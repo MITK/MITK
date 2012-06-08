@@ -46,9 +46,11 @@ public:
   QmitkMouseModeSwitcher* m_MouseModeToolbar;
   std::string m_FirstBackgroundColor;
   std::string m_SecondBackgroundColor;
+  bool m_MenuWidgetsEnabled;
   berry::IPartListener::Pointer m_PartListener;
 
   QHash<QString, QmitkRenderWindow*> m_RenderWindows;
+
 };
 
 struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
@@ -73,6 +75,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
       if (d->m_StdMultiWidget == stdMultiWidgetEditor->GetStdMultiWidget())
       {
         d->m_StdMultiWidget->RemovePlanesFromDataStorage();
+        stdMultiWidgetEditor->RequestActivateMenuWidget(false);
       }
     }
   }
@@ -86,6 +89,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
       if (d->m_StdMultiWidget == stdMultiWidgetEditor->GetStdMultiWidget())
       {
         d->m_StdMultiWidget->RemovePlanesFromDataStorage();
+        stdMultiWidgetEditor->RequestActivateMenuWidget(false);
       }
     }
   }
@@ -99,6 +103,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
       if (d->m_StdMultiWidget == stdMultiWidgetEditor->GetStdMultiWidget())
       {
         d->m_StdMultiWidget->AddPlanesToDataStorage();
+        stdMultiWidgetEditor->RequestActivateMenuWidget(true);
       }
     }
   }
@@ -111,6 +116,7 @@ private:
 
 QmitkStdMultiWidgetEditorPrivate::QmitkStdMultiWidgetEditorPrivate()
   : m_StdMultiWidget(0), m_MouseModeToolbar(0)
+  , m_MenuWidgetsEnabled(false)
   , m_PartListener(new QmitkStdMultiWidgetPartListener(this))
 {}
 
@@ -303,6 +309,9 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     d->m_StdMultiWidget->EnableNavigationControllerEventListening();
 
+    // Store the initial visibility status of the menu widget.
+    d->m_MenuWidgetsEnabled = d->m_StdMultiWidget->IsMenuWidgetEnabled();
+
     this->GetSite()->GetPage()->AddPartListener(d->m_PartListener);
 
     berry::IPreferences::Pointer prefs = this->GetPreferences();
@@ -404,3 +413,20 @@ void QmitkStdMultiWidgetEditor::SetFocus()
   if (d->m_StdMultiWidget != 0)
     d->m_StdMultiWidget->setFocus();
 }
+
+void QmitkStdMultiWidgetEditor::RequestActivateMenuWidget(bool on)
+{
+  if (d->m_StdMultiWidget)
+  {
+    if (on)
+    {
+      d->m_StdMultiWidget->ActivateMenuWidget(d->m_MenuWidgetsEnabled);
+    }
+    else
+    {
+      d->m_MenuWidgetsEnabled = d->m_StdMultiWidget->IsMenuWidgetEnabled();
+      d->m_StdMultiWidget->ActivateMenuWidget(false);
+    }
+  }
+}
+

@@ -144,6 +144,7 @@ class mitkTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
                                    bool& distanceImageSelected,
                                    bool& amplitudeImageSelected,
                                    bool& intensityImageSelected,
+                                   bool& rgbImageSelected,
                                    bool& rawDataSelected,
                                    QWidget *parent = 0,
                                    const QString &caption = QString(),

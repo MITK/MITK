@@ -115,7 +115,7 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
 
         int delta = 0;
 
-        delta = m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1];
+        delta = static_cast<int>(m_LastDisplayCoordinate[1]-posEvent->GetDisplayPosition()[1]);
 
         // if we moved less than 'm_IndexToSliceModifier' pixels slice ONE slice only
         if ( delta>0 && delta<m_IndexToSliceModifier )

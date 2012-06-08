@@ -1,5 +1,5 @@
-
-set(CPP_FILES
+SET(CPP_FILES
+  Qmitk/QmitkKinectParameterWidget.cpp
   Qmitk/QmitkToFConnectionWidget.cpp
   Qmitk/QmitkToFPointSetWidget.cpp
   Qmitk/QmitkToFRecorderWidget.cpp
@@ -8,7 +8,8 @@ set(CPP_FILES
   Qmitk/QmitkToFPMDParameterWidget.cpp
   Qmitk/QmitkToFMESAParameterWidget.cpp
 )
-set(UI_FILES
+SET(UI_FILES
+  Qmitk/QmitkKinectParameterWidgetControls.ui
   Qmitk/QmitkToFConnectionWidgetControls.ui
   Qmitk/QmitkToFPointSetWidgetControls.ui
   Qmitk/QmitkToFRecorderWidgetControls.ui
@@ -18,7 +19,8 @@ set(UI_FILES
   Qmitk/QmitkToFMESAParameterWidgetControls.ui
 )
 
-set(MOC_H_FILES
+SET(MOC_H_FILES
+  Qmitk/QmitkKinectParameterWidget.h
   Qmitk/QmitkToFConnectionWidget.h
   Qmitk/QmitkToFPointSetWidget.h
   Qmitk/QmitkToFRecorderWidget.h

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNodeFactory.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPropertyListDeserializer.h"
+#include "mitkProgressBar.h"
 #include "Poco/Path.h"
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
@@ -29,6 +30,15 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   bool error(false);
 
   // TODO prepare to detect errors (such as cycles) from wrongly written or edited xml files
+
+  //Get number of elements to initialze progress bar
+  unsigned int listSize = 0;
+  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
+  {
+    ++listSize;
+  }
+
+  ProgressBar::GetInstance()->AddStepsToDo( listSize ); 
 
   // iterate all nodes
   // first level nodes should be <node> elements
@@ -91,6 +101,9 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       MITK_ERROR << "Could not load properties for node.";
       error = true;
     }
+
+    ProgressBar::GetInstance()->Progress();
+
   } // end for all <node>
     
   // remove all unknown parent UIDs

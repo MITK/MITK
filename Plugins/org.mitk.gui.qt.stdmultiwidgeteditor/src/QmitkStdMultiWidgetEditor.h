@@ -46,6 +46,10 @@ public:
 
   QmitkStdMultiWidget* GetStdMultiWidget();
 
+  /// \brief If on=true will request the QmitkStdMultiWidget set the Menu widget to
+  /// whatever was the last known enabled state, and if on=false will turn the Menu widget off.
+  void RequestActivateMenuWidget(bool on);
+
   // -------------------  mitk::IRenderWindowPart  ----------------------
 
   /**

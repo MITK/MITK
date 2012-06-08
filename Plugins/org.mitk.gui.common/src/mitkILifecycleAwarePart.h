@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKILIFECYCLEAWAREPART_H
 #define MITKILIFECYCLEAWAREPART_H
 
+#include <org_mitk_gui_common_Export.h>
+
 
 namespace mitk {
 
@@ -36,9 +38,9 @@ namespace mitk {
  * \see berry::IPartListener
  * \see mitk::IZombieViewPart
  */
-struct ILifecycleAwarePart
+struct MITK_GUI_COMMON_PLUGIN ILifecycleAwarePart
 {
-  virtual ~ILifecycleAwarePart() {}
+  virtual ~ILifecycleAwarePart();
 
   /** \see berry::IPartListener::PartActivated */
   virtual void Activated() = 0;

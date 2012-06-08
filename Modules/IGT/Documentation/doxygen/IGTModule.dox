@@ -3,11 +3,20 @@
 
 \section IGTGeneralModulePageOverview Overview
 
-These modules for image guided therapy contain functionalities for the tracking for instruments and the subsequent rendering of these instruments within MITK.
+The module IGT integrates image guided therapy (IGT) functionality to MITK. The main features of MITK-IGT are: 
+<ul>
+  <li> handling and processing of medical imaging data which is available through MITK itself 
+  <li> support of tracking devices 
+  <li> a concept for processing tracking data
+</ul>
 
-\section IGTGeneralModulePageModuleList List of IGT Modules
+MITK-IGT consists of two layers for hardware control (Tracking Layer) and processing of tracking data (Navigation Layer). Additionally it offers components for rapid development of graphical user interfaces (GUIs) of navigation applications. To seperate UI functionality from the rest of the code UI classes are encapsulated in the seperate module IGT-UI.
 
-  \li \subpage org_mitk_gui_qt_igtnavigation
-  \li \subpage org_mitk_gui_qt_igttracking
+\section IGTGeneralModulePageModuleList List of IGT Plugins
+
+There are also a few ready-to-use sample applications available as MITK-Plugins:
+
   \li \subpage org_mitk_gui_qt_igtexample
+  \li \subpage org_mitk_gui_qt_igttracking
+  
 */

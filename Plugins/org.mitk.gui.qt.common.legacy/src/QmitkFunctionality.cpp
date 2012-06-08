@@ -249,14 +249,13 @@ void QmitkFunctionality::DataStorageChanged()
 QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget( bool reCreateWidget )
 {
   QmitkStdMultiWidget* activeStdMultiWidget = 0;
+
   berry::IEditorPart::Pointer editor =
     this->GetSite()->GetPage()->GetActiveEditor();
 
-  if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
-  {
-    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
-  }
-  else if (reCreateWidget)
+  if (reCreateWidget
+      || editor.Cast<QmitkStdMultiWidgetEditor>().IsNull()
+     )
   {
     mitk::IDataStorageService::Pointer service =
       berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
@@ -264,7 +263,11 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget( bool reCreateW
     mitk::DataStorageEditorInput::Pointer editorInput;
     editorInput = new mitk::DataStorageEditorInput( service->GetActiveDataStorage() );
     // open a new multi-widget editor, but do not give it the focus
-    berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false);
+    berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false, berry::IWorkbenchPage::MATCH_ID);
+    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+  }
+  else if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
+  {
     activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
   }
 

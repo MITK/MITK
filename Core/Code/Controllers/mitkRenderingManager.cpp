@@ -68,9 +68,12 @@ RenderingManager
 
     RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(*it);
 
-    (*it)->RemoveObserver(callbacks_it->second.commands[0u]);
-    (*it)->RemoveObserver(callbacks_it->second.commands[1u]);
-    (*it)->RemoveObserver(callbacks_it->second.commands[2u]);
+    if (callbacks_it != this->m_RenderWindowCallbacksList.end())
+    {
+      (*it)->RemoveObserver(callbacks_it->second.commands[0u]);
+      (*it)->RemoveObserver(callbacks_it->second.commands[1u]);
+      (*it)->RemoveObserver(callbacks_it->second.commands[2u]);
+    }
   }
 }
 
@@ -202,17 +205,22 @@ RenderingManager
   if (m_RenderWindowList.erase( renderWindow ))
   {
     RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
-
-    renderWindow->RemoveObserver(callbacks_it->second.commands[0u]);
-    renderWindow->RemoveObserver(callbacks_it->second.commands[1u]);
-    renderWindow->RemoveObserver(callbacks_it->second.commands[2u]);
-    this->m_RenderWindowCallbacksList.erase(callbacks_it);
+    if(callbacks_it != this->m_RenderWindowCallbacksList.end())
+    {
+      renderWindow->RemoveObserver(callbacks_it->second.commands[0u]);
+      renderWindow->RemoveObserver(callbacks_it->second.commands[1u]);
+      renderWindow->RemoveObserver(callbacks_it->second.commands[2u]);
+      this->m_RenderWindowCallbacksList.erase(callbacks_it);
+    }
 
     RenderWindowVector::iterator rw_it = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
 
-    // Decrease reference count for proper destruction
-    (*rw_it)->UnRegister(NULL);
-    m_AllRenderWindows.erase( rw_it );
+    if(rw_it != m_AllRenderWindows.end())
+    {
+      // Decrease reference count for proper destruction
+      (*rw_it)->UnRegister(NULL);
+      m_AllRenderWindows.erase( rw_it );
+    }
   }
 }
 

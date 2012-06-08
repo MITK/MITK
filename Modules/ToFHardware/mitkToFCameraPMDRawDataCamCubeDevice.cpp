@@ -72,7 +72,7 @@ namespace mitk
     ToFCameraPMDCamCubeController::Pointer myController = dynamic_cast<mitk::ToFCameraPMDCamCubeController*>(this->m_Controller.GetPointer());
 
     bool boolValue = false;
-    GetBoolProperty(propertyValue, boolValue);
+    GetBoolProperty(propertyKey, boolValue);
     if (strcmp(propertyKey, "SetFPNCalibration") == 0)
     {
       myController->SetFPNCalibration(boolValue);

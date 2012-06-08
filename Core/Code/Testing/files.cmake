@@ -1,3 +1,4 @@
+
 # tests with no extra command line parameter
 set(MODULE_TESTS
   mitkAccessByItkTest.cpp
@@ -57,6 +58,7 @@ set(MODULE_TESTS
   mitkClippedSurfaceBoundsCalculatorTest.cpp
   #QmitkRenderingTestHelper.cpp
   mitkExceptionTest.cpp
+  mitkExtractSliceFilterTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -95,6 +97,9 @@ set(MODULE_CUSTOM_TESTS
     mitkImageTest.cpp
     mitkImageWriterTest.cpp
     mitkImageVtkMapper2DTest.cpp
+    mitkImageVtkMapper2DLevelWindowTest.cpp
+    mitkImageVtkMapper2DOpacityTest.cpp
+    mitkImageVtkMapper2DColorTest.cpp
 )
 
 # Create an artificial module initializing class for

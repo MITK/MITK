@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk includes
 #include "mitkImageDataItem.h"
+#include <mitkImageStatisticsHolder.h>
 
 #include "vtkSmartPointer.h"
 #include "vtkColorTransferFunction.h"
@@ -164,8 +165,8 @@ namespace mitk
     floatArrayInt = vtkFloatArray::New();
     floatArrayInt->Initialize();
     floatArrayInt->SetArray(floatData, numOfPixel, 0);
-    mitk::ScalarType min = mitkImage->GetScalarValueMin();
-    mitk::ScalarType max = mitkImage->GetScalarValueMaxNoRecompute();
+    mitk::ScalarType min = mitkImage->GetStatistics()->GetScalarValueMin();
+    mitk::ScalarType max = mitkImage->GetStatistics()->GetScalarValueMaxNoRecompute();
     MITK_INFO<<"Minimum: "<<min;
     MITK_INFO<<"Maximum: "<<max;
     colorTransferFunction->RemoveAllPoints();

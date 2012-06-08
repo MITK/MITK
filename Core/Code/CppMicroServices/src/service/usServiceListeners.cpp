@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "usUtils.h"
+#include "usUtils_p.h"
 
 #include "usServiceListeners_p.h"
 #include "usServiceReferencePrivate.h"
@@ -163,11 +163,11 @@ void ServiceListeners::ServiceChanged(const ServiceListenerEntries& receivers,
       }
       catch (...)
       {
-        US_ERROR << "Service listener"
+        US_WARN << "Service listener"
             #ifdef US_MODULE_SUPPORT_ENABLED
-                 << " in " << l->GetModule()->GetName()
+                << " in " << l->GetModule()->GetName()
             #endif
-                 << " threw an exception!";
+                << " threw an exception!";
       }
     }
   }

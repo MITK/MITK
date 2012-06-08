@@ -59,6 +59,8 @@ void mitk::PaintbrushTool::Deactivated()
   if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
       m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
   Superclass::Deactivated();
+  m_WorkingSlice = NULL;
+  m_CurrentPlane = NULL;
 }
 
 void mitk::PaintbrushTool::SetSize(int value)
@@ -221,15 +223,13 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   }
 
   static Point3D lastPos; // uninitialized: if somebody finds out how this can be initialized in a one-liner, tell me
-  static bool lastLeftMouseButtonPressed(false);
   if ( fabs(indexCoordinates[0] - lastPos[0]) > mitk::eps ||
        fabs(indexCoordinates[1] - lastPos[1]) > mitk::eps ||
        fabs(indexCoordinates[2] - lastPos[2]) > mitk::eps ||
-       leftMouseButtonPressed != lastLeftMouseButtonPressed
+       leftMouseButtonPressed
      )
   {
     lastPos = indexCoordinates;
-    lastLeftMouseButtonPressed = leftMouseButtonPressed;
   }
   else
   {
@@ -241,13 +241,13 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
   Contour::Pointer contour = Contour::New();
   contour->Initialize();
+
   for (unsigned int index = 0; index < m_MasterContour->GetNumberOfPoints(); ++index)
   {
     Point3D point = m_MasterContour->GetPoints()->ElementAt(index);
     point[0] += indexCoordinates[ 0 ];
     point[1] += indexCoordinates[ 1 ];
 
-    MITK_DEBUG << "Contour point [" << index << "] :" << point;
     contour->AddVertex( point );
   }
   

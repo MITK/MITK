@@ -36,23 +36,22 @@ set(_srcs
 )
 
 set(_private_headers
-  util/usAtomicInt.h
-  util/usExportMacros.h
-  util/usFunctor.h
-  util/usStaticInit.h
-  util/usThreads.h
-  util/usUtils.h
+  util/usAtomicInt_p.h
+  util/usFunctor_p.h
+  util/usStaticInit_p.h
+  util/usThreads_p.h
+  util/usUtils_p.h
   
   service/usServiceTracker.tpp
   service/usServiceTrackerPrivate.h
   service/usServiceTrackerPrivate.tpp
-  service/usTrackedService.h
-  service/usTrackedServiceListener.h
+  service/usTrackedService_p.h
+  service/usTrackedServiceListener_p.h
   service/usTrackedService.tpp
   
-  module/usModuleAbstractTracked.h
+  module/usModuleAbstractTracked_p.h
   module/usModuleAbstractTracked.tpp
-  module/usModuleUtils.h
+  module/usModuleUtils_p.h
 )
 
 set(_public_headers
@@ -75,17 +74,13 @@ set(_public_headers
   module/usModuleContext.h
   module/usModuleEvent.h
   module/usModuleInfo.h
+  module/usModuleInitialization.h
   module/usModuleRegistry.h
-  module/usModuleUtils.h
   module/usModuleVersion.h
 )
 
 if(_us_baseclass_default)
   list(APPEND _public_headers util/usBase.h)
-endif()
-
-if(US_ENABLE_THREADING_SUPPORT)
-  list(APPEND _public_headers util/usThreads.h)
 endif()
 
 if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
@@ -146,7 +141,7 @@ foreach(_header ${_public_headers} ${_private_headers})
 endforeach()
 
 if(NOT US_IS_EMBEDDED)
-  set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER ${US_PUBLIC_HEADERS})
+  set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER ${US_PUBLIC_HEADERS} ${us_config_h_file})
   set_property(TARGET ${PROJECT_NAME} PROPERTY PRIVATE_HEADER ${_private_headers})
 else()
   set(US_PUBLIC_HEADERS ${US_PUBLIC_HEADERS} PARENT_SCOPE)

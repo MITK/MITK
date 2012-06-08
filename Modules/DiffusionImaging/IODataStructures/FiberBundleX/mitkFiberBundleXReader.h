@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFileReader.h>
 #include <mitkFiberBundleX.h>
 #include <vtkSmartPointer.h>
+#include <MitkDiffusionImagingExports.h>
 
 namespace mitk
 {
@@ -28,7 +29,7 @@ namespace mitk
   /** \brief
   */
 
-  class FiberBundleXReader : public FileReader, public BaseProcess
+  class MitkDiffusionImaging_EXPORT FiberBundleXReader : public FileReader, public BaseProcess
   {
   public:
 

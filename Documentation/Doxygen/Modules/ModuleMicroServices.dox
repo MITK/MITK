@@ -8,6 +8,13 @@
 
 /**
 
+\addtogroup MicroServicesUtils
+\ingroup Core
+
+*/
+
+/**
+
 \defgroup MicroServices_Interfaces Micro Services Interfaces
 \ingroup Core
 

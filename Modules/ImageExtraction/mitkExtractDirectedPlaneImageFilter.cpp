@@ -14,16 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkExtractDirectedPlaneImageFilter.h"
 #include "mitkAbstractTransformGeometry.h"
 //#include "mitkImageMapperGL2D.h"
+
+#include <mitkProperties.h>
+#include <mitkDataNode.h>
+#include <mitkDataNodeFactory.h>
+#include <mitkResliceMethodProperty.h>
+#include "vtkMitkThickSlicesFilter.h"
 
 #include <vtkTransform.h>
 #include <vtkGeneralTransform.h>
 #include <vtkImageData.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkPoints.h>
+#include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 
 #include "pic2vtk.h"
 
@@ -33,13 +40,17 @@ mitk::ExtractDirectedPlaneImageFilter::ExtractDirectedPlaneImageFilter()
 : m_WorldGeometry(NULL)
 {
   m_Reslicer = vtkImageReslice::New();
+  
   m_TargetTimestep = 0;
-  m_InPlaneResampleExtentByGeometry = false;
+  m_InPlaneResampleExtentByGeometry = true;
+  m_ResliceInterpolationProperty = NULL;//VtkResliceInterpolationProperty::New(); //TODO initial with value
+    m_ThickSlicesMode = 0;
+  m_ThickSlicesNum = 1;
 }
 
 mitk::ExtractDirectedPlaneImageFilter::~ExtractDirectedPlaneImageFilter()
 {
-  m_WorldGeometry = NULL;
+  if(m_ResliceInterpolationProperty!=NULL)m_ResliceInterpolationProperty->Delete();
   m_Reslicer->Delete();
 }
 
@@ -376,13 +387,13 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
 void mitk::ExtractDirectedPlaneImageFilter::GenerateOutputInformation()
 {
-  Superclass::GenerateOutputInformation();
+  Superclass::GenerateOutputInformation(); 
 }
 
 
 bool mitk::ExtractDirectedPlaneImageFilter
 ::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
-                              const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+                const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
   // Clip the plane with the bounding geometry. To do so, the corner points 
   // of the bounding box are transformed by the inverse transformation 
@@ -474,7 +485,7 @@ bool mitk::ExtractDirectedPlaneImageFilter
 
 bool mitk::ExtractDirectedPlaneImageFilter
 ::LineIntersectZero( vtkPoints *points, int p1, int p2,
-                    vtkFloatingPointType *bounds )
+          vtkFloatingPointType *bounds )
 {
   vtkFloatingPointType point1[3];
   vtkFloatingPointType point2[3];

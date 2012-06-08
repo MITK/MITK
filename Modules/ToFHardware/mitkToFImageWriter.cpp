@@ -22,9 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   ToFImageWriter::ToFImageWriter():m_Extension(".nrrd"),
-    m_DistanceImageFileName(), m_AmplitudeImageFileName(), m_IntensityImageFileName(),
+    m_DistanceImageFileName(), m_AmplitudeImageFileName(), m_IntensityImageFileName(), m_RGBImageFileName(),
     m_NumOfFrames(0), m_DistanceImageSelected(true), m_AmplitudeImageSelected(true),
-    m_IntensityImageSelected(true),m_CaptureWidth(200),m_CaptureHeight(200), 
+    m_IntensityImageSelected(true), m_RGBImageSelected(true), m_CaptureWidth(200),m_CaptureHeight(200),
     m_PixelNumber(0), m_ImageSizeInBytes(0), 
     m_ToFImageType(ToFImageWriter::ToFImageType3D)
   {

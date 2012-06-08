@@ -90,10 +90,10 @@ public:
 int mitkUSPipelineTest(int  argc , char* argv[])
 {
   MITK_TEST_BEGIN("mitkUSPipelineTest");
-    // Removed Until Fix for Linux / Mac is available
-    // mitkUSPipelineTestClass::TestPipelineUS(argv[1]);
-    
-    
+
+  #ifdef WIN32 // Video file compression is currently only supported under windows.
+    mitkUSPipelineTestClass::TestPipelineUS(argv[1]);
+  #endif    
 
   MITK_TEST_END();
 }

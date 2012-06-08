@@ -181,7 +181,7 @@ ServiceReference ServiceRegistry::Get(ModulePrivate* module, const std::string& 
   {
     std::list<ServiceReference> srs;
     Get_unlocked(clazz, "", module, srs);
-    US_INFO << "get service ref " << clazz << " for module "
+    US_DEBUG << "get service ref " << clazz << " for module "
              << module->info.name << " = " << srs.size() << " refs";
 
     if (!srs.empty())
@@ -292,7 +292,7 @@ void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistration& sr)
     std::list<ServiceRegistration>& s = classServices[*i];
     if (s.size() > 1)
     {
-      std::remove(s.begin(), s.end(), sr);
+      s.erase(std::remove(s.begin(), s.end(), sr), s.end());
     }
     else
     {

@@ -20,6 +20,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkModuleActivator.h>
 
+void HandleMicroServicesMessages(mitk::MsgType type, const char* msg)
+{
+  switch (type)
+  {
+  case mitk::DebugMsg:
+    MITK_DEBUG << msg;
+    break;
+  case mitk::InfoMsg:
+    MITK_INFO << msg;
+    break;
+  case mitk::WarningMsg:
+    MITK_WARN << msg;
+    break;
+  case mitk::ErrorMsg:
+    MITK_ERROR << msg;
+    break;
+  }
+}
+
 /*
  * This is the module activator for the "Mitk" module. It registers core services
  * like ...
@@ -30,6 +49,9 @@ public:
 
   void Load(mitk::ModuleContext* context)
   {
+    // Handle messages from CppMicroServices
+    mitk::installMsgHandler(HandleMicroServicesMessages);
+
     //m_RenderingManager = mitk::RenderingManager::New();
     //context->RegisterService<mitk::RenderingManager>(renderingManager.GetPointer());
     m_PlanePositionManager = mitk::PlanePositionManagerService::New();

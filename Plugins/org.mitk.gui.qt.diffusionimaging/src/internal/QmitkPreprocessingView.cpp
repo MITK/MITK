@@ -52,7 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTableWidget>
 
 const std::string QmitkPreprocessingView::VIEW_ID =
-"org.mitk.views.preprocessing";
+    "org.mitk.views.preprocessing";
 
 #define DI_INFO MITK_INFO("DiffusionImaging")
 
@@ -61,10 +61,10 @@ typedef float TTensorPixelType;
 
 
 QmitkPreprocessingView::QmitkPreprocessingView()
-: QmitkFunctionality(),
-m_Controls(NULL),
-m_MultiWidget(NULL),
-m_DiffusionImage(NULL)
+  : QmitkFunctionality(),
+    m_Controls(NULL),
+    m_MultiWidget(NULL),
+    m_DiffusionImage(NULL)
 {
 }
 
@@ -160,12 +160,25 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
         item->setText(QString::number(mf.get(r,c)));
         m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
       }
-    m_Controls->m_GradientsLabel->setText(QString::number(m_DiffusionImage->GetNumDirections()));
 
-    if (m_DiffusionImage->IsMultiBval())
-      m_Controls->m_BvalLabel->setText("Acquisition with multiple b-values!");
-    else
-      m_Controls->m_BvalLabel->setText(QString::number(m_DiffusionImage->GetB_Value()));
+    typedef mitk::DiffusionImage<short*>::BValueMap BValueMap;
+    typedef mitk::DiffusionImage<short*>::BValueMap::iterator BValueMapIterator;
+
+    BValueMap bValMap =  m_DiffusionImage->GetB_ValueMap();
+    BValueMapIterator it = bValMap.begin();
+    m_Controls->m_BvalueTable->clear();
+    m_Controls->m_BvalueTable->setRowCount(bValMap.size() );
+    QStringList headerList;
+    headerList << "b-Value" << "Number of gradients";
+    m_Controls->m_BvalueTable->setHorizontalHeaderLabels(headerList);
+    int i = 0 ;
+    for(;it != bValMap.end(); it++)
+    {
+      m_Controls->m_BvalueTable->setItem(i,0,new QTableWidgetItem(QString::number(it->first)));
+      m_Controls->m_BvalueTable->setItem(i,1,new QTableWidgetItem(QString::number(it->second.size())));
+      i++;
+    }
+
   }
   else
   {
@@ -177,8 +190,13 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
         item = new QTableWidgetItem();
         m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
       }
-    m_Controls->m_GradientsLabel->setText("-");
-    m_Controls->m_BvalLabel->setText("-");
+    m_Controls->m_BvalueTable->clear();
+    m_Controls->m_BvalueTable->setRowCount(1);
+    QStringList headerList;
+    headerList << "b-Value" << "Number of gradients";
+    m_Controls->m_BvalueTable->setHorizontalHeaderLabels(headerList);
+    m_Controls->m_BvalueTable->setItem(0,0,new QTableWidgetItem("-"));
+    m_Controls->m_BvalueTable->setItem(0,1,new QTableWidgetItem("-"));
     m_Controls->m_DiffusionImageLabel->setText("-");
   }
 }
@@ -300,8 +318,8 @@ void QmitkPreprocessingView::ExtractB0()
   {
 
     DiffusionImageType* vols =
-      static_cast<DiffusionImageType*>(
-      (*itemiter)->GetData());
+        static_cast<DiffusionImageType*>(
+          (*itemiter)->GetData());
 
     std::string nodename;
     (*itemiter)->GetStringProperty("name", nodename);
@@ -346,8 +364,8 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
   while ( itemiter != itemiterend ) // for all items
   {
     DiffusionImageType* vols =
-      static_cast<DiffusionImageType*>(
-      (*itemiter)->GetData());
+        static_cast<DiffusionImageType*>(
+          (*itemiter)->GetData());
 
     std::string nodename;
     (*itemiter)->GetStringProperty("name", nodename);
@@ -360,7 +378,7 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
 
     mitk::Image::Pointer mitkImage = mitk::Image::New();
     mitkImage->InitializeByItk( filter->GetOutput() );
-    mitkImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
     mitk::DataNode::Pointer node=mitk::DataNode::New();
     node->SetData( mitkImage );
     node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0_ALL"));
@@ -385,8 +403,8 @@ void QmitkPreprocessingView::AverageGradients()
   {
 
     mitk::DiffusionImage<DiffusionPixelType>* vols =
-      static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
-      (*itemiter)->GetData());
+        static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
+          (*itemiter)->GetData());
 
     vols->AverageRedundantGradients(m_Controls->m_Blur->value());
 
@@ -406,8 +424,8 @@ void QmitkPreprocessingView::BrainMask()
   {
 
     mitk::DiffusionImage<DiffusionPixelType>* vols =
-      static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
-      (*itemiter)->GetData());
+        static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
+          (*itemiter)->GetData());
 
     std::string nodename;
     (*itemiter)->GetStringProperty("name", nodename);

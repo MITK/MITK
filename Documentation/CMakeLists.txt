@@ -127,8 +127,7 @@ if(MITK_USE_BLUEBERRY)
   if(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
 
     list(APPEND MITK_XP_GLOB_EXPRESSIONS
-         ${MITK_SOURCE_DIR}/CoreUI/Bundles/plugin.xml
-         ${MITK_SOURCE_DIR}/Modules/Bundles/plugin.xml)
+         ${MITK_SOURCE_DIR}/Plugins/plugin.xml)
 
     file(GLOB_RECURSE _plugin_xmls ${MITK_XP_GLOB_EXPRESSIONS})
                       

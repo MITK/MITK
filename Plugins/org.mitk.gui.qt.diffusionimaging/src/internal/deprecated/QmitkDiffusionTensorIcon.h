@@ -1,3 +1,18 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 #ifndef _QEMBED_1804289383
 #define _QEMBED_1804289383
 #include <qimage.h>
@@ -68,25 +83,25 @@ static const QImage& qembed_findImage( const QString& name )
     static QDict<QImage> dict;
     QImage* img = dict.find( name );
     if ( !img ) {
-	for ( int i = 0; embed_image_vec[i].data; i++ ) {
-	    if ( strcmp(embed_image_vec[i].name, name.latin1()) == 0 ) {
-		img = new QImage((uchar*)embed_image_vec[i].data,
-			    embed_image_vec[i].width,
-			    embed_image_vec[i].height,
-			    embed_image_vec[i].depth,
-			    (QRgb*)embed_image_vec[i].colorTable,
-			    embed_image_vec[i].numColors,
-			    QImage::BigEndian );
-		if ( embed_image_vec[i].alpha )
-		    img->setAlphaBuffer( TRUE );
-		dict.insert( name, img );
-		break;
-	    }
-	}
-	if ( !img ) {
-	    static QImage dummy;
-	    return dummy;
-	}
+  for ( int i = 0; embed_image_vec[i].data; i++ ) {
+      if ( strcmp(embed_image_vec[i].name, name.latin1()) == 0 ) {
+    img = new QImage((uchar*)embed_image_vec[i].data,
+          embed_image_vec[i].width,
+          embed_image_vec[i].height,
+          embed_image_vec[i].depth,
+          (QRgb*)embed_image_vec[i].colorTable,
+          embed_image_vec[i].numColors,
+          QImage::BigEndian );
+    if ( embed_image_vec[i].alpha )
+        img->setAlphaBuffer( TRUE );
+    dict.insert( name, img );
+    break;
+      }
+  }
+  if ( !img ) {
+      static QImage dummy;
+      return dummy;
+  }
     }
     return *img;
 }

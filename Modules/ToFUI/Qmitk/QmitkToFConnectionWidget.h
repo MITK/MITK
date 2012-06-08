@@ -84,7 +84,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     /*!
     \brief slot updating the GUI elements after the selection of the camera combo box has changed
     */
-    void OnSelectCamera(const QString selectedText);
+    void OnSelectCamera(const QString selectedCamera);
 
   protected:
 
@@ -99,11 +99,6 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 
     void ShowParameterWidget();
 
-    void ShowPMDParameterWidget();
-
-    void ShowMESAParameterWidget();
-
-    void ShowPlayerParameterWidget();
 };
 
 #endif // _QMITKTOFCONNECTIONWIDGET_H_INCLUDED

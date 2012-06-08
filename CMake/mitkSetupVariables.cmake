@@ -24,7 +24,12 @@ if(NOT UNIX AND NOT MINGW)
 endif()
 
 # build the MITK_INCLUDE_DIRS variable
-set(MITK_INCLUDE_DIRS ${PROJECT_BINARY_DIR})
+set(MITK_INCLUDE_DIRS
+    ${ITK_INCLUDE_DIRS}
+    ${VTK_INCLUDE_DIRS}
+    ${PROJECT_BINARY_DIR} # contains mitkConfig.h and similar files
+    ${MODULES_CONF_DIRS} # contains module *Exports.h files
+   )
 set(CORE_DIRECTORIES Common DataManagement Algorithms IO Rendering Interactions Controllers Service)
 foreach(d ${CORE_DIRECTORIES})
   list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/Core/Code/${d})
@@ -103,17 +108,12 @@ if(MITK_USE_QT)
 
   set(QMITK_INCLUDE_DIRS 
       ${MITK_INCLUDE_DIRS}
-      ${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/Qmitk
-      ${PROJECT_BINARY_DIR}/CoreUI/Qmitk
+      ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Qmitk
+      ${PROJECT_BINARY_DIR}/Modules/Qmitk
      )
-     
-  foreach(d QmitkApplicationBase QmitkModels QmitkPropertyObservers) 
-    list(APPEND QMITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/Qmitk/${d})
-  endforeach()
-  list(APPEND QMITK_INCLUDE_DIRS ${QWT_INCLUDE_DIR})
   
-  set(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES} ${QT_LIBRARIES})
-  set(QMITK_LINK_DIRECTORIES ${MITK_LINK_DIRECTORIES} ${QT_LIBRARY_DIR})
+  set(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES})
+  set(QMITK_LINK_DIRECTORIES ${MITK_LINK_DIRECTORIES})
 endif()
 
 if(MITK_BUILD_ALL_PLUGINS)

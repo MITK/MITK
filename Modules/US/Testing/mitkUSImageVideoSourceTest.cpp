@@ -68,8 +68,13 @@ int mitkUSImageVideoSourceTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkUSImageVideoSourceTest");
 
   mitkUSImageVideoSourceTestClass::TestInstantiation();
-  // Removed Until Fix for Linux / Mac is available
-  //mitkUSImageVideoSourceTestClass::TestOpenVideoFile(argv[1]);
+
+  #ifdef WIN32 // Video file compression is currently only supported under windows.
+  mitkUSImageVideoSourceTestClass::TestOpenVideoFile(argv[1]);
+  #endif
+  
+  // This test is commented out since no videodevcie ist steadily connected to the dart clients.
+  // Functionality should sufficiently be tested through TestOpenVideoFile anyway
   //mitkUSImageVideoSourceTestClass::TestOpenDevice();
 
   MITK_TEST_END();

@@ -74,7 +74,7 @@ bool mitk::PositionTracker::ExecuteAction(Action* /*action*/, mitk::StateEvent c
   }
   else
   {
-    mitk::PointSet::PointDataType pointData = {position , false /*selected*/, mitk::PTUNDEFINED};
+    mitk::PointSet::PointDataType pointData = {static_cast<unsigned int>(position) , false /*selected*/, mitk::PTUNDEFINED};
     ps->GetPointSet()->GetPointData()->InsertElement(position, pointData);
     ps->GetPointSet()->GetPoints()->InsertElement(position, displayPositionEvent->GetWorldPosition());
   }

@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifdef WIN32
 #include "process.h"
+#else
+#include <unistd.h>
 #endif
 
 std::string AppendExtension(const std::string &filename, const char *extension)

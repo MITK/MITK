@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 struct QmitkMeasurementViewData
 {
   QmitkMeasurementViewData()
-    : m_LineCounter(0)
+    : m_LineCounter(0), m_AngleCounter(0)
   {
   }
 
@@ -63,6 +63,7 @@ struct QmitkMeasurementViewData
 
   mitk::WeakPointer<mitk::DataNode> m_SelectedImageNode;
   int m_LineCounter;
+  int m_AngleCounter;
   QList<mitk::WeakPointer<mitk::DataNode> > m_SelectedPlanarFigures;
 };
 
@@ -333,6 +334,9 @@ void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
 
 void QmitkMeasurementView::ActionDrawAngleTriggered(bool checked)
 {
+  mitk::PlanarAngle::Pointer figure = mitk::PlanarAngle::New();
+  QString qString = QString("Angle%1").arg(++d->m_AngleCounter);
+  this->AddFigureToDataStorage(figure, qString);
 }
 
 void QmitkMeasurementView::ActionDrawFourPointAngleTriggered(bool checked)

@@ -171,13 +171,36 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     QStringList headerList;
     headerList << "b-Value" << "Number of gradients";
     m_Controls->m_BvalueTable->setHorizontalHeaderLabels(headerList);
+
+
+    QCheckBox * tmp;
+
+    foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
+    {
+      m_Controls->m_ReduceSizeLayout->layout()->removeWidget(box);
+      delete box;
+    }
+
+     m_ReduceGradientCheckboxes.clear();
+
     int i = 0 ;
     for(;it != bValMap.end(); it++)
     {
       m_Controls->m_BvalueTable->setItem(i,0,new QTableWidgetItem(QString::number(it->first)));
       m_Controls->m_BvalueTable->setItem(i,1,new QTableWidgetItem(QString::number(it->second.size())));
+
+      // Reduce Gradients GUI adaption
+      if(it->first != 0 && bValMap.size() > 2){
+        tmp = new QCheckBox(QString::number(it->first) + " with " + QString::number(it->second.size()) + " directions");
+        tmp->setEnabled(true);
+        tmp->setChecked(true);
+        tmp->setCheckable(true);
+        m_ReduceGradientCheckboxes.push_back(tmp);
+        m_Controls->m_ReduceSizeLayout->layout()->addWidget(tmp);
+      }
       i++;
     }
+
 
   }
   else
@@ -198,6 +221,13 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_BvalueTable->setItem(0,0,new QTableWidgetItem("-"));
     m_Controls->m_BvalueTable->setItem(0,1,new QTableWidgetItem("-"));
     m_Controls->m_DiffusionImageLabel->setText("-");
+
+    foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
+    {
+      m_Controls->m_ReduceSizeLayout->layout()->removeWidget(box);
+      delete box;
+    }
+     m_ReduceGradientCheckboxes.clear();
   }
 }
 

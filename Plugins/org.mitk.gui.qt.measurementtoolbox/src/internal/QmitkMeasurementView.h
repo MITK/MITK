@@ -77,7 +77,7 @@ class QmitkMeasurementView : public QmitkAbstractView, public mitk::ILifecycleAw
     void SetFocus();
 
     virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, 
-    const QList<mitk::DataNode::Pointer> &nodes);
+      const QList<mitk::DataNode::Pointer> &nodes);
 
     void NodeAdded(const mitk::DataNode* node);
     void NodeChanged(const mitk::DataNode* node);
@@ -104,7 +104,11 @@ class QmitkMeasurementView : public QmitkAbstractView, public mitk::ILifecycleAw
   private:
     void CheckSelection();
     void CreateConnections();
-    void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);    
+    void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
+    void SetText();
+    void AddAllInteractors();
+    void RemoveAllInteractors();
+
     QmitkMeasurementViewData* d;
 };
 

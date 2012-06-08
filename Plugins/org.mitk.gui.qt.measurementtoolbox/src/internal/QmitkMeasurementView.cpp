@@ -74,6 +74,7 @@ QmitkMeasurementView::QmitkMeasurementView()
 }
 QmitkMeasurementView::~QmitkMeasurementView()
 {
+  this->RemoveAllInteractors();
   delete d;
 }
 void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
@@ -159,6 +160,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 
   this->CreateConnections();
   this->CheckSelection();
+  this->AddAllInteractors();
 }
 void QmitkMeasurementView::CreateConnections()
 {
@@ -184,12 +186,65 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
 {
   // add observer for selection in renderwindow
   mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+  if( figure )
+  {
+    MITK_INFO << "figure added. will add interactor now.";
+    mitk::PlanarFigureInteractor::Pointer figureInteractor
+        = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+
+    mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
+    if(figureInteractor.IsNull())
+      figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", nonConstNode);
+
+    MITK_INFO << "adding interactor to globalinteraction";
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+  }
 }
+
 void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
 {
+  // DETERMINE IF WE HAVE TO RENEW OUR DETAILS TEXT (ANY NODE CHANGED IN OUR SELECTION?)
+  bool renewText = false;
+  if( node == d->m_SelectedImageNode )
+    renewText = true;
+  else
+  {
+    for( int i=0; i < d->m_SelectedPlanarFigures.size(); ++i )
+    {
+      if( node == d->m_SelectedPlanarFigures.at(i) )
+      {
+        renewText = true;
+        break;
+      }
+    }
+  }
+
+  if(renewText)
+  {
+    MITK_INFO << "Selected nodes changed. Refreshing text.";
+    this->SetText();
+  }
 }
+
 void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
 {
+  if( node == d->m_SelectedImageNode )
+  {
+    d->m_SelectedImageLabel->setText("");
+    MITK_INFO << "disabling toolbar";
+    d->m_DrawActionsToolBar->setEnabled(false);
+  }
+  else
+  {
+    mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+    if( figure )
+    {
+      MITK_INFO << "removing figure interactor to globalinteraction";
+      mitk::Interactor::Pointer oldInteractor = node->GetInteractor();
+      if(oldInteractor.IsNotNull())
+        mitk::GlobalInteraction::GetInstance()->RemoveInteractor(oldInteractor);
+    }
+  }
 }
 
 void QmitkMeasurementView::SetFocus()
@@ -218,24 +273,14 @@ void QmitkMeasurementView::Hidden()
 
 }
 void QmitkMeasurementView::CheckSelection()
-{  
-  // for all currently selected planar figures: remove interactors, clear detail text
+{
+  // find currently selected image, find selected planar figures
+  QList<mitk::DataNode::Pointer> selection = this->GetDataManagerSelection();
   mitk::DataNode* currentNode = 0;
-  for( int i=0; i < d->m_SelectedPlanarFigures.size(); ++i )
-  {
-    currentNode = d->m_SelectedPlanarFigures.at(i).GetPointer();
 
-    mitk::PlanarFigureInteractor* figureInteractor 
-      = dynamic_cast<mitk::PlanarFigureInteractor*>(currentNode->GetInteractor());
-
-    if(figureInteractor)
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
-  }
   // clear current selection
   d->m_SelectedPlanarFigures.clear();
 
-  // find currently selected image, find selected planar figure
-  QList<mitk::DataNode::Pointer> selection = this->GetDataManagerSelection();
   mitk::DataNode* firstImageDataNode = 0;
   for( int i=0; i < selection.size(); ++i )
   {
@@ -256,15 +301,6 @@ void QmitkMeasurementView::CheckSelection()
     {
       // current figure found: add it to the selection
       d->m_SelectedPlanarFigures.push_back( currentNode );
-
-      // add interactor if needed
-      mitk::PlanarFigureInteractor::Pointer figureInteractor
-        = dynamic_cast<mitk::PlanarFigureInteractor*>(currentNode->GetInteractor());
-
-      if(figureInteractor.IsNull())
-        figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", currentNode);
-
-      mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
     }
   }
 
@@ -276,7 +312,11 @@ void QmitkMeasurementView::CheckSelection()
   }
 
   // enable toolbar only when an image is selected
+  MITK_INFO << "enable/disable m_DrawActionsToolBar. m_SelectedImageNode is null:" << d->m_SelectedImageNode.IsNull();
   d->m_DrawActionsToolBar->setEnabled(d->m_SelectedImageNode.IsNotNull());
+
+  // renew text
+  this->SetText();
   this->RequestRenderWindowUpdate();
 }
 
@@ -329,14 +369,106 @@ void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, co
   // add as 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(name.toStdString());
-  newNode->SetData(figure);  
-  this->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
-
+  newNode->SetData(figure);
   // set as selected
-  this->FireNodeSelected( newNode );
+  // newNode->SetSelected( true );
+  this->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
+}
 
-  // make sure selection is checked (node gets an interactor)
-  this->CheckSelection();
+void QmitkMeasurementView::SetText()
+{
+  d->m_SelectedPlanarFiguresText->clear();
+
+  QString infoText;
+  QString plainInfoText;
+  unsigned int j = 1;
+  mitk::PlanarFigure* _PlanarFigure = 0;
+  mitk::PlanarAngle* planarAngle = 0;
+  mitk::PlanarFourPointAngle* planarFourPointAngle = 0;
+  mitk::DataNode::Pointer node = 0;
+
+  for (unsigned int i=0; i<d->m_SelectedPlanarFigures.size(); ++i, ++j)
+  {
+    plainInfoText.clear();
+    node = d->m_SelectedPlanarFigures.at(i);
+    if(j>1)
+      infoText.append("<br />");
+
+    infoText.append(QString("<b>%1</b><hr />").arg(QString::fromStdString(
+      node->GetName())));
+    plainInfoText.append(QString("%1").arg(QString::fromStdString(
+      node->GetName())));
+
+    _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
+
+    planarAngle = dynamic_cast<mitk::PlanarAngle*> (_PlanarFigure);
+    if(!planarAngle)
+    {
+      planarFourPointAngle = dynamic_cast<mitk::PlanarFourPointAngle*> (_PlanarFigure);
+    }
+
+    if(!_PlanarFigure)
+      continue;
+
+    double featureQuantity = 0.0;
+    for (unsigned int k = 0; k < _PlanarFigure->GetNumberOfFeatures(); ++k)
+    {
+      if ( !_PlanarFigure->IsFeatureActive( k ) ) continue;
+
+      featureQuantity = _PlanarFigure->GetQuantity(k);
+      if ((planarAngle && k == planarAngle->FEATURE_ID_ANGLE)
+        || (planarFourPointAngle && k == planarFourPointAngle->FEATURE_ID_ANGLE))
+        featureQuantity = featureQuantity * 180 / vnl_math::pi;
+
+      infoText.append(
+        QString("<i>%1</i>: %2 %3") .arg(QString(
+        _PlanarFigure->GetFeatureName(k))) .arg(featureQuantity, 0, 'f',
+        2) .arg(QString(_PlanarFigure->GetFeatureUnit(k))));
+
+      plainInfoText.append(
+        QString("\n%1: %2 %3") .arg(QString(_PlanarFigure->GetFeatureName(k))) .arg(
+        featureQuantity, 0, 'f', 2) .arg(QString(
+        _PlanarFigure->GetFeatureUnit(k))));
+
+      if(k+1 != _PlanarFigure->GetNumberOfFeatures())
+        infoText.append("<br />");
+    }
+
+    if (j != d->m_SelectedPlanarFigures.size())
+      infoText.append("<br />");
+  }
+
+  d->m_SelectedPlanarFiguresText->setHtml(infoText);
+}
+
+void QmitkMeasurementView::AddAllInteractors()
+{
+  MITK_INFO << "Adding interactors to all planar figures";
+
+  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
+  const mitk::DataNode* node = 0;
+
+  for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
+    ; it++)
+  {
+    node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
+    this->NodeAdded( node );
+  }
+}
+
+void QmitkMeasurementView::RemoveAllInteractors()
+{
+  MITK_INFO << "Removing interactors to all planar figures";
+
+  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
+  const mitk::DataNode* node = 0;
+
+  for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
+    ; it++)
+  {
+    node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
+    this->NodeRemoved( node );
+  }
 }
 
 /*

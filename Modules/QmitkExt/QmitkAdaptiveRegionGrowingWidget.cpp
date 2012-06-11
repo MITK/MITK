@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkImageTimeSelector.h"
 
+#include "mitkImageStatisticsHolder.h"
+
 #include <itkConnectedAdaptiveThresholdImageFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkBinaryThresholdImageFilter.h>
@@ -51,6 +53,24 @@ QmitkAdaptiveRegionGrowingWidget::~QmitkAdaptiveRegionGrowingWidget()
         this->DeactivateSeedPointMode();
         dynamic_cast<mitk::PointSet*>(node->GetData())->RemoveObserver(m_PointSetAddObserverTag);
     }    
+
+    this->RemoveHelperNodes();
+
+}
+
+void QmitkAdaptiveRegionGrowingWidget::RemoveHelperNodes()
+{
+  mitk::DataNode::Pointer seedNode = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
+  if( seedNode.IsNotNull() )
+  {
+    m_DataStorage->Remove(seedNode);
+  }
+
+  mitk::DataNode::Pointer imageNode = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
+  if( imageNode.IsNotNull() )
+  {
+    m_DataStorage->Remove(imageNode);
+  }
 }
 
 void QmitkAdaptiveRegionGrowingWidget::CreateConnections()
@@ -241,8 +261,8 @@ void QmitkAdaptiveRegionGrowingWidget::OnPointAdded()
        * If the RG direction is upwards the lower TH is meanSeedValue-0.15*windowSize and upper TH is meanSeedValue+0.85*windowsSize
        * if the RG direction is downwards the lower TH is meanSeedValue-0.85*windowSize and upper TH is meanSeedValue+0.15*windowsSize
       */
-      mitk::ScalarType min = image->GetScalarValueMin();
-      mitk::ScalarType max = image->GetScalarValueMax();
+      mitk::ScalarType min = image->GetStatistics()->GetScalarValueMin();
+      mitk::ScalarType max = image->GetStatistics()->GetScalarValueMax();
       mitk::ScalarType windowSize = max - min;
 
       windowSize = 0.15*windowSize;
@@ -592,6 +612,9 @@ void QmitkAdaptiveRegionGrowingWidget::ConfirmSegmentation()
   mitk::Image* img = dynamic_cast<mitk::Image*>(newNode->GetData());
   AccessByItk(img, ITKThresholding);
 
+  // disable volume rendering preview after the segmentation node was created
+  this->EnableVolumeRendering(false);
+  m_Controls.m_cbVolumeRendering->setChecked(false);
 
 }
 
@@ -760,14 +783,22 @@ void QmitkAdaptiveRegionGrowingWidget::SetUpperThresholdValue( double upperThres
 void QmitkAdaptiveRegionGrowingWidget::Deactivated()
 {
   this->DeactivateSeedPointMode();
+
+  // make the segmentation preview node invisible
+  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
+  if( node.IsNotNull() )
+  {
+    node->SetVisibility(false);
+  }
+
+  // disable volume rendering preview after the segmentation node was created
+  this->EnableVolumeRendering(false);
+  m_Controls.m_cbVolumeRendering->setChecked(false);
 }
 
 void QmitkAdaptiveRegionGrowingWidget::Activated()
 {
-  if(m_Controls.m_pbDefineSeedPoint->isChecked())
-  {
-    this->ActivateSeedPointMode();
-  }
+
 }
 
 void QmitkAdaptiveRegionGrowingWidget::ActivateSeedPointMode()

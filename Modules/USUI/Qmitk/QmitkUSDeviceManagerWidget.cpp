@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QColor>
 
 //mitk headers
+#include "mitkDataNode.h"
 
 
 //itk headers
@@ -91,6 +92,49 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice(){
   if (device.IsNull()) return;
   if (device->GetIsActive()) device->Deactivate();
   else device->Activate();
+
+  ////////////////////////////
+  // THIS IS DEBUGGING CODE //
+  ////////////////////////////
+  
+  // 
+  //QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  //if (nodes.empty()) return;
+
+  //mitk::DataNode* node = mitk::DataNode::New();
+  //device->Update();
+  //mitk::USImage::Pointer image = device->GetOutput();
+  //node->SetData(image);
+
+  
+
+  //// here we have a valid mitk::DataNode
+
+  //// a node itself is not very useful, we need its data item (the image)
+  //mitk::BaseData* data = node->GetData();
+  //if (data)
+  //{
+  //  // test if this data item is an image or not (could also be a surface or something totally different)
+  //  mitk::Image* image = dynamic_cast<mitk::Image*>( data );
+  //  if (image)
+  //  {
+  //    std::stringstream message;
+  //    std::string name;
+  //    message << "Performing image processing for image ";
+  //    if (node->GetName(name))
+  //    {
+  //      // a property called "name" was found for this DataNode
+  //      message << "'" << name << "'";
+  //    }
+  //    message << ".";
+  //    MITK_INFO << message.str();
+
+  //    // actually do something here...
+
+  //  }
+  //}
+
+
 }
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){

@@ -2,14 +2,17 @@
 set(CPP_FILES
   Qmitk/QmitkUSDeviceManagerWidget.cpp
   Qmitk/QmitkUSNewVideoDeviceWidget.cpp
+  Qmitk/QmitkUSDeviceListWidget.cpp
 )
 set(UI_FILES
+  Qmitk/QmitkUSDeviceListWidgetControls.ui
   Qmitk/QmitkUSDeviceManagerWidgetControls.ui
   Qmitk/QmitkUSNewVideoDeviceWidgetControls.ui
 )
 
 set(MOC_H_FILES
   Qmitk/QmitkUSDeviceManagerWidget.h
+  Qmitk/QmitkUSDeviceListWidget.h
   Qmitk/QmitkUSNewVideoDeviceWidget.h
 )
 

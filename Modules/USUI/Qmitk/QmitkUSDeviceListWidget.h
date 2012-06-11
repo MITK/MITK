@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _QmitkUSDeviceManagerWidget_H_INCLUDED
-#define _QmitkUSDeviceManagerWidget_H_INCLUDED
+#ifndef _QmitkUSDeviceListWidget_H_INCLUDED
+#define _QmitkUSDeviceListWidget_H_INCLUDED
 
 #include "mitkUSUIExports.h"
-#include "ui_QmitkUSDeviceManagerWidgetControls.h"
+#include "ui_QmitkUSDeviceListWidgetControls.h"
 #include "mitkUSDevice.h"
 #include <vector>
 
@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup USUI
 */
-class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk::ServiceTrackerCustomizer<> // this extension is necessary if one wants to use ServiceTracking instead of filtering
+class MitkUSUI_EXPORT QmitkUSDeviceListWidget :public QWidget //, public mitk::ServiceTrackerCustomizer<> // this extension is necessary if one wants to use ServiceTracking instead of filtering
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -48,8 +48,8 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk
 
     static const std::string VIEW_ID;
 
-    QmitkUSDeviceManagerWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkUSDeviceManagerWidget();
+    QmitkUSDeviceListWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
+    virtual ~QmitkUSDeviceListWidget();
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);
@@ -66,24 +66,11 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk
 
   signals:
 
-    /*
-    \brief Sent, when the user clicks "Activate Device"
-    */
-    void USDeviceActivated();
+    
 
   public slots:
 
   protected slots:
-  
-    /*
-    \brief Called, when the button "Activate Device" was clicked
-    */
-    void OnClickedActivateDevice();
-
-    /*
-    \brief Called, when the button "Disconnect Device" was clicked
-    */
-    void OnClickedDisconnectDevice();   
 
     /*
     \brief Called, when the selection in the devicelist changes
@@ -93,7 +80,7 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk
 
   protected:
 
-    Ui::QmitkUSDeviceManagerWidgetControls* m_Controls; ///< member holding the UI elements of this widget
+    Ui::QmitkUSDeviceListWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
     /*
     * \brief  Internal Structure used to link devices to their QListWidget Items
@@ -138,4 +125,4 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk
     
 };
 
-#endif // _QmitkUSDeviceManagerWidget_H_INCLUDED
+#endif // _QmitkUSDeviceListWidget_H_INCLUDED

@@ -65,15 +65,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
   //case 0:
   //  {
   //    DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpTEST,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
-  //    if (m_UndoEnabled)  //write to UndoMechanism
-  //    {
-  //      DisplayCoordinateOperation* undoOp = new DisplayCoordinateOperation(OpTEST, m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
-  //      
-  //      
-  //      OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp);
-  //      m_UndoController->SetOperationEvent(operationEvent);
-  //    }
-  //    
+  //
   //    //execute the Operation
   //    m_Destination->ExecuteOperation(doOp);
   //    ok = true;
@@ -98,14 +90,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
       m_StartCoordinateInMM=mitk::Point2D( ( origin+m_StartDisplayCoordinate.GetVectorFromOrigin()*scaleFactorMMPerDisplayUnit ).GetDataPointer() );
       ok = true;
-      break; if (m_UndoEnabled)  //write to UndoMechanism
-      {
-       // DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpMOVE,  m_Sender, m_StartDisplayCoordinate, m_StartDisplayCoordinate, posEvent->GetDisplayPosition());
-        //DisplayCoordinateOperation* undoOp = new mitk::DisplayCoordinateOperation(OpMOVE,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), m_StartDisplayCoordinate);
-
-        //OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp, "Move view");
-       // m_UndoController->SetOperationEvent(operationEvent);
-      }
+      break;
     }
   case AcMOVE:
     {

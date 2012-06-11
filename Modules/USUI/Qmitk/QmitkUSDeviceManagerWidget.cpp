@@ -78,6 +78,7 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
   {
     connect( m_Controls->m_BtnActivate,   SIGNAL(clicked()), this, SLOT(OnClickedActivateDevice()) );
     connect( m_Controls->m_BtnDisconnect, SIGNAL(clicked()), this, SLOT(OnClickedDisconnectDevice()) );
+    connect( m_Controls->m_ConnectedDevices, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnDeviceSelectionChanged()) );
   }
 }
 
@@ -87,15 +88,24 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 void QmitkUSDeviceManagerWidget::OnClickedActivateDevice(){
   MITK_INFO << "Activated Device";
   mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_ConnectedDevices->currentItem());
-  device->Activate();
+  if (device.IsNull()) return;
+  if (device->GetIsActive()) device->Deactivate();
+  else device->Activate();
 }
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
   MITK_INFO << "Disconnected Device";
   mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_ConnectedDevices->currentItem());
+  if (device.IsNull()) return;
   device->Disconnect();
 }
 
+void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(){
+  mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_ConnectedDevices->currentItem());
+  if (device.IsNull()) return;
+  if (device->GetIsActive()) m_Controls->m_BtnActivate->setText("Deactivate");
+    else m_Controls->m_BtnActivate->setText("Activate");
+}
 
 
 ///////////////// Methods & Slots Handling Logic //////////////////////////

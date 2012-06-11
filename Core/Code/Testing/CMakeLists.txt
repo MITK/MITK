@@ -45,7 +45,7 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2DTe
 #                        ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
 #                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dOpacity640x480REF.png #corresponding reference screenshot
 #)
-endif(WIN32 OR APPLE)
+endif()
 
 # see bug 9882
 if(NOT APPLE)

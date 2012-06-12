@@ -34,7 +34,8 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer
   layout->AddView("org.mitk.views.imagenavigator", 
     berry::IPageLayout::BOTTOM, 0.5f, "org.mitk.views.datamanager");
 
-  berry::IFolderLayout::Pointer bottomFolder = layout->CreateFolder("bottom", berry::IPageLayout::BOTTOM, 0.7f, editorArea);
-  bottomFolder->AddView("org.mitk.views.propertylistview");
-  bottomFolder->AddView("org.blueberry.views.logview");
+  berry::IPlaceholderFolderLayout::Pointer bottomFolder = layout->CreatePlaceholderFolder("bottom", berry::IPageLayout::BOTTOM, 0.7f, editorArea);
+  bottomFolder->AddPlaceholder("org.mitk.views.propertylistview");
+  bottomFolder->AddPlaceholder("org.blueberry.views.logview");
+  bottomFolder->AddPlaceholder("org.mitk.views.modules");
 }

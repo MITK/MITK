@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _ENCOMP
 
 #include <MitkDiffusionImagingExports.h>
+#include <itkOrientationDistributionFunction.h>
 #include "mitkParticleGrid.h"
 #include "mitkSphereInterpolator.h"
 #include "MersenneTwister.h"
@@ -30,9 +31,13 @@ class MitkDiffusionImaging_EXPORT EnergyComputer
 {
 
 public:
+
+    typedef itk::Vector<float, QBALL_ODFSIZE> OdfVectorType;
+    typedef itk::Image<OdfVectorType, 3> ItkQBallImgType;
+
     float eigen_energy;
     vnl_matrix_fixed<float, 3, 3> m_RotationMatrix;
-    float *m_QBallImageData;
+    ItkQBallImgType* m_QBallImageData;
     const int *m_QBallImageSize;
     SphereInterpolator *m_SphereInterpolator;
     ParticleGrid *m_ParticleGrid;
@@ -71,7 +76,7 @@ public:
     float curv_hard;
 
 
-    EnergyComputer(MTRand* rgen, float *data, const int *dsz,  double *cellsize, SphereInterpolator *sp, ParticleGrid *pcon, float *spimg, int spmult, vnl_matrix_fixed<float, 3, 3> rotMatrix);
+    EnergyComputer(MTRand* rgen, ItkQBallImgType* data, const int *dsz,  double *cellsize, SphereInterpolator *sp, ParticleGrid *pcon, float *spimg, int spmult, vnl_matrix_fixed<float, 3, 3> rotMatrix);
 
     void setParameters(float pwei,float pwid,float chempot_connection, float length,float curv_hardthres, float inex_balance, float chempot2, float meanv);
 

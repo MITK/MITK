@@ -40,32 +40,29 @@ namespace mitk
 class MitkDiffusionImaging_EXPORT FiberBuilder
 {
 public:
-  Particle *particles;
-  int pcnt;
-  int attrcnt;
-  typedef vector< Particle* > ParticleContainerType;
-  typedef vector< ParticleContainerType* > FiberContainerType;
 
-  vtkSmartPointer<vtkCellArray> m_VtkCellArray;
-  vtkSmartPointer<vtkPoints>    m_VtkPoints;
+    typedef itk::Image<float, 3>  ItkFloatImageType;
 
-  typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
-  typedef itk::Image<OdfVectorType, 3>        ItkQBallImgType;
-  ItkQBallImgType::Pointer                    m_ItkQBallImage;
-  float m_FiberLength;
-  itk::Point<float> m_LastPoint;
+    FiberBuilder(ParticleGrid* grid, ItkFloatImageType* image);
+    ~FiberBuilder();
 
-  FiberBuilder(float *points, int numPoints, double spacing[], ItkQBallImgType::Pointer image);
+    vtkSmartPointer<vtkPolyData> iterate(int minFiberLength);
 
-  ~FiberBuilder();
+protected:
 
-  vtkSmartPointer<vtkPolyData> iterate(int minFiberLength);
+    void AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container);
 
-  void AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container);
+    void labelPredecessors(Particle *dp, vtkSmartPointer<vtkPolyLine> container);
+    void labelSuccessors(Particle *dp, vtkSmartPointer<vtkPolyLine> container);
 
-  void labelPredecessors(Particle *dp, vtkSmartPointer<vtkPolyLine> container);
+    itk::Point<float>           m_LastPoint;
+    float                       m_FiberLength;
+    ItkFloatImageType::Pointer  m_Image;
+    ParticleGrid*               m_Grid;
+    Particle*                   particles;
+    vtkSmartPointer<vtkCellArray> m_VtkCellArray;
+    vtkSmartPointer<vtkPoints>    m_VtkPoints;
 
-  void labelSuccessors(Particle *dp, vtkSmartPointer<vtkPolyLine> container);
 };
 
 }

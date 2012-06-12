@@ -20,10 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorContainer.h"
 #include "itkImage.h"
 
-#include "GibbsTracking/MersenneTwister.h"
-#include "GibbsTracking/mitkMetropolisHastingsSampler.h"
-#include "GibbsTracking/mitkEnergyComputer.h"
-
 #include <fstream>
 #include <QFile>
 #include <vtkSmartPointer.h>
@@ -34,10 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk{
 
-  template< class TInputQBallImage, class TInputROIImage >
-  class GibbsTrackingFilter :
-  public ProcessObject{
-  public:
+template< class ItkQBallImageType >
+class GibbsTrackingFilter : public ProcessObject
+{
+public:
     typedef GibbsTrackingFilter Self;
     typedef ProcessObject Superclass;
     typedef SmartPointer< Self > Pointer;
@@ -46,17 +42,9 @@ namespace itk{
     itkNewMacro(Self)
     itkTypeMacro( GibbsTrackingFilter, ProcessObject )
 
-    /** Types for the DWI Input Image **/
-    typedef TInputQBallImage InputQBallImageType;
-
-    /** Types for the Mask Image **/
-    typedef TInputROIImage MaskImageType;
-    typedef typename MaskImageType::Pointer MaskImageTypePointer;
-
-    typedef vtkSmartPointer< vtkPolyData >     FiberPolyDataType;
-
-    typedef Image< float, 3 >                  GfaImageType;
-    typedef typename GfaImageType::Pointer     GfaImageTypePointer;
+    typedef typename ItkQBallImageType::Pointer ItkQBallImageTypePointer;
+    typedef Image< float, 3 >                   ItkFloatImageType;
+    typedef vtkSmartPointer< vtkPolyData >      FiberPolyDataType;
 
     itkSetMacro( TempStart, float )
     itkGetMacro( TempStart, float )
@@ -99,22 +87,8 @@ namespace itk{
     itkSetMacro( CurrentStep, unsigned long )
     itkGetMacro( CurrentStep, unsigned long )
 
-    itkSetMacro( SubtractMean, bool)
-    itkGetMacro( SubtractMean, bool)
-
     itkSetMacro( CurvatureHardThreshold, float)
     itkGetMacro( CurvatureHardThreshold, float)
-
-    /** Set/Get the Odf Input Image **/
-    itkSetInputMacro(OdfImage, InputQBallImageType, 0)
-    itkGetInputMacro(OdfImage, InputQBallImageType, 0)
-
-    /** Set/Get the Input mask image **/
-    itkSetMacro(MaskImage, MaskImageTypePointer)
-    itkGetMacro(MaskImage, MaskImageTypePointer)
-
-    itkSetMacro(GfaImage, GfaImageTypePointer)
-    itkGetMacro(GfaImage, GfaImageTypePointer)
 
     itkGetMacro(NumParticles, unsigned long)
     itkGetMacro(NumConnections, unsigned long)
@@ -122,60 +96,42 @@ namespace itk{
     itkGetMacro(ProposalAcceptance, float)
     itkGetMacro(Steps, unsigned int)
 
-    /** Entry Point For the Algorithm:  Is invoked when Update() is called
-    either directly or through itk pipeline propagation
-    **/
+    // input data
+    itkSetMacro(QBallImage, typename ItkQBallImageType::Pointer)
+    itkSetMacro(MaskImage, ItkFloatImageType::Pointer)
+
     void GenerateData();
 
-    /** override the Process Object Update because we don't have a
-    dataobject as an outpgnome themeut.  We can change this later by wrapping the
-    tractcontainer in a dataobject decorator and letting the Superclass
-    know about it.
-    **/
-    struct StochasticTractGenerationCallbackStruct{
-      Pointer Filter;
-    };
-
     virtual void Update(){
-      this->GenerateData();
+        this->GenerateData();
     }
 
     FiberPolyDataType GetFiberBundle();
-    float GetMemoryUsage();
-    bool EstimateParticleWeight();
 
-  protected:
+protected:
 
     GibbsTrackingFilter();
     virtual ~GibbsTrackingFilter();
-
-    void ComputeFiberCorrelation();
-    void ComputeFiberCorrelationOriginal();
-
-    void BuildFibers(float* points, int numPoints);
+    bool EstimateParticleWeight();
 
     // Input Images
-    typename InputQBallImageType::Pointer m_ItkQBallImage;
-    typename MaskImageType::Pointer m_MaskImage;
-    typename GfaImageType::Pointer m_GfaImage;
+    typename ItkQBallImageType::Pointer m_QBallImage;
+    typename ItkFloatImageType::Pointer m_MaskImage;
 
     // Tracking parameters
-    float   m_TempStart;  // Start temperature
-    float   m_TempEnd;  // End temperature
-    unsigned long m_NumIt;  // Total number of iterations
-    unsigned long m_CurrentStep;  // current tracking step
-    float   m_ParticleWeight; //w (unitless)
-    float   m_ParticleWidth;  //sigma  (mm)
-    float   m_ParticleLength; // ell (mm)
-    float   m_ChempotConnection;  // gross L (chemisches potential)
-    float   m_ChempotParticle;// unbenutzt (immer null, wenn groesser dann insgesamt weniger teilchen)
-    float   m_InexBalance;    // gewichtung zwischen den lambdas
-    // -5 ... 5 -> nur intern ... nur extern,default 0
-    float   m_Chempot2;       // typischerweise 0,
-    // korrektur fuer das geschaetzte integral
+    float   m_TempStart;            // Start temperature
+    float   m_TempEnd;              // End temperature
+    unsigned long m_NumIt;          // Total number of iterations
+    unsigned long m_CurrentStep;    // current tracking step
+    float   m_ParticleWeight;       // w (unitless)
+    float   m_ParticleWidth;        //sigma  (mm)
+    float   m_ParticleLength;       // ell (mm)
+    float   m_ChempotConnection;    // gross L (chemisches potential)
+    float   m_ChempotParticle;      // unbenutzt (immer null, wenn groesser dann insgesamt weniger teilchen)
+    float   m_InexBalance;          // gewichtung zwischen den lambdas; -5 ... 5 -> nur intern ... nur extern,default 0
+    float   m_Chempot2;             // typischerweise 0
     int     m_FiberLength;
     bool    m_AbortTracking;
-    bool    m_SubtractMean;
     int     m_NumAcceptedFibers;
     volatile bool   m_BuildFibers;
     unsigned int    m_Steps;
@@ -184,11 +140,10 @@ namespace itk{
     float   m_CurvatureHardThreshold;
     float   m_Meanval_sq;
 
-    MetropolisHastingsSampler* m_Sampler;
     FiberPolyDataType m_FiberPolyData;
     unsigned long m_NumParticles;
     unsigned long m_NumConnections;
-  };
+};
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION

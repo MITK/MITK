@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,28 +53,27 @@ void QmitkTrackingWorker::run()
 {
   m_View->m_GlobalTracker = QmitkGibbsTrackingView::GibbsTrackingFilterType::New();
 
-  MITK_INFO << "Resampling mask images";
-  // setup resampler
-  typedef itk::ResampleImageFilter<QmitkGibbsTrackingView::MaskImgType, QmitkGibbsTrackingView::MaskImgType, float> ResamplerType;
-  ResamplerType::Pointer resampler = ResamplerType::New();
-  resampler->SetOutputSpacing( m_View->m_ItkQBallImage->GetSpacing() );
-  resampler->SetOutputOrigin( m_View->m_ItkQBallImage->GetOrigin() );
-  resampler->SetOutputDirection( m_View->m_ItkQBallImage->GetDirection() );
-  resampler->SetSize( m_View->m_ItkQBallImage->GetLargestPossibleRegion().GetSize() );
+//  MITK_INFO << "Resampling mask images";
+//  // setup resampler
+//  typedef itk::ResampleImageFilter<QmitkGibbsTrackingView::MaskImgType, QmitkGibbsTrackingView::MaskImgType, float> ResamplerType;
+//  ResamplerType::Pointer resampler = ResamplerType::New();
+//  resampler->SetOutputSpacing( m_View->m_ItkQBallImage->GetSpacing() );
+//  resampler->SetOutputOrigin( m_View->m_ItkQBallImage->GetOrigin() );
+//  resampler->SetOutputDirection( m_View->m_ItkQBallImage->GetDirection() );
+//  resampler->SetSize( m_View->m_ItkQBallImage->GetLargestPossibleRegion().GetSize() );
 
-  // resample mask image
-  resampler->SetInput( m_View->m_MaskImage );
-  resampler->SetDefaultPixelValue(0);
-  resampler->Update();
-  m_View->m_MaskImage = resampler->GetOutput();
+//  // resample mask image
+//  resampler->SetInput( m_View->m_MaskImage );
+//  resampler->SetDefaultPixelValue(0);
+//  resampler->Update();
+//  m_View->m_MaskImage = resampler->GetOutput();
 
-  m_View->m_GlobalTracker->SetInput0(m_View->m_ItkQBallImage.GetPointer());
+  m_View->m_GlobalTracker->SetQBallImage(m_View->m_ItkQBallImage);
   m_View->m_GlobalTracker->SetMaskImage(m_View->m_MaskImage);
   m_View->m_GlobalTracker->SetTempStart((float)m_View->m_Controls->m_StartTempSlider->value()/100);
   m_View->m_GlobalTracker->SetTempEnd((float)m_View->m_Controls->m_EndTempSlider->value()/10000);
   m_View->m_GlobalTracker->SetNumIt(m_View->m_Iterations);
   m_View->m_GlobalTracker->SetParticleWeight((float)m_View->m_Controls->m_ParticleWeightSlider->value()/10000);
-  m_View->m_GlobalTracker->SetSubtractMean(m_View->m_Controls->m_MeanSubtractionCheckbox->isChecked());
   m_View->m_GlobalTracker->SetParticleWidth((float)(m_View->m_Controls->m_ParticleWidthSlider->value())/10);
   m_View->m_GlobalTracker->SetParticleLength((float)(m_View->m_Controls->m_ParticleLengthSlider->value())/10);
   m_View->m_GlobalTracker->SetInexBalance((float)m_View->m_Controls->m_InExBalanceSlider->value()/10);
@@ -557,8 +556,8 @@ void QmitkGibbsTrackingView::GenerateFiberBundle(bool smoothFibers)
     return;
   m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
 
-  if (smoothFibers)
-    m_FiberBundle->DoFiberSmoothing(10);
+//  if (smoothFibers)
+//    m_FiberBundle->DoFiberSmoothing(10);
 
   if (m_FiberBundleNode.IsNotNull()){
     GetDefaultDataStorage()->Remove(m_FiberBundleNode);

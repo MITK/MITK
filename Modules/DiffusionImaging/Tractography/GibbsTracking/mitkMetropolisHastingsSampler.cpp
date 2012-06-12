@@ -18,74 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-MetropolisHastingsSampler::MetropolisHastingsSampler(MTRand* rgen, float *points,int numPoints,  float *dimg, const int *dsz, double *voxsz, double cellsize)
-    : m_QBallImageData(dimg)
-    , datasz(dsz)
-    , enc(0)
-    , voxsize(voxsz)
-    , m_NumAttributes(0)
+MetropolisHastingsSampler::MetropolisHastingsSampler(ParticleGrid* grid, MTRand* randGen)
+    : m_NumAttributes(0)
     , m_AcceptedProposals(0)
 {
-    mtrand = rgen;
+    mtrand = randGen;
 
-    m_ParticleGrid = new ParticleGrid();
-
-    width = dsz[1]*voxsize[0];
-    height = dsz[2]*voxsize[1];
-    depth = dsz[3]*voxsize[2];
-
-    fprintf(stderr,"Data dimensions (mm) :  %f x %f x %f\n",width,height,depth);
-    fprintf(stderr,"Data dimensions (voxel) :  %i x %i x %i\n",datasz[1],datasz[2],datasz[3]);
-    fprintf(stderr,"voxel size (mm) :  %lf x %lf x %lf\n",voxsize[0],voxsize[1],voxsize[2]);
-
-    float cellcnt_x = (int)((float)width/cellsize) +1;
-    float cellcnt_y = (int)((float)height/cellsize) +1;
-    float cellcnt_z = (int)((float)depth/cellsize) +1;
-    //int cell_capacity = 2048;
-    //int cell_capacity = 64;
-    int cell_capacity = 512;
-
-    fprintf(stderr,"grid dimensions :  %f x %f x %f\n",cellcnt_x,cellcnt_y,cellcnt_z);
-    fprintf(stderr,"grid cell size (mm) :  %f^3\n",cellsize);
-    fprintf(stderr,"cell capacity :  %i\n",cell_capacity);
-    fprintf(stderr,"#cells*cellcap :  %.1f K\n",cell_capacity*cellcnt_x*cellcnt_y*cellcnt_z/1000);
-
-    int minsize = 1000000;
-    int err = m_ParticleGrid->allocate(((numPoints>minsize)? (numPoints+100000) : minsize), cellcnt_x, cellcnt_y, cellcnt_z, cellsize, cell_capacity);
-
-    if (err == -1)
-    {
-        fprintf(stderr,"MetropolisHastingsSamplerBase: out of Memory!\n");
-        return;
-    }
-
-    m_NumAttributes = 10;
-    for (int k = 0; k < numPoints; k++)
-    {
-        Particle *p = m_ParticleGrid->newParticle(vnl_vector_fixed<float, 3>(points[m_NumAttributes*k], points[m_NumAttributes*k+1],points[m_NumAttributes*k+2]));
-        if (p!=0)
-        {
-            p->N = vnl_vector_fixed<float, 3>(points[m_NumAttributes*k+3],points[m_NumAttributes*k+4],points[m_NumAttributes*k+5]);
-            p->cap =  points[m_NumAttributes*k+6];
-            p->len =  points[m_NumAttributes*k+7];
-            p->mID = (int) points[m_NumAttributes*k+8];
-            p->pID = (int) points[m_NumAttributes*k+9];
-            if (p->mID != -1)
-                m_ParticleGrid->m_NumConnections++;
-            if (p->pID != -1)
-                m_ParticleGrid->m_NumConnections++;
-            p->label = 0;
-        }
-        else
-        {
-            fprintf(stderr,"error: cannot allocate particle,  con. indices will be wrong! \n");
-        }
-    }
-    m_ParticleGrid->m_NumConnections /= 2;
+    m_ParticleGrid = grid;
 
     m_Iterations = 0;
     m_AcceptedProposals = 0;
-
     externalEnergy = 0;
     internalEnergy = 0;
 }
@@ -125,8 +67,8 @@ void MetropolisHastingsSampler::WriteOutParticles(float *npoints)
         npoints[m_NumAttributes*k+5] = p->N[2];
         npoints[m_NumAttributes*k+6] = p->cap;
         npoints[m_NumAttributes*k+7] = p->len;
-        npoints[m_NumAttributes*k+8] = m_ParticleGrid->ID_2_index(p->mID);
-        npoints[m_NumAttributes*k+9] = m_ParticleGrid->ID_2_index(p->pID);
+        npoints[m_NumAttributes*k+8] = m_ParticleGrid->Id2Index(p->mID);
+        npoints[m_NumAttributes*k+9] = m_ParticleGrid->Id2Index(p->pID);
     }
 }
 

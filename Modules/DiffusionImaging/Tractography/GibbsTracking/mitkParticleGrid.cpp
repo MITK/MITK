@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-ParticleGrid::ParticleGrid()
+ParticleGrid::ParticleGrid(ItkFloatImageType* image, float cellSize)
 {
     //// involving the container
     capacity = 0;
@@ -39,17 +39,18 @@ ParticleGrid::ParticleGrid()
 
     increase_step = 100000;
     m_Memory = 0;
-}
 
-float ParticleGrid::GetMemoryUsage()
-{
-    return m_Memory;
-}
+    int width = image->GetLargestPossibleRegion().GetSize()[0]*image->GetSpacing()[0];
+    int height = image->GetLargestPossibleRegion().GetSize()[1]*image->GetSpacing()[1];
+    int depth = image->GetLargestPossibleRegion().GetSize()[2]*image->GetSpacing()[2];
 
-int ParticleGrid::allocate(int _capacity, int _nx, int _ny, int _nz, float cellsize, int cellcapacity)
-{
+    float   cellcnt_x = (int)((float)width/cellSize) +1;
+    float   cellcnt_y = (int)((float)height/cellSize) +1;
+    float   cellcnt_z = (int)((float)depth/cellSize) +1;
+    int     cell_capacity = 512;
+
     //// involving the container
-    capacity = _capacity;
+    capacity = 100000;
     m_Particles = (Particle*) malloc(sizeof(Particle)*capacity);
     m_AddressContainer = (Particle**) malloc(sizeof(Particle*)*capacity);
 
@@ -57,23 +58,21 @@ int ParticleGrid::allocate(int _capacity, int _nx, int _ny, int _nz, float cells
     {
         fprintf(stderr,"error: Out of Memory\n");
         capacity = 0;
-        return -1;
     }
     else
     {
         fprintf(stderr,"Allocated Memory for %i particles \n",capacity);
     }
 
-    m_NumParticles = 0;
     int i;
     for (i = 0;i < capacity;i++)
     {
-        m_AddressContainer[i] = &(m_Particles[i]);   // initialize pointer in LUT
-        m_Particles[i].ID = i;         // initialize unique IDs
+        m_AddressContainer[i] = &(m_Particles[i]);      // initialize pointer in LUT
+        m_Particles[i].ID = i;                          // initialize unique IDs
     }
 
-    ////// involvin the grid
-    nx = _nx; ny = _ny; nz = _nz; csize = cellcapacity;
+    // involving the grid
+    nx = cellcnt_x; ny = cellcnt_y; nz = cellcnt_z; csize = cell_capacity;
     gridsize = nx*ny*nz;
 
     m_Memory = (float)(sizeof(Particle*)*gridsize*csize)/1000000;
@@ -85,20 +84,15 @@ int ParticleGrid::allocate(int _capacity, int _nx, int _ny, int _nz, float cells
     {
         fprintf(stderr,"error: Out of Memory\n");
         capacity = 0;
-        return -1;
     }
 
     for (i = 0;i < gridsize;i++)
         occnt[i] = 0;
 
-    mulx = 1/cellsize;
-    muly = 1/cellsize;
-    mulz = 1/cellsize;
-
-    return 1;
+    mulx = 1/cellSize;
+    muly = 1/cellSize;
+    mulz = 1/cellSize;
 }
-
-
 
 int ParticleGrid::reallocate()
 {
@@ -150,7 +144,7 @@ ParticleGrid::~ParticleGrid()
 
 
 
-int ParticleGrid::ID_2_index(int ID)
+int ParticleGrid::Id2Index(int ID)
 {
     if (ID == -1)
         return -1;

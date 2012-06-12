@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -62,7 +62,7 @@ typedef itk::Image< float, 3 >            FloatImageType;
 
 namespace itk
 {
-template<class X, class Y>
+template<class X>
 class GibbsTrackingFilter;
 }
 
@@ -79,7 +79,7 @@ public:
   typedef itk::Vector<float, QBALL_ODFSIZE> OdfVectorType;
   typedef itk::Image<OdfVectorType, 3> ItkQBallImgType;
 
-  typedef itk::GibbsTrackingFilter<ItkQBallImgType, MaskImgType> GibbsTrackingFilterType;
+  typedef itk::GibbsTrackingFilter< ItkQBallImgType > GibbsTrackingFilterType;
 
   static const std::string VIEW_ID;
 

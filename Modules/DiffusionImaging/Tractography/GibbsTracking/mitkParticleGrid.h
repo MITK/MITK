@@ -17,8 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _PARTICLEGRID
 #define _PARTICLEGRID
 
+// MITK
 #include "mitkParticle.h"
 #include "MitkDiffusionImagingExports.h"
+
+// ITK
+#include <itkImage.h>
 
 namespace mitk
 {
@@ -28,6 +32,9 @@ class MitkDiffusionImaging_EXPORT ParticleGrid
 
     //////////////// Container
 public:
+
+    typedef itk::Image< float, 3 >  ItkFloatImageType;
+
     Particle*   m_Particles;    // particles in linear array
     Particle**  m_AddressContainer;
 
@@ -35,14 +42,12 @@ public:
     int m_NumConnections;       // number of connections
     int m_NumCellOverflows;     // number of cell overflows
 
-    ParticleGrid();
+    ParticleGrid(ItkFloatImageType* image, float cellSize);
     ~ParticleGrid();
 
-    float GetMemoryUsage();
-    int allocate(int _capacity, int _nx, int _ny, int _nz, float cellsize, int cellcapacity);
     int reallocate();
 
-    int ID_2_index(int ID);
+    int Id2Index(int ID);
 
     Particle* newParticle(vnl_vector_fixed<float, 3> R);
     bool TryUpdateGrid(int k);

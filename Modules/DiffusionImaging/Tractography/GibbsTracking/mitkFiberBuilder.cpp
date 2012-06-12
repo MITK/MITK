@@ -18,40 +18,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-FiberBuilder::FiberBuilder(float *points, int numPoints, double spacing[], ItkQBallImgType::Pointer image)
+FiberBuilder::FiberBuilder(ParticleGrid* grid, ItkFloatImageType* image)
 {
+    m_Grid = grid;
+    particles = m_Grid->m_Particles;
+    m_Image = image;
     m_FiberLength = 0;
-    m_ItkQBallImage = image;
-    particles = (Particle*) malloc(sizeof(Particle)*numPoints);
-    pcnt = numPoints;
-    attrcnt = 10;
-    for (int k = 0; k < numPoints; k++)
-    {
-        Particle *p = &(particles[k]);
-        p->R = vnl_vector_fixed<float, 3>(points[attrcnt*k]/spacing[0]-0.5, points[attrcnt*k+1]/spacing[1]-0.5,points[attrcnt*k+2]/spacing[2]-0.5);
-        p->N = vnl_vector_fixed<float, 3>(points[attrcnt*k+3],points[attrcnt*k+4],points[attrcnt*k+5]);
-        p->cap =  points[attrcnt*k+6];
-        p->len =  points[attrcnt*k+7];
-        p->mID = (int) points[attrcnt*k+8];
-        p->pID = (int) points[attrcnt*k+9];
-        p->ID = k;
-        p->label = 0;
-    }
-    m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
-    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 }
 
 FiberBuilder::~FiberBuilder()
 {
-    free(particles);
+
 }
 
 vtkSmartPointer<vtkPolyData> FiberBuilder::iterate(int minFiberLength)
 {
+    m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
+    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
+
     int cur_label = 1;
     int numFibers = 0;
     m_FiberLength = 0;
-    for (int k = 0; k < pcnt;k++)
+    for (int k = 0; k < m_Grid->m_NumParticles;k++)
     {
         Particle *dp =  &(particles[k]);
         if (dp->label == 0)
@@ -70,6 +58,13 @@ vtkSmartPointer<vtkPolyData> FiberBuilder::iterate(int minFiberLength)
             m_FiberLength = 0;
         }
     }
+    for (int k = 0; k < m_Grid->m_NumParticles;k++)
+    {
+        Particle *dp =  &(particles[k]);
+        dp->inserted = false;
+        dp->label = 0;
+    }
+
     vtkSmartPointer<vtkPolyData> fiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     fiberPolyData->SetPoints(m_VtkPoints);
     fiberPolyData->SetLines(m_VtkCellArray);
@@ -84,11 +79,11 @@ void FiberBuilder::AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container
     dp->inserted = true;
 
     itk::ContinuousIndex<float, 3> index;
-    index[0] = dp->R[0];
-    index[1] = dp->R[1];
-    index[2] = dp->R[2];
+    index[0] = dp->R[0]/m_Image->GetSpacing()[0];
+    index[1] = dp->R[1]/m_Image->GetSpacing()[1];
+    index[2] = dp->R[2]/m_Image->GetSpacing()[2];
     itk::Point<float> point;
-    m_ItkQBallImage->TransformContinuousIndexToPhysicalPoint( index, point );
+    m_Image->TransformContinuousIndexToPhysicalPoint( index, point );
     vtkIdType id = m_VtkPoints->InsertNextPoint(point.GetDataPointer());
     container->GetPointIds()->InsertNextId(id);
 
@@ -102,20 +97,20 @@ void FiberBuilder::labelPredecessors(Particle *dp, vtkSmartPointer<vtkPolyLine> 
 {
     if (dp->mID != -1 && dp->mID!=dp->ID)
     {
-        if (dp->ID!=particles[dp->mID].pID)
+        if (dp->ID!=particles[m_Grid->Id2Index(dp->mID)].pID)
         {
-            if (dp->ID==particles[dp->mID].mID)
+            if (dp->ID==particles[m_Grid->Id2Index(dp->mID)].mID)
             {
-                int tmp = particles[dp->mID].pID;
-                particles[dp->mID].pID = particles[dp->mID].mID;
-                particles[dp->mID].mID = tmp;
+                int tmp = particles[m_Grid->Id2Index(dp->mID)].pID;
+                particles[m_Grid->Id2Index(dp->mID)].pID = particles[m_Grid->Id2Index(dp->mID)].mID;
+                particles[m_Grid->Id2Index(dp->mID)].mID = tmp;
             }
         }
-        if (particles[dp->mID].label == 0)
+        if (particles[m_Grid->Id2Index(dp->mID)].label == 0)
         {
-            particles[dp->mID].label = dp->label;
-            particles[dp->mID].numerator = dp->numerator-1;
-            labelPredecessors(&(particles[dp->mID]), container);
+            particles[m_Grid->Id2Index(dp->mID)].label = dp->label;
+            particles[m_Grid->Id2Index(dp->mID)].numerator = dp->numerator-1;
+            labelPredecessors(&(particles[m_Grid->Id2Index(dp->mID)]), container);
         }
     }
 
@@ -128,20 +123,20 @@ void FiberBuilder::labelSuccessors(Particle *dp, vtkSmartPointer<vtkPolyLine> co
 
     if (dp->pID != -1 && dp->pID!=dp->ID)
     {
-        if (dp->ID!=particles[dp->pID].mID)
+        if (dp->ID!=particles[m_Grid->Id2Index(dp->pID)].mID)
         {
-            if (dp->ID==particles[dp->pID].pID)
+            if (dp->ID==particles[m_Grid->Id2Index(dp->pID)].pID)
             {
-                int tmp = particles[dp->pID].pID;
-                particles[dp->pID].pID = particles[dp->pID].mID;
-                particles[dp->pID].mID = tmp;
+                int tmp = particles[m_Grid->Id2Index(dp->pID)].pID;
+                particles[m_Grid->Id2Index(dp->pID)].pID = particles[m_Grid->Id2Index(dp->pID)].mID;
+                particles[m_Grid->Id2Index(dp->pID)].mID = tmp;
             }
         }
-        if (particles[dp->pID].label == 0)
+        if (particles[m_Grid->Id2Index(dp->pID)].label == 0)
         {
-            particles[dp->pID].label = dp->label;
-            particles[dp->pID].numerator = dp->numerator+1;
-            labelSuccessors(&(particles[dp->pID]), container);
+            particles[m_Grid->Id2Index(dp->pID)].label = dp->label;
+            particles[m_Grid->Id2Index(dp->pID)].numerator = dp->numerator+1;
+            labelSuccessors(&(particles[m_Grid->Id2Index(dp->pID)]), container);
         }
     }
 }

@@ -17,11 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _SAMPLER
 #define _SAMPLER
 
+// MITK
 #include <MitkDiffusionImagingExports.h>
 #include "mitkParticleGrid.h"
 #include "mitkEnergyComputer.h"
 #include "MersenneTwister.h"
 #include "mitkSimpSamp.h"
+
+// ITK
+#include <itkImage.h>
+
+// MISC
 #include <fstream>
 
 namespace mitk
@@ -32,15 +38,15 @@ class MitkDiffusionImaging_EXPORT MetropolisHastingsSampler
 public:
 
 
+    typedef itk::Image< float, 3 >  ItkFloatImageType;
+
     ParticleGrid* m_ParticleGrid;
-    float* m_QBallImageData;
     const int* datasz;
     EnergyComputer* enc;
     int m_Iterations;
     float width;
     float height;
     float depth;
-    double *voxsize;
     int m_NumAttributes;
     int m_AcceptedProposals;
 
@@ -79,7 +85,7 @@ public:
     Track TrackProposal, TrackBackup;
     SimpSamp simpsamp;
 
-    MetropolisHastingsSampler(MTRand* rgen, float *points,int numPoints,  float *dimg, const int *dsz, double *voxsz, double cellsize);
+    MetropolisHastingsSampler(ParticleGrid* grid, MTRand* randGen);
 
     void WriteOutParticles(float *npoints);
 

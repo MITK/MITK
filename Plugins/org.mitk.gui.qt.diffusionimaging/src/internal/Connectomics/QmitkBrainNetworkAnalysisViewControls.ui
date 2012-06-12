@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>227</width>
-    <height>1012</height>
+    <height>1045</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -106,6 +106,13 @@
     <widget class="QPushButton" name="modularizePushButton">
      <property name="text">
       <string>Divide in Modules</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="prunePushButton">
+     <property name="text">
+      <string>Prune Network</string>
      </property>
     </widget>
    </item>

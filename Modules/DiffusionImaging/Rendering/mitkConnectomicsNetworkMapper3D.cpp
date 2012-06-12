@@ -46,9 +46,10 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
 void mitk::ConnectomicsNetworkMapper3D::GenerateData()
 {
-  //TODO: implement
+  m_NetworkAssembly->Delete();
+  m_NetworkAssembly = vtkPropAssembly::New();
 
-   // Here is the part where a graph is given and converted to points and connections between points...
+  // Here is the part where a graph is given and converted to points and connections between points...
   std::vector< mitk::ConnectomicsNetwork::NetworkNode > vectorOfNodes = this->GetInput()->GetVectorOfAllNodes();
   std::vector< std::pair< 
     std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode > 

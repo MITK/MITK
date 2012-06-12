@@ -111,6 +111,8 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
     }
   }
 
+  // Prune unconnected nodes
+  m_ConNetwork->PruneUnconnectedSingleNodes();
   // provide network with geometry
   m_ConNetwork->SetGeometry( m_Segmentation->GetGeometry() );
   m_ConNetwork->UpdateBounds();

@@ -501,3 +501,56 @@ void mitk::ConnectomicsNetwork::UpdateBounds( )
   this->GetGeometry()->SetFloatBounds(bounds);
   this->GetTimeSlicedGeometry()->UpdateInformation();
 }
+
+void mitk::ConnectomicsNetwork::PruneUnconnectedSingleNodes()
+{
+  boost::graph_traits<NetworkType>::vertex_iterator iterator, end;
+
+  // set to true if iterators are invalidated by deleting a vertex
+  bool vertexHasBeenRemoved( true );
+
+  // if no vertex has been removed in the last loop, we are done
+  while( vertexHasBeenRemoved )
+  {
+    vertexHasBeenRemoved = false;
+    // sets iterator to start and end to end
+    boost::tie(iterator, end) = boost::vertices( m_Network );
+
+    for ( ; iterator != end && !vertexHasBeenRemoved; ++iterator)
+    {
+      // If the node has no adjacent vertices it should be deleted
+      if( GetVectorOfAdjacentNodes( *iterator ).size() == 0 )
+      {
+        vertexHasBeenRemoved = true;
+        // this invalidates all iterators
+        boost::remove_vertex( *iterator, m_Network );
+      }
+    }
+  }
+
+  UpdateIDs();
+}
+
+void mitk::ConnectomicsNetwork::UpdateIDs()
+{
+  boost::graph_traits<NetworkType>::vertex_iterator v_i, v_end;
+  boost::graph_traits<NetworkType>::edge_iterator e_i, e_end;
+
+  // update node ids
+  boost::tie( v_i, v_end ) = boost::vertices( m_Network );
+
+  for ( ; v_i != v_end; ++v_i)
+  {
+    m_Network[*v_i].id = *v_i;
+  }
+
+  // update edge information
+  boost::tie(e_i, e_end) = boost::edges( m_Network );
+
+  for ( ; e_i != e_end; ++e_i)
+  {
+    m_Network[ *e_i ].sourceId = m_Network[ boost::source( *e_i, m_Network ) ].id;
+    m_Network[ *e_i ].targetId = m_Network[ boost::target( *e_i, m_Network ) ].id;
+  }
+  this->SetIsModified( true );
+}

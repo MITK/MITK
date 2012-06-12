@@ -73,6 +73,9 @@ namespace itk
     typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
     typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
 
+    typedef std::vector<unsigned int> IndicesVector;
+    typedef std::map<double, IndicesVector> BValueMap;
+
     itkGetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
     itkSetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
 
@@ -85,7 +88,10 @@ namespace itk
     itkGetMacro(Iterations, unsigned long)
     itkSetMacro(Iterations, unsigned long)
 
-    std::vector< int > GetUsedGradientIndices();
+    IndicesVector GetUsedGradientIndices(){return m_UsedGradientIndices;}
+    void SetOriginalBValueMap(BValueMap inp){m_OriginalBValueMap = inp;}
+    void SetShellSelectionBValueMap(BValueMap inp){m_InputBValueMap = inp;}
+
   protected:
     ReduceDirectionGradientsFilter();
     ~ReduceDirectionGradientsFilter() {};
@@ -96,9 +102,12 @@ namespace itk
     GradientDirectionContainerType::Pointer m_GradientDirections;
     GradientDirectionContainerType::Pointer m_OriginalGradientDirections;
 
-    std::vector< int > m_UsedGradientIndices;
-    std::vector< int > m_UnUsedGradientIndices;
-    std::vector< int > m_BaselineImageIndices;
+    IndicesVector m_UsedGradientIndices;
+    IndicesVector m_UnUsedGradientIndices;
+    IndicesVector m_BaselineImageIndices;
+
+    BValueMap m_OriginalBValueMap;
+    BValueMap m_InputBValueMap;
 
     int m_NumGradientDirections;
     unsigned long m_Iterations;

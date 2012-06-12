@@ -304,12 +304,29 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
 
   typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
   typedef itk::ReduceDirectionGradientsFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+  typedef DiffusionImageType::BValueMap BValueMap;
+
+  // GetShellSelection from GUI
+  BValueMap shellSlectionMap;
+  BValueMap originalShellMap = m_DiffusionImage->GetB_ValueMap();
+  foreach(QCheckBox * box , m_ReduceGradientCheckboxes)
+  {
+    if(box->isChecked()){
+      double BValue = (box->text().split(' ')).at(0).toDouble();
+      shellSlectionMap[BValue] = originalShellMap[BValue];
+      MITK_INFO << BValue;
+    }
+  }
+
+  MITK_INFO << shellSlectionMap.size();
 
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetOriginalDirections();
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput(m_DiffusionImage->GetVectorImage());
   filter->SetOriginalGradientDirections(gradientContainer);
   filter->SetNumGradientDirections(m_Controls->m_ReduceGradientsBox->value());
+  filter->SetOriginalBValueMap(originalShellMap);
+  filter->SetShellSelectionBValueMap(shellSlectionMap);
   filter->Update();
 
   DiffusionImageType::Pointer image = DiffusionImageType::New();

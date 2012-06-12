@@ -26,8 +26,8 @@ Errors or bugs discovered in these platforms are prioritized and corrected as so
 
 | Platform                            | Compilers
 | ----------------------------------- | -----------------------------
-| Ubuntu Linux 11.04 (64-bit)         | As provided by Ubuntu
-| Microsoft Windows 7 (32 and 64-bit) | MSVC 2008 SP1
+| Ubuntu Linux 12.04 (64-bit)         | gcc as provided by Ubuntu
+| Microsoft Windows 7 (64-bit)        | MSVC 2008 SP1
 | Apple Mac OS X 10.7 "Lion"          | LLVM-GCC as provided by Apple
 
 
@@ -41,9 +41,10 @@ as well as in the current master branch.
 
 | Platform                           | Compilers
 | ---------------------------------- | -----------------------------
-| Ubuntu Linux 11.04 (32-bit)        | As provided by Ubuntu
-| Microsoft Windows XP (32-bit)      | MSVC 2008 SP1
-| Apple Mac OS X 10.6 "Snow Leopard" | LLVM-GCC as provided by Apple
+| Ubuntu Linux 11.04 (64-bit)        | gcc as provided by Ubuntu
+| Ubuntu Linux 12.04 (64-bit)        | Clang as provided by Ubuntu
+| Microsoft Windows 7 (32-bit)       | MSVC 2008 SP1
+| Apple Mac OS X 10.7 "Lion"         | Clang as provided by Apple (XCode)
 
 
 All platforms not listed above are not officially supported by the MITK team. However, we will happily accept

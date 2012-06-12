@@ -68,9 +68,7 @@ namespace mitk
     typedef int                                             ImageLabelType;
     typedef std::pair< ImageLabelType, ImageLabelType >     ImageLabelPairType;
 
-
-
-
+    /** Given a fiber bundle and a parcellation are set, this will create a network from both */
     void CreateNetworkFromFibersAndSegmentation();
     void SetFiberBundle(mitk::FiberBundleX::Pointer fiberBundle);
     void SetSegmentation(mitk::Image::Pointer segmentation);
@@ -181,8 +179,12 @@ namespace mitk
 
     static const int freesurfer_Left_Cerebral_White_Matter = 2;
     static const int freesurfer_Left_Cerebellum_White_Matter = 7;
+    static const int freesurfer_Left_Cerebellum_Cortex = 8;
+    static const int freesurfer_Brain_Stem = 16;
     static const int freesurfer_Right_Cerebral_White_Matter = 41;
     static const int freesurfer_Right_Cerebellum_White_Matter = 46;
+    static const int freesurfer_Right_Cerebellum_Cortex = 47;
+
 
   };
 

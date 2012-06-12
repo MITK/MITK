@@ -539,7 +539,10 @@ bool mitk::ConnectomicsNetworkCreator::IsNonWhiteMatterLabel( int labelInQuestio
     ( labelInQuestion == freesurfer_Left_Cerebral_White_Matter )   || 
     ( labelInQuestion == freesurfer_Left_Cerebellum_White_Matter ) || 
     ( labelInQuestion == freesurfer_Right_Cerebral_White_Matter )  || 
-    ( labelInQuestion == freesurfer_Right_Cerebellum_White_Matter )  
+    ( labelInQuestion == freesurfer_Right_Cerebellum_White_Matter )||
+    ( labelInQuestion == freesurfer_Left_Cerebellum_Cortex )       ||
+    ( labelInQuestion == freesurfer_Right_Cerebellum_Cortex )      ||
+    ( labelInQuestion == freesurfer_Brain_Stem )
     );
 
   return !isWhite;
@@ -656,7 +659,7 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
         if( tempLabel < 1 )
         {
           keepOn = false;
-          MBI_WARN << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_NOT_EXTEND_TO_WHITE;
+          //MBI_WARN << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_NOT_EXTEND_TO_WHITE;
         }
         else
         {

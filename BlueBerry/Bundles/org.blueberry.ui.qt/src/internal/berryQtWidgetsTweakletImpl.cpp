@@ -317,7 +317,11 @@ void QtWidgetsTweakletImpl::Dispose(QWidget* widget)
 
 Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int style)
 {
+#ifdef __APPLE__
+  Qt::WindowFlags qtFlags(0);
+#else
   Qt::WindowFlags qtFlags(Qt::CustomizeWindowHint);
+#endif
 
   if (style & Constants::MAX)
     qtFlags |= Qt::WindowMaximizeButtonHint;

@@ -54,24 +54,6 @@ void MetropolisHastingsSampler::Iterate(float* acceptance, unsigned long* numCon
     *acceptance = (float)m_AcceptedProposals/m_Iterations;
 }
 
-void MetropolisHastingsSampler::WriteOutParticles(float *npoints)
-{
-    for (int k = 0; k < m_ParticleGrid->m_NumParticles; k++)
-    {
-        Particle *p = &(m_ParticleGrid->m_Particles[k]);
-        npoints[m_NumAttributes*k] = p->R[0];
-        npoints[m_NumAttributes*k+1] = p->R[1];
-        npoints[m_NumAttributes*k+2] = p->R[2];
-        npoints[m_NumAttributes*k+3] = p->N[0];
-        npoints[m_NumAttributes*k+4] = p->N[1];
-        npoints[m_NumAttributes*k+5] = p->N[2];
-        npoints[m_NumAttributes*k+6] = p->cap;
-        npoints[m_NumAttributes*k+7] = p->len;
-        npoints[m_NumAttributes*k+8] = m_ParticleGrid->Id2Index(p->mID);
-        npoints[m_NumAttributes*k+9] = m_ParticleGrid->Id2Index(p->pID);
-    }
-}
-
 void MetropolisHastingsSampler::SetParameters(float Temp, int numit, float plen, float curv_hardthres, float chempot_particle)
 {
     m_Iterations = numit;

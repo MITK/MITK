@@ -30,7 +30,6 @@ namespace mitk
 class MitkDiffusionImaging_EXPORT ParticleGrid
 {
 
-    //////////////// Container
 public:
 
     typedef itk::Image< float, 3 >  ItkFloatImageType;
@@ -45,9 +44,7 @@ public:
     ParticleGrid(ItkFloatImageType* image, float cellSize);
     ~ParticleGrid();
 
-    int reallocate();
-
-    int Id2Index(int ID);
+    Particle* GetParticle(int ID);
 
     Particle* newParticle(vnl_vector_fixed<float, 3> R);
     bool TryUpdateGrid(int k);
@@ -61,6 +58,9 @@ public:
     void DestroyConnection(Particle *P1,int ep1);
 
 private:
+
+    int Id2Index(int ID);
+    int ReallocateGrid();
 
     int capacity; // maximal number of particles
     int increase_step;

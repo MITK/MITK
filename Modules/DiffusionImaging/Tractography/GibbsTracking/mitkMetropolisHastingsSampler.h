@@ -87,8 +87,6 @@ public:
 
     MetropolisHastingsSampler(ParticleGrid* grid, MTRand* randGen);
 
-    void WriteOutParticles(float *npoints);
-
     void SetEnergyComputer(EnergyComputer *e);
     void SetParameters(float Temp, int numit, float plen, float curv_hardthres, float chempot_particle);
     void SetTemperature(float temp);

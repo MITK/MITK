@@ -94,7 +94,7 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float cellSize)
     mulz = 1/cellSize;
 }
 
-int ParticleGrid::reallocate()
+int ParticleGrid::ReallocateGrid()
 {
     int new_capacity = capacity + increase_step;
     Particle* new_particles = (Particle*) realloc(m_Particles,sizeof(Particle)*new_capacity);
@@ -153,6 +153,11 @@ int ParticleGrid::Id2Index(int ID)
 
 }
 
+Particle* ParticleGrid::GetParticle(int ID)
+{
+    return &m_Particles[Id2Index(ID)];
+}
+
 
 Particle* ParticleGrid::newParticle(vnl_vector_fixed<float, 3> R)
 {
@@ -160,7 +165,7 @@ Particle* ParticleGrid::newParticle(vnl_vector_fixed<float, 3> R)
     if (m_NumParticles >= capacity)
     {
         fprintf(stderr,"capacity overflow , reallocating ...\n");
-        if (reallocate() == -1)
+        if (ReallocateGrid() == -1)
         {
             fprintf(stderr,"out of Memory!!\n");
             return 0;

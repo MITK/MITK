@@ -97,20 +97,20 @@ void FiberBuilder::labelPredecessors(Particle *dp, vtkSmartPointer<vtkPolyLine> 
 {
     if (dp->mID != -1 && dp->mID!=dp->ID)
     {
-        if (dp->ID!=particles[m_Grid->Id2Index(dp->mID)].pID)
+        if (dp->ID!=m_Grid->GetParticle(dp->mID)->pID)
         {
-            if (dp->ID==particles[m_Grid->Id2Index(dp->mID)].mID)
+            if (dp->ID==m_Grid->GetParticle(dp->mID)->mID)
             {
-                int tmp = particles[m_Grid->Id2Index(dp->mID)].pID;
-                particles[m_Grid->Id2Index(dp->mID)].pID = particles[m_Grid->Id2Index(dp->mID)].mID;
-                particles[m_Grid->Id2Index(dp->mID)].mID = tmp;
+                int tmp = m_Grid->GetParticle(dp->mID)->pID;
+                m_Grid->GetParticle(dp->mID)->pID = m_Grid->GetParticle(dp->mID)->mID;
+                m_Grid->GetParticle(dp->mID)->mID = tmp;
             }
         }
-        if (particles[m_Grid->Id2Index(dp->mID)].label == 0)
+        if (m_Grid->GetParticle(dp->mID)->label == 0)
         {
-            particles[m_Grid->Id2Index(dp->mID)].label = dp->label;
-            particles[m_Grid->Id2Index(dp->mID)].numerator = dp->numerator-1;
-            labelPredecessors(&(particles[m_Grid->Id2Index(dp->mID)]), container);
+            m_Grid->GetParticle(dp->mID)->label = dp->label;
+            m_Grid->GetParticle(dp->mID)->numerator = dp->numerator-1;
+            labelPredecessors(m_Grid->GetParticle(dp->mID), container);
         }
     }
 
@@ -123,20 +123,20 @@ void FiberBuilder::labelSuccessors(Particle *dp, vtkSmartPointer<vtkPolyLine> co
 
     if (dp->pID != -1 && dp->pID!=dp->ID)
     {
-        if (dp->ID!=particles[m_Grid->Id2Index(dp->pID)].mID)
+        if (dp->ID!=m_Grid->GetParticle(dp->pID)->mID)
         {
-            if (dp->ID==particles[m_Grid->Id2Index(dp->pID)].pID)
+            if (dp->ID==m_Grid->GetParticle(dp->pID)->pID)
             {
-                int tmp = particles[m_Grid->Id2Index(dp->pID)].pID;
-                particles[m_Grid->Id2Index(dp->pID)].pID = particles[m_Grid->Id2Index(dp->pID)].mID;
-                particles[m_Grid->Id2Index(dp->pID)].mID = tmp;
+                int tmp = m_Grid->GetParticle(dp->pID)->pID;
+                m_Grid->GetParticle(dp->pID)->pID = m_Grid->GetParticle(dp->pID)->mID;
+                m_Grid->GetParticle(dp->pID)->mID = tmp;
             }
         }
-        if (particles[m_Grid->Id2Index(dp->pID)].label == 0)
+        if (m_Grid->GetParticle(dp->pID)->label == 0)
         {
-            particles[m_Grid->Id2Index(dp->pID)].label = dp->label;
-            particles[m_Grid->Id2Index(dp->pID)].numerator = dp->numerator+1;
-            labelSuccessors(&(particles[m_Grid->Id2Index(dp->pID)]), container);
+            m_Grid->GetParticle(dp->pID)->label = dp->label;
+            m_Grid->GetParticle(dp->pID)->numerator = dp->numerator+1;
+            labelSuccessors(m_Grid->GetParticle(dp->pID), container);
         }
     }
 }

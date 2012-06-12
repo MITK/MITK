@@ -57,6 +57,8 @@ class UltrasoundSupport : public QmitkAbstractView
   
     void OnClickedAddNewDevice();
 
+    void OnClickedViewDevice();
+
   protected:
   
     virtual void SetFocus();

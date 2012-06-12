@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QColor>
 
 //mitk headers
-#include "mitkDataNode.h"
+
 
 
 //itk headers
@@ -48,12 +48,12 @@ QmitkUSDeviceManagerWidget::QmitkUSDeviceManagerWidget(QWidget* parent, Qt::Wind
 
   // Register this Widget as a listener for Registry changes.
   // If devices are registered, unregistered or changed, notifications will go there
-  std::string filter = "(";
+  std::string filter = "(&(";
   filter += mitk::ServiceConstants::OBJECTCLASS();
   filter += "=";
   //filter += us_service_interface_iid<mitk::USDevice>();
-  filter += "org.mitk.services.UltrasoundDevice)";
-   m_MitkUSContext->AddServiceListener(this, &QmitkUSDeviceManagerWidget::OnServiceEvent ,filter);
+  filter += "org.mitk.services.UltrasoundDevice)(IsActive=false))";
+   m_MitkUSContext->AddServiceListener(this, &QmitkUSDeviceManagerWidget::OnServiceEvent, filter);
 }
 
 QmitkUSDeviceManagerWidget::~QmitkUSDeviceManagerWidget()
@@ -84,57 +84,17 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 }
 
 
+
+
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
-void QmitkUSDeviceManagerWidget::OnClickedActivateDevice(){
+void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
+{
   MITK_INFO << "Activated Device";
   mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_ConnectedDevices->currentItem());
   if (device.IsNull()) return;
   if (device->GetIsActive()) device->Deactivate();
   else device->Activate();
-
-  ////////////////////////////
-  // THIS IS DEBUGGING CODE //
-  ////////////////////////////
-  
-  // 
-  //QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  //if (nodes.empty()) return;
-
-  //mitk::DataNode* node = mitk::DataNode::New();
-  //device->Update();
-  //mitk::USImage::Pointer image = device->GetOutput();
-  //node->SetData(image);
-
-  
-
-  //// here we have a valid mitk::DataNode
-
-  //// a node itself is not very useful, we need its data item (the image)
-  //mitk::BaseData* data = node->GetData();
-  //if (data)
-  //{
-  //  // test if this data item is an image or not (could also be a surface or something totally different)
-  //  mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-  //  if (image)
-  //  {
-  //    std::stringstream message;
-  //    std::string name;
-  //    message << "Performing image processing for image ";
-  //    if (node->GetName(name))
-  //    {
-  //      // a property called "name" was found for this DataNode
-  //      message << "'" << name << "'";
-  //    }
-  //    message << ".";
-  //    MITK_INFO << message.str();
-
-  //    // actually do something here...
-
-  //  }
-  //}
-
-
 }
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){

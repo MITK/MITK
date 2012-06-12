@@ -123,19 +123,13 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk
     /*
     * \brief Returns a List of US Devices that are currently connected by querying the service registry.
     */
-    std::vector<mitk::USDevice::Pointer> GetAllRegisteredDevices();
-
-
-    
+    std::vector<mitk::USDevice::Pointer> GetAllRegisteredDevices(); 
 
   private:
 
     mitk::ModuleContext* m_MitkUSContext;
 
-    
-
-
-    
+   
 };
 
 #endif // _QmitkUSDeviceManagerWidget_H_INCLUDED

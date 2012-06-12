@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 
+//Mitk
+#include "mitkDataNode.h"
+
 // Qmitk
 #include "UltrasoundSupport.h"
 
@@ -44,11 +47,14 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_AddDevice, SIGNAL(clicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
   connect( m_Controls.m_AddDevice, SIGNAL(clicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
-
-  // Show & Hide
+  connect( m_Controls.m_BtnView, SIGNAL(clicked()), this, SLOT(OnClickedViewDevice()) ); 
+  //connect (m_Controls.m_ActiveVideoDevices, SIGNAL())
+  
+  // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
+  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(IsActive=true))";
+  m_Controls.m_ActiveVideoDevices->Initialize(filter);
 }
-
 
 void UltrasoundSupport::OnClickedAddNewDevice(){
   MITK_INFO << "USSUPPORT: OnClickedAddNewDevice()"; 
@@ -56,6 +62,65 @@ void UltrasoundSupport::OnClickedAddNewDevice(){
   m_Controls.m_DeviceManagerWidget->setVisible(false);
   m_Controls.m_AddDevice->setVisible(false);
   m_Controls.m_Headline->setText("Add New Device:");
+}
+
+void UltrasoundSupport::OnClickedViewDevice()
+{
+  MITK_INFO << "USSUPPORT: OnClickedViewDevice()"; 
+  mitk::USDevice::Pointer device = m_Controls.m_ActiveVideoDevices->GetSelectedDevice();
+  if (device.IsNull()) return;
+  //QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+ // if (nodes.empty()) return;
+
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  device->Update();
+  mitk::USImage::Pointer image = device->GetOutput();
+  node->SetData(image);
+  node->SetName("US-Image 0");
+  this->GetDataStorage()->Add(node);
+  int i;
+  for (i = 1; i < 10; i++)
+  {
+    device->Update();
+    if ((i % 3) == 0 ){
+    node = mitk::DataNode::New();
+    image = device->GetOutput();
+    node->SetData(image);
+    node->SetName("US-Image " + i);
+    this->GetDataStorage()->Add(node);
+    }
+  }
+
+
+
+  
+
+  //// here we have a valid mitk::DataNode
+
+  //// a node itself is not very useful, we need its data item (the image)
+  //mitk::BaseData* data = node->GetData();
+  //if (data)
+  //{
+  //  // test if this data item is an image or not (could also be a surface or something totally different)
+  //  mitk::Image* image = dynamic_cast<mitk::Image*>( data );
+  //  if (image)
+  //  {
+  //    std::stringstream message;
+  //    std::string name;
+  //    message << "Performing image processing for image ";
+  //    if (node->GetName(name))
+  //    {
+  //      // a property called "name" was found for this DataNode
+  //      message << "'" << name << "'";
+  //    }
+  //    message << ".";
+  //    MITK_INFO << message.str();
+
+  //    // actually do something here...
+
+  //  }
+  //}
+
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()

@@ -43,20 +43,14 @@ QmitkUSDeviceListWidget::QmitkUSDeviceListWidget(QWidget* parent, Qt::WindowFlag
   mitk::Module* mitkUS = mitk::ModuleRegistry::GetModule("MitkUS");  
   m_MitkUSContext = mitkUS->GetModuleContext();
 
-  //ServiceTracker<mitk::USDevice>* tracker = new ServiceTracker<mitk::USDevice>(m_MitkUSContext, this);
+ 
 
-  // Register this Widget as a listener for Registry changes.
-  // If devices are registered, unregistered or changed, notifications will go there
-  std::string filter = "(";
-  filter += mitk::ServiceConstants::OBJECTCLASS();
-  filter += "=";
-  //filter += us_service_interface_iid<mitk::USDevice>();
-  filter += "org.mitk.services.UltrasoundDevice)";
-   m_MitkUSContext->AddServiceListener(this, &QmitkUSDeviceListWidget::OnServiceEvent ,filter);
+  
 }
 
 QmitkUSDeviceListWidget::~QmitkUSDeviceListWidget()
 {
+
 }
 
 //////////////////// INITIALIZATION /////////////////////
@@ -76,21 +70,30 @@ void QmitkUSDeviceListWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    //connect( m_Controls->m_ConnectedDevices, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnDeviceSelectionChanged()) );
+    connect( m_Controls->m_DeviceList, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnDeviceSelectionChanged()) );
   }
 }
 
+void QmitkUSDeviceListWidget::Initialize(std::string filter)
+{
+  m_Filter = filter;
+  m_MitkUSContext->AddServiceListener(this, &QmitkUSDeviceListWidget::OnServiceEvent, m_Filter);
+}
+
+///////////////////////// Getter & Setter /////////////////////////////////
+
+mitk::USDevice::Pointer QmitkUSDeviceListWidget::GetSelectedDevice()
+{
+  return this->GetDeviceForListItem(this->m_Controls->m_DeviceList->currentItem());
+}
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
 
-
-
 void QmitkUSDeviceListWidget::OnDeviceSelectionChanged(){
-    //mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_ConnectedDevices->currentItem());
-    //if (device.IsNull()) return;
-    //if (device->GetIsActive()) m_Controls->m_BtnActivate->setText("Deactivate");
-    //else m_Controls->m_BtnActivate->setText("Activate");
+  mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_DeviceList->currentItem());
+  if (device.IsNull()) return;
+  emit (DeviceSelected(device));
 }
 
 
@@ -111,7 +114,7 @@ void QmitkUSDeviceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
     QListWidgetItem *newItem = ConstructItemFromDevice(it->GetPointer());
     //Add new item to QListWidget
     m_Controls->m_DeviceList->addItem(newItem);
-    // Construct Link and add to internal List for reference
+    // Construct link and add to internal List for reference
     QmitkUSDeviceListWidget::DeviceListLink link;
     link.device = it->GetPointer();
     link.item = newItem;
@@ -155,7 +158,7 @@ mitk::USDevice::Pointer QmitkUSDeviceListWidget::GetDeviceForListItem(QListWidge
 std::vector <mitk::USDevice::Pointer> QmitkUSDeviceListWidget::GetAllRegisteredDevices(){
   
   //Get Service References
-  std::list<mitk::ServiceReference> serviceRefs = m_MitkUSContext->GetServiceReferences<mitk::USDevice>();
+  std::list<mitk::ServiceReference> serviceRefs = m_MitkUSContext->GetServiceReferences<mitk::USDevice>(m_Filter);
   
   // Convert Service References to US Devices
   std::vector<mitk::USDevice::Pointer>* result = new std::vector<mitk::USDevice::Pointer>;

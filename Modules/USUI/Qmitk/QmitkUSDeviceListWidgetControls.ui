@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>405</width>
+    <width>323</width>
     <height>231</height>
    </rect>
   </property>
@@ -20,7 +20,7 @@
    <string>QmitkUSDeviceListWidget</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="2">
+   <item row="0" column="0">
     <widget class="QListWidget" name="m_DeviceList"/>
    </item>
   </layout>

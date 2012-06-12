@@ -32,13 +32,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "usModuleContext.h"
 #include "usServiceEvent.h"
+#include "usServiceTrackerCustomizer.h"
 
 /**
 * @brief TODO
 *
 * @ingroup USUI
 */
-class MitkUSUI_EXPORT QmitkUSDeviceListWidget :public QWidget //, public mitk::ServiceTrackerCustomizer<> // this extension is necessary if one wants to use ServiceTracking instead of filtering
+class MitkUSUI_EXPORT QmitkUSDeviceListWidget :public QWidget //,  public mitk::ServiceTrackerCustomizer<> // this extension is necessary if one wants to use ServiceTracking instead of filtering
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -57,6 +58,16 @@ class MitkUSUI_EXPORT QmitkUSDeviceListWidget :public QWidget //, public mitk::S
     virtual void CreateConnections();
   
     /*
+    * \brief  Initializes the connection to the registry. The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
+    */
+    void Initialize(std::string filter);
+
+    /*
+    * \brief Returns the currently selected device, or null if none is selected.
+    */
+    mitk::USDevice::Pointer GetSelectedDevice();
+
+    /*
     *\brief This Function listens to ServiceRegistry changes and updates the
     *       list of devices accordingly.
     */
@@ -65,6 +76,24 @@ class MitkUSUI_EXPORT QmitkUSDeviceListWidget :public QWidget //, public mitk::S
     
 
   signals:
+
+    /*
+    *\brief Emitted when a new device mathing the filter connects
+    */
+    void DeviceConnected(mitk::USDevice::Pointer);
+    /*
+    *\brief Emitted directly before device matching the filter disconnects
+    */
+    void DeviceDisconnected(mitk::USDevice::Pointer);
+    /*
+    *\brief Emitted when a new device mathing the filter changes it's state. This does of now only compromise changes to activity.
+    */
+    void DeviceChanged(mitk::USDevice::Pointer);
+    
+    /*
+    *\brief Emitted the user selects a device from the list
+    */
+    void DeviceSelected(mitk::USDevice::Pointer);
 
     
 
@@ -118,6 +147,7 @@ class MitkUSUI_EXPORT QmitkUSDeviceListWidget :public QWidget //, public mitk::S
   private:
 
     mitk::ModuleContext* m_MitkUSContext;
+    std::string m_Filter;
 
     
 

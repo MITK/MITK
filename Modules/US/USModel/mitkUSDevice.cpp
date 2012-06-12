@@ -73,7 +73,8 @@ bool mitk::USDevice::Connect()
   // Define ServiceProps
   ServiceProperties props;
   props["DeviceClass"] = this->GetDeviceClass();
-  props["IsActive"] = false;
+  std::string no = "false";
+  props["IsActive"] = no;
   props["Class"] = this->GetClassName();
   m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
   return true; 
@@ -111,7 +112,8 @@ bool mitk::USDevice::Activate()
 
   ServiceProperties props;
   props["DeviceClass"] = this->GetDeviceClass();
-  props["IsActive"] = true;
+  std::string yes = "true";
+  props["IsActive"] = yes;
   props["Class"] = this->GetClassName();
   this->m_ServiceRegistration.SetProperties(props);
   return m_IsActive;
@@ -123,7 +125,8 @@ void mitk::USDevice::Deactivate()
 
   ServiceProperties props;
   props["DeviceClass"] = this->GetDeviceClass();
-  props["IsActive"] = false;
+  std::string no = "false";
+  props["IsActive"] = no;
   props["Class"] = this->GetClassName();
   this->m_ServiceRegistration.SetProperties(props);
   OnDeactivation();

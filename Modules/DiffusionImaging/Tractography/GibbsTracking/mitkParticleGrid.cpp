@@ -150,7 +150,6 @@ int ParticleGrid::Id2Index(int ID)
         return -1;
     else
         return (m_AddressContainer[ID] - m_Particles);
-
 }
 
 Particle* ParticleGrid::GetParticle(int ID)
@@ -173,20 +172,20 @@ Particle* ParticleGrid::newParticle(vnl_vector_fixed<float, 3> R)
     }
 
     int xint = int(R[0]*mulx);
-    if (xint < 0) { //fprintf(stderr,"error: out of grid\n");
-        return 0;}
-    if (xint >= nx)  { // fprintf(stderr,"error: out of grid\n");
-        return 0;}
+    if (xint < 0)
+        return 0;
+    if (xint >= nx)
+        return 0;
     int yint = int(R[1]*muly);
-    if (yint < 0)  { //fprintf(stderr,"error: out of grid\n");
-        return 0;}
-    if (yint >= ny)  {// fprintf(stderr,"error: out of grid\n");
-        return 0;}
+    if (yint < 0)
+        return 0;
+    if (yint >= ny)
+        return 0;
     int zint = int(R[2]*mulz);
-    if (zint < 0) {// fprintf(stderr,"error: out of grid\n");
-        return 0;}
-    if (zint >= nz)  { //fprintf(stderr,"error: out of grid\n");
-        return 0;}
+    if (zint < 0)
+        return 0;
+    if (zint >= nz)
+        return 0;
 
     int idx = xint + nx*(yint + ny*zint);
     if (occnt[idx] < csize)
@@ -204,7 +203,6 @@ Particle* ParticleGrid::newParticle(vnl_vector_fixed<float, 3> R)
     else
     {
         m_NumCellOverflows++;
-        //fprintf(stderr,"error: cell overflow \n");
         return 0;
     }
 }
@@ -274,27 +272,29 @@ void ParticleGrid::RemoveParticle(int k)
     }
     occnt[cellidx]--;
 
-
-
     // remove from container
     if (k<m_NumParticles-1)
     {
         int todel_ID = p->ID;
         int move_ID = m_Particles[m_NumParticles-1].ID;
 
-        *p = m_Particles[m_NumParticles-1];          // move very last particle to empty slot
+        m_Particles[k] = m_Particles[m_NumParticles-1];          // move very last particle to empty slot
         m_Particles[m_NumParticles-1].ID = todel_ID; // keep IDs unique
+
+        if (m_Particles[k].mID!=-1)
+        {
+            m_Particles[m_Particles[k].mID]
+        }
+        m_Particles[k].ID = move_ID;
+
         grid[p->gridindex] = p;          // keep gridindex consistent
 
         // permute address table
         m_AddressContainer[todel_ID] = &(m_Particles[m_NumParticles-1]);
         m_AddressContainer[move_ID]  = p;
-
     }
+
     m_NumParticles--;
-
-
-
 }
 
 void ParticleGrid::ComputeNeighbors(vnl_vector_fixed<float, 3> &R)

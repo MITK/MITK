@@ -2,23 +2,24 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef _SPHEREINTERPOLATOR
+#define _SPHEREINTERPOLATOR
 
-#include "auxilary_classes.cpp"
+#include <MitkDiffusionImagingExports.h>
 
-
-class SphereInterpolator
+class MitkDiffusionImaging_EXPORT SphereInterpolator
 {
 public:
   float *barycoords;
@@ -51,7 +52,7 @@ public:
   }
 
 
-  inline void getInterpolation(vnl_vector_fixed<double, 3> N)
+  inline void getInterpolation(vnl_vector_fixed<float, 3> N)
   {
     float nx = N[0];
     float ny = N[1];
@@ -133,5 +134,4 @@ public:
 
 };
 
-
-
+#endif

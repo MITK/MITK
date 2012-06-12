@@ -18,9 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProgressReporter.h>
 
 #include <mitkQBallImage.h>
-#include "itkPointShell.h"
 
-#include "GibbsTracking/BuildFibres.cpp"
+#include "GibbsTracking/mitkFiberBuilder.h"
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -37,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageDuplicator.h>
 #include <mitkStandardFileLocations.h>
 #include <itkDiffusionQballGeneralizedFaImageFilter.h>
+#include <vnl/vnl_copy.h>
 
 struct LessDereference {
     template <class T>
@@ -435,14 +435,16 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     }
 
     // calculate rotation matrix
-    vnl_matrix_fixed<double, 3, 3>  directionMatrix = m_ItkQBallImage->GetDirection().GetVnlMatrix();
-    vnl_vector_fixed<double, 3> d0 = directionMatrix.get_column(0); d0.normalize();
-    vnl_vector_fixed<double, 3> d1 = directionMatrix.get_column(1); d1.normalize();
-    vnl_vector_fixed<double, 3> d2 = directionMatrix.get_column(2); d2.normalize();
+    vnl_matrix<double> temp = m_ItkQBallImage->GetDirection().GetVnlMatrix();
+    vnl_matrix<float>  directionMatrix; directionMatrix.set_size(3,3);
+    vnl_copy(temp, directionMatrix);
+    vnl_vector_fixed<float, 3> d0 = directionMatrix.get_column(0); d0.normalize();
+    vnl_vector_fixed<float, 3> d1 = directionMatrix.get_column(1); d1.normalize();
+    vnl_vector_fixed<float, 3> d2 = directionMatrix.get_column(2); d2.normalize();
     directionMatrix.set_column(0, d0);
     directionMatrix.set_column(1, d1);
     directionMatrix.set_column(2, d2);
-    vnl_matrix_fixed<double, 3, 3> I = directionMatrix*directionMatrix.transpose();
+    vnl_matrix_fixed<float, 3, 3> I = directionMatrix*directionMatrix.transpose();
     if(!I.is_identity(mitk::eps)){
         MITK_INFO << "itkGibbsTrackingFilter: image direction is not a rotation matrix. Tracking not possible!";
         m_AbortTracking = true;
@@ -585,18 +587,18 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
       m_CurvatureHardThreshold = 0;
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
 
+    MTRand randGen(1);
+    srand(1);
+
     // setup metropolis hastings sampler
     MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
     if (m_Sampler!=NULL)
         delete m_Sampler;
-    m_Sampler = new RJMCMC(NULL, 0, workingQballImage, qBallImageSize, qBallImageSpacing, cellsize);
-
-    mtrand.seed((unsigned long)0);
-    srand(0);
+    m_Sampler = new MetropolisHastingsSampler(&randGen, NULL, 0, workingQballImage, qBallImageSize, qBallImageSpacing, cellsize);
 
     // setup energy computer
     MITK_INFO << "itkGibbsTrackingFilter: setting up Energy-computer";
-    EnergyComputer encomp(workingQballImage,qBallImageSize,qBallImageSpacing,sinterp,m_Sampler->m_ParticleGrid,mask,mask_oversamp_mult, directionMatrix);
+    EnergyComputer encomp(&randGen, workingQballImage,qBallImageSize,qBallImageSpacing,sinterp,m_Sampler->m_ParticleGrid,mask,mask_oversamp_mult, directionMatrix);
 
     encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,m_CurvatureHardThreshold,m_InexBalance,m_Chempot2, m_Meanval_sq);
     m_Sampler->SetEnergyComputer(&encomp);

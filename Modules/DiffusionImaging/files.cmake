@@ -116,6 +116,9 @@ set(CPP_FILES
 
   # Tractography
   Tractography/GibbsTracking/mitkParticleGrid.cpp
+  Tractography/GibbsTracking/mitkMetropolisHastingsSampler.cpp
+  Tractography/GibbsTracking/mitkEnergyComputer.cpp
+  Tractography/GibbsTracking/mitkFiberBuilder.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
@@ -176,7 +179,13 @@ set(H_FILES
   Tractography/itkGibbsTrackingFilter.h
   Tractography/itkStochasticTractographyFilter.h
   Tractography/itkStreamlineTrackingFilter.h
+  Tractography/GibbsTracking/mitkParticle.h
   Tractography/GibbsTracking/mitkParticleGrid.h
+  Tractography/GibbsTracking/mitkMetropolisHastingsSampler.h
+  Tractography/GibbsTracking/mitkSimpSamp.h
+  Tractography/GibbsTracking/mitkEnergyComputer.h
+  Tractography/GibbsTracking/mitkSphereInterpolator.h
+  Tractography/GibbsTracking/mitkFiberBuilder.h
 
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h

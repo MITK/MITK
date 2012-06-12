@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorContainer.h"
 #include "itkImage.h"
 
-#include "GibbsTracking/auxilary_classes.cpp"
-#include "GibbsTracking/RJMCMC_randshift.cpp"
-#include "GibbsTracking/EnergyComputer_connec.cpp"
+#include "GibbsTracking/MersenneTwister.h"
+#include "GibbsTracking/mitkMetropolisHastingsSampler.h"
+#include "GibbsTracking/mitkEnergyComputer.h"
 
 #include <fstream>
 #include <QFile>
@@ -31,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
-
-#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 namespace itk{
 
@@ -45,8 +43,8 @@ namespace itk{
     typedef SmartPointer< Self > Pointer;
     typedef SmartPointer< const Self > ConstPointer;
 
-    itkNewMacro(Self);
-    itkTypeMacro( GibbsTrackingFilter, ProcessObject );
+    itkNewMacro(Self)
+    itkTypeMacro( GibbsTrackingFilter, ProcessObject )
 
     /** Types for the DWI Input Image **/
     typedef TInputQBallImage InputQBallImageType;
@@ -60,69 +58,69 @@ namespace itk{
     typedef Image< float, 3 >                  GfaImageType;
     typedef typename GfaImageType::Pointer     GfaImageTypePointer;
 
-    itkSetMacro( TempStart, float );
-    itkGetMacro( TempStart, float );
+    itkSetMacro( TempStart, float )
+    itkGetMacro( TempStart, float )
 
-    itkSetMacro( TempEnd, float );
-    itkGetMacro( TempEnd, float );
+    itkSetMacro( TempEnd, float )
+    itkGetMacro( TempEnd, float )
 
-    itkSetMacro( NumIt, unsigned long );
-    itkGetMacro( NumIt, unsigned long );
+    itkSetMacro( NumIt, unsigned long )
+    itkGetMacro( NumIt, unsigned long )
 
-    itkSetMacro( ParticleWeight, float );
-    itkGetMacro( ParticleWeight, float );
+    itkSetMacro( ParticleWeight, float )
+    itkGetMacro( ParticleWeight, float )
 
     /** width of particle sigma (std-dev of gaussian around center) **/
-    itkSetMacro( ParticleWidth, float );
-    itkGetMacro( ParticleWidth, float );
+    itkSetMacro( ParticleWidth, float )
+    itkGetMacro( ParticleWidth, float )
 
     /** length of particle from midpoint to ends **/
-    itkSetMacro( ParticleLength, float );
-    itkGetMacro( ParticleLength, float );
+    itkSetMacro( ParticleLength, float )
+    itkGetMacro( ParticleLength, float )
 
-    itkSetMacro( ChempotConnection, float );
-    itkGetMacro( ChempotConnection, float );
+    itkSetMacro( ChempotConnection, float )
+    itkGetMacro( ChempotConnection, float )
 
-    itkSetMacro( ChempotParticle, float );
-    itkGetMacro( ChempotParticle, float );
+    itkSetMacro( ChempotParticle, float )
+    itkGetMacro( ChempotParticle, float )
 
-    itkSetMacro( InexBalance, float );
-    itkGetMacro( InexBalance, float );
+    itkSetMacro( InexBalance, float )
+    itkGetMacro( InexBalance, float )
 
-    itkSetMacro( Chempot2, float );
-    itkGetMacro( Chempot2, float );
+    itkSetMacro( Chempot2, float )
+    itkGetMacro( Chempot2, float )
 
-    itkSetMacro( FiberLength, int );
-    itkGetMacro( FiberLength, int );
+    itkSetMacro( FiberLength, int )
+    itkGetMacro( FiberLength, int )
 
-    itkSetMacro( AbortTracking, bool );
-    itkGetMacro( AbortTracking, bool );
+    itkSetMacro( AbortTracking, bool )
+    itkGetMacro( AbortTracking, bool )
 
-    itkSetMacro( CurrentStep, unsigned long );
-    itkGetMacro( CurrentStep, unsigned long );
+    itkSetMacro( CurrentStep, unsigned long )
+    itkGetMacro( CurrentStep, unsigned long )
 
-    itkSetMacro( SubtractMean, bool);
-    itkGetMacro( SubtractMean, bool);
+    itkSetMacro( SubtractMean, bool)
+    itkGetMacro( SubtractMean, bool)
 
-    itkSetMacro( CurvatureHardThreshold, float);
-    itkGetMacro( CurvatureHardThreshold, float);
+    itkSetMacro( CurvatureHardThreshold, float)
+    itkGetMacro( CurvatureHardThreshold, float)
 
     /** Set/Get the Odf Input Image **/
-    itkSetInputMacro(OdfImage, InputQBallImageType, 0);
-    itkGetInputMacro(OdfImage, InputQBallImageType, 0);
+    itkSetInputMacro(OdfImage, InputQBallImageType, 0)
+    itkGetInputMacro(OdfImage, InputQBallImageType, 0)
 
     /** Set/Get the Input mask image **/
-    itkSetMacro(MaskImage, MaskImageTypePointer);
-    itkGetMacro(MaskImage, MaskImageTypePointer);
+    itkSetMacro(MaskImage, MaskImageTypePointer)
+    itkGetMacro(MaskImage, MaskImageTypePointer)
 
-    itkSetMacro(GfaImage, GfaImageTypePointer);
-    itkGetMacro(GfaImage, GfaImageTypePointer);
+    itkSetMacro(GfaImage, GfaImageTypePointer)
+    itkGetMacro(GfaImage, GfaImageTypePointer)
 
-    itkGetMacro(NumParticles, unsigned long);
-    itkGetMacro(NumConnections, unsigned long);
-    itkGetMacro(NumAcceptedFibers, int);
-    itkGetMacro(ProposalAcceptance, float);
-    itkGetMacro(Steps, unsigned int);
+    itkGetMacro(NumParticles, unsigned long)
+    itkGetMacro(NumConnections, unsigned long)
+    itkGetMacro(NumAcceptedFibers, int)
+    itkGetMacro(ProposalAcceptance, float)
+    itkGetMacro(Steps, unsigned int)
 
     /** Entry Point For the Algorithm:  Is invoked when Update() is called
     either directly or through itk pipeline propagation
@@ -186,7 +184,7 @@ namespace itk{
     float   m_CurvatureHardThreshold;
     float   m_Meanval_sq;
 
-    RJMCMC* m_Sampler;
+    MetropolisHastingsSampler* m_Sampler;
     FiberPolyDataType m_FiberPolyData;
     unsigned long m_NumParticles;
     unsigned long m_NumConnections;

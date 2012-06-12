@@ -165,6 +165,9 @@ namespace mitk
     char** m_SourceDataBuffer; ///< buffer holding the last acquired images
     char* m_SourceDataArray; ///< array holding the current PMD source data
     short* m_ShortSourceData; ///< array holding the current PMD raw data
+    unsigned int m_OriginControllerWidth;
+    unsigned int m_OriginControllerHeight;
+
   private:
 
     //member variables

@@ -17,18 +17,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFConfig.h"
 #include <pmdsdk2.h>
 
+// vnl includes
+#include "vnl/vnl_matrix.h"
+
 //Plugin defines for CamBoard
 #define SOURCE_PARAM "" 
 #define PROC_PARAM ""
 
 extern PMDHandle m_PMDHandle; //TODO
-
 extern PMDDataDescription m_DataDescription; //TODO
 
+struct SourceDataStruct {
+  PMDDataDescription dataDescription;
+  char sourceData;
+}; 
 
 namespace mitk
 {
-  ToFCameraPMDCamBoardController::ToFCameraPMDCamBoardController()
+  ToFCameraPMDCamBoardController::ToFCameraPMDCamBoardController(): m_InternalCaptureWidth(0), 
+    m_InternalCaptureHeight(0), m_InternalPixelNumber(0)
   {
     m_SourcePlugin = MITK_TOF_PMDCAMBOARD_SOURCE_PLUGIN;
     m_SourceParam = SOURCE_PARAM;
@@ -50,21 +57,23 @@ namespace mitk
       {
         return m_ConnectionCheck;
       }
-
       // get image properties from camera
       this->UpdateCamera();
       m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &m_DataDescription);
-      ErrorText(m_PMDRes);
-      m_CaptureWidth = m_DataDescription.img.numColumns;
-      m_CaptureHeight = m_DataDescription.img.numRows;
+      ErrorText(m_PMDRes); 
+      m_InternalCaptureWidth = m_DataDescription.img.numColumns;
+      m_CaptureWidth = 200;
+      m_InternalCaptureHeight = m_DataDescription.img.numRows;
+      m_CaptureHeight = 200;
+      m_InternalPixelNumber = m_InternalCaptureWidth*m_InternalCaptureHeight;
       m_PixelNumber = m_CaptureWidth*m_CaptureHeight;
-      m_NumberOfBytes = m_PixelNumber * sizeof(float);
+
+      m_NumberOfBytes = m_InternalPixelNumber * sizeof(float);
       m_SourceDataSize = m_DataDescription.size;
       m_SourceDataStructSize = m_DataDescription.size + sizeof(PMDDataDescription);
       MITK_INFO << "Datasource size: " << this->m_SourceDataSize <<std::endl;
       MITK_INFO << "Integration Time: " << this->GetIntegrationTime();
-      MITK_INFO << "Modulation Frequence: " << this->GetModulationFrequency();
-
+      MITK_INFO << "Modulation Frequency: " << this->GetModulationFrequency();
       return m_ConnectionCheck;
     }
     else return m_ConnectionCheck;
@@ -88,6 +97,7 @@ namespace mitk
 
   bool mitk::ToFCameraPMDCamBoardController::SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height )
   {
+    // CAVE: This function does not work properly, don't use unless you know what you're doing!!
     // check if leftUpperCornerX and width are divisible by 3 otherwise round to the next value divisible by 3
     unsigned int factor = leftUpperCornerX/3;
     leftUpperCornerX = 3*factor;
@@ -222,4 +232,76 @@ namespace mitk
     }
   }
 
+  bool ToFCameraPMDCamBoardController::GetAmplitudes(float* amplitudeArray)
+  {
+    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
+    this->m_PMDRes = pmdGetAmplitudes(m_PMDHandle, tempArray, this->m_NumberOfBytes);
+    this->TransformCameraOutput(tempArray, amplitudeArray, false);
+    delete[] tempArray;
+    return ErrorText(this->m_PMDRes);
+  }
+
+  bool ToFCameraPMDCamBoardController::GetAmplitudes(char* sourceData, float* amplitudeArray)
+  {
+    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
+    this->m_PMDRes = pmdCalcAmplitudes(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    this->TransformCameraOutput(tempArray, amplitudeArray, false);
+    delete[] tempArray;
+    return ErrorText(this->m_PMDRes);
+  }
+
+  bool ToFCameraPMDCamBoardController::GetIntensities(float* intensityArray)
+  {
+    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
+    this->m_PMDRes = pmdGetIntensities(m_PMDHandle, tempArray, this->m_NumberOfBytes);
+    this->TransformCameraOutput(tempArray, intensityArray, false);
+    delete[] tempArray;
+    return ErrorText(this->m_PMDRes);
+  }
+
+  bool ToFCameraPMDCamBoardController::GetIntensities(char* sourceData, float* intensityArray)
+  {
+    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
+    this->m_PMDRes = pmdCalcIntensities(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    this->TransformCameraOutput(tempArray, intensityArray, false);
+    delete[] tempArray;
+    return ErrorText(this->m_PMDRes);
+  }
+
+  bool ToFCameraPMDCamBoardController::GetDistances(float* distanceArray)
+  {
+    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
+    this->m_PMDRes = pmdGetDistances(m_PMDHandle, tempArray, this->m_NumberOfBytes);
+    this->TransformCameraOutput(tempArray, distanceArray, true);
+    delete[] tempArray;
+    return ErrorText(this->m_PMDRes);
+  }
+
+  bool ToFCameraPMDCamBoardController::GetDistances(char* sourceData, float* distanceArray)
+  {
+    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
+    this->m_PMDRes = pmdCalcDistances(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    this->TransformCameraOutput(tempArray, distanceArray, true);
+    delete[] tempArray;
+
+    return ErrorText(this->m_PMDRes);
+  }
+
+  void ToFCameraPMDCamBoardController::TransformCameraOutput( float* in, float* out, bool isDist )
+  {
+    vnl_matrix<float> inMat = vnl_matrix<float>(m_InternalCaptureHeight,m_InternalCaptureWidth);
+    inMat.copy_in(in);
+    vnl_matrix<float> outMat = vnl_matrix<float>(m_CaptureHeight, m_CaptureWidth);
+    vnl_matrix<float> temp = vnl_matrix<float>(m_CaptureHeight, m_CaptureWidth);
+    temp = inMat.extract(m_CaptureHeight, m_CaptureWidth, 0,1);
+    outMat = temp.transpose();
+    if(isDist)
+    {
+      outMat*=1000;
+    }
+    outMat.copy_out(out);
+    inMat.clear();
+    outMat.clear();
+    temp.clear();
+  }
 }

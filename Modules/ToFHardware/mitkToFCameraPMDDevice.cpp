@@ -46,10 +46,10 @@ namespace mitk
         this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
 
         // allocate buffers
-        AllocatePixelArrays();
+        this->AllocatePixelArrays();
         this->AllocateSourceData();
 
-        m_CameraConnected = true;
+        this->m_CameraConnected = true;
       }
     }
     return ok;
@@ -334,19 +334,23 @@ namespace mitk
       memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
       m_ImageMutex->Unlock();
 
-      int u, v;
-      for (int i=0; i<this->m_CaptureHeight; i++)
-      {
-        for (int j=0; j<this->m_CaptureWidth; j++)
-        {
-          u = i*this->m_CaptureWidth+j;
-          v = (i+1)*this->m_CaptureWidth-1-j;
-          distanceArray[u] = 1000 * this->m_DistanceArray[v]; // unit in minimeter
-          //distanceArray[u] = this->m_DistanceArray[v]; // unit in meter
-          amplitudeArray[u] = this->m_AmplitudeArray[v];
-          intensityArray[u] = this->m_IntensityArray[v];
-        }
-      }
+      memcpy(distanceArray, this->m_DistanceArray, this->m_CaptureWidth*this->m_CaptureHeight*sizeof(float));
+      memcpy(intensityArray, this->m_IntensityArray, this->m_CaptureWidth*this->m_CaptureHeight*sizeof(float));
+      memcpy(amplitudeArray, this->m_AmplitudeArray, this->m_CaptureWidth*this->m_CaptureHeight*sizeof(float));
+
+      //int u, v;
+      //for (int i=0; i<this->m_CaptureHeight; i++)
+      //{
+      //  for (int j=0; j<this->m_CaptureWidth; j++)
+      //  {
+      //    u = i*this->m_CaptureWidth+j;
+      //    v = (i+1)*this->m_CaptureWidth-1-j;
+      //    distanceArray[u] = 1000 * this->m_DistanceArray[v]; // unit in minimeter
+      //    //distanceArray[u] = this->m_DistanceArray[v]; // unit in meter
+      //    amplitudeArray[u] = this->m_AmplitudeArray[v];
+      //    intensityArray[u] = this->m_IntensityArray[v];
+      //  }
+      //}
     }
     else
     {

@@ -88,7 +88,8 @@ namespace mitk
 
   }
 
-void ThreadedToFRawDataReconstruction::Initialize(int width, int height, int modulationFrequency, int sourceDataSize )
+void ThreadedToFRawDataReconstruction::Initialize(int width, int height, int modulationFrequency, 
+                                                  int sourceDataSize )
 {
   m_Width = width;
   m_Height = height;
@@ -331,4 +332,5 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
   {
     this->GenerateData();
   }
+
 } // end mitk namespace

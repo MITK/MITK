@@ -41,6 +41,11 @@ namespace mitk
 
     virtual void GetChannelSourceData(short* sourceData, vtkShortArray* vtkChannelArray );
 
+    bool ConnectCamera();
+    void GetIntensities(float* intensityArray, int& imageSequence);
+    void GetAmplitudes(float* amplitudeArray, int& imageSequence);
+    void GetDistances(float* distanceArray, int& imageSequence);
+    void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray, int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray);
 
   protected:
 
@@ -48,7 +53,10 @@ namespace mitk
 
     ~ToFCameraPMDRawDataCamBoardDevice();
   private:
-
+    void ResizeOutputImage(float* in, float* out);
+    // member variables
+    //unsigned int m_OriginControllerHeight;
+    //unsigned int m_OriginControllerWidth;
   };
 } //END mitk namespace
 #endif // __mitkToFCameraPMDRawDataCamBoardDevice_h

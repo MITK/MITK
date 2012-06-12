@@ -15,14 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkToFCameraPMDRawDataDevice.h"
 #include "mitkRealTimeClock.h"
-
+#include "mitkToFCameraPMDCamBoardController.h"
 #include "itkMultiThreader.h"
 #include <itksys/SystemTools.hxx>
 
 namespace mitk
 {
   ToFCameraPMDRawDataDevice::ToFCameraPMDRawDataDevice() :
-    m_SourceDataBuffer(NULL), m_SourceDataArray(NULL), m_ShortSourceData(NULL)
+  m_SourceDataBuffer(NULL), m_SourceDataArray(NULL), m_ShortSourceData(NULL), 
+  m_OriginControllerWidth(0), m_OriginControllerHeight(0)
   {
     m_RawDataSource = ThreadedToFRawDataReconstruction::New();
 
@@ -43,6 +44,8 @@ namespace mitk
       {
         this->m_CaptureWidth = m_Controller->GetCaptureWidth();
         this->m_CaptureHeight = m_Controller->GetCaptureHeight();
+        this->m_OriginControllerHeight = m_CaptureHeight;
+        this->m_OriginControllerWidth = m_CaptureWidth;
         this->m_SourceDataSize = m_Controller->GetSourceDataStructSize();
         this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
 
@@ -167,14 +170,17 @@ namespace mitk
 
         if(!toFCameraDevice->m_RawDataSource->GetInit())
         {
-          toFCameraDevice->m_RawDataSource->Initialize(toFCameraDevice->m_CaptureWidth, toFCameraDevice->m_CaptureHeight, 
-            toFCameraDevice->m_Controller->GetModulationFrequency(), toFCameraDevice->GetChannelSize());
+          toFCameraDevice->m_RawDataSource->Initialize(toFCameraDevice->m_OriginControllerWidth, 
+            toFCameraDevice->m_OriginControllerHeight, 
+            toFCameraDevice->m_Controller->GetModulationFrequency(), 
+            toFCameraDevice->GetChannelSize());
         }
         toFCameraDevice->m_RawDataSource->SetChannelData(channelData);
         toFCameraDevice->m_RawDataSource->Update();
         toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataArray);
-        toFCameraDevice->m_RawDataSource->GetAllData(toFCameraDevice->m_DistanceArray, toFCameraDevice->m_AmplitudeArray, toFCameraDevice->m_IntensityArray);
+        toFCameraDevice->m_RawDataSource->GetAllData(toFCameraDevice->m_DistanceArray, 
+          toFCameraDevice->m_AmplitudeArray, toFCameraDevice->m_IntensityArray);
         toFCameraDevice->m_ImageMutex->Unlock();
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          TODO Buffer Handling currently only works for buffer size 1

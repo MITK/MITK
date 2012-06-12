@@ -122,7 +122,7 @@ namespace mitk
       m_CaptureHeight = m_ToFCameraDevice->GetCaptureHeight();
       m_PixelNumber = m_CaptureWidth * m_CaptureHeight;
       m_SourceDataSize = m_ToFCameraDevice->GetSourceDataSize();
-      AllocateImageArrays();
+      this->AllocateImageArrays();
     }
     return ok;
   }

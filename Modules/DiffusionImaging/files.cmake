@@ -114,8 +114,8 @@ set(CPP_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.cpp
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
 
- # Tractography
- Tractography/itkStochasticTractographyFilter.h
+  # Tractography
+  Tractography/GibbsTracking/mitkParticleGrid.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
@@ -176,6 +176,7 @@ set(H_FILES
   Tractography/itkGibbsTrackingFilter.h
   Tractography/itkStochasticTractographyFilter.h
   Tractography/itkStreamlineTrackingFilter.h
+  Tractography/GibbsTracking/mitkParticleGrid.h
 
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h

@@ -2,47 +2,41 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef _ENCOMP
+#define _ENCOMP
 
+#include "mitkParticleGrid.h"
+#include "SphereInterpolator.cpp"
+#include <vnl/vnl_matrix_fixed.h>
+#include <fstream>
 
-/// bessel for wid = 1
-
-//#define mbesseli0(x) ((x>=1.0) ? ((-0.2578*x+0.7236)*exp(x)) : ((x>=0.9) ? ((-0.2740*x+0.7398)*exp(x)) : ((x>=0.8) ? ((-0.3099*x+0.7720)*exp(x)) : ((x>=0.7) ? ((-0.3634*x+0.8149)*exp(x)) : ((x>=0.5) ? ((-0.4425*x+0.8663)*exp(x)) : ((x>=0.3) ? ((-0.5627*x+0.9264)*exp(x)) : ((x>=0.2) ? ((-0.6936*x+0.9657)*exp(x)) : ((x>=0.1) ? ((-0.8016*x+0.9873)*exp(x)) : ((x>=0.0) ? ((-0.9290*x+1.0000)*exp(x)) : 1 )))))))))
-//#define mbesseli0(x) ((x>=1.0) ? ((0.5652*x+0.7009)) : ((x>=0.8) ? ((0.4978*x+0.7683)) : ((x>=0.6) ? ((0.3723*x+0.8686)) : ((x>=0.4) ? ((0.2582*x+0.9371)) : ((x>=0.2) ? ((0.1519*x+0.9796)) : ((x>=0.0) ? ((0.0501*x+1.0000)) : 1 ))))))
-
+using namespace mitk;
 
 inline float mbesseli0(float x)
 {
+//    BESSEL_APPROXCOEFF[0] = -0.1714;
+//    BESSEL_APPROXCOEFF[1] = 0.5332;
+//    BESSEL_APPROXCOEFF[2] = -1.4889;
+//    BESSEL_APPROXCOEFF[3] = 2.0389;
     float y = x*x;
-    float erg = BESSEL_APPROXCOEFF[0];
-    erg += y*BESSEL_APPROXCOEFF[1];
-    erg += y*y*BESSEL_APPROXCOEFF[2];
-    erg += y*y*y*BESSEL_APPROXCOEFF[3];
+    float erg = -0.1714;
+    erg += y*0.5332;
+    erg += y*y*-1.4889;
+    erg += y*y*y*2.0389;
     return erg;
 }
-
-//
-//
-// inline REAL mbesseli0(REAL x)
-// {
-//     REAL y = x*x;
-//     REAL erg = BESSEL_APPROXCOEFF[0];
-//     erg += y*BESSEL_APPROXCOEFF[1];
-//     erg += y*x*BESSEL_APPROXCOEFF[2];
-//     erg += x*x*BESSEL_APPROXCOEFF[3];
-//     return erg;
-// }
 
 inline float mexp(float x)
 {
@@ -52,18 +46,37 @@ inline float mexp(float x)
 
 }
 
-
-#include "ParticleGrid.cpp"
-
-#include "EnergyComputerBase.cpp"
-#include <fstream>
-
-
-class EnergyComputer : public EnergyComputerBase
+class EnergyComputer
 {
 
 public:
 
+
+    float eigen_energy;
+    vnl_matrix_fixed<double, 3, 3> m_RotationMatrix;
+    float *m_QBallImageData;
+    const int *m_QBallImageSize;
+    SphereInterpolator *m_SphereInterpolator;
+    ParticleGrid *m_ParticleGrid;
+
+    int w,h,d;
+    float voxsize_w;
+    float voxsize_h;
+    float voxsize_d;
+
+    int w_sp,h_sp,d_sp;
+    float voxsize_sp_w;
+    float voxsize_sp_h;
+    float voxsize_sp_d;
+
+
+    int nip; // number of data vertices on sphere
+
+
+    float *m_MaskImageData;
+    float *cumulspatprob;
+    int *spatidx;
+    int scnt;
 
   float eigencon_energy;
 
@@ -81,9 +94,79 @@ public:
   float curv_hard;
 
 
-  EnergyComputer(float *data, const int *dsz,  double *cellsize, SphereInterpolator *sp, ParticleGrid<Particle> *pcon, float *spimg, int spmult, vnl_matrix_fixed<double, 3, 3> rotMatrix) : EnergyComputerBase(data,dsz,cellsize,sp,pcon,spimg,spmult,rotMatrix)
+  EnergyComputer(float *data, const int *dsz,  double *cellsize, SphereInterpolator *sp, ParticleGrid *pcon, float *spimg, int spmult, vnl_matrix_fixed<double, 3, 3> rotMatrix)
   {
+      m_RotationMatrix = rotMatrix;
+      m_QBallImageData = data;
+      m_QBallImageSize = dsz;
+      m_SphereInterpolator = sp;
 
+      m_MaskImageData = spimg;
+
+      nip = m_QBallImageSize[0];
+
+
+      w = m_QBallImageSize[1];
+      h = m_QBallImageSize[2];
+      d = m_QBallImageSize[3];
+
+      voxsize_w = cellsize[0];
+      voxsize_h = cellsize[1];
+      voxsize_d = cellsize[2];
+
+
+      w_sp = m_QBallImageSize[1]*spmult;
+      h_sp = m_QBallImageSize[2]*spmult;
+      d_sp = m_QBallImageSize[3]*spmult;
+
+      voxsize_sp_w = cellsize[0]/spmult;
+      voxsize_sp_h = cellsize[1]/spmult;
+      voxsize_sp_d = cellsize[2]/spmult;
+
+
+      fprintf(stderr,"Data size (voxels) : %i x %i x %i\n",w,h,d);
+      fprintf(stderr,"voxel size:  %f x %f x %f\n",voxsize_w,voxsize_h,voxsize_d);
+      fprintf(stderr,"mask_oversamp_mult: %i\n",spmult);
+
+      if (nip != sp->nverts)
+      {
+        fprintf(stderr,"EnergyComputer: error during init: data does not match with interpolation scheme\n");
+      }
+
+      m_ParticleGrid = pcon;
+
+
+      int totsz = w_sp*h_sp*d_sp;
+      cumulspatprob = (float*) malloc(sizeof(float) * totsz);
+      spatidx = (int*) malloc(sizeof(int) * totsz);
+      if (cumulspatprob == 0 || spatidx == 0)
+      {
+        fprintf(stderr,"EnergyCOmputerBase: out of memory!\n");
+        return ;
+      }
+
+
+      scnt = 0;
+      cumulspatprob[0] = 0;
+      for (int x = 1; x < w_sp;x++)
+        for (int y = 1; y < h_sp;y++)
+          for (int z = 1; z < d_sp;z++)
+          {
+        int idx = x+(y+z*h_sp)*w_sp;
+        if (m_MaskImageData[idx] > 0.5)
+        {
+          cumulspatprob[scnt+1] = cumulspatprob[scnt] + m_MaskImageData[idx];
+          spatidx[scnt] = idx;
+          scnt++;
+        }
+      }
+
+      for (int k = 0; k < scnt; k++)
+      {
+        cumulspatprob[k] /= cumulspatprob[scnt];
+      }
+
+      fprintf(stderr,"#active voxels: %i (in mask units) \n",scnt);
   }
 
   void setParameters(float pwei,float pwid,float chempot_connection, float length,float curv_hardthres, float inex_balance, float chempot2, float meanv)
@@ -110,6 +193,123 @@ public:
 
 
 
+  void drawSpatPosition(pVector *R)
+  {
+    float r = mtrand.frand();
+    int j;
+    int rl = 1;
+    int rh = scnt;
+    while(rh != rl)
+    {
+      j = rl + (rh-rl)/2;
+      if (r < cumulspatprob[j])
+      {
+        rh = j;
+        continue;
+      }
+      if (r > cumulspatprob[j])
+      {
+        rl = j+1;
+        continue;
+      }
+      break;
+    }
+    R->SetXYZ(voxsize_sp_w*((float)(spatidx[rh-1] % w_sp)  + mtrand.frand()),
+              voxsize_sp_h*((float)((spatidx[rh-1]/w_sp) % h_sp)  + mtrand.frand()),
+              voxsize_sp_d*((float)(spatidx[rh-1]/(w_sp*h_sp))    + mtrand.frand()));
+  }
+
+  float SpatProb(pVector R)
+  {
+    int rx = int(R.GetX()/voxsize_sp_w);
+    int ry = int(R.GetY()/voxsize_sp_h);
+    int rz = int(R.GetZ()/voxsize_sp_d);
+    if (rx >= 0 && rx < w_sp && ry >= 0 && ry < h_sp && rz >= 0 && rz < d_sp){
+      return m_MaskImageData[rx + w_sp* (ry + h_sp*rz)];
+    }
+    else
+      return 0;
+  }
+
+  inline float evaluateODF(pVector &R, pVector &N, float &len)
+  {
+    const int CU = 10;
+    pVector Rs;
+    float Dn = 0;
+    int xint,yint,zint,spatindex;
+
+    vnl_vector_fixed<double, 3> n;
+    n[0] = N[0];
+    n[1] = N[1];
+    n[2] = N[2];
+    n = m_RotationMatrix*n;
+    m_SphereInterpolator->getInterpolation(n);
+
+    for (int i=-CU; i <= CU;i++)
+    {
+      Rs = R + (N * len) * ((float)i/CU);
+
+      float Rx = Rs[0]/voxsize_w-0.5;
+      float Ry = Rs[1]/voxsize_h-0.5;
+      float Rz = Rs[2]/voxsize_d-0.5;
+
+
+      xint = int(floor(Rx));
+      yint = int(floor(Ry));
+      zint = int(floor(Rz));
+
+
+      if (xint >= 0 && xint < w-1 && yint >= 0 && yint < h-1 && zint >= 0 && zint < d-1)
+      {
+        float xfrac = Rx-xint;
+        float yfrac = Ry-yint;
+        float zfrac = Rz-zint;
+
+        float weight;
+
+        weight = (1-xfrac)*(1-yfrac)*(1-zfrac);
+        spatindex = (xint + w*(yint+h*zint)) *nip;
+        Dn += (m_QBallImageData[spatindex + m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+        weight = (xfrac)*(1-yfrac)*(1-zfrac);
+        spatindex = (xint+1 + w*(yint+h*zint)) *nip;
+        Dn += (m_QBallImageData[spatindex + m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+        weight = (1-xfrac)*(yfrac)*(1-zfrac);
+        spatindex = (xint + w*(yint+1+h*zint)) *nip;
+        Dn += (m_QBallImageData[spatindex + m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+        weight = (1-xfrac)*(1-yfrac)*(zfrac);
+        spatindex = (xint + w*(yint+h*(zint+1))) *nip;
+        Dn += (m_QBallImageData[spatindex + m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+        weight = (xfrac)*(yfrac)*(1-zfrac);
+        spatindex = (xint+1 + w*(yint+1+h*zint)) *nip;
+        Dn += (m_QBallImageData[spatindex + m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+        weight = (1-xfrac)*(yfrac)*(zfrac);
+        spatindex = (xint + w*(yint+1+h*(zint+1))) *nip;
+        Dn += (m_QBallImageData[spatindex + m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+        weight = (xfrac)*(1-yfrac)*(zfrac);
+        spatindex = (xint+1 + w*(yint+h*(zint+1))) *nip;
+        Dn += (m_QBallImageData[spatindex + m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+        weight = (xfrac)*(yfrac)*(zfrac);
+        spatindex = (xint+1 + w*(yint+1+h*(zint+1))) *nip;
+        Dn += (m_QBallImageData[spatindex + m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] + m_QBallImageData[spatindex + m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+
+      }
+
+
+    }
+
+    Dn *= 1.0/(2*CU+1);
+    return Dn;
+  }
+
+
   ////////////////////////////////////////////////////////////////////////////
   ////// External Energy
   ////////////////////////////////////////////////////////////////////////////
@@ -126,10 +326,10 @@ public:
     float Sn = 0;
     float Pn = 0;
 
-    m_ParticleGrid->computeNeighbors(R);
+    m_ParticleGrid->ComputeNeighbors(R);
     for (;;)
     {
-      Particle *p =  m_ParticleGrid->getNextNeighbor();
+      Particle *p =  m_ParticleGrid->GetNextNeighbor();
       if (p == 0) break;
       if (dp != p)
       {
@@ -176,9 +376,9 @@ public:
     Particle *p2 = 0;
     int ep2;
     if (ep1 == 1)
-      p2 = m_ParticleGrid->ID_2_address[p1->pID];
+      p2 = m_ParticleGrid->m_AddressContainer[p1->pID];
     else
-      p2 = m_ParticleGrid->ID_2_address[p1->mID];
+      p2 = m_ParticleGrid->m_AddressContainer[p1->mID];
     if (p2->mID == p1->ID)
       ep2 = -1;
     else if (p2->pID == p1->ID)
@@ -224,14 +424,6 @@ public:
 
     return energy;
   }
-
-
-
-
-
-
-
-
-
 };
 
+#endif

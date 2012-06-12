@@ -2,19 +2,19 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "ParticleGrid.cpp"
+#include "mitkParticleGrid.h"
 #include "RJMCMCBase.cpp"
 #include <fstream>
 
@@ -26,15 +26,12 @@ public:
   float T_ex ;
   float dens;
 
-
   float p_birth;
   float p_death;
   float p_shift;
   float p_shiftopt;
   float p_cap;
   float p_con;
-
-
 
   float sigma_g;
   float gamma_g;
@@ -46,8 +43,6 @@ public:
   float stopprobability;
   float del_prob;
 
-
-
   float len_def;
   float len_sig;
 
@@ -56,15 +51,10 @@ public:
 
   float externalEnergy;
   float internalEnergy;
-
   float m_ChempotParticle;
 
-
   Track TrackProposal, TrackBackup;
-
-
   SimpSamp<EndPoint> simpsamp;
-
 
   RJMCMC(float *points,int numPoints,  float *dimg, const int *dsz, double *voxsz, double cellsz) : RJMCMCBase(points,numPoints,dimg,dsz,voxsz,cellsz)
   {
@@ -100,7 +90,7 @@ public:
     // shift proposal
     sigma_g = len_def/8.0;
     gamma_g = 1/(sigma_g*sigma_g*2);
-    Z_g = pow(2*PI*sigma_g,3.0/2.0)*(PI*sigma_g/len_def);
+    Z_g = pow(2*M_PI*sigma_g,3.0/2.0)*(M_PI*sigma_g/len_def);
 
     // conn proposal
     dthres = len_def;
@@ -150,7 +140,7 @@ public:
       prop.len = len;
 
 
-      float prob =  dens * p_death /((p_birth)*(m_ParticleGrid.pcnt+1));
+      float prob =  dens * p_death /((p_birth)*(m_ParticleGrid->m_NumParticles+1));
 
       float ex_energy = enc->computeExternalEnergy(R,N,cap,len,0);
       float in_energy = enc->computeInternalEnergy(&prop);
@@ -159,7 +149,7 @@ public:
 
       if (prob > 1 || mtrand.frand() < prob)
       {
-        Particle *p = m_ParticleGrid.newParticle(R);
+        Particle *p = m_ParticleGrid->newParticle(R);
         if (p!=0)
         {
           p->R = R;
@@ -182,26 +172,26 @@ public:
     ///////////////////////////////////////////////////////////////
     else if (randnum < p_birth+p_death)
     {
-      if (m_ParticleGrid.pcnt > 0)
+      if (m_ParticleGrid->m_NumParticles > 0)
       {
 #ifdef TIMING
         tic(&deathproposal_time);
         deathstats.propose();
 #endif
 
-        int pnum = rand()%m_ParticleGrid.pcnt;
-        Particle *dp = &(m_ParticleGrid.particles[pnum]);
+        int pnum = rand()%m_ParticleGrid->m_NumParticles;
+        Particle *dp = &(m_ParticleGrid->m_Particles[pnum]);
         if (dp->pID == -1 && dp->mID == -1)
         {
 
           float ex_energy = enc->computeExternalEnergy(dp->R,dp->N,dp->cap,dp->len,dp);
           float in_energy = enc->computeInternalEnergy(dp);
 
-          float prob = m_ParticleGrid.pcnt * (p_birth) /(dens*p_death); //*SpatProb(dp->R);
+          float prob = m_ParticleGrid->m_NumParticles * (p_birth) /(dens*p_death); //*SpatProb(dp->R);
           prob *= exp(-(in_energy/T_in+ex_energy/T_ex)) ;
           if (prob > 1 || mtrand.frand() < prob)
           {
-            m_ParticleGrid.remove(pnum);
+            m_ParticleGrid->RemoveParticle(pnum);
 #ifdef TIMING
             deathstats.accepted();
 #endif
@@ -219,11 +209,11 @@ public:
     ///////////////////////////////////////////////////////////////
     else  if (randnum < p_birth+p_death+p_cap)
     {
-      if (m_ParticleGrid.pcnt > 0)
+      if (m_ParticleGrid->m_NumParticles > 0)
       {
 
-        int pnum = rand()%m_ParticleGrid.pcnt;
-        Particle *p =  &(m_ParticleGrid.particles[pnum]);
+        int pnum = rand()%m_ParticleGrid->m_NumParticles;
+        Particle *p =  &(m_ParticleGrid->m_Particles[pnum]);
         Particle prop_p = *p;
 
         prop_p.cap = cap_def - cap_sig*mtrand.frand();
@@ -250,15 +240,15 @@ public:
     else  if (randnum < p_birth+p_death+p_shift+p_cap)
     {
       float energy = 0;
-      if (m_ParticleGrid.pcnt > 0)
+      if (m_ParticleGrid->m_NumParticles > 0)
       {
 #ifdef TIMING
         tic(&shiftproposal_time);
         shiftstats.propose();
 #endif
 
-        int pnum = rand()%m_ParticleGrid.pcnt;
-        Particle *p =  &(m_ParticleGrid.particles[pnum]);
+        int pnum = rand()%m_ParticleGrid->m_NumParticles;
+        Particle *p =  &(m_ParticleGrid->m_Particles[pnum]);
         Particle prop_p = *p;
 
         prop_p.R.distortn(sigma_g);
@@ -278,7 +268,7 @@ public:
           pVector Ntmp = p->N;
           p->R = prop_p.R;
           p->N = prop_p.N;
-          if (!m_ParticleGrid.tryUpdateGrid(pnum))
+          if (!m_ParticleGrid->TryUpdateGrid(pnum))
           {
             p->R = Rtmp;
             p->N = Ntmp;
@@ -299,19 +289,19 @@ public:
     else  if (randnum < p_birth+p_death+p_shift+p_shiftopt+p_cap)
     {
       float energy = 0;
-      if (m_ParticleGrid.pcnt > 0)
+      if (m_ParticleGrid->m_NumParticles > 0)
       {
 
-        int pnum = rand()%m_ParticleGrid.pcnt;
-        Particle *p =  &(m_ParticleGrid.particles[pnum]);
+        int pnum = rand()%m_ParticleGrid->m_NumParticles;
+        Particle *p =  &(m_ParticleGrid->m_Particles[pnum]);
 
         bool no_proposal = false;
         Particle prop_p = *p;
         if (p->pID != -1 && p->mID != -1)
         {
-          Particle *plus = m_ParticleGrid.ID_2_address[p->pID];
+          Particle *plus = m_ParticleGrid->m_AddressContainer[p->pID];
           int ep_plus = (plus->pID == p->ID)? 1 : -1;
-          Particle *minus = m_ParticleGrid.ID_2_address[p->mID];
+          Particle *minus = m_ParticleGrid->m_AddressContainer[p->mID];
           int ep_minus = (minus->pID == p->ID)? 1 : -1;
           prop_p.R = (plus->R + plus->N * (plus->len * ep_plus)  + minus->R + minus->N * (minus->len * ep_minus))*0.5;
           prop_p.N = plus->R - minus->R;
@@ -319,14 +309,14 @@ public:
         }
         else if (p->pID != -1)
         {
-          Particle *plus = m_ParticleGrid.ID_2_address[p->pID];
+          Particle *plus = m_ParticleGrid->m_AddressContainer[p->pID];
           int ep_plus = (plus->pID == p->ID)? 1 : -1;
           prop_p.R = plus->R + plus->N * (plus->len * ep_plus * 2);
           prop_p.N = plus->N;
         }
         else if (p->mID != -1)
         {
-          Particle *minus = m_ParticleGrid.ID_2_address[p->mID];
+          Particle *minus = m_ParticleGrid->m_AddressContainer[p->mID];
           int ep_minus = (minus->pID == p->ID)? 1 : -1;
           prop_p.R = minus->R + minus->N * (minus->len * ep_minus * 2);
           prop_p.N = minus->N;
@@ -352,7 +342,7 @@ public:
             pVector Ntmp = p->N;
             p->R = prop_p.R;
             p->N = prop_p.N;
-            if (!m_ParticleGrid.tryUpdateGrid(pnum))
+            if (!m_ParticleGrid->TryUpdateGrid(pnum))
             {
               p->R = Rtmp;
               p->N = Ntmp;
@@ -367,7 +357,7 @@ public:
     {
 
 
-      if (m_ParticleGrid.pcnt > 0)
+      if (m_ParticleGrid->m_NumParticles > 0)
       {
 
 #ifdef TIMING
@@ -375,8 +365,8 @@ public:
         connstats.propose();
 #endif
 
-        int pnum = rand()%m_ParticleGrid.pcnt;
-        Particle *p = &(m_ParticleGrid.particles[pnum]);
+        int pnum = rand()%m_ParticleGrid->m_NumParticles;
+        Particle *p = &(m_ParticleGrid->m_Particles[pnum]);
 
         EndPoint P;
         P.p = p;
@@ -421,7 +411,7 @@ public:
   {
     for (int k = 1; k < T.length;k++)
     {
-      m_ParticleGrid.createConnection(T.track[k-1].p,T.track[k-1].ep,T.track[k].p,-T.track[k].ep);
+      m_ParticleGrid->CreateConnection(T.track[k-1].p,T.track[k-1].ep,T.track[k].p,-T.track[k].ep);
     }
   }
 
@@ -447,18 +437,18 @@ public:
       {
         if (Current.p->pID != -1)
         {
-          Next.p = m_ParticleGrid.ID_2_address[Current.p->pID];
+          Next.p = m_ParticleGrid->m_AddressContainer[Current.p->pID];
           Current.p->pID = -1;
-          m_ParticleGrid.concnt--;
+          m_ParticleGrid->m_NumConnections--;
         }
       }
       else if (Current.ep == -1)
       {
         if (Current.p->mID != -1)
         {
-          Next.p = m_ParticleGrid.ID_2_address[Current.p->mID];
+          Next.p = m_ParticleGrid->m_AddressContainer[Current.p->mID];
           Current.p->mID = -1;
-          m_ParticleGrid.concnt--;
+          m_ParticleGrid->m_NumConnections--;
         }
       }
       else
@@ -587,14 +577,14 @@ public:
 
     float dist,dot;
     pVector R = p->R + (p->N * ep*p->len);
-    m_ParticleGrid.computeNeighbors(R);
+    m_ParticleGrid->ComputeNeighbors(R);
     simpsamp.clear();
 
     simpsamp.add(stopprobability,EndPoint(0,0));
 
     for (;;)
     {
-      Particle *p2 =  m_ParticleGrid.getNextNeighbor();
+      Particle *p2 =  m_ParticleGrid->GetNextNeighbor();
       if (p2 == 0) break;
       if (p!=p2 && p2->label == 0)
       {

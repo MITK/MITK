@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,8 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorContainer.h"
 #include "itkImage.h"
 
-#include "GibbsTracking/pcRJMCMC.cpp"
 #include "GibbsTracking/auxilary_classes.cpp"
+#include "GibbsTracking/RJMCMC_randshift.cpp"
+#include "GibbsTracking/EnergyComputer_connec.cpp"
 
 #include <fstream>
 #include <QFile>
@@ -30,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
+
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 namespace itk{
 

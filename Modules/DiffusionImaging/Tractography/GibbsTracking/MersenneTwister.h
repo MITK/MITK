@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
 // Copyright (C) 2000 - 2003, Richard J. Wagner
-// All rights reserved.                          
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -45,8 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //      notice, this list of conditions and the following disclaimer in the
 //      documentation and/or other materials provided with the distribution.
 //
-//   3. The names of its contributors may not be used to endorse or promote 
-//      products derived from this software without specific prior written 
+//   3. The names of its contributors may not be used to endorse or promote
+//      products derived from this software without specific prior written
 //      permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -79,6 +79,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <limits.h>
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -87,13 +88,13 @@ class MTRand {
 // Data
 public:
   typedef unsigned long uint32;  // unsigned integer type, at least 32 bits
-  
+
   enum { N = 624 };       // length of state vector
   enum { SAVE = N + 1 };  // length of array for save()
 
 // protected:
   enum { M = 397 };  // period parameter
-  
+
   uint32 state[N];   // internal state
   uint32 *pNext;     // next value to get from state
   int left;          // number of values left before reload needed
@@ -104,12 +105,12 @@ public:
   MTRand( const uint32& oneSeed );  // initialize with a simple uint32
   MTRand( uint32 *const bigSeed, uint32 const seedLength = N );  // or an array
   MTRand();  // auto-initialize with /dev/urandom or time() and clock()
-  ~MTRand(); 
-  
+  ~MTRand();
+
   // Do NOT use for CRYPTOGRAPHY without securely hashing several returned
   // values together, otherwise the generator state can be learned after
   // reading 624 consecutive values.
-  
+
   // Access to 32-bit random numbers
   double rand();                          // real number in [0,1]
   float frand();                          // real number in [0,1]
@@ -121,21 +122,21 @@ public:
   uint32 randInt();                       // integer in [0,2^32-1]
   uint32 randInt( const uint32& n );      // integer in [0,n] for n < 2^32
   double operator()() { return rand(); }  // same as rand()
-  
+
   // Access to 53-bit random numbers (capacity of IEEE double precision)
   double rand53();  // real number in [0,1)
-  
+
   // Access to nonuniform random number distributions
   double randNorm( const double& mean = 0.0, const double& variance = 0.0 );
   float frandn();
-  
+
   // Re-seeding functions with same behavior as initializers
   void seed( const uint32 oneSeed );
   void seed( uint32 *const bigSeed, const uint32 seedLength = N );
   void seed();
 
 
-  ////// 
+  //////
   int Poisson();
   void initPoisson(float mean, int accuracy);
   float *cumulPoisson;
@@ -147,7 +148,7 @@ public:
   int accuracyGamma;
 
 
-  
+
   // Saving and loading generator state
   void save( uint32* saveArray ) const;  // to array of size SAVE
   void load( uint32 *const loadArray );  // from such array
@@ -170,21 +171,21 @@ protected:
 
 inline MTRand::MTRand( const uint32& oneSeed )
   { seed(oneSeed);
-  cumulPoisson = 0;  
-  cumulGamma = 0;  
+  cumulPoisson = 0;
+  cumulGamma = 0;
   }
 
 inline MTRand::MTRand( uint32 *const bigSeed, const uint32 seedLength )
   { seed(bigSeed,seedLength);
-  cumulPoisson = 0;  
-  cumulGamma = 0;  
+  cumulPoisson = 0;
+  cumulGamma = 0;
 
    }
 
 inline MTRand::MTRand()
   { seed();
-  cumulPoisson = 0;  
-  cumulGamma = 0;  
+  cumulPoisson = 0;
+  cumulGamma = 0;
   }
 
 inline MTRand::~MTRand()
@@ -245,9 +246,9 @@ inline float MTRand::frandn()
 inline int MTRand::Poisson()
 {
   int j;
-  
+
   float r = frand();
-  
+
   int rl = 0;
   int rh = accuracyPoisson-1;
   while(rh != rl)
@@ -266,7 +267,7 @@ inline int MTRand::Poisson()
   break;
   }
   j = rh;
-  
+
   return j;
 }
 
@@ -274,9 +275,9 @@ inline int MTRand::Poisson()
 inline int MTRand::drawGamma()
 {
   int j;
-  
+
   float r = frand();
-  
+
   int rl = 0;
   int rh = accuracyGamma-1;
   while(rh != rl)
@@ -295,7 +296,7 @@ inline int MTRand::drawGamma()
   break;
   }
   j = rh;
-  
+
   return j;
 }
 
@@ -335,11 +336,11 @@ inline void MTRand::initGamma(float theta,int k)
   int accuracy = int(k*theta*5);
 
   float p[accuracy];
-  int fac = 1;   
+  int fac = 1;
   for (int i = 1; i < k-1;i++)
     fac *= i;
 
-  for (int i = 0; i < accuracy;i++)  
+  for (int i = 0; i < accuracy;i++)
   {
     p[i] = pow(i/theta,k-1)/fac * exp(i/theta);
   }
@@ -368,7 +369,7 @@ inline MTRand::uint32 MTRand::randInt()
 {
   // Pull a 32-bit integer from the generator state
   // Every other access function simply transforms the numbers extracted here
-  
+
   if( left == 0 ) reload();
   --left;
 
@@ -390,7 +391,7 @@ inline MTRand::uint32 MTRand::randInt( const uint32& n )
   used |= used >> 4;
   used |= used >> 8;
   used |= used >> 16;
-  
+
   // Draw numbers until one is found in [0,n]
   uint32 i;
   do
@@ -448,7 +449,7 @@ inline void MTRand::seed()
 {
   // Seed the generator with an array from /dev/urandom if available
   // Otherwise use a hash of time() and clock() values
-  
+
   // First try getting an array from /dev/urandom
   FILE* urandom = fopen( "/dev/urandom", "rb" );
   if( urandom )
@@ -462,7 +463,7 @@ inline void MTRand::seed()
     fclose(urandom);
     if( success ) { seed( bigSeed, N );  return; }
   }
-  
+
   // Was not successful, so use time() and clock() instead
   seed( hash( time(NULL), clock() ) );
 }

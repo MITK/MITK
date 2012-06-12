@@ -2,30 +2,30 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "ParticleGrid.cpp"
+#include "mitkParticleGrid.h"
+#include "EnergyComputer_connec.cpp"
 #include <vector>
-#include "MersenneTwister.h"
 
 class RJMCMCBase
 {
 public:
 
-  ParticleGrid<Particle> m_ParticleGrid;
+  ParticleGrid* m_ParticleGrid;
   float *m_QBallImageData;
   const int *datasz;
-  EnergyComputerBase *enc;
+  EnergyComputer* enc;
   int m_Iterations;
   float width;
   float height;
@@ -45,6 +45,7 @@ public:
     , m_NumAttributes(0)
     , m_AcceptedProposals(0)
   {
+      m_ParticleGrid = new ParticleGrid();
     fprintf(stderr,"Data dimensions (mm) :  %f x %f x %f\n",width,height,depth);
     fprintf(stderr,"Data dimensions (voxel) :  %i x %i x %i\n",datasz[1],datasz[2],datasz[3]);
     fprintf(stderr,"voxel size (mm) :  %lf x %lf x %lf\n",voxsize[0],voxsize[1],voxsize[2]);
@@ -62,7 +63,7 @@ public:
     fprintf(stderr,"#cells*cellcap :  %.1f K\n",cell_capacity*cellcnt_x*cellcnt_y*cellcnt_z/1000);
 
     int minsize = 1000000;
-    int err = m_ParticleGrid.allocate(((numPoints>minsize)? (numPoints+100000) : minsize), cellcnt_x, cellcnt_y, cellcnt_z, cellsize, cell_capacity);
+    int err = m_ParticleGrid->allocate(((numPoints>minsize)? (numPoints+100000) : minsize), cellcnt_x, cellcnt_y, cellcnt_z, cellsize, cell_capacity);
 
     if (err == -1)
     {
@@ -73,7 +74,7 @@ public:
     m_NumAttributes = 10;
     for (int k = 0; k < numPoints; k++)
     {
-      Particle *p = m_ParticleGrid.newParticle(pVector(points[m_NumAttributes*k], points[m_NumAttributes*k+1],points[m_NumAttributes*k+2]));
+      Particle *p = m_ParticleGrid->newParticle(pVector(points[m_NumAttributes*k], points[m_NumAttributes*k+1],points[m_NumAttributes*k+2]));
       if (p!=0)
       {
         p->N = pVector(points[m_NumAttributes*k+3],points[m_NumAttributes*k+4],points[m_NumAttributes*k+5]);
@@ -82,9 +83,9 @@ public:
         p->mID = (int) points[m_NumAttributes*k+8];
         p->pID = (int) points[m_NumAttributes*k+9];
         if (p->mID != -1)
-          m_ParticleGrid.concnt++;
+          m_ParticleGrid->m_NumConnections++;
         if (p->pID != -1)
-          m_ParticleGrid.concnt++;
+          m_ParticleGrid->m_NumConnections++;
         p->label = 0;
       }
       else
@@ -92,7 +93,7 @@ public:
         fprintf(stderr,"error: cannot allocate particle,  con. indices will be wrong! \n");
       }
     }
-    m_ParticleGrid.concnt /= 2;
+    m_ParticleGrid->m_NumConnections /= 2;
 
     m_Iterations = 0;
     m_AcceptedProposals = 0;
@@ -100,14 +101,14 @@ public:
 
   ~RJMCMCBase()
   {
-
+    delete m_ParticleGrid;
   }
 
   void WriteOutParticles(float *npoints)
   {
-    for (int k = 0; k < m_ParticleGrid.pcnt; k++)
+    for (int k = 0; k < m_ParticleGrid->m_NumParticles; k++)
     {
-      Particle *p = &(m_ParticleGrid.particles[k]);
+      Particle *p = &(m_ParticleGrid->m_Particles[k]);
       npoints[m_NumAttributes*k] = p->R.GetX();
       npoints[m_NumAttributes*k+1] = p->R.GetY();
       npoints[m_NumAttributes*k+2] = p->R.GetZ();
@@ -116,12 +117,12 @@ public:
       npoints[m_NumAttributes*k+5] = p->N.GetZ();
       npoints[m_NumAttributes*k+6] = p->cap;
       npoints[m_NumAttributes*k+7] = p->len;
-      npoints[m_NumAttributes*k+8] = m_ParticleGrid.ID_2_index(p->mID);
-      npoints[m_NumAttributes*k+9] = m_ParticleGrid.ID_2_index(p->pID);
+      npoints[m_NumAttributes*k+8] = m_ParticleGrid->ID_2_index(p->mID);
+      npoints[m_NumAttributes*k+9] = m_ParticleGrid->ID_2_index(p->pID);
     }
   }
 
-  void SetEnergyComputer(EnergyComputerBase *e)
+  void SetEnergyComputer(EnergyComputer *e)
   {
     enc = e;
   }
@@ -136,8 +137,8 @@ public:
 
       IterateOneStep();
 
-      *numCon = m_ParticleGrid.concnt;
-      *numPart = m_ParticleGrid.pcnt;
+      *numCon = m_ParticleGrid->m_NumConnections;
+      *numPart = m_ParticleGrid->m_NumParticles;
     }
     *acceptance = (float)m_AcceptedProposals/m_Iterations;
   }

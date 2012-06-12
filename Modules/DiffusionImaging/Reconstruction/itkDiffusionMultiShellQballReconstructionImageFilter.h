@@ -165,6 +165,10 @@ private:
 
     // Interpolation
     bool m_Interpolation_Flag;
+    CoefficientMatrixType m_Interpolation_SHT1_inv;
+    CoefficientMatrixType m_Interpolation_SHT2_inv;
+    CoefficientMatrixType m_Interpolation_SHT3_inv;
+    CoefficientMatrixType m_Interpolation_TARGET_SH;
 
     //CoefficientMatrixType m_ReconstructionMatrix;
     CoefficientMatrixType m_CoeffReconstructionMatrix;
@@ -221,6 +225,8 @@ private:
       double result = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]) / (v1.two_norm() * v2.two_norm());
       return result ;
     }
+
+    void ComputeSphericalFromCartesian(vnl_matrix<double> * Q, const IndiciesVector & refShell);
 
 };
 

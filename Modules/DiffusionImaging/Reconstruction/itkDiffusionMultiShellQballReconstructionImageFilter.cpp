@@ -45,7 +45,12 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_Lambda(0.0),
   m_IsHemisphericalArrangementOfGradientDirections(false),
   m_IsArithmeticProgession(false),
-  m_ReconstructionType(Mode_Standard1Shell)
+  m_ReconstructionType(Mode_Standard1Shell),
+  m_Interpolation_Flag(false),
+  m_Interpolation_SHT1_inv(0),
+  m_Interpolation_SHT2_inv(0),
+  m_Interpolation_SHT3_inv(0),
+  m_Interpolation_TARGET_SH(0)
 {
   // At least 1 inputs is necessary for a vector image.
   // For images added one at a time we need at least six
@@ -480,9 +485,63 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
         MITK_INFO << "Interpolation enabeled, using SH of order : " << Interpolation_SHOrder;
 
-        // create SH-Basis
+        // create target SH-Basis
+        vnl_matrix<double> * Q = new vnl_matrix<double>(3, max_shell.size());
+        ComputeSphericalFromCartesian(Q, max_shell);
 
-        // creat Coeff reconstruction MAtrix
+        int NumberOfCoeffs = (int)(Interpolation_SHOrder*Interpolation_SHOrder + Interpolation_SHOrder + 2.0)/2.0 + Interpolation_SHOrder;
+        m_Interpolation_TARGET_SH = new vnl_matrix<double>(max_shell.size(), NumberOfCoeffs);
+        ComputeSphericalHarmonicsBasis(Q, m_Interpolation_TARGET_SH, Interpolation_SHOrder);
+        delete Q;
+        // end creat target SH-Basis
+
+        // create measured-SHBasis
+        // Shell 1
+        vnl_matrix<double> * tempSHBasis;
+        vnl_matrix_inverse<double> * temp;
+
+        Q = new vnl_matrix<double>(3, shell1.size());
+        ComputeSphericalFromCartesian(Q, shell1);
+
+        tempSHBasis = new vnl_matrix<double>(shell1.size(), NumberOfCoeffs);
+        ComputeSphericalHarmonicsBasis(Q, tempSHBasis, Interpolation_SHOrder);
+        temp = new vnl_matrix_inverse<double>((*tempSHBasis));
+
+        m_Interpolation_SHT1_inv = new vnl_matrix<double>(temp->inverse());
+
+        delete Q;
+        delete temp;
+        delete tempSHBasis;
+
+        // Shell 2
+        Q = new vnl_matrix<double>(3, shell2.size());
+        ComputeSphericalFromCartesian(Q, shell2);
+
+        tempSHBasis = new vnl_matrix<double>(shell2.size(), NumberOfCoeffs);
+        ComputeSphericalHarmonicsBasis(Q, tempSHBasis, Interpolation_SHOrder);
+        temp = new vnl_matrix_inverse<double>((*tempSHBasis));
+
+        m_Interpolation_SHT1_inv = new vnl_matrix<double>(temp->inverse());
+
+        delete Q;
+        delete temp;
+        delete tempSHBasis;
+
+        // Shell 3
+        Q = new vnl_matrix<double>(3, shell3.size());
+        ComputeSphericalFromCartesian(Q, shell3);
+
+        tempSHBasis = new vnl_matrix<double>(shell3.size(), NumberOfCoeffs);
+
+        ComputeSphericalHarmonicsBasis(Q, tempSHBasis, Interpolation_SHOrder);
+
+        temp = new vnl_matrix_inverse<double>((*tempSHBasis));
+
+        m_Interpolation_SHT1_inv = new vnl_matrix<double>(temp->inverse());
+
+        delete Q;
+        delete temp;
+        delete tempSHBasis;
       }
 
       m_ReconstructionType = Mode_Analytical3Shells;
@@ -723,6 +782,13 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       //E->set_column(1, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(1))));
       //E->set_column(2, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(2))));
 
+      if(m_Interpolation_Flag)
+      {
+        E->set_column(0, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (E->get_column(0))));
+        E->set_column(1, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (E->get_column(1))));
+        E->set_column(2, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (E->get_column(2))));
+      }
+
       // Normalize the Signal: Si/S0
       S_S0Normalization(*E,bzeroImageIterator.Get());
 
@@ -878,7 +944,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   typedef std::auto_ptr< vnl_vector< int > >    VectorIntPtr;
   typedef std::auto_ptr< vnl_matrix_inverse< double > >  InverseMatrixDoublePtr;
 
-    int numberOfGradientDirections = refVector.size();
+  int numberOfGradientDirections = refVector.size();
 
   if( numberOfGradientDirections < (((L+1)*(L+2))/2) || numberOfGradientDirections < 6  )
   {
@@ -902,20 +968,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   FRTMatrix->fill(0.0);
   MatrixDoublePtr SHEigenvalues(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   SHEigenvalues->fill(0.0);
+
   MatrixDoublePtr Q(new vnl_matrix<double>(3, numberOfGradientDirections));
 
-  for(int i = 0; i < refVector.size(); i++)
-  {
-
-    double x = m_GradientDirectionContainer->ElementAt(refVector[i]).get(0);
-    double y = m_GradientDirectionContainer->ElementAt(refVector[i]).get(1);
-    double z = m_GradientDirectionContainer->ElementAt(refVector[i]).get(2);
-    double cart[3];
-    mitk::sh::Cart2Sph(x,y,z,cart);
-    (*Q)(0,i) = cart[0];
-    (*Q)(1,i) = cart[1];
-    (*Q)(2,i) = cart[2];
-  }
+  // Convert Cartesian to Spherical Coordinates refVector -> Q
+  ComputeSphericalFromCartesian(Q.get(), refVector);
 
   // SHBasis-Matrix + LaplacianBaltrami-Matrix + SHOrderAssociationVector
   ComputeSphericalHarmonicsBasis(Q.get() ,SHBasisMatrix.get() , LOrder , LaplacianBaltrami.get(), SHOrderAssociation.get(), SHEigenvalues.get());
@@ -959,7 +1016,24 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   MatrixDoublePtr tempPtr (new vnl_matrix<double>( U->as_matrix() ));
   m_ODFSphericalHarmonicBasisMatrix  = new vnl_matrix<double>(NOdfDirections,NumberOfCoeffs);
   ComputeSphericalHarmonicsBasis(tempPtr.get(), m_ODFSphericalHarmonicBasisMatrix, LOrder);
- }
+}
+
+template< class T, class TG, class TO, int L, int NOdfDirections>
+void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
+::ComputeSphericalFromCartesian(vnl_matrix<double> * Q,  IndiciesVector const & refShell)
+{
+  for(int i = 0; i < refShell.size(); i++)
+  {
+    double x = m_GradientDirectionContainer->ElementAt(refShell[i]).get(0);
+    double y = m_GradientDirectionContainer->ElementAt(refShell[i]).get(1);
+    double z = m_GradientDirectionContainer->ElementAt(refShell[i]).get(2);
+    double cart[3];
+    mitk::sh::Cart2Sph(x,y,z,cart);
+    (*Q)(0,i) = cart[0];
+    (*Q)(1,i) = cart[1];
+    (*Q)(2,i) = cart[2];
+  }
+}
 
 
 template< class T, class TG, class TO, int L, int NODF>

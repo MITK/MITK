@@ -83,7 +83,7 @@ void QmitkBrainNetworkAnalysisView::CreateQtPartControl( QWidget *parent )
     this->m_Controls->networkifyPushButton->show();
     this->m_Controls->networkifyPushButton->setText( "Create Network" );
     this->m_Controls->modularizePushButton->hide();
-    this->m_Controls->prunePushButton->hide();
+    this->m_Controls->pruneOptionsGroupBox->hide();
 
     this->m_Controls->syntheticNetworkOptionsGroupBox->show();
     //--------------------------- fill comboBox---------------------------
@@ -97,7 +97,7 @@ void QmitkBrainNetworkAnalysisView::CreateQtPartControl( QWidget *parent )
     this->m_Controls->networkifyPushButton->show();
     this->m_Controls->networkifyPushButton->setText( "Networkify" );
     this->m_Controls->modularizePushButton->show();
-    this->m_Controls->prunePushButton->show();
+    this->m_Controls->pruneOptionsGroupBox->show();
 
     this->m_Controls->syntheticNetworkOptionsGroupBox->show();
     //--------------------------- fill comboBox---------------------------
@@ -703,7 +703,8 @@ void QmitkBrainNetworkAnalysisView::OnPrunePushButtonClicked()
       mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( node->GetData() );
       if( node.IsNotNull() && network )
       {
-        network->PruneUnconnectedSingleNodes();
+        // Edge pruning will also do node pruning
+        network->PruneEdgesBelowWeight( this->m_Controls->pruneEdgeWeightSpinBox->value() );
       }
     }
   }

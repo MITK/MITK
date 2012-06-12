@@ -554,3 +554,34 @@ void mitk::ConnectomicsNetwork::UpdateIDs()
   }
   this->SetIsModified( true );
 }
+
+void mitk::ConnectomicsNetwork::PruneEdgesBelowWeight( int targetWeight )
+{
+  boost::graph_traits<NetworkType>::edge_iterator iterator, end;
+
+  // set to true if iterators are invalidated by deleting a vertex
+  bool edgeHasBeenRemoved( true );
+
+  // if no vertex has been removed in the last loop, we are done
+  while( edgeHasBeenRemoved )
+  {
+    edgeHasBeenRemoved = false;
+    // sets iterator to start and end to end
+    boost::tie(iterator, end) = boost::edges( m_Network );
+
+    for ( ; iterator != end && !edgeHasBeenRemoved; ++iterator)
+    {
+      // If the node has no adjacent edges it should be deleted
+      if( m_Network[ *iterator ].weight < targetWeight )
+      {
+        edgeHasBeenRemoved = true;
+        // this invalidates all iterators
+        boost::remove_edge( *iterator, m_Network );
+      }
+    }
+  }
+
+  // this will remove any nodes which, after deleting edges are now
+  // unconnected, also this calls UpdateIDs()
+  PruneUnconnectedSingleNodes();
+}

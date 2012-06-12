@@ -160,6 +160,14 @@ namespace mitk {
     /** Remove nodes not connected to any other node */
     void PruneUnconnectedSingleNodes();
 
+    /** Remove edges below the specified weight
+      * 
+      * targetWeight is the number of connecting fibers
+      *
+      * This will remove unconnected nodes after removal
+      */
+    void PruneEdgesBelowWeight( int targetWeight );
+
   protected:
     ConnectomicsNetwork();
     virtual ~ConnectomicsNetwork();

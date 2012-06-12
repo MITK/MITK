@@ -3768,6 +3768,9 @@
     <state NAME="IsOverImage" ID="2" >
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="1" />
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="3" />
+      <transition NAME="name" EVENT_ID="1013" NEXT_STATE_ID="3">
+        <action ID="30" />
+      </transition>
     </state>
     <state NAME="Hovering" ID="3" >
       <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
@@ -3806,6 +3809,9 @@
       </transition>
       <transition NAME="name" EVENT_ID="630" NEXT_STATE_ID="6">
         <action ID="49007" />
+      </transition>
+      <transition NAME="name" EVENT_ID="2" NEXT_STATE_ID="3">
+        <action ID="61" />
       </transition>
     </state>
     <state NAME="DragSegmentationSurface" ID="7" X_POS="95" Y_POS="473" WIDTH="202" HEIGHT="50">

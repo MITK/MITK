@@ -103,11 +103,22 @@ namespace mitk
     \param on enabled (true), disabled (false)
     */
     bool SetLensCalibration( bool on );
-
+    /*
+    \brief Returns amplitude data, performs camera data transform
+    \param output data array
+    */
     bool GetAmplitudes(float* amplitudeArray);
     bool GetAmplitudes(char* sourceData, float* amplitudeArray);
+    /*
+    \brief Returns intensity data, performs camera data transform
+    \param output data array
+    */
     bool GetIntensities(float* intensityArray);
     bool GetIntensities(char* sourceData, float* intensityArray);
+    /*
+    \brief Returns distance data, performs camera data transform
+    \param output data array
+    */
     bool GetDistances(float* distanceArray);
     bool GetDistances(char* sourceData, float* distanceArray);
 

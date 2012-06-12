@@ -26,7 +26,6 @@ namespace mitk
   m_OriginControllerWidth(0), m_OriginControllerHeight(0)
   {
     m_RawDataSource = ThreadedToFRawDataReconstruction::New();
-
   }
 
   ToFCameraPMDRawDataDevice::~ToFCameraPMDRawDataDevice()
@@ -53,7 +52,7 @@ namespace mitk
         this->AllocatePixelArrays();
         this->AllocateSourceData();
 
-        m_CameraConnected = true;
+        this->m_CameraConnected = true;
       }
     }
     return ok;
@@ -208,7 +207,7 @@ namespace mitk
          END TODO Buffer Handling currently only works for buffer size 1
          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-        // print current framerate
+        // print current frame rate
         if (printStatus)
         {
           t2 = realTimeClock->GetCurrentStamp() - t1;

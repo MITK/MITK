@@ -118,7 +118,6 @@ namespace mitk
     if (m_CameraActive)
     {
       this->ResizeOutputImage(m_AmplitudeArray,amplitudeArray);
-      //memcpy(amplitudeArray, this->m_AmplitudeArray, this->m_PixelNumber*sizeof(float));
       imageSequence = this->m_ImageSequence;
     }
     else
@@ -132,7 +131,6 @@ namespace mitk
     if (m_CameraActive)
     {
       this->ResizeOutputImage(m_IntensityArray, intensityArray);
-     // memcpy(intensityArray, this->m_IntensityArray, this->m_PixelNumber*sizeof(float));
       imageSequence = this->m_ImageSequence;
     }
     else
@@ -146,7 +144,6 @@ namespace mitk
     if (m_CameraActive)
     {
       this->ResizeOutputImage(m_DistanceArray, distanceArray);
-      //memcpy(distanceArray, this->m_DistanceArray, this->m_PixelNumber*sizeof(float));
       imageSequence = this->m_ImageSequence;
     }
     else
@@ -160,10 +157,6 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      // 1) copy the image buffer
-      // 2) convert the distance values from m to mm
-      // 3) Flip around y- axis (vertical axis)
-
       // check for empty buffer
       if (this->m_ImageSequence < 0)
       {
@@ -197,9 +190,6 @@ namespace mitk
       this->ResizeOutputImage(m_DistanceArray, distanceArray);
       this->ResizeOutputImage(m_AmplitudeArray, amplitudeArray);
       this->ResizeOutputImage(m_IntensityArray, intensityArray);
-      //memcpy(distanceArray, this->m_DistanceArray, this->m_PixelNumber*sizeof(float));
-      //memcpy(amplitudeArray, this->m_AmplitudeArray, this->m_PixelNumber*sizeof(float));
-      //memcpy(intensityArray, this->m_IntensityArray, this->m_PixelNumber*sizeof(float));
       memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
     }
     else
@@ -207,6 +197,7 @@ namespace mitk
       MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
     }
   }
+
   void ToFCameraPMDRawDataCamBoardDevice::ResizeOutputImage(float* in, float* out)
   {
     vnl_matrix<float> inMat = vnl_matrix<float>(m_OriginControllerHeight, m_OriginControllerWidth);
@@ -215,9 +206,9 @@ namespace mitk
     vnl_matrix<float> temp = vnl_matrix<float>(m_CaptureHeight,m_CaptureWidth);
     temp = inMat.extract(m_CaptureHeight,m_CaptureWidth, 0, 4);
     outMat = temp.transpose();    // rotate the image data
-    outMat.flipud();
+    outMat.flipud();              // flip image upside down
     outMat.copy_out(out);
-    inMat.clear();
+    inMat.clear();                // clean data
     outMat.clear();
     temp.clear();
   }

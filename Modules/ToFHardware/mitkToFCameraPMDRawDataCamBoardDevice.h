@@ -36,27 +36,46 @@ namespace mitk
     mitkClassMacro( ToFCameraPMDRawDataCamBoardDevice , ToFCameraPMDRawDataDevice );
 
     itkNewMacro( Self );
-    
+    /*!
+    \brief set a BaseProperty
+    */
     virtual void SetProperty( const char *propertyKey, BaseProperty* propertyValue );
-
+    /*!
+    \brief Transforms the sourceData into an array with four tuples holding the channels for 
+           raw data reconstruction.
+    */
     virtual void GetChannelSourceData(short* sourceData, vtkShortArray* vtkChannelArray );
-
+    /*!
+    \brief Establishes camera connection and sets the class variables
+    */
     bool ConnectCamera();
+    /*!
+    \brief Returns intensity data
+    */
     void GetIntensities(float* intensityArray, int& imageSequence);
+    /*!
+    \brief Returns amplitude data
+    */
     void GetAmplitudes(float* amplitudeArray, int& imageSequence);
+    /*!
+    \brief Returns distance data 
+    */
     void GetDistances(float* distanceArray, int& imageSequence);
+    /*!
+    \brief Returns all image data at once.
+    */
     void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray, int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray);
 
   protected:
 
     ToFCameraPMDRawDataCamBoardDevice();
-
     ~ToFCameraPMDRawDataCamBoardDevice();
+
   private:
+    /*!
+    \brief Method performs resize of the image data and flips it upside down
+    */
     void ResizeOutputImage(float* in, float* out);
-    // member variables
-    //unsigned int m_OriginControllerHeight;
-    //unsigned int m_OriginControllerWidth;
   };
 } //END mitk namespace
 #endif // __mitkToFCameraPMDRawDataCamBoardDevice_h

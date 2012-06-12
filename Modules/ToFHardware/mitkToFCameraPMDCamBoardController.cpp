@@ -283,7 +283,6 @@ namespace mitk
     this->m_PMDRes = pmdCalcDistances(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
     this->TransformCameraOutput(tempArray, distanceArray, true);
     delete[] tempArray;
-
     return ErrorText(this->m_PMDRes);
   }
 

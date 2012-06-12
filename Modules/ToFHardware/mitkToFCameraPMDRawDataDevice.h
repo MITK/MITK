@@ -160,17 +160,17 @@ namespace mitk
     */
     void XYAxisFlipImage( float* imageData, float* &flippedData, int xAxis, int yAxis, int dimension = 1 );
 
+    //member variables
     ToFCameraPMDController::Pointer m_Controller; ///< corresponding CameraController
     ThreadedToFRawDataReconstruction::Pointer m_RawDataSource;
     char** m_SourceDataBuffer; ///< buffer holding the last acquired images
     char* m_SourceDataArray; ///< array holding the current PMD source data
     short* m_ShortSourceData; ///< array holding the current PMD raw data
-    unsigned int m_OriginControllerWidth;
-    unsigned int m_OriginControllerHeight;
+    unsigned int m_OriginControllerWidth; ///< holds the original controller width
+    unsigned int m_OriginControllerHeight; ///< holds the original controller height
 
   private:
 
-    //member variables
     int m_ChannelSize;      ///< member holds the size of a single raw data channel
 
   };

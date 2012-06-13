@@ -53,7 +53,7 @@ In general, exceptions emit no logging messages by default because they are inte
 
 \subsection Catch Catching exceptions
 
-Exceptions should be catched by overlying classes, when they can handle them in a proper way. Catching exceptions is very simple, use the standard try-catch block to do so. An example is given below.
+Exceptions should be caught by overlying classes, if they can handle them in a proper way. Catching exceptions is very simple, use the standard try-catch block to do so. An example is given below.
 
 \verbatim
 try
@@ -68,7 +68,7 @@ catch (mitk::Exception e)
   }
 \endverbatim
 
-Please do not use "catch (...)" because normally your class can't garantee to handle all exceptions in a proper way without differentiate them.
+Please do not use "catch (...)" because normally your class can't garantee to handle all exceptions in a proper way without differentiating them.
 
 \section SpecializedExceptionHandling Defining and Using more Specialized Exceptions
 

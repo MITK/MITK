@@ -59,7 +59,6 @@ protected:
     float                       m_FiberLength;
     ItkFloatImageType::Pointer  m_Image;
     ParticleGrid*               m_Grid;
-    Particle*                   particles;
     vtkSmartPointer<vtkCellArray> m_VtkCellArray;
     vtkSmartPointer<vtkPoints>    m_VtkPoints;
 

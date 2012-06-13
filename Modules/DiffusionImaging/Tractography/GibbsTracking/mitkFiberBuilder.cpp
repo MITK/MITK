@@ -21,7 +21,6 @@ using namespace mitk;
 FiberBuilder::FiberBuilder(ParticleGrid* grid, ItkFloatImageType* image)
 {
     m_Grid = grid;
-    particles = m_Grid->m_Particles;
     m_Image = image;
     m_FiberLength = 0;
 }
@@ -41,7 +40,7 @@ vtkSmartPointer<vtkPolyData> FiberBuilder::iterate(int minFiberLength)
     m_FiberLength = 0;
     for (int k = 0; k < m_Grid->m_NumParticles;k++)
     {
-        Particle *dp =  &(particles[k]);
+        Particle *dp =  m_Grid->GetParticle(k);
         if (dp->label == 0)
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
@@ -60,7 +59,7 @@ vtkSmartPointer<vtkPolyData> FiberBuilder::iterate(int minFiberLength)
     }
     for (int k = 0; k < m_Grid->m_NumParticles;k++)
     {
-        Particle *dp =  &(particles[k]);
+        Particle *dp =  m_Grid->GetParticle(k);
         dp->inserted = false;
         dp->label = 0;
     }

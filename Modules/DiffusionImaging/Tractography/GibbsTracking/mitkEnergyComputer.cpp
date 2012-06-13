@@ -294,9 +294,9 @@ float EnergyComputer::computeInternalEnergyConnection(Particle *p1,int ep1)
     Particle *p2 = 0;
     int ep2;
     if (ep1 == 1)
-        p2 = m_ParticleGrid->m_AddressContainer[p1->pID];
+        p2 = m_ParticleGrid->GetParticle(p1->pID);
     else
-        p2 = m_ParticleGrid->m_AddressContainer[p1->mID];
+        p2 = m_ParticleGrid->GetParticle(p1->mID);
     if (p2->mID == p1->ID)
         ep2 = -1;
     else if (p2->pID == p1->ID)

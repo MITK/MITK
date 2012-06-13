@@ -24,21 +24,11 @@ using namespace mitk;
 ParticleGrid::ParticleGrid(ItkFloatImageType* image, float cellSize)
 {
     //// involving the container
-    capacity = 0;
-    m_Particles = 0;
-    m_AddressContainer = 0;
     m_NumParticles = 0;
     m_NumConnections = 0;
     m_NumCellOverflows = 0;
 
-    ////// involvin the grid
-    nx = 0; ny = 0; nz = 0; csize = 0;
-    gridsize = 0;
-    grid = (Particle**) 0;
-    occnt = (int*) 0;
-
     increase_step = 100000;
-    m_Memory = 0;
 
     int width = image->GetLargestPossibleRegion().GetSize()[0]*image->GetSpacing()[0];
     int height = image->GetLargestPossibleRegion().GetSize()[1]*image->GetSpacing()[1];
@@ -51,40 +41,18 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float cellSize)
 
     //// involving the container
     capacity = 100000;
-    m_Particles = (Particle*) malloc(sizeof(Particle)*capacity);
-    m_AddressContainer = (Particle**) malloc(sizeof(Particle*)*capacity);
-
-    if (m_Particles == 0 || m_AddressContainer == 0)
-    {
-        fprintf(stderr,"error: Out of Memory\n");
-        capacity = 0;
-    }
-    else
-    {
-        fprintf(stderr,"Allocated Memory for %i particles \n",capacity);
-    }
+    m_Particles.resize(capacity);
 
     int i;
     for (i = 0;i < capacity;i++)
-    {
-        m_AddressContainer[i] = &(m_Particles[i]);      // initialize pointer in LUT
         m_Particles[i].ID = i;                          // initialize unique IDs
-    }
 
     // involving the grid
     nx = cellcnt_x; ny = cellcnt_y; nz = cellcnt_z; csize = cell_capacity;
     gridsize = nx*ny*nz;
 
-    m_Memory = (float)(sizeof(Particle*)*gridsize*csize)/1000000;
-
-    grid = (Particle**) malloc(sizeof(Particle*)*gridsize*csize);
-    occnt = (int*) malloc(sizeof(int)*gridsize);
-
-    if (grid == 0 || occnt == 0)
-    {
-        fprintf(stderr,"error: Out of Memory\n");
-        capacity = 0;
-    }
+    grid.resize(gridsize*csize);
+    occnt.resize(gridsize);
 
     for (i = 0;i < gridsize;i++)
         occnt[i] = 0;
@@ -97,32 +65,15 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float cellSize)
 int ParticleGrid::ReallocateGrid()
 {
     int new_capacity = capacity + increase_step;
-    Particle* new_particles = (Particle*) realloc(m_Particles,sizeof(Particle)*new_capacity);
-    Particle** new_ID_2_address = (Particle**) realloc(m_AddressContainer,sizeof(Particle*)*new_capacity);
-    if (new_particles == 0 || new_ID_2_address == 0)
-    {
-        fprintf(stderr,"ParticleGird:reallocate: out of memory!\n");
-        return -1;
-    }
+    m_Particles.resize(new_capacity);
     fprintf(stderr,"   now %i particles are allocated \n",new_capacity);
-    m_Memory = (float)(sizeof(Particle*)*new_capacity)/1000000;
 
-    int i;
-    for (i = 0; i < capacity; i++)
-    {
-        new_ID_2_address[i] = new_ID_2_address[i] - m_Particles + new_particles;   // shift address
-    }
-    for (i = capacity; i < new_capacity; i++)
-    {
-        new_particles[i].ID = i;         // initialize unique IDs
-        new_ID_2_address[i] = &(new_particles[i]) ;   // initliaze pointer in LUT
-    }
-    for (i = 0; i < nx*ny*nz*csize; i++)
-    {
-        grid[i] = grid[i] - m_Particles + new_particles;
-    }
-    m_Particles = new_particles;
-    m_AddressContainer = new_ID_2_address;
+    for (int i = 0; i<capacity; i++)    // update addresses
+       grid[m_Particles[i].gridindex] = &m_Particles[i];
+
+    for (int i = capacity; i < new_capacity; i++)
+        m_Particles[i].ID = i;         // initialize unique IDs
+
     capacity = new_capacity;
 
     return 1;
@@ -132,29 +83,11 @@ int ParticleGrid::ReallocateGrid()
 
 ParticleGrid::~ParticleGrid()
 {
-    if (m_Particles != 0)
-        free(m_Particles);
-    if (grid != 0)
-        free(grid);
-    if (occnt != 0)
-        free(occnt);
-    if (m_AddressContainer != 0)
-        free(m_AddressContainer);
-}
-
-
-
-int ParticleGrid::Id2Index(int ID)
-{
-    if (ID == -1)
-        return -1;
-    else
-        return (m_AddressContainer[ID] - m_Particles);
 }
 
 Particle* ParticleGrid::GetParticle(int ID)
 {
-    return &m_Particles[Id2Index(ID)];
+    return &m_Particles[ID];
 }
 
 
@@ -256,7 +189,6 @@ void ParticleGrid::RemoveParticle(int k)
     Particle* p = &(m_Particles[k]);
     int grdindex = p->gridindex;
     int cellidx = grdindex/csize;
-    int idx = grdindex%csize;
 
     // remove pending connections
     if (p->mID != -1)
@@ -264,36 +196,35 @@ void ParticleGrid::RemoveParticle(int k)
     if (p->pID != -1)
         DestroyConnection(p,+1);
 
-    // remove from grid
-    if (idx < occnt[cellidx]-1)
-    {
-        grid[grdindex] = grid[cellidx*csize + occnt[cellidx]-1];
-        grid[grdindex]->gridindex = grdindex;
-    }
+    // remove from grid (no need to actually change grid entries because the adresses stay the same)
     occnt[cellidx]--;
 
     // remove from container
     if (k<m_NumParticles-1)
     {
-        int todel_ID = p->ID;
-        int move_ID = m_Particles[m_NumParticles-1].ID;
+        Particle* toMove = &m_Particles[m_NumParticles-1];  // last particle
 
-        m_Particles[k] = m_Particles[m_NumParticles-1];          // move very last particle to empty slot
-        m_Particles[m_NumParticles-1].ID = todel_ID; // keep IDs unique
-
-        if (m_Particles[k].mID!=-1)
+        // update connections of last particle because its index is changig
+        if (toMove->mID!=-1)
         {
-            m_Particles[m_Particles[k].mID]
+            if ( m_Particles[toMove->mID].mID == m_NumParticles-1 )
+                m_Particles[toMove->mID].mID = k;
+            else if ( m_Particles[toMove->mID].pID == m_NumParticles-1 )
+                m_Particles[toMove->mID].pID = k;
         }
-        m_Particles[k].ID = move_ID;
+        if (toMove->pID!=-1)
+        {
+            if ( m_Particles[toMove->pID].mID == m_NumParticles-1 )
+                m_Particles[toMove->pID].mID = k;
+            else if ( m_Particles[toMove->pID].pID == m_NumParticles-1 )
+                m_Particles[toMove->pID].pID = k;
+        }
 
-        grid[p->gridindex] = p;          // keep gridindex consistent
-
-        // permute address table
-        m_AddressContainer[todel_ID] = &(m_Particles[m_NumParticles-1]);
-        m_AddressContainer[move_ID]  = p;
+        m_Particles[k] = m_Particles[m_NumParticles-1];         // move very last particle to empty slot
+        m_Particles[m_NumParticles-1].ID = m_NumParticles-1;    // update ID of deleted element to match the index
+        m_Particles[k].ID = k;                                  // update ID of moved element
+        m_Particles[k].gridindex = grdindex;                    // update grid index of moved element
     }
-
     m_NumParticles--;
 }
 
@@ -409,12 +340,12 @@ void ParticleGrid::DestroyConnection(Particle *P1,int ep1)
     Particle *P2 = 0;
     if (ep1 == 1)
     {
-        P2 = m_AddressContainer[P1->pID];
+        P2 = &m_Particles[P1->pID];
         P1->pID = -1;
     }
     else
     {
-        P2 = m_AddressContainer[P1->mID];
+        P2 = &m_Particles[P1->mID];
         P1->mID = -1;
     }
     if (P2->mID == P1->ID)

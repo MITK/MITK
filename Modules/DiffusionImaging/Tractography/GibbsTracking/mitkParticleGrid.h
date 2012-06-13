@@ -34,8 +34,6 @@ public:
 
     typedef itk::Image< float, 3 >  ItkFloatImageType;
 
-    Particle*   m_Particles;    // particles in linear array
-    Particle**  m_AddressContainer;
 
     int m_NumParticles;         // number of particles
     int m_NumConnections;       // number of connections
@@ -57,15 +55,16 @@ public:
     void DestroyConnection(Particle *P1,int ep1, Particle *P2, int ep2);
     void DestroyConnection(Particle *P1,int ep1);
 
-private:
+protected:
 
-    int Id2Index(int ID);
     int ReallocateGrid();
 
     int capacity; // maximal number of particles
     int increase_step;
 
-    Particle **grid;   // the grid
+    std::vector< Particle* > grid;   // the grid
+    std::vector< Particle >  m_Particles;    // particles in linear array
+    std::vector< int > occnt;     // occupation count of grid cells
 
     // grid size
     int nx;
@@ -78,9 +77,7 @@ private:
     float mulz;
 
     int csize;      // particle capacity of single cell in grid
-    int *occnt;     // occupation count of grid cells
     int gridsize;   // total number of cells
-    float m_Memory;
 
     struct NeighborTracker  // to run over the neighbors
     {

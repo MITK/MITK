@@ -198,7 +198,7 @@ void MetropolisHastingsSampler::IterateOneStep()
 #endif
 
             int pnum = rand()%m_ParticleGrid->m_NumParticles;
-            Particle *dp = &(m_ParticleGrid->m_Particles[pnum]);
+            Particle *dp = m_ParticleGrid->GetParticle(pnum);
             if (dp->pID == -1 && dp->mID == -1)
             {
 
@@ -231,7 +231,7 @@ void MetropolisHastingsSampler::IterateOneStep()
         {
 
             int pnum = rand()%m_ParticleGrid->m_NumParticles;
-            Particle *p =  &(m_ParticleGrid->m_Particles[pnum]);
+            Particle *p =  m_ParticleGrid->GetParticle(pnum);
             Particle prop_p = *p;
 
             prop_p.cap = cap_def - cap_sig*mtrand->frand();
@@ -266,7 +266,7 @@ void MetropolisHastingsSampler::IterateOneStep()
 #endif
 
             int pnum = rand()%m_ParticleGrid->m_NumParticles;
-            Particle *p =  &(m_ParticleGrid->m_Particles[pnum]);
+            Particle *p =  m_ParticleGrid->GetParticle(pnum);
             Particle prop_p = *p;
 
             distortn(sigma_g, prop_p.R);
@@ -311,15 +311,15 @@ void MetropolisHastingsSampler::IterateOneStep()
         {
 
             int pnum = rand()%m_ParticleGrid->m_NumParticles;
-            Particle *p =  &(m_ParticleGrid->m_Particles[pnum]);
+            Particle *p =  m_ParticleGrid->GetParticle(pnum);
 
             bool no_proposal = false;
             Particle prop_p = *p;
             if (p->pID != -1 && p->mID != -1)
             {
-                Particle *plus = m_ParticleGrid->m_AddressContainer[p->pID];
+                Particle *plus = m_ParticleGrid->GetParticle(p->pID);
                 int ep_plus = (plus->pID == p->ID)? 1 : -1;
-                Particle *minus = m_ParticleGrid->m_AddressContainer[p->mID];
+                Particle *minus = m_ParticleGrid->GetParticle(p->mID);
                 int ep_minus = (minus->pID == p->ID)? 1 : -1;
                 prop_p.R = (plus->R + plus->N * (plus->len * ep_plus)  + minus->R + minus->N * (minus->len * ep_minus));
                 prop_p.R *= 0.5;
@@ -328,14 +328,14 @@ void MetropolisHastingsSampler::IterateOneStep()
             }
             else if (p->pID != -1)
             {
-                Particle *plus = m_ParticleGrid->m_AddressContainer[p->pID];
+                Particle *plus = m_ParticleGrid->GetParticle(p->pID);
                 int ep_plus = (plus->pID == p->ID)? 1 : -1;
                 prop_p.R = plus->R + plus->N * (plus->len * ep_plus * 2);
                 prop_p.N = plus->N;
             }
             else if (p->mID != -1)
             {
-                Particle *minus = m_ParticleGrid->m_AddressContainer[p->mID];
+                Particle *minus = m_ParticleGrid->GetParticle(p->mID);
                 int ep_minus = (minus->pID == p->ID)? 1 : -1;
                 prop_p.R = minus->R + minus->N * (minus->len * ep_minus * 2);
                 prop_p.N = minus->N;
@@ -385,7 +385,7 @@ void MetropolisHastingsSampler::IterateOneStep()
 #endif
 
             int pnum = rand()%m_ParticleGrid->m_NumParticles;
-            Particle *p = &(m_ParticleGrid->m_Particles[pnum]);
+            Particle *p = m_ParticleGrid->GetParticle(pnum);
 
             EndPoint P;
             P.p = p;
@@ -456,7 +456,7 @@ void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
         {
             if (Current.p->pID != -1)
             {
-                Next.p = m_ParticleGrid->m_AddressContainer[Current.p->pID];
+                Next.p = m_ParticleGrid->GetParticle(Current.p->pID);
                 Current.p->pID = -1;
                 m_ParticleGrid->m_NumConnections--;
             }
@@ -465,7 +465,7 @@ void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
         {
             if (Current.p->mID != -1)
             {
-                Next.p = m_ParticleGrid->m_AddressContainer[Current.p->mID];
+                Next.p = m_ParticleGrid->GetParticle(Current.p->mID);
                 Current.p->mID = -1;
                 m_ParticleGrid->m_NumConnections--;
             }

@@ -575,7 +575,6 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     slicewriter->SetTimeStep( m_TimeStep[m_LastSliceDimension] );
     slicewriter->Update();
     m_FeedbackNode->SetData(NULL);
-    m_RBtnDisableInterpolation->setChecked(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

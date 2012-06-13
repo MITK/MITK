@@ -100,7 +100,7 @@
     <event NAME="rightBN+MouseWheel" ID="522" TYPE="Type_Wheel" BUTTON="BS_RightButton" BUTTONSTATE="0x0002" KEY="Key_none" />
     <!-- middle MouseButton and MouseWheel -->
     <event NAME="middleBN+MouseWheel" ID="523" TYPE="Type_Wheel" BUTTON="BS_MidButton" BUTTONSTATE="0x0004" KEY="Key_none" />
-	<!-- CTRL and MouseMove -->
+  <!-- CTRL and MouseMove -->
     <event NAME="CTRL+MouseMove" ID="529" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_none" />
     <!-- left MouseButton and MouseMove -->
     <event NAME="leftBN+MouseMove" ID="530" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0001" KEY="Key_none" />
@@ -109,7 +109,7 @@
     <!-- middle MouseButton and MouseMove -->
     <event NAME="middleBN+MouseMove" ID="533" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0004" KEY="Key_none" />
     <!-- CTRL + left MouseButton and MouseMove -->
-    <event NAME="CTRL+leftBN+MouseMove" ID="534" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0201" KEY="Key_none" />	
+    <event NAME="CTRL+leftBN+MouseMove" ID="534" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0201" KEY="Key_none" />  
     <!-- CTRL + right MouseButton and MouseMove -->
     <event NAME="CTRL+rightBN+MouseMove" ID="535" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0202" KEY="Key_none" />
     <!-- CTRL + middle MouseButton and MouseMove -->
@@ -792,18 +792,18 @@
       </transition>
       <transition NAME="CTRL+press" NEXT_STATE_ID="2" EVENT_ID="5">
         <action ID="49014" />
-		<action ID="80" />
+    <action ID="80" />
       </transition>
       <transition NAME="move w/ left button" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="90" />
       </transition>
       <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
         <action ID="90" />
-      </transition>	  
-	  <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
+      </transition>    
+    <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
         <action ID="49014" />
         <action ID="90" />
-      </transition>	  
+      </transition>    
       <transition NAME="CTRL+move  w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
         <action ID="49014" />
         <action ID="90" />
@@ -818,18 +818,18 @@
       </transition>
     </state>
     <state NAME="inverted" ID="2">
-	  <transition NAME="move  w/ left button" NEXT_STATE_ID="1" EVENT_ID="530">
+    <transition NAME="move  w/ left button" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="90" />
         <action ID="49014" />
       </transition>
       <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
         <action ID="49014" />
-		<action ID="90" />
-      </transition>	 
-	  <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
+    <action ID="90" />
+      </transition>   
+    <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
           <action ID="90" />
-      </transition>	  
-	  <transition NAME="CTRL+move   w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
+      </transition>    
+    <transition NAME="CTRL+move   w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
         <action ID="90" />
       </transition>
       <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
@@ -3698,7 +3698,7 @@
       <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="47">
         <action ID="90" />
       </transition>
-      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="52">
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="51">
         <action ID="76" />
       </transition>
     </state>
@@ -3763,7 +3763,9 @@
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="52">
         <action ID="100" />
       </transition>
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="53" />
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="52" >
+        <action ID="48000" />
+      </transition>
     </state>
     <state NAME="IsOverControlPoint" ID="59" X_POS="586" Y_POS="636" WIDTH="120" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="55">

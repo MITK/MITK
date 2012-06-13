@@ -30,7 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <iostream>
 
-QmitkHistogramWidget::QmitkHistogramWidget(QWidget * /*parent*/, bool showreport)
+QmitkHistogramWidget::QmitkHistogramWidget(QWidget * parent, bool showreport)
+  : QDialog(parent)
 {
   QBoxLayout *layout = new QVBoxLayout(this);
 

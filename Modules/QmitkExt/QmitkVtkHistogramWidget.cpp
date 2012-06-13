@@ -39,8 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <iostream>
 
-QmitkVtkHistogramWidget::QmitkVtkHistogramWidget( QWidget * /*parent*/ )
-: m_HistogramMode( HISTOGRAM_MODE_ENTIREIMAGE )
+QmitkVtkHistogramWidget::QmitkVtkHistogramWidget( QWidget * parent )
+: QDialog(parent), m_HistogramMode( HISTOGRAM_MODE_ENTIREIMAGE )
 {
   //QGroupBox *hgroupbox = new QGroupBox( "", this );
   //hgroupbox->setMinimumSize( 150, 150 );

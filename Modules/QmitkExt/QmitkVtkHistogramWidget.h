@@ -45,7 +45,7 @@ class QmitkExt_EXPORT QmitkVtkHistogramWidget : public QDialog
   Q_OBJECT
 
 public:
-  QmitkVtkHistogramWidget( QWidget * /*parent = 0 */);
+  QmitkVtkHistogramWidget( QWidget * parent = 0 );
   virtual ~QmitkVtkHistogramWidget();
 
   typedef mitk::Image::HistogramType HistogramType;

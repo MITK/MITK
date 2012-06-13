@@ -46,7 +46,7 @@ class QmitkExt_EXPORT QmitkVtkLineProfileWidget : public QDialog
   Q_OBJECT
 
 public:
-  QmitkVtkLineProfileWidget( QWidget * /*parent = 0*/ );
+  QmitkVtkLineProfileWidget( QWidget * parent = 0 );
   virtual ~QmitkVtkLineProfileWidget();
 
   typedef itk::ParametricPath< 3 >::Superclass PathType;

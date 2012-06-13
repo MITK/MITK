@@ -52,8 +52,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <iostream>
 
-QmitkVtkLineProfileWidget::QmitkVtkLineProfileWidget( QWidget * /*parent*/ )
-: m_PathMode( PATH_MODE_DIRECT )
+QmitkVtkLineProfileWidget::QmitkVtkLineProfileWidget( QWidget * parent )
+  : QDialog(parent), m_PathMode( PATH_MODE_DIRECT )
 {
   m_ChartWidget = new vtkQtChartWidget( this );
 

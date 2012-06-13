@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>465</width>
-    <height>475</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -198,11 +198,36 @@
         </column>
        </widget>
       </item>
-      <item alignment="Qt::AlignLeft">
-       <widget class="QPushButton" name="m_ButtonCopyStatisticsToClipboard">
-        <property name="text">
-         <string>Copy to Clipboard</string>
-        </property>
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="m_ButtonCopyStatisticsToClipboard">
+           <property name="text">
+            <string>Copy to Clipboard</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -218,9 +243,6 @@
      </property>
      <property name="title">
       <string>Histogram</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
      <property name="checkable">
       <bool>false</bool>
@@ -246,15 +268,42 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget"/>
+        <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget">
+         <zorder>widget_2</zorder>
+        </widget>
         <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget"/>
        </widget>
       </item>
-      <item alignment="Qt::AlignLeft">
-       <widget class="QPushButton" name="m_ButtonCopyHistogramToClipboard">
-        <property name="text">
-         <string>Copy to Clipboard</string>
-        </property>
+      <item>
+       <widget class="QWidget" name="widget_2" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="m_ButtonCopyHistogramToClipboard">
+           <property name="text">
+            <string>Copy to Clipboard</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>

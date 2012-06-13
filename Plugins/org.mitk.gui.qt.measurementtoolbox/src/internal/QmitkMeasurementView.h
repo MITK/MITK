@@ -105,7 +105,7 @@ class QmitkMeasurementView : public QmitkAbstractView
     void EnableCrosshairNavigation();
     void DisableCrosshairNavigation();
     void PlanarFigureInitialized();
-    void CheckForTopMostVisibleImage();
+    void CheckForTopMostVisibleImage(mitk::DataNode* _NodeToNeglect=0);
 
     QmitkMeasurementViewData* d;
 };

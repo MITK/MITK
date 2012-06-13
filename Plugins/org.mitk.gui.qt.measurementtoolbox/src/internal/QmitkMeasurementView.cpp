@@ -112,43 +112,58 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_DrawActionsGroup->setExclusive(true);
 
   //# add actions
+  MEASUREMENT_DEBUG << "Draw Line";
   QAction* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/line.png"), "Draw Line");
+  currentAction->setCheckable(true);
   d->m_DrawLine = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
+  MEASUREMENT_DEBUG << "Draw Path";
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/path.png"), "Draw Path");
+  currentAction->setCheckable(true);
   d->m_DrawPath = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
+
+  MEASUREMENT_DEBUG << "Draw Angle";
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/angle.png"), "Draw Angle");
+  currentAction->setCheckable(true);
   d->m_DrawAngle = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
+  MEASUREMENT_DEBUG << "Draw Four Point Angle";
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/four-point-angle.png"), "Draw Four Point Angle");
+  currentAction->setCheckable(true);
   d->m_DrawFourPointAngle = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
+  MEASUREMENT_DEBUG << "Draw Circle";
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/circle.png"), "Draw Circle");
+  currentAction->setCheckable(true);
   d->m_DrawEllipse = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
+  MEASUREMENT_DEBUG << "Draw Rectangle";
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/rectangle.png"), "Draw Rectangle");
+  currentAction->setCheckable(true);
   d->m_DrawRectangle = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
+  MEASUREMENT_DEBUG << "Draw Polygon";
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
     ":/measurement/polygon.png"), "Draw Polygon");
+  currentAction->setCheckable(true);
   d->m_DrawPolygon = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
@@ -272,9 +287,11 @@ void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
   this->CheckForTopMostVisibleImage();
 }
 
-void QmitkMeasurementView::CheckForTopMostVisibleImage()
+void QmitkMeasurementView::CheckForTopMostVisibleImage(mitk::DataNode* _NodeToNeglect)
 {
   d->m_SelectedImageNode = this->DetectTopMostVisibleImage().GetPointer();
+  if( d->m_SelectedImageNode.GetPointer() == _NodeToNeglect )
+    d->m_SelectedImageNode = 0;
 
   if( d->m_SelectedImageNode.IsNotNull() )
   {
@@ -318,7 +335,7 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
     d->m_DataNodeToPlanarFigureData.erase( it );
   }
 
-  this->CheckForTopMostVisibleImage();
+  this->CheckForTopMostVisibleImage(nonConstNode);
 }
 
 
@@ -354,6 +371,15 @@ void QmitkMeasurementView::PlanarFigureSelected( itk::Object* object, const itk:
 void QmitkMeasurementView::PlanarFigureInitialized()
 {
   MEASUREMENT_DEBUG << "planar figure initialized";
+  d->m_DrawActionsToolBar->setEnabled(true);
+
+  d->m_DrawLine->setChecked(false);
+  d->m_DrawPath->setChecked(false);
+  d->m_DrawAngle->setChecked(false);
+  d->m_DrawFourPointAngle->setChecked(false);
+  d->m_DrawEllipse->setChecked(false);
+  d->m_DrawRectangle->setChecked(false);
+  d->m_DrawPolygon->setChecked(false);
 }
 
 void QmitkMeasurementView::SetFocus()
@@ -475,6 +501,7 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(
   d->m_CurrentSelection.push_back( newNode );
   this->UpdateMeasurementText();
   this->DisableCrosshairNavigation();
+  d->m_DrawActionsToolBar->setEnabled(false);
   return newNode;
 }
 

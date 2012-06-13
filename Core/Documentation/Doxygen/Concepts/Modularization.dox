@@ -18,7 +18,7 @@ Modules can be found in the MITK/Modules directory (with the exception of the co
 
 \subsection ModularizationPageViews Views
 
-One of the smallest units in the MITK application framework (@BLUEBERRY_DOXYGEN_LINK@) is a \e view. A view is always part of a plug-in and provides one specific function, such as grouping all gui elements needed for providing segmentation algorithms or loading dicom images. Views usually contain any code which communicates with the user, performs input checking and similar, but no advanced algorithms.
+One of the smallest units in the MITK application framework (\ref FurtherReading "Blueberry") is a \e view. A view is always part of a plug-in and provides one specific function, such as grouping all gui elements needed for providing segmentation algorithms or loading dicom images. Views usually contain any code which communicates with the user, performs input checking and similar, but no advanced algorithms.
 
 \subsection ModularizationPagePlugInBundles Plugins
 

@@ -126,23 +126,34 @@ static void testGeneratedImage()
 
 }
 
-static void testLoadedImage(mitk::Image::Pointer mitkImage)
+static void testLoadedImage(std::string mitkImagePath)
 {
+      mitk::Image::Pointer testImage = LoadImage(mitkImagePath);
     mitk::ImageToOpenCVImageFilter::Pointer _ImageToOpenCVImageFilter =
       mitk::ImageToOpenCVImageFilter::New();
 
-    _ImageToOpenCVImageFilter->SetImage( mitkImage );
+    _ImageToOpenCVImageFilter->SetImage( testImage );
 
     IplImage* openCVImage = _ImageToOpenCVImageFilter->GetOpenCVImage();
+    IplImage* openCVImage_Ref = cvLoadImage(mitkImagePath.c_str());
 
     MITK_TEST_CONDITION_REQUIRED( openCVImage != NULL, "Image returned by filter is not null.");
 
-    CvScalar s;
-    s=cvGet2D(img,i,j); // get the (i,j) pixel value
-    printf("B=%f, G=%f, R=%f\n",s.val[0],s.val[1],s.val[2]);
-    s.val[0]=111;
-    s.val[1]=111;
-    s.val[2]=111;
+    for(int i = 0 ; i<openCVImage->height ; i++)
+    {
+        for(int j = 0 ; j<openCVImage->width ; j++)
+        {
+            CvScalar s;
+            s=cvGet2D(openCVImage,i,j); // get the (i,j) pixel value
+            CvScalar sRef;
+            sRef=cvGet2D(openCVImage_Ref,i,j); // get the (i,j) pixel value
+            for(int c = 0 ; c < openCVImage->nChannels ; c++)
+            {
+            MITK_TEST_CONDITION_REQUIRED( s.val[c] == sRef.val[c] , "All pixel values have to be equal");
+            }
+        }
+    }
+
 
 //     cvNamedWindow( "test" );
 //     cvShowImage( "test" , openCVImage );
@@ -156,9 +167,8 @@ int mitkImageToOpenCVImageFilterTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("ImageToOpenCVImageFilter")
 
-testGeneratedImage();
-  mitk::Image::Pointer testImage = LoadImage(argv[1]);
-  testLoadedImage(testImage);
+  testGeneratedImage();
+  testLoadedImage(argv[1]);
   // always end with this!
   MITK_TEST_END();
 

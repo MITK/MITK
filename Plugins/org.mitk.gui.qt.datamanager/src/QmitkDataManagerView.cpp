@@ -141,8 +141,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setAcceptDrops(true);
   m_NodeTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
   m_NodeTreeView->setModel(m_NodeTreeModel);
-  m_NodeTreeView->header()->setResizeMode(0,QHeaderView::ResizeToContents);
-  m_NodeTreeView->header()->setStretchLastSection(false);
+  m_NodeTreeView->setTextElideMode(Qt::ElideMiddle);
   m_NodeTreeView->installEventFilter(new QmitkNodeTableViewKeyFilter(this));
   QObject::connect( m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );

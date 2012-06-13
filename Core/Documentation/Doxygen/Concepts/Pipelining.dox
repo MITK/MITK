@@ -1,5 +1,5 @@
 /**
-\page PipelineingConceptPage The MITK Pipelining Concept
+\page PipelineingConceptPage The Pipelining Concept
 
 Available Sections:
 
@@ -14,7 +14,7 @@ Available Sections:
 
 \section PipelineingConceptPage_Introduction Introduction to Pipelining
 
-Image processing in MITK draws heavily from the pipelining concept, and a clear understaning of it is crucial when developing with our framework. This document will first clarify the general idea behind pipelining and then discuss some MITK specifics that you should know about.
+Image processing in MITK draws heavily from the pipelining concept, and a clear understaning of it is crucial when developing with MITK. This document will first clarify the general idea behind pipelining and then discuss some MITK specifics that you should know about.
 
 In the real world, a pipeline connects a source of some kind with a consumer of another. So we identify three key concepts:
 
@@ -75,10 +75,10 @@ The filters themselves extend one of the source classes. This may not immediatel
 \subsection PipelineingConceptPage_Implement      Writing Your Own Filter
 When writing your first Filter, this is the recommended way to go about:
 
-1. Identify which kinds of Data you require for input, and which for output
-2. According to the information from step one, extend the most specific subclass of BaseProcess available. E.g. a filter that processes images, should extend ImageToImageFilter. If none is available, extend ImageSource.
-3. Identify how many inputs and how many outputs you require.
-4. In the constructor, define the number of inputs, and create an output.
+- Identify which kinds of Data you require for input, and which for output
+- According to the information from step one, extend the most specific subclass of BaseProcess available. E.g. a filter that processes images, should extend ImageToImageFilter.
+- Identify how many inputs and how many outputs you require.
+- In the constructor, define the number of outputs, and create an output.
 \verbatim
 //set number of outputs
 this->SetNumberOfOutputs(1);
@@ -88,7 +88,7 @@ mitk::Image::Pointer newOutput = mitk::Image::New();
 this->SetNthOutput(0, newOutput);
 \endverbatim
 
-5. Implement MakeOutput(). This Method creats a new, clean Output that can be written to. Refer to Filters with similiar task for this.
-6. Implement GenerateData(). This Method will generate the output based on the input it. At time of execution you can assume that the Data in input is a new set.
+- Implement MakeOutput(). This Method creats a new, clean Output that can be written to. Refer to Filters with similiar task for this.
+- Implement GenerateData(). This Method will generate the output based on the input it. At time of execution you can assume that the Data in input is a new set.
 
 */

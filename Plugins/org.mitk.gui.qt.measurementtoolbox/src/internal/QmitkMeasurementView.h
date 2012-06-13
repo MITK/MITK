@@ -63,7 +63,7 @@ namespace mitk
 /// 2. A textbrowser which shows details for the selected PlanarFigures
 /// 3. A button for copying all details to the clipboard
 ///
-class QmitkMeasurementView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
+class QmitkMeasurementView : public QmitkAbstractView
 {
   Q_OBJECT
   
@@ -83,11 +83,7 @@ class QmitkMeasurementView : public QmitkAbstractView, public mitk::ILifecycleAw
     void NodeChanged(const mitk::DataNode* node);
     void NodeRemoved(const mitk::DataNode* node);
 
-    virtual void Activated();
-    virtual void Deactivated();
-    virtual void Visible();
-    virtual void Hidden();
-
+    void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
   protected slots:
     ///# draw actions
     void ActionDrawLineTriggered( bool checked = false );
@@ -97,17 +93,19 @@ class QmitkMeasurementView : public QmitkAbstractView, public mitk::ILifecycleAw
     void ActionDrawEllipseTriggered( bool checked = false );
     void ActionDrawRectangleTriggered( bool checked = false );
     void ActionDrawPolygonTriggered( bool checked = false );
-    void ActionDrawArrowTriggered( bool checked = false );
-    void ActionDrawTextTriggered( bool checked = false );
     void CopyToClipboard( bool checked = false );
 
   private:
-    void CheckSelection();
     void CreateConnections();
-    void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
-    void SetText();
+    mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
+    void UpdateMeasurementText();
     void AddAllInteractors();
     void RemoveAllInteractors();
+    mitk::DataNode::Pointer DetectTopMostVisibleImage();
+    void EnableCrosshairNavigation();
+    void DisableCrosshairNavigation();
+    void PlanarFigureInitialized();
+    void CheckForTopMostVisibleImage();
 
     QmitkMeasurementViewData* d;
 };

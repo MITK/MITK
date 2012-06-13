@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -18,35 +18,58 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtGui>
 
-#include <vtkTextProperty.h>
-#include <vtkRenderer.h>
-#include <vtkCornerAnnotation.h>
-
 #include <mitkVtkLayerController.h>
 #include <mitkWeakPointer.h>
-#include "mitkPlanarCircle.h"
-#include "mitkPlanarPolygon.h"
-#include "mitkPlanarAngle.h"
-#include "mitkPlanarRectangle.h"
-#include "mitkPlanarLine.h"
-#include "mitkPlanarCross.h"
-#include "mitkPlanarFourPointAngle.h"
-#include "mitkPlanarFigureInteractor.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkGlobalInteraction.h"
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarPolygon.h>
+#include <mitkPlanarAngle.h>
+#include <mitkPlanarRectangle.h>
+#include <mitkPlanarLine.h>
+#include <mitkPlanarCross.h>
+#include <mitkPlanarFourPointAngle.h>
+#include <mitkPlanarFigureInteractor.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkILinkedRenderWindowPart.h>
+#include <mitkNodePredicateDataType.h>
+
+struct QmitkPlanarFigureData
+{
+  QmitkPlanarFigureData()
+    : m_Figure(0), m_EndPlacementObserverTag(0), m_SelectObserverTag(0), m_StartInteractionObserverTag(0), m_EndInteractionObserverTag(0)
+  {
+  }
+
+  mitk::PlanarFigure* m_Figure;
+  unsigned int m_EndPlacementObserverTag;
+  unsigned int m_SelectObserverTag;
+  unsigned int m_StartInteractionObserverTag;
+  unsigned int m_EndInteractionObserverTag;
+};
 
 struct QmitkMeasurementViewData
 {
   QmitkMeasurementViewData()
-    : m_LineCounter(0), m_AngleCounter(0)
+    : m_LineCounter(0), m_PathCounter(0), m_AngleCounter(0),
+      m_FourPointAngleCounter(0), m_EllipseCounter(0),
+      m_RectangleCounter(0), m_PolygonCounter(0)
   {
   }
 
+  // internal vars
+  unsigned int m_LineCounter;
+  unsigned int m_PathCounter;
+  unsigned int m_AngleCounter;
+  unsigned int m_FourPointAngleCounter;
+  unsigned int m_EllipseCounter;
+  unsigned int m_RectangleCounter;
+  unsigned int m_PolygonCounter;
+  QList<mitk::DataNode::Pointer> m_CurrentSelection;
+  std::map<mitk::DataNode*, QmitkPlanarFigureData> m_DataNodeToPlanarFigureData;
+  mitk::WeakPointer<mitk::DataNode> m_SelectedImageNode;
+
+  // WIDGETS
   QWidget* m_Parent;
-
-  vtkRenderer * m_MeasurementInfoRenderer;
-  vtkCornerAnnotation *m_MeasurementInfoAnnotation;
-
   QLabel* m_SelectedImageLabel;
   QAction* m_DrawLine;
   QAction* m_DrawPath;
@@ -60,11 +83,6 @@ struct QmitkMeasurementViewData
   QTextBrowser* m_SelectedPlanarFiguresText;
   QPushButton* m_CopyToClipboard;
   QGridLayout* m_Layout;
-
-  mitk::WeakPointer<mitk::DataNode> m_SelectedImageNode;
-  int m_LineCounter;
-  int m_AngleCounter;
-  QList<mitk::WeakPointer<mitk::DataNode> > m_SelectedPlanarFigures;
 };
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
@@ -81,20 +99,9 @@ QmitkMeasurementView::~QmitkMeasurementView()
 void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 {
   d->m_Parent = parent;
-  
-  // vtk annotation
-  vtkTextProperty *textProp = vtkTextProperty::New();
-  textProp->SetColor(1.0, 1.0, 1.0);
-
-  d->m_MeasurementInfoAnnotation = vtkCornerAnnotation::New();
-  d->m_MeasurementInfoAnnotation->SetMaximumFontSize(12);
-  d->m_MeasurementInfoAnnotation->SetTextProperty(textProp);
-
-  d->m_MeasurementInfoRenderer = vtkRenderer::New();
-  d->m_MeasurementInfoRenderer->AddActor(d->m_MeasurementInfoAnnotation);
 
   // image label
-  QLabel* selectedImageLabel = new QLabel("Selected Image: ");
+  QLabel* selectedImageLabel = new QLabel("Reference Image: ");
   d->m_SelectedImageLabel = new QLabel;
   d->m_SelectedImageLabel->setStyleSheet("font-weight: bold;");
 
@@ -159,8 +166,10 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 
   d->m_Parent->setLayout(d->m_Layout);
 
+  // create connections
   this->CreateConnections();
-  this->CheckSelection();
+
+  // readd interactors and observers
   this->AddAllInteractors();
 }
 void QmitkMeasurementView::CreateConnections()
@@ -189,136 +198,176 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
   mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
   if( figure )
   {
-    MITK_INFO << "figure added. will add interactor now.";
+    MITK_DEBUG << "figure added. will add interactor if needed.";
     mitk::PlanarFigureInteractor::Pointer figureInteractor
         = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
 
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
     if(figureInteractor.IsNull())
+    {
       figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", nonConstNode);
+    }
+    else
+    {
+      // just to be sure that the interactor is not added twice
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
+    }
 
-    MITK_INFO << "adding interactor to globalinteraction";
+    MITK_DEBUG << "adding interactor to globalinteraction";
     mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+
+    MITK_DEBUG << "will now add observers for planarfigure";
+    QmitkPlanarFigureData data;
+    data.m_Figure = figure;
+
+    // add observer for event when figure has been placed
+    typedef itk::SimpleMemberCommand< QmitkMeasurementView > SimpleCommandType;
+    SimpleCommandType::Pointer initializationCommand = SimpleCommandType::New();
+    initializationCommand->SetCallbackFunction( this, &QmitkMeasurementView::PlanarFigureInitialized );
+    data.m_EndPlacementObserverTag = figure->AddObserver( mitk::EndPlacementPlanarFigureEvent(), initializationCommand );
+
+    // add observer for event when figure is picked (selected)
+    typedef itk::MemberCommand< QmitkMeasurementView > MemberCommandType;
+    MemberCommandType::Pointer selectCommand = MemberCommandType::New();
+    selectCommand->SetCallbackFunction( this, &QmitkMeasurementView::PlanarFigureSelected );
+    data.m_SelectObserverTag = figure->AddObserver( mitk::SelectPlanarFigureEvent(), selectCommand );
+
+    // add observer for event when interaction with figure starts
+    SimpleCommandType::Pointer startInteractionCommand = SimpleCommandType::New();
+    startInteractionCommand->SetCallbackFunction( this, &QmitkMeasurementView::DisableCrosshairNavigation);
+    data.m_StartInteractionObserverTag = figure->AddObserver( mitk::StartInteractionPlanarFigureEvent(), startInteractionCommand );
+
+    // add observer for event when interaction with figure starts
+    SimpleCommandType::Pointer endInteractionCommand = SimpleCommandType::New();
+    endInteractionCommand->SetCallbackFunction( this, &QmitkMeasurementView::EnableCrosshairNavigation);
+    data.m_EndInteractionObserverTag = figure->AddObserver( mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand );
+
+    // adding to the map of tracked planarfigures
+    d->m_DataNodeToPlanarFigureData[nonConstNode] = data;
   }
+  this->CheckForTopMostVisibleImage();
 }
 
 void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
 {
   // DETERMINE IF WE HAVE TO RENEW OUR DETAILS TEXT (ANY NODE CHANGED IN OUR SELECTION?)
   bool renewText = false;
-  if( node == d->m_SelectedImageNode )
-    renewText = true;
-  else
+  for( int i=0; i < d->m_CurrentSelection.size(); ++i )
   {
-    for( int i=0; i < d->m_SelectedPlanarFigures.size(); ++i )
+    if( node == d->m_CurrentSelection.at(i) )
     {
-      if( node == d->m_SelectedPlanarFigures.at(i) )
-      {
-        renewText = true;
-        break;
-      }
+      renewText = true;
+      break;
     }
   }
 
   if(renewText)
   {
-    MITK_INFO << "Selected nodes changed. Refreshing text.";
-    this->SetText();
+    MITK_DEBUG << "Selected nodes changed. Refreshing text.";
+    this->UpdateMeasurementText();
+  }
+
+  this->CheckForTopMostVisibleImage();
+}
+
+void QmitkMeasurementView::CheckForTopMostVisibleImage()
+{
+  d->m_SelectedImageNode = this->DetectTopMostVisibleImage().GetPointer();
+
+  if( d->m_SelectedImageNode.IsNotNull() )
+  {
+    MITK_DEBUG << "Reference image found";
+    d->m_SelectedImageLabel->setText( QString::fromStdString( d->m_SelectedImageNode->GetName() ) );
+    d->m_DrawActionsToolBar->setEnabled(true);
+    MITK_DEBUG << "Updating Measurement text";
+  }
+  else
+  {
+    MITK_DEBUG << "No reference image available. Will disable actions for creating new planarfigures";
+    d->m_SelectedImageLabel->setText( "No visible image available." );
+    d->m_DrawActionsToolBar->setEnabled(false);
   }
 }
 
 void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
 {
-  if( node == d->m_SelectedImageNode )
+  MITK_DEBUG << "node removed from data storage";
+
+  mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
+  std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it =
+      d->m_DataNodeToPlanarFigureData.find(nonConstNode);
+
+  if( it != d->m_DataNodeToPlanarFigureData.end() )
   {
-    d->m_SelectedImageLabel->setText("");
-    MITK_INFO << "disabling toolbar";
-    d->m_DrawActionsToolBar->setEnabled(false);
+    QmitkPlanarFigureData& data = it->second;
+
+    MITK_DEBUG << "removing figure interactor to globalinteraction";
+    mitk::Interactor::Pointer oldInteractor = node->GetInteractor();
+    if(oldInteractor.IsNotNull())
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(oldInteractor);
+
+    // remove observers
+    data.m_Figure->RemoveObserver( data.m_EndPlacementObserverTag );
+    data.m_Figure->RemoveObserver( data.m_SelectObserverTag );
+    data.m_Figure->RemoveObserver( data.m_StartInteractionObserverTag );
+    data.m_Figure->RemoveObserver( data.m_EndInteractionObserverTag );
+
+    MITK_DEBUG << "removing from the list of tracked planar figures";
+    d->m_DataNodeToPlanarFigureData.erase( it );
   }
-  else
+
+  this->CheckForTopMostVisibleImage();
+}
+
+
+void QmitkMeasurementView::PlanarFigureSelected( itk::Object* object, const itk::EventObject& )
+{
+  MITK_DEBUG << "planar figure " << object << " selected";
+  std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it =
+      d->m_DataNodeToPlanarFigureData.begin();
+
+  d->m_CurrentSelection.clear();
+  while( it != d->m_DataNodeToPlanarFigureData.end())
   {
-    mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
-    if( figure )
+    mitk::DataNode* node = it->first;
+    QmitkPlanarFigureData& data = it->second;
+
+    if( data.m_Figure == object )
     {
-      MITK_INFO << "removing figure interactor to globalinteraction";
-      mitk::Interactor::Pointer oldInteractor = node->GetInteractor();
-      if(oldInteractor.IsNotNull())
-        mitk::GlobalInteraction::GetInstance()->RemoveInteractor(oldInteractor);
+      node->SetSelected(true);
+      d->m_CurrentSelection.push_back( node );
     }
+    else
+    {
+      node->SetSelected(false);
+    }
+
+    ++it;
   }
+  this->UpdateMeasurementText();
+}
+
+void QmitkMeasurementView::PlanarFigureInitialized()
+{
+  MITK_DEBUG << "planar figure initialized";
 }
 
 void QmitkMeasurementView::SetFocus()
 {
   d->m_SelectedImageLabel->setFocus();
 }
-void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, 
+
+void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
                                               const QList<mitk::DataNode::Pointer> &nodes)
 {
-  this->CheckSelection();
-}
-void QmitkMeasurementView::Activated()
-{
+  MITK_DEBUG << "Determine the top most visible image";
+  MITK_DEBUG << "The PlanarFigure interactor will take the currently visible PlaneGeometry from the slice navigation controller";
 
-}
-void QmitkMeasurementView::Deactivated()
-{
+  this->CheckForTopMostVisibleImage();
 
-}
-void QmitkMeasurementView::Visible()
-{
-
-}
-void QmitkMeasurementView::Hidden()
-{
-
-}
-void QmitkMeasurementView::CheckSelection()
-{
-  // find currently selected image, find selected planar figures
-  QList<mitk::DataNode::Pointer> selection = this->GetDataManagerSelection();
-  mitk::DataNode* currentNode = 0;
-
-  // clear current selection
-  d->m_SelectedPlanarFigures.clear();
-
-  mitk::DataNode* firstImageDataNode = 0;
-  for( int i=0; i < selection.size(); ++i )
-  {
-    currentNode = selection.at(i);
-    // search for first image data node
-    if( firstImageDataNode == 0 )
-    {
-      mitk::Image* image = dynamic_cast<mitk::Image*>( currentNode->GetData() );
-      if(image)
-        firstImageDataNode = currentNode;
-    }
-
-    // search for planar figure
-    mitk::PlanarFigure* currentFigure = 
-      dynamic_cast<mitk::PlanarFigure*>( currentNode->GetData() );
-    // add it to the current selection
-    if(currentFigure)
-    {
-      // current figure found: add it to the selection
-      d->m_SelectedPlanarFigures.push_back( currentNode );
-    }
-  }
-
-  // set label for selected image
-  if( firstImageDataNode )
-  {
-    d->m_SelectedImageLabel->setText( QString::fromStdString(firstImageDataNode->GetName()) );
-    d->m_SelectedImageNode = firstImageDataNode;    
-  }
-
-  // enable toolbar only when an image is selected
-  MITK_INFO << "enable/disable m_DrawActionsToolBar. m_SelectedImageNode is null:" << d->m_SelectedImageNode.IsNull();
-  d->m_DrawActionsToolBar->setEnabled(d->m_SelectedImageNode.IsNotNull());
-
-  // renew text
-  this->SetText();
-  this->RequestRenderWindowUpdate();
+  MITK_DEBUG << "refreshing selection and detailed text";
+  d->m_CurrentSelection = nodes;
+  this->UpdateMeasurementText();
 }
 
 void QmitkMeasurementView::ActionDrawLineTriggered(bool checked)
@@ -326,10 +375,20 @@ void QmitkMeasurementView::ActionDrawLineTriggered(bool checked)
   mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
   QString qString = QString("Line%1").arg(++d->m_LineCounter);
   this->AddFigureToDataStorage(figure, qString);
+
+  MITK_DEBUG << "PlanarLine initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
 {
+  mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
+  figure->ClosedOff();
+  QString qString = QString("Path%1").arg(++d->m_PathCounter);
+  mitk::DataNode::Pointer node = this->AddFigureToDataStorage(figure, qString);
+  mitk::BoolProperty::Pointer closedProperty = mitk::BoolProperty::New( false );
+  node->SetProperty("ClosedPlanarPolygon", closedProperty);
+
+  MITK_DEBUG << "PlanarPath initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawAngleTriggered(bool checked)
@@ -337,49 +396,76 @@ void QmitkMeasurementView::ActionDrawAngleTriggered(bool checked)
   mitk::PlanarAngle::Pointer figure = mitk::PlanarAngle::New();
   QString qString = QString("Angle%1").arg(++d->m_AngleCounter);
   this->AddFigureToDataStorage(figure, qString);
+
+  MITK_DEBUG << "PlanarAngle initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawFourPointAngleTriggered(bool checked)
 {
+  mitk::PlanarFourPointAngle::Pointer figure =
+    mitk::PlanarFourPointAngle::New();
+  QString qString = QString("Four Point Angle%1").arg(++d->m_FourPointAngleCounter);
+  this->AddFigureToDataStorage(figure, qString);
+
+  MITK_DEBUG << "PlanarFourPointAngle initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawEllipseTriggered(bool checked)
 {
+  mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+  QString qString = QString("Circle%1").arg(++d->m_EllipseCounter);
+  this->AddFigureToDataStorage(figure, qString);
+
+  MITK_DEBUG << "PlanarCircle initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawRectangleTriggered(bool checked)
 {
+  mitk::PlanarRectangle::Pointer figure = mitk::PlanarRectangle::New();
+  QString qString = QString("Rectangle%1").arg(++d->m_RectangleCounter);
+  this->AddFigureToDataStorage(figure, qString);
+
+  MITK_DEBUG << "PlanarRectangle initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawPolygonTriggered(bool checked)
 {
-}
+  mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
+  figure->ClosedOn();
+  QString qString = QString("Polygon%1").arg(++d->m_PolygonCounter);
+  this->AddFigureToDataStorage(figure, qString);
 
-void QmitkMeasurementView::ActionDrawArrowTriggered(bool checked)
-{
-}
-
-void QmitkMeasurementView::ActionDrawTextTriggered(bool checked)
-{
+  MITK_DEBUG << "PlanarPolygon initialized...";
 }
 
 void QmitkMeasurementView::CopyToClipboard( bool checked )
 {
-
+  MITK_DEBUG << "Copying current Text to clipboard...";
+  QString clipboardText = d->m_SelectedPlanarFiguresText->toPlainText();
+  QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
 }
 
-void QmitkMeasurementView::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name)
+mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(
+  mitk::PlanarFigure* figure, const QString& name)
 {
-  // add as 
+  // add as
+  MITK_DEBUG << "Adding new figure to datastorage...";
+  if( d->m_SelectedImageNode.IsNull() )
+  {
+    MITK_ERROR << "No reference image available";
+    return 0;
+  }
+
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(name.toStdString());
   newNode->SetData(figure);
   // set as selected
   // newNode->SetSelected( true );
   this->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
+  return newNode;
 }
 
-void QmitkMeasurementView::SetText()
+void QmitkMeasurementView::UpdateMeasurementText()
 {
   d->m_SelectedPlanarFiguresText->clear();
 
@@ -391,10 +477,15 @@ void QmitkMeasurementView::SetText()
   mitk::PlanarFourPointAngle* planarFourPointAngle = 0;
   mitk::DataNode::Pointer node = 0;
 
-  for (unsigned int i=0; i<d->m_SelectedPlanarFigures.size(); ++i, ++j)
+  for (unsigned int i=0; i<d->m_CurrentSelection.size(); ++i, ++j)
   {
     plainInfoText.clear();
-    node = d->m_SelectedPlanarFigures.at(i);
+    node = d->m_CurrentSelection.at(i);
+    _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
+
+    if( !_PlanarFigure )
+      continue;
+
     if(j>1)
       infoText.append("<br />");
 
@@ -403,16 +494,11 @@ void QmitkMeasurementView::SetText()
     plainInfoText.append(QString("%1").arg(QString::fromStdString(
       node->GetName())));
 
-    _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
-
     planarAngle = dynamic_cast<mitk::PlanarAngle*> (_PlanarFigure);
     if(!planarAngle)
     {
       planarFourPointAngle = dynamic_cast<mitk::PlanarFourPointAngle*> (_PlanarFigure);
     }
-
-    if(!_PlanarFigure)
-      continue;
 
     double featureQuantity = 0.0;
     for (unsigned int k = 0; k < _PlanarFigure->GetNumberOfFeatures(); ++k)
@@ -438,7 +524,7 @@ void QmitkMeasurementView::SetText()
         infoText.append("<br />");
     }
 
-    if (j != d->m_SelectedPlanarFigures.size())
+    if (j != d->m_CurrentSelection.size())
       infoText.append("<br />");
   }
 
@@ -447,7 +533,7 @@ void QmitkMeasurementView::SetText()
 
 void QmitkMeasurementView::AddAllInteractors()
 {
-  MITK_INFO << "Adding interactors to all planar figures";
+  MITK_DEBUG << "Adding interactors to all planar figures";
 
   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
   const mitk::DataNode* node = 0;
@@ -462,7 +548,7 @@ void QmitkMeasurementView::AddAllInteractors()
 
 void QmitkMeasurementView::RemoveAllInteractors()
 {
-  MITK_INFO << "Removing interactors to all planar figures";
+  MITK_DEBUG << "Removing interactors and observers from all planar figures";
 
   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
   const mitk::DataNode* node = 0;
@@ -472,6 +558,54 @@ void QmitkMeasurementView::RemoveAllInteractors()
   {
     node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
     this->NodeRemoved( node );
+  }
+}
+
+mitk::DataNode::Pointer QmitkMeasurementView::DetectTopMostVisibleImage()
+{
+  // get all images from the data storage
+  mitk::DataStorage::SetOfObjects::ConstPointer Images
+      = this->GetDataStorage()->GetSubset( mitk::NodePredicateDataType::New("Image") );
+
+  mitk::DataNode::Pointer currentNode;
+  int maxLayer = itk::NumericTraits<int>::min();
+
+  // iterate over selection
+  for (mitk::DataStorage::SetOfObjects::ConstIterator sofIt = Images->Begin(); sofIt != Images->End(); ++sofIt)
+  {
+    mitk::DataNode::Pointer node = sofIt->Value();
+    if ( node.IsNull() )
+      continue;
+    if (node->IsVisible(NULL) == false)
+      continue;
+    int layer = 0;
+    node->GetIntProperty("layer", layer);
+    if ( layer < maxLayer )
+      continue;
+
+    currentNode = node;
+  }
+
+  return currentNode;
+}
+
+void QmitkMeasurementView::EnableCrosshairNavigation()
+{
+  // enable the crosshair navigation
+  if (mitk::ILinkedRenderWindowPart* linkedRenderWindow =
+      dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
+  {
+    linkedRenderWindow->EnableLinkedNavigation(true);
+  }
+}
+
+void QmitkMeasurementView::DisableCrosshairNavigation()
+{
+  // disable the crosshair navigation during the drawing
+  if (mitk::ILinkedRenderWindowPart* linkedRenderWindow =
+      dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
+  {
+    linkedRenderWindow->EnableLinkedNavigation(false);
   }
 }
 
@@ -1131,7 +1265,7 @@ void QmitkMeasurementView::ActionDrawLineTriggered(bool checked)
   }
   this->AddFigureToDataStorage(figure, qString);
 
-  MITK_INFO << "PlanarLine initialized...";
+  MITK_DEBUG << "PlanarLine initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
@@ -1154,7 +1288,7 @@ void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
   this->AddFigureToDataStorage(figure, qString,
     "ClosedPlanarPolygon", closedProperty);
 
-  MITK_INFO << "PlanarPath initialized...";
+  MITK_DEBUG << "PlanarPath initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawAngleTriggered(bool checked)
@@ -1172,7 +1306,7 @@ void QmitkMeasurementView::ActionDrawAngleTriggered(bool checked)
   }
   this->AddFigureToDataStorage(figure, qString);
 
-  MITK_INFO << "PlanarAngle initialized...";
+  MITK_DEBUG << "PlanarAngle initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawFourPointAngleTriggered(bool checked)
@@ -1191,7 +1325,7 @@ void QmitkMeasurementView::ActionDrawFourPointAngleTriggered(bool checked)
   }
   this->AddFigureToDataStorage(figure, qString);
 
-  MITK_INFO << "PlanarFourPointAngle initialized...";
+  MITK_DEBUG << "PlanarFourPointAngle initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawEllipseTriggered(bool checked)
@@ -1209,7 +1343,7 @@ void QmitkMeasurementView::ActionDrawEllipseTriggered(bool checked)
   }
   this->AddFigureToDataStorage(figure, qString);
 
-  MITK_INFO << "PlanarCircle initialized...";
+  MITK_DEBUG << "PlanarCircle initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawRectangleTriggered(bool checked)
@@ -1227,7 +1361,7 @@ void QmitkMeasurementView::ActionDrawRectangleTriggered(bool checked)
   }
   this->AddFigureToDataStorage(figure, qString);
 
-  MITK_INFO << "PlanarRectangle initialized...";
+  MITK_DEBUG << "PlanarRectangle initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawPolygonTriggered(bool checked)
@@ -1246,7 +1380,7 @@ void QmitkMeasurementView::ActionDrawPolygonTriggered(bool checked)
   }
   this->AddFigureToDataStorage(figure, qString);
 
-  MITK_INFO << "PlanarPolygon initialized...";
+  MITK_DEBUG << "PlanarPolygon initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawArrowTriggered(bool checked)
@@ -1268,7 +1402,7 @@ void QmitkMeasurementView::ActionDrawTextTriggered(bool checked)
 void QmitkMeasurementView::Activated()
 {
   m_Activated = true;
-  MITK_INFO << "QmitkMeasurementView::Activated";
+  MITK_DEBUG << "QmitkMeasurementView::Activated";
 
   if (mitk::ILinkedRenderWindowPart* linkedRenderWindow =
       dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
@@ -1306,7 +1440,7 @@ void QmitkMeasurementView::Activated()
 
 void QmitkMeasurementView::Deactivated()
 {
-  MITK_INFO << "QmitkMeasurementView::Deactivated";
+  MITK_DEBUG << "QmitkMeasurementView::Deactivated";
 }
 
 void QmitkMeasurementView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer )
@@ -1347,13 +1481,13 @@ void QmitkMeasurementView::ActivatedZombieView(berry::IWorkbenchPartReference::P
 void QmitkMeasurementView::Visible()
 {
   m_Visible = true;
-  MITK_INFO << "QmitkMeasurementView::Visible";
+  MITK_DEBUG << "QmitkMeasurementView::Visible";
 }
 
 void QmitkMeasurementView::Hidden()
 {
   m_Visible = false;
-  MITK_INFO << "QmitkMeasurementView::Hidden";
+  MITK_DEBUG << "QmitkMeasurementView::Hidden";
 }
 
 void QmitkMeasurementView::PropertyChanged(const mitk::DataNode*, const mitk::BaseProperty*)
@@ -1505,7 +1639,7 @@ void QmitkMeasurementView::OnRenderWindowDelete(QObject * obj)
   if(obj == m_LastRenderWindow)
     m_LastRenderWindow = 0;
 }
-    
+
 void QmitkMeasurementView::ReproducePotentialBug(bool)
 {
   std::vector<mitk::DataNode*> nodes = m_SelectedPlanarFigures->GetNodes();
@@ -1548,7 +1682,7 @@ void QmitkMeasurementView::ReproducePotentialBug(bool)
     std::cout << "--- PlanarFigure geometry --------------" << std::endl;
     planarFigureGeometry->Print(std::cout);
     std::cout << "----------------------------------------" << std::endl;
-    
+
     mitk::RenderingManager::GetInstance()->InitializeViews( geometryForRendering, mitk::RenderingManager::REQUEST_UPDATE_ALL, false );
 
     QmitkRenderWindow* renderWindow = this->GetRenderWindowPart()->GetRenderWindows().values().front();
@@ -1566,7 +1700,7 @@ void QmitkMeasurementView::ReproducePotentialBug(bool)
     std::cout << "--- Renderer->GetWorldGeometry() --------------" << std::endl;
     renderWindow->GetRenderer()->GetWorldGeometry()->Print(std::cout);
   }
-  
+
   m_SelectedPlanarFiguresText->setText(output);
 
 }

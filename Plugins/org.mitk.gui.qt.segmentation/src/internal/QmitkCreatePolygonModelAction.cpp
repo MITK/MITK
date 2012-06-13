@@ -132,7 +132,12 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
       ProgressBar::GetInstance()->AddStepsToDo(8);
       StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background...");
 
-      surfaceFilter->StartAlgorithm();
+      try {
+        surfaceFilter->StartAlgorithm();
+      } catch (...)
+      {
+        MITK_ERROR<<"Error creating smoothed polygon model: Not enough memory!";
+      }
     }
   }
   catch(...)

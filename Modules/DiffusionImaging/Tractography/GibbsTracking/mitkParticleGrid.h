@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _PARTICLEGRID
 
 // MITK
-#include "mitkParticle.h"
 #include "MitkDiffusionImagingExports.h"
+#include <mitkParticle.h>
 
 // ITK
 #include <itkImage.h>

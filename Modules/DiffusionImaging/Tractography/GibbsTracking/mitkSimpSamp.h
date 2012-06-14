@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _SIMPSAMP
 
 #include <MitkDiffusionImagingExports.h>
+#include <mitkParticle.h>
 #include <stdlib.h>
-#include "mitkParticle.h"
 
 using namespace std;
 

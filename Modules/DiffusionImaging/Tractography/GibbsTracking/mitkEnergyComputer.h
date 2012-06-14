@@ -19,11 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkDiffusionImagingExports.h>
 #include <itkOrientationDistributionFunction.h>
-#include "mitkParticleGrid.h"
-#include "mitkSphereInterpolator.h"
-#include "MersenneTwister.h"
-#include <vnl/vnl_matrix_fixed.h>
-#include <fstream>
+#include <mitkParticleGrid.h>
+#include <mitkSphereInterpolator.h>
+#include <MersenneTwister.h>
 
 using namespace mitk;
 
@@ -86,7 +84,7 @@ public:
 
     float evaluateODF(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len);
 
-    float computeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &cap, float &len, Particle *dp);
+    float computeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len, Particle *dp);
 
     float computeInternalEnergy(Particle *dp);
 

@@ -51,7 +51,6 @@ public:
 
   }
 
-
   inline void getInterpolation(vnl_vector_fixed<float, 3> N)
   {
     float nx = N[0];

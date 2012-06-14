@@ -16,12 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef itkGibbsTrackingFilter_h
 #define itkGibbsTrackingFilter_h
 
-#include "itkProcessObject.h"
-#include "itkVectorContainer.h"
-#include "itkImage.h"
+// MITK
+#include <mitkSphereInterpolator.h>
 
-#include <fstream>
-#include <QFile>
+// ITK
+#include <itkProcessObject.h>
+#include <itkImage.h>
+#include <itkDiffusionTensor3D.h>
+
+// VTK
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
 #include <vtkCellArray.h>
@@ -42,6 +45,7 @@ public:
     itkNewMacro(Self)
     itkTypeMacro( GibbsTrackingFilter, ProcessObject )
 
+    typedef Image< DiffusionTensor3D<float>, 3 > ItkTensorImage;
     typedef typename ItkQBallImageType::Pointer ItkQBallImageTypePointer;
     typedef Image< float, 3 >                   ItkFloatImageType;
     typedef vtkSmartPointer< vtkPolyData >      FiberPolyDataType;
@@ -99,6 +103,7 @@ public:
     // input data
     itkSetMacro(QBallImage, typename ItkQBallImageType::Pointer)
     itkSetMacro(MaskImage, ItkFloatImageType::Pointer)
+    itkSetMacro(TensorImage, ItkTensorImage::Pointer)
 
     void GenerateData();
 
@@ -113,10 +118,12 @@ protected:
     GibbsTrackingFilter();
     virtual ~GibbsTrackingFilter();
     bool EstimateParticleWeight();
+    SphereInterpolator* LoadSphereInterpolator();
 
     // Input Images
     typename ItkQBallImageType::Pointer m_QBallImage;
     typename ItkFloatImageType::Pointer m_MaskImage;
+    typename ItkTensorImage::Pointer    m_TensorImage;
 
     // Tracking parameters
     float   m_TempStart;            // Start temperature

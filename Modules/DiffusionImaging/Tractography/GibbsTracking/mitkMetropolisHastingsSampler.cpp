@@ -19,13 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 MetropolisHastingsSampler::MetropolisHastingsSampler(ParticleGrid* grid, MTRand* randGen)
-    : m_NumAttributes(0)
-    , m_AcceptedProposals(0)
+    : m_AcceptedProposals(0)
 {
     mtrand = randGen;
-
     m_ParticleGrid = grid;
-
     m_Iterations = 0;
     m_AcceptedProposals = 0;
     externalEnergy = 0;
@@ -58,21 +55,20 @@ void MetropolisHastingsSampler::SetParameters(float Temp, int numit, float plen,
 {
     m_Iterations = numit;
 
-    p_birth = 0.25;
-    p_death = 0.05;
-    p_shift = 0.15;
-    p_shiftopt = 0.1;
-    p_con = 0.45;
-    p_cap = 0.0;
+    m_BirthProb = 0.25;
+    m_DeathProb = 0.05;
+    m_ShiftProb = 0.15;
+    m_OptShiftProb = 0.1;
+    m_ConnectionProb = 0.45;
 
     m_ChempotParticle = chempot_particle;
 
-    float sum = p_birth+p_death+p_shift+p_shiftopt+p_con;
-    p_birth /= sum; p_death /= sum; p_shift /= sum; p_shiftopt /= sum;
+    float sum = m_BirthProb+m_DeathProb+m_ShiftProb+m_OptShiftProb+m_ConnectionProb;
+    m_BirthProb /= sum; m_DeathProb /= sum; m_ShiftProb /= sum; m_OptShiftProb /= sum;
 
-    T_in = Temp;
-    T_ex = 0.01;
-    dens = exp(-chempot_particle/T_in);
+    m_InTemp = Temp;
+    m_ExTemp = 0.01;
+    m_Density = exp(-chempot_particle/m_InTemp);
 
     len_def = plen;
     len_sig = 0.0;
@@ -95,8 +91,8 @@ void MetropolisHastingsSampler::SetParameters(float Temp, int numit, float plen,
 
 void MetropolisHastingsSampler::SetTemperature(float temp)
 {
-    T_in = temp;
-    dens = exp(-m_ChempotParticle/T_in);
+    m_InTemp = temp;
+    m_Density = exp(-m_ChempotParticle/m_InTemp);
 }
 
 vnl_vector_fixed<float, 3> MetropolisHastingsSampler::distortn(float sigma, vnl_vector_fixed<float, 3>& vec)
@@ -116,15 +112,6 @@ vnl_vector_fixed<float, 3> MetropolisHastingsSampler::rand_sphere()
     return vec;
 }
 
-//vnl_vector_fixed<float, 3> MetropolisHastingsSampler::rand(float w, float h, float d)
-//{
-//    vnl_vector_fixed<float, 3> vec;
-//    vec[0] = mtrand->frand()*w;
-//    vec[1] = mtrand->frand()*h;
-//    vec[2] = mtrand->frand()*d;
-//    return vec;
-//}
-
 void MetropolisHastingsSampler::IterateOneStep()
 {
     float randnum = mtrand->frand();
@@ -133,7 +120,7 @@ void MetropolisHastingsSampler::IterateOneStep()
     ///////////////////////////////////////////////////////////////
     //////// Birth Proposal
     ///////////////////////////////////////////////////////////////
-    if (randnum < p_birth)
+    if (randnum < m_BirthProb)
     {
 
 #ifdef TIMING
@@ -149,21 +136,19 @@ void MetropolisHastingsSampler::IterateOneStep()
 
         vnl_vector_fixed<float, 3> N = rand_sphere();
         //N.setXYZ(1,0,0);
-        float cap =  cap_def - cap_sig*mtrand->frand();
         float len =  len_def;// + len_sig*(mtrand->frand()-0.5);
         Particle prop;
         prop.R = R;
         prop.N = N;
-        prop.cap = cap;
         prop.len = len;
 
 
-        float prob =  dens * p_death /((p_birth)*(m_ParticleGrid->m_NumParticles+1));
+        float prob =  m_Density * m_DeathProb /((m_BirthProb)*(m_ParticleGrid->m_NumParticles+1));
 
-        float ex_energy = enc->computeExternalEnergy(R,N,cap,len,0);
+        float ex_energy = enc->computeExternalEnergy(R,N,len,0);
         float in_energy = enc->computeInternalEnergy(&prop);
 
-        prob *= exp((in_energy/T_in+ex_energy/T_ex)) ;
+        prob *= exp((in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
 
         if (prob > 1 || mtrand->frand() < prob)
         {
@@ -172,7 +157,6 @@ void MetropolisHastingsSampler::IterateOneStep()
             {
                 p->R = R;
                 p->N = N;
-                p->cap = cap;
                 p->len = len;
 #ifdef TIMING
                 birthstats.accepted();
@@ -188,7 +172,7 @@ void MetropolisHastingsSampler::IterateOneStep()
     ///////////////////////////////////////////////////////////////
     //////// Death Proposal
     ///////////////////////////////////////////////////////////////
-    else if (randnum < p_birth+p_death)
+    else if (randnum < m_BirthProb+m_DeathProb)
     {
         if (m_ParticleGrid->m_NumParticles > 0)
         {
@@ -202,11 +186,11 @@ void MetropolisHastingsSampler::IterateOneStep()
             if (dp->pID == -1 && dp->mID == -1)
             {
 
-                float ex_energy = enc->computeExternalEnergy(dp->R,dp->N,dp->cap,dp->len,dp);
+                float ex_energy = enc->computeExternalEnergy(dp->R,dp->N,dp->len,dp);
                 float in_energy = enc->computeInternalEnergy(dp);
 
-                float prob = m_ParticleGrid->m_NumParticles * (p_birth) /(dens*p_death); //*SpatProb(dp->R);
-                prob *= exp(-(in_energy/T_in+ex_energy/T_ex)) ;
+                float prob = m_ParticleGrid->m_NumParticles * (m_BirthProb) /(m_Density*m_DeathProb); //*SpatProb(dp->R);
+                prob *= exp(-(in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
                 if (prob > 1 || mtrand->frand() < prob)
                 {
                     m_ParticleGrid->RemoveParticle(pnum);
@@ -223,39 +207,9 @@ void MetropolisHastingsSampler::IterateOneStep()
 
     }
     ///////////////////////////////////////////////////////////////
-    //////// Cap change Proposal
-    ///////////////////////////////////////////////////////////////
-    else  if (randnum < p_birth+p_death+p_cap)
-    {
-        if (m_ParticleGrid->m_NumParticles > 0)
-        {
-
-            int pnum = rand()%m_ParticleGrid->m_NumParticles;
-            Particle *p =  m_ParticleGrid->GetParticle(pnum);
-            Particle prop_p = *p;
-
-            prop_p.cap = cap_def - cap_sig*mtrand->frand();
-
-            float ex_energy = enc->computeExternalEnergy(prop_p.R,prop_p.N,prop_p.cap,p->len,p)
-                    - enc->computeExternalEnergy(p->R,p->N,p->cap,p->len,p);
-            //float in_energy = enc->computeExternalEnergy(prop_p.R,prop_p.N,p->cap,p->len,p)
-            //    - enc->computeExternalEnergy(p->R,p->N,p->cap,p->len,p);
-            float prob = exp(ex_energy/T_ex);
-            // * SpatProb(p->R) / SpatProb(prop_p.R);
-            if (mtrand->frand() < prob)
-            {
-                p->cap = prop_p.cap;
-                m_AcceptedProposals++;
-            }
-
-        }
-
-    }
-
-    ///////////////////////////////////////////////////////////////
     //////// Shift Proposal
     ///////////////////////////////////////////////////////////////
-    else  if (randnum < p_birth+p_death+p_shift+p_cap)
+    else  if (randnum < m_BirthProb+m_DeathProb+m_ShiftProb)
     {
         float energy = 0;
         if (m_ParticleGrid->m_NumParticles > 0)
@@ -274,11 +228,11 @@ void MetropolisHastingsSampler::IterateOneStep()
             prop_p.N.normalize();
 
 
-            float ex_energy = enc->computeExternalEnergy(prop_p.R,prop_p.N,p->cap,p->len,p)
-                    - enc->computeExternalEnergy(p->R,p->N,p->cap,p->len,p);
+            float ex_energy = enc->computeExternalEnergy(prop_p.R,prop_p.N,p->len,p)
+                    - enc->computeExternalEnergy(p->R,p->N,p->len,p);
             float in_energy = enc->computeInternalEnergy(&prop_p) - enc->computeInternalEnergy(p);
 
-            float prob = exp(ex_energy/T_ex+in_energy/T_in);
+            float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp);
             // * SpatProb(p->R) / SpatProb(prop_p.R);
             if (mtrand->frand() < prob)
             {
@@ -304,7 +258,7 @@ void MetropolisHastingsSampler::IterateOneStep()
         }
 
     }
-    else  if (randnum < p_birth+p_death+p_shift+p_shiftopt+p_cap)
+    else  if (randnum < m_BirthProb+m_DeathProb+m_ShiftProb+m_OptShiftProb)
     {
         float energy = 0;
         if (m_ParticleGrid->m_NumParticles > 0)
@@ -348,11 +302,11 @@ void MetropolisHastingsSampler::IterateOneStep()
                 float cos = dot_product(prop_p.N, p->N);
                 float p_rev = exp(-((prop_p.R-p->R).squared_magnitude() + (1-cos*cos))*gamma_g)/Z_g;
 
-                float ex_energy = enc->computeExternalEnergy(prop_p.R,prop_p.N,p->cap,p->len,p)
-                        - enc->computeExternalEnergy(p->R,p->N,p->cap,p->len,p);
+                float ex_energy = enc->computeExternalEnergy(prop_p.R,prop_p.N,p->len,p)
+                        - enc->computeExternalEnergy(p->R,p->N,p->len,p);
                 float in_energy = enc->computeInternalEnergy(&prop_p) - enc->computeInternalEnergy(p);
 
-                float prob = exp(ex_energy/T_ex+in_energy/T_in)*p_shift*p_rev/(p_shiftopt+p_shift*p_rev);
+                float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp)*m_ShiftProb*p_rev/(m_OptShiftProb+m_ShiftProb*p_rev);
                 //* SpatProb(p->R) / SpatProb(prop_p.R);
 
                 if (mtrand->frand() < prob)
@@ -374,8 +328,6 @@ void MetropolisHastingsSampler::IterateOneStep()
     }
     else
     {
-
-
         if (m_ParticleGrid->m_NumParticles > 0)
         {
 
@@ -396,7 +348,7 @@ void MetropolisHastingsSampler::IterateOneStep()
             {
                 MakeTrackProposal(P);
 
-                float prob = (TrackProposal.m_Energy-TrackBackup.m_Energy)/T_in ;
+                float prob = (TrackProposal.m_Energy-TrackBackup.m_Energy)/m_InTemp ;
 
                 //            prob = exp(prob)*(TrackBackup.proposal_probability)
                 //                                        /(TrackProposal.proposal_probability);

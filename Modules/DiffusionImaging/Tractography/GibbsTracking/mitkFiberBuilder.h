@@ -16,12 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _BUILDFIBRES
 #define _BUILDFIBRES
 
-
+// MITK
 #include <MitkDiffusionImagingExports.h>
-#include <itkOrientationDistributionFunction.h>
+#include <mitkParticleGrid.h>
 
-#include "mitkParticleGrid.h"
-
+// VTK
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
 #include <vtkCellArray.h>
@@ -29,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <vtkCleanPolyData.h>
 
-#include <itkVector.h>
 #include <itkImage.h>
 
 using namespace std;

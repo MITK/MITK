@@ -15,31 +15,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "itkGibbsTrackingFilter.h"
 
-#include <itkProgressReporter.h>
+// MITK
+#include <itkOrientationDistributionFunction.h>
+#include <itkDiffusionQballGeneralizedFaImageFilter.h>
+#include <mitkStandardFileLocations.h>
+#include <MersenneTwister.h>
+#include <mitkFiberBuilder.h>
+#include <mitkMetropolisHastingsSampler.h>
+#include <mitkEnergyComputer.h>
+#include <itkTensorImageToQBallImageFilter.h>
 
-#include <mitkQBallImage.h>
-
-#include "GibbsTracking/MersenneTwister.h"
-#include "GibbsTracking/mitkFiberBuilder.h"
-#include "GibbsTracking/mitkMetropolisHastingsSampler.h"
-#include "GibbsTracking/mitkEnergyComputer.h"
-
+// ITK
+#include <itkImageDuplicator.h>
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
 #pragma GCC visibility pop
 
-#include <QMutexLocker>
-#include <vnl/vnl_matrix_fixed.h>
-#include <vnl/vnl_vector_fixed.h>
-
-#include <fstream>
-#include <QCoreApplication>
-#include <itkRescaleIntensityImageFilter.h>
-#include <itkOrientationDistributionFunction.h>
-#include <itkImageDuplicator.h>
-#include <mitkStandardFileLocations.h>
-#include <itkDiffusionQballGeneralizedFaImageFilter.h>
+// MISC
 #include <vnl/vnl_copy.h>
+#include <fstream>
+#include <QFile>
 
 namespace itk{
 
@@ -154,8 +149,13 @@ GibbsTrackingFilter< ItkQBallImageType >
 template< class ItkQBallImageType >
 void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
 {
-
-    m_NumAcceptedFibers = 0;
+    if (m_QBallImage.IsNull() && m_TensorImage.IsNotNull())
+    {
+        TensorImageToQBallImageFilter<float,float>::Pointer filter = TensorImageToQBallImageFilter<float,float>::New();
+        filter->SetInput( m_TensorImage );
+        filter->Update();
+        m_QBallImage = filter->GetOutput();
+    }
 
     // image sizes and spacing
     int imgSize[4] = {  QBALL_ODFSIZE,
@@ -234,7 +234,101 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     }
     int mask_oversamp_mult = maskImageSize[0]/imgSize[1];
 
-    // load lookuptable
+    // get paramters
+    float minSpacing;
+    if(spacing[0]<spacing[1] && spacing[0]<spacing[2])
+        minSpacing = spacing[0];
+    else if (spacing[1] < spacing[2])
+        minSpacing = spacing[1];
+    else
+        minSpacing = spacing[2];
+
+    if(m_ParticleLength == 0)
+        m_ParticleLength = 1.5*minSpacing;
+    if(m_ParticleWidth == 0)
+        m_ParticleWidth = 0.5*minSpacing;
+    if(m_ParticleWeight == 0)
+        if (!EstimateParticleWeight())
+        {
+            MITK_INFO << "itkGibbsTrackingFilter: could not estimate particle weight!";
+            m_ParticleWeight = 0.0001;
+        }
+    m_CurrentStep = 0;
+    m_Memory = 0;
+
+    float alpha = log(m_TempEnd/m_TempStart);
+    m_Steps = m_NumIt/10000;
+    if (m_Steps<10)
+        m_Steps = 10;
+    if (m_Steps>m_NumIt)
+    {
+        MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
+        m_AbortTracking = true;
+    }
+
+    if (m_CurvatureHardThreshold < mitk::eps)
+        m_CurvatureHardThreshold = 0;
+    unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
+
+    MTRand randGen(1);
+    srand(1);
+
+    SphereInterpolator* interpolator = LoadSphereInterpolator();
+
+    MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
+    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, 2*m_ParticleLength);
+    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, &randGen);
+
+    EnergyComputer encomp(&randGen, qballImage, imgSize,spacing,interpolator,particleGrid,mask,mask_oversamp_mult, directionMatrix);
+    encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,m_CurvatureHardThreshold,m_InexBalance,m_Chempot2, m_Meanval_sq);
+
+    sampler->SetEnergyComputer(&encomp);
+    sampler->SetParameters(m_TempStart,singleIts,m_ParticleLength,m_CurvatureHardThreshold,m_ChempotParticle);
+
+    // main loop
+    m_NumAcceptedFibers = 0;
+    for( int step = 0; step < m_Steps; step++ )
+    {
+        if (m_AbortTracking)
+            break;
+
+        m_CurrentStep = step+1;
+        float temperature = m_TempStart * exp(alpha*(((1.0)*step)/((1.0)*m_Steps)));
+
+        sampler->SetTemperature(temperature);
+        sampler->Iterate(&m_ProposalAcceptance, &m_NumConnections, &m_NumParticles, &m_AbortTracking);
+
+        MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
+        MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
+        MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
+        MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)step/m_Steps << "%";
+
+        if (m_BuildFibers)
+        {
+            FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
+            m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
+            m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
+            m_BuildFibers = false;
+        }
+    }
+
+
+    FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
+    m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
+    m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
+
+    delete interpolator;
+    delete sampler;
+    delete particleGrid;
+    m_AbortTracking = true;
+    m_BuildFibers = false;
+
+    MITK_INFO << "itkGibbsTrackingFilter: done generate data";
+}
+
+template< class ItkQBallImageType >
+SphereInterpolator* GibbsTrackingFilter< ItkQBallImageType >::LoadSphereInterpolator()
+{
     QString applicationDir = QCoreApplication::applicationDirPath();
     applicationDir.append("/");
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
@@ -288,100 +382,9 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     }
 
     // initialize sphere interpolator with lookuptables
-    SphereInterpolator *sinterp = new SphereInterpolator(coords, ind, QBALL_ODFSIZE, 301, 0.5);
-
-    // get paramters
-    float minSpacing;
-    if(spacing[0]<spacing[1] && spacing[0]<spacing[2])
-        minSpacing = spacing[0];
-    else if (spacing[1] < spacing[2])
-        minSpacing = spacing[1];
-    else
-        minSpacing = spacing[2];
-
-    if(m_ParticleLength == 0)
-        m_ParticleLength = 1.5*minSpacing;
-    if(m_ParticleWidth == 0)
-        m_ParticleWidth = 0.5*minSpacing;
-    if(m_ParticleWeight == 0)
-        if (!EstimateParticleWeight())
-        {
-            MITK_INFO << "itkGibbsTrackingFilter: could not estimate particle weight!";
-            m_ParticleWeight = 0.0001;
-        }
-    m_CurrentStep = 0;
-    m_Memory = 0;
-
-    float alpha = log(m_TempEnd/m_TempStart);
-    m_Steps = m_NumIt/10000;
-    if (m_Steps<10)
-        m_Steps = 10;
-    if (m_Steps>m_NumIt)
-    {
-        MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
-        m_AbortTracking = true;
-    }
-
-    if (m_CurvatureHardThreshold < mitk::eps)
-        m_CurvatureHardThreshold = 0;
-    unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
-
-    MTRand randGen;
-//    srand(1);
-
-    MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
-
-
-    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, 2*m_ParticleLength);
-    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, &randGen);
-
-    EnergyComputer encomp(&randGen, qballImage, imgSize,spacing,sinterp,particleGrid,mask,mask_oversamp_mult, directionMatrix);
-    encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,m_CurvatureHardThreshold,m_InexBalance,m_Chempot2, m_Meanval_sq);
-
-    sampler->SetEnergyComputer(&encomp);
-    sampler->SetParameters(m_TempStart,singleIts,m_ParticleLength,m_CurvatureHardThreshold,m_ChempotParticle);
-
-    // main loop
-    for( int step = 0; step < m_Steps; step++ )
-    {
-        if (m_AbortTracking)
-            break;
-
-        m_CurrentStep = step+1;
-        float temperature = m_TempStart * exp(alpha*(((1.0)*step)/((1.0)*m_Steps)));
-
-        sampler->SetTemperature(temperature);
-        sampler->Iterate(&m_ProposalAcceptance, &m_NumConnections, &m_NumParticles, &m_AbortTracking);
-
-        MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
-        MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
-        MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
-        MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)step/m_Steps << "%";
-
-        if (m_BuildFibers)
-        {
-            FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
-            m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
-            m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
-            m_BuildFibers = false;
-        }
-    }
-
-
-    FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
-    m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
-    m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
-
-    delete sinterp;
-    delete coords;
-    delete ind;
-    delete sampler;
-    delete particleGrid;
-    m_AbortTracking = true;
-    m_BuildFibers = false;
-
-    MITK_INFO << "itkGibbsTrackingFilter: done generate data";
+    return new SphereInterpolator(coords, ind, QBALL_ODFSIZE, 301, 0.5);
 }
+
 }
 
 

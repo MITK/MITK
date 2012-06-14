@@ -211,6 +211,7 @@ set(H_FILES
   Algorithms/itkReduceDirectionGradientsFilter.h
   Algorithms/itkResidualImageFilter.h
   Algorithms/itkExtractChannelFromRgbaImageFilter.h
+  Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h
@@ -225,7 +226,7 @@ set(H_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingManager.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
-  Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
+
 
 )
 

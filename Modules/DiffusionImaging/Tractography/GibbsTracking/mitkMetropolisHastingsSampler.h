@@ -19,10 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <MitkDiffusionImagingExports.h>
-#include "mitkParticleGrid.h"
-#include "mitkEnergyComputer.h"
-#include "MersenneTwister.h"
-#include "mitkSimpSamp.h"
+#include <mitkParticleGrid.h>
+#include <mitkEnergyComputer.h>
+#include <MersenneTwister.h>
+#include <mitkSimpSamp.h>
 
 // ITK
 #include <itkImage.h>
@@ -37,29 +37,26 @@ class MitkDiffusionImaging_EXPORT MetropolisHastingsSampler
 {
 public:
 
-
     typedef itk::Image< float, 3 >  ItkFloatImageType;
 
-    ParticleGrid* m_ParticleGrid;
-    const int* datasz;
+    ParticleGrid*   m_ParticleGrid;
+    const int*      datasz;
     EnergyComputer* enc;
-    int m_Iterations;
-    float width;
-    float height;
-    float depth;
-    int m_NumAttributes;
-    int m_AcceptedProposals;
+    int             m_Iterations;
+    float           width;
+    float           height;
+    float           depth;
+    int             m_AcceptedProposals;
 
-    float T_in ;
-    float T_ex ;
-    float dens;
+    float m_InTemp;
+    float m_ExTemp;
+    float m_Density;
 
-    float p_birth;
-    float p_death;
-    float p_shift;
-    float p_shiftopt;
-    float p_cap;
-    float p_con;
+    float m_BirthProb;
+    float m_DeathProb;
+    float m_ShiftProb;
+    float m_OptShiftProb;
+    float m_ConnectionProb;
 
     float sigma_g;
     float gamma_g;
@@ -80,8 +77,8 @@ public:
     float externalEnergy;
     float internalEnergy;
     float m_ChempotParticle;
-    MTRand* mtrand;
 
+    MTRand* mtrand;
     Track TrackProposal, TrackBackup;
     SimpSamp simpsamp;
 

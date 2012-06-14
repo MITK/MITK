@@ -242,7 +242,7 @@ float EnergyComputer::evaluateODF(vnl_vector_fixed<float, 3> &R, vnl_vector_fixe
     return Dn;
 }
 
-float EnergyComputer::computeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &cap, float &len, Particle *dp)
+float EnergyComputer::computeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len, Particle *dp)
 {
     float m = SpatProb(R);
     if (m == 0)
@@ -264,14 +264,14 @@ float EnergyComputer::computeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_v
             float bw = mbesseli0(dot);
             float dpos = (p->R-R).squared_magnitude();
             float w = mexp(dpos*gamma_s);
-            Sn += w*(bw+chempot2)*p->cap ;
+            Sn += w*(bw+chempot2);
             w = mexp(dpos*gamma_reg_s);
             Pn += w*bw;
         }
     }
 
     float energy = 0;
-    energy += (2*(Dn/particle_weight-Sn) - (mbesseli0(1.0)+chempot2)*cap)*cap;
+    energy += 2*(Dn/particle_weight-Sn) - (mbesseli0(1.0)+chempot2);
 
     return energy*ex_strength;
 }

@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 //Mitk
 #include "mitkDataNode.h"
 
+
 // Qmitk
 #include "UltrasoundSupport.h"
 
@@ -73,23 +74,26 @@ void UltrasoundSupport::OnClickedViewDevice()
  // if (nodes.empty()) return;
 
   mitk::DataNode::Pointer node = mitk::DataNode::New();
-  device->Update();
+  device->UpdateOutputData(0);
   mitk::USImage::Pointer image = device->GetOutput();
   node->SetData(image);
   node->SetName("US-Image 0");
   this->GetDataStorage()->Add(node);
-  int i;
+ /* int i;
   for (i = 1; i < 10; i++)
   {
     device->Update();
-    if ((i % 3) == 0 ){
-    node = mitk::DataNode::New();
-    image = device->GetOutput();
-    node->SetData(image);
-    node->SetName("US-Image " + i);
-    this->GetDataStorage()->Add(node);
+    if ((i % 3) == 0 )
+    {
+      node = mitk::DataNode::New();
+      image = device->GetOutput();
+      node->SetData(image);
+      std::ostringstream oss;
+      oss << "US-Image " << i;
+      node->SetName(oss.str());
+      this->GetDataStorage()->Add(node);
     }
-  }
+  }*/
 
 
 

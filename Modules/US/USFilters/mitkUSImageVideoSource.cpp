@@ -66,20 +66,30 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID)
 
 mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 {
+  IplImage *m_cvCurrentVideoFrame = NULL;
+  int height = m_OpenCVVideoSource->GetImageHeight();
+  int width = m_OpenCVVideoSource->GetImageWidth();
+  m_cvCurrentVideoFrame = cvCreateImage(cvSize(width,height),8,3);
+  m_OpenCVVideoSource->GetCurrentFrameAsOpenCVImage(m_cvCurrentVideoFrame);
   m_OpenCVVideoSource->FetchFrame();
+  //m_WidgetBackground1->Update(m_cvCurrentVideoFrame->imageData, m_cvCurrentVideoFrame->width, m_cvCurrentVideoFrame->height, m_cvCurrentVideoFrame->nChannels);
+  //m_Counter++;
+
+//old code
+  //m_OpenCVVideoSource->FetchFrame();
 
   // This is a bit of a workaround: We only need to initialize an OpenCV Image. Actual
   // Initialization happens inside the OpenCVVideoSource
-  IplImage* iplImage = cvCreateImage(cvSize(320,240),IPL_DEPTH_8U,3); 
-  m_OpenCVVideoSource->GetCurrentFrameAsOpenCVImage(iplImage);
+  //IplImage* iplImage = cvCreateImage(cvSize(320,240),IPL_DEPTH_8U,3); 
+  //m_OpenCVVideoSource->GetCurrentFrameAsOpenCVImage(iplImage);
   
-  this->m_OpenCVToMitkFilter->SetOpenCVImage(iplImage);
+  this->m_OpenCVToMitkFilter->SetOpenCVImage(m_cvCurrentVideoFrame);
   this->m_OpenCVToMitkFilter->Update();
 
   // OpenCVToMitkImageFilter returns a standard mit::image. We then transform it into an USImage
   mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput(0));
   
-  cvReleaseImage (&iplImage);
+  cvReleaseImage (&m_cvCurrentVideoFrame);
 
   return result;
 }

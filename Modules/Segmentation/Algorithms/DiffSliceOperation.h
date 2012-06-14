@@ -40,7 +40,7 @@ namespace mitk
      timestep                the timestep in an 4D image.
      currentWorldGeometry   specifies the axis where the slice has to be applied in the volume. 
   */
-  class MITK_CORE_EXPORT DiffSliceOperation : public Operation
+  class Segmentation_EXPORT DiffSliceOperation : public Operation
   {
 
   public:

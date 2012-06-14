@@ -49,7 +49,7 @@ PURPOSE.  See the above copyright notices for more information.
       \sa vtkImageReslice
       (Note that the execute and interpolation function are no members and thus can not be overriden)
    */
-  class MITK_CORE_EXPORT mitkVtkImageOverwrite : public vtkImageReslice
+  class Segmentation_EXPORT mitkVtkImageOverwrite : public vtkImageReslice
   {
   public:
     static mitkVtkImageOverwrite *New();

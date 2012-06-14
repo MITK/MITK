@@ -31,7 +31,7 @@ namespace mitk
   /** \brief Executes a DiffSliceOperation. 
     \sa DiffSliceOperation
   */
-  class MITK_CORE_EXPORT DiffSliceOperationApplier : public OperationActor
+  class Segmentation_EXPORT DiffSliceOperationApplier : public OperationActor
   {
 
   public:

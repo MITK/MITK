@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef mitkDiffSliceOperation_h_Included
 #define mitkDiffSliceOperation_h_Included
@@ -30,15 +29,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  /** \brief An Operation for applying a an edited slice to the volume.
+  /** \brief An Operation for applying an edited slice to the volume.
     \sa DiffSliceOperationApplier
     
-    The information for the operation is set via properties:
+    The information for the operation is specified by properties:
 
      imageVolume            the volume where the slice was extracted from.
      slice                  the slice to be applied.
-     timestep                the timestep in an 4D image.
-     currentWorldGeometry   specifies the axis where the slice has to be applied in the volume. 
+     timestep               the timestep in an 4D image.
+     currentWorldGeometry   specifies the axis where the slice has to be applied in the volume.
+    
+    This Operation can be used to realize undo-redo functionality for e.g. segmentation.	
   */
   class Segmentation_EXPORT DiffSliceOperation : public Operation
   {

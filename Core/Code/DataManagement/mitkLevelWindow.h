@@ -86,12 +86,12 @@ public:
   /*!
   * To set the level and the window value
   */
-  void SetLevelWindow(ScalarType level, ScalarType window);
+  void SetLevelWindow(ScalarType level, ScalarType window, bool expandRangesIfNecessary = false);
 
   /*!
   * Set the lower and upper bound of the window
   */
-  void SetWindowBounds(ScalarType lowerBound, ScalarType upperBound);
+  void SetWindowBounds(ScalarType lowerBound, ScalarType upperBound, bool expandRangesIfNecessary = false);
 
   /*!
   * sets the window to its maximum Size in scaleRange

@@ -512,25 +512,6 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
     m_MaskImage = NULL;
   }
 
-
-  // if no mask image is selected generate it
-  if( m_MaskImage.IsNull() )
-  {
-    m_MaskImage = MaskImgType::New();
-    m_MaskImage->SetSpacing( m_ItkQBallImage->GetSpacing() );   // Set the image spacing
-    m_MaskImage->SetOrigin( m_ItkQBallImage->GetOrigin() );     // Set the image origin
-    m_MaskImage->SetDirection( m_ItkQBallImage->GetDirection() );  // Set the image direction
-    m_MaskImage->SetLargestPossibleRegion( m_ItkQBallImage->GetLargestPossibleRegion());
-    m_MaskImage->SetBufferedRegion( m_ItkQBallImage->GetLargestPossibleRegion() );
-    m_MaskImage->Allocate();
-
-    itk::ImageRegionIterator<MaskImgType> it (m_MaskImage, m_MaskImage->GetLargestPossibleRegion() );
-    for (it = it.Begin(); !it.IsAtEnd(); ++it)
-    {
-      it.Set(1);
-    }
-  }
-
   unsigned int steps = m_Iterations/10000;
   if (steps<10)
     steps = 10;

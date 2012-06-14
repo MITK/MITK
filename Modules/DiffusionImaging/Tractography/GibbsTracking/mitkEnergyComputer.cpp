@@ -20,6 +20,7 @@ using namespace mitk;
 
 EnergyComputer::EnergyComputer(MTRand* rgen, ItkQBallImgType* qballImage, SphereInterpolator *sp, ParticleGrid *particleGrid, float *mask, vnl_matrix_fixed<float, 3, 3> rotMatrix)
 {
+    m_UseTrilinearInterpolation = true;
     m_ParticleGrid = particleGrid;
     m_RandGen = rgen;
     m_RotationMatrix = rotMatrix;
@@ -30,6 +31,9 @@ EnergyComputer::EnergyComputer(MTRand* rgen, ItkQBallImgType* qballImage, Sphere
     m_Size[0] = m_ImageData->GetLargestPossibleRegion().GetSize()[0];
     m_Size[1] = m_ImageData->GetLargestPossibleRegion().GetSize()[1];
     m_Size[2] = m_ImageData->GetLargestPossibleRegion().GetSize()[2];
+
+    if (m_Size[0]<3 || m_Size[1]<3 || m_Size[2]<3)
+        m_UseTrilinearInterpolation = false;
 
     m_Spacing[0] = m_ImageData->GetSpacing()[0];
     m_Spacing[1] = m_ImageData->GetSpacing()[1];
@@ -46,9 +50,9 @@ EnergyComputer::EnergyComputer(MTRand* rgen, ItkQBallImgType* qballImage, Sphere
 
     m_NumActiveVoxels = 0;
     cumulspatprob[0] = 0;
-    for (int x = 1; x < m_Size[0];x++)
-        for (int y = 1; y < m_Size[1];y++)
-            for (int z = 1; z < m_Size[2];z++)
+    for (int x = 0; x < m_Size[0];x++)
+        for (int y = 0; y < m_Size[1];y++)
+            for (int z = 0; z < m_Size[2];z++)
             {
                 int idx = x+(y+z*m_Size[1])*m_Size[0];
                 if (m_MaskImageData[idx] > 0.5)
@@ -115,9 +119,9 @@ void EnergyComputer::drawSpatPosition(vnl_vector_fixed<float, 3>& R)
 
 float EnergyComputer::SpatProb(vnl_vector_fixed<float, 3> R)
 {
-    int rx = int(R[0]/m_Spacing[0]);
-    int ry = int(R[1]/m_Spacing[1]);
-    int rz = int(R[2]/m_Spacing[2]);
+    int rx = floor(R[0]/m_Spacing[0]);
+    int ry = floor(R[1]/m_Spacing[1]);
+    int rz = floor(R[2]/m_Spacing[2]);
     if (rx >= 0 && rx < m_Size[0] && ry >= 0 && ry < m_Size[1] && rz >= 0 && rz < m_Size[2]){
         return m_MaskImageData[rx + m_Size[0]* (ry + m_Size[1]*rz)];
     }
@@ -143,70 +147,86 @@ float EnergyComputer::evaluateODF(vnl_vector_fixed<float, 3> &R, vnl_vector_fixe
     {
         Rs = R + (N * len) * ((float)i/CU);
 
-        float Rx = Rs[0]/m_Spacing[0]-0.5;
-        float Ry = Rs[1]/m_Spacing[1]-0.5;
-        float Rz = Rs[2]/m_Spacing[2]-0.5;
-
-        xint = int(floor(Rx));
-        yint = int(floor(Ry));
-        zint = int(floor(Rz));
-
-        if (xint >= 0 && xint < m_Size[0]-1 && yint >= 0 && yint < m_Size[1]-1 && zint >= 0 && zint < m_Size[2]-1)
+        if (!m_UseTrilinearInterpolation)
         {
-            float xfrac = Rx-xint;
-            float yfrac = Ry-yint;
-            float zfrac = Rz-zint;
-
             ItkQBallImgType::IndexType index;
-            float weight;
+            index[0] = floor(R[0]/m_Spacing[0]);
+            index[1] = floor(R[1]/m_Spacing[1]);
+            index[2] = floor(R[2]/m_Spacing[2]);
+            if (index[0]>=0 && index[0]<m_Size[0] && index[1]>=0 && index[1]<m_Size[1] && index[2]>=0 && index[2]<m_Size[2])
+            {
+                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2]);
+            }
+        }
+        else
+        {
+            float Rx = Rs[0]/m_Spacing[0]-0.5;
+            float Ry = Rs[1]/m_Spacing[1]-0.5;
+            float Rz = Rs[2]/m_Spacing[2]-0.5;
 
-            weight = (1-xfrac)*(1-yfrac)*(1-zfrac);
-            index[0] = xint; index[1] = yint; index[2] = zint;
-            Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+            xint = floor(Rx);
+            yint = floor(Ry);
+            zint = floor(Rz);
 
-            weight = (xfrac)*(1-yfrac)*(1-zfrac);
-            index[0] = xint+1; index[1] = yint; index[2] = zint;
-            Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+            if (xint >= 0 && xint < m_Size[0]-1 && yint >= 0 && yint < m_Size[1]-1 && zint >= 0 && zint < m_Size[2]-1)
+            {
+                float xfrac = Rx-xint;
+                float yfrac = Ry-yint;
+                float zfrac = Rz-zint;
 
-            weight = (1-xfrac)*(yfrac)*(1-zfrac);
-            index[0] = xint; index[1] = yint+1; index[2] = zint;
-            Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                ItkQBallImgType::IndexType index;
+                float weight;
 
-            weight = (1-xfrac)*(1-yfrac)*(zfrac);
-            index[0] = xint; index[1] = yint; index[2] = zint+1;
-            Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                weight = (1-xfrac)*(1-yfrac)*(1-zfrac);
+                index[0] = xint; index[1] = yint; index[2] = zint;
+                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
-            weight = (xfrac)*(yfrac)*(1-zfrac);
-            index[0] = xint+1; index[1] = yint+1; index[2] = zint;
-            Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                weight = (xfrac)*(1-yfrac)*(1-zfrac);
+                index[0] = xint+1; index[1] = yint; index[2] = zint;
+                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
-            weight = (1-xfrac)*(yfrac)*(zfrac);
-            index[0] = xint; index[1] = yint+1; index[2] = zint+1;
-            Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                weight = (1-xfrac)*(yfrac)*(1-zfrac);
+                index[0] = xint; index[1] = yint+1; index[2] = zint;
+                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
-            weight = (xfrac)*(1-yfrac)*(zfrac);
-            index[0] = xint+1; index[1] = yint; index[2] = zint+1;
-            Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                weight = (1-xfrac)*(1-yfrac)*(zfrac);
+                index[0] = xint; index[1] = yint; index[2] = zint+1;
+                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
-            weight = (xfrac)*(yfrac)*(zfrac);
-            index[0] = xint+1; index[1] = yint+1; index[2] = zint+1;
-            Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                   m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                weight = (xfrac)*(yfrac)*(1-zfrac);
+                index[0] = xint+1; index[1] = yint+1; index[2] = zint;
+                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+                weight = (1-xfrac)*(yfrac)*(zfrac);
+                index[0] = xint; index[1] = yint+1; index[2] = zint+1;
+                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+                weight = (xfrac)*(1-yfrac)*(zfrac);
+                index[0] = xint+1; index[1] = yint; index[2] = zint+1;
+                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+
+                weight = (xfrac)*(yfrac)*(zfrac);
+                index[0] = xint+1; index[1] = yint+1; index[2] = zint+1;
+                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+            }
         }
     }
     Dn *= 1.0/(2*CU+1);

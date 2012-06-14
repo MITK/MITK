@@ -163,13 +163,6 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
                         m_QBallImage->GetLargestPossibleRegion().GetSize().GetElement(2)};
     double spacing[3] = {m_QBallImage->GetSpacing().GetElement(0),m_QBallImage->GetSpacing().GetElement(1),m_QBallImage->GetSpacing().GetElement(2)};
 
-    // make sure image has enough slices
-    if (imgSize[1]<3 || imgSize[2]<3 || imgSize[3]<3)
-    {
-        MITK_INFO << "itkGibbsTrackingFilter: image size < 3 not supported";
-        m_AbortTracking = true;
-    }
-
     // calculate rotation matrix
     vnl_matrix<double> temp = m_QBallImage->GetDirection().GetVnlMatrix();
     vnl_matrix<float>  directionMatrix; directionMatrix.set_size(3,3);
@@ -217,21 +210,20 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     // mask image
     int maskImageSize[3];
     float *mask;
-    if(m_MaskImage.IsNotNull())
+    if(m_MaskImage.IsNull())
     {
-        mask = (float*) m_MaskImage->GetBufferPointer();
-        maskImageSize[0] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(0);
-        maskImageSize[1] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(1);
-        maskImageSize[2] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(2);
+        m_MaskImage = ItkFloatImageType::New();
+        m_MaskImage->SetSpacing( qballImage->GetSpacing() );   // Set the image spacing
+        m_MaskImage->SetOrigin( qballImage->GetOrigin() );     // Set the image origin
+        m_MaskImage->SetDirection( qballImage->GetDirection() );  // Set the image direction
+        m_MaskImage->SetRegions( qballImage->GetLargestPossibleRegion());
+        m_MaskImage->Allocate();
+        m_MaskImage->FillBuffer(1.0);
     }
-    else
-    {
-        mask = 0;
-        maskImageSize[0] = imgSize[1];
-        maskImageSize[1] = imgSize[2];
-        maskImageSize[2] = imgSize[3];
-    }
-    int mask_oversamp_mult = maskImageSize[0]/imgSize[1];
+    mask = (float*) m_MaskImage->GetBufferPointer();
+    maskImageSize[0] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(0);
+    maskImageSize[1] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(1);
+    maskImageSize[2] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(2);
 
     // get paramters
     float minSpacing;

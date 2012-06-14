@@ -44,6 +44,8 @@ public:
     std::vector< float >            cumulspatprob;
     std::vector< int >              spatidx;
 
+    bool m_UseTrilinearInterpolation;
+
     float *m_MaskImageData;
     int m_NumActiveVoxels;
 

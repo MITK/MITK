@@ -94,7 +94,7 @@ public:
         track.resize(1000);
     }
 
-    ~Track();
+    ~Track(){}
 
     void clear()
     {

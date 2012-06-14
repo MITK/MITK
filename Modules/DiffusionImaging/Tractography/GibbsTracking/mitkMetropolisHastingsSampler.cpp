@@ -392,16 +392,16 @@ void MetropolisHastingsSampler::IterateOneStep()
             P.ep = (mtrand->frand() > 0.5)? 1 : -1;
 
             RemoveAndSaveTrack(P);
-            if (TrackBackup.proposal_probability != 0)
+            if (TrackBackup.m_Probability != 0)
             {
                 MakeTrackProposal(P);
 
-                float prob = (TrackProposal.energy-TrackBackup.energy)/T_in ;
+                float prob = (TrackProposal.m_Energy-TrackBackup.m_Energy)/T_in ;
 
                 //            prob = exp(prob)*(TrackBackup.proposal_probability)
                 //                                        /(TrackProposal.proposal_probability);
-                prob = exp(prob)*(TrackBackup.proposal_probability * pow(del_prob,TrackProposal.length))
-                        /(TrackProposal.proposal_probability * pow(del_prob,TrackBackup.length));
+                prob = exp(prob)*(TrackBackup.m_Probability * pow(del_prob,TrackProposal.m_Length))
+                        /(TrackProposal.m_Probability * pow(del_prob,TrackBackup.m_Length));
                 if (mtrand->frand() < prob)
                 {
                     ImplementTrack(TrackProposal);
@@ -428,7 +428,7 @@ void MetropolisHastingsSampler::IterateOneStep()
 
 void MetropolisHastingsSampler::ImplementTrack(Track &T)
 {
-    for (int k = 1; k < T.length;k++)
+    for (int k = 1; k < T.m_Length;k++)
     {
         m_ParticleGrid->CreateConnection(T.track[k-1].p,T.track[k-1].ep,T.track[k].p,-T.track[k].ep);
     }
@@ -516,9 +516,9 @@ void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
         }
 
     }
-    TrackBackup.energy = energy;
-    TrackBackup.proposal_probability = AccumProb;
-    TrackBackup.length = cnt+1;
+    TrackBackup.m_Energy = energy;
+    TrackBackup.m_Probability = AccumProb;
+    TrackBackup.m_Length = cnt+1;
 }
 
 void MetropolisHastingsSampler::MakeTrackProposal(EndPoint P)
@@ -568,12 +568,12 @@ void MetropolisHastingsSampler::MakeTrackProposal(EndPoint P)
         TrackProposal.track[cnt++] = Current;
     }
 
-    TrackProposal.energy = energy;
-    TrackProposal.proposal_probability = AccumProb;
-    TrackProposal.length = cnt;
+    TrackProposal.m_Energy = energy;
+    TrackProposal.m_Probability = AccumProb;
+    TrackProposal.m_Length = cnt;
 
     // clear labels
-    for (int j = 0; j < TrackProposal.length;j++)
+    for (int j = 0; j < TrackProposal.m_Length;j++)
         TrackProposal.track[j].p->label = 0;
 }
 

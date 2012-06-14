@@ -39,7 +39,7 @@ namespace mitk
      timestep               the timestep in an 4D image.
      currentWorldGeometry   specifies the axis where the slice has to be applied in the volume.
     
-    This Operation can be used to realize undo-redo functionality for e.g. segmentation.	
+    This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.  
   */
   class Segmentation_EXPORT DiffSliceOperation : public Operation
   {

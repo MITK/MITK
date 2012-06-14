@@ -34,7 +34,6 @@ public:
 
     typedef itk::Image< float, 3 >  ItkFloatImageType;
 
-
     int m_NumParticles;         // number of particles
     int m_NumConnections;       // number of connections
     int m_NumCellOverflows;     // number of cell overflows
@@ -44,7 +43,7 @@ public:
 
     Particle* GetParticle(int ID);
 
-    Particle* newParticle(vnl_vector_fixed<float, 3> R);
+    Particle* NewParticle(vnl_vector_fixed<float, 3> R);
     bool TryUpdateGrid(int k);
     void RemoveParticle(int k);
 
@@ -55,34 +54,27 @@ public:
     void DestroyConnection(Particle *P1,int ep1, Particle *P2, int ep2);
     void DestroyConnection(Particle *P1,int ep1);
 
+    bool CheckConsistency();
+
 protected:
 
-    int ReallocateGrid();
+    bool ReallocateGrid();
 
-    int capacity; // maximal number of particles
-    int increase_step;
+    std::vector< Particle* >    m_Grid;             // the grid
+    std::vector< Particle >     m_Particles;        // particle container
+    std::vector< int >          m_OccupationCount;  // number of particles per grid cell
 
-    std::vector< Particle* > grid;   // the grid
-    std::vector< Particle >  m_Particles;    // particles in linear array
-    std::vector< int > occnt;     // occupation count of grid cells
+    int m_ContainerCapacity;     // maximal number of particles
 
-    // grid size
-    int nx;
-    int ny;
-    int nz;
+    vnl_vector_fixed< int, 3 >      m_GridSize;     // grid dimensions
+    vnl_vector_fixed< float, 3 >    m_GridScale;    // scaling factor for grid
 
-    // scaling factor for grid
-    float mulx;
-    float muly;
-    float mulz;
-
-    int csize;      // particle capacity of single cell in grid
-    int gridsize;   // total number of cells
+    int m_CellCapacity;      // particle capacity of single cell in grid
 
     struct NeighborTracker  // to run over the neighbors
     {
-        int cellidx[8];
-        int cellidx_c[8];
+        std::vector< int > cellidx;
+        std::vector< int > cellidx_c;
         int cellcnt;
         int pcnt;
     } m_NeighbourTracker;
@@ -92,21 +84,28 @@ protected:
 class MitkDiffusionImaging_EXPORT Track
 {
 public:
-    EndPoint track[1000];
-    float energy;
-    float proposal_probability;
-    int length;
+    std::vector< EndPoint > track;
+    float   m_Energy;
+    float   m_Probability;
+    int     m_Length;
+
+    Track()
+    {
+        track.resize(1000);
+    }
+
+    ~Track();
 
     void clear()
     {
-        length = 0;
-        energy = 0;
-        proposal_probability = 1;
+        m_Length = 0;
+        m_Energy = 0;
+        m_Probability = 1;
     }
 
-    bool isequal(Track &t)
+    bool isequal(Track& t)
     {
-        for (int i = 0; i < length;i++)
+        for (int i = 0; i < m_Length;i++)
         {
             if (track[i].p != t.track[i].p || track[i].ep != t.track[i].ep)
                 return false;

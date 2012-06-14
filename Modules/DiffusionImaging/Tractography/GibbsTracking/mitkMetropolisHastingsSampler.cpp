@@ -167,7 +167,7 @@ void MetropolisHastingsSampler::IterateOneStep()
 
         if (prob > 1 || mtrand->frand() < prob)
         {
-            Particle *p = m_ParticleGrid->newParticle(R);
+            Particle *p = m_ParticleGrid->NewParticle(R);
             if (p!=0)
             {
                 p->R = R;

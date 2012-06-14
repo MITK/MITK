@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -43,7 +43,6 @@ mitk::FiberBundleXMapper3D::~FiberBundleXMapper3D()
 
 const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
 {
-    MITK_INFO << "FiberBundleXxXXMapper3D() GetInput()";
     return static_cast<const mitk::FiberBundleX * > ( GetData() );
 }
 
@@ -107,11 +106,6 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
     localStorage->m_LastUpdateTime.Modified();
     //since this method is called after generating all necessary data for fiber visualization, all modifications are represented so far.
-
-    //====timer measurement========
-    MITK_INFO << "Execution Time GenerateData() (nmiliseconds): " << myTimer.elapsed();
-    //=============================
-
 }
 
 
@@ -132,7 +126,7 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
          || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
          || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
     {
-        MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
+        MITK_DEBUG << "UPDATE NEEDED FOR _ " << renderer->GetName();
         this->GenerateData(renderer);
     }
 

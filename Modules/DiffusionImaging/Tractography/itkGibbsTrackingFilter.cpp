@@ -66,7 +66,8 @@ GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
     m_Memory(0),
     m_ProposalAcceptance(0),
     m_CurvatureHardThreshold(0.7),
-    m_Meanval_sq(0.0)
+    m_Meanval_sq(0.0),
+    m_DuplicateImage(true)
 {
 
 }
@@ -187,11 +188,19 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     }
 
     // generate local working copy of QBall image
-    typedef itk::ImageDuplicator< ItkQBallImageType > DuplicateFilterType;
-    typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
-    duplicator->SetInputImage( m_QBallImage );
-    duplicator->Update();
-    typename ItkQBallImageType::Pointer qballImage = duplicator->GetOutput();
+    typename ItkQBallImageType::Pointer qballImage;
+    if (m_DuplicateImage)
+    {
+        typedef itk::ImageDuplicator< ItkQBallImageType > DuplicateFilterType;
+        typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
+        duplicator->SetInputImage( m_QBallImage );
+        duplicator->Update();
+        qballImage = duplicator->GetOutput();
+    }
+    else
+    {
+        qballImage = m_QBallImage;
+    }
 
     // perform mean subtraction on odfs
     typedef ImageRegionIterator< ItkQBallImageType > InputIteratorType;
@@ -317,8 +326,8 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         m_CurvatureHardThreshold = 0;
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
 
-    MTRand randGen(1);
-    srand(1);
+    MTRand randGen;
+//    srand(1);
 
     MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
 

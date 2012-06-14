@@ -139,6 +139,7 @@ protected:
     float   m_ProposalAcceptance;
     float   m_CurvatureHardThreshold;
     float   m_Meanval_sq;
+    bool    m_DuplicateImage;
 
     FiberPolyDataType m_FiberPolyData;
     unsigned long m_NumParticles;

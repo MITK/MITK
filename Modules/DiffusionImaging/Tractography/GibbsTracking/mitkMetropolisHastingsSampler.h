@@ -94,7 +94,7 @@ public:
     void Iterate(float* acceptance, unsigned long* numCon, unsigned long* numPart, bool *abort);
     void IterateOneStep();
 
-    void ImplementTrack(Track &T);
+    void ImplementTrack(Track& T);
     void RemoveAndSaveTrack(EndPoint P);
     void MakeTrackProposal(EndPoint P);
     void ComputeEndPointProposalDistribution(EndPoint P);

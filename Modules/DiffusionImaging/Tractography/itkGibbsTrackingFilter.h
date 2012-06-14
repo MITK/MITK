@@ -73,9 +73,6 @@ public:
     itkSetMacro( ChempotConnection, float )
     itkGetMacro( ChempotConnection, float )
 
-    itkSetMacro( ChempotParticle, float )
-    itkGetMacro( ChempotParticle, float )
-
     itkSetMacro( InexBalance, float )
     itkGetMacro( InexBalance, float )
 
@@ -134,7 +131,6 @@ protected:
     float   m_ParticleWidth;        //sigma  (mm)
     float   m_ParticleLength;       // ell (mm)
     float   m_ChempotConnection;    // gross L (chemisches potential)
-    float   m_ChempotParticle;      // unbenutzt (immer null, wenn groesser dann insgesamt weniger teilchen)
     float   m_InexBalance;          // gewichtung zwischen den lambdas; -5 ... 5 -> nur intern ... nur extern,default 0
     float   m_Chempot2;             // typischerweise 0
     int     m_FiberLength;

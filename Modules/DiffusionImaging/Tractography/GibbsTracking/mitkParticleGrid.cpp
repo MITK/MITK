@@ -21,14 +21,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-ParticleGrid::ParticleGrid(ItkFloatImageType* image, float cellSize)
+ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength)
 {
     // initialize counters
     m_NumParticles = 0;
     m_NumConnections = 0;
     m_NumCellOverflows = 0;
+    m_ParticleLength = particleLength;
 
-    // define isotropic grid from voxel spacing and particle length (cellSize)
+    // define isotropic grid from voxel spacing and particle length
+    float cellSize = 2*m_ParticleLength;
     m_GridSize[0] = image->GetLargestPossibleRegion().GetSize()[0]*image->GetSpacing()[0]/cellSize +1;
     m_GridSize[1] = image->GetLargestPossibleRegion().GetSize()[1]*image->GetSpacing()[1]/cellSize +1;
     m_GridSize[2] = image->GetLargestPossibleRegion().GetSize()[2]*image->GetSpacing()[2]/cellSize +1;

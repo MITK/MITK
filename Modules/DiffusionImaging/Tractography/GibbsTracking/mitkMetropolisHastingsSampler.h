@@ -39,14 +39,28 @@ public:
 
     typedef itk::Image< float, 3 >  ItkFloatImageType;
 
-    ParticleGrid*   m_ParticleGrid;
-    const int*      datasz;
-    EnergyComputer* enc;
-    int             m_Iterations;
-    float           width;
-    float           height;
-    float           depth;
-    int             m_AcceptedProposals;
+    MetropolisHastingsSampler(ParticleGrid* grid, EnergyComputer* enComp, MTRand* randGen, float curvThres);
+    void SetTemperature(float val);
+
+    void MakeProposal();
+    int GetNumAcceptedProposals();
+
+protected:
+
+    // connection proposal related methods
+    void ImplementTrack(Track& T);
+    void RemoveAndSaveTrack(EndPoint P);
+    void MakeTrackProposal(EndPoint P);
+    void ComputeEndPointProposalDistribution(EndPoint P);
+
+    // generate random vectors
+    vnl_vector_fixed<float, 3> DistortVector(float sigma, vnl_vector_fixed<float, 3>& vec);
+    vnl_vector_fixed<float, 3> GetRandomDirection();
+
+    MTRand*     m_RandGen;
+    Track       m_ProposalTrack;
+    Track       m_BackupTrack;
+    SimpSamp    m_SimpSamp;
 
     float m_InTemp;
     float m_ExTemp;
@@ -58,47 +72,25 @@ public:
     float m_OptShiftProb;
     float m_ConnectionProb;
 
-    float sigma_g;
-    float gamma_g;
-    float Z_g;
+    float m_Sigma;
+    float m_Gamma;
+    float m_Z;
 
-    float dthres;
-    float nthres;
-    float T_prop;
-    float stopprobability;
-    float del_prob;
-
-    float len_def;
-    float len_sig;
-
-    float cap_def;
-    float cap_sig;
-
-    float externalEnergy;
-    float internalEnergy;
+    float m_DistanceThreshold;
+    float m_CurvatureThreshold;
+    float m_TractProb;
+    float m_StopProb;
+    float m_DelProb;
+    float m_ParticleLength;
     float m_ChempotParticle;
 
-    MTRand* mtrand;
-    Track TrackProposal, TrackBackup;
-    SimpSamp simpsamp;
-
-    MetropolisHastingsSampler(ParticleGrid* grid, MTRand* randGen);
-
-    void SetEnergyComputer(EnergyComputer *e);
-    void SetParameters(float Temp, int numit, float plen, float curv_hardthres, float chempot_particle);
-    void SetTemperature(float temp);
-
-    void Iterate(float* acceptance, unsigned long* numCon, unsigned long* numPart, bool *abort);
-    void IterateOneStep();
-
-    void ImplementTrack(Track& T);
-    void RemoveAndSaveTrack(EndPoint P);
-    void MakeTrackProposal(EndPoint P);
-    void ComputeEndPointProposalDistribution(EndPoint P);
-
-    vnl_vector_fixed<float, 3> distortn(float sigma, vnl_vector_fixed<float, 3>& vec);
-    vnl_vector_fixed<float, 3> rand_sphere();
-//    vnl_vector_fixed<float, 3> rand(float w, float h, float d);
+    ParticleGrid*   m_ParticleGrid;
+    const int*      datasz;
+    EnergyComputer* m_EnergyComputer;
+    float           width;
+    float           height;
+    float           depth;
+    int             m_AcceptedProposals;
 };
 
 }

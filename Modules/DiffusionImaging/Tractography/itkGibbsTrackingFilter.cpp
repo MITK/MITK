@@ -47,7 +47,6 @@ GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
     m_ParticleWidth(0),
     m_ParticleLength(0),
     m_ChempotConnection(10),
-    m_ChempotParticle(0),
     m_InexBalance(0),
     m_Chempot2(0.2),
     m_FiberLength(10),
@@ -276,43 +275,49 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     SphereInterpolator* interpolator = LoadSphereInterpolator();
 
     MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
-    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, 2*m_ParticleLength);
-    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, &randGen);
+    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
 
     EnergyComputer encomp(&randGen, qballImage, imgSize,spacing,interpolator,particleGrid,mask,mask_oversamp_mult, directionMatrix);
     encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,m_CurvatureHardThreshold,m_InexBalance,m_Chempot2, m_Meanval_sq);
 
-    sampler->SetEnergyComputer(&encomp);
-    sampler->SetParameters(m_TempStart,singleIts,m_ParticleLength,m_CurvatureHardThreshold,m_ChempotParticle);
+    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, &encomp, &randGen, m_CurvatureHardThreshold);
 
     // main loop
     m_NumAcceptedFibers = 0;
-    for( int step = 0; step < m_Steps; step++ )
+    for( int m_CurrentStep = 1; m_CurrentStep <= m_Steps; m_CurrentStep++ )
     {
-        if (m_AbortTracking)
-            break;
-
-        m_CurrentStep = step+1;
-        float temperature = m_TempStart * exp(alpha*(((1.0)*step)/((1.0)*m_Steps)));
-
-        sampler->SetTemperature(temperature);
-        sampler->Iterate(&m_ProposalAcceptance, &m_NumConnections, &m_NumParticles, &m_AbortTracking);
+        m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/m_NumIt;
+        m_NumParticles = particleGrid->m_NumParticles;
+        m_NumConnections = particleGrid->m_NumConnections;
 
         MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
         MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
         MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
-        MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)step/m_Steps << "%";
+        MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)m_CurrentStep/m_Steps << "%";
 
-        if (m_BuildFibers)
+        float temperature = m_TempStart * exp(alpha*(((1.0)*m_CurrentStep)/((1.0)*m_Steps)));
+        sampler->SetTemperature(temperature);
+
+        for (unsigned long i=0; i<singleIts; i++)
         {
-            FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
-            m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
-            m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
-            m_BuildFibers = false;
+            if (m_AbortTracking)
+                break;
+
+            sampler->MakeProposal();
+
+            if (m_BuildFibers)
+            {
+                m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/m_NumIt;
+                m_NumParticles = particleGrid->m_NumParticles;
+                m_NumConnections = particleGrid->m_NumConnections;
+
+                FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
+                m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
+                m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
+                m_BuildFibers = false;
+            }
         }
     }
-
-
     FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
     m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
     m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();

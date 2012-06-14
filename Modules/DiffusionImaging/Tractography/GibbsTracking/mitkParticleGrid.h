@@ -37,8 +37,9 @@ public:
     int m_NumParticles;         // number of particles
     int m_NumConnections;       // number of connections
     int m_NumCellOverflows;     // number of cell overflows
+    float m_ParticleLength;
 
-    ParticleGrid(ItkFloatImageType* image, float cellSize);
+    ParticleGrid(ItkFloatImageType* image, float particleLength);
     ~ParticleGrid();
 
     Particle* GetParticle(int ID);

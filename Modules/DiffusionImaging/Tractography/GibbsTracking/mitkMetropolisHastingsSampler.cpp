@@ -18,139 +18,80 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-MetropolisHastingsSampler::MetropolisHastingsSampler(ParticleGrid* grid, MTRand* randGen)
+MetropolisHastingsSampler::MetropolisHastingsSampler(ParticleGrid* grid, EnergyComputer* enComp, MTRand* randGen, float curvThres)
     : m_AcceptedProposals(0)
+    , m_ExTemp(0.01)
+    , m_BirthProb(0.25)
+    , m_DeathProb(0.05)
+    , m_ShiftProb(0.15)
+    , m_OptShiftProb(0.1)
+    , m_ConnectionProb(0.45)
+    , m_TractProb(0.5)
+    , m_DelProb(0.1)
+    , m_ChempotParticle(0.0)
 {
-    mtrand = randGen;
+    m_RandGen = randGen;
     m_ParticleGrid = grid;
-    m_Iterations = 0;
-    m_AcceptedProposals = 0;
-    externalEnergy = 0;
-    internalEnergy = 0;
+    m_EnergyComputer = enComp;
+
+    m_ParticleLength = m_ParticleGrid->m_ParticleLength;
+    m_DistanceThreshold = m_ParticleLength*m_ParticleLength;
+    m_Sigma = m_ParticleLength/8.0;
+    m_Gamma = 1/(m_Sigma*m_Sigma*2);
+    m_Z = pow(2*M_PI*m_Sigma,3.0/2.0)*(M_PI*m_Sigma/m_ParticleLength);
+
+    m_CurvatureThreshold = curvThres;
+
+    // ???
+    m_StopProb = exp(-1/m_TractProb);
 }
 
-
-void MetropolisHastingsSampler::SetEnergyComputer(EnergyComputer *e)
+void MetropolisHastingsSampler::SetTemperature(float val)
 {
-    enc = e;
-}
-
-void MetropolisHastingsSampler::Iterate(float* acceptance, unsigned long* numCon, unsigned long* numPart, bool *abort)
-{
-    m_AcceptedProposals = 0;
-    for (int it = 0; it < m_Iterations;it++)
-    {
-        if (*abort)
-            break;
-
-        IterateOneStep();
-
-        *numCon = m_ParticleGrid->m_NumConnections;
-        *numPart = m_ParticleGrid->m_NumParticles;
-    }
-    *acceptance = (float)m_AcceptedProposals/m_Iterations;
-}
-
-void MetropolisHastingsSampler::SetParameters(float Temp, int numit, float plen, float curv_hardthres, float chempot_particle)
-{
-    m_Iterations = numit;
-
-    m_BirthProb = 0.25;
-    m_DeathProb = 0.05;
-    m_ShiftProb = 0.15;
-    m_OptShiftProb = 0.1;
-    m_ConnectionProb = 0.45;
-
-    m_ChempotParticle = chempot_particle;
-
-    float sum = m_BirthProb+m_DeathProb+m_ShiftProb+m_OptShiftProb+m_ConnectionProb;
-    m_BirthProb /= sum; m_DeathProb /= sum; m_ShiftProb /= sum; m_OptShiftProb /= sum;
-
-    m_InTemp = Temp;
-    m_ExTemp = 0.01;
-    m_Density = exp(-chempot_particle/m_InTemp);
-
-    len_def = plen;
-    len_sig = 0.0;
-    cap_def = 1.0;
-    cap_sig = 0.0;
-
-    // shift proposal
-    sigma_g = len_def/8.0;
-    gamma_g = 1/(sigma_g*sigma_g*2);
-    Z_g = pow(2*M_PI*sigma_g,3.0/2.0)*(M_PI*sigma_g/len_def);
-
-    // conn proposal
-    dthres = len_def;
-    nthres = curv_hardthres;
-    T_prop = 0.5;
-    dthres *= dthres;
-    stopprobability = exp(-1/T_prop);
-    del_prob = 0.1;
-}
-
-void MetropolisHastingsSampler::SetTemperature(float temp)
-{
-    m_InTemp = temp;
+    m_InTemp = val;
     m_Density = exp(-m_ChempotParticle/m_InTemp);
 }
 
-vnl_vector_fixed<float, 3> MetropolisHastingsSampler::distortn(float sigma, vnl_vector_fixed<float, 3>& vec)
+vnl_vector_fixed<float, 3> MetropolisHastingsSampler::DistortVector(float sigma, vnl_vector_fixed<float, 3>& vec)
 {
-    vec[0] += sigma*mtrand->frandn();
-    vec[1] += sigma*mtrand->frandn();
-    vec[2] += sigma*mtrand->frandn();
+    vec[0] += sigma*m_RandGen->frandn();
+    vec[1] += sigma*m_RandGen->frandn();
+    vec[2] += sigma*m_RandGen->frandn();
 }
 
-vnl_vector_fixed<float, 3> MetropolisHastingsSampler::rand_sphere()
+vnl_vector_fixed<float, 3> MetropolisHastingsSampler::GetRandomDirection()
 {
     vnl_vector_fixed<float, 3> vec;
-    vec[0] += mtrand->frandn();
-    vec[1] += mtrand->frandn();
-    vec[2] += mtrand->frandn();
+    vec[0] += m_RandGen->frandn();
+    vec[1] += m_RandGen->frandn();
+    vec[2] += m_RandGen->frandn();
     vec.normalize();
     return vec;
 }
 
-void MetropolisHastingsSampler::IterateOneStep()
+void MetropolisHastingsSampler::MakeProposal()
 {
-    float randnum = mtrand->frand();
-    //randnum = 0;
+    float randnum = m_RandGen->frand();
 
-    ///////////////////////////////////////////////////////////////
-    //////// Birth Proposal
-    ///////////////////////////////////////////////////////////////
+    // Birth Proposal
     if (randnum < m_BirthProb)
     {
-
-#ifdef TIMING
-        tic(&birthproposal_time);
-        birthstats.propose();
-#endif
-
         vnl_vector_fixed<float, 3> R;
-        enc->drawSpatPosition(R);
-
-        //fprintf(stderr,"drawn: %f, %f, %f\n",R[0],R[1],R[2]);
-        //R.setXYZ(20.5*3, 35.5*3, 1.5*3);
-
-        vnl_vector_fixed<float, 3> N = rand_sphere();
-        //N.setXYZ(1,0,0);
-        float len =  len_def;// + len_sig*(mtrand->frand()-0.5);
+        m_EnergyComputer->drawSpatPosition(R);
+        vnl_vector_fixed<float, 3> N = GetRandomDirection();
+        float len =  m_ParticleLength;
         Particle prop;
         prop.R = R;
         prop.N = N;
         prop.len = len;
 
-
         float prob =  m_Density * m_DeathProb /((m_BirthProb)*(m_ParticleGrid->m_NumParticles+1));
 
-        float ex_energy = enc->computeExternalEnergy(R,N,len,0);
-        float in_energy = enc->computeInternalEnergy(&prop);
-
+        float ex_energy = m_EnergyComputer->computeExternalEnergy(R,N,len,0);
+        float in_energy = m_EnergyComputer->computeInternalEnergy(&prop);
         prob *= exp((in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
 
-        if (prob > 1 || mtrand->frand() < prob)
+        if (prob > 1 || m_RandGen->frand() < prob)
         {
             Particle *p = m_ParticleGrid->NewParticle(R);
             if (p!=0)
@@ -158,83 +99,53 @@ void MetropolisHastingsSampler::IterateOneStep()
                 p->R = R;
                 p->N = N;
                 p->len = len;
-#ifdef TIMING
-                birthstats.accepted();
-#endif
                 m_AcceptedProposals++;
             }
         }
-
-#ifdef TIMING
-        toc(&birthproposal_time);
-#endif
     }
-    ///////////////////////////////////////////////////////////////
-    //////// Death Proposal
-    ///////////////////////////////////////////////////////////////
+    // Death Proposal
     else if (randnum < m_BirthProb+m_DeathProb)
     {
         if (m_ParticleGrid->m_NumParticles > 0)
         {
-#ifdef TIMING
-            tic(&deathproposal_time);
-            deathstats.propose();
-#endif
-
             int pnum = rand()%m_ParticleGrid->m_NumParticles;
             Particle *dp = m_ParticleGrid->GetParticle(pnum);
             if (dp->pID == -1 && dp->mID == -1)
             {
-
-                float ex_energy = enc->computeExternalEnergy(dp->R,dp->N,dp->len,dp);
-                float in_energy = enc->computeInternalEnergy(dp);
+                float ex_energy = m_EnergyComputer->computeExternalEnergy(dp->R,dp->N,dp->len,dp);
+                float in_energy = m_EnergyComputer->computeInternalEnergy(dp);
 
                 float prob = m_ParticleGrid->m_NumParticles * (m_BirthProb) /(m_Density*m_DeathProb); //*SpatProb(dp->R);
                 prob *= exp(-(in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
-                if (prob > 1 || mtrand->frand() < prob)
+                if (prob > 1 || m_RandGen->frand() < prob)
                 {
                     m_ParticleGrid->RemoveParticle(pnum);
-#ifdef TIMING
-                    deathstats.accepted();
-#endif
                     m_AcceptedProposals++;
                 }
             }
-#ifdef TIMING
-            toc(&deathproposal_time);
-#endif
         }
 
     }
-    ///////////////////////////////////////////////////////////////
-    //////// Shift Proposal
-    ///////////////////////////////////////////////////////////////
+    // Shift Proposal
     else  if (randnum < m_BirthProb+m_DeathProb+m_ShiftProb)
     {
-        float energy = 0;
         if (m_ParticleGrid->m_NumParticles > 0)
         {
-#ifdef TIMING
-            tic(&shiftproposal_time);
-            shiftstats.propose();
-#endif
-
             int pnum = rand()%m_ParticleGrid->m_NumParticles;
             Particle *p =  m_ParticleGrid->GetParticle(pnum);
             Particle prop_p = *p;
 
-            distortn(sigma_g, prop_p.R);
-            distortn(sigma_g/(2*p->len), prop_p.N);
+            DistortVector(m_Sigma, prop_p.R);
+            DistortVector(m_Sigma/(2*p->len), prop_p.N);
             prop_p.N.normalize();
 
 
-            float ex_energy = enc->computeExternalEnergy(prop_p.R,prop_p.N,p->len,p)
-                    - enc->computeExternalEnergy(p->R,p->N,p->len,p);
-            float in_energy = enc->computeInternalEnergy(&prop_p) - enc->computeInternalEnergy(p);
+            float ex_energy = m_EnergyComputer->computeExternalEnergy(prop_p.R,prop_p.N,p->len,p)
+                    - m_EnergyComputer->computeExternalEnergy(p->R,p->N,p->len,p);
+            float in_energy = m_EnergyComputer->computeInternalEnergy(&prop_p) - m_EnergyComputer->computeInternalEnergy(p);
 
             float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp);
-            // * SpatProb(p->R) / SpatProb(prop_p.R);
-            if (mtrand->frand() < prob)
+            if (m_RandGen->frand() < prob)
             {
                 vnl_vector_fixed<float, 3> Rtmp = p->R;
                 vnl_vector_fixed<float, 3> Ntmp = p->N;
@@ -245,22 +156,13 @@ void MetropolisHastingsSampler::IterateOneStep()
                     p->R = Rtmp;
                     p->N = Ntmp;
                 }
-#ifdef TIMING
-                shiftstats.accepted();
-#endif
                 m_AcceptedProposals++;
             }
-
-#ifdef TIMING
-            toc(&shiftproposal_time);
-#endif
-
         }
-
     }
+    // Optimal Shift Proposal
     else  if (randnum < m_BirthProb+m_DeathProb+m_ShiftProb+m_OptShiftProb)
     {
-        float energy = 0;
         if (m_ParticleGrid->m_NumParticles > 0)
         {
 
@@ -300,16 +202,15 @@ void MetropolisHastingsSampler::IterateOneStep()
             if (!no_proposal)
             {
                 float cos = dot_product(prop_p.N, p->N);
-                float p_rev = exp(-((prop_p.R-p->R).squared_magnitude() + (1-cos*cos))*gamma_g)/Z_g;
+                float p_rev = exp(-((prop_p.R-p->R).squared_magnitude() + (1-cos*cos))*m_Gamma)/m_Z;
 
-                float ex_energy = enc->computeExternalEnergy(prop_p.R,prop_p.N,p->len,p)
-                        - enc->computeExternalEnergy(p->R,p->N,p->len,p);
-                float in_energy = enc->computeInternalEnergy(&prop_p) - enc->computeInternalEnergy(p);
+                float ex_energy = m_EnergyComputer->computeExternalEnergy(prop_p.R,prop_p.N,p->len,p)
+                        - m_EnergyComputer->computeExternalEnergy(p->R,p->N,p->len,p);
+                float in_energy = m_EnergyComputer->computeInternalEnergy(&prop_p) - m_EnergyComputer->computeInternalEnergy(p);
 
                 float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp)*m_ShiftProb*p_rev/(m_OptShiftProb+m_ShiftProb*p_rev);
-                //* SpatProb(p->R) / SpatProb(prop_p.R);
 
-                if (mtrand->frand() < prob)
+                if (m_RandGen->frand() < prob)
                 {
                     vnl_vector_fixed<float, 3> Rtmp = p->R;
                     vnl_vector_fixed<float, 3> Ntmp = p->N;
@@ -324,55 +225,39 @@ void MetropolisHastingsSampler::IterateOneStep()
                 }
             }
         }
-
     }
     else
     {
         if (m_ParticleGrid->m_NumParticles > 0)
         {
-
-#ifdef TIMING
-            tic(&connproposal_time);
-            connstats.propose();
-#endif
-
             int pnum = rand()%m_ParticleGrid->m_NumParticles;
             Particle *p = m_ParticleGrid->GetParticle(pnum);
 
             EndPoint P;
             P.p = p;
-            P.ep = (mtrand->frand() > 0.5)? 1 : -1;
+            P.ep = (m_RandGen->frand() > 0.5)? 1 : -1;
 
             RemoveAndSaveTrack(P);
-            if (TrackBackup.m_Probability != 0)
+            if (m_BackupTrack.m_Probability != 0)
             {
                 MakeTrackProposal(P);
 
-                float prob = (TrackProposal.m_Energy-TrackBackup.m_Energy)/m_InTemp ;
+                float prob = (m_ProposalTrack.m_Energy-m_BackupTrack.m_Energy)/m_InTemp ;
 
-                //            prob = exp(prob)*(TrackBackup.proposal_probability)
-                //                                        /(TrackProposal.proposal_probability);
-                prob = exp(prob)*(TrackBackup.m_Probability * pow(del_prob,TrackProposal.m_Length))
-                        /(TrackProposal.m_Probability * pow(del_prob,TrackBackup.m_Length));
-                if (mtrand->frand() < prob)
+                prob = exp(prob)*(m_BackupTrack.m_Probability * pow(m_DelProb,m_ProposalTrack.m_Length))
+                        /(m_ProposalTrack.m_Probability * pow(m_DelProb,m_BackupTrack.m_Length));
+                if (m_RandGen->frand() < prob)
                 {
-                    ImplementTrack(TrackProposal);
-#ifdef TIMING
-                    connstats.accepted();
-#endif
+                    ImplementTrack(m_ProposalTrack);
                     m_AcceptedProposals++;
                 }
                 else
                 {
-                    ImplementTrack(TrackBackup);
+                    ImplementTrack(m_BackupTrack);
                 }
             }
             else
-                ImplementTrack(TrackBackup);
-
-#ifdef TIMING
-            toc(&connproposal_time);
-#endif
+                ImplementTrack(m_BackupTrack);
         }
     }
 }
@@ -381,9 +266,7 @@ void MetropolisHastingsSampler::IterateOneStep()
 void MetropolisHastingsSampler::ImplementTrack(Track &T)
 {
     for (int k = 1; k < T.m_Length;k++)
-    {
         m_ParticleGrid->CreateConnection(T.track[k-1].p,T.track[k-1].ep,T.track[k].p,-T.track[k].ep);
-    }
 }
 
 
@@ -391,15 +274,11 @@ void MetropolisHastingsSampler::ImplementTrack(Track &T)
 void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
 {
     EndPoint Current = P;
-
     int cnt = 0;
     float energy = 0;
     float AccumProb = 1.0;
-    TrackBackup.track[cnt] = Current;
-
+    m_BackupTrack.track[cnt] = Current;
     EndPoint Next;
-
-
 
     for (;;)
     {
@@ -446,31 +325,25 @@ void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
             { fprintf(stderr,"MetropolisHastingsSampler_randshift: Connection inconsistent 4\n"); break; }
         }
 
-
         ComputeEndPointProposalDistribution(Current);
-
-        AccumProb *= (simpsamp.probFor(Next));
+        AccumProb *= (m_SimpSamp.probFor(Next));
 
         if (Next.p == 0) // no successor -> break
             break;
 
-        energy += enc->computeInternalEnergyConnection(Current.p,Current.ep,Next.p,Next.ep);
+        energy += m_EnergyComputer->computeInternalEnergyConnection(Current.p,Current.ep,Next.p,Next.ep);
 
         Current = Next;
         Current.ep *= -1;
         cnt++;
-        TrackBackup.track[cnt] = Current;
+        m_BackupTrack.track[cnt] = Current;
 
-
-        if (mtrand->rand() > del_prob)
-        {
+        if (m_RandGen->rand() > m_DelProb)
             break;
-        }
-
     }
-    TrackBackup.m_Energy = energy;
-    TrackBackup.m_Probability = AccumProb;
-    TrackBackup.m_Length = cnt+1;
+    m_BackupTrack.m_Energy = energy;
+    m_BackupTrack.m_Probability = AccumProb;
+    m_BackupTrack.m_Length = cnt+1;
 }
 
 void MetropolisHastingsSampler::MakeTrackProposal(EndPoint P)
@@ -479,37 +352,32 @@ void MetropolisHastingsSampler::MakeTrackProposal(EndPoint P)
     int cnt = 0;
     float energy = 0;
     float AccumProb = 1.0;
-    TrackProposal.track[cnt++] = Current;
+    m_ProposalTrack.track[cnt++] = Current;
     Current.p->label = 1;
 
     for (;;)
     {
-
         // next candidate is already connected
         if ((Current.ep == 1 && Current.p->pID != -1) || (Current.ep == -1 && Current.p->mID != -1))
             break;
 
         // track too long
-        if (cnt > 250)
-            break;
+//        if (cnt > 250)
+//            break;
 
         ComputeEndPointProposalDistribution(Current);
 
-        //       // no candidates anymore
-        //       if (simpsamp.isempty())
-        //         break;
-
-        int k = simpsamp.draw(mtrand->frand());
+        int k = m_SimpSamp.draw(m_RandGen->frand());
 
         // stop tracking proposed
         if (k==0)
             break;
 
-        EndPoint Next = simpsamp.objs[k];
-        float probability = simpsamp.probFor(k);
+        EndPoint Next = m_SimpSamp.objs[k];
+        float probability = m_SimpSamp.probFor(k);
 
         // accumulate energy and proposal distribution
-        energy += enc->computeInternalEnergyConnection(Current.p,Current.ep,Next.p,Next.ep);
+        energy += m_EnergyComputer->computeInternalEnergyConnection(Current.p,Current.ep,Next.p,Next.ep);
         AccumProb *= probability;
 
         // track to next endpoint
@@ -517,16 +385,16 @@ void MetropolisHastingsSampler::MakeTrackProposal(EndPoint P)
         Current.ep *= -1;
 
         Current.p->label = 1;  // put label to avoid loops
-        TrackProposal.track[cnt++] = Current;
+        m_ProposalTrack.track[cnt++] = Current;
     }
 
-    TrackProposal.m_Energy = energy;
-    TrackProposal.m_Probability = AccumProb;
-    TrackProposal.m_Length = cnt;
+    m_ProposalTrack.m_Energy = energy;
+    m_ProposalTrack.m_Probability = AccumProb;
+    m_ProposalTrack.m_Length = cnt;
 
     // clear labels
-    for (int j = 0; j < TrackProposal.m_Length;j++)
-        TrackProposal.track[j].p->label = 0;
+    for (int j = 0; j < m_ProposalTrack.m_Length;j++)
+        m_ProposalTrack.track[j].p->label = 0;
 }
 
 void MetropolisHastingsSampler::ComputeEndPointProposalDistribution(EndPoint P)
@@ -537,9 +405,9 @@ void MetropolisHastingsSampler::ComputeEndPointProposalDistribution(EndPoint P)
     float dist,dot;
     vnl_vector_fixed<float, 3> R = p->R + (p->N * (ep*p->len) );
     m_ParticleGrid->ComputeNeighbors(R);
-    simpsamp.clear();
+    m_SimpSamp.clear();
 
-    simpsamp.add(stopprobability,EndPoint(0,0));
+    m_SimpSamp.add(m_StopProb,EndPoint(0,0));
 
     for (;;)
     {
@@ -550,31 +418,36 @@ void MetropolisHastingsSampler::ComputeEndPointProposalDistribution(EndPoint P)
             if (p2->mID == -1)
             {
                 dist = (p2->R - p2->N * p2->len - R).squared_magnitude();
-                if (dist < dthres)
+                if (dist < m_DistanceThreshold)
                 {
                     dot = dot_product(p2->N,p->N) * ep;
-                    if (dot > nthres)
+                    if (dot > m_CurvatureThreshold)
                     {
-                        float en = enc->computeInternalEnergyConnection(p,ep,p2,-1);
-                        simpsamp.add(exp(en/T_prop),EndPoint(p2,-1));
+                        float en = m_EnergyComputer->computeInternalEnergyConnection(p,ep,p2,-1);
+                        m_SimpSamp.add(exp(en/m_TractProb),EndPoint(p2,-1));
                     }
                 }
             }
             if (p2->pID == -1)
             {
                 dist = (p2->R + p2->N * p2->len - R).squared_magnitude();
-                if (dist < dthres)
+                if (dist < m_DistanceThreshold)
                 {
                     dot = dot_product(p2->N,p->N) * (-ep);
-                    if (dot > nthres)
+                    if (dot > m_CurvatureThreshold)
                     {
-                        float en = enc->computeInternalEnergyConnection(p,ep,p2,+1);
-                        simpsamp.add(exp(en/T_prop),EndPoint(p2,+1));
+                        float en = m_EnergyComputer->computeInternalEnergyConnection(p,ep,p2,+1);
+                        m_SimpSamp.add(exp(en/m_TractProb),EndPoint(p2,+1));
                     }
                 }
             }
         }
     }
+}
+
+int MetropolisHastingsSampler::GetNumAcceptedProposals()
+{
+    return m_AcceptedProposals;
 }
 
 

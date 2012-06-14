@@ -462,12 +462,13 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         if(m_Interpolation_Flag) MITK_INFO << "Shell interpolation: gradient direction differ more than one 1 degree";
       }
 
-      IndiciesVector min_shell;
-      IndiciesVector max_shell;
-      int Interpolation_SHOrder = 10;
+      m_ReconstructionType = Mode_Analytical3Shells;
 
       if(m_Interpolation_Flag)
       {
+        IndiciesVector min_shell;
+        IndiciesVector max_shell;
+        int Interpolation_SHOrder = 10;
 
         //fewer directions
         if (vecSize1 <= vecSize2 )      { min_shell = shell1;}
@@ -478,6 +479,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         if (vecSize1 >= vecSize2 )      { max_shell = shell1;}
         else                            { max_shell = shell2;}
         if (max_shell.size() < vecSize3){ max_shell = shell3;}
+
+        m_MaxDirections = max_shell.size();
 
         //SH-order determination
         while( ((Interpolation_SHOrder+1)*(Interpolation_SHOrder+2)/2) > min_shell.size() && Interpolation_SHOrder > L )
@@ -521,7 +524,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         ComputeSphericalHarmonicsBasis(Q, tempSHBasis, Interpolation_SHOrder);
         temp = new vnl_matrix_inverse<double>((*tempSHBasis));
 
-        m_Interpolation_SHT1_inv = new vnl_matrix<double>(temp->inverse());
+        m_Interpolation_SHT2_inv = new vnl_matrix<double>(temp->inverse());
 
         delete Q;
         delete temp;
@@ -537,14 +540,15 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
         temp = new vnl_matrix_inverse<double>((*tempSHBasis));
 
-        m_Interpolation_SHT1_inv = new vnl_matrix<double>(temp->inverse());
+        m_Interpolation_SHT3_inv = new vnl_matrix<double>(temp->inverse());
 
         delete Q;
         delete temp;
         delete tempSHBasis;
-      }
 
-      m_ReconstructionType = Mode_Analytical3Shells;
+        ComputeReconstructionMatrix(max_shell);
+        return;
+      }
     }
   }
 
@@ -554,7 +558,24 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   }
 
   // Reconstruction Matrix
-  ComputeReconstructionMatrix(shell1);
+  ComputeReconstructionMatrix(shell2);
+
+  m_scalingFactors = new vnl_vector<double>((L+1)*(L+2)/2);
+  double P=2/(16*M_PI);
+  (*m_scalingFactors)[0]=0;
+  for (int l=2; l < L; l=l+2){
+    for (int m=-l; m<l; m++){
+      double j=l*(l+1)/2+m;
+      double prod=P*pow(-1,(float)l/2);
+      double prod2=1;
+      for (int n=3; n<=l-1; n=n+2)
+        prod=prod*n;
+      for (int n=2; n<=l; n=n+2)
+        prod2=prod2*n;
+      (*m_scalingFactors)[j]=-l*(l+1)*prod/prod2;
+    }
+  }
+
 }
 
 
@@ -737,24 +758,31 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   it++;
   // it = b-value = 1000
   IndiciesVector Shell1Indiecies = it->second;
-  int vecSize1 = it->second.size();
   it++;
   // it = b-value = 2000
   IndiciesVector Shell2Indiecies = it->second;
-  int vecSize2 = it->second.size();
   it++;
   // it = b-value = 3000
   IndiciesVector Shell3Indiecies = it->second;
-  int vecSize3 = it->second.size();
+
+
+  if(!m_Interpolation_Flag)
+  {
+    m_MaxDirections = Shell1Indiecies.size();
+  }
 
 
   // Nx3 Signal Matrix with E(0) = Shell 1, E(1) = Shell 2, E(2) = Shell 3
-  vnl_matrix< double > * E = new vnl_matrix<double>(Shell1Indiecies.size(), 3);
+  vnl_matrix< double > E(m_MaxDirections, 3);
 
-  vnl_vector<double> * AlphaValues = new vnl_vector<double>(Shell1Indiecies.size());
-  vnl_vector<double> * BetaValues = new vnl_vector<double>(Shell1Indiecies.size());
-  vnl_vector<double> * LAValues = new vnl_vector<double>(Shell1Indiecies.size());
-  vnl_vector<double> * PValues = new vnl_vector<double>(Shell1Indiecies.size());
+  vnl_vector<double> AlphaValues(m_MaxDirections);
+  vnl_vector<double> BetaValues(m_MaxDirections);
+  vnl_vector<double> LAValues(m_MaxDirections);
+  vnl_vector<double> PValues(m_MaxDirections);
+
+  vnl_vector<double> DataShell1(Shell1Indiecies.size());
+  vnl_vector<double> DataShell2(Shell2Indiecies.size());
+  vnl_vector<double> DataShell3(Shell3Indiecies.size());
 
   OdfPixelType odf(0.0);
 
@@ -767,9 +795,15 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       GradientVectorType b = gradientInputImageIterator.Get();
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
       {
-        E->put(i,0, static_cast<double>(b[Shell1Indiecies[i]]));
-        E->put(i,1, static_cast<double>(b[Shell2Indiecies[i]]));
-        E->put(i,2, static_cast<double>(b[Shell3Indiecies[i]]));
+        DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
+      }
+      for(int i = 0 ; i < Shell2Indiecies.size(); i++)
+      {
+        DataShell2[i] = static_cast<double>(b[Shell2Indiecies[i]]);
+      }
+      for(int i = 0 ; i < Shell3Indiecies.size(); i++)
+      {
+        DataShell3[i] = static_cast<double>(b[Shell3Indiecies[i]]);
       }
 
 
@@ -784,29 +818,34 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       if(m_Interpolation_Flag)
       {
-        E->set_column(0, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (E->get_column(0))));
-        E->set_column(1, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (E->get_column(1))));
-        E->set_column(2, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (E->get_column(2))));
+        E.set_column(0, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (DataShell1)));
+        E.set_column(1, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT2_inv) * (DataShell2)));
+        E.set_column(2, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT3_inv) * (DataShell3)));
+      }else
+      {
+        E.set_column(0, (DataShell1));
+        E.set_column(1, (DataShell2));
+        E.set_column(2, (DataShell3));
       }
 
       // Normalize the Signal: Si/S0
-      S_S0Normalization(*E,bzeroImageIterator.Get());
+      S_S0Normalization(E,bzeroImageIterator.Get());
 
       //Implements Eq. [19] and Fig. 4.
-      Threshold(*E);
+      Threshold(E);
 
       //inqualities [31]. Taking the lograithm of th first tree inqualities
       //convert the quadratic inqualities to linear ones.
-      Projection1(*E);
+      Projection1(E);
 
       double E1, E2, E3, P2,A,B2,B,P,alpha,beta,lambda, ER1, ER2;
 
-      for( unsigned int i = 0; i< Shell1Indiecies.size(); i++ )
+      for( unsigned int i = 0; i< m_MaxDirections; i++ )
       {
 
-        E1 = E->get(i,0);
-        E2 = E->get(i,1);
-        E3 = E->get(i,2);
+        E1 = E.get(i,0);
+        E2 = E.get(i,1);
+        E3 = E.get(i,2);
 
         P2 = E2-E1*E1;
         A = (E3 -E1*E2) / ( 2* P2);
@@ -830,22 +869,23 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
             + std::fabs((lambda-1) * (std::pow(alpha, 3) - std::pow(beta, 3)) + (std::pow(beta, 3) - E3 ));
 
 
-        PValues->put(i, P);
-        AlphaValues->put(i, alpha);
-        BetaValues->put(i, beta);
-        LAValues->put(i,(lambda * (ER1 < ER2)) + ((1-lambda) * (ER1 >= ER2)));
+        PValues.put(i, P);
+        AlphaValues.put(i, alpha);
+        BetaValues.put(i, beta);
+        LAValues.put(i,(lambda * (ER1 < ER2)) + ((1-lambda) * (ER1 >= ER2)));
 
       }
-      Projection2(*PValues, *AlphaValues, *BetaValues);
+      Projection2(PValues, AlphaValues, BetaValues);
 
       //Threshold(*AlphaValues);
       //Threshold(*BetaValues);
 
-      DoubleLogarithm(*AlphaValues);
-      DoubleLogarithm(*BetaValues);
+      DoubleLogarithm(AlphaValues);
+      DoubleLogarithm(BetaValues);
 
-      vnl_vector<double> SignalVector(element_product((*LAValues) , (*AlphaValues)-(*BetaValues)) + (*BetaValues));
+      vnl_vector<double> SignalVector(element_product((LAValues) , (AlphaValues)-(BetaValues)) + (BetaValues));
       vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
+      //coeffs = element_product(*m_scalingFactors , coeffs);
 
       // the first coeff is a fix value
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
@@ -863,11 +903,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     ++bzeroImageIterator;
     ++gradientInputImageIterator;
   }
-  delete E;
-  delete AlphaValues;
-  delete BetaValues;
-  delete PValues;
-  delete LAValues;
+
 }
 
 

@@ -134,7 +134,7 @@ public:
 
 protected:
     DiffusionMultiShellQballReconstructionImageFilter();
-    ~DiffusionMultiShellQballReconstructionImageFilter() { delete m_ODFSphericalHarmonicBasisMatrix; delete m_CoeffReconstructionMatrix; };
+    ~DiffusionMultiShellQballReconstructionImageFilter() { };
     void PrintSelf(std::ostream& os, Indent indent) const;
 
     void ComputeReconstructionMatrix(IndiciesVector const & refVector);
@@ -169,12 +169,15 @@ private:
     CoefficientMatrixType m_Interpolation_SHT2_inv;
     CoefficientMatrixType m_Interpolation_SHT3_inv;
     CoefficientMatrixType m_Interpolation_TARGET_SH;
+    int m_MaxDirections;
 
     //CoefficientMatrixType m_ReconstructionMatrix;
     CoefficientMatrixType m_CoeffReconstructionMatrix;
     CoefficientMatrixType m_ODFSphericalHarmonicBasisMatrix;
     //CoefficientMatrixType m_SignalReonstructionMatrix;
     //CoefficientMatrixType m_SHBasisMatrix;
+
+    vnl_vector<double> * m_scalingFactors;
 
     /** container to hold gradient directions */
     GradientDirectionContainerType::Pointer m_GradientDirectionContainer;

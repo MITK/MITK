@@ -10,14 +10,14 @@
     <x>0</x>
     <y>0</y>
     <width>465</width>
-    <height>475</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_11">
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
     <layout class="QGridLayout" name="gridLayout_5">
      <item row="0" column="0">
       <widget class="QLabel" name="label_2">
@@ -44,13 +44,39 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item>
+    <widget class="QLabel" name="m_ErrorMessageLabel">
+     <property name="text">
+      <string>Error Message</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="m_IgnoreZerosCheckbox">
+     <property name="text">
+      <string>Ignore zero-valued voxels</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
       <string>Statistics</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
        <widget class="QTableWidget" name="m_StatisticsTable">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -69,15 +95,6 @@
           <width>16777215</width>
           <height>144</height>
          </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>250</width>
-          <height>185</height>
-         </size>
-        </property>
-        <property name="lineWidth">
-         <number>1</number>
         </property>
         <property name="verticalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -181,158 +198,115 @@
         </column>
        </widget>
       </item>
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="m_ButtonCopyStatisticsToClipboard">
+           <property name="text">
+            <string>Copy to Clipboard</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
       <size>
-       <width>447</width>
-       <height>16777215</height>
+       <width>150</width>
+       <height>160</height>
       </size>
      </property>
-     <property name="autoFillBackground">
+     <property name="title">
+      <string>Histogram</string>
+     </property>
+     <property name="checkable">
       <bool>false</bool>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="lineWidth">
-      <number>-1</number>
-     </property>
-     <property name="midLineWidth">
-      <number>-1</number>
-     </property>
-     <property name="currentIndex">
-      <number>1</number>
-     </property>
-     <widget class="QWidget" name="page">
-      <layout class="QGridLayout" name="gridLayout_8">
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="minimumSize">
-          <size>
-           <width>150</width>
-           <height>160</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>Histogram</string>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item row="1" column="0">
-           <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget" native="true">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-         </layout>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget">
+         <zorder>widget_2</zorder>
         </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_2">
-      <layout class="QGridLayout" name="gridLayout_9">
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>Intensity Profile</string>
+        <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget"/>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widget_2" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
          </property>
-         <layout class="QGridLayout" name="gridLayout_10">
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget" native="true"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <layout class="QGridLayout" name="gridLayout_7">
-     <item row="0" column="0">
-      <widget class="QPushButton" name="m_ButtonCopyStatisticsToClipboard">
-       <property name="text">
-        <string>Statistics to Clipboard</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="m_ButtonCopyHistogramToClipboard">
-       <property name="text">
-        <string>Histogram to Clipboard</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="5" column="1">
-    <spacer name="spacer2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Preferred</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>1</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="m_ErrorMessageLabel">
-     <property name="text">
-      <string>Error Message</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QCheckBox" name="m_IgnoreZerosCheckbox">
-     <property name="text">
-      <string>Ignore zero-valued voxels</string>
-     </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="m_ButtonCopyHistogramToClipboard">
+           <property name="text">
+            <string>Copy to Clipboard</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

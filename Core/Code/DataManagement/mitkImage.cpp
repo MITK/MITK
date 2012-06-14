@@ -158,10 +158,21 @@ double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned
 
   // Comparison ?>=0 not needed since all position[i] and timestep are unsigned int
   // (position[0]>=0 && position[1] >=0 && position[2]>=0 && timestep>=0)
-  // &&
-  if ( (unsigned int)position[0] < imageDims[0] && (unsigned int)position[1] < imageDims[1] &&
-       ( (imageDims[2] == 0) || (unsigned int)position[2] < imageDims[2]) // in case a 2D Image passed in, the third dimension could be set to 0 causing the if() to fail
-    /*&& (unsigned int)timestep < imageDims[3]*/ )
+  // bug-11978 : we still need to catch index with negative values
+  if ( position[0] < 0 ||
+       position[1] < 0 ||
+       position[2] < 0 )
+  {
+    MITK_WARN << "Given position ("<< position << ") is out of image range, returning 0." ;
+  }
+  // check if the given position is inside the index range of the image, the 3rd dimension needs to be compared only if the dimension is not 0
+  else if ( (unsigned int)position[0] >= imageDims[0] ||
+            (unsigned int)position[1] >= imageDims[1] ||
+            ( imageDims[2] && (unsigned int)position[2] >= imageDims[2] ))
+  {
+    MITK_WARN << "Given position ("<< position << ") is out of image range, returning 0." ;
+  }
+  else
   {
     const unsigned int offset = position[0] + position[1]*imageDims[0] + position[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
 
@@ -182,20 +193,7 @@ double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position
   Index3D itkIndex;
   this->GetGeometry()->WorldToIndex(position, itkIndex);
 
-  const unsigned int* imageDims = this->m_ImageDescriptor->GetDimensions();
-  const mitk::PixelType ptype = this->m_ImageDescriptor->GetChannelTypeById(0);
-
-  //if ( (itkIndex[0]>=0 && itkIndex[1] >=0 && itkIndex[2]>=0 && timestep>=0)
-  //     &&
-  // lines above taken from comparison since always true due to unsigned type
-  if (((unsigned int)itkIndex[0] < imageDims[0] && 
-        (unsigned int)itkIndex[1] < imageDims[1] &&
-          (imageDims[2] == 0) ) || ((unsigned int)itkIndex[2] < imageDims[2])) // in case a 2D Image passed in, the third dimension could be set to 0 causing the if() to fail
-  {
-    const unsigned int offset = itkIndex[0] + itkIndex[1]*imageDims[0] + itkIndex[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
-
-    mitkPixelTypeMultiplex3( AccessPixel, ptype, this->GetData(), offset, value );
-  }
+  value = this->GetPixelValueByIndex( itkIndex, timestep);
 
   return value;
 }

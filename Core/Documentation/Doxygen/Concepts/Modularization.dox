@@ -1,0 +1,44 @@
+/**
+
+\page ModularizationPage Modular MITK
+
+MITK has been designed to be modular and flexible, to facilitate reuse of existing code and functionality if possible. As such there are several levels of modularization which can be chosen when working with MITK, depending on the use case.
+
+\section ModularizationPageOverview Overview
+
+The general hierarchy of modularization runs micro service, module, view, plug-in, perspective and finally application.
+
+\subsection ModularizationPageMicroServices Micro Services
+
+A \ref MicroServices_Overview "micro service" is a reusable component provided by MITK modules. It can be accessed by other MITK modules or MITK plug-ins via its declared interface.
+
+\subsection ModularizationPageModules Modules
+
+Modules can be found in the MITK/Modules directory (with the exception of the core module in MITK/Core). Each module is a shared library that provides algorithms, data structures and similar code. Many modules are gui independent. A module is only build if it is required by other code, e.g. if a plug-ins is activated that requires it.
+
+\subsection ModularizationPageViews Views
+
+One of the smallest units in the MITK application framework (\ref FurtherReading "Blueberry") is a \e view. A view is always part of a plug-in and provides one specific function, such as grouping all gui elements needed for providing segmentation algorithms or loading dicom images. Views usually contain any code which communicates with the user, performs input checking and similar, but no advanced algorithms.
+
+\subsection ModularizationPagePlugInBundles Plugins
+
+The next smallest unit is a CTK Plug-in (the term \e Bundle is used interchangeably). They can be found in MITK/Plugins or MITK/BlueBerry/Bundles. Plugins can be individually switched on and off during the CMake configuration.
+
+A plugin usually represents a solution to a specific problem, such as segmentation or data management. As such they may provide any number of views and other contributions to the MITK application framework.
+
+If you want to create your own MITK plugin you find further information \ref NewPluginPage "here".
+
+\subsection ModularizationPagePerspectives Perspectives
+
+Perspectives represent a configuration for the MITK application framework (specifically, for the \e Workbench) needed for a specific workflow. They allow the arrangement of different views (contributed by different plug-ins) to reflect the usage scenario, such as a data loading view in the top right, a segmentation view to the right and a visualization view to the bottom right. A perspective is provided by arbitrary plug-ins as an extension (contribution) to the application framework.
+
+\subsection ModularizationPageApplications Applications
+
+A specific selection of plug-ins together with custom configuration data defines the functionality for an application. The application corresponds to an executable and enables very specific program behaviour and configuration.
+
+Example applications can be found in the MITK/Applications directory.
+
+\section ModularizationPageHowTo How to create your own application
+
+It is suggested to use the project generator provided by MITK unless one knows what one is doing. See \ref NewPluginWithProject "here" for more information.
+*/

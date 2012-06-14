@@ -63,7 +63,7 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
   connect( m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
   layout->addWidget( m_Slider );
 
-  QPushButton* okButton = new QPushButton("Ok", this);
+  QPushButton* okButton = new QPushButton("Create Segmentation", this);
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnAcceptThresholdPreview()));
   okButton->setFont( f );
   layout->addWidget( okButton );
@@ -143,10 +143,12 @@ void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
 
     if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar
     {
+      this->thresholdAccepted();
       m_BinaryThresholdTool->AcceptCurrentThresholdValue( organName, color );
     }
     else
     {
+      this->thresholdCanceled();
       m_BinaryThresholdTool->CancelThresholding();
     }
   }

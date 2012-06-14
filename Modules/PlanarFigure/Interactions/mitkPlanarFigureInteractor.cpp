@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
+#define PLANARFIGUREINTERACTOR_DBG MITK_DEBUG("PlanarFigureInteractor") << __LINE__ << ": "
+
 #include "mitkPlanarFigureInteractor.h"
 #include "mitkPointOperation.h"
 #include "mitkPositionEvent.h"
@@ -153,11 +155,13 @@ bool mitk::PlanarFigureInteractor
   switch (action->GetActionId())
   {
   case AcDONOTHING:
+    PLANARFIGUREINTERACTOR_DBG << "AcDONOTHING";
     ok = true;
     break;
 
   case AcCHECKOBJECT:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcCHECKOBJECT";
       if ( planarFigure->IsPlaced() )
       {
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
@@ -172,6 +176,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcADD:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcADD";
       // Invoke event to notify listeners that placement of this PF starts now
       planarFigure->InvokeEvent( StartPlacementPlanarFigureEvent() );
 
@@ -222,6 +227,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcMOVEPOINT:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcMOVEPOINT";
       bool isEditable = true;
       m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
 
@@ -259,6 +265,8 @@ bool mitk::PlanarFigureInteractor
 
   case AcCHECKNMINUS1:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcCHECKNMINUS1";
+
       if ( planarFigure->GetNumberOfControlPoints() >=
         planarFigure->GetMaximumNumberOfControlPoints() )
       {
@@ -288,6 +296,8 @@ bool mitk::PlanarFigureInteractor
 
   case AcCHECKEQUALS1:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcCHECKEQUALS1";
+
       // NOTE: Action name is a bit misleading; this action checks whether
       // the figure has already the minimum number of required points to
       // be finished (by double-click)
@@ -330,6 +340,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcCHECKPOINT:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcCHECKPOINT";
       // Check if the distance of the current point to the previously set point in display coordinates
       // is sufficient (if a previous point exists)
 
@@ -359,6 +370,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcADDPOINT:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcADDPOINT";
       bool selected = false;
       bool isEditable = true;
       m_DataNode->GetBoolProperty("selected", selected);
@@ -419,6 +431,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcDESELECTPOINT:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcDESELECTPOINT";
       planarFigure->DeselectControlPoint();
 
       // Issue event so that listeners may update themselves
@@ -435,6 +448,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcCHECKHOVERING:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcCHECKHOVERING";
       mitk::Point2D pointProjectedOntoLine;
       int previousControlPoint = mitk::PlanarFigureInteractor::IsPositionOverFigure(
         stateEvent, planarFigure,
@@ -550,6 +564,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcCHECKSELECTED:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcCHECKSELECTED";
       bool selected = false;
       m_DataNode->GetBoolProperty("selected", selected);
 
@@ -567,8 +582,10 @@ bool mitk::PlanarFigureInteractor
 
   case AcSELECTPICKEDOBJECT:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcSELECTPICKEDOBJECT";
       //// Invoke event to notify listeners that this planar figure should be selected
       //planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
+      //planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
 
       // Check if planar figure is marked as "editable"
       bool isEditable = true;
@@ -609,6 +626,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcENTEROBJECT:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcENTEROBJECT";
       bool selected = false;
       m_DataNode->GetBoolProperty("selected", selected);
 
@@ -638,6 +656,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcSELECTPOINT:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcSELECTPOINT";
       // Invoke event to notify listeners that interaction with this PF starts now
       planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
 
@@ -657,6 +676,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcREMOVEPOINT:
     {
+      PLANARFIGUREINTERACTOR_DBG << "AcREMOVEPOINT";
       bool isExtendable = false;
       m_DataNode->GetBoolProperty("planarfigure.isextendable", isExtendable);
 

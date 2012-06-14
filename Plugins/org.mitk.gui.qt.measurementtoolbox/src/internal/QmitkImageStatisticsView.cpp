@@ -256,7 +256,7 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
   // Clear any unreferenced images
   this->RemoveOrphanImages();
 
-  if ( !m_Visible )
+  if ( !m_Visible || selectedNodes.isEmpty())
   {
     return;
   }

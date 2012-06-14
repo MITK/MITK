@@ -43,6 +43,7 @@ set(CPP_FILES
   
   IGTExceptionHandling/mitkIGTException.cpp
   IGTExceptionHandling/mitkIGTHardwareException.cpp
+  IGTExceptionHandling/mitkIGTIOException.cpp
 )
 
 if(MITK_USE_MICRON_TRACKER)

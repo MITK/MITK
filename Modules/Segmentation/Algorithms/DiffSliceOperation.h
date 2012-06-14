@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkDiffSliceOperation_h_Included
 #define mitkDiffSliceOperation_h_Included
 
-#include "MitkExports.h"
+#include "SegmentationExports.h"
 #include "mitkCommon.h"
 #include <mitkOperation.h>
 //#include "mitkCompressedImageContainer.h"

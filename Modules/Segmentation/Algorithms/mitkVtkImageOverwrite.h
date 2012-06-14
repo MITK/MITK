@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkVtkImageOverwrite_h_Included
 
 #include <vtkImageReslice.h>
-#include "MitkExports.h"
+#include "SegmentationExports.h"
 
   /** \brief A vtk Filter based on vtkImageReslice with the aditional feature to write a slice into the given input volume.
     All optimizations for e.g. the plane directions or interpolation are stripped away, the algorithm only interpolates nearest

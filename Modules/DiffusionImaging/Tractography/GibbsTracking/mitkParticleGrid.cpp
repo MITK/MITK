@@ -85,7 +85,9 @@ bool ParticleGrid::ReallocateGrid()
 
 Particle* ParticleGrid::GetParticle(int ID)
 {
-    return &m_Particles[ID];
+    if (ID!=-1)
+        return &m_Particles[ID];
+    return NULL;
 }
 
 

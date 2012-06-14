@@ -50,8 +50,8 @@ protected:
 
     void AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container);
 
-    void labelPredecessors(Particle *dp, vtkSmartPointer<vtkPolyLine> container);
-    void labelSuccessors(Particle *dp, vtkSmartPointer<vtkPolyLine> container);
+    void LabelPredecessors(Particle* p, int ep, vtkPolyLine* container);
+    void LabelSuccessors(Particle* p, int ep, vtkPolyLine* container);
 
     itk::Point<float>           m_LastPoint;
     float                       m_FiberLength;

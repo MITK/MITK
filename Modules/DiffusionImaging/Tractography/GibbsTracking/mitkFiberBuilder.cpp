@@ -46,8 +46,8 @@ vtkSmartPointer<vtkPolyData> FiberBuilder::iterate(int minFiberLength)
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
             dp->label = cur_label;
             dp->numerator = 0;
-            labelPredecessors(dp, container);
-            labelSuccessors(dp, container);
+            LabelPredecessors(dp, -1, container);
+            LabelSuccessors(dp, 1, container);
             cur_label++;
             if(m_FiberLength >= minFiberLength)
             {
@@ -70,6 +70,54 @@ vtkSmartPointer<vtkPolyData> FiberBuilder::iterate(int minFiberLength)
     return fiberPolyData;
 }
 
+void FiberBuilder::LabelPredecessors(Particle* p, int ep, vtkPolyLine* container)
+{
+    Particle* p2 = NULL;
+    if (ep==1)
+        p2 = m_Grid->GetParticle(p->pID);
+    else
+        p2 = m_Grid->GetParticle(p->mID);
+
+    if (p2!=NULL && p2->label==0)
+    {
+        p2->label = 1;    // assign particle to current fiber
+
+        if (p2->pID==p->ID)
+            LabelPredecessors(p2, -1, container);
+        else if (p2->mID==p->ID)
+            LabelPredecessors(p2, 1, container);
+        else
+            std::cout << "FiberBuilder: connection inconsistent (LabelPredecessors)" << std::endl;
+    }
+
+    AddPoint(p, container);
+}
+
+
+void FiberBuilder::LabelSuccessors(Particle* p, int ep, vtkPolyLine* container)
+{
+    // TODO:: avoid double entry of first
+    AddPoint(p, container);
+
+    Particle* p2 = NULL;
+    if (ep==1)
+        p2 = m_Grid->GetParticle(p->pID);
+    else
+        p2 = m_Grid->GetParticle(p->mID);
+
+    if (p2!=NULL && p2->label==0)
+    {
+        p2->label = 1;    // assign particle to current fiber
+
+        if (p2->pID==p->ID)
+            LabelPredecessors(p2, -1, container);
+        else if (p2->mID==p->ID)
+            LabelPredecessors(p2, 1, container);
+        else
+            std::cout << "FiberBuilder: connection inconsistent (LabelPredecessors)" << std::endl;
+    }
+}
+
 void FiberBuilder::AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container)
 {
     if (dp->inserted)
@@ -90,52 +138,4 @@ void FiberBuilder::AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container
         m_FiberLength += m_LastPoint.EuclideanDistanceTo(point);
 
     m_LastPoint = point;
-}
-
-void FiberBuilder::labelPredecessors(Particle *dp, vtkSmartPointer<vtkPolyLine> container)
-{
-    if (dp->mID != -1 && dp->mID!=dp->ID)
-    {
-        if (dp->ID!=m_Grid->GetParticle(dp->mID)->pID)
-        {
-            if (dp->ID==m_Grid->GetParticle(dp->mID)->mID)
-            {
-                int tmp = m_Grid->GetParticle(dp->mID)->pID;
-                m_Grid->GetParticle(dp->mID)->pID = m_Grid->GetParticle(dp->mID)->mID;
-                m_Grid->GetParticle(dp->mID)->mID = tmp;
-            }
-        }
-        if (m_Grid->GetParticle(dp->mID)->label == 0)
-        {
-            m_Grid->GetParticle(dp->mID)->label = dp->label;
-            m_Grid->GetParticle(dp->mID)->numerator = dp->numerator-1;
-            labelPredecessors(m_Grid->GetParticle(dp->mID), container);
-        }
-    }
-
-    AddPoint(dp, container);
-}
-
-void FiberBuilder::labelSuccessors(Particle *dp, vtkSmartPointer<vtkPolyLine> container)
-{
-    AddPoint(dp, container);
-
-    if (dp->pID != -1 && dp->pID!=dp->ID)
-    {
-        if (dp->ID!=m_Grid->GetParticle(dp->pID)->mID)
-        {
-            if (dp->ID==m_Grid->GetParticle(dp->pID)->pID)
-            {
-                int tmp = m_Grid->GetParticle(dp->pID)->pID;
-                m_Grid->GetParticle(dp->pID)->pID = m_Grid->GetParticle(dp->pID)->mID;
-                m_Grid->GetParticle(dp->pID)->mID = tmp;
-            }
-        }
-        if (m_Grid->GetParticle(dp->pID)->label == 0)
-        {
-            m_Grid->GetParticle(dp->pID)->label = dp->label;
-            m_Grid->GetParticle(dp->pID)->numerator = dp->numerator+1;
-            labelSuccessors(m_Grid->GetParticle(dp->pID), container);
-        }
-    }
 }

@@ -217,9 +217,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
 }
 
-
-
-
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
 ::Projection2( vnl_vector<double> & A, vnl_vector<double> & a, vnl_vector<double> & b, double delta0)
@@ -317,7 +314,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
 }
 
-
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
 ::S_S0Normalization( vnl_vector<double> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
@@ -335,7 +331,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
 }
 
-
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
 ::S_S0Normalization( vnl_matrix<double> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
@@ -352,8 +347,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
     }
   }
 }
-
-
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
@@ -734,13 +727,11 @@ template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread)
 {
-
   typedef typename GradientImagesType::PixelType         GradientVectorType;
 
   // Input Gradient Image and Output ODF Image
   typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(ProcessObject::GetOutput(0));
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
-
 
   // Define Image iterators
   ImageRegionIterator< OutputImageType > odfOutputImageIterator(outputImage, outputRegionForThread);
@@ -771,7 +762,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     m_MaxDirections = Shell1Indiecies.size();
   }
 
-
   // Nx3 Signal Matrix with E(0) = Shell 1, E(1) = Shell 2, E(2) = Shell 3
   vnl_matrix< double > E(m_MaxDirections, 3);
 
@@ -786,6 +776,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
   OdfPixelType odf(0.0);
 
+  double E1, E2, E3, P2,A,B2,B,P,alpha,beta,lambda, ER1, ER2;
+
   // iterate overall voxels of the gradient image region
   while( ! gradientInputImageIterator.IsAtEnd() )
   {
@@ -793,43 +785,27 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     {
       // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
       GradientVectorType b = gradientInputImageIterator.Get();
+
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
-      {
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
-      }
       for(int i = 0 ; i < Shell2Indiecies.size(); i++)
-      {
         DataShell2[i] = static_cast<double>(b[Shell2Indiecies[i]]);
-      }
       for(int i = 0 ; i < Shell3Indiecies.size(); i++)
-      {
         DataShell3[i] = static_cast<double>(b[Shell3Indiecies[i]]);
-      }
-
-
-      // IF GRADIENT DIRECTIONS AND NUMBERS OF DIRECTIONS ARE EQUAL EACH OTHER, THAN DO NOT INTERPOLATE
-
-      //Approximated-Signal by SH fit - using the specific shell directions and values
-      // approximated Signal : S = SHBasis * Coeffs
-      // with Coeffs : C = (B_T * B + lambda * L) ^ -1 * B_T * OS
-      // OS := Original-Signal
-      //E->set_column(1, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(1))));
-      //E->set_column(2, (*m_SHBasisMatrix) * ((*m_SignalReonstructionMatrix) * (E->get_column(2))));
 
       if(m_Interpolation_Flag)
       {
         E.set_column(0, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (DataShell1)));
         E.set_column(1, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT2_inv) * (DataShell2)));
         E.set_column(2, ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT3_inv) * (DataShell3)));
-      }else
-      {
+      }else{
         E.set_column(0, (DataShell1));
         E.set_column(1, (DataShell2));
         E.set_column(2, (DataShell3));
       }
 
       // Normalize the Signal: Si/S0
-      S_S0Normalization(E,bzeroImageIterator.Get());
+      S_S0Normalization(E, bzeroImageIterator.Get());
 
       //Implements Eq. [19] and Fig. 4.
       Threshold(E);
@@ -838,11 +814,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       //convert the quadratic inqualities to linear ones.
       Projection1(E);
 
-      double E1, E2, E3, P2,A,B2,B,P,alpha,beta,lambda, ER1, ER2;
-
       for( unsigned int i = 0; i< m_MaxDirections; i++ )
       {
-
         E1 = E.get(i,0);
         E2 = E.get(i,1);
         E3 = E.get(i,2);
@@ -852,13 +825,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         B2 = A * A -(E1 * E3 - E2 * E2) /P2;
         B = 0;
         if(B2 > 0) B = sqrt(B2);
-
         P = 0;
         if(P2 > 0) P = sqrt(P2);
 
         alpha = A + B;
         beta = A - B;
-
 
         lambda = 0.5 + 0.5 * std::sqrt(1 - std::pow((P * 2 ) / (alpha - beta), 2));;
         ER1 = std::fabs(lambda * (alpha - beta) + (beta - E1 ))
@@ -868,32 +839,27 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
             + std::fabs((lambda-1) * (std::pow(alpha, 2) - std::pow(beta, 2)) + (std::pow(beta, 2) - E2 ))
             + std::fabs((lambda-1) * (std::pow(alpha, 3) - std::pow(beta, 3)) + (std::pow(beta, 3) - E3 ));
 
-
         PValues.put(i, P);
         AlphaValues.put(i, alpha);
         BetaValues.put(i, beta);
         LAValues.put(i,(lambda * (ER1 < ER2)) + ((1-lambda) * (ER1 >= ER2)));
 
       }
-      Projection2(PValues, AlphaValues, BetaValues);
 
-      //Threshold(*AlphaValues);
-      //Threshold(*BetaValues);
+      Projection2(PValues, AlphaValues, BetaValues);
 
       DoubleLogarithm(AlphaValues);
       DoubleLogarithm(BetaValues);
 
       vnl_vector<double> SignalVector(element_product((LAValues) , (AlphaValues)-(BetaValues)) + (BetaValues));
-      vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
-      //coeffs = element_product(*m_scalingFactors , coeffs);
 
+      vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
       // the first coeff is a fix value
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
       odf *= (QBALL_ANAL_RECON_PI*4/NODF);
-      //Normalize(odf);
     }
 
     // set ODF to ODF-Image
@@ -942,33 +908,6 @@ ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<d
       }
     }
   }
-}
-
-template< class T, class TG, class TO, int L, int NOdfDirections>
-bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
-::CheckHemisphericalArrangementOfGradientDirections()
-{
-  // handle acquisition schemes where only half of the spherical
-  // shell is sampled by the gradient directions. In this case,
-  // each gradient direction is duplicated in negative direction.
-  vnl_vector<double> centerMass(3);
-  centerMass.fill(0.0);
-  int count = 0;
-  GradientDirectionContainerType::ConstIterator gdcit1;
-  for( gdcit1 = m_GradientDirectionContainer->Begin(); gdcit1 != m_GradientDirectionContainer->End(); ++gdcit1)
-  {
-    if(gdcit1.Value().one_norm() > 0.0)
-    {
-      centerMass += gdcit1.Value();
-      count ++;
-    }
-  }
-  centerMass /= count;
-  if(centerMass.two_norm() > 0.1)
-  {
-    return false;
-  }
-  return true;
 }
 
 template< class T, class TG, class TO, int L, int NOdfDirections>

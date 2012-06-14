@@ -277,7 +277,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
     ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
 
-    EnergyComputer encomp(&randGen, qballImage, imgSize,spacing,interpolator,particleGrid,mask,mask_oversamp_mult, directionMatrix);
+    EnergyComputer encomp(&randGen, qballImage, interpolator, particleGrid, mask, directionMatrix);
     encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,m_CurvatureHardThreshold,m_InexBalance,m_Chempot2, m_Meanval_sq);
 
     MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, &encomp, &randGen, m_CurvatureHardThreshold);

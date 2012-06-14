@@ -30,15 +30,22 @@ class MitkDiffusionImaging_EXPORT EnergyComputer
 
 public:
 
-    typedef itk::Vector<float, QBALL_ODFSIZE> OdfVectorType;
-    typedef itk::Image<OdfVectorType, 3> ItkQBallImgType;
+    typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
+    typedef itk::Image<OdfVectorType, 3>        ItkQBallImgType;
+    typedef itk::Image<float, 3>                ItkFloatImageType;
 
-    float eigen_energy;
-    vnl_matrix_fixed<float, 3, 3> m_RotationMatrix;
-    ItkQBallImgType* m_QBallImageData;
-    const int *m_QBallImageSize;
-    SphereInterpolator *m_SphereInterpolator;
-    ParticleGrid *m_ParticleGrid;
+    vnl_matrix_fixed<float, 3, 3>   m_RotationMatrix;
+    ItkQBallImgType*                m_ImageData;
+    vnl_vector_fixed<int, 3>        m_Size;
+    vnl_vector_fixed<float, 3>      m_Spacing;
+    SphereInterpolator*             m_SphereInterpolator;
+    ParticleGrid*                   m_ParticleGrid;
+
+    std::vector< float >            cumulspatprob;
+    std::vector< int >              spatidx;
+
+    float *m_MaskImageData;
+    int m_NumActiveVoxels;
 
     int w,h,d;
     float voxsize_w;
@@ -49,14 +56,11 @@ public:
     float voxsize_sp_w;
     float voxsize_sp_h;
     float voxsize_sp_d;
-    MTRand* mtrand;
+    MTRand* m_RandGen;
 
+    float eigen_energy;
     int nip; // number of data vertices on sphere
 
-    float *m_MaskImageData;
-    float *cumulspatprob;
-    int *spatidx;
-    int scnt;
 
     float eigencon_energy;
 
@@ -74,7 +78,7 @@ public:
     float curv_hard;
 
 
-    EnergyComputer(MTRand* rgen, ItkQBallImgType* data, const int *dsz,  double *cellsize, SphereInterpolator *sp, ParticleGrid *pcon, float *spimg, int spmult, vnl_matrix_fixed<float, 3, 3> rotMatrix);
+    EnergyComputer(MTRand* rgen, ItkQBallImgType* qballImage, SphereInterpolator *sp, ParticleGrid *pcon, float *mask, vnl_matrix_fixed<float, 3, 3> rotMatrix);
 
     void setParameters(float pwei,float pwid,float chempot_connection, float length,float curv_hardthres, float inex_balance, float chempot2, float meanv);
 

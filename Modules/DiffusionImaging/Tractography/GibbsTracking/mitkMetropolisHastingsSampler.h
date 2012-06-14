@@ -85,11 +85,7 @@ protected:
     float m_ChempotParticle;
 
     ParticleGrid*   m_ParticleGrid;
-    const int*      datasz;
     EnergyComputer* m_EnergyComputer;
-    float           width;
-    float           height;
-    float           depth;
     int             m_AcceptedProposals;
 };
 

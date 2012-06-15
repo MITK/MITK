@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // uncomment for learning more about the internal sorting mechanisms
-//#define MBILOG_ENABLE_DEBUG 
+#define MBILOG_ENABLE_DEBUG 
 
 #include <mitkDicomSeriesReader.h>
 
@@ -33,6 +33,60 @@ namespace mitk
 {
 
 typedef itk::GDCMSeriesFileNames DcmFileNamesGeneratorType;
+
+
+DicomSeriesReader::SliceGroupingAnalysisResult::SliceGroupingAnalysisResult()
+:m_GantryTilt(false)
+{
+}
+
+DicomSeriesReader::StringContainer DicomSeriesReader::SliceGroupingAnalysisResult::GetBlockFilenames()
+{
+  return m_GroupedFiles;
+}
+
+DicomSeriesReader::StringContainer DicomSeriesReader::SliceGroupingAnalysisResult::GetUnsortedFilenames()
+{
+  return m_UnsortedFiles;
+}
+
+bool DicomSeriesReader::SliceGroupingAnalysisResult::ContainsGantryTilt()
+{
+  return m_GantryTilt;
+}
+
+Vector3D DicomSeriesReader::SliceGroupingAnalysisResult::GetInterSliceOffset()
+{
+  return m_InterSliceOffset;
+}
+
+void DicomSeriesReader::SliceGroupingAnalysisResult::AddFileToSortedBlock(const std::string& filename)
+{
+  m_GroupedFiles.push_back( filename );
+}
+
+void DicomSeriesReader::SliceGroupingAnalysisResult::AddFileToUnsortedBlock(const std::string& filename)
+{
+  m_UnsortedFiles.push_back( filename );
+}
+
+void DicomSeriesReader::SliceGroupingAnalysisResult::FlagGantryTilt()
+{
+  m_GantryTilt = true;
+}
+
+void DicomSeriesReader::SliceGroupingAnalysisResult::DoATrick()
+{
+  assert( !m_GroupedFiles.empty() );
+  m_UnsortedFiles.push_back( m_GroupedFiles.back() );
+  m_GroupedFiles.pop_back();
+}
+
+
+
+
+
+
 
 const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsToMITKPropertyMap()
 {
@@ -369,14 +423,14 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   return true; // actually never returns false yet.. but exception possible
 }
 
-DicomSeriesReader::TwoStringContainers
+DicomSeriesReader::SliceGroupingAnalysisResult
 DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     const StringContainer& files,
     const gdcm::Scanner::MappingType& tagValueMappings_)
 {
   // result.first = files that fit ITK's assumption
   // result.second = files that do not fit, should be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption() again
-  TwoStringContainers result;
+  SliceGroupingAnalysisResult result;
  
   // we const_cast here, because I could not use a map.at(), which would make the code much more readable
   gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
@@ -393,8 +447,10 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
   bool lastOriginInitialized(false);
 
+  bool assumeGantryTilt(false);
+
   MITK_DEBUG << "--------------------------------------------------------------------------------";
-  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader ";
+  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader "; // TODO output tilting allowed
   unsigned int fileIndex(0);
   for (StringContainer::const_iterator fileIter = files.begin();
        fileIter != files.end();
@@ -426,7 +482,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     if ( lastOriginInitialized && (thisOrigin == lastOrigin) )
     {
       MITK_DEBUG << "    ==> Sort away " << *fileIter << " for separate time step"; // we already have one occupying this position
-      result.second.push_back( *fileIter );
+      result.AddFileToUnsortedBlock( *fileIter );
       fileFitsIntoPattern = false;
     }
     else
@@ -491,7 +547,8 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
         {
           MITK_DEBUG << "  Series might contain a tilted geometry";
           MITK_DEBUG << "  Distance of expected slice origin from actual slice origin: " << distance;
-          MITK_DEBUG  << "    ==> Sort away " << *fileIter << " for later analysis";
+          //MITK_DEBUG << "    ==> Sort away " << *fileIter << " for later analysis";
+          MITK_DEBUG << "    ==> storing this distance for later analysis.";
 
           /* Pessimistic approach: split block right here
 
@@ -501,14 +558,26 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           return result; // stop processing with first split
           */
 
-          /* optimistic approach: save file for later, check all further files */
-          
-          result.second.push_back(*fileIter);
+          /* TODO optimistic approach: save file for later, check all further files */
+          // TODO at this point we have TWO slices analyzed! if they are the only two files, we still split, because there is no third to verify our tilting assumption.
+          // TODO later with a third being available, we must check if the initial tilting vector is still valid. if yes, continue. 
+          // TODO if NO, we need to split the already sorted part (result.first) and the currently analyzed file (*fileIter)
+
+          // TODO how do we tell apart gantry tilt from overall skewedness?
+          // TODO WE DON'T at first.
+
+          result.AddFileToUnsortedBlock(*fileIter);
           fileFitsIntoPattern = false;
+         
+          /*
+          result.FlagGantryTilt();
+          result.AddFileToSortedBlock(*fileIter); // this file is good for current block
+          fileFitsIntoPattern = true;
+          */
         }
         else
         {
-          result.first.push_back(*fileIter); // this file is good for current block
+          result.AddFileToSortedBlock(*fileIter); // this file is good for current block
           fileFitsIntoPattern = true;
         }
       }
@@ -547,23 +616,23 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           */
 
           /* Optimistic approach: check if any of the remaining slices fits in */
-          result.second.push_back( *fileIter ); // sort away for further analysis
+          result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
           fileFitsIntoPattern = false;
         }
         else
         {
-          result.first.push_back(*fileIter); // this file is good for current block
+          result.AddFileToSortedBlock(*fileIter); // this file is good for current block
           fileFitsIntoPattern = true;
         }
       }
       else // this should be the very first slice
       {
-        result.first.push_back(*fileIter); // this file is good for current block
+        result.AddFileToSortedBlock(*fileIter); // this file is good for current block
         fileFitsIntoPattern = true;
       }
     }
 
-    // recored current origin for reference in later iterations
+    // record current origin for reference in later iterations
     if ( !lastOriginInitialized || ( fileFitsIntoPattern && (thisOrigin != lastOrigin) ) )
     {
       lastDifferentOrigin = thisOrigin;
@@ -571,6 +640,18 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
     lastOrigin = thisOrigin; 
     lastOriginInitialized = true;
+  }
+
+  if ( assumeGantryTilt )
+  {
+    // TODO communicate this finding to caller
+    // 
+    // TODO check here how many files were grouped.
+    //      IF it was only two files AND we assume tiltedness (e.g. save "distance")
+    //      THEN we would want to also split the two previous files (simple) because
+    //      we don't have any reason to assume they belong together
+
+    // TODO store fromFirstToSecondOrigin somewhere, this can be used for block grouping! 
   }
   
   return result;
@@ -652,7 +733,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
     groupsOfSimilarImages [ moreUniqueSeriesId ].push_back( fileIter->first );
   }
   
-  // PART III: sort slices spatially
+  // PART II: sort slices spatially
 
   for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
   {
@@ -665,7 +746,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
     }
   }
 
-  // PART II: analyze pre-sorted images for valid blocks (i.e. blocks of equal z-spacing), 
+  // PART III: analyze pre-sorted images for valid blocks (i.e. blocks of equal z-spacing), 
   //          separate into multiple blocks if necessary.
   //          
   //          Analysis performs the following steps:
@@ -684,21 +765,23 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
 
     while (!filesStillToAnalyze.empty()) // repeat until all files are grouped somehow 
     {
-      TwoStringContainers analysisResult = AnalyzeFileForITKImageSeriesReaderSpacingAssumption( filesStillToAnalyze, scanner.GetMappings() );
+      SliceGroupingAnalysisResult analysisResult = AnalyzeFileForITKImageSeriesReaderSpacingAssumption( filesStillToAnalyze, scanner.GetMappings() );
 
       // enhance the UID for additional groups
       std::stringstream newGroupUID;
       newGroupUID << groupUID << '.' << subgroup;
-      mapOf3DBlocks[ newGroupUID.str() ] = analysisResult.first;
+      mapOf3DBlocks[ newGroupUID.str() ] = analysisResult.GetBlockFilenames();
       MITK_DEBUG << "Result: sorted 3D group " << newGroupUID.str() << " with " << mapOf3DBlocks[ newGroupUID.str() ].size() << " files";
       
       ++subgroup;
         
-      filesStillToAnalyze = analysisResult.second; // remember what needs further analysis
+      filesStillToAnalyze = analysisResult.GetUnsortedFilenames(); // remember what needs further analysis
     }
 
     // end of grouping, now post-process groups
   
+    // TODO: check tilting property of blocks. they must match!
+
     // PART IV: attempt to group blocks to 3D+t blocks if requested
     //           inspect entries of mapOf3DBlocks
     //            - if number of files is identical to previous entry, collect for 3D+t block

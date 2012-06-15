@@ -297,10 +297,40 @@ public:
 
 protected:
 
+  class SliceGroupingAnalysisResult
+  {
+    public:
+
+      SliceGroupingAnalysisResult();
+
+      StringContainer GetBlockFilenames();
+      StringContainer GetUnsortedFilenames();
+      
+      bool ContainsGantryTilt();
+      Vector3D GetInterSliceOffset();
+
+      void AddFileToSortedBlock(const std::string& filename);
+      void AddFileToUnsortedBlock(const std::string& filename);
+      void FlagGantryTilt();
+
+      void DoATrick();
+
+    protected:
+      
+      StringContainer m_GroupedFiles;
+      StringContainer m_UnsortedFiles;
+
+      bool m_GantryTilt;
+
+      Vector3D m_InterSliceOffset;
+  };
+
   /**
     \brief for internal sorting.
   */
   typedef std::pair<StringContainer, StringContainer> TwoStringContainers;
+  // TODO implement a complete analysis result data type instead of two lists
+  // list of matching files; gantry-tilt flag; gantry tilt degrees (nice-to-have) or inter-slice-vector; unsorted files
  
   /**
     \brief Maps DICOM tags to MITK properties.
@@ -317,7 +347,7 @@ protected:
     itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
   */
   static
-  TwoStringContainers
+  SliceGroupingAnalysisResult
   AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings_);
 
   /**

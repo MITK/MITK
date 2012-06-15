@@ -32,7 +32,6 @@ public:
         label = 0;
         pID = -1;
         mID = -1;
-        inserted = false;
     }
 
     ~Particle()
@@ -48,9 +47,7 @@ public:
     int pID;
     int mID;
 
-    int label;
-    int numerator;
-    bool inserted;
+    unsigned char label;
 };
 
 class MitkDiffusionImaging_EXPORT EndPoint

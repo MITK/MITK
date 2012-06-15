@@ -276,7 +276,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
 
     // main loop
     m_NumAcceptedFibers = 0;
-    for( int m_CurrentStep = 1; m_CurrentStep <= m_Steps; m_CurrentStep++ )
+    for( m_CurrentStep = 1; m_CurrentStep <= m_Steps; m_CurrentStep++ )
     {
         m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/m_NumIt;
         m_NumParticles = particleGrid->m_NumParticles;

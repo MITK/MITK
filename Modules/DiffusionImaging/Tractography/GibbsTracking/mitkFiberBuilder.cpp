@@ -45,7 +45,6 @@ vtkSmartPointer<vtkPolyData> FiberBuilder::iterate(int minFiberLength)
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
             dp->label = cur_label;
-            dp->numerator = 0;
             LabelPredecessors(dp, -1, container);
             LabelSuccessors(dp, 1, container);
             cur_label++;
@@ -60,7 +59,6 @@ vtkSmartPointer<vtkPolyData> FiberBuilder::iterate(int minFiberLength)
     for (int k = 0; k < m_Grid->m_NumParticles;k++)
     {
         Particle *dp =  m_Grid->GetParticle(k);
-        dp->inserted = false;
         dp->label = 0;
     }
 
@@ -96,7 +94,6 @@ void FiberBuilder::LabelPredecessors(Particle* p, int ep, vtkPolyLine* container
 
 void FiberBuilder::LabelSuccessors(Particle* p, int ep, vtkPolyLine* container)
 {
-    // TODO:: avoid double entry of first
     AddPoint(p, container);
 
     Particle* p2 = NULL;
@@ -110,9 +107,9 @@ void FiberBuilder::LabelSuccessors(Particle* p, int ep, vtkPolyLine* container)
         p2->label = 1;    // assign particle to current fiber
 
         if (p2->pID==p->ID)
-            LabelPredecessors(p2, -1, container);
+            LabelSuccessors(p2, -1, container);
         else if (p2->mID==p->ID)
-            LabelPredecessors(p2, 1, container);
+            LabelSuccessors(p2, 1, container);
         else
             std::cout << "FiberBuilder: connection inconsistent (LabelPredecessors)" << std::endl;
     }
@@ -120,10 +117,10 @@ void FiberBuilder::LabelSuccessors(Particle* p, int ep, vtkPolyLine* container)
 
 void FiberBuilder::AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container)
 {
-    if (dp->inserted)
+    if (dp->label!=1)
         return;
 
-    dp->inserted = true;
+    dp->label = 2;
 
     itk::ContinuousIndex<float, 3> index;
     index[0] = dp->R[0]/m_Image->GetSpacing()[0]-0.5;

@@ -64,6 +64,7 @@ EnergyComputer::EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* m
     m_CumulatedSpatialProbability.resize(totsz, 0.0);
     m_ActiveIndices.resize(totsz, 0);
 
+    // calculate active voxels and cumulate probabilities
     m_NumActiveVoxels = 0;
     m_CumulatedSpatialProbability[0] = 0;
     for (int x = 0; x < m_Size[0];x++)
@@ -80,7 +81,6 @@ EnergyComputer::EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* m
                     m_NumActiveVoxels++;
                 }
             }
-
     for (int k = 0; k < m_NumActiveVoxels; k++)
         m_CumulatedSpatialProbability[k] /= m_CumulatedSpatialProbability[m_NumActiveVoxels];
 
@@ -249,35 +249,32 @@ float EnergyComputer::EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vector_fi
     return result;
 }
 
-float EnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len, Particle *dp)
+float EnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, Particle *dp)
 {
-    float m = SpatProb(R);
-    if (m == 0)
+    if (SpatProb(R) == 0)   // check if position is inside mask
         return -INFINITY;
 
-    float Dn = EvaluateOdf(R, N);
+    float odfVal = EvaluateOdf(R, N);   // evaluate ODF in given direction
 
-    float Sn = 0;
-    float Pn = 0;
-
-    m_ParticleGrid->ComputeNeighbors(R);
-    for (;;)
+    float modelVal = 0;
+    m_ParticleGrid->ComputeNeighbors(R);    // retrieve neighbouring particles from particle grid
+    Particle* neighbour =  m_ParticleGrid->GetNextNeighbor();
+    while (neighbour!=NULL)                         // iterate over nieghbouring particles
     {
-        Particle *p =  m_ParticleGrid->GetNextNeighbor();
-        if (p == 0) break;
-        if (dp != p)
+        if (dp != neighbour)                        // don't evaluate against itself
         {
-            float dot = fabs(dot_product(N,p->N));
+            // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
+            float dot = fabs(dot_product(N,neighbour->N));
             float bw = mbesseli0(dot);
-            float dpos = (p->R-R).squared_magnitude();
+            float dpos = (neighbour->R-R).squared_magnitude();
             float w = mexp(dpos*gamma_s);
-            Sn += w*(bw+m_ParticleChemicalPotential);
+            modelVal += w*(bw+m_ParticleChemicalPotential);
             w = mexp(dpos*gamma_reg_s);
-            Pn += w*bw;
         }
+        neighbour =  m_ParticleGrid->GetNextNeighbor();
     }
 
-    float energy = 2*(Dn/m_ParticleWeight-Sn) - (mbesseli0(1.0)+m_ParticleChemicalPotential);
+    float energy = 2*(odfVal/m_ParticleWeight-modelVal) - (mbesseli0(1.0)+m_ParticleChemicalPotential);
     return energy*m_ExtStrength;
 }
 
@@ -285,10 +282,10 @@ float EnergyComputer::ComputeInternalEnergy(Particle *dp)
 {
     float energy = 0;
 
-    if (dp->pID != -1)
+    if (dp->pID != -1)  // has predecessor
         energy += ComputeInternalEnergyConnection(dp,+1);
 
-    if (dp->mID != -1)
+    if (dp->mID != -1)  // has successor
         energy += ComputeInternalEnergyConnection(dp,-1);
 
     return energy;
@@ -298,45 +295,50 @@ float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1)
 {
     Particle *p2 = 0;
     int ep2;
+
     if (ep1 == 1)
-        p2 = m_ParticleGrid->GetParticle(p1->pID);
+        p2 = m_ParticleGrid->GetParticle(p1->pID);  // get predecessor
     else
-        p2 = m_ParticleGrid->GetParticle(p1->mID);
+        p2 = m_ParticleGrid->GetParticle(p1->mID);  // get successor
+
+    // check in which direction the connected particle is pointing
     if (p2->mID == p1->ID)
         ep2 = -1;
     else if (p2->pID == p1->ID)
         ep2 = 1;
     else
-        fprintf(stderr,"EnergyComputer_connec: Connections are inconsistent!\n");
-
-    if (p2 == 0)
-        fprintf(stderr,"bug2");
+       std::cout << "EnergyComputer: Connections are inconsistent!" << std::endl;
 
     return ComputeInternalEnergyConnection(p1,ep1,p2,ep2);
 }
 
 float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2)
 {
-    if ((dot_product(p1->N,p2->N))*ep1*ep2 > -m_CurvatureThreshold)
+    // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
+    if ((dot_product(p1->N,p2->N))*ep1*ep2 > -m_CurvatureThreshold)     // angle between particles is too sharp
         return -INFINITY;
 
-    vnl_vector_fixed<float, 3> R1 = p1->R + (p1->N * (m_ParticleLength * ep1));
-    vnl_vector_fixed<float, 3> R2 = p2->R + (p2->N * (m_ParticleLength * ep2));
+    // calculate the endpoints of the two particles
+    vnl_vector_fixed<float, 3> endPoint1 = p1->R + (p1->N * (m_ParticleLength * ep1));
+    vnl_vector_fixed<float, 3> endPoint2 = p2->R + (p2->N * (m_ParticleLength * ep2));
 
-    if ((R1-R2).squared_magnitude() > m_SquaredParticleLength)
+    // check if endpoints are too far apart to connect
+    if ((endPoint1-endPoint2).squared_magnitude() > m_SquaredParticleLength)
         return -INFINITY;
 
+    // calculate center point of the two particles
     vnl_vector_fixed<float, 3> R = (p2->R + p1->R); R *= 0.5;
 
+    // they are not allowed to connect if the mask image does not allow it
     if (SpatProb(R) == 0)
         return -INFINITY;
 
-    float norm1 = (R1-R).squared_magnitude();
-    float norm2 = (R2-R).squared_magnitude();
+    // get distances of endpoints to center point
+    float norm1 = (endPoint1-R).squared_magnitude();
+    float norm2 = (endPoint2-R).squared_magnitude();
 
-
+    // calculate actual internal energy
     float energy = (m_ConnectionPotential-norm1-norm2)*m_IntStrength;
-
     return energy;
 }
 

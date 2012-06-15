@@ -85,7 +85,7 @@ void MetropolisHastingsSampler::MakeProposal()
 
         float prob =  m_Density * m_DeathProb /((m_BirthProb)*(m_ParticleGrid->m_NumParticles+1));
 
-        float ex_energy = m_EnergyComputer->ComputeExternalEnergy(R,N,m_ParticleLength,0);
+        float ex_energy = m_EnergyComputer->ComputeExternalEnergy(R,N,0);
         float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop);
         prob *= exp((in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
 
@@ -109,7 +109,7 @@ void MetropolisHastingsSampler::MakeProposal()
             Particle *dp = m_ParticleGrid->GetParticle(pnum);
             if (dp->pID == -1 && dp->mID == -1)
             {
-                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(dp->R,dp->N,m_ParticleLength,dp);
+                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(dp->R,dp->N,dp);
                 float in_energy = m_EnergyComputer->ComputeInternalEnergy(dp);
 
                 float prob = m_ParticleGrid->m_NumParticles * (m_BirthProb) /(m_Density*m_DeathProb); //*SpatProb(dp->R);
@@ -137,8 +137,8 @@ void MetropolisHastingsSampler::MakeProposal()
             prop_p.N.normalize();
 
 
-            float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.R,prop_p.N,m_ParticleLength,p)
-                    - m_EnergyComputer->ComputeExternalEnergy(p->R,p->N,m_ParticleLength,p);
+            float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.R,prop_p.N,p)
+                    - m_EnergyComputer->ComputeExternalEnergy(p->R,p->N,p);
             float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop_p) - m_EnergyComputer->ComputeInternalEnergy(p);
 
             float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp);
@@ -201,8 +201,8 @@ void MetropolisHastingsSampler::MakeProposal()
                 float cos = dot_product(prop_p.N, p->N);
                 float p_rev = exp(-((prop_p.R-p->R).squared_magnitude() + (1-cos*cos))*m_Gamma)/m_Z;
 
-                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.R,prop_p.N,m_ParticleLength,p)
-                        - m_EnergyComputer->ComputeExternalEnergy(p->R,p->N,m_ParticleLength,p);
+                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.R,prop_p.N,p)
+                        - m_EnergyComputer->ComputeExternalEnergy(p->R,p->N,p);
                 float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop_p) - m_EnergyComputer->ComputeInternalEnergy(p);
 
                 float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp)*m_ShiftProb*p_rev/(m_OptShiftProb+m_ShiftProb*p_rev);

@@ -227,6 +227,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
 
     // main loop
     m_NumAcceptedFibers = 0;
+    unsigned long counter = 1;
     for( m_CurrentStep = 1; m_CurrentStep <= m_Steps; m_CurrentStep++ )
     {
         // update temperatur for simulated annealing process
@@ -242,7 +243,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
 
             if (m_BuildFibers || (i==singleIts-1 && m_CurrentStep==m_Steps))
             {
-                m_ProposalAcceptance = (float)sampler.GetNumAcceptedProposals()/m_Iterations;
+                m_ProposalAcceptance = (float)sampler.GetNumAcceptedProposals()/counter;
                 m_NumParticles = particleGrid->m_NumParticles;
                 m_NumConnections = particleGrid->m_NumConnections;
 
@@ -251,9 +252,10 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
                 m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
                 m_BuildFibers = false;
             }
+            counter++;
         }
 
-        m_ProposalAcceptance = (float)sampler.GetNumAcceptedProposals()/m_Iterations;
+        m_ProposalAcceptance = (float)sampler.GetNumAcceptedProposals()/counter;
         m_NumParticles = particleGrid->m_NumParticles;
         m_NumConnections = particleGrid->m_NumConnections;
         MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";

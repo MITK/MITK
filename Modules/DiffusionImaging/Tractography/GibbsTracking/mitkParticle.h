@@ -40,7 +40,6 @@ public:
 
     vnl_vector_fixed<float, 3> R;
     vnl_vector_fixed<float, 3> N;
-    float len;
 
     int gridindex; // index in the grid where it is living
     int ID;

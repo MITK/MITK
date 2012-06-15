@@ -77,18 +77,16 @@ void MetropolisHastingsSampler::MakeProposal()
     if (randnum < m_BirthProb)
     {
         vnl_vector_fixed<float, 3> R;
-        m_EnergyComputer->drawSpatPosition(R);
+        m_EnergyComputer->DrawRandomPosition(R);
         vnl_vector_fixed<float, 3> N = GetRandomDirection();
-        float len =  m_ParticleLength;
         Particle prop;
         prop.R = R;
         prop.N = N;
-        prop.len = len;
 
         float prob =  m_Density * m_DeathProb /((m_BirthProb)*(m_ParticleGrid->m_NumParticles+1));
 
-        float ex_energy = m_EnergyComputer->computeExternalEnergy(R,N,len,0);
-        float in_energy = m_EnergyComputer->computeInternalEnergy(&prop);
+        float ex_energy = m_EnergyComputer->ComputeExternalEnergy(R,N,m_ParticleLength,0);
+        float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop);
         prob *= exp((in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
 
         if (prob > 1 || m_RandGen->frand() < prob)
@@ -98,7 +96,6 @@ void MetropolisHastingsSampler::MakeProposal()
             {
                 p->R = R;
                 p->N = N;
-                p->len = len;
                 m_AcceptedProposals++;
             }
         }
@@ -112,8 +109,8 @@ void MetropolisHastingsSampler::MakeProposal()
             Particle *dp = m_ParticleGrid->GetParticle(pnum);
             if (dp->pID == -1 && dp->mID == -1)
             {
-                float ex_energy = m_EnergyComputer->computeExternalEnergy(dp->R,dp->N,dp->len,dp);
-                float in_energy = m_EnergyComputer->computeInternalEnergy(dp);
+                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(dp->R,dp->N,m_ParticleLength,dp);
+                float in_energy = m_EnergyComputer->ComputeInternalEnergy(dp);
 
                 float prob = m_ParticleGrid->m_NumParticles * (m_BirthProb) /(m_Density*m_DeathProb); //*SpatProb(dp->R);
                 prob *= exp(-(in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
@@ -136,13 +133,13 @@ void MetropolisHastingsSampler::MakeProposal()
             Particle prop_p = *p;
 
             DistortVector(m_Sigma, prop_p.R);
-            DistortVector(m_Sigma/(2*p->len), prop_p.N);
+            DistortVector(m_Sigma/(2*m_ParticleLength), prop_p.N);
             prop_p.N.normalize();
 
 
-            float ex_energy = m_EnergyComputer->computeExternalEnergy(prop_p.R,prop_p.N,p->len,p)
-                    - m_EnergyComputer->computeExternalEnergy(p->R,p->N,p->len,p);
-            float in_energy = m_EnergyComputer->computeInternalEnergy(&prop_p) - m_EnergyComputer->computeInternalEnergy(p);
+            float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.R,prop_p.N,m_ParticleLength,p)
+                    - m_EnergyComputer->ComputeExternalEnergy(p->R,p->N,m_ParticleLength,p);
+            float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop_p) - m_EnergyComputer->ComputeInternalEnergy(p);
 
             float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp);
             if (m_RandGen->frand() < prob)
@@ -177,7 +174,7 @@ void MetropolisHastingsSampler::MakeProposal()
                 int ep_plus = (plus->pID == p->ID)? 1 : -1;
                 Particle *minus = m_ParticleGrid->GetParticle(p->mID);
                 int ep_minus = (minus->pID == p->ID)? 1 : -1;
-                prop_p.R = (plus->R + plus->N * (plus->len * ep_plus)  + minus->R + minus->N * (minus->len * ep_minus));
+                prop_p.R = (plus->R + plus->N * (m_ParticleLength * ep_plus)  + minus->R + minus->N * (m_ParticleLength * ep_minus));
                 prop_p.R *= 0.5;
                 prop_p.N = plus->R - minus->R;
                 prop_p.N.normalize();
@@ -186,14 +183,14 @@ void MetropolisHastingsSampler::MakeProposal()
             {
                 Particle *plus = m_ParticleGrid->GetParticle(p->pID);
                 int ep_plus = (plus->pID == p->ID)? 1 : -1;
-                prop_p.R = plus->R + plus->N * (plus->len * ep_plus * 2);
+                prop_p.R = plus->R + plus->N * (m_ParticleLength * ep_plus * 2);
                 prop_p.N = plus->N;
             }
             else if (p->mID != -1)
             {
                 Particle *minus = m_ParticleGrid->GetParticle(p->mID);
                 int ep_minus = (minus->pID == p->ID)? 1 : -1;
-                prop_p.R = minus->R + minus->N * (minus->len * ep_minus * 2);
+                prop_p.R = minus->R + minus->N * (m_ParticleLength * ep_minus * 2);
                 prop_p.N = minus->N;
             }
             else
@@ -204,9 +201,9 @@ void MetropolisHastingsSampler::MakeProposal()
                 float cos = dot_product(prop_p.N, p->N);
                 float p_rev = exp(-((prop_p.R-p->R).squared_magnitude() + (1-cos*cos))*m_Gamma)/m_Z;
 
-                float ex_energy = m_EnergyComputer->computeExternalEnergy(prop_p.R,prop_p.N,p->len,p)
-                        - m_EnergyComputer->computeExternalEnergy(p->R,p->N,p->len,p);
-                float in_energy = m_EnergyComputer->computeInternalEnergy(&prop_p) - m_EnergyComputer->computeInternalEnergy(p);
+                float ex_energy = m_EnergyComputer->ComputeExternalEnergy(prop_p.R,prop_p.N,m_ParticleLength,p)
+                        - m_EnergyComputer->ComputeExternalEnergy(p->R,p->N,m_ParticleLength,p);
+                float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop_p) - m_EnergyComputer->ComputeInternalEnergy(p);
 
                 float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp)*m_ShiftProb*p_rev/(m_OptShiftProb+m_ShiftProb*p_rev);
 
@@ -331,7 +328,7 @@ void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
         if (Next.p == 0) // no successor -> break
             break;
 
-        energy += m_EnergyComputer->computeInternalEnergyConnection(Current.p,Current.ep,Next.p,Next.ep);
+        energy += m_EnergyComputer->ComputeInternalEnergyConnection(Current.p,Current.ep,Next.p,Next.ep);
 
         Current = Next;
         Current.ep *= -1;
@@ -377,7 +374,7 @@ void MetropolisHastingsSampler::MakeTrackProposal(EndPoint P)
         float probability = m_SimpSamp.probFor(k);
 
         // accumulate energy and proposal distribution
-        energy += m_EnergyComputer->computeInternalEnergyConnection(Current.p,Current.ep,Next.p,Next.ep);
+        energy += m_EnergyComputer->ComputeInternalEnergyConnection(Current.p,Current.ep,Next.p,Next.ep);
         AccumProb *= probability;
 
         // track to next endpoint
@@ -403,7 +400,7 @@ void MetropolisHastingsSampler::ComputeEndPointProposalDistribution(EndPoint P)
     int ep = P.ep;
 
     float dist,dot;
-    vnl_vector_fixed<float, 3> R = p->R + (p->N * (ep*p->len) );
+    vnl_vector_fixed<float, 3> R = p->R + (p->N * (ep*m_ParticleLength) );
     m_ParticleGrid->ComputeNeighbors(R);
     m_SimpSamp.clear();
 
@@ -417,26 +414,26 @@ void MetropolisHastingsSampler::ComputeEndPointProposalDistribution(EndPoint P)
         {
             if (p2->mID == -1)
             {
-                dist = (p2->R - p2->N * p2->len - R).squared_magnitude();
+                dist = (p2->R - p2->N * m_ParticleLength - R).squared_magnitude();
                 if (dist < m_DistanceThreshold)
                 {
                     dot = dot_product(p2->N,p->N) * ep;
                     if (dot > m_CurvatureThreshold)
                     {
-                        float en = m_EnergyComputer->computeInternalEnergyConnection(p,ep,p2,-1);
+                        float en = m_EnergyComputer->ComputeInternalEnergyConnection(p,ep,p2,-1);
                         m_SimpSamp.add(exp(en/m_TractProb),EndPoint(p2,-1));
                     }
                 }
             }
             if (p2->pID == -1)
             {
-                dist = (p2->R + p2->N * p2->len - R).squared_magnitude();
+                dist = (p2->R + p2->N * m_ParticleLength - R).squared_magnitude();
                 if (dist < m_DistanceThreshold)
                 {
                     dot = dot_product(p2->N,p->N) * (-ep);
                     if (dot > m_CurvatureThreshold)
                     {
-                        float en = m_EnergyComputer->computeInternalEnergyConnection(p,ep,p2,+1);
+                        float en = m_EnergyComputer->ComputeInternalEnergyConnection(p,ep,p2,+1);
                         m_SimpSamp.add(exp(en/m_TractProb),EndPoint(p2,+1));
                     }
                 }

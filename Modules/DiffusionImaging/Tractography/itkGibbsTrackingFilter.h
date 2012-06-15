@@ -45,57 +45,36 @@ public:
     itkNewMacro(Self)
     itkTypeMacro( GibbsTrackingFilter, ProcessObject )
 
-    typedef Image< DiffusionTensor3D<float>, 3 > ItkTensorImage;
-    typedef typename ItkQBallImageType::Pointer ItkQBallImageTypePointer;
-    typedef Image< float, 3 >                   ItkFloatImageType;
-    typedef vtkSmartPointer< vtkPolyData >      FiberPolyDataType;
+    typedef Image< DiffusionTensor3D<float>, 3 >    ItkTensorImage;
+    typedef typename ItkQBallImageType::Pointer     ItkQBallImageTypePointer;
+    typedef Image< float, 3 >                       ItkFloatImageType;
+    typedef vtkSmartPointer< vtkPolyData >          FiberPolyDataType;
 
-    itkSetMacro( TempStart, float )
-    itkGetMacro( TempStart, float )
-
-    itkSetMacro( TempEnd, float )
-    itkGetMacro( TempEnd, float )
-
-    itkSetMacro( NumIt, unsigned long )
-    itkGetMacro( NumIt, unsigned long )
-
+    // parameter setter
+    itkSetMacro( StartTemperature, float )
+    itkSetMacro( EndTemperature, float )
+    itkSetMacro( Iterations, unsigned long )
     itkSetMacro( ParticleWeight, float )
-    itkGetMacro( ParticleWeight, float )
-
-    /** width of particle sigma (std-dev of gaussian around center) **/
     itkSetMacro( ParticleWidth, float )
-    itkGetMacro( ParticleWidth, float )
-
-    /** length of particle from midpoint to ends **/
     itkSetMacro( ParticleLength, float )
-    itkGetMacro( ParticleLength, float )
-
-    itkSetMacro( ChempotConnection, float )
-    itkGetMacro( ChempotConnection, float )
-
+    itkSetMacro( ConnectionPotential, float )
     itkSetMacro( InexBalance, float )
-    itkGetMacro( InexBalance, float )
-
-    itkSetMacro( Chempot2, float )
-    itkGetMacro( Chempot2, float )
-
-    itkSetMacro( FiberLength, int )
-    itkGetMacro( FiberLength, int )
-
+    itkSetMacro( ParticlePotential, float )
+    itkSetMacro( MinFiberLength, int )
     itkSetMacro( AbortTracking, bool )
-    itkGetMacro( AbortTracking, bool )
+    itkSetMacro( CurvatureThreshold, float)
+    itkSetMacro( DuplicateImage, bool )
 
-    itkSetMacro( CurrentStep, unsigned long )
+    // getter
+    itkGetMacro( ParticleWeight, float )
+    itkGetMacro( ParticleWidth, float )
+    itkGetMacro( ParticleLength, float )
     itkGetMacro( CurrentStep, unsigned long )
-
-    itkSetMacro( CurvatureHardThreshold, float)
-    itkGetMacro( CurvatureHardThreshold, float)
-
-    itkGetMacro(NumParticles, unsigned long)
-    itkGetMacro(NumConnections, unsigned long)
-    itkGetMacro(NumAcceptedFibers, int)
-    itkGetMacro(ProposalAcceptance, float)
-    itkGetMacro(Steps, unsigned int)
+    itkGetMacro( NumParticles, int )
+    itkGetMacro( NumConnections, int )
+    itkGetMacro( NumAcceptedFibers, int )
+    itkGetMacro( ProposalAcceptance, float )
+    itkGetMacro( Steps, unsigned int)
 
     // input data
     itkSetMacro(QBallImage, typename ItkQBallImageType::Pointer)
@@ -116,6 +95,7 @@ protected:
     virtual ~GibbsTrackingFilter();
     bool EstimateParticleWeight();
     SphereInterpolator* LoadSphereInterpolator();
+    void PrepareMaskImage();
 
     // Input Images
     typename ItkQBallImageType::Pointer m_QBallImage;
@@ -123,30 +103,28 @@ protected:
     typename ItkTensorImage::Pointer    m_TensorImage;
 
     // Tracking parameters
-    float   m_TempStart;            // Start temperature
-    float   m_TempEnd;              // End temperature
-    unsigned long m_NumIt;          // Total number of iterations
-    unsigned long m_CurrentStep;    // current tracking step
-    float   m_ParticleWeight;       // w (unitless)
-    float   m_ParticleWidth;        //sigma  (mm)
-    float   m_ParticleLength;       // ell (mm)
-    float   m_ChempotConnection;    // gross L (chemisches potential)
-    float   m_InexBalance;          // gewichtung zwischen den lambdas; -5 ... 5 -> nur intern ... nur extern,default 0
-    float   m_Chempot2;             // typischerweise 0
-    int     m_FiberLength;
-    bool    m_AbortTracking;
-    int     m_NumAcceptedFibers;
-    volatile bool   m_BuildFibers;
-    unsigned int    m_Steps;
-    float   m_Memory;
-    float   m_ProposalAcceptance;
-    float   m_CurvatureHardThreshold;
-    float   m_Meanval_sq;
-    bool    m_DuplicateImage;
+    float           m_StartTemperature;     // Start temperature
+    float           m_EndTemperature;       // End temperature
+    unsigned long   m_Iterations;           // Total number of iterations
+    unsigned long   m_CurrentStep;          // current tracking step
+    float           m_ParticleWeight;       // w (unitless)
+    float           m_ParticleWidth;        // sigma  (mm)
+    float           m_ParticleLength;       // l (mm)
+    float           m_ConnectionPotential;  // gross L (chemisches potential, default 10)
+    float           m_InexBalance;          // gewichtung zwischen den lambdas; -5 ... 5 -> nur intern ... nur extern,default 0
+    float           m_ParticlePotential;    // default 0.2
+    int             m_MinFiberLength;       // discard all fibers shortan than the specified length in mm
+    bool            m_AbortTracking;        // set flag to abort tracking
+    int             m_NumAcceptedFibers;    // number of reconstructed fibers generated by the FiberBuilder
+    volatile bool   m_BuildFibers;          // set flag to generate fibers from particle grid
+    unsigned int    m_Steps;                // number of temperature decrease steps
+    float           m_ProposalAcceptance;   // proposal acceptance rate (0-1)
+    float           m_CurvatureThreshold;   // curvature threshold in radians (1 -> no curvature is accepted, -1 all curvature angles are accepted)
+    bool            m_DuplicateImage;       // generates a working copy of the qball image so that the original image won't be changed by the mean subtraction
+    int             m_NumParticles;         // current number of particles in grid
+    int             m_NumConnections;       // current number of connections between particles in grid
 
-    FiberPolyDataType m_FiberPolyData;
-    unsigned long m_NumParticles;
-    unsigned long m_NumConnections;
+    FiberPolyDataType m_FiberPolyData;      // container for reconstructed fibers
 };
 }
 

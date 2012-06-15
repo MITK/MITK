@@ -34,72 +34,51 @@ public:
     typedef itk::Image<OdfVectorType, 3>        ItkQBallImgType;
     typedef itk::Image<float, 3>                ItkFloatImageType;
 
+    EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, MTRand* randGen);
+
+    void SetParameters(float particleWeight, float particleWidth, float connectionPotential, float curvThres, float inexBalance, float particlePotential);
+
+    void DrawRandomPosition(vnl_vector_fixed<float, 3>& R);
+
+    float ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len, Particle *dp);
+
+    float ComputeInternalEnergyConnection(Particle *p1,int ep1);
+
+    float ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2);
+
+    float ComputeInternalEnergy(Particle *dp);
+
+protected:
+
     vnl_matrix_fixed<float, 3, 3>   m_RotationMatrix;
-    ItkQBallImgType*                m_ImageData;
-    vnl_vector_fixed<int, 3>        m_Size;
-    vnl_vector_fixed<float, 3>      m_Spacing;
     SphereInterpolator*             m_SphereInterpolator;
     ParticleGrid*                   m_ParticleGrid;
+    MTRand*                         m_RandGen;
+    ItkQBallImgType*                m_Image;
+    ItkFloatImageType*              m_Mask;
+    vnl_vector_fixed<int, 3>        m_Size;
+    vnl_vector_fixed<float, 3>      m_Spacing;
 
-    std::vector< float >            cumulspatprob;
-    std::vector< int >              spatidx;
+    std::vector< float >            m_CumulatedSpatialProbability;
+    std::vector< int >              m_ActiveIndices;
 
-    bool m_UseTrilinearInterpolation;
+    bool                            m_UseTrilinearInterpolation;    // is deactivated if less than 3 image slices are available
 
-    float *m_MaskImageData;
-    int m_NumActiveVoxels;
+    int     m_NumActiveVoxels;
+    float   m_ConnectionPotential;
+    float   m_ParticleChemicalPotential;
+    float   gamma_s;
+    float   gamma_reg_s;
+    float   m_ParticleWeight;
+    float   m_ExtStrength;
+    float   m_IntStrength;
+    float   m_ParticleLength;
+    float   m_SquaredParticleLength;
+    float   m_CurvatureThreshold;
 
-    int w,h,d;
-    float voxsize_w;
-    float voxsize_h;
-    float voxsize_d;
-
-    int w_sp,h_sp,d_sp;
-    float voxsize_sp_w;
-    float voxsize_sp_h;
-    float voxsize_sp_d;
-    MTRand* m_RandGen;
-
-    float eigen_energy;
-    int nip; // number of data vertices on sphere
-
-
-    float eigencon_energy;
-
-    float chempot2;
-    float meanval_sq;
-
-    float gamma_s;
-    float gamma_reg_s;
-
-    float particle_weight;
-    float ex_strength;
-    float in_strength;
-
-    float particle_length_sq;
-    float curv_hard;
-
-
-    EnergyComputer(MTRand* rgen, ItkQBallImgType* qballImage, SphereInterpolator *sp, ParticleGrid *pcon, float *mask, vnl_matrix_fixed<float, 3, 3> rotMatrix);
-
-    void setParameters(float pwei,float pwid,float chempot_connection, float length,float curv_hardthres, float inex_balance, float chempot2, float meanv);
-
-    void drawSpatPosition(vnl_vector_fixed<float, 3>& R);
-
-    float SpatProb(vnl_vector_fixed<float, 3> R);
-
-    float evaluateODF(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len);
-
-    float computeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len, Particle *dp);
-
-    float computeInternalEnergy(Particle *dp);
-
-    float computeInternalEnergyConnection(Particle *p1,int ep1);
-
-    float computeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2);
-
+    float SpatProb(vnl_vector_fixed<float, 3> pos);
+    float EvaluateOdf(vnl_vector_fixed<float, 3> &pos, vnl_vector_fixed<float, 3> dir);
     float mbesseli0(float x);
-
     float mexp(float x);
 };
 

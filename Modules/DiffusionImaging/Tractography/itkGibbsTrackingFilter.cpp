@@ -27,12 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK
 #include <itkImageDuplicator.h>
-#pragma GCC visibility push(default)
-#include <itkEventObject.h>
-#pragma GCC visibility pop
+#include <itkResampleImageFilter.h>
 
 // MISC
-#include <vnl/vnl_copy.h>
 #include <fstream>
 #include <QFile>
 
@@ -40,16 +37,16 @@ namespace itk{
 
 template< class ItkQBallImageType >
 GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
-    m_TempStart(0.1),
-    m_TempEnd(0.001),
-    m_NumIt(500000),
+    m_StartTemperature(0.1),
+    m_EndTemperature(0.001),
+    m_Iterations(500000),
     m_ParticleWeight(0),
     m_ParticleWidth(0),
     m_ParticleLength(0),
-    m_ChempotConnection(10),
+    m_ConnectionPotential(10),
     m_InexBalance(0),
-    m_Chempot2(0.2),
-    m_FiberLength(10),
+    m_ParticlePotential(0.2),
+    m_MinFiberLength(10),
     m_AbortTracking(false),
     m_NumConnections(0),
     m_NumParticles(0),
@@ -57,10 +54,8 @@ GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
     m_CurrentStep(0),
     m_BuildFibers(false),
     m_Steps(10),
-    m_Memory(0),
     m_ProposalAcceptance(0),
-    m_CurvatureHardThreshold(0.7),
-    m_Meanval_sq(0.0),
+    m_CurvatureThreshold(0.7),
     m_DuplicateImage(true)
 {
 
@@ -148,6 +143,7 @@ GibbsTrackingFilter< ItkQBallImageType >
 template< class ItkQBallImageType >
 void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
 {
+    // check if input is qball or tensor image and generate qball if necessary
     if (m_QBallImage.IsNull() && m_TensorImage.IsNotNull())
     {
         TensorImageToQBallImageFilter<float,float>::Pointer filter = TensorImageToQBallImageFilter<float,float>::New();
@@ -156,47 +152,19 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         m_QBallImage = filter->GetOutput();
     }
 
-    // image sizes and spacing
-    int imgSize[4] = {  QBALL_ODFSIZE,
-                        m_QBallImage->GetLargestPossibleRegion().GetSize().GetElement(0),
-                        m_QBallImage->GetLargestPossibleRegion().GetSize().GetElement(1),
-                        m_QBallImage->GetLargestPossibleRegion().GetSize().GetElement(2)};
-    double spacing[3] = {m_QBallImage->GetSpacing().GetElement(0),m_QBallImage->GetSpacing().GetElement(1),m_QBallImage->GetSpacing().GetElement(2)};
-
-    // calculate rotation matrix
-    vnl_matrix<double> temp = m_QBallImage->GetDirection().GetVnlMatrix();
-    vnl_matrix<float>  directionMatrix; directionMatrix.set_size(3,3);
-    vnl_copy(temp, directionMatrix);
-    vnl_vector_fixed<float, 3> d0 = directionMatrix.get_column(0); d0.normalize();
-    vnl_vector_fixed<float, 3> d1 = directionMatrix.get_column(1); d1.normalize();
-    vnl_vector_fixed<float, 3> d2 = directionMatrix.get_column(2); d2.normalize();
-    directionMatrix.set_column(0, d0);
-    directionMatrix.set_column(1, d1);
-    directionMatrix.set_column(2, d2);
-    vnl_matrix_fixed<float, 3, 3> I = directionMatrix*directionMatrix.transpose();
-    if(!I.is_identity(mitk::eps)){
-        MITK_INFO << "itkGibbsTrackingFilter: image direction is not a rotation matrix. Tracking not possible!";
-        m_AbortTracking = true;
-    }
-
-    // generate local working copy of QBall image
-    typename ItkQBallImageType::Pointer qballImage;
+    // generate local working copy of QBall image (if not disabled)
     if (m_DuplicateImage)
     {
         typedef itk::ImageDuplicator< ItkQBallImageType > DuplicateFilterType;
         typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
         duplicator->SetInputImage( m_QBallImage );
         duplicator->Update();
-        qballImage = duplicator->GetOutput();
-    }
-    else
-    {
-        qballImage = m_QBallImage;
+        m_QBallImage = duplicator->GetOutput();
     }
 
     // perform mean subtraction on odfs
     typedef ImageRegionIterator< ItkQBallImageType > InputIteratorType;
-    InputIteratorType it(qballImage, qballImage->GetLargestPossibleRegion() );
+    InputIteratorType it(m_QBallImage, m_QBallImage->GetLargestPossibleRegion() );
     it.GoToBegin();
     while (!it.IsAtEnd())
     {
@@ -207,32 +175,17 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         ++it;
     }
 
-    // mask image
-    int maskImageSize[3];
-    float *mask;
-    if(m_MaskImage.IsNull())
-    {
-        m_MaskImage = ItkFloatImageType::New();
-        m_MaskImage->SetSpacing( qballImage->GetSpacing() );   // Set the image spacing
-        m_MaskImage->SetOrigin( qballImage->GetOrigin() );     // Set the image origin
-        m_MaskImage->SetDirection( qballImage->GetDirection() );  // Set the image direction
-        m_MaskImage->SetRegions( qballImage->GetLargestPossibleRegion());
-        m_MaskImage->Allocate();
-        m_MaskImage->FillBuffer(1.0);
-    }
-    mask = (float*) m_MaskImage->GetBufferPointer();
-    maskImageSize[0] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(0);
-    maskImageSize[1] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(1);
-    maskImageSize[2] = m_MaskImage->GetLargestPossibleRegion().GetSize().GetElement(2);
+    // check if mask image is given if it needs resampling
+    PrepareMaskImage();
 
-    // get paramters
+    // prepare parameters
     float minSpacing;
-    if(spacing[0]<spacing[1] && spacing[0]<spacing[2])
-        minSpacing = spacing[0];
-    else if (spacing[1] < spacing[2])
-        minSpacing = spacing[1];
+    if(m_QBallImage->GetSpacing()[0]<m_QBallImage->GetSpacing()[1] && m_QBallImage->GetSpacing()[0]<m_QBallImage->GetSpacing()[2])
+        minSpacing = m_QBallImage->GetSpacing()[0];
+    else if (m_QBallImage->GetSpacing()[1] < m_QBallImage->GetSpacing()[2])
+        minSpacing = m_QBallImage->GetSpacing()[1];
     else
-        minSpacing = spacing[2];
+        minSpacing = m_QBallImage->GetSpacing()[2];
 
     if(m_ParticleLength == 0)
         m_ParticleLength = 1.5*minSpacing;
@@ -241,86 +194,117 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     if(m_ParticleWeight == 0)
         if (!EstimateParticleWeight())
         {
-            MITK_INFO << "itkGibbsTrackingFilter: could not estimate particle weight!";
+            MITK_INFO << "itkGibbsTrackingFilter: could not estimate particle weight. using default value.";
             m_ParticleWeight = 0.0001;
         }
-    m_CurrentStep = 0;
-    m_Memory = 0;
-
-    float alpha = log(m_TempEnd/m_TempStart);
-    m_Steps = m_NumIt/10000;
+    float alpha = log(m_EndTemperature/m_StartTemperature);
+    m_Steps = m_Iterations/10000;
     if (m_Steps<10)
         m_Steps = 10;
-    if (m_Steps>m_NumIt)
+    if (m_Steps>m_Iterations)
     {
         MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
         m_AbortTracking = true;
     }
+    if (m_CurvatureThreshold < mitk::eps)
+        m_CurvatureThreshold = 0;
+    unsigned long singleIts = (unsigned long)((1.0*m_Iterations) / (1.0*m_Steps));
 
-    if (m_CurvatureHardThreshold < mitk::eps)
-        m_CurvatureHardThreshold = 0;
-    unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
-
+    // seed random generators
     MTRand randGen(1);
     srand(1);
 
+    // load sphere interpolator to evaluate the ODFs
     SphereInterpolator* interpolator = LoadSphereInterpolator();
 
-    MITK_INFO << "itkGibbsTrackingFilter: setting up MH-sampler";
+    // initialize the actual tracking components (ParticleGrid, Metropolis Hastings Sampler and Energy Computer)
     ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
 
-    EnergyComputer encomp(&randGen, qballImage, interpolator, particleGrid, mask, directionMatrix);
-    encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,m_CurvatureHardThreshold,m_InexBalance,m_Chempot2, m_Meanval_sq);
+    EnergyComputer encomp(m_QBallImage, m_MaskImage, particleGrid, interpolator, &randGen);
+    encomp.SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
 
-    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, &encomp, &randGen, m_CurvatureHardThreshold);
+    MetropolisHastingsSampler sampler(particleGrid, &encomp, &randGen, m_CurvatureThreshold);
 
     // main loop
     m_NumAcceptedFibers = 0;
     for( m_CurrentStep = 1; m_CurrentStep <= m_Steps; m_CurrentStep++ )
     {
-        m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/m_NumIt;
-        m_NumParticles = particleGrid->m_NumParticles;
-        m_NumConnections = particleGrid->m_NumConnections;
-
-        MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
-        MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
-        MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
-        MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)m_CurrentStep/m_Steps << "%";
-
-        float temperature = m_TempStart * exp(alpha*(((1.0)*m_CurrentStep)/((1.0)*m_Steps)));
-        sampler->SetTemperature(temperature);
+        // update temperatur for simulated annealing process
+        float temperature = m_StartTemperature * exp(alpha*(((1.0)*m_CurrentStep)/((1.0)*m_Steps)));
+        sampler.SetTemperature(temperature);
 
         for (unsigned long i=0; i<singleIts; i++)
         {
             if (m_AbortTracking)
                 break;
 
-            sampler->MakeProposal();
+            sampler.MakeProposal();
 
-            if (m_BuildFibers)
+            if (m_BuildFibers || (i==singleIts-1 && m_CurrentStep==m_Steps))
             {
-                m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/m_NumIt;
+                m_ProposalAcceptance = (float)sampler.GetNumAcceptedProposals()/m_Iterations;
                 m_NumParticles = particleGrid->m_NumParticles;
                 m_NumConnections = particleGrid->m_NumConnections;
 
                 FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
-                m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
+                m_FiberPolyData = fiberBuilder.iterate(m_MinFiberLength);
                 m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
                 m_BuildFibers = false;
             }
         }
+
+        m_ProposalAcceptance = (float)sampler.GetNumAcceptedProposals()/m_Iterations;
+        m_NumParticles = particleGrid->m_NumParticles;
+        m_NumConnections = particleGrid->m_NumConnections;
+        MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
+        MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
+        MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
+        MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)m_CurrentStep/m_Steps << "%";
     }
-    FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
-    m_FiberPolyData = fiberBuilder.iterate(m_FiberLength);
-    m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
 
     delete interpolator;
-    delete sampler;
     delete particleGrid;
     m_AbortTracking = true;
     m_BuildFibers = false;
 
     MITK_INFO << "itkGibbsTrackingFilter: done generate data";
+}
+
+template< class ItkQBallImageType >
+void GibbsTrackingFilter< ItkQBallImageType >::PrepareMaskImage()
+{
+    if(m_MaskImage.IsNull())
+    {
+        MITK_INFO << "itkGibbsTrackingFilter: generating default mask image";
+        m_MaskImage = ItkFloatImageType::New();
+        m_MaskImage->SetSpacing( m_QBallImage->GetSpacing() );
+        m_MaskImage->SetOrigin( m_QBallImage->GetOrigin() );
+        m_MaskImage->SetDirection( m_QBallImage->GetDirection() );
+        m_MaskImage->SetRegions( m_QBallImage->GetLargestPossibleRegion() );
+        m_MaskImage->Allocate();
+        m_MaskImage->FillBuffer(1.0);
+    }
+    else if ( m_MaskImage->GetLargestPossibleRegion().GetSize()[0]!=m_QBallImage->GetLargestPossibleRegion().GetSize()[0] ||
+         m_MaskImage->GetLargestPossibleRegion().GetSize()[1]!=m_QBallImage->GetLargestPossibleRegion().GetSize()[1] ||
+         m_MaskImage->GetLargestPossibleRegion().GetSize()[2]!=m_QBallImage->GetLargestPossibleRegion().GetSize()[2] ||
+         m_MaskImage->GetSpacing()[0]!=m_QBallImage->GetSpacing()[0] ||
+         m_MaskImage->GetSpacing()[1]!=m_QBallImage->GetSpacing()[1] ||
+         m_MaskImage->GetSpacing()[2]!=m_QBallImage->GetSpacing()[2] )
+    {
+        MITK_INFO << "itkGibbsTrackingFilter: resampling mask image";
+        typedef itk::ResampleImageFilter< ItkFloatImageType, ItkFloatImageType, float > ResamplerType;
+        ResamplerType::Pointer resampler = ResamplerType::New();
+        resampler->SetOutputSpacing( m_QBallImage->GetSpacing() );
+        resampler->SetOutputOrigin( m_QBallImage->GetOrigin() );
+        resampler->SetOutputDirection( m_QBallImage->GetDirection() );
+        resampler->SetSize( m_QBallImage->GetLargestPossibleRegion().GetSize() );
+
+        resampler->SetInput( m_MaskImage );
+        resampler->SetDefaultPixelValue(1.0);
+        resampler->Update();
+        m_MaskImage = resampler->GetOutput();
+        MITK_INFO << "itkGibbsTrackingFilter: resampling finished";
+    }
 }
 
 template< class ItkQBallImageType >

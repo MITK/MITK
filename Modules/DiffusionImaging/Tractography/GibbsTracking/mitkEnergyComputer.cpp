@@ -15,83 +15,97 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkEnergyComputer.h"
+#include <vnl/vnl_copy.h>
 
 using namespace mitk;
 
-EnergyComputer::EnergyComputer(MTRand* rgen, ItkQBallImgType* qballImage, SphereInterpolator *sp, ParticleGrid *particleGrid, float *mask, vnl_matrix_fixed<float, 3, 3> rotMatrix)
+EnergyComputer::EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, MTRand* randGen)
+    : m_UseTrilinearInterpolation(true)
 {
-    m_UseTrilinearInterpolation = true;
     m_ParticleGrid = particleGrid;
-    m_RandGen = rgen;
-    m_RotationMatrix = rotMatrix;
-    m_ImageData = qballImage;
-    m_SphereInterpolator = sp;
-    m_MaskImageData = mask;
+    m_RandGen = randGen;
+    m_Image = qballImage;
+    m_SphereInterpolator = interpolator;
+    m_Mask = mask;
 
-    m_Size[0] = m_ImageData->GetLargestPossibleRegion().GetSize()[0];
-    m_Size[1] = m_ImageData->GetLargestPossibleRegion().GetSize()[1];
-    m_Size[2] = m_ImageData->GetLargestPossibleRegion().GetSize()[2];
+    m_ParticleLength = m_ParticleGrid->m_ParticleLength;
+    m_SquaredParticleLength = m_ParticleLength*m_ParticleLength;
+
+    m_Size[0] = m_Image->GetLargestPossibleRegion().GetSize()[0];
+    m_Size[1] = m_Image->GetLargestPossibleRegion().GetSize()[1];
+    m_Size[2] = m_Image->GetLargestPossibleRegion().GetSize()[2];
 
     if (m_Size[0]<3 || m_Size[1]<3 || m_Size[2]<3)
         m_UseTrilinearInterpolation = false;
 
-    m_Spacing[0] = m_ImageData->GetSpacing()[0];
-    m_Spacing[1] = m_ImageData->GetSpacing()[1];
-    m_Spacing[2] = m_ImageData->GetSpacing()[2];
+    m_Spacing[0] = m_Image->GetSpacing()[0];
+    m_Spacing[1] = m_Image->GetSpacing()[1];
+    m_Spacing[2] = m_Image->GetSpacing()[2];
 
-    nip = QBALL_ODFSIZE;
+    // calculate rotation matrix
+    vnl_matrix<double> temp = m_Image->GetDirection().GetVnlMatrix();
+    vnl_matrix<float>  directionMatrix; directionMatrix.set_size(3,3);
+    vnl_copy(temp, directionMatrix);
+    vnl_vector_fixed<float, 3> d0 = directionMatrix.get_column(0); d0.normalize();
+    vnl_vector_fixed<float, 3> d1 = directionMatrix.get_column(1); d1.normalize();
+    vnl_vector_fixed<float, 3> d2 = directionMatrix.get_column(2); d2.normalize();
+    directionMatrix.set_column(0, d0);
+    directionMatrix.set_column(1, d1);
+    directionMatrix.set_column(2, d2);
+    vnl_matrix_fixed<float, 3, 3> I = directionMatrix*directionMatrix.transpose();
+    if(!I.is_identity(mitk::eps))
+        fprintf(stderr,"itkGibbsTrackingFilter: image direction is not a rotation matrix. Tracking not possible!\n");
+    m_RotationMatrix = directionMatrix;
 
-    if (nip != sp->nverts)
+    if (QBALL_ODFSIZE != m_SphereInterpolator->nverts)
         fprintf(stderr,"EnergyComputer: error during init: data does not match with interpolation scheme\n");
 
     int totsz = m_Size[0]*m_Size[1]*m_Size[2];
-    cumulspatprob.resize(totsz, 0.0);
-    spatidx.resize(totsz, 0);
+    m_CumulatedSpatialProbability.resize(totsz, 0.0);
+    m_ActiveIndices.resize(totsz, 0);
 
     m_NumActiveVoxels = 0;
-    cumulspatprob[0] = 0;
+    m_CumulatedSpatialProbability[0] = 0;
     for (int x = 0; x < m_Size[0];x++)
         for (int y = 0; y < m_Size[1];y++)
             for (int z = 0; z < m_Size[2];z++)
             {
                 int idx = x+(y+z*m_Size[1])*m_Size[0];
-                if (m_MaskImageData[idx] > 0.5)
+                ItkFloatImageType::IndexType index;
+                index[0] = x; index[1] = y; index[2] = z;
+                if (m_Mask->GetPixel(index) > 0.5)
                 {
-                    cumulspatprob[m_NumActiveVoxels+1] = cumulspatprob[m_NumActiveVoxels] + m_MaskImageData[idx];
-                    spatidx[m_NumActiveVoxels] = idx;
+                    m_CumulatedSpatialProbability[m_NumActiveVoxels+1] = m_CumulatedSpatialProbability[m_NumActiveVoxels] + m_Mask->GetPixel(index);
+                    m_ActiveIndices[m_NumActiveVoxels] = idx;
                     m_NumActiveVoxels++;
                 }
             }
 
     for (int k = 0; k < m_NumActiveVoxels; k++)
-        cumulspatprob[k] /= cumulspatprob[m_NumActiveVoxels];
+        m_CumulatedSpatialProbability[k] /= m_CumulatedSpatialProbability[m_NumActiveVoxels];
 
-    fprintf(stderr,"EnergyComputer: %i active voxels found\n",m_NumActiveVoxels);
+    std::cout << "EnergyComputer: " << m_NumActiveVoxels << " active voxels found" << std::endl;
 }
 
-void EnergyComputer::setParameters(float pwei,float pwid,float chempot_connection, float length,float curv_hardthres, float inex_balance, float chempot2, float meanv)
+void EnergyComputer::SetParameters(float particleWeight, float particleWidth, float connectionPotential, float curvThres, float inexBalance, float particlePotential)
 {
-    this->chempot2 = chempot2;
-    meanval_sq = meanv;
+    m_ParticleChemicalPotential = particlePotential;
+    m_ConnectionPotential = connectionPotential;
+    m_ParticleWeight = particleWeight;
 
-    eigencon_energy = chempot_connection;
-    eigen_energy = 0;
-    particle_weight = pwei;
+    float bal = 1/(1+exp(-inexBalance));
+    m_ExtStrength = 2*bal;
+    m_IntStrength = 2*(1-bal)/m_SquaredParticleLength;
 
-    float bal = 1/(1+exp(-inex_balance));
-    ex_strength = 2*bal;                         // cleanup (todo)
-    in_strength = 2*(1-bal)/length/length;         // cleanup (todo)
-    //    in_strength = 0.64/length/length;         // cleanup (todo)
+    m_CurvatureThreshold = curvThres;
 
-    particle_length_sq = length*length;
-    curv_hard = curv_hardthres;
-
-    float sigma_s = pwid;
+    float sigma_s = particleWidth;
     gamma_s = 1/(sigma_s*sigma_s);
-    gamma_reg_s =1/(length*length/4);
+    gamma_reg_s =1/(m_SquaredParticleLength/4);
 }
 
-void EnergyComputer::drawSpatPosition(vnl_vector_fixed<float, 3>& R)
+// draw random position from active voxels
+void EnergyComputer::DrawRandomPosition(vnl_vector_fixed<float, 3>& R)
 {
     float r = m_RandGen->frand();
     int j;
@@ -100,71 +114,73 @@ void EnergyComputer::drawSpatPosition(vnl_vector_fixed<float, 3>& R)
     while(rh != rl)
     {
         j = rl + (rh-rl)/2;
-        if (r < cumulspatprob[j])
+        if (r < m_CumulatedSpatialProbability[j])
         {
             rh = j;
             continue;
         }
-        if (r > cumulspatprob[j])
+        if (r > m_CumulatedSpatialProbability[j])
         {
             rl = j+1;
             continue;
         }
         break;
     }
-    R[0] = m_Spacing[0]*((float)(spatidx[rh-1] % m_Size[0])  + m_RandGen->frand());
-    R[1] = m_Spacing[1]*((float)((spatidx[rh-1]/m_Size[0]) % m_Size[1])  + m_RandGen->frand());
-    R[2] = m_Spacing[2]*((float)(spatidx[rh-1]/(m_Size[0]*m_Size[1]))    + m_RandGen->frand());
+    R[0] = m_Spacing[0]*((float)(m_ActiveIndices[rh-1] % m_Size[0])  + m_RandGen->frand());
+    R[1] = m_Spacing[1]*((float)((m_ActiveIndices[rh-1]/m_Size[0]) % m_Size[1])  + m_RandGen->frand());
+    R[2] = m_Spacing[2]*((float)(m_ActiveIndices[rh-1]/(m_Size[0]*m_Size[1]))    + m_RandGen->frand());
 }
 
-float EnergyComputer::SpatProb(vnl_vector_fixed<float, 3> R)
+// return spatial probability of position
+float EnergyComputer::SpatProb(vnl_vector_fixed<float, 3> pos)
 {
-    int rx = floor(R[0]/m_Spacing[0]);
-    int ry = floor(R[1]/m_Spacing[1]);
-    int rz = floor(R[2]/m_Spacing[2]);
-    if (rx >= 0 && rx < m_Size[0] && ry >= 0 && ry < m_Size[1] && rz >= 0 && rz < m_Size[2]){
-        return m_MaskImageData[rx + m_Size[0]* (ry + m_Size[1]*rz)];
-    }
+    ItkFloatImageType::IndexType index;
+    index[0] = floor(pos[0]/m_Spacing[0]);
+    index[1] = floor(pos[1]/m_Spacing[1]);
+    index[2] = floor(pos[2]/m_Spacing[2]);
+
+    if (m_Mask->GetLargestPossibleRegion().IsInside(index)) // is inside image?
+        return m_Mask->GetPixel(index);
     else
         return 0;
 }
 
-float EnergyComputer::evaluateODF(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len)
+float EnergyComputer::EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vector_fixed<float, 3> dir)
 {
-    const int CU = 10;
-    vnl_vector_fixed<float, 3> Rs;
-    float Dn = 0;
-    int xint,yint,zint;
+    const int sampleSteps = 10;             // evaluate ODF at 2*sampleSteps+1 positions along dir
+    vnl_vector_fixed<float, 3> samplePos;   // current position to evaluate
+    float result = 0;                       // average of sampled ODF values
+    int xint, yint, zint;                   // voxel containing samplePos
 
-    vnl_vector_fixed<float, 3> n;
-    n[0] = N[0];
-    n[1] = N[1];
-    n[2] = N[2];
-    n = m_RotationMatrix*n;
-    m_SphereInterpolator->getInterpolation(n);
+    // rotate particle direction according to image rotation
+    dir = m_RotationMatrix*dir;
 
-    for (int i=-CU; i <= CU;i++)
+    // get interpolation for rotated direction
+    m_SphereInterpolator->getInterpolation(dir);
+
+    // sample ODF values along particle direction
+    for (int i=-sampleSteps; i <= sampleSteps;i++)
     {
-        Rs = R + (N * len) * ((float)i/CU);
+        samplePos = pos + (dir * m_ParticleLength) * ((float)i/sampleSteps);
 
-        if (!m_UseTrilinearInterpolation)
+        if (!m_UseTrilinearInterpolation)   // image has not enough slices to use trilinear interpolation
         {
             ItkQBallImgType::IndexType index;
-            index[0] = floor(R[0]/m_Spacing[0]);
-            index[1] = floor(R[1]/m_Spacing[1]);
-            index[2] = floor(R[2]/m_Spacing[2]);
-            if (index[0]>=0 && index[0]<m_Size[0] && index[1]>=0 && index[1]<m_Size[1] && index[2]>=0 && index[2]<m_Size[2])
+            index[0] = floor(pos[0]/m_Spacing[0]);
+            index[1] = floor(pos[1]/m_Spacing[1]);
+            index[2] = floor(pos[2]/m_Spacing[2]);
+            if (m_Image->GetLargestPossibleRegion().IsInside(index))
             {
-                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2]);
+                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2]);
             }
         }
-        else
+        else    // use trilinear interpolation
         {
-            float Rx = Rs[0]/m_Spacing[0]-0.5;
-            float Ry = Rs[1]/m_Spacing[1]-0.5;
-            float Rz = Rs[2]/m_Spacing[2]-0.5;
+            float Rx = samplePos[0]/m_Spacing[0]-0.5;
+            float Ry = samplePos[1]/m_Spacing[1]-0.5;
+            float Rz = samplePos[2]/m_Spacing[2]-0.5;
 
             xint = floor(Rx);
             yint = floor(Ry);
@@ -181,65 +197,65 @@ float EnergyComputer::evaluateODF(vnl_vector_fixed<float, 3> &R, vnl_vector_fixe
 
                 weight = (1-xfrac)*(1-yfrac)*(1-zfrac);
                 index[0] = xint; index[1] = yint; index[2] = zint;
-                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
                 weight = (xfrac)*(1-yfrac)*(1-zfrac);
                 index[0] = xint+1; index[1] = yint; index[2] = zint;
-                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
                 weight = (1-xfrac)*(yfrac)*(1-zfrac);
                 index[0] = xint; index[1] = yint+1; index[2] = zint;
-                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
                 weight = (1-xfrac)*(1-yfrac)*(zfrac);
                 index[0] = xint; index[1] = yint; index[2] = zint+1;
-                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
                 weight = (xfrac)*(yfrac)*(1-zfrac);
                 index[0] = xint+1; index[1] = yint+1; index[2] = zint;
-                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
                 weight = (1-xfrac)*(yfrac)*(zfrac);
                 index[0] = xint; index[1] = yint+1; index[2] = zint+1;
-                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
                 weight = (xfrac)*(1-yfrac)*(zfrac);
                 index[0] = xint+1; index[1] = yint; index[2] = zint+1;
-                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
 
                 weight = (xfrac)*(yfrac)*(zfrac);
                 index[0] = xint+1; index[1] = yint+1; index[2] = zint+1;
-                Dn += (m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_ImageData->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
+                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
+                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
             }
         }
     }
-    Dn *= 1.0/(2*CU+1);
-    return Dn;
+    result /= (2*sampleSteps+1);    // average result over taken samples
+    return result;
 }
 
-float EnergyComputer::computeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len, Particle *dp)
+float EnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, float &len, Particle *dp)
 {
     float m = SpatProb(R);
     if (m == 0)
         return -INFINITY;
 
-    float Dn = evaluateODF(R,N,len);
+    float Dn = EvaluateOdf(R, N);
 
     float Sn = 0;
     float Pn = 0;
@@ -255,32 +271,30 @@ float EnergyComputer::computeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_v
             float bw = mbesseli0(dot);
             float dpos = (p->R-R).squared_magnitude();
             float w = mexp(dpos*gamma_s);
-            Sn += w*(bw+chempot2);
+            Sn += w*(bw+m_ParticleChemicalPotential);
             w = mexp(dpos*gamma_reg_s);
             Pn += w*bw;
         }
     }
 
-    float energy = 0;
-    energy += 2*(Dn/particle_weight-Sn) - (mbesseli0(1.0)+chempot2);
-
-    return energy*ex_strength;
+    float energy = 2*(Dn/m_ParticleWeight-Sn) - (mbesseli0(1.0)+m_ParticleChemicalPotential);
+    return energy*m_ExtStrength;
 }
 
-float EnergyComputer::computeInternalEnergy(Particle *dp)
+float EnergyComputer::ComputeInternalEnergy(Particle *dp)
 {
-    float energy = eigen_energy;
+    float energy = 0;
 
     if (dp->pID != -1)
-        energy += computeInternalEnergyConnection(dp,+1);
+        energy += ComputeInternalEnergyConnection(dp,+1);
 
     if (dp->mID != -1)
-        energy += computeInternalEnergyConnection(dp,-1);
+        energy += ComputeInternalEnergyConnection(dp,-1);
 
     return energy;
 }
 
-float EnergyComputer::computeInternalEnergyConnection(Particle *p1,int ep1)
+float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1)
 {
     Particle *p2 = 0;
     int ep2;
@@ -298,18 +312,18 @@ float EnergyComputer::computeInternalEnergyConnection(Particle *p1,int ep1)
     if (p2 == 0)
         fprintf(stderr,"bug2");
 
-    return computeInternalEnergyConnection(p1,ep1,p2,ep2);
+    return ComputeInternalEnergyConnection(p1,ep1,p2,ep2);
 }
 
-float EnergyComputer::computeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2)
+float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2)
 {
-    if ((dot_product(p1->N,p2->N))*ep1*ep2 > -curv_hard)
+    if ((dot_product(p1->N,p2->N))*ep1*ep2 > -m_CurvatureThreshold)
         return -INFINITY;
 
-    vnl_vector_fixed<float, 3> R1 = p1->R + (p1->N * (p1->len * ep1));
-    vnl_vector_fixed<float, 3> R2 = p2->R + (p2->N * (p2->len * ep2));
+    vnl_vector_fixed<float, 3> R1 = p1->R + (p1->N * (m_ParticleLength * ep1));
+    vnl_vector_fixed<float, 3> R2 = p2->R + (p2->N * (m_ParticleLength * ep2));
 
-    if ((R1-R2).squared_magnitude() > particle_length_sq)
+    if ((R1-R2).squared_magnitude() > m_SquaredParticleLength)
         return -INFINITY;
 
     vnl_vector_fixed<float, 3> R = (p2->R + p1->R); R *= 0.5;
@@ -321,7 +335,7 @@ float EnergyComputer::computeInternalEnergyConnection(Particle *p1,int ep1, Part
     float norm2 = (R2-R).squared_magnitude();
 
 
-    float energy = (eigencon_energy-norm1-norm2)*in_strength;
+    float energy = (m_ConnectionPotential-norm1-norm2)*m_IntStrength;
 
     return energy;
 }

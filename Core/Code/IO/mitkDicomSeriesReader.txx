@@ -33,6 +33,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   std::locale previousCppLocale( std::cin.getloc() );
   std::locale l( "C" );
   std::cin.imbue(l);
+  
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+  const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
 
   try
   {
@@ -52,10 +55,38 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       bool canLoadAs4D(true);
       gdcm::Scanner scanner;
       ScanForSliceInformation(filenames, scanner);
+   
+      // need non-const access for map
+      gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(scanner.GetMappings());
       
-      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, scanner.GetMappings(), sort, canLoadAs4D );
+      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
+  
+      // TODO check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
+      // TODO check first and second position/orientation from tags, make some calculations
+      // TODO refactor these calculations into method, which could also be used from GetSeries()
 
+      bool volumeIsTilted(false);
+      double volumeTilt(-1.0);
+      // TODO check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible!!
+      std::string firstFilename(filenames.front());
+      std::string secondFilename( *(++(filenames.begin())) );
+
+      std::string imagePosition1(    ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImagePositionPatient ] ) );
+      std::string imageOrientation( ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImageOrientation ] ) );
+      std::string imagePosition2(    ConstCharStarToString( tagValueMappings[secondFilename.c_str() ][ tagImagePositionPatient ] ) );
+    
+      bool ignoredConversionError(-42); // hard to get here, no graceful way to react
+      Point3D origin1( DICOMStringToPoint3D( imagePosition1, ignoredConversionError ) );
+      Point3D origin2( DICOMStringToPoint3D( imagePosition2, ignoredConversionError ) );
+    
+      Vector3D right; right.Fill(0.0);
+      Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
+      DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
+
+      CheckGantryTilt( origin1, origin2, right, up, volumeIsTilted, volumeTilt );
+      MITK_DEBUG << "** Loading now: tilt? " << volumeIsTilted;
+      MITK_DEBUG << "** Loading now: how tilt? " << volumeTilt;
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
         image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
@@ -123,9 +154,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       }
     }
 
-	if (initialize_node)
-	{
-	  // forward some image properties to node
+    if (initialize_node)
+    {
+      // forward some image properties to node
       node.GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
 
       node.SetData( image );
@@ -202,6 +233,9 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
 {
   const gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
   scanner.AddTag(ippTag);
+  
+  const gdcm::Tag tagImageOrientation(0x0020,0x0037); //Image orientation
+  scanner.AddTag(tagImageOrientation);
 
   // TODO what if tags don't exist?
   const gdcm::Tag tagSliceLocation(0x0020, 0x1041); // slice location

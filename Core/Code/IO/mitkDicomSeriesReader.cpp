@@ -70,15 +70,16 @@ void DicomSeriesReader::SliceGroupingAnalysisResult::AddFileToUnsortedBlock(cons
   m_UnsortedFiles.push_back( filename );
 }
 
-void DicomSeriesReader::SliceGroupingAnalysisResult::FlagGantryTilt()
+void DicomSeriesReader::SliceGroupingAnalysisResult::FlagGantryTilt(Vector3D interSliceOffset)
 {
+  m_InterSliceOffset = interSliceOffset;
   m_GantryTilt = true;
 }
 
 void DicomSeriesReader::SliceGroupingAnalysisResult::DoATrick()
 {
   assert( !m_GroupedFiles.empty() );
-  m_UnsortedFiles.push_back( m_GroupedFiles.back() );
+  m_UnsortedFiles.insert( m_UnsortedFiles.begin(), m_GroupedFiles.back() );
   m_GroupedFiles.pop_back();
 }
 
@@ -423,6 +424,109 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   return true; // actually never returns false yet.. but exception possible
 }
 
+void 
+DicomSeriesReader::CheckGantryTilt( 
+    const Point3D& origin1, const Point3D& origin2,
+    const Vector3D& right, const Vector3D& up,
+    bool& volumeIsTilted, double& volumeTilt )
+{
+  // determine if slice 1 (imagePosition1 and imageOrientation1) and slice 2 can be in one orthogonal slice stack:
+  // calculate a line from origin 1, directed along the normal of slice (calculated as the cross product of orientation 1)
+  // check if this line passes through origin 2
+        
+  /* 
+     Determine if line (imagePosition2 + l * normal) contains imagePosition1.
+     Done by calculating the distance of imagePosition1 from line (imagePosition2 + l *normal)
+
+     E.g. http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+
+     squared distance = | (pointAlongNormal - origin2) x (origin2 - origin1) | ^ 2
+     /
+     |pointAlongNormal - origin2| ^ 2
+
+     ( x meaning the cross product )
+  */
+
+  Vector3D normal = itk::CrossProduct(right, up);
+  Point3D pointAlongNormal = origin2 + normal;
+
+  double numerator = itk::CrossProduct( pointAlongNormal - origin2 , origin2 - origin1 ).GetSquaredNorm();
+  double denominator = (pointAlongNormal - origin2).GetSquaredNorm();
+
+  double distance = sqrt(numerator / denominator);
+
+  volumeIsTilted = distance > 0.001; // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
+  if ( volumeIsTilted )
+  {
+    MITK_DEBUG << "  Series might contain a tilted geometry";
+    MITK_DEBUG << "  Distance of expected slice origin from actual slice origin: " << distance;
+    MITK_DEBUG << "    ==> storing this distance for later analysis.";
+
+    volumeTilt = distance;
+  }
+}
+
+std::string
+DicomSeriesReader::ConstCharStarToString(const char* s)
+{
+  return s ?  std::string(s) : std::string();
+}
+  
+Point3D
+DicomSeriesReader::DICOMStringToPoint3D(const std::string& s, bool& successful)
+{
+  Point3D p;
+  successful = true;
+
+  std::istringstream originReader(s);
+  std::string coordinate;
+  unsigned int dim(0);
+  while( std::getline( originReader, coordinate, '\\' ) ) 
+  {
+    if (dim > 4) break; // otherwise we access invalid array index
+
+    p[dim++] = atof(coordinate.c_str());
+  }
+
+  if (dim != 3)
+  {
+    successful = false;
+    MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0032). Found " << dim << " instead of 3 values.";
+  }
+
+  return p;
+}
+  
+void
+DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful)
+{
+  successful = true;
+
+  std::istringstream orientationReader(s);
+  std::string coordinate;
+  unsigned int dim(0);
+  while( std::getline( orientationReader, coordinate, '\\' ) )
+  {
+    if (dim > 6) break; // otherwise we access invalid array index
+
+    if (dim<3) 
+    {
+      right[dim++] = atof(coordinate.c_str());
+    }
+    else
+    {
+      up[dim++ - 3] = atof(coordinate.c_str());
+    }
+  }
+
+  if (dim != 6)
+  {
+    successful = false;
+    MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0037). Found " << dim << " instead of 6 values.";
+  }
+}
+
+
 DicomSeriesReader::SliceGroupingAnalysisResult
 DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     const StringContainer& files,
@@ -447,10 +551,8 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
   bool lastOriginInitialized(false);
 
-  bool assumeGantryTilt(false);
-
   MITK_DEBUG << "--------------------------------------------------------------------------------";
-  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader "; // TODO output tilting allowed
+  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader ";
   unsigned int fileIndex(0);
   for (StringContainer::const_iterator fileIter = files.begin();
        fileIter != files.end();
@@ -459,21 +561,10 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     bool fileFitsIntoPattern(false);
     std::string thisOriginString;
     // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
-    const char* value = tagValueMappings[fileIter->c_str()][tagImagePositionPatient];
-    if (value)
-    {
-      thisOriginString = value;
-    }
+    thisOriginString = ConstCharStarToString( tagValueMappings[fileIter->c_str()][tagImagePositionPatient] );
 
-    std::istringstream originReader(thisOriginString);
-    std::string coordinate;
-    unsigned int dim(0);
-    while( std::getline( originReader, coordinate, '\\' ) ) thisOrigin[dim++] = atof(coordinate.c_str());
-
-    if (dim != 3)
-    {
-      MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0032). Found " << dim << "instead of 3 values.";
-    }
+    bool ignoredConversionError(-42); // hard to get here, no graceful way to react
+    thisOrigin = DICOMStringToPoint3D( thisOriginString, ignoredConversionError );
 
     MITK_DEBUG << "  " << fileIndex << " " << *fileIter
                        << " at "
@@ -496,84 +587,28 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
         // If this is NOT the case, then we have a data set with a TILTED GANTRY geometry,
         // which cannot be loaded into a single mitk::Image at the moment
 
-        // Again ugly code to read tag Image Orientation into two vEctors
         Vector3D right; right.Fill(0.0);
         Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
-        std::string thisOrientationString;
-        const char* value = tagValueMappings[fileIter->c_str()][tagImageOrientation];
-        if (value)
+        DICOMStringToOrientationVectors( tagValueMappings[fileIter->c_str()][tagImageOrientation], right, up, ignoredConversionError );
+       
+        bool assumeTilt(false);
+        double tiltDistance = -0.0;
+        CheckGantryTilt( lastDifferentOrigin, thisOrigin, right, up, assumeTilt, tiltDistance);
+
+        if (assumeTilt) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
         {
-          thisOrientationString = value;
-        }
-        std::istringstream orientationReader(thisOrientationString);
-        std::string coordinate;
-        unsigned int dim(0);
-        while( std::getline( orientationReader, coordinate, '\\' ) )
-          if (dim<3) right[dim++] = atof(coordinate.c_str());
-          else      up[dim++ - 3] = atof(coordinate.c_str());
-
-        if (dim != 6)
-        {
-          MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0037). Found " << dim << "instead of 6 values.";
-        }
-
-
-        /* 
-           Determine if line (thisOrigin + l * normal) contains lastDifferentOrigin.
-
-           Done by calculating the distance of lastDifferentOrigin from line (thisOrigin + l *normal)
-
-           E.g. http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
-
-           squared distance = | (pointAlongNormal - thisOrign) x (thisOrigin - lastDifferentOrigin) | ^ 2
-                              /
-                              |pointAlongNormal - thisOrigin| ^ 2
-
-           ( x meaning the cross product )
-
-        MITK_DEBUG << "Tilt check: right vector (" << right[0] << "," << right[1] << "," << right[2] << "), "
-                                     "up vector (" << up[0] << "," << up[1] << "," << up[2] << ")";
-        */
-
-        Vector3D normal = itk::CrossProduct(right, up);
-        Point3D pointAlongNormal = thisOrigin + normal;
-        
-        double numerator = itk::CrossProduct( pointAlongNormal - thisOrigin , thisOrigin - lastDifferentOrigin ).GetSquaredNorm();
-        double denominator = (pointAlongNormal - thisOrigin).GetSquaredNorm();
-
-        double distance = sqrt(numerator / denominator);
-
-        if (distance > 0.001) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
-        {
-          MITK_DEBUG << "  Series might contain a tilted geometry";
-          MITK_DEBUG << "  Distance of expected slice origin from actual slice origin: " << distance;
-          //MITK_DEBUG << "    ==> Sort away " << *fileIter << " for later analysis";
-          MITK_DEBUG << "    ==> storing this distance for later analysis.";
-
-          /* Pessimistic approach: split block right here
-
-          result.first.assign( files.begin(), fileIter );
-          result.second.insert( result.second.end(), fileIter, files.end() );
-
-          return result; // stop processing with first split
-          */
-
-          /* TODO optimistic approach: save file for later, check all further files */
+          /* TODO optimistic approach, accepting gantry tilt: save file for later, check all further files */
+          
           // TODO at this point we have TWO slices analyzed! if they are the only two files, we still split, because there is no third to verify our tilting assumption.
           // TODO later with a third being available, we must check if the initial tilting vector is still valid. if yes, continue. 
           // TODO if NO, we need to split the already sorted part (result.first) and the currently analyzed file (*fileIter)
 
           // TODO how do we tell apart gantry tilt from overall skewedness?
           // TODO WE DON'T at first.
-
-          result.AddFileToUnsortedBlock(*fileIter);
-          fileFitsIntoPattern = false;
-         
-          /*
-          result.FlagGantryTilt();
+          result.FlagGantryTilt( fromFirstToSecondOrigin );
+          
           result.AddFileToSortedBlock(*fileIter); // this file is good for current block
           fileFitsIntoPattern = true;
-          */
         }
         else
         {
@@ -606,15 +641,6 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           // We split the input file list at this point, i.e. all files up to this one (excluding it)
           // are returned as group 1, the remaining files (including the faulty one) are group 2
           
-          /*
-             Pessimistic approach: split right here:
-
-          result.first.assign( files.begin(), fileIter );
-          result.second.insert( result.second.end(), fileIter, files.end() );
-
-          return result; // stop processing with first split
-          */
-
           /* Optimistic approach: check if any of the remaining slices fits in */
           result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
           fileFitsIntoPattern = false;
@@ -642,16 +668,17 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     lastOriginInitialized = true;
   }
 
-  if ( assumeGantryTilt )
+  if ( result.ContainsGantryTilt() )
   {
-    // TODO communicate this finding to caller
-    // 
-    // TODO check here how many files were grouped.
-    //      IF it was only two files AND we assume tiltedness (e.g. save "distance")
-    //      THEN we would want to also split the two previous files (simple) because
-    //      we don't have any reason to assume they belong together
+    // check here how many files were grouped.
+    // IF it was only two files AND we assume tiltedness (e.g. save "distance")
+    // THEN we would want to also split the two previous files (simple) because
+    // we don't have any reason to assume they belong together
 
-    // TODO store fromFirstToSecondOrigin somewhere, this can be used for block grouping! 
+    if ( result.GetBlockFilenames().size() == 2 )
+    {
+      result.DoATrick();
+    }
   }
   
   return result;
@@ -758,6 +785,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
   for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
   {
     UidFileNamesMap mapOf3DBlocks;      // intermediate result for only this group(!)
+    std::map<std::string, SliceGroupingAnalysisResult> mapOf3DBlockAnalysisResults;
     StringContainer filesStillToAnalyze = groupIter->second;
     std::string groupUID = groupIter->first;
     unsigned int subgroup(0);
@@ -780,7 +808,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
 
     // end of grouping, now post-process groups
   
-    // TODO: check tilting property of blocks. they must match!
+    // TODO: store and compare tilting property of blocks. they must match!
 
     // PART IV: attempt to group blocks to 3D+t blocks if requested
     //           inspect entries of mapOf3DBlocks
@@ -839,12 +867,12 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
             } 
             else
             { 
-              std::string thisOriginString = origin_value;
-              std::string previousOriginString = previous_origin_value;
+              std::string thisOriginString = ConstCharStarToString( origin_value );
+              std::string previousOriginString = ConstCharStarToString( previous_origin_value );
 
               // also compare last origin, because this might differ if z-spacing is different
-              std::string thisDestinationString = destination_value;
-              std::string previousDestinationString = previous_destination_value;
+              std::string thisDestinationString = ConstCharStarToString( destination_value );
+              std::string previousDestinationString = ConstCharStarToString( previous_destination_value );
 
               identicalOrigins =  ( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
             }
@@ -1184,17 +1212,17 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
   itk::MetaDataDictionary::ConstIterator dictIter = dict.Begin();
   while ( dictIter != dict.End() )
   {
-    MITK_DEBUG << "Key " << dictIter->first;
+    //MITK_DEBUG << "Key " << dictIter->first;
     std::string value;
     if ( itk::ExposeMetaData<std::string>( dict, dictIter->first, value ) )
     {
-      MITK_DEBUG << "Value " << value;
+      //MITK_DEBUG << "Value " << value;
 
       TagToPropertyMapType::const_iterator valuePosition = propertyLookup.find( dictIter->first );
       if ( valuePosition != propertyLookup.end() )
       {
         std::string propertyKey = valuePosition->second;
-        MITK_DEBUG << "--> " << propertyKey;
+        //MITK_DEBUG << "--> " << propertyKey;
         
         image->SetProperty( propertyKey.c_str(), StringProperty::New(value) );
       }

@@ -311,7 +311,7 @@ protected:
 
       void AddFileToSortedBlock(const std::string& filename);
       void AddFileToUnsortedBlock(const std::string& filename);
-      void FlagGantryTilt();
+      void FlagGantryTilt(Vector3D interSliceOffset);
 
       void DoATrick();
 
@@ -349,6 +349,25 @@ protected:
   static
   SliceGroupingAnalysisResult
   AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings_);
+      
+  static 
+  void 
+  CheckGantryTilt( const Point3D& origin1, const Point3D& origin2,
+                   const Vector3D& right, const Vector3D& up,
+                   bool& volumeIsTilted, double& volumeTilt );
+
+  static
+  std::string
+  ConstCharStarToString(const char* s);
+
+  static
+  Point3D
+  DICOMStringToPoint3D(const std::string& s, bool& successful);
+
+  static
+  void
+  DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful);
+
 
   /**
     \brief Sort a set of file names in an order that is meaningful for loading them into an mitk::Image.

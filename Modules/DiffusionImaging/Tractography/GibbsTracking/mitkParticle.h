@@ -38,15 +38,14 @@ public:
     {
     }
 
-    vnl_vector_fixed<float, 3> R;
-    vnl_vector_fixed<float, 3> N;
+    vnl_vector_fixed<float, 3> pos; // particle position (world coordinates. corner based voxels. not accounted for image rotation.
+    vnl_vector_fixed<float, 3> dir; // normalized direction vector
 
-    int gridindex; // index in the grid where it is living
-    int ID;
-    int pID;
-    int mID;
-
-    unsigned char label;
+    int gridindex;          // index in the grid where it is living
+    int ID;                 // particle ID
+    int pID;                // successor ID
+    int mID;                // predecessor ID
+    unsigned char label;    // label used in the fiber building process
 };
 
 class MitkDiffusionImaging_EXPORT EndPoint

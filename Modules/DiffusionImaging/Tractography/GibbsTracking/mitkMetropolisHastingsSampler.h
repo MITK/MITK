@@ -44,6 +44,7 @@ public:
 
     void MakeProposal();
     int GetNumAcceptedProposals();
+    void SetProbabilities(float birth, float death, float shift, float optShift, float connect);
 
 protected:
 
@@ -57,27 +58,27 @@ protected:
     vnl_vector_fixed<float, 3> DistortVector(float sigma, vnl_vector_fixed<float, 3>& vec);
     vnl_vector_fixed<float, 3> GetRandomDirection();
 
-    MTRand*     m_RandGen;
-    Track       m_ProposalTrack;
-    Track       m_BackupTrack;
-    SimpSamp    m_SimpSamp;
+    MTRand*     m_RandGen;          // random generator
+    Track       m_ProposalTrack;    // stores proposal track
+    Track       m_BackupTrack;      // stores track removed for new proposal traCK
+    SimpSamp    m_SimpSamp;         // neighbouring particles and their probabilities for the local tracking
 
-    float m_InTemp;
-    float m_ExTemp;
+    float m_InTemp;     // simulated annealing temperature
+    float m_ExTemp;     // simulated annealing temperature
     float m_Density;
 
-    float m_BirthProb;
-    float m_DeathProb;
-    float m_ShiftProb;
-    float m_OptShiftProb;
-    float m_ConnectionProb;
+    float m_BirthProb;          // probability for particle birth
+    float m_DeathProb;          // probability for particle death
+    float m_ShiftProb;          // probability for particle shift
+    float m_OptShiftProb;       // probability for optimal particle shift
+    float m_ConnectionProb;     // probability for particle connection proposal
 
     float m_Sigma;
     float m_Gamma;
     float m_Z;
 
-    float m_DistanceThreshold;
-    float m_CurvatureThreshold;
+    float m_DistanceThreshold;  // threshold for maximum distance between connected particles
+    float m_CurvatureThreshold; // threshold for maximum angle between connected particles
     float m_TractProb;
     float m_StopProb;
     float m_DelProb;

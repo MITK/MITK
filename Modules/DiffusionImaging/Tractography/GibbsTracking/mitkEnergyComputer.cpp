@@ -61,7 +61,7 @@ EnergyComputer::EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* m
         fprintf(stderr,"EnergyComputer: error during init: data does not match with interpolation scheme\n");
 
     int totsz = m_Size[0]*m_Size[1]*m_Size[2];
-    m_CumulatedSpatialProbability.resize(totsz, 0.0);
+    m_CumulatedSpatialProbability.resize(totsz, 0.0); // +1?
     m_ActiveIndices.resize(totsz, 0);
 
     // calculate active voxels and cumulate probabilities
@@ -264,9 +264,9 @@ float EnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_v
         if (dp != neighbour)                        // don't evaluate against itself
         {
             // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-            float dot = fabs(dot_product(N,neighbour->N));
+            float dot = fabs(dot_product(N,neighbour->dir));
             float bw = mbesseli0(dot);
-            float dpos = (neighbour->R-R).squared_magnitude();
+            float dpos = (neighbour->pos-R).squared_magnitude();
             float w = mexp(dpos*gamma_s);
             modelVal += w*(bw+m_ParticleChemicalPotential);
             w = mexp(dpos*gamma_reg_s);
@@ -315,19 +315,19 @@ float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1)
 float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2)
 {
     // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-    if ((dot_product(p1->N,p2->N))*ep1*ep2 > -m_CurvatureThreshold)     // angle between particles is too sharp
+    if ((dot_product(p1->dir,p2->dir))*ep1*ep2 > -m_CurvatureThreshold)     // angle between particles is too sharp
         return -INFINITY;
 
     // calculate the endpoints of the two particles
-    vnl_vector_fixed<float, 3> endPoint1 = p1->R + (p1->N * (m_ParticleLength * ep1));
-    vnl_vector_fixed<float, 3> endPoint2 = p2->R + (p2->N * (m_ParticleLength * ep2));
+    vnl_vector_fixed<float, 3> endPoint1 = p1->pos + (p1->dir * (m_ParticleLength * ep1));
+    vnl_vector_fixed<float, 3> endPoint2 = p2->pos + (p2->dir * (m_ParticleLength * ep2));
 
     // check if endpoints are too far apart to connect
     if ((endPoint1-endPoint2).squared_magnitude() > m_SquaredParticleLength)
         return -INFINITY;
 
     // calculate center point of the two particles
-    vnl_vector_fixed<float, 3> R = (p2->R + p1->R); R *= 0.5;
+    vnl_vector_fixed<float, 3> R = (p2->pos + p1->pos); R *= 0.5;
 
     // they are not allowed to connect if the mask image does not allow it
     if (SpatProb(R) == 0)

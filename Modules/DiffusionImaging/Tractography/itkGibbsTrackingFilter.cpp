@@ -211,19 +211,19 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     unsigned long singleIts = (unsigned long)((1.0*m_Iterations) / (1.0*m_Steps));
 
     // seed random generators
-    MTRand randGen(1);
-    srand(1);
+    MTRand randGen;
+//    srand(1);
 
     // load sphere interpolator to evaluate the ODFs
-    SphereInterpolator* interpolator = LoadSphereInterpolator();
+    SphereInterpolator* interpolator = new SphereInterpolator();
 
     // initialize the actual tracking components (ParticleGrid, Metropolis Hastings Sampler and Energy Computer)
     ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
 
-    EnergyComputer encomp(m_QBallImage, m_MaskImage, particleGrid, interpolator, &randGen);
-    encomp.SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
+    EnergyComputer* encomp = new EnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, &randGen);
+    encomp->SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
 
-    MetropolisHastingsSampler sampler(particleGrid, &encomp, &randGen, m_CurvatureThreshold);
+    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, encomp, &randGen, m_CurvatureThreshold);
 
     // main loop
     m_NumAcceptedFibers = 0;
@@ -232,18 +232,18 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     {
         // update temperatur for simulated annealing process
         float temperature = m_StartTemperature * exp(alpha*(((1.0)*m_CurrentStep)/((1.0)*m_Steps)));
-        sampler.SetTemperature(temperature);
+        sampler->SetTemperature(temperature);
 
         for (unsigned long i=0; i<singleIts; i++)
         {
             if (m_AbortTracking)
                 break;
 
-            sampler.MakeProposal();
+            sampler->MakeProposal();
 
             if (m_BuildFibers || (i==singleIts-1 && m_CurrentStep==m_Steps))
             {
-                m_ProposalAcceptance = (float)sampler.GetNumAcceptedProposals()/counter;
+                m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/counter;
                 m_NumParticles = particleGrid->m_NumParticles;
                 m_NumConnections = particleGrid->m_NumConnections;
 
@@ -255,15 +255,18 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
             counter++;
         }
 
-        m_ProposalAcceptance = (float)sampler.GetNumAcceptedProposals()/counter;
+        m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/counter;
         m_NumParticles = particleGrid->m_NumParticles;
         m_NumConnections = particleGrid->m_NumConnections;
+
         MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
         MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
         MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
         MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)m_CurrentStep/m_Steps << "%";
     }
 
+    delete sampler;
+    delete encomp;
     delete interpolator;
     delete particleGrid;
     m_AbortTracking = true;
@@ -307,65 +310,6 @@ void GibbsTrackingFilter< ItkQBallImageType >::PrepareMaskImage()
         m_MaskImage = resampler->GetOutput();
         MITK_INFO << "itkGibbsTrackingFilter: resampling finished";
     }
-}
-
-template< class ItkQBallImageType >
-SphereInterpolator* GibbsTrackingFilter< ItkQBallImageType >::LoadSphereInterpolator()
-{
-    QString applicationDir = QCoreApplication::applicationDirPath();
-    applicationDir.append("/");
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
-    applicationDir.append("../");
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
-    applicationDir.append("../../");
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
-
-    std::string lutPath = mitk::StandardFileLocations::GetInstance()->FindFile("FiberTrackingLUTBaryCoords.bin");
-    ifstream BaryCoords;
-    BaryCoords.open(lutPath.c_str(), ios::in | ios::binary);
-    float* coords;
-    if (BaryCoords.is_open())
-    {
-        float tmp;
-        coords = new float [1630818];
-        BaryCoords.seekg (0, ios::beg);
-        for (int i=0; i<1630818; i++)
-        {
-            BaryCoords.read((char *)&tmp, sizeof(tmp));
-            coords[i] = tmp;
-        }
-        BaryCoords.close();
-    }
-    else
-    {
-        MITK_INFO << "itkGibbsTrackingFilter: unable to open barycoords file";
-        m_AbortTracking = true;
-    }
-
-    ifstream Indices;
-    lutPath = mitk::StandardFileLocations::GetInstance()->FindFile("FiberTrackingLUTIndices.bin");
-    Indices.open(lutPath.c_str(), ios::in | ios::binary);
-    int* ind;
-    if (Indices.is_open())
-    {
-        int tmp;
-        ind = new int [1630818];
-        Indices.seekg (0, ios::beg);
-        for (int i=0; i<1630818; i++)
-        {
-            Indices.read((char *)&tmp, 4);
-            ind[i] = tmp;
-        }
-        Indices.close();
-    }
-    else
-    {
-        MITK_INFO << "itkGibbsTrackingFilter: unable to open indices file";
-        m_AbortTracking = true;
-    }
-
-    // initialize sphere interpolator with lookuptables
-    return new SphereInterpolator(coords, ind, QBALL_ODFSIZE, 301, 0.5);
 }
 
 }

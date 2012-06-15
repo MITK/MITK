@@ -94,7 +94,6 @@ protected:
     GibbsTrackingFilter();
     virtual ~GibbsTrackingFilter();
     bool EstimateParticleWeight();
-    SphereInterpolator* LoadSphereInterpolator();
     void PrepareMaskImage();
 
     // Input Images

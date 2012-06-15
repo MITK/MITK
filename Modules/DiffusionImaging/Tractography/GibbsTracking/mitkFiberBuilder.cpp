@@ -123,9 +123,9 @@ void FiberBuilder::AddPoint(Particle *dp, vtkSmartPointer<vtkPolyLine> container
     dp->label = 2;
 
     itk::ContinuousIndex<float, 3> index;
-    index[0] = dp->R[0]/m_Image->GetSpacing()[0]-0.5;
-    index[1] = dp->R[1]/m_Image->GetSpacing()[1]-0.5;
-    index[2] = dp->R[2]/m_Image->GetSpacing()[2]-0.5;
+    index[0] = dp->pos[0]/m_Image->GetSpacing()[0]-0.5;
+    index[1] = dp->pos[1]/m_Image->GetSpacing()[1]-0.5;
+    index[2] = dp->pos[2]/m_Image->GetSpacing()[2]-0.5;
     itk::Point<float> point;
     m_Image->TransformContinuousIndexToPhysicalPoint( index, point );
     vtkIdType id = m_VtkPoints->InsertNextPoint(point.GetDataPointer());

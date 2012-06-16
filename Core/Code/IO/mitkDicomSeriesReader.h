@@ -354,7 +354,7 @@ protected:
   void 
   CheckGantryTilt( const Point3D& origin1, const Point3D& origin2,
                    const Vector3D& right, const Vector3D& up,
-                   bool& volumeIsTilted, double& volumeTilt );
+                   bool& volumeIsTilted, Vector3D& interSliceOffset );
 
   static
   std::string
@@ -367,6 +367,11 @@ protected:
   static
   void
   DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful);
+
+  template <typename ImageType>
+  static
+  typename ImageType::Pointer
+  InPlaceFixUpTiltedGeometry( ImageType* input );
 
 
   /**

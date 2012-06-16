@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageSeriesReader.h>
 #include <mitkProperties.h>
 
+#include <itkResampleImageFilter.h>
+#include <itkAffineTransform.h>
+#include <itkLinearInterpolateImageFunction.h>
+
 namespace mitk
 {
 
@@ -67,7 +71,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       // TODO refactor these calculations into method, which could also be used from GetSeries()
 
       bool volumeIsTilted(false);
-      double volumeTilt(-1.0);
+      Vector3D InterSliceOffset;
       // TODO check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible!!
       std::string firstFilename(filenames.front());
       std::string secondFilename( *(++(filenames.begin())) );
@@ -84,9 +88,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
       DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
 
-      CheckGantryTilt( origin1, origin2, right, up, volumeIsTilted, volumeTilt );
+      CheckGantryTilt( origin1, origin2, right, up, volumeIsTilted, InterSliceOffset );
       MITK_DEBUG << "** Loading now: tilt? " << volumeIsTilted;
-      MITK_DEBUG << "** Loading now: how tilt? " << volumeTilt;
+      MITK_DEBUG << "** Loading now: how tilt? " << InterSliceOffset[0];
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
         image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
@@ -113,8 +117,16 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
         reader->SetFileNames(imageBlocks.front());
         reader->Update();
-        image->InitializeByItk(reader->GetOutput(), 1, volume_count);
-        image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
+
+        typename ImageType::Pointer readVolume = reader->GetOutput();
+        // TODO call tilt correction here as an itk filter
+        // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
+        if (volumeIsTilted)
+        {
+          readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput() );
+        }
+        image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
+        image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
 
         gdcm::Scanner scanner;
         ScanForSliceInformation(filenames, scanner);
@@ -147,11 +159,18 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         {
           reader->SetFileNames(*df_it);
           reader->Update();
-          image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), act_volume++);
+          readVolume = reader->GetOutput();
+          
+          if (volumeIsTilted)
+          {
+            readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput() );
+          }
+          image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
         }
         
         initialize_node = true;
       }
+   
     }
 
     if (initialize_node)
@@ -345,6 +364,33 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
 
   return imageBlocks;
 }
+
+template <typename ImageType>
+typename ImageType::Pointer
+DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input )
+{
+  typedef itk::ResampleImageFilter<ImageType,ImageType> ResampleFilterType;
+  typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+
+  typedef itk::AffineTransform< double, ImageType::ImageDimension > TransformType;
+  typename TransformType::Pointer transform = TransformType::New();
+  resampler->SetTransform( transform );
+
+  typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
+  typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+  resampler->SetInterpolator( interpolator );
+
+  resampler->SetDefaultPixelValue(120);
+  resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
+  
+  // TODO calculate transform!
+  // TODO adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
+
+  resampler->SetInput( input );
+  resampler->Update();
+  return resampler->GetOutput();
+}
+
 
 }
 

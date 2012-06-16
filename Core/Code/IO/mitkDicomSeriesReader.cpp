@@ -428,7 +428,7 @@ void
 DicomSeriesReader::CheckGantryTilt( 
     const Point3D& origin1, const Point3D& origin2,
     const Vector3D& right, const Vector3D& up,
-    bool& volumeIsTilted, double& volumeTilt )
+    bool& volumeIsTilted, Vector3D& interSliceOffset )
 {
   // determine if slice 1 (imagePosition1 and imageOrientation1) and slice 2 can be in one orthogonal slice stack:
   // calculate a line from origin 1, directed along the normal of slice (calculated as the cross product of orientation 1)
@@ -462,7 +462,7 @@ DicomSeriesReader::CheckGantryTilt(
     MITK_DEBUG << "  Distance of expected slice origin from actual slice origin: " << distance;
     MITK_DEBUG << "    ==> storing this distance for later analysis.";
 
-    volumeTilt = distance;
+    interSliceOffset.Fill( distance );
   }
 }
 
@@ -592,8 +592,8 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
         DICOMStringToOrientationVectors( tagValueMappings[fileIter->c_str()][tagImageOrientation], right, up, ignoredConversionError );
        
         bool assumeTilt(false);
-        double tiltDistance = -0.0;
-        CheckGantryTilt( lastDifferentOrigin, thisOrigin, right, up, assumeTilt, tiltDistance);
+        Vector3D interSliceOffset;
+        CheckGantryTilt( lastDifferentOrigin, thisOrigin, right, up, assumeTilt, interSliceOffset);
 
         if (assumeTilt) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
         {

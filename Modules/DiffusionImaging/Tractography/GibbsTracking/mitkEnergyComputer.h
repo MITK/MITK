@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOrientationDistributionFunction.h>
 #include <mitkParticleGrid.h>
 #include <mitkSphereInterpolator.h>
-#include <MersenneTwister.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
 using namespace mitk;

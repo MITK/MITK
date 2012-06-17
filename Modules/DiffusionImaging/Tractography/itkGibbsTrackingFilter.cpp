@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOrientationDistributionFunction.h>
 #include <itkDiffusionQballGeneralizedFaImageFilter.h>
 #include <mitkStandardFileLocations.h>
-#include <MersenneTwister.h>
 #include <mitkFiberBuilder.h>
 #include <mitkMetropolisHastingsSampler.h>
 #include <mitkEnergyComputer.h>

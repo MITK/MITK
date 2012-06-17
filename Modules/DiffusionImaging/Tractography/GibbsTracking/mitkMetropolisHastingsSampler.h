@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkDiffusionImagingExports.h>
 #include <mitkParticleGrid.h>
 #include <mitkEnergyComputer.h>
-#include <MersenneTwister.h>
 #include <mitkSimpSamp.h>
 
 // ITK

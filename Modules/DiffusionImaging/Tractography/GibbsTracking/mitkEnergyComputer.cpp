@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-EnergyComputer::EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, MTRand* randGen)
+EnergyComputer::EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen)
     : m_UseTrilinearInterpolation(true)
 {
     m_ParticleGrid = particleGrid;
@@ -107,7 +107,7 @@ void EnergyComputer::SetParameters(float particleWeight, float particleWidth, fl
 // draw random position from active voxels
 void EnergyComputer::DrawRandomPosition(vnl_vector_fixed<float, 3>& R)
 {
-    float r = m_RandGen->frand();
+    float r = m_RandGen->GetVariate();//m_RandGen->frand();
     int j;
     int rl = 1;
     int rh = m_NumActiveVoxels;
@@ -126,9 +126,9 @@ void EnergyComputer::DrawRandomPosition(vnl_vector_fixed<float, 3>& R)
         }
         break;
     }
-    R[0] = m_Spacing[0]*((float)(m_ActiveIndices[rh-1] % m_Size[0])  + m_RandGen->frand());
-    R[1] = m_Spacing[1]*((float)((m_ActiveIndices[rh-1]/m_Size[0]) % m_Size[1])  + m_RandGen->frand());
-    R[2] = m_Spacing[2]*((float)(m_ActiveIndices[rh-1]/(m_Size[0]*m_Size[1]))    + m_RandGen->frand());
+    R[0] = m_Spacing[0]*((float)(m_ActiveIndices[rh-1] % m_Size[0])  + m_RandGen->GetVariate());
+    R[1] = m_Spacing[1]*((float)((m_ActiveIndices[rh-1]/m_Size[0]) % m_Size[1])  + m_RandGen->GetVariate());
+    R[2] = m_Spacing[2]*((float)(m_ActiveIndices[rh-1]/(m_Size[0]*m_Size[1]))    + m_RandGen->GetVariate());
 }
 
 // return spatial probability of position

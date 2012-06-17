@@ -527,9 +527,6 @@ void QmitkGibbsTrackingView::GenerateFiberBundle(bool smoothFibers)
         return;
     m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
 
-    //  if (smoothFibers)
-    //    m_FiberBundle->DoFiberSmoothing(10);
-
     if (m_FiberBundleNode.IsNotNull()){
         GetDefaultDataStorage()->Remove(m_FiberBundleNode);
         m_FiberBundleNode = 0;

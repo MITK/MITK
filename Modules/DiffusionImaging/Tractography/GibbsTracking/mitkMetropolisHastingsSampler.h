@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK
 #include <itkImage.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 // MISC
 #include <fstream>
@@ -38,8 +39,9 @@ class MitkDiffusionImaging_EXPORT MetropolisHastingsSampler
 public:
 
     typedef itk::Image< float, 3 >  ItkFloatImageType;
+    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator ItkRandGenType;
 
-    MetropolisHastingsSampler(ParticleGrid* grid, EnergyComputer* enComp, MTRand* randGen, float curvThres);
+    MetropolisHastingsSampler(ParticleGrid* grid, EnergyComputer* enComp, ItkRandGenType* randGen, float curvThres);
     void SetTemperature(float val);
 
     void MakeProposal();
@@ -58,7 +60,7 @@ protected:
     vnl_vector_fixed<float, 3> DistortVector(float sigma, vnl_vector_fixed<float, 3>& vec);
     vnl_vector_fixed<float, 3> GetRandomDirection();
 
-    MTRand*     m_RandGen;          // random generator
+    ItkRandGenType* m_RandGen;      // random generator
     Track       m_ProposalTrack;    // stores proposal track
     Track       m_BackupTrack;      // stores track removed for new proposal traCK
     SimpSamp    m_SimpSamp;         // neighbouring particles and their probabilities for the local tracking

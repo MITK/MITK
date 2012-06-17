@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkParticleGrid.h>
 #include <mitkSphereInterpolator.h>
 #include <MersenneTwister.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 using namespace mitk;
 
@@ -33,8 +34,9 @@ public:
     typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
     typedef itk::Image<OdfVectorType, 3>        ItkQBallImgType;
     typedef itk::Image<float, 3>                ItkFloatImageType;
+    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator ItkRandGenType;
 
-    EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, MTRand* randGen);
+    EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen);
     void SetParameters(float particleWeight, float particleWidth, float connectionPotential, float curvThres, float inexBalance, float particlePotential);
 
     // get random position inside mask
@@ -53,7 +55,7 @@ protected:
     vnl_matrix_fixed<float, 3, 3>   m_RotationMatrix;
     SphereInterpolator*             m_SphereInterpolator;
     ParticleGrid*                   m_ParticleGrid;
-    MTRand*                         m_RandGen;
+    ItkRandGenType*                 m_RandGen;
     ItkQBallImgType*                m_Image;
     ItkFloatImageType*              m_Mask;
     vnl_vector_fixed<int, 3>        m_Size;

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-MetropolisHastingsSampler::MetropolisHastingsSampler(ParticleGrid* grid, EnergyComputer* enComp, MTRand* randGen, float curvThres)
+MetropolisHastingsSampler::MetropolisHastingsSampler(ParticleGrid* grid, EnergyComputer* enComp, ItkRandGenType* randGen, float curvThres)
     : m_AcceptedProposals(0)
     , m_ExTemp(0.01)
     , m_BirthProb(0.25)
@@ -78,18 +78,18 @@ void MetropolisHastingsSampler::SetTemperature(float val)
 // add small random number drawn from gaussian to each vector element
 vnl_vector_fixed<float, 3> MetropolisHastingsSampler::DistortVector(float sigma, vnl_vector_fixed<float, 3>& vec)
 {
-    vec[0] += sigma*m_RandGen->frandn();
-    vec[1] += sigma*m_RandGen->frandn();
-    vec[2] += sigma*m_RandGen->frandn();
+    vec[0] += m_RandGen->GetNormalVariate(0.0, sigma);
+    vec[1] += m_RandGen->GetNormalVariate(0.0, sigma);
+    vec[2] += m_RandGen->GetNormalVariate(0.0, sigma);
 }
 
 // generate normalized random vector
 vnl_vector_fixed<float, 3> MetropolisHastingsSampler::GetRandomDirection()
 {
     vnl_vector_fixed<float, 3> vec;
-    vec[0] = m_RandGen->frandn();
-    vec[1] = m_RandGen->frandn();
-    vec[2] = m_RandGen->frandn();
+    vec[0] = m_RandGen->GetNormalVariate();
+    vec[1] = m_RandGen->GetNormalVariate();
+    vec[2] = m_RandGen->GetNormalVariate();
     vec.normalize();
     return vec;
 }
@@ -97,7 +97,7 @@ vnl_vector_fixed<float, 3> MetropolisHastingsSampler::GetRandomDirection()
 // generate actual proposal (birth, death, shift and connection of particle)
 void MetropolisHastingsSampler::MakeProposal()
 {
-    float randnum = m_RandGen->frand();
+    float randnum = m_RandGen->GetVariate();
 
     // Birth Proposal
     if (randnum < m_BirthProb)
@@ -115,7 +115,7 @@ void MetropolisHastingsSampler::MakeProposal()
         float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop);
         prob *= exp((in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
 
-        if (prob > 1 || m_RandGen->frand() < prob)
+        if (prob > 1 || m_RandGen->GetVariate() < prob)
         {
             Particle *p = m_ParticleGrid->NewParticle(R);
             if (p!=0)
@@ -131,7 +131,7 @@ void MetropolisHastingsSampler::MakeProposal()
     {
         if (m_ParticleGrid->m_NumParticles > 0)
         {
-            int pnum = rand()%m_ParticleGrid->m_NumParticles;
+            int pnum = m_RandGen->GetIntegerVariate()%m_ParticleGrid->m_NumParticles;
             Particle *dp = m_ParticleGrid->GetParticle(pnum);
             if (dp->pID == -1 && dp->mID == -1)
             {
@@ -140,7 +140,7 @@ void MetropolisHastingsSampler::MakeProposal()
 
                 float prob = m_ParticleGrid->m_NumParticles * (m_BirthProb) /(m_Density*m_DeathProb); //*SpatProb(dp->R);
                 prob *= exp(-(in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
-                if (prob > 1 || m_RandGen->frand() < prob)
+                if (prob > 1 || m_RandGen->GetVariate() < prob)
                 {
                     m_ParticleGrid->RemoveParticle(pnum);
                     m_AcceptedProposals++;
@@ -154,7 +154,7 @@ void MetropolisHastingsSampler::MakeProposal()
     {
         if (m_ParticleGrid->m_NumParticles > 0)
         {
-            int pnum = rand()%m_ParticleGrid->m_NumParticles;
+            int pnum = m_RandGen->GetIntegerVariate()%m_ParticleGrid->m_NumParticles;
             Particle *p =  m_ParticleGrid->GetParticle(pnum);
             Particle prop_p = *p;
 
@@ -168,7 +168,7 @@ void MetropolisHastingsSampler::MakeProposal()
             float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop_p) - m_EnergyComputer->ComputeInternalEnergy(p);
 
             float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp);
-            if (m_RandGen->frand() < prob)
+            if (m_RandGen->GetVariate() < prob)
             {
                 vnl_vector_fixed<float, 3> Rtmp = p->pos;
                 vnl_vector_fixed<float, 3> Ntmp = p->dir;
@@ -189,7 +189,7 @@ void MetropolisHastingsSampler::MakeProposal()
         if (m_ParticleGrid->m_NumParticles > 0)
         {
 
-            int pnum = rand()%m_ParticleGrid->m_NumParticles;
+            int pnum = m_RandGen->GetIntegerVariate()%m_ParticleGrid->m_NumParticles;
             Particle *p =  m_ParticleGrid->GetParticle(pnum);
 
             bool no_proposal = false;
@@ -233,7 +233,7 @@ void MetropolisHastingsSampler::MakeProposal()
 
                 float prob = exp(ex_energy/m_ExTemp+in_energy/m_InTemp)*m_ShiftProb*p_rev/(m_OptShiftProb+m_ShiftProb*p_rev);
 
-                if (m_RandGen->frand() < prob)
+                if (m_RandGen->GetVariate() < prob)
                 {
                     vnl_vector_fixed<float, 3> Rtmp = p->pos;
                     vnl_vector_fixed<float, 3> Ntmp = p->dir;
@@ -253,12 +253,12 @@ void MetropolisHastingsSampler::MakeProposal()
     {
         if (m_ParticleGrid->m_NumParticles > 0)
         {
-            int pnum = rand()%m_ParticleGrid->m_NumParticles;
+            int pnum = m_RandGen->GetIntegerVariate()%m_ParticleGrid->m_NumParticles;
             Particle *p = m_ParticleGrid->GetParticle(pnum);
 
             EndPoint P;
             P.p = p;
-            P.ep = (m_RandGen->frand() > 0.5)? 1 : -1;
+            P.ep = (m_RandGen->GetVariate() > 0.5)? 1 : -1;
 
             RemoveAndSaveTrack(P);
             if (m_BackupTrack.m_Probability != 0)
@@ -269,7 +269,7 @@ void MetropolisHastingsSampler::MakeProposal()
 
                 prob = exp(prob)*(m_BackupTrack.m_Probability * pow(m_DelProb,m_ProposalTrack.m_Length))
                         /(m_ProposalTrack.m_Probability * pow(m_DelProb,m_BackupTrack.m_Length));
-                if (m_RandGen->frand() < prob)
+                if (m_RandGen->GetVariate() < prob)
                 {
                     ImplementTrack(m_ProposalTrack);
                     m_AcceptedProposals++;
@@ -360,7 +360,7 @@ void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
         cnt++;
         m_BackupTrack.track[cnt] = Current;
 
-        if (m_RandGen->rand() > m_DelProb)
+        if (m_RandGen->GetVariate() > m_DelProb)
             break;
     }
     m_BackupTrack.m_Energy = energy;
@@ -390,7 +390,7 @@ void MetropolisHastingsSampler::MakeTrackProposal(EndPoint P)
 
         ComputeEndPointProposalDistribution(Current);
 
-        int k = m_SimpSamp.draw(m_RandGen->frand());
+        int k = m_SimpSamp.draw(m_RandGen->GetVariate());
 
         // stop tracking proposed
         if (k==0)

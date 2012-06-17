@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 #include <itkImage.h>
 #include <itkDiffusionTensor3D.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 // VTK
 #include <vtkSmartPointer.h>
@@ -64,6 +65,7 @@ public:
     itkSetMacro( AbortTracking, bool )
     itkSetMacro( CurvatureThreshold, float)
     itkSetMacro( DuplicateImage, bool )
+    itkSetMacro( RandomSeed, int )
 
     // getter
     itkGetMacro( ParticleWeight, float )
@@ -122,6 +124,7 @@ protected:
     bool            m_DuplicateImage;       // generates a working copy of the qball image so that the original image won't be changed by the mean subtraction
     int             m_NumParticles;         // current number of particles in grid
     int             m_NumConnections;       // current number of connections between particles in grid
+    int             m_RandomSeed;           // seed value for random generator (-1 for standard seeding)
 
     FiberPolyDataType m_FiberPolyData;      // container for reconstructed fibers
 };

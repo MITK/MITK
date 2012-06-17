@@ -56,7 +56,8 @@ GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
     m_Steps(10),
     m_ProposalAcceptance(0),
     m_CurvatureThreshold(0.7),
-    m_DuplicateImage(true)
+    m_DuplicateImage(true),
+    m_RandomSeed(-1)
 {
 
 }
@@ -211,8 +212,9 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     unsigned long singleIts = (unsigned long)((1.0*m_Iterations) / (1.0*m_Steps));
 
     // seed random generators
-    MTRand randGen;
-//    srand(1);
+    Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
+    if (m_RandomSeed>-1)
+        randGen->SetSeed(m_RandomSeed);
 
     // load sphere interpolator to evaluate the ODFs
     SphereInterpolator* interpolator = new SphereInterpolator();
@@ -220,10 +222,10 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     // initialize the actual tracking components (ParticleGrid, Metropolis Hastings Sampler and Energy Computer)
     ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
 
-    EnergyComputer* encomp = new EnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, &randGen);
+    EnergyComputer* encomp = new EnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
     encomp->SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
 
-    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, encomp, &randGen, m_CurvatureThreshold);
+    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, encomp, randGen, m_CurvatureThreshold);
 
     // main loop
     m_NumAcceptedFibers = 0;
@@ -263,6 +265,10 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
         MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
         MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)m_CurrentStep/m_Steps << "%";
+        MITK_INFO << "----------------------------------------";
+
+        if (m_AbortTracking)
+            break;
     }
 
     delete sampler;

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEnergyComputer.h"
 #include <vnl/vnl_copy.h>
+#include <itkNumericTraits.h>
 
 using namespace mitk;
 
@@ -252,7 +253,7 @@ float EnergyComputer::EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vector_fi
 float EnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, Particle *dp)
 {
     if (SpatProb(R) == 0)   // check if position is inside mask
-        return -INFINITY;
+        return itk::NumericTraits<float>::NonpositiveMin();
 
     float odfVal = EvaluateOdf(R, N);   // evaluate ODF in given direction
 
@@ -316,7 +317,7 @@ float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1, Part
 {
     // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
     if ((dot_product(p1->dir,p2->dir))*ep1*ep2 > -m_CurvatureThreshold)     // angle between particles is too sharp
-        return -INFINITY;
+        return itk::NumericTraits<float>::NonpositiveMin();
 
     // calculate the endpoints of the two particles
     vnl_vector_fixed<float, 3> endPoint1 = p1->pos + (p1->dir * (m_ParticleLength * ep1));
@@ -324,14 +325,14 @@ float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1, Part
 
     // check if endpoints are too far apart to connect
     if ((endPoint1-endPoint2).squared_magnitude() > m_SquaredParticleLength)
-        return -INFINITY;
+        return itk::NumericTraits<float>::NonpositiveMin();
 
     // calculate center point of the two particles
     vnl_vector_fixed<float, 3> R = (p2->pos + p1->pos); R *= 0.5;
 
     // they are not allowed to connect if the mask image does not allow it
     if (SpatProb(R) == 0)
-        return -INFINITY;
+        return itk::NumericTraits<float>::NonpositiveMin();
 
     // get distances of endpoints to center point
     float norm1 = (endPoint1-R).squared_magnitude();

@@ -76,7 +76,7 @@ void MetropolisHastingsSampler::SetTemperature(float val)
 }
 
 // add small random number drawn from gaussian to each vector element
-vnl_vector_fixed<float, 3> MetropolisHastingsSampler::DistortVector(float sigma, vnl_vector_fixed<float, 3>& vec)
+void MetropolisHastingsSampler::DistortVector(float sigma, vnl_vector_fixed<float, 3>& vec)
 {
     vec[0] += m_RandGen->GetNormalVariate(0.0, sigma);
     vec[1] += m_RandGen->GetNormalVariate(0.0, sigma);

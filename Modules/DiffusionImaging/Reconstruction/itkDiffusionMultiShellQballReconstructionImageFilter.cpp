@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkPointShell.h"
 #include <memory>
 
+#include <fstream>
+
 
 namespace itk {
 
@@ -316,7 +318,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
-::S_S0Normalization( vnl_vector<double> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
+::S_S0Normalization( vnl_vector<double> & vec, float b0 )
 {
 
   double b0f = (double)b0;
@@ -333,7 +335,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
-::S_S0Normalization( vnl_matrix<double> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
+::S_S0Normalization( vnl_matrix<double> & mat, float b0 )
 {
   double b0f = (double)b0;
   for(int i = 0; i < mat.rows(); i++)
@@ -577,8 +579,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int NumberOfThreads)
 {
   itk::TimeProbe clock;
-  GenerateAveragedBZeroImage(outputRegionForThread);
-
+  data1.open("/Users/Cordes/test/shell1.txt");
+  data2.open("/Users/Cordes/test/shell2.txt");
+  //data3.open("/Users/Cordes/test/shell3.txt");
   clock.Start();
   switch(m_ReconstructionType)
   {
@@ -593,6 +596,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   }
   clock.Stop();
   MITK_INFO << "Reconstruction in : " << clock.GetTotal() << " s";
+  data1.close();
+  data2.close();
+  //data3.close();
+
 }
 
 
@@ -688,39 +695,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::GenerateAveragedBZeroImage(const OutputImageRegionType& outputRegionForThread)
+::writeData(const vnl_matrix<double> &mat, std::ofstream & stream)
 {
-  typedef typename GradientImagesType::PixelType         GradientVectorType;
-
-  ImageRegionIterator< BZeroImageType > bzeroIterator(m_BZeroImage, outputRegionForThread);
-  bzeroIterator.GoToBegin();
-
-  IndiciesVector BZeroIndicies = m_BValueMap[0];
-
-  typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
-
-  //  Const ImageRegionIterator for input gradient image
-  typedef ImageRegionConstIterator< GradientImagesType > GradientIteratorType;
-  GradientIteratorType git(gradientImagePointer, outputRegionForThread );
-  git.GoToBegin();
-
-
-  while( ! git.IsAtEnd() )
-  {
-    GradientVectorType b = git.Get();
-
-    // compute the average bzero signal
-    typename NumericTraits<ReferencePixelType>::AccumulateType b0 = NumericTraits<ReferencePixelType>::Zero;
-    for(unsigned int i = 0; i < BZeroIndicies.size(); ++i)
-    {
-      b0 += b[BZeroIndicies[i]];
-    }
-    b0 /= BZeroIndicies.size();
-
-    bzeroIterator.Set(b0);
-    ++bzeroIterator;
-    ++git;
+  for(int i = 0 ; i < mat.rows(); i ++){
+    stream << mat(i,0)<<" , "<<mat(i,1)<<"  ,  "<<mat(i,2)<< std::endl;
   }
+  stream << "-------------------------------------" << std::endl;
 }
 
 template< class T, class TG, class TO, int L, int NODF>
@@ -733,14 +713,16 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(ProcessObject::GetOutput(0));
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
 
+
+
   // Define Image iterators
   ImageRegionIterator< OutputImageType > odfOutputImageIterator(outputImage, outputRegionForThread);
-  ImageRegionConstIterator< BZeroImageType > bzeroImageIterator(m_BZeroImage, outputRegionForThread);
   ImageRegionConstIterator< GradientImagesType > gradientInputImageIterator(gradientImagePointer, outputRegionForThread );
 
+  ImageRegionIterator< BZeroImageType > bzeroIterator(m_BZeroImage, outputRegionForThread);
+  bzeroIterator.GoToBegin();
   // All iterators seht to Begin of the specific OutputRegion
   odfOutputImageIterator.GoToBegin();
-  bzeroImageIterator.GoToBegin();
   gradientInputImageIterator.GoToBegin();
 
   // Get Shell Indicies for all non-BZero Gradients
@@ -777,17 +759,35 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   OdfPixelType odf(0.0);
 
   double E1, E2, E3, P2,A,B2,B,P,alpha,beta,lambda, ER1, ER2;
+  IndiciesVector BZeroIndicies = m_BValueMap[0];
 
   // iterate overall voxels of the gradient image region
   while( ! gradientInputImageIterator.IsAtEnd() )
   {
-    if( (bzeroImageIterator.Get() != 0) && (bzeroImageIterator.Get() >= m_Threshold) )
-    {
-      // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
-      GradientVectorType b = gradientInputImageIterator.Get();
 
-      for(int i = 0 ; i < Shell1Indiecies.size(); i++)
+   GradientVectorType b = gradientInputImageIterator.Get();
+
+    typename NumericTraits<ReferencePixelType>::AccumulateType b0 = NumericTraits<ReferencePixelType>::Zero;
+
+    for(unsigned int i = 0; i < BZeroIndicies.size(); ++i)
+    {
+      b0 += b[BZeroIndicies[i]];
+    }
+
+    float newb0= (float)b0 / (float)BZeroIndicies.size();
+    bzeroIterator.Set(newb0);
+    ++bzeroIterator;
+
+    if( (newb0 != 0) && (newb0 >= m_Threshold) )
+    {
+
+      // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
+
+
+      for(int i = 0 ; i < Shell1Indiecies.size(); i++){
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
+        // MITK_INFO << DataShell1[i];
+      }
       for(int i = 0 ; i < Shell2Indiecies.size(); i++)
         DataShell2[i] = static_cast<double>(b[Shell2Indiecies[i]]);
       for(int i = 0 ; i < Shell3Indiecies.size(); i++)
@@ -804,8 +804,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         E.set_column(2, (DataShell3));
       }
 
+      writeData(E,data1);
       // Normalize the Signal: Si/S0
-      S_S0Normalization(E, bzeroImageIterator.Get());
+      S_S0Normalization(E, newb0);
+      writeData(E,data2);
+
 
       //Implements Eq. [19] and Fig. 4.
       Threshold(E);
@@ -865,8 +868,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     // set ODF to ODF-Image
     odfOutputImageIterator.Set( odf );
     ++odfOutputImageIterator;
-    // iterate
-    ++bzeroImageIterator;
     ++gradientInputImageIterator;
   }
 

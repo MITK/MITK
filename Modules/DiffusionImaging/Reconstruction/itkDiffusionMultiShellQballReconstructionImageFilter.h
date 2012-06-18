@@ -103,8 +103,8 @@ public:
 
     void Normalize(OdfPixelType & odf );
 
-    void S_S0Normalization( vnl_vector<double> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
-    void S_S0Normalization( vnl_matrix<double> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
+    void S_S0Normalization( vnl_vector<double> & vec, float b0  = 0 );
+    void S_S0Normalization( vnl_matrix<double> & mat, float b0  = 0 );
 
     void DoubleLogarithm(vnl_vector<double> & vec);
 
@@ -230,6 +230,10 @@ private:
     }
 
     void ComputeSphericalFromCartesian(vnl_matrix<double> * Q, const IndiciesVector & refShell);
+
+    void writeData(const vnl_matrix<double> & mat, std::ofstream &);
+
+    std::ofstream data1, data2, data3;
 
 };
 

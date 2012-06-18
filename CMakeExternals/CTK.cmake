@@ -15,7 +15,7 @@ IF(MITK_USE_CTK)
 
   IF(NOT DEFINED CTK_DIR)
     
-    SET(revision_tag 6d277f4c60fa5cfceb54053ad057a7a0fe8e22f5)
+    SET(revision_tag 31d144ecab0c7a8bdc5d8e2ec8b33972ce8e490d)
     IF(${proj}_REVISION_TAG)
       SET(revision_tag ${${proj}_REVISION_TAG})
     ENDIF()

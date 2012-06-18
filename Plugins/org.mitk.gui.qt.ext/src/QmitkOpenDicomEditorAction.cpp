@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateProperty.h"
 
 
-#include "QmitkStdMultiWidgetEditor.h"
+//#include <QmitkStdMultiWidgetEditor.h>
 
 QmitkOpenDicomEditorAction::QmitkOpenDicomEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)

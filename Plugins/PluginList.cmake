@@ -7,6 +7,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.planarfigure:ON
   org.mitk.core.ext:OFF
   org.mitk.core.jobs:OFF
+  org.mitk.diffusionimaging:OFF
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.coreapplication:OFF

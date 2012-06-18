@@ -49,7 +49,7 @@ QString QmitkStoreSCPLauncher::GetPathToExecutable()
     QDir root;
     QString currentPath =  root.currentPath();
     currentPath = currentPath.split("MITK").at(0);
-    currentPath.append("MITK/CTK-build/CMakeExternals/Install/bin");
+    currentPath.append("MITK/DCMTK-install/bin");
     return currentPath;
 }
 

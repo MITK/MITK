@@ -424,8 +424,7 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   return true; // actually never returns false yet.. but exception possible
 }
 
-void 
-DicomSeriesReader::CheckGantryTilt( 
+DicomSeriesReader::GantryTiltInformation::GantryTiltInformation( 
     const Point3D& origin1, const Point3D& origin2,
     const Vector3D& right, const Vector3D& up,
     bool& volumeIsTilted, Vector3D& interSliceOffset )
@@ -464,6 +463,12 @@ DicomSeriesReader::CheckGantryTilt(
 
     interSliceOffset.Fill( distance );
   }
+}
+      
+ScalarType 
+DicomSeriesReader::GantryTiltInformation::matrixCoefficientForCorrection() const
+{
+  return 2.0;
 }
 
 std::string
@@ -593,7 +598,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
        
         bool assumeTilt(false);
         Vector3D interSliceOffset;
-        CheckGantryTilt( lastDifferentOrigin, thisOrigin, right, up, assumeTilt, interSliceOffset);
+        GantryTiltInformation tiltInfo( lastDifferentOrigin, thisOrigin, right, up, assumeTilt, interSliceOffset );
 
         if (assumeTilt) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
         {

@@ -26,12 +26,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkAffineTransform.h>
 #include <itkLinearInterpolateImageFunction.h>
 
+#include <limits>
+
 namespace mitk
 {
 
 template <typename PixelType>
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, UpdateCallBackMethod callback)
 {
+  bool correctTilt(true);
+
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );
@@ -88,12 +92,15 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
       DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
 
-      CheckGantryTilt( origin1, origin2, right, up, volumeIsTilted, InterSliceOffset );
+      GantryTiltInformation tiltInfo( origin1, origin2, right, up, volumeIsTilted, InterSliceOffset );
+      correctTilt &= volumeIsTilted;
+
       MITK_DEBUG << "** Loading now: tilt? " << volumeIsTilted;
       MITK_DEBUG << "** Loading now: how tilt? " << InterSliceOffset[0];
+      MITK_DEBUG << "** Loading now: corect tilt? " << correctTilt;
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
-        image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
+        image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, command ); // load first 3D block
         initialize_node = true;
       }
       else if (volume_count > 1)
@@ -121,9 +128,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         typename ImageType::Pointer readVolume = reader->GetOutput();
         // TODO call tilt correction here as an itk filter
         // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
-        if (volumeIsTilted)
+        if (correctTilt)
         {
-          readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput() );
+          readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.matrixCoefficientForCorrection() );
         }
         image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
         image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
@@ -161,9 +168,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           reader->Update();
           readVolume = reader->GetOutput();
           
-          if (volumeIsTilted)
+          if (correctTilt)
           {
-            readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput() );
+            readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.matrixCoefficientForCorrection() );
           }
           image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
         }
@@ -194,7 +201,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 }
 
 template <typename PixelType>
-Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, CallbackCommand* command )
+Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, CallbackCommand* command )
 {
   /******** Normal Case, 3D (also for GDCM < 2 usable) ***************/
   mitk::Image::Pointer image = mitk::Image::New();
@@ -215,8 +222,16 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 
   reader->SetFileNames(filenames);
   reader->Update();
-  image->InitializeByItk(reader->GetOutput());
-  image->SetImportVolume(reader->GetOutput()->GetBufferPointer());
+  typename ImageType::Pointer readVolume = reader->GetOutput();
+
+  // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
+  if (correctTilt)
+  {
+    readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.matrixCoefficientForCorrection() );
+  }
+  
+  image->InitializeByItk(readVolume.GetPointer());
+  image->SetImportVolume(readVolume->GetBufferPointer());
 
   gdcm::Scanner scanner;
   ScanForSliceInformation(filenames, scanner);
@@ -367,28 +382,37 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
 
 template <typename ImageType>
 typename ImageType::Pointer
-DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input )
+DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, ScalarType factor )
 {
   typedef itk::ResampleImageFilter<ImageType,ImageType> ResampleFilterType;
   typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+  resampler->SetInput( input );
 
   typedef itk::AffineTransform< double, ImageType::ImageDimension > TransformType;
   typename TransformType::Pointer transform = TransformType::New();
+  transform->SetCenter( input->GetOrigin() );
+  transform->Shear(1, 2, factor); // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
   resampler->SetTransform( transform );
 
   typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
   typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
   resampler->SetInterpolator( interpolator );
 
-  resampler->SetDefaultPixelValue(120);
-  resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
+  MITK_INFO << "************  FIXI UPPI  ****************" << input->GetOrigin();
+  MITK_INFO << "************  FIXI UPPI  ****************";
+  MITK_INFO << "************  FIXI UPPI  ****************";
+  MITK_INFO << "************  FIXI UPPI  ****************";
+  MITK_INFO << "************  FIXI UPPI  ****************" << transform;
+
+  resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::max() );
   
   // TODO calculate transform!
   // TODO adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
 
-  resampler->SetInput( input );
-  resampler->Update();
-  return resampler->GetOutput();
+  resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
+  resampler->UpdateLargestPossibleRegion();
+  typename ImageType::Pointer result = resampler->GetOutput();
+  return result;
 }
 
 

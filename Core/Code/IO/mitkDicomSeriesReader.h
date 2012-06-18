@@ -325,6 +325,18 @@ protected:
       Vector3D m_InterSliceOffset;
   };
 
+  class GantryTiltInformation
+  {
+    public:
+
+      GantryTiltInformation( const Point3D& origin1, const Point3D& origin2,
+            const Vector3D& right, const Vector3D& up,
+            bool& volumeIsTilted, Vector3D& interSliceOffset );
+
+      ScalarType matrixCoefficientForCorrection() const;
+
+  };
+
   /**
     \brief for internal sorting.
   */
@@ -350,12 +362,6 @@ protected:
   SliceGroupingAnalysisResult
   AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings_);
       
-  static 
-  void 
-  CheckGantryTilt( const Point3D& origin1, const Point3D& origin2,
-                   const Vector3D& right, const Vector3D& up,
-                   bool& volumeIsTilted, Vector3D& interSliceOffset );
-
   static
   std::string
   ConstCharStarToString(const char* s);
@@ -371,7 +377,7 @@ protected:
   template <typename ImageType>
   static
   typename ImageType::Pointer
-  InPlaceFixUpTiltedGeometry( ImageType* input );
+  InPlaceFixUpTiltedGeometry( ImageType* input, ScalarType factor );
 
 
   /**
@@ -470,7 +476,7 @@ protected:
   template <typename PixelType>
   static 
   Image::Pointer 
-  LoadDICOMByITK( const StringContainer&, CallbackCommand* command = NULL);
+  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, CallbackCommand* command = NULL);
 
   /**
     \brief Sort files into time step blocks of a 3D+t image.

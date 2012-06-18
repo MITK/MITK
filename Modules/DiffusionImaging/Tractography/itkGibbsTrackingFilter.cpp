@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -568,8 +568,6 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
             MITK_INFO << "itkGibbsTrackingFilter: could not estimate particle weight!";
             m_ParticleWeight = 0.0001;
         }
-    MITK_INFO << "itkGibbsTrackingFilter: particle Weight: " << m_ParticleWeight;
-    MITK_INFO << "itkGibbsTrackingFilter: iterations: " << m_NumIt;
     m_CurrentStep = 0;
     m_Memory = 0;
 
@@ -583,11 +581,9 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
         MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
         m_AbortTracking = true;
     }
-    MITK_INFO << "itkGibbsTrackingFilter: steps: " << m_Steps;
 
     if (m_CurvatureHardThreshold < mitk::eps)
       m_CurvatureHardThreshold = 0;
-    MITK_INFO << "itkGibbsTrackingFilter: curvature threshold: " << m_CurvatureHardThreshold;
     unsigned long singleIts = (unsigned long)((1.0*m_NumIt) / (1.0*m_Steps));
 
     // setup metropolis hastings sampler
@@ -602,6 +598,18 @@ GibbsTrackingFilter< TInputOdfImage, TInputROIImage >
     encomp.setParameters(m_ParticleWeight,m_ParticleWidth,m_ChempotConnection*m_ParticleLength*m_ParticleLength,m_ParticleLength,m_CurvatureHardThreshold,m_InexBalance,m_Chempot2, m_Meanval_sq);
     m_Sampler->SetEnergyComputer(&encomp);
     m_Sampler->SetParameters(m_TempStart,singleIts,m_ParticleLength,m_CurvatureHardThreshold,m_ChempotParticle);
+
+
+    MITK_INFO << "itkGibbsTrackingFilter: Iterations: " << m_NumIt;
+    MITK_INFO << "itkGibbsTrackingFilter: steps: " << m_Steps;
+    MITK_INFO << "itkGibbsTrackingFilter: Particle weight: " << m_ParticleWeight;
+    MITK_INFO << "itkGibbsTrackingFilter: Particle width: " << m_ParticleWidth;
+    MITK_INFO << "itkGibbsTrackingFilter: Particle length: " << m_ParticleLength;
+    MITK_INFO << "itkGibbsTrackingFilter: Min. fiber length: " << m_ParticleLength;
+    MITK_INFO << "itkGibbsTrackingFilter: Start temperature: " << m_TempStart;
+    MITK_INFO << "itkGibbsTrackingFilter: End temperature: " << m_TempEnd;
+    MITK_INFO << "itkGibbsTrackingFilter: Energy balance: " << m_InexBalance;
+    MITK_INFO << "itkGibbsTrackingFilter: Curvature threshold: " << m_CurvatureHardThreshold;
 
     // main loop
     for( int step = 0; step < m_Steps; step++ )

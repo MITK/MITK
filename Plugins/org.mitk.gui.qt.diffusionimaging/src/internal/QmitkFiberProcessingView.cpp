@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkDataNodeObject.h>
 #include <mitkDiffusionImage.h>
+#include <mitkTensorImage.h>
 
 // ITK
 #include <itkResampleImageFilter.h>
@@ -93,15 +94,16 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     connect(m_Controls->PFCompoANDButton, SIGNAL(clicked()), this, SLOT(GenerateAndComposite()) );
     connect(m_Controls->PFCompoORButton, SIGNAL(clicked()), this, SLOT(GenerateOrComposite()) );
     connect(m_Controls->PFCompoNOTButton, SIGNAL(clicked()), this, SLOT(GenerateNotComposite()) );
-
     connect(m_Controls->m_JoinBundles, SIGNAL(clicked()), this, SLOT(JoinBundles()) );
     connect(m_Controls->m_SubstractBundles, SIGNAL(clicked()), this, SLOT(SubstractBundles()) );
     connect(m_Controls->m_GenerateRoiImage, SIGNAL(clicked()), this, SLOT(GenerateRoiImage()) );
-
     connect(m_Controls->m_Extract3dButton, SIGNAL(clicked()), this, SLOT(Extract3d()));
     connect( m_Controls->m_ProcessFiberBundleButton, SIGNAL(clicked()), this, SLOT(ProcessSelectedBundles()) );
     connect( m_Controls->m_ResampleFibersButton, SIGNAL(clicked()), this, SLOT(ResampleSelectedBundles()) );
     connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
+    connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
+    connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
+
   }
 }
 
@@ -743,12 +745,16 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_ResampleFibersButton->setEnabled(false);
     m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
     m_Controls->m_FaColorFibersButton->setEnabled(false);
+    m_Controls->m_PruneFibersButton->setEnabled(false);
+    m_Controls->m_MirrorFibersButton->setEnabled(false);
   }
   else
   {
     m_Controls->m_PlanarFigureButtonsFrame->setEnabled(true);
     m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
     m_Controls->m_ResampleFibersButton->setEnabled(true);
+    m_Controls->m_PruneFibersButton->setEnabled(true);
+    m_Controls->m_MirrorFibersButton->setEnabled(true);
 
     if (m_Surfaces.size()>0)
       m_Controls->m_Extract3dButton->setEnabled(true);
@@ -1449,6 +1455,26 @@ void QmitkFiberProcessingView::SubstractBundles()
   GetDataStorage()->Add(fbNode);
 }
 
+void QmitkFiberProcessingView::PruneBundle()
+{
+    int minLength = this->m_Controls->m_PruneFibersSpinBox->value();
+    bool doneSomething = false;
+    for (int i=0; i<m_SelectedFB.size(); i++)
+    {
+      mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+      if (!fib->RemoveShortFibers(minLength))
+          QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+      else
+          doneSomething = true;
+    }
+
+    if (doneSomething)
+    {
+        GenerateStats();
+        RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+}
+
 void QmitkFiberProcessingView::GenerateStats()
 {
   if ( m_SelectedFB.empty() )
@@ -1737,20 +1763,26 @@ void QmitkFiberProcessingView::ResampleSelectedBundles()
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
     fib->DoFiberSmoothing(factor);
   }
+  GenerateStats();
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkFiberProcessingView::MirrorFibers()
+{
+  unsigned int axis = this->m_Controls->m_AxisSelectionBox->currentIndex();
+  for (int i=0; i<m_SelectedFB.size(); i++)
+  {
+    mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+    fib->MirrorFibers(axis);
+  }
+  GenerateStats();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberProcessingView::DoFaColorCoding()
 {
   if (m_SelectedImage.IsNull())
     return;
-//  mitk::PixelType pType = mitk::MakeScalarPixelType<float>();
-//  if (m_SelectedImage->GetPixelType()!=pType)
-//  {
-//    //mitk::Image bla; bla.GetPixelType().GetNameOfClass()
-//        MITK_INFO << m_SelectedImage->GetPixelType().GetNameOfClass();
-//    QMessageBox::warning(NULL, "Wrong Image Type", "FA/GFA image should be of type float");
-////    return;
-//  }
 
   for( int i=0; i<m_SelectedFB.size(); i++ )
   {
@@ -1763,4 +1795,3 @@ void QmitkFiberProcessingView::DoFaColorCoding()
   if(m_MultiWidget)
     m_MultiWidget->RequestUpdate();
 }
-

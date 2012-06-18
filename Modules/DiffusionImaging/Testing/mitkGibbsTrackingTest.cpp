@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 #include <math.h>
 #include <tinyxml.h>
+#include <mitkImageCast.h>
 
 using namespace mitk;
 
@@ -41,43 +42,54 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkGibbsTrackingTest");
 
-  MITK_TEST_CONDITION_REQUIRED(argc>4,"check for input data")
+  MITK_TEST_CONDITION_REQUIRED(argc>5,"check for input data")
 
-  NrrdQBallImageReader::Pointer qbiReader = mitk::NrrdQBallImageReader::New();
-//  QBallImage::Pointer mitkQballImage;
-//  MITK_TEST_CONDITION_REQUIRED(qbiReader.IsNotNull(),"qball reader instantiation")
-
-  ItkImageFileReader::Pointer imageReader = mitk::ItkImageFileReader::New();
+  QBallImage::Pointer mitkQballImage;
   Image::Pointer mitkMaskImage;
-  MITK_TEST_CONDITION_REQUIRED(imageReader.IsNotNull(),"image reader instantiation")
-
-  mitk::FiberBundleXReader::Pointer fibReader = mitk::FiberBundleXReader::New();
-  mitk::FiberBundleX::Pointer fib1, fib2;
-  MITK_TEST_CONDITION_REQUIRED(fibReader.IsNotNull(),"fiber bundle reader instantiation")
+  mitk::FiberBundleX::Pointer fib1;
 
   try{
     RegisterDiffusionImagingObjectFactory();
 
     // test if fib1 can be read
     const std::string s1="", s2="";
-    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );
-    fib1 = dynamic_cast<mitk::FiberBundleX*>(fibInfile.at(0).GetPointer());
-    MITK_TEST_CONDITION_REQUIRED(fib1.IsNotNull(),"check if reader 1 returned null")
+    std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );
+    mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
+    MITK_TEST_CONDITION_REQUIRED(mitkQballImage.IsNotNull(),"check qball image")
 
+    infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[2], s1, s2, false );
+    mitkMaskImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
+    MITK_TEST_CONDITION_REQUIRED(mitkMaskImage.IsNotNull(),"check qball image")
 
+    infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[5], s1, s2, false );
+    fib1 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());
+    MITK_TEST_CONDITION_REQUIRED(fib1.IsNotNull(),"check fiber bundle")
 
     typedef itk::Vector<float, QBALL_ODFSIZE> OdfVectorType;
     typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
     typedef itk::Image<float,3> MaskImgType;
     typedef itk::GibbsTrackingFilter<OdfVectorImgType> GibbsTrackingFilterType;
 
-    MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2),"check if equals method is working");
+    OdfVectorImgType::Pointer itk_qbi = OdfVectorImgType::New();
+    mitk::CastToItkImage<OdfVectorImgType>(mitkQballImage, itk_qbi);
 
+    MaskImgType::Pointer itk_mask = MaskImgType::New();
+    mitk::CastToItkImage<MaskImgType>(mitkMaskImage, itk_mask);
+
+    GibbsTrackingFilterType::Pointer gibbsTracker = GibbsTrackingFilterType::New();
+    gibbsTracker->SetQBallImage(itk_qbi.GetPointer());
+    gibbsTracker->SetMaskImage(itk_mask);
+    gibbsTracker->SetDuplicateImage(false);
+    gibbsTracker->SetRandomSeed(1);
+    gibbsTracker->SetParameterFile(std::string(argv[3]));
+    gibbsTracker->SetLutPath(std::string(argv[4]));
+    gibbsTracker->Update();
+
+    mitk::FiberBundleX::Pointer fib2 = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
+    MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2), "check if gibbs tracking has changed");
   }
   catch(...)
   {
-    //this means that a wrong exception (i.e. no itk:Exception) has been thrown
-    std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
 

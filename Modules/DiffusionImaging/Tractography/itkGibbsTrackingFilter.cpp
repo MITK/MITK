@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <QFile>
 #include <tinyxml.h>
+#include <math.h>
 
 namespace itk{
 
@@ -58,7 +59,8 @@ GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
     m_CurvatureThreshold(0.7),
     m_DuplicateImage(true),
     m_RandomSeed(-1),
-    m_ParameterFile("")
+    m_ParameterFile(""),
+    m_LutPath("")
 {
 
 }
@@ -183,7 +185,6 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     // load parameter file
     LoadParameters(m_ParameterFile);
 
-
     // prepare parameters
     float minSpacing;
     if(m_QBallImage->GetSpacing()[0]<m_QBallImage->GetSpacing()[1] && m_QBallImage->GetSpacing()[0]<m_QBallImage->GetSpacing()[2])
@@ -222,7 +223,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         randGen->SetSeed(m_RandomSeed);
 
     // load sphere interpolator to evaluate the ODFs
-    SphereInterpolator* interpolator = new SphereInterpolator();
+    SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
 
     // initialize the actual tracking components (ParticleGrid, Metropolis Hastings Sampler and Energy Computer)
     ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
@@ -231,6 +232,20 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     encomp->SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
 
     MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, encomp, randGen, m_CurvatureThreshold);
+
+    MITK_INFO << "----------------------------------------";
+    MITK_INFO << "Iterations: " << m_Iterations;
+    MITK_INFO << "Steps: " << m_Steps;
+    MITK_INFO << "Particle length: " << m_ParticleLength;
+    MITK_INFO << "Particle width: " << m_ParticleWidth;
+    MITK_INFO << "Particle weight: " << m_ParticleWeight;
+    MITK_INFO << "Start temperature: " << m_StartTemperature;
+    MITK_INFO << "End temperature: " << m_EndTemperature;
+    MITK_INFO << "In/Ex balance: " << m_InexBalance;
+    MITK_INFO << "Min. fiber length: " << m_MinFiberLength;
+    MITK_INFO << "Curvature threshold: " << m_CurvatureThreshold;
+    MITK_INFO << "Random seed: " << m_RandomSeed;
+    MITK_INFO << "----------------------------------------";
 
     // main loop
     m_NumAcceptedFibers = 0;
@@ -336,6 +351,8 @@ bool GibbsTrackingFilter< ItkQBallImageType >::LoadParameters(std::string filena
             return true;
         }
 
+        MITK_INFO << "GibbsTrackingFilter: loading parameter file " << filename;
+
         TiXmlDocument doc( filename );
         doc.LoadFile();
 
@@ -372,13 +389,14 @@ bool GibbsTrackingFilter< ItkQBallImageType >::LoadParameters(std::string filena
         m_MinFiberLength = fiberLength.toFloat();
 
         QString curvThres(pElem->Attribute("curvature_threshold"));
-        m_CurvatureThreshold = curvThres.toFloat();
+        m_CurvatureThreshold = cos(curvThres.toFloat()*M_PI/180);
         m_AbortTracking = false;
+        MITK_INFO << "GibbsTrackingFilter: parameter file loaded successfully";
         return true;
     }
     catch(...)
     {
-        MITK_INFO << "GibbsTrackingFilter: could not load parameter file.";
+        MITK_INFO << "GibbsTrackingFilter: could not load parameter file";
         return false;
     }
 }

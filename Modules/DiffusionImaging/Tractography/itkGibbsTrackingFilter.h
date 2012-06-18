@@ -67,6 +67,7 @@ public:
     itkSetMacro( DuplicateImage, bool )
     itkSetMacro( RandomSeed, int )
     itkSetMacro( ParameterFile, std::string )
+    itkSetMacro( LutPath, std::string )
 
     // getter
     itkGetMacro( ParticleWeight, float )
@@ -128,6 +129,7 @@ protected:
     int             m_NumConnections;       // current number of connections between particles in grid
     int             m_RandomSeed;           // seed value for random generator (-1 for standard seeding)
     std::string     m_ParameterFile;        // filename of parameter file
+    std::string     m_LutPath;              // path to lookuptables used by the sphere interpolator
 
     FiberPolyDataType m_FiberPolyData;      // container for reconstructed fibers
 };

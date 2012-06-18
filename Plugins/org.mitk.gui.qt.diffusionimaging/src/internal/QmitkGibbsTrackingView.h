@@ -114,6 +114,7 @@ protected slots:
   void SetStartTemp(int value);
   void SetEndTemp(int value);
   void SetCurvatureThreshold(int value);
+  void SetRandomSeed(int value);
   void SetOutputFile();
 
 private:

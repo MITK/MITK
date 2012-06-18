@@ -75,6 +75,7 @@ namespace itk{
     ~StreamlineTrackingFilter() {}
     void PrintSelf(std::ostream& os, Indent indent) const;
 
+    double RoundToNearest(double num);
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int threadId);
     void AfterThreadedGenerateData();

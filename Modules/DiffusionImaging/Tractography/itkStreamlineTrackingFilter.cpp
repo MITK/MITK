@@ -49,6 +49,14 @@ TPDPixelType>
 
 template< class TTensorPixelType,
           class TPDPixelType>
+double StreamlineTrackingFilter< TTensorPixelType,
+TPDPixelType>
+::RoundToNearest(double num) {
+    return (num > 0.0) ? floor(num + 0.5) : ceil(num - 0.5);
+}
+
+template< class TTensorPixelType,
+          class TPDPixelType>
 void StreamlineTrackingFilter< TTensorPixelType,
 TPDPixelType>
 ::BeforeThreadedGenerateData()
@@ -151,9 +159,9 @@ TPDPixelType>
             {
                 ++step;
 
-                index[0] = round(pos[0]);
-                index[1] = round(pos[1]);
-                index[2] = round(pos[2]);
+                index[0] = RoundToNearest(pos[0]);
+                index[1] = RoundToNearest(pos[1]);
+                index[2] = RoundToNearest(pos[2]);
 
                 if (index[0] < 0 || index[0]>=m_ImageSize[0])
                     break;
@@ -220,9 +228,9 @@ TPDPixelType>
             {
                 ++step;
 
-                index[0] = round(pos[0]);
-                index[1] = round(pos[1]);
-                index[2] = round(pos[2]);
+                index[0] = RoundToNearest(pos[0]);
+                index[1] = RoundToNearest(pos[1]);
+                index[2] = RoundToNearest(pos[2]);
 
                 if (index[0] < 0 || index[0]>=m_ImageSize[0])
                     break;

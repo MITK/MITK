@@ -66,6 +66,7 @@ public:
     itkSetMacro( CurvatureThreshold, float)
     itkSetMacro( DuplicateImage, bool )
     itkSetMacro( RandomSeed, int )
+    itkSetMacro( ParameterFile, std::string )
 
     // getter
     itkGetMacro( ParticleWeight, float )
@@ -97,6 +98,7 @@ protected:
     virtual ~GibbsTrackingFilter();
     bool EstimateParticleWeight();
     void PrepareMaskImage();
+    bool LoadParameters(std::string filename);
 
     // Input Images
     typename ItkQBallImageType::Pointer m_QBallImage;
@@ -125,6 +127,7 @@ protected:
     int             m_NumParticles;         // current number of particles in grid
     int             m_NumConnections;       // current number of connections between particles in grid
     int             m_RandomSeed;           // seed value for random generator (-1 for standard seeding)
+    std::string     m_ParameterFile;        // filename of parameter file
 
     FiberPolyDataType m_FiberPolyData;      // container for reconstructed fibers
 };

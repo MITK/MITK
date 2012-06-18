@@ -5,4 +5,5 @@ SET(MODULE_TESTS
 SET(MODULE_CUSTOM_TESTS
   mitkFiberBundleXReaderWriterTest.cpp
   # mitkFiberBundleXTest.cpp ## deactivated, see bug 12017
+  mitkGibbsTrackingTest.cpp
 )

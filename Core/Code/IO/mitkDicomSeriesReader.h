@@ -183,6 +183,7 @@ namespace mitk
 
  A number of tests have been implemented to check our assumptions regarding DICOM loading. Please see \ref DICOMTesting
 
+ \todo refactor all the protected helper objects/methods into a separate header so we compile faster
 */
 class MITK_CORE_EXPORT DicomSeriesReader
 {
@@ -329,20 +330,29 @@ protected:
   {
     public:
 
-      GantryTiltInformation( const Point3D& origin1, const Point3D& origin2,
-            const Vector3D& right, const Vector3D& up,
-            bool& volumeIsTilted, Vector3D& interSliceOffset );
+      GantryTiltInformation( const Point3D& origin1, 
+                             const Point3D& origin2,
+                             const Vector3D& right, 
+                             const Vector3D& up);
+      
+      bool IsSheared() const;
+      bool IsRegularGantryTilt() const;
 
-      ScalarType matrixCoefficientForCorrection() const;
+      ScalarType GetMatrixCoefficientForCorrection() const;
 
+    protected:
+
+      Point3D projectPointOnLine( Point3D p, Point3D lineOrigin, Vector3D lineDirection ); 
+
+      ScalarType m_ShiftUp;
+      ScalarType m_ShiftRight;
+      ScalarType m_ShiftNormal;
   };
 
   /**
     \brief for internal sorting.
   */
   typedef std::pair<StringContainer, StringContainer> TwoStringContainers;
-  // TODO implement a complete analysis result data type instead of two lists
-  // list of matching files; gantry-tilt flag; gantry tilt degrees (nice-to-have) or inter-slice-vector; unsorted files
  
   /**
     \brief Maps DICOM tags to MITK properties.

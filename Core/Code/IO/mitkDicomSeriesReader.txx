@@ -70,12 +70,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
   
-      // TODO check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
-      // TODO check first and second position/orientation from tags, make some calculations
-      // TODO refactor these calculations into method, which could also be used from GetSeries()
+      // check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
+      // check first and second position/orientation from tags, make some calculations
 
-      bool volumeIsTilted(false);
-      Vector3D InterSliceOffset;
       // TODO check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible!!
       std::string firstFilename(filenames.front());
       std::string secondFilename( *(++(filenames.begin())) );
@@ -92,12 +89,12 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
       DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
 
-      GantryTiltInformation tiltInfo( origin1, origin2, right, up, volumeIsTilted, InterSliceOffset );
-      correctTilt &= volumeIsTilted;
+      GantryTiltInformation tiltInfo( origin1, origin2, right, up );
+      correctTilt &= tiltInfo.IsSheared();
 
-      MITK_DEBUG << "** Loading now: tilt? " << volumeIsTilted;
-      MITK_DEBUG << "** Loading now: how tilt? " << InterSliceOffset[0];
-      MITK_DEBUG << "** Loading now: corect tilt? " << correctTilt;
+      MITK_DEBUG << "** Loading now: shear? " << tiltInfo.IsSheared();
+      MITK_DEBUG << "** Loading now: normal tilt? " << tiltInfo.IsRegularGantryTilt();
+      MITK_DEBUG << "** Loading now: perform tilt correction? " << correctTilt;
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
         image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, command ); // load first 3D block
@@ -126,11 +123,10 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         reader->Update();
 
         typename ImageType::Pointer readVolume = reader->GetOutput();
-        // TODO call tilt correction here as an itk filter
         // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
         if (correctTilt)
         {
-          readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.matrixCoefficientForCorrection() );
+          readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.GetMatrixCoefficientForCorrection() );
         }
         image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
         image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
@@ -170,7 +166,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           
           if (correctTilt)
           {
-            readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.matrixCoefficientForCorrection() );
+            readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.GetMatrixCoefficientForCorrection() );
           }
           image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
         }
@@ -227,7 +223,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
   if (correctTilt)
   {
-    readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.matrixCoefficientForCorrection() );
+    readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.GetMatrixCoefficientForCorrection() );
   }
   
   image->InitializeByItk(readVolume.GetPointer());
@@ -398,15 +394,8 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, ScalarType fact
   typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
   resampler->SetInterpolator( interpolator );
 
-  MITK_INFO << "************  FIXI UPPI  ****************" << input->GetOrigin();
-  MITK_INFO << "************  FIXI UPPI  ****************";
-  MITK_INFO << "************  FIXI UPPI  ****************";
-  MITK_INFO << "************  FIXI UPPI  ****************";
-  MITK_INFO << "************  FIXI UPPI  ****************" << transform;
-
   resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::max() );
   
-  // TODO calculate transform!
   // TODO adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
 
   resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared

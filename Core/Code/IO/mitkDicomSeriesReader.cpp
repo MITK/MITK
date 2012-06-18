@@ -426,8 +426,7 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
 
 DicomSeriesReader::GantryTiltInformation::GantryTiltInformation( 
     const Point3D& origin1, const Point3D& origin2,
-    const Vector3D& right, const Vector3D& up,
-    bool& volumeIsTilted, Vector3D& interSliceOffset )
+    const Vector3D& right, const Vector3D& up)
 {
   // determine if slice 1 (imagePosition1 and imageOrientation1) and slice 2 can be in one orthogonal slice stack:
   // calculate a line from origin 1, directed along the normal of slice (calculated as the cross product of orientation 1)
@@ -454,22 +453,65 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
 
   double distance = sqrt(numerator / denominator);
 
-  volumeIsTilted = distance > 0.001; // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
-  if ( volumeIsTilted )
+  if ( distance > 0.001 ) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
   {
-    MITK_DEBUG << "  Series might contain a tilted geometry";
+    MITK_DEBUG << "  Series seems to contain a tilted (or sheared) geometry";
     MITK_DEBUG << "  Distance of expected slice origin from actual slice origin: " << distance;
-    MITK_DEBUG << "    ==> storing this distance for later analysis.";
+    MITK_DEBUG << "    ==> storing this shift for later analysis:";
 
-    interSliceOffset.Fill( distance );
+    Point3D projectionRight = projectPointOnLine( origin1, origin2, right );
+    Point3D projectionUp = projectPointOnLine( origin1, origin2, up );
+    Point3D projectionNormal = projectPointOnLine( origin1, origin2, normal );
+
+    m_ShiftRight = (projectionRight - origin2).GetNorm();
+    m_ShiftUp = (projectionUp - origin2).GetNorm();
+    m_ShiftNormal = (projectionNormal - origin2).GetNorm();
+
+    MITK_DEBUG << "    shift normal: " << m_ShiftNormal;
+    MITK_DEBUG << "    shift up: " << m_ShiftUp;
+    MITK_DEBUG << "    shift right: " << m_ShiftRight;
   }
 }
       
-ScalarType 
-DicomSeriesReader::GantryTiltInformation::matrixCoefficientForCorrection() const
+Point3D 
+DicomSeriesReader::GantryTiltInformation::projectPointOnLine( Point3D p, Point3D lineOrigin, Vector3D lineDirection )
 {
-  return 2.0;
+  /**
+    See illustration at http://mo.mathematik.uni-stuttgart.de/inhalt/aussage/aussage472/
+
+    vector(lineOrigin,p) = normal * ( innerproduct((p - lineOrigin),normal) / squared-length(normal) )
+  */
+
+  Vector3D lineOriginToP = p - lineOrigin;
+  ScalarType innerProduct = lineOriginToP * lineDirection;
+  
+  ScalarType factor = innerProduct / lineDirection.GetSquaredNorm();
+  Point3D projection = lineOrigin + factor * lineDirection;
+
+  return projection;
 }
+
+ScalarType 
+DicomSeriesReader::GantryTiltInformation::GetMatrixCoefficientForCorrection() const
+{
+  return m_ShiftUp / m_ShiftNormal;
+}
+
+bool 
+DicomSeriesReader::GantryTiltInformation::IsSheared() const
+{
+  return (   m_ShiftRight > 0.001
+          ||    m_ShiftUp > 0.001);
+}
+
+      
+bool 
+DicomSeriesReader::GantryTiltInformation::IsRegularGantryTilt() const
+{
+  return (   m_ShiftRight < 0.001 
+          &&    m_ShiftUp > 0.001);
+}
+
 
 std::string
 DicomSeriesReader::ConstCharStarToString(const char* s)
@@ -596,20 +638,19 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
         Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
         DICOMStringToOrientationVectors( tagValueMappings[fileIter->c_str()][tagImageOrientation], right, up, ignoredConversionError );
        
-        bool assumeTilt(false);
-        Vector3D interSliceOffset;
-        GantryTiltInformation tiltInfo( lastDifferentOrigin, thisOrigin, right, up, assumeTilt, interSliceOffset );
+        GantryTiltInformation tiltInfo( lastDifferentOrigin, thisOrigin, right, up );
 
-        if (assumeTilt) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
+        if ( tiltInfo.IsSheared() ) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
         {
-          /* TODO optimistic approach, accepting gantry tilt: save file for later, check all further files */
+          /* optimistic approach, accepting gantry tilt: save file for later, check all further files */
           
-          // TODO at this point we have TWO slices analyzed! if they are the only two files, we still split, because there is no third to verify our tilting assumption.
-          // TODO later with a third being available, we must check if the initial tilting vector is still valid. if yes, continue. 
-          // TODO if NO, we need to split the already sorted part (result.first) and the currently analyzed file (*fileIter)
+          // at this point we have TWO slices analyzed! if they are the only two files, we still split, because there is no third to verify our tilting assumption.
+          // later with a third being available, we must check if the initial tilting vector is still valid. if yes, continue. 
+          // if NO, we need to split the already sorted part (result.first) and the currently analyzed file (*fileIter)
 
-          // TODO how do we tell apart gantry tilt from overall skewedness?
-          // TODO WE DON'T at first.
+          // how do we tell apart gantry tilt from overall skewedness?
+          // TODO sort out irregularly sheared slices, that IS NOT tilting
+
           result.FlagGantryTilt( fromFirstToSecondOrigin );
           
           result.AddFileToSortedBlock(*fileIter); // this file is good for current block

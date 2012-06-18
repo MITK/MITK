@@ -69,11 +69,11 @@ protected:
     float   gamma_s;
     float   gamma_reg_s;
     float   m_ParticleWeight;               // defines how much one particle contributes to the artificial signal
-    float   m_ExtStrength;
-    float   m_IntStrength;
-    float   m_ParticleLength;
-    float   m_SquaredParticleLength;
-    float   m_CurvatureThreshold;
+    float   m_ExtStrength;                  // weighting factor for external energy
+    float   m_IntStrength;                  // weighting factor for internal energy
+    float   m_ParticleLength;               // particle length
+    float   m_SquaredParticleLength;        // squared particle length
+    float   m_CurvatureThreshold;           // maximum angle accepted between two connected particles
 
     float SpatProb(vnl_vector_fixed<float, 3> pos);
     float EvaluateOdf(vnl_vector_fixed<float, 3> &pos, vnl_vector_fixed<float, 3> dir);

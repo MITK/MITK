@@ -56,7 +56,7 @@ protected:
     void ComputeEndPointProposalDistribution(EndPoint P);
 
     // generate random vectors
-    vnl_vector_fixed<float, 3> DistortVector(float sigma, vnl_vector_fixed<float, 3>& vec);
+    void DistortVector(float sigma, vnl_vector_fixed<float, 3>& vec);
     vnl_vector_fixed<float, 3> GetRandomDirection();
 
     ItkRandGenType* m_RandGen;      // random generator

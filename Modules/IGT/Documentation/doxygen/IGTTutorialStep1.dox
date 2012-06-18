@@ -1,42 +1,42 @@
 /**
 \page IGTCodeTutorialPage The IGT Code Tutorial
 
-The IGT tutorial consists of 4 main parts for construction of small navigation pipeline with a virtual tracking device
-which produce random positions and orientation so no additional hardware is required.
+The IGT tutorial consists of four main parts for construction of a small navigation pipeline using a virtual tracking device.
+The virtual tracking device produces random tool data (position and orientation) so no additional hardware is required.
 
 \section sec1 In Tracking Layer
  
-Firstly a new object "tracker" of a type mitk::VirtualTrackingDevice is created, then two tools (for example) with names "tool1" and "tool2"
-are added to this object "tracker". Since, the tracking device tracker is treated as a virtual tracking
-device "tool1" and "tool2" are just added to the object tracker by method add. 
+Firstly a new object "tracker" of the type mitk::VirtualTrackingDevice is created, then two tools, named "tool1" and "tool2",
+are added to this "tracker". Since, the tracking device "tracker" is treated as a virtual tracking
+device "tool1" and "tool2" are just added to the object by method AddTool(name). 
 
 \section sec2 In Navigation Layer
 
 \image html IGTTutorialStep1.png 
 
-Secondly, a new source of a type  mitk::TrackingDeviceSource has to be created with outputs for each single tool of a tracker. 
+Secondly, a new source of the type  mitk::TrackingDeviceSource has to be created with outputs for each single tool of a tracker. 
 The source sets the following tracking device by using method SetTrackingDevice as shown below
+\code
 source->SetTrackingDevice(tracker);
-So now, the source is connected to the tracking device.
+\endcode
+So now, the source is initialized with the virtual tracking device. Next, the source is connected and tracking is started.
  
-On the third step, a displacemt filter (an object displacer) is constructed to change the positions of the input NavigationData objects
-with an offset for each direction (X,Y,Z).
-The given filter has inputs and outputs for each tool, in this example we have 2 tools, hence there exists two inputs and outputs.
-Every output of the displacement filter object is connected to the recorder object.
+In part II, a displacemt filter (object "displacer") is constructed to change the positions of the filtered NavigationData objects
+with an offset for each direction (X,Y,Z). The given filter has inputs and outputs for each tool, in this example we have 2 tools, hence there exists two inputs and outputs. Every output of the displacement filter object is connected to the recorder object in the next part.
 
-In third part, all the movements are recorded with the NavigationDataRecorder. In order to record, we are simply create
-an object recorder of a type  mitk::NavigationDataRecorder and set the appropriate file to it. Now the displacer object is connected to the
-recorder object for every output by using the first for-loop in the code and recorder start recording on the next line. Afterwards, 
-the recorder has to be updated and stop recording in the end of this stage. The recorder is updating 100 times as an example through 
-the second for-loop statement in part 3.The timer is simulated by using the second for-loop. 
+In part III, all the NavigationData is recorded with the NavigationDataRecorder. In order to record, we simply create
+an object "recorder" of the type mitk::NavigationDataRecorder and set the appropriate file to it. Now the displacer object is connected to the
+recorder object for every output by using a for-loop in the code, the method StartRecording() is called on the next line. Afterwards, 
+the recorder has to be updated a couple of times. In this example the recorder is updating 100 times through 
+the second for-loop statement in part III. This can also be seen as a simulation of a timer by using a for-loop. 
 
-Fourth part explains how the recoded file can be played for further use. After the object "player" of a type mitk::NavigationDataPlayer
-is created,the required file has to be set to player and starts playing.  Here, there exists a new pipeline which functions by reading 
-recorded file from the harddisc and plays it by passing it to the player. During the play, the for-loop makes the file update as in part 3.
+Part IV explains how the recoded file can be played for further use. After the object "player" of a type mitk::NavigationDataPlayer
+is created, the required file has to be set to the player and playing has to be started.  Here, there exists a new pipeline which functions by reading 
+the recorded file from the harddisc and plays it by using the player as source. During the play, the for-loop makes the file update as in part III.
 
 \image html IGTTutorialStep1-2.png 
 
-The full code of small navigation pipeline is show below.
+The full code of small navigation pipeline is shown below.
 
 \code
 

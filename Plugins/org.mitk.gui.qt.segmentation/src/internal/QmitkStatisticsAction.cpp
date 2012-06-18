@@ -25,9 +25,9 @@ QmitkStatisticsAction::~QmitkStatisticsAction()
 
 void QmitkStatisticsAction::Run(const QList<mitk::DataNode::Pointer>& /*selectedNodes*/)
 {
-  berry::IBundle::Pointer imageStatisticsBundle = berry::Platform::GetBundle("org.mitk.gui.qt.imagestatistics");
+  QSharedPointer<ctkPlugin> imageStatisticsBundle = berry::Platform::GetCTKPlugin("org.mitk.gui.qt.measurementtoolbox");
 
-  if (m_BlueBerryView && imageStatisticsBundle.IsNotNull())
+  if (m_BlueBerryView && !imageStatisticsBundle.isNull())
   {
     m_BlueBerryView->GetSite()->GetWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagestatistics");
   }

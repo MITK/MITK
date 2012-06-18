@@ -38,7 +38,7 @@ set(CPACK_PACKAGE_VERSION_MINOR "${MITK_VERSION_MINOR}")
 set(CPACK_STRIP_FILES ON)
 
 # append revision number if available
-if(MITK_REVISION_ID)
+if(MITK_REVISION_ID AND MITK_VERSION_PATCH STREQUAL "99")
   if(MITK_WC_TYPE STREQUAL "git")
     set(git_hash ${MITK_REVISION_ID})
     string(LENGTH "${git_hash}" hash_length)

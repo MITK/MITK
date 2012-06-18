@@ -69,8 +69,8 @@ QmitkSegmentationPostProcessing::QmitkSegmentationPostProcessing(mitk::DataStora
 
     m_StatisticsAction = new QAction("Statistics", parent);
     binaryImageDataNodeDescriptor->AddAction(m_StatisticsAction);
-    berry::IBundle::Pointer imageStatisticsBundle = berry::Platform::GetBundle("org.mitk.gui.qt.imagestatistics");
-    if(imageStatisticsBundle.IsNotNull())
+    QSharedPointer<ctkPlugin> imageStatisticsBundle = berry::Platform::GetCTKPlugin("org.mitk.gui.qt.measurementtoolbox");
+    if(!imageStatisticsBundle.isNull())
       connect( m_StatisticsAction, SIGNAL( triggered(bool) ) , this, SLOT( ImageStatistics(bool) ) );
     else
       m_StatisticsAction->setEnabled( false );

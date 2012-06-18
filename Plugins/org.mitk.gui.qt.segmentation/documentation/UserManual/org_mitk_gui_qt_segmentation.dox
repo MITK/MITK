@@ -32,7 +32,7 @@ The perspective groups a number of tools which can be used for:
 <ul>
   <li> (semi-)automatic segmentation of organs on CT or MR image volumes
   <li> semi-automatic segmentation of lesions such as enlarged lymph nodes or tumors
-  <li> manual segmentation of any strucutures you might want to delineate
+  <li> manual segmentation of any structures you might want to delineate
 </ul>
 
 \image html org_mitk_gui_qt_segmentationIMGapplication.png Segmentation perspective consisting of the Data Manager view and the Segmentation view
@@ -48,8 +48,8 @@ However, the distinction between a foreground and a background structure is requ
 <li>as a necessary pre-processing step for therapy planning, therapy support, and therapy monitoring
 </ul>
 Creating this distinction between foreground and background is called <i>segmentation</i>.
-The Segmentation perspective of MITKApp uses a voxel based approach to segmentation, i.e. each voxel of an image must be completely assigned to either foreground or background.
-This is, in contrast to some other applications which might use an approach based on contours, where the border of a structure might cut a voxel into two %parts.
+The Segmentation perspective of the MITK ExtApp uses a voxel based approach to segmentation, i.e. each voxel of an image must be completely assigned to either foreground or background.
+This is in contrast to some other applications which might use an approach based on contours, where the border of a structure might cut a voxel into two %parts.
 
 The remainder of this document will summarize the features of the Segmentation perspective and how they are used.
 
@@ -96,15 +96,14 @@ This item is automatically selected for you, allowing you to %start editing the 
 
 As you might want to have segmentations of multiple structures in a single patient image, the application needs to know which of them to use for editing.
 You select a segmenation by clicking it in the tree view of Data Manager. Note that segmentations are usually displayed as sub-items of "their" patient image.
-In the rare case, where you need to edit a segmentation that is not displayed as a a sub-item, you can click both the original image AND the segmentation while holding down CTRL on the keyboard.
+In the rare case, where you need to edit a segmentation that is not displayed as a a sub-item, you can click both the original image AND the segmentation while holding down CTRL or for Mac OS X the CMD on the keyboard.
 
 When a selection is made, the Segmentation View will hide all but the selected segmentation and the corresponding original image.
 When there are multiple segmentations, the unselected ones will remain in the Data Manager, you can make them visible at any time by selecting them.
-If you want to see all segmenations at the same time, just clear the selection by clicking outside all the tree items in the Data Manager.
 
 \subsection org_mitk_gui_qt_segmentationUserManualManualKringeling3 Selecting Editing Tools
 
-If you are familiar with MITKApp, you know that clicking and moving the mouse in any of the 2D render windows will move around the crosshair that defines what part of the image is displayed.
+If you are familiar with the MITK ExtApp, you know that clicking and moving the mouse in any of the 2D render windows will move around the crosshair that defines what part of the image is displayed.
 This behavior is disabled while any of the manual segmentation tools are active -- otherwise you might have a hard time concentrating on the contour you are drawing.
 
 To %start using one of the editing tools, click its button the the displayed toolbox.
@@ -116,19 +115,18 @@ If you have to delineate a lot of images, you should try using shortcuts to swit
 \subsection org_mitk_gui_qt_segmentationUserManualManualKringeling4 Using Editing Tools
 
 All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations transversal, sagittal, or frontal), move the mouse while holding the mouse button and release to finish the editing action.
-All tools work on the original slices of the patient image, i.e. with some rotated/tilted MR image volumes you need to perform a "reinit" option in the Data Manger before you are able to use the editing tools.
 
 Multi-step undo and redo is fully supported by all editing tools. Use the application-wide undo button in the toolbar to revert erroneous %actions.
 
 \image html org_mitk_gui_qt_segmentationIMGiconAddSubtract.png Add and Subtract Tools
 
 Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed from (Subtract tool) the current segmentation.
-Hold down the CTRL key to invert the operation (this will switch tools temporarily to allow for quick corrections).
+Hold down the CTRL / CMD key to invert the operation (this will switch tools temporarily to allow for quick corrections).
 
 \image html org_mitk_gui_qt_segmentationIMGiconPaintWipe.png Paint and Wipe Tools
 
 Use the slider below the toolbox to change the radius of these round paintbrush tools. Move the mouse in any 2D window and press the left button to draw or erase pixels.
-As the Add/Subtract tools, holding CTRL while drawing will invert the current tool's behavior.
+As the Add/Subtract tools, holding CTRL / CMD while drawing will invert the current tool's behavior.
 
 \image html org_mitk_gui_qt_segmentationIMGiconRegionGrowing.png Region Growing Tool
 
@@ -143,18 +141,19 @@ A common issue with region growing is the so called "leakage" which happens when
 The Region Growing tool comes with a "leakage detection/removal" feature. If leakage happens, you can left-click into the leakage region and the tool will try to automatically remove this region (see illustration below).
 
 \image html org_mitk_gui_qt_segmentationIMGleakage.png Leakage correction feature of the Region Growing tool
-
+<br>
 \image html org_mitk_gui_qt_segmentationIMGiconCorrection.png Correction Tool
 
 You do not have to draw a closed contour to use the Correction tool and do not need to switch between the Add and Substract tool to perform
 small corrective changes. The following figure shows the usage of this tool:
 <ul>
+<li> if the user draws a line which %starts and ends outside the segmenation AND it intersects no other segmentation the endpoints of the line are connected and the resulting contour is filled
 <li> if the user draws a line which %starts and ends outside the segmenation a part of it is cut off (left image)
 <li> if the line is drawn fully inside the segmentation the marked region is added to the segmentation (right image)
 </ul>
 
 \image html org_mitk_gui_qt_segmentationIMGcorrectionActions.png %Actions of the Correction tool illustrated.
-
+<br>
 \image html org_mitk_gui_qt_segmentationIMGiconFill.png Fill Tool
 
 Left-click inside a segmentation with holes to completely fill all holes.
@@ -165,8 +164,29 @@ This tool removes a connected part of pixels that form a segmentation. You may u
 
 \subsection org_mitk_gui_qt_segmentationUserManualManualKringeling5 Interpolation
 
-Creating segmentations for modern CT volumes is very time-consuming, because strucutres of interest can easily cover a range of 50 or more slices.
-The Segmentation view offers a helpful feature for these cases: "Interpolation" creates suggestions for a segmentation whenever you have a slice that
+Creating segmentations for modern CT volumes is very time-consuming, because structures of interest can easily cover a range of 50 or more slices.
+The Manual Segmentation View offers two helpful features for these cases: 
+
+<ul>
+<li> <b>3D Interpolation</b>
+<li> <b>2D Interpolation</b>
+</ul>
+<br>
+<b>The 3D interpolation</b> is activated by default when using the manual segmentation tools. That means if you start contouring, from the second contour onwards, the surface of the segmented area will be interpolated based on the given contour information. 
+The interpolation works with all available manual tools. Please note that this is currently a pure mathematical interpolation, i.e. image intensity information is not taken into account. With each further contour the interpolation result will be improved, 
+but the more contours you provide the longer the recalculation will take. To achieve an optimal interpolation result and in this way a most accurate segmentation you should try to describe the surface with sparse contours by segmenting in arbitrary 
+oriented planes. The 3D interpolation is not meant to be used for parallel slice-wise segmentation. 
+
+\image html org_mitk_gui_qt_segmentation3DInterpolationWrongRight.png 3D Interpolation HowTo
+
+You can accept the interpolation result by clicking the "Accept" - button below the tool buttons. 
+In this case the 3D interpolation will be deactivated automatically so that the result can be postprocessed without any interpolation running in background. During recalculation the interpolated surface is blinking yellow/white. When the interpolation 
+has finished the surface is shown yellow with a small opacity. Additional to the surface, black contours are shown in the 3D render window. They mark the positions of all the drawn contours which were used for the interpolation. 
+You can navigate between the drawn contours by clicking on the „Position“ - Nodes in the datamanager which are located below the selected segmentation. If you don't want to see these nodes just unckeck the „Show Position Nodes“ Checkbox and these nodes will be hidden.
+If you want to delete a drawn contour we recommend to use the Erase-Tool since Redo/Undo is not yet working for 3D interpolation.
+
+<br>
+<b>The 2D Interpolation</b> creates suggestions for a segmentation whenever you have a slice that
 <ul>
 <li> has got neighboring slices with segmentations (these do not need to be direct neighbors but could also be a couple of slices away) AND
 <li> is completely clear of a manual segmentation -- i.e. there will be no suggestion if there is even only a single pixel of segmentation in the current slice.
@@ -177,6 +197,8 @@ To accept single slices, click the "Accept" button below the toolbox.
 If you have segmented a whole organ in every-x-slice, you may also review the interpolations and then accept all of them at once by clicking "... all slices".
 
 \section org_mitk_gui_qt_segmentationUserManualOrganSegmentation Organ Segmentation
+
+\note This feature is only available in our 3M3 Demo Application (http://www.mint-medical.de/productssolutions/mitk3m3/mitk3m3/#downloads) but not in the open source part of MITK
 
 The manual contouring described above is a fallback option that will work for any kind of images and structures of interest.
 However, manual contouring is very time-consuming and tedious.
@@ -218,6 +240,8 @@ please contact our research team.
 
 \section org_mitk_gui_qt_segmentationUserManualLesionSegmentation Lesion Segmentation
 
+\note This feature is only available in our 3M3 Demo Application (http://www.mint-medical.de/productssolutions/mitk3m3/mitk3m3/#downloads) but not in the open source part of MITK
+
 Lesion segmentation is a little different from organ segmentation. Since lesions are not part of the healthy body, they sometimes have a diffused border,
 and are often found in varying places all over the body.
 The tools in this section offer efficient ways to create 3D segmentations of such lesions.
@@ -252,13 +276,13 @@ These %actions are accessible through the context-menu of segmentations in Data 
 You can use the surface masking tool to create binary images from a surface which
 is used used as a mask on an image. This task is demonstrated below:
 
-\image html segmentationFromSurfaceBefore.png Load an image and a surface. Select the
-image and the surface in the corresponding drop-down boxes (both are selected automatically
-if there is just one image and one surface)
+\image html segmentationFromSurfaceBefore.png Load an image and a surface. 
 
-\image html segmentationFromSurfaceAfter.png After clicking "Create segmentation
-from surface" the newly created binary image is inserted in the DataManager and can
-be used for further processing
+Select the image and the surface in the corresponding drop-down boxes (both are selected automatically if there is just one image and one surface)
+
+\image html segmentationFromSurfaceAfter.png Create segmentation from surface
+
+After clicking "Create segmentation from surface" the newly created binary image is inserted in the DataManager and can be used for further processing
 
 \section org_mitk_gui_qt_segmentationUserManualTechnicalDetail Technical Information for Developers
 

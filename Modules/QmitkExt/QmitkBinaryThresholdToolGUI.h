@@ -51,6 +51,12 @@ class QmitkExt_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 
   signals:
 
+    /// \brief Emitted when threshold Accepted
+    void thresholdAccepted();
+
+    /// \brief Emitted when threshold Canceled
+    void thresholdCanceled();
+
   public slots:
 
   protected slots:

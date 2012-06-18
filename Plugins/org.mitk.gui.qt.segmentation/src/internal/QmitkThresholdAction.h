@@ -26,8 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkToolManager.h>
 
-class QDialog;
-class QmitkStdMultiWidget;
 
 class MITK_QT_SEGMENTATION QmitkThresholdAction : public QObject, public mitk::IContextMenuAction
 {
@@ -47,16 +45,13 @@ public:
 
   void OnThresholdingToolManagerToolModified();
 
-private slots:
-  void ThresholdingDone(int);
-
 private:
   QmitkThresholdAction(const QmitkThresholdAction &);
   QmitkThresholdAction & operator=(const QmitkThresholdAction &);
 
+  mitk::DataNode::Pointer m_SelectedNode;
   mitk::DataStorage::Pointer m_DataStorage;
   mitk::ToolManager::Pointer m_ThresholdingToolManager;
-  QDialog *m_ThresholdingDialog;
 };
 
 #endif

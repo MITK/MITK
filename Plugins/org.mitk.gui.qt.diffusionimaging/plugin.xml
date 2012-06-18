@@ -79,6 +79,13 @@
           icon="resources/stochFB.png" />
   </extension>
 
+     <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.streamlinetracking"
+          name="Streamline Tracking"
+          class="QmitkStreamlineTrackingView"
+          icon="resources/stochFB.png" />
+  </extension>
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.fiberprocessing"
           name="Fiber Processing"

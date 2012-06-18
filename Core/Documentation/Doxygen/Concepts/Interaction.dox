@@ -17,13 +17,14 @@ This concept allows to build the steps of interaction with different states, whi
 Furthermore state machines can be implemented using object oriented programming (OOP). Due to that we can abstract from the section of code, that implements the interaction and focus on the sequence of interaction. What steps must the user do first before the program can compute a result? For example he has to declare three points in space first and these points are the input of a filter so only after the definition of the points, the filter can produce a result. The according interaction sequence will inform the filter after the third point is set and not before that. Now the filter after an adaption only needs two points as an input. The sequence of the interaction can be easily changed if it is build up as a sequence of objects and not hard implemented in a e.g. switch/case block. Or the user wants to add a point in the scene with the right mouse button instead of the left. Wouldn't it be nice to only change the definition of an interaction sequence rather than having to search through the code and changing every single if/else condition?
 
 \subsection InteractionPage_Statemachine State Machine
-So a separation of the definition of a sequence in interaction and its implementation is a useful step in the development of an interactive application.
+So a separation of the definition of a sequence in interaction and its implementation is a useful step in the development of an 
+interactive application.
 To be able to do that, we implemented the concept of state machines with several classes: States, Transitions and Actions define the interaction pattern. The state machine itself adds the handling of events, that are sent to it.
 
 \image html statemachine.jpg
 
 \subsubsection InteractionPage_ExampleA Example A: 
-A deterministic Mealy state machine has always one current state (here state 1). If an event 1 is sent to the state machine, it searches in its current state for a transition that waits for event 1 (here transition 1). The state machine finds transition 1, changes the current state to state2, cause the transition points to it and executes actions 1 and 2. Now state 2 is the current state. The state machine receives an event 2 and searches for an according transition. Transition 2 waits for event 2, and since the transition leads to state 2 the current state is not changed. Action 3 and 4 are executed. Now Event 3 gets send to the state machine but the state machine can't find an according transition in state 2. Only transition 2 , that waits for event 2 and transition 4, that waits for event 4 are defined in that state. So the state machine ignores the event and doesn't change the state or execute an action. Now the state machine receives an event 4 and finds transition 3. So now the current state changes from state 2 to state 1 and actions 5 and 1 are executed.
+A deterministic Mealy state machine has always one current state (here state 1). If an event 1 is sent to the state machine, it searches in its current state for a transition that waits for event 1 (here transition 1). The state machine finds transition 1, changes the current state to state2, as the transition points to it and executes actions 1 and 2. Now state 2 is the current state. The state machine receives an event 2 and searches for an according transition. Transition 2 waits for event 2, and since the transition leads to state 2 the current state is not changed. Action 3 and 4 are executed. Now Event 3 gets send to the state machine but the state machine can't find an according transition in state 2. Only transition 2 , that waits for event 2 and transition 4, that waits for event 4 are defined in that state. So the state machine ignores the event and doesn't change the state or execute an action. Now the state machine receives an event 4 and finds transition 3. So now the current state changes from state 2 to state 1 and actions 5 and 1 are executed.
 
 Several actions can be defined in one transition. The execution of an action is the active part of the state machine. Here is where the state machine can make changes in data, e.g. add a Point into a list.
 
@@ -31,26 +32,26 @@ Several actions can be defined in one transition. The execution of an action is 
 See mitk::StateMachine, mitk::State, mitk::Event, mitk::Action, mitk::Transition, mitk::Interactor
 
 \subsection InteractionPage_GuardState Guard States
-Guard States are a special kind of states. The action, that is executed after the state is set as current state, sends a new event to the state machine, which leads out of the guard state. So the state machine will only stay in a guard state for a short time. This kind of state is used to check different conditions, e.g. is an Object is picked of a set of points will be full after the addition of one point.
+Guard States are a special kind of states. The action, that is executed after the state is set as current state, sends a new event to the state machine, which leads out of the guard state. So the state machine will only stay in a guard state for a short time. This kind of state is used to check different conditions, e.g. if an Object is picked or whether a set of points will be full after the addition of one point.
 
 \image html statemachine_guard.jpg
 
 \subsubsection InteractionPage_ExampleB Example B: 
-Event 1 is sent to the state machine. This leads the current state from state 1 into state check. The action 1 is executed. This action checks a condition and puts the result into a new event, that is sent and handled by the same (this) state machine. E.g. is the the object, the state machine handles the interaction, picked with the received mouse-coordinate? The event, that is generated, will be Yes or No. In case of event No, the state machine sets the current state back to state 1 and executes action 2. In case of event Yes, the state machine changes the state from state check into state 2 and executes action 3, which e.g. can select the object taken care of.
+Event 1 is sent to the state machine. This leads the current state from state 1 into state check. The action 1 is executed. This action checks a condition and puts the result into a new event, that is sent and handled by the same (this) state machine. E.g. is the object picked with the received mouse-coordinate? The event, that is generated, will be Yes or No. In case of event No, the state machine sets the current state back to state 1 and executes action 2. In case of event Yes, the state machine changes the state from state check into state 2 and executes action 3, which e.g. can select said object.
 
 \subsection InteractionPage_XMLDefinitionStatemachine Definition of a State machine
-Due to the separation of the definition of an interaction sequence and its implementation, the definition has to be archived somewhere, where the application can reach it during startup and build up all the objects (states, transitions and actions) that represent the sequence of a special interaction. In MITK, these informations are defined in an XML-file (usually in Interaction/mitkBaseInteraction/StateMachine.xml).
+Due to the separation of the definition of an interaction sequence and its implementation, the definition has to be archived somewhere, where the application can reach it during startup and build up all the objects (states, transitions and actions) that represent the sequence of a special interaction. In MITK, these informations are defined in an XML-file (usually in Core/Code/Interactions/StateMachine.xml and Plugins/org.mitk.gui.qt.application/resources/StateMachine.xml, the duplication is currently needed due to design decisions).
 The structure is the following (from \ref InteractionPage_ExampleA) :
 
 \code
-  <stateMachine NAME="statemachine1">					<!-- defining a new state machine with its name -->
-    <state NAME="State1" ID="1" START_STATE="TRUE">			<!-- new state tag; start state of the state machine; ID=1 -->
-      <transition NAME="transition1" NEXT_STATE_ID="2" EVENT_ID="1">	<!-- transition, waits for event ID=1 and leads to state 2 -->
-        <action ID="1" />						<!-- action ID = 1 shall be executed --> 
-        <action ID="2" />						<!-- action ID = 2 shall be executed --> 
-      </transition>							<!-- end of transition -->
-    </state>								<!-- end of state ID = 0 -->
-    <state NAME="state2" ID="2">						
+  <stateMachine NAME="statemachine1"><!-- defining a new state machine with its name -->
+    <state NAME="State1" ID="1" START_STATE="TRUE"><!-- new state tag; start state of the state machine; ID=1 -->
+      <transition NAME="transition1" NEXT_STATE_ID="2" EVENT_ID="1"><!-- transition, waits for event ID=1 and leads to state 2 -->
+        <action ID="1" /><!-- action ID = 1 shall be executed --> 
+        <action ID="2" /><!-- action ID = 2 shall be executed --> 
+      </transition><!-- end of transition -->
+    </state><!-- end of state ID = 1 -->
+    <state NAME="state2" ID="2">
       <transition NAME="transition2" NEXT_STATE_ID="2" EVENT_ID="2">
         <action ID="3" />
         <action ID="4" />
@@ -63,32 +64,29 @@ The structure is the following (from \ref InteractionPage_ExampleA) :
   </stateMachine>
 \endcode
 
-The identification numbers (ID) inside a state machine has to be unique. Each state machine has to have one state, that is defined as the start-state of that state machine. This means, initially, the current state of the state machine is the start-state. 
+The identification numbers (ID) inside a state machine have to be unique. Each state machine has to have one state, that is defined as the start-state of that state machine. This means, initially, the current state of the state machine is the start-state. 
 The Event-Ids seen above are also defined in the statemachine.xml file. They specify a unique number for a combination of input-conditions (key, mouse and so on). See \ref InteractionPage_InteractionEvents for further informations.
 
-So a state machine is defined through a few lines of xml-code, which is loaded at runtime. This allows us to change the sequence in interaction in the xml-file and restart the application, where the changes are applied right away. 
+The statemachine is compiled into an application at compile time.
 The definition of one single state machine is called the \a statemachine-pattern. Since this pattern is build up during startup with objects (states, transitions and actions) and these objects only hold information about what interaction may be done at the current state, we can also reuse the pattern. 
 
-<b>Note</b>, that you as a developer don't necessarily have to implement your own XML-File! We already have defined some interaction-patterns (e.g. for setting Points in 2D or 3D) which you can use and adapt.  
+\note You as a developer don't necessarily have to implement your own XML-File! We already have defined some interaction-patterns (e.g. for setting Points in 2D or 3D) which you can use and adapt.  
 
 \subsubsection InteractionPage_ReusePattern Reuse of Interaction Patterns
 If we for example have a pattern called "pointset", which defines how the user can set different points into the scene and there is an instance of a state machine called "PointSetInteractor".  This state machine has a pointer pointing to the current state in its assigned state machine pattern. Several events are send to the state machine, which moves the pointer from one state to the next, according to the transitions, and executes the actions, referenced in the transitions. 
 But now a new instance of the class "PointSetInteractor" has to be build. So we reuse the pattern and let the current state pointer of the new object point to the start state of the pattern "pointset". The implementation of the actions is \b not done inside a class of the pattern (\a state, \a transition, \a action), it is done inside a state machine class (see the reference for mitkStatemachine).
 
-\subsection InteractionPage_StartupInteraction Loading Statemachines at Runtime
-During startup all state machine-patterns are checked for not having states, that have no transitions leading out of it (dead states), or states, that have no transitions leading into it (magic states) [Bin99 p. 183]. If an error is found, an error-message will be displayed \b and the state machine will be loaded.
-
-See mitk::StateMachineFactory
-
 \subsection InteractionPage_InteractionEvents Events
-During runtime, events are thrown from e.g. the mouse to the operation system, are then send to your graphical user interface and from there it has to be send to the MITK-object called \a mitkEventMapper. This class maps the events received with an internal list of all events that can be understood in MITK. The definition of all understandable events is also located in the XML-File the state machines are defined in. If the received event can be found in the list, an internal mitk-eventnumber is added to the event and send to the object \a mitkGlobalInteraction. 
+During runtime, events are thrown from e.g. the mouse to the operating system, are then send to your graphical user interface and from there it has to be send to the MITK-object called \a mitkEventMapper. This class maps the events received with an internal list of all events that can be understood in MITK. The definition of all understandable events is also located in the XML-File the state machines are defined in. If the received event can be found in the list, an internal mitk-eventnumber is added to the event and send to the object \a mitkGlobalInteraction. 
 
 See mitk::Event, mitk::GlobalInteraction
 
 \subsection InteractionPage_GlobalInteraction GlobalInteraction
-This object administers the transmission of events to registered state machines. There can be two kinds of state machines, the ones that are only listening and ones that also change data. Listening state machines are here called Listeners and state machines that also change data are called Interactors. \b Note that the discrimination between \a Listener and \a Interactor is only made in mitkGlobalInteraction. As Listener an object derived from class StateMachine can be added and removed from GlobalInteraction and as Interactor an object derived from class Interactor can be added and removed. See the interaction class diagram for further information. 
+This object administers the transmission of events to registered state machines. There can be two kinds of state machines, the ones that are only listening and ones that also change data. Listening state machines are here called Listeners and state machines that also change data are called Interactors. 
+\note The discrimination between \a Listener and \a Interactor is only made in mitkGlobalInteraction. 
+As Listener an object derived from class StateMachine can be added and removed from GlobalInteraction and as Interactor an object derived from class Interactor can be added and removed. See the interaction class diagram for further information. 
 
-To add or remove a state machine to the list of registered interactors, call \a AddInteractor or \a RemoveInteractor of \a GlobalInteraction or to add or remove a listener call \a AddListener of \a RemoveListener. Listeners are always provided with the events. Interactors shall only be provided with an event, if they can handle the event. Because of that the method CanHandleEvent is called, which is implemented in each Interactor. This method analyses the event and returns a value between 0 (can't handle event) and 1 (can handle the event). Information, that can help to calculate this jurisdiction can be the bounding box of the interacted data and the picked mouse-position stored in the event.
+To add or remove a state machine to the list of registered interactors, call \a AddInteractor or \a RemoveInteractor of \a GlobalInteraction or to add or remove a listener call \a AddListener of \a RemoveListener. Listeners are always provided with the events. Interactors shall only be provided with an event, if they can handle the event. Because of that the method CanHandleEvent is called, which is implemented in each Interactor. This method analyses the event and returns a value between 0 (can't handle event) and 1 (Best choice to handle the event). Information, that can help to calculate this jurisdiction can be the bounding box of the interacted data and the picked mouse-position stored in the event.
 
 So after the object \a GlobalInteraction has received an event, it sends this event to all registered Listeners and then asks all registered Interactors through the method \a CanHandleEvent how good each Interactor can handle this event. The Interactor which can handle the event the best receives the event. Also see the documented code in \a mitkGlobalInteraction.
 

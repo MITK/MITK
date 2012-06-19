@@ -458,6 +458,9 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
     MITK_DEBUG << "  Series seems to contain a tilted (or sheared) geometry";
     MITK_DEBUG << "  Distance of expected slice origin from actual slice origin: " << distance;
     MITK_DEBUG << "    ==> storing this shift for later analysis:";
+    MITK_DEBUG << "    v right: " << right;
+    MITK_DEBUG << "    v up: " << up;
+    MITK_DEBUG << "    v normal: " << normal;
 
     Point3D projectionRight = projectPointOnLine( origin1, origin2, right );
     Point3D projectionUp = projectPointOnLine( origin1, origin2, up );
@@ -470,6 +473,9 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
     MITK_DEBUG << "    shift normal: " << m_ShiftNormal;
     MITK_DEBUG << "    shift up: " << m_ShiftUp;
     MITK_DEBUG << "    shift right: " << m_ShiftRight;
+    
+    MITK_DEBUG << "    tilt angle (rad): " << tanh( m_ShiftUp / m_ShiftNormal );
+    MITK_DEBUG << "    tilt angle (deg): " << tanh( m_ShiftUp / m_ShiftNormal ) * 180.0 / 3.1415926535;
   }
 }
       
@@ -494,7 +500,7 @@ DicomSeriesReader::GantryTiltInformation::projectPointOnLine( Point3D p, Point3D
 ScalarType 
 DicomSeriesReader::GantryTiltInformation::GetMatrixCoefficientForCorrection() const
 {
-  return m_ShiftUp / m_ShiftNormal;
+  return - m_ShiftUp / m_ShiftNormal;
 }
 
 bool 

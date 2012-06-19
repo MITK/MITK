@@ -385,10 +385,35 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, ScalarType fact
   resampler->SetInput( input );
 
   typedef itk::AffineTransform< double, ImageType::ImageDimension > TransformType;
-  typename TransformType::Pointer transform = TransformType::New();
-  transform->SetCenter( input->GetOrigin() );
-  transform->Shear(1, 2, factor); // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
-  resampler->SetTransform( transform );
+  typename TransformType::Pointer transformShear = TransformType::New();
+  transformShear->Shear(1, 2, factor); // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
+ 
+  /*
+  typename TransformType::Pointer transformToZero = TransformType::New();
+  transformToZero->Translate( -(input->GetOrigin().GetVectorFromOrigin()) );
+  */
+  typename TransformType::Pointer imageTransform = TransformType::New();
+  imageTransform->SetOffset( input->GetOrigin().GetVectorFromOrigin() );
+  imageTransform->SetMatrix( input->GetDirection() );
+
+  /*
+  typename TransformType::Pointer transformToOrigin = TransformType::New();
+  transformToOrigin->Translate( input->GetOrigin().GetVectorFromOrigin() );
+  */
+  
+  typename TransformType::Pointer hinundher = TransformType::New();
+  //hinundher->Compose( transformToZero );
+  //hinundher->Compose( transformShear );
+  //hinundher->Compose( transformToOrigin );
+
+  typename TransformType::Pointer toZero = TransformType::New();
+  imageTransform->GetInverse( toZero );
+  
+  hinundher->Compose( toZero );
+  hinundher->Compose( transformShear );
+  hinundher->Compose( imageTransform );
+  
+  resampler->SetTransform( hinundher );
 
   typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
   typename InterpolatorType::Pointer interpolator = InterpolatorType::New();

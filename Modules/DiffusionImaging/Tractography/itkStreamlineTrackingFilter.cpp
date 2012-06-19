@@ -38,7 +38,7 @@ StreamlineTrackingFilter< TTensorPixelType,
 TPDPixelType>
 ::StreamlineTrackingFilter():
     m_FaThreshold(0.2),
-    m_StepSize(0.2),
+    m_StepSize(1),
     m_MaxLength(10000),
     m_SeedsPerVoxel(1)
 {
@@ -66,9 +66,26 @@ TPDPixelType>
     m_Cells = vtkCellArray::New();
 
     typename InputImageType::Pointer inputImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
-    m_ImageSize[0] = inputImage->GetLargestPossibleRegion().GetSize().GetElement(0);
-    m_ImageSize[1] = inputImage->GetLargestPossibleRegion().GetSize().GetElement(1);
-    m_ImageSize[2] = inputImage->GetLargestPossibleRegion().GetSize().GetElement(2);
+    m_ImageSize.resize(3);
+    m_ImageSize[0] = inputImage->GetLargestPossibleRegion().GetSize()[0];
+    m_ImageSize[1] = inputImage->GetLargestPossibleRegion().GetSize()[1];
+    m_ImageSize[2] = inputImage->GetLargestPossibleRegion().GetSize()[2];
+    m_ImageSpacing.resize(3);
+    m_ImageSpacing[0] = inputImage->GetSpacing()[0];
+    m_ImageSpacing[1] = inputImage->GetSpacing()[1];
+    m_ImageSpacing[2] = inputImage->GetSpacing()[2];
+
+    if (m_StepSize<0.005)
+    {
+        float minSpacing;
+        if(m_ImageSpacing[0]<m_ImageSpacing[1] && m_ImageSpacing[0]<m_ImageSpacing[2])
+            minSpacing = m_ImageSpacing[0];
+        else if (m_ImageSpacing[1] < m_ImageSpacing[2])
+            minSpacing = m_ImageSpacing[1];
+        else
+            minSpacing = m_ImageSpacing[2];
+        m_StepSize = 0.5*minSpacing;
+    }
 
     m_PolyDataContainer = itk::VectorContainer< int, FiberPolyDataType >::New();
     for (int i=0; i<this->GetNumberOfThreads(); i++)
@@ -93,7 +110,8 @@ TPDPixelType>
         m_MaskImage->Allocate();
         m_MaskImage->FillBuffer(1);
     }
-    std::cout << "starting streamline tracking" << std::endl;
+    std::cout << "StreamlineTrackingFilter: stepsize: " << m_StepSize << " mm" << std::endl;
+    std::cout << "StreamlineTrackingFilter: starting streamline tracking" << std::endl;
 }
 
 template< class TTensorPixelType,
@@ -163,11 +181,7 @@ TPDPixelType>
                 index[1] = RoundToNearest(pos[1]);
                 index[2] = RoundToNearest(pos[2]);
 
-                if (index[0] < 0 || index[0]>=m_ImageSize[0])
-                    break;
-                if (index[1] < 0 || index[1]>=m_ImageSize[1])
-                    break;
-                if (index[2] < 0 || index[2]>=m_ImageSize[2])
+                if (!inputImage->GetLargestPossibleRegion().IsInside(index))
                     break;
 
                 typename InputImageType::PixelType tensor = inputImage->GetPixel(index);
@@ -175,16 +189,10 @@ TPDPixelType>
                 {
                     tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
 
-                    int eIndex = 2;
-                    if( (eigenvalues[0] >= eigenvalues[1]) && (eigenvalues[0] >= eigenvalues[2]) )
-                        eIndex = 0;
-                    else if(eigenvalues[1] >= eigenvalues[2])
-                        eIndex = 1;
-
                     vnl_vector_fixed<double,3> dir;
-                    dir[0] = eigenvectors(eIndex, 0);
-                    dir[1] = eigenvectors(eIndex, 1);
-                    dir[2] = eigenvectors(eIndex, 2);
+                    dir[0] = eigenvectors(2, 0);
+                    dir[1] = eigenvectors(2, 1);
+                    dir[2] = eigenvectors(2, 2);
                     dir.normalize();
 
                     if (!dirOld.is_zero())
@@ -207,9 +215,9 @@ TPDPixelType>
                     pointISs.push_back(id);
                     counter++;
 
-                    pos[0] += dir[0];
-                    pos[1] += dir[1];
-                    pos[2] += dir[2];
+                    pos[0] += dir[0]/m_ImageSpacing[0];
+                    pos[1] += dir[1]/m_ImageSpacing[1];
+                    pos[2] += dir[2]/m_ImageSpacing[2];
                 }
             }
 
@@ -244,16 +252,10 @@ TPDPixelType>
                 {
                     tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
 
-                    int eIndex = 2;
-                    if( (eigenvalues[0] >= eigenvalues[1]) && (eigenvalues[0] >= eigenvalues[2]) )
-                        eIndex = 0;
-                    else if(eigenvalues[1] >= eigenvalues[2])
-                        eIndex = 1;
-
                     vnl_vector_fixed<double,3> dir;
-                    dir[0] = eigenvectors(eIndex, 0);
-                    dir[1] = eigenvectors(eIndex, 1);
-                    dir[2] = eigenvectors(eIndex, 2);
+                    dir[0] = eigenvectors(2, 0);
+                    dir[1] = eigenvectors(2, 1);
+                    dir[2] = eigenvectors(2, 2);
                     dir.normalize();
                     dir *= -1; // reverse direction
 
@@ -277,9 +279,9 @@ TPDPixelType>
                     container->GetPointIds()->InsertNextId(id);
                     counter++;
 
-                    pos[0] += dir[0];
-                    pos[1] += dir[1];
-                    pos[2] += dir[2];
+                    pos[0] += dir[0]/m_ImageSpacing[0];
+                    pos[1] += dir[1]/m_ImageSpacing[1];
+                    pos[2] += dir[2]/m_ImageSpacing[2];
                 }
             }
 

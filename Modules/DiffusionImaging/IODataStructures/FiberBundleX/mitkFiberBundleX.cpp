@@ -1122,7 +1122,7 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
 bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
 {
     if (lengthInMM<=0)
-        return false;
+        return true;
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();

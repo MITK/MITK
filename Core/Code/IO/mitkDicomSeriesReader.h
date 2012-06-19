@@ -179,6 +179,61 @@ namespace mitk
  This last step depends on an option of GetSeries(). When requested, image blocks from the previous step are merged again
  whenever two blocks occupy the same portion of space (i.e. same origin, number of slices and z-spacing).
  
+ \section DicomSeriesReader_gantrytilt Handling of gantry tilt
+
+ When CT gantry tilt is used, the gantry plane (= X-Ray source and detector ring) and the vertical plane do not align
+ anymore. This scanner feature is used for example to reduce metal artifacs (e.g. <i>Lee C , Evaluation of Using CT
+ Gantry Tilt Scan on Head and Neck Cancer Patients with Dental Structure: Scans Show Less Metal Artifacts. Presented
+ at: Radiological Society of North America 2011 Scientific Assembly and Annual Meeting; November 27- December 2,
+ 2011 Chicago IL.</i>).
+
+ The acquired planes of such CT series do not match the expectations of a orthogonal geometry in mitk::Image: if you
+ stack the slices, they show a small shift along the Y axis:
+\verbatim
+
+  without tilt       with tilt
+  
+    ||||||             //////
+    ||||||            //////
+--  |||||| --------- ////// -------- table orientation
+    ||||||          //////
+    ||||||         //////
+
+Stacked slices:
+
+  without tilt       with tilt
+
+ --------------    --------------
+ --------------     --------------
+ --------------      --------------
+ --------------       --------------
+ --------------        --------------
+
+\endverbatim
+
+
+ As such gemetries do not in conjunction with mitk::Image, DicomSeriesReader performs a correction for such series
+ if the correctGantryTilt flag in GetSeries and LoadDicomSeries is set (default = on).
+
+ The correction algorithms undoes two errors introduced by ITK's ImageSeriesReader:
+  - the plane shift that is ignored by ITK's reader is recreated by applying a shearing transformation using itk::ResampleFilter.
+  - the spacing is corrected (it is calculated by ITK's reader from the distance between two origins, which is NOT the slice distance in this special case)
+
+ Both errors are introduced in 
+ itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
+
+ For the correction, we examine two slices of a series, both described as a pair (origin/orientation):
+  - we calculate if the second origin is on a line along the normal of the first slice
+    - if this is not the case, the geometry will not fit a normal mitk::Image/mitk::Geometry3D
+    - we then project the second origin into the first slice's coordinate system to quantify the shift
+    - both is done in class GantryTiltInformation with quite some comments.
+ 
+ \section DicomSeriesReader_whynotinitk Why is this not in ITK?
+ 
+  Some of this code would probably be better located in ITK. It is just a matter of resources that this is not the
+  case yet. Any attempts into this direction are welcome and can be supported. At least the gantry tilt correction
+  should be a simple addition to itk::ImageSeriesReader.
+ 
  \section DicomSeriesReader_tests Tests regarding DICOM loading
 
  A number of tests have been implemented to check our assumptions regarding DICOM loading. Please see \ref DICOMTesting

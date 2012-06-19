@@ -664,13 +664,20 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           // later with a third being available, we must check if the initial tilting vector is still valid. if yes, continue. 
           // if NO, we need to split the already sorted part (result.first) and the currently analyzed file (*fileIter)
 
-          // how do we tell apart gantry tilt from overall skewedness?
-          // TODO sort out irregularly sheared slices, that IS NOT tilting
+          // tell apart gantry tilt from overall skewedness
+          // sort out irregularly sheared slices, that IS NOT tilting
 
-          result.FlagGantryTilt( fromFirstToSecondOrigin );
-          
-          result.AddFileToSortedBlock(*fileIter); // this file is good for current block
-          fileFitsIntoPattern = true;
+          if ( tiltInfo.IsRegularGantryTilt() )
+          {
+            result.FlagGantryTilt( fromFirstToSecondOrigin );
+            result.AddFileToSortedBlock(*fileIter); // this file is good for current block
+            fileFitsIntoPattern = true;
+          }
+          else
+          {
+            result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
+            fileFitsIntoPattern = false;
+          }
         }
         else
         {

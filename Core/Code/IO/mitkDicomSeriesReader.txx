@@ -90,7 +90,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
       DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
 
-      GantryTiltInformation tiltInfo( origin1, origin2, right, up );
+      GantryTiltInformation tiltInfo( origin1, origin2, right, up, filenames.size()-1 );
       correctTilt &= tiltInfo.IsSheared();
 
       MITK_DEBUG << "** Loading now: shear? " << tiltInfo.IsSheared();
@@ -127,7 +127,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
         if (correctTilt)
         {
-          readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.GetMatrixCoefficientForCorrection() );
+          readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
         }
         image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
         image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
@@ -167,7 +167,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           
           if (correctTilt)
           {
-            readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.GetMatrixCoefficientForCorrection() );
+            readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
           }
           image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
         }
@@ -224,7 +224,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
   if (correctTilt)
   {
-    readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo.GetMatrixCoefficientForCorrection() );
+    readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
   }
   
   image->InitializeByItk(readVolume.GetPointer());
@@ -379,7 +379,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
 
 template <typename ImageType>
 typename ImageType::Pointer
-DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, ScalarType factor )
+DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo )
 {
   typedef itk::ResampleImageFilter<ImageType,ImageType> ResampleFilterType;
   typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
@@ -387,7 +387,8 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, ScalarType fact
 
   typedef itk::AffineTransform< double, ImageType::ImageDimension > TransformType;
   typename TransformType::Pointer transformShear = TransformType::New();
-  transformShear->Shear(1, 2, factor); // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
+  // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
+  transformShear->Shear( 1, 2, tiltInfo.GetMatrixCoefficientForCorrection() ); 
  
   /*
   typename TransformType::Pointer transformToZero = TransformType::New();
@@ -427,6 +428,12 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, ScalarType fact
   resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
   resampler->UpdateLargestPossibleRegion();
   typename ImageType::Pointer result = resampler->GetOutput();
+
+  typename ImageType::SpacingType correctedSpacing = result->GetSpacing();
+  correctedSpacing[2] = tiltInfo.GetRealZSpacing();
+  result->SetSpacing( correctedSpacing );
+
+
   return result;
 }
 

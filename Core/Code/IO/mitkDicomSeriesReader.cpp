@@ -426,8 +426,11 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
 
 DicomSeriesReader::GantryTiltInformation::GantryTiltInformation( 
     const Point3D& origin1, const Point3D& origin2,
-    const Vector3D& right, const Vector3D& up)
+    const Vector3D& right, const Vector3D& up,
+    unsigned int numberOfSlicesApart)
+:m_NumberOfSlicesApart(numberOfSlicesApart)
 {
+  assert(numberOfSlicesApart);
   // determine if slice 1 (imagePosition1 and imageOrientation1) and slice 2 can be in one orthogonal slice stack:
   // calculate a line from origin 1, directed along the normal of slice (calculated as the cross product of orientation 1)
   // check if this line passes through origin 2
@@ -502,6 +505,13 @@ DicomSeriesReader::GantryTiltInformation::GetMatrixCoefficientForCorrection() co
 {
   return - m_ShiftUp / m_ShiftNormal;
 }
+
+ScalarType 
+DicomSeriesReader::GantryTiltInformation::GetRealZSpacing() const
+{
+  return m_ShiftNormal / static_cast<ScalarType>(m_NumberOfSlicesApart);
+}
+
 
 bool 
 DicomSeriesReader::GantryTiltInformation::IsSheared() const
@@ -644,7 +654,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
         Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
         DICOMStringToOrientationVectors( tagValueMappings[fileIter->c_str()][tagImageOrientation], right, up, ignoredConversionError );
        
-        GantryTiltInformation tiltInfo( lastDifferentOrigin, thisOrigin, right, up );
+        GantryTiltInformation tiltInfo( lastDifferentOrigin, thisOrigin, right, up, 1 );
 
         if ( tiltInfo.IsSheared() ) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
         {

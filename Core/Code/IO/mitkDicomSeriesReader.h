@@ -333,12 +333,14 @@ protected:
       GantryTiltInformation( const Point3D& origin1, 
                              const Point3D& origin2,
                              const Vector3D& right, 
-                             const Vector3D& up);
+                             const Vector3D& up,
+                             unsigned int numberOfSlicesApart);
       
       bool IsSheared() const;
       bool IsRegularGantryTilt() const;
 
       ScalarType GetMatrixCoefficientForCorrection() const;
+      ScalarType GetRealZSpacing() const;
 
     protected:
 
@@ -347,6 +349,7 @@ protected:
       ScalarType m_ShiftUp;
       ScalarType m_ShiftRight;
       ScalarType m_ShiftNormal;
+      unsigned int m_NumberOfSlicesApart;
   };
 
   /**
@@ -387,7 +390,7 @@ protected:
   template <typename ImageType>
   static
   typename ImageType::Pointer
-  InPlaceFixUpTiltedGeometry( ImageType* input, ScalarType factor );
+  InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
 
 
   /**

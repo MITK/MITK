@@ -69,6 +69,7 @@ namespace itk{
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
     itkSetMacro( SeedsPerVoxel, int)
     itkSetMacro( FaThreshold, float)
+    itkSetMacro( StepSize, float)
 
   protected:
     StreamlineTrackingFilter();
@@ -89,7 +90,8 @@ namespace itk{
     float m_StepSize;
     int m_MaxLength;
     int m_SeedsPerVoxel;
-    int m_ImageSize[3];
+    std::vector< int > m_ImageSize;
+    std::vector< float > m_ImageSpacing;
     ItkUcharImgType::Pointer m_MaskImage;
 
     itk::VectorContainer< int, FiberPolyDataType >::Pointer m_PolyDataContainer;

@@ -72,6 +72,7 @@ protected slots:
   void OnSeedsPerVoxelChanged(int value);
   void OnMinTractLengthChanged(int value);
   void OnFaThresholdChanged(int value);
+  void OnStepsizeChanged(int value);
 
 private:
 

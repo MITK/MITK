@@ -71,6 +71,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_SeedsPerVoxelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSeedsPerVoxelChanged(int)) );
         connect( m_Controls->m_MinTractLengthSlider, SIGNAL(valueChanged(int)), this, SLOT(OnMinTractLengthChanged(int)) );
         connect( m_Controls->m_FaThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(OnFaThresholdChanged(int)) );
+        connect( m_Controls->m_StepsizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnStepsizeChanged(int)) );
     }
 }
 
@@ -87,6 +88,14 @@ void QmitkStreamlineTrackingView::OnMinTractLengthChanged(int value)
 void QmitkStreamlineTrackingView::OnFaThresholdChanged(int value)
 {
     m_Controls->m_FaThresholdLabel->setText(QString("FA Threshold: ")+QString::number((float)value/100));
+}
+
+void QmitkStreamlineTrackingView::OnStepsizeChanged(int value)
+{
+    if (value==0)
+        m_Controls->m_StepsizeLabel->setText(QString("Stepsize: auto"));
+    else
+        m_Controls->m_StepsizeLabel->setText(QString("Stepsize: ")+QString::number((float)value/10)+QString("mm"));
 }
 
 void QmitkStreamlineTrackingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -163,6 +172,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     filter->SetInput(image);
     filter->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
     filter->SetFaThreshold((float)m_Controls->m_FaThresholdSlider->value()/100);
+    filter->SetStepSize((float)m_Controls->m_StepsizeSlider->value()/10);
 
     if (m_SeedRoi.IsNotNull())
     {
@@ -180,18 +190,16 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         return;
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
 
-    fib->RemoveShortFibers(m_Controls->m_MinTractLengthSlider->value());
-
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(fib);
-
-    QString name(m_TensorImageNode->GetName().c_str());
-    name += "_FiberBundle";
-    node->SetName(name.toStdString());
-
-    node->SetVisibility(true);
-
-    GetDataStorage()->Add(node);
+    if (fib->RemoveShortFibers(m_Controls->m_MinTractLengthSlider->value()))
+    {
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(fib);
+        QString name(m_TensorImageNode->GetName().c_str());
+        name += "_FiberBundle";
+        node->SetName(name.toStdString());
+        node->SetVisibility(true);
+        GetDataStorage()->Add(node);
+    }
 }
 
 

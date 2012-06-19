@@ -32,10 +32,8 @@ namespace mitk
 {
 
 template <typename PixelType>
-void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, UpdateCallBackMethod callback)
+void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback)
 {
-  bool correctTilt(false);
-
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );
@@ -73,7 +71,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       GantryTiltInformation tiltInfo;
  
       // check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible
-      if ( imageBlocks.front().size() > 1 )
+      if ( imageBlocks.front().size() > 1 && correctTilt)
       {
         // check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
         // check first and last position slice from tags, make some calculations to detect tilt
@@ -95,8 +93,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
 
         tiltInfo = GantryTiltInformation ( origin1, origin2, right, up, filenames.size()-1 );
-        correctTilt |= tiltInfo.IsSheared();
-        correctTilt |= tiltInfo.IsRegularGantryTilt();
+        correctTilt = tiltInfo.IsSheared() && tiltInfo.IsRegularGantryTilt();
 
         MITK_DEBUG << "** Loading now: shear? " << tiltInfo.IsSheared();
         MITK_DEBUG << "** Loading now: normal tilt? " << tiltInfo.IsRegularGantryTilt();

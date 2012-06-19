@@ -213,7 +213,7 @@ Stacked slices:
 
 
  As such gemetries do not in conjunction with mitk::Image, DicomSeriesReader performs a correction for such series
- if the correctGantryTilt flag in GetSeries and LoadDicomSeries is set (default = on).
+ if the groupImagesWithGantryTilt or correctGantryTilt flag in GetSeries and LoadDicomSeries is set (default = on).
 
  The correction algorithms undoes two errors introduced by ITK's ImageSeriesReader:
   - the plane shift that is ignored by ITK's reader is recreated by applying a shearing transformation using itk::ResampleFilter.
@@ -280,6 +280,7 @@ public:
    Find all series (and sub-series -- see details) in a particular directory.
   */
   static UidFileNamesMap GetSeries(const std::string &dir, 
+                                   bool groupImagesWithGantryTilt,
                                    const StringContainer &restrictions = StringContainer());
 
   /**
@@ -292,6 +293,7 @@ public:
   */
   static StringContainer GetSeries(const std::string &dir, 
                                    const std::string &series_uid,
+                                   bool groupImagesWithGantryTilt,
                                    const StringContainer &restrictions = StringContainer());
 
   /**
@@ -318,7 +320,10 @@ public:
    */
   static
   UidFileNamesMap 
-  GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions = StringContainer());
+  GetSeries(const StringContainer& files, 
+            bool sortTo3DPlust, 
+            bool groupImagesWithGantryTilt,
+            const StringContainer &restrictions = StringContainer());
   
   /**
     \brief See other GetSeries().
@@ -327,7 +332,9 @@ public:
   */
   static
   UidFileNamesMap 
-  GetSeries(const StringContainer& files, const StringContainer &restrictions = StringContainer());
+  GetSeries(const StringContainer& files, 
+            bool groupImagesWithGantryTilt,
+            const StringContainer &restrictions = StringContainer());
 
   /**
    Loads a DICOM series composed by the file names enumerated in the file names container.
@@ -340,6 +347,7 @@ public:
   static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames, 
                                            bool sort = true, 
                                            bool load4D = true, 
+                                           bool correctGantryTilt = true,
                                            UpdateCallBackMethod callback = 0);
 
   /**
@@ -349,6 +357,7 @@ public:
                               DataNode &node, 
                               bool sort = true, 
                               bool load4D = true, 
+                              bool correctGantryTilt = true,
                               UpdateCallBackMethod callback = 0);
 
 protected:
@@ -432,7 +441,7 @@ protected:
   */
   static
   SliceGroupingAnalysisResult
-  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings_);
+  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, bool groupsOfSimilarImages, const gdcm::Scanner::MappingType& tagValueMappings_);
       
   static
   std::string
@@ -538,7 +547,7 @@ protected:
   template <typename PixelType>
   static 
   void 
-  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback);
+  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback);
 
   /**
     \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.

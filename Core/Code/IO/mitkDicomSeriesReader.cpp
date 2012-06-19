@@ -157,11 +157,11 @@ const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsTo
 
 
 DataNode::Pointer 
-DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, UpdateCallBackMethod callback)
+DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback)
 {
   DataNode::Pointer node = DataNode::New();
 
-  if (DicomSeriesReader::LoadDicomSeries(filenames, *node, sort, check_4d, callback))
+  if (DicomSeriesReader::LoadDicomSeries(filenames, *node, sort, check_4d, correctTilt, callback))
   {
     if( filenames.empty() )
     {
@@ -177,7 +177,7 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, 
 }
 
 bool 
-DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback)
+DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback)
 {
   if( filenames.empty() )
   {
@@ -198,34 +198,34 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
       switch (io->GetComponentType())
       {
       case DcmIoType::UCHAR:
-        DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       case DcmIoType::CHAR:
-        DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       case DcmIoType::USHORT:
-        DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       case DcmIoType::SHORT:
-        DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       case DcmIoType::UINT:
-        DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       case DcmIoType::INT:
-        DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       case DcmIoType::ULONG:
-        DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       case DcmIoType::LONG:
-        DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       case DcmIoType::FLOAT:
-        DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       case DcmIoType::DOUBLE:
-        DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, callback);
+        DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, correctTilt, callback);
         break;
       default:
         MITK_ERROR << "Found unsupported DICOM pixel type: (enum value) " << io->GetComponentType();
@@ -607,6 +607,7 @@ DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3
 DicomSeriesReader::SliceGroupingAnalysisResult
 DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     const StringContainer& files,
+    bool groupImagesWithGantryTilt,
     const gdcm::Scanner::MappingType& tagValueMappings_)
 {
   // result.first = files that fit ITK's assumption
@@ -629,7 +630,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   bool lastOriginInitialized(false);
 
   MITK_DEBUG << "--------------------------------------------------------------------------------";
-  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader ";
+  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
   unsigned int fileIndex(0);
   for (StringContainer::const_iterator fileIter = files.begin();
        fileIter != files.end();
@@ -681,7 +682,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           // tell apart gantry tilt from overall skewedness
           // sort out irregularly sheared slices, that IS NOT tilting
 
-          if ( tiltInfo.IsRegularGantryTilt() )
+          if ( groupImagesWithGantryTilt && tiltInfo.IsRegularGantryTilt() )
           {
             result.FlagGantryTilt( fromFirstToSecondOrigin );
             result.AddFileToSortedBlock(*fileIter); // this file is good for current block
@@ -768,13 +769,13 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 }
 
 DicomSeriesReader::UidFileNamesMap 
-DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer &restrictions)
+DicomSeriesReader::GetSeries(const StringContainer& files, bool groupImagesWithGantryTilt, const StringContainer &restrictions)
 {
-  return GetSeries(files, true, restrictions);
+  return GetSeries(files, true, groupImagesWithGantryTilt, restrictions);
 }
   
 DicomSeriesReader::UidFileNamesMap 
-DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer& /*restrictions*/)
+DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, bool groupImagesWithGantryTilt, const StringContainer& /*restrictions*/)
 {
   /**
     assumption about this method:
@@ -876,7 +877,10 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
 
     while (!filesStillToAnalyze.empty()) // repeat until all files are grouped somehow 
     {
-      SliceGroupingAnalysisResult analysisResult = AnalyzeFileForITKImageSeriesReaderSpacingAssumption( filesStillToAnalyze, scanner.GetMappings() );
+      SliceGroupingAnalysisResult analysisResult = 
+        AnalyzeFileForITKImageSeriesReaderSpacingAssumption( filesStillToAnalyze, 
+                                                             groupImagesWithGantryTilt, 
+                                                             scanner.GetMappings() );
 
       // enhance the UID for additional groups
       std::stringstream newGroupUID;
@@ -1001,11 +1005,11 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
 }
 
 DicomSeriesReader::UidFileNamesMap 
-DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
+DicomSeriesReader::GetSeries(const std::string &dir, bool groupImagesWithGantryTilt, const StringContainer &restrictions)
 {
   gdcm::Directory directoryLister;
   directoryLister.Load( dir.c_str(), false ); // non-recursive
-  return GetSeries(directoryLister.GetFilenames(), restrictions);
+  return GetSeries(directoryLister.GetFilenames(), groupImagesWithGantryTilt, restrictions);
 }
 
 std::string
@@ -1083,9 +1087,9 @@ DicomSeriesReader::IDifyTagValue(const std::string& value)
 }
 
 DicomSeriesReader::StringContainer 
-DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, const StringContainer &restrictions)
+DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, bool groupImagesWithGantryTilt, const StringContainer &restrictions)
 {
-  UidFileNamesMap allSeries = GetSeries(dir, restrictions);
+  UidFileNamesMap allSeries = GetSeries(dir, groupImagesWithGantryTilt, restrictions);
   StringContainer resultingFileList;
 
   for ( UidFileNamesMap::const_iterator idIter = allSeries.begin(); 

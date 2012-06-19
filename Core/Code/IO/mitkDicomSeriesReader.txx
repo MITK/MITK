@@ -433,15 +433,21 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
   typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
   resampler->SetInterpolator( interpolator );
-
-  resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::max() );
+  resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::min() ); // TODO minimum meaningful modality value?
   
-  // TODO adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
+  // adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
 
   resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
-  resampler->UpdateLargestPossibleRegion();
+
+  typename ImageType::SizeType largerSize = resampler->GetSize(); // now the resampler already holds the input image's size.
+  largerSize[1] += tiltInfo.GetTiltCorrectedAdditionalSize();
+  resampler->SetSize( largerSize );
+
+  resampler->Update();
   typename ImageType::Pointer result = resampler->GetOutput();
 
+  // ImageSeriesReader calculates z spacing as the distance between the first two origins.
+  // This is not correct in case of gantry tilt, so we set our calculated spacing.
   typename ImageType::SpacingType correctedSpacing = result->GetSpacing();
   correctedSpacing[2] = tiltInfo.GetRealZSpacing();
   result->SetSpacing( correctedSpacing );

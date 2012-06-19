@@ -399,6 +399,8 @@ protected:
       ScalarType GetMatrixCoefficientForCorrection() const;
       ScalarType GetRealZSpacing() const;
 
+      ScalarType GetTiltCorrectedAdditionalSize() const;
+
     protected:
 
       Point3D projectPointOnLine( Point3D p, Point3D lineOrigin, Vector3D lineDirection ); 

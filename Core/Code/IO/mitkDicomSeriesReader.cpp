@@ -509,6 +509,12 @@ DicomSeriesReader::GantryTiltInformation::projectPointOnLine( Point3D p, Point3D
 }
 
 ScalarType 
+DicomSeriesReader::GantryTiltInformation::GetTiltCorrectedAdditionalSize() const
+{
+  return int(m_ShiftUp + 1.0); // to next bigger int
+  }
+
+ScalarType 
 DicomSeriesReader::GantryTiltInformation::GetMatrixCoefficientForCorrection() const
 {
   return - m_ShiftUp / m_ShiftNormal;

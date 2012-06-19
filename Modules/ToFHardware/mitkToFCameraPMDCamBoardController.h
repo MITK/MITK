@@ -137,10 +137,11 @@ namespace mitk
     \param rotated output data array of reduced size (200x200)
     */
     void TransformCameraOutput(float* in, float* out, bool isDist);
+
     // member variables
-    unsigned int m_InternalCaptureWidth;
-    unsigned int m_InternalCaptureHeight;
-    unsigned int m_InternalPixelNumber;
+    unsigned int m_InternalCaptureWidth; ///< variable holds the original image data width
+    unsigned int m_InternalCaptureHeight; ///< variable holds the original image data height
+    unsigned int m_InternalPixelNumber; ///< variable holds the original number of pixel
   };
 } //END mitk namespace
 #endif

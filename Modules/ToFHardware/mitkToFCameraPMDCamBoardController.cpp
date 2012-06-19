@@ -59,18 +59,18 @@ namespace mitk
       }
       // get image properties from camera
       this->UpdateCamera();
-      m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &m_DataDescription);
+      this->m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &m_DataDescription);
       ErrorText(m_PMDRes); 
-      m_InternalCaptureWidth = m_DataDescription.img.numColumns;
-      m_CaptureWidth = 200;
-      m_InternalCaptureHeight = m_DataDescription.img.numRows;
-      m_CaptureHeight = 200;
-      m_InternalPixelNumber = m_InternalCaptureWidth*m_InternalCaptureHeight;
-      m_PixelNumber = m_CaptureWidth*m_CaptureHeight;
+      this->m_InternalCaptureWidth = m_DataDescription.img.numColumns;
+      this->m_CaptureWidth = 200;
+      this->m_InternalCaptureHeight = m_DataDescription.img.numRows;
+      this->m_CaptureHeight = 200;
+      this->m_InternalPixelNumber = m_InternalCaptureWidth*m_InternalCaptureHeight;
+      this->m_PixelNumber = m_CaptureWidth*m_CaptureHeight;
 
-      m_NumberOfBytes = m_InternalPixelNumber * sizeof(float);
-      m_SourceDataSize = m_DataDescription.size;
-      m_SourceDataStructSize = m_DataDescription.size + sizeof(PMDDataDescription);
+      this->m_NumberOfBytes = m_InternalPixelNumber * sizeof(float);
+      this->m_SourceDataSize = m_DataDescription.size;
+      this->m_SourceDataStructSize = m_DataDescription.size + sizeof(PMDDataDescription);
       MITK_INFO << "Datasource size: " << this->m_SourceDataSize <<std::endl;
       MITK_INFO << "Integration Time: " << this->GetIntegrationTime();
       MITK_INFO << "Modulation Frequency: " << this->GetModulationFrequency();

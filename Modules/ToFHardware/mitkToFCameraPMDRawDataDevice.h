@@ -170,7 +170,6 @@ namespace mitk
     unsigned int m_OriginControllerHeight; ///< holds the original controller height
 
   private:
-
     int m_ChannelSize;      ///< member holds the size of a single raw data channel
 
   };

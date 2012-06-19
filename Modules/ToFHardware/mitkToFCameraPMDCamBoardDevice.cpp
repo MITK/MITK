@@ -106,7 +106,6 @@ namespace mitk
         //MITK_INFO << "Out of buffer! Required: " << requiredImageSequence << " delivered: " << capturedImageSequence << " current: " << this->m_ImageSequence;
       }
       else // (requiredImageSequence > this->m_ImageSequence - this->m_BufferSize) && (requiredImageSequence <= this->m_ImageSequence)
-
       {
         capturedImageSequence = requiredImageSequence;
         pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
@@ -119,9 +118,6 @@ namespace mitk
       memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
       m_ImageMutex->Unlock();
 
-      //memcpy(distanceArray, this->m_DistanceArray, this->m_CaptureWidth*this->m_CaptureHeight*sizeof(float));
-      //memcpy(intensityArray, this->m_IntensityArray, this->m_CaptureWidth*this->m_CaptureHeight*sizeof(float));
-      //memcpy(amplitudeArray, this->m_AmplitudeArray, this->m_CaptureWidth*this->m_CaptureHeight*sizeof(float));
     }
     else
     {

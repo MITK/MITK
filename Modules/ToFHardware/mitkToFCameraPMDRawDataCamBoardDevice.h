@@ -73,7 +73,7 @@ namespace mitk
 
   private:
     /*!
-    \brief Method performs resize of the image data and flips it upside down
+    \brief Method performs resizing of the image data and flips it upside down
     */
     void ResizeOutputImage(float* in, float* out);
   };

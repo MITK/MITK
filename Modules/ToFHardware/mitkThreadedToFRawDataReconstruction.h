@@ -53,7 +53,7 @@ namespace mitk
 
     void SetChannelData(vtkShortArray* sourceData);
 
-    void Initialize(int width, int height, int modulationFrequency, int sourceDataSize);
+    void Initialize(int width, int height, int modulationFrequency, int sourceDataSize );
 
     void GetDistances(float* dist);
     void GetAmplitudes(float* ampl);
@@ -88,6 +88,11 @@ namespace mitk
     \brief threader callback function for multi threaded data generation
     */
     static ITK_THREAD_RETURN_TYPE ThreadedGenerateDataCallbackFunction(void* data);
+    /*!
+    \brief Method to reduce image size from original controller size to output size (200x200px) 
+    and rotate the image. This is needed due to defect pixel rows at the rim of the chip
+    */
+    void ResizeOutputImage(float* in, float* out);
 
     // member variables
     int m_StackSize;                ///<

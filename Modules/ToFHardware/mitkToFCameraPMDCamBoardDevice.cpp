@@ -75,5 +75,54 @@ namespace mitk
       }
     }
   }
+  void ToFCameraPMDCamBoardDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
+    int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
+  {
+    if (m_CameraActive)
+    {
+      // 1) copy the image buffer
+      // 2) convert the distance values from m to mm
+     
+      // check for empty buffer
+      if (this->m_ImageSequence < 0)
+      {
+        // buffer empty
+        MITK_INFO << "Buffer empty!! ";
+        capturedImageSequence = this->m_ImageSequence;
+        return;
+      }
+      // determine position of image in buffer
+      int pos = 0;
+      if ((requiredImageSequence < 0) || (requiredImageSequence > this->m_ImageSequence))
+      {
+        capturedImageSequence = this->m_ImageSequence;
+        pos = this->m_CurrentPos;
+        //MITK_INFO << "Required image not found! Required: " << requiredImageSequence << " delivered/current: " << this->m_ImageSequence;
+      }
+      else if (requiredImageSequence <= this->m_ImageSequence - this->m_BufferSize)
+      {
+        capturedImageSequence = (this->m_ImageSequence - this->m_BufferSize) + 1;
+        pos = (this->m_CurrentPos + 1) % this->m_BufferSize;
+        //MITK_INFO << "Out of buffer! Required: " << requiredImageSequence << " delivered: " << capturedImageSequence << " current: " << this->m_ImageSequence;
+      }
+      else // (requiredImageSequence > this->m_ImageSequence - this->m_BufferSize) && (requiredImageSequence <= this->m_ImageSequence)
+      {
+        capturedImageSequence = requiredImageSequence;
+        pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
+      }
+
+      m_ImageMutex->Lock();
+      this->m_Controller->GetDistances(this->m_SourceDataBuffer[pos], distanceArray);
+      this->m_Controller->GetAmplitudes(this->m_SourceDataBuffer[pos], amplitudeArray);
+      this->m_Controller->GetIntensities(this->m_SourceDataBuffer[pos], intensityArray);
+      memcpy(sourceDataArray, this->m_SourceDataBuffer[this->m_CurrentPos], this->m_SourceDataSize);
+      m_ImageMutex->Unlock();
+
+    }
+    else
+    {
+      MITK_WARN("ToF") << "Warning: Data can only be acquired if camera is active.";
+    }
+  }
 
 }

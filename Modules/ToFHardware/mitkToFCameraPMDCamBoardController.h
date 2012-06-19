@@ -103,14 +103,45 @@ namespace mitk
     \param on enabled (true), disabled (false)
     */
     bool SetLensCalibration( bool on );
+    /*
+    \brief Returns amplitude data, performs camera data transform
+    \param output data array
+    */
+    bool GetAmplitudes(float* amplitudeArray);
+    bool GetAmplitudes(char* sourceData, float* amplitudeArray);
+    /*
+    \brief Returns intensity data, performs camera data transform
+    \param output data array
+    */
+    bool GetIntensities(float* intensityArray);
+    bool GetIntensities(char* sourceData, float* intensityArray);
+    /*
+    \brief Returns distance data, performs camera data transform
+    \param output data array
+    */
+    bool GetDistances(float* distanceArray);
+    bool GetDistances(char* sourceData, float* distanceArray);
 
+    itkGetMacro(InternalCaptureWidth, int);
+    itkGetMacro(InternalCaptureHeight, int);
   protected:
 
     ToFCameraPMDCamBoardController();
 
     ~ToFCameraPMDCamBoardController();
-
   private:
+    /*
+    \brief Transform the output of the camera, i.e. cut invalid pixels, and rotate 90°
+           counterclockwise 
+    \param input data array of original size (207x204)
+    \param rotated output data array of reduced size (200x200)
+    */
+    void TransformCameraOutput(float* in, float* out, bool isDist);
+
+    // member variables
+    unsigned int m_InternalCaptureWidth; ///< variable holds the original image data width
+    unsigned int m_InternalCaptureHeight; ///< variable holds the original image data height
+    unsigned int m_InternalPixelNumber; ///< variable holds the original number of pixel
   };
 } //END mitk namespace
 #endif

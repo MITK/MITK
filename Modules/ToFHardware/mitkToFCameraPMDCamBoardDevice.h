@@ -56,12 +56,13 @@ namespace mitk
     */
     void SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height );
 
+    void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray, int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray);
+
   protected:
 
     ToFCameraPMDCamBoardDevice();
 
     ~ToFCameraPMDCamBoardDevice();
-
 
   private:
 

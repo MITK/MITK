@@ -886,6 +886,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
     // end of grouping, now post-process groups
   
     // TODO: store and compare tilting property of blocks. they must match!
+    // Solution: already guaranteed by previous sorting. ALL the images in one group already share one direction/tilt/etc.
 
     // PART IV: attempt to group blocks to 3D+t blocks if requested
     //           inspect entries of mapOf3DBlocks

@@ -99,4 +99,46 @@ namespace mitk
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
     return true;
   }
+
+  bool ToFCameraPMDCamBoardController::GetAmplitudes(float* amplitudeArray)
+  {
+    MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return true;
+  }
+
+  bool ToFCameraPMDCamBoardController::GetAmplitudes(char* sourceData, float* amplitudeArray)
+  {
+    MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return true;
+  }
+
+  bool ToFCameraPMDCamBoardController::GetIntensities(float* intensityArray)
+  {
+    MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return true;
+  }
+
+  bool ToFCameraPMDCamBoardController::GetIntensities(char* sourceData, float* intensityArray)
+  {
+    MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return true;
+  }
+
+  bool ToFCameraPMDCamBoardController::GetDistances(float* distanceArray)
+  {
+    MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return true;
+  }
+
+  bool ToFCameraPMDCamBoardController::GetDistances(char* sourceData, float* distanceArray)
+  {
+    MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return true;
+  }
+
+  void ToFCameraPMDCamBoardController::TransformCameraOutput(float* in, float* out, bool isDist)
+  {
+    MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+  }
+
 }

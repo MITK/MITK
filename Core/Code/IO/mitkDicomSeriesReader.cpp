@@ -76,7 +76,7 @@ void DicomSeriesReader::SliceGroupingAnalysisResult::FlagGantryTilt(Vector3D int
   m_GantryTilt = true;
 }
 
-void DicomSeriesReader::SliceGroupingAnalysisResult::DoATrick()
+void DicomSeriesReader::SliceGroupingAnalysisResult::UndoPrematureGrouping()
 {
   assert( !m_GroupedFiles.empty() );
   m_UnsortedFiles.insert( m_UnsortedFiles.begin(), m_GroupedFiles.back() );
@@ -761,7 +761,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
     if ( result.GetBlockFilenames().size() == 2 )
     {
-      result.DoATrick();
+      result.UndoPrematureGrouping();
     }
   }
   

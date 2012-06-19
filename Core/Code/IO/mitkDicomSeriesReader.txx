@@ -395,37 +395,33 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
   resampler->SetInput( input );
 
+  /*
+     transform for a point is
+      - transform from actual position to index coordinates
+      - apply a shear that undoes the gantry tilt
+      - transform back into world coordinates
+
+     anybody who does this in a simpler way: don't forget to write up how and why your solution works
+  */
   typedef itk::AffineTransform< double, ImageType::ImageDimension > TransformType;
   typename TransformType::Pointer transformShear = TransformType::New();
+
   // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
   transformShear->Shear( 1, 2, tiltInfo.GetMatrixCoefficientForCorrection() ); 
  
-  /*
-  typename TransformType::Pointer transformToZero = TransformType::New();
-  transformToZero->Translate( -(input->GetOrigin().GetVectorFromOrigin()) );
-  */
-  typename TransformType::Pointer imageTransform = TransformType::New();
-  imageTransform->SetOffset( input->GetOrigin().GetVectorFromOrigin() );
-  imageTransform->SetMatrix( input->GetDirection() );
-
-  /*
-  typename TransformType::Pointer transformToOrigin = TransformType::New();
-  transformToOrigin->Translate( input->GetOrigin().GetVectorFromOrigin() );
-  */
+  typename TransformType::Pointer imageIndexToWorld = TransformType::New();
+  imageIndexToWorld->SetOffset( input->GetOrigin().GetVectorFromOrigin() );
+  imageIndexToWorld->SetMatrix( input->GetDirection() );
   
-  typename TransformType::Pointer hinundher = TransformType::New();
-  //hinundher->Compose( transformToZero );
-  //hinundher->Compose( transformShear );
-  //hinundher->Compose( transformToOrigin );
-
-  typename TransformType::Pointer toZero = TransformType::New();
-  imageTransform->GetInverse( toZero );
+  typename TransformType::Pointer imageWorldToIndex = TransformType::New();
+  imageIndexToWorld->GetInverse( imageWorldToIndex );
   
-  hinundher->Compose( toZero );
-  hinundher->Compose( transformShear );
-  hinundher->Compose( imageTransform );
+  typename TransformType::Pointer gantryTiltCorrection = TransformType::New();
+  gantryTiltCorrection->Compose( imageWorldToIndex );
+  gantryTiltCorrection->Compose( transformShear );
+  gantryTiltCorrection->Compose( imageIndexToWorld );
   
-  resampler->SetTransform( hinundher );
+  resampler->SetTransform( gantryTiltCorrection );
 
   typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
   typename InterpolatorType::Pointer interpolator = InterpolatorType::New();

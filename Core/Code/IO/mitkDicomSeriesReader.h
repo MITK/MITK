@@ -378,7 +378,7 @@ protected:
       void AddFileToUnsortedBlock(const std::string& filename);
       void FlagGantryTilt(Vector3D interSliceOffset);
 
-      void DoATrick();
+      void UndoPrematureGrouping();
 
     protected:
       

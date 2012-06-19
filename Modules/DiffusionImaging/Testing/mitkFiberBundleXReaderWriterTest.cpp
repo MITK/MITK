@@ -34,7 +34,6 @@ int mitkFiberBundleXReaderWriterTest(int argc, char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(argc>1,"check for fielename")
 
-  mitk::FiberBundleXReader::Pointer reader = mitk::FiberBundleXReader::New();
   mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
   mitk::FiberBundleX::Pointer fib1;
   mitk::FiberBundleX::Pointer fib2;
@@ -42,7 +41,6 @@ int mitkFiberBundleXReaderWriterTest(int argc, char* argv[])
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(reader.IsNotNull(),"reader instantiation")
   MITK_TEST_CONDITION_REQUIRED(writer.IsNotNull(),"writer instantiation")
 
   try{
@@ -70,8 +68,6 @@ int mitkFiberBundleXReaderWriterTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2),"fiber bundles are not changed during reading/writing")
   }
   catch(...) {
-    //this means that a wrong exception (i.e. no itk:Exception) has been thrown
-    std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
 

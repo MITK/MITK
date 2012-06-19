@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MISC
 #include <fstream>
 #include <QFile>
+#include <tinyxml.h>
+#include <math.h>
 
 namespace itk{
 
@@ -56,7 +58,9 @@ GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
     m_ProposalAcceptance(0),
     m_CurvatureThreshold(0.7),
     m_DuplicateImage(true),
-    m_RandomSeed(-1)
+    m_RandomSeed(-1),
+    m_ParameterFile(""),
+    m_LutPath("")
 {
 
 }
@@ -85,7 +89,7 @@ bool
 GibbsTrackingFilter< ItkQBallImageType >
 ::EstimateParticleWeight()
 {
-    MITK_INFO << "itkGibbsTrackingFilter: estimating particle weight";
+    MITK_INFO << "GibbsTrackingFilter: estimating particle weight";
     typedef itk::DiffusionQballGeneralizedFaImageFilter<float,float,QBALL_ODFSIZE> GfaFilterType;
     GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
     gfaFilter->SetInput(m_QBallImage);
@@ -151,9 +155,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         filter->Update();
         m_QBallImage = filter->GetOutput();
     }
-
-    // generate local working copy of QBall image (if not disabled)
-    if (m_DuplicateImage)
+    else if (m_DuplicateImage) // generate local working copy of QBall image (if not disabled)
     {
         typedef itk::ImageDuplicator< ItkQBallImageType > DuplicateFilterType;
         typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
@@ -178,6 +180,9 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     // check if mask image is given if it needs resampling
     PrepareMaskImage();
 
+    // load parameter file
+    LoadParameters(m_ParameterFile);
+
     // prepare parameters
     float minSpacing;
     if(m_QBallImage->GetSpacing()[0]<m_QBallImage->GetSpacing()[1] && m_QBallImage->GetSpacing()[0]<m_QBallImage->GetSpacing()[2])
@@ -194,7 +199,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     if(m_ParticleWeight == 0)
         if (!EstimateParticleWeight())
         {
-            MITK_INFO << "itkGibbsTrackingFilter: could not estimate particle weight. using default value.";
+            MITK_INFO << "GibbsTrackingFilter: could not estimate particle weight. using default value.";
             m_ParticleWeight = 0.0001;
         }
     float alpha = log(m_EndTemperature/m_StartTemperature);
@@ -203,7 +208,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         m_Steps = 10;
     if (m_Steps>m_Iterations)
     {
-        MITK_INFO << "itkGibbsTrackingFilter: not enough iterations!";
+        MITK_INFO << "GibbsTrackingFilter: not enough iterations!";
         m_AbortTracking = true;
     }
     if (m_CurvatureThreshold < mitk::eps)
@@ -216,7 +221,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         randGen->SetSeed(m_RandomSeed);
 
     // load sphere interpolator to evaluate the ODFs
-    SphereInterpolator* interpolator = new SphereInterpolator();
+    SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
 
     // initialize the actual tracking components (ParticleGrid, Metropolis Hastings Sampler and Energy Computer)
     ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
@@ -225,6 +230,20 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     encomp->SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
 
     MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, encomp, randGen, m_CurvatureThreshold);
+
+    MITK_INFO << "----------------------------------------";
+    MITK_INFO << "Iterations: " << m_Iterations;
+    MITK_INFO << "Steps: " << m_Steps;
+    MITK_INFO << "Particle length: " << m_ParticleLength;
+    MITK_INFO << "Particle width: " << m_ParticleWidth;
+    MITK_INFO << "Particle weight: " << m_ParticleWeight;
+    MITK_INFO << "Start temperature: " << m_StartTemperature;
+    MITK_INFO << "End temperature: " << m_EndTemperature;
+    MITK_INFO << "In/Ex balance: " << m_InexBalance;
+    MITK_INFO << "Min. fiber length: " << m_MinFiberLength;
+    MITK_INFO << "Curvature threshold: " << m_CurvatureThreshold;
+    MITK_INFO << "Random seed: " << m_RandomSeed;
+    MITK_INFO << "----------------------------------------";
 
     // main loop
     m_NumAcceptedFibers = 0;
@@ -260,10 +279,11 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         m_NumParticles = particleGrid->m_NumParticles;
         m_NumConnections = particleGrid->m_NumConnections;
 
-        MITK_INFO << "itkGibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
-        MITK_INFO << "itkGibbsTrackingFilter: particles: " << m_NumParticles;
-        MITK_INFO << "itkGibbsTrackingFilter: connections: " << m_NumConnections;
-        MITK_INFO << "itkGibbsTrackingFilter: progress: " << 100*(float)m_CurrentStep/m_Steps << "%";
+        MITK_INFO << "GibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
+        MITK_INFO << "GibbsTrackingFilter: particles: " << m_NumParticles;
+        MITK_INFO << "GibbsTrackingFilter: connections: " << m_NumConnections;
+        MITK_INFO << "GibbsTrackingFilter: progress: " << 100*(float)m_CurrentStep/m_Steps << "%";
+        MITK_INFO << "GibbsTrackingFilter: cell overflows: " << particleGrid->m_NumCellOverflows;
         MITK_INFO << "----------------------------------------";
 
         if (m_AbortTracking)
@@ -277,7 +297,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     m_AbortTracking = true;
     m_BuildFibers = false;
 
-    MITK_INFO << "itkGibbsTrackingFilter: done generate data";
+    MITK_INFO << "GibbsTrackingFilter: done generate data";
 }
 
 template< class ItkQBallImageType >
@@ -285,7 +305,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::PrepareMaskImage()
 {
     if(m_MaskImage.IsNull())
     {
-        MITK_INFO << "itkGibbsTrackingFilter: generating default mask image";
+        MITK_INFO << "GibbsTrackingFilter: generating default mask image";
         m_MaskImage = ItkFloatImageType::New();
         m_MaskImage->SetSpacing( m_QBallImage->GetSpacing() );
         m_MaskImage->SetOrigin( m_QBallImage->GetOrigin() );
@@ -301,7 +321,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::PrepareMaskImage()
          m_MaskImage->GetSpacing()[1]!=m_QBallImage->GetSpacing()[1] ||
          m_MaskImage->GetSpacing()[2]!=m_QBallImage->GetSpacing()[2] )
     {
-        MITK_INFO << "itkGibbsTrackingFilter: resampling mask image";
+        MITK_INFO << "GibbsTrackingFilter: resampling mask image";
         typedef itk::ResampleImageFilter< ItkFloatImageType, ItkFloatImageType, float > ResamplerType;
         ResamplerType::Pointer resampler = ResamplerType::New();
         resampler->SetOutputSpacing( m_QBallImage->GetSpacing() );
@@ -313,7 +333,70 @@ void GibbsTrackingFilter< ItkQBallImageType >::PrepareMaskImage()
         resampler->SetDefaultPixelValue(1.0);
         resampler->Update();
         m_MaskImage = resampler->GetOutput();
-        MITK_INFO << "itkGibbsTrackingFilter: resampling finished";
+        MITK_INFO << "GibbsTrackingFilter: resampling finished";
+    }
+}
+
+// load current tracking paramters from xml file (.gtp)
+template< class ItkQBallImageType >
+bool GibbsTrackingFilter< ItkQBallImageType >::LoadParameters(std::string filename)
+{
+    m_AbortTracking = true;
+    try
+    {
+        if( filename.length()==0 )
+        {
+            m_AbortTracking = false;
+            return true;
+        }
+
+        MITK_INFO << "GibbsTrackingFilter: loading parameter file " << filename;
+
+        TiXmlDocument doc( filename );
+        doc.LoadFile();
+
+        TiXmlHandle hDoc(&doc);
+        TiXmlElement* pElem;
+        TiXmlHandle hRoot(0);
+
+        pElem = hDoc.FirstChildElement().Element();
+        hRoot = TiXmlHandle(pElem);
+        pElem = hRoot.FirstChildElement("parameter_set").Element();
+
+        QString iterations(pElem->Attribute("iterations"));
+        m_Iterations = iterations.toULong();
+
+        QString particleLength(pElem->Attribute("particle_length"));
+        m_ParticleLength = particleLength.toFloat();
+
+        QString particleWidth(pElem->Attribute("particle_width"));
+        m_ParticleWidth = particleWidth.toFloat();
+
+        QString partWeight(pElem->Attribute("particle_weight"));
+        m_ParticleWeight = partWeight.toFloat();
+
+        QString startTemp(pElem->Attribute("temp_start"));
+        m_StartTemperature = startTemp.toFloat();
+
+        QString endTemp(pElem->Attribute("temp_end"));
+        m_EndTemperature = endTemp.toFloat();
+
+        QString inExBalance(pElem->Attribute("inexbalance"));
+        m_InexBalance = inExBalance.toFloat();
+
+        QString fiberLength(pElem->Attribute("fiber_length"));
+        m_MinFiberLength = fiberLength.toFloat();
+
+        QString curvThres(pElem->Attribute("curvature_threshold"));
+        m_CurvatureThreshold = cos(curvThres.toFloat()*M_PI/180);
+        m_AbortTracking = false;
+        MITK_INFO << "GibbsTrackingFilter: parameter file loaded successfully";
+        return true;
+    }
+    catch(...)
+    {
+        MITK_INFO << "GibbsTrackingFilter: could not load parameter file";
+        return false;
     }
 }
 

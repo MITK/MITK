@@ -255,8 +255,8 @@
       <property name="spacing">
        <number>4</number>
       </property>
-      <item row="3" column="1">
-       <widget class="QLabel" name="m_ParticleWeightLabel">
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_ParticleWidthLabel_2">
         <property name="toolTip">
          <string/>
         </property>
@@ -267,10 +267,7 @@
          <string/>
         </property>
         <property name="text">
-         <string>auto</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <string>Particle Width:</string>
         </property>
        </widget>
       </item>
@@ -293,89 +290,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="m_ParticleWidthLabel_2">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Particle Width:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="2">
-       <widget class="QSlider" name="m_FiberLengthSlider">
-        <property name="toolTip">
-         <string>Only fibers longer than specified are accepted.</string>
-        </property>
-        <property name="maximum">
-         <number>500</number>
-        </property>
-        <property name="singleStep">
-         <number>1</number>
-        </property>
-        <property name="value">
-         <number>40</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::NoTicks</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="m_CurvatureThresholdLabel_2">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Curvature Threshold:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QLabel" name="m_EndTempLabel">
-        <property name="text">
-         <string>0.001</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="1">
-       <widget class="QLabel" name="m_FiberLengthLabel">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string/>
-        </property>
-        <property name="text">
-         <string>40mm</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="1">
        <widget class="QLabel" name="m_StartTempLabel">
         <property name="text">
@@ -386,8 +300,8 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="m_ParticleWidthLabel">
+      <item row="3" column="0">
+       <widget class="QLabel" name="m_ParticleWeightLabel_2">
         <property name="toolTip">
          <string/>
         </property>
@@ -398,48 +312,36 @@
          <string/>
         </property>
         <property name="text">
-         <string>auto</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <string>Particle Weight:</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="m_InExBalanceLabel_2">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Balance In/Ex Energy:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="2">
-       <widget class="QSlider" name="m_InExBalanceSlider">
-        <property name="toolTip">
-         <string>IE Bias &lt; 0 &lt; EE Bias</string>
-        </property>
+      <item row="5" column="2">
+       <widget class="QSlider" name="m_EndTempSlider">
         <property name="minimum">
-         <number>-50</number>
+         <number>1</number>
         </property>
         <property name="maximum">
-         <number>50</number>
+         <number>99</number>
         </property>
         <property name="singleStep">
          <number>1</number>
+        </property>
+        <property name="value">
+         <number>10</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="tickPosition">
          <enum>QSlider::NoTicks</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="m_StartTempLabel_2">
+        <property name="text">
+         <string>Start Temperature:</string>
         </property>
        </widget>
       </item>
@@ -471,8 +373,40 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="m_FiberLengthLabel_2">
+      <item row="6" column="2">
+       <widget class="QSlider" name="m_InExBalanceSlider">
+        <property name="toolTip">
+         <string>IE Bias &lt; 0 &lt; EE Bias</string>
+        </property>
+        <property name="minimum">
+         <number>-50</number>
+        </property>
+        <property name="maximum">
+         <number>50</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::NoTicks</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLabel" name="m_EndTempLabel">
+        <property name="text">
+         <string>0.001</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="m_CurvatureThresholdLabel_2">
         <property name="toolTip">
          <string/>
         </property>
@@ -483,7 +417,61 @@
          <string/>
         </property>
         <property name="text">
-         <string>Min. Fiber Length:</string>
+         <string>Curvature Threshold:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="m_InExBalanceLabel_2">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Balance In/Ex Energy:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QLabel" name="m_CurvatureThresholdLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="text">
+         <string>45°</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QSlider" name="m_ParticleWidthSlider">
+        <property name="toolTip">
+         <string>auto = 0.5 * min. spacing; sigma</string>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::NoTicks</enum>
         </property>
        </widget>
       </item>
@@ -503,30 +491,8 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="2">
-       <widget class="QSlider" name="m_EndTempSlider">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>99</number>
-        </property>
-        <property name="singleStep">
-         <number>1</number>
-        </property>
-        <property name="value">
-         <number>10</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::NoTicks</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="m_ParticleWeightLabel_2">
+      <item row="1" column="1">
+       <widget class="QLabel" name="m_ParticleLengthLabel">
         <property name="toolTip">
          <string/>
         </property>
@@ -537,14 +503,48 @@
          <string/>
         </property>
         <property name="text">
-         <string>Particle Weight:</string>
+         <string>auto</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="m_StartTempLabel_2">
+      <item row="7" column="0">
+       <widget class="QLabel" name="m_FiberLengthLabel_2">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
         <property name="text">
-         <string>Start Temperature:</string>
+         <string>Min. Fiber Length:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="2">
+       <widget class="QSlider" name="m_FiberLengthSlider">
+        <property name="toolTip">
+         <string>Only fibers longer than specified are accepted.</string>
+        </property>
+        <property name="maximum">
+         <number>500</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>40</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::NoTicks</enum>
         </property>
        </widget>
       </item>
@@ -570,46 +570,15 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QSlider" name="m_ParticleLengthSlider">
-        <property name="toolTip">
-         <string>auto = 1.5 * min. spacing; l</string>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="singleStep">
-         <number>1</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::NoTicks</enum>
+      <item row="5" column="0">
+       <widget class="QLabel" name="m_EndTempLabel_2">
+        <property name="text">
+         <string>End Temperature:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QSlider" name="m_ParticleWidthSlider">
-        <property name="toolTip">
-         <string>auto = 0.5 * min. spacing; sigma</string>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="singleStep">
-         <number>1</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::NoTicks</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1">
-       <widget class="QLabel" name="m_CurvatureThresholdLabel">
+      <item row="7" column="1">
+       <widget class="QLabel" name="m_FiberLengthLabel">
         <property name="toolTip">
          <string/>
         </property>
@@ -620,15 +589,15 @@
          <string/>
         </property>
         <property name="text">
-         <string>45°</string>
+         <string>40mm</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="m_ParticleLengthLabel">
+      <item row="3" column="1">
+       <widget class="QLabel" name="m_ParticleWeightLabel">
         <property name="toolTip">
          <string/>
         </property>
@@ -643,13 +612,6 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="m_EndTempLabel_2">
-        <property name="text">
-         <string>End Temperature:</string>
         </property>
        </widget>
       </item>
@@ -675,6 +637,104 @@
         </property>
         <property name="invertedControls">
          <bool>false</bool>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::NoTicks</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="m_ParticleWidthLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="text">
+         <string>auto</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QSlider" name="m_ParticleLengthSlider">
+        <property name="toolTip">
+         <string>auto = 1.5 * min. spacing; l</string>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::NoTicks</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="m_CurvatureThresholdLabel_4">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Random Seed</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QLabel" name="m_RandomSeedLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="text">
+         <string>auto</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="2">
+       <widget class="QSlider" name="m_RandomSeedSlider">
+        <property name="toolTip">
+         <string>auto = 1.5 * min. spacing; l</string>
+        </property>
+        <property name="minimum">
+         <number>-1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>-1</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
         <property name="tickPosition">
          <enum>QSlider::NoTicks</enum>

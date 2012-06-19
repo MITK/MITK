@@ -64,7 +64,8 @@ void QmitkTrackingWorker::run()
     m_View->m_GlobalTracker->SetParticleLength((float)(m_View->m_Controls->m_ParticleLengthSlider->value())/10);
     m_View->m_GlobalTracker->SetInexBalance((float)m_View->m_Controls->m_InExBalanceSlider->value()/10);
     m_View->m_GlobalTracker->SetMinFiberLength(m_View->m_Controls->m_FiberLengthSlider->value());
-    m_View->m_GlobalTracker->SetCurvatureThreshold(cos((float)m_View->m_Controls->m_CurvatureThresholdSlider->value()*3.14159265/180));
+    m_View->m_GlobalTracker->SetCurvatureThreshold(cos((float)m_View->m_Controls->m_CurvatureThresholdSlider->value()*M_PI/180));
+    m_View->m_GlobalTracker->SetRandomSeed(m_View->m_Controls->m_RandomSeedSlider->value());
 
     m_View->m_GlobalTracker->Update();
     m_View->m_TrackingThread.quit();
@@ -194,6 +195,7 @@ void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_StartTempSlider, SIGNAL(valueChanged(int)), this, SLOT(SetStartTemp(int)) );
         connect( m_Controls->m_EndTempSlider, SIGNAL(valueChanged(int)), this, SLOT(SetEndTemp(int)) );
         connect( m_Controls->m_CurvatureThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(SetCurvatureThreshold(int)) );
+        connect( m_Controls->m_RandomSeedSlider, SIGNAL(valueChanged(int)), this, SLOT(SetRandomSeed(int)) );
         connect( m_Controls->m_OutputFileButton, SIGNAL(clicked()), this, SLOT(SetOutputFile()) );
     }
 }
@@ -206,6 +208,14 @@ void QmitkGibbsTrackingView::SetInExBalance(int value)
 void QmitkGibbsTrackingView::SetFiberLength(int value)
 {
     m_Controls->m_FiberLengthLabel->setText(QString::number(value)+"mm");
+}
+
+void QmitkGibbsTrackingView::SetRandomSeed(int value)
+{
+    if (value>=0)
+        m_Controls->m_RandomSeedLabel->setText(QString::number(value));
+    else
+        m_Controls->m_RandomSeedLabel->setText("auto");
 }
 
 void QmitkGibbsTrackingView::SetParticleWeight(int value)

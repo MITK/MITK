@@ -34,7 +34,7 @@ namespace mitk
 template <typename PixelType>
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, UpdateCallBackMethod callback)
 {
-  bool correctTilt(true);
+  bool correctTilt(false);
 
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
@@ -69,33 +69,44 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       
       std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
-  
-      // check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
-      // check first and second position/orientation from tags, make some calculations
 
-      // TODO check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible!!
-      std::string firstFilename(filenames.front());
-      // calculate from first and last slice to minimize rounding errors
-      std::string secondFilename(filenames.back());
+      GantryTiltInformation tiltInfo;
+ 
+      // check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible
+      if ( imageBlocks.front().size() > 1 )
+      {
+        // check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
+        // check first and last position slice from tags, make some calculations to detect tilt
 
-      std::string imagePosition1(    ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImagePositionPatient ] ) );
-      std::string imageOrientation( ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImageOrientation ] ) );
-      std::string imagePosition2(    ConstCharStarToString( tagValueMappings[secondFilename.c_str() ][ tagImagePositionPatient ] ) );
-    
-      bool ignoredConversionError(-42); // hard to get here, no graceful way to react
-      Point3D origin1( DICOMStringToPoint3D( imagePosition1, ignoredConversionError ) );
-      Point3D origin2( DICOMStringToPoint3D( imagePosition2, ignoredConversionError ) );
-    
-      Vector3D right; right.Fill(0.0);
-      Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
-      DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
+        std::string firstFilename(imageBlocks.front().front()); 
+        // calculate from first and last slice to minimize rounding errors
+        std::string secondFilename(imageBlocks.front().back());
 
-      GantryTiltInformation tiltInfo( origin1, origin2, right, up, filenames.size()-1 );
-      correctTilt &= tiltInfo.IsSheared();
+        std::string imagePosition1(    ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImagePositionPatient ] ) );
+        std::string imageOrientation( ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImageOrientation ] ) );
+        std::string imagePosition2(    ConstCharStarToString( tagValueMappings[secondFilename.c_str() ][ tagImagePositionPatient ] ) );
+      
+        bool ignoredConversionError(-42); // hard to get here, no graceful way to react
+        Point3D origin1( DICOMStringToPoint3D( imagePosition1, ignoredConversionError ) );
+        Point3D origin2( DICOMStringToPoint3D( imagePosition2, ignoredConversionError ) );
+      
+        Vector3D right; right.Fill(0.0);
+        Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
+        DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
 
-      MITK_DEBUG << "** Loading now: shear? " << tiltInfo.IsSheared();
-      MITK_DEBUG << "** Loading now: normal tilt? " << tiltInfo.IsRegularGantryTilt();
-      MITK_DEBUG << "** Loading now: perform tilt correction? " << correctTilt;
+        tiltInfo = GantryTiltInformation ( origin1, origin2, right, up, filenames.size()-1 );
+        correctTilt |= tiltInfo.IsSheared();
+        correctTilt |= tiltInfo.IsRegularGantryTilt();
+
+        MITK_DEBUG << "** Loading now: shear? " << tiltInfo.IsSheared();
+        MITK_DEBUG << "** Loading now: normal tilt? " << tiltInfo.IsRegularGantryTilt();
+        MITK_DEBUG << "** Loading now: perform tilt correction? " << correctTilt;
+      }
+      else
+      {
+        correctTilt = false; // we CANNOT do that
+      }
+
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
         image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, command ); // load first 3D block
@@ -129,6 +140,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         {
           readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
         }
+
         image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
         image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
 
@@ -169,6 +181,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           {
             readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
           }
+
           image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
         }
         

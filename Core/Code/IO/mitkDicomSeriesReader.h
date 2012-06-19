@@ -385,6 +385,8 @@ protected:
   {
     public:
 
+      GantryTiltInformation();
+ 
       GantryTiltInformation( const Point3D& origin1, 
                              const Point3D& origin2,
                              const Vector3D& right, 

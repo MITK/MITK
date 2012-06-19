@@ -423,6 +423,14 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   mitk::CastToMitkImage(imageItk, output_image);
   return true; // actually never returns false yet.. but exception possible
 }
+      
+DicomSeriesReader::GantryTiltInformation::GantryTiltInformation()
+: m_ShiftUp(0.0)
+, m_ShiftRight(0.0)
+, m_ShiftNormal(0.0)
+, m_NumberOfSlicesApart(1)
+{
+}
 
 DicomSeriesReader::GantryTiltInformation::GantryTiltInformation( 
     const Point3D& origin1, const Point3D& origin2,

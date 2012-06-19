@@ -14,24 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestingMacros.h"
-
-#include <mitkDiffusionImagingObjectFactory.h>
-#include <mitkFiberBundleX.h>
-#include <mitkFiberBundleXReader.h>
-#include <mitkQBallImage.h>
-#include <mitkNrrdQBallImageReader.h>
-#include <mitkImage.h>
-#include <mitkItkImageFileReader.h>
-#include <itkGibbsTrackingFilter.h>
-#include <itkOrientationDistributionFunction.h>
-#include <mitkBaseDataIOFactory.h>
-#include <mitkBaseData.h>
-#include <itksys/SystemTools.hxx>
-#include <mitkTestingConfig.h>
-#include <math.h>
-#include <tinyxml.h>
+#include <mitkTestingMacros.h>
 #include <mitkImageCast.h>
+#include <mitkQBallImage.h>
+#include <mitkBaseDataIOFactory.h>
+#include <mitkDiffusionImagingObjectFactory.h>
+#include <itkGibbsTrackingFilter.h>
+#include <mitkFiberBundleX.h>
 
 using namespace mitk;
 
@@ -81,8 +70,8 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     gibbsTracker->SetMaskImage(itk_mask);
     gibbsTracker->SetDuplicateImage(false);
     gibbsTracker->SetRandomSeed(1);
-    gibbsTracker->SetParameterFile(std::string(argv[3]));
-    gibbsTracker->SetLutPath(std::string(argv[4]));
+    gibbsTracker->SetParameterFile(argv[3]);
+    gibbsTracker->SetLutPath(argv[4]);
     gibbsTracker->Update();
 
     mitk::FiberBundleX::Pointer fib2 = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());

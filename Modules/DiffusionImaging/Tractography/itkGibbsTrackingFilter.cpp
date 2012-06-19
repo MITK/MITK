@@ -219,6 +219,8 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
     if (m_RandomSeed>-1)
         randGen->SetSeed(m_RandomSeed);
+    else
+        randGen->SetSeed();
 
     // load sphere interpolator to evaluate the ODFs
     SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);

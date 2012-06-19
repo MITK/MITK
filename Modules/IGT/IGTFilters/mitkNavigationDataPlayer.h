@@ -68,6 +68,11 @@ namespace mitk {
     *
     * Before the stream has to be set. Either with a PlayingMode (SetStream(PlayerMode)) and FileName. Or
     * with an own inputstream (SetStream(istream*)).
+  *
+  * @throws mitk::IGTIOException Throws an exception if the file cannot be opened
+  * @throws mitk::IGTIOException Throws an exception if there is no file choosen 
+  * @throws mitk::IGTException Throws an exception if there is no stream (i.e stream=NULL)
+  * @throws mitk::IGTIOException Throws an exception if the file is damaged
     */
     void StartPlaying();
 
@@ -120,15 +125,14 @@ namespace mitk {
 
     /**
     * \brief sets the recording mode which causes different types of output streams
-    * This method is overloaded with SetStream( ostream* )
-    */
-    void SetStream(PlayerMode mode);
-
-    /**
-    * \brief sets the recording mode which causes different types of output streams
     * This method is overloaded with SetStream( PlayerMode )
+    *
+    *@throws mitk::IGTException Throws an exception if stream is NULL or if it is not good.
     */
     void SetStream(std::istream* stream);
+
+
+
 
   protected:
     NavigationDataPlayer();
@@ -141,13 +145,27 @@ namespace mitk {
     */
     virtual void GenerateData();
 
+
+        /**
+    * \brief sets the recording mode which causes different types of output streams
+    * This method is overloaded with SetStream( ostream* )
+  *
+  * @throws mitk::IGTIOException Throws an exception if file does not exist
+  * @throws mitk::IGTException Throws an exception if the stream is NULL
+    */
+    void CreateStreamFromFilename();
+
+
     /**
-    * \brief Returns the file version out of the XML document. 
+    * \brief Returns the file version out of the XML document.
+  * @throw Throws an exception if stream is NULL (exception havent been thrown yet)?????????
     */
     unsigned int GetFileVersion(std::istream* stream);
 
     /**
     * \brief Returns the number of tracked tools out of the XML document.
+  * @throw Throws an exception if stream is NULL (exception havent been thrown yet)?????????
+  * @throw Throws an exception if the input stream seems to have XML incompatible format
     */
     unsigned int GetNumberOfNavigationDatas(std::istream* stream);
 
@@ -159,6 +177,7 @@ namespace mitk {
     /**
     * \brief This method reads one line of the XML document and returns the data as a NavigationData object
     * If there is a new file version another method must be added which reads this data.
+  * @throws mitk::IGTException Throws an exceptions if file is damaged
     */
     mitk::NavigationData::Pointer ReadVersion1();
 
@@ -196,7 +215,9 @@ namespace mitk {
     TiXmlNode * m_currentNode;
 
     bool m_StreamEnd; ///< stores if the input stream arrived at end
-
+  /**
+  *@throws mitk::IGTIOException Throws an exception if the stream is invalid
+  **/
     void StreamInvalid(std::string message);  ///< help method which sets the stream invalid and displays an error
    
   };

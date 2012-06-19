@@ -65,6 +65,7 @@ namespace mitk{
 
     /**
     * \brief Creates NavigationData from XML element and returns it 
+  * @throw mitk::Exception Throws an exception if elem is NULL.
     */
     mitk::NavigationData::Pointer ReadNavigationData(TiXmlElement* elem);
 

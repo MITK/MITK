@@ -25,6 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include <fstream>
 
+#include "mitkIGTException.h"
+#include "mitkIGTIOException.h"
+
+
+
+#include <itksys/SystemTools.hxx>
+
 class mitkNavigationDataPlayerTestClass
   {
   public:
@@ -51,11 +58,10 @@ class mitkNavigationDataPlayerTestClass
     player->SetFileName( file );
 
     MITK_TEST_CONDITION_REQUIRED( strcmp(player->GetFileName(), file.c_str()) == 0, "Testing SetFileName and GetFileName");
-
-    player->SetStream( mitk::NavigationDataPlayer::NormalFile );
+    //exception is thrown in StartPlaying method
     player->StartPlaying();
     player->Update();
-    player->StopPlaying();
+    player->StopPlaying();;
 
     mitk::NavigationData::Pointer nd = player->GetOutput();
     mitk::Point3D pnt;
@@ -67,8 +73,7 @@ class mitkNavigationDataPlayerTestClass
 
     player = mitk::NavigationDataPlayer::New();
     player->SetFileName( file );
-    player->SetStream( mitk::NavigationDataPlayer::NormalFile );
-
+ 
     std::vector<double> times, refTimes;
     refTimes.resize(5);
     refTimes[0] = 3.9;
@@ -133,9 +138,16 @@ class mitkNavigationDataPlayerTestClass
 
     MITK_TEST_CONDITION_REQUIRED( strcmp(player->GetFileName(), file.c_str()) == 0, "Testing SetFileName and GetFileName");
 
-    player->SetStream( mitk::NavigationDataPlayer::NormalFile );
     player->StartPlaying();
     player->Update();
+
+    mitk::NavigationData::Pointer nd = player->GetOutput();
+    mitk::Point3D pnt;
+    pnt[0] = 1;
+    pnt[1] = 0;
+    pnt[2] = 3;
+
+    MITK_TEST_CONDITION_REQUIRED( nd->GetPosition() == pnt, "Testing position of replayed NavigaionData" );
 
     MITK_TEST_OUTPUT(<<"Test double call of Pause() method!");
     player->Pause(); //test pause method
@@ -148,17 +160,8 @@ class mitkNavigationDataPlayerTestClass
     player->Update();
     player->StopPlaying();
 
-    mitk::NavigationData::Pointer nd = player->GetOutput();
-    mitk::Point3D pnt;
-    pnt[0] = 1;
-    pnt[1] = 0;
-    pnt[2] = 3;
-
-    MITK_TEST_CONDITION_REQUIRED( nd->GetPosition() == pnt, "Testing position of replayed NavigaionData" );
-
     player = mitk::NavigationDataPlayer::New();
     player->SetFileName( file );
-    player->SetStream( mitk::NavigationDataPlayer::NormalFile );
 
     std::vector<double> times, refTimes;
     refTimes.resize(5);
@@ -245,97 +248,287 @@ class mitkNavigationDataPlayerTestClass
 
     //case 0: stream not set
     player = mitk::NavigationDataPlayer::New();
-    player->SetStream( mitk::NavigationDataPlayer::ZipFile );
+    bool InvalidStreamException0 = false;
+    try
+    {
     player->StartPlaying();
+    }
+    catch(mitk::IGTException)
+    {
+    InvalidStreamException0=true;
     player->Update();
     player->StopPlaying();
     MITK_TEST_OUTPUT(<<"#0: Tested stream not set. Application should not crash.");
+    }
+   
+    MITK_TEST_CONDITION_REQUIRED(InvalidStreamException0, "Testing Invalid Stream method if exception (stream not set) was thrown.");
 
     //case 1: non-existing file
     player = mitk::NavigationDataPlayer::New();
+    bool InvalidStreamException1 = false;
     player->SetFileName( "ffdsd" );
-    player->SetStream( mitk::NavigationDataPlayer::NormalFile );
+    try
+    {
     player->StartPlaying();
+    }
+    catch(mitk::IGTException)
+    {
+    InvalidStreamException1=true;
     player->Update();
     player->StopPlaying();
     MITK_TEST_OUTPUT(<<"#1: Tested non-existing file. Application should not crash.");
+    }
 
+    MITK_TEST_CONDITION_REQUIRED(InvalidStreamException1, "Testing Invalid Stream method if exception (non-existing file) was thrown.");
+     
     //case 2: wrong file format
     player = mitk::NavigationDataPlayer::New();
+    bool InvalidStreamException2 = false;
     file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
     player->SetFileName( file );
-    player->SetStream( mitk::NavigationDataPlayer::NormalFile );
+    try
+    {
     player->StartPlaying();
+    }
+    catch(mitk::IGTException)
+    {
+    InvalidStreamException2=true;
     player->Update();
     player->StopPlaying();
     MITK_TEST_OUTPUT(<<"#2: Tested wrong file format. Application should not crash.");
+    }
+
+    MITK_TEST_CONDITION_REQUIRED(InvalidStreamException2, "Testing Invalid Stream method if exception (wrong file format) was thrown.");
 
     //case 3: wrong file version
     player = mitk::NavigationDataPlayer::New();
     file = mitk::StandardFileLocations::GetInstance()->FindFile("InvalidVersionNavigationDataTestData.xml", "Modules/IGT/Testing/Data");
     player->SetFileName( file );
-    player->SetStream( mitk::NavigationDataPlayer::NormalFile );
+    bool InvalidStreamException3 = false;
+    try
+    {
     player->StartPlaying();
+    }
+    catch(mitk::IGTException)
+    {
+    InvalidStreamException3 = true;
     player->Update();
     player->StopPlaying();
     MITK_TEST_OUTPUT(<<"#3: Tested wrong file version. Application should not crash.");
+    }
+    MITK_TEST_CONDITION_REQUIRED(InvalidStreamException3, "Testing Invalid Stream method if exception (wrong file version) was thrown.");
 
     //case 4: wrong file
     player = mitk::NavigationDataPlayer::New();
     player->SetFileName( "cs:\fsd/$%§²³ffdsd" );
-    player->SetStream( mitk::NavigationDataPlayer::NormalFile );
+    bool InvalidStreamException4=false;
+    try
+    {
     player->StartPlaying();
-    player->Update();
-    player->StopPlaying();
+    }
+    catch(mitk::IGTException)
+    {
+    InvalidStreamException4=true;
     MITK_TEST_OUTPUT(<<"#4: Tested wrong file. Application should not crash.");
+    }
+
+    MITK_TEST_CONDITION_REQUIRED(InvalidStreamException4, "Testing Invalid Stream method if exception (wrong file) was thrown.");
 
     //case 5: null stream
     player = mitk::NavigationDataPlayer::New();
-    player->SetStream( NULL );
+    bool InvalidStreamException5=false;
+    try
+    {
     player->StartPlaying();
+    }
+    catch(mitk::IGTException)
+    {
+    InvalidStreamException5=true;
     player->Update();
     player->StopPlaying();
     MITK_TEST_OUTPUT(<<"#5: Tested null stream. Application should not crash.");
+    }
 
-    //case 6: empty stream
+    MITK_TEST_CONDITION_REQUIRED(InvalidStreamException5, "Testing Invalid Stream method if exception (null stream) was thrown.");
+     
+    //case 6: empty stream, exception is thrown in setstream
     player = mitk::NavigationDataPlayer::New();
-    std::ifstream* myEmptyStream = new std::ifstream("");
+    bool InvalidStreamException6=false;
+    std::ifstream* myEmptyStream;
+    try
+    {
+    myEmptyStream = new std::ifstream(""); 
     player->SetStream( myEmptyStream );
-    player->StartPlaying();
-    player->Update();
-    player->StopPlaying();
+    }
+    catch(mitk::IGTException)
+    {
+    InvalidStreamException6=true;
     MITK_TEST_OUTPUT(<<"#6: Tested empty stream. Application should not crash.");
+    }
+    MITK_TEST_CONDITION_REQUIRED(InvalidStreamException6, "Testing Invalid Stream method if exception (empty stream) was thrown.");
+
+
+
 
     //case 7: wrong stream
     player = mitk::NavigationDataPlayer::New();
     file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
-    std::ifstream* myWrongStream = new std::ifstream(file.c_str());
+    
+    bool InvalidStreamException7=false;
+    std::ifstream* myWrongStream;
+    myWrongStream = new std::ifstream(file.c_str());
+    try
+    {
     player->SetStream( myWrongStream );
-    player->StartPlaying();
-    player->Update();
-    player->StopPlaying();
+    }
+    catch(mitk::IGTIOException)
+    {
+    InvalidStreamException7=true;   
     MITK_TEST_OUTPUT(<<"#7: Tested wrong stream. Application should not crash.");
+    }
+    
+    MITK_TEST_CONDITION_REQUIRED(InvalidStreamException7, "Testing Invalid Stream method if exception (wrong stream) was thrown.");
+
+    
 
     //case 8: invalid
     player = mitk::NavigationDataPlayer::New();
     file = mitk::StandardFileLocations::GetInstance()->FindFile("InvalidDataNavigationDataTestData.xml", "Modules/IGT/Testing/Data");
     player->SetFileName( file );
-    player->SetStream( mitk::NavigationDataPlayer::NormalFile );
+    bool InvalidStreamException8=false;
+    try
+    {
     player->StartPlaying();
-    player->Update();
-    player->StopPlaying();
+    }
+    catch(mitk::IGTIOException)
+    {
+    InvalidStreamException8=true;
     MITK_TEST_OUTPUT(<<"#8: Tested invalid file version. Application should not crash.");
+    }
+    MITK_TEST_CONDITION_REQUIRED(InvalidStreamException8, "Testing Invalid Stream method if exception (Invalid) was thrown.");
 
     //clean up
     delete myEmptyStream;
     delete myWrongStream;
     }
+  
+  static void TestSetStreamExceptions()
+    {
+    mitk::NavigationDataPlayer::Pointer myTestPlayer = mitk::NavigationDataPlayer::New();
+    std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData.xml", "Modules/IGT/Testing/Data");
+    myTestPlayer->SetFileName( file );
+    
 
-  };
+    bool exceptionThrown=false;
+
+    try
+    {
+      std::istream* stream=NULL;
+      myTestPlayer->SetStream(stream);
+    }
+    catch(mitk::IGTException)
+    {
+     exceptionThrown = true;
+     MITK_TEST_OUTPUT(<<"#9: Tested exceptions in SetStream. Application should not crash.");
+
+    }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown, "Testing SetStream method in exception was thrown.");
+  }
+    
+ static void TestStartPlayingExceptions()
+    {
+      MITK_INFO <<"In the following, exceptions are tested. Errors will occur and are expected.";
+
+
+      //Case1 Testing if stream=NULL
+      mitk::NavigationDataPlayer::Pointer myTestPlayer1 = mitk::NavigationDataPlayer::New();
+      bool exceptionThrown1 = false;
+      try
+       {
+       myTestPlayer1->StartPlaying();
+       
+       }
+       catch(mitk::IGTException)
+       {
+       exceptionThrown1 = true;
+       myTestPlayer1->StopPlaying();
+       MITK_TEST_OUTPUT(<<"#10: Tested exception for the case when stream=NULL in StartPlaying. Application should not crash.");
+       }
+
+      MITK_TEST_CONDITION_REQUIRED(exceptionThrown1, "Testing StartPlaying method if exception (stream=NULL) was thrown.");
+
+      //Case2 Testing if file does not exist
+      mitk::NavigationDataPlayer::Pointer myTestPlayer2 = mitk::NavigationDataPlayer::New();
+      myTestPlayer2->SetFileName("ffdsd");
+      bool exceptionThrown2 = false;
+      try{
+      myTestPlayer2->StartPlaying();
+      } 
+      catch(mitk::IGTIOException)
+      {
+      exceptionThrown2 = true;
+      myTestPlayer2->StopPlaying();
+      MITK_TEST_OUTPUT(<<"#11: Tested exception for the case when file does not exist in StartPlaying. Application should not crash.");
+      }
+      MITK_TEST_CONDITION_REQUIRED(exceptionThrown2, "Testing StartPlaying method if exception is thrown when file does not exist.");
+
+  
+      //Case3 Testing if wrong file format
+      mitk::NavigationDataPlayer::Pointer myTestPlayer3 = mitk::NavigationDataPlayer::New();
+      std::string file3 = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
+      myTestPlayer3->SetFileName( file3 );
+      bool exceptionThrown3 = false;
+      try{
+      myTestPlayer3->StartPlaying();
+      } 
+      catch(mitk::IGTIOException)
+      {
+      exceptionThrown3 = true;
+      myTestPlayer3->StopPlaying();
+      MITK_TEST_OUTPUT(<<"#12: Tested exception for the case when file format is wrong in StartPlaying. Application should not crash.");
+      }
+      MITK_TEST_CONDITION_REQUIRED(exceptionThrown3, "Testing StartPlaying method if exception (file format is wrong) was thrown.");
+
+
+      //Case4 Testing if wrong file version
+      mitk::NavigationDataPlayer::Pointer myTestPlayer4 = mitk::NavigationDataPlayer::New();
+      std::string file4 = mitk::StandardFileLocations::GetInstance()->FindFile("InvalidVersionNavigationDataTestData.xml", "Modules/IGT/Testing/Data");
+      myTestPlayer4->SetFileName( file3 );
+      bool exceptionThrown4 = false;
+      try{
+      myTestPlayer4->StartPlaying();
+      } 
+      catch(mitk::IGTIOException)
+      {
+      exceptionThrown4 = true;
+      myTestPlayer4->StopPlaying();
+      MITK_TEST_OUTPUT(<<"#13: Tested exception for the case when file version is wrong in StartPlaying. Application should not crash.");
+      }
+      MITK_TEST_CONDITION_REQUIRED(exceptionThrown4, "Testing StartPlaying method if exception (file version is wrong) was thrown.");
+
+      //Case5 Testing if not existing file name
+      mitk::NavigationDataPlayer::Pointer myTestPlayer5 = mitk::NavigationDataPlayer::New();
+      myTestPlayer5->SetFileName("ffdsd");
+      bool exceptionThrown5 = false;
+      try{
+      myTestPlayer5->StartPlaying();
+      } 
+      catch(mitk::IGTIOException)
+      {
+      exceptionThrown5 = true;
+      myTestPlayer5->StopPlaying();
+      MITK_TEST_OUTPUT(<<"#14: Tested exception for the case when non-existing file name in StartPlaying. Application should not crash.");
+      }
+      MITK_TEST_CONDITION_REQUIRED(exceptionThrown5, "Testing StartPlaying method if exception (non-existing file name) was thrown.");
+
+ }
+
+};
 
 /**Documentation
  *  test for the class "NavigationDataPlayer".
  */
+
 int mitkNavigationDataPlayerTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationDataPlayer");
@@ -343,9 +536,14 @@ int mitkNavigationDataPlayerTest(int /* argc */, char* /*argv*/[])
 
   mitkNavigationDataPlayerTestClass::TestInstantiation();
   mitkNavigationDataPlayerTestClass::TestSimpleDataPlay();
+  mitkNavigationDataPlayerTestClass::TestSetStreamExceptions();
+  mitkNavigationDataPlayerTestClass::TestStartPlayingExceptions();
   mitkNavigationDataPlayerTestClass::TestPauseAndResume();
   mitkNavigationDataPlayerTestClass::TestInvalidStream();
 
   // always end with this!
   MITK_TEST_END();
 }
+
+
+

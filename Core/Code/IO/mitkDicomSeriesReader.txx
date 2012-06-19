@@ -75,7 +75,8 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
       // TODO check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible!!
       std::string firstFilename(filenames.front());
-      std::string secondFilename( *(++(filenames.begin())) );
+      // calculate from first and last slice to minimize rounding errors
+      std::string secondFilename(filenames.back());
 
       std::string imagePosition1(    ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImagePositionPatient ] ) );
       std::string imageOrientation( ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImageOrientation ] ) );

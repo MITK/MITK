@@ -71,7 +71,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       GantryTiltInformation tiltInfo;
  
       // check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible
-      if ( imageBlocks.front().size() > 1 && correctTilt)
+      if ( !imageBlocks.empty() && imageBlocks.front().size() > 1 && correctTilt)
       {
         // check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
         // check first and last position slice from tags, make some calculations to detect tilt

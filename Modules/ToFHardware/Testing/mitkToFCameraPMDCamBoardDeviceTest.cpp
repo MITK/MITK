@@ -44,7 +44,7 @@ int mitkToFCameraPMDCamBoardDeviceTest(int /* argc */, char* /*argv*/[])
   tofCameraPMDCamBoardDevice->GetDistances(distances,imageSequence);
   tofCameraPMDCamBoardDevice->GetAmplitudes(amplitudes,imageSequence);
   tofCameraPMDCamBoardDevice->GetIntensities(intensities,imageSequence);
-  tofCameraPMDCamBoardDevice->GetAllImages(distances,amplitudes,intensities,sourceData,requiredImageSequence,imageSequence);
+  tofCameraPMDCamBoardDevice->GetAllImages(distances,amplitudes,intensities,sourceData,requiredImageSequence,imageSequence, 0);
   MITK_TEST_CONDITION_REQUIRED(tofCameraPMDCamBoardDevice->IsCameraActive(), "Test IsCameraActive() before StopCamera()");
   MITK_TEST_OUTPUT(<<"Call StopCamera()");
   tofCameraPMDCamBoardDevice->StopCamera();

@@ -155,9 +155,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         filter->Update();
         m_QBallImage = filter->GetOutput();
     }
-
-    // generate local working copy of QBall image (if not disabled)
-    if (m_DuplicateImage)
+    else if (m_DuplicateImage) // generate local working copy of QBall image (if not disabled)
     {
         typedef itk::ImageDuplicator< ItkQBallImageType > DuplicateFilterType;
         typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
@@ -285,6 +283,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         MITK_INFO << "GibbsTrackingFilter: particles: " << m_NumParticles;
         MITK_INFO << "GibbsTrackingFilter: connections: " << m_NumConnections;
         MITK_INFO << "GibbsTrackingFilter: progress: " << 100*(float)m_CurrentStep/m_Steps << "%";
+        MITK_INFO << "GibbsTrackingFilter: cell overflows: " << particleGrid->m_NumCellOverflows;
         MITK_INFO << "----------------------------------------";
 
         if (m_AbortTracking)

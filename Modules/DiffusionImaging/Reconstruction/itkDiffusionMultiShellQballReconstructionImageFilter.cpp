@@ -318,34 +318,34 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
-::S_S0Normalization( vnl_vector<double> & vec, float b0 )
+::S_S0Normalization( vnl_vector<double> & vec, double S0 )
 {
-
-  double b0f = (double)b0;
-  for(int i = 0; i < vec.size(); i++)
+  //MITK_INFO <<"S0 :" <<S0;
+    for(int i = 0; i < vec.size(); i++)
   {
-    if (b0f==0)
-      b0f = 0.01;
+    if (S0==0)
+      S0 = 0.01;
     // if(vec[i] >= b0f)
     //   vec[i] = b0f - 0.001;
-    vec[i] /= b0f;
+    vec[i] /= S0;
   }
 
 }
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
-::S_S0Normalization( vnl_matrix<double> & mat, float b0 )
+::S_S0Normalization( vnl_matrix<double> & mat, double S0 )
 {
-  double b0f = (double)b0;
+//MITK_INFO <<"S0 :" <<S0;
+
   for(int i = 0; i < mat.rows(); i++)
   {
     for( int j = 0; j < mat.cols(); j++ ){
-      if (b0f==0)
-        b0f = 0.01;
+      if (S0==0)
+        S0 = 0.01;
       //if(mat(i,j) >= b0f)
       //  mat(i,j) = b0f - 0.001;
-      mat(i,j) /= b0f;
+      mat(i,j) /= S0;
     }
   }
 }
@@ -767,31 +767,43 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
    GradientVectorType b = gradientInputImageIterator.Get();
 
-    typename NumericTraits<ReferencePixelType>::AccumulateType b0 = NumericTraits<ReferencePixelType>::Zero;
+    typename NumericTraits<ReferencePixelType>::AccumulateType shell1b0 = NumericTraits<ReferencePixelType>::Zero;
+    typename NumericTraits<ReferencePixelType>::AccumulateType shell2b0 = NumericTraits<ReferencePixelType>::Zero;
+    typename NumericTraits<ReferencePixelType>::AccumulateType shell3b0 = NumericTraits<ReferencePixelType>::Zero;
 
-    for(unsigned int i = 0; i < BZeroIndicies.size(); ++i)
+   const int b0size = BZeroIndicies.size();
+    for(unsigned int i = 0; i <b0size ; ++i)
     {
-      b0 += b[BZeroIndicies[i]];
+      if(i < b0size / 3)                          shell1b0 += b[BZeroIndicies[i]];
+      if(i >= b0size / 3 && i < (b0size / 3)*2)   shell2b0 += b[BZeroIndicies[i]];
+      if(i >= (b0size / 3) * 2)                   shell3b0 += b[BZeroIndicies[i]];
     }
 
-    float newb0= (float)b0 / (float)BZeroIndicies.size();
-    bzeroIterator.Set(newb0);
+    double shell1b0Norm= (double)shell1b0 / (BZeroIndicies.size()/3);
+    double shell2b0Norm= (double)shell2b0 / (BZeroIndicies.size()/3);
+    double shell3b0Norm= (double)shell3b0 / (BZeroIndicies.size()/3);
+
+    //MITK_INFO << "S1s0 :" << shell1b0;
+    //MITK_INFO << "S2s0 :" << shell2b0;
+    //MITK_INFO << "S3s0 :" << shell3b0;
+    bzeroIterator.Set((shell1b0Norm + shell2b0Norm+ shell3b0Norm)/3);
     ++bzeroIterator;
 
-    if( (newb0 != 0) && (newb0 >= m_Threshold) )
+    //if( (newb0 != 0) && (newb0 >= m_Threshold) )
     {
 
       // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
-
-
-      for(int i = 0 ; i < Shell1Indiecies.size(); i++){
+      for(int i = 0 ; i < Shell1Indiecies.size(); i++)
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
-        // MITK_INFO << DataShell1[i];
-      }
       for(int i = 0 ; i < Shell2Indiecies.size(); i++)
         DataShell2[i] = static_cast<double>(b[Shell2Indiecies[i]]);
       for(int i = 0 ; i < Shell3Indiecies.size(); i++)
         DataShell3[i] = static_cast<double>(b[Shell3Indiecies[i]]);
+
+      // Normalize the Signal: Si/S0
+      S_S0Normalization(DataShell1, shell1b0Norm);
+      S_S0Normalization(DataShell2, shell2b0Norm);
+      S_S0Normalization(DataShell3, shell3b0Norm);
 
       if(m_Interpolation_Flag)
       {
@@ -804,11 +816,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         E.set_column(2, (DataShell3));
       }
 
-      writeData(E,data1);
-      // Normalize the Signal: Si/S0
-      S_S0Normalization(E, newb0);
-      writeData(E,data2);
-
+      //writeData(E,data1);
 
       //Implements Eq. [19] and Fig. 4.
       Threshold(E);

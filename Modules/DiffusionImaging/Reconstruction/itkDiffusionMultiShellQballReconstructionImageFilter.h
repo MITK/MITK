@@ -103,8 +103,8 @@ public:
 
     void Normalize(OdfPixelType & odf );
 
-    void S_S0Normalization( vnl_vector<double> & vec, float b0  = 0 );
-    void S_S0Normalization( vnl_matrix<double> & mat, float b0  = 0 );
+    void S_S0Normalization( vnl_vector<double> & vec, double b0  = 0 );
+    void S_S0Normalization( vnl_matrix<double> & mat, double b0  = 0 );
 
     void DoubleLogarithm(vnl_vector<double> & vec);
 

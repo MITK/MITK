@@ -835,6 +835,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   {
     //MITK_DEBUG << "Scan file " << fileIter->first << std::endl;
     if ( std::string(fileIter->first).empty() ) continue; // TODO understand why Scanner has empty string entries
+    if ( std::string(fileIter->first) == std::string("DICOMDIR") ) continue;
 
     // we const_cast here, because I could not use a map.at() function in CreateMoreUniqueSeriesIdentifier.
     // doing the same thing with find would make the code less readable. Since we forget the Scanner results

@@ -48,11 +48,11 @@ public:
 
   virtual DataObjectPointer MakeOutput(unsigned int idx);
 
-  //OutputType * GetOutput(unsigned int idx);
+  OutputType * GetOutput(unsigned int idx);
 
   //void SetOutput(OutputType* output);
 
-  //OutputType* GetOutput()
+  OutputType* GetOutput();
   //{return Superclass::GetOutput();}
 
   //OutputType* GetOutput(unsigned int idx);

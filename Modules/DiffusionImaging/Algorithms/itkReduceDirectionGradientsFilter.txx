@@ -104,8 +104,11 @@ ReduceDirectionGradientsFilter<TInputScalarType, TOutputScalarType>
     m_UsedGradientIndices.clear();
     m_UnUsedGradientIndices.clear();
 
-    if ( it->second.size() <= m_NumGradientDirections )
-      m_NumGradientDirections = it->second.size();
+    if ( it->second.size() <= m_NumGradientDirections ){
+       itkWarningMacro( << "current directions: " << it->second.size() << " wanted directions: " << m_NumGradientDirections);
+       m_NumGradientDirections = it->second.size();
+       continue;
+    }
 
 
     int c=0;

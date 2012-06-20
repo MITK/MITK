@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,23 +36,23 @@ public:
 
   typedef typename OutputImageType::PixelType OutPixelType;
 
-  itkNewMacro(Self);
-  itkTypeMacro( TractsToFiberEndingsImageFilter, ImageSource );
+  itkNewMacro(Self)
+  itkTypeMacro( TractsToFiberEndingsImageFilter, ImageSource )
 
   /** Upsampling factor **/
-  itkSetMacro( UpsamplingFactor, unsigned int);
-  itkGetMacro( UpsamplingFactor, unsigned int);
+  itkSetMacro( UpsamplingFactor, float)
+  itkGetMacro( UpsamplingFactor, float)
 
   /** Invert Image **/
-  itkSetMacro( InvertImage, bool);
-  itkGetMacro( InvertImage, bool);
+  itkSetMacro( InvertImage, bool)
+  itkGetMacro( InvertImage, bool)
 
-  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer);
-  itkSetMacro( InputImage, typename OutputImageType::Pointer);
+  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer)
+  itkSetMacro( InputImage, typename OutputImageType::Pointer)
 
   /** Use input image geometry to initialize output image **/
-  itkSetMacro( UseImageGeometry, bool);
-  itkGetMacro( UseImageGeometry, bool);
+  itkSetMacro( UseImageGeometry, bool)
+  itkGetMacro( UseImageGeometry, bool)
 
   void GenerateData();
 
@@ -64,7 +64,7 @@ protected:
   virtual ~TractsToFiberEndingsImageFilter();
 
   mitk::FiberBundleX::Pointer m_FiberBundle;
-  unsigned int m_UpsamplingFactor;
+  float m_UpsamplingFactor;
   bool m_InvertImage;
   bool m_UseImageGeometry;
   typename OutputImageType::Pointer m_InputImage;

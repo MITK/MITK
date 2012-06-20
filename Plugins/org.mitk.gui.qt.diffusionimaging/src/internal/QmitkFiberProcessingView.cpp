@@ -1588,21 +1588,25 @@ void QmitkFiberProcessingView::ProcessSelectedBundles()
       DataNode::Pointer newNode = NULL;
       switch(generationMethod){
       case 0:
-        newNode = GenerateTractDensityImage(fib, false);
+        newNode = GenerateTractDensityImage(fib, false, true);
         name += "_TDI";
         break;
       case 1:
-        newNode = GenerateTractDensityImage(fib, true);
-        name += "_envelope";
+        newNode = GenerateTractDensityImage(fib, false, false);
+        name += "_TDI";
         break;
       case 2:
-        newNode = GenerateColorHeatmap(fib);
+        newNode = GenerateTractDensityImage(fib, true, false);
+        name += "_envelope";
         break;
       case 3:
+        newNode = GenerateColorHeatmap(fib);
+        break;
+      case 4:
         newNode = GenerateFiberEndingsImage(fib);
         name += "_fiber_endings";
         break;
-      case 4:
+      case 5:
         newNode = GenerateFiberEndingsPointSet(fib);
         name += "_fiber_endings";
         break;
@@ -1723,7 +1727,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateColorHeatmap(mitk::Fib
 }
 
 // generate tract density image from fiber bundle
-mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary)
+mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute)
 {
   typedef float OutPixType;
   typedef itk::Image<OutPixType, 3> OutImageType;
@@ -1731,6 +1735,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
   itk::TractDensityImageFilter< OutImageType >::Pointer generator = itk::TractDensityImageFilter< OutImageType >::New();
   generator->SetFiberBundle(fib);
   generator->SetBinaryOutput(binary);
+  generator->SetOutputAbsoluteValues(absolute);
   generator->SetInvertImage(m_Controls->m_InvertCheckbox->isChecked());
   generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
   if (m_SelectedImage.IsNotNull())
@@ -1739,6 +1744,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
     CastToItkImage(m_SelectedImage, itkImage);
     generator->SetInputImage(itkImage);
     generator->SetUseImageGeometry(true);
+
   }
   generator->Update();
 

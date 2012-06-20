@@ -76,6 +76,11 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
 
     mitk::FiberBundleX::Pointer fib2 = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
     MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2), "check if gibbs tracking has changed");
+
+    gibbsTracker->SetRandomSeed(0);
+    gibbsTracker->Update();
+    fib2 = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
+    MITK_TEST_CONDITION_REQUIRED(!fib1->Equals(fib2), "check if gibbs tracking has changed after wrong seed");
   }
   catch(...)
   {

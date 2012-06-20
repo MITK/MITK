@@ -480,7 +480,12 @@
         </property>
         <item>
          <property name="text">
-          <string>Tract Density Image (TDI)</string>
+          <string>Tract Density Image</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Tract Density Image (normalize image values)</string>
          </property>
         </item>
         <item>
@@ -503,22 +508,6 @@
           <string>Fiber Endings Pointset</string>
          </property>
         </item>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="m_UpsamplingSpinBox">
-        <property name="toolTip">
-         <string>Upsampling factor</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>10</number>
-        </property>
-        <property name="value">
-         <number>2</number>
-        </property>
        </widget>
       </item>
       <item row="1" column="0">
@@ -739,6 +728,28 @@
           <string>z - Axis</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="m_UpsamplingSpinBox">
+        <property name="toolTip">
+         <string>Upsampling factor</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
      </layout>

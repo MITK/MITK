@@ -1036,19 +1036,14 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
   const gdcm::Tag tagSliceThickness(0x0018, 0x0050); // slice thickness
   const gdcm::Tag tagNumberOfRows(0x0028, 0x0010); // number rows
   const gdcm::Tag tagNumberOfColumns(0x0028, 0x0011); // number cols
-    
-  std::string constructedID;
- 
-  try
+
+  const char* tagSeriesInstanceUid = tagValueMap[tagSeriesInstanceUID];
+  if (!tagSeriesInstanceUid)
   {
-    constructedID = tagValueMap[ tagSeriesInstanceUID ];
+    mitkThrow() << "CreateMoreUniqueSeriesIdentifier() could not access series instance UID. Something is seriously wrong with this image, so stopping here.";
   }
-  catch (std::exception& e)
-  {
-    MITK_ERROR << "CreateMoreUniqueSeriesIdentifier() could not access series instance UID. Something is seriously wrong with this image.";
-    MITK_ERROR << "Error from exception: " << e.what();
-  }
- 
+  std::string constructedID = tagSeriesInstanceUid;
+
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfRows );
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfColumns );
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagPixelSpacing );

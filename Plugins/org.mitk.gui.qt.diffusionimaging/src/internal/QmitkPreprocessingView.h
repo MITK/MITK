@@ -98,6 +98,8 @@ protected:
 
   mitk::DiffusionImage<DiffusionPixelType>::Pointer m_DiffusionImage;
   mitk::DataStorage::SetOfObjects::Pointer m_SelectedDiffusionNodes;
+
+  QList<QCheckBox *> m_ReduceGradientCheckboxes;
 };
 
 

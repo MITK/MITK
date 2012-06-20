@@ -144,16 +144,20 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
       T0(i,j) = -log(E(i,j));
     }
   }
-
+ // std::cout << "T0" <<std::endl;
+//  std::cout  << std::setprecision(6) << T0 << std::endl;
 
   //T0 = -T0.apply(std::log);
+
 
   // Summeiere Zeilenweise über alle Shells sum = E1+E2+E3
   for(int i = 0 ; i < E.rows(); i++)
   {
     s0[i] = T0(i,0) + T0(i,1) + T0(i,2);
-  }
 
+  }
+  //std::cout << "S0" <<std::endl;
+  //std::cout << std::setprecision(6) << s0 <<std::endl;
 
   for(int i = 0; i < E.rows(); i ++)
   {
@@ -163,6 +167,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
     b0 = E(i,1) / s0[i];
   }
 
+  std::cout << "a0" <<std::endl;
+  std::cout << std::setprecision(6) << a0 <<std::endl;
+
+  std::cout << "b0" <<std::endl;
+  std::cout << std::setprecision(6) << b0 <<std::endl;
+
   ta = a0 * 3.0;
   tb = b0 * 3.0;
   e = tb - (ta * 2.0);
@@ -170,13 +180,13 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
   for(int i = 0; i < E.rows(); i++)
   {
-    C(i,0) = tb[i] < 1+3*delta && 0.5+1.5*(sF+1)*delta < ta[i] && ta[i] < 1-3* (sF+2) *delta;
-    C(i,1) = e[i] <= -1 +3*(2*sF+5)* delta && ta[i] >= 1-3*(sF+2)*delta;
-    C(i,2) = m[i] > 3 -3*sF*delta && -1+3*(2*sF+5)*delta < e[i] && e[i]<-3*sF*delta;
-    C(i,3) = m[i] >= 3-3*sF*delta && e[i] >= -3 *sF * delta;
-    C(i,4) = 2.5 + 1.5*(5+sF)*delta < m[i] && m[i] < 3-3*sF*delta && e[i] > -3*sF*delta;
-    C(i,5) = ta[i] <= 0.5+1.5 *(sF+1)*delta && m[i] <= 2.5 + 1.5 *(5+sF) * delta;
-    C(i,6) = !( C(i,0) || C(i,1) || C(i,2) || C(i,3) || C(i,4) || C(i,5) ); // ~ANY(C(i,[0-5] ),2)
+    C(i,0) = (tb[i] < 1+3*delta && 0.5+1.5*(sF+1)*delta < ta[i] && ta[i] < 1-3* (sF+2) *delta);
+    C(i,1) = (e[i] <= -1+3*(2*sF+5)*delta) && (ta[i]>=1-3*(sF+2)*delta);
+    C(i,2) = (m[i] > 3-3*sF*delta) && (-1+3*(2*sF+5)*delta<e[i]) && (e[i]<-3*sF*delta);
+    C(i,3) = (m[i] >= 3-3*sF*delta && e[i] >= -3 *sF * delta);
+    C(i,4) = (2.5 + 1.5*(5+sF)*delta < m[i] && m[i] < 3-3*sF*delta && e[i] > -3*sF*delta);
+    C(i,5) = (ta[i] <= 0.5+1.5 *(sF+1)*delta && m[i] <= 2.5 + 1.5 *(5+sF) * delta);
+    C(i,6) = !((bool) C(i,0) ||(bool) C(i,1) ||(bool) C(i,2) ||(bool) C(i,3) ||(bool) C(i,4) ||(bool) C(i,5) ); // ~ANY(C(i,[0-5] ),2)
 
     A(i,0)=(bool)C(i,0) * a0(i);
     A(i,1)=(bool)C(i,1) * (1.0/3.0-(sF+2)*delta);
@@ -194,7 +204,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
     B(i,5)=(bool)C(i,5) * (1.0/3.0+delta);
     B(i,6)=(bool)C(i,6) * b0(i);
   }
-
 
 
   for(int i = 0 ; i < E.rows(); i++)
@@ -793,6 +802,22 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     {
 
       // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
+
+      //fsl fix ---------------------------------------------------
+      for(int i = 0 ; i < Shell1Indiecies.size(); i++)
+        DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
+      for(int i = 0 ; i < Shell2Indiecies.size(); i++)
+        DataShell2[i] = static_cast<double>(b[Shell2Indiecies[i]]);
+      for(int i = 0 ; i < Shell3Indiecies.size(); i++)
+        DataShell3[i] = static_cast<double>(b[Shell2Indiecies[i]]);
+
+      // Normalize the Signal: Si/S0
+      S_S0Normalization(DataShell1, shell1b0Norm);
+      S_S0Normalization(DataShell2, shell2b0Norm);
+      S_S0Normalization(DataShell3, shell2b0Norm);
+      //fsl fix -------------------------------------------ende--
+
+      /* correct version
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
       for(int i = 0 ; i < Shell2Indiecies.size(); i++)
@@ -804,6 +829,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       S_S0Normalization(DataShell1, shell1b0Norm);
       S_S0Normalization(DataShell2, shell2b0Norm);
       S_S0Normalization(DataShell3, shell3b0Norm);
+        */
 
       if(m_Interpolation_Flag)
       {
@@ -816,14 +842,16 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         E.set_column(2, (DataShell3));
       }
 
-      //writeData(E,data1);
-
       //Implements Eq. [19] and Fig. 4.
       Threshold(E);
+
+
 
       //inqualities [31]. Taking the lograithm of th first tree inqualities
       //convert the quadratic inqualities to linear ones.
       Projection1(E);
+
+      writeData(E,data1);
 
       for( unsigned int i = 0; i< m_MaxDirections; i++ )
       {

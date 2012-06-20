@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderWindow.h>
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
+#include <vtkRenderWindowInteractor.h>
 
 #include <mitkRenderWindow.h>
 #include <mitkGlobalInteraction.h>
@@ -27,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 
 mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc, char* argv[])
+:m_width(width), m_height(height)
 {
     // Global interaction must(!) be initialized
     mitk::GlobalInteraction::GetInstance()->Initialize("global");
@@ -50,6 +52,7 @@ void mitkRenderingTestHelper::Render()
     if(m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1 )
     {
         mitk::TimeSlicedGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+        m_RenderWindow->GetRenderer()->Resize(m_width, m_height);
 
         mitk::RenderingManager::GetInstance()->InitializeViews( geo );
         mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());

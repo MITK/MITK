@@ -34,6 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGlobalInteraction.h>
 #include <mitkILinkedRenderWindowPart.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
 #include <QmitkRenderWindow.h>
 
 struct QmitkPlanarFigureData
@@ -647,9 +650,15 @@ void QmitkMeasurementView::RemoveAllInteractors()
 
 mitk::DataNode::Pointer QmitkMeasurementView::DetectTopMostVisibleImage()
 {
-  // get all images from the data storage
+  // get all images from the data storage which are not a segmentation
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  mitk::NodePredicateNot::Pointer isNotBinary = mitk::NodePredicateNot::New( isBinary );
+  mitk::NodePredicateAnd::Pointer isNormalImage = mitk::NodePredicateAnd::New( isImage, isNotBinary );
+
   mitk::DataStorage::SetOfObjects::ConstPointer Images
-      = this->GetDataStorage()->GetSubset( mitk::NodePredicateDataType::New("Image") );
+      = this->GetDataStorage()->GetSubset( isNormalImage );
+
 
   mitk::DataNode::Pointer currentNode;
   int maxLayer = itk::NumericTraits<int>::min();
@@ -665,9 +674,14 @@ mitk::DataNode::Pointer QmitkMeasurementView::DetectTopMostVisibleImage()
     int layer = 0;
     node->GetIntProperty("layer", layer);
     if ( layer < maxLayer )
+    {
       continue;
-
-    currentNode = node;
+    }
+    else
+    {
+      maxLayer = layer;
+      currentNode = node;
+    }
   }
 
   return currentNode;

@@ -340,11 +340,35 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( (QObject*)(m_Controls->m_AddGroup), SIGNAL(clicked()), this, SLOT(AddGroup()) );
     connect( (QObject*)(m_Controls->m_RemoveGroup), SIGNAL(clicked()), this, SLOT(RemoveGroup()) );
     connect( (QObject*)(m_Controls->m_Clipboard), SIGNAL(clicked()), this, SLOT(CopyToClipboard()) );
+    connect( (QObject*)(m_Controls->m_IndividualsClipBoard), SIGNAL(clicked()), this, SLOT(CopyToClipboardIndividuals()) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
   }
 }
 
+
+void QmitkTractbasedSpatialStatisticsView::CopyToClipboardIndividuals()
+{
+  std::vector<std::vector<double> > vals = m_Controls->m_RoiPlotWidget->GetIndividualProfiles();
+  QString clipboardText;
+  for (std::vector<std::vector<double> >::iterator it = vals.begin(); it
+                                                         != vals.end(); ++it)
+  {
+    for (std::vector<double>::iterator it2 = (*it).begin(); it2 !=
+          (*it).end(); ++it2)
+    {
+      clipboardText.append(QString("%1 \t").arg(*it2));
+
+      double d = *it2;
+      std::cout << d <<std::endl;
+    }
+    clipboardText.append(QString("\n"));
+  }
+
+  QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
+
+
+}
 
 void QmitkTractbasedSpatialStatisticsView::CopyToClipboard()
 {

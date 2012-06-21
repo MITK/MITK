@@ -140,8 +140,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void CopyToClipboard();
 
-
-
+    void CopyToClipboardIndividuals();
 
 
   protected:

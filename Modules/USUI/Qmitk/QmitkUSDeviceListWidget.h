@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QmitkUSDeviceListWidget_H_INCLUDED
 #define _QmitkUSDeviceListWidget_H_INCLUDED
 
-#include "mitkUSUIExports.h"
+#include "MitkUSUIExports.h"
 #include "ui_QmitkUSDeviceListWidgetControls.h"
 #include "mitkUSDevice.h"
 #include <vector>

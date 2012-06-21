@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QmitkUSNewVideoDeviceWidget_H_INCLUDED
 #define _QmitkUSNewVideoDeviceWidget_H_INCLUDED
 
-#include "mitkUSUIExports.h"
+#include "MitkUSUIExports.h"
 #include "ui_QmitkUSNewVideoDeviceWidgetControls.h"
 #include "mitkUSVideoDevice.h"
 #include "mitkUSImageMetadata.h"

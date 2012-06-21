@@ -253,8 +253,11 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     return;
 
   }
+
+  static bool correctTilt = true;
+  correctTilt = !correctTilt; // toggle each time so we can compare real and correct image
       
-  DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), true, this->m_SeriesRestrictions); // true = group gantry tilt images
+  DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), correctTilt, this->m_SeriesRestrictions); // true = group gantry tilt images
   const unsigned int size = names_map.size();
 
   this->ResizeOutputs(size);
@@ -271,7 +274,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 
     MITK_INFO << "Reading series " << outputIndex << ": " << uid << std::endl;
 
-    if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node, true, true, true)) 
+    if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node, true, true, correctTilt)) 
     {
       std::string nodeName(uid);
       std::string studyDescription;

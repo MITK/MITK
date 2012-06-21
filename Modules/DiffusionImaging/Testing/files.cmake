@@ -5,7 +5,7 @@ SET(MODULE_CUSTOM_TESTS
   # mitkGibbsTrackingTest.cpp # deactivated until new tarball is available
 
   mitkTbssNrrdImageReaderTest.cpp
-  mitkTbssRoiNrrdImageReaderTest.cpp
+  #mitkTbssRoiNrrdImageReaderTest.cpp
   mitkTbssNrrdImageWriterTest.cpp
 )
 
@@ -14,3 +14,4 @@ set(MODULE_TESTS
 )
 
 
+git sta

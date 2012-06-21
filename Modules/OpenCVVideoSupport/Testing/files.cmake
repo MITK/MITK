@@ -9,5 +9,5 @@ set(MODULE_IMAGE_TESTS
 set(MODULE_TESTIMAGES
   Png2D-bw.png
   RenderingTestData/rgbImage.png
-NrrdWritingTestImage.jpg
+#NrrdWritingTestImage.jpg
 )

@@ -660,9 +660,14 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
         fromFirstToSecondOrigin = thisOrigin - lastDifferentOrigin;
         fromFirstToSecondOriginInitialized = true;
 
-        // Now make sure this direction is along the normal vector of the first slice
+        // Here we calculate if this slice and the previous one are well aligned,
+        // i.e. we test if the previous origin is on a line through the current
+        // origin, directed into the normal direction of the current slice.
+
         // If this is NOT the case, then we have a data set with a TILTED GANTRY geometry,
-        // which cannot be loaded into a single mitk::Image at the moment
+        // which cannot be simply loaded into a single mitk::Image at the moment.
+        // For this case, we flag this finding in the result and DicomSeriesReader
+        // can correct for that later.
 
         Vector3D right; right.Fill(0.0);
         Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point

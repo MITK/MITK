@@ -27,6 +27,9 @@
   ;Default installation folder
   InstallDir "@CPACK_NSIS_INSTALL_ROOT@\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
 
+  ;Allow for very long title on the welcome page
+  !define MUI_WELCOMEPAGE_TITLE_3LINES
+  
 ;--------------------------------
 ;General
 

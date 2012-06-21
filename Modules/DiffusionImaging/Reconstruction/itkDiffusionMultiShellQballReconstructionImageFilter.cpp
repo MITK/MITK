@@ -144,8 +144,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
       T0(i,j) = -log(E(i,j));
     }
   }
- // std::cout << "T0" <<std::endl;
-//  std::cout  << std::setprecision(6) << T0 << std::endl;
 
   //T0 = -T0.apply(std::log);
 
@@ -156,22 +154,14 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
     s0[i] = T0(i,0) + T0(i,1) + T0(i,2);
 
   }
-  //std::cout << "S0" <<std::endl;
-  //std::cout << std::setprecision(6) << s0 <<std::endl;
 
   for(int i = 0; i < E.rows(); i ++)
   {
     // Alle Signal-Werte auf der Ersten shell E(N,0) normiert auf s0
-    a0 = E(i,0) / s0[i];
+    a0[i] = T0(i,0) / s0[i];
     // Alle Signal-Werte auf der Zweiten shell E(N,1) normiert auf s0
-    b0 = E(i,1) / s0[i];
+    b0[i] = T0(i,1) / s0[i];
   }
-
-  std::cout << "a0" <<std::endl;
-  std::cout << std::setprecision(6) << a0 <<std::endl;
-
-  std::cout << "b0" <<std::endl;
-  std::cout << std::setprecision(6) << b0 <<std::endl;
 
   ta = a0 * 3.0;
   tb = b0 * 3.0;
@@ -204,7 +194,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
     B(i,5)=(bool)C(i,5) * (1.0/3.0+delta);
     B(i,6)=(bool)C(i,6) * b0(i);
   }
-
 
   for(int i = 0 ; i < E.rows(); i++)
   {
@@ -792,18 +781,14 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     double shell2b0Norm= (double)shell2b0 / (BZeroIndicies.size()/3);
     double shell3b0Norm= (double)shell3b0 / (BZeroIndicies.size()/3);
 
-    //MITK_INFO << "S1s0 :" << shell1b0;
-    //MITK_INFO << "S2s0 :" << shell2b0;
-    //MITK_INFO << "S3s0 :" << shell3b0;
     bzeroIterator.Set((shell1b0Norm + shell2b0Norm+ shell3b0Norm)/3);
     ++bzeroIterator;
 
     //if( (newb0 != 0) && (newb0 >= m_Threshold) )
     {
-
       // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
 
-      //fsl fix ---------------------------------------------------
+      ///fsl fix ---------------------------------------------------
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
       for(int i = 0 ; i < Shell2Indiecies.size(); i++)
@@ -844,15 +829,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       //Implements Eq. [19] and Fig. 4.
       Threshold(E);
-
-
-
       //inqualities [31]. Taking the lograithm of th first tree inqualities
       //convert the quadratic inqualities to linear ones.
       Projection1(E);
-
-      writeData(E,data1);
-
       for( unsigned int i = 0; i< m_MaxDirections; i++ )
       {
         E1 = E.get(i,0);
@@ -870,22 +849,34 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         alpha = A + B;
         beta = A - B;
 
-        lambda = 0.5 + 0.5 * std::sqrt(1 - std::pow((P * 2 ) / (alpha - beta), 2));;
-        ER1 = std::fabs(lambda * (alpha - beta) + (beta - E1 ))
-            + std::fabs(lambda * (std::pow(alpha, 2) - std::pow(beta, 2)) + (std::pow(beta, 2) - E2 ))
-            + std::fabs(lambda * (std::pow(alpha, 3) - std::pow(beta, 3)) + (std::pow(beta, 3) - E3 ));
-        ER2 = std::fabs((lambda-1) * (alpha - beta) + (beta - E1 ))
-            + std::fabs((lambda-1) * (std::pow(alpha, 2) - std::pow(beta, 2)) + (std::pow(beta, 2) - E2 ))
-            + std::fabs((lambda-1) * (std::pow(alpha, 3) - std::pow(beta, 3)) + (std::pow(beta, 3) - E3 ));
-
         PValues.put(i, P);
         AlphaValues.put(i, alpha);
         BetaValues.put(i, beta);
-        LAValues.put(i,(lambda * (ER1 < ER2)) + ((1-lambda) * (ER1 >= ER2)));
 
       }
 
       Projection2(PValues, AlphaValues, BetaValues);
+
+      for(int i = 0 ; i < m_MaxDirections; i++)
+      {
+        E1 = E.get(i,0);
+        E2 = E.get(i,1);
+        E3 = E.get(i,2);
+
+        const double fac = (PValues[i] * 2 ) / (AlphaValues[i] - BetaValues[i]);
+        lambda = 0.5 + 0.5 * std::sqrt(1 - fac * fac);;
+        ER1 = std::fabs(lambda * (AlphaValues[i] - BetaValues[i]) + (BetaValues[i] - E1 ))
+            + std::fabs(lambda * (AlphaValues[i] * AlphaValues[i] - BetaValues[i] * BetaValues[i]) + (BetaValues[i] * BetaValues[i] - E2 ))
+            + std::fabs(lambda * (AlphaValues[i] * AlphaValues[i] * AlphaValues[i] - BetaValues[i] * BetaValues[i] * BetaValues[i]) + (BetaValues[i] * BetaValues[i] * BetaValues[i] - E3 ));
+        ER2 = std::fabs((1-lambda) * (AlphaValues[i] - BetaValues[i]) + (BetaValues[i] - E1 ))
+            + std::fabs((1-lambda) * (AlphaValues[i] * AlphaValues[i] - BetaValues[i] * BetaValues[i]) + (BetaValues[i] * BetaValues[i] - E2 ))
+            + std::fabs((1-lambda) * (AlphaValues[i] * AlphaValues[i] * AlphaValues[i] - BetaValues[i] * BetaValues[i] * BetaValues[i]) + (BetaValues[i] * BetaValues[i] * BetaValues[i] - E3));
+        if(ER1 < ER2)
+          LAValues.put(i, lambda);
+        else
+          LAValues.put(i, 1-lambda);
+
+      }
 
       DoubleLogarithm(AlphaValues);
       DoubleLogarithm(BetaValues);
@@ -893,8 +884,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       vnl_vector<double> SignalVector(element_product((LAValues) , (AlphaValues)-(BetaValues)) + (BetaValues));
 
       vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
+
       // the first coeff is a fix value
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+      //MITK_INFO<< coeffs;
 
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
@@ -915,6 +908,9 @@ template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T, TG, TO, L, NODF>::
 ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<double> *SHBasisOutput, int LOrder , vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation, vnl_matrix<double>* SHEigenvalues)
 {
+
+ // MITK_INFO << *QBallReference;
+
   for(unsigned int i=0; i< (*SHBasisOutput).rows(); i++)
   {
     for(int k = 0; k <= LOrder; k += 2)
@@ -989,6 +985,14 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   // SHBasis-Matrix + LaplacianBaltrami-Matrix + SHOrderAssociationVector
   ComputeSphericalHarmonicsBasis(Q.get() ,SHBasisMatrix.get() , LOrder , LaplacianBaltrami.get(), SHOrderAssociation.get(), SHEigenvalues.get());
 
+
+  InverseMatrixDoublePtr sh_inv(new vnl_matrix_inverse<double>((*SHBasisMatrix)));
+  MatrixDoublePtr inv(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
+  (*inv) = sh_inv->inverse();
+  m_InverseSphericalHarmonicsBasisMatrix = new vnl_matrix<double>((*inv));
+
+  MITK_INFO << *m_InverseSphericalHarmonicsBasisMatrix;
+
   // Compute FunkRadon Transformation Matrix Associated to SHBasis Order lj
 
   for(int i=0; i<NumberOfCoeffs; i++)
@@ -1003,9 +1007,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   MatrixDoublePtr inverse(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   (*inverse) = pseudo_inv->inverse();
 
+
+
   // ODF Factor ( missing 1/4PI ?? )
   //const double factor = /*(1/4*QBALL_ANAL_RECON_PI) +*/ (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
-  const double factor = /*(1/4*QBALL_ANAL_RECON_PI) +*/ (2.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
+  const double factor = (2.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
   MatrixDoublePtr SignalReonstructionMatrix (new vnl_matrix<double>((*inverse) * (SHBasisMatrix->transpose())));
 
   m_CoeffReconstructionMatrix = new vnl_matrix<double>(( factor * ((*FRTMatrix) * ((*SHEigenvalues) * (*SignalReonstructionMatrix))) ));
@@ -1036,9 +1042,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 {
   for(int i = 0; i < refShell.size(); i++)
   {
-    double x = m_GradientDirectionContainer->ElementAt(refShell[i]).get(0);
-    double y = m_GradientDirectionContainer->ElementAt(refShell[i]).get(1);
-    double z = m_GradientDirectionContainer->ElementAt(refShell[i]).get(2);
+    double x = m_GradientDirectionContainer->ElementAt(refShell[i]).normalize().get(0);
+    double y = m_GradientDirectionContainer->ElementAt(refShell[i]).normalize().get(1);
+    double z = m_GradientDirectionContainer->ElementAt(refShell[i]).normalize().get(2);
     double cart[3];
     mitk::sh::Cart2Sph(x,y,z,cart);
     (*Q)(0,i) = cart[0];

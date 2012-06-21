@@ -173,6 +173,7 @@ private:
 
     //CoefficientMatrixType m_ReconstructionMatrix;
     CoefficientMatrixType m_CoeffReconstructionMatrix;
+    CoefficientMatrixType m_InverseSphericalHarmonicsBasisMatrix;
     CoefficientMatrixType m_ODFSphericalHarmonicBasisMatrix;
     //CoefficientMatrixType m_SignalReonstructionMatrix;
     //CoefficientMatrixType m_SHBasisMatrix;

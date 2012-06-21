@@ -113,49 +113,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>old</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QLabel" name="labelWarning">
-         <property name="styleSheet">
-          <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
-         </property>
-         <property name="text">
-          <string>Please select an image!</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="buttonPerformImageProcessing">
-         <property name="toolTip">
-          <string>Do image processing</string>
-         </property>
-         <property name="text">
-          <string>Do Something</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="spacer1">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>17</width>
-           <height>348</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
   </layout>

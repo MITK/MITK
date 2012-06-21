@@ -59,10 +59,17 @@ class UltrasoundSupport : public QmitkAbstractView
 
     void OnClickedViewDevice();
 
+    void DisplayImage();
+
   protected:
   
     virtual void SetFocus();
 
+    QTimer *m_Timer;
+
+    mitk::USDevice::Pointer m_Device;
+
+    mitk::DataNode::Pointer m_Node;
    
     // Not necessary?
     //const QList<mitk::DataNode::Pointer>& nodes );

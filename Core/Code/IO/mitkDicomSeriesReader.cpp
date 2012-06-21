@@ -1053,7 +1053,34 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfColumns );
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagPixelSpacing );
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagSliceThickness );
-  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagImageOrientation );
+  
+  // be a bit tolerant for orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
+  // NOT constructedID += CreateSeriesIdentifierPart( tagValueMap, tagImageOrientation );
+  try
+  {
+    bool conversionError(false);
+    Vector3D right; right.Fill(0.0);
+    Vector3D up; right.Fill(0.0);
+    DICOMStringToOrientationVectors( tagValueMap[tagImageOrientation], right, up, conversionError );
+    //string  newstring sprintf(simplifiedOrientationString, "%.3f\\%.3f\\%.3f\\%.3f\\%.3f\\%.3f", right[0], right[1], right[2], up[0], up[1], up[2]);
+    std::ostringstream ss;
+    ss.setf(std::ios::fixed, std::ios::floatfield);
+    ss.precision(5);
+    ss << right[0] << "\\"
+       << right[1] << "\\"
+       << right[2] << "\\"
+       << up[0] << "\\"
+       << up[1] << "\\"
+       << up[2];
+    std::string simplifiedOrientationString(ss.str());
+
+    constructedID += IDifyTagValue( simplifiedOrientationString );
+  }
+  catch (std::exception& e)
+  {
+    MITK_WARN << "Could not access tag " << tagImageOrientation << ": " << e.what();
+  }
+ 
 
   constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
 
@@ -1125,7 +1152,7 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
 bool 
 DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
 {
-  // make sure we habe Image Position and Orientation
+  // make sure we have Image Position and Orientation
   if ( ! ( 
       ds1.FindDataElement(gdcm::Tag(0x0020,0x0032)) &&
       ds1.FindDataElement(gdcm::Tag(0x0020,0x0037)) &&
@@ -1150,10 +1177,20 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
   image_pos2.Set(ds2);
   image_orientation2.Set(ds2);
 
-  if (image_orientation1 != image_orientation2)
+  /*
+     we tolerate very small differences in image orientation, since we got to know about
+     acquisitions where these values change across a single series (7th decimal digit)
+     (http://bugs.mitk.org/show_bug.cgi?id=12263)
+
+     still, we want to check if our assumption of 'almost equal' orientations is valid
+  */
+  for (unsigned int dim = 0; dim < 6; ++dim)
   {
-    MITK_ERROR << "Dicom images have different orientations.";
-    throw std::logic_error("Dicom images have different orientations. Call GetSeries() first to separate images.");
+    if ( fabs(image_orientation2[dim] - image_orientation1[dim] > 0.0001 ) )
+    {
+      MITK_ERROR << "Dicom images have different orientations.";
+      throw std::logic_error("Dicom images have different orientations. Call GetSeries() first to separate images.");
+    }
   }
 
   double normal[3];

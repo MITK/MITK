@@ -430,7 +430,10 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
     const Point3D& origin1, const Point3D& origin2,
     const Vector3D& right, const Vector3D& up,
     unsigned int numberOfSlicesApart)
-:m_NumberOfSlicesApart(numberOfSlicesApart)
+: m_ShiftUp(0.0)
+, m_ShiftRight(0.0)
+, m_ShiftNormal(0.0)
+, m_NumberOfSlicesApart(numberOfSlicesApart)
 {
   assert(numberOfSlicesApart);
   // determine if slice 1 (imagePosition1 and imageOrientation1) and slice 2 can be in one orthogonal slice stack:

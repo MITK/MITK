@@ -55,11 +55,6 @@ bool DicomSeriesReader::SliceGroupingAnalysisResult::ContainsGantryTilt()
   return m_GantryTilt;
 }
 
-Vector3D DicomSeriesReader::SliceGroupingAnalysisResult::GetInterSliceOffset()
-{
-  return m_InterSliceOffset;
-}
-
 void DicomSeriesReader::SliceGroupingAnalysisResult::AddFileToSortedBlock(const std::string& filename)
 {
   m_GroupedFiles.push_back( filename );
@@ -70,9 +65,8 @@ void DicomSeriesReader::SliceGroupingAnalysisResult::AddFileToUnsortedBlock(cons
   m_UnsortedFiles.push_back( filename );
 }
 
-void DicomSeriesReader::SliceGroupingAnalysisResult::FlagGantryTilt(Vector3D interSliceOffset)
+void DicomSeriesReader::SliceGroupingAnalysisResult::FlagGantryTilt()
 {
-  m_InterSliceOffset = interSliceOffset;
   m_GantryTilt = true;
 }
 
@@ -511,13 +505,15 @@ DicomSeriesReader::GantryTiltInformation::projectPointOnLine( Point3D p, Point3D
 ScalarType 
 DicomSeriesReader::GantryTiltInformation::GetTiltCorrectedAdditionalSize() const
 {
-  return int(m_ShiftUp + 1.0); // to next bigger int
-  }
+  // this seems to be a bit too much sometimes, but better too much than cutting off parts of the image
+  return int(m_ShiftUp + 1.0); // to next bigger int: plus 1, then cut off after point
+}
 
 ScalarType 
-DicomSeriesReader::GantryTiltInformation::GetMatrixCoefficientForCorrection() const
+DicomSeriesReader::GantryTiltInformation::GetMatrixCoefficientForCorrectionInWorldCoordinates() const
 {
-  return - m_ShiftUp / m_ShiftNormal;
+  // so many mm shifted per slice!
+  return m_ShiftUp / static_cast<ScalarType>(m_NumberOfSlicesApart);
 }
 
 ScalarType 
@@ -684,7 +680,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
           if ( groupImagesWithGantryTilt && tiltInfo.IsRegularGantryTilt() )
           {
-            result.FlagGantryTilt( fromFirstToSecondOrigin );
+            result.FlagGantryTilt();
             result.AddFileToSortedBlock(*fileIter); // this file is good for current block
             fileFitsIntoPattern = true;
           }

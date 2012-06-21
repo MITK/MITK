@@ -362,22 +362,55 @@ public:
 
 protected:
 
+  /**
+    \brief Return type of DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
+
+    Class contains the grouping result of method DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption,
+    which takes as input a number of images, which are all equally oriented and spatially sorted along their normal direction.
+
+    The result contains of two blocks: a first one is the grouping result, all of those images can be loaded
+    into one image block because they have an equal origin-to-origin distance without any gaps in-between. 
+  */
   class SliceGroupingAnalysisResult
   {
     public:
 
       SliceGroupingAnalysisResult();
 
+      /**
+        \brief Grouping result, all same origin-to-origin distance w/o gaps.
+      */
       StringContainer GetBlockFilenames();
-      StringContainer GetUnsortedFilenames();
       
+      /**
+        \brief Remaining files, which could not be grouped.
+      */
+      StringContainer GetUnsortedFilenames();
+  
+      /**
+        \brief Wheter or not the grouped result contain a gantry tilt.
+      */
       bool ContainsGantryTilt();
-      Vector3D GetInterSliceOffset();
 
+      /**
+        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+      */
       void AddFileToSortedBlock(const std::string& filename);
+     
+      /**
+        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+      */
       void AddFileToUnsortedBlock(const std::string& filename);
-      void FlagGantryTilt(Vector3D interSliceOffset);
+      
+      /**
+        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+        \todo Could make sense to enhance this with an instance of GantryTiltInformation to store the whole result!
+      */
+      void FlagGantryTilt();
 
+      /**
+        \brief Only meaningful for use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
+      */
       void UndoPrematureGrouping();
 
     protected:
@@ -386,32 +419,72 @@ protected:
       StringContainer m_UnsortedFiles;
 
       bool m_GantryTilt;
-
-      Vector3D m_InterSliceOffset;
   };
 
+  /**
+    \brief Gantry tilt analysis result.
+
+    Takes geometry information for two slices of a DICOM series and
+    calculates whether these fit into an orthogonal block or not.
+    If NOT, they can either be the result of an acquisition with
+    gantry tilt OR completly broken by some shearing transformation.
+
+    All calculations are done in the constructor, results can then
+    be read via the remaining methods.
+  */
   class GantryTiltInformation
   {
     public:
 
+      /**
+        \brief Just so we can create empty instances for assigning results later.
+      */
       GantryTiltInformation();
- 
+
+      /**
+        \brief THE constructor, which does all the calculations.
+
+        See code comments for explanation.
+      */
       GantryTiltInformation( const Point3D& origin1, 
                              const Point3D& origin2,
                              const Vector3D& right, 
                              const Vector3D& up,
                              unsigned int numberOfSlicesApart);
-      
+
+      /**
+        \brief Whether the slices were sheared.
+      */
       bool IsSheared() const;
+
+      /**
+        \brief Whether the shearing is a gantry tilt or more complicated.
+      */
       bool IsRegularGantryTilt() const;
 
-      ScalarType GetMatrixCoefficientForCorrection() const;
+      /**
+        \brief The offset distance in Y direction for each slice (describes the tilt result).
+      */
+      ScalarType GetMatrixCoefficientForCorrectionInWorldCoordinates() const;
+
+
+      /**
+        \brief The z / inter-slice spacing. Needed to correct ImageSeriesReader's result.
+      */
       ScalarType GetRealZSpacing() const;
 
+      /**
+        \brief The shift between first and last slice in mm.
+
+        Needed to resize an orthogonal image volume.
+      */
       ScalarType GetTiltCorrectedAdditionalSize() const;
 
     protected:
 
+      /**
+        \brief Projection of point p onto line through lineOrigin in direction of lineDirection.
+      */
       Point3D projectPointOnLine( Point3D p, Point3D lineOrigin, Vector3D lineDirection ); 
 
       ScalarType m_ShiftUp;
@@ -432,6 +505,8 @@ protected:
 
   /**
     \brief Ensure an equal z-spacing for a group of files.
+    
+    Takes as input a number of images, which are all equally oriented and spatially sorted along their normal direction.
 
     Internally used by GetSeries. Returns two lists: the first one contins slices of equal inter-slice spacing.
     The second list contains remaining files, which need to be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption again.

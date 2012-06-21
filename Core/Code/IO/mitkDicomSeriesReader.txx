@@ -396,18 +396,48 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   resampler->SetInput( input );
 
   /*
-     transform for a point is
+     Transform for a point is
       - transform from actual position to index coordinates
       - apply a shear that undoes the gantry tilt
       - transform back into world coordinates
 
-     anybody who does this in a simpler way: don't forget to write up how and why your solution works
+     Anybody who does this in a simpler way: don't forget to write up how and why your solution works
   */
   typedef itk::AffineTransform< double, ImageType::ImageDimension > TransformType;
   typename TransformType::Pointer transformShear = TransformType::New();
 
+  /**
+    What I think should be done here:
+
+    - apply a shear and spacing correction to the image block that corrects the ITK reader's error
+      - ITK ignores the shear and loads slices into an orthogonal volume
+      - ITK calculates the spacing from the origin distance, which is more than the actual spacing with gantry tilt images
+    - to undo the effect
+      - we have calculated some information in tiltInfo:
+        - the shift in Y direction that is added with each additional slice is the most important information
+        - the Y-shift is calculated in mm world coordinates
+      - we apply a shearing transformation to the ITK-read image volume
+        - to do this locally, 
+          - we transform the image volume back to origin and "normal" orientation by applying the inverse of its transform
+            - this should bring us into the image's "index coordinate" system
+          - we apply a shear with the Y-shift factor put into a unit transform at row 1, col 2
+            - we probably would need the shift factor in index coordinates but we use mm, which appears strange, see below
+          - we transform the image volume back to its actual position
+            - presumably back from index to world coordinates
+      - we lastly apply modify the image spacing in z direction by replacing this number with the correctly calulcated inter-slice distance
+
+    Here comes the unsolved PROBLEM:
+     - WHY is it correct to apply the shift factor in millimeters, when we assume we are in a index coordinate system?
+       - or why is it not millimeters but index coordinates?
+       - or what else is the wrong assumption here?
+     - This is a serious question to anybody very firm in transforms, ITK, etc.
+       - this is also a chocolate reward question. Provide a good explanation with corrected code as a git commit and get it.
+  */
+  
+  // ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];
+  ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates();
   // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
-  transformShear->Shear( 1, 2, tiltInfo.GetMatrixCoefficientForCorrection() ); 
+  transformShear->Shear( 1, 2, factor );
  
   typename TransformType::Pointer imageIndexToWorld = TransformType::New();
   imageIndexToWorld->SetOffset( input->GetOrigin().GetVectorFromOrigin() );
@@ -426,7 +456,12 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
   typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
   resampler->SetInterpolator( interpolator );
-  resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::min() ); // TODO minimum meaningful modality value?
+  /*
+     This would be the right place to invent a meaningful value for positions outside of the image.
+     For CT, HU -1000 might be meaningful, but a general solution seems not possible. Even for CT,
+     -1000 would only look natural for many not all images.
+  */
+  resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::min() );
   
   // adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
 
@@ -444,7 +479,6 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   typename ImageType::SpacingType correctedSpacing = result->GetSpacing();
   correctedSpacing[2] = tiltInfo.GetRealZSpacing();
   result->SetSpacing( correctedSpacing );
-
 
   return result;
 }

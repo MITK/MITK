@@ -13,5 +13,3 @@ set(MODULE_TESTS
   mitkFactoryRegistrationTest.cpp 
 )
 
-
-git sta

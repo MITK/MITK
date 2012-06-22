@@ -27,6 +27,9 @@ namespace mitk
 {
 
 /**
+  \deprecated This class is deprecated. Use mitkVtkImageOverwrite instead.
+  \sa mitkVtkImageOverwrite
+
   \brief Writes a 2D slice into a 3D image.
 
   \sa SegTool2D

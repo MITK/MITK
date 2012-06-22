@@ -715,17 +715,17 @@
         </property>
         <item>
          <property name="text">
-          <string>x - Axis</string>
+          <string>y-z-Plane</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>y - Axis</string>
+          <string>x-z-Plane</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>z - Axis</string>
+          <string>x-y-Plane</string>
          </property>
         </item>
        </widget>

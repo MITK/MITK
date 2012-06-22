@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkDiffusionFunctionCollection_h_
 
 
-//#include "MitkDiffusionImagingExports.h"
+#include "MitkDiffusionImagingExports.h"
 
 
 namespace mitk{
 
-class /*MitkDiffusionImaging_EXPORT*/ sh
+class MitkDiffusionImaging_EXPORT sh
 {
 public:
 static double factorial(int number);

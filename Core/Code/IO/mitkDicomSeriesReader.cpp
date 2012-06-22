@@ -1187,7 +1187,7 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
   */
   for (unsigned int dim = 0; dim < 6; ++dim)
   {
-    if ( fabs(image_orientation2[dim] - image_orientation1[dim] > 0.0001 ) )
+    if ( fabs(image_orientation2[dim] - image_orientation1[dim]) > 0.0001 )
     {
       MITK_ERROR << "Dicom images have different orientations.";
       throw std::logic_error("Dicom images have different orientations. Call GetSeries() first to separate images.");

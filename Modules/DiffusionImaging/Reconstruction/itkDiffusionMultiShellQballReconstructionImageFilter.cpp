@@ -784,7 +784,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     bzeroIterator.Set((shell1b0Norm + shell2b0Norm+ shell3b0Norm)/3);
     ++bzeroIterator;
 
-    //if( (newb0 != 0) && (newb0 >= m_Threshold) )
+    if( ((shell1b0Norm + shell2b0Norm+ shell3b0Norm)/3 != 0) && ((shell1b0Norm + shell2b0Norm+ shell3b0Norm)/3 >= m_Threshold) )
     {
       // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
 
@@ -887,11 +887,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       // the first coeff is a fix value
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
-      //MITK_INFO<< coeffs;
 
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
-      odf *= (QBALL_ANAL_RECON_PI*4/NODF);
+      odf *= ((QBALL_ANAL_RECON_PI*4)/NODF);
     }
 
     // set ODF to ODF-Image
@@ -959,9 +958,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
     itkExceptionMacro( << "At least (L+1)(L+2)/2 gradient directions for each shell are required; current : " << numberOfGradientDirections );
   }
 
-
   CheckDuplicateDiffusionGradients();
-
 
   const int LOrder = L;
   int NumberOfCoeffs = (int)(LOrder*LOrder + LOrder + 2.0)/2.0 + LOrder;
@@ -986,20 +983,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   ComputeSphericalHarmonicsBasis(Q.get() ,SHBasisMatrix.get() , LOrder , LaplacianBaltrami.get(), SHOrderAssociation.get(), SHEigenvalues.get());
 
 
-  InverseMatrixDoublePtr sh_inv(new vnl_matrix_inverse<double>((*SHBasisMatrix)));
-  MatrixDoublePtr inv(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
-  (*inv) = sh_inv->inverse();
-  m_InverseSphericalHarmonicsBasisMatrix = new vnl_matrix<double>((*inv));
-
-  MITK_INFO << *m_InverseSphericalHarmonicsBasisMatrix;
-
   // Compute FunkRadon Transformation Matrix Associated to SHBasis Order lj
 
   for(int i=0; i<NumberOfCoeffs; i++)
   {
     (*FRTMatrix)(i,i) = 2.0 * M_PI * mitk::sh::legendre0((*SHOrderAssociation)[i]);
   }
-  //ComputeFunkRadonTransformationMatrix(SHOrderAssociation.get() ,FRTMatrix.get());
 
   MatrixDoublePtr temp(new vnl_matrix<double>(((SHBasisMatrix->transpose()) * (*SHBasisMatrix)) + (m_Lambda  * (*LaplacianBaltrami))));
 
@@ -1007,13 +996,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   MatrixDoublePtr inverse(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   (*inverse) = pseudo_inv->inverse();
 
-
-
-  // ODF Factor ( missing 1/4PI ?? )
-  //const double factor = /*(1/4*QBALL_ANAL_RECON_PI) +*/ (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
-  const double factor = (2.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
+  const double factor = (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
   MatrixDoublePtr SignalReonstructionMatrix (new vnl_matrix<double>((*inverse) * (SHBasisMatrix->transpose())));
-
   m_CoeffReconstructionMatrix = new vnl_matrix<double>(( factor * ((*FRTMatrix) * ((*SHEigenvalues) * (*SignalReonstructionMatrix))) ));
 
 

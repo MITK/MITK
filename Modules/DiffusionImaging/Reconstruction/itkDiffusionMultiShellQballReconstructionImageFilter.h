@@ -104,16 +104,14 @@ public:
     void Normalize(OdfPixelType & odf );
 
     void S_S0Normalization( vnl_vector<double> & vec, double b0  = 0 );
-    void S_S0Normalization( vnl_matrix<double> & mat, double b0  = 0 );
 
     void DoubleLogarithm(vnl_vector<double> & vec);
 
-    void Threshold(vnl_vector<double> & vec, double delta = 0.01);
-    void Threshold(vnl_matrix<double> & mat, double delta = 0.01);
+    void Projection1(vnl_vector<double> & vec, double delta = 0.01);
     double CalculateThreashold(const double value, const double delta);
 
-    void Projection1( vnl_matrix<double> & mat, double delta = 0.01);
-    void Projection2( vnl_vector<double> & A, vnl_vector<double> & alpha, vnl_vector<double> & beta, double delta = 0.01);
+    void Projection2( vnl_vector<double> & E1, vnl_vector<double> & E2, vnl_vector<double> & E3, double delta = 0.01);
+    void Projection3( vnl_vector<double> & A, vnl_vector<double> & alpha, vnl_vector<double> & beta, double delta = 0.01);
 
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this
@@ -177,8 +175,6 @@ private:
     //CoefficientMatrixType m_SignalReonstructionMatrix;
     //CoefficientMatrixType m_SHBasisMatrix;
 
-    vnl_vector<double> * m_scalingFactors;
-
     /** container to hold gradient directions */
     GradientDirectionContainerType::Pointer m_GradientDirectionContainer;
 
@@ -231,9 +227,6 @@ private:
 
     void ComputeSphericalFromCartesian(vnl_matrix<double> * Q, const IndiciesVector & refShell);
 
-    void writeData(const vnl_matrix<double> & mat, std::ofstream &);
-
-    std::ofstream data1, data2, data3;
 
 };
 

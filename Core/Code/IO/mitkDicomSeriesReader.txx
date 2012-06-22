@@ -22,17 +22,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageSeriesReader.h>
 #include <mitkProperties.h>
 
+#include <itkResampleImageFilter.h>
+#include <itkAffineTransform.h>
+#include <itkLinearInterpolateImageFunction.h>
+
+#include <limits>
+
 namespace mitk
 {
 
 template <typename PixelType>
-void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, UpdateCallBackMethod callback)
+void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback)
 {
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );
   std::locale l( "C" );
   std::cin.imbue(l);
+  
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+  const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
 
   try
   {
@@ -52,13 +61,52 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       bool canLoadAs4D(true);
       gdcm::Scanner scanner;
       ScanForSliceInformation(filenames, scanner);
+   
+      // need non-const access for map
+      gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(scanner.GetMappings());
       
-      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, scanner.GetMappings(), sort, canLoadAs4D );
+      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
+
+      GantryTiltInformation tiltInfo;
+ 
+      // check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible
+      if ( !imageBlocks.empty() && imageBlocks.front().size() > 1 && correctTilt)
+      {
+        // check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
+        // check first and last position slice from tags, make some calculations to detect tilt
+
+        std::string firstFilename(imageBlocks.front().front()); 
+        // calculate from first and last slice to minimize rounding errors
+        std::string secondFilename(imageBlocks.front().back());
+
+        std::string imagePosition1(    ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImagePositionPatient ] ) );
+        std::string imageOrientation( ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImageOrientation ] ) );
+        std::string imagePosition2(    ConstCharStarToString( tagValueMappings[secondFilename.c_str() ][ tagImagePositionPatient ] ) );
+      
+        bool ignoredConversionError(-42); // hard to get here, no graceful way to react
+        Point3D origin1( DICOMStringToPoint3D( imagePosition1, ignoredConversionError ) );
+        Point3D origin2( DICOMStringToPoint3D( imagePosition2, ignoredConversionError ) );
+      
+        Vector3D right; right.Fill(0.0);
+        Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
+        DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
+
+        tiltInfo = GantryTiltInformation ( origin1, origin2, right, up, filenames.size()-1 );
+        correctTilt = tiltInfo.IsSheared() && tiltInfo.IsRegularGantryTilt();
+
+        MITK_DEBUG << "** Loading now: shear? " << tiltInfo.IsSheared();
+        MITK_DEBUG << "** Loading now: normal tilt? " << tiltInfo.IsRegularGantryTilt();
+        MITK_DEBUG << "** Loading now: perform tilt correction? " << correctTilt;
+      }
+      else
+      {
+        correctTilt = false; // we CANNOT do that
+      }
 
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
-        image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
+        image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, command ); // load first 3D block
         initialize_node = true;
       }
       else if (volume_count > 1)
@@ -82,8 +130,16 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
         reader->SetFileNames(imageBlocks.front());
         reader->Update();
-        image->InitializeByItk(reader->GetOutput(), 1, volume_count);
-        image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
+
+        typename ImageType::Pointer readVolume = reader->GetOutput();
+        // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
+        if (correctTilt)
+        {
+          readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+        }
+
+        image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
+        image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
 
         gdcm::Scanner scanner;
         ScanForSliceInformation(filenames, scanner);
@@ -116,16 +172,24 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         {
           reader->SetFileNames(*df_it);
           reader->Update();
-          image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), act_volume++);
+          readVolume = reader->GetOutput();
+          
+          if (correctTilt)
+          {
+            readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+          }
+
+          image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
         }
         
         initialize_node = true;
       }
+   
     }
 
-	if (initialize_node)
-	{
-	  // forward some image properties to node
+    if (initialize_node)
+    {
+      // forward some image properties to node
       node.GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
 
       node.SetData( image );
@@ -144,7 +208,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 }
 
 template <typename PixelType>
-Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, CallbackCommand* command )
+Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, CallbackCommand* command )
 {
   /******** Normal Case, 3D (also for GDCM < 2 usable) ***************/
   mitk::Image::Pointer image = mitk::Image::New();
@@ -165,8 +229,16 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 
   reader->SetFileNames(filenames);
   reader->Update();
-  image->InitializeByItk(reader->GetOutput());
-  image->SetImportVolume(reader->GetOutput()->GetBufferPointer());
+  typename ImageType::Pointer readVolume = reader->GetOutput();
+
+  // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
+  if (correctTilt)
+  {
+    readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+  }
+  
+  image->InitializeByItk(readVolume.GetPointer());
+  image->SetImportVolume(readVolume->GetBufferPointer());
 
   gdcm::Scanner scanner;
   ScanForSliceInformation(filenames, scanner);
@@ -202,6 +274,9 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
 {
   const gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
   scanner.AddTag(ippTag);
+  
+  const gdcm::Tag tagImageOrientation(0x0020,0x0037); //Image orientation
+  scanner.AddTag(tagImageOrientation);
 
   // TODO what if tags don't exist?
   const gdcm::Tag tagSliceLocation(0x0020, 0x1041); // slice location
@@ -311,6 +386,103 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
 
   return imageBlocks;
 }
+
+template <typename ImageType>
+typename ImageType::Pointer
+DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo )
+{
+  typedef itk::ResampleImageFilter<ImageType,ImageType> ResampleFilterType;
+  typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+  resampler->SetInput( input );
+
+  /*
+     Transform for a point is
+      - transform from actual position to index coordinates
+      - apply a shear that undoes the gantry tilt
+      - transform back into world coordinates
+
+     Anybody who does this in a simpler way: don't forget to write up how and why your solution works
+  */
+  typedef itk::AffineTransform< double, ImageType::ImageDimension > TransformType;
+  typename TransformType::Pointer transformShear = TransformType::New();
+
+  /**
+    What I think should be done here:
+
+    - apply a shear and spacing correction to the image block that corrects the ITK reader's error
+      - ITK ignores the shear and loads slices into an orthogonal volume
+      - ITK calculates the spacing from the origin distance, which is more than the actual spacing with gantry tilt images
+    - to undo the effect
+      - we have calculated some information in tiltInfo:
+        - the shift in Y direction that is added with each additional slice is the most important information
+        - the Y-shift is calculated in mm world coordinates
+      - we apply a shearing transformation to the ITK-read image volume
+        - to do this locally, 
+          - we transform the image volume back to origin and "normal" orientation by applying the inverse of its transform
+            - this should bring us into the image's "index coordinate" system
+          - we apply a shear with the Y-shift factor put into a unit transform at row 1, col 2
+            - we probably would need the shift factor in index coordinates but we use mm, which appears strange, see below
+          - we transform the image volume back to its actual position
+            - presumably back from index to world coordinates
+      - we lastly apply modify the image spacing in z direction by replacing this number with the correctly calulcated inter-slice distance
+
+    Here comes the unsolved PROBLEM:
+     - WHY is it correct to apply the shift factor in millimeters, when we assume we are in a index coordinate system?
+       - or why is it not millimeters but index coordinates?
+       - or what else is the wrong assumption here?
+     - This is a serious question to anybody very firm in transforms, ITK, etc.
+       - this is also a chocolate reward question. Provide a good explanation with corrected code as a git commit and get it.
+  */
+  
+  // ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];
+  ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates();
+  // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
+  transformShear->Shear( 1, 2, factor );
+ 
+  typename TransformType::Pointer imageIndexToWorld = TransformType::New();
+  imageIndexToWorld->SetOffset( input->GetOrigin().GetVectorFromOrigin() );
+  imageIndexToWorld->SetMatrix( input->GetDirection() );
+  
+  typename TransformType::Pointer imageWorldToIndex = TransformType::New();
+  imageIndexToWorld->GetInverse( imageWorldToIndex );
+  
+  typename TransformType::Pointer gantryTiltCorrection = TransformType::New();
+  gantryTiltCorrection->Compose( imageWorldToIndex );
+  gantryTiltCorrection->Compose( transformShear );
+  gantryTiltCorrection->Compose( imageIndexToWorld );
+  
+  resampler->SetTransform( gantryTiltCorrection );
+
+  typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
+  typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+  resampler->SetInterpolator( interpolator );
+  /*
+     This would be the right place to invent a meaningful value for positions outside of the image.
+     For CT, HU -1000 might be meaningful, but a general solution seems not possible. Even for CT,
+     -1000 would only look natural for many not all images.
+  */
+  resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::min() );
+  
+  // adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
+
+  resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
+
+  typename ImageType::SizeType largerSize = resampler->GetSize(); // now the resampler already holds the input image's size.
+  largerSize[1] += tiltInfo.GetTiltCorrectedAdditionalSize();
+  resampler->SetSize( largerSize );
+
+  resampler->Update();
+  typename ImageType::Pointer result = resampler->GetOutput();
+
+  // ImageSeriesReader calculates z spacing as the distance between the first two origins.
+  // This is not correct in case of gantry tilt, so we set our calculated spacing.
+  typename ImageType::SpacingType correctedSpacing = result->GetSpacing();
+  correctedSpacing[2] = tiltInfo.GetRealZSpacing();
+  result->SetSpacing( correctedSpacing );
+
+  return result;
+}
+
 
 }
 

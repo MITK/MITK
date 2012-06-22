@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>350</width>
-    <height>385</height>
+    <height>844</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -169,7 +169,7 @@
       <item>
        <widget class="QComboBox" name="m_QBallReconstructionMethodComboBox">
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <item>
          <property name="text">
@@ -201,6 +201,11 @@
           <string>Raw Signal only (SH)</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Mulit q-Ball (SH)</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
@@ -230,6 +235,23 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_QBallSelectionBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Multi q-Ball reconstruction</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2"/>
     </widget>
    </item>
    <item>

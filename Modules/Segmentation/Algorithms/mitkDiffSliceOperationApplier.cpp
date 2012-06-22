@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "DiffSliceOperationApplier.h"
+#include "mitkDiffSliceOperationApplier.h"
 #include "mitkRenderingManager.h"
 #include <vtkSmartPointer.h>
 

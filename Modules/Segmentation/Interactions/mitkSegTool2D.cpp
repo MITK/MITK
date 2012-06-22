@@ -43,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
 
-#include <DiffSliceOperationApplier.h>
+#include <mitkDiffSliceOperationApplier.h>
 #include "mitkOperationEvent.h"
 #include "mitkUndoController.h"
 

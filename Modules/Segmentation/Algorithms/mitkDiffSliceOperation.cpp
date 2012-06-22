@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "DiffSliceOperation.h"
+#include "mitkDiffSliceOperation.h"
 
 #include <itkCommand.h>
 

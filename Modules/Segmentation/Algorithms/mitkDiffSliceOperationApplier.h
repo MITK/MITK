@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include <mitkOperationActor.h>
 
-#include "DiffSliceOperation.h"
+#include "mitkDiffSliceOperation.h"
 #include <mitkExtractSliceFilter.h>
 #include <mitkVtkImageOverwrite.h>
 

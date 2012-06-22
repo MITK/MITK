@@ -110,13 +110,13 @@ Each test case is translated into a CTest test which evaluates the return value 
 
 \section PageDICOMLoadingTests_testcases Implemented test cases
 
-From test set TinyCTAbdomen (see description.txt in this directory for details on test images):
+From test set \b TinyCTAbdomen (see description.txt in this directory for details on test images):
 
  - singleslice : just a single slice (should work and contain meaningful spacing)
  - two_slices : two slices, spacing should be calculated correctly
  - all : load a "normal" series as a single 3D block
  - 3D_and_T : load a small set of slices with multiple time-steps
- - diff_orientation : load a set of files containing two differently oriented image blocks
+ - diff_orientation : load a set of files containing two differently oriented image blocks; at least two images (110,111) have minor errors in small decimal digits
  - diff_orientation_gaps : load a set of files containing two differently oriented image blocks, each missing slices, so blocks must be split
  - diff_spacing : load a set of files containint two set of slices with different spacings
  - gap : load slices that cannot form a single 3D block, because single slices are missing
@@ -125,6 +125,10 @@ From test set TinyCTAbdomen (see description.txt in this directory for details o
  - single_negative_spacing : from reported bug related to single MR images with misleading spacing information
  - tilted_gantry : slice origins do not align along first slice normal (happens with tilted gantries)
  - interleaved : two volumes of slices with origins along the same line. The volumes' slices interleave in their border region. This test is meant to correctly sort apart the two blocks instead of generating many two-slices groups in the interleaved region.
+
+From test set \b TiltHead (see description.txt in this directory for details on test images):
+ 
+ - head_ct_tilt : load a series with gantry tilt and check its orientation
 
 
 \section DICOMTesting_othertests Specific other tests

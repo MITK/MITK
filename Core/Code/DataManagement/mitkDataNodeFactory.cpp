@@ -254,7 +254,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 
   }
       
-  DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), this->m_SeriesRestrictions);
+  DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), true, this->m_SeriesRestrictions); // true = group gantry tilt images
   const unsigned int size = names_map.size();
 
   this->ResizeOutputs(size);
@@ -271,7 +271,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 
     MITK_INFO << "Reading series " << outputIndex << ": " << uid << std::endl;
 
-    if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node))
+    if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node, true, true, true)) 
     {
       std::string nodeName(uid);
       std::string studyDescription;

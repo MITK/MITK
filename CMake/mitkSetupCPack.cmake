@@ -23,6 +23,16 @@ if(NOT CPACK_GENERATOR)
   endif()
 endif(NOT CPACK_GENERATOR)
 
+# On windows set default install directory appropriately for 32 and 64 bit 
+# installers if not already set
+if(WIN32 AND NOT CPACK_NSIS_INSTALL_ROOT)
+  if(CMAKE_CL_64) 
+    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64") 
+  else()
+    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES") 
+  endif()
+endif()
+
 # include required mfc libraries
 include(InstallRequiredSystemLibraries)
 

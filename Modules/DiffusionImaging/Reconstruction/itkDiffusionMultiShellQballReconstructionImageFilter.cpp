@@ -220,7 +220,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 ::Projection2( vnl_vector<double> & A, vnl_vector<double> & a, vnl_vector<double> & b, double delta0)
 {
 
-  const double s6 = sqrt(6);
+  const double s6 = sqrt(6.0);
   const double s15 = s6/2.0;
 
   vnl_vector<double> delta(a.size());

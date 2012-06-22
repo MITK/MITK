@@ -980,11 +980,6 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
 
 }
 
-mitk::DiffusionImage<DiffusionPixelType>::BValueMap GenerateBValueMapFromGui(std::string nodename)
-{
-
-}
-
 void QmitkQBallReconstructionView::SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name)
 {
   node->SetProperty( "ShowMaxNumber", mitk::IntProperty::New( 500 ) );

@@ -66,8 +66,8 @@ public:
     /** Container to hold gradient directions of the 'n' DW measurements */
     typedef VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
 
-    typedef std::map<double, std::vector<unsigned int> > GradientIndexMap;
-    typedef std::map<double, std::vector<unsigned int> >::iterator GradientIndexMapIteraotr;
+    typedef std::map<double, std::vector<unsigned int> > BValueMap;
+    typedef std::map<double, std::vector<unsigned int> >::iterator BValueMapIteraotr;
     typedef std::vector<unsigned int> IndiciesVector;
 
     // --------------------------------------------------------------------------------------------//
@@ -129,6 +129,8 @@ public:
 
     itkGetConstReferenceMacro( BValue, TOdfPixelType);
 
+    void SetBValueMap(BValueMap map){this->m_BValueMap = map;}
+
 
 protected:
     DiffusionMultiShellQballReconstructionImageFilter();
@@ -184,7 +186,7 @@ private:
 
     typename BZeroImageType::Pointer m_BZeroImage;
 
-    GradientIndexMap m_GradientIndexMap;
+    BValueMap m_BValueMap;
 
     double m_Lambda;
 
@@ -201,7 +203,19 @@ private:
     template< class VNLType >
     void printMatrix( VNLType * mat );
 
+    //------------------------- VNL-function ------------------------------------
 
+
+    template<typename CurrentValue, typename WntValue>
+    static vnl_vector< WntValue> element_cast (vnl_vector< CurrentValue> const& v1)
+    {
+      vnl_vector<WntValue> result(v1.size());
+
+      for(int i = 0 ; i < v1.size(); i++)
+           result[i] = static_cast< WntValue>(v1[i]);
+
+      return result;
+    }
 
 };
 

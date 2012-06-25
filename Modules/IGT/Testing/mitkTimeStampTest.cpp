@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <time.h>
 
+#ifndef WIN32
+#include <unistd.h>
+#endif
+
 
 
 /**

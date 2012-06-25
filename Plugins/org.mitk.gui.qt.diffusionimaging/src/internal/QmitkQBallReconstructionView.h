@@ -33,6 +33,8 @@ typedef short DiffusionPixelType;
 
 struct QbrSelListener;
 
+struct QbrShellSelection;
+
 /*!
  * \ingroup org_mitk_gui_qt_qballreconstruction_internal
  *
@@ -46,6 +48,8 @@ class QmitkQBallReconstructionView : public QmitkFunctionality
 {
 
   friend struct QbrSelListener;
+
+  friend struct QbrShellSelection;
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
@@ -92,6 +96,7 @@ protected slots:
 
   void NumericalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
   void AnalyticalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
+  void MultiQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
 protected:
 
@@ -106,11 +111,22 @@ protected:
   void TemplatedAnalyticalQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,
     float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, int normalization);
 
+  template<int L>
+  void TemplatedMultiQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,
+    float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes);
+
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
+
+  //void Create
 
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
+
+private:
+
+  std::map< std::string, QbrShellSelection * > m_ShellSelectorMap;
+  void GenerateShellSelectionUI(mitk::DataStorage::SetOfObjects::Pointer set);
 };
 
 

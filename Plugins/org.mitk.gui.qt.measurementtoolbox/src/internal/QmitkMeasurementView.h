@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_MEASUREMENT_H__INCLUDED
 #define QMITK_MEASUREMENT_H__INCLUDED
 
+/*
 #include <berryIPartListener.h>
 #include <berryISelection.h>
 #include <berryISelectionProvider.h>
@@ -30,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorageSelection.h>
 #include <mitkIZombieViewPart.h>
 
-#include <QmitkAbstractView.h>
-
 class QmitkPlanarFiguresTableModel;
 class QGridLayout;
 class QMainWindow;
@@ -44,7 +43,17 @@ class QPushButton;
 
 class vtkRenderer;
 class vtkCornerAnnotation;
+*/
 
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
+
+/// forward declarations
+struct QmitkMeasurementViewData;
+namespace mitk
+{
+  class PlanarFigure;
+}
 
 ///
 /// A view for doing measurements in digital images by means of
@@ -54,10 +63,54 @@ class vtkCornerAnnotation;
 /// 2. A textbrowser which shows details for the selected PlanarFigures
 /// 3. A button for copying all details to the clipboard
 ///
-class QmitkMeasurementView : public QmitkAbstractView, public mitk::IZombieViewPart
+class QmitkMeasurementView : public QmitkAbstractView
 {
   Q_OBJECT
+  
+  public:
 
+    static const std::string VIEW_ID;
+    QmitkMeasurementView();
+    virtual ~QmitkMeasurementView();
+
+    void CreateQtPartControl(QWidget* parent);
+    void SetFocus();
+
+    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, 
+      const QList<mitk::DataNode::Pointer> &nodes);
+
+    void NodeAdded(const mitk::DataNode* node);
+    void NodeChanged(const mitk::DataNode* node);
+    void NodeRemoved(const mitk::DataNode* node);
+
+    void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
+  protected slots:
+    ///# draw actions
+    void ActionDrawLineTriggered( bool checked = false );
+    void ActionDrawPathTriggered( bool checked = false );
+    void ActionDrawAngleTriggered( bool checked = false );
+    void ActionDrawFourPointAngleTriggered( bool checked = false );
+    void ActionDrawEllipseTriggered( bool checked = false );
+    void ActionDrawRectangleTriggered( bool checked = false );
+    void ActionDrawPolygonTriggered( bool checked = false );
+    void CopyToClipboard( bool checked = false );
+
+  private:
+    void CreateConnections();
+    mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
+    void UpdateMeasurementText();
+    void AddAllInteractors();
+    void RemoveAllInteractors();
+    mitk::DataNode::Pointer DetectTopMostVisibleImage();
+    void EnableCrosshairNavigation();
+    void DisableCrosshairNavigation();
+    void PlanarFigureInitialized();
+    void CheckForTopMostVisibleImage(mitk::DataNode* _NodeToNeglect=0);
+
+    QmitkMeasurementViewData* d;
+};
+
+/*
   public:
     ///
     /// Just a shortcut
@@ -74,7 +127,6 @@ class QmitkMeasurementView : public QmitkAbstractView, public mitk::IZombieViewP
     ///
     virtual ~QmitkMeasurementView();
 
-    static const std::string VIEW_ID;
 
   public:
     ///
@@ -163,9 +215,6 @@ class QmitkMeasurementView : public QmitkAbstractView, public mitk::IZombieViewP
     // fields
   // widgets
 protected:
-  QWidget* m_Parent;
-  QGridLayout* m_Layout;
-  QLabel* m_SelectedImage;
   QAction* m_DrawLine;
   QAction* m_DrawPath;
   QAction* m_DrawAngle;
@@ -214,8 +263,8 @@ protected:
   QmitkRenderWindow* m_LastRenderWindow;
 
   private:
+    void RemoveEndPlacementObserverTag();
  mitk::DataNode::Pointer DetectTopMostVisibleImage();
-
-};
+ */
 
 #endif // QMITK_MEASUREMENT_H__INCLUDED

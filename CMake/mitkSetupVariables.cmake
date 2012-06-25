@@ -6,7 +6,7 @@ set(LIBPOSTFIX "")
 
 # MITK_VERSION
 set(MITK_VERSION_MAJOR "2012")
-set(MITK_VERSION_MINOR "02")
+set(MITK_VERSION_MINOR "06")
 set(MITK_VERSION_PATCH "99")
 set(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}")
 if(MITK_VERSION_PATCH STREQUAL "99")
@@ -39,7 +39,6 @@ endforeach()
      #${VTK_INCLUDE_DIRS}
 #    )
      
-#foreach(d Utilities Utilities/ipPic Utilities/IIL4MITK Utilities/pic2vtk Utilities/tinyxml Utilities/mbilog)
 foreach(d Utilities Utilities/ipPic Utilities/pic2vtk Utilities/tinyxml Utilities/mbilog)
   list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${d})
 endforeach()
@@ -85,7 +84,6 @@ set(MITK_LIBRARIES
     ${MITK_CORE_LIBRARIES}
     ${LIBRARIES_FOR_MITK_CORE}
     pic2vtk
-    #IIL4MITK
     ipSegmentation
     ann 
    )

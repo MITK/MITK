@@ -92,6 +92,12 @@ namespace mitk
     return ErrorText(this->m_PMDRes);
   }
 
+  bool ToFCameraPMDController::GetDistances(char* sourceData, float* distanceArray)
+  {
+    this->m_PMDRes = pmdCalcDistances(m_PMDHandle, distanceArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    return ErrorText(this->m_PMDRes);
+  }
+
   bool ToFCameraPMDController::GetSourceData(char* sourceDataArray)
   {
     this->m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &m_DataDescription);
@@ -110,12 +116,6 @@ namespace mitk
     ErrorText( this->m_PMDRes);
      this->m_PMDRes = pmdGetSourceData(m_PMDHandle,sourceData,m_DataDescription.size);
     return ErrorText( this->m_PMDRes);
-  }
-
-  bool ToFCameraPMDController::GetDistances(char* sourceData, float* distanceArray)
-  {
-    this->m_PMDRes = pmdCalcDistances(m_PMDHandle, distanceArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
-    return ErrorText(this->m_PMDRes);
   }
 
   int ToFCameraPMDController::SetIntegrationTime(unsigned int integrationTime)

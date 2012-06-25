@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,8 +27,7 @@ namespace itk{
 
   template< class OutputImageType >
   TractsToRgbaImageFilter< OutputImageType >::TractsToRgbaImageFilter()
-    : m_BinaryOutput(false)
-    , m_InvertImage(false)
+    : m_InvertImage(false)
     , m_UpsamplingFactor(1)
     , m_InputImage(NULL)
     , m_UseImageGeometry(false)
@@ -123,7 +122,7 @@ namespace itk{
         minSpacing = newSpacing[2];
 
     m_FiberBundle = m_FiberBundle->GetDeepCopy();
-    m_FiberBundle->ResampleFibers(minSpacing/10);
+    m_FiberBundle->ResampleFibers(minSpacing);
 
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
     vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();

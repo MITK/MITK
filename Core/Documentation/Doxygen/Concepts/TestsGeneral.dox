@@ -1,0 +1,93 @@
+/**
+\page GeneralTests General: Tests in MITK
+
+Two types of standardizes automated tests are provided by MITK. These types are <B> unit tests </B> and <B> rendering tests </B>. This section will describe unit testing in MITK, while more information on rendering tests can be found in the section \ref RenderingTests.
+
+-# \ref GeneralTestsSection1 "Basic Information on Unit Testing"
+-# \ref GeneralTestsSection2 "Adding a Unit Test to MITK"
+ -# \ref GeneralTestsSection2_1 "Structure your test method"
+-# \ref GeneralTestsSection3 "Run a Unit Test with MITK"
+-# \ref GeneralTestsSection4 "MITK Testing Macros"
+
+\section GeneralTestsSection1 Basic Information on Unit Testing
+
+The basic idea about unit testing is to write a test for every class (unit) of your software. The test should then run all methods of the tested class and check if the results are correct. Thus, the testing environment for MITK allows for simple implementation of corresponding test methods for MITK classes. 
+
+The build system of MITK generates a test driver which includes all tests that have been added to the project. Alternativly you can run MITK tests by using the program ctest. This is the way all MITK tests run on the continous dart clients of MITK. The results of these runs can be found at http://cdash.mitk.org.
+
+The following sections will explain how to write your own tests with MITK and how to run them. The last section will describe the testing macros of MITK in detail.
+
+\section GeneralTestsSection2 Adding a Unit Test to MITK
+
+To add a test, you simply need to create a new file "mitkMyTest.cpp" in the folder "Testing" of the software module to which you want to add the test. The file must contain such a method: \code int mitkMyTest(int argc, char* argv[]) \endcode This method is automatically called by the test driver. A header file to this cpp file is not needed. An example for a simple test method is shown next.
+
+\code
+int mitkMyTest(int argc, char* argv[])
+{
+  MITK_TEST_BEGIN("MyTest");
+  MITK_TEST_CONDITION_REQUIRED(true,"Here we test our condition");
+  MITK_TEST_END();
+}
+\endcode
+
+Additionaly you've to add the test file to the files.cmake of your testing directory. In the files.cmake you'll find a command "SET(MODULE_TESTS [...])", this is where you've to add the filename of your test. This will add your test to the test driver. A possible files.cmake where a test have already been added is shown next. 
+\code
+SET(MODULE_TESTS
+  mitkMyTest.cpp
+  [...]
+)
+\endcode
+Finally you only have to run cmake one your project and then compile the test driver. Don't forget to turn "BUILD_TESTING" on, when running cmake.
+
+\subsection GeneralTestsSection2_1 Structure your test method
+
+When implementing more complex test methods you might want to structure them, e.g. by using sub methods. This is also possible. You can create a test class and add static methods which can then be called in your main test method. This is a simple way to keep a clear structure in your test file. An example for such a structured test file is shown next.
+
+\code
+//first: your test class with static methods, if it comes before the main test method
+//       like shown here, you still don't need a header and you can keep your code as
+//       simple as possible
+class mitkMyTestClass
+{
+public:
+
+  static void TestInstantiation()
+  {
+  //do your instantiation test here
+  }
+  
+  static void TestMethod1()
+  {
+  //do a test of method 1 here
+  }
+};//do not forget the semicolon at this place!
+
+//secondly: your main test method
+int mitkMyTest(int argc, char* argv[])
+{
+  MITK_TEST_BEGIN("MyTest");
+  mitkMyTestClass.TestInstantiation();
+  mitkMyTestClass.TestMethod1();
+  MITK_TEST_END();
+}
+\endcode
+
+\section GeneralTestsSection3 Run a Unit Test with MITK
+
+After building and compiling MITK, there are two ways to run your test. Firstly, you can run your test using the executable test driver. Secondly, you can use the external program ctest. 
+
+If you use the test driver, you only need to start the executable. If you start it without parameters, it will then give you an overview of all tests which are included in this test driver and you can choose one by typing a number. 
+
+\note This way you can not set additional input, such as images.
+
+Alternatively you can give your test driver the name of your test as parameter. Then this test will be started directly. You are also allowed to give more parameters which are then given to the main test method as parameters (argv[]).
+
+If you want to use ctest instead of the test driver you need to start a command line, go to the binary directory of MITK and call ctest. To avoid errors, check if your path variable contains all relevant paths to start MITK.
+
+\section GeneralTestsSection4 MITK Testing Macros
+
+MITK offers testing macros to simplify testing, e.g. to test your testing conditions. These macros can be found in the header mitkTestingMacros.h .
+
+
+
+*/

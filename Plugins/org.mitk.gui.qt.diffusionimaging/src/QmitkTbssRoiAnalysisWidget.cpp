@@ -90,6 +90,9 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
       }
     }
   }
+
+
+  m_IndividualProfiles = profiles;
   // Calculate the averages
 
   // Here a check could be build in to check whether all profiles have

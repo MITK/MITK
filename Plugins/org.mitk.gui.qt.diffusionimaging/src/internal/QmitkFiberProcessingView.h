@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -49,6 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkXMLUnstructuredGridWriter.h>
 
 #include <itkTimeProbe.h>
+#include <itkStreamlineTrackingFilter.h>
 
 /*!
 \brief QmitkFiberProcessingView
@@ -88,7 +89,8 @@ public:
   void GenerateAndComposite();
   void GenerateOrComposite();
   void GenerateNotComposite();
-
+  void PruneBundle();
+  void MirrorFibers();
   void JoinBundles();
   void SubstractBundles();
   void GenerateRoiImage();
@@ -185,7 +187,7 @@ private:
   void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
   void CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image);
-  mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary);
+  mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute);
   mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundleX::Pointer fib);

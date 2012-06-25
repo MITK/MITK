@@ -111,12 +111,17 @@ public:
     return m_Vals;
   }
 
+  std::vector <std::vector<double> > GetIndividualProfiles()
+  {
+    return m_IndividualProfiles;
+  }
+
 
 protected:
 
   std::vector< std::vector<double> > m_Vals;
 
-
+  std::vector< std::vector<double> > m_IndividualProfiles;
 
 
   std::vector< std::vector<double> > CalculateGroupProfiles(std::string preprocessed);

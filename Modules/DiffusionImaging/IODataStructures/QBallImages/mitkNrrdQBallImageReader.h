@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,20 +24,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkQBallImage.h"
 #include "mitkQBallImageSource.h"
 #include "itkVectorImage.h"
+#include <MitkDiffusionImagingExports.h>
 
 namespace mitk
 {
 
-  /** \brief 
+  /** \brief
   */
 
-  class NrrdQBallImageReader : public mitk::QBallImageSource, public FileReader
+  class MitkDiffusionImaging_EXPORT NrrdQBallImageReader : public mitk::QBallImageSource, public FileReader
   {
   public:
 
     typedef mitk::QBallImage OutputType;
     typedef mitk::QBallImageSource QBImgSourceType;
- 
+
     mitkClassMacro( NrrdQBallImageReader, QBImgSourceType );
     itkNewMacro(Self);
 

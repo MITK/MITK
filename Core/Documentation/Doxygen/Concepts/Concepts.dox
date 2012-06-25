@@ -3,15 +3,28 @@
 
 The following items describe some issues about MITK on a more abstract level. 
 
-If you want to start using MITK, you also want to see \ref Development
+-# \subpage OverviewPage
+-# \subpage CodingPage "Coding Concepts"
+ -# \ref CodingPageGeneral
+ -# \ref CodingPageStyle
+ -# \ref CodingPageMITKMacros
+ -# \subpage MicroServices_Overview
+-# Data Concepts
+ -# \subpage DataManagementPage
+ -# \subpage MitkImagePage
+ -# \subpage PropertiesPage
+ -# \subpage GeometryOverviewPage
+ -# \subpage PipelineingConceptPage
+-# \subpage QVTKRendering
+-# \subpage InteractionPage
+-# \subpage LoggingPage
+-# \subpage ExceptionPage
+-# Testing Concept
+ -# \subpage GeneralTests
+ -# \subpage RenderingTests
+-# \subpage ModularizationPage "Modularization Concept"
+ -# \ref ModularizationPageOverview
+ -# \ref ModularizationPageHowTo
 
-\li \subpage OverviewPage
-\li \subpage QVTKRendering
-\li \subpage InteractionPage
-\li \subpage ExceptionPage
-\li \subpage LoggingPage
-\li \subpage PropertiesPage
-\li \subpage GeometryOverviewPage
-\li \subpage MicroServices_Overview
-\li \subpage RenderingTests
+If you want to start using MITK, you also want to see the chapter \ref Development.
 */

@@ -38,14 +38,14 @@ itk::DataObject::Pointer mitk::TbssImageSource::MakeOutput( unsigned int /*idx*/
   return static_cast<itk::DataObject*>(mitk::TbssImage::New().GetPointer());
 }
 
-/*
-template<typename TPixelType>
-mitk::TbssImageSource<TPixelType>::OutputType* mitk::TbssImageSource::GetOutput(unsigned int idx)
+
+
+mitk::TbssImageSource::OutputType* mitk::TbssImageSource::GetOutput(unsigned int idx)
 {
   return static_cast<OutputType*>
                      (this->ProcessObject::GetOutput(idx));
 }
 
-*/
+
 
 #endif //__MITK_NRRD_TBSS_VOULMES_IO_FACTORY_CPP__

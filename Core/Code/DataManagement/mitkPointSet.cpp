@@ -507,7 +507,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
 
       PointDataType pointData = 
       {
-        pointOp->GetIndex(), 
+        static_cast<unsigned int>(pointOp->GetIndex()), 
         pointOp->GetSelected(), 
         pointOp->GetPointType()
       };

@@ -60,7 +60,7 @@ int mitkFiberBundleXTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2),"check if equals method is working");
 
     int randNum = rand()%20;
-    MITK_INFO << "DoFiberSmoothing " << randNum; fib2->DoFiberSmoothing(randNum);
+    MITK_INFO << "DoFiberSmoothing(" << randNum << ")" << randNum; fib2->DoFiberSmoothing(randNum);
     MITK_TEST_CONDITION_REQUIRED(!fib1->Equals(fib2),"check if fiber resampling method does something");
 
     mitk::FiberBundleX::Pointer fib3 = fib1->AddBundle(fib2);
@@ -84,6 +84,9 @@ int mitkFiberBundleXTest(int argc, char* argv[])
     MITK_INFO << "DoColorCodingFaBased"; fib1->DoColorCodingFaBased();
     MITK_INFO << "DoUseFaFiberOpacity"; fib1->DoUseFaFiberOpacity();
     MITK_INFO << "ResetFiberOpacity"; fib1->ResetFiberOpacity();
+
+    float randFloat = rand()%300;
+    MITK_INFO << "RemoveShortFibers(" << randFloat << ")"; fib1->RemoveShortFibers(randFloat);
   }
   catch(...)
   {

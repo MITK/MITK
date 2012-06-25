@@ -114,8 +114,11 @@ set(CPP_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.cpp
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
 
- # Tractography
- Tractography/itkStochasticTractographyFilter.h
+  # Tractography
+  Tractography/GibbsTracking/mitkParticleGrid.cpp
+  Tractography/GibbsTracking/mitkMetropolisHastingsSampler.cpp
+  Tractography/GibbsTracking/mitkEnergyComputer.cpp
+  Tractography/GibbsTracking/mitkFiberBuilder.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
@@ -125,7 +128,7 @@ set(CPP_FILES
 set(H_FILES
   # function Collection
   mitkDiffusionFunctionCollection.h
-  
+
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkTbssImageMapper.h
@@ -175,6 +178,14 @@ set(H_FILES
   # Tractography
   Tractography/itkGibbsTrackingFilter.h
   Tractography/itkStochasticTractographyFilter.h
+  Tractography/itkStreamlineTrackingFilter.h
+  Tractography/GibbsTracking/mitkParticle.h
+  Tractography/GibbsTracking/mitkParticleGrid.h
+  Tractography/GibbsTracking/mitkMetropolisHastingsSampler.h
+  Tractography/GibbsTracking/mitkSimpSamp.h
+  Tractography/GibbsTracking/mitkEnergyComputer.h
+  Tractography/GibbsTracking/mitkSphereInterpolator.h
+  Tractography/GibbsTracking/mitkFiberBuilder.h
 
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
@@ -200,6 +211,7 @@ set(H_FILES
   Algorithms/itkReduceDirectionGradientsFilter.h
   Algorithms/itkResidualImageFilter.h
   Algorithms/itkExtractChannelFromRgbaImageFilter.h
+  Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h
@@ -214,8 +226,8 @@ set(H_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingManager.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
-  Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
-  
+
+
 )
 
 set( TOOL_FILES

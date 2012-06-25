@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
+#include <itkDiffusionTensor3D.h>
+#include <mitkTensorImage.h>
 
 class QmitkGibbsTrackingView;
 
@@ -62,7 +64,7 @@ typedef itk::Image< float, 3 >            FloatImageType;
 
 namespace itk
 {
-template<class X, class Y>
+template<class X>
 class GibbsTrackingFilter;
 }
 
@@ -74,12 +76,11 @@ class QmitkGibbsTrackingView : public QmitkFunctionality
 
 public:
 
-  typedef itk::Image<float,3> MaskImgType;
-
-  typedef itk::Vector<float, QBALL_ODFSIZE> OdfVectorType;
-  typedef itk::Image<OdfVectorType, 3> ItkQBallImgType;
-
-  typedef itk::GibbsTrackingFilter<ItkQBallImgType, MaskImgType> GibbsTrackingFilterType;
+  typedef itk::Image<float,3>                               ItkFloatImageType;
+  typedef itk::Vector<float, QBALL_ODFSIZE>                 OdfVectorType;
+  typedef itk::Image<OdfVectorType, 3>                      ItkQBallImgType;
+  typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
+  typedef itk::GibbsTrackingFilter< ItkQBallImgType >       GibbsTrackingFilterType;
 
   static const std::string VIEW_ID;
 
@@ -113,6 +114,7 @@ protected slots:
   void SetStartTemp(int value);
   void SetEndTemp(int value);
   void SetCurvatureThreshold(int value);
+  void SetRandomSeed(int value);
   void SetOutputFile();
 
 private:
@@ -135,12 +137,14 @@ private:
 
   // data objects
   mitk::FiberBundleX::Pointer m_FiberBundle;
-  MaskImgType::Pointer        m_MaskImage;
+  ItkFloatImageType::Pointer        m_MaskImage;
+  mitk::TensorImage::Pointer  m_TensorImage;
   mitk::QBallImage::Pointer   m_QBallImage;
   ItkQBallImgType::Pointer    m_ItkQBallImage;
+  ItkTensorImage::Pointer     m_ItkTensorImage;
 
   // data nodes
-  mitk::DataNode::Pointer m_QBallImageNode;
+  mitk::DataNode::Pointer m_ImageNode;
   mitk::DataNode::Pointer m_MaskImageNode;
   mitk::DataNode::Pointer m_FiberBundleNode;
 

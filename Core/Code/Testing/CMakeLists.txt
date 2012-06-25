@@ -24,7 +24,7 @@ mitkAddCustomModuleTest(mitkImageTest_3DImageData mitkImageTest ${MITK_DATA_DIR}
 mitkAddCustomModuleTest(mitkImageTest_brainImage mitkImageTest ${MITK_DATA_DIR}/brain.mhd)
 #mitkAddCustomModuleTest(mitkImageTest_color2DImage mitkImageTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
 
-if(MITK_ENABLE_GUI_TESTING)
+if(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_GUI_TESTING
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2DTest
                         ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/rgbaImage640x480REF.png #corresponding reference screenshot
@@ -37,10 +37,10 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkM
                         ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dColorBlue640x480REF.png #corresponding reference screenshot
 )
-mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2DLevelWindowTest #test for levelwindow property (=blood) Pic3D sagittal slice
-                        ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dLevelWindowBlood640x480REF.png #corresponding reference screenshot
-)
+#mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2DLevelWindowTest #test for levelwindow property (=blood) #Pic3D sagittal slice
+#                        ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
+#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dLevelWindowBlood640x480REF.png #corresponding reference #screenshot
+#)
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dOpacity640x480 mitkImageVtkMapper2DOpacityTest #test for opacity (=0.5) Pic3D coronal slice
                         ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dOpacity640x480REF.png #corresponding reference screenshot

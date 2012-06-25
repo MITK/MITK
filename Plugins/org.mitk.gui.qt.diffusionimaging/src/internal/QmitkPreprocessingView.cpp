@@ -171,13 +171,36 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     QStringList headerList;
     headerList << "b-Value" << "Number of gradients";
     m_Controls->m_BvalueTable->setHorizontalHeaderLabels(headerList);
+
+
+    QCheckBox * tmp;
+
+    foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
+    {
+      m_Controls->m_ReduceSizeLayout->layout()->removeWidget(box);
+      delete box;
+    }
+
+     m_ReduceGradientCheckboxes.clear();
+
     int i = 0 ;
     for(;it != bValMap.end(); it++)
     {
       m_Controls->m_BvalueTable->setItem(i,0,new QTableWidgetItem(QString::number(it->first)));
       m_Controls->m_BvalueTable->setItem(i,1,new QTableWidgetItem(QString::number(it->second.size())));
+
+      // Reduce Gradients GUI adaption
+      if(it->first != 0 && bValMap.size() > 2){
+        tmp = new QCheckBox(QString::number(it->first) + " with " + QString::number(it->second.size()) + " directions");
+        tmp->setEnabled(true);
+        tmp->setChecked(true);
+        tmp->setCheckable(true);
+        m_ReduceGradientCheckboxes.push_back(tmp);
+        m_Controls->m_ReduceSizeLayout->layout()->addWidget(tmp);
+      }
       i++;
     }
+
 
   }
   else
@@ -198,6 +221,13 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_BvalueTable->setItem(0,0,new QTableWidgetItem("-"));
     m_Controls->m_BvalueTable->setItem(0,1,new QTableWidgetItem("-"));
     m_Controls->m_DiffusionImageLabel->setText("-");
+
+    foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
+    {
+      m_Controls->m_ReduceSizeLayout->layout()->removeWidget(box);
+      delete box;
+    }
+     m_ReduceGradientCheckboxes.clear();
   }
 }
 
@@ -274,12 +304,29 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
 
   typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
   typedef itk::ReduceDirectionGradientsFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+  typedef DiffusionImageType::BValueMap BValueMap;
+
+  // GetShellSelection from GUI
+  BValueMap shellSlectionMap;
+  BValueMap originalShellMap = m_DiffusionImage->GetB_ValueMap();
+  foreach(QCheckBox * box , m_ReduceGradientCheckboxes)
+  {
+    if(box->isChecked()){
+      double BValue = (box->text().split(' ')).at(0).toDouble();
+      shellSlectionMap[BValue] = originalShellMap[BValue];
+      MITK_INFO << BValue;
+    }
+  }
+
+  MITK_INFO << shellSlectionMap.size();
 
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetOriginalDirections();
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput(m_DiffusionImage->GetVectorImage());
   filter->SetOriginalGradientDirections(gradientContainer);
   filter->SetNumGradientDirections(m_Controls->m_ReduceGradientsBox->value());
+  filter->SetOriginalBValueMap(originalShellMap);
+  filter->SetShellSelectionBValueMap(shellSlectionMap);
   filter->Update();
 
   DiffusionImageType::Pointer image = DiffusionImageType::New();

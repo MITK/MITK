@@ -419,7 +419,7 @@ if(WIN32)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  set(cflags "${cflags} -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
+  set(cflags "${cflags} -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings")
 
   mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
@@ -445,6 +445,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 
   #set(MITK_CXX_FLAGS "-Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MITK_CXX_FLAGS}")
   set(MITK_CXX_FLAGS "-Woverloaded-virtual -Wstrict-null-sentinel ${MITK_CXX_FLAGS}")
+  set(MITK_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
+
 endif()
 
 set(MITK_C_FLAGS "${cflags} ${MITK_C_FLAGS}")
@@ -587,6 +589,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${MITK_CXX_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}")
 
 if(MITK_USE_QT)

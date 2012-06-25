@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,27 +37,23 @@ public:
   typedef typename OutputImageType::PixelType OutPixelType;
   typedef itk::Image<unsigned char, 3> InputImageType;
 
-  itkNewMacro(Self);
-  itkTypeMacro( TractsToRgbaImageFilter, ImageSource );
+  itkNewMacro(Self)
+  itkTypeMacro( TractsToRgbaImageFilter, ImageSource )
 
   /** Upsampling factor **/
-  itkSetMacro( UpsamplingFactor, unsigned int);
-  itkGetMacro( UpsamplingFactor, unsigned int);
+  itkSetMacro( UpsamplingFactor, float)
+  itkGetMacro( UpsamplingFactor, float)
 
   /** Invert Image **/
-  itkSetMacro( InvertImage, bool);
-  itkGetMacro( InvertImage, bool);
+  itkSetMacro( InvertImage, bool)
+  itkGetMacro( InvertImage, bool)
 
-  /** Binary Output **/
-  itkSetMacro( BinaryOutput, bool);
-  itkGetMacro( BinaryOutput, bool);
-
-  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer);
-  itkSetMacro( InputImage, typename InputImageType::Pointer);
+  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer)
+  itkSetMacro( InputImage, typename InputImageType::Pointer)
 
   /** Use input image geometry to initialize output image **/
-  itkSetMacro( UseImageGeometry, bool);
-  itkGetMacro( UseImageGeometry, bool);
+  itkSetMacro( UseImageGeometry, bool)
+  itkGetMacro( UseImageGeometry, bool)
 
 
   void GenerateData();
@@ -70,9 +66,8 @@ protected:
   virtual ~TractsToRgbaImageFilter();
 
   mitk::FiberBundleX::Pointer m_FiberBundle;
-  unsigned int m_UpsamplingFactor;
+  float m_UpsamplingFactor;
   bool m_InvertImage;
-  bool m_BinaryOutput;
   bool m_UseImageGeometry;
   typename InputImageType::Pointer m_InputImage;
 };

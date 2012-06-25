@@ -97,7 +97,9 @@ bool mitk::ImageToOpenCVImageFilter::CheckImage( mitk::Image* image )
 
 IplImage* mitk::ImageToOpenCVImageFilter::GetOpenCVImage()
 {
-  if(!m_OpenCVImage && this->CheckImage( m_Image ) == true )
+  if(!this->CheckImage( m_Image ))
+    return 0;
+  if(!m_OpenCVImage)
   {
     try
     {
@@ -109,6 +111,7 @@ IplImage* mitk::ImageToOpenCVImageFilter::GetOpenCVImage()
     }
     catch (const AccessByItkException& e) {
       std::cout << "Caught exception [from AccessFixedTypeByItk]: \n" << e.what() << "\n";
+      return 0;
     }
   }
   return m_OpenCVImage;
@@ -116,7 +119,7 @@ IplImage* mitk::ImageToOpenCVImageFilter::GetOpenCVImage()
 
 void mitk::ImageToOpenCVImageFilter::SetImage( mitk::Image* _Image )
 {
-  if(m_Image == _Image) return;
+//  if(m_Image == _Image) return;
   m_Image = _Image;
   m_OpenCVImage = 0;
 }

@@ -27,7 +27,7 @@ as they used to do in previous version of MITK.
 To create an automatic rendering test you should use an existing test as example
 (e.g. mitkImageVtkMapper2DTest).
 
-1. Adding the test to CMake
+\subsection RenderingTests_HowToCreateATest_Sub1 Adding the test to CMake
 Like adding any test with parameters to CMake, you have to add a custom test to
 the files.cmake and the corresponding CMakeLists.txt:
 
@@ -49,29 +49,29 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper
 )
 \endcode
 
-The first parameter defines a name for the test on the dashboard. This is a feature to distinguish
+The first parameter defines a custom name for the test. This is a feature to distinguish
 between tests with different inputs. In this example the test is named
 <em>mitkImageVtkMapper2D_rgbaImage640x480</em> to show that this test is using the test image
 <em>rbgaImage640x480</em> as input.
 
-The next parameters sets test name (i.e. the name of the test class). Here: <em>mitkImageVtkMapper2D</em>.
+The next parameters sets test executable name (i.e. the name of the test class). Here: <em>mitkImageVtkMapper2D</em>.
 
 The next parameter(s) are used to pass the input to the test. For instance, it is possible to set
 multiple objects as input for a test (e.g. /path/to/img1.jpg /path/to/img2.pic /path/to/pointset.mps).
 All test data for core tests should be placed into the MITK-DATA repository inside the folder:
-${MITK_DATA_DIR}/RenderingTestData/
-It is possible to create another folders for other modules/bundles.
+${MITK_DATA_DIR}/RenderingTestData/. It is possible to create other folders for different modules or bundles.
 
 The option -V defines the path to the reference screen shot and is internally used by VTK. The reference
-screen shot is highly important and has to be triple-checked if is correct!!! The
+screen shot is highly important and has to be proven if is correct. The
 <em>mitkRenderingTestHelper</em> offers means to capture a screen shot of a renderwindow.
 Capturing a reference screen shot should happen just once and NOT be a permanent part of the test.
 
 It is also possible to set the option -T /path/to/directory/. This option is internally used by VTK
-to save a difference image. This is meant for debugging and should not be used on the dashboard.
+to save a difference image. This is meant for debugging and should not be used for the final implemenation of a test.
 
 
-2. Coding the test
+\subsection RenderingTests_HowToCreateATest_Sub2 Coding the test
+
 Writing the test code is pretty straight forward. In the example of the <em>mitkImageVtkMapper2DTest</em>
 the input parameters are added to a datastorage and rendered into a render window via the
 <em>mitkRenderingTestHelper</em>. Last, the vtkTesting macro is called to compare the given reference to

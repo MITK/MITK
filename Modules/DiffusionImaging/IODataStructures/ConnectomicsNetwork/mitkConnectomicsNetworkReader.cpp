@@ -55,7 +55,11 @@ void mitk::ConnectomicsNetworkReader::GenerateOutputInformation()
     try
     {
       TiXmlDocument doc( m_FileName );
-      doc.LoadFile();
+      bool loadOkay = doc.LoadFile();
+      if(!loadOkay)
+      {
+        mitkThrow() << "Could not open file " << m_FileName << " for reading.";
+      }
 
       TiXmlHandle hDoc(&doc);
       TiXmlElement* pElem;
@@ -182,9 +186,13 @@ void mitk::ConnectomicsNetworkReader::GenerateOutputInformation()
       m_OutputCache->UpdateBounds();
       MITK_INFO << "Network read";
     }
+    catch (mitk::Exception e)
+    {
+      MITK_ERROR << e.GetDescription();
+    }
     catch(...)
     {
-      MITK_INFO << "Could not read file ";
+      MITK_ERROR << "Unknown error occured while trying to read file.";
     }
   }
 }

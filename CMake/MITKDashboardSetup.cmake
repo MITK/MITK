@@ -123,11 +123,6 @@ endif()
 #
 # Download and include dashboard driver script 
 #
-if(NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
-  set(hb "HEAD")
-else()
-  set(hb "refs/heads/${GIT_BRANCH}")
-endif()
 set(url "http://mitk.org/git/?p=MITK.git;a=blob_plain;f=CMake/MITKDashboardDriverScript.cmake;hb=${hb}")
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.driver)
 downloadFile("${url}" "${dest}")

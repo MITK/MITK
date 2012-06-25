@@ -179,10 +179,66 @@ namespace mitk
  This last step depends on an option of GetSeries(). When requested, image blocks from the previous step are merged again
  whenever two blocks occupy the same portion of space (i.e. same origin, number of slices and z-spacing).
  
+ \section DicomSeriesReader_gantrytilt Handling of gantry tilt
+
+ When CT gantry tilt is used, the gantry plane (= X-Ray source and detector ring) and the vertical plane do not align
+ anymore. This scanner feature is used for example to reduce metal artifacs (e.g. <i>Lee C , Evaluation of Using CT
+ Gantry Tilt Scan on Head and Neck Cancer Patients with Dental Structure: Scans Show Less Metal Artifacts. Presented
+ at: Radiological Society of North America 2011 Scientific Assembly and Annual Meeting; November 27- December 2,
+ 2011 Chicago IL.</i>).
+
+ The acquired planes of such CT series do not match the expectations of a orthogonal geometry in mitk::Image: if you
+ stack the slices, they show a small shift along the Y axis:
+\verbatim
+
+  without tilt       with tilt
+  
+    ||||||             //////
+    ||||||            //////
+--  |||||| --------- ////// -------- table orientation
+    ||||||          //////
+    ||||||         //////
+
+Stacked slices:
+
+  without tilt       with tilt
+
+ --------------    --------------
+ --------------     --------------
+ --------------      --------------
+ --------------       --------------
+ --------------        --------------
+
+\endverbatim
+
+
+ As such gemetries do not in conjunction with mitk::Image, DicomSeriesReader performs a correction for such series
+ if the groupImagesWithGantryTilt or correctGantryTilt flag in GetSeries and LoadDicomSeries is set (default = on).
+
+ The correction algorithms undoes two errors introduced by ITK's ImageSeriesReader:
+  - the plane shift that is ignored by ITK's reader is recreated by applying a shearing transformation using itk::ResampleFilter.
+  - the spacing is corrected (it is calculated by ITK's reader from the distance between two origins, which is NOT the slice distance in this special case)
+
+ Both errors are introduced in 
+ itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
+
+ For the correction, we examine two slices of a series, both described as a pair (origin/orientation):
+  - we calculate if the second origin is on a line along the normal of the first slice
+    - if this is not the case, the geometry will not fit a normal mitk::Image/mitk::Geometry3D
+    - we then project the second origin into the first slice's coordinate system to quantify the shift
+    - both is done in class GantryTiltInformation with quite some comments.
+ 
+ \section DicomSeriesReader_whynotinitk Why is this not in ITK?
+ 
+  Some of this code would probably be better located in ITK. It is just a matter of resources that this is not the
+  case yet. Any attempts into this direction are welcome and can be supported. At least the gantry tilt correction
+  should be a simple addition to itk::ImageSeriesReader.
+ 
  \section DicomSeriesReader_tests Tests regarding DICOM loading
 
  A number of tests have been implemented to check our assumptions regarding DICOM loading. Please see \ref DICOMTesting
 
+ \todo refactor all the protected helper objects/methods into a separate header so we compile faster
 */
 class MITK_CORE_EXPORT DicomSeriesReader
 {
@@ -224,6 +280,7 @@ public:
    Find all series (and sub-series -- see details) in a particular directory.
   */
   static UidFileNamesMap GetSeries(const std::string &dir, 
+                                   bool groupImagesWithGantryTilt,
                                    const StringContainer &restrictions = StringContainer());
 
   /**
@@ -236,6 +293,7 @@ public:
   */
   static StringContainer GetSeries(const std::string &dir, 
                                    const std::string &series_uid,
+                                   bool groupImagesWithGantryTilt,
                                    const StringContainer &restrictions = StringContainer());
 
   /**
@@ -262,7 +320,10 @@ public:
    */
   static
   UidFileNamesMap 
-  GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions = StringContainer());
+  GetSeries(const StringContainer& files, 
+            bool sortTo3DPlust, 
+            bool groupImagesWithGantryTilt,
+            const StringContainer &restrictions = StringContainer());
   
   /**
     \brief See other GetSeries().
@@ -271,7 +332,9 @@ public:
   */
   static
   UidFileNamesMap 
-  GetSeries(const StringContainer& files, const StringContainer &restrictions = StringContainer());
+  GetSeries(const StringContainer& files, 
+            bool groupImagesWithGantryTilt,
+            const StringContainer &restrictions = StringContainer());
 
   /**
    Loads a DICOM series composed by the file names enumerated in the file names container.
@@ -284,6 +347,7 @@ public:
   static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames, 
                                            bool sort = true, 
                                            bool load4D = true, 
+                                           bool correctGantryTilt = true,
                                            UpdateCallBackMethod callback = 0);
 
   /**
@@ -293,9 +357,141 @@ public:
                               DataNode &node, 
                               bool sort = true, 
                               bool load4D = true, 
+                              bool correctGantryTilt = true,
                               UpdateCallBackMethod callback = 0);
 
 protected:
+
+  /**
+    \brief Return type of DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
+
+    Class contains the grouping result of method DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption,
+    which takes as input a number of images, which are all equally oriented and spatially sorted along their normal direction.
+
+    The result contains of two blocks: a first one is the grouping result, all of those images can be loaded
+    into one image block because they have an equal origin-to-origin distance without any gaps in-between. 
+  */
+  class SliceGroupingAnalysisResult
+  {
+    public:
+
+      SliceGroupingAnalysisResult();
+
+      /**
+        \brief Grouping result, all same origin-to-origin distance w/o gaps.
+      */
+      StringContainer GetBlockFilenames();
+      
+      /**
+        \brief Remaining files, which could not be grouped.
+      */
+      StringContainer GetUnsortedFilenames();
+  
+      /**
+        \brief Wheter or not the grouped result contain a gantry tilt.
+      */
+      bool ContainsGantryTilt();
+
+      /**
+        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+      */
+      void AddFileToSortedBlock(const std::string& filename);
+     
+      /**
+        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+      */
+      void AddFileToUnsortedBlock(const std::string& filename);
+      
+      /**
+        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+        \todo Could make sense to enhance this with an instance of GantryTiltInformation to store the whole result!
+      */
+      void FlagGantryTilt();
+
+      /**
+        \brief Only meaningful for use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption.
+      */
+      void UndoPrematureGrouping();
+
+    protected:
+      
+      StringContainer m_GroupedFiles;
+      StringContainer m_UnsortedFiles;
+
+      bool m_GantryTilt;
+  };
+
+  /**
+    \brief Gantry tilt analysis result.
+
+    Takes geometry information for two slices of a DICOM series and
+    calculates whether these fit into an orthogonal block or not.
+    If NOT, they can either be the result of an acquisition with
+    gantry tilt OR completly broken by some shearing transformation.
+
+    All calculations are done in the constructor, results can then
+    be read via the remaining methods.
+  */
+  class GantryTiltInformation
+  {
+    public:
+
+      /**
+        \brief Just so we can create empty instances for assigning results later.
+      */
+      GantryTiltInformation();
+
+      /**
+        \brief THE constructor, which does all the calculations.
+
+        See code comments for explanation.
+      */
+      GantryTiltInformation( const Point3D& origin1, 
+                             const Point3D& origin2,
+                             const Vector3D& right, 
+                             const Vector3D& up,
+                             unsigned int numberOfSlicesApart);
+
+      /**
+        \brief Whether the slices were sheared.
+      */
+      bool IsSheared() const;
+
+      /**
+        \brief Whether the shearing is a gantry tilt or more complicated.
+      */
+      bool IsRegularGantryTilt() const;
+
+      /**
+        \brief The offset distance in Y direction for each slice (describes the tilt result).
+      */
+      ScalarType GetMatrixCoefficientForCorrectionInWorldCoordinates() const;
+
+
+      /**
+        \brief The z / inter-slice spacing. Needed to correct ImageSeriesReader's result.
+      */
+      ScalarType GetRealZSpacing() const;
+
+      /**
+        \brief The shift between first and last slice in mm.
+
+        Needed to resize an orthogonal image volume.
+      */
+      ScalarType GetTiltCorrectedAdditionalSize() const;
+
+    protected:
+
+      /**
+        \brief Projection of point p onto line through lineOrigin in direction of lineDirection.
+      */
+      Point3D projectPointOnLine( Point3D p, Point3D lineOrigin, Vector3D lineDirection ); 
+
+      ScalarType m_ShiftUp;
+      ScalarType m_ShiftRight;
+      ScalarType m_ShiftNormal;
+      unsigned int m_NumberOfSlicesApart;
+  };
 
   /**
     \brief for internal sorting.
@@ -309,6 +505,8 @@ protected:
 
   /**
     \brief Ensure an equal z-spacing for a group of files.
+    
+    Takes as input a number of images, which are all equally oriented and spatially sorted along their normal direction.
 
     Internally used by GetSeries. Returns two lists: the first one contins slices of equal inter-slice spacing.
     The second list contains remaining files, which need to be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption again.
@@ -317,8 +515,26 @@ protected:
     itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
   */
   static
-  TwoStringContainers
-  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings_);
+  SliceGroupingAnalysisResult
+  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, bool groupsOfSimilarImages, const gdcm::Scanner::MappingType& tagValueMappings_);
+      
+  static
+  std::string
+  ConstCharStarToString(const char* s);
+
+  static
+  Point3D
+  DICOMStringToPoint3D(const std::string& s, bool& successful);
+
+  static
+  void
+  DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful);
+
+  template <typename ImageType>
+  static
+  typename ImageType::Pointer
+  InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
+
 
   /**
     \brief Sort a set of file names in an order that is meaningful for loading them into an mitk::Image.
@@ -406,7 +622,7 @@ protected:
   template <typename PixelType>
   static 
   void 
-  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback);
+  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback);
 
   /**
     \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
@@ -416,7 +632,7 @@ protected:
   template <typename PixelType>
   static 
   Image::Pointer 
-  LoadDICOMByITK( const StringContainer&, CallbackCommand* command = NULL);
+  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, CallbackCommand* command = NULL);
 
   /**
     \brief Sort files into time step blocks of a 3D+t image.

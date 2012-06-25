@@ -27,10 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdio.h>
 #include <locale>
 #include <strstream>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "mitkDiffusionFunctionCollection.h"
 #include "itkPointShell.h"
 #include <memory>
@@ -224,7 +220,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 ::Projection2( vnl_vector<double> & A, vnl_vector<double> & a, vnl_vector<double> & b, double delta0)
 {
 
-  const double s6 = sqrt(6);
+  const double s6 = sqrt(6.0);
   const double s15 = s6/2.0;
 
   vnl_vector<double> delta(a.size());
@@ -420,26 +416,26 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   this->m_NumberOfBaselineImages = 0;
   this->m_ReconstructionType = Mode_Standard1Shell;
 
-  GradientDirectionContainerType::ConstIterator gdcit;
-  for( gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
+  if(m_BValueMap.size() == 0){
+    itkWarningMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : no GradientIndexMapAvalible");
+
+    GradientDirectionContainerType::ConstIterator gdcit;
+    for( gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
+    {
+      double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
+      m_BValueMap[bValueKey].push_back(gdcit.Index());
+    }
+
+  }
+
+  if(m_BValueMap.find(0) == m_BValueMap.end())
   {
-    double bValueKey = int(((m_BValue* gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
-    m_GradientIndexMap[bValueKey].push_back(gdcit.Index());
+    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : GradientIndxMap with no b-Zero indecies found: check input image");
   }
 
-  //if(listOfUserSelctedBValues.size() == 0){
-  //  itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : No list Of User Selcted B Values available");
-  //}
-  if(m_GradientIndexMap.size() == 0){
-    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : no GradientIndexMapAvalible");
-  }
-  //if(listOfUserSelctedBValues.size() != m_GradientIndexMap.size()){
-  //  itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : The number of user selected B Values != number of Image BValues");
-  //}
+  if(m_BValueMap.size() == 4 ){
 
-  if(m_GradientIndexMap.size() == 4){
-
-    GradientIndexMapIteraotr it = m_GradientIndexMap.begin();
+    BValueMapIteraotr it = m_BValueMap.begin();
     it++;
     const int b1 = (*it).first;
     it++;
@@ -453,12 +449,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     }
   }
 
-  if(m_GradientIndexMap.size() > 2 && m_ReconstructionType != Mode_Analytical3Shells)
+  if(m_BValueMap.size() > 2 && m_ReconstructionType != Mode_Analytical3Shells)
   {
     m_ReconstructionType = Mode_NumericalNShells;
   }
 
-  this->m_NumberOfBaselineImages = m_GradientIndexMap[0].size();
+  this->m_NumberOfBaselineImages = m_BValueMap[0].size();
   this->m_NumberOfGradientDirections = gradientDirection->Size() - this->m_NumberOfBaselineImages;
 
   // ensure that the gradient image we received has as many components as
@@ -524,7 +520,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   ImageRegionConstIterator< BZeroImageType > bzeroImageIterator(m_BZeroImage, outputRegionForThread);
   bzeroImageIterator.GoToBegin();
 
-  IndiciesVector SignalIndicies = m_GradientIndexMap[1];
+  IndiciesVector SignalIndicies = m_BValueMap[1];
 
   // if the gradient directiosn aragement is hemispherical, duplicate all gradient directions
   // alone, interested in the value, the direction can be neglected
@@ -574,7 +570,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
-      odf = mitk::vnl_function::element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
+      odf = element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
       odf *= (QBALL_ANAL_RECON_PI*4/NODF);
     }
     // set ODF to ODF-Image
@@ -613,7 +609,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   ImageRegionIterator< BZeroImageType > bzeroIterator(m_BZeroImage, outputRegionForThread);
   bzeroIterator.GoToBegin();
 
-  IndiciesVector BZeroIndicies = m_GradientIndexMap[0];
+  IndiciesVector BZeroIndicies = m_BValueMap[0];
 
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( this->ProcessObject::GetInput(0) );
 
@@ -665,7 +661,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
   // Get Shell Indicies for all non-BZero Gradients
   // it MUST be a arithmetic progression eg.: 1000, 2000, 3000
-  GradientIndexMapIteraotr it = m_GradientIndexMap.begin();
+  BValueMapIteraotr it = m_BValueMap.begin();
   it++;
   // it = b-value = 1000
   IndiciesVector Shell1Indiecies = (*it).second;
@@ -780,7 +776,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
       // Cast the Signal-Type from double to float for the ODF-Image
-      odf = mitk::vnl_function::element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
+      odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
       odf *= (QBALL_ANAL_RECON_PI*4/NODF);
       //Normalize(odf);
     }
@@ -920,12 +916,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   typedef std::auto_ptr< vnl_vector< int > >    VectorIntPtr;
   typedef std::auto_ptr< vnl_matrix_inverse< double > >  InverseMatrixDoublePtr;
 
-  std::map<double ,std::vector<unsigned int > >::const_iterator it = (m_GradientIndexMap.begin());
+  std::map<double ,std::vector<unsigned int > >::const_iterator it = (m_BValueMap.begin());
   it++;
-  const std::vector<unsigned int> gradientIndiciesVector= (*it).second;
+  const std::vector<unsigned int> gradientIndiciesVector = (*it).second;
 
   int numberOfGradientDirections = gradientIndiciesVector.size();
-
 
   if( numberOfGradientDirections < (((L+1)*(L+2))/2) || numberOfGradientDirections < 6  )
   {
@@ -1071,8 +1066,8 @@ bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
   bool value = false;
 
-  GradientIndexMapIteraotr mapIterator = m_GradientIndexMap.begin();
-  while(mapIterator != m_GradientIndexMap.end())
+  BValueMapIteraotr mapIterator = m_BValueMap.begin();
+  while(mapIterator != m_BValueMap.end())
   {
     std::vector<unsigned int>::const_iterator it1 = mapIterator->second.begin();
     std::vector<unsigned int>::const_iterator it2 = mapIterator->second.begin();

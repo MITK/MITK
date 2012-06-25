@@ -103,17 +103,15 @@ public:
 
     void Normalize(OdfPixelType & odf );
 
-    void S_S0Normalization( vnl_vector<double> & vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
-    void S_S0Normalization( vnl_matrix<double> & mat, typename NumericTraits<ReferencePixelType>::AccumulateType b0  = 0 );
+    void S_S0Normalization( vnl_vector<double> & vec, double b0  = 0 );
 
     void DoubleLogarithm(vnl_vector<double> & vec);
 
-    void Threshold(vnl_vector<double> & vec, double delta = 0.01);
-    void Threshold(vnl_matrix<double> & mat, double delta = 0.01);
+    void Projection1(vnl_vector<double> & vec, double delta = 0.01);
     double CalculateThreashold(const double value, const double delta);
 
-    void Projection1( vnl_matrix<double> & mat, double delta = 0.01);
-    void Projection2( vnl_vector<double> & A, vnl_vector<double> & alpha, vnl_vector<double> & beta, double delta = 0.01);
+    void Projection2( vnl_vector<double> & E1, vnl_vector<double> & E2, vnl_vector<double> & E3, double delta = 0.01);
+    void Projection3( vnl_vector<double> & A, vnl_vector<double> & alpha, vnl_vector<double> & beta, double delta = 0.01);
 
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this
@@ -134,19 +132,20 @@ public:
 
 protected:
     DiffusionMultiShellQballReconstructionImageFilter();
-    ~DiffusionMultiShellQballReconstructionImageFilter() {};
+    ~DiffusionMultiShellQballReconstructionImageFilter() { };
     void PrintSelf(std::ostream& os, Indent indent) const;
 
-    void ComputeReconstructionMatrix();
+    void ComputeReconstructionMatrix(IndiciesVector const & refVector);
+    void ComputeODFSHBasis();
     bool CheckDuplicateDiffusionGradients();
-    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation , vnl_matrix<double> * SHEigenvalues);
-    void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
-    bool CheckHemisphericalArrangementOfGradientDirections();
+    bool CheckForDifferingShellDirections();
+    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, int Lorder , vnl_matrix<double>* LaplaciaBaltramiOutput =0 , vnl_vector<int>* SHOrderAssociation =0 , vnl_matrix<double> * SHEigenvalues =0);
+    //void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
+    //bool CheckHemisphericalArrangementOfGradientDirections();
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
 
-    vnl_vector<TOdfPixelType> AnalyticalThreeShellParameterEstimation(const IndiciesVector * shell1, const IndiciesVector * shell2, const IndiciesVector * shell3, vnl_vector<TOdfPixelType> b);
     void StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread);
     void AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread);
     void NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread);
@@ -162,12 +161,19 @@ private:
     };
 
 
+    // Interpolation
+    bool m_Interpolation_Flag;
+    CoefficientMatrixType m_Interpolation_SHT1_inv;
+    CoefficientMatrixType m_Interpolation_SHT2_inv;
+    CoefficientMatrixType m_Interpolation_SHT3_inv;
+    CoefficientMatrixType m_Interpolation_TARGET_SH;
+    int m_MaxDirections;
 
     //CoefficientMatrixType m_ReconstructionMatrix;
     CoefficientMatrixType m_CoeffReconstructionMatrix;
     CoefficientMatrixType m_ODFSphericalHarmonicBasisMatrix;
-    CoefficientMatrixType m_SignalReonstructionMatrix;
-    CoefficientMatrixType m_SHBasisMatrix;
+    //CoefficientMatrixType m_SignalReonstructionMatrix;
+    //CoefficientMatrixType m_SHBasisMatrix;
 
     /** container to hold gradient directions */
     GradientDirectionContainerType::Pointer m_GradientDirectionContainer;
@@ -194,20 +200,15 @@ private:
 
     bool m_IsArithmeticProgession;
 
-    int m_NumberCoefficients;
+    //int m_NumberCoefficients;
 
     ReconstructionType m_ReconstructionType;
 
 
-
-    template< class VNLType >
-    void printMatrix( VNLType * mat );
-
     //------------------------- VNL-function ------------------------------------
 
-
     template<typename CurrentValue, typename WntValue>
-    static vnl_vector< WntValue> element_cast (vnl_vector< CurrentValue> const& v1)
+    vnl_vector< WntValue> element_cast (vnl_vector< CurrentValue> const& v1)
     {
       vnl_vector<WntValue> result(v1.size());
 
@@ -216,6 +217,16 @@ private:
 
       return result;
     }
+
+    template<typename type>
+    double dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 )
+    {
+      double result = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]) / (v1.two_norm() * v2.two_norm());
+      return result ;
+    }
+
+    void ComputeSphericalFromCartesian(vnl_matrix<double> * Q, const IndiciesVector & refShell);
+
 
 };
 

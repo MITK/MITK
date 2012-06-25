@@ -36,12 +36,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
-
-
-
 void UltrasoundSupport::SetFocus()
 {
-  // m_Controls.buttonPerformImageProcessing->setFocus();
+  m_Controls.m_AddDevice->setFocus();
 }
 
 void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
@@ -63,7 +60,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   m_Controls.m_ActiveVideoDevices->Initialize(filter);
   
   m_Node = mitk::DataNode::New();
-  m_Node->SetName("US-Image 0");
+  m_Node->SetName("US Image Stream");
   this->GetDataStorage()->Add(m_Node);
 }
 
@@ -78,13 +75,15 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 
 void UltrasoundSupport::DisplayImage()
 {
-
+   MITK_INFO << "USSUPPORT: DisplayImage()"; 
   //QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   // if (nodes.empty()) return;
 
   m_Device->UpdateOutputData(0);
   mitk::USImage::Pointer image = m_Device->GetOutput();
+  //m_Node->Initialize();
   m_Node->SetData(image);
+  this->RequestRenderWindowUpdate();
   /* int i;
   for (i = 1; i < 10; i++)
   {
@@ -143,7 +142,7 @@ void UltrasoundSupport::OnClickedViewDevice()
     return;
   }
 
-  m_Timer->start();
+  m_Timer->start(100);
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
@@ -154,18 +153,6 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
   m_Controls.m_AddDevice->setVisible(true);
   m_Controls.m_Headline->setText("Connected Devices:");
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

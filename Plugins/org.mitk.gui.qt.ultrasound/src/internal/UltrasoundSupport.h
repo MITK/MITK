@@ -28,8 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /*!
   \brief UltrasoundSupport
-
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+  This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
 
   \sa QmitkFunctionality
   \ingroup ${plugin_target}_internal
@@ -41,16 +40,19 @@ class UltrasoundSupport : public QmitkAbstractView
   Q_OBJECT
   
   public:  
+    
+    virtual void SetFocus();
 
     static const std::string VIEW_ID;
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-   signals:
-     
-    void DeviceServiceUpdated();
+   signals: 
 
   public slots:
+    /*
+    * \brief This is called when the newDeviceWidget is closed
+    */
     void OnNewDeviceWidgetDone();
      
   protected slots:
@@ -59,20 +61,27 @@ class UltrasoundSupport : public QmitkAbstractView
 
     void OnClickedViewDevice();
 
+    /*
+    * \brief This is the main imaging loop that is called regularily during the imaging process
+    */
     void DisplayImage();
 
   protected:
-  
-    virtual void SetFocus();
 
+    /*
+    * \brief This timer triggers periodic updates to the pipeline
+    */
     QTimer *m_Timer;
 
+    /*
+    * \brief The device that is currently used to quire images
+    */
     mitk::USDevice::Pointer m_Device;
 
+    /*
+    * \brief The node that we feed images into
+    */
     mitk::DataNode::Pointer m_Node;
-   
-    // Not necessary?
-    //const QList<mitk::DataNode::Pointer>& nodes );
 
     Ui::UltrasoundSupportControls m_Controls;
 

@@ -157,9 +157,27 @@ namespace mitk {
     /** Update the bounds of the geometry to fit the network */
     void UpdateBounds( );
 
+    /** Remove nodes not connected to any other node */
+    void PruneUnconnectedSingleNodes();
+
+    /** Remove edges below the specified weight
+      * 
+      * targetWeight is the number of connecting fibers
+      *
+      * This will remove unconnected nodes after removal
+      */
+    void PruneEdgesBelowWeight( int targetWeight );
+
   protected:
     ConnectomicsNetwork();
     virtual ~ConnectomicsNetwork();
+
+    /** This function will relabel all vertices and edges in a continuous manner 
+      *
+      * Mainly important after removing vertices, to make sure that the ids run continuously from
+      * 0 to number of vertices - 1 and edge target and source ids match the corresponding node.
+      */
+    void UpdateIDs();
 
     NetworkType m_Network;
 

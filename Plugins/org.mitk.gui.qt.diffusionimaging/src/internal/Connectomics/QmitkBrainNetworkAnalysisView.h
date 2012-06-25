@@ -74,6 +74,9 @@ public:
     /// \brief Create modularization of network
     void OnModularizePushButtonClicked();
 
+    /// \brief Prune network
+    void OnPrunePushButtonClicked();
+
 protected:
 
   // ####### Functions #######

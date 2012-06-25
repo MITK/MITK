@@ -70,8 +70,9 @@ void QmitkBrainNetworkAnalysisView::CreateQtPartControl( QWidget *parent )
     QObject::connect( m_Controls->convertToRGBAImagePushButton, SIGNAL(clicked()), this, SLOT(OnConvertToRGBAImagePushButtonClicked()) );
     QObject::connect( m_Controls->networkifyPushButton, SIGNAL(clicked()), this, SLOT(OnNetworkifyPushButtonClicked()) );
     QObject::connect( m_Controls->syntheticNetworkCreationPushButton, SIGNAL(clicked()), this, SLOT(OnSyntheticNetworkCreationPushButtonClicked()) );
-    QObject::connect( (QObject*)( m_Controls->syntheticNetworkComboBox ), SIGNAL(currentIndexChanged (int)),	this, SLOT(OnSyntheticNetworkComboBoxCurrentIndexChanged(int)) );
-    QObject::connect( (QObject*)( m_Controls->modularizePushButton ), SIGNAL(clicked()),	this, SLOT(OnModularizePushButtonClicked()) );
+    QObject::connect( (QObject*)( m_Controls->syntheticNetworkComboBox ), SIGNAL(currentIndexChanged (int)),  this, SLOT(OnSyntheticNetworkComboBoxCurrentIndexChanged(int)) );
+    QObject::connect( (QObject*)( m_Controls->modularizePushButton ), SIGNAL(clicked()),  this, SLOT(OnModularizePushButtonClicked()) );
+    QObject::connect( (QObject*)( m_Controls->prunePushButton ), SIGNAL(clicked()),  this, SLOT(OnPrunePushButtonClicked()) );
   }
 
   // GUI is different for developer and demo mode
@@ -82,6 +83,7 @@ void QmitkBrainNetworkAnalysisView::CreateQtPartControl( QWidget *parent )
     this->m_Controls->networkifyPushButton->show();
     this->m_Controls->networkifyPushButton->setText( "Create Network" );
     this->m_Controls->modularizePushButton->hide();
+    this->m_Controls->pruneOptionsGroupBox->hide();
 
     this->m_Controls->syntheticNetworkOptionsGroupBox->show();
     //--------------------------- fill comboBox---------------------------
@@ -95,6 +97,7 @@ void QmitkBrainNetworkAnalysisView::CreateQtPartControl( QWidget *parent )
     this->m_Controls->networkifyPushButton->show();
     this->m_Controls->networkifyPushButton->setText( "Networkify" );
     this->m_Controls->modularizePushButton->show();
+    this->m_Controls->pruneOptionsGroupBox->show();
 
     this->m_Controls->syntheticNetworkOptionsGroupBox->show();
     //--------------------------- fill comboBox---------------------------
@@ -370,7 +373,7 @@ void QmitkBrainNetworkAnalysisView::OnSyntheticNetworkCreationPushButtonClicked(
   mitk::DataNode::Pointer networkNode = mitk::DataNode::New();
   int parameterOne = this->m_Controls->parameterOneSpinBox->value();
   double parameterTwo = this->m_Controls->parameterTwoDoubleSpinBox->value();
-  ////add network to datastorage
+  //add network to datastorage
   networkNode->SetData( generator->CreateSyntheticNetwork( m_currentIndex, parameterOne, parameterTwo ) );
   networkNode->SetName( mitk::ConnectomicsConstantsManager::CONNECTOMICS_PROPERTY_DEFAULT_CNF_NAME );
   if( generator->WasGenerationSuccessfull() )
@@ -596,7 +599,7 @@ void QmitkBrainNetworkAnalysisView::OnNetworkifyPushButtonClicked()
       m_ConnectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
       mitk::DataNode::Pointer networkNode = mitk::DataNode::New();
 
-      ////add network to datastorage
+      //add network to datastorage
       networkNode->SetData( m_ConnectomicsNetworkCreator->GetNetwork() );
       networkNode->SetName( mitk::ConnectomicsConstantsManager::CONNECTOMICS_PROPERTY_DEFAULT_CNF_NAME );
       this->GetDefaultDataStorage()->Add( networkNode );
@@ -674,4 +677,35 @@ void QmitkBrainNetworkAnalysisView::OnModularizePushButtonClicked()
     }
   }
 
+}
+
+void QmitkBrainNetworkAnalysisView::OnPrunePushButtonClicked()
+{
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  if ( nodes.empty() )
+  {
+    QMessageBox::information( NULL, "Network pruning", "Please select one or more network.");
+    return;
+  }
+
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+    it != nodes.end();
+    ++it )
+  {
+    mitk::DataNode::Pointer node = *it;
+
+    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+    {
+      return;
+    }
+
+    {
+      mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( node->GetData() );
+      if( node.IsNotNull() && network )
+      {
+        // Edge pruning will also do node pruning
+        network->PruneEdgesBelowWeight( this->m_Controls->pruneEdgeWeightSpinBox->value() );
+      }
+    }
+  }
 }

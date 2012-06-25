@@ -43,9 +43,6 @@ QmitkUSDeviceListWidget::QmitkUSDeviceListWidget(QWidget* parent, Qt::WindowFlag
   mitk::Module* mitkUS = mitk::ModuleRegistry::GetModule("MitkUS");  
   m_MitkUSContext = mitkUS->GetModuleContext();
 
- 
-
-  
 }
 
 QmitkUSDeviceListWidget::~QmitkUSDeviceListWidget()

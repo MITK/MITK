@@ -288,7 +288,7 @@ void QmitkStdMultiWidget::InitializeWidget()
 
   //Render Window 1 == transversal
   m_CornerAnnotaions[0].cornerText = vtkCornerAnnotation::New();
-  m_CornerAnnotaions[0].cornerText->SetText(0, "Transversal");
+  m_CornerAnnotaions[0].cornerText->SetText(0, "Axial");
   m_CornerAnnotaions[0].cornerText->SetMaximumFontSize(12);
   m_CornerAnnotaions[0].textProp = vtkTextProperty::New();
   m_CornerAnnotaions[0].textProp->SetColor( 1.0, 0.0, 0.0 );

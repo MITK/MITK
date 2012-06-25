@@ -317,6 +317,11 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     // Store the initial visibility status of the menu widget.
     d->m_MenuWidgetsEnabled = d->m_StdMultiWidget->IsMenuWidgetEnabled();
 
+    this->GetSite()->GetPage()->AddPartListener(d->m_PartListener);
+
+    berry::IPreferences::Pointer prefs = this->GetPreferences();
+    this->OnPreferencesChanged(dynamic_cast<berry::IBerryPreferences*>(prefs.GetPointer()));
+
     // Store the initial interactor status of the mouse mode.
     if  (d->m_StdMultiWidget->GetMouseModeSwitcher()->GetInteractionScheme() == mitk::MouseModeSwitcher::MITK )
     {
@@ -326,11 +331,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     {
       d->m_EnabledInteractors << INTERACTOR_PACS;
     }
-
-    this->GetSite()->GetPage()->AddPartListener(d->m_PartListener);
-
-    berry::IPreferences::Pointer prefs = this->GetPreferences();
-    this->OnPreferencesChanged(dynamic_cast<berry::IBerryPreferences*>(prefs.GetPointer()));
 
     this->RequestUpdate();
   }

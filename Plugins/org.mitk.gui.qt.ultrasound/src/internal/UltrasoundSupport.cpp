@@ -84,51 +84,7 @@ void UltrasoundSupport::DisplayImage()
   //m_Node->Initialize();
   m_Node->SetData(image);
   this->RequestRenderWindowUpdate();
-  /* int i;
-  for (i = 1; i < 10; i++)
-  {
-    device->Update();
-    if ((i % 3) == 0 )
-    {
-      node = mitk::DataNode::New();
-      image = device->GetOutput();
-      node->SetData(image);
-      std::ostringstream oss;
-      oss << "US-Image " << i;
-      node->SetName(oss.str());
-      this->GetDataStorage()->Add(node);
-    }
-  }*/
-
-
-
   
-
-  //// here we have a valid mitk::DataNode
-
-  //// a node itself is not very useful, we need its data item (the image)
-  //mitk::BaseData* data = node->GetData();
-  //if (data)
-  //{
-  //  // test if this data item is an image or not (could also be a surface or something totally different)
-  //  mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-  //  if (image)
-  //  {
-  //    std::stringstream message;
-  //    std::string name;
-  //    message << "Performing image processing for image ";
-  //    if (node->GetName(name))
-  //    {
-  //      // a property called "name" was found for this DataNode
-  //      message << "'" << name << "'";
-  //    }
-  //    message << ".";
-  //    MITK_INFO << message.str();
-
-  //    // actually do something here...
-
-  //  }
-  //}
 
 }
 
@@ -153,51 +109,3 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
   m_Controls.m_AddDevice->setVisible(true);
   m_Controls.m_Headline->setText("Connected Devices:");
 }
-
-
-
-/** EXAMPLE CODE FOR WORKING WITH DATANODES ///
-
-void UltrasoundSupport::DoImageProcessing()
-{
-  MITK_INFO << "DO SUPM";
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
-
-  mitk::DataNode* node = nodes.front();
-
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
-    return;
-  }
-
-  // here we have a valid mitk::DataNode
-
-  // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData* data = node->GetData();
-  if (data)
-  {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-    if (image)
-    {
-      std::stringstream message;
-      std::string name;
-      message << "Performing image processing for image ";
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        message << "'" << name << "'";
-      }
-      message << ".";
-      MITK_INFO << message.str();
-
-      // actually do something here...
-
-    }
-  }
-}
-
-**/

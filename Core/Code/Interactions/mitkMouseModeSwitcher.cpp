@@ -127,6 +127,11 @@ void mitk::MouseModeSwitcher::SetInteractionScheme( InteractionScheme scheme )
   m_ActiveInteractionScheme = scheme;
 }
 
+mitk::MouseModeSwitcher::InteractionScheme mitk::MouseModeSwitcher::GetInteractionScheme() const
+{
+  return m_ActiveInteractionScheme;
+}
+
 void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
 {
   if ( m_ActiveInteractionScheme != PACS )

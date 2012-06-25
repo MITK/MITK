@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryUIException.h>
 
 #include <ctkServiceTracker.h>
+#include <ctkPluginContext.h>
+#include <service/event/ctkEvent.h>
+#include <service/event/ctkEventConstants.h>
 
 class QmitkAbstractRenderEditorPrivate
 {
@@ -33,6 +36,8 @@ public:
   QmitkAbstractRenderEditorPrivate()
     : m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance()))
     , m_PrefServiceTracker(QmitkCommonActivator::GetContext())
+    , m_Context(0)
+    , m_EventAdmin(0)
   {
     m_PrefServiceTracker.open();
   }
@@ -45,6 +50,10 @@ public:
   mitk::IRenderingManager* m_RenderingManagerInterface;
   ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
   berry::IBerryPreferences::Pointer m_Prefs;
+
+  ctkPluginContext* m_Context;
+  ctkServiceReference m_EventAdminRef;
+  ctkEventAdmin* m_EventAdmin;
 };
 
 QmitkAbstractRenderEditor::QmitkAbstractRenderEditor()
@@ -75,6 +84,14 @@ void QmitkAbstractRenderEditor::Init(berry::IEditorSite::Pointer site, berry::IE
     d->m_Prefs->OnChanged.AddListener(berry::MessageDelegate1<QmitkAbstractRenderEditor, const berry::IBerryPreferences*>
                                       (this, &QmitkAbstractRenderEditor::OnPreferencesChanged ) );
   }
+
+  d->m_Context = QmitkCommonActivator::GetContext();
+  d->m_EventAdminRef = d->m_Context->getServiceReference<ctkEventAdmin>();
+  d->m_EventAdmin = d->m_Context->getService<ctkEventAdmin>(d->m_EventAdminRef);
+
+  ctkDictionary propsForSlot;
+  propsForSlot[ctkEventConstants::EVENT_TOPIC] = "org/mitk/gui/qt/INTERACTOR_REQUEST";
+  d->m_EventAdmin->subscribeSlot(this, SLOT(handleEvent(ctkEvent)), propsForSlot);
 }
 
 mitk::IDataStorageReference::Pointer QmitkAbstractRenderEditor::GetDataStorageReference() const
@@ -144,3 +161,41 @@ bool QmitkAbstractRenderEditor::IsDirty() const
 
 bool QmitkAbstractRenderEditor::IsSaveAsAllowed() const
 { return false; }
+
+void QmitkAbstractRenderEditor::EnableInteractors(bool enable, const QStringList& interactors)
+{
+  Q_UNUSED(enable);
+  Q_UNUSED(interactors);
+}
+
+bool QmitkAbstractRenderEditor::IsInteractorEnabled(const QString& interactor) const
+{
+  Q_UNUSED(interactor);
+  return false;
+}
+
+QStringList QmitkAbstractRenderEditor::GetInteractors() const
+{
+  return QStringList();
+}
+
+void QmitkAbstractRenderEditor::handleEvent(const ctkEvent& event)
+{
+  try
+  {
+    QString topic = event.getProperty(ctkEventConstants::EVENT_TOPIC).toString();
+    if (topic == "org/mitk/gui/qt/INTERACTOR_REQUEST")
+    {
+      bool enabled = event.getProperty("enabled").toBool();
+      QStringList interactors = event.getProperty("interactors").toStringList();
+
+      this->EnableInteractors(enabled, interactors);
+    }
+  }
+  catch (const ctkRuntimeException& e)
+  {
+    MITK_ERROR << "QmitkAbstractRenderEditor::handleEvent, failed with:" << e.what() \
+        << ", caused by " << e.getCause().toLocal8Bit().constData() \
+        << std::endl;
+  }
+}

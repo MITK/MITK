@@ -97,8 +97,6 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
     newData.position = newOp;
 
     m_ReduceFilter->SetInput(m_ListOfContourLists.at(m_CurrentContourListID).size(), newContour);
-    m_NormalsFilter->SetInput(m_ListOfContourLists.at(m_CurrentContourListID).size(), m_ReduceFilter->GetOutput(m_ListOfContourLists.at(m_CurrentContourListID).size()));
-    m_InterpolateSurfaceFilter->SetInput(m_ListOfContourLists.at(m_CurrentContourListID).size(), m_NormalsFilter->GetOutput(m_ListOfContourLists.at(m_CurrentContourListID).size()));
     m_ListOfContourLists.at(m_CurrentContourListID).push_back(newData);
   }
   else
@@ -106,8 +104,15 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
     //MITK_INFO<<"Modified Contour";
     m_ListOfContourLists.at(m_CurrentContourListID).at(pos).contour = newContour;
     m_ReduceFilter->SetInput(pos, newContour);
-    m_NormalsFilter->SetInput(pos, m_ReduceFilter->GetOutput(pos));
-    m_InterpolateSurfaceFilter->SetInput(pos, m_NormalsFilter->GetOutput(pos));
+  }
+
+  m_ReduceFilter->Update();
+  m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
+
+  for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
+  {
+    m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
+    m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
   }
 
   this->Modified();
@@ -115,7 +120,7 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
 
 void mitk::SurfaceInterpolationController::Interpolate()
 {
-  if (m_ListOfContourLists.at(m_CurrentContourListID).size() < 2)
+  if (m_CurrentNumberOfReducedContours< 2)
     return;
 
   //Setting up progress bar

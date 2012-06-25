@@ -51,6 +51,8 @@ public:
 
   QHash<QString, QmitkRenderWindow*> m_RenderWindows;
 
+  QStringList m_EnabledInteractors;
+
 };
 
 struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
@@ -76,6 +78,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
       {
         d->m_StdMultiWidget->RemovePlanesFromDataStorage();
         stdMultiWidgetEditor->RequestActivateMenuWidget(false);
+        stdMultiWidgetEditor->EnableInteractors(false);
       }
     }
   }
@@ -90,6 +93,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
       {
         d->m_StdMultiWidget->RemovePlanesFromDataStorage();
         stdMultiWidgetEditor->RequestActivateMenuWidget(false);
+        stdMultiWidgetEditor->EnableInteractors(false);
       }
     }
   }
@@ -104,6 +108,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
       {
         d->m_StdMultiWidget->AddPlanesToDataStorage();
         stdMultiWidgetEditor->RequestActivateMenuWidget(true);
+        stdMultiWidgetEditor->EnableInteractors(true);
       }
     }
   }
@@ -312,6 +317,16 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     // Store the initial visibility status of the menu widget.
     d->m_MenuWidgetsEnabled = d->m_StdMultiWidget->IsMenuWidgetEnabled();
 
+    // Store the initial interactor status of the mouse mode.
+    if  (d->m_StdMultiWidget->GetMouseModeSwitcher()->GetInteractionScheme() == mitk::MouseModeSwitcher::MITK )
+    {
+      d->m_EnabledInteractors << INTERACTOR_MITK;
+    }
+    else if (d->m_StdMultiWidget->GetMouseModeSwitcher()->GetInteractionScheme() == mitk::MouseModeSwitcher::PACS )
+    {
+      d->m_EnabledInteractors << INTERACTOR_PACS;
+    }
+
     this->GetSite()->GetPage()->AddPartListener(d->m_PartListener);
 
     berry::IPreferences::Pointer prefs = this->GetPreferences();
@@ -428,5 +443,85 @@ void QmitkStdMultiWidgetEditor::RequestActivateMenuWidget(bool on)
       d->m_StdMultiWidget->ActivateMenuWidget(false);
     }
   }
+}
+
+void QmitkStdMultiWidgetEditor::EnableInteractors(bool enable, const QStringList& interactors)
+{
+  if (d->m_StdMultiWidget)
+  {
+    if (interactors.isEmpty())
+    {
+      if (enable)
+      {
+        if (!d->m_EnabledInteractors.isEmpty())
+        {
+          // i.e. enable previously stored interactors.
+          this->EnableInteractors(true, d->m_EnabledInteractors);
+        }
+        else
+        {
+          // pick a default.
+          QStringList defaultInteractor;
+          defaultInteractor << INTERACTOR_MITK;
+          this->EnableInteractors(true, defaultInteractor);
+        }
+      }
+      else
+      {
+        // Requesting de-activation, so we store the state, so that when re-activated we can restore it.
+        QStringList currentlyEnabledInteractors;
+        if (this->IsInteractorEnabled(INTERACTOR_MITK))
+        {
+          currentlyEnabledInteractors << INTERACTOR_MITK;
+        }
+        if (this->IsInteractorEnabled(INTERACTOR_PACS))
+        {
+          currentlyEnabledInteractors << INTERACTOR_PACS;
+        }
+        d->m_EnabledInteractors.clear();
+        d->m_EnabledInteractors << currentlyEnabledInteractors;
+        d->m_StdMultiWidget->GetMouseModeSwitcher()->SetInteractionScheme(mitk::MouseModeSwitcher::OFF);
+      }
+    }
+    else
+    {
+      if (enable && interactors.contains(INTERACTOR_MITK))
+      {
+        d->m_StdMultiWidget->GetMouseModeSwitcher()->SetInteractionScheme(mitk::MouseModeSwitcher::MITK);
+      }
+      if (enable && interactors.contains(INTERACTOR_PACS))
+      {
+        d->m_StdMultiWidget->GetMouseModeSwitcher()->SetInteractionScheme(mitk::MouseModeSwitcher::PACS);
+      }
+    }
+  }
+}
+
+bool QmitkStdMultiWidgetEditor::IsInteractorEnabled(const QString& interactor) const
+{
+  bool isEnabled = false;
+
+  if (d->m_StdMultiWidget)
+  {
+    if (   (interactor == INTERACTOR_MITK
+              && d->m_StdMultiWidget->GetMouseModeSwitcher()->GetInteractionScheme()
+                 == mitk::MouseModeSwitcher::MITK)
+        || (interactor == INTERACTOR_PACS
+              && d->m_StdMultiWidget->GetMouseModeSwitcher()->GetInteractionScheme()
+                 == mitk::MouseModeSwitcher::PACS)
+        )
+    {
+      isEnabled = true;
+    }
+  }
+
+  return isEnabled;
+}
+
+QStringList QmitkStdMultiWidgetEditor::GetInteractors() const
+{
+  QStringList interactors;
+  interactors << INTERACTOR_MITK << INTERACTOR_PACS;
+  return interactors;
 }
 

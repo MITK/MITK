@@ -46,8 +46,14 @@ public:
 
   QmitkStdMultiWidget* GetStdMultiWidget();
 
-  /// \brief If on=true will request the QmitkStdMultiWidget set the Menu widget to
-  /// whatever was the last known enabled state, and if on=false will turn the Menu widget off.
+  /**
+   * Request the QmitkRenderWindowMenus to be either off, or whatever was the last known state, which is
+   * useful when responding to the PartOpened, PartClosed, PartHidden methods.
+   *
+   * \param on If <code>true</code> will request the QmitkStdMultiWidget to set the QmitkRenderWindowMenu to
+   *           whatever was the last known state, and if <code>false</code> will turn the QmitkRenderWindowMenu off.
+   *
+   */
   void RequestActivateMenuWidget(bool on);
 
   // -------------------  mitk::IRenderWindowPart  ----------------------
@@ -91,6 +97,21 @@ public:
    * \see mitk::IRenderWindowPart::GetDecorations()
    */
   QStringList GetDecorations() const;
+
+  /**
+   * \see mitk::IRenderWindowPart::EnableInteractors()
+   */
+  void EnableInteractors(bool enable, const QStringList& interactors = QStringList());
+
+  /**
+   * \see mitk::IRenderWindowPart::IsInteractorEnabled()
+   */
+  bool IsInteractorEnabled(const QString& interactor) const;
+
+  /**
+   * \see mitk::IRenderWindowPart::GetInteractors()
+   */
+  QStringList GetInteractors() const;
 
   // -------------------  mitk::ILinkedRenderWindowPart  ----------------------
 

@@ -36,7 +36,6 @@ void mitk::ReduceContourSetFilter::GenerateData()
 {
   unsigned int numberOfInputs = this->GetNumberOfInputs();
   unsigned int numberOfOutputs (0);
-  this->CreateOutputsForAllInputs(numberOfInputs);
 
   vtkSmartPointer<vtkPolyData> newPolyData;
   vtkSmartPointer<vtkCellArray> newPolygons;

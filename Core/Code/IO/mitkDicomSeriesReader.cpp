@@ -557,11 +557,9 @@ DicomSeriesReader::DICOMStringToPoint3D(const std::string& s, bool& successful)
   std::istringstream originReader(s);
   std::string coordinate;
   unsigned int dim(0);
-  while( std::getline( originReader, coordinate, '\\' ) ) 
+  while( std::getline( originReader, coordinate, '\\' ) && dim < 3) 
   {
-    if (dim > 4) break; // otherwise we access invalid array index
-
-    p[dim++] = atof(coordinate.c_str());
+    p[dim++]= atof(coordinate.c_str());
   }
 
   if (dim != 3)
@@ -581,10 +579,8 @@ DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3
   std::istringstream orientationReader(s);
   std::string coordinate;
   unsigned int dim(0);
-  while( std::getline( orientationReader, coordinate, '\\' ) )
+  while( std::getline( orientationReader, coordinate, '\\' ) && dim < 6 )
   {
-    if (dim > 6) break; // otherwise we access invalid array index
-
     if (dim<3) 
     {
       right[dim++] = atof(coordinate.c_str());
@@ -621,6 +617,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   Vector3D fromFirstToSecondOrigin; fromFirstToSecondOrigin.Fill(0.0);
   bool fromFirstToSecondOriginInitialized(false);
   Point3D thisOrigin;
+  thisOrigin.Fill(0.0f);
   Point3D lastOrigin;
   lastOrigin.Fill(0.0f);
   Point3D lastDifferentOrigin;

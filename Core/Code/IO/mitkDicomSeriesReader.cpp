@@ -422,13 +422,28 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation()
 : m_ShiftUp(0.0)
 , m_ShiftRight(0.0)
 , m_ShiftNormal(0.0)
+, m_ITKAssumedSliceSpacing(0.0)
 , m_NumberOfSlicesApart(1)
 {
 }
 
+
+#define doublepoint(x) \
+  Point3Dd x; \
+  x[0] = x ## f[0]; \
+  x[1] = x ## f[1]; \
+  x[2] = x ## f[2];
+
+
+#define doublevector(x) \
+  Vector3Dd x; \
+  x[0] = x ## f[0]; \
+  x[1] = x ## f[1]; \
+  x[2] = x ## f[2];
+
 DicomSeriesReader::GantryTiltInformation::GantryTiltInformation( 
-    const Point3D& origin1, const Point3D& origin2,
-    const Vector3D& right, const Vector3D& up,
+    const Point3D& origin1f, const Point3D& origin2f,
+    const Vector3D& rightf, const Vector3D& upf,
     unsigned int numberOfSlicesApart)
 : m_ShiftUp(0.0)
 , m_ShiftRight(0.0)
@@ -436,6 +451,12 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
 , m_NumberOfSlicesApart(numberOfSlicesApart)
 {
   assert(numberOfSlicesApart);
+
+  doublepoint(origin1);
+  doublepoint(origin2);
+  doublevector(right);
+  doublevector(up);
+
   // determine if slice 1 (imagePosition1 and imageOrientation1) and slice 2 can be in one orthogonal slice stack:
   // calculate a line from origin 1, directed along the normal of slice (calculated as the cross product of orientation 1)
   // check if this line passes through origin 2
@@ -453,8 +474,8 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
      ( x meaning the cross product )
   */
 
-  Vector3D normal = itk::CrossProduct(right, up);
-  Point3D pointAlongNormal = origin2 + normal;
+  Vector3Dd normal = itk::CrossProduct(right, up);
+  Point3Dd pointAlongNormal = origin2 + normal;
 
   double numerator = itk::CrossProduct( pointAlongNormal - origin2 , origin2 - origin1 ).GetSquaredNorm();
   double denominator = (pointAlongNormal - origin2).GetSquaredNorm();
@@ -470,25 +491,58 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
     MITK_DEBUG << "    v up: " << up;
     MITK_DEBUG << "    v normal: " << normal;
 
-    Point3D projectionRight = projectPointOnLine( origin1, origin2, right );
-    Point3D projectionUp = projectPointOnLine( origin1, origin2, up );
-    Point3D projectionNormal = projectPointOnLine( origin1, origin2, normal );
+    Point3Dd projectionRight = projectPointOnLine( origin1, origin2, right );
+    Point3Dd projectionUp = projectPointOnLine( origin1, origin2, up );
+    Point3Dd projectionNormal = projectPointOnLine( origin1, origin2, normal );
 
     m_ShiftRight = (projectionRight - origin2).GetNorm();
     m_ShiftUp = (projectionUp - origin2).GetNorm();
     m_ShiftNormal = (projectionNormal - origin2).GetNorm();
 
+    /* 
+       now also check to which side the image is shifted.
+
+       Calculation e.g. from
+       http://mathworld.wolfram.com/Point-PlaneDistance.html
+    */
+
+    Point3Dd  testPoint = origin1;
+    Vector3Dd planeNormal = up;
+
+    double signedDistance = (
+                             planeNormal[0] * testPoint[0]
+                           + planeNormal[1] * testPoint[1]
+                           + planeNormal[2] * testPoint[2]
+                           - (
+                               planeNormal[0] * origin2[0]
+                             + planeNormal[1] * origin2[1]
+                             + planeNormal[2] * origin2[2]
+                             )
+                           )
+                           /
+                           sqrt( planeNormal[0] * planeNormal[0]
+                               + planeNormal[1] * planeNormal[1]
+                               + planeNormal[2] * planeNormal[2]
+                               );
+
+    MITK_INFO << "Whichside is " << signedDistance;
+    if (signedDistance < 0.0) m_ShiftUp *= -1.0; // negative sign if shift is against "right" direction
+    m_ShiftUp = signedDistance;
+    
+    m_ITKAssumedSliceSpacing = (origin2 - origin1).GetNorm();
+
     MITK_DEBUG << "    shift normal: " << m_ShiftNormal;
+    MITK_DEBUG << "    shift assumed by ITK: " << m_ITKAssumedSliceSpacing;
     MITK_DEBUG << "    shift up: " << m_ShiftUp;
     MITK_DEBUG << "    shift right: " << m_ShiftRight;
     
-    MITK_DEBUG << "    tilt angle (rad): " << tanh( m_ShiftUp / m_ShiftNormal );
-    MITK_DEBUG << "    tilt angle (deg): " << tanh( m_ShiftUp / m_ShiftNormal ) * 180.0 / 3.1415926535;
+    MITK_DEBUG << "    tilt angle (rad): " << atan( m_ShiftUp / m_ShiftNormal );
+    MITK_DEBUG << "    tilt angle (deg): " << atan( m_ShiftUp / m_ShiftNormal ) * 180.0 / 3.1415926535;
   }
 }
       
 Point3D 
-DicomSeriesReader::GantryTiltInformation::projectPointOnLine( Point3D p, Point3D lineOrigin, Vector3D lineDirection )
+DicomSeriesReader::GantryTiltInformation::projectPointOnLine( Point3Dd p, Point3Dd lineOrigin, Vector3Dd lineDirection )
 {
   /**
     See illustration at http://mo.mathematik.uni-stuttgart.de/inhalt/aussage/aussage472/
@@ -496,33 +550,40 @@ DicomSeriesReader::GantryTiltInformation::projectPointOnLine( Point3D p, Point3D
     vector(lineOrigin,p) = normal * ( innerproduct((p - lineOrigin),normal) / squared-length(normal) )
   */
 
-  Vector3D lineOriginToP = p - lineOrigin;
-  ScalarType innerProduct = lineOriginToP * lineDirection;
+  Vector3Dd lineOriginToP = p - lineOrigin;
+  double innerProduct = lineOriginToP * lineDirection;
   
-  ScalarType factor = innerProduct / lineDirection.GetSquaredNorm();
-  Point3D projection = lineOrigin + factor * lineDirection;
+  double factor = innerProduct / lineDirection.GetSquaredNorm();
+  Point3Dd projection = lineOrigin + factor * lineDirection;
 
   return projection;
 }
 
-ScalarType 
+double 
 DicomSeriesReader::GantryTiltInformation::GetTiltCorrectedAdditionalSize() const
 {
   // this seems to be a bit too much sometimes, but better too much than cutting off parts of the image
-  return int(m_ShiftUp + 1.0); // to next bigger int: plus 1, then cut off after point
+  return fabs(m_ShiftUp);
+}
+      
+double 
+DicomSeriesReader::GantryTiltInformation::GetTiltAngleInDegrees() const
+{
+  return atan( fabs(m_ShiftUp) / m_ShiftNormal ) * 180.0 / 3.1415926535;
 }
 
-ScalarType 
+double 
 DicomSeriesReader::GantryTiltInformation::GetMatrixCoefficientForCorrectionInWorldCoordinates() const
 {
-  // so many mm shifted per slice!
-  return m_ShiftUp / static_cast<ScalarType>(m_NumberOfSlicesApart);
+  // so many mm need to be shifted per slice!
+  double factorTilt = m_ShiftUp / m_ITKAssumedSliceSpacing;
+  return factorTilt;
 }
 
-ScalarType 
+double 
 DicomSeriesReader::GantryTiltInformation::GetRealZSpacing() const
 {
-  return m_ShiftNormal / static_cast<ScalarType>(m_NumberOfSlicesApart);
+  return m_ShiftNormal / static_cast<double>(m_NumberOfSlicesApart);
 }
 
 
@@ -530,7 +591,7 @@ bool
 DicomSeriesReader::GantryTiltInformation::IsSheared() const
 {
   return (   m_ShiftRight > 0.001
-          ||    m_ShiftUp > 0.001);
+          ||    fabs(m_ShiftUp) > 0.001);
 }
 
       
@@ -538,7 +599,7 @@ bool
 DicomSeriesReader::GantryTiltInformation::IsRegularGantryTilt() const
 {
   return (   m_ShiftRight < 0.001 
-          &&    m_ShiftUp > 0.001);
+          &&    fabs(m_ShiftUp) > 0.001);
 }
 
 
@@ -613,6 +674,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
   const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
+  const gdcm::Tag          tagGantryTilt(0x0018, 0x1120); // gantry tilt
 
   Vector3D fromFirstToSecondOrigin; fromFirstToSecondOrigin.Fill(0.0);
   bool fromFirstToSecondOriginInitialized(false);
@@ -685,9 +747,32 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
           if ( groupImagesWithGantryTilt && tiltInfo.IsRegularGantryTilt() )
           {
-            result.FlagGantryTilt();
-            result.AddFileToSortedBlock(*fileIter); // this file is good for current block
-            fileFitsIntoPattern = true;
+            // check if this is at least roughly the same angle as recorded in DICOM tags
+            if ( tagValueMappings[fileIter->c_str()].find(tagGantryTilt) != tagValueMappings[fileIter->c_str()].end() )
+            {
+              // read value, compare to calculated angle
+              std::string tiltStr = ConstCharStarToString( tagValueMappings[fileIter->c_str()][tagGantryTilt] );
+              double angle = atof(tiltStr.c_str());
+
+              MITK_DEBUG << "Comparing recorded tilt angle " << angle << " against calculated value " << tiltInfo.GetTiltAngleInDegrees();
+              if ( fabs(angle - tiltInfo.GetTiltAngleInDegrees() > 0.02) )
+              {
+                result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
+                fileFitsIntoPattern = false;
+              }
+              else
+              {
+                result.FlagGantryTilt();
+                result.AddFileToSortedBlock(*fileIter); // this file is good for current block
+                fileFitsIntoPattern = true;
+              }
+            }
+            else
+            {
+              result.FlagGantryTilt();
+              result.AddFileToSortedBlock(*fileIter); // this file is good for current block
+              fileFitsIntoPattern = true;
+            }
           }
           else
           {
@@ -815,6 +900,9 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
 
   const gdcm::Tag tagNumberOfColumns(0x0028, 0x0011); // number cols
     scanner.AddTag( tagNumberOfColumns );
+  
+  const gdcm::Tag tagGantryTilt(0x0018, 0x1120); // gantry tilt
+    scanner.AddTag( tagGantryTilt );
   
   // additional tags read in this scan to allow later analysis
   // THESE tag are not used for initial separating of files

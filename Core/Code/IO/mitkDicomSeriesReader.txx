@@ -94,10 +94,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
         tiltInfo = GantryTiltInformation ( origin1, origin2, right, up, filenames.size()-1 );
         correctTilt = tiltInfo.IsSheared() && tiltInfo.IsRegularGantryTilt();
-
-        MITK_DEBUG << "** Loading now: shear? " << tiltInfo.IsSheared();
-        MITK_DEBUG << "** Loading now: normal tilt? " << tiltInfo.IsRegularGantryTilt();
-        MITK_DEBUG << "** Loading now: perform tilt correction? " << correctTilt;
       }
       else
       {
@@ -467,9 +463,34 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
 
   resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
 
+
+  // if tilt positive, then we need additional pixels BELOW origin, otherwise we need pixels behind the end of the block
+
+  // in any case we need more size to accomodate shifted slices
   typename ImageType::SizeType largerSize = resampler->GetSize(); // now the resampler already holds the input image's size.
-  largerSize[1] += tiltInfo.GetTiltCorrectedAdditionalSize();
+  largerSize[1] += int(tiltInfo.GetTiltCorrectedAdditionalSize() / input->GetSpacing()[1]+ 2.0);
   resampler->SetSize( largerSize );
+
+  // in SOME cases this additional size is below/behind origin
+  if ( tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() > 0.0 )
+  {
+    typename ImageType::DirectionType imageDirection = input->GetDirection();
+    Vector3D yDirection;
+    yDirection[0] = imageDirection[0][1];
+    yDirection[1] = imageDirection[1][1];
+    yDirection[2] = imageDirection[2][1];
+    yDirection.Normalize();
+
+    typename ImageType::PointType shiftedOrigin;
+    shiftedOrigin = input->GetOrigin();
+   
+    // add some pixels to make everything fit
+    shiftedOrigin[0] -= yDirection[0] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
+    shiftedOrigin[1] -= yDirection[1] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
+    shiftedOrigin[2] -= yDirection[2] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
+    
+    resampler->SetOutputOrigin( shiftedOrigin );
+  }
 
   resampler->Update();
   typename ImageType::Pointer result = resampler->GetOutput();

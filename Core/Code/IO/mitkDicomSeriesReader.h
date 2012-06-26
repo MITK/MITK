@@ -240,6 +240,8 @@ Stacked slices:
 
  \todo refactor all the protected helper objects/methods into a separate header so we compile faster
 */
+typedef  itk::Point<double,3> Point3Dd;
+typedef itk::Vector<double,3> Vector3Dd;
 class MITK_CORE_EXPORT DicomSeriesReader
 {
 public:
@@ -465,31 +467,37 @@ protected:
       /**
         \brief The offset distance in Y direction for each slice (describes the tilt result).
       */
-      ScalarType GetMatrixCoefficientForCorrectionInWorldCoordinates() const;
+      double GetMatrixCoefficientForCorrectionInWorldCoordinates() const;
 
 
       /**
         \brief The z / inter-slice spacing. Needed to correct ImageSeriesReader's result.
       */
-      ScalarType GetRealZSpacing() const;
+      double GetRealZSpacing() const;
 
       /**
         \brief The shift between first and last slice in mm.
 
         Needed to resize an orthogonal image volume.
       */
-      ScalarType GetTiltCorrectedAdditionalSize() const;
+      double GetTiltCorrectedAdditionalSize() const;
+
+      /**
+        \brief Calculated tilt angle in degrees.
+      */
+      double GetTiltAngleInDegrees() const;
 
     protected:
 
       /**
         \brief Projection of point p onto line through lineOrigin in direction of lineDirection.
       */
-      Point3D projectPointOnLine( Point3D p, Point3D lineOrigin, Vector3D lineDirection ); 
+      Point3D projectPointOnLine( Point3Dd p, Point3Dd lineOrigin, Vector3Dd lineDirection ); 
 
-      ScalarType m_ShiftUp;
-      ScalarType m_ShiftRight;
-      ScalarType m_ShiftNormal;
+      double m_ShiftUp;
+      double m_ShiftRight;
+      double m_ShiftNormal;
+      double m_ITKAssumedSliceSpacing;
       unsigned int m_NumberOfSlicesApart;
   };
 
@@ -533,6 +541,7 @@ protected:
   template <typename ImageType>
   static
   typename ImageType::Pointer
+  // TODO this is NOT inplace!
   InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
 
 

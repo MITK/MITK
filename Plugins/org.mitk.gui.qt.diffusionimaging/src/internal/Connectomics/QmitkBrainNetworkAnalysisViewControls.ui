@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>227</width>
-    <height>1012</height>
+    <height>1045</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -107,6 +107,36 @@
      <property name="text">
       <string>Divide in Modules</string>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="pruneOptionsGroupBox">
+     <property name="title">
+      <string>Prune Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QPushButton" name="prunePushButton">
+        <property name="text">
+         <string>Prune Network</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="edgeWeightLabel">
+          <property name="text">
+           <string>Prune edge weight below</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="pruneEdgeWeightSpinBox"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

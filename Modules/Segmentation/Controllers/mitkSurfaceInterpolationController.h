@@ -126,6 +126,8 @@ namespace mitk
     unsigned int m_CurrentContourListID;
 
     mitk::Surface::Pointer m_InterpolationResult;
+
+    unsigned int m_CurrentNumberOfReducedContours;
  };
 }
 #endif

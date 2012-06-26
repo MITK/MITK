@@ -118,9 +118,9 @@ void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection(){
 void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 {
   // If no VideoDevice is given, throw an exception
-  if (device->GetClassName().compare("org.mitk.modules.us.USVideoDevice") != 0){
+  if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") != 0){
     // TODO Alert if bad path
-    mitkThrow() << "NewVideoDevcieWidget recieved an incompatible Device Type to edit. Devicetype was: " << device->GetClassName();
+    mitkThrow() << "NewVideoDevcieWidget recieved an incompatible Device Type to edit. Devicetype was: " << device->GetDeviceClass();
   }
   MITK_INFO << "NewDeviceWidget: EditDevice()";
   m_TargetDevice = static_cast<mitk::USVideoDevice*> (device.GetPointer());
@@ -137,7 +137,7 @@ void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 }
 
 
-/////////////////////// HOUSEHOLDING CODE /////////////////////////////////
+/////////////////////// HOUSEHOLDING CODE ///////////////////////////////
 
 QListWidgetItem* QmitkUSNewVideoDeviceWidget::ConstructItemFromDevice(mitk::USDevice::Pointer device){
   QListWidgetItem *result = new QListWidgetItem;

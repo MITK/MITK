@@ -75,7 +75,6 @@ bool mitk::USDevice::Connect()
   props["DeviceClass"] = this->GetDeviceClass();
   std::string no = "false";
   props["IsActive"] = no;
-  props["Class"] = this->GetClassName();
   m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
   return true; 
 }
@@ -114,10 +113,10 @@ bool mitk::USDevice::Activate()
   props["DeviceClass"] = this->GetDeviceClass();
   std::string yes = "true";
   props["IsActive"] = yes;
-  props["Class"] = this->GetClassName();
   this->m_ServiceRegistration.SetProperties(props);
   return m_IsActive;
 }
+
 
 void mitk::USDevice::Deactivate()
 {
@@ -127,7 +126,6 @@ void mitk::USDevice::Deactivate()
   props["DeviceClass"] = this->GetDeviceClass();
   std::string no = "false";
   props["IsActive"] = no;
-  props["Class"] = this->GetClassName();
   this->m_ServiceRegistration.SetProperties(props);
   OnDeactivation();
 }
@@ -162,6 +160,7 @@ void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
   this->m_ConnectedProbes.push_back(probe);
 }
 
+
 void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
   // currently, we may just add the probe. This behaviour must be changed, should more complicated SDK applications emerge 
   AddProbe(probe);
@@ -173,6 +172,7 @@ void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
   // index now contains the position of the original instance of this probe
   m_ActiveProbe = m_ConnectedProbes[index];
 }
+
 
 void mitk::USDevice::DeactivateProbe(){
   m_ActiveProbe = 0;

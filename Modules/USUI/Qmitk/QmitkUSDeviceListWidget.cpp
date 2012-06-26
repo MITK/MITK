@@ -77,6 +77,7 @@ void QmitkUSDeviceListWidget::Initialize(std::string filter)
   m_MitkUSContext->AddServiceListener(this, &QmitkUSDeviceListWidget::OnServiceEvent, m_Filter);
 }
 
+
 ///////////////////////// Getter & Setter /////////////////////////////////
 
 mitk::USDevice::Pointer QmitkUSDeviceListWidget::GetSelectedDevice()
@@ -147,10 +148,6 @@ mitk::USDevice::Pointer QmitkUSDeviceListWidget::GetDeviceForListItem(QListWidge
   return 0;
 }
 
-
-//mitk::ServiceTracker<mitk::USDevice, mitk::USDevice::Pointer> QmitkUSDeviceListWidget::ConstructServiceTracker(){
-//return 0;
-//}
 
 std::vector <mitk::USDevice::Pointer> QmitkUSDeviceListWidget::GetAllRegisteredDevices(){
   

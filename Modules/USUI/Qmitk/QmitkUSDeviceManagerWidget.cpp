@@ -165,11 +165,6 @@ mitk::USDevice::Pointer QmitkUSDeviceManagerWidget::GetDeviceForListItem(QListWi
   return 0;
 }
 
-
-//mitk::ServiceTracker<mitk::USDevice, mitk::USDevice::Pointer> QmitkUSDeviceManagerWidget::ConstructServiceTracker(){
-//return 0;
-//}
-
 std::vector <mitk::USDevice::Pointer> QmitkUSDeviceManagerWidget::GetAllRegisteredDevices(){
   
   //Get Service References

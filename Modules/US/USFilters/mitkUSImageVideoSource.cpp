@@ -79,7 +79,7 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID)
 mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 {
   IplImage *m_cvCurrentVideoFrame = NULL;
-  CvCapture* capture = cvCaptureFromCAM( 50 );
+  CvCapture* capture = cvCaptureFromCAM( 1000 );
    if ( !capture ) {
      fprintf( stderr, "ERROR: capture is NULL \n" );
      getchar();

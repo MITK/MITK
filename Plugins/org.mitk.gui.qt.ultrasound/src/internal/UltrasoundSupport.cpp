@@ -81,11 +81,8 @@ void UltrasoundSupport::DisplayImage()
 
   m_Device->UpdateOutputData(0);
   mitk::USImage::Pointer image = m_Device->GetOutput();
-  //m_Node->Initialize();
   m_Node->SetData(image);
   this->RequestRenderWindowUpdate();
-  
-
 }
 
 void UltrasoundSupport::OnClickedViewDevice()

@@ -24,13 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModuleContext.h"
 
 
-mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVideoOnly) : mitk::ImageSource()
+mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::ImageSource()
 {
   // Initialize Members
   m_Metadata = mitk::USImageMetadata::New();
   m_Metadata->SetDeviceManufacturer(manufacturer);
   m_Metadata->SetDeviceModel(model);
-  m_Metadata->SetDeviceIsVideoOnly(isVideoOnly);
   m_IsActive = false;
   
   //set number of outputs
@@ -41,7 +40,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model, bool isVid
   this->SetNthOutput(0,newOutput);
 }
 
-mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata, bool isVideoOnly) : mitk::ImageSource()
+mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata) : mitk::ImageSource()
 {
   m_Metadata = metadata;
   m_IsActive = false;
@@ -79,11 +78,7 @@ bool mitk::USDevice::Connect()
   return true; 
 }
 
-bool mitk::USDevice::OnConnection()
-{
-  return true;
-  // TODO: Make Abstract
-}
+
 
 bool mitk::USDevice::Disconnect()
 {
@@ -96,11 +91,17 @@ bool mitk::USDevice::Disconnect()
   return true;
 }
 
-bool mitk::USDevice::OnDisconnection()
-{
-  return true;
-  // TODO Make Abstract
-}
+//bool mitk::USDevice::OnConnection()
+//{
+//  return true;
+//  // TODO: Make Abstract
+//}
+//
+//bool mitk::USDevice::OnDisconnection()
+//{
+//  return true;
+//  // TODO Make Abstract
+//}
 
 
 bool mitk::USDevice::Activate()
@@ -130,24 +131,24 @@ void mitk::USDevice::Deactivate()
   OnDeactivation();
 }
 
-
-bool mitk::USDevice::OnActivation()
-{
-  return true;
-  // TODO Make Abstract
-}
-
-
-void mitk::USDevice::OnDeactivation()
-{
-  // TODO Make Abstract
-}
-
-
-std::string mitk::USDevice::GetDeviceClass()
-{
-  return "org.mitk.Ultrasound.GenericDevice";
-}
+//
+//bool mitk::USDevice::OnActivation()
+//{
+//  return true;
+//  // TODO Make Abstract
+//}
+//
+//
+//void mitk::USDevice::OnDeactivation()
+//{
+//  // TODO Make Abstract
+//}
+//
+//
+//std::string mitk::USDevice::GetDeviceClass()
+//{
+//  return "org.mitk.Ultrasound.GenericDevice";
+//}
 
 
 
@@ -262,10 +263,6 @@ std::string mitk::USDevice::GetDeviceModel(){
 
 std::string mitk::USDevice::GetDeviceComment(){
   return this->m_Metadata->GetDeviceComment();
-}
-
-bool mitk::USDevice::GetIsVideoOnly(){
-  return this->m_Metadata->GetDeviceIsVideoOnly();
 }
 
 std::vector<mitk::USProbe::Pointer> mitk::USDevice::GetConnectedProbes()

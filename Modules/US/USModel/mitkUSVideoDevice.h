@@ -27,8 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
     /**Documentation
-    * \brief A VideoDevcie is the common class for video only devcies. They capture Video Input either from
-    *  a file or from a devcie, and transform the output into an mitkUSImage with attached Metadata.
+    * \brief A VideoDevice is the common class for video only devices. They capture Video Input either from
+    *  a file or from a device, and transform the output into an mitkUSImage with attached Metadata.
     *  This simple implementation does only capture and display 2D Images without cropping or registration.
     *  One can simply inherit from this class and overwrite the handle2D and handle 3Dmethods to get full access to the data
     * \ingroup US
@@ -50,9 +50,7 @@ namespace mitk {
       /**
       * \brief Returns the qualified name of this class. Be sure to override this when inheriting from VideoDevice!
       */
-      virtual std::string GetClassName(){
-        return "org.mitk.modules.us.USVideoDevice";
-      }
+      virtual std::string GetDeviceClass();
 
       void GenerateData();
 
@@ -80,7 +78,49 @@ namespace mitk {
 
       virtual ~USVideoDevice();
 
+
+      /**
+      * \brief Is called during the connection process. 
+      *  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
+      */
+      virtual bool OnConnection();
+
+      /**
+      * \brief Is called during the disconnection process.
+      *  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
+      */
+      virtual bool OnDisconnection();    
+
+      /**
+      * \brief Is called during the activation process. After this method is finsihed, the device should be generating images
+      */
+      virtual bool OnActivation();    
+
+
+      /**
+      * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
+      */
+      virtual void OnDeactivation();  
+
+      /**
+      * \brief The image source that we use to aquire data
+      */
       mitk::USImageVideoSource::Pointer m_Source;
+
+      /**
+      * \brief True, if this source plays back a file, false if it recieves data from a device
+      */
+      bool m_SourceIsFile;
+
+      /**
+      * \brief The device id to connect to. Undefined, if m_SourceIsFile == true;
+      */
+      int m_DeviceID;
+
+      /**
+      * \brief The Filepath id to connect to. Undefined, if m_SourceIsFile == false;
+      */
+      std::string m_FilePath;
 
     };
 } // namespace mitk

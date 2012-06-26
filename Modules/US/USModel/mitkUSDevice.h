@@ -47,18 +47,16 @@ namespace mitk {
       mitkClassMacro(USDevice, mitk::ImageSource);
 
       /**
-      * \brief Enforces minimal Metadata to be set. The isVideoOnly flag indicates that this class 
-      *        only handles a videostream and does not receive Metadata from the physical device itself.
+      * \brief Enforces minimal Metadata to be set. 
       */
-      mitkNewMacro3Param(Self, std::string, std::string, bool);
+     // mitkNewMacro3Param(Self, std::string, std::string, bool);
 
       
       /**
       * \brief Constructs a device with the given Metadata. Make sure the Metadata contains meaningful content!
-      *        The isVideoOnly flag indicates that this class 
-      *        only handles a videostream and does not receive Metadata from the physical device itself.
+      *      
       */
-      mitkNewMacro2Param(Self, mitk::USImageMetadata::Pointer, bool);
+     // mitkNewMacro2Param(Self, mitk::USImageMetadata::Pointer, bool);
 
       /**
       * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.
@@ -160,7 +158,7 @@ namespace mitk {
       /**
       * \brief Returns the Class of the Device. This Method must be reimplemented by every Inheriting Class.
       */
-      std::string GetDeviceClass();
+      virtual std::string GetDeviceClass() = 0;
 
       /**
       * \brief True, if the device is currently generating image data, false otherwise.
@@ -180,7 +178,6 @@ namespace mitk {
       std::string GetDeviceManufacturer();
       std::string GetDeviceModel();
       std::string GetDeviceComment();
-      bool GetIsVideoOnly();
 
     protected:
       mitk::USProbe::Pointer m_ActiveProbe;
@@ -191,24 +188,24 @@ namespace mitk {
       * \brief Is called during the connection process. Override this method in your subclass to handle the actual connection.
       *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
       */
-      virtual bool OnConnection();
+      virtual bool OnConnection() = 0;
 
       /**
       * \brief Is called during the disconnection process. Override this method in your subclass to handle the actual disconnection.
       *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
       */
-      virtual bool OnDisconnection();    
+      virtual bool OnDisconnection() = 0;    
 
       /**
       * \brief Is called during the activation process. After this method is finsihed, the device should be generating images
       */
-      virtual bool OnActivation();    
+      virtual bool OnActivation() = 0;    
 
 
       /**
-      * \brief Is called during the disactivation process. After a call to this method the device should still be connected, but not producing images anymore.
+      * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
       */
-      virtual void OnDeactivation();    
+      virtual void OnDeactivation() = 0;    
       
 
       /**
@@ -221,17 +218,14 @@ namespace mitk {
 
       
       /**
-      * \brief Enforces minimal Metadata to be set. The isVideoOnly flag indicates that this class 
-      *        only handles a videostream and does not recieve Metadata from the physical device itself.
+      * \brief Enforces minimal Metadata to be set.
       */
-      USDevice(std::string manufacturer, std::string model, bool isVideoOnly);
+      USDevice(std::string manufacturer, std::string model);
 
       /**
       * \brief Constructs a device with the given Metadata. Make sure the Metadata contains meaningful content!
-      *        The isVideoOnly flag indicates that this class 
-      *        only handles a videostream and does not receive Metadata from the physical device itself.
       */
-      USDevice(mitk::USImageMetadata::Pointer metadata, bool isVideoOnly);
+      USDevice(mitk::USImageMetadata::Pointer metadata);
 
       virtual ~USDevice();
 

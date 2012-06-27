@@ -58,15 +58,12 @@ QmitkToFUtilView::QmitkToFUtilView()
     this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
     this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
     this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
-
-    this->m_UpdateMutex = new QMutex;
 }
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
     OnToFCameraStopped();
     OnToFCameraDisconnected();
-    delete this->m_UpdateMutex;
 }
 
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
@@ -354,9 +351,7 @@ void QmitkToFUtilView::OnUpdateCamera()
     else
     {
       // update pipeline
-      m_UpdateMutex->lock();
       this->m_MitkDistanceImage->Update();
-      m_UpdateMutex->unlock();
     }
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

@@ -433,6 +433,7 @@ class mitkNavigationDataPlayerTestClass
 
     }
     MITK_TEST_CONDITION_REQUIRED(exceptionThrown, "Testing SetStream method in exception was thrown.");
+
   }
     
  static void TestStartPlayingExceptions()

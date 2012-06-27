@@ -229,8 +229,9 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
   }
   if (!stream->good())
   {
-    MITK_ERROR << "Stream not good!";
-    return 0;
+    MITK_ERROR << "Stream is not good!";
+    mitkThrowException(mitk::IGTException)<<"Stream is not good!";
+    return 0; //add an exception here?
   }
   int version = 1;
   
@@ -273,7 +274,8 @@ unsigned int mitk::NavigationDataPlayer::GetNumberOfNavigationDatas(std::istream
     return 0;
   }
   if (!stream->good())
-  {
+  { 
+    mitkThrowException(mitk::IGTException)<<"Stream not good!";
     MITK_ERROR << "Stream not good!";
     return 0;
   }
@@ -309,6 +311,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
   if (!m_Stream->good())
   {
     m_Playing = false;
+    mitkThrowException(mitk::IGTException) << "Playing not possible. Stream is not good!";
     MITK_ERROR << "Playing not possible. Stream is not good!";
     return NULL;
   }

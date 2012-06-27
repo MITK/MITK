@@ -158,7 +158,8 @@ namespace mitk {
 
     /**
     * \brief Returns the file version out of the XML document.
-  * @throw Throws an exception if stream is NULL (exception havent been thrown yet)?????????
+    * @throws Throws an exception if stream is NULL
+    * @throws Throws an exception if stream in not good
     */
     unsigned int GetFileVersion(std::istream* stream);
 

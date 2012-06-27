@@ -16,41 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkImageStatisticsView.h"
 
-#include <limits>
-
-#include <qlabel.h>
-#include <qspinbox.h>
-#include <qpushbutton.h>
-#include <qcheckbox.h>
-#include <qgroupbox.h>
-#include <qradiobutton.h>
-#include <qlineedit.h>
+// Qt includes
 #include <qclipboard.h>
-#include <qfiledialog.h>
 
-#include <berryIEditorPart.h>
+// berry includes
 #include <berryIWorkbenchPage.h>
-#include <berryPlatform.h>
 
-
-#include "QmitkStdMultiWidget.h"
-#include "QmitkSliderNavigatorWidget.h"
-
+// mitk includes
 #include "mitkNodePredicateDataType.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkProperties.h"
-
-#include "mitkProgressBar.h"
-
-// Includes for image processing
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
-
-#include "mitkDataNodeObject.h"
-#include "mitkNodePredicateData.h"
 #include "mitkPlanarFigureInteractor.h"
 
-#include <itkVectorImage.h>
+// itk includes
 #include "itksys/SystemTools.hxx"
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
@@ -115,7 +91,7 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*)(this->m_Controls->m_ButtonCopyHistogramToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(OnClipboardHistogramButtonClicked()) );
     connect( (QObject*)(this->m_Controls->m_ButtonCopyStatisticsToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(OnClipboardStatisticsButtonClicked()) );
     connect( (QObject*)(this->m_Controls->m_IgnoreZerosCheckbox), SIGNAL(clicked()),(QObject*) this, SLOT(OnIgnoreZerosCheckboxClicked()) );
-    connect( (QObject*) this->m_CalculationThread, SIGNAL(finished()),this, SLOT( OnThreadedStatisticsCalculationEnds(/*bool, bool*/)),Qt::QueuedConnection);
+    connect( (QObject*) this->m_CalculationThread, SIGNAL(finished()),this, SLOT( OnThreadedStatisticsCalculationEnds()),Qt::QueuedConnection);
     connect( (QObject*) this, SIGNAL(StatisticsUpdate()),this, SLOT( RequestStatisticsUpdate()), Qt::QueuedConnection); 
   }
 }
@@ -437,7 +413,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
     m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
     m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
-   // m_Controls->m_HistogramWidget->SetHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
+    m_Controls->m_HistogramWidget->SetHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
     int timeStep = this->m_CalculationThread->GetTimeStep();
     this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
   }

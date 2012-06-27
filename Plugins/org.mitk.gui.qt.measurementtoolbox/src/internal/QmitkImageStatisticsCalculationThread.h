@@ -85,11 +85,6 @@ public:
   /brief Method called once the thread is executed. */
   void run();
 
-signals:
-  /*! 
-  /brief Signal emitted once the calculation has finished */
-  void CalculationFinished(bool calculationSuccessful, bool statisticsChanged);
-
 private:
   //member declaration
   mitk::Image::Pointer m_StatisticsImage;                         ///< member variable holds the input image for which the statistics need to be calculated.

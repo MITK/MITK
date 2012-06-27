@@ -152,6 +152,4 @@ void QmitkImageStatisticsCalculationThread::run()
     } 
     this->m_TimeStepHistogram = (HistogramType*) calculator->GetHistogram(m_TimeStep);
   }
-
-  emit CalculationFinished( statisticCalculationSuccessful, statisticChanged);
 }

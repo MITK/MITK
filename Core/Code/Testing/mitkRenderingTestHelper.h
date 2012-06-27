@@ -59,6 +59,8 @@ public:
     **/
     void SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection);
 
+    void SetSwivelDirection();
+
     /** @brief Render everything into an mitkRenderWindow. Call SetViewDirection() and SetProperty() before this method.
     **/
     void Render();
@@ -77,9 +79,6 @@ protected:
 
     mitk::RenderWindow::Pointer m_RenderWindow; //<< Contains the mitkRenderWindow into which the test renders the data
     mitk::DataStorage::Pointer m_DataStorage; //<< Contains the mitkDataStorage which contains the data to be rendered
-    int m_width;
-    int m_height;
-
 
 };
 

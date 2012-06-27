@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 
 mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc, char* argv[])
-:m_width(width), m_height(height)
 {
     // Global interaction must(!) be initialized
     mitk::GlobalInteraction::GetInstance()->Initialize("global");
@@ -39,6 +38,9 @@ mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc
     m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
     m_RenderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
     this->GetVtkRenderWindow()->SetSize( width, height );
+    m_RenderWindow->GetRenderer()->Resize( width, height);
+
+    this->GetVtkRenderWindow()->DoubleBufferOff( );
     this->SetInputFileNames(argc, argv);
 }
 
@@ -51,20 +53,19 @@ void mitkRenderingTestHelper::Render()
     //if the datastorage is initialized and at least 1 image is loaded render it
     if(m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1 )
     {
-        mitk::TimeSlicedGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
-        m_RenderWindow->GetRenderer()->Resize(m_width, m_height);
+      
+      mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
 
-        mitk::RenderingManager::GetInstance()->InitializeViews( geo );
-        mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
+      //use this to actually show the iamge in a renderwindow
+      //  this->GetVtkRenderWindow()->Render();
+      //  this->GetVtkRenderWindow()->GetInteractor()->Start();
+
     }
     else
     {
         MITK_ERROR << "No images loaded in data storage!";
     }
 
-    //use this to actually show the iamge in a renderwindow
-    //  this->GetVtkRenderWindow()->Render();
-    //  this->GetVtkRenderWindow()->GetInteractor()->Start();
 }
 
 void mitkRenderingTestHelper::SetInputFileNames(int argc, char* argv[])
@@ -88,6 +89,27 @@ void mitkRenderingTestHelper::SetInputFileNames(int argc, char* argv[])
 void mitkRenderingTestHelper::SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection)
 {
     mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController()->SetDefaultViewDirection(viewDirection);
+    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
+}
+
+void mitkRenderingTestHelper::SetSwivelDirection() {
+    mitk::Point3D p3d;
+   p3d.SetElement(0, 0.0f);
+   p3d.SetElement(1, 0.0f);
+   p3d.SetElement(2, 0.0f);
+
+   mitk::Vector3D v3d;
+   v3d.SetElement(0, 0.2);
+   v3d.SetElement(1, 0.3);
+   v3d.SetElement(2, 0.5);
+
+   mitk::SliceNavigationController::Pointer sliceNavi =
+   mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController();
+  
+   sliceNavi->ReorientSlices(p3d, v3d);
+
+   mitk::Stepper::Pointer stepper = sliceNavi->GetSlice();
+   sliceNavi->GetSlice()->SetPos(stepper->GetSteps()/2);
 }
 
 vtkRenderer* mitkRenderingTestHelper::GetVtkRenderer()
@@ -144,5 +166,8 @@ void mitkRenderingTestHelper::AddToStorage(const std::string &filename)
     {
         MITK_ERROR << "Failed loading test data '" << filename << "': " << e.what();
     }
+
+    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
+
 }
 

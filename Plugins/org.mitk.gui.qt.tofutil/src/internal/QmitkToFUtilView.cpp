@@ -347,8 +347,8 @@ void QmitkToFUtilView::OnUpdateCamera()
     }
     else
     {
-        // update pipeline
-        this->m_MitkDistanceImage->Update();
+      // update pipeline
+      this->m_MitkDistanceImage->Update();
     }
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

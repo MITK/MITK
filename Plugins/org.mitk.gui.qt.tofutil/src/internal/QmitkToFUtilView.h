@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ui_QmitkToFUtilViewControls.h>
 
 #include <QTimer>
+#include <QMutex>
 
 #include <mitkRealTimeClock.h>
 #include <mitkToFImageGrabber.h>
@@ -166,6 +167,8 @@ class QmitkToFUtilView : public QmitkFunctionality
     void ProcessVideoTransform();
 
     mitk::ToFSurfaceVtkMapper3D::Pointer m_ToFSurfaceVtkMapper3D;
+
+    QMutex* m_UpdateMutex;
 };
 
 #endif // _QMITKTOFUTILVIEW_H_INCLUDED

@@ -117,7 +117,7 @@ void mitk::BinaryThresholdTool::SetThresholdValue(double value)
   if (m_ThresholdFeedbackNode.IsNotNull())
   {
     m_CurrentThresholdValue = value;
-    m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 1) ) );
+    m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.0) ) );
     RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

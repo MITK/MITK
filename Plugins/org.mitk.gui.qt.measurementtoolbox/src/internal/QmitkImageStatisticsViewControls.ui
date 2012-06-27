@@ -9,14 +9,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>465</width>
-    <height>475</height>
+    <width>501</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_11">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_5">
      <item row="0" column="0">
@@ -44,7 +44,17 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="1" column="0">
+    <widget class="QLabel" name="m_ErrorMessageLabel">
+     <property name="text">
+      <string>Error Message</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
       <string>Statistics</string>
@@ -184,7 +194,7 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="3" column="0">
     <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
      <property name="enabled">
       <bool>true</bool>
@@ -262,7 +272,7 @@
      </widget>
      <widget class="QWidget" name="page_2">
       <layout class="QGridLayout" name="gridLayout_9">
-       <item row="1" column="0">
+       <item row="0" column="0">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>Intensity Profile</string>
@@ -284,7 +294,7 @@
      </widget>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
+   <item row="4" column="0">
     <layout class="QGridLayout" name="gridLayout_7">
      <item row="0" column="0">
       <widget class="QPushButton" name="m_ButtonCopyStatisticsToClipboard">
@@ -302,7 +312,14 @@
      </item>
     </layout>
    </item>
-   <item row="5" column="1">
+   <item row="5" column="0">
+    <widget class="QCheckBox" name="m_IgnoreZerosCheckbox">
+     <property name="text">
+      <string>Ignore zero-valued voxels</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
     <spacer name="spacer2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -317,23 +334,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="m_ErrorMessageLabel">
-     <property name="text">
-      <string>Error Message</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QCheckBox" name="m_IgnoreZerosCheckbox">
-     <property name="text">
-      <string>Ignore zero-valued voxels</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

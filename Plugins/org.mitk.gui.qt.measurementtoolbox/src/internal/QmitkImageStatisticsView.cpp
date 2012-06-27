@@ -55,43 +55,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 
-//class QmitkRequestStatisticsUpdateEvent : public QEvent
-//{
-//public:
-//  enum Type
-//  {
-//    StatisticsUpdateRequest = QEvent::MaxUser - 1025
-//  };
-//
-//  QmitkRequestStatisticsUpdateEvent()
-//    : QEvent( (QEvent::Type) StatisticsUpdateRequest ) {};
-//};
-
-
-
-//typedef itk::Image<short, 3>                 ImageType;
-//typedef itk::Image<float, 3>                 FloatImageType;
-//typedef itk::Image<itk::Vector<float,3>, 3>  VectorImageType;
-//
-//inline bool my_isnan(float x)
-//{
-//  volatile float d = x;
-//
-//  if(d!=d)
-//    return true;
-//
-//  if(d==d)
-//    return false;
-//  return d != d;
-//
-//}
-
 QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const char* /*name*/)
 : m_Controls( NULL ),
 m_TimeStepperAdapter( NULL ),
-//m_SelectedImageNode( NULL ),
 m_SelectedImage( NULL ),
-//m_SelectedMaskNode( NULL ),
 m_SelectedImageMask( NULL ),
 m_SelectedPlanarFigure( NULL ),
 m_ImageObserverTag( -1 ),
@@ -99,12 +66,10 @@ m_ImageMaskObserverTag( -1 ),
 m_PlanarFigureObserverTag( -1 ),
 m_CurrentStatisticsValid( false ),
 m_StatisticsUpdatePending( false ),
-//m_StatisticsIntegrationPending( false ),
 m_DataNodeSelectionChanged ( false ),
 m_Visible(false)
 {
   this->m_CalculationThread = new QmitkImageStatisticsCalculationThread;
-  this->m_QThreadMutex = new QMutex;
   this->m_SelectedDataNodes = SelectedDataNodeVectorType(2);    // maximum number of selected nodes is exactly two!
 }
 
@@ -122,8 +87,12 @@ QmitkImageStatisticsView::~QmitkImageStatisticsView()
     itksys::SystemTools::Delay(100);
   }
   delete this->m_CalculationThread;
-}
 
+  //if(m_QThreadMutex != 0)
+  //{
+  //  delete m_QThreadMutex;
+  //}
+}
 
 void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
@@ -146,7 +115,7 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*)(this->m_Controls->m_ButtonCopyHistogramToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(OnClipboardHistogramButtonClicked()) );
     connect( (QObject*)(this->m_Controls->m_ButtonCopyStatisticsToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(OnClipboardStatisticsButtonClicked()) );
     connect( (QObject*)(this->m_Controls->m_IgnoreZerosCheckbox), SIGNAL(clicked()),(QObject*) this, SLOT(OnIgnoreZerosCheckboxClicked()) );
-    connect( (QObject*) this->m_CalculationThread, SIGNAL(CalculationFinished(bool, bool)),this, SLOT( OnThreadedStatisticsCalculationEnds(bool, bool)),Qt::QueuedConnection);
+    connect( (QObject*) this->m_CalculationThread, SIGNAL(finished()),this, SLOT( OnThreadedStatisticsCalculationEnds(/*bool, bool*/)),Qt::QueuedConnection);
     connect( (QObject*) this, SIGNAL(StatisticsUpdate()),this, SLOT( RequestStatisticsUpdate()), Qt::QueuedConnection); 
   }
 }
@@ -218,8 +187,6 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
 
 void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
-  //MITK_INFO<<"Start SelectionChanged!";
-
   if( this->m_StatisticsUpdatePending )
   {
     this->m_DataNodeSelectionChanged = true;
@@ -276,8 +243,12 @@ void QmitkImageStatisticsView::ReinitData()
   m_Controls->m_LineProfileWidget->ClearItemModel();
 }
 
-void QmitkImageStatisticsView::OnThreadedStatisticsCalculationEnds( bool calculationSuccessful, bool statisticsChanged )
+void QmitkImageStatisticsView::OnThreadedStatisticsCalculationEnds()
 {
+  std::stringstream message;
+  message << "";
+  m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+  m_Controls->m_ErrorMessageLabel->hide();
   this->WriteStatisticsToGUI();
 }
 
@@ -320,13 +291,11 @@ void QmitkImageStatisticsView::UpdateStatistics()
       }
       else if( !isMask )
       {
-        //this->m_QThreadMutex->lock(); 
         if(this->m_SelectedImage == NULL)
         {
           this->m_SelectedImage = static_cast<mitk::Image*>(this->m_SelectedDataNodes.at(i)->GetData());
           this->m_ImageObserverTag = this->m_SelectedImage->AddObserver(itk::ModifiedEvent(), changeListener);
         }
-        //this->m_QThreadMutex->unlock();
       }
     }
     else if (planarFig.IsNotNull())
@@ -387,11 +356,15 @@ void QmitkImageStatisticsView::UpdateStatistics()
     m_Controls->m_SelectedMaskLabel->setText( maskLabel.str().c_str() );
 
     //// initialize thread and trigger it
-    this-> m_QThreadMutex->lock();
+    //this-> m_QThreadMutex->lock();
     this->m_CalculationThread->SetIgnoreZeroValueVoxel( m_Controls->m_IgnoreZerosCheckbox->isChecked() );
     this->m_CalculationThread->Initialize( m_SelectedImage, m_SelectedImageMask, m_SelectedPlanarFigure );
     this->m_CalculationThread->SetTimeStep( timeStep );
-    this-> m_QThreadMutex->unlock();
+    //this-> m_QThreadMutex->unlock();
+    std::stringstream message;
+    message << "<font color='red'>Calculating statistics...</font>";
+    m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+    m_Controls->m_ErrorMessageLabel->show();
 
     try
     {
@@ -464,7 +437,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
     m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
     m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
-    m_Controls->m_HistogramWidget->SetHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
+   // m_Controls->m_HistogramWidget->SetHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
     int timeStep = this->m_CalculationThread->GetTimeStep();
     this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
   }
@@ -566,7 +539,6 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   }
 }
 
-
 void QmitkImageStatisticsView::InvalidateStatisticsTableView()
 {
   for ( unsigned int i = 0; i < 7; ++i )
@@ -598,459 +570,3 @@ void QmitkImageStatisticsView::Hidden()
 void QmitkImageStatisticsView::SetFocus()
 {
 }
-
-
-
-
-//void QmitkImageStatisticsView::UpdateProgressBar()
-//{
-//  mitk::ProgressBar::GetInstance()->Progress();
-//}
-
-//  if ( !m_StatisticsUpdatePending )
-//  {
-//    if(this->m_DataNodeSelectionChanged)
-//    {
-//      this->ReinitData();
-//      this->SelectionChanged( this->GetDataManagerSelection());  
-//while( this->m_CalculationThread->isRunning() )
-//{
-//  itksys::SystemTools::Delay(100);
-//}
-
-//this->m_CalculationThread->terminate();
-//this->m_StatisticsUpdatePending = false;
-
-//if(this->m_SelectedImage != NULL)
-//{
-//  this->m_SelectedImage->RemoveObserver( this->m_ImageObserverTag);
-//  this->m_ImageObserverTag = -1;
-//  this->m_SelectedImage = NULL;
-//}
-//if(this->m_SelectedImageMask != NULL)
-//{
-//  this->m_SelectedImageMask->RemoveObserver( this->m_ImageMaskObserverTag);
-//  this->m_ImageMaskObserverTag = -1;
-//  this->m_SelectedImageMask = NULL;
-//}    
-//if(this->m_SelectedPlanarFigure != NULL)
-//{
-//  this->m_SelectedPlanarFigure->RemoveObserver( this->m_PlanarFigureObserverTag);
-//  this->m_PlanarFigureObserverTag = -1;
-//  this->m_SelectedPlanarFigure = NULL;
-//}
-//    }
-//    else
-//    {
-//      emit StatisticsUpdate();
-//    }
-//  }
-//}
-//void QmitkImageStatisticsView::RemoveOrphanImages()
-//{
-//  ImageStatisticsMapType::iterator it = m_ImageStatisticsMap.begin();
-//
-//  while ( it != m_ImageStatisticsMap.end() )
-//  {
-//    mitk::Image *image = it->first;
-//    mitk::ImageStatisticsCalculator *calculator = it->second;
-//    ++it;
-//
-//    mitk::NodePredicateData::Pointer hasImage = mitk::NodePredicateData::New( image );
-//    if ( this->GetDataStorage()->GetNode( hasImage ) == NULL )
-//    {
-//      if ( m_SelectedImage == image )
-//      {
-//        m_SelectedImage = NULL;
-//        //m_SelectedImageNode = NULL;
-//      }
-//      if ( m_CurrentStatisticsCalculator == calculator )
-//      {
-//        m_CurrentStatisticsCalculator = NULL;
-//      }
-//      m_ImageStatisticsMap.erase( image );
-//      it = m_ImageStatisticsMap.begin();
-//    }
-//  }
-//}
-
-//bool QmitkImageStatisticsView::event( QEvent *event )
-//{
-//  if ( event->type() == (QEvent::Type) QmitkRequestStatisticsUpdateEvent::StatisticsUpdateRequest )
-//  {
-//    // Update statistics
-//
-//    m_StatisticsUpdatePending = false;
-//
-//    this->UpdateStatistics();
-//    return true;
-//  }
-//  else if(event->type() == (QEvent::Type) QmitkStatisticsCalculatedEvent::StatisticsCalculated )
-//  {
-//    this->OnThreadedStatisticsCalculationEnds();
-//  }
-//
-//  return false;
-//}
-//void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*part*/,
-//                                                   const QList<mitk::DataNode::Pointer> &selectedNodes )
-//{
-//  MITK_INFO<<"SelectionChanged!";
-//  // Clear any unreferenced images
-//  this->RemoveOrphanImages();
-//
-//  if ( !m_Visible )
-//  {
-//    return;
-//  }
-//
-//  // Check if selection makeup consists only of valid nodes:
-//  // One image, segmentation or planarFigure
-//  // One image and one of the other two
-//  bool tooManyNodes( true );
-//  bool invalidNodes( true );
-//
-//  if ( selectedNodes.size() < 3 )
-//  {
-//    tooManyNodes = false;
-//  }
-//
-//  QList<mitk::DataNode::Pointer> nodes(selectedNodes);
-//  if( !tooManyNodes )
-//  {
-//    unsigned int numberImages = 0;
-//    unsigned int numberSegmentations = 0;
-//    unsigned int numberPlanarFigures = 0;
-//
-//    for ( int index = 0; index < nodes.size(); index++ )
-//    {
-//      m_SelectedImageMask = dynamic_cast< mitk::Image * >( nodes[ index ]->GetData() );
-//      m_SelectedPlanarFigure = dynamic_cast< mitk::PlanarFigure * >( nodes[ index ]->GetData() );
-//
-//      if ( m_SelectedImageMask != NULL )
-//      {
-//        bool isMask( false );
-//        nodes[ index ]->GetPropertyValue("binary", isMask);
-//        if ( !isMask )
-//        {
-//          numberImages++;
-//        }
-//        else
-//        {
-//          numberSegmentations++;
-//          if ( numberImages != 0 ) // image should be last element
-//          {
-//            std::swap( nodes[ index ], nodes[ index - 1 ] );
-//          }
-//        }
-//      }
-//      else if ( m_SelectedPlanarFigure != NULL )
-//      {
-//        numberPlanarFigures++;
-//        if ( numberImages != 0 ) // image should be last element
-//        {
-//          std::swap( nodes[ index ], nodes[ index - 1 ] );
-//        }
-//      }
-//    }
-//
-//    if ( ( numberPlanarFigures + numberSegmentations + numberImages ) == nodes.size() && //No invalid nodes
-//      ( numberPlanarFigures + numberSegmentations ) < 2 && numberImages < 2
-//      // maximum of one image and/or one of either planar figure or segmentation
-//      )
-//    {
-//      invalidNodes = false;
-//    }
-//  }
-//
-//  if ( nodes.empty() || tooManyNodes || invalidNodes )
-//  {
-//    // Nothing to do: invalidate image, clear statistics, histogram, and GUI
-//    m_SelectedImage = NULL;
-//    this->InvalidateStatisticsTableView() ;
-//    m_Controls->m_HistogramWidget->ClearItemModel();
-//    m_Controls->m_LineProfileWidget->ClearItemModel();
-//
-//    m_CurrentStatisticsValid = false;
-//    m_Controls->m_ErrorMessageLabel->hide();
-//    m_Controls->m_SelectedMaskLabel->setText( "None" );
-//    return;
-//  }
-//
-//  // Get selected element
-//
-//  mitk::DataNode *selectedNode = nodes.front();
-//  mitk::Image *selectedImage = dynamic_cast< mitk::Image * >( selectedNode->GetData() );
-//
-//  // Find the next parent/grand-parent node containing an image, if any
-//  mitk::DataStorage::SetOfObjects::ConstPointer parentObjects;
-//  mitk::DataNode *parentNode = NULL;
-//  mitk::Image *parentImage = NULL;
-//
-//  // Possibly previous change listeners
-//  if ( (m_SelectedPlanarFigure != NULL) && (m_PlanarFigureObserverTag >= 0) )
-//  {
-//    m_SelectedPlanarFigure->RemoveObserver( m_PlanarFigureObserverTag );
-//    m_PlanarFigureObserverTag = -1;
-//  }
-//  if ( (m_SelectedImage != NULL) && (m_ImageObserverTag >= 0) )
-//  {
-//    m_SelectedImage->RemoveObserver( m_ImageObserverTag );
-//    m_ImageObserverTag = -1;
-//  }
-//  if ( (m_SelectedImageMask != NULL) && (m_ImageMaskObserverTag >= 0) )
-//  {
-//    m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag );
-//    m_ImageMaskObserverTag = -1;
-//  }
-//
-//  // Deselect all images and masks by default
-//  m_SelectedImageNode = NULL;
-//  m_SelectedImage = NULL;
-//  m_SelectedMaskNode = NULL;
-//  m_SelectedImageMask = NULL;
-//  m_SelectedPlanarFigure = NULL;
-//
-//  {
-//    unsigned int parentObjectIndex = 0;
-//    parentObjects = this->GetDataStorage()->GetSources( selectedNode );
-//    while( parentObjectIndex < parentObjects->Size() )
-//    {
-//      // Use first parent object (if multiple parents are present)
-//      parentNode = parentObjects->ElementAt( parentObjectIndex );
-//      parentImage = dynamic_cast< mitk::Image * >( parentNode->GetData() );
-//      if( parentImage != NULL )
-//      {
-//        break;
-//      }
-//      parentObjectIndex++;
-//    }
-//  }
-//
-//  if ( nodes.size() == 2 )
-//  {
-//    parentNode = nodes.back();
-//    parentImage = dynamic_cast< mitk::Image * >( parentNode->GetData() );
-//  }
-//
-//  if ( parentImage != NULL )
-//  {
-//    m_SelectedImageNode = parentNode;
-//    m_SelectedImage = parentImage;
-//
-//    // Check if a valid mask has been selected (Image or PlanarFigure)
-//    m_SelectedImageMask = dynamic_cast< mitk::Image * >( selectedNode->GetData() );
-//    m_SelectedPlanarFigure = dynamic_cast< mitk::PlanarFigure * >( selectedNode->GetData() );
-//
-//    // Check whether ImageMask is a binary segmentation
-//
-//    if ( (m_SelectedImageMask != NULL) )
-//    {
-//      bool isMask( false );
-//      selectedNode->GetPropertyValue("binary", isMask);
-//      if ( !isMask )
-//      {
-//        m_SelectedImageNode = selectedNode;
-//        m_SelectedImage = selectedImage;
-//        m_SelectedImageMask = NULL;
-//      }
-//      else
-//      {
-//        m_SelectedMaskNode = selectedNode;
-//      }
-//    }
-//    else if ( (m_SelectedPlanarFigure != NULL) )
-//    {
-//      m_SelectedMaskNode = selectedNode;
-//    }
-//  }
-//  else if ( selectedImage != NULL )
-//  {
-//    m_SelectedImageNode = selectedNode;
-//    m_SelectedImage = selectedImage;
-//  }
-//
-//
-//  typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
-//  ITKCommandType::Pointer changeListener;
-//  changeListener = ITKCommandType::New();
-//  changeListener->SetCallbackFunction( this, &QmitkImageStatisticsView::RequestStatisticsUpdate );
-//
-//  // Add change listeners to selected objects
-//  if ( m_SelectedImage != NULL )
-//  {
-//    m_ImageObserverTag = m_SelectedImage->AddObserver(
-//      itk::ModifiedEvent(), changeListener );
-//  }
-//
-//  if ( m_SelectedImageMask != NULL )
-//  {
-//    m_ImageMaskObserverTag = m_SelectedImageMask->AddObserver(
-//      itk::ModifiedEvent(), changeListener );
-//  }
-//
-//  if ( m_SelectedPlanarFigure != NULL )
-//  {
-//    m_PlanarFigureObserverTag = m_SelectedPlanarFigure->AddObserver(
-//      mitk::EndInteractionPlanarFigureEvent(), changeListener );
-//  }
-//
-//  // Clear statistics / histogram GUI if nothing is selected
-//  if ( m_SelectedImage == NULL )
-//  {
-//    // Clear statistics, histogram, and GUI
-//    this->InvalidateStatisticsTableView();
-//    m_Controls->m_HistogramWidget->ClearItemModel();
-//    m_Controls->m_LineProfileWidget->ClearItemModel();
-//    m_CurrentStatisticsValid = false;
-//    m_Controls->m_ErrorMessageLabel->hide();
-//    m_Controls->m_SelectedMaskLabel->setText( "None" );
-//  }
-//  else
-//  {
-//    // Else, request statistics and GUI update
-//    emit StatisticsUpdate();
-//  }
-//}
-//
-
-
-
-// Retrieve ImageStatisticsCalculator from hash map (or create a new one
-// for this image if non-existent)
-//ImageStatisticsMapType::iterator it =
-//  m_ImageStatisticsMap.find( m_SelectedImage );
-
-//if ( it != m_ImageStatisticsMap.end() )
-//{
-//  m_CurrentStatisticsCalculator = it->second;
-//  //MITK_INFO << "Retrieving StatisticsCalculator";
-//}
-//else
-//{
-//  m_CurrentStatisticsCalculator = mitk::ImageStatisticsCalculator::New();
-//  m_CurrentStatisticsCalculator->SetImage( m_SelectedImage );
-//  m_ImageStatisticsMap[m_SelectedImage] = m_CurrentStatisticsCalculator;
-//  //MITK_INFO << "Creating StatisticsCalculator";
-//}
-
-//std::string maskName;
-//std::string maskType;
-
-//if ( m_SelectedImageMask != NULL )
-//{
-//  m_CurrentStatisticsCalculator->SetImageMask( m_SelectedImageMask );
-//  m_CurrentStatisticsCalculator->SetMaskingModeToImage();
-
-//  //maskName = m_SelectedMaskNode->GetName();
-//  //maskType = m_SelectedImageMask->GetNameOfClass();
-//  //maskDimension = 3;
-//}
-//else if ( m_SelectedPlanarFigure != NULL )
-//{
-//  m_CurrentStatisticsCalculator->SetPlanarFigure( m_SelectedPlanarFigure );
-//  m_CurrentStatisticsCalculator->SetMaskingModeToPlanarFigure();
-
-//  //maskName = m_SelectedMaskNode->GetName();
-//  //maskType = m_SelectedPlanarFigure->GetNameOfClass();
-//  //maskDimension = 2;
-//}
-//else
-//{
-//  m_CurrentStatisticsCalculator->SetMaskingModeToNone();
-
-//  //maskName = "None";
-//  //maskType = "";
-//  //maskDimension = 0;
-//}
-
-//if(m_Controls->m_IgnoreZerosCheckbox->isChecked())
-//{
-//  m_CurrentStatisticsCalculator->SetIgnorePixelValue(0);
-//  m_CurrentStatisticsCalculator->SetDoIgnorePixelValue(true);
-//}
-//else
-//{
-//  m_CurrentStatisticsCalculator->SetDoIgnorePixelValue(false);
-//}
-
-
-//bool statisticsChanged = false;
-//bool statisticsCalculationSuccessful = false;
-
-// Initialize progress bar
-//mitk::ProgressBar::GetInstance()->AddStepsToDo( 100 );
-
-// Install listener for progress events and initialize progress bar
-//typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
-//ITKCommandType::Pointer progressListener;
-//progressListener = ITKCommandType::New();
-//progressListener->SetCallbackFunction( this, &QmitkImageStatisticsView::UpdateProgressBar );
-//unsigned long progressObserverTag = m_CurrentStatisticsCalculator
-//  ->AddObserver( itk::ProgressEvent(), progressListener );
-
-// show wait cursor
-//this->WaitCursorOn();
-
-//m_CurrentStatisticsCalculator->RemoveObserver( progressObserverTag );
-
-// Make sure that progress bar closes
-//mitk::ProgressBar::GetInstance()->Progress( 100 );
-
-// remove wait cursor
-//this->WaitCursorOff();
-
-//  if ( statisticsCalculationSuccessful )
-//  {
-//    if ( statisticsChanged )
-//    {
-//      // Do not show any error messages
-//      m_Controls->m_ErrorMessageLabel->hide();
-
-//      m_CurrentStatisticsValid = true;
-//    }
-
-//    m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-//    m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
-//    m_Controls->m_HistogramWidget->SetHistogram(
-//      m_CurrentStatisticsCalculator->GetHistogram( timeStep ) );
-//    m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
-
-//    MITK_INFO << "UpdateItemModelFromHistogram()";
-
-//    this->FillStatisticsTableView(
-//      m_CurrentStatisticsCalculator->GetStatistics( timeStep ),
-//      m_SelectedImage );
-//  }
-//  else
-//  {
-//    m_Controls->m_SelectedMaskLabel->setText( "None" );
-
-//    // Clear statistics and histogram
-//    this->InvalidateStatisticsTableView();
-//    m_Controls->m_HistogramWidget->ClearItemModel();
-//    m_CurrentStatisticsValid = false;
-
-//    // If a (non-closed) PlanarFigure is selected, display a line profile widget
-//    if ( m_SelectedPlanarFigure != NULL )
-//    {
-//      // check whether PlanarFigure is initialized
-//      const mitk::Geometry2D *planarFigureGeometry2D = m_SelectedPlanarFigure->GetGeometry2D();
-//      if ( planarFigureGeometry2D == NULL )
-//      {
-//        // Clear statistics, histogram, and GUI
-//        this->InvalidateStatisticsTableView();
-//        m_Controls->m_HistogramWidget->ClearItemModel();
-//        m_Controls->m_LineProfileWidget->ClearItemModel();
-//        m_CurrentStatisticsValid = false;
-//        m_Controls->m_ErrorMessageLabel->hide();
-//        m_Controls->m_SelectedMaskLabel->setText( "None" );
-//        return;
-//      }
-//      // TODO: enable line profile widget
-//      m_Controls->m_Sta tisticsWidgetStack->setCurrentIndex( 1 );
-//      m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );
-//      m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
-//      m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
-//    }
-//  }

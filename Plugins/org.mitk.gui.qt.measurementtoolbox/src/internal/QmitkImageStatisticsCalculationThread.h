@@ -1,20 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile$
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 #ifndef QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED
 #define QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED
 
@@ -35,22 +33,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 /** /brief This class is executed as background thread for image statistics calculation.
   * Documentation: This class is derived from QThread and is intended to be used by QmitkImageStatisticsView
-                   to run the image statistics calculation in a background thread to keep the 
-                   gui usable.
+                   to run the image statistics calculation in a background thread keepung the gui usable.
   *   \ingroup Plugins/MeasurementToolbox
   */
-
-//class QmitkStatisticsCalculatedEvent : public QEvent
-//{
-//public:
-//  enum Type
-//  {
-//    StatisticsCalculated = QEvent::MaxUser - 1050
-//  };
-//
-//  QmitkStatisticsCalculatedEvent()
-//    : QEvent( (QEvent::Type) StatisticsCalculated ) {};
-//};
 
 class  QmitkImageStatisticsCalculationThread : public QThread
 {
@@ -91,16 +76,18 @@ public:
   /brief Returns the histogram of the currently selected time step. */
   HistogramType::Pointer GetTimeStepHistogram();
   /*! 
-  /brief */
+  /brief Returns a flag indicating if the statistics have changed during calculation */
   bool GetStatisticsChangedFlag();
   /*! 
-  /brief */
+  /brief Returns a flag the indicates if the statistics are updated successfully */
   bool GetStatisticsUpdateSuccessFlag();
   /*! 
   /brief Method called once the thread is executed. */
   void run();
 
 signals:
+  /*! 
+  /brief Signal emitted once the calculation has finished */
   void CalculationFinished(bool calculationSuccessful, bool statisticsChanged);
 
 private:
@@ -111,8 +98,8 @@ private:
   mitk::ImageStatisticsCalculator::Statistics m_StatisticsStruct; ///< member variable holds the result struct.
   int m_TimeStep;                                                 ///< member variable holds the time step for statistics calculation
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
-  bool m_StatisticChanged;
-  bool m_CalculationSuccessful;
-  HistogramType::Pointer m_TimeStepHistogram;                              ///< member holds the histogram of the current time step.
+  bool m_StatisticChanged;                                        ///< flag set if statistics have changed
+  bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
+  HistogramType::Pointer m_TimeStepHistogram;                     ///< member holds the histogram of the current time step.
 };
 #endif // QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED

@@ -1,20 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile$
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, 
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "QmitkImageStatisticsCalculationThread.h"
 
@@ -50,7 +48,7 @@ void QmitkImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer ima
   if(binaryImage.IsNotNull())
     this->m_BinaryMask = binaryImage->Clone();
   if(planarFig.IsNotNull())
-    this->m_PlanarFigureMask = dynamic_cast<mitk::PlanarFigure*>(planarFig.GetPointer());
+    this->m_PlanarFigureMask = dynamic_cast<mitk::PlanarFigure*>(planarFig.GetPointer()); // once clone methods for planar figures are implemented, copy the data here!
 }
 
 void QmitkImageStatisticsCalculationThread::SetTimeStep( int times )
@@ -143,6 +141,7 @@ void QmitkImageStatisticsCalculationThread::run()
   }
   this->m_StatisticChanged = statisticChanged;
   this->m_CalculationSuccessful = statisticCalculationSuccessful;
+
   if(statisticCalculationSuccessful)
   {
     this->m_StatisticsStruct = calculator->GetStatistics();  
@@ -150,8 +149,9 @@ void QmitkImageStatisticsCalculationThread::run()
     if(this->m_TimeStepHistogram.IsNotNull())
     {
       this->m_TimeStepHistogram = NULL;
-} 
+    } 
     this->m_TimeStepHistogram = (HistogramType*) calculator->GetHistogram(m_TimeStep);
   }
+
   emit CalculationFinished( statisticCalculationSuccessful, statisticChanged);
 }

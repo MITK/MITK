@@ -75,17 +75,13 @@ public:
   virtual void CreateConnections();
 
   bool IsExclusiveFunctionality() const;
-  /*!
-  \brief */
-  //void SetStatisticsUpdatePendingFlag( bool flag);
-  //virtual bool event( QEvent *event );
 
   void OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes );
 
   static const std::string VIEW_ID;
 
 public slots: 
-    void OnThreadedStatisticsCalculationEnds(bool , bool );
+    void OnThreadedStatisticsCalculationEnds();
 
 protected slots:
   void OnClipboardHistogramButtonClicked();
@@ -105,14 +101,6 @@ protected:
     const mitk::Image *image );
 
   void InvalidateStatisticsTableView();
-
-  /** \brief Issues a request to update statistics by sending an event to the
-  * Qt event processing queue.
-  *
-  * Statistics update should only be executed after program execution returns
-  * to the Qt main loop. This mechanism also prevents multiple execution of
-  * updates where only one is required.*/
-  //void RequestStatisticsUpdate();
 
   /** \brief Recalculate statistics for currently selected image and mask and
    * update the GUI. */
@@ -181,7 +169,6 @@ protected:
   bool m_StatisticsIntegrationPending;
   bool m_DataNodeSelectionChanged;
   bool m_Visible;
-  QMutex* m_QThreadMutex;
 };
 
 #endif // QmitkImageStatisticsView_H__INCLUDED

@@ -22,12 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 
+//for exceptions
+#include "mitkIGTException.h"
+#include "mitkIGTIOException.h"
 
-
-
-
-
-
+//default constructor
 mitk::NavigationDataRecorder::NavigationDataRecorder()
 {
   //set default values
@@ -46,8 +45,6 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
-  
-
 }
 
 mitk::NavigationDataRecorder::~NavigationDataRecorder()
@@ -95,7 +92,7 @@ void mitk::NavigationDataRecorder::Update()
     strs << sysTimestamp;
     std::string sysTimeStr = strs.str();
 
-    //if csv-mode: write csv header and timpstamp at beginning
+    //if csv-mode: write csv header and timestamp at beginning
     if (m_OutputFormat == mitk::NavigationDataRecorder::csv)
       {
       //write header only when it's the first line 
@@ -245,15 +242,11 @@ void mitk::NavigationDataRecorder::RemoveAdditionalAttribute( const NavigationDa
 
 void mitk::NavigationDataRecorder::StartRecording()
 {
-  if (m_Recording)
-  {
-    std::cout << "Already recording please stop before start new recording session" << std::endl;
-    return;
-  }
-  
 
-  if (m_Stream == NULL)
+  if(!m_Recording)
   {
+  if (m_Stream == NULL)
+  { 
     std::stringstream ss;
     std::ostream* stream;
     
@@ -288,7 +281,10 @@ void mitk::NavigationDataRecorder::StartRecording()
         if (m_FileName == "")
         {
           stream = &std::cout;
-          std::cout << "No file name or file path set the output is redirected to the console";
+          //throw an exception 
+          std::string message="No file name or file path set the output is redirected to the console";
+          mitkThrowException(mitk::IGTIOException)<<message;
+          std::cout << message;
         }
         else
         {
@@ -298,7 +294,7 @@ void mitk::NavigationDataRecorder::StartRecording()
         break;
       case ZipFile:
         stream = &std::cout;
-        std::cout << "Sorry no ZipFile support yet";
+        MITK_WARN << "Sorry no ZipFile support yet";
         break;
       default:
         stream = &std::cout;
@@ -310,16 +306,23 @@ void mitk::NavigationDataRecorder::StartRecording()
     m_RecordCounter = 0;
     StartRecording(stream);
   }
-
-
+} else  if (m_Recording)
+ { //exception is thrown
+    mitkThrowException(mitk::IGTException)<<"Already recording please stop before start new recording session";
+    MITK_WARN << "Already recording please stop before start new recording session" << std::endl;
+    return;
+  } 
 
 
 }
+
 void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
 {
   if (m_Recording)
   {
-    std::cout << "Already recording please stop before start new recording session" << std::endl;
+    //throwing an exception
+    mitkThrowException(mitk::IGTException)<<"Already recording please stop before start new recording session";
+    MITK_WARN << "Already recording please stop before start new recording session" << std::endl;
     return;
   }
 
@@ -327,8 +330,9 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
   m_Stream->precision(10);
 
   //TODO store date and GMT time
-  if (m_Stream)
-  {
+  //cheking if the stream is good
+  if (m_Stream->good())
+  { 
     if (m_OutputFormat == mitk::NavigationDataRecorder::xml)
       {
       *m_Stream << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << std::endl;
@@ -337,12 +341,19 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
       *m_Stream << "    " << "<Data ToolCount=\"" << (m_NumberOfInputs) << "\" version=\"1.0\">" << std::endl;
       }
     m_Recording = true;
+  } 
+  else 
+  {
+   m_Recording = false;
+   mitkThrowException(mitk::IGTException)<<"The stream is not good";
   }
 }
+
+
 void mitk::NavigationDataRecorder::StopRecording()
 {
   if (!m_Recording)
-  {
+  { 
     std::cout << "You have to start a recording first" << std::endl;
     return;
   }

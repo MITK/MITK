@@ -35,7 +35,10 @@ public:
 
    static void TestAddProbe()
   {
-    mitk::USDevice::Pointer device = mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    //mitk::USDevice::Pointer device = mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    mitk::USVideoDevice::Pointer  tempPointer =  mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    mitk::USDevice* device = tempPointer.GetPointer();
+
     // create probes
     mitk::USProbe::Pointer usSource = mitk::USProbe::New();
     mitk::USProbe::Pointer probeA = mitk::USProbe::New();
@@ -67,7 +70,9 @@ public:
 
   static void TestActivateProbe()
   {
-    mitk::USDevice::Pointer device = mitk::USVideoDevice::New("IllegalVideoDevice", "Manufacturer", "Model");
+    //mitk::USDevice::Pointer device = mitk::USVideoDevice::New("IllegalVideoDevice", "Manufacturer", "Model");
+    mitk::USVideoDevice::Pointer  tempPointer =  mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    mitk::USDevice* device = tempPointer.GetPointer();
     // create probes
     mitk::USProbe::Pointer usSource = mitk::USProbe::New();
     mitk::USProbe::Pointer probeA = mitk::USProbe::New();

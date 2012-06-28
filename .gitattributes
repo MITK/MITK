@@ -27,6 +27,7 @@ vxl_doxy.pl      crlf=input
 zap.pl           crlf=input
 
 *.c              whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify
+*.cpp            whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify
 *.h              whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify
 *.cxx            whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify
 *.hxx            whitespace=tab-in-indent,no-lf-at-eof  hooks.style=KWStyle,uncrustify

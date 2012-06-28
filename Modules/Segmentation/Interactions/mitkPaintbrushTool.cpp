@@ -184,7 +184,7 @@ bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* sta
   */
 bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const StateEvent* stateEvent)
 {
-    const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if (!positionEvent) return false;
 
     CheckIfCurrentSliceHasChanged(positionEvent);
@@ -276,6 +276,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
   displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
   SetFeedbackContour( *displayContour );
+
   assert( positionEvent->GetSender()->GetRenderWindow() );
 
   RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -297,23 +298,21 @@ bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent*
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0. 
   */
-bool mitk::PaintbrushTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+bool mitk::PaintbrushTool::OnInvertLogic(Action* itkNotUsed(action), const StateEvent* stateEvent)
 {
-  if (!FeedbackContourTool::OnInvertLogic(action, stateEvent)) return false;
-
-  // Inversion only for 0 and 1 as painting values
-  if (m_PaintingPixelValue == 1)
-  {
-    m_PaintingPixelValue = 0;
-    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
-  }
-  else if (m_PaintingPixelValue == 0)
-  {
-    m_PaintingPixelValue = 1;
-    FeedbackContourTool::SetFeedbackContourColorDefault();
-  }
-
-  return true;
+    // Inversion only for 0 and 1 as painting values
+    if (m_PaintingPixelValue == 1)
+    {
+      m_PaintingPixelValue = 0;
+      FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+    }
+    else if (m_PaintingPixelValue == 0)
+    {
+      m_PaintingPixelValue = 1;
+      FeedbackContourTool::SetFeedbackContourColorDefault();
+    }
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return true;
 }
 
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *event)
@@ -333,7 +332,6 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *ev
     {
         m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
         m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
-
         m_WorkingNode->ReplaceProperty( "color", workingNode->GetProperty("color") );
         m_WorkingNode->SetData(m_WorkingSlice);
     }

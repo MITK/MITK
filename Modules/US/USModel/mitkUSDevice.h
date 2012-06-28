@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceInterface.h>
 #include <usServiceRegistration.h>
+#include <usServiceProperties.h>
 
 
 
@@ -188,9 +189,11 @@ namespace mitk {
 
 
       /*
-      *\brief Is called when 
+      * \brief This Method constructs the service properties which can later be used to
+      *  register the object with the Microservices
+      *  Return service properties
       */
-      bool ConstructServiceProperties();
+      mitk::ServiceProperties ConstructServiceProperties();
 
 
       /**

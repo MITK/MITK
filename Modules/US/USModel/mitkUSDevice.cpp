@@ -59,7 +59,7 @@ mitk::USDevice::~USDevice()
 
 }
 
-bool mitk::USDevice::ConstructServiceProperties()
+mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 {
   ServiceProperties props;
   std::string yes = "true";
@@ -69,13 +69,14 @@ bool mitk::USDevice::ConstructServiceProperties()
     props["IsActive"] = yes;
   else
     props["IsActive"] = no;
+  props[ "DeviceClass" ] = GetDeviceClass();
   props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
   props[ mitk::USImageMetadata::PROP_DEV_MODEL ] = m_Metadata->GetDeviceModel();
   props[ mitk::USImageMetadata::PROP_DEV_COMMENT ] = m_Metadata->GetDeviceComment();
   props[ mitk::USImageMetadata::PROP_PROBE_NAME ] = m_Metadata->GetProbeName();
   props[ mitk::USImageMetadata::PROP_PROBE_FREQUENCY ] = m_Metadata->GetProbeFrequency();
   props[ mitk::USImageMetadata::PROP_ZOOM ] = m_Metadata->GetZoom();
-  return true;
+  return props;
 }
 
 
@@ -88,12 +89,8 @@ bool mitk::USDevice::Connect()
 
   // Get Context and Module
   mitk::ModuleContext* context = GetModuleContext();
+  ServiceProperties props = ConstructServiceProperties();
 
-  // Define ServiceProps
-  ServiceProperties props;
-  props["DeviceClass"] = this->GetDeviceClass();
-  std::string no = "false";
-  props["IsActive"] = no;
   m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
   return true; 
 }

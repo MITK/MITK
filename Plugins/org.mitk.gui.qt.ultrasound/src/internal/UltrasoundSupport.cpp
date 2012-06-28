@@ -95,7 +95,7 @@ void UltrasoundSupport::OnClickedViewDevice()
     return;
   }
 
-  m_Timer->start(100);
+  m_Timer->start(50);
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()

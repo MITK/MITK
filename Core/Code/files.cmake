@@ -45,7 +45,7 @@ set(H_FILES
   Algorithms/mitkPPTupleElem.h
   Algorithms/mitkPPTupleRem.h
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
-  Algorithms/mitkExtractSliceFilter.h
+  Algorithms/mitkExtractSliceFilter.h  
   
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
@@ -55,7 +55,7 @@ set(H_FILES
   DataManagement/mitkImageToItk.txx
   
   Interfaces/mitkIDataNodeReader.h
-  
+
   IO/mitkPixelTypeTraits.h
   
   Interactions/mitkEventMapperAddOn.h

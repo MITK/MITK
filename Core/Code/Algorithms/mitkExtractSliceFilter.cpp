@@ -381,7 +381,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
     reslicedImage = m_Reslicer->GetOutput();
 
 
-
     if(!reslicedImage)
     {
       itkWarningMacro(<<"Reslicer returned empty image");
@@ -461,6 +460,7 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(vtkFloatingPointType bounds
     return false;
 
   return this->GetClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), dynamic_cast< const PlaneGeometry * >( m_WorldGeometry ), bounds); 
+
 }
 
 

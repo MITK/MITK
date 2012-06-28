@@ -8,6 +8,7 @@ set(MODULE_TESTS
 set(MODULE_IMAGE_TESTS
   mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkOverwriteSliceImageFilterTest.cpp
+  mitkOverwriteSliceFilterTest.cpp
 )
 set(MODULE_CUSTOM_TESTS
 )

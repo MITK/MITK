@@ -26,8 +26,9 @@ public:
   static void TestInstantiation()
   {
     // let's create an object of our class
-    mitk::USDevice::Pointer device = mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
-    MITK_TEST_CONDITION_REQUIRED(device.IsNotNull(), "USDevice should not be null after instantiation");
+    mitk::USVideoDevice::Pointer  tempPointer =  mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    mitk::USDevice* device = tempPointer.GetPointer();
+    MITK_TEST_CONDITION_REQUIRED(device, "USDevice should not be null after instantiation");
     MITK_TEST_CONDITION_REQUIRED((device->GetDeviceManufacturer().compare("Manufacturer") == 0), "Manufacturer should be set correctly");
     MITK_TEST_CONDITION_REQUIRED((device->GetDeviceModel().compare("Model") == 0), "Model should be set correctly");
   }

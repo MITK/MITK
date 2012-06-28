@@ -58,7 +58,7 @@ Core/Code/CppMicroServices/*.cpp   copyright=apache-license
 Core/Code/CppMicroServices/*.h     copyright=apache-license
 
 # There is no need to check files in the utilities directory for copyright
-./Utilities/*    -copyright
+Utilities/*    -copyright
 
 # ExternalData content links must have LF newlines
 *.md5            crlf=input

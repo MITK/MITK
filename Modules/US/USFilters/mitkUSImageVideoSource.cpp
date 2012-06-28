@@ -62,7 +62,7 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID)
 
 
 
-  /* Old Code, this will probably not work
+  // Old Code, this may not work
   m_OpenCVVideoSource = mitk::OpenCVVideoSource::New();
 
   m_OpenCVVideoSource->SetVideoCameraInput(deviceID);
@@ -72,36 +72,34 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID)
   
   // Let's see if we have been successful
   m_IsVideoReady = m_OpenCVVideoSource->IsCapturingEnabled();
-  */
 }
 
 
 mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 {
-  IplImage *m_cvCurrentVideoFrame = NULL;
-  CvCapture* capture = cvCaptureFromCAM( 1000 );
-   if ( !capture ) {
-     fprintf( stderr, "ERROR: capture is NULL \n" );
-     getchar();
-     return NULL;
-   }
-   // Show the image captured from the camera in the window and repeat
-   
-   // Get one frame
-   m_cvCurrentVideoFrame  = cvQueryFrame( capture );
-     
-   
 
+// The following code utilizes open CV directly do access images
+  //IplImage *m_cvCurrentVideoFrame = NULL;
+  //CvCapture* capture = cvCaptureFromCAM( 1000 );
+  // if ( !capture ) {
+  //   fprintf( stderr, "ERROR: capture is NULL \n" );
+  //   getchar();
+  //   return NULL;
+  // }
+  // // Show the image captured from the camera in the window and repeat
+  //
+  // // Get one frame
+  // m_cvCurrentVideoFrame  = cvQueryFrame( capture );
+  //
 /// WORKING CODE
 
 
-  /*IplImage *m_cvCurrentVideoFrame = NULL;
+  IplImage *m_cvCurrentVideoFrame = NULL;
   int height = m_OpenCVVideoSource->GetImageHeight();
   int width = m_OpenCVVideoSource->GetImageWidth();
   m_cvCurrentVideoFrame = cvCreateImage(cvSize(width,height),8,3);
   m_OpenCVVideoSource->GetCurrentFrameAsOpenCVImage(m_cvCurrentVideoFrame);
   m_OpenCVVideoSource->FetchFrame();
-  */  
   this->m_OpenCVToMitkFilter->SetOpenCVImage(m_cvCurrentVideoFrame);
   this->m_OpenCVToMitkFilter->Update();
 

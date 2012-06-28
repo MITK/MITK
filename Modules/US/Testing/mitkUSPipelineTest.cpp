@@ -90,7 +90,7 @@ int mitkUSPipelineTest(int  argc , char* argv[])
   MITK_TEST_BEGIN("mitkUSPipelineTest");
 
   #ifdef WIN32 // Video file compression is currently only supported under windows.
-   // USPipelines require a major rework :(
+   // US Pipelines need to be reworked :(
    // mitkUSPipelineTestClass::TestPipelineUS(argv[1]);
   #endif    
 

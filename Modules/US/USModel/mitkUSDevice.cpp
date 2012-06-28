@@ -59,6 +59,26 @@ mitk::USDevice::~USDevice()
 
 }
 
+bool mitk::USDevice::ConstructServiceProperties()
+{
+  ServiceProperties props;
+  std::string yes = "true";
+  std::string no = "false";
+
+  if(this->GetIsActive())
+    props["IsActive"] = yes;
+  else
+    props["IsActive"] = no;
+  props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
+  props[ mitk::USImageMetadata::PROP_DEV_MODEL ] = m_Metadata->GetDeviceModel();
+  props[ mitk::USImageMetadata::PROP_DEV_COMMENT ] = m_Metadata->GetDeviceComment();
+  props[ mitk::USImageMetadata::PROP_PROBE_NAME ] = m_Metadata->GetProbeName();
+  props[ mitk::USImageMetadata::PROP_PROBE_FREQUENCY ] = m_Metadata->GetProbeFrequency();
+  props[ mitk::USImageMetadata::PROP_ZOOM ] = m_Metadata->GetZoom();
+  return true;
+}
+
+
 bool mitk::USDevice::Connect()
 {
   //TODO Throw Exception is already activated before connection

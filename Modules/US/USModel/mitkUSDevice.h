@@ -58,6 +58,8 @@ namespace mitk {
       */
      // mitkNewMacro2Param(Self, mitk::USImageMetadata::Pointer, bool);
 
+
+
       /**
       * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.
       *  Internally calls onConnect and then registers the device with the service. A device usually should
@@ -183,6 +185,13 @@ namespace mitk {
       mitk::USProbe::Pointer m_ActiveProbe;
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes; 
       bool m_IsActive;
+
+
+      /*
+      *\brief Is called when 
+      */
+      bool ConstructServiceProperties();
+
 
       /**
       * \brief Is called during the connection process. Override this method in your subclass to handle the actual connection.

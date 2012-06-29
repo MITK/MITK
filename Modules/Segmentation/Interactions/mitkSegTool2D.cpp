@@ -54,8 +54,7 @@ mitk::SegTool2D::SegTool2D(const char* type)
  m_LastEventSender(NULL),
  m_LastEventSlice(0),
  m_Contourmarkername ("Position"),
- m_ShowMarkerNodes (true),
- m_3DInterpolationEnabled (true)
+ m_ShowMarkerNodes (true)
 {
   // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
@@ -282,35 +281,27 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   m_doOperation = NULL;
   /*============= END undo feature block ========================*/
   
-  if ( m_3DInterpolationEnabled )
+  slice->DisconnectPipeline();
+  ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
+  contourExtractor->SetInput(slice);
+  contourExtractor->Update();
+  mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+
+  if (contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
   {
-    slice->DisconnectPipeline();
-    ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
-    contourExtractor->SetInput(slice);
-    contourExtractor->Update();
-    mitk::Surface::Pointer contour = contourExtractor->GetOutput();
-
-    if (contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
-    {
-      unsigned int pos = this->AddContourmarker(positionEvent);
-      mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
-      PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
-      mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
-      contour->DisconnectPipeline();
-    }
-
+    unsigned int pos = this->AddContourmarker(positionEvent);
+    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+    PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
+    contour->DisconnectPipeline();
   }
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)
 {
     m_ShowMarkerNodes = status;
-}
-
-void mitk::SegTool2D::Enable3DInterpolation(bool status)
-{
-    m_3DInterpolationEnabled = status;
 }
 
 unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )

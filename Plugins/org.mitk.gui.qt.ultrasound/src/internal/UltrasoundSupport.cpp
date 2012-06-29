@@ -79,8 +79,9 @@ void UltrasoundSupport::DisplayImage()
   // if (nodes.empty()) return;
 
   m_Device->UpdateOutputData(0);
-  mitk::USImage::Pointer image = m_Device->GetOutput();
-  m_Node->SetData(image);
+  //mitk::USImage::Pointer image = m_Device->GetOutput();
+  //m_Node->SetData(image);
+  m_Image->Update();
   this->RequestRenderWindowUpdate();
 }
 
@@ -89,11 +90,14 @@ void UltrasoundSupport::OnClickedViewDevice()
   
   MITK_INFO << "USSUPPORT: OnClickedViewDevice()"; 
   m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedDevice();
+  // if (m_Node) m_Node->ReleaseData();
   if (m_Device.IsNull()){
     m_Timer->stop();
     return;
   }
-
+  m_Device->UpdateOutputData(0);
+  m_Image = m_Device->GetOutput(0);
+  m_Node->SetData(m_Device->GetOutput(0));
   m_Timer->start(50);
 }
 

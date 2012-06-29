@@ -82,6 +82,8 @@ class UltrasoundSupport : public QmitkAbstractView
     */
     mitk::DataNode::Pointer m_Node;
 
+    mitk::Image::Pointer m_Image;
+
     Ui::UltrasoundSupportControls m_Controls;
 
 };

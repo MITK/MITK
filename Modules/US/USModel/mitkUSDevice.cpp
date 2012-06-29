@@ -59,6 +59,8 @@ mitk::USDevice::~USDevice()
 
 }
 
+
+// Constructing Service Properties for the device
 mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 {
   ServiceProperties props;
@@ -83,7 +85,7 @@ mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 bool mitk::USDevice::Connect()
 {
   //TODO Throw Exception is already activated before connection
-
+  
   // Prepare connection, fail if this fails.
   if (! this->OnConnection()) return false;
 
@@ -121,18 +123,16 @@ bool mitk::USDevice::Disconnect()
 //}
 
 
+//Changed
 bool mitk::USDevice::Activate()
 {
   if (! this->GetIsConnected()) return false;
 
   m_IsActive = OnActivation();
 
-  ServiceProperties props;
-  props["DeviceClass"] = this->GetDeviceClass();
-  std::string yes = "true";
-  props["IsActive"] = yes;
+  ServiceProperties props = ConstructServiceProperties();
   this->m_ServiceRegistration.SetProperties(props);
-  return m_IsActive;
+  return m_IsActive;  
 }
 
 

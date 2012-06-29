@@ -42,6 +42,7 @@ namespace mitk {
     * for all US Devices, and every new device should extend it.
     * \ingroup US
     */
+
    class MitkUS_EXPORT USDevice : public mitk::ImageSource
     {
     public:

@@ -80,7 +80,6 @@ m_3DInterpolationEnabled(false)
 
   m_RBtnEnable3DInterpolation = new QRadioButton("3D",this);
   connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
-  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SIGNAL(Signal3DInterpolationEnabled(bool)));
   m_RBtnEnable3DInterpolation->setChecked(true);
   grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
 

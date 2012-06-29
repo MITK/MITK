@@ -149,7 +149,6 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void SignalRememberContourPositions(bool);
     void SignalShowMarkerNodes(bool);
-    void Signal3DInterpolationEnabled(bool);
 
   public slots:
 

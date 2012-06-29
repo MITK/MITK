@@ -75,8 +75,6 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     void SetShowMarkerNodes(bool);
 
-    void Enable3DInterpolation(bool);
-
   protected:
 
     SegTool2D(); // purposely hidden

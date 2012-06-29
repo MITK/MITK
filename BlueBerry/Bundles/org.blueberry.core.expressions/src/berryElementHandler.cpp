@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+ElementHandler::~ElementHandler()
+{
+}
+
 ElementHandler::Pointer
 ElementHandler::GetDefault()
 {

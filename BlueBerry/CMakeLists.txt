@@ -190,7 +190,6 @@ set(_ctk_plugins
   Bundles/org.blueberry.solstice.common:OFF
   Bundles/org.blueberry.core.commands:OFF
   Bundles/org.blueberry.core.jobs:OFF
-  Bundles/org.blueberry.ui:OFF
   Bundles/org.blueberry.ui.qt:OFF
   Bundles/org.blueberry.ui.qt.help:OFF
   Bundles/org.blueberry.ui.qt.log:ON

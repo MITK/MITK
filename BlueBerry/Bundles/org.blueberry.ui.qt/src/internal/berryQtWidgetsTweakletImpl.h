@@ -29,8 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <list>
 #include <vector>
 
-Q_DECLARE_METATYPE(berry::Object::Pointer)
-
 namespace berry {
 
 class QtSelectionListenerWrapper : public QObject

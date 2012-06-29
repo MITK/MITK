@@ -41,8 +41,10 @@ public:
     QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
         berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-    berry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
-        berry::IActionBarConfigurer::Pointer configurer);
+    ~QmitkExtWorkbenchWindowAdvisor();
+
+    berry::SmartPointer<berry::ActionBarAdvisor> CreateActionBarAdvisor(
+        berry::SmartPointer<berry::IActionBarConfigurer> configurer);
 
     void* CreateEmptyWindowContents(void* parent);
 
@@ -100,7 +102,7 @@ private:
    */
   void HookTitleUpdateListeners(berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-  std::string ComputeTitle();
+  QString ComputeTitle();
 
   void RecomputeTitle();
 
@@ -146,11 +148,11 @@ private:
   bool showClosePerspectiveMenuItem;
   bool viewNavigatorFound;
   bool showMemoryIndicator;
-  std::string productName;
+  QString productName;
   std::string windowIcon;
 
   // enables DnD on the editor area
-  berry::IDropTargetListener::Pointer dropTargetListener;
+  berry::SmartPointer<berry::IDropTargetListener> dropTargetListener;
 
   // stringlist for excluding perspectives from the perspective menu entry (e.g. Welcome Perspective)
   std::vector<std::string> perspectiveExcludeList;

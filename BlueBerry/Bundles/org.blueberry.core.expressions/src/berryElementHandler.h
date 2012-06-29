@@ -17,18 +17,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYELEMENTHANDLER_H_
 #define BERRYELEMENTHANDLER_H_
 
-#include <Poco/DOM/Element.h>
+#include <berryObject.h>
 
-#include <berryIConfigurationElement.h>
-#include <berryMacros.h>
-
-#include "berryExpression.h"
 #include <org_blueberry_core_expressions_Export.h>
 
-#include "internal/berryCompositeExpression.h"
+namespace Poco {
+namespace XML {
+class Element;
+}
+}
 
 namespace berry {
 
+struct IConfigurationElement;
+
+class CompositeExpression;
+class Expression;
 class ExpressionConverter;
 
 /**
@@ -46,7 +50,7 @@ public:
 
   berryObjectMacro(ElementHandler);
 
-  virtual ~ElementHandler() {}
+  ~ElementHandler();
 
   /**
    * The default element handler which can cope with all XML expression elements
@@ -68,7 +72,7 @@ public:
    *
    * @throws CoreException if the conversion failed
    */
-  virtual Expression::Pointer Create(ExpressionConverter* converter, SmartPointer<IConfigurationElement> config) = 0;
+  virtual SmartPointer<Expression> Create(ExpressionConverter* converter, SmartPointer<IConfigurationElement> config) = 0;
 
   /**
    * Creates the corresponding expression for the given DOM element. This is
@@ -86,7 +90,7 @@ public:
    *
    * @since 3.3
    */
-  virtual Expression::Pointer Create(ExpressionConverter* converter, Poco::XML::Element* element);
+  virtual SmartPointer<Expression> Create(ExpressionConverter* converter, Poco::XML::Element* element);
 
 protected:
 

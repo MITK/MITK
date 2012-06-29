@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryConfig.h>
 
+#include <QMetaType>
+
 #ifdef _MSC_VER
 // disable inheritance by dominance warnings
 #pragma warning( disable : 4250 4275 4251 )
@@ -213,6 +215,14 @@ private:
 BERRY_OSGI std::ostream& operator<<(std::ostream& os, const Object& o);
 
 
+}
+
+Q_DECLARE_METATYPE(berry::Object::Pointer)
+
+template<class T>
+uint qHash(const berry::SmartPointer<T>& sp)
+{
+  return static_cast<uint>(sp->HashCode());
 }
 
 #endif /*BERRYOSGILIGHTOBJECT_H_*/

@@ -34,7 +34,7 @@ namespace berry
 {
 
 /**
- * \ingroup org_blueberry_ui
+ * \ingroup org_blueberry_ui_qt
  *
  */
 struct BERRY_UI_QT IQtPreferencePage : public IPreferencePage

@@ -124,8 +124,7 @@ bool ParameterizedCommand::operator==(const Object* object) const
 }
 
 Object::Pointer ParameterizedCommand::ExecuteWithChecks(const Object::ConstPointer trigger,
-    const Object::ConstPointer applicationContext) throw(ExecutionException,
-    NotDefinedException, NotEnabledException, NotHandledException)
+    const Object::ConstPointer applicationContext)
 {
   ExecutionEvent::Pointer excEvent(new ExecutionEvent(command,
           this->GetParameterMap(), trigger, applicationContext));
@@ -142,7 +141,7 @@ std::string ParameterizedCommand::GetId() const
   return command->GetId();
 }
 
-std::string ParameterizedCommand::GetName() const throw(NotDefinedException)
+std::string ParameterizedCommand::GetName() const
 {
   if (name.empty())
   {
@@ -260,7 +259,6 @@ std::string ParameterizedCommand::ToString() const
 
 std::vector<ParameterizedCommand::Pointer>
 ParameterizedCommand::GenerateCombinations(const SmartPointer<Command> command)
-throw(NotDefinedException)
 {
   std::vector<IParameter::Pointer> parameters(command->GetParameters());
 

@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryQtShowViewDialog.h"
 #include "berryQtDisplay.h"
-#include "berryQtWorkbenchWindow.h"
 
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
@@ -50,12 +49,6 @@ Display* QtWorkbenchTweaklet::CreateDisplay()
 bool QtWorkbenchTweaklet::IsRunning()
 {
   return QApplication::instance() != 0;
-}
-
-WorkbenchWindow::Pointer QtWorkbenchTweaklet::CreateWorkbenchWindow(int number)
-{
-  WorkbenchWindow::Pointer wnd(new QtWorkbenchWindow(number));
-  return wnd;
 }
 
 IDialog::Pointer

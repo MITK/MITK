@@ -44,15 +44,15 @@ public:
 
   Point ComputeSize(int wHint, int hHint, bool changed);
 
-  std::string GetText() const;
-  void SetText(const std::string& text);
+  QString GetText() const;
+  void SetText(const QString& text);
 
   bool IsVisible();
   void SetVisible(bool visible);
 
   void SetActive();
 
-  void* GetControl();
+  QWidget* GetControl();
 
   void SetImages(const std::vector<void*>& images);
 
@@ -70,7 +70,7 @@ public:
 
   std::vector<Shell::Pointer> GetShells();
 
-  int GetStyle ();
+  Qt::WindowFlags GetStyle () const;
 
   QWidget* GetWidget();
 

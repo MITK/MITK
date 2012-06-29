@@ -81,14 +81,13 @@ Point QtShell::ComputeSize(int  /*wHint*/, int  /*hHint*/, bool changed)
   return point;
 }
 
-std::string QtShell::GetText() const
+QString QtShell::GetText() const
 {
-  return widget->windowTitle().toStdString();
+  return widget->windowTitle();
 }
 
-void QtShell::SetText(const std::string& text)
+void QtShell::SetText(const QString& title)
 {
-  QString title(QString::fromStdString(text));
   widget->setWindowTitle(title);
   widget->setObjectName(title);
 }
@@ -109,7 +108,7 @@ void QtShell::SetActive()
   widget->raise();
 }
 
-void* QtShell::GetControl()
+QWidget *QtShell::GetControl()
 {
   return widget;
 }
@@ -192,28 +191,9 @@ std::vector<Shell::Pointer> QtShell::GetShells()
   return descendants;
 }
 
-int QtShell::GetStyle()
+Qt::WindowFlags QtShell::GetStyle() const
 {
-  Qt::WindowFlags qtFlags = widget->windowFlags();
-
-  int berryFlags = 0;
-  if (!(qtFlags & Qt::FramelessWindowHint))
-    berryFlags |= Constants::BORDER;
-  if (qtFlags & Qt::WindowTitleHint)
-    berryFlags |= Constants::TITLE;
-  if (qtFlags & Qt::WindowSystemMenuHint)
-    berryFlags |= Constants::CLOSE;
-  if (qtFlags & Qt::WindowMinimizeButtonHint)
-    berryFlags |= Constants::MIN;
-  if (qtFlags & Qt::WindowMaximizeButtonHint)
-    berryFlags |= Constants::MAX;
-
-  if (widget->windowModality() == Qt::WindowModal)
-    berryFlags |= Constants::PRIMARY_MODAL;
-  else if(widget->windowModality() == Qt::ApplicationModal)
-    berryFlags |= Constants::APPLICATION_MODAL;
-
-  return berryFlags;
+  return widget->windowFlags();
 }
 
 QWidget* QtShell::GetWidget()

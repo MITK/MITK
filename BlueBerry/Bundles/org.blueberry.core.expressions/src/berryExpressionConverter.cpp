@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryExpressionConverter.h"
 
 #include "berryPlatformException.h"
+#include "berryIConfigurationElement.h"
 
 #include "Poco/DOM/Node.h"
 

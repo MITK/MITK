@@ -92,15 +92,10 @@ public:
    *            the command. This value may be <code>null</code>.
    */
   ParameterizedCommand(const SmartPointer<Command> command,
-      const std::vector<Parameterization>& parameterizations);
+                       const std::vector<Parameterization>& parameterizations);
 
   bool operator<(const Object* object) const;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   bool operator==(const Object* object) const;
 
   /**
@@ -124,11 +119,9 @@ public:
    *             If the command you are trying to execute is not enabled.
    * @throws NotHandledException
    *             If there is no handler.
-   * @since 3.2
    */
   Object::Pointer ExecuteWithChecks(const Object::ConstPointer trigger,
-      const Object::ConstPointer applicationContext) throw(ExecutionException,
-      NotDefinedException, NotEnabledException, NotHandledException);
+                                    const Object::ConstPointer applicationContext);
 
   /**
    * Returns the base command. It is possible for more than one parameterized
@@ -155,7 +148,7 @@ public:
    * @throws NotDefinedException
    *             If the underlying command is not defined.
    */
-  std::string GetName() const throw(NotDefinedException);
+  std::string GetName() const;
 
   /**
    * Returns the parameter map, as can be used to construct an
@@ -167,11 +160,6 @@ public:
    */
   std::map<std::string, std::string> GetParameterMap() const;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Object#hashCode()
-   */
   std::size_t HashCode() const;
 
   /**
@@ -257,8 +245,7 @@ public:
    *             If the command is not defined.
    */
   static std::vector<ParameterizedCommand::Pointer>
-  GenerateCombinations(const SmartPointer<Command> command)
-  throw(NotDefinedException);
+  GenerateCombinations(const SmartPointer<Command> command);
 
   /**
    * Take a command and a map of parameter IDs to values, and generate the

@@ -14,10 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#include "berryLog.h"
 
-#include "src/internal/berrySystemBundleActivator.h"
+#include <QString>
 
-POCO_BEGIN_MANIFEST(berry::IBundleActivator)
-  POCO_EXPORT_CLASS(berry::SystemBundleActivator)
-POCO_END_MANIFEST
+std::stringstream& operator<<(std::stringstream& os, const QString& str)
+{
+  os << str.toStdString();
+  return os;
+}
+

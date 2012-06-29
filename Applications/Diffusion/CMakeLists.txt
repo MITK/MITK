@@ -23,7 +23,6 @@ set(_plugins
   org.blueberry.core.expressions
   org.blueberry.solstice.common
   org.blueberry.core.commands
-  org.blueberry.ui
   org.blueberry.ui.qt
   org.blueberry.ui.qt.log
   org.blueberry.ui.qt.help

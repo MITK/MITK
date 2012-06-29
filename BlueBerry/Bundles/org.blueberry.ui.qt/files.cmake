@@ -332,6 +332,7 @@ set(INTERNAL_CPP_FILES
   berryServiceLocatorCreator.cpp
   berryShellPool.cpp
   berrySourcePriorityNameMapping.cpp
+  berryStatusUtil.cpp
   berryStickyViewDescriptor.cpp
   berryStickyViewManager.cpp
   berryTweaklets.cpp
@@ -382,7 +383,6 @@ set(MOC_H_FILES
   src/internal/defaultpresentation/berryQCTabBar.h
   src/internal/defaultpresentation/berryQtWorkbenchPresentationFactory.h
 
-  src/internal/berryWorkbenchPlugin.h
   src/internal/intro/berryEditorIntroAdapterPart.h
 
   src/internal/berryQtDisplay.h

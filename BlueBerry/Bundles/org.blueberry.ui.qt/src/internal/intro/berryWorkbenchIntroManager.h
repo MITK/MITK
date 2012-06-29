@@ -107,7 +107,7 @@ public:
    * @return a new IIntroPart.  This has the side effect of setting the introPart field to the new
    * value.
    */
-  IIntroPart::Pointer CreateNewIntroPart() throw (CoreException);
+  IIntroPart::Pointer CreateNewIntroPart();
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbench#hasIntro()

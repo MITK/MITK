@@ -238,7 +238,6 @@ org_blueberry_core_runtime_EXPORT QTextStream& operator<<(QTextStream& os, const
 org_blueberry_core_runtime_EXPORT QTextStream& operator<<(QTextStream& os, const berry::SmartPointer<const berry::Object>& o);
 //org_blueberry_core_runtime_EXPORT QTextStream& operator<<(QTextStream& os, const berry::SmartPointer<berry::Object>& o);
 
-
 Q_DECLARE_METATYPE(berry::Object::Pointer)
 
 org_blueberry_core_runtime_EXPORT uint qHash(const berry::Object& o);

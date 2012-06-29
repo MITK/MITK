@@ -19,11 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryTypeExtensionManager.h"
 
 #include "berryExpressions.h"
+#include "berryExpressionStatus.h"
 
 #include "berryPropertyTesterDescriptor.h"
 
 #include "berryPlatform.h"
-#include "berryPlatformException.h"
+#include "berryCoreException.h"
 #include <berryIExtensionRegistry.h>
 
 #include <ctime>
@@ -83,7 +84,11 @@ namespace berry {
     {
       QString msg("Unknown method for ");
       msg.append(receiver->GetClassName());
-      throw CoreException(msg + ": " + method);
+      IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::TYPE_EXTENDER_UNKOWN_METHOD,
+                                                   QString("No property tester contributes a property %1 to type %2")
+                                                   .arg(namespaze + "::" + method).arg(receiver->GetClassName()),
+                                                   BERRY_STATUS_LOC));
+      throw CoreException(status);
     }
     result->SetPropertyTester(extender);
     fPropertyCache->Put(result);

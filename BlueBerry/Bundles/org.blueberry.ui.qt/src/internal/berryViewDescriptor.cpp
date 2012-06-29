@@ -17,8 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryViewDescriptor.h"
 
 #include "berryIConfigurationElement.h"
-#include "berryPlatformException.h"
+#include "berryCoreException.h"
 #include "berryIExtension.h"
+#include "berryIContributor.h"
+#include "berryStatus.h"
 
 #include "berryRegistryReader.h"
 #include "berryWorkbenchRegistryConstants.h"
@@ -86,8 +88,8 @@ ImageDescriptor::Pointer ViewDescriptor::GetImageDescriptor() const
     //return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
     return ImageDescriptor::GetMissingImageDescriptor();
   }
-  const IExtension* extension(configElement->GetDeclaringExtension());
-  const QString extendingPluginId(extension->GetContributor());
+  IExtension::Pointer extension(configElement->GetDeclaringExtension());
+  const QString extendingPluginId(extension->GetContributor()->GetName());
   imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
       extendingPluginId, iconName);
   if (!imageDescriptor)
@@ -180,7 +182,7 @@ std::vector< std::string> ViewDescriptor::GetKeywordReferences() const
 
 QString ViewDescriptor::GetPluginId() const
 {
-  return configElement->GetContributor();
+  return configElement->GetContributor()->GetName();
 }
 
 QString ViewDescriptor::GetLocalId() const
@@ -197,7 +199,9 @@ void ViewDescriptor::LoadFromExtension()
   if (name.isEmpty() ||
       RegistryReader::GetClassValue(configElement, WorkbenchRegistryConstants::ATT_CLASS).isEmpty())
   {
-    throw CoreException(QString("Invalid extension (missing label or class name): ") + id);
+    IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, configElement->GetContributor()->GetName(), 0,
+                                       QString("Invalid extension (missing label or class name): ") + id));
+    throw CoreException(status);
   }
 
   QString category = configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY);

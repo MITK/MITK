@@ -19,8 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryTypeExtensionManager.h"
 #include "berryPropertyTesterDescriptor.h"
 #include "berryPropertyTester.h"
+#include "berryExpressionStatus.h"
 
-#include <berryPlatformException.h>
+#include <berryCoreException.h>
 
 namespace berry {
 
@@ -81,7 +82,10 @@ IPropertyTester::Pointer TypeExtension::FindTypeExtender(
         else
         {
           fExtenders[i]= IPropertyTester::Pointer();
-          throw CoreException("Type extender has incorrect type");
+          IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::TYPE_EXTENDER_INCORRECT_TYPE,
+                                                       "The implementation class is not a sub type of berry::PropertyTester",
+                                                       BERRY_STATUS_LOC));
+          throw CoreException(status);
         }
       }
       else

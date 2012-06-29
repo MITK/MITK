@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchConstants.h"
 #include "berryPerspectiveRegistry.h"
+#include "berryStatus.h"
+#include "berryIContributor.h"
 
 namespace berry
 {
@@ -80,8 +82,12 @@ PerspectiveDescriptor::PerspectiveDescriptor(const QString& id,
   if ((this->GetId() == "") || (this->GetLabel() == "")
       || (this->GetFactoryClassName() == ""))
   {
-    throw CoreException("Invalid extension (missing label, id or class name): "
-        + this->GetId());
+    IStatus::Pointer status(new Status(
+                              IStatus::ERROR_TYPE,
+                              PlatformUI::PLUGIN_ID,
+                              0,
+                              QString("Invalid extension (missing label, id or class name): ") + GetId()));
+    throw CoreException(status);
   }
 }
 
@@ -168,7 +174,7 @@ QString PerspectiveDescriptor::GetId() const
 
 QString PerspectiveDescriptor::GetPluginId() const
 {
-  return configElement == 0 ? pluginId : configElement->GetContributor();
+  return configElement == 0 ? pluginId : configElement->GetContributor()->GetName();
 }
 
 ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
@@ -182,7 +188,7 @@ ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
     if (!icon.isEmpty())
     {
       imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
-          configElement->GetContributor(), icon);
+            configElement->GetContributor()->GetName(), icon);
     }
 
   }

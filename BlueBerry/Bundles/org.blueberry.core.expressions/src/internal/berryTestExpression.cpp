@@ -17,9 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryTestExpression.h"
 
 #include "berryExpressions.h"
+#include "berryExpressionStatus.h"
 
 #include "berryPlatform.h"
-#include "berryPlatformException.h"
+#include "berryCoreException.h"
 
 #include <berryObjectString.h>
 #include <berryIConfigurationElement.h>
@@ -42,7 +43,11 @@ TestExpression::TestExpression(const IConfigurationElement::Pointer& element)
   int pos = property.lastIndexOf(PROP_SEP);
   if (pos == -1)
   {
-    throw CoreException("No namespace provided");
+    IStatus::Pointer status(new ExpressionStatus(
+                              ExpressionStatus::NO_NAMESPACE_PROVIDED,
+                              "The property attribute of the test expression must be qualified by a name space.",
+                              BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
   fNamespace = property.left(pos);
   fProperty = property.mid(pos + 1);
@@ -57,7 +62,11 @@ TestExpression::TestExpression(Poco::XML::Element* element)
   int pos = property.lastIndexOf(PROP_SEP);
   if (pos == -1)
   {
-    throw CoreException("No namespace provided");
+    IStatus::Pointer status(new ExpressionStatus(
+                              ExpressionStatus::NO_NAMESPACE_PROVIDED,
+                              "The property attribute of the test expression must be qualified by a name space.",
+                              BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
   fNamespace = property.left(pos);
   fProperty = property.mid(pos + 1);

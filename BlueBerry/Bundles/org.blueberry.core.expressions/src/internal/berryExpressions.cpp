@@ -16,8 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressions.h"
 
+#include "berryExpressionStatus.h"
+
 #include <berryPlatform.h>
-#include <berryPlatformException.h>
+#include <berryCoreException.h>
 #include <service/berryServiceRegistry.h>
 
 #include <berryIAdapterManager.h>
@@ -57,7 +59,11 @@ namespace berry
   {
     if (value.isNull())
     {
-      throw CoreException(QString("Missing attribute: ") + name);
+      IStatus::Pointer status(new ExpressionStatus(
+                                ExpressionStatus::MISSING_ATTRIBUTE,
+                                QString("Mandatory attribute %1 is missing").arg(name),
+                                BERRY_STATUS_LOC));
+      throw CoreException(status);
     }
   }
 
@@ -66,7 +72,10 @@ namespace berry
   {
     CheckAttribute(name, value);
     if (validValues.contains(value)) return;
-    throw CoreException(QString("Wrong attribute value") + value);
+    IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::WRONG_ATTRIBUTE_VALUE,
+                                                 QString("Attribute value %1 is not valid").arg(value),
+                                                 BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
 
   void
@@ -74,7 +83,11 @@ namespace berry
   {
     if (var.Cast<const ObjectList<Object::Pointer> >())
       return;
-    throw CoreException(QString("Expression variable is not of type ObjectList: " + expression->ToString()));
+    IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_IS_NOT_A_COLLECTION,
+                                                 QString("The default variable is not of type ObjectList<Object::Pointer>. "
+                                                         "Failed expression: %1").arg(expression->ToString()),
+                                                 BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
 
   IIterable::Pointer
@@ -104,7 +117,10 @@ namespace berry
       if (manager->QueryAdapter(var->GetClassName(), IIterable::GetStaticClassName()) == IAdapterManager::NOT_LOADED)
         return IIterable::Pointer();
 
-      throw CoreException(QString("The variable is not iterable: ") + expression->ToString());
+      IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_IS_NOT_A_COLLECTION,
+                                                   QString("The default variable is not iterable. Failed expression: %1").arg(expression->ToString()),
+                                                   BERRY_STATUS_LOC));
+      throw CoreException(status);
     }
   }
 
@@ -134,7 +150,10 @@ namespace berry
       if (manager->QueryAdapter(var->GetClassName(), ICountable::GetStaticClassName()) == IAdapterManager::NOT_LOADED)
         return ICountable::Pointer();
 
-      throw CoreException(QString("The variable is not countable: ") + expression->ToString());
+      IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_IS_NOT_A_COLLECTION,
+                                                   QString("The default variable is not countable. Failed expression: %1").arg(expression->ToString()),
+                                                   BERRY_STATUS_LOC));
+      throw CoreException(status);
     }
   }
 
@@ -228,7 +247,12 @@ namespace berry
       }
     }
     if (inString)
-      throw CoreException(QString("String not terminated: ") + str);
+    {
+      IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::STRING_NOT_TERMINATED,
+                                                   QString("The String \"%1\" is not correctly terminated with an apostrophe character.").arg(str),
+                                                   BERRY_STATUS_LOC));
+      throw CoreException(status);
+    }
 
     return -1;
   }
@@ -302,7 +326,13 @@ namespace berry
       if (ch == '\'')
       {
         if (i == str.size() - 1 || str.at(i + 1) != '\'')
-          throw CoreException(QString("String not correctly escaped: ") + str);
+        {
+          IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::STRING_NOT_CORRECT_ESCAPED,
+                                                       QString("The String \"%1\" is not correctly escaped. "
+                                                               "Wrong number of apostrophe characters.").arg(str),
+                                                       BERRY_STATUS_LOC));
+          throw CoreException(status);
+        }
         result.append('\'');
         i++;
       }

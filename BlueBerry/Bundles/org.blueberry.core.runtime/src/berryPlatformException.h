@@ -25,16 +25,6 @@ namespace berry {
 
 CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, PlatformException, ctkRuntimeException)
 
-CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, ManifestException, PlatformException)
-CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, BundleException, PlatformException)
-CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, BundleStateException, PlatformException)
-CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, BundleVersionConflictException, PlatformException)
-CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, BundleLoadException, PlatformException)
-CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, BundleResolveException, PlatformException)
-
-CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, CoreException, PlatformException)
-CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, InvalidServiceObjectException, CoreException)
-
 }
 
 #endif /*BERRYPLATFORMEXCEPTION_H_*/

@@ -50,12 +50,14 @@ struct BERRY_COMMANDS IExecutionListener : public virtual Object {
     Message2<const QString&, Object::Pointer> postExecuteSuccess;
     Message2<const QString&, const SmartPointer<const ExecutionEvent> > preExecute;
 
-  virtual ~Events();
+    virtual ~Events();
 
     virtual void AddListener(IExecutionListener* listener);
     virtual void RemoveListener(IExecutionListener* listener);
     virtual bool HasListeners() const;
     virtual bool IsEmpty() const;
+
+    private:
 
     typedef MessageDelegate2<IExecutionListener, const QString&, const NotHandledException* > NotHandledDelegate;
     typedef MessageDelegate2<IExecutionListener, const QString&, const ExecutionException*> PostExecuteFailureDelegate;

@@ -18,10 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPlatformException.h"
 #include "berryIConfigurationElement.h"
+#include "berryIExtension.h"
+#include "berryIContributor.h"
 
+#include "berryCoreException.h"
 #include "berryElementHandler.h"
 #include "berryExpression.h"
+#include "berryStatus.h"
 
+#include "internal/berryExpressionPlugin.h"
 #include "internal/berryCompositeExpression.h"
 
 #include "Poco/DOM/Node.h"
@@ -84,7 +89,12 @@ ExpressionConverter::ProcessChildren(const IConfigurationElement::Pointer& eleme
   {
     Expression::Pointer child = this->Perform(*iter);
     if (child.IsNull())
-      throw CoreException(QString("Unknown element: ") + GetDebugPath(*iter));
+    {
+      IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, ExpressionPlugin::GetPluginId(),
+                                         IStatus::ERROR_TYPE, QString("Unknown expression element ") + GetDebugPath(*iter),
+                                         BERRY_STATUS_LOC));
+      throw CoreException(status);
+    }
 
     result->Add(child);
   }
@@ -95,22 +105,31 @@ ExpressionConverter::GetDebugPath(const IConfigurationElement::Pointer& configur
 {
   QString buf;
   buf.append(configurationElement->GetName());
-  const IConfigurationElement* parent= configurationElement->GetParent();
-  while (parent) {
-    if (parent->GetParent())
+  Object::Pointer parent= configurationElement->GetParent();
+  while (parent)
+  {
+    if (IConfigurationElement::Pointer parent2 = parent.Cast<IConfigurationElement>())
     {
       buf.append(" > ");
-      buf.append(parent->GetName());
-      parent = parent->GetParent();
+      buf.append(parent2->GetName());
+      QString id= parent2->GetAttribute("id");
+      if (!id.isEmpty())
+      {
+        buf.append(" (id=").append(id).append(')');
+      }
+      parent= parent2->GetParent();
+    }
+    else if (IExtension::Pointer parent2 = parent.Cast<IExtension>())
+    {
+      buf.append(" : ");
+      buf.append(parent2->GetExtensionPointUniqueIdentifier());
+      buf.append(" @ ");
+      buf.append(parent2->GetContributor()->GetName());
+      parent = 0;
     }
     else
     {
-      buf.append(" : ");
-      QString point = parent->GetAttribute("point");
-      buf.append(point);
-      buf.append(" @ ");
-      buf.append(parent->GetContributor());
-      parent= 0;
+      parent = 0;
     }
   }
   return buf;
@@ -126,9 +145,13 @@ ExpressionConverter::ProcessChildren(Poco::XML::Element* element,
       Poco::XML::Element* elem = static_cast<Poco::XML::Element*>(child);
       Expression::Pointer exp = this->Perform(elem);
       if (exp.IsNull())
-        throw CoreException(QString("org.blueberry.core.expressions unknown element: ")
-                            + QString::fromStdString(elem->nodeName()));
+      {
+        IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, ExpressionPlugin::GetPluginId(),
+                                           IStatus::ERROR_TYPE, QString("Unknown expression element ")
+                                           + QString::fromStdString(elem->nodeName()), BERRY_STATUS_LOC));
 
+        throw CoreException(status);
+      }
       result->Add(exp);
     }
     child = child->nextSibling();

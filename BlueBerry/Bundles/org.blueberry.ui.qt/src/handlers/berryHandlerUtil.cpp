@@ -46,7 +46,12 @@ void HandlerUtil::IncorrectTypeFound(ExecutionEvent::Pointer event,
 Object::Pointer HandlerUtil::GetVariable(
     ExecutionEvent::Pointer event, const QString& name)
 {
-  return event->GetApplicationContext().Cast<const IEvaluationContext>()->GetVariable(name);
+  if (IEvaluationContext::ConstPointer evalContext = event->GetApplicationContext().Cast<const IEvaluationContext>())
+  {
+    Object::Pointer var = evalContext->GetVariable(name);
+    return var == IEvaluationContext::UNDEFINED_VARIABLE ? Object::Pointer() : var;
+  }
+  return Object::Pointer();
 }
 
 Object::Pointer HandlerUtil::GetVariableChecked(
@@ -66,7 +71,8 @@ Object::Pointer HandlerUtil::GetVariable(
   IEvaluationContext::Pointer eval(context.Cast<IEvaluationContext>());
   if (eval.IsNotNull())
   {
-    return eval->GetVariable(name);
+    Object::Pointer var = eval->GetVariable(name);
+    return var == IEvaluationContext::UNDEFINED_VARIABLE ? Object::Pointer() : var;
   }
   return Object::Pointer(0);
 }

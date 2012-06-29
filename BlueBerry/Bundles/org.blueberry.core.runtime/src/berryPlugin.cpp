@@ -19,29 +19,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-void
-Plugin::Start(IBundleContext::Pointer context)
+Plugin::Plugin()
+  : m_Context(NULL)
 {
-  m_Bundle = context->GetThisBundle();
 }
 
-void
-Plugin::Stop(IBundleContext::Pointer /*context*/)
+void Plugin::start(ctkPluginContext* context)
 {
-  m_Bundle = 0;
+  m_Context = context;
 }
 
-IBundle::Pointer
-Plugin::GetBundle()
+void Plugin::stop(ctkPluginContext* /*context*/)
 {
-  return m_Bundle;
+  m_Context = NULL;
 }
 
-
-bool
-Plugin::GetStatePath(QDir &path)
+QSharedPointer<ctkPlugin> Plugin::GetPlugin() const
 {
-  return InternalPlatform::GetInstance()->GetStatePath(path, m_Bundle, true);
+  return m_Context->getPlugin();
+}
+
+ILog* Plugin::GetLog() const
+{
+  return InternalPlatform::GetInstance()->GetLog(m_Context->getPlugin());
+}
+
+QString Plugin::GetStateLocation() const
+{
+  QDir dir;
+  if (InternalPlatform::GetInstance()->GetStatePath(dir, GetPlugin(), true))
+  {
+    return dir.absolutePath();
+  }
+  return QString();
 }
 
 }

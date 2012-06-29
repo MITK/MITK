@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryExpressions.h"
 
 #include <berryIConfigurationElement.h>
-#include <berryPlatformException.h>
+#include <berryCoreException.h>
 
 #include "Poco/Hash.h"
 

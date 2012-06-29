@@ -23,7 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+struct IContributor;
 struct IExtension;
+
+class Handle;
 
 /**
  * A configuration element, with its attributes and children,
@@ -58,10 +61,12 @@ struct IExtension;
  * </p>
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct IConfigurationElement : public Object
+struct IConfigurationElement : public virtual Object
 {
 
   berryInterfaceMacro(IConfigurationElement, berry)
+
+  virtual ~IConfigurationElement();
 
   /**
    * Creates and returns a new instance of the executable extension
@@ -151,7 +156,7 @@ struct IConfigurationElement : public Object
    * @return the names of the attributes
    * @throws InvalidRegistryObjectException if this configuration element is no longer valid
    */
-  virtual QStringList GetAttributeNames() const = 0;
+  virtual QList<QString> GetAttributeNames() const = 0;
 
   /**
    * Returns all configuration elements that are children of this
@@ -195,7 +200,7 @@ struct IConfigurationElement : public Object
    * @return the extension
    * @throws InvalidRegistryObjectException if this configuration element is no longer valid
    */
-  virtual const IExtension* GetDeclaringExtension() const = 0;
+  virtual SmartPointer<IExtension> GetDeclaringExtension() const = 0;
 
   /**
    * Returns the name of this configuration element.
@@ -223,7 +228,7 @@ struct IConfigurationElement : public Object
    *  or <code>null</code>
    * @throws InvalidRegistryObjectException if this configuration element is no longer valid
    */
-  virtual const IConfigurationElement* GetParent() const = 0;
+  virtual SmartPointer<Object> GetParent() const = 0;
 
   /**
    * Returns the text value of this configuration element.
@@ -245,6 +250,26 @@ struct IConfigurationElement : public Object
   virtual QString GetValue() const = 0;
 
   /**
+   * When multi-language support is enabled, this method returns the text value of this
+   * configuration element in the specified locale, or <code>null</code> if none.
+   * <p>
+   * The locale matching tries to find the best match between available translations and
+   * the requested locale, falling back to a more generic locale ("en") when the specific
+   * locale ("en_US") is not available.
+   * </p><p>
+   * If multi-language support is not enabled, this method is equivalent to the method
+   * {@link #getValue()}.
+   * </p>
+   * @param locale the requested locale
+   * @return the text value of this configuration element in the specified locale,
+   * or <code>null</code>
+   * @throws InvalidRegistryObjectException if this configuration element is no longer valid
+   * @see #GetValue(String)
+   * @see IExtensionRegistry#IsMultiLanguage()
+   */
+  virtual QString GetValue(const QLocale& locale) const = 0;
+
+  /**
    * Returns the namespace name for this configuration element.
    *
    * @return the namespace name for this configuration element
@@ -258,7 +283,7 @@ struct IConfigurationElement : public Object
    * @return the contributor for this configuration element
    * @throws InvalidRegistryObjectException if this configuration element is no longer valid
    */
-  virtual QString GetContributor() const = 0;
+  virtual SmartPointer<IContributor> GetContributor() const = 0;
 
   /**
    * Returns whether this configuration element object is valid.

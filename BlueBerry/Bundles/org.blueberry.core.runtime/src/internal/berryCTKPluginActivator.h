@@ -47,6 +47,12 @@ public:
 
   static ctkPluginContext* getPluginContext();
 
+  /**
+   * Returns the plug-in id of the plug-in that contains the provided symbol, or
+   * a null QString if the plug-in could not be determined.
+   */
+  static QString getPluginId(void* symbol);
+
 private:
 
   static ctkPluginContext* context;

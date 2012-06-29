@@ -16,6 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berrySafeRunner.h"
 #include "berryOperationCanceledException.h"
+#include "berryCoreException.h"
+#include "berryMultiStatus.h"
+
+#include "internal/berryIRuntimeConstants.h"
+#include "internal/berryCTKPluginActivator.h"
 
 #include <typeinfo>
 
@@ -28,50 +33,64 @@ void SafeRunner::Run(ISafeRunnable::Pointer code)
   try
   {
     code->Run();
-  } catch (const std::exception& e)
+  }
+  catch (const ctkException& e)
   {
     HandleException(code, e);
-  } catch (...)
+  }
+  catch (const std::exception& e)
+  {
+    HandleException(code, e);
+  }
+  catch (...)
   {
     HandleException(code);
   }
 }
 
+void SafeRunner::HandleException(ISafeRunnable::Pointer code)
+{
+  HandleException(code, ctkException("Unknown exception thrown"));
+}
+
 void SafeRunner::HandleException(ISafeRunnable::Pointer code,
-    const std::exception& e)
+                                 const std::exception& e)
+{
+  HandleException(code, ctkException(e.what()));
+}
+
+void SafeRunner::HandleException(ISafeRunnable::Pointer code,
+                                 const ctkException& e)
 {
   try {
     dynamic_cast<const OperationCanceledException&>(e);
   }
-    catch (const std::bad_cast& )
+  catch (const std::bad_cast& )
+  {
+    // try to obtain the correct plug-in id for the bundle providing the safe runnable
+    QString pluginId = CTKPluginActivator::getPluginId(static_cast<void*>(code.GetPointer()));
+    if (pluginId.isEmpty())
+      pluginId = IRuntimeConstants::PI_RUNTIME();
+    QString message = QString("Problems occurred when invoking code from plug-in: \"%1\".").arg(pluginId);
+    IStatus::Pointer status;
+    try {
+      const CoreException& coreExc = dynamic_cast<const CoreException&>(e);
+      MultiStatus::Pointer multiStatus(new MultiStatus(pluginId, IRuntimeConstants::PLUGIN_ERROR,
+                                                       message, e, BERRY_STATUS_LOC));
+      multiStatus->Merge(coreExc.GetStatus());
+      status = multiStatus;
+    }
+    catch (const std::bad_cast&)
     {
-      // TODO proper exception logging
-//    // try to obtain the correct plug-in id for the bundle providing the safe runnable
-//    Activator activator = Activator.getDefault();
-//    String pluginId = null;
-//    if (activator != null)
-//      pluginId = activator.getBundleId(code);
-//    if (pluginId == null)
-//      pluginId = IRuntimeConstants.PI_COMMON;
-//    String message = NLS.bind(CommonMessages.meta_pluginProblems, pluginId);
-//    IStatus status;
-//    if (e instanceof CoreException) {
-//      status = new MultiStatus(pluginId, IRuntimeConstants.PLUGIN_ERROR, message, e);
-//      ((MultiStatus) status).merge(((CoreException) e).getStatus());
-//    } else {
-//      status = new Status(IStatus.ERROR, pluginId, IRuntimeConstants.PLUGIN_ERROR, message, e);
-//    }
-
-//    // Make sure user sees the exception: if the log is empty, log the exceptions on stderr
+      IStatus::Pointer tmpStatus(new Status(IStatus::ERROR_TYPE, pluginId,
+                                            IRuntimeConstants::PLUGIN_ERROR, message, e, BERRY_STATUS_LOC));
+      status = tmpStatus;
+    }
+    // Make sure user sees the exception: if the log is empty, log the exceptions on stderr
 //    if (!RuntimeLog.isEmpty())
-//    {
 //      RuntimeLog.log(status);
-//    }
 //    else
-//    {
-      //e.printStackTrace();
-      std::cerr << e.what() << std::endl;
-//    }
+    qWarning() << e.printStackTrace();
   }
   code->HandleException(e);
 }

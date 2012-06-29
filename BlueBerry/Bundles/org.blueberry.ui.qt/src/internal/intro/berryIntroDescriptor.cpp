@@ -20,37 +20,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "internal/berryWorkbenchRegistryConstants.h"
 
 #include <berryAbstractUICTKPlugin.h>
+#include <berryStatus.h>
+#include <berryCoreException.h>
+#include <berryIContributor.h>
 
 namespace berry
 {
 
 IntroDescriptor::IntroDescriptor(IConfigurationElement::Pointer configElement)
-    throw (CoreException) :
-  element(configElement)
+  : element(configElement)
 {
   QString val = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS);
   if (val.isEmpty())
   {
-    //TODO IStatus
-    /*
-    throw CoreException(new Status(IStatus.ERROR,
-        configElement .getNamespace(), 0,
-        "Invalid extension (Missing class name): " + getId(), //$NON-NLS-1$
-        null));
-        */
-    throw CoreException(configElement->GetContributor() +
-                        ": Invalid extension (Missing className): " + GetId());
+    IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, configElement->GetContributor()->GetName(), 0,
+                                       QString("Invalid extension (Missing class name): ") + GetId()));
+    throw CoreException(status);
   }
 }
 
-SmartPointer<IIntroPart> IntroDescriptor::CreateIntro() throw (CoreException)
+SmartPointer<IIntroPart> IntroDescriptor::CreateIntro()
 {
   IIntroPart::Pointer intro(element->CreateExecutableExtension<IIntroPart>(WorkbenchRegistryConstants::ATT_CLASS));
   return intro;
 }
 
 IntroContentDetector::Pointer IntroDescriptor::GetIntroContentDetector()
-    throw (CoreException)
 {
   QString val = element->GetAttribute(WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR);
   if (val.isEmpty())
@@ -82,7 +77,7 @@ QString IntroDescriptor::GetId() const
 
 QString IntroDescriptor::GetPluginId() const
 {
-  return element->GetContributor();
+  return element->GetContributor()->GetName();
 }
 
 ImageDescriptor::Pointer IntroDescriptor::GetImageDescriptor() const
@@ -98,7 +93,7 @@ ImageDescriptor::Pointer IntroDescriptor::GetImageDescriptor() const
   }
 
   imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
-        element->GetContributor(), iconName);
+        element->GetContributor()->GetName(), iconName);
   return imageDescriptor;
 }
 

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPropertyTester.h"
 
 #include "berryPlatform.h"
+#include "berryIContributor.h"
 
 namespace berry
 {
@@ -47,7 +48,7 @@ bool PropertyTester::IsInstantiated()
 
 bool PropertyTester::IsDeclaringPluginActive()
 {
-  QSharedPointer<ctkPlugin> plugin = Platform::GetPlugin(fConfigElement->GetContributor());
+  QSharedPointer<ctkPlugin> plugin = Platform::GetCTKPlugin(fConfigElement->GetContributor()->GetName());
   return plugin->getState() == ctkPlugin::ACTIVE;
 }
 

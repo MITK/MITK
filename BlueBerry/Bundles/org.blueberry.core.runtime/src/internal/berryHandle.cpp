@@ -17,9 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryHandle.h"
 
+#include "berryIObjectManager.h"
+
 namespace berry {
 
-Handle::Handle(RegistryObjectManager* objectManager, int value)
+Handle::Handle(const SmartPointer<const IObjectManager> &objectManager, int value)
   : objectManager(objectManager), objectId(value)
 {
 }

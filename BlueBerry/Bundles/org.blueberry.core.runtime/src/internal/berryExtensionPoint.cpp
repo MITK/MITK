@@ -16,123 +16,125 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExtensionPoint.h"
 
-#include <berryIConfigurationElement.h>
+#include "berryExtensionRegistry.h"
+#include "berryRegistryContributor.h"
+#include "berryRegistryObjectManager.h"
 
-#include "berryPlatformException.h"
+#include <QDir>
 
 namespace berry {
 
-ExtensionPoint::ExtensionPoint(const std::string& contributor)
- : m_Contributor(contributor), m_Label(""), m_SimpleId("")
-{
-  m_UniqueId = contributor + "." + m_SimpleId;
-}
+const int ExtensionPoint::LABEL = 0; //The human readable name for the extension point
+const int ExtensionPoint::SCHEMA = 1; //The schema of the extension point
+const int ExtensionPoint::QUALIFIED_NAME = 2; //The fully qualified name of the extension point
+const int ExtensionPoint::NAMESPACE = 3; //The name of the namespace of the extension point
+const int ExtensionPoint::CONTRIBUTOR_ID = 4; //The ID of the actual contributor of the extension point
+const int ExtensionPoint::EXTRA_SIZE = 5;
 
-std::string
-ExtensionPoint::GetContributor() const
+QList<QString> ExtensionPoint::GetExtraData() const
 {
-  return m_Contributor;
-}
-
-const std::vector<IConfigurationElement::Pointer> ExtensionPoint::GetConfigurationElements() const
-{
-  std::vector<IConfigurationElement::Pointer> result;
-
-  const std::vector<const IExtension*> extensions = this->GetExtensions();
-  for (std::vector<const IExtension*>::const_iterator itr = extensions.begin();
-       itr != extensions.end(); ++itr)
-  {
-    const std::vector<IConfigurationElement::Pointer> configs = (*itr)->GetConfigurationElements();
-    result.insert(result.end(), configs.begin(), configs.end());
+  //The extension point has been created by parsing, or does not have any extra data
+  if (NoExtraData())
+  { //When this is true, the extraInformation is always a String[]. This happens when the object is created by the parser.
+    return extraInformation;
   }
 
-  return result;
+//  //The extension point has been loaded from the cache.
+//  if (extraInformation.empty())
+//  {
+//    extraInformation = registry->GetTableReader()->LoadExtensionPointExtraData(GetExtraDataOffset());
+//  }
+  return extraInformation;
 }
 
-const IExtension*
-ExtensionPoint::GetExtension(const std::string& extensionId) const
+ExtensionPoint::ExtensionPoint(ExtensionRegistry* registry, bool persist)
+  : RegistryObject(registry, persist)
 {
-  std::map<std::string, Extension::Pointer>::const_iterator iter = m_Extensions.find(extensionId);
-
-  if (iter == m_Extensions.end())
-    return 0;
-
-  return iter->second.GetPointer();
 }
 
-const std::vector<const IExtension*>
-ExtensionPoint::GetExtensions() const
+ExtensionPoint::ExtensionPoint(int self, const QList<int>& children, int dataOffset,
+               ExtensionRegistry* registry, bool persist)
+  : RegistryObject(registry, persist)
 {
-  std::vector<const IExtension*> extensions;
-  for (std::map<std::string, Extension::Pointer>::const_iterator iter = m_Extensions.begin();
-       iter != m_Extensions.end(); ++iter)
-  {
-    extensions.push_back(iter->second.GetPointer());
-  }
-
-  for (std::vector<Extension::Pointer>::const_iterator iter = m_UnnamedExtensions.begin();
-       iter != m_UnnamedExtensions.end(); ++iter)
-  {
-    extensions.push_back(iter->GetPointer());
-  }
-  //extensions.insert(extensions.end(), m_UnnamedExtensions.begin(), m_UnnamedExtensions.end());
-
-  return extensions;
+  SetObjectId(self);
+  SetRawChildren(children);
+  SetExtraDataOffset(dataOffset);
 }
 
-std::string
-ExtensionPoint::GetLabel() const
+QString ExtensionPoint::GetSimpleIdentifier() const
 {
-  return m_Label;
+  return GetUniqueIdentifier().mid(GetUniqueIdentifier().lastIndexOf('.') + 1);
 }
 
-std::string
-ExtensionPoint::GetSimpleIdentifier() const
+QString ExtensionPoint::GetSchemaReference() const
 {
-  return m_SimpleId;
+  return QDir::fromNativeSeparators(GetExtraData()[SCHEMA]);
 }
 
-std::string
-ExtensionPoint::GetUniqueIdentifier() const
+QString ExtensionPoint::GetLabel() const
 {
-  return m_UniqueId;
+  return GetExtraData()[LABEL];
 }
 
-void
-ExtensionPoint::SetLabel(const std::string& label)
+QString ExtensionPoint::GetUniqueIdentifier() const
 {
-  m_Label = label;
+  return GetExtraData()[QUALIFIED_NAME];
 }
 
-void
-ExtensionPoint::SetSimpleId(const std::string& id)
+QString ExtensionPoint::GetNamespace() const
 {
-  m_SimpleId = id;
+  return GetExtraData()[NAMESPACE];
 }
 
-void
-ExtensionPoint::SetParentId(const std::string& id)
+QString ExtensionPoint::GetContributorId() const
 {
-  m_UniqueId = id + "." + m_SimpleId;
+  return GetExtraData()[CONTRIBUTOR_ID];
 }
 
-void
-ExtensionPoint::AddExtension(Extension::Pointer extension)
+void ExtensionPoint::SetSchema(const QString& value)
 {
-  if (extension->GetUniqueIdentifier() == "")
-  {
-    m_UnnamedExtensions.push_back(extension);
-    return;
-  }
+  extraInformation[SCHEMA] = value;
+}
 
-  if (m_Extensions.find(extension->GetUniqueIdentifier()) != m_Extensions.end())
-  {
-    throw PlatformException("Duplicate extension id \"" + extension->GetUniqueIdentifier()
-        + "\" found for extension point \"" + this->GetUniqueIdentifier() + "\" from plugin \""
-        + this->GetContributor() + "\"");
-  }
+void ExtensionPoint::SetLabel(const QString& value)
+{
+  extraInformation[LABEL] = value;
+}
 
-  m_Extensions[extension->GetUniqueIdentifier()] = extension;
+void ExtensionPoint::SetUniqueIdentifier(const QString& value)
+{
+  extraInformation[QUALIFIED_NAME] = value;
+}
+
+void ExtensionPoint::SetNamespace(const QString& value)
+{
+  extraInformation[NAMESPACE] = value;
+}
+
+void ExtensionPoint::SetContributorId(const QString id)
+{
+  extraInformation[CONTRIBUTOR_ID] = id;
+}
+
+QString ExtensionPoint::GetLabelAsIs() const
+{
+  return GetExtraData()[LABEL];
+}
+
+QString ExtensionPoint::GetLabel(const QLocale& locale)
+{
+  registry->LogMultiLangError();
+  return GetLabel();
+}
+
+SmartPointer<IContributor> ExtensionPoint::GetContributor() const
+{
+  return registry->GetObjectManager()->GetContributor(GetContributorId());
+}
+
+QString ExtensionPoint::ToString() const
+{
+  return GetUniqueIdentifier();
 }
 
 }

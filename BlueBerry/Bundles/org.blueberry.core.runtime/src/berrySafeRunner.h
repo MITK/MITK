@@ -47,7 +47,9 @@ public:
 
 private:
 
-  static void HandleException(ISafeRunnable::Pointer code, const std::exception& e = std::exception());
+  static void HandleException(ISafeRunnable::Pointer code);
+  static void HandleException(ISafeRunnable::Pointer code, const std::exception&);
+  static void HandleException(ISafeRunnable::Pointer code, const ctkException& e);
 
 };
 

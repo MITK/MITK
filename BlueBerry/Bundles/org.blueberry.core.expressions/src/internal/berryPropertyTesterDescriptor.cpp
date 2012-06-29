@@ -17,9 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPropertyTesterDescriptor.h"
 
 #include "berryPlatform.h"
-#include "berryPlatformException.h"
+#include "berryCoreException.h"
+#include "berryStatus.h"
+#include "berryExpressionPlugin.h"
 
 #include <berryIConfigurationElement.h>
+#include <berryIContributor.h>
 
 #include "Poco/String.h"
 
@@ -36,13 +39,21 @@ PropertyTesterDescriptor::PropertyTesterDescriptor(const IConfigurationElement::
   fNamespace = fConfigElement->GetAttribute(NAMESPACE);
   if (fNamespace.isNull())
   {
-    throw CoreException("No namespace");
+    IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, ExpressionPlugin::GetPluginId(),
+                                       IStatus::ERROR_TYPE,
+                                       "The mandatory attribute namespace is missing. Tester has been disabled.",
+                                       BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
   QString buffer(",");
   QString properties = fConfigElement->GetAttribute(PROPERTIES);
   if (properties.isNull())
   {
-    throw CoreException("No properties");
+    IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, ExpressionPlugin::GetPluginId(),
+                                       IStatus::ERROR_TYPE,
+                                       "The mandatory attribute properties is missing. Tester has been disabled.",
+                                       BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
   foreach(QChar ch, properties)
   {
@@ -94,7 +105,7 @@ PropertyTesterDescriptor::IsInstantiated()
 bool
 PropertyTesterDescriptor::IsDeclaringPluginActive()
 {
-  QSharedPointer<ctkPlugin> plugin = Platform::GetPlugin(fConfigElement->GetContributor());
+  QSharedPointer<ctkPlugin> plugin = Platform::GetPlugin(fConfigElement->GetContributor()->GetName());
   return plugin->getState() == ctkPlugin::ACTIVE;
 }
 

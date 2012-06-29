@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryEditorPart.h"
 #include "berryImageDescriptor.h"
+#include "berryIContributor.h"
 
 namespace berry
 {
@@ -136,7 +137,7 @@ SmartPointer<ImageDescriptor> EditorDescriptor::GetImageDescriptor() const
       if (!imageFileName.isEmpty() && configurationElement)
       {
         imageDesc = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
-            configurationElement->GetContributor(), imageFileName);
+              configurationElement->GetContributor()->GetName(), imageFileName);
       }
       else if (!command.isEmpty())
       {
@@ -204,7 +205,7 @@ QString EditorDescriptor::GetPluginID() const
 {
   if (!configurationElement.IsNull())
   {
-    return configurationElement->GetContributor();
+    return configurationElement->GetContributor()->GetName();
   }
   return pluginIdentifier;
 }

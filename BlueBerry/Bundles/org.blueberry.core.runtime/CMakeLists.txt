@@ -1,5 +1,7 @@
 project(org_blueberry_core_runtime)
 
+set(QT_USE_QTXML 1)
+
 MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE org_blueberry_core_runtime_EXPORT
                         EXPORTED_INCLUDE_SUFFIXES src src/application src/service src/registry)
 

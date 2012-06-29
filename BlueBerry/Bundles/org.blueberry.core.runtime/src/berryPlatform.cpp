@@ -68,6 +68,10 @@ QString Platform::ARG_CONSOLELOG = "BlueBerry.consoleLog";
 QString Platform::ARG_TESTPLUGIN = "BlueBerry.testplugin";
 QString Platform::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
 
+QString Platform::ARG_NO_REGISTRY_CACHE = "BlueBerry.noRegistryCache";
+QString Platform::ARG_NO_LAZY_REGISTRY_CACHE_LOADING = "BlueBerry.noLazyRegistryCacheLoading";
+QString Platform::ARG_REGISTRY_MULTI_LANGUAGE = "BlueBerry.registryMultiLanguage";
+
 QString Platform::ARG_XARGS = "xargs";
 
 QDir Platform::GetConfigurationPath()

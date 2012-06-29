@@ -45,7 +45,7 @@ struct BERRY_EXPRESSIONS IPropertyTester : public Object {
 
   berryInterfaceMacro(IPropertyTester, berry);
 
-  virtual ~IPropertyTester() {}
+  virtual ~IPropertyTester();
 
   /**
    * Returns whether the property tester can handle the given

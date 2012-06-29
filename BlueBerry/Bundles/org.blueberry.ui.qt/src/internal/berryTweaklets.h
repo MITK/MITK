@@ -44,7 +44,7 @@ BERRY_UI_QT uint qHash(const berry::TweakKey_base& key);
 #include <berryIConfigurationElement.h>
 #include <berryPlatform.h>
 #include <berryIExtensionRegistry.h>
-#include <berryPlatformException.h>
+#include <berryCoreException.h>
 
 
 namespace berry {

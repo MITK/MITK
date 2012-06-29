@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berrySourcePriorityNameMapping.h"
 #include "berryEvaluationResult.h"
 
-#include <berryPlatformException.h>
+#include <berryCoreException.h>
 
 namespace berry {
 

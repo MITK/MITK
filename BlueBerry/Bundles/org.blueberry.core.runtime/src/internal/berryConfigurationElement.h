@@ -17,59 +17,98 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYEXTENSIONELEMENT_H_
 #define BERRYEXTENSIONELEMENT_H_
 
-#include "berryMacros.h"
-
-#include "berryBundleLoader.h"
-
-#include "Poco/DOM/Node.h"
-
-#include <berryIConfigurationElement.h>
+#include "berryRegistryObject.h"
 
 namespace berry {
 
-class Extension;
+struct IContributor;
 
-class ConfigurationElement : public IConfigurationElement
+/**
+ * An object which represents the user-defined contents of an extension
+ * in a plug-in manifest.
+ */
+class ConfigurationElement : public RegistryObject
 {
 
-public:
+private:
 
-  berryObjectMacro(ConfigurationElement);
+  //The id of the parent element. It can be a configuration element or an extension
+  int parentId;
+  short parentType; //This value is only interesting when running from cache.
 
-  ConfigurationElement(BundleLoader* loader, Poco::XML::Node* config,
-                     std::string contributor, SmartPointer<Extension> extension,
-                     const ConfigurationElement* parent = 0);
+  //Store the properties and the value of the configuration element.
+  //The format is the following:
+  //  [p1, v1, p2, v2, configurationElementValue]
+  //If the array size is even, there is no "configurationElementValue (ie getValue returns null)".
+  //The properties and their values are alternated (v1 is the value of p1).
+  QList<QString> propertiesAndValue;
 
-  QObject* CreateExecutableExtension(const QString& propertyName) const;
+  //The name of the configuration element
+  QString name;
 
-  QString GetAttribute(const QString& name) const;
-  QStringList GetAttributeNames() const;
+  //ID of the actual contributor of this element
+  //This value can be null when the element is loaded from disk and the owner has been uninstalled.
+  //This happens when the configuration is obtained from a delta containing removed extension.
+  QString contributorId;
 
-  bool GetBoolAttribute(const std::string& name, bool& value) const;
+protected:
 
-  QList<IConfigurationElement::Pointer> GetChildren() const;
-  QList<IConfigurationElement::Pointer> GetChildren(const QString& name) const;
+  friend class ConfigurationElementHandle;
+  friend class ExtensionRegistry;
+  friend class ExtensionsParser;
+
+  void ThrowException(const QString& message, const ctkException& exc);
+
+  void ThrowException(const QString& message);
 
   QString GetValue() const;
 
-  QString GetNamespaceIdentifier() const;
+  QString GetValueAsIs() const;
+
+  QString GetAttributeAsIs(const QString& attrName) const;
+
+  QList<QString> GetAttributeNames() const;
+
+  void SetProperties(const QList<QString>& value);
+
+  QList<QString> GetPropertiesAndValue() const;
+
+  void SetValue(const QString& value);
+
+  void SetContributorId(const QString& id);
+
+  QString GetContributorId() const;
+
+  void SetParentId(int objectId);
 
   QString GetName() const;
-  const IConfigurationElement* GetParent() const;
 
-  QString GetContributor() const;
-  const IExtension* GetDeclaringExtension() const;
+  void SetName(const QString& name);
 
-  bool IsValid() const;
+  void SetParentType(short type);
 
-  ~ConfigurationElement();
+  QObject* CreateExecutableExtension(const QString& attributeName);
 
+  QString GetAttribute(const QString& attrName, const QLocale& locale) const;
 
-private:
-  Poco::XML::Node* m_ConfigurationNode;
+  QString GetValue(const QLocale& locale) const;
 
-  const ConfigurationElement* m_Parent;
-  SmartPointer<Extension> m_Extension;
+public:
+
+  berryObjectMacro(berry::ConfigurationElement)
+
+  ConfigurationElement(ExtensionRegistry* registry, bool persist);
+
+  ConfigurationElement(int self, const QString& contributorId,
+                       const QString& name, const QList<QString>& propertiesAndValue,
+                       const QList<int>& children, int extraDataOffset, int parent,
+                       short parentType, ExtensionRegistry* registry, bool persist);
+
+  QString GetAttribute(const QString& attrName) const;
+
+  QList<ConfigurationElement::Pointer> GetChildren(const QString& childrenName) const;
+
+  SmartPointer<IContributor> GetContributor() const;
 
 };
 

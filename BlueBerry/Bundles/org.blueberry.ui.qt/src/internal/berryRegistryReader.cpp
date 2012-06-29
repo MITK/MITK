@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIExtensionRegistry.h>
 #include <berryIExtension.h>
 #include <berryIConfigurationElement.h>
+#include <berryIContributor.h>
 
 #include "berryRegistryReader.h"
 
@@ -29,7 +30,7 @@ namespace {
 bool CompareExtensionsByContributor(const berry::IExtension::Pointer& e1,
                                     const berry::IExtension::Pointer& e2)
 {
-  return e1->GetContributor().compare(e2->GetContributor(), Qt::CaseInsensitive) < 0;
+  return e1->GetContributor()->GetName().compare(e2->GetContributor()->GetName(), Qt::CaseInsensitive) < 0;
 }
 
 }
@@ -48,8 +49,8 @@ RegistryReader::~RegistryReader()
 void RegistryReader::LogError(const IConfigurationElement::Pointer& element,
                               const QString& text)
 {
-  const IExtension* extension = element->GetDeclaringExtension();
-  QString buf = QString("Plugin ") + extension->GetContributor() + ", extension "
+  IExtension::Pointer extension = element->GetDeclaringExtension();
+  QString buf = QString("Plugin ") + extension->GetContributor()->GetName() + ", extension "
       + extension->GetExtensionPointUniqueIdentifier();
   // look for an ID if available - this should help debugging
   QString id = element->GetAttribute("id");

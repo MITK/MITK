@@ -17,105 +17,83 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYEXTENSION_H_
 #define BERRYEXTENSION_H_
 
-#include <berryIExtension.h>
-
-#include "berryConfigurationElement.h"
+#include "berryRegistryObject.h"
 
 namespace berry {
 
+struct IContributor;
+
 /**
- * An object which represents the user-defined extension in a
- * plug-in manifest.
- * <p>
- * This class may be instantiated, or further subclassed.
- * </p>
+ * An object which represents the user-defined extension in a plug-in manifest.
  */
-class Extension : public IExtension
+class Extension : public RegistryObject
 {
 
 private:
 
-  // DTD properties (included in plug-in manifest)
-  std::string extensionPoint;
-  std::string id;
-  std::string label;
-  std::string namespaze;
-  std::vector<IConfigurationElement::Pointer> elements;
+  friend class ExtensionHandle;
+  friend class ExtensionsParser;
+  friend class ExtensionPointHandle;
+  friend class ExtensionRegistry;
+  friend class RegistryObjectManager;
 
+  //Extension simple identifier
+  QString simpleId;
+  //The namespace for the extension.
+  QString namespaceIdentifier;
 
-public:
+  //  Place holder for the label and  the extension point. It contains either a String[] or a SoftReference to a String[].
+  //The array layout is [label, extension point name]
+  QList<QString> extraInformation;
 
-  berryObjectMacro(Extension);
+  static const int LABEL; // = 0; //The human readable name of the extension
+  static const int XPT_NAME; // = 1; // The fully qualified name of the extension point to which this extension is attached to
+  static const int CONTRIBUTOR_ID; // = 2; // ID of the actual contributor of this extension
+  static const int EXTRA_SIZE; // = 3;
 
-  Extension(const std::string& namespaze);
+  QList<QString> GetExtraData() const;
 
-  /**
-   * Two Extensions are equal if they have the same Id
-   * and target the same extension point.
-   */
-  bool operator==(const Object* em) const;
+protected:
 
-  /**
-   * Returns the extension point with which this extension is associated.
-   *
-   * @return the extension point with which this extension is associated
-   *  or <code>null</code>
-   */
   QString GetExtensionPointIdentifier() const;
 
-  QString GetNamespace() const;
-
-  /**
-   * Returns the simple identifier of this extension, or <code>null</code>
-   * if this extension does not have an identifier.
-   * This identifier is specified in the plug-in manifest as a non-empty
-   * string containing no period characters (<code>'.'</code>) and
-   * must be unique within the defining plug-in.
-   *
-   * @return the simple identifier of the extension (e.g. <code>"main"</code>)
-   *  or <code>null</code>
-   */
   QString GetSimpleIdentifier() const;
 
   QString GetUniqueIdentifier() const;
 
-  QList<IConfigurationElement::Pointer> GetConfigurationElements() const;
+  void SetExtensionPointIdentifier(const QString& value);
+
+  void SetSimpleIdentifier(const QString& value);
 
   QString GetLabel() const;
 
-  /**
-   * Set the extension point with which this extension is associated.
-   * This object must not be read-only.
-   *
-   * @return the extension point with which this extension is associated.
-   *    May be <code>null</code>.
-   */
-  void SetExtensionPointIdentifier(const std::string& value);
+  void SetLabel(const QString& value);
 
-  /**
-   * Sets the simple identifier of this extension, or <code>null</code>
-   * if this extension does not have an identifier.
-   * This identifier is specified in the plug-in manifest as a non-empty
-   * string containing no period characters (<code>'.'</code>) and
-   * must be unique within the defining plug-in.
-   * This object must not be read-only.
-   *
-   * @param value the simple identifier of the extension (e.g. <code>"main"</code>).
-   *    May be <code>null</code>.
-   */
-  void SetSimpleIdentifier(const std::string& value);
+  QString GetContributorId() const;
 
-  /**
-   * Sets the configuration element children of this extension.
-   *
-   * @param value the configuration elements in this extension.
-   *    May be <code>null</code>.
-   */
-  void SetSubElements(const std::vector<IConfigurationElement::Pointer>& value);
+  void SetContributorId(const QString& value);
 
-  void SetLabel(const std::string& l);
+  void SetNamespaceIdentifier(const QString& value);
 
-  bool operator<(const IExtension* e2) const;
+  QString GetLabelAsIs() const;
+
+  QString GetLabel(const QLocale& locale) const;
+
+public:
+
+  berryObjectMacro(berry::Extension)
+
+  Extension(ExtensionRegistry* registry, bool persist);
+
+  Extension(int self, const QString& simpleId, const QString& namespaze,
+            const QList<int>& children, int extraData,
+            ExtensionRegistry* registry, bool persist);
+
+  SmartPointer<IContributor> GetContributor() const;
+
+  QString GetNamespaceIdentifier() const;
+
+  QString ToString() const;
 
 };
 

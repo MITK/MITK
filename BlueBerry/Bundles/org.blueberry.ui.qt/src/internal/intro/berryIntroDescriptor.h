@@ -47,15 +47,14 @@ public:
   /**
    * Create a new IntroDescriptor for an extension.
    */
-  IntroDescriptor(IConfigurationElement::Pointer configElement)
-      throw (CoreException);
+  IntroDescriptor(IConfigurationElement::Pointer configElement);
 
   /*
    * @see IIntroDescriptor#CreateIntro()
    */
-  IIntroPart::Pointer CreateIntro() throw (CoreException);
+  IIntroPart::Pointer CreateIntro();
 
-  IntroContentDetector::Pointer GetIntroContentDetector() throw (CoreException);
+  IntroContentDetector::Pointer GetIntroContentDetector();
 
   int GetRole() const;
 

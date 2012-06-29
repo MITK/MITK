@@ -19,7 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchRegistryConstants.h"
 
 #include <berryIPageLayout.h>
-#include <berryPlatformException.h>
+#include <berryCoreException.h>
+#include <berryStatus.h>
+#include <berryIContributor.h>
 
 namespace berry
 {
@@ -37,10 +39,9 @@ StickyViewDescriptor::StickyViewDescriptor(IConfigurationElement::Pointer elemen
   this->id = configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
   if (id.isEmpty())
   {
-    //TODO IStatus
-//    throw new CoreException(new Status(IStatus.ERROR, element .getNamespace(),
-//        0, "Invalid extension (missing id) ", null));
-    throw CoreException(element->GetContributor() + ": Invalid extension (missing id)");
+    IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, element->GetContributor()->GetName(),
+                                       0, "Invalid extension (missing id)", BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
 }
 

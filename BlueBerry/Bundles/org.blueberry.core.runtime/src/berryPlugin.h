@@ -19,32 +19,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_runtime_Export.h>
 
-#include "berryIBundleActivator.h"
-#include "berryIBundleContext.h"
-
-
-struct IBundle;
-class BundleLoader;
+#include <ctkPluginActivator.h>
 
 namespace berry {
 
-class org_blueberry_core_runtime_EXPORT Plugin : public IBundleActivator
+struct ILog;
+
+class org_blueberry_core_runtime_EXPORT Plugin : public QObject, public ctkPluginActivator
 {
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
 public:
-  void Start(IBundleContext::Pointer context);
-  void Stop(IBundleContext::Pointer context);
 
-  SmartPointer<IBundle> GetBundle();
-  //Poco::Logger& GetLog();
+  Plugin();
 
-  bool GetStatePath(QDir& path);
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+  QSharedPointer<ctkPlugin> GetPlugin() const;
+
+  /**
+   * Returns the log for this plug-in.  If no such log exists, one is created.
+   *
+   * @return the log for this plug-in
+   * XXX change this into a LogMgr service that would keep track of the map. See if it can be a service factory.
+   */
+  ILog* GetLog() const;
+
+  QString GetStateLocation() const;
 
 protected:
 
-  friend class BundleLoader;
-
-  //TODO WeakPointer!!!
-  SmartPointer<IBundle> m_Bundle;
+  ctkPluginContext* m_Context;
 
 };
 

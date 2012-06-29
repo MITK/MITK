@@ -34,9 +34,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryQtWorkbenchPageTweaklet.h"
 #include "berryQtWidgetsTweaklet.h"
 #include "berryQtStylePreferencePage.h"
+#include "berryStatusUtil.h"
 
 #include "berryIQtStyleManager.h"
 #include "berryImageDescriptor.h"
+#include "berryIContributor.h"
+#include "berryILog.h"
 
 #include <QDebug>
 
@@ -141,7 +144,7 @@ QSharedPointer<ctkPlugin> WorkbenchPlugin::GetBundleForExecutableExtension(
   }
 
   if (contributorName.isNull())
-    contributorName = element->GetContributor();
+    contributorName = element->GetContributor()->GetName();
 
   return Platform::GetPlugin(contributorName);
 }
@@ -253,21 +256,21 @@ void WorkbenchPlugin::Log(const QString& message)
   //inst->GetLog().log(message);
 }
 
-void WorkbenchPlugin::Log(const ctkRuntimeException &exc)
+void WorkbenchPlugin::Log(const ctkException &exc)
 {
   BERRY_INFO << "LOG: " << exc.what() << std::endl;
   //inst->GetLog().log(exc);
 }
 
 
-void WorkbenchPlugin::Log(const QString& message, const ctkRuntimeException &t)
+void WorkbenchPlugin::Log(const QString& message, const ctkException &t)
 {
   PlatformException exc(message, t);
   WorkbenchPlugin::Log(exc);
 }
 
 void WorkbenchPlugin::Log(const QString& clazz,
-                          const QString& methodName, const ctkRuntimeException& t)
+                          const QString& methodName, const ctkException &t)
 {
   QString msg = QString("Exception in ") + clazz + "." + methodName + ": "
       + t.what();
@@ -275,6 +278,22 @@ void WorkbenchPlugin::Log(const QString& clazz,
   WorkbenchPlugin::Log(msg, t);
 }
 
+void WorkbenchPlugin::Log(const QString& message, const SmartPointer<IStatus>& status)
+{
+  //1FTUHE0: ITPCORE:ALL - API - Status & logging - loss of semantic info
+
+  if (!message.isEmpty())
+  {
+    GetDefault()->GetLog()->Log(StatusUtil::NewStatus(IStatus::ERROR_TYPE, message, BERRY_STATUS_LOC));
+  }
+
+  GetDefault()->GetLog()->Log(status);
+}
+
+void WorkbenchPlugin::Log(const SmartPointer<IStatus>& status)
+{
+  GetDefault()->GetLog()->Log(status);
+}
 
 void WorkbenchPlugin::start(ctkPluginContext* context)
 {

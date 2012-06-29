@@ -31,11 +31,25 @@ namespace berry {
  * This class can be used without OSGi running.
  * </p>
  */
-class org_blueberry_core_runtime_EXPORT Status : public IStatus {
+class org_blueberry_core_runtime_EXPORT Status : public IStatus
+{
+
+public:
+
+  struct SourceLocation {
+
+    SourceLocation(const QString& fileName = QString(), const QString& methodName = QString(), int lineNumber = 0)
+      : fileName(fileName), methodName(methodName), lineNumber(lineNumber)
+    {}
+
+    const QString fileName;
+    const QString methodName;
+    const int lineNumber;
+  };
 
 private:
 
-    /**
+  /**
    * The severity. One of
    * <ul>
    * <li><code>CANCEL</code></li>
@@ -67,21 +81,18 @@ private:
    */
   static const QList<IStatus::Pointer> theEmptyStatusArray;
 
+  SourceLocation sourceLocation;
 
 public:
 
   /**
    * A standard OK status with an "ok"  message.
-   *
-   * @since 3.0
    */
-  static const IStatus::Pointer OK_STATUS;
+  static const IStatus::Pointer OK_STATUS(const SourceLocation& sl);
   /**
    * A standard CANCEL status with no message.
-   *
-   * @since 3.0
    */
-  static const IStatus::Pointer CANCEL_STATUS;
+  static const IStatus::Pointer CANCEL_STATUS(const SourceLocation& sl);
 
   /**
    * Creates a new status object.  The created status has no children.
@@ -93,7 +104,8 @@ public:
    * @param message a human-readable message, localized to the
    *    current locale
    */
-  Status(const Severity& severity, const QString& pluginId, int code, const QString& message);
+  Status(const Severity& severity, const QString& pluginId, int code, const QString& message,
+         const SourceLocation& sl);
 
   /**
    * Creates a new status object.  The created status has no children.
@@ -106,7 +118,8 @@ public:
    *    current locale
    * @param exception a low-level exception.
    */
-  Status(const Severity& severity, const QString& pluginId, int code, const QString& message, const ctkException& exc);
+  Status(const Severity& severity, const QString& pluginId, int code, const QString& message,
+         const ctkException& exc, const SourceLocation& sl);
 
   /**
    * Simplified constructor of a new status object; assumes that code is <code>OK</code>.
@@ -118,7 +131,8 @@ public:
    * @param message a human-readable message, localized to the
    *    current locale
    */
-  Status(const Severity& severity, const QString& pluginId, const QString& message);
+  Status(const Severity& severity, const QString& pluginId, const QString& message,
+         const SourceLocation& sl);
 
   /**
    * Simplified constructor of a new status object; assumes that code is <code>OK</code>.
@@ -131,52 +145,59 @@ public:
    *    current locale
    * @param exception a low-level exception.
    */
-  Status(const Severity& severity, const QString& pluginId, const QString& message, const ctkException& exc);
+  Status(const Severity& severity, const QString& pluginId, const QString& message,
+         const ctkException& exc, const SourceLocation& sl);
 
-  /* (Intentionally not javadoc'd)
+  /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
   QList<IStatus::Pointer> GetChildren() const;
 
-  /* (Intentionally not javadoc'd)
+  /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
   int GetCode() const;
 
-  /* (Intentionally not javadoc'd)
+  /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
   const ctkException* GetException() const;
 
-  /* (Intentionally not javadoc'd)
+  /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
   QString GetMessage() const;
 
-  /* (Intentionally not javadoc'd)
+  /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
   QString GetPlugin() const;
 
-  /* (Intentionally not javadoc'd)
+  /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
   Severity GetSeverity() const;
 
-  /* (Intentionally not javadoc'd)
+  /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
   bool IsMultiStatus() const;
 
-  /* (Intentionally not javadoc'd)
+  /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
   bool IsOK() const;
 
-  /* (Intentionally not javadoc'd)
+  /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
   bool Matches(const Severities& severityMask) const;
+
+  QString GetFileName() const;
+
+  QString GetMethodName() const;
+
+  int GetLineNumber() const;
 
 
 protected:
@@ -232,5 +253,7 @@ public:
 };
 
 }
+
+#define BERRY_STATUS_LOC berry::Status::SourceLocation(__FILE__, __FUNCTION__, __LINE__)
 
 #endif /* BERRYSTATUS_H_ */

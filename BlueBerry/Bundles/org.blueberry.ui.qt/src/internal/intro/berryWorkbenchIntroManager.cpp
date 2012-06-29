@@ -299,7 +299,6 @@ IWorkbenchPart::Pointer WorkbenchIntroManager::GetIntroAdapterPart() const
 }
 
 IIntroPart::Pointer WorkbenchIntroManager::CreateNewIntroPart()
-    throw (CoreException)
 {
   IntroDescriptor::Pointer introDescriptor(workbench->GetIntroDescriptor());
   introPart = (introDescriptor == 0 ? IIntroPart::Pointer(0) : introDescriptor->CreateIntro());

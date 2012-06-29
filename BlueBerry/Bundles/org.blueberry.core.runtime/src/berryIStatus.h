@@ -191,6 +191,12 @@ struct org_blueberry_core_runtime_EXPORT IStatus: public Object
    * @see #INFO_TYPE
    */
   virtual bool Matches(const Severities& severityMask) const = 0;
+
+  virtual QString GetFileName() const = 0;
+
+  virtual QString GetMethodName() const = 0;
+
+  virtual int GetLineNumber() const = 0;
 };
 
 }

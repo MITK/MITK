@@ -25,14 +25,23 @@ namespace berry
 
 const QList<IStatus::Pointer> Status::theEmptyStatusArray = QList<IStatus::Pointer>();
 
-const IStatus::Pointer Status::OK_STATUS(new Status(IStatus::OK_TYPE,
-                                                    IRuntimeConstants::PI_RUNTIME(), 0, "OK"));
-const IStatus::Pointer Status::CANCEL_STATUS(new Status(IStatus::CANCEL_TYPE,
-                                                        IRuntimeConstants::PI_RUNTIME(), 1, ""));
+const IStatus::Pointer Status::OK_STATUS(const SourceLocation &sl)
+{
+  IStatus::Pointer status(new Status(IStatus::OK_TYPE,
+                                     IRuntimeConstants::PI_RUNTIME(), 0, "OK", sl));
+  return status;
+}
+
+const IStatus::Pointer Status::CANCEL_STATUS(const SourceLocation &sl)
+{
+  IStatus::Pointer status(new Status(IStatus::CANCEL_TYPE,
+                                     IRuntimeConstants::PI_RUNTIME(), 1, "", sl));
+  return status;
+}
 
 Status::Status(const Severity& severity, const QString& pluginId, int code,
-               const QString& message)
-  : exception(0)
+               const QString& message, const SourceLocation& sl)
+  : exception(0), sourceLocation(sl)
 {
   SetSeverity(severity);
   SetPlugin(pluginId);
@@ -41,8 +50,9 @@ Status::Status(const Severity& severity, const QString& pluginId, int code,
 }
 
 Status::Status(const Severity& severity, const QString& pluginId, int code,
-               const QString& message, const ctkException& exception)
-  : exception(0)
+               const QString& message, const ctkException& exception,
+               const SourceLocation& sl)
+  : exception(0), sourceLocation(sl)
 {
   SetSeverity(severity);
   SetPlugin(pluginId);
@@ -52,8 +62,8 @@ Status::Status(const Severity& severity, const QString& pluginId, int code,
 }
 
 Status::Status(const Severity& severity, const QString& pluginId,
-               const QString& message)
-  : exception(0)
+               const QString& message, const SourceLocation& sl)
+  : exception(0), sourceLocation(sl)
 {
   SetSeverity(severity);
   SetPlugin(pluginId);
@@ -62,8 +72,9 @@ Status::Status(const Severity& severity, const QString& pluginId,
 }
 
 Status::Status(const Severity& severity, const QString& pluginId,
-               const QString& message, const ctkException& exception)
-  : exception(0)
+               const QString& message, const ctkException& exception,
+               const SourceLocation& sl)
+  : exception(0), sourceLocation(sl)
 {
   SetSeverity(severity);
   SetPlugin(pluginId);
@@ -118,6 +129,21 @@ bool Status::IsOK() const
 bool Status::Matches(const Severities& severityMask) const
 {
   return (severity & severityMask) != 0;
+}
+
+QString Status::GetFileName() const
+{
+  return sourceLocation.fileName;
+}
+
+QString Status::GetMethodName() const
+{
+  return sourceLocation.methodName;
+}
+
+int Status::GetLineNumber() const
+{
+  return sourceLocation.lineNumber;
 }
 
 void Status::SetCode(int code)

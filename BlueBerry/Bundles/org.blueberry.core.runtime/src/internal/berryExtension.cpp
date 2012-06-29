@@ -16,76 +16,123 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExtension.h"
 
+#include "berryExtensionRegistry.h"
+#include "berryRegistryContributor.h"
+#include "berryRegistryObjectManager.h"
+
 namespace berry
 {
 
-Extension::Extension(const std::string& ns)
- : namespaze(ns)
-{
+const int Extension::LABEL = 0; //The human readable name of the extension
+const int Extension::XPT_NAME = 1; // The fully qualified name of the extension point to which this extension is attached to
+const int Extension::CONTRIBUTOR_ID = 2; // ID of the actual contributor of this extension
+const int Extension::EXTRA_SIZE = 3;
 
+QList<QString> Extension::GetExtraData() const
+{
+  //The extension has been created by parsing, or does not have any extra data
+  if (NoExtraData())
+  {
+    return extraInformation;
+  }
+
+//  //The extension has been loaded from the cache.
+//  if (extraInformation.empty())
+//  {
+//    extraInformation = registry->GetTableReader()->LoadExtensionExtraData(GetExtraDataOffset());
+//  }
+  return extraInformation;
 }
 
-bool Extension::operator==(const Object* em) const
+Extension::Extension(ExtensionRegistry* registry, bool persist)
+  : RegistryObject(registry, persist)
 {
-  if (const Extension* other = dynamic_cast<const Extension*>(em))
-    return (id == other->id) && (extensionPoint == other->extensionPoint);
-
-  return false;
 }
 
-std::string Extension::GetNamespace() const
+Extension::Extension(int self, const QString& simpleId, const QString& namespaze,
+          const QList<int>& children, int extraData,
+          ExtensionRegistry* registry, bool persist)
+  : RegistryObject(registry, persist), simpleId(simpleId), namespaceIdentifier(namespaze)
 {
-  return namespaze;
+  SetObjectId(self);
+  SetRawChildren(children);
+  SetExtraDataOffset(extraData);
 }
 
-std::string Extension::GetExtensionPointIdentifier() const
+QString Extension::GetExtensionPointIdentifier() const
 {
-  return extensionPoint;
+  return GetExtraData()[XPT_NAME];
 }
 
-std::string Extension::GetSimpleIdentifier() const
+QString Extension::GetSimpleIdentifier() const
 {
-  return id;
+  return simpleId;
 }
 
-std::string Extension::GetUniqueIdentifier() const
+QString Extension::GetUniqueIdentifier() const
 {
-  return id == "" ? "" : this->GetNamespace() + "." + id; //$NON-NLS-1$
+  return simpleId.isEmpty() ? QString() : this->GetNamespaceIdentifier() + '.' + simpleId;
 }
 
-const std::vector<IConfigurationElement::Pointer> Extension::GetConfigurationElements() const
+void Extension::SetExtensionPointIdentifier(const QString& value)
 {
-  return elements;
+  extraInformation[XPT_NAME] = value;
 }
 
-std::string Extension::GetLabel() const
+void Extension::SetSimpleIdentifier(const QString& value)
 {
-  return label;
+  simpleId = value;
 }
 
-void Extension::SetExtensionPointIdentifier(const std::string& value)
+QString Extension::GetLabel() const
 {
-  extensionPoint = value;
+  return GetExtraData()[LABEL];
 }
 
-void Extension::SetSimpleIdentifier(const std::string& value)
+void Extension::SetLabel(const QString& value)
 {
-  id = value;
+  extraInformation[LABEL] = value;
 }
 
-void Extension::SetSubElements(const std::vector<IConfigurationElement::Pointer>& value)
+QString Extension::GetContributorId() const
 {
-  elements = value;
+  return GetExtraData()[CONTRIBUTOR_ID];
 }
 
-void Extension::SetLabel(const std::string& l)
+void Extension::SetContributorId(const QString& value)
 {
-  label = l;
+  extraInformation[CONTRIBUTOR_ID] = value;
 }
 
-bool Extension::operator<(const IExtension* e2) const
+void Extension::SetNamespaceIdentifier(const QString& value)
 {
-  return this->GetNamespace() < e2->GetNamespace();
+  namespaceIdentifier = value;
+}
+
+QString Extension::GetLabelAsIs() const
+{
+  return GetExtraData()[LABEL];
+}
+
+QString Extension::GetLabel(const QLocale& locale) const
+{
+  registry->LogMultiLangError();
+  return GetLabel();
+}
+
+SmartPointer<IContributor> Extension::GetContributor() const
+{
+  return registry->GetObjectManager()->GetContributor(GetContributorId());
+}
+
+QString Extension::GetNamespaceIdentifier() const
+{
+  return namespaceIdentifier;
+}
+
+QString Extension::ToString() const
+{
+  return GetUniqueIdentifier() + " -> " + GetExtensionPointIdentifier();
 }
 
 } // namespace berry

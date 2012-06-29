@@ -51,6 +51,8 @@ struct BERRY_COMMANDS IExecutionListenerWithChecks : public IExecutionListener {
     bool HasListeners() const;
     bool IsEmpty() const;
 
+    private:
+
     typedef MessageDelegate2<IExecutionListenerWithChecks, const QString&, const NotDefinedException* > NotDefinedDelegate;
     typedef MessageDelegate2<IExecutionListenerWithChecks, const QString&, const NotEnabledException*> NotEnabledDelegate;
   };

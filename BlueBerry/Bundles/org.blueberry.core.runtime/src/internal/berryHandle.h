@@ -22,21 +22,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+struct IObjectManager;
+
 class RegistryObject;
-class RegistryObjectManager;
 
 /**
  * A handle is the super class to all registry objects that are now served to users.
  * The handles never hold on to any "real" content of the object being represented.
  * A handle can become stale if its referenced object has been removed from the registry.
  */
-class Handle : public Object
+class Handle : public virtual Object
 {
 public:
 
   berryObjectMacro(berry::Handle)
 
-  Handle(RegistryObjectManager* objectManager, int value);
+  Handle(const SmartPointer<const IObjectManager>& objectManager, int value);
 
   /**
    * Return the actual object corresponding to this handle.
@@ -52,7 +53,7 @@ public:
 
 protected:
 
-  RegistryObjectManager* const objectManager;
+  SmartPointer<const IObjectManager> objectManager;
 
 private:
 

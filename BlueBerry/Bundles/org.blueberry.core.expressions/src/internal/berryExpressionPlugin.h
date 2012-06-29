@@ -15,15 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef BERRYPLUGINACTIVATOR_H
-#define BERRYPLUGINACTIVATOR_H
+#ifndef BERRYEXPRESSIONPLUGIN_H
+#define BERRYEXPRESSIONPLUGIN_H
 
-#include <ctkPluginActivator.h>
+#include "berryPlugin.h"
 
 namespace berry {
 
-class org_blueberry_core_expressions_Activator :
-  public QObject, public ctkPluginActivator
+class ExpressionPlugin : public Plugin
 {
   Q_OBJECT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -32,14 +31,24 @@ class org_blueberry_core_expressions_Activator :
   Q_INTERFACES(ctkPluginActivator)
 
 public:
-  org_blueberry_core_expressions_Activator();
 
-  void start(ctkPluginContext* context);
+  static QObject* m_PluginListener;
+
+  ExpressionPlugin();
+
+  static ExpressionPlugin* GetDefault();
+
+  static QString GetPluginId();
+
   void stop(ctkPluginContext* context);
+  ctkPluginContext* GetPluginContext() const;
+
+private:
+
+  static ExpressionPlugin* m_Default;
 };
 
-typedef org_blueberry_core_expressions_Activator PluginActivator;
 
 }
 
-#endif // BERRYPLUGINACTIVATOR_H
+#endif // BERRYEXPRESSIONPLUGIN_H

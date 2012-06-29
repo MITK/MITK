@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYSOLSTICEEXCEPTIONS_H_
 
 #include <org_blueberry_core_runtime_Export.h>
-#include <Poco/Exception.h>
+#include <ctkException.h>
 
 namespace berry {
 
@@ -31,7 +31,7 @@ namespace berry {
  * may be instantiated.
  * </p>
  */
-POCO_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, OperationCanceledException, Poco::RuntimeException)
+CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, OperationCanceledException, ctkRuntimeException)
 
 }
 

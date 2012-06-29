@@ -44,9 +44,11 @@ struct IBundle;
 struct IExtensionPointService;
 struct IExtensionRegistry;
 struct IPreferencesService;
+struct ILog;
 
 class CodeCache;
 class BundleLoader;
+class LogImpl;
 class PlatformLogChannel;
 class SystemBundle;
 
@@ -80,6 +82,8 @@ private:
 
   Poco::AutoPtr<Poco::SimpleFileChannel> m_PlatformLogChannel;
   Poco::Logger* m_PlatformLogger;
+
+  mutable QHash<int, LogImpl*> m_Logs;
 
   ctkPluginFrameworkFactory* m_ctkPluginFrameworkFactory;
   QList<long> m_CTKPluginsToStart;
@@ -145,6 +149,15 @@ public:
   bool GetStatePath(QDir& statePath, const SmartPointer<IBundle>& bundle, bool create = true);
 
   QDir GetUserPath();
+
+  /**
+   * Returns a log for the given plugin. Creates a new one if needed.
+   * XXX change this into a LogMgr service that would keep track of the map. See if it can be a service factory.
+   * It would contain all the logging methods that are here.
+   * Relate to RuntimeLog if appropriate.
+   * The system log listener needs to be optional: turned on or off. What about a system property? :-)
+   */
+  ILog* GetLog(const QSharedPointer<ctkPlugin>& plugin) const;
 
   //PlatformEvents& GetEvents();
 

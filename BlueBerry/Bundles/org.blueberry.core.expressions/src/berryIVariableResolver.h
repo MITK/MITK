@@ -29,13 +29,11 @@ namespace berry {
  * A variable resolver can be used to add additional variable resolving
  * strategies to an {@link EvaluationContext}.
  *
- * @see org.blueberry.core.expressions.EvaluationContext#resolveVariable(String, Object[])
- *
- * @since 3.0
+ * @see EvaluationContext#ResolveVariable(String, Object[])
  */
 struct BERRY_EXPRESSIONS IVariableResolver {
 
-  virtual ~IVariableResolver() {};
+  virtual ~IVariableResolver();
 
   /**
    * Resolves a variable for the given name and arguments. The

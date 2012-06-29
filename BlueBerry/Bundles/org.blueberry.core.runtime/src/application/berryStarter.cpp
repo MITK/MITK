@@ -24,7 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIExtensionPointService.h>
 #include <berryIConfigurationElement.h>
-#include <berryIConfigurationElementLegacy.h>
+//#include <berryIConfigurationElementLegacy.h>
+#include <berryIContributor.h>
 #include <berryIApplication.h>
 
 #include <vector>
@@ -146,12 +147,12 @@ int Starter::Run(int& argc, char** argv,
       app = runs.front()->CreateExecutableExtension<IApplication>("class");
       if (app == 0)
       {
-        // support legacy BlueBerry extensions
-        if (IConfigurationElementLegacy* legacyConfigElement =
-            dynamic_cast<IConfigurationElementLegacy*>(runs.front().GetPointer()))
-        {
-          app = legacyConfigElement->CreateExecutableExtension<IApplication> ("class", IApplication::GetManifestName());
-        }
+//        // support legacy BlueBerry extensions
+//        if (IConfigurationElementLegacy* legacyConfigElement =
+//            dynamic_cast<IConfigurationElementLegacy*>(runs.front().GetPointer()))
+//        {
+//          app = legacyConfigElement->CreateExecutableExtension<IApplication> ("class", IApplication::GetManifestName());
+//        }
       }
     }
     else
@@ -176,7 +177,7 @@ int Starter::Run(int& argc, char** argv,
         for (iter = extensions.begin(); iter != extensions.end(); ++iter)
         {
           BERRY_INFO(consoleLog) << "Checking applications extension from: "
-                                 << (*iter)->GetContributor().toStdString() << std::endl;
+                                 << (*iter)->GetContributor()->GetName().toStdString() << std::endl;
 
           QString appid = (*iter)->GetAttribute("id");
           if (!appid.isNull())
@@ -186,20 +187,22 @@ int Starter::Run(int& argc, char** argv,
             {
               QList<IConfigurationElement::Pointer> runs((*iter)->GetChildren("run"));
               app = runs.front()->CreateExecutableExtension<IApplication>("class");
-              if (app == 0)
-              {
-                // try legacy BlueBerry extensions
-                if (IConfigurationElementLegacy* legacyConfigElement =
-                    dynamic_cast<IConfigurationElementLegacy*>(runs.front().GetPointer()))
-                {
-                  app = legacyConfigElement->CreateExecutableExtension<IApplication> ("class", IApplication::GetManifestName());
-                }
-              }
+//              if (app == 0)
+//              {
+//                // try legacy BlueBerry extensions
+//                if (IConfigurationElementLegacy* legacyConfigElement =
+//                    dynamic_cast<IConfigurationElementLegacy*>(runs.front().GetPointer()))
+//                {
+//                  app = legacyConfigElement->CreateExecutableExtension<IApplication> ("class", IApplication::GetManifestName());
+//                }
+//              }
               break;
             }
           }
           else
-            throw CoreException("missing attribute: id");
+          {
+            BERRY_ERROR << "missing attribute: id";
+          }
         }
       }
     }

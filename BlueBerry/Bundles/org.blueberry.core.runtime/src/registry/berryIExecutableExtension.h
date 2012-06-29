@@ -45,6 +45,7 @@ struct IConfigurationElement;
  */
 struct IExecutableExtension
 {
+  virtual ~IExecutableExtension();
 
   /**
    * This method is called by the implementation of the method
@@ -134,7 +135,6 @@ struct IExecutableExtension
   virtual void SetInitializationData(const SmartPointer<IConfigurationElement>& config,
                                      const QString& propertyName, const Object::Pointer& data) = 0;
 
-  virtual ~IExecutableExtension() {}
 };
 
 }

@@ -18,9 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressions.h"
 #include "berryEvaluationContext.h"
+#include "berryExpressionStatus.h"
 
 #include <berryIConfigurationElement.h>
-#include <berryPlatformException.h>
+#include <berryCoreException.h>
 
 namespace berry {
 
@@ -54,7 +55,10 @@ ResolveExpression::Evaluate(IEvaluationContext* context) const
   Object::Pointer variable= context->ResolveVariable(fVariable, fArgs);
   if (variable.IsNull())
   {
-    throw CoreException(QString("Variable not defined: ") + fVariable);
+    IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_NOT_DEFINED,
+                                                 QString("The variable %1 is not defined.").arg(fVariable),
+                                                 BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
   EvaluationContext evalContext(context, variable);
   return this->EvaluateAnd(&evalContext);

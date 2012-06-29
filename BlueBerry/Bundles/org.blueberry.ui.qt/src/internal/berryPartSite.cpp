@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchPage.h"
 #include "berryIWorkbenchWindow.h"
 #include "berryPartPane.h"
+#include "berryIContributor.h"
 
 #include "services/berryIServiceFactory.h"
 
@@ -219,7 +220,7 @@ void PartSite::SetConfigurationElement(
   extensionID = configElement->GetAttribute("id");
 
   // Get plugin ID.
-  pluginID = configElement->GetContributor();
+  pluginID = configElement->GetContributor()->GetName();
 
   // Get extension name.
   QString name = configElement->GetAttribute("name");

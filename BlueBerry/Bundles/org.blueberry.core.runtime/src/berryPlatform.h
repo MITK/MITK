@@ -243,6 +243,10 @@ public:
   static QString ARG_TESTPLUGIN;
   static QString ARG_TESTAPPLICATION;
 
+  static QString ARG_NO_REGISTRY_CACHE;
+  static QString ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
+  static QString ARG_REGISTRY_MULTI_LANGUAGE;
+
   static QString ARG_XARGS;
 
   /**

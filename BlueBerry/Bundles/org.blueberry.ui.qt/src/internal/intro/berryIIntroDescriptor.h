@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "intro/berryIIntroPart.h"
 
-#include <berryPlatformException.h>
 #include <berryImageDescriptor.h>
 
 namespace berry {
@@ -42,7 +41,7 @@ struct BERRY_UI_QT IIntroDescriptor : public Object {
   /**
    * Creates an instance of the intro part defined in the descriptor.
    */
-  virtual IIntroPart::Pointer CreateIntro() throw(CoreException) = 0;
+  virtual IIntroPart::Pointer CreateIntro() = 0;
 
   /**
    * Returns the role of the intro part (view or editor)

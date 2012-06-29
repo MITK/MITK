@@ -30,16 +30,15 @@ namespace berry {
  *
  * @see IAdaptable
  * @see IAdapterManager
- *
- * @since 3.3
  */
-struct BERRY_EXPRESSIONS IIterable : public Object {
+struct BERRY_EXPRESSIONS IIterable : public Object
+{
 
-  berryObjectMacro(IIterable);
+  berryInterfaceMacro(IIterable, berry)
 
   typedef QList<Object::Pointer>::iterator iterator;
 
-  virtual ~IIterable() {}
+  virtual ~IIterable();
 
   /**
    * Returns an iterator to iterate over the elements.

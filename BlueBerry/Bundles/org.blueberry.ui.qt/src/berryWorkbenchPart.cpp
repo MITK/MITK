@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIWorkbenchPartConstants.h"
 #include "berryImageDescriptor.h"
+#include <berryIContributor.h>
 #include <berrySafeRunner.h>
 #include <util/berrySafeRunnable.h>
 
@@ -298,7 +299,7 @@ void WorkbenchPart::SetInitializationData(const IConfigurationElement::Pointer& 
   }
 
   m_ImageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
-        m_ConfigElement->GetContributor(), strIcon);
+        m_ConfigElement->GetContributor()->GetName(), strIcon);
 
   if (!m_ImageDescriptor)
   {

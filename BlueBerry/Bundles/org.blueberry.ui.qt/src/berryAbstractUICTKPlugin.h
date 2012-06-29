@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_ui_qt_Export.h>
 
-#include <berrySmartPointer.h>
-
-#include <ctkPluginActivator.h>
+#include <berryPlugin.h>
 
 namespace berry {
+
+template<class T> class SmartPointer;
 
 struct IPreferencesService;
 struct IWorkbench;
@@ -103,8 +103,8 @@ class ImageDescriptor;
  * See the description on {@link Plugin}.
  * </p>
  */
-class BERRY_UI_QT AbstractUICTKPlugin : public ctkPluginActivator {
-
+class BERRY_UI_QT AbstractUICTKPlugin : public Plugin
+{
 
 private:
 

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryCTKPluginActivator.h"
 
+#include "berryPlatform.h"
 #include "berrySystemBundle.h"
 #include "berryInternalPlatform.h"
 #include "berryCTKPluginListener_p.h"
@@ -82,6 +83,55 @@ ctkPluginContext* org_blueberry_core_runtime_Activator::getPluginContext()
 {
   return context;
 }
+
+#if defined(Q_OS_LINUX) || defined(Q_OS_DARWIN) || defined(Q_CC_MINGW)
+
+#include <dlfcn.h>
+QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
+{
+  if (symbol == NULL) return QString();
+
+  Dl_info info = {0,0,0,0};
+  if(dladdr(symbol, &info) == 0)
+  {
+    return QString();
+  }
+  else if(info.dli_fname)
+  {
+    QFile soPath(info.dli_fname);
+    int index = soPath.fileName().lastIndexOf('.');
+    QString pluginId = soPath.fileName().left(index);
+    if (pluginId.startsWith("lib"))
+      pluginId = pluginId.mid(3);
+    return pluginId.replace('_', '.');
+  }
+  return QString();
+}
+
+#elif defined(Q_CC_MSVC)
+
+#include <ctkBackTrace.h>
+#include <windows.h>
+#include <dbghelp.h>
+QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
+{
+  if (symbol == NULL) return QString();
+
+  if (ctk::DebugSymInitialize())
+  {
+    std::vector<char> moduleBuffer(sizeof(IMAGEHLP_MODULE64));
+    PIMAGEHLP_MODULE64 pModuleInfo = (PIMAGEHLP_MODULE64)&moduleBuffer.front();
+    pModuleInfo->SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
+    if (SymGetModuleInfo64(GetCurrentProcess(), (DWORD64)symbol, pModuleInfo))
+    {
+      QString pluginId = pModuleInfo->ModuleName;
+      return pluginId.replace('_', '.');
+    }
+  }
+  return QString();
+}
+
+#endif
 
 org_blueberry_core_runtime_Activator::~org_blueberry_core_runtime_Activator()
 {

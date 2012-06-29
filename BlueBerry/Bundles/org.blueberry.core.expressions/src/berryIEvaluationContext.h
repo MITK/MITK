@@ -37,11 +37,19 @@ namespace berry {
  *
  * @since 3.0
  */
-struct BERRY_EXPRESSIONS IEvaluationContext : public Object {
+struct BERRY_EXPRESSIONS IEvaluationContext : public Object
+{
 
-  berryInterfaceMacro(IEvaluationContext, berry);
+  berryInterfaceMacro(IEvaluationContext, berry)
 
-  virtual ~IEvaluationContext() {}
+  /**
+   * Represents the value used by variables that exist but are not defined
+   * in a evaluation context. When tested by the 'with' expression, <code>false</code>
+   * will be returned.
+   */
+  static Object::Pointer UNDEFINED_VARIABLE;
+
+  virtual ~IEvaluationContext();
 
   /**
    * Returns the parent context or <code>null</code> if

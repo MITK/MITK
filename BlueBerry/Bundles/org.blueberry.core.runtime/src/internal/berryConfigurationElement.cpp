@@ -15,187 +15,299 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "berryConfigurationElement.h"
-#include "berryExtension.h"
-#include "berryBundleLoader.h"
 
-#include <Poco/DOM/NamedNodeMap.h>
-#include <Poco/DOM/NodeList.h>
-#include <Poco/String.h>
+#include "berryIExecutableExtension.h"
+#include "berryIExecutableExtensionFactory.h"
+#include "berryConfigurationElementHandle.h"
+#include "berryStatus.h"
+#include "berryRegistryMessages.h"
+#include "berryRegistryConstants.h"
+#include "berryCoreException.h"
+#include "berryExtensionRegistry.h"
+#include "berryRegistryObjectManager.h"
+#include "berryRegistryContributor.h"
+#include "berryObjectString.h"
+#include "berryObjectStringMap.h"
 
 namespace berry {
 
-ConfigurationElement::ConfigurationElement(BundleLoader* loader, Poco::XML::Node* config,
-                                        std::string contributor, Extension::Pointer extension,
-                                        const ConfigurationElement* parent)
-  : m_ConfigurationNode(config), m_Parent(parent), m_Extension(extension)
+ConfigurationElement::ConfigurationElement(ExtensionRegistry* registry, bool persist)
+  : RegistryObject(registry, persist)
 {
-  IConfigurationElement::m_ClassLoader = loader;
-  IConfigurationElement::m_Contributor = contributor;
 }
 
-QObject* ConfigurationElement::CreateExecutableExtension(const QString& propertyName) const
+ConfigurationElement::ConfigurationElement(int self, const QString& contributorId,
+                                           const QString& name, const QList<QString>& propertiesAndValue,
+                                           const QList<int>& children, int extraDataOffset, int parent,
+                                           short parentType, ExtensionRegistry* registry, bool persist)
+  : RegistryObject(registry, persist), parentId(parent), parentType(parentType),
+    propertiesAndValue(propertiesAndValue), name(name), contributorId(contributorId)
 {
-  std::string className;
-  if (this->GetAttribute(propertyName, className))
-  {
-    std::string contributor = this->GetContributor();
-    QSharedPointer<ctkPlugin> plugin = Platform::GetCTKPlugin(QString::fromStdString(contributor));
-    if (!plugin.isNull())
-    {
-      // immediately start the plugin but do not change the plugins autostart setting
-      plugin->start(ctkPlugin::START_TRANSIENT);
+  SetObjectId(self);
+  SetRawChildren(children);
+  SetExtraDataOffset(extraDataOffset);
+}
 
-      QString typeName = plugin->getSymbolicName() + "_" + QString::fromStdString(className);
-      int extensionTypeId = ExtensionType::type(typeName.toLatin1().data());
-      if (extensionTypeId == 0)
+void ConfigurationElement::ThrowException(const QString& message, const ctkException& exc)
+{
+  IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, RegistryMessages::OWNER_NAME,
+                                     RegistryConstants::PLUGIN_ERROR, message, exc,
+                                     BERRY_STATUS_LOC));
+  throw CoreException(status);
+}
+
+void ConfigurationElement::ThrowException(const QString &message)
+{
+  IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, RegistryMessages::OWNER_NAME,
+                                     RegistryConstants::PLUGIN_ERROR, message,
+                                     BERRY_STATUS_LOC));
+  throw CoreException(status);
+}
+
+QString ConfigurationElement::GetValue() const
+{
+  return GetValueAsIs();
+}
+
+QString ConfigurationElement::GetValueAsIs() const
+{
+  if (!propertiesAndValue.empty() && propertiesAndValue.size() % 2 == 1)
+    return propertiesAndValue.back();
+  return QString();
+}
+
+QString ConfigurationElement::GetAttributeAsIs(const QString& attrName) const
+{
+  if (propertiesAndValue.size() <= 1)
+    return QString();
+  int size = propertiesAndValue.size() - (propertiesAndValue.size() % 2);
+  for (int i = 0; i < size; i += 2)
+  {
+    if (propertiesAndValue[i] == attrName)
+      return propertiesAndValue[i + 1];
+  }
+  return QString();
+}
+
+QList<QString> ConfigurationElement::GetAttributeNames() const
+{
+  if (propertiesAndValue.size() <= 1)
+    return QList<QString>();
+
+  QList<QString> result;
+  int size = propertiesAndValue.size() / 2;
+  for (int i = 0; i < size; i++)
+  {
+    result.push_back(propertiesAndValue[i * 2]);
+  }
+  return result;
+}
+
+void ConfigurationElement::SetProperties(const QList<QString>& value)
+{
+  propertiesAndValue = value;
+}
+
+QList<QString> ConfigurationElement::GetPropertiesAndValue() const
+{
+  return propertiesAndValue;
+}
+
+void ConfigurationElement::SetValue(const QString& value)
+{
+  if (propertiesAndValue.empty())
+  {
+    propertiesAndValue.push_back(value);
+    return;
+  }
+  if (propertiesAndValue.size() % 2 == 1)
+  {
+    propertiesAndValue[propertiesAndValue.size() - 1] = value;
+    return;
+  }
+  propertiesAndValue.push_back(value);
+}
+
+void ConfigurationElement::SetContributorId(const QString& id)
+{
+  contributorId = id;
+}
+
+QString ConfigurationElement::GetContributorId() const
+{
+  return contributorId;
+}
+
+void ConfigurationElement::SetParentId(int objectId)
+{
+  parentId = objectId;
+}
+
+QString ConfigurationElement::GetName() const
+{
+  return name;
+}
+
+void ConfigurationElement::SetName(const QString& name)
+{
+  this->name = name;
+}
+
+void ConfigurationElement::SetParentType(short type)
+{
+  parentType = type;
+}
+
+QObject* ConfigurationElement::CreateExecutableExtension(const QString& attributeName)
+{
+  QString prop;
+  QString executable;
+  QString contributorName;
+  QString className;
+  Object::Pointer initData;
+  int i = 0;
+
+  if (!attributeName.isEmpty())
+  {
+    prop = GetAttribute(attributeName);
+  }
+  else
+  {
+    // property not specified, try as element value
+    prop = GetValue().trimmed();
+  }
+
+  if (prop.isEmpty())
+  {
+    // property not defined, try as a child element
+    QList<ConfigurationElement::Pointer> exec = GetChildren(attributeName);
+    if (!exec.empty())
+    {
+      ConfigurationElement::Pointer element = exec[0]; // assumes single definition
+      contributorName = element->GetAttribute("plugin");
+      className = element->GetAttribute("class");
+      QList<ConfigurationElement::Pointer> parms = element->GetChildren("parameter");
+      if (!parms.empty())
       {
-        BERRY_WARN << "The class " << className << " was not registered as an Extension Type using BERRY_REGISTER_EXTENSION_CLASS(type, pluginContext) or you forgot to run Qt's moc on the header file. "
-                      "Legacy BlueBerry bundles should use CreateExecutableExtension<C>(propertyName, C::GetManifestName()) instead.";
-      }
-      else
-      {
-        QObject* obj = ExtensionType::construct(extensionTypeId);
-        // check if we have extension adapter and initialize
-        if (IExecutableExtension* execExt = qobject_cast<IExecutableExtension*>(obj))
+        QHash<QString,QString> initParms;
+        for (i = 0; i < parms.size(); i++)
         {
-          // make the call even if the initialization string is null
-          execExt->SetInitializationData(Pointer(this), propertyName, Object::Pointer(0));
+          QString pname = parms[i]->GetAttribute("name");
+          if (!pname.isEmpty())
+            initParms.insert(pname, parms[i]->GetAttribute("value"));
         }
-
-        return obj;
+        if (!initParms.isEmpty())
+          initData = new ObjectStringMap(initParms);
       }
     }
     else
     {
-      BERRY_WARN << "Trying to create an executable extension (from "
-                 << this->GetDeclaringExtension()->GetExtensionPointIdentifier()
-                 << " in " << contributor << ") from a non-CTK plug-in. "
-                    "Use the CreateExecutableExtension<C>(propertyName, manifestName) method instead.";
+      // specified name is not a simple attribute nor child element
+      ThrowException(QString("Executable extension definition for \"%1\" not found.").arg(attributeName));
     }
   }
-  return 0;
-}
-
-QString ConfigurationElement::GetAttribute(const QString &name) const
-{
-  if (m_ConfigurationNode->hasAttributes())
+  else
   {
-    Poco::XML::NamedNodeMap* attributes = m_ConfigurationNode->attributes();
-    Poco::XML::Node* attr = attributes->getNamedItem(name);
-    if (attr == 0) return false;
-    value = attr->nodeValue();
-    attributes->release();
-    return true;
-  }
-
-  return false;
-}
-
-bool
-ConfigurationElement::GetBoolAttribute(const std::string& name, bool& value) const
-{
-  std::string val;
-  if (this->GetAttribute(name, val))
-  {
-    Poco::toUpperInPlace(val);
-    if (val == "1" || val == "TRUE")
-      value = true;
+    // simple property or element value, parse it into its components
+    i = prop.indexOf(':');
+    if (i != -1)
+    {
+      executable = prop.left(i).trimmed();
+      initData = new ObjectString(prop.mid(i + 1).trimmed());
+    }
     else
-      value = false;
-    return true;
-  }
-
-  return false;
-}
-
-const std::vector<IConfigurationElement::Pointer>
-ConfigurationElement
-::GetChildren() const
-{
-  std::vector<IConfigurationElement::Pointer> children;
-
-  if (m_ConfigurationNode->hasChildNodes())
-  {
-    Poco::XML::NodeList* ch = m_ConfigurationNode->childNodes();
-    for (unsigned long i = 0; i < ch->length(); ++i)
     {
-      if (ch->item(i)->nodeType() != Poco::XML::Node::ELEMENT_NODE) continue;
-      IConfigurationElement::Pointer xelem(new ConfigurationElement(IConfigurationElement::m_ClassLoader, ch->item(i), m_Contributor, m_Extension, this));
-      children.push_back(xelem);
+      executable = prop;
     }
-    ch->release();
-  }
 
-  return children;
-}
-
-QList<IConfigurationElement::Pointer> ConfigurationElement::GetChildren(const QString &name) const
-{
-  std::vector<IConfigurationElement::Pointer> children;
-
-  if (m_ConfigurationNode->hasChildNodes())
-  {
-    Poco::XML::NodeList* ch = m_ConfigurationNode->childNodes();
-    for (unsigned long i = 0; i < ch->length(); ++i)
+    i = executable.indexOf('/');
+    if (i != -1)
     {
-      if (ch->item(i)->nodeName() == name)
-      {
-        IConfigurationElement::Pointer xelem(new ConfigurationElement(IConfigurationElement::m_ClassLoader, ch->item(i), m_Contributor, m_Extension, this));
-        children.push_back(xelem);
-      }
+      contributorName = executable.left(i).trimmed();
+      className = executable.mid(i + 1).trimmed();
     }
-    ch->release();
-  }
-
-  return children;
-}
-
-std::string
-ConfigurationElement::GetValue() const
-{
-  std::string value;
-  if (m_ConfigurationNode->hasChildNodes())
-  {
-    Poco::XML::NodeList* ch = m_ConfigurationNode->childNodes();
-    for (unsigned long i = 0; i < ch->length(); ++i)
+    else
     {
-      if (ch->item(i)->nodeType() == Poco::XML::Node::TEXT_NODE)
-      {
-        value = ch->item(i)->nodeValue();
-        break;
-      }
+      className = executable;
     }
-    ch->release();
   }
-  return value;
+
+  // create a new instance
+  RegistryContributor::Pointer defaultContributor = registry->GetObjectManager()->GetContributor(contributorId);
+  QObject* result = registry->CreateExecutableExtension(defaultContributor, className, contributorName);
+
+  // Check if we have extension adapter and initialize;
+  // Make the call even if the initialization string is null
+  try
+  {
+    // We need to take into account both "old" and "new" style executable extensions
+    if (IExecutableExtension* execExt = qobject_cast<IExecutableExtension*>(result))
+    {
+      ConfigurationElementHandle::Pointer confElementHandle(new ConfigurationElementHandle(
+                                                              registry->GetObjectManager(), GetObjectId()));
+      execExt->SetInitializationData(confElementHandle, attributeName, initData);
+    }
+  }
+  catch (const CoreException& ce)
+  {
+    // user code threw exception
+    throw ce;
+  }
+  catch (const ctkException& te)
+  {
+    // user code caused exception
+    ThrowException(QString("Plug-in \"%1\" was unable to execute setInitializationData on an instance of \"%2\".")
+                   .arg(GetContributor()->GetName()).arg(className), te);
+  }
+
+  // Deal with executable extension factories.
+  if (IExecutableExtensionFactory* execExtFactory = qobject_cast<IExecutableExtensionFactory*>(result))
+  {
+    result = execExtFactory->Create();
+  }
+
+  return result;
 }
 
-std::string
-ConfigurationElement::GetName() const
+QString ConfigurationElement::GetAttribute(const QString& attrName, const QLocale& locale) const
 {
-  return m_ConfigurationNode->nodeName();
+  registry->LogMultiLangError();
+  return GetAttribute(attrName);
 }
 
-const IConfigurationElement*
-ConfigurationElement::GetParent() const
+QString ConfigurationElement::GetValue(const QLocale& locale) const
 {
-  return m_Parent;
+  registry->LogMultiLangError();
+  return GetValue();
 }
 
-QString ConfigurationElement::GetContributor() const
+QString ConfigurationElement::GetAttribute(const QString& attrName) const
 {
-  return m_Contributor;
+  return GetAttributeAsIs(attrName);
 }
 
-const IExtension*
-ConfigurationElement::GetDeclaringExtension() const
+QList<ConfigurationElement::Pointer> ConfigurationElement::GetChildren(const QString& childrenName) const
 {
-  return m_Extension.GetPointer();
+  QList<ConfigurationElement::Pointer> result;
+  if (GetRawChildren().empty())
+    return result;
+
+  RegistryObjectManager::Pointer objectManager = registry->GetObjectManager();
+  for (int i = 0; i < children.size(); i++)
+  {
+    ConfigurationElement::Pointer toTest = objectManager->GetObject(
+          children[i], NoExtraData() ? RegistryObjectManager::CONFIGURATION_ELEMENT : RegistryObjectManager::THIRDLEVEL_CONFIGURATION_ELEMENT).Cast<ConfigurationElement>();
+    if (toTest->name == childrenName)
+    {
+      result.push_back(toTest);
+    }
+  }
+  return result;
 }
 
-ConfigurationElement::~ConfigurationElement()
+SmartPointer<IContributor> ConfigurationElement::GetContributor() const
 {
-
+  return registry->GetObjectManager()->GetContributor(contributorId);
 }
 
 }

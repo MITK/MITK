@@ -36,28 +36,31 @@ IStatus::Severity MultiStatus::GetMaxSeverity(const QList<IStatus::Pointer>& chi
 
 MultiStatus::MultiStatus(const QString& pluginId, int code,
                          const QList<IStatus::Pointer>& newChildren,
-                         const QString& message)
-  : Status(OK_TYPE, pluginId, code, message), children(newChildren)
+                         const QString& message, const SourceLocation& sl)
+  : Status(OK_TYPE, pluginId, code, message, sl), children(newChildren)
 {
   this->SetSeverity(GetMaxSeverity(children));
 }
 
 MultiStatus::MultiStatus(const QString& pluginId, int code,
                          const QList<IStatus::Pointer>& newChildren,
-                         const QString& message, const ctkException& exception)
-  : Status(OK_TYPE, pluginId, code, message, exception), children(newChildren)
+                         const QString& message, const ctkException& exception,
+                         const SourceLocation& sl)
+  : Status(OK_TYPE, pluginId, code, message, exception, sl), children(newChildren)
 {
   this->SetSeverity(GetMaxSeverity(children));
 }
 
-MultiStatus::MultiStatus(const QString& pluginId, int code, const QString& message)
-: Status(OK_TYPE, pluginId, code, message)
+MultiStatus::MultiStatus(const QString& pluginId, int code, const QString& message,
+                         const SourceLocation& sl)
+: Status(OK_TYPE, pluginId, code, message, sl)
 {
 }
 
 MultiStatus::MultiStatus(const QString& pluginId, int code,
-                         const QString& message, const ctkException& exception)
-: Status(OK_TYPE, pluginId, code, message, exception)
+                         const QString& message, const ctkException& exception,
+                         const SourceLocation& sl)
+: Status(OK_TYPE, pluginId, code, message, exception, sl)
 {
 }
 
@@ -92,7 +95,7 @@ bool MultiStatus::IsMultiStatus() const
   return true;
 }
 
-void MultiStatus::Merge(IStatus::Pointer status)
+void MultiStatus::Merge(const IStatus::Pointer& status)
 {
   poco_assert(status);
   if (!status->IsMultiStatus())

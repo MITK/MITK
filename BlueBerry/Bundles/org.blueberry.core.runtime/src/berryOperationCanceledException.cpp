@@ -16,10 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryOperationCanceledException.h"
 
-#include <typeinfo>
-
 namespace berry {
 
-POCO_IMPLEMENT_EXCEPTION(OperationCanceledException, Poco::RuntimeException, "Operation canceled exception")
+CTK_IMPLEMENT_EXCEPTION(OperationCanceledException, ctkRuntimeException, "Operation canceled exception")
 
 }

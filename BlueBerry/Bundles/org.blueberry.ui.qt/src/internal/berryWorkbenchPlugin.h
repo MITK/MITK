@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIExtensionPoint.h>
 #include <berryIExtensionRegistry.h>
 #include <berryPlatform.h>
+#include <berryCoreException.h>
 
 #include "berryAbstractUICTKPlugin.h"
 #include "berryPlatformUI.h"
@@ -58,7 +59,8 @@ struct IQtStyleManager;
  *      calls createExecutableExtension to create an executable
  *      instance of our workbench class.
  */
-class WorkbenchPlugin : public QObject, public AbstractUICTKPlugin {
+class WorkbenchPlugin : public AbstractUICTKPlugin
+{
 
   Q_OBJECT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -70,66 +72,66 @@ private:
 
   //static const QString UI_BUNDLE_ACTIVATOR = "org.blueberry.ui.internal.UIPlugin"; //$NON-NLS-1$
 
-    // Default instance of the receiver
-    static WorkbenchPlugin* inst;
+  // Default instance of the receiver
+  static WorkbenchPlugin* inst;
 
-    // The presentation factory
-    IPresentationFactory* presentationFactory;
+  // The presentation factory
+  IPresentationFactory* presentationFactory;
 
-    // Manager that maps resources to descriptors of editors to use
-    EditorRegistry* editorRegistry;
+  // Manager that maps resources to descriptors of editors to use
+  EditorRegistry* editorRegistry;
 
-    // The context within which this plugin was started.
-    ctkPluginContext* bundleContext;
+  // The context within which this plugin was started.
+  ctkPluginContext* bundleContext;
 
-    // Other data.
-    //WorkbenchPreferenceManager preferenceManager;
+  // Other data.
+  //WorkbenchPreferenceManager preferenceManager;
 
-    ViewRegistry* viewRegistry;
+  ViewRegistry* viewRegistry;
 
-    PerspectiveRegistry* perspRegistry;
+  PerspectiveRegistry* perspRegistry;
 
-    IntroRegistry* introRegistry;
+  IntroRegistry* introRegistry;
 
-    //SharedImages sharedImages;
+  //SharedImages sharedImages;
 
-    SmartPointer<IQtStyleManager> styleManager;
+  SmartPointer<IQtStyleManager> styleManager;
 
 
 public:
 
-    /**
-     * Global workbench ui plugin flag. Only workbench implementation is allowed to use this flag
-     * All other plugins, examples, or test cases must *not* use this flag.
-     */
-    static bool DEBUG;
+  /**
+   * Global workbench ui plugin flag. Only workbench implementation is allowed to use this flag
+   * All other plugins, examples, or test cases must *not* use this flag.
+   */
+  static bool DEBUG;
 
-    /**
-     * The character used to separate preference page category ids
-     */
-    static char PREFERENCE_PAGE_CATEGORY_SEPARATOR;
-
-
-    /**
-     * Create an instance of the WorkbenchPlugin. The workbench plugin is
-     * effectively the "application" for the workbench UI. The entire UI
-     * operates as a good plugin citizen.
-     */
-    WorkbenchPlugin();
-
-    ~WorkbenchPlugin();
+  /**
+   * The character used to separate preference page category ids
+   */
+  static char PREFERENCE_PAGE_CATEGORY_SEPARATOR;
 
 
-    /**
-     * Creates an extension.  If the extension plugin has not
-     * been loaded a busy cursor will be activated during the duration of
-     * the load.
-     *
-     * @param element the config element defining the extension
-     * @param classAttribute the name of the attribute carrying the class
-     * @return the extension object
-     * @throws CoreException if the extension cannot be created
-     */
+  /**
+   * Create an instance of the WorkbenchPlugin. The workbench plugin is
+   * effectively the "application" for the workbench UI. The entire UI
+   * operates as a good plugin citizen.
+   */
+  WorkbenchPlugin();
+
+  ~WorkbenchPlugin();
+
+
+  /**
+   * Creates an extension.  If the extension plugin has not
+   * been loaded a busy cursor will be activated during the duration of
+   * the load.
+   *
+   * @param element the config element defining the extension
+   * @param classAttribute the name of the attribute carrying the class
+   * @return the extension object
+   * @throws CoreException if the extension cannot be created
+   */
 
 //    template<class E>
 //    static E* CreateExtension(IConfigurationElement::ConstPointer element,
@@ -166,7 +168,7 @@ public:
 //        }
 //    }
 
-    /**
+  /**
    * Answers whether the provided element either has an attribute with the
    * given name or a child element with the given name with an attribute
    * called class.
@@ -176,7 +178,6 @@ public:
    * @param extensionName
    *            the name of the extension to test for
    * @return whether or not the extension is declared
-   * @since 3.3
    */
   static bool HasExecutableExtension(const IConfigurationElement::Pointer& element,
                                      const QString& extensionName);
@@ -226,34 +227,34 @@ public:
 
 
   /**
-     * Return the default instance of the receiver. This represents the runtime plugin.
-     * @return WorkbenchPlugin
-     * @see AbstractUICTKPlugin for the typical implementation pattern for plugin classes.
-     */
-    static WorkbenchPlugin* GetDefault();
+   * Return the default instance of the receiver. This represents the runtime plugin.
+   * @return WorkbenchPlugin
+   * @see AbstractUICTKPlugin for the typical implementation pattern for plugin classes.
+   */
+  static WorkbenchPlugin* GetDefault();
 
-    std::size_t GetBundleCount();
+  std::size_t GetBundleCount();
 
-    /**
-     * Answer the manager that maps resource types to a the
-     * description of the editor to use
-     * @return IEditorRegistry the editor registry used
-     * by this plug-in.
-     */
-    IEditorRegistry* GetEditorRegistry();
+  /**
+   * Answer the manager that maps resource types to a the
+   * description of the editor to use
+   * @return IEditorRegistry the editor registry used
+   * by this plug-in.
+   */
+  IEditorRegistry* GetEditorRegistry();
 
-    /**
-     * Returns the presentation factory with the given id, or <code>null</code> if not found.
-     * @param targetID The id of the presentation factory to use.
-     * @return IPresentationFactory or <code>null</code>
-     * if not factory matches that id.
-     */
-    IPresentationFactory* GetPresentationFactory();
+  /**
+   * Returns the presentation factory with the given id, or <code>null</code> if not found.
+   * @param targetID The id of the presentation factory to use.
+   * @return IPresentationFactory or <code>null</code>
+   * if not factory matches that id.
+   */
+  IPresentationFactory* GetPresentationFactory();
 
 
 protected:
 
-    /**
+  /*
    * Returns the image registry for this plugin.
    *
    * Where are the images? The images (typically gifs) are found in the same
@@ -266,138 +267,137 @@ protected:
    * convenience access to the graphics resources and fast field access for
    * some of the commonly used graphical images.
    */
-//    ImageRegistry createImageRegistry();
+  //ImageRegistry createImageRegistry();
 
 
 
 private:
 
-    /**
-     * Looks up the configuration element with the given id on the given extension point
-     * and instantiates the class specified by the class attributes.
-     *
-     * @param extensionPointId the extension point id (simple id)
-     * @param elementName the name of the configuration element, or <code>null</code>
-     *   to match any element
-     * @param targetID the target id
-     * @return the instantiated extension object, or <code>null</code> if not found
-     */
-    template<class C>
-    C* CreateExtension(const QString& extensionPointId, const QString& elementName,
-                       const QString& targetID)
+  /**
+   * Looks up the configuration element with the given id on the given extension point
+   * and instantiates the class specified by the class attributes.
+   *
+   * @param extensionPointId the extension point id (simple id)
+   * @param elementName the name of the configuration element, or <code>null</code>
+   *   to match any element
+   * @param targetID the target id
+   * @return the instantiated extension object, or <code>null</code> if not found
+   */
+  template<class C>
+  C* CreateExtension(const QString& extensionPointId, const QString& elementName,
+                     const QString& targetID)
+  {
+    IExtensionPoint::Pointer extensionPoint = Platform::GetExtensionRegistry()
+        ->GetExtensionPoint(PlatformUI::PLUGIN_ID + "." + extensionPointId);
+    if (extensionPoint == 0)
     {
-        IExtensionPoint::Pointer extensionPoint = Platform::GetExtensionRegistry()
-            ->GetExtensionPoint(PlatformUI::PLUGIN_ID + "." + extensionPointId);
-        if (extensionPoint == 0)
-        {
-            WorkbenchPlugin::Log("Unable to find extension. Extension point: " +
-                                 extensionPointId + " not found");
-            return 0;
-        }
-
-        // Loop through the config elements.
-        IConfigurationElement::Pointer targetElement(0);
-        QList<IConfigurationElement::Pointer> elements(
-              Platform::GetExtensionRegistry()->GetConfigurationElementsFor(PlatformUI::PLUGIN_ID + "." + extensionPointId));
-        for (unsigned int j = 0; j < elements.size(); j++)
-        {
-            if (elementName == "" || elementName == elements[j]->GetName())
-            {
-                QString strID = elements[j]->GetAttribute("id");
-                if (targetID == strID)
-                {
-                    targetElement = elements[j];
-                    break;
-                }
-            }
-        }
-        if (targetElement.IsNull())
-        {
-            // log it since we cannot safely display a dialog.
-            WorkbenchPlugin::Log("Unable to find extension: " + targetID
-                                 + " in extension point: " + extensionPointId);
-            return 0;
-        }
-
-        // Create the extension.
-        try
-        {
-            return targetElement->CreateExecutableExtension<C>("class");
-        }
-        catch (const CoreException& e)
-        {
-            // log it since we cannot safely display a dialog.
-            WorkbenchPlugin::Log("Unable to create extension: " + targetID
-                                 + " in extension point: " + extensionPointId);
-        }
-        return 0;
+      WorkbenchPlugin::Log("Unable to find extension. Extension point: " +
+                           extensionPointId + " not found");
+      return 0;
     }
+
+    // Loop through the config elements.
+    IConfigurationElement::Pointer targetElement(0);
+    QList<IConfigurationElement::Pointer> elements(
+          Platform::GetExtensionRegistry()->GetConfigurationElementsFor(PlatformUI::PLUGIN_ID + "." + extensionPointId));
+    for (unsigned int j = 0; j < elements.size(); j++)
+    {
+      if (elementName == "" || elementName == elements[j]->GetName())
+      {
+        QString strID = elements[j]->GetAttribute("id");
+        if (targetID == strID)
+        {
+            targetElement = elements[j];
+            break;
+        }
+      }
+    }
+    if (targetElement.IsNull())
+    {
+      // log it since we cannot safely display a dialog.
+      WorkbenchPlugin::Log("Unable to find extension: " + targetID
+                           + " in extension point: " + extensionPointId);
+      return 0;
+    }
+
+    // Create the extension.
+    try
+    {
+      return targetElement->CreateExecutableExtension<C>("class");
+    }
+    catch (const CoreException& e)
+    {
+      // log it since we cannot safely display a dialog.
+      WorkbenchPlugin::Log("Unable to create extension: " + targetID
+                           + " in extension point: " + extensionPointId);
+    }
+    return 0;
+  }
 
 
 public:
 
-    /**
-     * Return the perspective registry.
-     * @return IPerspectiveRegistry. The registry for the receiver.
-     */
-    IPerspectiveRegistry* GetPerspectiveRegistry();
+  /**
+   * Return the perspective registry.
+   * @return IPerspectiveRegistry. The registry for the receiver.
+   */
+  IPerspectiveRegistry* GetPerspectiveRegistry();
 
 
-    /**
-     * Returns the introduction registry.
-     *
-     * @return the introduction registry.
-     * @since 3.0
-     */
-    IIntroRegistry* GetIntroRegistry();
+  /**
+   * Returns the introduction registry.
+   *
+   * @return the introduction registry.
+   */
+  IIntroRegistry* GetIntroRegistry();
 
-    /**
-     * Get the preference manager.
-     * @return PreferenceManager the preference manager for
-     * the receiver.
-     */
-//    PreferenceManager getPreferenceManager();
+  /*
+   * Get the preference manager.
+   * @return PreferenceManager the preference manager for
+   * the receiver.
+   */
+  //PreferenceManager getPreferenceManager();
 
-    /**
-     * Returns the shared images for the workbench.
-     *
-     * @return the shared image manager
-     */
-//    ISharedImages getSharedImages();
-
+  /*
+   * Returns the shared images for the workbench.
+   *
+   * @return the shared image manager
+   */
+  //ISharedImages getSharedImages();
 
 
-    /**
-     * Answer the view registry.
-     * @return IViewRegistry the view registry for the
-     * receiver.
-     */
-    IViewRegistry* GetViewRegistry();
+
+  /**
+   * Answer the view registry.
+   * @return IViewRegistry the view registry for the
+   * receiver.
+   */
+  IViewRegistry* GetViewRegistry();
 
 
-    /**
-     * Logs the given message to the platform log.
-     *
-     * If you have an exception in hand, call log(String, Throwable) instead.
-     *
-     * If you have a status object in hand call log(String, IStatus) instead.
-     *
-     * This convenience method is for internal use by the Workbench only and
-     * must not be called outside the Workbench.
-     *
-     * @param message
-     *            A high level UI message describing when the problem happened.
-     */
-    static void Log(const QString &message);
+  /**
+   * Logs the given message to the platform log.
+   *
+   * If you have an exception in hand, call log(String, Throwable) instead.
+   *
+   * If you have a status object in hand call log(String, IStatus) instead.
+   *
+   * This convenience method is for internal use by the Workbench only and
+   * must not be called outside the Workbench.
+   *
+   * @param message
+   *            A high level UI message describing when the problem happened.
+   */
+  static void Log(const QString &message);
 
-    /**
-     * Log the throwable.
-     * @param t
-     */
-    static void Log(const ctkRuntimeException& exc);
+  /**
+   * Log the throwable.
+   * @param t
+   */
+  static void Log(const ctkException& exc);
 
 
-    /**
+  /**
    * Logs the given message and throwable to the platform log.
    *
    * If you have a status object in hand call log(String, IStatus) instead.
@@ -410,70 +410,86 @@ public:
    * @param t
    *            The throwable from where the problem actually occurred.
    */
-    static void Log(const QString &message, const ctkRuntimeException& t);
+  static void Log(const QString &message, const ctkException& t);
 
-    /**
-     * Logs the given throwable to the platform log, indicating the class and
-     * method from where it is being logged (this is not necessarily where it
-     * occurred).
-     *
-     * This convenience method is for internal use by the Workbench only and
-     * must not be called outside the Workbench.
-     *
-     * @param clazz
-     *            The calling class.
-     * @param methodName
-     *            The calling method name.
-     * @param t
-     *            The throwable from where the problem actually occurred.
-     */
-    static void Log(const QString &clazz, const QString &methodName, const ctkRuntimeException& t);
+  /**
+   * Logs the given throwable to the platform log, indicating the class and
+   * method from where it is being logged (this is not necessarily where it
+   * occurred).
+   *
+   * This convenience method is for internal use by the Workbench only and
+   * must not be called outside the Workbench.
+   *
+   * @param clazz
+   *            The calling class.
+   * @param methodName
+   *            The calling method name.
+   * @param t
+   *            The throwable from where the problem actually occurred.
+   */
+  static void Log(const QString &clazz, const QString &methodName, const ctkException& t);
+
+  /**
+   * Logs the given message and status to the platform log.
+   *
+   * This convenience method is for internal use by the Workbench only and
+   * must not be called outside the Workbench.
+   *
+   * @param message
+   *            A high level UI message describing when the problem happened.
+   *            May be <code>null</code>.
+   * @param status
+   *            The status describing the problem. Must not be null.
+   */
+  static void Log(const QString& message, const SmartPointer<IStatus>& status);
+
+  /**
+   * Log the status to the default log.
+   * @param status
+   */
+  static void Log(const SmartPointer<IStatus>& status);
+
+  /*
+   *  (non-Javadoc)
+   * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+   */
+  void start(ctkPluginContext* context);
 
 
-    /*
-     *  (non-Javadoc)
-     * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-     */
-    void start(ctkPluginContext* context);
+  /*
+   * Return an array of all bundles contained in this workbench.
+   *
+   * @return an array of bundles in the workbench or an empty array if none
+   */
+  //const QList<IBundle::Pointer> GetBundles();
+
+  /**
+   * Returns the bundle context associated with the workbench plug-in.
+   *
+   * @return the bundle context
+   */
+  ctkPluginContext* GetPluginContext();
+
+
+  /* (non-Javadoc)
+   * @see org.blueberry.ui.plugin.AbstractUICTKPlugin#stop(org.osgi.framework.BundleContext)
+   */
+  void stop(ctkPluginContext* context);
 
 
   /**
-     * Return an array of all bundles contained in this workbench.
-     *
-     * @return an array of bundles in the workbench or an empty array if none
-     * @since 3.0
-     */
-    //const QList<IBundle::Pointer> GetBundles();
-
-    /**
-     * Returns the bundle context associated with the workbench plug-in.
-     *
-     * @return the bundle context
-     * @since 3.1
-     */
-    ctkPluginContext* GetPluginContext();
-
-
-    /* (non-Javadoc)
-     * @see org.blueberry.ui.plugin.AbstractUICTKPlugin#stop(org.osgi.framework.BundleContext)
-     */
-    void stop(ctkPluginContext* context);
-
-
-    /**
-     * FOR INTERNAL WORKBENCH USE ONLY.
-     *
-     * Returns the path to a location in the file system that can be used
-     * to persist/restore state between workbench invocations.
-     * If the location did not exist prior to this call it will  be created.
-     * Returns <code>null</code> if no such location is available.
-     *
-     * @return path to a location in the file system where this plug-in can
-     * persist data between sessions, or <code>null</code> if no such
-     * location is available.
-     * @since 3.1
-     */
-    QString GetDataLocation() const;
+   * FOR INTERNAL WORKBENCH USE ONLY.
+   *
+   * Returns the path to a location in the file system that can be used
+   * to persist/restore state between workbench invocations.
+   * If the location did not exist prior to this call it will  be created.
+   * Returns <code>null</code> if no such location is available.
+   *
+   * @return path to a location in the file system where this plug-in can
+   * persist data between sessions, or <code>null</code> if no such
+   * location is available.
+   */
+  QString GetDataLocation() const;
 
 };
 

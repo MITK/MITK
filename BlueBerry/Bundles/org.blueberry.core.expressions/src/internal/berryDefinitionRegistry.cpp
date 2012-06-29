@@ -17,11 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryDefinitionRegistry.h"
 
 #include "berryExpressionConverter.h"
+#include "berryExpressionStatus.h"
+#include "berryCoreException.h"
 
 #include "berryPlatform.h"
 #include "berryPlatformException.h"
+#include "berryStatus.h"
 #include "berryIExtensionRegistry.h"
 #include "berryIConfigurationElement.h"
+#include "berryInvalidRegistryObjectException.h"
 
 namespace berry {
 
@@ -60,16 +64,22 @@ Expression::Pointer DefinitionRegistry::GetExpression(const QString& id)
           foundExpression= this->GetExpression(id, *i);
           break;
         }
-        catch (const InvalidServiceObjectException& e)
+        catch (const InvalidRegistryObjectException& e)
         {
-          throw CoreException(QString("Missing expression: ") + id);
+          IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::MISSING_EXPRESSION,
+                                                       QString("Unable to locate expression definition ") + id,
+                                                       BERRY_STATUS_LOC));
+          throw CoreException(status);
         }
       }
     }
   }
   if (foundExpression.IsNull())
   {
-    throw CoreException(QString("Missing expression: ") + id);
+    IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::MISSING_EXPRESSION,
+                                                 QString("Unable to locate expression definition ") + id,
+                                                 BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
 
   return foundExpression;

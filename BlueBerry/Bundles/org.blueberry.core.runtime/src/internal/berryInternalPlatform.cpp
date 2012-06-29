@@ -47,6 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryBundleDirectory.h"
 #include "berryProvisioningInfo.h"
 #include "berryCTKPluginActivator.h"
+#include "berryLogImpl.h"
 
 #include <berryIPreferencesService.h>
 #include <berryIExtensionPointService.h>
@@ -282,75 +283,75 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN.toStdString()))
     m_CodeCache->Clear();
 
-  try
-  {
-    // assemble a list of base plugin-directories (which contain
-    // the real plugins as directories)
-    std::vector<std::string> pluginBaseDirs;
+//  try
+//  {
+//    // assemble a list of base plugin-directories (which contain
+//    // the real plugins as directories)
+//    std::vector<std::string> pluginBaseDirs;
 
-    Poco::StringTokenizer tokenizer(this->GetConfiguration().getString(Platform::ARG_PLUGIN_DIRS.toStdString(), ""), ";",
-                                    Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+//    Poco::StringTokenizer tokenizer(this->GetConfiguration().getString(Platform::ARG_PLUGIN_DIRS.toStdString(), ""), ";",
+//                                    Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
 
-    for (Poco::StringTokenizer::Iterator token = tokenizer.begin();
-         token != tokenizer.end(); ++token)
-    {
-      pluginBaseDirs.push_back(*token);
-    }
+//    for (Poco::StringTokenizer::Iterator token = tokenizer.begin();
+//         token != tokenizer.end(); ++token)
+//    {
+//      pluginBaseDirs.push_back(*token);
+//    }
 
-    std::vector<Poco::Path> pluginPaths;
-    for (std::vector<std::string>::iterator pluginBaseDir = pluginBaseDirs.begin();
-         pluginBaseDir != pluginBaseDirs.end(); ++pluginBaseDir)
-    {
-      BERRY_INFO(m_ConsoleLog) << "Plugin base directory: " << *pluginBaseDir;
-      Poco::File pluginDir(*pluginBaseDir);
+//    std::vector<Poco::Path> pluginPaths;
+//    for (std::vector<std::string>::iterator pluginBaseDir = pluginBaseDirs.begin();
+//         pluginBaseDir != pluginBaseDirs.end(); ++pluginBaseDir)
+//    {
+//      BERRY_INFO(m_ConsoleLog) << "Plugin base directory: " << *pluginBaseDir;
+//      Poco::File pluginDir(*pluginBaseDir);
 
-      if (!pluginDir.exists() || !pluginDir.isDirectory())
-      {
-        BERRY_WARN(m_ConsoleLog) << *pluginBaseDir << " is not a direcotry or does not exist. SKIPPED.\n";
-        continue;
-      }
+//      if (!pluginDir.exists() || !pluginDir.isDirectory())
+//      {
+//        BERRY_WARN(m_ConsoleLog) << *pluginBaseDir << " is not a direcotry or does not exist. SKIPPED.\n";
+//        continue;
+//      }
 
-      std::vector<std::string> pluginList;
-      pluginDir.list(pluginList);
+//      std::vector<std::string> pluginList;
+//      pluginDir.list(pluginList);
 
-      std::vector<std::string>::iterator iter;
-      for (iter = pluginList.begin(); iter != pluginList.end(); iter++)
-      {
-        Poco::Path pluginPath = Poco::Path::forDirectory(*pluginBaseDir);
-        pluginPath.pushDirectory(*iter);
+//      std::vector<std::string>::iterator iter;
+//      for (iter = pluginList.begin(); iter != pluginList.end(); iter++)
+//      {
+//        Poco::Path pluginPath = Poco::Path::forDirectory(*pluginBaseDir);
+//        pluginPath.pushDirectory(*iter);
 
-        Poco::File file(pluginPath);
-        if (file.exists() && file.isDirectory())
-        {
-          pluginPaths.push_back(pluginPath);
-        }
-      }
-    }
+//        Poco::File file(pluginPath);
+//        if (file.exists() && file.isDirectory())
+//        {
+//          pluginPaths.push_back(pluginPath);
+//        }
+//      }
+//    }
 
-    std::vector<Poco::Path>::iterator pathIter;
-    for (pathIter = pluginPaths.begin(); pathIter != pluginPaths.end(); pathIter++)
-    {
-      try
-      {
-      Bundle::Pointer bundle = m_BundleLoader->LoadBundle(*pathIter);
-      if (bundle)
-      {
-        BERRY_INFO(m_ConsoleLog) << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
-      }
-      }
-      catch (const BundleStateException& exc)
-      {
-        BERRY_WARN << exc.what() << std::endl;
-      }
-    }
+//    std::vector<Poco::Path>::iterator pathIter;
+//    for (pathIter = pluginPaths.begin(); pathIter != pluginPaths.end(); pathIter++)
+//    {
+//      try
+//      {
+//      Bundle::Pointer bundle = m_BundleLoader->LoadBundle(*pathIter);
+//      if (bundle)
+//      {
+//        BERRY_INFO(m_ConsoleLog) << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
+//      }
+//      }
+//      catch (const BundleStateException& exc)
+//      {
+//        BERRY_WARN << exc.what() << std::endl;
+//      }
+//    }
 
-    // resolve plugins
-    m_BundleLoader->ResolveAllBundles();
-  }
-  catch (Poco::Exception& exc)
-  {
-    this->logger().log(exc);
-  }
+//    // resolve plugins
+//    m_BundleLoader->ResolveAllBundles();
+//  }
+//  catch (Poco::Exception& exc)
+//  {
+//    this->logger().log(exc);
+//  }
 
 #ifdef BLUEBERRY_DEBUG_SMARTPOINTER
   DebugUtil::RestoreState();
@@ -532,6 +533,25 @@ QDir InternalPlatform::GetUserPath()
   return m_UserPath;
 }
 
+ILog *InternalPlatform::GetLog(const QSharedPointer<ctkPlugin> &plugin) const
+{
+  LogImpl* result = m_Logs.value(plugin->getPluginId());
+  if (result != NULL)
+    return result;
+
+//  ExtendedLogService logService = (ExtendedLogService) extendedLogTracker.getService();
+//  Logger logger = logService == null ? null : logService.getLogger(bundle, PlatformLogWriter.EQUINOX_LOGGER_NAME);
+//  result = new Log(bundle, logger);
+//  ExtendedLogReaderService logReader = (ExtendedLogReaderService) logReaderTracker.getService();
+//  logReader.addLogListener(result, result);
+//  logs.put(bundle, result);
+//  return result;
+
+  result = new LogImpl(plugin);
+  m_Logs.insert(plugin->getPluginId(), result);
+  return result;
+}
+
 bool InternalPlatform::IsRunning() const
 {
   Poco::Mutex::ScopedLock lock(m_Mutex);
@@ -662,6 +682,18 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   Poco::Util::Option testAppOption(Platform::ARG_TESTAPPLICATION.toStdString(), "", "the application to be tested");
   testAppOption.argument("<id>").binding(Platform::ARG_TESTAPPLICATION.toStdString());
   options.addOption(testAppOption);
+
+  Poco::Util::Option noRegistryCacheOption(Platform::ARG_NO_REGISTRY_CACHE.toStdString(), "", "do not use a cache for the registry");
+  noRegistryCacheOption.binding(Platform::ARG_NO_REGISTRY_CACHE.toStdString());
+  options.addOption(noRegistryCacheOption);
+
+  Poco::Util::Option noLazyRegistryCacheLoadingOption(Platform::ARG_NO_LAZY_REGISTRY_CACHE_LOADING.toStdString(), "", "do not use lazy cache loading for the registry");
+  noLazyRegistryCacheLoadingOption.binding(Platform::ARG_NO_LAZY_REGISTRY_CACHE_LOADING.toStdString());
+  options.addOption(noLazyRegistryCacheLoadingOption);
+
+  Poco::Util::Option registryMultiLanguageOption(Platform::ARG_REGISTRY_MULTI_LANGUAGE.toStdString(), "", "enable multi-language support for the registry");
+  registryMultiLanguageOption.binding(Platform::ARG_REGISTRY_MULTI_LANGUAGE.toStdString());
+  options.addOption(registryMultiLanguageOption);
 
   Poco::Util::Option xargsOption(Platform::ARG_XARGS.toStdString(), "", "Extended argument list");
   xargsOption.argument("<args>").binding(Platform::ARG_XARGS.toStdString());

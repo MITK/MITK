@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berrySafeRunner.h>
 #include <berryObjects.h>
+#include <berryIContributor.h>
 #include <berryIWorkbenchPartConstants.h>
 #include <berryAbstractUICTKPlugin.h>
 
@@ -176,7 +177,7 @@ void IntroPart::SetInitializationData(IConfigurationElement::Pointer cfig,
   }
 
   imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
-        configElement->GetContributor(), strIcon);
+        configElement->GetContributor()->GetName(), strIcon);
 
   if (!imageDescriptor)
   {

@@ -44,6 +44,8 @@ private:
 
 public:
 
+  berryObjectMacro(berry::MultiStatus)
+
   /**
    * Creates and returns a new multi-status object with the given children.
    *
@@ -53,7 +55,8 @@ public:
    * @param message a human-readable message, localized to the
    *    current locale
    */
-  MultiStatus(const QString& pluginId, int code, const QList<IStatus::Pointer>& newChildren, const QString& message);
+  MultiStatus(const QString& pluginId, int code, const QList<IStatus::Pointer>& newChildren,
+              const QString& message, const SourceLocation& sl);
 
   /**
    * Creates and returns a new multi-status object with the given children.
@@ -65,7 +68,8 @@ public:
    *    current locale
    * @param exception a low-level exception.
    */
-  MultiStatus(const QString& pluginId, int code, const QList<IStatus::Pointer>& newChildren, const QString& message, const ctkException& exception);
+  MultiStatus(const QString& pluginId, int code, const QList<IStatus::Pointer>& newChildren,
+              const QString& message, const ctkException& exception, const SourceLocation& sl);
 
   /**
    * Creates and returns a new multi-status object with no children.
@@ -75,7 +79,8 @@ public:
    * @param message a human-readable message, localized to the
    *    current locale
    */
-  MultiStatus(const QString& pluginId, int code, const QString& message);
+  MultiStatus(const QString& pluginId, int code, const QString& message,
+              const SourceLocation& sl);
 
   /**
    * Creates and returns a new multi-status object with no children.
@@ -87,7 +92,8 @@ public:
    * @param exception a low-level exception, or <code>null</code> if not
    *    applicable
    */
-  MultiStatus(const QString& pluginId, int code, const QString& message, const ctkException& exception);
+  MultiStatus(const QString& pluginId, int code, const QString& message,
+              const ctkException& exception, const SourceLocation& sl);
 
   /**
    * Adds the given status to this multi-status.
@@ -126,7 +132,7 @@ public:
    * @see #add(IStatus)
    * @see #addAll(IStatus)
    */
-  void Merge(IStatus::Pointer status);
+  void Merge(const IStatus::Pointer& status);
 
   /**
    * Returns a string representation of the status, suitable

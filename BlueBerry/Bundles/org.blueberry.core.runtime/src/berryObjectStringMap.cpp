@@ -14,29 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#include "berryPluginActivator.h"
-
-#include <QtPlugin>
+#include "berryObjectStringMap.h"
 
 namespace berry {
 
-org_blueberry_core_expressions_Activator::org_blueberry_core_expressions_Activator()
+ObjectStringMap::ObjectStringMap()
 {
 }
 
-void org_blueberry_core_expressions_Activator::start(ctkPluginContext* context)
+ObjectStringMap::ObjectStringMap(const QHash<QString, QString> &other)
+  : QHash<QString,QString>(other), Object()
 {
-  Q_UNUSED(context)
-}
-
-void org_blueberry_core_expressions_Activator::stop(ctkPluginContext* context)
-{
-  Q_UNUSED(context)
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_blueberry_core_expressions, berry::org_blueberry_core_expressions_Activator)
-#endif

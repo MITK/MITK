@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 struct IConfigurationElement;
+struct IContributor;
 
 /**
  * An extension declared in a plug-in.
@@ -55,9 +56,11 @@ struct IConfigurationElement;
  * </p>
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct IExtension : public Object
+struct IExtension : public virtual Object
 {
   berryInterfaceMacro(IExtension, berry)
+
+  virtual ~IExtension();
 
   /**
    * Returns all configuration elements declared by this extension.
@@ -86,7 +89,7 @@ struct IExtension : public Object
    * @return the contributor for this extension
    * @throws InvalidRegistryObjectException if this extension is no longer valid
    */
-  virtual QString GetContributor() const = 0;
+  virtual SmartPointer<IContributor> GetContributor() const = 0;
 
   /**
    * Returns the unique identifier of the extension point

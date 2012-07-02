@@ -25,13 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 class DicomEventHandler : public QObject
 {
     Q_OBJECT
-    public:
+public:
 
-		DicomEventHandler();
+    DicomEventHandler();
 
-		virtual ~DicomEventHandler();
+    virtual ~DicomEventHandler();
 
-        void SubscribeSlots();
+    void SubscribeSlots();
 
     public slots:
 

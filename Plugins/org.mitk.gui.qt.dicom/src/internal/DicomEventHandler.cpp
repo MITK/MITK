@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 DicomEventHandler::DicomEventHandler() 
-{    
+{
 }
 
 DicomEventHandler::~DicomEventHandler()
@@ -52,7 +52,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
     mitk::DicomSeriesReader::UidFileNamesMap dicomSeriesMap = mitk::DicomSeriesReader::GetSeries(path.toStdString());
     mitk::DicomSeriesReader::UidFileNamesMap::const_iterator qualifiedSeriesInstanceUIDIterator;
-        
+
     for(qualifiedSeriesInstanceUIDIterator = dicomSeriesMap.begin();
         qualifiedSeriesInstanceUIDIterator != dicomSeriesMap.end();
         ++qualifiedSeriesInstanceUIDIterator)
@@ -74,7 +74,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
     {        
         ctkServiceReference serviceReference =mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
         mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
-        
+
         storageService->GetActiveDataStorage().GetPointer()->GetDataStorage()->Add(node);
         mitk::RenderingManager::GetInstance()->SetDataStorage(storageService->GetActiveDataStorage().GetPointer()->GetDataStorage());
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -87,14 +87,14 @@ void DicomEventHandler::OnSignalRemoveSeriesFromStorage(const ctkEvent& ctkEvent
 
 void DicomEventHandler::SubscribeSlots()
 {
-  ctkServiceReference ref = mitk::PluginActivator::getContext()->getServiceReference<ctkEventAdmin>();
-  if (ref)
-  {
-      ctkEventAdmin* eventAdmin = mitk::PluginActivator::getContext()->getService<ctkEventAdmin>(ref);
-      ctkDictionary properties;
-      properties[ctkEventConstants::EVENT_TOPIC] = "org/mitk/gui/qt/dicom/ADD";
-      eventAdmin->subscribeSlot(this, SLOT(OnSignalAddSeriesToDataManager(ctkEvent)), properties);
-      properties[ctkEventConstants::EVENT_TOPIC] = "org/mitk/gui/qt/dicom/DELETED";
-      eventAdmin->subscribeSlot(this, SLOT(OnSignalRemoveSeriesFromStorage(ctkEvent)), properties);
-  }
+    ctkServiceReference ref = mitk::PluginActivator::getContext()->getServiceReference<ctkEventAdmin>();
+    if (ref)
+    {
+        ctkEventAdmin* eventAdmin = mitk::PluginActivator::getContext()->getService<ctkEventAdmin>(ref);
+        ctkDictionary properties;
+        properties[ctkEventConstants::EVENT_TOPIC] = "org/mitk/gui/qt/dicom/ADD";
+        eventAdmin->subscribeSlot(this, SLOT(OnSignalAddSeriesToDataManager(ctkEvent)), properties);
+        properties[ctkEventConstants::EVENT_TOPIC] = "org/mitk/gui/qt/dicom/DELETED";
+        eventAdmin->subscribeSlot(this, SLOT(OnSignalRemoveSeriesFromStorage(ctkEvent)), properties);
+    }
 }

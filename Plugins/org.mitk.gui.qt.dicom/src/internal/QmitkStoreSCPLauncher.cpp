@@ -55,49 +55,49 @@ QString QmitkStoreSCPLauncher::GetPathToExecutable()
 
 void QmitkStoreSCPLauncher::OnProcessError(QProcess::ProcessError err)
 {
-	switch(err)
-	{
-	case QProcess::FailedToStart:
+    switch(err)
+    {
+    case QProcess::FailedToStart:
         MITK_INFO << QString("Failed to start storage provider: ").append(m_StoreSCP->errorString()).toStdString();
-		break;
-	case QProcess::Crashed:
+        break;
+    case QProcess::Crashed:
         MITK_INFO << QString("Storage provider crashed: ").append(m_StoreSCP->errorString()).toStdString();
-		break;
-	case QProcess::Timedout:
+        break;
+    case QProcess::Timedout:
         MITK_INFO << QString("Storage provider timeout: ").append(m_StoreSCP->errorString()).toStdString();
-		break;
-	case QProcess::WriteError:
+        break;
+    case QProcess::WriteError:
         MITK_INFO << QString("Storage provider write error: ").append(m_StoreSCP->errorString()).toStdString();
-		break;
-	case QProcess::ReadError:
+        break;
+    case QProcess::ReadError:
         MITK_INFO << QString("Storage provider read error: ").append(m_StoreSCP->errorString()).toStdString();
-		break;
-	case QProcess::UnknownError:
+        break;
+    case QProcess::UnknownError:
         MITK_INFO << QString("Storage provider unknown error: ").append(m_StoreSCP->errorString()).toStdString();
-		break;
-	default:
+        break;
+    default:
         MITK_INFO << QString("Storage provider unknown error: ").append(m_StoreSCP->errorString()).toStdString();
-		break;
-	}
+        break;
+    }
 }
 
 void QmitkStoreSCPLauncher::OnStateChanged(QProcess::ProcessState status)
 {
-	switch(status)
-	{
-	case QProcess::NotRunning:
+    switch(status)
+    {
+    case QProcess::NotRunning:
         MITK_INFO << QString("Storage provider not running: ").append(m_StoreSCP->errorString()).toStdString();
-		break;
-	case QProcess::Starting:
-		MITK_INFO << QString("Starting storage provider").toStdString();
-		break;
-	case QProcess::Running:
+        break;
+    case QProcess::Starting:
+        MITK_INFO << QString("Starting storage provider").toStdString();
+        break;
+    case QProcess::Running:
         MITK_INFO << QString("Running storage provider").toStdString();
-		break;
-	default:
-		MITK_INFO << QString("Storage provider unknown error: ").append(m_StoreSCP->errorString()).toStdString();
-		break;
-	}
+        break;
+    default:
+        MITK_INFO << QString("Storage provider unknown error: ").append(m_StoreSCP->errorString()).toStdString();
+        break;
+    }
 }
 
 void QmitkStoreSCPLauncher::SetArgumentList(QmitkStoreSCPLauncherBuilder* builder)

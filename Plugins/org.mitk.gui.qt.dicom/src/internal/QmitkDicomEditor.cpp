@@ -68,6 +68,8 @@ QmitkDicomEditor::QmitkDicomEditor()
 , m_ListenerDirectory(new QString())
 , m_DatabaseDirectory(new QString())
 , m_PluginDirectory(new QString())
+, m_Publisher(new QmitkDicomDataEventPublisher())
+, m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&builder))
 {
 }
 
@@ -186,9 +188,7 @@ void QmitkDicomEditor::OnViewButtonAddToDataManager(const QStringList& eventProp
     properties["SeriesName"] = eventProperties.at(4);
     properties["Path"] = eventProperties.at(5);
 
-    m_Publisher = new QmitkDicomDataEventPublisher();
     m_Publisher->PublishSignals(mitk::PluginActivator::getContext());
-
     m_Publisher->AddSeriesToDataManagerEvent(properties);
 }
 

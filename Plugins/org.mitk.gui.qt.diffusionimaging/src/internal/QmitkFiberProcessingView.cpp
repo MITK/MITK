@@ -758,12 +758,10 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
         m_Controls->m_ResampleFibersButton->setEnabled(true);
         m_Controls->m_PruneFibersButton->setEnabled(true);
+        m_Controls->m_MirrorFibersButton->setEnabled(true);
 
         if (m_Surfaces.size()>0)
-        {
             m_Controls->m_Extract3dButton->setEnabled(true);
-            m_Controls->m_MirrorFibersButton->setEnabled(true);
-        }
 
         // one bundle and one planar figure needed to extract fibers
         if (!m_SelectedPF.empty())

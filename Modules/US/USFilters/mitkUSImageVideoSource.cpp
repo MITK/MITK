@@ -34,6 +34,7 @@ mitk::USImageVideoSource::USImageVideoSource()
     m_IsVideoReady = false;
     m_IsMetadataReady = false;
     m_IsGeometryReady = false;
+    m_IsGreyscale = true;
     this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
 }
 
@@ -59,10 +60,6 @@ void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
     
 void mitk::USImageVideoSource::SetCameraInput(int deviceID)
 {
-
-
-
-  // Old Code, this may not work
   m_OpenCVVideoSource = mitk::OpenCVVideoSource::New();
 
   m_OpenCVVideoSource->SetVideoCameraInput(deviceID);
@@ -74,39 +71,41 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID)
   m_IsVideoReady = m_OpenCVVideoSource->IsCapturingEnabled();
 }
 
+void mitk::USImageVideoSource::SetColorOutput(bool isColor){
+  m_IsGreyscale = !isColor;
+}
+
 
 mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 {
+  // Setup Pointers
+  IplImage *rgbImage = NULL;
+  IplImage *greyImage = NULL;
 
-// The following code utilizes open CV directly do access images
-  //IplImage *m_cvCurrentVideoFrame = NULL;
-  //CvCapture* capture = cvCaptureFromCAM( 1000 );
-  // if ( !capture ) {
-  //   fprintf( stderr, "ERROR: capture is NULL \n" );
-  //   getchar();
-  //   return NULL;
-  // }
-  // // Show the image captured from the camera in the window and repeat
-  //
-  // // Get one frame
-  // m_cvCurrentVideoFrame  = cvQueryFrame( capture );
-  //
-/// WORKING CODE
-
-
-  IplImage *m_cvCurrentVideoFrame = NULL;
+  //Get Dimensions and init rgb
   int height = m_OpenCVVideoSource->GetImageHeight();
   int width = m_OpenCVVideoSource->GetImageWidth();
-  m_cvCurrentVideoFrame = cvCreateImage(cvSize(width,height),8,3);
-  m_OpenCVVideoSource->GetCurrentFrameAsOpenCVImage(m_cvCurrentVideoFrame);
+  rgbImage = cvCreateImage(cvSize(width,height),8,3);
+
+  // Get Frame from Source
+  m_OpenCVVideoSource->GetCurrentFrameAsOpenCVImage(rgbImage);
   m_OpenCVVideoSource->FetchFrame();
-  this->m_OpenCVToMitkFilter->SetOpenCVImage(m_cvCurrentVideoFrame);
+
+  // If this is a greyscale image, convert it and put into the filter.
+  if (m_IsGreyscale){
+    greyImage = cvCreateImage(cvSize(width,height),8,1);
+    cvCvtColor( rgbImage, greyImage, CV_RGB2GRAY );
+    this->m_OpenCVToMitkFilter->SetOpenCVImage(greyImage);
+  } else {
+    this->m_OpenCVToMitkFilter->SetOpenCVImage(rgbImage);
+  }
   this->m_OpenCVToMitkFilter->Update();
 
   // OpenCVToMitkImageFilter returns a standard mit::image. We then transform it into an USImage
   mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput(0));
   
-  cvReleaseImage (&m_cvCurrentVideoFrame);
+  cvReleaseImage (&rgbImage);
+  cvReleaseImage (&greyImage);
 
   return result;
 }

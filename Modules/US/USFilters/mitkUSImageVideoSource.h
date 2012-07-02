@@ -50,6 +50,13 @@ namespace mitk {
     void SetCameraInput(int deviceID);
 
     /**
+    *\brief Opens a video device for streaming. Takes the Device id. Try -1 for "grab the first you can get"
+    * which works quite well if only one device is available. If nothing goes wrong, the
+    * VideoSource is ready to deliver images after calling this function.
+    */
+    void SetColorOutput(bool isColor);
+
+    /**
     *\brief Retrieves the next frame. This will typically be the next frame in a file
     * or the last cahced file in a devcie.
     */
@@ -79,6 +86,7 @@ namespace mitk {
    bool m_IsVideoReady;
    bool m_IsMetadataReady;
    bool m_IsGeometryReady;
+   bool m_IsGreyscale;
    mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToMitkFilter;
     
 

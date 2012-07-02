@@ -30,6 +30,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::Im
   m_Metadata = mitk::USImageMetadata::New();
   m_Metadata->SetDeviceManufacturer(manufacturer);
   m_Metadata->SetDeviceModel(model);
+  //m_Metadata->SetDeviceClass(GetDeviceClass());
   m_IsActive = false;
   
   //set number of outputs
@@ -43,6 +44,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::Im
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata) : mitk::ImageSource()
 {
   m_Metadata = metadata;
+  //m_Metadata->SetDeviceClass(GetDeviceClass());
   m_IsActive = false;
 
   //set number of outputs
@@ -140,34 +142,10 @@ void mitk::USDevice::Deactivate()
 {
   m_IsActive= false;
 
-  ServiceProperties props;
-  props["DeviceClass"] = this->GetDeviceClass();
-  std::string no = "false";
-  props["IsActive"] = no;
+  ServiceProperties props = ConstructServiceProperties();
   this->m_ServiceRegistration.SetProperties(props);
   OnDeactivation();
 }
-
-//
-//bool mitk::USDevice::OnActivation()
-//{
-//  return true;
-//  // TODO Make Abstract
-//}
-//
-//
-//void mitk::USDevice::OnDeactivation()
-//{
-//  // TODO Make Abstract
-//}
-//
-//
-//std::string mitk::USDevice::GetDeviceClass()
-//{
-//  return "org.mitk.Ultrasound.GenericDevice";
-//}
-
-
 
 void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
 {

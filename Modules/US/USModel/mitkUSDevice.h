@@ -210,7 +210,7 @@ namespace mitk {
       virtual bool OnDisconnection() = 0;    
 
       /**
-      * \brief Is called during the activation process. After this method is finsihed, the device should be generating images
+      * \brief Is called during the activation process. After this method is finished, the device should be generating images
       */
       virtual bool OnActivation() = 0;    
 

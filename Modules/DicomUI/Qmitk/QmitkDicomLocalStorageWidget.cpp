@@ -18,13 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 // Qmitk
 #include "QmitkDicomLocalStorageWidget.h"
 #include <mitklogmacros.h>
-//#include <mitkProgressBar.h>
+#include <mitkProgressBar.h>
 // Qt
 #include <QMessageBox>
 #include <QModelIndex>
 #include <QMap>
 #include <QVariant>
-//#include "QmitkDicomDataEventPublisher.h"
 
 
 
@@ -69,6 +68,7 @@ void QmitkDicomLocalStorageWidget::StartDicomImport(const QString& dicomData)
     if (m_Watcher.isRunning()){
         m_Watcher.waitForFinished();
     }
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
     m_Future = QtConcurrent::run(this,(void (QmitkDicomLocalStorageWidget::*)(const QString&)) &QmitkDicomLocalStorageWidget::AddDICOMData,dicomData);
     m_Watcher.setFuture(m_Future); 
 }
@@ -79,6 +79,7 @@ void QmitkDicomLocalStorageWidget::StartDicomImport(const QStringList& dicomData
     {
         m_Watcher.waitForFinished();
     }
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(dicomData.count());
     m_Future = QtConcurrent::run(this,(void (QmitkDicomLocalStorageWidget::*)(const QStringList&)) &QmitkDicomLocalStorageWidget::AddDICOMData,dicomData);
     m_Watcher.setFuture(m_Future);
 }
@@ -87,9 +88,11 @@ void QmitkDicomLocalStorageWidget::AddDICOMData(const QString& directory)
 {
     if(m_LocalDatabase->isOpen())
     {
+        mitk::ProgressBar::GetInstance()->Progress();
         m_LocalIndexer->addDirectory(*m_LocalDatabase,directory,m_LocalDatabase->databaseDirectory());
     }
     m_LocalModel->setDatabase(m_LocalDatabase->database());
+    mitk::ProgressBar::GetInstance()->Progress();
     emit FinishedImport(directory);
 }
 
@@ -101,6 +104,7 @@ void QmitkDicomLocalStorageWidget::AddDICOMData(const QStringList& patientFiles)
         while(fileIterator.hasNext())
         {
             m_LocalIndexer->addFile(*m_LocalDatabase,fileIterator.next(),m_LocalDatabase->databaseDirectory());
+            mitk::ProgressBar::GetInstance()->Progress();
         }
     }
     m_LocalModel->setDatabase(m_LocalDatabase->database());

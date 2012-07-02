@@ -87,6 +87,7 @@ namespace mitk {
    bool m_IsMetadataReady;
    bool m_IsGeometryReady;
    bool m_IsGreyscale;
+   CvRect m_CropRegion;
    mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToMitkFilter;
     
 

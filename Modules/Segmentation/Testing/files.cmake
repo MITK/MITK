@@ -8,7 +8,8 @@ set(MODULE_TESTS
 set(MODULE_IMAGE_TESTS
   mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkOverwriteSliceImageFilterTest.cpp
-  mitkOverwriteSliceFilterTest.cpp
+#Deactivate due to Bug 12340. Should be fixed soon!
+#  mitkOverwriteSliceFilterTest.cpp
 )
 set(MODULE_CUSTOM_TESTS
 )

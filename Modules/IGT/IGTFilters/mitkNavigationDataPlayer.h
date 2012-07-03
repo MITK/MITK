@@ -57,7 +57,7 @@ namespace mitk {
     */
     itkGetStringMacro(FileName);
 
-
+    
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update
     */
@@ -122,6 +122,12 @@ namespace mitk {
       NormalFile,
       ZipFile
     };
+
+    /** @return Returns the current playing mode of the player. */
+    itkGetMacro(PlayerMode,PlayerMode);
+
+    /** @brief Sets the playing mode of the player. */
+    itkSetMacro(PlayerMode,PlayerMode);
 
     /**
     * \brief sets the recording mode which causes different types of output streams

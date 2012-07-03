@@ -50,4 +50,4 @@ private:
     QString* m_Mode;   
     QString* m_OutputDirectory;
 };
-#endif QmitkStoreSCPLauncherBuilder_h
+#endif 

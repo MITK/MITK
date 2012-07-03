@@ -48,7 +48,7 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     mitkClassMacro(OpenCVToMitkImageFilter, ImageSource);
     itkNewMacro(OpenCVToMitkImageFilter);
 
-    itkSetObjectMacro(OpenCVImage, const IplImage);
+    void SetOpenCVImage(const IplImage* image);
     itkGetMacro(OpenCVImage, const IplImage*);
 
     itkSetMacro(CopyBuffer, bool);

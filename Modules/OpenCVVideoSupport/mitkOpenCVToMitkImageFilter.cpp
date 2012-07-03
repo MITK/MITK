@@ -29,6 +29,12 @@ mitk::OpenCVToMitkImageFilter::~OpenCVToMitkImageFilter()
 {
 }
 
+void mitk::OpenCVToMitkImageFilter::SetOpenCVImage(const IplImage* image)
+{
+  this->m_OpenCVImage = image;
+  this->Modified();
+}
+
 void mitk::OpenCVToMitkImageFilter::GenerateData()
 {
   if(m_OpenCVImage == 0)
@@ -71,6 +77,12 @@ void mitk::OpenCVToMitkImageFilter::GenerateData()
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_64F && m_OpenCVImage->nChannels == 3 )
     m_Image = ConvertIplToMitkImage< DoubleRGBPixelType , 2>( rgbOpenCVImage, m_CopyBuffer );
+
+  else
+  {
+    MITK_WARN << "Unknown image depth and/or pixel type. Cannot convert OpenCV to MITK image.";
+    return;
+  }
 
   cvReleaseImage(&rgbOpenCVImage);
 }

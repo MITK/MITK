@@ -1,3 +1,5 @@
+set(QT_USE_QTSQL 1)
+
 include_directories(${CTK_INCLUDE_DIRS})
 
 MITK_CREATE_MODULE(mitkDicomUI

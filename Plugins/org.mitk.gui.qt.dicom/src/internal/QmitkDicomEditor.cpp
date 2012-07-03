@@ -65,25 +65,20 @@ const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
 QmitkDicomEditor::QmitkDicomEditor()
 : m_Thread(new QThread())
 , m_DicomDirectoryListener(new QmitkDicomDirectoryListener())
-, m_ListenerDirectory(new QString())
-, m_DatabaseDirectory(new QString())
-, m_PluginDirectory(new QString())
-, m_Publisher(new QmitkDicomDataEventPublisher())
 , m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&builder))
+, m_Publisher(new QmitkDicomDataEventPublisher())
 {
 }
 
 QmitkDicomEditor::~QmitkDicomEditor()
 {
-    m_Thread->terminate();
+    m_Thread->quit();
+    m_Thread->wait(1000);
     delete m_Handler;
     delete m_Publisher;
     delete m_StoreSCPLauncher;
     delete m_Thread;
     delete m_DicomDirectoryListener;
-    delete m_ListenerDirectory;
-    delete m_DatabaseDirectory;
-    delete m_PluginDirectory;
 }
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
@@ -151,11 +146,11 @@ void QmitkDicomEditor::OnChangePage(int page)
     }
 }
 
-void QmitkDicomEditor::OnDicomImportFinished(const QString& path)
+void QmitkDicomEditor::OnDicomImportFinished(const QString& /*path*/)
 {
 }
 
-void QmitkDicomEditor::OnDicomImportFinished(const QStringList& path)
+void QmitkDicomEditor::OnDicomImportFinished(const QStringList& /*path*/)
 {
 }
 
@@ -163,7 +158,7 @@ void QmitkDicomEditor::StartDicomDirectoryListener()
 {   
     if(!m_Thread->isRunning())
     {
-        m_DicomDirectoryListener->SetDicomListenerDirectory(*m_ListenerDirectory);
+        m_DicomDirectoryListener->SetDicomListenerDirectory(m_ListenerDirectory);
         connect(m_DicomDirectoryListener,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&)),Qt::DirectConnection);
         connect(m_Controls.internalDataWidget,SIGNAL(FinishedImport(const QStringList&)),m_DicomDirectoryListener,SLOT(OnDicomImportFinished(const QStringList&)),Qt::DirectConnection);
         m_DicomDirectoryListener->moveToThread(m_Thread);
@@ -197,7 +192,7 @@ void QmitkDicomEditor::StartStoreSCP()
 {
     QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
     QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
-    builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(*m_ListenerDirectory);
+    builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_ListenerDirectory);
     m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&builder);
     m_StoreSCPLauncher->StartStoreSCP();
     m_Controls.radioButton->setChecked(true);
@@ -233,21 +228,21 @@ void QmitkDicomEditor::StartStopStoreSCP()
 
 void QmitkDicomEditor::SetPluginDirectory()
 {
-    mitk::PluginActivator::getContext()->getDataFile(*m_PluginDirectory);
-    m_PluginDirectory->append("/");
+  m_PluginDirectory = mitk::PluginActivator::getContext()->getDataFile("").absolutePath();
+  m_PluginDirectory.append("/");
 }
 
 void QmitkDicomEditor::SetDatabaseDirectory(const QString& databaseDirectory)
 {
-    m_DatabaseDirectory->clear();
-    m_DatabaseDirectory->append(m_PluginDirectory);
-    m_DatabaseDirectory->append(databaseDirectory);
-    m_Controls.internalDataWidget->SetDatabaseDirectory(*m_DatabaseDirectory);
+    m_DatabaseDirectory.clear();
+    m_DatabaseDirectory.append(m_PluginDirectory);
+    m_DatabaseDirectory.append(databaseDirectory);
+    m_Controls.internalDataWidget->SetDatabaseDirectory(m_DatabaseDirectory);
 }
 
 void QmitkDicomEditor::SetListenerDirectory(const QString& listenerDirectory)
 {
-    m_ListenerDirectory->clear();
-    m_ListenerDirectory->append(m_PluginDirectory);
-    m_ListenerDirectory->append(listenerDirectory);
+    m_ListenerDirectory.clear();
+    m_ListenerDirectory.append(m_PluginDirectory);
+    m_ListenerDirectory.append(listenerDirectory);
 }

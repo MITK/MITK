@@ -56,15 +56,11 @@ class DICOM_EXPORT QmitkDicomEditor : public berry::QtEditorPart, virtual public
 
 public:
 
-    berryObjectMacro(QmitkDicomEditor);
+    berryObjectMacro(QmitkDicomEditor)
     static const std::string EDITOR_ID;
 
     QmitkDicomEditor();
-    QmitkDicomEditor(const QmitkDicomEditor& other)
-    {
-        Q_UNUSED(other)
-            throw std::runtime_error("Copy constructor not implemented");
-    }
+
     virtual ~QmitkDicomEditor();
 
     void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
@@ -130,9 +126,9 @@ protected:
     QmitkStoreSCPLauncher* m_StoreSCPLauncher;
     DicomEventHandler* m_Handler;
     QmitkDicomDataEventPublisher* m_Publisher;
-    QString* m_PluginDirectory;
-    QString* m_ListenerDirectory;
-    QString* m_DatabaseDirectory;
+    QString m_PluginDirectory;
+    QString m_ListenerDirectory;
+    QString m_DatabaseDirectory;
 
 };
 

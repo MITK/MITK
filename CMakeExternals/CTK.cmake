@@ -15,10 +15,10 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
     
-    SET(revision_tag 2b5ab7c42c0e180c21922cf09c5ccd465477cca8)
-    IF(${proj}_REVISION_TAG)
-      SET(revision_tag ${${proj}_REVISION_TAG})
-    ENDIF()
+    set(revision_tag 2b5ab7c4)
+    #IF(${proj}_REVISION_TAG)
+    #  SET(revision_tag ${${proj}_REVISION_TAG})
+    #ENDIF()
     
     set(ctk_optional_cache_args )
     if(MITK_USE_Python)
@@ -45,13 +45,11 @@ if(MITK_USE_CTK)
     ENDFOREACH()
 
     ExternalProject_Add(${proj}
-      GIT_REPOSITORY http://github.com/Miluba154/CTK.git
-      GIT_TAG ${revision_tag}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 e214b632dc876592923d5d8ca77296d5
+      URL_MD5 2352b3078d045387232ac148c63b1c3a
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

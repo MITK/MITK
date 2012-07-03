@@ -69,7 +69,10 @@ namespace itk{
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
     itkSetMacro( SeedsPerVoxel, int)
     itkSetMacro( FaThreshold, float)
+    itkSetMacro( AngularThreshold, float)
     itkSetMacro( StepSize, float)
+    itkSetMacro( F, float )
+    itkSetMacro( G, float )
 
   protected:
     StreamlineTrackingFilter();
@@ -87,9 +90,12 @@ namespace itk{
     vtkSmartPointer<vtkPoints> m_Points;
     vtkSmartPointer<vtkCellArray> m_Cells;
     float m_FaThreshold;
+    float m_AngularThreshold;
     float m_StepSize;
     int m_MaxLength;
     int m_SeedsPerVoxel;
+    float m_F;
+    float m_G;
     std::vector< int > m_ImageSize;
     std::vector< float > m_ImageSpacing;
     ItkUcharImgType::Pointer m_MaskImage;

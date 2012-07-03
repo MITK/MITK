@@ -40,7 +40,10 @@ TPDPixelType>
     m_FaThreshold(0.2),
     m_StepSize(1),
     m_MaxLength(10000),
-    m_SeedsPerVoxel(1)
+    m_SeedsPerVoxel(1),
+    m_AngularThreshold(0.7),
+    m_F(1.0),
+    m_G(0.0)
 {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
@@ -188,7 +191,6 @@ TPDPixelType>
                 if(tensor.GetTrace()!=0 && tensor.GetFractionalAnisotropy()>m_FaThreshold)
                 {
                     tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
-
                     vnl_vector_fixed<double,3> dir;
                     dir[0] = eigenvectors(2, 0);
                     dir[1] = eigenvectors(2, 1);
@@ -197,13 +199,19 @@ TPDPixelType>
 
                     if (!dirOld.is_zero())
                     {
+                        dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
+                        dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
+                        dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
+                        dir.normalize();
+
                         float angle = dot_product(dirOld, dir);
                         if (angle<0)
                             dir *= -1;
                         angle = fabs(dot_product(dirOld, dir));
-                        if (angle<0.7)
+                        if (angle<m_AngularThreshold)
                             break;
                     }
+
                     dirOld = dir;
 
                     dir *= m_StepSize;

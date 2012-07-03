@@ -34,28 +34,27 @@ namespace mitk {
   */  
   class MitkIGT_EXPORT NavigationToolStorageSerializer : public itk::Object
   {
-
   public:
     mitkClassMacro(NavigationToolStorageSerializer,itk::Object);
     itkNewMacro(Self);
 
     /**
-     * @brief  Saves a mitk navigation tool storage to a file. 
+     * @brief  Saves a mitk navigation tool storage to a file.
      * @return Returns true if the file was saved successfully. False if not.
+     * @throws Throws mitk::IGTException if zip-file cannot be opened for writing
      */
     bool Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage);
     
     itkGetMacro(ErrorMessage,std::string);
-
   protected:
     NavigationToolStorageSerializer();
     ~NavigationToolStorageSerializer();
 
-    std::string m_ErrorMessage;
+   std::string m_ErrorMessage;
 
-    std::string convertIntToString(int i);
+   std::string convertIntToString(int i);
 
-    std::string m_tempDirectory;
+   std::string m_tempDirectory;
 
   };
 } // namespace mitk

@@ -174,10 +174,23 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
         else if(isSequentialMode)
         {
           m_SequentialPlayer = mitk::NavigationDataSequentialPlayer::New();
+          try
+          {
           m_SequentialPlayer->SetFileName(m_CmpFilename.toStdString());
-          
+          }
+          catch(mitk::IGTException)
+          {
+           std::string errormessage = "Error during start playing. Invalid or wrong file type?";
+           QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+           m_Controls->playPushButton->setChecked(false);
+           m_RealTimePlayer = NULL;
+           return;
+          }
+
           m_Controls->samplePositionHorizontalSlider->setMinimum(0);
+
           m_Controls->samplePositionHorizontalSlider->setMaximum(m_SequentialPlayer->GetNumberOfSnapshots());
+
           m_Controls->samplePositionHorizontalSlider->setEnabled(true);
         }
 

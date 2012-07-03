@@ -37,7 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // vtk
 #include <vtkSphereSource.h>
-
+//for exceptions
+#include <mitkIGTException.h>
+#include <mitkIGTIOException.h>
 
 
 
@@ -79,7 +81,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
     connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
-	connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
+      connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
     connect( m_Controls->m_ShowTrackingVolume, SIGNAL(clicked()), this, SLOT(OnShowTrackingVolumeChanged()));
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
     connect( m_Controls->m_ResetTools, SIGNAL(clicked()), this, SLOT(OnResetTools()));
@@ -108,11 +110,11 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_StopLogging->setEnabled(false);
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
 
-	  //Update List of available models for selected tool.
+      //Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
     m_Controls->m_VolumeSelectionBox->clear();
     for(int i = 0; i < Compatibles.size(); i++)
-	  {
+      {
       m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
     }
   }
@@ -139,8 +141,18 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   //read tool storage from disk
   std::string errorMessage = "";
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(GetDataStorage());
+  // try-catch block for exceptions
+  try
+  {
   m_toolStorage = myDeserializer->Deserialize(filename.toStdString());
-  
+  }
+  catch(mitk::IGTException)
+  {
+   std::string errormessage = "Error during deserializing. Problems with file,please check the file?";
+   QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+   return;
+  }
+
   if(m_toolStorage->isEmpty())
     {
     errorMessage = myDeserializer->GetErrorMessage();
@@ -295,17 +307,17 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 
 void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
 {
-	if (qstr.isNull()) return;
-	if (qstr.isEmpty()) return;
+    if (qstr.isNull()) return;
+    if (qstr.isEmpty()) return;
   if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 
-	  std::string str = qstr.toStdString();
+      std::string str = qstr.toStdString();
 
-	  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+      mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
 
-	  volumeGenerator->SetTrackingDeviceData(data);
+      volumeGenerator->SetTrackingDeviceData(data);
     volumeGenerator->Update();
 
     mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
@@ -388,10 +400,20 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
         //ask the user for a filename
         QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"),"",tr("*.*"));
         mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-        if (!mySerializer->Serialize(fileName.toStdString(),m_toolStorage)) MessageBox(mySerializer->GetErrorMessage());
+
+        //when Serialize method is used exceptions are thrown, need to be adapted
+        //try-catch block for exception handling in Serializer
+        try
+        {
+        mySerializer->Serialize(fileName.toStdString(),m_toolStorage);
+        }
+        catch(mitk::IGTException)
+        {
+        std::string errormessage = "Error during serialization. Please check the Zip file.";
+        QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());}
         return;
         }
-      else if (ret == 65536) //no
+        else if (ret == 65536) //no
         {
         return;
         }
@@ -429,6 +451,7 @@ void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
   this->m_Controls->m_LoggingFileName->setText(filename);
   }
 
+
 void QmitkMITKIGTTrackingToolboxView::StartLogging()
   {
   if (!m_logging)
@@ -438,14 +461,34 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
     m_loggingFilter->SetRecordingMode(mitk::NavigationDataRecorder::NormalFile);
     if (m_Controls->m_xmlFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::xml);
     else if (m_Controls->m_csvFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::csv);
-    m_loggingFilter->SetFileName(m_Controls->m_LoggingFileName->text().toStdString().c_str());
+    std::string filename = m_Controls->m_LoggingFileName->text().toStdString().c_str();
+    // this part has been changed in order to prevent crash of the  program
+    if(!filename.empty())
+    m_loggingFilter->SetFileName(filename);
+    else if(filename.empty()){
+     std::string errormessage = "File name has not been set, please set the file name";
+     mitkThrowException(mitk::IGTIOException)<<errormessage;
+     QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+     m_loggingFilter->SetFileName(filename);
+    }
+
     if (m_Controls->m_LoggingLimit->isChecked()){m_loggingFilter->SetRecordCountLimit(m_Controls->m_LoggedFramesLimit->value());}
 
     //connect filter
     for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfOutputs(); i++){m_loggingFilter->AddNavigationData(m_ToolVisualizationFilter->GetOutput(i));}
 
-    //start filter
+    //start filter with try-catch block for exceptions
+    try
+    {
     m_loggingFilter->StartRecording();
+    }
+    catch(mitk::IGTException)
+    {
+    std::string errormessage = "Error during start recording. Recorder already started recording?";
+    QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+    m_loggingFilter->StopRecording();
+    return;
+    }
 
     //update labels / logging variables
     this->m_Controls->m_LoggingLabel->setText("Logging ON");
@@ -453,8 +496,10 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
     m_loggedFrames = 0;
     m_logging = true;
     DisableLoggingButtons();
-    }
   }
+  }
+
+
 
 void QmitkMITKIGTTrackingToolboxView::StopLogging()
   {

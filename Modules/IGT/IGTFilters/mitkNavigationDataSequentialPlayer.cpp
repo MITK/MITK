@@ -23,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <sstream>
 
+//Exceptions
+#include "mitkIGTException.h"
+#include "mitkIGTIOException.h"
+
 mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer() 
   : mitk::NavigationDataPlayerBase()
   , m_Doc(new TiXmlDocument)
@@ -45,7 +49,11 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
   m_DataElem = m_Doc->FirstChildElement("Data");
   int toolcount;
   if(!m_DataElem)
+  {
+    //throwing an exception
+    mitkThrowException(mitk::IGTException) << "Data element not found";
     MITK_WARN << "Data element not found";
+  }
   else
   {
     m_DataElem->QueryIntAttribute("ToolCount", &toolcount);
@@ -97,6 +105,11 @@ void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
   {
     if(!m_Repeat)
     {
+      //throwing an exception
+      mitkThrowException(mitk::IGTException)<<"cannot go back to snapshot " << i << " because the "
+          << this->GetNameOfClass() << " is configured to not repeat the"
+          << " navigation data";
+
       MITK_WARN << "cannot go back to snapshot " << i << " because the "
           << this->GetNameOfClass() << " is configured to not repeat the"
           << " navigation data";
@@ -118,13 +131,17 @@ void mitk::NavigationDataSequentialPlayer::
     SetFileName(const std::string& _FileName)
 {
   m_FileName = _FileName;
+  // if Loading wasnt succesfull
+  // (!m_Doc->LoadFile(m_FileName)=false) wherase (m_Doc->LoadFile(m_FileName)=true)
 
   if(!m_Doc->LoadFile(m_FileName))
   {
     this->SetNumberOfOutputs(0);
     std::ostringstream s;
     s << "File " << _FileName << " could not be loaded";
-    throw std::invalid_argument(s.str());
+    //may be we need to change to mitk::exception
+    mitkThrowException(mitk::IGTIOException)<<s.str();
+    //throw std::invalid_argument(s.str());
   }
   else
     this->ReinitXML();
@@ -132,13 +149,21 @@ void mitk::NavigationDataSequentialPlayer::
   this->Modified();
 }
 
+//NEW PART is ADDED
 void mitk::NavigationDataSequentialPlayer::
     SetXMLString(const std::string& _XMLString)
 {
   m_XMLString = _XMLString;
-
-  m_Doc->Parse( m_XMLString.c_str() );
+  if((m_Doc->Parse( m_XMLString.c_str()))== NULL)
+  {
   this->ReinitXML();
+  } else 
+  {
+    //if the string is not an XML string
+   std::ostringstream s;
+   s << "String" << _XMLString << " is not an XML string";
+   mitkThrowException(mitk::IGTIOException)<<s.str();
+  } 
 
   this->Modified();
 }
@@ -146,8 +171,7 @@ void mitk::NavigationDataSequentialPlayer::
 void mitk::NavigationDataSequentialPlayer::GenerateData()
 {
   assert(m_DataElem);
-
-  // very important: go through the tools (there could be more then one)
+  // very important: go through the tools (there could be more than one)
   mitk::NavigationData::Pointer tmp;
   //MITK_INFO << "this->GetNumberOfOutputs()" << this->GetNumberOfOutputs();
   for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
@@ -176,7 +200,9 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
       {
       output->SetDataValid(false);
       m_StreamValid = false;
-      m_ErrorMessage = "Error: Cannot parse input file.";
+      //throwing exception 
+      mitkThrowException(mitk::IGTException)<<"Error: Cannot parse input file.";
+      //m_ErrorMessage = "Error: Cannot parse input file.";
       }
   }
 }
@@ -197,3 +223,6 @@ void mitk::NavigationDataSequentialPlayer::UpdateOutputInformation()
   this->Modified();  // make sure that we need to be updated
   Superclass::UpdateOutputInformation();
 }
+
+
+

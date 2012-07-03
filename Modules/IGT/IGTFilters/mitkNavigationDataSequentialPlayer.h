@@ -41,16 +41,18 @@ namespace mitk
 
     /**
     * \brief sets the file name and path (if XMLString is set, this is neglected)
+    * @throws  Throws an exception if the given file cannot be loaded
     */
     void SetFileName(const std::string& _FileName);
 
     /**
-    * \brief returns the file name and path
+    * \brief returns the file name and path 
     */
     itkGetStringMacro(FileName);
 
     /**
     * \brief sets a xml string (by this, the xml string is not read from file)
+    * @throws  Throws an mitk::IGT excepton if the string to set is not an XMLString
     */
     void SetXMLString(const std::string& _XMLString);
 
@@ -78,6 +80,7 @@ namespace mitk
     /// 17 then you can call GoToSnapshot(17). index begins at 1!
     /// you can then also go back to snapshot 1 with GoToSnapshot(1)
     ///
+    //@throws  Throws an exception if cannot go back to particular snapshot
     void GoToSnapshot(int i);
 
     /**
@@ -89,11 +92,15 @@ namespace mitk
   protected:
     NavigationDataSequentialPlayer();
     virtual ~NavigationDataSequentialPlayer();
+    //@throws Throws an exception if data element is not found
     void ReinitXML();
     mitk::NavigationData::Pointer ReadVersion1();
     ///
     /// do the work here
     ///
+    /*
+    *@throws  Throws an exception if cannot parse input file
+    */
     virtual void GenerateData();
 
     std::string m_FileName;

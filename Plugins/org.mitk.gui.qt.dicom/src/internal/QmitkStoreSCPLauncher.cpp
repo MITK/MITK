@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QDir>
 #include <QMessageBox>
 #include <QProcessEnvironment>
-#include <mitklogmacros.h>
+#include <mitkLogMacros.h>
 //#include <QStringListIterator>
 
 QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder) 

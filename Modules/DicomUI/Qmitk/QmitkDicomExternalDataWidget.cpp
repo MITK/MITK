@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Qmitk
 #include "QmitkDicomExternalDataWidget.h"
-#include <mitklogmacros.h>
+#include <mitkLogMacros.h>
 
 // Qt
 #include <QCheckBox>

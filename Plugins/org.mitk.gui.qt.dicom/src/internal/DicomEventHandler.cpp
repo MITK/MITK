@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "DicomEventHandler.h"
 #include <service/event/ctkEventConstants.h>
 #include <ctkDictionary.h>
-#include <mitklogmacros.h>
+#include <mitkLogMacros.h>
 #include <mitkDicomSeriesReader.h>
 #include <mitkDataNode.h>
 #include <QmitkBaseFunctionalityComponent.h>

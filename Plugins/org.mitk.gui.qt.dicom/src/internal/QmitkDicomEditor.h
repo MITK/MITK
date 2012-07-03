@@ -36,9 +36,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMap>
 #include <QVariant>
 #include <QStringList>
-#include <QThread.h>
+#include <QThread>
 #include <QProcess>
-#include <QstringList>
+#include <QStringList>
 #include <org_mitk_gui_qt_dicom_Export.h>
 /*!
 \brief QmitkDicomEditor
@@ -118,7 +118,7 @@ protected:
 
     void CreateQtPartControl(QWidget *parent);
 
-    void QmitkDicomEditor::SetPluginDirectory();
+    void SetPluginDirectory();
 
     Events::Types GetPartEventTypes() const;
 

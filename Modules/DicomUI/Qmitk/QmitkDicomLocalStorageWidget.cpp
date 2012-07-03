@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Qmitk
 #include "QmitkDicomLocalStorageWidget.h"
-#include <mitklogmacros.h>
+#include <mitkLogMacros.h>
 #include <mitkProgressBar.h>
 // Qt
 #include <QMessageBox>

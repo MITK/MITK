@@ -223,8 +223,8 @@ BlueBerry/Bundles/org.blueberry.ui/src/internal/intro/berryEditorIntroAdapterPar
 BlueBerry/Bundles/org.blueberry.ui/src/internal/intro/berryEditorIntroAdapterPart.h[36m:[mclass EditorIntroAdapterPart: public [1;31mEditorPart[m
 BlueBerry/Bundles/org.blueberry.ui/src/tweaklets/berryWorkbenchPageTweaklet.h[36m:[m  virtual I[1;31mEditorPart[m::Pointer CreateError[1;31mEditorPart[m(const std::string& partName, const std::string& msg) = 0;
 Build/Tools/StateMachineEditor/src/stateMachines/StateMachinesEditor.java[36m:[mimport org.eclipse.ui.I[1;31mEditorPart[m;
-Build/Tools/StateMachineEditor/src/stateMachines/StateMachinesEditor.java[36m:[m		firePropertyChange(I[1;31mEditorPart[m.PROP_DIRTY);
-Build/Tools/StateMachineEditor/src/stateMachines/StateMachinesEditor.java[36m:[m	 * @see org.eclipse.ui.part.[1;31mEditorPart[m#setInput(org.eclipse.ui.IEditorInput)
+Build/Tools/StateMachineEditor/src/stateMachines/StateMachinesEditor.java[36m:[m    firePropertyChange(I[1;31mEditorPart[m.PROP_DIRTY);
+Build/Tools/StateMachineEditor/src/stateMachines/StateMachinesEditor.java[36m:[m   * @see org.eclipse.ui.part.[1;31mEditorPart[m#setInput(org.eclipse.ui.IEditorInput)
 CoreUI/Bundles/org.mitk.gui.qt.common/src/QmitkCloseProjectAction.cpp[36m:[m#include <berryI[1;31mEditorPart[m.h>
 CoreUI/Bundles/org.mitk.gui.qt.common/src/QmitkCloseProjectAction.cpp[36m:[m    berry::I[1;31mEditorPart[m::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
 CoreUI/Bundles/org.mitk.gui.qt.common/src/QmitkFileExitAction.cpp[36m:[m#include <berryI[1;31mEditorPart[m.h>

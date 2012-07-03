@@ -41,6 +41,8 @@ void mitk::NavigationDataPlayerBase::UpdateOutputInformation()
 
 mitk::NavigationData::Pointer mitk::NavigationDataPlayerBase::ReadNavigationData(TiXmlElement* elem)
 {
+  if (elem == NULL) {mitkThrow() << "Error: Element is NULL!";}
+
   mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
 
   mitk::NavigationData::PositionType position;
@@ -54,7 +56,6 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayerBase::ReadNavigationData
 
   position.Fill(0.0);
   matrix.SetIdentity();
-
 
   elem->QueryDoubleAttribute("Time",&timestamp);
   if (timestamp == -1)

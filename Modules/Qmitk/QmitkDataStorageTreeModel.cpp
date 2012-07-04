@@ -543,16 +543,24 @@ void QmitkDataStorageTreeModel::SetNodeModified( const mitk::DataNode* node )
 {
   TreeItem* treeItem = m_Root->Find(node);
   if(!treeItem)
-    return;
+  {
+    // check if the node still fits the predicates
+    if( m_Predicate->CheckNode( node ) )
+    {
+      this->UpdateNodeVisibility();
+    }
+  }
+  else
+  {
+    TreeItem* parentTreeItem = treeItem->GetParent();
+    // as the root node should not be removed one should always have a parent item
+    if(!parentTreeItem)
+      return;
+    QModelIndex index = this->createIndex(treeItem->GetIndex(), 0, treeItem);
 
-  TreeItem* parentTreeItem = treeItem->GetParent();
-  // as the root node should not be removed one should always have a parent item
-  if(!parentTreeItem)
-    return;
-  QModelIndex index = this->createIndex(treeItem->GetIndex(), 0, treeItem);
-
-  // now emit the dataChanged signal
-  emit dataChanged(index, index);
+    // now emit the dataChanged signal
+    emit dataChanged(index, index);
+  }
 }
 
 mitk::DataNode* QmitkDataStorageTreeModel::GetParentNode( const mitk::DataNode* node ) const

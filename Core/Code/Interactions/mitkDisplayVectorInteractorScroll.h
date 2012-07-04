@@ -110,7 +110,7 @@ namespace mitk {
 
     bool m_InvertScrollingDirection;
 
-    bool m_IsAltModifierActive;
+    bool m_IsModifierActive;
 
   };
 

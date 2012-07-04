@@ -171,20 +171,17 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if ( openGLrenderer )
     {
-      if ( m_IsSelected || m_IsHovering )
-      {
-        openGLrenderer->WriteSimpleText( name,
-          firstPoint[0] + 6.0, firstPoint[1] + 4.0,
-          0,
-          0,
-          0); //this is a shadow 
-        openGLrenderer->WriteSimpleText( name,
-          firstPoint[0] + 5.0, firstPoint[1] + 5.0,
-          m_LineColor[lineDisplayMode][0],
-          m_LineColor[lineDisplayMode][1],
-          m_LineColor[lineDisplayMode][2] );
-      }
-
+      openGLrenderer->WriteSimpleText( name,
+        firstPoint[0] + 6.0, firstPoint[1] + 4.0,
+        0,
+        0,
+        0); //this is a shadow 
+      openGLrenderer->WriteSimpleText( name,
+        firstPoint[0] + 5.0, firstPoint[1] + 5.0,
+        m_LineColor[lineDisplayMode][0],
+        m_LineColor[lineDisplayMode][1],
+        m_LineColor[lineDisplayMode][2] );
+    
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;
     }
@@ -204,7 +201,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       {
         if ( ! firstActiveFeature ) 
         {
-          quantityString << " / ";
+          quantityString << " x ";
         }
         quantityString << planarFigure->GetQuantity( i ) << " ";
         quantityString << planarFigure->GetFeatureUnit( i );

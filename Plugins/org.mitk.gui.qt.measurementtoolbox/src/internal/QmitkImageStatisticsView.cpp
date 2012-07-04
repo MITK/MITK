@@ -303,7 +303,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
   }
 
   unsigned int timeStep = renderPart->GetTimeNavigationController()->GetTime()->GetPos();
-
+  
   if ( m_SelectedImage != NULL && m_SelectedImage->IsInitialized())
   {
     // Check if a the selected image is a multi-channel image. If yes, statistics
@@ -330,13 +330,17 @@ void QmitkImageStatisticsView::UpdateStatistics()
       maskLabel << "  [" << maskDimension << "D " << maskType << "]";
     }
     m_Controls->m_SelectedMaskLabel->setText( maskLabel.str().c_str() );
+    
+    // check time step validity
+    if(m_SelectedImage->GetDimension() <= 3 && timeStep > m_SelectedImage->GetDimension(3)-1)
+    {
+      timeStep = m_SelectedImage->GetDimension(3)-1;
+    }
 
     //// initialize thread and trigger it
-    //this-> m_QThreadMutex->lock();
     this->m_CalculationThread->SetIgnoreZeroValueVoxel( m_Controls->m_IgnoreZerosCheckbox->isChecked() );
     this->m_CalculationThread->Initialize( m_SelectedImage, m_SelectedImageMask, m_SelectedPlanarFigure );
     this->m_CalculationThread->SetTimeStep( timeStep );
-    //this-> m_QThreadMutex->unlock();
     std::stringstream message;
     message << "<font color='red'>Calculating statistics...</font>";
     m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
@@ -401,7 +405,14 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
 
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
-  if ( this->m_CalculationThread->GetStatisticsUpdateSuccessFlag() && !m_DataNodeSelectionChanged )
+  if(m_DataNodeSelectionChanged)
+  {
+    this->m_StatisticsUpdatePending = false;
+    this->RequestStatisticsUpdate();
+    return;    // stop visualization of results and calculate statistics of new selection
+  }
+
+  if ( this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
   {
     if ( this->m_CalculationThread->GetStatisticsChangedFlag() )
     {

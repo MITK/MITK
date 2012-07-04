@@ -144,7 +144,7 @@ void QmitkImageStatisticsCalculationThread::run()
 
   if(statisticCalculationSuccessful)
   {
-    this->m_StatisticsStruct = calculator->GetStatistics();  
+    this->m_StatisticsStruct = calculator->GetStatistics(m_TimeStep);  
 
     if(this->m_TimeStepHistogram.IsNotNull())
     {

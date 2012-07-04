@@ -284,6 +284,9 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
       m_SelectedImageMask = dynamic_cast< mitk::Image * >( nodes[ index ]->GetData() );
       m_SelectedPlanarFigure = dynamic_cast< mitk::PlanarFigure * >( nodes[ index ]->GetData() );
 
+      bool isPositionMarker (false);
+      nodes[index]->GetBoolProperty("isContourMarker", isPositionMarker);
+
       if ( m_SelectedImageMask != NULL )
       {
         bool isMask( false );
@@ -301,7 +304,7 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
           }
         }
       }
-      else if ( m_SelectedPlanarFigure != NULL )
+      else if ( m_SelectedPlanarFigure != NULL && !isPositionMarker)
       {
         numberPlanarFigures++;
         if ( numberImages != 0 ) // image should be last element

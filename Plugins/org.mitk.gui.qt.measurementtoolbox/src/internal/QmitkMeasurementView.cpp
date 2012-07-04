@@ -215,7 +215,9 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
 {
   // add observer for selection in renderwindow
   mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
-  if( figure )
+  bool isPositionMarker (false);
+  node->GetBoolProperty("isContourMarker", isPositionMarker);
+  if( figure && !isPositionMarker )
   {
     MEASUREMENT_DEBUG << "figure added. will add interactor if needed.";
     mitk::PlanarFigureInteractor::Pointer figureInteractor

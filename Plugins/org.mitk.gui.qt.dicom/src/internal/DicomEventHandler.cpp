@@ -50,7 +50,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
     mitk::DicomSeriesReader::StringContainer seriesToLoad;
     std::size_t found;
 
-    mitk::DicomSeriesReader::UidFileNamesMap dicomSeriesMap = mitk::DicomSeriesReader::GetSeries(path.toStdString());
+    mitk::DicomSeriesReader::UidFileNamesMap dicomSeriesMap = mitk::DicomSeriesReader::GetSeries(path.toStdString(),false);
     mitk::DicomSeriesReader::UidFileNamesMap::const_iterator qualifiedSeriesInstanceUIDIterator;
 
     for(qualifiedSeriesInstanceUIDIterator = dicomSeriesMap.begin();

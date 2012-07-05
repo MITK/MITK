@@ -363,6 +363,11 @@ float EnergyComputer::mexp(float x)
     //  return exp(-x);
 }
 
+int EnergyComputer::GetNumActiveVoxels()
+{
+    return m_NumActiveVoxels;
+}
+
 //ComputeFiberCorrelation()
 //{
 //    float bD = 15;

@@ -120,7 +120,7 @@ protected slots:
 private:
 
   // Visualization & GUI
-  void GenerateFiberBundle(bool smoothFibers);
+  void GenerateFiberBundle();
   void UpdateGUI();
   void UpdateTrackingStatus();
 

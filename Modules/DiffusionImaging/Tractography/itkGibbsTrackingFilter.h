@@ -97,7 +97,7 @@ protected:
 
     GibbsTrackingFilter();
     virtual ~GibbsTrackingFilter();
-    bool EstimateParticleWeight();
+    void EstimateParticleWeight();
     void PrepareMaskImage();
     bool LoadParameters(std::string filename);
 

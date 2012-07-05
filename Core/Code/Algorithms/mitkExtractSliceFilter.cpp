@@ -324,7 +324,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
   /*========== BEGIN setup extent of the slice ==========*/
   int xMin, xMax, yMin, yMax;
 
+  bool successfullyClipped = false;
   vtkFloatingPointType sliceBounds[6];
+
   if(m_WorldGeometry->GetReferenceGeometry()){
 
 
@@ -332,18 +334,20 @@ void mitk::ExtractSliceFilter::GenerateData(){
     {
       sliceBounds[i] = 0.0;
     }
-    this->GetClippedPlaneBounds( m_WorldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
-
+    successfullyClipped = this->GetClippedPlaneBounds( m_WorldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds );
+  }
+  if (m_WorldGeometry->GetReferenceGeometry() && successfullyClipped)
+  {
     // Calculate output extent (integer values)
     xMin = static_cast< int >( sliceBounds[0] / m_OutPutSpacing[0] + 0.5 );
     xMax = static_cast< int >( sliceBounds[1] / m_OutPutSpacing[0] + 0.5 );
     yMin = static_cast< int >( sliceBounds[2] / m_OutPutSpacing[1] + 0.5 );
     yMax = static_cast< int >( sliceBounds[3] / m_OutPutSpacing[1] + 0.5 );
-
-  }else
+  }
+  else
   {
-    // If no reference geometry is available, we also don't know about the
-    // maximum plane size;
+    // If no reference geometry is available, or we couldn't clip
+    // we also don't know about the maximum plane size;
     xMin = yMin = 0;
     xMax = static_cast< int >( extent[0]);
     yMax = static_cast< int >( extent[1]);

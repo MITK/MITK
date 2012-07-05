@@ -468,7 +468,7 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
 
   typename ImageType::SizeType largerSize = resampler->GetSize(); // now the resampler already holds the input image's size.
-  largerSize[1] += tiltInfo.GetTiltCorrectedAdditionalSize();
+  largerSize[1] += static_cast<typename ImageType::SizeType::SizeValueType>(tiltInfo.GetTiltCorrectedAdditionalSize());
   resampler->SetSize( largerSize );
 
   resampler->Update();

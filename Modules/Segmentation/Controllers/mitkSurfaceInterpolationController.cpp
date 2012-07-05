@@ -235,10 +235,11 @@ mitk::Image* mitk::SurfaceInterpolationController::GetImage()
   return m_InterpolateSurfaceFilter->GetOutput();
 }
 
-float mitk::SurfaceInterpolationController::EstimatePortionOfNeededMemory()
+double mitk::SurfaceInterpolationController::EstimatePortionOfNeededMemory()
 {
-  float sizeOfPoints = pow(m_ReduceFilter->GetNumberOfPointsAfterReduction()*3,2)*sizeof(double);
-  float totalMem = mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
-  float percentage = sizeOfPoints/totalMem;
+  double numberOfPointsAfterReduction = m_ReduceFilter->GetNumberOfPointsAfterReduction()*3;
+  double sizeOfPoints = pow(numberOfPointsAfterReduction,2)*sizeof(double);
+  double totalMem = mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
+  double percentage = sizeOfPoints/totalMem;
   return percentage;
 }

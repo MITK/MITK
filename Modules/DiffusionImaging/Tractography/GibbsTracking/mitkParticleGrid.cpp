@@ -56,6 +56,32 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength)
 
 ParticleGrid::~ParticleGrid()
 {
+
+}
+
+// remove all particles
+void ParticleGrid::ResetGrid()
+{
+    // initialize counters
+    m_NumParticles = 0;
+    m_NumConnections = 0;
+    m_NumCellOverflows = 0;
+    m_Particles.clear();
+    m_Grid.clear();
+    m_OccupationCount.clear();
+    m_NeighbourTracker.cellidx.clear();
+    m_NeighbourTracker.cellidx_c.clear();
+
+    int numCells = m_GridSize[0]*m_GridSize[1]*m_GridSize[2];   // number of grid cells
+
+    m_Particles.resize(m_ContainerCapacity);        // allocate and initialize particles
+    m_Grid.resize(numCells*m_CellCapacity, NULL);   // allocate and initialize particle grid
+    m_OccupationCount.resize(numCells, 0);          // allocate and initialize occupation counter array
+    m_NeighbourTracker.cellidx.resize(8, 0);        // allocate and initialize neighbour tracker
+    m_NeighbourTracker.cellidx_c.resize(8, 0);
+
+    for (int i = 0;i < m_ContainerCapacity;i++)     // initialize particle IDs
+        m_Particles[i].ID = i;
 }
 
 bool ParticleGrid::ReallocateGrid()

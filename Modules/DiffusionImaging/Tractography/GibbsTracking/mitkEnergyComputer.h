@@ -49,6 +49,8 @@ public:
     float ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2);
     float ComputeInternalEnergy(Particle *dp);
 
+    int GetNumActiveVoxels();
+
 protected:
 
     vnl_matrix_fixed<float, 3, 3>   m_RotationMatrix;

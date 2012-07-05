@@ -85,62 +85,66 @@ typename GibbsTrackingFilter< ItkQBallImageType >::FiberPolyDataType GibbsTracki
 }
 
 template< class ItkQBallImageType >
-bool
+void
 GibbsTrackingFilter< ItkQBallImageType >
 ::EstimateParticleWeight()
 {
     MITK_INFO << "GibbsTrackingFilter: estimating particle weight";
-    typedef itk::DiffusionQballGeneralizedFaImageFilter<float,float,QBALL_ODFSIZE> GfaFilterType;
-    GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
-    gfaFilter->SetInput(m_QBallImage);
-    gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
-    gfaFilter->Update();
-    ItkFloatImageType::Pointer gfaImage = gfaFilter->GetOutput();
 
-    float samplingStart = 1.0;
-    float samplingStop = 0.66;
-
-    // GFA iterator
-    typedef ImageRegionIterator< ItkFloatImageType > GfaIteratorType;
-    GfaIteratorType gfaIt(gfaImage, gfaImage->GetLargestPossibleRegion() );
-
-    // Mask iterator
-    typedef ImageRegionConstIterator< ItkFloatImageType > MaskIteratorType;
-    MaskIteratorType mit(m_MaskImage, m_MaskImage->GetLargestPossibleRegion() );
-
-    // Input iterator
-    typedef ImageRegionConstIterator< ItkQBallImageType > InputIteratorType;
-    InputIteratorType it(m_QBallImage, m_QBallImage->GetLargestPossibleRegion() );
-
-    float upper = 0;
-    int count = 0;
-    for(float thr=samplingStart; thr>samplingStop; thr-=0.01)
-    {
-        it.GoToBegin();
-        mit.GoToBegin();
-        gfaIt.GoToBegin();
-
-        while( !gfaIt.IsAtEnd() )
-        {
-            if(gfaIt.Get()>thr && mit.Get()>0)
-            {
-                itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> odf(it.Get().GetDataPointer());
-                upper += odf.GetMaxValue()-odf.GetMeanValue();
-                ++count;
-            }
-            ++it;
-            ++mit;
-            ++gfaIt;
-        }
-    }
-
-    if (count>0)
-        upper /= count;
+    float minSpacing;
+    if(m_QBallImage->GetSpacing()[0]<m_QBallImage->GetSpacing()[1] && m_QBallImage->GetSpacing()[0]<m_QBallImage->GetSpacing()[2])
+        minSpacing = m_QBallImage->GetSpacing()[0];
+    else if (m_QBallImage->GetSpacing()[1] < m_QBallImage->GetSpacing()[2])
+        minSpacing = m_QBallImage->GetSpacing()[1];
     else
-        return false;
+        minSpacing = m_QBallImage->GetSpacing()[2];
+    float m_ParticleLength = 1.5*minSpacing;
+    float m_ParticleWidth = 0.5*minSpacing;
 
-    m_ParticleWeight = upper/6;
-    return true;
+    // seed random generators
+    Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
+    if (m_RandomSeed>-1)
+        randGen->SetSeed(m_RandomSeed);
+    else
+        randGen->SetSeed();
+
+    // instantiate all necessary components
+    SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
+    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
+    EnergyComputer* encomp = new EnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
+    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, encomp, randGen, m_CurvatureThreshold);
+
+    float alpha = log(m_EndTemperature/m_StartTemperature);
+    m_ParticleWeight = 0.01;
+    int ppv = 0;
+    // main loop
+    int neededParts = 3000;
+    while (ppv<neededParts)
+    {
+        if (ppv<1000)
+            m_ParticleWeight /= 2;
+        else
+            m_ParticleWeight = ppv*m_ParticleWeight/neededParts;
+
+        encomp->SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
+        for( int step = 0; step < 10; step++ )
+        {
+            // update temperatur for simulated annealing process
+            float temperature = m_StartTemperature * exp(alpha*(((1.0)*step)/((1.0)*10)));
+            sampler->SetTemperature(temperature);
+
+            for (unsigned long i=0; i<10000; i++)
+                sampler->MakeProposal();
+        }
+        ppv = particleGrid->m_NumParticles;
+        particleGrid->ResetGrid();
+    }
+    delete sampler;
+    delete encomp;
+    delete particleGrid;
+    delete interpolator;
+
+    MITK_INFO << "GibbsTrackingFilter: finished estimating particle weight";
 }
 
 // perform global tracking
@@ -196,12 +200,10 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         m_ParticleLength = 1.5*minSpacing;
     if(m_ParticleWidth == 0)
         m_ParticleWidth = 0.5*minSpacing;
+
     if(m_ParticleWeight == 0)
-        if (!EstimateParticleWeight())
-        {
-            MITK_INFO << "GibbsTrackingFilter: could not estimate particle weight. using default value.";
-            m_ParticleWeight = 0.0001;
-        }
+        EstimateParticleWeight();
+
     float alpha = log(m_EndTemperature/m_StartTemperature);
     m_Steps = m_Iterations/10000;
     if (m_Steps<10)

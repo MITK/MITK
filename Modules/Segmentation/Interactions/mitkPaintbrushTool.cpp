@@ -290,7 +290,7 @@ bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent*
     //When mouse is released write segmentationresult back into image
     const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if (!positionEvent) return false;
-    this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
+    this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 
   return true;
 }

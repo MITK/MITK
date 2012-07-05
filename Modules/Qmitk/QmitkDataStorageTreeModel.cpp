@@ -101,11 +101,18 @@ int QmitkDataStorageTreeModel::rowCount(const QModelIndex &parent) const
 
 Qt::ItemFlags QmitkDataStorageTreeModel::flags( const QModelIndex& index ) const
 {
+  mitk::DataNode* dataNode = this->TreeItemFromIndex(index)->GetDataNode();
   if (index.isValid())
+  {
+    if(DicomPropertiesExists(*dataNode))
+    {
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    }
     return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable
-      | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
-  else
+        | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+  }else{
     return Qt::ItemIsDropEnabled;
+  }
 }
 
 int QmitkDataStorageTreeModel::columnCount( const QModelIndex& /* parent = QModelIndex() */ ) const
@@ -311,9 +318,23 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   mitk::DataNode* dataNode = this->TreeItemFromIndex(index)->GetDataNode();
 
   // get name of treeItem (may also be edited)
-  QString nodeName = QString::fromStdString(dataNode->GetName());
+  QString nodeName;  
+  if(DicomPropertiesExists(*dataNode))
+  {
+    mitk::BaseProperty* seriesDescription = (dataNode->GetProperty("dicom.series.SeriesDescription"));
+    mitk::BaseProperty* studyDescription = (dataNode->GetProperty("dicom.study.StudyDescription"));
+    mitk::BaseProperty* patientsName = (dataNode->GetProperty("dicom.patient.PatientsName"));
+
+    nodeName.append(patientsName->GetValueAsString().c_str()).append("\n");
+    nodeName.append(studyDescription->GetValueAsString().c_str()).append("\n");
+    nodeName.append(seriesDescription->GetValueAsString().c_str());
+  }else{
+      nodeName = QString::fromStdString(dataNode->GetName());
+  }
   if(nodeName.isEmpty())
+  {
     nodeName = "unnamed";
+  }
 
   if (role == Qt::DisplayRole)
     return nodeName;
@@ -336,6 +357,26 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
 
   return QVariant();
 }
+
+bool QmitkDataStorageTreeModel::DicomPropertiesExists(const mitk::DataNode& node) const
+{
+    bool propertiesExists = false;
+    mitk::BaseProperty* seriesDescription = (node.GetProperty("dicom.series.SeriesDescription"));
+    mitk::BaseProperty* studyDescription = (node.GetProperty("dicom.study.StudyDescription"));
+    mitk::BaseProperty* patientsName = (node.GetProperty("dicom.patient.PatientsName"));
+
+    if(patientsName!=NULL && studyDescription!=NULL && seriesDescription!=NULL)
+    {
+        if((!patientsName->GetValueAsString().empty())&&
+            (!studyDescription->GetValueAsString().empty())&&
+            (!seriesDescription->GetValueAsString().empty()))
+        {
+            propertiesExists = true;
+        }
+    }
+    return propertiesExists;
+}
+
 
 QVariant QmitkDataStorageTreeModel::headerData(int /*section*/,
                                  Qt::Orientation orientation,

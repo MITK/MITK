@@ -51,6 +51,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
+#include <QmitkOpenDicomEditorAction.h>
 
 #include <itkConfigure.h>
 #include <vtkConfigure.h>
@@ -228,7 +229,7 @@ public:
      {
       i.next()->setEnabled(true);
      }
-
+     windowAdvisor->openDicomEditorAction->setEnabled(true);
      windowAdvisor->fileSaveProjectAction->setEnabled(true);
      windowAdvisor->closeProjectAction->setEnabled(true);
      windowAdvisor->undoAction->setEnabled(true);
@@ -265,6 +266,7 @@ public:
       i.next()->setEnabled(false);
      }
 
+     windowAdvisor->openDicomEditorAction->setEnabled(false);
      windowAdvisor->fileSaveProjectAction->setEnabled(false);
      windowAdvisor->closeProjectAction->setEnabled(false);
      windowAdvisor->undoAction->setEnabled(false);
@@ -451,6 +453,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  fileExitAction->setObjectName("QmitkFileExitAction");
  fileMenu->addAction(fileExitAction);
 
+ openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
+ fileMenu->addAction(openDicomEditorAction);
+
  berry::IViewRegistry* viewRegistry =
   berry::PlatformUI::GetWorkbench()->GetViewRegistry();
  const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors =
@@ -505,6 +510,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  mainActionsToolBar->addAction(closeProjectAction);
  mainActionsToolBar->addAction(undoAction);
  mainActionsToolBar->addAction(redoAction);
+  mainActionsToolBar->addAction(openDicomEditorAction);
  if (imageNavigatorViewFound)
  {
    mainActionsToolBar->addAction(imageNavigatorAction);

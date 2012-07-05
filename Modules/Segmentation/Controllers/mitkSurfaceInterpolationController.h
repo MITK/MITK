@@ -60,32 +60,65 @@ namespace mitk
 
     static SurfaceInterpolationController* GetInstance();
 
-    /*
+    /**
      * Adds a new extracted contour to the list 
      */
     void AddNewContour(Surface::Pointer newContour, RestorePlanePositionOperation *op);
 
-    /*
+    /**
      * Interpolates the 3D surface from the given extracted contours
      */
     void Interpolate ();
 
     mitk::Surface::Pointer GetInterpolationResult();
 
+    /**
+     * Sets the minimum spacing of the current selected segmentation
+     * This is needed since the contour points we reduced before they are used to interpolate the surface
+     */
     void SetMinSpacing(double minSpacing);
+
+    /**
+     * Sets the minimum spacing of the current selected segmentation
+     * This is needed since the contour points we reduced before they are used to interpolate the surface
+     */
     void SetMaxSpacing(double maxSpacing);
+
+    /**
+     * Sets the volume i.e. the number of pixels that the distance image should have
+     * By evaluation we found out that 50.000 pixel delivers a good result
+     */
     void SetDistanceImageVolume(unsigned int distImageVolume);
+
+    /**
+     * Sets the current segmentation which is used by the interpolation
+     * This is needed because the calculation of the normals needs to now wheather a normal points inside a segmentation or not
+     */
     void SetWorkingImage(Image* workingImage);
 
     Surface* GetContoursAsSurface();
 
     void SetDataStorage(DataStorage &ds);
 
+    /**
+     * Creates a new contourlist.
+     * \returns the new ContourList ID
+     */
     unsigned int CreateNewContourList();
 
+    /**
+     * Sets the ID for the ContourList which will be used for interpolation.
+     * This is neccessary since MITK allows to load / create multiple segmentations and each segmentation must have its own contour list.
+     */
     void SetCurrentListID (unsigned int ID);
 
     mitk::Image* GetImage();
+
+    /**
+     * Estimates the memory which is needed to build up the equationsystem for the interpolation.
+     * \returns The percentage of the real memory which will be used by the interpolation
+     */
+    float EstimatePortionOfNeededMemory();
 
  protected:
 

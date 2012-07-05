@@ -835,11 +835,29 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
           {
             m_SurfaceInterpolator->SetCurrentListID(listID);
 
+            int ret = QMessageBox::Yes;
+
+            if (m_SurfaceInterpolator->EstimatePortionOfNeededMemory() > 0.5)
+            {
+              QMessageBox msgBox;
+              msgBox.setText("Due to short handed system memory the 3D interpolation may be very slow!");
+              msgBox.setInformativeText("Are you sure you want to activate the 3D interpolation?");
+              msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+              ret = msgBox.exec();
+            }
+
             if (m_Watcher.isRunning())
                 m_Watcher.waitForFinished();
 
-            m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-            m_Watcher.setFuture(m_Future);
+            if (ret == QMessageBox::Yes)
+            {
+              m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+              m_Watcher.setFuture(m_Future);
+            }
+            else
+            {
+              m_RBtnDisableInterpolation->toggle();
+            }
           }
           else
           {
@@ -947,10 +965,10 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::Event
 {
   if(m_3DInterpolationEnabled)
   {
-      if (m_Watcher.isRunning())
-          m_Watcher.waitForFinished();
-      m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-      m_Watcher.setFuture(m_Future);
+    if (m_Watcher.isRunning())
+      m_Watcher.waitForFinished();
+    m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+    m_Watcher.setFuture(m_Future);
   }
 }
 

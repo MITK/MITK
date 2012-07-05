@@ -376,6 +376,14 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
   m_BZeroImage->Allocate();
 
+  m_CoefficientImage = CoefficientImageType::New();
+  m_CoefficientImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
+  m_CoefficientImage->SetOrigin( img->GetOrigin() );     // Set the image origin
+  m_CoefficientImage->SetDirection( img->GetDirection() );  // Set the image direction
+  m_CoefficientImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
+  m_CoefficientImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
+  m_CoefficientImage->Allocate();
+
 }
 
 template< class T, class TG, class TO, int L, int NODF>
@@ -652,8 +660,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   ImageRegionIterator< OutputImageType > odfOutputImageIterator(outputImage, outputRegionForThread);
   ImageRegionConstIterator< GradientImagesType > gradientInputImageIterator(gradientImagePointer, outputRegionForThread );
   ImageRegionIterator< BZeroImageType > bzeroIterator(m_BZeroImage, outputRegionForThread);
+  ImageRegionIterator< CoefficientImageType > coefficientImageIterator(m_CoefficientImage, outputRegionForThread);
 
   // All iterators seht to Begin of the specific OutputRegion
+  coefficientImageIterator.GoToBegin();
   bzeroIterator.GoToBegin();
   odfOutputImageIterator.GoToBegin();
   gradientInputImageIterator.GoToBegin();
@@ -692,6 +702,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   vnl_vector<double> DataShell3(Shell3Indiecies.size());
 
   OdfPixelType odf(0.0);
+  typename CoefficientImageType::PixelType coeffPixel(0.0);
 
   double P2,A,B2,B,P,alpha,beta,lambda, ER1, ER2;
 
@@ -824,14 +835,18 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       // the first coeff is a fix value
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
+      coeffPixel = element_cast<double, TO>(coeffs).data_block();
+
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
       odf *= ((QBALL_ANAL_RECON_PI*4)/NODF);
     }
 
     // set ODF to ODF-Image
+    coefficientImageIterator.Set(coeffPixel);
     odfOutputImageIterator.Set( odf );
     ++odfOutputImageIterator;
+    ++coefficientImageIterator;
     ++gradientInputImageIterator;
   }
 

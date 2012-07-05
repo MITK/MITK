@@ -118,7 +118,7 @@ namespace mitk
      * Estimates the memory which is needed to build up the equationsystem for the interpolation.
      * \returns The percentage of the real memory which will be used by the interpolation
      */
-    float EstimatePortionOfNeededMemory();
+    double EstimatePortionOfNeededMemory();
 
  protected:
 

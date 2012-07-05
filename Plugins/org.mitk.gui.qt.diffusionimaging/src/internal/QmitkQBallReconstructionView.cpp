@@ -402,6 +402,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
 #endif
 
   m_Controls->m_QBallSelectionBox->setHidden(true);
+  m_Controls->m_OutputCoeffsImage->setHidden(true);
 
   switch(method)
   {
@@ -426,6 +427,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
   case 6:
     m_Controls->m_Description->setText("SH Multi q-Ball recon. of the multi q-Ball diffusion signal");
     m_Controls->m_QBallSelectionBox->setHidden(false);
+    m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   }
 }

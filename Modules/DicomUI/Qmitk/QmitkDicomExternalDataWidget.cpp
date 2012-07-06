@@ -109,7 +109,7 @@ void QmitkDicomExternalDataWidget::Initialize()
 void QmitkDicomExternalDataWidget::OnFolderCDImport()
 {
     m_ImportDialog->show();
-    m_ImportDialog->raise();  
+    m_ImportDialog->raise();
 }
 
 void QmitkDicomExternalDataWidget::OnFileSelectedAddExternalData(QString directory)

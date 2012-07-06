@@ -53,6 +53,8 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkDicomLocalStorageWidgetControls;
         m_Controls->setupUi( parent );
         m_Controls->groupBox->setVisible(false);
+        m_Controls->addSortingTagButton_2->setVisible(false);
+        m_Controls->deleteSortingTagButton_2->setVisible(false);
         m_Controls->InternalDataTreeView->setSortingEnabled(true);
         m_Controls->InternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
         m_Controls->InternalDataTreeView->setModel(m_LocalModel);

@@ -76,8 +76,11 @@ signals:
 
     protected slots:
 
-        /// \brief Called when StoreSCP shold be started or updated
-        void StartStopStoreSCP();
+        /// \brief Called when StoreSCP shold start
+        void StartStoreSCP();
+
+        /// \brief Called when StoreSCP should stop
+        void StopStoreSCP();
 
         /// \brief Called when import is finished
         void OnDicomImportFinished(const QString& path);
@@ -90,6 +93,9 @@ signals:
 
         /// \brief Called when LocalStorageButton was clicked.
         void OnLocalStorage();
+
+        /// \brief Called when FolderCDButton was clicked.
+        void OnFolderCDImport();
 
         /// \brief Called when view button is clicked. Sends out an event for adding the current selected file to the mitkDataStorage.
         void OnViewButtonAddToDataManager(const QStringList& eventProperties);
@@ -105,12 +111,6 @@ signals:
         void SetListenerDirectory(const QString& listenerDirectory);
 
 protected:
-
-    /// \brief Called when StoreSCP shold start
-    void StartStoreSCP();
-
-    /// \brief Called when StoreSCP should stop
-    void StopStoreSCP();
 
     void CreateQtPartControl(QWidget *parent);
 
@@ -133,4 +133,3 @@ protected:
 };
 
 #endif // QmitkDicomEditor_h
-

@@ -62,7 +62,7 @@ EnergyComputer::EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* m
         fprintf(stderr,"EnergyComputer: error during init: data does not match with interpolation scheme\n");
 
     int totsz = m_Size[0]*m_Size[1]*m_Size[2];
-    m_CumulatedSpatialProbability.resize(totsz, 0.0); // +1?
+    m_CumulatedSpatialProbability.resize(totsz + 1, 0.0);
     m_ActiveIndices.resize(totsz, 0);
 
     // calculate active voxels and cumulate probabilities

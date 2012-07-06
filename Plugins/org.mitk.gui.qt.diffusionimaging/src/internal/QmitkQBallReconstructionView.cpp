@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -402,6 +402,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
 #endif
 
   m_Controls->m_QBallSelectionBox->setHidden(true);
+  m_Controls->m_OutputCoeffsImage->setHidden(true);
 
   switch(method)
   {
@@ -426,6 +427,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
   case 6:
     m_Controls->m_Description->setText("SH Multi q-Ball recon. of the multi q-Ball diffusion signal");
     m_Controls->m_QBallSelectionBox->setHidden(false);
+    m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   }
 }
@@ -945,7 +947,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
   filter->SetBValueMap(m_ShellSelectorMap[nodename]->GetBValueSelctionMap());
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage(), vols->GetB_Value() );
 
-  //filter->SetBValue(vols->GetB_Value()); 
+  //filter->SetBValue(vols->GetB_Value());
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
   filter->SetLambda(lambda);
 
@@ -975,6 +977,18 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
     node4->SetProperty( "name", mitk::StringProperty::New(
                           QString(nodename.c_str()).append("_b0").toStdString()) );
     nodes->push_back(node4);
+  }
+
+  if(m_Controls->m_OutputCoeffsImage->isChecked())
+  {
+    mitk::Image::Pointer coeffsImage = mitk::Image::New();
+    coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+    coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
+    mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
+    coeffsNode->SetData( coeffsImage );
+    coeffsNode->SetProperty( "name", mitk::StringProperty::New(
+                          QString(nodename.c_str()).append("_coeffs").toStdString()) );
+    nodes->push_back(coeffsNode);
   }
 
 

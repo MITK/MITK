@@ -66,6 +66,8 @@ public:
     /** Container to hold gradient directions of the 'n' DW measurements */
     typedef VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
 
+    typedef Image< Vector< TOdfPixelType, (NOrderL*NOrderL + NOrderL + 2)/2 + NOrderL >, 3 > CoefficientImageType;
+
     typedef std::map<double, std::vector<unsigned int> > BValueMap;
     typedef std::map<double, std::vector<unsigned int> >::iterator BValueMapIteraotr;
     typedef std::vector<unsigned int> IndiciesVector;
@@ -121,6 +123,8 @@ public:
 
     itkGetMacro( BZeroImage, typename BZeroImageType::Pointer);
     //itkGetMacro( ODFSumImage, typename BlaImage::Pointer);
+
+    itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer );
 
     itkSetMacro( Lambda, double );
     itkGetMacro( Lambda, double );
@@ -191,6 +195,8 @@ private:
     float m_BValue;
 
     typename BZeroImageType::Pointer m_BZeroImage;
+
+    typename CoefficientImageType::Pointer m_CoefficientImage;
 
     BValueMap m_BValueMap;
 

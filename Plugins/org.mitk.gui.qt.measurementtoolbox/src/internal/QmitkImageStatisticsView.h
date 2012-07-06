@@ -114,6 +114,9 @@ protected:
   /** \brief Computes an Intensity Profile along line and updates the histogram widget with it. */
   void ComputeIntensityProfile( mitk::PlanarLine* line );
 
+  /** \brief Removes all Observers to images, masks and planar figures and sets corresponding members to zero */
+  void ClearObservers();
+
   void Activated();
   void Deactivated();
 

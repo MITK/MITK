@@ -325,8 +325,8 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
 
   if ( nodes.empty() || tooManyNodes || invalidNodes )
   {
+    ClearObservers();
     // Nothing to do: invalidate image, clear statistics, histogram, and GUI
-    m_SelectedImage = NULL;
     this->InvalidateStatisticsTableView() ;
     m_Controls->m_HistogramWidget->ClearItemModel();
     m_Controls->m_LineProfileWidget->ClearItemModel();
@@ -334,6 +334,8 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
     m_CurrentStatisticsValid = false;
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_SelectedMaskLabel->setText( "None" );
+
+
     return;
   }
 
@@ -347,30 +349,7 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
   mitk::DataNode *parentNode = NULL;
   mitk::Image *parentImage = NULL;
 
-  // Possibly previous change listeners
-  if ( (m_SelectedPlanarFigure != NULL) && (m_PlanarFigureObserverTag >= 0) )
-  {
-    m_SelectedPlanarFigure->RemoveObserver( m_PlanarFigureObserverTag );
-    m_PlanarFigureObserverTag = -1;
-  }
-  if ( (m_SelectedImage != NULL) && (m_ImageObserverTag >= 0) )
-  {
-    m_SelectedImage->RemoveObserver( m_ImageObserverTag );
-    m_ImageObserverTag = -1;
-  }
-  if ( (m_SelectedImageMask != NULL) && (m_ImageMaskObserverTag >= 0) )
-  {
-    m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag );
-    m_ImageMaskObserverTag = -1;
-  }
-
-  // Deselect all images and masks by default
-  m_SelectedImageNode = NULL;
-  m_SelectedImage = NULL;
-  m_SelectedMaskNode = NULL;
-  m_SelectedImageMask = NULL;
-  m_SelectedPlanarFigure = NULL;
-
+  ClearObservers();
   {
     unsigned int parentObjectIndex = 0;
     parentObjects = this->GetDataStorage()->GetSources( selectedNode );
@@ -794,4 +773,33 @@ void QmitkImageStatisticsView::Hidden()
 void QmitkImageStatisticsView::SetFocus()
 {
 
+}
+
+void QmitkImageStatisticsView::ClearObservers()
+{
+  // Possibly previous change listeners
+  if ( (m_SelectedPlanarFigure != NULL) && (m_PlanarFigureObserverTag >= 0) )
+  {
+    m_SelectedPlanarFigure->RemoveObserver( m_PlanarFigureObserverTag );
+    m_PlanarFigureObserverTag = -1;
+  }
+  if ( (m_SelectedImage != NULL) && (m_ImageObserverTag >= 0) )
+  {
+    m_SelectedImage->RemoveObserver( m_ImageObserverTag );
+    m_ImageObserverTag = -1;
+  }
+  if ( (m_SelectedImageMask != NULL) && (m_ImageMaskObserverTag >= 0) )
+  {
+    m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag );
+    m_ImageMaskObserverTag = -1;
+  }
+
+  // Deselect all images and masks by default
+  m_SelectedImageNode = NULL;
+  m_SelectedImage = NULL;
+  m_SelectedMaskNode = NULL;
+  m_SelectedImageMask = NULL;
+  m_SelectedPlanarFigure = NULL;
+
+  return;
 }

@@ -454,7 +454,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  fileMenu->addAction(fileExitAction);
 
  openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
- fileMenu->addAction(openDicomEditorAction);
+ //fileMenu->addAction(openDicomEditorAction);
 
  berry::IViewRegistry* viewRegistry =
   berry::PlatformUI::GetWorkbench()->GetViewRegistry();

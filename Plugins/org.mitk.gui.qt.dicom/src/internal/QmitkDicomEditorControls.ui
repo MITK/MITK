@@ -114,18 +114,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton">
-        <property name="toolTip">
-         <string>Switch the storage service provider (STORESCP) on or of.</string>
-        </property>
+       <widget class="QLabel" name="StoreSCPLabel">
         <property name="text">
-         <string>Storage provider is not running! </string>
+         <string>Storage provider is not running!</string>
         </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
+        <property name="textInteractionFlags">
+         <set>Qt::NoTextInteraction</set>
         </property>
        </widget>
       </item>

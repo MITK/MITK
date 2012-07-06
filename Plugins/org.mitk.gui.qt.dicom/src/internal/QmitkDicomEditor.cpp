@@ -92,6 +92,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     StartDicomDirectoryListener();
 
     m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(false);
+    m_Controls.StoreSCPLabel->setVisible(false);
 
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QString&)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&)));
@@ -104,6 +105,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 
     connect(m_Controls.CDButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
     connect(m_Controls.FolderButton, SIGNAL(clicked()), m_Controls.externalDataWidget, SLOT(OnFolderCDImport()));
+    connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
     connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(OnQueryRetrieve()));
     connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));
 
@@ -128,12 +130,26 @@ berry::IPartListener::Events::Types QmitkDicomEditor::GetPartEventTypes() const
 void QmitkDicomEditor::OnQueryRetrieve()
 {
     OnChangePage(2);
-    StartStopStoreSCP();
+    QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
+    QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
+     if(!((builder.GetAETitle()->compare(storageAET,Qt::CaseSensitive)==0)&&
+         (builder.GetPort()->compare(storagePort,Qt::CaseSensitive)==0)))
+     {
+         StopStoreSCP();
+         StartStoreSCP();
+     }
+    m_Controls.StoreSCPLabel->setVisible(true);
+}
+
+void QmitkDicomEditor::OnFolderCDImport()
+{
+    m_Controls.StoreSCPLabel->setVisible(false);
 }
 
 void QmitkDicomEditor::OnLocalStorage()
 {
     OnChangePage(0);
+    m_Controls.StoreSCPLabel->setVisible(false);
 }
 
 void QmitkDicomEditor::OnChangePage(int page)
@@ -195,8 +211,7 @@ void QmitkDicomEditor::StartStoreSCP()
     builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_ListenerDirectory);
     m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&builder);
     m_StoreSCPLauncher->StartStoreSCP();
-    m_Controls.radioButton->setChecked(true);
-    m_Controls.radioButton->setText(storageAET+QString(" ")+storagePort);
+    m_Controls.StoreSCPLabel->setText("Storage provider is running on port: "+storagePort);
 
 }
 
@@ -204,26 +219,7 @@ void QmitkDicomEditor::StartStoreSCP()
 void QmitkDicomEditor::StopStoreSCP()
 {
         delete m_StoreSCPLauncher;
-        m_Controls.radioButton->setChecked(false);
-        m_Controls.radioButton->setText(QString("Storage service provider is not running!"));
-}
-
-void QmitkDicomEditor::StartStopStoreSCP()
-{
-    QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
-    QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
-
-    if(!((builder.GetAETitle()->compare(storageAET,Qt::CaseSensitive)==0)&&
-        (builder.GetPort()->compare(storagePort,Qt::CaseSensitive)==0)))
-    {
-        if(m_Controls.radioButton->isChecked())
-        {
-            StopStoreSCP();
-            StartStoreSCP();
-        }else{
-            StartStoreSCP();
-        }
-    }   
+        m_Controls.StoreSCPLabel->setText(QString("Storage service provider is not running!"));
 }
 
 void QmitkDicomEditor::SetPluginDirectory()

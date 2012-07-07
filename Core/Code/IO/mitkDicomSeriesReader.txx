@@ -403,8 +403,6 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   typename TransformType::Pointer transformShear = TransformType::New();
 
   /**
-    What I think should be done here:
-
     - apply a shear and spacing correction to the image block that corrects the ITK reader's error
       - ITK ignores the shear and loads slices into an orthogonal volume
       - ITK calculates the spacing from the origin distance, which is more than the actual spacing with gantry tilt images
@@ -415,19 +413,10 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
       - we apply a shearing transformation to the ITK-read image volume
         - to do this locally, 
           - we transform the image volume back to origin and "normal" orientation by applying the inverse of its transform
-            - this should bring us into the image's "index coordinate" system
+            (this brings us into the image's "index coordinate" system)
           - we apply a shear with the Y-shift factor put into a unit transform at row 1, col 2
-            - we probably would need the shift factor in index coordinates but we use mm, which appears strange, see below
-          - we transform the image volume back to its actual position
-            - presumably back from index to world coordinates
+          - we transform the image volume back to its actual position (from index to world coordinates)
       - we lastly apply modify the image spacing in z direction by replacing this number with the correctly calulcated inter-slice distance
-
-    Here comes the unsolved PROBLEM:
-     - WHY is it correct to apply the shift factor in millimeters, when we assume we are in a index coordinate system?
-       - or why is it not millimeters but index coordinates?
-       - or what else is the wrong assumption here?
-     - This is a serious question to anybody very firm in transforms, ITK, etc.
-       - this is also a chocolate reward question. Provide a good explanation with corrected code as a git commit and get it.
   */
   
   // ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];

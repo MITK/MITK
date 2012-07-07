@@ -492,11 +492,9 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
     MITK_DEBUG << "    v normal: " << normal;
 
     Point3Dd projectionRight = projectPointOnLine( origin1, origin2, right );
-    Point3Dd projectionUp = projectPointOnLine( origin1, origin2, up );
     Point3Dd projectionNormal = projectPointOnLine( origin1, origin2, normal );
 
     m_ShiftRight = (projectionRight - origin2).GetNorm();
-    m_ShiftUp = (projectionUp - origin2).GetNorm();
     m_ShiftNormal = (projectionNormal - origin2).GetNorm();
 
     /* 
@@ -525,8 +523,6 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
                                + planeNormal[2] * planeNormal[2]
                                );
 
-    MITK_INFO << "Whichside is " << signedDistance;
-    if (signedDistance < 0.0) m_ShiftUp *= -1.0; // negative sign if shift is against "right" direction
     m_ShiftUp = signedDistance;
     
     m_ITKAssumedSliceSpacing = (origin2 - origin1).GetNorm();

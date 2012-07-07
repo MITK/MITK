@@ -414,6 +414,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
     break;
   case 2:
     m_Controls->m_Description->setText("SH recon. with solid angle consideration (Aganj2009)");
+    m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   case 3:
     m_Controls->m_Description->setText("SH solid angle with non-neg. constraint (Goh2009)");
@@ -828,6 +829,18 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
     node4->SetProperty( "name", mitk::StringProperty::New(
                           QString(nodename.c_str()).append("_b0").toStdString()) );
     nodes->push_back(node4);
+  }
+
+  if(m_Controls->m_OutputCoeffsImage->isChecked())
+  {
+    mitk::Image::Pointer coeffsImage = mitk::Image::New();
+    coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+    coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
+    mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
+    coeffsNode->SetData( coeffsImage );
+    coeffsNode->SetProperty( "name", mitk::StringProperty::New(
+                          QString(nodename.c_str()).append("_coeffs").toStdString()) );
+    nodes->push_back(coeffsNode);
   }
 
 }

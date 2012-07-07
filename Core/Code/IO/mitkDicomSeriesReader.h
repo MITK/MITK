@@ -240,8 +240,6 @@ Stacked slices:
 
  \todo refactor all the protected helper objects/methods into a separate header so we compile faster
 */
-typedef  itk::Point<double,3> Point3Dd;
-typedef itk::Vector<double,3> Vector3Dd;
 class MITK_CORE_EXPORT DicomSeriesReader
 {
 public:
@@ -437,6 +435,10 @@ protected:
   class GantryTiltInformation
   {
     public:
+
+      // two types to avoid any rounding errors
+      typedef  itk::Point<double,3> Point3Dd;
+      typedef itk::Vector<double,3> Vector3Dd;
 
       /**
         \brief Just so we can create empty instances for assigning results later.

@@ -751,32 +751,33 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
               double angle = atof(tiltStr.c_str());
 
               MITK_DEBUG << "Comparing recorded tilt angle " << angle << " against calculated value " << tiltInfo.GetTiltAngleInDegrees();
-              if ( fabs(angle - tiltInfo.GetTiltAngleInDegrees() > 0.02) )
+              // TODO we probably want the signs correct, too
+              if ( fabs(angle) - tiltInfo.GetTiltAngleInDegrees() > 0.25) 
               {
                 result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
                 fileFitsIntoPattern = false;
               }
-              else
+              else  // tilt angle from header is less than 0.25 degrees different from what we calculated, assume this is fine
               {
                 result.FlagGantryTilt();
                 result.AddFileToSortedBlock(*fileIter); // this file is good for current block
                 fileFitsIntoPattern = true;
               }
             }
-            else
+            else // we cannot check the calculated tilt angle against the one from the dicom header (so we assume we are right)
             {
               result.FlagGantryTilt();
               result.AddFileToSortedBlock(*fileIter); // this file is good for current block
               fileFitsIntoPattern = true;
             }
           }
-          else
+          else // caller does not want tilt compensation OR shearing is more complicated than tilt
           {
             result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
             fileFitsIntoPattern = false;
           }
         }
-        else
+        else // not sheared
         {
           result.AddFileToSortedBlock(*fileIter); // this file is good for current block
           fileFitsIntoPattern = true;

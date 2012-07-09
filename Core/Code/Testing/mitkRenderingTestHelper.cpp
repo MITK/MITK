@@ -57,8 +57,8 @@ void mitkRenderingTestHelper::Render()
       mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
 
       //use this to actually show the iamge in a renderwindow
-      //  this->GetVtkRenderWindow()->Render();
-      //  this->GetVtkRenderWindow()->GetInteractor()->Start();
+//        this->GetVtkRenderWindow()->Render();
+//        this->GetVtkRenderWindow()->GetInteractor()->Start();
 
     }
     else
@@ -66,6 +66,11 @@ void mitkRenderingTestHelper::Render()
         MITK_ERROR << "No images loaded in data storage!";
     }
 
+}
+
+mitk::DataStorage::Pointer mitkRenderingTestHelper::GetDataStorage()
+{
+    return m_DataStorage;
 }
 
 void mitkRenderingTestHelper::SetInputFileNames(int argc, char* argv[])
@@ -92,24 +97,14 @@ void mitkRenderingTestHelper::SetViewDirection(mitk::SliceNavigationController::
     mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
 }
 
-void mitkRenderingTestHelper::SetSwivelDirection() {
-    mitk::Point3D p3d;
-   p3d.SetElement(0, 0.0f);
-   p3d.SetElement(1, 0.0f);
-   p3d.SetElement(2, 0.0f);
-
-   mitk::Vector3D v3d;
-   v3d.SetElement(0, 0.2);
-   v3d.SetElement(1, 0.3);
-   v3d.SetElement(2, 0.5);
-
-   mitk::SliceNavigationController::Pointer sliceNavi =
+void mitkRenderingTestHelper::ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation) {
+   mitk::SliceNavigationController::Pointer sliceNavigationController =
    mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController();
-  
-   sliceNavi->ReorientSlices(p3d, v3d);
+     sliceNavigationController->ReorientSlices(origin, rotation);
 
-   mitk::Stepper::Pointer stepper = sliceNavi->GetSlice();
-   sliceNavi->GetSlice()->SetPos(stepper->GetSteps()/2);
+//first version of alex using the sliceNavigationController to set the center.
+//     mitk::Stepper::Pointer stepper = sliceNavigationController->GetSlice();
+//     sliceNavigationController->GetSlice()->SetPos(stepper->GetSteps()/2);
 }
 
 vtkRenderer* mitkRenderingTestHelper::GetVtkRenderer()

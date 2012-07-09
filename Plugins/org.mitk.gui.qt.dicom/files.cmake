@@ -34,6 +34,7 @@ set(MOC_H_FILES
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
   resources/icon.xpm
+  resources/config.ini
   plugin.xml
 )
 

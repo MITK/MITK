@@ -2,6 +2,12 @@ project(org_mitk_gui_qt_dicom)
 
 set(QT_USE_QTSQL 1)
 
+find_program( StoreSCPExecutable storescp)
+
+message( STATUS ${StoreSCPExecutable} )
+
+file(WRITE resources/config.ini ${StoreSCPExecutable} )
+
 include_directories(${CTK_INCLUDE_DIRS})
 
 MACRO_CREATE_MITK_CTK_PLUGIN(

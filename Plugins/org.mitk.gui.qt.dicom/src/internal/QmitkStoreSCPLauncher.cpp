@@ -20,7 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMessageBox>
 #include <QProcessEnvironment>
 #include <mitkLogMacros.h>
-//#include <QStringListIterator>
+#include <QFile>
+#include <QTextStream>
+#include <QIODevice>
+#include <fstream>
+#include <iostream>
 
 QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder) 
 : m_StoreSCP(new QProcess())
@@ -38,19 +42,46 @@ QmitkStoreSCPLauncher::~QmitkStoreSCPLauncher()
 
 void QmitkStoreSCPLauncher::StartStoreSCP()
 {
-    QString storeSCP;
-    storeSCP.append(GetPathToExecutable());
-    storeSCP.append(QString("/storescp.exe"));
-    m_StoreSCP->start(storeSCP,m_ArgumentList);
+    SetPathToStoreSCP();
+    m_StoreSCP->start(m_PathToStoreSCP,m_ArgumentList);
 }
 
-QString QmitkStoreSCPLauncher::GetPathToExecutable()
+void QmitkStoreSCPLauncher::SetPathToStoreSCP()
 {
-    QDir root;
-    QString currentPath =  root.currentPath();
-    currentPath = currentPath.split("MITK").at(0);
-    currentPath.append("MITK/DCMTK-install/bin");
-    return currentPath;
+    std::string line;
+    std::ifstream myfile("text.ini");
+    if (myfile.is_open())
+    {
+        while ( myfile.good() )
+        {
+            std::getline (myfile,line);
+            MITK_INFO << line << endl;
+        }
+        myfile.close();
+    }else{
+        MITK_INFO << "Unable to open file"; 
+    }
+    m_PathToStoreSCP.fromStdString(line);
+    MITK_INFO << m_PathToStoreSCP.toStdString();
+    //if(QFile::exists("config.ini")){
+
+
+    //    if (!file.open(QIODevice::ReadWrite))
+    //    {
+    //        MITK_INFO << "cannot find file";
+    //    }
+    //    QTextStream stream(&file);
+
+    //    while( !stream.atEnd() ) {
+    //        m_PathToStoreSCP = stream.readLine().split("-").at(1);
+    //    }
+    //    file.close();
+    //    MITK_INFO << m_PathToStoreSCP.toStdString();
+    //    if(m_PathToStoreSCP.compare("NOTFOUND"))
+    //    {
+    //        MITK_INFO << "cannot find binary";
+    //    }
+    //}
 }
 
 void QmitkStoreSCPLauncher::OnProcessError(QProcess::ProcessError err)

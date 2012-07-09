@@ -247,6 +247,8 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
      */
     bool GetSliceForWindowsID(unsigned windowID, int& sliceDimension, int& sliceIndex);
 
+    void SetCurrentContourListID();
+
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 

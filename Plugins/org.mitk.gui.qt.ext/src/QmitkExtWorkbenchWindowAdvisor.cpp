@@ -229,7 +229,12 @@ public:
      {
       i.next()->setEnabled(true);
      }
-     windowAdvisor->openDicomEditorAction->setEnabled(true);
+
+         //GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+     {
+        windowAdvisor->openDicomEditorAction->setEnabled(true);
+     }
      windowAdvisor->fileSaveProjectAction->setEnabled(true);
      windowAdvisor->closeProjectAction->setEnabled(true);
      windowAdvisor->undoAction->setEnabled(true);
@@ -266,7 +271,10 @@ public:
       i.next()->setEnabled(false);
      }
 
-     windowAdvisor->openDicomEditorAction->setEnabled(false);
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+     {
+        windowAdvisor->openDicomEditorAction->setEnabled(false);
+     }
      windowAdvisor->fileSaveProjectAction->setEnabled(false);
      windowAdvisor->closeProjectAction->setEnabled(false);
      windowAdvisor->undoAction->setEnabled(false);
@@ -453,8 +461,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  fileExitAction->setObjectName("QmitkFileExitAction");
  fileMenu->addAction(fileExitAction);
 
+if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+{
  openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
- //fileMenu->addAction(openDicomEditorAction);
+}
 
  berry::IViewRegistry* viewRegistry =
   berry::PlatformUI::GetWorkbench()->GetViewRegistry();
@@ -510,7 +520,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  mainActionsToolBar->addAction(closeProjectAction);
  mainActionsToolBar->addAction(undoAction);
  mainActionsToolBar->addAction(redoAction);
-  mainActionsToolBar->addAction(openDicomEditorAction);
+if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+{
+ mainActionsToolBar->addAction(openDicomEditorAction);
+}
  if (imageNavigatorViewFound)
  {
    mainActionsToolBar->addAction(imageNavigatorAction);

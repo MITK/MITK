@@ -17,11 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef CommandLineModulesView_h
 #define CommandLineModulesView_h
 
-#include <berryISelectionListener.h>
-
 #include <QmitkAbstractView.h>
-
 #include "ui_CommandLineModulesViewControls.h"
+#include <ctkCmdLineModuleReference.h>
+
+class ctkCmdLineModuleDescriptionDefaultFactory;
+class ctkCmdLineModuleManager;
 
 namespace berry
 {
@@ -63,6 +64,8 @@ public:
 
 protected slots:
   
+  void OnChooseFileButtonPressed();
+
 protected:
 
   /**
@@ -80,13 +83,60 @@ private:
   virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
 
   /**
-   * Called on startup and by OnPreferencesChanged to load the preferences into member variables.
+   * \brief Called on startup and by OnPreferencesChanged to load the preferences into member variables.
    */
   void RetrievePreferenceValues();
 
-  QString m_TemporaryDirectoryName;
-  QString m_ModulesDirectoryName;
+  /**
+   * \brief Creates a module from a file location.
+   * \param location The full absolute file name of a command line module.
+   */
+  void AddModule(const QString& location);
+
+  /**
+   * \brief Adds a module to the views tabbed widget, creating a new tab each time.
+   * \param moduleRef A ctkCmdLineModuleReference.
+   */
+  void AddModuleTab(const ctkCmdLineModuleReference& moduleRef);
+
+  /**
+   * \brief We store the parent, passed in via CommandLineModulesView::CreateQtPartControl, as this class itself is not a QWidget.
+   */
+  QWidget *m_Parent;
+
+  /**
+   * \brief The GUI controls contain a run/stop button, and a tabbed widget, so the GUI component
+   * for each command line module is added to the tabbed widget dynamically at run time.
+   */
   Ui::CommandLineModulesViewControls m_Controls;
+
+  /**
+   * \brief We maintain a hashmap of tab-number to module reference.
+   */
+  QHash<int, ctkCmdLineModuleReference> m_MapTabToModuleRef;
+
+  /**
+   * \brief The ctkCmdLineModuleDescriptionFactory creates GUI's from an XML description,
+   * and here we use a basic implementation called ctkCmdLineModuleDescriptionDefaultFactory
+   * which uses QUiLoader to convert an XML document (assumed to be a .ui file) into widgets.
+   */
+  ctkCmdLineModuleDescriptionDefaultFactory *m_Factory;
+
+  /**
+   * \brief The manager is responsible for loading modules ...
+   */
+  ctkCmdLineModuleManager *m_ModuleManager;
+
+  /**
+   * \brief We store a temporary folder name, accessible via user preferences.
+   */
+  QString m_TemporaryDirectoryName;
+
+  /**
+   * \brief We store a folder name, where we look for modules to load.
+   */
+  QString m_ModulesDirectoryName;
+
 };
 
 #endif // CommandLineModulesView_h

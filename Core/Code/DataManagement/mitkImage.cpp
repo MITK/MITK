@@ -163,14 +163,14 @@ double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned
        position[1] < 0 ||
        position[2] < 0 )
   {
-    MITK_WARN << "Given position ("<< position << ") is out of image range, returning 0." ;
+    MITK_DEBUG << "Given position ("<< position << ") is out of image range, returning 0." ;
   }
   // check if the given position is inside the index range of the image, the 3rd dimension needs to be compared only if the dimension is not 0
   else if ( (unsigned int)position[0] >= imageDims[0] ||
             (unsigned int)position[1] >= imageDims[1] ||
             ( imageDims[2] && (unsigned int)position[2] >= imageDims[2] ))
   {
-    MITK_WARN << "Given position ("<< position << ") is out of image range, returning 0." ;
+    MITK_DEBUG << "Given position ("<< position << ") is out of image range, returning 0." ;
   }
   else
   {

@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_CommandLineModulesViewControls.h"
 #include <ctkCmdLineModuleReference.h>
 
-class ctkCmdLineModuleDescriptionDefaultFactory;
 class ctkCmdLineModuleManager;
 
 namespace berry
@@ -100,32 +99,25 @@ private:
   void AddModuleTab(const ctkCmdLineModuleReference& moduleRef);
 
   /**
-   * \brief We store the parent, passed in via CommandLineModulesView::CreateQtPartControl, as this class itself is not a QWidget.
-   */
-  QWidget *m_Parent;
-
-  /**
    * \brief The GUI controls contain a run/stop button, and a tabbed widget, so the GUI component
    * for each command line module is added to the tabbed widget dynamically at run time.
    */
   Ui::CommandLineModulesViewControls m_Controls;
 
   /**
-   * \brief We maintain a hashmap of tab-number to module reference.
+   * \brief We store the parent, passed in via CommandLineModulesView::CreateQtPartControl, as this class itself is not a QWidget.
    */
-  QHash<int, ctkCmdLineModuleReference> m_MapTabToModuleRef;
-
-  /**
-   * \brief The ctkCmdLineModuleDescriptionFactory creates GUI's from an XML description,
-   * and here we use a basic implementation called ctkCmdLineModuleDescriptionDefaultFactory
-   * which uses QUiLoader to convert an XML document (assumed to be a .ui file) into widgets.
-   */
-  ctkCmdLineModuleDescriptionDefaultFactory *m_Factory;
+  QWidget *m_Parent;
 
   /**
    * \brief The manager is responsible for loading modules ...
    */
   ctkCmdLineModuleManager *m_ModuleManager;
+
+  /**
+   * \brief We maintain a hashmap of tab-number to module reference.
+   */
+  QHash<int, ctkCmdLineModuleReference> m_MapTabToModuleRef;
 
   /**
    * \brief We store a temporary folder name, accessible via user preferences.

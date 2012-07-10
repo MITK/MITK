@@ -38,74 +38,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // CTK
 #include <ctkCmdLineModuleManager.h>
+#include <ctkCmdLineModuleInstance.h>
+#include <ctkCmdLineModuleInstanceFactoryQtGui.h>
 #include <ctkCmdLineModuleXmlValidator.h>
+#include <ctkCmdLineModuleProcessFuture.h>
 
 const std::string CommandLineModulesView::VIEW_ID = "org.mitk.gui.qt.cli";
 
-class ctkCmdLineModuleDescriptionDefaultFactory : public ctkCmdLineModuleDescriptionFactory
-{
-public:
-
-  QObject* createObjectRepresentationFromXML(const QByteArray &xmlDescription)
-  {
-    return cachedObjectTree(xmlDescription);
-  }
-
-  QObject* createGUIFromXML(const QByteArray &xmlDescription)
-  {
-    return cachedObjectTree(xmlDescription);
-  }
-
-private:
-
-  QObject* cachedObjectTree(const QByteArray& xmlDescription)
-  {
-    QObject* root = cache[xmlDescription];
-    if (root != 0) return root;
-
-    QBuffer input;
-    input.setData(xmlDescription);
-    input.open(QIODevice::ReadOnly);
-
-    ctkCmdLineModuleXmlValidator validator(&input);
-    if (!validator.validateXSLTOutput())
-    {
-      qCritical() << validator.errorString();
-      return 0;
-    }
-
-    QUiLoader uiLoader;
-    QByteArray uiBlob;
-    uiBlob.append(validator.output());
-    qDebug() << validator.output();
-    QBuffer uiForm(&uiBlob);
-
-    root = uiLoader.load(&uiForm);
-    cache[xmlDescription] = root;
-    return root;
-  }
-
-  // TODO: remove entry if QObject was deleted
-  QHash<QByteArray, QObject*> cache;
-};
-
 CommandLineModulesView::CommandLineModulesView()
 : m_Parent(NULL)
-, m_Factory(NULL)
 , m_ModuleManager(NULL)
 , m_TemporaryDirectoryName("")
 , m_ModulesDirectoryName("")
 {
-  m_Factory = new ctkCmdLineModuleDescriptionDefaultFactory();
-  m_ModuleManager = new ctkCmdLineModuleManager(m_Factory);
+  m_ModuleManager = new ctkCmdLineModuleManager(new ctkCmdLineModuleInstanceFactoryQtGui());
 }
 
 CommandLineModulesView::~CommandLineModulesView()
 {
-  if (m_Factory != NULL)
-  {
-    delete m_Factory;
-  }
   if (m_ModuleManager != NULL)
   {
     delete m_ModuleManager;
@@ -166,10 +116,8 @@ void CommandLineModulesView::OnChooseFileButtonPressed()
 
 void CommandLineModulesView::AddModule(const QString& fileName)
 {
-  std::cerr << "Matt, CommandLineModulesView::AddModule fileName=" << fileName.toStdString() << std::endl;
-
-  ctkCmdLineModuleReference ref = m_ModuleManager->addModule(fileName);
-  if (ref.isValid())
+  ctkCmdLineModuleReference ref = m_ModuleManager->registerModule(fileName);
+  if (ref)
   {
     AddModuleTab(ref);
   }
@@ -177,22 +125,26 @@ void CommandLineModulesView::AddModule(const QString& fileName)
 
 void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& moduleRef)
 {
-  if (moduleRef.widgetTree() == 0) return;
+  ctkCmdLineModuleInstance* moduleInstance = m_ModuleManager->createModuleInstance(moduleRef);
+  if (!moduleInstance) return;
 
-  QWidget* widget = qobject_cast<QWidget*>(moduleRef.widgetTree());
-/*
-  QScrollArea* scrollArea = new QScrollArea();
-  scrollArea->setContentsMargins(0,0,0,0);
+  QObject* guiHandle = moduleInstance->guiHandle();
+  QWidget* widget = qobject_cast<QWidget*>(guiHandle);
 
-  QHBoxLayout *layout = new QHBoxLayout(scrollArea);
-  layout->addWidget(widget);
-  layout->setContentsMargins(0,0,0,0);
-  layout->setSpacing(0);
+  /*
+    QScrollArea* scrollArea = new QScrollArea();
+    scrollArea->setContentsMargins(0,0,0,0);
 
-  scrollArea->setLayout(layout);
-*/
+    QHBoxLayout *layout = new QHBoxLayout(scrollArea);
+    layout->addWidget(widget);
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
+
+    scrollArea->setLayout(layout);
+  */
+
   int tabIndex = m_Controls.m_TabWidget->addTab(widget, widget->objectName());
-  //int tabIndex = m_Controls.m_TabWidget->addTab(scrollArea, widget->objectName());
   m_MapTabToModuleRef[tabIndex] = moduleRef;
+
 }
 

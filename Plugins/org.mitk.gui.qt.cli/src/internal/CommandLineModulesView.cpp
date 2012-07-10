@@ -67,11 +67,8 @@ void CommandLineModulesView::RetrievePreferenceValues()
 
   assert( prefs );
 
-  m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, "/tmp"));
-  m_ModulesDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::MODULES_DIRECTORY_NODE_NAME, "/cs/research/medic/home2/paramedic/clarkson/modules"));
-
-  MITK_INFO << "CommandLineModulesView::RetrievePreferenceValues: m_TemporaryDirectoryName=" << m_TemporaryDirectoryName.toStdString() << std::endl;
-  MITK_INFO << "CommandLineModulesView::RetrievePreferenceValues: m_ModulesDirectoryName=" << m_ModulesDirectoryName.toStdString() << std::endl;
+  m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, ""));
+  m_ModulesDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::MODULES_DIRECTORY_NODE_NAME, ""));
 }
 
 void CommandLineModulesView::OnPreferencesChanged(const berry::IBerryPreferences* /*prefs*/)

@@ -59,7 +59,9 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_MainControl = new QWidget(parent);
 
   m_TemporaryDirectory = new ctkDirectoryButton(m_MainControl);
+  m_TemporaryDirectory->setCaption("Select a directory for temporary files ... ");
   m_ModulesDirectory = new ctkDirectoryButton(m_MainControl);
+  m_ModulesDirectory->setCaption("Select a directory to load modules from ... ");
 
   QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("temporary directory:", m_TemporaryDirectory);
@@ -77,8 +79,8 @@ QWidget* CommandLineModulesPreferencesPage::GetQtControl() const
 
 bool CommandLineModulesPreferencesPage::PerformOk()
 {
-  m_CLIPreferencesNode->Put(TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->text().toStdString());
-  m_CLIPreferencesNode->Put(MODULES_DIRECTORY_NODE_NAME, m_ModulesDirectory->text().toStdString());
+  m_CLIPreferencesNode->Put(TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory().toStdString());
+  m_CLIPreferencesNode->Put(MODULES_DIRECTORY_NODE_NAME, m_ModulesDirectory->directory().toStdString());
   return true;
 }
 
@@ -88,6 +90,6 @@ void CommandLineModulesPreferencesPage::PerformCancel()
 
 void CommandLineModulesPreferencesPage::Update()
 {
-  m_TemporaryDirectory->setText(QString::fromStdString(m_CLIPreferencesNode->Get(TEMPORARY_DIRECTORY_NODE_NAME, "/tmp")));
-  m_ModulesDirectory->setText(QString::fromStdString(m_CLIPreferencesNode->Get(MODULES_DIRECTORY_NODE_NAME, "/cs/research/medic/home2/paramedic/clarkson/modules")));
+  m_TemporaryDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(TEMPORARY_DIRECTORY_NODE_NAME, "")));
+  m_ModulesDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(MODULES_DIRECTORY_NODE_NAME, "")));
 }

@@ -115,6 +115,15 @@ namespace CommonFunctionality
     }
   }
 
+  /** \brief Converts a 2D image to an 3D image
+  */
+  template < typename TPixel, unsigned int VImageDimension >
+  void Convert2DImageTo3D( const itk::Image< TPixel, VImageDimension > *image, mitk::Image::Pointer oldImage, mitk::Image::Pointer &newImage );
+
+  
+
+
+
   QmitkExt_EXPORT mitk::DataNode::Pointer FileOpen( const QString& fileName);
   QmitkExt_EXPORT mitk::DataNode::Pointer FileOpen( const char *fileName );
   QmitkExt_EXPORT mitk::DataNode::Pointer FileOpenSpecific( const QString& fileExtensions);

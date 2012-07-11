@@ -41,11 +41,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName, const char* propFileName)
 { 
+   // Check if desired format is supported
   if (! fileWriter->CanWriteBaseDataType(data) ) {
     QMessageBox::critical(NULL,"ERROR","Could not write file. Invalid data type for file writer.");
     return;
   }
 
+  // Ensure a valid filename
   QString fileName;
   if (aFileName == NULL)
   {
@@ -81,6 +83,8 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
   else
     fileName = aFileName;
 
+
+  // Write
   if (fileName.isEmpty() == false )
   {
     fileWriter->SetFileName( fileName.toLocal8Bit().constData() );
@@ -540,7 +544,76 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
       if( answer == QMessageBox::No )
         return "";
     }
-   
+
+
+    // Check if Image data/ Geometry information is lost
+    if (image->GetDimension() == 2)
+    {
+       //if image is 2D the transformation matrix is cropped to 2D. Check if information is lost here.
+       bool informationIsLost = false;
+       while(1)
+       {
+          if (image->GetGeometry()->GetSpacing()[2] != 0)
+          {
+             informationIsLost = true;
+             break;
+          }
+          if (image->GetGeometry()->GetOrigin()[2] != 0)
+          {
+             informationIsLost = true;
+             break;
+          }
+          mitk::Vector3D col0, col1, col2;
+          col0.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+          col1.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+          col2.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+
+          if ((col0[2] != 0) || (col1[2] != 0) || (col2[0] != 0) || (col2[1] != 0) || (col2[2] != 0))
+          {
+             informationIsLost = true;
+             break;
+          }
+       };
+
+       if (informationIsLost)
+       {
+          // information will be lost, if continuing to save this file as 2D
+          // tell it the user and offer to save it as 3D
+
+          // todo: if format is png, jpg, etc.. forget it, no geometry information at all
+
+          QMessageBox msgBox;
+          msgBox.setText("You are trying to save a 2D image that has 3D geometry informations.");
+          msgBox.setInformativeText("You will lose the 3D geometry information this way. Do you rather want to save it as a 3D image?");
+          msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+          msgBox.setDefaultButton(QMessageBox::Yes);
+          int ret = msgBox.exec();
+
+          if (ret == QMessageBox::YesRole)
+          {
+             // Save as 3D
+             // todo: convert image to 3D image
+             mitk::Image::Pointer imageAs3D;
+             AccessFixedDimensionByItk_2(image,Convert2DImageTo3D,2,image,imageAs3D);
+             image = imageAs3D;
+          }
+          else if (ret == QMessageBox::NoRole)
+          {
+             // Continue Saving as 2D
+
+          }
+          else 
+          {
+             // Abort, don't save anything
+             return 0; 
+          }
+
+
+       }
+       
+    }
+
+    // write image
     imageWriter->SetInput(image);
     imageWriter->SetFileName(dir.c_str());
     imageWriter->SetExtension(extension.c_str());
@@ -690,3 +763,51 @@ if (returnValue != "")
 return returnValue;
 }
 
+template < typename TPixel, unsigned int VImageDimension >
+void CommonFunctionality::Convert2DImageTo3D( const itk::Image< TPixel, VImageDimension > *image, mitk::Image::Pointer oldImage, mitk::Image::Pointer &newImage)
+{
+   typedef itk::Image<TPixel,3> ImageType;
+
+   // create new 3D ITK image with just one slice.
+   typename ImageType::Pointer outputImage = ImageType::New();
+   typename ImageType::RegionType myRegion;
+   typename ImageType::SizeType mySize;
+   typename ImageType::IndexType myIndex;
+   typename ImageType::SpacingType mySpacing;
+   mySpacing[0] = oldImage->GetGeometry()->GetSpacing()[0];
+   mySpacing[1] = oldImage->GetGeometry()->GetSpacing()[1];
+   mySpacing[2] = oldImage->GetGeometry()->GetSpacing()[2];
+   myIndex[0] = oldImage->GetGeometry()->GetOrigin()[0];
+   myIndex[1] = oldImage->GetGeometry()->GetOrigin()[1];
+   myIndex[2] = oldImage->GetGeometry()->GetOrigin()[2];
+   mySize[0] = oldImage->GetLargestPossibleRegion().GetSize()[0];
+   mySize[1] = oldImage->GetLargestPossibleRegion().GetSize()[1];
+   mySize[2] = oldImage->GetLargestPossibleRegion().GetSize()[2];
+   myRegion.SetSize( mySize);
+   myRegion.SetIndex( myIndex );
+   outputImage->SetSpacing(mySpacing);
+   outputImage->SetRegions( myRegion);
+   outputImage->Allocate();
+   outputImage->FillBuffer(0);
+
+   // Copy values
+   itk::Index<3> index3;
+   itk::Index<2> index2;
+   for (int x=0; x<oldImage->GetDimension(0); x++)
+   {
+      for (int y=0; y<oldImage->GetDimension(1); y++)
+      {
+         index2[0] = x;
+         index2[1] = y;
+
+         index3[0] = x;
+         index3[1] = y;
+         index3[2] = 0;
+
+         outputImage->SetPixel(index3,image->GetPixel(index2));
+      }
+   }
+
+   // produce MITK image as output
+   CastToMitkImage(outputImage, newImage);
+}

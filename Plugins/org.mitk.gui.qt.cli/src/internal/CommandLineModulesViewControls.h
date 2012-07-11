@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_CommandLineModulesViewControls.h"
 
+class QHBoxLayout;
+
 /**
  * \class CommandLineModulesViewControls
  * \brief Contains various utilities to remove the responsibility from CommandLineModulesView.
@@ -42,6 +44,15 @@ protected:
 
 private:
 
+  /**
+   * \brief Tab widget, needs programatically controlled layout.
+   */
+  QHBoxLayout *m_LayoutForAbout;
+
+  /**
+   * \brief Tab widget, needs programatically controlled layout.
+   */
+  QHBoxLayout *m_LayoutForHelp;
 };
 
 #endif // CommandLineModulesViewControls_h

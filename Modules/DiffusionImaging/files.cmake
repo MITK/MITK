@@ -208,10 +208,10 @@ set(H_FILES
   Algorithms/itkDistanceMapFilter.h
   Algorithms/itkProjectionFilter.h
   Algorithms/itkSkeletonizationFilter.h
-  Algorithms/itkReduceDirectionGradientsFilter.h
   Algorithms/itkResidualImageFilter.h
   Algorithms/itkExtractChannelFromRgbaImageFilter.h
   Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
+  Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h

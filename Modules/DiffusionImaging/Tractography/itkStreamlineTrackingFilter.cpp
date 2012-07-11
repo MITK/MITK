@@ -87,7 +87,7 @@ TPDPixelType>
             minSpacing = m_ImageSpacing[1];
         else
             minSpacing = m_ImageSpacing[2];
-        m_StepSize = 0.5*minSpacing;
+        m_StepSize = 0.1*minSpacing;
     }
 
     m_PolyDataContainer = itk::VectorContainer< int, FiberPolyDataType >::New();
@@ -112,7 +112,10 @@ TPDPixelType>
         m_MaskImage->SetRegions( imageRegion );
         m_MaskImage->Allocate();
         m_MaskImage->FillBuffer(1);
+
     }
+    std::cout << "StreamlineTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
+    std::cout << "StreamlineTrackingFilter: FA threshold: " << m_FaThreshold << std::endl;
     std::cout << "StreamlineTrackingFilter: stepsize: " << m_StepSize << " mm" << std::endl;
     std::cout << "StreamlineTrackingFilter: starting streamline tracking" << std::endl;
 }

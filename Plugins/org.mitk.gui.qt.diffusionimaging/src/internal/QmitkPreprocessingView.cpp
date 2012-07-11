@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkBrainMaskExtractionImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkVectorContainer.h"
-#include <itkReduceDirectionGradientsFilter.h>
+#include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 
 // mitk includes
 #include "QmitkDataStorageComboBox.h"
@@ -121,7 +121,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
 {
   bool foundDwiVolume = false;
   m_DiffusionImage = NULL;
-  m_SelectedDiffusionNodes = mitk::DataStorage::SetOfObjects::New();
+  m_SelectedDiffusionNodes.clear();
 
   // iterate selection
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
@@ -133,7 +133,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
       foundDwiVolume = true;
       m_DiffusionImage = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType>*>(node->GetData());
       m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
-      m_SelectedDiffusionNodes->push_back(node);
+      m_SelectedDiffusionNodes.push_back(node);
     }
   }
 
@@ -243,14 +243,14 @@ void QmitkPreprocessingView::Deactivated()
 
 void QmitkPreprocessingView::DoHalfSphereGradientDirections()
 {
-  if (m_DiffusionImage.IsNull())
-    return;
-
+    for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+    {
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetOriginalDirections();
 
   for (int j=0; j<gradientContainer->Size(); j++)
     if (gradientContainer->at(j)[0]<0)
       gradientContainer->at(j) = -gradientContainer->at(j);
+    }
 }
 
 void QmitkPreprocessingView::DoApplyMesurementFrame()
@@ -281,19 +281,22 @@ void QmitkPreprocessingView::DoShowGradientDirections()
   {
     mitk::Point3D p;
     vnl_vector_fixed< double, 3 > v = gradientContainer->at(j);
-    if (fabs(v[0])>0.001 || fabs(v[1])>0.001 || fabs(v[2])>0.001)
+    if (v.magnitude()>mitk::eps)
     {
-      p[0] = v[0];
-      p[1] = v[1];
-      p[2] = v[2];
+      p[0] = v[0]*100;
+      p[1] = v[1]*100;
+      p[2] = v[2]*100;
       pointset->InsertPoint(j, p);
     }
   }
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(pointset);
-  node->SetName("gradient directions");
-  node->SetProperty("pointsize", mitk::FloatProperty::New(0.05));
+  QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+  name += "_GradientDirections";
+  node->SetName(name.toStdString().c_str());
+  node->SetProperty("pointsize", mitk::FloatProperty::New(2.5));
   node->SetProperty("color", mitk::ColorProperty::New(1,0,0));
+
   GetDefaultDataStorage()->Add(node);
 }
 
@@ -303,7 +306,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
     return;
 
   typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-  typedef itk::ReduceDirectionGradientsFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+  typedef itk::ElectrostaticRepulsionDiffusionGradientReductionFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
   typedef DiffusionImageType::BValueMap BValueMap;
 
   // GetShellSelection from GUI
@@ -311,15 +314,13 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
   BValueMap originalShellMap = m_DiffusionImage->GetB_ValueMap();
   foreach(QCheckBox * box , m_ReduceGradientCheckboxes)
   {
-    if(box->isChecked()){
+    if(box->isChecked())
+    {
       double BValue = (box->text().split(' ')).at(0).toDouble();
       shellSlectionMap[BValue] = originalShellMap[BValue];
       MITK_INFO << BValue;
     }
   }
-
-  MITK_INFO << shellSlectionMap.size();
-
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetOriginalDirections();
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput(m_DiffusionImage->GetVectorImage());
@@ -338,7 +339,10 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
   image->InitializeFromVectorImage();
   mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
   imageNode->SetData( image );
-  imageNode->SetName("reduced_image");
+  QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+  name += "_";
+  name += QString::number(m_Controls->m_ReduceGradientsBox->value());
+  imageNode->SetName(name.toStdString().c_str());
   GetDefaultDataStorage()->Add(imageNode);
 }
 
@@ -347,7 +351,7 @@ void QmitkPreprocessingView::ExtractB0()
   typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
   typedef DiffusionImageType::GradientDirectionContainerType    GradientContainerType;
 
-  int nrFiles = m_SelectedDiffusionNodes->size();
+  int nrFiles = m_SelectedDiffusionNodes.size();
   if (!nrFiles) return;
 
   // call the extraction withou averaging if the check-box is checked
@@ -357,8 +361,8 @@ void QmitkPreprocessingView::ExtractB0()
     return;
   }
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes->begin() );
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes->end() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
 
   std::vector<mitk::DataNode::Pointer> nodes;
   while ( itemiter != itemiterend ) // for all items
@@ -399,14 +403,12 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
   typedef itk::B0ImageExtractionToSeparateImageFilter< short, short> FilterType;
 
   // check number of selected objects, return if empty
-  int nrFiles = m_SelectedDiffusionNodes->size();
+  int nrFiles = m_SelectedDiffusionNodes.size();
   if (!nrFiles)
     return;
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes->begin() );
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes->end() );
-
-  std::vector< mitk::DataNode::Pointer > nodes;
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
 
   while ( itemiter != itemiterend ) // for all items
   {
@@ -439,11 +441,11 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
 
 void QmitkPreprocessingView::AverageGradients()
 {
-  int nrFiles = m_SelectedDiffusionNodes->size();
+  int nrFiles = m_SelectedDiffusionNodes.size();
   if (!nrFiles) return;
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes->begin() );
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes->end() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
 
   std::vector<mitk::DataNode::Pointer> nodes;
   while ( itemiter != itemiterend ) // for all items
@@ -461,11 +463,11 @@ void QmitkPreprocessingView::AverageGradients()
 
 void QmitkPreprocessingView::BrainMask()
 {
-  int nrFiles = m_SelectedDiffusionNodes->size();
+  int nrFiles = m_SelectedDiffusionNodes.size();
   if (!nrFiles) return;
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes->begin() );
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes->end() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
 
   while ( itemiter != itemiterend ) // for all items
   {

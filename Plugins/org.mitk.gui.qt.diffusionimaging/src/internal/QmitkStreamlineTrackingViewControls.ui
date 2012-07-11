@@ -29,6 +29,26 @@
    <property name="spacing">
     <number>0</number>
    </property>
+   <item row="6" column="0">
+    <widget class="QLabel" name="m_SeedsPerVoxelLabel_2">
+     <property name="toolTip">
+      <string>Number of tracts started in each voxel of the seed ROI.</string>
+     </property>
+     <property name="text">
+      <string>Mori et al. Annals Neurology 1999</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QCommandLinkButton" name="commandLinkButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Start Tracking</string>
+     </property>
+    </widget>
+   </item>
    <item row="5" column="0">
     <spacer name="spacer1">
      <property name="orientation">
@@ -44,16 +64,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="4" column="0">
-    <widget class="QCommandLinkButton" name="commandLinkButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Start Tracking</string>
-     </property>
-    </widget>
    </item>
    <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox_2">
@@ -193,7 +203,7 @@
       <item row="2" column="1">
        <widget class="QSlider" name="m_fSlider">
         <property name="toolTip">
-         <string>Weighting factor between first eigenvector (f=1) and input vector dependent direction (f=0).</string>
+         <string>Weighting factor between first eigenvector (f=1 equals FACT tracking) and input vector dependent direction (f=0).</string>
         </property>
         <property name="minimum">
          <number>0</number>
@@ -261,7 +271,7 @@
       <item row="3" column="1">
        <widget class="QSlider" name="m_gSlider">
         <property name="toolTip">
-         <string>Weighting factor between input vector (g=0) and tensor deflection (g=1)</string>
+         <string>Weighting factor between input vector (g=0) and tensor deflection (g=1 equals TEND tracking)</string>
         </property>
         <property name="minimum">
          <number>0</number>
@@ -315,6 +325,26 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="m_SeedsPerVoxelLabel_3">
+     <property name="toolTip">
+      <string>Number of tracts started in each voxel of the seed ROI.</string>
+     </property>
+     <property name="text">
+      <string>Lazar et al. Human Brain Mapping 2003</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="m_SeedsPerVoxelLabel_4">
+     <property name="toolTip">
+      <string>Number of tracts started in each voxel of the seed ROI.</string>
+     </property>
+     <property name="text">
+      <string>Weinstein et al. Proceedings of IEEE Visualization 1999</string>
+     </property>
     </widget>
    </item>
   </layout>

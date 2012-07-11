@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  * \class CommandLineModulesViewControls
  * \brief Contains various utilities to remove the responsibility from CommandLineModulesView.
+ * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  */
 class CommandLineModulesViewControls : public QWidget, public Ui_CommandLineModulesViewControls
 {

@@ -18,10 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define CommandLineModulesView_h
 
 #include <QmitkAbstractView.h>
-#include "ui_CommandLineModulesViewControls.h"
+#include "CommandLineModulesViewControls.h"
 #include <ctkCmdLineModuleReference.h>
+#include <ctkCmdLineModuleProcessFuture.h>
 
 class ctkCmdLineModuleManager;
+class ctkCmdLineModuleInstance;
 
 namespace berry
 {
@@ -31,6 +33,7 @@ namespace berry
 /*!
  * \class CommandLineModulesView
  * \brief Provides basic GUI interface to the CTK command line modules.
+ * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  *
  * The intention of this class is that it is an intermediate integration point
  * for the CTK command line modules. Ideally, an MITK base application would
@@ -64,6 +67,9 @@ public:
 protected slots:
   
   void OnChooseFileButtonPressed();
+  void OnRunButtonPressed();
+  void OnStopButtonPressed();
+  void OnFutureFinished();
 
 protected:
 
@@ -102,7 +108,7 @@ private:
    * \brief The GUI controls contain a run/stop button, and a tabbed widget, so the GUI component
    * for each command line module is added to the tabbed widget dynamically at run time.
    */
-  Ui::CommandLineModulesViewControls m_Controls;
+  CommandLineModulesViewControls *m_Controls;
 
   /**
    * \brief We store the parent, passed in via CommandLineModulesView::CreateQtPartControl, as this class itself is not a QWidget.
@@ -117,7 +123,12 @@ private:
   /**
    * \brief We maintain a hashmap of tab-number to module reference.
    */
-  QHash<int, ctkCmdLineModuleReference> m_MapTabToModuleRef;
+  QHash<int, ctkCmdLineModuleInstance*> m_MapTabToModuleInstance;
+
+  /**
+   * \brief We use a QFutureWatcher to monitor the QFuture.
+   */
+  ctkCmdLineModuleProcessFutureWatcher m_FutureWatcher;
 
   /**
    * \brief We store a temporary folder name, accessible via user preferences.

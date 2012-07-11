@@ -20,11 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMessageBox>
 #include <QProcessEnvironment>
 #include <mitkLogMacros.h>
+#include <fstream>
+#include <iostream>
 #include <QFile>
 #include <QTextStream>
 #include <QIODevice>
-#include <fstream>
-#include <iostream>
+#include <QDir>
 
 QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder) 
 : m_StoreSCP(new QProcess())
@@ -48,40 +49,26 @@ void QmitkStoreSCPLauncher::StartStoreSCP()
 
 void QmitkStoreSCPLauncher::SetPathToStoreSCP()
 {
-    std::string line;
-    std::ifstream myfile("text.ini");
-    if (myfile.is_open())
+    QDir dir("qrc:///org.mitk.gui.qt.dicom/config.txt");
+    MITK_INFO << dir.absolutePath().toStdString();
+    QFile file((dir.absolutePath());
+    m_PathToStoreSCP.clear();
+
+    if(file.open(QIODevice::ReadWrite))
     {
-        while ( myfile.good() )
+        QTextStream stream ( &file );
+        QString line;
+
+        while( !stream.atEnd() )
         {
-            std::getline (myfile,line);
-            MITK_INFO << line << endl;
+            line = stream.readLine();
+            MITK_INFO << line.toStdString();
+            m_PathToStoreSCP.append(line);
+            file.close();
         }
-        myfile.close();
     }else{
         MITK_INFO << "Unable to open file"; 
     }
-    m_PathToStoreSCP.fromStdString(line);
-    MITK_INFO << m_PathToStoreSCP.toStdString();
-    //if(QFile::exists("config.ini")){
-
-
-    //    if (!file.open(QIODevice::ReadWrite))
-    //    {
-    //        MITK_INFO << "cannot find file";
-    //    }
-    //    QTextStream stream(&file);
-
-    //    while( !stream.atEnd() ) {
-    //        m_PathToStoreSCP = stream.readLine().split("-").at(1);
-    //    }
-    //    file.close();
-    //    MITK_INFO << m_PathToStoreSCP.toStdString();
-    //    if(m_PathToStoreSCP.compare("NOTFOUND"))
-    //    {
-    //        MITK_INFO << "cannot find binary";
-    //    }
-    //}
 }
 
 void QmitkStoreSCPLauncher::OnProcessError(QProcess::ProcessError err)

@@ -171,7 +171,7 @@ void QmitkDicomEditor::OnDicomImportFinished(const QStringList& /*path*/)
 }
 
 void QmitkDicomEditor::StartDicomDirectoryListener()
-{   
+{
     if(!m_Thread->isRunning())
     {
         m_DicomDirectoryListener->SetDicomListenerDirectory(m_ListenerDirectory);
@@ -218,14 +218,14 @@ void QmitkDicomEditor::StartStoreSCP()
 
 void QmitkDicomEditor::StopStoreSCP()
 {
-        delete m_StoreSCPLauncher;
-        m_Controls.StoreSCPLabel->setText(QString("Storage service provider is not running!"));
+    delete m_StoreSCPLauncher;
+    m_Controls.StoreSCPLabel->setText(QString("Storage service provider is not running!"));
 }
 
 void QmitkDicomEditor::SetPluginDirectory()
 {
-  m_PluginDirectory = mitk::PluginActivator::getContext()->getDataFile("").absolutePath();
-  m_PluginDirectory.append("/");
+     m_PluginDirectory = mitk::PluginActivator::getContext()->getDataFile("").absolutePath();
+     m_PluginDirectory.append("/");
 }
 
 void QmitkDicomEditor::SetDatabaseDirectory(const QString& databaseDirectory)

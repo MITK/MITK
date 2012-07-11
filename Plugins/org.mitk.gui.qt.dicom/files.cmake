@@ -1,5 +1,4 @@
 set(SRC_CPP_FILES
-
 )
 
 set(INTERNAL_CPP_FILES
@@ -34,14 +33,13 @@ set(MOC_H_FILES
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
   resources/icon.xpm
-  resources/config.ini
   plugin.xml
 )
 
 # list of Qt .qrc files which contain additional resources
 # specific to this plugin
 set(QRC_FILES
-
+  resources/org_mitk_gui_qt_dicom.qrc
 )
 
 set(CPP_FILES )

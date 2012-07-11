@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class ctkCmdLineModuleManager;
 class ctkCmdLineModuleInstance;
+class QAction;
 
 namespace berry
 {
@@ -66,16 +67,17 @@ public:
 
 protected slots:
   
-  void OnChooseFileButtonPressed();
+  void OnActionChanged(QAction*);
   void OnRunButtonPressed();
   void OnStopButtonPressed();
+  void OnRestoreDefaultsButtonPressed();
   void OnFutureFinished();
 
 protected:
 
   /**
    * \brief Called by framework to set the focus on the right widget
-   * when this view has focus, but currently does nothing.
+   * when this view has focus, so currently, thats the combo box to select a module.
    */
   virtual void SetFocus();
 
@@ -93,10 +95,25 @@ private:
   void RetrievePreferenceValues();
 
   /**
-   * \brief Creates a module from a file location.
-   * \param location The full absolute file name of a command line module.
+   * \brief Given a list of absolute or relative paths, will search for modules to load.
+   * \param paths QStringList containing a list of paths to search.
+   * \return QHash<QString, ctkCmdLineModuleReference> Hash map of filename to reference.
    */
-  void AddModule(const QString& location);
+  QHash<QString, ctkCmdLineModuleReference> LoadModuleReferencesFromPaths(QStringList& paths);
+
+  /**
+   * \brief Constructs a nested menu, for all the items in the QHash.
+   * \param references Hash map of filename to reference.
+   * \return QMenu* a nested menu.
+   */
+  QMenu* CreateMenuFromReferences(QHash<QString, ctkCmdLineModuleReference>& references);
+
+  /**
+   * \brief Search the internal datastructure (QHash) to find the reference that matches the identifier (title).
+   * \param identifier The identifier used in the front end combo box widget, currently title.
+   * \return ctkCmdLineModuleReference the reference corresponding to the identifier, or an invalid reference if non found.
+   */
+  ctkCmdLineModuleReference GetReferenceByIdentifier(QString identifier);
 
   /**
    * \brief Adds a module to the views tabbed widget, creating a new tab each time.
@@ -121,7 +138,13 @@ private:
   ctkCmdLineModuleManager *m_ModuleManager;
 
   /**
-   * \brief We maintain a hashmap of tab-number to module reference.
+   * \brief We store a map of filename to reference, and use the reference to populate the combo box.
+   */
+  QHash<QString, ctkCmdLineModuleReference> m_MapFilenameToReference;
+
+
+  /**
+   * \brief We use this map to decide if we want to create more tabs or not.
    */
   QHash<int, ctkCmdLineModuleInstance*> m_MapTabToModuleInstance;
 
@@ -136,9 +159,10 @@ private:
   QString m_TemporaryDirectoryName;
 
   /**
-   * \brief We store a folder name, where we look for modules to load.
+   * \brief We store list of folder names, to avoid re-loading modules if
+   * RetrievePreferenceValues is called multiple times.
    */
-  QString m_ModulesDirectoryName;
+  QStringList m_ModulesDirectoryNames;
 
 };
 

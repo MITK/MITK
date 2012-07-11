@@ -56,12 +56,14 @@ namespace itk{
     /** Runtime information support. */
     itkTypeMacro(StreamlineTrackingFilter, ImageToImageFilter)
 
-    typedef TTensorPixelType                        TensorComponentType;
-    typedef TPDPixelType                            DirectionPixelType;
-    typedef typename Superclass::InputImageType     InputImageType;
-    typedef typename Superclass::OutputImageType    OutputImageType;
-    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
-    typedef itk::Image<unsigned char, 3>            ItkUcharImgType;
+    typedef TTensorPixelType                            TensorComponentType;
+    typedef TPDPixelType                                DirectionPixelType;
+    typedef typename Superclass::InputImageType         InputImageType;
+    typedef typename Superclass::OutputImageType        OutputImageType;
+    typedef typename Superclass::OutputImageRegionType  OutputImageRegionType;
+    typedef itk::Image<unsigned char, 3>                ItkUcharImgType;
+    typedef itk::Image<float, 3>                        ItkFloatImgType;
+    typedef itk::Image< vnl_vector_fixed<double,3>, 3>  ItkPDImgType;
 
     typedef vtkSmartPointer< vtkPolyData >     FiberPolyDataType;
 
@@ -89,6 +91,11 @@ namespace itk{
     FiberPolyDataType m_FiberPolyData;
     vtkSmartPointer<vtkPoints> m_Points;
     vtkSmartPointer<vtkCellArray> m_Cells;
+
+    ItkFloatImgType::Pointer    m_EmaxImage;
+    ItkFloatImgType::Pointer    m_FaImage;
+    ItkPDImgType::Pointer       m_PdImage;
+
     float m_FaThreshold;
     float m_AngularThreshold;
     float m_StepSize;

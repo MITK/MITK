@@ -99,24 +99,69 @@ TPDPixelType>
 
     if (m_MaskImage.IsNull())
     {
-        itk::Vector<double, 3> spacing = inputImage->GetSpacing();
-        itk::Point<double, 3> origin = inputImage->GetOrigin();
-        itk::Matrix<double, 3, 3> direction = inputImage->GetDirection();
-        ImageRegion<3> imageRegion = inputImage->GetLargestPossibleRegion();
-
-        // initialize crossings image
+        // initialize mask image
         m_MaskImage = ItkUcharImgType::New();
-        m_MaskImage->SetSpacing( spacing );
-        m_MaskImage->SetOrigin( origin );
-        m_MaskImage->SetDirection( direction );
-        m_MaskImage->SetRegions( imageRegion );
+        m_MaskImage->SetSpacing( inputImage->GetSpacing() );
+        m_MaskImage->SetOrigin( inputImage->GetOrigin() );
+        m_MaskImage->SetDirection( inputImage->GetDirection() );
+        m_MaskImage->SetRegions( inputImage->GetLargestPossibleRegion() );
         m_MaskImage->Allocate();
         m_MaskImage->FillBuffer(1);
 
     }
+
+    m_FaImage = ItkFloatImgType::New();
+    m_FaImage->SetSpacing( inputImage->GetSpacing() );
+    m_FaImage->SetOrigin( inputImage->GetOrigin() );
+    m_FaImage->SetDirection( inputImage->GetDirection() );
+    m_FaImage->SetRegions( inputImage->GetLargestPossibleRegion() );
+    m_FaImage->Allocate();
+    m_FaImage->FillBuffer(0.0);
+
+    m_PdImage = ItkPDImgType::New();
+    m_PdImage->SetSpacing( inputImage->GetSpacing() );
+    m_PdImage->SetOrigin( inputImage->GetOrigin() );
+    m_PdImage->SetDirection( inputImage->GetDirection() );
+    m_PdImage->SetRegions( inputImage->GetLargestPossibleRegion() );
+    m_PdImage->Allocate();
+
+    m_EmaxImage = ItkFloatImgType::New();
+    m_EmaxImage->SetSpacing( inputImage->GetSpacing() );
+    m_EmaxImage->SetOrigin( inputImage->GetOrigin() );
+    m_EmaxImage->SetDirection( inputImage->GetDirection() );
+    m_EmaxImage->SetRegions( inputImage->GetLargestPossibleRegion() );
+    m_EmaxImage->Allocate();
+    m_EmaxImage->FillBuffer(1.0);
+
+    typedef itk::DiffusionTensor3D<TTensorPixelType>    TensorType;
+    typename TensorType::EigenValuesArrayType eigenvalues;
+    typename TensorType::EigenVectorsMatrixType eigenvectors;
+    for (int x=0; x<m_ImageSize[0]; x++)
+        for (int y=0; y<m_ImageSize[1]; y++)
+            for (int z=0; z<m_ImageSize[2]; z++)
+            {
+                typename InputImageType::IndexType index;
+                index[0] = x; index[1] = y; index[2] = z;
+                typename InputImageType::PixelType tensor = inputImage->GetPixel(index);
+                if(tensor.GetTrace()!=0 && tensor.GetFractionalAnisotropy()>m_FaThreshold)
+                {
+                    vnl_vector_fixed<double,3> dir;
+                    tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
+                    dir[0] = eigenvectors(2, 0);
+                    dir[1] = eigenvectors(2, 1);
+                    dir[2] = eigenvectors(2, 2);
+                    dir.normalize();
+                    m_PdImage->SetPixel(index, dir);
+                    m_FaImage->SetPixel(index, tensor.GetFractionalAnisotropy());
+                    m_EmaxImage->SetPixel(index, 2/eigenvalues[2]);
+                }
+            }
+
     std::cout << "StreamlineTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
     std::cout << "StreamlineTrackingFilter: FA threshold: " << m_FaThreshold << std::endl;
     std::cout << "StreamlineTrackingFilter: stepsize: " << m_StepSize << " mm" << std::endl;
+    std::cout << "StreamlineTrackingFilter: f: " << m_F << std::endl;
+    std::cout << "StreamlineTrackingFilter: g: " << m_G << std::endl;
     std::cout << "StreamlineTrackingFilter: starting streamline tracking" << std::endl;
 }
 
@@ -150,15 +195,13 @@ TPDPixelType>
             continue;
         }
 
-        typename TensorType::EigenValuesArrayType eigenvalues;
-        typename TensorType::EigenVectorsMatrixType eigenvectors;
-
         for (int s=0; s<m_SeedsPerVoxel; s++)
         {
             unsigned long counter = 0;
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
             std::vector< vtkIdType > pointISs;
             typename InputImageType::IndexType index = it.GetIndex();
+            typename InputImageType::IndexType indexOld; indexOld[0] = -1; indexOld[1] = -1; indexOld[2] = -1;
             itk::ContinuousIndex<double, 3> pos;
             itk::ContinuousIndex<double, 3> start;
 
@@ -191,31 +234,33 @@ TPDPixelType>
                     break;
 
                 typename InputImageType::PixelType tensor = inputImage->GetPixel(index);
-                if(tensor.GetTrace()!=0 && tensor.GetFractionalAnisotropy()>m_FaThreshold)
+                if(m_FaImage->GetPixel(index)>m_FaThreshold)
                 {
-                    tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
                     vnl_vector_fixed<double,3> dir;
-                    dir[0] = eigenvectors(2, 0);
-                    dir[1] = eigenvectors(2, 1);
-                    dir[2] = eigenvectors(2, 2);
-                    dir.normalize();
-
-                    if (!dirOld.is_zero())
+                    if (indexOld!=index)
                     {
-                        dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
-                        dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
-                        dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
-                        dir.normalize();
+                        dir = m_PdImage->GetPixel(index);
 
-                        float angle = dot_product(dirOld, dir);
-                        if (angle<0)
-                            dir *= -1;
-                        angle = fabs(dot_product(dirOld, dir));
-                        if (angle<m_AngularThreshold)
-                            break;
+                        if (!dirOld.is_zero())
+                        {
+                            float scale = m_EmaxImage->GetPixel(index);
+                            dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
+                            dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
+                            dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
+                            dir.normalize();
+
+                            float angle = dot_product(dirOld, dir);
+                            if (angle<0)
+                                dir *= -1;
+                            angle = dot_product(dirOld, dir);
+                            if (angle<m_AngularThreshold)
+                                break;
+                        }
+                        dirOld = dir;
+                        indexOld = index;
                     }
-
-                    dirOld = dir;
+                    else
+                        dir = dirOld;
 
                     dir *= m_StepSize;
 
@@ -241,6 +286,7 @@ TPDPixelType>
 
             // do backward tracking
             index = it.GetIndex();
+            indexOld[0] = -1; indexOld[1] = -1; indexOld[2] = -1;
             pos = start;
             dirOld.fill(0.0);
             while (step < m_MaxLength)
@@ -259,27 +305,34 @@ TPDPixelType>
                     break;
 
                 typename InputImageType::PixelType tensor = inputImage->GetPixel(index);
-                if(tensor.GetTrace()!=0 && tensor.GetFractionalAnisotropy()>m_FaThreshold)
+                if(m_FaImage->GetPixel(index)>m_FaThreshold)
                 {
-                    tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
-
                     vnl_vector_fixed<double,3> dir;
-                    dir[0] = eigenvectors(2, 0);
-                    dir[1] = eigenvectors(2, 1);
-                    dir[2] = eigenvectors(2, 2);
-                    dir.normalize();
-                    dir *= -1; // reverse direction
-
-                    if (!dirOld.is_zero())
+                    if (indexOld!=index)
                     {
-                        float angle = dot_product(dirOld, dir);
-                        if (angle<0)
-                            dir *= -1;
-                        angle = fabs(dot_product(dirOld, dir));
-                        if (angle<0.7)
-                            break;
+                        dir = m_PdImage->GetPixel(index);
+                        dir *= -1; // reverse direction
+
+                        if (!dirOld.is_zero())
+                        {
+                            float scale = m_EmaxImage->GetPixel(index);
+                            dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
+                            dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
+                            dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
+                            dir.normalize();
+
+                            float angle = dot_product(dirOld, dir);
+                            if (angle<0)
+                                dir *= -1;
+                            angle = dot_product(dirOld, dir);
+                            if (angle<m_AngularThreshold)
+                                break;
+                        }
+                        dirOld = dir;
+                        indexOld = index;
                     }
-                    dirOld = dir;
+                    else
+                        dir = dirOld;
 
                     dir *= m_StepSize;
 

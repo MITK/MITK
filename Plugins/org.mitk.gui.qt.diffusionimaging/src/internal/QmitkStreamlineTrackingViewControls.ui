@@ -126,7 +126,7 @@
          <number>0</number>
         </property>
         <property name="maximum">
-         <number>180</number>
+         <number>90</number>
         </property>
         <property name="value">
          <number>45</number>
@@ -242,7 +242,7 @@
       <item row="4" column="1">
        <widget class="QSlider" name="m_StepsizeSlider">
         <property name="toolTip">
-         <string>Stepsize in mm (auto = 0.5*minimal spacing)</string>
+         <string>Stepsize in mm (auto = 0.1*minimal spacing)</string>
         </property>
         <property name="minimum">
          <number>0</number>
@@ -264,7 +264,7 @@
          <string>Minimum tract length in mm.</string>
         </property>
         <property name="text">
-         <string>g: 1</string>
+         <string>g: 0</string>
         </property>
        </widget>
       </item>

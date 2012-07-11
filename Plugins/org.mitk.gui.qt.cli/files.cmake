@@ -4,8 +4,9 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_cli_Activator.cpp
-  CommandLineModulesView.cpp
+  CommandLineModulesViewControls.cpp
   CommandLineModulesPreferencesPage.cpp
+  CommandLineModulesView.cpp
 )
 
 set(UI_FILES
@@ -14,8 +15,9 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_cli_Activator.h
-  src/internal/CommandLineModulesView.h
+  src/internal/CommandLineModulesViewControls.h
   src/internal/CommandLineModulesPreferencesPage.h
+  src/internal/CommandLineModulesView.h
 )
 
 # list of resource files which can be used by the plug-in
@@ -24,6 +26,8 @@ set(MOC_H_FILES
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
   resources/icon.xpm
+  resources/run.png
+  resources/stop.png
   plugin.xml
 )
 

@@ -46,7 +46,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string CommandLineModulesView::VIEW_ID = "org.mitk.gui.qt.cli";
 
 CommandLineModulesView::CommandLineModulesView()
-: m_Parent(NULL)
+: m_Controls(NULL)
+, m_Parent(NULL)
 , m_ModuleManager(NULL)
 , m_TemporaryDirectoryName("")
 , m_ModulesDirectoryName("")
@@ -68,14 +69,20 @@ void CommandLineModulesView::SetFocus()
 
 void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
 {
-  // Create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi( parent );
+  if (!m_Controls)
+  {
+    // We create CommandLineModulesViewControls, which derives from the Qt generated class.
+    m_Controls = new CommandLineModulesViewControls(parent);
 
-  // Loads the preferences into member variables.
-  this->RetrievePreferenceValues();
+    // Loads the preferences like directory settings into member variables.
+    this->RetrievePreferenceValues();
 
-  // Connect signals to slots after we have set up GUI.
-  connect(this->m_Controls.m_FileChoose, SIGNAL(pressed()), this, SLOT(OnChooseFileButtonPressed()));
+    // Connect signals to slots after we have set up GUI.
+    connect(this->m_Controls->m_FileChoose, SIGNAL(pressed()), this, SLOT(OnChooseFileButtonPressed()));
+    connect(this->m_Controls->m_RunButton, SIGNAL(pressed()), this, SLOT(OnRunButtonPressed()));
+    connect(this->m_Controls->m_StopButton, SIGNAL(pressed()), this, SLOT(OnStopButtonPressed()));
+    connect(&(this->m_FutureWatcher), SIGNAL(finished()), this, SLOT(OnFutureFinished()));
+  }
 }
 
 void CommandLineModulesView::RetrievePreferenceValues()
@@ -131,20 +138,40 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
   QObject* guiHandle = moduleInstance->guiHandle();
   QWidget* widget = qobject_cast<QWidget*>(guiHandle);
 
-  /*
-    QScrollArea* scrollArea = new QScrollArea();
-    scrollArea->setContentsMargins(0,0,0,0);
-
-    QHBoxLayout *layout = new QHBoxLayout(scrollArea);
-    layout->addWidget(widget);
-    layout->setContentsMargins(0,0,0,0);
-    layout->setSpacing(0);
-
-    scrollArea->setLayout(layout);
-  */
-
-  int tabIndex = m_Controls.m_TabWidget->addTab(widget, widget->objectName());
-  m_MapTabToModuleRef[tabIndex] = moduleRef;
+  int tabIndex = m_Controls->m_TabWidget->addTab(widget, widget->objectName());
+  m_MapTabToModuleInstance[tabIndex] = moduleInstance;
 
 }
 
+void CommandLineModulesView::OnRunButtonPressed()
+{
+  qDebug() << "Creating module command line...";
+
+  ctkCmdLineModuleInstance* moduleInstance = m_MapTabToModuleInstance[m_Controls->m_TabWidget->currentIndex()];
+  if (!moduleInstance)
+  {
+    qWarning() << "Invalid module instance";
+    return;
+  }
+
+  qDebug() << "Launching module command line...";
+
+  ctkCmdLineModuleProcessFuture future = moduleInstance->run();
+
+  qDebug() << "Launched module command line...";
+}
+
+void CommandLineModulesView::OnStopButtonPressed()
+{
+  qDebug() << "Stopping module command line...";
+
+
+  qDebug() << "Stopped module command line...";
+}
+
+void CommandLineModulesView::OnFutureFinished()
+{
+  qDebug() << "*** Future finished ***";
+  qDebug() << "stdout:" << m_FutureWatcher.future().standardOutput();
+  qDebug() << "stderr:" << m_FutureWatcher.future().standardError();
+}

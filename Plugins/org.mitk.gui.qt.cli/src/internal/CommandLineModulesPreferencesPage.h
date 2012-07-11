@@ -24,6 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QWidget;
 class ctkDirectoryButton;
 
+/**
+ * \class CommandLineModulesPreferencesPage
+ * \brief Preference page for CommandLineModulesView
+ * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
+ */
 class CommandLineModulesPreferencesPage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT

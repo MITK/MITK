@@ -15,12 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "CommandLineModulesViewControls.h"
+#include <QIcon>
 
 CommandLineModulesViewControls::CommandLineModulesViewControls(QWidget *parent)
 {
   this->setupUi(parent);
-  this->m_RunButton->setIcon(":/CommandLineModulesResources/run.png");
-  this->m_StopButton->setIcon(":/CommandLineModulesResources/stop.png");
+  this->m_RunButton->setIcon(QIcon(":/CommandLineModulesResources/run.png"));
+  this->m_StopButton->setIcon(QIcon(":/CommandLineModulesResources/stop.png"));
 }
 
 CommandLineModulesViewControls::~CommandLineModulesViewControls()

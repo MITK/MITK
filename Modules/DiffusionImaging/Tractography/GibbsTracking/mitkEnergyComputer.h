@@ -30,8 +30,8 @@ class MitkDiffusionImaging_EXPORT EnergyComputer
 
 public:
 
-    typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
-    typedef itk::Image<OdfVectorType, 3>        ItkQBallImgType;
+    //typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
+    //typedef itk::Image<OdfVectorType, 3>        ItkQBallImgType;
     typedef itk::Image<float, 3>                ItkFloatImageType;
     typedef itk::Statistics::MersenneTwisterRandomVariateGenerator ItkRandGenType;
 
@@ -49,12 +49,15 @@ public:
     virtual float ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2) = 0;
     virtual float ComputeInternalEnergy(Particle *dp) = 0;
 
+    int GetNumActiveVoxels();
+
 protected:
 
     vnl_matrix_fixed<float, 3, 3>   m_RotationMatrix;
     SphereInterpolator*             m_SphereInterpolator;
     ParticleGrid*                   m_ParticleGrid;
     ItkRandGenType*                 m_RandGen;
+//    ItkQBallImgType*                m_Image;
     ItkFloatImageType*              m_Mask;
     vnl_vector_fixed<int, 3>        m_Size;
     vnl_vector_fixed<float, 3>      m_Spacing;

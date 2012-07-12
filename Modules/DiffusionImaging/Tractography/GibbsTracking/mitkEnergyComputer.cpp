@@ -43,7 +43,7 @@ EnergyComputer::EnergyComputer(ItkFloatImageType* mask, ParticleGrid* particleGr
     m_Spacing[1] = mask->GetSpacing()[1];
     m_Spacing[2] = mask->GetSpacing()[2];
 
-        //calculate rotation matrix
+    // calculate rotation matrix
     vnl_matrix<double> temp = mask->GetDirection().GetVnlMatrix();
     vnl_matrix<float>  directionMatrix; directionMatrix.set_size(3,3);
     vnl_copy(temp, directionMatrix);
@@ -62,7 +62,7 @@ EnergyComputer::EnergyComputer(ItkFloatImageType* mask, ParticleGrid* particleGr
         fprintf(stderr,"EnergyComputer: error during init: data does not match with interpolation scheme\n");
 
     int totsz = m_Size[0]*m_Size[1]*m_Size[2];
-    m_CumulatedSpatialProbability.resize(totsz+1, 0.0); // +1?
+    m_CumulatedSpatialProbability.resize(totsz + 1, 0.0);
     m_ActiveIndices.resize(totsz, 0);
 
     // calculate active voxels and cumulate probabilities
@@ -146,101 +146,6 @@ float EnergyComputer::SpatProb(vnl_vector_fixed<float, 3> pos)
         return 0;
 }
 
-
-
-//float EnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, Particle *dp)
-//{
-//    if (SpatProb(R) == 0)   // check if position is inside mask
-//        return itk::NumericTraits<float>::NonpositiveMin();
-//
-//    float odfVal = EvaluateOdf(R, N);   // evaluate ODF in given direction
-//
-//    float modelVal = 0;
-//    m_ParticleGrid->ComputeNeighbors(R);    // retrieve neighbouring particles from particle grid
-//    Particle* neighbour =  m_ParticleGrid->GetNextNeighbor();
-//    while (neighbour!=NULL)                         // iterate over nieghbouring particles
-//    {
-//        if (dp != neighbour)                        // don't evaluate against itself
-//        {
-//            // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-//            float dot = fabs(dot_product(N,neighbour->dir));
-//            float bw = mbesseli0(dot);
-//            float dpos = (neighbour->pos-R).squared_magnitude();
-//            float w = mexp(dpos*gamma_s);
-//            modelVal += w*(bw+m_ParticleChemicalPotential);
-//            w = mexp(dpos*gamma_reg_s);
-//        }
-//        neighbour =  m_ParticleGrid->GetNextNeighbor();
-//    }
-//
-//    float energy = 2*(odfVal/m_ParticleWeight-modelVal) - (mbesseli0(1.0)+m_ParticleChemicalPotential);
-//    return energy*m_ExtStrength;
-//}
-//
-//float EnergyComputer::ComputeInternalEnergy(Particle *dp)
-//{
-//    float energy = 0;
-//
-//    if (dp->pID != -1)  // has predecessor
-//        energy += ComputeInternalEnergyConnection(dp,+1);
-//
-//    if (dp->mID != -1)  // has successor
-//        energy += ComputeInternalEnergyConnection(dp,-1);
-//
-//    return energy;
-//}
-//
-//float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1)
-//{
-//    Particle *p2 = 0;
-//    int ep2;
-//
-//    if (ep1 == 1)
-//        p2 = m_ParticleGrid->GetParticle(p1->pID);  // get predecessor
-//    else
-//        p2 = m_ParticleGrid->GetParticle(p1->mID);  // get successor
-//
-//    // check in which direction the connected particle is pointing
-//    if (p2->mID == p1->ID)
-//        ep2 = -1;
-//    else if (p2->pID == p1->ID)
-//        ep2 = 1;
-//    else
-//       std::cout << "EnergyComputer: Connections are inconsistent!" << std::endl;
-//
-//    return ComputeInternalEnergyConnection(p1,ep1,p2,ep2);
-//}
-//
-//float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2)
-//{
-//    // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-//    if ((dot_product(p1->dir,p2->dir))*ep1*ep2 > -m_CurvatureThreshold)     // angle between particles is too sharp
-//        return itk::NumericTraits<float>::NonpositiveMin();
-//
-//    // calculate the endpoints of the two particles
-//    vnl_vector_fixed<float, 3> endPoint1 = p1->pos + (p1->dir * (m_ParticleLength * ep1));
-//    vnl_vector_fixed<float, 3> endPoint2 = p2->pos + (p2->dir * (m_ParticleLength * ep2));
-//
-//    // check if endpoints are too far apart to connect
-//    if ((endPoint1-endPoint2).squared_magnitude() > m_SquaredParticleLength)
-//        return itk::NumericTraits<float>::NonpositiveMin();
-//
-//    // calculate center point of the two particles
-//    vnl_vector_fixed<float, 3> R = (p2->pos + p1->pos); R *= 0.5;
-//
-//    // they are not allowed to connect if the mask image does not allow it
-//    if (SpatProb(R) == 0)
-//        return itk::NumericTraits<float>::NonpositiveMin();
-//
-//    // get distances of endpoints to center point
-//    float norm1 = (endPoint1-R).squared_magnitude();
-//    float norm2 = (endPoint2-R).squared_magnitude();
-//
-//    // calculate actual internal energy
-//    float energy = (m_ConnectionPotential-norm1-norm2)*m_IntStrength;
-//    return energy;
-//}
-
 float EnergyComputer::mbesseli0(float x)
 {
     //    BESSEL_APPROXCOEFF[0] = -0.1714;
@@ -261,98 +166,7 @@ float EnergyComputer::mexp(float x)
     //  return exp(-x);
 }
 
-//ComputeFiberCorrelation()
-//{
-//    float bD = 15;
-
-//    vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> bDir =
-//        *itk::PointShell<QBALL_ODFSIZE, vnl_matrix_fixed<double, 3, QBALL_ODFSIZE> >::DistributePointShell();
-
-//    const int N = QBALL_ODFSIZE;
-
-//    vnl_matrix_fixed<double, QBALL_ODFSIZE, 3> temp = bDir.transpose();
-//    vnl_matrix_fixed<double, N, N> C = temp*bDir;
-//    vnl_matrix_fixed<double, N, N> Q = C;
-//    vnl_vector_fixed<double, N> mean;
-//    for(int i=0; i<N; i++)
-//    {
-//      double tempMean = 0;
-//      for(int j=0; j<N; j++)
-//      {
-//        C(i,j) = abs(C(i,j));
-//        Q(i,j) = exp(-bD * C(i,j) * C(i,j));
-//        tempMean += Q(i,j);
-//      }
-//      mean[i] = tempMean/N;
-//    }
-
-//    vnl_matrix_fixed<double, N, N> repMean;
-//    for (int i=0; i<N; i++)
-//      repMean.set_row(i, mean);
-//    Q -= repMean;
-
-//    vnl_matrix_fixed<double, N, N> P = Q*Q;
-
-//    std::vector<const double *> pointer;
-//    pointer.reserve(N*N);
-//    double * start = C.data_block();
-//    double * end =  start + N*N;
-//    for (double * iter = start; iter != end; ++iter)
-//    {
-//      pointer.push_back(iter);
-//    }
-//    std::sort(pointer.begin(), pointer.end(), LessDereference());
-
-//    vnl_vector_fixed<double,N*N> alpha;
-//    vnl_vector_fixed<double,N*N> beta;
-//    for (int i=0; i<N*N; i++) {
-//      alpha(i) = *pointer[i];
-//      beta(i)  = *(P.data_block()+(pointer[i]-start));
-//    }
-
-//    double nfac = sqrt(beta(N*N-1));
-//    beta = beta / (nfac*nfac);
-//    Q = Q / nfac;
-
-//    double sum = 0;
-//    for(int i=0; i<N; i++)
-//    {
-//      sum += Q(0,i);
-//    }
-//    // if left to default 0
-//    // then mean is not substracted in order to correct odf integral
-//    // this->m_Meanval_sq = (sum*sum)/N;
-
-//    vnl_vector_fixed<double,N*N> alpha_0;
-//    vnl_vector_fixed<double,N*N> alpha_2;
-//    vnl_vector_fixed<double,N*N> alpha_4;
-//    vnl_vector_fixed<double,N*N> alpha_6;
-//    for(int i=0; i<N*N; i++)
-//    {
-//      alpha_0(i) = 1;
-//      alpha_2(i) = alpha(i)*alpha(i);
-//      alpha_4(i) = alpha_2(i)*alpha_2(i);
-//      alpha_6(i) = alpha_4(i)*alpha_2(i);
-//    }
-
-//    vnl_matrix_fixed<double, N*N, 4> T;
-//    T.set_column(0,alpha_0);
-//    T.set_column(1,alpha_2);
-//    T.set_column(2,alpha_4);
-//    T.set_column(3,alpha_6);
-
-//    vnl_vector_fixed<double,4> coeff = vnl_matrix_inverse<double>(T).pinverse()*beta;
-
-//    MITK_INFO << "itkGibbsTrackingFilter: Bessel oefficients: " << coeff;
-
-//    BESSEL_APPROXCOEFF = new float[4];
-
-//    BESSEL_APPROXCOEFF[0] = coeff(0);
-//    BESSEL_APPROXCOEFF[1] = coeff(1);
-//    BESSEL_APPROXCOEFF[2] = coeff(2);
-//    BESSEL_APPROXCOEFF[3] = coeff(3);
-//    BESSEL_APPROXCOEFF[0] = -0.1714;
-//    BESSEL_APPROXCOEFF[1] = 0.5332;
-//    BESSEL_APPROXCOEFF[2] = -1.4889;
-//    BESSEL_APPROXCOEFF[3] = 2.0389;
-//}
+int EnergyComputer::GetNumActiveVoxels()
+{
+    return m_NumActiveVoxels;
+}

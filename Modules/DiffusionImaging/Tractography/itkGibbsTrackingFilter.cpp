@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandardFileLocations.h>
 #include <mitkFiberBuilder.h>
 #include <mitkMetropolisHastingsSampler.h>
-#include <mitkEnergyComputer.h>
+//#include <mitkEnergyComputer.h>
 #include <itkTensorImageToQBallImageFilter.h>
 #include <mitkGibbsEnergyComputer.h>
 

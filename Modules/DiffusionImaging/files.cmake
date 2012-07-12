@@ -118,6 +118,7 @@ set(CPP_FILES
   Tractography/GibbsTracking/mitkParticleGrid.cpp
   Tractography/GibbsTracking/mitkMetropolisHastingsSampler.cpp
   Tractography/GibbsTracking/mitkEnergyComputer.cpp
+  Tractography/GibbsTracking/mitkGibbsEnergyComputer.cpp
   Tractography/GibbsTracking/mitkFiberBuilder.cpp
 
   # Function Collection
@@ -184,6 +185,7 @@ set(H_FILES
   Tractography/GibbsTracking/mitkMetropolisHastingsSampler.h
   Tractography/GibbsTracking/mitkSimpSamp.h
   Tractography/GibbsTracking/mitkEnergyComputer.h
+  Tractography/GibbsTracking/mitkGibbsEnergyComputer.h
   Tractography/GibbsTracking/mitkSphereInterpolator.h
   Tractography/GibbsTracking/mitkFiberBuilder.h
 

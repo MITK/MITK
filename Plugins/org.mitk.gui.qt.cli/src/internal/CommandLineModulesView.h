@@ -164,6 +164,11 @@ private:
    */
   QStringList m_ModulesDirectoryNames;
 
+  /**
+   * \brief Member variable, taken from preference page.
+   */
+  bool m_DebugOutput;
+
 };
 
 #endif // CommandLineModulesView_h

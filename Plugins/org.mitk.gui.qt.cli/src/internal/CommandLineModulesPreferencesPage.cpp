@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QLabel>
 #include <QFormLayout>
+#include <QCheckBox>
 #include <ctkDirectoryButton.h>
 #include <ctkDirectoryListWidget.h>
 
@@ -28,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME = "temporary directory";
 const std::string CommandLineModulesPreferencesPage::MODULE_DIRECTORIES_NODE_NAME = "module directories";
+const std::string CommandLineModulesPreferencesPage::DEBUG_OUTPUT_NODE_NAME = "debug output";
 
 CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 : m_MainControl(0)
@@ -63,9 +65,12 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_TemporaryDirectory->setCaption("Select a directory for temporary files ... ");
   m_ModulesDirectories = new ctkDirectoryListWidget(m_MainControl);
 
+  m_DebugOutput = new QCheckBox(m_MainControl);
+
   QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("temporary directory:", m_TemporaryDirectory);
   formLayout->addRow("module paths:", m_ModulesDirectories);
+  formLayout->addRow("debug output:", m_DebugOutput);
 
   m_MainControl->setLayout(formLayout);
 
@@ -80,6 +85,7 @@ QWidget* CommandLineModulesPreferencesPage::GetQtControl() const
 bool CommandLineModulesPreferencesPage::PerformOk()
 {
   m_CLIPreferencesNode->Put(TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory().toStdString());
+  m_CLIPreferencesNode->PutBool(DEBUG_OUTPUT_NODE_NAME, m_DebugOutput->isChecked());
 
   // Convert paths to a single item.
   QStringList directoryList = m_ModulesDirectories->directoryList();
@@ -99,6 +105,7 @@ void CommandLineModulesPreferencesPage::PerformCancel()
 
 void CommandLineModulesPreferencesPage::Update()
 {
+  m_DebugOutput->setChecked(m_CLIPreferencesNode->GetBool(DEBUG_OUTPUT_NODE_NAME, false));
   m_TemporaryDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(TEMPORARY_DIRECTORY_NODE_NAME, "")));
 
   // Load paths from a single item, and split into a StringList.

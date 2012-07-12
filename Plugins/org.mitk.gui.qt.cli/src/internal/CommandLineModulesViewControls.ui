@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>423</width>
-    <height>380</height>
+    <width>678</width>
+    <height>582</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -137,7 +137,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="m_TabAbout">
            <attribute name="title">
@@ -205,12 +205,6 @@
     </layout>
    </item>
   </layout>
-  <zorder>m_GeneratedGuiWidget</zorder>
-  <zorder>m_RestoreDefaults</zorder>
-  <zorder>m_ChooseLabel</zorder>
-  <zorder>m_DocumentationWidget</zorder>
-  <zorder>m_ComboBox</zorder>
-  <zorder>m_TabWidget</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

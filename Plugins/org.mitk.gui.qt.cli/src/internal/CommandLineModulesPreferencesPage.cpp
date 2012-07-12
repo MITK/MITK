@@ -69,8 +69,6 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
 
   m_MainControl->setLayout(formLayout);
 
-  connect(m_ModulesDirectories, SIGNAL(directoryListChanged(QStringList)), this, SLOT(onPathsUpdated(QStringList)));
-
   this->Update();
 }
 

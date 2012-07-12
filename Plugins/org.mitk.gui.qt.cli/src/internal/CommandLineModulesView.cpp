@@ -113,7 +113,8 @@ void CommandLineModulesView::RetrievePreferenceValues()
   QStringList paths = pathString.split(";", QString::SkipEmptyParts);
 
   // OnPreferencesChanged can be called for each preference in a dialog box, so
-  // when you hit "OK", it could be called repeatedly.
+  // when you hit "OK", it is called repeatedly, whereas we want to only call this once,
+  // so I am checking if the list of directory names has changed.
   if (paths != this->m_ModulesDirectoryNames)
   {
     m_MapFilenameToReference = this->LoadModuleReferencesFromPaths(paths);

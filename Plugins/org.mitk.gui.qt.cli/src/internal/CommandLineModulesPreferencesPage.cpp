@@ -20,18 +20,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QLabel>
 #include <QFormLayout>
-#include "ctkDirectoryButton.h"
+#include <ctkDirectoryButton.h>
+#include <ctkDirectoryListWidget.h>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
-const std::string CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME = "temporary directory name";
-const std::string CommandLineModulesPreferencesPage::MODULES_DIRECTORY_NODE_NAME = "modules directory name";
+const std::string CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME = "temporary directory";
+const std::string CommandLineModulesPreferencesPage::MODULE_DIRECTORIES_NODE_NAME = "module directories";
 
 CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 : m_MainControl(0)
 , m_TemporaryDirectory(0)
-, m_ModulesDirectory(0)
+, m_ModulesDirectories(0)
 , m_CLIPreferencesNode(0)
 {
 
@@ -60,14 +61,15 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
 
   m_TemporaryDirectory = new ctkDirectoryButton(m_MainControl);
   m_TemporaryDirectory->setCaption("Select a directory for temporary files ... ");
-  m_ModulesDirectory = new ctkDirectoryButton(m_MainControl);
-  m_ModulesDirectory->setCaption("Select a directory to load modules from ... ");
+  m_ModulesDirectories = new ctkDirectoryListWidget(m_MainControl);
 
   QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("temporary directory:", m_TemporaryDirectory);
-  formLayout->addRow("modules directory:", m_ModulesDirectory);
+  formLayout->addRow("module paths:", m_ModulesDirectories);
 
   m_MainControl->setLayout(formLayout);
+
+  connect(m_ModulesDirectories, SIGNAL(directoryListChanged(QStringList)), this, SLOT(onPathsUpdated(QStringList)));
 
   this->Update();
 }
@@ -80,7 +82,16 @@ QWidget* CommandLineModulesPreferencesPage::GetQtControl() const
 bool CommandLineModulesPreferencesPage::PerformOk()
 {
   m_CLIPreferencesNode->Put(TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory().toStdString());
-  m_CLIPreferencesNode->Put(MODULES_DIRECTORY_NODE_NAME, m_ModulesDirectory->directory().toStdString());
+
+  // Convert paths to a single item.
+  QStringList directoryList = m_ModulesDirectories->directoryList();
+  std::string paths;
+  for (int i = 0; i < directoryList.count(); i++)
+  {
+    QString path = directoryList[i] + ";";
+    paths += path.toStdString();
+  }
+  m_CLIPreferencesNode->Put(MODULE_DIRECTORIES_NODE_NAME, paths);
   return true;
 }
 
@@ -91,5 +102,9 @@ void CommandLineModulesPreferencesPage::PerformCancel()
 void CommandLineModulesPreferencesPage::Update()
 {
   m_TemporaryDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(TEMPORARY_DIRECTORY_NODE_NAME, "")));
-  m_ModulesDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(MODULES_DIRECTORY_NODE_NAME, "")));
+
+  // Load paths from a single item, and split into a StringList.
+  QString paths = QString::fromStdString(m_CLIPreferencesNode->Get(MODULE_DIRECTORIES_NODE_NAME, ""));
+  QStringList directoryList = paths.split(";", QString::SkipEmptyParts);
+  m_ModulesDirectories->setDirectoryList(directoryList);
 }

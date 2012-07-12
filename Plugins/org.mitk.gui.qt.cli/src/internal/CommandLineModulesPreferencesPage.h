@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QWidget;
 class ctkDirectoryButton;
+class ctkDirectoryListWidget;
 
 /**
  * \class CommandLineModulesPreferencesPage
@@ -39,14 +40,14 @@ public:
   ~CommandLineModulesPreferencesPage();
 
   /**
-   * \brief We store the temporary directory preferences node name.
+   * \brief We store the node name that stores the temporary directory path.
    */
   static const std::string TEMPORARY_DIRECTORY_NODE_NAME;
 
   /**
-   * \brief We store the modules directory preferences node name.
+   * \brief We store the node name that stores the list of modules paths.
    */
-  static const std::string MODULES_DIRECTORY_NODE_NAME;
+  static const std::string MODULE_DIRECTORIES_NODE_NAME;
 
   /**
    * \brief Called by framework to initialise this preference page, but currently does nothing.
@@ -81,10 +82,13 @@ public:
    */
   virtual void Update();
 
+public slots:
+
 protected:
   QWidget            *m_MainControl;
   ctkDirectoryButton *m_TemporaryDirectory;
-  ctkDirectoryButton *m_ModulesDirectory;
+  ctkDirectoryListWidget *m_ModulesDirectories;
+
   berry::IPreferences::Pointer m_CLIPreferencesNode;
 };
 

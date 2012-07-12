@@ -109,9 +109,8 @@ void CommandLineModulesView::RetrievePreferenceValues()
   assert( prefs );
 
   m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, ""));
-  QString modulesPath = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::MODULES_DIRECTORY_NODE_NAME, ""));
-  QStringList paths;
-  paths << "/scratch0/NOT_BACKED_UP/clarkson/build/CTK-build/CTK-build/bin";
+  QString pathString = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::MODULE_DIRECTORIES_NODE_NAME, ""));
+  QStringList paths = pathString.split(";", QString::SkipEmptyParts);
 
   // OnPreferencesChanged can be called for each preference in a dialog box, so
   // when you hit "OK", it could be called repeatedly.
@@ -129,6 +128,7 @@ QHash<QString, ctkCmdLineModuleReference> CommandLineModulesView::LoadModuleRefe
   QString path;
   QString executable;
   QFileInfo executableFileInfo;
+
   QHash<QString, ctkCmdLineModuleReference> result;
 
   foreach (path, paths)

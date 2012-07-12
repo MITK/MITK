@@ -384,6 +384,9 @@ bool mitk::PlanarFigureInteractor
       // TODO: check segement of polyline we clicked in
       int nextIndex = -1;
       
+      // We only need to check which position to insert the control point 
+      // when interacting with a PlanarPolygon. For all other types
+      // new control points will always be appended
       if ( dynamic_cast<mitk::PlanarPolygon*>( planarFigure ) )
       {
         nextIndex = this->IsPositionOverFigure(

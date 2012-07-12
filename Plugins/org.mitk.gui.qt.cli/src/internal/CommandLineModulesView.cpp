@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleInstanceFactoryQtGui.h>
 #include <ctkCmdLineModuleXmlValidator.h>
 #include <ctkCmdLineModuleProcessFuture.h>
+#include <ctkCmdLineModuleDefaultPathBuilder.h>
 
 const std::string CommandLineModulesView::VIEW_ID = "org.mitk.gui.qt.cli";
 
@@ -108,19 +109,29 @@ void CommandLineModulesView::RetrievePreferenceValues()
 
   assert( prefs );
 
+  // Get some default application paths.
+  ctkCmdLineModuleDefaultPathBuilder builder;
+  QStringList defaultPaths = builder.build();
+
+  // We get additional paths from preferences.
   m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, ""));
   QString pathString = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::MODULE_DIRECTORIES_NODE_NAME, ""));
-  QStringList paths = pathString.split(";", QString::SkipEmptyParts);
+  QStringList additionalPaths = pathString.split(";", QString::SkipEmptyParts);
+
+  // Combine the sets of paths.
+  QStringList totalPaths;
+  totalPaths << defaultPaths;
+  totalPaths << additionalPaths;
 
   // OnPreferencesChanged can be called for each preference in a dialog box, so
   // when you hit "OK", it is called repeatedly, whereas we want to only call this once,
   // so I am checking if the list of directory names has changed.
-  if (paths != this->m_ModulesDirectoryNames)
+  if (this->m_ModulesDirectoryNames != totalPaths)
   {
-    m_MapFilenameToReference = this->LoadModuleReferencesFromPaths(paths);
+    m_MapFilenameToReference = this->LoadModuleReferencesFromPaths(totalPaths);
     QMenu *menu = this->CreateMenuFromReferences(m_MapFilenameToReference);
     this->m_Controls->m_ComboBox->setMenu(menu);
-    this->m_ModulesDirectoryNames = paths;
+    this->m_ModulesDirectoryNames = totalPaths;
   }
 }
 

@@ -20,31 +20,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-EnergyComputer::EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen)
+EnergyComputer::EnergyComputer(ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen)
     : m_UseTrilinearInterpolation(true)
 {
     m_ParticleGrid = particleGrid;
     m_RandGen = randGen;
-    m_Image = qballImage;
+    //m_Image = qballImage;
     m_SphereInterpolator = interpolator;
     m_Mask = mask;
 
     m_ParticleLength = m_ParticleGrid->m_ParticleLength;
     m_SquaredParticleLength = m_ParticleLength*m_ParticleLength;
 
-    m_Size[0] = m_Image->GetLargestPossibleRegion().GetSize()[0];
-    m_Size[1] = m_Image->GetLargestPossibleRegion().GetSize()[1];
-    m_Size[2] = m_Image->GetLargestPossibleRegion().GetSize()[2];
+    m_Size[0] = mask->GetLargestPossibleRegion().GetSize()[0];
+    m_Size[1] = mask->GetLargestPossibleRegion().GetSize()[1];
+    m_Size[2] = mask->GetLargestPossibleRegion().GetSize()[2];
 
     if (m_Size[0]<3 || m_Size[1]<3 || m_Size[2]<3)
         m_UseTrilinearInterpolation = false;
 
-    m_Spacing[0] = m_Image->GetSpacing()[0];
-    m_Spacing[1] = m_Image->GetSpacing()[1];
-    m_Spacing[2] = m_Image->GetSpacing()[2];
+    m_Spacing[0] = mask->GetSpacing()[0];
+    m_Spacing[1] = mask->GetSpacing()[1];
+    m_Spacing[2] = mask->GetSpacing()[2];
 
-    // calculate rotation matrix
-    vnl_matrix<double> temp = m_Image->GetDirection().GetVnlMatrix();
+        //calculate rotation matrix
+    vnl_matrix<double> temp = mask->GetDirection().GetVnlMatrix();
     vnl_matrix<float>  directionMatrix; directionMatrix.set_size(3,3);
     vnl_copy(temp, directionMatrix);
     vnl_vector_fixed<float, 3> d0 = directionMatrix.get_column(0); d0.normalize();
@@ -62,7 +62,7 @@ EnergyComputer::EnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* m
         fprintf(stderr,"EnergyComputer: error during init: data does not match with interpolation scheme\n");
 
     int totsz = m_Size[0]*m_Size[1]*m_Size[2];
-    m_CumulatedSpatialProbability.resize(totsz + 1, 0.0);
+    m_CumulatedSpatialProbability.resize(totsz+1, 0.0); // +1?
     m_ActiveIndices.resize(totsz, 0);
 
     // calculate active voxels and cumulate probabilities
@@ -146,202 +146,100 @@ float EnergyComputer::SpatProb(vnl_vector_fixed<float, 3> pos)
         return 0;
 }
 
-float EnergyComputer::EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vector_fixed<float, 3> dir)
-{
-    const int sampleSteps = 10;             // evaluate ODF at 2*sampleSteps+1 positions along dir
-    vnl_vector_fixed<float, 3> samplePos;   // current position to evaluate
-    float result = 0;                       // average of sampled ODF values
-    int xint, yint, zint;                   // voxel containing samplePos
 
-    // rotate particle direction according to image rotation
-    dir = m_RotationMatrix*dir;
 
-    // get interpolation for rotated direction
-    m_SphereInterpolator->getInterpolation(dir);
-
-    // sample ODF values along particle direction
-    for (int i=-sampleSteps; i <= sampleSteps;i++)
-    {
-        samplePos = pos + (dir * m_ParticleLength) * ((float)i/sampleSteps);
-
-        if (!m_UseTrilinearInterpolation)   // image has not enough slices to use trilinear interpolation
-        {
-            ItkQBallImgType::IndexType index;
-            index[0] = floor(pos[0]/m_Spacing[0]);
-            index[1] = floor(pos[1]/m_Spacing[1]);
-            index[2] = floor(pos[2]/m_Spacing[2]);
-            if (m_Image->GetLargestPossibleRegion().IsInside(index))
-            {
-                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2]);
-            }
-        }
-        else    // use trilinear interpolation
-        {
-            float Rx = samplePos[0]/m_Spacing[0]-0.5;
-            float Ry = samplePos[1]/m_Spacing[1]-0.5;
-            float Rz = samplePos[2]/m_Spacing[2]-0.5;
-
-            xint = floor(Rx);
-            yint = floor(Ry);
-            zint = floor(Rz);
-
-            if (xint >= 0 && xint < m_Size[0]-1 && yint >= 0 && yint < m_Size[1]-1 && zint >= 0 && zint < m_Size[2]-1)
-            {
-                float xfrac = Rx-xint;
-                float yfrac = Ry-yint;
-                float zfrac = Rz-zint;
-
-                ItkQBallImgType::IndexType index;
-                float weight;
-
-                weight = (1-xfrac)*(1-yfrac)*(1-zfrac);
-                index[0] = xint; index[1] = yint; index[2] = zint;
-                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
-
-                weight = (xfrac)*(1-yfrac)*(1-zfrac);
-                index[0] = xint+1; index[1] = yint; index[2] = zint;
-                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
-
-                weight = (1-xfrac)*(yfrac)*(1-zfrac);
-                index[0] = xint; index[1] = yint+1; index[2] = zint;
-                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
-
-                weight = (1-xfrac)*(1-yfrac)*(zfrac);
-                index[0] = xint; index[1] = yint; index[2] = zint+1;
-                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
-
-                weight = (xfrac)*(yfrac)*(1-zfrac);
-                index[0] = xint+1; index[1] = yint+1; index[2] = zint;
-                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
-
-                weight = (1-xfrac)*(yfrac)*(zfrac);
-                index[0] = xint; index[1] = yint+1; index[2] = zint+1;
-                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
-
-                weight = (xfrac)*(1-yfrac)*(zfrac);
-                index[0] = xint+1; index[1] = yint; index[2] = zint+1;
-                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
-
-                weight = (xfrac)*(yfrac)*(zfrac);
-                index[0] = xint+1; index[1] = yint+1; index[2] = zint+1;
-                result += (m_Image->GetPixel(index)[m_SphereInterpolator->idx[0]-1]*m_SphereInterpolator->interpw[0] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[1]-1]*m_SphereInterpolator->interpw[1] +
-                       m_Image->GetPixel(index)[m_SphereInterpolator->idx[2]-1]* m_SphereInterpolator->interpw[2])*weight;
-            }
-        }
-    }
-    result /= (2*sampleSteps+1);    // average result over taken samples
-    return result;
-}
-
-float EnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, Particle *dp)
-{
-    if (SpatProb(R) == 0)   // check if position is inside mask
-        return itk::NumericTraits<float>::NonpositiveMin();
-
-    float odfVal = EvaluateOdf(R, N);   // evaluate ODF in given direction
-
-    float modelVal = 0;
-    m_ParticleGrid->ComputeNeighbors(R);    // retrieve neighbouring particles from particle grid
-    Particle* neighbour =  m_ParticleGrid->GetNextNeighbor();
-    while (neighbour!=NULL)                         // iterate over nieghbouring particles
-    {
-        if (dp != neighbour)                        // don't evaluate against itself
-        {
-            // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-            float dot = fabs(dot_product(N,neighbour->dir));
-            float bw = mbesseli0(dot);
-            float dpos = (neighbour->pos-R).squared_magnitude();
-            float w = mexp(dpos*gamma_s);
-            modelVal += w*(bw+m_ParticleChemicalPotential);
-            w = mexp(dpos*gamma_reg_s);
-        }
-        neighbour =  m_ParticleGrid->GetNextNeighbor();
-    }
-
-    float energy = 2*(odfVal/m_ParticleWeight-modelVal) - (mbesseli0(1.0)+m_ParticleChemicalPotential);
-    return energy*m_ExtStrength;
-}
-
-float EnergyComputer::ComputeInternalEnergy(Particle *dp)
-{
-    float energy = 0;
-
-    if (dp->pID != -1)  // has predecessor
-        energy += ComputeInternalEnergyConnection(dp,+1);
-
-    if (dp->mID != -1)  // has successor
-        energy += ComputeInternalEnergyConnection(dp,-1);
-
-    return energy;
-}
-
-float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1)
-{
-    Particle *p2 = 0;
-    int ep2;
-
-    if (ep1 == 1)
-        p2 = m_ParticleGrid->GetParticle(p1->pID);  // get predecessor
-    else
-        p2 = m_ParticleGrid->GetParticle(p1->mID);  // get successor
-
-    // check in which direction the connected particle is pointing
-    if (p2->mID == p1->ID)
-        ep2 = -1;
-    else if (p2->pID == p1->ID)
-        ep2 = 1;
-    else
-       std::cout << "EnergyComputer: Connections are inconsistent!" << std::endl;
-
-    return ComputeInternalEnergyConnection(p1,ep1,p2,ep2);
-}
-
-float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2)
-{
-    // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-    if ((dot_product(p1->dir,p2->dir))*ep1*ep2 > -m_CurvatureThreshold)     // angle between particles is too sharp
-        return itk::NumericTraits<float>::NonpositiveMin();
-
-    // calculate the endpoints of the two particles
-    vnl_vector_fixed<float, 3> endPoint1 = p1->pos + (p1->dir * (m_ParticleLength * ep1));
-    vnl_vector_fixed<float, 3> endPoint2 = p2->pos + (p2->dir * (m_ParticleLength * ep2));
-
-    // check if endpoints are too far apart to connect
-    if ((endPoint1-endPoint2).squared_magnitude() > m_SquaredParticleLength)
-        return itk::NumericTraits<float>::NonpositiveMin();
-
-    // calculate center point of the two particles
-    vnl_vector_fixed<float, 3> R = (p2->pos + p1->pos); R *= 0.5;
-
-    // they are not allowed to connect if the mask image does not allow it
-    if (SpatProb(R) == 0)
-        return itk::NumericTraits<float>::NonpositiveMin();
-
-    // get distances of endpoints to center point
-    float norm1 = (endPoint1-R).squared_magnitude();
-    float norm2 = (endPoint2-R).squared_magnitude();
-
-    // calculate actual internal energy
-    float energy = (m_ConnectionPotential-norm1-norm2)*m_IntStrength;
-    return energy;
-}
+//float EnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, vnl_vector_fixed<float, 3> &N, Particle *dp)
+//{
+//    if (SpatProb(R) == 0)   // check if position is inside mask
+//        return itk::NumericTraits<float>::NonpositiveMin();
+//
+//    float odfVal = EvaluateOdf(R, N);   // evaluate ODF in given direction
+//
+//    float modelVal = 0;
+//    m_ParticleGrid->ComputeNeighbors(R);    // retrieve neighbouring particles from particle grid
+//    Particle* neighbour =  m_ParticleGrid->GetNextNeighbor();
+//    while (neighbour!=NULL)                         // iterate over nieghbouring particles
+//    {
+//        if (dp != neighbour)                        // don't evaluate against itself
+//        {
+//            // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
+//            float dot = fabs(dot_product(N,neighbour->dir));
+//            float bw = mbesseli0(dot);
+//            float dpos = (neighbour->pos-R).squared_magnitude();
+//            float w = mexp(dpos*gamma_s);
+//            modelVal += w*(bw+m_ParticleChemicalPotential);
+//            w = mexp(dpos*gamma_reg_s);
+//        }
+//        neighbour =  m_ParticleGrid->GetNextNeighbor();
+//    }
+//
+//    float energy = 2*(odfVal/m_ParticleWeight-modelVal) - (mbesseli0(1.0)+m_ParticleChemicalPotential);
+//    return energy*m_ExtStrength;
+//}
+//
+//float EnergyComputer::ComputeInternalEnergy(Particle *dp)
+//{
+//    float energy = 0;
+//
+//    if (dp->pID != -1)  // has predecessor
+//        energy += ComputeInternalEnergyConnection(dp,+1);
+//
+//    if (dp->mID != -1)  // has successor
+//        energy += ComputeInternalEnergyConnection(dp,-1);
+//
+//    return energy;
+//}
+//
+//float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1)
+//{
+//    Particle *p2 = 0;
+//    int ep2;
+//
+//    if (ep1 == 1)
+//        p2 = m_ParticleGrid->GetParticle(p1->pID);  // get predecessor
+//    else
+//        p2 = m_ParticleGrid->GetParticle(p1->mID);  // get successor
+//
+//    // check in which direction the connected particle is pointing
+//    if (p2->mID == p1->ID)
+//        ep2 = -1;
+//    else if (p2->pID == p1->ID)
+//        ep2 = 1;
+//    else
+//       std::cout << "EnergyComputer: Connections are inconsistent!" << std::endl;
+//
+//    return ComputeInternalEnergyConnection(p1,ep1,p2,ep2);
+//}
+//
+//float EnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2)
+//{
+//    // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
+//    if ((dot_product(p1->dir,p2->dir))*ep1*ep2 > -m_CurvatureThreshold)     // angle between particles is too sharp
+//        return itk::NumericTraits<float>::NonpositiveMin();
+//
+//    // calculate the endpoints of the two particles
+//    vnl_vector_fixed<float, 3> endPoint1 = p1->pos + (p1->dir * (m_ParticleLength * ep1));
+//    vnl_vector_fixed<float, 3> endPoint2 = p2->pos + (p2->dir * (m_ParticleLength * ep2));
+//
+//    // check if endpoints are too far apart to connect
+//    if ((endPoint1-endPoint2).squared_magnitude() > m_SquaredParticleLength)
+//        return itk::NumericTraits<float>::NonpositiveMin();
+//
+//    // calculate center point of the two particles
+//    vnl_vector_fixed<float, 3> R = (p2->pos + p1->pos); R *= 0.5;
+//
+//    // they are not allowed to connect if the mask image does not allow it
+//    if (SpatProb(R) == 0)
+//        return itk::NumericTraits<float>::NonpositiveMin();
+//
+//    // get distances of endpoints to center point
+//    float norm1 = (endPoint1-R).squared_magnitude();
+//    float norm2 = (endPoint2-R).squared_magnitude();
+//
+//    // calculate actual internal energy
+//    float energy = (m_ConnectionPotential-norm1-norm2)*m_IntStrength;
+//    return energy;
+//}
 
 float EnergyComputer::mbesseli0(float x)
 {
@@ -361,11 +259,6 @@ float EnergyComputer::mexp(float x)
 {
     return((x>=7.0) ? 0 : ((x>=5.0) ? (-0.0029*x+0.0213) : ((x>=3.0) ? (-0.0215*x+0.1144) : ((x>=2.0) ? (-0.0855*x+0.3064) : ((x>=1.0) ? (-0.2325*x+0.6004) : ((x>=0.5) ? (-0.4773*x+0.8452) : ((x>=0.0) ? (-0.7869*x+1.0000) : 1 )))))));
     //  return exp(-x);
-}
-
-int EnergyComputer::GetNumActiveVoxels()
-{
-    return m_NumActiveVoxels;
 }
 
 //ComputeFiberCorrelation()

@@ -109,6 +109,10 @@ void CommandLineModulesView::RetrievePreferenceValues()
 
   assert( prefs );
 
+  // Get the flag for debug output, useful when parsing all the XML.
+  bool debugOutputBefore = m_DebugOutput;
+  m_DebugOutput = prefs->GetBool(CommandLineModulesPreferencesPage::DEBUG_OUTPUT_NODE_NAME, false);
+
   // Get some default application paths.
   ctkCmdLineModuleDefaultPathBuilder builder;
   QStringList defaultPaths = builder.build();
@@ -126,7 +130,7 @@ void CommandLineModulesView::RetrievePreferenceValues()
   // OnPreferencesChanged can be called for each preference in a dialog box, so
   // when you hit "OK", it is called repeatedly, whereas we want to only call this once,
   // so I am checking if the list of directory names has changed.
-  if (this->m_ModulesDirectoryNames != totalPaths)
+  if (this->m_ModulesDirectoryNames != totalPaths || (debugOutputBefore != m_DebugOutput))
   {
     m_MapFilenameToReference = this->LoadModuleReferencesFromPaths(totalPaths);
     QMenu *menu = this->CreateMenuFromReferences(m_MapFilenameToReference);
@@ -154,7 +158,7 @@ QHash<QString, ctkCmdLineModuleReference> CommandLineModulesView::LoadModuleRefe
       foreach (executableFileInfo, executablesInfoList)
       {
         executable = executableFileInfo.absoluteFilePath();
-        ctkCmdLineModuleReference ref = m_ModuleManager->registerModule(executable, true);
+        ctkCmdLineModuleReference ref = m_ModuleManager->registerModule(executable, !m_DebugOutput);
         if (ref)
         {
           result[executable] = ref;

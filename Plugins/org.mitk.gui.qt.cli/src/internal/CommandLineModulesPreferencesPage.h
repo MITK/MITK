@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferences.h>
 
 class QWidget;
+class QCheckBox;
 class ctkDirectoryButton;
 class ctkDirectoryListWidget;
 
@@ -48,6 +49,11 @@ public:
    * \brief We store the node name that stores the list of modules paths.
    */
   static const std::string MODULE_DIRECTORIES_NODE_NAME;
+
+  /**
+   * \brief We store the node name that stores the boolean of whether we want debug output when loading modules.
+   */
+  static const std::string DEBUG_OUTPUT_NODE_NAME;
 
   /**
    * \brief Called by framework to initialise this preference page, but currently does nothing.
@@ -86,6 +92,7 @@ public slots:
 
 protected:
   QWidget            *m_MainControl;
+  QCheckBox          *m_DebugOutput;
   ctkDirectoryButton *m_TemporaryDirectory;
   ctkDirectoryListWidget *m_ModulesDirectories;
 

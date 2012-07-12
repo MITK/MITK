@@ -99,7 +99,7 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
     {
       if ( m_ControlPoints.size() > this->GetMaximumNumberOfControlPoints()-1 )
       {
-        m_ControlPoints.resize( this->GetMaximumNumberOfControlPoints()-1 );
+        m_ControlPoints.resize( this->GetNumberOfControlPoints() );
       }
 
       m_ControlPoints.push_back( this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );

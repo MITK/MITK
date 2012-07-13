@@ -715,17 +715,17 @@
         </property>
         <item>
          <property name="text">
-          <string>y-z-Plane</string>
+          <string>Sagittal</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>x-z-Plane</string>
+          <string>Coronal</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>x-y-Plane</string>
+          <string>Transversal</string>
          </property>
         </item>
        </widget>

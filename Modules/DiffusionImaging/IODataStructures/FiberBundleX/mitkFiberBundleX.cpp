@@ -258,6 +258,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
         vtkIdType*  points(NULL);
         vLines->GetNextCell ( numPoints, points );
 
+        if (points==NULL)
+            continue;
+
         vtkSmartPointer<vtkCellArray> vLines2 = fib->m_FiberPolyData->GetLines();
         vLines2->InitTraversal();
         int numFibers2 = fib->GetNumFibers();
@@ -268,6 +271,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
             vtkIdType   numPoints2(0);
             vtkIdType*  points2(NULL);
             vLines2->GetNextCell ( numPoints2, points2 );
+
+            if (points2==NULL)
+                continue;
 
             // check endpoints
             itk::Point<float, 3> point_start = GetItkPoint(m_FiberPolyData->GetPoint(points[0]));

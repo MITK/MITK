@@ -56,16 +56,19 @@ namespace itk{
     /** Runtime information support. */
     itkTypeMacro(StreamlineTrackingFilter, ImageToImageFilter)
 
-    typedef TTensorPixelType                        TensorComponentType;
-    typedef TPDPixelType                            DirectionPixelType;
-    typedef typename Superclass::InputImageType     InputImageType;
-    typedef typename Superclass::OutputImageType    OutputImageType;
-    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
-    typedef itk::Image<unsigned char, 3>            ItkUcharImgType;
+    typedef TTensorPixelType                            TensorComponentType;
+    typedef TPDPixelType                                DirectionPixelType;
+    typedef typename Superclass::InputImageType         InputImageType;
+    typedef typename Superclass::OutputImageType        OutputImageType;
+    typedef typename Superclass::OutputImageRegionType  OutputImageRegionType;
+    typedef itk::Image<unsigned char, 3>                ItkUcharImgType;
+    typedef itk::Image<float, 3>                        ItkFloatImgType;
+    typedef itk::Image< vnl_vector_fixed<double,3>, 3>  ItkPDImgType;
 
     typedef vtkSmartPointer< vtkPolyData >     FiberPolyDataType;
 
     itkGetMacro( FiberPolyData, FiberPolyDataType )
+    itkSetMacro( SeedImage, ItkUcharImgType::Pointer)
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
     itkSetMacro( SeedsPerVoxel, int)
     itkSetMacro( FaThreshold, float)
@@ -79,6 +82,10 @@ namespace itk{
     ~StreamlineTrackingFilter() {}
     void PrintSelf(std::ostream& os, Indent indent) const;
 
+    void CalculateNewPosition(itk::ContinuousIndex<double, 3>& pos, vnl_vector_fixed<double,3>& dir, typename InputImageType::IndexType& index);
+    void FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids);
+
+
     double RoundToNearest(double num);
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int threadId);
@@ -89,6 +96,12 @@ namespace itk{
     FiberPolyDataType m_FiberPolyData;
     vtkSmartPointer<vtkPoints> m_Points;
     vtkSmartPointer<vtkCellArray> m_Cells;
+
+    ItkFloatImgType::Pointer    m_EmaxImage;
+    ItkFloatImgType::Pointer    m_FaImage;
+    ItkPDImgType::Pointer       m_PdImage;
+    typename InputImageType::Pointer m_InputImage;
+
     float m_FaThreshold;
     float m_AngularThreshold;
     float m_StepSize;
@@ -98,6 +111,7 @@ namespace itk{
     float m_G;
     std::vector< int > m_ImageSize;
     std::vector< float > m_ImageSpacing;
+    ItkUcharImgType::Pointer m_SeedImage;
     ItkUcharImgType::Pointer m_MaskImage;
 
     itk::VectorContainer< int, FiberPolyDataType >::Pointer m_PolyDataContainer;

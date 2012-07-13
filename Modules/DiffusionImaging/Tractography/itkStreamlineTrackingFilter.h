@@ -68,6 +68,7 @@ namespace itk{
     typedef vtkSmartPointer< vtkPolyData >     FiberPolyDataType;
 
     itkGetMacro( FiberPolyData, FiberPolyDataType )
+    itkSetMacro( SeedImage, ItkUcharImgType::Pointer)
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
     itkSetMacro( SeedsPerVoxel, int)
     itkSetMacro( FaThreshold, float)
@@ -80,6 +81,10 @@ namespace itk{
     StreamlineTrackingFilter();
     ~StreamlineTrackingFilter() {}
     void PrintSelf(std::ostream& os, Indent indent) const;
+
+    void CalculateNewPosition(itk::ContinuousIndex<double, 3>& pos, vnl_vector_fixed<double,3>& dir, typename InputImageType::IndexType& index);
+    void FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids);
+
 
     double RoundToNearest(double num);
     void BeforeThreadedGenerateData();
@@ -95,6 +100,7 @@ namespace itk{
     ItkFloatImgType::Pointer    m_EmaxImage;
     ItkFloatImgType::Pointer    m_FaImage;
     ItkPDImgType::Pointer       m_PdImage;
+    typename InputImageType::Pointer m_InputImage;
 
     float m_FaThreshold;
     float m_AngularThreshold;
@@ -105,6 +111,7 @@ namespace itk{
     float m_G;
     std::vector< int > m_ImageSize;
     std::vector< float > m_ImageSpacing;
+    ItkUcharImgType::Pointer m_SeedImage;
     ItkUcharImgType::Pointer m_MaskImage;
 
     itk::VectorContainer< int, FiberPolyDataType >::Pointer m_PolyDataContainer;

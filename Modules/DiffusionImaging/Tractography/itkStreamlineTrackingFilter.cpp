@@ -68,15 +68,15 @@ TPDPixelType>
     m_Points = vtkPoints::New();
     m_Cells = vtkCellArray::New();
 
-    typename InputImageType::Pointer inputImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
+    m_InputImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
     m_ImageSize.resize(3);
-    m_ImageSize[0] = inputImage->GetLargestPossibleRegion().GetSize()[0];
-    m_ImageSize[1] = inputImage->GetLargestPossibleRegion().GetSize()[1];
-    m_ImageSize[2] = inputImage->GetLargestPossibleRegion().GetSize()[2];
+    m_ImageSize[0] = m_InputImage->GetLargestPossibleRegion().GetSize()[0];
+    m_ImageSize[1] = m_InputImage->GetLargestPossibleRegion().GetSize()[1];
+    m_ImageSize[2] = m_InputImage->GetLargestPossibleRegion().GetSize()[2];
     m_ImageSpacing.resize(3);
-    m_ImageSpacing[0] = inputImage->GetSpacing()[0];
-    m_ImageSpacing[1] = inputImage->GetSpacing()[1];
-    m_ImageSpacing[2] = inputImage->GetSpacing()[2];
+    m_ImageSpacing[0] = m_InputImage->GetSpacing()[0];
+    m_ImageSpacing[1] = m_InputImage->GetSpacing()[1];
+    m_ImageSpacing[2] = m_InputImage->GetSpacing()[2];
 
     if (m_StepSize<0.005)
     {
@@ -97,39 +97,50 @@ TPDPixelType>
         m_PolyDataContainer->InsertElement(i, poly);
     }
 
+    if (m_SeedImage.IsNull())
+    {
+        // initialize mask image
+        m_SeedImage = ItkUcharImgType::New();
+        m_SeedImage->SetSpacing( m_InputImage->GetSpacing() );
+        m_SeedImage->SetOrigin( m_InputImage->GetOrigin() );
+        m_SeedImage->SetDirection( m_InputImage->GetDirection() );
+        m_SeedImage->SetRegions( m_InputImage->GetLargestPossibleRegion() );
+        m_SeedImage->Allocate();
+        m_SeedImage->FillBuffer(1);
+    }
+
     if (m_MaskImage.IsNull())
     {
         // initialize mask image
         m_MaskImage = ItkUcharImgType::New();
-        m_MaskImage->SetSpacing( inputImage->GetSpacing() );
-        m_MaskImage->SetOrigin( inputImage->GetOrigin() );
-        m_MaskImage->SetDirection( inputImage->GetDirection() );
-        m_MaskImage->SetRegions( inputImage->GetLargestPossibleRegion() );
+        m_MaskImage->SetSpacing( m_InputImage->GetSpacing() );
+        m_MaskImage->SetOrigin( m_InputImage->GetOrigin() );
+        m_MaskImage->SetDirection( m_InputImage->GetDirection() );
+        m_MaskImage->SetRegions( m_InputImage->GetLargestPossibleRegion() );
         m_MaskImage->Allocate();
         m_MaskImage->FillBuffer(1);
-
     }
 
     m_FaImage = ItkFloatImgType::New();
-    m_FaImage->SetSpacing( inputImage->GetSpacing() );
-    m_FaImage->SetOrigin( inputImage->GetOrigin() );
-    m_FaImage->SetDirection( inputImage->GetDirection() );
-    m_FaImage->SetRegions( inputImage->GetLargestPossibleRegion() );
+    m_FaImage->SetSpacing( m_InputImage->GetSpacing() );
+    m_FaImage->SetOrigin( m_InputImage->GetOrigin() );
+    m_FaImage->SetDirection( m_InputImage->GetDirection() );
+    m_FaImage->SetRegions( m_InputImage->GetLargestPossibleRegion() );
     m_FaImage->Allocate();
     m_FaImage->FillBuffer(0.0);
 
     m_PdImage = ItkPDImgType::New();
-    m_PdImage->SetSpacing( inputImage->GetSpacing() );
-    m_PdImage->SetOrigin( inputImage->GetOrigin() );
-    m_PdImage->SetDirection( inputImage->GetDirection() );
-    m_PdImage->SetRegions( inputImage->GetLargestPossibleRegion() );
+    m_PdImage->SetSpacing( m_InputImage->GetSpacing() );
+    m_PdImage->SetOrigin( m_InputImage->GetOrigin() );
+    m_PdImage->SetDirection( m_InputImage->GetDirection() );
+    m_PdImage->SetRegions( m_InputImage->GetLargestPossibleRegion() );
     m_PdImage->Allocate();
 
     m_EmaxImage = ItkFloatImgType::New();
-    m_EmaxImage->SetSpacing( inputImage->GetSpacing() );
-    m_EmaxImage->SetOrigin( inputImage->GetOrigin() );
-    m_EmaxImage->SetDirection( inputImage->GetDirection() );
-    m_EmaxImage->SetRegions( inputImage->GetLargestPossibleRegion() );
+    m_EmaxImage->SetSpacing( m_InputImage->GetSpacing() );
+    m_EmaxImage->SetOrigin( m_InputImage->GetOrigin() );
+    m_EmaxImage->SetDirection( m_InputImage->GetDirection() );
+    m_EmaxImage->SetRegions( m_InputImage->GetLargestPossibleRegion() );
     m_EmaxImage->Allocate();
     m_EmaxImage->FillBuffer(1.0);
 
@@ -142,19 +153,17 @@ TPDPixelType>
             {
                 typename InputImageType::IndexType index;
                 index[0] = x; index[1] = y; index[2] = z;
-                typename InputImageType::PixelType tensor = inputImage->GetPixel(index);
-                if(tensor.GetTrace()!=0 && tensor.GetFractionalAnisotropy()>m_FaThreshold)
-                {
-                    vnl_vector_fixed<double,3> dir;
-                    tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
-                    dir[0] = eigenvectors(2, 0);
-                    dir[1] = eigenvectors(2, 1);
-                    dir[2] = eigenvectors(2, 2);
-                    dir.normalize();
-                    m_PdImage->SetPixel(index, dir);
-                    m_FaImage->SetPixel(index, tensor.GetFractionalAnisotropy());
-                    m_EmaxImage->SetPixel(index, 2/eigenvalues[2]);
-                }
+                typename InputImageType::PixelType tensor = m_InputImage->GetPixel(index);
+
+                vnl_vector_fixed<double,3> dir;
+                tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
+                dir[0] = eigenvectors(2, 0);
+                dir[1] = eigenvectors(2, 1);
+                dir[2] = eigenvectors(2, 2);
+                dir.normalize();
+                m_PdImage->SetPixel(index, dir);
+                m_FaImage->SetPixel(index, tensor.GetFractionalAnisotropy());
+                m_EmaxImage->SetPixel(index, 2/eigenvalues[2]);
             }
 
     std::cout << "StreamlineTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
@@ -165,6 +174,223 @@ TPDPixelType>
     std::cout << "StreamlineTrackingFilter: starting streamline tracking" << std::endl;
 }
 
+template< class TTensorPixelType, class TPDPixelType>
+void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
+::CalculateNewPosition(itk::ContinuousIndex<double, 3>& pos, vnl_vector_fixed<double,3>& dir, typename InputImageType::IndexType& index)
+{
+    if (true)
+    {
+        dir *= m_StepSize;
+        pos[0] += dir[0]/m_ImageSpacing[0];
+        pos[1] += dir[1]/m_ImageSpacing[1];
+        pos[2] += dir[2]/m_ImageSpacing[2];
+        index[0] = RoundToNearest(pos[0]);
+        index[1] = RoundToNearest(pos[1]);
+        index[2] = RoundToNearest(pos[2]);
+    }
+    else
+    {
+        dir[0] /= m_ImageSpacing[0];
+        dir[1] /= m_ImageSpacing[1];
+        dir[2] /= m_ImageSpacing[2];
+
+        int smallest = 0;
+        float x = 100000;
+        if (dir[0]>0)
+        {
+            if (fabs(fabs(RoundToNearest(pos[0])-pos[0])-0.5)>mitk::eps)
+                x = fabs(pos[0]-RoundToNearest(pos[0])-0.5)/dir[0];
+            else
+                x = fabs(pos[0]-std::ceil(pos[0])-0.5)/dir[0];
+        }
+        else if (dir[0]<0)
+        {
+            if (fabs(fabs(RoundToNearest(pos[0])-pos[0])-0.5)>mitk::eps)
+                x = -fabs(pos[0]-RoundToNearest(pos[0])+0.5)/dir[0];
+            else
+                x = -fabs(pos[0]-std::floor(pos[0])+0.5)/dir[0];
+        }
+        float s = x;
+
+        float y = 100000;
+        if (dir[1]>0)
+        {
+            if (fabs(fabs(RoundToNearest(pos[1])-pos[1])-0.5)>mitk::eps)
+                y = fabs(pos[1]-RoundToNearest(pos[1])-0.5)/dir[1];
+            else
+                y = fabs(pos[1]-std::ceil(pos[1])-0.5)/dir[1];
+        }
+        else if (dir[1]<0)
+        {
+            if (fabs(fabs(RoundToNearest(pos[1])-pos[1])-0.5)>mitk::eps)
+                y = -fabs(pos[1]-RoundToNearest(pos[1])+0.5)/dir[1];
+            else
+                y = -fabs(pos[1]-std::floor(pos[1])+0.5)/dir[1];
+        }
+        if (s>y)
+        {
+            s=y;
+            smallest = 1;
+        }
+
+        float z = 100000;
+        if (dir[2]>0)
+        {
+            if (fabs(fabs(RoundToNearest(pos[2])-pos[2])-0.5)>mitk::eps)
+                z = fabs(pos[2]-RoundToNearest(pos[2])-0.5)/dir[2];
+            else
+                z = fabs(pos[2]-std::ceil(pos[2])-0.5)/dir[2];
+        }
+        else if (dir[2]<0)
+        {
+            if (fabs(fabs(RoundToNearest(pos[2])-pos[2])-0.5)>mitk::eps)
+                z = -fabs(pos[2]-RoundToNearest(pos[2])+0.5)/dir[2];
+            else
+                z = -fabs(pos[2]-std::floor(pos[2])+0.5)/dir[2];
+        }
+        if (s>z)
+        {
+            s=z;
+            smallest = 2;
+        }
+
+//        MITK_INFO << "---------------------------------------------";
+//        MITK_INFO << "s: " << s;
+//        MITK_INFO << "dir: " << dir;
+//        MITK_INFO << "old: " << pos[0] << ", " << pos[1] << ", " << pos[2];
+
+        pos[0] += dir[0]*s;
+        pos[1] += dir[1]*s;
+        pos[2] += dir[2]*s;
+
+        switch (smallest)
+        {
+        case 0:
+            if (dir[0]<0)
+                index[0] = std::floor(pos[0]);
+            else
+                index[0] = std::ceil(pos[0]);
+            index[1] = RoundToNearest(pos[1]);
+            index[2] = RoundToNearest(pos[2]);
+            break;
+
+        case 1:
+            if (dir[1]<0)
+                index[1] = std::floor(pos[1]);
+            else
+                index[1] = std::ceil(pos[1]);
+            index[0] = RoundToNearest(pos[0]);
+            index[2] = RoundToNearest(pos[2]);
+            break;
+
+        case 2:
+            if (dir[2]<0)
+                index[2] = std::floor(pos[2]);
+            else
+                index[2] = std::ceil(pos[2]);
+            index[1] = RoundToNearest(pos[1]);
+            index[0] = RoundToNearest(pos[0]);
+        }
+
+//        float x = 100000;
+//        if (dir[0]>0)
+//            x = fabs(pos[0]-RoundToNearest(pos[0])-0.5)/dir[0];
+//        else if (dir[0]<0)
+//            x = -fabs(pos[0]-RoundToNearest(pos[0])+0.5)/dir[0];
+//        float s = x;
+
+//        float y = 100000;
+//        if (dir[1]>0)
+//            y = fabs(pos[1]-RoundToNearest(pos[1])-0.5)/dir[1];
+//        else if (dir[1]<0)
+//            y = -fabs(pos[1]-RoundToNearest(pos[1])+0.5)/dir[1];
+//        if (s>y)
+//            s=y;
+
+//        float z = 100000;
+//        if (dir[2]>0)
+//            z = fabs(pos[2]-RoundToNearest(pos[2])-0.5)/dir[2];
+//        else if (dir[2]<0)
+//            z = -fabs(pos[2]-RoundToNearest(pos[2])+0.5)/dir[2];
+
+//        if (s>z)
+//            s=z;
+//        s *= 1.001;
+
+//        pos[0] += dir[0]*s;
+//        pos[1] += dir[1]*s;
+//        pos[2] += dir[2]*s;
+
+//        index[0] = RoundToNearest(pos[0]);
+//        index[1] = RoundToNearest(pos[1]);
+//        index[2] = RoundToNearest(pos[2]);
+
+//        MITK_INFO << "new: " << pos[0] << ", " << pos[1] << ", " << pos[2];
+    }
+}
+
+template< class TTensorPixelType, class TPDPixelType>
+void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
+::FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids)
+{
+    typename InputImageType::IndexType index, indexOld;
+    indexOld[0] = -1; indexOld[1] = -1; indexOld[2] = -1;
+    itk::Point<double> worldPos;
+
+    // starting index and direction
+    index[0] = RoundToNearest(pos[0]);
+    index[1] = RoundToNearest(pos[1]);
+    index[2] = RoundToNearest(pos[2]);
+    vnl_vector_fixed<double,3> dir = m_PdImage->GetPixel(index);
+    dir *= dirSign;                     // reverse direction
+    vnl_vector_fixed<double,3> dirOld = dir;
+
+    for (int step=0; step< m_MaxLength/2; step++)
+    {
+        // get new position
+        CalculateNewPosition(pos, dir, index);
+
+        // are we still inside the image and is the fa value high enough?
+        if (!m_InputImage->GetLargestPossibleRegion().IsInside(index) || m_FaImage->GetPixel(index)<m_FaThreshold || m_MaskImage->GetPixel(index)==0)
+        {
+            m_InputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
+            ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
+            break;
+        }
+
+        if (indexOld!=index)                    // did we enter a new voxel? if yes, calculate new direction
+        {
+            dir = m_PdImage->GetPixel(index);   // get principal direction
+            dir *= dirSign;                     // reverse direction
+
+            if (!dirOld.is_zero())
+            {
+                typename InputImageType::PixelType tensor = m_InputImage->GetPixel(index);
+                float scale = m_EmaxImage->GetPixel(index);
+                dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
+                dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
+                dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
+                dir.normalize();
+
+                float angle = dot_product(dirOld, dir);
+                if (angle<0)
+                    dir *= -1;
+                angle = dot_product(dirOld, dir);
+                if (angle<m_AngularThreshold)
+                    break;
+            }
+            dirOld = dir;
+            indexOld = index;
+
+            // add position to streamline
+            m_InputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
+            ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
+        }
+        else    // keep old direction
+            dir = dirOld;
+    }
+}
+
 template< class TTensorPixelType,
           class TPDPixelType>
 void StreamlineTrackingFilter< TTensorPixelType,
@@ -173,190 +399,90 @@ TPDPixelType>
                        int threadId)
 {
     FiberPolyDataType poly = m_PolyDataContainer->GetElement(threadId);
-    vtkSmartPointer<vtkPoints> Points = vtkPoints::New();
+    vtkSmartPointer<vtkPoints> points = vtkPoints::New();
     vtkSmartPointer<vtkCellArray> Cells = vtkCellArray::New();
 
-    typedef itk::DiffusionTensor3D<TTensorPixelType>    TensorType;
-    typedef ImageRegionConstIterator< InputImageType >  InputIteratorType;
-    typedef ImageRegionConstIterator< ItkUcharImgType >  MaskIteratorType;
-    typedef typename InputImageType::PixelType          InputTensorType;
-    typename InputImageType::Pointer inputImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
+    typedef itk::DiffusionTensor3D<TTensorPixelType>        TensorType;
+    typedef ImageRegionConstIterator< InputImageType >      InputIteratorType;
+    typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
+    typedef ImageRegionConstIterator< ItkFloatImgType >     FloatIteratorType;
+    typedef typename InputImageType::PixelType              InputTensorType;
 
-    InputIteratorType it(inputImage, outputRegionForThread );
-    MaskIteratorType mit(m_MaskImage, outputRegionForThread );
+    InputIteratorType   it(m_InputImage, outputRegionForThread );
+    MaskIteratorType    mit(m_SeedImage, outputRegionForThread );
+    FloatIteratorType   fit(m_FaImage, outputRegionForThread );
+    MaskIteratorType    mit2(m_MaskImage, outputRegionForThread );
+
+
     it.GoToBegin();
     mit.GoToBegin();
+    mit2.GoToBegin();
+    fit.GoToBegin();
+    itk::Point<double> worldPos;
     while( !it.IsAtEnd() )
     {
-        if (mit.Value()==0)
+        if (mit.Value()==0 || fit.Value()<m_FaThreshold || mit2.Value()==0)
         {
             ++mit;
+            ++mit2;
             ++it;
+            ++fit;
             continue;
         }
 
         for (int s=0; s<m_SeedsPerVoxel; s++)
         {
-            unsigned long counter = 0;
-            vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-            std::vector< vtkIdType > pointISs;
+            vtkSmartPointer<vtkPolyLine> line = vtkSmartPointer<vtkPolyLine>::New();
+            std::vector< vtkIdType > pointIDs;
             typename InputImageType::IndexType index = it.GetIndex();
-            typename InputImageType::IndexType indexOld; indexOld[0] = -1; indexOld[1] = -1; indexOld[2] = -1;
-            itk::ContinuousIndex<double, 3> pos;
             itk::ContinuousIndex<double, 3> start;
+            unsigned int counter = 0;
 
             if (m_SeedsPerVoxel>1)
             {
-                pos[0] = index[0]+(double)(rand()%99-49)/100;
-                pos[1] = index[1]+(double)(rand()%99-49)/100;
-                pos[2] = index[2]+(double)(rand()%99-49)/100;
+                start[0] = index[0]+(double)(rand()%99-49)/100;
+                start[1] = index[1]+(double)(rand()%99-49)/100;
+                start[2] = index[2]+(double)(rand()%99-49)/100;
             }
             else
             {
-                pos[0] = index[0];
-                pos[1] = index[1];
-                pos[2] = index[2];
+                start[0] = index[0];
+                start[1] = index[1];
+                start[2] = index[2];
             }
-            start = pos;
 
-            int step = 0;
-            vnl_vector_fixed<double,3> dirOld; dirOld.fill(0.0);
-            // do forward tracking
-            while (step < m_MaxLength)
+            // forward tracking
+            FollowStreamline(start, 1, points, pointIDs);
+
+            // add ids to line
+            counter += pointIDs.size();
+            while (!pointIDs.empty())
             {
-                ++step;
-
-                index[0] = RoundToNearest(pos[0]);
-                index[1] = RoundToNearest(pos[1]);
-                index[2] = RoundToNearest(pos[2]);
-
-                if (!inputImage->GetLargestPossibleRegion().IsInside(index))
-                    break;
-
-                typename InputImageType::PixelType tensor = inputImage->GetPixel(index);
-                if(m_FaImage->GetPixel(index)>m_FaThreshold)
-                {
-                    vnl_vector_fixed<double,3> dir;
-                    if (indexOld!=index)
-                    {
-                        dir = m_PdImage->GetPixel(index);
-
-                        if (!dirOld.is_zero())
-                        {
-                            float scale = m_EmaxImage->GetPixel(index);
-                            dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
-                            dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
-                            dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
-                            dir.normalize();
-
-                            float angle = dot_product(dirOld, dir);
-                            if (angle<0)
-                                dir *= -1;
-                            angle = dot_product(dirOld, dir);
-                            if (angle<m_AngularThreshold)
-                                break;
-                        }
-                        dirOld = dir;
-                        indexOld = index;
-                    }
-                    else
-                        dir = dirOld;
-
-                    dir *= m_StepSize;
-
-                    itk::Point<double> worldPos;
-                    inputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
-
-                    vtkIdType id = Points->InsertNextPoint(worldPos.GetDataPointer());
-                    pointISs.push_back(id);
-                    counter++;
-
-                    pos[0] += dir[0]/m_ImageSpacing[0];
-                    pos[1] += dir[1]/m_ImageSpacing[1];
-                    pos[2] += dir[2]/m_ImageSpacing[2];
-                }
+                line->GetPointIds()->InsertNextId(pointIDs.back());
+                pointIDs.pop_back();
             }
 
-            // insert reverse IDs
-            while (!pointISs.empty())
-            {
-                container->GetPointIds()->InsertNextId(pointISs.back());
-                pointISs.pop_back();
-            }
+            // insert start point
+            m_InputImage->TransformContinuousIndexToPhysicalPoint( start, worldPos );
+            line->GetPointIds()->InsertNextId(points->InsertNextPoint(worldPos.GetDataPointer()));
 
-            // do backward tracking
-            index = it.GetIndex();
-            indexOld[0] = -1; indexOld[1] = -1; indexOld[2] = -1;
-            pos = start;
-            dirOld.fill(0.0);
-            while (step < m_MaxLength)
-            {
-                ++step;
+            // backward tracking
+            FollowStreamline(start, -1, points, pointIDs);
 
-                index[0] = RoundToNearest(pos[0]);
-                index[1] = RoundToNearest(pos[1]);
-                index[2] = RoundToNearest(pos[2]);
+            // add ids to line
+            counter += pointIDs.size();
+            for (int i=0; i<pointIDs.size(); i++)
+                line->GetPointIds()->InsertNextId(pointIDs.at(i));
 
-                if (index[0] < 0 || index[0]>=m_ImageSize[0])
-                    break;
-                if (index[1] < 0 || index[1]>=m_ImageSize[1])
-                    break;
-                if (index[2] < 0 || index[2]>=m_ImageSize[2])
-                    break;
-
-                typename InputImageType::PixelType tensor = inputImage->GetPixel(index);
-                if(m_FaImage->GetPixel(index)>m_FaThreshold)
-                {
-                    vnl_vector_fixed<double,3> dir;
-                    if (indexOld!=index)
-                    {
-                        dir = m_PdImage->GetPixel(index);
-                        dir *= -1; // reverse direction
-
-                        if (!dirOld.is_zero())
-                        {
-                            float scale = m_EmaxImage->GetPixel(index);
-                            dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
-                            dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
-                            dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
-                            dir.normalize();
-
-                            float angle = dot_product(dirOld, dir);
-                            if (angle<0)
-                                dir *= -1;
-                            angle = dot_product(dirOld, dir);
-                            if (angle<m_AngularThreshold)
-                                break;
-                        }
-                        dirOld = dir;
-                        indexOld = index;
-                    }
-                    else
-                        dir = dirOld;
-
-                    dir *= m_StepSize;
-
-                    itk::Point<double> worldPos;
-                    inputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
-
-                    vtkIdType id = Points->InsertNextPoint(worldPos.GetDataPointer());
-                    container->GetPointIds()->InsertNextId(id);
-                    counter++;
-
-                    pos[0] += dir[0]/m_ImageSpacing[0];
-                    pos[1] += dir[1]/m_ImageSpacing[1];
-                    pos[2] += dir[2]/m_ImageSpacing[2];
-                }
-            }
-
-            if (counter>0)
-                Cells->InsertNextCell(container);
+            if (counter>1)
+                Cells->InsertNextCell(line);
         }
         ++mit;
+        ++mit2;
         ++it;
+        ++fit;
     }
-
-    poly->SetPoints(Points);
+    poly->SetPoints(points);
     poly->SetLines(Cells);
 
     std::cout << "Thread " << threadId << " finished tracking" << std::endl;

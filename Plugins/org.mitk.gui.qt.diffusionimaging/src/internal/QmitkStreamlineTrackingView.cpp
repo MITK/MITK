@@ -132,8 +132,10 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
     m_TensorImageNode = NULL;
     m_TensorImage = NULL;
     m_SeedRoi = NULL;
+    m_MaskImage = NULL;
     m_Controls->m_TensorImageLabel->setText("-");
     m_Controls->m_RoiImageLabel->setText("-");
+    m_Controls->m_MaskImageLabel->setText("-");
 
     if(nodes.empty())
         return;
@@ -154,10 +156,15 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
             {
                 bool isBinary = false;
                 node->GetPropertyValue<bool>("binary", isBinary);
-                if (isBinary)
+                if (isBinary && m_SeedRoi.IsNull())
                 {
                     m_SeedRoi = dynamic_cast<mitk::Image*>(node->GetData());
                     m_Controls->m_RoiImageLabel->setText(node->GetName().c_str());
+                }
+                else if (isBinary)
+                {
+                    m_MaskImage = dynamic_cast<mitk::Image*>(node->GetData());
+                    m_Controls->m_MaskImageLabel->setText(node->GetName().c_str());
                 }
             }
         }
@@ -199,6 +206,15 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     {
         CastType2::Pointer caster2 = CastType2::New();
         caster2->SetInput(m_SeedRoi);
+        caster2->Update();
+        ItkUCharImageType::Pointer mask = caster2->GetOutput();
+        filter->SetSeedImage(mask);
+    }
+
+    if (m_MaskImage.IsNotNull())
+    {
+        CastType2::Pointer caster2 = CastType2::New();
+        caster2->SetInput(m_MaskImage);
         caster2->Update();
         ItkUCharImageType::Pointer mask = caster2->GetOutput();
         filter->SetMaskImage(mask);

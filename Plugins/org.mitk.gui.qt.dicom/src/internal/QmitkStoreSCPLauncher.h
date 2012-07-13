@@ -37,7 +37,7 @@ public:
 
 
 private:
-    void SetPathToStoreSCP();
+    void FindPathToStoreSCP();
     void SetArgumentList(QmitkStoreSCPLauncherBuilder* builder);
     QString ArgumentListToQString();
     QString m_PathToStoreSCP;

@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/org.mitk.gui.qt.dicom" >
-        <file>config.txt</file>
-    </qresource>
-</RCC>

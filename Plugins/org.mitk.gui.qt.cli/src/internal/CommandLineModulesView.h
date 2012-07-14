@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include "CommandLineModulesViewControls.h"
 #include <ctkCmdLineModuleReference.h>
-#include <ctkCmdLineModuleProcessFuture.h>
 
 class ctkCmdLineModuleManager;
 class ctkCmdLineModuleInstance;
@@ -142,16 +141,10 @@ private:
    */
   QHash<QString, ctkCmdLineModuleReference> m_MapFilenameToReference;
 
-
   /**
    * \brief We use this map to decide if we want to create more tabs or not.
    */
   QHash<int, ctkCmdLineModuleInstance*> m_MapTabToModuleInstance;
-
-  /**
-   * \brief We use a QFutureWatcher to monitor the QFuture.
-   */
-  ctkCmdLineModuleProcessFutureWatcher m_FutureWatcher;
 
   /**
    * \brief We store a temporary folder name, accessible via user preferences.

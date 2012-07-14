@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QByteArray>
 #include <QHBoxLayout>
 #include <QAction>
+#include <QDebug>
 
 // CTK
 #include <ctkCmdLineModuleManager.h>
@@ -45,7 +46,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleInstanceFactoryQtGui.h>
 #include <ctkCmdLineModuleXmlValidator.h>
-#include <ctkCmdLineModuleProcessFuture.h>
 #include <ctkCmdLineModuleDefaultPathBuilder.h>
 
 const std::string CommandLineModulesView::VIEW_ID = "org.mitk.gui.qt.cli";
@@ -90,7 +90,6 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     connect(this->m_Controls->m_StopButton, SIGNAL(pressed()), this, SLOT(OnStopButtonPressed()));
     connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreDefaultsButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
-    connect(&(this->m_FutureWatcher), SIGNAL(finished()), this, SLOT(OnFutureFinished()));
   }
 }
 
@@ -209,8 +208,6 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
 void CommandLineModulesView::OnFutureFinished()
 {
   qDebug() << "*** Future finished ***";
-  qDebug() << "stdout:" << m_FutureWatcher.future().standardOutput();
-  qDebug() << "stderr:" << m_FutureWatcher.future().standardError();
 }
 
 void CommandLineModulesView::OnActionChanged(QAction* action)
@@ -250,8 +247,6 @@ void CommandLineModulesView::OnRunButtonPressed()
   }
 
   qDebug() << "Launching module command line...";
-
-  ctkCmdLineModuleProcessFuture future = moduleInstance->run();
 
   qDebug() << "Launched module command line...";
 }

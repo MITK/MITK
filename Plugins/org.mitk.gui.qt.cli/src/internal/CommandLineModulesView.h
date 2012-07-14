@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include "CommandLineModulesViewControls.h"
 #include <ctkCmdLineModuleReference.h>
-#include <ctkCmdLineModuleProcessFuture.h>
 
 class ctkCmdLineModuleManager;
 class ctkCmdLineModuleInstance;

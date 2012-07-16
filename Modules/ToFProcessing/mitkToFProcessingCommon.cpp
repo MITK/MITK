@@ -17,7 +17,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::IndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLength,
+  ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::IndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
+    ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY)
+  {
+    ToFPoint3D cartesianCoordinates;
+
+    // calculate image coordinates in pixel units;
+    // Note: pixel unit (pX) in x direction does normally not equal pixel unit (pY) in y direction.
+    // Therefore, a transformation in one of the pixel units is necessary
+    // Here, pX as image coordinate unit is chosen
+    // pY = (focalLengthX / focalLengthY) * pX
+    ToFScalarType imageX = i - principalPointX;
+    ToFScalarType imageY = j - principalPointY;
+    ToFScalarType imageY_in_pX = imageY * (focalLengthX / focalLengthY);
+
+    //distance from pinhole to pixel (i,j) in pX units (pixel unit in x direction)
+    ToFScalarType d_in_pX = sqrt(imageX*imageX + imageY_in_pX*imageY_in_pX + focalLengthX*focalLengthX);
+
+    cartesianCoordinates[0] = distance * imageX / d_in_pX; //Strahlensatz: x / imageX = distance / d
+    cartesianCoordinates[1] = distance * imageY_in_pX / d_in_pX; //Strahlensatz: y / imageY = distances / d
+    cartesianCoordinates[2] = distance * focalLengthX / d_in_pX; //Strahlensatz: z / f = distance / d.
+
+    return cartesianCoordinates;
+  }
+
+//deprecated
+  ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLength,
     ToFScalarType interPixelDistanceX, ToFScalarType interPixelDistanceY,
     ToFScalarType principalPointX, ToFScalarType principalPointY)
   {
@@ -37,7 +62,41 @@ namespace mitk
     return cartesianCoordinates;
   }
 
+
   ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::CartesianToIndexCoordinates(ToFScalarType cartesianPointX, ToFScalarType cartesianPointY,ToFScalarType cartesianPointZ,
+    ToFScalarType focalLengthX, ToFScalarType focalLengthY,
+    ToFScalarType principalPointX, ToFScalarType principalPointY, bool calculateDistance)
+  {
+    ToFPoint3D indexCoordinatesAndDistanceValue;
+
+    ToFScalarType imageX = cartesianPointX*focalLengthX/cartesianPointZ; //Strahlensatz: cartesianPointX / imageX = cartesianPointZ / focalLengthX
+    ToFScalarType imageY = cartesianPointY*focalLengthY/cartesianPointZ; //Strahlensatz: cartesianPointY / imageY = cartesianPointZ / focalLengthY
+
+    indexCoordinatesAndDistanceValue[0] = imageX + principalPointX;
+    indexCoordinatesAndDistanceValue[1] = imageY + principalPointY;
+
+    // Note: pixel unit (pX) in x direction does normally not equal pixel unit (pY) in y direction.
+    // Therefore, a transformation in one of the pixel units is necessary
+    // Here, pX as image coordinate unit is chosen
+    // pY = (focalLengthX / focalLengthY) * pX
+    ToFScalarType imageY_in_pX = imageY * focalLengthX/focalLengthY;
+
+    //distance from pinhole to pixel
+    ToFScalarType d_in_pX = sqrt(imageX*imageX + imageY_in_pX*imageY_in_pX + focalLengthX*focalLengthX);
+
+    if (calculateDistance)
+    {
+      indexCoordinatesAndDistanceValue[2] = d*(cartesianPointZ) / focalLengthX;
+    }
+    else
+    {
+      indexCoordinatesAndDistanceValue[2] = 0.0;
+    }
+    return indexCoordinatesAndDistanceValue;
+  }
+
+//deprecated
+  ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::CartesianToIndexCoordinatesWithInterpixdist(ToFScalarType cartesianPointX, ToFScalarType cartesianPointY,ToFScalarType cartesianPointZ,
     ToFScalarType focalLength, ToFScalarType interPixelDistanceX, ToFScalarType interPixelDistanceY, 
     ToFScalarType principalPointX, ToFScalarType principalPointY, bool calculateDistance)
   {

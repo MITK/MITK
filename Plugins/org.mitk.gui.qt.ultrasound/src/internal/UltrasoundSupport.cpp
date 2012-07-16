@@ -97,10 +97,13 @@ void UltrasoundSupport::OnClickedViewDevice()
     m_Device->UpdateOutputData(0);
     m_Image = m_Device->GetOutput(0);
     m_Node->SetData(m_Device->GetOutput(0));
-    m_Timer->start(50);
-
+    int interval = (1000 / m_Controls.m_FrameRate->value());
+    m_Timer->setInterval(interval);
+    m_Timer->start();
     m_Controls.m_BtnView->setText("Stop Viewing");
-  } else { //deactivate Imaging
+  }
+  else
+  { //deactivate Imaging
     m_Controls.m_BtnView->setText("Start Viewing");
     m_Timer->stop();
     m_Node->ReleaseData();

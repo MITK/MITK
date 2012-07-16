@@ -553,11 +553,13 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
        bool informationIsLost = false;
        while(1)
        {
-          if (image->GetGeometry()->GetSpacing()[2] != 0)
+          MITK_INFO << "spac: " << image->GetGeometry()->GetSpacing();
+          if (image->GetGeometry()->GetSpacing()[2] != 1)
           {
              informationIsLost = true;
              break;
           }
+          MITK_INFO << "orig: " << image->GetGeometry()->GetOrigin();
           if (image->GetGeometry()->GetOrigin()[2] != 0)
           {
              informationIsLost = true;
@@ -568,11 +570,15 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
           col1.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
           col2.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
 
-          if ((col0[2] != 0) || (col1[2] != 0) || (col2[0] != 0) || (col2[1] != 0) || (col2[2] != 0))
+          MITK_INFO << "col0: " << col0;
+          MITK_INFO << "col1 " <<  col1;
+          MITK_INFO << "col2: " << col2;
+          if ((col0[2] != 0) || (col1[2] != 0) || (col2[0] != 0) || (col2[1] != 0) || (col2[2] != 1))
           {
              informationIsLost = true;
              break;
           }
+          break;
        };
 
        if (informationIsLost)
@@ -607,10 +613,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
              // Abort, don't save anything
              return 0; 
           }
-
-
        }
-       
     }
 
     // write image

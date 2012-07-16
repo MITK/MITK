@@ -243,11 +243,13 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
-  //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
+
+    //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
   //Set the slice as 'input'
-  reslice->SetInputSlice(slice->GetVtkImageData(this->m_TimeStep));
+  reslice->SetInputSlice(slice->GetVtkImageData());
 
   //set overwrite mode to true to write back to the image volume
   reslice->SetOverwriteMode(true);
@@ -255,10 +257,10 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
   mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslice);
   extractor->SetInput( image );
-  extractor->SetTimeStep( this->m_TimeStep );
+  extractor->SetTimeStep( timeStep );
   extractor->SetWorldGeometry( planeGeometry );
   extractor->SetVtkOutputRequest(true);
-  extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( this->m_TimeStep ) );
+  extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
 
   extractor->Modified();
   extractor->Update();
@@ -268,7 +270,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
   /*============= BEGIN undo feature block ========================*/
   //specify the undo operation with the edited slice
-  m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),slice->GetGeometry(), this->m_TimeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+  m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
   
   //create an operation event for the undo stack
   OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );

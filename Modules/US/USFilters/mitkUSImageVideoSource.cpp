@@ -102,8 +102,8 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   int height = m_OpenCVVideoSource->GetImageHeight();
 
   // Get Frame from Source
-  image = m_OpenCVVideoSource->GetImage();
   m_OpenCVVideoSource->FetchFrame();
+  image = m_OpenCVVideoSource->GetImage();
 
   // if Region of interest is set, crop image
   if (m_CropRegion.width > 0){

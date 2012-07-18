@@ -9,7 +9,6 @@ set(MITK_EXT_PLUGINS
   org.mitk.core.jobs:OFF
   org.mitk.diffusionimaging:OFF
   org.mitk.gui.qt.application:ON
-  org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.coreapplication:OFF
   org.mitk.gui.qt.ext:OFF
   org.mitk.gui.qt.extapplication:OFF
@@ -18,6 +17,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.common.legacy:OFF
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.datamanager:ON
+  org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.dtiatlasapp:OFF

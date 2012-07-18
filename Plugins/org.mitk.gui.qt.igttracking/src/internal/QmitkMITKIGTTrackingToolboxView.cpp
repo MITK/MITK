@@ -212,7 +212,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
     m_TrackingDeviceSource->Connect();
     m_TrackingDeviceSource->RegisterAsMicroservice();
     //TODO Toolbox Service Integration
-    m_toolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID);
+    m_toolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID());
     //ab hier: StartTracking, davor: Connect
     m_TrackingDeviceSource->StartTracking();
   }

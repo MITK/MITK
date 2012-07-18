@@ -94,8 +94,31 @@ float mitk::PlanarFigureInteractor
 
   if ( planarFigure != NULL )
   {
+    if ( planarFigure->IsPlaced() )
+    {
+      const mitk::PositionEvent *positionEvent = dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
+      if ( positionEvent == NULL )
+      {
+        return false;
+      }
+
+      double pixelValueAtCursorPosition = 0.0;
+      mitk::Point3D worldPoint3D = positionEvent->GetWorldPosition();
+
+      mitk::Geometry2D *planarFigureGeometry2D =
+        dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
+
+      double planeThickness = planarFigureGeometry2D->GetExtentInMM( 2 );
+      if ( planarFigureGeometry2D->Distance( worldPoint3D ) > planeThickness )
+      {
+        return 0.0;
+      }
+    }
+
     // Give higher priority if this figure is currently selected
-    if ( planarFigure->GetSelectedControlPoint() >= 0 )
+    bool selected = false;
+    m_DataNode->GetBoolProperty("selected", selected);
+    if ( selected )
     {
       return 1.0;
     }

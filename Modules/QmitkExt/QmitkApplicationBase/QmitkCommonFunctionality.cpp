@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCommonFunctionality.h"
 #include <mitkImageAccessByItk.h>
 #include <mitkPicFileReader.h>
+#include <mitkConvert2Dto3DImageFilter.h>
 
 #include <mitkIpPic.h>
 
@@ -597,11 +598,11 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
 
           if (ret == QMessageBox::YesRole)
           {
-             // Save as 3D
-             // todo: convert image to 3D image
-             mitk::Image::Pointer imageAs3D;
-             AccessFixedDimensionByItk_2(image,Convert2DImageTo3D,2,image,imageAs3D);
-             image = imageAs3D;
+             // convert image to 2D
+             mitk::Convert2Dto3DImageFilter::Pointer convertFilter = mitk::Convert2Dto3DImageFilter::New();
+             convertFilter->SetInput(image);
+             convertFilter->Update();
+             image = convertFilter->GetOutput();
           }
           else if (ret == QMessageBox::NoRole)
           {

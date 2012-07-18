@@ -20,7 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMessageBox>
 #include <QProcessEnvironment>
 #include <mitkLogMacros.h>
-//#include <QStringListIterator>
+
+#include <fstream>
+#include <iostream>
+#include <QFile>
+#include <QTextStream>
+#include <QIODevice>
+#include <QDir>
+#include <QCoreApplication>
 
 QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder) 
 : m_StoreSCP(new QProcess())
@@ -38,19 +45,35 @@ QmitkStoreSCPLauncher::~QmitkStoreSCPLauncher()
 
 void QmitkStoreSCPLauncher::StartStoreSCP()
 {
-    QString storeSCP;
-    storeSCP.append(GetPathToExecutable());
-    storeSCP.append(QString("/storescp.exe"));
-    m_StoreSCP->start(storeSCP,m_ArgumentList);
+    FindPathToStoreSCP();
+    MITK_INFO << m_PathToStoreSCP.toStdString();
+    m_StoreSCP->start(m_PathToStoreSCP,m_ArgumentList);
 }
 
-QString QmitkStoreSCPLauncher::GetPathToExecutable()
+void QmitkStoreSCPLauncher::FindPathToStoreSCP()
 {
-    QDir root;
-    QString currentPath =  root.currentPath();
-    currentPath = currentPath.split("MITK").at(0);
-    currentPath.append("MITK/DCMTK-install/bin");
-    return currentPath;
+    if(m_PathToStoreSCP.isEmpty())
+    {
+        QString fileName;
+#ifdef _WIN32
+        fileName = "/storescp.exe";
+#else
+        fileName = "/storescp";
+#endif
+
+        QString appPath= QCoreApplication::applicationDirPath();
+        appPath;
+        m_PathToStoreSCP = appPath;
+        m_PathToStoreSCP.append(fileName);
+        //In developement the storescp isn't copied into bin directory
+        if(!QFile::exists(m_PathToStoreSCP))
+        {
+            m_PathToStoreSCP.clear();
+            appPath.append("/../../../DCMTK-install/bin");
+            m_PathToStoreSCP = appPath;
+            m_PathToStoreSCP.append(fileName);
+        }
+    }
 }
 
 void QmitkStoreSCPLauncher::OnProcessError(QProcess::ProcessError err)

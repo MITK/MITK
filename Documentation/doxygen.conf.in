@@ -772,7 +772,8 @@ EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Core/Code/ \
                          @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/Documentation/Snippets/ \
                          @MITK_DOXYGEN_OUTPUT_DIR@/html/extension-points/html/ \
-                         @MITK_SOURCE_DIR@/Documentation/Snippets/
+                         @MITK_SOURCE_DIR@/Documentation/Snippets/ \
+                         @MITK_SOURCE_DIR@/Documentation/Doxygen/ExampleCode/
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp

@@ -59,6 +59,7 @@ set(MODULE_TESTS
   #QmitkRenderingTestHelper.cpp
   mitkExceptionTest.cpp
   mitkExtractSliceFilterTest.cpp
+  mitkImageDimensionConverterTest.cpp
 )
 
 # test with image filename as an extra command line parameter

@@ -150,38 +150,39 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
         int rejectionCount = 0;
         int maxRejections = 10000;// m_NumGradientDirections[shellCounter] * 1000;
         int iUsed = 0;
-        while ( stagnationCount<1000 && rejectionCount<maxRejections )
-        {
-            // make proposal for new gradient configuration by randomly removing one of the currently used directions and instead adding one of the unused directions
-            //int iUsed = rand() % m_UsedGradientIndices.size();
-            int iUnUsed = rand() % m_UnusedGradientIndices.size();
-            int vUsed = m_UsedGradientIndices.at(iUsed);
-            int vUnUsed = m_UnusedGradientIndices.at(iUnUsed);
-            m_UsedGradientIndices.at(iUsed) = vUnUsed;
-            m_UnusedGradientIndices.at(iUnUsed) = vUsed;
-
-            newMinAngle = Costs();          // calculate costs of proposed configuration
-            if (newMinAngle > minAngle)     // accept or reject proposal
+        if (m_UsedGradientIndices.size()>0)
+            while ( stagnationCount<1000 && rejectionCount<maxRejections )
             {
-                MITK_INFO << "minimum angle: " << 180*newMinAngle/M_PI;
+                // make proposal for new gradient configuration by randomly removing one of the currently used directions and instead adding one of the unused directions
+                //int iUsed = rand() % m_UsedGradientIndices.size();
+                int iUnUsed = rand() % m_UnusedGradientIndices.size();
+                int vUsed = m_UsedGradientIndices.at(iUsed);
+                int vUnUsed = m_UnusedGradientIndices.at(iUnUsed);
+                m_UsedGradientIndices.at(iUsed) = vUnUsed;
+                m_UnusedGradientIndices.at(iUnUsed) = vUsed;
 
-                if ( (newMinAngle-minAngle)<0.01 )
-                    stagnationCount++;
+                newMinAngle = Costs();          // calculate costs of proposed configuration
+                if (newMinAngle > minAngle)     // accept or reject proposal
+                {
+                    MITK_INFO << "minimum angle: " << 180*newMinAngle/M_PI;
+
+                    if ( (newMinAngle-minAngle)<0.01 )
+                        stagnationCount++;
+                    else
+                        stagnationCount = 0;
+
+                    minAngle = newMinAngle;
+                    rejectionCount = 0;
+                }
                 else
-                    stagnationCount = 0;
-
-                minAngle = newMinAngle;
-                rejectionCount = 0;
+                {
+                    rejectionCount++;
+                    m_UsedGradientIndices.at(iUsed) = vUsed;
+                    m_UnusedGradientIndices.at(iUnUsed) = vUnUsed;
+                }
+                iUsed++;
+                iUsed = iUsed % m_UsedGradientIndices.size();
             }
-            else
-            {
-                rejectionCount++;
-                m_UsedGradientIndices.at(iUsed) = vUsed;
-                m_UnusedGradientIndices.at(iUnUsed) = vUnUsed;
-            }
-            iUsed++;
-            iUsed = iUsed % m_UsedGradientIndices.size();
-        }
         manipulatedMap[it->first] = m_UsedGradientIndices;
         shellCounter++;
     }

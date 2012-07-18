@@ -79,7 +79,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
     connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
-	connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
+    connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
     connect( m_Controls->m_ShowTrackingVolume, SIGNAL(clicked()), this, SLOT(OnShowTrackingVolumeChanged()));
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
     connect( m_Controls->m_ResetTools, SIGNAL(clicked()), this, SLOT(OnResetTools()));
@@ -108,11 +108,11 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_StopLogging->setEnabled(false);
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
 
-	  //Update List of available models for selected tool.
+    //Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
     m_Controls->m_VolumeSelectionBox->clear();
     for(int i = 0; i < Compatibles.size(); i++)
-	  {
+    {
       m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
     }
   }
@@ -295,17 +295,17 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 
 void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
 {
-	if (qstr.isNull()) return;
-	if (qstr.isEmpty()) return;
+  if (qstr.isNull()) return;
+  if (qstr.isEmpty()) return;
   if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
     mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 
-	  std::string str = qstr.toStdString();
+    std::string str = qstr.toStdString();
 
-	  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+    mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
 
-	  volumeGenerator->SetTrackingDeviceData(data);
+    volumeGenerator->SetTrackingDeviceData(data);
     volumeGenerator->Update();
 
     mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
@@ -378,15 +378,25 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
       {
       //ask the user if he wants to save the detected tools
       QMessageBox msgBox;
-      msgBox.setText("Found " + QString::number(m_toolStorage->GetToolCount()) + " tools!");
+      switch(m_toolStorage->GetToolCount())
+        { 
+        case 1:
+          msgBox.setText("Found one tool!");
+          break;
+        default:
+          msgBox.setText("Found " + QString::number(m_toolStorage->GetToolCount()) + " tools!");
+        }
       msgBox.setInformativeText("Do you want to save this tools as tool storage, so you can load them again?");
       msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
       msgBox.setDefaultButton(QMessageBox::No);
       int ret = msgBox.exec();
+      
       if (ret == 16384) //yes
         {
         //ask the user for a filename
-        QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"),"",tr("*.*"));
+        QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"),"/",tr("*.*"));
+        //check for empty filename
+        if(fileName == "") {return;}
         mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
         if (!mySerializer->Serialize(fileName.toStdString(),m_toolStorage)) MessageBox(mySerializer->GetErrorMessage());
         return;

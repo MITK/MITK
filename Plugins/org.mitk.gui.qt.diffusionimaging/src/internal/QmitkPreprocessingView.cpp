@@ -107,6 +107,7 @@ void QmitkPreprocessingView::CreateConnections()
 {
     if ( m_Controls )
     {
+        m_Controls->m_ReductionFrame->setLayout(new QGridLayout);
         connect( (QObject*)(m_Controls->m_ButtonAverageGradients), SIGNAL(clicked()), this, SLOT(AverageGradients()) );
         connect( (QObject*)(m_Controls->m_ButtonExtractB0), SIGNAL(clicked()), this, SLOT(ExtractB0()) );
         connect( (QObject*)(m_Controls->m_ButtonBrainMask), SIGNAL(clicked()), this, SLOT(BrainMask()) );

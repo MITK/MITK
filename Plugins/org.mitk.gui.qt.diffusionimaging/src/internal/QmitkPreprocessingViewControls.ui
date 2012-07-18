@@ -261,6 +261,38 @@
        </widget>
       </item>
       <item>
+       <widget class="QFrame" name="m_ReductionFrame">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <property name="margin">
+          <number>9</number>
+         </property>
+         <property name="spacing">
+          <number>9</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Specify desired number of gradients per shell.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QCommandLinkButton" name="m_ReduceGradientsButton">
         <property name="enabled">
          <bool>false</bool>
@@ -277,24 +309,6 @@
         <property name="text">
          <string>Reduce number of gradients</string>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFrame" name="m_ReductionFrame">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <property name="spacing">
-          <number>0</number>
-         </property>
-        </layout>
        </widget>
       </item>
      </layout>

@@ -82,12 +82,10 @@ namespace itk
     itkGetMacro(GradientDirections, GradientDirectionContainerType::Pointer)
     itkSetMacro(GradientDirections, GradientDirectionContainerType::Pointer)
 
-    itkGetMacro(NumGradientDirections, int)
-    itkSetMacro(NumGradientDirections, int)
-
     IndicesVector GetUsedGradientIndices(){return m_UsedGradientIndices;}
     void SetOriginalBValueMap(BValueMap inp){m_OriginalBValueMap = inp;}
     void SetShellSelectionBValueMap(BValueMap inp){m_InputBValueMap = inp;}
+    void SetNumGradientDirections(std::vector<int> numDirs){m_NumGradientDirections = numDirs;}
 
   protected:
     ElectrostaticRepulsionDiffusionGradientReductionFilter();
@@ -106,7 +104,7 @@ namespace itk
     BValueMap m_OriginalBValueMap;
     BValueMap m_InputBValueMap;
 
-    int m_NumGradientDirections;
+    std::vector<int> m_NumGradientDirections;
   };
 
 

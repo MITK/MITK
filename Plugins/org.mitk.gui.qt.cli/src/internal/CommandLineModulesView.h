@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class ctkCmdLineModuleManager;
 class ctkCmdLineModuleInstance;
+class ctkCmdLineModuleDirectoryWatcher;
+class ctkCmdLineModuleMenuFactoryQtGui;
 class QAction;
 
 namespace berry
@@ -72,6 +74,12 @@ protected slots:
   void OnRestoreDefaultsButtonPressed();
   void OnFutureFinished();
 
+  /**
+   * \brief We register with the ctkCmdLineModuleDirectoryWatcher so that if the ModulesChanged signal
+   * is received we can update the GUI.
+   */
+  void OnModulesChanged();
+
 protected:
 
   /**
@@ -92,20 +100,6 @@ private:
    * \brief Called on startup and by OnPreferencesChanged to load the preferences into member variables.
    */
   void RetrievePreferenceValues();
-
-  /**
-   * \brief Given a list of absolute or relative paths, will search for modules to load.
-   * \param paths QStringList containing a list of paths to search.
-   * \return QHash<QString, ctkCmdLineModuleReference> Hash map of filename to reference.
-   */
-  QHash<QString, ctkCmdLineModuleReference> LoadModuleReferencesFromPaths(QStringList& paths);
-
-  /**
-   * \brief Constructs a nested menu, for all the items in the QHash.
-   * \param references Hash map of filename to reference.
-   * \return QMenu* a nested menu.
-   */
-  QMenu* CreateMenuFromReferences(QHash<QString, ctkCmdLineModuleReference>& references);
 
   /**
    * \brief Search the internal datastructure (QHash) to find the reference that matches the identifier (title).
@@ -132,14 +126,19 @@ private:
   QWidget *m_Parent;
 
   /**
-   * \brief The manager is responsible for loading modules ...
+   * \brief The manager is responsible for loading command line modules.
    */
   ctkCmdLineModuleManager *m_ModuleManager;
 
   /**
-   * \brief We store a map of filename to reference, and use the reference to populate the combo box.
+   * \brief The DirectoryWatcher maintains the list of directories we are using to load modules, to provide automatic updates.
    */
-  QHash<QString, ctkCmdLineModuleReference> m_MapFilenameToReference;
+  ctkCmdLineModuleDirectoryWatcher *m_DirectoryWatcher;
+
+  /**
+   * \brief The menu factory will build a QMenu from the list of available modules.
+   */
+  ctkCmdLineModuleMenuFactoryQtGui *m_MenuFactory;
 
   /**
    * \brief We use this map to decide if we want to create more tabs or not.
@@ -150,12 +149,6 @@ private:
    * \brief We store a temporary folder name, accessible via user preferences.
    */
   QString m_TemporaryDirectoryName;
-
-  /**
-   * \brief We store list of folder names, to avoid re-loading modules if
-   * RetrievePreferenceValues is called multiple times.
-   */
-  QStringList m_ModulesDirectoryNames;
 
   /**
    * \brief Member variable, taken from preference page.

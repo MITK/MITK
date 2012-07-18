@@ -42,6 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // CTK
 #include <ctkCmdLineModuleManager.h>
+#include <ctkCmdLineModuleDirectoryWatcher.h>
+#include <ctkCmdLineModuleMenuFactoryQtGui.h>
 #include <ctkCmdLineModuleInstance.h>
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleInstanceFactoryQtGui.h>
@@ -54,12 +56,14 @@ CommandLineModulesView::CommandLineModulesView()
 : m_Controls(NULL)
 , m_Parent(NULL)
 , m_ModuleManager(NULL)
+, m_DirectoryWatcher(NULL)
+, m_MenuFactory(NULL)
 , m_TemporaryDirectoryName("")
 {
-  m_ModulesDirectoryNames.clear();
-  m_MapFilenameToReference.clear();
   m_MapTabToModuleInstance.clear();
   m_ModuleManager = new ctkCmdLineModuleManager(new ctkCmdLineModuleInstanceFactoryQtGui());
+  m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
+  m_MenuFactory = new ctkCmdLineModuleMenuFactoryQtGui();
 }
 
 CommandLineModulesView::~CommandLineModulesView()
@@ -67,6 +71,16 @@ CommandLineModulesView::~CommandLineModulesView()
   if (m_ModuleManager != NULL)
   {
     delete m_ModuleManager;
+  }
+
+  if (m_DirectoryWatcher != NULL)
+  {
+    delete m_DirectoryWatcher;
+  }
+
+  if (m_MenuFactory != NULL)
+  {
+    delete m_MenuFactory;
   }
 }
 
@@ -81,6 +95,9 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
   {
     // We create CommandLineModulesViewControls, which derives from the Qt generated class.
     m_Controls = new CommandLineModulesViewControls(parent);
+
+    // This connect must come before we update the preferences for the first time.
+    connect(this->m_DirectoryWatcher, SIGNAL(modulesChanged()), this, SLOT(OnModulesChanged()));
 
     // Loads the preferences like directory settings into member variables.
     this->RetrievePreferenceValues();
@@ -111,13 +128,17 @@ void CommandLineModulesView::RetrievePreferenceValues()
   // Get the flag for debug output, useful when parsing all the XML.
   bool debugOutputBefore = m_DebugOutput;
   m_DebugOutput = prefs->GetBool(CommandLineModulesPreferencesPage::DEBUG_OUTPUT_NODE_NAME, false);
+  m_DirectoryWatcher->setDebug(m_DebugOutput);
+
+  // Not yet in use, will be used for ... er... temporary stuff.
+  m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, ""));
 
   // Get some default application paths.
+  // Here we can use the preferences to set up the builder, before asking him for the paths to scan.
   ctkCmdLineModuleDefaultPathBuilder builder;
   QStringList defaultPaths = builder.build();
 
   // We get additional paths from preferences.
-  m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, ""));
   QString pathString = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::MODULE_DIRECTORIES_NODE_NAME, ""));
   QStringList additionalPaths = pathString.split(";", QString::SkipEmptyParts);
 
@@ -128,63 +149,26 @@ void CommandLineModulesView::RetrievePreferenceValues()
 
   // OnPreferencesChanged can be called for each preference in a dialog box, so
   // when you hit "OK", it is called repeatedly, whereas we want to only call this once,
-  // so I am checking if the list of directory names has changed.
-  if (this->m_ModulesDirectoryNames != totalPaths || (debugOutputBefore != m_DebugOutput))
+  // so I am checking if the list of directory names has changed, and whether the debug flag has changed.
+  if (this->m_DirectoryWatcher->directories() != totalPaths || (debugOutputBefore != m_DebugOutput))
   {
-    m_MapFilenameToReference = this->LoadModuleReferencesFromPaths(totalPaths);
-    QMenu *menu = this->CreateMenuFromReferences(m_MapFilenameToReference);
-    this->m_Controls->m_ComboBox->setMenu(menu);
-    this->m_ModulesDirectoryNames = totalPaths;
+    // This should update the directory watcher, which should sort out if any new modules have been loaded
+    // and if so, should signal ModulesChanged, which is caught by this class, and re-build the GUI.
+    m_DirectoryWatcher->setDirectories(totalPaths);
   }
-}
-
-QHash<QString, ctkCmdLineModuleReference> CommandLineModulesView::LoadModuleReferencesFromPaths(QStringList &paths)
-{
-  QString path;
-  QString executable;
-  QFileInfo executableFileInfo;
-
-  QHash<QString, ctkCmdLineModuleReference> result;
-
-  foreach (path, paths)
-  {
-    if (!path.isNull() && !path.isEmpty() && !path.trimmed().isEmpty())
-    {
-      QDir directory = QDir(path);
-      directory.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::Executable);
-
-      QFileInfoList executablesInfoList = directory.entryInfoList();
-      foreach (executableFileInfo, executablesInfoList)
-      {
-        executable = executableFileInfo.absoluteFilePath();
-        ctkCmdLineModuleReference ref = m_ModuleManager->registerModule(executable, !m_DebugOutput);
-        if (ref)
-        {
-          result[executable] = ref;
-        }
-      }
-    }
-  }
-  return result;
-}
-
-QMenu* CommandLineModulesView::CreateMenuFromReferences(QHash<QString, ctkCmdLineModuleReference>& hashMap)
-{
-  QMenu *menu = new QMenu();
-  ctkCmdLineModuleReference ref;
-
-  QList<ctkCmdLineModuleReference> references = hashMap.values();
-  foreach (ref, references)
-  {
-    menu->addAction(ref.description().title());
-  }
-  return menu;
 }
 
 void CommandLineModulesView::OnPreferencesChanged(const berry::IBerryPreferences* /*prefs*/)
 {
   // Loads the preferences into member variables.
   this->RetrievePreferenceValues();
+}
+
+void CommandLineModulesView::OnModulesChanged()
+{
+  QHash<QString, ctkCmdLineModuleReference> map = this->m_DirectoryWatcher->filenameToReferenceMap();
+  QMenu *menu = m_MenuFactory->create(map);
+  this->m_Controls->m_ComboBox->setMenu(menu);
 }
 
 void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& moduleRef)
@@ -223,7 +207,9 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QStri
 {
   ctkCmdLineModuleReference result;
 
-  QList<ctkCmdLineModuleReference> references = m_MapFilenameToReference.values();
+  QHash<QString, ctkCmdLineModuleReference> map = this->m_DirectoryWatcher->filenameToReferenceMap();
+  QList<ctkCmdLineModuleReference> references = map.values();
+
   ctkCmdLineModuleReference ref;
   foreach(ref, references)
   {
@@ -232,6 +218,7 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QStri
       result = ref;
     }
   }
+
   return result;
 }
 

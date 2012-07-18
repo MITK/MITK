@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
 #include <mitkImageWriter.h>
+#include <mitkPlaneOperation.h>
 
 // itk includes
 #include <itkImage.h>
@@ -78,6 +79,13 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   mitk::RotationOperation op(mitk::OpROTATE, p, v, 35);
   mitkImage2D->GetGeometry()->ExecuteOperation(&op);
 
+  
+
+
+  //mitk::PlaneOperation op( mitk::OpORIENT, p, v );
+  //mitkImage2D->GetGeometry()->ExecuteOperation( &op );
+
+
   ///////////////////////////////////////
   // mitkImage2D is now a 2D image with 3D Geometry information.
   // Convert it with filter to a 3D image and check if everything went well
@@ -104,6 +112,9 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   Original_col0.Set_vnl_vector(mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
   Original_col1.Set_vnl_vector(mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
   Original_col2.Set_vnl_vector(mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+  MITK_INFO << "Rotated Matrix: " << Original_col0 << " " << Original_col1 << " " << Original_col2;
+
+
   mitk::Vector3D Converted_col0, Converted_col1, Converted_col2;
   Converted_col0.Set_vnl_vector(mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
   Converted_col1.Set_vnl_vector(mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));

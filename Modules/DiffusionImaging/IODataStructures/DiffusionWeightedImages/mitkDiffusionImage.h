@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -52,8 +52,8 @@ public:
   typedef std::vector< unsigned int > IndicesVector;
   typedef std::map< double , IndicesVector >  BValueMap;
 
-  mitkClassMacro( DiffusionImage, Image );
-  itkNewMacro(Self);
+  mitkClassMacro( DiffusionImage, Image )
+  itkNewMacro(Self)
 
 
   void AverageRedundantGradients(double precision);
@@ -68,13 +68,13 @@ public:
   void InitializeFromVectorImage();
   void SetDisplayIndexForRendering(int displayIndex);
 
-  GradientDirectionContainerType::Pointer GetDirections() { return m_Directions; }
-  void SetDirections( GradientDirectionContainerType::Pointer directions ) { this->m_Directions = directions; }
+  GradientDirectionContainerType::Pointer GetDirections() { return m_OriginalDirections; }
+  void SetDirections( GradientDirectionContainerType::Pointer directions )
+  {
+      this->m_OriginalDirections = directions;
+      ApplyMeasurementFrame();
+  }
   void SetDirections(const std::vector<itk::Vector<double,3> > directions);
-
-  GradientDirectionContainerType::Pointer GetOriginalDirections()  { return m_OriginalDirections; }
-  void SetOriginalDirections( GradientDirectionContainerType::Pointer directions )   { this->m_OriginalDirections = directions; this->ApplyMeasurementFrame(); }
-  void SetOriginalDirections(const std::vector<itk::Vector<double,3> > directions);
 
   MeasurementFrameType GetMeasurementFrame()  { return m_MeasurementFrame; }
   void SetMeasurementFrame( MeasurementFrameType mFrame )  { this->m_MeasurementFrame = mFrame; this->ApplyMeasurementFrame(); }
@@ -89,8 +89,8 @@ public:
 
   IndicesVector GetB0Indices();
 
-  itkGetMacro(B_Value, float);
-  itkSetMacro(B_Value, float);
+  itkGetMacro(B_Value, float)
+  itkSetMacro(B_Value, float)
 
   BValueMap GetB_ValueMap(){ return m_B_ValueMap; }
 

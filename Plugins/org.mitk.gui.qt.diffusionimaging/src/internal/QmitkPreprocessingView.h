@@ -99,7 +99,8 @@ protected:
   mitk::DiffusionImage<DiffusionPixelType>::Pointer m_DiffusionImage;
   std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
 
-  QList<QCheckBox *> m_ReduceGradientCheckboxes;
+  QList<QCheckBox*> m_ReduceGradientCheckboxes;
+  QList<QSpinBox*> m_ReduceGradientSpinboxes;
 };
 
 

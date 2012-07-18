@@ -15,12 +15,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNavigationDataSource.h"
+#include "mitkUIDGenerator.h"
 
+//Microservices
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usServiceProperties.h>
+#include "mitkModuleContext.h"
 
 
 mitk::NavigationDataSource::NavigationDataSource() 
 : itk::ProcessObject()
 {
+  US_INTERFACE_NAME = "org.mitk.services.NavigationDataSource";
+  US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
+  US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 }
 
 
@@ -62,6 +71,27 @@ itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataSource::G
     if (navDataName == (static_cast<NavigationData*>(outputs.at(i).GetPointer()))->GetName())
       return i;
   throw std::invalid_argument("output name does not exist");
+}
+
+void mitk::NavigationDataSource::RegisterAsMicroservice(){
+  // Get Context
+  mitk::ModuleContext* context = GetModuleContext();
+
+  // Define ServiceProps
+  ServiceProperties props;
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator ("org.mitk.services.NavigationDataSource.id_", 16);
+  props[ US_PROPKEY_ID ] = uidGen.GetUID();
+  m_ServiceRegistration = context->RegisterService<mitk::NavigationDataSource>(this, props);
+}
+
+
+void mitk::NavigationDataSource::UnRegisterMicroservice(){
+  m_ServiceRegistration.Unregister();
+  m_ServiceRegistration = 0;
+}
+
+std::string mitk::NavigationDataSource::GetMicroserviceID(){
+  return this->m_ServiceRegistration.GetReference().GetProperty(US_PROPKEY_ID).ToString();
 }
 
 void mitk::NavigationDataSource::GraftOutput(itk::DataObject *graft)

@@ -91,19 +91,6 @@ bool mitk::USDevice::Disconnect()
   return true;
 }
 
-//bool mitk::USDevice::OnConnection()
-//{
-//  return true;
-//  // TODO: Make Abstract
-//}
-//
-//bool mitk::USDevice::OnDisconnection()
-//{
-//  return true;
-//  // TODO Make Abstract
-//}
-
-
 bool mitk::USDevice::Activate()
 {
   if (! this->GetIsConnected()) return false;
@@ -130,27 +117,6 @@ void mitk::USDevice::Deactivate()
   this->m_ServiceRegistration.SetProperties(props);
   OnDeactivation();
 }
-
-//
-//bool mitk::USDevice::OnActivation()
-//{
-//  return true;
-//  // TODO Make Abstract
-//}
-//
-//
-//void mitk::USDevice::OnDeactivation()
-//{
-//  // TODO Make Abstract
-//}
-//
-//
-//std::string mitk::USDevice::GetDeviceClass()
-//{
-//  return "org.mitk.Ultrasound.GenericDevice";
-//}
-
-
 
 void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
 {

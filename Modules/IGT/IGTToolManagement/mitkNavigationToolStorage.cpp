@@ -16,8 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationToolStorage.h"
 
+//Microservices
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usServiceProperties.h>
+#include "mitkModuleContext.h"
+
 mitk::NavigationToolStorage::NavigationToolStorage()
   {
+
+  US_INTERFACE_NAME = "org.mitk.services.NavigationToolStorage"; // Name of the interface
+  US_PROPKEY_SOURCE_ID = US_INTERFACE_NAME + ".sourceID";
   m_ToolCollection = std::vector<mitk::NavigationTool::Pointer>();
   this->m_DataStorage = NULL;
   }
@@ -38,6 +47,27 @@ mitk::NavigationToolStorage::~NavigationToolStorage()
         m_DataStorage->Remove((*it)->GetDataNode());
     }
   }
+
+
+void mitk::NavigationToolStorage::RegisterAsMicroservice(std::string sourceID){
+
+  if ( sourceID.empty() ) mitkThrow() << "Empty or null string passed to NavigationToolStorage::registerAsMicroservice().";
+
+  // Get Context
+  mitk::ModuleContext* context = GetModuleContext();
+
+  // Define ServiceProps
+  ServiceProperties props;
+  props[ US_PROPKEY_SOURCE_ID ] = sourceID;
+  m_ServiceRegistration = context->RegisterService<mitk::NavigationToolStorage>(this, props);
+}
+
+
+void mitk::NavigationToolStorage::UnRegisterMicroservice(){
+  m_ServiceRegistration.Unregister();
+  m_ServiceRegistration = 0;
+}
+
 
 bool mitk::NavigationToolStorage::DeleteTool(int number)
   {

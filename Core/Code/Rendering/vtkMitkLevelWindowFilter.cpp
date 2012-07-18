@@ -142,13 +142,12 @@ template <class T>
   vtkImageIterator<T> outputIt(outData, outExt);
   vtkLookupTable* lookupTable;
   const int maxC = inData->GetNumberOfScalarComponents();
-  double imgRange[2];
+
   double tableRange[2];
 
   lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
 
   lookupTable->GetTableRange(tableRange);
-  inData->GetScalarRange(imgRange);
 
   //parameters for RGB level window
   double scale = (tableRange[1] -tableRange[0] > 0 ? 255.0 / (tableRange[1] - tableRange[0]) : 0.0);

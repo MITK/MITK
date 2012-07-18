@@ -94,7 +94,9 @@ float mitk::PlanarFigureInteractor
   if ( planarFigure != NULL )
   {
     // Give higher priority if this figure is currently selected
-    if ( planarFigure->GetSelectedControlPoint() >= 0 )
+    bool selected = false;
+    m_DataNode->GetBoolProperty("selected", selected);
+    if ( selected )
     {
       return 1.0;
     }

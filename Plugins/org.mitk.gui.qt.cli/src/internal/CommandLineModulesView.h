@@ -75,8 +75,8 @@ protected slots:
   void OnFutureFinished();
 
   /**
-   * \brief We register with the ctkCmdLineModuleDirectoryWatcher so that if the ModulesChanged signal
-   * is received we can update the GUI.
+   * \brief We register with the ctkCmdLineModuleManager so that if the modulesAdded or modulesREmoved signals
+   * are emmitted we rebuild the whole menu. In future this could be made more efficient, and only add/remove single items.
    */
   void OnModulesChanged();
 

@@ -97,7 +97,8 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     m_Controls = new CommandLineModulesViewControls(parent);
 
     // This connect must come before we update the preferences for the first time.
-    connect(this->m_DirectoryWatcher, SIGNAL(modulesChanged()), this, SLOT(OnModulesChanged()));
+    connect(this->m_ModuleManager, SIGNAL(moduleAdded(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
+    connect(this->m_ModuleManager, SIGNAL(moduleRemoved(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
 
     // Loads the preferences like directory settings into member variables.
     this->RetrievePreferenceValues();
@@ -166,8 +167,8 @@ void CommandLineModulesView::OnPreferencesChanged(const berry::IBerryPreferences
 
 void CommandLineModulesView::OnModulesChanged()
 {
-  QHash<QString, ctkCmdLineModuleReference> map = this->m_DirectoryWatcher->filenameToReferenceMap();
-  QMenu *menu = m_MenuFactory->create(map);
+  QList<ctkCmdLineModuleReference> refs = this->m_ModuleManager->moduleReferences();
+  QMenu *menu = m_MenuFactory->create(refs);
   this->m_Controls->m_ComboBox->setMenu(menu);
 }
 
@@ -207,8 +208,7 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QStri
 {
   ctkCmdLineModuleReference result;
 
-  QHash<QString, ctkCmdLineModuleReference> map = this->m_DirectoryWatcher->filenameToReferenceMap();
-  QList<ctkCmdLineModuleReference> references = map.values();
+  QList<ctkCmdLineModuleReference> references = this->m_ModuleManager->moduleReferences();
 
   ctkCmdLineModuleReference ref;
   foreach(ref, references)

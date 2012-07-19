@@ -72,6 +72,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     //create connections
     connect( m_Controls->m_LoadTools, SIGNAL(clicked()), this, SLOT(OnLoadTools()) );
+    connect( m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnConnect()) );
+    connect( m_Controls->m_Disconnect, SIGNAL(clicked()), this, SLOT(OnDisconnect()) );
     connect( m_Controls->m_StartTracking, SIGNAL(clicked()), this, SLOT(OnStartTracking()) );
     connect( m_Controls->m_StopTracking, SIGNAL(clicked()), this, SLOT(OnStopTracking()) );
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(UpdateTrackingTimer()));
@@ -79,7 +81,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
     connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
-  connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
+    connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
     connect( m_Controls->m_ShowTrackingVolume, SIGNAL(clicked()), this, SLOT(OnShowTrackingVolumeChanged()));
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
     connect( m_Controls->m_ResetTools, SIGNAL(clicked()), this, SLOT(OnResetTools()));
@@ -104,8 +106,10 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     GetDataStorage()->Add(m_TrackingVolumeNode);
 
     //initialize buttons
+    m_Controls->m_Connect->setEnabled(true);
+    m_Controls->m_Disconnect->setEnabled(false);
+    m_Controls->m_StartTracking->setEnabled(false);
     m_Controls->m_StopTracking->setEnabled(false);
-    m_Controls->m_StopLogging->setEnabled(false);
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
 
     //Update List of available models for selected tool.
@@ -166,8 +170,8 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
   m_Controls->m_toolLabel->setText(toolLabel);
 }
 
-void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
-{
+void QmitkMITKIGTTrackingToolboxView::OnConnect()
+  {
   //check if everything is ready to start tracking
   if (this->m_toolStorage.IsNull())
   {
@@ -194,38 +198,71 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
 
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
+
   if (m_TrackingDeviceSource.IsNull())
   {
     MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
     return;
   }
 
-  //disable Buttons
-  m_Controls->m_StopTracking->setEnabled(true);
-  m_Controls->m_StartTracking->setEnabled(false);
+  //connect to device
+  try
+    {
+    m_TrackingDeviceSource->Connect();
+    //Microservice registration:
+    m_TrackingDeviceSource->RegisterAsMicroservice();
+    m_toolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID());
+    }
+  catch (...) //todo: change to mitk::IGTException
+    {
+    MessageBox("Error while starting the tracking device!");
+    return;
+    }
+
+  //enable/disable Buttons
+  m_Controls->m_Disconnect->setEnabled(true);
+  m_Controls->m_StartTracking->setEnabled(true);
+  m_Controls->m_StopTracking->setEnabled(false);
+  m_Controls->m_Connect->setEnabled(false);
   DisableOptionsButtons();
   DisableTrackingConfigurationButtons();
+  m_Controls->m_configurationWidget->ConfigurationFinished();
 
-  //initialize tracking
+  m_Controls->m_TrackingControlLabel->setText("Status: connected");
+  }
+
+void QmitkMITKIGTTrackingToolboxView::OnDisconnect()
+  {
+  if (m_tracking) this->OnStopTracking();
+  
+  m_TrackingDeviceSource->Disconnect();
+  m_TrackingDeviceSource->UnRegisterMicroservice();
+  //ToolStorages unregisters automatically
+
+  //enable/disable Buttons
+  m_Controls->m_Disconnect->setEnabled(false);
+  m_Controls->m_StartTracking->setEnabled(false);
+  m_Controls->m_StopTracking->setEnabled(false);
+  m_Controls->m_Connect->setEnabled(true);
+  EnableOptionsButtons();
+  EnableTrackingConfigurationButtons();
+  m_Controls->m_configurationWidget->Reset();
+  m_Controls->m_TrackingControlLabel->setText("Status: disconnected");
+
+  }
+
+void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
+{
   try
-  {
-    m_TrackingDeviceSource->Connect();
-    m_TrackingDeviceSource->RegisterAsMicroservice();
-    //TODO Toolbox Service Integration
-    m_toolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID());
-    //ab hier: StartTracking, davor: Connect
+    {
     m_TrackingDeviceSource->StartTracking();
-  }
-  catch (...)
-  {
+    }
+  catch (...) //todo: change to mitk::IGTException
+    {
     MessageBox("Error while starting the tracking device!");
-    //enable Buttons
-    m_Controls->m_StopTracking->setEnabled(false);
-    m_Controls->m_StartTracking->setEnabled(true);
-    EnableOptionsButtons();
-    EnableTrackingConfigurationButtons();
     return;
-  }
+    }
+
   m_TrackingTimer->start(1000/(m_Controls->m_UpdateRate->value()));
   m_Controls->m_TrackingControlLabel->setText("Status: tracking");
 
@@ -238,11 +275,14 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
   if (m_Controls->m_ShowToolQuaternions->isChecked()) {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(true);}
   else {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(false);}
 
-  //set configuration finished
-  this->m_Controls->m_configurationWidget->ConfigurationFinished();
-
   //show tracking volume
   this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
+
+  //enable/disable Buttons
+  m_Controls->m_Disconnect->setEnabled(true);
+  m_Controls->m_StartTracking->setEnabled(false);
+  m_Controls->m_StopTracking->setEnabled(true);
+  m_Controls->m_Connect->setEnabled(false);
 
   m_tracking = true;
 
@@ -254,27 +294,18 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
   if (!m_tracking) return;
   m_TrackingTimer->stop();
   m_TrackingDeviceSource->StopTracking();
-
-  //Disconnect
-  m_TrackingDeviceSource->Disconnect();
-  m_TrackingDeviceSource->UnRegisterMicroservice();
-  //ToolStorages unregisters automatically
-
-
-  //ab hier wieder StopTracking:
-  this->m_Controls->m_configurationWidget->Reset();
-  m_Controls->m_TrackingControlLabel->setText("Status: stopped");
+  m_Controls->m_TrackingControlLabel->setText("Status: connected");
   if (m_logging) StopLogging();
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
   m_tracking = false;
-
-  //enable Buttons
-  m_Controls->m_StopTracking->setEnabled(false);
+  
+  //enable/disable Buttons
+  m_Controls->m_Disconnect->setEnabled(true);
   m_Controls->m_StartTracking->setEnabled(true);
-  EnableOptionsButtons();
-  EnableTrackingConfigurationButtons();
-
+  m_Controls->m_StopTracking->setEnabled(false);
+  m_Controls->m_Connect->setEnabled(false);
+   
   this->GlobalReinit();
 }
 

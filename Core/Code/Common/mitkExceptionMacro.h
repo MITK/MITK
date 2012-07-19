@@ -31,6 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 #define mitkThrow() throw mitk::Exception(__FILE__,__LINE__,"",ITK_LOCATION)
 
+//TODO implement and document
+//#define mitkReThrow(mitkexception) \
+//    throw mitkexception
+    
+
 /** The specialized exception macro is used to print error information / throw exceptions 
   * in cases of specialized errors. This means the second parameter must be a class which 
   * inherits from mitk::Exception. An object of this exception is thrown when using the macro.

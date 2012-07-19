@@ -55,7 +55,16 @@ namespace mitk {
     virtual ~Exception() throw() {}
 
     itkTypeMacro(ClassName, SuperClassName);
-
+    
+    /** \brief Adds rethrow data to this exception. */
+    void AddRethrowData(const char *file, unsigned int lineNumber, const char *message);
+    
+    /** \return Returns how often the exception was rethrown. */
+    int GetNumberOfRethrows();
+    
+    /** \brief Returns the rethrow data of the specified rethrow number. */ 
+    void GetRethrowData(int rethrowNumber, std::string &file, int &line, std::string &message);
+    
     /** \brief Definition of the bit shift operator for this class.*/
     template <class T> inline Exception& operator<<(const T& data)
     {
@@ -82,6 +91,16 @@ namespace mitk {
       this->SetDescription(ss.str());
       return *this;
     }
+  protected:
+  
+  struct ReThrowData
+    {
+    std::string RethrowClassname,
+    int RethrowLine,
+    std::string RethrowMessage
+    }
+   
+   std::vector<ReThrowData> m_RethrowData;
    
   };
 } // namespace mitk

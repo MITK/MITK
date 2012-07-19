@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationToolStorage.h"
 
+//POCO
+#include <Poco/Exception.h>
+
 class NavigationToolStorageSerializerAndDeserializerTestClass
   {
   public:
@@ -207,14 +210,39 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     MITK_TEST_CONDITION_REQUIRED(readStorage->GetToolCount()==2," ..Testing number of tools in storage");
     }
 
-    static void TestReadInvalidStorage()
+    static void TestReadNotExistingStorage()
     {
     mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
     mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize("noStorage.tfl");
-    MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(),"Testing deserialization of invalid data storage.");
+    MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(),"Testing deserialization of not existing data storage.");
     MITK_TEST_CONDITION_REQUIRED(myDeserializer->GetErrorMessage() == "Cannot open 'noStorage.tfl' for reading", "Checking Error Message");
     }
+
+    static void TestReadStorageWithUnknownFiletype()
+    {
+    mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
+
+    std::string toolFileName = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronTool.stl", "Modules/IGT/Testing/Data");
+    MITK_TEST_CONDITION(toolFileName.empty() == false, "Check if tool calibration of claron tool file exists");
+    mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
+
+    mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(toolFileName);
+    MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(), "Testing deserialization of existing file with unknown filetype.");
+    }
+
+    static void TestReadZipFileWithNoToolstorage()
+    {
+    mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
+
+    std::string toolFileName = mitk::StandardFileLocations::GetInstance()->FindFile("Empty.zip", "Modules/IGT/Testing/Data");
+    MITK_TEST_CONDITION(toolFileName.empty() == false, "Check if tool calibration of claron tool file exists");
+    mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
+
+    mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(toolFileName);
+    MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(), "Testing deserialization of empty zip file with no toolstorage in it");
+    }
+
 
     static void TestWriteStorageToInvalidFile()
     {
@@ -237,20 +265,36 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
 
     //create filename
-	#ifdef WIN32
-		std::string filename = "C:\342INVALIDFILE<>.storage"; //invalid filename for windows
-	#else
-		std::string filename = "/dsfdsf:$§$342INVALIDFILE.storage"; //invalid filename for linux
-	#endif
-   
-	
+    #ifdef WIN32
+      std::string filename = "C:\342INVALIDFILE<>.storage"; //invalid filename for windows
+    #else
+      std::string filename = "/dsfdsf:$§$342INVALIDFILE.storage"; //invalid filename for linux
+    #endif
+
+
     //test serialization
     bool success = true;
     success = mySerializer->Serialize(filename,myStorage);
-	
+
     MITK_TEST_CONDITION_REQUIRED(!success,"Testing serialization into invalid file.");
     }
 
+
+    static void TestWriteEmptyToolStorage()
+    {
+    //create Tool Storage
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
+
+    //create Serializer
+    mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
+
+    //create filename
+    std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage";
+
+    //test serialization
+    bool success = mySerializer->Serialize(filename,myStorage);
+    MITK_TEST_CONDITION_REQUIRED(success,"Testing serialization of simple tool storage");
+    }
   };
 
 /** This function is testing the TrackingVolume class. */
@@ -265,8 +309,11 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
   NavigationToolStorageSerializerAndDeserializerTestClass::TestReadSimpleToolStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteComplexToolStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestReadComplexToolStorage();
-  NavigationToolStorageSerializerAndDeserializerTestClass::TestReadInvalidStorage();
+  NavigationToolStorageSerializerAndDeserializerTestClass::TestReadNotExistingStorage();
+  NavigationToolStorageSerializerAndDeserializerTestClass::TestReadStorageWithUnknownFiletype();
+  NavigationToolStorageSerializerAndDeserializerTestClass::TestReadZipFileWithNoToolstorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteStorageToInvalidFile();
+  NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteEmptyToolStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::CleanUp();
 
   MITK_TEST_END();

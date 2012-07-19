@@ -107,7 +107,6 @@ void QmitkPreprocessingView::CreateConnections()
 {
     if ( m_Controls )
     {
-        m_Controls->m_ReductionFrame->setLayout(new QGridLayout);
         connect( (QObject*)(m_Controls->m_ButtonAverageGradients), SIGNAL(clicked()), this, SLOT(AverageGradients()) );
         connect( (QObject*)(m_Controls->m_ButtonExtractB0), SIGNAL(clicked()), this, SLOT(ExtractB0()) );
         connect( (QObject*)(m_Controls->m_ButtonBrainMask), SIGNAL(clicked()), this, SLOT(BrainMask()) );
@@ -278,30 +277,86 @@ void QmitkPreprocessingView::DoShowGradientDirections()
     if (m_DiffusionImage.IsNull())
         return;
 
-    GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
-
-    mitk::PointSet::Pointer pointset = mitk::PointSet::New();
-    for (int j=0; j<gradientContainer->Size(); j++)
+    int maxIndex = 0;
+    int maxSize = m_DiffusionImage->GetDimension(0);
+    if (maxSize<m_DiffusionImage->GetDimension(1))
     {
-        mitk::Point3D p;
-        vnl_vector_fixed< double, 3 > v = gradientContainer->at(j);
-        if (v.magnitude()>mitk::eps)
-        {
-            p[0] = v[0]*100;
-            p[1] = v[1]*100;
-            p[2] = v[2]*100;
-            pointset->InsertPoint(j, p);
-        }
+        maxSize = m_DiffusionImage->GetDimension(1);
+        maxIndex = 1;
     }
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(pointset);
-    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
-    name += "_GradientDirections";
-    node->SetName(name.toStdString().c_str());
-    node->SetProperty("pointsize", mitk::FloatProperty::New(2.5));
-    node->SetProperty("color", mitk::ColorProperty::New(1,0,0));
+    if (maxSize<m_DiffusionImage->GetDimension(2))
+    {
+        maxSize = m_DiffusionImage->GetDimension(2);
+        maxIndex = 2;
+    }
 
-    GetDefaultDataStorage()->Add(node);
+    mitk::Point3D origin = m_DiffusionImage->GetGeometry()->GetOrigin();
+    mitk::PointSet::Pointer originSet = mitk::PointSet::New();
+
+    typedef mitk::DiffusionImage<short*>::BValueMap BValueMap;
+    typedef mitk::DiffusionImage<short*>::BValueMap::iterator BValueMapIterator;
+    BValueMap bValMap =  m_DiffusionImage->GetB_ValueMap();
+
+    GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirectionsWithMeasurementFrame();
+    mitk::Geometry3D::Pointer geometry = m_DiffusionImage->GetGeometry();
+    int shellCount = 1;
+    for(BValueMapIterator it = bValMap.begin(); it!=bValMap.end(); ++it)
+    {
+        mitk::PointSet::Pointer pointset = mitk::PointSet::New();
+        for (int j=0; j<it->second.size(); j++)
+        {
+            mitk::Point3D ip;
+            vnl_vector_fixed< double, 3 > v = gradientContainer->at(it->second[j]);
+            if (v.magnitude()>mitk::eps)
+            {
+                ip[0] = v[0]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[0]-0.5*geometry->GetSpacing()[0] + geometry->GetSpacing()[0]*m_DiffusionImage->GetDimension(0)/2;
+                ip[1] = v[1]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[1]-0.5*geometry->GetSpacing()[1] + geometry->GetSpacing()[1]*m_DiffusionImage->GetDimension(1)/2;
+                ip[2] = v[2]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[2]-0.5*geometry->GetSpacing()[2] + geometry->GetSpacing()[2]*m_DiffusionImage->GetDimension(2)/2;
+
+                pointset->InsertPoint(j, ip);
+            }
+            else if (originSet->IsEmpty())
+            {
+                ip[0] = v[0]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[0]-0.5*geometry->GetSpacing()[0] + geometry->GetSpacing()[0]*m_DiffusionImage->GetDimension(0)/2;
+                ip[1] = v[1]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[1]-0.5*geometry->GetSpacing()[1] + geometry->GetSpacing()[1]*m_DiffusionImage->GetDimension(1)/2;
+                ip[2] = v[2]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[2]-0.5*geometry->GetSpacing()[2] + geometry->GetSpacing()[2]*m_DiffusionImage->GetDimension(2)/2;
+
+                originSet->InsertPoint(j, ip);
+            }
+        }
+        if (it->first<mitk::eps)
+            continue;
+
+        // add shell to datastorage
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(pointset);
+        QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+        name += "_Shell_";
+        name += QString::number(it->first);
+        node->SetName(name.toStdString().c_str());
+        node->SetProperty("pointsize", mitk::FloatProperty::New((float)maxSize/50));
+        int b0 = shellCount%2;
+        int b1 = 0;
+        int b2 = 0;
+        if (shellCount>4)
+            b2 = 1;
+        if (shellCount%4 >= 2)
+            b1 = 1;
+
+        node->SetProperty("color", mitk::ColorProperty::New(b2, b1, b0));
+        GetDefaultDataStorage()->Add(node, m_SelectedDiffusionNodes.front());
+        shellCount++;
+    }
+
+    // add origin to datastorage
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(originSet);
+    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+    name += "_Origin";
+    node->SetName(name.toStdString().c_str());
+    node->SetProperty("pointsize", mitk::FloatProperty::New((float)maxSize/50));
+    node->SetProperty("color", mitk::ColorProperty::New(1,1,1));
+    GetDefaultDataStorage()->Add(node, m_SelectedDiffusionNodes.front());
 }
 
 void QmitkPreprocessingView::DoReduceGradientDirections()
@@ -318,6 +373,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
     BValueMap originalShellMap = m_DiffusionImage->GetB_ValueMap();
     std::vector<int> newNumGradientDirections;
     int shellCounter = 0;
+
     foreach(QCheckBox * box , m_ReduceGradientCheckboxes)
     {
         if(box->isChecked())
@@ -328,6 +384,9 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
         }
         shellCounter++;
     }
+
+    if (newNumGradientDirections.empty())
+        return;
 
     GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
     FilterType::Pointer filter = FilterType::New();

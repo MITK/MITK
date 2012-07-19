@@ -99,11 +99,8 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
 {
     unsigned int randSeed = time(NULL);
 
-    if(m_InputBValueMap.empty())
-    {
-        // if no InputMap is set, do the same for each shell
-        m_InputBValueMap = m_OriginalBValueMap;
-    }
+    if(m_InputBValueMap.empty() || m_NumGradientDirections.size()!=m_InputBValueMap.size())
+        return;
 
     if(m_InputBValueMap.find(0) != m_InputBValueMap.end())
     {
@@ -148,7 +145,9 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
         MITK_INFO << "minimum angle: " << 180*minAngle/M_PI;
         int stagnationCount = 0;
         int rejectionCount = 0;
-        int maxRejections = 10000;// m_NumGradientDirections[shellCounter] * 1000;
+        int maxRejections = m_NumGradientDirections[shellCounter] * 1000;
+        if (maxRejections<10000)
+            maxRejections = 10000;
         int iUsed = 0;
         if (m_UsedGradientIndices.size()>0)
             while ( stagnationCount<1000 && rejectionCount<maxRejections )

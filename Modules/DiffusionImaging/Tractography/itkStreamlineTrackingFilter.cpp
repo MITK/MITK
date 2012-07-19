@@ -43,7 +43,8 @@ TPDPixelType>
     m_SeedsPerVoxel(1),
     m_AngularThreshold(0.7),
     m_F(1.0),
-    m_G(0.0)
+    m_G(0.0),
+    m_Interpolate(true)
 {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
@@ -73,21 +74,26 @@ TPDPixelType>
     m_ImageSize[0] = m_InputImage->GetLargestPossibleRegion().GetSize()[0];
     m_ImageSize[1] = m_InputImage->GetLargestPossibleRegion().GetSize()[1];
     m_ImageSize[2] = m_InputImage->GetLargestPossibleRegion().GetSize()[2];
+
+    if (m_ImageSize[0]<3 || m_ImageSize[1]<3 || m_ImageSize[2]<3)
+        m_Interpolate = false;
+
     m_ImageSpacing.resize(3);
     m_ImageSpacing[0] = m_InputImage->GetSpacing()[0];
     m_ImageSpacing[1] = m_InputImage->GetSpacing()[1];
     m_ImageSpacing[2] = m_InputImage->GetSpacing()[2];
 
-    if (m_StepSize<0.005)
+    float minSpacing;
+    if(m_ImageSpacing[0]<m_ImageSpacing[1] && m_ImageSpacing[0]<m_ImageSpacing[2])
+        minSpacing = m_ImageSpacing[0];
+    else if (m_ImageSpacing[1] < m_ImageSpacing[2])
+        minSpacing = m_ImageSpacing[1];
+    else
+        minSpacing = m_ImageSpacing[2];
+    if (m_StepSize<0.1*minSpacing)
     {
-        float minSpacing;
-        if(m_ImageSpacing[0]<m_ImageSpacing[1] && m_ImageSpacing[0]<m_ImageSpacing[2])
-            minSpacing = m_ImageSpacing[0];
-        else if (m_ImageSpacing[1] < m_ImageSpacing[2])
-            minSpacing = m_ImageSpacing[1];
-        else
-            minSpacing = m_ImageSpacing[2];
         m_StepSize = 0.1*minSpacing;
+        m_PointPistance = 0.5*minSpacing;
     }
 
     m_PolyDataContainer = itk::VectorContainer< int, FiberPolyDataType >::New();
@@ -333,9 +339,14 @@ template< class TTensorPixelType, class TPDPixelType>
 void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 ::FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids)
 {
+    typedef itk::DiffusionTensor3D<TTensorPixelType>    TensorType;
+    typename TensorType::EigenValuesArrayType eigenvalues;
+    typename TensorType::EigenVectorsMatrixType eigenvectors;
+
     typename InputImageType::IndexType index, indexOld;
     indexOld[0] = -1; indexOld[1] = -1; indexOld[2] = -1;
     itk::Point<double> worldPos;
+    float distance = 0;
 
     // starting index and direction
     index[0] = RoundToNearest(pos[0]);
@@ -344,11 +355,14 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
     vnl_vector_fixed<double,3> dir = m_PdImage->GetPixel(index);
     dir *= dirSign;                     // reverse direction
     vnl_vector_fixed<double,3> dirOld = dir;
+    if (dir.magnitude()<mitk::eps)
+        return;
 
     for (int step=0; step< m_MaxLength/2; step++)
     {
         // get new position
         CalculateNewPosition(pos, dir, index);
+        distance += m_StepSize;
 
         // are we still inside the image and is the fa value high enough?
         if (!m_InputImage->GetLargestPossibleRegion().IsInside(index) || m_FaImage->GetPixel(index)<m_FaThreshold || m_MaskImage->GetPixel(index)==0)
@@ -358,13 +372,12 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
             break;
         }
 
-        if (indexOld!=index)                    // did we enter a new voxel? if yes, calculate new direction
+        if (!m_Interpolate)
         {
-            dir = m_PdImage->GetPixel(index);   // get principal direction
-            dir *= dirSign;                     // reverse direction
-
-            if (!dirOld.is_zero())
+            if (indexOld!=index)                    // did we enter a new voxel? if yes, calculate new direction
             {
+                dir = m_PdImage->GetPixel(index);   // get principal direction
+
                 typename InputImageType::PixelType tensor = m_InputImage->GetPixel(index);
                 float scale = m_EmaxImage->GetPixel(index);
                 dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
@@ -378,16 +391,107 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 angle = dot_product(dirOld, dir);
                 if (angle<m_AngularThreshold)
                     break;
+
+                if (dir.magnitude()<mitk::eps)
+                    dir = dirOld;
+                else
+                    dirOld = dir;
+                indexOld = index;
+
+                // add position to streamline
+                m_InputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
+                ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
             }
-            dirOld = dir;
+            else
+                dir = dirOld;
+        }
+        else
+        {
+            float frac_x = pos[0] - index[0];
+            float frac_y = pos[1] - index[1];
+            float frac_z = pos[2] - index[2];
+
+            if (frac_x<0)
+            {
+                index[0] -= 1;
+                frac_x += 1;
+            }
+            if (frac_y<0)
+            {
+                index[1] -= 1;
+                frac_y += 1;
+            }
+            if (frac_z<0)
+            {
+                index[2] -= 1;
+                frac_z += 1;
+            }
+
+            frac_x = 1-frac_x;
+            frac_y = 1-frac_y;
+            frac_z = 1-frac_z;
+
+            // int coordinates inside image?
+            if (index[0] < 0 || index[0] >= m_ImageSize[0]-1)
+                continue;
+            if (index[1] < 0 || index[1] >= m_ImageSize[1]-1)
+                continue;
+            if (index[2] < 0 || index[2] >= m_ImageSize[2]-1)
+                continue;
+
+            typename InputImageType::IndexType tmpIdx;
+            typename InputImageType::PixelType tensor = m_InputImage->GetPixel(index);
+            tensor *=  (  frac_x)*(  frac_y)*(  frac_z);
+
+            tmpIdx = index; tmpIdx[0]++;
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * (1-frac_x)*(  frac_y)*(  frac_z);
+            tmpIdx = index; tmpIdx[1]++;
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * (  frac_x)*(1-frac_y)*(  frac_z);
+            tmpIdx = index; tmpIdx[2]++;
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * (  frac_x)*(  frac_y)*(1-frac_z);
+            tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++;
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * (1-frac_x)*(1-frac_y)*(  frac_z);
+            tmpIdx = index; tmpIdx[1]++; tmpIdx[2]++;
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * (  frac_x)*(1-frac_y)*(1-frac_z);
+            tmpIdx = index; tmpIdx[2]++; tmpIdx[0]++;
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * (1-frac_x)*(  frac_y)*(1-frac_z);
+            tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * (1-frac_x)*(1-frac_y)*(1-frac_z);
+
+            tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
+            dir[0] = eigenvectors(2, 0);
+            dir[1] = eigenvectors(2, 1);
+            dir[2] = eigenvectors(2, 2);
+            dir.normalize();
+
+            float scale = 2/eigenvalues[2];
+            dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
+            dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
+            dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
+            dir.normalize();
+
+            float angle = dot_product(dirOld, dir);
+            if (angle<0)
+                dir *= -1;
+            angle = dot_product(dirOld, dir);
+            if (angle<m_AngularThreshold)
+                break;
+
+            if (dir.magnitude()<mitk::eps)
+                dir = dirOld;
+            else
+                dirOld = dir;
+
             indexOld = index;
 
             // add position to streamline
-            m_InputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
-            ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
+            if (distance>=m_PointPistance)
+            {
+                m_InputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
+                ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
+                distance = 0;
+            }
         }
-        else    // keep old direction
-            dir = dirOld;
     }
 }
 

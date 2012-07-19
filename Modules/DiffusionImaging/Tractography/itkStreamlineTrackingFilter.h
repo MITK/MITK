@@ -76,6 +76,7 @@ namespace itk{
     itkSetMacro( StepSize, float)
     itkSetMacro( F, float )
     itkSetMacro( G, float )
+    itkSetMacro( Interpolate, bool )
 
   protected:
     StreamlineTrackingFilter();
@@ -113,6 +114,8 @@ namespace itk{
     std::vector< float > m_ImageSpacing;
     ItkUcharImgType::Pointer m_SeedImage;
     ItkUcharImgType::Pointer m_MaskImage;
+    bool m_Interpolate;
+    float m_PointPistance;
 
     itk::VectorContainer< int, FiberPolyDataType >::Pointer m_PolyDataContainer;
 

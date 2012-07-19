@@ -201,6 +201,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     filter->SetStepSize((float)m_Controls->m_StepsizeSlider->value()/10);
     filter->SetF((float)m_Controls->m_fSlider->value()/100);
     filter->SetG((float)m_Controls->m_gSlider->value()/100);
+    filter->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
+    //filter->SetNumberOfThreads(1);
 
     if (m_SeedRoi.IsNotNull())
     {

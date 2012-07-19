@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$ 
- 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+The Medical Imaging Interaction Toolkit (MITK)
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-=========================================================================*/
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 
 // Blueberry
@@ -66,7 +65,6 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 
 void UltrasoundSupport::OnClickedAddNewDevice()
 {
-  MITK_INFO << "USSUPPORT: OnClickedAddNewDevice()"; 
   m_Controls.m_NewVideoDeviceWidget->setVisible(true);
   m_Controls.m_DeviceManagerWidget->setVisible(false);
   m_Controls.m_AddDevice->setVisible(false);
@@ -75,32 +73,46 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 
 void UltrasoundSupport::DisplayImage()
 {
-   MITK_INFO << "USSUPPORT: DisplayImage()"; 
   //QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   // if (nodes.empty()) return;
 
   m_Device->UpdateOutputData(0);
   mitk::USImage::Pointer image = m_Device->GetOutput();
   m_Node->SetData(image);
+ // m_Image->Update();
   this->RequestRenderWindowUpdate();
 }
 
 void UltrasoundSupport::OnClickedViewDevice()
 {
-  
-  MITK_INFO << "USSUPPORT: OnClickedViewDevice()"; 
-  m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedDevice();
-  if (m_Device.IsNull()){
-    m_Timer->stop();
-    return;
+  // We use the activity state of the timer to determine whether we are currently viewing images
+  if ( ! m_Timer->isActive() ) // Activate Imaging
+  {
+    m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedDevice();
+    // if (m_Node) m_Node->ReleaseData();
+    if (m_Device.IsNull()){
+      m_Timer->stop();
+      return;
+    }
+    m_Device->UpdateOutputData(0);
+    m_Image = m_Device->GetOutput(0);
+    m_Node->SetData(m_Device->GetOutput(0));
+    int interval = (1000 / m_Controls.m_FrameRate->value());
+    m_Timer->setInterval(interval);
+    m_Timer->start();
+    m_Controls.m_BtnView->setText("Stop Viewing");
   }
-
-  m_Timer->start(50);
+  else
+  { //deactivate Imaging
+    m_Controls.m_BtnView->setText("Start Viewing");
+    m_Timer->stop();
+    m_Node->ReleaseData();
+    this->RequestRenderWindowUpdate();
+  }
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
 {
-  MITK_INFO << "USSUPPORT: OnNewDeviceWidgetDone()";
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
   m_Controls.m_DeviceManagerWidget->setVisible(true);
   m_Controls.m_AddDevice->setVisible(true);

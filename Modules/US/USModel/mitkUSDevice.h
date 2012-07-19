@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceInterface.h>
 #include <usServiceRegistration.h>
+#include <usServiceProperties.h>
 
 
 
@@ -41,6 +42,7 @@ namespace mitk {
     * for all US Devices, and every new device should extend it.
     * \ingroup US
     */
+
    class MitkUS_EXPORT USDevice : public mitk::ImageSource
     {
     public:
@@ -57,6 +59,8 @@ namespace mitk {
       *      
       */
      // mitkNewMacro2Param(Self, mitk::USImageMetadata::Pointer, bool);
+
+
 
       /**
       * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.
@@ -184,6 +188,15 @@ namespace mitk {
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes; 
       bool m_IsActive;
 
+
+      /*
+      * \brief This Method constructs the service properties which can later be used to
+      *  register the object with the Microservices
+      *  Return service properties
+      */
+      mitk::ServiceProperties ConstructServiceProperties();
+
+
       /**
       * \brief Is called during the connection process. Override this method in your subclass to handle the actual connection.
       *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
@@ -197,7 +210,7 @@ namespace mitk {
       virtual bool OnDisconnection() = 0;    
 
       /**
-      * \brief Is called during the activation process. After this method is finsihed, the device should be generating images
+      * \brief Is called during the activation process. After this method is finished, the device should be generating images
       */
       virtual bool OnActivation() = 0;    
 

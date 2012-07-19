@@ -249,6 +249,8 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void SetCurrentContourListID();
 
+    void Show3DInterpolationResult(bool);
+
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 

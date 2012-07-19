@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "CommandLineModulesViewControls.h"
 #include <ctkCmdLineModuleReference.h>
 
+class ctkCmdLineModule;
 class ctkCmdLineModuleManager;
-class ctkCmdLineModuleInstance;
 class ctkCmdLineModuleDirectoryWatcher;
 class ctkCmdLineModuleMenuFactoryQtGui;
 class QAction;
@@ -143,7 +143,7 @@ private:
   /**
    * \brief We use this map to decide if we want to create more tabs or not.
    */
-  QHash<int, ctkCmdLineModuleInstance*> m_MapTabToModuleInstance;
+  QHash<int, ctkCmdLineModule*> m_MapTabToModuleInstance;
 
   /**
    * \brief We store a temporary folder name, accessible via user preferences.

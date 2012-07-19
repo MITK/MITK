@@ -41,12 +41,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDebug>
 
 // CTK
+#include <ctkCmdLineModule.h>
 #include <ctkCmdLineModuleManager.h>
 #include <ctkCmdLineModuleDirectoryWatcher.h>
 #include <ctkCmdLineModuleMenuFactoryQtGui.h>
-#include <ctkCmdLineModuleInstance.h>
 #include <ctkCmdLineModuleDescription.h>
-#include <ctkCmdLineModuleInstanceFactoryQtGui.h>
+#include <ctkCmdLineModuleFactoryQtGui.h>
 #include <ctkCmdLineModuleXmlValidator.h>
 #include <ctkCmdLineModuleDefaultPathBuilder.h>
 
@@ -61,7 +61,7 @@ CommandLineModulesView::CommandLineModulesView()
 , m_TemporaryDirectoryName("")
 {
   m_MapTabToModuleInstance.clear();
-  m_ModuleManager = new ctkCmdLineModuleManager(new ctkCmdLineModuleInstanceFactoryQtGui());
+  m_ModuleManager = new ctkCmdLineModuleManager(new ctkCmdLineModuleFactoryQtGui());
   m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
   m_MenuFactory = new ctkCmdLineModuleMenuFactoryQtGui();
 }
@@ -174,7 +174,7 @@ void CommandLineModulesView::OnModulesChanged()
 
 void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& moduleRef)
 {
-  ctkCmdLineModuleInstance* moduleInstance = m_ModuleManager->createModuleInstance(moduleRef);
+  ctkCmdLineModule* moduleInstance = m_ModuleManager->createModule(moduleRef);
   if (!moduleInstance) return;
 
   QObject* guiHandle = moduleInstance->guiHandle();
@@ -226,7 +226,7 @@ void CommandLineModulesView::OnRunButtonPressed()
 {
   qDebug() << "Creating module command line...";
 
-  ctkCmdLineModuleInstance* moduleInstance = m_MapTabToModuleInstance[m_Controls->m_TabWidget->currentIndex()];
+  ctkCmdLineModule* moduleInstance = m_MapTabToModuleInstance[m_Controls->m_TabWidget->currentIndex()];
   if (!moduleInstance)
   {
     qWarning() << "Invalid module instance";

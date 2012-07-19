@@ -66,7 +66,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #endif
 
-#include "vtkMitkOpenGLGPUVolumeRayCastMapper.h"
+//#include "vtkMitkOpenGLGPUVolumeRayCastMapper.h"
+#include "vtkOpenGLGPUVolumeRayCastMapper.h"
 #include "vtkMitkOpenGLVolumeTextureMapper3D.h"
 
 
@@ -629,7 +630,7 @@ bool mitk::GPUVolumeMapper3D::InitRAY(mitk::BaseRenderer* renderer)
   
   GPU_INFO << "initializing gpu-raycast-vr (vtkMitkOpenGLGPUVolumeRayCastMapper)";
   
-  ls->m_MapperRAY = vtkMitkOpenGLGPUVolumeRayCastMapper::New();
+  ls->m_MapperRAY = vtkOpenGLGPUVolumeRayCastMapper::New();
   ls->m_MapperRAY->SetAutoAdjustSampleDistances(0);
   ls->m_MapperRAY->SetSampleDistance(1.0); 
    

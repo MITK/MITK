@@ -137,8 +137,8 @@ set(CPP_FILES
   Rendering/vtkMitkOpenGLVolumeTextureMapper3D.cpp
   Rendering/mitkGPUVolumeMapper3D.cpp
   Rendering/vtkMitkGPUVolumeRayCastMapper.cpp
-  Rendering/vtkMitkOpenGLGPUVolumeRayCastMapper.cpp
-  Rendering/vtkMitkOpenGLGPUVolumeRayCastMapperShaders.cpp
+  #Rendering/vtkMitkOpenGLGPUVolumeRayCastMapper.cpp
+  #Rendering/vtkMitkOpenGLGPUVolumeRayCastMapperShaders.cpp
 )
 
 if(WIN32 AND NOT MINGW)

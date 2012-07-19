@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkFixedPointVolumeRayCastMapper.h>
 #include "vtkMitkVolumeTextureMapper3D.h"
 
+#include "vtkGPUVolumeRayCastMapper.h"
+
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
 
@@ -142,7 +144,7 @@ protected:
     bool m_raySupported;
     bool m_rayInitialized;
     vtkVolume *m_VolumeRAY;
-    vtkMitkGPUVolumeRayCastMapper* m_MapperRAY;
+    vtkGPUVolumeRayCastMapper* m_MapperRAY;
     vtkVolumeProperty* m_VolumePropertyRAY;
 
 #endif

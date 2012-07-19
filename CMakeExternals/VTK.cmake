@@ -47,8 +47,8 @@ if(NOT DEFINED VTK_DIR)
   endif()
 
   #use only VTK 5.8 in superbuild until all issues regarding VTK 5.10 are solved
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.8.0.tar.gz)
-  set(VTK_URL_MD5 37b7297d02d647cc6ca95b38174cb41f)
+  set(VTK_URL /media/hdd/thomasHdd/VTK-Sourcen/vtk-5.10.0.tar.gz)
+  #set(VTK_URL_MD5 37b7297d02d647cc6ca95b38174cb41f)
 
   ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src

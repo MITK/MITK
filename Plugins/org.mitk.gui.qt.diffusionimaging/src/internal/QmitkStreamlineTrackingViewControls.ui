@@ -30,26 +30,6 @@
     <number>0</number>
    </property>
    <item row="6" column="0">
-    <widget class="QLabel" name="m_SeedsPerVoxelLabel_2">
-     <property name="toolTip">
-      <string>Number of tracts started in each voxel of the seed ROI.</string>
-     </property>
-     <property name="text">
-      <string>Mori et al. Annals Neurology 1999</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QCommandLinkButton" name="commandLinkButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Start Tracking</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
     <spacer name="spacer1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -71,36 +51,6 @@
       <string>Parameters</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="1" column="0">
-       <widget class="QLabel" name="m_AngularThresholdLabel">
-        <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
-        </property>
-        <property name="text">
-         <string>Angular Threshold: 45°</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="m_StepsizeLabel">
-        <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
-        </property>
-        <property name="text">
-         <string>Step Size: auto</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="m_fLabel">
-        <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
-        </property>
-        <property name="text">
-         <string>f: 1</string>
-        </property>
-       </widget>
-      </item>
       <item row="6" column="1">
        <widget class="QSlider" name="m_SeedsPerVoxelSlider">
         <property name="toolTip">
@@ -287,7 +237,67 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_AngularThresholdLabel">
+        <property name="toolTip">
+         <string>Minimum tract length in mm.</string>
+        </property>
+        <property name="text">
+         <string>Angular Threshold: 45°</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="m_StepsizeLabel">
+        <property name="toolTip">
+         <string>Minimum tract length in mm.</string>
+        </property>
+        <property name="text">
+         <string>Step Size: auto</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_fLabel">
+        <property name="toolTip">
+         <string>Minimum tract length in mm.</string>
+        </property>
+        <property name="text">
+         <string>f: 1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QCheckBox" name="m_InterpolationBox">
+        <property name="toolTip">
+         <string>Default is nearest neighbor interpolation.</string>
+        </property>
+        <property name="text">
+         <string>Enable trilinear interpolation</string>
+        </property>
+       </widget>
+      </item>
      </layout>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="m_SeedsPerVoxelLabel_2">
+     <property name="toolTip">
+      <string>Number of tracts started in each voxel of the seed ROI.</string>
+     </property>
+     <property name="text">
+      <string>Mori et al. Annals Neurology 1999</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QCommandLinkButton" name="commandLinkButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Start Tracking</string>
+     </property>
     </widget>
    </item>
    <item row="0" column="0">
@@ -344,7 +354,7 @@
      </layout>
     </widget>
    </item>
-   <item row="8" column="0">
+   <item row="9" column="0">
     <widget class="QLabel" name="m_SeedsPerVoxelLabel_3">
      <property name="toolTip">
       <string>Number of tracts started in each voxel of the seed ROI.</string>
@@ -354,7 +364,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="8" column="0">
     <widget class="QLabel" name="m_SeedsPerVoxelLabel_4">
      <property name="toolTip">
       <string>Number of tracts started in each voxel of the seed ROI.</string>

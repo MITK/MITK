@@ -77,7 +77,7 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     gibbsTracker->SetMaskImage(itk_mask);
     gibbsTracker->SetDuplicateImage(false);
     gibbsTracker->SetRandomSeed(1);
-    gibbsTracker->SetParameterFile(argv[3]);
+    gibbsTracker->SetLoadParameterFile(argv[3]);
     gibbsTracker->SetLutPath(argv[4]);
     gibbsTracker->Update();
 

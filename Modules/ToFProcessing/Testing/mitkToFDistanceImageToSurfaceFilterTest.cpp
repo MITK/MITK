@@ -74,6 +74,8 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   ToFPoint2D ipD = filter->GetInterPixelDistance();
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(ipD,interPixelDistance),"Testing Set/GetInterPixelDistance()");
 
+  filter->SetReconstructionMode(false);
+
   // test Set/GetInput()
   filter->SetInput(image);
   MITK_TEST_CONDITION_REQUIRED((image==filter->GetInput()),"Testing Set/GetInput()");

@@ -116,7 +116,7 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
     focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
   }
   else
-    mitk::ToFProcessingCommon::ToFScalarType focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+    focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
   
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
   principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();

@@ -99,7 +99,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
       index[1] = j;
       index[2] = 0;
       ToFScalarType distance = image->GetPixelValueByIndex(index);
-      ToFPoint3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,interPixelDistance,principalPoint);
+      ToFPoint3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
 //      if ((i==0)&&(j==0))
 //      {
 //        MITK_INFO<<"Distance test: "<<distance;
@@ -166,10 +166,10 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
     resultPoint[2] = res[2];
 
     ToFPoint3D expectedPointBackward =
-        mitk::ToFProcessingCommon::CartesianToIndexCoordinates(expectedPoint,focalLength,interPixelDistance,principalPoint);
+        mitk::ToFProcessingCommon::CartesianToIndexCoordinatesWithInterpixdist(expectedPoint,focalLength,interPixelDistance,principalPoint);
 
     ToFPoint3D resultPointBackward =
-        mitk::ToFProcessingCommon::CartesianToIndexCoordinates(resultPoint,focalLength,interPixelDistance,principalPoint);
+        mitk::ToFProcessingCommon::CartesianToIndexCoordinatesWithInterpixdist(resultPoint,focalLength,interPixelDistance,principalPoint);
 
     if (!mitk::Equal(expectedPointBackward,resultPointBackward))
     {
@@ -193,7 +193,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
     resultPoint[2] = res[2];
 
     ToFPoint3D resultPointBackward =
-        mitk::ToFProcessingCommon::CartesianToIndexCoordinates(resultPoint,focalLength,interPixelDistance,principalPoint);
+        mitk::ToFProcessingCommon::CartesianToIndexCoordinatesWithInterpixdist(resultPoint,focalLength,interPixelDistance,principalPoint);
 
     mitk::Index3D pixelIndex;
     pixelIndex[0] = (int) (resultPointBackward[0]+0.5);

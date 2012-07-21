@@ -126,7 +126,16 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
   float* inputFloatData = (float*)(input->GetSliceData(0, 0, 0)->GetData());
   //calculate world coordinates
-  mitk::ToFProcessingCommon::ToFScalarType focalLength = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  mitk::ToFProcessingCommon::ToFPoint2D focalLengthInPixelUnits;
+  mitk::ToFProcessingCommon::ToFScalarType focalLengthInMm;
+  if (m_ReconstructionMode)
+  {
+    focalLengthInPixelUnits[0] = m_CameraIntrinsics->GetFocalLengthX();
+    focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
+  }
+  else
+    mitk::ToFProcessingCommon::ToFScalarType focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
   principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
   principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
@@ -145,8 +154,11 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
 
-      mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates =
-          mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,m_InterPixelDistance,principalPoint);
+      mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates;
+      if (m_ReconstructionMode)
+        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthInPixelUnits,principalPoint);
+      else
+        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
 
       //TODO: why epsilon here and what value should it have?
 //      if (cartesianCoordinates[2] == 0)
@@ -249,4 +261,9 @@ void mitk::ToFDistanceImageToSurfaceFilter::SetTextureImageWidth(int width)
 void mitk::ToFDistanceImageToSurfaceFilter::SetTextureImageHeight(int height)
 {
   this->m_TextureImageHeight = height;
+}
+
+void mitk::ToFDistanceImageToSurfaceFilter::SetReconstructionMode(bool withoutInterpixdist)
+{
+  this->m_ReconstructionMode = withoutInterpixdist;
 }

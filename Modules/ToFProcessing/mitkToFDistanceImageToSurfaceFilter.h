@@ -77,6 +77,10 @@ namespace mitk
     */
     void SetTextureImageHeight(int height);
     /*!
+    \brief Set the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units (=true) or interpixeldistances and focal length in mm (=false)
+    */
+    void SetReconstructionMode(bool withoutInterpixdist = true);
+    /*!
     \brief Sets the input of this filter
     \param distanceImage input is the distance image of e.g. a ToF camera
     */
@@ -148,6 +152,7 @@ namespace mitk
 
     int m_TextureIndex; ///< Index of the input used as texture image when no scalar image was set via SetIplScalarImage(). 0 = Distance, 1 = Amplitude, 2 = Intensity
 
+    bool m_ReconstructionMode; ///< true = Reconstruction without interpixeldistance and with focal lengths in pixel units. false = Reconstruction with interpixeldistance and with focal length in mm.
   };
 } //END mitk namespace
 #endif

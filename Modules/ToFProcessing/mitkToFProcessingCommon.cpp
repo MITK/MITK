@@ -41,7 +41,7 @@ namespace mitk
     return cartesianCoordinates;
   }
 
-//deprecated
+
   ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLength,
     ToFScalarType interPixelDistanceX, ToFScalarType interPixelDistanceY,
     ToFScalarType principalPointX, ToFScalarType principalPointY)
@@ -63,6 +63,7 @@ namespace mitk
   }
 
 
+
   ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::CartesianToIndexCoordinates(ToFScalarType cartesianPointX, ToFScalarType cartesianPointY,ToFScalarType cartesianPointZ,
     ToFScalarType focalLengthX, ToFScalarType focalLengthY,
     ToFScalarType principalPointX, ToFScalarType principalPointY, bool calculateDistance)
@@ -76,7 +77,7 @@ namespace mitk
     indexCoordinatesAndDistanceValue[1] = imageY + principalPointY;
 
     // Note: pixel unit (pX) in x direction does normally not equal pixel unit (pY) in y direction.
-    // Therefore, a transformation in one of the pixel units is necessary
+    // Therefore, a transformation in one of the pixel units is necessary (for calculation of the distance value only)
     // Here, pX as image coordinate unit is chosen
     // pY = (focalLengthX / focalLengthY) * pX
     ToFScalarType imageY_in_pX = imageY * focalLengthX/focalLengthY;
@@ -86,7 +87,7 @@ namespace mitk
 
     if (calculateDistance)
     {
-      indexCoordinatesAndDistanceValue[2] = d*(cartesianPointZ) / focalLengthX;
+      indexCoordinatesAndDistanceValue[2] = d_in_pX*(cartesianPointZ) / focalLengthX;
     }
     else
     {
@@ -95,7 +96,7 @@ namespace mitk
     return indexCoordinatesAndDistanceValue;
   }
 
-//deprecated
+
   ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::CartesianToIndexCoordinatesWithInterpixdist(ToFScalarType cartesianPointX, ToFScalarType cartesianPointY,ToFScalarType cartesianPointZ,
     ToFScalarType focalLength, ToFScalarType interPixelDistanceX, ToFScalarType interPixelDistanceY, 
     ToFScalarType principalPointX, ToFScalarType principalPointY, bool calculateDistance)

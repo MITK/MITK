@@ -191,7 +191,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
       index[1] = j;
       index[2] = 0;
       mitk::ScalarType distance = image->GetPixelValueByIndex(index);
-      mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,interPixelDistance,principalPoint);
+      mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
       expectedResult->InsertPoint(counter,coordinate);
       counter++;
     }
@@ -240,7 +240,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
     index[1] = point[1];
     index[2] = 0;
     mitk::ScalarType distance = image->GetPixelValueByIndex(index);
-    mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(point[0],point[1],
+    mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(point[0],point[1],
                                                                                       distance,focalLength,interPixelDistance,principalPoint);
     expectedResult->InsertPoint(counter,coordinate);
     counter++;

@@ -106,6 +106,8 @@ public slots :
 
     void UpdateAllOverlays();
 
+    void UpdateOverlayData( QmitkOverlay* overlay );
+
 
 protected:
 
@@ -131,7 +133,6 @@ protected:
  
   void RestackOverlays( QmitkOverlay::DisplayPosition pos );
  
-  void UpdateOverlayData( QmitkOverlay* overlay );
 
   typedef std::map< QmitkOverlay::DisplayPosition, QWidget* > OverlayPositionMap;
   typedef std::vector< QmitkOverlay* > OverlayVector;

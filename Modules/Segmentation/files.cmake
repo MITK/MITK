@@ -49,6 +49,10 @@ Interactions/mitkSegmentationsProcessingTool.cpp
 Interactions/mitkSetRegionTool.cpp
 Interactions/mitkSegTool2D.cpp
 Interactions/mitkSubtractContourTool.cpp
+IO/ContourModelIOFactory.cpp
+IO/ContourModelReader.cpp
+IO/ContourModelWriter.cpp
+IO/ContourModelWriterFactory.cpp
 Rendering/mitkContourMapper2D.cpp
 Rendering/mitkContourSetMapper2D.cpp
 Rendering/mitkContourSetVtkMapper3D.cpp

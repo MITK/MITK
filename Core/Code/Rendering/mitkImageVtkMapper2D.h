@@ -258,6 +258,18 @@ namespace mitk {
 
     /** \brief Set the opacity of the actor. */
     void ApplyOpacity( mitk::BaseRenderer* renderer );
+    
+    /**
+    * \brief Calculates whether the given rendering geometry intersects the 
+    * given SlicedGeometry3D.
+    * 
+    * This method checks if the given Geometry2D intersects the given 
+    * SlicedGeometry3D. It calculates the distance of the Geometry2D to all
+    * 8 cornerpoints of the SlicedGeometry3D. If all distances have the same
+    * sign (all positive or all negative) there is no intersection.
+    * If the distances have different sign, there is an intersection.
+    **/
+    bool RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry );
   };
 
 } // namespace mitk

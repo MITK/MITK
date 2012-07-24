@@ -157,6 +157,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
+  mitk::DataNode* datanode = this->GetDataNode();
 
   if ( input == NULL || input->IsInitialized() == false )
   {
@@ -172,6 +173,14 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   input->Update();
 
+  // early out if there is no intersection of the current rendering geometry
+  // and the geometry of the image that is to be rendered.
+  if ( !RenderingGeometryIntersectsImage( worldGeometry, input->GetSlicedGeometry() ) )
+  {
+    localStorage->m_Mapper->SetInput( NULL );
+    return;
+  }
+
 
   //set main input for ExtractSliceFilter
   localStorage->m_Reslicer->SetInput(input);
@@ -185,7 +194,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   //is the geometry of the slice based on the input image or the worldgeometry?
   bool inPlaneResampleExtentByGeometry = false;
-  GetDataNode()->GetBoolProperty("in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer);
+  datanode->GetBoolProperty("in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer);
   localStorage->m_Reslicer->SetInPlaneResampleExtentByGeometry(inPlaneResampleExtentByGeometry);
 
 
@@ -194,7 +203,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   if ( (input->GetDimension() >= 3) && (input->GetDimension(2) > 1) )
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
-    this->GetDataNode()->GetProperty(
+    datanode->GetProperty(
       resliceInterpolationProperty, "reslice interpolation" );
 
     int interpolationMode = VTK_RESLICE_NEAREST;
@@ -328,19 +337,19 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //get the binary property
   bool binary = false;
   bool binaryOutline = false;
-  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+  datanode->GetBoolProperty( "binary", binary, renderer );
   if(binary) //binary image
   {
-    this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer );
+    datanode->GetBoolProperty( "outline binary", binaryOutline, renderer );
     if(binaryOutline) //contour rendering
     {
-      if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
+      if ( input->GetPixelType().GetBpe() <= 8 )
       {
-        //generate ontours/outlines
+        //generate contours/outlines
         localStorage->m_OutlinePolyData = CreateOutlinePolyData(renderer);
 
         float binaryOutlineWidth(1.0);
-        if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
+        if ( datanode->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ) )
         {
           localStorage->m_Actor->GetProperty()->SetLineWidth(binaryOutlineWidth);
         }
@@ -920,6 +929,34 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
   localStorage->m_Actor->SetUserTransform(trans);
   //transform the origin to center based coordinates, because MITK is center based.
   localStorage->m_Actor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
+}
+
+bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
+{
+  // if either one of the two geometries is NULL we return true 
+  // for safety reasons
+  if ( renderingGeometry == NULL || imageGeometry == NULL )
+    return true;
+
+  // get the distance for the first cornerpoint
+  ScalarType initialDistance = renderingGeometry->SignedDistance( imageGeometry->GetCornerPoint( 0 ) );
+  for( int i=1; i<8; i++ )
+  {
+    mitk::Point3D cornerPoint = imageGeometry->GetCornerPoint( i );
+
+    // get the distance to the other cornerpoints
+    ScalarType distance = renderingGeometry->SignedDistance( cornerPoint );
+
+    // if it has not the same signing as the distance of the first point
+    if ( initialDistance * distance < 0 )
+    {
+      // we have an intersection and return true
+      return true;
+    }
+  }
+
+  // all distances have the same sign, no intersection and we return false
+  return false;
 }
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()

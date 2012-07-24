@@ -49,6 +49,7 @@ QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
     delete m_ExternalIndexer;
     delete m_Controls;
     delete m_DirectoryName;
+    delete m_ProgressDialogLabel;
 }
 
 
@@ -77,12 +78,25 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         m_ImportDialog->setWindowModality(Qt::ApplicationModal);
         connect(m_ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(OnFileSelectedAddExternalData(QString)));
 
-        //connect Buttons
-        connect(m_Controls->downloadButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
-        connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()),this,SLOT(OnViewButtonClicked()));
-        connect(m_Controls->cancelButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
+        m_ProgressDialog= new QProgressDialog ("DICOM Import", "Cancel", 0, 100, this,Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        // We don't want the m_ProgressDialog dialog to resize itself, so we bypass the label
+        // by creating our own
+        m_ProgressDialogLabel = new QLabel(tr("Initialization..."));
+        m_ProgressDialog->setLabel(m_ProgressDialogLabel);
+        #ifdef Q_WS_MAC
+        // BUG: avoid deadlock of dialogs on mac
+        m_ProgressDialog->setWindowModality(Qt::NonModal);
+        #else
+        m_ProgressDialog->setWindowModality(Qt::ApplicationModal);
+        #endif
 
-        connect(m_Controls->SearchOption_2, SIGNAL(parameterChanged()), this, SLOT(OnSearchParameterChanged()));
+    connect(m_ProgressDialog, SIGNAL(canceled()), m_ExternalIndexer, SLOT(cancel()));
+    connect(m_ExternalIndexer, SIGNAL(indexingFilePath(QString)),
+            m_ProgressDialogLabel, SLOT(setText(QString)));
+    connect(m_ExternalIndexer, SIGNAL(progress(int)),
+            m_ProgressDialog, SLOT(setValue(int)));
+    connect(m_ExternalIndexer, SIGNAL(progress(int)),
+            this, SLOT(OnProgress(int)));
     }
 }
 
@@ -120,17 +134,9 @@ void QmitkDicomExternalDataWidget::OnFileSelectedAddExternalData(QString directo
 
         if (copyOnImport->isChecked())
         {
-            //targetDirectory = d->DICOMDatabase->databaseDirectory();
-            MBI_DEBUG<<directory.toStdString();
             emit SignalAddDicomData(directory);
         }else{
-            if (m_Watcher.isRunning())
-            {
-                m_Watcher.waitForFinished();
-            }
-            m_Future = QtConcurrent::run(this,(void (QmitkDicomExternalDataWidget::*)(QString)) &QmitkDicomExternalDataWidget::AddDicomTemporary,directory);
-            m_Watcher.setFuture(m_Future);
-
+            AddDicomTemporary(directory);
             emit SignalChangePage(1);
         }
     }
@@ -212,8 +218,17 @@ void QmitkDicomExternalDataWidget::GetFileNamesFromIndex(QStringList& filePaths)
 
 void QmitkDicomExternalDataWidget::AddDicomTemporary(QString directory)
 {
+    m_ProgressDialog->setMinimumDuration(0);
+    m_ProgressDialog->setValue(0);
+    m_ProgressDialog->show();
     m_ExternalIndexer->addDirectory(*m_ExternalDatabase,directory);
     m_ExternalModel->reset();
+}
+
+void QmitkDicomExternalDataWidget::OnProgress(int progress)
+{
+  Q_UNUSED(progress);
+  QApplication::processEvents();
 }
 
 void QmitkDicomExternalDataWidget::OnSearchParameterChanged()

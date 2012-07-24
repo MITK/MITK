@@ -62,11 +62,17 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         // create GUI widgets from the Qt Designer's .ui file
         m_Controls = new Ui::QmitkDicomExternalDataWidgetControls;
         m_Controls->setupUi( parent );
-
+        m_Controls->cancelButton->setVisible(false);
+        m_Controls->viewExternalDataButton->setVisible(false);
         // 
         m_Controls->ExternalDataTreeView->setSortingEnabled(true);
         m_Controls->ExternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
         m_Controls->ExternalDataTreeView->setModel(m_ExternalModel);
+
+        //connect Buttons
+        connect(m_Controls->downloadButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
+        connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()),this,SLOT(OnViewButtonClicked()));
+        connect(m_Controls->cancelButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
 
         //Initialize import widget
         m_ImportDialog = new ctkFileDialog();
@@ -166,8 +172,6 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
 
         QStringList eventProperties;
         eventProperties << patientName << studyUID << studyName << seriesUID << seriesName << *m_DirectoryName;
-        MITK_INFO << m_DirectoryName->toStdString();
-
         emit SignalDicomToDataManager(eventProperties);
     }
 }

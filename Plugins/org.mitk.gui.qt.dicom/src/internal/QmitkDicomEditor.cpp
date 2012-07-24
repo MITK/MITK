@@ -97,7 +97,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     SetListenerDirectory("ListenerDirectory");
     StartDicomDirectoryListener();
 
-    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(false);
+    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(true);
 
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QString&)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&)));

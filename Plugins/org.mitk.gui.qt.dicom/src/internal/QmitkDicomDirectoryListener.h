@@ -70,8 +70,8 @@ protected:
     void RemoveFilesFromDirectoryAndImportingFilesList(const QStringList& files);
 
     QFileSystemWatcher* m_FileSystemWatcher;
-    QStringList* m_FilesToImport;
-    QStringList* m_ImportingFiles;
+    QStringList m_FilesToImport;
+    QStringList m_ImportingFiles;
     QString m_DicomListenerDirectory;
 };
 

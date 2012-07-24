@@ -51,6 +51,7 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkDicomLocalStorageWidgetControls;
         m_Controls->setupUi( parent );
         m_Controls->groupBox->setVisible(false);
+        m_Controls->CancelButton->setVisible(false);
         m_Controls->addSortingTagButton_2->setVisible(false);
         m_Controls->deleteSortingTagButton_2->setVisible(false);
         m_Controls->InternalDataTreeView->setSortingEnabled(true);
@@ -75,12 +76,11 @@ void QmitkDicomLocalStorageWidget::StartDicomImport(const QString& dicomData)
 
 void QmitkDicomLocalStorageWidget::StartDicomImport(const QStringList& dicomData)
 {
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(dicomData.count());
     if (m_Watcher.isRunning())
     {
         m_Watcher.waitForFinished();
     }
-
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(dicomData.count());
     m_Future = QtConcurrent::run(this,(void (QmitkDicomLocalStorageWidget::*)(const QStringList&)) &QmitkDicomLocalStorageWidget::AddDICOMData,dicomData);
     m_Watcher.setFuture(m_Future);
 }
@@ -192,7 +192,6 @@ void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
 
         QStringList eventProperties;
         eventProperties << patientName << studyUID <<studyName << seriesUID << seriesName << filePath;
-        MITK_INFO << filePath.toStdString();
         emit SignalDicomToDataManager(eventProperties);
     }
 }

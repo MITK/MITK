@@ -17,44 +17,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QString>
 #include <QFile>
-
+#include <mitkLogMacros.h>
 #include <QFileInfoList>
 
 QmitkDicomDirectoryListener::QmitkDicomDirectoryListener()
 : m_FileSystemWatcher(new QFileSystemWatcher())
-, m_FilesToImport(new QStringList())
-, m_ImportingFiles(new QStringList())
 {
     connect(m_FileSystemWatcher,SIGNAL(directoryChanged(const QString&)),this,SLOT(OnDirectoryChanged(const QString&))); 
 }
 
 QmitkDicomDirectoryListener::~QmitkDicomDirectoryListener()
 {
-    delete m_FilesToImport;
-    delete m_ImportingFiles;
     delete m_FileSystemWatcher;
 }
 
 
 void QmitkDicomDirectoryListener::OnDirectoryChanged(const QString&)
 {   
-    //m_Mutex.lock();
     SetFilesToImport();
-    m_ImportingFiles->append(*m_FilesToImport);
-    emit SignalAddDicomData(*m_FilesToImport);
-    //m_Mutex.unlock();
+    m_ImportingFiles.append(m_FilesToImport);
+    emit SignalAddDicomData(m_FilesToImport);
 }
 
 void QmitkDicomDirectoryListener::OnDicomImportFinished(const QStringList& finishedFiles)
 {
-    //m_Mutex.lock();
     RemoveFilesFromDirectoryAndImportingFilesList(finishedFiles);
-    //m_Mutex.unlock();
 }
 
 void QmitkDicomDirectoryListener::SetFilesToImport()
 {   
-    m_FilesToImport->clear();
+    m_FilesToImport.clear();
     QDir listenerDirectory(m_DicomListenerDirectory);
     QFileInfoList entries = listenerDirectory.entryInfoList(QDir::Files);
     if(!entries.isEmpty())
@@ -62,9 +54,9 @@ void QmitkDicomDirectoryListener::SetFilesToImport()
         QFileInfoList::const_iterator file;
         for(file = entries.constBegin(); file != entries.constEnd(); ++file )
         {
-            if(!m_ImportingFiles->contains((*file).absoluteFilePath()))
+            if(!m_ImportingFiles.contains((*file).absoluteFilePath()))
             {
-                m_FilesToImport->append((*file).absoluteFilePath());
+                m_FilesToImport.append((*file).absoluteFilePath());
             }
         }
     } 
@@ -76,9 +68,9 @@ void QmitkDicomDirectoryListener::RemoveFilesFromDirectoryAndImportingFilesList(
     while(fileToDeleteIterator.hasNext())
     {
         QFile file(fileToDeleteIterator.next());
-        if(m_ImportingFiles->contains(file.fileName()))
+        if(m_ImportingFiles.contains(file.fileName()))
         {
-            m_ImportingFiles->removeOne(file.fileName());
+            m_ImportingFiles.removeOne(file.fileName());
             file.remove();
         }
     }
@@ -93,6 +85,7 @@ void QmitkDicomDirectoryListener::SetDicomListenerDirectory(const QString& direc
         
         m_DicomListenerDirectory=listenerDirectory.absolutePath();
         m_FileSystemWatcher->addPath(m_DicomListenerDirectory);
+        MITK_INFO << m_DicomListenerDirectory.toStdString();
     }
 }
 

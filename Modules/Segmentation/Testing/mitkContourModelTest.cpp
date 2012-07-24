@@ -13,3 +13,11 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+#include <mitkTestingMacros.h>
+
+int mitkContourModelTest(int argc, char* argv[])
+{
+  MITK_TEST_BEGIN("mitkContourModelTest")
+
+  MITK_TEST_END()
+}

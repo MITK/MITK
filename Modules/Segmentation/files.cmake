@@ -29,7 +29,6 @@ DataManagement/mitkContourSet.cpp
 DataManagement/mitkExtrudedContour.cpp
 DataManagement/mitkContourModel.cpp
 DataManagement/mitkContourModelElement.cpp
-DataManagement/mitkContourModelControlPoint.cpp
 Interactions/mitkAddContourTool.cpp
 Interactions/mitkAutoCropTool.cpp
 Interactions/mitkAutoSegmentationTool.cpp

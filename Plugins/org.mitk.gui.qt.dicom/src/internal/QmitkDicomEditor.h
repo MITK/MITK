@@ -102,6 +102,7 @@ signals:
 
         void OnChangePage(int);
 
+        void OnStoreSCPStatusChanged(const QString& status);
         void TestHandler();
 
         void SetDatabaseDirectory(const QString& databaseDirectory);

@@ -25,6 +25,9 @@ Controllers/mitkSurfaceInterpolationController.cpp
 DataManagement/mitkContour.cpp
 DataManagement/mitkContourSet.cpp
 DataManagement/mitkExtrudedContour.cpp
+DataManagement/ContourModel.cpp
+DataManagement/ContourModelElement.cpp
+DataManagement/ContourModelControlPoint.cpp
 Interactions/mitkAddContourTool.cpp
 Interactions/mitkAutoCropTool.cpp
 Interactions/mitkAutoSegmentationTool.cpp

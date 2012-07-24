@@ -46,6 +46,7 @@ void QmitkStoreSCPLauncher::StartStoreSCP()
 {
     FindPathToStoreSCP();
     MITK_INFO << m_PathToStoreSCP.toStdString();
+    MITK_INFO << m_ArgumentList[7].toStdString();
     m_StoreSCP->start(m_PathToStoreSCP,m_ArgumentList);
 }
 

@@ -92,8 +92,9 @@ void Stop()
 
 };
 
-/**
- *  TODO
+/** Documentation
+ *
+ *  @brief This class holds static test methods to sturcture the test of the mitk logging mechanism.   
  */
 class mitkLogTestClass
 { 
@@ -161,12 +162,18 @@ static void TestLoggingToFile()
 
 static void TestAddAndRemoveBackends()
     {
+    mbilog::BackendCout myBackend = mbilog::BackendCout();
+    mbilog::RegisterBackend(&myBackend);
+    MITK_INFO << "Test logging";
+    mbilog::UnregisterBackend(&myBackend);
 
+    //if no error occured until now, everything is ok
+    MITK_TEST_CONDITION_REQUIRED(true,"Test add/remove logging backend.");
     }
 
 static void  TestDefaultBackend()
     {
-
+    //not possible now, because we cannot unregister the mitk logging backend in the moment. If such a method is added to mbilog utility one may add this test.
     }
 
 
@@ -181,6 +188,8 @@ int mitkLogTest(int /* argc */, char* /*argv*/[])
   
   mitkLogTestClass::TestSimpleLog();
   mitkLogTestClass::TestThreadSaveLog();
+  mitkLogTestClass::TestLoggingToFile();
+  mitkLogTestClass::TestAddAndRemoveBackends();
   
   // always end with this!
   MITK_TEST_END()

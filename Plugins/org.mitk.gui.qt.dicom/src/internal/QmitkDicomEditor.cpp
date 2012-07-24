@@ -63,7 +63,7 @@ const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
 QmitkDicomEditor::QmitkDicomEditor()
 : m_Thread(new QThread())
 , m_DicomDirectoryListener(new QmitkDicomDirectoryListener())
-, m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&builder))
+, m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&m_Builder))
 , m_Publisher(new QmitkDicomDataEventPublisher())
 {
 }
@@ -137,6 +137,8 @@ void QmitkDicomEditor::OnQueryRetrieve()
     OnChangePage(2);
     QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
     QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
+     if(!((m_Builder.GetAETitle()->compare(storageAET,Qt::CaseSensitive)==0)&&
+         (m_Builder.GetPort()->compare(storagePort,Qt::CaseSensitive)==0)))
      {
          StopStoreSCP();
          StartStoreSCP();
@@ -162,11 +164,11 @@ void QmitkDicomEditor::OnChangePage(int page)
     }
 }
 
-void QmitkDicomEditor::OnDicomImportFinished(const QString& /*path*/)
+void QmitkDicomEditor::OnDicomImportFinished(const QString&)
 {
 }
 
-void QmitkDicomEditor::OnDicomImportFinished(const QStringList& /*path*/)
+void QmitkDicomEditor::OnDicomImportFinished(const QStringList&)
 {
 }
 
@@ -182,7 +184,7 @@ void QmitkDicomEditor::StartDicomDirectoryListener()
     }
 }
 
-//TODO Remove
+
 void QmitkDicomEditor::TestHandler()
 {
     m_Handler = new DicomEventHandler();
@@ -208,6 +210,8 @@ void QmitkDicomEditor::StartStoreSCP()
 {
     QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
     QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
+    m_Builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_ListenerDirectory);
+    m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&m_Builder);
     connect(m_StoreSCPLauncher, SIGNAL(SignalStatusOfStoreSCP(const QString&)), this, SLOT(OnStoreSCPStatusChanged(const QString&)));
     m_StoreSCPLauncher->StartStoreSCP();
 

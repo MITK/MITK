@@ -24,7 +24,6 @@ QmitkDicomDirectoryListener::QmitkDicomDirectoryListener()
 : m_FileSystemWatcher(new QFileSystemWatcher())
 , m_FilesToImport(new QStringList())
 , m_ImportingFiles(new QStringList())
-, m_DicomListenerDirectory(QString())
 {
     connect(m_FileSystemWatcher,SIGNAL(directoryChanged(const QString&)),this,SLOT(OnDirectoryChanged(const QString&))); 
 }

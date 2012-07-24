@@ -137,14 +137,14 @@ static void TestThreadSaveLog()
       
 
       //wait for 500 ms
-      Sleep(500);
+      itksys::SystemTools::Delay(500);
 
       //stop them
       myThreadClass1.Stop();
       myThreadClass2.Stop();
 
       //sleep again to let all threads end
-      Sleep(200);
+      itksys::SystemTools::Delay(200);
       }
     catch(...)
       {

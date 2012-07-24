@@ -3,6 +3,9 @@ set(MODULE_TESTS
   mitkContourTest.cpp
   mitkDataNodeSegmentationTest.cpp
 #  mitkSegmentationInterpolationTest.cpp
+  ContourModelReaderTest.cpp
+  ContourModelTest.cpp
+  ContourModelWriterTest.cpp
 )
 
 set(MODULE_IMAGE_TESTS

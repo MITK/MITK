@@ -16,8 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "mitkTestingMacros.h"
+#include <mitkLog.h>
 #include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
+#include <mitkStandardFileLocations.h>
 
 
 /** Documentation
@@ -157,7 +159,11 @@ static void TestThreadSaveLog()
 
 static void TestLoggingToFile()
     {
-
+    std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testlog.log";
+    mitk::LoggingBackend::SetLogFile(filename.c_str());
+    MITK_INFO << "Test logging to default filename: " << mitk::LoggingBackend::GetLogFile();
+    MITK_TEST_CONDITION_REQUIRED(itksys::SystemTools::FileExists(filename.c_str()),"Testing if log file exists.");
+    //TODO delete log file?
     }
 
 static void TestAddAndRemoveBackends()

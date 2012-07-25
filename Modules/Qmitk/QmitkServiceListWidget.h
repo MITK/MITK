@@ -56,7 +56,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /*
     * \brief  Initializes the connection to the registry. The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
     */
-    void Initialize(std::string interfaceName, std::string filter);
+    void Initialize(std::string interfaceName, std::string namingProperty, std::string filter);
 
     /*
     * \brief TODO
@@ -73,7 +73,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
 
     /*
     *\brief This Function listens to ServiceRegistry changes and updates the
-    *       list of devices accordingly. The User of this Widget does not need to use this method,
+    *       list of services accordingly. The user of this widget does not need to use this method,
     *       it is instead used to recieve events from the module registry.
     */
     void OnServiceEvent(const mitk::ServiceEvent event);
@@ -117,7 +117,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     Ui::QmitkServiceListWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
     /*
-    * \brief  Internal Structure used to link services to their QListWidgetItems
+    * \brief  Internal structure used to link ServiceReferences to their QListWidgetItems
     */
     struct ServiceListLink {
       mitk::ServiceReference* service;
@@ -125,7 +125,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     };
 
     /*
-    * \brief  Contains a list of currently active servicesand their entires in the list. This is wiped with every ServiceRegistryEvent.
+    * \brief  Contains a list of currently active services and their entires in the list. This is wiped with every ServiceRegistryEvent.
     */
     std::vector<ServiceListLink> m_ListContent;
 
@@ -154,6 +154,8 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     std::string m_Filter;
     /** \brief The name of the ServiceInterface that this class should list **/
     std::string m_Interface;
+    /** \brief The name of the ServiceProperty that will be displayed in the List to represent the service **/
+    std::string m_NamingProperty;
 };
 
 #endif // _QmitkServiceListWidget_H_INCLUDED

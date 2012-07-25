@@ -64,11 +64,12 @@ void QmitkServiceListWidget::CreateConnections()
   }
 }
 
-void QmitkServiceListWidget::Initialize(std::string interfaceName, std::string filter)
+void QmitkServiceListWidget::Initialize(std::string interfaceName, std::string namingProperty,  std::string filter)
 {
   m_Context = mitk::GetModuleContext();
   m_Filter = filter;
   m_Interface = interfaceName;
+  m_NamingProperty = namingProperty;
   m_Context->AddServiceListener(this, &QmitkServiceListWidget::OnServiceEvent, m_Filter);
 }
 
@@ -121,10 +122,10 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
 QListWidgetItem* QmitkServiceListWidget::ConstructItemFromService(mitk::ServiceReference* serviceRef){
   QListWidgetItem *result = new QListWidgetItem;
 
-  //TODO allow formatting
-  std::string text = "ThisIsAService";
+  //TODO allow more complex formatting
+  std::string caption = serviceRef->GetProperty(m_NamingProperty).ToString();
 
-  result->setText(text.c_str());
+  result->setText(caption.c_str());
 
   return result;
 }

@@ -64,9 +64,9 @@ void QmitkServiceListWidget::CreateConnections()
   }
 }
 
-void QmitkServiceListWidget::Initialize(mitk::ModuleContext* context, std::string interfaceName, std::string filter)
+void QmitkServiceListWidget::Initialize(std::string interfaceName, std::string filter)
 {
-  m_Context = context;
+  m_Context = mitk::GetModuleContext();
   m_Filter = filter;
   m_Interface = interfaceName;
   m_Context->AddServiceListener(this, &QmitkServiceListWidget::OnServiceEvent, m_Filter);

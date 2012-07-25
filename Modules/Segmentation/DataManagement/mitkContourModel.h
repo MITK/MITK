@@ -45,12 +45,12 @@ namespace mitk
 /*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
     typedef mitk::ContourModelElement::VertexType VertexType;
     typedef mitk::ContourModelElement::VertexListType VertexListType;
-    typedef VertexListType::iterator VertexIterator;
-    typedef VertexListType::const_iterator ConstVertexIterator;
+    typedef mitk::ContourModelElement::ConstVertexIterator VertexIterator;
 /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
 
 
+/*++++++++++++++++  inline methods  +++++++++++++++++++++++*/
     void AddVertex(mitk::Point3D &vertex)
     {
       this->m_Contour->AddVertex(vertex);
@@ -66,9 +66,14 @@ namespace mitk
       this->m_Contour->Concatenate(other->m_Contour);
     }
 
-    ConstVertexIterator GetVertexIterator()
+    VertexIterator IteratorBegin()
     {
-      return this->m_Contour->GetConstVertexIterator();
+      return this->m_Contour->ConstIteratorBegin();
+    }
+
+    VertexIterator IteratorEnd()
+    {
+      return this->m_Contour->ConstIteratorEnd();
     }
 
     int GetNumberOfVertices()
@@ -76,10 +81,17 @@ namespace mitk
       return this->m_Contour->GetSize();
     }
 
-    const VertexType* GetSelectedVertex() const
+    VertexType* GetSelectedVertex()
     {
       return this->m_SelectedVertex;
     }
+
+    virtual void Close()
+    {
+      this->m_Contour->Close();
+    }
+/*++++++++++++++++  END inline methods  +++++++++++++++++++++++*/
+
 
 
     bool SelectVertexAt(int index);
@@ -95,7 +107,7 @@ namespace mitk
     void MoveContour(mitk::Vector3D &translate);
 
 
-/* method inherit from base data */
+/*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/
     virtual void SetRequestedRegionToLargestPossibleRegion ();
 
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion ();

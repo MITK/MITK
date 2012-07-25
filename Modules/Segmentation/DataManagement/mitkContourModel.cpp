@@ -92,7 +92,7 @@ void mitk::ContourModel::MoveContour(mitk::Vector3D &translate)
 void mitk::ContourModel::MoveVertex(VertexType* vertex, mitk::Vector3D &vector)
 {
   vertex->Coordinates[0] += vector[0];
-  vertex->Coordinates[1] += vector[3];
+  vertex->Coordinates[1] += vector[1];
   vertex->Coordinates[2] += vector[2];
 }
 

@@ -37,7 +37,12 @@ namespace mitk
 
     mitkClassMacro(ContourModelElement, itk::LightObject);
 
+    itkNewMacro(Self);
 
+    mitkCloneMacro(Self);
+
+
+/*+++++++++++++++++++++ Data container representing vertices +++++++++++++++++*/
     struct ContourModelControlPoint
     {
       ContourModelControlPoint(mitk::Point3D* point=NULL, bool active=false)
@@ -50,42 +55,58 @@ namespace mitk
 
       mitk::Point3D* Coordinates;
     };
+/*+++++++++++++++++++++ END Data container representing vertices ++++++++++++++*/
 
 
-    itkNewMacro(Self);
-
+/*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
     typedef ContourModelControlPoint VertexType;
+    typedef std::deque<VertexType*> VertexListType;
+    typedef VertexListType::iterator VertexIterator;
+    typedef VertexListType::const_iterator ConstVertexIterator;
+/*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
 
-
-    virtual void AddVertex(mitk::Point3D* vertex);
+    virtual void AddVertex(mitk::Point3D &vertex);
 
     virtual VertexType* GetVertexAt(int index);
 
-    virtual VertexType* GetVertexAt(mitk::Point3D* point);
+    virtual VertexType* GetVertexAt(const mitk::Point3D &point, float eps);
 
-    std::deque<VertexType*>* GetVertexList();
+    VertexListType* GetVertexList();
 
     virtual bool IsClosed();
 
     void Concatenate(mitk::ContourModelElement* other);
 
-    virtual bool RemoveVertex(VertexType* vertex);
+    virtual void RemoveVertex(VertexType* vertex);
 
-    virtual bool RemoveVertexAt(int index);
+    virtual void RemoveVertexAt(int index);
 
-    virtual bool RemoveVertexAt(mitk::Point3D* point);
+    virtual bool RemoveVertexAt(mitk::Point3D &point, float eps);
 
+    virtual ConstVertexIterator GetConstVertexIterator()
+    {
+      return this->m_Vertices->begin();
+    }
 
+    virtual VertexIterator GetVertexIterator()
+    {
+      return this->m_Vertices->begin();
+    }
+
+    virtual int GetSize()
+    {
+      return this->m_Vertices->size();
+    }
 
   protected:
 
     ContourModelElement();
-    ContourModelElement(mitk::ContourModelElement &other);
+    ContourModelElement(const mitk::ContourModelElement &other);
     virtual ~ContourModelElement();
 
-    std::deque<VertexType*>* m_Vertices;
-    VertexType* m_SlectedVertex;
+    VertexListType* m_Vertices;
+
   };
 }
 

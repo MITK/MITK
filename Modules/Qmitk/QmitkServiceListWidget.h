@@ -31,7 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceEvent.h"
 
 /**
-* @brief TODO
+* @brief This widget provides abstraction for MicroServices. Place one in your Plugin and set it to a certain interface.
+* One can also specify a filter and / or a property to use for captioning of the services. It also offers functionality to be
+* informed of ServiceEvents and to return the sctual classes, so only a minimum of interaction with the MicroserviceInterface is required.
 *
 * @ingroup QMITK
 */
@@ -55,17 +57,21 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
 
     /*
     * \brief  Initializes the connection to the registry. The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
+    * interfaceName is the name of the interface that is defined in the classes header file and that is used register it it with the MicroServices. NamingProperty
+    * is a property that will be used to caption the Items in the list. If no filter is supplied, all matching interfaces are shown. If no namingProperty is supplied,
+    * the interfaceName will be used to caption Items in the list.
     */
     void Initialize(std::string interfaceName, std::string namingProperty, std::string filter);
 
     /*
-    * \brief TODO
+    * \brief Use this function to returns the currently selected service as a class directly.
+    *  Make sure you pass the appropriate type, or else this call will fail.
     */
     template <class T>
     T GetSelectedService();
 
     /*
-    * \brief TODO
+    * \brief Returns the currently selected Service as a ServiceReference.
     */
     mitk::ServiceReference* GetSelectedService();
 
@@ -73,7 +79,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
 
     /*
     *\brief This Function listens to ServiceRegistry changes and updates the
-    *       list of services accordingly. The user of this widget does not need to use this method,
+    *       list of services accordingly. The user of this widget does not need to call this method,
     *       it is instead used to recieve events from the module registry.
     */
     void OnServiceEvent(const mitk::ServiceEvent event);
@@ -83,17 +89,17 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
   signals:
 
     /*
-    *\brief Emitted when a new service mathing the filter connects.
+    *\brief Emitted when a new Service mathing the filter connects.
     */
     void ServiceConnected(mitk::ServiceReference*);
 
     /*
-    *\brief Emitted directly before a service matching the filter disconnects.
+    *\brief Emitted directly before a Service matching the filter disconnects.
     */
     void ServiceDisconnected(mitk::ServiceReference*);
 
     /*
-    *\brief Emitted when a service mathing the filter changes it's properties.
+    *\brief Emitted when a Service matching the filter changes it's properties.
     */
     void ServiceChanged(mitk::ServiceReference*);
 
@@ -107,7 +113,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
   protected slots:
 
     /*
-    \brief Called, when the selection in the servicelist changes
+    \brief Called, when the selection in the list of Services changes
     */
     void OnServiceSelectionChanged();
 

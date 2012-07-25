@@ -121,9 +121,12 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
 
 QListWidgetItem* QmitkServiceListWidget::ConstructItemFromService(mitk::ServiceReference* serviceRef){
   QListWidgetItem *result = new QListWidgetItem;
-
+  std::string caption;
   //TODO allow more complex formatting
-  std::string caption = serviceRef->GetProperty(m_NamingProperty).ToString();
+  if (m_NamingProperty.empty())
+    caption = m_Interface;
+  else
+    caption = serviceRef->GetProperty(m_NamingProperty).ToString();
 
   result->setText(caption.c_str());
 

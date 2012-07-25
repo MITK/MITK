@@ -105,6 +105,8 @@ void QmitkScalarBarOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
 {
   if ( prop.IsNotNull() )
   {
+    prop->RemoveObserver(m_ObserverTag);
+
     typedef itk::SimpleMemberCommand< QmitkScalarBarOverlay > MemberCommandType;
     MemberCommandType::Pointer propModifiedCommand;
     propModifiedCommand = MemberCommandType::New();

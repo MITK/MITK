@@ -22,10 +22,10 @@ static void TestAddVertex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  mitk::Point3D point;
-  point[0] = point[1] = point[2] = 0;
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
 
-  contour->AddVertex(point);
+  contour->AddVertex(p);
 
   MITK_TEST_CONDITION(contour->GetNumberOfVertices() > 0, "Add a Vertex, size increased");
 
@@ -38,10 +38,10 @@ static void TestSelectVertexAtIndex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  mitk::Point3D point;
-  point[0] = point[1] = point[2] = 0;
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
 
-  contour->AddVertex(point);
+  contour->AddVertex(p);
 
   contour->SelectVertexAt(0);
 
@@ -55,13 +55,13 @@ static void TestSelectVertexAtWorldposition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  mitk::Point3D point;
-  point[0] = point[1] = point[2] = 0;
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
 
-  contour->AddVertex(point);
+  contour->AddVertex(p);
 
   //same point is used here so the epsilon can be chosen very small
-  contour->SelectVertexAt(point, 0.01);
+  contour->SelectVertexAt(p, 0.01);
 
   MITK_TEST_CONDITION(contour->GetSelectedVertex() != NULL, "Vertex was selected at index");
 }
@@ -73,13 +73,13 @@ static void TestMoveSelectedVertex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  mitk::Point3D point;
-  point[0] = point[1] = point[2] = 0;
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
 
-  contour->AddVertex(point);
+  contour->AddVertex(p);
 
   //same point is used here so the epsilon can be chosen very small
-  contour->SelectVertexAt(point, 0.01);
+  contour->SelectVertexAt(p, 0.01);
 
   mitk::Vector3D v;
   v[0] = 1;
@@ -92,12 +92,153 @@ static void TestMoveSelectedVertex()
 
   bool correctlyMoved = false;
 
-  correctlyMoved = (*(vertex->Coordinates))[0] == (v[0]) &&
-                   (*(vertex->Coordinates))[1] == (v[1]) &&
-                   (*(vertex->Coordinates))[2] == (v[2]);
+  correctlyMoved = (vertex->Coordinates)[0] == (v[0]) &&
+                   (vertex->Coordinates)[1] == (v[1]) &&
+                   (vertex->Coordinates)[2] == (v[2]);
 
   MITK_TEST_CONDITION(correctlyMoved, "Vertex has been moved");
 }
+
+
+
+//test to move the whole contour
+static void TestMoveContour()
+{
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
+
+  contour->AddVertex(p);
+
+
+  mitk::Point3D p2;
+  p2[0] = p2[1] = p2[2] = 0;
+
+  contour->AddVertex(p2);
+
+
+  mitk::Vector3D v;
+  v[0] = 1;
+  v[1] = 3;
+  v[2] = -1;
+
+  contour->MoveContour(v);
+
+  mitk::ContourModel::VertexIterator it = contour->IteratorBegin();
+  mitk::ContourModel::VertexIterator end = contour->IteratorEnd();
+
+  bool correctlyMoved = false;
+
+  while(it != end)
+  {
+
+    correctlyMoved &= (*it)->Coordinates[0] == (v[0]) &&
+      (*it)->Coordinates[1] == (v[1]) &&
+      (*it)->Coordinates[2] == (v[2]);
+  }
+
+  MITK_TEST_CONDITION(correctlyMoved, "Contour has been moved");
+}
+
+
+
+//remove a vertex by index
+static void TestRemoveVertexAtIndex()
+{
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
+
+  contour->AddVertex(p);
+
+  contour->RemoveVertexAt(0);
+
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 0, "removed vertex");
+}
+
+
+
+//remove a vertex by position
+static void TestRemoveVertexAtWorldPosition()
+{
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
+
+  contour->AddVertex(p);
+
+  contour->RemoveVertexAt(p, 0.01);
+
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 0, "removed vertex");
+}
+
+
+
+//check closeable contour
+static void TestIsclosed()
+{
+    mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
+
+  contour->AddVertex(p);
+
+
+  mitk::Point3D p2;
+  p2[0] = p2[1] = p2[2] = 1;
+
+  contour->AddVertex(p2);
+
+  contour->Close();
+
+  MITK_TEST_CONDITION(contour->IsClosed(), "close contour");
+}
+
+
+
+//test concatenating two contours
+static void TestConcatenate()
+{
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
+
+  contour->AddVertex(p);
+
+
+  mitk::Point3D p2;
+  p2[0] = p2[1] = p2[2] = 1;
+
+  contour->AddVertex(p2);
+
+
+  mitk::ContourModel::Pointer contour2 = mitk::ContourModel::New();
+
+  mitk::Point3D p3;
+  p3[0] = -2;
+  p3[1] = 10;
+  p3[2] = 0;
+
+  contour2->AddVertex(p3);
+
+
+  mitk::Point3D p4;
+  p4[0] = -3;
+  p4[1] = 6;
+  p4[2] = -5;
+
+  contour2->AddVertex(p4);
+
+  contour->Concatenate(contour2);
+
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 4, "two contours were concatenated");
+}
+
 
 
 
@@ -108,5 +249,11 @@ int mitkContourModelTest(int argc, char* argv[])
     TestAddVertex();
   TestSelectVertexAtIndex();
   TestSelectVertexAtWorldposition();
+  TestMoveSelectedVertex();
+  TestRemoveVertexAtIndex();
+  TestRemoveVertexAtWorldPosition();
+  TestIsclosed();
+  TestConcatenate();
+
   MITK_TEST_END()
 }

@@ -45,7 +45,7 @@ namespace mitk
 /*+++++++++++++++++++++ Data container representing vertices +++++++++++++++++*/
     struct ContourModelControlPoint
     {
-      ContourModelControlPoint(mitk::Point3D* point=NULL, bool active=false)
+      ContourModelControlPoint(mitk::Point3D &point, bool active=false)
         : Coordinates(point), IsActive(active)
       {
 
@@ -53,7 +53,7 @@ namespace mitk
 
       bool IsActive;
 
-      mitk::Point3D* Coordinates;
+      mitk::Point3D Coordinates;
     };
 /*+++++++++++++++++++++ END Data container representing vertices ++++++++++++++*/
 
@@ -66,6 +66,36 @@ namespace mitk
 /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
 
+
+/*++++++++++++++++  inline methods  +++++++++++++++++++++++*/
+    virtual ConstVertexIterator ConstIteratorBegin()
+    {
+      return this->m_Vertices->begin();
+    }
+
+    virtual ConstVertexIterator ConstIteratorEnd()
+    {
+      return this->m_Vertices->end();
+    }
+
+    virtual VertexIterator IteratorBegin()
+    {
+      return this->m_Vertices->begin();
+    }
+
+    virtual VertexIterator IteratorEnd()
+    {
+      return this->m_Vertices->end();
+    }
+
+    virtual int GetSize()
+    {
+      return this->m_Vertices->size();
+    }
+/*++++++++++++++++  END inline methods  +++++++++++++++++++++++*/
+
+
+
     virtual void AddVertex(mitk::Point3D &vertex);
 
     virtual VertexType* GetVertexAt(int index);
@@ -76,6 +106,8 @@ namespace mitk
 
     virtual bool IsClosed();
 
+    virtual void Close();
+
     void Concatenate(mitk::ContourModelElement* other);
 
     virtual void RemoveVertex(VertexType* vertex);
@@ -84,20 +116,6 @@ namespace mitk
 
     virtual bool RemoveVertexAt(mitk::Point3D &point, float eps);
 
-    virtual ConstVertexIterator GetConstVertexIterator()
-    {
-      return this->m_Vertices->begin();
-    }
-
-    virtual VertexIterator GetVertexIterator()
-    {
-      return this->m_Vertices->begin();
-    }
-
-    virtual int GetSize()
-    {
-      return this->m_Vertices->size();
-    }
 
   protected:
 
@@ -106,6 +124,7 @@ namespace mitk
     virtual ~ContourModelElement();
 
     VertexListType* m_Vertices;
+    bool m_IsClosed;
 
   };
 }

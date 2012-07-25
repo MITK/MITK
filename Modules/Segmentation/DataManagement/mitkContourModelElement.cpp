@@ -18,11 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ContourModelElement::ContourModelElement()
 {
   this->m_Vertices = new VertexListType();
+  this->m_IsClosed = false;
 }
 
 
 mitk::ContourModelElement::ContourModelElement(const mitk::ContourModelElement &other) :
-  m_Vertices(other.m_Vertices)
+  m_Vertices(other.m_Vertices), m_IsClosed(other.m_IsClosed)
 {
 }
 
@@ -35,7 +36,7 @@ mitk::ContourModelElement::~ContourModelElement()
 
 void mitk::ContourModelElement::AddVertex(mitk::Point3D &vertex)
 {
-  this->m_Vertices->push_back(new VertexType(&vertex, false));
+  this->m_Vertices->push_back(new VertexType(vertex, false));
 }
 
 
@@ -55,9 +56,9 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(co
 
   while(it != end)
   {
-    mitk::Point3D* currentPoint = (*it)->Coordinates;
+    mitk::Point3D currentPoint = (*it)->Coordinates;
 
-    if(currentPoint->EuclideanDistanceTo(point) < eps)
+    if(currentPoint.EuclideanDistanceTo(point) < eps)
     {
       //found an approximate point
       return *it;
@@ -77,21 +78,31 @@ mitk::ContourModelElement::VertexListType* mitk::ContourModelElement::GetVertexL
 
 bool mitk::ContourModelElement::IsClosed()
 {
-  return this->m_Vertices->front() == this->m_Vertices->back();
+  return this->m_IsClosed;
+}
+
+
+void mitk::ContourModelElement::Close()
+{
+  this->m_IsClosed = true;
 }
 
 
 void mitk::ContourModelElement::Concatenate(mitk::ContourModelElement* other)
 {
-  VertexListType* temp(other->m_Vertices);
-  this->m_Vertices->push_back(temp->front());
-  temp = NULL;
+  ConstVertexIterator it =  other->m_Vertices->begin();
+  ConstVertexIterator end =  other->m_Vertices->end();
+  while(it != end)
+  {
+    this->m_Vertices->push_back(*it);
+    it++;
+  }
 }
 
 
 void mitk::ContourModelElement::RemoveVertex(mitk::ContourModelElement::VertexType* vertex)
 {
-  this->RemoveVertexAt(*(vertex->Coordinates), 0.1);
+  this->RemoveVertexAt(vertex->Coordinates, 0.1);
 }
 
 
@@ -111,9 +122,9 @@ bool mitk::ContourModelElement::RemoveVertexAt(mitk::Point3D &point, float eps)
 
   while(it != end)
   {
-    mitk::Point3D* currentPoint = (*it)->Coordinates;
+    mitk::Point3D currentPoint = (*it)->Coordinates;
 
-    if(currentPoint->EuclideanDistanceTo(point) < eps)
+    if(currentPoint.EuclideanDistanceTo(point) < eps)
     {
       //approximate point found
       //now erase it

@@ -37,6 +37,7 @@ QmitkScalarBarOverlay::QmitkScalarBarOverlay( const char* id )
 QmitkScalarBarOverlay::~QmitkScalarBarOverlay()
 {
   m_PropertyList->GetProperty( m_Id )->RemoveObserver(m_ObserverTag);
+  m_PropertyList = NULL;
 }
 
 void QmitkScalarBarOverlay::GenerateData( mitk::PropertyList::Pointer pl )
@@ -44,7 +45,7 @@ void QmitkScalarBarOverlay::GenerateData( mitk::PropertyList::Pointer pl )
   if ( pl.IsNull() )
     return;
 
-  m_PropertyList = pl;
+  m_PropertyList = pl->Clone();
 
   if ( m_PropertyList.IsNotNull() )
   {
@@ -67,7 +68,11 @@ void QmitkScalarBarOverlay::SetScaleFactor()
   {
     MITK_DEBUG << "Property " << m_Id << " could not be found";
   }
-  m_ScalarBar->SetScaleFactor( scale );
+
+  if ( m_ScalarBar != NULL )
+  {
+    m_ScalarBar->SetScaleFactor( scale );
+  }
 }
 
 

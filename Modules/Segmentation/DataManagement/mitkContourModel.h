@@ -39,10 +39,19 @@ namespace mitk
 
     itkNewMacro(Self);
 
+    mitkCloneMacro(Self);
+
+
+/*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
+    typedef mitk::ContourModelElement::VertexType VertexType;
+    typedef mitk::ContourModelElement::VertexListType VertexListType;
+    typedef VertexListType::iterator VertexIterator;
+    typedef VertexListType::const_iterator ConstVertexIterator;
+/*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
 
 
-    void AddVertex(mitk::Point3D* vertex)
+    void AddVertex(mitk::Point3D &vertex)
     {
       this->m_Contour->AddVertex(vertex);
     }
@@ -57,21 +66,36 @@ namespace mitk
       this->m_Contour->Concatenate(other->m_Contour);
     }
 
-    std::deque<mitk::ContourModelElement::VertexType*>* GetVertexList();
+    ConstVertexIterator GetVertexIterator()
+    {
+      return this->m_Contour->GetConstVertexIterator();
+    }
+
+    int GetNumberOfVertices()
+    {
+      return this->m_Contour->GetSize();
+    }
+
+    const VertexType* GetSelectedVertex() const
+    {
+      return this->m_SelectedVertex;
+    }
+
 
     bool SelectVertexAt(int index);
 
-    bool SelectVertexAt(mitk::Point3D &point);
+    bool SelectVertexAt(mitk::Point3D &point, float eps);
 
     bool RemoveVertexAt(int index);
 
-    bool RemoveVertexAt(mitk::Point3D &point);
+    bool RemoveVertexAt(mitk::Point3D &point, float eps);
 
     void MoveSelectedVertex(mitk::Vector3D &translate);
 
     void MoveContour(mitk::Vector3D &translate);
 
 
+/* method inherit from base data */
     virtual void SetRequestedRegionToLargestPossibleRegion ();
 
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion ();
@@ -84,13 +108,17 @@ namespace mitk
 
     virtual void SetRequestedRegion (itk::DataObject *data);
 
+
   protected:
 
     ContourModel();
-    ContourModel(mitk::ContourModel &other);
+    ContourModel(const mitk::ContourModel &other);
     virtual ~ContourModel();
 
+    void MoveVertex(VertexType* vertex, mitk::Vector3D &vector);
+
     mitk::ContourModelElement::Pointer m_Contour;
+    VertexType* m_SelectedVertex;
   };
 }
 

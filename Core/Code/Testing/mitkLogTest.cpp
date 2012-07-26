@@ -193,8 +193,8 @@ int mitkLogTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_OUTPUT(<<"TESTING ALL LOGGING OUTPUTS, ERROR MESSAGES ARE ALSO TESTED AND NOT MEANING AN ERROR OCCURED!")
   
   mitkLogTestClass::TestSimpleLog();
-  mitkLogTestClass::TestThreadSaveLog();
-  mitkLogTestClass::TestLoggingToFile();
+  //mitkLogTestClass::TestThreadSaveLog();
+  //mitkLogTestClass::TestLoggingToFile();
   //mitkLogTestClass::TestAddAndRemoveBackends();
   
   // always end with this!

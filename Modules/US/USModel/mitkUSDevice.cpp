@@ -112,19 +112,6 @@ bool mitk::USDevice::Disconnect()
   return true;
 }
 
-//bool mitk::USDevice::OnConnection()
-//{
-//  return true;
-//  // TODO: Make Abstract
-//}
-//
-//bool mitk::USDevice::OnDisconnection()
-//{
-//  return true;
-//  // TODO Make Abstract
-//}
-
-
 //Changed
 bool mitk::USDevice::Activate()
 {

@@ -23,13 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include "mitkModuleContext.h"
 
+const std::string mitk::NavigationDataSource::US_INTERFACE_NAME = "org.mitk.services.NavigationDataSource";
+const std::string mitk::NavigationDataSource::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
+const std::string mitk::NavigationDataSource::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 
 mitk::NavigationDataSource::NavigationDataSource() 
 : itk::ProcessObject()
 {
-  US_INTERFACE_NAME = "org.mitk.services.NavigationDataSource";
-  US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
-  US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
+
 }
 
 

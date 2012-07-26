@@ -85,9 +85,9 @@ namespace mitk {
     /**
     *\brief These Constants are used in conjunction with Microservices
     */
-    std::string US_INTERFACE_NAME;
-    std::string US_PROPKEY_ID;
-    std::string US_PROPKEY_ISACTIVE;
+    static const std::string US_INTERFACE_NAME;
+    static const std::string US_PROPKEY_ID;
+    static const std::string US_PROPKEY_ISACTIVE;
 
     /**
     *\brief Graft the specified DataObject onto this ProcessObject's output.

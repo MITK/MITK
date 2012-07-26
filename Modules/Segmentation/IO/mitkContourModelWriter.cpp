@@ -220,10 +220,13 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
 
       /*++++ </point> ++++*/
       WriteEndElement( XML_POINT, out );
+      
+      it++;
     }
 
     /*++++ </timestep> ++++*/
     WriteEndElement( XML_TIME_STEP, out );
+
   }
 
   /*++++ </data> ++++*/
@@ -423,7 +426,7 @@ std::string mitk::ContourModelWriter::GetWritenMIMEType()
 std::vector<std::string> mitk::ContourModelWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(m_Extension);
+  possibleFileExtensions.push_back(".cnt");
   return possibleFileExtensions;
 }
 

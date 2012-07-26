@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static itk::SimpleFastMutexLock logMutex;
 static mitk::LoggingBackend *mitkLogBackend = 0;
 static std::ofstream *logFile = 0;
+static std::string logFileName = "";
 static std::stringstream *outputWindow = 0;
 static bool logOutputWindow = false;
 
@@ -92,7 +93,7 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
   logMutex.Lock();
   if(logFile)
   {
-    MITK_INFO << "closing logfile";
+    MITK_INFO << "closing logfile (" << logFileName << ")" ;
     logFile->close();
     delete logFile;
     logFile = 0;
@@ -100,6 +101,7 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
   if(file)
   {
       logFile = new std::ofstream( file,  std::ios_base::out | std::ios_base::app );
+      logFileName = file;
     /*
     if(*logFile)
     {
@@ -116,6 +118,11 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
     */
   }
   logMutex.Unlock();
+}
+
+std::string mitk::LoggingBackend::GetLogFile()
+{
+  return logFileName;
 }
 
 void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc,char **argv)

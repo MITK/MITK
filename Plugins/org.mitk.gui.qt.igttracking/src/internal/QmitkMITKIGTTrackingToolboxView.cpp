@@ -234,7 +234,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
 void QmitkMITKIGTTrackingToolboxView::OnDisconnect()
   {
   if (m_tracking) this->OnStopTracking();
-  
+
   m_TrackingDeviceSource->Disconnect();
   m_TrackingDeviceSource->UnRegisterMicroservice();
   //ToolStorages unregisters automatically
@@ -299,13 +299,13 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
   m_tracking = false;
-  
+
   //enable/disable Buttons
   m_Controls->m_Disconnect->setEnabled(true);
   m_Controls->m_StartTracking->setEnabled(true);
   m_Controls->m_StopTracking->setEnabled(false);
   m_Controls->m_Connect->setEnabled(false);
-   
+
   this->GlobalReinit();
 }
 

@@ -29,9 +29,8 @@ namespace mitk
  * @brief XML-based writer for mitk::ContourModels 
  *
  * XML-based writer for mitk::ContourModels. Multiple ContourModels can be written in
- * a single XML file by simply setting multiple inputs to the filter. 
- * Writing of multiple XML files according to a given filename pattern is not
- * yet supported.
+ * a single XML file by simply setting multiple inputs to the filter.
+ *
  * @ingroup PSIO
  * @ingroup Process
  */
@@ -182,6 +181,14 @@ protected:
     void WriteXML( mitk::ContourModel* contourModel, std::ofstream& out );
 
     /**
+    * Writes the geometry information of the TimeSlicedGeometry to an outstream.
+    * The root tag is not included.
+    * @param geometry the TimeSlicedGeometry of the contour.
+    * @param the stream to write to.
+    */
+    void WriteGeometryInformation( mitk::TimeSlicedGeometry* geometry, std::ofstream& out );
+
+    /**
      * Writes an standard xml header to the given stream.
      * @param file the stream in which the header is written.
      */
@@ -231,29 +238,26 @@ protected:
     
 public:
 
-    static const char* XML_POINT_SET;
+    static const char* XML_CONTOURMODEL;
     
-    static const char* XML_TIME_SERIES;
+    static const char* XML_HEAD;
 
-    static const char* XML_TIME_SERIES_ID;
+    static const char* XML_GEOMETRY_INFO;
 
-    static const char* XML_POINT_SET_FILE;
+    static const char* XML_DATA;
     
-    static const char* XML_FILE_VERSION;
+    static const char* XML_TIME_STEP;
+    
+    static const char* XML_CONTROL_POINTS;
     
     static const char* XML_POINT;
-    
-    static const char* XML_SPEC;
-
-    static const char* XML_ID;
     
     static const char* XML_X;
     
     static const char* XML_Y;
     
     static const char* XML_Z;
-    
-    static const char* VERSION_STRING;
+
 
 };
 

@@ -20,33 +20,53 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <locale>
 
 
+/*
+ * The xml file will look like:
+ *   
+ *   <?xml version="1.0" encoding="utf-8"?>
+ *   <contourModel>
+ *      <head>
+ *        <geometryInfo>
+ *        </geometryInfo>
+ *      </head>
+ *      <data>
+ *        <timestep n="0">
+ *          <controlPoints>
+ *            <point>
+ *              <x></x>
+ *              <y></y>
+ *              <z></z>
+ *            </point>
+ *          </controlPoint>
+ *        </timestep>
+ *      </data>
+ *    </contourModel>
+ */
+
+
 //
 // Initialization of the xml tags.
 //
 
-const char* mitk::ContourModelWriter::XML_POINT_SET_FILE = "point_set_file" ;
+const char* mitk::ContourModelWriter::XML_CONTOURMODEL = "contourModel" ;
 
-const char* mitk::ContourModelWriter::XML_FILE_VERSION = "file_version" ;
+const char* mitk::ContourModelWriter::XML_HEAD = "head" ;
 
-const char* mitk::ContourModelWriter::XML_POINT_SET = "point_set" ;
+const char* mitk::ContourModelWriter::XML_GEOMETRY_INFO = "geometryInfo" ;
 
-const char* mitk::ContourModelWriter::XML_TIME_SERIES = "time_series";
+const char* mitk::ContourModelWriter::XML_DATA = "data";
 
-const char* mitk::ContourModelWriter::XML_TIME_SERIES_ID = "time_series_id";
+const char* mitk::ContourModelWriter::XML_TIME_STEP = "timestep";
+
+const char* mitk::ContourModelWriter::XML_CONTROL_POINTS = "controlPoints" ;
 
 const char* mitk::ContourModelWriter::XML_POINT = "point" ;
-
-const char* mitk::ContourModelWriter::XML_ID = "id" ;
-
-const char* mitk::ContourModelWriter::XML_SPEC = "specification" ;
 
 const char* mitk::ContourModelWriter::XML_X = "x" ;
 
 const char* mitk::ContourModelWriter::XML_Y = "y" ;
 
 const char* mitk::ContourModelWriter::XML_Z = "z" ;
-
-const char* mitk::ContourModelWriter::VERSION_STRING = "0.1" ;
 
 
 
@@ -72,7 +92,7 @@ mitk::ContourModelWriter::~ContourModelWriter()
 
 
 void mitk::ContourModelWriter::GenerateData()
-{/*
+{
     m_Success = false;
     m_IndentDepth = 0;
 
@@ -97,14 +117,32 @@ void mitk::ContourModelWriter::GenerateData()
     std::locale I("C");
     out.imbue(I);
 
-    //
-    // Here the actual xml writing begins
-    //
+
+/*+++++++++++ Here the actual xml writing begins +++++++++*/
+
+    /*++++ <?xml version="1.0" encoding="utf-8"?> ++++*/
     WriteXMLHeader( out );
-    WriteStartElement( XML_POINT_SET_FILE, out );
-    WriteStartElement( XML_FILE_VERSION, out );
-    WriteCharacterData( VERSION_STRING, out );
-    WriteEndElement( XML_FILE_VERSION, out, false );
+    /*++++ <contourModel> ++++*/
+    WriteStartElement( XML_CONTOURMODEL, out );
+
+    /*++++ <head> ++++*/
+    WriteStartElement( XML_HEAD, out);
+
+    /*++++ <geometryInfo> ++++*/
+    WriteStartElement( XML_GEOMETRY_INFO, out);
+
+
+    //write the geometry informations to the stream
+      InputType::Pointer contourModel = this->GetInput();
+      assert( contourModel.IsNotNull() );
+      WriteGeometryInformation( contourModel->GetTimeSlicedGeometry(), out);;
+
+
+    /*++++ </geometryInfo> ++++*/
+    WriteEndElement( XML_GEOMETRY_INFO, out);
+
+    /*++++ </head> ++++*/
+    WriteEndElement( XML_HEAD, out);
 
     //
     // for each input object write its xml representation to
@@ -117,8 +155,13 @@ void mitk::ContourModelWriter::GenerateData()
         WriteXML( contourModel.GetPointer(), out );
     }
 
-   WriteEndElement( XML_POINT_SET_FILE, out );
-   out.imbue(previousLocale);
+
+    /*++++ </contourModel> ++++*/
+    WriteEndElement( XML_CONTOURMODEL, out );
+
+    
+    out.imbue(previousLocale);
+
     if ( !out.good() ) // some error during output
     {
       out.close();
@@ -127,63 +170,72 @@ void mitk::ContourModelWriter::GenerateData()
  
     out.close();
     m_Success = true;
-    m_MimeType = "application/MITK.ContourModel";*/
+    m_MimeType = "application/MITK.ContourModel";
 }
 
 
 
 
 void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::ofstream& out )
-{/*
-    WriteStartElement( XML_POINT_SET, out );
-    unsigned int timecount = contourModel->GetTimeSteps();
+{
+  /*++++ <data> ++++*/
+  WriteStartElement( XML_DATA, out);
 
-    for(unsigned int i=0; i< timecount; i++)
+  unsigned int timecount = contourModel->GetTimeSteps();
+
+  for(unsigned int i=0; i< timecount; i++)
+  {
+    /*++++ <timestep> ++++*/
+    WriteStartElement( XML_TIME_STEP, out );
+
+
+    mitk::ContourModel::VertexIterator it = contourModel->IteratorBegin();
+    mitk::ContourModel::VertexIterator end = contourModel->IteratorEnd();
+
+
+    while(it != end)
     {
-      WriteStartElement( XML_TIME_SERIES, out );
-      
-      WriteStartElement( XML_TIME_SERIES_ID, out );
-      WriteCharacterData( ConvertToString( i ).c_str() , out );
-      WriteEndElement( XML_TIME_SERIES_ID, out, false );
+      /*++++ <point> ++++*/
+      WriteStartElement( XML_POINT, out );
 
-      mitk::ContourModel::PointsContainer* pointsContainer = contourModel->GetContourModel(i)->GetPoints();
-      mitk::ContourModel::PointsContainer::Iterator it;
+      mitk::ContourModel::VertexType* v = *it;
 
-      for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
-      {
-          WriteStartElement( XML_POINT, out );
+      /*++++ <x> ++++*/
+      WriteStartElement( XML_X, out );
+      WriteCharacterData( ConvertToString(v->Coordinates[0] ).c_str(), out );
+      /*++++ </x> ++++*/
+      WriteEndElement( XML_X, out, false );
 
-          WriteStartElement( XML_ID, out );
-          WriteCharacterData( ConvertToString( it->Index() ).c_str() , out );
-          WriteEndElement( XML_ID, out, false );
+      /*++++ <y> ++++*/
+      WriteStartElement( XML_Y, out );
+      WriteCharacterData( ConvertToString( v->Coordinates[ 1 ] ).c_str(), out );
+      /*++++ </y> ++++*/
+      WriteEndElement( XML_Y, out, false );
 
-          mitk::ContourModel::PointType point = it->Value();
+      /*++++ <z> ++++*/
+      WriteStartElement( XML_Z, out );
+      WriteCharacterData( ConvertToString( v->Coordinates[ 2 ] ).c_str(), out );
+      /*++++ </z> ++++*/
+      WriteEndElement( XML_Z, out, false );
 
-          WriteStartElement( XML_SPEC, out );
-          WriteCharacterData( ConvertToString( contourModel->GetSpecificationTypeInfo(it->Index(), i) ).c_str() , out );
-          WriteEndElement( XML_SPEC, out, false );
-
-          WriteStartElement( XML_X, out );
-          WriteCharacterData( ConvertToString( point[ 0 ] ).c_str(), out );
-          WriteEndElement( XML_X, out, false );
-
-          WriteStartElement( XML_Y, out );
-          WriteCharacterData( ConvertToString( point[ 1 ] ).c_str(), out );
-          WriteEndElement( XML_Y, out, false );
-
-          WriteStartElement( XML_Z, out );
-          WriteCharacterData( ConvertToString( point[ 2 ] ).c_str(), out );
-          WriteEndElement( XML_Z, out, false );
-
-          WriteEndElement( XML_POINT, out );
-      }
-    WriteEndElement( XML_TIME_SERIES, out );
+      /*++++ </point> ++++*/
+      WriteEndElement( XML_POINT, out );
     }
 
-    WriteEndElement( XML_POINT_SET, out );*/
+    /*++++ </timestep> ++++*/
+    WriteEndElement( XML_TIME_STEP, out );
+  }
+
+  /*++++ </data> ++++*/
+  WriteEndElement( XML_DATA, out );
 }
 
 
+
+void mitk::ContourModelWriter::WriteGeometryInformation( mitk::TimeSlicedGeometry* geometry, std::ofstream& out )
+{
+  WriteCharacterData("<!-- geometry information -->", out);
+}
 
 
 
@@ -260,7 +312,7 @@ std::string mitk::ContourModelWriter::ConvertToString( T value )
 
 void mitk::ContourModelWriter::WriteXMLHeader( std::ofstream &file )
 {
-    file << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
+    file << "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 }
 
 
@@ -349,7 +401,7 @@ bool mitk::ContourModelWriter::CanWriteDataType( DataNode* input )
        if( contourModel.IsNotNull() )
        {
          //this writer has no "SetDefaultExtension()" - function 
-         m_Extension = ".mps";
+         m_Extension = ".cnt";
          return true;
        }
     }
@@ -371,7 +423,7 @@ std::string mitk::ContourModelWriter::GetWritenMIMEType()
 std::vector<std::string> mitk::ContourModelWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".mps");
+  possibleFileExtensions.push_back(m_Extension);
   return possibleFileExtensions;
 }
 

@@ -114,6 +114,20 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
     link.item = newItem;
     m_ListContent.push_back(link);
   }
+  switch (event.GetType())
+  {
+    case event.MODIFIED:
+      emit(ServiceModified(& event.GetServiceReference()));
+      break;
+    case event.REGISTERED:
+      emit(ServiceRegistered(& event.GetServiceReference()));
+      break;
+    case event.UNREGISTERING:
+      emit(ServiceUnregistering(& event.GetServiceReference()));
+      break;
+  //default:
+    // mitkThrow() << "ServiceListenerWidget recieved an unrecognized event. Please Update Implementation of QmitkServiceListWidget::OnServiceEvent()";
+}
 }
 
 

@@ -89,19 +89,19 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
   signals:
 
     /*
-    *\brief Emitted when a new Service mathing the filter connects.
+    *\brief Emitted when a new Service mathing the filter is being registered.
     */
-    void ServiceConnected(mitk::ServiceReference*);
+    void ServiceRegistered(mitk::ServiceReference*);
 
     /*
-    *\brief Emitted directly before a Service matching the filter disconnects.
+    *\brief Emitted directly before a Service matching the filter is being unregistered.
     */
-    void ServiceDisconnected(mitk::ServiceReference*);
+    void ServiceUnregistering(mitk::ServiceReference*);
 
     /*
     *\brief Emitted when a Service matching the filter changes it's properties.
     */
-    void ServiceChanged(mitk::ServiceReference*);
+    void ServiceModified(mitk::ServiceReference*);
 
     /*
     *\brief Emitted the user selects a Service from the list

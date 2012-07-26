@@ -1286,33 +1286,41 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
 
   if ( fabs(dist1 - dist2) < mitk::eps)
   {
-    gdcm::Attribute<0x0018,0x1060> trg_time1; // Trigger time (may be missing, so we check existence first)
-    gdcm::Attribute<0x0018,0x1060> trg_time2;
-
-    gdcm::Attribute<0x0008,0x0032> acq_time1;   // Acquisition time (may be missing, so we check existence first)
-    gdcm::Attribute<0x0008,0x0032> acq_time2;
-
     gdcm::Attribute<0x0020,0x0012> acq_number1; // Acquisition number (may also be missing, so we check existence first)
     gdcm::Attribute<0x0020,0x0012> acq_number2;
 
-    if (ds1.FindDataElement(gdcm::Tag(0x0018,0x1060)) && ds2.FindDataElement(gdcm::Tag(0x0018,0x1060)))
-    {
-      trg_time1.Set(ds1);
-      trg_time2.Set(ds2);
+    gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time (may be missing, so we check existence first)
+    gdcm::Attribute<0x0008,0x0032> acq_time2;
 
-      return trg_time1 < trg_time2;
-    }
-    else if (ds1.FindDataElement(gdcm::Tag(0x0008,0x0032)) && ds2.FindDataElement(gdcm::Tag(0x0008,0x0032)))
-    {
-      acq_time1.Set(ds1);
-      acq_time2.Set(ds2);
+    gdcm::Attribute<0x0018,0x1060> trg_time1; // Trigger time (may be missing, so we check existence first)
+    gdcm::Attribute<0x0018,0x1060> trg_time2;
 
-      return acq_time1 < acq_time2;
-    }
-    else if (ds1.FindDataElement(gdcm::Tag(0x0020,0x0012)) && ds2.FindDataElement(gdcm::Tag(0x0020,0x0012)))
+    if (ds1.FindDataElement(gdcm::Tag(0x0020,0x0012)) && ds2.FindDataElement(gdcm::Tag(0x0020,0x0012)))
     {
       acq_number1.Set(ds1);
       acq_number2.Set(ds2);
+
+      if (acq_number1 == acq_number2)
+      {
+        if (ds1.FindDataElement(gdcm::Tag(0x0008,0x0032)) && ds2.FindDataElement(gdcm::Tag(0x0008,0x0032)))
+        {
+          acq_time1.Set(ds1);
+          acq_time2.Set(ds2);
+
+          if (acq_time1 == acq_time2)
+          {
+            if (ds1.FindDataElement(gdcm::Tag(0x0018,0x1060)) && ds2.FindDataElement(gdcm::Tag(0x0018,0x1060)))
+            {
+              trg_time1.Set(ds1);
+              trg_time2.Set(ds2);
+
+              return trg_time1 < trg_time2;
+            }
+          }
+
+          return acq_time1 < acq_time2;
+        }
+      }
 
       return acq_number1 < acq_number2;
     }

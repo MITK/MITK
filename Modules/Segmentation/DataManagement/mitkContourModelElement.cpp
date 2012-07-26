@@ -50,21 +50,23 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(co
 {
   /* current version iterates over the whole deque - should some kind of an octree with spatial query*/
 
-  ConstVertexIterator it = this->m_Vertices->begin();
+  if(eps > 0){
+    ConstVertexIterator it = this->m_Vertices->begin();
 
-  ConstVertexIterator end = this->m_Vertices->end();
+    ConstVertexIterator end = this->m_Vertices->end();
 
-  while(it != end)
-  {
-    mitk::Point3D currentPoint = (*it)->Coordinates;
-
-    if(currentPoint.EuclideanDistanceTo(point) < eps)
+    while(it != end)
     {
-      //found an approximate point
-      return *it;
-    }
+      mitk::Point3D currentPoint = (*it)->Coordinates;
 
-    it++;
+      if(currentPoint.EuclideanDistanceTo(point) < eps)
+      {
+        //found an approximate point
+        return *it;
+      }
+
+      it++;
+    }
   }
   return NULL;
 }
@@ -116,23 +118,25 @@ bool mitk::ContourModelElement::RemoveVertexAt(mitk::Point3D &point, float eps)
 {
   /* current version iterates over the whole deque - should be some kind of an octree with spatial query*/
 
-  ConstVertexIterator it = this->m_Vertices->begin();
+  if(eps > 0){
+    ConstVertexIterator it = this->m_Vertices->begin();
 
-  ConstVertexIterator end = this->m_Vertices->end();
+    ConstVertexIterator end = this->m_Vertices->end();
 
-  while(it != end)
-  {
-    mitk::Point3D currentPoint = (*it)->Coordinates;
-
-    if(currentPoint.EuclideanDistanceTo(point) < eps)
+    while(it != end)
     {
-      //approximate point found
-      //now erase it
-      this->m_Vertices->erase(it);
-      return true;
-    }
+      mitk::Point3D currentPoint = (*it)->Coordinates;
 
-    it++;
+      if(currentPoint.EuclideanDistanceTo(point) < eps)
+      {
+        //approximate point found
+        //now erase it
+        this->m_Vertices->erase(it);
+        return true;
+      }
+
+      it++;
+    }
   }
   return false;
 }

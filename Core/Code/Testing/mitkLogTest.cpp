@@ -195,7 +195,7 @@ int mitkLogTest(int /* argc */, char* /*argv*/[])
   mitkLogTestClass::TestSimpleLog();
   mitkLogTestClass::TestThreadSaveLog();
   mitkLogTestClass::TestLoggingToFile();
-  mitkLogTestClass::TestAddAndRemoveBackends();
+  //mitkLogTestClass::TestAddAndRemoveBackends();
   
   // always end with this!
   MITK_TEST_END()

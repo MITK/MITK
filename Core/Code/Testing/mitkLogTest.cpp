@@ -53,7 +53,7 @@ void LogMessages()
   }
 
 
-static ITK_THREAD_RETURN_TYPE mitkTestLoggingThread::ThreadStartTracking(void* pInfoStruct)
+static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* pInfoStruct)
   {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;

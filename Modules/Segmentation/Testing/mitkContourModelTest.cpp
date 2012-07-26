@@ -33,7 +33,7 @@ static void TestAddVertex()
 
 
 
-//select a vertex by index. successful if the selected vertex member of the contour is no longer set to null
+//Select a vertex by index. successful if the selected vertex member of the contour is no longer set to null
 static void TestSelectVertexAtIndex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -50,7 +50,7 @@ static void TestSelectVertexAtIndex()
 
 
 
-//select a vertex by worldposition. successful if the selected vertex member of the contour is no longer set to null
+//Select a vertex by worldposition. successful if the selected vertex member of the contour is no longer set to null
 static void TestSelectVertexAtWorldposition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -63,12 +63,12 @@ static void TestSelectVertexAtWorldposition()
   //same point is used here so the epsilon can be chosen very small
   contour->SelectVertexAt(p, 0.01);
 
-  MITK_TEST_CONDITION(contour->GetSelectedVertex() != NULL, "Vertex was selected at index");
+  MITK_TEST_CONDITION(contour->GetSelectedVertex() != NULL, "Vertex was selected at position");
 }
 
 
 
-//move a vertex by a translation vector
+//Move a vertex by a translation vector
 static void TestMoveSelectedVertex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -78,7 +78,7 @@ static void TestMoveSelectedVertex()
 
   contour->AddVertex(p);
 
-  //same point is used here so the epsilon can be chosen very small
+  //Same point is used here so the epsilon can be chosen very small
   contour->SelectVertexAt(p, 0.01);
 
   mitk::Vector3D v;
@@ -101,7 +101,7 @@ static void TestMoveSelectedVertex()
 
 
 
-//test to move the whole contour
+//Test to move the whole contour
 static void TestMoveContour()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -143,7 +143,7 @@ static void TestMoveContour()
 
 
 
-//remove a vertex by index
+//Remove a vertex by index
 static void TestRemoveVertexAtIndex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -160,7 +160,7 @@ static void TestRemoveVertexAtIndex()
 
 
 
-//remove a vertex by position
+//Remove a vertex by position
 static void TestRemoveVertexAtWorldPosition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -177,7 +177,7 @@ static void TestRemoveVertexAtWorldPosition()
 
 
 
-//check closeable contour
+//Check closeable contour
 static void TestIsclosed()
 {
     mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -200,7 +200,7 @@ static void TestIsclosed()
 
 
 
-//test concatenating two contours
+//Test concatenating two contours
 static void TestConcatenate()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -241,6 +241,26 @@ static void TestConcatenate()
 
 
 
+//Try to select a vertex at position (within a epsilon of course) where no vertex is.
+//So the selected verted member should be null.
+static void TestSelectVertexAtWrongPosition()
+{
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
+
+  contour->AddVertex(p);
+
+  p[0] = p[1] = p[2] = 2;
+
+  contour->SelectVertexAt(p, 0.1);
+
+  MITK_TEST_CONDITION(contour->GetSelectedVertex() == NULL, "Vertex was not selected");
+}
+
+
+
 
 int mitkContourModelTest(int argc, char* argv[])
 {
@@ -254,6 +274,8 @@ int mitkContourModelTest(int argc, char* argv[])
   TestRemoveVertexAtWorldPosition();
   TestIsclosed();
   TestConcatenate();
+
+  TestSelectVertexAtWrongPosition();
 
   MITK_TEST_END()
 }

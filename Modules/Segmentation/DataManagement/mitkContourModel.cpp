@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ContourModel::ContourModel()
 {
   this->m_Contour = mitk::ContourModelElement::New();
+  Superclass::InitializeTimeSlicedGeometry(1);
   m_SelectedVertex = NULL;
 }
 
@@ -105,12 +106,12 @@ void mitk::ContourModel::SetRequestedRegionToLargestPossibleRegion ()
 
 bool mitk::ContourModel::RequestedRegionIsOutsideOfTheBufferedRegion ()
 {
-  return NULL;
+  return false;
 }
 
 bool mitk::ContourModel::VerifyRequestedRegion ()
 {
-  return NULL;
+  return true;
 }
 
 const mitk::Geometry3D * mitk::ContourModel::GetUpdatedGeometry (int t)

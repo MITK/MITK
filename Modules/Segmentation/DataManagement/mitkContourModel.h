@@ -90,6 +90,11 @@ namespace mitk
     {
       this->m_Contour->Close();
     }
+
+    void Deselect()
+    {
+      this->m_SelectedVertex = NULL;
+    }
 /*++++++++++++++++  END inline methods  +++++++++++++++++++++++*/
 
 

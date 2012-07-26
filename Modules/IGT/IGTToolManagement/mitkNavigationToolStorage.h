@@ -71,8 +71,8 @@ namespace mitk {
     /**
     *\brief These constants are used in conjunction with Microservices
     */
-    std::string US_INTERFACE_NAME; // Name of the interface
-    std::string US_PROPKEY_SOURCE_ID; // ID of the device this ToolStorage is associated with
+    static const std::string US_INTERFACE_NAME; // Name of the interface
+    static const std::string US_PROPKEY_SOURCE_ID; // ID of the device this ToolStorage is associated with
 
 
     /**

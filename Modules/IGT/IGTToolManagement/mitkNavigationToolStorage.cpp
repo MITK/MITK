@@ -22,11 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include "mitkModuleContext.h"
 
+const std::string  mitk::NavigationToolStorage::US_INTERFACE_NAME = "org.mitk.services.NavigationToolStorage"; // Name of the interface
+const std::string  mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID = US_INTERFACE_NAME + ".sourceID";
+
 mitk::NavigationToolStorage::NavigationToolStorage()
   {
-
-  US_INTERFACE_NAME = "org.mitk.services.NavigationToolStorage"; // Name of the interface
-  US_PROPKEY_SOURCE_ID = US_INTERFACE_NAME + ".sourceID";
   m_ToolCollection = std::vector<mitk::NavigationTool::Pointer>();
   this->m_DataStorage = NULL;
   }

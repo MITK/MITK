@@ -63,7 +63,7 @@ const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
 QmitkDicomEditor::QmitkDicomEditor()
 : m_Thread(new QThread())
 , m_DicomDirectoryListener(new QmitkDicomDirectoryListener())
-, m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&builder))
+, m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&m_Builder))
 , m_Publisher(new QmitkDicomDataEventPublisher())
 {
 }
@@ -82,6 +82,14 @@ QmitkDicomEditor::~QmitkDicomEditor()
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 {   
     m_Controls.setupUi( parent );
+    m_Controls.LocalStorageButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/drive-harddisk_32.png"));
+    m_Controls.FolderButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/folder_32.png"));
+    m_Controls.CDButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/media-optical_32.png"));
+    m_Controls.QueryRetrieveButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/network-workgroup_32.png"));
+    m_Controls.StoreSCPStatusLabel->setTextFormat(Qt::RichText);
+    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicom/network-offline_16.png'>");
+
+
     TestHandler();
 
     SetPluginDirectory();
@@ -89,8 +97,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     SetListenerDirectory("ListenerDirectory");
     StartDicomDirectoryListener();
 
-    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(false);
-    m_Controls.StoreSCPLabel->setVisible(false);
+    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(true);
 
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QString&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QString&)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalAddDicomData(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&)));
@@ -130,24 +137,21 @@ void QmitkDicomEditor::OnQueryRetrieve()
     OnChangePage(2);
     QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
     QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
-     if(!((builder.GetAETitle()->compare(storageAET,Qt::CaseSensitive)==0)&&
-         (builder.GetPort()->compare(storagePort,Qt::CaseSensitive)==0)))
+     if(!((m_Builder.GetAETitle()->compare(storageAET,Qt::CaseSensitive)==0)&&
+         (m_Builder.GetPort()->compare(storagePort,Qt::CaseSensitive)==0)))
      {
          StopStoreSCP();
          StartStoreSCP();
      }
-    m_Controls.StoreSCPLabel->setVisible(true);
 }
 
 void QmitkDicomEditor::OnFolderCDImport()
 {
-    m_Controls.StoreSCPLabel->setVisible(false);
 }
 
 void QmitkDicomEditor::OnLocalStorage()
 {
     OnChangePage(0);
-    m_Controls.StoreSCPLabel->setVisible(false);
 }
 
 void QmitkDicomEditor::OnChangePage(int page)
@@ -160,11 +164,11 @@ void QmitkDicomEditor::OnChangePage(int page)
     }
 }
 
-void QmitkDicomEditor::OnDicomImportFinished(const QString& /*path*/)
+void QmitkDicomEditor::OnDicomImportFinished(const QString&)
 {
 }
 
-void QmitkDicomEditor::OnDicomImportFinished(const QStringList& /*path*/)
+void QmitkDicomEditor::OnDicomImportFinished(const QStringList&)
 {
 }
 
@@ -180,7 +184,7 @@ void QmitkDicomEditor::StartDicomDirectoryListener()
     }
 }
 
-//TODO Remove
+
 void QmitkDicomEditor::TestHandler()
 {
     m_Handler = new DicomEventHandler();
@@ -206,18 +210,21 @@ void QmitkDicomEditor::StartStoreSCP()
 {
     QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
     QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
-    builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_ListenerDirectory);
-    m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&builder);
+    m_Builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_ListenerDirectory);
+    m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&m_Builder);
+    connect(m_StoreSCPLauncher, SIGNAL(SignalStatusOfStoreSCP(const QString&)), this, SLOT(OnStoreSCPStatusChanged(const QString&)));
     m_StoreSCPLauncher->StartStoreSCP();
-    m_Controls.StoreSCPLabel->setText("Storage provider is running on port: "+storagePort);
 
 }
 
+void QmitkDicomEditor::OnStoreSCPStatusChanged(const QString& status)
+{
+    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicom/network-idle_16.png'> "+status);
+}
 
 void QmitkDicomEditor::StopStoreSCP()
 {
     delete m_StoreSCPLauncher;
-    m_Controls.StoreSCPLabel->setText(QString("Storage service provider is not running!"));
 }
 
 void QmitkDicomEditor::SetPluginDirectory()

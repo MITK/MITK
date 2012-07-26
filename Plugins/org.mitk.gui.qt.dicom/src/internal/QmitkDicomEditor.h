@@ -1,4 +1,4 @@
-/*===================================================================
+/*=========================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
@@ -102,6 +102,8 @@ signals:
 
         void OnChangePage(int);
 
+        void OnStoreSCPStatusChanged(const QString& status);
+
         void TestHandler();
 
         void SetDatabaseDirectory(const QString& databaseDirectory);
@@ -120,7 +122,7 @@ protected:
 
     QThread* m_Thread;
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
-    QmitkStoreSCPLauncherBuilder builder;
+    QmitkStoreSCPLauncherBuilder m_Builder;
     QmitkStoreSCPLauncher* m_StoreSCPLauncher;
     DicomEventHandler* m_Handler;
     QmitkDicomDataEventPublisher* m_Publisher;

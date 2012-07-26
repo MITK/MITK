@@ -29,17 +29,21 @@ public:
     QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder);
     virtual ~QmitkStoreSCPLauncher();
 
-    public slots:
-        void StartStoreSCP();
-        void OnProcessError(QProcess::ProcessError error);
-        void OnStateChanged(QProcess::ProcessState status);
+public slots:
+    void StartStoreSCP();
+    void OnProcessError(QProcess::ProcessError error);
+    void OnStateChanged(QProcess::ProcessState status);
 
+signals:
+    void SignalStatusOfStoreSCP(const QString&);
 
 private:
     void FindPathToStoreSCP();
     void SetArgumentList(QmitkStoreSCPLauncherBuilder* builder);
     QString ArgumentListToQString();
     QString m_PathToStoreSCP;
+    QString m_ErrorText;
+    QString m_StatusText;
 
     QProcess* m_StoreSCP;
     QStringList m_ArgumentList;

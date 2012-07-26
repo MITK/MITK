@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include <QFileSystemWatcher>
 #include <QDir>
-#include <QMutex>
 
 
 #include<QTimer>
@@ -71,10 +70,9 @@ protected:
     void RemoveFilesFromDirectoryAndImportingFilesList(const QStringList& files);
 
     QFileSystemWatcher* m_FileSystemWatcher;
-    QStringList* m_FilesToImport;
-    QStringList* m_ImportingFiles;
+    QStringList m_FilesToImport;
+    QStringList m_ImportingFiles;
     QString m_DicomListenerDirectory;
-    QMutex m_Mutex;
 };
 
 #endif // QmitkDicomListener_h

@@ -35,9 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QTimer>
-
-#include <mitkStatusBar.h>
-#include <mitkProgressBar.h>
+#include <QLabel>
+#include <QProgressDialog>
 /*!
 \brief QmitkDicomLocalStorageWidget 
 
@@ -88,6 +87,7 @@ signals:
         /// @brief   Called when search parameters change.
         void OnSearchParameterChanged();
 
+        void OnProgress(int progress);
 
 protected:
 
@@ -98,6 +98,11 @@ protected:
     void AddDICOMData(const QStringList& dicomFiles);
 
     void SetDatabase(QString databaseFile);
+
+    void SetupProgressDialog();
+
+    QProgressDialog* m_ProgressDialog;
+    QLabel* m_ProgressDialogLabel;
 
     ctkDICOMDatabase* m_LocalDatabase;
     ctkDICOMModel* m_LocalModel;

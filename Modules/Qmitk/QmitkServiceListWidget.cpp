@@ -92,7 +92,7 @@ void QmitkServiceListWidget::Initialize(std::string interfaceName, std::string n
 template <class T>
 T QmitkServiceListWidget::GetSelectedService()
 {
-  return this->GetDeviceForListItem(this->m_Controls->m_ServiceList->currentItem());
+  return this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
 }
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
@@ -111,16 +111,16 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
 
   switch (event.GetType())
   {
-    case event.MODIFIED:
+    case mitk::ServiceEvent::MODIFIED:
       emit(ServiceModified(event.GetServiceReference()));
       RemoveServiceFromList(event.GetServiceReference());
       AddServiceToList(event.GetServiceReference());
       break;
-    case event.REGISTERED:
+    case mitk::ServiceEvent::REGISTERED:
       emit(ServiceRegistered(event.GetServiceReference()));
       AddServiceToList(event.GetServiceReference());
       break;
-    case event.UNREGISTERING:
+    case mitk::ServiceEvent::UNREGISTERING:
       emit(ServiceUnregistering(event.GetServiceReference()));
       RemoveServiceFromList(event.GetServiceReference());
       break;

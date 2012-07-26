@@ -83,7 +83,7 @@ void QmitkServiceListWidget::Initialize(std::string interfaceName, std::string n
   std::list<mitk::ServiceReference> services = this->GetAllRegisteredServices();
   // Transfer them to the List
   for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
-    AddServiceToList(& *it);
+    AddServiceToList(*it);
 }
 
 
@@ -98,8 +98,8 @@ T QmitkServiceListWidget::GetSelectedService()
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
 void QmitkServiceListWidget::OnServiceSelectionChanged(){
-  mitk::ServiceReference* ref = this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
-  if (ref == 0) return;
+  mitk::ServiceReference ref = this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
+  if (! ref) return;
 
   emit (ServiceSelected(ref));
 }
@@ -112,17 +112,17 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
   switch (event.GetType())
   {
     case event.MODIFIED:
-      emit(ServiceModified(& event.GetServiceReference()));
-      RemoveServiceFromList(& event.GetServiceReference());
-      AddServiceToList(& event.GetServiceReference());
+      emit(ServiceModified(event.GetServiceReference()));
+      RemoveServiceFromList(event.GetServiceReference());
+      AddServiceToList(event.GetServiceReference());
       break;
     case event.REGISTERED:
-      emit(ServiceRegistered(& event.GetServiceReference()));
-      AddServiceToList(& event.GetServiceReference());
+      emit(ServiceRegistered(event.GetServiceReference()));
+      AddServiceToList(event.GetServiceReference());
       break;
     case event.UNREGISTERING:
-      emit(ServiceUnregistering(& event.GetServiceReference()));
-      RemoveServiceFromList(& event.GetServiceReference());
+      emit(ServiceUnregistering(event.GetServiceReference()));
+      RemoveServiceFromList(event.GetServiceReference());
       break;
   //default:
     // mitkThrow() << "ServiceListenerWidget recieved an unrecognized event. Please Update Implementation of QmitkServiceListWidget::OnServiceEvent()";
@@ -132,14 +132,14 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
 
 /////////////////////// HOUSEHOLDING CODE /////////////////////////////////
 
-QListWidgetItem* QmitkServiceListWidget::AddServiceToList(mitk::ServiceReference* serviceRef){
+QListWidgetItem* QmitkServiceListWidget::AddServiceToList(mitk::ServiceReference serviceRef){
   QListWidgetItem *newItem = new QListWidgetItem;
   std::string caption;
   //TODO allow more complex formatting
   if (m_NamingProperty.empty())
     caption = m_Interface;
   else
-    caption = serviceRef->GetProperty(m_NamingProperty).ToString();
+    caption = serviceRef.GetProperty(m_NamingProperty).ToString();
 
   newItem->setText(caption.c_str());
 
@@ -153,23 +153,25 @@ QListWidgetItem* QmitkServiceListWidget::AddServiceToList(mitk::ServiceReference
   return newItem;
 }
 
-bool QmitkServiceListWidget::RemoveServiceFromList(mitk::ServiceReference* serviceRef){
-  for(std::vector<QmitkServiceListWidget::ServiceListLink>::iterator it = m_ListContent.begin(); it != m_ListContent.end(); ++it)
-    if (serviceRef == it->service)
+bool QmitkServiceListWidget::RemoveServiceFromList(mitk::ServiceReference serviceRef){
+  for(std::vector<QmitkServiceListWidget::ServiceListLink>::iterator it = m_ListContent.begin(); it != m_ListContent.end(); ++it){
+    if ( serviceRef == it->service )
     {
-      m_Controls->m_ServiceList->removeItemWidget(it->item);
+      int row = m_Controls->m_ServiceList->row(it->item);
+      QListWidgetItem* oldItem = m_Controls->m_ServiceList->takeItem(row);
+      delete oldItem;
       this->m_ListContent.erase(it);
       return true;
     }
+  }
   return false;
 }
 
 
-mitk::ServiceReference* QmitkServiceListWidget::GetServiceForListItem(QListWidgetItem* item)
+mitk::ServiceReference QmitkServiceListWidget::GetServiceForListItem(QListWidgetItem* item)
 {
   for(std::vector<QmitkServiceListWidget::ServiceListLink>::iterator it = m_ListContent.begin(); it != m_ListContent.end(); ++it)
     if (item == it->item) return it->service;
-  return 0;
 }
 
 

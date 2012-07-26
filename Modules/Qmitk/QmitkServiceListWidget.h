@@ -73,9 +73,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /*
     * \brief Returns the currently selected Service as a ServiceReference.
     */
-    mitk::ServiceReference* GetSelectedService();
-
-
+    mitk::ServiceReference GetSelectedService();
 
     /*
     *\brief This Function listens to ServiceRegistry changes and updates the
@@ -91,22 +89,22 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /*
     *\brief Emitted when a new Service mathing the filter is being registered.
     */
-    void ServiceRegistered(mitk::ServiceReference*);
+    void ServiceRegistered(mitk::ServiceReference);
 
     /*
     *\brief Emitted directly before a Service matching the filter is being unregistered.
     */
-    void ServiceUnregistering(mitk::ServiceReference*);
+    void ServiceUnregistering(mitk::ServiceReference);
 
     /*
     *\brief Emitted when a Service matching the filter changes it's properties.
     */
-    void ServiceModified(mitk::ServiceReference*);
+    void ServiceModified(mitk::ServiceReference);
 
     /*
     *\brief Emitted the user selects a Service from the list
     */
-    void ServiceSelected(mitk::ServiceReference*);
+    void ServiceSelected(mitk::ServiceReference);
 
   public slots:
 
@@ -126,7 +124,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * \brief  Internal structure used to link ServiceReferences to their QListWidgetItems
     */
     struct ServiceListLink {
-      mitk::ServiceReference* service;
+      mitk::ServiceReference service;
       QListWidgetItem* item;
     };
 
@@ -138,25 +136,22 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /*
     * \brief Constructs a ListItem from the given service, displays it, and locally stores the service.
     */
-    QListWidgetItem* AddServiceToList(mitk::ServiceReference* serviceRef);
-
+    QListWidgetItem* AddServiceToList(mitk::ServiceReference serviceRef);
 
     /*
     * \brief Removes the given service from the list and cleans up. Returns true if successful, false if service was not found.
     */
-    bool RemoveServiceFromList(mitk::ServiceReference* serviceRef);
+    bool RemoveServiceFromList(mitk::ServiceReference serviceRef);
 
     /*
     * \brief Returns the serviceReference corresponding to the given ListEntry or null if none was found (which really shouldn't happen).
     */
-    mitk::ServiceReference* GetServiceForListItem(QListWidgetItem* item);
+    mitk::ServiceReference GetServiceForListItem(QListWidgetItem* item);
 
     /*
     * \brief Returns a list of ServiceReferences matching the filter criteria by querying the service registry.
     */
     std::list<mitk::ServiceReference> GetAllRegisteredServices();
-
-
 
 
   private:

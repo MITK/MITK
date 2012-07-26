@@ -131,14 +131,20 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     };
 
     /*
-    * \brief  Contains a list of currently active services and their entires in the list. This is wiped with every ServiceRegistryEvent.
+    * \brief Contains a list of currently active services and their entires in the list. This is wiped with every ServiceRegistryEvent.
     */
     std::vector<ServiceListLink> m_ListContent;
 
     /*
-    * \brief Constructs a ListItem from the given service for display in the list of services.
+    * \brief Constructs a ListItem from the given service, displays it, and locally stores the service.
     */
-    QListWidgetItem* ConstructItemFromService(mitk::ServiceReference* serviceRef);
+    QListWidgetItem* AddServiceToList(mitk::ServiceReference* serviceRef);
+
+
+    /*
+    * \brief Removes the given service from the list and cleans up. Returns true if successful, false if service was not found.
+    */
+    bool RemoveServiceFromList(mitk::ServiceReference* serviceRef);
 
     /*
     * \brief Returns the serviceReference corresponding to the given ListEntry or null if none was found (which really shouldn't happen).

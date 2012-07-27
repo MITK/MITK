@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include <itkExceptionObject.h>
+#include <vector>
 
 namespace mitk {
   /**Documentation
@@ -62,7 +63,12 @@ namespace mitk {
     /** \return Returns how often the exception was rethrown. */
     int GetNumberOfRethrows();
     
-    /** \brief Returns the rethrow data of the specified rethrow number. */ 
+    /** @return Returns the rethrow data of the specified rethrow number. Returns empty data, if the rethrowNumber doesn't exist. 
+      * @param rethrowNumber The internal number of the rethrow.
+      * @param file (returnvalue) This varaiable will be filled with the file of the specified rethrow.
+      * @param file (returnvalue) This varaiable will be filled with the line of the specified rethrow.
+      * @param file (returnvalue) This varaiable will be filled with the message of the specified rethrow.
+      */ 
     void GetRethrowData(int rethrowNumber, std::string &file, int &line, std::string &message);
     
     /** \brief Definition of the bit shift operator for this class.*/
@@ -95,10 +101,10 @@ namespace mitk {
   
   struct ReThrowData
     {
-    std::string RethrowClassname,
-    int RethrowLine,
-    std::string RethrowMessage
-    }
+    std::string RethrowClassname;
+    int RethrowLine;
+    std::string RethrowMessage;
+    };
    
    std::vector<ReThrowData> m_RethrowData;
    

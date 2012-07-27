@@ -90,9 +90,11 @@ void QmitkServiceListWidget::Initialize(std::string interfaceName, std::string n
 ///////////////////////// Getter & Setter /////////////////////////////////
 
 template <class T>
-T QmitkServiceListWidget::GetSelectedService()
+T* QmitkServiceListWidget::GetSelectedService2()
 {
-  return this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
+  mitk::ServiceReference ref = GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
+  return dynamic_cast<T*> m_Context->GetService<T>(ref);
+
 }
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
@@ -178,4 +180,12 @@ mitk::ServiceReference QmitkServiceListWidget::GetServiceForListItem(QListWidget
 std::list<mitk::ServiceReference> QmitkServiceListWidget::GetAllRegisteredServices(){
   //Get Service References
   return m_Context->GetServiceReferences(m_Interface, m_Filter);
+}
+
+
+////////// DEBUG ///////////
+
+
+mitk::ModuleContext* QmitkServiceListWidget::provideContext(){
+  return m_Context;
 }

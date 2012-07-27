@@ -54,8 +54,8 @@ namespace mitk
     \param i index in x direction of image plane
     \param j index in y direction of image plane
     \param distance distance value at given index in mm
-    \param focalLength focalX length of optical system in pixel units in x-direction (mostly obtained from camera calibration)
-    \param focalLength focalY length of optical system in pixel units in y-direction (mostly obtained from camera calibration)
+    \param focalLengthX focal length of optical system in pixel units in x-direction (mostly obtained from camera calibration)
+    \param focalLengthY focal length of optical system in pixel units in y-direction (mostly obtained from camera calibration)
     \param principalPointX x coordinate of principal point on image plane in pixel
     \param principalPointY y coordinate of principal point on image plane in pixel
     \return cartesian coordinates for current index will be written here
@@ -173,8 +173,8 @@ namespace mitk
     \param cartesianPointX x coordinate of point (of a surface or point set) to convert in 3D coordinates
     \param cartesianPointY y coordinate of point (of a surface or point set) to convert in 3D coordinates
     \param cartesianPointZ z coordinate of point (of a surface or point set) to convert in 3D coordinates
-    \param focalLength focalX length of optical system in pixel units in x-direction (mostly obtained from camera calibration)
-    \param focalLength focalY length of optical system in pixel units in y-direction (mostly obtained from camera calibration)
+    \param focalLengthX focal length of optical system in pixel units in x-direction (mostly obtained from camera calibration)
+    \param focalLengthY focal length of optical system in pixel units in y-direction (mostly obtained from camera calibration)
     \param principalPointX x coordinate of principal point on image plane in pixel
     \param principalPointY y coordinate of principal point on image plane in pixel
     \param calculateDistance if this flag is set, the distance value is stored in the z position of the output otherwise z=0

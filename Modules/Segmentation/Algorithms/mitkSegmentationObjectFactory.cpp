@@ -28,6 +28,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourVtkMapper3D.h"
 
 
+#include "mitkContourModel.h"
+#include "mitkContourModelIOFactory.h"
+#include "mitkContourModelWriterFactory.h"
+#include "mitkContourModelWriter.h"
+#include "mitkContourModelMapper2D.h"
+
+
 mitk::SegmentationObjectFactory::SegmentationObjectFactory() 
 :CoreObjectFactoryBase()
 {
@@ -35,7 +42,7 @@ mitk::SegmentationObjectFactory::SegmentationObjectFactory()
   if (!alreadyDone)
   {
     MITK_DEBUG << "SegmentationObjectFactory c'tor" << std::endl;
-    
+     RegisterIOFactories();
     //CreateFileExtensionsMap();
     
     alreadyDone = true;
@@ -57,6 +64,13 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
     else if((dynamic_cast<ContourSet*>(data)!=NULL))
     {
       newMapper = mitk::ContourSetMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
+
+    std::string classname("ContourModel");
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::ContourModelMapper2D::New();
       newMapper->SetDataNode(node);
     }
   }
@@ -127,6 +141,12 @@ const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
 
 void mitk::SegmentationObjectFactory::RegisterIOFactories() 
 {
+  //register io classes of mitkContourModel
+  mitk::ContourModelIOFactory::RegisterOneFactory();
+  
+  mitk::ContourModelWriterFactory::RegisterOneFactory();
+
+  this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
 }
 
 void RegisterSegmentationObjectFactory() 

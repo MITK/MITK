@@ -211,6 +211,8 @@ protected:
     /** Write a start element tag */
     void WriteStartElement( const char *const tag, std::ofstream &file );
 
+    void WriteStartElementWithAttribut( const char *const tag, std::vector<std::string> attributes, std::vector<std::string> values, std::ofstream &file );
+
     /**
      * Write an end element tag
      * End-Elements following character data should pass indent = false.

@@ -186,8 +186,14 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
   for(unsigned int i=0; i< timecount; i++)
   {
     /*++++ <timestep> ++++*/
-    WriteStartElement( XML_TIME_STEP, out );
+    std::vector<std::string> at;
+    at.push_back("n");
+    std::vector<std::string> val;
+    val.push_back(ConvertToString(i));
+    WriteStartElementWithAttribut( XML_TIME_STEP, at, val, out );
 
+    /*++++ <controlPoints> ++++*/
+    WriteStartElement(XML_CONTROL_POINTS, out);
 
     mitk::ContourModel::VertexIterator it = contourModel->IteratorBegin();
     mitk::ContourModel::VertexIterator end = contourModel->IteratorEnd();
@@ -223,6 +229,9 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
       
       it++;
     }
+
+    /*++++ </controlPoints> ++++*/
+    WriteEndElement(XML_CONTROL_POINTS, out);
 
     /*++++ </timestep> ++++*/
     WriteEndElement( XML_TIME_STEP, out );
@@ -326,6 +335,43 @@ void mitk::ContourModelWriter::WriteStartElement( const char *const tag, std::of
     file << std::endl;
     WriteIndent( file );
     file << '<' << tag << '>';
+    m_IndentDepth++;
+}
+
+
+
+void mitk::ContourModelWriter::WriteStartElementWithAttribut( const char *const tag, std::vector<std::string> attributes, std::vector<std::string> values, std::ofstream &file )
+{
+    file << std::endl;
+    WriteIndent( file );
+    file << '<' << tag;
+
+    unsigned int attributesSize = attributes.size();
+    unsigned int valuesSize = values.size();
+
+    if( attributesSize == valuesSize){
+      for ( int i = 0; i < attributesSize; i++)
+      {
+        std::vector<std::string>::iterator attributesIt = attributes.begin();
+        std::vector<std::string>::iterator end = attributes.end();
+
+        std::vector<std::string>::iterator valuesIt = values.begin();
+
+        while(attributesIt != end)
+        {
+          file << ' ';
+          WriteCharacterData( *attributesIt, file);
+          file << '=' << '"';
+          WriteCharacterData( *valuesIt, file);
+          file << '"';
+          attributesIt++;
+          valuesIt++;
+        }
+      }
+    }
+
+
+    file << '>';
     m_IndentDepth++;
 }
 

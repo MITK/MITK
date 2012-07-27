@@ -29,7 +29,7 @@ int mitk::Exception::GetNumberOfRethrows()
     
 void mitk::Exception::GetRethrowData(int rethrowNumber, std::string &file, int &line, std::string &message)
     {
-      if ((rethrowNumber >= m_RethrowData.size()) || (rethrowNumber<0))
+      if ((rethrowNumber >= (int)m_RethrowData.size()) || (rethrowNumber<0))
         {
         file = "";
         line = 0;

@@ -75,7 +75,7 @@ void mitk::ContourModelReader::GenerateData()
 
             currentTimeStep = atoi(currentTimeSeries->Attribute("n"));
 
-            newContourModel = this->ReadPoint(newContourModel, currentTimeSeries, currentTimeStep);
+            this->ReadPoint(newContourModel, currentTimeSeries, currentTimeStep);
           }
           /*++++ END handle n timesteps within timestep tags ++++*/
 

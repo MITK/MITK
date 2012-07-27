@@ -54,11 +54,6 @@ mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != NULL)
     {
-        vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-        cleaner->SetInput(fiberPolyData);
-        cleaner->Update();
-        fiberPolyData = cleaner->GetOutput();
-
         m_FiberPolyData = fiberPolyData;
         //m_FiberPolyData->DeepCopy(fiberPolyData);
         this->DoColorCodingOrientationBased();
@@ -982,6 +977,12 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
 
 void mitk::FiberBundleX::UpdateFiberGeometry()
 {
+    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+    cleaner->SetInput(m_FiberPolyData);
+    cleaner->PointMergingOff();
+    cleaner->Update();
+    m_FiberPolyData = cleaner->GetOutput();
+
     m_FiberLengths.clear();
     m_MeanFiberLength = 0;
     m_MedianFiberLength = 0;
@@ -1053,7 +1054,7 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
         {
             if (length<m_MinFiberLength)
                 m_MinFiberLength = length;
-            else if (length>m_MaxFiberLength)
+            if (length>m_MaxFiberLength)
                 m_MaxFiberLength = length;
         }
     }
@@ -1171,6 +1172,7 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
 
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
+        MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
         vtkIdType   numPoints(0);
         vtkIdType*  points(NULL);
         vtkOldCells->GetNextCell ( numPoints, points );
@@ -1240,12 +1242,6 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
 
-    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-    cleaner->SetInput(m_FiberPolyData);
-    cleaner->PointMergingOff();
-    cleaner->Update();
-    m_FiberPolyData = cleaner->GetOutput();
-
     UpdateColorCoding();
     UpdateFiberGeometry();
     return true;
@@ -1253,13 +1249,17 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
 
 bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
 {
-    if (lengthInMM<=0 && lengthInMM>m_MinFiberLength)
+    if (lengthInMM<=0 || lengthInMM<m_MinFiberLength)
         return true;
+
+    if (lengthInMM>m_MaxFiberLength)    // can't remove all fibers
+        return false;
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();
     vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
     vLines->InitTraversal();
+    float min = m_MaxFiberLength;
     for (int i=0; i<m_NumFibers; i++)
     {
         MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
@@ -1277,6 +1277,8 @@ bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
                 container->GetPointIds()->InsertNextId(id);
             }
             vtkNewCells->InsertNextCell(container);
+            if (m_FiberLengths.at(i)<min)
+                min = m_FiberLengths.at(i);
         }
     }
 
@@ -1286,6 +1288,7 @@ bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
+
     UpdateColorCoding();
     UpdateFiberGeometry();
     return true;
@@ -1293,8 +1296,11 @@ bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
 
 bool mitk::FiberBundleX::RemoveLongFibers(float lengthInMM)
 {
-    if (lengthInMM<=0 && lengthInMM>m_MaxFiberLength)
+    if (lengthInMM<=0 || lengthInMM>m_MaxFiberLength)
         return true;
+
+    if (lengthInMM<m_MinFiberLength)    // can't remove all fibers
+        return false;
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();

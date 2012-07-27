@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
+#define _USE_MATH_DEFINES
 #include "mitkFiberBundleX.h"
 
 #include <mitkPlanarCircle.h>
@@ -36,8 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkParametricSpline.h>
 #include <vtkPolygon.h>
 #include <vtkCleanPolyData.h>
-
-#define _USE_MATH_DEFINES
 #include <cmath>
 
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
@@ -46,6 +45,7 @@ const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "FA_Values";
 const char* mitk::FiberBundleX::COLORCODING_CUSTOM = "custom";
 const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";
 
+using namespace std;
 
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_CurrentColorCoding(NULL)

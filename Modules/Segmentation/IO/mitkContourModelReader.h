@@ -72,7 +72,8 @@ public:
      */
     itkGetStringMacro( FilePattern );
     
-    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
+    static bool CanReadFile(const std::string filename, const std::string filePrefix,
+      const std::string filePattern);
     
     /**
      * @returns whether the last read attempt was successful or not.
@@ -96,7 +97,7 @@ protected:
      */
     virtual void GenerateData();
     
-    virtual mitk::ContourModel::Pointer ReadPoint(mitk::ContourModel::Pointer newContourModel, 
+    virtual void ReadPoint(mitk::ContourModel::Pointer newContourModel, 
       TiXmlElement* currentTimeSeries, unsigned int currentTimeStep);
 
     /**

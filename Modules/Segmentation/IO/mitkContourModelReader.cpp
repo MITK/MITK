@@ -30,7 +30,7 @@ mitk::ContourModelReader::~ContourModelReader()
 
 
 void mitk::ContourModelReader::GenerateData()
-{/*
+{
     std::locale::global(std::locale("C"));
 
     m_Success = false;
@@ -51,31 +51,45 @@ void mitk::ContourModelReader::GenerateData()
     if (loadOkay)
     {
       TiXmlHandle docHandle( &doc );
+
+      //handle geometry information
+      TiXmlElement* currentContourModelElement = docHandle.FirstChildElement("contourModel").FirstChildElement("head").FirstChildElement("geometryInformation").ToElement();
+      
+      
+      /*++++ handle n contourModels within data tags ++++*/
       unsigned int contourCounter(0);
-      for( TiXmlElement* currentContourModelElement = docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
+
+      for( TiXmlElement* currentContourModelElement = docHandle.FirstChildElement("contourModel").FirstChildElement("data").ToElement();
         currentContourModelElement != NULL; currentContourModelElement = currentContourModelElement->NextSiblingElement())
       {
         mitk::ContourModel::Pointer newContourModel = mitk::ContourModel::New();
-        if(currentContourModelElement->FirstChildElement("time_series") != NULL)
+        if(currentContourModelElement->FirstChildElement("timestep") != NULL)
         {
-          for( TiXmlElement* currentTimeSeries = currentContourModelElement->FirstChildElement("time_series")->ToElement();
+
+          /*++++ handle n timesteps within timestep tags ++++*/
+          for( TiXmlElement* currentTimeSeries = currentContourModelElement->FirstChildElement("timestep")->ToElement();
             currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
           {
             unsigned int currentTimeStep(0);
-            TiXmlElement* currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
+            
 
-            currentTimeStep = atoi(currentTimeSeriesID->GetText());
+            currentTimeStep = atoi(currentTimeSeries->Attribute("n"));
 
             newContourModel = this->ReadPoint(newContourModel, currentTimeSeries, currentTimeStep);
           }
+          /*++++ END handle n timesteps within timestep tags ++++*/
+
         } 
         else 
         {
-          newContourModel = this->ReadPoint(newContourModel, currentContourModelElement, 0);
+          //this should not happen
+          MITK_WARN << "wrong file format!";
+          //newContourModel = this->ReadPoint(newContourModel, currentContourModelElement, 0);
         }
-        this->SetNthOutput( ContourModelCounter, newContourModel );
+        this->SetNthOutput( contourCounter, newContourModel );
         contourCounter++;
       }
+      /*++++ END handle n contourModels within data tags ++++*/
     }
     else
     {
@@ -83,48 +97,47 @@ void mitk::ContourModelReader::GenerateData()
     }
   }catch(...)
    {
-      MITK_ERROR  << "Cannot read point set.";
+      MITK_ERROR  << "Cannot read contourModel.";
       m_Success = false;
    }
-    m_Success = true;*/
+    m_Success = true;
 }
 
-mitk::ContourModel::Pointer mitk::ContourModelReader::ReadPoint(mitk::ContourModel::Pointer newContourModel, 
+void mitk::ContourModelReader::ReadPoint(mitk::ContourModel::Pointer newContourModel, 
         TiXmlElement* currentTimeSeries, unsigned int currentTimeStep) 
-{/*
-  if(currentTimeSeries->FirstChildElement("point") != NULL)
+{
+  //check if the timesteps in contourModel have to be expanded
+  if(currentTimeStep != newContourModel->GetTimeSteps())
   {
-    for( TiXmlElement* currentPoint = currentTimeSeries->FirstChildElement("point")->ToElement();
+    newContourModel->Expand(currentTimeStep+1);
+  }
+
+  //read all points within controlPoints tag
+  if(currentTimeSeries->FirstChildElement("controlPoints")->FirstChildElement("point") != NULL)
+  {
+    for( TiXmlElement* currentPoint = currentTimeSeries->FirstChildElement("controlPoints")->FirstChildElement("point")->ToElement();
               currentPoint != NULL; currentPoint = currentPoint->NextSiblingElement())
       {
-        unsigned int id(0);
+
         mitk::PointSpecificationType spec((mitk::PointSpecificationType) 0);
         double x(0.0);
         double y(0.0);
         double z(0.0);
 
-       id = atoi(currentPoint->FirstChildElement("id")->GetText());
-        if(currentPoint->FirstChildElement("specification") != NULL)
-        {
-          spec = (mitk::PointSpecificationType) atoi(currentPoint->FirstChildElement("specification")->GetText());
-        }
         x = atof(currentPoint->FirstChildElement("x")->GetText());
         y = atof(currentPoint->FirstChildElement("y")->GetText());
         z = atof(currentPoint->FirstChildElement("z")->GetText());
 
         mitk::Point3D point;
         mitk::FillVector3D(point, x, y, z);
-        newContourModel->SetPoint(id, point, spec, currentTimeStep);
+        newContourModel->AddVertex(point);
       }
     }
   else
   {
-    if(currentTimeStep != newContourModel->GetTimeSteps()+1)
-    {
-      newContourModel->Expand(currentTimeStep+1);     // expand time step series with empty time step
-    }
+    //nothing to read
   }
-    return newContourModel;*/return NULL;
+
 }
 
 void mitk::ContourModelReader::GenerateOutputInformation()
@@ -153,14 +166,14 @@ bool mitk::ContourModelReader::CanReadFile(const std::string filename, const std
     return false;
 
   bool extensionFound = false;
-  std::string::size_type MPSPos = filename.rfind(".mps");
+  std::string::size_type MPSPos = filename.rfind(".cnt");
   if ((MPSPos != std::string::npos)
       && (MPSPos == filename.length() - 4))
     {
     extensionFound = true;
     }
 
-  MPSPos = filename.rfind(".MPS");
+  MPSPos = filename.rfind(".CNT");
   if ((MPSPos != std::string::npos)
       && (MPSPos == filename.length() - 4))
     {

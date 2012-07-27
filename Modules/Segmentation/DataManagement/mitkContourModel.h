@@ -46,39 +46,40 @@ namespace mitk
     typedef mitk::ContourModelElement::VertexType VertexType;
     typedef mitk::ContourModelElement::VertexListType VertexListType;
     typedef mitk::ContourModelElement::ConstVertexIterator VertexIterator;
+    typedef std::vector< mitk::ContourModelElement::Pointer > ContourModelSeries;
 /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
 
 
 /*++++++++++++++++  inline methods  +++++++++++++++++++++++*/
-    void AddVertex(mitk::Point3D &vertex)
+    void AddVertex(mitk::Point3D &vertex, unsigned int timestep=0)
     {
-      this->m_Contour->AddVertex(vertex);
+      this->m_ContourSeries[timestep]->AddVertex(vertex);
     }
 
-    bool IsClosed()
+    bool IsClosed(unsigned int timestep=0)
     {
-      return this->m_Contour->IsClosed();
+      return this->m_ContourSeries[timestep]->IsClosed();
     }
 
-    void Concatenate(mitk::ContourModel* other)
+    void Concatenate(mitk::ContourModel* other, unsigned int timestep=0)
     {
-      this->m_Contour->Concatenate(other->m_Contour);
+      this->m_ContourSeries[timestep]->Concatenate(other->m_ContourSeries[timestep]);
     }
 
-    VertexIterator IteratorBegin()
+    VertexIterator IteratorBegin(unsigned int timestep=0)
     {
-      return this->m_Contour->ConstIteratorBegin();
+      return this->m_ContourSeries[timestep]->ConstIteratorBegin();
     }
 
-    VertexIterator IteratorEnd()
+    VertexIterator IteratorEnd( unsigned int timestep=0)
     {
-      return this->m_Contour->ConstIteratorEnd();
+      return this->m_ContourSeries[timestep]->ConstIteratorEnd();
     }
 
-    int GetNumberOfVertices()
+    int GetNumberOfVertices( unsigned int timestep=0)
     {
-      return this->m_Contour->GetSize();
+       return this->m_ContourSeries[timestep]->GetSize();
     }
 
     VertexType* GetSelectedVertex()
@@ -86,9 +87,9 @@ namespace mitk
       return this->m_SelectedVertex;
     }
 
-    virtual void Close()
+    virtual void Close(unsigned int timestep=0)
     {
-      this->m_Contour->Close();
+      this->m_ContourSeries[timestep]->Close();
     }
 
     void Deselect()
@@ -99,17 +100,17 @@ namespace mitk
 
 
 
-    bool SelectVertexAt(int index);
+    bool SelectVertexAt(int index, unsigned int timestep=0);
 
-    bool SelectVertexAt(mitk::Point3D &point, float eps);
+    bool SelectVertexAt(mitk::Point3D &point, float eps, unsigned int timestep=0);
 
-    bool RemoveVertexAt(int index);
+    bool RemoveVertexAt(int index, unsigned int timestep=0);
 
-    bool RemoveVertexAt(mitk::Point3D &point, float eps);
+    bool RemoveVertexAt(mitk::Point3D &point, float eps, unsigned int timestep=0);
 
     void MoveSelectedVertex(mitk::Vector3D &translate);
 
-    void MoveContour(mitk::Vector3D &translate);
+    void MoveContour(mitk::Vector3D &translate, unsigned int timestep=0);
 
 
 /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/
@@ -125,6 +126,8 @@ namespace mitk
 
     virtual void SetRequestedRegion (itk::DataObject *data);
 
+    virtual void Expand( unsigned int timeSteps );
+
 
   protected:
 
@@ -134,7 +137,8 @@ namespace mitk
 
     void MoveVertex(VertexType* vertex, mitk::Vector3D &vector);
 
-    mitk::ContourModelElement::Pointer m_Contour;
+
+    ContourModelSeries m_ContourSeries;
     VertexType* m_SelectedVertex;
   };
 }

@@ -17,13 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ContourModel::ContourModel()
 {
-  this->m_Contour = mitk::ContourModelElement::New();
+  m_ContourSeries.push_back(mitk::ContourModelElement::New());
+
   Superclass::InitializeTimeSlicedGeometry(1);
   m_SelectedVertex = NULL;
 }
 
 mitk::ContourModel::ContourModel(const mitk::ContourModel &other) :
-m_Contour(other.m_Contour)
+m_ContourSeries(other.m_ContourSeries)
 {
   m_SelectedVertex = NULL;
 }
@@ -31,39 +32,39 @@ m_Contour(other.m_Contour)
 mitk::ContourModel::~ContourModel()
 {
   m_SelectedVertex = NULL;
-  this->m_Contour = NULL;
+  this->m_ContourSeries.clear();//TODO check destruction
 }
 
 
-bool mitk::ContourModel::SelectVertexAt(int index)
+bool mitk::ContourModel::SelectVertexAt(int index, unsigned int timestep)
 {
-  if(index < 0 || index > this->m_Contour->GetSize())
+  if(index < 0 || index > this->m_ContourSeries[timestep]->GetSize())
     return false;
 
-  this->m_SelectedVertex = this->m_Contour->GetVertexAt(index);
+  this->m_SelectedVertex = this->m_ContourSeries[timestep]->GetVertexAt(index);
 
   return true;
 }
 
-bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps)
+bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, unsigned int timestep)
 {
-  this->m_SelectedVertex = this->m_Contour->GetVertexAt(point, eps);
+  this->m_SelectedVertex = this->m_ContourSeries[timestep]->GetVertexAt(point, eps);
   return this->m_SelectedVertex != NULL;
 }
 
-bool mitk::ContourModel::RemoveVertexAt(int index)
+bool mitk::ContourModel::RemoveVertexAt(int index, unsigned int timestep)
 {
-  if(index < 0 || index > this->m_Contour->GetSize())
+  if(index < 0 || index > this->m_ContourSeries[timestep]->GetSize())
     return false;
 
-  this->m_Contour->RemoveVertexAt(index);
+  this->m_ContourSeries[timestep]->RemoveVertexAt(index);
 
   return true;
 }
 
-bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps)
+bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps, unsigned int timestep)
 {
-  return this->m_Contour->RemoveVertexAt(point, eps);
+  return this->m_ContourSeries[timestep]->RemoveVertexAt(point, eps);
 }
 
 void mitk::ContourModel::MoveSelectedVertex(mitk::Vector3D &translate)
@@ -74,9 +75,9 @@ void mitk::ContourModel::MoveSelectedVertex(mitk::Vector3D &translate)
   }
 }
 
-void mitk::ContourModel::MoveContour(mitk::Vector3D &translate)
+void mitk::ContourModel::MoveContour(mitk::Vector3D &translate, unsigned int timestep)
 {
-  VertexListType* vList = this->m_Contour->GetVertexList();
+  VertexListType* vList = this->m_ContourSeries[timestep]->GetVertexList();
   VertexIterator it = vList->begin();
   VertexIterator end = vList->end();
 
@@ -97,6 +98,17 @@ void mitk::ContourModel::MoveVertex(VertexType* vertex, mitk::Vector3D &vector)
   vertex->Coordinates[2] += vector[2];
 }
 
+
+void mitk::ContourModel::Expand( unsigned int timeSteps )
+{
+  unsigned int oldSize = this->m_ContourSeries.size();
+
+  if( timeSteps > oldSize )
+  {
+    Superclass::Expand(timeSteps);
+    m_ContourSeries.push_back(mitk::ContourModelElement::New());
+  }
+}
 
 
 void mitk::ContourModel::SetRequestedRegionToLargestPossibleRegion ()

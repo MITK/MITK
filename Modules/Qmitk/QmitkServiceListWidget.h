@@ -68,7 +68,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     *  Make sure you pass the appropriate type, or else this call will fail.
     */
     template <class T>
-    T GetSelectedService();
+    T* GetSelectedService2();
 
     /*
     * \brief Returns the currently selected Service as a ServiceReference.
@@ -81,6 +81,8 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     *       it is instead used to recieve events from the module registry.
     */
     void OnServiceEvent(const mitk::ServiceEvent event);
+
+    mitk::ModuleContext* provideContext();
 
 
 

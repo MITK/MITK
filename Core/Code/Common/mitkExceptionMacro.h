@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include "mitkException.h"
 
-/** The exception macro is used to print error information / throw an exception 
+/** The exception macro is used to throw an exception 
  *  (i.e., usually a condition that results in program failure). 
  *
  *  Example usage looks like:
@@ -31,12 +31,27 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 #define mitkThrow() throw mitk::Exception(__FILE__,__LINE__,"",ITK_LOCATION)
 
-//TODO implement and document
-//#define mitkReThrow(mitkexception) \
-//    throw mitkexception
-    
-
-/** The specialized exception macro is used to print error information / throw exceptions 
+/** The rethrow macro is used to rethrow an existing exception. The
+  * rethrow information (file,line of code) is then additionally stored
+  * in the exception. To check if an exception was rethrown you can use
+  * the methods GetNumberOfRethrows() and GetRethrowData().
+  *
+  * Example usage:
+  * try
+  *   {
+  *   //some code that throws an exception
+  *   }
+  * catch(mitk::Exception e)
+  *   {
+  *   //here we want to rethrow the exception
+  *   mitkmitkReThrow(e) << "Message that will be appended to the exception (optional)";
+  *   }
+  */
+#define mitkReThrow(mitkexception) \
+    mitkexception.AddRethrowData(__FILE__,__LINE__,"Rethrow by mitkReThrow macro.");\
+    throw mitkexception
+ 
+/** The specialized exception macro is used to throw exceptions 
   * in cases of specialized errors. This means the second parameter must be a class which 
   * inherits from mitk::Exception. An object of this exception is thrown when using the macro.
   * Thus, more differentiated excaptions can be thrown, when needed.

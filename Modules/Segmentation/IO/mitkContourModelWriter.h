@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SegmentationExports.h"
 #include <itkProcessObject.h>
-#include <mitkFileWriter.h>
+#include <mitkFileWriterWithInformation.h>
 #include <mitkContourModel.h>
 
 namespace mitk
@@ -34,7 +34,7 @@ namespace mitk
  * @ingroup PSIO
  * @ingroup Process
  */
-class Segmentation_EXPORT ContourModelWriter : public mitk::FileWriter
+class Segmentation_EXPORT ContourModelWriter : public mitk::FileWriterWithInformation
 {
 public:
 
@@ -131,10 +131,24 @@ public:
     virtual void SetInput( DataNode* );
 
     /**
-     * @returns whether the last write attempt was successful or not.
-     */
+    * @returns whether the last write attempt was successful or not.
+    */
     bool GetSuccess() const;
-    
+
+    /*++++++ FileWriterWithInformation methods +++++++*/
+    virtual const char *GetDefaultFilename() { return "ContourModel.cnt"; }
+    virtual const char *GetFileDialogPattern() { return "MITK ContourModel (*.cnt)"; }
+    virtual const char *GetDefaultExtension() { return ".cnt"; }
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::ContourModel *>(data.GetPointer()) != NULL); };  
+    virtual void DoWrite(BaseData::Pointer data) 
+    { 
+      if (this->CanWriteBaseDataType(data)) 
+      {
+        this->SetInput(dynamic_cast<mitk::ContourModel *>(data.GetPointer())); 
+        this->Update(); 
+      }
+    }
+
 protected:
 
     /**

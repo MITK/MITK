@@ -85,15 +85,21 @@ void QmitkPropertyTreeView::OnFilterChanged(const QString &filter)
 
 void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer> &nodes)
 {
+  std::string partName = "Properties";
+
   if (nodes.empty() || nodes.front().IsNull())
-    return;
+  {
+    SetPartName(partName);
+    m_Model->SetProperties(NULL);
+  }
+  else
+  {
+    std::ostringstream extPartName;
+    extPartName << partName << " (" << nodes.front()->GetName() << ")";
+    SetPartName(extPartName.str().c_str());
 
-  std::ostringstream partName;
-  partName << "Properties (" << nodes.front()->GetName() << ")";
-
-  SetPartName(partName.str().c_str());
-
-  m_Model->SetProperties(nodes.front()->GetPropertyList());
+    m_Model->SetProperties(nodes.front()->GetPropertyList());
+  }
 }
 
 void QmitkPropertyTreeView::SetFocus()

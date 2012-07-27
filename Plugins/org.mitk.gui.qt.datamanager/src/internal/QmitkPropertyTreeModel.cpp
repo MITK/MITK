@@ -45,10 +45,11 @@ void QmitkPropertyTreeModel::SetProperties(mitk::PropertyList *properties)
     m_Properties = NULL;
   }
 
+  CreateRootItem();
+
   if (properties != NULL && !properties->IsEmpty())
   {
     m_Properties = properties;
-    CreateRootItem();
 
     std::map<std::string, mitk::BaseProperty::Pointer>::const_iterator end = properties->GetMap()->end();
 

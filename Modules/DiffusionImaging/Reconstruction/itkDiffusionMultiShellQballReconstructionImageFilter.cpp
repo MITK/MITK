@@ -701,6 +701,15 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   vnl_vector<double> DataShell2(Shell2Indiecies.size());
   vnl_vector<double> DataShell3(Shell3Indiecies.size());
 
+  vnl_matrix<double> tempInterpolationMatrixShell1,tempInterpolationMatrixShell2,tempInterpolationMatrixShell3;
+
+  if(m_Interpolation_Flag)
+  {
+    tempInterpolationMatrixShell1 = (*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv);
+    tempInterpolationMatrixShell2 = (*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT2_inv);
+    tempInterpolationMatrixShell3 = (*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT3_inv);
+  }
+
   OdfPixelType odf(0.0);
   typename CoefficientImageType::PixelType coeffPixel(0.0);
 
@@ -719,16 +728,37 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     double shell3b0Norm =0;
     double b0average = 0;
     const int b0size = BZeroIndicies.size();
-    for(unsigned int i = 0; i <b0size ; ++i)
+
+    if(b0size == 1)
     {
-      if(i < b0size / 3)                          shell1b0Norm += b[BZeroIndicies[i]];
-      if(i >= b0size / 3 && i < (b0size / 3)*2)   shell2b0Norm += b[BZeroIndicies[i]];
-      if(i >= (b0size / 3) * 2)                   shell3b0Norm += b[BZeroIndicies[i]];
+      shell1b0Norm = b[BZeroIndicies[0]];
+      shell2b0Norm = b[BZeroIndicies[0]];
+      shell3b0Norm = b[BZeroIndicies[0]];
+      b0average = b[BZeroIndicies[0]];
+    }else if(b0size % 3 ==0)
+    {
+      for(unsigned int i = 0; i <b0size ; ++i)
+      {
+        if(i < b0size / 3)                          shell1b0Norm += b[BZeroIndicies[i]];
+        if(i >= b0size / 3 && i < (b0size / 3)*2)   shell2b0Norm += b[BZeroIndicies[i]];
+        if(i >= (b0size / 3) * 2)                   shell3b0Norm += b[BZeroIndicies[i]];
+      }
+      shell1b0Norm /= (b0size/3);
+      shell2b0Norm /= (b0size/3);
+      shell3b0Norm /= (b0size/3);
+      b0average = (shell1b0Norm + shell2b0Norm+ shell3b0Norm)/3;
+    }else
+    {
+      for(unsigned int i = 0; i <b0size ; ++i)
+      {
+        shell1b0Norm += b[BZeroIndicies[i]];
+      }
+      shell1b0Norm /= b0size;
+      shell2b0Norm = shell1b0Norm;
+      shell3b0Norm = shell1b0Norm;
+      b0average = shell1b0Norm;
     }
-    shell1b0Norm /= (BZeroIndicies.size()/3);
-    shell2b0Norm /= (BZeroIndicies.size()/3);
-    shell3b0Norm /= (BZeroIndicies.size()/3);
-    b0average = (shell1b0Norm + shell2b0Norm+ shell3b0Norm)/3;
+
     bzeroIterator.Set(b0average);
     ++bzeroIterator;
 
@@ -736,7 +766,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     {
       // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
 
-      ///fsl fix ---------------------------------------------------
+      /*//fsl fix ---------------------------------------------------
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
       for(int i = 0 ; i < Shell2Indiecies.size(); i++)
@@ -748,9 +778,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       S_S0Normalization(DataShell1, shell1b0Norm);
       S_S0Normalization(DataShell2, shell2b0Norm);
       S_S0Normalization(DataShell3, shell2b0Norm);
-      //fsl fix -------------------------------------------ende--
+      *///fsl fix -------------------------------------------ende--
 
-      /* correct version
+      ///correct version
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
       for(int i = 0 ; i < Shell2Indiecies.size(); i++)
@@ -762,13 +792,13 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       S_S0Normalization(DataShell1, shell1b0Norm);
       S_S0Normalization(DataShell2, shell2b0Norm);
       S_S0Normalization(DataShell3, shell3b0Norm);
-        */
+
 
       if(m_Interpolation_Flag)
       {
-        E1 = ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (DataShell1));
-        E2 = ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT2_inv) * (DataShell2));
-        E3 = ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT3_inv) * (DataShell3));
+        E1 = tempInterpolationMatrixShell1 * DataShell1;
+        E2 = tempInterpolationMatrixShell2 * DataShell2;
+        E3 = tempInterpolationMatrixShell3 * DataShell3;
       }else{
         E1 = (DataShell1);
         E2 = (DataShell2);

@@ -16,8 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataSequentialPlayer.h"
 
-//for the pause
-#include <itksys/SystemTools.hxx>
+#include <itksys/SystemTools.hxx> //for the pause
 
 #include <mitkTimeStamp.h>
 #include <fstream>
@@ -50,9 +49,8 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
   int toolcount;
   if(!m_DataElem)
   {
-    //throwing an exception
-    mitkThrowException(mitk::IGTException) << "Data element not found";
     MITK_WARN << "Data element not found";
+    mitkThrowException(mitk::IGTException) << "Data element not found"; 
   }
   else
   {
@@ -92,6 +90,12 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
 
 void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
 {
+  if(!m_Repeat && (this->GetNumberOfSnapshots()<i))
+    {
+      MITK_ERROR << "Snaphot " << i << " does not exist and repat is off: can't go to that snapshot!";
+      mitkThrowException(mitk::IGTException) << "Snaphot " << i << " does not exist and repat is off: can't go to that snapshot!";
+    }
+
   assert(m_DataElem);
 
   int numOfUpdateCalls = 0;
@@ -105,15 +109,12 @@ void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
   {
     if(!m_Repeat)
     {
-      //throwing an exception
-      mitkThrowException(mitk::IGTException)<<"cannot go back to snapshot " << i << " because the "
+      std::stringstream message;
+      message <<"cannot go back to snapshot " << i << " because the "
           << this->GetNameOfClass() << " is configured to not repeat the"
           << " navigation data";
-
-      MITK_WARN << "cannot go back to snapshot " << i << " because the "
-          << this->GetNameOfClass() << " is configured to not repeat the"
-          << " navigation data";
-
+      MITK_WARN << message;
+      mitkThrowException(mitk::IGTException) << message;
     }
     else
     {
@@ -131,40 +132,37 @@ void mitk::NavigationDataSequentialPlayer::
     SetFileName(const std::string& _FileName)
 {
   m_FileName = _FileName;
-  // if Loading wasnt succesfull
-  // (!m_Doc->LoadFile(m_FileName)=false) wherase (m_Doc->LoadFile(m_FileName)=true)
-
+  
   if(!m_Doc->LoadFile(m_FileName))
   {
     this->SetNumberOfOutputs(0);
     std::ostringstream s;
     s << "File " << _FileName << " could not be loaded";
-    //may be we need to change to mitk::exception
     mitkThrowException(mitk::IGTIOException)<<s.str();
-    //throw std::invalid_argument(s.str());
   }
   else
+  {
     this->ReinitXML();
+  }
 
   this->Modified();
 }
 
-//NEW PART is ADDED
 void mitk::NavigationDataSequentialPlayer::
     SetXMLString(const std::string& _XMLString)
 {
   m_XMLString = _XMLString;
   if((m_Doc->Parse( m_XMLString.c_str()))== NULL)
   {
-  this->ReinitXML();
-  } else 
+    this->ReinitXML();
+  } 
+  else 
   {
     //if the string is not an XML string
-   std::ostringstream s;
-   s << "String" << _XMLString << " is not an XML string";
-   mitkThrowException(mitk::IGTIOException)<<s.str();
+    std::ostringstream s;
+    s << "String" << _XMLString << " is not an XML string";
+    mitkThrowException(mitk::IGTIOException)<<s.str();
   } 
-
   this->Modified();
 }
 
@@ -173,16 +171,17 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
   assert(m_DataElem);
   // very important: go through the tools (there could be more than one)
   mitk::NavigationData::Pointer tmp;
-  //MITK_INFO << "this->GetNumberOfOutputs()" << this->GetNumberOfOutputs();
+  
   for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
   {
-    //MITK_INFO << "index" << index;
     // go to the first element
     if(!m_CurrentElem)
       m_CurrentElem = m_DataElem->FirstChildElement("NavigationData");
     // go to the next element
     else
+      {
       m_CurrentElem = m_CurrentElem->NextSiblingElement();
+      }
 
     // if repeat is on: go back to the first element (prior calls delivered NULL
     // elem)
@@ -200,9 +199,9 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
       {
       output->SetDataValid(false);
       m_StreamValid = false;
-      //throwing exception 
-      mitkThrowException(mitk::IGTException)<<"Error: Cannot parse input file.";
-      //m_ErrorMessage = "Error: Cannot parse input file.";
+      
+      m_ErrorMessage = "Error: Cannot parse input file.";
+      mitkThrowException(mitk::IGTException)<<m_ErrorMessage;
       }
   }
 }

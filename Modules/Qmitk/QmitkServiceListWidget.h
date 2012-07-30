@@ -96,22 +96,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
       {
         std::string interfaceName ( us_service_interface_iid<T*>() );
         m_Interface = interfaceName;
-        if (filter.empty())
-          m_Filter = "(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + m_Interface + ")";
-        else
-          m_Filter = filter;
-        m_NamingProperty = namingProperty;
-        m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
-        m_Context->AddServiceListener(this, &QmitkServiceListWidget::OnServiceEvent, m_Filter);
-          // Empty ListWidget
-        this->m_ListContent.clear();
-        m_Controls->m_ServiceList->clear();
-
-        // get Services
-        std::list<mitk::ServiceReference> services = this->GetAllRegisteredServices();
-        // Transfer them to the List
-        for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
-          AddServiceToList(*it);
+        InitPrivate(namingProperty, filter);
       }
 
     /*
@@ -128,7 +113,9 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
   signals:
 
     /*
-    *\brief Emitted when a new Service mathing the filter is being registered.
+    *\brief Emitted when a new Service matching the filter is being registered. Be careful if you use a filter:
+    * If a device does not match the filter when registering, but modifies it's properties later to match the filter,
+    * then the first signal you will see this device in will be ServiceModified.
     */
     void ServiceRegistered(mitk::ServiceReference);
 
@@ -138,10 +125,17 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     void ServiceUnregistering(mitk::ServiceReference);
 
     /*
-    *\brief Emitted when a Service matching the filter changes it's properties.
+    *\brief Emitted when a Service matching the filter changes it's properties, or when a service that formerly not matched the filter
+    * changed it's properties and now matches the filter.
     */
     void ServiceModified(mitk::ServiceReference);
 
+    /*
+    *\brief Emitted when a Service matching the filter changes it's properties,
+    * and the new properties make it fall trough the filter. This effectively means that
+    * the widget will not track the service anymore. Usually, the Service should still be useable though
+    */
+    void ServiceModiefiedEndMatch(mitk::ServiceReference);
     /*
     *\brief Emitted the user selects a Service from the list
     */
@@ -168,6 +162,11 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
       mitk::ServiceReference service;
       QListWidgetItem* item;
     };
+
+    /*
+    * \brief Finishes initialization after Initialize has been called. This function assumes that m_Interface is set correctly (Which Initialize does).
+    */
+    void InitPrivate(const std::string& namingProperty, const std::string& filter);
 
     /*
     * \brief Contains a list of currently active services and their entires in the list. This is wiped with every ServiceRegistryEvent.

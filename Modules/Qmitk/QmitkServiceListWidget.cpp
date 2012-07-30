@@ -65,6 +65,26 @@ void QmitkServiceListWidget::CreateConnections()
   }
 }
 
+void QmitkServiceListWidget::InitPrivate(const std::string& namingProperty, const std::string& filter)
+{
+  if (filter.empty())
+    m_Filter = "(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + m_Interface + ")";
+  else
+    m_Filter = filter;
+  m_NamingProperty = namingProperty;
+  m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
+  m_Context->AddServiceListener(this, &QmitkServiceListWidget::OnServiceEvent, m_Filter);
+    // Empty ListWidget
+  this->m_ListContent.clear();
+  m_Controls->m_ServiceList->clear();
+
+  // get Services
+  std::list<mitk::ServiceReference> services = this->GetAllRegisteredServices();
+  // Transfer them to the List
+  for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
+    AddServiceToList(*it);
+}
+
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
 void QmitkServiceListWidget::OnServiceSelectionChanged(){
@@ -92,6 +112,10 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
       break;
     case mitk::ServiceEvent::UNREGISTERING:
       emit(ServiceUnregistering(event.GetServiceReference()));
+      RemoveServiceFromList(event.GetServiceReference());
+      break;
+    case mitk::ServiceEvent::MODIFIED_ENDMATCH:
+      emit(ServiceModiefiedEndMatch(event.GetServiceReference()));
       RemoveServiceFromList(event.GetServiceReference());
       break;
   //default:

@@ -51,6 +51,8 @@ namespace mitk {
       itkSetMacro(Zoom,  std::string);
       itkGetMacro(DeviceIsVideoOnly, bool);
       itkSetMacro(DeviceIsVideoOnly, bool);
+      itkGetMacro(DeviceIsCalibrated, bool);
+      itkSetMacro(DeviceIsCalibrated, bool);
       itkGetMacro(DeviceClass, std::string);
       itkSetMacro(DeviceClass, std::string);
 
@@ -62,11 +64,11 @@ namespace mitk {
       static const char* PROP_DEV_MODEL;
       static const char* PROP_DEV_COMMENT;
       static const char* PROP_DEV_ISVIDEOONLY;
+      static const char* PROP_DEV_ISCALIBRATED;
       static const char* PROP_PROBE_NAME;
       static const char* PROP_PROBE_FREQUENCY;
       static const char* PROP_ZOOM;
       static const char* PROP_DEVICE_CLASS;
-      
 
     protected:
       /**
@@ -83,6 +85,7 @@ namespace mitk {
       std::string m_Zoom;
       std::string m_DeviceClass;
       bool m_DeviceIsVideoOnly;
+      bool m_DeviceIsCalibrated;
 
       
 

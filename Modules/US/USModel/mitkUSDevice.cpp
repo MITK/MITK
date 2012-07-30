@@ -73,6 +73,12 @@ mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
     props["IsActive"] = yes;
   else
     props["IsActive"] = no;
+
+  if( m_Calibration.IsNotNull() )
+    props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = yes;
+  else
+    props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = no;
+
   props[ "DeviceClass" ] = GetDeviceClass();
   props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
   props[ mitk::USImageMetadata::PROP_DEV_MODEL ] = m_Metadata->GetDeviceModel();
@@ -87,7 +93,7 @@ mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 bool mitk::USDevice::Connect()
 {
   //TODO Throw Exception is already activated before connection
-  
+
   // Prepare connection, fail if this fails.
   if (! this->OnConnection()) return false;
 
@@ -121,7 +127,7 @@ bool mitk::USDevice::Activate()
 
   ServiceProperties props = ConstructServiceProperties();
   this->m_ServiceRegistration.SetProperties(props);
-  return m_IsActive;  
+  return m_IsActive;
 }
 
 
@@ -220,7 +226,30 @@ itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( unsigned int /
   return static_cast<itk::DataObject*>(p.GetPointer());
 }
 
+bool mitk::USDevice::ApplyCalibration(mitk::USImage::Pointer image){
+  if ( m_Calibration.IsNull() ) return false;
+
+  image->GetGeometry()->SetIndexToWorldTransform(m_Calibration);
+  return true;
+}
+
+
  //########### GETTER & SETTER ##################//
+
+void mitk::USDevice::setCalibration (mitk::AffineTransform3D::Pointer calibration){
+  if (calibration.IsNull())
+  {
+    MITK_ERROR << "Null pointer passed to SetCalibration of mitk::USDevice. Ignoring call.";
+    return;
+  }
+  m_Calibration = calibration;
+  m_Metadata->SetDeviceIsCalibrated(true);
+  if (m_ServiceRegistration != 0)
+  {
+    ServiceProperties props = ConstructServiceProperties();
+    this->m_ServiceRegistration.SetProperties(props);
+  }
+}
 
 bool mitk::USDevice::GetIsActive()
 {

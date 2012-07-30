@@ -18,13 +18,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSDevice_H_HEADER_INCLUDED_
 #define MITKUSDevice_H_HEADER_INCLUDED_
 
+// STL
 #include <vector>
+
+// MitkUS
 #include "mitkUSProbe.h"
 #include "mitkUSImageMetadata.h"
 #include "mitkUSImage.h"
 #include <MitkUSExports.h>
+
+// MITK
 #include <mitkCommon.h>
 #include <mitkImageSource.h>
+
+// ITK
 #include <itkObjectFactory.h>
 
 // Microservices
@@ -40,6 +47,10 @@ namespace mitk {
     * \brief A device holds information about it's model, make and the connected probes. It is the
     * common super class for all devices and acts as an image source for mitkUSImages. It is the base class
     * for all US Devices, and every new device should extend it.
+    *
+    * US Devices support output of calibrated images, i.e. images that include a specific geometry.
+    * To achieve this, call SetCalibration, and make sure that the subclass also calls apply
+    * transformation at some point (The USDevice does not automatically apply the transformation to the image)
     * \ingroup US
     */
 
@@ -175,10 +186,23 @@ namespace mitk {
       */
       bool GetIsConnected();
 
+
+      /**
+      * \brief Sets a transformation as Calibration data. It also marks the device as Calibrated. This data is not automatically applied to the image. Subclasses must call ApplyTransformation
+      * to achieve this.
+      */
+      void setCalibration (mitk::AffineTransform3D::Pointer calibration);
+
+      /**
+      * \brief Returns the current Calibration
+      */
+      itkGetMacro(Calibration, mitk::AffineTransform3D::Pointer);
+
       /**
       * \brief Returns the currently active probe or null, if none is active
       */
       itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
+
       std::string GetDeviceManufacturer();
       std::string GetDeviceModel();
       std::string GetDeviceComment();
@@ -247,6 +271,17 @@ namespace mitk {
       */
        void GenerateData();
 
+      /**
+      *  \brief The Calibration Transformation of this US-Device. This will automatically be written into the image once
+      */
+       mitk::AffineTransform3D::Pointer m_Calibration;
+
+      /**
+      *  \brief Convenience method that can be used by subclasses to apply the Calibration Data to the image. A subclass has to call
+      * this method or set the transformation itself for the output to be calibrated! Returns true if a Calibration was set and false otherwise
+      * (Usually happens when no transformation was set yet).
+      */
+       bool ApplyCalibration(mitk::USImage::Pointer image);
 
 
      private:

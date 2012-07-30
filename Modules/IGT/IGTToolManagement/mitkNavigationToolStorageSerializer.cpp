@@ -33,7 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationToolStorageSerializer::NavigationToolStorageSerializer()
 {
   //create temp directory
-  m_tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "tempNavigationToolSerializer";
+  mitk::UIDGenerator myUIDGen = mitk::UIDGenerator("",16);
+  m_tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "tempNavigationToolSerializer_" + myUIDGen.GetUID();
   Poco::File myFile(m_tempDirectory);  
   myFile.createDirectory();
 }
@@ -44,7 +45,7 @@ mitk::NavigationToolStorageSerializer::~NavigationToolStorageSerializer()
  Poco::File myFile(m_tempDirectory);
  try
 {
- if (myFile.exists()) myFile.remove();
+ if (myFile.exists()) myFile.remove(true);
 }
 catch(...)
 {

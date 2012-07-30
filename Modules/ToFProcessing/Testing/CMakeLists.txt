@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE_TESTS()
 
-if(BUILD_TESTING AND MODULE_IS_ENABLED) 
+if(BUILD_TESTING AND mitkToFProcessing_IS_ENABLED) 
   mitkAddCustomModuleTest(mitkToFImageDownsamplingFilterTest_20 mitkToFImageDownsamplingFilterTest PMDCamCube2_MF0_IT0_20Images_DistanceImage.pic)
   mitkAddCustomModuleTest(mitkToFImageDownsamplingFilterTest_1 mitkToFImageDownsamplingFilterTest PMDCamCube2_MF0_IT0_1Images_DistanceImage.pic)
-endif(BUILD_TESTING AND MODULE_IS_ENABLED)
+endif(BUILD_TESTING AND mitkToFProcessing_IS_ENABLED)

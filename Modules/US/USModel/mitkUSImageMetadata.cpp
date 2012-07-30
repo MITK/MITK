@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const char* mitk::USImageMetadata::PROP_DEV_MANUFACTURER  = "US.Device.Manufacturer";
 const char* mitk::USImageMetadata::PROP_DEV_MODEL         = "US.Device.Model";
 const char* mitk::USImageMetadata::PROP_DEV_COMMENT       = "US.Device.Comment";
+const char* mitk::USImageMetadata::PROP_DEV_ISCALIBRATED  = "US.Device.IsCalibrated";
 const char* mitk::USImageMetadata::PROP_DEV_ISVIDEOONLY   = "US.Device.VideoOnly";
 const char* mitk::USImageMetadata::PROP_PROBE_NAME        = "US.Probe.Name";
 const char* mitk::USImageMetadata::PROP_PROBE_FREQUENCY   = "US.Probe.Frequency";

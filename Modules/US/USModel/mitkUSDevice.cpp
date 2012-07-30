@@ -204,7 +204,26 @@ itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( unsigned int /
   return static_cast<itk::DataObject*>(p.GetPointer());
 }
 
+bool mitk::USDevice::ApplyCalibration(mitk::USImage::Pointer image){
+  if ( m_Calibration.IsNull() ) return false;
+
+  image->GetGeometry()->SetIndexToWorldTransform(m_Calibration);
+
+  return true;
+}
+
+
  //########### GETTER & SETTER ##################//
+
+void mitk::USDevice::setCalibration (mitk::AffineTransform3D::Pointer calibration){
+  if (calibration.IsNull)
+  {
+    MITK_ERROR << "Null pointer passed to SetCalibration of mitk::USDevice. Ignoring call."
+    return;
+  }
+  m_Calibration = calibration;
+  m_Metadata->SetDeviceIsCalibrated(true);
+}
 
 bool mitk::USDevice::GetIsActive()
 {

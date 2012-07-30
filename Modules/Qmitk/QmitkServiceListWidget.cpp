@@ -54,6 +54,8 @@ void QmitkServiceListWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
   }
+
+  m_Context = mitk::GetModuleContext();
 }
 
 void QmitkServiceListWidget::CreateConnections()
@@ -62,28 +64,6 @@ void QmitkServiceListWidget::CreateConnections()
   {
     connect( m_Controls->m_ServiceList, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnDeviceSelectionChanged()) );
   }
-}
-
-void QmitkServiceListWidget::Initialize(const std::string& interfaceName, const std::string& namingProperty, std::string& filter)
-{
-  m_Context = mitk::GetModuleContext();
-  if (filter.empty())
-    m_Filter = "(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + interfaceName + ")";
-  else
-    m_Filter = filter;
-  m_Interface = interfaceName;
-  m_NamingProperty = namingProperty;
-  m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
-  m_Context->AddServiceListener(this, &QmitkServiceListWidget::OnServiceEvent, m_Filter);
-    // Empty ListWidget
-  this->m_ListContent.clear();
-  m_Controls->m_ServiceList->clear();
-
-  // get Services
-  std::list<mitk::ServiceReference> services = this->GetAllRegisteredServices();
-  // Transfer them to the List
-  for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
-    AddServiceToList(*it);
 }
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////

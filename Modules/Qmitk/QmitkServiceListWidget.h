@@ -29,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "usModuleContext.h"
 #include "usServiceEvent.h"
+#include "usServiceInterface.h"
+
+
 
 /**
 * @brief This widget provides abstraction for MicroServices. Place one in your Plugin and set it to a certain interface.
@@ -65,13 +68,6 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
 
-    /*
-    * \brief  Initializes the connection to the registry. The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
-    * interfaceName is the name of the interface that is defined in the classes header file and that is used register it it with the MicroServices. NamingProperty
-    * is a property that will be used to caption the Items in the list. If no filter is supplied, all matching interfaces are shown. If no namingProperty is supplied,
-    * the interfaceName will be used to caption Items in the list.
-    */
-    void Initialize(const std::string& interfaceName, const std::string& namingProperty, std::string& filter);
 
     /*
     * \brief Returns the currently selected Service as a ServiceReference.
@@ -88,6 +84,35 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
       mitk::ServiceReference ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
       return dynamic_cast<T*> ( m_Context->GetService<T>(ref) );
     }
+
+    /*
+    * \brief  Initializes the connection to the registry. The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
+    * interfaceName is the name of the interface that is defined in the classes header file and that is used register it it with the MicroServices. NamingProperty
+    * is a property that will be used to caption the Items in the list. If no filter is supplied, all matching interfaces are shown. If no namingProperty is supplied,
+    * the interfaceName will be used to caption Items in the list.
+    */
+    template <class T>
+    void Initialize(const std::string& namingProperty, std::string& filter)
+      {
+        std::string interfaceName ( us_service_interface_iid<T>() );
+        m_Interface = interfaceName;
+        if (filter.empty())
+          m_Filter = "(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + m_Interface + ")";
+        else
+          m_Filter = filter;
+        m_NamingProperty = namingProperty;
+        m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
+        m_Context->AddServiceListener(this, &QmitkServiceListWidget::OnServiceEvent, m_Filter);
+          // Empty ListWidget
+        this->m_ListContent.clear();
+        m_Controls->m_ServiceList->clear();
+
+        // get Services
+        std::list<mitk::ServiceReference> services = this->GetAllRegisteredServices();
+        // Transfer them to the List
+        for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
+          AddServiceToList(*it);
+      }
 
     /*
     *\brief This Function listens to ServiceRegistry changes and updates the

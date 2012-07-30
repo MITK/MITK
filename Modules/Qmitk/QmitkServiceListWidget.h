@@ -94,7 +94,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     template <class T>
     void Initialize(const std::string& namingProperty, std::string& filter)
       {
-        std::string interfaceName ( us_service_interface_iid<T>() );
+        std::string interfaceName ( us_service_interface_iid<T*>() );
         m_Interface = interfaceName;
         if (filter.empty())
           m_Filter = "(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + m_Interface + ")";

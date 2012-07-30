@@ -54,7 +54,6 @@ void QmitkServiceListWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
   }
-
   m_Context = mitk::GetModuleContext();
 }
 

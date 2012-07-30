@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
+#include <vtkProp.h>
+#include <vtkPolyData.h>
 
 
 namespace mitk {
@@ -45,14 +47,20 @@ namespace mitk {
 
     const mitk::ContourModel* GetInput(void);
 
-        //### methods of MITK-VTK rendering pipeline
+    /** \brief Checks whether this mapper needs to update itself and generate
+   * data. */
+    virtual void Update(mitk::BaseRenderer * renderer);
+
+
+        /*+++ methods of MITK-VTK rendering pipeline +++*/
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
     virtual void MitkRenderOverlay(BaseRenderer* renderer);
     virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
-    //### end of methods of MITK-VTK rendering pipeline
+    /*+++ END methods of MITK-VTK rendering pipeline +++*/
+
 
     class Segmentation_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
@@ -64,6 +72,11 @@ namespace mitk {
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
 
       //mitk::ContourModelToVtkPolyDataFilter::Pointer m_contourToPolyData;
+
+      vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
+
+      /** \brief Timestamp of last update of stored data. */
+      itk::TimeStamp m_LastUpdateTime;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
@@ -89,6 +102,10 @@ namespace mitk {
     virtual ~ContourModelMapper2D();
 
     void GenerateDataForRenderer( mitk::BaseRenderer *renderer );
+
+    virtual vtkSmartPointer<vtkPolyData> CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour);
+
+    virtual void ApplyContourProperties(mitk::BaseRenderer* renderer);
   };
 }
 #endif

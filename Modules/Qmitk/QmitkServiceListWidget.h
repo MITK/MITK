@@ -43,6 +43,16 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
+  private:
+
+    mitk::ModuleContext* m_Context;
+    /** \brief a filter to further narrow down the list of results **/
+    std::string m_Filter;
+    /** \brief The name of the ServiceInterface that this class should list **/
+    std::string m_Interface;
+    /** \brief The name of the ServiceProperty that will be displayed in the List to represent the service **/
+    std::string m_NamingProperty;
+
   public:
 
     static const std::string VIEW_ID;
@@ -64,17 +74,20 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     void Initialize(std::string interfaceName, std::string namingProperty, std::string filter);
 
     /*
-    * \brief Use this function to returns the currently selected service as a class directly.
-    *  Make sure you pass the appropriate type, or else this call will fail.
-    *  Commented out until depency issues are resolved
-    */
-//    template <class T>
-//    T* GetSelectedService2();
-
-    /*
     * \brief Returns the currently selected Service as a ServiceReference.
     */
     mitk::ServiceReference GetSelectedService();
+
+    /*
+    * \brief Use this function to returns the currently selected service as a class directly.
+    *  Make sure you pass the appropriate type, or else this call will fail.
+    */
+    template <class T>
+    T* GetSelectedServiceAsClass()
+    {
+      mitk::ServiceReference ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
+      return dynamic_cast<T*> ( m_Context->GetService<T>(ref) );
+    }
 
     /*
     *\brief This Function listens to ServiceRegistry changes and updates the
@@ -157,15 +170,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     std::list<mitk::ServiceReference> GetAllRegisteredServices();
 
 
-  private:
 
-    mitk::ModuleContext* m_Context;
-    /** \brief a filter to further narrow down the list of results **/
-    std::string m_Filter;
-    /** \brief The name of the ServiceInterface that this class should list **/
-    std::string m_Interface;
-    /** \brief The name of the ServiceProperty that will be displayed in the List to represent the service **/
-    std::string m_NamingProperty;
 };
 
 #endif // _QmitkServiceListWidget_H_INCLUDED

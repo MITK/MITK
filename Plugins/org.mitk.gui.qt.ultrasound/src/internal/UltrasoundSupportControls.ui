@@ -23,7 +23,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -92,7 +92,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QmitkUSDeviceListWidget" name="m_ActiveVideoDevices" native="true">
+        <widget class="QmitkServiceListWidget" name="m_ActiveVideoDevices" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -175,9 +175,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QmitkUSDeviceListWidget</class>
+   <class>QmitkServiceListWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkUSDeviceListWidget.h</header>
+   <header>QmitkServiceListWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

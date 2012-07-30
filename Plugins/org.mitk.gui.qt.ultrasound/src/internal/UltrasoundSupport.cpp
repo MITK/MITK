@@ -56,7 +56,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
   std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(IsActive=true))";
-  m_Controls.m_ActiveVideoDevices->Initialize(filter);
+  m_Controls.m_ActiveVideoDevices->Initialize("org.mitk.services.UltrasoundDevice", mitk::USImageMetadata::PROP_DEV_MODEL ,filter);
   
   m_Node = mitk::DataNode::New();
   m_Node->SetName("US Image Stream");
@@ -88,8 +88,7 @@ void UltrasoundSupport::OnClickedViewDevice()
   // We use the activity state of the timer to determine whether we are currently viewing images
   if ( ! m_Timer->isActive() ) // Activate Imaging
   {
-    m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedDevice();
-    // if (m_Node) m_Node->ReleaseData();
+    m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedServiceAsClass<mitk::USDevice>();
     if (m_Device.IsNull()){
       m_Timer->stop();
       return;

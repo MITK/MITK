@@ -86,16 +86,6 @@ void QmitkServiceListWidget::Initialize(std::string interfaceName, std::string n
     AddServiceToList(*it);
 }
 
-
-///////////////////////// Getter & Setter /////////////////////////////////
-
-//template <class T>
-//T* QmitkServiceListWidget::GetSelectedService2()
-//{
-//  mitk::ServiceReference ref = GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
-//  return dynamic_cast<T*> m_Context->GetService<T>(ref);
-//}
-
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
 void QmitkServiceListWidget::OnServiceSelectionChanged(){

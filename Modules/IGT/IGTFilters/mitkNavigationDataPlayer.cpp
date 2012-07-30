@@ -16,17 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataPlayer.h"
 
-//for the pause 
 #include <itksys/SystemTools.hxx>
-
 #include <mitkTimeStamp.h>
 #include <fstream>
 
-//for exceptions
+//includes for exceptions
 #include "mitkIGTException.h"
 #include "mitkIGTIOException.h"
 
-// default constructor of type mitk
 mitk::NavigationDataPlayer::NavigationDataPlayer() : mitk::NavigationDataPlayerBase() 
 {
   m_NumberOfOutputs = 0;
@@ -61,7 +58,7 @@ mitk::NavigationDataPlayer::~NavigationDataPlayer()
 void mitk::NavigationDataPlayer::GenerateData()
 {
   //Only produce new output if the player is started
-  if (!m_Playing) // !m_Playing=true means player has started 
+  if (!m_Playing) //m_Playing==true means player has started 
   {
     //The output is not valid anymore 
     for (unsigned int index = 0; index < m_NumberOfOutputs; index++)
@@ -95,7 +92,6 @@ void mitk::NavigationDataPlayer::GenerateData()
   std::vector< NavigationData::TimeStampType > currentTimeOfData;
   for (unsigned int index=0; index < m_NumberOfOutputs; index++)
   {
-  // m_NextToPlayNavigationData - vector
     nextCandidates.push_back(m_NextToPlayNavigationData.at(index));
     lastCandidates.push_back(m_NextToPlayNavigationData.at(index));
     
@@ -125,22 +121,22 @@ void mitk::NavigationDataPlayer::GenerateData()
     for (unsigned int index=0; index < m_NumberOfOutputs; index++)
     {
       lastCandidates[index] = nextCandidates.at(index);
-        // m_FileVersion indicates which XML encoding is used
-      switch(m_FileVersion)
+      switch(m_FileVersion) // m_FileVersion indicates which XML encoding is used
       {
-      case 1: 
+      case 1:  
         nextCandidates[index] = ReadVersion1();
         break;
-      default: //this case should not happen! therefore the return at this point
+      default: //this case should not happen! therefore return at this point
+        MITK_ERROR << "File encoding format was not stored, aborting!";
         return;
         break;
       }
 
       //check if the input stream delivered a correct NavigationData object
-      //Stops playing because there is now more nextCandidate, the file ended for all outputs
       for (unsigned int i = 0; i < m_NumberOfOutputs; i++)
       {
         if (nextCandidates.at(index).IsNull())
+        //Stops playing because there is now more nextCandidate, the file ended for all outputs
         {
           m_StreamEnd = true;
           StopPlaying();
@@ -151,13 +147,11 @@ void mitk::NavigationDataPlayer::GenerateData()
 
   }
 
-
   //Now lastCandidates stores the new output and nextCandidates is stored to the m_NextToPlay vector
   for (unsigned int index = 0; index < m_NumberOfOutputs; index++)
   {
     mitk::NavigationData* output = this->GetOutput(index);
     assert(output);
-    //always takes the lastCandidate, because we can not go to the next Candidata at the current moment
     output->Graft(lastCandidates.at(index));
     m_NextToPlayNavigationData[index] = nextCandidates.at(index);
   }
@@ -173,32 +167,29 @@ void mitk::NavigationDataPlayer::UpdateOutputInformation()
 
 void mitk::NavigationDataPlayer::InitPlayer()
 {
-  if (m_Stream == NULL){  
+  if (m_Stream == NULL)
+  {  
     StreamInvalid("Playing not possible. Wrong file name or path?");
     return;
   }
 
   if (!m_Stream->good())
   {
-   StreamInvalid("Playing not possible. Stream is not good!");
+    StreamInvalid("Playing not possible. Stream is not good!");
     return;
   }
 
+  //first get the file version
+  m_FileVersion = GetFileVersion(m_Stream);
 
-m_FileVersion = GetFileVersion(m_Stream); //first get the file version
-
-
-
-//check if we have a valid version
-//m_FileVersion has to be always be bigger than 1 for playing
+  //check if we have a valid version: m_FileVersion has to be always bigger than 1 for playing
   if (m_FileVersion < 1)
- {  
-   StreamInvalid("Playing not possible. Invalid file version!");
-   return;
+  {  
+    StreamInvalid("Playing not possible. Invalid file version!");
+    return;
   }
 
- //now read the number of Tracked Tools
-  if(m_NumberOfOutputs == 0){m_NumberOfOutputs = GetNumberOfNavigationDatas(m_Stream);}
+  if(m_NumberOfOutputs == 0) {m_NumberOfOutputs = GetNumberOfNavigationDatas(m_Stream);}
 
   //with the information about the tracked tool number we can generate the output
   if (m_NumberOfOutputs > 0)
@@ -231,13 +222,13 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
   {
     MITK_ERROR << "Stream is not good!";
     mitkThrowException(mitk::IGTException)<<"Stream is not good!";
-    return 0; //add an exception here?
   }
   int version = 1;
   
   TiXmlDeclaration* dec = new TiXmlDeclaration();
   *stream >> *dec;
-  if(strcmp(dec->Version(),"") == 0){
+  if(strcmp(dec->Version(),"") == 0)
+  {
     MITK_ERROR << "The input stream seems to have XML incompatible format";
     mitkThrowException(mitk::IGTIOException) << "The input stream seems to have XML incompatible format";
   }
@@ -268,16 +259,14 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
 unsigned int mitk::NavigationDataPlayer::GetNumberOfNavigationDatas(std::istream* stream)
 {
   if (stream == NULL)
-  {  
-    mitkThrowException(mitk::IGTException)<<"No input stream set!";
+  { 
     MITK_ERROR << "No input stream set!";
-    return 0;
+    mitkThrowException(mitk::IGTException)<<"No input stream set!";
   }
   if (!stream->good())
   { 
-    mitkThrowException(mitk::IGTException)<<"Stream not good!";
     MITK_ERROR << "Stream not good!";
-    return 0;
+    mitkThrowException(mitk::IGTException)<<"Stream not good!";
   }
 
   //If something has changed in a future version of the XML definition e.g. navigationcount or addional parameters 
@@ -304,16 +293,14 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
   if (m_Stream == NULL)
   {
     m_Playing = false;
-    mitkThrowException(mitk::IGTException) << "Playing not possible. Wrong file name or path? ";
     MITK_ERROR << "Playing not possible. Wrong file name or path? ";
-    return NULL;
+    mitkThrowException(mitk::IGTException) << "Playing not possible. Wrong file name or path? ";
   }
   if (!m_Stream->good())
   {
     m_Playing = false;
-    mitkThrowException(mitk::IGTException) << "Playing not possible. Stream is not good!";
     MITK_ERROR << "Playing not possible. Stream is not good!";
-    return NULL;
+    mitkThrowException(mitk::IGTException) << "Playing not possible. Stream is not good!";
   }
 
   /*TiXmlElement* elem = new TiXmlElement("");
@@ -332,9 +319,10 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
   if(m_currentNode)
   {
     elem = m_currentNode->ToElement();
-    if(elem==NULL){mitkThrowException(mitk::IGTException) << "DamagedFileException!";
-    }
-    //maybe: throw "DamagedFileException" if elem is NULL?
+    if(elem==NULL)
+      {
+      mitkThrowException(mitk::IGTException) << "Cannot find element: Is this file damaged?";
+      }
     delElem = false;
   }
   
@@ -358,24 +346,25 @@ void mitk::NavigationDataPlayer::StartPlaying()
   if (m_Stream == NULL)
   {   
     m_Playing = false;
+    
     //Perhaps the SetStream method was not called so we do this when a FileName is set with SetStream(PlayerMode)
     if (m_FileName != "")
     {
-        //The PlayerMode is initialized with LastSetStream 
-        //CreateStreamFromFilename also calls InitPlayer()
-      try
+    //The PlayerMode is initialized with LastSetStream 
+    //CreateStreamFromFilename also calls InitPlayer()
+    try
       {
-        CreateStreamFromFilename();
+      CreateStreamFromFilename();
       }
-      catch(mitk::IGTIOException e)
+    catch(mitk::IGTIOException e)
       {
-        MITK_ERROR << "Cannot create stream from filename, please check the stream";
-        throw e; //todo replace by macro
+      MITK_ERROR << "Cannot create stream from filename, please check the stream";
+      throw e; //TODO replace by macro
       }
-      catch(mitk::IGTException e2)
+    catch(mitk::IGTException e2)
       {
-        MITK_ERROR << "Cannot open the file, please check the file";
-        throw e2;//todo replace by macro
+      MITK_ERROR << "Cannot open the file, please check the file";
+      throw e2; //TODO replace by macro
       }
     }
 
@@ -443,20 +432,17 @@ void mitk::NavigationDataPlayer::GetFirstData()
         if (m_NextToPlayNavigationData[index].IsNull())
         {
           m_StreamEnd = true;
-
           StopPlaying();
-      //Exception is thrown
-      mitkThrowException(mitk::IGTIOException) << "XML File is corrupt or has no NavigationData";
-          return;
+          mitkThrowException(mitk::IGTIOException) << "XML File is corrupt or has no NavigationData.";
         }
 
         //Have a look it the output was set already without this check the pipline will disconnect after a start/stop cycle
-        if (nd.IsNull())
-          this->SetNthOutput(index, m_NextToPlayNavigationData[index]);
+        if (nd.IsNull()) {this->SetNthOutput(index, m_NextToPlayNavigationData[index]);}
 
         m_StartTimeOfData[index] = m_NextToPlayNavigationData[index]->GetTimeStamp();
         break;
-        default: //this case should not happen! therefore the return at this point
+      
+      default: //this case should not happen! therefore the return at this point
         return;
         break;
     }
@@ -506,27 +492,24 @@ void mitk::NavigationDataPlayer::CreateStreamFromFilename()
 
   if (!itksys::SystemTools::FileExists(m_FileName.c_str()))
   {
-    //Exception is thrown
     mitkThrowException(mitk::IGTIOException) << "File does not exist!";
-    return;
   }
+
   switch(m_PlayerMode)
   {
-  // so we can only read normal files not zip file
   case NormalFile:
-
     m_Stream = new std::ifstream(m_FileName.c_str());
-    m_StreamSetOutsideFromClass = false;
-    
+    m_StreamSetOutsideFromClass = false; 
     break;
+
   case ZipFile:
     m_Stream = NULL;
     MITK_ERROR << "Sorry no ZipFile support yet";
     break;
-  // Exception is thrown, if the stream is NULL
+
   default:
     m_Stream = NULL;
-    mitkThrowException(mitk::IGTException)<<"The stream is NULL";
+    mitkThrowException(mitk::IGTException) << "The stream is NULL";
     break;
   }
 
@@ -564,5 +547,4 @@ void mitk::NavigationDataPlayer::StreamInvalid(std::string message)
   m_ErrorMessage = message;
   m_StreamValid = false;
   mitkThrowException(mitk::IGTIOException) << "Invalid stream!";
-  return;
 }

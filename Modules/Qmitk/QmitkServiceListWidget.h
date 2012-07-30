@@ -37,6 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @brief This widget provides abstraction for MicroServices. Place one in your Plugin and set it to a certain interface.
 * One can also specify a filter and / or a property to use for captioning of the services. It also offers functionality to be
 * informed of ServiceEvents and to return the sctual classes, so only a minimum of interaction with the MicroserviceInterface is required.
+* To get started, just put it in your Plugin or Widget, call the Initialize Method and optionally connect it's signals.
+* As QT limits templating possibilities, events only throw ServiceReferences. You can manually dereference them using TranslateServiceReference()
 *
 * @ingroup QMITK
 */
@@ -87,8 +89,8 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
 
     /*
     * \brief  Initializes the connection to the registry. The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
-    * interfaceName is the name of the interface that is defined in the classes header file and that is used register it it with the MicroServices. NamingProperty
-    * is a property that will be used to caption the Items in the list. If no filter is supplied, all matching interfaces are shown. If no namingProperty is supplied,
+    * This. Pass class T to tell the widget which class it should filter for - only services of this class will be listed.
+    * NamingProperty is a property that will be used to caption the Items in the list. If no filter is supplied, all matching interfaces are shown. If no namingProperty is supplied,
     * the interfaceName will be used to caption Items in the list.
     */
     template <class T>
@@ -97,6 +99,16 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
         std::string interfaceName ( us_service_interface_iid<T*>() );
         m_Interface = interfaceName;
         InitPrivate(namingProperty, filter);
+      }
+
+    /*
+    * \brief Translates a serviceReference to a class of the given type. Use this to translate the signal's parameters.
+    * To adhere to the MicroService contract, only ServiceReferences stemming from the same widget should be this method.
+    */
+    template <class T>
+    T* TranslateReference(mitk::ServiceReference reference)
+      {
+        return dynamic_cast<T*> ( m_Context->GetService<T>(reference) );
       }
 
     /*

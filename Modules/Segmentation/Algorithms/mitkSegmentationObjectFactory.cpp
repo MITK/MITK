@@ -42,9 +42,8 @@ mitk::SegmentationObjectFactory::SegmentationObjectFactory()
   if (!alreadyDone)
   {
     MITK_DEBUG << "SegmentationObjectFactory c'tor" << std::endl;
-     RegisterIOFactories();
-    //CreateFileExtensionsMap();
-    
+    RegisterIOFactories();
+
     alreadyDone = true;
   }
 }
@@ -130,6 +129,9 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetSa
 
 void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour Files"));
+
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour File"));
 }
 
 const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
@@ -147,6 +149,8 @@ void mitk::SegmentationObjectFactory::RegisterIOFactories()
   mitk::ContourModelWriterFactory::RegisterOneFactory();
 
   this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
+
+  CreateFileExtensionsMap();
 }
 
 void RegisterSegmentationObjectFactory() 

@@ -71,7 +71,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * is a property that will be used to caption the Items in the list. If no filter is supplied, all matching interfaces are shown. If no namingProperty is supplied,
     * the interfaceName will be used to caption Items in the list.
     */
-    void Initialize(std::string interfaceName, std::string namingProperty, std::string filter);
+    void Initialize(const std::string& interfaceName, const std::string& namingProperty, std::string& filter);
 
     /*
     * \brief Returns the currently selected Service as a ServiceReference.

@@ -25,7 +25,7 @@ const char* mitk::USImageMetadata::PROP_DEV_ISVIDEOONLY   = "US.Device.VideoOnly
 const char* mitk::USImageMetadata::PROP_PROBE_NAME        = "US.Probe.Name";
 const char* mitk::USImageMetadata::PROP_PROBE_FREQUENCY   = "US.Probe.Frequency";
 const char* mitk::USImageMetadata::PROP_ZOOM              = "US.Zoom.Factor";
-
+const char* mitk::USImageMetadata::PROP_DEVICE_CLASS      = "org.mitk.modules.us.USVideoDevice";
 
 mitk::USImageMetadata::USImageMetadata() : itk::Object()
 {

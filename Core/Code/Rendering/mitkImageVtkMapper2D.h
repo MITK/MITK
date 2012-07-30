@@ -144,6 +144,10 @@ namespace mitk {
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
       /** \brief Current slice of a 2D render window. */
       vtkSmartPointer<vtkImageData> m_ReslicedImage;
+      /** \brief Empty vtkPolyData that is set when rendering geometry does not
+      *   intersect the image geometry.
+      */
+      vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
       /** \brief Plane on which the slice is rendered as texture. */
       vtkSmartPointer<vtkPlaneSource> m_Plane;
       /** \brief The texture which is used to render the current slice. */

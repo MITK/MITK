@@ -177,7 +177,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // and the geometry of the image that is to be rendered.
   if ( !RenderingGeometryIntersectsImage( worldGeometry, input->GetSlicedGeometry() ) )
   {
-    localStorage->m_Mapper->SetInput( NULL );
+    localStorage->m_Mapper->SetInput( localStorage->m_EmptyPolyData );
     return;
   }
 
@@ -971,6 +971,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
+  m_EmptyPolyData = vtkSmartPointer<vtkPolyData>::New();
 
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)

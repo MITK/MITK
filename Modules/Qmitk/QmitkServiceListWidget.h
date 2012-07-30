@@ -118,6 +118,10 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     */
     void OnServiceEvent(const mitk::ServiceEvent event);
 
+    /*
+    *\brief This is a legacy method that will be removed in the near future, do not use.
+    * Use the templated functions instead, as they provide a much cleaner API.
+    */
     mitk::ModuleContext* provideContext();
 
 

@@ -29,11 +29,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "usModuleContext.h"
 #include "usServiceEvent.h"
+#include "usServiceInterface.h"
+
+
 
 /**
 * @brief This widget provides abstraction for MicroServices. Place one in your Plugin and set it to a certain interface.
 * One can also specify a filter and / or a property to use for captioning of the services. It also offers functionality to be
 * informed of ServiceEvents and to return the sctual classes, so only a minimum of interaction with the MicroserviceInterface is required.
+* To get started, just put it in your Plugin or Widget, call the Initialize Method and optionally connect it's signals.
+* As QT limits templating possibilities, events only throw ServiceReferences. You can manually dereference them using TranslateServiceReference()
 *
 * @ingroup QMITK
 */
@@ -42,6 +47,16 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
+
+  private:
+
+    mitk::ModuleContext* m_Context;
+    /** \brief a filter to further narrow down the list of results **/
+    std::string m_Filter;
+    /** \brief The name of the ServiceInterface that this class should list **/
+    std::string m_Interface;
+    /** \brief The name of the ServiceProperty that will be displayed in the List to represent the service **/
+    std::string m_NamingProperty;
 
   public:
 
@@ -55,26 +70,46 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
 
-    /*
-    * \brief  Initializes the connection to the registry. The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
-    * interfaceName is the name of the interface that is defined in the classes header file and that is used register it it with the MicroServices. NamingProperty
-    * is a property that will be used to caption the Items in the list. If no filter is supplied, all matching interfaces are shown. If no namingProperty is supplied,
-    * the interfaceName will be used to caption Items in the list.
-    */
-    void Initialize(std::string interfaceName, std::string namingProperty, std::string filter);
-
-    /*
-    * \brief Use this function to returns the currently selected service as a class directly.
-    *  Make sure you pass the appropriate type, or else this call will fail.
-    *  Commented out until depency issues are resolved
-    */
-//    template <class T>
-//    T* GetSelectedService2();
 
     /*
     * \brief Returns the currently selected Service as a ServiceReference.
     */
     mitk::ServiceReference GetSelectedService();
+
+    /*
+    * \brief Use this function to returns the currently selected service as a class directly.
+    *  Make sure you pass the appropriate type, or else this call will fail.
+    */
+    template <class T>
+    T* GetSelectedServiceAsClass()
+    {
+      mitk::ServiceReference ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
+      return dynamic_cast<T*> ( m_Context->GetService<T>(ref) );
+    }
+
+    /*
+    * \brief  Initializes the connection to the registry. The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
+    * This. Pass class T to tell the widget which class it should filter for - only services of this class will be listed.
+    * NamingProperty is a property that will be used to caption the Items in the list. If no filter is supplied, all matching interfaces are shown. If no namingProperty is supplied,
+    * the interfaceName will be used to caption Items in the list.
+    */
+    template <class T>
+    void Initialize(const std::string& namingProperty, std::string& filter)
+      {
+        std::string interfaceName ( us_service_interface_iid<T*>() );
+        m_Interface = interfaceName;
+        InitPrivate(namingProperty, filter);
+      }
+
+    /*
+    * \brief Translates a serviceReference to a class of the given type. Use this to translate the signal's parameters.
+    * To adhere to the MicroService contract, only ServiceReferences stemming from the same widget should be this method.
+    */
+    template <class T>
+    T* TranslateReference(mitk::ServiceReference reference)
+      {
+        return dynamic_cast<T*> ( m_Context->GetService<T>(reference) );
+      }
 
     /*
     *\brief This Function listens to ServiceRegistry changes and updates the
@@ -83,6 +118,10 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     */
     void OnServiceEvent(const mitk::ServiceEvent event);
 
+    /*
+    *\brief This is a legacy method that will be removed in the near future, do not use.
+    * Use the templated functions instead, as they provide a much cleaner API.
+    */
     mitk::ModuleContext* provideContext();
 
 
@@ -90,7 +129,9 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
   signals:
 
     /*
-    *\brief Emitted when a new Service mathing the filter is being registered.
+    *\brief Emitted when a new Service matching the filter is being registered. Be careful if you use a filter:
+    * If a device does not match the filter when registering, but modifies it's properties later to match the filter,
+    * then the first signal you will see this device in will be ServiceModified.
     */
     void ServiceRegistered(mitk::ServiceReference);
 
@@ -100,10 +141,17 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     void ServiceUnregistering(mitk::ServiceReference);
 
     /*
-    *\brief Emitted when a Service matching the filter changes it's properties.
+    *\brief Emitted when a Service matching the filter changes it's properties, or when a service that formerly not matched the filter
+    * changed it's properties and now matches the filter.
     */
     void ServiceModified(mitk::ServiceReference);
 
+    /*
+    *\brief Emitted when a Service matching the filter changes it's properties,
+    * and the new properties make it fall trough the filter. This effectively means that
+    * the widget will not track the service anymore. Usually, the Service should still be useable though
+    */
+    void ServiceModiefiedEndMatch(mitk::ServiceReference);
     /*
     *\brief Emitted the user selects a Service from the list
     */
@@ -132,6 +180,11 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     };
 
     /*
+    * \brief Finishes initialization after Initialize has been called. This function assumes that m_Interface is set correctly (Which Initialize does).
+    */
+    void InitPrivate(const std::string& namingProperty, const std::string& filter);
+
+    /*
     * \brief Contains a list of currently active services and their entires in the list. This is wiped with every ServiceRegistryEvent.
     */
     std::vector<ServiceListLink> m_ListContent;
@@ -157,15 +210,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     std::list<mitk::ServiceReference> GetAllRegisteredServices();
 
 
-  private:
 
-    mitk::ModuleContext* m_Context;
-    /** \brief a filter to further narrow down the list of results **/
-    std::string m_Filter;
-    /** \brief The name of the ServiceInterface that this class should list **/
-    std::string m_Interface;
-    /** \brief The name of the ServiceProperty that will be displayed in the List to represent the service **/
-    std::string m_NamingProperty;
 };
 
 #endif // _QmitkServiceListWidget_H_INCLUDED

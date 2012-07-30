@@ -54,6 +54,7 @@ void QmitkServiceListWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
   }
+  m_Context = mitk::GetModuleContext();
 }
 
 void QmitkServiceListWidget::CreateConnections()
@@ -64,14 +65,12 @@ void QmitkServiceListWidget::CreateConnections()
   }
 }
 
-void QmitkServiceListWidget::Initialize(std::string interfaceName, std::string namingProperty,  std::string filter)
+void QmitkServiceListWidget::InitPrivate(const std::string& namingProperty, const std::string& filter)
 {
-  m_Context = mitk::GetModuleContext();
   if (filter.empty())
-    m_Filter = "(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + interfaceName + ")";
+    m_Filter = "(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + m_Interface + ")";
   else
     m_Filter = filter;
-  m_Interface = interfaceName;
   m_NamingProperty = namingProperty;
   m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
   m_Context->AddServiceListener(this, &QmitkServiceListWidget::OnServiceEvent, m_Filter);
@@ -85,16 +84,6 @@ void QmitkServiceListWidget::Initialize(std::string interfaceName, std::string n
   for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
     AddServiceToList(*it);
 }
-
-
-///////////////////////// Getter & Setter /////////////////////////////////
-
-//template <class T>
-//T* QmitkServiceListWidget::GetSelectedService2()
-//{
-//  mitk::ServiceReference ref = GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
-//  return dynamic_cast<T*> m_Context->GetService<T>(ref);
-//}
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
@@ -123,6 +112,10 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
       break;
     case mitk::ServiceEvent::UNREGISTERING:
       emit(ServiceUnregistering(event.GetServiceReference()));
+      RemoveServiceFromList(event.GetServiceReference());
+      break;
+    case mitk::ServiceEvent::MODIFIED_ENDMATCH:
+      emit(ServiceModiefiedEndMatch(event.GetServiceReference()));
       RemoveServiceFromList(event.GetServiceReference());
       break;
   //default:

@@ -130,19 +130,22 @@ public:
                                  , const std::string& attributeValue );
     void RemoveAdditionalAttribute( const NavigationData* nd );
 
-    /**Documentation
-    * \brief Starts the recording with the presetted OutputMode 
-    * this method calls StartRecording(std::ostream*)
-    * @throws Throws an exception if it is already recording and method StartRecorded is called again
-    * @throws Throws an exception if No file name or file path set the output is redirected to the console for the normal file 
-    */
+    /**
+     * Documentation
+     * \brief Starts the recording with the presetted OutputMode.
+     *        This method calls StartRecording(std::ostream*). 
+     *        Does nothing if the recorder is already recording and 
+     *        the method StartRecording is called again.
+     * @throw mitk::IGTException Throws an exception if no file name or file path is set. 
+     */
     void StartRecording();
 
-    /**Documentation
-    * \brief Starts the recording with an own preinitialized stream
-    * @throws Throws an exception if it is already recording and method StartRecorded is called
-    * @throws Throws an exception if the stream is not good
-    */
+    /**
+     * Documentation
+     * \brief Starts the recording with an own preinitialized stream
+     * Does nothing if it is already recording and method StartRecorded is called
+     * @throw mitk::IGTException Throws an exception if the stream is not good.
+     */
     void StartRecording(std::ostream* stream);
 
     /**Documentation

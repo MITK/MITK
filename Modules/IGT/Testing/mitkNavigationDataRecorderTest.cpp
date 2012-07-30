@@ -308,80 +308,61 @@ class mitkNavigationDataRecorderTestClass
     }
   
   static void TestStartRecordingExceptions()
-    {
+     {
      //Testing Start Recording for exceptions if recording has already started 
      mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
      std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"Recordertest.xml";
      recorder->SetFileName(filename.c_str());
 
-     bool exceptionThrown = false;
+     //Testing double call of StartRecording().
      mitk::NavigationData::Pointer naviData = mitk::NavigationData::New();
      recorder->AddNavigationData( naviData );
      recorder->StartRecording();
-     try{
      recorder->StartRecording();
-     }
-     catch(mitk::IGTException)
-     {
-     exceptionThrown = true;
-     MITK_TEST_OUTPUT(<<"Tested exception for the case recorder already started recording in StartRecording. Application should not crash.");
-     }
-     MITK_TEST_CONDITION(exceptionThrown,"Testing exception thrown when recorder starts recording for the case if recording has already started .");
-     
      recorder->StopRecording();
-
-     //Testing Start Recording for exceptions if no file name or file path set the output is redirected to the console.
+     MITK_TEST_OUTPUT(<<"Tested double call of StartRecording(). Application should not crash.");
+    
+     //Testing exceptions for method StartRecording() when no file is set.
      mitk::NavigationDataRecorder::Pointer recorder1 = mitk::NavigationDataRecorder::New();
      std::string filename1 = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"Recordertest.xml";
      recorder->SetFileName("");
-
      bool exceptionThrown1 = false;
      mitk::NavigationData::Pointer naviData1 = mitk::NavigationData::New();
      recorder1->AddNavigationData( naviData1 );
-     try{
-     recorder1->StartRecording();
-     }
-     catch(mitk::IGTIOException)
-     {
-     exceptionThrown1 = true;
-     MITK_TEST_OUTPUT(<<"Tested exception for the case no file name or file path set the output is redirected to the console in StartRecording. Application should not crash.");
-     }
-     MITK_TEST_CONDITION(exceptionThrown1,"Testing exception thrown when no file name or file path set the output is redirected to the console.");
+     try
+       {
+       recorder1->StartRecording();
+       }
+     catch(mitk::IGTException)
+       {
+       exceptionThrown1 = true;
+       }
+     MITK_TEST_CONDITION(exceptionThrown1,"Testing exception throwing when no file name or file path is set.");
 
-     //Testing Start Recording method for the stream for exceptions if recording has already started 
+     //Testing double call of StartRecording(stream) method.
      mitk::NavigationDataRecorder::Pointer recorder2 = mitk::NavigationDataRecorder::New();
      std::string tmp = "";
      std::ostringstream* stream = new std::ostringstream( std::ostringstream::trunc );
      stream->setf( std::ios::fixed, std::ios::floatfield );
-     bool exceptionThrown2 = false;
      recorder2->StartRecording(stream);
-     try
-     {
      recorder2->StartRecording(stream);
-     }
-     catch(mitk::IGTException)
-     {
-     exceptionThrown2 = true;
-     MITK_TEST_OUTPUT(<<"Tested exception for the case recorder already started recording in StartRecording. Application should not crash.");
-     }
-     MITK_TEST_CONDITION(exceptionThrown2,"Testing exception thrown when recorder starts recording for the stream.");
-
+     recorder2->StopRecording();
+     MITK_TEST_OUTPUT(<<"Tested double call of StartRecording(stream). Application should not crash.");
+    
      //Testing exceptions if the stream is not good
      mitk::NavigationDataRecorder::Pointer recorder3 = mitk::NavigationDataRecorder::New();
-     //making an empty stream
-     std::ofstream* stream3 = new std::ofstream("");
+     std::ofstream* stream3 = new std::ofstream(""); //making an empty stream
      bool exceptionThrown3 = false;
-     try{
-     recorder3->StartRecording(stream3);
-     }
+     try
+       {
+       recorder3->StartRecording(stream3);
+       }
      catch(mitk::IGTException)
-     {
-     exceptionThrown3 = true;
-     MITK_TEST_OUTPUT(<<"Tested exception for the case if the stream is not good in StartRecording. Application should not crash.");
-     }
+       {
+       exceptionThrown3 = true;
+       }
      MITK_TEST_CONDITION(exceptionThrown3,"Testing exception thrown when the stream in not good.");
-
-  }
+     }
 
   };
 

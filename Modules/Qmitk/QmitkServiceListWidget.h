@@ -66,9 +66,10 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /*
     * \brief Use this function to returns the currently selected service as a class directly.
     *  Make sure you pass the appropriate type, or else this call will fail.
+    *  Commented out until depency issues are resolved
     */
-    template <class T>
-    T* GetSelectedService2();
+//    template <class T>
+//    T* GetSelectedService2();
 
     /*
     * \brief Returns the currently selected Service as a ServiceReference.

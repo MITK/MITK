@@ -63,4 +63,5 @@ Rendering/mitkContourSetMapper2D.cpp
 Rendering/mitkContourSetVtkMapper3D.cpp
 Rendering/mitkContourVtkMapper3D.cpp
 Rendering/mitkContourModelMapper2D.cpp
+Rendering/mitkContourModelMapper3D.cpp
 )

@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelWriterFactory.h"
 #include "mitkContourModelWriter.h"
 #include "mitkContourModelMapper2D.h"
+#include "mitkContourModelMapper3D.h"
 
 
 mitk::SegmentationObjectFactory::SegmentationObjectFactory() 
@@ -83,6 +84,14 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
     else if((dynamic_cast<ContourSet*>(data)!=NULL))
     {
       newMapper = mitk::ContourSetVtkMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+
+    std::string classname("ContourModel");
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      //has to be the 3D mapper, is set to 2D just for testing
+      newMapper = mitk::ContourModelMapper3D::New();
       newMapper->SetDataNode(node);
     }
   }

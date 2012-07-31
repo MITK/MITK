@@ -70,19 +70,13 @@ bool mitk::USVideoDevice::OnConnection()
   return true;
 }
 
-/**
-* \brief Is called during the disconnection process.
-*  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
-*/
 bool mitk::USVideoDevice::OnDisconnection()
 {
     // TODO Implement Disconnection Behaviour
   return true;
 }
 
-/**
-* \brief Is called during the activation process. After this method is finsihed, the device should be generating images
-*/
+
 bool mitk::USVideoDevice::OnActivation()
 {
     // TODO Implement Activation Behaviour
@@ -106,6 +100,8 @@ void mitk::USVideoDevice::GenerateData()
   
   // Set Metadata
   result->SetMetadata(this->m_Metadata);
+  //Apply Transformation
+  this->ApplyCalibration(result);
   // Set Output
   this->SetNthOutput(0, result);
 }

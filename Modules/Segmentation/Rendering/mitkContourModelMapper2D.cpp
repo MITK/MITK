@@ -18,6 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 #include <vtkProperty.h>
+#include <vtkPlane.h>
+#include <vtkCutter.h>
+#include <vtkStripper.h>
+#include <vtkTubeFilter.h>
 
 mitk::ContourModelMapper2D::ContourModelMapper2D()
 {
@@ -31,6 +35,7 @@ mitk::ContourModelMapper2D::~ContourModelMapper2D()
 
 const mitk::ContourModel* mitk::ContourModelMapper2D::GetInput( void )
 {
+  //convient way to get the data from the dataNode
   return static_cast< const mitk::ContourModel * >( this->GetData() );
 }
 
@@ -92,15 +97,17 @@ void mitk::ContourModelMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* rend
 
 void mitk::ContourModelMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
+  /*++ convert the contour to vtkPolyData and set it as input for our mapper ++*/
+
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   mitk::ContourModel* inputContour  = static_cast< mitk::ContourModel* >( this->GetData() );
 
-  localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour);
-
-  this->ApplyContourProperties(renderer);
+  localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour, renderer);
 
   localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
+
+  this->ApplyContourProperties(renderer);
 
 }
 
@@ -113,6 +120,7 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer* renderer)
     return;
   }
 
+  //check if there is something to be rendered
   mitk::ContourModel* data  = static_cast< mitk::ContourModel*>( this->GetData() );
   if ( data == NULL )
   {
@@ -153,11 +161,15 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer* renderer)
 
 
 
-vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour)
+vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour, mitk::BaseRenderer* renderer)
 {
+  /* First of all convert the control points of the contourModel to vtk points
+   * and add lines in between them
+   */
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
+  //iterate over all control points
   mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin();
   mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin();
   next++;
@@ -180,11 +192,14 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
     next++;
   }
 
+  /* If the contour is closed an additional line has to be created between the very first point
+   * and the last point
+   */
   if(inputContour->IsClosed())
   {
     //add a line from the last to the first control point
     mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin());
-    mitk::ContourModel::VertexType* lastControlPoint = *(inputContour->IteratorEnd());
+    mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd()));
     vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);
     vtkIdType p1 = points->InsertNextPoint(firstControlPoint->Coordinates[0], firstControlPoint->Coordinates[1], firstControlPoint->Coordinates[2]);
 
@@ -194,12 +209,56 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
     lines->InsertCellPoint(p2);
   }
 
-    // Create a polydata to store everything in
+  // Create a polydata to store everything in
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   // Add the points to the dataset
   polyData->SetPoints(points);
   // Add the lines to the dataset
   polyData->SetLines(lines);
+
+  //check for the worldgeometry from the current render window
+  mitk::PlaneGeometry* currentWorldGeometry = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(renderer->GetCurrentWorldGeometry2D()));
+  if (currentWorldGeometry)
+  {
+    //slice through the data to get a 2D representation of the (possible) 3D contour
+
+    //needed because currently there is no outher solution if the contour is within the plane
+    vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
+    tubeFilter->SetInput(polyData);
+    tubeFilter->SetRadius(0.01);
+
+    //origin and normal of vtkPlane
+    mitk::Point3D origin = currentWorldGeometry->GetOrigin();
+    mitk::Vector3D normal = currentWorldGeometry->GetNormal();
+
+    //the implicit function to slice through the polyData
+    vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+    plane->SetOrigin(origin[0], origin[1], origin[2]);
+    plane->SetNormal(normal[0], normal[1], normal[2]);
+
+    //cuts through vtkPolyData with a given implicit function. In our case a plane
+    vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
+
+    cutter->SetCutFunction(plane);
+    //cutter->SetInput(polyData);
+    cutter->SetInputConnection(tubeFilter->GetOutputPort());
+
+
+    vtkSmartPointer<vtkStripper> cutStrips = vtkStripper::New();
+
+    cutStrips->SetInputConnection(cutter->GetOutputPort()); 
+
+    cutStrips->Update();
+
+
+    //store the result in a new polyData
+    vtkSmartPointer<vtkPolyData> cutPolyData = vtkSmartPointer<vtkPolyData>::New();
+
+    cutPolyData= cutStrips->GetOutput();
+
+    return cutPolyData;
+  }
+  
   return polyData;
 }
 
@@ -215,7 +274,7 @@ void mitk::ContourModelMapper2D::ApplyContourProperties(mitk::BaseRenderer* rend
     localStorage->m_Actor->GetProperty()->SetLineWidth(binaryOutlineWidth);
   }
 
-  localStorage->m_Actor->GetProperty()->SetColor(0.0, 1.0, 0.0);
+  localStorage->m_Actor->GetProperty()->SetColor(0.9, 1.0, 0.1);
 }
 
 

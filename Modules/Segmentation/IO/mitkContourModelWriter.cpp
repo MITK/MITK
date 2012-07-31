@@ -190,6 +190,10 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
     at.push_back("n");
     std::vector<std::string> val;
     val.push_back(ConvertToString(i));
+
+    at.push_back("isClosed");
+    val.push_back(ConvertToString(contourModel->IsClosed()));
+
     WriteStartElementWithAttribut( XML_TIME_STEP, at, val, out );
 
     /*++++ <controlPoints> ++++*/

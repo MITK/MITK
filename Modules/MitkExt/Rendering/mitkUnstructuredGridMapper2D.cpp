@@ -400,12 +400,12 @@ mitk::UnstructuredGridMapper2D
   vtkAssembly* assembly = dynamic_cast<vtkAssembly*>(mitkMapper->GetVtkProp(renderer));
   if (assembly)
   {
-	  vtkProp3DCollection* collection = assembly->GetParts();
-	  collection->InitTraversal();
-    vtkProp3D* prop3d = 0;
-	  do
-	  {
-	    prop3d = collection->GetNextProp3D();
+  vtkProp3DCollection* collection = assembly->GetParts();
+  collection->InitTraversal();
+  vtkProp3D* prop3d = 0;
+  do
+  {
+    prop3d = collection->GetNextProp3D();
       vtkActor* actor = dynamic_cast<vtkActor*>( prop3d );
       if (actor)
       {

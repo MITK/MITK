@@ -313,7 +313,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
       {
         if ( useCellData )
         {  // color each cell according to cell data
-          double scalar = vcellscalars->GetComponent( i, 0 );
+          double scalar = vcellscalars->GetComponent( i+numberOfLines, 0 );
           double rgb[3] = { 1.0f, 1.0f, 1.0f };
           m_ScalarsToColors->GetColor(scalar, rgb);
           rgba[0] = (float)rgb[0];

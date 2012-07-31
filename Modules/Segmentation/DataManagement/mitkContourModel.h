@@ -128,6 +128,8 @@ namespace mitk
 
     virtual void Expand( unsigned int timeSteps );
 
+    virtual void UpdateOutputInformation();
+
 
   protected:
 

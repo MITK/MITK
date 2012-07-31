@@ -19,7 +19,9 @@ mitk::ContourModel::ContourModel()
 {
   m_ContourSeries.push_back(mitk::ContourModelElement::New());
 
-  Superclass::InitializeTimeSlicedGeometry(1);
+  this->InitializeEmpty();
+  this->InitializeTimeSlicedGeometry(1);
+
   m_SelectedVertex = NULL;
 }
 
@@ -99,6 +101,7 @@ void mitk::ContourModel::MoveVertex(VertexType* vertex, mitk::Vector3D &vector)
 }
 
 
+
 void mitk::ContourModel::Expand( unsigned int timeSteps )
 {
   unsigned int oldSize = this->m_ContourSeries.size();
@@ -109,6 +112,7 @@ void mitk::ContourModel::Expand( unsigned int timeSteps )
     m_ContourSeries.push_back(mitk::ContourModelElement::New());
   }
 }
+
 
 
 void mitk::ContourModel::SetRequestedRegionToLargestPossibleRegion ()
@@ -128,15 +132,74 @@ bool mitk::ContourModel::VerifyRequestedRegion ()
 
 const mitk::Geometry3D * mitk::ContourModel::GetUpdatedGeometry (int t)
 {
-  return NULL;
+  return Superclass::GetUpdatedGeometry(t);
 }
 
 mitk::Geometry3D* mitk::ContourModel::GetGeometry (int t)const
 {
-  return NULL;
+  return Superclass::GetGeometry(t);
 }
 
 void mitk::ContourModel::SetRequestedRegion (itk::DataObject *data)
 {
 
+}
+
+
+
+void mitk::ContourModel::UpdateOutputInformation()
+{
+  //Superclass::UpdateOutputInformation();/*
+
+  if ( this->GetSource() )
+  {
+    this->GetSource()->UpdateOutputInformation();
+  }
+
+  //update the bounds of the geometry
+  float mitkBounds[6];
+  if (this->GetNumberOfVertices() == 0)  {
+    mitkBounds[0] = 0.0;
+    mitkBounds[1] = 0.0;
+    mitkBounds[2] = 0.0;
+    mitkBounds[3] = 0.0;
+    mitkBounds[4] = 0.0;
+    mitkBounds[5] = 0.0;
+  }
+  else
+  {
+    typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
+    typedef BoundingBoxType::PointsContainer                      PointsContainer;
+
+    BoundingBoxType::Pointer boundingBox = BoundingBoxType::New();
+    
+    PointsContainer::Pointer points = PointsContainer::New();
+
+    VertexIterator it = this->IteratorBegin();
+    VertexIterator end = this->IteratorEnd();
+
+    while(it != end)
+    {
+      Point3D currentP = (*it)->Coordinates;
+      BoundingBoxType::PointType p;
+      p.CastFrom(currentP);
+      points->InsertElement(points->Size(), p);
+
+      it++;
+    }
+    
+    boundingBox->SetPoints(points);
+    boundingBox->ComputeBoundingBox();
+    BoundingBoxType::BoundsArrayType tmp = boundingBox->GetBounds();
+    mitkBounds[0] = tmp[0];
+    mitkBounds[1] = tmp[1];
+    mitkBounds[2] = tmp[2];
+    mitkBounds[3] = tmp[3];
+    mitkBounds[4] = tmp[4];
+    mitkBounds[5] = tmp[5];
+  }
+
+  Geometry3D* geometry3d = this->GetGeometry(0);
+  geometry3d->SetBounds(mitkBounds);
+  GetTimeSlicedGeometry()->UpdateInformation();//*/
 }

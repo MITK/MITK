@@ -97,7 +97,7 @@ protected:
      */
     virtual void GenerateData();
     
-    virtual void ReadPoint(mitk::ContourModel::Pointer newContourModel, 
+    virtual void ReadPoints(mitk::ContourModel::Pointer newContourModel, 
       TiXmlElement* currentTimeSeries, unsigned int currentTimeStep);
 
     /**

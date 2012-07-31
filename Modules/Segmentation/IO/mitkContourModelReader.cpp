@@ -65,17 +65,21 @@ void mitk::ContourModelReader::GenerateData()
         mitk::ContourModel::Pointer newContourModel = mitk::ContourModel::New();
         if(currentContourModelElement->FirstChildElement("timestep") != NULL)
         {
-
           /*++++ handle n timesteps within timestep tags ++++*/
           for( TiXmlElement* currentTimeSeries = currentContourModelElement->FirstChildElement("timestep")->ToElement();
             currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
           {
             unsigned int currentTimeStep(0);
-            
+
 
             currentTimeStep = atoi(currentTimeSeries->Attribute("n"));
 
-            this->ReadPoint(newContourModel, currentTimeSeries, currentTimeStep);
+            if(bool(currentTimeSeries->Attribute("isClosed")))
+            {
+              newContourModel->Close(currentTimeStep);
+            }
+
+            this->ReadPoints(newContourModel, currentTimeSeries, currentTimeStep);
           }
           /*++++ END handle n timesteps within timestep tags ++++*/
 
@@ -103,7 +107,7 @@ void mitk::ContourModelReader::GenerateData()
     m_Success = true;
 }
 
-void mitk::ContourModelReader::ReadPoint(mitk::ContourModel::Pointer newContourModel, 
+void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContourModel, 
         TiXmlElement* currentTimeSeries, unsigned int currentTimeStep) 
 {
   //check if the timesteps in contourModel have to be expanded

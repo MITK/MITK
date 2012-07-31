@@ -287,19 +287,21 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
   bool polyOutline = m_Outline->GetValue();
   bool scalarVisibility = m_ScalarVisibility->GetValue();
 
+  // cache the transformed points
+  // a fixed size array is way faster than 'new'
+  // slices through 3d cells usually do not generated
+  // polygons with more than 6 vertices
+  const int maxPolySize = 10;
+  Point2D* cachedPoints = new Point2D[maxPolySize*numberOfPolys];
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   // only draw polygons if there are cell scalars
   // or the outline property is set to true
-  if ((scalarVisibility && vcellscalars) || polyOutline)
+  if (scalarVisibility && vcellscalars)
   {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    // cache the transformed points
-    // a fixed size array is way faster than 'new'
-    // slices through 3d cells usually do not generated
-    // polygons with more than 6 vertices
-    Point2D cachedPoints[10];
 
     for (int i = 0;i < numberOfPolys;++i )
     {
@@ -352,31 +354,41 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
         //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
         //p2d[1]=toGL-p2d[1];
 
-        cachedPoints[j][0] = p2d[0];
-        cachedPoints[j][1] = p2d[1];
+        cachedPoints[i*10+j][0] = p2d[0];
+        cachedPoints[i*10+j][1] = p2d[1];
 
         //add the current vertex to the line
         glVertex2f( p2d[0], p2d[1] );
       }
       glEnd();
+    }
 
-      if (polyOutline)
+    if (polyOutline)
+    {
+      vpolys->InitTraversal();
+
+      glColor4f(outlineColor[0], outlineColor[1], outlineColor[2], 1.0f);
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      for (int i = 0;i < numberOfPolys;++i)
       {
-        glColor4f(outlineColor[0], outlineColor[1], outlineColor[2], 1.0f);
+        vtkIdType *cell(0);
+        vtkIdType cellSize(0);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        vpolys->GetNextCell( cellSize, cell );
+
         glBegin( GL_POLYGON );
         //glPolygonOffset(1.0, 1.0);
         for (int j = 0; j < cellSize; ++j)
         {
           //add the current vertex to the line
-          glVertex2f( cachedPoints[j][0], cachedPoints[j][1] );
+          glVertex2f( cachedPoints[i*10+j][0], cachedPoints[i*10+j][1] );
         }
         glEnd();
       }
     }
-    glDisable(GL_BLEND);
   }
+  glDisable(GL_BLEND);
+  delete cachedPoints;
 }
 
 

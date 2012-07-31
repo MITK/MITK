@@ -225,7 +225,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
     //needed because currently there is no outher solution if the contour is within the plane
     vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
     tubeFilter->SetInput(polyData);
-    tubeFilter->SetRadius(0.01);
+    tubeFilter->SetRadius(0.05);
 
     //origin and normal of vtkPlane
     mitk::Point3D origin = currentWorldGeometry->GetOrigin();
@@ -243,18 +243,16 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
     //cutter->SetInput(polyData);
     cutter->SetInputConnection(tubeFilter->GetOutputPort());
 
-
-    vtkSmartPointer<vtkStripper> cutStrips = vtkStripper::New();
-
-    cutStrips->SetInputConnection(cutter->GetOutputPort()); 
-
-    cutStrips->Update();
+    //we want the scalars of the input - so turn off generating the scalars within vtkCutter
+    cutter->GenerateCutScalarsOff();
+    cutter->Update();
 
 
     //store the result in a new polyData
     vtkSmartPointer<vtkPolyData> cutPolyData = vtkSmartPointer<vtkPolyData>::New();
 
-    cutPolyData= cutStrips->GetOutput();
+    cutPolyData= cutter->GetOutput();
+
 
     return cutPolyData;
   }
@@ -274,6 +272,12 @@ void mitk::ContourModelMapper2D::ApplyContourProperties(mitk::BaseRenderer* rend
     localStorage->m_Actor->GetProperty()->SetLineWidth(binaryOutlineWidth);
   }
 
+  //make sure that directional lighting isn't used for our contour
+  localStorage->m_Actor->GetProperty()->SetAmbient(1.0);
+  localStorage->m_Actor->GetProperty()->SetDiffuse(0.0);
+  localStorage->m_Actor->GetProperty()->SetSpecular(0.0);
+
+  //set the color of the contour
   localStorage->m_Actor->GetProperty()->SetColor(0.9, 1.0, 0.1);
 }
 

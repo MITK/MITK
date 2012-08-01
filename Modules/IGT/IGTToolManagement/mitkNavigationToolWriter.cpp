@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkProperties.h>
 #include <mitkSceneIO.h>
+#include <mitkPointSet.h>
 #include <mitkStandardFileLocations.h>
 
 //std headers
@@ -90,8 +91,13 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
   //Surface
     if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData()!=NULL) thisTool->SetData(Tool->GetDataNode()->GetData());
 
+  //Tool Landmarks
+    thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolRegistrationLandmarks())));
+    thisTool->AddProperty("ToolCalibrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolCalibrationLandmarks())));
+
   //Material is not needed, to avoid errors in scene serialization we have to do this:
     thisTool->ReplaceProperty("material",NULL);
+
 
   return thisTool;
   }
@@ -103,4 +109,16 @@ std::string mitk::NavigationToolWriter::GetFileWithoutPath(std::string FileWithP
   //dirty hack: Windows path seperators
   if (returnValue.size() == FileWithPath.size()) returnValue = FileWithPath.substr(FileWithPath.rfind("\\")+1, FileWithPath.length());
   return returnValue;
+  }
+
+std::string mitk::NavigationToolWriter::ConvertPointSetToString(mitk::PointSet::Pointer pointSet)
+  {
+  std::stringstream returnValue;
+  mitk::PointSet::PointDataIterator it;
+  for ( it = pointSet->GetPointSet()->GetPointData()->Begin();it != pointSet->GetPointSet()->GetPointData()->End();it++ )
+    {
+    mitk::Point3D thisPoint = pointSet->GetPoint(it->Index());
+    returnValue << it->Index() << ";" << thisPoint[0] << ";" << thisPoint[1] << ";" << thisPoint[2] << "|";
+    }
+  return returnValue.str();
   }

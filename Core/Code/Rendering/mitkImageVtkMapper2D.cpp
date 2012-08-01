@@ -153,6 +153,116 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
   }
 }
 
+
+bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p2,
+                                                vtkFloatingPointType *bounds )
+{
+  vtkFloatingPointType point1[3];
+  vtkFloatingPointType point2[3];
+  points->GetPoint( p1, point1 );
+  points->GetPoint( p2, point2 );
+
+  if ( (point1[2] * point2[2] <= 0.0) && (point1[2] != point2[2]) )
+  {
+    double x, y;
+    x = ( point1[0] * point2[2] - point1[2] * point2[0] ) / ( point2[2] - point1[2] );
+    y = ( point1[1] * point2[2] - point1[2] * point2[1] ) / ( point2[2] - point1[2] );
+
+    if ( x < bounds[0] ) { bounds[0] = x; }
+    if ( x > bounds[1] ) { bounds[1] = x; }
+    if ( y < bounds[2] ) { bounds[2] = y; }
+    if ( y > bounds[3] ) { bounds[3] = y; }
+    bounds[4] = bounds[5] = 0.0;
+    return true;
+  }
+  return false;
+}
+
+bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
+                                                          const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+{
+  // Clip the plane with the bounding geometry. To do so, the corner points
+  // of the bounding box are transformed by the inverse transformation
+  // matrix, and the transformed bounding box edges derived therefrom are
+  // clipped with the plane z=0. The resulting min/max values are taken as
+  // bounds for the image reslicer.
+  const mitk::BoundingBox *boundingBox = boundingGeometry->GetBoundingBox();
+
+  mitk::BoundingBox::PointType bbMin = boundingBox->GetMinimum();
+  mitk::BoundingBox::PointType bbMax = boundingBox->GetMaximum();
+
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  if(boundingGeometry->GetImageGeometry())
+  {
+    points->InsertPoint( 0, bbMin[0]-0.5, bbMin[1]-0.5, bbMin[2]-0.5 );
+    points->InsertPoint( 1, bbMin[0]-0.5, bbMin[1]-0.5, bbMax[2]-0.5 );
+    points->InsertPoint( 2, bbMin[0]-0.5, bbMax[1]-0.5, bbMax[2]-0.5 );
+    points->InsertPoint( 3, bbMin[0]-0.5, bbMax[1]-0.5, bbMin[2]-0.5 );
+    points->InsertPoint( 4, bbMax[0]-0.5, bbMin[1]-0.5, bbMin[2]-0.5 );
+    points->InsertPoint( 5, bbMax[0]-0.5, bbMin[1]-0.5, bbMax[2]-0.5 );
+    points->InsertPoint( 6, bbMax[0]-0.5, bbMax[1]-0.5, bbMax[2]-0.5 );
+    points->InsertPoint( 7, bbMax[0]-0.5, bbMax[1]-0.5, bbMin[2]-0.5 );
+  }
+  else
+  {
+    points->InsertPoint( 0, bbMin[0], bbMin[1], bbMin[2] );
+    points->InsertPoint( 1, bbMin[0], bbMin[1], bbMax[2] );
+    points->InsertPoint( 2, bbMin[0], bbMax[1], bbMax[2] );
+    points->InsertPoint( 3, bbMin[0], bbMax[1], bbMin[2] );
+    points->InsertPoint( 4, bbMax[0], bbMin[1], bbMin[2] );
+    points->InsertPoint( 5, bbMax[0], bbMin[1], bbMax[2] );
+    points->InsertPoint( 6, bbMax[0], bbMax[1], bbMax[2] );
+    points->InsertPoint( 7, bbMax[0], bbMax[1], bbMin[2] );
+  }
+
+  vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
+
+  vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+  transform->Identity();
+  transform->Concatenate( planeGeometry->GetVtkTransform()->GetLinearInverse() );
+
+  transform->Concatenate( boundingGeometry->GetVtkTransform() );
+
+  transform->TransformPoints( points, newPoints );
+
+  bounds[0] = bounds[2] = 10000000.0;
+  bounds[1] = bounds[3] = -10000000.0;
+  bounds[4] = bounds[5] = 0.0;
+
+  this->LineIntersectZero( newPoints, 0, 1, bounds );
+  this->LineIntersectZero( newPoints, 1, 2, bounds );
+  this->LineIntersectZero( newPoints, 2, 3, bounds );
+  this->LineIntersectZero( newPoints, 3, 0, bounds );
+  this->LineIntersectZero( newPoints, 0, 4, bounds );
+  this->LineIntersectZero( newPoints, 1, 5, bounds );
+  this->LineIntersectZero( newPoints, 2, 6, bounds );
+  this->LineIntersectZero( newPoints, 3, 7, bounds );
+  this->LineIntersectZero( newPoints, 4, 5, bounds );
+  this->LineIntersectZero( newPoints, 5, 6, bounds );
+  this->LineIntersectZero( newPoints, 6, 7, bounds );
+  this->LineIntersectZero( newPoints, 7, 4, bounds );
+
+  if ( (bounds[0] > 9999999.0) || (bounds[2] > 9999999.0)
+    || (bounds[1] < -9999999.0) || (bounds[3] < -9999999.0) )
+    {
+    return false;
+  }
+  else
+  {
+    // The resulting bounds must be adjusted by the plane spacing, since we
+    // we have so far dealt with index coordinates
+    const float *planeSpacing = planeGeometry->GetFloatSpacing();
+    bounds[0] *= planeSpacing[0];
+    bounds[1] *= planeSpacing[0];
+    bounds[2] *= planeSpacing[1];
+    bounds[3] *= planeSpacing[1];
+    bounds[4] *= planeSpacing[2];
+    bounds[5] *= planeSpacing[2];
+    return true;
+  }
+}
+
+
 void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
@@ -255,13 +365,14 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     }
   }
 
+  const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
 
   if(thickSlicesMode > 0)
   {  
     double dataZSpacing = 1.0;
 
     Vector3D normInIndex, normal;
-    const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
+
     if ( planeGeometry != NULL ){
       normal = planeGeometry->GetNormal();
     }else{
@@ -334,7 +445,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // Calculate the actual bounds of the transformed plane clipped by the
   // dataset bounding box; this is required for drawing the texture at the
   // correct position during 3D mapping.
-  bool anyPartVisible = this->CalculateClippedPlaneBounds( input->GetGeometry(), planeGeometry, textureClippingBounds );
+  /*bool anyPartVisible =*/ this->CalculateClippedPlaneBounds( input->GetGeometry(), planeGeometry, textureClippingBounds );
 
   textureClippingBounds[0] = static_cast< int >( textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5 );
   textureClippingBounds[1] = static_cast< int >( textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5 );

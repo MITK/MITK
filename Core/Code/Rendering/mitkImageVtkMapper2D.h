@@ -238,6 +238,15 @@ namespace mitk {
     */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
 
+    /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds() */
+    bool LineIntersectZero( vtkPoints *points, int p1, int p2,
+                            vtkFloatingPointType *bounds );
+
+    /** \brief Calculate the bounding box of the resliced image. This is necessary for
+        arbitrarily rotated planes in an image volume. A rotated plane (e.g. in swivel mode)
+        will have a new bounding box, which needs to be calculated. */
+    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
+                                      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
 
     /** \brief This method uses the vtkCamera clipping range and the layer property
     * to calcualte the depth of the object (e.g. image or contour). The depth is used

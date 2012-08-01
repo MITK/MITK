@@ -145,6 +145,9 @@ template <class T>
 
   double tableRange[2];
 
+  clippingBounds ++;
+
+
   lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
 
   lookupTable->GetTableRange(tableRange);

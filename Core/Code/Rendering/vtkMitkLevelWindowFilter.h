@@ -1,21 +1,22 @@
-/*===================================================================
+/*=========================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2009-07-14 19:11:20 +0200 (Tue, 14 Jul 2009) $
+Version:   $Revision: 18127 $
 
-Copyright (c) German Cancer Research Center, 
-Division of Medical and Biological Informatics.
-All rights reserved.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
-A PARTICULAR PURPOSE.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
-See LICENSE.txt or http://www.mitk.org for details.
+=========================================================================*/
 
-===================================================================*/
-
-#ifndef __vtkMitkApplyLevelWindowToRGBFilter_h
-#define __vtkMitkApplyLevelWindowToRGBFilter_h
+#ifndef __vtkMitkLevelWindowFilter_h
+#define __vtkMitkLevelWindowFilter_h
 
 class vtkScalarsToColors;
 #include <vtkImageData.h>
@@ -34,7 +35,7 @@ class vtkScalarsToColors;
 *
 * \ingroup Renderer
 */
-class MITK_CORE_EXPORT vtkMitkApplyLevelWindowToRGBFilter : public vtkImageToImageFilter
+class MITK_CORE_EXPORT vtkMitkLevelWindowFilter : public vtkImageToImageFilter
 {
 public:
   virtual unsigned long int GetMTime();
@@ -51,10 +52,12 @@ public:
   void SetMaxOpacity(double maxOpacity);
   inline double GetMaxOpacity() const;
 
+  void SetClippingBounds(vtkFloatingPointType*);
+
   /** Default constructor. */
-  vtkMitkApplyLevelWindowToRGBFilter();
+  vtkMitkLevelWindowFilter();
   /** Default deconstructor. */
-  ~vtkMitkApplyLevelWindowToRGBFilter();
+  ~vtkMitkLevelWindowFilter();
 protected:
   /** \brief Method for threaded execution of the filter.
    * \param *inData: The input.
@@ -77,5 +80,7 @@ private:
   double m_MinOqacity;
   /** m_MinOqacity contains the upper bound for the alpha level window.*/
   double m_MaxOpacity;
+
+  vtkFloatingPointType m_ClippingBounds[4];
 };
 #endif

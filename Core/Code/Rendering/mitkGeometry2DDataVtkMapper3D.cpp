@@ -99,7 +99,7 @@ namespace mitk
 
     m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
     m_BackgroundActor->GetProperty()->SetColor( 0.0, 0.0, 0.0 );
-    m_BackgroundActor->GetProperty()->SetOpacity( 1.0 );
+    m_BackgroundActor->GetProperty()->SetOpacity( 0.0 );
     m_BackgroundActor->SetMapper( m_BackgroundMapper );
 
     vtkProperty * backfaceProperty = m_BackgroundActor->MakeProperty();
@@ -487,6 +487,8 @@ namespace mitk
               imageActor = vtkActor::New();
               imageActor->SetMapper( dataSetMapper );
               imageActor->SetTexture( texture );
+              imageActor->GetProperty()->SetOpacity(0.999); // HACK! otherwise VTK wouldn't recognize this as translucent surface (if LUT values map to alpha < 255
+              // improvement: apply "opacity" property onle HERE and also in 2D image mapper. DO NOT change LUT to achieve translucent images (see method ChangeOpacity in image mapper 2D)
 
               // Make imageActor the sole owner of the mapper and texture
               // objects

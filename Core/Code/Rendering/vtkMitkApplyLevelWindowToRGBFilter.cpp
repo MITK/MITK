@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageData.h>
 #include <vtkImageIterator.h>
 #include <vtkLookupTable.h>
+#include <mitkLogMacros.h>
 
 //used for acos etc.
 #include <cmath>
@@ -34,10 +35,30 @@ vtkMitkApplyLevelWindowToRGBFilter::vtkMitkApplyLevelWindowToRGBFilter():m_MinOq
 vtkMitkApplyLevelWindowToRGBFilter::~vtkMitkApplyLevelWindowToRGBFilter()
 {
 }
+//----------------------------------------------------------------------------
+// Account for the MTime of the transform and its matrix when determining
+// the MTime of the filter
+unsigned long int vtkMitkApplyLevelWindowToRGBFilter::GetMTime()
+{
+  unsigned long mTime=this->vtkObject::GetMTime();
+  unsigned long time;
+
+  if ( this->m_LookupTable != NULL )
+  {
+    time = this->m_LookupTable->GetMTime();
+    mTime = ( time > mTime ? time : mTime );
+  }
+ 
+  return mTime;
+}
 
 void vtkMitkApplyLevelWindowToRGBFilter::SetLookupTable(vtkScalarsToColors *lookupTable)
 {
-  m_LookupTable = lookupTable;
+  if (m_LookupTable != lookupTable)
+  {
+    m_LookupTable = lookupTable;
+    this->Modified();
+  }
 }
 
 vtkScalarsToColors* vtkMitkApplyLevelWindowToRGBFilter::GetLookupTable()
@@ -207,17 +228,17 @@ void vtkMitkApplyLevelWindowToRGBFilter::ExecuteInformation()
   output->SetUpdateExtent(extent);
   output->AllocateScalars();
 
-  switch (input->GetScalarType())
-  {
-    vtkTemplateMacro(
-        vtkCalculateIntensityFromLookupTable( this,
-                                              input,
-                                              output, extent,
-                                              static_cast<VTK_TT *>(0)));
-  default:
-    vtkErrorMacro(<< "Execute: Unknown ScalarType");
-    return;
-  }
+  //switch (input->GetScalarType())
+  //{
+  //  vtkTemplateMacro(
+  //      vtkCalculateIntensityFromLookupTable( this,
+  //                                            input,
+  //                                            output, extent,
+  //                                            static_cast<VTK_TT *>(0)));
+  //default:
+  //  vtkErrorMacro(<< "Execute: Unknown ScalarType");
+  //  return;
+  //}
 }
 
 //Method to run the filter in different threads.
@@ -225,6 +246,8 @@ void vtkMitkApplyLevelWindowToRGBFilter::ThreadedExecute(vtkImageData *inData,
                                                          vtkImageData *outData,
                                                          int extent[6], int /*id*/)
 {
+  std::cout << "RGB" << std::flush;
+
   switch (inData->GetScalarType())
   {
     vtkTemplateMacro(

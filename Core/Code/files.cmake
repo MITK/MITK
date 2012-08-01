@@ -292,11 +292,13 @@ set(CPP_FILES
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkApplyLevelWindowToRGBFilter.cpp
+  Rendering/vtkMitkLevelWindowFilter.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h
   Common/mitkCoreObjectFactoryBase.cpp
   Common/mitkCoreObjectFactory.cpp
+
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})

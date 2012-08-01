@@ -70,6 +70,11 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /*! \brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
 
+    /*!
+    * \brief Will return true, if a service is currently selected and false otherwise.
+    * Call this before requesting service references to avoid invalid objects
+    */
+    bool GetIsServiceSelected();
 
     /*!
     * \brief Returns the currently selected Service as a ServiceReference.
@@ -122,7 +127,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     *\brief This is a legacy method that will be removed in the near future, do not use.
     * Use the templated functions instead, as they provide a much cleaner API.
     */
-    mitk::ModuleContext* provideContext();
+    mitk::ModuleContext* ProvideContext();
 
 
 
@@ -151,12 +156,12 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * and the new properties make it fall trough the filter. This effectively means that
     * the widget will not track the service anymore. Usually, the Service should still be useable though
     */
-    void ServiceModiefiedEndMatch(mitk::ServiceReference);
+    void ServiceModifiedEndMatch(mitk::ServiceReference);
 
     /*!
     *\brief Emitted the user selects a Service from the list
     */
-    void ServiceSelected(mitk::ServiceReference);
+    void ServiceSelectionChanged(mitk::ServiceReference*);
 
   public slots:
 

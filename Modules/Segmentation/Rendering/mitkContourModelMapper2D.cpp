@@ -103,11 +103,18 @@ void mitk::ContourModelMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
   mitk::ContourModel* inputContour  = static_cast< mitk::ContourModel* >( this->GetData() );
 
-  localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour, renderer);
+  unsigned int timestep = renderer->GetTimeStep();
+
+  //if there's something to be rendered
+  if( inputContour->GetNumberOfVertices(timestep) > 0)
+  {
+    localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour, renderer);
+  }
 
   localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
 
   this->ApplyContourProperties(renderer);
+
 
 }
 
@@ -130,18 +137,22 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer* renderer)
   // Calculate time step of the input data for the specified renderer (integer value)
   this->CalculateTimeStep( renderer );
 
+    LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+
   // Check if time step is valid
   const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
   if ( ( dataTimeGeometry == NULL )
     || ( dataTimeGeometry->GetTimeSteps() == 0 )
-    || ( !dataTimeGeometry->IsValidTime( this->GetTimestep() ) ) )
+    || ( !dataTimeGeometry->IsValidTime( renderer->GetTimeStep() ) ) )
   {
+    //clear the rendered polydata
+    localStorage->m_Mapper->SetInput(vtkSmartPointer<vtkPolyData>::New());
     return;
   }
 
   const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+
 
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
@@ -163,6 +174,9 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer* renderer)
 
 vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour, mitk::BaseRenderer* renderer)
 {
+  unsigned int timestep = this->GetTimestep();
+
+
   /* First of all convert the control points of the contourModel to vtk points
    * and add lines in between them
    */
@@ -170,11 +184,11 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
   //iterate over all control points
-  mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin();
-  mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin();
+  mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(timestep);
+  mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin(timestep);
   next++;
 
-  mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd();
+  mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd(timestep);
 
   while(next != end)
   {
@@ -195,11 +209,11 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
   /* If the contour is closed an additional line has to be created between the very first point
    * and the last point
    */
-  if(inputContour->IsClosed())
+  if(inputContour->IsClosed(timestep))
   {
     //add a line from the last to the first control point
-    mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin());
-    mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd()));
+    mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin(timestep));
+    mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd(timestep)));
     vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);
     vtkIdType p1 = points->InsertNextPoint(firstControlPoint->Coordinates[0], firstControlPoint->Coordinates[1], firstControlPoint->Coordinates[2]);
 

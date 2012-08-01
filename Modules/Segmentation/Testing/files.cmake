@@ -2,7 +2,7 @@ set(MODULE_TESTS
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
   mitkDataNodeSegmentationTest.cpp
-#  mitkSegmentationInterpolationTest.cpp
+  mitkSegmentationInterpolationTest.cpp
 )
 
 set(MODULE_IMAGE_TESTS

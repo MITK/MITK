@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandardFileLocations.h"
 #include "mitkDataNodeFactory.h"
 #include "ipSegmentation.h"
-#include "mitkCompareImageSliceTestHelper.h"s
+#include "mitkCompareImageSliceTestHelper.h"
 
 class mitkSegmentationInterpolationTestClass
 {
@@ -27,7 +27,7 @@ class mitkSegmentationInterpolationTestClass
     mitkSegmentationInterpolationTestClass() {}
     ~mitkSegmentationInterpolationTestClass() {}
 
-    bool Test()
+    bool Test(std::string filename1, std::string filename2)
     {
       return CreateNewInterpolator()
           && CreateSegmentation()
@@ -42,7 +42,7 @@ class mitkSegmentationInterpolationTestClass
           && TestInterpolation(0)
           && DeleteInterpolator()
           && CreateNewInterpolator()
-          && LoadTestImages()
+          && LoadTestImages(filename1, filename2)
           && CompareInterpolationsToDefinedReference();
     }
 
@@ -54,7 +54,7 @@ class mitkSegmentationInterpolationTestClass
     bool CreateTwoSlices(int);
     bool TestInterpolation(int);
     bool DeleteInterpolator();
-    bool LoadTestImages();
+    bool LoadTestImages(std::string filename1, std::string filename2);
     bool CompareInterpolationsToDefinedReference();
 
     mitk::Image::Pointer LoadImage(const std::string& filename);
@@ -242,37 +242,12 @@ bool mitkSegmentationInterpolationTestClass::DeleteInterpolator()
   return true;
 }
 
-bool mitkSegmentationInterpolationTestClass::LoadTestImages()
+bool mitkSegmentationInterpolationTestClass::LoadTestImages(std::string filename1, std::string filename2)
 {
-  std::string filename1 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_manual.pic.gz", "../mitk/Core/Testing/Data/");
-  if ( filename1.empty() )
-  {
-    filename1 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_manual.pic.gz", "Testing/Data/");
-  }
-  
-  std::cout << "Found test image (manual slices) in '" << filename1 << "'" << std::endl;
-  
-  std::string filename2 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_result.pic.gz", "../mitk/Core/Testing/Data/");
-  if ( filename2.empty() )
-  {
-    filename2 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_result.pic.gz", "Testing/Data/");
-  }
-  
-  std::cout << "Found test image (reference for interpolation) in '" << filename2 << "'" << std::endl;
-  
-  if ( filename1.empty() || filename2.empty() )
-  {
-    return false;
-  }
-  else
-  {
-    m_ManualSlices = LoadImage( filename1 );
-    m_InterpolatedSlices = LoadImage( filename2 );
+  m_ManualSlices = LoadImage( filename1 );
+  m_InterpolatedSlices = LoadImage( filename2 );
 
-    return ( m_ManualSlices.IsNotNull() && m_InterpolatedSlices.IsNotNull() );
-  }
-
-  return true;
+  return ( m_ManualSlices.IsNotNull() && m_InterpolatedSlices.IsNotNull() );
 }
     
 mitk::Image::Pointer mitkSegmentationInterpolationTestClass::LoadImage(const std::string& filename)
@@ -344,14 +319,17 @@ bool mitkSegmentationInterpolationTestClass::CompareInterpolationsToDefinedRefer
 }
 
 /// ctest entry point
-int mitkSegmentationInterpolationTest(int /*argc*/, char* /*argv*/[])
+int mitkSegmentationInterpolationTest(int argc, char* argv[])
 {
 // one big variable to tell if anything went wrong
-  std::cout << "Creating CoreObjectFactory" << std::endl;
-  itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
-
+//  std::cout << "Creating CoreObjectFactory" << std::endl;
+//  itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
+  if (argc < 3)
+  {
+    std::cerr << " (EE) Missing arguments for testing" << std::endl;
+  }
   mitkSegmentationInterpolationTestClass test;
-  if ( test.Test() )
+  if ( test.Test(argv[1], argv[2]) )
   {
     std::cout << "[PASSED]" << std::endl;
     return EXIT_SUCCESS;

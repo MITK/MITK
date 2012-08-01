@@ -1,1 +1,2 @@
 MITK_CREATE_MODULE_TESTS()
+mitkAddCustomModuleTest(mitkSegmentationInterpolationTest mitkSegmentationInterpolationTest ${MITK_DATA_DIR}/interpolation_test_manual.pic.gz ${MITK_DATA_DIR}/interpolation_test_result.pic.gz)

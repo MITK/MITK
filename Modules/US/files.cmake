@@ -1,9 +1,15 @@
 SET(CPP_FILES
-USFilters/mitkUSImage.cpp
+## Model classes
+USModel/mitkUSImage.cpp
+USModel/mitkUSImageMetadata.cpp
+USModel/mitkUSDevice.cpp
+USModel/mitkUSVideoDevice.cpp
+USModel/mitkUSProbe.cpp
+
+## Services
+USService/mitkUSDeviceService.cpp
+
+## Filters and sources
 USFilters/mitkUSImageVideoSource.cpp
-USFilters/mitkUSImageMetadata.cpp
-USFilters/mitkUSDevice.cpp
-USFilters/mitkUSVideoDevice.cpp
-USFilters/mitkUSProbe.cpp
 USFilters/mitkUSImageToUSImageFilter.cpp
 )

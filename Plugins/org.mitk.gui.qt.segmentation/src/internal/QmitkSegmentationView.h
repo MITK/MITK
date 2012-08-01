@@ -98,8 +98,6 @@ protected slots:
 
   void OnShowMarkerNodes(bool);
 
-  void On3DInterpolationEnabled(bool);
-
 protected:
   
   // a type for handling lists of DataNodes

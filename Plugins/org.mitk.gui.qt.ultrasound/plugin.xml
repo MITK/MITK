@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.ultrasoundsupport"
+          name="Ultrasound Support"
+          class="UltrasoundSupport"
+          icon="resources/icon.xpm" />
+  </extension>
+
+</plugin>

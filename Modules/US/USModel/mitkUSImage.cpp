@@ -28,7 +28,6 @@ mitk::USImage::USImage(mitk::Image::Pointer image) : mitk::Image()
 {
   this->Initialize(image);
   this->SetVolume(image->GetData());
-  //this->SetMetadata(mitk::USImageMetadata::New());
 }
 
 mitk::USImage::~USImage()

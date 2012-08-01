@@ -72,28 +72,28 @@ public:
   static const std::string VIEW_ID;
 
 public slots: 
-    /** \brief  */
+    /** \brief  Called when the statistics update is finished, sets the results to GUI.*/
     void OnThreadedStatisticsCalculationEnds();
 
 protected slots:
-  /** \brief  */
+  /** \brief  Saves the histogram to the clipboard */
   void OnClipboardHistogramButtonClicked();
-  /** \brief  */
+  /** \brief  Saves the statistics to the clipboard */
   void OnClipboardStatisticsButtonClicked();
-  /** \brief  */
+  /** \brief  Indicates if zeros should be excluded from statistics calculation */
   void OnIgnoreZerosCheckboxClicked(  );
-  /** \brief  */
+  /** \brief Checks if update is possible and calls StatisticsUpdate() possible */
   void RequestStatisticsUpdate();
 
 signals:
-  /** \brief  */
+  /** \brief Method to set the data to the member and start the threaded statistics update */
   void StatisticsUpdate();
 
 protected:
-  /** \brief  */
+  /** \brief  Writes the calculated statistics to the GUI */
   void FillStatisticsTableView( const mitk::ImageStatisticsCalculator::Statistics &s,
     const mitk::Image *image );
-  /** \brief  */
+  /** \brief  Removes statistics from the GUI */
   void InvalidateStatisticsTableView();
 
   /** \brief Recalculate statistics for currently selected image and mask and
@@ -113,8 +113,8 @@ protected:
   void Deactivated();
   void Visible();
   void Hidden();
-
   void SetFocus();
+
   /** \brief Method called when itkModifiedEvent is called by selected data. */
   void SelectedDataModified();
   /** \brief  Method called when the data manager selection changes */
@@ -124,6 +124,9 @@ protected:
   /** \brief  writes the statistics to the gui*/
   void WriteStatisticsToGUI();
 
+  void NodeRemoved(const mitk::DataNode *node);
+
+  // member variables 
   Ui::QmitkImageStatisticsViewControls *m_Controls;
   QmitkImageStatisticsCalculationThread* m_CalculationThread;
 

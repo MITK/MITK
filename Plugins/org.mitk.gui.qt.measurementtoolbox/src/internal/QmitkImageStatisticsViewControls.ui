@@ -100,13 +100,13 @@
         <property name="minimumSize">
          <size>
           <width>100</width>
-          <height>144</height>
+          <height>175</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>144</height>
+          <height>170</height>
          </size>
         </property>
         <property name="verticalScrollBarPolicy">
@@ -158,10 +158,10 @@
          <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderDefaultSectionSize">
-         <number>20</number>
+         <number>25</number>
         </attribute>
         <attribute name="verticalHeaderMinimumSectionSize">
-         <number>20</number>
+         <number>25</number>
         </attribute>
         <attribute name="verticalHeaderShowSortIndicator" stdset="0">
          <bool>false</bool>
@@ -260,59 +260,49 @@
      <property name="checkable">
       <bool>false</bool>
      </property>
-     <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
-      <property name="geometry">
-       <rect>
-        <x>1</x>
-        <y>23</y>
-        <width>445</width>
-        <height>163</height>
-       </rect>
-      </property>
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget"/>
-      <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget"/>
-     </widget>
-     <widget class="QWidget" name="widget_2" native="true">
-      <property name="geometry">
-       <rect>
-        <x>1</x>
-        <y>192</y>
-        <width>134</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="margin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="m_ButtonCopyHistogramToClipboard">
-         <property name="text">
-          <string>Copy to Clipboard</string>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget"/>
+        <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget"/>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QWidget" name="widget_2" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
          </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+         <property name="margin">
+          <number>0</number>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
+         <item>
+          <widget class="QPushButton" name="m_ButtonCopyHistogramToClipboard">
+           <property name="text">
+            <string>Copy to Clipboard</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="5" column="0">

@@ -29,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkInteractionConst.h"
 
+#include <mitkDiffSliceOperation.h>
+
+
 namespace mitk
 {
 
@@ -72,8 +75,6 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     void SetShowMarkerNodes(bool);
 
-    void Enable3DInterpolation(bool);
-
   protected:
 
     SegTool2D(); // purposely hidden
@@ -115,7 +116,6 @@ class Segmentation_EXPORT SegTool2D : public Tool
     unsigned int AddContourmarker ( const PositionEvent* );
 
     void InteractiveSegmentationBugMessage( const std::string& message );
-
  
   private:
 
@@ -126,6 +126,9 @@ class Segmentation_EXPORT SegTool2D : public Tool
 
     bool m_ShowMarkerNodes;
     bool m_3DInterpolationEnabled;
+
+    DiffSliceOperation* m_doOperation;
+    DiffSliceOperation* m_undoOperation;
 };
 
 } // namespace

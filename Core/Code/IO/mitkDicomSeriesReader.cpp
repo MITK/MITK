@@ -1231,7 +1231,14 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
     }
     else
     {
-      return true;
+      // we need some reproducible sort criteria here
+      gdcm::Attribute<0x0008,0x0018> sop_uid1;   // SOP instance UID, mandatory
+      gdcm::Attribute<0x0008,0x0018> sop_uid2;
+
+      sop_uid1.Set(ds1);
+      sop_uid2.Set(ds2);
+
+      return sop_uid1 < sop_uid2;
     }
   }
   else

@@ -14,10 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSDevice.h"
+#include "mitkUSVideoDevice.h"
 #include "mitkUSProbe.h"
 #include "mitkTestingMacros.h"
-#include <string>
 
 
 class mitkUSDeviceTestClass
@@ -27,16 +26,19 @@ public:
   static void TestInstantiation()
   {
     // let's create an object of our class
-    mitk::USDevice::Pointer device = mitk::USDevice::New("Manufacturer", "Model", true);
-    MITK_TEST_CONDITION_REQUIRED(device.IsNotNull(), "USDevice should not be null after instantiation");
+    mitk::USVideoDevice::Pointer  tempPointer =  mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    mitk::USDevice* device = tempPointer.GetPointer();
+    MITK_TEST_CONDITION_REQUIRED(device, "USDevice should not be null after instantiation");
     MITK_TEST_CONDITION_REQUIRED((device->GetDeviceManufacturer().compare("Manufacturer") == 0), "Manufacturer should be set correctly");
     MITK_TEST_CONDITION_REQUIRED((device->GetDeviceModel().compare("Model") == 0), "Model should be set correctly");
-    MITK_TEST_CONDITION_REQUIRED((device->GetIsVideoOnly() == true), "Device should be VideoOnly");
   }
 
    static void TestAddProbe()
   {
-    mitk::USDevice::Pointer device = mitk::USDevice::New("Manufacturer", "Model", true);
+    //mitk::USDevice::Pointer device = mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    mitk::USVideoDevice::Pointer  tempPointer =  mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    mitk::USDevice* device = tempPointer.GetPointer();
+
     // create probes
     mitk::USProbe::Pointer usSource = mitk::USProbe::New();
     mitk::USProbe::Pointer probeA = mitk::USProbe::New();
@@ -68,7 +70,9 @@ public:
 
   static void TestActivateProbe()
   {
-    mitk::USDevice::Pointer device = mitk::USDevice::New("Manufacturer", "Model", true);
+    //mitk::USDevice::Pointer device = mitk::USVideoDevice::New("IllegalVideoDevice", "Manufacturer", "Model");
+    mitk::USVideoDevice::Pointer  tempPointer =  mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    mitk::USDevice* device = tempPointer.GetPointer();
     // create probes
     mitk::USProbe::Pointer usSource = mitk::USProbe::New();
     mitk::USProbe::Pointer probeA = mitk::USProbe::New();

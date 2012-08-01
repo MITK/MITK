@@ -341,19 +341,34 @@ namespace mitk
             MITK_INFO << "Unable to open bvals file";
           }
 
+
           m_B_Value = -1;
           unsigned int numb = bval_entries.size();
           for(unsigned int i=0; i<numb; i++)
           {
+
+            // Take the first entry in bvals as the reference b-value
             if(m_B_Value == -1 && bval_entries.at(i) != 0)
             {
               m_B_Value = bval_entries.at(i);
             }
 
+            float b_val = bval_entries.at(i);
+
+
             vnl_vector_fixed< double, 3 > vec;
             vec[0] = bvec_entries.at(i);
             vec[1] = bvec_entries.at(i+numb);
             vec[2] = bvec_entries.at(i+2*numb);
+
+            // Adjust the vector length to encode gradient strength
+            float factor = b_val/m_B_Value;
+            if(vec.magnitude() > 0)
+            {
+              vec[0] = sqrt(factor)*vec[0];
+              vec[1] = sqrt(factor)*vec[1];
+              vec[2] = sqrt(factor)*vec[2];
+            }
 
             m_DiffusionVectors->InsertElement(i,vec);
             m_OriginalDiffusionVectors->InsertElement(i,vec);

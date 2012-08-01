@@ -63,11 +63,6 @@ QmitkImageStatisticsView::~QmitkImageStatisticsView()
     itksys::SystemTools::Delay(100);
   }
   delete this->m_CalculationThread;
-
-  //if(m_QThreadMutex != 0)
-  //{
-  //  delete m_QThreadMutex;
-  //}
 }
 
 void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
@@ -215,6 +210,7 @@ void QmitkImageStatisticsView::ReinitData()
   m_Controls->m_ErrorMessageLabel->setText( "" );
   m_Controls->m_ErrorMessageLabel->hide();
   this->InvalidateStatisticsTableView();
+  m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
   m_Controls->m_HistogramWidget->ClearItemModel();
   m_Controls->m_LineProfileWidget->ClearItemModel();
 }
@@ -318,6 +314,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       this->InvalidateStatisticsTableView();
       m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
       m_Controls->m_HistogramWidget->ClearItemModel();
+      m_Controls->m_LineProfileWidget->ClearItemModel();
       m_CurrentStatisticsValid = false;
       this->m_StatisticsUpdatePending = false;
       return;
@@ -386,6 +383,19 @@ void QmitkImageStatisticsView::SelectedDataModified()
   }
 }
 
+void QmitkImageStatisticsView::NodeRemoved(const mitk::DataNode *node)
+{
+  while(this->m_CalculationThread->isRunning()) // wait until thread has finished
+  {
+    itksys::SystemTools::Delay(100);
+  }
+
+  if (node->GetData() == m_SelectedImage)
+  {
+    m_SelectedImage = NULL;
+  }
+}
+
 void QmitkImageStatisticsView::RequestStatisticsUpdate()
 {
   if ( !m_StatisticsUpdatePending )
@@ -400,7 +410,8 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
       this->UpdateStatistics();
     }
   }
-  this->GetRenderWindowPart()->RequestUpdate();
+  if (this->GetRenderWindowPart())
+    this->GetRenderWindowPart()->RequestUpdate();
 }
 
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
@@ -423,8 +434,8 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
 
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
     m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
-    m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
     m_Controls->m_HistogramWidget->SetHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
+    m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
     int timeStep = this->m_CalculationThread->GetTimeStep();
     this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
   }
@@ -437,7 +448,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     m_Controls->m_ErrorMessageLabel->show();
     // Clear statistics and histogram
     this->InvalidateStatisticsTableView();
+    m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
     m_Controls->m_HistogramWidget->ClearItemModel();
+    m_Controls->m_LineProfileWidget->ClearItemModel();
     m_CurrentStatisticsValid = false;
 
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
@@ -449,6 +462,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       {
         // Clear statistics, histogram, and GUI
         this->InvalidateStatisticsTableView();
+        m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
         m_Controls->m_HistogramWidget->ClearItemModel();
         m_Controls->m_LineProfileWidget->ClearItemModel();
         m_CurrentStatisticsValid = false;

@@ -126,8 +126,6 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
       emit(ServiceModifiedEndMatch(event.GetServiceReference()));
       RemoveServiceFromList(event.GetServiceReference());
       break;
-  //default:
-    // mitkThrow() << "ServiceListenerWidget recieved an unrecognized event. Please Update Implementation of QmitkServiceListWidget::OnServiceEvent()";
   }
 }
 
@@ -180,12 +178,4 @@ mitk::ServiceReference QmitkServiceListWidget::GetServiceForListItem(QListWidget
 std::list<mitk::ServiceReference> QmitkServiceListWidget::GetAllRegisteredServices(){
   //Get Service References
   return m_Context->GetServiceReferences(m_Interface, m_Filter);
-}
-
-
-////////// DEBUG ///////////
-
-
-mitk::ModuleContext* QmitkServiceListWidget::ProvideContext(){
-  return m_Context;
 }

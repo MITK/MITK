@@ -20,6 +20,8 @@ TestPerspective::TestPerspective()
 {
 }
 
-void TestPerspective::CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/)
+void TestPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
+  layout->AddStandaloneView("StandaloneView1", true, 0, 0.33f, layout->GetEditorArea());
+  layout->GetViewLayout("StandaloneView1")->SetCloseable(false);
 }

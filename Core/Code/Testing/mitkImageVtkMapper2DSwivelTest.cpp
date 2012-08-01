@@ -52,8 +52,11 @@ int mitkImageVtkMapper2DSwivelTest(int argc, char* argv[])
 
     //new version of setting the center point:
     mitk::Image::Pointer image = static_cast<mitk::Image*>(renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Image"))->GetData());
+
+    //get the center point of the image
     centerPoint = image->GetGeometry()->GetCenter();
 
+    //rotate the image arround its own center
     renderingHelper.ReorientSlices(centerPoint, rotationVector);
     renderingHelper.Render();
 

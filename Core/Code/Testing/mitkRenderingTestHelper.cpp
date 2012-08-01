@@ -101,10 +101,6 @@ void mitkRenderingTestHelper::ReorientSlices(mitk::Point3D origin, mitk::Vector3
    mitk::SliceNavigationController::Pointer sliceNavigationController =
    mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController();
      sliceNavigationController->ReorientSlices(origin, rotation);
-
-//first version of alex using the sliceNavigationController to set the center.
-//     mitk::Stepper::Pointer stepper = sliceNavigationController->GetSlice();
-//     sliceNavigationController->GetSlice()->SetPos(stepper->GetSteps()/2);
 }
 
 vtkRenderer* mitkRenderingTestHelper::GetVtkRenderer()

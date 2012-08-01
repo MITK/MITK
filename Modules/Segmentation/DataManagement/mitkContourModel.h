@@ -96,6 +96,16 @@ namespace mitk
     {
       this->m_SelectedVertex = NULL;
     }
+
+    virtual const VertexType* GetVertexAt(int index, int timestep=0) const
+    {
+      return this->m_ContourSeries[timestep]->GetVertexAt(index);
+    }
+
+    virtual bool IsEmptyTimeStep(unsigned int t) const
+    {
+      return this->m_ContourSeries.size() <= t;
+    }
 /*++++++++++++++++  END inline methods  +++++++++++++++++++++++*/
 
 

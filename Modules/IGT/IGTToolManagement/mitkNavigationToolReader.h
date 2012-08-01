@@ -63,6 +63,8 @@ namespace mitk {
 
     //################### protected help methods ########################
     std::string GetFileWithoutPath(std::string FileWithPath);
+    mitk::PointSet::Pointer ConvertStringToPointSet(std::string string);
+    void split(std::string& text, std::string& separators, std::vector<std::string>& words);
 
   };
 } // namespace mitk

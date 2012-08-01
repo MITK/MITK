@@ -135,8 +135,10 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
   const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
   if ( ( dataTimeGeometry == NULL )
     || ( dataTimeGeometry->GetTimeSteps() == 0 )
-    || ( !dataTimeGeometry->IsValidTime( this->GetTimestep() ) ) )
+    || ( !dataTimeGeometry->IsValidTime( renderer->GetTimeStep() ) ) )
   {
+    //clear the rendered polydata
+    localStorage->m_Mapper->SetInput(vtkSmartPointer<vtkPolyData>::New());
     return;
   }
 
@@ -164,17 +166,19 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
 
 vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour)
 {
+  unsigned int timestep = this->GetTimestep();
+
   //the points to draw
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   //the lines to connect the points
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
 
   //iterate over the control points
-  mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin();
-  mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin();
+  mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(timestep);
+  mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin(timestep);
   next++;
 
-  mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd();
+  mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd(timestep);
 
   while(next != end)
   {
@@ -192,11 +196,11 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
     next++;
   }
 
-  if(inputContour->IsClosed())
+  if(inputContour->IsClosed(timestep))
   {
     // If the contour is closed add a line from the last to the first control point
-    mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin());
-    mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd()));
+    mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin(timestep));
+    mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd(timestep)));
     vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);
     vtkIdType p1 = points->InsertNextPoint(firstControlPoint->Coordinates[0], firstControlPoint->Coordinates[1], firstControlPoint->Coordinates[2]);
 

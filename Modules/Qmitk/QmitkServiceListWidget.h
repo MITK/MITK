@@ -161,7 +161,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /*!
     *\brief Emitted the user selects a Service from the list
     */
-    void ServiceSelected(mitk::ServiceReference);
+    void ServiceSelectionChanged(mitk::ServiceReference*);
 
   public slots:
 

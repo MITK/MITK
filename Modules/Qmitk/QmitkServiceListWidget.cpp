@@ -61,7 +61,7 @@ void QmitkServiceListWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_ServiceList, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnDeviceSelectionChanged()) );
+    connect( m_Controls->m_ServiceList, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnServiceSelectionChanged()) );
   }
 }
 
@@ -95,7 +95,7 @@ void QmitkServiceListWidget::OnServiceSelectionChanged(){
   mitk::ServiceReference ref = this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
   if (! ref) return;
 
-  emit (ServiceSelected(ref));
+  emit (ServiceSelectionChanged(&ref));
 }
 
 mitk::ServiceReference QmitkServiceListWidget::GetSelectedService(){

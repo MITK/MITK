@@ -87,11 +87,19 @@ void QmitkServiceListWidget::InitPrivate(const std::string& namingProperty, cons
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
+bool QmitkServiceListWidget::GetIsServiceSelected(){
+  return (this->m_Controls->m_ServiceList->currentItem() != 0);
+}
+
 void QmitkServiceListWidget::OnServiceSelectionChanged(){
   mitk::ServiceReference ref = this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
   if (! ref) return;
 
   emit (ServiceSelected(ref));
+}
+
+mitk::ServiceReference QmitkServiceListWidget::GetSelectedService(){
+  return this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
 }
 
 
@@ -115,7 +123,7 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
       RemoveServiceFromList(event.GetServiceReference());
       break;
     case mitk::ServiceEvent::MODIFIED_ENDMATCH:
-      emit(ServiceModiefiedEndMatch(event.GetServiceReference()));
+      emit(ServiceModifiedEndMatch(event.GetServiceReference()));
       RemoveServiceFromList(event.GetServiceReference());
       break;
   //default:
@@ -178,6 +186,6 @@ std::list<mitk::ServiceReference> QmitkServiceListWidget::GetAllRegisteredServic
 ////////// DEBUG ///////////
 
 
-mitk::ModuleContext* QmitkServiceListWidget::provideContext(){
+mitk::ModuleContext* QmitkServiceListWidget::ProvideContext(){
   return m_Context;
 }

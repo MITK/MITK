@@ -260,6 +260,21 @@ static void TestSelectVertexAtWrongPosition()
 }
 
 
+//try to access an invalid timestep
+static void TestInvalidTimeStep()
+{
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  MITK_TEST_FOR_EXCEPTION(std::exception, contour->IteratorBegin(-1));
+
+  contour->Close(50);
+  MITK_TEST_CONDITION(contour->IsClosed() == false, "test close for timestep 0");
+  MITK_TEST_CONDITION(contour->IsClosed(50) == false, "test close with invalid timestep");
+
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices(50) == -1, "test number of vertices with invalid timestep");
+}
+
+
 
 
 int mitkContourModelTest(int argc, char* argv[])
@@ -274,6 +289,7 @@ int mitkContourModelTest(int argc, char* argv[])
   TestRemoveVertexAtWorldPosition();
   TestIsclosed();
   TestConcatenate();
+  TestInvalidTimeStep();
 
   TestSelectVertexAtWrongPosition();
 

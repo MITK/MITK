@@ -27,8 +27,10 @@ namespace mitk
 {
 
   /**
-  * Represents a contour element consisting of several control points.
-  *
+  * @brief Represents a contour element consisting of several control points.
+  * The contour is implicitly defined by the given control points.
+  * 
+  * 
   */
   class Segmentation_EXPORT ContourModel : public BaseData
   {
@@ -49,12 +51,21 @@ namespace mitk
     typedef std::vector< mitk::ContourModelElement::Pointer > ContourModelSeries;
 /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
+/*+++++++ Possible interpolation of the line segments between control points +++++++*/
+    enum LineSegmentInterpolation{
+      LINEAR, B_SPLINE
+    }
 
 
 /*++++++++++++++++  inline methods  +++++++++++++++++++++++*/
     void AddVertex(mitk::Point3D &vertex, unsigned int timestep=0)
     {
-      this->m_ContourSeries[timestep]->AddVertex(vertex);
+      this->AddVertex(vertex, false, timestep);
+    }
+
+    void AddVertex(mitk::Point3D &vertex, bool isActive, unsigned int timestep=0)
+    {
+      this->m_ContourSeries[timestep]->AddVertex(vertex, isActive);
     }
 
     bool IsClosed(unsigned int timestep=0)
@@ -106,6 +117,11 @@ namespace mitk
     {
       return this->m_ContourSeries.size() <= t;
     }
+
+    void SetLineSegmentInterpolation(LineSegmentInterpolation interpolation)
+    {
+      this->m_lineInterpolation = interpolation;
+    }
 /*++++++++++++++++  END inline methods  +++++++++++++++++++++++*/
 
 
@@ -152,6 +168,7 @@ namespace mitk
 
     ContourModelSeries m_ContourSeries;
     VertexType* m_SelectedVertex;
+    LineSegmentInterpolation m_lineInterpolation;
   };
 }
 

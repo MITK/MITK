@@ -23,6 +23,7 @@ mitk::ContourModel::ContourModel()
   this->InitializeTimeSlicedGeometry(1);
 
   m_SelectedVertex = NULL;
+  this->m_lineInterpolation = LineSegmentInterpolation::LINEAR;
 }
 
 mitk::ContourModel::ContourModel(const mitk::ContourModel &other) :

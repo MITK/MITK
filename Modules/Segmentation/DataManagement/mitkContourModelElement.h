@@ -96,7 +96,7 @@ namespace mitk
 
 
 
-    virtual void AddVertex(mitk::Point3D &vertex);
+    virtual void AddVertex(mitk::Point3D &vertex, bool isActive);
 
     virtual VertexType* GetVertexAt(int index);
 

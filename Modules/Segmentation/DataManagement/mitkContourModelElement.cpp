@@ -34,9 +34,9 @@ mitk::ContourModelElement::~ContourModelElement()
 }
 
 
-void mitk::ContourModelElement::AddVertex(mitk::Point3D &vertex)
+void mitk::ContourModelElement::AddVertex(mitk::Point3D &vertex, bool isActive)
 {
-  this->m_Vertices->push_back(new VertexType(vertex, false));
+  this->m_Vertices->push_back(new VertexType(vertex, isActive));
 }
 
 

@@ -49,6 +49,9 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dOpacity640x480 mitkImageVtkMap
 #                        ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
 #                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dSwivel640x480REF.png #corresponding reference screenshot
 #)
+
+SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dOpacity640x480 PROPERTY RUN_SERIAL TRUE)
+
 endif()
 
 # see bug 9882

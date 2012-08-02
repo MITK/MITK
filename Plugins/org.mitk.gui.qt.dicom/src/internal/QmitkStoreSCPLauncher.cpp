@@ -52,24 +52,24 @@ void QmitkStoreSCPLauncher::StartStoreSCP()
 
 void QmitkStoreSCPLauncher::FindPathToStoreSCP()
 {
+    QString appPath= QCoreApplication::applicationDirPath();
     if(m_PathToStoreSCP.isEmpty())
     {
         QString fileName;
 #ifdef _WIN32
+
+        appPath.append("/../../../DCMTK-install/bin");
         fileName = "/storescp.exe";
 #else
+        appPath.append("/../../DCMTK-install/bin");
         fileName = "/storescp";
 #endif
-
-        QString appPath= QCoreApplication::applicationDirPath();
-        appPath;
-        m_PathToStoreSCP = appPath;
+        m_PathToStoreSCP.clear();
         m_PathToStoreSCP.append(fileName);
+
         //In developement the storescp isn't copied into bin directory
         if(!QFile::exists(m_PathToStoreSCP))
         {
-            m_PathToStoreSCP.clear();
-            appPath.append("/../../../DCMTK-install/bin");
             m_PathToStoreSCP = appPath;
             m_PathToStoreSCP.append(fileName);
         }

@@ -68,12 +68,42 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
     m_CurrentSource = this->m_Controls->m_NaviagationDataSourceWidget->TranslateReference<mitk::NavigationDataSource>(*s);
     std::string id = s->GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
     mitk::ModuleContext* context = mitk::GetModuleContext();
+    
     //Fill tool list
     for(int i = 0; i < m_CurrentSource->GetNumberOfOutputs(); i++) {new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);}
+    
+    //The following code is not working yet! (So Toolstorages are not available at the moment)
+    
     // Create Filter for ToolStorage
     std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + mitk::NavigationDataSource::US_INTERFACE_NAME + ")("+ mitk::NavigationDataSource::US_PROPKEY_ID + " = " + id + "))";
-    // Get Storage
+        
+    // Get Storage 
     std::list<mitk::ServiceReference> refs = context->GetServiceReferences(mitk::NavigationDataSource::US_INTERFACE_NAME, filter);
     if (refs.size() == 0) return;
     this->m_CurrentStorage = context->GetService<mitk::NavigationToolStorage>(refs.front());
+  }
+
+mitk::NavigationDataSource::Pointer QmitkNavigationDataSourceSelectionWidget::GetSelectedNavigationDataSource()
+  {
+  return this->m_CurrentSource;
+  }
+
+
+int QmitkNavigationDataSourceSelectionWidget::GetSelectedToolID()
+  {
+    return this->m_Controls->m_ToolView->currentIndex().row();
+  }
+
+
+mitk::NavigationTool::Pointer QmitkNavigationDataSourceSelectionWidget::GetSelectedNavigationTool()
+  {
+    if (this->m_CurrentStorage.IsNull()) return NULL;
+    if (m_Controls->m_ToolView->currentIndex().row() >= m_CurrentStorage->GetToolCount()) return NULL;
+    return this->m_CurrentStorage->GetTool(m_Controls->m_ToolView->currentIndex().row());
+  }
+
+
+mitk::NavigationToolStorage::Pointer QmitkNavigationDataSourceSelectionWidget::GetNavigationToolStorageOfSource()
+  {
+    return this->m_CurrentStorage;
   }

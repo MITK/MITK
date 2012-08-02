@@ -30,10 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
  /** Documentation:
-  *   \brief GUI to access the IGT recorder.
-  *   User can specify the file name where the output shall be stored and
-  *   how long the recording shall be performed.
-  *
+  *   \brief This widget allows the user to select a NavigationDataSource. Tools of this Source are also shown and the user can select one of these tools.
   *   \ingroup IGTUI
   */
 class MitkIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
@@ -46,7 +43,27 @@ class MitkIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
     QmitkNavigationDataSourceSelectionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationDataSourceSelectionWidget();
 
+    /** @return Returns the currently selected NavigationDataSource. Returns null if no source is selected at the moment. */
+    mitk::NavigationDataSource::Pointer GetSelectedNavigationDataSource();
 
+    /** @return Returns the ID of the currently selected tool. You can get the corresponding NavigationData when calling GetOutput(id)
+      *         on the source object. Returns -1 if there is no tool selected. 
+      */
+    int GetSelectedToolID();
+
+    /** @return Returns the NavigationTool of the current selected tool if a NavigationToolStorage is available. Returns NULL if
+      *         there is no storage available or if no tool is selected.
+      */
+    mitk::NavigationTool::Pointer GetSelectedNavigationTool();
+
+    /** @return Returns the NavigationToolStorage of the currently selected NavigationDataSource. Returns NULL if there is no 
+      *         source selected or if the source has no NavigationToolStorage assigned.
+      */
+    mitk::NavigationToolStorage::Pointer GetNavigationToolStorageOfSource();
+
+  signals:  
+    
+    
 
   protected slots:
 

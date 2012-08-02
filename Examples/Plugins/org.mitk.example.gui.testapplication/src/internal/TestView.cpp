@@ -14,15 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "TestPerspective.h"
+#include "TestView.h"
 
-TestPerspective::TestPerspective()
+TestView::TestView()
 {
 }
 
-void TestPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
-{
-  layout->AddView("org.mitk.views.minimalview", 0, 0.33f, layout->GetEditorArea());
-  layout->GetViewLayout("org.mitk.views.minimalview")->SetCloseable(false);
-  layout->SetEditorAreaVisible(true);
-}
+//void TestView::CreateQtPartControl(QWidget *parent)
+//{
+//  // create GUI widgets
+//  m_Parent = parent;
+//  m_Controls.setupUi(parent);
+//
+//  connect(m_Controls.selectButton, SIGNAL(clicked()), this, SLOT(ToggleRadioMethod()));
+//  
+//  // register selection listener
+//  GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
+//
+//  m_Parent->setEnabled(true);
+//}

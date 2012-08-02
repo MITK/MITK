@@ -14,15 +14,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "TestPerspective.h"
 
-TestPerspective::TestPerspective()
-{
-}
+#ifndef TESTVIEW_H_
+#define TESTVIEW_H_
 
-void TestPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+#include <berryIViewPart.h>
+
+#include <QObject>
+
+
+class TestView : public QObject, public berry::IViewPart
 {
-  layout->AddView("org.mitk.views.minimalview", 0, 0.33f, layout->GetEditorArea());
-  layout->GetViewLayout("org.mitk.views.minimalview")->SetCloseable(false);
-  layout->SetEditorAreaVisible(true);
-}
+  Q_OBJECT
+  Q_INTERFACES(berry::IViewPart)
+
+public:
+
+  TestView();
+
+  //virtual void CreateQtPartControl(QWidget *parent);
+
+};
+
+#endif /* TESTPERSPECTIVE_H_ */

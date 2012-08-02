@@ -5,6 +5,8 @@ set(INTERNAL_CPP_FILES
   org_mitk_example_gui_testapplication_Activator.cpp
   TestApplication.cpp
   TestPerspective.cpp
+  TestView.cpp
+  MinimalView.cpp
 )
 
 set(MOC_H_FILES
@@ -12,6 +14,8 @@ set(MOC_H_FILES
 
   src/internal/TestApplication.h
   src/internal/TestPerspective.h
+  src/internal/TestView.h
+  src/internal/MinimalView.h
 )
 
 set(CACHED_RESOURCE_FILES

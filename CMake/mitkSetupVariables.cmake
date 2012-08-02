@@ -154,7 +154,7 @@ foreach(_type INTEGRAL FLOATING)
 endforeach()
 
 # separate processing of the COMPOSITE list to avoid its concatenation to to global list
-_create_type_seq(${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}
+_create_type_seq("${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}"
                  MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ
                  MITK_ACCESSBYITK_COMPOSITE_TYPES_DIMN_SEQ)
 

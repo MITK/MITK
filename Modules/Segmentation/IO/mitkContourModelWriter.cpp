@@ -205,10 +205,15 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
 
     while(it != end)
     {
-      /*++++ <point> ++++*/
-      WriteStartElement( XML_POINT, out );
-
       mitk::ContourModel::VertexType* v = *it;
+
+      /*++++ <point> ++++*/
+      std::vector<std::string> attr;
+      attr.push_back("isActive");
+      std::vector<std::string> value;
+      value.push_back(ConvertToString(v->IsActive));
+      WriteStartElementWithAttribut( XML_POINT, attr, value, out );
+
 
       /*++++ <x> ++++*/
       WriteStartElement( XML_X, out );
@@ -218,13 +223,13 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
 
       /*++++ <y> ++++*/
       WriteStartElement( XML_Y, out );
-      WriteCharacterData( ConvertToString( v->Coordinates[ 1 ] ).c_str(), out );
+      WriteCharacterData( ConvertToString( v->Coordinates[1] ).c_str(), out );
       /*++++ </y> ++++*/
       WriteEndElement( XML_Y, out, false );
 
       /*++++ <z> ++++*/
       WriteStartElement( XML_Z, out );
-      WriteCharacterData( ConvertToString( v->Coordinates[ 2 ] ).c_str(), out );
+      WriteCharacterData( ConvertToString( v->Coordinates[2] ).c_str(), out );
       /*++++ </z> ++++*/
       WriteEndElement( XML_Z, out, false );
 
@@ -354,23 +359,20 @@ void mitk::ContourModelWriter::WriteStartElementWithAttribut( const char *const 
     unsigned int valuesSize = values.size();
 
     if( attributesSize == valuesSize){
-      for ( int i = 0; i < attributesSize; i++)
+      std::vector<std::string>::iterator attributesIt = attributes.begin();
+      std::vector<std::string>::iterator end = attributes.end();
+
+      std::vector<std::string>::iterator valuesIt = values.begin();
+
+      while(attributesIt != end)
       {
-        std::vector<std::string>::iterator attributesIt = attributes.begin();
-        std::vector<std::string>::iterator end = attributes.end();
-
-        std::vector<std::string>::iterator valuesIt = values.begin();
-
-        while(attributesIt != end)
-        {
-          file << ' ';
-          WriteCharacterData( *attributesIt, file);
-          file << '=' << '"';
-          WriteCharacterData( *valuesIt, file);
-          file << '"';
-          attributesIt++;
-          valuesIt++;
-        }
+        file << ' ';
+        WriteCharacterData( *attributesIt, file);
+        file << '=' << '"';
+        WriteCharacterData( *valuesIt, file);
+        file << '"';
+        attributesIt++;
+        valuesIt++;
       }
     }
 

@@ -132,9 +132,10 @@ void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContour
         y = atof(currentPoint->FirstChildElement("y")->GetText());
         z = atof(currentPoint->FirstChildElement("z")->GetText());
 
+        bool isActivePoint = bool(currentPoint->Attribute("isActive"));
         mitk::Point3D point;
         mitk::FillVector3D(point, x, y, z);
-        newContourModel->AddVertex(point);
+        newContourModel->AddVertex(point, isActivePoint,currentTimeStep);
       }
     }
   else

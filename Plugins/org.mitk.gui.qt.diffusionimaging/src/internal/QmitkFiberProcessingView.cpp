@@ -1453,12 +1453,11 @@ void QmitkFiberProcessingView::PruneBundle()
 
 void QmitkFiberProcessingView::ApplyCurvatureThreshold()
 {
-    int maxAngle = this->m_Controls->m_CurvatureThresholdSpinBox->value();
-    int mm = this->m_Controls->m_CurvatureThresholdDistanceBox->value();
+    int mm = this->m_Controls->m_MinCurvatureRadiusBox->value();
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        if (!fib->ApplyCurvatureThreshold(maxAngle, mm))
+        if (!fib->ApplyCurvatureThreshold(mm, this->m_Controls->m_RemoveFiberDueToCurvatureCheckbox->isChecked()))
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
     }
     GenerateStats();

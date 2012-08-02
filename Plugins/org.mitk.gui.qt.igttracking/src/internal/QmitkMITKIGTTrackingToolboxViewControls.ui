@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="m_MainWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -660,6 +660,29 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>Testing</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_11">
+       <item>
+        <widget class="QmitkNavigationDataSourceSelectionWidget" name="widget" native="true"/>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>930</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -682,6 +705,12 @@ p, li { white-space: pre-wrap; }
    <class>QmitkNavigationToolCreationWidget</class>
    <extends>QWidget</extends>
    <header>QmitkNavigationToolCreationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkNavigationDataSourceSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkNavigationDataSourceSelectionWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

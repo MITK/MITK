@@ -14,6 +14,7 @@ set(CPP_FILES
   Qmitk/QmitkIGTConnectionWidget.cpp
   Qmitk/QmitkToolSelectionWidget.cpp
   Qmitk/QmitkNavigationToolCreationWidget.cpp
+  Qmitk/QmitkNavigationDataSourceSelectionWidget.cpp
 )
 
 set(UI_FILES
@@ -30,6 +31,7 @@ set(UI_FILES
   Qmitk/QmitkIGTConnectionWidgetControls.ui
   Qmitk/QmitkToolSelectionWidgetControls.ui
   Qmitk/QmitkNavigationToolCreationWidget.ui
+  Qmitk/QmitkNavigationDataSourceSelectionWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -48,12 +50,11 @@ set(MOC_H_FILES
   Qmitk/QmitkIGTConnectionWidget.h
   Qmitk/QmitkToolSelectionWidget.h
   Qmitk/QmitkNavigationToolCreationWidget.h
+  Qmitk/QmitkNavigationDataSourceSelectionWidget.h
 )
 
 set(QRC_FILES
   resources/IGTUI.qrc
 )
-
-
 
 

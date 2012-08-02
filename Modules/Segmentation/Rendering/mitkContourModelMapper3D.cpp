@@ -131,6 +131,7 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
   // Calculate time step of the input data for the specified renderer (integer value)
   this->CalculateTimeStep( renderer );
 
+  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   // Check if time step is valid
   const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
   if ( ( dataTimeGeometry == NULL )
@@ -144,7 +145,6 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
 
   const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?

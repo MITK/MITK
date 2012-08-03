@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -460,7 +460,6 @@ void QmitkTensorReconstructionView::ResidualCalculation()
   image->SetVectorImage( filter->GetOutput() );
   image->SetB_Value(diffImage->GetB_Value());
   image->SetDirections(gradientList);
-  image->SetOriginalDirections(gradientList);
   image->InitializeFromVectorImage();
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData( image );
@@ -710,7 +709,7 @@ void QmitkTensorReconstructionView::Reconstruct(int method)
     TensorReconstructionWithCorr(m_DiffusionImages);
   }
 
-  
+
 }
 
 void QmitkTensorReconstructionView::TensorReconstructionWithCorr
@@ -822,7 +821,6 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
       correctedDiffusion->SetVectorImage(correctedVols);
       correctedDiffusion->SetDirections(vols->GetDirections());
       correctedDiffusion->SetB_Value(vols->GetB_Value());
-      correctedDiffusion->SetOriginalDirections(vols->GetDirections());
       correctedDiffusion->InitializeFromVectorImage();
 
       mitk::DataNode::Pointer diffNode=mitk::DataNode::New();
@@ -1385,7 +1383,6 @@ void QmitkTensorReconstructionView::DoTensorsToDWI
       image->SetVectorImage( filter->GetOutput() );
       image->SetB_Value(bVal);
       image->SetDirections(gradientList);
-      image->SetOriginalDirections(gradientList);
       image->InitializeFromVectorImage();
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( image );

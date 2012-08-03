@@ -70,6 +70,8 @@ namespace mitk {
     void ResampleFibers(float pointDistance = 1);
     void DoFiberSmoothing(int pointsPerCm);
     bool RemoveShortFibers(float lengthInMM);
+    bool RemoveLongFibers(float lengthInMM);
+    bool ApplyCurvatureThreshold(float maxDeg, float mm);
     void MirrorFibers(unsigned int axis);
 
     // add/subtract fibers
@@ -87,7 +89,14 @@ namespace mitk {
     vtkSmartPointer<vtkPolyData> GetFiberPolyData();
     QStringList GetAvailableColorCodings();
     char* GetCurrentColorCoding();
-    itkGetMacro(NumFibers, int)
+    itkGetMacro( NumFibers, int)
+    itkGetMacro( MinFiberLength, float )
+    itkGetMacro( MaxFiberLength, float )
+    itkGetMacro( MeanFiberLength, float )
+    itkGetMacro( MedianFiberLength, float )
+    itkGetMacro( LengthStDev, float )
+    itkGetMacro( RemoveFibers, bool )
+    itkSetMacro( RemoveFibers, bool )
 
     // copy fiber bundle
     mitk::FiberBundleX::Pointer GetDeepCopy();
@@ -118,6 +127,14 @@ namespace mitk {
 
     char* m_CurrentColorCoding;
     int   m_NumFibers;
+
+    std::vector< float > m_FiberLengths;
+    float m_MinFiberLength;
+    float m_MaxFiberLength;
+    float m_MeanFiberLength;
+    float m_MedianFiberLength;
+    float m_LengthStDev;
+    bool  m_RemoveFibers;
   };
 
 } // namespace mitk

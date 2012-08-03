@@ -3,5 +3,8 @@ set(MODULE_TESTS
   mitkToFDistanceImageToSurfaceFilterTest.cpp
   mitkToFCompositeFilterTest.cpp
   mitkToFProcessingCommonTest.cpp
+)
+ 
+set(MODULE_CUSTOM_TESTS
   mitkToFImageDownsamplingFilterTest.cpp
 )

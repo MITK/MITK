@@ -94,6 +94,12 @@ namespace mitk
     */
     void SetSubset( mitk::PointSet::Pointer pointSet);
 
+    /*!
+    \brief Set the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units (=true) or interpixeldistances and focal length in mm (=false)
+    */
+    void SetReconstructionMode(bool withoutInterpixdist = true);
+
+
   protected:
     /*!
     \brief Standard constructor
@@ -121,6 +127,7 @@ namespace mitk
     std::vector<Index3D> m_Subset; ///< If this subset is specified only the contained indizes are converted to cartesian coordinates
     mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< Member holding the intrinsic parameters needed for PointSet calculation
     ToFProcessingCommon::ToFPoint2D m_InterPixelDistance; ///< distance in mm between two adjacent pixels on the ToF camera chip
+    bool m_ReconstructionMode; ///< true = Reconstruction without interpixeldistance and with focal lengths in pixel units. false = Reconstruction with interpixeldistance and with focal length in mm.
   };
 } //END mitk namespace
 #endif

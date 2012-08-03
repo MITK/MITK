@@ -1062,6 +1062,22 @@
      </property>
     </spacer>
    </item>
+   <item>
+    <widget class="QLabel" name="m_CurvatureThresholdLabel_5">
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="statusTip">
+      <string/>
+     </property>
+     <property name="whatsThis">
+      <string/>
+     </property>
+     <property name="text">
+      <string>Reisert et al. NeuroImage 2011</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

@@ -112,6 +112,18 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
     std::string calibration_filename_with_path = toolPath + Poco::Path::separator() + calibration_filename;
     returnValue->SetCalibrationFile(calibration_filename_with_path);
     }
+
+  //Tool Landmarks
+  mitk::PointSet::Pointer ToolRegLandmarks = mitk::PointSet::New();
+  mitk::PointSet::Pointer ToolCalLandmarks = mitk::PointSet::New();
+  std::string RegLandmarksString;
+  std::string CalLandmarksString;
+  node->GetStringProperty("ToolRegistrationLandmarks",RegLandmarksString);
+  node->GetStringProperty("ToolCalibrationLandmarks",CalLandmarksString);
+  ToolRegLandmarks = ConvertStringToPointSet(RegLandmarksString);
+  ToolCalLandmarks = ConvertStringToPointSet(CalLandmarksString);
+  returnValue->SetToolRegistrationLandmarks(ToolRegLandmarks);
+  returnValue->SetToolCalibrationLandmarks(ToolCalLandmarks);
   
   return returnValue;
   }
@@ -123,4 +135,43 @@ std::string mitk::NavigationToolReader::GetFileWithoutPath(std::string FileWithP
   //dirty hack: Windows path seperators
   if (returnValue.size() == FileWithPath.size()) returnValue = FileWithPath.substr(FileWithPath.rfind("\\")+1, FileWithPath.length());
   return returnValue;
+  }
+
+mitk::PointSet::Pointer mitk::NavigationToolReader::ConvertStringToPointSet(std::string string)
+  {
+  mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
+  std::string pointSeperator = "|";
+  std::string valueSeperator = ";";
+  std::vector<std::string> points;
+  split(string,pointSeperator,points);
+  for(int i=0; i<points.size(); i++)
+    {
+    std::vector<std::string> values;
+    split(points.at(i),valueSeperator,values);
+    if (values.size() == 4)
+      {
+      double index = atof(values.at(0).c_str());
+      mitk::Point3D point;
+      point[0] = atof(values.at(1).c_str());
+      point[1] = atof(values.at(2).c_str());
+      point[2] = atof(values.at(3).c_str());
+      returnValue->SetPoint(index,point);
+      }
+    }
+  return returnValue;
+  }
+
+void mitk::NavigationToolReader::split(std::string& text, std::string& separators, std::vector<std::string>& words)
+  {
+  int n = text.length();
+  int start, stop;
+
+  start = text.find_first_not_of(separators);
+  while ((start >= 0) && (start < n))
+  {
+    stop = text.find_first_of(separators, start);
+    if ((stop < 0) || (stop > n)) stop = n;
+    words.push_back(text.substr(start, stop - start));
+    start = text.find_first_not_of(separators, stop+1);
+    }
   }

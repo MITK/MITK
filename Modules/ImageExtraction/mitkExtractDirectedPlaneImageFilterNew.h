@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
+  \deprecated This class is deprecated. Use mitk::ExtractSliceFilter instead.
+  \sa ExtractSliceFilter
+
   \brief A filter that can extract a 2D slice from a 3D or 4D image especially if the image`s axes are rotated
 
   \sa ContourTool

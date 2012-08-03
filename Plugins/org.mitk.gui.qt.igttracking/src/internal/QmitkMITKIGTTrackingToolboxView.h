@@ -71,6 +71,12 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
                corrupt or not valid the user gets an error message. If the file was loaded successfully the tools are show in the tool status widget. */
     void OnLoadTools();
 
+    /** @brief This slot connects to the device. In status "connected" configuration of the device is disabled. */
+    void OnConnect();
+
+    /** @brief This slot disconnects from the device. */
+    void OnDisconnect();
+
     /** @brief This slot tries to start tracking with the current device. If start tracking fails the user gets an error message and tracking stays off.*/
     void OnStartTracking();
 

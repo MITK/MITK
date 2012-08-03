@@ -59,9 +59,17 @@ public:
     **/
     void SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection);
 
+    /** @brief Reorient the slice (e.g. rotation and translation like the swivel mode).
+    **/
+    void ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation);
+
     /** @brief Render everything into an mitkRenderWindow. Call SetViewDirection() and SetProperty() before this method.
     **/
     void Render();
+
+    /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
+    **/
+    mitk::DataStorage::Pointer GetDataStorage();
 protected:
 
     /** @brief This method tries to load the given file into a member datastorage, in order to render it.
@@ -77,9 +85,6 @@ protected:
 
     mitk::RenderWindow::Pointer m_RenderWindow; //<< Contains the mitkRenderWindow into which the test renders the data
     mitk::DataStorage::Pointer m_DataStorage; //<< Contains the mitkDataStorage which contains the data to be rendered
-    int m_width;
-    int m_height;
-
 
 };
 

@@ -101,7 +101,7 @@ namespace mitk {
     virtual void RemoveInputs(mitk::Surface* input);
 
 
-    /*
+    /**
     \brief Set the size of the output distance image. The size is specified by the image's volume
            (i.e. in this case how many pixels are enclosed by the image)
            If non is set, the volume will be 500000 pixels.

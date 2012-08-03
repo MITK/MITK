@@ -147,7 +147,8 @@ option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_QT "Use Nokia's Qt library" ${MITK_USE_CTK})
-option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_USE_CTK})
+option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_USE_CTK})
+option(MITK_DCMTK_BUILD_SHARED_LIBS "EXPERIMENTAL, superbuild only: build DCMTK as shared libs" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
@@ -201,7 +202,7 @@ set(MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES
     CACHE STRING "List of floating pixel types used in AccessByItk and InstantiateAccessFunction macros")
 
 set(MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES
-    ""
+    "itk::RGBPixel<unsigned char>, itk::RGBAPixel<unsigned char>"
     CACHE STRING "List of composite pixel types used in AccessByItk and InstantiateAccessFunction macros")
 
 set(MITK_ACCESSBYITK_DIMENSIONS
@@ -226,6 +227,12 @@ if(NOT MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES)
   set(MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES
       "double, float"
       CACHE STRING "List of floating pixel types used in AccessByItk and InstantiateAccessFunction macros" FORCE)
+endif()
+
+if(NOT MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES)
+  set(MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES
+    "itk::RGBPixel<unsigned char>, itk::RGBAPixel<unsigned char>"
+    CACHE STRING "List of composite pixel types used in AccessByItk and InstantiateAccessFunction macros" FORCE)
 endif()
 
 if(NOT MITK_ACCESSBYITK_DIMENSIONS)
@@ -376,7 +383,7 @@ if(MITK_USE_BLUEBERRY AND APPLE)
     list(GET target_info_list 1 option_name)
     list(GET target_info_list 0 app_name)
     # check if the application is enabled
-    if(${option_name})
+    if(${option_name} OR MITK_BUILD_ALL_APPS)
       set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ${app_name})
     endif()
   endforeach()
@@ -557,7 +564,7 @@ if(MITK_USE_BLUEBERRY)
     list(GET target_info_list 0 target_dir)
     list(GET target_info_list 1 option_name)
     # check if the application is enabled and if target_libraries.cmake exists
-    if(${option_name} AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
+    if((${option_name} OR MITK_BUILD_ALL_APPS) AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
       include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
       foreach(_target_dep ${target_libraries})
         if(_target_dep MATCHES org_blueberry_)
@@ -765,7 +772,7 @@ if(MITK_APPS)
     set(target_info_list ${target_info})
     list(GET target_info_list 1 option_name)
     # check if the application is enabled
-    if(${option_name})
+    if(${option_name} OR MITK_BUILD_ALL_APPS)
       MATH(EXPR activated_apps_no "${activated_apps_no} + 1")
     endif()
   endforeach()
@@ -788,7 +795,7 @@ if(MITK_APPS)
     list(GET target_info_list 0 target_dir)
     list(GET target_info_list 1 option_name)
     # check if the application is enabled
-    if(${option_name})
+    if(${option_name} OR MITK_BUILD_ALL_APPS)
       # check whether application specific configuration files will be used
       if(use_project_cpack)
         # use files if they exist

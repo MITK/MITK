@@ -38,6 +38,13 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
   mitk::FiberBundleX::Pointer fib1;
 
   try{
+
+    MITK_INFO << "Q-Ball image: " << argv[1];
+    MITK_INFO << "Mask image: " << argv[2];
+    MITK_INFO << "Parameter file: " << argv[3];
+    MITK_INFO << "Lut path: " << argv[4];
+    MITK_INFO << "Reference bundle: " << argv[5];
+
     RegisterDiffusionImagingObjectFactory();
 
     // test if fib1 can be read
@@ -48,7 +55,7 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
 
     infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[2], s1, s2, false );
     mitkMaskImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
-    MITK_TEST_CONDITION_REQUIRED(mitkMaskImage.IsNotNull(),"check qball image")
+    MITK_TEST_CONDITION_REQUIRED(mitkMaskImage.IsNotNull(),"check mask image")
 
     infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[5], s1, s2, false );
     fib1 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());
@@ -70,7 +77,7 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     gibbsTracker->SetMaskImage(itk_mask);
     gibbsTracker->SetDuplicateImage(false);
     gibbsTracker->SetRandomSeed(1);
-    gibbsTracker->SetParameterFile(argv[3]);
+    gibbsTracker->SetLoadParameterFile(argv[3]);
     gibbsTracker->SetLutPath(argv[4]);
     gibbsTracker->Update();
 

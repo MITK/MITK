@@ -43,7 +43,10 @@ class vtkPoints;
 
 namespace mitk
 {
-  /**
+/**
+  \deprecated This class is deprecated. Use mitk::ExtractSliceFilter instead.
+  \sa ExtractSliceFilter
+
   \brief Extracts a 2D slice of arbitrary geometry from a 3D or 4D image.
 
   \sa mitkImageMapper2D
@@ -61,7 +64,7 @@ namespace mitk
   Output will not be set if there was a problem extracting the desired slice.
 
   Last contributor: $Author: T. Schwarz$
-  */
+*/
 
   class ImageExtraction_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
   {

@@ -149,7 +149,6 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void SignalRememberContourPositions(bool);
     void SignalShowMarkerNodes(bool);
-    void Signal3DInterpolationEnabled(bool);
 
   public slots:
 
@@ -247,6 +246,10 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
      * \return false if orientation could not be determined
      */
     bool GetSliceForWindowsID(unsigned windowID, int& sliceDimension, int& sliceIndex);
+
+    void SetCurrentContourListID();
+
+    void Show3DInterpolationResult(bool);
 
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;

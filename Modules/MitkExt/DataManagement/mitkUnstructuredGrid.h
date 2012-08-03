@@ -62,6 +62,10 @@ public:
   
   virtual void Update();
 
+  // Initialize should not be called manually;
+  // The polydata vector is initialized automatically when enlarged;
+  virtual void Expand( unsigned int timeSteps = 1 );
+
   const RegionType& GetLargestPossibleRegion() const
   {
     m_LargestPossibleRegion.SetIndex(3, 0);
@@ -83,10 +87,6 @@ public:
 protected:
 
   typedef std::vector< vtkUnstructuredGrid* > VTKUnstructuredGridSeries;
- 
-  // Initialize should not be called manually;
-  // The polydata vector is initialized automatically when enlarged;
-  virtual void Expand( unsigned int timeSteps = 1 );
  
   UnstructuredGrid();
 

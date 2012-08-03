@@ -24,6 +24,7 @@ QmitkRegisterClasses.cpp
 QmitkRenderingManager.cpp
 QmitkRenderingManagerFactory.cpp
 QmitkRenderWindow.cpp
+QmitkServiceListWidget.cpp
 QmitkSliderLevelWindowWidget.cpp
 QmitkStdMultiWidget.cpp
 QmitkMouseModeSwitcher.cpp
@@ -46,6 +47,7 @@ QmitkPropertiesTableEditor.h
 QmitkPropertyDelegate.h
 QmitkRenderingManager.h
 QmitkRenderWindow.h
+QmitkServiceListWidget.h
 QmitkSliderLevelWindowWidget.h
 QmitkStdMultiWidget.h
 QmitkMouseModeSwitcher.h
@@ -56,6 +58,7 @@ QmitkLevelWindowPresetDefinition.ui
 QmitkLevelWindowWidget.ui
 QmitkLevelWindowRangeChange.ui
 QmitkMemoryUsageIndicator.ui
+QmitkServiceListWidgetControls.ui
 )
 
 set(QRC_FILES

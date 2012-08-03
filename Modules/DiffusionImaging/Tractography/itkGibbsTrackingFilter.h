@@ -66,7 +66,8 @@ public:
     itkSetMacro( CurvatureThreshold, float)
     itkSetMacro( DuplicateImage, bool )
     itkSetMacro( RandomSeed, int )
-    itkSetMacro( ParameterFile, std::string )
+    itkSetMacro( LoadParameterFile, std::string )
+    itkSetMacro( SaveParameterFile, std::string )
     itkSetMacro( LutPath, std::string )
 
     // getter
@@ -97,9 +98,10 @@ protected:
 
     GibbsTrackingFilter();
     virtual ~GibbsTrackingFilter();
-    bool EstimateParticleWeight();
+    void EstimateParticleWeight();
     void PrepareMaskImage();
-    bool LoadParameters(std::string filename);
+    bool LoadParameters();
+    bool SaveParameters();
 
     // Input Images
     typename ItkQBallImageType::Pointer m_QBallImage;
@@ -128,7 +130,8 @@ protected:
     int             m_NumParticles;         // current number of particles in grid
     int             m_NumConnections;       // current number of connections between particles in grid
     int             m_RandomSeed;           // seed value for random generator (-1 for standard seeding)
-    std::string     m_ParameterFile;        // filename of parameter file
+    std::string     m_LoadParameterFile;    // filename of parameter file (reader)
+    std::string     m_SaveParameterFile;    // filename of parameter file (writer)
     std::string     m_LutPath;              // path to lookuptables used by the sphere interpolator
 
     FiberPolyDataType m_FiberPolyData;      // container for reconstructed fibers

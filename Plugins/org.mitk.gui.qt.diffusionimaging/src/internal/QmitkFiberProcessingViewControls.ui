@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>665</width>
-    <height>671</height>
+    <height>677</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Fiber Bundle Modification</string>
+      <string>Fiber Extraction</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="0" column="0">
@@ -464,7 +464,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Fiber Bundle Processing</string>
+      <string>Fiber Processing</string>
      </property>
      <layout class="QFormLayout" name="formLayout">
       <property name="fieldGrowthPolicy">
@@ -592,7 +592,7 @@
          <number>50</number>
         </property>
         <property name="value">
-         <number>10</number>
+         <number>5</number>
         </property>
        </widget>
       </item>
@@ -619,30 +619,14 @@
          </font>
         </property>
         <property name="toolTip">
-         <string>Remove fibers shorten than the specified length (in mm).</string>
+         <string>Remove fibers shorter/longer than the specified length (in mm).</string>
         </property>
         <property name="text">
-         <string>Prune Bundle</string>
+         <string>Length Threshold</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QSpinBox" name="m_PruneFibersSpinBox">
-        <property name="toolTip">
-         <string>Minimum fiber length in mm</string>
-        </property>
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="value">
-         <number>20</number>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
+      <item row="6" column="0">
        <widget class="QCommandLinkButton" name="m_MirrorFibersButton">
         <property name="enabled">
          <bool>false</bool>
@@ -672,7 +656,7 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="7" column="0">
        <widget class="QCommandLinkButton" name="m_FaColorFibersButton">
         <property name="enabled">
          <bool>false</bool>
@@ -702,7 +686,7 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="6" column="1">
        <widget class="QComboBox" name="m_AxisSelectionBox">
         <property name="currentIndex">
          <number>0</number>
@@ -715,17 +699,17 @@
         </property>
         <item>
          <property name="text">
-          <string>y-z-Plane</string>
+          <string>Sagittal</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>x-z-Plane</string>
+          <string>Coronal</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>x-y-Plane</string>
+          <string>Transversal</string>
          </property>
         </item>
        </widget>
@@ -752,13 +736,143 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="1">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_6">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QSpinBox" name="m_PruneFibersSpinBox">
+           <property name="toolTip">
+            <string>Minimum fiber length in mm</string>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="m_MaxPruneFibersSpinBox">
+           <property name="toolTip">
+            <string>Maximum fiber length in mm</string>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>500</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCommandLinkButton" name="m_CurvatureThresholdButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Remove fibers with a higher curvature than specified (in degree).</string>
+        </property>
+        <property name="text">
+         <string>Curvature Threshold</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_7">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QSpinBox" name="m_CurvatureThresholdSpinBox">
+           <property name="toolTip">
+            <string>Maximum fiber curvature in degree</string>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>180</number>
+           </property>
+           <property name="value">
+            <number>45</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="m_CurvatureThresholdDistanceBox">
+           <property name="toolTip">
+            <string>Accumulate curvature over given distance in mm</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>2</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
-      <string>Fiber Bundle Statistics</string>
+      <string>Fiber Statistics</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">

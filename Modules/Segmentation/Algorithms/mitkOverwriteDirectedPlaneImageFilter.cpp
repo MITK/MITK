@@ -36,6 +36,7 @@ m_Dimension0(0),
 m_Dimension1(1),
 m_CreateUndoInformation(false)
 {
+  MITK_WARN << "Class is deprecated! Use mitkVtkImageOverwrite instead.";
 }
 
 mitk::OverwriteDirectedPlaneImageFilter::~OverwriteDirectedPlaneImageFilter()

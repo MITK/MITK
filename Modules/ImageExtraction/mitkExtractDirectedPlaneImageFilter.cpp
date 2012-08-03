@@ -39,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ExtractDirectedPlaneImageFilter::ExtractDirectedPlaneImageFilter()
 : m_WorldGeometry(NULL)
 {
+  MITK_WARN << "Class ExtractDirectedPlaneImageFilter is deprecated! Use ExtractSliceFilter instead.";
+
   m_Reslicer = vtkImageReslice::New();
   
   m_TargetTimestep = 0;

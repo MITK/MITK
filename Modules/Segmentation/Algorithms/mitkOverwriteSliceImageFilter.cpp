@@ -36,6 +36,7 @@ mitk::OverwriteSliceImageFilter::OverwriteSliceImageFilter()
  m_Dimension1(1),
  m_CreateUndoInformation(false)
 {
+  MITK_WARN << "Class is deprecated! Use mitkVtkImageOverwrite instead.";
 }
 
 mitk::OverwriteSliceImageFilter::~OverwriteSliceImageFilter()

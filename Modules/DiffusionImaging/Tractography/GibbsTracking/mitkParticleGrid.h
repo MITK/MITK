@@ -56,6 +56,7 @@ public:
     void DestroyConnection(Particle *P1,int ep1);
 
     bool CheckConsistency();
+    void ResetGrid();
 
 protected:
 

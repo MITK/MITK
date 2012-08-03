@@ -118,6 +118,7 @@ set(CPP_FILES
   Tractography/GibbsTracking/mitkParticleGrid.cpp
   Tractography/GibbsTracking/mitkMetropolisHastingsSampler.cpp
   Tractography/GibbsTracking/mitkEnergyComputer.cpp
+  Tractography/GibbsTracking/mitkGibbsEnergyComputer.cpp
   Tractography/GibbsTracking/mitkFiberBuilder.cpp
 
   # Function Collection
@@ -184,6 +185,7 @@ set(H_FILES
   Tractography/GibbsTracking/mitkMetropolisHastingsSampler.h
   Tractography/GibbsTracking/mitkSimpSamp.h
   Tractography/GibbsTracking/mitkEnergyComputer.h
+  Tractography/GibbsTracking/mitkGibbsEnergyComputer.h
   Tractography/GibbsTracking/mitkSphereInterpolator.h
   Tractography/GibbsTracking/mitkFiberBuilder.h
 
@@ -208,10 +210,10 @@ set(H_FILES
   Algorithms/itkDistanceMapFilter.h
   Algorithms/itkProjectionFilter.h
   Algorithms/itkSkeletonizationFilter.h
-  Algorithms/itkReduceDirectionGradientsFilter.h
   Algorithms/itkResidualImageFilter.h
   Algorithms/itkExtractChannelFromRgbaImageFilter.h
   Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
+  Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h

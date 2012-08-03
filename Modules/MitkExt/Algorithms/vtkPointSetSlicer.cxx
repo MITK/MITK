@@ -192,34 +192,6 @@ int vtkPointSetSlicer::FillInputPortInformation(int, vtkInformation *info)
   return 1;
 }
 
-void vtkPointSetSlicer::GetCellTypeDimensions(unsigned char* cellTypeDimensions)
-{
-  // Assume most cells will be 3d.
-  memset(cellTypeDimensions, 3, VTK_NUMBER_OF_CELL_TYPES);
-  cellTypeDimensions[VTK_EMPTY_CELL] = 0;
-  cellTypeDimensions[VTK_VERTEX] = 0;
-  cellTypeDimensions[VTK_POLY_VERTEX] = 0;
-  cellTypeDimensions[VTK_LINE] = 1;
-  cellTypeDimensions[VTK_POLY_LINE] = 1;
-  cellTypeDimensions[VTK_QUADRATIC_EDGE] = 1;
-  cellTypeDimensions[VTK_PARAMETRIC_CURVE] = 1;
-  cellTypeDimensions[VTK_TRIANGLE] = 2;
-  cellTypeDimensions[VTK_TRIANGLE_STRIP] = 2;
-  cellTypeDimensions[VTK_POLYGON] = 2;
-  cellTypeDimensions[VTK_PIXEL] = 2;
-  cellTypeDimensions[VTK_QUAD] = 2;
-  cellTypeDimensions[VTK_QUADRATIC_TRIANGLE] = 2;
-  cellTypeDimensions[VTK_QUADRATIC_QUAD] = 2;
-  cellTypeDimensions[VTK_PARAMETRIC_SURFACE] = 2;
-  cellTypeDimensions[VTK_PARAMETRIC_TRI_SURFACE] = 2;
-  cellTypeDimensions[VTK_PARAMETRIC_QUAD_SURFACE] = 2;
-  cellTypeDimensions[VTK_HIGHER_ORDER_EDGE] = 1;
-  cellTypeDimensions[VTK_HIGHER_ORDER_TRIANGLE] = 2;
-  cellTypeDimensions[VTK_HIGHER_ORDER_QUAD] = 2;
-  cellTypeDimensions[VTK_HIGHER_ORDER_POLYGON] = 2;
-}
-
-
 void vtkPointSetSlicer::UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *output)
 {
   vtkIdType cellId, i;
@@ -303,7 +275,6 @@ void vtkPointSetSlicer::UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *o
   cellScalars->SetNumberOfComponents(cutScalars->GetNumberOfComponents());
   cellScalars->Allocate(VTK_CELL_SIZE*cutScalars->GetNumberOfComponents());
 
-
   // Three passes over the cells to process lower dimensional cells first.
   // For poly data output cells need to be added in the order:
   // verts, lines and then polys, or cell data gets mixed up.
@@ -311,15 +282,15 @@ void vtkPointSetSlicer::UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *o
   // I create a table that maps cell type to cell dimensionality,
   // because I need a fast way to get cell dimensionality.
   // This assumes GetCell is slow and GetCellType is fast.
-  // I do not like hard coding a list of cell types here, 
+  // I do not like hard coding a list of cell types here,
   // but I do not want to add GetCellDimension(vtkIdType cellId)
   // to the vtkDataSet API.  Since I anticipate that the output
-  // will change to vtkUnstructuredGrid.  This temporary solution 
+  // will change to vtkUnstructuredGrid.  This temporary solution
   // is acceptable.
   //
   int cellType;
   unsigned char cellTypeDimensions[VTK_NUMBER_OF_CELL_TYPES];
-  this->GetCellTypeDimensions(cellTypeDimensions);
+  vtkCutter::GetCellTypeDimensions(cellTypeDimensions);
   int dimensionality;
   // We skip 0d cells (points), because they cannot be cut (generate no data).
   for (dimensionality = 1; dimensionality <= 3; ++dimensionality)
@@ -366,12 +337,12 @@ void vtkPointSetSlicer::UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *o
       } // for all points in this cell
 
       int needCell = 0;
-      if (0 >= range[0] && 0 <= range[1]) 
+      if (0.0 >= range[0] && 0.0 <= range[1])
       {
         needCell = 1;
       }
 
-      if (needCell) 
+      if (needCell)
       {
         vtkCell *cell = input->GetCell(cellId);
         cellIds = cell->GetPointIds();
@@ -380,13 +351,13 @@ void vtkPointSetSlicer::UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *o
         if (dimensionality == 3 && !(++cut % progressInterval) )
         {
           vtkDebugMacro(<<"Cutting #" << cut);
-          this->UpdateProgress ((double)cut/numCuts);
+          this->UpdateProgress (static_cast<double>(cut)/numCuts);
           abortExecute = this->GetAbortExecute();
         }
 
-        this->ContourUnstructuredGridCell(cell, cellScalars, this->Locator, 
-            newVerts, newLines, newPolys, inPD, outPD,
-            inCD, cellId, outCD);
+        this->ContourUnstructuredGridCell(cell, cellScalars, this->Locator,
+                                          newVerts, newLines, newPolys, inPD, outPD,
+                                          inCD, cellId, outCD);
       } // if need cell
     } // for all cells
   } // for all dimensions (1,2,3).

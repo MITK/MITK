@@ -29,6 +29,7 @@ mitk::ExtractImageFilter::ExtractImageFilter()
  m_SliceDimension(0),
  m_TimeStep(0)
 {
+  MITK_WARN << "Class ExtractImageFilter is deprecated! Use ExtractSliceFilter instead.";
 }
 
 mitk::ExtractImageFilter::~ExtractImageFilter()

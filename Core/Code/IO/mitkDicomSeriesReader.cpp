@@ -1054,7 +1054,7 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
   
   // be a bit tolerant for orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
   // NOT constructedID += CreateSeriesIdentifierPart( tagValueMap, tagImageOrientation );
-  try
+  if (tagValueMap.find(tagImageOrientation) != tagValueMap.end())
   {
     bool conversionError(false);
     Vector3D right; right.Fill(0.0);
@@ -1074,11 +1074,6 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
 
     constructedID += IDifyTagValue( simplifiedOrientationString );
   }
-  catch (std::exception& e)
-  {
-    MITK_WARN << "Could not access tag " << tagImageOrientation << ": " << e.what();
-  }
- 
 
   constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
 
@@ -1231,7 +1226,14 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
     }
     else
     {
-      return true;
+      // we need some reproducible sort criteria here
+      gdcm::Attribute<0x0008,0x0018> sop_uid1;   // SOP instance UID, mandatory
+      gdcm::Attribute<0x0008,0x0018> sop_uid2;
+
+      sop_uid1.Set(ds1);
+      sop_uid2.Set(ds2);
+
+      return sop_uid1 < sop_uid2;
     }
   }
   else

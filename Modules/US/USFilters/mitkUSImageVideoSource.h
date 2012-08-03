@@ -50,6 +50,24 @@ namespace mitk {
     void SetCameraInput(int deviceID);
 
     /**
+    *\brief Sets the output image to rgb or grayscale. Output is grayscale by default
+    * and can be set to color by passing true, or to grayscale again by passing false.
+    */
+    void SetColorOutput(bool isColor);
+
+    /**
+    * /brief Defines the cropping area. The rectangle will be justified to the image borders
+    * if the given rectangle is larger than the video source. If a correct rectangle is given,
+    * The dimensions of the output image will be equal to those of the rectangle.
+    */
+    void SetRegionOfInterest(int topLeftX, int topLeftY, int bottomRightX, int bottomRightY);
+
+    /**
+    * /brief Removes the region of interest. Produced images will be uncropped after call.
+    */
+    void RemoveRegionOfInterest();
+
+    /**
     *\brief Retrieves the next frame. This will typically be the next frame in a file
     * or the last cahced file in a devcie.
     */
@@ -59,26 +77,20 @@ namespace mitk {
     itkGetMacro(OpenCVVideoSource, mitk::OpenCVVideoSource::Pointer);
     itkSetMacro(OpenCVVideoSource, mitk::OpenCVVideoSource::Pointer);
     itkGetMacro(IsVideoReady, bool);
-    itkGetMacro(IsMetadataReady, bool);
-    itkGetMacro(IsGeometryReady, bool);
 
 
   protected:
     USImageVideoSource();
     virtual ~USImageVideoSource();
-    
 
     /**
     * \brief The source of the video
     */
     mitk::OpenCVVideoSource::Pointer m_OpenCVVideoSource;
 
-    /**
-    * \brief The Following flags are used internally, to assure that all necessary steps are taken before capturing
-    */
    bool m_IsVideoReady;
-   bool m_IsMetadataReady;
-   bool m_IsGeometryReady;
+   bool m_IsGreyscale;
+   cv::Rect m_CropRegion;
    mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToMitkFilter;
     
 

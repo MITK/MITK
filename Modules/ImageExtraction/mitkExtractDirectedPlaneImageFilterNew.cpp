@@ -25,6 +25,7 @@ mitk::ExtractDirectedPlaneImageFilterNew::ExtractDirectedPlaneImageFilterNew()
 :m_CurrentWorldGeometry2D(NULL),
 m_ActualInputTimestep(-1)
 {
+  MITK_WARN << "Class ExtractDirectedPlaneImageFilterNew is deprecated! Use ExtractSliceFilter instead.";
 }
 
 mitk::ExtractDirectedPlaneImageFilterNew::~ExtractDirectedPlaneImageFilterNew()

@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageSeriesWriter.h>
 #include <itkRescaleIntensityImageFilter.h>
 
+#include <itkRGBAPixel.h>
+
 template < typename TPixel, unsigned int VImageDimension > 
 void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName)
 {
@@ -66,10 +68,35 @@ void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const
   writer->Update();
 }
 
+template < typename TPixel, unsigned int VImageDimension >
+void _mitkItkPictureWriteComposite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName)
+{
+  typedef itk::Image< TPixel, VImageDimension > TImageType;
+
+  typedef itk::ImageFileWriter< TImageType > WriterType;
+  typename WriterType::Pointer simpleWriter = WriterType::New();
+
+  simpleWriter->SetFileName( fileName );
+  simpleWriter->SetInput( itkImage );
+  try
+  {
+    simpleWriter->Update();
+  }
+  catch( itk::ExceptionObject &e)
+  {
+    std::cerr << "Caught exception while writing image with composite type: \n" << e.what();
+  }
+}
+
 #define InstantiateAccessFunction__mitkItkPictureWrite(pixelType, dim) \
   template MITK_CORE_EXPORT void _mitkItkPictureWrite(itk::Image<pixelType,dim>*, const std::string&);
 
+#define InstantiateAccessFunction__mitkItkPictureWriteComposite(pixelType, dim) \
+  template MITK_CORE_EXPORT void _mitkItkPictureWriteComposite(itk::Image<pixelType,dim>*, const std::string&);
+
 InstantiateAccessFunction(_mitkItkPictureWrite)
+
+InstantiateAccessFunctionForFixedPixelType( _mitkItkPictureWriteComposite, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ)
 
 // typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
 // template <> void _mitkItkImageWrite<itk::RGBPixel<unsigned char>, 2>(itkImageRGBUC2* itkImage, const std::string& fileName)

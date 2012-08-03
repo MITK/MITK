@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHeaderView>
 
 #include <QTimer>
+#include <QClipboard>
 
 namespace berry {
 
@@ -46,8 +47,11 @@ QtLogView::QtLogView(QWidget *parent)
       = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
         .Cast<berry::IBerryPreferences>();
   
-  bool showAdvancedFields = 
-      prefs->GetBool("ShowAdvancedFields", true) ;
+  
+  prefs->PutBool("ShowAdvancedFields", false);
+  prefs->PutBool("ShowCategory", true);
+  bool showAdvancedFields = false;
+     
 
   ui.setupUi(this);
   
@@ -65,6 +69,9 @@ QtLogView::QtLogView(QWidget *parent)
              
   connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
   connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
+  connect( ui.ShowCategory, SIGNAL( clicked(bool checked)),this, SLOT(on_ShowAdvancedFields_clicked(checked)));
+  connect( ui.SaveToClipboard, SIGNAL( clicked()),this, SLOT(on_SaveToClipboard_clicked()));
+  
   ui.ShowAdvancedFields->setChecked( showAdvancedFields );
            
 }
@@ -116,6 +123,28 @@ void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
   
   prefs->PutBool("ShowAdvancedFields", checked);
   prefs->Flush();
+}
+
+void QtLogView::on_ShowCategory_clicked( bool checked )
+{
+  QtLogPlugin::GetInstance()->GetLogModel()->SetShowCategory( checked );  
+  ui.tableView->resizeColumnsToContents();
+
+  berry::IPreferencesService::Pointer prefService
+    = berry::Platform::GetServiceRegistry()
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IBerryPreferences::Pointer prefs
+      = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
+        .Cast<berry::IBerryPreferences>();
+  
+  prefs->PutBool("ShowCategory", checked);
+  prefs->Flush();
+}
+
+void QtLogView::on_SaveToClipboard_clicked()
+{
+  QClipboard *clipboard = QApplication::clipboard();
+  clipboard->setText(model->GetDataAsString());
 }
 
 }

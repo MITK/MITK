@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   #include <mach/task.h>
   #include <mach/mach_init.h>
   #include <mach/mach_host.h>
+  #include <sys/sysctl.h>
 #else
   #include <sys/sysinfo.h>
   #include <unistd.h>
@@ -80,14 +81,13 @@ size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
   GlobalMemoryStatusEx (&statex);
   return (size_t) statex.ullTotalPhys;
 #elif defined(__APPLE__)
-  kern_return_t kr;
-  host_basic_info_data_t hostinfo;
-  int count = HOST_BASIC_INFO_COUNT;
-  kr = host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)&hostinfo, (mach_msg_type_number_t*)&count);
-  if(kr == KERN_SUCCESS)
-    return (size_t)hostinfo.memory_size;
-  else
-    return 0;
+  int mib[2];
+  int64_t physical_memory;
+  mib[0] = CTL_HW;
+  mib[1] = HW_MEMSIZE;
+  size_t length = sizeof(int64_t);
+  sysctl(mib, 2, &physical_memory, &length, NULL, 0);
+  return physical_memory;
 #else
   struct sysinfo info;
   if ( ! sysinfo( &info ) )

@@ -353,7 +353,8 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
       m_Interactor = NULL;
     }
     emit EditPointSets(checked);
-    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();
+    if (m_MultiWidget!=NULL)
+      mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();
   }
 }
 

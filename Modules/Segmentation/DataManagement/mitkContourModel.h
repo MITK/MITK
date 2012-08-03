@@ -213,12 +213,19 @@ namespace mitk
     //##
     virtual void UpdateOutputInformation();
 
+    //##Documentation
+    //## @brief
+    //##
+    virtual void Clear();
 
   protected:
 
     ContourModel();
     ContourModel(const mitk::ContourModel &other);
     virtual ~ContourModel();
+
+    virtual void ClearData();//inherit from BaseData
+    virtual void InitializeEmpty();//inherit from BaseData
 
     void MoveVertex(VertexType* vertex, mitk::Vector3D &vector);
 

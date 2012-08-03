@@ -17,13 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ContourModel::ContourModel()
 {
-  m_ContourSeries.push_back(mitk::ContourModelElement::New());
-
   this->InitializeEmpty();
-  this->InitializeTimeSlicedGeometry(1);
-
-  m_SelectedVertex = NULL;
-  this->m_lineInterpolation = ContourModel::LINEAR;
 }
 
 
@@ -289,6 +283,38 @@ void mitk::ContourModel::SetRequestedRegion (itk::DataObject *data)
 }
 
 
+void mitk::ContourModel::Clear()
+{
+  //clear data and set to initial state again
+  this->ClearData();
+  this->InitializeEmpty();
+}
+
+
+
+void mitk::ContourModel::ClearData()
+{
+  //call the superclass, this releases the data of BaseData
+  Superclass::ClearData();
+
+  //clear out the time resolved contours
+  this->m_ContourSeries.clear();
+}
+
+
+
+void mitk::ContourModel::InitializeEmpty()
+{
+  this->m_ContourSeries.resize(0);
+  this->m_ContourSeries.push_back(mitk::ContourModelElement::New());
+
+  this->InitializeTimeSlicedGeometry(1);
+
+  m_SelectedVertex = NULL;
+  this->m_lineInterpolation = ContourModel::LINEAR;
+}
+
+
 
 void mitk::ContourModel::UpdateOutputInformation()
 {
@@ -300,7 +326,10 @@ void mitk::ContourModel::UpdateOutputInformation()
 
   //update the bounds of the geometry
   float mitkBounds[6];
-  if (this->GetNumberOfVertices() == 0)  {
+
+  //if no controlPoints are available the boundingbox is 0 in all dimensions
+  if (this->GetNumberOfVertices() == 0)
+  {
     mitkBounds[0] = 0.0;
     mitkBounds[1] = 0.0;
     mitkBounds[2] = 0.0;
@@ -310,38 +339,49 @@ void mitk::ContourModel::UpdateOutputInformation()
   }
   else
   {
+    //calculate the boundingbox accroding to all point in the contour in each timestep
+
     typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
     typedef BoundingBoxType::PointsContainer                      PointsContainer;
 
-    BoundingBoxType::Pointer boundingBox = BoundingBoxType::New();
-    
-    PointsContainer::Pointer points = PointsContainer::New();
+    unsigned int timesteps = this->GetTimeSteps();
 
-    VertexIterator it = this->IteratorBegin();
-    VertexIterator end = this->IteratorEnd();
-
-    while(it != end)
+    //update the boudingbox of each timestep
+    for(int currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
     {
-      Point3D currentP = (*it)->Coordinates;
-      BoundingBoxType::PointType p;
-      p.CastFrom(currentP);
-      points->InsertElement(points->Size(), p);
 
-      it++;
+      BoundingBoxType::Pointer boundingBox = BoundingBoxType::New();
+
+      PointsContainer::Pointer points = PointsContainer::New();
+
+      VertexIterator it = this->IteratorBegin(currenTimeStep);
+      VertexIterator end = this->IteratorEnd(currenTimeStep);
+
+      //fill the boundingbox with the points
+      while(it != end)
+      {
+        Point3D currentP = (*it)->Coordinates;
+        BoundingBoxType::PointType p;
+        p.CastFrom(currentP);
+        points->InsertElement(points->Size(), p);
+
+        it++;
+      }
+
+      boundingBox->SetPoints(points);
+      boundingBox->ComputeBoundingBox();
+      BoundingBoxType::BoundsArrayType tmp = boundingBox->GetBounds();
+      mitkBounds[0] = tmp[0];
+      mitkBounds[1] = tmp[1];
+      mitkBounds[2] = tmp[2];
+      mitkBounds[3] = tmp[3];
+      mitkBounds[4] = tmp[4];
+      mitkBounds[5] = tmp[5];
+
+      Geometry3D* geometry3d = this->GetGeometry(currenTimeStep);
+      geometry3d->SetBounds(mitkBounds);
     }
-    
-    boundingBox->SetPoints(points);
-    boundingBox->ComputeBoundingBox();
-    BoundingBoxType::BoundsArrayType tmp = boundingBox->GetBounds();
-    mitkBounds[0] = tmp[0];
-    mitkBounds[1] = tmp[1];
-    mitkBounds[2] = tmp[2];
-    mitkBounds[3] = tmp[3];
-    mitkBounds[4] = tmp[4];
-    mitkBounds[5] = tmp[5];
-  }
 
-  Geometry3D* geometry3d = this->GetGeometry(0);
-  geometry3d->SetBounds(mitkBounds);
-  GetTimeSlicedGeometry()->UpdateInformation();//*/
+    GetTimeSlicedGeometry()->UpdateInformation();
+  }//*/
 }

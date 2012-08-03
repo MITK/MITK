@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
+Copyright (c) German Cancer Research Center, 
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
+This software is distributed WITHOUT ANY WARRANTY; without 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR 
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -18,22 +18,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef TESTVIEW_H_
 #define TESTVIEW_H_
 
-#include <berryIViewPart.h>
+//#include <QmitkAbstractView.h>
+#include <berryQtViewPart.h>
 
-#include <QObject>
+//#include "ui_MinimalViewControls.h"
 
+#include <berryISelectionListener.h>
+#include <berryISelectionService.h>
+#include <berryIWorkbenchWindow.h>
+#include <berryIStructuredSelection.h>
 
-class TestView : public QObject, public berry::IViewPart
+class TestView : public berry::QtViewPart
 {
+
   Q_OBJECT
-  Q_INTERFACES(berry::IViewPart)
 
 public:
 
+  static const std::string VIEW_ID;
+
   TestView();
 
-  //virtual void CreateQtPartControl(QWidget *parent);
+  virtual ~TestView();
+
+  virtual void CreateQtPartControl(QWidget *parent);
+
+//private:
+    //void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
+    //                 berry::ISelection::ConstPointer selection);
+
+    //berry::ISelectionListener::Pointer m_SelectionListener;
+    //friend struct berry::SelectionChangedAdapter<MinimalView>;
+
+  //private slots:
+  //   void ToggleRadioMethod(); //Debugging only!
+
+protected:
+
+  void SetFocus();
+
+  //Ui::MinimalViewControls m_Controls;
+
+  QWidget* m_Parent;
 
 };
 
-#endif /* TESTPERSPECTIVE_H_ */
+#endif /*MINIMALVIEW_H_*/

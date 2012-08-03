@@ -18,8 +18,13 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.minimalview"
           name="Minimal View"
-          class="MinimalView"
-          icon="resources/lena.xpm" />
+          class="MinimalView"/>
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.testview"
+          name="Test View"
+          class="TestView"/>
   </extension>
   
 </plugin>

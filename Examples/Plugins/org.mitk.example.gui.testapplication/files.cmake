@@ -18,6 +18,10 @@ set(MOC_H_FILES
   src/internal/MinimalView.h
 )
 
+set(UI_FILES
+  src/internal/QmitkMinimalViewControls.ui
+ )
+
 set(CACHED_RESOURCE_FILES
   plugin.xml
 )

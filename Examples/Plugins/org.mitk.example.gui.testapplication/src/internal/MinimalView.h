@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <QmitkAbstractView.h>
 #include <berryQtViewPart.h>
 
-//#include "ui_MinimalViewControls.h"
+#include "ui_QmitkMinimalViewControls.h"
 
 #include <berryISelectionListener.h>
 #include <berryISelectionService.h>

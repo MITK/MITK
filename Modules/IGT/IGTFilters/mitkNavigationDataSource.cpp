@@ -24,11 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModuleContext.h"
 
 const std::string mitk::NavigationDataSource::US_INTERFACE_NAME = "org.mitk.services.NavigationDataSource";
+const std::string mitk::NavigationDataSource::US_PROPKEY_DEVICENAME = US_INTERFACE_NAME + ".devicename";
 const std::string mitk::NavigationDataSource::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
 const std::string mitk::NavigationDataSource::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 
 mitk::NavigationDataSource::NavigationDataSource() 
-: itk::ProcessObject()
+: itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)")
 {
 
 }
@@ -82,6 +83,7 @@ void mitk::NavigationDataSource::RegisterAsMicroservice(){
   ServiceProperties props;
   mitk::UIDGenerator uidGen = mitk::UIDGenerator ("org.mitk.services.NavigationDataSource.id_", 16);
   props[ US_PROPKEY_ID ] = uidGen.GetUID();
+  props[ US_PROPKEY_DEVICENAME ] = m_Name;
   m_ServiceRegistration = context->RegisterService<mitk::NavigationDataSource>(this, props);
 }
 

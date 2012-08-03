@@ -96,11 +96,14 @@ void mitk::TrackingDeviceSource::GenerateData()
 
 void mitk::TrackingDeviceSource::SetTrackingDevice( mitk::TrackingDevice* td )
 {
-  itkDebugMacro("setting TrackingDevice to " << td );
+  MITK_DEBUG << "Setting TrackingDevice to " << td;
   if (this->m_TrackingDevice.GetPointer() != td)
   {
     this->m_TrackingDevice = td;
     this->CreateOutputs();
+    std::stringstream name; // create a human readable name for the source
+    name << td->GetData().Model << " Tracking Source";
+    this->SetName(name.str());
   }
 }
 

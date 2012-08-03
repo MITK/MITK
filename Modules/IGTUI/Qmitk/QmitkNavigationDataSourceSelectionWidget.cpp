@@ -48,7 +48,7 @@ void QmitkNavigationDataSourceSelectionWidget::CreateQtPartControl(QWidget *pare
     m_Controls->setupUi(parent);
 
     std::string empty = "";
-    m_Controls->m_NaviagationDataSourceWidget->Initialize<mitk::NavigationDataSource>(empty,empty);
+    m_Controls->m_NaviagationDataSourceWidget->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME,empty);
 
   }
 }
@@ -72,15 +72,24 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
     //Fill tool list
     for(int i = 0; i < m_CurrentSource->GetNumberOfOutputs(); i++) {new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);}
     
-    //The following code is not working yet! (So Toolstorages are not available at the moment)
-    
+        
     // Create Filter for ToolStorage
-    std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + mitk::NavigationDataSource::US_INTERFACE_NAME + ")("+ mitk::NavigationDataSource::US_PROPKEY_ID + " = " + id + "))";
+    std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + mitk::NavigationToolStorage::US_INTERFACE_NAME + ")("+ mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + "))";
         
     // Get Storage 
-    std::list<mitk::ServiceReference> refs = context->GetServiceReferences(mitk::NavigationDataSource::US_INTERFACE_NAME, filter);
-    if (refs.size() == 0) return;
-    this->m_CurrentStorage = context->GetService<mitk::NavigationToolStorage>(refs.front());
+    std::list<mitk::ServiceReference> refs = context->GetServiceReferences(mitk::NavigationToolStorage::US_INTERFACE_NAME, filter);
+    if (refs.size() == 0) return; //no storage was found
+    m_CurrentStorage = context->GetService<mitk::NavigationToolStorage>(refs.front());
+    if (m_CurrentStorage.IsNull())
+      {
+      MITK_WARN << "Found an invalid storage object!";
+      return;
+      }
+    if (m_CurrentStorage->GetToolCount() != m_CurrentSource->GetNumberOfOutputs()) //there is something wrong with the storage
+      {
+      MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
+      m_CurrentStorage = NULL;
+      }    
   }
 
 mitk::NavigationDataSource::Pointer QmitkNavigationDataSourceSelectionWidget::GetSelectedNavigationDataSource()

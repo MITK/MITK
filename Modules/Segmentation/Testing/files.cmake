@@ -3,13 +3,13 @@ set(MODULE_TESTS
   mitkContourTest.cpp
   mitkDataNodeSegmentationTest.cpp
   mitkSegmentationInterpolationTest.cpp
+  mitkOverwriteSliceFilterTest.cpp
+#  mitkOverwriteSliceFilterObliquePlaneTest.cpp
 )
 
 set(MODULE_IMAGE_TESTS
   mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkOverwriteSliceImageFilterTest.cpp
-#Deactivate due to Bug 12340. Should be fixed soon!
-#  mitkOverwriteSliceFilterTest.cpp
 )
 set(MODULE_CUSTOM_TESTS
 )

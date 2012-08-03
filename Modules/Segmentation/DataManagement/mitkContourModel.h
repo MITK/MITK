@@ -218,6 +218,13 @@ namespace mitk
     //##
     virtual void Clear();
 
+  //##Documentation
+  //##@brief overwrite if the Data can be called by an Interactor (StateMachine).
+  //## 
+  //## Empty by default. Overwrite and implement all the necessary operations here 
+  //## and get the necessary information from the parameter operation.
+  void ExecuteOperation(Operation* operation);
+
   protected:
 
     ContourModel();

@@ -23,7 +23,7 @@ mitk::ContourModel::ContourModel()
 
 
 mitk::ContourModel::ContourModel(const mitk::ContourModel &other) :
-m_ContourSeries(other.m_ContourSeries)
+m_ContourSeries(other.m_ContourSeries), m_lineInterpolation(other.m_lineInterpolation)
 {
   m_SelectedVertex = NULL;
 }
@@ -384,4 +384,11 @@ void mitk::ContourModel::UpdateOutputInformation()
 
     GetTimeSlicedGeometry()->UpdateInformation();
   }//*/
+}
+
+
+
+void mitk::ContourModel::ExecuteOperation(mitk::Operation* operation)
+{
+
 }

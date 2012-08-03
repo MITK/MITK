@@ -85,10 +85,13 @@ namespace mitk {
     * then do the following: Using the drivers control panel to force a certain resolution, then call
     * this method with the same Dimensions after opening the device.
     */
-    void ForceDimensions(int width, int height);
-    
+    void OverrideResolution(int width, int height);
+
+
     // Getter & Setter
     itkGetMacro(IsVideoReady, bool);
+    itkGetMacro(ResolutionOverride, bool);
+    itkSetMacro(ResolutionOverride, bool);
 
 
   protected:
@@ -96,13 +99,34 @@ namespace mitk {
     virtual ~USImageVideoSource();
 
     /**
-    * \brief The source of the video
+    * \brief The source of the video, managed internally
     */
     cv::VideoCapture* m_VideoCapture;
+
+    /**
+    * \brief If true, a frame can be grabbed anytime.
+    */
     bool m_IsVideoReady;
+    /**
+    * \brief If true, image output will be greyscale.
+    */
     bool m_IsGreyscale;
+    /**
+    * \brief If values inside are nonzero, this rectangle will be cropped from the stream and used as an output.
+    * Used to mark Region of Interest.
+    */
     cv::Rect m_CropRegion;
+    /**
+    * \brief Used to convert from OpenCV Images to MITK Images.
+    */
     mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToMitkFilter;
+
+    /**
+    * These Variables determined whether Resolution Override is on, what dimensions to use.
+    */
+    int  m_ResolutionOverrideWidth;
+    int  m_ResolutionOverrideHeight;
+    bool m_ResolutionOverride;
 
   };
 } // namespace mitk

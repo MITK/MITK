@@ -29,9 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::USImageVideoSource::USImageVideoSource()
 : itk::Object()
 {
-    m_IsVideoReady = false;
-    m_IsGreyscale = true;
-    this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
+  m_VideoCapture = new cv::VideoCapture();
+  m_IsVideoReady = false;
+  m_IsGreyscale = true;
+  this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
+  int  m_ResolutionOverrideWidth = 0;
+  int  m_ResolutionOverrideHeight = 0;
+  bool m_ResolutionOverride = false;
 }
 
 mitk::USImageVideoSource::~USImageVideoSource()
@@ -40,21 +44,33 @@ mitk::USImageVideoSource::~USImageVideoSource()
 
 void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
 {
-  m_VideoCapture = new cv::VideoCapture(path.c_str());
+  m_VideoCapture->open(path.c_str());
   if(!m_VideoCapture->isOpened())  // check if we succeeded
     m_IsVideoReady = false;
   else     
     m_IsVideoReady = true;
+
+  // If Override is enabled, use it
+  if (m_ResolutionOverride) {
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, this->m_ResolutionOverrideWidth);
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, this->m_ResolutionOverrideHeight);
+  }
 }
 
     
 void mitk::USImageVideoSource::SetCameraInput(int deviceID)
 {
-  m_VideoCapture = new cv::VideoCapture(deviceID);
+  m_VideoCapture->open(deviceID);
   if(!m_VideoCapture->isOpened())  // check if we succeeded
     m_IsVideoReady = false;
   else     
     m_IsVideoReady = true;
+
+  // If Override is enabled, use it
+  if (m_ResolutionOverride) {
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, this->m_ResolutionOverrideWidth);
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, this->m_ResolutionOverrideHeight);
+  }
 }
 
 void mitk::USImageVideoSource::SetColorOutput(bool isColor){
@@ -119,7 +135,14 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   return result;
 }
 
-void mitk::USImageVideoSource::ForceDimensions(int width, int height){
-  m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, width);
-  m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, height);
+void mitk::USImageVideoSource::OverrideResolution(int width, int height){
+  this->m_ResolutionOverrideHeight = height;
+  this->m_ResolutionOverrideWidth = width;
+
+  if (m_VideoCapture != 0)
+  {
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, width);
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, height);
+  }
 }
+

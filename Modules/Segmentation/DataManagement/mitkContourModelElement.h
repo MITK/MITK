@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include <mitkVector.h>
 
+#include <ANN/ANN.h>
+
 
 #include <deque>
 

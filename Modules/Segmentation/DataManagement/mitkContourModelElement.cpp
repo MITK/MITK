@@ -50,24 +50,90 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(co
 {
   /* current version iterates over the whole deque - should some kind of an octree with spatial query*/
 
-  if(eps > 0){
-    ConstVertexIterator it = this->m_Vertices->begin();
+  if(eps > 0)
+  {
 
-    ConstVertexIterator end = this->m_Vertices->end();
-
-    while(it != end)
+    if(this->m_Vertices->size() < 100)
     {
-      mitk::Point3D currentPoint = (*it)->Coordinates;
 
-      if(currentPoint.EuclideanDistanceTo(point) < eps)
+      ConstVertexIterator it = this->m_Vertices->begin();
+
+      ConstVertexIterator end = this->m_Vertices->end();
+
+      while(it != end)
       {
-        //found an approximate point
-        return *it;
+        mitk::Point3D currentPoint = (*it)->Coordinates;
+
+        if(currentPoint.EuclideanDistanceTo(point) < eps)
+        {
+          //found an approximate point
+          return *it;
+        }//if
+
+        it++;
+      }//while
+
+    }//if size < n
+    else
+    {
+      int k = 1;
+      int dim = 3;
+      int nPoints = this->m_Vertices->size();
+      ANNpointArray pointsArray;
+      ANNpoint queryPoint;
+      ANNidxArray indexArray;
+      ANNdistArray distanceArray;
+      ANNkd_tree* kdTree;
+
+      queryPoint = annAllocPt(dim);
+      pointsArray = annAllocPts(nPoints, dim);
+      indexArray = new ANNidx[k];
+      distanceArray = new ANNdist[k];
+
+
+       int i = 0;
+
+      //fill points array with our control points
+      for(VertexIterator it = this->m_Vertices->begin(); it != this->m_Vertices->end(); it++, i++)
+      {
+        mitk::Point3D cur = (*it)->Coordinates;
+        pointsArray[i][0]= cur[0];
+        pointsArray[i][1]= cur[1];
+        pointsArray[i][2]= cur[2];
       }
 
-      it++;
-    }
-  }
+      //create the kd tree
+      kdTree = new ANNkd_tree(pointsArray,nPoints, dim);
+
+      //fill mitk::Point3D into ANN query point
+      queryPoint[0] = point[0];
+      queryPoint[1] = point[1];
+      queryPoint[2] = point[2];
+
+      //k nearest neighbour search
+      kdTree->annkSearch(queryPoint, k, indexArray, distanceArray, eps);
+
+      VertexType* ret = NULL;
+
+      try
+      {
+        ret = this->m_Vertices->at(indexArray[0]);
+      }
+      catch(std::out_of_range ex)
+      {
+        //ret stays NULL
+      }
+
+      //clean up ANN
+      delete [] indexArray;
+      delete [] distanceArray;
+      delete kdTree;
+      annClose();
+
+      return ret;
+
+    }//else
+  }//if eps < 0
   return NULL;
 }
 

@@ -26,45 +26,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdio.h>  
 
 
-
-
 mitk::USImageVideoSource::USImageVideoSource()
 : itk::Object()
 {
-    m_IsVideoReady = false;
-    m_IsGreyscale = true;
-    this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
+  m_VideoCapture = new cv::VideoCapture();
+  m_IsVideoReady = false;
+  m_IsGreyscale  = false;
+  this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
+  int  m_ResolutionOverrideWidth = 0;
+  int  m_ResolutionOverrideHeight = 0;
+  bool m_ResolutionOverride = false;
 }
-
 
 mitk::USImageVideoSource::~USImageVideoSource()
 {
 }
 
-
 void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
 {
-  m_OpenCVVideoSource = mitk::OpenCVVideoSource::New();
+  m_VideoCapture->open(path.c_str());
+  if(!m_VideoCapture->isOpened())  // check if we succeeded
+    m_IsVideoReady = false;
+  else     
+    m_IsVideoReady = true;
 
-  m_OpenCVVideoSource->SetVideoFileInput(path.c_str(),true,false);
-  m_OpenCVVideoSource->StartCapturing();
-  m_OpenCVVideoSource->FetchFrame();
-  
-  // Let's see if we have been successful
-  m_IsVideoReady = m_OpenCVVideoSource->IsCapturingEnabled();
+  // If Override is enabled, use it
+  if (m_ResolutionOverride) {
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, this->m_ResolutionOverrideWidth);
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, this->m_ResolutionOverrideHeight);
+  }
 }
 
     
 void mitk::USImageVideoSource::SetCameraInput(int deviceID)
 {
-  m_OpenCVVideoSource = mitk::OpenCVVideoSource::New();
-  m_OpenCVVideoSource->SetVideoCameraInput(deviceID);
+  m_VideoCapture->open(deviceID);
+  if(!m_VideoCapture->isOpened())  // check if we succeeded
+    m_IsVideoReady = false;
+  else     
+    m_IsVideoReady = true;
 
-  m_OpenCVVideoSource->StartCapturing();
-  m_OpenCVVideoSource->FetchFrame();
-  
-  // Let's see if we have been successful
-  m_IsVideoReady = m_OpenCVVideoSource->IsCapturingEnabled();
+  // If Override is enabled, use it
+  if (m_ResolutionOverride) {
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, this->m_ResolutionOverrideWidth);
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, this->m_ResolutionOverrideHeight);
+  }
 }
 
 void mitk::USImageVideoSource::SetColorOutput(bool isColor){
@@ -77,9 +83,11 @@ void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, i
   if (topLeftX < 0) topLeftX = 0;
   if (topLeftY < 0) topLeftY = 0;
 
-  if (bottomRightX >  m_OpenCVVideoSource->GetImageWidth()) bottomRightX = m_OpenCVVideoSource->GetImageWidth();
-  if (bottomRightX >  m_OpenCVVideoSource->GetImageHeight()) bottomRightY = m_OpenCVVideoSource->GetImageHeight();
+  // We can try and correct too large boundaries
+  if (bottomRightX >  m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH)) bottomRightX = m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
+  if (bottomRightX >  m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)) bottomRightY = m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
 
+  // Nothing to save, throw an exception
   if (topLeftX > bottomRightX) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
   if (topLeftY > bottomRightY) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
 
@@ -93,32 +101,32 @@ void mitk::USImageVideoSource::RemoveRegionOfInterest(){
 
 mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 {
-  // Setup Pointers
+  // Loop video if necessary
+  if (m_VideoCapture->get(CV_CAP_PROP_POS_AVI_RATIO) >= 0.99 )
+    m_VideoCapture->set(CV_CAP_PROP_POS_AVI_RATIO, 0);
+
+  // Setup pointers
   cv::Mat image;
   cv::Mat buffer;
 
-  //Get dimensions and init rgb
-  int width  = m_OpenCVVideoSource->GetImageWidth();
-  int height = m_OpenCVVideoSource->GetImageHeight();
-
-  // Get Frame from Source
-  m_OpenCVVideoSource->FetchFrame();
-  image = m_OpenCVVideoSource->GetImage();
-
+  // Retrieve image
+  *m_VideoCapture >> image; // get a new frame from camera
+ 
   // if Region of interest is set, crop image
   if (m_CropRegion.width > 0){
     buffer = image(m_CropRegion);
     image = buffer;
   }
-  // If this is a greyscale image, convert it
+  // If this source is set to deliver greyscale images, convert it
   if (m_IsGreyscale)
   {
     cv::cvtColor(image, buffer, CV_RGB2GRAY, 1);
     image = buffer;
   }
+
+  // Convert to MITK-Image
   IplImage ipl_img = image;
   this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
-
   this->m_OpenCVToMitkFilter->Update();
 
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
@@ -126,3 +134,15 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 
   return result;
 }
+
+void mitk::USImageVideoSource::OverrideResolution(int width, int height){
+  this->m_ResolutionOverrideHeight = height;
+  this->m_ResolutionOverrideWidth = width;
+
+  if (m_VideoCapture != 0)
+  {
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, width);
+    m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, height);
+  }
+}
+

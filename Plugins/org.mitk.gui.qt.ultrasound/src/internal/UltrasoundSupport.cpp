@@ -73,9 +73,6 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 
 void UltrasoundSupport::DisplayImage()
 {
-  //QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  // if (nodes.empty()) return;
-
   m_Device->UpdateOutputData(0);
   mitk::USImage::Pointer image = m_Device->GetOutput();
   m_Node->SetData(image);

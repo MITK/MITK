@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkImageToItk.h>
 #include <mitkFiberBundleX.h>
+#include <mitkImageCast.h>
 
 // VTK
 #include <vtkPolyData.h>
@@ -206,19 +207,15 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
     if (m_SeedRoi.IsNotNull())
     {
-        CastType2::Pointer caster2 = CastType2::New();
-        caster2->SetInput(m_SeedRoi);
-        caster2->Update();
-        ItkUCharImageType::Pointer mask = caster2->GetOutput();
+        ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
+        mitk::CastToItkImage<ItkUCharImageType>(m_SeedRoi, mask);
         filter->SetSeedImage(mask);
     }
 
     if (m_MaskImage.IsNotNull())
     {
-        CastType2::Pointer caster2 = CastType2::New();
-        caster2->SetInput(m_MaskImage);
-        caster2->Update();
-        ItkUCharImageType::Pointer mask = caster2->GetOutput();
+        ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
+        mitk::CastToItkImage<ItkUCharImageType>(m_MaskImage, mask);
         filter->SetMaskImage(mask);
     }
 

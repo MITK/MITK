@@ -71,7 +71,7 @@ namespace mitk {
     void DoFiberSmoothing(int pointsPerCm);
     bool RemoveShortFibers(float lengthInMM);
     bool RemoveLongFibers(float lengthInMM);
-    bool ApplyCurvatureThreshold(float maxDeg, float mm);
+    bool ApplyCurvatureThreshold(float minRadius, bool deleteFibers);
     void MirrorFibers(unsigned int axis);
 
     // add/subtract fibers
@@ -95,8 +95,6 @@ namespace mitk {
     itkGetMacro( MeanFiberLength, float )
     itkGetMacro( MedianFiberLength, float )
     itkGetMacro( LengthStDev, float )
-    itkGetMacro( RemoveFibers, bool )
-    itkSetMacro( RemoveFibers, bool )
 
     // copy fiber bundle
     mitk::FiberBundleX::Pointer GetDeepCopy();
@@ -134,7 +132,6 @@ namespace mitk {
     float m_MeanFiberLength;
     float m_MedianFiberLength;
     float m_LengthStDev;
-    bool  m_RemoveFibers;
   };
 
 } // namespace mitk

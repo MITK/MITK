@@ -18,10 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSImageVideoSource_H_HEADER_INCLUDED_
 #define MITKUSImageVideoSource_H_HEADER_INCLUDED_
 
+// ITK
 #include <itkProcessObject.h>
+
+// MITK
 #include "mitkUSImage.h"
-#include "mitkOpenCVVideoSource.h"
 #include "mitkOpenCVToMitkImageFilter.h"
+
+// OpenCV
+#include <highgui.h>
 
 namespace mitk {
 
@@ -68,14 +73,21 @@ namespace mitk {
     void RemoveRegionOfInterest();
 
     /**
-    *\brief Retrieves the next frame. This will typically be the next frame in a file
-    * or the last cahced file in a devcie.
+    * \brief Retrieves the next frame. This will typically be the next frame in a file
+    * or the last cached file in a device.
     */
     mitk::USImage::Pointer GetNextImage();
+
+    /**
+    * \brief This is a workaround for a problem that happens with some video device drivers.
+    *  
+    * If you encounter OpenCV Warnings that buffer sizes do not match while calling getNextFrame,
+    * then do the following: Using the drivers control panel to force a certain resolution, then call
+    * this method with the same Dimensions after opening the device.
+    */
+    void ForceDimensions(int width, int height);
     
     // Getter & Setter
-    itkGetMacro(OpenCVVideoSource, mitk::OpenCVVideoSource::Pointer);
-    itkSetMacro(OpenCVVideoSource, mitk::OpenCVVideoSource::Pointer);
     itkGetMacro(IsVideoReady, bool);
 
 
@@ -86,13 +98,11 @@ namespace mitk {
     /**
     * \brief The source of the video
     */
-    mitk::OpenCVVideoSource::Pointer m_OpenCVVideoSource;
-
-   bool m_IsVideoReady;
-   bool m_IsGreyscale;
-   cv::Rect m_CropRegion;
-   mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToMitkFilter;
-    
+    cv::VideoCapture* m_VideoCapture;
+    bool m_IsVideoReady;
+    bool m_IsGreyscale;
+    cv::Rect m_CropRegion;
+    mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToMitkFilter;
 
   };
 } // namespace mitk

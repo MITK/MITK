@@ -137,7 +137,7 @@ void QmitkMITKIGTTrackingToolboxView::StdMultiWidgetNotAvailable()
 void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 {
   //read in filename
-  QString filename = QFileDialog::getOpenFileName(NULL,tr("Open Toolfile"), "/", tr("All Files (*.*)")); //later perhaps: tr("Toolfile (*.tfl)"
+  QString filename = QFileDialog::getOpenFileName(NULL,tr("Open Tool Storage"), "/", tr("Tool Storage Files (*.IGTToolStorage)"));
   if (filename.isNull()) return;
 
   //read tool storage from disk
@@ -436,7 +436,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
       if (ret == 16384) //yes
         {
         //ask the user for a filename
-        QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"),"/",tr("*.*"));
+        QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"),"/",tr("*.IGTToolStorage"));
         //check for empty filename
         if(fileName == "") {return;}
         mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();

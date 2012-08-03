@@ -31,7 +31,7 @@ mitk::USImageVideoSource::USImageVideoSource()
 {
   m_VideoCapture = new cv::VideoCapture();
   m_IsVideoReady = false;
-  m_IsGreyscale = true;
+  m_IsGreyscale  = false;
   this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
   int  m_ResolutionOverrideWidth = 0;
   int  m_ResolutionOverrideHeight = 0;

@@ -31,7 +31,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /**Documentation
-  * \brief This class can be pointed to a video file or a videodevice and delivers USImages with default metadata Sets
+  * \brief This class can be pointed to a video file or a videodevice and delivers USImages.
+  *
+  * Images are in color by default, but can be set to greyscale via SetColorOutput(false),
+  * which significantly improves performance.
+  *
+  * Images can also be cropped to a region of interest, further increasing performance.
   *
   * \ingroup US
   */
@@ -42,20 +47,21 @@ namespace mitk {
     itkNewMacro(Self);
 
     /**
-    *\brief Opens a video file for streaming. If nothing goes wrong, the 
+    * \brief Opens a video file for streaming. If nothing goes wrong, the 
     * VideoSource is ready to deliver images after calling this function.
     */
     void SetVideoFileInput(std::string path);
 
     /**
-    *\brief Opens a video device for streaming. Takes the Device id. Try -1 for "grab the first you can get"
+    * \brief Opens a video device for streaming. Takes the Device id. Try -1 for "grab the first you can get"
     * which works quite well if only one device is available. If nothing goes wrong, the 
     * VideoSource is ready to deliver images after calling this function.
     */
     void SetCameraInput(int deviceID);
 
     /**
-    *\brief Sets the output image to rgb or grayscale. Output is grayscale by default
+    * \brief Sets the output image to rgb or grayscale.
+    * Output is color by default
     * and can be set to color by passing true, or to grayscale again by passing false.
     */
     void SetColorOutput(bool isColor);

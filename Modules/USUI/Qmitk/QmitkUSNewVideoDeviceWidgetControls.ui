@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>405</width>
-    <height>528</height>
+    <height>569</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -151,21 +151,14 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="m_BtnDone">
-     <property name="text">
-      <string>Add Device</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
+   <item row="3" column="1">
     <widget class="QPushButton" name="m_BtnCancel">
      <property name="text">
       <string>Cancel</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="4" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Override:</string>
@@ -174,7 +167,7 @@
       <item row="0" column="1" colspan="2">
        <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>If you encounter problems with devices (e.g. Images of uniform color and error messages in the log window), then try to set the resolution externally using the devices driver panel, and then enter the same resolution here.</string>
+         <string>If you encounter problems with devices (e.g. Images of uniform color and error messages in the log window), then try to set the resolution externally using the device's driver panel and then enter the same resolution here.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -182,7 +175,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QCheckBox" name="m_ResolutionOverride">
+       <widget class="QCheckBox" name="m_CheckResolutionOverride">
         <property name="text">
          <string>Enable Resolution Override</string>
         </property>
@@ -237,7 +230,7 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
+   <item row="5" column="0" colspan="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -249,6 +242,32 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="m_BtnDone">
+     <property name="text">
+      <string>Add Device</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Video Options:</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="m_CheckGreyscale">
+        <property name="text">
+         <string>Greyscale Image (Significantly faster)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -263,9 +282,8 @@
   <tabstop>m_DeviceSelector</tabstop>
   <tabstop>m_RadioFileSource</tabstop>
   <tabstop>m_FilePathSelector</tabstop>
-  <tabstop>m_BtnDone</tabstop>
   <tabstop>m_BtnCancel</tabstop>
-  <tabstop>m_ResolutionOverride</tabstop>
+  <tabstop>m_CheckResolutionOverride</tabstop>
   <tabstop>m_ResolutionWidth</tabstop>
   <tabstop>m_ResolutionHeight</tabstop>
  </tabstops>

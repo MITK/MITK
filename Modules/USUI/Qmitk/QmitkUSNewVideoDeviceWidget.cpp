@@ -92,15 +92,17 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
     newDevice = mitk::USVideoDevice::New(filepath, metadata);
   }
 
+  // Set Video Options
+   newDevice->GetSource()->SetColorOutput(! m_Controls->m_CheckGreyscale->isChecked());
+
   // If Resolution override is activated, apply it
-  if (m_Controls->m_ResolutionOverride->isChecked())
+  if (m_Controls->m_CheckResolutionOverride->isChecked())
   {
     int width  = m_Controls->m_ResolutionWidth->value();
     int height = m_Controls->m_ResolutionHeight->value();
     newDevice->GetSource()->OverrideResolution(width, height);
     newDevice->GetSource()->SetResolutionOverride(true);
   }
-
 
   newDevice->Connect();
 

@@ -53,6 +53,7 @@ void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isActive, unsigne
   if(!this->IsEmptyTimeStep(timestep))
   {
     this->m_ContourSeries[timestep]->AddVertex(vertex, isActive);
+    this->Modified();
   }
 }
 
@@ -85,6 +86,7 @@ void mitk::ContourModel::Close(unsigned int timestep)
   if(!this->IsEmptyTimeStep(timestep))
   {
     this->m_ContourSeries[timestep]->Close();
+    this->Modified();
   }
 }
 
@@ -102,6 +104,7 @@ void mitk::ContourModel::Concatenate(mitk::ContourModel* other, unsigned int tim
   if(!this->IsEmptyTimeStep(timestep))
   {
     this->m_ContourSeries[timestep]->Concatenate(other->m_ContourSeries[timestep]);
+    this->Modified();
   }
 }
 
@@ -176,6 +179,8 @@ bool mitk::ContourModel::RemoveVertexAt(int index, unsigned int timestep)
 
   this->m_ContourSeries[timestep]->RemoveVertexAt(index);
 
+  this->Modified();
+
   return true;
 }
 
@@ -186,6 +191,7 @@ bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps, unsigne
   if(!this->IsEmptyTimeStep(timestep))
   {
     return this->m_ContourSeries[timestep]->RemoveVertexAt(point, eps);
+    this->Modified();
   }
   return false;
 }
@@ -215,6 +221,8 @@ void mitk::ContourModel::MoveContour(mitk::Vector3D &translate, unsigned int tim
       this->MoveVertex((*it),translate);
       it++;
     }
+
+    this->Modified();
   }
 }
 
@@ -225,6 +233,8 @@ void mitk::ContourModel::MoveVertex(VertexType* vertex, mitk::Vector3D &vector)
   vertex->Coordinates[0] += vector[0];
   vertex->Coordinates[1] += vector[1];
   vertex->Coordinates[2] += vector[2];
+
+  this->Modified();
 }
 
 
@@ -288,6 +298,7 @@ void mitk::ContourModel::Clear()
   //clear data and set to initial state again
   this->ClearData();
   this->InitializeEmpty();
+  this->Modified();
 }
 
 

@@ -4,5 +4,7 @@ SET(CPP_FILES
  mitkCameraIntrinsics.cpp
  mitkXMLSerializable.cpp
  mitkNavigationDataHandEyeCalibrationFilter.cpp
+ mitkEndoDebugToXmlFile.cpp
+ mitkEndoDebugFromXmlFile.cpp
 )
 

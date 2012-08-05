@@ -25,13 +25,25 @@ namespace mitk
     /// init default values
     ///
     EndoDebugToXmlFile(
-      EndoDebug* _EndoDebug,
-      const std::string* _FileName);
+      EndoDebug* _EndoDebug=0,
+      const std::string* _FileName=0);
+
 
     ///
     /// Actually executes the algorithm.
     ///
     void Update();
+
+    ///
+    /// setter EndoDebug
+    ///
+    void SetEndoDebug(EndoDebug* _EndoDebug);
+
+    ///
+    /// setter FileName
+    ///
+    void SetFileName(const std::string* _FileName);
+
     ///
     /// nothing to do here yet
     ///

@@ -97,4 +97,14 @@ namespace mitk
         endodebug("File " << _FileName << " could not be written. Please check permissions.");
     }
   }
+
+  void EndoDebugToXmlFile::SetEndoDebug(EndoDebug *_EndoDebug)
+  {
+      d->m_EndoDebug = _EndoDebug;
+  }
+
+  void EndoDebugToXmlFile::SetFileName(const std::string *_FileName)
+  {
+      d->m_FileName = _FileName;
+  }
 }

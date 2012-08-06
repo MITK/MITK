@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <fstream>
 #include <locale>
-#include <mitkRenderingManager.h>
 
 #include <mitkContourModelReader.h>
 

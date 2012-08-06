@@ -175,7 +175,7 @@ static bool TestANN()
 
 
 
-std::string fileName3 = std::string( MITK_TEST_OUTPUT_DIR ) + "/Raw-search-test.csv";
+std::string fileName3 = std::string( MITK_TEST_OUTPUT_DIR ) + "/test10000.csv";
 
   std::ofstream out3( fileName3.c_str() );
   if ( !out3.good() )

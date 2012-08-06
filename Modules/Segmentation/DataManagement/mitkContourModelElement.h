@@ -28,10 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk 
 {
 
-  /**
-  * Represents a contour element consisting of several control points.
-  *
-  */
+  //##Documentation
+  //## @brief
+  //##
   class Segmentation_EXPORT ContourModelElement : public itk::LightObject
   {
 
@@ -45,6 +44,10 @@ namespace mitk
 
 
 /*+++++++++++++++++++++ Data container representing vertices +++++++++++++++++*/
+    
+    //##Documentation
+    //## @brief
+    //##
     struct ContourModelControlPoint
     {
       ContourModelControlPoint(mitk::Point3D &point, bool active=false)
@@ -70,26 +73,42 @@ namespace mitk
 
 
 /*++++++++++++++++  inline methods  +++++++++++++++++++++++*/
+
+    //##Documentation
+    //## @brief
+    //##
     virtual ConstVertexIterator ConstIteratorBegin()
     {
       return this->m_Vertices->begin();
     }
 
+    //##Documentation
+    //## @brief
+    //##
     virtual ConstVertexIterator ConstIteratorEnd()
     {
       return this->m_Vertices->end();
     }
 
+    //##Documentation
+    //## @brief
+    //##
     virtual VertexIterator IteratorBegin()
     {
       return this->m_Vertices->begin();
     }
 
+    //##Documentation
+    //## @brief
+    //##
     virtual VertexIterator IteratorEnd()
     {
       return this->m_Vertices->end();
     }
 
+    //##Documentation
+    //## @brief
+    //##
     virtual int GetSize()
     {
       return this->m_Vertices->size();
@@ -98,28 +117,64 @@ namespace mitk
 
 
 
+    //##Documentation
+    //## @brief
+    //##
     virtual void AddVertex(mitk::Point3D &vertex, bool isActive);
 
+    //##Documentation
+    //## @brief
+    //##
     virtual VertexType* GetVertexAt(int index);
 
+    //##Documentation
+    //## @brief
+    //##
     virtual VertexType* GetVertexAt(const mitk::Point3D &point, float eps);
 
+    //##Documentation
+    //## @brief
+    //##
     VertexListType* GetVertexList();
 
+    //##Documentation
+    //## @brief
+    //##
     virtual bool IsClosed();
 
+    //##Documentation
+    //## @brief
+    //##
     virtual void Close();
 
+    //##Documentation
+    //## @brief
+    //##
     void Concatenate(mitk::ContourModelElement* other);
 
+    //##Documentation
+    //## @brief
+    //##
     virtual void RemoveVertex(VertexType* vertex);
 
+    //##Documentation
+    //## @brief
+    //##
     virtual void RemoveVertexAt(int index);
 
+    //##Documentation
+    //## @brief
+    //##
     virtual bool RemoveVertexAt(mitk::Point3D &point, float eps);
 
+    //##Documentation
+    //## @brief
+    //##
     VertexType* BruteForceGetVertexAt(const mitk::Point3D &point, float eps);
 
+    //##Documentation
+    //## @brief
+    //##
     VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
 
 

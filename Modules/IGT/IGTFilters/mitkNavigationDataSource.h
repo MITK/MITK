@@ -43,6 +43,16 @@ namespace mitk {
   public:
     mitkClassMacro(NavigationDataSource, itk::ProcessObject);
 
+    /** @return Returns a human readable name of this source. There will be a default name,
+      *         or you can set the name with the method SetName() if you want to change it. 
+      */
+    itkGetMacro(Name,std::string);
+
+    /** @brief Sets the human readable name of this source. There is also a default name,
+      *        but you can use this method if you need to define it on your own.
+      */
+    itkSetMacro(Name,std::string);
+
     /**
     *\brief return the output (output with id 0) of the filter
     */
@@ -86,8 +96,9 @@ namespace mitk {
     *\brief These Constants are used in conjunction with Microservices
     */
     static const std::string US_INTERFACE_NAME;
+    static const std::string US_PROPKEY_DEVICENAME;
     static const std::string US_PROPKEY_ID;
-    static const std::string US_PROPKEY_ISACTIVE;
+    static const std::string US_PROPKEY_ISACTIVE; //NOT IMPLEMENTED YET!
 
     /**
     *\brief Graft the specified DataObject onto this ProcessObject's output.
@@ -145,6 +156,8 @@ namespace mitk {
   protected:
     NavigationDataSource();
     virtual ~NavigationDataSource();
+
+    std::string m_Name;
 
 
   private:

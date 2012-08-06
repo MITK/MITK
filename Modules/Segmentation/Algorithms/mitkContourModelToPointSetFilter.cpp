@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkContourModelToPointSetFilter.h"
+#include <mitkInteractionConst.h>
 #include <mitkPointOperation.h>
 
 
@@ -103,15 +104,30 @@ void mitk::ContourModelToPointSetFilter::GraftNthOutput(unsigned int idx, mitk::
   }
 }
 
+const mitk::ContourModelToPointSetFilter::InputType* mitk::ContourModelToPointSetFilter::GetInput( void )
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+  return static_cast<const mitk::ContourModelToPointSetFilter::InputType*>(this->ProcessObject::GetInput(0));
+}
+
+
+const mitk::ContourModelToPointSetFilter::InputType* mitk::ContourModelToPointSetFilter::GetInput( unsigned int idx )
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+  return static_cast<const mitk::ContourModelToPointSetFilter::InputType*>(this->ProcessObject::GetInput(idx));
+}
+
 
 void mitk::ContourModelToPointSetFilter::GenerateData()
 {
 
-  mitk::ContourModel* inputContour =  (mitk::ContourSet*) (this->GetInput());
+  mitk::ContourModel::Pointer inputContour =  const_cast<mitk::ContourModel*>(this->GetInput(0));
   mitk::ContourModelToPointSetFilter::OutputType* outputPointSet = this->GetOutput();
 
-  mitk::ContourModel::VertexIterator it = inputContour->IteratorBegin();
-  mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd();
+  InputType::VertexIterator it = inputContour->IteratorBegin();
+  InputType::VertexIterator end = inputContour->IteratorEnd();
   unsigned int pointId = 0;
 
  //TODO timestep support

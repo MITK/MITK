@@ -88,9 +88,9 @@ namespace mitk {
 
     virtual ~ContourModelToPointSetFilter();
 
-    virtual void GenerateOutputInformation();
+    void GenerateOutputInformation() {};
 
-    virtual void GenerateData();
+    void GenerateData();
   };
 
 }

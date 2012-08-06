@@ -93,7 +93,10 @@ bool QmitkServiceListWidget::GetIsServiceSelected(){
 
 void QmitkServiceListWidget::OnServiceSelectionChanged(){
   mitk::ServiceReference ref = this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
-  if (! ref) return;
+  if (! ref){
+    emit (ServiceSelectionChanged(0));
+    return;
+  }
 
   emit (ServiceSelectionChanged(&ref));
 }
@@ -172,6 +175,8 @@ mitk::ServiceReference QmitkServiceListWidget::GetServiceForListItem(QListWidget
 {
   for(std::vector<QmitkServiceListWidget::ServiceListLink>::iterator it = m_ListContent.begin(); it != m_ListContent.end(); ++it)
     if (item == it->item) return it->service;
+  // Return invalid ServiceReference (will evaluate to false in bool expressions)
+  return mitk::ServiceReference();
 }
 
 

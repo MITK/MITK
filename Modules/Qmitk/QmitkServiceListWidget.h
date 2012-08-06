@@ -222,7 +222,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     bool RemoveServiceFromList(mitk::ServiceReference serviceRef);
 
     /**
-    * \brief Returns the serviceReference corresponding to the given ListEntry or null if none was found (which really shouldn't happen).
+    * \brief Returns the serviceReference corresponding to the given ListEntry or an invalid one if none was found (will evaluate to false in bool expressions).
     */
     mitk::ServiceReference GetServiceForListItem(QListWidgetItem* item);
 

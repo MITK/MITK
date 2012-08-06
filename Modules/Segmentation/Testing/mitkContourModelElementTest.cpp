@@ -88,7 +88,16 @@ static bool TestANN()
 {
   int64 startJob, stopJob, durationJob;
 
-  std::string fileName = std::string( MITK_TEST_OUTPUT_DIR ) + "/ANN-test.csv";
+  int maxNumberPts = 1000;
+  
+  //worst case query
+  mitk::Point3D query;
+  query[0] = query[1] = query[2] = -100;
+
+
+
+/*+++++++++++++++++++++++++++++ BruteForce +++++++++++++++++++++++++++++++++++++++++*/
+  std::string fileName = std::string( MITK_TEST_OUTPUT_DIR ) + "/Bruteforce-test.csv";
 
   std::ofstream out( fileName.c_str() );
   if ( !out.good() )
@@ -101,23 +110,10 @@ static bool TestANN()
   std::locale I("C");
   out.imbue(I);
 
-  int maxNumberPts = 1000;
-  
-  //worst case query
-  mitk::Point3D query;
-  query[0] = query[1] = query[2] = -100;
-
-
-
-/*+++++++++++++++++++++++++++++ BruteForce +++++++++++++++++++++++++++++++++++++++++*/
   mitk::ContourModelElement::Pointer contour = mitk::ContourModelElement::New();
-
-  out << "\"BruteForce:\"" << std::endl;
 
   for(int step = 0; step < 1000; step++)
   {
-    out << "Step: " << step << std::endl;
-
     for(int i=0; i<10; i++)
     {
       startJob = GetTimeMs64();
@@ -132,42 +128,65 @@ static bool TestANN()
 
     out << std::endl;
   }
+  out.close();out.imbue(previousLocale);
 /*+++++++++++++++++++++++++++++ END BruteForce +++++++++++++++++++++++++++++++++++++++++*/
 
 
-  out << std::endl << std::endl;
 
 
 
 /*+++++++++++++++++++++++++++++ ANN +++++++++++++++++++++++++++++++++++++++++*/
-  mitk::ContourModelElement::Pointer contour2 = mitk::ContourModelElement::New();
+  std::string fileName2 = std::string( MITK_TEST_OUTPUT_DIR ) + "/ANN-test.csv";
 
-  out << "\"Optimized:\"" << std::endl;
+  std::ofstream out2( fileName2.c_str() );
+  if ( !out2.good() )
+  {
+    out2.close();
+    return false;
+  }
+
+  std::locale previousLocale2(out2.getloc());
+  std::locale I2("C");
+  out2.imbue(I);
+  mitk::ContourModelElement::Pointer contour2 = mitk::ContourModelElement::New();
 
   for(int step = 0; step < maxNumberPts; step++)
   {
-    out << "Step: " << step << std::endl;
-
     for(int i=0; i<10; i++)
     {
       startJob = GetTimeMs64();
       mitk::ContourModelElement::VertexType* v = contour2->OptimizedGetVertexAt(query,0.001);
       stopJob = GetTimeMs64();
       durationJob = (stopJob - startJob);
-      out << durationJob << ";";
+      out2 << durationJob << ";";
     }
     mitk::Point3D p;
     p[0] = p[1] = p[2] = 1;
     contour2->AddVertex(p,false);
 
-    out << std::endl;
+    out2 << std::endl;
 
   }
 
 
 /*+++++++++++++++++++++++++++++ END ANN +++++++++++++++++++++++++++++++++++++++++*/
 
-  out << std::endl<< std::endl<< std::endl;
+
+
+
+
+std::string fileName3 = std::string( MITK_TEST_OUTPUT_DIR ) + "/Raw-search-test.csv";
+
+  std::ofstream out3( fileName3.c_str() );
+  if ( !out3.good() )
+  {
+    out3.close();
+    return false;
+  }
+
+  std::locale previousLocale3(out3.getloc());
+  std::locale I3("C");
+  out3.imbue(I3);
 
   mitk::ContourModelElement::Pointer contour3 = mitk::ContourModelElement::New();
   for( int i = 0; i < 10000; i++)
@@ -181,28 +200,18 @@ static bool TestANN()
   mitk::ContourModelElement::VertexType* v = contour3->BruteForceGetVertexAt(query,0.001);
   stopJob = GetTimeMs64();
   durationJob = (stopJob - startJob);
-  out << durationJob << ";";
+  out3 << durationJob << ";";
 
   startJob = GetTimeMs64();
   v = contour3->OptimizedGetVertexAt(query,0.001);
   stopJob = GetTimeMs64();
   durationJob = (stopJob - startJob);
-  out << durationJob << ";";
-
-
-
-  out.imbue(previousLocale);
-
-  if ( !out.good() ) // some error during output
-    {
-      out.close();
-      throw std::ios_base::failure("Some error during point set writing.");
-    }
- 
-    out.close();
+  out3 << durationJob << ";";
+  out3.close();
 
     return true;
 }
+
 
 
 

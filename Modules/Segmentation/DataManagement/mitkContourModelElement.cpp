@@ -92,7 +92,7 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetV
 
 mitk::ContourModelElement::VertexType* mitk::ContourModelElement::OptimizedGetVertexAt(const mitk::Point3D &point, float eps)
 {
-  if(eps > 0)
+  if( (eps > 0) && (this->m_Vertices->size()>0) )
   {
       int k = 1;
       int dim = 3;

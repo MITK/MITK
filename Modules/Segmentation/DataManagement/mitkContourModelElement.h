@@ -118,6 +118,10 @@ namespace mitk
 
     virtual bool RemoveVertexAt(mitk::Point3D &point, float eps);
 
+    VertexType* BruteForceGetVertexAt(const mitk::Point3D &point, float eps);
+
+    VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
+
 
   protected:
 

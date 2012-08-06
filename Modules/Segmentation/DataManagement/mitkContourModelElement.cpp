@@ -55,27 +55,45 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(co
 
     if(this->m_Vertices->size() < 100)
     {
-
-      ConstVertexIterator it = this->m_Vertices->begin();
-
-      ConstVertexIterator end = this->m_Vertices->end();
-
-      while(it != end)
-      {
-        mitk::Point3D currentPoint = (*it)->Coordinates;
-
-        if(currentPoint.EuclideanDistanceTo(point) < eps)
-        {
-          //found an approximate point
-          return *it;
-        }//if
-
-        it++;
-      }//while
-
+      return BruteForceGetVertexAt(point, eps);
     }//if size < n
     else
     {
+      return OptimizedGetVertexAt(point, eps);
+    }//else
+  }//if eps < 0
+  return NULL;
+}
+
+
+mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetVertexAt(const mitk::Point3D &point, float eps)
+{
+  if(eps > 0)
+  {
+    ConstVertexIterator it = this->m_Vertices->begin();
+
+    ConstVertexIterator end = this->m_Vertices->end();
+
+    while(it != end)
+    {
+      mitk::Point3D currentPoint = (*it)->Coordinates;
+
+      if(currentPoint.EuclideanDistanceTo(point) < eps)
+      {
+        //found an approximate point
+        return *it;
+      }//if
+
+      it++;
+    }//while
+  }
+  return NULL;
+}
+
+mitk::ContourModelElement::VertexType* mitk::ContourModelElement::OptimizedGetVertexAt(const mitk::Point3D &point, float eps)
+{
+  if(eps > 0)
+  {
       int k = 1;
       int dim = 3;
       int nPoints = this->m_Vertices->size();
@@ -131,10 +149,7 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(co
       annClose();
 
       return ret;
-
-    }//else
-  }//if eps < 0
-  return NULL;
+  }
 }
 
 

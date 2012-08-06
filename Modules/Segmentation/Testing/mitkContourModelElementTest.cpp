@@ -50,7 +50,7 @@ int64 GetTimeMs64()
  uint64 ret = li.QuadPart;
  ret -= 116444736000000000LL; /* Convert from file time to UNIX epoch time. */
  //ret /= 10000; /* From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals */
- ret /= 10; /* From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals */
+ ret /= 10; /* 1 microsecond (10^-6) */
 
  return ret;
 #else
@@ -101,18 +101,20 @@ static bool TestANN()
   std::locale I("C");
   out.imbue(I);
 
-
-
-  mitk::ContourModelElement::Pointer contour = mitk::ContourModelElement::New();
-
-
+  int maxNumberPts = 1000;
+  
   //worst case query
   mitk::Point3D query;
   query[0] = query[1] = query[2] = -100;
 
-  out << "BruteForce" << std::endl;
 
-  for(int step = 0; step < 20000; step++)
+
+/*+++++++++++++++++++++++++++++ BruteForce +++++++++++++++++++++++++++++++++++++++++*/
+  mitk::ContourModelElement::Pointer contour = mitk::ContourModelElement::New();
+
+  out << "\"BruteForce:\"" << std::endl;
+
+  for(int step = 0; step < 1000; step++)
   {
     out << "Step: " << step << std::endl;
 
@@ -122,7 +124,7 @@ static bool TestANN()
       mitk::ContourModelElement::VertexType* v = contour->BruteForceGetVertexAt(query,0.001);
       stopJob = GetTimeMs64();
       durationJob = (stopJob - startJob);
-      out << durationJob << " ";
+      out << durationJob << ";";
     }
     mitk::Point3D p;
     p[0] = p[1] = p[2] = 1;
@@ -130,11 +132,68 @@ static bool TestANN()
 
     out << std::endl;
   }
+/*+++++++++++++++++++++++++++++ END BruteForce +++++++++++++++++++++++++++++++++++++++++*/
+
+
+  out << std::endl << std::endl;
+
+
+
+/*+++++++++++++++++++++++++++++ ANN +++++++++++++++++++++++++++++++++++++++++*/
+  mitk::ContourModelElement::Pointer contour2 = mitk::ContourModelElement::New();
+
+  out << "\"Optimized:\"" << std::endl;
+
+  for(int step = 0; step < maxNumberPts; step++)
+  {
+    out << "Step: " << step << std::endl;
+
+    for(int i=0; i<10; i++)
+    {
+      startJob = GetTimeMs64();
+      mitk::ContourModelElement::VertexType* v = contour2->OptimizedGetVertexAt(query,0.001);
+      stopJob = GetTimeMs64();
+      durationJob = (stopJob - startJob);
+      out << durationJob << ";";
+    }
+    mitk::Point3D p;
+    p[0] = p[1] = p[2] = 1;
+    contour2->AddVertex(p,false);
+
+    out << std::endl;
+
+  }
+
+
+/*+++++++++++++++++++++++++++++ END ANN +++++++++++++++++++++++++++++++++++++++++*/
+
+  out << std::endl<< std::endl<< std::endl;
+
+  mitk::ContourModelElement::Pointer contour3 = mitk::ContourModelElement::New();
+  for( int i = 0; i < 10000; i++)
+  {
+    mitk::Point3D p;
+    p[0] = p[1] = p[2] = 1;
+    contour3->AddVertex(p,false);
+  }
+
+  startJob = GetTimeMs64();
+  mitk::ContourModelElement::VertexType* v = contour3->BruteForceGetVertexAt(query,0.001);
+  stopJob = GetTimeMs64();
+  durationJob = (stopJob - startJob);
+  out << durationJob << ";";
+
+  startJob = GetTimeMs64();
+  v = contour3->OptimizedGetVertexAt(query,0.001);
+  stopJob = GetTimeMs64();
+  durationJob = (stopJob - startJob);
+  out << durationJob << ";";
+
 
 
   out.imbue(previousLocale);
 
-    if ( !out.good() ) // some error during output
+  if ( !out.good() ) // some error during output
     {
       out.close();
       throw std::ios_base::failure("Some error during point set writing.");

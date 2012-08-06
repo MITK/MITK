@@ -62,7 +62,9 @@ void QmitkNavigationToolManagementWidget::CreateQtPartControl(QWidget *parent)
 void QmitkNavigationToolManagementWidget::OnLoadTool()
 {
     mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-    mitk::NavigationTool::Pointer readTool = myReader->DoRead(QFileDialog::getOpenFileName(NULL,tr("Add Navigation Tool"), "/", "*.IGTTool").toAscii().data());
+    std::string filename = QFileDialog::getOpenFileName(NULL,tr("Add Navigation Tool"), "/", "*.IGTTool").toAscii().data();
+    if (filename == "") return;
+    mitk::NavigationTool::Pointer readTool = myReader->DoRead(filename);
     if (readTool.IsNull()) MessageBox("Error: " + myReader->GetErrorMessage());
     else 
       { 
@@ -81,7 +83,9 @@ void QmitkNavigationToolManagementWidget::OnSaveTool()
     if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
 
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-    if (!myWriter->DoWrite(QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.IGTTool").toAscii().data(),m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row()))) 
+    std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.IGTTool").toAscii().data();
+    if (filename == "") return;
+    if (!myWriter->DoWrite(filename,m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row()))) 
       MessageBox("Error: "+ myWriter->GetErrorMessage());
 
 }

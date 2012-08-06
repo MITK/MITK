@@ -21,7 +21,7 @@ Algorithms/mitkDiffSliceOperation.cpp
 Algorithms/mitkDiffSliceOperationApplier.cpp
 Algorithms/mitkContourModelSource.cpp
 Algorithms/mitkContourModelToPointSetFilter.cpp
-Algorithms/mitkContourModelToVtkPolyDataFilter.cpp
+Algorithms/mitkContourModelToSurfaceFilter.cpp
 Controllers/mitkSegmentationInterpolationController.cpp
 Controllers/mitkSurfaceInterpolationController.cpp
 # DataManagement/mitkApplyDiffImageOperation.cpp

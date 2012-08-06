@@ -57,7 +57,7 @@ protected:
 
   void SetFocus();
 
-  //Ui::MinimalViewControls m_Controls;
+  Ui::QmitkMinimalViewControls m_Controls;
 
   QWidget* m_Parent;
 

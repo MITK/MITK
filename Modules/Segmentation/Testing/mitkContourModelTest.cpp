@@ -86,7 +86,7 @@ static void TestMoveSelectedVertex()
   v[1] = 3;
   v[2] = -1;
 
-  contour->MoveSelectedVertex(v);
+  contour->ShiftSelectedVertex(v);
 
   const mitk::ContourModel::VertexType* vertex = contour->GetSelectedVertex();
 
@@ -123,7 +123,7 @@ static void TestMoveContour()
   v[1] = 3;
   v[2] = -1;
 
-  contour->MoveContour(v);
+  contour->ShiftContour(v);
 
   mitk::ContourModel::VertexIterator it = contour->IteratorBegin();
   mitk::ContourModel::VertexIterator end = contour->IteratorEnd();

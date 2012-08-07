@@ -40,12 +40,19 @@ namespace mitk {
 
     /**
      * @brief  Saves a mitk navigation tool storage to a file.
-     * @return Returns true if the file was saved successfully. False if not.
-     * @throws Throws mitk::IGTException if zip-file cannot be opened for writing
+     * @return Returns true always true since error handling was converted to exception handling.
+     *         The return value is decrepated. Will be changed to void.
+     * @throw mitk::IGTIOException Throws an exception if the given filename cannot be opened for writing or
+     *                             if the temp directory is not accessible.
      */
     bool Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage);
     
+    /**
+     * @brief This method is decrepated. Exceptions are used for error handling now!
+     * @return Returns always an empty string since error handling was converted to exception handling.
+     */
     itkGetMacro(ErrorMessage,std::string);
+
   protected:
     NavigationToolStorageSerializer();
     ~NavigationToolStorageSerializer();

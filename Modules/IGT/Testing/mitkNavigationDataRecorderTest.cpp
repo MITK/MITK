@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 //for exceptions
 #include "mitkIGTException.h"

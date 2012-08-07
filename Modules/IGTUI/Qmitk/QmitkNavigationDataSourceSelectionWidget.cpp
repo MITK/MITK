@@ -64,6 +64,14 @@ void QmitkNavigationDataSourceSelectionWidget::CreateConnections()
 
 void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk::ServiceReference* s)
   {
+    if (s==NULL) //no device selected
+      {
+        //reset everything
+        m_CurrentSource = NULL;
+        m_CurrentStorage = NULL;
+        return;
+      }
+
     // Get Source
     m_CurrentSource = this->m_Controls->m_NaviagationDataSourceWidget->TranslateReference<mitk::NavigationDataSource>(*s);
     std::string id = s->GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();

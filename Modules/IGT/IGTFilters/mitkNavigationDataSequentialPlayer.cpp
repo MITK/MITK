@@ -110,11 +110,11 @@ void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
     if(!m_Repeat)
     {
       std::stringstream message;
-      message <<"cannot go back to snapshot " << i << " because the "
+      message <<"Cannot go back to snapshot " << i << " because the "
           << this->GetNameOfClass() << " is configured to not repeat the"
-          << " navigation data";
-      MITK_WARN << message;
-      mitkThrowException(mitk::IGTException) << message;
+          << " navigation data.";
+      MITK_WARN << message.str();
+      mitkThrowException(mitk::IGTException) << message.str();
     }
     else
     {

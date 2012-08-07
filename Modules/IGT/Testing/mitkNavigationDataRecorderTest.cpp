@@ -351,11 +351,12 @@ class mitkNavigationDataRecorderTestClass
     
      //Testing exceptions if the stream is not good
      mitk::NavigationDataRecorder::Pointer recorder3 = mitk::NavigationDataRecorder::New();
-     std::ofstream* stream3 = new std::ofstream(""); //making an empty stream
+     std::ofstream stream3; //making an invalid stream
+     stream3.open("");
      bool exceptionThrown3 = false;
      try
        {
-       recorder3->StartRecording(stream3);
+       recorder3->StartRecording(&stream3);
        }
      catch(mitk::IGTException)
        {

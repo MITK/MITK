@@ -41,7 +41,6 @@ TPDPixelType>
     m_StepSize(1),
     m_MaxLength(10000),
     m_SeedsPerVoxel(1),
-    m_AngularThreshold(0.7),
     m_F(1.0),
     m_G(0.0),
     m_Interpolate(true),
@@ -173,15 +172,24 @@ TPDPixelType>
                 m_EmaxImage->SetPixel(index, 2/eigenvalues[2]);
             }
 
-    std::cout << "StreamlineTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
+    if (m_Interpolate)
+        std::cout << "StreamlineTrackingFilter: using trilinear interpolation" << std::endl;
+    else
+    {
+        if (m_MinCurvatureRadius<0.0)
+            m_MinCurvatureRadius = 0.1*minSpacing;
+
+        std::cout << "StreamlineTrackingFilter: using nearest neighbor interpolation" << std::endl;
+    }
+
+    if (m_MinCurvatureRadius<0.0)
+        m_MinCurvatureRadius = 0.5*minSpacing;
+
+    std::cout << "StreamlineTrackingFilter: Min. curvature radius: " << m_MinCurvatureRadius << std::endl;
     std::cout << "StreamlineTrackingFilter: FA threshold: " << m_FaThreshold << std::endl;
     std::cout << "StreamlineTrackingFilter: stepsize: " << m_StepSize << " mm" << std::endl;
     std::cout << "StreamlineTrackingFilter: f: " << m_F << std::endl;
     std::cout << "StreamlineTrackingFilter: g: " << m_G << std::endl;
-    if (m_Interpolate)
-        std::cout << "StreamlineTrackingFilter: using trilinear interpolation" << std::endl;
-    else
-        std::cout << "StreamlineTrackingFilter: using nearest neighbor interpolation" << std::endl;
     std::cout << "StreamlineTrackingFilter: starting streamline tracking" << std::endl;
 }
 
@@ -430,6 +438,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
     indexOld[0] = -1; indexOld[1] = -1; indexOld[2] = -1;
     itk::Point<double> worldPos;
     float distance = 0;
+    float distanceInVoxel = 0;
 
     // starting index and direction
     index[0] = RoundToNearest(pos[0]);
@@ -447,6 +456,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
         CalculateNewPosition(pos, dir, index);
         distance += m_StepSize;
         tractLength +=  m_StepSize;
+        distanceInVoxel += m_StepSize;
 
         // is new position valid (inside image, above FA threshold etc.)
         if (!IsValidPosition(pos, index, interpWeights))   // if not add last point and end streamline
@@ -477,16 +487,21 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 
                 float angle = dot_product(dirOld, dir);
                 if (angle<0)
+                {
                     dir *= -1;
-                angle = dot_product(dirOld, dir);
-                if (angle<m_AngularThreshold)
-                    break;
+                    angle *= -1;
+                }
+
+                float r = m_StepSize/(2*std::asin(std::acos(angle)/2));
+                if (r<m_MinCurvatureRadius)
+                    return tractLength;
 
                 if (dir.magnitude()<mitk::eps)
                     dir = dirOld;
                 else
                     dirOld = dir;
                 indexOld = index;
+                distanceInVoxel = 0;
             }
             else
                 dir = dirOld;
@@ -523,10 +538,14 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 
             float angle = dot_product(dirOld, dir);
             if (angle<0)
+            {
                 dir *= -1;
-            angle = dot_product(dirOld, dir);
-            if (angle<m_AngularThreshold)
-                break;
+                angle *= -1;
+            }
+
+            float r = m_StepSize/(2*std::asin(std::acos(angle)/2));
+            if (r<m_MinCurvatureRadius)
+                return tractLength;
 
             if (dir.magnitude()<mitk::eps)
                 dir = dirOld;

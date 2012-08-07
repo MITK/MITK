@@ -72,13 +72,14 @@ namespace itk{
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
     itkSetMacro( SeedsPerVoxel, int)
     itkSetMacro( FaThreshold, float)
-    itkSetMacro( AngularThreshold, float)
     itkSetMacro( StepSize, float)
     itkSetMacro( F, float )
     itkSetMacro( G, float )
     itkSetMacro( Interpolate, bool )
     itkSetMacro( MinTractLength, float )
     itkGetMacro( MinTractLength, float )
+    itkSetMacro( MinCurvatureRadius, float )
+    itkGetMacro( MinCurvatureRadius, float )
 
   protected:
     StreamlineTrackingFilter();
@@ -106,7 +107,7 @@ namespace itk{
     typename InputImageType::Pointer m_InputImage;
 
     float m_FaThreshold;
-    float m_AngularThreshold;
+    float m_MinCurvatureRadius;
     float m_StepSize;
     int m_MaxLength;
     float m_MinTractLength;

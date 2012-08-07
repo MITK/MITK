@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MinimalApplication.h"
+#include "MultiplePerspectives.h"
 
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
-class MinimalWorkbenchAdvisor : public berry::WorkbenchAdvisor
+class MultiplePerspectivesWorkbenchAdvisor : public berry::WorkbenchAdvisor
 {
 
 public:
@@ -34,7 +34,7 @@ public:
     // Enable or disable the perspective bar
     configurer->SetShowPerspectiveBar(true);
     //configurer->SetTitle("TEST TEST TEST!");
-
+    
     wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
     return wwAdvisor.data();
   }
@@ -50,21 +50,21 @@ private:
 
 };
 
-const std::string MinimalWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.minimalperspective";
+const std::string MultiplePerspectivesWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.minimalperspective";
 
-MinimalApplication::MinimalApplication()
+MultiplePerspectives::MultiplePerspectives()
 {
 }
 
-MinimalApplication::~MinimalApplication()
+MultiplePerspectives::~MultiplePerspectives()
 {
 }
  
-int MinimalApplication::Start()
+int MultiplePerspectives::Start()
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
+  wbAdvisor.reset(new MultiplePerspectivesWorkbenchAdvisor);
 
-  wbAdvisor.reset(new MinimalWorkbenchAdvisor);
   int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
   
   // exit the application with an appropriate return code
@@ -72,7 +72,7 @@ int MinimalApplication::Start()
               ? EXIT_RESTART : EXIT_OK;
 }
 
-void MinimalApplication::Stop()
+void MultiplePerspectives::Stop()
 {
   
 }

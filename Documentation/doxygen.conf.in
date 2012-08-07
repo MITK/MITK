@@ -768,6 +768,7 @@ EXCLUDE_SYMBOLS        =
 
 EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Examples/Tutorial/ \
+                        @MITK_SOURCE_DIR@/Examples/Plugins/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
                          @MITK_SOURCE_DIR@/Core/Code/ \
                          @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/Documentation/Snippets/ \

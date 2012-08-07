@@ -1,0 +1,23 @@
+/**
+
+\page Example02Page Blueberry Examples - 2. Multiple perspectives
+
+\image html multipleperspectives_result.png
+
+The second example creates two perspectives. The first perspective has a visible editor area and uses a folder to bring the MITK datamanager view to the left side.
+
+The second perspective sets the editor area to invisible. The MITK datamanger is displayed over the whole perspective window.
+
+The visibility of the editor area is controlled by:
+\snippet ExtendedPerspective.cpp Visibility of editor area
+
+In both perspectives the selection service is used to connect the selection of the radio buttons with the selection of the list. The SelectionView is the selection provider for this example and the MinimalView is the selection listener.
+
+first perspective:
+\include MinimalPerspective.cpp
+second perspective:
+\include ExtendedPerspective.cpp
+
+\ref Example01Page "[Previous example]" \ref Example03Page "[Next example]" \ref ExamplePage "[Main example page]"
+
+*/

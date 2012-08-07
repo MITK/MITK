@@ -1,0 +1,14 @@
+/**
+
+\page ExamplePage Blueberry Examples
+ 
+The following examples give an introduction to Blueberry...
+
+The source code of the examples can be found in mitk/Examples/Plugins/ \n
+
+\section ExampleSection Examples
+
+\li \subpage Example01Page "Minimal application"
+\li \subpage Example02Page "Multiple perspectives"
+\li \subpage Example03Page "..."
+*/

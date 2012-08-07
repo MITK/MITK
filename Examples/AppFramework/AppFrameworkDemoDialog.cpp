@@ -66,6 +66,10 @@ QString AppFrameworkDemoDialog::getDemoConfiguration()
   if (eventLoop.exec() == 0)
   {
     QDir appDir = QCoreApplication::applicationDirPath();
+    #ifdef CMAKE_INTDIR
+      appDir.cdUp();
+    #endif
+    
     return appDir.filePath(provisioningFiles[ui->appList->currentRow()]);
   }
 

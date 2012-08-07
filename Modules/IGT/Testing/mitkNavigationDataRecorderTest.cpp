@@ -342,10 +342,10 @@ class mitkNavigationDataRecorderTestClass
      //Testing double call of StartRecording(stream) method.
      mitk::NavigationDataRecorder::Pointer recorder2 = mitk::NavigationDataRecorder::New();
      std::string tmp = "";
-     std::ostringstream* stream = new std::ostringstream( std::ostringstream::trunc );
-     stream->setf( std::ios::fixed, std::ios::floatfield );
-     recorder2->StartRecording(stream);
-     recorder2->StartRecording(stream);
+     std::ostringstream stream;// = new std::ostringstream( std::ostringstream::trunc );
+     stream.setf( std::ios::fixed, std::ios::floatfield );
+     recorder2->StartRecording(&stream);
+     recorder2->StartRecording(&stream);
      recorder2->StopRecording();
      MITK_TEST_OUTPUT(<<"Tested double call of StartRecording(stream). Application should not crash.");
     

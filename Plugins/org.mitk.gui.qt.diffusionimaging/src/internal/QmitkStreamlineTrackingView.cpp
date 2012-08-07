@@ -203,6 +203,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     filter->SetF((float)m_Controls->m_fSlider->value()/100);
     filter->SetG((float)m_Controls->m_gSlider->value()/100);
     filter->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
+    filter->SetMinTractLength(m_Controls->m_MinTractLengthSlider->value());
     //filter->SetNumberOfThreads(1);
 
     if (m_SeedRoi.IsNotNull())
@@ -226,16 +227,13 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         return;
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
 
-    if (fib->RemoveShortFibers(m_Controls->m_MinTractLengthSlider->value()))
-    {
-        mitk::DataNode::Pointer node = mitk::DataNode::New();
-        node->SetData(fib);
-        QString name(m_TensorImageNode->GetName().c_str());
-        name += "_FiberBundle";
-        node->SetName(name.toStdString());
-        node->SetVisibility(true);
-        GetDataStorage()->Add(node);
-    }
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(fib);
+    QString name(m_TensorImageNode->GetName().c_str());
+    name += "_Streamline";
+    node->SetName(name.toStdString());
+    node->SetVisibility(true);
+    GetDataStorage()->Add(node);
 }
 
 

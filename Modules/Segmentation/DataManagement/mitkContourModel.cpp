@@ -228,7 +228,7 @@ void mitk::ContourModel::ShiftSelectedVertex(mitk::Vector3D &translate)
 {
   if(this->m_SelectedVertex)
   {
-    this->MoveVertex(this->m_SelectedVertex,translate);
+    this->ShiftVertex(this->m_SelectedVertex,translate);
     this->Modified();
   }
 }
@@ -245,7 +245,7 @@ void mitk::ContourModel::ShiftContour(mitk::Vector3D &translate, unsigned int ti
 
     while(it != end)
     {
-      this->MoveVertex((*it),translate);
+      this->ShiftVertex((*it),translate);
       it++;
     }
 

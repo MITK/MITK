@@ -129,7 +129,7 @@ namespace mitk
     //## @param isActive - specifies wether the vertex is active or not (Active 
     //## vertices will be rendered).
     //##
-    //##//##
+    //##
     //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     //## will not be added, the TimeSlicedGeometry will not be expanded.
     //## @Note Also if the contour is closed the vertex will not be added.

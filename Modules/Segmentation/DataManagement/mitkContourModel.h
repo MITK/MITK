@@ -71,7 +71,7 @@ namespace mitk
 /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
 
-    /** @brief Possible interpolation of the line segments between control points */
+    //## @brief Possible interpolation of the line segments between control points */
     enum LineSegmentInterpolation{
       LINEAR, B_SPLINE
     };
@@ -219,7 +219,7 @@ namespace mitk
     //##
     //## @param translate - the translation vector.
     //##
-    void MoveSelectedVertex(mitk::Vector3D &translate);
+    void ShiftSelectedVertex(mitk::Vector3D &translate);
 
     //##Documentation
     //## @brief Shift the whole contour by a translation vector at given timestep.
@@ -227,27 +227,27 @@ namespace mitk
     //## @param translate - the translation vector.
     //## @param timestep - at this timestep the contour will be shifted.
     //##
-    void MoveContour(mitk::Vector3D &translate, unsigned int timestep=0);
+    void ShiftContour(mitk::Vector3D &translate, unsigned int timestep=0);
 
 
 /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/
     //##Documentation
-    //## @brief
+    //## @brief Inherit from base data - no region support available for contourModel objects.
     //##
     virtual void SetRequestedRegionToLargestPossibleRegion ();
 
     //##Documentation
-    //## @brief
+    //## @brief Inherit from base data - no region support available for contourModel objects.
     //##
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion ();
 
     //##Documentation
-    //## @brief
+    //## @brief Inherit from base data - no region support available for contourModel objects.
     //##
     virtual bool VerifyRequestedRegion ();
 
     //##Documentation
-    //## @brief
+    //## @brief Get the updated geometry with recomputed bounds.
     //##
     virtual const mitk::Geometry3D* GetUpdatedGeometry (int t=0);
 
@@ -257,7 +257,7 @@ namespace mitk
     virtual mitk::Geometry3D* GetGeometry (int t=0) const;
 
     //##Documentation
-    //## @brief
+    //## @brief Inherit from base data - no region support available for contourModel objects.
     //##
     virtual void SetRequestedRegion (itk::DataObject *data);
 

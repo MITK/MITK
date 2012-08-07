@@ -198,7 +198,7 @@ bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps, unsigne
 
 
 
-void mitk::ContourModel::MoveSelectedVertex(mitk::Vector3D &translate)
+void mitk::ContourModel::ShiftSelectedVertex(mitk::Vector3D &translate)
 {
   if(this->m_SelectedVertex)
   {
@@ -208,7 +208,7 @@ void mitk::ContourModel::MoveSelectedVertex(mitk::Vector3D &translate)
 
 
 
-void mitk::ContourModel::MoveContour(mitk::Vector3D &translate, unsigned int timestep)
+void mitk::ContourModel::ShiftContour(mitk::Vector3D &translate, unsigned int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {

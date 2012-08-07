@@ -176,7 +176,7 @@
       <item>
        <widget class="QComboBox" name="m_QBallReconstructionMethodComboBox">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <item>
          <property name="text">
@@ -210,7 +210,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Mulit q-Ball (SH)</string>
+          <string>Multi-Shell (SH)</string>
          </property>
         </item>
        </widget>
@@ -256,7 +256,7 @@
       <bool>false</bool>
      </property>
      <property name="title">
-      <string>Multi q-Ball reconstruction</string>
+      <string>Multi-Shell Reconstruction</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2"/>
     </widget>

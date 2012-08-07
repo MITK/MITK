@@ -214,10 +214,59 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     {
     mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
-    mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize("noStorage.tfl");
-    MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(),"Testing deserialization of invalid data storage.");
-    MITK_TEST_CONDITION_REQUIRED(myDeserializer->GetErrorMessage() == "Cannot open 'noStorage.tfl' for reading", "Checking Error Message");
+    
+    bool exceptionThrown = false;
+    try
+      {
+      mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize("noStorage.tfl");
+      }
+    catch (mitk::IGTException e)
+      {
+      exceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a non existing storage is given for deserialization.");
     }
+
+    static void TestReadStorageWithUnknownFiletype()
+    {
+    mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
+
+    std::string toolFileName = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronTool.stl", "Modules/IGT/Testing/Data");
+    MITK_TEST_CONDITION(toolFileName.empty() == false, "Check if tool calibration of claron tool file exists");
+    mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
+
+    bool exceptionThrown = false;
+    try
+      {
+      mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(toolFileName);
+      }
+    catch (mitk::IGTException e)
+      {
+      exceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a wrong file type is given for deserialization.");
+    }
+
+    static void TestReadZipFileWithNoToolstorage()
+    {
+    mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
+
+    std::string toolFileName = mitk::StandardFileLocations::GetInstance()->FindFile("Empty.zip", "Modules/IGT/Testing/Data");
+    MITK_TEST_CONDITION(toolFileName.empty() == false, "Check if tool calibration of claron tool file exists");
+    mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
+
+    bool exceptionThrown = false;
+    try
+      {
+      mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(toolFileName);
+      }
+    catch (mitk::IGTException e)
+      {
+      exceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a empty zip file is given for deserialization.");
+    }
+
 
     static void TestWriteStorageToInvalidFile()
     {

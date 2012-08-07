@@ -159,6 +159,20 @@ namespace mitk
     virtual void Close(unsigned int timestep=0);
 
     //##Documentation
+    //## @brief Set isClosed to false contour.
+    //## The link between the last control point the first point will be removed.
+    //##
+    virtual void Open(unsigned int timestep=0);
+
+    //##Documentation
+    //## @brief Set isClosed to given boolean.
+    //##
+    //## false - The link between the last control point the first point will be removed.
+    //## true - The last control point will be linked with the first point.
+    //##
+    virtual void SetIsClosed(bool isClosed, unsigned int timestep=0);
+
+    //##Documentation
     //## @brief Returns a const VertexIterator at the end element of the contour.
     //##
     VertexIterator IteratorEnd( unsigned int timestep=0);
@@ -300,7 +314,7 @@ namespace mitk
     virtual void InitializeEmpty();
 
     //Shift a vertex
-    void MoveVertex(VertexType* vertex, mitk::Vector3D &vector);
+    void ShiftVertex(VertexType* vertex, mitk::Vector3D &vector);
 
 
     //Storage with time resolved support.

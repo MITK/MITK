@@ -171,6 +171,18 @@ void mitk::ContourModelElement::Close()
 }
 
 
+void mitk::ContourModelElement::Open()
+{
+  this->m_IsClosed = false;
+}
+
+
+void mitk::ContourModelElement::SetIsClosed( bool isClosed)
+{
+  isClosed ? this->Close() : this->Open();
+}
+
+
 void mitk::ContourModelElement::Concatenate(mitk::ContourModelElement* other)
 {
   ConstVertexIterator it =  other->m_Vertices->begin();

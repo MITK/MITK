@@ -150,6 +150,16 @@ namespace mitk
     //##Documentation
     //## @brief
     //##
+    virtual void Open();
+
+    //##Documentation
+    //## @brief
+    //##
+    virtual void SetIsClosed(bool isClosed);
+
+    //##Documentation
+    //## @brief
+    //##
     void Concatenate(mitk::ContourModelElement* other);
 
     //##Documentation

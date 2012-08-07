@@ -130,17 +130,25 @@ void mitk::ContourModelToPointSetFilter::GenerateData()
   InputType::VertexIterator end = inputContour->IteratorEnd();
   unsigned int pointId = 0;
 
- //TODO timestep support
+  
+  unsigned int timestep = inputContour->GetTimeSteps();
 
-
-  while ( it <= end )
+  for ( int i = 0; i < timestep; i++)
   {
-    mitk::Point3D p = (*it)->Coordinates;
-    mitk::PointOperation popInsert( mitk::OpINSERT, p, pointId++, false );
-    
-    outputPointSet->ExecuteOperation( &popInsert );
 
-    it++;
+
+    while ( it <= end )
+    {
+      mitk::Point3D p = (*it)->Coordinates;
+      mitk::PointOperation popInsert( mitk::OpINSERT,
+                                      inputContour->GetTimeSlicedGeometry()->TimeStepToMS(timestep),
+                                      p,
+                                      pointId++,
+                                      false );
+
+      outputPointSet->ExecuteOperation( &popInsert );
+
+      it++;
+    }
   }
-
 }

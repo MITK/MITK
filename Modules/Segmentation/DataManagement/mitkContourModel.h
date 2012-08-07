@@ -27,12 +27,29 @@ namespace mitk
 {
 
   //##Documentation
-  //## @brief Represents a contour element consisting of several control points.
-  //## The contour is implicitly defined by the given control points.
-  //## Interaction with the contour is available without any interactor
-  //## class using the api of ContourModel.
+  //## @brief ContourModel is a structure of linked control points defining a contour in 3D space.
+  //## Vertices are stored in a VertexList in mitk::ContourModelControl.
+  //## For timeresolved purposes a mitk::ContourModelElement is stored for each timestep.
+  //## The contour line segments are implicitly defined by the given control points.
+  //##
+  //## Points are specified as vertices containing coordinates additional (data) information,
+  //## see mitk::ContourModelElement.
+  //## The vertices are best accessed by using a VertexIterator.
+  //## For accessing a specific vertex either an index or a position in 3D Space can be used.
+  //## Interaction with the contour is available without any mitk interactor class using the
+  //## api of ContourModel. It is possible to shift single vertices also as shifting the whole
+  //## contour.
+  //##
   //## A contour can be either open like a single curved line segment or
-  //## closed.
+  //## closed. A closed contour can for example represent a jordan curve.
+  //## By default two control points are are linked by a straight line. The interpolation
+  //## can be set via enum property (mitk::ContourModel::LineSegmentInterpolation).
+  //##
+  //## \section mitkPointSetDisplayOptions
+  //##
+  //## The default mappers for this data structure are mitk::ContourModelMapper2D and
+  //## mitk::ContourModelMapper3D. See these classes for display options which can
+  //## can be set via properties.
   //##
   class Segmentation_EXPORT ContourModel : public BaseData
   {
@@ -64,7 +81,7 @@ namespace mitk
 /*++++++++++++++++  inline methods  +++++++++++++++++++++++*/
 
     //##Documentation
-    //## @brief
+    //## @brief Get the current selected vertex.
     //##
     VertexType* GetSelectedVertex()
     {
@@ -73,7 +90,7 @@ namespace mitk
 
 
     //##Documentation
-    //## @brief
+    //## @brief Deselect vertex.
     //##
     void Deselect()
     {
@@ -82,7 +99,7 @@ namespace mitk
 
 
     //##Documentation
-    //## @brief
+    //## @brief Set the interpolation of the line segments between control points.
     //##
     void SetLineSegmentInterpolation(LineSegmentInterpolation interpolation)
     {
@@ -92,82 +109,123 @@ namespace mitk
 
 
     //##Documentation
-    //## @brief
+    //## @brief Add a vertex to the contour at given timestep.
+    //## The vertex is added at the end of contour.
+    //##
+    //## @param vertex - coordinate representation of a control point
+    //## @param timestep - the timestep at which the vertex will be add ( default 0)
+    //##
+    //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    //## will not be added, the TimeSlicedGeometry will not be expanded.
+    //## @Note Also if the contour is closed the vertex will not be added.
     //##
     void AddVertex(mitk::Point3D &vertex, unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Add a vertex to the contour.
+    //##
+    //## @param vertex - coordinate representation of a control point
+    //## @param timestep - the timestep at which the vertex will be add ( default 0)
+    //## @param isActive - specifies wether the vertex is active or not (Active 
+    //## vertices will be rendered).
+    //##
+    //##//##
+    //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    //## will not be added, the TimeSlicedGeometry will not be expanded.
+    //## @Note Also if the contour is closed the vertex will not be added.
     //##
     void AddVertex(mitk::Point3D &vertex, bool isActive, unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Return if the contour is closed or not.
     //##
     bool IsClosed(unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Concatenate two contours.
+    //## The starting control point of the other will be added at the end of the contour.
     //##
     void Concatenate(mitk::ContourModel* other, unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Returns a const VertexIterator at the start element of the contour.
     //##
     VertexIterator IteratorBegin(unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Close the contour.
+    //## The last control point will be linked with the first point.
     //##
     virtual void Close(unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Returns a const VertexIterator at the end element of the contour.
     //##
     VertexIterator IteratorEnd( unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Returns the number of vertices at a given timestep.
+    //##
+    //## @param timestep - default = 0
     //##
     int GetNumberOfVertices( unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Returns the vertex at the index position within the container.
     //##
     virtual const VertexType* GetVertexAt(int index, int timestep=0) const;
 
     //##Documentation
-    //## @brief
+    //## @brief Check if there isn't something at this timestep.
     //##
     virtual bool IsEmptyTimeStep(unsigned int t) const;
 
     //##Documentation
-    //## @brief
+    //## @brief Mark a vertex at an index in the container as selected.
     //##
     bool SelectVertexAt(int index, unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Mark a vertex at a given position in 3D space.
+    //## 
+    //## @param point - query point in 3D space
+    //## @param eps - radius for nearest neighbour search (error bound).
+    //## @param timestep - search at this timestep
+    //##
+    //## @return true = vertex found;  false = no vertex found
     //##
     bool SelectVertexAt(mitk::Point3D &point, float eps, unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Remove a vertex at given index within the container.
+    //##
+    //## @return true = the vertex was successfuly removed;  false = wrong index.
     //##
     bool RemoveVertexAt(int index, unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Remove a vertex at a query position in 3D space.
+    //##
+    //## The vertex to be removed will be search by nearest neighbour search.
+    //## Note that possibly no vertex at this position and eps is stored inside
+    //## the contour.
+    //##
+    //## @return true = the vertex was successfuly removed;  false = no vertex found.
     //##
     bool RemoveVertexAt(mitk::Point3D &point, float eps, unsigned int timestep=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Shift the currently selected vertex by a translation vector.
+    //##
+    //## @param translate - the translation vector.
     //##
     void MoveSelectedVertex(mitk::Vector3D &translate);
 
     //##Documentation
-    //## @brief
+    //## @brief Shift the whole contour by a translation vector at given timestep.
+    //## 
+    //## @param translate - the translation vector.
+    //## @param timestep - at this timestep the contour will be shifted.
     //##
     void MoveContour(mitk::Vector3D &translate, unsigned int timestep=0);
 
@@ -194,7 +252,7 @@ namespace mitk
     virtual const mitk::Geometry3D* GetUpdatedGeometry (int t=0);
 
     //##Documentation
-    //## @brief
+    //## @brief Get the Geometry3D for timestep t.
     //##
     virtual mitk::Geometry3D* GetGeometry (int t=0) const;
 
@@ -204,25 +262,29 @@ namespace mitk
     virtual void SetRequestedRegion (itk::DataObject *data);
 
     //##Documentation
-    //## @brief
+    //## @brief Expand the timebounds of the TimeSlicedGeometry.
     //##
     virtual void Expand( unsigned int timeSteps );
 
     //##Documentation
-    //## @brief
+    //## @brief Update the OutputInformation of a ContourModel object
+    //##
+    //## The BoundingBox of the contour will be updated, if necessary.
     //##
     virtual void UpdateOutputInformation();
 
     //##Documentation
-    //## @brief
+    //## @brief Clear the storage container.
+    //##
+    //## The object is set to initial state. All control points are removed and the number of
+    //## timesteps are set to 1.
     //##
     virtual void Clear();
 
   //##Documentation
   //##@brief overwrite if the Data can be called by an Interactor (StateMachine).
   //## 
-  //## Empty by default. Overwrite and implement all the necessary operations here 
-  //## and get the necessary information from the parameter operation.
+  //## 
   void ExecuteOperation(Operation* operation);
 
   protected:
@@ -231,14 +293,23 @@ namespace mitk
     ContourModel(const mitk::ContourModel &other);
     virtual ~ContourModel();
 
-    virtual void ClearData();//inherit from BaseData
-    virtual void InitializeEmpty();//inherit from BaseData
+    //inherit from BaseData. called by Clear()
+    virtual void ClearData();
 
+    //inherit from BaseData. Initial state of a contour with no vertices and a single timestep.
+    virtual void InitializeEmpty();
+
+    //Shift a vertex
     void MoveVertex(VertexType* vertex, mitk::Vector3D &vector);
 
 
+    //Storage with time resolved support.
     ContourModelSeries m_ContourSeries;
+
+    //The currently selected vertex.
     VertexType* m_SelectedVertex;
+
+    //The interpolation of the line segment between control points.
     LineSegmentInterpolation m_lineInterpolation;
   };
 }

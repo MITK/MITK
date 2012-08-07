@@ -16,12 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataSequentialPlayer.h"
 
-//for the pause
-#include <itksys/SystemTools.hxx>
+#include <itksys/SystemTools.hxx> //for the pause
 
 #include <mitkTimeStamp.h>
 #include <fstream>
 #include <sstream>
+
+//Exceptions
+#include "mitkIGTException.h"
+#include "mitkIGTIOException.h"
 
 mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer() 
   : mitk::NavigationDataPlayerBase()
@@ -45,7 +48,10 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
   m_DataElem = m_Doc->FirstChildElement("Data");
   int toolcount;
   if(!m_DataElem)
+  {
     MITK_WARN << "Data element not found";
+    mitkThrowException(mitk::IGTException) << "Data element not found"; 
+  }
   else
   {
     m_DataElem->QueryIntAttribute("ToolCount", &toolcount);
@@ -84,6 +90,12 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
 
 void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
 {
+  if(!m_Repeat && (this->GetNumberOfSnapshots()<i))
+    {
+      MITK_ERROR << "Snaphot " << i << " does not exist and repat is off: can't go to that snapshot!";
+      mitkThrowException(mitk::IGTException) << "Snaphot " << i << " does not exist and repat is off: can't go to that snapshot!";
+    }
+
   assert(m_DataElem);
 
   int numOfUpdateCalls = 0;
@@ -97,10 +109,12 @@ void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
   {
     if(!m_Repeat)
     {
-      MITK_WARN << "cannot go back to snapshot " << i << " because the "
+      std::stringstream message;
+      message <<"cannot go back to snapshot " << i << " because the "
           << this->GetNameOfClass() << " is configured to not repeat the"
           << " navigation data";
-
+      MITK_WARN << message;
+      mitkThrowException(mitk::IGTException) << message;
     }
     else
     {
@@ -118,16 +132,18 @@ void mitk::NavigationDataSequentialPlayer::
     SetFileName(const std::string& _FileName)
 {
   m_FileName = _FileName;
-
+  
   if(!m_Doc->LoadFile(m_FileName))
   {
     this->SetNumberOfOutputs(0);
     std::ostringstream s;
     s << "File " << _FileName << " could not be loaded";
-    throw std::invalid_argument(s.str());
+    mitkThrowException(mitk::IGTIOException)<<s.str();
   }
   else
+  {
     this->ReinitXML();
+  }
 
   this->Modified();
 }
@@ -136,29 +152,36 @@ void mitk::NavigationDataSequentialPlayer::
     SetXMLString(const std::string& _XMLString)
 {
   m_XMLString = _XMLString;
-
-  m_Doc->Parse( m_XMLString.c_str() );
-  this->ReinitXML();
-
+  if((m_Doc->Parse( m_XMLString.c_str()))== NULL)
+  {
+    this->ReinitXML();
+  } 
+  else 
+  {
+    //if the string is not an XML string
+    std::ostringstream s;
+    s << "String" << _XMLString << " is not an XML string";
+    mitkThrowException(mitk::IGTIOException)<<s.str();
+  } 
   this->Modified();
 }
 
 void mitk::NavigationDataSequentialPlayer::GenerateData()
 {
   assert(m_DataElem);
-
-  // very important: go through the tools (there could be more then one)
+  // very important: go through the tools (there could be more than one)
   mitk::NavigationData::Pointer tmp;
-  //MITK_INFO << "this->GetNumberOfOutputs()" << this->GetNumberOfOutputs();
+  
   for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
   {
-    //MITK_INFO << "index" << index;
     // go to the first element
     if(!m_CurrentElem)
       m_CurrentElem = m_DataElem->FirstChildElement("NavigationData");
     // go to the next element
     else
+      {
       m_CurrentElem = m_CurrentElem->NextSiblingElement();
+      }
 
     // if repeat is on: go back to the first element (prior calls delivered NULL
     // elem)
@@ -176,7 +199,9 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
       {
       output->SetDataValid(false);
       m_StreamValid = false;
+      
       m_ErrorMessage = "Error: Cannot parse input file.";
+      mitkThrowException(mitk::IGTException)<<m_ErrorMessage;
       }
   }
 }
@@ -197,3 +222,6 @@ void mitk::NavigationDataSequentialPlayer::UpdateOutputInformation()
   this->Modified();  // make sure that we need to be updated
   Superclass::UpdateOutputInformation();
 }
+
+
+

@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //POCO
 #include <Poco/Exception.h>
 
+#include "mitkIGTException.h"
+#include "mitkIGTIOException.h"
+
 class NavigationToolStorageSerializerAndDeserializerTestClass
   {
   public:
@@ -317,10 +320,16 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
 
 
     //test serialization
-    bool success = true;
-    success = mySerializer->Serialize(filename,myStorage);
-
-    MITK_TEST_CONDITION_REQUIRED(!success,"Testing serialization into invalid file.");
+    bool exceptionThrown = false;
+    try
+      {
+      mySerializer->Serialize(filename,myStorage);
+      }
+    catch(mitk::IGTException e)
+      {
+      exceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if an exception is thrown if an invalid file is used.");
     }
 
 
@@ -339,14 +348,76 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     bool success = mySerializer->Serialize(filename,myStorage);
     MITK_TEST_CONDITION_REQUIRED(success,"Testing serialization of simple tool storage");
     }
+    //new tests for exception throwing of NavigationToolStorageSerializer
+    static void TestSerializerForExceptions()
+    {
+    mitk::NavigationToolStorageSerializer::Pointer testSerializer = mitk::NavigationToolStorageSerializer::New();
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
+    
+    //create an invalid filename
+    std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"";
+
+    //now try to serialize an check if an exception is thrown
+    bool ExceptionThrown = false;
+    try
+      {
+      testSerializer->Serialize(filename,myStorage);
+      }
+    catch(mitk::IGTException)
+      {
+      ExceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(ExceptionThrown, "Testing serializer with invalid filename.");
+    }
+
+    //new tests for exception throwing of NavigationToolStorageDeserializer
+    static void TestDeserializerForExceptions()
+    {
+
+    
+    // Desearializing file with invalid name 
+    mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
+    mitk::NavigationToolStorageDeserializer::Pointer testDeseralizer= mitk::NavigationToolStorageDeserializer::New(tempStorage);
+    bool ExceptionThrown1 = false;
+    try
+      {
+      mitk::NavigationToolStorage::Pointer readStorage = testDeseralizer->Deserialize("InvalidName");
+      }
+    catch(mitk::IGTException)
+      {
+      ExceptionThrown1 = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(ExceptionThrown1, "Testing deserializer with invalid filename.");
+
+    bool ExceptionThrown2 = false;
+    
+    // Deserializing of empty zip file
+    mitk::NavigationToolStorageDeserializer::Pointer testDeseralizer2= mitk::NavigationToolStorageDeserializer::New(tempStorage);
+    try
+      {
+      std::string filename = mitk::StandardFileLocations::GetInstance()->FindFile("EmptyZipFile.zip", "Modules/IGT/Testing/Data");
+      mitk::NavigationToolStorage::Pointer readStorage = testDeseralizer2->Deserialize(filename);
+      }
+    catch(mitk::IGTException)
+      {
+      ExceptionThrown2 = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(ExceptionThrown2, "Testing deserializer method with empty zip file.");
+
+    }
+
   };
+
+
+
+
+
 
 /** This function is testing the TrackingVolume class. */
 int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationToolStorageSerializerAndDeserializer");
-
-  ///** TESTS DEACTIVATED BECAUSE OF DART-CLIENT PROBLEMS
+  
   NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationSerializer();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationDeserializer();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteSimpleToolStorage();
@@ -359,6 +430,12 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
   NavigationToolStorageSerializerAndDeserializerTestClass::TestReadZipFileWithNoToolstorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteStorageToInvalidFile();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteEmptyToolStorage();
+  //TestReadInvalidStorage() fails
+  // NavigationToolStorageSerializerAndDeserializerTestClass::TestReadInvalidStorage();
+  
+  NavigationToolStorageSerializerAndDeserializerTestClass::TestSerializerForExceptions();
+  NavigationToolStorageSerializerAndDeserializerTestClass::TestDeserializerForExceptions();
+  
   NavigationToolStorageSerializerAndDeserializerTestClass::CleanUp();
 
   MITK_TEST_END();

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkTestingMacros.h"
 #include <mitkLog.h>
+#include <mitkVector.h>
 #include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkStandardFileLocations.h>
@@ -122,6 +123,34 @@ static void TestSimpleLog()
     MITK_TEST_CONDITION_REQUIRED(testSucceded,"Test logging streams.");
     }
 
+static void TestObjectInfoLogging()
+    {
+    bool testSucceded = true;
+    try
+      {
+      int i = 123;
+      float f = .32234;
+      double d = 123123;
+      std::string testString = "testString";
+      std::stringstream testStringStream;
+      testStringStream << "test" << "String" << "Stream";
+      mitk::Point3D testMitkPoint;
+      testMitkPoint.Fill(2);
+      
+      MITK_INFO << i;
+      MITK_INFO << f;
+      MITK_INFO << d;
+      MITK_INFO << testString;
+      MITK_INFO << testStringStream;
+      MITK_INFO << testMitkPoint;      
+      }
+    catch(mitk::Exception e)
+      {
+      testSucceded = false;
+      }  
+    MITK_TEST_CONDITION_REQUIRED(testSucceded,"Test logging of object information.");
+    }
+
 static void TestThreadSaveLog()
     {
     bool testSucceded = true;
@@ -193,6 +222,7 @@ int mitkLogTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_OUTPUT(<<"TESTING ALL LOGGING OUTPUTS, ERROR MESSAGES ARE ALSO TESTED AND NOT MEANING AN ERROR OCCURED!")
   
   mitkLogTestClass::TestSimpleLog();
+  mitkLogTestClass::TestObjectInfoLogging();
   //mitkLogTestClass::TestThreadSaveLog();
   //mitkLogTestClass::TestLoggingToFile();
   //mitkLogTestClass::TestAddAndRemoveBackends();

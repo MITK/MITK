@@ -38,7 +38,7 @@ QmitkDataNodeSelectionProvider::GetDataNodeSelection() const
     return sel;
   }
 
-  return QmitkDataNodeSelection::ConstPointer(new QmitkDataNodeSelection());
+  return QmitkDataNodeSelection::ConstPointer(0);
 }
 
 void QmitkDataNodeSelectionProvider::FireSelectionChanged(

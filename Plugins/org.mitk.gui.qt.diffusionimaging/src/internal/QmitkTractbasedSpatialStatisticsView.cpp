@@ -555,14 +555,12 @@ void QmitkTractbasedSpatialStatisticsView::AddTbssToDataStorage(mitk::Image* ima
 
 void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
 {
-  if(m_Roi.size() > 0 && m_CurrentGeometry != NULL)
-  {
-    int index = (int)pos.x();
+  int index = (int)pos.x();
 
+  if(m_Roi.size() > 0 && m_CurrentGeometry != NULL && !m_Controls->m_RoiPlotWidget->IsPlottingFiber() )
+  {
 
     index = std::min( (int)m_Roi.size()-1, std::max(0, index) );
-
-
     itk::Index<3> ix = m_Roi.at(index);
 
     mitk::Vector3D i;
@@ -581,14 +579,56 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
     p[1] = w[1] + origin[1];
     p[2] = w[2] + origin[2];
 
-
-
-
     m_MultiWidget->MoveCrossToPosition(p);
-
     m_Controls->m_RoiPlotWidget->drawBar(index);
+  }
+
+  else if(m_Fib != NULL && m_CurrentGeometry != NULL && m_Controls->m_RoiPlotWidget->IsPlottingFiber() )
+  {
+    int num = m_Fib->GetNumFibers();
+    if(num == 0)
+    {
+      return;
+    }
+
+
+    typedef itk::Point<float,3>               PointType;
+    typedef std::vector< PointType>           TractType;
+
+
+
+    vtkSmartPointer<vtkPolyData> fiberPolyData = m_Fib->GetFiberPolyData();
+
+    vtkCellArray* lines = fiberPolyData->GetLines();
+    lines->InitTraversal();
+
+
+    // assume one fiber for now
+  //  for( int fiberID( 0 ); fiberID < num; fiberID++ )
+    //{
+
+      vtkIdType   numPointsInCell(0);
+      vtkIdType*  pointsInCell(NULL);
+      lines->GetNextCell ( numPointsInCell, pointsInCell );
+
+
+      index = std::min( (int)numPointsInCell-1, std::max(0, index) );
+
+      double *p = fiberPolyData->GetPoint( pointsInCell[ index ] );
+      PointType point;
+      point[0] = p[0];
+      point[1] = p[1];
+      point[2] = p[2];
+
+      m_MultiWidget->MoveCrossToPosition(point);
+
+
+   // }
+
+
 
   }
+
 
 }
 
@@ -1140,6 +1180,10 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
 void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img)
 {
+
+  m_Fib = fib;
+  m_CurrentGeometry = fib->GetGeometry();
+
   int num = fib->GetNumFibers();
   std::cout << "number of fibers: " << num << std::endl;
 
@@ -1181,10 +1225,8 @@ void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *f
     tracts.push_back(singleTract);
   }
 
-
-
   m_Controls->m_RoiPlotWidget->PlotFiberBundles(tracts, img);
-
+  m_Controls->m_RoiPlotWidget->SetPlottingFiber(true);
 
 
 
@@ -1201,41 +1243,19 @@ void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::Tb
     m_CurrentGeometry = image->GetGeometry();
 
 
-    std::string resultfile = "";
-
-    /*
-    if(image->GetPreprocessedFA())
-    {
-      resultFile = image->GetPreprocessedFAFile();
-    }
-    */
+    std::string resultfile = "";    
     std::string structure = roiImage->GetStructure();
 
-
-
-    //m_View->m_CurrentGeometry = image->GetGeometry();
-
     m_Controls->m_RoiPlotWidget->SetGroups(image->GetGroupInfo());
-
-
-    // Check for preprocessed results to save time
-
-    //if(resultfile == "")
-   // {
-      // Need to calculate the results using the 4D volume
-      // Can save the time this takes if there are results available already
-
-    //std::string type = m_Controls->m_MeasureType->itemText(m_Controls->m_MeasureType->currentIndex()).toStdString();
     m_Controls->m_RoiPlotWidget->SetProjections(image->GetImage());
-
-
-   // }
-
     m_Controls->m_RoiPlotWidget->SetRoi(roi);
     m_Controls->m_RoiPlotWidget->SetStructure(structure);
     m_Controls->m_RoiPlotWidget->SetMeasure( image->GetMeasurementInfo() );
     m_Controls->m_RoiPlotWidget->DrawProfiles(resultfile);
   }
+
+  m_Controls->m_RoiPlotWidget->SetPlottingFiber(false);
+
 }
 
 

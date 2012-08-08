@@ -233,6 +233,8 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     std::vector< itk::Index<3> > m_Roi;
 
+    mitk::FiberBundleX* m_Fib;
+
     std::string m_CurrentStructure;
 
     mitk::Geometry3D* m_CurrentGeometry;

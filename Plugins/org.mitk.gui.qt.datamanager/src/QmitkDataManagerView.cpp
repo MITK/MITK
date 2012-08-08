@@ -809,24 +809,6 @@ void QmitkDataManagerView::GlobalReinit( bool )
   renderWindow->GetRenderingManager()->InitializeViews(bounds);
 }
 
-void QmitkDataManagerView::OnSelectionChanged( berry::IWorkbenchPart::Pointer part , const QList<mitk::DataNode::Pointer>& selection )
-{
-  if(part.GetPointer() == this)
-    return;
-
-  QItemSelection newSelection;
-
-  m_NodeTreeView->selectionModel()->reset();
-
-  foreach(mitk::DataNode::Pointer node, selection)
-  {
-    QModelIndex treeIndex = m_NodeTreeModel->GetIndex(node);
-    if(treeIndex.isValid())
-      newSelection.select(treeIndex, treeIndex);
-  }
-  m_NodeTreeView->selectionModel()->select(newSelection, QItemSelectionModel::SelectCurrent);
-}
-
 void QmitkDataManagerView::OtsuFilter( bool )
 {
   QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();

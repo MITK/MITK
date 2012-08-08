@@ -41,15 +41,19 @@ class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecyc
 {
   Q_OBJECT
 
-public:
+private:
+
   /*!
   \  Convenient typedefs */
   typedef mitk::DataStorage::SetOfObjects  ConstVector;
   typedef ConstVector::ConstPointer        ConstVectorPointer;
   typedef ConstVector::ConstIterator       ConstVectorIterator;
   typedef std::map< mitk::Image *, mitk::ImageStatisticsCalculator::Pointer > ImageStatisticsMapType;
-  typedef std::vector<mitk::DataNode*> SelectedDataNodeVectorType;
+  typedef QList<mitk::DataNode*> SelectedDataNodeVectorType;
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
+
+public:
+
   /*!
   \brief default constructor */
   QmitkImageStatisticsView(QObject *parent=0, const char *name=0);

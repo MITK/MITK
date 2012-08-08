@@ -48,7 +48,7 @@ namespace mitk
       static void SetLogFile(const char *file);
 
      /** @return Returns the log file if there is one. Returns an empty string
-      *          if no log file was set.
+      *          if no log file is active.
       */
       static std::string GetLogFile();
      

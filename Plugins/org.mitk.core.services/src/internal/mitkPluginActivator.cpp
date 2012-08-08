@@ -73,7 +73,6 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   QString filename = "mitk.log";
   QFileInfo path = context->getDataFile(filename);
   mitk::LoggingBackend::SetLogFile(path.absoluteFilePath().toStdString().c_str());
-  MITK_INFO << "Logfile: " << path.absoluteFilePath().toStdString().c_str();
 
   //initialize data storage service
   DataStorageService* service = new DataStorageService();

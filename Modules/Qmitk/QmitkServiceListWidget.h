@@ -173,9 +173,10 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /**
     *\brief Emitted if the user selects a Service from the list.
     *
-    * Returns null, if no service is selected anymore.
+    * If no service is selected, an invalid serviceReference is returned. The user can easily check for this.
+    * if (serviceReference) will evaluate to false, if the reference is invalid and true if valid.
     */
-    void ServiceSelectionChanged(mitk::ServiceReference*);
+    void ServiceSelectionChanged(mitk::ServiceReference);
 
   public slots:
 

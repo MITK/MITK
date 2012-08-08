@@ -67,7 +67,7 @@ class MitkIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
 
   protected slots:
 
-    void NavigationDataSourceSelected(mitk::ServiceReference* s);
+    void NavigationDataSourceSelected(mitk::ServiceReference s);
 
 
   protected:

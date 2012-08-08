@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -97,7 +97,7 @@ QmitkDataManagerView::~QmitkDataManagerView()
 {
   //Remove all registered actions from each descriptor
   for (std::vector< std::pair< QmitkNodeDescriptor*, QAction* > >::iterator it = m_DescriptorActionList.begin();it != m_DescriptorActionList.end(); it++)
-  { 
+  {
     // first== the NodeDescriptor; second== the registered QAction
     (it->first)->RemoveAction(it->second);
   }
@@ -793,7 +793,9 @@ QItemSelectionModel *QmitkDataManagerView::GetDataNodeSelectionModel() const
 
 void QmitkDataManagerView::GlobalReinit( bool )
 {
-  mitk::IRenderWindowPart* renderWindow = this->OpenRenderWindowPart();
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();//->OpenRenderWindowPart();
+  if (renderWindow == NULL)
+    return;
   // get all nodes that have not set "includeInBoundingBox" to false
   mitk::NodePredicateNot::Pointer pred
     = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"

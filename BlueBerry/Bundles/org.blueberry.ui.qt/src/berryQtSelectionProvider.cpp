@@ -23,74 +23,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-QtSelectionProvider
-::QtSelectionProvider() : qSelectionModel(0)
+QtSelectionProvider::QtSelectionProvider() : qSelectionModel(0)
 {
 
 }
 
-void
-QtSelectionProvider
-::AddSelectionChangedListener(ISelectionChangedListener::Pointer l)
+void QtSelectionProvider::AddSelectionChangedListener(ISelectionChangedListener::Pointer l)
 {
   selectionEvents.AddListener(l);
 }
 
-void
-QtSelectionProvider
-::RemoveSelectionChangedListener(ISelectionChangedListener::Pointer l)
+void QtSelectionProvider::RemoveSelectionChangedListener(ISelectionChangedListener::Pointer l)
 {
   selectionEvents.RemoveListener(l);
 }
 
- ISelection::ConstPointer
- QtSelectionProvider
-::GetSelection() const
+ISelection::ConstPointer QtSelectionProvider::GetSelection() const
 {
-   if (qSelectionModel)
-   {
-   QtItemSelection::Pointer qsel(new QtItemSelection(qSelectionModel->selection()));
-   return qsel;
-   }
+  if (qSelectionModel)
+  {
+    QtItemSelection::Pointer qsel(new QtItemSelection(qSelectionModel->selection()));
+    return qsel;
+  }
 
-   return QtItemSelection::Pointer(new QtItemSelection());
+  return QtItemSelection::Pointer(new QtItemSelection());
 }
 
- void
- QtSelectionProvider
-::SetSelection(ISelection::Pointer selection)
- {
-   if (!qSelectionModel) return;
-
-   if (QtItemSelection::Pointer qsel = selection.Cast<QtItemSelection>())
-   {
-     qSelectionModel->select(qsel->GetQItemSelection(), QItemSelectionModel::Select);
-   }
- }
-
- QItemSelection
- QtSelectionProvider
-::GetQItemSelection() const
+void QtSelectionProvider::SetSelection(ISelection::Pointer selection)
 {
-   if (qSelectionModel)
-   return qSelectionModel->selection();
+  if (!qSelectionModel) return;
 
-   return QItemSelection();
+  if (QtItemSelection::Pointer qsel = selection.Cast<QtItemSelection>())
+  {
+    qSelectionModel->select(qsel->GetQItemSelection(), QItemSelectionModel::Select);
+  }
 }
 
- void
- QtSelectionProvider
-::SetQItemSelection(const QItemSelection& selection)
- {
-   if (qSelectionModel)
-     qSelectionModel->select(selection, QItemSelectionModel::Select);
- }
-
-  QItemSelectionModel*
-  QtSelectionProvider
-::GetItemSelectionModel() const
+QItemSelection QtSelectionProvider::GetQItemSelection() const
 {
-    return qSelectionModel;
+  if (qSelectionModel)
+    return qSelectionModel->selection();
+
+  return QItemSelection();
+}
+
+void QtSelectionProvider::SetQItemSelection(const QItemSelection& selection)
+{
+  if (qSelectionModel)
+    qSelectionModel->select(selection, QItemSelectionModel::Select);
+}
+
+QItemSelectionModel* QtSelectionProvider::GetItemSelectionModel() const
+{
+  return qSelectionModel;
 }
 
 void QtSelectionProvider::SetItemSelectionModel(QItemSelectionModel* selModel)

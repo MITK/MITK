@@ -49,7 +49,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   // Define helper variables
   float error = 0;
   bool matrixIsEqual = true;
-  std::stringstream sstream = "";
+  std::stringstream sstream;
   mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
   mitk::ItkImageFileReader::Pointer imageReader = mitk::ItkImageFileReader::New();
   mitk::Convert2Dto3DImageFilter::Pointer convertFilter = mitk::Convert2Dto3DImageFilter::New();
@@ -107,13 +107,14 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   ///////////////////////////////////////
   // mitkImage2D is now a 2D image with 3D Geometry information.
   // Save it without conversion and load it again. It should have an identitiy matrix
-  sstream = "";
+  sstream.clear();
   sstream << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage2D";
   imageWriter->SetInput(mitkImage2D);
   imageWriter->SetFileName(sstream.str().c_str());
   imageWriter->SetExtension(".nrrd");
   imageWriter->Write();
   sstream << ".nrrd";
+
   imageReader->SetFileName(sstream.str().c_str());
   imageReader->Update();
   mitk::Image::Pointer imageLoaded2D = imageReader->GetOutput();
@@ -144,9 +145,9 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
 
   // Check matrix
   mitk::Vector3D Loaded2D_col0, Loaded2D_col1, Loaded2D_col2;
-  Loaded2D_col0.Set_vnl_vector(mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
-  Loaded2D_col1.Set_vnl_vector(mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
-  Loaded2D_col2.Set_vnl_vector(mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+  Loaded2D_col0.Set_vnl_vector(imageLoaded2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+  Loaded2D_col1.Set_vnl_vector(imageLoaded2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+  Loaded2D_col2.Set_vnl_vector(imageLoaded2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
 
   if (
      (abs(1 - Loaded2D_col0[0]) > eps) ||
@@ -192,6 +193,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
      abs(Converted_Origin[1] - Original_Origin[1]) +
      abs(Converted_Origin[2] - Original_Origin[2]) ;
 
+  MITK_INFO << Converted_Origin << " and " << Original_Origin;
   MITK_TEST_CONDITION_REQUIRED(  error < eps    , "Compare Geometry: Origin");
 
   mitk::Vector3D Converted_col0, Converted_col1, Converted_col2;
@@ -225,7 +227,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
      ///////////////////////////////////////
      // So far it seems good! now try to save and load the file
 
-     sstream = "";
+     sstream.clear();
      sstream << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage";
      imageWriter->SetInput(mitkImage3D);
      imageWriter->SetFileName(sstream.str().c_str());

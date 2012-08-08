@@ -150,7 +150,8 @@ void mitk::ImageWriter::GenerateData()
   fclose(tempFile);
   remove(m_FileName.c_str());
 
-  mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
+  // Creating clone of input image, since i might change the geometry 
+  mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput())->Clone();
 
   // Check if geometry information will be lost
   if (input->GetDimension() == 2)
@@ -160,9 +161,13 @@ void mitk::ImageWriter::GenerateData()
         MITK_WARN << "Saving a 2D image with 3D geometry information. Geometry information will be lost! You might consider using Convert2Dto3DImageFilter before saving.";
         
         // set matrix to identity
-        mitk::AffineTransform3D affTrans;
+        mitk::AffineTransform3D::Pointer affTrans = mitk::AffineTransform3D::New();
         affTrans->SetIdentity();
-        input->GetGeometry()->SetIndexToWorldTransform(affTrans);
+        mitk::Vector3D spacing = input->GetGeometry()->GetSpacing();
+        mitk::Point3D origin = input->GetGeometry()->GetOrigin();
+        input->GetGeometry()->SetIndexToWorldTransform(affTrans); 
+        input->GetGeometry()->SetSpacing(spacing);
+        input->GetGeometry()->SetOrigin(origin);
      }
   }
 

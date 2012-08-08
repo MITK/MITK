@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkPointSetInteractor.h>
 #include <QmitkStdMultiWidget.h>
-
+#include <mitkSliceNavigationController.h>
 
 #include <QPushButton>
 
@@ -60,6 +60,18 @@ public:
     ~QmitkPointListWidget();
 
     void SetupConnections();
+
+
+    ///@{
+    /**
+    * \brief Sets the SliceNavigationController of the three 2D Renderwindows.
+    *  If they are defined, they can be used to automatically set the crosshair to the selected point
+    */
+    void SetSnc1(mitk::SliceNavigationController* snc);
+    void SetSnc2(mitk::SliceNavigationController* snc);
+    void SetSnc3(mitk::SliceNavigationController* snc);
+    ///@}
+
 
     /// assign a point set (contained in a node of DataStorage) for observation
     void SetPointSet(mitk::PointSet* newPs);
@@ -124,6 +136,9 @@ protected:
     QPushButton* m_ToggleAddPoint;
     QPushButton* m_AddPoint;
 
+    mitk::SliceNavigationController* m_Snc1;
+    mitk::SliceNavigationController* m_Snc2;
+    mitk::SliceNavigationController* m_Snc3;
 
     mitk::PointSetInteractor::Pointer   m_Interactor;
     int     m_TimeStep;

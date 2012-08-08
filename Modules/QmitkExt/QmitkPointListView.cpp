@@ -33,7 +33,10 @@ QmitkPointListView::QmitkPointListView( QWidget* parent )
   m_PointListModel( new QmitkPointListModel() ),
   m_SelfCall( false ),
   m_showFading(false),
-  m_MultiWidget( NULL)
+  m_MultiWidget( NULL),
+  m_Snc1(NULL),
+  m_Snc2(NULL),
+  m_Snc3(NULL)
 {  
   QListView::setAlternatingRowColors( true );
 
@@ -169,9 +172,18 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& select
       if (selectedIndexes.indexOf(index) != -1) // index is found in the selected indices list
       {
         pointSet->SetSelectInfo(it->Index(), true, m_PointListModel->GetTimeStep());
+
+        // Use Multiwidget or SliceNavigationControllers to set crosshair to selected point
         if ( m_MultiWidget != NULL)
         {
           m_MultiWidget->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep()));
+        }
+        else if ( (m_Snc1 != NULL) && (m_Snc2 != NULL) && (m_Snc3 != NULL) )
+        {
+           mitk::Point3D p = pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep());
+           m_Snc1->SelectSliceByPoint(p);
+           m_Snc2->SelectSliceByPoint(p);
+           m_Snc3->SelectSliceByPoint(p);
         }
       }
       else
@@ -413,4 +425,19 @@ void QmitkPointListView::ClearPointListTS()
   //        break;
   //     }
   //   // emit PointListChanged();
+}
+
+void QmitkPointListView::SetSnc1(mitk::SliceNavigationController* snc)
+{
+   m_Snc1 = snc;
+}
+
+void QmitkPointListView::SetSnc2(mitk::SliceNavigationController* snc)
+{
+   m_Snc2 = snc;
+}
+
+void QmitkPointListView::SetSnc3(mitk::SliceNavigationController* snc)
+{
+   m_Snc3 = snc;
 }

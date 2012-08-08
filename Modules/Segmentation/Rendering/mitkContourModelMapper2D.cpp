@@ -17,11 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
+#include <vtkAppendPolyData.h>
 #include <vtkProperty.h>
 #include <vtkPlane.h>
 #include <vtkCutter.h>
 #include <vtkStripper.h>
 #include <vtkTubeFilter.h>
+#include <vtkSphereSource.h>
 
 mitk::ContourModelMapper2D::ContourModelMapper2D()
 {
@@ -183,6 +185,8 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
+  vtkSmartPointer<vtkAppendPolyData> appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
+
   //iterate over all control points
   mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(timestep);
   mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin(timestep);
@@ -202,9 +206,34 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
     lines->InsertCellPoint(p1);
     lines->InsertCellPoint(p2);
 
+    if ( currentControlPoint->IsActive )
+      {
+        vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+
+        sphere->SetRadius(1.5);
+        sphere->SetCenter(currentControlPoint->Coordinates[0], currentControlPoint->Coordinates[1], currentControlPoint->Coordinates[2]);
+
+        appendPoly->AddInput(sphere->GetOutput());
+        sphere->Update();
+      }
+
+
     current++; 
     next++;
   }
+
+  //check if last control point is enabled to draw it
+  if ( (*current)->IsActive )
+  {
+    vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+
+    sphere->SetRadius(1.5);
+    sphere->SetCenter((*current)->Coordinates[0], (*current)->Coordinates[1], (*current)->Coordinates[2]);
+
+    appendPoly->AddInput(sphere->GetOutput());
+    sphere->Update();
+  }
+
 
   /* If the contour is closed an additional line has to be created between the very first point
    * and the last point
@@ -229,6 +258,9 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
   polyData->SetPoints(points);
   // Add the lines to the dataset
   polyData->SetLines(lines);
+
+
+
 
   //check for the worldgeometry from the current render window
   mitk::PlaneGeometry* currentWorldGeometry = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(renderer->GetCurrentWorldGeometry2D()));
@@ -262,16 +294,13 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
     cutter->Update();
 
 
-    //store the result in a new polyData
-    vtkSmartPointer<vtkPolyData> cutPolyData = vtkSmartPointer<vtkPolyData>::New();
+    polyData= cutter->GetOutput();
 
-    cutPolyData= cutter->GetOutput();
-
-
-    return cutPolyData;
   }
+    appendPoly->AddInput(polyData);
+
   
-  return polyData;
+    return appendPoly->GetOutput();
 }
 
 

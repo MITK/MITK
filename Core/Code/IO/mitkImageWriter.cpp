@@ -158,6 +158,11 @@ void mitk::ImageWriter::GenerateData()
      if (!input->GetGeometry()->Is2DConvertable())
      {
         MITK_WARN << "Saving a 2D image with 3D geometry information. Geometry information will be lost! You might consider using Convert2Dto3DImageFilter before saving.";
+        
+        // set matrix to identity
+        mitk::AffineTransform3D affTrans;
+        affTrans->SetIdentity();
+        input->GetGeometry()->SetIndexToWorldTransform(affTrans);
      }
   }
 

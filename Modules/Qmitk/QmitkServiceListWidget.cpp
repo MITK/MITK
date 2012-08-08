@@ -39,7 +39,7 @@ QmitkServiceListWidget::QmitkServiceListWidget(QWidget* parent, Qt::WindowFlags 
 
 QmitkServiceListWidget::~QmitkServiceListWidget()
 {
-
+  m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
 }
 
 

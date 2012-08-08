@@ -57,14 +57,14 @@ void QmitkNavigationDataSourceSelectionWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_NaviagationDataSourceWidget), SIGNAL(ServiceSelectionChanged(mitk::ServiceReference*)), this, SLOT(NavigationDataSourceSelected(mitk::ServiceReference*)) );
+    connect( (QObject*)(m_Controls->m_NaviagationDataSourceWidget), SIGNAL(ServiceSelectionChanged(mitk::ServiceReference)), this, SLOT(NavigationDataSourceSelected(mitk::ServiceReference)) );
 
   }
 }
 
-void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk::ServiceReference* s)
+void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk::ServiceReference s)
   {
-    if (s==NULL) //no device selected
+    if (!s) //no device selected
       {
         //reset everything
         m_CurrentSource = NULL;
@@ -73,8 +73,8 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
       }
 
     // Get Source
-    m_CurrentSource = this->m_Controls->m_NaviagationDataSourceWidget->TranslateReference<mitk::NavigationDataSource>(*s);
-    std::string id = s->GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
+    m_CurrentSource = this->m_Controls->m_NaviagationDataSourceWidget->TranslateReference<mitk::NavigationDataSource>(s);
+    std::string id = s.GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
     mitk::ModuleContext* context = mitk::GetModuleContext();
     
     //Fill tool list

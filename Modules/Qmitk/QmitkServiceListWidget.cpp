@@ -39,7 +39,7 @@ QmitkServiceListWidget::QmitkServiceListWidget(QWidget* parent, Qt::WindowFlags 
 
 QmitkServiceListWidget::~QmitkServiceListWidget()
 {
-
+  m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
 }
 
 
@@ -94,11 +94,11 @@ bool QmitkServiceListWidget::GetIsServiceSelected(){
 void QmitkServiceListWidget::OnServiceSelectionChanged(){
   mitk::ServiceReference ref = this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
   if (! ref){
-    emit (ServiceSelectionChanged(0));
+    emit (ServiceSelectionChanged(mitk::ServiceReference()));
     return;
   }
 
-  emit (ServiceSelectionChanged(&ref));
+  emit (ServiceSelectionChanged(ref));
 }
 
 mitk::ServiceReference QmitkServiceListWidget::GetSelectedService(){

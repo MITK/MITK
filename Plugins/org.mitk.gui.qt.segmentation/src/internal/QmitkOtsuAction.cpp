@@ -19,6 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOtsuMultipleThresholdsImageFilter.h>
 #include <mitkRenderingManager.h>
 #include <mitkImage.h>
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
+
+// ITK
+#include <itkMultiplyImageFilter.h>
 
 // Qt
 #include <QDialog>
@@ -41,10 +46,11 @@ QmitkOtsuAction::~QmitkOtsuAction()
 
 void QmitkOtsuAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 {
-  this->m_selectedNodes = selectedNodes;
+  this->m_DataNode = selectedNodes[0];
+  //this->m_selectedNodes = selectedNodes;
 
   m_OtsuSegmentationDialog = new QDialog(QApplication::activeWindow());
-  connect(m_OtsuSegmentationDialog, SIGNAL(finished(int)), this, SLOT(OtsuSegmentationDone(int)));
+  
 
   QVBoxLayout *layout = new QVBoxLayout;
   layout->setContentsMargins(0, 0, 0, 0);
@@ -55,6 +61,8 @@ void QmitkOtsuAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 
   m_OtsuPushButton = new QPushButton("OK");
 
+  connect(m_OtsuPushButton, SIGNAL(clicked()), this, SLOT(OtsuSegmentationDone()));
+
   layout->addWidget(m_OtsuSpinBox);
   layout->addWidget(m_OtsuPushButton);
 
@@ -64,14 +72,14 @@ void QmitkOtsuAction::Run(const QList<DataNode::Pointer> &selectedNodes)
   m_OtsuSegmentationDialog->open();
 }
 
-void QmitkOtsuAction::OtsuSegmentationDone(int result)
+void QmitkOtsuAction::OtsuSegmentationDone()
 {
 
   /*
   if (result == QDialog::Rejected)
   m_ThresholdingToolManager->ActivateTool(-1);*/
 
-  this->PerformOtsuSegmentation(this->m_selectedNodes);
+  this->PerformOtsuSegmentation();
 
   m_OtsuSegmentationDialog->deleteLater();
   m_OtsuSegmentationDialog = NULL;
@@ -96,12 +104,8 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
   int numberOfThresholds = this->m_OtsuSpinBox->value() - 1;
 
   mitk::Image::Pointer mitkImage = 0;
-  foreach(mitk::DataNode::Pointer node, this->m_selectedNodes)
-  {
-  mitkImage = dynamic_cast<mitk::Image*>( node->GetData() );
-
-  if(mitkImage.IsNull())
-    continue;
+  
+  mitkImage = dynamic_cast<mitk::Image*>( this->m_DataNode->GetData() );
 
   try
   {
@@ -116,13 +120,13 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     //typedef itk::OtsuThresholdImageFilter< InputImageType, OutputImageType > FilterType;
     typedef itk::OtsuMultipleThresholdsImageFilter< InputImageType, OutputImageType > FilterType;
     typedef itk::MultiplyImageFilter< OutputImageType, OutputImageType, OutputImageType> MultiplyFilterType;
-    typedef itk::RandomImageSource< OutputImageType> RandomImageSourceType;
+    //typedef itk::RandomImageSource< OutputImageType> RandomImageSourceType;
     typedef itk::ImageRegionIterator< OutputImageType > ImageIteratorType;
 
 
     FilterType::Pointer filter = FilterType::New();
     MultiplyFilterType::Pointer multiplyImageFilter = MultiplyFilterType::New();
-    RandomImageSourceType::Pointer randomImageSource = RandomImageSourceType::New();
+    //RandomImageSourceType::Pointer randomImageSource = RandomImageSourceType::New();
 
     filter->SetNumberOfThresholds(numberOfThresholds);
     //filter->SetLabelOffset(0);
@@ -156,7 +160,7 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     multiplyImageFilter->Update();
 
     mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-    std::string nameOfResultImage = node->GetName();
+    std::string nameOfResultImage = this->m_DataNode->GetName();
     nameOfResultImage.append("Otsu");
     resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
     resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
@@ -164,7 +168,7 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     resultNode->SetData( mitk::ImportItkImage ( multiplyImageFilter->GetOutput() ) );
 
 
-    this->GetDataStorage()->Add(resultNode, node);
+    this->m_DataStorage->Add(resultNode, this->m_DataNode);
 
   }
   catch( std::exception& err )

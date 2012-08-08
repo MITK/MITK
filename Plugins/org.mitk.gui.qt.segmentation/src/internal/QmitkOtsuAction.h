@@ -46,9 +46,11 @@ public:
   void Run(const QList<mitk::DataNode::Pointer> &selectedNodes);
   void SetDataStorage(mitk::DataStorage *dataStorage);
   void SetFunctionality(berry::QtViewPart *functionality);
+  void SetSmoothed(bool smoothed){}
+  void SetDecimated(bool decimated){}
 
 private slots:
-  void OtsuSegmentationDone(int);
+  void OtsuSegmentationDone();
 
 private:
   QmitkOtsuAction(const QmitkOtsuAction &);
@@ -62,7 +64,7 @@ private:
   QSpinBox* m_OtsuSpinBox;
   QPushButton* m_OtsuPushButton; 
 
-  QList<mitk::DataNode::Pointer>& m_selectedNodes;
+  mitk::DataNode::Pointer m_DataNode;
 };
 
 #endif

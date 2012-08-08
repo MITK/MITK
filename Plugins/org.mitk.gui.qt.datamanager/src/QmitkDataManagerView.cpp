@@ -340,9 +340,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QAction* otsuFilterAction = new QAction("Apply Otsu Filter", this);
   QObject::connect( otsuFilterAction, SIGNAL( triggered(bool) )
     , this, SLOT( OtsuFilter(bool) ) );
-  // Otsu filter does not work properly, remove it temporarily
-  // imageDataNodeDescriptor->AddAction(otsuFilterAction);
-  // m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,otsuFilterAction));
+   //Otsu filter does not work properly, remove it temporarily
+   imageDataNodeDescriptor->AddAction(otsuFilterAction);
+   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,otsuFilterAction));
 
   QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
   _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
@@ -381,6 +381,10 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   confElem->GetAttribute("class", className);
   confElem->GetAttribute("smoothed", smoothed);
   if(className == "QmitkThresholdAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
+  }
+  else if(className == "QmitkOtsuAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
   }

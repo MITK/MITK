@@ -10,8 +10,8 @@ mitk::VideoInputSource::VideoInputSource()
 {
 
 
-  m_CaptureWidth  = 1900;
-  m_CaptureHeight = 1080;
+  m_CaptureWidth  = 1024;
+  m_CaptureHeight = 720;
   m_CapturingInProcess = false;
 
   m_DeviceNumber = -1;
@@ -27,6 +27,8 @@ mitk::VideoInputSource::VideoInputSource()
 
 mitk::VideoInputSource::~VideoInputSource()
 {
+  m_VideoInput->stopDevice(m_DeviceNumber);
+  m_CapturingInProcess = false;
   delete m_VideoInput;
 }
 
@@ -57,7 +59,14 @@ void mitk::VideoInputSource::StartCapturing()
   //Prints out a list of available devices and returns num of devices found
   int numDevices = m_VideoInput->listDevices();
 
-  m_VideoInput->setupDevice(m_DeviceNumber, m_CaptureWidth, m_CaptureHeight);
+  try
+  {
+    m_VideoInput->setupDevice(m_DeviceNumber, m_CaptureWidth, m_CaptureHeight, VI_COMPOSITE);
+  }
+  catch(...)
+  {
+    MITK_WARN << "error setting up device";
+  }
 
   //to get a settings dialog for the device
   if(m_ShowSettingsWindow)
@@ -77,6 +86,7 @@ void mitk::VideoInputSource::StartCapturing()
 
 void mitk::VideoInputSource::StopCapturing()
 {
+  MITK_INFO << "stopping cpaturing process";
   m_VideoInput->stopDevice(m_DeviceNumber);
   m_CapturingInProcess = false;
 

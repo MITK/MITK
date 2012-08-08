@@ -104,6 +104,15 @@ namespace mitk
     void SetLineSegmentInterpolation(LineSegmentInterpolation interpolation)
     {
       this->m_lineInterpolation = interpolation;
+      this->Modified();
+    }
+
+    //##Documentation
+    //## @brief Get the interpolation of the line segments between control points.
+    //##
+    LineSegmentInterpolation GetLineSegmentInterpolation()
+    {
+      return this->m_lineInterpolation;
     }
 /*++++++++++++++++  END inline methods  +++++++++++++++++++++++*/
 

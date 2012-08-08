@@ -223,9 +223,9 @@ int mitkLogTest(int /* argc */, char* /*argv*/[])
   
   mitkLogTestClass::TestSimpleLog();
   mitkLogTestClass::TestObjectInfoLogging();
-  //mitkLogTestClass::TestThreadSaveLog();
-  //mitkLogTestClass::TestLoggingToFile();
-  //mitkLogTestClass::TestAddAndRemoveBackends();
+  mitkLogTestClass::TestThreadSaveLog();
+  mitkLogTestClass::TestLoggingToFile();
+  mitkLogTestClass::TestAddAndRemoveBackends();
   
   // always end with this!
   MITK_TEST_END()

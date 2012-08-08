@@ -81,7 +81,7 @@ public:
 
     bool LoadLookuptables(string lutPath)
     {
-        std::cout << "SphereInterpolator: loading lookuptables from custom path" << std::endl;
+        MITK_INFO << "SphereInterpolator: loading lookuptables from custom path: " << lutPath;
 
         QString path(lutPath.c_str()); path += "FiberTrackingLUTBaryCoords.bin";
         std::ifstream BaryCoordsStream;
@@ -99,7 +99,10 @@ public:
             BaryCoordsStream.close();
         }
         else
+        {
+            MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTBaryCoords.bin from " << path.toStdString();
             return false;
+        }
 
         ifstream IndicesStream;
         path = lutPath.c_str(); path += "FiberTrackingLUTIndices.bin";
@@ -117,7 +120,10 @@ public:
             IndicesStream.close();
         }
         else
+        {
+            MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTIndices.bin from " << path.toStdString();
             return false;
+        }
 
         return true;
     }
@@ -152,7 +158,10 @@ public:
             BaryCoordsStream.close();
         }
         else
+        {
+            MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTBaryCoords.bin from " << lutPath;
             return false;
+        }
 
         ifstream IndicesStream;
         lutPath = mitk::StandardFileLocations::GetInstance()->FindFile("FiberTrackingLUTIndices.bin");
@@ -170,7 +179,10 @@ public:
             IndicesStream.close();
         }
         else
+        {
+            MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTIndices.bin from " << lutPath;
             return false;
+        }
 
         return true;
     }

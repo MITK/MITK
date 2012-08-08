@@ -152,6 +152,14 @@ virtual void SetBounds(const BoundsArrayType& bounds);
 
 
   //##Documentation
+  //## @brief Checks, if the given geometry can be converted to 2D without information loss
+  //## e.g. when a 2D image is saved, the matrix is usually cropped to 2x2, and when you load it back to MITK
+  //## it will be filled with standard values. This function checks, if information would be lost during this 
+  //## procedure
+  virtual bool Is2DConvertable();
+
+
+  //##Documentation
   //## @brief Get the time bounds (in ms)
   itkGetConstReferenceMacro(TimeBounds, TimeBounds);
   //##Documentation

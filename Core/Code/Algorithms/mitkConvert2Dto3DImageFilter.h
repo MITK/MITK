@@ -21,9 +21,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToImageFilter.h"
 #include <itkImage.h>
 
+
 namespace mitk
 {
 
+   /** \brief Image Filter to convert 2D MITK images to 3D MITK images.
+   * 
+   * A new 3D MITK image is created and all pixel and geometry information from
+   * the given 2D input image is copied. The resulting image 3D image has just one slice.
+   *
+   * This filter can be used when before saving a 2D image with 3D geometry information.
+   * By converting it to 3D with just one slice, the common formats (e.g. nrrd) allow
+   * a 3x3 transformation matrix.
+   *
+   * @ingroup Geometry
+   */
   class MITK_CORE_EXPORT Convert2Dto3DImageFilter : public ImageToImageFilter
   {
   public: 

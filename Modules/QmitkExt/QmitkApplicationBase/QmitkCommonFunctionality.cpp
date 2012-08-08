@@ -550,45 +550,12 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     // Check if Image data/ Geometry information is lost
     if (image->GetDimension() == 2)
     {
-       //if image is 2D the transformation matrix is cropped to 2D. Check if information is lost here.
-       bool informationIsLost = false;
-       while(1)
-       {
-          MITK_INFO << "spac: " << image->GetGeometry()->GetSpacing();
-          if (image->GetGeometry()->GetSpacing()[2] != 1)
-          {
-             informationIsLost = true;
-             break;
-          }
-          MITK_INFO << "orig: " << image->GetGeometry()->GetOrigin();
-          if (image->GetGeometry()->GetOrigin()[2] != 0)
-          {
-             informationIsLost = true;
-             break;
-          }
-          mitk::Vector3D col0, col1, col2;
-          col0.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
-          col1.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
-          col2.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
-
-          MITK_INFO << "col0: " << col0;
-          MITK_INFO << "col1 " <<  col1;
-          MITK_INFO << "col2: " << col2;
-          if ((col0[2] != 0) || (col1[2] != 0) || (col2[0] != 0) || (col2[1] != 0) || (col2[2] != 1))
-          {
-             informationIsLost = true;
-             break;
-          }
-          break;
-       };
-
-       if (informationIsLost)
+       if (!image->GetGeometry()->Is2DConvertable())
        {
           // information will be lost, if continuing to save this file as 2D
           // tell it the user and offer to save it as 3D
 
           // todo: if format is png, jpg, etc.. forget it, no geometry information at all
-
           QMessageBox msgBox;
           msgBox.setText("You are trying to save a 2D image that has 3D geometry informations.");
           msgBox.setInformativeText("You will lose the 3D geometry information this way. Do you rather want to save it as a 3D image?");

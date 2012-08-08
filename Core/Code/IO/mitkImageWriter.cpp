@@ -152,6 +152,15 @@ void mitk::ImageWriter::GenerateData()
 
   mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
 
+  // Check if geometry information will be lost
+  if (input->GetDimension() == 2)
+  {
+     if (!input->GetGeometry()->Is2DConvertable())
+     {
+        MITK_WARN << "Saving a 2D image with 3D geometry information. Geometry information will be lost! You might consider using Convert2Dto3DImageFilter before saving.";
+     }
+  }
+
   bool vti = (m_Extension.find(".vti") != std::string::npos);
 
   // If the extension is NOT .pic and NOT .nrrd and NOT .nii and NOT .nii.gz the following block is entered

@@ -94,6 +94,22 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   Original_col2.Set_vnl_vector(mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
   MITK_INFO << "Rotated Matrix: " << Original_col0 << " " << Original_col1 << " " << Original_col2;
 
+
+      // TEST
+  std::stringstream sstream1;
+  sstream1 << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage2D";
+
+  mitk::ImageWriter::Pointer imageWriter1 = mitk::ImageWriter::New();
+  imageWriter1->SetInput(mitkImage2D);
+  imageWriter1->SetFileName(sstream1.str().c_str());
+  imageWriter1->SetExtension(".nrrd");
+  imageWriter1->Write();
+
+
+
+
+
+
   ///////////////////////////////////////
   // mitkImage2D is now a 2D image with 3D Geometry information.
   // Convert it with filter to a 3D image and check if everything went well

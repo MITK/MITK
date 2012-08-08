@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryIBerryPreferences.h>
 #include <berryIEditorPart.h>
+#include <berryINullSelectionListener.h>
 
 // CTK Includes
 #include <ctkServiceTracker.h>
@@ -126,6 +127,12 @@ public:
   {
     if(sourcepart.IsNull() || sourcepart.GetPointer() == static_cast<berry::IWorkbenchPart*>(q))
       return;
+
+    if(selection.IsNull())
+    {
+      q->OnNullSelection(sourcepart);
+      return;
+    }
 
     mitk::DataNodeSelection::ConstPointer _DataNodeSelection
       = selection.Cast<const mitk::DataNodeSelection>();
@@ -239,7 +246,7 @@ void QmitkAbstractView::AfterCreateQtPartControl()
 
   // REGISTER FOR WORKBENCH SELECTION EVENTS
   d->m_BlueBerrySelectionListener = berry::ISelectionListener::Pointer(
-        new berry::SelectionChangedAdapter<QmitkAbstractViewPrivate>(d.data(),
+        new berry::NullSelectionChangedAdapter<QmitkAbstractViewPrivate>(d.data(),
                                                              &QmitkAbstractViewPrivate::BlueBerrySelectionChanged));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(d->m_BlueBerrySelectionListener);
   
@@ -299,7 +306,7 @@ void QmitkAbstractView::SetSelectionProvider()
 
 QItemSelectionModel *QmitkAbstractView::GetDataNodeSelectionModel() const
 {
-  return d->m_DataNodeSelectionModel;
+  return 0;
 }
 
 void QmitkAbstractView::OnPreferencesChanged( const berry::IBerryPreferences* )
@@ -480,6 +487,11 @@ QList<mitk::DataNode::Pointer> QmitkAbstractView::GetCurrentSelection() const
   return d->DataNodeSelectionToQList(currentSelection);
 }
 
+bool QmitkAbstractView::IsCurrentSelectionValid() const
+{
+  return this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
+}
+
 QList<mitk::DataNode::Pointer> QmitkAbstractView::GetDataManagerSelection() const
 {
   berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
@@ -487,8 +499,17 @@ QList<mitk::DataNode::Pointer> QmitkAbstractView::GetDataManagerSelection() cons
   return d->DataNodeSelectionToQList(currentSelection);
 }
 
+bool QmitkAbstractView::IsDataManagerSelectionValid() const
+{
+  return this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager");
+}
+
 void QmitkAbstractView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
                                            const QList<mitk::DataNode::Pointer>& /*nodes*/)
+{
+}
+
+void QmitkAbstractView::OnNullSelection(berry::IWorkbenchPart::Pointer /*part*/)
 {
 }
 
@@ -538,21 +559,33 @@ void QmitkAbstractView::FireNodeSelected( mitk::DataNode::Pointer node )
 
 void QmitkAbstractView::FireNodesSelected( const QList<mitk::DataNode::Pointer>& nodes )
 {
+  if (GetDataNodeSelectionModel() == 0)
+  {
+    d->m_SelectionProvider->SetItemSelectionModel(d->m_DataNodeSelectionModel);
+  }
+
   if (nodes.empty())
   {
     d->m_DataNodeSelectionModel->clearSelection();
     d->m_DataNodeItemModel->clear();
-    return;
   }
-
-  // The helper data node model is just used for sending selection events.
-  // We add the to be selected nodes and set the selection range to everything.
-
-  d->m_DataNodeItemModel->clear();
-  foreach(mitk::DataNode::Pointer node, nodes)
+  else
   {
-    d->m_DataNodeItemModel->AddDataNode(node);
+
+    // The helper data node model is just used for sending selection events.
+    // We add the to be selected nodes and set the selection range to everything.
+
+    d->m_DataNodeItemModel->clear();
+    foreach(mitk::DataNode::Pointer node, nodes)
+    {
+      d->m_DataNodeItemModel->AddDataNode(node);
+    }
+    d->m_DataNodeSelectionModel->select(QItemSelection(d->m_DataNodeItemModel->index(0,0), d->m_DataNodeItemModel->index(nodes.size(), 0)),
+                                        QItemSelectionModel::ClearAndSelect);
   }
-  d->m_DataNodeSelectionModel->select(QItemSelection(d->m_DataNodeItemModel->index(0,0), d->m_DataNodeItemModel->index(nodes.size(), 0)),
-                                      QItemSelectionModel::ClearAndSelect);
+
+  if (GetDataNodeSelectionModel() == 0)
+  {
+    d->m_SelectionProvider->SetItemSelectionModel(0);
+  }
 }

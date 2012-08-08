@@ -88,6 +88,7 @@ class QmitkAbstractViewSelectionProvider;
  * You may reimplement the following private virtual methods to be notified about certain changes:
  * <ul>
  * <li>void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
+ * <li>void OnNullSelection(berry::IWorkbenchPart::Pointer part)
  * <li>void OnPreferencesChanged(const berry::IBerryPreferences*)
  * <li>void NodeAdded(const mitk::DataNode* node)
  * <li>void NodeChanged(const mitk::DataNode* node)
@@ -152,16 +153,36 @@ protected:
   virtual void FireNodesSelected(const QList<mitk::DataNode::Pointer>& nodes);
 
   /**
-   * \return the selection of the currently active part of the workbench or an empty list
-   *         if nothing is selected
+   * \return The selection of the currently active part of the workbench or an empty list
+   *         if there is no selection or if it is empty.
+   *
+   * \see IsCurrentSelectionValid
    */
   QList<mitk::DataNode::Pointer> GetCurrentSelection() const;
 
   /**
+   * Queries the state of the current selection.
+   *
+   * \return If the current selection is <code>NULL</code>, this method returns
+   * <code>false</code> and <code>true</code> otherwise.
+   */
+  bool IsCurrentSelectionValid() const;
+
+  /**
    * Returns the current selection made in the datamanager bundle or an empty list
-   * if nothing`s selected or if the data manager view does not exist
+   * if there is no selection or if it is empty.
+   *
+   * \see IsDataManagerSelectionValid
    */
   QList<mitk::DataNode::Pointer> GetDataManagerSelection() const;
+
+  /**
+   * Queries the state of the current selection of the data manager view.
+   *
+   * \return If the current data manager selection is <code>NULL</code>, this method returns
+   * <code>false</code> and <code>true</code> otherwise.
+   */
+  bool IsDataManagerSelectionValid() const;
 
   /**
    * Returns the Preferences object for this View.
@@ -268,8 +289,17 @@ private:
    *
    * \param part The source part responsible for the selection change.
    * \param nodes A list of selected nodes.
+   *
+   * \see OnNullSelection
    */
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
+
+  /**
+   * Called when a <code>NULL</code> selection occurs.
+   *
+   * \param part The source part responsible for the selection change.
+   */
+  virtual void OnNullSelection(berry::IWorkbenchPart::Pointer part);
 
   /**
    * Called when the preferences object of this view changed.

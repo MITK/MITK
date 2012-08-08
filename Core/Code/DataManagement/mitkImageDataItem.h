@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,15 +33,15 @@ namespace mitk {
   //##Documentation
   //## @brief Internal class for managing references on sub-images
   //##
-  //## ImageDataItem is a container for image data which is used internal in  
+  //## ImageDataItem is a container for image data which is used internal in
   //## mitk::Image to handle the communication between the different data types for images
-  //## used in MITK (ipPicDescriptor, mitk::Image, vtkImageData). Common for these image data 
+  //## used in MITK (ipPicDescriptor, mitk::Image, vtkImageData). Common for these image data
   //## types is the actual image data, but they differ in representation of pixel type etc.
-  //## The class is also used to convert ipPic images to vtkImageData. 
+  //## The class is also used to convert ipPic images to vtkImageData.
   //##
   //## The class is mainly used to extract sub-images inside of mitk::Image, like single slices etc.
   //## It should not be used outside of this.
-  //## 
+  //##
   //## @param manageMemory Determines if image data is removed while destruction of ImageDataItem or not.
   //## @ingroup Data
   class MITK_CORE_EXPORT ImageDataItem : public itk::LightObject
@@ -145,9 +145,6 @@ namespace mitk {
     void ComputeItemSize( const unsigned int* dimensions, unsigned int dimension);
 
     ImageDataItem::ConstPointer m_Parent;
-
-    template <class TPixeltype>
-    unsigned char *ConvertTensorsToRGB() const;
 
     unsigned int m_Dimension;
 

@@ -93,8 +93,8 @@ static void TestMoveSelectedVertex()
   bool correctlyMoved = false;
 
   correctlyMoved = (vertex->Coordinates)[0] == (v[0]) &&
-                   (vertex->Coordinates)[1] == (v[1]) &&
-                   (vertex->Coordinates)[2] == (v[2]);
+    (vertex->Coordinates)[1] == (v[1]) &&
+    (vertex->Coordinates)[2] == (v[2]);
 
   MITK_TEST_CONDITION(correctlyMoved, "Vertex has been moved");
 }
@@ -272,7 +272,7 @@ static void TestSelectVertexAtWrongPosition()
 }
 
 
-void TestInsertVertex()
+static void TestInsertVertex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
@@ -340,6 +340,15 @@ static void TestInvalidTimeStep()
 }
 
 
+static void TestEmptyContour()
+{
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  MITK_TEST_CONDITION(contour->IteratorBegin() == contour->IteratorEnd(), "test iterator of emtpy contour");
+
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 0, "test numberof vertices of empty contour");
+}
+
 
 
 int mitkContourModelTest(int argc, char* argv[])
@@ -356,6 +365,7 @@ int mitkContourModelTest(int argc, char* argv[])
   TestConcatenate();
   TestInvalidTimeStep();
   TestInsertVertex();
+  TestEmptyContour();
 
   TestSelectVertexAtWrongPosition();
 

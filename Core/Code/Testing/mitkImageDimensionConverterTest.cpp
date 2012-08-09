@@ -141,7 +141,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
      abs(Loaded2D_Origin[1] - Original_Origin[1]) +
      abs(Loaded2D_Origin[2] - 0) ;
 
-  MITK_TEST_CONDITION_REQUIRED( error == error < eps, "Compare Geometry: Origin");
+  MITK_TEST_CONDITION_REQUIRED( error < eps, "Compare Geometry: Origin");
 
   // Check matrix
   mitk::Vector3D Loaded2D_col0, Loaded2D_col1, Loaded2D_col2;
@@ -227,14 +227,14 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
      ///////////////////////////////////////
      // So far it seems good! now try to save and load the file
 
-     sstream.clear();
-     sstream << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage";
+     std::stringstream sstream2;
+     sstream2 << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage";
      imageWriter->SetInput(mitkImage3D);
-     imageWriter->SetFileName(sstream.str().c_str());
+     imageWriter->SetFileName(sstream2.str().c_str());
      imageWriter->SetExtension(".nrrd");
      imageWriter->Write();
-     sstream << ".nrrd";
-     imageReader->SetFileName(sstream.str().c_str());
+     sstream2 << ".nrrd";
+     imageReader->SetFileName(sstream2.str().c_str());
      imageReader->Update();
      mitk::Image::Pointer imageLoaded = imageReader->GetOutput();
      

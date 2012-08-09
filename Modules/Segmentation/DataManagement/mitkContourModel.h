@@ -148,7 +148,7 @@ namespace mitk
     //##Documentation
     //## @brief Insert a vertex after given index.
     //##
-    void InsertVertexAfterIndex(mitk::Point3D &vertex, int index, bool isActive=false, int timestep=0);
+    void InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isActive=false, int timestep=0);
 
     //##Documentation
     //## @brief Return if the contour is closed or not.

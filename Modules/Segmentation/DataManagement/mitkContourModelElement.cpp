@@ -44,7 +44,7 @@ void mitk::ContourModelElement::AddVertex(mitk::Point3D &vertex, bool isActive)
 
 
 
-void mitk::ContourModelElement::InsertVertexAfterIndex(mitk::Point3D &vertex, bool isActive, int index)
+void mitk::ContourModelElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isActive, int index)
 {
   if(index > 0 && this->GetSize() > index)
   {
@@ -171,6 +171,7 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::OptimizedGetVe
 
       return ret;
   }
+  return NULL;
 }
 
 

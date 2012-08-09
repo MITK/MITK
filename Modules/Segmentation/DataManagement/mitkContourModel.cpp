@@ -63,13 +63,13 @@ void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isActive, int tim
 
 
 
-void mitk::ContourModel::InsertVertexAfterIndex(mitk::Point3D &vertex, int index, bool isActive, int timestep)
+void mitk::ContourModel::InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isActive, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
     if(index > 0 && this->m_ContourSeries[timestep]->GetSize() > index)
     {
-      this->m_ContourSeries[timestep]->InsertVertexAfterIndex(vertex, isActive, index);
+      this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isActive, index);
       this->Modified();
     }
   }

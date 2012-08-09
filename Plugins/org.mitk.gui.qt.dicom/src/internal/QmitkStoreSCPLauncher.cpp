@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QIODevice>
 #include <QDir>
 #include <QCoreApplication>
+#include "org_mitk_gui_qt_dicom_config.h"
 
 QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder) 
 : m_StoreSCP(new QProcess())
@@ -57,21 +58,17 @@ void QmitkStoreSCPLauncher::FindPathToStoreSCP()
     {
         QString fileName;
 #ifdef _WIN32
-
-        appPath.append("/../../../DCMTK-install/bin");
         fileName = "/storescp.exe";
 #else
-        appPath.append("/../../DCMTK-install/bin");
         fileName = "/storescp";
 #endif
-        m_PathToStoreSCP.clear();
-        m_PathToStoreSCP.append(fileName);
+
+        m_PathToStoreSCP = fileName;
 
         //In developement the storescp isn't copied into bin directory
         if(!QFile::exists(m_PathToStoreSCP))
         {
-            m_PathToStoreSCP = appPath;
-            m_PathToStoreSCP.append(fileName);
+            m_PathToStoreSCP = static_cast<QString>(MITK_STORESCP);
         }
     }
 }

@@ -94,6 +94,11 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     RegLandmarks1->SetPoint(5,testPt2);
     myTool1->SetToolCalibrationLandmarks(CalLandmarks1);
     myTool1->SetToolRegistrationLandmarks(RegLandmarks1);
+    mitk::Point3D toolTipPos; 
+    mitk::FillVector3D(toolTipPos,1.3423,2.323,4.332);
+    mitk::Quaternion toolTipRot = mitk::Quaternion(0.1,0.2,0.3,0.4);
+    myTool1->SetToolTipPosition(toolTipPos);
+    myTool1->SetToolTipOrientation(toolTipRot);
     myStorage->AddTool(myTool1);
 
     //create Serializer
@@ -117,6 +122,21 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
 
     MITK_TEST_CONDITION_REQUIRED(((readRegLandmarks->GetPoint(5)[0] == 4)&&(readRegLandmarks->GetPoint(5)[1] == 5)&&(readRegLandmarks->GetPoint(5)[2] == 6)),"..Testing if tool registration landmarks have been stored and loaded correctly.");
     MITK_TEST_CONDITION_REQUIRED(((readCalLandmarks->GetPoint(0)[0] == 1)&&(readCalLandmarks->GetPoint(0)[1] == 2)&&(readCalLandmarks->GetPoint(0)[2] == 3)),"..Testing if tool calibration landmarks have been stored and loaded correctly.");
+
+    mitk::Point3D readToolTipPos = readStorage->GetTool(0)->GetToolTipPosition();
+    mitk::Quaternion readToolTipRot = readStorage->GetTool(0)->GetToolTipOrientation();
+    
+    MITK_TEST_CONDITION_REQUIRED(((float(readToolTipPos[0]) == float(1.3423))&&
+                                  (float(readToolTipPos[1]) == float(2.323))&&
+                                  (float(readToolTipPos[2]) == float(4.332))),
+                                  "..Testing if tool tip position has been stored and loaded correctly.");
+   
+    MITK_TEST_CONDITION_REQUIRED(((float(readToolTipRot.x()) == float(0.1))&&
+                                  (float(readToolTipRot.y()) == float(0.2))&&
+                                  (float(readToolTipRot.z()) == float(0.3))&&
+                                  (float(readToolTipRot.r()) == float(0.4))),
+                                  "..Testing if tool tip orientation has been stored and loaded correctly.");
+
     }
 
     static void TestReadSimpleToolStorage()

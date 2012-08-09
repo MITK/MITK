@@ -113,10 +113,9 @@ void mitk::ContourModelMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *re
     localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour, renderer);
   }
 
-  localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
-
   this->ApplyContourProperties(renderer);
 
+  localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
 
 }
 
@@ -148,7 +147,7 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer* renderer)
     || ( !dataTimeGeometry->IsValidTime( renderer->GetTimeStep() ) ) )
   {
     //clear the rendered polydata
-    localStorage->m_Mapper->SetInput(vtkSmartPointer<vtkPolyData>::New());
+    localStorage->m_Mapper->RemoveAllInputs();//SetInput(vtkSmartPointer<vtkPolyData>::New());
     return;
   }
 
@@ -180,17 +179,22 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
 
   /* First of all convert the control points of the contourModel to vtk points
-   * and add lines in between them
-   */
-  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
-  vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
+  * and add lines in between them
+  */
+  //the points to draw
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  //the lines to connect the points
+  vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+  // Create a polydata to store everything in
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
 
   vtkSmartPointer<vtkAppendPolyData> appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
 
   //iterate over all control points
   mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(timestep);
   mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin(timestep);
-  if(next != end)
+  if(next != inputContour->IteratorEnd(timestep))
   {
     next++;
 
@@ -214,9 +218,8 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
         sphere->SetRadius(1.5);
         sphere->SetCenter(currentControlPoint->Coordinates[0], currentControlPoint->Coordinates[1], currentControlPoint->Coordinates[2]);
-
-        appendPoly->AddInput(sphere->GetOutput());
         sphere->Update();
+        appendPoly->AddInput(sphere->GetOutput());
       }
 
 
@@ -302,7 +305,9 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
     appendPoly->AddInput(polyData);
 
   }//end if (it != end)
-  return appendPoly->GetOutput();
+  appendPoly->Update();
+  vtkSmartPointer<vtkPolyData> poly = appendPoly->GetOutput();
+  return poly;
 }
 
 

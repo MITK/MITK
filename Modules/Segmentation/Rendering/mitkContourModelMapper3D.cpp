@@ -172,11 +172,13 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   //the lines to connect the points
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+  // Create a polydata to store everything in
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
 
   //iterate over the control points
   mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(timestep);
   mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin(timestep);
-  if(next != end)
+  if(next != inputContour->IteratorEnd(timestep))
   {
     next++;
 
@@ -212,8 +214,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
       lines->InsertCellPoint(p2);
     }
 
-    // Create a polydata to store everything in
-    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
     // Add the points to the dataset
     polyData->SetPoints(points);
     // Add the lines to the dataset

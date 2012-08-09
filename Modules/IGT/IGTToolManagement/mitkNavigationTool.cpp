@@ -23,7 +23,9 @@ mitk::NavigationTool::NavigationTool() : m_Type(mitk::NavigationTool::Unknown),
                                          m_CalibrationFile("none"),
                                          m_SerialNumber(""),
                                          m_ToolRegistrationLandmarks(mitk::PointSet::New()),
-                                         m_ToolCalibrationLandmarks(mitk::PointSet::New())
+                                         m_ToolCalibrationLandmarks(mitk::PointSet::New()),
+                                         m_ToolTipPosition(mitk::Point3D()),
+                                         m_ToolTipOrientation(mitk::Quaternion(0,0,0,1))
   {
     
   }

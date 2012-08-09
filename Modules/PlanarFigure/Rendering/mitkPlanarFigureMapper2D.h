@@ -51,6 +51,7 @@ class Contour;
 *   <ul>
 *     <li>"planarfigure.drawoutline": if true, the "outline" lines is drawn
 *     <li>"planarfigure.drawquantities": if true, the quantities (text) associated with the planar figure is drawn
+*     <li>"planarfigure.drawname": if true, the name specified by the dataNode is drawn
 *     <li>"planarfigure.drawshadow": if true, a black shadow is drawn around the planar figure
 *     <li>"planarfigure.controlpointshape": style of the control points (enum)
 *   </ul>
@@ -210,6 +211,7 @@ private:
   bool m_DrawQuantities;
   bool m_DrawShadow;
   bool m_DrawControlPoints;
+  bool m_DrawName;
 
   // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;

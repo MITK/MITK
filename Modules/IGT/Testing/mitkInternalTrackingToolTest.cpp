@@ -96,7 +96,7 @@ static void TestBasicFunctionality()
 
 static void TestTooltipFunctionality()
   {
-  mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New();
+  mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New().GetPointer();
   mitk::Point3D toolTipPos; mitk::FillVector3D(toolTipPos,1,1,1);
   mitk::Quaternion toolTipQuat = mitk::Quaternion(0,0,0,1);
   internalTrackingTool->SetToolTip(toolTipPos,toolTipQuat);

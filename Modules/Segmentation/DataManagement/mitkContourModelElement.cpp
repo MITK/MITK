@@ -22,10 +22,12 @@ mitk::ContourModelElement::ContourModelElement()
 }
 
 
+
 mitk::ContourModelElement::ContourModelElement(const mitk::ContourModelElement &other) :
   m_Vertices(other.m_Vertices), m_IsClosed(other.m_IsClosed)
 {
 }
+
 
 
 mitk::ContourModelElement::~ContourModelElement()
@@ -34,16 +36,31 @@ mitk::ContourModelElement::~ContourModelElement()
 }
 
 
+
 void mitk::ContourModelElement::AddVertex(mitk::Point3D &vertex, bool isActive)
 {
   this->m_Vertices->push_back(new VertexType(vertex, isActive));
 }
 
 
+
+void mitk::ContourModelElement::InsertVertexAfterIndex(mitk::Point3D &vertex, bool isActive, int index)
+{
+  if(index > 0 && this->GetSize() > index)
+  {
+    VertexIterator _where = this->m_Vertices->begin();
+    _where += index;
+    this->m_Vertices->insert(_where, new VertexType(vertex, isActive));
+  }
+}
+
+
+
 mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(int index)
 {
   return this->m_Vertices->at(index);
 }
+
 
 
 mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(const mitk::Point3D &point, float eps)
@@ -64,6 +81,7 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(co
   }//if eps < 0
   return NULL;
 }
+
 
 
 mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetVertexAt(const mitk::Point3D &point, float eps)
@@ -89,6 +107,8 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetV
   }
   return NULL;
 }
+
+
 
 mitk::ContourModelElement::VertexType* mitk::ContourModelElement::OptimizedGetVertexAt(const mitk::Point3D &point, float eps)
 {
@@ -140,6 +160,7 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::OptimizedGetVe
       catch(std::out_of_range ex)
       {
         //ret stays NULL
+        return ret;
       }
 
       //clean up ANN
@@ -153,10 +174,12 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::OptimizedGetVe
 }
 
 
+
 mitk::ContourModelElement::VertexListType* mitk::ContourModelElement::GetVertexList()
 {
   return this->m_Vertices;
 }
+
 
 
 bool mitk::ContourModelElement::IsClosed()
@@ -165,10 +188,12 @@ bool mitk::ContourModelElement::IsClosed()
 }
 
 
+
 void mitk::ContourModelElement::Close()
 {
   this->m_IsClosed = true;
 }
+
 
 
 void mitk::ContourModelElement::Open()
@@ -177,10 +202,12 @@ void mitk::ContourModelElement::Open()
 }
 
 
+
 void mitk::ContourModelElement::SetIsClosed( bool isClosed)
 {
   isClosed ? this->Close() : this->Open();
 }
+
 
 
 void mitk::ContourModelElement::Concatenate(mitk::ContourModelElement* other)
@@ -195,16 +222,19 @@ void mitk::ContourModelElement::Concatenate(mitk::ContourModelElement* other)
 }
 
 
+
 void mitk::ContourModelElement::RemoveVertex(mitk::ContourModelElement::VertexType* vertex)
 {
   this->RemoveVertexAt(vertex->Coordinates, 0.1);
 }
 
 
+
 void mitk::ContourModelElement::RemoveVertexAt(int index)
 {
   this->m_Vertices->erase(this->m_Vertices->begin()+index);
 }
+
 
 
 bool mitk::ContourModelElement::RemoveVertexAt(mitk::Point3D &point, float eps)

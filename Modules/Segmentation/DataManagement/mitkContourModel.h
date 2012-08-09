@@ -128,7 +128,7 @@ namespace mitk
     //## will not be added, the TimeSlicedGeometry will not be expanded.
     //## @Note Also if the contour is closed the vertex will not be added.
     //##
-    void AddVertex(mitk::Point3D &vertex, unsigned int timestep=0);
+    void AddVertex(mitk::Point3D &vertex, int timestep=0);
 
     //##Documentation
     //## @brief Add a vertex to the contour.
@@ -143,35 +143,40 @@ namespace mitk
     //## will not be added, the TimeSlicedGeometry will not be expanded.
     //## @Note Also if the contour is closed the vertex will not be added.
     //##
-    void AddVertex(mitk::Point3D &vertex, bool isActive, unsigned int timestep=0);
+    void AddVertex(mitk::Point3D &vertex, bool isActive, int timestep=0);
+
+    //##Documentation
+    //## @brief Insert a vertex after given index.
+    //##
+    void InsertVertexAfterIndex(mitk::Point3D &vertex, int index, bool isActive=false, int timestep=0);
 
     //##Documentation
     //## @brief Return if the contour is closed or not.
     //##
-    bool IsClosed(unsigned int timestep=0);
+    bool IsClosed( int timestep=0);
 
     //##Documentation
     //## @brief Concatenate two contours.
     //## The starting control point of the other will be added at the end of the contour.
     //##
-    void Concatenate(mitk::ContourModel* other, unsigned int timestep=0);
+    void Concatenate(mitk::ContourModel* other, int timestep=0);
 
     //##Documentation
     //## @brief Returns a const VertexIterator at the start element of the contour.
     //##
-    VertexIterator IteratorBegin(unsigned int timestep=0);
+    VertexIterator IteratorBegin( int timestep=0);
 
     //##Documentation
     //## @brief Close the contour.
     //## The last control point will be linked with the first point.
     //##
-    virtual void Close(unsigned int timestep=0);
+    virtual void Close( int timestep=0);
 
     //##Documentation
     //## @brief Set isClosed to false contour.
     //## The link between the last control point the first point will be removed.
     //##
-    virtual void Open(unsigned int timestep=0);
+    virtual void Open( int timestep=0);
 
     //##Documentation
     //## @brief Set isClosed to given boolean.
@@ -179,19 +184,19 @@ namespace mitk
     //## false - The link between the last control point the first point will be removed.
     //## true - The last control point will be linked with the first point.
     //##
-    virtual void SetIsClosed(bool isClosed, unsigned int timestep=0);
+    virtual void SetIsClosed(bool isClosed, int timestep=0);
 
     //##Documentation
     //## @brief Returns a const VertexIterator at the end element of the contour.
     //##
-    VertexIterator IteratorEnd( unsigned int timestep=0);
+    VertexIterator IteratorEnd( int timestep=0);
 
     //##Documentation
     //## @brief Returns the number of vertices at a given timestep.
     //##
     //## @param timestep - default = 0
     //##
-    int GetNumberOfVertices( unsigned int timestep=0);
+    int GetNumberOfVertices( int timestep=0);
 
     //##Documentation
     //## @brief Returns the vertex at the index position within the container.
@@ -201,12 +206,12 @@ namespace mitk
     //##Documentation
     //## @brief Check if there isn't something at this timestep.
     //##
-    virtual bool IsEmptyTimeStep(unsigned int t) const;
+    virtual bool IsEmptyTimeStep( int t) const;
 
     //##Documentation
     //## @brief Mark a vertex at an index in the container as selected.
     //##
-    bool SelectVertexAt(int index, unsigned int timestep=0);
+    bool SelectVertexAt(int index, int timestep=0);
 
     //##Documentation
     //## @brief Mark a vertex at a given position in 3D space.
@@ -217,14 +222,14 @@ namespace mitk
     //##
     //## @return true = vertex found;  false = no vertex found
     //##
-    bool SelectVertexAt(mitk::Point3D &point, float eps, unsigned int timestep=0);
+    bool SelectVertexAt(mitk::Point3D &point, float eps, int timestep=0);
 
     //##Documentation
     //## @brief Remove a vertex at given index within the container.
     //##
     //## @return true = the vertex was successfuly removed;  false = wrong index.
     //##
-    bool RemoveVertexAt(int index, unsigned int timestep=0);
+    bool RemoveVertexAt(int index, int timestep=0);
 
     //##Documentation
     //## @brief Remove a vertex at a query position in 3D space.
@@ -235,7 +240,7 @@ namespace mitk
     //##
     //## @return true = the vertex was successfuly removed;  false = no vertex found.
     //##
-    bool RemoveVertexAt(mitk::Point3D &point, float eps, unsigned int timestep=0);
+    bool RemoveVertexAt(mitk::Point3D &point, float eps, int timestep=0);
 
     //##Documentation
     //## @brief Shift the currently selected vertex by a translation vector.
@@ -250,7 +255,7 @@ namespace mitk
     //## @param translate - the translation vector.
     //## @param timestep - at this timestep the contour will be shifted.
     //##
-    void ShiftContour(mitk::Vector3D &translate, unsigned int timestep=0);
+    void ShiftContour(mitk::Vector3D &translate, int timestep=0);
 
 
 /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/
@@ -287,7 +292,7 @@ namespace mitk
     //##Documentation
     //## @brief Expand the timebounds of the TimeSlicedGeometry.
     //##
-    virtual void Expand( unsigned int timeSteps );
+    virtual void Expand( int timeSteps );
 
     //##Documentation
     //## @brief Update the OutputInformation of a ContourModel object
@@ -309,6 +314,7 @@ namespace mitk
   //## 
   //## 
   void ExecuteOperation(Operation* operation);
+
 
   protected:
 

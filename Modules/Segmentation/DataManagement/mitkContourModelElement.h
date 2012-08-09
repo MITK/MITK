@@ -125,6 +125,11 @@ namespace mitk
     //##Documentation
     //## @brief
     //##
+    virtual void InsertVertexAfterIndex(mitk::Point3D &vertex, bool isActive, int index);
+
+    //##Documentation
+    //## @brief
+    //##
     virtual VertexType* GetVertexAt(int index);
 
     //##Documentation

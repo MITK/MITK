@@ -39,7 +39,7 @@ mitk::ContourModel::~ContourModel()
 
 
 
-void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, unsigned int timestep)
+void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep) )
   {
@@ -49,7 +49,7 @@ void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, unsigned int timestep)
 
 
 
-void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isActive, unsigned int timestep)
+void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isActive, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -63,7 +63,21 @@ void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isActive, unsigne
 
 
 
-int mitk::ContourModel::GetNumberOfVertices( unsigned int timestep)
+void mitk::ContourModel::InsertVertexAfterIndex(mitk::Point3D &vertex, int index, bool isActive, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    if(index > 0 && this->m_ContourSeries[timestep]->GetSize() > index)
+    {
+      this->m_ContourSeries[timestep]->InsertVertexAfterIndex(vertex, isActive, index);
+      this->Modified();
+    }
+  }
+}
+
+
+
+int mitk::ContourModel::GetNumberOfVertices( int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -85,7 +99,7 @@ const mitk::ContourModel::VertexType* mitk::ContourModel::GetVertexAt(int index,
 
 
 
-void mitk::ContourModel::Close(unsigned int timestep)
+void mitk::ContourModel::Close( int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -95,7 +109,7 @@ void mitk::ContourModel::Close(unsigned int timestep)
 }
 
 
-void mitk::ContourModel::Open(unsigned int timestep)
+void mitk::ContourModel::Open( int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -105,7 +119,7 @@ void mitk::ContourModel::Open(unsigned int timestep)
 }
 
 
-void mitk::ContourModel::SetIsClosed(bool isClosed, unsigned int timestep)
+void mitk::ContourModel::SetIsClosed(bool isClosed, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -116,14 +130,14 @@ void mitk::ContourModel::SetIsClosed(bool isClosed, unsigned int timestep)
 
 
 
-bool mitk::ContourModel::IsEmptyTimeStep(unsigned int t) const
+bool mitk::ContourModel::IsEmptyTimeStep( int t) const
 {
   return (t < 0) || (this->m_ContourSeries.size() <= t);
 }
 
 
 
-void mitk::ContourModel::Concatenate(mitk::ContourModel* other, unsigned int timestep)
+void mitk::ContourModel::Concatenate(mitk::ContourModel* other, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -137,7 +151,7 @@ void mitk::ContourModel::Concatenate(mitk::ContourModel* other, unsigned int tim
 
 
 
-mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin(unsigned int timestep)
+mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -151,7 +165,7 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin(unsigned in
 
 
 
-mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd( unsigned int timestep)
+mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd( int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -165,7 +179,7 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd( unsigned int
 
 
 
-bool mitk::ContourModel::IsClosed(unsigned int timestep)
+bool mitk::ContourModel::IsClosed( int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -176,7 +190,7 @@ bool mitk::ContourModel::IsClosed(unsigned int timestep)
 
 
 
-bool mitk::ContourModel::SelectVertexAt(int index, unsigned int timestep)
+bool mitk::ContourModel::SelectVertexAt(int index, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -187,7 +201,7 @@ bool mitk::ContourModel::SelectVertexAt(int index, unsigned int timestep)
 
 
 
-bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, unsigned int timestep)
+bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -198,7 +212,7 @@ bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, unsigne
 
 
 
-bool mitk::ContourModel::RemoveVertexAt(int index, unsigned int timestep)
+bool mitk::ContourModel::RemoveVertexAt(int index, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -211,7 +225,7 @@ bool mitk::ContourModel::RemoveVertexAt(int index, unsigned int timestep)
 
 
 
-bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps, unsigned int timestep)
+bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -235,7 +249,7 @@ void mitk::ContourModel::ShiftSelectedVertex(mitk::Vector3D &translate)
 
 
 
-void mitk::ContourModel::ShiftContour(mitk::Vector3D &translate, unsigned int timestep)
+void mitk::ContourModel::ShiftContour(mitk::Vector3D &translate, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -264,9 +278,9 @@ void mitk::ContourModel::ShiftVertex(VertexType* vertex, mitk::Vector3D &vector)
 
 
 
-void mitk::ContourModel::Expand( unsigned int timeSteps )
+void mitk::ContourModel::Expand( int timeSteps )
 {
-  unsigned int oldSize = this->m_ContourSeries.size();
+  int oldSize = this->m_ContourSeries.size();
 
   if( timeSteps > 0 && timeSteps > oldSize )
   {
@@ -389,7 +403,7 @@ void mitk::ContourModel::UpdateOutputInformation()
     typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
     typedef BoundingBoxType::PointsContainer                      PointsContainer;
 
-    unsigned int timesteps = this->GetTimeSteps();
+    int timesteps = this->GetTimeSteps();
 
     //iterate over the timesteps
     for(int currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)

@@ -56,6 +56,7 @@ void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isActive, int tim
     if( !this->m_ContourSeries[timestep]->IsClosed() )
     {
       this->m_ContourSeries[timestep]->AddVertex(vertex, isActive);
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
       this->Modified();
     }
   }
@@ -70,6 +71,7 @@ void mitk::ContourModel::InsertVertexAtIndex(mitk::Point3D &vertex, int index, b
     if(index > 0 && this->m_ContourSeries[timestep]->GetSize() > index)
     {
       this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isActive, index);
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
       this->Modified();
     }
   }
@@ -104,6 +106,7 @@ void mitk::ContourModel::Close( int timestep)
   if(!this->IsEmptyTimeStep(timestep))
   {
     this->m_ContourSeries[timestep]->Close();
+    this->InvokeEvent( ContourModelClosedEvent() );
     this->Modified();
   }
 }
@@ -114,6 +117,7 @@ void mitk::ContourModel::Open( int timestep)
   if(!this->IsEmptyTimeStep(timestep))
   {
     this->m_ContourSeries[timestep]->Open();
+    this->InvokeEvent( ContourModelClosedEvent() );
     this->Modified();
   }
 }
@@ -124,6 +128,7 @@ void mitk::ContourModel::SetIsClosed(bool isClosed, int timestep)
   if(!this->IsEmptyTimeStep(timestep))
   {
     this->m_ContourSeries[timestep]->SetIsClosed(isClosed);
+    this->InvokeEvent( ContourModelClosedEvent() );
     this->Modified();
   }
 }
@@ -144,6 +149,7 @@ void mitk::ContourModel::Concatenate(mitk::ContourModel* other, int timestep)
     if( !this->m_ContourSeries[timestep]->IsClosed() )
     {
       this->m_ContourSeries[timestep]->Concatenate(other->m_ContourSeries[timestep]);
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
       this->Modified();
     }
   }
@@ -218,6 +224,7 @@ bool mitk::ContourModel::RemoveVertexAt(int index, int timestep)
   {
     this->m_ContourSeries[timestep]->RemoveVertexAt(index);
     this->Modified();
+    this->InvokeEvent( ContourModelSizeChangeEvent() );
     return true;
   }
   return false;
@@ -231,6 +238,7 @@ bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps, int tim
   {
     return this->m_ContourSeries[timestep]->RemoveVertexAt(point, eps);
     this->Modified();
+    this->InvokeEvent( ContourModelSizeChangeEvent() );
     return true;
   }
   return false;
@@ -264,6 +272,7 @@ void mitk::ContourModel::ShiftContour(mitk::Vector3D &translate, int timestep)
     }
 
     this->Modified();
+    this->InvokeEvent( ContourModelShiftEvent() );
   }
 }
 
@@ -291,6 +300,7 @@ void mitk::ContourModel::Expand( int timeSteps )
       m_ContourSeries.push_back(mitk::ContourModelElement::New());
     }
     
+    this->InvokeEvent( ContourModelExpandTimeBoundsEvent() );
   }
 }
 

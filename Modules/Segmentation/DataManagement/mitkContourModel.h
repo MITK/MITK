@@ -146,7 +146,7 @@ namespace mitk
     void AddVertex(mitk::Point3D &vertex, bool isActive, int timestep=0);
 
     //##Documentation
-    //## @brief Insert a vertex after given index.
+    //## @brief Insert a vertex at given index.
     //##
     void InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isActive=false, int timestep=0);
 
@@ -341,6 +341,14 @@ namespace mitk
     //The interpolation of the line segment between control points.
     LineSegmentInterpolation m_lineInterpolation;
   };
-}
 
+  itkEventMacro( ContourModelEvent, itk::AnyEvent );
+  itkEventMacro( ContourModelShiftEvent, ContourModelEvent );
+  itkEventMacro( ContourModelSizeChangeEvent, ContourModelEvent );
+  itkEventMacro( ContourModelAddEvent, ContourModelSizeChangeEvent );
+  itkEventMacro( ContourModelRemoveEvent, ContourModelSizeChangeEvent );
+  itkEventMacro( ContourModelExpandTimeBoundsEvent, ContourModelEvent );
+  itkEventMacro( ContourModelClosedEvent, ContourModelEvent );
+
+}
 #endif

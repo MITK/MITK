@@ -738,3 +738,34 @@ mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnIma
 
   this->SetImageGeometry(isAnImageGeometry);
 }
+
+
+bool mitk::Geometry3D::Is2DConvertable()
+{
+   bool isConvertableWithoutLoss = true;
+   do
+   {
+      if (this->GetSpacing()[2] != 1)
+      {
+         isConvertableWithoutLoss = false;
+         break;
+      }
+      if (this->GetOrigin()[2] != 0)
+      {
+         isConvertableWithoutLoss = false;
+         break;
+      }
+      mitk::Vector3D col0, col1, col2;
+      col0.Set_vnl_vector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+      col1.Set_vnl_vector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+      col2.Set_vnl_vector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+      
+      if ((col0[2] != 0) || (col1[2] != 0) || (col2[0] != 0) || (col2[1] != 0) || (col2[2] != 1))
+      {
+         isConvertableWithoutLoss = false;
+         break;
+      }
+   } while (0);
+   
+   return isConvertableWithoutLoss;
+}

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCommonFunctionality.h"
 #include <mitkImageAccessByItk.h>
 #include <mitkPicFileReader.h>
+#include <mitkConvert2Dto3DImageFilter.h>
 
 #include <mitkIpPic.h>
 
@@ -41,11 +42,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName, const char* propFileName)
 { 
+   // Check if desired format is supported
   if (! fileWriter->CanWriteBaseDataType(data) ) {
     QMessageBox::critical(NULL,"ERROR","Could not write file. Invalid data type for file writer.");
     return;
   }
 
+  // Ensure a valid filename
   QString fileName;
   if (aFileName == NULL)
   {
@@ -81,6 +84,8 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
   else
     fileName = aFileName;
 
+
+  // Write
   if (fileName.isEmpty() == false )
   {
     fileWriter->SetFileName( fileName.toLocal8Bit().constData() );
@@ -540,7 +545,46 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
       if( answer == QMessageBox::No )
         return "";
     }
-   
+
+
+    // Check if Image data/ Geometry information is lost
+    if (image->GetDimension() == 2)
+    {
+       if (!image->GetGeometry()->Is2DConvertable())
+       {
+          // information will be lost, if continuing to save this file as 2D
+          // tell it the user and offer to save it as 3D
+
+          // todo: if format is png, jpg, etc.. forget it, no geometry information at all
+          QMessageBox msgBox;
+          msgBox.setText("You are trying to save a 2D image that has 3D geometry informations.");
+          msgBox.setInformativeText("You will lose the 3D geometry information this way. Do you rather want to save it as a 3D image?");
+          msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+          msgBox.setDefaultButton(QMessageBox::Yes);
+          int ret = msgBox.exec();
+
+          if (ret == QMessageBox::YesRole)
+          {
+             // convert image to 2D
+             mitk::Convert2Dto3DImageFilter::Pointer convertFilter = mitk::Convert2Dto3DImageFilter::New();
+             convertFilter->SetInput(image);
+             convertFilter->Update();
+             image = convertFilter->GetOutput();
+          }
+          else if (ret == QMessageBox::NoRole)
+          {
+             // Continue Saving as 2D
+
+          }
+          else 
+          {
+             // Abort, don't save anything
+             return 0; 
+          }
+       }
+    }
+
+    // write image
     imageWriter->SetInput(image);
     imageWriter->SetFileName(dir.c_str());
     imageWriter->SetExtension(extension.c_str());
@@ -689,4 +733,3 @@ if (returnValue != "")
   }
 return returnValue;
 }
-

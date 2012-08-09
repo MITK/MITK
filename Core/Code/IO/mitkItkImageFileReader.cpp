@@ -130,13 +130,8 @@ void mitk::ItkImageFileReader::GenerateData()
   imageIO->SetIORegion( ioRegion );
   void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
   imageIO->Read( buffer );
-  //mitk::Image::Pointer image = mitk::Image::New();
-  if((ndim==4) && (dimensions[3]<=1))
-    ndim = 3;
-  if((ndim==3) && (dimensions[2]<=1))
-    ndim = 2;
-
   mitk::PixelType pixelType = mitk::PixelType(imageIO->GetComponentTypeInfo(), mitk::GetPixelTypeFromITKImageIO(imageIO),
+
                                               imageIO->GetComponentSize(), imageIO->GetNumberOfComponents(),
                                               imageIO->GetComponentTypeAsString( imageIO->GetComponentType() ).c_str(),
                                               imageIO->GetPixelTypeAsString( imageIO->GetPixelType() ).c_str() );

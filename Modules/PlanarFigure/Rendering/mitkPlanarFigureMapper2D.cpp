@@ -166,25 +166,22 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   // draw name near the first point (if present)
   std::string name = node->GetName();
-  if ( !name.empty() )
+  if ( m_DrawName && !name.empty() )
   {
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if ( openGLrenderer )
     {
-      if ( m_IsSelected || m_IsHovering )
-      {
-        openGLrenderer->WriteSimpleText( name,
-          firstPoint[0] + 6.0, firstPoint[1] + 4.0,
-          0,
-          0,
-          0); //this is a shadow 
-        openGLrenderer->WriteSimpleText( name,
-          firstPoint[0] + 5.0, firstPoint[1] + 5.0,
-          m_LineColor[lineDisplayMode][0],
-          m_LineColor[lineDisplayMode][1],
-          m_LineColor[lineDisplayMode][2] );
-      }
-
+      openGLrenderer->WriteSimpleText( name,
+        firstPoint[0] + 6.0, firstPoint[1] + 4.0,
+        0,
+        0,
+        0); //this is a shadow 
+      openGLrenderer->WriteSimpleText( name,
+        firstPoint[0] + 5.0, firstPoint[1] + 5.0,
+        m_LineColor[lineDisplayMode][0],
+        m_LineColor[lineDisplayMode][1],
+        m_LineColor[lineDisplayMode][2] );
+    
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;
     }
@@ -204,7 +201,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       {
         if ( ! firstActiveFeature ) 
         {
-          quantityString << " / ";
+          quantityString << " x ";
         }
         quantityString << planarFigure->GetQuantity( i ) << " ";
         quantityString << planarFigure->GetFeatureUnit( i );
@@ -533,6 +530,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   m_DrawQuantities = false;
   m_DrawShadow = false;
   m_DrawControlPoints = false;
+  m_DrawName = true;
 
   m_ShadowWidthFactor = 1.2;
   m_LineWidth = 1.0;
@@ -589,6 +587,7 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetBoolProperty( "planarfigure.drawquantities", m_DrawQuantities );
   node->GetBoolProperty( "planarfigure.drawshadow", m_DrawShadow );
   node->GetBoolProperty( "planarfigure.drawcontrolpoints", m_DrawControlPoints );
+  node->GetBoolProperty( "planarfigure.drawname", m_DrawName );
 
   node->GetFloatProperty( "planarfigure.line.width", m_LineWidth );
   node->GetFloatProperty( "planarfigure.shadow.widthmodifier", m_ShadowWidthFactor );
@@ -649,6 +648,7 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
   //node->AddProperty( "planarfigure.drawquantities", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawcontrolpoints", mitk::BoolProperty::New(true) );
+  node->AddProperty( "planarfigure.drawname", mitk::BoolProperty::New(true) );
 
   node->AddProperty("planarfigure.line.width", mitk::FloatProperty::New(2.0) );
   node->AddProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );

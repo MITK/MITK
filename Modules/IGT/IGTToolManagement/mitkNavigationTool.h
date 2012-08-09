@@ -73,6 +73,12 @@ namespace mitk {
     //CalibrationFile:
     itkGetMacro(CalibrationFile,std::string);
     void SetCalibrationFile(const std::string filename);
+
+    //Tool tip definition:
+    itkGetMacro(ToolTipPosition,mitk::Point3D);
+    itkSetMacro(ToolTipPosition,mitk::Point3D);
+    itkGetMacro(ToolTipOrientation,mitk::Quaternion);
+    itkSetMacro(ToolTipOrientation,mitk::Quaternion);
     
     //Tool Landmarks:
     /** @return Returns the tool registration landmarks which represent markers / special points on a
@@ -147,6 +153,10 @@ namespace mitk {
       *        e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool. 
       */
     mitk::PointSet::Pointer m_ToolCalibrationLandmarks;
+    /** @brief Holds the position of the tool tip. */
+    mitk::Point3D m_ToolTipPosition;
+    /** @brief Holds the orientation of the tool tip. */
+    mitk::Quaternion m_ToolTipOrientation;
     //#################################################
 
   };

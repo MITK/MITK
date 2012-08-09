@@ -124,7 +124,15 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   ToolCalLandmarks = ConvertStringToPointSet(CalLandmarksString);
   returnValue->SetToolRegistrationLandmarks(ToolRegLandmarks);
   returnValue->SetToolCalibrationLandmarks(ToolCalLandmarks);
-  
+
+  //Tool Tip
+  std::string toolTipPositionString;
+  std::string toolTipOrientationString;
+  node->GetStringProperty("ToolTipPosition",toolTipPositionString);
+  node->GetStringProperty("ToolTipOrientation",toolTipOrientationString);
+  returnValue->SetToolTipPosition(ConvertStringToPoint(toolTipPositionString));
+  returnValue->SetToolTipOrientation(ConvertStringToQuaternion(toolTipOrientationString));
+
   return returnValue;
   }
 
@@ -160,6 +168,37 @@ mitk::PointSet::Pointer mitk::NavigationToolReader::ConvertStringToPointSet(std:
     }
   return returnValue;
   }
+mitk::Point3D mitk::NavigationToolReader::ConvertStringToPoint(std::string string)
+{
+std::string valueSeperator = ";";
+std::vector<std::string> values;
+split(string,valueSeperator,values);
+mitk::Point3D point;
+if (values.size() == 3)
+    {
+    point[0] = atof(values.at(0).c_str());
+    point[1] = atof(values.at(1).c_str());
+    point[2] = atof(values.at(2).c_str());
+    }
+return point;
+}
+
+mitk::Quaternion mitk::NavigationToolReader::ConvertStringToQuaternion(std::string string)
+{
+std::string valueSeperator = ";";
+std::vector<std::string> values;
+split(string,valueSeperator,values);
+mitk::Quaternion quat = mitk::Quaternion(0,0,0,1);
+if (values.size() == 4)
+    {
+    quat = mitk::Quaternion(atof(values.at(0).c_str()),
+                            atof(values.at(1).c_str()),
+                            atof(values.at(2).c_str()),
+                            atof(values.at(3).c_str()));
+    }
+return quat;
+
+}
 
 void mitk::NavigationToolReader::split(std::string& text, std::string& separators, std::vector<std::string>& words)
   {

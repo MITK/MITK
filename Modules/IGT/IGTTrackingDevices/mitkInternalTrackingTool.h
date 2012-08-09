@@ -56,6 +56,7 @@ namespace mitk {
     virtual void SetTrackingError(float error);                 ///< sets the tracking error
     virtual void SetDataValid(bool _arg);                       ///< sets if the tracking data (position & Orientation) is valid
     virtual void SetErrorMessage(const char* _arg);             ///< sets the error message
+    virtual void SetToolTip(mitk::Point3D toolTipPosition, mitk::Quaternion orientation = mitk::Quaternion(0,0,0,1)); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
 
   protected:
     itkNewMacro(Self);
@@ -67,6 +68,9 @@ namespace mitk {
     float m_TrackingError;    ///< holds the tracking error of the tool
     bool m_Enabled;           ///< if true, tool is enabled and should receive tracking updates from the tracking device
     bool m_DataValid;         ///< if true, data in m_Position and m_Orientation is valid, e.g. true tracking data
+    Point3D m_ToolTip;
+    Quaternion m_ToolTipRotation;
+    bool m_ToolTipSet;
   };
 } // namespace mitk
 #endif /* MITKINTERNALTRACKINGTOOL_H_HEADER_INCLUDED_ */

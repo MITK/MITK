@@ -62,6 +62,8 @@ namespace mitk
     mitk::DataNode::Pointer ConvertToDataNode(mitk::NavigationTool::Pointer Tool);
     std::string GetFileWithoutPath(std::string FileWithPath);
     std::string ConvertPointSetToString(mitk::PointSet::Pointer pointSet);
+    std::string ConvertPointToString(mitk::Point3D point);
+    std::string ConvertQuaternionToString(mitk::Quaternion quat);
   };
 } // namespace mitk
 #endif //NAVIGATIONTOOLWRITER

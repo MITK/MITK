@@ -176,47 +176,49 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
   //iterate over the control points
   mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(timestep);
   mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin(timestep);
-  next++;
-
-  mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd(timestep);
-
-  while(next != end)
+  if(next != end)
   {
-    mitk::ContourModel::VertexType* currentControlPoint = *current;
-    mitk::ContourModel::VertexType* nextControlPoint = *next;
-
-    vtkIdType p1 = points->InsertNextPoint(currentControlPoint->Coordinates[0], currentControlPoint->Coordinates[1], currentControlPoint->Coordinates[2]);
-    vtkIdType p2 = points->InsertNextPoint(nextControlPoint->Coordinates[0], nextControlPoint->Coordinates[1], nextControlPoint->Coordinates[2]);
-    //add the line between both contorlPoints
-    lines->InsertNextCell(2);
-    lines->InsertCellPoint(p1);
-    lines->InsertCellPoint(p2);
-
-    current++; 
     next++;
+
+    mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd(timestep);
+
+    while(next != end)
+    {
+      mitk::ContourModel::VertexType* currentControlPoint = *current;
+      mitk::ContourModel::VertexType* nextControlPoint = *next;
+
+      vtkIdType p1 = points->InsertNextPoint(currentControlPoint->Coordinates[0], currentControlPoint->Coordinates[1], currentControlPoint->Coordinates[2]);
+      vtkIdType p2 = points->InsertNextPoint(nextControlPoint->Coordinates[0], nextControlPoint->Coordinates[1], nextControlPoint->Coordinates[2]);
+      //add the line between both contorlPoints
+      lines->InsertNextCell(2);
+      lines->InsertCellPoint(p1);
+      lines->InsertCellPoint(p2);
+
+      current++; 
+      next++;
+    }
+
+    if(inputContour->IsClosed(timestep))
+    {
+      // If the contour is closed add a line from the last to the first control point
+      mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin(timestep));
+      mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd(timestep)));
+      vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);
+      vtkIdType p1 = points->InsertNextPoint(firstControlPoint->Coordinates[0], firstControlPoint->Coordinates[1], firstControlPoint->Coordinates[2]);
+
+      //add the line to the cellArray
+      lines->InsertNextCell(2);
+      lines->InsertCellPoint(p1);
+      lines->InsertCellPoint(p2);
+    }
+
+    // Create a polydata to store everything in
+    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+    // Add the points to the dataset
+    polyData->SetPoints(points);
+    // Add the lines to the dataset
+    polyData->SetLines(lines);
   }
-
-  if(inputContour->IsClosed(timestep))
-  {
-    // If the contour is closed add a line from the last to the first control point
-    mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin(timestep));
-    mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd(timestep)));
-    vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);
-    vtkIdType p1 = points->InsertNextPoint(firstControlPoint->Coordinates[0], firstControlPoint->Coordinates[1], firstControlPoint->Coordinates[2]);
-
-    //add the line to the cellArray
-    lines->InsertNextCell(2);
-    lines->InsertCellPoint(p1);
-    lines->InsertCellPoint(p2);
-  }
-
-  // Create a polydata to store everything in
-  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-  // Add the points to the dataset
-  polyData->SetPoints(points);
-  // Add the lines to the dataset
-  polyData->SetLines(lines);
-
   return polyData;
 }
 

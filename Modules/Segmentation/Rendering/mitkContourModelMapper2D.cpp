@@ -190,23 +190,25 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
   //iterate over all control points
   mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(timestep);
   mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin(timestep);
-  next++;
-
-  mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd(timestep);
-
-  while(next != end)
+  if(next != end)
   {
-    mitk::ContourModel::VertexType* currentControlPoint = *current;
-    mitk::ContourModel::VertexType* nextControlPoint = *next;
+    next++;
 
-    vtkIdType p1 = points->InsertNextPoint(currentControlPoint->Coordinates[0], currentControlPoint->Coordinates[1], currentControlPoint->Coordinates[2]);
-    vtkIdType p2 = points->InsertNextPoint(nextControlPoint->Coordinates[0], nextControlPoint->Coordinates[1], nextControlPoint->Coordinates[2]);
-    //add the line between both contorlPoints
-    lines->InsertNextCell(2);
-    lines->InsertCellPoint(p1);
-    lines->InsertCellPoint(p2);
+    mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd(timestep);
 
-    if ( currentControlPoint->IsActive )
+    while(next != end)
+    {
+      mitk::ContourModel::VertexType* currentControlPoint = *current;
+      mitk::ContourModel::VertexType* nextControlPoint = *next;
+
+      vtkIdType p1 = points->InsertNextPoint(currentControlPoint->Coordinates[0], currentControlPoint->Coordinates[1], currentControlPoint->Coordinates[2]);
+      vtkIdType p2 = points->InsertNextPoint(nextControlPoint->Coordinates[0], nextControlPoint->Coordinates[1], nextControlPoint->Coordinates[2]);
+      //add the line between both contorlPoints
+      lines->InsertNextCell(2);
+      lines->InsertCellPoint(p1);
+      lines->InsertCellPoint(p2);
+
+      if ( currentControlPoint->IsActive )
       {
         vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
@@ -218,89 +220,89 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
       }
 
 
-    current++; 
-    next++;
-  }
+      current++; 
+      next++;
+    }// while (it!=end)
 
-  //check if last control point is enabled to draw it
-  if ( (*current)->IsActive )
-  {
-    vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+    //check if last control point is enabled to draw it
+    if ( (*current)->IsActive )
+    {
+      vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
-    sphere->SetRadius(1.5);
-    sphere->SetCenter((*current)->Coordinates[0], (*current)->Coordinates[1], (*current)->Coordinates[2]);
+      sphere->SetRadius(1.5);
+      sphere->SetCenter((*current)->Coordinates[0], (*current)->Coordinates[1], (*current)->Coordinates[2]);
 
-    appendPoly->AddInput(sphere->GetOutput());
-    sphere->Update();
-  }
-
-
-  /* If the contour is closed an additional line has to be created between the very first point
-   * and the last point
-   */
-  if(inputContour->IsClosed(timestep))
-  {
-    //add a line from the last to the first control point
-    mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin(timestep));
-    mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd(timestep)));
-    vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);
-    vtkIdType p1 = points->InsertNextPoint(firstControlPoint->Coordinates[0], firstControlPoint->Coordinates[1], firstControlPoint->Coordinates[2]);
-
-    //add the line between both contorlPoints
-    lines->InsertNextCell(2);
-    lines->InsertCellPoint(p1);
-    lines->InsertCellPoint(p2);
-  }
-
-  // Create a polydata to store everything in
-  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-  // Add the points to the dataset
-  polyData->SetPoints(points);
-  // Add the lines to the dataset
-  polyData->SetLines(lines);
+      appendPoly->AddInput(sphere->GetOutput());
+      sphere->Update();
+    }
 
 
+    /* If the contour is closed an additional line has to be created between the very first point
+    * and the last point
+    */
+    if(inputContour->IsClosed(timestep))
+    {
+      //add a line from the last to the first control point
+      mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin(timestep));
+      mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd(timestep)));
+      vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);
+      vtkIdType p1 = points->InsertNextPoint(firstControlPoint->Coordinates[0], firstControlPoint->Coordinates[1], firstControlPoint->Coordinates[2]);
+
+      //add the line between both contorlPoints
+      lines->InsertNextCell(2);
+      lines->InsertCellPoint(p1);
+      lines->InsertCellPoint(p2);
+    }//end if(isClosed)
+
+    // Create a polydata to store everything in
+    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+    // Add the points to the dataset
+    polyData->SetPoints(points);
+    // Add the lines to the dataset
+    polyData->SetLines(lines);
 
 
-  //check for the worldgeometry from the current render window
-  mitk::PlaneGeometry* currentWorldGeometry = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(renderer->GetCurrentWorldGeometry2D()));
-  if (currentWorldGeometry)
-  {
-    //slice through the data to get a 2D representation of the (possible) 3D contour
-
-    //needed because currently there is no outher solution if the contour is within the plane
-    vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
-    tubeFilter->SetInput(polyData);
-    tubeFilter->SetRadius(0.05);
-
-    //origin and normal of vtkPlane
-    mitk::Point3D origin = currentWorldGeometry->GetOrigin();
-    mitk::Vector3D normal = currentWorldGeometry->GetNormal();
-
-    //the implicit function to slice through the polyData
-    vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
-    plane->SetOrigin(origin[0], origin[1], origin[2]);
-    plane->SetNormal(normal[0], normal[1], normal[2]);
-
-    //cuts through vtkPolyData with a given implicit function. In our case a plane
-    vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
-
-    cutter->SetCutFunction(plane);
-    //cutter->SetInput(polyData);
-    cutter->SetInputConnection(tubeFilter->GetOutputPort());
-
-    //we want the scalars of the input - so turn off generating the scalars within vtkCutter
-    cutter->GenerateCutScalarsOff();
-    cutter->Update();
 
 
-    polyData= cutter->GetOutput();
+    //check for the worldgeometry from the current render window
+    mitk::PlaneGeometry* currentWorldGeometry = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(renderer->GetCurrentWorldGeometry2D()));
+    if (currentWorldGeometry)
+    {
+      //slice through the data to get a 2D representation of the (possible) 3D contour
 
-  }
+      //needed because currently there is no outher solution if the contour is within the plane
+      vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
+      tubeFilter->SetInput(polyData);
+      tubeFilter->SetRadius(0.05);
+
+      //origin and normal of vtkPlane
+      mitk::Point3D origin = currentWorldGeometry->GetOrigin();
+      mitk::Vector3D normal = currentWorldGeometry->GetNormal();
+
+      //the implicit function to slice through the polyData
+      vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+      plane->SetOrigin(origin[0], origin[1], origin[2]);
+      plane->SetNormal(normal[0], normal[1], normal[2]);
+
+      //cuts through vtkPolyData with a given implicit function. In our case a plane
+      vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
+
+      cutter->SetCutFunction(plane);
+      //cutter->SetInput(polyData);
+      cutter->SetInputConnection(tubeFilter->GetOutputPort());
+
+      //we want the scalars of the input - so turn off generating the scalars within vtkCutter
+      cutter->GenerateCutScalarsOff();
+      cutter->Update();
+
+
+      polyData= cutter->GetOutput();
+
+    }//end if(worldGeometry)
     appendPoly->AddInput(polyData);
 
-  
-    return appendPoly->GetOutput();
+  }//end if (it != end)
+  return appendPoly->GetOutput();
 }
 
 

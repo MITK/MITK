@@ -41,7 +41,7 @@ template<typename TPixel, unsigned int VImageDimension>
 void mitk::Convert2Dto3DImageFilter::ItkConvert2DTo3D( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Image::Pointer &mitkImage)
 {
    typedef itk::Image<TPixel,3> itkImageType3D;
-   typedef itkImageType3D::SizeType::SizeValueType sizeVal;
+   typedef typename itkImageType3D::SizeType::SizeValueType sizeVal;
 
    // Create a new ITK image   
    typename itkImageType3D::Pointer outputImage = itkImageType3D::New();

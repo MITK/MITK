@@ -160,7 +160,7 @@ namespace mitk
 
     ResliceInterpolation m_InterpolationMode;
 
-    const Geometry3D* m_ResliceTransform;
+    Geometry3D::ConstPointer m_ResliceTransform;
 
     bool m_InPlaneResampleExtentByGeometry;//Resampling grid corresponds to:  false->image    true->worldgeometry
 

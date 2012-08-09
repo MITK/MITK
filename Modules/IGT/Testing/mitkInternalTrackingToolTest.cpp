@@ -39,23 +39,14 @@ protected:
   InternalTrackingToolTestClass() : mitk::InternalTrackingTool()  
   {
   }
-};
 
-/**
- *  Simple example for a test for the class "InternalTrackingTool".
- *  
- *  argc and argv are the command line parameters which were passed to 
- *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
- *  tests, argv is either empty for the simple tests or contains the filename
- *  of a test image for the image tests (see CMakeLists.txt).
- */
-int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
-{
-  // always start with this!
-  MITK_TEST_BEGIN("InternalTrackingTool")
+public: //these static methods are only to structure the test
+        //please see them seperated from the upper part of the class
 
+static void TestBasicFunctionality()
+  {
   // let's create an object of our class  
-  mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New().GetPointer();
+  mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New();
   
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
@@ -101,9 +92,50 @@ int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
 
   internalTrackingTool->Disable();
   MITK_TEST_CONDITION((internalTrackingTool->IsEnabled()==false),"Testing of Disable()");
+  }
 
-  // write your own tests here and use the macros from mitkTestingMacros.h !!!
-  // do not write to std::cout and do not return from this function yourself!
+static void TestTooltipFunctionality()
+  {
+  mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New();
+  mitk::Point3D toolTipPos; mitk::FillVector3D(toolTipPos,1,1,1);
+  mitk::Quaternion toolTipQuat = mitk::Quaternion(0,0,0,1);
+  internalTrackingTool->SetToolTip(toolTipPos,toolTipQuat);
+
+  mitk::Point3D positionInput; mitk::FillVector3D(positionInput,5,6,7);
+
+  internalTrackingTool->SetPosition(positionInput);
+
+  mitk::Point3D positionOutput;
+
+  internalTrackingTool->GetPosition(positionOutput);
+
+  MITK_TEST_CONDITION(((positionOutput[0] == 6)&&
+                       (positionOutput[0] == 6)&&
+                       (positionOutput[0] == 6)&&
+                       (positionOutput[0] == 6)),
+                       "Testing tooltip definition."
+                     );
+  
+
+  }
+};
+
+/**
+ *  Simple example for a test for the class "InternalTrackingTool".
+ *  
+ *  argc and argv are the command line parameters which were passed to 
+ *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
+ *  tests, argv is either empty for the simple tests or contains the filename
+ *  of a test image for the image tests (see CMakeLists.txt).
+ */
+int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
+{
+  // always start with this!
+  MITK_TEST_BEGIN("InternalTrackingTool")
+
+  InternalTrackingToolTestClass::TestBasicFunctionality();
+  InternalTrackingToolTestClass::TestTooltipFunctionality();
+  
   
   // always end with this!
   MITK_TEST_END();

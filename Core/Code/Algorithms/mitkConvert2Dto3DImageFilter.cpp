@@ -41,6 +41,7 @@ template<typename TPixel, unsigned int VImageDimension>
 void mitk::Convert2Dto3DImageFilter::ItkConvert2DTo3D( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Image::Pointer &mitkImage)
 {
    typedef itk::Image<TPixel,3> itkImageType3D;
+   typedef itkImageType3D::SizeType::SizeValueType sizeVal;
 
    // Create a new ITK image   
    typename itkImageType3D::Pointer outputImage = itkImageType3D::New();
@@ -64,9 +65,9 @@ void mitk::Convert2Dto3DImageFilter::ItkConvert2DTo3D( itk::Image<TPixel,VImageD
    outputImage->Allocate();
 
    // Copy Values:
-   for (int x = 0; x<mySize[0]; x++)
+   for (  typename sizeVal x = 0; x<mySize[0]; x++)
    {
-      for (int y = 0; y<mySize[1]; y++)
+      for (typename sizeVal y = 0; y<mySize[1]; y++)
       {
          itk::Index<2> index2D;
          index2D[0] = x;

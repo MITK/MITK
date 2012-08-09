@@ -42,20 +42,25 @@ ISelection::ConstPointer QtSelectionProvider::GetSelection() const
 {
   if (qSelectionModel)
   {
-    QtItemSelection::Pointer qsel(new QtItemSelection(qSelectionModel->selection()));
+    ISelection::Pointer qsel(new QtItemSelection(qSelectionModel->selection()));
     return qsel;
   }
 
-  return QtItemSelection::Pointer(new QtItemSelection());
+  return ISelection::ConstPointer(0);
 }
 
-void QtSelectionProvider::SetSelection(ISelection::Pointer selection)
+void QtSelectionProvider::SetSelection(ISelection::ConstPointer selection)
+{
+  this->SetSelection(selection, QItemSelectionModel::ClearAndSelect);
+}
+
+void QtSelectionProvider::SetSelection(ISelection::ConstPointer selection, QItemSelectionModel::SelectionFlags flags)
 {
   if (!qSelectionModel) return;
 
-  if (QtItemSelection::Pointer qsel = selection.Cast<QtItemSelection>())
+  if (QtItemSelection::ConstPointer qsel = selection.Cast<const QtItemSelection>())
   {
-    qSelectionModel->select(qsel->GetQItemSelection(), QItemSelectionModel::Select);
+    qSelectionModel->select(qsel->GetQItemSelection(), flags);
   }
 }
 
@@ -95,7 +100,6 @@ void QtSelectionProvider::SetItemSelectionModel(QItemSelectionModel* selModel)
 
 void QtSelectionProvider::FireSelectionChanged(const QItemSelection&  /*selected*/, const QItemSelection&  /*deselected*/)
 {
-
   QtItemSelection::Pointer sel(new QtItemSelection(this->GetQItemSelection()));
   SelectionChangedEvent::Pointer event(new SelectionChangedEvent(ISelectionProvider::Pointer(this), sel));
   selectionEvents.selectionChanged(event);

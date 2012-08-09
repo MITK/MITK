@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkIDataStorageReference.h>
 
-class QItemSelectionModel;
+#include <QItemSelectionModel>
 
 namespace mitk {
   class DataNode;
@@ -144,11 +144,17 @@ protected:
 
   /**
    * Informs other parts of the workbench that node is selected via the blueberry selection service.
+   *
+   * \note This method should not be used if you have set your own selection provider via
+   * SetSelectionProvider() or your own QItemSelectionModel via GetDataNodeSelectionModel().
    */
   void FireNodeSelected(mitk::DataNode::Pointer node);
 
   /**
    * Informs other parts of the workbench that the nodes are selected via the blueberry selection service.
+   *
+   * \note This method should not be used if you have set your own selection provider via
+   * SetSelectionProvider() or your own QItemSelectionModel via GetDataNodeSelectionModel().
    */
   virtual void FireNodesSelected(const QList<mitk::DataNode::Pointer>& nodes);
 
@@ -183,6 +189,21 @@ protected:
    * <code>false</code> and <code>true</code> otherwise.
    */
   bool IsDataManagerSelectionValid() const;
+
+  /**
+   * Sets the selection of the data manager view if available.
+   *
+   * \param selection The new selection for the data manager.
+   * \param flags The Qt selection flags for controlling the way how the selection is updated.
+   */
+  void SetDataManagerSelection(const berry::ISelection::ConstPointer& selection,
+                               QItemSelectionModel::SelectionFlags flags = QItemSelectionModel::ClearAndSelect) const;
+
+  /**
+   * Takes the current selection and sets it on the data manager. Only matching nodes in the
+   * data manager view will be selected.
+   */
+  void SynchronizeDataManagerSelection() const;
 
   /**
    * Returns the Preferences object for this View.

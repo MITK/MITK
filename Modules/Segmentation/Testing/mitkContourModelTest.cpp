@@ -180,7 +180,7 @@ static void TestRemoveVertexAtWorldPosition()
 //Check closeable contour
 static void TestIsclosed()
 {
-    mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
   mitk::Point3D p;
   p[0] = p[1] = p[2] = 0;
@@ -196,6 +196,18 @@ static void TestIsclosed()
   contour->Close();
 
   MITK_TEST_CONDITION(contour->IsClosed(), "close contour");
+
+  //no vertices should be added to a closed contour
+  int oldNumberOfVertices = contour->GetNumberOfVertices();
+
+  mitk::Point3D p3;
+  p3[0] = p3[1] = p3[2] = 4;
+
+  contour->AddVertex(p3);
+
+  int newNumberOfVertices = contour->GetNumberOfVertices();
+
+  MITK_TEST_CONDITION(oldNumberOfVertices == newNumberOfVertices, "no vertices added to closed contour");
 }
 
 
@@ -260,18 +272,71 @@ static void TestSelectVertexAtWrongPosition()
 }
 
 
+void TestInsertVertex()
+{
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
+
+  contour->AddVertex(p);
+
+
+  mitk::Point3D p2;
+  p2[0] = p2[1] = p2[2] = 1;
+
+  contour->AddVertex(p2);
+
+  mitk::Point3D pointToInsert;
+  pointToInsert[0] = pointToInsert[1] = pointToInsert[2] = 10;
+
+  contour->InsertVertexAtIndex(pointToInsert, 1);
+
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 3, "test insert vertex");
+
+  MITK_TEST_CONDITION(contour->GetVertexAt(1)->Coordinates == pointToInsert, "compare inserted vertex");
+
+}
+
+
 //try to access an invalid timestep
 static void TestInvalidTimeStep()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
+
+  contour->AddVertex(p);
+
+
+  mitk::Point3D p2;
+  p2[0] = p2[1] = p2[2] = 1;
+
+  contour->AddVertex(p2);
+
+  int invalidTimeStep = 42;
+
+  MITK_TEST_CONDITION_REQUIRED(contour->IsEmptyTimeStep(invalidTimeStep), "invalid timestep required");
 
   MITK_TEST_FOR_EXCEPTION(std::exception, contour->IteratorBegin(-1));
 
-  contour->Close(50);
+  contour->Close(invalidTimeStep);
   MITK_TEST_CONDITION(contour->IsClosed() == false, "test close for timestep 0");
-  MITK_TEST_CONDITION(contour->IsClosed(50) == false, "test close with invalid timestep");
+  MITK_TEST_CONDITION(contour->IsClosed(invalidTimeStep) == false, "test close at invalid timestep");
 
-  MITK_TEST_CONDITION(contour->GetNumberOfVertices(50) == -1, "test number of vertices with invalid timestep");
+  contour->SetIsClosed(true, invalidTimeStep);
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices(invalidTimeStep) == -1, "test number of vertices at invalid timestep");
+
+  contour->AddVertex(p2, invalidTimeStep);
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices(invalidTimeStep) == -1, "test add vertex at invalid timestep");
+
+  contour->InsertVertexAtIndex(p2, 0, false, invalidTimeStep);
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices(invalidTimeStep) == -1, "test insert vertex at invalid timestep");
+
+  MITK_TEST_CONDITION(contour->SelectVertexAt(0, invalidTimeStep) == NULL, "test select vertex at invalid timestep");
+
+  MITK_TEST_CONDITION(contour->RemoveVertexAt(0, invalidTimeStep) == false, "test remove vertex at invalid timestep");
+
 }
 
 
@@ -290,6 +355,7 @@ int mitkContourModelTest(int argc, char* argv[])
   TestIsclosed();
   TestConcatenate();
   TestInvalidTimeStep();
+  TestInsertVertex();
 
   TestSelectVertexAtWrongPosition();
 

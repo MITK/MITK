@@ -462,6 +462,9 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
 {
   mitk::Point2D displayPoint;
 
+  if ( markerOpacity == 0 && lineOpacity == 0 )
+    return;
+
   this->TransformObjectToDisplay(
     point, displayPoint,
     objectGeometry, rendererGeometry, displayGeometry );

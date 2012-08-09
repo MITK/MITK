@@ -99,7 +99,9 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
     {
       if ( m_ControlPoints.size() > this->GetMaximumNumberOfControlPoints()-1 )
       {
-        m_ControlPoints.resize( this->GetMaximumNumberOfControlPoints()-1 );
+        // get rid of deprecated control points in the list. This is necessary
+        // as ::ResetNumberOfControlPoints() only sets the member, does not resize the list!
+        m_ControlPoints.resize( this->GetNumberOfControlPoints() );
       }
 
       m_ControlPoints.push_back( this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
@@ -446,6 +448,7 @@ void mitk::PlanarFigure::SetRequestedRegion( itk::DataObject * /*data*/ )
 
 void mitk::PlanarFigure::ResetNumberOfControlPoints( int numberOfControlPoints )
 {
+  // DO NOT resize the list here, will cause crash!!
   m_NumberOfControlPoints = numberOfControlPoints;
 }
 

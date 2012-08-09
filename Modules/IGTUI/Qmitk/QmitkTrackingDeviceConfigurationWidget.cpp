@@ -401,12 +401,12 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
         
         mitk::ClaronTrackingDevice::Pointer newDevice = mitk::ClaronTrackingDevice::New();
         if(this->m_MTCalibrationFile=="") AddOutput("<br>Warning: Calibration file is not set!");
-		    else 
-		      {
+        else 
+          {
           //extract path from calibration file and set the calibration dir of the device
           std::string path =  itksys::SystemTools::GetFilenamePath(m_MTCalibrationFile);
           newDevice->SetCalibrationDir(path);
-		      }
+          }
         returnValue = newDevice;
         }
   return returnValue;
@@ -442,6 +442,7 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
   QString portName = prefix + QString::number(port);
 
   tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
+  tempTrackingDevice->SetBaudRate(mitk::SerialCommunication::BaudRate115200);//set baud rate
   mitk::TrackingDevice::Pointer returnValue = static_cast<mitk::TrackingDevice*>(tempTrackingDevice);
   return returnValue;
   }

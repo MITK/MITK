@@ -47,6 +47,8 @@ public:
 
   virtual ContainerType::Pointer ToVector() const;
 
+  std::list<mitk::DataNode::Pointer> GetSelectedDataNodes() const;
+
   /**
    * @see berry::ISelection::IsEmpty()
    */

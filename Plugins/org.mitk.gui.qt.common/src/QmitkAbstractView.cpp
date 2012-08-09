@@ -504,6 +504,23 @@ bool QmitkAbstractView::IsDataManagerSelectionValid() const
   return this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager");
 }
 
+void QmitkAbstractView::SetDataManagerSelection(const berry::ISelection::ConstPointer &selection,
+                                                QItemSelectionModel::SelectionFlags flags) const
+{
+  berry::IViewPart::Pointer datamanagerView = this->GetSite()->GetWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.datamanager");
+  if (datamanagerView.IsNull()) return;
+
+  datamanagerView->GetSite()->GetSelectionProvider().Cast<berry::QtSelectionProvider>()->SetSelection(selection, flags);
+}
+
+void QmitkAbstractView::SynchronizeDataManagerSelection() const
+{
+  berry::ISelection::ConstPointer currentSelection = this->GetSite()->GetSelectionProvider()->GetSelection();
+  if (currentSelection.IsNull()) return;
+
+  SetDataManagerSelection(currentSelection);
+}
+
 void QmitkAbstractView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
                                            const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
@@ -515,28 +532,9 @@ void QmitkAbstractView::OnNullSelection(berry::IWorkbenchPart::Pointer /*part*/)
 
 QList<mitk::DataNode::Pointer> QmitkAbstractViewPrivate::DataNodeSelectionToQList(mitk::DataNodeSelection::ConstPointer currentSelection) const
 {
-  QList<mitk::DataNode::Pointer> selectedNodes;
-  if(currentSelection.IsNull())
-    return selectedNodes;
-
-  mitk::DataNodeObject::Pointer _DataNodeObject;
-  mitk::DataNode::Pointer _DataNode;
-
-  for(mitk::DataNodeSelection::iterator it = currentSelection->Begin();
-    it != currentSelection->End(); ++it)
-  {
-    _DataNodeObject = it->Cast<mitk::DataNodeObject>();
-    if(_DataNodeObject.IsNotNull())
-    {
-      _DataNode = _DataNodeObject->GetDataNode();
-      if(_DataNode.IsNotNull())
-        selectedNodes << _DataNode;
-    }
-  }
-
-  return selectedNodes;
+  if (currentSelection.IsNull()) return QList<mitk::DataNode::Pointer>();
+  return QList<mitk::DataNode::Pointer>::fromStdList(currentSelection->GetSelectedDataNodes());
 }
-
 
 void QmitkAbstractView::NodeAdded( const mitk::DataNode*  /*node*/ )
 {
@@ -559,9 +557,16 @@ void QmitkAbstractView::FireNodeSelected( mitk::DataNode::Pointer node )
 
 void QmitkAbstractView::FireNodesSelected( const QList<mitk::DataNode::Pointer>& nodes )
 {
-  if (GetDataNodeSelectionModel() == 0)
+  // if this is the first call to FireNodesSelected and the selection provider has no QItemSelectiomMode
+  // yet, set our helper model
+  if (d->m_SelectionProvider->GetItemSelectionModel() == 0)
   {
     d->m_SelectionProvider->SetItemSelectionModel(d->m_DataNodeSelectionModel);
+  }
+  else if (d->m_SelectionProvider->GetItemSelectionModel() != d->m_DataNodeSelectionModel)
+  {
+    MITK_WARN << "A custom data node selection model has been set. Ignoring call to FireNodesSelected().";
+    return;
   }
 
   if (nodes.empty())
@@ -582,10 +587,5 @@ void QmitkAbstractView::FireNodesSelected( const QList<mitk::DataNode::Pointer>&
     }
     d->m_DataNodeSelectionModel->select(QItemSelection(d->m_DataNodeItemModel->index(0,0), d->m_DataNodeItemModel->index(nodes.size(), 0)),
                                         QItemSelectionModel::ClearAndSelect);
-  }
-
-  if (GetDataNodeSelectionModel() == 0)
-  {
-    d->m_SelectionProvider->SetItemSelectionModel(0);
   }
 }

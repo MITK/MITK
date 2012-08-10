@@ -643,13 +643,17 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
     PFCNot->addPlanarFigure( pf );
 
 
-    mitk::FiberBundleX::Pointer notRoi = outputBundle->ExtractFiberSubset(PFCNot);
+    mitk::FiberBundleX::Pointer notRoi = this->ExtractFiberSubset(PFCNot);
+
+    mitk::FiberBundleX::Pointer finalResult = notRoi->AddBundle(clippedBundle);
+
 
 
 
     bundles.push_back(outputBundle);
     bundles.push_back(clippedBundle);
     bundles.push_back(notRoi);
+    bundles.push_back(finalResult);
 
 
     return bundles;

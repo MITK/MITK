@@ -742,7 +742,8 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       }
     }
     if(((overwrite) || (node->GetProperty("opaclevelwindow", renderer)==NULL))
-      && image->GetPixelType().GetPixelTypeId() == typeid(itk::RGBAPixel<unsigned char>))
+       && (image->GetPixelType().GetPixelTypeId() == itk::ImageIOBase::RGBA)
+       && (image->GetPixelType().GetTypeId() == typeid( unsigned char)) )
     {
       mitk::LevelWindow opaclevwin;
       opaclevwin.SetRangeMinMax(0,255);

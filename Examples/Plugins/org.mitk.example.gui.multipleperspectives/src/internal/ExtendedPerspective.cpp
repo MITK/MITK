@@ -25,23 +25,10 @@ void ExtendedPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout
 {
   // Editors are placed for free.
   std::string editorAreaId = layout->GetEditorArea();
-  //! [Visibility of editor area]
+
   // Hides the editor area.
   layout->SetEditorAreaVisible(false);
-  //! [Visibility of editor area]
 
-  //berry::IFolderLayout::Pointer left =
-  //  layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.3f, editorAreaId);
-  //left->AddView("org.mitk.views.datamanager");
-
-  //layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.3f, editorAreaId);
-  layout->AddView("org.mitk.views.selectionview", berry::IPageLayout::LEFT,0.3f, editorAreaId);
-
-  layout->AddView("org.mitk.views.minimalview", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
-
-  //layout->AddView("org.mitk.views.modules", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
-  //layout->AddView("org.mitk.views.rigidregistration", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
-  //layout->AddView("org.mitk.views.mitkigttrackingtoolbox", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
-  //layout->AddView("org.mitk.views.imagecropper", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
-  //layout->AddView("org.mitk.views.imagenavigator", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
+  layout->AddView("org.mitk.views.emptyview1", berry::IPageLayout::LEFT,0.3f, editorAreaId);
+  layout->AddView("org.mitk.views.emptyview2", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
 }

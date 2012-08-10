@@ -14,13 +14,5 @@
       class="MinimalPerspective">
     </perspective>
   </extension>
-
-<!--   <extension point="org.blueberry.ui.views">
-    <view 
-      id="org.mitk.example.minimalview" 
-      name="Minimal Example View" 
-      class="MinimalView">
-    </view>
-  </extension> -->
   
 </plugin>

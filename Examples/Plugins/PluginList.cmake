@@ -4,4 +4,6 @@
 set(MITK_EXAMPLE_PLUGINS
   org.mitk.example.gui.minimalapplication:ON
   org.mitk.example.gui.multipleperspectives:ON
+  org.mitk.example.gui.selectionserviceqt:ON
+  org.mitk.example.gui.selectionservicemitk:ON
 )

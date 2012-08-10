@@ -2,34 +2,31 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  multipleperspectivesActivator.cpp
-  MultiplePerspectives.cpp
-  MinimalPerspective.cpp
+  selectionserviceqtActivator.cpp
+  SelectionServiceQT.cpp
   ExtendedPerspective.cpp
-  EmptyView1.cpp
-  EmptyView2.cpp
+  ListenerView.cpp
+  SelectionView.cpp
 )
 
 set(UI_FILES
-  src/internal/EmptyView1Controls.ui
-  src/internal/EmptyView2Controls.ui
+  src/internal/ListenerViewControls.ui
+  src/internal/SelectionViewControls.ui
 )
 
 set(MOC_H_FILES
-  src/internal/multipleperspectivesActivator.h
-  src/internal/MultiplePerspectives.h
-  src/internal/MinimalPerspective.h
+  src/internal/selectionserviceqtActivator.h
+  src/internal/SelectionServiceQT.h
   src/internal/ExtendedPerspective.h
-  src/internal/EmptyView1.h
-  src/internal/EmptyView2.h
+  src/internal/ListenerView.h
+  src/internal/SelectionView.h
 )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
   resources/perspectiveIcon1.png
-  resources/perspectiveIcon2.png
-  resources/viewIcon1.png
-  resources/viewIcon2.png
+  resources/selectionListenerIcon.png
+  resources/selectionProviderIcon.png
 )
 
 set(CPP_FILES )

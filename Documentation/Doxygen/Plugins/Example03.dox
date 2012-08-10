@@ -1,0 +1,16 @@
+/**
+
+\page Example03Page Blueberry Examples - 3. Selection service QT
+
+\image html SelectionServiceQT.png
+
+In this examples the selection service is used to connect the selection of the radio buttons from one view with the selection of the list of the other view. The SelectionView is the selection provider for this example and the ListenerView is the selection listener.
+
+selection provider:
+\include SelectionView.cpp
+selection listener:
+\include ListenerView.cpp
+
+\ref Example02Page "[Previous example]" \ref Example04Page "[Next example]" \ref ExamplePage "[Main example page]"
+
+*/

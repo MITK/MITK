@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MultiplePerspectives.h"
+#include "SelectionServiceMITK.h"
 
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
-class MultiplePerspectivesWorkbenchAdvisor : public berry::WorkbenchAdvisor
+class SelectionServiceMITKWorkbenchAdvisor : public berry::WorkbenchAdvisor
 {
 
 public:
@@ -31,10 +31,6 @@ public:
   {
     // Set an individual initial size
     configurer->SetInitialSize(berry::Point(600,400));
-    //! [Visibility of perspective bar]
-    // Enable or disable the perspective bar
-    configurer->SetShowPerspectiveBar(true);
-    //! [Visibility of perspective bar]
 
     wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
     return wwAdvisor.data();
@@ -51,20 +47,20 @@ private:
 
 };
 
-const std::string MultiplePerspectivesWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.minimalperspective";
+const std::string SelectionServiceMITKWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
 
-MultiplePerspectives::MultiplePerspectives()
+SelectionServiceMITK::SelectionServiceMITK()
 {
 }
 
-MultiplePerspectives::~MultiplePerspectives()
+SelectionServiceMITK::~SelectionServiceMITK()
 {
 }
  
-int MultiplePerspectives::Start()
+int SelectionServiceMITK::Start()
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
-  wbAdvisor.reset(new MultiplePerspectivesWorkbenchAdvisor);
+  wbAdvisor.reset(new SelectionServiceMITKWorkbenchAdvisor);
 
   int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
   
@@ -73,7 +69,7 @@ int MultiplePerspectives::Start()
               ? EXIT_RESTART : EXIT_OK;
 }
 
-void MultiplePerspectives::Stop()
+void SelectionServiceMITK::Stop()
 {
   
 }

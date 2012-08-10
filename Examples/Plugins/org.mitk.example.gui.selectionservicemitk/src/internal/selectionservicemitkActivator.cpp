@@ -15,32 +15,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "multipleperspectivesActivator.h"
+#include "selectionservicemitkActivator.h"
 
-#include "MultiplePerspectives.h"
-#include "MinimalPerspective.h"
+#include "SelectionServiceMITK.h"
 #include "ExtendedPerspective.h"
-#include "EmptyView1.h"
-#include "EmptyView2.h"
+#include "ListenerView.h"
+#include "SelectionView.h"
 
 #include <QtPlugin>
 
 
-void multipleperspectivesActivator::start(ctkPluginContext* context)
+void selectionservicemitkActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(MultiplePerspectives, context)
-    BERRY_REGISTER_EXTENSION_CLASS(MinimalPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(SelectionServiceMITK, context)
     BERRY_REGISTER_EXTENSION_CLASS(ExtendedPerspective, context)
-    BERRY_REGISTER_EXTENSION_CLASS(EmptyView1, context)
-    BERRY_REGISTER_EXTENSION_CLASS(EmptyView2, context)
+    BERRY_REGISTER_EXTENSION_CLASS(ListenerView, context)
+    BERRY_REGISTER_EXTENSION_CLASS(SelectionView, context)
 }
 
-void multipleperspectivesActivator::stop(ctkPluginContext* context)
+void selectionservicemitkActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
 
 
-Q_EXPORT_PLUGIN2(org_mitk_example_gui_multipleperspectives, multipleperspectivesActivator)
+Q_EXPORT_PLUGIN2(org_mitk_example_gui_selectionservicemitk, selectionservicemitkActivator)
 
 

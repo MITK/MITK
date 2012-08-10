@@ -1,17 +1,18 @@
 /**
 
-\page Example02Page Blueberry Examples - 2. Multiple perspectives
+\page Example02Page Blueberry Examples - 2. Multiple perspectives and views
 
-\image html multipleperspectives_result.png
+\image html MultiplePerspectives.png
 
-The second example creates two perspectives. The first perspective has a visible editor area and uses a folder to bring the MITK datamanager view to the left side.
-
-The second perspective sets the editor area to invisible. The MITK datamanger is displayed over the whole perspective window.
+The second example creates two perspectives. The first perspective has a visible editor area and uses a folder to bring the first view to the left side. The second perspective sets the editor area to invisible. Now both views take half of the layout area. The two views are filled with an empty QListWidget. The perspective bar is displayed in the window.
 
 The visibility of the editor area is controlled by:
 \snippet ExtendedPerspective.cpp Visibility of editor area
 
-In both perspectives the selection service is used to connect the selection of the radio buttons with the selection of the list. The SelectionView is the selection provider for this example and the MinimalView is the selection listener.
+The visibility of the perspective bar is controlled by:
+\snippet MultiplePerspectives.cpp Visibility of perspective bar
+
+\image html Perspectivebar.png
 
 first perspective:
 \include MinimalPerspective.cpp

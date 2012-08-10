@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MinimalViewControls</class>
- <widget class="QWidget" name="MinimalViewControls">
+ <class>ListenerViewControls</class>
+ <widget class="QWidget" name="ListenerViewControls">
   <property name="enabled">
    <bool>true</bool>
   </property>

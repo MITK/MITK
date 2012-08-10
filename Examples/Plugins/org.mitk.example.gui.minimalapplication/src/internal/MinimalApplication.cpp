@@ -30,9 +30,9 @@ public:
       berry::IWorkbenchWindowConfigurer::Pointer configurer)
   {
     // Set an individual initial size
-    //configurer->SetInitialSize(berry::Point(1000,1000));
+    configurer->SetInitialSize(berry::Point(600,400));
     // Enable or disable the perspective bar
-    configurer->SetShowPerspectiveBar(true);
+    configurer->SetShowPerspectiveBar(false);
     //configurer->SetTitle("TEST TEST TEST!");
 
     wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));

@@ -14,25 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MinimalView.h"
+#include "ListenerView.h"
 
 #include <QMessageBox>
 
-const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview"; 
+const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview"; 
 
-MinimalView::MinimalView()
+ListenerView::ListenerView()
   : m_Parent(0)
-  , m_SelectionListener(new berry::SelectionChangedAdapter<MinimalView>(this, &MinimalView::SelectionChanged))
+  , m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))
 {
 }
 
-MinimalView::~MinimalView()
+ListenerView::~ListenerView()
 {
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   s->RemoveSelectionListener(m_SelectionListener);
 }
 
-void MinimalView::CreateQtPartControl(QWidget *parent)
+void ListenerView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets
   m_Parent = parent;
@@ -46,18 +46,18 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   m_Parent->setEnabled(true);
 }
 
-void MinimalView::ToggleRadioMethod()
+void ListenerView::ToggleRadioMethod()
 {
   bool buttonState = m_Controls.radioButton->isChecked();
   if (buttonState) m_Controls.radioButton_2->toggle();
   else m_Controls.radioButton->toggle();
 }
 
-void MinimalView::SetFocus ()
+void ListenerView::SetFocus ()
 {
 }
 
-void MinimalView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
+void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
                                berry::ISelection::ConstPointer selection)
 {
   if (sourcepart != this && 

@@ -15,20 +15,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MINIMALVIEW_H_
-#define MINIMALVIEW_H_
+#ifndef SELECTIONVIEW_H_
+#define SELECTIONVIEW_H_
 
 //#include <QmitkAbstractView.h>
 #include <berryQtViewPart.h>
 
-#include "ui_MinimalViewControls.h"
+#include "ui_SelectionViewControls.h"
 
-#include <berryISelectionListener.h>
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryIStructuredSelection.h>
+#include <berryQtSelectionProvider.h>
 
-class MinimalView : public berry::QtViewPart
+
+class SelectionView : public berry::QtViewPart
 {
 
   Q_OBJECT
@@ -37,30 +35,28 @@ public:
 
   static const std::string VIEW_ID;
 
-  MinimalView();
+  berry::QtSelectionProvider::Pointer m_SelectionProvider;
 
-  virtual ~MinimalView();
+  SelectionView();
+
+  virtual ~SelectionView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
 private:
-    void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
-                     berry::ISelection::ConstPointer selection);
 
-    berry::ISelectionListener::Pointer m_SelectionListener;
-    friend struct berry::SelectionChangedAdapter<MinimalView>;
-
+  
   private slots:
-     void ToggleRadioMethod(); //Debugging only!
+     void TestMethod(); //Debugging only!
 
 protected:
 
   void SetFocus();
 
-  Ui::MinimalViewControls m_Controls;
+  Ui::SelectionViewControls m_Controls;
 
   QWidget* m_Parent;
 
 };
 
-#endif /*MINIMALVIEW_H_*/
+#endif /*SELECTIONVIEW_H_*/

@@ -2,14 +2,13 @@
 
 \page Example01Page Blueberry Examples - 1. Minimal application
 
-\image html minimalapplication_result.png
+\image html MinimalApplication.png
 
-Open the Example by executing startAppFrameworkDemo_release.bat. All other examples can also be found among the shown list.
 The first example creates a minimal application with an empty perspective. 
 
 \include MinimalApplication.cpp
 minimal perspective:
-\include ExtendedPerspective.cpp
+\include MinimalPerspective.cpp
 
 \ref Example02Page "[Next example]" \ref ExamplePage "[Main example page]"
 

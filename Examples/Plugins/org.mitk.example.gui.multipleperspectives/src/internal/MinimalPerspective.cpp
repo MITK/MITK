@@ -30,12 +30,7 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 
   berry::IFolderLayout::Pointer left =
     layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.3f, editorAreaId);
-  //left->AddView("org.mitk.views.datamanager");
-  left->AddView("org.mitk.views.selectionview");
-  //layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.3f, editorAreaId);
-  //layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::LEFT, 0.3f, editorAreaId);
-  
-  layout->AddView("org.mitk.views.minimalview", berry::IPageLayout::RIGHT, 0.3f, editorAreaId);
-  
-  //layout->AddView("org.mitk.views.imagenavigator", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
+
+  left->AddView("org.mitk.views.emptyview1");
+  layout->AddView("org.mitk.views.emptyview2", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
 }

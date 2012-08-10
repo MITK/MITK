@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -64,7 +64,7 @@ namespace mitk
     return instance;
   }
 
-  std::string EndoDebug::GetUniqueFileName( const std::string& dir, const std::string& ext )
+  std::string EndoDebug::GetUniqueFileName( const std::string& dir, const std::string& ext, const std::string& prefix )
   {
     std::stringstream s;
     s.precision( 0 );
@@ -75,7 +75,7 @@ namespace mitk
     {
       s.str("");
       s << i;
-      filename = s.str() + "." + ext;
+      filename = prefix + s.str() + "." + ext;
       ++i;
     }
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -43,7 +43,7 @@ namespace mitk
     ///
     /// helper function getting unique file name
     ///
-    static std::string GetUniqueFileName( const std::string& dir, const std::string& ext="jpg" );
+    static std::string GetUniqueFileName(const std::string& dir, const std::string& ext="jpg" , const std::string &prefix="");
 
     ///
     /// set if debug is enabled at all
@@ -240,11 +240,14 @@ namespace mitk
       std::string outputFile = mitk::EndoDebug::GetInstance().GetDebugImagesOutputDirectory(); \
       if( !outputFile.empty() ) \
       {\
-        outputFile =  mitk::EndoDebug::GetInstance().GetUniqueFileName(outputFile, "jpg");\
+        outputFile =  mitk::EndoDebug::GetInstance().GetUniqueFileName(outputFile, "jpg", std::string(#imgVariableName) );\
         cv::imwrite(outputFile, imgVariableName);\
       }\
-      cv::imshow( "Debug", imgVariableName ); \
-      cv::waitKey( mitk::EndoDebug::GetInstance().GetShowImagesTimeOut() ); \
+      else\
+      {\
+        cv::imshow( "Debug", imgVariableName ); \
+        cv::waitKey( mitk::EndoDebug::GetInstance().GetShowImagesTimeOut() ); \
+      }\
     }
 
   ///

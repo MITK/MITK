@@ -104,9 +104,61 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
         connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
         connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
+        connect( m_Controls->m_CutBundle, SIGNAL(clicked()), this, SLOT(CutFibers()) );
 
     }
 }
+
+
+void QmitkFiberProcessingView::CutFibers()
+{
+    for (int i=0; i<m_SelectedFB.size(); i++)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        mitk::PlanarFigure::Pointer roi = dynamic_cast<mitk::PlanarFigure*> (m_SelectedPF.at(0)->GetData());
+
+        std::vector<mitk::FiberBundleX::Pointer> extFB = fib->CutFiberBundle(roi);
+
+        if(extFB.size() != 3)
+            return;
+
+
+
+
+
+
+        mitk::DataNode::Pointer node;
+
+        node = mitk::DataNode::New();
+        node->SetData(extFB.at(0));
+        QString name(m_SelectedFB.at(i)->GetName().c_str());
+        name += "_output";
+        node->SetName(name.toStdString());
+        GetDataStorage()->Add(node);
+
+
+        node = mitk::DataNode::New();
+        node->SetData(extFB.at(1));
+        name = "clipped";
+        node->SetName(name.toStdString());
+        GetDataStorage()->Add(node);
+
+
+
+        node = mitk::DataNode::New();
+        node->SetData(extFB.at(2));
+        name = "rest";
+        node->SetName(name.toStdString());
+        GetDataStorage()->Add(node);
+        m_SelectedFB.at(i)->SetVisibility(false);
+
+
+
+
+
+    }
+}
+
 
 void QmitkFiberProcessingView::Extract3d()
 {
@@ -748,6 +800,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_FaColorFibersButton->setEnabled(false);
         m_Controls->m_PruneFibersButton->setEnabled(false);
         m_Controls->m_CurvatureThresholdButton->setEnabled(false);
+        m_Controls->m_CutBundle->setEnabled(false);
 
         if (m_Surfaces.size()>0)
             m_Controls->m_MirrorFibersButton->setEnabled(true);
@@ -766,9 +819,13 @@ void QmitkFiberProcessingView::UpdateGui()
         if (m_Surfaces.size()>0)
             m_Controls->m_Extract3dButton->setEnabled(true);
 
+
         // one bundle and one planar figure needed to extract fibers
         if (!m_SelectedPF.empty())
+        {
             m_Controls->doExtractFibersButton->setEnabled(true);
+            m_Controls->m_CutBundle->setEnabled(true);
+        }
 
         // more than two bundles needed to join/subtract
         if (m_SelectedFB.size() > 1)
@@ -790,6 +847,7 @@ void QmitkFiberProcessingView::UpdateGui()
     if ( m_SelectedPF.empty() )
     {
         m_Controls->doExtractFibersButton->setEnabled(false);
+        m_Controls->m_CutBundle->setEnabled(false);
         m_Controls->PFCompoANDButton->setEnabled(false);
         m_Controls->PFCompoORButton->setEnabled(false);
         m_Controls->PFCompoNOTButton->setEnabled(false);

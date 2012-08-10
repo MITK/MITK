@@ -51,6 +51,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTractAnalyzer.h>
 #include <mitkTbssImporter.h>
 #include <mitkProgressBar.h>
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarFigureInteractor.h>
 
 
 #include <mitkVectorImageMapper2D.h>
@@ -623,14 +625,11 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
       m_MultiWidget->MoveCrossToPosition(point);
 
 
-   // }
-
-
-
   }
 
 
 }
+
 
 void QmitkTractbasedSpatialStatisticsView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {

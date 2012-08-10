@@ -73,7 +73,7 @@ namespace mitk
     ///
     /// \return true if debug should be enabled
     ///
-    bool GetShowImagesTimeOut();
+    size_t GetShowImagesTimeOut();
 
     ///
     /// sets an output directory. if set all images that are shown are also written to that
@@ -98,14 +98,34 @@ namespace mitk
     /// statements like endodebug(...) will be evaluated in
     /// MyClass.cpp and nowhere else
     ///
-    void AddFileToDebug(const std::string& fileToDebug);
+    bool AddFileToDebug(const std::string& fileToDebug);
+
+    ///
+    /// \see AddFileToDebug
+    ///
+    void SetFilesToDebug(const std::set<std::string>& filesToDebug);
+
+    ///
+    /// \return the files to be debugged
+    ///
+    std::set<std::string> GetFilesToDebug();
 
     ///
     /// same as files to debug, but the user can provide
     /// any symbol string. if one or more symbols
     /// are set only for these symbols Debug() will return true
     ///
-    void AddSymbolToDebug(const std::string& symbolToDebug);
+    bool AddSymbolToDebug(const std::string& symbolToDebug);
+
+    ///
+    /// \see AddSymbolToDebug
+    ///
+    void SetSymbolsToDebug(const std::set<std::string>& symbolsToDebug);
+
+    ///
+    /// \return the symbols to be debugged
+    ///
+    std::set<std::string> GetSymbolsToDebug();
 
     ///
     /// \return true if file should be debugged

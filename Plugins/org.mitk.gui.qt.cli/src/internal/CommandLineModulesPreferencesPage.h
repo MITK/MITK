@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define COMMANDLINEMODULESPREFERENCESPAGE_H
 
 #include "berryIQtPreferencePage.h"
+#include "berryIPreferences.h"
 #include <org_mitk_gui_qt_cli_Export.h>
-#include <berryIPreferences.h>
 
 class QWidget;
 class QCheckBox;
@@ -91,9 +91,9 @@ public:
 public slots:
 
 protected:
-  QWidget            *m_MainControl;
-  QCheckBox          *m_DebugOutput;
-  ctkDirectoryButton *m_TemporaryDirectory;
+  QWidget                *m_MainControl;
+  QCheckBox              *m_DebugOutput;
+  ctkDirectoryButton     *m_TemporaryDirectory;
   ctkDirectoryListWidget *m_ModulesDirectories;
 
   berry::IPreferences::Pointer m_CLIPreferencesNode;

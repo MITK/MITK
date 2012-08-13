@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSize>
 #include <QHBoxLayout>
 
+//-----------------------------------------------------------------------------
 CommandLineModulesViewControls::CommandLineModulesViewControls(QWidget *parent)
 : m_LayoutForAbout(NULL)
 , m_LayoutForHelp(NULL)
@@ -46,6 +47,8 @@ CommandLineModulesViewControls::CommandLineModulesViewControls(QWidget *parent)
 
 }
 
+
+//-----------------------------------------------------------------------------
 CommandLineModulesViewControls::~CommandLineModulesViewControls()
 {
 

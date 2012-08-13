@@ -31,6 +31,7 @@ const std::string CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NA
 const std::string CommandLineModulesPreferencesPage::MODULE_DIRECTORIES_NODE_NAME = "module directories";
 const std::string CommandLineModulesPreferencesPage::DEBUG_OUTPUT_NODE_NAME = "debug output";
 
+//-----------------------------------------------------------------------------
 CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 : m_MainControl(0)
 , m_TemporaryDirectory(0)
@@ -40,16 +41,22 @@ CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 
 }
 
+
+//-----------------------------------------------------------------------------
 CommandLineModulesPreferencesPage::~CommandLineModulesPreferencesPage()
 {
 
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesPreferencesPage::Init(berry::IWorkbench::Pointer )
 {
 
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
 {
   berry::IPreferencesService::Pointer prefService
@@ -77,11 +84,15 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   this->Update();
 }
 
+
+//-----------------------------------------------------------------------------
 QWidget* CommandLineModulesPreferencesPage::GetQtControl() const
 {
   return m_MainControl;
 }
 
+
+//-----------------------------------------------------------------------------
 bool CommandLineModulesPreferencesPage::PerformOk()
 {
   m_CLIPreferencesNode->Put(TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory().toStdString());
@@ -99,10 +110,14 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   return true;
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesPreferencesPage::PerformCancel()
 {
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesPreferencesPage::Update()
 {
   m_DebugOutput->setChecked(m_CLIPreferencesNode->GetBool(DEBUG_OUTPUT_NODE_NAME, false));

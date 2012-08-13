@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "CommandLineModulesView.h"
 #include "CommandLineModulesPreferencesPage.h"
+#include "QmitkCmdLineModuleFactoryGui.h"
 
 // Qt
 #include <QMessageBox>
@@ -46,12 +47,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleDirectoryWatcher.h>
 #include <ctkCmdLineModuleMenuFactoryQtGui.h>
 #include <ctkCmdLineModuleDescription.h>
-#include <ctkCmdLineModuleFactoryQtGui.h>
 #include <ctkCmdLineModuleXmlValidator.h>
 #include <ctkCmdLineModuleDefaultPathBuilder.h>
 
 const std::string CommandLineModulesView::VIEW_ID = "org.mitk.gui.qt.cli";
 
+//-----------------------------------------------------------------------------
 CommandLineModulesView::CommandLineModulesView()
 : m_Controls(NULL)
 , m_Parent(NULL)
@@ -61,11 +62,14 @@ CommandLineModulesView::CommandLineModulesView()
 , m_TemporaryDirectoryName("")
 {
   m_MapTabToModuleInstance.clear();
-  m_ModuleManager = new ctkCmdLineModuleManager(new ctkCmdLineModuleFactoryQtGui());
+  m_ModuleFactory = new QmitkCmdLineModuleFactoryGui(this->GetDataStorage());
+  m_ModuleManager = new ctkCmdLineModuleManager(m_ModuleFactory);
   m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
   m_MenuFactory = new ctkCmdLineModuleMenuFactoryQtGui();
 }
 
+
+//-----------------------------------------------------------------------------
 CommandLineModulesView::~CommandLineModulesView()
 {
   if (m_ModuleManager != NULL)
@@ -82,13 +86,22 @@ CommandLineModulesView::~CommandLineModulesView()
   {
     delete m_MenuFactory;
   }
+
+  if (m_ModuleFactory != NULL)
+  {
+    delete m_ModuleFactory;
+  }
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::SetFocus()
 {
   this->m_Controls->m_ComboBox->setFocus();
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
 {
   if (!m_Controls)
@@ -111,6 +124,8 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
   }
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::RetrievePreferenceValues()
 {
   berry::IPreferencesService::Pointer prefService
@@ -159,12 +174,16 @@ void CommandLineModulesView::RetrievePreferenceValues()
   }
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::OnPreferencesChanged(const berry::IBerryPreferences* /*prefs*/)
 {
   // Loads the preferences into member variables.
   this->RetrievePreferenceValues();
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::OnModulesChanged()
 {
   QList<ctkCmdLineModuleReference> refs = this->m_ModuleManager->moduleReferences();
@@ -172,6 +191,8 @@ void CommandLineModulesView::OnModulesChanged()
   this->m_Controls->m_ComboBox->setMenu(menu);
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& moduleRef)
 {
   ctkCmdLineModule* moduleInstance = m_ModuleManager->createModule(moduleRef);
@@ -190,11 +211,15 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
   m_Controls->m_AboutBrowser->setPlainText(moduleRef.description().acknowledgements());
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::OnFutureFinished()
 {
   qDebug() << "*** Future finished ***";
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::OnActionChanged(QAction* action)
 {
   ctkCmdLineModuleReference ref = this->GetReferenceByIdentifier(action->text());
@@ -204,6 +229,8 @@ void CommandLineModulesView::OnActionChanged(QAction* action)
   }
 }
 
+
+//-----------------------------------------------------------------------------
 ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QString identifier)
 {
   ctkCmdLineModuleReference result;
@@ -222,6 +249,8 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QStri
   return result;
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::OnRunButtonPressed()
 {
   qDebug() << "Creating module command line...";
@@ -238,6 +267,8 @@ void CommandLineModulesView::OnRunButtonPressed()
   qDebug() << "Launched module command line...";
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::OnStopButtonPressed()
 {
   qDebug() << "Stopping module command line...";
@@ -246,6 +277,8 @@ void CommandLineModulesView::OnStopButtonPressed()
   qDebug() << "Stopped module command line...";
 }
 
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::OnRestoreDefaultsButtonPressed()
 {
 

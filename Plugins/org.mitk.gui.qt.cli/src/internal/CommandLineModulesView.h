@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 #include "CommandLineModulesViewControls.h"
+#include "QmitkCmdLineModuleFactoryGui.h"
 #include <ctkCmdLineModuleReference.h>
 
 class ctkCmdLineModule;
@@ -139,6 +140,11 @@ private:
    * \brief The menu factory will build a QMenu from the list of available modules.
    */
   ctkCmdLineModuleMenuFactoryQtGui *m_MenuFactory;
+
+  /**
+   * \brief The module factory builds a gui for each plugin.
+   */
+  QmitkCmdLineModuleFactoryGui *m_ModuleFactory;
 
   /**
    * \brief We use this map to decide if we want to create more tabs or not.

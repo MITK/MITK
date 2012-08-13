@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QUiLoader>
 #include <QStringList>
+#include "mitkDataStorage.h"
 
 class QmitkUiLoader : public QUiLoader
 {
@@ -26,13 +27,15 @@ class QmitkUiLoader : public QUiLoader
   Q_OBJECT
 
 public:
-  QmitkUiLoader(QObject *parent=0);
+  QmitkUiLoader(const mitk::DataStorage* dataStorage, QObject *parent=0);
   virtual ~QmitkUiLoader();
 
   QStringList availableWidgets () const;
   virtual QWidget* createWidget(const QString & className, QWidget * parent = 0, const QString & name = QString() );
 
 private:
+
+  const mitk::DataStorage* m_DataStorage;
 
 }; // end class
 

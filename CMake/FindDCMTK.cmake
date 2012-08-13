@@ -63,28 +63,50 @@ foreach(lib
     oflog
     ofstd)
 
+  # Find Release libraries
   find_library(DCMTK_${lib}_LIBRARY
     ${lib}
     PATHS
     ${DCMTK_DIR}/${lib}/libsrc
     ${DCMTK_DIR}/${lib}/libsrc/Release
-    ${DCMTK_DIR}/${lib}/libsrc/Debug
     ${DCMTK_DIR}/${lib}/Release
-    ${DCMTK_DIR}/${lib}/Debug
     ${DCMTK_DIR}/lib
+    ${DCMTK_DIR}/lib/Release
+    ${DCMTK_DIR}/dcmjpeg/lib${lib}/Release
     NO_DEFAULT_PATH
     )
-
+    
   mark_as_advanced(DCMTK_${lib}_LIBRARY)
 
   #message("** DCMTKs ${lib} found at ${DCMTK_${lib}_LIBRARY}")
 
   if(DCMTK_${lib}_LIBRARY)
-    list(APPEND DCMTK_LIBRARIES ${DCMTK_${lib}_LIBRARY})
+    list(APPEND DCMTK_LIBRARIES_RELEASE optimized ${DCMTK_${lib}_LIBRARY})
+  endif()
+  
+  # Find Debug libraries
+  find_library(DCMTK_${lib}_LIBRARY_DEBUG
+    ${lib}
+    PATHS
+    ${DCMTK_DIR}/${lib}/libsrc
+    ${DCMTK_DIR}/${lib}/libsrc/Debug
+    ${DCMTK_DIR}/${lib}/Debug
+    ${DCMTK_DIR}/lib
+    ${DCMTK_DIR}/lib/Debug
+    ${DCMTK_DIR}/dcmjpeg/lib${lib}/Debug
+    NO_DEFAULT_PATH
+    )
+    
+  mark_as_advanced(DCMTK_${lib}_LIBRARY_DEBUG)
+
+  if(DCMTK_${lib}_LIBRARY_DEBUG)
+    list(APPEND DCMTK_LIBRARIES_DEBUG debug ${DCMTK_${lib}_LIBRARY_DEBUG})
   endif()
 
 endforeach()
 
+#depending on build type set debug or release
+list(APPEND DCMTK_LIBRARIES ${DCMTK_LIBRARIES_RELEASE} ${DCMTK_LIBRARIES_DEBUG} )
 
 set(DCMTK_config_TEST_HEADER osconfig.h)
 set(DCMTK_dcmdata_TEST_HEADER dctypes.h)

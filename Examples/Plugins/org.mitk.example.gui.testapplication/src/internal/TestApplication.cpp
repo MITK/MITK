@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
+#include "TestApplicationWorkbenchWindowAdvisor.h"
 
 class TestWorkbenchAdvisor : public berry::WorkbenchAdvisor
 {
@@ -29,7 +30,8 @@ public:
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
       berry::IWorkbenchWindowConfigurer::Pointer configurer)
   {
-    wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
+    //wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
+    wwAdvisor.reset(new TestApplicationWorkbenchWindowAdvisor(configurer));
     return wwAdvisor.data();
   }
 

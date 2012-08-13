@@ -7,15 +7,16 @@ set(INTERNAL_CPP_FILES
   TestPerspective.cpp
   TestView.cpp
   MinimalView.cpp
+  TestApplicationWorkbenchWindowAdvisor.cpp
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_example_gui_testapplication_Activator.h
-
   src/internal/TestApplication.h
   src/internal/TestPerspective.h
   src/internal/TestView.h
   src/internal/MinimalView.h
+  src/internal/TestApplicationWorkbenchWindowAdvisor.h
 )
 
 set(UI_FILES

@@ -30,9 +30,9 @@
     <number>4</number>
    </property>
    <item>
-    <widget class="QPushButton" name="reInitializeNavigatorsButton">
+    <widget class="QPushButton" name="SelfDestruct">
      <property name="text">
-      <string>Re-initialize Navigators</string>
+      <string>Initialize Self Destruct Sequence</string>
      </property>
     </widget>
    </item>
@@ -115,24 +115,24 @@
      <item>
       <layout class="QVBoxLayout">
        <item>
-        <widget class="QPushButton" name="m_TakeScreenshotBtn">
+        <widget class="QPushButton" name="TestA">
          <property name="text">
-          <string>Take Screenshot</string>
+          <string>Test A</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="m_TakeHighResScreenShotBtn">
+        <widget class="QPushButton" name="TestB">
          <property name="toolTip">
           <string>Screenshot will be 4 times larger than current render window size</string>
          </property>
          <property name="text">
-          <string>Take HighDef 3D Screenshot</string>
+          <string>Test B</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="genMovieButton">
+        <widget class="QPushButton" name="TestC">
          <property name="maximumSize">
           <size>
            <width>32767</width>
@@ -140,7 +140,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Generate Movie</string>
+          <string>Test C</string>
          </property>
         </widget>
        </item>
@@ -149,7 +149,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QComboBox" name="stereoSelect">
+    <widget class="QComboBox" name="TimerSelect">
      <property name="minimumSize">
       <size>
        <width>200</width>
@@ -158,17 +158,17 @@
      </property>
      <item>
       <property name="text">
-       <string>stereo off</string>
+       <string>5 Minutes</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>red-blue stereo</string>
+       <string>10 Minutes</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>D4D stereo</string>
+       <string>30 Minutes</string>
       </property>
      </item>
     </widget>
@@ -193,8 +193,8 @@
  </widget>
  <layoutdefault spacing="0" margin="0"/>
  <tabstops>
-  <tabstop>reInitializeNavigatorsButton</tabstop>
-  <tabstop>stereoSelect</tabstop>
+  <tabstop>SelfDestruct</tabstop>
+  <tabstop>TimerSelect</tabstop>
  </tabstops>
  <resources/>
  <connections/>

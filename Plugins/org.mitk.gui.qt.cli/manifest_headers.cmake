@@ -1,5 +1,5 @@
 set(Plugin-Name "CLI")
 set(Plugin-Version "0.1")
-set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
-set(Plugin-ContactAddress "")
+set(Plugin-Vendor "CMIC, Centre For Medical Image Computing, UCL.")
+set(Plugin-ContactAddress "http://cmic.cs.ucl.ac.uk/")
 set(Require-Plugin org.mitk.gui.qt.common)

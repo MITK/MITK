@@ -2,8 +2,7 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) University College London (UCL).
 All rights reserved.
 
 This software is distributed WITHOUT ANY WARRANTY; without
@@ -23,8 +22,9 @@ class QHBoxLayout;
 
 /**
  * \class CommandLineModulesViewControls
- * \brief Contains various utilities to remove the responsibility from CommandLineModulesView.
+ * \brief Contains various Qt related methods to remove the responsibility from CommandLineModulesView.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
+ * \ingroup org_mitk_gui_qt_cli_internal
  */
 class CommandLineModulesViewControls : public QWidget, public Ui_CommandLineModulesViewControls
 {

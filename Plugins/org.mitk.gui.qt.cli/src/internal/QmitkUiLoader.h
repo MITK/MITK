@@ -2,8 +2,7 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) University College London (UCL).
 All rights reserved.
 
 This software is distributed WITHOUT ANY WARRANTY; without
@@ -21,6 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include "mitkDataStorage.h"
 
+/**
+ * \class QmitkUiLoader
+ * \brief Derived from QUiLoader to enable us to instantiate widgets from Qmitk at runtime.
+ * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
+ * \ingroup org_mitk_gui_qt_cli_internal
+ */
 class QmitkUiLoader : public QUiLoader
 {
 

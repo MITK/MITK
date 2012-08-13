@@ -2,8 +2,7 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) University College London (UCL).
 All rights reserved.
 
 This software is distributed WITHOUT ANY WARRANTY; without
@@ -20,6 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleFactory.h>
 #include "mitkDataStorage.h"
 
+/**
+ * \class QmitkCmdLineModuleFactoryGui
+ * \brief Derived from ctkCmdLineModuleFactory to instantiate QmitkCmdLineModuleGui
+ * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
+ * \ingroup org_mitk_gui_qt_cli_internal
+ * \sa QmitkCmdLineModuleGui
+ */
 class QmitkCmdLineModuleFactoryGui
     : public ctkCmdLineModuleFactory
 {

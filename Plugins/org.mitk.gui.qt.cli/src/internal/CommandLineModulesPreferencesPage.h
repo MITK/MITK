@@ -2,8 +2,7 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) University College London (UCL).
 All rights reserved.
 
 This software is distributed WITHOUT ANY WARRANTY; without
@@ -30,6 +29,7 @@ class ctkDirectoryListWidget;
  * \class CommandLineModulesPreferencesPage
  * \brief Preference page for CommandLineModulesView
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
+ * \ingroup org_mitk_gui_qt_cli_internal
  */
 class CommandLineModulesPreferencesPage : public QObject, public berry::IQtPreferencePage
 {

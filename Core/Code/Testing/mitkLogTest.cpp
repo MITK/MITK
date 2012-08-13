@@ -175,7 +175,7 @@ static void TestThreadSaveLog()
       myThreadClass2.Stop();
 
       //sleep again to let all threads end
-      itksys::SystemTools::Delay(200);
+      itksys::SystemTools::Delay(500);
       }
     catch(...)
       {

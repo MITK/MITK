@@ -31,8 +31,8 @@ if(MITK_USE_OpenCV)
           )
     endif()     
 
-    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenCV-2.3.0.tar.bz2)
-    set(opencv_url_md5 4e353dfb04b53bea37407f397aabf069)
+    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenCV-2.4.2.tar.bz2)
+    set(opencv_url_md5 d5d13c4a65dc96cdfaad54767e428215)
 
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
@@ -48,7 +48,7 @@ if(MITK_USE_OpenCV)
         -DBUILD_TESTS:BOOL=OFF
         -DBUILD_EXAMPLES:BOOL=OFF
         -DBUILD_DOXYGEN_DOCS:BOOL=OFF
-	-DWITH_CUDA:BOOL=OFF
+        -DWITH_CUDA:BOOL=OFF
         ${additional_cmake_args}
       DEPENDS ${proj_DEPENDENCIES}
     )

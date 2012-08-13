@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org.berry.log} The Logging Module
+\bundlemainpage{org_blueberry_ui_qt_log} The Logging Module
 
 \image html Logging.png "Icon of the Module"
 

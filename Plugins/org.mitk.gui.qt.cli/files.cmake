@@ -4,6 +4,8 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   QmitkUiLoader.cpp
+  QmitkCmdLineModuleGui.cpp
+  QmitkCmdLineModuleFactoryGui.cpp
   org_mitk_gui_qt_cli_Activator.cpp
   CommandLineModulesViewControls.cpp
   CommandLineModulesPreferencesPage.cpp
@@ -16,6 +18,7 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/QmitkUiLoader.h
+  src/internal/QmitkCmdLineModuleGui.h
   src/internal/org_mitk_gui_qt_cli_Activator.h
   src/internal/CommandLineModulesViewControls.h
   src/internal/CommandLineModulesPreferencesPage.h

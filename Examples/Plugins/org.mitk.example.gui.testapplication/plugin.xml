@@ -15,6 +15,14 @@
     </perspective>
   </extension>
   
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective
+      id="org.mitk.example.testperspective2"
+      name="Test Example Perspective 2"
+      class="TestPerspective2">
+    </perspective>
+  </extension>
+  
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.minimalview"
           name="Minimal View"

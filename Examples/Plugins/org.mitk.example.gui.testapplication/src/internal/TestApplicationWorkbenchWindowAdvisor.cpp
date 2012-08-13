@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "TestApplicationWorkbenchWindowAdvisor.h"
 //#include "QmitkActionBarAdvisor.h"
-
+#include "QtPerspectiveSwitcherTabBar.h"
 
 #include <QMenu>
 #include <QMenuBar>
@@ -176,7 +176,8 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   QWidget* PageComposite = new QWidget(CentralWidget);
   PageComposite->setVisible(true);
   //QWidget* PageComposite = new berry::QtControlWidget(CentralWidget, shell.GetPointer());
-  QTabBar* PerspectivesTabBar = new QTabBar(CentralWidget);
+  QtPerspectiveSwitcherTabBar* PerspectivesTabBar = new QtPerspectiveSwitcherTabBar(this->GetWindowConfigurer()->GetWindow());
+  //QTabBar* PerspectivesTabBar = new QTabBar(CentralWidget);
   PerspectivesTabBar->addTab("Perspective 1");
   PerspectivesTabBar->addTab("Perspective 2");
   PerspectivesTabBar->setVisible(true);

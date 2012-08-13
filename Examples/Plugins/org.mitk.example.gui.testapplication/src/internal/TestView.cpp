@@ -39,6 +39,16 @@ TestView::~TestView()
 
 void TestView::CreateQtPartControl(QWidget *parent)
 {
+  // create GUI widgets
+  m_Parent = parent;
+  m_Controls.setupUi(parent);
+
+  //connect(m_Controls.selectButton, SIGNAL(clicked()), this, SLOT(ToggleRadioMethod()));
+  
+  // register selection listener
+  //GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
+
+  m_Parent->setEnabled(true);
 }
 //{
 //  // create GUI widgets

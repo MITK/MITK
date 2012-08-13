@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <QmitkAbstractView.h>
 #include <berryQtViewPart.h>
 
-//#include "ui_MinimalViewControls.h"
+#include "ui_QmitkTestViewControls.h"
 
 #include <berryISelectionListener.h>
 #include <berryISelectionService.h>
@@ -57,10 +57,10 @@ protected:
 
   void SetFocus();
 
-  //Ui::MinimalViewControls m_Controls;
+  Ui::QmitkTestViewControls m_Controls;
 
   QWidget* m_Parent;
 
 };
 
-#endif /*MINIMALVIEW_H_*/
+#endif /*TESTVIEW_H_*/

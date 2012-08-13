@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "TestApplication.h"
 #include "TestPerspective.h"
+#include "TestPerspective2.h"
 #include "MinimalView.h"
 #include "TestView.h"
 
@@ -28,6 +29,7 @@ void org_mitk_example_gui_testapplication_Activator::start(ctkPluginContext* con
 {
   BERRY_REGISTER_EXTENSION_CLASS(TestApplication, context)
   BERRY_REGISTER_EXTENSION_CLASS(TestPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(TestPerspective2, context)
   BERRY_REGISTER_EXTENSION_CLASS(MinimalView, context)
   BERRY_REGISTER_EXTENSION_CLASS(TestView, context)
 }

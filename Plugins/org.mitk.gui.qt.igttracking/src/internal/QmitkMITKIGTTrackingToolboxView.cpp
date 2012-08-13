@@ -196,14 +196,27 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
     data = mitk::GetDeviceDataByName(str); //Data will be set later, after device generation
   }
 
+  //Create Navigation Data Source with the factory class
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
 
+  //First check if the created object is valid
   if (m_TrackingDeviceSource.IsNull())
   {
     MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
     return;
   }
+
+  //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
+  mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();
+  if ((toolsInNewOrder.IsNotNull()) && (toolsInNewOrder->GetToolCount() > 0))
+    {
+    //so delete the old tools in wrong order and add them in the right order
+    //we cannot simply replace the tool storage because the new storage is
+    //not correctly initialized with the right data storage
+    m_toolStorage->DeleteAllTools();
+    for (int i=0; i < toolsInNewOrder->GetToolCount(); i++) {m_toolStorage->AddTool(toolsInNewOrder->GetTool(i));}
+    }
 
   //connect to device
   try

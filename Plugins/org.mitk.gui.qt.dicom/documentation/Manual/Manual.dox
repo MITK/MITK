@@ -1,12 +1,12 @@
 /**
-\bundlemainpage{org.mitk.gui.qt.dicom} Dicom
+\bundlemainpage{org_mitk_gui_qt_dicom} Dicom
 
 \image html icon.png "Icon of Dicom"
 
 Available sections:
-  - \ref org.mitk.gui.qt.dicomOverview
+  - \ref org_mitk_gui_qt_dicomOverview
 
-\section org.mitk.gui.qt.dicomOverview
+\section org_mitk_gui_qt_dicomOverview
 Describe the features of your awesome plugin here
 <ul>
 <li>Increases productivity

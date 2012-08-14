@@ -176,6 +176,8 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer* renderer)
 vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour, mitk::BaseRenderer* renderer)
 {
   unsigned int timestep = this->GetTimestep();
+  // Create a polydata to store everything in
+  vtkSmartPointer<vtkPolyData> resultingPolyData = vtkSmartPointer<vtkPolyData>::New();
 
 
   /* First of all convert the control points of the contourModel to vtk points
@@ -186,7 +188,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
   //the lines to connect the points
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
   // Create a polydata to store everything in
-  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkPolyData> polyDataIn3D = vtkSmartPointer<vtkPolyData>::New();
 
 
   vtkSmartPointer<vtkAppendPolyData> appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
@@ -225,7 +227,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
       current++; 
       next++;
-    }// while (it!=end)
+    }//end while (it!=end)
 
     //check if last control point is enabled to draw it
     if ( (*current)->IsActive )
@@ -257,14 +259,14 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
       lines->InsertCellPoint(p2);
     }//end if(isClosed)
 
-    // Create a polydata to store everything in
-    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
     // Add the points to the dataset
-    polyData->SetPoints(points);
+    polyDataIn3D->SetPoints(points);
     // Add the lines to the dataset
-    polyData->SetLines(lines);
+    polyDataIn3D->SetLines(lines);
 
-
+    appendPoly->AddInput(polyDataIn3D);
+    appendPoly->Update();
 
 
     //check for the worldgeometry from the current render window
@@ -275,7 +277,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
       //needed because currently there is no outher solution if the contour is within the plane
       vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
-      tubeFilter->SetInput(polyData);
+      tubeFilter->SetInput(appendPoly->GetOutput());
       tubeFilter->SetRadius(0.05);
 
       //origin and normal of vtkPlane
@@ -291,7 +293,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
       vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
 
       cutter->SetCutFunction(plane);
-      //cutter->SetInput(polyData);
+
       cutter->SetInputConnection(tubeFilter->GetOutputPort());
 
       //we want the scalars of the input - so turn off generating the scalars within vtkCutter
@@ -299,15 +301,19 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
       cutter->Update();
 
 
-      polyData= cutter->GetOutput();
+      //set to 2D representation of the contour
+      resultingPolyData= cutter->GetOutput();
 
     }//end if(worldGeometry)
-    appendPoly->AddInput(polyData);
+    else
+    {
+      //set to 3D polyData
+      resultingPolyData = polyDataIn3D;
+    }
 
   }//end if (it != end)
-  appendPoly->Update();
-  vtkSmartPointer<vtkPolyData> poly = appendPoly->GetOutput();
-  return poly;
+  
+  return resultingPolyData;
 }
 
 

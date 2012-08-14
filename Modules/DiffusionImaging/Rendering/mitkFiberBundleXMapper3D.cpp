@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPropAssembly.h>
 #include <vtkPointData.h>
 #include <vtkProperty.h>
+#include <vtkCellArray.h>
 
 //not essential for mapper
 #include <QTime>
@@ -66,12 +67,32 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
         return;
 
     vtkSmartPointer<vtkPolyData> FiberData = FBX->GetFiberPolyData();
+
     if (FiberData == NULL)
         return;
 
 
     FBXLocalStorage3D *localStorage = m_LSH.GetLocalStorage(renderer);
-    localStorage->m_FiberMapper->SetInput(FiberData);
+
+    int index;
+    bool hasSelected = this->GetDataNode()->GetIntProperty("SelectedFiber",index);
+
+
+
+    if(hasSelected && index >= 0)
+    {
+      std::vector<long> ids;
+      ids.push_back(index);
+
+      vtkSmartPointer<vtkPolyData> singlefib = FBX->GeneratePolyDataByIds(ids);
+
+      localStorage->m_FiberMapper->SetInput(singlefib);
+    }
+    else
+    {
+      localStorage->m_FiberMapper->SetInput(FiberData);
+    }
+
 
     if ( FiberData->GetPointData()->GetNumberOfArrays() > 0 )
         localStorage->m_FiberMapper->SelectColorArray( FBX->GetCurrentColorCoding() );
@@ -88,6 +109,9 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     this->GetDataNode()->GetOpacity(tmpopa, NULL);
     localStorage->m_FiberActor->GetProperty()->SetOpacity((double) tmpopa);
 
+
+
+
     // set color
     if (FBX->GetCurrentColorCoding() != NULL){
 //        localStorage->m_FiberMapper->SelectColorArray("");
@@ -100,6 +124,8 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
             double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
             localStorage->m_FiberActor->GetProperty()->SetColor(trgb);
         }
+
+
     }
 
 

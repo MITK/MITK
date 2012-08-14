@@ -231,7 +231,7 @@ void QmitkTbssRoiAnalysisWidget::DrawProfiles(std::string preprocessed)
 
 
 
-void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img)
+void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img, int index)
 {
   this->Clear();
 
@@ -255,10 +255,6 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     }
     ++it;
   }
-
-
-
-
 
 
   it = tracts.begin();
@@ -389,6 +385,15 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     }
 
     int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
+
+
+    if(id == index)
+    {
+      pen.setColor(Qt::red);
+      this->SetCurvePen( curveId, pen );
+    }
+
+
     this->SetCurveData( curveId, xAxis, profile );
 
     ++profit;

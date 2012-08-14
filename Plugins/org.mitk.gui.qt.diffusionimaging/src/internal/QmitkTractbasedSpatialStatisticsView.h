@@ -142,6 +142,8 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void CopyToClipboardIndividuals();
 
+    void Replot(int index);
+
 
   protected:
 
@@ -151,7 +153,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
 
-    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img);
+    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, int index=-1);
 
     void InitPointsets();
 
@@ -248,7 +250,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     VectorImageType::Pointer ConvertToVectorImage(mitk::Image::Pointer mitkImg);
 
 
-
+    bool m_CanReplot;
 
 };
 

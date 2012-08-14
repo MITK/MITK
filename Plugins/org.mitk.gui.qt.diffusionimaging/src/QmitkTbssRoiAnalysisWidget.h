@@ -70,7 +70,7 @@ public:
   void DrawProfiles(std::string preprocessed);
 
 
-  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img);
+  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, int index=-1);
 
 
   void Boxplots();

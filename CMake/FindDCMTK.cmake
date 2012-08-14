@@ -48,21 +48,22 @@ endif()
 
 # Find all libraries, store debug and release separately
 foreach(lib
-    dcmdata
+    dcmpstat
+    dcmsr
+    dcmsign
+    dcmtls
+    dcmqrdb
+    dcmnet
+    dcmjpeg
     dcmimage
     dcmimgle
-    dcmjpeg
-    dcmnet
-    dcmpstat
-    dcmqrdb
-    dcmsign
-    dcmsr
-    dcmtls
+    dcmdata
+    oflog
+    ofstd
     ijg12
     ijg16
     ijg8
-    oflog
-    ofstd)
+    )
 
   # Find Release libraries
   find_library(DCMTK_${lib}_LIBRARY_RELEASE
@@ -92,28 +93,8 @@ foreach(lib
     
   mark_as_advanced(DCMTK_${lib}_LIBRARY_RELEASE)
   mark_as_advanced(DCMTK_${lib}_LIBRARY_DEBUG)
-
-endforeach()
-
-# Add libraries to variable according to build type
-# this is done as a separate loop for transparencies sake
-foreach(lib
-    dcmdata
-    dcmimage
-    dcmimgle
-    dcmjpeg
-    dcmnet
-    dcmpstat
-    dcmqrdb
-    dcmsign
-    dcmsr
-    dcmtls
-    ijg12
-    ijg16
-    ijg8
-    oflog
-    ofstd)
-
+  
+  # Add libraries to variable according to build type
   if(DCMTK_${lib}_LIBRARY_RELEASE)
     list(APPEND DCMTK_LIBRARIES optimized ${DCMTK_${lib}_LIBRARY_RELEASE})
   endif()
@@ -121,7 +102,7 @@ foreach(lib
   if(DCMTK_${lib}_LIBRARY_DEBUG)
     list(APPEND DCMTK_LIBRARIES debug ${DCMTK_${lib}_LIBRARY_DEBUG})
   endif()
-  
+
 endforeach()
 
 set(DCMTK_config_TEST_HEADER osconfig.h)

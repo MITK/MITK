@@ -74,12 +74,14 @@ void mitk::ContourModelReader::GenerateData()
 
             currentTimeStep = atoi(currentTimeSeries->Attribute("n"));
 
-            if( "1" == currentTimeSeries->Attribute("isClosed") )
+            this->ReadPoints(newContourModel, currentTimeSeries, currentTimeStep);
+            
+            int isClosed;
+            currentTimeSeries->QueryIntAttribute("isClosed", &isClosed);
+            if( isClosed )
             {
               newContourModel->Close(currentTimeStep);
             }
-
-            this->ReadPoints(newContourModel, currentTimeSeries, currentTimeStep);
           }
           /*++++ END handle n timesteps within timestep tags ++++*/
 
@@ -132,9 +134,9 @@ void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContour
         y = atof(currentPoint->FirstChildElement("y")->GetText());
         z = atof(currentPoint->FirstChildElement("z")->GetText());
 
-        int b;
-        currentPoint->QueryIntAttribute("isActive", &b);
-        bool isActivePoint = bool(b);
+        int isActivePoint;
+        currentPoint->QueryIntAttribute("isActive", &isActivePoint);
+
         mitk::Point3D point;
         mitk::FillVector3D(point, x, y, z);
         newContourModel->AddVertex(point, isActivePoint,currentTimeStep);

@@ -18,12 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SELECTIONVIEW_H_
 #define SELECTIONVIEW_H_
 
-//#include <QmitkAbstractView.h>
+/// Berry
 #include <berryQtViewPart.h>
+#include <berryQtSelectionProvider.h>
 
 #include "ui_SelectionViewControls.h"
-
-#include <berryQtSelectionProvider.h>
 
 
 class SelectionView : public berry::QtViewPart
@@ -46,8 +45,8 @@ public:
 private:
 
   
-  private slots:
-     void TestMethod(); //Debugging only!
+  //private slots:
+  //   void TestMethod(); //Debugging only!
 
 protected:
 

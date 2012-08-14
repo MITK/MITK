@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MinimalApplication.h"
 
+/// Berry
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 

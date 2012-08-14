@@ -16,7 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ListenerView.h"
 
+/// Berry
+#include <berryISelectionService.h>
+#include <berryIWorkbenchWindow.h>
+
+/// Qt
 #include <QMessageBox>
+#include <QString>
 
 const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview"; 
 
@@ -40,12 +46,14 @@ void ListenerView::CreateQtPartControl(QWidget *parent)
   
   // register selection listener
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
-
+  
   m_Parent->setEnabled(true);
 }
 
+//void ListenerView::ToggleRadioMethod(berry::IStructuredSelection::ConstPointer m_CurrentSelection)
 void ListenerView::ToggleRadioMethod()
 {
+  
   bool buttonState = m_Controls.radioButton->isChecked();
   if (buttonState) m_Controls.radioButton_2->toggle();
   else m_Controls.radioButton->toggle();
@@ -58,10 +66,16 @@ void ListenerView::SetFocus ()
 void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
                                berry::ISelection::ConstPointer selection)
 {
+  if (selection.IsNull())
+  {
+    return;
+  }
+
   if (sourcepart != this && 
       selection.Cast<const berry::IStructuredSelection>())
   {
     ToggleRadioMethod();
-    //DoSomething(selection.Cast<const berry::IStructuredSelection>());
+    m_CurrentSelection = selection.Cast<const berry::IStructuredSelection>();
+    //ToggleRadioMethod(selection.Cast<const berry::IStructuredSelection>());
   }
 }

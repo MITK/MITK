@@ -17,8 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MULTIPLEPERSPECTIVES_H_
 #define MULTIPLEPERSPECTIVES_H_
 
+/// Berry
 #include <berryIApplication.h>
 
+/// Qt
 #include <QObject>
 #include <QScopedPointer>
 

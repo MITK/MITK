@@ -18,8 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MINIMALPERSPECTIVE_H_
 #define MINIMALPERSPECTIVE_H_
 
+/// Berry
 #include <berryIPerspectiveFactory.h>
 
+/// Qt
 #include <QObject>
 
 

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SelectionView.h"
 
+/// Qt
 #include <QMessageBox>
 
 
@@ -35,7 +36,7 @@ void SelectionView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
   m_Controls.setupUi(parent);
 
-  m_SelectionProvider = new berry::QtSelectionProvider();
+  m_SelectionProvider = new QmitkDataNodeSelectionProvider();
   m_SelectionProvider->SetItemSelectionModel(m_Controls.m_SelectionList->selectionModel());
   GetSite()->SetSelectionProvider(m_SelectionProvider);
 

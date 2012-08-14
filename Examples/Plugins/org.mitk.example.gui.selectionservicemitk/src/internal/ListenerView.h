@@ -18,16 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef LISTENERVIEW_H_
 #define LISTENERVIEW_H_
 
-#include <berryQtViewPart.h>
+/// Qmitk
+#include <QmitkAbstractView.h>
 
-#include "ui_ListenerViewControls.h"
-
+/// Berry
 #include <berryISelectionListener.h>
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryIStructuredSelection.h>
 
-class ListenerView : public berry::QtViewPart
+#include "ui_ListenerViewControls.h"
+
+class ListenerView : public QmitkAbstractView
 {
 
   Q_OBJECT

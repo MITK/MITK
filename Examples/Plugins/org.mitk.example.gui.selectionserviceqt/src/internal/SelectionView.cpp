@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SelectionView.h"
 
+/// Qt
 #include <QMessageBox>
 
 
@@ -45,7 +46,7 @@ void SelectionView::CreateQtPartControl(QWidget *parent)
   // pre-select the first item of the list
   m_Controls.m_SelectionList->setCurrentRow(0);
   
-  connect(m_Controls.m_SelectionList, SIGNAL(itemSelectionChanged()), this, SLOT(TestMethod()));  //Debugging only!
+  //connect(m_Controls.m_SelectionList, SIGNAL(itemSelectionChanged()), this, SLOT(TestMethod()));  //Debugging only!
 
   m_Parent->setEnabled(true);
 
@@ -55,7 +56,7 @@ void SelectionView::SetFocus ()
 {
 }
 
-void SelectionView::TestMethod()  //Debugging only!
-{
-  //QMessageBox::critical(0, "Error", " List selection changed! ");
-}
+//void SelectionView::TestMethod()  //Debugging only!
+//{
+//  QMessageBox::critical(0, "Error", " List selection changed! ");
+//}

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef EMPTYVIEW2_H_
 #define EMPTYVIEW2_H_
 
-//#include <QmitkAbstractView.h>
+/// Berry
 #include <berryQtViewPart.h>
 
 #include "ui_EmptyView2Controls.h"

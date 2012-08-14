@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ListenerView.h"
 
+/// Qt
 #include <QMessageBox>
 
 const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview"; 

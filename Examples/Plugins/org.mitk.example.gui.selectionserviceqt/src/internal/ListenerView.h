@@ -18,14 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef LISTENERVIEW_H_
 #define LISTENERVIEW_H_
 
+/// Berry
 #include <berryQtViewPart.h>
+#include <berryIStructuredSelection.h>
+#include <berryISelectionListener.h>
+
 
 #include "ui_ListenerViewControls.h"
 
-#include <berryISelectionListener.h>
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryIStructuredSelection.h>
 
 class ListenerView : public berry::QtViewPart
 {
@@ -50,9 +50,12 @@ private:
     friend struct berry::SelectionChangedAdapter<ListenerView>;
 
   private slots:
-     void ToggleRadioMethod(); //Debugging only!
+    void ToggleRadioMethod(); 
+    //void ToggleRadioMethod(berry::IStructuredSelection::ConstPointer m_CurrentSelection); //Debugging only!
 
 protected:
+
+  berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
   void SetFocus();
 

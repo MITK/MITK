@@ -70,8 +70,8 @@ public:
     void SetGradientLists(GradientListContainerType cont){ m_GradientLists=cont; }
     void SetBValues(std::vector< double > cont){ m_BValues=cont; }
 
-    itkGetMacro( OutputGradients, GradientListType::Pointer )
-    itkGetMacro( BValue, double )
+    GradientListType::Pointer GetOutputGradients(){ return m_OutputGradients; }
+    double GetBValue(){ return m_BValue; }
 
 protected:
 

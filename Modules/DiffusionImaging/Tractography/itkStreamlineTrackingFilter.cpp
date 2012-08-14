@@ -352,7 +352,7 @@ template< class TTensorPixelType, class TPDPixelType>
 bool StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 ::IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType &index, vnl_vector_fixed< float, 8 >& interpWeights)
 {
-    if (m_MaskImage->GetPixel(index)==0 || !m_InputImage->GetLargestPossibleRegion().IsInside(index))
+    if (!m_InputImage->GetLargestPossibleRegion().IsInside(index) || m_MaskImage->GetPixel(index)==0)
         return false;
 
     if (m_Interpolate)

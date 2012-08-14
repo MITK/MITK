@@ -85,6 +85,7 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
       ids.push_back(index);
 
       vtkSmartPointer<vtkPolyData> singlefib = FBX->GeneratePolyDataByIds(ids);
+      FBX->SetColorCoding(FBX->COLORCODING_ORIENTATION_BASED);
 
       localStorage->m_FiberMapper->SetInput(singlefib);
     }
@@ -124,8 +125,16 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
             double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
             localStorage->m_FiberActor->GetProperty()->SetColor(trgb);
         }
+    }
 
 
+    if(hasSelected)
+    {
+        double trgb[3];
+        trgb[0] = 1.0;
+        trgb[1] = 0.0;
+        trgb[2] = 0.0;
+        localStorage->m_FiberActor->GetProperty()->SetColor(trgb);
     }
 
 

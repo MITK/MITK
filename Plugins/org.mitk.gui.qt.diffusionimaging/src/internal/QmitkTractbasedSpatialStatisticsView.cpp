@@ -161,11 +161,12 @@ struct TbssSelListener : ISelectionListener
               }
             }
 
-          else if (QString("FiberBundleX").compare(nodeData->GetNameOfClass())==0)
-          {
-            foundFiberBundle = true;
-            fib = static_cast<mitk::FiberBundleX*>(nodeData);
-          }
+            else if (QString("FiberBundleX").compare(nodeData->GetNameOfClass())==0)
+            {
+              foundFiberBundle = true;
+              fib = static_cast<mitk::FiberBundleX*>(nodeData);
+              m_View->m_CurrentFiberNode = node;
+            }
           } // end CHECK nodeData != NULL
 
         }
@@ -187,7 +188,7 @@ struct TbssSelListener : ISelectionListener
 
       if(found3dImage == true && foundFiberBundle)
       {
-        m_View->PlotFiberBundle(fib, img);
+        m_View->PlotFiberBundle(fib, img);        
       }
 
     }
@@ -640,43 +641,36 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
 
   else if(m_Fib != NULL && m_CurrentGeometry != NULL && m_Controls->m_RoiPlotWidget->IsPlottingFiber() )
   {
-    int num = m_Fib->GetNumFibers();
-    if(num == 0)
+
+    int fibIndex;
+    bool fibSelected = m_CurrentFiberNode->GetIntProperty("SelectedFiber", fibIndex);
+
+
+    // Select fiber by fibIndex
+    if(fibSelected)
     {
-      return;
-    }
+      std::vector<long> ids;
+      ids.push_back(fibIndex);
 
+      vtkSmartPointer<vtkPolyData> singlefib = m_Fib->GeneratePolyDataByIds(ids);
 
-    typedef itk::Point<float,3>               PointType;
-    typedef std::vector< PointType>           TractType;
-
-
-
-    vtkSmartPointer<vtkPolyData> fiberPolyData = m_Fib->GetFiberPolyData();
-
-    vtkCellArray* lines = fiberPolyData->GetLines();
-    lines->InitTraversal();
-
-
-    // assume one fiber for now
-  //  for( int fiberID( 0 ); fiberID < num; fiberID++ )
-    //{
+      vtkCellArray* lines = singlefib->GetLines();
+      lines->InitTraversal();
 
       vtkIdType   numPointsInCell(0);
       vtkIdType*  pointsInCell(NULL);
       lines->GetNextCell ( numPointsInCell, pointsInCell );
 
-
       index = std::min( (int)numPointsInCell-1, std::max(0, index) );
 
-      double *p = fiberPolyData->GetPoint( pointsInCell[ index ] );
+      double *p = singlefib->GetPoint( pointsInCell[ index ] );
       PointType point;
       point[0] = p[0];
       point[1] = p[1];
       point[2] = p[2];
 
       m_MultiWidget->MoveCrossToPosition(point);
-
+    }
 
   }
 
@@ -1311,7 +1305,7 @@ void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *f
 
   m_Controls->m_FiberSelector->setCurrentIndex( std::max(0,index) );
 
-  m_Controls->m_RoiPlotWidget->PlotFiberBundles(tracts, img);
+  m_Controls->m_RoiPlotWidget->PlotFiberBundles(tracts, img, index-1);
   m_Controls->m_RoiPlotWidget->SetPlottingFiber(true);
 
 

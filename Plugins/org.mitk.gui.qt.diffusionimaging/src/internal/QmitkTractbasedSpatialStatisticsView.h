@@ -254,6 +254,8 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     bool m_CanReplot;
 
+    mitk::DataNode::Pointer m_CurrentFiberNode; // needed for the index property when interacting with the plot widget
+
 
 };
 

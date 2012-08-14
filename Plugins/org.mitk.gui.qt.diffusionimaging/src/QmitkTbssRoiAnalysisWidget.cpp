@@ -39,6 +39,8 @@ QmitkTbssRoiAnalysisWidget::QmitkTbssRoiAnalysisWidget( QWidget * parent )
   m_PlotPicker = new QwtPlotPicker(m_Plot->canvas());
   m_PlotPicker->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::ClickSelection | QwtPicker::DragSelection);
   m_PlotPicker->setTrackerMode(QwtPicker::ActiveOnly);
+
+  m_PlottingFiberBundle = false;
 }
 
 std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfiles(std::string preprocessed)

@@ -595,6 +595,76 @@ void mitk::FiberBundleX::GenerateFiberIds()
 
 }
 
+
+std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk::PlanarFigure *pf)
+{
+    std::vector<mitk::FiberBundleX::Pointer> bundles;
+    if (pf==NULL)
+        return bundles;
+
+
+    // Obtain the geometry info of the PlanarFigure roi
+    mitk::Geometry2D::ConstPointer pfgeometry = pf->GetGeometry2D();
+    const mitk::PlaneGeometry* planeGeometry = dynamic_cast<const mitk::PlaneGeometry*> (pfgeometry.GetPointer());
+    Vector3D planeNormal = planeGeometry->GetNormal();
+    planeNormal.Normalize();
+    Point3D planeOrigin = planeGeometry->GetOrigin();
+
+
+    /* Define cutting plane by ROI (PlanarFigure) */
+    vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+    plane->SetOrigin(planeOrigin[0],planeOrigin[1],planeOrigin[2]);
+    plane->SetNormal(planeNormal[0],planeNormal[1],planeNormal[2]);
+
+
+
+    MITK_DEBUG << "start clipping";
+    vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
+    clipper->SetInput(m_FiberIdDataSet);
+    clipper->SetClipFunction(plane);
+    clipper->GenerateClipScalarsOn();
+    clipper->GenerateClippedOutputOn();
+
+    vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
+    vtkSmartPointer<vtkPolyData> out = clipper->GetOutput();
+
+    mitk::FiberBundleX::Pointer clippedBundle = mitk::FiberBundleX::New(clipperout);
+    mitk::FiberBundleX::Pointer outputBundle = mitk::FiberBundleX::New(out);
+
+
+
+
+
+    mitk::PlanarFigureComposite::Pointer PFCNot = mitk::PlanarFigureComposite::New();
+
+    mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(pf->GetGeometry2D()) );
+    PFCNot->SetGeometry2D(currentGeometry2D);
+    PFCNot->setOperationType(mitk::PFCOMPOSITION_NOT_OPERATION);
+    PFCNot->addPlanarFigure( pf );
+
+
+    mitk::FiberBundleX::Pointer notRoi = this->ExtractFiberSubset(PFCNot);
+
+    mitk::FiberBundleX::Pointer finalResult = notRoi->AddBundle(clippedBundle);
+
+
+
+
+    bundles.push_back(outputBundle);
+    bundles.push_back(clippedBundle);
+    bundles.push_back(notRoi);
+    bundles.push_back(finalResult);
+
+
+    return bundles;
+
+
+
+
+
+}
+
+
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarFigure* pf)
 {
     if (pf==NULL)

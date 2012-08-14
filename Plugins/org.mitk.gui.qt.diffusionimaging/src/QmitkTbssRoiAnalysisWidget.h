@@ -117,6 +117,17 @@ public:
   }
 
 
+  void SetPlottingFiber(bool b)
+  {
+    m_PlottingFiberBundle = b;
+  }
+
+  bool IsPlottingFiber()
+  {
+    return m_PlottingFiberBundle;
+  }
+
+
 protected:
 
   std::vector< std::vector<double> > m_Vals;
@@ -155,6 +166,7 @@ protected:
   std::string m_Structure;
   std::string m_Measure;
 
+  bool m_PlottingFiberBundle; // true when the plot results from a fiber tracking result (vtk .fib file)
 
 
 };

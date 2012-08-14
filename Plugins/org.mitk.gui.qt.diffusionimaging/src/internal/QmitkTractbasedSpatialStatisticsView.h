@@ -232,8 +232,9 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     std::string ReadFile(std::string whatfile);
 
-
     std::vector< itk::Index<3> > m_Roi;
+
+    mitk::FiberBundleX* m_Fib;
 
     std::string m_CurrentStructure;
 
@@ -250,7 +251,9 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     VectorImageType::Pointer ConvertToVectorImage(mitk::Image::Pointer mitkImg);
 
 
+
     bool m_CanReplot;
+
 
 };
 

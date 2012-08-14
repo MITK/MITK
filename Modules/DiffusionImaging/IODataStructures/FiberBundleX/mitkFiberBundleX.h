@@ -84,6 +84,11 @@ namespace mitk {
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected
     void                            GenerateFiberIds(); // TODO: make protected
 
+
+    // cutting fibers
+    std::vector<FiberBundleX::Pointer>           CutFiberBundle(PlanarFigure *pf);
+
+
     // get/set data
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData();

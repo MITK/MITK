@@ -16,6 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCmdLineModuleGui.h"
 #include "QmitkUiLoader.h"
 #include <QVariant>
+#include <QIODevice>
+#include <QFile>
+#include <QScopedPointer>
+
 #include <ctkCmdLineModuleXslTransform.h>
 
 //-----------------------------------------------------------------------------
@@ -50,6 +54,11 @@ ctkCmdLineModuleXslTransform* QmitkCmdLineModuleGui::xslTransform() const
   if (Transform != NULL)
   {
     Transform->bindVariable("imageWidget", QVariant(QString("QmitkDataStorageComboBox")));
+    QIODevice* transformQmitkDataStorageComboBox(new QFile(":/CommandLineModulesResources/QmitkDataStorageComboBox.xsl"));
+    if (transformQmitkDataStorageComboBox)
+    {
+      Transform->setXslExtraTransformation(transformQmitkDataStorageComboBox);
+    }
   }
   return Transform;
 }

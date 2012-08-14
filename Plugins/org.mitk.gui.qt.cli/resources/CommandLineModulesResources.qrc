@@ -3,5 +3,6 @@
         <file>run.png</file>
         <file>stop.png</file>
         <file>undo.png</file>
+        <file>QmitkDataStorageComboBox.xsl</file>
     </qresource>
 </RCC>

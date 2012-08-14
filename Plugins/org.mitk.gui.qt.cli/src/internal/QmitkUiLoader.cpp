@@ -45,17 +45,18 @@ QStringList QmitkUiLoader::availableWidgets () const
 //-----------------------------------------------------------------------------
 QWidget* QmitkUiLoader::createWidget(const QString& className, QWidget* parent, const QString& name)
 {
-  QWidget* widget = QUiLoader::createWidget(className, parent, name);
-  if (widget == NULL)
+  QWidget* widget = NULL;
+  if (className == "QmitkDataStorageComboBox")
   {
-    if (className == "QmitkDataStorageComboBox")
-    {
-      QmitkDataStorageComboBox* comboBox = new QmitkDataStorageComboBox(parent);
-      comboBox->setObjectName(name);
-      comboBox->SetDataStorage(const_cast<mitk::DataStorage*>(m_DataStorage));
-      comboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
-      widget = comboBox;
-    }
+    QmitkDataStorageComboBox* comboBox = new QmitkDataStorageComboBox(parent);
+    comboBox->setObjectName(name);
+    comboBox->SetDataStorage(const_cast<mitk::DataStorage*>(m_DataStorage));
+    comboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+    widget = comboBox;
+  }
+  else
+  {
+    widget = QUiLoader::createWidget(className, parent, name);
   }
   return widget;
 }

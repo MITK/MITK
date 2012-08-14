@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkCastImageFilter.h"
 #include "itkVectorContainer.h"
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
+#include <itkMergeDiffusionImagesFilter.h>
 
 // mitk includes
 #include "QmitkDataStorageComboBox.h"
@@ -114,6 +115,8 @@ void QmitkPreprocessingView::CreateConnections()
         connect( (QObject*)(m_Controls->m_ReduceGradientsButton), SIGNAL(clicked()), this, SLOT(DoReduceGradientDirections()) );
         connect( (QObject*)(m_Controls->m_ShowGradientsButton), SIGNAL(clicked()), this, SLOT(DoShowGradientDirections()) );
         connect( (QObject*)(m_Controls->m_MirrorGradientToHalfSphereButton), SIGNAL(clicked()), this, SLOT(DoHalfSphereGradientDirections()) );
+        connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
+
     }
 }
 
@@ -146,6 +149,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_ReduceGradientsButton->setEnabled(foundDwiVolume);
     m_Controls->m_ShowGradientsButton->setEnabled(foundDwiVolume);
     m_Controls->m_MirrorGradientToHalfSphereButton->setEnabled(foundDwiVolume);
+    m_Controls->m_MergeDwisButton->setEnabled(foundDwiVolume);
 
 
     foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
@@ -412,6 +416,65 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
     {
         name += "_";
         name += QString::number(box->value());
+    }
+
+    imageNode->SetName(name.toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode);
+}
+
+void QmitkPreprocessingView::MergeDwis()
+{
+    typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
+    typedef DiffusionImageType::GradientDirectionContainerType    GradientContainerType;
+
+    if (m_SelectedDiffusionNodes.size()<2)
+        return;
+
+    typedef itk::VectorImage<DiffusionPixelType,3>                  DwiImageType;
+    typedef typename DwiImageType::PixelType                        DwiPixelType;
+    typedef typename DwiImageType::RegionType                       DwiRegionType;
+    typedef typename std::vector< typename DwiImageType::Pointer >  DwiImageContainerType;
+
+    typedef typename std::vector< GradientContainerType::Pointer >  GradientListContainerType;
+
+    DwiImageContainerType       imageContainer;
+    GradientListContainerType   gradientListContainer;
+    std::vector< double >       bValueContainer;
+
+    for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+    {
+        DiffusionImageType::Pointer dwi = dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >( m_SelectedDiffusionNodes.at(i)->GetData() );
+        if ( dwi.IsNotNull() )
+        {
+            imageContainer.push_back(dwi->GetVectorImage());
+            gradientListContainer.push_back(dwi->GetDirectionsWithMeasurementFrame());
+            bValueContainer.push_back(dwi->GetB_Value());
+        }
+    }
+
+    typedef itk::MergeDiffusionImagesFilter<short> FilterType;
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetImageVolumes(imageContainer);
+    filter->SetGradientLists(gradientListContainer);
+    filter->SetBValues(bValueContainer);
+    filter->Update();
+
+    vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
+    DiffusionImageType::Pointer image = DiffusionImageType::New();
+    image->SetVectorImage( filter->GetOutput() );
+    image->SetB_Value(filter->GetBValue());
+    image->SetDirections(filter->GetOutputGradients());
+    image->SetMeasurementFrame(mf);
+    image->InitializeFromVectorImage();
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+
+    for (int i=0; i<bValueContainer.size(); i++)
+    {
+        name += "_";
+        name += QString::number(bValueContainer.at(i));
     }
 
     imageNode->SetName(name.toStdString().c_str());

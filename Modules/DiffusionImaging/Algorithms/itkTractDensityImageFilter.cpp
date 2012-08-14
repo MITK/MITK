@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // misc
 #include <math.h>
+#include <boost/progress.hpp>
 
 namespace itk{
 
@@ -129,8 +130,10 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
     vLines->InitTraversal();
     int numFibers = m_FiberBundle->GetNumFibers();
+    boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
+        ++disp;
         vtkIdType   numPoints(0);
         vtkIdType*  points(NULL);
         vLines->GetNextCell ( numPoints, points );

@@ -431,11 +431,11 @@ void QmitkPreprocessingView::MergeDwis()
         return;
 
     typedef itk::VectorImage<DiffusionPixelType,3>                  DwiImageType;
-    typedef typename DwiImageType::PixelType                        DwiPixelType;
-    typedef typename DwiImageType::RegionType                       DwiRegionType;
-    typedef typename std::vector< typename DwiImageType::Pointer >  DwiImageContainerType;
+    typedef DwiImageType::PixelType                        DwiPixelType;
+    typedef DwiImageType::RegionType                       DwiRegionType;
+    typedef std::vector< DwiImageType::Pointer >  DwiImageContainerType;
 
-    typedef typename std::vector< GradientContainerType::Pointer >  GradientListContainerType;
+    typedef std::vector< GradientContainerType::Pointer >  GradientListContainerType;
 
     DwiImageContainerType       imageContainer;
     GradientListContainerType   gradientListContainer;

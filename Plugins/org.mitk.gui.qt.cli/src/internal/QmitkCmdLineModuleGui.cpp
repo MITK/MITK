@@ -53,7 +53,7 @@ ctkCmdLineModuleXslTransform* QmitkCmdLineModuleGui::xslTransform() const
   ctkCmdLineModuleQtGui::xslTransform();
   if (Transform != NULL)
   {
-    Transform->bindVariable("imageWidget", QVariant(QString("QmitkDataStorageComboBox")));
+    Transform->bindVariable("imageInputWidget", QVariant(QString("QmitkDataStorageComboBox")));
     QIODevice* transformQmitkDataStorageComboBox(new QFile(":/CommandLineModulesResources/QmitkDataStorageComboBox.xsl"));
     if (transformQmitkDataStorageComboBox)
     {

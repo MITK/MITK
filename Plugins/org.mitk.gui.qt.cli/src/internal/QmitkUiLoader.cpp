@@ -52,6 +52,8 @@ QWidget* QmitkUiLoader::createWidget(const QString& className, QWidget* parent, 
     comboBox->setObjectName(name);
     comboBox->SetDataStorage(const_cast<mitk::DataStorage*>(m_DataStorage));
     comboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+    comboBox->SetAutoSelectNewItems(false);
+    comboBox->addItem("please select");
     widget = comboBox;
   }
   else

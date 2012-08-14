@@ -214,6 +214,7 @@ set(H_FILES
   Algorithms/itkExtractChannelFromRgbaImageFilter.h
   Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
   Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
+  Algorithms/itkMergeDiffusionImagesFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h

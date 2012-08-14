@@ -105,6 +105,13 @@ void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     return;
   
   mitk::DataNode::Pointer nodePointer = node;
+
+  std::string classname("ContourModel");
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      mitk::ContourModelMapper2D::SetDefaultProperties(node);
+      mitk::ContourModelMapper3D::SetDefaultProperties(node);
+    }
   
 //  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 //  if(image.IsNotNull() && image->IsInitialized())

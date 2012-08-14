@@ -322,19 +322,28 @@ void mitk::ContourModelMapper2D::ApplyContourProperties(mitk::BaseRenderer* rend
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  float binaryOutlineWidth(1.0);
-  if (this->GetDataNode()->GetFloatProperty( "contour width", binaryOutlineWidth, renderer ))
+  float lineWidth(1.0);
+  if (this->GetDataNode()->GetFloatProperty( "width", lineWidth, renderer ))
   {
-    localStorage->m_Actor->GetProperty()->SetLineWidth(binaryOutlineWidth);
+    localStorage->m_Actor->GetProperty()->SetLineWidth(lineWidth);
   }
+
+  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+        ("color", renderer));
+  if(colorprop)
+  {
+    //set the color of the contour
+    double red = colorprop->GetColor().GetRed();
+    double green = colorprop->GetColor().GetGreen();
+    double blue = colorprop->GetColor().GetBlue();
+    localStorage->m_Actor->GetProperty()->SetColor(red, green, blue);
+  }
+
 
   //make sure that directional lighting isn't used for our contour
   localStorage->m_Actor->GetProperty()->SetAmbient(1.0);
   localStorage->m_Actor->GetProperty()->SetDiffuse(0.0);
   localStorage->m_Actor->GetProperty()->SetSpecular(0.0);
-
-  //set the color of the contour
-  localStorage->m_Actor->GetProperty()->SetColor(0.9, 1.0, 0.1);
 }
 
 
@@ -359,8 +368,8 @@ mitk::ContourModelMapper2D::LocalStorage::LocalStorage()
 
 void mitk::ContourModelMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
-  node->AddProperty( "contour width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
+  node->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
+  node->AddProperty( "width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

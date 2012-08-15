@@ -72,7 +72,6 @@ namespace mitk
     \brief sets the input of this filter at idx
     \param idx number of the current input
     \param distanceImage input is the distance image of e.g. a ToF camera
-    \param CameraModel This is the camera model which holds parameters like focal length, pixel size, etc. which are needed for the reconstruction of the surface.
     */
     virtual void SetInput(unsigned int idx,  Image* distanceImage);
 

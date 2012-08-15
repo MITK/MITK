@@ -337,12 +337,13 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(actionShowInfoDialog);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,actionShowInfoDialog));
 
-  QAction* otsuFilterAction = new QAction("Apply Otsu Filter", this);
-  QObject::connect( otsuFilterAction, SIGNAL( triggered(bool) )
-    , this, SLOT( OtsuFilter(bool) ) );
-   //Otsu filter does not work properly, remove it temporarily
-   imageDataNodeDescriptor->AddAction(otsuFilterAction);
-   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,otsuFilterAction));
+  //obsolete...
+  //QAction* otsuFilterAction = new QAction("Apply Otsu Filter", this);
+  //QObject::connect( otsuFilterAction, SIGNAL( triggered(bool) )
+  //  , this, SLOT( OtsuFilter(bool) ) );
+  // //Otsu filter does not work properly, remove it temporarily
+  // imageDataNodeDescriptor->AddAction(otsuFilterAction);
+  // m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,otsuFilterAction));
 
   QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
   _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);

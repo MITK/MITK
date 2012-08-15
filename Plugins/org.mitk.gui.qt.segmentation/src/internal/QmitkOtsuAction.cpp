@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
+#include <mitkLevelWindowProperty.h>
 
 // ITK
 #include <itkMultiplyImageFilter.h>
@@ -30,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QList>
+#include <QLabel>
+#include <QMessageBox>
 
 using namespace berry;
 using namespace mitk;
@@ -63,6 +66,11 @@ void QmitkOtsuAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 
   connect(m_OtsuPushButton, SIGNAL(clicked()), this, SLOT(OtsuSegmentationDone()));
 
+  QLabel* numberOfThresholdsLabel = new QLabel("Select number of Regions of Interest:");
+  //numberOfThresholdsLabel->setAlignment(Qt::AlignmentFlag::AlignHCenter);
+  //numberOfThresholdsLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter);
+  numberOfThresholdsLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter | Qt::AlignmentFlag::AlignHCenter);
+  layout->addWidget(numberOfThresholdsLabel);
   layout->addWidget(m_OtsuSpinBox);
   layout->addWidget(m_OtsuPushButton);
 
@@ -102,6 +110,14 @@ void QmitkOtsuAction::SetFunctionality(QtViewPart* /*functionality*/)
 void QmitkOtsuAction::PerformOtsuSegmentation()
 {
   int numberOfThresholds = this->m_OtsuSpinBox->value() - 1;
+  int proceed;
+
+  QMessageBox* messageBox = new QMessageBox(QMessageBox::Icon::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
+  if (numberOfThresholds >= 5) 
+  {
+    proceed = messageBox->exec();
+    if (proceed != QMessageBox::StandardButton::Ok) return;
+  }
 
   mitk::Image::Pointer mitkImage = 0;
   
@@ -119,13 +135,13 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
 
     //typedef itk::OtsuThresholdImageFilter< InputImageType, OutputImageType > FilterType;
     typedef itk::OtsuMultipleThresholdsImageFilter< InputImageType, OutputImageType > FilterType;
-    typedef itk::MultiplyImageFilter< OutputImageType, OutputImageType, OutputImageType> MultiplyFilterType;
+    //typedef itk::MultiplyImageFilter< OutputImageType, OutputImageType, OutputImageType> MultiplyFilterType;
     //typedef itk::RandomImageSource< OutputImageType> RandomImageSourceType;
-    typedef itk::ImageRegionIterator< OutputImageType > ImageIteratorType;
+    //typedef itk::ImageRegionIterator< OutputImageType > ImageIteratorType;
 
 
     FilterType::Pointer filter = FilterType::New();
-    MultiplyFilterType::Pointer multiplyImageFilter = MultiplyFilterType::New();
+    //MultiplyFilterType::Pointer multiplyImageFilter = MultiplyFilterType::New();
     //RandomImageSourceType::Pointer randomImageSource = RandomImageSourceType::New();
 
     filter->SetNumberOfThresholds(numberOfThresholds);
@@ -138,34 +154,42 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     mitk::CastToItkImage(mitkImage, itkImage);
 
     filter->SetInput( itkImage );
-    filter->UpdateOutputInformation();
+//    filter->UpdateOutputInformation();
 
-    multiplyImageFilter->SetInput1(filter->GetOutput());
-    OutputImageType::Pointer constantImage = OutputImageType::New();
-    constantImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
-    constantImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-    constantImage->Allocate();
-    ImageIteratorType it(constantImage, constantImage->GetLargestPossibleRegion());
-    while (!it.IsAtEnd())
-    {
-      it.Set(80);
-      ++it;
-    }
+    //multiplyImageFilter->SetInput1(filter->GetOutput());
+    //OutputImageType::Pointer constantImage = OutputImageType::New();
+    //constantImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
+    //constantImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+    //constantImage->Allocate();
+    //ImageIteratorType it(constantImage, constantImage->GetLargestPossibleRegion());
+    //while (!it.IsAtEnd())
+    //{
+    //  it.Set(1);
+    //  ++it;
+    //}
 
-    //randomImageSource->SetSize(filter->GetOutput()->GetLargestPossibleRegion().GetSize());
-    //multiplyImageFilter->SetInput2(randomImageSource->GetOutput());
-    multiplyImageFilter->SetInput2(constantImage);
+    ////randomImageSource->SetSize(filter->GetOutput()->GetLargestPossibleRegion().GetSize());
+    ////multiplyImageFilter->SetInput2(randomImageSource->GetOutput());
+    //multiplyImageFilter->SetInput2(constantImage);
 
-    //filter->Update();
-    multiplyImageFilter->Update();
+    filter->Update();
+    //multiplyImageFilter->Update();
 
     mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
     std::string nameOfResultImage = this->m_DataNode->GetName();
     nameOfResultImage.append("Otsu");
     resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-    resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
+    resultNode->SetProperty("binary", mitk::BoolProperty::New(false) );
+    resultNode->SetProperty("use color", mitk::BoolProperty::New(false) );
+
+    mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+    mitk::LevelWindow levelwindow;
+    levelwindow.SetRangeMinMax(0, numberOfThresholds);
+    levWinProp->SetLevelWindow( levelwindow );
+    resultNode->SetProperty( "levelwindow", levWinProp );
+
     //resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
-    resultNode->SetData( mitk::ImportItkImage ( multiplyImageFilter->GetOutput() ) );
+    resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
 
 
     this->m_DataStorage->Add(resultNode, this->m_DataNode);

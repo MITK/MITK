@@ -166,11 +166,15 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(DCMTK DEFAULT_MSG
   DCMTK_config_INCLUDE_DIR
   DCMTK_ofstd_INCLUDE_DIR
-  DCMTK_ofstd_LIBRARY
+  DCMTK_ofstd_LIBRARY_RELEASE
+  DCMTK_ofstd_LIBRARY_DEBUG
   DCMTK_dcmdata_INCLUDE_DIR
-  DCMTK_dcmdata_LIBRARY
+  DCMTK_dcmdata_LIBRARY_RELEASE
+  DCMTK_dcmdata_LIBRARY_DEBUG
   DCMTK_dcmimgle_INCLUDE_DIR
-  DCMTK_dcmimgle_LIBRARY)
+  DCMTK_dcmimgle_LIBRARY_RELEASE
+  DCMTK_dcmimgle_LIBRARY_DEBUG
+  )
 
 # Compatibility: This variable is deprecated
 set(DCMTK_INCLUDE_DIR ${DCMTK_INCLUDE_DIRS})

@@ -200,12 +200,8 @@ void QmitkPointListWidget::SetPointSet(mitk::PointSet* newPs)
 
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 {
-
   ObserveNewNode(newNode);
-  if (newNode != NULL)
-    dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(newNode);
-  else
-    dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(NULL);
+  dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(newNode);
 }
 
 void QmitkPointListWidget::OnBtnSavePoints()
@@ -431,7 +427,8 @@ void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
 
   m_RemovePointBtn->setEnabled( m_PointSetNode );
   m_LoadPointsBtn->setEnabled( m_PointSetNode );
-  m_LoadPointsBtn->setEnabled( m_PointSetNode );
+  m_SavePointsBtn->setEnabled(m_PointSetNode);
+  m_AddPoint->setEnabled(m_PointSetNode);
 }
 
 void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject &  /*e*/ )
@@ -443,9 +440,10 @@ void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject &  /*e*/ )
   m_PointListView->SetPointSetNode(NULL);
   m_ToggleAddPoint->setEnabled(false);
 
-  m_RemovePointBtn->setEnabled( m_PointSetNode );
-  m_LoadPointsBtn->setEnabled( m_PointSetNode );
-  m_LoadPointsBtn->setEnabled( m_PointSetNode );
+  m_RemovePointBtn->setEnabled( false );
+  m_LoadPointsBtn->setEnabled( false );
+  m_SavePointsBtn->setEnabled(false);
+  m_AddPoint->setEnabled(false);
 }
 
 

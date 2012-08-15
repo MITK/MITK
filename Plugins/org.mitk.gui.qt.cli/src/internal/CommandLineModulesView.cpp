@@ -150,16 +150,24 @@ void CommandLineModulesView::RetrievePreferenceValues()
   assert( prefs );
 
   // Get the flag for debug output, useful when parsing all the XML.
-  bool debugOutputBefore = m_DebugOutput;
   m_DebugOutput = prefs->GetBool(CommandLineModulesPreferencesPage::DEBUG_OUTPUT_NODE_NAME, false);
   m_DirectoryWatcher->setDebug(m_DebugOutput);
 
-  // Not yet in use, will be used for ... er... temporary stuff.
+  bool loadApplicationDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_APPLICATION_DIR, false);
+  bool loadHomeDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_HOME_DIR, false);
+  bool loadCurrentDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_CURRENT_DIR, false);
+  bool loadAutoLoadDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_AUTO_LOAD_DIR, false);
+
   m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, ""));
 
   // Get some default application paths.
   // Here we can use the preferences to set up the builder, before asking him for the paths to scan.
   ctkCmdLineModuleDefaultPathBuilder builder;
+  builder.setLoadFromApplicationDir(loadApplicationDir);
+  builder.setLoadFromHomeDir(loadHomeDir);
+  builder.setLoadFromCurrentDir(loadCurrentDir);
+  builder.setLoadFromCtkModuleLoadPath(loadAutoLoadDir);
+
   QStringList defaultPaths = builder.build();
 
   // We get additional paths from preferences.
@@ -173,9 +181,16 @@ void CommandLineModulesView::RetrievePreferenceValues()
 
   // OnPreferencesChanged can be called for each preference in a dialog box, so
   // when you hit "OK", it is called repeatedly, whereas we want to only call this once,
-  // so I am checking if the list of directory names has changed, and whether the debug flag has changed.
-  if (this->m_DirectoryWatcher->directories() != totalPaths || (debugOutputBefore != m_DebugOutput))
+  // so I am checking if the list of directory names has changed.
+  if (this->m_DirectoryWatcher->directories() != totalPaths)
   {
+    qDebug() << "CommandLineModulesView::RetrievePreferenceValues loading modules from:";
+    QString path;
+    foreach (path, totalPaths)
+    {
+      qDebug() << "  " << path;
+    }
+
     // This should update the directory watcher, which should sort out if any new modules have been loaded
     // and if so, should signal ModulesChanged, which is caught by this class, and re-build the GUI.
     m_DirectoryWatcher->setDirectories(totalPaths);
@@ -235,7 +250,6 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
                          + "\">the online documentation</a>.</p>";
     helpString += docUrlHtml;
   }
-
 
   QString aboutString = "";
 

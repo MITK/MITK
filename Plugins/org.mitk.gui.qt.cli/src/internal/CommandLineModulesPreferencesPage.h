@@ -59,6 +59,30 @@ public:
   static const std::string DEBUG_OUTPUT_NODE_NAME;
 
   /**
+   * \brief We store the name of the node that stores the preference of whether
+   * we load modules from the application installation dir.
+   */
+  static const std::string LOAD_FROM_APPLICATION_DIR;
+
+  /**
+   * \brief We store the name of the node that stores the preference of whether
+   * we load modules from the users home dir.
+   */
+  static const std::string LOAD_FROM_HOME_DIR;
+
+  /**
+   * \brief We store the name of the node that stores the preference of whether
+   * we load modules from the application current working dir.
+   */
+  static const std::string LOAD_FROM_CURRENT_DIR;
+
+  /**
+   * \brief We store the name of the node that stores the preference of whether
+   * we load modules from the path determined by CTK_MODULE_LOAD_PATH.
+   */
+  static const std::string LOAD_FROM_AUTO_LOAD_DIR;
+
+  /**
    * \brief Called by framework to initialise this preference page, but currently does nothing.
    * \param workbench The workbench.
    */
@@ -98,6 +122,10 @@ protected:
   QCheckBox              *m_DebugOutput;
   ctkDirectoryButton     *m_TemporaryDirectory;
   ctkDirectoryListWidget *m_ModulesDirectories;
+  QCheckBox              *m_LoadFromHomeDir;
+  QCheckBox              *m_LoadFromCurrentDir;
+  QCheckBox              *m_LoadFromApplicationDir;
+  QCheckBox              *m_LoadFromAutoLoadPathDir;
 
   berry::IPreferences::Pointer m_CLIPreferencesNode;
 };

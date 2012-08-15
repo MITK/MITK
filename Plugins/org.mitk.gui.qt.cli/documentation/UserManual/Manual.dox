@@ -43,6 +43,8 @@ When this view starts it will scan the following folders for programs that can b
 
 These all default to OFF, or un-checked as scanning many directories can take a long time.
 
+In addition, for the installation directory, home directory and current directory, the sub-directory "cli-modules" is also searched.
+
 \section CLIUsage Usage
 
 When the view is launched, a simple interface is presented:

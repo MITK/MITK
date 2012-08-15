@@ -68,6 +68,12 @@ public:
    */
   virtual void CreateQtPartControl(QWidget *parent);
 
+  /**
+   * \brief Called by the framework to indicate that the preferences have changed.
+   * \param prefs not used.
+   */
+  void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
+
 protected Q_SLOTS:
   
   /**
@@ -129,12 +135,6 @@ protected:
   virtual void SetFocus();
 
 private:
-
-  /**
-   * \brief Called by the framework to indicate that the preferences have changed.
-   * \param prefs not used.
-   */
-  virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
 
   /**
    * \brief Called on startup and by OnPreferencesChanged to load the preferences into member variables.

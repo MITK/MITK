@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 
 
+#include <mitkContourModelSubdivisionFilter.h>
+
 namespace mitk {
 
   class Segmentation_EXPORT ContourModelMapper2D : public VtkMapper2D

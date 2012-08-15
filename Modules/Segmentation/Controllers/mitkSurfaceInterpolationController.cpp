@@ -34,6 +34,7 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   m_PolyData->SetPoints(vtkPoints::New());
 
   m_InterpolationResult = 0;
+  m_CurrentNumberOfReducedContours = 0;
 }
 
 mitk::SurfaceInterpolationController::~SurfaceInterpolationController()

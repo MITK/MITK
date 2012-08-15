@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "CommandLineModulesView.h"
 #include "CommandLineModulesPreferencesPage.h"
 #include "QmitkCmdLineModuleFactoryGui.h"
+#include "QmitkDataStorageComboBox.h"
+#include "QmitkCommonFunctionality.h"
 
 // Qt
 #include <QMessageBox>
@@ -48,6 +50,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleXmlValidator.h>
 #include <ctkCmdLineModuleDefaultPathBuilder.h>
+#include <ctkCmdLineModuleObjectTreeWalker_p.h>
+#include <ctkCmdLineModuleFuture.h>
+#include <ctkCmdLineModuleReference.h>
+#include <ctkCmdLineModuleParameter.h>
+
+// MITK
+#include <mitkIOUtil.h>
 
 const std::string CommandLineModulesView::VIEW_ID = "org.mitk.gui.qt.cli";
 
@@ -58,6 +67,7 @@ CommandLineModulesView::CommandLineModulesView()
 , m_ModuleManager(NULL)
 , m_DirectoryWatcher(NULL)
 , m_MenuFactory(NULL)
+, m_Watcher(NULL)
 , m_TemporaryDirectoryName("")
 {
   m_MapTabToModuleInstance.clear();
@@ -65,6 +75,7 @@ CommandLineModulesView::CommandLineModulesView()
   m_ModuleManager = new ctkCmdLineModuleManager(m_ModuleFactory);
   m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
   m_MenuFactory = new ctkCmdLineModuleMenuFactoryQtGui();
+  m_TemporaryFileNames.clear();
 }
 
 
@@ -90,6 +101,8 @@ CommandLineModulesView::~CommandLineModulesView()
   {
     delete m_ModuleFactory;
   }
+
+  this->ClearUpTemporaryFiles();
 }
 
 
@@ -212,13 +225,6 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
 
 
 //-----------------------------------------------------------------------------
-void CommandLineModulesView::OnFutureFinished()
-{
-  qDebug() << "*** Future finished ***";
-}
-
-
-//-----------------------------------------------------------------------------
 void CommandLineModulesView::OnActionChanged(QAction* action)
 {
   ctkCmdLineModuleReference ref = this->GetReferenceByIdentifier(action->text());
@@ -252,8 +258,7 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QStri
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnRunButtonPressed()
 {
-  qDebug() << "Creating module command line...";
-
+  // Get hold of the command line module.
   ctkCmdLineModule* moduleInstance = m_MapTabToModuleInstance[m_Controls->m_TabWidget->currentIndex()];
   if (!moduleInstance)
   {
@@ -261,24 +266,186 @@ void CommandLineModulesView::OnRunButtonPressed()
     return;
   }
 
-  qDebug() << "Launching module command line...";
+  m_OutputDataToLoad.clear();
+  ctkCmdLineModuleReference reference = moduleInstance->moduleReference();
+  ctkCmdLineModuleDescription description = reference.description();
 
-  qDebug() << "Launched module command line...";
+  qDebug() << "Command Line Module ... Saving data to temporary storage...";
+
+  // The aim here is to walk the tree of QObject (widgets) and
+  // 1. If there are QmitkDataStorageComboBox containing valid images
+  //    a. write them to temporary storage
+  //    b. set the parameter to have the correct file name
+  // 2. If we have an output parameter, where the user has specified the output file name,
+  //    a. Register that output file name, so that we can auto-load it into the data storage.
+
+  ctkCmdLineModuleObjectTreeWalker walker;
+  walker.setRootObject(m_Controls->m_TabWidget->currentWidget());
+
+  while (!walker.atEnd())
+  {
+    QObject *currentObject = walker.currentObject();
+    QmitkDataStorageComboBox* comboBox = dynamic_cast<QmitkDataStorageComboBox*>(currentObject);
+
+    // Case 1. Sort out image data that needs writing out to temporary storage.
+    if (comboBox != NULL && comboBox->currentText() != "please select")
+    {
+      mitk::DataNode* node = comboBox->GetSelectedNode();
+      if (node != NULL)
+      {
+        // At the moment, we are only using the combo box for images.
+        mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+        if (image != NULL)
+        {
+          QString name = QString::fromStdString(node->GetName());
+          int pid = QCoreApplication::applicationPid();
+          int randomInt = qrand() % 1000000;
+
+          QString fileName = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "." + QString::number(randomInt) + ".nii";
+
+          qDebug() << "Command Line Module ... Saving " << fileName;
+
+          std::string tmpFN = CommonFunctionality::SaveImage(image, fileName.toStdString().c_str());
+          QString temporaryStorageFileName = QString::fromStdString(tmpFN);
+
+          m_TemporaryFileNames.push_back(temporaryStorageFileName);
+          moduleInstance->setValue(walker.name(), temporaryStorageFileName);
+
+          qDebug() << "Command Line Module ... Saved " << temporaryStorageFileName;
+
+        }
+      }
+    }
+
+    // Case 2. If the parameter corresponds to an output channel, save the file name.
+    if (walker.isParameter() && !(walker.name().isEmpty()))
+    {
+      ctkCmdLineModuleParameter parameter = description.parameter(walker.name());
+      if (parameter.channel().compare("output", Qt::CaseInsensitive) == 0)
+      {
+        QString outputFileName = moduleInstance->value(walker.name()).toString();
+        if (!outputFileName.isEmpty())
+        {
+          m_OutputDataToLoad.push_back(outputFileName);
+          qDebug() << "Command Line Module ... Registered " << outputFileName << " to auto load";
+        }
+      }
+    }
+
+    // Always Iterate.
+    walker.readNext();
+  }
+
+  qDebug() << "Command Line Module ... starting.";
+
+  QStringList cmdLineArgs = moduleInstance->commandLineArguments();
+  qDebug() << "Command Line Module ... arguments are:";
+  qDebug() << cmdLineArgs;
+
+  if (m_Watcher != NULL)
+  {
+    QObject::disconnect(m_Watcher, 0, 0, 0);
+    delete m_Watcher;
+  }
+  m_Watcher = new QFutureWatcher<ctkCmdLineModuleResult>();
+  QObject::connect(m_Watcher, SIGNAL(started()), this, SLOT(OnModuleStarted()));
+  QObject::connect(m_Watcher, SIGNAL(finished()), this, SLOT(OnModuleFinished()));
+  QObject::connect(m_Watcher, SIGNAL(progressValueChanged(int)), this, SLOT(OnModuleProgressValueChanged(int)));
+  QObject::connect(m_Watcher, SIGNAL(progressTextChanged(QString)), this, SLOT(OnModuleProgressTextChanged(QString)));
+
+  m_ModuleManager->setVerboseOutput(m_DebugOutput);
+
+  ctkCmdLineModuleFuture future = moduleInstance->run();
+  m_Watcher->setFuture(future);
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnStopButtonPressed()
 {
-  qDebug() << "Stopping module command line...";
+  qDebug() << "Command Line Module ... stopping.";
 
-
-  qDebug() << "Stopped module command line...";
+  qDebug() << "Command Line Module ... stopped.";
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnRestoreDefaultsButtonPressed()
 {
+  qDebug() << "Command Line Module ... restoring.";
 
+  qDebug() << "Command Line Module ... restored.";
+
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::ClearUpTemporaryFiles()
+{
+  QString fileName;
+  foreach (fileName, m_TemporaryFileNames)
+  {
+    QFile file(fileName);
+    if (file.exists())
+    {
+      qDebug() << "Command Line Module ... removing " << fileName;
+      bool success = file.remove();
+      qDebug() << "Command Line Module ... removed " << fileName << ", successfully=" << success;
+    }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::LoadOutputData()
+{
+  std::vector<std::string> fileNames;
+
+  QString fileName;
+  foreach (fileName, m_OutputDataToLoad)
+  {
+    qDebug() << "Command Line Module ... loading " << fileName;
+    fileNames.push_back(fileName.toStdString());
+  }
+
+  if (fileNames.size() > 0)
+  {
+    mitk::DataStorage::Pointer dataStorage = this->GetDataStorage();
+    int numberLoaded = mitk::IOUtil::LoadFiles(fileNames, *(dataStorage.GetPointer()));
+
+    qDebug() << "Command Line Module ... loaded " << numberLoaded << " files";
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnModuleStarted()
+{
+  qDebug() << "Command Line Module ... started.";
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnModuleProgressValueChanged(int value)
+{
+  qDebug() << "Command Line Module ... OnModuleProgressValueChanged int=" << value;
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnModuleProgressTextChanged(QString value)
+{
+  qDebug() << "Command Line Module ... OnModuleProgressValueChanged QString=" << value;
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnModuleFinished()
+{
+  qDebug() << "Command Line Module ... finishing.";
+
+  this->LoadOutputData();
+  //this->ClearUpTemporaryFiles();
+
+  qDebug() << "Command Line Module ... finished.";
 }

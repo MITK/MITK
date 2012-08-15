@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "CommandLineModulesViewControls.h"
 #include "QmitkCmdLineModuleFactoryGui.h"
 #include <ctkCmdLineModuleReference.h>
+#include <ctkCmdLineModuleResult.h>
+#include <QFutureWatcher>
 
 class ctkCmdLineModule;
 class ctkCmdLineModuleManager;
@@ -66,16 +68,19 @@ public:
    */
   virtual void CreateQtPartControl(QWidget *parent);
 
-protected slots:
+protected Q_SLOTS:
   
   void OnActionChanged(QAction*);
   void OnRunButtonPressed();
   void OnStopButtonPressed();
   void OnRestoreDefaultsButtonPressed();
-  void OnFutureFinished();
+  void OnModuleStarted();
+  void OnModuleFinished();
+  void OnModuleProgressValueChanged(int);
+  void OnModuleProgressTextChanged(QString);
 
   /**
-   * \brief We register with the ctkCmdLineModuleManager so that if the modulesAdded or modulesREmoved signals
+   * \brief We register with the ctkCmdLineModuleManager so that if the modulesAdded or modulesRemoved signals
    * are emmitted we rebuild the whole menu. In future this could be made more efficient, and only add/remove single items.
    */
   void OnModulesChanged();
@@ -115,6 +120,16 @@ private:
   void AddModuleTab(const ctkCmdLineModuleReference& moduleRef);
 
   /**
+   * \brief Destroys any images listed in m_TemporaryFileNames.
+   */
+  void ClearUpTemporaryFiles();
+
+  /**
+   * \brief Loads the data produced by the command line module into the mitk::DataStorage.
+   */
+  void LoadOutputData();
+
+  /**
    * \brief The GUI controls contain a run/stop button, and a tabbed widget, so the GUI component
    * for each command line module is added to the tabbed widget dynamically at run time.
    */
@@ -151,9 +166,27 @@ private:
   QHash<int, ctkCmdLineModule*> m_MapTabToModuleInstance;
 
   /**
+   * \brief This is the QFutureWatcher that will watch for when the process has finished, and call OnFutureFinished() slot.
+   */
+  QFutureWatcher<ctkCmdLineModuleResult>* m_Watcher;
+
+  /**
    * \brief We store a temporary folder name, accessible via user preferences.
    */
   QString m_TemporaryDirectoryName;
+
+  /**
+   * \brief We store a list of temporary file names that are saved to disk before
+   * launching a command line app, and then must be cleared up when the command line
+   * app successfully finishes.
+   */
+  QStringList m_TemporaryFileNames;
+
+  /**
+   * \brief We store a list of output images, so that on successfull completion of
+   * a command line module, we load the output data into the mitk::DataStorage.
+   */
+  QStringList m_OutputDataToLoad;
 
   /**
    * \brief Member variable, taken from preference page.

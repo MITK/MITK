@@ -32,7 +32,7 @@ static const double PI = itk::Math::pi;
 
 vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter():m_MinOqacity(0.0),m_MaxOpacity(255.0)
 {
-//  SetNumberOfThreads(1);
+  //  SetNumberOfThreads(1);
 
   MITK_INFO << "mitk level/window filter uses " << GetNumberOfThreads() << " thread(s)";
 }
@@ -51,13 +51,13 @@ unsigned long int vtkMitkLevelWindowFilter::GetMTime()
     time = this->m_LookupTable->GetMTime();
     mTime = ( time > mTime ? time : mTime );
   }
- 
+
   return mTime;
 }
 
 void vtkMitkLevelWindowFilter::SetLookupTable(vtkScalarsToColors *lookupTable)
 {
- if (m_LookupTable != lookupTable)
+  if (m_LookupTable != lookupTable)
   {
     m_LookupTable = lookupTable;
     this->Modified();
@@ -77,14 +77,14 @@ template<class T>
 void RGBtoHSI(T* RGB, T* HSI)
 {
   T R = RGB[0],
-  G = RGB[1],
-  B = RGB[2],
-  nR = (R<0?0:(R>255?255:R))/255,
-  nG = (G<0?0:(G>255?255:G))/255,
-  nB = (B<0?0:(B>255?255:B))/255,
-  m = nR<nG?(nR<nB?nR:nB):(nG<nB?nG:nB),
-  theta = (T)(std::acos(0.5f*((nR-nG)+(nR-nB))/std::sqrt(std::pow(nR-nG,2)+(nR-nB)*(nG-nB)))*180/PI),
-  sum = nR + nG + nB;
+      G = RGB[1],
+      B = RGB[2],
+      nR = (R<0?0:(R>255?255:R))/255,
+      nG = (G<0?0:(G>255?255:G))/255,
+      nB = (B<0?0:(B>255?255:B))/255,
+      m = nR<nG?(nR<nB?nR:nB):(nG<nB?nG:nB),
+      theta = (T)(std::acos(0.5f*((nR-nG)+(nR-nB))/std::sqrt(std::pow(nR-nG,2)+(nR-nB)*(nG-nB)))*180/PI),
+      sum = nR + nG + nB;
   T H = 0, S = 0, I = 0;
   if (theta>0) H = (nB<=nG)?theta:360-theta;
   if (sum>0) S = 1 - 3/sum*m;
@@ -101,10 +101,10 @@ template<class T>
 void HSItoRGB(T* HSI, T* RGB)
 {
   T H = (T)HSI[0],
-  S = (T)HSI[1],
-  I = (T)HSI[2],
-  a = I*(1-S),
-  R = 0, G = 0, B = 0;
+      S = (T)HSI[1],
+      I = (T)HSI[2],
+      a = I*(1-S),
+      R = 0, G = 0, B = 0;
   if (H<120) {
     B = a;
     R = (T)(I*(1+S*std::cos(H*PI/180)/std::cos((60-H)*PI/180)));
@@ -131,12 +131,12 @@ void HSItoRGB(T* HSI, T* RGB)
 //----------------------------------------------------------------------------
 // This templated function executes the filter for any type of data.
 template <class T>
-    void vtkApplyLookupTableOnRGBPlus(vtkMitkLevelWindowFilter* self,
-                                              vtkImageData* inData,
-                                              vtkImageData* outData,
-                                              int outExt[6],
-                                              vtkFloatingPointType* clippingBounds,
-                                              T*)
+void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter* self,
+                               vtkImageData* inData,
+                               vtkImageData* outData,
+                               int outExt[6],
+                               vtkFloatingPointType* clippingBounds,
+                               T*)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
   vtkImageIterator<T> outputIt(outData, outExt);
@@ -160,59 +160,90 @@ template <class T>
   double scaleOpac = (self->GetMaxOpacity() -self->GetMinOpacity() > 0 ? 255.0 / (self->GetMaxOpacity() - self->GetMinOpacity()) : 0.0);
   double biasOpac = self->GetMinOpacity() * scaleOpac;
 
+  int y = outExt[2];
+
   // Loop through ouput pixels
   while (!outputIt.IsAtEnd())
   {
     T* inputSI = inputIt.BeginSpan();
     T* outputSI = outputIt.BeginSpan();
     T* outputSIEnd = outputIt.EndSpan();
-    while (outputSI != outputSIEnd)
+
+    if( y >= clippingBounds[2] && y < clippingBounds[3] )
     {
-      double rgb[3], alpha, hsi[3];
+      int x = outExt[0];
 
-      // level/window mechanism for intensity in HSI space
-      rgb[0] = static_cast<double>(*inputSI); inputSI++;
-      rgb[1] = static_cast<double>(*inputSI); inputSI++;
-      rgb[2] = static_cast<double>(*inputSI); inputSI++;
-
-      RGBtoHSI<double>(rgb,hsi);
-      hsi[2] = hsi[2] * 255.0 * scale - bias;
-      hsi[2] = (hsi[2] > 255.0 ? 255 : (hsi[2] < 0.0 ? 0 : hsi[2]));
-      hsi[2] /= 255.0;
-      HSItoRGB<double>(hsi,rgb);
-
-      *outputSI = static_cast<T>(rgb[0]); outputSI++;
-      *outputSI = static_cast<T>(rgb[1]); outputSI++;
-      *outputSI = static_cast<T>(rgb[2]); outputSI++;
-
-      unsigned char finalAlpha = 255;
-
-      //RGBA case
-      if(maxC >= 4)
+      while (outputSI != outputSIEnd)
       {
-        // level/window mechanism for opacity
-        alpha = static_cast<double>(*inputSI); inputSI++;
-        alpha = alpha * scaleOpac - biasOpac;
-        if(alpha > 255.0)
+        if ( x >= clippingBounds[0] && x < clippingBounds[1])
         {
-          alpha = 255.0;
+          double rgb[3], alpha, hsi[3];
+
+          // level/window mechanism for intensity in HSI space
+          rgb[0] = static_cast<double>(*inputSI); inputSI++;
+          rgb[1] = static_cast<double>(*inputSI); inputSI++;
+          rgb[2] = static_cast<double>(*inputSI); inputSI++;
+
+          RGBtoHSI<double>(rgb,hsi);
+          hsi[2] = hsi[2] * 255.0 * scale - bias;
+          hsi[2] = (hsi[2] > 255.0 ? 255 : (hsi[2] < 0.0 ? 0 : hsi[2]));
+          hsi[2] /= 255.0;
+          HSItoRGB<double>(hsi,rgb);
+
+          *outputSI = static_cast<T>(rgb[0]); outputSI++;
+          *outputSI = static_cast<T>(rgb[1]); outputSI++;
+          *outputSI = static_cast<T>(rgb[2]); outputSI++;
+
+          unsigned char finalAlpha = 255;
+
+          //RGBA case
+          if(maxC >= 4)
+          {
+            // level/window mechanism for opacity
+            alpha = static_cast<double>(*inputSI); inputSI++;
+            alpha = alpha * scaleOpac - biasOpac;
+            if(alpha > 255.0)
+            {
+              alpha = 255.0;
+            }
+            else if(alpha < 0.0)
+            {
+              alpha = 0.0;
+            }
+            finalAlpha = static_cast<T>(alpha);
+
+            for( int c = 4; c < maxC; c++ )
+              inputSI++;
+
+          }
+
+          *outputSI = static_cast<T>(finalAlpha); outputSI++;
         }
-        else if(alpha < 0.0)
+        else
         {
-          alpha = 0.0;
+          inputSI+=maxC;
+          *outputSI = 0; outputSI++;
+          *outputSI = 0; outputSI++;
+          *outputSI = 0; outputSI++;
+          *outputSI = 0; outputSI++;
         }
-        finalAlpha = static_cast<T>(alpha);
 
-
-        for( int c = 4; c < maxC; c++ )
-          inputSI++;
+        x++;
       }
-
-      *outputSI = static_cast<T>(finalAlpha); outputSI++;
-
+    }
+    else
+    {
+      while (outputSI != outputSIEnd)
+      {
+        *outputSI = 0; outputSI++;
+        *outputSI = 0; outputSI++;
+        *outputSI = 0; outputSI++;
+        *outputSI = 0; outputSI++;
+      }
     }
     inputIt.NextSpan();
     outputIt.NextSpan();
+    y++;
   }
 }
 
@@ -220,12 +251,11 @@ template <class T>
 //----------------------------------------------------------------------------
 // This templated function executes the filter for any type of data.
 template <class T>
-    void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
-                                              vtkImageData *inData,
-                                              vtkImageData *outData,
-                                              int outExt[6],
-                                              vtkFloatingPointType* clippingBounds,
-                                              T *)
+void vtkApplyLookupTableOnScalarsFast(vtkMitkLevelWindowFilter *self,
+                                  vtkImageData *inData,
+                                  vtkImageData *outData,
+                                  int outExt[6],
+                                  T *)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
   vtkImageIterator<unsigned char> outputIt(outData, outExt);
@@ -236,10 +266,63 @@ template <class T>
   lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
   lookupTable->GetTableRange(tableRange);
 
-  double scale = (tableRange[1] -tableRange[0] > 0 ? 255.0 / (tableRange[1] - tableRange[0]) : 0.0);
-  double bias = - tableRange[0] * scale;
+  float scale,bias;
 
-  bias += 0.5;
+  int * realLookupTable = reinterpret_cast<int*>(lookupTable->GetTable()->GetPointer(0));
+  int maxIndex = lookupTable->GetNumberOfColors() - 1;
+
+  scale = (tableRange[1] -tableRange[0] > 0 ? (maxIndex + 1) / (tableRange[1] - tableRange[0]) : 0.0);
+  bias = - tableRange[0] * scale;
+  bias += 0.5f;
+
+
+  // Loop through ouput pixels
+  while (!outputIt.IsAtEnd())
+  {
+    unsigned char* outputSI = outputIt.BeginSpan();
+    unsigned char* outputSIEnd = outputIt.EndSpan();
+
+    T* inputSI = inputIt.BeginSpan();
+
+    while (outputSI != outputSIEnd)
+    {
+      // map to an index
+      int idx = static_cast<int>( *inputSI * scale + bias );
+
+      if (idx < 0)
+        idx = 0;
+      else if (idx > maxIndex)
+        idx = maxIndex;
+
+      * reinterpret_cast<int*>(outputSI) = realLookupTable[idx];
+
+      inputSI++;
+      outputSI+=4;
+    }
+
+    inputIt.NextSpan();
+    outputIt.NextSpan();
+  }
+}
+
+
+
+//Internal method which should never be used anywhere else and should not be in th header.
+//----------------------------------------------------------------------------
+// This templated function executes the filter for any type of data.
+template <class T>
+void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
+                                  vtkImageData *inData,
+                                  vtkImageData *outData,
+                                  int outExt[6],
+                                  vtkFloatingPointType* clippingBounds,
+                                  T *)
+{
+  vtkImageIterator<T> inputIt(inData, outExt);
+  vtkImageIterator<unsigned char> outputIt(outData, outExt);
+  vtkLookupTable* lookupTable;
+
+  lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
 
   int y = outExt[2];
 
@@ -259,6 +342,7 @@ template <class T>
       {
         if ( x >= clippingBounds[0] && x < clippingBounds[1])
         {
+
           // fetching original value
           double grayValue = static_cast<double>(*inputSI);
 
@@ -267,6 +351,7 @@ template <class T>
 
           // storing
           * reinterpret_cast<int*>(outputSI) = *RGBA;
+
           outputSI+=4;
         }
         else
@@ -299,6 +384,7 @@ template <class T>
   }
 }
 
+
 void vtkMitkLevelWindowFilter::ExecuteInformation()
 {
   vtkImageData *input = this->GetInput();
@@ -325,40 +411,64 @@ void vtkMitkLevelWindowFilter::ExecuteInformation()
 
 //Method to run the filter in different threads.
 void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
-                                                         vtkImageData *outData,
-                                                         int extent[6], int /*id*/)
+                                               vtkImageData *outData,
+                                               int extent[6], int /*id*/)
 {
   if(inData->GetNumberOfScalarComponents() > 2)
   {
     switch (inData->GetScalarType())
     {
       vtkTemplateMacro(
-          vtkApplyLookupTableOnRGBPlus( this,
-                                                inData,
-                                                outData,
-                                                extent,
-                                                m_ClippingBounds,
-                                                static_cast<VTK_TT *>(0)));
-    default:
-      vtkErrorMacro(<< "Execute: Unknown ScalarType");
-      return;
+            vtkApplyLookupTableOnRGBA( this,
+                                       inData,
+                                       outData,
+                                       extent,
+                                       m_ClippingBounds,
+                                       static_cast<VTK_TT *>(0)));
+      default:
+        vtkErrorMacro(<< "Execute: Unknown ScalarType");
+        return;
     }
   }
   else
   {
-    switch (inData->GetScalarType())
-    {
-      vtkTemplateMacro(
-          vtkApplyLookupTableOnScalars( this,
+    bool dontClip =
+           extent[2] >= m_ClippingBounds[2]
+        && extent[3] <= m_ClippingBounds[3]
+        && extent[0] >= m_ClippingBounds[0]
+        && extent[1] <= m_ClippingBounds[1];
+
+    bool linearLookupTable = dynamic_cast<vtkLookupTable*>(this->GetLookupTable())->GetScale() == VTK_SCALE_LINEAR;
+
+    bool useFast = dontClip && linearLookupTable;
+
+    if(useFast)
+      switch (inData->GetScalarType())
+      {
+        vtkTemplateMacro(
+              vtkApplyLookupTableOnScalarsFast( this,
                                                 inData,
                                                 outData,
                                                 extent,
-                                                m_ClippingBounds,
                                                 static_cast<VTK_TT *>(0)));
-    default:
-      vtkErrorMacro(<< "Execute: Unknown ScalarType");
-      return;
-    }
+        default:
+          vtkErrorMacro(<< "Execute: Unknown ScalarType");
+          return;
+      }
+    else
+      switch (inData->GetScalarType())
+      {
+        vtkTemplateMacro(
+              vtkApplyLookupTableOnScalars( this,
+                                            inData,
+                                            outData,
+                                            extent,
+                                            m_ClippingBounds,
+                                            static_cast<VTK_TT *>(0)));
+        default:
+          vtkErrorMacro(<< "Execute: Unknown ScalarType");
+          return;
+      }
   }
 }
 

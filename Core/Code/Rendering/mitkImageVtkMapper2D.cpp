@@ -402,8 +402,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     //vtkFilter=>mitkFilter=>vtkFilter update mechanism will fail without calling manually
     localStorage->m_Reslicer->Modified();
     localStorage->m_Reslicer->Update();
-
     localStorage->m_TSFilter->Modified();
+
     localStorage->m_TSFilter->Update();
     localStorage->m_ReslicedImage = localStorage->m_TSFilter->GetOutput();
   }
@@ -414,9 +414,9 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     localStorage->m_Reslicer->SetOutputSpacingZDirection(1.0);
     localStorage->m_Reslicer->SetOutputExtentZDirection( 0, 0 );
 
-
     localStorage->m_Reslicer->Modified();
     //start the pipeline with updating the largest possible, needed if the geometry of the input has changed
+
     localStorage->m_Reslicer->UpdateLargestPossibleRegion();
     localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetVtkOutput();
   }

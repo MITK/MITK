@@ -43,56 +43,56 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-template <class ScalarType>
-MergeDiffusionImagesFilter<ScalarType>::MergeDiffusionImagesFilter()
+template <class TScalarType>
+MergeDiffusionImagesFilter<TScalarType>::MergeDiffusionImagesFilter()
 {
 
 }
 
-template <class ScalarType>
-MergeDiffusionImagesFilter<ScalarType>::~MergeDiffusionImagesFilter()
+template <class TScalarType>
+MergeDiffusionImagesFilter<TScalarType>::~MergeDiffusionImagesFilter()
 {
 
 }
 
-template <class ScalarType>
-void MergeDiffusionImagesFilter<ScalarType>
+template <class TScalarType>
+void MergeDiffusionImagesFilter<TScalarType>
 ::SetImageVolumes(DwiImageContainerType cont)
 {
     m_ImageVolumes=cont;
 }
 
-template <class ScalarType>
-void MergeDiffusionImagesFilter<ScalarType>
+template <class TScalarType>
+void MergeDiffusionImagesFilter<TScalarType>
 ::SetGradientLists(GradientListContainerType cont)
 {
     m_GradientLists=cont;
 }
 
-template <class ScalarType>
-void MergeDiffusionImagesFilter<ScalarType>
+template <class TScalarType>
+void MergeDiffusionImagesFilter<TScalarType>
 ::SetBValues(std::vector< double > bvals)
 {
     m_BValues=bvals;
 }
 
-template <class ScalarType>
-MergeDiffusionImagesFilter<ScalarType>::GradientListType::Pointer MergeDiffusionImagesFilter<ScalarType>
+template <class TScalarType>
+MergeDiffusionImagesFilter<TScalarType>::GradientListType::Pointer MergeDiffusionImagesFilter<TScalarType>
 ::GetOutputGradients()
 {
     return m_OutputGradients;
 }
 
-template <class ScalarType>
-double MergeDiffusionImagesFilter<ScalarType>
+template <class TScalarType>
+double MergeDiffusionImagesFilter<TScalarType>
 ::GetBValue()
 {
     return m_BValue;
 }
 
-template <class ScalarType>
+template <class TScalarType>
 void
-MergeDiffusionImagesFilter<ScalarType>
+MergeDiffusionImagesFilter<TScalarType>
 ::GenerateData ()
 {
 
@@ -162,7 +162,7 @@ MergeDiffusionImagesFilter<ScalarType>
                     g = zeroG;
 
                 m_OutputGradients->InsertElement(c, g);
-                out[c] = static_cast<ScalarType>(img->GetPixel(itOut.GetIndex())[j]);
+                out[c] = static_cast<TScalarType>(img->GetPixel(itOut.GetIndex())[j]);
                 c++;
             }
         }

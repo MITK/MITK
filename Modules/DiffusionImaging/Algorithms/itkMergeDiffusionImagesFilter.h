@@ -40,16 +40,16 @@ PURPOSE.  See the above copyright notices for more information.
 namespace itk
 {
 
-template <class ScalarType>
+template <class TScalarType>
 class MergeDiffusionImagesFilter
-        : public ImageSource<itk::VectorImage<ScalarType,3> >
+        : public ImageSource<itk::VectorImage<TScalarType,3> >
 {
 
 public:
 
 
     typedef MergeDiffusionImagesFilter Self;
-    typedef ImageSource< itk::VectorImage<ScalarType,3> > Superclass;
+    typedef ImageSource< itk::VectorImage<TScalarType,3> > Superclass;
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
@@ -59,7 +59,7 @@ public:
    /** Runtime information support. */
    itkTypeMacro(MergeDiffusionImagesFilter, ImageSource);
 
-    typedef itk::VectorImage<ScalarType,3>                  DwiImageType;
+    typedef itk::VectorImage<TScalarType,3>                  DwiImageType;
     typedef typename DwiImageType::PixelType                DwiPixelType;
     typedef typename DwiImageType::RegionType               DwiRegionType;
     typedef typename std::vector< typename DwiImageType::Pointer >   DwiImageContainerType;

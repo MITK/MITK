@@ -166,6 +166,9 @@ void mitk::GPUVolumeMapper3D::DeinitGPU(mitk::BaseRenderer* renderer)
   {
     GPU_INFO << "deinitializing gpu-slicing-vr";
 
+    ls->m_VolumePropertyGPU = NULL;
+    ls->m_MapperGPU = NULL;
+    ls->m_VolumeGPU = NULL;
     ls->m_gpuInitialized=false;
   }
 }
@@ -179,6 +182,9 @@ void mitk::GPUVolumeMapper3D::DeinitCPU(mitk::BaseRenderer* renderer)
 
   GPU_INFO << "deinitializing cpu-raycast-vr";
 
+  ls->m_VolumePropertyCPU = NULL;
+  ls->m_MapperCPU = NULL;
+  ls->m_VolumeCPU = NULL;
   ls->m_cpuInitialized=false;
 }
 
@@ -631,12 +637,10 @@ bool mitk::GPUVolumeMapper3D::InitRAY(mitk::BaseRenderer* renderer)
   
   ls->m_MapperRAY->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
 
-  MITK_INFO << "4";
   ls->m_raySupported = ls->m_MapperRAY->IsRenderSupported(renderer->GetRenderWindow(),ls->m_VolumePropertyRAY);
-  MITK_INFO << "5";
+
 
   ls->m_rayInitialized = true;
-  MITK_INFO << "InitRAY Ende ";
   return ls->m_raySupported;
 }
 
@@ -648,9 +652,10 @@ void mitk::GPUVolumeMapper3D::DeinitRAY(mitk::BaseRenderer* renderer)
   {
     GPU_INFO << "deinitializing gpu-raycast-vr";
 
-//    ls->m_MapperRAY = NULL;
-//    ls->m_VolumePropertyRAY = NULL;
-//    ls->m_VolumeRAY = NULL;
+    ls->m_MapperRAY = NULL;
+    ls->m_VolumePropertyRAY = NULL;
+    ls->m_VolumeRAY->ReleaseGraphicsResources(renderer->GetVtkRenderer()->GetRenderWindow());
+    ls->m_VolumeRAY = NULL;
     ls->m_rayInitialized=false;
   }
 }

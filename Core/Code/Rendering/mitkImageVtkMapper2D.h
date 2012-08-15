@@ -214,9 +214,8 @@ namespace mitk {
     void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
 
     /** \brief Generates a vtkPolyData object containing the outline of a given binary slice.
-      \param binarySlice - The binary image slice. (Volumes are not supported.)
-      \param mmPerPixel - Spacing of the binary image slice. Hence it's 2D, only in x/y-direction.
-      \note This code has been taken from the deprecated library iil.
+      \param renderer: Pointer to the renderer containing the needed information
+      \note This code is based on code from the iil library.
       */
     vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer);
 

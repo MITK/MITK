@@ -47,13 +47,19 @@ class MergeDiffusionImagesFilter
 
 public:
 
-    typedef itk::VectorImage<ScalarType,3>                  DwiImageType;
-    typedef MergeDiffusionImagesFilter Self;
-    typedef ImageSource<DwiImageType> Superclass;
 
+    typedef MergeDiffusionImagesFilter Self;
+    typedef ImageSource< itk::VectorImage<ScalarType,3> > Superclass;
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
+    /** Method for creation through the object factory. */
+   itkNewMacro(Self);
+
+   /** Runtime information support. */
+   itkTypeMacro(MergeDiffusionImagesFilter, ImageSource);
+
+    typedef itk::VectorImage<ScalarType,3>                  DwiImageType;
     typedef typename DwiImageType::PixelType                DwiPixelType;
     typedef typename DwiImageType::RegionType               DwiRegionType;
     typedef typename std::vector< typename DwiImageType::Pointer >   DwiImageContainerType;
@@ -61,9 +67,6 @@ public:
     typedef vnl_vector_fixed< double, 3 >                       GradientType;
     typedef itk::VectorContainer< unsigned int, GradientType >  GradientListType;
     typedef typename std::vector< GradientListType::Pointer >   GradientListContainerType;
-
-    itkTypeMacro(MergeDiffusionImagesFilter, ImageToImageFilter)
-    itkNewMacro(Self)
 
     void SetImageVolumes(DwiImageContainerType cont);
     void SetGradientLists(GradientListContainerType cont);

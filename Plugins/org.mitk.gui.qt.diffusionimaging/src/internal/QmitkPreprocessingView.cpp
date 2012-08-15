@@ -462,7 +462,7 @@ void QmitkPreprocessingView::MergeDwis()
     vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
     DiffusionImageType::Pointer image = DiffusionImageType::New();
     image->SetVectorImage( filter->GetOutput() );
-    image->SetB_Value(filter->GetBValue());
+    image->SetB_Value(filter->GetB_Value());
     image->SetDirections(filter->GetOutputGradients());
     image->SetMeasurementFrame(mf);
     image->InitializeFromVectorImage();

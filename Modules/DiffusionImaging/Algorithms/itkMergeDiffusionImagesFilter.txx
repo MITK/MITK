@@ -85,7 +85,7 @@ MergeDiffusionImagesFilter<TScalarType>::GradientListType::Pointer MergeDiffusio
 
 template <class TScalarType>
 double MergeDiffusionImagesFilter<TScalarType>
-::GetBValue()
+::GetB_Value()
 {
     return m_BValue;
 }

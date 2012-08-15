@@ -73,7 +73,7 @@ public:
     void SetBValues(std::vector< double > bvals);
 
     GradientListType::Pointer GetOutputGradients();
-    double GetBValue();
+    double GetB_Value();
 
 protected:
 

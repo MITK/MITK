@@ -13,6 +13,7 @@ set(INTERNAL_CPP_FILES
   QmitkBooleanOperationsView.cpp
   QmitkDeformableClippingPlaneView.cpp
   regiongrowing/QmitkRegionGrowingView.cpp
+  QmitkOtsuAction.cpp
 )
 
 set(UI_FILES
@@ -34,6 +35,7 @@ set(MOC_H_FILES
   src/internal/QmitkBooleanOperationsView.h
   src/internal/QmitkDeformableClippingPlaneView.h
   src/internal/regiongrowing/QmitkRegionGrowingView.h
+  src/internal/QmitkOtsuAction.h
 )
 
 set(CACHED_RESOURCE_FILES

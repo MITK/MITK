@@ -38,6 +38,7 @@
   
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
     <contextMenuAction nodeDescriptorName="Image" label="Threshold..." icon="" class="QmitkThresholdAction" />
+    <contextMenuAction nodeDescriptorName="Image" label="Otsu Segmentation" icon="" class="QmitkOtsuAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Statistics" icon="" class="QmitkStatisticsAction" />

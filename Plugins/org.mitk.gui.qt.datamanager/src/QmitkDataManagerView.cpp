@@ -336,10 +336,11 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(actionShowInfoDialog);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,actionShowInfoDialog));
 
-  QAction* otsuFilterAction = new QAction("Apply Otsu Filter", this);
-  QObject::connect( otsuFilterAction, SIGNAL( triggered(bool) )
-    , this, SLOT( OtsuFilter(bool) ) );
-  // Otsu filter does not work properly, remove it temporarily
+  //obsolete...
+  //QAction* otsuFilterAction = new QAction("Apply Otsu Filter", this);
+  //QObject::connect( otsuFilterAction, SIGNAL( triggered(bool) )
+  //  , this, SLOT( OtsuFilter(bool) ) );
+  // //Otsu filter does not work properly, remove it temporarily
   // imageDataNodeDescriptor->AddAction(otsuFilterAction);
   // m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,otsuFilterAction));
 
@@ -380,6 +381,10 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   confElem->GetAttribute("class", className);
   confElem->GetAttribute("smoothed", smoothed);
   if(className == "QmitkThresholdAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
+  }
+  else if(className == "QmitkOtsuAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
   }

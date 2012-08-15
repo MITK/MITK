@@ -41,17 +41,20 @@ public:
   ~CommandLineModulesPreferencesPage();
 
   /**
-   * \brief We store the node name that stores the temporary directory path.
+   * \brief We store the node name that stores the temporary directory
+   * path as a static variable to avoid code duplication elsewhere.
    */
   static const std::string TEMPORARY_DIRECTORY_NODE_NAME;
 
   /**
-   * \brief We store the node name that stores the list of modules paths.
+   * \brief We store the node name that stores the list of modules
+   * paths as a static variable to avoid code duplication elsewhere.
    */
   static const std::string MODULE_DIRECTORIES_NODE_NAME;
 
   /**
-   * \brief We store the node name that stores the boolean of whether we want debug output when loading modules.
+   * \brief We store the node name that stores the boolean of whether we want
+   * debug output when loading modules as a static variable to avoid code duplication elsewhere.
    */
   static const std::string DEBUG_OUTPUT_NODE_NAME;
 

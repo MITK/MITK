@@ -22,7 +22,7 @@ class QHBoxLayout;
 
 /**
  * \class CommandLineModulesViewControls
- * \brief Contains various Qt related methods to remove the responsibility from CommandLineModulesView.
+ * \brief Class derived from Ui_CommandLineModulesViewControls to provide programatic access to GUI.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cli_internal
  */

@@ -38,16 +38,16 @@ namespace berry
  * \class CommandLineModulesView
  * \brief Provides basic GUI interface to the CTK command line modules.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
+ * \ingroup org_mitk_gui_qt_cli_internal
  *
- * The intention of this class is that it is an intermediate integration point
- * for the CTK command line modules. Ideally, an MITK base application would
- * load command line modules dynamically at runtime, and promote them to the
- * main window menu bar to appear as fully fledged views. However, currently
- * this is not supported, and so this view provides a simplified interface
- * in order to facilitate testing, debugging, and understanding of use-cases.
+ * This class is a basic interface to the CTK command line modules library.
+ * Ideally, an MITK base application would load command line modules dynamically
+ * at runtime, and promote them to the main window menu bar to appear as fully
+ * fledged views. However, currently this is not supported, and so this view
+ * provides a simplified interface, contained within one plugin in order to
+ * facilitate testing, debugging, and understanding of use-cases.
  *
  * \sa QmitkAbstractView
- * \ingroup org_mitk_gui_qt_cli_internal
  */
 class CommandLineModulesView : public QmitkAbstractView
 {  
@@ -70,18 +70,53 @@ public:
 
 protected Q_SLOTS:
   
+  /**
+   * \brief Called when the ctkMenuComboBox has the menu selection changed,
+   * meaning that a new GUI page be created in another tab.
+   */
   void OnActionChanged(QAction*);
+
+  /**
+   * \brief Slot to launch the command line module.
+   */
   void OnRunButtonPressed();
+
+  /**
+   * \brief Slot to stop (kill) the command line module, currently inactive.
+   */
   void OnStopButtonPressed();
+
+  /**
+   * \brief Slot to restore the form to the default parameters, currently inactive/un-implemented.
+   */
   void OnRestoreDefaultsButtonPressed();
+
+  /**
+   * \brief Slot called from QFutureWatcher<ctkCmdLineModuleResult> when the module has been launched.
+   */
   void OnModuleStarted();
+
+  /**
+   * \brief Slot called from QFutureWatcher<ctkCmdLineModuleResult> when the module has finished.
+   */
   void OnModuleFinished();
+
+  /**
+   * \brief Slot called from QFutureWatcher<ctkCmdLineModuleResult> to notify of any progress,
+   * currently just printing console debug messages.
+   */
   void OnModuleProgressValueChanged(int);
+
+  /**
+   * \brief Slot called from QFutureWatcher<ctkCmdLineModuleResult> to notify of any progress,
+   * currently just printing console debug messages.
+   */
   void OnModuleProgressTextChanged(QString);
 
   /**
-   * \brief We register with the ctkCmdLineModuleManager so that if the modulesAdded or modulesRemoved signals
-   * are emmitted we rebuild the whole menu. In future this could be made more efficient, and only add/remove single items.
+   * \brief We register this slot with the ctkCmdLineModuleManager so that if
+   * the modulesAdded or modulesRemoved signals are emmitted from ctkCmdLineModuleManager
+   * we rebuild the whole menu. In future this could be made more efficient, and only add/remove single items.
    */
   void OnModulesChanged();
 
@@ -89,7 +124,7 @@ protected:
 
   /**
    * \brief Called by framework to set the focus on the right widget
-   * when this view has focus, so currently, thats the combo box to select a module.
+   * when this view has focus, so currently, thats the combo box.
    */
   virtual void SetFocus();
 
@@ -107,7 +142,7 @@ private:
   void RetrievePreferenceValues();
 
   /**
-   * \brief Search the internal datastructure (QHash) to find the reference that matches the identifier (title).
+   * \brief Search the internal datastructure (QHash) to find the reference that matches the identifier.
    * \param identifier The identifier used in the front end combo box widget, currently title.
    * \return ctkCmdLineModuleReference the reference corresponding to the identifier, or an invalid reference if non found.
    */
@@ -120,17 +155,17 @@ private:
   void AddModuleTab(const ctkCmdLineModuleReference& moduleRef);
 
   /**
-   * \brief Destroys any images listed in m_TemporaryFileNames.
+   * \brief Destroys any images listed in m_TemporaryFileNames, silently failing.
    */
   void ClearUpTemporaryFiles();
 
   /**
-   * \brief Loads the data produced by the command line module into the mitk::DataStorage.
+   * \brief Loads any data listed in m_OutputDataToLoad into the mitk::DataStorage.
    */
   void LoadOutputData();
 
   /**
-   * \brief The GUI controls contain a run/stop button, and a tabbed widget, so the GUI component
+   * \brief The GUI controls contain a run/stop button, and a tabbed widget, and the GUI component
    * for each command line module is added to the tabbed widget dynamically at run time.
    */
   CommandLineModulesViewControls *m_Controls;
@@ -141,22 +176,23 @@ private:
   QWidget *m_Parent;
 
   /**
-   * \brief The manager is responsible for loading command line modules.
+   * \brief The manager is responsible for loading and instantiating command line modules.
    */
   ctkCmdLineModuleManager *m_ModuleManager;
 
   /**
-   * \brief The DirectoryWatcher maintains the list of directories we are using to load modules, to provide automatic updates.
+   * \brief The ctkCmdLineModuleDirectoryWatcher maintains the list of directories
+   * we are using to load modules, to provide automatic updates.
    */
   ctkCmdLineModuleDirectoryWatcher *m_DirectoryWatcher;
 
   /**
-   * \brief The menu factory will build a QMenu from the list of available modules.
+   * \brief The ctkCmdLineModuleMenuFactoryQtGui will build a QMenu from the list of available modules.
    */
   ctkCmdLineModuleMenuFactoryQtGui *m_MenuFactory;
 
   /**
-   * \brief The module factory builds a gui for each plugin.
+   * \brief The QmitkCmdLineModuleFactoryGui builds a gui for each plugin.
    */
   QmitkCmdLineModuleFactoryGui *m_ModuleFactory;
 

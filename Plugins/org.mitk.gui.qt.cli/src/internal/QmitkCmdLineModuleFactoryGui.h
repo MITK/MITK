@@ -34,6 +34,9 @@ public:
   QmitkCmdLineModuleFactoryGui(const mitk::DataStorage* dataStorage);
   virtual ~QmitkCmdLineModuleFactoryGui();
 
+  /**
+   * \brief Simply creates QmitkCmdLineModuleGui which is an MITK specific module.
+   */
   ctkCmdLineModule* create(const ctkCmdLineModuleReference& moduleRef);
 
 private:

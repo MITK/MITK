@@ -25,7 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  * \class QmitkCmdLineModuleGui
- * \brief Derived from ctkCmdLineModuleQtGui to implement a Qt specific command line module.
+ * \brief Derived from ctkCmdLineModuleQtGui to implement an MITK specific command line module,
+ * that has access to the mitk::DataStorage, and also instantiates QmitkDataStorageComboBox
+ * for any "imageInputWidget" type, and also provides QmitkDataStorageComboBox.xsl to override
+ * the standard CTK xslt transformation.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cli_internal
  * \sa QmitkCmdLineModuleFactoryGui
@@ -40,7 +43,16 @@ public:
 
 protected:
 
+  /**
+   * \brief Virtual getter.
+   * \see ctkCmdLineModuleQtGui::uiLoader()
+   */
   virtual QUiLoader* uiLoader() const;
+
+  /**
+   * \brief Virtual getter.
+   * \see ctkCmdLineModuleQtGui::xslTransform()
+   */ \
   virtual ctkCmdLineModuleXslTransform* xslTransform() const;
 
 private:

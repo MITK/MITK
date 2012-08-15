@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  * \class QmitkUiLoader
- * \brief Derived from QUiLoader to enable us to instantiate widgets from Qmitk at runtime.
+ * \brief Derived from QUiLoader to enable us to instantiate widgets from Qmitk at runtime,
+ * and currently we instatiate QmitkDataStorageComboBox, used for image input widgets.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cli_internal
  */
@@ -35,7 +36,17 @@ public:
   QmitkUiLoader(const mitk::DataStorage* dataStorage, QObject *parent=0);
   virtual ~QmitkUiLoader();
 
+  /**
+   * \brief Returns the list of available widgets in QUiLoader and also QmitkDataStorageComboBox.
+   * \see QUiLoader::availableWidgets()
+   */
   QStringList availableWidgets () const;
+
+  /**
+   * \brief If className is QmitkDataStorageComboBox, instantiates QmitkDataStorageComboBox and
+   * otherwise delegates to base class.
+   * \see QUiLoader::createWidget()
+   */
   virtual QWidget* createWidget(const QString & className, QWidget * parent = 0, const QString & name = QString() );
 
 private:

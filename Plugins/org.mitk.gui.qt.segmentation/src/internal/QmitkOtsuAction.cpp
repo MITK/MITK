@@ -69,7 +69,7 @@ void QmitkOtsuAction::Run(const QList<DataNode::Pointer> &selectedNodes)
   QLabel* numberOfThresholdsLabel = new QLabel("Select number of Regions of Interest:");
   //numberOfThresholdsLabel->setAlignment(Qt::AlignmentFlag::AlignHCenter);
   //numberOfThresholdsLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter);
-  numberOfThresholdsLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter | Qt::AlignmentFlag::AlignHCenter);
+  numberOfThresholdsLabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
   layout->addWidget(numberOfThresholdsLabel);
   layout->addWidget(m_OtsuSpinBox);
   layout->addWidget(m_OtsuPushButton);
@@ -111,12 +111,12 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
 {
   int numberOfThresholds = this->m_OtsuSpinBox->value() - 1;
   int proceed;
-
-  QMessageBox* messageBox = new QMessageBox(QMessageBox::Icon::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
+  
+  QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
   if (numberOfThresholds >= 5) 
   {
     proceed = messageBox->exec();
-    if (proceed != QMessageBox::StandardButton::Ok) return;
+    if (proceed != QMessageBox::Ok) return;
   }
 
   mitk::Image::Pointer mitkImage = 0;

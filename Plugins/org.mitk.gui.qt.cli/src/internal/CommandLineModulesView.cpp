@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFile>
 #include <QAction>
 #include <QDebug>
+#include <QTabWidget>
+#include <QTextBrowser>
 
 // CTK
 #include <ctkCmdLineModule.h>
@@ -221,12 +223,47 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
   ctkCmdLineModule* moduleInstance = m_ModuleManager->createModule(moduleRef);
   if (!moduleInstance) return;
 
-  QObject* guiHandle = moduleInstance->guiHandle();
-  QWidget* widget = qobject_cast<QWidget*>(guiHandle);
+  // Build up the GUI layout programmatically (manually).
 
-  int tabIndex = m_Controls->m_TabWidget->addTab(widget, moduleRef.description().title());
-  m_Controls->m_TabWidget->setCurrentIndex(tabIndex);
-  m_MapTabToModuleInstance[tabIndex] = moduleInstance;
+  QTabWidget *documentationTabWidget = new QTabWidget();
+  documentationTabWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+  QWidget *aboutWidget = new QWidget();
+  QWidget *helpWidget = new QWidget();
+
+  QTextBrowser *aboutBrowser = new QTextBrowser(aboutWidget);
+  aboutBrowser->setReadOnly(true);
+  aboutBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+  QTextBrowser *helpBrowser = new QTextBrowser(helpWidget);
+  helpBrowser->setReadOnly(true);
+  helpBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+  QHBoxLayout *aboutLayout = new QHBoxLayout(aboutWidget);
+  aboutLayout->addWidget(aboutBrowser);
+  aboutLayout->setContentsMargins(0,0,0,0);
+  aboutLayout->setSpacing(0);
+
+  QHBoxLayout *helpLayout = new QHBoxLayout(helpWidget);
+  helpLayout->addWidget(helpBrowser);
+  helpLayout->setContentsMargins(0,0,0,0);
+  helpLayout->setSpacing(0);
+
+  documentationTabWidget->addTab(aboutWidget, "About");
+  documentationTabWidget->addTab(helpWidget, "Help");
+
+  QObject* guiHandle = moduleInstance->guiHandle();
+  QWidget* generatedGuiWidgets = qobject_cast<QWidget*>(guiHandle);
+
+  QWidget *topLevelWidget = new QWidget();
+  QGridLayout *topLevelLayout = new QGridLayout(topLevelWidget);
+
+  topLevelLayout->setContentsMargins(0,0,0,0);
+  topLevelLayout->setSpacing(0);
+  topLevelLayout->addWidget(documentationTabWidget, 0, 0);
+  topLevelLayout->setRowStretch(0, 1);
+  topLevelLayout->addWidget(generatedGuiWidgets, 1, 0);
+  topLevelLayout->setRowStretch(1, 10);
 
   ctkCmdLineModuleDescription description = moduleRef.description();
 
@@ -271,10 +308,15 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
     aboutString += acknowledgementsHtml;
   }
 
-  m_Controls->m_HelpBrowser->clear();
-  m_Controls->m_HelpBrowser->setHtml(helpString);
-  m_Controls->m_AboutBrowser->clear();
-  m_Controls->m_AboutBrowser->setHtml(aboutString);
+  helpBrowser->clear();
+  helpBrowser->setHtml(helpString);
+  aboutBrowser->clear();
+  aboutBrowser->setHtml(aboutString);
+
+  int tabIndex = m_Controls->m_TabWidget->addTab(topLevelWidget, moduleRef.description().title());
+  m_Controls->m_TabWidget->setCurrentIndex(tabIndex);
+  m_MapTabToModuleInstance[tabIndex] = moduleInstance;
+
 }
 
 

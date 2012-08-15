@@ -44,15 +44,6 @@ protected:
 
 private:
 
-  /**
-   * \brief Tab widget, needs programatically controlled layout.
-   */
-  QHBoxLayout *m_LayoutForAbout;
-
-  /**
-   * \brief Tab widget, needs programatically controlled layout.
-   */
-  QHBoxLayout *m_LayoutForHelp;
 };
 
 #endif // CommandLineModulesViewControls_h

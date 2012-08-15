@@ -54,9 +54,9 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     virtual void CreateConnections();
     /*!
     \brief initialize the widget with the images to be shown
-    \param distanceImage image holding the range image of a ToF camera
-    \param amplitudeImage image holding the amplitude image of a ToF camera
-    \param intensityImage image holding the intensity image of a ToF camera
+    \param distanceImageNode image holding the range image of a ToF camera
+    \param amplitudeImageNode image holding the amplitude image of a ToF camera
+    \param intensityImageNode image holding the intensity image of a ToF camera
     */
     void Initialize(mitk::DataNode* distanceImageNode=NULL, mitk::DataNode* amplitudeImageNode=NULL, mitk::DataNode* intensityImageNode=NULL);
 

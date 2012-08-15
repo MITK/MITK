@@ -62,21 +62,20 @@ public:
     typedef itk::VectorContainer< unsigned int, GradientType >  GradientListType;
     typedef typename std::vector< GradientListType::Pointer >   GradientListContainerType;
 
-    itkTypeMacro (MergeDiffusionImagesFilter, ImageToImageFilter)
-    itkStaticConstMacro (ImageDimension, unsigned int, DwiImageType::ImageDimension);
-    itkNewMacro (Self)
+    itkTypeMacro(MergeDiffusionImagesFilter, ImageToImageFilter)
+    itkNewMacro(Self)
 
-    void SetImageVolumes(DwiImageContainerType cont){ m_ImageVolumes=cont; }
-    void SetGradientLists(GradientListContainerType cont){ m_GradientLists=cont; }
-    void SetBValues(std::vector< double > cont){ m_BValues=cont; }
+    void SetImageVolumes(DwiImageContainerType cont);
+    void SetGradientLists(GradientListContainerType cont);
+    void SetBValues(std::vector< double > bvals);
 
-    GradientListType::Pointer GetOutputGradients(){ return m_OutputGradients; }
-    double GetBValue(){ return m_BValue; }
+    GradientListType::Pointer GetOutputGradients();
+    double GetBValue();
 
 protected:
 
-    MergeDiffusionImagesFilter(){}
-    ~MergeDiffusionImagesFilter(){}
+    MergeDiffusionImagesFilter();
+    ~MergeDiffusionImagesFilter();
 
     void GenerateData();
 

@@ -35,6 +35,15 @@ public:
     return wwAdvisor.data();
   }
 
+  /*void Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
+  {
+    berry::WorkbenchAdvisor::Initialize(configurer);
+    QString styleName = "teststyle";
+
+    IQtStyleManager::Pointer styleManager = Platform::GetServiceRegistry().GetServiceById<IQtStyleManager>(IQtStyleManager::ID);
+    styleManager->SetStyle(styleName);
+  }*/
+
   std::string GetInitialWindowPerspectiveId()
   {
     return DEFAULT_PERSPECTIVE_ID;

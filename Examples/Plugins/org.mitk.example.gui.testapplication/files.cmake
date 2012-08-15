@@ -29,6 +29,10 @@ set(UI_FILES
   src/internal/QmitkTestViewControls.ui
 )
 
+set(QRC_FILES
+  resources/org_mitk_example_gui_testapplication.qrc
+)
+
 set(CACHED_RESOURCE_FILES
   plugin.xml
 )

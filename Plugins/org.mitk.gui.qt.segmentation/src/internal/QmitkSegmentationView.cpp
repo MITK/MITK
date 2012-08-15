@@ -516,6 +516,11 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     m_WorkingDataObserverTags.erase(tempNode);
     this->SetToolManagerSelection(NULL, NULL);
   }
+  else if ( !isHelperObject )
+  {
+    this->m_Controls->m_ManualToolSelectionBox->GetToolManager()->OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode*>(node), itk::DeleteEvent());
+    this->SetToolManagerSelection(NULL, NULL);
+  }
 }
 
 void QmitkSegmentationView::CreateSegmentationFromSurface()

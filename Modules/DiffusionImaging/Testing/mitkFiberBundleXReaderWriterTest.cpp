@@ -34,7 +34,7 @@ int mitkFiberBundleXReaderWriterTest(int argc, char* argv[])
 
    std::cout << argv[1]<<std::endl;
 
-  MITK_TEST_CONDITION_REQUIRED(argc>1,"check for fielename")
+  MITK_TEST_CONDITION_REQUIRED(argc>1,"check for filename")
 
   mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
   mitk::FiberBundleX::Pointer fib1;

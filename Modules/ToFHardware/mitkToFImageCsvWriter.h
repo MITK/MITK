@@ -55,7 +55,9 @@ namespace mitk
     void Close();
     /*!
     \brief Pushes the image data to the output files
-    \param data from distance, amplitude and intensity images as float values
+    \param distanceFloatData from distance image as float value
+    \param amplitudeFloatData from amplitude image as float value
+    \param intensityFloatData from intensity image as float value
     */
     void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0);
 

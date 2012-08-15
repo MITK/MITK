@@ -100,7 +100,7 @@ namespace mitk
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
                               int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
 //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-//    /*!
+//    /* // * TODO: Reenable doxygen comment when uncommenting, disabled to fix doxygen warning see bug 12882
 //    \brief pure virtual method resetting the buffer using the specified bufferSize. Has to be implemented by sub-classes
 //    \param bufferSize buffer size the buffer should be reset to
 //    */

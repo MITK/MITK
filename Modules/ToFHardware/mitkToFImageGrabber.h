@@ -45,7 +45,6 @@ namespace mitk
 
     /*!
     \brief Establish a connection to the ToF camera
-    \param device specifies the actually used ToF Camera. 0: PMD O3D, 1: PMD CamCube 2.0
     */
     virtual bool ConnectCamera();
     /*!

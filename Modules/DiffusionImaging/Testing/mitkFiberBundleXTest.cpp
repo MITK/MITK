@@ -32,7 +32,7 @@ int mitkFiberBundleXTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkFiberBundleXTest");
 
-  MITK_TEST_CONDITION_REQUIRED(argc>1,"check for fielename")
+  MITK_TEST_CONDITION_REQUIRED(argc>1,"check for filename")
 
   mitk::FiberBundleXReader::Pointer reader = mitk::FiberBundleXReader::New();
   mitk::FiberBundleX::Pointer fib1, fib2;

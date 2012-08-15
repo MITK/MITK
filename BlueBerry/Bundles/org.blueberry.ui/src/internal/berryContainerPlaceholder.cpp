@@ -25,22 +25,12 @@ namespace berry
 int ContainerPlaceholder::nextId = 0;
 
 ContainerPlaceholder::ContainerPlaceholder(const std::string& id) :
-  LayoutPart(id == "" ? "Container Placeholder " + nextId++ : id)
+  PartPlaceholder(id == "" ? "Container Placeholder " + nextId++ : id)
 {
 
 }
 
-void ContainerPlaceholder::CreateControl(void*  /*parent*/)
-{
-
-}
-
-void* ContainerPlaceholder::GetControl()
-{
-  return 0;
-}
-
-void ContainerPlaceholder::Add(StackablePart::Pointer child)
+void ContainerPlaceholder::Add(LayoutPart::Pointer child)
 {
   if (child.Cast<PartPlaceholder>() == 0)
   {
@@ -49,12 +39,12 @@ void ContainerPlaceholder::Add(StackablePart::Pointer child)
   realContainer->Add(child);
 }
 
-bool ContainerPlaceholder::AllowsAdd(StackablePart::Pointer  /*toAdd*/)
+bool ContainerPlaceholder::AllowsAdd(LayoutPart::Pointer  /*toAdd*/)
 {
   return false;
 }
 
-std::list<StackablePart::Pointer> ContainerPlaceholder::GetChildren() const
+std::list<LayoutPart::Pointer> ContainerPlaceholder::GetChildren() const
 {
   return realContainer->GetChildren();
 }
@@ -64,12 +54,12 @@ std::string ContainerPlaceholder::GetID() const
   return LayoutPart::GetID();
 }
 
-IStackableContainer::Pointer ContainerPlaceholder::GetRealContainer()
+LayoutPart::Pointer ContainerPlaceholder::GetRealContainer()
 {
-  return realContainer;
+  return realContainer.Cast<LayoutPart>();
 }
 
-void ContainerPlaceholder::Remove(StackablePart::Pointer child)
+void ContainerPlaceholder::Remove(LayoutPart::Pointer child)
 {
   if (child.Cast<PartPlaceholder> () == 0)
   {
@@ -78,8 +68,8 @@ void ContainerPlaceholder::Remove(StackablePart::Pointer child)
   realContainer->Remove(child);
 }
 
-void ContainerPlaceholder::Replace(StackablePart::Pointer oldChild,
-    StackablePart::Pointer newChild)
+void ContainerPlaceholder::Replace(LayoutPart::Pointer oldChild,
+    LayoutPart::Pointer newChild)
 {
   if (oldChild.Cast<PartPlaceholder>() == 0 && newChild.Cast<PartPlaceholder>()
       == 0)
@@ -90,7 +80,7 @@ void ContainerPlaceholder::Replace(StackablePart::Pointer oldChild,
 }
 
 void ContainerPlaceholder::SetRealContainer(
-    IStackableContainer::Pointer container)
+    ILayoutContainer::Pointer container)
 {
 
   if (container == 0)
@@ -98,8 +88,8 @@ void ContainerPlaceholder::SetRealContainer(
     // set the parent container of the children back to the real container
     if (realContainer != 0)
     {
-      std::list<StackablePart::Pointer> children = realContainer->GetChildren();
-      for (std::list<StackablePart::Pointer>::iterator iter = children.begin(); iter
+      std::list<LayoutPart::Pointer> children = realContainer->GetChildren();
+      for (std::list<LayoutPart::Pointer>::iterator iter = children.begin(); iter
           != children.end(); ++iter)
       {
         (*iter)->SetContainer(realContainer);
@@ -109,18 +99,18 @@ void ContainerPlaceholder::SetRealContainer(
   else
   {
     // replace the real container with this place holder
-    std::list<StackablePart::Pointer> children = container->GetChildren();
-    for (std::list<StackablePart::Pointer>::iterator iter = children.begin(); iter
+    std::list<LayoutPart::Pointer> children = container->GetChildren();
+    for (std::list<LayoutPart::Pointer>::iterator iter = children.begin(); iter
         != children.end(); ++iter)
     {
-      (*iter)->SetContainer(IStackableContainer::Pointer(this));
+      (*iter)->SetContainer(ILayoutContainer::Pointer(this));
     }
   }
 
   this->realContainer = container;
 }
 
-void ContainerPlaceholder::FindSashes(PartPane::Sashes& sashes)
+void ContainerPlaceholder::FindSashes(LayoutPart::Pointer /*part*/, PartPane::Sashes& sashes)
 {
   ILayoutContainer::Pointer container = this->GetContainer();
 
@@ -129,7 +119,7 @@ void ContainerPlaceholder::FindSashes(PartPane::Sashes& sashes)
   }
 }
 
-void ContainerPlaceholder::ResizeChild(StackablePart::Pointer  /*childThatChanged*/)
+void ContainerPlaceholder::ResizeChild(LayoutPart::Pointer  /*childThatChanged*/)
 {
 
 }

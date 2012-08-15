@@ -25,12 +25,12 @@ namespace berry
 
 DetachedPlaceHolder::DetachedPlaceHolder(const std::string& id,
     const Rectangle& b) :
-  ContainerPlaceholder(id), bounds(b)
+  PartPlaceholder(id), bounds(b)
 {
 
 }
 
-void DetachedPlaceHolder::Add(StackablePart::Pointer newPart)
+void DetachedPlaceHolder::Add(LayoutPart::Pointer newPart)
 {
   if (newPart.Cast<PartPlaceholder> () == 0)
   {
@@ -44,23 +44,33 @@ bool DetachedPlaceHolder::AllowsBorder()
   return false;
 }
 
+bool DetachedPlaceHolder::AllowsAdd(LayoutPart::Pointer toAdd)
+{
+  return PartPlaceholder::AllowsAdd(toAdd);
+}
+
+bool DetachedPlaceHolder::AllowsAutoFocus()
+{
+  return PartPlaceholder::AllowsAutoFocus();
+}
+
 Rectangle DetachedPlaceHolder::GetBounds()
 {
   return bounds;
 }
 
-std::list<StackablePart::Pointer> DetachedPlaceHolder::GetChildren()
+std::list<LayoutPart::Pointer> DetachedPlaceHolder::GetChildren()
 {
   return children;
 }
 
-void DetachedPlaceHolder::Remove(StackablePart::Pointer part)
+void DetachedPlaceHolder::Remove(LayoutPart::Pointer part)
 {
   children.remove(part);
 }
 
-void DetachedPlaceHolder::Replace(StackablePart::Pointer oldPart,
-    StackablePart::Pointer newPart)
+void DetachedPlaceHolder::Replace(LayoutPart::Pointer oldPart,
+    LayoutPart::Pointer newPart)
 {
   this->Remove(oldPart);
   this->Add(newPart);
@@ -87,7 +97,7 @@ void DetachedPlaceHolder::RestoreState(IMemento::Pointer memento)
      std::string id;
      childrenMem[i]->GetString(WorkbenchConstants::TAG_ID, id);
      PartPlaceholder::Pointer holder(new PartPlaceholder(id));
-     holder->SetContainer(IStackableContainer::Pointer(this));
+     holder->SetContainer(ILayoutContainer::Pointer(this));
      children.push_back(holder);
   }
 }
@@ -101,11 +111,11 @@ void DetachedPlaceHolder::SaveState(IMemento::Pointer memento)
   memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height);
 
   // Save the views.
-  for (std::list<StackablePart::Pointer>::iterator i = children.begin();
+  for (std::list<LayoutPart::Pointer>::iterator i = children.begin();
       i != children.end(); ++i) {
      IMemento::Pointer childMem = memento
              ->CreateChild(WorkbenchConstants::TAG_VIEW);
-     childMem->PutString(WorkbenchConstants::TAG_ID, (*i)->GetId());
+     childMem->PutString(WorkbenchConstants::TAG_ID, (*i)->GetID());
   }
 }
 
@@ -118,6 +128,16 @@ void DetachedPlaceHolder::FindSashes(LayoutPart::Pointer /*part*/,
   {
     container->FindSashes(LayoutPart::Pointer(this), sashes);
   }
+}
+
+ILayoutContainer::ChildrenType DetachedPlaceHolder::GetChildren() const
+{
+  return children;
+}
+
+void DetachedPlaceHolder::ResizeChild(LayoutPart::Pointer childThatChanged)
+{
+  PartPlaceholder::ResizeChild(childThatChanged);
 }
 
 

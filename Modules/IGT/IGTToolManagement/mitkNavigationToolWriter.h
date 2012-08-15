@@ -61,6 +61,7 @@ namespace mitk
     std::string m_ErrorMessage;
     mitk::DataNode::Pointer ConvertToDataNode(mitk::NavigationTool::Pointer Tool);
     std::string GetFileWithoutPath(std::string FileWithPath);
+    std::string ConvertPointSetToString(mitk::PointSet::Pointer pointSet);
   };
 } // namespace mitk
 #endif //NAVIGATIONTOOLWRITER

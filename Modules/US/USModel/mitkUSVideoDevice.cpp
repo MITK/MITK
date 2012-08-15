@@ -23,6 +23,7 @@ mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, std::string manufactur
   this->SetNumberOfOutputs(1);
   m_SourceIsFile = false;
   m_DeviceID = videoDeviceNumber;
+  m_Source = mitk::USImageVideoSource::New();
 }
 
 mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model)
@@ -31,6 +32,7 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, std::string manufa
   this->SetNumberOfOutputs(1);
   m_SourceIsFile = true;
   m_FilePath = videoFilePath;
+  m_Source = mitk::USImageVideoSource::New();
 }
 
 mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, mitk::USImageMetadata::Pointer metadata) : mitk::USDevice(metadata)
@@ -39,6 +41,7 @@ mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, mitk::USImageMetadata:
   this->SetNumberOfOutputs(1);
   m_SourceIsFile = false;
   m_DeviceID = videoDeviceNumber;
+  m_Source = mitk::USImageVideoSource::New();
 }
 
 mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetadata::Pointer metadata) : mitk::USDevice(metadata)
@@ -47,6 +50,7 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetad
   this->SetNumberOfOutputs(1);
   m_SourceIsFile = true;
   m_FilePath = videoFilePath;
+  m_Source = mitk::USImageVideoSource::New();
 }
 
 mitk::USVideoDevice::~USVideoDevice()
@@ -61,7 +65,6 @@ std::string mitk::USVideoDevice::GetDeviceClass(){
 
 bool mitk::USVideoDevice::OnConnection()
 {
-  m_Source = mitk::USImageVideoSource::New();
   if (m_SourceIsFile){
     m_Source->SetVideoFileInput(m_FilePath);
   } else {
@@ -70,19 +73,13 @@ bool mitk::USVideoDevice::OnConnection()
   return true;
 }
 
-/**
-* \brief Is called during the disconnection process.
-*  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
-*/
 bool mitk::USVideoDevice::OnDisconnection()
 {
     // TODO Implement Disconnection Behaviour
   return true;
 }
 
-/**
-* \brief Is called during the activation process. After this method is finsihed, the device should be generating images
-*/
+
 bool mitk::USVideoDevice::OnActivation()
 {
     // TODO Implement Activation Behaviour
@@ -90,13 +87,9 @@ bool mitk::USVideoDevice::OnActivation()
 }  
 
 
-/**
-* \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
-*/
 void mitk::USVideoDevice::OnDeactivation()
 {
     // TODO Implement Deactivation Behaviour
-
 }
 
 void mitk::USVideoDevice::GenerateData()
@@ -106,6 +99,8 @@ void mitk::USVideoDevice::GenerateData()
   
   // Set Metadata
   result->SetMetadata(this->m_Metadata);
+  //Apply Transformation
+  this->ApplyCalibration(result);
   // Set Output
   this->SetNthOutput(0, result);
 }

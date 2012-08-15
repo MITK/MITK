@@ -1,5 +1,4 @@
 set(SRC_CPP_FILES
-
 )
 
 set(INTERNAL_CPP_FILES
@@ -40,7 +39,7 @@ set(CACHED_RESOURCE_FILES
 # list of Qt .qrc files which contain additional resources
 # specific to this plugin
 set(QRC_FILES
-
+resources/dicom.qrc
 )
 
 set(CPP_FILES )

@@ -134,7 +134,9 @@ endfunction()
 set(MITK_ACCESSBYITK_PIXEL_TYPES )
 set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ )
 set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ )
-foreach(_type INTEGRAL FLOATING COMPOSITE)
+# concatenate only the simple pixel types to the MITK_ACCESSBYITK_PIXEL_TYPE_SEQ list
+# see Bug 12682 for detailed information
+foreach(_type INTEGRAL FLOATING)
   set(_typelist "${MITK_ACCESSBYITK_${_type}_PIXEL_TYPES}")
   if(_typelist)
     if(MITK_ACCESSBYITK_PIXEL_TYPES)
@@ -150,6 +152,11 @@ foreach(_type INTEGRAL FLOATING COMPOSITE)
   set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ "${MITK_ACCESSBYITK_PIXEL_TYPES_SEQ}${MITK_ACCESSBYITK_${_type}_PIXEL_TYPES_SEQ}")
   set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ "${MITK_ACCESSBYITK_TYPES_DIMN_SEQ}${MITK_ACCESSBYITK_${_type}_TYPES_DIMN_SEQ}")
 endforeach()
+
+# separate processing of the COMPOSITE list to avoid its concatenation to to global list
+_create_type_seq(${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}
+                 MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ
+                 MITK_ACCESSBYITK_COMPOSITE_TYPES_DIMN_SEQ)
 
 set(MITK_ACCESSBYITK_DIMENSIONS_SEQ )
 string(REPLACE "," ";" _dimensions "${MITK_ACCESSBYITK_DIMENSIONS}")

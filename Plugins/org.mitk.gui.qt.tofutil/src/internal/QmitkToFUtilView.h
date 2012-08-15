@@ -17,12 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkToFUtilView_h
 #define QmitkToFUtilView_h
 
-#include <QmitkFunctionality.h>
 #include <QmitkOverlayController.h>
+#include <QmitkAbstractView.h>
+#include <berryIWorkbenchPartReference.h>
+#include <mitkIZombieViewPart.h>
+
 
 #include <ui_QmitkToFUtilViewControls.h>
 
-#include <QTimer>
+class QTimer;
 
 #include <mitkRealTimeClock.h>
 #include <mitkToFImageGrabber.h>
@@ -34,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFCompositeFilter.h>
 
 /*!
-  \brief QmitkToFUtilView 
+  \brief QmitkToFUtilView
 
   Application that allows simple playing, recording, visualization, processing and measurement of Time-of-Flight (ToF) data.
   Currently the following features are implemented:
@@ -49,13 +52,13 @@ See LICENSE.txt or http://www.mitk.org for details.
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class QmitkToFUtilView : public QmitkFunctionality
+class QmitkToFUtilView : public QmitkAbstractView, public mitk::IZombieViewPart
 {  
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
-  Q_OBJECT
-  
-  public:  
+    // this is needed for all Qt objects that should have a Qt meta-object
+    // (everything that derives from QObject and wants to have signal/slots)
+    Q_OBJECT
+
+public:
 
     static const std::string VIEW_ID;
 
@@ -63,15 +66,19 @@ class QmitkToFUtilView : public QmitkFunctionality
     ~QmitkToFUtilView();
 
     virtual void CreateQtPartControl(QWidget *parent);
-    /// \brief Called when the functionality is activated
+    /// \brief Called when the functionality is activated.
     virtual void Activated();
-    /// \brief Called when the functionality is deactivated
-    virtual void Deactivated();
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
+    /// \brief Called when the functionality is deactivated. In this case the zombie view of this functionality becomes active!
+    virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer zombieView);
 
-  protected slots:
-  
+    virtual void Deactivated();
+    virtual void Visible();
+    virtual void Hidden();
+
+    void SetFocus();
+
+protected slots:
+
     /*!
     \brief Slot triggered from the timer to update the images and visualization
     */
@@ -105,7 +112,7 @@ class QmitkToFUtilView : public QmitkFunctionality
     */
     void OnVideoTextureCheckBoxChecked(bool checked);
 
-  protected:
+protected:
 
     /*!
     \brief initialize the visibility settings of ToF data (images + surface)
@@ -153,7 +160,7 @@ class QmitkToFUtilView : public QmitkFunctionality
     int m_VideoCaptureHeight; ///< height of the video image
     bool m_VideoEnabled; ///< flag indicating whether video grabbing is enabled. Set via the RGB texture checkbox
 
-  private:
+private:
 
     /*!
     \brief helper method to replace data of the specified node. If node does not exist it will be created
@@ -164,6 +171,11 @@ class QmitkToFUtilView : public QmitkFunctionality
     mitk::DataNode::Pointer ReplaceNodeData(std::string nodeName, mitk::BaseData* data);
 
     void ProcessVideoTransform();
+
+    /*!
+      \brief Reset all GUI related things to default. E.g. show sagittal and coronal slices in the renderwindows.
+      */
+    void ResetGUIToDefault();
 
     mitk::ToFSurfaceVtkMapper3D::Pointer m_ToFSurfaceVtkMapper3D;
 };

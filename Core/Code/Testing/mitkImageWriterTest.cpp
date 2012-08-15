@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageWriter.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkTestingMacros.h"
+#include "mitkItkImageFileReader.h"
+#include "mitkException.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -33,6 +36,48 @@ std::string AppendExtension(const std::string &filename, const char *extension)
   new_filename += extension;
   return new_filename;
 }
+
+mitk::Image::Pointer LoadMyImage( std::string filename )
+{
+    mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
+
+    try
+    {
+      reader->SetFileName ( filename.c_str() );
+      reader->Update();
+    }
+    //catch( mitk::Exception e )
+    catch(...) //todo: Alfred warum kann man die mitk::Exception hier nicht fangen?
+    {
+      MITK_TEST_FAILED_MSG(<< "Exception during image loading "); // <<  e.what() );
+    }
+
+    if ( reader->GetOutput() == NULL )
+        itkGenericExceptionMacro("File "<<filename <<" could not be read!");
+    mitk::Image::Pointer image = reader->GetOutput();
+    return image;
+}
+
+bool CompareImageMetaData( mitk::Image::Pointer image, mitk::Image::Pointer reference)
+{
+  // switch to AreIdentical() methods as soon as Bug 11925 (Basic comparison operators) is fixed
+
+  if( image->GetDimension() != reference->GetDimension() )
+  {
+    MITK_ERROR << "The image dimension differs";
+    return false;
+  }
+
+  // pixel type
+  if( image->GetPixelType() != reference->GetPixelType() )
+  {
+    MITK_ERROR << "Pixeltype differs ";
+    return false;
+  }
+
+  return true;
+}
+
 
 /**
 *  test for "ImageWriter".
@@ -97,9 +142,13 @@ int mitkImageWriterTest(int  argc , char* argv[])
 #else
   filename_stream << "test" << getpid();
 #endif
+
+
   
 
   std::string filename = filename_stream.str();
+
+  std::cout << filename << std::endl;
 
   // test set/get methods
   myImageWriter->SetInput(image);
@@ -118,22 +167,23 @@ int mitkImageWriterTest(int  argc , char* argv[])
     {
       myImageWriter->SetExtension(".mhd");
       myImageWriter->Update();
-      std::fstream fin, fin2;
-      fin.open(AppendExtension(filename, ".mhd").c_str(),std::ios::in);
+
+      mitk::Image::Pointer compareImage = LoadMyImage(AppendExtension(filename, ".mhd").c_str());
+      MITK_TEST_CONDITION_REQUIRED( compareImage.IsNotNull(), "Image stored in MHD format was succesfully loaded again! ");
 
       std::string rawExtension = ".raw";
-      fin2.open(AppendExtension(filename, ".raw").c_str(),std::ios::in);
-      if( !fin2.is_open() )
+      std::fstream rawPartIn;
+      rawPartIn.open(AppendExtension(filename, ".raw").c_str());
+      if( !rawPartIn.is_open() )
       {
         rawExtension = ".zraw";
-        fin2.open(AppendExtension(filename, ".zraw").c_str(),std::ios::in);
+        rawPartIn.open(AppendExtension(filename, ".zraw").c_str());
       }
 
-      MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .mhd file");
-      MITK_TEST_CONDITION_REQUIRED(fin2.is_open(),"Write .raw file");
+      MITK_TEST_CONDITION_REQUIRED(rawPartIn.is_open(),"Write .raw file");
+      rawPartIn.close();
 
-      fin.close();
-      fin2.close();
+      // delete
       remove(AppendExtension(filename, ".mhd").c_str());
       remove(AppendExtension(filename, rawExtension.c_str()).c_str());
     }
@@ -149,8 +199,8 @@ int mitkImageWriterTest(int  argc , char* argv[])
     myImageWriter->SetExtension(".nrrd");
     myImageWriter->Update();
     std::fstream fin;
-    fin.open(AppendExtension(filename, ".nrrd").c_str(),std::ios::in);
-    MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .nrrd file");
+    mitk::Image::Pointer compareImage = LoadMyImage(AppendExtension(filename, ".nrrd").c_str());
+    MITK_TEST_CONDITION_REQUIRED(compareImage.IsNotNull(), "Image stored in NRRD format was succesfully loaded again");
     fin.close();
     remove(AppendExtension(filename, ".nrrd").c_str());
   }
@@ -171,8 +221,10 @@ int mitkImageWriterTest(int  argc , char* argv[])
       myImageWriter->SetExtension(".png");
       myImageWriter->Update();
       std::fstream fin;
-      fin.open(AppendExtension(filename, ".png").c_str(),std::ios::in);
-      MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .png file");
+      mitk::Image::Pointer compareImage = LoadMyImage(AppendExtension(filename, ".png").c_str());
+      MITK_TEST_CONDITION_REQUIRED(compareImage.IsNotNull(), "Image stored in PNG format was succesfully loaded again");
+
+      MITK_TEST_CONDITION_REQUIRED( CompareImageMetaData(image, compareImage ), "Image meta data unchanged after writing and loading again. ");
       fin.close();
       remove(AppendExtension(filename, ".png").c_str());
     }

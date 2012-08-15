@@ -17,13 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationTool.h"
 #include "Poco/File.h"
 
-mitk::NavigationTool::NavigationTool()
+mitk::NavigationTool::NavigationTool() : m_Type(mitk::NavigationTool::Unknown), 
+                                         m_Identifier("None"),
+                                         m_TrackingDeviceType(mitk::TrackingSystemNotSpecified),
+                                         m_CalibrationFile("none"),
+                                         m_SerialNumber(""),
+                                         m_ToolRegistrationLandmarks(mitk::PointSet::New()),
+                                         m_ToolCalibrationLandmarks(mitk::PointSet::New())
   {
-    m_Type = mitk::NavigationTool::Unknown;
-    m_Identifier = "None";
-    m_TrackingDeviceType = mitk::TrackingSystemNotSpecified;
-    m_CalibrationFile = "none";
-    m_SerialNumber = "";
+    
   }
  
 mitk::NavigationTool::~NavigationTool()

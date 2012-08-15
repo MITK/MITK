@@ -16,17 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataRecorder.h"
 #include <fstream>
-
 #include <mitkTimeStamp.h>
 #include <tinyxml.h>
-
 #include <itksys/SystemTools.hxx>
 
-
-
-
-
-
+//headers for exceptions
+#include "mitkIGTException.h"
+#include "mitkIGTIOException.h"
 
 mitk::NavigationDataRecorder::NavigationDataRecorder()
 {
@@ -46,8 +42,6 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
-  
-
 }
 
 mitk::NavigationDataRecorder::~NavigationDataRecorder()
@@ -95,7 +89,7 @@ void mitk::NavigationDataRecorder::Update()
     strs << sysTimestamp;
     std::string sysTimeStr = strs.str();
 
-    //if csv-mode: write csv header and timpstamp at beginning
+    //if csv-mode: write csv header and timestamp at beginning
     if (m_OutputFormat == mitk::NavigationDataRecorder::csv)
       {
       //write header only when it's the first line 
@@ -245,81 +239,81 @@ void mitk::NavigationDataRecorder::RemoveAdditionalAttribute( const NavigationDa
 
 void mitk::NavigationDataRecorder::StartRecording()
 {
-  if (m_Recording)
+
+  if(!m_Recording)
   {
-    std::cout << "Already recording please stop before start new recording session" << std::endl;
-    return;
-  }
-  
+    if (m_Stream == NULL)
+    { 
+      std::stringstream ss;
+      std::ostream* stream;
+      
+      //An existing extension will be cut and replaced with .xml
+      std::string tmpPath = itksys::SystemTools::GetFilenamePath(m_FileName);
+      m_FileName = itksys::SystemTools::GetFilenameWithoutExtension(m_FileName);
+      std::string extension = ".xml";
+      if (m_OutputFormat == mitk::NavigationDataRecorder::csv) 
+        extension = ".csv";
 
-  if (m_Stream == NULL)
-  {
-    std::stringstream ss;
-    std::ostream* stream;
-    
-    //An existing extension will be cut and replaced with .xml
-    std::string tmpPath = itksys::SystemTools::GetFilenamePath(m_FileName);
-    m_FileName = itksys::SystemTools::GetFilenameWithoutExtension(m_FileName);
-    std::string extension = ".xml";
-    if (m_OutputFormat == mitk::NavigationDataRecorder::csv) 
-      extension = ".csv";
+      ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << extension;
 
-    ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << extension;
-
-    if( m_DoNotOverwriteFiles )
-    {
-      unsigned int index = m_NumberOfRecordedFiles+1;
-      while( itksys::SystemTools::FileExists( ss.str().c_str() ) )
+      if( m_DoNotOverwriteFiles )
       {
-        ss.str("");
-        ss << tmpPath << "/" <<  m_FileName << "-" << index  << extension;
-        index++;
+        unsigned int index = m_NumberOfRecordedFiles+1;
+        while( itksys::SystemTools::FileExists( ss.str().c_str() ) )
+        {
+          ss.str("");
+          ss << tmpPath << "/" <<  m_FileName << "-" << index  << extension;
+          index++;
+        }
       }
-    }
 
-    switch(m_RecordingMode)
-    {
-      case Console:
-        stream = &std::cout;
-        break;
-      case NormalFile:
-
-        //Check if there is a file name and path
-        if (m_FileName == "")
-        {
+      switch(m_RecordingMode)
+      {
+        case Console:
           stream = &std::cout;
-          std::cout << "No file name or file path set the output is redirected to the console";
-        }
-        else
-        {
-          stream = new std::ofstream(ss.str().c_str());
-        }
+          break;
 
-        break;
-      case ZipFile:
-        stream = &std::cout;
-        std::cout << "Sorry no ZipFile support yet";
-        break;
-      default:
-        stream = &std::cout;
-        break;
+        case NormalFile:
+          if (m_FileName == "") //Check if there is a file name and path
+          {
+            std::string message = "No file name or file path set.";
+            MITK_ERROR << message;
+            mitkThrowException(mitk::IGTException) << message;
+          }
+          else
+          {
+            stream = new std::ofstream(ss.str().c_str());
+          }
+          break;
+        
+        case ZipFile:
+          stream = &std::cout;
+          MITK_WARN << "Sorry no ZipFile support yet";
+          break;
+        
+        default:
+          stream = &std::cout;
+          break;
+      }
+      m_Stream = stream;
+      m_StreamMustBeDeleted = true;
+      m_firstLine = true;
+      m_RecordCounter = 0;
+      StartRecording(stream);
     }
-    m_Stream = stream;
-    m_StreamMustBeDeleted = true;
-    m_firstLine = true;
-    m_RecordCounter = 0;
-    StartRecording(stream);
-  }
-
-
-
-
+  } 
+else if (m_Recording)
+  {
+  MITK_WARN << "Already recording please stop before start new recording session";
+  return;
+  } 
 }
+
 void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
 {
   if (m_Recording)
   {
-    std::cout << "Already recording please stop before start new recording session" << std::endl;
+    MITK_WARN << "Already recording please stop before start new recording session";
     return;
   }
 
@@ -327,8 +321,9 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
   m_Stream->precision(10);
 
   //TODO store date and GMT time
-  if (m_Stream)
-  {
+  //cheking if the stream is good
+  if (m_Stream->good())
+  { 
     if (m_OutputFormat == mitk::NavigationDataRecorder::xml)
       {
       *m_Stream << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << std::endl;
@@ -337,12 +332,19 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
       *m_Stream << "    " << "<Data ToolCount=\"" << (m_NumberOfInputs) << "\" version=\"1.0\">" << std::endl;
       }
     m_Recording = true;
+  } 
+  else 
+  {
+   m_Recording = false;
+   mitkThrowException(mitk::IGTException)<<"The stream is not good";
   }
 }
+
+
 void mitk::NavigationDataRecorder::StopRecording()
 {
   if (!m_Recording)
-  {
+  { 
     std::cout << "You have to start a recording first" << std::endl;
     return;
   }

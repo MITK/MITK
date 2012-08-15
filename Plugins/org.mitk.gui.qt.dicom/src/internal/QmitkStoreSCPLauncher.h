@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef QmitkStoreSCPLauncher_h
 #define QmitkStoreSCPLauncher_h
@@ -30,16 +29,21 @@ public:
     QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder);
     virtual ~QmitkStoreSCPLauncher();
 
-    public slots:
-        void StartStoreSCP();
-        void OnProcessError(QProcess::ProcessError error);
-        void OnStateChanged(QProcess::ProcessState status);
+public slots:
+    void StartStoreSCP();
+    void OnProcessError(QProcess::ProcessError error);
+    void OnStateChanged(QProcess::ProcessState status);
 
+signals:
+    void SignalStatusOfStoreSCP(const QString&);
 
 private:
-    QString GetPathToExecutable();
+    void FindPathToStoreSCP();
     void SetArgumentList(QmitkStoreSCPLauncherBuilder* builder);
     QString ArgumentListToQString();
+    QString m_PathToStoreSCP;
+    QString m_ErrorText;
+    QString m_StatusText;
 
     QProcess* m_StoreSCP;
     QStringList m_ArgumentList;

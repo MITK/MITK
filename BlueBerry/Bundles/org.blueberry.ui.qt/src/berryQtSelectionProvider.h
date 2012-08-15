@@ -45,7 +45,9 @@ public:
       ISelectionChangedListener::Pointer listener);
 
   ISelection::ConstPointer GetSelection() const;
-  void SetSelection(ISelection::Pointer selection);
+  void SetSelection(ISelection::ConstPointer selection);
+
+  virtual void SetSelection(ISelection::ConstPointer selection, QItemSelectionModel::SelectionFlags);
 
   QItemSelection GetQItemSelection() const;
   void SetQItemSelection(const QItemSelection& selection);

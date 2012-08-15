@@ -70,7 +70,7 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
 void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
-   m_Active = false;
+  m_Active = false;
   MITK_INFO << "NewDeviceWidget: ClickedDone()";
   
   // Assemble Metadata
@@ -90,6 +90,18 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
   } else {
     std::string filepath = m_Controls->m_FilePathSelector->text().toStdString();
     newDevice = mitk::USVideoDevice::New(filepath, metadata);
+  }
+
+  // Set Video Options
+   newDevice->GetSource()->SetColorOutput(! m_Controls->m_CheckGreyscale->isChecked());
+
+  // If Resolution override is activated, apply it
+  if (m_Controls->m_CheckResolutionOverride->isChecked())
+  {
+    int width  = m_Controls->m_ResolutionWidth->value();
+    int height = m_Controls->m_ResolutionHeight->value();
+    newDevice->GetSource()->OverrideResolution(width, height);
+    newDevice->GetSource()->SetResolutionOverride(true);
   }
 
   newDevice->Connect();

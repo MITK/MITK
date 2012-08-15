@@ -47,7 +47,7 @@ m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_ImageStati
 
   //Since the above called "Initialize" method doesn't take the geometry into account we need to set it
   //here manually
-  this->SetGeometry(dynamic_cast<mitk::Geometry3D*>(other.GetGeometry()->Clone().GetPointer()));
+  this->SetGeometry(dynamic_cast<mitk::TimeSlicedGeometry*>(other.GetTimeSlicedGeometry()->Clone().GetPointer()));
 
   if (this->GetDimension() > 3)
   {

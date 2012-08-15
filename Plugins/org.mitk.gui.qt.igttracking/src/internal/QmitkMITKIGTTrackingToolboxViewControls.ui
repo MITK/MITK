@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>377</width>
-    <height>849</height>
+    <width>438</width>
+    <height>1001</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -154,7 +154,7 @@ p, li { white-space: pre-wrap; }
                  <widget class="QPushButton" name="m_AddSingleTool">
                   <property name="minimumSize">
                    <size>
-                    <width>110</width>
+                    <width>120</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -199,7 +199,7 @@ p, li { white-space: pre-wrap; }
                  <widget class="QPushButton" name="m_LoadTools">
                   <property name="minimumSize">
                    <size>
-                    <width>110</width>
+                    <width>120</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -229,7 +229,7 @@ p, li { white-space: pre-wrap; }
                  <widget class="QPushButton" name="m_ResetTools">
                   <property name="minimumSize">
                    <size>
-                    <width>110</width>
+                    <width>120</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -279,6 +279,36 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="m_Connect">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Connect</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <spacer name="horizontalSpacer_2">
@@ -297,7 +327,7 @@ p, li { white-space: pre-wrap; }
              <widget class="QPushButton" name="m_StartTracking">
               <property name="minimumSize">
                <size>
-                <width>110</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
@@ -327,12 +357,42 @@ p, li { white-space: pre-wrap; }
              <widget class="QPushButton" name="m_StopTracking">
               <property name="minimumSize">
                <size>
-                <width>110</width>
+                <width>120</width>
                 <height>0</height>
                </size>
               </property>
               <property name="text">
                <string>Stop Tracking</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <spacer name="horizontalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="m_Disconnect">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Disconnect</string>
               </property>
              </widget>
             </item>

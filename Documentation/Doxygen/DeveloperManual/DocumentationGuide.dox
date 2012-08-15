@@ -33,6 +33,8 @@ An example:
    */
 \endverbatim
 
+See \subpage DocumentationExample for an exemplary documentation of a class.
+
 \subsection DocumentationGuideCodeHints Helpful hints:
 <ul>
  <li> Always put comments intended for doxygen in the header files.

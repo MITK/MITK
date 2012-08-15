@@ -53,13 +53,35 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
   vtkwriter->Delete();
 }
 
+#include <itkRGBAPixel.h>
+
 void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileName)
 {
   // Pictures and picture series like .png are written via a different mechanism then volume images.
   // So, they are still multiplexed and thus not support vector images.
   if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
   {
-    AccessByItk_1( image, _mitkItkPictureWrite, fileName );
+    try
+    {
+      // switch processing of single/multi-component images
+      if( image->GetPixelType(0).GetNumberOfComponents() == 1)
+      {
+        AccessByItk_1( image, _mitkItkPictureWrite, fileName );
+      }
+      else
+      {
+        AccessFixedPixelTypeByItk_1( image, _mitkItkPictureWriteComposite, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ , fileName);
+      }
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      std::cerr << "Caught " << e.what() << std::endl;
+    }
+    catch(std::exception &e)
+    {
+      std::cerr << "Caught std::exception " << e.what() << std::endl;
+    }
+
     return;
   }
 

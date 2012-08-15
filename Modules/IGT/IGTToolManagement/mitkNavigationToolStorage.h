@@ -26,6 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationTool.h"
 #include <mitkDataStorage.h>
 
+// Microservices
+#include <usServiceInterface.h>
+#include <usServiceRegistration.h>
+
 namespace mitk {
   /**Documentation
   * \brief An object of this class represents a collection of navigation tools.
@@ -46,6 +50,31 @@ namespace mitk {
     /** @brief Constructs a NavigationToolStorage with reference to a DataStorage. The Data Nodes of tools are added and removed automatically to this data storage. */
     mitkNewMacro1Param(Self,mitk::DataStorage::Pointer);
     
+
+    /**
+    *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
+    * To unregister, call UnregisterMicroservice(). Make sure to pass the id of the Device that this tool is connected to.
+    */
+    virtual void RegisterAsMicroservice(std::string sourceID);
+
+    /**
+    *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
+    */
+    virtual void UnRegisterMicroservice();
+
+    /**
+    *\brief Returns the id that this device is registered with. The id will only be valid, if the
+    * NavigationDataSource has been registered using RegisterAsMicroservice().
+    */
+    std::string GetMicroserviceID();
+
+    /**
+    *\brief These constants are used in conjunction with Microservices
+    */
+    static const std::string US_INTERFACE_NAME; // Name of the interface
+    static const std::string US_PROPKEY_SOURCE_ID; // ID of the device this ToolStorage is associated with
+
+
     /**
      * @brief  Adds a tool to the storage. Be sure that the tool has a unique 
      *         identifier which is not already part of this storage.
@@ -105,6 +134,10 @@ namespace mitk {
     std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
     mitk::DataStorage::Pointer m_DataStorage;
 
+  private:
+    mitk::ServiceRegistration m_ServiceRegistration;
+
   };
 } // namespace mitk
+US_DECLARE_SERVICE_INTERFACE(mitk::NavigationToolStorage, "org.mitk.services.NavigationToolStorage")
 #endif //NAVIGATIONTOOLSTORAGE

@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$ 
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include <mitkStatusBar.h>
 
@@ -50,6 +49,7 @@ QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
     delete m_ExternalIndexer;
     delete m_Controls;
     delete m_DirectoryName;
+    delete m_ProgressDialogLabel;
 }
 
 
@@ -62,11 +62,17 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         // create GUI widgets from the Qt Designer's .ui file
         m_Controls = new Ui::QmitkDicomExternalDataWidgetControls;
         m_Controls->setupUi( parent );
-
+        m_Controls->cancelButton->setVisible(false);
+        m_Controls->viewExternalDataButton->setVisible(false);
         // 
         m_Controls->ExternalDataTreeView->setSortingEnabled(true);
         m_Controls->ExternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
         m_Controls->ExternalDataTreeView->setModel(m_ExternalModel);
+
+        //connect Buttons
+        connect(m_Controls->downloadButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
+        connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()),this,SLOT(OnViewButtonClicked()));
+        connect(m_Controls->cancelButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
 
         //Initialize import widget
         m_ImportDialog = new ctkFileDialog();
@@ -78,12 +84,25 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         m_ImportDialog->setWindowModality(Qt::ApplicationModal);
         connect(m_ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(OnFileSelectedAddExternalData(QString)));
 
-        //connect Buttons
-        connect(m_Controls->downloadButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
-        connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()),this,SLOT(OnViewButtonClicked()));
-        connect(m_Controls->cancelButton, SIGNAL(clicked()),this,SLOT(OnDownloadButtonClicked()));
+        m_ProgressDialog= new QProgressDialog ("DICOM Import", "Cancel", 0, 100, this,Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        // We don't want the m_ProgressDialog dialog to resize itself, so we bypass the label
+        // by creating our own
+        m_ProgressDialogLabel = new QLabel(tr("Initialization..."));
+        m_ProgressDialog->setLabel(m_ProgressDialogLabel);
+        #ifdef Q_WS_MAC
+        // BUG: avoid deadlock of dialogs on mac
+        m_ProgressDialog->setWindowModality(Qt::NonModal);
+        #else
+        m_ProgressDialog->setWindowModality(Qt::ApplicationModal);
+        #endif
 
-        connect(m_Controls->SearchOption_2, SIGNAL(parameterChanged()), this, SLOT(OnSearchParameterChanged()));
+    connect(m_ProgressDialog, SIGNAL(canceled()), m_ExternalIndexer, SLOT(cancel()));
+    connect(m_ExternalIndexer, SIGNAL(indexingFilePath(QString)),
+            m_ProgressDialogLabel, SLOT(setText(QString)));
+    connect(m_ExternalIndexer, SIGNAL(progress(int)),
+            m_ProgressDialog, SLOT(setValue(int)));
+    connect(m_ExternalIndexer, SIGNAL(progress(int)),
+            this, SLOT(OnProgress(int)));
     }
 }
 
@@ -121,17 +140,9 @@ void QmitkDicomExternalDataWidget::OnFileSelectedAddExternalData(QString directo
 
         if (copyOnImport->isChecked())
         {
-            //targetDirectory = d->DICOMDatabase->databaseDirectory();
-            MBI_DEBUG<<directory.toStdString();
             emit SignalAddDicomData(directory);
         }else{
-            if (m_Watcher.isRunning())
-            {
-                m_Watcher.waitForFinished();
-            }
-            m_Future = QtConcurrent::run(this,(void (QmitkDicomExternalDataWidget::*)(QString)) &QmitkDicomExternalDataWidget::AddDicomTemporary,directory);
-            m_Watcher.setFuture(m_Future);
-
+            AddDicomTemporary(directory);
             emit SignalChangePage(1);
         }
     }
@@ -161,8 +172,6 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
 
         QStringList eventProperties;
         eventProperties << patientName << studyUID << studyName << seriesUID << seriesName << *m_DirectoryName;
-        MITK_INFO << m_DirectoryName->toStdString();
-
         emit SignalDicomToDataManager(eventProperties);
     }
 }
@@ -213,8 +222,17 @@ void QmitkDicomExternalDataWidget::GetFileNamesFromIndex(QStringList& filePaths)
 
 void QmitkDicomExternalDataWidget::AddDicomTemporary(QString directory)
 {
+    m_ProgressDialog->setMinimumDuration(0);
+    m_ProgressDialog->setValue(0);
+    m_ProgressDialog->show();
     m_ExternalIndexer->addDirectory(*m_ExternalDatabase,directory);
     m_ExternalModel->reset();
+}
+
+void QmitkDicomExternalDataWidget::OnProgress(int progress)
+{
+  Q_UNUSED(progress);
+  QApplication::processEvents();
 }
 
 void QmitkDicomExternalDataWidget::OnSearchParameterChanged()

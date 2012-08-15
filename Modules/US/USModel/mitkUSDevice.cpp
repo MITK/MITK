@@ -30,6 +30,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::Im
   m_Metadata = mitk::USImageMetadata::New();
   m_Metadata->SetDeviceManufacturer(manufacturer);
   m_Metadata->SetDeviceModel(model);
+  //m_Metadata->SetDeviceClass(GetDeviceClass());
   m_IsActive = false;
   
   //set number of outputs
@@ -43,6 +44,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::Im
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata) : mitk::ImageSource()
 {
   m_Metadata = metadata;
+  //m_Metadata->SetDeviceClass(GetDeviceClass());
   m_IsActive = false;
 
   //set number of outputs
@@ -59,6 +61,35 @@ mitk::USDevice::~USDevice()
 
 }
 
+
+// Constructing Service Properties for the device
+mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
+{
+  ServiceProperties props;
+  std::string yes = "true";
+  std::string no = "false";
+
+  if(this->GetIsActive())
+    props["IsActive"] = yes;
+  else
+    props["IsActive"] = no;
+
+  if( m_Calibration.IsNotNull() )
+    props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = yes;
+  else
+    props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = no;
+
+  props[ "DeviceClass" ] = GetDeviceClass();
+  props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
+  props[ mitk::USImageMetadata::PROP_DEV_MODEL ] = m_Metadata->GetDeviceModel();
+  props[ mitk::USImageMetadata::PROP_DEV_COMMENT ] = m_Metadata->GetDeviceComment();
+  props[ mitk::USImageMetadata::PROP_PROBE_NAME ] = m_Metadata->GetProbeName();
+  props[ mitk::USImageMetadata::PROP_PROBE_FREQUENCY ] = m_Metadata->GetProbeFrequency();
+  props[ mitk::USImageMetadata::PROP_ZOOM ] = m_Metadata->GetZoom();
+  return props;
+}
+
+
 bool mitk::USDevice::Connect()
 {
   //TODO Throw Exception is already activated before connection
@@ -68,12 +99,8 @@ bool mitk::USDevice::Connect()
 
   // Get Context and Module
   mitk::ModuleContext* context = GetModuleContext();
+  ServiceProperties props = ConstructServiceProperties();
 
-  // Define ServiceProps
-  ServiceProperties props;
-  props["DeviceClass"] = this->GetDeviceClass();
-  std::string no = "false";
-  props["IsActive"] = no;
   m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
   return true; 
 }
@@ -91,29 +118,14 @@ bool mitk::USDevice::Disconnect()
   return true;
 }
 
-//bool mitk::USDevice::OnConnection()
-//{
-//  return true;
-//  // TODO: Make Abstract
-//}
-//
-//bool mitk::USDevice::OnDisconnection()
-//{
-//  return true;
-//  // TODO Make Abstract
-//}
-
-
+//Changed
 bool mitk::USDevice::Activate()
 {
   if (! this->GetIsConnected()) return false;
 
   m_IsActive = OnActivation();
 
-  ServiceProperties props;
-  props["DeviceClass"] = this->GetDeviceClass();
-  std::string yes = "true";
-  props["IsActive"] = yes;
+  ServiceProperties props = ConstructServiceProperties();
   this->m_ServiceRegistration.SetProperties(props);
   return m_IsActive;
 }
@@ -123,34 +135,10 @@ void mitk::USDevice::Deactivate()
 {
   m_IsActive= false;
 
-  ServiceProperties props;
-  props["DeviceClass"] = this->GetDeviceClass();
-  std::string no = "false";
-  props["IsActive"] = no;
+  ServiceProperties props = ConstructServiceProperties();
   this->m_ServiceRegistration.SetProperties(props);
   OnDeactivation();
 }
-
-//
-//bool mitk::USDevice::OnActivation()
-//{
-//  return true;
-//  // TODO Make Abstract
-//}
-//
-//
-//void mitk::USDevice::OnDeactivation()
-//{
-//  // TODO Make Abstract
-//}
-//
-//
-//std::string mitk::USDevice::GetDeviceClass()
-//{
-//  return "org.mitk.Ultrasound.GenericDevice";
-//}
-
-
 
 void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
 {
@@ -238,7 +226,30 @@ itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( unsigned int /
   return static_cast<itk::DataObject*>(p.GetPointer());
 }
 
+bool mitk::USDevice::ApplyCalibration(mitk::USImage::Pointer image){
+  if ( m_Calibration.IsNull() ) return false;
+
+  image->GetGeometry()->SetIndexToWorldTransform(m_Calibration);
+  return true;
+}
+
+
  //########### GETTER & SETTER ##################//
+
+void mitk::USDevice::setCalibration (mitk::AffineTransform3D::Pointer calibration){
+  if (calibration.IsNull())
+  {
+    MITK_ERROR << "Null pointer passed to SetCalibration of mitk::USDevice. Ignoring call.";
+    return;
+  }
+  m_Calibration = calibration;
+  m_Metadata->SetDeviceIsCalibrated(true);
+  if (m_ServiceRegistration != 0)
+  {
+    ServiceProperties props = ConstructServiceProperties();
+    this->m_ServiceRegistration.SetProperties(props);
+  }
+}
 
 bool mitk::USDevice::GetIsActive()
 {

@@ -340,6 +340,7 @@ void QmitkSlicesInterpolator::OnInterpolationDisabled(bool status)
   {
     OnInterpolationActivated(!status);
     On3DInterpolationActivated(!status);
+    this->Show3DInterpolationResult(false);
   }
 }
 
@@ -376,8 +377,7 @@ void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
   }
   if (m_3DInterpolationEnabled)
   {
-    m_InterpolatedSurfaceNode->SetVisibility(false);
-    m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+    this->Show3DInterpolationResult(false);
   }
 }
 
@@ -531,8 +531,7 @@ void QmitkSlicesInterpolator::SurfaceInterpolationFinished()
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
-    m_InterpolatedSurfaceNode->SetVisibility(true);
-    m_3DContourNode->SetVisibility(true, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+    this->Show3DInterpolationResult(true);
 
     if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
     {
@@ -547,8 +546,7 @@ void QmitkSlicesInterpolator::SurfaceInterpolationFinished()
 
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     {
-      m_InterpolatedSurfaceNode->SetVisibility(false);
-      m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+      this->Show3DInterpolationResult(false);
     }
   }
 
@@ -691,6 +689,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     segmentationNode->SetData(s2iFilter->GetOutput());
     m_RBtnDisableInterpolation->setChecked(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    this->Show3DInterpolationResult(false);
   }
 }
 
@@ -859,8 +858,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
         }
         else if (!m_3DInterpolationEnabled)
         {
-          m_InterpolatedSurfaceNode->SetVisibility(false);
-          m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+          this->Show3DInterpolationResult(false);
           m_BtnAccept3DInterpolation->setEnabled(m_3DInterpolationEnabled);
         }
       }
@@ -1020,8 +1018,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
         {
           listID = m_SurfaceInterpolator->CreateNewContourList();
           workingNode->SetIntProperty("3DInterpolationListID", listID);
-          m_InterpolatedSurfaceNode->SetVisibility(false);
-          m_3DContourNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+          this->Show3DInterpolationResult(false);
           m_BtnAccept3DInterpolation->setEnabled(false);
         }
 
@@ -1047,4 +1044,10 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
       }
     }
   }
+}
+
+void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
+{
+  m_InterpolatedSurfaceNode->SetVisibility(status);
+  m_3DContourNode->SetVisibility(status, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 }

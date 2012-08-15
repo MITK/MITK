@@ -134,7 +134,6 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
 
   //connect to aurora to dectect tools automatically
   thisDevice->OpenConnection();
-  thisDevice->StartTracking();
   
   //now search for automatically detected tools in the tool storage and save them
   mitk::NavigationToolStorage::Pointer newToolStorageInRightOrder = mitk::NavigationToolStorage::New();

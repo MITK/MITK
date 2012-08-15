@@ -133,6 +133,8 @@ void QmitkTextOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
 {
   if ( prop.IsNotNull() )
   {
+    prop->RemoveObserver(m_ObserverTag);
+
     typedef itk::SimpleMemberCommand< QmitkTextOverlay > MemberCommandType;
     MemberCommandType::Pointer propModifiedCommand;
     propModifiedCommand = MemberCommandType::New();

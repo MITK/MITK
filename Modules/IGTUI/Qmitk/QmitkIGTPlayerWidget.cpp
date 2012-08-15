@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorage.h>
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkNavigationToolStorageSerializer.h>
+#include <mitkIGTException.h>
 
 
 //qt headers
@@ -157,15 +158,39 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
         {
           m_RealTimePlayer = mitk::NavigationDataPlayer::New();
           m_RealTimePlayer->SetFileName(m_CmpFilename.toStdString());
-          m_RealTimePlayer->StartPlaying();
+          try
+            {
+            m_RealTimePlayer->StartPlaying();
+            }
+          catch(mitk::IGTException)
+            {
+            std::string errormessage = "Error during start playing. Invalid or wrong file?";
+            QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+            m_Controls->playPushButton->setChecked(false);
+            m_RealTimePlayer = NULL;
+            return;
+            }
         }
         else if(isSequentialMode)
         {
           m_SequentialPlayer = mitk::NavigationDataSequentialPlayer::New();
+          try
+          {
           m_SequentialPlayer->SetFileName(m_CmpFilename.toStdString());
-          
+          }
+          catch(mitk::IGTException)
+          {
+           std::string errormessage = "Error during start playing. Invalid or wrong file type?";
+           QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+           m_Controls->playPushButton->setChecked(false);
+           m_RealTimePlayer = NULL;
+           return;
+          }
+
           m_Controls->samplePositionHorizontalSlider->setMinimum(0);
+
           m_Controls->samplePositionHorizontalSlider->setMaximum(m_SequentialPlayer->GetNumberOfSnapshots());
+
           m_Controls->samplePositionHorizontalSlider->setEnabled(true);
         }
 

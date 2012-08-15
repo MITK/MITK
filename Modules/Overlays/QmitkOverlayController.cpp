@@ -292,7 +292,10 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
 
 void QmitkOverlayController::UpdateOverlayData( QmitkOverlay* overlay )
 {
-  overlay->GenerateData( m_PropertyList );
+  if ( overlay != NULL)
+  {
+    overlay->GenerateData( m_PropertyList );
+  }
 }
 
 void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )

@@ -20,7 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 enum QmitkItemModelRole
 {
-  QmitkDataNodeRole = 64
+  QmitkDataNodeRole = 64,
+  QmitkDataNodeRawPointerRole = 65
 };
 
 #endif /* QMITKENUMS_H_ */

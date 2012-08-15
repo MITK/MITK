@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
+#define _USE_MATH_DEFINES
 #include "mitkFiberBundleX.h"
 
 #include <mitkPlanarCircle.h>
@@ -36,8 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkParametricSpline.h>
 #include <vtkPolygon.h>
 #include <vtkCleanPolyData.h>
-
-#include <math.h>
+#include <cmath>
 
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 //const char* mitk::FiberBundleX::COLORCODING_FA_AS_OPACITY = "Color_Orient_FA_Opacity";
@@ -45,6 +45,7 @@ const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "FA_Values";
 const char* mitk::FiberBundleX::COLORCODING_CUSTOM = "custom";
 const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";
 
+using namespace std;
 
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_CurrentColorCoding(NULL)
@@ -53,23 +54,9 @@ mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != NULL)
     {
-        vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
-        cleaner->SetInput(fiberPolyData);
-        cleaner->Update();
-        fiberPolyData = cleaner->GetOutput();
-
-        m_FiberPolyData->DeepCopy(fiberPolyData);
+        m_FiberPolyData = fiberPolyData;
+        //m_FiberPolyData->DeepCopy(fiberPolyData);
         this->DoColorCodingOrientationBased();
-    }
-
-    if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED))
-        MITK_DEBUG << "ok";
-
-    vtkUnsignedCharArray* tmpColors = (vtkUnsignedCharArray*) m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED);
-    if (tmpColors!=NULL)
-    {
-        int tmpColorss = tmpColors->GetNumberOfTuples();
-        int tmpColorc = tmpColors->GetNumberOfComponents();
     }
 
     m_NumFibers = m_FiberPolyData->GetNumberOfLines();
@@ -258,6 +245,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
         vtkIdType*  points(NULL);
         vLines->GetNextCell ( numPoints, points );
 
+        if (points==NULL)
+            continue;
+
         vtkSmartPointer<vtkCellArray> vLines2 = fib->m_FiberPolyData->GetLines();
         vLines2->InitTraversal();
         int numFibers2 = fib->GetNumFibers();
@@ -268,6 +258,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
             vtkIdType   numPoints2(0);
             vtkIdType*  points2(NULL);
             vLines2->GetNextCell ( numPoints2, points2 );
+
+            if (points2==NULL)
+                continue;
 
             // check endpoints
             itk::Point<float, 3> point_start = GetItkPoint(m_FiberPolyData->GetPoint(points[0]));
@@ -984,8 +977,22 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
 
 void mitk::FiberBundleX::UpdateFiberGeometry()
 {
+    vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+    cleaner->SetInput(m_FiberPolyData);
+    cleaner->PointMergingOff();
+    cleaner->Update();
+    m_FiberPolyData = cleaner->GetOutput();
+
+    m_FiberLengths.clear();
+    m_MeanFiberLength = 0;
+    m_MedianFiberLength = 0;
+    m_LengthStDev = 0;
+    m_NumFibers = m_FiberPolyData->GetNumberOfLines();
+
     if (m_NumFibers<=0) // no fibers present; apply default geometry
     {
+        m_MinFiberLength = 0;
+        m_MaxFiberLength = 0;
         mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
         geometry->SetImageGeometry(true);
         float b[] = {0, 1, 0, 1, 0, 1};
@@ -1004,27 +1011,66 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
         vtkCell* cell = m_FiberPolyData->GetCell(i);
         int p = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();
+        float length = 0;
         for (int j=0; j<p; j++)
         {
-            double p[3];
-            points->GetPoint(j, p);
+            // calculate bounding box
+            double p1[3];
+            points->GetPoint(j, p1);
 
-            if (p[0]<b[0])
-                b[0]=p[0];
-            if (p[0]>b[1])
-                b[1]=p[0];
+            if (p1[0]<b[0])
+                b[0]=p1[0];
+            if (p1[0]>b[1])
+                b[1]=p1[0];
 
-            if (p[1]<b[2])
-                b[2]=p[1];
-            if (p[1]>b[3])
-                b[3]=p[1];
+            if (p1[1]<b[2])
+                b[2]=p1[1];
+            if (p1[1]>b[3])
+                b[3]=p1[1];
 
-            if (p[2]<b[4])
-                b[4]=p[2];
-            if (p[2]>b[5])
-                b[5]=p[2];
+            if (p1[2]<b[4])
+                b[4]=p1[2];
+            if (p1[2]>b[5])
+                b[5]=p1[2];
+
+            // calculate statistics
+            if (j<p-1)
+            {
+                double p2[3];
+                points->GetPoint(j+1, p2);
+
+                float dist = std::sqrt((p1[0]-p2[0])*(p1[0]-p2[0])+(p1[1]-p2[1])*(p1[1]-p2[1])+(p1[2]-p2[2])*(p1[2]-p2[2]));
+                length += dist;
+            }
+        }
+        m_FiberLengths.push_back(length);
+        m_MeanFiberLength += length;
+        if (i==0)
+        {
+            m_MinFiberLength = length;
+            m_MaxFiberLength = length;
+        }
+        else
+        {
+            if (length<m_MinFiberLength)
+                m_MinFiberLength = length;
+            if (length>m_MaxFiberLength)
+                m_MaxFiberLength = length;
         }
     }
+    m_MeanFiberLength /= m_NumFibers;
+
+    std::vector< float > sortedLengths = m_FiberLengths;
+    std::sort(sortedLengths.begin(), sortedLengths.end());
+    for (int i=0; i<m_NumFibers; i++)
+        m_LengthStDev += (m_MeanFiberLength-sortedLengths.at(i))*(m_MeanFiberLength-sortedLengths.at(i));
+    if (m_NumFibers>1)
+        m_LengthStDev /= (m_NumFibers-1);
+    else
+        m_LengthStDev = 0;
+    m_LengthStDev = std::sqrt(m_LengthStDev);
+    m_MedianFiberLength = sortedLengths.at(m_NumFibers/2);
+
     // provide some border margin
     for(int i=0; i<=4; i+=2)
         b[i] -=10;
@@ -1048,11 +1094,6 @@ QStringList mitk::FiberBundleX::GetAvailableColorCodings()
     //this controlstructure shall be implemented by the calling method
     if (availableColorCodings.isEmpty())
         MITK_DEBUG << "no colorcodings available in fiberbundleX";
-
-    //    for(int i=0; i<availableColorCodings.size(); i++)
-    //    {
-    //            MITK_DEBUG << availableColorCodings.at(i).toLocal8Bit().constData();
-    //    }
 
     return availableColorCodings;
 }
@@ -1119,36 +1160,158 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
     UpdateFiberGeometry();
 }
 
-bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
+bool mitk::FiberBundleX::ApplyCurvatureThreshold(float minRadius, bool deleteFibers)
 {
-    if (lengthInMM<=0)
+    if (minRadius<0)
         return true;
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();
+    vtkSmartPointer<vtkCellArray> vtkOldCells = m_FiberPolyData->GetLines();
+    vtkOldCells->InitTraversal();
 
+    for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+    {
+        MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
+        vtkIdType   numPoints(0);
+        vtkIdType*  points(NULL);
+        vtkOldCells->GetNextCell ( numPoints, points );
+
+        // calculate curvatures
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+        for (int j=0; j<numPoints-2; j++)
+        {
+            double p1[3];
+            m_FiberPolyData->GetPoint(points[j], p1);
+            double p2[3];
+            m_FiberPolyData->GetPoint(points[j+1], p2);
+            double p3[3];
+            m_FiberPolyData->GetPoint(points[j+2], p3);
+
+            vnl_vector_fixed< float, 3 > v1, v2, v3;
+
+            v1[0] = p2[0]-p1[0];
+            v1[1] = p2[1]-p1[1];
+            v1[2] = p2[2]-p1[2];
+
+            v2[0] = p3[0]-p2[0];
+            v2[1] = p3[1]-p2[1];
+            v2[2] = p3[2]-p2[2];
+
+            v3[0] = p1[0]-p3[0];
+            v3[1] = p1[1]-p3[1];
+            v3[2] = p1[2]-p3[2];
+
+            float a = v1.magnitude();
+            float b = v2.magnitude();
+            float c = v3.magnitude();
+            float r = a*b*c/std::sqrt((a+b+c)*(a+b-c)*(b+c-a)*(a-b+c)); // radius of triangle via Heron's formula (area of triangle)
+
+            vtkIdType id = vtkNewPoints->InsertNextPoint(p1);
+            container->GetPointIds()->InsertNextId(id);
+
+            if (deleteFibers && r<minRadius)
+                break;
+
+            if (r<minRadius)
+            {
+                j += 2;
+//                id = vtkNewPoints->InsertNextPoint(p2);
+//                container->GetPointIds()->InsertNextId(id);
+                vtkNewCells->InsertNextCell(container);
+                container = vtkSmartPointer<vtkPolyLine>::New();
+            }
+            else if (j==numPoints-3)
+            {
+                id = vtkNewPoints->InsertNextPoint(p2);
+                container->GetPointIds()->InsertNextId(id);
+                id = vtkNewPoints->InsertNextPoint(p3);
+                container->GetPointIds()->InsertNextId(id);
+                vtkNewCells->InsertNextCell(container);
+            }
+        }
+    }
+
+    if (vtkNewCells->GetNumberOfCells()<=0)
+        return false;
+
+
+    m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_FiberPolyData->SetPoints(vtkNewPoints);
+    m_FiberPolyData->SetLines(vtkNewCells);
+
+    UpdateColorCoding();
+    UpdateFiberGeometry();
+    return true;
+}
+
+bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
+{
+    if (lengthInMM<=0 || lengthInMM<m_MinFiberLength)
+        return true;
+
+    if (lengthInMM>m_MaxFiberLength)    // can't remove all fibers
+        return false;
+
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();
     vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
     vLines->InitTraversal();
+    float min = m_MaxFiberLength;
     for (int i=0; i<m_NumFibers; i++)
     {
+        MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
         vtkIdType   numPoints(0);
         vtkIdType*  pointIds(NULL);
         vLines->GetNextCell ( numPoints, pointIds );
 
-        // calculate fiber length
-        float length = 0;
-        itk::Point<double> lastP;
-        for (int j=0; j<numPoints; j++)
+        if (m_FiberLengths.at(i)>=lengthInMM)
         {
-            double* p = m_FiberPolyData->GetPoint(pointIds[j]);
-            if (j>0)
-                length += sqrt(pow(p[0]-lastP[0], 2)+pow(p[1]-lastP[1], 2)+pow(p[2]-lastP[2], 2));
-            lastP[0] = p[0];
-            lastP[1] = p[1];
-            lastP[2] = p[2];
+            vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+            for (int j=0; j<numPoints; j++)
+            {
+                double* p = m_FiberPolyData->GetPoint(pointIds[j]);
+                vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                container->GetPointIds()->InsertNextId(id);
+            }
+            vtkNewCells->InsertNextCell(container);
+            if (m_FiberLengths.at(i)<min)
+                min = m_FiberLengths.at(i);
         }
+    }
 
-        if (length>=lengthInMM)
+    if (vtkNewCells->GetNumberOfCells()<=0)
+        return false;
+
+    m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_FiberPolyData->SetPoints(vtkNewPoints);
+    m_FiberPolyData->SetLines(vtkNewCells);
+
+    UpdateColorCoding();
+    UpdateFiberGeometry();
+    return true;
+}
+
+bool mitk::FiberBundleX::RemoveLongFibers(float lengthInMM)
+{
+    if (lengthInMM<=0 || lengthInMM>m_MaxFiberLength)
+        return true;
+
+    if (lengthInMM<m_MinFiberLength)    // can't remove all fibers
+        return false;
+
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();
+    vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
+    vLines->InitTraversal();
+    for (int i=0; i<m_NumFibers; i++)
+    {
+        MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
+        vtkIdType   numPoints(0);
+        vtkIdType*  pointIds(NULL);
+        vLines->GetNextCell ( numPoints, pointIds );
+
+        if (m_FiberLengths.at(i)<=lengthInMM)
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
             for (int j=0; j<numPoints; j++)
@@ -1178,33 +1341,25 @@ void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm)
 
     //in vtkcells all polylines are stored, actually all id's of them are stored
     vtkSmartPointer<vtkCellArray> vtkSmoothCells = vtkCellArray::New(); //cellcontainer for smoothed lines
-
     vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
     vLines->InitTraversal();
     vtkIdType pointHelperCnt = 0;
+
     for (int i=0; i<m_NumFibers; i++)
     {
+        MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
         vtkIdType   numPoints(0);
         vtkIdType*  pointIds(NULL);
         vLines->GetNextCell ( numPoints, pointIds );
 
         vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-        float length = 0;
-        itk::Point<double> lastP;
         for (int j=0; j<numPoints; j++)
-        {
-            double* p = m_FiberPolyData->GetPoint(pointIds[j]);
-            points->InsertNextPoint(p);
-            if (j>0)
-                length += sqrt(pow(p[0]-lastP[0], 2)+pow(p[1]-lastP[1], 2)+pow(p[2]-lastP[2], 2));
-            lastP[0] = p[0];
-            lastP[1] = p[1];
-            lastP[2] = p[2];
-        }
+            points->InsertNextPoint(m_FiberPolyData->GetPoint(pointIds[j]));
+
+        float length = m_FiberLengths.at(i);
         length /=10;
         int sampling = pointsPerCm*length;
 
-        /////PROCESS POLYLINE SMOOTHING/////
         vtkSmartPointer<vtkKochanekSpline> xSpline = vtkKochanekSpline::New();
         vtkSmartPointer<vtkKochanekSpline> ySpline = vtkKochanekSpline::New();
         vtkSmartPointer<vtkKochanekSpline> zSpline = vtkKochanekSpline::New();

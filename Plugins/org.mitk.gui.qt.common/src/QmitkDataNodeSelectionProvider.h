@@ -47,6 +47,10 @@ public:
    */
   berry::ISelection::ConstPointer GetSelection() const;
 
+  using QtSelectionProvider::SetSelection;
+
+  void SetSelection(berry::ISelection::ConstPointer selection, QItemSelectionModel::SelectionFlags flags);
+
 protected:
 
   mitk::DataNodeSelection::ConstPointer GetDataNodeSelection() const;

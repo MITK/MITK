@@ -15,8 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 // Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
 #include <berryIPreferences.h>
 #include <berryIPreferencesService.h>
 #include <berryIBerryPreferences.h>
@@ -29,16 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCommonFunctionality.h"
 
 // Qt
-#include <QMessageBox>
-#include <QScrollArea>
 #include <QFile>
-#include <QFileDialog>
-#include <QFileInfoList>
-#include <QDir>
-#include <QBuffer>
-#include <QtUiTools/QUiLoader>
-#include <QByteArray>
-#include <QHBoxLayout>
 #include <QAction>
 #include <QDebug>
 
@@ -67,8 +56,10 @@ CommandLineModulesView::CommandLineModulesView()
 , m_ModuleManager(NULL)
 , m_DirectoryWatcher(NULL)
 , m_MenuFactory(NULL)
+, m_ModuleFactory(NULL)
 , m_Watcher(NULL)
 , m_TemporaryDirectoryName("")
+, m_DebugOutput(false)
 {
   m_MapTabToModuleInstance.clear();
   m_ModuleFactory = new QmitkCmdLineModuleFactoryGui(this->GetDataStorage());
@@ -100,6 +91,11 @@ CommandLineModulesView::~CommandLineModulesView()
   if (m_ModuleFactory != NULL)
   {
     delete m_ModuleFactory;
+  }
+
+  if (m_Watcher != NULL)
+  {
+    delete m_Watcher;
   }
 
   this->ClearUpTemporaryFiles();

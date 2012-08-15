@@ -107,7 +107,17 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
   //tube filter the polyData
   localStorage->m_TubeFilter->SetInput(localStorage->m_OutlinePolyData);
-  localStorage->m_TubeFilter->SetRadius(0.2);
+
+  float lineWidth(1.0);
+  if (this->GetDataNode()->GetFloatProperty( "3D contour width", lineWidth, renderer ))
+  {
+    localStorage->m_TubeFilter->SetRadius(lineWidth);
+  }else
+  {
+    localStorage->m_TubeFilter->SetRadius(0.2);
+  }
+  localStorage->m_TubeFilter->CappingOn();
+  localStorage->m_TubeFilter->SetNumberOfSides(10);
   localStorage->m_TubeFilter->Update();
   localStorage->m_Mapper->SetInput(localStorage->m_TubeFilter->GetOutput());
 
@@ -229,13 +239,17 @@ void mitk::ContourModelMapper3D::ApplyContourProperties(mitk::BaseRenderer* rend
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  float binaryOutlineWidth(1.0);
-  if (this->GetDataNode()->GetFloatProperty( "contour width", binaryOutlineWidth, renderer ))
-  {
-    localStorage->m_Actor->GetProperty()->SetLineWidth(binaryOutlineWidth);
-  }
 
-  localStorage->m_Actor->GetProperty()->SetColor(0.9, 1.0, 0.1);
+  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+        ("color", renderer));
+  if(colorprop)
+  {
+    //set the color of the contour
+    double red = colorprop->GetColor().GetRed();
+    double green = colorprop->GetColor().GetGreen();
+    double blue = colorprop->GetColor().GetBlue();
+    localStorage->m_Actor->GetProperty()->SetColor(red, green, blue);
+  }
 }
 
 
@@ -262,7 +276,7 @@ mitk::ContourModelMapper3D::LocalStorage::LocalStorage()
 void mitk::ContourModelMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
-  node->AddProperty( "contour width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
+  node->AddProperty( "3D contour width", mitk::FloatProperty::New( 0.2 ), renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

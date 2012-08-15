@@ -1,19 +1,84 @@
 /**
-\bundlemainpage{org.mitk.gui.qt.cli} CLI
+\bundlemainpage{org.mitk.gui.qt.cli} The Command Line Interface (CLI) View
 
 \image html icon.xpm "Icon of CLI"
 
-Available sections:
-  - \ref org.mitk.gui.qt.cliOverview
+\section CLIIntroduction Introduction
 
-\section org.mitk.gui.qt.cliOverview
-Describe the features of your awesome plugin here
-<ul>
-<li>Increases productivity
-<li>Creates beautiful images
-<li>Generates PhD thesis
-<li>Brings world peace
-</ul>
+This view provides the facility to run command line programs, and load the data back
+into the <a href="qthelp://org.mitk.gui.qt.datamanager/bundle/index.html">DataManager</a> for
+immediate visualisation.
 
+The instructions here are intended for an end-user, and technical details are ommitted.
+
+The main purpose of this view is that it can be used to run any other
+third party external program subject to compatibility requirements.
+This is achieved using the following steps:
+
+\li This view is launched.
+\li The view searches for available programs to run, and populates a list of available programs.
+\li When a program is selected, the program is asked to provide a description of the required controls.
+\li These controls are drawn on the screen, ready for the user to click/press/interact with them.
+
+The consequence of this last point is that these instructions tell you how to operate this view in a general sense.
+The details of the exact operation of each external command line program is down to the developers of those external programs.
+
+\section CLIPreferences Preferences
+
+\image html CLIPreferences.png "The CLI Preferences Page"
+
+The CLI view has preferences that control
+
+\li temporary directory: Images stored in the DataManager are first written to a temporary folder before being passed to each command line program.
+\li module paths: The user can specify additional search paths to look for command line programs. The user is advised to keep this list to a minimum,
+as the more paths used, the slower the view will initialise.
+\li debug output: If checked the XML parsing will produce debug output on the console.
+
+When this view starts it will scan the following folders for programs that can be run via this interface:
+
+\li scan installation directory: If checked, scans application installation directory.
+\li scan CTK_MODULE_LOAD_PATH: If checked, scans the directory specified by the environment variable CTK_MODULE_LOAD_PATH.
+\li scan home directory: If checked, scans the users home directory.
+\li scan current directory: If checked, scans the current working directory that the application was launched from.
+
+These all default to OFF, or un-checked as scanning many directories can take a long time.
+
+\section CLIUsage Usage
+
+When the view is launched, a simple interface is presented:
+
+\image html CLIInitial.png "The initial interface, with no command line programs available."
+
+In this example, all the above check-box preferences were off, and the "module paths" was empty, so no command line applications were found.
+If the available search paths contain programs that are compatible (i.e. runnable) with this view, the name of the programs are displayed
+in the "Search" combo-box.
+
+\image html CLIWithPrograms.png "When valid paths are set, and programs are discovered, the menu is recalculated to show available programs."
+
+When a program is selected, the relevant interface is displayed:
+
+\image html CLINiftyReg.png "An example program, showing parameters for NiftyReg."
+
+In this example, the parameters are displayed for <a href="http://www0.cs.ucl.ac.uk/staff/m.modat/Marcs_Page/Software.html">NiftyReg</a>
+produced at <a href="http://www.ucl.ac.uk">UCL</a>. The interface can contain a wide variety of typical controls. If a parameter for
+a command line program is an image, then the widget displayed is linked to the DataManager, so that as new images are loaded, the
+correct image can be easily selected.
+
+In addition, the view contains an "About" tab containing details of the contributors, the licence and acknowledgements and also
+a "Help" tab containing a description and a link to any on-line documentation.
+
+These documentation features are provided by the developers of the third party plugin, and not by the host program.
+If information is missing, the user must contact the third party developers.
+
+If the preferences are changed to add search paths, or the available programs within those search paths are changed,
+then this view will automatically update the list of programs.
+
+Finally, there are 3 buttons to control the operation of the command line application:
+
+\image html CLIControls.png "The main controls."
+
+\li The green triangle: Run the program
+\li The red square: Stop the program
+\li The yellow arrow: Restore the form to default parameters
 */
 

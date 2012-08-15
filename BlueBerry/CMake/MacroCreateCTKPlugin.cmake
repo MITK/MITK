@@ -50,6 +50,10 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     set(is_test_plugin)
   endif()
 
+  # Compute the plugin dependencies
+  ctkFunctionGetTargetLibraries(_PLUGIN_target_libraries)
+  
+
   #------------------------------------------------------------#
   #------------------ Qt Help support -------------------------#
 
@@ -58,6 +62,21 @@ macro(MACRO_CREATE_CTK_PLUGIN)
       EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     set(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     set(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
+
+    # Create a list of Doxygen tag files from the plug-in dependencies
+    set(PLUGIN_DOXYGEN_TAGFILES)
+    foreach(_dep_target ${_PLUGIN_target_libraries})
+      string(REPLACE _ . _dep ${_dep_target})
+      set(_tag_file "${CMAKE_BINARY_DIR}/Plugins/${_dep}/documentation/UserManual/${_dep_target}.tag")
+      if(EXISTS ${_tag_file})
+        set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} ${_tag_file}=qthelp://${_dep}/bundle/")
+      endif()
+    endforeach()
+    if(_PLUGIN_DOXYGEN_TAGFILES)
+      set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} ${_PLUGIN_DOXYGEN_TAGFILES}")
+    endif()
+    message("PLUGIN_DOXYGEN_TAGFILES: ${PLUGIN_DOXYGEN_TAGFILES}")
+      
     if(_PLUGIN_NO_QHP_TRANSFORM)
       set(_use_qhp_xsl 0)
     else()
@@ -67,8 +86,8 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     list(APPEND _PLUGIN_CACHED_RESOURCE_FILES ${PLUGIN_GENERATED_QCH_FILES})
   endif()
 
-  # Compute the plugin dependencies
-  ctkFunctionGetTargetLibraries(_PLUGIN_target_libraries)
+  #------------------------------------------------------------#
+  #------------------ Create Plug-in --------------------------#
 
   ctkMacroBuildPlugin(
     NAME ${PLUGIN_TARGET}

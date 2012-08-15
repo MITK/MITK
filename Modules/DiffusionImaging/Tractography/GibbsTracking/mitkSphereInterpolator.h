@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOrientationDistributionFunction.h>
 #include <QCoreApplication>
 #include <mitkStandardFileLocations.h>
+#include <exception>
 
 using namespace std;
 
@@ -40,28 +41,22 @@ public:
     float inva;
     float b;
 
-    float*    barycoords;
-    int*      indices;
-    int*      idx;
-    float*    interpw;
+    vector< float > barycoords;
+    vector< int >   indices;
+    vnl_vector_fixed< int, 3 >     idx;
+    vnl_vector_fixed< float, 3 >   interpw;
 
     SphereInterpolator(string lutPath)
     {
         if (lutPath.length()==0)
         {
             if (!LoadLookuptables())
-            {
-                MITK_INFO << "SphereInterpolator: unable to load lookuptables";
                 return;
-            }
         }
         else
         {
             if (!LoadLookuptables(lutPath))
-            {
-                MITK_INFO << "SphereInterpolator: unable to load lookuptables";
                 return;
-            }
         }
 
         size = 301;
@@ -75,8 +70,7 @@ public:
 
     ~SphereInterpolator()
     {
-        delete[] barycoords;
-        delete[] indices;
+
     }
 
     bool LoadLookuptables(string lutPath)
@@ -88,15 +82,21 @@ public:
         BaryCoordsStream.open(path.toStdString().c_str(), ios::in | ios::binary);
         if (BaryCoordsStream.is_open())
         {
-            float tmp;
-            barycoords = new float [1630818];
-            BaryCoordsStream.seekg (0, ios::beg);
-            for (int i=0; i<1630818; i++)
+            try
             {
-                BaryCoordsStream.read((char *)&tmp, sizeof(tmp));
-                barycoords[i] = tmp;
+                float tmp;
+                BaryCoordsStream.seekg (0, ios::beg);
+                while (!BaryCoordsStream.eof())
+                {
+                    BaryCoordsStream.read((char *)&tmp, sizeof(tmp));
+                    barycoords.push_back(tmp);
+                }
+                BaryCoordsStream.close();
             }
-            BaryCoordsStream.close();
+            catch (const std::exception& e)
+            {
+                MITK_INFO << e.what();
+            }
         }
         else
         {
@@ -109,15 +109,21 @@ public:
         IndicesStream.open(path.toStdString().c_str(), ios::in | ios::binary);
         if (IndicesStream.is_open())
         {
-            int tmp;
-            indices = new int [1630818];
-            IndicesStream.seekg (0, ios::beg);
-            for (int i=0; i<1630818; i++)
+            try
             {
-                IndicesStream.read((char *)&tmp, 4);
-                indices[i] = tmp;
+                int tmp;
+                IndicesStream.seekg (0, ios::beg);
+                while (!IndicesStream.eof())
+                {
+                    IndicesStream.read((char *)&tmp, sizeof(tmp));
+                    indices.push_back(tmp);
+                }
+                IndicesStream.close();
             }
-            IndicesStream.close();
+            catch (const std::exception& e)
+            {
+                MITK_INFO << e.what();
+            }
         }
         else
         {
@@ -147,15 +153,21 @@ public:
         BaryCoordsStream.open(lutPath.c_str(), ios::in | ios::binary);
         if (BaryCoordsStream.is_open())
         {
-            float tmp;
-            barycoords = new float [1630818];
-            BaryCoordsStream.seekg (0, ios::beg);
-            for (int i=0; i<1630818; i++)
+            try
             {
-                BaryCoordsStream.read((char *)&tmp, sizeof(tmp));
-                barycoords[i] = tmp;
+                float tmp;
+                BaryCoordsStream.seekg (0, ios::beg);
+                while (!BaryCoordsStream.eof())
+                {
+                    BaryCoordsStream.read((char *)&tmp, sizeof(tmp));
+                    barycoords.push_back(tmp);
+                }
+                BaryCoordsStream.close();
             }
-            BaryCoordsStream.close();
+            catch (const std::exception& e)
+            {
+                MITK_INFO << e.what();
+            }
         }
         else
         {
@@ -168,15 +180,21 @@ public:
         IndicesStream.open(lutPath.c_str(), ios::in | ios::binary);
         if (IndicesStream.is_open())
         {
-            int tmp;
-            indices = new int [1630818];
-            IndicesStream.seekg (0, ios::beg);
-            for (int i=0; i<1630818; i++)
+            try
             {
-                IndicesStream.read((char *)&tmp, 4);
-                indices[i] = tmp;
+                int tmp;
+                IndicesStream.seekg (0, ios::beg);
+                while (!IndicesStream.eof())
+                {
+                    IndicesStream.read((char *)&tmp, sizeof(tmp));
+                    indices.push_back(tmp);
+                }
+                IndicesStream.close();
             }
-            IndicesStream.close();
+            catch (const std::exception& e)
+            {
+                MITK_INFO << e.what();
+            }
         }
         else
         {
@@ -198,8 +216,12 @@ public:
             int x = float2int(nx);
             int y = float2int(ny);
             int i = 3*6*(x+y*size);  // (:,1,x,y)
-            idx = indices+i;
-            interpw = barycoords +i;
+            idx[0] = indices[i];
+            idx[1] = indices[i+1];
+            idx[2] = indices[i+2];
+            interpw[0] = barycoords[i];
+            interpw[1] = barycoords[i+1];
+            interpw[2] = barycoords[i+2];
             return;
         }
         if (nz < -0.5)
@@ -207,8 +229,12 @@ public:
             int x = float2int(nx);
             int y = float2int(ny);
             int i = 3*(1+6*(x+y*size));  // (:,2,x,y)
-            idx = indices+i;
-            interpw = barycoords +i;
+            idx[0] = indices[i];
+            idx[1] = indices[i+1];
+            idx[2] = indices[i+2];
+            interpw[0] = barycoords[i];
+            interpw[1] = barycoords[i+1];
+            interpw[2] = barycoords[i+2];
             return;
         }
         if (nx > 0.5)
@@ -216,8 +242,12 @@ public:
             int z = float2int(nz);
             int y = float2int(ny);
             int i = 3*(2+6*(z+y*size));  // (:,2,x,y)
-            idx = indices+i;
-            interpw = barycoords +i;
+            idx[0] = indices[i];
+            idx[1] = indices[i+1];
+            idx[2] = indices[i+2];
+            interpw[0] = barycoords[i];
+            interpw[1] = barycoords[i+1];
+            interpw[2] = barycoords[i+2];
             return;
         }
         if (nx < -0.5)
@@ -225,8 +255,12 @@ public:
             int z = float2int(nz);
             int y = float2int(ny);
             int i = 3*(3+6*(z+y*size));  // (:,2,x,y)
-            idx = indices+i;
-            interpw = barycoords +i;
+            idx[0] = indices[i];
+            idx[1] = indices[i+1];
+            idx[2] = indices[i+2];
+            interpw[0] = barycoords[i];
+            interpw[1] = barycoords[i+1];
+            interpw[2] = barycoords[i+2];
             return;
         }
         if (ny > 0)
@@ -234,8 +268,12 @@ public:
             int x = float2int(nx);
             int z = float2int(nz);
             int i = 3*(4+6*(x+z*size));  // (:,1,x,y)
-            idx = indices+i;
-            interpw = barycoords +i;
+            idx[0] = indices[i];
+            idx[1] = indices[i+1];
+            idx[2] = indices[i+2];
+            interpw[0] = barycoords[i];
+            interpw[1] = barycoords[i+1];
+            interpw[2] = barycoords[i+2];
             return;
         }
         else
@@ -243,8 +281,12 @@ public:
             int x = float2int(nx);
             int z = float2int(nz);
             int i = 3*(5+6*(x+z*size));  // (:,1,x,y)
-            idx = indices+i;
-            interpw = barycoords +i;
+            idx[0] = indices[i];
+            idx[1] = indices[i+1];
+            idx[2] = indices[i+2];
+            interpw[0] = barycoords[i];
+            interpw[1] = barycoords[i+1];
+            interpw[2] = barycoords[i+2];
             return;
         }
 

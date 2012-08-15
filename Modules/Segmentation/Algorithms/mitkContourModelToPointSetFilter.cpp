@@ -49,10 +49,7 @@ void mitk::ContourModelToPointSetFilter::SetInput ( unsigned int idx, const mitk
   }
 }
 
-itk::DataObject::Pointer mitk::ContourModelToPointSetFilter::MakeOutput ( unsigned int idx )
-{
-  return NULL;
-}
+
 
 mitk::ContourModelToPointSetFilter::OutputType* mitk::ContourModelToPointSetFilter::GetOutput()
 {

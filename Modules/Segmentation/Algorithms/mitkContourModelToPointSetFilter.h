@@ -49,14 +49,6 @@ namespace mitk {
 
 
     /**
-    * Allocates a new output object and returns it. Currently the
-    * index idx is not evaluated.
-    * @param idx the index of the output for which an object should be created
-    * @returns the new object
-    */
-    virtual itk::DataObject::Pointer MakeOutput ( unsigned int idx );
-
-    /**
     * Allows to set the output of the point set source. 
     * @param output the intended output of the point set source
     */

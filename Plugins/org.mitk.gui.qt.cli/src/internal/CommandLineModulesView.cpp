@@ -213,10 +213,54 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
   m_Controls->m_TabWidget->setCurrentIndex(tabIndex);
   m_MapTabToModuleInstance[tabIndex] = moduleInstance;
 
+  ctkCmdLineModuleDescription description = moduleRef.description();
+
+  QString helpString = "";
+
+  if (!description.title().isEmpty())
+  {
+    QString titleHtml = "<h1>" + description.title() + "</h1>";
+    helpString += titleHtml;
+  }
+
+  if (!description.description().isEmpty())
+  {
+    QString descriptionHtml = "<p>" + description.description() + "</p>";
+    helpString += descriptionHtml;
+  }
+
+  if (!description.documentationURL().isEmpty())
+  {
+    QString docUrlHtml = "<p>For more information please see <a href=\"" + description.documentationURL() \
+                         + "\">the online documentation</a>.</p>";
+    helpString += docUrlHtml;
+  }
+
+
+  QString aboutString = "";
+
+  if (!description.contributor().isEmpty())
+  {
+    QString contributorHtml = "<h2>Contributed By</h2><p>" + description.contributor() + "</p>";
+    aboutString += contributorHtml;
+  }
+
+  if (!description.license().isEmpty())
+  {
+    QString licenseHtml = "<h2>License</h2><p>" + description.license() + "</p>";
+    aboutString += licenseHtml;
+  }
+
+  if (!description.acknowledgements().isEmpty())
+  {
+    QString acknowledgementsHtml = "<h2>Acknowledgements</h2><p>" + description.acknowledgements() + "</p>";
+    aboutString += acknowledgementsHtml;
+  }
+
   m_Controls->m_HelpBrowser->clear();
-  m_Controls->m_HelpBrowser->setPlainText(moduleRef.description().description());
+  m_Controls->m_HelpBrowser->setHtml(helpString);
   m_Controls->m_AboutBrowser->clear();
-  m_Controls->m_AboutBrowser->setPlainText(moduleRef.description().acknowledgements());
+  m_Controls->m_AboutBrowser->setHtml(aboutString);
 }
 
 

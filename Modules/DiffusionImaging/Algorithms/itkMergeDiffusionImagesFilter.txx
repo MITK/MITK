@@ -44,6 +44,53 @@ namespace itk
 {
 
 template <class ScalarType>
+MergeDiffusionImagesFilter<ScalarType>::MergeDiffusionImagesFilter()
+{
+
+}
+
+template <class ScalarType>
+MergeDiffusionImagesFilter<ScalarType>::~MergeDiffusionImagesFilter()
+{
+
+}
+
+template <class ScalarType>
+void MergeDiffusionImagesFilter<ScalarType>
+::SetImageVolumes(DwiImageContainerType cont)
+{
+    m_ImageVolumes=cont;
+}
+
+template <class ScalarType>
+void MergeDiffusionImagesFilter<ScalarType>
+::SetGradientLists(GradientListContainerType cont)
+{
+    m_GradientLists=cont;
+}
+
+template <class ScalarType>
+void MergeDiffusionImagesFilter<ScalarType>
+::SetBValues(std::vector< double > bvals)
+{
+    m_BValues=bvals;
+}
+
+template <class ScalarType>
+MergeDiffusionImagesFilter<ScalarType>::GradientListType::Pointer MergeDiffusionImagesFilter<ScalarType>
+::GetOutputGradients()
+{
+    return m_OutputGradients;
+}
+
+template <class ScalarType>
+double MergeDiffusionImagesFilter<ScalarType>
+::GetBValue()
+{
+    return m_BValue;
+}
+
+template <class ScalarType>
 void
 MergeDiffusionImagesFilter<ScalarType>
 ::GenerateData ()

@@ -461,7 +461,7 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
 int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationToolStorageSerializerAndDeserializer");
-  
+  try{
   NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationSerializer();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationDeserializer();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteSimpleToolStorage();
@@ -476,9 +476,15 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteEmptyToolStorage();
   //TestReadInvalidStorage() fails
   // NavigationToolStorageSerializerAndDeserializerTestClass::TestReadInvalidStorage();
-  
   NavigationToolStorageSerializerAndDeserializerTestClass::TestSerializerForExceptions();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestDeserializerForExceptions();
+  }
+  catch (std::exception& e) {
+      MITK_ERROR << "exception:" << e.what();
+  }
+  catch (...) {
+      MITK_ERROR << "Unknown Exception?";
+  }
   
   NavigationToolStorageSerializerAndDeserializerTestClass::CleanUp();
 

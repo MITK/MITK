@@ -107,13 +107,13 @@ protected:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#setVisiblePart(org.blueberry.ui.internal.ILayoutContainer, org.blueberry.ui.internal.LayoutPart)
    */
-  void SetVisiblePart(IStackableContainer::Pointer container,
+  void SetVisiblePart(ILayoutContainer::Pointer container,
       PartPane::Pointer visiblePart);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#getVisiblePart(org.blueberry.ui.internal.ILayoutContainer)
    */
-  StackablePart::Pointer GetVisiblePart(IStackableContainer::Pointer container);
+  LayoutPart::Pointer GetVisiblePart(ILayoutContainer::Pointer container);
 
 public:
 
@@ -224,12 +224,12 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#isStackType(org.blueberry.ui.internal.LayoutPart)
    */
-  bool IsStackType(IStackableContainer::Pointer toTest);
+  bool IsStackType(ILayoutContainer::Pointer toTest);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#isPaneType(org.blueberry.ui.internal.LayoutPart)
    */
-  bool IsPaneType(StackablePart::Pointer toTest);
+  bool IsPaneType(LayoutPart::Pointer toTest);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#pickPartToZoom()

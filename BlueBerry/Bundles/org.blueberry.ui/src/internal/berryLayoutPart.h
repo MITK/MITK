@@ -37,7 +37,8 @@ struct IWorkbenchWindow;
  * A presentation part is used to build the presentation for the
  * workbench.  Common subclasses are pane and folder.
  */
-class LayoutPart : virtual public Object { //, public ISizeProvider {
+class LayoutPart : virtual public Object, public virtual ISizeProvider
+{
 
 public:
 
@@ -119,6 +120,8 @@ protected: SmartPointer<ILayoutContainer> container;
      * Get the part control.  This method may return null.
      */
     public: virtual void* GetControl() = 0;
+
+    public: virtual bool IsPlaceHolder() const;
 
     /**
      * Gets the ID for this part.
@@ -202,6 +205,11 @@ protected: SmartPointer<ILayoutContainer> container;
      * Sets the parent for this part.
      */
     public: virtual void SetContainer(SmartPointer<ILayoutContainer> container);
+
+    /**
+     * Sets focus to this part.
+     */
+    public: virtual void SetFocus();
 
     /**
      * Sets the part ID.

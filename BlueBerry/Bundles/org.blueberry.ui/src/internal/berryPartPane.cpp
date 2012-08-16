@@ -36,7 +36,7 @@ PartPane::Sashes::Sashes() :
 
 PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
     WorkbenchPage* workbenchPage)
- : StackablePart(partReference->GetId()),
+ : LayoutPart(partReference->GetId()),
    control(0), inLayout(true), busy(false), hasFocus(false)
 {
   //super(partReference.getId());
@@ -69,11 +69,6 @@ void PartPane::CreateControl(void* parent) {
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(control, GuiTk::IControlListener::Pointer(this));
 
   //control.addTraverseListener(traverseListener);
-}
-
-bool PartPane::IsPlaceHolder()
-{
-  return false;
 }
 
 PartPane::~PartPane()
@@ -179,13 +174,13 @@ PartPane::Sashes PartPane::FindSashes()
 {
   Sashes result;
 
-  IStackableContainer::Pointer container = this->GetContainer();
+  ILayoutContainer::Pointer container = this->GetContainer();
 
   if (container == 0) {
       return result;
   }
 
-  container->FindSashes(result);
+  container->FindSashes(LayoutPart::Pointer(this), result);
   return result;
 }
 
@@ -194,12 +189,12 @@ WorkbenchPage::Pointer PartPane::GetPage()
   return WorkbenchPage::Pointer(page);
 }
 
-void PartPane::SetContainer(IStackableContainer::Pointer container)
+void PartPane::SetContainer(ILayoutContainer::Pointer container)
 {
 
   if (hasFocus)
   {
-    IStackableContainer::Pointer oldContainer = this->GetContainer();
+    ILayoutContainer::Pointer oldContainer = this->GetContainer();
     if (PartStack::Pointer oldStack = oldContainer.Cast<PartStack>())
     {
       oldStack->SetActive(StackPresentation::AS_INACTIVE);
@@ -222,7 +217,7 @@ void PartPane::SetContainer(IStackableContainer::Pointer container)
     }
   }
 
-  StackablePart::SetContainer(container);
+  LayoutPart::SetContainer(container);
 }
 
 void PartPane::Reparent(void* newParent)
@@ -281,7 +276,7 @@ void PartPane::ShowFocus(bool inFocus)
 
 PartStack::Pointer PartPane::GetStack()
 {
-  IStackableContainer::Pointer container = this->GetContainer();
+  ILayoutContainer::Pointer container = this->GetContainer();
   return container.Cast<PartStack>();
 }
 

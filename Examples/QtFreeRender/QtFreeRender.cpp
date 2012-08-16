@@ -53,6 +53,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 //##Documentation
 //## @brief Example of a NON QT DEPENDENT MITK RENDERING APPLICATION. 
 
+
+mitk::RenderWindow::Pointer mitkWidget1;
+mitk::RenderWindow::Pointer mitkWidget2;
+mitk::RenderWindow::Pointer mitkWidget3;
+mitk::RenderWindow::Pointer mitkWidget4;
+
 mitk::DisplayVectorInteractor::Pointer    m_MoveAndZoomInteractor;
 mitk::CoordinateSupplier::Pointer         m_LastLeftClickPositionSupplier;
 mitk::GradientBackground::Pointer         m_GradientBackground4;
@@ -69,10 +75,6 @@ mitk::DataNode::Pointer m_PlaneNode2;
 mitk::DataNode::Pointer m_PlaneNode3;
 mitk::DataNode::Pointer m_Node;
 
-mitk::RenderWindow::Pointer mitkWidget1;
-mitk::RenderWindow::Pointer mitkWidget2;
-mitk::RenderWindow::Pointer mitkWidget3;
-mitk::RenderWindow::Pointer mitkWidget4;
 
 void InitializeWindows()
 {

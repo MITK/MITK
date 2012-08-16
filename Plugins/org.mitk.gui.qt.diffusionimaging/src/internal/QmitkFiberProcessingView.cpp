@@ -954,6 +954,7 @@ void QmitkFiberProcessingView::OnDrawCircle()
     //  return;
 
     mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+
     this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_EllipseCounter));
 
     this->GetDataStorage()->Modified();
@@ -1003,6 +1004,11 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
     newNode->SetName(name.toStdString());
     newNode->SetData(figure);
+
+
+    newNode->AddProperty( "shownormal", mitk::BoolProperty::New( true ) );
+
+
 
     newNode->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,0.0,0.0));
     newNode->AddProperty( "planarfigure.line.width", mitk::FloatProperty::New(2.0));

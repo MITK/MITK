@@ -89,6 +89,21 @@ void mitk::PlanarCircleMapper3D::GenerateData()
     m_CircleActor = vtkOpenGLActor::New();
     m_CircleActor->SetMapper(m_VtkCircleDataMapperGL);
     m_CircleAssembly->AddPart(m_CircleActor);
+
+
+    // Visualize normal if required
+    bool showNormal;
+    bool hasNormalProp = this->GetDataNode()->GetBoolProperty("shownormal",showNormal);
+
+
+    if(hasNormalProp && showNormal)
+    {
+       m_NormalActor = vtkActor::New();
+       m_NormalMapper = vtkPolyDataMapper::New();
+
+    }
+
+
   }
   catch(...)
   {

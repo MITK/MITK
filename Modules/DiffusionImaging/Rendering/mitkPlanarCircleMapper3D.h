@@ -69,6 +69,11 @@ namespace mitk {
     vtkSmartPointer<vtkPropAssembly>          m_CircleAssembly;
     vtkSmartPointer<vtkRegularPolygonSource>  m_polygonSource;
 
+
+    vtkSmartPointer<vtkActor>           m_NormalActor;
+    vtkSmartPointer<vtkPolyDataMapper>  m_NormalMapper;
+
+
   };
 
 } // namespace mitk

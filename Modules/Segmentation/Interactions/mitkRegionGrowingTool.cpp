@@ -51,6 +51,11 @@ mitk::RegionGrowingTool::RegionGrowingTool()
  m_LastWorkingSeed(-1),
  m_FillFeedbackContour(true)
 {
+  // great magic numbers
+  CONNECT_ACTION( 80, OnMousePressed );
+  CONNECT_ACTION( 90, OnMouseMoved );
+  CONNECT_ACTION( 42, OnMouseReleased );
+
 }
 
 mitk::RegionGrowingTool::~RegionGrowingTool()
@@ -91,15 +96,20 @@ void mitk::RegionGrowingTool::Deactivated()
  */
 bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
+
+  m_LastEventSender = positionEvent->GetSender();
+  m_LastEventSlice = m_LastEventSender->GetSlice();
+
   //ToolLogger::SetVerboseness(3);
 
   MITK_DEBUG << "OnMousePressed" << std::endl;
-  if (FeedbackContourTool::OnMousePressed( action, stateEvent ))
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 ) 
   {
     MITK_DEBUG << "OnMousePressed: FeedbackContourTool says ok" << std::endl;
 
     // 1. Find out which slice the user clicked, find out which slice of the toolmanager's reference and working image corresponds to that
-    const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if (positionEvent)
     {
       MITK_DEBUG << "OnMousePressed: got positionEvent" << std::endl;
@@ -320,7 +330,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
 */
 bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* stateEvent)
 {
-  if (FeedbackContourTool::OnMouseMoved( action, stateEvent ))
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
   {
     if ( m_ReferenceSlice.IsNotNull() && m_OriginalPicSlice ) 
     {
@@ -353,7 +363,7 @@ bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* sta
 */
 bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
 {
-  if (FeedbackContourTool::OnMouseReleased( action, stateEvent ))
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
   {
     // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
     if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )

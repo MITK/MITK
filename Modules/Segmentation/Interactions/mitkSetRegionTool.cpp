@@ -32,6 +32,12 @@ mitk::SetRegionTool::SetRegionTool(int paintingPixelValue)
  m_FillContour(false),
  m_StatusFillWholeSlice(false)
 {
+  // great magic numbers
+  CONNECT_ACTION( 80, OnMousePressed );
+  //CONNECT_ACTION( 90, OnMouseMoved );
+  CONNECT_ACTION( 42, OnMouseReleased );
+  CONNECT_ACTION( 49014, OnInvertLogic );
+
 }
 
 mitk::SetRegionTool::~SetRegionTool()
@@ -50,10 +56,14 @@ void mitk::SetRegionTool::Deactivated()
 
 bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
-  if (!FeedbackContourTool::OnMousePressed( action, stateEvent )) return false;
-
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
+
+  m_LastEventSender = positionEvent->GetSender();
+  m_LastEventSlice = m_LastEventSender->GetSlice();
+
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+
 
   // 1. Get the working image
   Image::Pointer workingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
@@ -246,7 +256,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   
   if (!m_FillContour && !m_StatusFillWholeSlice) return true;
   
-  if (!FeedbackContourTool::OnMouseReleased( action, stateEvent )) return false;
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
@@ -283,7 +293,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 */
 bool mitk::SetRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
 {
-  if (!FeedbackContourTool::OnInvertLogic(action, stateEvent)) return false;
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
   
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;

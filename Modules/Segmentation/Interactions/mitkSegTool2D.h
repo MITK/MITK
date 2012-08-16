@@ -81,10 +81,11 @@ class Segmentation_EXPORT SegTool2D : public Tool
     SegTool2D(const char*); // purposely hidden
     virtual ~SegTool2D();
 
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnMouseMoved   (Action*, const StateEvent*);
-    virtual bool OnMouseReleased(Action*, const StateEvent*);
-    virtual bool OnInvertLogic  (Action*, const StateEvent*);
+    /**
+    * \brief Calculates how good the data, this statemachine handles, is hit by the event.
+    *
+    */
+    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
     /**
       \brief Extract the slice of an image that the user just scribbles on.
@@ -116,11 +117,12 @@ class Segmentation_EXPORT SegTool2D : public Tool
     unsigned int AddContourmarker ( const PositionEvent* );
 
     void InteractiveSegmentationBugMessage( const std::string& message );
- 
-  private:
+
 
     BaseRenderer*         m_LastEventSender;
     unsigned int          m_LastEventSlice;
+
+  private:
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
 

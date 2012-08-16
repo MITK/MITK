@@ -95,7 +95,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     SetPluginDirectory();
     SetDatabaseDirectory("DatabaseDirectory");
     SetListenerDirectory("ListenerDirectory");
-    StartDicomDirectoryListener();
+    //StartDicomDirectoryListener();
 
     m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(true);
 
@@ -113,8 +113,6 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
     connect(m_Controls.QueryRetrieveButton, SIGNAL(clicked()), this, SLOT(OnQueryRetrieve()));
     connect(m_Controls.LocalStorageButton, SIGNAL(clicked()), this, SLOT(OnLocalStorage()));
-
-    //connect(m_Controls.radioButton,SIGNAL(clicked()),this,SLOT(StartStopStoreSCP()));
 }
 
 void QmitkDicomEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
@@ -213,6 +211,8 @@ void QmitkDicomEditor::StartStoreSCP()
     m_Builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_ListenerDirectory);
     m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&m_Builder);
     connect(m_StoreSCPLauncher, SIGNAL(SignalStatusOfStoreSCP(const QString&)), this, SLOT(OnStoreSCPStatusChanged(const QString&)));
+    connect(m_StoreSCPLauncher ,SIGNAL(SignalStartImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(StartDicomImport(const QStringList&)));
+    connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),m_Controls.internalDataWidget,SLOT(OnCancelButtonClicked()));
     m_StoreSCPLauncher->StartStoreSCP();
 
 }

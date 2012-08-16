@@ -180,7 +180,7 @@ void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
         QString studyName = m_LocalModel->data(studyIndex).toString();
 
         QModelIndex patientIndex = m_LocalModel->parent(studyIndex);
-        QString patientName = m_LocalModel->data(patientIndex).toString();        
+        QString patientName = m_LocalModel->data(patientIndex).toString();
 
         QString filePath;
         filePath.append(m_LocalDatabase->databaseDirectory());

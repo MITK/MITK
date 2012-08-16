@@ -634,7 +634,27 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
 
 
     // true when we are currently moving on points that should be thrown away
-    bool currentlyOnResidual = false;
+    bool currentlyOnPositive = false;
+
+
+    // plane equation: Ax+By+Cz+D=0
+    Vector3D normal = currentGeometry2D->GetNormal();
+    double A = normal[0];
+    double B = normal[1];
+    double C = normal[2];
+    double D = - (A + (B + C) );
+
+
+
+
+
+    // Create a cell array to store the lines in and add the lines to it
+    vtkSmartPointer<vtkCellArray> cells =
+      vtkSmartPointer<vtkCellArray>::New();
+
+
+    vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+    int lastId = 0;
 
 
     // iterate through all the lines
@@ -645,15 +665,61 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
       lines->GetNextCell ( numPointsInCell, pointsInCell );
 
 
+      int pointsSinceLastCrossing = 0;
+
+
       // iterate trough all the points on the line and check on which side of the plane defined by the planar figure they are
       for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
       {
         // push back point
         double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+        Point3D point;
+        point[0] = p[0];
+        point[1] = p[1];
+        point[2] = p[2];
+
+        if( (A*p[0]+B*p[1]+C*p[2]+D > 0) && currentlyOnPositive ||
+                (A*p[0]+B*p[1]+C*p[2]+D) <= 0 && !currentlyOnPositive )
+        {
+          // we remain on the same side of the plane
+          points->InsertNextPoint(point);
+          pointsSinceLastCrossing++;
+        }
+        else
+        {
+          // we change to the other side of the plane
+          currentlyOnPositive = !currentlyOnPositive;
+
+
+          // add the line we created thus far
+          vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
+          polyLine->GetPointIds()->SetNumberOfIds( pointsSinceLastCrossing );
+          while(lastId < points->GetNumberOfPoints())
+          {
+            polyLine->GetPointIds()->SetId(i,i);
+            lastId+++;
+          }
+
+          cells->InsertNextCell(polyLine);
+
+          pointsSinceLastCrossing=0;
+
+        }
+
 
       }
 
-      //tracts.push_back(singleTract);
+      // Done with all points, so add remaining line
+
+      vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
+      polyLine->GetPointIds()->SetNumberOfIds( pointsSinceLastCrossing );
+      while(lastId < points->GetNumberOfPoints())
+      {
+        polyLine->GetPointIds()->SetId(i,i);
+        lastId+++;
+      }
+
+
     }
 
 

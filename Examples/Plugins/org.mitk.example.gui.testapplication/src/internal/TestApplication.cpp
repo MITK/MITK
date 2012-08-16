@@ -19,8 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 #include "TestApplicationWorkbenchWindowAdvisor.h"
+#include "berryIQtStyleManager.h"
+#include "org_mitk_example_gui_testapplication_Activator.h"
 
-class TestWorkbenchAdvisor : public berry::WorkbenchAdvisor
+class TestWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {
 
 public:
@@ -35,14 +37,25 @@ public:
     return wwAdvisor.data();
   }
 
-  /*void Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
+  void Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
   {
-    berry::WorkbenchAdvisor::Initialize(configurer);
-    QString styleName = "teststyle";
+    berry::QtWorkbenchAdvisor::Initialize(configurer);
+    QString styleName = "TestStyle";
 
-    IQtStyleManager::Pointer styleManager = Platform::GetServiceRegistry().GetServiceById<IQtStyleManager>(IQtStyleManager::ID);
-    styleManager->SetStyle(styleName);
-  }*/
+    ctkPluginContext* pluginContext = org_mitk_example_gui_testapplication_Activator::GetPluginContext();
+    ctkServiceReference serviceReference = pluginContext->getServiceReference<berry::IQtStyleManager>();
+
+    //always granted by org.blueberry.ui.qt
+    Q_ASSERT(serviceReference);
+    
+    berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
+    Q_ASSERT(styleManager);
+    
+    styleManager->AddStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.testapplication/resources/teststyle.qss", styleName);
+    styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.testapplication/resources/teststyle.qss");
+
+
+  }
 
   std::string GetInitialWindowPerspectiveId()
   {

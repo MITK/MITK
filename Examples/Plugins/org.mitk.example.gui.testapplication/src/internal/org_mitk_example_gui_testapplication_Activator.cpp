@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 
+ctkPluginContext* org_mitk_example_gui_testapplication_Activator::PluginContext = 0;
+
 void org_mitk_example_gui_testapplication_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(TestApplication, context)
@@ -32,11 +34,19 @@ void org_mitk_example_gui_testapplication_Activator::start(ctkPluginContext* con
   BERRY_REGISTER_EXTENSION_CLASS(TestPerspective2, context)
   BERRY_REGISTER_EXTENSION_CLASS(MinimalView, context)
   BERRY_REGISTER_EXTENSION_CLASS(TestView, context)
+  PluginContext = context;
 }
 
 void org_mitk_example_gui_testapplication_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+
+  PluginContext = 0;
+}
+
+ctkPluginContext* org_mitk_example_gui_testapplication_Activator::GetPluginContext()
+{
+  return PluginContext;
 }
 
 Q_EXPORT_PLUGIN2(org_mitk_example_gui_testapplication, org_mitk_example_gui_testapplication_Activator)

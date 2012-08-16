@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "TestApplicationWorkbenchWindowAdvisor.h"
 //#include "QmitkActionBarAdvisor.h"
 #include "QtPerspectiveSwitcherTabBar.h"
+#include "org_mitk_example_gui_testapplication_Activator.h"
 
 #include <QMenu>
 #include <QMenuBar>
@@ -28,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTabBar>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QPushButton>
+
 //#include <QComboBox>
 //
 //#include <berryPlatform.h>
@@ -36,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <berryIPreferencesService.h>
 #include <berryIViewRegistry.h>
 #include <internal/berryQtControlWidget.h>
+#include <berryIQtStyleManager.h>
 //#include <berryQtShell.h>
 //#include "D:/Plattformprojekt/MITK/BlueBerry/Bundles/org.blueberry.ui.qt/src/internal/berryQtShell.h"
 //
@@ -182,7 +186,17 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   PerspectivesTabBar->addTab("Perspective 2");
   PerspectivesTabBar->setVisible(true);
   QVBoxLayout* CentralWidgetLayout = new QVBoxLayout(CentralWidget);
-  CentralWidgetLayout->addWidget(PerspectivesTabBar);
+  QHBoxLayout* PerspectivesLayer = new QHBoxLayout(mainWindow);
+  CentralWidgetLayout->addLayout(PerspectivesLayer);
+  PerspectivesLayer->addWidget(PerspectivesTabBar);
+  PerspectivesLayer->addSpacing(300);
+  QPushButton* StyleUpdateButton = new QPushButton("Update Style", mainWindow);
+  StyleUpdateButton->setMaximumWidth(100);
+  PerspectivesLayer->addWidget(StyleUpdateButton);
+
+  QObject::connect(StyleUpdateButton, SIGNAL( clicked() ), this, SLOT( UpdateStyle() ));
+
+  //CentralWidgetLayout->addWidget(PerspectivesTabBar);
   CentralWidgetLayout->addWidget(PageComposite);
   CentralWidget->setLayout(CentralWidgetLayout);
   //CentralWidget->resize(mainWindow->size());
@@ -215,4 +229,18 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   configurer->CreatePageComposite(static_cast<void*>(&(*shell)));*/
   
   //this->GetWindowConfigurer()->CreatePageComposite(static_cast<void*>(shell*));
+}
+
+void TestApplicationWorkbenchWindowAdvisor::UpdateStyle()
+{
+  ctkPluginContext* pluginContext = org_mitk_example_gui_testapplication_Activator::GetPluginContext();
+  ctkServiceReference serviceReference = pluginContext->getServiceReference<berry::IQtStyleManager>();
+
+  //always granted by org.blueberry.ui.qt
+  Q_ASSERT(serviceReference);
+  
+  berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
+  Q_ASSERT(styleManager);
+  
+  styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.testapplication/resources/teststyle.qss");
 }

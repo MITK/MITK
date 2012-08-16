@@ -18,10 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define TESTAPPLICATIONWORKBENCHWINDOWADVISOR_H_
 
 #include <berryWorkbenchWindowAdvisor.h>
+#include <QObject.h>
 
-
-class TestApplicationWorkbenchWindowAdvisor : public berry::WorkbenchWindowAdvisor
+class TestApplicationWorkbenchWindowAdvisor : public QObject, public berry::WorkbenchWindowAdvisor
 {
+  Q_OBJECT
+
 public:
 
     TestApplicationWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer);
@@ -36,6 +38,11 @@ public:
     void PreWindowOpen();
 
 private:
+
+private slots:
+
+  void UpdateStyle();
+
 
 //    berry::IDropTargetListener::Pointer dropTargetListener;
 };

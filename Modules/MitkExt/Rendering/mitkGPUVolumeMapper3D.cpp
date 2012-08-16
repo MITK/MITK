@@ -654,6 +654,10 @@ void mitk::GPUVolumeMapper3D::DeinitRAY(mitk::BaseRenderer* renderer)
 
     ls->m_MapperRAY = NULL;
     ls->m_VolumePropertyRAY = NULL;
+    //Here ReleaseGraphicsResources has to be called to avoid VTK error messages.
+    //This seems like a VTK bug, because ReleaseGraphicsResources() is ment for internal use,
+    //but you cannot just delete the object (last smartpointer reference) without getting the
+    //VTK error.
     ls->m_VolumeRAY->ReleaseGraphicsResources(renderer->GetVtkRenderer()->GetRenderWindow());
     ls->m_VolumeRAY = NULL;
     ls->m_rayInitialized=false;

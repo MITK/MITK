@@ -34,6 +34,11 @@ mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)
 :FeedbackContourTool("PressMoveRelease"),
  m_PaintingPixelValue(paintingPixelValue)
 {
+  // great magic numbers
+  CONNECT_ACTION( 80, OnMousePressed );
+  CONNECT_ACTION( 90, OnMouseMoved );
+  CONNECT_ACTION( 42, OnMouseReleased );
+
   GetFeedbackContour()->SetClosed( false ); // don't close the contour to a polygon
 }
 
@@ -63,10 +68,13 @@ void mitk::CorrectorTool2D::Deactivated()
 
 bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
-  if (!FeedbackContourTool::OnMousePressed( action, stateEvent )) return false;
-
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
+
+  m_LastEventSender = positionEvent->GetSender();
+  m_LastEventSlice = m_LastEventSender->GetSlice();
+
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   Contour* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Initialize();
@@ -79,7 +87,7 @@ bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* st
 
 bool mitk::CorrectorTool2D::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
 {
-  if (!FeedbackContourTool::OnMouseMoved( action, stateEvent )) return false;
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -104,7 +112,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
   
-  if (!FeedbackContourTool::OnMouseReleased( action, stateEvent )) return false;
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;

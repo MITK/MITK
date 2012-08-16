@@ -33,6 +33,13 @@ mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
  m_PaintingPixelValue(paintingPixelValue),
  m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
+  // great magic numbers
+  CONNECT_ACTION( 80, OnMousePressed );
+  CONNECT_ACTION( 90, OnMouseMoved );
+  CONNECT_ACTION( 42, OnMouseReleased );
+  CONNECT_ACTION( 49014, OnInvertLogic );
+
+
   m_MasterContour = Contour::New();
   m_MasterContour->Initialize();
   m_CurrentPlane = NULL;
@@ -175,6 +182,12 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   */
 bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
+
+  m_LastEventSender = positionEvent->GetSender();
+  m_LastEventSlice = m_LastEventSender->GetSlice();
+
   return this->OnMouseMoved(action, stateEvent);
 }
 
@@ -185,23 +198,22 @@ bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* sta
 bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-    if (!positionEvent) return false;
 
-    CheckIfCurrentSliceHasChanged(positionEvent);
+  CheckIfCurrentSliceHasChanged(positionEvent);
 
-    if ( m_LastContourSize != m_Size )
-    {
-      UpdateContour( stateEvent );
-      m_LastContourSize = m_Size;
-    }
+  if ( m_LastContourSize != m_Size )
+  {
+    UpdateContour( stateEvent );
+    m_LastContourSize = m_Size;
+  }
 
   bool leftMouseButtonPressed(
-          stateEvent->GetId() == 530
-       || stateEvent->GetId() == 534
-       || stateEvent->GetId() == 1
-       || stateEvent->GetId() == 5
-                             );
-    
+    stateEvent->GetId() == 530
+    || stateEvent->GetId() == 534
+    || stateEvent->GetId() == 1
+    || stateEvent->GetId() == 5
+    );
+
   Point3D worldCoordinates = positionEvent->GetWorldPosition();
   Point3D indexCoordinates;
 

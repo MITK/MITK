@@ -112,7 +112,7 @@ GibbsTrackingFilter< ItkQBallImageType >
 
     // instantiate all necessary components
     SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
-    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
+    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength, m_ParticleGridCellCapacity);
     GibbsEnergyComputer* encomp = new GibbsEnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
 
     //    EnergyComputer* encomp = new EnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
@@ -233,7 +233,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
 
     // initialize the actual tracking components (ParticleGrid, Metropolis Hastings Sampler and Energy Computer)
-    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength);
+    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength, m_ParticleGridCellCapacity);
 
     GibbsEnergyComputer* encomp = new GibbsEnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
     encomp->SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);

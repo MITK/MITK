@@ -137,6 +137,10 @@ namespace mitk {
     float m_MeanFiberLength;
     float m_MedianFiberLength;
     float m_LengthStDev;
+
+
+    std::vector<long> m_PointsRoi; // this global variable needs to be refactored
+
   };
 
 } // namespace mitk

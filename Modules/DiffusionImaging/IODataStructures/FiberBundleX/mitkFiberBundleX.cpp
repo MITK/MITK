@@ -598,7 +598,67 @@ void mitk::FiberBundleX::GenerateFiberIds()
 
 std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk::PlanarFigure *pf)
 {
+
     std::vector<mitk::FiberBundleX::Pointer> bundles;
+
+
+
+    // Get all fibers that do not pass the roi. these can be used directly.
+    mitk::PlanarFigureComposite::Pointer PFCNot = mitk::PlanarFigureComposite::New();
+    mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(pf->GetGeometry2D()) );
+    PFCNot->SetGeometry2D(currentGeometry2D);
+    PFCNot->setOperationType(mitk::PFCOMPOSITION_NOT_OPERATION);
+    PFCNot->addPlanarFigure( pf );
+
+    mitk::FiberBundleX::Pointer notInRoi = this->ExtractFiberSubset(PFCNot);
+
+
+
+    // Now find the fibers that pass the roi and need some more attention and get a list of all points that lie on the ROI
+
+    mitk::FiberBundleX::Pointer inRoi = this->ExtractFiberSubset(pf);
+
+    int num = inRoi->GetNumFibers();
+    vtkSmartPointer<vtkPolyData> fiberPolyData = inRoi->GetFiberPolyData();
+
+
+    vtkCellArray* lines = fiberPolyData->GetLines();
+    lines->InitTraversal();
+
+    // New fiber polyData for clipped and residual bundles
+    vtkSmartPointer<vtkPolyData> clippedPolyData =
+      vtkSmartPointer<vtkPolyData>::New();
+
+    vtkSmartPointer<vtkPolyData> residualPolyData =
+      vtkSmartPointer<vtkPolyData>::New();
+
+
+    // true when we are currently moving on points that should be thrown away
+    bool currentlyOnResidual = false;
+
+
+    // iterate through all the lines
+    for( int fiberID( 0 ); fiberID < num; fiberID++ )
+    {
+      vtkIdType   numPointsInCell(0);
+      vtkIdType*  pointsInCell(NULL);
+      lines->GetNextCell ( numPointsInCell, pointsInCell );
+
+
+      // iterate trough all the points on the line and check on which side of the plane defined by the planar figure they are
+      for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
+      {
+        // push back point
+        double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+
+      }
+
+      //tracts.push_back(singleTract);
+    }
+
+
+    /*
+
     if (pf==NULL)
         return bundles;
 
@@ -611,13 +671,15 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
     Point3D planeOrigin = planeGeometry->GetOrigin();
 
 
-    /* Define cutting plane by ROI (PlanarFigure) */
+    //Define cutting plane by ROI (PlanarFigure)
     vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
     plane->SetOrigin(planeOrigin[0],planeOrigin[1],planeOrigin[2]);
     plane->SetNormal(planeNormal[0],planeNormal[1],planeNormal[2]);
 
 
 
+    // Use the plane that was defined by the planar figure and cut the fiber bundle in two parts:
+    // One part on the min-side of the plane and one on the plus-side of the plane
     MITK_DEBUG << "start clipping";
     vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
     clipper->SetInput(m_FiberIdDataSet);
@@ -625,17 +687,16 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
     clipper->GenerateClipScalarsOn();
     clipper->GenerateClippedOutputOn();
 
-    vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
-    vtkSmartPointer<vtkPolyData> out = clipper->GetOutput();
+    vtkSmartPointer<vtkPolyData> minusSide = clipper->GetClippedOutput();
+    vtkSmartPointer<vtkPolyData> plusSide = clipper->GetOutput();
 
-    mitk::FiberBundleX::Pointer clippedBundle = mitk::FiberBundleX::New(clipperout);
-    mitk::FiberBundleX::Pointer outputBundle = mitk::FiberBundleX::New(out);
-
-
+    mitk::FiberBundleX::Pointer minusBundle = mitk::FiberBundleX::New(minusSide);
+    mitk::FiberBundleX::Pointer plusBundle = mitk::FiberBundleX::New(plusSide);
 
 
 
-    mitk::PlanarFigureComposite::Pointer PFCNot = mitk::PlanarFigureComposite::New();
+    // Now from the bundles on the min-side of the plane
+
 
     mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(pf->GetGeometry2D()) );
     PFCNot->SetGeometry2D(currentGeometry2D);
@@ -643,20 +704,29 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
     PFCNot->addPlanarFigure( pf );
 
 
-    mitk::FiberBundleX::Pointer notRoi = this->ExtractFiberSubset(PFCNot);
 
-    mitk::FiberBundleX::Pointer finalResult = notRoi->AddBundle(clippedBundle);
-
-
+    mitk::FiberBundleX::Pointer notRoi = minusBundle->ExtractFiberSubset(PFCNot);
+    mitk::FiberBundleX::Pointer plusNotRoi = plusBundle->ExtractFiberSubset(PFCNot);
 
 
-    bundles.push_back(outputBundle);
-    bundles.push_back(clippedBundle);
+    mitk::FiberBundleX::Pointer finalResult = notRoi->AddBundle(plusBundle);
+
+
+
+    bundles.push_back(plusBundle);
+    bundles.push_back(minusBundle);
+
+
     bundles.push_back(notRoi);
+    bundles.push_back(plusNotRoi);
     bundles.push_back(finalResult);
-
+    */
 
     return bundles;
+
+
+
+
 
 
 
@@ -671,6 +741,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarF
         return NULL;
 
     std::vector<long> tmp = ExtractFiberIdSubset(pf);
+
     if (tmp.size()<=0)
         return mitk::FiberBundleX::New();
     vtkSmartPointer<vtkPolyData> pTmp = GeneratePolyDataByIds(tmp);
@@ -1021,6 +1092,8 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
             else
                 MITK_INFO << "ERROR in ExtractFiberIdSubset; impossible fiber id detected";
         }
+
+        m_PointsRoi = FibersInROI;
 
     }
 

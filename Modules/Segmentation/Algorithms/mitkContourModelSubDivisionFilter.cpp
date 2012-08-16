@@ -101,28 +101,56 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
           //add the current point to the temp contour
           tempContour->AddVertex((*it)->Coordinates, (*it)->IsActive, currentTimestep);
 
+          //control points for interpolation
           InputType::VertexIterator Ci = it;
           InputType::VertexIterator CiPlus1; 
           InputType::VertexIterator CiPlus2; 
           InputType::VertexIterator CiMinus1; 
 
+          //consider all possible cases
           if( it == first)
           {
-            CiPlus1 = it + 1;
-            CiPlus2 = it + 2;
-            CiMinus1 = last;
+            if( input->IsClosed(currentTimestep) )
+            {
+              CiPlus1 = it + 1;
+              CiPlus2 = it + 2;
+              CiMinus1 = last;
+            }
+            else
+            {
+              CiPlus1 = it + 1;
+              CiPlus2 = it + 2;
+              CiMinus1 = it;
+            }
           }
-          else if( (it == last) && input->IsClosed(currentTimestep) )
+          else if( it == last )
           {
-            CiPlus1 = first;
-            CiPlus2 = first + 1;
-            CiMinus1 = it -1;
+            if( input->IsClosed(currentTimestep) )
+            {
+              CiPlus1 = first;
+              CiPlus2 = first + 1;
+              CiMinus1 = it -1;
+            }
+            else
+            {
+              //don't add point after last
+              break;
+            }
           }
-          else if( (it == (last - 1)) && input->IsClosed(currentTimestep) )
+          else if( it == (last - 1) )
           {
-            CiPlus1 = it + 1;
-            CiPlus2 = first;
-            CiMinus1 = it -1;
+            if( input->IsClosed(currentTimestep) )
+            {
+              CiPlus1 = it + 1;
+              CiPlus2 = first;
+              CiMinus1 = it -1;
+            }
+            else
+            {
+              CiPlus1 = it + 1;
+              CiPlus2 = it + 1;
+              CiMinus1 = it -1;
+            }
           }
           else
           {
@@ -164,12 +192,13 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
           subpoint[2] = a[2] + b[2] + c[2] + d[2];
           InputType::VertexType subdivisionPoint(subpoint,false);
 
+          //add the new subdivision point to our tempContour
           tempContour->AddVertex(subdivisionPoint.Coordinates, currentTimestep);
 
           it++;
         }
 
-        //set the interpolated contour
+        //set the interpolated contour as the contour for the next iteration
         contour = tempContour;
       }
     }
@@ -185,5 +214,4 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
 
   this->SetOutput(contour);
 
-  //this->GraftOutput( contour);
 }

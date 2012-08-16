@@ -140,8 +140,10 @@ void CommandLineModulesPreferencesPage::PerformCancel()
 //-----------------------------------------------------------------------------
 void CommandLineModulesPreferencesPage::Update()
 {
+  QString fallbackTmpDir = QDir::tempPath();
+  m_TemporaryDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString())));
+
   m_DebugOutput->setChecked(m_CLIPreferencesNode->GetBool(DEBUG_OUTPUT_NODE_NAME, false));
-  m_TemporaryDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(TEMPORARY_DIRECTORY_NODE_NAME, "")));
   m_LoadFromApplicationDir->setChecked(m_CLIPreferencesNode->GetBool(LOAD_FROM_APPLICATION_DIR, false));
   m_LoadFromHomeDir->setChecked(m_CLIPreferencesNode->GetBool(LOAD_FROM_HOME_DIR, false));
   m_LoadFromCurrentDir->setChecked(m_CLIPreferencesNode->GetBool(LOAD_FROM_CURRENT_DIR, false));

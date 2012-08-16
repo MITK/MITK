@@ -160,7 +160,8 @@ void CommandLineModulesView::RetrievePreferenceValues()
   bool loadCurrentDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_CURRENT_DIR, false);
   bool loadAutoLoadDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_AUTO_LOAD_DIR, false);
 
-  m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, ""));
+  QString fallbackTmpDir = QDir::tempPath();
+  m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString()));
 
   // Get some default application paths.
   // Here we can use the preferences to set up the builder, before asking him for the paths to scan.

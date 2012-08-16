@@ -61,7 +61,8 @@ namespace mitk {
     PlanarCircleMapper3D();
     virtual ~PlanarCircleMapper3D();
 
-    void UpdateVtkObjects();
+    void UpdateVtkObjects(mitk::PlanarCircle* PFCircle);
+
 
     vtkSmartPointer<vtkAppendPolyData>        m_vtkCircleList;
     vtkSmartPointer<vtkOpenGLPolyDataMapper>  m_VtkCircleDataMapperGL;

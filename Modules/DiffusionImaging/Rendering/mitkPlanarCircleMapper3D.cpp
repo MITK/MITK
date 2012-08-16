@@ -44,6 +44,15 @@ mitk::PlanarCircleMapper3D::PlanarCircleMapper3D()
   m_CircleAssembly = vtkPropAssembly::New();
   m_CircleActor = vtkOpenGLActor::New();
   m_polygonSource = vtkRegularPolygonSource::New();
+
+  m_NormalActor = vtkActor::New();
+  m_NormalMapper = vtkPolyDataMapper::New();
+
+
+
+  m_NormalActor->SetMapper(m_NormalMapper);
+  m_CircleAssembly->AddPart(m_NormalActor);
+
 }
 
 mitk::PlanarCircleMapper3D::~PlanarCircleMapper3D()
@@ -91,67 +100,9 @@ void mitk::PlanarCircleMapper3D::GenerateData()
     m_CircleAssembly->AddPart(m_CircleActor);
 
 
-    // Visualize normal if required
-    bool showNormal;
-    bool hasNormalProp = this->GetDataNode()->GetBoolProperty("shownormal",showNormal);
 
+    this->UpdateVtkObjects(PFCircle);
 
-    if(hasNormalProp && showNormal)
-    {
-
-      m_NormalActor = vtkActor::New();
-      m_NormalMapper = vtkPolyDataMapper::New();
-
-
-
-      vtkSmartPointer<vtkPoints> points = vtkPoints::New();
-
-      double p0[3] = {V1[0],V1[1],V1[2]};
-      double p1[3] = {V1[0]+(double)N[0],
-                      V1[1]+(double)N[1],
-                      V1[2]+(double)N[2]};
-
-
-
-      points->InsertNextPoint(p0);
-      points->InsertNextPoint(p1);
-
-      vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
-
-
-      polyLine->GetPointIds()->SetNumberOfIds(2);
-      for(unsigned int i = 0; i < 2; i++)
-      {
-        polyLine->GetPointIds()->SetId(i,i);
-      }
-
-
-
-
-      // Create a cell array to store the lines in and add the lines to it
-      vtkSmartPointer<vtkCellArray> cells =
-        vtkSmartPointer<vtkCellArray>::New();
-      cells->InsertNextCell(polyLine);
-
-
-      // Create a polydata to store everything in
-      vtkSmartPointer<vtkPolyData> polyData =
-        vtkSmartPointer<vtkPolyData>::New();
-
-
-      // Add the points to the dataset
-      polyData->SetPoints(points);
-
-      // Add the lines to the dataset
-      polyData->SetLines(cells);
-
-
-      m_NormalMapper->SetInput(polyData);
-      m_NormalActor->SetMapper(m_NormalMapper);
-      m_CircleAssembly->AddPart(m_NormalActor);
-
-
-    }
 
 
   }
@@ -185,6 +136,12 @@ void mitk::PlanarCircleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
     this->GetDataNode()->GetColor( temprgb, NULL );
     double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
     m_CircleActor->GetProperty()->SetColor(trgb);
+
+
+
+    this->UpdateVtkObjects(PFCircle);
+
+
   }
   catch (...)
   {
@@ -206,8 +163,74 @@ void mitk::PlanarCircleMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
 }
 
-void mitk::PlanarCircleMapper3D::UpdateVtkObjects()
+void mitk::PlanarCircleMapper3D::UpdateVtkObjects(mitk::PlanarCircle* PFCircle)
 {
+  mitk::Point3D V1 = PFCircle->GetWorldControlPoint(0); //centerPoint
+
+  bool showNormal;
+  bool hasNormalProp = this->GetDataNode()->GetBoolProperty("shownormal",showNormal);
+
+  if(hasNormalProp && showNormal)
+  {
+
+    const mitk::Geometry2D* pfgeometry = PFCircle->GetGeometry2D();
+    const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*> (pfgeometry);
+    mitk::Vector3D N = planeGeo->GetNormal();
+
+
+    vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+
+    double p0[3] = {V1[0],V1[1],V1[2]};
+    double p1[3] = {V1[0]+(double)N[0],
+                    V1[1]+(double)N[1],
+                    V1[2]+(double)N[2]};
+
+
+
+    points->InsertNextPoint(p0);
+    points->InsertNextPoint(p1);
+
+    vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
+
+
+    polyLine->GetPointIds()->SetNumberOfIds(2);
+    for(unsigned int i = 0; i < 2; i++)
+    {
+      polyLine->GetPointIds()->SetId(i,i);
+    }
+
+
+    // Create a cell array to store the lines in and add the lines to it
+    vtkSmartPointer<vtkCellArray> cells =
+      vtkSmartPointer<vtkCellArray>::New();
+    cells->InsertNextCell(polyLine);
+
+
+    // Create a polydata to store everything in
+    vtkSmartPointer<vtkPolyData> polyData =
+      vtkSmartPointer<vtkPolyData>::New();
+
+
+    // Add the points to the dataset
+    polyData->SetPoints(points);
+
+    // Add the lines to the dataset
+    polyData->SetLines(cells);
+
+
+    m_NormalMapper->SetInput(polyData);
+
+
+
+
+
+  }
+  else{
+    // Make sure m_NormalMapper has empty input, so no normal vector is shown
+    vtkSmartPointer<vtkPolyData> polyData =
+      vtkSmartPointer<vtkPolyData>::New();
+    m_NormalMapper->SetInput(polyData);
+  }
 }
 
 void mitk::PlanarCircleMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *)

@@ -46,7 +46,7 @@ itk::DataObject::Pointer mitk::ContourModelSource::MakeOutput ( unsigned int /*i
 
 void mitk::ContourModelSource::SetOutput( OutputType* output )
 {
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
+  //itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
     this->ProcessObject::SetNthOutput( 0, output );
 }
 

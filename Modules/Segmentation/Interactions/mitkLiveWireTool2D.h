@@ -60,7 +60,7 @@ class Segmentation_EXPORT LiveWireTool2D.cpp : public SegTool2D
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
 
-    int m_PaintingPixelValue;
+    mitk::DataNode::Pointer m_ContourModelNode;
 
     Image::Pointer m_WorkingSlice;
 };

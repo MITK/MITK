@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkPolyLineParametricPath.h>
 
 namespace mitk 
-{
+{class ContourModel;
 
 /**
 * This class holds stores vertices for drawing a contour 

@@ -31,9 +31,16 @@ namespace mitk {
 }
 
 mitk::LiveWireTool2D::LiveWireTool2D(int paintingPixelValue)
-:FeedbackContourTool("PressMoveRelease"),
- m_PaintingPixelValue(paintingPixelValue)
+:SegTool2D("PressMoveRelease"),
+ 
 {
+  //m_FeedbackContour = Contour::New();
+  m_ContourModelNode = DataNode::New();
+  //m_ContourModelNode->SetData( m_FeedbackContour );
+  m_ContourModelNode->SetProperty("name", StringProperty::New("contour node"));
+  m_ContourModelNode->SetProperty("visible", BoolProperty::New(true));
+
+  
   // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
   CONNECT_ACTION( 90, OnMouseMoved );
@@ -53,7 +60,7 @@ const char** mitk::LiveWireTool2D::GetXPM() const
 
 const char* mitk::LiveWireTool2D::GetName() const
 {
-  return "Correction";
+  return "LiveWire";
 }
 
 void mitk::LiveWireTool2D::Activated()
@@ -74,7 +81,7 @@ bool mitk::LiveWireTool2D::OnMousePressed (Action* action, const StateEvent* sta
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   Contour* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Initialize();
@@ -87,7 +94,7 @@ bool mitk::LiveWireTool2D::OnMousePressed (Action* action, const StateEvent* sta
 
 bool mitk::LiveWireTool2D::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -112,7 +119,7 @@ bool mitk::LiveWireTool2D::OnMouseReleased(Action* action, const StateEvent* sta
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
   
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
@@ -122,7 +129,7 @@ bool mitk::LiveWireTool2D::OnMouseReleased(Action* action, const StateEvent* sta
   if ( !image || !planeGeometry ) return false;
 
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-  m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
+  m_WorkingSlice = Superclass::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
   if ( m_WorkingSlice.IsNull() )
   {
@@ -130,23 +137,6 @@ bool mitk::LiveWireTool2D::OnMouseReleased(Action* action, const StateEvent* sta
       return false;
   }
 
-  CorrectorAlgorithm::Pointer algorithm = CorrectorAlgorithm::New();
-  algorithm->SetInput( m_WorkingSlice );
-  algorithm->SetContour( FeedbackContourTool::GetFeedbackContour() );
-  try 
-  {
-      algorithm->UpdateLargestPossibleRegion();
-  }
-  catch ( std::exception& e )
-  {
-      MITK_ERROR << "Caught exception '" << e.what() << "'" << std::endl;
-  }
-
-  mitk::Image::Pointer resultSlice = mitk::Image::New();
-  resultSlice->Initialize(algorithm->GetOutput());
-  resultSlice->SetVolume(algorithm->GetOutput()->GetData());
-
-  this->WriteBackSegmentationResult(positionEvent, resultSlice);
 
   return true;
 }

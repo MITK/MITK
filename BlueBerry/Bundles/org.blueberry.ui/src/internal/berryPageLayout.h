@@ -73,16 +73,16 @@ private:
 
   bool fixed;
 
-  typedef std::map<std::string, IStackableContainer::Pointer> IDToFolderMap;
+  typedef std::map<std::string, ILayoutContainer::Pointer> IDToFolderMap;
   IDToFolderMap mapIDtoFolder;
 
-  typedef std::map<std::string, StackablePart::Pointer> IDToPartMap;
+  typedef std::map<std::string, LayoutPart::Pointer> IDToPartMap;
   IDToPartMap mapIDtoPart;
 
   typedef std::map<std::string, ViewLayoutRec::Pointer> IDToViewLayoutRecMap;
   IDToViewLayoutRecMap mapIDtoViewLayoutRec;
 
-  typedef std::map<IStackableContainer::Pointer, IPlaceholderFolderLayout::Pointer> FolderToFolderLayoutMap;
+  typedef std::map<ILayoutContainer::Pointer, IPlaceholderFolderLayout::Pointer> FolderToFolderLayoutMap;
   FolderToFolderLayoutMap mapFolderToFolderLayout;
 
   std::vector<std::string> perspectiveShortcuts;
@@ -213,8 +213,8 @@ public:
    * Add the layout part to the page's layout
    */
 private:
-  void AddStack(IStackableContainer::Pointer newPart, const std::string& partId,
-        int relationship, float ratio, const std::string& refId);
+  void AddPart(LayoutPart::Pointer newPart, const std::string& partId,
+               int relationship, float ratio, const std::string& refId);
 
   /**
    * Adds a perspective shortcut to the Perspective menu.
@@ -319,7 +319,7 @@ public:
    * @throws PartInitException thrown if there is a problem creating the part.
    */
 private:
-  StackablePart::Pointer CreateView(const std::string& partID);
+  LayoutPart::Pointer CreateView(const std::string& partID);
 
   /**
    * @return the action set list for the page. This is <code>List</code> of
@@ -362,7 +362,7 @@ public:
    * if none (i.e. part of the page layout instead of a folder layout).
    */
 private:
-  IStackableContainer::Pointer GetFolderPart(const std::string& viewId);
+  PartStack::Pointer GetFolderPart(const std::string& viewId);
 
   /**
    * @return the new wizard shortcuts associated with the page. This is a <code>List</code> of
@@ -389,7 +389,7 @@ public:
    * @return the part for a given ID.
    */
   /*package*/
-  StackablePart::Pointer GetRefPart(const std::string& partID);
+  LayoutPart::Pointer GetRefPart(const std::string& partID);
 
   /**
    * @return the top level layout container.
@@ -472,7 +472,7 @@ public:
    */
   /*package*/
   void SetFolderPart(const std::string& viewId,
-      ContainerPlaceholder::Pointer container);
+                     ContainerPlaceholder::Pointer container);
 
   /**
    * Map the folder part containing the given view ID.
@@ -483,7 +483,7 @@ public:
   /*package*/
   void SetFolderPart(const std::string& viewId, PartStack::Pointer folder);
 
-  void SetFolderPart(const std::string& viewId, IStackableContainer::Pointer folder);
+  void SetFolderPart(const std::string& viewId, ILayoutContainer::Pointer folder);
 
   /**
    * Map an ID to a part.
@@ -492,7 +492,7 @@ public:
    * @param part the <code>LayoutPart</code>.
    */
   /*package*/
-  void SetRefPart(const std::string& partID, StackablePart::Pointer part);
+  void SetRefPart(const std::string& partID, LayoutPart::Pointer part);
 
   /**
    * Stack a part on top of another.
@@ -502,7 +502,7 @@ public:
    * @param refId the reference ID.
    */
 private:
-  void StackPart(StackablePart::Pointer newPart, const std::string& viewId,
+  void StackPart(LayoutPart::Pointer newPart, const std::string& viewId,
       const std::string& refId);
 
   /**

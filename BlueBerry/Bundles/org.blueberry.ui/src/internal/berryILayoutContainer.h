@@ -48,7 +48,7 @@ struct BERRY_UI ILayoutContainer : virtual public Object {
     /**
      * Returns a list of layout children.
      */
-  virtual ChildrenType GetChildren() = 0;
+  virtual ChildrenType GetChildren() const = 0;
 
     /**
      * Remove a child from the container.

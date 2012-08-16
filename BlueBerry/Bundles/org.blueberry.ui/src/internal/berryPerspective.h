@@ -73,7 +73,7 @@ protected:
 
     // Editor Area management
     LayoutPart::Pointer editorArea;
-    ContainerPlaceholder::Pointer editorHolder;
+    PartPlaceholder::Pointer editorHolder;
     bool editorHidden;
     int editorAreaState;
 

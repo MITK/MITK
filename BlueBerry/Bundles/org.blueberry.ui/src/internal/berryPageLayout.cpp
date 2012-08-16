@@ -52,17 +52,17 @@ void PageLayout::AddEditorArea()
   try
   {
     // Create the part.
-//    StackablePart::Pointer newPart = this->CreateView(ID_EDITOR_AREA);
-//    if (newPart == 0)
-//    {
-//      // this should never happen as long as newID is the editor ID.
-//      return;
-//    }
-//
- //   this->SetFolderPart(ID_EDITOR_AREA, editorFolder.Cast<ILayoutContainer>());
+    LayoutPart::Pointer newPart = this->CreateView(ID_EDITOR_AREA);
+    if (newPart == 0)
+    {
+      // this should never happen as long as newID is the editor ID.
+      return;
+    }
+
+    this->SetRefPart(ID_EDITOR_AREA, newPart);
 
     // Add it to the layout.
-    rootLayoutContainer->Add(editorFolder);
+    rootLayoutContainer->Add(newPart);
   }
   catch (PartInitException& e)
   {
@@ -87,40 +87,31 @@ ViewLayoutRec::Pointer PageLayout::GetViewLayoutRec(const std::string& id, bool 
   return rec;
 }
 
-void PageLayout::AddStack(IStackableContainer::Pointer newPart,
+void PageLayout::AddPart(LayoutPart::Pointer newPart,
     const std::string& partId, int relationship, float ratio,
     const std::string& refId)
 {
 
-  //this->SetRefPart(partId, newPart);
-  this->SetFolderPart(partId, newPart);
+  this->SetRefPart(partId, newPart);
 
   // If the referenced part is inside a folder,
   // then use the folder as the reference part.
-  IStackableContainer::Pointer refPart = this->GetFolderPart(refId);
-
-  //  if (refPart == 0)
-//  {
-//    refPart = this->GetRefPart(refId);
-//  }
+  LayoutPart::Pointer refPart = this->GetFolderPart(refId);
+  if (refPart == 0)
+  {
+    refPart = this->GetRefPart(refId);
+  }
 
   // Add it to the layout.
   if (refPart != 0)
   {
     ratio = this->NormalizeRatio(ratio);
-    rootLayoutContainer->Add(newPart.Cast<LayoutPart>(), this->GetPartSashConst(relationship), ratio,
-        refPart.Cast<LayoutPart>());
-  }
-  else if (refId == ID_EDITOR_AREA)
-  {
-    ratio = this->NormalizeRatio(ratio);
-    rootLayoutContainer->Add(newPart.Cast<LayoutPart>(), this->GetPartSashConst(relationship), ratio,
-        this->editorFolder.Cast<LayoutPart>());
+    rootLayoutContainer->Add(newPart, this->GetPartSashConst(relationship), ratio, refPart);
   }
   else
   {
     WorkbenchPlugin::Log("Reference part does not exist yet: " + refId);
-    rootLayoutContainer->Add(newPart.Cast<LayoutPart>());
+    rootLayoutContainer->Add(newPart);
   }
 }
 
@@ -141,15 +132,9 @@ void PageLayout::AddPlaceholder(const std::string& viewId, int relationship,
     return;
   }
 
-  // Create a folder.
-  ContainerPlaceholder::Pointer folder(new ContainerPlaceholder(viewId));
-  folder->SetContainer(rootLayoutContainer);
-  folder->SetRealContainer(PartStack::Pointer(new PartStack(rootLayoutContainer->page)));
-  //folder->SetId(folderId);
   // Create the placeholder.
   PartPlaceholder::Pointer newPart(new PartPlaceholder(viewId));
-  folder->Add(newPart);
-  this->AddStack(folder, viewId, relationship, ratio, refId);
+  this->AddPart(newPart, viewId, relationship, ratio, refId);
   // force creation of the view layout rec
   this->GetViewLayoutRec(viewId, true);
 }
@@ -222,12 +207,11 @@ void PageLayout::AddView(const std::string& viewId, int relationship,
   try
   {
     // Create the part.
-    StackablePart::Pointer newPart = this->CreateView(viewId);
+    LayoutPart::Pointer newPart = this->CreateView(viewId);
     if (newPart == 0)
     {
       this->AddPlaceholder(viewId, relationship, ratio, refId);
-      //TODO ViewActivator for IIdentifier
-      //LayoutHelper::AddViewActivator(this, viewId);
+      LayoutHelper::AddViewActivator(PageLayout::Pointer(this), viewId);
     }
     else
     {
@@ -249,7 +233,7 @@ void PageLayout::AddView(const std::string& viewId, int relationship,
           true, appearance, 0));
       newFolder->Add(newPart);
       this->SetFolderPart(viewId, newFolder);
-      this->AddStack(newFolder, viewId, relationship, ratio, refId);
+      this->AddPart(newFolder, viewId, relationship, ratio, refId);
       // force creation of the view layout rec
       this->GetViewLayoutRec(viewId, true);
 
@@ -297,7 +281,7 @@ IFolderLayout::Pointer PageLayout::CreateFolder(const std::string& folderId,
 {
   if (this->CheckPartInLayout(folderId))
   {
-    IStackableContainer::Pointer folder = this->GetFolderPart(folderId);
+    ILayoutContainer::Pointer folder = this->GetFolderPart(folderId);
 
     return mapFolderToFolderLayout[folder].Cast<IFolderLayout>();
   }
@@ -305,7 +289,7 @@ IFolderLayout::Pointer PageLayout::CreateFolder(const std::string& folderId,
   // Create the folder.
   PartStack::Pointer folder(new PartStack(rootLayoutContainer->page));
   folder->SetID(folderId);
-  this->AddStack(folder, folderId, relationship, ratio, refId);
+  this->AddPart(folder, folderId, relationship, ratio, refId);
 
   // Create a wrapper.
   FolderLayout::Pointer layout(new FolderLayout(PageLayout::Pointer(this), folder, viewFactory));
@@ -328,9 +312,9 @@ IPlaceholderFolderLayout::Pointer PageLayout::CreatePlaceholderFolder(
   // Create the folder.
   ContainerPlaceholder::Pointer folder(new ContainerPlaceholder(""));
   folder->SetContainer(rootLayoutContainer);
-  folder->SetRealContainer(IStackableContainer::Pointer(new PartStack(rootLayoutContainer->page)));
+  folder->SetRealContainer(ILayoutContainer::Pointer(new PartStack(rootLayoutContainer->page)));
   folder->SetID(folderId);
-  this->AddStack(folder, folderId, relationship, ratio, refId);
+  this->AddPart(folder, folderId, relationship, ratio, refId);
 
   // Create a wrapper.
   IPlaceholderFolderLayout::Pointer layout(new PlaceholderFolderLayout(PageLayout::Pointer(this), folder));
@@ -340,15 +324,15 @@ IPlaceholderFolderLayout::Pointer PageLayout::CreatePlaceholderFolder(
   return layout;
 }
 
-StackablePart::Pointer PageLayout::CreateView(const std::string& partID)
+LayoutPart::Pointer PageLayout::CreateView(const std::string& partID)
 {
-//  if (partID == ID_EDITOR_AREA)
-//  {
-//    return editorFolder;
-//  }
+  if (partID == ID_EDITOR_AREA)
+  {
+    return editorFolder;
+  }
 
-  IViewDescriptor::Pointer viewDescriptor = viewFactory->GetViewRegistry()
-    ->Find(ViewFactory::ExtractPrimaryId(partID));
+//  IViewDescriptor::Pointer viewDescriptor = viewFactory->GetViewRegistry()
+//    ->Find(ViewFactory::ExtractPrimaryId(partID));
 //  if (WorkbenchActivityHelper.filterItem(viewDescriptor))
 //  {
 //    return null;
@@ -366,9 +350,9 @@ std::string PageLayout::GetEditorArea()
   return ID_EDITOR_AREA;
 }
 
-IStackableContainer::Pointer PageLayout::GetFolderPart(const std::string& viewId)
+PartStack::Pointer PageLayout::GetFolderPart(const std::string& viewId)
 {
-  return mapIDtoFolder[viewId];
+  return mapIDtoFolder[viewId].Cast<PartStack>();
 }
 
 int PageLayout::GetPartSashConst(int nRelationship)
@@ -381,7 +365,7 @@ std::vector<std::string> PageLayout::GetPerspectiveShortcuts()
   return perspectiveShortcuts;
 }
 
-StackablePart::Pointer PageLayout::GetRefPart(const std::string& partID)
+LayoutPart::Pointer PageLayout::GetRefPart(const std::string& partID)
 {
   return mapIDtoPart[partID];
 }
@@ -462,28 +446,28 @@ bool PageLayout::IsFixed()
 void PageLayout::SetFolderPart(const std::string& viewId,
     ContainerPlaceholder::Pointer container)
 {
-  IStackableContainer::Pointer tabFolder = container->GetRealContainer();
-  mapIDtoFolder[viewId] = tabFolder;
+  LayoutPart::Pointer tabFolder = container->GetRealContainer();
+  mapIDtoFolder[viewId] = tabFolder.Cast<ILayoutContainer>();
 }
 
 void PageLayout::SetFolderPart(const std::string& viewId,
     PartStack::Pointer folder)
 {
-  mapIDtoFolder[viewId] = folder.Cast<IStackableContainer>();
+  mapIDtoFolder[viewId] = folder.Cast<ILayoutContainer>();
 }
 
 void PageLayout::SetFolderPart(const std::string& viewId,
-    IStackableContainer::Pointer folder)
+    ILayoutContainer::Pointer folder)
 {
   mapIDtoFolder[viewId] = folder;
 }
 
-void PageLayout::SetRefPart(const std::string& partID, StackablePart::Pointer part)
+void PageLayout::SetRefPart(const std::string& partID, LayoutPart::Pointer part)
 {
   mapIDtoPart[partID] = part;
 }
 
-void PageLayout::StackPart(StackablePart::Pointer newPart,
+void PageLayout::StackPart(LayoutPart::Pointer newPart,
     const std::string& viewId, const std::string& refId)
 {
   this->SetRefPart(viewId, newPart);
@@ -504,7 +488,7 @@ void PageLayout::StackPart(StackablePart::Pointer newPart,
 
 //  // If the ref part is in the page layout then create
 //  // a new folder and add the new view.
-//  StackablePart::Pointer refPart = this->GetRefPart(refId);
+//  LayoutPart::Pointer refPart = this->GetRefPart(refId);
 //  if (refPart != 0) // && (refPart instanceof PartPane || refPart instanceof PartPlaceholder))
 //  {
 //    PartStack::Pointer newFolder(new PartStack(rootLayoutContainer->page));
@@ -535,7 +519,7 @@ void PageLayout::StackPlaceholder(const std::string& viewId,
   // Create the placeholder.
   PartPlaceholder::Pointer newPart(new PartPlaceholder(viewId));
 
-  StackablePart::Pointer refPart = this->GetRefPart(refId);
+  LayoutPart::Pointer refPart = this->GetRefPart(refId);
   if (refPart != 0)
   {
     newPart->SetContainer(refPart->GetContainer());
@@ -554,7 +538,7 @@ void PageLayout::StackView(const std::string& viewId, const std::string& refId)
   // Create the new part.
   try
   {
-    StackablePart::Pointer newPart = this->CreateView(viewId);
+    LayoutPart::Pointer newPart = this->CreateView(viewId);
     if (newPart == 0)
     {
       this->StackPlaceholder(viewId, refId);
@@ -613,10 +597,10 @@ void PageLayout::AddStandaloneViewPlaceholder(const std::string& viewId,
   {
     appearance = PresentationFactoryUtil::ROLE_STANDALONE_NOTITLE;
   }
-  folder->SetRealContainer(IStackableContainer::Pointer(new PartStack(rootLayoutContainer->page, true,
+  folder->SetRealContainer(ILayoutContainer::Pointer(new PartStack(rootLayoutContainer->page, true,
       appearance, 0)));
   folder->SetID(stackId);
-  this->AddStack(folder, stackId, relationship, ratio, refId);
+  this->AddPart(folder, stackId, relationship, ratio, refId);
 
   // Create a wrapper.
   PlaceholderFolderLayout::Pointer placeHolder(new PlaceholderFolderLayout(PageLayout::Pointer(this),
@@ -647,10 +631,10 @@ std::map<std::string, ViewLayoutRec::Pointer> PageLayout::GetIDtoViewLayoutRecMa
 
 void PageLayout::RemovePlaceholder(const std::string& id)
 {
-  StackablePart::Pointer part = this->GetRefPart(id);
+  LayoutPart::Pointer part = this->GetRefPart(id);
   if (part->IsPlaceHolder())
   {
-    IStackableContainer::Pointer stack = this->GetFolderPart(id);
+    ILayoutContainer::Pointer stack = this->GetFolderPart(id);
     if (stack != 0)
     {
       stack->Remove(part);
@@ -672,7 +656,7 @@ IPlaceholderFolderLayout::Pointer PageLayout::GetFolderForView(
   if (mapIDtoFolder[viewId] == 0)
     return IPlaceholderFolderLayout::Pointer(0);
 
-  IStackableContainer::Pointer folder = mapIDtoFolder[viewId];
+  ILayoutContainer::Pointer folder = mapIDtoFolder[viewId];
   IPlaceholderFolderLayout::Pointer layout;
   if (mapFolderToFolderLayout[folder] == 0)
   {

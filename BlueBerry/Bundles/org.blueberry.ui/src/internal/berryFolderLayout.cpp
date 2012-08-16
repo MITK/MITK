@@ -41,7 +41,7 @@ void FolderLayout::AddPlaceholder(const std::string& viewId)
   }
 
   // Create the placeholder.
-  StackablePart::Pointer newPart(new PartPlaceholder(viewId));
+  LayoutPart::Pointer newPart(new PartPlaceholder(viewId));
   this->LinkPartToPageLayout(viewId, newPart);
 
   // Add it to the folder layout.
@@ -86,7 +86,7 @@ void FolderLayout::SetProperty(const std::string& id, const std::string& value)
 }
 
 void FolderLayout::LinkPartToPageLayout(const std::string& viewId,
-    StackablePart::Pointer newPart)
+    LayoutPart::Pointer newPart)
 {
   pageLayout->SetRefPart(viewId, newPart);
   pageLayout->SetFolderPart(viewId, folder);

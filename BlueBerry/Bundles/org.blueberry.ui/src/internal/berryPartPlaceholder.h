@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYPARTPLACEHOLDER_H_
 #define BERRYPARTPLACEHOLDER_H_
 
-#include "berryStackablePart.h"
+#include "berryLayoutPart.h"
 
 namespace berry {
 
@@ -26,7 +26,7 @@ namespace berry {
  *
  * A PlaceHolder is a non-visible stand-in for a layout part.
  */
-class PartPlaceholder : public StackablePart {
+class PartPlaceholder : public LayoutPart {
 
 public:
 

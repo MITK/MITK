@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYEDITORAREAHELPER_H_
 
 #include "berryLayoutPart.h"
-#include "berryStackablePart.h"
+#include "berryLayoutPart.h"
 #include "berryEditorReference.h"
 
 #include <vector>
@@ -83,7 +83,7 @@ public:
      * Deref a given part.  Deconstruct its container as required.
      * Do not remove drag listeners.
      */
-    static void DerefPart(StackablePart::Pointer part);
+    static void DerefPart(LayoutPart::Pointer part);
 
     /**
      * Dispose of the editor presentation.

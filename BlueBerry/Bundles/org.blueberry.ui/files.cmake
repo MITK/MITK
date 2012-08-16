@@ -221,9 +221,7 @@ set(INTERNAL_CPP_FILES
   berryIEvaluationResultCache.cpp
   berryIEvaluationResultCache.cpp
   berryILayoutContainer.cpp
-  berryILayoutContainer.cpp
   berryIServiceLocatorCreator.cpp
-  berryIStackableContainer.cpp
   berryIStickyViewManager.cpp
   berryIWorkbenchLocationService.cpp
   berryIWorkbenchLocationService.cpp
@@ -264,7 +262,6 @@ set(INTERNAL_CPP_FILES
   berryServiceLocatorCreator.cpp
   berryShellPool.cpp
   berrySourcePriorityNameMapping.cpp
-  berryStackablePart.cpp
   berryStickyViewDescriptor.cpp
   berryStickyViewManager.cpp
   berryTweaklets.cpp

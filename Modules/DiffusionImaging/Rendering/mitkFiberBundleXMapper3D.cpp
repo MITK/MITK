@@ -101,7 +101,6 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
     localStorage->m_FiberActor->SetMapper(localStorage->m_FiberMapper);
-//    localStorage->m_FiberActor->GetProperty()->SetOpacity(0.999);
     localStorage->m_FiberMapper->SetLookupTable(m_lut);
 
 

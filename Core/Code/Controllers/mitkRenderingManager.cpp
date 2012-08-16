@@ -43,7 +43,7 @@ RenderingManager
   m_LODIncreaseBlocked( false ),
   m_LODAbortMechanismEnabled( false ),
   m_ClippingPlaneEnabled( false ),
-  m_TimeNavigationController( NULL ),
+  m_TimeNavigationController( SliceNavigationController::New("dummy") ),
   m_DataStorage( NULL ),
   m_ConstrainedPaddingZooming ( true )
 {
@@ -541,14 +541,11 @@ RenderingManager
     }
   }
 
-  if ( m_TimeNavigationController != NULL )
+  if ( boundingBoxInitialized )
   {
-    if ( boundingBoxInitialized )
-    {
-      m_TimeNavigationController->SetInputWorldGeometry( geometry );
-    }
-    m_TimeNavigationController->Update();
+    m_TimeNavigationController->SetInputWorldGeometry( geometry );
   }
+  m_TimeNavigationController->Update();
 
   this->RequestUpdateAll( type );
 
@@ -649,14 +646,11 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geo
   this->InternalViewInitialization( baseRenderer, geometry,
    boundingBoxInitialized, id );
 
-  if ( m_TimeNavigationController != NULL )
+  if ( boundingBoxInitialized && initializeGlobalTimeSNC )
   {
-   if ( boundingBoxInitialized && initializeGlobalTimeSNC )
-   {
-     m_TimeNavigationController->SetInputWorldGeometry( geometry );
-   }
-   m_TimeNavigationController->Update();
+    m_TimeNavigationController->SetInputWorldGeometry( geometry );
   }
+  m_TimeNavigationController->Update();
 
   this->RequestUpdate( renderWindow );
 
@@ -717,21 +711,21 @@ void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRender
 }
 
 
-void RenderingManager::SetTimeNavigationController( SliceNavigationController *nc )
-{
-  m_TimeNavigationController = nc;
-}
+//void RenderingManager::SetTimeNavigationController( SliceNavigationController *nc )
+//{
+//  m_TimeNavigationController = nc;
+//}
 
 
 const SliceNavigationController* RenderingManager::GetTimeNavigationController() const
 {
-  return m_TimeNavigationController;
+  return m_TimeNavigationController.GetPointer();
 }
 
 
 SliceNavigationController* RenderingManager::GetTimeNavigationController()
 {
-  return m_TimeNavigationController;
+  return m_TimeNavigationController.GetPointer();
 }
 
 

@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
  
 #include "QmitkUiLoader.h"
-#include "QmitkDataStorageComboBox.h"
+#include "QmitkDataStorageComboBoxWithSelectNone.h"
 #include "mitkNodePredicateDataType.h"
 
 //-----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ QmitkUiLoader::~QmitkUiLoader()
 QStringList QmitkUiLoader::availableWidgets () const
 {
   QStringList availableWidgets = QUiLoader::availableWidgets();
-  availableWidgets << "QmitkDataStorageComboBox";
+  availableWidgets << "QmitkDataStorageComboBoxWithSelectNone";
   return availableWidgets;
 }
 
@@ -46,14 +46,14 @@ QStringList QmitkUiLoader::availableWidgets () const
 QWidget* QmitkUiLoader::createWidget(const QString& className, QWidget* parent, const QString& name)
 {
   QWidget* widget = NULL;
-  if (className == "QmitkDataStorageComboBox")
+  if (className == "QmitkDataStorageComboBoxWithSelectNone")
   {
-    QmitkDataStorageComboBox* comboBox = new QmitkDataStorageComboBox(parent);
+    QmitkDataStorageComboBoxWithSelectNone* comboBox = new QmitkDataStorageComboBoxWithSelectNone(parent);
     comboBox->setObjectName(name);
-    comboBox->SetDataStorage(const_cast<mitk::DataStorage*>(m_DataStorage));
-    comboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
     comboBox->SetAutoSelectNewItems(false);
-    comboBox->addItem("please select");
+    comboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+    comboBox->SetDataStorage(const_cast<mitk::DataStorage*>(m_DataStorage));
+    comboBox->setCurrentIndex(0);
     widget = comboBox;
   }
   else

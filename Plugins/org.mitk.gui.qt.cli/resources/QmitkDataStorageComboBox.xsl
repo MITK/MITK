@@ -1,8 +1,8 @@
   <!--
-  ============================================================================
-    For an input image, we use QmitkDataStorageComboBox and no Browse button.
+  =========================================================================================
+    For an input image, we use QmitkDataStorageComboBoxWithSelectNone and no Browse button.
     But for output image, we use standard ctkPathLineEdit and a Browse button.
-  ============================================================================
+  =========================================================================================
   -->
   <xsl:template match="parameters/*[name()=('image')]" priority="2">
     <xsl:call-template name="gridItemWithLabel"/>
@@ -41,10 +41,10 @@
   </xsl:template>
 
   <!--
-  ============================================================================
-    For an input image, we use QmitkDataStorageComboBox and no Browse button.
+  =========================================================================================
+    For an input image, we use QmitkDataStorageComboBoxWithSelectNone and no Browse button.
     But for output image, we use standard ctkPathLineEdit and a Browse button.
-  ============================================================================
+  =========================================================================================
   -->
 
   <xsl:template match="parameters/*[name()=('image')]" mode="connections" priority="2">

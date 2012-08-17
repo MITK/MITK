@@ -55,6 +55,7 @@ Interactions/mitkSegmentationsProcessingTool.cpp
 Interactions/mitkSetRegionTool.cpp
 Interactions/mitkSegTool2D.cpp
 Interactions/mitkSubtractContourTool.cpp
+Interactions/mitkContourModelInteractor.cpp
 Interactions/mitkLiveWireTool2D.cpp
 IO/mitkContourModelIOFactory.cpp
 IO/mitkContourModelReader.cpp

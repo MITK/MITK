@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLiveWireTool2D.xpm"
 
 #include <mitkInteractionConst.h>
+#include <mitkContourModelInteractor.h>
 
 
 namespace mitk {
@@ -180,10 +181,12 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 
   m_ContourModelNode->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), NULL, true );
 
+  mitk::ContourModelInteractor::Pointer interactor = mitk::ContourModelInteractor::New(m_ContourModelNode);
   //set the livewire interactor to edit control points
-  //m_ContourModelNode->SetInteractor(fooo);
+  m_ContourModelNode->SetInteractor(interactor);
 
   m_Contour = mitk::ContourModel::New();
+
   m_ContourModelNode = mitk::DataNode::New();
   m_ContourModelNode->SetData( m_Contour );
   m_ContourModelNode->SetProperty("name", StringProperty::New("anoter contour node"));

@@ -599,8 +599,8 @@ void mitk::FiberBundleX::GenerateFiberIds()
 std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk::PlanarFigure *pf)
 {
 
-    std::vector<mitk::FiberBundleX::Pointer> bundles;
 
+    std::vector<mitk::FiberBundleX::Pointer> bundles;
 
 
     // Get all fibers that do not pass the roi. these can be used directly.
@@ -611,8 +611,7 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
     PFCNot->addPlanarFigure( pf );
 
     mitk::FiberBundleX::Pointer notInRoi = this->ExtractFiberSubset(PFCNot);
-
-
+    bundles.push_back(notInRoi);
 
     // Now find the fibers that pass the roi and need some more attention and get a list of all points that lie on the ROI
 
@@ -625,16 +624,6 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
     vtkCellArray* lines = fiberPolyData->GetLines();
     lines->InitTraversal();
 
-    // New fiber polyData for clipped and residual bundles
-    vtkSmartPointer<vtkPolyData> clippedPolyData =
-      vtkSmartPointer<vtkPolyData>::New();
-
-    vtkSmartPointer<vtkPolyData> residualPolyData =
-      vtkSmartPointer<vtkPolyData>::New();
-
-
-    // true when we are currently moving on points that should be thrown away
-    bool currentlyOnPositive = false;
 
 
     // plane equation: Ax+By+Cz+D=0
@@ -646,15 +635,36 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
 
 
 
+    // Create a new polyData for points on the positive side of the ROI
+    vtkSmartPointer<vtkPolyData> posPolyData =
+      vtkSmartPointer<vtkPolyData>::New();
 
+    vtkSmartPointer<vtkPolyData> negPolyData =
+      vtkSmartPointer<vtkPolyData>::New();
 
-    // Create a cell array to store the lines in and add the lines to it
-    vtkSmartPointer<vtkCellArray> cells =
+    // Create a cell array to store the lines on the positive side of the ROI
+    vtkSmartPointer<vtkCellArray> posCells =
+      vtkSmartPointer<vtkCellArray>::New();
+
+    // Create a cell array to store the lines on the negative side of the ROI
+    vtkSmartPointer<vtkCellArray> negCells =
       vtkSmartPointer<vtkCellArray>::New();
 
 
-    vtkSmartPointer<vtkPoints> points = vtkPoints::New();
-    int lastId = 0;
+    // points for the polyData on the positive side of the roi
+    vtkSmartPointer<vtkPoints> posPoints =
+      vtkPoints::New();
+
+    // points for the polyData on the positive side of the roi
+    vtkSmartPointer<vtkPoints> negPoints =
+      vtkPoints::New();
+
+
+    /* These points are needed to keep track until which point the points where
+       already added to a polyline so every time the plane is crossed
+       we know where to start adding points to a new polyline */
+    int lastPosId = 0;
+    int lastNegId = 0;
 
 
     // iterate through all the lines
@@ -665,44 +675,142 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
       lines->GetNextCell ( numPointsInCell, pointsInCell );
 
 
-      int pointsSinceLastCrossing = 0;
+      // Determine on which side of the plane we start
+      bool currentlyOnPositive = false;
 
+
+      // Find the side of the plane we are initially on
+      if(numPointsInCell == 0)
+        continue;
+      else
+      {
+        double *p = fiberPolyData->GetPoint( pointsInCell[ 0 ] );
+        if(A*p[0]+B*p[1]+C*p[2]+D > 0)
+          currentlyOnPositive = true;
+      }
 
       // iterate trough all the points on the line and check on which side of the plane defined by the planar figure they are
       for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
       {
-        // push back point
-        double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
-        Point3D point;
-        point[0] = p[0];
-        point[1] = p[1];
-        point[2] = p[2];
 
-        if( (A*p[0]+B*p[1]+C*p[2]+D > 0) && currentlyOnPositive ||
-                (A*p[0]+B*p[1]+C*p[2]+D) <= 0 && !currentlyOnPositive )
+        double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+        mitk::Vector3D P;
+        P[0] = p[0];
+        P[1] = p[1];
+        P[2] = p[2];
+
+        mitk::Vector3D previous;
+
+
+        if (pointInCellID>0)
+        {
+          double *p0 = fiberPolyData->GetPoint( pointsInCell[ pointInCellID-1 ] );
+          previous[0] = p0[0];
+          previous[1] = p0[1];
+          previous[2] = p0[2];
+        }
+
+
+
+        if( (A*P[0]+B*P[1]+C*P[2]+D > 0) && currentlyOnPositive ||
+                (A*P[0]+B*P[1]+C*P[2]+D) <= 0 && !currentlyOnPositive )
         {
           // we remain on the same side of the plane
-          points->InsertNextPoint(point);
-          pointsSinceLastCrossing++;
+          double insertPoint[3] = { (double)P[0], (double)P[1], (double)P[2] };
+
+          if(currentlyOnPositive)
+            posPoints->InsertNextPoint(insertPoint);
+          else
+            negPoints->InsertNextPoint(insertPoint);
+
         }
         else
         {
-          // we change to the other side of the plane
-          currentlyOnPositive = !currentlyOnPositive;
-
 
           // add the line we created thus far
+          int i=0;
           vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
-          polyLine->GetPointIds()->SetNumberOfIds( pointsSinceLastCrossing );
-          while(lastId < points->GetNumberOfPoints())
+
+          if(currentlyOnPositive)
           {
-            polyLine->GetPointIds()->SetId(i,i);
-            lastId+++;
+            while(lastPosId < posPoints->GetNumberOfPoints())
+            {
+              //Last point added should be the point where the line crosses the plane
+
+              if(lastPosId == posPoints->GetNumberOfPoints()-1)
+              {
+
+                mitk::Vector3D L;
+                L[0] = P[0]-previous[0];
+                L[1] = P[1]-previous[1];
+                L[2] = P[2]-previous[2];
+
+
+                mitk::Point3D point0 = currentGeometry2D->GetOrigin();
+                mitk::Vector3D P0;
+                P0[0] = point0[0];
+                P0[1] = point0[1];
+                P0[2] = point0[2];
+
+                float d = ( (P0-previous) * normal ) / (L*normal);
+
+                double intersect[3] = {previous[0] + d*L[0],
+                               previous[1] + d*L[1],
+                               previous[2] + d*L[2]};
+
+                posPoints->InsertNextPoint(intersect);
+
+                // insert point as always
+                polyLine->GetPointIds()->InsertId(i, lastPosId);
+                lastPosId++;
+                i++;
+
+                //insert the calculated intersection
+                polyLine->GetPointIds()->InsertId(i, lastPosId);
+                lastPosId++;
+                i++;
+
+
+                // done for this fiber
+                continue;
+
+              }
+              else
+              {
+                polyLine->GetPointIds()->InsertId(i,lastPosId);
+                lastPosId++;
+                i++;
+              }
+
+
+            }
+
+
+            posCells->InsertNextCell(polyLine);
           }
 
-          cells->InsertNextCell(polyLine);
+          else
+          {
+            while(lastNegId < negPoints->GetNumberOfPoints())
+            {
+              polyLine->GetPointIds()->InsertId(i,lastNegId);
+              lastNegId++;
+              i++;
+            }
 
-          pointsSinceLastCrossing=0;
+            negCells->InsertNextCell(polyLine);
+          }
+
+
+          // change to the other side of the plane
+          currentlyOnPositive = !currentlyOnPositive;
+
+          // we still need to add the point we are currently visiting
+          if(currentlyOnPositive)
+            posPoints->InsertNextPoint(p);
+          else
+            negPoints->InsertNextPoint(p);
+
 
         }
 
@@ -712,16 +820,49 @@ std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk
       // Done with all points, so add remaining line
 
       vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
-      polyLine->GetPointIds()->SetNumberOfIds( pointsSinceLastCrossing );
-      while(lastId < points->GetNumberOfPoints())
+      int i=0;
+
+      if(currentlyOnPositive)
       {
-        polyLine->GetPointIds()->SetId(i,i);
-        lastId+++;
+        while(lastPosId < posPoints->GetNumberOfPoints())
+        {
+          polyLine->GetPointIds()->InsertId(i,lastPosId);
+          lastPosId++;
+          i++;
+        }
+
+        posCells->InsertNextCell(polyLine);
+      }
+
+      else
+      {
+        while(lastNegId < negPoints->GetNumberOfPoints())
+        {
+          polyLine->GetPointIds()->InsertId(i,lastPosId);
+          lastNegId++;
+          i++;
+        }
+
+        negCells->InsertNextCell(polyLine);
       }
 
 
     }
 
+
+    // Add points and cells to the respective poly datas
+    posPolyData->SetPoints(posPoints);
+    posPolyData->SetLines(posCells);
+    negPolyData->SetPoints(negPoints);
+    negPolyData->SetLines(negCells);
+
+
+    // Create new fiber bundles based on posPolyData and negPolyData and at them to the return vector
+    mitk::FiberBundleX::Pointer posFibBundle = mitk::FiberBundleX::New(posPolyData);
+    mitk::FiberBundleX::Pointer negFibBundle = mitk::FiberBundleX::New(negPolyData);
+
+    bundles.push_back(posFibBundle);
+    bundles.push_back(negFibBundle);
 
     /*
 

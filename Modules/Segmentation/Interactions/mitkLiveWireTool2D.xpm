@@ -1,5 +1,5 @@
 /* XPM */
-static char * C:\home\schroedt\workspace\BS\MITK_source\MITK\Modules\Segmentation\Interactions\mitkLiveWireTool2D_xpm[] = {
+static const char * mitkLiveWireTool2D_xpm[] = {
 "24 24 9 1",
 " 	c None",
 ".	c #000000",

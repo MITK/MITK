@@ -246,6 +246,10 @@ enum EOperations
   OpATTRIBUTATION = 2004,       //used in VesselGraphInteractor
   OpDEFAULT = 2006,                  //used in VesselGraphInteractor
   OpSURFACECHANGED = 3000,  // used for changing polydata in surfaces
+  OpCONCATENATECONTOUR = 7006, //used for concatenating two contourModels
+  OpCLOSECONTOUR = 7007, //used to close a contour
+  OpOPENCONTOUR = 7008, //remove link between first and last point
+  OpMOVECONTOUR = 7009 //move the whole contour
 };
 
 //##Constants for EventMapping...
@@ -416,8 +420,8 @@ enum EActions
   AcINITIALIZECONTOUR = 5001,
   AcCALCULATENEWSEGMENTATION_SP= 5002,
   AcINTERACTOR = 5003,
-  AcCALCULATENEWSEGMENTATION_BB= 5004
-
+  AcCALCULATENEWSEGMENTATION_BB= 5004,
+  AcCLOSECONTOUR = 7007
 };
 
 

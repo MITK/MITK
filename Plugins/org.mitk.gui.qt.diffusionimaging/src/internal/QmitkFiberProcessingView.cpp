@@ -119,45 +119,34 @@ void QmitkFiberProcessingView::CutFibers()
 
         std::vector<mitk::FiberBundleX::Pointer> extFB = fib->CutFiberBundle(roi);
 
+        if(!(extFB.size() == 3))
+          return;
 
         mitk::DataNode::Pointer node;
 
         node = mitk::DataNode::New();
         node->SetData(extFB.at(0));
         QString name(m_SelectedFB.at(i)->GetName().c_str());
-        name += "plus_side";
+        name += "not_in_roi";
         node->SetName(name.toStdString());
         GetDataStorage()->Add(node);
 
 
         node = mitk::DataNode::New();
         node->SetData(extFB.at(1));
-        name = "minus_side";
+        name = "pos_side";
         node->SetName(name.toStdString());
         GetDataStorage()->Add(node);
 
 
         node = mitk::DataNode::New();
         node->SetData(extFB.at(2));
-        name = "minus_side_not_in_roi";
-        node->SetName(name.toStdString());
-        GetDataStorage()->Add(node);
-        m_SelectedFB.at(i)->SetVisibility(false);
-
-        node = mitk::DataNode::New();
-        node->SetData(extFB.at(3));
-        name = "plus_side_not_in_roi";
+        name = "neg_side_not_in_roi";
         node->SetName(name.toStdString());
         GetDataStorage()->Add(node);
         m_SelectedFB.at(i)->SetVisibility(false);
 
 
-        node = mitk::DataNode::New();
-        node->SetData(extFB.at(4));
-        name = "fiber_cut";
-        node->SetName(name.toStdString());
-        GetDataStorage()->Add(node);
-        m_SelectedFB.at(i)->SetVisibility(false);
 
 
 

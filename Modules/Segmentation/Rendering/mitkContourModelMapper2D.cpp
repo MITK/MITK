@@ -269,7 +269,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
           {
             vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
-            sphere->SetRadius(1.5);
+            sphere->SetRadius(1.2);
             sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
             sphere->Update();
             appendPoly->AddInput(sphere->GetOutput());
@@ -294,7 +294,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
         {
           vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
-          sphere->SetRadius(1.5);
+          sphere->SetRadius(1.2);
           sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
           sphere->Update();
           appendPoly->AddInput(sphere->GetOutput());
@@ -432,7 +432,7 @@ void mitk::ContourModelMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
   node->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
   node->AddProperty( "width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
   node->AddProperty( "use cutting plane", mitk::BoolProperty::New( true ), renderer, overwrite );
-  node->AddProperty( "subdivision curve", mitk::BoolProperty::New( true ), renderer, overwrite );
+  node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

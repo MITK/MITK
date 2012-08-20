@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkCorrectorTool2D_h_Included
-#define mitkCorrectorTool2D_h_Included
+#ifndef mitkContourModelInteractor_h_Included
+#define mitkContourModelInteractor_h_Included
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
@@ -65,14 +65,15 @@ class Segmentation_EXPORT ContourModelInteractor : public Interactor
     ContourModelInteractor(DataNode* dataNode); // purposely hidden
     virtual ~ContourModelInteractor();
 
-    
-    virtual bool OnInitLiveWire (Action*, const StateEvent*);
-    virtual bool OnAddPoint   (Action*, const StateEvent*);
-    virtual bool OnMouseMoved(Action*, const StateEvent*);
-    virtual bool OnCheckPoint(Action*, const StateEvent*);
-    virtual bool OnFinish(Action*, const StateEvent*);
-    virtual bool OnCloseContour(Action*, const StateEvent*);
 
+    virtual bool OnCheckPointClick (Action*, const StateEvent*);
+    virtual bool OnCheckContourClick   (Action*, const StateEvent*);
+    virtual bool OnSelectPoint(Action*, const StateEvent*);
+    virtual bool OnMovePoint(Action*, const StateEvent*);
+    virtual bool OnMoveContour(Action*, const StateEvent*);
+    virtual bool OnFinish(Action*, const StateEvent*);
+
+    mitk::Point3D m_lastMousePosition;
 
 };
 

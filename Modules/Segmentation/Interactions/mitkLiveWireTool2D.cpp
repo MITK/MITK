@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkInteractionConst.h>
 #include <mitkContourModelInteractor.h>
+#include <mitkGlobalInteraction.h>
 
 
 namespace mitk {
@@ -184,6 +185,8 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   mitk::ContourModelInteractor::Pointer interactor = mitk::ContourModelInteractor::New(m_ContourModelNode);
   //set the livewire interactor to edit control points
   m_ContourModelNode->SetInteractor(interactor);
+
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(interactor);
 
   m_Contour = mitk::ContourModel::New();
 

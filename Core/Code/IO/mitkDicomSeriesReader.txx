@@ -399,7 +399,7 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
 
      Anybody who does this in a simpler way: don't forget to write up how and why your solution works
   */
-  typedef itk::AffineTransform< double, ImageType::ImageDimension > TransformType;
+  typedef itk::ScalableAffineTransform< double, ImageType::ImageDimension > TransformType;
   typename TransformType::Pointer transformShear = TransformType::New();
 
   /**
@@ -419,14 +419,24 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
       - we lastly apply modify the image spacing in z direction by replacing this number with the correctly calulcated inter-slice distance
   */
   
-  // ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];
-  ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates();
+  ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];
   // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
   transformShear->Shear( 1, 2, factor );
  
   typename TransformType::Pointer imageIndexToWorld = TransformType::New();
   imageIndexToWorld->SetOffset( input->GetOrigin().GetVectorFromOrigin() );
-  imageIndexToWorld->SetMatrix( input->GetDirection() );
+
+  typename TransformType::MatrixType indexToWorldMatrix;
+  indexToWorldMatrix = input->GetDirection();
+
+  typename ImageType::DirectionType scale;
+  for ( unsigned int i = 0; i < ImageType::ImageDimension; i++ )
+  {
+    scale[i][i] = input->GetSpacing()[i];
+  }
+  indexToWorldMatrix *= scale;
+
+  imageIndexToWorld->SetMatrix( indexToWorldMatrix );
   
   typename TransformType::Pointer imageWorldToIndex = TransformType::New();
   imageIndexToWorld->GetInverse( imageWorldToIndex );

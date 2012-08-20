@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // uncomment for learning more about the internal sorting mechanisms
-//#define MBILOG_ENABLE_DEBUG 
+#define MBILOG_ENABLE_DEBUG 
 
 #include <mitkDicomSeriesReader.h>
 
@@ -526,9 +526,10 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
     m_ShiftUp = signedDistance;
     
     m_ITKAssumedSliceSpacing = (origin2 - origin1).GetNorm();
+    //double itkAssumedSliceSpacing = sqrt( m_ShiftUp * m_ShiftUp + m_ShiftNormal * m_ShiftNormal );
 
     MITK_DEBUG << "    shift normal: " << m_ShiftNormal;
-    MITK_DEBUG << "    shift assumed by ITK: " << m_ITKAssumedSliceSpacing;
+    MITK_DEBUG << "    shift normal assumed by ITK: " << m_ITKAssumedSliceSpacing;
     MITK_DEBUG << "    shift up: " << m_ShiftUp;
     MITK_DEBUG << "    shift right: " << m_ShiftRight;
     
@@ -572,8 +573,7 @@ double
 DicomSeriesReader::GantryTiltInformation::GetMatrixCoefficientForCorrectionInWorldCoordinates() const
 {
   // so many mm need to be shifted per slice!
-  double factorTilt = m_ShiftUp / m_ITKAssumedSliceSpacing;
-  return factorTilt;
+  return m_ShiftUp / static_cast<double>(m_NumberOfSlicesApart);
 }
 
 double 

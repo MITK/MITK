@@ -3853,6 +3853,48 @@
     </transition>
    </state>
   </stateMachine>
+    <stateMachine NAME="ContourModelInteractor">
+   <state NAME="Start" ID="1" START_STATE="TRUE">
+    <transition NAME="checkPointClick" NEXT_STATE_ID="10" EVENT_ID="1"> <!-- left mbtn = 1 -->
+     <action ID="21"/> <!-- AcCHECKPOINT = 21 -->
+    </transition>
+    <transition NAME="checkContourClick" NEXT_STATE_ID="20" EVENT_ID="5"> <!-- left mbtn + ctrl = 5 -->
+     <action ID="31"/> <!-- AcCHECKOBJECT = 31 -->
+    </transition>
+   </state>
+   <state NAME="Guard_CheckPointClick" ID="10" ><!-- check click on point -->
+    <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004"> <!-- EIDYES = 1004 -->
+     <action ID="66" /> <!-- AcSELECTPOINT = 66 -->
+    </transition>
+    <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- EIDNO = 1003 -->
+     <!-- no action -->
+    </transition>
+   </state>
+   <state NAME="EditPoint" ID="2" >
+    <transition NAME="mouseMove" NEXT_STATE_ID="2" EVENT_ID="520"> <!-- MouseMove = 520 -->
+     <action ID="90" /> <!-- AcMOVEPOINT = 90 -->
+    </transition>
+    <transition NAME="mouseRelease" NEXT_STATE_ID="1" EVENT_ID="505"> <!--  left mbtn release = 505 -->
+     <action ID="44" /> <!-- AcFINISH = 44 -->
+    </transition>
+   </state>
+   <state NAME="Guard_CheckContourClick" ID="20" ><!-- check click on contouor -->
+    <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- EIDYES = 1004 -->
+     <!-- no action -->
+    </transition>
+    <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- EIDNO = 1003 -->
+     <!-- no action -->
+    </transition>
+   </state>
+   <state NAME="EditContour" ID="3" >
+    <transition NAME="mouseMove" NEXT_STATE_ID="2" EVENT_ID="520"> <!-- MouseMove = 520 -->
+     <action ID="92" /> <!-- AcMOVE = 92 -->
+    </transition>
+    <transition NAME="mouseRelease" NEXT_STATE_ID="1" EVENT_ID="505"> <!--  left mbtn release = 505 -->
+     <action ID="44" /> <!-- AcFINISH = 44 -->
+    </transition>
+   </state>
+  </stateMachine>
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->

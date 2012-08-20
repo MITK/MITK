@@ -77,9 +77,10 @@ float mitk::ContourModelInteractor::CanHandleEvent(StateEvent const* stateEvent)
     mitk::Geometry3D *contourGeometry =
       dynamic_cast< Geometry3D * >( contour->GetGeometry( timestep ) );
 
-    if ( contourGeometry->IsInside(worldPoint3D) )
+    if ( contourGeometry )
     {
-      return 1.0;
+      if( contourGeometry->IsInside(worldPoint3D) ) return 1.0;
+      return 0.9;
     }
 
   }
@@ -106,8 +107,6 @@ void mitk::ContourModelInteractor::DataChanged()
 
 bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const StateEvent* stateEvent)
 {
-  if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
-
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
@@ -148,11 +147,24 @@ bool mitk::ContourModelInteractor::OnCheckContourClick( Action* action, const St
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
+  int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
   mitk::Point3D click = positionEvent->GetWorldPosition();
-  m_lastMousePosition = click;
-
   mitk::StateEvent* newStateEvent = NULL;
-  newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+
+  mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>(
+    m_DataNode->GetData() );
+  mitk::Geometry3D *contourGeometry = dynamic_cast< Geometry3D * >( contour->GetGeometry( timestep ) );
+
+  if ( contourGeometry->IsInside(click) )
+  {
+    m_lastMousePosition = click;
+    newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+  }
+  else
+  {
+    newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+  }
+
   this->HandleEvent( newStateEvent );
 
   return true;

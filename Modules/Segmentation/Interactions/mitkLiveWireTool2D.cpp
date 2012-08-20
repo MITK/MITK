@@ -158,7 +158,7 @@ bool mitk::LiveWireTool2D::OnCheckPoint( Action* action, const StateEvent* state
   mitk::Point3D first = this->m_Contour->GetVertexAt(0)->Coordinates;
 
 
-  if (first.EuclideanDistanceTo(click) < 1.1)
+  if (first.EuclideanDistanceTo(click) < 1.5)
   {
     newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
   }else

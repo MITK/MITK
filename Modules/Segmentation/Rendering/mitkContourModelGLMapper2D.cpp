@@ -35,14 +35,14 @@ mitk::ContourModelGLMapper2D::~ContourModelGLMapper2D()
 
 
 void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
-  {
+{
   if(IsVisible(renderer)==false) return;
 
   ////  @FIXME: Logik fuer update
   bool updateNeccesary=true;
 
   if (updateNeccesary) 
-    {
+  {
     mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput());
 
     // ok, das ist aus GenerateData kopiert
@@ -83,8 +83,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     glLineWidth(lineWidth);
 
 
-    //ContourModel::InputType end = input->GetContourPath()->EndOfInput();
-    //if (end > 50000) end = 0;
+    bool drawit=false;
 
     mitk::ContourModel::VertexIterator pointsIt = input->IteratorBegin();
 
@@ -109,69 +108,79 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       Vector3D diff=p-projected_p;
       ScalarType scalardiff = diff.GetSquaredNorm();
 
+      //draw lines
       bool projectmode=false;
       GetDataNode()->GetVisibility(projectmode, renderer, "project");
-      bool drawit=false;
+      
       if(projectmode)
         drawit=true;
       else
       {
-        Vector3D diff=p-projected_p;
         if(diff.GetSquaredNorm()<1.0)
           drawit=true;
       }
       if(drawit)
       {
-        /*if (input->IsClosed())
+        //lastPt2d is not valid in first step
+        if( !(pointsIt == input->IteratorBegin()) )
         {
-          glBegin (GL_LINE_LOOP);
+          glBegin (GL_LINES);
+          glVertex2f(pt2d[0], pt2d[1]);
+          glVertex2f(lastPt2d[0], lastPt2d[1]);
+          glEnd();
         }
-        else 
-        {*/
-          glBegin (GL_LINE_STRIP);
-        //}
-        Point2D pt2d, tmp;
-        glVertex2f(pt2d[0], pt2d[1]);
-        glVertex2f(lastPt2d[0], lastPt2d[1]);
-        glEnd();
+      
+
+        //draw active points
+        if ((*pointsIt)->IsActive)
+        {
+          float pointsize = 4;
+          Point2D  tmp;
+
+          Vector2D horz,vert;
+          horz[0]=pointsize-scalardiff*2; horz[1]=0;
+          vert[0]=0;                vert[1]=pointsize-scalardiff*2;
+          horz[0]=pointsize;
+          vert[1]=pointsize;
+          glColor3f(selectedcolor->GetColor().GetRed(), selectedcolor->GetColor().GetBlue(), selectedcolor->GetColor().GetGreen());
+          glLineWidth(1);
+          //a diamond around the point with the selected color
+          glBegin (GL_LINE_LOOP);
+          tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
+          tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+          tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
+          tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+          glEnd ();
+          glLineWidth(1);
+          //the actual point in the specified color to see the usual color of the point
+          glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
+          glPointSize(1);
+          glBegin (GL_POINTS);
+          tmp=pt2d;             glVertex2fv(&tmp[0]);
+          glEnd ();
+        }
       }
-
-
-      if ((*pointsIt)->IsActive)
-      {
-        float pointsize = 1.5;
-        Point2D  tmp;
-
-        Vector2D horz,vert;
-        horz[0]=pointsize-scalardiff*2; horz[1]=0;
-        vert[0]=0;                vert[1]=pointsize-scalardiff*2;
-        horz[0]=pointsize;
-        vert[1]=pointsize;
-        glColor3f(selectedcolor->GetColor().GetRed(), selectedcolor->GetColor().GetBlue(), selectedcolor->GetColor().GetGreen());
-        glLineWidth(1);
-        //a diamond around the point with the selected color
-        glBegin (GL_LINE_LOOP);
-        tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-        tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-        tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-        tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
-        glEnd ();
-        glLineWidth(1);
-        //the actual point in the specified color to see the usual color of the point
-        glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
-        glPointSize(1);
-        glBegin (GL_POINTS);
-        tmp=pt2d;             glVertex2fv(&tmp[0]);
-        glEnd ();
-      }
-
 
       pointsIt++;
+    }//end while iterate over controlpoints
+
+    //close contour if necessary
+    if(input->IsClosed() && drawit)
+    {
+      lastPt2d = pt2d;
+      point = input->GetVertexAt(0)->Coordinates;
+      itk2vtk(point, vtkp);
+      transform->TransformPoint(vtkp, vtkp);
+      vtk2itk(vtkp,p);
+      displayGeometry->Project(p, projected_p);
+      displayGeometry->Map(projected_p, pt2d);
+      displayGeometry->WorldToDisplay(pt2d, pt2d);
+
+      glBegin (GL_LINES);
+      glVertex2f(lastPt2d[0], lastPt2d[1]);
+      glVertex2f( pt2d[0], pt2d[1] );
+      glEnd();
     }
-
-
-    glLineWidth(1.0);
-
   }
 }
 

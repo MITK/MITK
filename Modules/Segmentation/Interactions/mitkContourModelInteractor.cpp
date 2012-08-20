@@ -125,7 +125,7 @@ bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const Stat
   mitk::Point3D click = positionEvent->GetWorldPosition();
 
 
-  if (contour->SelectVertexAt(click, 1.1, timestep) )
+  if (contour->SelectVertexAt(click, 1.5, timestep) )
   {
     newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
     m_lastMousePosition = click;

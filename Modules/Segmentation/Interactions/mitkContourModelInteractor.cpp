@@ -210,13 +210,15 @@ bool mitk::ContourModelInteractor::OnMoveContour( Action* action, const StateEve
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
   mitk::Vector3D translation;
   mitk::Point3D currentPosition = positionEvent->GetWorldPosition();
   translation[0] = currentPosition[0] - this->m_lastMousePosition[0];
   translation[1] = currentPosition[1] - this->m_lastMousePosition[1];
   translation[2] = currentPosition[2] - this->m_lastMousePosition[2];
-  contour->ShiftContour(translation);
+  contour->ShiftContour(translation, timestep);
 
   this->m_lastMousePosition = positionEvent->GetWorldPosition();
 

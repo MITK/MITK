@@ -38,13 +38,18 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   if(IsVisible(renderer)==false) return;
 
-  ////  @FIXME: Logik fuer update
+  ////  @FIXME: Logic for update
   bool updateNeccesary=true;
+
+  mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput());
+
+  int timestep = renderer->GetTimeStep();
+
+  if(input->GetNumberOfVertices(timestep) < 1)
+    updateNeccesary = false;
 
   if (updateNeccesary) 
   {
-    mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput());
-
     // ok, das ist aus GenerateData kopiert
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
     assert(displayGeometry.IsNotNull());
@@ -85,12 +90,12 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     bool drawit=false;
 
-    mitk::ContourModel::VertexIterator pointsIt = input->IteratorBegin();
+    mitk::ContourModel::VertexIterator pointsIt = input->IteratorBegin(timestep);
 
     Point2D pt2d;       // projected_p in display coordinates
     Point2D lastPt2d;
 
-    while ( pointsIt != input->IteratorEnd() )
+    while ( pointsIt != input->IteratorEnd(timestep) )
     {
       lastPt2d = pt2d;
 
@@ -116,13 +121,13 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
         drawit=true;
       else
       {
-        if(diff.GetSquaredNorm()<1.0)
+        if(diff.GetSquaredNorm()<0.5)
           drawit=true;
       }
       if(drawit)
       {
         //lastPt2d is not valid in first step
-        if( !(pointsIt == input->IteratorBegin()) )
+        if( !(pointsIt == input->IteratorBegin(timestep)) )
         {
           glBegin (GL_LINES);
           glVertex2f(pt2d[0], pt2d[1]);
@@ -165,10 +170,10 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }//end while iterate over controlpoints
 
     //close contour if necessary
-    if(input->IsClosed() && drawit)
+    if(input->IsClosed(timestep) && drawit)
     {
       lastPt2d = pt2d;
-      point = input->GetVertexAt(0)->Coordinates;
+      point = input->GetVertexAt(0,timestep)->Coordinates;
       itk2vtk(point, vtkp);
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);

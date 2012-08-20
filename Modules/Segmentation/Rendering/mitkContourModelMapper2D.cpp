@@ -389,8 +389,7 @@ void mitk::ContourModelMapper2D::ApplyContourProperties(mitk::BaseRenderer* rend
     localStorage->m_Actor->GetProperty()->SetLineWidth(lineWidth);
   }
 
-  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-        ("color", renderer));
+  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("color", renderer));
   if(colorprop)
   {
     //set the color of the contour

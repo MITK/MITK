@@ -46,9 +46,9 @@ void QmitkFunctionalitySelectionProvider::RemoveSelectionChangedListener( berry:
   m_SelectionEvents.RemoveListener(listener);
 }
 
-void QmitkFunctionalitySelectionProvider::SetSelection( berry::ISelection::Pointer selection )
+void QmitkFunctionalitySelectionProvider::SetSelection( berry::ISelection::ConstPointer selection )
 {
-  m_CurrentSelection = selection.Cast<mitk::DataNodeSelection>();
+  m_CurrentSelection = selection.Cast<const mitk::DataNodeSelection>();
 }
 
 void QmitkFunctionalitySelectionProvider::FireNodesSelected( std::vector<mitk::DataNode::Pointer> nodes )

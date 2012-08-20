@@ -102,6 +102,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_ResampleFibersButton, SIGNAL(clicked()), this, SLOT(ResampleSelectedBundles()) );
         connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
         connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
+        connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
         connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
 
     }
@@ -746,6 +747,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
         m_Controls->m_FaColorFibersButton->setEnabled(false);
         m_Controls->m_PruneFibersButton->setEnabled(false);
+        m_Controls->m_CurvatureThresholdButton->setEnabled(false);
 
         if (m_Surfaces.size()>0)
             m_Controls->m_MirrorFibersButton->setEnabled(true);
@@ -758,12 +760,11 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
         m_Controls->m_ResampleFibersButton->setEnabled(true);
         m_Controls->m_PruneFibersButton->setEnabled(true);
+        m_Controls->m_CurvatureThresholdButton->setEnabled(true);
+        m_Controls->m_MirrorFibersButton->setEnabled(true);
 
         if (m_Surfaces.size()>0)
-        {
             m_Controls->m_Extract3dButton->setEnabled(true);
-            m_Controls->m_MirrorFibersButton->setEnabled(true);
-        }
 
         // one bundle and one planar figure needed to extract fibers
         if (!m_SelectedPF.empty())
@@ -922,34 +923,6 @@ void QmitkFiberProcessingView::OnDrawCircle()
 
 void QmitkFiberProcessingView::Activated()
 {
-
-    MITK_INFO << "FB OPerations ACTIVATED()";
-    /*
-
-   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
-   mitk::DataNode* node = 0;
-   mitk::PlanarFigureInteractor::Pointer figureInteractor = 0;
-   mitk::PlanarFigure* figure = 0;
-
-   for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
-   ; it++)
-   {
-   node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
-   figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
-
-   if(figure)
-   {
-   figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
-
-   if(figureInteractor.IsNull())
-   figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
-
-   mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
-   }
-   }
-
-   */
-
 
 }
 
@@ -1464,21 +1437,31 @@ void QmitkFiberProcessingView::SubstractBundles()
 void QmitkFiberProcessingView::PruneBundle()
 {
     int minLength = this->m_Controls->m_PruneFibersSpinBox->value();
-    bool doneSomething = false;
+    int maxLength = this->m_Controls->m_MaxPruneFibersSpinBox->value();
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
         if (!fib->RemoveShortFibers(minLength))
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
-        else
-            doneSomething = true;
+        else if (!fib->RemoveLongFibers(maxLength))
+            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
     }
+    GenerateStats();
+    RenderingManager::GetInstance()->RequestUpdateAll();
+}
 
-    if (doneSomething)
+
+void QmitkFiberProcessingView::ApplyCurvatureThreshold()
+{
+    int mm = this->m_Controls->m_MinCurvatureRadiusBox->value();
+    for (int i=0; i<m_SelectedFB.size(); i++)
     {
-        GenerateStats();
-        RenderingManager::GetInstance()->RequestUpdateAll();
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        if (!fib->ApplyCurvatureThreshold(mm, this->m_Controls->m_RemoveFiberDueToCurvatureCheckbox->isChecked()))
+            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
     }
+    GenerateStats();
+    RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberProcessingView::GenerateStats()
@@ -1497,78 +1480,12 @@ void QmitkFiberProcessingView::GenerateStats()
                 stats += "\n-----------------------------\n";
             stats += QString(node->GetName().c_str()) + "\n";
             mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
-            vtkSmartPointer<vtkPolyData> fiberPolyData = fib->GetFiberPolyData();
-            vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
-            vLines->InitTraversal();
-            int numberOfLines = vLines->GetNumberOfCells();
-
-            stats += "Number of fibers: "+ QString::number(numberOfLines) + "\n";
-
-            float length = 0;
-            std::vector<float> lengths;
-            for (int i=0; i<numberOfLines; i++)
-            {
-                vtkIdType   numPoints(0);
-                vtkIdType*  points(NULL);
-                vLines->GetNextCell ( numPoints, points );
-
-                float l=0;
-                for (unsigned int j=0; j<numPoints-1; j++)
-                {
-                    itk::Point<double> p1;
-                    itk::Point<double> p2;
-                    fiberPolyData->GetPoint(points[j], p1.GetDataPointer());
-                    fiberPolyData->GetPoint(points[j+1], p2.GetDataPointer());
-
-                    float dist = p1.EuclideanDistanceTo(p2);
-                    length += dist;
-                    l += dist;
-                }
-                itk::Point<double> p2;
-                fiberPolyData->GetPoint(points[numPoints-1], p2.GetDataPointer());
-
-                lengths.push_back(l);
-            }
-
-            std::sort(lengths.begin(), lengths.end());
-
-            if (numberOfLines>0)
-                length /= numberOfLines;
-
-            float dev=0;
-            int count = 0;
-            vLines->InitTraversal();
-            for (int i=0; i<numberOfLines; i++)
-            {
-                vtkIdType   numPoints(0);
-                vtkIdType*  points(NULL);
-                vLines->GetNextCell ( numPoints, points );
-
-                float l=0;
-                for (unsigned int j=0; j<numPoints-1; j++)
-                {
-                    itk::Point<double> p1;
-                    itk::Point<double> p2;
-                    fiberPolyData->GetPoint(points[j], p1.GetDataPointer());
-                    fiberPolyData->GetPoint(points[j+1], p2.GetDataPointer());
-
-                    float dist = p1.EuclideanDistanceTo(p2);
-                    l += dist;
-                }
-                dev += (length-l)*(length-l);
-                count++;
-            }
-
-            if (numberOfLines>1)
-                dev /= (numberOfLines-1);
-            else
-                dev = 0;
-
-            stats += "Min. length:         "+ QString::number(lengths.front(),'f',1) + " mm\n";
-            stats += "Max. length:         "+ QString::number(lengths.back(),'f',1) + " mm\n";
-            stats += "Mean length:         "+ QString::number(length,'f',1) + " mm\n";
-            stats += "Median length:       "+ QString::number(lengths.at(lengths.size()/2),'f',1) + " mm\n";
-            stats += "Standard deviation:  "+ QString::number(sqrt(dev),'f',1) + " mm\n";
+            stats += "Number of fibers: "+ QString::number(fib->GetNumFibers()) + "\n";
+            stats += "Min. length:         "+ QString::number(fib->GetMinFiberLength(),'f',1) + " mm\n";
+            stats += "Max. length:         "+ QString::number(fib->GetMaxFiberLength(),'f',1) + " mm\n";
+            stats += "Mean length:         "+ QString::number(fib->GetMeanFiberLength(),'f',1) + " mm\n";
+            stats += "Median length:       "+ QString::number(fib->GetMedianFiberLength(),'f',1) + " mm\n";
+            stats += "Standard deviation:  "+ QString::number(fib->GetLengthStDev(),'f',1) + " mm\n";
         }
     }
     this->m_Controls->m_StatsTextEdit->setText(stats);

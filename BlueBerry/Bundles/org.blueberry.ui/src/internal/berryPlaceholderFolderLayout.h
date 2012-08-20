@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIPlaceholderFolderLayout.h"
 
-#include "berryStackablePart.h"
+#include "berryLayoutPart.h"
 #include "berryPageLayout.h"
 
 namespace berry
@@ -75,7 +75,7 @@ private:
    * and the placeholder the part belongs to.
    */
   void LinkPartToPageLayout(const std::string& viewId,
-      StackablePart::Pointer newPart);
+      LayoutPart::Pointer newPart);
 
 };
 

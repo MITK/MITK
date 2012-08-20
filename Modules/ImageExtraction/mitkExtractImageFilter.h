@@ -27,6 +27,9 @@ namespace mitk
 {
 
 /**
+  \deprecated This class is deprecated. Use mitk::ExtractSliceFilter instead.
+  \sa ExtractSliceFilter
+
   \brief Extracts a 2D slice from a 3D image.
 
   \sa SegTool2D

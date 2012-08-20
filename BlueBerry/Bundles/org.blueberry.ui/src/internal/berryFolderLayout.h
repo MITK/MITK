@@ -87,7 +87,7 @@ public:
         * Inform the page layout of the new part created
         * and the folder the part belongs to.
         */
-  void LinkPartToPageLayout(const std::string& viewId, StackablePart::Pointer newPart);
+  void LinkPartToPageLayout(const std::string& viewId, LayoutPart::Pointer newPart);
 
 };
 

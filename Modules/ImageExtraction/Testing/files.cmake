@@ -1,5 +1,5 @@
 set(MODULE_IMAGE_TESTS
-    
+
 
 )
 set(MODULE_TESTIMAGES

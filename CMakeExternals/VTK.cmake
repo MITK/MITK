@@ -46,29 +46,15 @@ if(NOT DEFINED VTK_DIR)
      )
   endif()
 
-  option(MITK_USE_VTK_5_8_IN_SUPERBUILD "Use VTK 5.8 in MITK superbuild" OFF)
-  
-  include(mitkFunctionGetGccVersion)
-  mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
-  if(GCC_VERSION AND NOT ${GCC_VERSION} VERSION_LESS "4.6")
-    if(NOT MITK_USE_VTK_5_8_IN_SUPERBUILD)
-      message("Forcing VTK 5.8 since we're using gcc ${GCC_VERSION}")
-    endif()  
-    set(MITK_USE_VTK_5_8_IN_SUPERBUILD ON CACHE BOOL "Use VTK 5.8 in MITK superbuild" FORCE)
-  endif()
-  
-  if(CMAKE_CXX_COMPILER MATCHES clang)
-    if(NOT MITK_USE_VTK_5_8_IN_SUPERBUILD)
-      message("Forcing VTK 5.8 since we're using clang")
-    endif()  
-    set(MITK_USE_VTK_5_8_IN_SUPERBUILD ON CACHE BOOL "Use VTK 5.8 in MITK superbuild" FORCE)
-  endif()
-  if(MITK_USE_VTK_5_8_IN_SUPERBUILD)
+  option(MITK_USE_VTK_5_10_IN_SUPERBUILD "Use VTK 5.10 in MITK superbuild" OFF)
+  #use only VTK 5.8 in superbuild until all issues regarding VTK 5.10 are solved
+
+  if(MITK_USE_VTK_5_10_IN_SUPERBUILD)
+    set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.10.0.tar.gz)
+    set(VTK_URL_MD5 a0363f78910f466ba8f1bd5ab5437cb9)
+  else()
     set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.8.0.tar.gz)
     set(VTK_URL_MD5 37b7297d02d647cc6ca95b38174cb41f)
-  else()
-    set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.6.1.tar.gz)
-    set(VTK_URL_MD5 b80a76435207c5d0f74dfcab15b75181)
   endif()
 
   ExternalProject_Add(${proj}

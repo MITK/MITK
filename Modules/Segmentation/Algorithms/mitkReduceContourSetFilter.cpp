@@ -26,6 +26,7 @@ mitk::ReduceContourSetFilter::ReduceContourSetFilter()
   m_MinSpacing = -1;
   this->m_UseProgressBar = false;
   this->m_ProgressStepSize = 1;
+  m_NumberOfPointsAfterReduction = 0;
 }
 
 mitk::ReduceContourSetFilter::~ReduceContourSetFilter()
@@ -43,7 +44,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
 
   //For the purpose of evaluation
 //  unsigned int numberOfPointsBefore (0);
-//  unsigned int numberOfPointsAfter (0);
+  m_NumberOfPointsAfterReduction=0;
 
   for(unsigned int i = 0; i < numberOfInputs; i++)
   {
@@ -89,7 +90,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
 
       //Again for evaluation
 //      numberOfPointsBefore += cellSize;
-//      numberOfPointsAfter += newPolygon->GetPointIds()->GetNumberOfIds();
+      m_NumberOfPointsAfterReduction += newPolygon->GetPointIds()->GetNumberOfIds();
 
     }
 
@@ -477,6 +478,7 @@ void mitk::ReduceContourSetFilter::Reset()
   }
   this->SetNumberOfInputs(0);
   this->SetNumberOfOutputs(0);
+  m_NumberOfPointsAfterReduction = 0;
 }
 
 void mitk::ReduceContourSetFilter::SetUseProgressBar(bool status)

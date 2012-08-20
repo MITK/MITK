@@ -19,6 +19,11 @@
       name="Property List" 
       icon="resources/propertylist.png"
       class="QmitkPropertyListView" />
+    <view
+      id="org.mitk.views.propertytreeview"
+      name="Properties"
+      icon="resources/propertylist.png"
+      class="QmitkPropertyTreeView" />
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">
@@ -27,7 +32,7 @@
     </page>
     <page id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPage" name="Hotkeys" class="QmitkDataManagerHotkeysPrefPage" category="org.mitk.gui.qt.application.DataManagerPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords"></keywordreference>
-    </page>	
+    </page>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">

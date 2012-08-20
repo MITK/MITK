@@ -1,0 +1,22 @@
+/**
+\page DocumentationExample Example Class Documentation
+
+This page will try to give an example of some of the most commonly used commands and techniques for documenting
+your code using doxygen. The corresponding source file can be found \ref DocumentationExampleTheSourceFile "below".
+
+For the generated documentation page see DocumentationExample .
+
+\section DocumentationExampleAdvanced Advanced Doxygen Usage
+
+For more information on doxygen and its use you can take a look at one of the following resources.
+
+<ul>
+  <li> The doxygen <a href="http://www.stack.nl/~dimitri/doxygen/commands.html">Command List</a>
+  <li> The doxygen <a href="http://www.stack.nl/~dimitri/doxygen/manual.html">Manual</a>
+  <li> The doxygen <a href="http://www.stack.nl/~dimitri/doxygen/faq.html">FAQ</a>
+</ul>
+
+\section DocumentationExampleTheSourceFile The Source File
+
+\verbinclude DocumentationExample.h
+*/

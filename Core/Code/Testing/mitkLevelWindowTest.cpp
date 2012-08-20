@@ -638,6 +638,71 @@ int mitkLevelWindowTest(int, char* [])
   std::cout << "Testing mitk::LevelWindow destructor ";
   delete levWin;
   delete lw;
+
+  mitk::LevelWindow levelWindow(50,100);
+  levelWindow.SetRangeMinMax(0,100);
+  // test range restriction/adaption for SetLevelWindow and SetWindowBounds
+  std::cout << "Testing range restriction of mitk::LevelWindow::SetWindowBounds()";
+  mitk::ScalarType initialUpperBound = levelWindow.GetUpperWindowBound();
+  mitk::ScalarType initialLowerBound = levelWindow.GetLowerWindowBound();
+  levelWindow.SetWindowBounds( -10, 110 );
+  if ( levelWindow.GetUpperWindowBound() != initialUpperBound ||
+       levelWindow.GetLowerWindowBound() != initialLowerBound )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing range restriction of mitk::LevelWindow::SetLevelWindow()";
+  levelWindow.SetLevelWindow( 60, 100 );
+  if ( levelWindow.GetUpperWindowBound() != initialUpperBound )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing range restriction of mitk::LevelWindow::SetLevelWindow()";
+  levelWindow.SetLevelWindow( 40, 100 );
+  if ( levelWindow.GetLowerWindowBound() != initialLowerBound )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing range adaption of mitk::LevelWindow::SetWindowBounds()";
+  levelWindow.SetWindowBounds(-10,90,true); // ture == force
+  if ( levelWindow.GetUpperWindowBound() != 90.0 ||
+       levelWindow.GetLowerWindowBound() != -10.0 )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing range adaption of mitk::LevelWindow::SetWindowBounds()";
+  levelWindow.SetWindowBounds(-20,110,true); // ture == force
+  if ( levelWindow.GetUpperWindowBound() != 110.0 ||
+       levelWindow.GetLowerWindowBound() != -20.0 )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  
+  std::cout << "Testing range adaption of mitk::LevelWindow::SetLevelWindow()";
+  levelWindow.SetLevelWindow(50,140,true); // ture == force
+  if ( levelWindow.GetUpperWindowBound() != 120.0 ||
+       levelWindow.GetLowerWindowBound() != -20.0 )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+ 
+
   std::cout<<"[PASSED]"<<std::endl;
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

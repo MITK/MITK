@@ -107,7 +107,17 @@ void mitk::ToFDistanceImageToPointSetFilter::SetSubset( mitk::PointSet::Pointer 
 
 void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
 {
-  mitk::ToFProcessingCommon::ToFScalarType focalLength = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  //calculate world coordinates
+  mitk::ToFProcessingCommon::ToFPoint2D focalLengthInPixelUnits;
+  mitk::ToFProcessingCommon::ToFScalarType focalLengthInMm;
+  if (m_ReconstructionMode)
+  {
+    focalLengthInPixelUnits[0] = m_CameraIntrinsics->GetFocalLengthX();
+    focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
+  }
+  else
+    focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
   principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
   principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
@@ -125,8 +135,12 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
       mitk::Index3D currentIndex = m_Subset.at(i);;
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)input->GetPixelValueByIndex(currentIndex);
 
-      mitk::Point3D currentPoint =
-          mitk::ToFProcessingCommon::IndexToCartesianCoordinates(currentIndex,distance,focalLength,m_InterPixelDistance,principalPoint);
+      mitk::Point3D currentPoint;
+      if (m_ReconstructionMode)
+        currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(currentIndex,distance,focalLengthInPixelUnits,principalPoint);
+      else
+        currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(currentIndex,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
+
       output->InsertPoint(i,currentPoint);
     }
   }
@@ -146,8 +160,11 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
 
         mitk::ToFProcessingCommon::ToFScalarType distance = (double)input->GetPixelValueByIndex(pixel);
 
-        mitk::Point3D currentPoint = 
-          mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,m_InterPixelDistance,principalPoint);
+      mitk::Point3D currentPoint;
+      if (m_ReconstructionMode)
+        currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthInPixelUnits,principalPoint);
+      else
+        currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
 
         if (distance>mitk::eps)
         {
@@ -175,4 +192,9 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateOutputInformation()
 {
   this->GetOutput();
   itkDebugMacro(<<"GenerateOutputInformation()");
+}
+
+void mitk::ToFDistanceImageToPointSetFilter::SetReconstructionMode(bool withoutInterpixdist)
+{
+  this->m_ReconstructionMode = withoutInterpixdist;
 }

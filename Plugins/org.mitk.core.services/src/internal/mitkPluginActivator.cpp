@@ -16,6 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPluginActivator.h"
 
+#include "mitkLog.h"
+
+#include <QString>
+#include <QFileInfo>
+
 #include "internal/mitkDataStorageService.h"
 
 #include <mitkModuleRegistry.h>
@@ -63,6 +68,13 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
 {
   pluginContext = context;
 
+  //initialize logging
+  mitk::LoggingBackend::Register(); 
+  QString filename = "mitk.log";
+  QFileInfo path = context->getDataFile(filename);
+  mitk::LoggingBackend::SetLogFile(path.absoluteFilePath().toStdString().c_str());
+
+  //initialize data storage service
   DataStorageService* service = new DataStorageService();
   dataStorageService = IDataStorageService::Pointer(service);
   context->registerService<mitk::IDataStorageService>(service);
@@ -94,6 +106,9 @@ void org_mitk_core_services_Activator::stop(ctkPluginContext* /*context*/)
   qDeleteAll(mapMitkIdToAdapter);
   mapMitkIdToAdapter.clear();
 
+  //clean up logging
+  mitk::LoggingBackend::Unregister();
+  
   dataStorageService = 0;
   mitkContext = 0;
   pluginContext = 0;

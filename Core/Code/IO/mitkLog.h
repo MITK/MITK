@@ -46,6 +46,11 @@ namespace mitk
      /** \brief Sets extra log file path (additionally to the console log)
       */      
       static void SetLogFile(const char *file);
+
+     /** @return Returns the log file if there is one. Returns an empty string
+      *          if no log file is active.
+      */
+      static std::string GetLogFile();
      
      /** \brief Enables an additional logging output window by means of itk::outputwindow
      * This might be relevant for showing log output in applications with no default output console

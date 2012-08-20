@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkMouseModeSwitcher.h>
 #include <QmitkStdMultiWidget.h>
 
+#include <mbilogo.h>
 
 class QmitkStdMultiWidgetEditorPrivate
 {
@@ -338,18 +339,29 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
 void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  // enable change of logo
-  std::string departmentLogoLocation = prefs->Get("DepartmentLogo","");
-  if (departmentLogoLocation.empty())
+  // Enable change of logo. If no DepartmentLogo was set explicitly, MBILogo is used.
+  // Set new department logo by prefs->Set("DepartmentLogo", "PathToImage");
+  std::vector<std::string> keys = prefs->Keys();
+  
+  for( int i = 0; i < keys.size(); ++i )
   {
-    d->m_StdMultiWidget->DisableDepartmentLogo();
-  }
-  else
-  {
-    d->m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
-    d->m_StdMultiWidget->EnableDepartmentLogo();
-  }
+    if( keys[i] == "DepartmentLogo")
+    {
+      std::string departmentLogoLocation = prefs->Get("DepartmentLogo", "");
 
+      if (departmentLogoLocation.empty())
+      {
+        d->m_StdMultiWidget->DisableDepartmentLogo();
+      }
+      else
+      {
+        d->m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
+        d->m_StdMultiWidget->EnableDepartmentLogo();
+      }
+      break;
+    }
+  }
+ 
   // preferences for gradient background
   float color = 255.0;
   QString firstColorName = QString::fromStdString (prefs->GetByteArray("first background color", ""));

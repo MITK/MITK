@@ -101,11 +101,18 @@ int QmitkDataStorageTreeModel::rowCount(const QModelIndex &parent) const
 
 Qt::ItemFlags QmitkDataStorageTreeModel::flags( const QModelIndex& index ) const
 {
+  mitk::DataNode* dataNode = this->TreeItemFromIndex(index)->GetDataNode();
   if (index.isValid())
+  {
+    if(DicomPropertiesExists(*dataNode))
+    {
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    }
     return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable
-      | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
-  else
+        | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+  }else{
     return Qt::ItemIsDropEnabled;
+  }
 }
 
 int QmitkDataStorageTreeModel::columnCount( const QModelIndex& /* parent = QModelIndex() */ ) const
@@ -311,9 +318,23 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   mitk::DataNode* dataNode = this->TreeItemFromIndex(index)->GetDataNode();
 
   // get name of treeItem (may also be edited)
-  QString nodeName = QString::fromStdString(dataNode->GetName());
+  QString nodeName;  
+  if(DicomPropertiesExists(*dataNode))
+  {
+    mitk::BaseProperty* seriesDescription = (dataNode->GetProperty("dicom.series.SeriesDescription"));
+    mitk::BaseProperty* studyDescription = (dataNode->GetProperty("dicom.study.StudyDescription"));
+    mitk::BaseProperty* patientsName = (dataNode->GetProperty("dicom.patient.PatientsName"));
+
+    nodeName.append(patientsName->GetValueAsString().c_str()).append("\n");
+    nodeName.append(studyDescription->GetValueAsString().c_str()).append("\n");
+    nodeName.append(seriesDescription->GetValueAsString().c_str());
+  }else{
+      nodeName = QString::fromStdString(dataNode->GetName());
+  }
   if(nodeName.isEmpty())
+  {
     nodeName = "unnamed";
+  }
 
   if (role == Qt::DisplayRole)
     return nodeName;
@@ -333,9 +354,33 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   {
     return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));
   }
+  else if(role == QmitkDataNodeRawPointerRole)
+  {
+    return QVariant::fromValue<mitk::DataNode*>(dataNode);
+  }
 
   return QVariant();
 }
+
+bool QmitkDataStorageTreeModel::DicomPropertiesExists(const mitk::DataNode& node) const
+{
+    bool propertiesExists = false;
+    mitk::BaseProperty* seriesDescription = (node.GetProperty("dicom.series.SeriesDescription"));
+    mitk::BaseProperty* studyDescription = (node.GetProperty("dicom.study.StudyDescription"));
+    mitk::BaseProperty* patientsName = (node.GetProperty("dicom.patient.PatientsName"));
+
+    if(patientsName!=NULL && studyDescription!=NULL && seriesDescription!=NULL)
+    {
+        if((!patientsName->GetValueAsString().empty())&&
+            (!studyDescription->GetValueAsString().empty())&&
+            (!seriesDescription->GetValueAsString().empty()))
+        {
+            propertiesExists = true;
+        }
+    }
+    return propertiesExists;
+}
+
 
 QVariant QmitkDataStorageTreeModel::headerData(int /*section*/,
                                  Qt::Orientation orientation,
@@ -464,7 +509,6 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
     if(node == 0
       || m_DataStorage.IsNull()
       || !m_DataStorage->Exists(node)
-      || !m_Predicate->CheckNode(node)
       || m_Root->Find(node) != 0)
       return;
 
@@ -476,7 +520,8 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
         m_HelperObjectObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("helper object")->AddObserver( itk::ModifiedEvent(), command ) ) );
     }
 
-    this->AddNodeInternal(node);
+    if (m_Predicate->CheckNode(node))
+      this->AddNodeInternal(node);
 }
 
 
@@ -543,16 +588,24 @@ void QmitkDataStorageTreeModel::SetNodeModified( const mitk::DataNode* node )
 {
   TreeItem* treeItem = m_Root->Find(node);
   if(!treeItem)
-    return;
+  {
+    // check if the node still fits the predicates
+    if( m_Predicate->CheckNode( node ) )
+    {
+      this->UpdateNodeVisibility();
+    }
+  }
+  else
+  {
+    TreeItem* parentTreeItem = treeItem->GetParent();
+    // as the root node should not be removed one should always have a parent item
+    if(!parentTreeItem)
+      return;
+    QModelIndex index = this->createIndex(treeItem->GetIndex(), 0, treeItem);
 
-  TreeItem* parentTreeItem = treeItem->GetParent();
-  // as the root node should not be removed one should always have a parent item
-  if(!parentTreeItem)
-    return;
-  QModelIndex index = this->createIndex(treeItem->GetIndex(), 0, treeItem);
-
-  // now emit the dataChanged signal
-  emit dataChanged(index, index);
+    // now emit the dataChanged signal
+    emit dataChanged(index, index);
+  }
 }
 
 mitk::DataNode* QmitkDataStorageTreeModel::GetParentNode( const mitk::DataNode* node ) const

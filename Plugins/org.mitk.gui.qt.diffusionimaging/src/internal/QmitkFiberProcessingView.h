@@ -81,7 +81,7 @@ public:
   virtual void StdMultiWidgetNotAvailable();
   virtual void Activated();
 
-  protected slots:
+protected slots:
 
   void OnDrawCircle();
   void OnDrawPolygon();
@@ -98,6 +98,7 @@ public:
   void ResampleSelectedBundles();
   void DoFaColorCoding();
   void Extract3d();
+  void ApplyCurvatureThreshold();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );

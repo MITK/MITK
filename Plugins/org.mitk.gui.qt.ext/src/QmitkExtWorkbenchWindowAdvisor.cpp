@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,10 +51,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
+#include <QmitkOpenDicomEditorAction.h>
 
 #include <itkConfigure.h>
 #include <vtkConfigure.h>
 #include <mitkVersion.h>
+#include <mitkIDataStorageService.h>
+#include <mitkIDataStorageReference.h>
+#include <mitkDataStorageEditorInput.h>
+#include <mitkWorkbenchUtil.h>
 
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
@@ -229,6 +234,11 @@ public:
       i.next()->setEnabled(true);
      }
 
+         //GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+     {
+        windowAdvisor->openDicomEditorAction->setEnabled(true);
+     }
      windowAdvisor->fileSaveProjectAction->setEnabled(true);
      windowAdvisor->closeProjectAction->setEnabled(true);
      windowAdvisor->undoAction->setEnabled(true);
@@ -238,7 +248,7 @@ public:
      if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
      {
        windowAdvisor->closePerspAction->setEnabled(true);
-     }   
+     }
     }
 
     perspectivesClosed = false;
@@ -265,6 +275,10 @@ public:
       i.next()->setEnabled(false);
      }
 
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+     {
+        windowAdvisor->openDicomEditorAction->setEnabled(false);
+     }
      windowAdvisor->fileSaveProjectAction->setEnabled(false);
      windowAdvisor->closeProjectAction->setEnabled(false);
      windowAdvisor->undoAction->setEnabled(false);
@@ -274,7 +288,7 @@ public:
      if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
      {
        windowAdvisor->closePerspAction->setEnabled(false);
-     }     
+     }
     }
    }
 
@@ -451,6 +465,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  fileExitAction->setObjectName("QmitkFileExitAction");
  fileMenu->addAction(fileExitAction);
 
+if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+{
+ openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
+}
+
  berry::IViewRegistry* viewRegistry =
   berry::PlatformUI::GetWorkbench()->GetViewRegistry();
  const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors =
@@ -505,6 +524,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  mainActionsToolBar->addAction(closeProjectAction);
  mainActionsToolBar->addAction(undoAction);
  mainActionsToolBar->addAction(redoAction);
+if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+{
+ mainActionsToolBar->addAction(openDicomEditorAction);
+}
  if (imageNavigatorViewFound)
  {
    mainActionsToolBar->addAction(imageNavigatorAction);
@@ -718,6 +741,26 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 
  configurer->AddEditorAreaTransfer(QStringList("text/uri-list"));
  configurer->ConfigureEditorAreaDropListener(dropTargetListener);
+
+}
+
+void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
+{
+  // Force Rendering Window Creation on startup.
+  berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
+
+  ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
+  ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
+  if (serviceRef)
+  {
+    mitk::IDataStorageService *dsService = context->getService<mitk::IDataStorageService>(serviceRef);
+    if (dsService)
+    {
+      mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
+      mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
+      mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
+    }
+  }
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()

@@ -18,15 +18,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKGPUVOLUMEMAPPER3D_H_HEADER_INCLUDED
 #define MITKGPUVOLUMEMAPPER3D_H_HEADER_INCLUDED
 
+//MITK
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-
 #include "mitkBaseRenderer.h"
-#include "mitkVtkMapper3D.h"
 #include "mitkImage.h"
-
-#include <vtkFixedPointVolumeRayCastMapper.h>
+#include "mitkVtkMapper3D.h"
 #include "vtkMitkVolumeTextureMapper3D.h"
+
+//VTK
+#include <vtkFixedPointVolumeRayCastMapper.h>
+#include <vtkGPUVolumeRayCastMapper.h>
+#include <vtkVolumeProperty.h>
+#include <vtkImageChangeInformation.h>
+#include <vtkSmartPointer.h>
 
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
@@ -35,8 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #endif
 
-#include <vtkVolumeProperty.h>
-#include <vtkImageChangeInformation.h>
 
 namespace mitk {
 
@@ -110,40 +113,40 @@ protected:
   void CreateDefaultTransferFunctions();
   void UpdateTransferFunctions( mitk::BaseRenderer *renderer );
 
-  vtkVolume * m_VolumeNULL;
+  vtkSmartPointer<vtkVolume> m_VolumeNULL;
   
   bool m_commonInitialized;
-  vtkImageChangeInformation* m_UnitSpacingImageFilter;
-  vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
-  vtkPiecewiseFunction *m_DefaultGradientTransferFunction;
-  vtkColorTransferFunction *m_DefaultColorTransferFunction;
-  vtkPiecewiseFunction *m_BinaryOpacityTransferFunction;
-  vtkPiecewiseFunction *m_BinaryGradientTransferFunction;
-  vtkColorTransferFunction *m_BinaryColorTransferFunction;
+  vtkSmartPointer<vtkImageChangeInformation> m_UnitSpacingImageFilter;
+  vtkSmartPointer<vtkPiecewiseFunction> m_DefaultOpacityTransferFunction;
+  vtkSmartPointer<vtkPiecewiseFunction> m_DefaultGradientTransferFunction;
+  vtkSmartPointer<vtkColorTransferFunction> m_DefaultColorTransferFunction;
+  vtkSmartPointer<vtkPiecewiseFunction> m_BinaryOpacityTransferFunction;
+  vtkSmartPointer<vtkPiecewiseFunction> m_BinaryGradientTransferFunction;
+  vtkSmartPointer<vtkColorTransferFunction> m_BinaryColorTransferFunction;
   
   class LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
     public:
 
     bool m_cpuInitialized;
-    vtkVolume *m_VolumeCPU;
-    vtkFixedPointVolumeRayCastMapper* m_MapperCPU;
-    vtkVolumeProperty* m_VolumePropertyCPU;
+    vtkSmartPointer<vtkVolume> m_VolumeCPU;
+    vtkSmartPointer<vtkFixedPointVolumeRayCastMapper> m_MapperCPU;
+    vtkSmartPointer<vtkVolumeProperty> m_VolumePropertyCPU;
 
     bool m_gpuSupported;
     bool m_gpuInitialized;
-    vtkVolume *m_VolumeGPU;
-    vtkMitkVolumeTextureMapper3D* m_MapperGPU;
-    vtkVolumeProperty* m_VolumePropertyGPU;
+    vtkSmartPointer<vtkVolume> m_VolumeGPU;
+    vtkSmartPointer<vtkMitkVolumeTextureMapper3D> m_MapperGPU;
+    vtkSmartPointer<vtkVolumeProperty> m_VolumePropertyGPU;
 
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
 
     bool m_raySupported;
     bool m_rayInitialized;
-    vtkVolume *m_VolumeRAY;
-    vtkMitkGPUVolumeRayCastMapper* m_MapperRAY;
-    vtkVolumeProperty* m_VolumePropertyRAY;
+    vtkSmartPointer<vtkVolume> m_VolumeRAY;
+    vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_MapperRAY;
+    vtkSmartPointer<vtkVolumeProperty> m_VolumePropertyRAY;
 
 #endif
 
@@ -165,17 +168,11 @@ protected:
     {
       if(m_cpuInitialized)
       {
-        m_VolumeCPU->Delete();
-        m_MapperCPU->Delete();
-        m_VolumePropertyCPU->Delete();
         m_cpuInitialized=false;
       }
 
       if(m_gpuInitialized)
       {
-        m_VolumeGPU->Delete();
-        m_MapperGPU->Delete();
-        m_VolumePropertyGPU->Delete();
         m_gpuInitialized=false;
       }
 
@@ -184,18 +181,15 @@ protected:
 
       if(m_rayInitialized)
       {
-        m_VolumeRAY->Delete();
-        m_MapperRAY->Delete();
-        m_VolumePropertyRAY->Delete();
         m_rayInitialized=false;
       }
 
 #endif
 
     }
-  };  
+  };
     
-  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;  
+  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
 };
 
 } // namespace mitk

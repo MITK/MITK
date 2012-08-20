@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QListView>
 #include <QLabel>
 #include "QmitkExtExports.h"
-
+#include <mitkSliceNavigationController.h>
 #include "QmitkPointListModel.h"
 
 class QmitkStdMultiWidget;
@@ -43,6 +43,7 @@ class QmitkExt_EXPORT QmitkPointListView : public QListView
 
 public:
 
+
   QmitkPointListView( QWidget* parent = 0 );
   ~QmitkPointListView();
 
@@ -52,11 +53,28 @@ public:
   /// which point set to work on
   const mitk::PointSet* GetPointSet() const;
 
-  void SetMultiWidget( QmitkStdMultiWidget* multiWidget ); ///< assign a QmitkStdMultiWidget for updating render window crosshair
+  /**
+  * \brief If Multiwidget is set, the crosshair is automatically centering to the selected point
+  * As an alternative, if you dont have a multiwidget, you can call SetSnc1, SetSnc2, SetSnc3 to set the
+  * SliceNavigationControllers directly to enable the focussing feature. 
+  */
+  void SetMultiWidget( QmitkStdMultiWidget* multiWidget ); 
 
   QmitkStdMultiWidget* GetMultiWidget() const;  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
 
   void SetTimesStep(int i); ///< which time step to display/model
+
+
+  ///@{
+  /**
+  * \brief Sets the SliceNavigationController of the three 2D Renderwindows.
+  *  If they are defined, they can be used to automatically set the crosshair to the selected point
+  */
+  void SetSnc1(mitk::SliceNavigationController* snc);
+  void SetSnc2(mitk::SliceNavigationController* snc);
+  void SetSnc3(mitk::SliceNavigationController* snc);
+  ///@}
+
 
 signals:
 
@@ -95,17 +113,18 @@ protected:
   void wheelEvent( QWheelEvent* event); ///< change timestep of the current pointset by mouse wheel
   void fadeTimeStepIn(); ///< fade a label with the currently shown timestep in
 
-protected:
+
+  mitk::SliceNavigationController* m_Snc1;
+  mitk::SliceNavigationController* m_Snc2;
+  mitk::SliceNavigationController* m_Snc3;
+
 
   QmitkPointListModel*    m_PointListModel;
-
   bool                    m_SelfCall;
-
   bool                    m_showFading;
 
   /// used to position the planes on a selected point
   QmitkStdMultiWidget*    m_MultiWidget;
-
   QLabel*                m_TimeStepFaderLabel;
 
 };

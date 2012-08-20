@@ -28,6 +28,9 @@ int mitkToFProcessingCommonTest(int /* argc */, char* /*argv*/[])
   unsigned int j = 50;
   mitk::ScalarType distance = 1000;
   mitk::ScalarType focalLength = 10;
+  mitk::Point2D focalLength_XY;
+  focalLength_XY[0] = 200;
+  focalLength_XY[1] = 200;
   mitk::Point2D interPixelDistance;
   interPixelDistance[0] = 0.05;
   interPixelDistance[1] = 0.05;
@@ -39,16 +42,22 @@ int mitkToFProcessingCommonTest(int /* argc */, char* /*argv*/[])
   expectedCoordinate[0] = -400.0988;
   expectedCoordinate[1] = -222.2771;
   expectedCoordinate[2] =  889.1084;
-  // resulting coordinate
-  mitk::ToFProcessingCommon::ToFPoint3D resultingCoordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,interPixelDistance,principalPoint);
+  // resulting coordinate without using the interpixeldistance
+  mitk::ToFProcessingCommon::ToFPoint3D resultingCoordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength_XY,principalPoint);
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedCoordinate,resultingCoordinate),"Testing IndexToCartesianCoordinates()");
+  // resulting coordinate with using the interpixeldistance
+  mitk::ToFProcessingCommon::ToFPoint3D resultingCoordinateInterpix = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedCoordinate,resultingCoordinateInterpix),"Testing IndexToCartesianCoordinatesWithInterpixdist()");
   // expected index
   mitk::ToFProcessingCommon::ToFPoint3D expectedIndex;
   expectedIndex[0] = i;
   expectedIndex[1] = j;
   expectedIndex[2] = 1000;
-  mitk::ToFProcessingCommon::ToFPoint3D resultingIndex = mitk::ToFProcessingCommon::CartesianToIndexCoordinates(expectedCoordinate,focalLength,interPixelDistance,principalPoint);
+  mitk::ToFProcessingCommon::ToFPoint3D resultingIndex = mitk::ToFProcessingCommon::CartesianToIndexCoordinates(expectedCoordinate,focalLength_XY,principalPoint);
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedIndex,resultingIndex),"Testing CartesianToIndexCoordinates()");
+
+  mitk::ToFProcessingCommon::ToFPoint3D resultingIndexInterpix = mitk::ToFProcessingCommon::CartesianToIndexCoordinatesWithInterpixdist(expectedCoordinate,focalLength,interPixelDistance,principalPoint);
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedIndex,resultingIndexInterpix),"Testing CartesianToIndexCoordinatesWithInterpixdist()");
 
   MITK_TEST_END();
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -60,8 +60,6 @@ namespace mitk
         ->SetB_Value(m_OutputCache->GetB_Value());
     static_cast<OutputType*>(this->GetOutput())
         ->SetDirections(m_OutputCache->GetDirections());
-    static_cast<OutputType*>(this->GetOutput())
-        ->SetOriginalDirections(m_OutputCache->GetOriginalDirections());
     static_cast<OutputType*>(this->GetOutput())
         ->SetMeasurementFrame(m_OutputCache->GetMeasurementFrame());
     static_cast<OutputType*>(this->GetOutput())
@@ -224,7 +222,6 @@ namespace mitk
               sscanf(metaString.c_str(), "%lf %lf %lf\n", &x, &y, &z);
               vect3d[0] = x; vect3d[1] = y; vect3d[2] = z;
               m_DiffusionVectors->InsertElement( numberOfImages, vect3d );
-              m_OriginalDiffusionVectors->InsertElement( numberOfImages, vect3d );
               ++numberOfImages;
               // If the direction is 0.0, this is a reference image
               if (vect3d[0] == 0.0 &&
@@ -271,17 +268,6 @@ namespace mitk
                 m_MeasurementFrame(2,1) = 0;
                 m_MeasurementFrame(2,2) = 1;
               }
-            }
-          }
-
-          if(readFrame)
-          {
-            for(int i=0; i<numberOfImages; i++)
-            {
-              vnl_vector<double> vec(3);
-              vec.copy_in(m_DiffusionVectors->ElementAt(i).data_block());
-              vec = vec.pre_multiply(m_MeasurementFrame);
-              m_DiffusionVectors->ElementAt(i).copy_in(vec.data_block());
             }
           }
 
@@ -341,23 +327,36 @@ namespace mitk
             MITK_INFO << "Unable to open bvals file";
           }
 
+
           m_B_Value = -1;
           unsigned int numb = bval_entries.size();
           for(unsigned int i=0; i<numb; i++)
           {
+
+            // Take the first entry in bvals as the reference b-value
             if(m_B_Value == -1 && bval_entries.at(i) != 0)
             {
               m_B_Value = bval_entries.at(i);
             }
+
+            float b_val = bval_entries.at(i);
+
 
             vnl_vector_fixed< double, 3 > vec;
             vec[0] = bvec_entries.at(i);
             vec[1] = bvec_entries.at(i+numb);
             vec[2] = bvec_entries.at(i+2*numb);
 
-            m_DiffusionVectors->InsertElement(i,vec);
-            m_OriginalDiffusionVectors->InsertElement(i,vec);
+            // Adjust the vector length to encode gradient strength
+            float factor = b_val/m_B_Value;
+            if(vec.magnitude() > 0)
+            {
+              vec[0] = sqrt(factor)*vec[0];
+              vec[1] = sqrt(factor)*vec[1];
+              vec[2] = sqrt(factor)*vec[2];
+            }
 
+            m_DiffusionVectors->InsertElement(i,vec);
           }
 
           for(int i=0; i<3; i++)
@@ -368,7 +367,6 @@ namespace mitk
         outputForCache->SetVectorImage(img);
         outputForCache->SetB_Value(m_B_Value);
         outputForCache->SetDirections(m_DiffusionVectors);
-        outputForCache->SetOriginalDirections(m_OriginalDiffusionVectors);
         outputForCache->SetMeasurementFrame(m_MeasurementFrame);
 
         // Since we have already read the tree, we can store it in a cache variable

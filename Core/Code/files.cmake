@@ -46,7 +46,7 @@ set(H_FILES
   Algorithms/mitkPPTupleRem.h
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
   Algorithms/mitkExtractSliceFilter.h
-  
+  Algorithms/mitkConvert2Dto3DImageFilter.h 
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
   DataManagement/mitkITKImageImport.h
@@ -55,13 +55,14 @@ set(H_FILES
   DataManagement/mitkImageToItk.txx
   
   Interfaces/mitkIDataNodeReader.h
-  
+
   IO/mitkPixelTypeTraits.h
   
   Interactions/mitkEventMapperAddOn.h
   
   Common/mitkExceptionMacro.h
   Common/mitkTestingMacros.h
+   
 )
 
 set(CPP_FILES
@@ -85,6 +86,7 @@ set(CPP_FILES
   Algorithms/mitkVolumeCalculator.cpp
   Algorithms/mitkClippedSurfaceBoundsCalculator.cpp
   Algorithms/mitkExtractSliceFilter.cpp
+  Algorithms/mitkConvert2Dto3DImageFilter.cpp
   Controllers/mitkBaseController.cpp
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp

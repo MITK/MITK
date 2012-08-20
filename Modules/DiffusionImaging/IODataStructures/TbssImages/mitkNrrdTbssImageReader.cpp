@@ -137,10 +137,10 @@ namespace mitk
           //int numberOfGradientImages = 0;
           std::string measurementInfo;
           bool isMeta = false;
-          bool containsSkeleton;
-          bool containsSkeletonMask;
-          bool containsGradient;
-          bool containsDistanceMap;
+          bool containsSkeleton = false;
+          bool containsSkeletonMask = false;
+          bool containsGradient = false;
+          bool containsDistanceMap = false;
 
 
 

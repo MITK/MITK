@@ -1,0 +1,64 @@
+.git*            export-ignore
+.hooks*          export-ignore
+.mailmap         export-ignore
+
+# Set general file size limit on all files
+*               hooks.MaxObjectKiB=1024
+
+*.bat           -crlf
+*.bin           -crlf
+*.blend         -crlf
+*.bmp           -crlf
+*.cpt           -crlf
+*.gif           -crlf
+*.icns          -crlf
+*.ico           -crlf
+*.jpeg          -crlf
+*.jpg           -crlf
+*.mha           -crlf
+*.odg           -crlf
+*.pbxproj       -crlf
+*.pdf           -crlf
+*.plist         -crlf
+*.png           -crlf
+*.ppt           -crlf
+*.pptx          -crlf
+*.raw           -crlf
+*.vtk           -crlf
+*.xpm           -crlf -diff
+*.sh             crlf=input
+*.sh.in          crlf=input
+configure        crlf=input
+cvsrmvend        crlf=input
+imcp             crlf=input
+imglob           crlf=input
+imln             crlf=input
+immv             crlf=input
+imrm             crlf=input
+imtest           crlf=input
+install-sh       crlf=input
+newalpha         crlf=input
+newversion       crlf=input
+remove_ext       crlf=input
+vxl_doxy.pl      crlf=input
+zap.pl           crlf=input
+
+*.c              whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
+*.cpp            whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
+*.h              whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
+*.cxx            whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
+*.hxx            whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
+*.txx            whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
+*.txt            whitespace=tab-in-indent,no-lf-at-eof
+*.cmake          whitespace=tab-in-indent,no-lf-at-eof
+
+# The Microservices use an apache copyright
+Core/Code/CppMicroServices/*.c     copyright=apache-license
+Core/Code/CppMicroServices/*.cpp   copyright=apache-license
+Core/Code/CppMicroServices/*.h     copyright=apache-license
+
+# There is no need to check files in the utilities directory for copyright
+Utilities/*    -copyright
+
+# ExternalData content links must have LF newlines
+*.md5            crlf=input

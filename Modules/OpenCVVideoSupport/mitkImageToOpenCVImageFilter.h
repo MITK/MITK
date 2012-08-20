@@ -115,7 +115,7 @@ namespace mitk
                 cvdata[(numberOfComponents-c-1)+x] =mitkImagedata[x+c];
             }
         }
-        cvdata+= stepsize;
+        cvdata = (TPixel*)(((unsigned char*)cvdata)+stepsize);
         mitkImagedata+= width*numberOfComponents;
     }
   }

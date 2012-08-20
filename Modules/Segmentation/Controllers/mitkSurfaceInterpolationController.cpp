@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSurfaceInterpolationController.h"
+#include "mitkMemoryUtilities.h"
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
 : m_CurrentContourListID (0)
@@ -33,6 +34,7 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   m_PolyData->SetPoints(vtkPoints::New());
 
   m_InterpolationResult = 0;
+  m_CurrentNumberOfReducedContours = 0;
 }
 
 mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
@@ -193,8 +195,18 @@ void mitk::SurfaceInterpolationController::SetCurrentListID ( unsigned int ID )
   for (unsigned int i = 0; i < m_ListOfContourLists.at(m_CurrentContourListID).size(); i++)
   {
     m_ReduceFilter->SetInput(i, m_ListOfContourLists.at(m_CurrentContourListID).at(i).contour);
-    m_NormalsFilter->SetInput(i,m_ReduceFilter->GetOutput(i));
-    m_InterpolateSurfaceFilter->SetInput(i,m_NormalsFilter->GetOutput(i));
+//    m_NormalsFilter->SetInput(i,m_ReduceFilter->GetOutput(i));
+//    m_InterpolateSurfaceFilter->SetInput(i,m_NormalsFilter->GetOutput(i));
+  }
+
+  m_ReduceFilter->Update();
+
+  m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
+
+  for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
+  {
+    m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
+    m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
   }
 }
 
@@ -222,4 +234,13 @@ void mitk::SurfaceInterpolationController::SetWorkingImage(Image* workingImage)
 mitk::Image* mitk::SurfaceInterpolationController::GetImage()
 {
   return m_InterpolateSurfaceFilter->GetOutput();
+}
+
+double mitk::SurfaceInterpolationController::EstimatePortionOfNeededMemory()
+{
+  double numberOfPointsAfterReduction = m_ReduceFilter->GetNumberOfPointsAfterReduction()*3;
+  double sizeOfPoints = pow(numberOfPointsAfterReduction,2)*sizeof(double);
+  double totalMem = mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
+  double percentage = sizeOfPoints/totalMem;
+  return percentage;
 }

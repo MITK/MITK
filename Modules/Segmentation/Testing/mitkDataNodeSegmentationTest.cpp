@@ -133,7 +133,7 @@ static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
 
 };
 
-int mitkDataNodeExtTest(int /* argc */, char* /*argv*/[])
+int mitkDataNodeSegmentationTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("DataNode")
@@ -150,11 +150,11 @@ int mitkDataNodeExtTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(myDataNode.IsNotNull(),"Testing instantiation") 
 
   //test setData() Method
-  mitkDataNodeExtTestClass::TestDataSetting(myDataNode);
-  mitkDataNodeExtTestClass::TestMapperSetting(myDataNode);
+  mitkDataNodeSegmentationTestClass::TestDataSetting(myDataNode);
+  mitkDataNodeSegmentationTestClass::TestMapperSetting(myDataNode);
   
   //note, that no data is set to the dataNode
-  mitkDataNodeExtTestClass::TestInteractorSetting(myDataNode);
+  mitkDataNodeSegmentationTestClass::TestInteractorSetting(myDataNode);
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!

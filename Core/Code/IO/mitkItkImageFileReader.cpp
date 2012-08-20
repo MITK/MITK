@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkItkImageFileReader.h"
 #include "mitkConfig.h"
+#include "mitkException.h"
 
 #include <itkImageFileReader.h>
 #include <itksys/SystemTools.hxx>
@@ -61,14 +62,15 @@ void mitk::ItkImageFileReader::GenerateData()
   // Check to see if we can read the file given the name or prefix
   if ( m_FileName == "" )
   {
-    itkWarningMacro( << "File Type not supported!" );
+    mitkThrow() << "Empty filename in mitk::ItkImageFileReader ";
     return ;
   }
 
   itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( m_FileName.c_str(), itk::ImageIOFactory::ReadMode );
   if ( imageIO.IsNull() )
   {
-    itkWarningMacro( << "File Type not supported!" );
+    //itkWarningMacro( << "File Type not supported!" );
+    mitkThrow() << "Could not create itk::ImageIOBase object for filename " << m_FileName;
     return ;
   }
 
@@ -128,13 +130,8 @@ void mitk::ItkImageFileReader::GenerateData()
   imageIO->SetIORegion( ioRegion );
   void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
   imageIO->Read( buffer );
-  //mitk::Image::Pointer image = mitk::Image::New();
-  if((ndim==4) && (dimensions[3]<=1))
-    ndim = 3;
-  if((ndim==3) && (dimensions[2]<=1))
-    ndim = 2;
+  mitk::PixelType pixelType = mitk::PixelType(imageIO->GetComponentTypeInfo(), mitk::GetPixelTypeFromITKImageIO(imageIO),
 
-  mitk::PixelType pixelType = mitk::PixelType(imageIO->GetComponentTypeInfo(), imageIO->GetComponentTypeInfo(),
                                               imageIO->GetComponentSize(), imageIO->GetNumberOfComponents(),
                                               imageIO->GetComponentTypeAsString( imageIO->GetComponentType() ).c_str(),
                                               imageIO->GetPixelTypeAsString( imageIO->GetPixelType() ).c_str() );

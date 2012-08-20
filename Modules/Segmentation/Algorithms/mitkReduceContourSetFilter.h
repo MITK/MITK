@@ -76,6 +76,8 @@ namespace mitk {
         itkSetMacro(ReductionType, Reduction_Type);
         itkSetMacro(StepSize, unsigned int);
         itkSetMacro(Tolerance, double);
+
+        itkGetMacro(NumberOfPointsAfterReduction, unsigned int);
         
         //Resets the filter, i.e. removes all inputs and outputs
         void Reset();
@@ -117,6 +119,8 @@ namespace mitk {
 
         bool m_UseProgressBar;
         unsigned int m_ProgressStepSize;
+
+        unsigned int m_NumberOfPointsAfterReduction;
         
     };//class
     

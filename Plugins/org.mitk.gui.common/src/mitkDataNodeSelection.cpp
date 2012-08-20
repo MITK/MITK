@@ -72,6 +72,28 @@ berry::IStructuredSelection::ContainerType::Pointer DataNodeSelection::ToVector(
   return m_Selection;
 }
 
+std::list<DataNode::Pointer> DataNodeSelection::GetSelectedDataNodes() const
+{
+  std::list<DataNode::Pointer> selectedNodes;
+  if(IsEmpty())
+    return selectedNodes;
+
+  DataNodeObject::Pointer dataNodeObject;
+  DataNode::Pointer dataNode;
+
+  for(iterator it = Begin(); it != End(); ++it)
+  {
+    dataNodeObject = it->Cast<DataNodeObject>();
+    if(dataNodeObject.IsNotNull())
+    {
+      dataNode = dataNodeObject->GetDataNode();
+      if(dataNode.IsNotNull())
+        selectedNodes.push_back(dataNode);
+    }
+  }
+  return selectedNodes;
+}
+
 bool DataNodeSelection::IsEmpty() const
 {
   return m_Selection->empty();

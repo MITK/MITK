@@ -13,6 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #include "mitkCameraIntrinsics.h"
 #include <itkMutexLockHolder.h>
 #include <mitkEndoMacros.h>
@@ -45,6 +46,7 @@ void mitk::CameraIntrinsics::Copy(const CameraIntrinsics* other)
 {
   this->SetIntrinsics( other->GetCameraMatrix().clone()
     , other->GetDistorsionCoeffs().clone() );
+  this->SetValid(other->m_Valid);
 }
 
 bool mitk::CameraIntrinsics::IsValid() const
@@ -57,6 +59,7 @@ mitk::CameraIntrinsics::Pointer mitk::CameraIntrinsics::Clone() const
 {
   mitk::CameraIntrinsics::Pointer copy = mitk::CameraIntrinsics::New();
   copy->SetIntrinsics( this->GetCameraMatrix(), this->GetDistorsionCoeffs() );
+  copy->SetValid(this->IsValid());
   return copy;
 }
 

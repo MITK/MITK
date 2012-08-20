@@ -110,7 +110,7 @@ void QmitkGibbsTrackingView::TimerUpdate()
     int currentStep = m_GlobalTracker->GetCurrentStep();
     mitk::ProgressBar::GetInstance()->Progress(currentStep-m_LastStep);
     UpdateTrackingStatus();
-    GenerateFiberBundle(false);
+    GenerateFiberBundle();
     m_LastStep = currentStep;
 }
 
@@ -152,7 +152,7 @@ void QmitkGibbsTrackingView::AfterThread()
         m_Controls->m_ParticleLengthSlider->setValue(m_GlobalTracker->GetParticleLength()*10);
     }
 
-    GenerateFiberBundle(true);
+    GenerateFiberBundle();
     m_FiberBundleNode = NULL;
 }
 
@@ -524,7 +524,7 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
 }
 
 // generate mitkFiberBundle from tracking filter output
-void QmitkGibbsTrackingView::GenerateFiberBundle(bool smoothFibers)
+void QmitkGibbsTrackingView::GenerateFiberBundle()
 {
     if (m_GlobalTracker.IsNull() || (!(m_Controls->m_VisualizationCheckbox->isChecked() || m_Controls->m_VisualizeOnceButton->isChecked()) && m_ThreadIsRunning))
         return;
@@ -533,7 +533,7 @@ void QmitkGibbsTrackingView::GenerateFiberBundle(bool smoothFibers)
         m_Controls->m_VisualizeOnceButton->setChecked(false);
 
     vtkSmartPointer<vtkPolyData> fiberBundle = m_GlobalTracker->GetFiberBundle();
-    if ( fiberBundle->GetNumberOfLines()==0 )
+    if ( m_GlobalTracker->GetNumAcceptedFibers()==0 )
         return;
     m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
 
@@ -545,7 +545,7 @@ void QmitkGibbsTrackingView::GenerateFiberBundle(bool smoothFibers)
     m_FiberBundleNode->SetData(m_FiberBundle);
 
     QString name(m_ImageNode->GetName().c_str());
-    name += "_FiberBundle";
+    name += "_Gibbs";
     m_FiberBundleNode->SetName(name.toStdString());
     m_FiberBundleNode->SetVisibility(true);
 

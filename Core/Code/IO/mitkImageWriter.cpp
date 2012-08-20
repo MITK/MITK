@@ -53,13 +53,35 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
   vtkwriter->Delete();
 }
 
+#include <itkRGBAPixel.h>
+
 void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileName)
 {
   // Pictures and picture series like .png are written via a different mechanism then volume images.
   // So, they are still multiplexed and thus not support vector images.
   if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
   {
-    AccessByItk_1( image, _mitkItkPictureWrite, fileName );
+    try
+    {
+      // switch processing of single/multi-component images
+      if( image->GetPixelType(0).GetNumberOfComponents() == 1)
+      {
+        AccessByItk_1( image, _mitkItkPictureWrite, fileName );
+      }
+      else
+      {
+        AccessFixedPixelTypeByItk_1( image, _mitkItkPictureWriteComposite, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ , fileName);
+      }
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      std::cerr << "Caught " << e.what() << std::endl;
+    }
+    catch(std::exception &e)
+    {
+      std::cerr << "Caught std::exception " << e.what() << std::endl;
+    }
+
     return;
   }
 
@@ -150,7 +172,26 @@ void mitk::ImageWriter::GenerateData()
   fclose(tempFile);
   remove(m_FileName.c_str());
 
-  mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
+  // Creating clone of input image, since i might change the geometry 
+  mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput())->Clone();
+
+  // Check if geometry information will be lost
+  if (input->GetDimension() == 2)
+  {
+     if (!input->GetGeometry()->Is2DConvertable())
+     {
+        MITK_WARN << "Saving a 2D image with 3D geometry information. Geometry information will be lost! You might consider using Convert2Dto3DImageFilter before saving.";
+        
+        // set matrix to identity
+        mitk::AffineTransform3D::Pointer affTrans = mitk::AffineTransform3D::New();
+        affTrans->SetIdentity();
+        mitk::Vector3D spacing = input->GetGeometry()->GetSpacing();
+        mitk::Point3D origin = input->GetGeometry()->GetOrigin();
+        input->GetGeometry()->SetIndexToWorldTransform(affTrans); 
+        input->GetGeometry()->SetSpacing(spacing);
+        input->GetGeometry()->SetOrigin(origin);
+     }
+  }
 
   bool vti = (m_Extension.find(".vti") != std::string::npos);
 

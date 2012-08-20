@@ -56,25 +56,39 @@ namespace itk{
     /** Runtime information support. */
     itkTypeMacro(StreamlineTrackingFilter, ImageToImageFilter)
 
-    typedef TTensorPixelType                        TensorComponentType;
-    typedef TPDPixelType                            DirectionPixelType;
-    typedef typename Superclass::InputImageType     InputImageType;
-    typedef typename Superclass::OutputImageType    OutputImageType;
-    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
-    typedef itk::Image<unsigned char, 3>            ItkUcharImgType;
+    typedef TTensorPixelType                            TensorComponentType;
+    typedef TPDPixelType                                DirectionPixelType;
+    typedef typename Superclass::InputImageType         InputImageType;
+    typedef typename Superclass::OutputImageType        OutputImageType;
+    typedef typename Superclass::OutputImageRegionType  OutputImageRegionType;
+    typedef itk::Image<unsigned char, 3>                ItkUcharImgType;
+    typedef itk::Image<float, 3>                        ItkFloatImgType;
+    typedef itk::Image< vnl_vector_fixed<double,3>, 3>  ItkPDImgType;
 
     typedef vtkSmartPointer< vtkPolyData >     FiberPolyDataType;
 
     itkGetMacro( FiberPolyData, FiberPolyDataType )
+    itkSetMacro( SeedImage, ItkUcharImgType::Pointer)
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
     itkSetMacro( SeedsPerVoxel, int)
     itkSetMacro( FaThreshold, float)
     itkSetMacro( StepSize, float)
+    itkSetMacro( F, float )
+    itkSetMacro( G, float )
+    itkSetMacro( Interpolate, bool )
+    itkSetMacro( MinTractLength, float )
+    itkGetMacro( MinTractLength, float )
+    itkSetMacro( MinCurvatureRadius, float )
+    itkGetMacro( MinCurvatureRadius, float )
 
   protected:
     StreamlineTrackingFilter();
     ~StreamlineTrackingFilter() {}
     void PrintSelf(std::ostream& os, Indent indent) const;
+
+    void CalculateNewPosition(itk::ContinuousIndex<double, 3>& pos, vnl_vector_fixed<double,3>& dir, typename InputImageType::IndexType& index);
+    float FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids);
+    bool IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType& index, vnl_vector_fixed< float, 8 >& interpWeights);
 
     double RoundToNearest(double num);
     void BeforeThreadedGenerateData();
@@ -86,13 +100,26 @@ namespace itk{
     FiberPolyDataType m_FiberPolyData;
     vtkSmartPointer<vtkPoints> m_Points;
     vtkSmartPointer<vtkCellArray> m_Cells;
+
+    ItkFloatImgType::Pointer    m_EmaxImage;
+    ItkFloatImgType::Pointer    m_FaImage;
+    ItkPDImgType::Pointer       m_PdImage;
+    typename InputImageType::Pointer m_InputImage;
+
     float m_FaThreshold;
+    float m_MinCurvatureRadius;
     float m_StepSize;
     int m_MaxLength;
+    float m_MinTractLength;
     int m_SeedsPerVoxel;
+    float m_F;
+    float m_G;
     std::vector< int > m_ImageSize;
     std::vector< float > m_ImageSpacing;
+    ItkUcharImgType::Pointer m_SeedImage;
     ItkUcharImgType::Pointer m_MaskImage;
+    bool m_Interpolate;
+    float m_PointPistance;
 
     itk::VectorContainer< int, FiberPolyDataType >::Pointer m_PolyDataContainer;
 

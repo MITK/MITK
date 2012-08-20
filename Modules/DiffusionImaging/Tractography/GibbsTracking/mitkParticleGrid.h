@@ -39,7 +39,7 @@ public:
     int m_NumCellOverflows;     // number of cell overflows
     float m_ParticleLength;
 
-    ParticleGrid(ItkFloatImageType* image, float particleLength);
+    ParticleGrid(ItkFloatImageType* image, float particleLength, int cellCapacity);
     ~ParticleGrid();
 
     Particle* GetParticle(int ID);
@@ -56,6 +56,7 @@ public:
     void DestroyConnection(Particle *P1,int ep1);
 
     bool CheckConsistency();
+    void ResetGrid();
 
 protected:
 

@@ -510,6 +510,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHINF(std::string portHandle, std::string*
   mitk::NDIErrorCode returnValue = m_TrackingDevice->Send(&command, m_UseCRC); 
   if (returnValue==NDIOKAY)
     {
+    m_TrackingDevice->ClearReceiveBuffer();
     m_TrackingDevice->Receive(portInfo, 33);
     m_TrackingDevice->ClearReceiveBuffer();
     }

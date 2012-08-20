@@ -119,9 +119,11 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
         bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str(),thisNavigationTool->GetCalibrationFile().c_str());
         if (!toolAddSuccess)
           {
+          //todo: error handling
           this->m_ErrorMessage = "Can't add tool, is the SROM-file valid?";
           return NULL;
           }
+        thisDevice->GetTool(i)->SetToolTip(thisNavigationTool->GetToolTipPosition(),thisNavigationTool->GetToolTipOrientation());
       } 
   returnValue->SetTrackingDevice(thisDevice);
   return returnValue;
@@ -134,7 +136,6 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
 
   //connect to aurora to dectect tools automatically
   thisDevice->OpenConnection();
-  thisDevice->StartTracking();
   
   //now search for automatically detected tools in the tool storage and save them
   mitk::NavigationToolStorage::Pointer newToolStorageInRightOrder = mitk::NavigationToolStorage::New();
@@ -159,6 +160,8 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
               m_ToolCorrespondencesInToolStorage.push_back(j);
               //adapt name of tool
               dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolName(navigationTools->GetTool(j)->GetToolName());
+              //set tip of tool
+              dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolTip(navigationTools->GetTool(j)->GetToolTipPosition(),navigationTools->GetTool(j)->GetToolTipOrientation());
               //rember that this tool was already found
               alreadyFoundTools.push_back(j);
 
@@ -199,9 +202,11 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
         bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str(),thisNavigationTool->GetCalibrationFile().c_str());
         if (!toolAddSuccess)
           {
+          //todo error handling
           this->m_ErrorMessage = "Can't add tool, is the toolfile valid?";
           return NULL;
           }
+        thisDevice->GetTool(i)->SetToolTip(thisNavigationTool->GetToolTipPosition(),thisNavigationTool->GetToolTipOrientation());
       } 
   returnValue->SetTrackingDevice(thisDevice);
   return returnValue;

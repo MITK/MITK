@@ -74,6 +74,19 @@ public:
   mitkThrowException(SpecializedTestException)<<message;
   }
 
+  void reThrowExceptionWithReThrowMacro(std::string messageThrow, std::string messageReThrow)
+  {
+  try
+    {
+    throwExceptionWithThrowMacro(messageThrow);
+    }
+  catch(mitk::Exception e)
+    {
+    mitkReThrow(e) << messageReThrow;
+    }
+  
+  }
+
   static void TestExceptionConstructor()
     {
     bool exceptionThrown = false;
@@ -208,6 +221,92 @@ public:
     MITK_TEST_CONDITION_REQUIRED(exceptionThrown && messageText=="test123","Testing special exception with mitkThrow(mitk::SpecializedException)");
     
     }
+
+static void TestRethrowInformation()
+    //this method is ONLY to test methods of mitk::Exception and no code example
+    //normally exceptions should only be instantiated and thrown by using the exception macros!
+    {
+    //first: testing rethrow information methods, when no information is stored
+
+    //case 1.1: method GetNumberOfRethrows()
+    mitk::Exception e = mitk::Exception("test.cpp",155,"","");
+    MITK_TEST_CONDITION_REQUIRED(e.GetNumberOfRethrows()==0,"Testing GetNumberOfRethrows() with empty rethrow information");
+    
+    //case 1.2: GetRethrowData() with negative number
+    {
+    std::string file = "invalid";
+    int line = -1;
+    std::string message = "invalid";
+    e.GetRethrowData(-1,file,line,message);
+    MITK_TEST_CONDITION_REQUIRED(((file == "")&&(line==0)&&(message == "")),"Testing GetRethrowData() with invalid rethrow number (negative).");
+    }
+
+    //case 1.3: GetRethrowData() with number 0
+    {
+    std::string file = "invalid";
+    int line= -1;
+    std::string message = "invalid";
+    e.GetRethrowData(0,file,line,message);
+    MITK_TEST_CONDITION_REQUIRED(((file == "")&&(line==0)&&(message == "")),"Testing GetRethrowData() with non-existing rethrow number (0).");
+    }
+
+    //case 1.4: GetRethrowData() with number 1
+    {
+    std::string file = "invalid";
+    int line= -1;
+    std::string message = "invalid";
+    e.GetRethrowData(1,file,line,message);
+    MITK_TEST_CONDITION_REQUIRED(((file == "")&&(line==0)&&(message == "")),"Testing GetRethrowData() with non-existing rethrow number (1).");
+    }
+
+
+    //second: add rethrow data
+    e.AddRethrowData("test2.cpp",10,"Rethrow one");
+    MITK_TEST_CONDITION_REQUIRED(e.GetNumberOfRethrows()==1,"Testing adding of rethrow data.");
+    e.AddRethrowData("test3.cpp",15,"Rethrow two");
+    MITK_TEST_CONDITION_REQUIRED(e.GetNumberOfRethrows()==2,"Testing adding of more rethrow data.");
+
+    //third: test if this rethrow data was stored properly
+    {
+    std::string file = "invalid";
+    int line= -1;
+    std::string message = "invalid";
+    e.GetRethrowData(0,file,line,message);
+    MITK_TEST_CONDITION_REQUIRED(((file == "test2.cpp")&&(line==10)&&(message == "Rethrow one")),"Testing stored information of first rethrow.");
+    }
+   
+    {
+    std::string file = "invalid";
+    int line= -1;
+    std::string message = "invalid";
+    e.GetRethrowData(1,file,line,message);
+    MITK_TEST_CONDITION_REQUIRED(((file == "test3.cpp")&&(line==15)&&(message == "Rethrow two")),"Testing stored information of second rethrow.");
+    }
+
+
+    }
+
+static void TestRethrowMacro()
+    {
+    bool exceptionThrown = false;
+    std::string message = "";
+    ExceptionTestClass::Pointer myExceptionTestObject = ExceptionTestClass::New();
+    
+    //case 1: test throwing
+    
+    try
+     {
+     myExceptionTestObject->reThrowExceptionWithReThrowMacro("Test original message.","Test rethrow message.");
+     }
+    catch(mitk::Exception e)
+     {
+     message = e.GetDescription();
+     exceptionThrown = true;
+     }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing mitkReThrow()");
+    MITK_TEST_CONDITION_REQUIRED(message == "Test original message.Test rethrow message.", "Testing message/descriprion after rethrow.")
+
+    }
 };
 
 int mitkExceptionTest(int /*argc*/, char* /*argv*/[])
@@ -217,6 +316,8 @@ int mitkExceptionTest(int /*argc*/, char* /*argv*/[])
   ExceptionTestClass::TestExceptionMessageStream();
   ExceptionTestClass::TestExceptionMessageStreamThrowing();
   ExceptionTestClass::TestMitkThrowMacro();
+  ExceptionTestClass::TestRethrowInformation();
+  ExceptionTestClass::TestRethrowMacro();
   MITK_TEST_END();
 
 }

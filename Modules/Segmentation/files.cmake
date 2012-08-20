@@ -16,6 +16,9 @@ Algorithms/mitkSegmentationSink.cpp
 Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
 Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
 Algorithms/mitkShowSegmentationAsSurface.cpp
+Algorithms/mitkVtkImageOverwrite.cpp
+Algorithms/mitkDiffSliceOperation.cpp
+Algorithms/mitkDiffSliceOperationApplier.cpp
 Controllers/mitkSegmentationInterpolationController.cpp
 Controllers/mitkSurfaceInterpolationController.cpp
 # DataManagement/mitkApplyDiffImageOperation.cpp

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <boost/progress.hpp>
 
 namespace itk{
 
@@ -119,8 +120,10 @@ namespace itk{
     vLines->InitTraversal();
 
     int numFibers = m_FiberBundle->GetNumFibers();
+    boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
+        ++disp;
       vtkIdType   numPoints(0);
       vtkIdType*  points(NULL);
       vLines->GetNextCell ( numPoints, points );

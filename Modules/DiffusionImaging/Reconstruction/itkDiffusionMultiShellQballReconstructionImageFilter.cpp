@@ -376,6 +376,14 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
   m_BZeroImage->Allocate();
 
+  m_CoefficientImage = CoefficientImageType::New();
+  m_CoefficientImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
+  m_CoefficientImage->SetOrigin( img->GetOrigin() );     // Set the image origin
+  m_CoefficientImage->SetDirection( img->GetDirection() );  // Set the image direction
+  m_CoefficientImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
+  m_CoefficientImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
+  m_CoefficientImage->Allocate();
+
 }
 
 template< class T, class TG, class TO, int L, int NODF>
@@ -652,8 +660,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   ImageRegionIterator< OutputImageType > odfOutputImageIterator(outputImage, outputRegionForThread);
   ImageRegionConstIterator< GradientImagesType > gradientInputImageIterator(gradientImagePointer, outputRegionForThread );
   ImageRegionIterator< BZeroImageType > bzeroIterator(m_BZeroImage, outputRegionForThread);
+  ImageRegionIterator< CoefficientImageType > coefficientImageIterator(m_CoefficientImage, outputRegionForThread);
 
   // All iterators seht to Begin of the specific OutputRegion
+  coefficientImageIterator.GoToBegin();
   bzeroIterator.GoToBegin();
   odfOutputImageIterator.GoToBegin();
   gradientInputImageIterator.GoToBegin();
@@ -691,7 +701,17 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   vnl_vector<double> DataShell2(Shell2Indiecies.size());
   vnl_vector<double> DataShell3(Shell3Indiecies.size());
 
+  vnl_matrix<double> tempInterpolationMatrixShell1,tempInterpolationMatrixShell2,tempInterpolationMatrixShell3;
+
+  if(m_Interpolation_Flag)
+  {
+    tempInterpolationMatrixShell1 = (*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv);
+    tempInterpolationMatrixShell2 = (*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT2_inv);
+    tempInterpolationMatrixShell3 = (*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT3_inv);
+  }
+
   OdfPixelType odf(0.0);
+  typename CoefficientImageType::PixelType coeffPixel(0.0);
 
   double P2,A,B2,B,P,alpha,beta,lambda, ER1, ER2;
 
@@ -699,6 +719,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   // iterate overall voxels of the gradient image region
   while( ! gradientInputImageIterator.IsAtEnd() )
   {
+
+    odf = 0.0;
+    coeffPixel = 0.0;
 
     GradientVectorType b = gradientInputImageIterator.Get();
 
@@ -708,16 +731,37 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     double shell3b0Norm =0;
     double b0average = 0;
     const int b0size = BZeroIndicies.size();
-    for(unsigned int i = 0; i <b0size ; ++i)
+
+    if(b0size == 1)
     {
-      if(i < b0size / 3)                          shell1b0Norm += b[BZeroIndicies[i]];
-      if(i >= b0size / 3 && i < (b0size / 3)*2)   shell2b0Norm += b[BZeroIndicies[i]];
-      if(i >= (b0size / 3) * 2)                   shell3b0Norm += b[BZeroIndicies[i]];
+      shell1b0Norm = b[BZeroIndicies[0]];
+      shell2b0Norm = b[BZeroIndicies[0]];
+      shell3b0Norm = b[BZeroIndicies[0]];
+      b0average = b[BZeroIndicies[0]];
+    }else if(b0size % 3 ==0)
+    {
+      for(unsigned int i = 0; i <b0size ; ++i)
+      {
+        if(i < b0size / 3)                          shell1b0Norm += b[BZeroIndicies[i]];
+        if(i >= b0size / 3 && i < (b0size / 3)*2)   shell2b0Norm += b[BZeroIndicies[i]];
+        if(i >= (b0size / 3) * 2)                   shell3b0Norm += b[BZeroIndicies[i]];
+      }
+      shell1b0Norm /= (b0size/3);
+      shell2b0Norm /= (b0size/3);
+      shell3b0Norm /= (b0size/3);
+      b0average = (shell1b0Norm + shell2b0Norm+ shell3b0Norm)/3;
+    }else
+    {
+      for(unsigned int i = 0; i <b0size ; ++i)
+      {
+        shell1b0Norm += b[BZeroIndicies[i]];
+      }
+      shell1b0Norm /= b0size;
+      shell2b0Norm = shell1b0Norm;
+      shell3b0Norm = shell1b0Norm;
+      b0average = shell1b0Norm;
     }
-    shell1b0Norm /= (BZeroIndicies.size()/3);
-    shell2b0Norm /= (BZeroIndicies.size()/3);
-    shell3b0Norm /= (BZeroIndicies.size()/3);
-    b0average = (shell1b0Norm + shell2b0Norm+ shell3b0Norm)/3;
+
     bzeroIterator.Set(b0average);
     ++bzeroIterator;
 
@@ -725,7 +769,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     {
       // Get the Signal-Value for each Shell at each direction (specified in the ShellIndicies Vector .. this direction corresponse to this shell...)
 
-      ///fsl fix ---------------------------------------------------
+      /*//fsl fix ---------------------------------------------------
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
       for(int i = 0 ; i < Shell2Indiecies.size(); i++)
@@ -737,9 +781,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       S_S0Normalization(DataShell1, shell1b0Norm);
       S_S0Normalization(DataShell2, shell2b0Norm);
       S_S0Normalization(DataShell3, shell2b0Norm);
-      //fsl fix -------------------------------------------ende--
+      *///fsl fix -------------------------------------------ende--
 
-      /* correct version
+      ///correct version
       for(int i = 0 ; i < Shell1Indiecies.size(); i++)
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
       for(int i = 0 ; i < Shell2Indiecies.size(); i++)
@@ -751,13 +795,13 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       S_S0Normalization(DataShell1, shell1b0Norm);
       S_S0Normalization(DataShell2, shell2b0Norm);
       S_S0Normalization(DataShell3, shell3b0Norm);
-        */
+
 
       if(m_Interpolation_Flag)
       {
-        E1 = ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv) * (DataShell1));
-        E2 = ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT2_inv) * (DataShell2));
-        E3 = ((*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT3_inv) * (DataShell3));
+        E1 = tempInterpolationMatrixShell1 * DataShell1;
+        E2 = tempInterpolationMatrixShell2 * DataShell2;
+        E3 = tempInterpolationMatrixShell3 * DataShell3;
       }else{
         E1 = (DataShell1);
         E2 = (DataShell2);
@@ -824,14 +868,18 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       // the first coeff is a fix value
       coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
 
+      coeffPixel = element_cast<double, TO>(coeffs).data_block();
+
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
       odf *= ((QBALL_ANAL_RECON_PI*4)/NODF);
     }
 
     // set ODF to ODF-Image
+    coefficientImageIterator.Set(coeffPixel);
     odfOutputImageIterator.Set( odf );
     ++odfOutputImageIterator;
+    ++coefficientImageIterator;
     ++gradientInputImageIterator;
   }
 

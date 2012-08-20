@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength)
+ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength, int cellCapacity)
 {
     // initialize counters
     m_NumParticles = 0;
@@ -38,8 +38,8 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength)
     m_GridScale[1] = 1/cellSize;
     m_GridScale[2] = 1/cellSize;
 
-    m_CellCapacity = 1024;          // maximum number of particles per grid cell
-    m_ContainerCapacity = 100000;   // initial particle container capacity
+    m_CellCapacity = cellCapacity;          // maximum number of particles per grid cell
+    m_ContainerCapacity = 100000;           // initial particle container capacity
     int numCells = m_GridSize[0]*m_GridSize[1]*m_GridSize[2];   // number of grid cells
 
     m_Particles.resize(m_ContainerCapacity);        // allocate and initialize particles
@@ -56,6 +56,32 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength)
 
 ParticleGrid::~ParticleGrid()
 {
+
+}
+
+// remove all particles
+void ParticleGrid::ResetGrid()
+{
+    // initialize counters
+    m_NumParticles = 0;
+    m_NumConnections = 0;
+    m_NumCellOverflows = 0;
+    m_Particles.clear();
+    m_Grid.clear();
+    m_OccupationCount.clear();
+    m_NeighbourTracker.cellidx.clear();
+    m_NeighbourTracker.cellidx_c.clear();
+
+    int numCells = m_GridSize[0]*m_GridSize[1]*m_GridSize[2];   // number of grid cells
+
+    m_Particles.resize(m_ContainerCapacity);        // allocate and initialize particles
+    m_Grid.resize(numCells*m_CellCapacity, NULL);   // allocate and initialize particle grid
+    m_OccupationCount.resize(numCells, 0);          // allocate and initialize occupation counter array
+    m_NeighbourTracker.cellidx.resize(8, 0);        // allocate and initialize neighbour tracker
+    m_NeighbourTracker.cellidx_c.resize(8, 0);
+
+    for (int i = 0;i < m_ContainerCapacity;i++)     // initialize particle IDs
+        m_Particles[i].ID = i;
 }
 
 bool ParticleGrid::ReallocateGrid()

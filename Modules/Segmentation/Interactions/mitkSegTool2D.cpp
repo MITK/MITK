@@ -37,6 +37,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToContourFilter.h"
 #include "mitkSurfaceInterpolationController.h"
 
+//includes for resling and overwriting
+#include <mitkExtractSliceFilter.h>
+#include <mitkVtkImageOverwrite.h>
+#include <vtkSmartPointer.h>
+#include <vtkImageData.h>
+
+#include <mitkDiffSliceOperationApplier.h>
+#include "mitkOperationEvent.h"
+#include "mitkUndoController.h"
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -45,65 +54,27 @@ mitk::SegTool2D::SegTool2D(const char* type)
  m_LastEventSender(NULL),
  m_LastEventSlice(0),
  m_Contourmarkername ("Position"),
- m_ShowMarkerNodes (true),
- m_3DInterpolationEnabled (true)
+ m_ShowMarkerNodes (true)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::SegTool2D::~SegTool2D()
 {
 }
 
-bool mitk::SegTool2D::OnMousePressed (Action*, const StateEvent* stateEvent)
+float mitk::SegTool2D::CanHandleEvent( StateEvent const *stateEvent) const
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
+  if (!positionEvent) return 0.0;
 
-  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return false; // we don't want anything but 2D
+  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return 0.0; // we don't want anything but 2D
 
-  m_LastEventSender = positionEvent->GetSender();
-  m_LastEventSlice = m_LastEventSender->GetSlice();
+  if( m_LastEventSender != positionEvent->GetSender()) return 0.0;
+  if( m_LastEventSlice != positionEvent->GetSender()->GetSlice() ) return 0.0;
 
-  return true;
+  return 1.0;
 }
 
-bool mitk::SegTool2D::OnMouseMoved   (Action*, const StateEvent* stateEvent)
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if ( m_LastEventSender != positionEvent->GetSender() ) return false;
-  if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-
-  return true;
-}
-
-bool mitk::SegTool2D::OnMouseReleased(Action*, const StateEvent* stateEvent)
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if ( m_LastEventSender != positionEvent->GetSender() ) return false;
-  if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-
-  return true;
-}
-
-bool mitk::SegTool2D::OnInvertLogic(Action*, const StateEvent* stateEvent)
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if ( m_LastEventSender != positionEvent->GetSender() ) return false;
-  if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-
-  return true;
-}
 
 bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice )
 {
@@ -177,67 +148,31 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
   if ( !image || !planeGeometry ) return NULL;
 
-  int affectedDimension( -1 );
-  int affectedSlice( -1 );
-  //DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
-  if ( DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
-  {
-    try
-    {
-      // now we extract the correct slice from the volume, resulting in a 2D image
-      ExtractImageFilter::Pointer extractor= ExtractImageFilter::New();
-      extractor->SetInput( image );
-      extractor->SetSliceDimension( affectedDimension );
-      extractor->SetSliceIndex( affectedSlice );
-      extractor->SetTimeStep( timeStep );
-      extractor->Update();
+  //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+  vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+  //set to false to extract a slice
+  reslice->SetOverwriteMode(false);
+  reslice->Modified();
 
-      // here we have a single slice that can be modified
-      Image::Pointer slice = extractor->GetOutput();
+  //use ExtractSliceFilter with our specific vtkImageReslice for overwriting and extracting
+  mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslice);
+  extractor->SetInput( image );
+  extractor->SetTimeStep( timeStep );
+  extractor->SetWorldGeometry( planeGeometry );
+  extractor->SetVtkOutputRequest(false);
+  extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
 
-      //Workaround because of bug #7079
-      Point3D origin = slice->GetGeometry()->GetOrigin();
+  extractor->Modified();
+  extractor->Update();
 
-      int affectedDimension(-1);
+  Image::Pointer slice = extractor->GetOutput();
 
-      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))
-      {
-          affectedDimension = 2;
-      }
-      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))
-      {
-          affectedDimension = 0;
-      }
-      if(positionEvent->GetSender()->GetRenderWindow() == mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
-      {
-          affectedDimension = 1;
-      }
+  /*============= BEGIN undo feature block ========================*/
+  //specify the undo operation with the non edited slice
+  m_undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), extractor->GetVtkOutput(), slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+  /*============= END undo feature block ========================*/
 
-      if (affectedDimension != -1)
-      {
-          origin[affectedDimension] = planeGeometry->GetOrigin()[affectedDimension];
-          slice->GetGeometry()->SetOrigin(origin);
-      }
-      //Workaround end
-
-      return slice;
-    }
-    catch(...)
-    {
-      // not working
-      return NULL;
-    }
-  }
-  else
-  {
-    ExtractDirectedPlaneImageFilterNew::Pointer newExtractor = ExtractDirectedPlaneImageFilterNew::New();
-    newExtractor->SetInput( image );
-    newExtractor->SetActualInputTimestep( timeStep );
-    newExtractor->SetCurrentWorldGeometry2D( planeGeometry );
-    newExtractor->Update();
-    Image::Pointer slice = newExtractor->GetOutput();
-    return slice;
-  }
+  return slice;
 }
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEvent* positionEvent)
@@ -269,58 +204,67 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
-  int affectedDimension( -1 );
-  int affectedSlice( -1 );
-  DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
+  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
 
-  if (affectedDimension != -1) {
-    OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-    slicewriter->SetInput( image );
-    slicewriter->SetCreateUndoInformation( true );
-    slicewriter->SetSliceImage( slice );
-    slicewriter->SetSliceDimension( affectedDimension );
-    slicewriter->SetSliceIndex( affectedSlice );
-    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-    slicewriter->Update();
-  }
-  else {
-    OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
-    slicewriter->SetInput( image );
-    slicewriter->SetCreateUndoInformation( false );
-    slicewriter->SetSliceImage( slice );
-    slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
-    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-    slicewriter->Update();
-  }
-  if ( m_3DInterpolationEnabled )
+    //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+  vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+
+  //Set the slice as 'input'
+  reslice->SetInputSlice(slice->GetVtkImageData());
+
+  //set overwrite mode to true to write back to the image volume
+  reslice->SetOverwriteMode(true);
+  reslice->Modified();
+
+  mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslice);
+  extractor->SetInput( image );
+  extractor->SetTimeStep( timeStep );
+  extractor->SetWorldGeometry( planeGeometry );
+  extractor->SetVtkOutputRequest(true);
+  extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+
+  extractor->Modified();
+  extractor->Update();
+
+  //the image was modified within the pipeline, but not marked so
+  image->Modified();
+
+  /*============= BEGIN undo feature block ========================*/
+  //specify the undo operation with the edited slice
+  m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+  
+  //create an operation event for the undo stack
+  OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );
+  
+  //add it to the undo controller
+  UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
+
+  //clear the pointers as the operation are stored in the undocontroller and also deleted from there
+  m_undoOperation = NULL;
+  m_doOperation = NULL;
+  /*============= END undo feature block ========================*/
+  
+  slice->DisconnectPipeline();
+  ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
+  contourExtractor->SetInput(slice);
+  contourExtractor->Update();
+  mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+
+  if (contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
   {
-    slice->DisconnectPipeline();
-    ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
-    contourExtractor->SetInput(slice);
-    contourExtractor->Update();
-    mitk::Surface::Pointer contour = contourExtractor->GetOutput();
-
-    if (contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
-    {
-      unsigned int pos = this->AddContourmarker(positionEvent);
-      mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
-      PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
-      mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
-      contour->DisconnectPipeline();
-    }
-
+    unsigned int pos = this->AddContourmarker(positionEvent);
+    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+    PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
+    contour->DisconnectPipeline();
   }
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)
 {
     m_ShowMarkerNodes = status;
-}
-
-void mitk::SegTool2D::Enable3DInterpolation(bool status)
-{
-    m_3DInterpolationEnabled = status;
 }
 
 unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )

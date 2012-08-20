@@ -253,6 +253,18 @@ PixelType MakeScalarPixelType()
     return MakePixelType<T,T,1>();
 }
 
+/**
+ * @brief Translate the itk::ImageIOBase::IOType to a std::type_info
+ *
+ * The functionality is similar to the itk::ImageIOBase::GetComponentTypeInfo but this one can also handle composite pixel types.
+ *
+ * @param imageIO the ImageIO associated with an image to be read-in
+ * @return the typeid() of the given type for composite types, calls internal GetComponentTypeInfo for simple types
+ */
+const std::type_info& GetPixelTypeFromITKImageIO( const itk::ImageIOBase::Pointer imageIO);
+
 } // namespace mitk
+
+
 
 #endif /* PIXELTYPE_H_HEADER_INCLUDED_C1EBF565 */

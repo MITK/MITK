@@ -337,7 +337,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
               firstTool->CreateEmptySegmentationNode( image, dialog->GetSegmentationName().toStdString(), dialog->GetColor() );
 
             //Here we change the reslice interpolation mode for a segmentation, so that contours in rotated slice can be shown correctly
-            emptySegmentation->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_LINEAR) );
+            emptySegmentation->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_NEAREST) );
             // initialize showVolume to false to prevent recalculating the volume while working on the segmentation
             emptySegmentation->SetProperty( "showVolume", mitk::BoolProperty::New( false ) );
 
@@ -675,23 +675,6 @@ void QmitkSegmentationView::OnShowMarkerNodes (bool state)
       {
         manualSegmentationTool->SetShowMarkerNodes( false );
       }
-    }
-  }
-}
-
-void QmitkSegmentationView::On3DInterpolationEnabled (bool state)
-{
-  mitk::SegTool2D::Pointer manualSegmentationTool;
-
-  unsigned int numberOfExistingTools = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetTools().size();
-
-  for(unsigned int i = 0; i < numberOfExistingTools; i++)
-{
-    manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetToolById(i));
-
-    if (manualSegmentationTool)
-    {
-        manualSegmentationTool->Enable3DInterpolation( state );
     }
   }
 }
@@ -1203,7 +1186,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
     this, SLOT( OnSurfaceSelectionChanged( ) ) );
 
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
-  connect(m_Controls->m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
 
   m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
   m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));

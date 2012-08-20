@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationData.h"
 #include "mitkPropertyList.h"
 
+// Microservices
+#include <usServiceInterface.h>
+#include <usServiceRegistration.h>
+
 namespace mitk {
 
   /**Documentation
@@ -38,6 +42,16 @@ namespace mitk {
   {
   public:
     mitkClassMacro(NavigationDataSource, itk::ProcessObject);
+
+    /** @return Returns a human readable name of this source. There will be a default name,
+      *         or you can set the name with the method SetName() if you want to change it. 
+      */
+    itkGetMacro(Name,std::string);
+
+    /** @brief Sets the human readable name of this source. There is also a default name,
+      *        but you can use this method if you need to define it on your own.
+      */
+    itkSetMacro(Name,std::string);
 
     /**
     *\brief return the output (output with id 0) of the filter
@@ -62,6 +76,31 @@ namespace mitk {
     DataObjectPointerArraySizeType GetOutputIndex(std::string navDataName);
 
     /** 
+    *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
+    * To unregister, call UnregisterMicroservice().
+    */
+    virtual void RegisterAsMicroservice();
+
+    /**
+    *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
+    */
+    virtual void UnRegisterMicroservice();
+
+    /**
+    *\brief Returns the id that this device is registered with. The id will only be valid, if the
+    * NavigationDataSource has been registered using RegisterAsMicroservice().
+    */
+    std::string GetMicroserviceID();
+
+    /**
+    *\brief These Constants are used in conjunction with Microservices
+    */
+    static const std::string US_INTERFACE_NAME;
+    static const std::string US_PROPKEY_DEVICENAME;
+    static const std::string US_PROPKEY_ID;
+    static const std::string US_PROPKEY_ISACTIVE; //NOT IMPLEMENTED YET!
+
+    /**
     *\brief Graft the specified DataObject onto this ProcessObject's output.
     * 
     * See itk::ImageSource::GraftNthOutput for details
@@ -117,6 +156,14 @@ namespace mitk {
   protected:
     NavigationDataSource();
     virtual ~NavigationDataSource();
+
+    std::string m_Name;
+
+
+  private:
+    mitk::ServiceRegistration m_ServiceRegistration;
   };
 } // namespace mitk
+// This is the microservice declaration. Do not meddle!
+US_DECLARE_SERVICE_INTERFACE(mitk::NavigationDataSource, "org.mitk.services.NavigationDataSource")
 #endif /* MITKNAVIGATIONDATASOURCE_H_HEADER_INCLUDED_ */

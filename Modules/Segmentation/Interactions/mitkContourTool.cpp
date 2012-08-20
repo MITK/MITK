@@ -30,6 +30,11 @@ mitk::ContourTool::ContourTool(int paintingPixelValue)
 :FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
  m_PaintingPixelValue(paintingPixelValue)
 {
+  // great magic numbers
+  CONNECT_ACTION( 80, OnMousePressed );
+  CONNECT_ACTION( 90, OnMouseMoved );
+  CONNECT_ACTION( 42, OnMouseReleased );
+  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::ContourTool::~ContourTool()
@@ -51,10 +56,14 @@ void mitk::ContourTool::Deactivated()
 */
 bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
-  if (!FeedbackContourTool::OnMousePressed( action, stateEvent )) return false;
-
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
+
+  m_LastEventSender = positionEvent->GetSender();
+  m_LastEventSlice = m_LastEventSender->GetSlice();
+
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+
 
   Contour* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Initialize();
@@ -72,7 +81,7 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
 */
 bool mitk::ContourTool::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
 {
-  if (!FeedbackContourTool::OnMouseMoved( action, stateEvent )) return false;
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -100,7 +109,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
   
-  if (!FeedbackContourTool::OnMouseReleased( action, stateEvent )) return false;
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
@@ -138,7 +147,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 */
 bool mitk::ContourTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
 {
-  if (!FeedbackContourTool::OnInvertLogic(action, stateEvent)) return false;
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   // Inversion only for 0 and 1 as painting values
   if (m_PaintingPixelValue == 1)

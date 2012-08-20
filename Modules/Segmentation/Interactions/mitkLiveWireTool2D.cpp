@@ -41,6 +41,7 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   m_ContourModelNode->SetProperty("name", StringProperty::New("contour node"));
   m_ContourModelNode->SetProperty("visible", BoolProperty::New(true));
   m_ContourModelNode->AddProperty( "color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
+  m_ContourModelNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
 
  
   
@@ -181,6 +182,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 
 
   m_ContourModelNode->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), NULL, true );
+  m_ContourModelNode->AddProperty( "selectedcolor", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );
 
   mitk::ContourModelInteractor::Pointer interactor = mitk::ContourModelInteractor::New(m_ContourModelNode);
   //set the livewire interactor to edit control points

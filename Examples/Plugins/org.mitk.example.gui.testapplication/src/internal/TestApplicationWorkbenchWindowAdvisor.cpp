@@ -177,9 +177,11 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   //QVBoxLayout* mainWindowLayout = new QVBoxLayout(mainWindow);
 
   QWidget* CentralWidget = new QWidget(mainWindow);
+  CentralWidget->setObjectName("CentralWidget");
   CentralWidget->setVisible(true);
   //QWidget* CentralWidget = new berry::QtControlWidget(mainWindow, shell.GetPointer());
   QWidget* PageComposite = new QWidget(CentralWidget);
+  PageComposite->setObjectName("PageComposite");
   PageComposite->setVisible(true);
   //QWidget* PageComposite = new berry::QtControlWidget(CentralWidget, shell.GetPointer());
   QtPerspectiveSwitcherTabBar* PerspectivesTabBar = new QtPerspectiveSwitcherTabBar(this->GetWindowConfigurer()->GetWindow());

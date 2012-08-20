@@ -118,3 +118,33 @@ QtPerspectiveSwitcherTabBar::tab
 {
 background: pink;
 }
+
+QFrame#StandaloneViewForm
+{
+background: light yellow;
+}
+
+QFrame#ViewForm
+{
+background: light pink;
+}
+
+QFrame#ViewFormContentFrame
+{
+background: green;
+}
+
+QWidget#CentralWidget
+{
+background: magenta;
+}
+
+QWidget#PageComposite
+{
+background: green;
+}
+
+/*QFrame#PartPaneControl
+{
+background: grey;
+}same as StandaloneViewForm*/

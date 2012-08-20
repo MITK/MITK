@@ -14,6 +14,9 @@
             <widget class="{$imageInputWidget}"  name="parameter:{name}">
               <xsl:call-template name="commonWidgetProperties"/>
               <xsl:call-template name="createQtDesignerStringListProperty"/>
+              <property name="parameter:valueProperty">
+                <string>GetSelectedNode</string>
+              </property>
             </widget>
           </item>
         </xsl:when>

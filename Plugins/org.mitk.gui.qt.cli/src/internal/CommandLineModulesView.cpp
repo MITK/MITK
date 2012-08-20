@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCmdLineModuleFactoryGui.h"
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkCommonFunctionality.h"
+#include "QmitkCustomVariants.h"
 
 // Qt
 #include <QFile>
@@ -41,7 +42,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleXmlValidator.h>
 #include <ctkCmdLineModuleDefaultPathBuilder.h>
-#include <ctkCmdLineModuleObjectTreeWalker_p.h>
 #include <ctkCmdLineModuleFuture.h>
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleParameter.h>
@@ -369,28 +369,31 @@ void CommandLineModulesView::OnRunButtonPressed()
 
   qDebug() << "Command Line Module ... Saving data to temporary storage...";
 
-  // The aim here is to walk the tree of QObject (widgets) and
-  // 1. If there are QmitkDataStorageComboBox containing valid images
+  // The aim here is to iterate through each parameter
+  // 1. If there are QmitkDataStorageComboBoxWithSelectNone containing valid input images
   //    a. write them to temporary storage
-  //    b. set the parameter to have the correct file name
+  //    b. set the parameter to have the correct file name, of the temporary image
   // 2. If we have an output parameter, where the user has specified the output file name,
   //    a. Register that output file name, so that we can auto-load it into the data storage.
 
-  ctkCmdLineModuleObjectTreeWalker walker;
-  walker.setRootObject(m_Controls->m_TabWidget->currentWidget());
+  QString parameterName;
+  QList<QString> parameterNames = moduleInstance->parameterNames();
+  qRegisterMetaType<mitk::DataNode::Pointer>();
 
-  while (!walker.atEnd())
+  foreach (parameterName, parameterNames)
   {
-    QObject *currentObject = walker.currentObject();
-    QmitkDataStorageComboBox* comboBox = dynamic_cast<QmitkDataStorageComboBox*>(currentObject);
+    ctkCmdLineModuleParameter parameter = description.parameter(parameterName);
 
-    // Case 1. Sort out image data that needs writing out to temporary storage.
-    if (comboBox != NULL && comboBox->currentText() != "please select")
+    // At the moment, we are only using the QmitkDataStorageComboBoxWithSelectNone combo box for images.
+    if (parameter.channel().compare("input", Qt::CaseInsensitive) == 0
+        && parameter.tag().compare("image", Qt::CaseInsensitive) == 0
+        )
     {
-      mitk::DataNode* node = comboBox->GetSelectedNode();
-      if (node != NULL)
+      QVariant tmp = moduleInstance->value(parameterName);
+      mitk::DataNode::Pointer node = tmp.value<mitk::DataNode::Pointer>();
+
+      if (node.IsNotNull())
       {
-        // At the moment, we are only using the combo box for images.
         mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
         if (image != NULL)
         {
@@ -406,31 +409,22 @@ void CommandLineModulesView::OnRunButtonPressed()
           QString temporaryStorageFileName = QString::fromStdString(tmpFN);
 
           m_TemporaryFileNames.push_back(temporaryStorageFileName);
-          moduleInstance->setValue(walker.name(), temporaryStorageFileName);
+          moduleInstance->setValue(parameterName, temporaryStorageFileName);
 
           qDebug() << "Command Line Module ... Saved " << temporaryStorageFileName;
 
-        }
-      }
-    }
-
-    // Case 2. If the parameter corresponds to an output channel, save the file name.
-    if (walker.isParameter() && !(walker.name().isEmpty()))
+        } // end if image
+      } // end if node
+    } // end if input image
+    else if (parameter.channel().compare("output", Qt::CaseInsensitive) == 0)
     {
-      ctkCmdLineModuleParameter parameter = description.parameter(walker.name());
-      if (parameter.channel().compare("output", Qt::CaseInsensitive) == 0)
+      QString outputFileName = moduleInstance->value(parameterName).toString();
+      if (!outputFileName.isEmpty())
       {
-        QString outputFileName = moduleInstance->value(walker.name()).toString();
-        if (!outputFileName.isEmpty())
-        {
-          m_OutputDataToLoad.push_back(outputFileName);
-          qDebug() << "Command Line Module ... Registered " << outputFileName << " to auto load";
-        }
+        m_OutputDataToLoad.push_back(outputFileName);
+        qDebug() << "Command Line Module ... Registered " << outputFileName << " to auto load upon completion.";
       }
     }
-
-    // Always Iterate.
-    walker.readNext();
   }
 
   qDebug() << "Command Line Module ... starting.";
@@ -444,6 +438,7 @@ void CommandLineModulesView::OnRunButtonPressed()
     QObject::disconnect(m_Watcher, 0, 0, 0);
     delete m_Watcher;
   }
+
   m_Watcher = new QFutureWatcher<ctkCmdLineModuleResult>();
   QObject::connect(m_Watcher, SIGNAL(started()), this, SLOT(OnModuleStarted()));
   QObject::connect(m_Watcher, SIGNAL(finished()), this, SLOT(OnModuleFinished()));

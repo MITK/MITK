@@ -44,12 +44,12 @@ mitk::LiveWireTool2D::LiveWireTool2D()
  
   
   // great magic numbers
-  CONNECT_ACTION( EActions::AcINITNEWOBJECT, OnInitLiveWire );
-  CONNECT_ACTION( EActions::AcADDPOINT, OnAddPoint );
-  CONNECT_ACTION( EActions::AcMOVE, OnMouseMoved );
-  CONNECT_ACTION( EActions::AcCHECKPOINT, OnCheckPoint );
-  CONNECT_ACTION( EActions::AcFINISH, OnFinish );
-  CONNECT_ACTION( EActions::AcCLOSECONTOUR, OnCloseContour );
+  CONNECT_ACTION( AcINITNEWOBJECT, OnInitLiveWire );
+  CONNECT_ACTION( AcADDPOINT, OnAddPoint );
+  CONNECT_ACTION( AcMOVE, OnMouseMoved );
+  CONNECT_ACTION( AcCHECKPOINT, OnCheckPoint );
+  CONNECT_ACTION( AcFINISH, OnFinish );
+  CONNECT_ACTION( AcCLOSECONTOUR, OnCloseContour );
 }
 
 
@@ -163,7 +163,7 @@ bool mitk::LiveWireTool2D::OnCheckPoint( Action* action, const StateEvent* state
   {
     newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
   }
-  /* write new state (selected/not selected) to the property */
+
   this->HandleEvent( newStateEvent );
 
   return true;

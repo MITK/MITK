@@ -87,8 +87,8 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   //fileMenu->addSeparator();
   //fileMenu->addAction(new QmitkFileExitAction(window));
 
-  berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
-  const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();
+  /*berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+  const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();*/
 
   QMenu* viewMenu = menuBar->addMenu("Show View");
   viewMenu->addAction("Show Nothing New");
@@ -132,6 +132,8 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
   QProgressBar *progBar = new QProgressBar();
   qStatusBar->addPermanentWidget(progBar, 0);
+
+  mainWindow->dumpObjectTree();
   //progBar->hide();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
@@ -207,7 +209,7 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   //Size = PageComposite->size();
 
   mainWindow->setCentralWidget(CentralWidget);
-  PageCompositeLayout->activate();
+  PageCompositeLayout->activate();//TODO: check for neccessity 
   PageCompositeLayout->update();
   CentralWidgetLayout->activate();
   CentralWidgetLayout->update();

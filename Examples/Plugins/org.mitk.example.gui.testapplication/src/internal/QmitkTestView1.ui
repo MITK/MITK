@@ -13,179 +13,27 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="gridLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>9</x>
-     <y>9</y>
-     <width>321</width>
-     <height>281</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="0">
-     <widget class="QComboBox" name="TimerSelect">
-      <property name="minimumSize">
-       <size>
-        <width>200</width>
-        <height>0</height>
-       </size>
-      </property>
-      <item>
-       <property name="text">
-        <string>5 Minutes</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>10 Minutes</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>30 Minutes</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="SelfDestruct">
-      <property name="text">
-       <string>Initialize Self Destruct Sequence</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <layout class="QHBoxLayout">
-      <item>
-       <layout class="QGridLayout" name="_2">
-        <item row="0" column="0">
-         <widget class="QPushButton" name="m_RenderWindow1Button">
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>32767</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>1</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="m_RenderWindow4Button">
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>32767</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>4</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="m_RenderWindow3Button">
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>32767</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>3</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="m_RenderWindow2Button">
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>32767</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>2</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="_3">
-        <item>
-         <widget class="QPushButton" name="TestA">
-          <property name="text">
-           <string>Test A</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="TestB">
-          <property name="toolTip">
-           <string>Screenshot will be 4 times larger than current render window size</string>
-          </property>
-          <property name="text">
-           <string>Test B</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="TestC">
-          <property name="maximumSize">
-           <size>
-            <width>32767</width>
-            <height>23</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Test C</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
-    <item row="5" column="0">
-     <spacer name="spacer1">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Expanding</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>230</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-   </layout>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QPushButton" name="importButton">
+     <property name="text">
+      <string>Import</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkDicomExternalDataWidget" name="widget" native="true"/>
+   </item>
+  </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDicomExternalDataWidget</class>
+   <extends>QWidget</extends>
+   <header>Qmitk/QmitkDicomExternalDataWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

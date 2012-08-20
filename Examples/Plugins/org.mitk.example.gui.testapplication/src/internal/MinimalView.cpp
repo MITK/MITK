@@ -18,6 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QMessageBox>
 
+#include "org_mitk_example_gui_testapplication_Activator.h"
+
+#include "mitkIDataStorageService.h"
+
 const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview"; 
 
 //MinimalView::MinimalView()
@@ -43,7 +47,21 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
   m_Controls.setupUi(parent);
 
-  //connect(m_Controls.selectButton, SIGNAL(clicked()), this, SLOT(ToggleRadioMethod()));
+  //ctkPluginContext* pluginContext = org_mitk_example_gui_testapplication_Activator::GetPluginContext();
+  //ctkServiceReference serviceReference = pluginContext->getServiceReference<berry::idata>();
+
+  ////always granted by org.blueberry.ui.qt
+  //Q_ASSERT(serviceReference);
+  //
+  //berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
+  //Q_ASSERT(styleManager);
+
+  ctkServiceReference serviceReference = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getServiceReference<mitk::IDataStorageService>();
+  mitk::IDataStorageService* storageService = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
+
+  storageService->GetActiveDataStorage().GetPointer()->GetDataStorage();
+
+  connect(m_Controls.importButton, SIGNAL(clicked()), m_Controls.widget, SLOT(OnFolderCDImport()));
   
   // register selection listener
   //GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);

@@ -28,7 +28,7 @@ void TestPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
   //layout->SetFixed(true);
   std::string editorArea = layout->GetEditorArea();
   layout->SetEditorAreaVisible(false);
-  layout->AddStandaloneView("org.mitk.views.minimalview", true, 1, 1.0f, layout->GetEditorArea());
+  layout->AddStandaloneView("org.mitk.views.minimalview", false, 1, 1.0f, layout->GetEditorArea());
   //layout->AddView("org.mitk.views.minimalview", 1, 1.0f, editorArea);
   layout->GetViewLayout("org.mitk.views.minimalview")->SetCloseable(false);
   layout->GetViewLayout("org.mitk.views.minimalview")->SetMoveable(false);

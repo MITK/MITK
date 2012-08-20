@@ -80,34 +80,41 @@ height: 12px;
 
 QMenuBar
 {
-background: red;
+background: rgb(43, 75, 116);
+}
+
+QStatusBar
+{
+background: rgb(197, 245, 254);
 }
 
 QMenuBar::item
 {
-background: orange;
+background: rgb(43, 75, 116);
+color: rgb(210, 221, 239);
 }
 
 QMenu
 {
-background: blue;
-border: 2px solid black;
+border: 0px;
+/*background: blue;*/
+/*border: 2px solid black;*/
 }
 
 QMenu::item
 {
-background: yellow;
+background: rgb(210, 221, 239);
 }
 
-QToolBar
+/*QToolBar
 {
 background: yellow;
-}
+}*/
 
-QtPerspectiveSwitcherTabBar
+/*QtPerspectiveSwitcherTabBar
 {
 background: green;
-}
+}*/
 
 /*QtPerspectiveSwitcherTabBar::tab-bar
 {
@@ -116,12 +123,23 @@ background: pink;
 
 QtPerspectiveSwitcherTabBar::tab
 {
-background: pink;
+background: rgb(210, 221, 239);
 }
 
 QFrame#StandaloneViewForm
 {
-background: light yellow;
+background: rgb(210, 221, 239);
+}
+
+QPushButton#StyleUpdateButton
+{
+min-height: 25px; 
+border-top-left-radius: 4px; 
+border-top-right-radius: 4px; 
+border-bottom-left-radius: 4px; 
+border-bottom-right-radius: 4px; 
+/*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(225, 242, 255), stop:1 rgb(138, 204, 253));*/
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(210, 221, 239), stop:1 rgb(197, 245, 254));
 }
 
 QFrame#ViewForm
@@ -136,13 +154,13 @@ background: green;
 
 QWidget#CentralWidget
 {
-background: magenta;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(43, 75, 116), stop:1 rgb(197, 245, 254));
 }
 
-QWidget#PageComposite
+/*QWidget#PageComposite
 {
 background: green;
-}
+}*/
 
 /*QFrame#PartPaneControl
 {

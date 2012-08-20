@@ -116,7 +116,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   //  qToolbar->addAction(viewAction);
   //}
   
-  mainWindow->addToolBar(qToolbar);
+  //mainWindow->addToolBar(qToolbar);
 
   QStatusBar* qStatusBar = new QStatusBar();
   QLabel* title = new QLabel("Status Bar");
@@ -133,7 +133,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QProgressBar *progBar = new QProgressBar();
   qStatusBar->addPermanentWidget(progBar, 0);
 
-  mainWindow->dumpObjectTree();
+  //mainWindow->dumpObjectTree();
   //progBar->hide();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
@@ -154,7 +154,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 void TestApplicationWorkbenchWindowAdvisor::PreWindowOpen()
 {
   berry::IWorkbenchWindowConfigurer::Pointer configurer = this->GetWindowConfigurer();
-  configurer->SetShowCoolBar(true);
+  configurer->SetShowCoolBar(false);
   configurer->SetShowMenuBar(true);
   configurer->SetShowPerspectiveBar(true);
   configurer->SetShowStatusLine(true);
@@ -196,6 +196,7 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   PerspectivesLayer->addSpacing(300);
   QPushButton* StyleUpdateButton = new QPushButton("Update Style", mainWindow);
   StyleUpdateButton->setMaximumWidth(100);
+  StyleUpdateButton->setObjectName("StyleUpdateButton");
   PerspectivesLayer->addWidget(StyleUpdateButton);
 
   QObject::connect(StyleUpdateButton, SIGNAL( clicked() ), this, SLOT( UpdateStyle() ));

@@ -27,10 +27,10 @@ void TestPerspective2::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   //layout->SetFixed(true);
   std::string editorArea = layout->GetEditorArea();
-  layout->SetEditorAreaVisible(true);
+  layout->SetEditorAreaVisible(false);
   //layout->AddStandaloneView("org.mitk.views.testview", false, 1, 1.0f, layout->GetEditorArea());
-  //layout->AddStandaloneView("org.mitk.views.datamanager", false, 1, 1.0f, layout->GetEditorArea());
-  layout->AddView("org.mitk.views.datamanager", true, 1.0f, editorArea);
+  layout->AddStandaloneView("org.mitk.views.datamanager", false, 1, 1.0f, layout->GetEditorArea());
+  //layout->AddView("org.mitk.views.datamanager", false, 1.0f, editorArea);
   //layout->GetViewLayout("org.mitk.views.datamanager")->SetCloseable(false);
   //layout->GetViewLayout("org.mitk.views.datamanager")->SetMoveable(false);
 

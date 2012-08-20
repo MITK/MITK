@@ -3864,7 +3864,7 @@
    </state>
    <state NAME="Guard_CheckPointClick" ID="10" ><!-- check click on point -->
     <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004"> <!-- EIDYES = 1004 -->
-     <action ID="66" /> <!-- AcSELECTPOINT = 66 -->
+     <!-- no action -->
     </transition>
     <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- EIDNO = 1003 -->
      <!-- no action -->
@@ -3887,10 +3887,10 @@
     </transition>
    </state>
    <state NAME="EditContour" ID="3" >
-    <transition NAME="mouseMove" NEXT_STATE_ID="2" EVENT_ID="534"> <!-- CTRL+leftBN+MouseMove = 534 -->
+    <transition NAME="mouseMoveContour" NEXT_STATE_ID="3" EVENT_ID="534"> <!-- CTRL+leftBN+MouseMove = 534 -->
      <action ID="92" /> <!-- AcMOVE = 92 -->
     </transition>
-    <transition NAME="mouseRelease" NEXT_STATE_ID="1" EVENT_ID="537"> <!--  CTRL+leftBNRelease = 537 -->
+    <transition NAME="mouseReleaseContour" NEXT_STATE_ID="1" EVENT_ID="505"> <!--  left mbtn release = 505 -->
      <action ID="44" /> <!-- AcFINISH = 44 -->
     </transition>
    </state>

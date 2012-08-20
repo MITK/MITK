@@ -32,7 +32,6 @@ mitk::ContourModelInteractor::ContourModelInteractor(DataNode* dataNode)
 {
   CONNECT_ACTION( AcCHECKPOINT, OnCheckPointClick );
   CONNECT_ACTION( AcCHECKOBJECT, OnCheckContourClick );
-  CONNECT_ACTION( AcSELECTPOINT, OnSelectPoint );
   CONNECT_ACTION( AcMOVEPOINT, OnMovePoint );
   CONNECT_ACTION( AcMOVE, OnMoveContour );
   CONNECT_ACTION( AcFINISH, OnFinish );
@@ -46,7 +45,7 @@ mitk::ContourModelInteractor::~ContourModelInteractor()
 
 float mitk::ContourModelInteractor::CanHandleEvent(StateEvent const* stateEvent) const
 {
-  float returnValue = 0.5;
+  float returnValue = 0.0;
   //if it is a key event that can be handled in the current state, then return 0.5
   mitk::PositionEvent const  *positionEvent =
     dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -182,8 +181,9 @@ bool mitk::ContourModelInteractor::OnMovePoint( Action* action, const StateEvent
   translation[0] = currentPosition[0] - this->m_lastMousePosition[0];
   translation[1] = currentPosition[1] - this->m_lastMousePosition[1];
   translation[2] = currentPosition[2] - this->m_lastMousePosition[2];
-
   contour->ShiftSelectedVertex(translation);
+
+  this->m_lastMousePosition = positionEvent->GetWorldPosition();
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -206,6 +206,8 @@ bool mitk::ContourModelInteractor::OnMoveContour( Action* action, const StateEve
   translation[2] = currentPosition[2] - this->m_lastMousePosition[2];
   contour->ShiftContour(translation);
 
+  this->m_lastMousePosition = positionEvent->GetWorldPosition();
+
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
@@ -217,7 +219,6 @@ bool mitk::ContourModelInteractor::OnMoveContour( Action* action, const StateEve
 
 bool mitk::ContourModelInteractor::OnFinish( Action* action, const StateEvent* stateEvent)
 {
-  
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 

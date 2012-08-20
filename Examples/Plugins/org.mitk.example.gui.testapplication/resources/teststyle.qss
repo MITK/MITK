@@ -108,3 +108,13 @@ QtPerspectiveSwitcherTabBar
 {
 background: green;
 }
+
+/*QtPerspectiveSwitcherTabBar::tab-bar
+{
+background: pink;
+}*/
+
+QtPerspectiveSwitcherTabBar::tab
+{
+background: pink;
+}

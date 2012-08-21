@@ -79,12 +79,14 @@ float mitk::ContourModelInteractor::CanHandleEvent(StateEvent const* stateEvent)
 
     if ( contourGeometry )
     {
-      if( contourGeometry->IsInside(worldPoint3D) ) return 1.0;
+      //if click is inside bounds the interactor can handle the event best
+      if( contourGeometry->IsInside(worldPoint3D) )
+      {
+        return 1.0;
+      }
       return 0.9;
     }
-
   }
-
 
   return returnValue;
 }
@@ -119,8 +121,8 @@ bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const Stat
     m_DataNode->GetData() );
 
   /* 
-  * Check distance to first point.
-  * Transition YES if click close to first control point 
+  * Check distance to any vertex.
+  * Transition YES if click close to a vertex
   */
   mitk::Point3D click = positionEvent->GetWorldPosition();
 

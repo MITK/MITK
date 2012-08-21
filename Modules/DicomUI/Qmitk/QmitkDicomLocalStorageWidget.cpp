@@ -76,7 +76,7 @@ void QmitkDicomLocalStorageWidget::StartDicomImport(const QString& dicomData)
 
 void QmitkDicomLocalStorageWidget::StartDicomImport(const QStringList& dicomData)
 {
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(dicomData.count());
+    //mitk::ProgressBar::GetInstance()->AddStepsToDo(dicomData.count());
     if (m_Watcher.isRunning())
     {
         m_Watcher.waitForFinished();
@@ -103,7 +103,7 @@ void QmitkDicomLocalStorageWidget::AddDICOMData(const QStringList& patientFiles)
         while(fileIterator.hasNext())
         {
             m_LocalIndexer->addFile(*m_LocalDatabase,fileIterator.next(),m_LocalDatabase->databaseDirectory());
-            mitk::ProgressBar::GetInstance()->Progress();
+            //mitk::ProgressBar::GetInstance()->Progress();
         }
     }
     m_LocalModel->setDatabase(m_LocalDatabase->database());
@@ -180,7 +180,7 @@ void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
         QString studyName = m_LocalModel->data(studyIndex).toString();
 
         QModelIndex patientIndex = m_LocalModel->parent(studyIndex);
-        QString patientName = m_LocalModel->data(patientIndex).toString();        
+        QString patientName = m_LocalModel->data(patientIndex).toString();
 
         QString filePath;
         filePath.append(m_LocalDatabase->databaseDirectory());

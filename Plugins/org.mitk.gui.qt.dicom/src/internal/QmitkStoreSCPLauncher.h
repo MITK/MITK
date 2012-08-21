@@ -33,11 +33,16 @@ public slots:
     void StartStoreSCP();
     void OnProcessError(QProcess::ProcessError error);
     void OnStateChanged(QProcess::ProcessState status);
+    void OnReadyProcessOutput();
 
 signals:
     void SignalStatusOfStoreSCP(const QString&);
+    void SignalStoreSCPError(const QString& errorText = "");
+    void SignalStartImport(const QStringList&);
+    void SignalFinishedImport();
 
 private:
+    void DeleteTemporaryData();
     void FindPathToStoreSCP();
     void SetArgumentList(QmitkStoreSCPLauncherBuilder* builder);
     QString ArgumentListToQString();
@@ -47,5 +52,6 @@ private:
 
     QProcess* m_StoreSCP;
     QStringList m_ArgumentList;
+    QStringList m_ImportFilesList;
 };
 #endif //QmitkStoreSCPLauncher_h

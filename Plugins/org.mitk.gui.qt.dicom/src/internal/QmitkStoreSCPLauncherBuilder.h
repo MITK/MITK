@@ -30,7 +30,7 @@ public:
     QmitkStoreSCPLauncherBuilder* AddAETitle(const QString& aeTitle = QString("STORESCP"));
     QmitkStoreSCPLauncherBuilder* AddTransferSyntax(const QString& transferSyntax = QString("+x="));
     QmitkStoreSCPLauncherBuilder* AddOtherNetworkOptions(const QString& otherNetworkOptions = QString("-pm"));
-    QmitkStoreSCPLauncherBuilder* AddMode(const QString& mode = QString("-d"));
+    QmitkStoreSCPLauncherBuilder* AddMode(const QString& mode = QString("-v"));
     QmitkStoreSCPLauncherBuilder* AddOutputDirectory(const QString& outputDirectory);
 
     QString* GetPort();

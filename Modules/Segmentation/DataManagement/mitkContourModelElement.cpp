@@ -69,15 +69,19 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(co
 
   if(eps > 0)
   {
+    if(this->m_Vertices->size() == 1)
+    {
+      return this->m_Vertices->at(0);
+    }
 
-    if(this->m_Vertices->size() < 100)
+    if(this->m_Vertices->size() < 10000)
     {
       return BruteForceGetVertexAt(point, eps);
-    }//if size < n
+    }
     else
     {
       return OptimizedGetVertexAt(point, eps);
-    }//else
+    }
   }//if eps < 0
   return NULL;
 }
@@ -88,22 +92,33 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetV
 {
   if(eps > 0)
   {
+    std::deque< std::pair<double, VertexType*> > nearestlist;
+
     ConstVertexIterator it = this->m_Vertices->begin();
 
     ConstVertexIterator end = this->m_Vertices->end();
+
+    nearestlist.push_front( std::pair<double, VertexType*>( (*it)->Coordinates.EuclideanDistanceTo(point), (*it) ));
 
     while(it != end)
     {
       mitk::Point3D currentPoint = (*it)->Coordinates;
 
-      if(currentPoint.EuclideanDistanceTo(point) < eps)
+      double distance = currentPoint.EuclideanDistanceTo(point);
+      if(distance < eps)
       {
-        //found an approximate point
-        return *it;
-      }//if
+        //found an approximate point - check if current is closer then first in nearestlist
+        if( distance < nearestlist.front().first )
+        {
+          //found even closer vertex
+          nearestlist.push_front(std::pair<double, VertexType*>( (*it)->Coordinates.EuclideanDistanceTo(point), (*it) ));
+        }
+      }//if distance > eps
 
       it++;
     }//while
+    //return closest point
+    return nearestlist.front().second;
   }
   return NULL;
 }

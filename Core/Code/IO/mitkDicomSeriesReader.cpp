@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // uncomment for learning more about the internal sorting mechanisms
-#define MBILOG_ENABLE_DEBUG 
+//#define MBILOG_ENABLE_DEBUG 
 
 #include <mitkDicomSeriesReader.h>
 
@@ -533,7 +533,6 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
     MITK_DEBUG << "    shift up: " << m_ShiftUp;
     MITK_DEBUG << "    shift right: " << m_ShiftRight;
     
-    MITK_DEBUG << "    tilt angle (rad): " << atan( m_ShiftUp / m_ShiftNormal );
     MITK_DEBUG << "    tilt angle (deg): " << atan( m_ShiftUp / m_ShiftNormal ) * 180.0 / 3.1415926535;
   }
 }
@@ -559,7 +558,6 @@ DicomSeriesReader::GantryTiltInformation::projectPointOnLine( Point3Dd p, Point3
 double 
 DicomSeriesReader::GantryTiltInformation::GetTiltCorrectedAdditionalSize() const
 {
-  // this seems to be a bit too much sometimes, but better too much than cutting off parts of the image
   return fabs(m_ShiftUp);
 }
       
@@ -586,7 +584,7 @@ DicomSeriesReader::GantryTiltInformation::GetRealZSpacing() const
 bool 
 DicomSeriesReader::GantryTiltInformation::IsSheared() const
 {
-  return (   m_ShiftRight > 0.001
+  return (   fabs(m_ShiftRight) > 0.001
           ||    fabs(m_ShiftUp) > 0.001);
 }
 
@@ -594,7 +592,7 @@ DicomSeriesReader::GantryTiltInformation::IsSheared() const
 bool 
 DicomSeriesReader::GantryTiltInformation::IsRegularGantryTilt() const
 {
-  return (   m_ShiftRight < 0.001 
+  return (   fabs(m_ShiftRight) < 0.001 
           &&    fabs(m_ShiftUp) > 0.001);
 }
 
@@ -700,7 +698,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
     MITK_DEBUG << "  " << fileIndex << " " << *fileIter
                        << " at "
-                       << thisOriginString << "(" << thisOrigin[0] << "," << thisOrigin[1] << "," << thisOrigin[2] << ")";
+                       /* << thisOriginString */ << "(" << thisOrigin[0] << "," << thisOrigin[1] << "," << thisOrigin[2] << ")";
 
     if ( lastOriginInitialized && (thisOrigin == lastOrigin) )
     {
@@ -1017,7 +1015,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
           mapOf3DPlusTBlocks[thisBlockKey].insert( mapOf3DPlusTBlocks[thisBlockKey].end(), 
                                                    block3DIter->second.begin(), 
                                                    block3DIter->second.end() );
-          MITK_DEBUG << "  3D+t group " << thisBlockKey << " started";
+          MITK_DEBUG << "  3D+t group " << thisBlockKey;
           previousBlockKey = thisBlockKey;
         }
         else
@@ -1083,9 +1081,8 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   MITK_DEBUG << "Summary: ";
   for ( UidFileNamesMap::const_iterator groupIter = mapOf3DPlusTBlocks.begin(); groupIter != mapOf3DPlusTBlocks.end(); ++groupIter )
   {
-    MITK_DEBUG << "  Image volume " << groupIter->first << " with " << groupIter->second.size() << " files";
+    MITK_DEBUG << "  " << groupIter->second.size() << " images in volume " << groupIter->first;
   }
-  MITK_DEBUG << "Done. ";
   MITK_DEBUG << "================================================================================";
 
   return mapOf3DPlusTBlocks;

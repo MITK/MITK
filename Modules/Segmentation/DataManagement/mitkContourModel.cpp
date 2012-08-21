@@ -390,31 +390,31 @@ void mitk::ContourModel::UpdateOutputInformation()
     this->GetSource()->UpdateOutputInformation();
   }
 
+
+
   //update the bounds of the geometry according to the stored vertices
   float mitkBounds[6];
 
-  //if no controlPoints are available the boundingbox is 0 in all dimensions
-  if (this->GetNumberOfVertices() == 0)
+
+  //calculate the boundingbox at each timestep
+
+  typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
+  typedef BoundingBoxType::PointsContainer                      PointsContainer;
+
+  int timesteps = this->GetTimeSteps();
+
+  //iterate over the timesteps
+  for(int currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
   {
-    mitkBounds[0] = 0.0;
-    mitkBounds[1] = 0.0;
-    mitkBounds[2] = 0.0;
-    mitkBounds[3] = 0.0;
-    mitkBounds[4] = 0.0;
-    mitkBounds[5] = 0.0;
-  }
-  else
-  {
-    //calculate the boundingbox at each timestep
-
-    typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
-    typedef BoundingBoxType::PointsContainer                      PointsContainer;
-
-    int timesteps = this->GetTimeSteps();
-
-    //iterate over the timesteps
-    for(int currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
+    //if no controlPoints are available the boundingbox is 0 in all dimensions
+    if (this->GetMTime() > this->GetGeometry(currenTimeStep)->GetBoundingBox()->GetMTime())
     {
+      mitkBounds[0] = 0.0;
+      mitkBounds[1] = 0.0;
+      mitkBounds[2] = 0.0;
+      mitkBounds[3] = 0.0;
+      mitkBounds[4] = 0.0;
+      mitkBounds[5] = 0.0;
 
       BoundingBoxType::Pointer boundingBox = BoundingBoxType::New();
 
@@ -449,9 +449,10 @@ void mitk::ContourModel::UpdateOutputInformation()
       geometry3d->SetBounds(mitkBounds);
     }
 
-    GetTimeSlicedGeometry()->UpdateInformation();
   }
+  GetTimeSlicedGeometry()->UpdateInformation();
 }
+
 
 
 

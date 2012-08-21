@@ -227,6 +227,13 @@ Stacked slices:
     - if this is not the case, the geometry will not fit a normal mitk::Image/mitk::Geometry3D
     - we then project the second origin into the first slice's coordinate system to quantify the shift
     - both is done in class GantryTiltInformation with quite some comments.
+
+ The geometry of image stacks with tilted geometries is illustrated below:
+  - green: the DICOM images as described by their tags: origin as a point with the line indicating the orientation
+  - red: the output of ITK ImageSeriesReader: wrong, larger spacing, no tilt
+  - blue: how much a shear must correct 
+
+  \image tilt-correction.jpg
  
  \section DicomSeriesReader_whynotinitk Why is this not in ITK?
  

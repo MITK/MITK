@@ -104,13 +104,6 @@ void QmitkStoreSCPLauncher::OnReadyProcessOutput()
     }
     if(!importList.isEmpty())
     {
-        QStringListIterator it2(importList);
-        while(it2.hasNext())
-        {
-            MITK_INFO << it2.next().toStdString();
-        }
-        m_StatusText = " storing DICOM files!";
-        OnStateChanged(QProcess::Running);
         emit SignalStartImport(importList);
     }
 }

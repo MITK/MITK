@@ -3890,7 +3890,10 @@
     <transition NAME="mouseMoveContour" NEXT_STATE_ID="3" EVENT_ID="534"> <!-- CTRL+leftBN+MouseMove = 534 -->
      <action ID="92" /> <!-- AcMOVE = 92 -->
     </transition>
-    <transition NAME="mouseReleaseContour" NEXT_STATE_ID="1" EVENT_ID="505"> <!--  left mbtn release = 505 -->
+    <transition NAME="mouseReleaseContour" NEXT_STATE_ID="1" EVENT_ID="505"> <!-- left mbtn release = 505 -->
+     <action ID="44" /> <!-- AcFINISH = 44 -->
+    </transition>
+    <transition NAME="mouseCtrlReleaseContour" NEXT_STATE_ID="1" EVENT_ID="537"> <!-- CTRL+leftBNRelease = 537 -->
      <action ID="44" /> <!-- AcFINISH = 44 -->
     </transition>
    </state>

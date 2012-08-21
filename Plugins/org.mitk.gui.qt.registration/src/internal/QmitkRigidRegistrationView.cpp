@@ -33,6 +33,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
+#include <mitkShowSegmentationAsSurface.h>
+#include <mitkImageStatisticsHolder.h>
+
 
 const std::string QmitkRigidRegistrationView::VIEW_ID = "org.mitk.views.rigidregistration";
 
@@ -237,6 +240,7 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect( m_Controls.m_ManualRegistrationCheckbox, SIGNAL(toggled(bool)), this, SLOT(ShowManualRegistrationFrame(bool)));
   connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
+  connect(m_Controls.m_ShowContour, SIGNAL(toggled(bool)), this, SLOT(ShowContour(bool)));
   connect(m_Controls.m_UseFixedImageMask, SIGNAL(toggled(bool)), this, SLOT(UseFixedMaskImageChecked(bool)));
   connect(m_Controls.m_UseMovingImageMask, SIGNAL(toggled(bool)), this, SLOT(UseMovingMaskImageChecked(bool)));
   connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
@@ -435,6 +439,13 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImag
       this->CheckForMaskImages();
       m_FixedMaskNode = NULL;
     }
+
+    // Modify slider range
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
+    int min = (int)image->GetStatistics()->GetScalarValueMin();
+    int max = (int)image->GetStatistics()->GetScalarValueMax();
+    m_Controls.m_ContourSlider->SetRange(min, max);
+
   }
   else
   {
@@ -635,6 +646,36 @@ void QmitkRigidRegistrationView::ShowRedGreen(bool redGreen)
   m_ShowRedGreen = redGreen;
   this->SetImageColor(m_ShowRedGreen);
 }
+
+void QmitkRigidRegistrationView::ShowContour(bool show)
+{
+
+  // Do the segmentation on the input image
+
+
+
+  if(m_FixedNode.IsNull())
+    return;
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
+  mitk::ShowSegmentationAsSurface::Pointer surfaceFilter = mitk::ShowSegmentationAsSurface::New();
+
+  surfaceFilter->SetDataStorage(*this->GetDataStorage());
+  surfaceFilter->SetPointerParameter("Input", image);
+  surfaceFilter->SetPointerParameter("Group node", m_FixedNode);
+  surfaceFilter->SetParameter("Show result", true);
+  surfaceFilter->SetParameter("Sync visibility", false);
+  surfaceFilter->SetParameter("Smooth", false);
+  surfaceFilter->SetParameter("Apply median", false);
+  surfaceFilter->SetParameter("Median kernel size", 3u);
+  surfaceFilter->SetParameter("Gaussian SD", 1.5f);
+  //surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated);
+  surfaceFilter->SetParameter("Decimate mesh", false);
+  surfaceFilter->SetParameter("Decimation rate", 0.8f);
+
+  surfaceFilter->StartAlgorithm();
+}
+
 
 void QmitkRigidRegistrationView::SetImageColor(bool redGreen)
 {

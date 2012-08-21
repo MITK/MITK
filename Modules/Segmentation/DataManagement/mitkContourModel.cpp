@@ -233,10 +233,16 @@ bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps, int tim
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-    return this->m_ContourSeries[timestep]->RemoveVertexAt(point, eps);
-    this->Modified();
-    this->InvokeEvent( ContourModelSizeChangeEvent() );
-    return true;
+    if(this->m_ContourSeries[timestep]->RemoveVertexAt(point, eps))
+    {
+      this->Modified();
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
   return false;
 }
@@ -262,6 +268,7 @@ void mitk::ContourModel::ShiftContour(mitk::Vector3D &translate, int timestep)
     VertexIterator it = vList->begin();
     VertexIterator end = vList->end();
 
+    //shift all vertices
     while(it != end)
     {
       this->ShiftVertex((*it),translate);
@@ -292,6 +299,7 @@ void mitk::ContourModel::Expand( int timeSteps )
   {
     Superclass::Expand(timeSteps);
 
+    //insert contours for each new timestep
     for( int i = oldSize; i < timeSteps; i++)
     {
       m_ContourSeries.push_back(mitk::ContourModelElement::New());
@@ -406,7 +414,7 @@ void mitk::ContourModel::UpdateOutputInformation()
   //iterate over the timesteps
   for(int currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
   {
-    //if no controlPoints are available the boundingbox is 0 in all dimensions
+    //only update bounds if the contour was modified
     if (this->GetMTime() > this->GetGeometry(currenTimeStep)->GetBoundingBox()->GetMTime())
     {
       mitkBounds[0] = 0.0;
@@ -445,6 +453,7 @@ void mitk::ContourModel::UpdateOutputInformation()
       mitkBounds[4] = tmp[4];
       mitkBounds[5] = tmp[5];
 
+      //set boundingBox at current timestep
       Geometry3D* geometry3d = this->GetGeometry(currenTimeStep);
       geometry3d->SetBounds(mitkBounds);
     }
@@ -458,5 +467,5 @@ void mitk::ContourModel::UpdateOutputInformation()
 
 void mitk::ContourModel::ExecuteOperation(mitk::Operation* operation)
 {
-
+  //not supported yet
 }

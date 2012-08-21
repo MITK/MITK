@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// Qt
 #include <QMessageBox>
 #include <QString>
+#include <QListWidgetItem>
 
 const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview"; 
 
@@ -76,6 +77,10 @@ void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
   {
     ToggleRadioMethod();
     m_CurrentSelection = selection.Cast<const berry::IStructuredSelection>();
+    // check if we can cast it to listwidgetitem
+    m_CurrentSelection->Begin();
+    //berry::Object::Pointer m_CurrentItem = m_CurrentSelection->GetFirstElement();
+    QMessageBox::critical(0, "Error", "TEST");
     //ToggleRadioMethod(selection.Cast<const berry::IStructuredSelection>());
   }
 }

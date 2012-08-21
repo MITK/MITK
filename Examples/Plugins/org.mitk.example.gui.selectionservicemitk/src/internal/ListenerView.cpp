@@ -19,11 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// Qt
 #include <QMessageBox>
 
+#include "mitkDataNodeObject.h"
+
 const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview"; 
 
 ListenerView::ListenerView()
+  //: QmitkFunctionality()
   : m_Parent(0)
-  , m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))
+  , m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))//m_SelectionListener(NULL)
 {
 }
 
@@ -59,12 +62,14 @@ void ListenerView::SetFocus ()
 }
 
 void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
-                               berry::ISelection::ConstPointer selection)
+                               berry::ISelection::ConstPointer selection)//void ListenerView::::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
-  if (sourcepart != this && 
-      selection.Cast<const berry::IStructuredSelection>())
-  {
-    ToggleRadioMethod();
-    //DoSomething(selection.Cast<const berry::IStructuredSelection>());
-  }
+    //any nodes there?
+  //if (!nodes.empty())
+  //{
+  //  //get the selected Node
+  //  mitk::DataNode::Pointer dataNode = nodes.front();
+  //  ToggleRadioMethod();
+  //  //DoSomething(selection.Cast<const berry::IStructuredSelection>());
+  //}
 }

@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIStructuredSelection.h>
 #include <berryISelectionListener.h>
 
-
 #include "ui_ListenerViewControls.h"
 
 

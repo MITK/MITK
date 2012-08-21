@@ -15,17 +15,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef SELECTIONVIEW_H_
-#define SELECTIONVIEW_H_
+#ifndef MINIMALVIEW_H_
+#define MINIMALVIEW_H_
 
-/// Qmitk
-#include <berryQtViewPart.h>//#include <QmitkFunctionality.h>
-#include <QmitkDataNodeSelectionProvider.h>
+/// Berry
+#include <berryQtViewPart.h>
 
-#include "ui_SelectionViewControls.h"
+#include <QString.h>
+
+#include "IChangeText.h"
+
+#include "ui_MinimalViewControls.h"
 
 
-class SelectionView : public berry::QtViewPart//public QmitkFunctionality
+class MinimalView : public berry::QtViewPart, public IChangeText
 {
 
   Q_OBJECT
@@ -34,28 +37,25 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkDataNodeSelectionProvider::Pointer m_SelectionProvider;
+  MinimalView();
 
-  SelectionView();
-
-  virtual ~SelectionView();
+  virtual ~MinimalView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  virtual void ChangeExtensionLabelText(QString s);
+
 private:
 
-  
-  private slots:
-     void TestMethod(); //Debugging only!
 
 protected:
 
   void SetFocus();
 
-  Ui::SelectionViewControls m_Controls;
+  Ui::MinimalViewControls m_Controls;
 
   QWidget* m_Parent;
 
 };
 
-#endif /*SELECTIONVIEW_H_*/
+#endif /*MINIMALVIEW_H_*/

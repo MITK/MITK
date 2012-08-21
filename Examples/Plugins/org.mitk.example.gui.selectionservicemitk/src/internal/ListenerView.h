@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define LISTENERVIEW_H_
 
 /// Qmitk
+//#include <QmitkFunctionality.h>
 #include <QmitkAbstractView.h>
 
 /// Berry
@@ -29,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_ListenerViewControls.h"
 
-class ListenerView : public QmitkAbstractView
+class ListenerView : public QmitkAbstractView//public QmitkFunctionality
 {
 
   Q_OBJECT
@@ -44,7 +45,10 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  //virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+
 private:
+
     void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
                      berry::ISelection::ConstPointer selection);
 

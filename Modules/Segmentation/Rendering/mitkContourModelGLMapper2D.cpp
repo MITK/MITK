@@ -38,12 +38,17 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   if(IsVisible(renderer)==false) return;
 
-  ////  @FIXME: Logic for update
   bool updateNeccesary=true;
+
+  int timestep = renderer->GetTimeStep();
 
   mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput());
 
-  int timestep = renderer->GetTimeStep();
+  input->UpdateOutputInformation();
+
+
+  if( input->GetMTime() < this->m_LastUpdateTime )
+    updateNeccesary = false;
 
   if(input->GetNumberOfVertices(timestep) < 1)
     updateNeccesary = false;

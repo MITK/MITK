@@ -65,6 +65,32 @@ See LICENSE.txt or http://www.mitk.org for details.
   }                                                                                     \
 
 
+
+const std::type_info &mitk::GetPixelTypeFromITKImageIO(const itk::ImageIOBase::Pointer imageIO)
+{
+  // return the component type for scalar types
+  if( imageIO->GetNumberOfComponents() == 1)
+  {
+    return imageIO->GetComponentTypeInfo();
+  }
+  else
+  {
+    itk::ImageIOBase::IOPixelType ptype = imageIO->GetPixelType();
+
+    switch(ptype)
+    {
+    case itk::ImageIOBase::RGBA:
+      return typeid( itk::RGBAPixel< unsigned char> );
+      break;
+    case itk::ImageIOBase::RGB:
+      return typeid( itk::RGBPixel< unsigned char>);
+      break;
+    default:
+      return imageIO->GetComponentTypeInfo();
+    }
+  }
+}
+
 mitk::PixelType::PixelType( const mitk::PixelType& other )
   : m_ComponentType( other.m_ComponentType ),
     m_PixelType( other.m_PixelType),

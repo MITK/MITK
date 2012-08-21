@@ -41,10 +41,10 @@ TPDPixelType>
     m_StepSize(1),
     m_MaxLength(10000),
     m_SeedsPerVoxel(1),
-    m_AngularThreshold(0.7),
     m_F(1.0),
     m_G(0.0),
-    m_Interpolate(true)
+    m_Interpolate(true),
+    m_MinTractLength(0.0)
 {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
@@ -172,7 +172,20 @@ TPDPixelType>
                 m_EmaxImage->SetPixel(index, 2/eigenvalues[2]);
             }
 
-    std::cout << "StreamlineTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
+    if (m_Interpolate)
+        std::cout << "StreamlineTrackingFilter: using trilinear interpolation" << std::endl;
+    else
+    {
+        if (m_MinCurvatureRadius<0.0)
+            m_MinCurvatureRadius = 0.1*minSpacing;
+
+        std::cout << "StreamlineTrackingFilter: using nearest neighbor interpolation" << std::endl;
+    }
+
+    if (m_MinCurvatureRadius<0.0)
+        m_MinCurvatureRadius = 0.5*minSpacing;
+
+    std::cout << "StreamlineTrackingFilter: Min. curvature radius: " << m_MinCurvatureRadius << std::endl;
     std::cout << "StreamlineTrackingFilter: FA threshold: " << m_FaThreshold << std::endl;
     std::cout << "StreamlineTrackingFilter: stepsize: " << m_StepSize << " mm" << std::endl;
     std::cout << "StreamlineTrackingFilter: f: " << m_F << std::endl;
@@ -336,17 +349,96 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 }
 
 template< class TTensorPixelType, class TPDPixelType>
-void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
+bool StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
+::IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType &index, vnl_vector_fixed< float, 8 >& interpWeights)
+{
+    if (m_MaskImage->GetPixel(index)==0 || !m_InputImage->GetLargestPossibleRegion().IsInside(index))
+        return false;
+
+    if (m_Interpolate)
+    {
+        float frac_x = pos[0] - index[0];
+        float frac_y = pos[1] - index[1];
+        float frac_z = pos[2] - index[2];
+
+        if (frac_x<0)
+        {
+            index[0] -= 1;
+            frac_x += 1;
+        }
+        if (frac_y<0)
+        {
+            index[1] -= 1;
+            frac_y += 1;
+        }
+        if (frac_z<0)
+        {
+            index[2] -= 1;
+            frac_z += 1;
+        }
+
+        frac_x = 1-frac_x;
+        frac_y = 1-frac_y;
+        frac_z = 1-frac_z;
+
+        // int coordinates inside image?
+        if (index[0] < 0 || index[0] >= m_ImageSize[0]-1)
+            return false;
+        if (index[1] < 0 || index[1] >= m_ImageSize[1]-1)
+            return false;
+        if (index[2] < 0 || index[2] >= m_ImageSize[2]-1)
+            return false;
+
+        interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
+        interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
+        interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
+        interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
+        interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
+        interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
+        interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
+        interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
+
+        typename InputImageType::IndexType tmpIdx;
+        float FA = m_FaImage->GetPixel(index) * interpWeights[0];
+        tmpIdx = index; tmpIdx[0]++;
+        FA +=  m_FaImage->GetPixel(tmpIdx) * interpWeights[1];
+        tmpIdx = index; tmpIdx[1]++;
+        FA +=  m_FaImage->GetPixel(tmpIdx) * interpWeights[2];
+        tmpIdx = index; tmpIdx[2]++;
+        FA +=  m_FaImage->GetPixel(tmpIdx) * interpWeights[3];
+        tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++;
+        FA +=  m_FaImage->GetPixel(tmpIdx) * interpWeights[4];
+        tmpIdx = index; tmpIdx[1]++; tmpIdx[2]++;
+        FA +=  m_FaImage->GetPixel(tmpIdx) * interpWeights[5];
+        tmpIdx = index; tmpIdx[2]++; tmpIdx[0]++;
+        FA +=  m_FaImage->GetPixel(tmpIdx) * interpWeights[6];
+        tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
+        FA +=  m_FaImage->GetPixel(tmpIdx) * interpWeights[7];
+
+        if (FA<m_FaThreshold)
+            return false;
+    }
+    else if (m_FaImage->GetPixel(index)<m_FaThreshold)
+        return false;
+
+    return true;
+}
+
+template< class TTensorPixelType, class TPDPixelType>
+float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 ::FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids)
 {
+    float tractLength = 0;
     typedef itk::DiffusionTensor3D<TTensorPixelType>    TensorType;
     typename TensorType::EigenValuesArrayType eigenvalues;
     typename TensorType::EigenVectorsMatrixType eigenvectors;
+    vnl_vector_fixed< float, 8 > interpWeights;
 
     typename InputImageType::IndexType index, indexOld;
     indexOld[0] = -1; indexOld[1] = -1; indexOld[2] = -1;
     itk::Point<double> worldPos;
     float distance = 0;
+    float distanceInVoxel = 0;
 
     // starting index and direction
     index[0] = RoundToNearest(pos[0]);
@@ -356,23 +448,31 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
     dir *= dirSign;                     // reverse direction
     vnl_vector_fixed<double,3> dirOld = dir;
     if (dir.magnitude()<mitk::eps)
-        return;
+        return tractLength;
 
     for (int step=0; step< m_MaxLength/2; step++)
     {
         // get new position
         CalculateNewPosition(pos, dir, index);
         distance += m_StepSize;
+        tractLength +=  m_StepSize;
+        distanceInVoxel += m_StepSize;
 
-        // are we still inside the image and is the fa value high enough?
-        if (!m_InputImage->GetLargestPossibleRegion().IsInside(index) || m_FaImage->GetPixel(index)<m_FaThreshold || m_MaskImage->GetPixel(index)==0)
+        // is new position valid (inside image, above FA threshold etc.)
+        if (!IsValidPosition(pos, index, interpWeights))   // if not add last point and end streamline
         {
             m_InputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
             ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
-            break;
+            return tractLength;
+        }
+        else if (distance>=m_PointPistance)
+        {
+            m_InputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
+            ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
+            distance = 0;
         }
 
-        if (!m_Interpolate)
+        if (!m_Interpolate)                         // use nearest neighbour interpolation
         {
             if (indexOld!=index)                    // did we enter a new voxel? if yes, calculate new direction
             {
@@ -387,76 +487,42 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 
                 float angle = dot_product(dirOld, dir);
                 if (angle<0)
+                {
                     dir *= -1;
-                angle = dot_product(dirOld, dir);
-                if (angle<m_AngularThreshold)
-                    break;
+                    angle *= -1;
+                }
+
+                float r = m_StepSize/(2*std::asin(std::acos(angle)/2));
+                if (r<m_MinCurvatureRadius)
+                    return tractLength;
 
                 if (dir.magnitude()<mitk::eps)
                     dir = dirOld;
                 else
                     dirOld = dir;
                 indexOld = index;
-
-                // add position to streamline
-                m_InputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
-                ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
+                distanceInVoxel = 0;
             }
             else
                 dir = dirOld;
         }
-        else
+        else // use trilinear interpolation (weights calculated in IsValidPosition())
         {
-            float frac_x = pos[0] - index[0];
-            float frac_y = pos[1] - index[1];
-            float frac_z = pos[2] - index[2];
-
-            if (frac_x<0)
-            {
-                index[0] -= 1;
-                frac_x += 1;
-            }
-            if (frac_y<0)
-            {
-                index[1] -= 1;
-                frac_y += 1;
-            }
-            if (frac_z<0)
-            {
-                index[2] -= 1;
-                frac_z += 1;
-            }
-
-            frac_x = 1-frac_x;
-            frac_y = 1-frac_y;
-            frac_z = 1-frac_z;
-
-            // int coordinates inside image?
-            if (index[0] < 0 || index[0] >= m_ImageSize[0]-1)
-                continue;
-            if (index[1] < 0 || index[1] >= m_ImageSize[1]-1)
-                continue;
-            if (index[2] < 0 || index[2] >= m_ImageSize[2]-1)
-                continue;
-
-            typename InputImageType::IndexType tmpIdx;
-            typename InputImageType::PixelType tensor = m_InputImage->GetPixel(index);
-            tensor *=  (  frac_x)*(  frac_y)*(  frac_z);
-
-            tmpIdx = index; tmpIdx[0]++;
-            tensor +=  m_InputImage->GetPixel(tmpIdx) * (1-frac_x)*(  frac_y)*(  frac_z);
+            typename InputImageType::PixelType tensor = m_InputImage->GetPixel(index) * interpWeights[0];
+            typename InputImageType::IndexType tmpIdx = index; tmpIdx[0]++;
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * interpWeights[1];
             tmpIdx = index; tmpIdx[1]++;
-            tensor +=  m_InputImage->GetPixel(tmpIdx) * (  frac_x)*(1-frac_y)*(  frac_z);
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * interpWeights[2];
             tmpIdx = index; tmpIdx[2]++;
-            tensor +=  m_InputImage->GetPixel(tmpIdx) * (  frac_x)*(  frac_y)*(1-frac_z);
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * interpWeights[3];
             tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++;
-            tensor +=  m_InputImage->GetPixel(tmpIdx) * (1-frac_x)*(1-frac_y)*(  frac_z);
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * interpWeights[4];
             tmpIdx = index; tmpIdx[1]++; tmpIdx[2]++;
-            tensor +=  m_InputImage->GetPixel(tmpIdx) * (  frac_x)*(1-frac_y)*(1-frac_z);
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * interpWeights[5];
             tmpIdx = index; tmpIdx[2]++; tmpIdx[0]++;
-            tensor +=  m_InputImage->GetPixel(tmpIdx) * (1-frac_x)*(  frac_y)*(1-frac_z);
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * interpWeights[6];
             tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-            tensor +=  m_InputImage->GetPixel(tmpIdx) * (1-frac_x)*(1-frac_y)*(1-frac_z);
+            tensor +=  m_InputImage->GetPixel(tmpIdx) * interpWeights[7];
 
             tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
             dir[0] = eigenvectors(2, 0);
@@ -472,10 +538,14 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 
             float angle = dot_product(dirOld, dir);
             if (angle<0)
+            {
                 dir *= -1;
-            angle = dot_product(dirOld, dir);
-            if (angle<m_AngularThreshold)
-                break;
+                angle *= -1;
+            }
+
+            float r = m_StepSize/(2*std::asin(std::acos(angle)/2));
+            if (r<m_MinCurvatureRadius)
+                return tractLength;
 
             if (dir.magnitude()<mitk::eps)
                 dir = dirOld;
@@ -483,16 +553,9 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 dirOld = dir;
 
             indexOld = index;
-
-            // add position to streamline
-            if (distance>=m_PointPistance)
-            {
-                m_InputImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
-                ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
-                distance = 0;
-            }
         }
     }
+    return tractLength;
 }
 
 template< class TTensorPixelType,
@@ -556,7 +619,7 @@ TPDPixelType>
             }
 
             // forward tracking
-            FollowStreamline(start, 1, points, pointIDs);
+            float tractLength = FollowStreamline(start, 1, points, pointIDs);
 
             // add ids to line
             counter += pointIDs.size();
@@ -571,15 +634,18 @@ TPDPixelType>
             line->GetPointIds()->InsertNextId(points->InsertNextPoint(worldPos.GetDataPointer()));
 
             // backward tracking
-            FollowStreamline(start, -1, points, pointIDs);
+            tractLength += FollowStreamline(start, -1, points, pointIDs);
+
+            counter += pointIDs.size();
+
+            if (tractLength<m_MinTractLength || counter<2)
+                continue;
 
             // add ids to line
-            counter += pointIDs.size();
             for (int i=0; i<pointIDs.size(); i++)
                 line->GetPointIds()->InsertNextId(pointIDs.at(i));
 
-            if (counter>1)
-                Cells->InsertNextCell(line);
+            Cells->InsertNextCell(line);
         }
         ++mit;
         ++mit2;

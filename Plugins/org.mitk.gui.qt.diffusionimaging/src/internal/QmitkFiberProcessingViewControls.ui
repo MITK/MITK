@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>665</width>
-    <height>677</height>
+    <height>683</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -776,7 +776,7 @@
             <number>0</number>
            </property>
            <property name="maximum">
-            <number>1000</number>
+            <number>10000</number>
            </property>
            <property name="value">
             <number>500</number>
@@ -809,7 +809,7 @@
          </font>
         </property>
         <property name="toolTip">
-         <string>Remove fibers with a higher curvature than specified (in degree).</string>
+         <string>Remove fibers with a too high curvature</string>
         </property>
         <property name="text">
          <string>Curvature Threshold</string>
@@ -832,34 +832,31 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <widget class="QSpinBox" name="m_CurvatureThresholdSpinBox">
+          <widget class="QDoubleSpinBox" name="m_MinCurvatureRadiusBox">
            <property name="toolTip">
-            <string>Maximum fiber curvature in degree</string>
-           </property>
-           <property name="minimum">
-            <number>0</number>
+            <string>Minimum radius of circle created by three consecutive points of a fiber</string>
            </property>
            <property name="maximum">
-            <number>180</number>
+            <double>100.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <number>45</number>
+            <double>2.000000000000000</double>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QSpinBox" name="m_CurvatureThresholdDistanceBox">
+          <widget class="QCheckBox" name="m_RemoveFiberDueToCurvatureCheckbox">
            <property name="toolTip">
-            <string>Accumulate curvature over given distance in mm</string>
+            <string>Remove whole fiber if it is exceeding the curvature threshold, otherwise remove only high curvature part.</string>
            </property>
-           <property name="minimum">
-            <number>1</number>
+           <property name="text">
+            <string>Remove Fiber</string>
            </property>
-           <property name="maximum">
-            <number>1000</number>
-           </property>
-           <property name="value">
-            <number>2</number>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

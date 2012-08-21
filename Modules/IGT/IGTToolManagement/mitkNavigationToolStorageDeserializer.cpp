@@ -27,6 +27,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 //POCO
 #include <Poco/Exception.h>
 
+
+#include "mitkIGTException.h"
+#include "mitkIGTIOException.h"
+
+
 mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer(mitk::DataStorage::Pointer dataStorage)
   {
   m_DataStorage = dataStorage;
@@ -55,10 +60,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
   bool success = false;
   
   //decomress zip file into temporary directory
-  success = decomressFiles(filename,m_tempDirectory);
-  
-  //currently returns an empty storage in case of an error. TODO when exception handling is availiable in MITK: Throw an exception?
-  if (!success) {return mitk::NavigationToolStorage::New();} 
+  decomressFiles(filename,m_tempDirectory);
   
   //now read all files and convert them to navigation tools
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New(m_DataStorage);
@@ -76,41 +78,43 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
     }
   if(i==1)
     {
+    //throw an exception here in case of not finding any tool
     m_ErrorMessage = "Error: did not find any tool. \n Is this a tool storage file?";
-    MITK_ERROR << "Error: did not find any tool. Is this a tool storage file?";
+    mitkThrowException(mitk::IGTException)<<"Error: did not find any tool. \n Is this a tool storage file?";
     }
   return returnValue;
   }
 
 std::string mitk::NavigationToolStorageDeserializer::convertIntToString(int i)
-  {
-  std::string s;
-  std::stringstream out;
-  out << i;
-  s = out.str();
-  return s;
-  }
+{
+std::string s;
+std::stringstream out;
+out << i;
+s = out.str();
+return s;
+}
 
-bool mitk::NavigationToolStorageDeserializer::decomressFiles(std::string filename,std::string path)
-  {
+void mitk::NavigationToolStorageDeserializer::decomressFiles(std::string filename,std::string path)
+{
   std::ifstream file( filename.c_str(), std::ios::binary );
   if (!file.good())
     {
     m_ErrorMessage = "Cannot open '" + filename + "' for reading";
-    return false;
+    mitkThrowException(mitk::IGTException)<<"Cannot open"+filename+" for reading";
     }
+
   try
     {
     Poco::Zip::Decompress unzipper( file, Poco::Path( path ) );
     unzipper.decompressAllFiles();
     file.close();
     }
+
   catch(Poco::IllegalStateException e) //temporary solution: replace this by defined exception handling later!
-    {
+    {  
     m_ErrorMessage = "Error: wrong file format! \n (please only load tool storage files)";
-    MITK_ERROR << "Error: wrong file format! (please only load tool storage files)";
-    return false;
+    MITK_ERROR << m_ErrorMessage;
+    mitkThrowException(mitk::IGTException) << m_ErrorMessage;
     }
 
-  return true;
   }

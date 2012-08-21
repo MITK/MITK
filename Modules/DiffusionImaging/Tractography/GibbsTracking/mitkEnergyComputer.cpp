@@ -55,7 +55,7 @@ EnergyComputer::EnergyComputer(ItkFloatImageType* mask, ParticleGrid* particleGr
     directionMatrix.set_column(2, d2);
     vnl_matrix_fixed<float, 3, 3> I = directionMatrix*directionMatrix.transpose();
     if(!I.is_identity(mitk::eps))
-        fprintf(stderr,"itkGibbsTrackingFilter: image direction is not a rotation matrix. Tracking not possible!\n");
+        fprintf(stderr,"EnergyComputer: image direction is not a rotation matrix. Tracking not possible!\n");
     m_RotationMatrix = directionMatrix;
 
     if (QBALL_ODFSIZE != m_SphereInterpolator->nverts)

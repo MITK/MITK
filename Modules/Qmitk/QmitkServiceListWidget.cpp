@@ -61,7 +61,7 @@ void QmitkServiceListWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_ServiceList, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnDeviceSelectionChanged()) );
+    connect( m_Controls->m_ServiceList, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnServiceSelectionChanged()) );
   }
 }
 
@@ -87,11 +87,22 @@ void QmitkServiceListWidget::InitPrivate(const std::string& namingProperty, cons
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
+bool QmitkServiceListWidget::GetIsServiceSelected(){
+  return (this->m_Controls->m_ServiceList->currentItem() != 0);
+}
+
 void QmitkServiceListWidget::OnServiceSelectionChanged(){
   mitk::ServiceReference ref = this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
-  if (! ref) return;
+  if (! ref){
+    emit (ServiceSelectionChanged(0));
+    return;
+  }
 
-  emit (ServiceSelected(ref));
+  emit (ServiceSelectionChanged(&ref));
+}
+
+mitk::ServiceReference QmitkServiceListWidget::GetSelectedService(){
+  return this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
 }
 
 
@@ -115,11 +126,9 @@ void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
       RemoveServiceFromList(event.GetServiceReference());
       break;
     case mitk::ServiceEvent::MODIFIED_ENDMATCH:
-      emit(ServiceModiefiedEndMatch(event.GetServiceReference()));
+      emit(ServiceModifiedEndMatch(event.GetServiceReference()));
       RemoveServiceFromList(event.GetServiceReference());
       break;
-  //default:
-    // mitkThrow() << "ServiceListenerWidget recieved an unrecognized event. Please Update Implementation of QmitkServiceListWidget::OnServiceEvent()";
   }
 }
 
@@ -166,18 +175,12 @@ mitk::ServiceReference QmitkServiceListWidget::GetServiceForListItem(QListWidget
 {
   for(std::vector<QmitkServiceListWidget::ServiceListLink>::iterator it = m_ListContent.begin(); it != m_ListContent.end(); ++it)
     if (item == it->item) return it->service;
+  // Return invalid ServiceReference (will evaluate to false in bool expressions)
+  return mitk::ServiceReference();
 }
 
 
 std::list<mitk::ServiceReference> QmitkServiceListWidget::GetAllRegisteredServices(){
   //Get Service References
   return m_Context->GetServiceReferences(m_Interface, m_Filter);
-}
-
-
-////////// DEBUG ///////////
-
-
-mitk::ModuleContext* QmitkServiceListWidget::provideContext(){
-  return m_Context;
 }

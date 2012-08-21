@@ -14,12 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QmitkToFPointSetWidget.h>
+#include "QmitkToFPointSetWidget.h"
 
 #include <QmitkTextOverlay.h>
 
 #include <mitkGlobalInteraction.h>
 #include <mitkVtkLayerController.h>
+
+#include <vtkTextProperty.h>
+
 
 const std::string QmitkToFPointSetWidget::VIEW_ID = "org.mitk.views.qmitktofpointsetwidget";
 
@@ -40,6 +43,7 @@ QmitkToFPointSetWidget::QmitkToFPointSetWidget(QWidget* parent, Qt::WindowFlags 
 , m_MeasurementPointSetInteractor(NULL)
 , m_MeasurementPointSetChangedObserverTag(0)
 , m_PointSetChangedObserverTag(0)
+, m_WindowHeight(0)
 {
   m_Controls = NULL;
   CreateQtPartControl(this);
@@ -55,8 +59,8 @@ QmitkToFPointSetWidget::~QmitkToFPointSetWidget()
   {
     m_PointSet2D->RemoveObserver(m_PointSetChangedObserverTag);
   }
-  if (m_MultiWidget)
-  {
+//  if (m_MultiWidget)
+//  {
     if (m_ForegroundRenderer1&&m_RenderWindow1)
     {
       if (mitk::VtkLayerController::GetInstance(m_RenderWindow1))
@@ -78,7 +82,7 @@ QmitkToFPointSetWidget::~QmitkToFPointSetWidget()
         mitk::VtkLayerController::GetInstance(m_RenderWindow3)->RemoveRenderer(m_ForegroundRenderer3);
       }
     }
-  }
+//  }
   if (mitk::RenderingManager::GetInstance())
   {
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -106,36 +110,37 @@ void QmitkToFPointSetWidget::CreateConnections()
   }
 }
 
-void QmitkToFPointSetWidget::InitializeWidget(QmitkStdMultiWidget* stdMultiWidget, mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer distanceImage)
+void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer distanceImage)
 {
   // initialize members
-  m_MultiWidget = stdMultiWidget;
+//  m_RenderWindowPart = renderWindowPart;
+    m_RenderWindow1 = renderWindowHashMap.value("transversal")->GetRenderWindow();
+    m_RenderWindow2 = renderWindowHashMap.value("sagittal")->GetRenderWindow();
+    m_RenderWindow3 = renderWindowHashMap.value("coronal")->GetRenderWindow();
+    m_RenderWindow4 = renderWindowHashMap.value("3d")->GetRenderWindow();
   m_DistanceImage = distanceImage;
-  if ((stdMultiWidget!=NULL)&&(dataStorage.IsNotNull()))
+  if ((m_RenderWindow1 != NULL) && (m_RenderWindow2 != NULL) && (m_RenderWindow3 != NULL) && (m_RenderWindow4 != NULL) && (dataStorage.IsNotNull()))
   {
     // enable buttons
     m_Controls->pointSetButton->setEnabled(true);
     m_Controls->measureButton->setEnabled(true);
     // initialize overlays
-    this->m_VtkTextActor = vtkTextActor::New();
+    this->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
     this->m_VtkTextActor->SetInput("Choose measurement points with SHIFT+Click");
-    int windowHeight = m_MultiWidget->mitkWidget1->GetRenderer()->GetSizeY();
-    this->m_VtkTextActor->SetDisplayPosition(10,windowHeight-30);
+    m_WindowHeight = renderWindowHashMap.value("transversal")->GetRenderer()->GetSizeY();
+    this->m_VtkTextActor->SetDisplayPosition(10,m_WindowHeight-30);
     this->m_VtkTextActor->GetTextProperty()->SetFontSize(16);
 //    this->m_VtkTextActor->GetTextProperty()->SetColor(1,0,0);
     this->m_VtkTextActor->GetTextProperty()->BoldOn();
     this->m_VtkTextActor->SetVisibility(0);
-    this->m_ForegroundRenderer1 = vtkRenderer::New();
+    this->m_ForegroundRenderer1 = vtkSmartPointer<vtkRenderer>::New();
     this->m_ForegroundRenderer1->AddActor(m_VtkTextActor);
-    m_RenderWindow1 = m_MultiWidget->mitkWidget1->GetRenderWindow();
-    mitk::VtkLayerController::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer1,true);
-    this->m_ForegroundRenderer2 = vtkRenderer::New();
+    mitk::VtkLayerController::GetInstance(m_RenderWindow1)->InsertForegroundRenderer(m_ForegroundRenderer1,true);
+    this->m_ForegroundRenderer2 = vtkSmartPointer<vtkRenderer>::New();
     this->m_ForegroundRenderer2->AddActor(m_VtkTextActor);
-    m_RenderWindow2 = m_MultiWidget->mitkWidget2->GetRenderWindow();
     mitk::VtkLayerController::GetInstance(m_RenderWindow2)->InsertForegroundRenderer(m_ForegroundRenderer2,true);
-    this->m_ForegroundRenderer3 = vtkRenderer::New();
+    this->m_ForegroundRenderer3 =vtkSmartPointer<vtkRenderer>::New();
     this->m_ForegroundRenderer3->AddActor(m_VtkTextActor);
-    m_RenderWindow3 = m_MultiWidget->mitkWidget3->GetRenderWindow();
     mitk::VtkLayerController::GetInstance(m_RenderWindow3)->InsertForegroundRenderer(m_ForegroundRenderer3,true);
     // initialize 2D measurement point set
     m_MeasurementPointSet2D = mitk::PointSet::New();
@@ -143,7 +148,7 @@ void QmitkToFPointSetWidget::InitializeWidget(QmitkStdMultiWidget* stdMultiWidge
     measurementNode2D->SetName("Measurement PointSet 2D");
     measurementNode2D->SetBoolProperty("helper object",true);
     measurementNode2D->SetBoolProperty("show contour",true);
-    measurementNode2D->SetVisibility(false,stdMultiWidget->mitkWidget4->GetRenderer());
+    measurementNode2D->SetVisibility(false, renderWindowHashMap.value("3d")->GetRenderer());
     measurementNode2D->SetData(m_MeasurementPointSet2D);
     dataStorage->Add(measurementNode2D);
     m_MeasurementPointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor",measurementNode2D,2);
@@ -167,7 +172,7 @@ void QmitkToFPointSetWidget::InitializeWidget(QmitkStdMultiWidget* stdMultiWidge
       m_PointSet2D = mitk::PointSet::New();
       mitk::DataNode::Pointer pointSet2DNode = mitk::DataNode::New();
       pointSet2DNode->SetName("ToF PointSet 2D");
-      pointSet2DNode->SetVisibility(false,stdMultiWidget->mitkWidget4->GetRenderer());
+      pointSet2DNode->SetVisibility(false, renderWindowHashMap.value("3d")->GetRenderer());
       pointSet2DNode->SetData(m_PointSet2D);
       dataStorage->Add(pointSet2DNode);
       m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor",pointSet2DNode);
@@ -254,8 +259,7 @@ void QmitkToFPointSetWidget::OnPointSet()
 void QmitkToFPointSetWidget::MeasurementPointSetChanged()
 {
   // replace text actor
-  int windowHeight = m_MultiWidget->mitkWidget1->GetRenderer()->GetSizeY();
-  this->m_VtkTextActor->SetDisplayPosition(10,windowHeight-30);
+  this->m_VtkTextActor->SetDisplayPosition(10,m_WindowHeight-30);
   // check if points are inside the image range
   int imageSizeX = m_DistanceImage->GetDimensions()[0];
   int imageSizeY = m_DistanceImage->GetDimensions()[1];

@@ -28,8 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyList.h>
 #include <mitkToFDistanceImageToPointSetFilter.h>
 
-// Qmitk headers
-#include <QmitkStdMultiWidget.h>
+//Qmitk headers
+#include <QmitkRenderWindow.h>
 
 // vtk includes
 #include <vtkSmartPointer.h>
@@ -68,7 +68,7 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     \param dataStorage DataStorage to add PointSets
     \param distanceImage range image used to calculate 3D PointSet from 2D index
     */
-    void InitializeWidget(QmitkStdMultiWidget* stdMultiWidget, mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer distanceImage);
+    void InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer distanceImage);
 
     /*!
     \brief specify the intrinsic parameters of the camera (holds focal length, principal point, distortion coefficients)
@@ -100,8 +100,6 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     Ui::QmitkToFPointSetWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
-    QmitkStdMultiWidget* m_MultiWidget; ///< multi widget used for overlay visualization
-
     mitk::Image::Pointer m_DistanceImage; ///< image holding the range data of the ToF camera
     mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< intrinsic parameters of the camera
 
@@ -112,6 +110,7 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     vtkSmartPointer<vtkRenderWindow> m_RenderWindow1; ///< vtk render window used for showing overlay in widget 1
     vtkSmartPointer<vtkRenderWindow> m_RenderWindow2; ///< vtk render window used for showing overlay in widget 2
     vtkSmartPointer<vtkRenderWindow> m_RenderWindow3; ///< vtk render window used for showing overlay in widget 3
+    vtkSmartPointer<vtkRenderWindow> m_RenderWindow4; ///< vtk render window used for showing overlay in widget 3
 
     mitk::PointSet::Pointer m_MeasurementPointSet2D; ///< PointSet holding the 2D ToF image point selection used for measuring
     mitk::DataNode::Pointer m_MeasurementPointSet3DNode; ///< DataNode holding the 3D ToF coordinates used for measuring
@@ -123,6 +122,8 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     long m_MeasurementPointSetChangedObserverTag; ///< observer tag for measurement PointSet observer
     long m_PointSetChangedObserverTag; ///< observer tag for PointSet observer
+
+    int m_WindowHeight; ///< Height of the renderWindow
 
   private:
 };

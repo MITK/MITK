@@ -50,7 +50,6 @@ using namespace std;
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_CurrentColorCoding(NULL)
     , m_NumFibers(0)
-    , m_RemoveFibers(true)
 {
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != NULL)
@@ -1161,9 +1160,9 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
     UpdateFiberGeometry();
 }
 
-bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
+bool mitk::FiberBundleX::ApplyCurvatureThreshold(float minRadius, bool deleteFibers)
 {
-    if (maxDeg<=0 || mm<=0)
+    if (minRadius<0)
         return true;
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
@@ -1178,11 +1177,8 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
         vtkIdType*  points(NULL);
         vtkOldCells->GetNextCell ( numPoints, points );
 
-        float curv = 0;
-        float dist = 0;
         // calculate curvatures
         vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-
         for (int j=0; j<numPoints-2; j++)
         {
             double p1[3];
@@ -1192,7 +1188,7 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
             double p3[3];
             m_FiberPolyData->GetPoint(points[j+2], p3);
 
-            vnl_vector_fixed< float, 3 > v1, v2;
+            vnl_vector_fixed< float, 3 > v1, v2, v3;
 
             v1[0] = p2[0]-p1[0];
             v1[1] = p2[1]-p1[1];
@@ -1202,35 +1198,36 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
             v2[1] = p3[1]-p2[1];
             v2[2] = p3[2]-p2[2];
 
-            dist += v1.magnitude()+v2.magnitude();
-            v1.normalize(); v2.normalize();
-            curv += 180*acos(dot_product(v1,v2))/M_PI;
+            v3[0] = p1[0]-p3[0];
+            v3[1] = p1[1]-p3[1];
+            v3[2] = p1[2]-p3[2];
+
+            float a = v1.magnitude();
+            float b = v2.magnitude();
+            float c = v3.magnitude();
+            float r = a*b*c/std::sqrt((a+b+c)*(a+b-c)*(b+c-a)*(a-b+c)); // radius of triangle via Heron's formula (area of triangle)
 
             vtkIdType id = vtkNewPoints->InsertNextPoint(p1);
             container->GetPointIds()->InsertNextId(id);
 
-            if (m_RemoveFibers && dist>=mm && curv>maxDeg)
+            if (deleteFibers && r<minRadius)
                 break;
 
-            if (j==numPoints-3)
+            if (r<minRadius)
+            {
+                j += 2;
+//                id = vtkNewPoints->InsertNextPoint(p2);
+//                container->GetPointIds()->InsertNextId(id);
+                vtkNewCells->InsertNextCell(container);
+                container = vtkSmartPointer<vtkPolyLine>::New();
+            }
+            else if (j==numPoints-3)
             {
                 id = vtkNewPoints->InsertNextPoint(p2);
                 container->GetPointIds()->InsertNextId(id);
                 id = vtkNewPoints->InsertNextPoint(p3);
                 container->GetPointIds()->InsertNextId(id);
                 vtkNewCells->InsertNextCell(container);
-            }
-            else if (dist>=mm)
-            {
-                if (curv>maxDeg)
-                {
-                    id = vtkNewPoints->InsertNextPoint(p2);
-                    container->GetPointIds()->InsertNextId(id);
-                    vtkNewCells->InsertNextCell(container);
-                    container = vtkSmartPointer<vtkPolyLine>::New();
-                }
-                dist = 0;
-                curv = 0;
             }
         }
     }

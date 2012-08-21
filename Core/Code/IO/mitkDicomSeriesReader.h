@@ -222,11 +222,18 @@ Stacked slices:
  Both errors are introduced in 
  itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
 
- For the correction, we examine two slices of a series, both described as a pair (origin/orientation):
-  - we calculate if the second origin is on a line along the normal of the first slice
+ For the correction, we examine two consecutive slices of a series, both described as a pair (origin/orientation):
+  - we calculate if the first origin is on a line along the normal of the second slice
     - if this is not the case, the geometry will not fit a normal mitk::Image/mitk::Geometry3D
     - we then project the second origin into the first slice's coordinate system to quantify the shift
     - both is done in class GantryTiltInformation with quite some comments.
+
+ The geometry of image stacks with tilted geometries is illustrated below:
+  - green: the DICOM images as described by their tags: origin as a point with the line indicating the orientation
+  - red: the output of ITK ImageSeriesReader: wrong, larger spacing, no tilt
+  - blue: how much a shear must correct 
+
+  \image tilt-correction.jpg
  
  \section DicomSeriesReader_whynotinitk Why is this not in ITK?
  
@@ -429,12 +436,16 @@ protected:
     If NOT, they can either be the result of an acquisition with
     gantry tilt OR completly broken by some shearing transformation.
 
-    All calculations are done in the constructor, results can then
+    Most calculations are done in the constructor, results can then
     be read via the remaining methods.
   */
   class GantryTiltInformation
   {
     public:
+
+      // two types to avoid any rounding errors
+      typedef  itk::Point<double,3> Point3Dd;
+      typedef itk::Vector<double,3> Vector3Dd;
 
       /**
         \brief Just so we can create empty instances for assigning results later.
@@ -444,7 +455,18 @@ protected:
       /**
         \brief THE constructor, which does all the calculations.
 
-        See code comments for explanation.
+        Determining the amount of tilt is done by checking the distances
+        of origin1 from planes through origin2. Two planes are considered:
+         - normal vector along normal of slices (right x up): gives the slice distance
+         - normal vector along orientation vector "up": gives the shift parallel to the plane orientation
+
+        The tilt angle can then be calculated from these distances
+
+        \param origin1 origin of the first slice
+        \param origin2 origin of the second slice
+        \param right right/up describe the orientatation of borth slices
+        \param up right/up describe the orientatation of borth slices
+        \param numberOfSlicesApart how many slices are the given origins apart (1 for neighboring slices)
       */
       GantryTiltInformation( const Point3D& origin1, 
                              const Point3D& origin2,
@@ -454,42 +476,56 @@ protected:
 
       /**
         \brief Whether the slices were sheared.
+
+        True if any of the shifts along right or up vector are non-zero.
       */
       bool IsSheared() const;
 
       /**
         \brief Whether the shearing is a gantry tilt or more complicated.
+
+        Gantry tilt will only produce shifts in ONE orientation, not in both.
+
+        Since the correction code currently only coveres one tilt direction
+        AND we don't know of medical images with two tilt directions, the
+        loading code wants to check if our assumptions are true.
       */
       bool IsRegularGantryTilt() const;
 
       /**
-        \brief The offset distance in Y direction for each slice (describes the tilt result).
+        \brief The offset distance in Y direction for each slice in mm (describes the tilt result).
       */
-      ScalarType GetMatrixCoefficientForCorrectionInWorldCoordinates() const;
+      double GetMatrixCoefficientForCorrectionInWorldCoordinates() const;
 
 
       /**
         \brief The z / inter-slice spacing. Needed to correct ImageSeriesReader's result.
       */
-      ScalarType GetRealZSpacing() const;
+      double GetRealZSpacing() const;
 
       /**
         \brief The shift between first and last slice in mm.
 
         Needed to resize an orthogonal image volume.
       */
-      ScalarType GetTiltCorrectedAdditionalSize() const;
+      double GetTiltCorrectedAdditionalSize() const;
+
+      /**
+        \brief Calculated tilt angle in degrees.
+      */
+      double GetTiltAngleInDegrees() const;
 
     protected:
 
       /**
         \brief Projection of point p onto line through lineOrigin in direction of lineDirection.
       */
-      Point3D projectPointOnLine( Point3D p, Point3D lineOrigin, Vector3D lineDirection ); 
+      Point3D projectPointOnLine( Point3Dd p, Point3Dd lineOrigin, Vector3Dd lineDirection ); 
 
-      ScalarType m_ShiftUp;
-      ScalarType m_ShiftRight;
-      ScalarType m_ShiftNormal;
+      double m_ShiftUp;
+      double m_ShiftRight;
+      double m_ShiftNormal;
+      double m_ITKAssumedSliceSpacing;
       unsigned int m_NumberOfSlicesApart;
   };
 
@@ -517,15 +553,34 @@ protected:
   static
   SliceGroupingAnalysisResult
   AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, bool groupsOfSimilarImages, const gdcm::Scanner::MappingType& tagValueMappings_);
-      
+  
+  /**
+    \brief Safely convert const char* to std::string.
+  */
   static
   std::string
   ConstCharStarToString(const char* s);
 
+  /**
+    \brief Convert DICOM string describing a point to Point3D.
+
+    DICOM tags like ImagePositionPatient contain a position as float numbers separated by backslashes:
+    \verbatim
+    42.7131\13.77\0.7
+    \endverbatim
+  */
   static
   Point3D
   DICOMStringToPoint3D(const std::string& s, bool& successful);
 
+  /**
+    \brief Convert DICOM string describing a point two Vector3D.
+
+    DICOM tags like ImageOrientationPatient contain two vectors as float numbers separated by backslashes:
+    \verbatim
+    42.7131\13.77\0.7\137.76\0.3
+    \endverbatim
+  */
   static
   void
   DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful);
@@ -533,6 +588,7 @@ protected:
   template <typename ImageType>
   static
   typename ImageType::Pointer
+  // TODO this is NOT inplace!
   InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTiltInformation& tiltInfo );
 
 
@@ -684,4 +740,4 @@ protected:
 }
 
 
-#endif /* MITKDICOMSERIESREADER_H_ */
+#endif /* mitkDicomSeriesReader_h */

@@ -94,10 +94,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
         tiltInfo = GantryTiltInformation ( origin1, origin2, right, up, filenames.size()-1 );
         correctTilt = tiltInfo.IsSheared() && tiltInfo.IsRegularGantryTilt();
-
-        MITK_DEBUG << "** Loading now: shear? " << tiltInfo.IsSheared();
-        MITK_DEBUG << "** Loading now: normal tilt? " << tiltInfo.IsRegularGantryTilt();
-        MITK_DEBUG << "** Loading now: perform tilt correction? " << correctTilt;
       }
       else
       {
@@ -403,12 +399,10 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
 
      Anybody who does this in a simpler way: don't forget to write up how and why your solution works
   */
-  typedef itk::AffineTransform< double, ImageType::ImageDimension > TransformType;
+  typedef itk::ScalableAffineTransform< double, ImageType::ImageDimension > TransformType;
   typename TransformType::Pointer transformShear = TransformType::New();
 
   /**
-    What I think should be done here:
-
     - apply a shear and spacing correction to the image block that corrects the ITK reader's error
       - ITK ignores the shear and loads slices into an orthogonal volume
       - ITK calculates the spacing from the origin distance, which is more than the actual spacing with gantry tilt images
@@ -419,29 +413,30 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
       - we apply a shearing transformation to the ITK-read image volume
         - to do this locally, 
           - we transform the image volume back to origin and "normal" orientation by applying the inverse of its transform
-            - this should bring us into the image's "index coordinate" system
+            (this brings us into the image's "index coordinate" system)
           - we apply a shear with the Y-shift factor put into a unit transform at row 1, col 2
-            - we probably would need the shift factor in index coordinates but we use mm, which appears strange, see below
-          - we transform the image volume back to its actual position
-            - presumably back from index to world coordinates
+          - we transform the image volume back to its actual position (from index to world coordinates)
       - we lastly apply modify the image spacing in z direction by replacing this number with the correctly calulcated inter-slice distance
-
-    Here comes the unsolved PROBLEM:
-     - WHY is it correct to apply the shift factor in millimeters, when we assume we are in a index coordinate system?
-       - or why is it not millimeters but index coordinates?
-       - or what else is the wrong assumption here?
-     - This is a serious question to anybody very firm in transforms, ITK, etc.
-       - this is also a chocolate reward question. Provide a good explanation with corrected code as a git commit and get it.
   */
   
-  // ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];
-  ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates();
+  ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];
   // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
   transformShear->Shear( 1, 2, factor );
  
   typename TransformType::Pointer imageIndexToWorld = TransformType::New();
   imageIndexToWorld->SetOffset( input->GetOrigin().GetVectorFromOrigin() );
-  imageIndexToWorld->SetMatrix( input->GetDirection() );
+
+  typename TransformType::MatrixType indexToWorldMatrix;
+  indexToWorldMatrix = input->GetDirection();
+
+  typename ImageType::DirectionType scale;
+  for ( unsigned int i = 0; i < ImageType::ImageDimension; i++ )
+  {
+    scale[i][i] = input->GetSpacing()[i];
+  }
+  indexToWorldMatrix *= scale;
+
+  imageIndexToWorld->SetMatrix( indexToWorldMatrix );
   
   typename TransformType::Pointer imageWorldToIndex = TransformType::New();
   imageIndexToWorld->GetInverse( imageWorldToIndex );
@@ -467,9 +462,34 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
 
   resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
 
+
+  // if tilt positive, then we need additional pixels BELOW origin, otherwise we need pixels behind the end of the block
+
+  // in any case we need more size to accomodate shifted slices
   typename ImageType::SizeType largerSize = resampler->GetSize(); // now the resampler already holds the input image's size.
   largerSize[1] += static_cast<typename ImageType::SizeType::SizeValueType>(tiltInfo.GetTiltCorrectedAdditionalSize());
   resampler->SetSize( largerSize );
+
+  // in SOME cases this additional size is below/behind origin
+  if ( tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() > 0.0 )
+  {
+    typename ImageType::DirectionType imageDirection = input->GetDirection();
+    Vector3D yDirection;
+    yDirection[0] = imageDirection[0][1];
+    yDirection[1] = imageDirection[1][1];
+    yDirection[2] = imageDirection[2][1];
+    yDirection.Normalize();
+
+    typename ImageType::PointType shiftedOrigin;
+    shiftedOrigin = input->GetOrigin();
+   
+    // add some pixels to make everything fit
+    shiftedOrigin[0] -= yDirection[0] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
+    shiftedOrigin[1] -= yDirection[1] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
+    shiftedOrigin[2] -= yDirection[2] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
+    
+    resampler->SetOutputOrigin( shiftedOrigin );
+  }
 
   resampler->Update();
   typename ImageType::Pointer result = resampler->GetOutput();

@@ -131,6 +131,19 @@ namespace mitk
     void AddVertex(mitk::Point3D &vertex, int timestep=0);
 
     //##Documentation
+    //## @brief Add a vertex to the contour at given timestep.
+    //## The vertex is added at the end of contour.
+    //##
+    //## @param vertex - coordinate representation of a control point
+    //## @param timestep - the timestep at which the vertex will be add ( default 0)
+    //##
+    //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    //## will not be added, the TimeSlicedGeometry will not be expanded.
+    //## @Note Also if the contour is closed the vertex will not be added.
+    //##
+    void AddVertex(VertexType &vertex, int timestep=0);
+
+    //##Documentation
     //## @brief Add a vertex to the contour.
     //##
     //## @param vertex - coordinate representation of a control point

@@ -37,8 +37,6 @@ class Image;
   \ingroup ToolManagerEtAl
 
   \warning Only to be instantiated by mitk::ToolManager.
-
-  $Author$
 */
 class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 {
@@ -52,23 +50,42 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 
   protected:
     
-    LiveWireTool2D(); // purposely hidden
+    LiveWireTool2D();
     virtual ~LiveWireTool2D();
 
     virtual void Activated();
     virtual void Deactivated();
     
+    //initialize tool
     virtual bool OnInitLiveWire (Action*, const StateEvent*);
+
+    //add a control point and finish current segment
     virtual bool OnAddPoint   (Action*, const StateEvent*);
+
+    // actual LiveWire computation
     virtual bool OnMouseMoved(Action*, const StateEvent*);
+
+    //check double click on first control point to finish the LiveWire tool
     virtual bool OnCheckPoint(Action*, const StateEvent*);
+
+    //finish LiveWire tool
     virtual bool OnFinish(Action*, const StateEvent*);
+
+    //close the contour
     virtual bool OnCloseContour(Action*, const StateEvent*);
 
 
+    //the contour already set by the user
     mitk::ContourModel::Pointer m_Contour;
+    //the corresponding datanode
     mitk::DataNode::Pointer m_ContourModelNode;
 
+    //the current LiveWire computed contour
+    mitk::ContourModel::Pointer m_LiveWireContour;
+    //the corresponding datanode
+    mitk::DataNode::Pointer m_LiveWireContourNode;
+
+    //the current reference image
     Image::Pointer m_WorkingSlice;
 };
 

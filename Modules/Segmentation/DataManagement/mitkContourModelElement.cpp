@@ -44,6 +44,13 @@ void mitk::ContourModelElement::AddVertex(mitk::Point3D &vertex, bool isActive)
 
 
 
+void mitk::ContourModelElement::AddVertex(VertexType &vertex)
+{
+  this->m_Vertices->push_back(&vertex);
+}
+
+
+
 void mitk::ContourModelElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isActive, int index)
 {
   if(index > 0 && this->GetSize() > index)
@@ -98,8 +105,6 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetV
 
     ConstVertexIterator end = this->m_Vertices->end();
 
-    nearestlist.push_front( std::pair<double, VertexType*>( (*it)->Coordinates.EuclideanDistanceTo(point), (*it) ));
-
     while(it != end)
     {
       mitk::Point3D currentPoint = (*it)->Coordinates;
@@ -107,8 +112,13 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetV
       double distance = currentPoint.EuclideanDistanceTo(point);
       if(distance < eps)
       {
+        //if list is emtpy, add point to list
+        if(nearestlist.size() < 1)
+        {
+          nearestlist.push_front(std::pair<double, VertexType*>( (*it)->Coordinates.EuclideanDistanceTo(point), (*it) ));
+        }
         //found an approximate point - check if current is closer then first in nearestlist
-        if( distance < nearestlist.front().first )
+        else if( distance < nearestlist.front().first )
         {
           //found even closer vertex
           nearestlist.push_front(std::pair<double, VertexType*>( (*it)->Coordinates.EuclideanDistanceTo(point), (*it) ));
@@ -117,8 +127,11 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetV
 
       it++;
     }//while
-    //return closest point
-    return nearestlist.front().second;
+    if(nearestlist.size() > 0)
+    {
+      //return closest point
+      return nearestlist.front().second;
+    }
   }
   return NULL;
 }

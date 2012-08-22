@@ -17,6 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef PIXELTYPETRAITS_H
 #define PIXELTYPETRAITS_H
 
+#include <itkImageIOBase.h>
+#include <itkRGBPixel.h>
+#include <itkRGBAPixel.h>
+#include <itkDiffusionTensor3D.h>
+
 /** \file mitkPixelTypeTraits.h
   *
   * The pixel type traits are in general used for compile time resolution of the component type and
@@ -123,5 +128,88 @@ struct ComponentsTrait<false, T>
   static const size_t Size = T::ValueType::Length;
 };
 
+typedef itk::ImageIOBase::IOPixelType itkIOPixelType;
+
+/** \brief Object for compile-time translation of a composite pixel type into an itk::ImageIOBase::IOPixelType information
+ *
+ * The default value of the IOCompositeType is the UNKNOWNPIXELTYPE, the default value will be used for all but the
+ * types below with own partial specialization. The values of the IOCompositeType member in the specializations correspond
+ * to the values of the itk::ImageIOBase::IOPixelType enum values.
+ */
+template< class T>
+struct MapCompositePixelType
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::UNKNOWNPIXELTYPE;
+};
+
+//------------------------
+// Partial template specialization for fixed-length types
+//------------------------
+
+template< class C>
+struct MapCompositePixelType< itk::RGBPixel<C> >
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::RGB;
+};
+
+template< class C>
+struct MapCompositePixelType< itk::RGBAPixel<C> >
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::RGBA;
+};
+
+template< class C>
+struct MapCompositePixelType< itk::DiffusionTensor3D<C> >
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::DIFFUSIONTENSOR3D;
+};
+
+//------------------------
+// Partial template specialization for variable-length types
+//------------------------
+template< class C, unsigned int N>
+struct MapCompositePixelType< itk::Vector< C,N > >
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::VECTOR;
+};
+
+template< class C, unsigned int N>
+struct MapCompositePixelType< itk::FixedArray< C,N > >
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::COVARIANTVECTOR;
+};
+
+template< class C, unsigned int N>
+struct MapCompositePixelType< itk::CovariantVector< C,N > >
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::COVARIANTVECTOR;
+};
+
+template< class C, unsigned int N>
+struct MapCompositePixelType< itk::Matrix< C,N > >
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::MATRIX;
+};
+
+/** \brief Object for compile-time translation of a pixel type into an itk::ImageIOBase::IOPixelType information
+ *
+ * The first template parameter is the pixel type to be translated, the second parameter determines the processing
+ * way. For non-primitive types the first template parameter is passed to the MapCompositePixelType object to be resolved there
+ * for primitive types the value is set to SCALAR.
+ *
+ * To initalize the flag correctly in compile-time use the \sa isPrimitiveType<T> trait.
+ */
+template< class T, bool Primitive>
+struct MapPixelType
+{
+  static const itkIOPixelType IOType = MapCompositePixelType<T>::IOCompositeType;
+};
+
+/** \brief Partial specialization for setting the IOPixelType for primitive types to SCALAR */
+template<class T>
+struct MapPixelType< T, true>
+{
+  static const itkIOPixelType IOType = itk::ImageIOBase::SCALAR;
+};
 
 #endif // PIXELTYPETRAITS_H

@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include <mitkDataStorage.h>
+#include <mitkSurface.h>
+#include <mitkPointSet.h>
+#include <mitkImage.h>
 
 namespace mitk {
 
@@ -60,6 +63,64 @@ public:
    * \see LoadFiles(std::vector<std::string>,DataStorage)
    */
   static DataStorage::Pointer LoadFiles(const std::vector<std::string>& fileNames);
+
+  /**
+   * @brief LoadDataNode Method to load an arbitrary DataNode.
+   * @param path The path to the file including file name and file extension.
+   * @return Returns the DataNode.
+   */
+  static mitk::DataNode::Pointer LoadDataNode(const std::string path);
+
+  /**
+   * @brief LoadImage Convenience method to load an arbitrary mitkImage.
+   * @param path The path to the image including file name and file extension.
+   * @return Returns the mitkImage.
+   */
+  static mitk::Image::Pointer LoadImage(const std::string path);
+
+  /**
+   * @brief LoadSurface Convenience method to load an arbitrary mitkSurface.
+   * @param path The path to the surface including file name and file extension.
+   * @return Returns the mitkSurface.
+   */
+  static mitk::Surface::Pointer LoadSurface(const std::string path);
+
+  /**
+   * @brief LoadPointSet Convenience method to load an arbitrary mitkPointSet.
+   * @param path The path to the pointset including file name and file extension (currently, only .mps is supported).
+   * @return Returns the mitkPointSet.
+   */
+  static mitk::PointSet::Pointer LoadPointSet(const std::string path);
+
+  /**
+   * @brief SaveImage Convenience method to save an arbitrary mitkImage.
+   * @param path The path to the image including file name and file extension.
+   * If not extention is set, the default value (defined in DEFAULTIMAGEEXTENSION) is used.
+   * @param image The image to save.
+   * @return Returns true for success else false.
+   */
+  static bool SaveImage(mitk::Image::Pointer image, const std::string path);
+
+  /**
+   * @brief SaveSurface Convenience method to save an arbitrary mitkSurface.
+   * @param path The path to the surface including file name and file extension.
+   * If not extention is set, the default value (defined in DEFAULTSURFACEEXTENSION) is used.
+   * @return Returns true for success else false.
+   */
+  static bool SaveSurface(mitk::Surface::Pointer surface, const std::string path);
+
+  /**
+   * @brief SavePointSet Convenience method to save an mitkPointSet.
+   * @param path The path to the pointset including file name and file extension (currently, only .mps is supported).
+   * If not extention is set, the default value (defined in DEFAULTPOINTSETEXTENSION) is used.
+   * @return Returns true for success else false.
+   */
+  static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string path);
+
+  static const std::string DEFAULTIMAGEEXTENSION;
+  static const std::string DEFAULTSURFACEEXTENSION;
+  static const std::string DEFAULTPOINTSETEXTENSION;
+
 };
 
 }

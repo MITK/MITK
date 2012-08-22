@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryQtWorkbenchAdvisor.h"
 #include "internal/berryQtGlobalEventFilter.h"
 #include "berryQtPreferences.h"
+#include "BlueBerryConfig.h"
 
 #include <berryPlatform.h>
 #include <berryIPreferencesService.h>
@@ -54,6 +55,24 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
   QTextCodec* utf8Codec = QTextCodec::codecForName("UTF-8");
   QTextCodec::setCodecForCStrings(utf8Codec);
   QTextCodec::setCodecForTr(utf8Codec);
+
+  // Add search paths for Qt plugins
+  foreach(QString qtPluginPath, BlueBerryQtPluginPaths())
+  {
+    // For installed applications, the following path does usually not exist
+    if (QFile::exists(qtPluginPath))
+    {
+      QCoreApplication::addLibraryPath(qtPluginPath);
+    }
+  }
+
+  // Add a default search path. It is assumed that installed applications
+  // provide their Qt plugins in that path.
+  static const QString defaultQtPluginPath = QCoreApplication::applicationDirPath() + "/plugins";
+  if (QFile::exists(defaultQtPluginPath))
+  {
+    QCoreApplication::addLibraryPath(defaultQtPluginPath);
+  }
 }
 
 }

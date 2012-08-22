@@ -103,6 +103,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DOpacityTest.cpp
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
+    mitkIOUtilTest.cpp
 )
 
 # Create an artificial module initializing class for

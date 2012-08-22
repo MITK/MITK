@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkToFPointSetWidget::VIEW_ID = "org.mitk.views.qmitktofpointsetwidget";
 
 QmitkToFPointSetWidget::QmitkToFPointSetWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
+, m_DistanceImage(NULL)
 , m_CameraIntrinsics(NULL)
 , m_VtkTextActor(NULL)
 , m_ForegroundRenderer1(NULL)
@@ -110,15 +111,14 @@ void QmitkToFPointSetWidget::CreateConnections()
   }
 }
 
-void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer distanceImage)
+void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage)
 {
   // initialize members
-//  m_RenderWindowPart = renderWindowPart;
-    m_RenderWindow1 = renderWindowHashMap.value("transversal")->GetRenderWindow();
-    m_RenderWindow2 = renderWindowHashMap.value("sagittal")->GetRenderWindow();
-    m_RenderWindow3 = renderWindowHashMap.value("coronal")->GetRenderWindow();
-    m_RenderWindow4 = renderWindowHashMap.value("3d")->GetRenderWindow();
-  m_DistanceImage = distanceImage;
+  //  m_RenderWindowPart = renderWindowPart;
+  m_RenderWindow1 = renderWindowHashMap.value("transversal")->GetRenderWindow();
+  m_RenderWindow2 = renderWindowHashMap.value("sagittal")->GetRenderWindow();
+  m_RenderWindow3 = renderWindowHashMap.value("coronal")->GetRenderWindow();
+  m_RenderWindow4 = renderWindowHashMap.value("3d")->GetRenderWindow();
   if ((m_RenderWindow1 != NULL) && (m_RenderWindow2 != NULL) && (m_RenderWindow3 != NULL) && (m_RenderWindow4 != NULL) && (dataStorage.IsNotNull()))
   {
     // enable buttons
@@ -193,6 +193,11 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
       dataStorage->Add(m_PointSet3DNode);
     }
   }
+}
+
+void QmitkToFPointSetWidget::SetDistanceImage(mitk::Image::Pointer distanceImage)
+{
+  m_DistanceImage = distanceImage;
 }
 
 void QmitkToFPointSetWidget::SetCameraIntrinsics(mitk::CameraIntrinsics::Pointer cameraIntrinsics)

@@ -111,24 +111,172 @@ background: rgb(210, 221, 239);
 background: yellow;
 }*/
 
-/*QtPerspectiveSwitcherTabBar
+QtPerspectiveSwitcherTabBar
 {
-background: green;
-}*/
+/*background: green;*/
+/*top: 100px;*/
+}
+
+QHBoxLayout#PerspectivesLayer
+{
+top: 10px;
+}
 
 /*QtPerspectiveSwitcherTabBar::tab-bar
 {
-background: pink;
+background: green;
+left: 10px;
 }*/
+
+QTabWidget::tab-bar
+{
+/*left: 12px;*/
+}
 
 QtPerspectiveSwitcherTabBar::tab
 {
+/*left: 12px;*/
+min-height: 24px; 
+border-top: 1px solid palette(mid); 
+border-left: 1px solid palette(mid); 
+/*border-bottom: 1px solid palette(mid);*/
+border-bottom: 0px;
+border-top-left-radius: 8px; 
+border-top-right-radius: 8px; 
+margin-top: -1px;
+margin-right: 4px;
+padding-left: 5px;
 background: rgb(210, 221, 239);
 }
 
+/*QtPerspectiveSwitcherTabBar::tab:selected { 
+left: 12px;
+min-height: 24px; 
+border-top: 1px solid palette(mid); 
+border-left: 1px solid palette(mid); 
+border-bottom: 1px solid palette(mid); 
+border-top-left-radius: 8px; 
+border-top-right-radius: 8px; 
+margin-top: -1px;
+margin-right: 4px;
+padding-left: 5px;
+background: rgb(210, 221, 239);
+}*/
+
+/*QtPerspectiveSwitcherTabBar::tab:selected { 
+left: 12px;
+border-right: 1px solid palette(Mid); 
+border-bottom: 0px; 
+border-top-left-radius: 8px; 
+border-top-right-radius: 8px; 
+}*/
+
+QtPerspectiveSwitcherTabBar::tab:selected:hover { 
+/*left: 12px;*/
+min-height: 24px; 
+border-top: 1px solid palette(mid); 
+border-left: 1px solid palette(mid); 
+border-bottom: 1px solid palette(mid); 
+border-top-left-radius: 8px; 
+border-top-right-radius: 8px; 
+margin-top: -1px;
+margin-right: 4px;
+padding-left: 5px;
+background: yellow;
+}
+
+QtPerspectiveSwitcherTabBar::tab:!selected { 
+/*left: 12px;*/
+min-height: 24px; 
+border-top: 1px solid palette(mid); 
+border-left: 1px solid palette(mid); 
+border-top-left-radius: 8px; 
+border-top-right-radius: 8px; 
+margin-top: 5px;
+margin-right: 4px;
+padding-left: 5px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(156, 181, 220), stop:1 rgb(130, 160, 210));
+}
+
+QtPerspectiveSwitcherTabBar::tab:!selected:hover { 
+/*left: 12px;*/
+min-height: 24px; 
+border-top: 1px solid palette(mid); 
+border-left: 1px solid palette(mid); 
+border-bottom: 1px solid palette(mid); 
+border-top-left-radius: 8px; 
+border-top-right-radius: 8px; 
+margin-top: 5px;
+margin-right: 4px;
+padding-left: 5px;
+background: yellow;
+}
+
+
+/*QtPerspectiveSwitcherTabBar::tab:hover { 
+background: yellow;
+left: 12px;
+border-right: 1px solid palette(Mid); 
+border-bottom: 0px; 
+border-top-left-radius: 8px; 
+border-top-right-radius: 8px; 
+}*/
+
+/*QtPerspectiveSwitcherTabBar::tab::pane
+{
+position: absolute;
+bottom: -5em;
+}*/
+
+/*QTabWidget::pane
+{
+position: absolute;
+top: -0.5em;
+}*/
+
+/*QtPerspectiveSwitcherTabBar::tab:first { 
+margin-left: -1px;
+border-left: 0px; 
+border-top-left-radius: 8px; 
+}*/
+
+/*QtPerspectiveSwitcherTabBar::tab:last { 
+border-right: 1px solid palette(mid); 
+border-top-right-radius: 8px 
+}*/
+
+/*QtPerspectiveSwitcherTabBar::tab:selected:!hover { 
+left: 12px;
+border-right: 1px solid palette(Mid); 
+border-bottom: 0px; 
+border-top-left-radius: 8px; 
+border-top-right-radius: 8px; 
+}*/
+
+/*QtPerspectiveSwitcherTabBar::tab:!selected:!hover { 
+left: 12px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(156, 181, 220), stop:1 rgb(130, 160, 210));
+margin-top: 5px;
+}*/
+
+/*QtPerspectiveSwitcherTabBar::tab:hover:!selected { 
+background: yellow;
+left: 12px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(156, 181, 220), stop:1 rgb(130, 160, 210));
+margin-top: 5px;
+}*/
+
+/*QWidget
+{
+border: 1px solid green;
+}*/
+
 QFrame#StandaloneViewForm
 {
+/*margin-top: -200px;*/
+/*border: 10px solid black;*/
 background: rgb(210, 221, 239);
+border-top: 0px;
 }
 
 QPushButton#StyleUpdateButton
@@ -157,10 +305,10 @@ QWidget#CentralWidget
 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(43, 75, 116), stop:1 rgb(197, 245, 254));
 }
 
-/*QWidget#PageComposite
+QWidget#PageComposite
 {
-background: green;
-}*/
+margin: 0 px;
+}
 
 /*QFrame#PartPaneControl
 {

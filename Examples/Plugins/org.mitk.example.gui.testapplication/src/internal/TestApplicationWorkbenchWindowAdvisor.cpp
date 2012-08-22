@@ -133,7 +133,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QProgressBar *progBar = new QProgressBar();
   qStatusBar->addPermanentWidget(progBar, 0);
 
-  //mainWindow->dumpObjectTree();
+  mainWindow->dumpObjectTree();
   //progBar->hide();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
@@ -189,9 +189,12 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   PerspectivesTabBar->addTab("Perspective 1");
   PerspectivesTabBar->addTab("Perspective 2");
   PerspectivesTabBar->setVisible(true);
+  PerspectivesTabBar->setDrawBase(false);
   QVBoxLayout* CentralWidgetLayout = new QVBoxLayout(CentralWidget);
   QHBoxLayout* PerspectivesLayer = new QHBoxLayout(mainWindow);
+  PerspectivesLayer->setObjectName("PerspectivesLayer");
   CentralWidgetLayout->addLayout(PerspectivesLayer);
+  CentralWidgetLayout->addSpacing(-18);
   PerspectivesLayer->addWidget(PerspectivesTabBar);
   PerspectivesLayer->addSpacing(300);
   QPushButton* StyleUpdateButton = new QPushButton("Update Style", mainWindow);
@@ -203,6 +206,7 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
 
   //CentralWidgetLayout->addWidget(PerspectivesTabBar);
   CentralWidgetLayout->addWidget(PageComposite);
+  //CentralWidgetLayout->addSpacing(-13);
   CentralWidget->setLayout(CentralWidgetLayout);
   //CentralWidget->resize(mainWindow->size());
   //QSize Size = CentralWidget->size();

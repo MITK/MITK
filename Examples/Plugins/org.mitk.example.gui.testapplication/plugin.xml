@@ -35,4 +35,10 @@
       class="QmitkDataManagerView" />
   </extension>
   
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.simplerenderwindowview" 
+      name="Simple Render Window View" 
+      class="SimpleRenderWindowView" />
+  </extension>
+  
 </plugin>

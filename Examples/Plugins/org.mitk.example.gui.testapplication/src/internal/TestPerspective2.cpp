@@ -33,6 +33,7 @@ void TestPerspective2::CreateInitialLayout(berry::IPageLayout::Pointer layout)
   //layout->AddView("org.mitk.views.datamanager", false, 1.0f, editorArea);
   //layout->GetViewLayout("org.mitk.views.datamanager")->SetCloseable(false);
   //layout->GetViewLayout("org.mitk.views.datamanager")->SetMoveable(false);
+  //layout->AddStandaloneView("org.mitk.views.simplerenderwindowview", false, 3, 1.0f, layout->GetEditorArea());
 
   ////layout->AddStandaloneView(TestView::VIEW_ID,true,2,0.33f, layout->GetEditorArea());
   //layout->AddView(TestView::VIEW_ID, 2, 0.33f, editorArea);

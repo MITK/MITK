@@ -10,6 +10,7 @@ set(INTERNAL_CPP_FILES
   MinimalView.cpp
   TestApplicationWorkbenchWindowAdvisor.cpp
   QtPerspectiveSwitcherTabBar.cpp
+  SimpleRenderWindowView.cpp
 )
 
 set(MOC_H_FILES
@@ -21,6 +22,7 @@ set(MOC_H_FILES
   src/internal/MinimalView.h
   src/internal/TestApplicationWorkbenchWindowAdvisor.h
   src/internal/QtPerspectiveSwitcherTabBar.h
+  src/internal/SimpleRenderWindowView.h
 )
 
 set(UI_FILES

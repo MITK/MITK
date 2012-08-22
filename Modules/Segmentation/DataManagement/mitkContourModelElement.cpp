@@ -292,3 +292,10 @@ bool mitk::ContourModelElement::RemoveVertexAt(mitk::Point3D &point, float eps)
   }
   return false;
 }
+
+
+
+void mitk::ContourModelElement::Clear()
+{
+  this->m_Vertices->clear();
+}

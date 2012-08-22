@@ -303,6 +303,19 @@ void mitk::ContourModel::ShiftVertex(VertexType* vertex, mitk::Vector3D &vector)
 
 
 
+void mitk::ContourModel::Clear(int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    //clear data at timestep
+    this->m_ContourSeries[timestep]->Clear();
+    this->InitializeEmpty();
+    this->Modified();
+  }
+}
+
+
+
 void mitk::ContourModel::Expand( int timeSteps )
 {
   int oldSize = this->m_ContourSeries.size();

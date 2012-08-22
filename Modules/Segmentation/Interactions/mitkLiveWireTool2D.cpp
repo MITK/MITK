@@ -49,7 +49,7 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   m_LiveWireContour = mitk::ContourModel::New();
   m_LiveWireContourNode = mitk::DataNode::New();
   m_LiveWireContourNode->SetData( m_LiveWireContour );
-  m_LiveWireContourNode->SetProperty("name", StringProperty::New("contour node"));
+  m_LiveWireContourNode->SetProperty("name", StringProperty::New("active livewire node"));
   m_LiveWireContourNode->SetProperty("visible", BoolProperty::New(true));
   m_LiveWireContourNode->AddProperty( "color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
@@ -125,6 +125,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_ToolManager->GetDataStorage()->Add( m_LiveWireContourNode );
   
   m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
+  m_Contour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
 
 
   //render
@@ -161,7 +162,7 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
 
 
   //clear the livewire contour and reset the corresponding datanode
-  m_LiveWireContour->Clear();
+  m_LiveWireContour->Clear(timestep);
   m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
 
   //render
@@ -191,7 +192,7 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
 
   ContourModel::VertexType* currentVertex = const_cast<ContourModel::VertexType*>(m_LiveWireContour->GetVertexAt(0));
 
-  m_LiveWireContour->Clear();
+  m_LiveWireContour->Clear(timestep);
   m_LiveWireContour->AddVertex(*currentVertex, timestep);
   m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
   /* END actual LiveWire computation */
@@ -223,11 +224,14 @@ bool mitk::LiveWireTool2D::OnCheckPoint( Action* action, const StateEvent* state
   /* END check if event can be handled */
 
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
+
   mitk::StateEvent* newStateEvent = NULL;
 
   mitk::Point3D click = positionEvent->GetWorldPosition();
 
-  mitk::Point3D first = this->m_Contour->GetVertexAt(0)->Coordinates;
+  mitk::Point3D first = this->m_Contour->GetVertexAt(0, timestep)->Coordinates;
 
 
   if (first.EuclideanDistanceTo(click) < 1.5)
@@ -260,6 +264,16 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   if (!positionEvent) return false;
   /* END check if event can be handled */
 
+  //actual timestep
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
+  //clear LiveWire node
+  m_ToolManager->GetDataStorage()->Remove( m_LiveWireContourNode );
+  m_LiveWireContourNode = NULL;
+  m_LiveWireContour = NULL;
+
+  //remove last control point being added by double click
+  m_Contour->RemoveVertexAt(m_Contour->GetNumberOfVertices(timestep) -1 , timestep);
 
   //TODO visual feedback for completing livewire tool
   m_ContourModelNode->AddProperty( "color", ColorProperty::New(1.0, 1.0, 0.1), NULL, true );
@@ -285,7 +299,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   m_LiveWireContour = mitk::ContourModel::New();
   m_LiveWireContourNode = mitk::DataNode::New();
   m_LiveWireContourNode->SetData( m_LiveWireContour );
-  m_LiveWireContourNode->SetProperty("name", StringProperty::New("contour node"));
+  m_LiveWireContourNode->SetProperty("name", StringProperty::New("active livewire node"));
   m_LiveWireContourNode->SetProperty("visible", BoolProperty::New(true));
   m_LiveWireContourNode->AddProperty( "color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );

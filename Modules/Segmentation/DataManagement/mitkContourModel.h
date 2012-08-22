@@ -270,6 +270,14 @@ namespace mitk
     //##
     void ShiftContour(mitk::Vector3D &translate, int timestep=0);
 
+    //##Documentation
+    //## @brief Clear the storage container at given timestep.
+    //##
+    //## All control points are removed at
+    //## timestep.
+    //##
+    virtual void Clear(int timestep);
+
 
 /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/
     //##Documentation

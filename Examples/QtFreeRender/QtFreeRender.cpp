@@ -53,6 +53,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 //##Documentation
 //## @brief Example of a NON QT DEPENDENT MITK RENDERING APPLICATION. 
 
+
+mitk::RenderWindow::Pointer mitkWidget1;
+mitk::RenderWindow::Pointer mitkWidget2;
+mitk::RenderWindow::Pointer mitkWidget3;
+mitk::RenderWindow::Pointer mitkWidget4;
+
 mitk::DisplayVectorInteractor::Pointer    m_MoveAndZoomInteractor;
 mitk::CoordinateSupplier::Pointer         m_LastLeftClickPositionSupplier;
 mitk::GradientBackground::Pointer         m_GradientBackground4;
@@ -61,7 +67,7 @@ mitk::RenderWindowFrame::Pointer          m_RectangleRendering2;
 mitk::RenderWindowFrame::Pointer          m_RectangleRendering3;
 mitk::RenderWindowFrame::Pointer          m_RectangleRendering4;
 
-mitk::SliceNavigationController::Pointer m_TimeNavigationController;
+mitk::SliceNavigationController* m_TimeNavigationController = NULL;
 
 mitk::DataStorage::Pointer m_DataStorage;
 mitk::DataNode::Pointer m_PlaneNode1;
@@ -69,10 +75,6 @@ mitk::DataNode::Pointer m_PlaneNode2;
 mitk::DataNode::Pointer m_PlaneNode3;
 mitk::DataNode::Pointer m_Node;
 
-mitk::RenderWindow::Pointer mitkWidget1;
-mitk::RenderWindow::Pointer mitkWidget2;
-mitk::RenderWindow::Pointer mitkWidget3;
-mitk::RenderWindow::Pointer mitkWidget4;
 
 void InitializeWindows()
 {
@@ -88,7 +90,7 @@ void InitializeWindows()
     mitk::SliceNavigationController::Original );
 
     //initialize m_TimeNavigationController: send time via sliceNavigationControllers
-  m_TimeNavigationController = mitk::SliceNavigationController::New("dummy");
+  m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
   m_TimeNavigationController->ConnectGeometryTimeEvent(
     mitkWidget1->GetSliceNavigationController() , false);
   m_TimeNavigationController->ConnectGeometryTimeEvent(
@@ -100,20 +102,15 @@ void InitializeWindows()
   mitkWidget1->GetSliceNavigationController()
     ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
 
-  // Set TimeNavigationController to RenderingManager
-  // (which uses it internally for views initialization!)
-  mitk::RenderingManager::GetInstance()->SetTimeNavigationController(
-    m_TimeNavigationController );
-
   //reverse connection between sliceNavigationControllers and m_TimeNavigationController
   mitkWidget1->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget2->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget3->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget4->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
 
   // Let NavigationControllers listen to GlobalInteraction

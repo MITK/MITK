@@ -322,7 +322,7 @@ protected:
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
   mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
   mitk::PositionTracker::Pointer m_PositionTracker;
-  mitk::SliceNavigationController::Pointer m_TimeNavigationController;
+  mitk::SliceNavigationController* m_TimeNavigationController;
   mitk::SlicesRotator::Pointer m_SlicesRotator;
   mitk::SlicesSwiveller::Pointer m_SlicesSwiveller;
 

@@ -97,6 +97,8 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
   }
+
+  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage());
 }
 
 void QmitkToFUtilView::Activated()
@@ -321,8 +323,8 @@ void QmitkToFUtilView::OnToFCameraStarted()
     }
   }
   m_Controls->m_TextureCheckBox->setEnabled(true);
-  // initialize point set measurement
-  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage(),m_MitkDistanceImage);
+  // set distance image for point set measurement
+  m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()

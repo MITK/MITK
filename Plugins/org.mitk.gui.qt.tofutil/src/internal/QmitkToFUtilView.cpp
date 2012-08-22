@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -131,6 +131,9 @@ void QmitkToFUtilView::Activated()
     {
       m_Controls->m_ToFRecorderWidget->setEnabled(false);
       m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+      m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
+      m_Controls->tofMeasurementWidget->setEnabled(false);
+      m_Controls->SurfacePropertiesBox->setEnabled(false);
     }
   }
 }
@@ -245,6 +248,11 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
   m_Controls->m_ToFRecorderWidget->OnStop();
   m_Controls->m_ToFRecorderWidget->setEnabled(false);
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+  m_Controls->tofMeasurementWidget->setEnabled(false);
+  m_Controls->SurfacePropertiesBox->setEnabled(false);
+
+
+
   if(this->m_VideoSource)
   {
     this->m_VideoSource->StopCapturing();
@@ -299,6 +307,9 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_Frametimer->start(0);
 
     m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
+    m_Controls->m_ToFCompositeFilterWidget->setEnabled(true);
+    m_Controls->tofMeasurementWidget->setEnabled(true);
+    m_Controls->SurfacePropertiesBox->setEnabled(true);
 
     if (m_Controls->m_TextureCheckBox->isChecked())
     {
@@ -317,6 +328,10 @@ void QmitkToFUtilView::OnToFCameraStarted()
 void QmitkToFUtilView::OnToFCameraStopped()
 {
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+  m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
+  m_Controls->tofMeasurementWidget->setEnabled(false);
+  m_Controls->SurfacePropertiesBox->setEnabled(false);
+
   this->m_Frametimer->stop();
 }
 

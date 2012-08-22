@@ -15,10 +15,11 @@
 #! \param EXPORTED_INCLUDE_SUFFIXES (optional) a list of sub-directories which should
 #!        be added to the current source directory. The resulting directories
 #!        will be available in the set of include directories of depending plug-ins.
+#! \param DOXYGEN_TAGFILES (optional) Which external tag files should be available for the plugin documentation
 #! \param TEST_PLUGIN (option) Mark this plug-in as a testing plug-in.
 macro(MACRO_CREATE_CTK_PLUGIN)
 
-  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES" "TEST_PLUGIN;NO_QHP_TRANSFORM" ${ARGN})
+  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;DOXYGEN_TAGFILES" "TEST_PLUGIN;NO_QHP_TRANSFORM" ${ARGN})
 
   message(STATUS "Creating CTK plugin ${PROJECT_NAME}")
 

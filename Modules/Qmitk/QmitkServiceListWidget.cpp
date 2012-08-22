@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#define _USE_MATH_DEFINES
 #include <QmitkServiceListWidget.h>
 
-// STL HEaders
+// STL Headers
 #include <list>
 
 //QT headers
@@ -101,7 +101,7 @@ void QmitkServiceListWidget::OnServiceSelectionChanged(){
   emit (ServiceSelectionChanged(ref));
 }
 
-mitk::ServiceReference QmitkServiceListWidget::GetSelectedService(){
+mitk::ServiceReference QmitkServiceListWidget::GetSelectedServiceReference(){
   return this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
 }
 

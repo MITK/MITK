@@ -711,12 +711,6 @@ void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRender
 }
 
 
-//void RenderingManager::SetTimeNavigationController( SliceNavigationController *nc )
-//{
-//  m_TimeNavigationController = nc;
-//}
-
-
 const SliceNavigationController* RenderingManager::GetTimeNavigationController() const
 {
   return m_TimeNavigationController.GetPointer();

@@ -90,6 +90,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
   endif()
   
   include_directories(${Poco_INCLUDE_DIRS})
+  include_directories(${BlueBerry_BINARY_DIR})
 
   target_link_libraries(${PLUGIN_TARGET}
     optimized PocoFoundation debug PocoFoundationd

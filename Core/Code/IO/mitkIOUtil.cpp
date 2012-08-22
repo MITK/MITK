@@ -124,15 +124,15 @@ DataNode::Pointer IOUtil::LoadDataNode(const std::string path)
 Image::Pointer IOUtil::LoadImage(const std::string path)
 {
     mitk::DataNode::Pointer node = LoadDataNode(path);
-    if(!node)
+    if(node.IsNull())
     {
         MITK_ERROR << "DataNode is NULL'" << path << "'";
         return NULL; //No data found, thus we return NULL.
     }
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-    if(image.IsNotNull() && image->IsInitialized())
+    if(image.IsNull())
     {
-        MITK_ERROR << "Image is NULL or not initialized '" << path << "'";
+        MITK_ERROR << "Image is NULL '" << path << "'";
         return NULL; //No data found, thus we return NULL.
     }
     //Success
@@ -142,15 +142,15 @@ Image::Pointer IOUtil::LoadImage(const std::string path)
 Surface::Pointer IOUtil::LoadSurface(const std::string path)
 {
     mitk::DataNode::Pointer node = LoadDataNode(path);
-    if(!node)
+    if(node.IsNull())
     {
         MITK_ERROR << "DataNode is NULL'" << path << "'";
         return NULL; //No data found, thus we return NULL.
     }
     mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
-    if(surface.IsNotNull() && surface->IsInitialized())
+    if(surface.IsNull())
     {
-        MITK_ERROR << "Surface is NULL or not initialized '" << path << "'";
+        MITK_ERROR << "Surface is NULL '" << path << "'";
         return NULL; //No data found, thus we return NULL.
     }
     //Success
@@ -160,15 +160,15 @@ Surface::Pointer IOUtil::LoadSurface(const std::string path)
 PointSet::Pointer IOUtil::LoadPointSet(const std::string path)
 {
     mitk::DataNode::Pointer node = LoadDataNode(path);
-    if(!node)
+    if(node.IsNull())
     {
         MITK_ERROR << "DataNode is NULL'" << path << "'";
         return NULL; //No data found, thus we return NULL.
     }
     mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(node->GetData());
-    if(pointset.IsNotNull() && pointset->IsInitialized())
+    if(pointset.IsNull())
     {
-        MITK_ERROR << "Surface is NULL or not initialized '" << path << "'";
+        MITK_ERROR << "Surface is NULL '" << path << "'";
         return NULL; //No data found, thus we return NULL.
     }
     //Success
@@ -245,7 +245,6 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
                 triangleFilter->Update();
                 polys = triangleFilter->GetOutput();
                 polys->Register(NULL);
-                triangleFilter->Delete();
                 surface->SetVtkPolyData(polys);
             }
             surfaceWriter->SetInput( surface );
@@ -286,7 +285,7 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
 
 bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
 {
-    mitk::PointSetWriter* pointSetWriter = mitk::PointSetWriter::New();
+    mitk::PointSetWriter::Pointer pointSetWriter = mitk::PointSetWriter::New();
 
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );

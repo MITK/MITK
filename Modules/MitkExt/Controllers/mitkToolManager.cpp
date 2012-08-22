@@ -111,6 +111,13 @@ mitk::Tool* mitk::ToolManager::GetToolById(int id)
 
 bool mitk::ToolManager::ActivateTool(int id)
 {
+
+  if(this->GetDataStorage())
+    {
+      this->GetDataStorage()->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<ToolManager, const mitk::DataNode*>
+        ( this, &ToolManager::OnNodeRemoved ) );
+    }
+
   //MITK_INFO << "ToolManager::ActivateTool("<<id<<")"<<std::endl;
   //if( GetToolById(id) == NULL ) return false; // NO, invalid IDs are actually used here. Parameter -1 or anything that does not exists will deactivate all tools!
 
@@ -178,6 +185,8 @@ void mitk::ToolManager::SetReferenceData(DataVectorType data)
     m_ReferenceDataObserverTags.clear();
     for ( DataVectorType::iterator dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter )
     {
+      
+
       //MITK_INFO << "Observing " << (void*)(*dataIter) << std::endl;
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheReferenceDataDeleted );
@@ -491,5 +500,14 @@ int mitk::ToolManager::GetToolID( const Tool* tool )
     }
   }
   return -1;
+}
+
+
+void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode* node)
+{
+  //check all storage vectors
+  OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode*>(node), itk::DeleteEvent());
+  OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
+  OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
 }
 

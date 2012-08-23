@@ -88,7 +88,6 @@ namespace mitk
       return this->m_SelectedVertex;
     }
 
-
     //##Documentation
     //## @brief Deselect vertex.
     //##
@@ -97,6 +96,14 @@ namespace mitk
       this->m_SelectedVertex = NULL;
     }
 
+    //##Documentation
+    //## @brief Deselect vertex.
+    //##
+    void SetSelectedVertexAcitve(bool active=true)
+    {
+      if(this->m_SelectedVertex)
+        m_SelectedVertex->IsActive = active;
+    }
 
     //##Documentation
     //## @brief Set the interpolation of the line segments between control points.

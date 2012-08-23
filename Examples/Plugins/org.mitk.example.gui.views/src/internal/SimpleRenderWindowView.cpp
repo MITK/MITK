@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkServiceTracker.h>
 #include <berryIBerryPreferences.h>
 #include <mitkIRenderingManager.h>
-#include "org_mitk_example_gui_testapplication_Activator.h"
+#include "org_mitk_example_gui_views_Activator.h"
 
 #include <QVBoxLayout>
 
@@ -35,7 +35,7 @@ public:
 
   AbstractRenderWindowViewPrivate()
     : m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance()))
-    , m_PrefServiceTracker(org_mitk_example_gui_testapplication_Activator::GetPluginContext())
+    , m_PrefServiceTracker(org_mitk_example_gui_views_Activator::GetPluginContext())
   {
     m_PrefServiceTracker.open();
   }

@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QToolButton>
 
 //#include <QComboBox>
 //
@@ -60,7 +61,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //}
 
 TestApplicationWorkbenchWindowAdvisor::TestApplicationWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
-: berry::WorkbenchWindowAdvisor(configurer)
+: berry::WorkbenchWindowAdvisor(configurer), FileOpenAction(0)
 {
 }
 
@@ -70,6 +71,7 @@ TestApplicationWorkbenchWindowAdvisor::CreateActionBarAdvisor(
 {
   berry::ActionBarAdvisor::Pointer actionBarAdvisor(new berry::ActionBarAdvisor(configurer));
   return actionBarAdvisor;
+  delete FileOpenAction;
 }
 
 void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
@@ -155,9 +157,9 @@ void TestApplicationWorkbenchWindowAdvisor::PreWindowOpen()
 {
   berry::IWorkbenchWindowConfigurer::Pointer configurer = this->GetWindowConfigurer();
   configurer->SetShowCoolBar(false);
-  configurer->SetShowMenuBar(true);
+  configurer->SetShowMenuBar(false);
   configurer->SetShowPerspectiveBar(true);
-  configurer->SetShowStatusLine(true);
+  configurer->SetShowStatusLine(false);
   configurer->SetTitle("TestApplication");
 
   //this->GetWindowConfigurer()->AddEditorAreaTransfer(QStringList("text/uri-list"));
@@ -171,6 +173,10 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
 
   /*berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*>(window->GetShell()->GetControl());*/
+
+  berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
+
+  if (!this->FileOpenAction) this->FileOpenAction = new QmitkFileOpenAction(window);
 
   QMainWindow* mainWindow = static_cast<QMainWindow*>(shell->GetControl());
   mainWindow->setVisible(true);
@@ -186,8 +192,8 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   //QWidget* PageComposite = new berry::QtControlWidget(CentralWidget, shell.GetPointer());
   QtPerspectiveSwitcherTabBar* PerspectivesTabBar = new QtPerspectiveSwitcherTabBar(this->GetWindowConfigurer()->GetWindow());
   //QTabBar* PerspectivesTabBar = new QTabBar(CentralWidget);
-  PerspectivesTabBar->addTab("Perspective 1");
-  PerspectivesTabBar->addTab("Perspective 2");
+  PerspectivesTabBar->addTab("DICOM-Manager");
+  PerspectivesTabBar->addTab("Image Viewer");
   PerspectivesTabBar->setVisible(true);
   PerspectivesTabBar->setDrawBase(false);
   QVBoxLayout* CentralWidgetLayout = new QVBoxLayout(CentralWidget);
@@ -205,7 +211,12 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   QPushButton* StyleUpdateButton = new QPushButton("Update Style", mainWindow);
   StyleUpdateButton->setMaximumWidth(100);
   StyleUpdateButton->setObjectName("StyleUpdateButton");
-  PerspectivesLayer->addWidget(StyleUpdateButton);
+  QToolButton* OpenFileButton = new QToolButton(mainWindow);
+  OpenFileButton->setMaximumWidth(100);
+  OpenFileButton->setObjectName("FileOpenButton");
+  OpenFileButton->setDefaultAction(this->FileOpenAction);
+
+  PerspectivesLayer->addWidget(OpenFileButton);
 
   QObject::connect(StyleUpdateButton, SIGNAL( clicked() ), this, SLOT( UpdateStyle() ));
 

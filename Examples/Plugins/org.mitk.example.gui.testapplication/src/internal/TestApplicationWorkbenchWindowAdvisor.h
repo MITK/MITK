@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryWorkbenchWindowAdvisor.h>
 #include <QObject.h>
+#include <QmitkFileOpenAction.h>
 
 class TestApplicationWorkbenchWindowAdvisor : public QObject, public berry::WorkbenchWindowAdvisor
 {
@@ -42,6 +43,9 @@ private:
 private slots:
 
   void UpdateStyle();
+
+private:
+  QmitkFileOpenAction* FileOpenAction;
 
 
 //    berry::IDropTargetListener::Pointer dropTargetListener;

@@ -15,8 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "TestPerspective2.h"
-#include "MinimalView.h"
-#include "TestView.h"
+//#include "MinimalView.h"
+//#include "SimpleRenderWindowView.h"
+//#include "TestView.h"
 #include "berryIFolderLayout.h"
 
 TestPerspective2::TestPerspective2()
@@ -29,11 +30,11 @@ void TestPerspective2::CreateInitialLayout(berry::IPageLayout::Pointer layout)
   std::string editorArea = layout->GetEditorArea();
   layout->SetEditorAreaVisible(false);
   //layout->AddStandaloneView("org.mitk.views.testview", false, 1, 1.0f, layout->GetEditorArea());
-  layout->AddStandaloneView("org.mitk.views.datamanager", false, 1, 1.0f, layout->GetEditorArea());
+  layout->AddStandaloneView("org.mitk.views.datamanager", false, 1, 0.3f, layout->GetEditorArea());
   //layout->AddView("org.mitk.views.datamanager", false, 1.0f, editorArea);
   //layout->GetViewLayout("org.mitk.views.datamanager")->SetCloseable(false);
   //layout->GetViewLayout("org.mitk.views.datamanager")->SetMoveable(false);
-  //layout->AddStandaloneView("org.mitk.views.simplerenderwindowview", false, 3, 1.0f, layout->GetEditorArea());
+  layout->AddStandaloneView("org.mitk.views.simplerenderwindowview", false, 3, 0.7f, layout->GetEditorArea());
 
   ////layout->AddStandaloneView(TestView::VIEW_ID,true,2,0.33f, layout->GetEditorArea());
   //layout->AddView(TestView::VIEW_ID, 2, 0.33f, editorArea);

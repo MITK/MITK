@@ -103,11 +103,7 @@ void MinimalView::AddDataNodeFromDICOM(const QStringList& Properties)
   else
   {        
       this->GetDataStorage()->Add(node);
-
-      ctkServiceReference serviceReference = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getServiceReference<mitk::IDataStorageService>();
-      mitk::IDataStorageService* storageService = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
-      mitk::RenderingManager::GetInstance()->SetDataStorage(storageService->GetActiveDataStorage().GetPointer()->GetDataStorage());
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      //this->GetRenderWindowPart()->RequestUpdateAll();
   }
 }
 

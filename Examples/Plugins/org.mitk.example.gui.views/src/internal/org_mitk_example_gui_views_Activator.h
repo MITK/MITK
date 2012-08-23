@@ -15,25 +15,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef TESTPERSPECTIVE_H_
-#define TESTPERSPECTIVE_H_
+#ifndef org_mitk_example_gui_views_Activator_H
+#define org_mitk_example_gui_views_Activator_H
 
-#include <berryIPerspectiveFactory.h>
+#include <ctkPluginActivator.h>
+class ctkPluginContext;
 
-#include <QObject>
-
-
-class TestPerspective : public QObject, public berry::IPerspectiveFactory
+class org_mitk_example_gui_views_Activator :
+  public QObject, public ctkPluginActivator
 {
   Q_OBJECT
-  Q_INTERFACES(berry::IPerspectiveFactory)
+  Q_INTERFACES(ctkPluginActivator)
 
 public:
 
-  TestPerspective();
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  static ctkPluginContext* GetPluginContext();
+
+private:
+
+  static ctkPluginContext* PluginContext;
 
 };
 
-#endif /* TESTPERSPECTIVE_H_ */
+#endif // org_mitk_example_gui_views_Activator_H

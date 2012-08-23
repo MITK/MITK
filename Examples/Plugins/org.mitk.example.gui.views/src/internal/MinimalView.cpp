@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QMessageBox>
 
-#include "org_mitk_example_gui_testapplication_Activator.h"
+#include "org_mitk_example_gui_views_Activator.h"
 
 #include "mitkIDataStorageService.h"
 #include "mitkDicomSeriesReader.h"
@@ -48,7 +48,7 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
   m_Controls.setupUi(parent);
 
-  //ctkPluginContext* pluginContext = org_mitk_example_gui_testapplication_Activator::GetPluginContext();
+  //ctkPluginContext* pluginContext = org_mitk_example_gui_views_Activator::GetPluginContext();
   //ctkServiceReference serviceReference = pluginContext->getServiceReference<berry::idata>();
 
   ////always granted by org.blueberry.ui.qt
@@ -57,8 +57,8 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   //berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
   //Q_ASSERT(styleManager);
 
-  ctkServiceReference serviceReference = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getServiceReference<mitk::IDataStorageService>();
-  mitk::IDataStorageService* storageService = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
+  ctkServiceReference serviceReference = org_mitk_example_gui_views_Activator::GetPluginContext()->getServiceReference<mitk::IDataStorageService>();
+  mitk::IDataStorageService* storageService = org_mitk_example_gui_views_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
 
   storageService->GetActiveDataStorage().GetPointer()->GetDataStorage();
 
@@ -104,8 +104,8 @@ void MinimalView::AddDataNodeFromDICOM(const QStringList& Properties)
   {        
       this->GetDataStorage()->Add(node);
 
-      ctkServiceReference serviceReference = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getServiceReference<mitk::IDataStorageService>();
-      mitk::IDataStorageService* storageService = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
+      ctkServiceReference serviceReference = org_mitk_example_gui_views_Activator::GetPluginContext()->getServiceReference<mitk::IDataStorageService>();
+      mitk::IDataStorageService* storageService = org_mitk_example_gui_views_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
       mitk::RenderingManager::GetInstance()->SetDataStorage(storageService->GetActiveDataStorage().GetPointer()->GetDataStorage());
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

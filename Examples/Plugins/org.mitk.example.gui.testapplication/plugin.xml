@@ -23,22 +23,4 @@
     </perspective>
   </extension>
   
-  <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.minimalview"
-          name="Minimal View"
-          class="MinimalView"/>
-  </extension>
-  
-  <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.datamanager" 
-      name="Datamanager" 
-      class="QmitkDataManagerView" />
-  </extension>
-  
-  <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.simplerenderwindowview" 
-      name="Simple Render Window View" 
-      class="SimpleRenderWindowView" />
-  </extension>
-  
 </plugin>

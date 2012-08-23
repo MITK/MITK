@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "TestPerspective.h"
-#include "MinimalView.h"
-#include "TestView.h"
+//#include "MinimalView.h"
+//#include "TestView.h"
 #include "berryIFolderLayout.h"
 
 TestPerspective::TestPerspective()

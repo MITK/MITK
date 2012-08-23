@@ -271,11 +271,10 @@ export(TARGETS ${my_plugin_targets} ${additional_export_targets}
 
 add_subdirectory(Documentation)
 
-configure_file(BlueBerryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/BlueBerryConfig.cmake @ONLY)
-
-set(BLUEBERRY_QTPLUGIN_PATHS )
+set(BLUEBERRY_QTPLUGIN_PATH )
 if(CTK_QTDESIGNERPLUGINS_DIR AND EXISTS ${CTK_QTDESIGNERPLUGINS_DIR})
-  set(BLUEBERRY_QTPLUGIN_PATHS "${BLUEBERRY_QTPLUGIN_PATHS} << \"${CTK_QTDESIGNERPLUGINS_DIR}\"")
+  set(BLUEBERRY_QTPLUGIN_PATH "${CTK_QTDESIGNERPLUGINS_DIR}")
 endif()
-configure_file(BlueBerryConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/BlueBerryConfig.h @ONLY)
+
+configure_file(BlueBerryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/BlueBerryConfig.cmake @ONLY)
 

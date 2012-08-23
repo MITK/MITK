@@ -90,15 +90,17 @@ namespace mitk {
           //fill the buffer for each pixel/voxel
           for(unsigned int i = 0; i < bufferSize; i++)
           {
-            if(type == typeid(int)) //call integer function
+            // the comparison of the component type is sufficient enough since the mitk::PixelType type object is
+            // created as SCALAR and hence does not need the comparison against type.GetPixelTypeId() == itk::ImageIOBase::SCALAR
+            if(type.GetTypeId() == typeid(int)) //call integer function
             {
               imageBuffer[i] = (TPixelType)randomGenerator->GetIntegerVariate((int)randomMax);
               //TODO random generator does not support integer values in a given range (e.g. from 5-10)
               //range is always [0, (int)randomMax]
-            }else if((type == typeid(double)) || (type == typeid(float))) //call integer function
+            }else if((type.GetTypeId() == typeid(double)) || (type.GetTypeId() == typeid(float))) //call integer function
             {
               imageBuffer[i] = (TPixelType)randomGenerator->GetUniformVariate(randMin,randomMax);
-            }else if(type == typeid(unsigned char))
+            }else if(type.GetTypeId() == typeid(unsigned char))
             {
               //use the integer randomGenerator with mod 256 to generate unsigned char values
               imageBuffer[i] = (unsigned char) ((int)randomGenerator->GetIntegerVariate((int)randomMax)) % 256;

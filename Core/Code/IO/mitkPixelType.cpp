@@ -108,20 +108,21 @@ bool mitk::PixelType::operator==(const mitk::PixelType& rhs) const
 
   MITK_DEBUG << "m_NumberOfComponents = " << m_NumberOfComponents << " " << rhs.m_NumberOfComponents << std::endl;
   MITK_DEBUG << "m_BytesPerComponent = " << m_BytesPerComponent << " " << rhs.m_BytesPerComponent << std::endl;
+  MITK_DEBUG << "m_PixelTypeName = " << m_PixelTypeName << " " << rhs.m_PixelTypeName << std::endl;
+  MITK_DEBUG << "m_PixelType = " << m_PixelType << " " << rhs.m_PixelType << std::endl;
 
-  return ( this->m_PixelType == rhs.m_PixelType
-    && this->m_ComponentType == rhs.m_ComponentType
-    && this->m_NumberOfComponents == rhs.m_NumberOfComponents
-    && this->m_BytesPerComponent == rhs.m_BytesPerComponent
-    );
-}
+  bool returnValue = ( this->m_PixelType == rhs.m_PixelType
+                       && this->m_ComponentType == rhs.m_ComponentType
+                       && this->m_NumberOfComponents == rhs.m_NumberOfComponents
+                       && this->m_BytesPerComponent == rhs.m_BytesPerComponent
+                       );
 
-bool mitk::PixelType::operator ==(const std::type_info& typeId) const
-{
-  if( m_NumberOfComponents ==1 )
-      return (m_ComponentType == typeId);
+  if(returnValue)
+    MITK_DEBUG << " [TRUE] ";
   else
-      return (m_PixelType == typeId);
+    MITK_DEBUG << " [FALSE] ";
+
+  return returnValue;
 }
 
 bool mitk::PixelType::operator!=(const mitk::PixelType& rhs) const
@@ -129,9 +130,37 @@ bool mitk::PixelType::operator!=(const mitk::PixelType& rhs) const
   return !(this->operator==(rhs));
 }
 
-bool mitk::PixelType::operator!=(const std::type_info& typeId) const
+std::string mitk::PixelType::PixelNameFromItkIOType(ItkIOPixelType ptype)
 {
-  return !(this->operator==(typeId));
+  std::string s;
+  switch(ptype)
+  {
+  case itk::ImageIOBase::SCALAR:
+    return (s = "scalar");
+  case itk::ImageIOBase::VECTOR:
+    return (s = "vector");
+  case itk::ImageIOBase::COVARIANTVECTOR:
+    return (s = "covariant_vector");
+  case itk::ImageIOBase::POINT:
+    return (s = "point");
+  case itk::ImageIOBase::OFFSET:
+    return (s = "offset");
+  case itk::ImageIOBase::RGB:
+    return (s = "rgb");
+  case itk::ImageIOBase::RGBA:
+    return (s = "rgba");
+  case itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR:
+    return (s = "symmetric_second_rank_tensor");
+  case itk::ImageIOBase::DIFFUSIONTENSOR3D:
+    return (s = "diffusion_tensor_3D");
+  case itk::ImageIOBase::COMPLEX:
+    return (s = "complex");
+  case itk::ImageIOBase::UNKNOWNPIXELTYPE:
+    break;
+  default:
+    mitkThrow() << "Unknown pixel type "<< ptype;
+  }
+  return (s="unknown");
 }
 
 #define SET_ITK_TYPE_ID(anItkIoPixelType_test, numberOfComponents_test, ITK_TYPE)     \

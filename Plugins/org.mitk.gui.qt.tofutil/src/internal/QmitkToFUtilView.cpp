@@ -97,8 +97,6 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
   }
-
-  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage());
 }
 
 void QmitkToFUtilView::Activated()
@@ -128,6 +126,7 @@ void QmitkToFUtilView::Activated()
 
     m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
     m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
+    m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage());
 
     if (this->m_ToFImageGrabber.IsNull())
     {

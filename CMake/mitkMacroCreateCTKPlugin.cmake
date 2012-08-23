@@ -16,9 +16,10 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
     endif()
 
     set(_mitk_tagfile )
-    if(EXISTS ${MITK_DOXYGEN_OUTPUT_DIR}/MITK.tag)
+
+    if(EXISTS ${MITK_DOXYGEN_TAGFILE_NAME})
       # Todo: Point to stable documentations for stable builds
-      set(_mitk_tagfile "${MITK_DOXYGEN_OUTPUT_DIR}/MITK.tag=http://docs.mitk.org/nightly-qt4/")
+      set(_mitk_tagfile "${MITK_DOXYGEN_TAGFILE_NAME}=http://docs.mitk.org/nightly-qt4/")
     endif()
 
     MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}

@@ -133,15 +133,24 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
 //    this->m_VtkTextActor->GetTextProperty()->SetColor(1,0,0);
     this->m_VtkTextActor->GetTextProperty()->BoldOn();
     this->m_VtkTextActor->SetVisibility(0);
-    this->m_ForegroundRenderer1 = vtkSmartPointer<vtkRenderer>::New();
-    this->m_ForegroundRenderer1->AddActor(m_VtkTextActor);
-    mitk::VtkLayerController::GetInstance(m_RenderWindow1)->InsertForegroundRenderer(m_ForegroundRenderer1,true);
-    this->m_ForegroundRenderer2 = vtkSmartPointer<vtkRenderer>::New();
-    this->m_ForegroundRenderer2->AddActor(m_VtkTextActor);
-    mitk::VtkLayerController::GetInstance(m_RenderWindow2)->InsertForegroundRenderer(m_ForegroundRenderer2,true);
-    this->m_ForegroundRenderer3 =vtkSmartPointer<vtkRenderer>::New();
-    this->m_ForegroundRenderer3->AddActor(m_VtkTextActor);
-    mitk::VtkLayerController::GetInstance(m_RenderWindow3)->InsertForegroundRenderer(m_ForegroundRenderer3,true);
+    if (m_ForegroundRenderer1==NULL)
+    {
+      this->m_ForegroundRenderer1 = vtkSmartPointer<vtkRenderer>::New();
+      this->m_ForegroundRenderer1->AddActor(m_VtkTextActor);
+      mitk::VtkLayerController::GetInstance(m_RenderWindow1)->InsertForegroundRenderer(m_ForegroundRenderer1,true);
+    }
+    if (m_ForegroundRenderer2==NULL)
+    {
+      this->m_ForegroundRenderer2 = vtkSmartPointer<vtkRenderer>::New();
+      this->m_ForegroundRenderer2->AddActor(m_VtkTextActor);
+      mitk::VtkLayerController::GetInstance(m_RenderWindow2)->InsertForegroundRenderer(m_ForegroundRenderer2,true);
+    }
+    if (m_ForegroundRenderer3==NULL)
+    {
+      this->m_ForegroundRenderer3 =vtkSmartPointer<vtkRenderer>::New();
+      this->m_ForegroundRenderer3->AddActor(m_VtkTextActor);
+      mitk::VtkLayerController::GetInstance(m_RenderWindow3)->InsertForegroundRenderer(m_ForegroundRenderer3,true);
+    }
     // initialize 2D measurement point set
     m_MeasurementPointSet2D = mitk::PointSet::New();
     mitk::DataNode::Pointer measurementNode2D = mitk::DataNode::New();

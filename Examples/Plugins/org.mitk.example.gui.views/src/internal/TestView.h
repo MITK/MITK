@@ -15,21 +15,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MINIMALVIEW_H_
-#define MINIMALVIEW_H_
+#ifndef TESTVIEW_H_
+#define TESTVIEW_H_
 
-#include <QmitkAbstractView.h>
+//#include <QmitkAbstractView.h>
 #include <berryQtViewPart.h>
 
-//#include "ui_QmitkMinimalViewControls.h"
-#include "ui_QmitkTestView1.h"
+#include "ui_QmitkTestViewControls.h"
 
 #include <berryISelectionListener.h>
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryIStructuredSelection.h>
 
-class MinimalView : public QmitkAbstractView
+class TestView : public berry::QtViewPart
 {
 
   Q_OBJECT
@@ -38,9 +37,9 @@ public:
 
   static const std::string VIEW_ID;
 
-  MinimalView();
+  TestView();
 
-  virtual ~MinimalView();
+  virtual ~TestView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -54,17 +53,14 @@ public:
   //private slots:
   //   void ToggleRadioMethod(); //Debugging only!
 
-protected slots:
-  void AddDataNodeFromDICOM(const QStringList& Properties);
-
 protected:
 
   void SetFocus();
 
-  Ui::QmitkTestView1 m_Controls;
+  Ui::QmitkTestViewControls m_Controls;
 
   QWidget* m_Parent;
 
 };
 
-#endif /*MINIMALVIEW_H_*/
+#endif /*TESTVIEW_H_*/

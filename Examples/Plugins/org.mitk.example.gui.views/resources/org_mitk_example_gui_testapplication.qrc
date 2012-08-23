@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>teststyle.qss</file>
+     <file>teststyle-activetab.qss</file>
+     <file>teststyle-tab.qss</file>
+ </qresource>
+ </RCC>

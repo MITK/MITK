@@ -27,7 +27,7 @@ namespace mitk {
 
   /**
   *
-  * @brief This filter interpolates a subdivision curve between control points of the contour.
+  * \brief This filter interpolates a subdivision curve between control points of the contour.
   * For inserting subpoints Dyn-Levin-Gregory (DLG) interpolation scheme is used.
   * Interpolating a cruve subdivision is done by:
   * F2i = Ci
@@ -35,8 +35,8 @@ namespace mitk {
   *
   * The number of interpolation iterations can be set via SetNumberOfIterations(int) which are 4 by dafault.
   *
-  * @ingroup ContourModelFilters
-  * @ingroup Process
+  * \ingroup ContourModelFilters
+  * \ingroup Process
   */
   class Segmentation_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
   {

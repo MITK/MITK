@@ -227,14 +227,32 @@ bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, int tim
 
 
 
+bool mitk::ContourModel::RemoveVertex(VertexType* vertex, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    if(this->m_ContourSeries[timestep]->RemoveVertex(vertex))
+    {
+      this->Modified();
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
+      return true;
+    }
+  }
+  return false;
+}
+
+
+
 bool mitk::ContourModel::RemoveVertexAt(int index, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-    this->m_ContourSeries[timestep]->RemoveVertexAt(index);
-    this->Modified();
-    this->InvokeEvent( ContourModelSizeChangeEvent() );
-    return true;
+    if(this->m_ContourSeries[timestep]->RemoveVertexAt(index))
+    {
+      this->Modified();
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
+      return true;
+    }
   }
   return false;
 }
@@ -250,10 +268,6 @@ bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps, int tim
       this->Modified();
       this->InvokeEvent( ContourModelSizeChangeEvent() );
       return true;
-    }
-    else
-    {
-      return false;
     }
   }
   return false;

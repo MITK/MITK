@@ -101,8 +101,11 @@ namespace mitk
     //##
     void SetSelectedVertexAcitve(bool active=true)
     {
-      if(this->m_SelectedVertex)
+      if(this->m_SelectedVertex && (this->m_SelectedVertex->IsActive != active) )
+      {
         m_SelectedVertex->IsActive = active;
+        this->Modified();
+      }
     }
 
     //##Documentation
@@ -250,6 +253,13 @@ namespace mitk
     //## @return true = the vertex was successfuly removed;  false = wrong index.
     //##
     bool RemoveVertexAt(int index, int timestep=0);
+
+    //##Documentation
+    //## @brief Remove a vertex at given timestep within the container.
+    //##
+    //## @return true = the vertex was successfuly removed.
+    //##
+    bool RemoveVertex(VertexType* vertex, int timestep=0);
 
     //##Documentation
     //## @brief Remove a vertex at a query position in 3D space.

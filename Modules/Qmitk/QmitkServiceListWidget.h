@@ -103,7 +103,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * \brief  Initializes the Widget with essential parameters.
     *
     * The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
-    * This. Pass class T to tell the widget which class it should filter for - only services of this class will be listed.
+    * Pass class T to tell the widget which class it should filter for - only services of this class will be listed.
     * NamingProperty is a property that will be used to caption the Items in the list. If no filter is supplied, all
     * matching interfaces are shown. If no namingProperty is supplied, the interfaceName will be used to caption Items in the list.
     * For example, this Initialization will filter for all USDevices that are set to active. The USDevice's model will be used to display it in the list:
@@ -113,7 +113,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * \endverbatim
     */
     template <class T>
-    void Initialize(const std::string& namingProperty = "", std::string& filter = "")
+    void Initialize(const std::string& namingProperty = static_cast< std::string >(""), std::string& filter = static_cast< std::string >(""))
       {
         std::string interfaceName ( us_service_interface_iid<T*>() );
         m_Interface = interfaceName;

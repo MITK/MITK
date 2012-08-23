@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceEvent.h"
 
 /**
-* @brief TODO
+* @brief This Widget is used to manage available Ultrasound Devices.
 *
 * @ingroup USUI
 */

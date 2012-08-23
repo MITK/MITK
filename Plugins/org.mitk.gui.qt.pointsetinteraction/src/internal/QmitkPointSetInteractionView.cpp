@@ -147,12 +147,12 @@ void QmitkPointSetInteractionView::NodeChanged( const mitk::DataNode* node )
 
 void QmitkPointSetInteractionView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
 {
-  if(m_Controls)
-    m_Controls->m_PointListWidget->SetMultiWidget( &stdMultiWidget );
+    if(m_Controls)
+      m_Controls->m_PointListWidget->SetMultiWidget( &stdMultiWidget );
 }
 
 void QmitkPointSetInteractionView::StdMultiWidgetClosed( QmitkStdMultiWidget& /*stdMultiWidget*/ )
 {
-  if(m_Controls)
-    m_Controls->m_PointListWidget->SetMultiWidget( 0 );
+   if(m_Controls)
+      m_Controls->m_PointListWidget->SetMultiWidget( 0 );
 }

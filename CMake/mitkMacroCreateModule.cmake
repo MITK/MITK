@@ -191,18 +191,18 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
             list(APPEND CPP_FILES ${module_init_src_file})
           endif()
 
+          if(MODULE_FORCE_STATIC)
+            set(_STATIC STATIC)
+          else()
+            set(_STATIC )
+          endif(MODULE_FORCE_STATIC)
+
           if(NOT MODULE_QT_MODULE)
             ORGANIZE_SOURCES(SOURCE ${CPP_FILES}
                              HEADER ${H_FILES}
                              TXX ${TXX_FILES}
                              DOC ${DOX_FILES}
                             )
-
-            if(MODULE_FORCE_STATIC)
-              set(_STATIC STATIC)
-            else()
-              set(_STATIC )
-            endif(MODULE_FORCE_STATIC)
 
             set(coverage_sources ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TXX_FILES} ${TOOL_CPPS})
             if(MODULE_SUBPROJECTS)
@@ -274,7 +274,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
                 # LINK_DIRECTORIES applies only to targets which are added after the call to LINK_DIRECTORIES
                 link_directories(${ALL_LIBRARY_DIRS})
               endif(ALL_LIBRARY_DIRS)
-              add_library(${MODULE_PROVIDES} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP} ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+              add_library(${MODULE_PROVIDES} ${_STATIC} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP} ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
               target_link_libraries(${MODULE_PROVIDES} ${QT_LIBRARIES} ${ALL_LIBRARIES} QVTK)
               if(MODULE_TARGET_DEPENDS)
                 add_dependencies(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})

@@ -59,6 +59,8 @@ set(MODULE_TESTS
   #QmitkRenderingTestHelper.cpp
   mitkExceptionTest.cpp
   mitkExtractSliceFilterTest.cpp
+  mitkLogTest.cpp
+  mitkImageDimensionConverterTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -100,6 +102,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DLevelWindowTest.cpp
     mitkImageVtkMapper2DOpacityTest.cpp
     mitkImageVtkMapper2DColorTest.cpp
+    mitkImageVtkMapper2DSwivelTest.cpp
 )
 
 # Create an artificial module initializing class for

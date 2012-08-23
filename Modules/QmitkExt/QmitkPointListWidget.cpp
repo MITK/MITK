@@ -38,7 +38,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation):
   QWidget(parent), m_PointListView(NULL),  m_MultiWidget(NULL),  m_PointSetNode(NULL), m_Orientation(0),  m_MovePointUpBtn(NULL),
   m_MovePointDownBtn(NULL), m_RemovePointBtn(NULL), m_SavePointsBtn(NULL), m_LoadPointsBtn(NULL), m_ToggleAddPoint(NULL),
-  m_AddPoint(NULL), m_Interactor(NULL), m_TimeStep(0), m_EditAllowed(true), m_NodeObserverTag(0)
+  m_AddPoint(NULL), m_Interactor(NULL), m_TimeStep(0), m_EditAllowed(true), m_NodeObserverTag(0),
+  m_Snc1(NULL),
+  m_Snc2(NULL),
+  m_Snc3(NULL)
 {
   m_PointListView = new QmitkPointListView();
 
@@ -197,12 +200,8 @@ void QmitkPointListWidget::SetPointSet(mitk::PointSet* newPs)
 
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 {
-
   ObserveNewNode(newNode);
-  if (newNode != NULL)
-    dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(newNode);
-  else
-    dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(NULL);
+  dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(newNode);
 }
 
 void QmitkPointListWidget::OnBtnSavePoints()
@@ -353,7 +352,6 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
       m_Interactor = NULL;
     }
     emit EditPointSets(checked);
-    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();
   }
 }
 
@@ -365,14 +363,6 @@ void QmitkPointListWidget::OnBtnAddPointManually()
   editPointDialog.SetPoint(pointSet, currentPosition, m_TimeStep);
   editPointDialog.exec();
 }
-
-//void QmitkPointListWidget::SetMultiWidget(QmitkStdMultiWidget *multiWidget)
-//{
-//    this->m_MultiWidget = multiWidget;
-//    this->m_PointListView->SetMultiWidget(multiWidget);
-//}
-
-
 
 void QmitkPointListWidget::OnListDoubleClick()
 {
@@ -437,7 +427,8 @@ void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
 
   m_RemovePointBtn->setEnabled( m_PointSetNode );
   m_LoadPointsBtn->setEnabled( m_PointSetNode );
-  m_LoadPointsBtn->setEnabled( m_PointSetNode );
+  m_SavePointsBtn->setEnabled(m_PointSetNode);
+  m_AddPoint->setEnabled(m_PointSetNode);
 }
 
 void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject &  /*e*/ )
@@ -449,7 +440,27 @@ void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject &  /*e*/ )
   m_PointListView->SetPointSetNode(NULL);
   m_ToggleAddPoint->setEnabled(false);
 
-  m_RemovePointBtn->setEnabled( m_PointSetNode );
-  m_LoadPointsBtn->setEnabled( m_PointSetNode );
-  m_LoadPointsBtn->setEnabled( m_PointSetNode );
+  m_RemovePointBtn->setEnabled( false );
+  m_LoadPointsBtn->setEnabled( false );
+  m_SavePointsBtn->setEnabled(false);
+  m_AddPoint->setEnabled(false);
+}
+
+
+void QmitkPointListWidget::SetSnc1(mitk::SliceNavigationController* snc)
+{
+   m_Snc1 = snc;
+   m_PointListView->SetSnc1(snc);
+}
+
+void QmitkPointListWidget::SetSnc2(mitk::SliceNavigationController* snc)
+{
+   m_Snc2 = snc;
+   m_PointListView->SetSnc2(snc);
+}
+
+void QmitkPointListWidget::SetSnc3(mitk::SliceNavigationController* snc)
+{
+   m_Snc3 = snc;
+   m_PointListView->SetSnc3(snc);
 }

@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "intro/berryIntroDescriptor.h"
 #include "intro/berryWorkbenchIntroManager.h"
 
-#include "berryIStackableContainer.h"
+#include "berryILayoutContainer.h"
 
 #include "berryServiceLocator.h"
 

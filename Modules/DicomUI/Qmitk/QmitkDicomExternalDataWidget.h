@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$ 
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef QmitkDicomExternalDataWidget_h
 #define QmitkDicomExternalDataWidget_h
@@ -38,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QTimer>
+#include <QProgressDialog>
+#include <QLabel>
 
 /*!
 \brief QmitkDicomExternalDataWidget 
@@ -95,6 +96,9 @@ signals:
        /// @brief   Called when search parameters change.
         void OnSearchParameterChanged();
 
+        /// @brief   Called when import progress change.
+        void OnProgress(int progress);
+
 protected:
 
     /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index will be returned.
@@ -107,6 +111,8 @@ protected:
     ctkDICOMIndexer* m_ExternalIndexer;
     
     ctkFileDialog* m_ImportDialog;
+    QProgressDialog* m_ProgressDialog;
+    QLabel* m_ProgressDialogLabel;
 
     Ui::QmitkDicomExternalDataWidgetControls* m_Controls;
 

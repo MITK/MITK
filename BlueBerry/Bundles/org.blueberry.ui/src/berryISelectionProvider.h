@@ -69,7 +69,7 @@ struct BERRY_UI ISelectionProvider : public virtual Object {
      *
      * @param selection the new selection
      */
-    virtual void SetSelection(ISelection::Pointer selection) = 0;
+    virtual void SetSelection(ISelection::ConstPointer selection) = 0;
 };
 
 }

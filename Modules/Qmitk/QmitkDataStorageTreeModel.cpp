@@ -354,6 +354,10 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   {
     return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));
   }
+  else if(role == QmitkDataNodeRawPointerRole)
+  {
+    return QVariant::fromValue<mitk::DataNode*>(dataNode);
+  }
 
   return QVariant();
 }
@@ -505,7 +509,6 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
     if(node == 0
       || m_DataStorage.IsNull()
       || !m_DataStorage->Exists(node)
-      || !m_Predicate->CheckNode(node)
       || m_Root->Find(node) != 0)
       return;
 
@@ -517,7 +520,8 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
         m_HelperObjectObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("helper object")->AddObserver( itk::ModifiedEvent(), command ) ) );
     }
 
-    this->AddNodeInternal(node);
+    if (m_Predicate->CheckNode(node))
+      this->AddNodeInternal(node);
 }
 
 

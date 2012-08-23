@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -294,7 +294,7 @@ void WorkbenchPage::ActivationList::SetActive(SmartPointer<IWorkbenchPart> part)
 void WorkbenchPage::ActivationList::BringToTop(SmartPointer<
     IWorkbenchPartReference> ref)
 {
-  IStackableContainer::Pointer targetContainer(page->GetContainer(ref));
+  ILayoutContainer::Pointer targetContainer(page->GetContainer(ref));
 
   PartListIter newIndex = this->LastIndexOfContainer(targetContainer);
 
@@ -317,13 +317,13 @@ void WorkbenchPage::ActivationList::BringToTop(SmartPointer<
 }
 
 WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::LastIndexOfContainer(
-    SmartPointer<IStackableContainer> container)
+    SmartPointer<ILayoutContainer> container)
 {
   PartListReverseIter i = parts.rbegin();
   while (i != parts.rend())
   {
     IWorkbenchPartReference::Pointer ref(*i);
-    IStackableContainer::Pointer cnt(page->GetContainer(ref));
+    ILayoutContainer::Pointer cnt(page->GetContainer(ref));
     if (cnt == container)
     {
       return --i.base();
@@ -812,25 +812,25 @@ void WorkbenchPage::AddPostSelectionListener(const std::string& partId,
   selectionService->AddPostSelectionListener(partId, listener);
 }
 
-IStackableContainer::Pointer WorkbenchPage::GetContainer(
+ILayoutContainer::Pointer WorkbenchPage::GetContainer(
     IWorkbenchPart::Pointer part)
 {
   PartPane::Pointer pane = this->GetPane(part);
   if (pane == 0)
   {
-    return IStackableContainer::Pointer(0);
+    return ILayoutContainer::Pointer(0);
   }
 
   return pane->GetContainer();
 }
 
-IStackableContainer::Pointer WorkbenchPage::GetContainer(
+ILayoutContainer::Pointer WorkbenchPage::GetContainer(
     IWorkbenchPartReference::Pointer part)
 {
   PartPane::Pointer pane = this->GetPane(part);
   if (pane == 0)
   {
-    return IStackableContainer::Pointer(0);
+    return ILayoutContainer::Pointer(0);
   }
 
   return pane->GetContainer();
@@ -863,7 +863,7 @@ bool WorkbenchPage::InternalBringToTop(IWorkbenchPartReference::Pointer part)
   // Move part.
   if (part.Cast<IEditorReference> ().IsNotNull())
   {
-    IStackableContainer::Pointer container = this->GetContainer(part);
+    ILayoutContainer::Pointer container = this->GetContainer(part);
     if (container.Cast<PartStack> () != 0)
     {
       PartStack::Pointer stack = container.Cast<PartStack> ();
@@ -912,11 +912,11 @@ void WorkbenchPage::BringToTop(IWorkbenchPart::Pointer part)
   //  }
 
   IWorkbenchPartReference::Pointer ref = this->GetReference(part);
-  IStackableContainer::Pointer activeEditorContainer = this->GetContainer(
+  ILayoutContainer::Pointer activeEditorContainer = this->GetContainer(
       this->GetActiveEditor().Cast<IWorkbenchPart> ());
-  IStackableContainer::Pointer activePartContainer = this->GetContainer(
+  ILayoutContainer::Pointer activePartContainer = this->GetContainer(
       this->GetActivePart());
-  IStackableContainer::Pointer newPartContainer = this->GetContainer(part);
+  ILayoutContainer::Pointer newPartContainer = this->GetContainer(part);
 
   if (newPartContainer == activePartContainer)
   {
@@ -3799,17 +3799,17 @@ std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferenceStack(
     return std::vector<IViewReference::Pointer>();
   }
 
-  IStackableContainer::Pointer container =
+  ILayoutContainer::Pointer container =
   part->GetSite().Cast<PartSite> ()->GetPane()->GetContainer();
   if (container.Cast<PartStack> () != 0)
   {
     PartStack::Pointer folder = container.Cast<PartStack> ();
     std::vector<IViewReference::Pointer> list;
-    IStackableContainer::ChildrenType children = folder->GetChildren();
-    for (IStackableContainer::ChildrenType::iterator childIter =
+    ILayoutContainer::ChildrenType children = folder->GetChildren();
+    for (ILayoutContainer::ChildrenType::iterator childIter =
         children.begin(); childIter != children.end(); ++childIter)
     {
-      StackablePart::Pointer stackablePart = *childIter;
+      LayoutPart::Pointer stackablePart = *childIter;
       if (stackablePart.Cast<PartPane> () != 0)
       {
         IViewReference::Pointer view =
@@ -3857,7 +3857,7 @@ void WorkbenchPage::ResizeView(IViewPart::Pointer part, int width, int height)
 {
   SashInfo sashInfo;
   PartPane::Pointer pane = part->GetSite().Cast<PartSite> ()->GetPane();
-  IStackableContainer::Pointer container = pane->GetContainer();
+  ILayoutContainer::Pointer container = pane->GetContainer();
   LayoutTree::Pointer tree =
   this->GetPerspectivePresentation()->GetLayout()->GetLayoutTree()->Find(
       container.Cast<PartStack> ());

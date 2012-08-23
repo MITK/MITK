@@ -79,6 +79,7 @@ protected slots:
 
 private:
 
+  mitk::Image::Pointer          m_MaskImage;
   mitk::Image::Pointer          m_SeedRoi;
   mitk::TensorImage::Pointer    m_TensorImage;
   mitk::DataNode::Pointer       m_TensorImageNode;

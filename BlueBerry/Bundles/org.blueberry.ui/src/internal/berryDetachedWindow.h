@@ -112,7 +112,7 @@ public:
    * Adds a visual part to this window.
    * Supports reparenting.
    */
-  void Add(StackablePart::Pointer part);
+  void Add(LayoutPart::Pointer part);
 
   bool BelongsToWorkbenchPage(IWorkbenchPage::Pointer workbenchPage);
 
@@ -125,7 +125,7 @@ public:
       Object::Pointer draggedObject, const Point& position,
       const Rectangle& dragRectangle);
 
-  IStackableContainer::ChildrenType GetChildren() const;
+  ILayoutContainer::ChildrenType GetChildren() const;
 
   WorkbenchPage::Pointer GetWorkbenchPage();
 
@@ -171,7 +171,7 @@ private:
   void UpdateMinimumSize();
 
   static IWorkbenchPartReference::Pointer GetPartReference(
-      StackablePart::Pointer pane);
+      LayoutPart::Pointer pane);
 
   /**
    * Closes this window and disposes its shell.
@@ -189,7 +189,7 @@ private:
    * Answer a list of the view panes.
    */
   void CollectViewPanes(std::list<PartPane::Pointer>& result,
-      const std::list<StackablePart::Pointer>& parts);
+      const std::list<LayoutPart::Pointer>& parts);
 
 };
 

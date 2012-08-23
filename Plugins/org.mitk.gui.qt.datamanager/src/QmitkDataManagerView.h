@@ -154,12 +154,6 @@ public slots:
   ///
   void ContextMenuActionTriggered( bool );
 
-  ///
-  /// Invoked when the MITK workbench selection changed
-  ///
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
-                          const QList<mitk::DataNode::Pointer>& selection);
-
   /// Invoked when the median action is invoked
   void OtsuFilter( bool checked = false );
   

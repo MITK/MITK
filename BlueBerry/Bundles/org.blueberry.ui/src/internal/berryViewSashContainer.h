@@ -57,12 +57,12 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#isStackType(org.blueberry.ui.internal.LayoutPart)
      */
-    bool IsStackType(IStackableContainer::Pointer toTest);
+    bool IsStackType(ILayoutContainer::Pointer toTest);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#isPaneType(org.blueberry.ui.internal.LayoutPart)
      */
-    bool IsPaneType(StackablePart::Pointer toTest);
+    bool IsPaneType(LayoutPart::Pointer toTest);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.ILayoutContainer#replace(org.blueberry.ui.internal.LayoutPart, org.blueberry.ui.internal.LayoutPart)
@@ -70,6 +70,8 @@ public:
     //void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild);
 
     bool AllowsAdd(LayoutPart::Pointer layoutPart);
+
+    void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild);
 
 
 protected:
@@ -90,7 +92,7 @@ protected:
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#getDockingRatio(org.blueberry.ui.internal.LayoutPart, org.blueberry.ui.internal.LayoutPart)
      */
-    float GetDockingRatio(Object::Pointer dragged, IStackableContainer::Pointer target);
+    float GetDockingRatio(Object::Pointer dragged, ILayoutContainer::Pointer target);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#createStack(org.blueberry.ui.internal.LayoutPart)
@@ -100,18 +102,18 @@ protected:
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#setVisiblePart(org.blueberry.ui.internal.ILayoutContainer, org.blueberry.ui.internal.LayoutPart)
      */
-    void SetVisiblePart(IStackableContainer::Pointer container,
+    void SetVisiblePart(ILayoutContainer::Pointer container,
             PartPane::Pointer visiblePart);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#getVisiblePart(org.blueberry.ui.internal.ILayoutContainer)
      */
-    StackablePart::Pointer GetVisiblePart(IStackableContainer::Pointer container);
+    LayoutPart::Pointer GetVisiblePart(ILayoutContainer::Pointer container);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#derefPart(org.blueberry.ui.internal.LayoutPart)
      */
-    void DerefPart(StackablePart::Pointer sourcePart);
+    void DerefPart(LayoutPart::Pointer sourcePart);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#addChild(org.blueberry.ui.internal.PartSashContainer.RelationshipInfo)

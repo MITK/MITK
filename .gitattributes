@@ -25,7 +25,7 @@
 *.pptx          -crlf
 *.raw           -crlf
 *.vtk           -crlf
-*.xpm           -crlf
+*.xpm           -crlf -diff
 *.sh             crlf=input
 *.sh.in          crlf=input
 configure        crlf=input

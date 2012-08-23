@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryLayoutPart.h"
 #include "berryILayoutContainer.h"
-#include "berryIStackableContainer.h"
+#include "berryILayoutContainer.h"
 #include "berryIDragOverListener.h"
 #include "berryAbstractDropTarget.h"
 
@@ -126,10 +126,10 @@ private:
       int side;
     int cursor;
 
-    // This is a IStackablePart or IStackableContainer
+    // This is a ILayoutPart or ILayoutContainer
     Object::Pointer targetPart;
 
-    // This is a IStackablePart or IStackableContainer
+    // This is a ILayoutPart or ILayoutContainer
     Object::Pointer sourcePart;
 
     PartSashContainer* partSashContainer;
@@ -202,7 +202,7 @@ public:
    */
   virtual void Add(LayoutPart::Pointer child);
 
-  virtual void AddPart(StackablePart::Pointer child);
+  virtual void AddPart(LayoutPart::Pointer child);
 
   /**
    * Add a part relative to another. For compatibility only. New code should use
@@ -219,7 +219,7 @@ public:
 
 protected:
   virtual void DropObject(const std::vector<PartPane::Pointer>& toDrop,
-        StackablePart::Pointer visiblePart,
+        LayoutPart::Pointer visiblePart,
             Object::Pointer targetPart, int side);
   /**
    * Add a new part relative to another. This should be used in place of <code>add</code>.
@@ -255,7 +255,7 @@ protected:
    * when a part is positioned relative to the editorarea.
    * We end up with a null relative and 0.0 for a ratio.
    */
-protected:
+public:
   virtual void AddChildForPlaceholder(LayoutPart::Pointer child,
       LayoutPart::Pointer placeholder);
 
@@ -348,7 +348,7 @@ public:
    * @see ILayoutContainer#getChildren
    */
 public:
-  ChildrenType GetChildren();
+  ChildrenType GetChildren() const;
 
   /**
    * @see LayoutPart#getControl
@@ -599,23 +599,23 @@ private:
    * @return
    */
 public:
-  virtual bool IsStackType(IStackableContainer::Pointer toTest) = 0;
+  virtual bool IsStackType(ILayoutContainer::Pointer toTest) = 0;
 
 public:
-  virtual bool IsPaneType(StackablePart::Pointer toTest) = 0;
+  virtual bool IsPaneType(LayoutPart::Pointer toTest) = 0;
 
 protected:
   virtual SmartPointer<PartStack> CreateStack() = 0;
 
 public:
-  virtual void Stack(StackablePart::Pointer newPart, SmartPointer<IStackableContainer> container);
+  virtual void Stack(LayoutPart::Pointer newPart, SmartPointer<ILayoutContainer> container);
 
   /**
    * @param container
    * @param visiblePart
    */
 protected:
-  virtual void SetVisiblePart(IStackableContainer::Pointer container,
+  virtual void SetVisiblePart(ILayoutContainer::Pointer container,
       SmartPointer<PartPane>  visiblePart) = 0;
 
   /**
@@ -623,22 +623,21 @@ protected:
    * @return
    */
 protected:
-  virtual StackablePart::Pointer GetVisiblePart(
-      IStackableContainer::Pointer container) = 0;
+  virtual LayoutPart::Pointer GetVisiblePart(
+      ILayoutContainer::Pointer container) = 0;
 
   /**
    * @param sourcePart
    */
 protected:
-  virtual void DerefPart(StackablePart::Pointer sourcePart);
+  virtual void DerefPart(LayoutPart::Pointer sourcePart);
 
 protected:
-  virtual std::size_t GetVisibleChildrenCount(IStackableContainer::Pointer container);
   virtual std::size_t GetVisibleChildrenCount(ILayoutContainer::Pointer container);
 
 protected:
   virtual float
-      GetDockingRatio(Object::Pointer dragged, IStackableContainer::Pointer target);
+      GetDockingRatio(Object::Pointer dragged, ILayoutContainer::Pointer target);
 
   /**
    * Writes a description of the layout to the given string buffer.

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*=========================================================================
 
 Program:   Tensor ToolKit - TTK
-Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkReduceDirectionGradientsFilter.h $
+Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h $
 Language:  C++
 Date:      $Date: 2010-06-07 13:39:13 +0200 (Mo, 07 Jun 2010) $
 Version:   $Revision: 68 $
@@ -29,8 +29,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef _itk_ReduceDirectionGradientsFilter_h_
-#define _itk_ReduceDirectionGradientsFilter_h_
+#ifndef _itk_ElectrostaticRepulsionDiffusionGradientReductionFilter_h_
+#define _itk_ElectrostaticRepulsionDiffusionGradientReductionFilter_h_
 
 #include <itkImageToImageFilter.h>
 #include <itkVectorImage.h>
@@ -40,23 +40,23 @@ namespace itk
 {
 
   template <class TInputScalarType, class TOutputScalarType>
-  class ReduceDirectionGradientsFilter
+  class ElectrostaticRepulsionDiffusionGradientReductionFilter
     : public ImageToImageFilter<itk::VectorImage<TInputScalarType,3>, itk::VectorImage<TOutputScalarType,3> >
   {
 
   public:
 
-    typedef ReduceDirectionGradientsFilter Self;
+    typedef ElectrostaticRepulsionDiffusionGradientReductionFilter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< itk::VectorImage<TOutputScalarType,3>, itk::VectorImage<TOutputScalarType,3> >
       Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkNewMacro(Self)
 
     /** Runtime information support. */
-    itkTypeMacro(ReduceDirectionGradientsFilter, ImageToImageFilter);
+    itkTypeMacro(ElectrostaticRepulsionDiffusionGradientReductionFilter, ImageToImageFilter)
 
     typedef TInputScalarType                         InputScalarType;
     typedef itk::VectorImage<InputScalarType,3>      InputImageType;
@@ -82,19 +82,14 @@ namespace itk
     itkGetMacro(GradientDirections, GradientDirectionContainerType::Pointer)
     itkSetMacro(GradientDirections, GradientDirectionContainerType::Pointer)
 
-    itkGetMacro(NumGradientDirections, int)
-    itkSetMacro(NumGradientDirections, int)
-
-    itkGetMacro(Iterations, unsigned long)
-    itkSetMacro(Iterations, unsigned long)
-
     IndicesVector GetUsedGradientIndices(){return m_UsedGradientIndices;}
     void SetOriginalBValueMap(BValueMap inp){m_OriginalBValueMap = inp;}
     void SetShellSelectionBValueMap(BValueMap inp){m_InputBValueMap = inp;}
+    void SetNumGradientDirections(std::vector<int> numDirs){m_NumGradientDirections = numDirs;}
 
   protected:
-    ReduceDirectionGradientsFilter();
-    ~ReduceDirectionGradientsFilter() {};
+    ElectrostaticRepulsionDiffusionGradientReductionFilter();
+    ~ElectrostaticRepulsionDiffusionGradientReductionFilter() {}
 
     void GenerateData();
     double Costs();
@@ -103,14 +98,13 @@ namespace itk
     GradientDirectionContainerType::Pointer m_OriginalGradientDirections;
 
     IndicesVector m_UsedGradientIndices;
-    IndicesVector m_UnUsedGradientIndices;
+    IndicesVector m_UnusedGradientIndices;
     IndicesVector m_BaselineImageIndices;
 
     BValueMap m_OriginalBValueMap;
     BValueMap m_InputBValueMap;
 
-    int m_NumGradientDirections;
-    unsigned long m_Iterations;
+    std::vector<int> m_NumGradientDirections;
   };
 
 
@@ -118,7 +112,7 @@ namespace itk
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkReduceDirectionGradientsFilter.txx"
+#include "itkElectrostaticRepulsionDiffusionGradientReductionFilter.txx"
 #endif
 
 

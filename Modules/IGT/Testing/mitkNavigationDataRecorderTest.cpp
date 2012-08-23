@@ -26,6 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
+
+//for exceptions
+#include "mitkIGTException.h"
+#include "mitkIGTIOException.h"
+
 
 class mitkNavigationDataRecorderTestClass
   {
@@ -184,7 +190,7 @@ class mitkNavigationDataRecorderTestClass
      mitk::Point3D pnt;
      pnt[0] = i + 1;
      pnt[1] = i + 1/2;
-     pnt[2] = i +1*3;
+     pnt[2] = i + 1*3;
      naviData->SetPosition(pnt);
      recorder->Update();
      }
@@ -278,15 +284,91 @@ class mitkNavigationDataRecorderTestClass
     std::string filenameXML = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"Recordertest-0.xml";
     std::string filenameCSV = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"Recordertest-0.csv";
     Poco::File myFileXML(filenameXML);
+    Poco::File myFileCSV(filenameCSV);
+    
+    try
+    {
     if (myFileXML.exists())
       {myFileXML.remove();}
-    Poco::File myFileCSV(filenameCSV);
-    if (myFileCSV.exists())
-      {myFileCSV.remove();}
-
+    }
+    catch(std::exception e)
+    {
+      MITK_WARN << "Cannot delete file while cleanup: " << filenameXML;
     }
 
+    try
+    {
+    if (myFileCSV.exists())
+      {myFileCSV.remove();}
+    }
+    catch(std::exception e)
+    {
+      MITK_WARN << "Cannot delete file while cleanup: " << filenameCSV;
+    }
+
+    }
+  
+  static void TestStartRecordingExceptions()
+     {
+     //Testing Start Recording for exceptions if recording has already started 
+     mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
+     std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"Recordertest.xml";
+     recorder->SetFileName(filename.c_str());
+
+     //Testing double call of StartRecording().
+     mitk::NavigationData::Pointer naviData = mitk::NavigationData::New();
+     recorder->AddNavigationData( naviData );
+     recorder->StartRecording();
+     recorder->StartRecording();
+     recorder->StopRecording();
+     MITK_TEST_OUTPUT(<<"Tested double call of StartRecording(). Application should not crash.");
+    
+     //Testing exceptions for method StartRecording() when no file is set.
+     mitk::NavigationDataRecorder::Pointer recorder1 = mitk::NavigationDataRecorder::New();
+     std::string filename1 = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"Recordertest.xml";
+     recorder->SetFileName("");
+     bool exceptionThrown1 = false;
+     mitk::NavigationData::Pointer naviData1 = mitk::NavigationData::New();
+     recorder1->AddNavigationData( naviData1 );
+     try
+       {
+       recorder1->StartRecording();
+       }
+     catch(mitk::IGTException)
+       {
+       exceptionThrown1 = true;
+       }
+     MITK_TEST_CONDITION(exceptionThrown1,"Testing exception throwing when no file name or file path is set.");
+
+     //Testing double call of StartRecording(stream) method.
+     mitk::NavigationDataRecorder::Pointer recorder2 = mitk::NavigationDataRecorder::New();
+     std::string tmp = "";
+     std::ostringstream stream;// = new std::ostringstream( std::ostringstream::trunc );
+     stream.setf( std::ios::fixed, std::ios::floatfield );
+     recorder2->StartRecording(&stream);
+     recorder2->StartRecording(&stream);
+     recorder2->StopRecording();
+     MITK_TEST_OUTPUT(<<"Tested double call of StartRecording(stream). Application should not crash.");
+    
+     //Testing exceptions if the stream is not good
+     mitk::NavigationDataRecorder::Pointer recorder3 = mitk::NavigationDataRecorder::New();
+     std::ofstream stream3; //making an invalid stream
+     stream3.open("");
+     bool exceptionThrown3 = false;
+     try
+       {
+       recorder3->StartRecording(&stream3);
+       }
+     catch(mitk::IGTException)
+       {
+       exceptionThrown3 = true;
+       }
+     MITK_TEST_CONDITION(exceptionThrown3,"Testing exception thrown when the stream in not good.");
+     }
+
   };
+
+
 
 /**Documentation
  *  test for the class "NavigationDataRecorder".
@@ -301,6 +383,8 @@ int mitkNavigationDataRecorderTest(int /* argc */, char* /*argv*/[])
   mitkNavigationDataRecorderTestClass::TestRecordingOnHarddiscXMLZIP();
   mitkNavigationDataRecorderTestClass::TestRecordingOnHarddiscCSV();
   mitkNavigationDataRecorderTestClass::TestRecordingInvalidData();
+  mitkNavigationDataRecorderTestClass::TestStartRecordingExceptions();
+
   
   //Test fails under linux, perhaps reading permission problems, deactivated it temporary
   //mitkNavigationDataRecorderTestClass::TestLoadingRecordedXMLFile();

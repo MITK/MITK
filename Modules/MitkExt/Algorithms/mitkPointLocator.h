@@ -76,7 +76,7 @@ public:
   /**
   * Sets the point which will be used for nearest-neighbour searches. Note
   * there must be at least one point in the point set.
-  * @param points the point set containing points for nearest neighbours searches.
+  * @param pointSet the point set containing points for nearest neighbours searches.
   */
   void SetPoints( ITKPointSet* pointSet );
 

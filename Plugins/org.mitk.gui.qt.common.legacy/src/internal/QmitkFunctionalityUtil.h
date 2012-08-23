@@ -58,7 +58,7 @@ public:
   ///
   /// \see ISelectionProvider::SetSelection()
   ///
-  virtual void SetSelection(berry::ISelection::Pointer selection);
+  virtual void SetSelection(berry::ISelection::ConstPointer selection);
   ///
   /// Sends the nodes as selected to the workbench
   ///
@@ -81,7 +81,7 @@ protected:
   ///
   /// Holds the current selection (selection made by m_Functionality !!!)
   ///
-  mitk::DataNodeSelection::Pointer m_CurrentSelection;
+  mitk::DataNodeSelection::ConstPointer m_CurrentSelection;
   ///
   /// The selection events other parts can listen too
   ///

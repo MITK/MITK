@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -86,13 +86,13 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
   sprintf( valbuffer, "DWMRI");
   itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("modality"),std::string(valbuffer));
 
-  if(input->GetOriginalDirections()->Size())
+  if(input->GetDirections()->Size())
   {
     sprintf( valbuffer, "%1f", input->GetB_Value() );
     itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
   }
 
-  for(unsigned int i=0; i<input->GetOriginalDirections()->Size(); i++)
+  for(unsigned int i=0; i<input->GetDirections()->Size(); i++)
   {
     sprintf( keybuffer, "DWMRI_gradient_%04d", i );
 
@@ -100,8 +100,8 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       std::string(keybuffer),tmp))
       continue;*/
 
-    sprintf( valbuffer, "%1f %1f %1f", input->GetOriginalDirections()->ElementAt(i).get(0),
-             input->GetOriginalDirections()->ElementAt(i).get(1), input->GetOriginalDirections()->ElementAt(i).get(2));
+    sprintf( valbuffer, "%1f %1f %1f", input->GetDirections()->ElementAt(i).get(0),
+             input->GetDirections()->ElementAt(i).get(1), input->GetDirections()->ElementAt(i).get(2));
 
     itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
   }

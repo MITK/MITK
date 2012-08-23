@@ -36,45 +36,6 @@ class mitkToFProcessing_EXPORT ToFTestingCommon
 {
 public:
 
-//creates a test image with given dimension filled with random values
-inline static mitk::Image::Pointer CreateTestImage(unsigned int dimX = 100, unsigned int dimY = 100)
-{
-  typedef itk::Image<float,2> ItkImageType2D;
-  typedef itk::ImageRegionIterator<ItkImageType2D> ItkImageRegionIteratorType2D;
-
-  ItkImageType2D::Pointer image = ItkImageType2D::New();
-  ItkImageType2D::IndexType start;
-  start[0] = 0;
-  start[1] = 0;
-  ItkImageType2D::SizeType size;
-  size[0] = dimX;
-  size[1] = dimY;
-  ItkImageType2D::RegionType region;
-  region.SetSize(size);
-  region.SetIndex( start);
-  ItkImageType2D::SpacingType spacing;
-  spacing[0] = 1.0;
-  spacing[1] = 1.0;
-
-  image->SetRegions( region );
-  image->SetSpacing ( spacing );
-  image->Allocate();
-
-  //Correlate inten values to PixelIndex//
-  ItkImageRegionIteratorType2D imageIterator(image,image->GetLargestPossibleRegion());
-  imageIterator.GoToBegin();
-  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
-  while (!imageIterator.IsAtEnd())
-  {
-    double pixelValue = randomGenerator->GetUniformVariate(0.0,1000.0);
-    imageIterator.Set(pixelValue);
-    ++imageIterator;
-  }
-  mitk::Image::Pointer mitkImage = mitk::Image::New();
-  mitk::CastToMitkImage(image,mitkImage);
-  return mitkImage;
-}
-
 //loads an image from file
 inline static mitk::Image::Pointer LoadImage( std::string filename )
 {

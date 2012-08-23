@@ -177,7 +177,7 @@ set(_ctk_plugins
   Bundles/org.blueberry.ui:OFF
   Bundles/org.blueberry.ui.qt:OFF
   Bundles/org.blueberry.ui.qt.help:OFF
-  Bundles/org.blueberry.ui.qt.log:OFF
+  Bundles/org.blueberry.ui.qt.log:ON
   Bundles/org.blueberry.ui.qt.objectinspector:OFF
 )
 

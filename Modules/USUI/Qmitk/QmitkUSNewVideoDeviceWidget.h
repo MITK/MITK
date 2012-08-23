@@ -93,7 +93,7 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     Ui::QmitkUSNewVideoDeviceWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
     /*
-    \brief Constructs a ListItem from the given devie for display in the list of active devices
+    \brief Constructs a ListItem from the given device for display in the list of active devices
     */
     QListWidgetItem* ConstructItemFromDevice(mitk::USDevice::Pointer device);
 

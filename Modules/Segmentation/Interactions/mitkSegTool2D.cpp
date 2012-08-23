@@ -56,64 +56,25 @@ mitk::SegTool2D::SegTool2D(const char* type)
  m_Contourmarkername ("Position"),
  m_ShowMarkerNodes (true)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-  CONNECT_ACTION( 49014, OnInvertLogic );
-
-
 }
 
 mitk::SegTool2D::~SegTool2D()
 {
 }
 
-bool mitk::SegTool2D::OnMousePressed (Action*, const StateEvent* stateEvent)
+float mitk::SegTool2D::CanHandleEvent( StateEvent const *stateEvent) const
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
+  if (!positionEvent) return 0.0;
 
-  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return false; // we don't want anything but 2D
+  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return 0.0; // we don't want anything but 2D
 
-  m_LastEventSender = positionEvent->GetSender();
-  m_LastEventSlice = m_LastEventSender->GetSlice();
+  if( m_LastEventSender != positionEvent->GetSender()) return 0.0;
+  if( m_LastEventSlice != positionEvent->GetSender()->GetSlice() ) return 0.0;
 
-  return true;
+  return 1.0;
 }
 
-bool mitk::SegTool2D::OnMouseMoved   (Action*, const StateEvent* stateEvent)
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if ( m_LastEventSender != positionEvent->GetSender() ) return false;
-  if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-
-  return true;
-}
-
-bool mitk::SegTool2D::OnMouseReleased(Action*, const StateEvent* stateEvent)
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if ( m_LastEventSender != positionEvent->GetSender() ) return false;
-  if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-
-  return true;
-}
-
-bool mitk::SegTool2D::OnInvertLogic(Action*, const StateEvent* stateEvent)
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if ( m_LastEventSender != positionEvent->GetSender() ) return false;
-  if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-
-  return true;
-}
 
 bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice )
 {
@@ -243,11 +204,13 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
-  //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
+
+    //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
   //Set the slice as 'input'
-  reslice->SetInputSlice(slice->GetVtkImageData(this->m_TimeStep));
+  reslice->SetInputSlice(slice->GetVtkImageData());
 
   //set overwrite mode to true to write back to the image volume
   reslice->SetOverwriteMode(true);
@@ -255,10 +218,10 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
   mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslice);
   extractor->SetInput( image );
-  extractor->SetTimeStep( this->m_TimeStep );
+  extractor->SetTimeStep( timeStep );
   extractor->SetWorldGeometry( planeGeometry );
   extractor->SetVtkOutputRequest(true);
-  extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( this->m_TimeStep ) );
+  extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
 
   extractor->Modified();
   extractor->Update();
@@ -268,7 +231,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
   /*============= BEGIN undo feature block ========================*/
   //specify the undo operation with the edited slice
-  m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),slice->GetGeometry(), this->m_TimeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+  m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
   
   //create an operation event for the undo stack
   OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );

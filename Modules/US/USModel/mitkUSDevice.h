@@ -18,18 +18,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSDevice_H_HEADER_INCLUDED_
 #define MITKUSDevice_H_HEADER_INCLUDED_
 
+// STL
 #include <vector>
+
+// MitkUS
 #include "mitkUSProbe.h"
 #include "mitkUSImageMetadata.h"
 #include "mitkUSImage.h"
 #include <MitkUSExports.h>
+
+// MITK
 #include <mitkCommon.h>
 #include <mitkImageSource.h>
+
+// ITK
 #include <itkObjectFactory.h>
 
 // Microservices
 #include <usServiceInterface.h>
 #include <usServiceRegistration.h>
+#include <usServiceProperties.h>
 
 
 
@@ -39,8 +47,13 @@ namespace mitk {
     * \brief A device holds information about it's model, make and the connected probes. It is the
     * common super class for all devices and acts as an image source for mitkUSImages. It is the base class
     * for all US Devices, and every new device should extend it.
+    *
+    * US Devices support output of calibrated images, i.e. images that include a specific geometry.
+    * To achieve this, call SetCalibration, and make sure that the subclass also calls apply
+    * transformation at some point (The USDevice does not automatically apply the transformation to the image)
     * \ingroup US
     */
+
    class MitkUS_EXPORT USDevice : public mitk::ImageSource
     {
     public:
@@ -57,6 +70,8 @@ namespace mitk {
       *      
       */
      // mitkNewMacro2Param(Self, mitk::USImageMetadata::Pointer, bool);
+
+
 
       /**
       * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.
@@ -171,10 +186,23 @@ namespace mitk {
       */
       bool GetIsConnected();
 
+
+      /**
+      * \brief Sets a transformation as Calibration data. It also marks the device as Calibrated. This data is not automatically applied to the image. Subclasses must call ApplyTransformation
+      * to achieve this.
+      */
+      void setCalibration (mitk::AffineTransform3D::Pointer calibration);
+
+      /**
+      * \brief Returns the current Calibration
+      */
+      itkGetMacro(Calibration, mitk::AffineTransform3D::Pointer);
+
       /**
       * \brief Returns the currently active probe or null, if none is active
       */
       itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
+
       std::string GetDeviceManufacturer();
       std::string GetDeviceModel();
       std::string GetDeviceComment();
@@ -183,6 +211,15 @@ namespace mitk {
       mitk::USProbe::Pointer m_ActiveProbe;
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes; 
       bool m_IsActive;
+
+
+      /*
+      * \brief This Method constructs the service properties which can later be used to
+      *  register the object with the Microservices
+      *  Return service properties
+      */
+      mitk::ServiceProperties ConstructServiceProperties();
+
 
       /**
       * \brief Is called during the connection process. Override this method in your subclass to handle the actual connection.
@@ -197,7 +234,7 @@ namespace mitk {
       virtual bool OnDisconnection() = 0;    
 
       /**
-      * \brief Is called during the activation process. After this method is finsihed, the device should be generating images
+      * \brief Is called during the activation process. After this method is finished, the device should be generating images
       */
       virtual bool OnActivation() = 0;    
 
@@ -234,6 +271,17 @@ namespace mitk {
       */
        void GenerateData();
 
+      /**
+      *  \brief The Calibration Transformation of this US-Device. This will automatically be written into the image once
+      */
+       mitk::AffineTransform3D::Pointer m_Calibration;
+
+      /**
+      *  \brief Convenience method that can be used by subclasses to apply the Calibration Data to the image. A subclass has to call
+      * this method or set the transformation itself for the output to be calibrated! Returns true if a Calibration was set and false otherwise
+      * (Usually happens when no transformation was set yet).
+      */
+       bool ApplyCalibration(mitk::USImage::Pointer image);
 
 
      private:

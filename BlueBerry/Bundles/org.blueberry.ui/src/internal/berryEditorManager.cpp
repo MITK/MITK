@@ -1035,9 +1035,9 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
         PartStack::Pointer workbook = *iter;
 
         // Use the list of editors found in EditorStack; fix for 24091
-        std::list<StackablePart::Pointer> editorPanes(workbook->GetChildren());
+        std::list<LayoutPart::Pointer> editorPanes(workbook->GetChildren());
 
-        for (std::list<StackablePart::Pointer>::iterator i = editorPanes.begin();
+        for (std::list<LayoutPart::Pointer>::iterator i = editorPanes.begin();
             i != editorPanes.end(); ++i)
         {
           // Save each open editor.

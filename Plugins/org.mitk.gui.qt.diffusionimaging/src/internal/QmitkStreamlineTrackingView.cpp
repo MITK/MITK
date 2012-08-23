@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkImageToItk.h>
 #include <mitkFiberBundleX.h>
+#include <mitkImageCast.h>
 
 // VTK
 #include <vtkPolyData.h>
@@ -90,7 +91,10 @@ void QmitkStreamlineTrackingView::OngChanged(int value)
 
 void QmitkStreamlineTrackingView::OnAngularThresholdChanged(int value)
 {
-    m_Controls->m_AngularThresholdLabel->setText(QString("Angular Threshold: ")+QString::number(value)+QString("°"));
+    if (value<0)
+        m_Controls->m_AngularThresholdLabel->setText(QString("Min. Curvature Radius: auto"));
+    else
+        m_Controls->m_AngularThresholdLabel->setText(QString("Min. Curvature Radius: ")+QString::number((float)value/10)+QString("mm"));
 }
 
 void QmitkStreamlineTrackingView::OnSeedsPerVoxelChanged(int value)
@@ -132,8 +136,10 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
     m_TensorImageNode = NULL;
     m_TensorImage = NULL;
     m_SeedRoi = NULL;
+    m_MaskImage = NULL;
     m_Controls->m_TensorImageLabel->setText("-");
     m_Controls->m_RoiImageLabel->setText("-");
+    m_Controls->m_MaskImageLabel->setText("-");
 
     if(nodes.empty())
         return;
@@ -154,10 +160,15 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
             {
                 bool isBinary = false;
                 node->GetPropertyValue<bool>("binary", isBinary);
-                if (isBinary)
+                if (isBinary && m_SeedRoi.IsNull())
                 {
                     m_SeedRoi = dynamic_cast<mitk::Image*>(node->GetData());
                     m_Controls->m_RoiImageLabel->setText(node->GetName().c_str());
+                }
+                else if (isBinary)
+                {
+                    m_MaskImage = dynamic_cast<mitk::Image*>(node->GetData());
+                    m_Controls->m_MaskImageLabel->setText(node->GetName().c_str());
                 }
             }
         }
@@ -190,17 +201,25 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     filter->SetInput(image);
     filter->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
     filter->SetFaThreshold((float)m_Controls->m_FaThresholdSlider->value()/100);
-    filter->SetAngularThreshold(cos((float)m_Controls->m_AngularThresholdSlider->value()*M_PI/180));
+    filter->SetMinCurvatureRadius((float)m_Controls->m_AngularThresholdSlider->value()/10);
     filter->SetStepSize((float)m_Controls->m_StepsizeSlider->value()/10);
     filter->SetF((float)m_Controls->m_fSlider->value()/100);
     filter->SetG((float)m_Controls->m_gSlider->value()/100);
+    filter->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
+    filter->SetMinTractLength(m_Controls->m_MinTractLengthSlider->value());
+    //filter->SetNumberOfThreads(1);
 
     if (m_SeedRoi.IsNotNull())
     {
-        CastType2::Pointer caster2 = CastType2::New();
-        caster2->SetInput(m_SeedRoi);
-        caster2->Update();
-        ItkUCharImageType::Pointer mask = caster2->GetOutput();
+        ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
+        mitk::CastToItkImage<ItkUCharImageType>(m_SeedRoi, mask);
+        filter->SetSeedImage(mask);
+    }
+
+    if (m_MaskImage.IsNotNull())
+    {
+        ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
+        mitk::CastToItkImage<ItkUCharImageType>(m_MaskImage, mask);
         filter->SetMaskImage(mask);
     }
 
@@ -211,16 +230,13 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         return;
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
 
-    if (fib->RemoveShortFibers(m_Controls->m_MinTractLengthSlider->value()))
-    {
-        mitk::DataNode::Pointer node = mitk::DataNode::New();
-        node->SetData(fib);
-        QString name(m_TensorImageNode->GetName().c_str());
-        name += "_FiberBundle";
-        node->SetName(name.toStdString());
-        node->SetVisibility(true);
-        GetDataStorage()->Add(node);
-    }
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(fib);
+    QString name(m_TensorImageNode->GetName().c_str());
+    name += "_Streamline";
+    node->SetName(name.toStdString());
+    node->SetVisibility(true);
+    GetDataStorage()->Add(node);
 }
 
 

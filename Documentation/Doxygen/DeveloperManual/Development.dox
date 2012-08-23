@@ -29,4 +29,15 @@ Some abstract concepts of MITK are described in \ref Concepts
 \li \subpage DocumentationGuide
 \li \subpage StyleGuideAndNotesPage
 
+\section DevelopmentFurtherInfo Further Information
+
+This section lists some ressources you might want to look at if you could not find what you need in
+the \ref Development or \ref Concepts sections.
+
+We hold regular internal seminars which may or may not have something to do with MITK directly. The slides can be found
+<a href="http://mitk.org/wiki/BugSquashingSeminars">here</a>.
+
+If you have some problems with MITK you might want to take a look at the <a href="http://mitk.org/wiki/MailinglistFAQ">FAQ</a>.
+
+If the above does not prove sufficient you can contact the <a href="http://mitk.org/wiki/Mailinglist">Mailinglist</a>.
 */

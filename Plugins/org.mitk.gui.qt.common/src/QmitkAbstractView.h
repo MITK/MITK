@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkIDataStorageReference.h>
 
-class QItemSelectionModel;
+#include <QItemSelectionModel>
 
 namespace mitk {
   class DataNode;
@@ -88,6 +88,7 @@ class QmitkAbstractViewSelectionProvider;
  * You may reimplement the following private virtual methods to be notified about certain changes:
  * <ul>
  * <li>void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
+ * <li>void OnNullSelection(berry::IWorkbenchPart::Pointer part)
  * <li>void OnPreferencesChanged(const berry::IBerryPreferences*)
  * <li>void NodeAdded(const mitk::DataNode* node)
  * <li>void NodeChanged(const mitk::DataNode* node)
@@ -143,25 +144,66 @@ protected:
 
   /**
    * Informs other parts of the workbench that node is selected via the blueberry selection service.
+   *
+   * \note This method should not be used if you have set your own selection provider via
+   * SetSelectionProvider() or your own QItemSelectionModel via GetDataNodeSelectionModel().
    */
   void FireNodeSelected(mitk::DataNode::Pointer node);
 
   /**
    * Informs other parts of the workbench that the nodes are selected via the blueberry selection service.
+   *
+   * \note This method should not be used if you have set your own selection provider via
+   * SetSelectionProvider() or your own QItemSelectionModel via GetDataNodeSelectionModel().
    */
   virtual void FireNodesSelected(const QList<mitk::DataNode::Pointer>& nodes);
 
   /**
-   * \return the selection of the currently active part of the workbench or an empty list
-   *         if nothing is selected
+   * \return The selection of the currently active part of the workbench or an empty list
+   *         if there is no selection or if it is empty.
+   *
+   * \see IsCurrentSelectionValid
    */
   QList<mitk::DataNode::Pointer> GetCurrentSelection() const;
 
   /**
+   * Queries the state of the current selection.
+   *
+   * \return If the current selection is <code>NULL</code>, this method returns
+   * <code>false</code> and <code>true</code> otherwise.
+   */
+  bool IsCurrentSelectionValid() const;
+
+  /**
    * Returns the current selection made in the datamanager bundle or an empty list
-   * if nothing`s selected or if the data manager view does not exist
+   * if there is no selection or if it is empty.
+   *
+   * \see IsDataManagerSelectionValid
    */
   QList<mitk::DataNode::Pointer> GetDataManagerSelection() const;
+
+  /**
+   * Queries the state of the current selection of the data manager view.
+   *
+   * \return If the current data manager selection is <code>NULL</code>, this method returns
+   * <code>false</code> and <code>true</code> otherwise.
+   */
+  bool IsDataManagerSelectionValid() const;
+
+  /**
+   * Sets the selection of the data manager view if available.
+   *
+   * \param selection The new selection for the data manager.
+   * \param flags The Qt selection flags for controlling the way how the selection is updated.
+   */
+  void SetDataManagerSelection(const berry::ISelection::ConstPointer& selection,
+                               QItemSelectionModel::SelectionFlags flags = QItemSelectionModel::ClearAndSelect) const;
+
+  /**
+   * Takes the current selection and sets it on the data manager. Only matching nodes in the
+   * data manager view will be selected.
+   */
+  void SynchronizeDataManagerSelection() const;
 
   /**
    * Returns the Preferences object for this View.
@@ -268,8 +310,17 @@ private:
    *
    * \param part The source part responsible for the selection change.
    * \param nodes A list of selected nodes.
+   *
+   * \see OnNullSelection
    */
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
+
+  /**
+   * Called when a <code>NULL</code> selection occurs.
+   *
+   * \param part The source part responsible for the selection change.
+   */
+  virtual void OnNullSelection(berry::IWorkbenchPart::Pointer part);
 
   /**
    * Called when the preferences object of this view changed.

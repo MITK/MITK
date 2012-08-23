@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYCONTAINERPLACEHOLDER_H_
 #define BERRYCONTAINERPLACEHOLDER_H_
 
-#include "berryIStackableContainer.h"
-#include "berryLayoutPart.h"
+#include "berryILayoutContainer.h"
+#include "berryPartPlaceholder.h"
 
 #include <Poco/SharedPtr.h>
 
@@ -30,13 +30,13 @@ namespace berry {
  * \ingroup org_blueberry_ui_internal
  *
  */
-class ContainerPlaceholder : public LayoutPart, public IStackableContainer {
+class ContainerPlaceholder : public PartPlaceholder, public ILayoutContainer {
 
 private:
 
   static int nextId;
 
-  IStackableContainer::Pointer realContainer;
+  ILayoutContainer::Pointer realContainer;
 
 public:
 
@@ -50,49 +50,39 @@ public:
     ContainerPlaceholder(const std::string& id);
 
     /**
-     * Creates the SWT control
-     */
-    void CreateControl(void* parent);
-
-    /**
-     * Get the part control.  This method may return null.
-     */
-    void* GetControl();
-
-    /**
      * add method comment.
      */
-    void Add(StackablePart::Pointer child);
+    void Add(LayoutPart::Pointer child);
 
-    bool AllowsAdd(StackablePart::Pointer toAdd);
+    bool AllowsAdd(LayoutPart::Pointer toAdd);
 
     /**
      * getChildren method comment.
      */
-    std::list<StackablePart::Pointer> GetChildren() const;
+    std::list<LayoutPart::Pointer> GetChildren() const;
 
     std::string GetID() const;
 
     /**
      * getFocus method comment.
      */
-    IStackableContainer::Pointer GetRealContainer();
+    LayoutPart::Pointer GetRealContainer();
 
     /**
      * remove method comment.
      */
-    void Remove(StackablePart::Pointer child);
+    void Remove(LayoutPart::Pointer child);
 
     /**
      * replace method comment.
      */
-    void Replace(StackablePart::Pointer oldChild, StackablePart::Pointer newChild);
+    void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild);
 
-    void SetRealContainer(IStackableContainer::Pointer container);
+    void SetRealContainer(ILayoutContainer::Pointer container);
 
-    void FindSashes(PartPane::Sashes& sashes);
+    void FindSashes(LayoutPart::Pointer part, PartPane::Sashes& sashes);
 
-    void ResizeChild(StackablePart::Pointer childThatChanged);
+    void ResizeChild(LayoutPart::Pointer childThatChanged);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.ILayoutContainer#allowsAutoFocus()

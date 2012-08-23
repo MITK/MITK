@@ -54,6 +54,8 @@ namespace mitk {
 
       void GenerateData();
 
+      itkGetMacro(Source, mitk::USImageVideoSource::Pointer);
+
     protected:
       /**
       * \brief Creates a new device that will deliver USImages taken from a video device.

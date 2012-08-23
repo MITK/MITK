@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -43,7 +43,7 @@ namespace mitk
     ///
     /// helper function getting unique file name
     ///
-    static std::string GetUniqueFileName( const std::string& dir, const std::string& ext="jpg" );
+    static std::string GetUniqueFileName(const std::string& dir, const std::string& ext="jpg" , const std::string &prefix="");
 
     ///
     /// set if debug is enabled at all
@@ -73,7 +73,7 @@ namespace mitk
     ///
     /// \return true if debug should be enabled
     ///
-    bool GetShowImagesTimeOut();
+    size_t GetShowImagesTimeOut();
 
     ///
     /// sets an output directory. if set all images that are shown are also written to that
@@ -98,14 +98,34 @@ namespace mitk
     /// statements like endodebug(...) will be evaluated in
     /// MyClass.cpp and nowhere else
     ///
-    void AddFileToDebug(const std::string& fileToDebug);
+    bool AddFileToDebug(const std::string& fileToDebug);
+
+    ///
+    /// \see AddFileToDebug
+    ///
+    void SetFilesToDebug(const std::set<std::string>& filesToDebug);
+
+    ///
+    /// \return the files to be debugged
+    ///
+    std::set<std::string> GetFilesToDebug();
 
     ///
     /// same as files to debug, but the user can provide
     /// any symbol string. if one or more symbols
     /// are set only for these symbols Debug() will return true
     ///
-    void AddSymbolToDebug(const std::string& symbolToDebug);
+    bool AddSymbolToDebug(const std::string& symbolToDebug);
+
+    ///
+    /// \see AddSymbolToDebug
+    ///
+    void SetSymbolsToDebug(const std::set<std::string>& symbolsToDebug);
+
+    ///
+    /// \return the symbols to be debugged
+    ///
+    std::set<std::string> GetSymbolsToDebug();
 
     ///
     /// \return true if file should be debugged
@@ -220,11 +240,14 @@ namespace mitk
       std::string outputFile = mitk::EndoDebug::GetInstance().GetDebugImagesOutputDirectory(); \
       if( !outputFile.empty() ) \
       {\
-        outputFile =  mitk::EndoDebug::GetInstance().GetUniqueFileName(outputFile, "jpg");\
+        outputFile =  mitk::EndoDebug::GetInstance().GetUniqueFileName(outputFile, "jpg", std::string(#imgVariableName) );\
         cv::imwrite(outputFile, imgVariableName);\
       }\
-      cv::imshow( "Debug", imgVariableName ); \
-      cv::waitKey( mitk::EndoDebug::GetInstance().GetShowImagesTimeOut() ); \
+      else\
+      {\
+        cv::imshow( "Debug", imgVariableName ); \
+        cv::waitKey( mitk::EndoDebug::GetInstance().GetShowImagesTimeOut() ); \
+      }\
     }
 
   ///

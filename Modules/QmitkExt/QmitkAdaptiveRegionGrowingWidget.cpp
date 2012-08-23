@@ -33,11 +33,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkConnectedAdaptiveThresholdImageFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkBinaryThresholdImageFilter.h>
+#include <itkImageIterator.h>
 
 QmitkAdaptiveRegionGrowingWidget::QmitkAdaptiveRegionGrowingWidget(QWidget * parent) :
 QWidget(parent), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSuggestedThreshold(true), m_SuggestedThValue(0.0)
 {
   m_Controls.setupUi(this);
+
+  // muellerm, 8.8.12.: assure no limits for thresholding (there can be images with pixel values above 4000!!!)
+  m_Controls.m_LowerThresholdSpinBox->setMinimum( std::numeric_limits<int>::min() );
+  m_Controls.m_UpperThresholdSpinBox->setMinimum( std::numeric_limits<int>::min() );
+
+  m_Controls.m_LowerThresholdSpinBox->setMaximum( std::numeric_limits<int>::max() );
+  m_Controls.m_UpperThresholdSpinBox->setMaximum( std::numeric_limits<int>::max() );
+
   m_NAMEFORSEEDPOINT = "Seed Point";
   this->CreateConnections();
   this->SetDataNodeNames("labeledRGSegmentation","RGResult","RGFeedbackSurface","RGSeedpoint");
@@ -356,6 +365,7 @@ void QmitkAdaptiveRegionGrowingWidget::RunSegmentation()
       }
   }
 
+  node->SetVisibility(true);
 }
 
 template<typename TPixel, unsigned int VImageDimension>
@@ -556,6 +566,7 @@ void QmitkAdaptiveRegionGrowingWidget::ChangeLevelWindow(int newValue)
     if (m_UseVolumeRendering)
     this->UpdateVolumeRenderingThreshold((int) (level - 0.5));//lower threshold for labeled image
     this->m_Controls.m_SliderValueLabel->setNum(newValue);
+    newNode->SetVisibility(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -578,7 +589,7 @@ void QmitkAdaptiveRegionGrowingWidget::IncreaseSlider()
   {
     int newValue = this->m_Controls.m_Slider->value() + 1;
     this->ChangeLevelWindow(newValue);
-    this->m_Controls.m_Slider->setValue(newValue);
+    this->m_Controls.m_Slider->setValue(newValue);    
   }
 }
 
@@ -614,6 +625,7 @@ void QmitkAdaptiveRegionGrowingWidget::ConfirmSegmentation()
 
   // disable volume rendering preview after the segmentation node was created
   this->EnableVolumeRendering(false);
+  newNode->SetVisibility(false);
   m_Controls.m_cbVolumeRendering->setChecked(false);
 
 }
@@ -621,6 +633,7 @@ void QmitkAdaptiveRegionGrowingWidget::ConfirmSegmentation()
 template<typename TPixel, unsigned int VImageDimension>
 void QmitkAdaptiveRegionGrowingWidget::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
 {
+    /*
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
     typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
     typedef itk::BinaryThresholdImageFilter<InputImageType, SegmentationType> ThresholdFilterType;
@@ -649,8 +662,42 @@ void QmitkAdaptiveRegionGrowingWidget::ITKThresholding(itk::Image<TPixel, VImage
     }
 
     filter->Update();
+    */
+
+    // muellerm, 6.8. change:
+    // instead of using the not working threshold filter, implemented a manual creation
+    // of the binary image in an easy way: every pixel unequal zero in the preview (input)
+    // image is a one in the resulting segmentation. at the same time overwrite the preview
+    // with zeros to invalidate it
+    // Allocate empty image
+    typedef itk::Image<TPixel, VImageDimension> InputImageType;
+    typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
+    typename SegmentationType::Pointer segmentationImage = SegmentationType::New();
+    segmentationImage->SetRegions( itkImage->GetLargestPossibleRegion() );
+    segmentationImage->SetOrigin( itkImage->GetOrigin() );
+    segmentationImage->SetDirection( itkImage->GetDirection() );
+    segmentationImage->SetSpacing( itkImage->GetSpacing() );
+    segmentationImage->Allocate();
+
+    itk::ImageRegionIterator<SegmentationType> itOutput( segmentationImage, segmentationImage->GetLargestPossibleRegion() );
+    itk::ImageRegionIterator<InputImageType> itInput( itkImage, itkImage->GetLargestPossibleRegion() );
+    itOutput.GoToBegin();
+    itInput.GoToBegin();
+    while( !itOutput.IsAtEnd() && !itInput.IsAtEnd() )
+    {
+        if( itInput.Value() != 0 )
+            itOutput.Set( 1 );
+        else
+            itOutput.Set( 0 );
+
+        // overwrite preview, so it wont disturb as when we see our resulting segmentation
+        //itInput.Set( 0 );
+        ++itOutput;
+        ++itInput;
+    }
+
     mitk::Image::Pointer new_image = mitk::Image::New();
-    mitk::CastToMitkImage(filter->GetOutput(), new_image);
+    mitk::CastToMitkImage( segmentationImage, new_image );
 
     mitk::DataNode::Pointer segNode = mitk::DataNode::New();
     segNode->SetData(new_image);

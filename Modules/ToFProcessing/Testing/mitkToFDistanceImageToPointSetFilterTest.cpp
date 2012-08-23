@@ -55,6 +55,7 @@ mitk::PointSet::Pointer CreateTestPointSet()
   return subSet;
 }
 
+// Create image with pixelValue in every pixel except for the pixels in subSet, which get successively the values of distances
 inline static mitk::Image::Pointer CreateTestImageWithPointSet(mitk::ScalarType pixelValue, unsigned int dimX, unsigned int dimY, mitk::PointSet::Pointer subSet)
 {
   typedef itk::Image<mitk::ScalarType,2> ItkImageType2D;
@@ -161,6 +162,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   cameraIntrinsics->SetFocalLength(focalLengthX,focalLengthY);
   cameraIntrinsics->SetPrincipalPoint(principalPoint[0],principalPoint[1]);
   cameraIntrinsics->SetDistorsionCoeffs(k1,k2,p1,p2);
+
   // test SetCameraIntrinsics()
   filter->SetCameraIntrinsics(cameraIntrinsics);
   MITK_TEST_CONDITION_REQUIRED((focalLengthX==filter->GetCameraIntrinsics()->GetFocalLengthX()),"Testing SetCameraIntrinsics with focalLength");
@@ -168,13 +170,15 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   pp[0] = filter->GetCameraIntrinsics()->GetPrincipalPointX();
   pp[1] = filter->GetCameraIntrinsics()->GetPrincipalPointY();
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(principalPoint,pp),"Testing SetCameraIntrinsics with principalPoint()");
-  // test SetInterPixelDistance()
 
+  // test SetInterPixelDistance()
   filter->SetInterPixelDistance(interPixelDistance);
   mitk::ToFProcessingCommon::ToFPoint2D ipD = filter->GetInterPixelDistance();
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(ipD,interPixelDistance),"Testing Set/GetInterPixelDistance()");
 
+  // test SetReconstructionMode()
   filter->SetReconstructionMode(false);
+  MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == false,"Testing Set/GetReconstructionMode()");
 
   // test Set/GetInput()
   filter->SetInput(image);
@@ -254,7 +258,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   filter->Update();
   result = filter->GetOutput();
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetSize()==result->GetSize()),"Test if point set size is equal");
-//  MITK_TEST_CONDITION_REQUIRED(PointSetsEqual(expectedResult,result),"Testing filter with subset"); TODO needs to be checked, why values are similar, but not equal
+  MITK_TEST_CONDITION_REQUIRED(PointSetsEqual(expectedResult,result),"Testing filter with subset");
 
   MITK_TEST_END();
 

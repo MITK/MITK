@@ -54,6 +54,7 @@ float mitk::ContourModelInteractor::CanHandleEvent(StateEvent const* stateEvent)
   //Key event handling:
   if (positionEvent == NULL)
   {
+    //check for delete and escape event
     if(stateEvent->GetId() == 12 || stateEvent->GetId() == 14)
     {
       return 1.0;

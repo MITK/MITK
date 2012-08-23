@@ -198,3 +198,8 @@ void mitk::ToFDistanceImageToPointSetFilter::SetReconstructionMode(bool withoutI
 {
   this->m_ReconstructionMode = withoutInterpixdist;
 }
+
+bool mitk::ToFDistanceImageToPointSetFilter::GetReconstructionMode()
+{
+  return (this->m_ReconstructionMode);
+}

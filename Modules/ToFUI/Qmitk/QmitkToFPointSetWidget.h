@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,7 +68,11 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     \param dataStorage DataStorage to add PointSets
     \param distanceImage range image used to calculate 3D PointSet from 2D index
     */
-    void InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer distanceImage);
+    void InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage);
+    /*!
+    \brief specify the image that is used for measurement
+    */
+    void SetDistanceImage(mitk::Image::Pointer distanceImage);
 
     /*!
     \brief specify the intrinsic parameters of the camera (holds focal length, principal point, distortion coefficients)

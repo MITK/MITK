@@ -217,6 +217,8 @@ public:
   static int ARCH_AMD64;
   static int ARCH_ARM;
 
+  static std::string PROP_QTPLUGIN_PATH;
+
   static std::string ARG_NEWINSTANCE;
   static std::string ARG_CLEAN;
   static std::string ARG_APPLICATION;

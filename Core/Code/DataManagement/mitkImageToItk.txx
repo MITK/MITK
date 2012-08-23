@@ -31,7 +31,7 @@ void mitk::ImageToItk<TOutputImage>::SetInput(const mitk::Image *input)
     itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
   
   
-  if(!(input->GetPixelType() == typeid(PixelType)))
+  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>()))
     itkExceptionMacro( << "image has wrong pixel type " );
   
   // Process object is not const-correct so the const_cast is required here
@@ -53,7 +53,7 @@ void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, const mitk::I
     itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
   
   
-  if(!(input->GetPixelType() == typeid(PixelType)))
+  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>() ))
     itkExceptionMacro( << "image has wrong pixel type " );
 
   // Process object is not const-correct so the const_cast is required here

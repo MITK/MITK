@@ -176,11 +176,6 @@ public:
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
   virtual bool InitializeView( vtkRenderWindow *renderWindow );
 
-
-  /** Sets the (global) SliceNavigationController responsible for
-   * time-slicing. */
-  void SetTimeNavigationController( SliceNavigationController *nc );
-
   /** Gets the (global) SliceNavigationController responsible for
    * time-slicing. */
   const SliceNavigationController *GetTimeNavigationController() const;
@@ -364,7 +359,7 @@ protected:
 
   RenderWindowCallbacksList m_RenderWindowCallbacksList;
 
-  SliceNavigationController *m_TimeNavigationController;
+  itk::SmartPointer<SliceNavigationController> m_TimeNavigationController;
 
   static RenderingManager::Pointer s_Instance;
   static RenderingManagerFactory *s_RenderingManagerFactory;

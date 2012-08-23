@@ -81,9 +81,9 @@ public:
 //-------------------------------- 0-Arg Versions --------------------------------------
 
 #define _accessByItk(itkImageTypeFunction, pixeltype, dimension)                       \
-  if ( pixelType == typeid(pixeltype) && constImage->GetDimension() == dimension)      \
-  {                                                                                    \
-    typedef itk::Image<pixeltype, dimension> ImageType;                                \
+  if ( pixelType == mitk::MakePixelType< itk::Image<pixeltype, dimension> >() && constImage->GetDimension() == dimension)      \
+  {\
+    typedef itk::Image<pixeltype, dimension> ImageType;                                  \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
     imagetoitk->SetInput(constImage);                                                  \
@@ -109,9 +109,9 @@ public:
 //-------------------------------- n-Arg Versions --------------------------------------
 
 #define _accessByItk_n(itkImageTypeFunction, pixeltype, dimension, args)               \
-  if ( pixelType == typeid(pixeltype) && constImage->GetDimension() == dimension)      \
-  {                                                                                    \
-    typedef itk::Image<pixeltype, dimension> ImageType;                                \
+  if ( pixelType == mitk::MakePixelType< itk::Image<pixeltype, dimension> >() && constImage->GetDimension() == dimension)    \
+  {\
+    typedef itk::Image<pixeltype, dimension> ImageType; \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
     imagetoitk->SetInput(constImage);                                                  \
@@ -516,7 +516,8 @@ public:
 #ifndef DOXYGEN_SKIP
 
 #define _accessTwoImagesByItk(itkImageTypeFunction, pixeltype1, dim1, pixeltype2, dim2) \
-  if (pixelType1 == typeid(pixeltype1) && pixelType2 == typeid(pixeltype2) &&           \
+  if (pixelType1 == mitk::MakePixelType< itk::Image<pixeltype1,dim1> >() &&             \
+      pixelType2 == mitk::MakePixelType< itk::Image<pixeltype2,dim2> >() &&             \
       constImage1->GetDimension() == dim1 && constImage2->GetDimension() == dim2)       \
   {                                                                                     \
     typedef itk::Image<pixeltype1,dim1> ImageType1;                                     \

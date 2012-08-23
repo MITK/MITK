@@ -7,6 +7,41 @@ MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml )
 MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml )
 MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml )
 
+# Install CTK Qt (designer) plugins
+if(MITK_USE_CTK)
+  if(EXISTS ${CTK_QTDESIGNERPLUGINS_DIR})
+    set(_qtplugin_install_destinations)
+    if(MACOSX_BUNDLE_NAMES)
+      foreach(bundle_name ${MACOSX_BUNDLE_NAMES})
+        list(APPEND _qtplugin_install_destinations
+             ${bundle_name}.app/Contents/MacOS/${_install_DESTINATION}/plugins/designer)
+      endforeach()
+    else()
+      list(APPEND _qtplugin_install_destinations bin/plugins/designer)
+    endif()
+    
+    if(NOT CMAKE_CFG_INTDIR STREQUAL ".")
+      set(_matching_pattern_release FILES_MATCHING PATTERN \"*Release*\")
+      set(_matching_pattern_debug FILES_MATCHING PATTERN \"*Debug*\")
+    else()
+      set(_matching_pattern_release )
+      set(_matching_pattern_debug )
+    endif()
+    
+    foreach(_qtplugin_install_dir ${_qtplugin_install_destinations})
+      install(DIRECTORY ${CTK_QTDESIGNERPLUGINS_DIR}/designer/
+              DESTINATION ${_qtplugin_install_dir}
+              CONFIGURATIONS Release
+              ${_matching_pattern_release}
+              )
+      install(DIRECTORY ${CTK_QTDESIGNERPLUGINS_DIR}/designer/
+              DESTINATION ${_qtplugin_install_dir}
+              CONFIGURATIONS Debug
+              ${_matching_pattern_debug}
+              )
+    endforeach()
+  endif()
+endif()
 
 if(WIN32)
   #DCMTK Dlls install target (shared libs on gcc only)

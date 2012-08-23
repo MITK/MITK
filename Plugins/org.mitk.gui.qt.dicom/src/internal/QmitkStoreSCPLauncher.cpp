@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "QmitkStoreSCPLauncher.h"
-#include <QDir>
 #include <QMessageBox>
 #include <QProcessEnvironment>
 #include <mitkLogMacros.h>
@@ -25,20 +24,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTextStream>
 #include <QIODevice>
 #include <QDir>
+#include <QDirIterator>
 #include <QCoreApplication>
+#include "org_mitk_gui_qt_dicom_config.h"
 
 QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder) 
 : m_StoreSCP(new QProcess())
 {
     connect( m_StoreSCP, SIGNAL(error(QProcess::ProcessError)),this, SLOT(OnProcessError(QProcess::ProcessError)));
     connect( m_StoreSCP, SIGNAL(stateChanged(QProcess::ProcessState)),this, SLOT(OnStateChanged(QProcess::ProcessState)));
+    //connect( m_StoreSCP, SIGNAL(readyReadStandardError()),this, SLOT(OnReadyProcessError()));
+    connect( m_StoreSCP, SIGNAL(readyReadStandardOutput()),this, SLOT(OnReadyProcessOutput()));
     SetArgumentList(builder);
+    //m_StoreSCP->setStandardOutputFile("OutputLog.log");
+    //m_StoreSCP->setStandardErrorFile("ErrorLog.log");
 }
 
 QmitkStoreSCPLauncher::~QmitkStoreSCPLauncher()
 {
     m_StoreSCP->close();
     m_StoreSCP->waitForFinished(1000);
+    DeleteTemporaryData();
     delete m_StoreSCP;
 }
 
@@ -57,22 +63,48 @@ void QmitkStoreSCPLauncher::FindPathToStoreSCP()
     {
         QString fileName;
 #ifdef _WIN32
-
-        appPath.append("/../../../DCMTK-install/bin");
         fileName = "/storescp.exe";
 #else
-        appPath.append("/../../DCMTK-install/bin");
         fileName = "/storescp";
 #endif
-        m_PathToStoreSCP.clear();
-        m_PathToStoreSCP.append(fileName);
+
+        m_PathToStoreSCP = fileName;
 
         //In developement the storescp isn't copied into bin directory
         if(!QFile::exists(m_PathToStoreSCP))
         {
-            m_PathToStoreSCP = appPath;
-            m_PathToStoreSCP.append(fileName);
+            m_PathToStoreSCP = static_cast<QString>(MITK_STORESCP);
         }
+    }
+}
+
+void QmitkStoreSCPLauncher::OnReadyProcessOutput()
+{
+    QString out(m_StoreSCP->readAllStandardOutput());
+    QStringList allDataList,importList;
+
+    allDataList = out.split("\n",QString::SkipEmptyParts);
+    QStringListIterator it(allDataList);
+
+    while(it.hasNext())
+    {
+        QString output = it.next();
+        if (output.contains("E: "))
+        {
+            output.replace("E: ","");
+            m_ErrorText = output;
+            OnProcessError(QProcess::UnknownError);
+            return;
+        }
+        if(output.contains("I: storing DICOM file: "))
+        {
+            output.replace("I: storing DICOM file: ","");
+            importList += output;
+        }
+    }
+    if(!importList.isEmpty())
+    {
+        emit SignalStartImport(importList);
     }
 }
 
@@ -81,25 +113,46 @@ void QmitkStoreSCPLauncher::OnProcessError(QProcess::ProcessError err)
     switch(err)
     {
     case QProcess::FailedToStart:
-        m_ErrorText = QString("Failed to start storage provider: ").append(m_StoreSCP->errorString());
+        m_ErrorText.prepend("Failed to start storage provider: ");
+        m_ErrorText.append(m_StoreSCP->errorString());
+        emit SignalStoreSCPError(m_ErrorText);
+        m_ErrorText.clear();
         break;
     case QProcess::Crashed:
-        m_ErrorText = QString("Storage provider crashed: ").append(m_StoreSCP->errorString());
+        m_ErrorText.prepend("Storage provider crashed: ");
+        m_ErrorText.append(m_StoreSCP->errorString());
+        emit SignalStoreSCPError(m_ErrorText);
+        m_ErrorText.clear();
         break;
     case QProcess::Timedout:
-        m_ErrorText = QString("Storage provider timeout: ").append(m_StoreSCP->errorString());
+        m_ErrorText.prepend("Storage provider timeout: ");
+        m_ErrorText.append(m_StoreSCP->errorString());
+        emit SignalStoreSCPError(m_ErrorText);
+        m_ErrorText.clear();
         break;
     case QProcess::WriteError:
-        m_ErrorText = QString("Storage provider write error: ").append(m_StoreSCP->errorString());
+        m_ErrorText.prepend("Storage provider write error: ");
+        m_ErrorText.append(m_StoreSCP->errorString());
+        emit SignalStoreSCPError(m_ErrorText);
+        m_ErrorText.clear();
         break;
     case QProcess::ReadError:
-        m_ErrorText = QString("Storage provider read error: ").append(m_StoreSCP->errorString());
+        m_ErrorText.prepend("Storage provider read error: ");
+        m_ErrorText.append(m_StoreSCP->errorString());
+        emit SignalStoreSCPError(m_ErrorText);
+        m_ErrorText.clear();
         break;
     case QProcess::UnknownError:
-        m_ErrorText = QString("Storage provider unknown error: ").append(m_StoreSCP->errorString());
+        m_ErrorText.prepend("Storage provider unknown error: ");
+        m_ErrorText.append(m_StoreSCP->errorString());
+        emit SignalStoreSCPError(m_ErrorText);
+        m_ErrorText.clear();
         break;
     default:
-        m_ErrorText = QString("Storage provider unknown error: ").append(m_StoreSCP->errorString());
+        m_ErrorText.prepend("Storage provider unknown error: ");
+        m_ErrorText.append(m_StoreSCP->errorString());
+        emit SignalStoreSCPError(m_ErrorText);
+        m_ErrorText.clear();
         break;
     }
 }
@@ -109,20 +162,24 @@ void QmitkStoreSCPLauncher::OnStateChanged(QProcess::ProcessState status)
     switch(status)
     {
     case QProcess::NotRunning:
-        m_StatusText = QString("Storage provider not running: ");
+        m_StatusText.prepend("Storage provider not running!");
         emit SignalStatusOfStoreSCP(m_StatusText);
+        m_StatusText.clear();
         break;
     case QProcess::Starting:
-        m_StatusText = QString("Starting ").append(m_ArgumentList[2]).append(" on port ").append(m_ArgumentList[0]);
+        m_StatusText.prepend("Starting storage provider!");
         emit SignalStatusOfStoreSCP(m_StatusText);
+        m_StatusText.clear();
         break;
     case QProcess::Running:
-        m_StatusText = QString("Running ").append(m_ArgumentList[2]).append(" on port ").append(m_ArgumentList[0]);;
+        m_StatusText.prepend(m_ArgumentList[0]).prepend(" Port: ").prepend(m_ArgumentList[2]).prepend(" AET: ").prepend("Storage provider running! ");
         emit SignalStatusOfStoreSCP(m_StatusText);
+        m_StatusText.clear();
         break;
     default:
-        m_StatusText = QString("Storage provider unknown error: ");
+        m_StatusText.prepend("Storage provider unknown error!");
         emit SignalStatusOfStoreSCP(m_StatusText);
+        m_StatusText.clear();
         break;
     }
 }
@@ -131,6 +188,18 @@ void QmitkStoreSCPLauncher::SetArgumentList(QmitkStoreSCPLauncherBuilder* builde
 {
     m_ArgumentList << *builder->GetPort() << QString("-aet") <<*builder->GetAETitle() << *builder->GetTransferSyntax()
         << *builder->GetOtherNetworkOptions() << *builder->GetMode() << QString("-od") << *builder->GetOutputDirectory();
+}
+
+void QmitkStoreSCPLauncher::DeleteTemporaryData()
+{
+    MITK_INFO << m_ArgumentList[7].toStdString();
+    QDir dir(m_ArgumentList[7]);
+    QDirIterator it(dir);
+    while(it.hasNext())
+    {
+        it.next();
+        dir.remove(it.fileInfo().absoluteFilePath());
+    }
 }
 
 QString QmitkStoreSCPLauncher::ArgumentListToQString()

@@ -133,7 +133,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QProgressBar *progBar = new QProgressBar();
   qStatusBar->addPermanentWidget(progBar, 0);
 
-  mainWindow->dumpObjectTree();
+  //mainWindow->dumpObjectTree();
   //progBar->hide();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
@@ -191,10 +191,15 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   PerspectivesTabBar->setVisible(true);
   PerspectivesTabBar->setDrawBase(false);
   QVBoxLayout* CentralWidgetLayout = new QVBoxLayout(CentralWidget);
+  CentralWidgetLayout->contentsMargins();
+  CentralWidgetLayout->setContentsMargins(9,9,9,0);
+  CentralWidgetLayout->setSpacing(0);
+  CentralWidgetLayout->setObjectName("CentralWidgetLayout");
   QHBoxLayout* PerspectivesLayer = new QHBoxLayout(mainWindow);
+  //PerspectivesLayer->setContentsMargins(0,0,0,0);
   PerspectivesLayer->setObjectName("PerspectivesLayer");
   CentralWidgetLayout->addLayout(PerspectivesLayer);
-  CentralWidgetLayout->addSpacing(-18);
+  //CentralWidgetLayout->addSpacing(-18);
   PerspectivesLayer->addWidget(PerspectivesTabBar);
   PerspectivesLayer->addSpacing(300);
   QPushButton* StyleUpdateButton = new QPushButton("Update Style", mainWindow);
@@ -211,6 +216,8 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   //CentralWidget->resize(mainWindow->size());
   //QSize Size = CentralWidget->size();
   QHBoxLayout* PageCompositeLayout = new QHBoxLayout(PageComposite);
+  PageCompositeLayout->setContentsMargins(0,0,0,0);
+  PageCompositeLayout->setSpacing(0);
   PageComposite->setLayout(PageCompositeLayout);
   //PageComposite->resize(mainWindow->size());
   //Size = PageComposite->size();
@@ -221,8 +228,6 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   CentralWidgetLayout->activate();
   CentralWidgetLayout->update();
   this->GetWindowConfigurer()->CreatePageComposite(static_cast<void*>(PageComposite));
-
-  
 
   //QComboBox* ComboBox = new QComboBox(mainWindow);
 

@@ -49,6 +49,69 @@ berry--QCTabBar QToolButton#TabCloseButton
     background: none; 
 }
 
+/*QWidget
+{
+border: 1px solid green;
+}*/
+
+QWidget#PageComposite
+{
+/*border: 1px solid orange;*/
+padding: 0px;
+}
+
+QWidget#PageComposite > QFrame
+{
+/*border: 1px solid yellow;*/
+margin: 0px;
+padding: 0px;
+/*background: green;*/
+}
+
+/*QWidget#PageComposite > QFrame
+{
+border: 1px solid yellow;
+margin: 0px;
+padding: 0px;
+}*/
+
+QWidget#PageCompositeControlWidget
+{
+/*border: 1px solid yellow;*/
+margin: 0px;
+padding: 0px;
+}
+
+QWidget#ClientComposite
+{
+/*border: 1px solid pink;*/
+background: rgb(210, 221, 239);
+margin: 0px;
+padding: 10px;
+}
+
+QWidget#ClientComposite > QFrame
+{
+/*border: 1px solid pink;*/
+margin: 0px;
+padding: 0px;
+}
+
+/*QFrame#StandaloneViewForm > QFrame
+{
+border: 1px solid red;
+}*/
+
+/*QFrame#PartPaneControl
+{
+border: 1px solid white;
+}*/
+
+/*QFrame#ViewFormContentFrame
+{
+border: 5px solid orange;
+}*/
+
 QWidget#TabTopRightControls {
     border: 1px solid palette(mid); 
     border-left: 0px; 
@@ -62,9 +125,9 @@ QWidget#ViewForm {
     border-top-right-radius: 8px; 
 }
 
-QWidget#StandaloneViewForm {
+/*QWidget#StandaloneViewForm {
       border: 1px solid palette(mid); 
-}
+}*/
 
 QMainWindow::separator {
 background: blue;
@@ -94,6 +157,11 @@ background: rgb(43, 75, 116);
 color: rgb(210, 221, 239);
 }
 
+QMenuBar::item:selected
+{
+border: 1px solid yellow;
+}
+
 QMenu
 {
 border: 0px;
@@ -106,16 +174,15 @@ QMenu::item
 background: rgb(210, 221, 239);
 }
 
+QMenu::item:selected
+{
+color: rgb(43, 75, 116);
+}
+
 /*QToolBar
 {
 background: yellow;
 }*/
-
-QtPerspectiveSwitcherTabBar
-{
-/*background: green;*/
-/*top: 100px;*/
-}
 
 QHBoxLayout#PerspectivesLayer
 {
@@ -271,12 +338,26 @@ margin-top: 5px;
 border: 1px solid green;
 }*/
 
+QtPerspectiveSwitcherTabBar
+{
+/*border: 1px solid pink;*/
+/*background: green;*/
+/*top: 100px;*/
+}
+
 QFrame#StandaloneViewForm
 {
 /*margin-top: -200px;*/
 /*border: 10px solid black;*/
 background: rgb(210, 221, 239);
-border-top: 0px;
+/*background: red;*/
+/*border-top: 0px;*/
+/*border: 5px solid red;*/
+/*margin: 2px solid orange;*/
+/*padding: 3px solid green;*/
+/*border: 1px solid green;*/
+margin: 0px;
+padding: 0px;
 }
 
 QPushButton#StyleUpdateButton
@@ -302,13 +383,15 @@ background: green;
 
 QWidget#CentralWidget
 {
+/*border: 1px solid red;*/
 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(43, 75, 116), stop:1 rgb(197, 245, 254));
 }
 
-QWidget#PageComposite
+/*QWidget#PageComposite
 {
-margin: 0 px;
-}
+margin: 0px;
+border: 10px solid orange;
+}*/
 
 /*QFrame#PartPaneControl
 {

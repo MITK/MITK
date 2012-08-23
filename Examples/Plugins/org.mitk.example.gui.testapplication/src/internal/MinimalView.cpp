@@ -62,12 +62,18 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   storageService->GetActiveDataStorage().GetPointer()->GetDataStorage();
 
   connect(m_Controls.importButton, SIGNAL(clicked()), m_Controls.widget, SLOT(OnFolderCDImport()));
+  connect(m_Controls.widget, SIGNAL(SignalDicomToDataManager(const QStringList&)), this, SLOT(AddDataNodeFromDICOM(const QStringList&)));
   
   // register selection listener
   //GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
 
   m_Parent->setEnabled(true);
 }
+
+void MinimalView::AddDataNodeFromDICOM(const QStringList& eventProperties)
+{
+}
+
 
 //void MinimalView::ToggleRadioMethod()
 //{

@@ -54,6 +54,9 @@ public:
   //private slots:
   //   void ToggleRadioMethod(); //Debugging only!
 
+protected slots:
+  void AddDataNodeFromDICOM(const QStringList& eventProperties);
+
 protected:
 
   void SetFocus();

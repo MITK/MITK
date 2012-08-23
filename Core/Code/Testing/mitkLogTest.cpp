@@ -50,6 +50,7 @@ void LogMessages()
     MITK_DEBUG << "Test debugging stream in thread " << ThreadID;
     MITK_ERROR << "Test error stream in thread " << ThreadID;
     MITK_FATAL << "Test fatal stream in thread " << ThreadID;
+
     }
   }
 
@@ -86,6 +87,7 @@ void Start()
   {
   LoggingRunning = true;
   m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);
+
   }
 
 void Stop()
@@ -165,17 +167,18 @@ static void TestThreadSaveLog()
       //start them
       myThreadClass1.Start();
       myThreadClass2.Start();
-      
 
       //wait for 500 ms
       itksys::SystemTools::Delay(500);
+
 
       //stop them
       myThreadClass1.Stop();
       myThreadClass2.Stop();
 
-      //sleep again to let all threads end
-      itksys::SystemTools::Delay(500);
+      //Wait for all threads to end
+      myThreader->TerminateThread(1);
+      myThreader->TerminateThread(2);
       }
     catch(...)
       {

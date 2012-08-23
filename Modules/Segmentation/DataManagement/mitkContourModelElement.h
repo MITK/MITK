@@ -175,12 +175,12 @@ namespace mitk
     //##Documentation
     //## @brief
     //##
-    virtual void RemoveVertex(VertexType* vertex);
+    virtual bool RemoveVertex(VertexType* vertex);
 
     //##Documentation
     //## @brief
     //##
-    virtual void RemoveVertexAt(int index);
+    virtual bool RemoveVertexAt(int index);
 
     //##Documentation
     //## @brief

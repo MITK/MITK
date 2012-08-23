@@ -252,16 +252,39 @@ void mitk::ContourModelElement::Concatenate(mitk::ContourModelElement* other)
 
 
 
-void mitk::ContourModelElement::RemoveVertex(mitk::ContourModelElement::VertexType* vertex)
+bool mitk::ContourModelElement::RemoveVertex(mitk::ContourModelElement::VertexType* vertex)
 {
-  this->RemoveVertexAt(vertex->Coordinates, 0.1);
+  ConstVertexIterator it = this->m_Vertices->begin();
+
+  ConstVertexIterator end = this->m_Vertices->end();
+
+  while(it != end)
+  {
+    if((*it) == vertex)
+    {
+      this->m_Vertices->erase(it);
+      return true;
+    }
+
+    it++;
+  }
+
+  return false;
 }
 
 
 
-void mitk::ContourModelElement::RemoveVertexAt(int index)
+bool mitk::ContourModelElement::RemoveVertexAt(int index)
 {
-  this->m_Vertices->erase(this->m_Vertices->begin()+index);
+  if( index >= 0 && index < this->m_Vertices->size() )
+  {
+    this->m_Vertices->erase(this->m_Vertices->begin()+index);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 

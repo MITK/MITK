@@ -154,7 +154,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           vert[1]=pointsize;
           glColor3f(selectedcolor->GetColor().GetRed(), selectedcolor->GetColor().GetBlue(), selectedcolor->GetColor().GetGreen());
           glLineWidth(1);
-          //a diamond around the point with the selected color
+          //a rectangle around the point with the selected color
           glBegin (GL_LINE_LOOP);
           tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
           tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
@@ -190,6 +190,41 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       glVertex2f(lastPt2d[0], lastPt2d[1]);
       glVertex2f( pt2d[0], pt2d[1] );
       glEnd();
+    }
+
+    //draw selected vertex if exists
+    if(input->GetSelectedVertex())
+    {
+      //transform selected vertex
+      point = input->GetSelectedVertex()->Coordinates;
+
+      itk2vtk(point, vtkp);
+      transform->TransformPoint(vtkp, vtkp);
+      vtk2itk(vtkp,p);
+
+      displayGeometry->Project(p, projected_p);
+
+      displayGeometry->Map(projected_p, pt2d);
+      displayGeometry->WorldToDisplay(pt2d, pt2d);
+
+      Vector3D diff=p-projected_p;
+      ScalarType scalardiff = diff.GetSquaredNorm();
+      //----------------------------------
+
+      //draw point
+      float pointsize = 4;
+      Point2D  tmp;
+      glColor3f(0.0, 1.0, 0.0);
+      glLineWidth(1);
+      //a diamond around the point
+      glBegin (GL_LINE_LOOP);
+      //begin from upper left corner and paint clockwise
+      tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex2fv(&tmp[0]);
+      tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex2fv(&tmp[0]);
+      tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex2fv(&tmp[0]);
+      tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex2fv(&tmp[0]);
+      glEnd ();
+      //------------------------------------
     }
   }
 }

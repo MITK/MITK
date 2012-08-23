@@ -55,6 +55,37 @@ int Starter::Run(int& argc, char** argv,
 
   bool consoleLog = platform->ConsoleLog();
 
+  // Add search paths for Qt plugins
+  foreach(QString qtPluginPath, QString::fromStdString(Platform::GetProperty(Platform::PROP_QTPLUGIN_PATH)).split(';', QString::SkipEmptyParts))
+  {
+    if (QFile::exists(qtPluginPath))
+    {
+      QCoreApplication::addLibraryPath(qtPluginPath);
+    }
+    else if (consoleLog)
+    {
+      BERRY_WARN << "Qt plugin path does not exist: " << qtPluginPath.toStdString();
+    }
+  }
+
+  // Add a default search path. It is assumed that installed applications
+  // provide their Qt plugins in that path.
+  static const QString defaultQtPluginPath = QCoreApplication::applicationDirPath() + "/plugins";
+  if (QFile::exists(defaultQtPluginPath))
+  {
+    QCoreApplication::addLibraryPath(defaultQtPluginPath);
+  }
+
+  if (consoleLog)
+  {
+    std::string pathList;
+    foreach(QString libPath, QCoreApplication::libraryPaths())
+    {
+      pathList += (pathList.empty() ? "" : ", ") + libPath.toStdString();
+    }
+    BERRY_INFO << "Qt library search paths: " << pathList;
+  }
+
   // run the application
   IExtensionPointService::Pointer service =
       platform->GetExtensionPointService();

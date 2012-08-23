@@ -67,9 +67,6 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
-  OnToFCameraStopped();
-  OnToFCameraDisconnected();
-  ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::SetFocus()
@@ -146,6 +143,9 @@ void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Point
 
 void QmitkToFUtilView::Deactivated()
 {
+  OnToFCameraStopped();
+  OnToFCameraDisconnected();
+  ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::Visible()

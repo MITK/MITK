@@ -211,19 +211,23 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       ScalarType scalardiff = diff.GetSquaredNorm();
       //----------------------------------
 
-      //draw point
-      float pointsize = 4;
-      Point2D  tmp;
-      glColor3f(0.0, 1.0, 0.0);
-      glLineWidth(1);
-      //a diamond around the point
-      glBegin (GL_LINE_LOOP);
-      //begin from upper left corner and paint clockwise
-      tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex2fv(&tmp[0]);
-      tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex2fv(&tmp[0]);
-      tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex2fv(&tmp[0]);
-      tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex2fv(&tmp[0]);
-      glEnd ();
+      //draw point if close to plane
+      if(scalardiff<0.5)
+      {
+
+        float pointsize = 3.2;
+        Point2D  tmp;
+        glColor3f(0.0, 1.0, 0.0);
+        glLineWidth(1);
+        //a diamond around the point
+        glBegin (GL_LINE_LOOP);
+        //begin from upper left corner and paint clockwise
+        tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex2fv(&tmp[0]);
+        tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex2fv(&tmp[0]);
+        tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex2fv(&tmp[0]);
+        tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex2fv(&tmp[0]);
+        glEnd ();
+      }
       //------------------------------------
     }
   }

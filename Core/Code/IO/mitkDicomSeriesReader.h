@@ -157,7 +157,8 @@ namespace mitk
  Before slices are further analyzed, they are sorted spatially. As implemented by GdcmSortFunction(),
  slices are sorted by
    1. distance from origin (calculated using (0020,0032) Image Position Patient and (0020,0037) Image Orientation)
-   2. when distance is equal, (0008,0032) Acquisition Time is used as a backup criterion (necessary for meaningful 3D+t sorting)
+   2. when distance is equal, (0020,0012) Aquisition Number, (0008,0032) Acquisition Time and (0018,1060) Trigger Time are
+      used as a backup criterions (necessary for meaningful 3D+t sorting)
 
  \subsection DicomSeriesReader_sorting3 Step 3: Ensure equal z spacing
 

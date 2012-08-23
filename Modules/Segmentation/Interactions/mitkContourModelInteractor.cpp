@@ -32,6 +32,7 @@ mitk::ContourModelInteractor::ContourModelInteractor(DataNode* dataNode)
 {
   CONNECT_ACTION( AcCHECKPOINT, OnCheckPointClick );
   CONNECT_ACTION( AcCHECKOBJECT, OnCheckContourClick );
+  CONNECT_ACTION( AcDELETEPOINT, OnDeletePoint );
   CONNECT_ACTION( AcMOVEPOINT, OnMovePoint );
   CONNECT_ACTION( AcMOVE, OnMoveContour );
   CONNECT_ACTION( AcFINISH, OnFinish );
@@ -120,6 +121,9 @@ bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const Stat
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>(
     m_DataNode->GetData() );
 
+  
+  contour->Deselect();
+
   /* 
   * Check distance to any vertex.
   * Transition YES if click close to a vertex
@@ -129,6 +133,7 @@ bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const Stat
 
   if (contour->SelectVertexAt(click, 1.5, timestep) )
   {
+    contour->SetSelectedVertexAcitve();
     newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
     m_lastMousePosition = click;
   }
@@ -157,6 +162,7 @@ bool mitk::ContourModelInteractor::OnCheckContourClick( Action* action, const St
     m_DataNode->GetData() );
   mitk::Geometry3D *contourGeometry = dynamic_cast< Geometry3D * >( contour->GetGeometry( timestep ) );
 
+
   if ( contourGeometry->IsInside(click) )
   {
     m_lastMousePosition = click;
@@ -174,12 +180,25 @@ bool mitk::ContourModelInteractor::OnCheckContourClick( Action* action, const St
 
 
 
-bool mitk::ContourModelInteractor::OnSelectPoint (Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelInteractor::OnDeletePoint( Action* action, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
+
+
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
+  mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
+
+  contour->RemoveVertexAt(contour->GetSelectedVertex()->Coordinates, timestep);
+
+  assert( positionEvent->GetSender()->GetRenderWindow() );
+  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+
   return true;
 }
+
+
 
 
 bool mitk::ContourModelInteractor::OnMovePoint( Action* action, const StateEvent* stateEvent)

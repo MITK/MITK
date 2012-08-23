@@ -33,24 +33,33 @@ namespace mitk {
   * \ingroup ContourModelFilters
   * \ingroup Process
   */
-  class Segmentation_EXPORT mitkImageToLiveWireContourFilter : public ImageToContourModelFilter
+  class Segmentation_EXPORT ImageToLiveWireContourFilter : public ImageToContourModelFilter
   {
 
   public:
 
-    mitkClassMacro(mitkImageToLiveWireContourFilter, ImageToContourModelFilter);
+    mitkClassMacro(ImageToLiveWireContourFilter, ImageToContourModelFilter);
     itkNewMacro(Self);
+
+    itkSetMacro(StartPoint, mitk::Point3D);
+    itkSetMacro(EndPoint, mitk::Point3D);
 
 
   protected:
-    mitkImageToLiveWireContourFilter();
+    ImageToLiveWireContourFilter();
 
-    virtual ~mitkImageToLiveWireContourFilter();
+    virtual ~ImageToLiveWireContourFilter();
 
     void GenerateData();
 
+    template<typename TPixel, unsigned int VImageDimension>
+    void ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
+
     mitk::Point3D m_StartPoint;
-    mitk::Point3D m_Endpoint;
+    mitk::Point3D m_EndPoint;
+
+    mitk::Point3D m_StartPointInIndex;
+    mitk::Point3D m_EndPointInIndex;
 
   };
 

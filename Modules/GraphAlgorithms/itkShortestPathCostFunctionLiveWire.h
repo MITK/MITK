@@ -22,17 +22,17 @@ namespace itk
     typedef SmartPointer<Self>                              Pointer;
     typedef SmartPointer<const Self>                        ConstPointer;    
     typedef itk::ImageRegionConstIterator<TInputImageType>  ConstIteratorType;
-    typedef TInputImageType::RegionType                     RegionType;
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(ShortestPathCostFunctionLiveWire, Object);
+    itkTypeMacro(ShortestPathCostFunctionLiveWire, ShortestPathCostFunction);
 
     // more Typdefs for convinience    
-    typedef typename TInputImageType::IndexType                                          IndexType;
-    typedef TInputImageType                                                              ImageType;
+    typedef typename TInputImageType::IndexType             IndexType;
+    typedef TInputImageType                                 ImageType;
+    typedef itk::ImageRegion<2>                             RegionType;
 
     typedef itk::GradientMagnitudeImageFilter<TInputImageType, TInputImageType> GradientMagnitudeFilterType;  
 
@@ -86,7 +86,7 @@ namespace itk
     typename Superclass::PixelType startValue;
     typename Superclass::PixelType endValue;
 
-    typename RegionType m_RequestedRegion;
+    RegionType m_RequestedRegion;
 
   private:
 

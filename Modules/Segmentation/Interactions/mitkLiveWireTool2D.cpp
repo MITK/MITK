@@ -54,6 +54,8 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   m_LiveWireContourNode->AddProperty( "color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
 
+
+  m_LiveWireFilter = mitk::ImageToLiveWireContourFilter::New();
  
   
   // great magic numbers
@@ -128,6 +130,13 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_Contour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
 
 
+  //set current slice as input for ImageToLiveWireContourFilter
+  m_WorkingSlice = this->GetAffectedReferenceSlice(positionEvent);
+  m_LiveWireFilter->SetInput(m_WorkingSlice);
+  //set initial start point
+  m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
+
+
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -164,6 +173,8 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   //clear the livewire contour and reset the corresponding datanode
   m_LiveWireContour->Clear(timestep);
   m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
+  //set new start point
+  m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -190,9 +201,14 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
   /* actual LiveWire computation */
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
+   m_LiveWireFilter->SetEndPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
+
+   m_LiveWireFilter->Update();
+
+
   ContourModel::VertexType* currentVertex = const_cast<ContourModel::VertexType*>(m_LiveWireContour->GetVertexAt(0));
 
-  m_LiveWireContour->Clear(timestep);
+  this->m_LiveWireContour = this->m_LiveWireFilter->GetOuput();
   m_LiveWireContour->AddVertex(*currentVertex, timestep);
   m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
   /* END actual LiveWire computation */

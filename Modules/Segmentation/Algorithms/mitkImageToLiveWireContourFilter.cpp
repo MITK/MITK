@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkShortestPathCostFunctionLiveWire.h>
 #include <itkImageRegionIterator.h>
+#include <itkShortestPathImageFilter.h>
 
 
 #include <mitkImageAccessByItk.h>
@@ -42,8 +43,6 @@ mitk::ImageToLiveWireContourFilter::~ImageToLiveWireContourFilter()
 void mitk::ImageToLiveWireContourFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
-
-  ImageToContourModelFilter::OutputType::Pointer output = this->GetOutput();
 
   if(!input)
   {
@@ -72,13 +71,13 @@ void mitk::ImageToLiveWireContourFilter::GenerateData()
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::ImageToLiveWireContourFilter::ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
 {
-  typedef itk::Image<TPixel, VImageDimension> InputImageType;
-  typedef itk::Image< float,  2 >   FloatImageType;
+  typedef itk::Image< TPixel, VImageDimension >                              InputImageType;
+  typedef itk::Image< float,  2 >                                          FloatImageType;
 
-  typedef itk::ShortestPathImageFilter<InputImageType, InputImageType>      ShortestPathImageFilterType;
-  typedef itk::ShortestPathCostFunctionLiveWire<typename InputImageType> CostFunctionType;
+  typedef typename itk::ShortestPathImageFilter< InputImageType, InputImageType >     ShortestPathImageFilterType;
+  typedef typename itk::ShortestPathCostFunctionLiveWire< InputImageType >   CostFunctionType;
 
-  typedef InputImageType::IndexType IndexType;
+  typedef InputImageType::IndexType                                        IndexType;
 
 
   /* compute the requested region for itk filters */
@@ -120,7 +119,7 @@ void mitk::ImageToLiveWireContourFilter::ItkProcessImage (itk::Image<TPixel, VIm
   /* calculate shortest path between start and end point */
   ShortestPathImageFilterType::Pointer shortestPathFilter = ShortestPathImageFilterType::New();
   shortestPathFilter->SetFullNeighborsMode(true);
-  shortestPathFilter->SetInput(sourceImageItk);
+  shortestPathFilter->SetInput(inputImage);
   shortestPathFilter->SetMakeOutputImage(true);  
   shortestPathFilter->SetStoreVectorOrder(false);  
   //shortestPathFilter->SetActivateTimeOut(true); 
@@ -137,7 +136,22 @@ void mitk::ImageToLiveWireContourFilter::ItkProcessImage (itk::Image<TPixel, VIm
   std::vector< itk::Index<3> > shortestPath = shortestPathFilter->GetVectorPath();
 
   //fill the output contour with controll points from the path
+  ImageToContourModelFilter::OutputType::Pointer outputContour = this->GetOutput();
+  mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
 
+  std::vector< itk::Index<3> >::iterator pathIterator = shortestPath.begin();
+
+  while(pathIterator != shortestPath.end())
+  {
+    mitk::Point3D currentPoint;
+    currentPoint[0] = (*pathIterator)[0];
+    currentPoint[1] = (*pathIterator)[1];
+
+    input->GetGeometry(0)->IndexToWorld(currentPoint, currentPoint);
+    outputContour->AddVertex(currentPoint);
+    
+    pathIterator++;
+  }
   /*---------------------------------------------*/
 
 }

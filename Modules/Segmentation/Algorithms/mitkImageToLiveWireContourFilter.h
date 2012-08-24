@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _mitkmitkImageToLiveWireContourFilter_h__
-#define _mitkmitkImageToLiveWireContourFilter_h__
+#ifndef _mitkImageToLiveWireContourFilter_h__
+#define _mitkImageToLiveWireContourFilter_h__
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
@@ -61,11 +61,10 @@ namespace mitk {
     mitk::Point3D m_StartPoint;
     mitk::Point3D m_EndPoint;
 
-    ImageToContourModelFilter::IndexType m_StartPointInIndex;
-    ImageToContourModelFilter::IndexType m_EndPointInIndex;
+    mitk::Point3D m_StartPointInIndex;
+    mitk::Point3D m_EndPointInIndex;
 
   };
 
 }
-
 #endif

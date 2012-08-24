@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _mitkmitkImageToContourModelFilter_h__
-#define _mitkmitkImageToContourModelFilter_h__
+#ifndef _mitkImageToContourModelFilter_h__
+#define _mitkImageToContourModelFilter_h__
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
@@ -42,7 +42,6 @@ namespace mitk {
     itkNewMacro(Self);
 
     typedef mitk::Image InputType;
-    typedef InputType::IndexType IndexType;
 
 
     virtual void SetInput( const InputType *input);
@@ -57,8 +56,6 @@ namespace mitk {
     ImageToContourModelFilter();
 
     virtual ~ImageToContourModelFilter();
-
-    void GenerateOutputInformation() {};
 
     void GenerateData();
 

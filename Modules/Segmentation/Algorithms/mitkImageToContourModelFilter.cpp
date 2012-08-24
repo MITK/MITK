@@ -15,17 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageToContourModelFilter.h"
-#include <mitkInteractionConst.h>
-#include <mitkPointOperation.h>
+
 
 
 mitk::ImageToContourModelFilter::ImageToContourModelFilter()
 {
-  OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
-  this->SetNumberOfRequiredInputs(1);
-  this->SetNumberOfOutputs( 1 );
-  this->SetNthOutput(0, output.GetPointer());
-
 }
 
 

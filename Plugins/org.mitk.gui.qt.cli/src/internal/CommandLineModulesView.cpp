@@ -231,6 +231,18 @@ void CommandLineModulesView::OnModulesChanged()
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& moduleRef)
 {
+  // We don't want to repeatedly create new tabs. If the moduleRef points to
+  // an existing tab, make that tab the current tab.
+  for (int i = 0; i < m_Controls->m_TabWidget->count(); i++)
+  {
+    if (m_Controls->m_TabWidget->tabText(i) == moduleRef.description().title())
+    {
+      m_Controls->m_TabWidget->setCurrentIndex(i);
+      return;
+    }
+  }
+
+  // Otherwise, create a new tab.
   ctkCmdLineModuleFrontend* moduleInstance = m_ModuleFactory->create(moduleRef);
   if (!moduleInstance) return;
 
@@ -300,6 +312,12 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
   }
 
   QString aboutString = "";
+
+  if (!description.title().isEmpty())
+  {
+    QString titleHtml = "<h1>" + description.title() + "</h1>";
+    aboutString += titleHtml;
+  }
 
   if (!description.contributor().isEmpty())
   {

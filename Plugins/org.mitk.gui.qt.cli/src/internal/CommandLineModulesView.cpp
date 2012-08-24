@@ -583,7 +583,7 @@ void CommandLineModulesView::OnModuleFinished()
   qDebug() << "Command Line Module ... finishing.";
 
   this->LoadOutputData();
-  //this->ClearUpTemporaryFiles();
+  this->ClearUpTemporaryFiles();
 
   qDebug() << "Command Line Module ... finished.";
 }

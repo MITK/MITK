@@ -122,15 +122,22 @@ void mitk::ImageToLiveWireContourFilter::ItkProcessImage (itk::Image<TPixel, VIm
   shortestPathFilter->SetFullNeighborsMode(true);
   shortestPathFilter->SetInput(sourceImageItk);
   shortestPathFilter->SetMakeOutputImage(true);  
-  shortestPathFilter->SetStoreVectorOrder(true);  
+  shortestPathFilter->SetStoreVectorOrder(false);  
   //shortestPathFilter->SetActivateTimeOut(true); 
   shortestPathFilter->SetStartIndex(startPoint);
   shortestPathFilter->SetEndIndex(endPoint);
 
   shortestPathFilter->Update();
 
-  mitk::Image::Pointer resultImageOrder;
-  CastToMitkImage(shortestPathFilter->GetVectorOrderImage(), resultImageOrder);
+  /*---------------------------------------------*/
+
+
+  /* construct contour from path image */
+  //get the shortest path as vector
+  std::vector< itk::Index<3> > shortestPath = shortestPathFilter->GetVectorPath();
+
+  //fill the output contour with controll points from the path
+
   /*---------------------------------------------*/
 
 }

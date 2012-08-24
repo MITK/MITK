@@ -113,6 +113,7 @@ void mitk::ImageToLiveWireContourFilter::ItkProcessImage (itk::Image<TPixel, VIm
   costFunction->SetImage(inputImage);
   costFunction->SetStartIndex(startPoint);
   costFunction->SetEndIndex(endPoint);
+  costFunction->SetRequestedRegion(region);
   /*---------------------------------------------*/
 
 

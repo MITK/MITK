@@ -12,23 +12,24 @@
 namespace itk
 {
 
-  template <class TInputImageType>            
+  template <class TInputImageType>
   class ITK_EXPORT ShortestPathCostFunctionLiveWire : public ShortestPathCostFunction<TInputImageType>
   {
   public:
     /** Standard class typedefs. */
-    typedef ShortestPathCostFunctionLiveWire              Self;
-    typedef ShortestPathCostFunction<TInputImageType>  Superclass;
-    typedef SmartPointer<Self>                         Pointer;
-    typedef SmartPointer<const Self>                   ConstPointer;    
+    typedef ShortestPathCostFunctionLiveWire                Self;
+    typedef ShortestPathCostFunction<TInputImageType>       Superclass;
+    typedef SmartPointer<Self>                              Pointer;
+    typedef SmartPointer<const Self>                        ConstPointer;    
     typedef itk::ImageRegionConstIterator<TInputImageType>  ConstIteratorType;
+    typedef TInputImageType::RegionType                     RegionType;
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
     /** Run-time type information (and related methods). */
     itkTypeMacro(ShortestPathCostFunctionLiveWire, Object);
-   
+
     // more Typdefs for convinience    
     typedef typename TInputImageType::IndexType                                          IndexType;
     typedef TInputImageType                                                              ImageType;
@@ -58,7 +59,9 @@ namespace itk
     // Set/Get function for sigma parameter
     itkSetMacro (Sigma, double);
     itkGetMacro (Sigma, double);
-     
+
+    itkSetMacro (RequestedRegion, RegionType);
+    itkGetMacro (RequestedRegion, RegionType);
 
   protected:
 
@@ -73,17 +76,17 @@ namespace itk
 
     double minCosts;
 
-   bool m_UseRepulsivePoint;
+    bool m_UseRepulsivePoint;
 
-   std::vector<  itk::Index<3>  > m_RepulsivePoints;
+    std::vector<  itk::Index<3>  > m_RepulsivePoints;
 
-   //typename Superclass::PixelType a,b, a2, b2;
+    //typename Superclass::PixelType a,b, a2, b2;
     typename Superclass::PixelType val;
 
     typename Superclass::PixelType startValue;
     typename Superclass::PixelType endValue;
 
-     
+    typename RegionType m_RequestedRegion;
 
   private:
 

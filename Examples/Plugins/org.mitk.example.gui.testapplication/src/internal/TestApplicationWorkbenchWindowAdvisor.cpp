@@ -135,7 +135,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QProgressBar *progBar = new QProgressBar();
   qStatusBar->addPermanentWidget(progBar, 0);*/
 
-  //mainWindow->dumpObjectTree();
+  static_cast<QMainWindow*>(this->GetWindowConfigurer()->GetWindow()->GetShell()->GetControl())->dumpObjectTree();
   //progBar->hide();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
@@ -161,6 +161,8 @@ void TestApplicationWorkbenchWindowAdvisor::PreWindowOpen()
   configurer->SetShowPerspectiveBar(true);
   configurer->SetShowStatusLine(false);
   configurer->SetTitle("TestApplication");
+
+  this->GetWindowConfigurer()->SetTitle("Spartan DICOM Viewer");
 
   //this->GetWindowConfigurer()->AddEditorAreaTransfer(QStringList("text/uri-list"));
   //this->GetWindowConfigurer()->ConfigureEditorAreaDropListener(dropTargetListener);
@@ -191,6 +193,7 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   PageComposite->setVisible(true);
   //QWidget* PageComposite = new berry::QtControlWidget(CentralWidget, shell.GetPointer());
   QtPerspectiveSwitcherTabBar* PerspectivesTabBar = new QtPerspectiveSwitcherTabBar(this->GetWindowConfigurer()->GetWindow());
+  PerspectivesTabBar->setObjectName("PerspectivesTabBar");
   //QTabBar* PerspectivesTabBar = new QTabBar(CentralWidget);
   PerspectivesTabBar->addTab("DICOM-Manager");
   PerspectivesTabBar->addTab("Image Viewer");

@@ -57,11 +57,6 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   //berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
   //Q_ASSERT(styleManager);
 
-  ctkServiceReference serviceReference = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getServiceReference<mitk::IDataStorageService>();
-  mitk::IDataStorageService* storageService = org_mitk_example_gui_testapplication_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
-
-  storageService->GetActiveDataStorage().GetPointer()->GetDataStorage();
-
   connect(m_Controls.importButton, SIGNAL(clicked()), m_Controls.widget, SLOT(OnFolderCDImport()));
   connect(m_Controls.widget, SIGNAL(SignalDicomToDataManager(const QStringList&)), this, SLOT(AddDataNodeFromDICOM(const QStringList&)));
   

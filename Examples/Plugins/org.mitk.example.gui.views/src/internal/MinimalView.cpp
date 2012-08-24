@@ -23,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIDataStorageService.h"
 #include "mitkDicomSeriesReader.h"
 
+#include <berryIWorkbench.h>
+#include <berryIWorkbenchWindow.h>
+#include <berryIWorkbenchPage.h>
+
 const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview"; 
 
 //MinimalView::MinimalView()
@@ -108,6 +112,10 @@ void MinimalView::AddDataNodeFromDICOM(const QStringList& Properties)
       mitk::IDataStorageService* storageService = org_mitk_example_gui_views_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
       mitk::RenderingManager::GetInstance()->SetDataStorage(storageService->GetActiveDataStorage().GetPointer()->GetDataStorage());
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      berry::IWorkbenchWindow::Pointer window = this->GetSite()->GetWorkbenchWindow();
+      std::string perspectiveId = "org.mitk.example.testperspective2";
+      window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
   }
 }
 

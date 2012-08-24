@@ -207,3 +207,19 @@ QWidget#CentralWidget
 {
 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(43, 75, 116), stop:1 rgb(197, 245, 254));
 }
+
+/*bad hack to make Button invisible*/
+QPushButton#downloadButton
+{
+background: rgb(240,240,240);
+border: 0px;
+color: rgb(240,240,240);
+}
+
+QPushButton#importButton
+{
+/*margin-left: 30px;*/
+min-height: 22px;
+max-height: 22px; 
+max-width: 70px;
+}

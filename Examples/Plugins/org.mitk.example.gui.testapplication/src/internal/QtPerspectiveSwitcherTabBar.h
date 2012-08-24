@@ -47,7 +47,7 @@ private:
 
   bool tabChanged;
 
-  //friend struct QtPerspectiveSwitcherTabBarListener;
+  friend struct QtPerspectiveSwitcherTabBarListener;
 };
 
 

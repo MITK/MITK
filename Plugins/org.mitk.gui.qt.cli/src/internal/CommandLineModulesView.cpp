@@ -409,6 +409,13 @@ void CommandLineModulesView::OnRestoreButtonPressed()
   QString message = "restoring defaults.";
   this->PublishMessage(message);
 
+  ctkCmdLineModuleFrontend* moduleInstance = m_MapTabToModuleInstance[m_Controls->m_TabWidget->currentIndex()];
+  if (!moduleInstance)
+  {
+    qWarning() << "Invalid module instance";
+    return;
+  }
+  moduleInstance->resetValues();
 
   message = "restored defaults.";
   this->PublishMessage(message);

@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define CommandLineModulesView_h
 
 #include <QmitkAbstractView.h>
+#include <berryIPreferences.h>
+#include <berryIPreferencesService.h>
+#include <berryIBerryPreferences.h>
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleResult.h>
 #include <QFutureWatcher>
@@ -139,8 +142,21 @@ private:
 
   /**
    * \brief Called on startup and by OnPreferencesChanged to load the preferences into member variables.
+   *
+   * Does not do the temporary folder.
    */
-  void RetrievePreferenceValues();
+  void RetrieveAndStorePreferenceValues();
+
+  /**
+   * \brief Called on startup and by OnPreferencesChanged to load the temporary folder preference into member variables.
+   */
+  void RetrieveAndStoreTemporaryDirectoryPreferenceValues();
+
+
+  /**
+   * \brief Called to get hold of the actual prefefences node.
+   */
+  berry::IBerryPreferences::Pointer RetrievePreferences();
 
   /**
    * \brief Search the internal datastructure (QHash) to find the reference that matches the identifier.

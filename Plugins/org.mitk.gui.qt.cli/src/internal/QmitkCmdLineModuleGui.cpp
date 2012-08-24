@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFile>
 #include <QScopedPointer>
 #include <ctkCmdLineModuleXslTransform.h>
+#include <ctkCmdLineModuleParameter.h>
+#include <ctkCmdLineModuleDescription.h>
 #include "mitkDataStorage.h"
 
 //-----------------------------------------------------------------------------
@@ -82,4 +84,20 @@ ctkCmdLineModuleXslTransform* QmitkCmdLineModuleGui::xslTransform() const
     }
   }
   return transform;
+}
+
+
+//-----------------------------------------------------------------------------
+QVariant QmitkCmdLineModuleGui::value(const QString &parameter, int role) const
+{
+  if (role == UserRole)
+  {
+    ctkCmdLineModuleParameter param = this->moduleReference().description().parameter(parameter);
+    if (param.channel() == "input" && param.tag() == "image")
+    {
+      return this->customValue(parameter, "GetSelectedNode");
+    }
+    return QVariant();
+  }
+  return ctkCmdLineModuleFrontendQtGui::value(parameter, role);
 }

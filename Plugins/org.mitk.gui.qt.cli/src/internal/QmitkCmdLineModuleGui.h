@@ -60,6 +60,22 @@ protected:
    */
   virtual ctkCmdLineModuleXslTransform* xslTransform() const;
 
+  /**
+   * \brief A custom method to enable access to a mitk::DataNode::Pointer for input images.
+   * \param parameter The name of the parameter as specified in XML.
+   * \param role The role, see ctkCmdLineModuleFrontend.
+   * \return QVariant
+   *
+   * If role==UserRole and the parameter specified by parameter name is an
+   * input image, will return a mitk::DataNode::Pointer wrapped in a QVariant.
+   *
+   * If role==UserRole and the parameter specified is not an input image,
+   * returns an Empty QVariant.
+   *
+   * For any other role, calls base class.
+   */
+  virtual QVariant value(const QString &parameter, int role) const;
+
 private:
 
   QScopedPointer<QmitkCmdLineModuleGuiPrivate> d;

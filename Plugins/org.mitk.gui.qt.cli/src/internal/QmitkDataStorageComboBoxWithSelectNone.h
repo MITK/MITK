@@ -26,6 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \brief Displays all or a subset (defined by a predicate) of nodes of the Data Storage,
  * and additionally, index 0 is always "please select", indicating no selection, and will
  * hence always return a NULL mitk::DataNode* if asked for the node at index 0.
+ *
+ * In addition, to support the integration of CTK command line modules, the methods
+ * currentValue() and setCurrentValue() are provided. See also the .xsl file
+ * in org.mitk.gui.qt.cli/resources/QmitkDataStorageComboBox.xsl.
+ *
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cli_internal
  * \sa QmitkDataStorageComboBox
@@ -34,6 +39,7 @@ class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
 {
   Q_OBJECT
   Q_PROPERTY(mitk::DataNode::Pointer GetSelectedNode READ GetSelectedNode)
+  Q_PROPERTY(QString currentValue READ currentValue WRITE setCurrentValue)
 
   public:
     /**
@@ -93,6 +99,16 @@ class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
      */
     virtual void SetNode(int index, const mitk::DataNode* dataNode);
 
+    /**
+     * \brief Get the current file path.
+     */
+    virtual QString currentValue() const;
+
+    /**
+     * \brief Set the current file path.
+     */
+    virtual void setCurrentValue(const QString& path);
+
   protected:
 
     /**
@@ -110,8 +126,15 @@ class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
      */
     virtual void Reset();
 
-  protected:
+  private:
 
+    /**
+     * \brief This should store the current file path of the current image.
+     *
+     *
+     * The reason is so that we can store and retrieve a temporary file name.
+     */
+    QString m_CurrentPath;
 };
 
 #endif // QmitkDataStorageComboBoxWithSelectNone_h

@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkDataStorageComboBoxWithSelectNone.h"
+#include <QDebug>
 
 const QString QmitkDataStorageComboBoxWithSelectNone::ZERO_ENTRY_STRING = "please select";
 
@@ -22,6 +23,7 @@ QmitkDataStorageComboBoxWithSelectNone::QmitkDataStorageComboBoxWithSelectNone(
     QWidget* parent,
     bool autoSelectNewNodes )
 : QmitkDataStorageComboBox(parent, autoSelectNewNodes)
+, m_CurrentPath("")
 {
 }
 
@@ -146,4 +148,18 @@ void QmitkDataStorageComboBoxWithSelectNone::Reset()
 {
   QmitkDataStorageComboBox::Reset();
   this->insertItem(0, ZERO_ENTRY_STRING);
+}
+
+
+//-----------------------------------------------------------------------------
+QString QmitkDataStorageComboBoxWithSelectNone::currentValue() const
+{
+  return m_CurrentPath;
+}
+
+
+//-----------------------------------------------------------------------------
+void QmitkDataStorageComboBoxWithSelectNone::setCurrentValue(const QString& path)
+{
+  m_CurrentPath = path;
 }

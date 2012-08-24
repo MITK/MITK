@@ -65,15 +65,8 @@ CommandLineModulesView::CommandLineModulesView()
 , m_TemporaryDirectoryName("")
 , m_DebugOutput(false)
 {
-  m_ModuleManager = new ctkCmdLineModuleManager();
-  m_ModuleBackend = new ctkCmdLineModuleBackendLocalProcess();
-  m_ModuleFactory = new QmitkCmdLineModuleFactoryGui(this->GetDataStorage());
-  m_MenuFactory = new ctkCmdLineModuleMenuFactoryQtGui();
-  m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
-  m_MapTabToModuleInstance.clear();
-  m_TemporaryFileNames.clear();
-
-  m_ModuleManager->registerBackend(m_ModuleBackend);
+  qRegisterMetaType<mitk::DataNode::Pointer>();
+  qRegisterMetaType<ctkCmdLineModuleReference>();
 }
 
 
@@ -126,15 +119,32 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
 {
   if (!m_Controls)
   {
+    m_MapTabToModuleInstance.clear();
+    m_TemporaryFileNames.clear();
+
     // We create CommandLineModulesViewControls, which derives from the Qt generated class.
     m_Controls = new CommandLineModulesViewControls(parent);
 
-    // This connect must come before we update the preferences for the first time.
+    // This must be done independent of other preferences, as we need it before
+    // we create the ctkCmdLineModuleManager to initialise the Cache.
+    this->RetrieveAndStoreTemporaryDirectoryPreferenceValues();
+
+    // Create the command line module infrastructure.
+    m_ModuleBackend = new ctkCmdLineModuleBackendLocalProcess();
+    m_ModuleFactory = new QmitkCmdLineModuleFactoryGui(this->GetDataStorage());
+    m_MenuFactory = new ctkCmdLineModuleMenuFactoryQtGui();
+    m_ModuleManager = new ctkCmdLineModuleManager(ctkCmdLineModuleManager::STRICT_VALIDATION, m_TemporaryDirectoryName);
+    m_ModuleManager->registerBackend(m_ModuleBackend);
+    m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
+
+    // This connect must come before we update the preferences for the first time,
+    // so that as you retrieve the preference values, and set up a load path, the m_ModuleManager
+    // is already listening.
     connect(this->m_ModuleManager, SIGNAL(moduleRegistered(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
     connect(this->m_ModuleManager, SIGNAL(moduleUnregistered(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
 
     // Loads the preferences like directory settings into member variables.
-    this->RetrievePreferenceValues();
+    this->RetrieveAndStorePreferenceValues();
 
     // Connect signals to slots after we have set up GUI.
     connect(this->m_Controls->m_RunButton, SIGNAL(pressed()), this, SLOT(OnRunButtonPressed()));
@@ -146,7 +156,7 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
 
 
 //-----------------------------------------------------------------------------
-void CommandLineModulesView::RetrievePreferenceValues()
+berry::IBerryPreferences::Pointer CommandLineModulesView::RetrievePreferences()
 {
   berry::IPreferencesService::Pointer prefService
       = berry::Platform::GetServiceRegistry()
@@ -161,6 +171,26 @@ void CommandLineModulesView::RetrievePreferenceValues()
 
   assert( prefs );
 
+  return prefs;
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::RetrieveAndStoreTemporaryDirectoryPreferenceValues()
+{
+  berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
+
+  QString fallbackTmpDir = QDir::tempPath();
+  m_TemporaryDirectoryName = QString::fromStdString(
+      prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString()));
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::RetrieveAndStorePreferenceValues()
+{
+  berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
+
   // Get the flag for debug output, useful when parsing all the XML.
   m_DebugOutput = prefs->GetBool(CommandLineModulesPreferencesPage::DEBUG_OUTPUT_NODE_NAME, false);
   m_DirectoryWatcher->setDebug(m_DebugOutput);
@@ -169,9 +199,6 @@ void CommandLineModulesView::RetrievePreferenceValues()
   bool loadHomeDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_HOME_DIR, false);
   bool loadCurrentDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_CURRENT_DIR, false);
   bool loadAutoLoadDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_AUTO_LOAD_DIR, false);
-
-  QString fallbackTmpDir = QDir::tempPath();
-  m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString()));
 
   // Get some default application paths.
   // Here we can use the preferences to set up the builder, before asking him for the paths to scan.
@@ -197,7 +224,7 @@ void CommandLineModulesView::RetrievePreferenceValues()
   // so I am checking if the list of directory names has changed.
   if (this->m_DirectoryWatcher->directories() != totalPaths)
   {
-    qDebug() << "CommandLineModulesView::RetrievePreferenceValues loading modules from:";
+    qDebug() << "CommandLineModulesView::RetrieveAndStorePreferenceValues loading modules from:";
     QString path;
     foreach (path, totalPaths)
     {
@@ -214,8 +241,8 @@ void CommandLineModulesView::RetrievePreferenceValues()
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnPreferencesChanged(const berry::IBerryPreferences* /*prefs*/)
 {
-  // Loads the preferences into member variables.
-  this->RetrievePreferenceValues();
+  this->RetrieveAndStoreTemporaryDirectoryPreferenceValues();
+  this->RetrieveAndStorePreferenceValues();
 }
 
 
@@ -395,66 +422,63 @@ void CommandLineModulesView::OnRunButtonPressed()
   ctkCmdLineModuleReference reference = moduleInstance->moduleReference();
   ctkCmdLineModuleDescription description = reference.description();
 
-  qDebug() << "Command Line Module ... Saving data to temporary storage...";
+  qDebug() << "Command Line Module ... Saving image data to temporary storage...";
 
-  // The aim here is to iterate through each parameter
-  // 1. If there are QmitkDataStorageComboBoxWithSelectNone containing valid input images
-  //    a. write them to temporary storage
-  //    b. set the parameter to have the correct file name, of the temporary image
-  // 2. If we have an output parameter, where the user has specified the output file name,
-  //    a. Register that output file name, so that we can auto-load it into the data storage.
-
+  // Sanity check we have actually specified some input:
   QString parameterName;
-  QList<QString> parameterNames = moduleInstance->parameterNames();
-  qRegisterMetaType<mitk::DataNode::Pointer>();
+  QList<ctkCmdLineModuleParameter> parameters;
 
-  foreach (parameterName, parameterNames)
+  // For each input image, write a temporary file as a Nifti image,
+  // and then save the full path name back on the parameter.
+  parameters = moduleInstance->parameters("image", ctkCmdLineModuleFrontend::Input);
+  foreach (ctkCmdLineModuleParameter parameter, parameters)
   {
-    ctkCmdLineModuleParameter parameter = description.parameter(parameterName);
+    parameterName = parameter.name();
 
-    // At the moment, we are only using the QmitkDataStorageComboBoxWithSelectNone combo box for images.
-    if (parameter.channel().compare("input", Qt::CaseInsensitive) == 0
-        && parameter.tag().compare("image", Qt::CaseInsensitive) == 0
-        )
+    QVariant tmp = moduleInstance->value(parameterName, ctkCmdLineModuleFrontend::UserRole);
+    mitk::DataNode::Pointer node = tmp.value<mitk::DataNode::Pointer>();
+
+    if (node.IsNotNull())
     {
-      QVariant tmp = moduleInstance->value(parameterName);
-      mitk::DataNode::Pointer node = tmp.value<mitk::DataNode::Pointer>();
-
-      if (node.IsNotNull())
+      mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+      if (image != NULL)
       {
-        mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
-        if (image != NULL)
-        {
-          QString name = QString::fromStdString(node->GetName());
-          int pid = QCoreApplication::applicationPid();
-          int randomInt = qrand() % 1000000;
+        QString name = QString::fromStdString(node->GetName());
+        int pid = QCoreApplication::applicationPid();
+        int randomInt = qrand() % 1000000;
 
-          QString fileName = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "." + QString::number(randomInt) + ".nii";
+        QString fileName = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "." + QString::number(randomInt) + ".nii";
 
-          qDebug() << "Command Line Module ... Saving " << fileName;
+        qDebug() << "Command Line Module ... Saving " << fileName;
 
-          std::string tmpFN = CommonFunctionality::SaveImage(image, fileName.toStdString().c_str());
-          QString temporaryStorageFileName = QString::fromStdString(tmpFN);
+        std::string tmpFN = CommonFunctionality::SaveImage(image, fileName.toStdString().c_str());
+        QString temporaryStorageFileName = QString::fromStdString(tmpFN);
 
-          m_TemporaryFileNames.push_back(temporaryStorageFileName);
-          moduleInstance->setValue(parameterName, temporaryStorageFileName);
+        m_TemporaryFileNames.push_back(temporaryStorageFileName);
+        moduleInstance->setValue(parameterName, temporaryStorageFileName);
 
-          qDebug() << "Command Line Module ... Saved " << temporaryStorageFileName;
+        qDebug() << "Command Line Module ... Saved " << temporaryStorageFileName;
 
-        } // end if image
-      } // end if node
-    } // end if input image
-    else if (parameter.channel().compare("output", Qt::CaseInsensitive) == 0)
+      } // end if image
+    } // end if node
+  } // end foreach input image
+
+  // For each output image or file, store the filename, so we can auto-load it once the process finishes.
+  parameters = moduleInstance->parameters("image", ctkCmdLineModuleFrontend::Output);
+  parameters << moduleInstance->parameters("file", ctkCmdLineModuleFrontend::Output);
+  foreach (ctkCmdLineModuleParameter parameter, parameters)
+  {
+    parameterName = parameter.name();
+    QString outputFileName = moduleInstance->value(parameterName).toString();
+
+    if (!outputFileName.isEmpty())
     {
-      QString outputFileName = moduleInstance->value(parameterName).toString();
-      if (!outputFileName.isEmpty())
-      {
-        m_OutputDataToLoad.push_back(outputFileName);
-        qDebug() << "Command Line Module ... Registered " << outputFileName << " to auto load upon completion.";
-      }
+      m_OutputDataToLoad.push_back(outputFileName);
+      qDebug() << "Command Line Module ... Registered " << outputFileName << " to auto load upon completion.";
     }
   }
 
+  // Now we run stuff.
   qDebug() << "Command Line Module ... starting.";
 
   if (m_Watcher != NULL)

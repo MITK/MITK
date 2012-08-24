@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToLiveWireContourFilter.h"
 #include <mitkInteractionConst.h>
 
-#include <itkGradientMagnitudeImageFilter.h>
+#include <itkShortestPathCostFunctionLiveWire.h>
 #include <itkImageRegionIterator.h>
-#include "itkShortestPathImageFilter.h"
+
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -75,51 +75,61 @@ void mitk::ImageToLiveWireContourFilter::ItkProcessImage (itk::Image<TPixel, VIm
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef itk::Image< float,  2 >   FloatImageType;
 
+  typedef itk::ShortestPathImageFilter<InputImageType, InputImageType>      ShortestPathImageFilterType;
+  typedef itk::ShortestPathCostFunctionLiveWire<typename InputImageType> CostFunctionType;
+
+  typedef InputImageType::IndexType IndexType;
+
 
   /* compute the requested region for itk filters */
-  //minimum value in each direction for start
-  typename InputImageType::IndexType start;
-  start[0] = m_StartPointInIndex[0] < m_EndPointInIndex[0] ? m_StartPointInIndex[0] : m_EndPointInIndex[0];
-  start[1] = m_StartPointInIndex[1] < m_EndPointInIndex[1] ? m_StartPointInIndex[1] : m_EndPointInIndex[1];
 
+  typename IndexType startPoint, endPoint;
+  
+  startPoint[0] = m_StartPointInIndex[0];
+  startPoint[1] = m_StartPointInIndex[1];
 
-  typename InputImageType::SizeType size;
+  endPoint[0] = m_EndPointInIndex[0];
+  endPoint[1] = m_EndPointInIndex[1];
+
+  //minimum value in each direction for startRegion
+  typename IndexType startRegion;
+  startRegion[0] = startPoint[0] < endPoint[0] ? startPoint[0] : endPoint[0];
+  startRegion[1] = startPoint[1] < endPoint[1] ? startPoint[1] : endPoint[1];
+
   //maximum value in each direction for size
-  size[0] = m_StartPointInIndex[0] > m_EndPointInIndex[0] ? m_StartPointInIndex[0] : m_EndPointInIndex[0];
-  size[1] = m_StartPointInIndex[1] > m_EndPointInIndex[1] ? m_StartPointInIndex[1] : m_EndPointInIndex[1];
+  typename InputImageType::SizeType size;
+  size[0] = startPoint[0] > endPoint[0] ? startPoint[0] : endPoint[0];
+  size[1] = startPoint[1] > endPoint[1] ? startPoint[1] : endPoint[1];
 
 
   typename InputImageType::RegionType region;
   region.SetSize( size );
-  region.SetIndex( start );
+  region.SetIndex( startRegion );
   /*---------------------------------------------*/
 
 
-  /* extract features from image */
-
-  //gradient magnitude
-  itk::GradientMagnitudeImageFilter<typename InputImageType, FloatImageType>::Pointer gradientFilter = 
-    itk::GradientMagnitudeImageFilter<typename InputImageType, FloatImageType>::New();
-
-  gradientFilter->SetInput(inputImage);
-
-  //apply filter only for specific region
-  gradientFilter->GetOutput()->SetRequestedRegion(region);
-
-
-  gradientFilter->Update();
-
-  FloatImageType::Pointer gradientMagnImage = gradientFilter->GetOutput();
-  /*---------------------------------------------*/
-
-
-  /* transfer to costs */
-  
+  /* extracts features from image and calculates costs */
+  typename CostFunctionType::Pointer costFunction = CostFunctionType::New();
+  costFunction->SetImage(inputImage);
+  costFunction->SetStartIndex(startPoint);
+  costFunction->SetEndIndex(endPoint);
   /*---------------------------------------------*/
 
 
   /* calculate shortest path between start and end point */
+  ShortestPathImageFilterType::Pointer shortestPathFilter = ShortestPathImageFilterType::New();
+  shortestPathFilter->SetFullNeighborsMode(true);
+  shortestPathFilter->SetInput(sourceImageItk);
+  shortestPathFilter->SetMakeOutputImage(true);  
+  shortestPathFilter->SetStoreVectorOrder(true);  
+  //shortestPathFilter->SetActivateTimeOut(true); 
+  shortestPathFilter->SetStartIndex(startPoint);
+  shortestPathFilter->SetEndIndex(endPoint);
 
+  shortestPathFilter->Update();
+
+  mitk::Image::Pointer resultImageOrder;
+  CastToMitkImage(shortestPathFilter->GetVectorOrderImage(), resultImageOrder);
   /*---------------------------------------------*/
 
 }

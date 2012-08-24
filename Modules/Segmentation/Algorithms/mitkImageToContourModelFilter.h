@@ -42,6 +42,7 @@ namespace mitk {
     itkNewMacro(Self);
 
     typedef mitk::Image InputType;
+    typedef InputType::IndexType IndexType;
 
 
     virtual void SetInput( const InputType *input);

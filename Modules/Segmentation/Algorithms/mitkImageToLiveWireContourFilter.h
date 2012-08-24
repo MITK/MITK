@@ -58,8 +58,8 @@ namespace mitk {
     mitk::Point3D m_StartPoint;
     mitk::Point3D m_EndPoint;
 
-    mitk::Point3D m_StartPointInIndex;
-    mitk::Point3D m_EndPointInIndex;
+    ImageToContourModelFilter::IndexType m_StartPointInIndex;
+    ImageToContourModelFilter::IndexType m_EndPointInIndex;
 
   };
 

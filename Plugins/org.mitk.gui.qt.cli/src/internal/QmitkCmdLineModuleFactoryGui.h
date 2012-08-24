@@ -16,8 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkCmdLineModuleFactoryGui_h
 #define QmitkCmdLineModuleFactoryGui_h
 
-#include <ctkCmdLineModuleFactory.h>
-#include "mitkDataStorage.h"
+#include <ctkCmdLineModuleFrontendFactoryQtGui.h>
+#include <ctkCmdLineModuleReference.h>
+
+namespace mitk {
+  class DataStorage;
+}
+class QmitkCmdLineModuleFactoryGuiPrivate;
 
 /**
  * \class QmitkCmdLineModuleFactoryGui
@@ -27,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \sa QmitkCmdLineModuleGui
  */
 class QmitkCmdLineModuleFactoryGui
-    : public ctkCmdLineModuleFactory
+    : public ctkCmdLineModuleFrontendFactoryQtGui
 {
 public:
 
@@ -37,11 +42,11 @@ public:
   /**
    * \brief Simply creates QmitkCmdLineModuleGui which is an MITK specific module.
    */
-  ctkCmdLineModule* create(const ctkCmdLineModuleReference& moduleRef);
+  ctkCmdLineModuleFrontendQtGui* create(const ctkCmdLineModuleReference& moduleRef);
 
 private:
 
-  const mitk::DataStorage* m_DataStorage;
+  QScopedPointer<QmitkCmdLineModuleFactoryGuiPrivate> d;
 
 };
 

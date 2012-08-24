@@ -17,23 +17,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCmdLineModuleGui.h"
 
 //-----------------------------------------------------------------------------
-QmitkCmdLineModuleFactoryGui::QmitkCmdLineModuleFactoryGui(const mitk::DataStorage* dataStorage)
-  : m_DataStorage(dataStorage)
+struct QmitkCmdLineModuleFactoryGuiPrivate
 {
+  QmitkCmdLineModuleFactoryGuiPrivate(const mitk::DataStorage* dataStorage)
+    : m_DataStorage(dataStorage)
+  {}
 
+  const mitk::DataStorage* m_DataStorage;
+};
+
+//-----------------------------------------------------------------------------
+QmitkCmdLineModuleFactoryGui::QmitkCmdLineModuleFactoryGui(const mitk::DataStorage* dataStorage)
+  : d(new QmitkCmdLineModuleFactoryGuiPrivate(dataStorage))
+{
 }
 
 
 //-----------------------------------------------------------------------------
 QmitkCmdLineModuleFactoryGui::~QmitkCmdLineModuleFactoryGui()
 {
-
 }
 
 
 //-----------------------------------------------------------------------------
-ctkCmdLineModule* QmitkCmdLineModuleFactoryGui::create(const ctkCmdLineModuleReference& moduleRef)
+ctkCmdLineModuleFrontendQtGui* QmitkCmdLineModuleFactoryGui::create(const ctkCmdLineModuleReference& moduleRef)
 {
-  QmitkCmdLineModuleGui* gui = new QmitkCmdLineModuleGui(m_DataStorage, moduleRef);
+  ctkCmdLineModuleFrontendQtGui* gui = new QmitkCmdLineModuleGui(d->m_DataStorage, moduleRef);
   return gui;
 }

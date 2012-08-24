@@ -19,9 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QBuffer>
 #include <QUiLoader>
 
-#include <ctkCmdLineModuleQtGui_p.h>
 #include <ctkCmdLineModuleReference.h>
-#include "mitkDataStorage.h"
+#include <ctkCmdLineModuleFrontendQtGui.h>
+
+namespace mitk
+{
+  class DataStorage;
+}
+class QmitkCmdLineModuleGuiPrivate;
 
 /**
  * \class QmitkCmdLineModuleGui
@@ -33,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \ingroup org_mitk_gui_qt_cli_internal
  * \sa QmitkCmdLineModuleFactoryGui
  */
-class QmitkCmdLineModuleGui : public ctkCmdLineModuleQtGui
+class QmitkCmdLineModuleGui : public ctkCmdLineModuleFrontendQtGui
 {
   Q_OBJECT
 
@@ -45,19 +50,19 @@ protected:
 
   /**
    * \brief Virtual getter.
-   * \see ctkCmdLineModuleQtGui::uiLoader()
+   * \see ctkCmdLineModuleFrontendQtGui::uiLoader()
    */
   virtual QUiLoader* uiLoader() const;
 
   /**
    * \brief Virtual getter.
-   * \see ctkCmdLineModuleQtGui::xslTransform()
-   */ \
+   * \see ctkCmdLineModuleFrontendQtGui::xslTransform()
+   */
   virtual ctkCmdLineModuleXslTransform* xslTransform() const;
 
 private:
 
-  const mitk::DataStorage* m_DataStorage;
+  QScopedPointer<QmitkCmdLineModuleGuiPrivate> d;
 
 }; // end class
 

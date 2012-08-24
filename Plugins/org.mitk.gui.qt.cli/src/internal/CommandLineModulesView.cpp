@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "CommandLineModulesView.h"
+#include "CommandLineModulesViewControls.h"
 #include "CommandLineModulesPreferencesPage.h"
 #include "QmitkCmdLineModuleFactoryGui.h"
 #include "QmitkDataStorageComboBox.h"
@@ -35,13 +36,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTextBrowser>
 
 // CTK
-#include <ctkCmdLineModule.h>
 #include <ctkCmdLineModuleManager.h>
-#include <ctkCmdLineModuleDirectoryWatcher.h>
+#include <ctkCmdLineModuleFrontend.h>
 #include <ctkCmdLineModuleMenuFactoryQtGui.h>
-#include <ctkCmdLineModuleDescription.h>
-#include <ctkCmdLineModuleXmlValidator.h>
+#include <ctkCmdLineModuleBackendLocalProcess.h>
 #include <ctkCmdLineModuleDefaultPathBuilder.h>
+#include <ctkCmdLineModuleDirectoryWatcher.h>
+#include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleFuture.h>
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleParameter.h>
@@ -56,19 +57,23 @@ CommandLineModulesView::CommandLineModulesView()
 : m_Controls(NULL)
 , m_Parent(NULL)
 , m_ModuleManager(NULL)
-, m_DirectoryWatcher(NULL)
-, m_MenuFactory(NULL)
+, m_ModuleBackend(NULL)
 , m_ModuleFactory(NULL)
+, m_MenuFactory(NULL)
+, m_DirectoryWatcher(NULL)
 , m_Watcher(NULL)
 , m_TemporaryDirectoryName("")
 , m_DebugOutput(false)
 {
-  m_MapTabToModuleInstance.clear();
+  m_ModuleManager = new ctkCmdLineModuleManager();
+  m_ModuleBackend = new ctkCmdLineModuleBackendLocalProcess();
   m_ModuleFactory = new QmitkCmdLineModuleFactoryGui(this->GetDataStorage());
-  m_ModuleManager = new ctkCmdLineModuleManager(m_ModuleFactory);
-  m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
   m_MenuFactory = new ctkCmdLineModuleMenuFactoryQtGui();
+  m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
+  m_MapTabToModuleInstance.clear();
   m_TemporaryFileNames.clear();
+
+  m_ModuleManager->registerBackend(m_ModuleBackend);
 }
 
 
@@ -80,9 +85,14 @@ CommandLineModulesView::~CommandLineModulesView()
     delete m_ModuleManager;
   }
 
-  if (m_DirectoryWatcher != NULL)
+  if (m_ModuleBackend != NULL)
   {
-    delete m_DirectoryWatcher;
+    delete m_ModuleBackend;
+  }
+
+  if (m_ModuleFactory != NULL)
+  {
+    delete m_ModuleFactory;
   }
 
   if (m_MenuFactory != NULL)
@@ -90,9 +100,9 @@ CommandLineModulesView::~CommandLineModulesView()
     delete m_MenuFactory;
   }
 
-  if (m_ModuleFactory != NULL)
+  if (m_DirectoryWatcher != NULL)
   {
-    delete m_ModuleFactory;
+    delete m_DirectoryWatcher;
   }
 
   if (m_Watcher != NULL)
@@ -120,8 +130,8 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     m_Controls = new CommandLineModulesViewControls(parent);
 
     // This connect must come before we update the preferences for the first time.
-    connect(this->m_ModuleManager, SIGNAL(moduleAdded(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
-    connect(this->m_ModuleManager, SIGNAL(moduleRemoved(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
+    connect(this->m_ModuleManager, SIGNAL(moduleRegistered(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
+    connect(this->m_ModuleManager, SIGNAL(moduleUnregistered(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
 
     // Loads the preferences like directory settings into member variables.
     this->RetrievePreferenceValues();
@@ -221,7 +231,7 @@ void CommandLineModulesView::OnModulesChanged()
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& moduleRef)
 {
-  ctkCmdLineModule* moduleInstance = m_ModuleManager->createModule(moduleRef);
+  ctkCmdLineModuleFrontend* moduleInstance = m_ModuleFactory->create(moduleRef);
   if (!moduleInstance) return;
 
   // Build up the GUI layout programmatically (manually).
@@ -356,7 +366,7 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QStri
 void CommandLineModulesView::OnRunButtonPressed()
 {
   // Get hold of the command line module.
-  ctkCmdLineModule* moduleInstance = m_MapTabToModuleInstance[m_Controls->m_TabWidget->currentIndex()];
+  ctkCmdLineModuleFrontend* moduleInstance = m_MapTabToModuleInstance[m_Controls->m_TabWidget->currentIndex()];
   if (!moduleInstance)
   {
     qWarning() << "Invalid module instance";
@@ -429,10 +439,6 @@ void CommandLineModulesView::OnRunButtonPressed()
 
   qDebug() << "Command Line Module ... starting.";
 
-  QStringList cmdLineArgs = moduleInstance->commandLineArguments();
-  qDebug() << "Command Line Module ... arguments are:";
-  qDebug() << cmdLineArgs;
-
   if (m_Watcher != NULL)
   {
     QObject::disconnect(m_Watcher, 0, 0, 0);
@@ -445,9 +451,7 @@ void CommandLineModulesView::OnRunButtonPressed()
   QObject::connect(m_Watcher, SIGNAL(progressValueChanged(int)), this, SLOT(OnModuleProgressValueChanged(int)));
   QObject::connect(m_Watcher, SIGNAL(progressTextChanged(QString)), this, SLOT(OnModuleProgressTextChanged(QString)));
 
-  m_ModuleManager->setVerboseOutput(m_DebugOutput);
-
-  ctkCmdLineModuleFuture future = moduleInstance->run();
+  ctkCmdLineModuleFuture future = m_ModuleManager->run(moduleInstance);
   m_Watcher->setFuture(future);
 }
 

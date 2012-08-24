@@ -17,16 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define CommandLineModulesView_h
 
 #include <QmitkAbstractView.h>
-#include "CommandLineModulesViewControls.h"
-#include "QmitkCmdLineModuleFactoryGui.h"
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleResult.h>
 #include <QFutureWatcher>
 
-class ctkCmdLineModule;
 class ctkCmdLineModuleManager;
-class ctkCmdLineModuleDirectoryWatcher;
+class QmitkCmdLineModuleFactoryGui;
 class ctkCmdLineModuleMenuFactoryQtGui;
+class ctkCmdLineModuleFrontend;
+class ctkCmdLineModuleBackendLocalProcess;
+class ctkCmdLineModuleDirectoryWatcher;
+class CommandLineModulesViewControls;
 class QAction;
 
 namespace berry
@@ -43,7 +44,7 @@ namespace berry
  * This class is a basic interface to the CTK command line modules library.
  * Ideally, an MITK base application would load command line modules dynamically
  * at runtime, and promote them to the main window menu bar to appear as fully
- * fledged views. However, currently this is not supported, and so this view
+ * fledged Views. However, currently this is not supported, and so this view
  * provides a simplified interface, contained within one plugin in order to
  * facilitate testing, debugging, and understanding of use-cases.
  *
@@ -70,7 +71,7 @@ public:
 
   /**
    * \brief Called by the framework to indicate that the preferences have changed.
-   * \param prefs not used.
+   * \param prefs not used, as we call RetrievePreferenceValues().
    */
   void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
 
@@ -88,12 +89,12 @@ protected Q_SLOTS:
   void OnRunButtonPressed();
 
   /**
-   * \brief Slot to stop (kill) the command line module, currently inactive.
+   * \brief Slot to stop (kill) the command line module.
    */
   void OnStopButtonPressed();
 
   /**
-   * \brief Slot to restore the form to the default parameters, currently inactive/un-implemented.
+   * \brief Slot to restore the form to the default parameters.
    */
   void OnRestoreDefaultsButtonPressed();
 
@@ -181,15 +182,9 @@ private:
   ctkCmdLineModuleManager *m_ModuleManager;
 
   /**
-   * \brief The ctkCmdLineModuleDirectoryWatcher maintains the list of directories
-   * we are using to load modules, to provide automatic updates.
+   * \brief We are using a back-end that runs locally installed command line programs.
    */
-  ctkCmdLineModuleDirectoryWatcher *m_DirectoryWatcher;
-
-  /**
-   * \brief The ctkCmdLineModuleMenuFactoryQtGui will build a QMenu from the list of available modules.
-   */
-  ctkCmdLineModuleMenuFactoryQtGui *m_MenuFactory;
+  ctkCmdLineModuleBackendLocalProcess *m_ModuleBackend;
 
   /**
    * \brief The QmitkCmdLineModuleFactoryGui builds a gui for each plugin.
@@ -197,14 +192,25 @@ private:
   QmitkCmdLineModuleFactoryGui *m_ModuleFactory;
 
   /**
-   * \brief We use this map to decide if we want to create more tabs or not.
+   * \brief The ctkCmdLineModuleMenuFactoryQtGui will build a QMenu from the list of available modules.
    */
-  QHash<int, ctkCmdLineModule*> m_MapTabToModuleInstance;
+  ctkCmdLineModuleMenuFactoryQtGui *m_MenuFactory;
+
+  /**
+   * \brief The ctkCmdLineModuleDirectoryWatcher maintains the list of directories
+   * we are using to load modules, to provide automatic updates.
+   */
+  ctkCmdLineModuleDirectoryWatcher *m_DirectoryWatcher;
 
   /**
    * \brief This is the QFutureWatcher that will watch for when the process has finished, and call OnFutureFinished() slot.
    */
   QFutureWatcher<ctkCmdLineModuleResult>* m_Watcher;
+
+  /**
+   * \brief We use this map to decide if we want to create more tabs or not.
+   */
+  QHash<int, ctkCmdLineModuleFrontend*> m_MapTabToModuleInstance;
 
   /**
    * \brief We store a temporary folder name, accessible via user preferences.

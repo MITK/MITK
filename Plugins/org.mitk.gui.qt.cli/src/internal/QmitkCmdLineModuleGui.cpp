@@ -19,13 +19,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QIODevice>
 #include <QFile>
 #include <QScopedPointer>
-
 #include <ctkCmdLineModuleXslTransform.h>
+#include "mitkDataStorage.h"
+
+//-----------------------------------------------------------------------------
+struct QmitkCmdLineModuleGuiPrivate
+{
+  QmitkCmdLineModuleGuiPrivate(const mitk::DataStorage* dataStorage)
+    : m_DataStorage(dataStorage), m_Loader(NULL), m_Transform(NULL)
+  {}
+
+  const mitk::DataStorage* m_DataStorage;
+  mutable QScopedPointer<QUiLoader> m_Loader;
+  mutable QScopedPointer<ctkCmdLineModuleXslTransform> m_Transform;
+};
+
 
 //-----------------------------------------------------------------------------
 QmitkCmdLineModuleGui::QmitkCmdLineModuleGui(const mitk::DataStorage* dataStorage, const ctkCmdLineModuleReference& moduleRef)
-  : ctkCmdLineModuleQtGui(moduleRef)
-, m_DataStorage(dataStorage)
+  : ctkCmdLineModuleFrontendQtGui(moduleRef)
+, d(new QmitkCmdLineModuleGuiPrivate(dataStorage))
 {
 }
 
@@ -39,26 +52,34 @@ QmitkCmdLineModuleGui::~QmitkCmdLineModuleGui()
 //-----------------------------------------------------------------------------
 QUiLoader* QmitkCmdLineModuleGui::uiLoader() const
 {
-  if (Loader == NULL)
+  // Here we are creating a QUiLoader locally, so when this method
+  // is called, it overrides the one in the base class, so the base
+  // class one is never constructed, and this one is constructed as
+  // a replacement.
+  if (d->m_Loader == NULL)
   {
-    Loader = new QmitkUiLoader(m_DataStorage);
+    d->m_Loader.reset(new QmitkUiLoader(d->m_DataStorage));
   }
-  return Loader;
+  return d->m_Loader.data();
 }
 
 
 //-----------------------------------------------------------------------------
 ctkCmdLineModuleXslTransform* QmitkCmdLineModuleGui::xslTransform() const
 {
-  ctkCmdLineModuleQtGui::xslTransform();
-  if (Transform != NULL)
+  // This is a virtual getter, overriding the one in the base class.
+  // However, we want to use the transform in the base class, and just append to it.
+  // So we call the base class one, modify it by adding some stuff, and then return
+  // the pointer to the one in the base class.
+  ctkCmdLineModuleXslTransform *transform = ctkCmdLineModuleFrontendQtGui::xslTransform();
+  if (transform != NULL)
   {
-    Transform->bindVariable("imageInputWidget", QVariant(QString("QmitkDataStorageComboBoxWithSelectNone")));
+    transform->bindVariable("imageInputWidget", QVariant(QString("QmitkDataStorageComboBoxWithSelectNone")));
     QIODevice* transformQmitkDataStorageComboBox(new QFile(":/CommandLineModulesResources/QmitkDataStorageComboBox.xsl"));
     if (transformQmitkDataStorageComboBox)
     {
-      Transform->setXslExtraTransformation(transformQmitkDataStorageComboBox);
+      transform->setXslExtraTransformation(transformQmitkDataStorageComboBox);
     }
   }
-  return Transform;
+  return transform;
 }

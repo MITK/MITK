@@ -42,7 +42,10 @@ namespace mitk {
     itkNewMacro(Self);
 
     itkSetMacro(StartPoint, mitk::Point3D);
+    itkGetMacro(StartPoint, mitk::Point3D);
+
     itkSetMacro(EndPoint, mitk::Point3D);
+    itkGetMacro(EndPoint, mitk::Point3D);
 
 
   protected:

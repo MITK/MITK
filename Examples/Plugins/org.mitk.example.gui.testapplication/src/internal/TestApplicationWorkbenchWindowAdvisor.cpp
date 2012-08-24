@@ -75,7 +75,7 @@ TestApplicationWorkbenchWindowAdvisor::CreateActionBarAdvisor(
 }
 
 void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
-{
+{/*
   // very bad hack...
   berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*>(window->GetShell()->GetControl());
@@ -83,7 +83,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QMenuBar* menuBar = mainWindow->menuBar();
 
   QMenu* fileMenu = menuBar->addMenu("File");
-  fileMenu->addAction("Open Nothing");
+  fileMenu->addAction("Open Nothing");*/
 
   //fileMenu->addAction(new QmitkFileOpenAction(window));
   //fileMenu->addSeparator();
@@ -91,9 +91,9 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
   /*berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
   const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();*/
-
+/*
   QMenu* viewMenu = menuBar->addMenu("Show View");
-  viewMenu->addAction("Show Nothing New");
+  viewMenu->addAction("Show Nothing New");*/
 
   //// sort elements (converting vector to map...)
   //std::vector<berry::IViewDescriptor::Pointer>::const_iterator iter;
@@ -106,8 +106,8 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   //  std::pair<std::string, berry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter)); 
   //  VDMap.insert(p);
   //}
-
-  QToolBar* qToolbar = new QToolBar;
+/*
+  QToolBar* qToolbar = new QToolBar;*/
   //
   //std::map<std::string, berry::IViewDescriptor::Pointer>::const_iterator MapIter;
   //for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
@@ -119,7 +119,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   //}
   
   //mainWindow->addToolBar(qToolbar);
-
+/*
   QStatusBar* qStatusBar = new QStatusBar();
   QLabel* title = new QLabel("Status Bar");
 
@@ -133,7 +133,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   mainWindow->setStatusBar(qStatusBar);
 
   QProgressBar *progBar = new QProgressBar();
-  qStatusBar->addPermanentWidget(progBar, 0);
+  qStatusBar->addPermanentWidget(progBar, 0);*/
 
   //mainWindow->dumpObjectTree();
   //progBar->hide();
@@ -198,7 +198,7 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   PerspectivesTabBar->setDrawBase(false);
   QVBoxLayout* CentralWidgetLayout = new QVBoxLayout(CentralWidget);
   CentralWidgetLayout->contentsMargins();
-  CentralWidgetLayout->setContentsMargins(9,9,9,0);
+  CentralWidgetLayout->setContentsMargins(9,9,9,9);
   CentralWidgetLayout->setSpacing(0);
   CentralWidgetLayout->setObjectName("CentralWidgetLayout");
   QHBoxLayout* PerspectivesLayer = new QHBoxLayout(mainWindow);
@@ -216,6 +216,7 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   OpenFileButton->setObjectName("FileOpenButton");
   OpenFileButton->setDefaultAction(this->FileOpenAction);
 
+  //PerspectivesLayer->addWidget(StyleUpdateButton);
   PerspectivesLayer->addWidget(OpenFileButton);
 
   QObject::connect(StyleUpdateButton, SIGNAL( clicked() ), this, SLOT( UpdateStyle() ));

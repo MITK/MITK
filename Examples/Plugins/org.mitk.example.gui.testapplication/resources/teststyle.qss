@@ -49,85 +49,29 @@ berry--QCTabBar QToolButton#TabCloseButton
     background: none; 
 }
 
-/*QWidget
+/*QGroupBox
 {
-border: 1px solid green;
-}*/
-
-QWidget#PageComposite
-{
-/*border: 1px solid orange;*/
-padding: 0px;
-}
-
-QWidget#PageComposite > QFrame
-{
-/*border: 1px solid yellow;*/
-margin: 0px;
-padding: 0px;
-/*background: green;*/
-}
-
-/*QWidget#PageComposite > QFrame
-{
-border: 1px solid yellow;
-margin: 0px;
-padding: 0px;
+border-top-left-radius: 4px; 
+border-top-right-radius: 4px;
+background: rgb(210, 221, 239);
 }*/
 
 QWidget#PageCompositeControlWidget
 {
-/*border: 1px solid yellow;*/
+border-left: 1px solid #a0a0a0;
+border-bottom: 1px solid #a0a0a0;
+border-right: 1px solid #a0a0a0;
 margin: 0px;
 padding: 0px;
+background: red;
 }
 
 QWidget#ClientComposite
 {
-/*border: 1px solid pink;*/
 background: rgb(210, 221, 239);
 margin: 0px;
 padding: 10px;
 }
-
-QWidget#ClientComposite > QFrame
-{
-/*border: 1px solid pink;*/
-margin: 0px;
-padding: 0px;
-}
-
-/*QFrame#StandaloneViewForm > QFrame
-{
-border: 1px solid red;
-}*/
-
-/*QFrame#PartPaneControl
-{
-border: 1px solid white;
-}*/
-
-/*QFrame#ViewFormContentFrame
-{
-border: 5px solid orange;
-}*/
-
-QWidget#TabTopRightControls {
-    border: 1px solid palette(mid); 
-    border-left: 0px; 
-    border-top: 0px; 
-    border-right: 0px; 
-}
-
-QWidget#ViewForm {
-    border: 1px solid palette(mid); 
-    border-top-left-radius: 8px; 
-    border-top-right-radius: 8px; 
-}
-
-/*QWidget#StandaloneViewForm {
-      border: 1px solid palette(mid); 
-}*/
 
 QMainWindow::separator {
 background: blue;
@@ -179,34 +123,28 @@ QMenu::item:selected
 color: rgb(43, 75, 116);
 }
 
-/*QToolBar
+QToolButton
 {
-background: yellow;
-}*/
-
-QHBoxLayout#PerspectivesLayer
-{
-top: 10px;
+min-height: 20px; 
+border-top-left-radius: 4px; 
+border-top-right-radius: 4px; 
+border-bottom-left-radius: 4px; 
+border-bottom-right-radius: 4px; 
+border: 1px solid gray;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(156, 181, 220), stop:1 rgb(130, 160, 210));
 }
 
-/*QtPerspectiveSwitcherTabBar::tab-bar
+QToolButton:hover
 {
-background: green;
-left: 10px;
-}*/
-
-QTabWidget::tab-bar
-{
-/*left: 12px;*/
+/*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 yellow, stop:1 gold);*/
+background: yellow;
 }
 
 QtPerspectiveSwitcherTabBar::tab
 {
-/*left: 12px;*/
 min-height: 24px; 
 border-top: 1px solid palette(mid); 
 border-left: 1px solid palette(mid); 
-/*border-bottom: 1px solid palette(mid);*/
 border-bottom: 0px;
 border-top-left-radius: 8px; 
 border-top-right-radius: 8px; 
@@ -216,30 +154,7 @@ padding-left: 5px;
 background: rgb(210, 221, 239);
 }
 
-/*QtPerspectiveSwitcherTabBar::tab:selected { 
-left: 12px;
-min-height: 24px; 
-border-top: 1px solid palette(mid); 
-border-left: 1px solid palette(mid); 
-border-bottom: 1px solid palette(mid); 
-border-top-left-radius: 8px; 
-border-top-right-radius: 8px; 
-margin-top: -1px;
-margin-right: 4px;
-padding-left: 5px;
-background: rgb(210, 221, 239);
-}*/
-
-/*QtPerspectiveSwitcherTabBar::tab:selected { 
-left: 12px;
-border-right: 1px solid palette(Mid); 
-border-bottom: 0px; 
-border-top-left-radius: 8px; 
-border-top-right-radius: 8px; 
-}*/
-
 QtPerspectiveSwitcherTabBar::tab:selected:hover { 
-/*left: 12px;*/
 min-height: 24px; 
 border-top: 1px solid palette(mid); 
 border-left: 1px solid palette(mid); 
@@ -250,10 +165,10 @@ margin-top: -1px;
 margin-right: 4px;
 padding-left: 5px;
 background: yellow;
+/*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 yellow, stop:1 gold);*/
 }
 
 QtPerspectiveSwitcherTabBar::tab:!selected { 
-/*left: 12px;*/
 min-height: 24px; 
 border-top: 1px solid palette(mid); 
 border-left: 1px solid palette(mid); 
@@ -266,7 +181,6 @@ background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(156, 181, 220), s
 }
 
 QtPerspectiveSwitcherTabBar::tab:!selected:hover { 
-/*left: 12px;*/
 min-height: 24px; 
 border-top: 1px solid palette(mid); 
 border-left: 1px solid palette(mid); 
@@ -279,87 +193,6 @@ padding-left: 5px;
 background: yellow;
 }
 
-
-/*QtPerspectiveSwitcherTabBar::tab:hover { 
-background: yellow;
-left: 12px;
-border-right: 1px solid palette(Mid); 
-border-bottom: 0px; 
-border-top-left-radius: 8px; 
-border-top-right-radius: 8px; 
-}*/
-
-/*QtPerspectiveSwitcherTabBar::tab::pane
-{
-position: absolute;
-bottom: -5em;
-}*/
-
-/*QTabWidget::pane
-{
-position: absolute;
-top: -0.5em;
-}*/
-
-/*QtPerspectiveSwitcherTabBar::tab:first { 
-margin-left: -1px;
-border-left: 0px; 
-border-top-left-radius: 8px; 
-}*/
-
-/*QtPerspectiveSwitcherTabBar::tab:last { 
-border-right: 1px solid palette(mid); 
-border-top-right-radius: 8px 
-}*/
-
-/*QtPerspectiveSwitcherTabBar::tab:selected:!hover { 
-left: 12px;
-border-right: 1px solid palette(Mid); 
-border-bottom: 0px; 
-border-top-left-radius: 8px; 
-border-top-right-radius: 8px; 
-}*/
-
-/*QtPerspectiveSwitcherTabBar::tab:!selected:!hover { 
-left: 12px;
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(156, 181, 220), stop:1 rgb(130, 160, 210));
-margin-top: 5px;
-}*/
-
-/*QtPerspectiveSwitcherTabBar::tab:hover:!selected { 
-background: yellow;
-left: 12px;
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(156, 181, 220), stop:1 rgb(130, 160, 210));
-margin-top: 5px;
-}*/
-
-/*QWidget
-{
-border: 1px solid green;
-}*/
-
-QtPerspectiveSwitcherTabBar
-{
-/*border: 1px solid pink;*/
-/*background: green;*/
-/*top: 100px;*/
-}
-
-QFrame#StandaloneViewForm
-{
-/*margin-top: -200px;*/
-/*border: 10px solid black;*/
-background: rgb(210, 221, 239);
-/*background: red;*/
-/*border-top: 0px;*/
-/*border: 5px solid red;*/
-/*margin: 2px solid orange;*/
-/*padding: 3px solid green;*/
-/*border: 1px solid green;*/
-margin: 0px;
-padding: 0px;
-}
-
 QPushButton#StyleUpdateButton
 {
 min-height: 25px; 
@@ -367,33 +200,10 @@ border-top-left-radius: 4px;
 border-top-right-radius: 4px; 
 border-bottom-left-radius: 4px; 
 border-bottom-right-radius: 4px; 
-/*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(225, 242, 255), stop:1 rgb(138, 204, 253));*/
 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(210, 221, 239), stop:1 rgb(197, 245, 254));
-}
-
-QFrame#ViewForm
-{
-background: light pink;
-}
-
-QFrame#ViewFormContentFrame
-{
-background: green;
 }
 
 QWidget#CentralWidget
 {
-/*border: 1px solid red;*/
 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(43, 75, 116), stop:1 rgb(197, 245, 254));
 }
-
-/*QWidget#PageComposite
-{
-margin: 0px;
-border: 10px solid orange;
-}*/
-
-/*QFrame#PartPaneControl
-{
-background: grey;
-}same as StandaloneViewForm*/

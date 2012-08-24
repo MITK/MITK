@@ -224,13 +224,6 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   // so I am checking if the list of directory names has changed.
   if (this->m_DirectoryWatcher->directories() != totalPaths)
   {
-    qDebug() << "CommandLineModulesView::RetrieveAndStorePreferenceValues loading modules from:";
-    QString path;
-    foreach (path, totalPaths)
-    {
-      qDebug() << "  " << path;
-    }
-
     // This should update the directory watcher, which should sort out if any new modules have been loaded
     // and if so, should signal ModulesChanged, which is caught by this class, and re-build the GUI.
     m_DirectoryWatcher->setDirectories(totalPaths);
@@ -509,7 +502,8 @@ void CommandLineModulesView::Run()
   ctkCmdLineModuleReference reference = moduleInstance->moduleReference();
   ctkCmdLineModuleDescription description = reference.description();
 
-  qDebug() << "Command Line Module ... Saving image data to temporary storage...";
+  QString message = "Saving image data to temporary storage...";
+  this->PublishMessage(message);
 
   // Sanity check we have actually specified some input:
   QString parameterName;
@@ -536,7 +530,8 @@ void CommandLineModulesView::Run()
 
         QString fileName = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "." + QString::number(randomInt) + ".nii";
 
-        qDebug() << "Command Line Module ... Saving " << fileName;
+        message = "Saving " + fileName;
+        this->PublishMessage(message);
 
         std::string tmpFN = CommonFunctionality::SaveImage(image, fileName.toStdString().c_str());
         QString temporaryStorageFileName = QString::fromStdString(tmpFN);
@@ -544,8 +539,8 @@ void CommandLineModulesView::Run()
         m_TemporaryFileNames.push_back(temporaryStorageFileName);
         moduleInstance->setValue(parameterName, temporaryStorageFileName);
 
-        qDebug() << "Command Line Module ... Saved " << temporaryStorageFileName;
-
+        message = "Saved " + temporaryStorageFileName;
+        this->PublishMessage(message);
       } // end if image
     } // end if node
   } // end foreach input image
@@ -561,12 +556,14 @@ void CommandLineModulesView::Run()
     if (!outputFileName.isEmpty())
     {
       m_OutputDataToLoad.push_back(outputFileName);
-      qDebug() << "Command Line Module ... Registered " << outputFileName << " to auto load upon completion.";
+
+      message = "Command Line Module ... Registered " + outputFileName + " to auto load upon completion.";
+      this->PublishMessage(message);
     }
   }
 
   // Now we run stuff.
-  QString message = "starting.";
+  message = "starting.";
   this->PublishMessage(message);
 
   if (m_Watcher != NULL)
@@ -685,8 +682,9 @@ void CommandLineModulesView::LoadOutputData()
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::PublishMessage(const QString& message)
 {
-  qDebug() << message;
-  m_Controls->m_ConsoleOutputTextEdit->appendPlainText(QString("Command Line Module ... ") + message);
+  QString prefix = "Command Line Module ... ";
+  qDebug() << prefix << message;
+  m_Controls->m_ConsoleOutputTextEdit->appendPlainText(prefix + message);
 }
 
 

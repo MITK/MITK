@@ -36,14 +36,18 @@ public:
   CommandLineModulesViewControls(QWidget *parent = 0);
   virtual ~CommandLineModulesViewControls();
 
-signals:
-
-protected slots:
+  void Initial();
+  void Running();
+  void Cancel();
+  void Pause();
+  void Resume();
+  void Finished();
 
 protected:
 
 private:
 
+  void Enable(bool enable);
 };
 
 #endif // CommandLineModulesViewControls_h

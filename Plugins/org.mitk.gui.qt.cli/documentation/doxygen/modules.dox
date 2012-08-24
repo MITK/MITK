@@ -2,7 +2,9 @@
   \defgroup org_mitk_gui_qt_cli org.mitk.gui.qt.cli
   \ingroup MITKPlugins
 
-  \brief Describe your plugin here.
+  \brief This plugin, provided by University College London (UCL), written by Matt
+  Clarkson (m.clarkson@ucl.ac.uk) uses the CTK (http://www.commontk.org) Command
+  Line Modules library to run command line programs as an external process.
   
 */
 

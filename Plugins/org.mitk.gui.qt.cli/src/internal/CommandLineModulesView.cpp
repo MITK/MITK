@@ -147,9 +147,9 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     this->RetrieveAndStorePreferenceValues();
 
     // Connect signals to slots after we have set up GUI.
-    connect(this->m_Controls->m_RunButton, SIGNAL(pressed()), this, SLOT(OnRunButtonPressed()));
+    connect(this->m_Controls->m_RunButton, SIGNAL(pressed()), this, SLOT(OnRunPauseButtonPressed()));
     connect(this->m_Controls->m_StopButton, SIGNAL(pressed()), this, SLOT(OnStopButtonPressed()));
-    connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreDefaultsButtonPressed()));
+    connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
   }
 }
@@ -377,17 +377,6 @@ void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& modul
 
 
 //-----------------------------------------------------------------------------
-void CommandLineModulesView::OnActionChanged(QAction* action)
-{
-  ctkCmdLineModuleReference ref = this->GetReferenceByIdentifier(action->text());
-  if (ref)
-  {
-    this->AddModuleTab(ref);
-  }
-}
-
-
-//-----------------------------------------------------------------------------
 ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QString identifier)
 {
   ctkCmdLineModuleReference result;
@@ -408,7 +397,105 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QStri
 
 
 //-----------------------------------------------------------------------------
-void CommandLineModulesView::OnRunButtonPressed()
+void CommandLineModulesView::OnRunPauseButtonPressed()
+{
+  this->ProcessInstruction(RunPauseButton);
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnStopButtonPressed()
+{
+  this->ProcessInstruction(StopButton);
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnRestoreButtonPressed()
+{
+  QString message = "restoring defaults.";
+  this->PublishMessage(message);
+
+
+  message = "restored defaults.";
+  this->PublishMessage(message);
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnActionChanged(QAction* action)
+{
+  ctkCmdLineModuleReference ref = this->GetReferenceByIdentifier(action->text());
+  if (ref)
+  {
+    this->AddModuleTab(ref);
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::ProcessInstruction(const ProcessingInstruction& instruction)
+{
+  // This code places one method between OnRunButtonPressed and
+  // OnStopButtonPressed, and is responsible for calling
+  // OnRun, OnStop, OnPause, OnResume, and so could be refactored
+  // into a separate class for ease of unit testing.
+
+  if (instruction == RunPauseButton)
+  {
+    if (m_Watcher == NULL)
+    {
+      // Never been run before ... so just run it.
+      this->Run();
+    }
+    else
+    {
+      if (m_Watcher->isCanceled())
+      {
+        this->Run();
+      }
+      else if (m_Watcher->isFinished())
+      {
+        this->Run();
+      }
+      else if (m_Watcher->isPaused())
+      {
+        this->Resume();
+      }
+      else if (m_Watcher->isRunning())
+      {
+        this->Pause();
+      }
+      else if (m_Watcher->isStarted())
+      {
+        this->Pause();
+      }
+    }
+  }
+  else if (instruction == StopButton)
+  {
+    if (m_Watcher != NULL)
+    {
+      if (m_Watcher->isPaused())
+      {
+        this->Resume();
+        this->Stop();
+      }
+      else if (m_Watcher->isRunning())
+      {
+        this->Stop();
+      }
+      else if (m_Watcher->isStarted())
+      {
+        this->Stop();
+      }
+    }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::Run()
 {
   // Get hold of the command line module.
   ctkCmdLineModuleFrontend* moduleInstance = m_MapTabToModuleInstance[m_Controls->m_TabWidget->currentIndex()];
@@ -479,7 +566,8 @@ void CommandLineModulesView::OnRunButtonPressed()
   }
 
   // Now we run stuff.
-  qDebug() << "Command Line Module ... starting.";
+  QString message = "starting.";
+  this->PublishMessage(message);
 
   if (m_Watcher != NULL)
   {
@@ -495,40 +583,75 @@ void CommandLineModulesView::OnRunButtonPressed()
 
   ctkCmdLineModuleFuture future = m_ModuleManager->run(moduleInstance);
   m_Watcher->setFuture(future);
+  m_Controls->Running();
 }
 
 
 //-----------------------------------------------------------------------------
-void CommandLineModulesView::OnStopButtonPressed()
+void CommandLineModulesView::Stop()
 {
-  qDebug() << "Command Line Module ... stopping.";
+  QString message = "stopping.";
+  this->PublishMessage(message);
 
-  qDebug() << "Command Line Module ... stopped.";
+  this->ClearUpTemporaryFiles();
+  m_TemporaryFileNames.clear();
+  m_OutputDataToLoad.clear();
+
+  m_Watcher->cancel();
+  m_Watcher->waitForFinished();
+  m_Controls->Cancel();
+
+  message = "stopped.";
+  this->PublishMessage(message);
 }
 
 
 //-----------------------------------------------------------------------------
-void CommandLineModulesView::OnRestoreDefaultsButtonPressed()
+void CommandLineModulesView::Pause()
 {
-  qDebug() << "Command Line Module ... restoring.";
+  QString message = "pausing.";
+  this->PublishMessage(message);
 
-  qDebug() << "Command Line Module ... restored.";
+  m_Watcher->pause();
+  m_Controls->Pause();
 
+  message = "paused.";
+  this->PublishMessage(message);
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::Resume()
+{
+  QString message = "resuming.";
+  this->PublishMessage(message);
+
+  m_Watcher->resume();
+  m_Controls->Resume();
+
+  message = "resumed.";
+  this->PublishMessage(message);
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::ClearUpTemporaryFiles()
 {
+  QString message;
   QString fileName;
+
   foreach (fileName, m_TemporaryFileNames)
   {
     QFile file(fileName);
     if (file.exists())
     {
-      qDebug() << "Command Line Module ... removing " << fileName;
+      message = QObject::tr("removing %1").arg(fileName);
+      this->PublishMessage(message);
+
       bool success = file.remove();
-      qDebug() << "Command Line Module ... removed " << fileName << ", successfully=" << success;
+
+      message = QObject::tr("removed %1, successfully=%2").arg(fileName).arg(success);
+      this->PublishMessage(message);
     }
   }
 }
@@ -542,7 +665,9 @@ void CommandLineModulesView::LoadOutputData()
   QString fileName;
   foreach (fileName, m_OutputDataToLoad)
   {
-    qDebug() << "Command Line Module ... loading " << fileName;
+    QString message = QObject::tr("loading %1").arg(fileName);
+    this->PublishMessage(message);
+
     fileNames.push_back(fileName.toStdString());
   }
 
@@ -551,39 +676,55 @@ void CommandLineModulesView::LoadOutputData()
     mitk::DataStorage::Pointer dataStorage = this->GetDataStorage();
     int numberLoaded = mitk::IOUtil::LoadFiles(fileNames, *(dataStorage.GetPointer()));
 
-    qDebug() << "Command Line Module ... loaded " << numberLoaded << " files";
+    QString message = QObject::tr("loaded %1 files").arg(numberLoaded);
+    this->PublishMessage(message);
   }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::PublishMessage(const QString& message)
+{
+  qDebug() << message;
+  m_Controls->m_ConsoleOutputTextEdit->appendPlainText(QString("Command Line Module ... ") + message);
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnModuleStarted()
 {
-  qDebug() << "Command Line Module ... started.";
+  QString message = "started.";
+  this->PublishMessage(message);
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnModuleProgressValueChanged(int value)
 {
-  qDebug() << "Command Line Module ... OnModuleProgressValueChanged int=" << value;
+  QString message = QObject::tr("OnModuleProgressValueChanged int=%1.").arg(value);
+  this->PublishMessage(message);
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnModuleProgressTextChanged(QString value)
 {
-  qDebug() << "Command Line Module ... OnModuleProgressValueChanged QString=" << value;
+  QString message = QObject::tr("OnModuleProgressValueChanged QString=%1.").arg(value);
+  this->PublishMessage(message);
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnModuleFinished()
 {
-  qDebug() << "Command Line Module ... finishing.";
+  QString message = "finishing.";
+  this->PublishMessage(message);
 
   this->LoadOutputData();
   this->ClearUpTemporaryFiles();
 
-  qDebug() << "Command Line Module ... finished.";
+  m_Controls->Finished();
+
+  message = "finished.";
+  this->PublishMessage(message);
 }

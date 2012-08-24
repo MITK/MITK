@@ -87,19 +87,19 @@ protected Q_SLOTS:
   void OnActionChanged(QAction*);
 
   /**
-   * \brief Slot to launch the command line module.
+   * \brief Slot that is called when the Run button is pressed.
    */
-  void OnRunButtonPressed();
+  void OnRunPauseButtonPressed();
 
   /**
-   * \brief Slot to stop (kill) the command line module.
+   * \brief Slot that is called when the Stop button is pressed.
    */
   void OnStopButtonPressed();
 
   /**
-   * \brief Slot to restore the form to the default parameters.
+   * \brief Slot that is called when the restore defaults button is pressed.
    */
-  void OnRestoreDefaultsButtonPressed();
+  void OnRestoreButtonPressed();
 
   /**
    * \brief Slot called from QFutureWatcher<ctkCmdLineModuleResult> when the module has been launched.
@@ -140,6 +140,11 @@ protected:
 
 private:
 
+  enum ProcessingInstruction {
+    RunPauseButton,
+    StopButton
+  };
+
   /**
    * \brief Called on startup and by OnPreferencesChanged to load the preferences into member variables.
    *
@@ -157,6 +162,11 @@ private:
    * \brief Called to get hold of the actual prefefences node.
    */
   berry::IBerryPreferences::Pointer RetrievePreferences();
+
+  /**
+   * \brief Used to write output to console.
+   */
+  void PublishMessage(const QString& message);
 
   /**
    * \brief Search the internal datastructure (QHash) to find the reference that matches the identifier.
@@ -180,6 +190,31 @@ private:
    * \brief Loads any data listed in m_OutputDataToLoad into the mitk::DataStorage.
    */
   void LoadOutputData();
+
+  /**
+   * \brief Called by OnRunButtonPressed() and OnStopButtonPressed() to actually decide what to run.
+   */
+  void ProcessInstruction(const ProcessingInstruction& instruction);
+
+  /**
+   * \brief Slot to launch the command line module.
+   */
+  void Run();
+
+  /**
+   * \brief Slot to stop (kill) the command line module.
+   */
+  void Stop();
+
+  /**
+   * \brief Slot to pause the command line module.
+   */
+  void Pause();
+
+  /**
+   * \brief Slot to resume the command line module.
+   */
+  void Resume();
 
   /**
    * \brief The GUI controls contain a run/stop button, and a tabbed widget, and the GUI component

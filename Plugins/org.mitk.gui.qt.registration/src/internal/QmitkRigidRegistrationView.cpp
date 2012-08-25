@@ -674,19 +674,16 @@ void QmitkRigidRegistrationView::EnableContour(bool show)
 
   m_ContourHelperNode->SetProperty("visible", mitk::BoolProperty::New(show));
 
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+
 }
 
 void QmitkRigidRegistrationView::ShowContour(int threshold)
 {
-
   bool show = m_Controls.m_ShowContour->isChecked();
-  // Do the segmentation on the input image
 
-
-
-  if(m_FixedNode.IsNull())
+  if(m_FixedNode.IsNull() || !show)
     return;
-
 
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
@@ -717,33 +714,6 @@ void QmitkRigidRegistrationView::ShowContour(int threshold)
 
 
   // Create a contour from the binary image
-
-/*
-
-  mitk::ShowSegmentationAsSurface::Pointer surfaceFilter = mitk::ShowSegmentationAsSurface::New();
-
-  surfaceFilter->SetDataStorage(*this->GetDataStorage());
-  surfaceFilter->SetPointerParameter("Input", mitkBinaryImage);
-  surfaceFilter->SetPointerParameter("Group node", m_FixedNode);
-  surfaceFilter->SetParameter("")
-  surfaceFilter->SetParameter("Show result", true);
-  surfaceFilter->SetParameter("Sync visibility", false);
-  surfaceFilter->SetParameter("Smooth", false);
-  surfaceFilter->SetParameter("Apply median", false);
-  surfaceFilter->SetParameter("Median kernel size", 3u);
-  surfaceFilter->SetParameter("Gaussian SD", 1.5f);
-  //surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated);
-  surfaceFilter->SetParameter("Decimate mesh", false);
-  surfaceFilter->SetParameter("Decimation rate", 0.8f);
-
-  surfaceFilter->StartAlgorithm();
-
-  // Need to create the surface as in the surfaceFilter, but reserve a new node that can be
-  // modified once it was created.
-*/
-
-
-
   mitk::ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = mitk::ManualSegmentationToSurfaceFilter::New();
   surfaceFilter->SetInput( mitkBinaryImage );
   surfaceFilter->SetThreshold( 1 ); //expects binary image with zeros and ones

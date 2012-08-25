@@ -175,10 +175,16 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     void ShowRedGreen(bool show);
 
     /*!
-    * \brief Stores whether the contour of the fixed image will be shhown
+    * \brief Draws the contour of the fixed image according to a threshold
     * @param show if true, then images will be shown in red and green
     */
     void ShowContour(int threshold);
+
+    /*!
+    * \brief Stores whether the contour of the fixed image will be shhown
+    * @param show if true, the contour of the fixed image is shown
+    */
+    void EnableContour(bool show);
 
     /*!
     * \brief Changes the visibility of the manual registration methods accordingly to the checkbox "Manual Registration" in GUI

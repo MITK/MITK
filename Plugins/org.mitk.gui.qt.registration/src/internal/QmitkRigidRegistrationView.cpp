@@ -246,7 +246,7 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect( m_Controls.m_ManualRegistrationCheckbox, SIGNAL(toggled(bool)), this, SLOT(ShowManualRegistrationFrame(bool)));
   connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
-  connect(m_Controls.m_ShowContour, SIGNAL(toggled(bool)), this, SLOT(ShowContour(bool)));
+  connect(m_Controls.m_ShowContour, SIGNAL(toggled(bool)), this, SLOT(EnableContour(bool)));
   connect(m_Controls.m_UseFixedImageMask, SIGNAL(toggled(bool)), this, SLOT(UseFixedMaskImageChecked(bool)));
   connect(m_Controls.m_UseMovingImageMask, SIGNAL(toggled(bool)), this, SLOT(UseMovingMaskImageChecked(bool)));
   connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
@@ -659,6 +659,23 @@ void QmitkRigidRegistrationView::ShowRedGreen(bool redGreen)
   this->SetImageColor(m_ShowRedGreen);
 }
 
+void QmitkRigidRegistrationView::EnableContour(bool show)
+{
+  if(show)
+  {
+    m_Controls.m_ContourSlider->setEnabled(false);
+    ShowContour(m_Controls.m_ContourSlider->value());
+  }
+  else
+  {
+    m_Controls.m_ContourSlider->setEnabled(true);
+  }
+
+
+  m_ContourHelperNode->SetProperty("visible", mitk::BoolProperty::New(show));
+
+}
+
 void QmitkRigidRegistrationView::ShowContour(int threshold)
 {
 
@@ -671,11 +688,6 @@ void QmitkRigidRegistrationView::ShowContour(int threshold)
     return;
 
 
-
-  if(!show)
-  {
-    // Remove contour
-  }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
 

@@ -394,6 +394,12 @@ void QmitkRigidRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* no
     m_Controls.m_ShowRedGreenValues->setEnabled(false);
     m_Controls.m_SwitchImages->hide();
   }
+
+  else if(node == m_ContourHelperNode)
+  {
+    // can this cause a memory leak?
+    m_ContourHelperNode = NULL;
+  }
 }
 
 void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImage)
@@ -662,16 +668,13 @@ void QmitkRigidRegistrationView::ShowRedGreen(bool redGreen)
 void QmitkRigidRegistrationView::EnableContour(bool show)
 {
   if(show)
-  {
-    m_Controls.m_ContourSlider->setEnabled(false);
     ShowContour(m_Controls.m_ContourSlider->value());
-  }
-  else
-  {
-    m_Controls.m_ContourSlider->setEnabled(true);
-  }
 
+  // Can happen when the m_ContourHelperNode was deleted before and now the show contour checkbox is turned off
+  if(m_ContourHelperNode.IsNull())
+    return;
 
+  m_Controls.m_ContourSlider->setEnabled(show);
   m_ContourHelperNode->SetProperty("visible", mitk::BoolProperty::New(show));
 
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -732,11 +735,12 @@ void QmitkRigidRegistrationView::ShowContour(int threshold)
     m_ContourHelperNode = mitk::DataNode::New();
     m_ContourHelperNode->SetData(surface);
     m_ContourHelperNode->SetProperty("opacity", mitk::FloatProperty::New(1.0) );
-    m_ContourHelperNode->SetProperty("line width", mitk::IntProperty::New(3) );
+    m_ContourHelperNode->SetProperty("line width", mitk::IntProperty::New(2) );
     m_ContourHelperNode->SetProperty("scalar visibility", mitk::BoolProperty::New(false) );
     m_ContourHelperNode->SetProperty( "name", mitk::StringProperty::New("surface") );
     m_ContourHelperNode->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0));
-    this->GetDataStorage()->Add(m_ContourHelperNode, m_FixedNode);
+    m_ContourHelperNode->SetBoolProperty("helper object", true);
+    this->GetDataStorage()->Add(m_ContourHelperNode);
 
   }
   else
@@ -1387,4 +1391,14 @@ void QmitkRigidRegistrationView::SwitchImages()
   mitk::DataNode::Pointer newFixed = m_MovingNode;
   this->FixedSelected(newFixed);
   this->MovingSelected(newMoving);
+
+  if(m_ContourHelperNode.IsNotNull())
+  {
+
+    // Update the contour
+    ShowContour(m_Controls.m_ContourSlider->value());
+
+
+  }
+
 }

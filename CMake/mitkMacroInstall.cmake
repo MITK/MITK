@@ -46,6 +46,10 @@ macro(_fixup_target)
         # item with relative path or embedded path pointing to some build dir
         set(full_path \"full_path-NOTFOUND\")
         file(GLOB_RECURSE full_path \${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/\${_item_name} )
+        list(LENGTH full_path full_path_length)
+        if(full_path_length GREATER 1)
+          list(GET full_path 0 full_path)
+        endif()
         get_filename_component(_item_path \"\${full_path}\" PATH)
       endif()
       

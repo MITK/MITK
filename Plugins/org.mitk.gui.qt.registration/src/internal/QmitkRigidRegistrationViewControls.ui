@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>413</width>
-    <height>847</height>
+    <width>417</width>
+    <height>932</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -323,6 +323,13 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QLabel" name="m_ThresholdLabel">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
              <item>
@@ -350,11 +357,6 @@
               </layout>
              </item>
             </layout>
-            <zorder>m_StatusLabel</zorder>
-            <zorder>timeSlider</zorder>
-            <zorder>m_ShowRedGreenValues</zorder>
-            <zorder>horizontalLayoutWidget</zorder>
-            <zorder>m_OpacityLabel</zorder>
            </widget>
           </item>
           <item>

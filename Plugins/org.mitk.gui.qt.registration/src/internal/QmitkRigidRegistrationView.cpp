@@ -34,7 +34,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryISelectionService.h"
 
 #include <mitkShowSegmentationAsSurface.h>
+#include "mitkManualSegmentationToSurfaceFilter.h"
+#include <mitkSegmentationSink.h>
+
 #include <mitkImageStatisticsHolder.h>
+
+
+#include <itkBinaryThresholdImageFilter.h>
 
 
 const std::string QmitkRigidRegistrationView::VIEW_ID = "org.mitk.views.rigidregistration";
@@ -245,6 +251,8 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect(m_Controls.m_UseMovingImageMask, SIGNAL(toggled(bool)), this, SLOT(UseMovingMaskImageChecked(bool)));
   connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(valueChanged(int)), this, SLOT(OpacityUpdate(int)));
+  connect(m_Controls.m_ContourSlider, SIGNAL(valueChanged(int)), this, SLOT(ShowContour(int)));
+
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
   connect(m_Controls.m_UndoTransformation,SIGNAL(clicked()),this,SLOT(UndoTransformation()));
   connect(m_Controls.m_RedoTransformation,SIGNAL(clicked()),this,SLOT(RedoTransformation()));
@@ -444,7 +452,11 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImag
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
     int min = (int)image->GetStatistics()->GetScalarValueMin();
     int max = (int)image->GetStatistics()->GetScalarValueMax();
-    m_Controls.m_ContourSlider->SetRange(min, max);
+    m_Controls.m_ContourSlider->setRange(min, max);
+
+    // Set slider to a default value
+    int avg = (min+max) / 2;
+    m_Controls.m_ContourSlider->setSliderPosition(avg);
 
   }
   else
@@ -647,9 +659,10 @@ void QmitkRigidRegistrationView::ShowRedGreen(bool redGreen)
   this->SetImageColor(m_ShowRedGreen);
 }
 
-void QmitkRigidRegistrationView::ShowContour(bool show)
+void QmitkRigidRegistrationView::ShowContour(int threshold)
 {
 
+  bool show = m_Controls.m_ShowContour->isChecked();
   // Do the segmentation on the input image
 
 
@@ -657,12 +670,50 @@ void QmitkRigidRegistrationView::ShowContour(bool show)
   if(m_FixedNode.IsNull())
     return;
 
+
+
+  if(!show)
+  {
+    // Remove contour
+  }
+
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
+
+  typedef itk::Image<float,3> FloatImageType;
+  typedef itk::Image<short,3> ShortImageType;
+
+  // Create a binary image using the given treshold
+  typedef itk::BinaryThresholdImageFilter<FloatImageType, ShortImageType> ThresholdFilterType;
+
+  FloatImageType::Pointer floatImage = FloatImageType::New();
+  mitk::CastToItkImage(image, floatImage);
+
+
+  ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
+  thresholdFilter->SetInput(floatImage);
+  thresholdFilter->SetLowerThreshold(threshold);
+  thresholdFilter->SetUpperThreshold((int)image->GetStatistics()->GetScalarValueMax());
+  thresholdFilter->SetInsideValue(1);
+  thresholdFilter->SetOutsideValue(0);
+  thresholdFilter->Update();
+
+  ShortImageType::Pointer binaryImage = thresholdFilter->GetOutput();
+  mitk::Image::Pointer mitkBinaryImage = mitk::Image::New();
+  mitk::CastToMitkImage(binaryImage, mitkBinaryImage);
+
+
+
+
+  // Create a contour from the binary image
+
+/*
+
   mitk::ShowSegmentationAsSurface::Pointer surfaceFilter = mitk::ShowSegmentationAsSurface::New();
 
   surfaceFilter->SetDataStorage(*this->GetDataStorage());
-  surfaceFilter->SetPointerParameter("Input", image);
+  surfaceFilter->SetPointerParameter("Input", mitkBinaryImage);
   surfaceFilter->SetPointerParameter("Group node", m_FixedNode);
+  surfaceFilter->SetParameter("")
   surfaceFilter->SetParameter("Show result", true);
   surfaceFilter->SetParameter("Sync visibility", false);
   surfaceFilter->SetParameter("Smooth", false);
@@ -674,6 +725,47 @@ void QmitkRigidRegistrationView::ShowContour(bool show)
   surfaceFilter->SetParameter("Decimation rate", 0.8f);
 
   surfaceFilter->StartAlgorithm();
+
+  // Need to create the surface as in the surfaceFilter, but reserve a new node that can be
+  // modified once it was created.
+*/
+
+
+
+  mitk::ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = mitk::ManualSegmentationToSurfaceFilter::New();
+  surfaceFilter->SetInput( mitkBinaryImage );
+  surfaceFilter->SetThreshold( 1 ); //expects binary image with zeros and ones
+  surfaceFilter->SetUseGaussianImageSmooth(false); // apply gaussian to thresholded image ?
+  surfaceFilter->SetMedianFilter3D(false); // apply median to segmentation before marching cubes ?
+  surfaceFilter->SetDecimate( mitk::ImageToSurfaceFilter::NoDecimation );
+
+  surfaceFilter->UpdateLargestPossibleRegion();
+
+  // calculate normals for nicer display
+  mitk::Surface::Pointer surface = surfaceFilter->GetOutput();
+
+
+  if(m_ContourHelperNode.IsNull())
+  {
+    m_ContourHelperNode = mitk::DataNode::New();
+    m_ContourHelperNode->SetData(surface);
+    m_ContourHelperNode->SetProperty("opacity", mitk::FloatProperty::New(1.0) );
+    m_ContourHelperNode->SetProperty("line width", mitk::IntProperty::New(3) );
+    m_ContourHelperNode->SetProperty("scalar visibility", mitk::BoolProperty::New(false) );
+    m_ContourHelperNode->SetProperty( "name", mitk::StringProperty::New("surface") );
+    m_ContourHelperNode->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0));
+    this->GetDataStorage()->Add(m_ContourHelperNode, m_FixedNode);
+
+  }
+  else
+  {
+    m_ContourHelperNode->SetData(surface);
+  }
+
+
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+
+
 }
 
 

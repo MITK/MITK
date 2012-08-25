@@ -178,7 +178,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     * \brief Stores whether the contour of the fixed image will be shhown
     * @param show if true, then images will be shown in red and green
     */
-    void ShowContour(bool show);
+    void ShowContour(int threshold);
 
     /*!
     * \brief Changes the visibility of the manual registration methods accordingly to the checkbox "Manual Registration" in GUI
@@ -278,6 +278,14 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     mitk::DataNode::Pointer m_MovingMaskNode;
     mitk::DataNode::Pointer m_FixedNode;
     mitk::DataNode::Pointer m_FixedMaskNode;
+
+
+
+    // A node to store the contour of the fixed image in
+    mitk::DataNode::Pointer m_ContourHelperNode;
+
+
+
     std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
     std::list<std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> > m_UndoChildGeometryList;
     std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;

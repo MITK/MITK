@@ -83,7 +83,7 @@ macro(_fixup_target)
       endif()
     endmacro(gp_resolved_file_type_override)
 
-    if(NOT APPLE AND (UNIX OR MINGW))
+    if(NOT APPLE)
       macro(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
         if(\${item} MATCHES \"blueberry_osgi\")
           get_filename_component(_item_name \${item} NAME)

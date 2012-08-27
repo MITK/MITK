@@ -99,10 +99,10 @@ namespace itk
     // init gradient magnitude image
     typename GradientMagnitudeFilterType::Pointer GradientFilter = GradientMagnitudeFilterType::New();
     GradientFilter->SetInput(this->m_Image);
-    GradientFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
+    //GradientFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
     //GradientFilter->SetSigma( 1.0 );
     //GradientFilter->SetNormalizeAcrossScale(true);
-    GradientFilter->Update();
+    //GradientFilter->Update();
     m_GradImage = GradientFilter->GetOutput();
 
     // check start/end point value 

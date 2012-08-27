@@ -815,7 +815,7 @@ namespace itk
 
  
   template <class TInputImageType, class TOutputImageType>
-  std::vector< itk::Index<3> >
+  std::vector< typename ShortestPathImageFilter<TInputImageType, TOutputImageType>::IndexType >
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     GetVectorPath()
   {
@@ -823,7 +823,7 @@ namespace itk
   }
 
    template <class TInputImageType, class TOutputImageType>
-  std::vector< std::vector< itk::Index<3> > >
+   std::vector< std::vector< typename ShortestPathImageFilter<TInputImageType, TOutputImageType>::IndexType > >
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     GetMultipleVectorPaths()
   {

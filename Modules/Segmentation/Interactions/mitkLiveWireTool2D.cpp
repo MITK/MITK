@@ -48,14 +48,14 @@ mitk::LiveWireTool2D::LiveWireTool2D()
 
   m_LiveWireContour = mitk::ContourModel::New();
   m_LiveWireContourNode = mitk::DataNode::New();
-  m_LiveWireContourNode->SetData( m_LiveWireContour );
+  //m_LiveWireContourNode->SetData( m_LiveWireContour );
   m_LiveWireContourNode->SetProperty("name", StringProperty::New("active livewire node"));
   m_LiveWireContourNode->SetProperty("visible", BoolProperty::New(true));
   m_LiveWireContourNode->AddProperty( "color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
 
 
-  m_LiveWireFilter = mitk::ImageToLiveWireContourFilter::New();
+  m_LiveWireFilter = mitk::ImageLiveWireContourModelFilter::New();
  
   
   // great magic numbers
@@ -126,7 +126,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
 
   m_ToolManager->GetDataStorage()->Add( m_LiveWireContourNode );
   
-  m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
+  //m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
   m_Contour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
 
 
@@ -135,7 +135,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_LiveWireFilter->SetInput(m_WorkingSlice);
   //set initial start point
   m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
-
+  m_LiveWireFilter->SetGeo2D(positionEvent->GetSender()->GetCurrentWorldGeometry2D());
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -166,13 +166,18 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   //remove duplicate first vertex, it's already contained in m_Contour
   m_LiveWireContour->RemoveVertexAt(0, timestep);
 
+
+  /* TODO fix this hack*/
+  //set last to active added point
+  const_cast<mitk::ContourModel::VertexType*>( m_LiveWireContour->GetVertexAt(m_LiveWireContour->GetNumberOfVertices(timestep)-1, timestep) )->IsActive = true;
+
   //merge contours
   m_Contour->Concatenate(m_LiveWireContour, timestep);
 
 
   //clear the livewire contour and reset the corresponding datanode
   m_LiveWireContour->Clear(timestep);
-  m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
+  //m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
   //set new start point
   m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
@@ -206,11 +211,12 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
    m_LiveWireFilter->Update();
 
 
-  ContourModel::VertexType* currentVertex = const_cast<ContourModel::VertexType*>(m_LiveWireContour->GetVertexAt(0));
+  //ContourModel::VertexType* currentVertex = const_cast<ContourModel::VertexType*>(m_LiveWireContour->GetVertexAt(0));
 
-  this->m_LiveWireContour = this->m_LiveWireFilter->GetOuput();
-  m_LiveWireContour->AddVertex(*currentVertex, timestep);
-  m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
+  this->m_LiveWireContour = this->m_LiveWireFilter->GetOutput();
+  this->m_LiveWireContourNode->SetData(this->m_LiveWireFilter->GetOutput());
+  /*m_LiveWireContour->AddVertex(*currentVertex, timestep);
+  m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );*/
   /* END actual LiveWire computation */
 
 
@@ -314,7 +320,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 
   m_LiveWireContour = mitk::ContourModel::New();
   m_LiveWireContourNode = mitk::DataNode::New();
-  m_LiveWireContourNode->SetData( m_LiveWireContour );
+  //m_LiveWireContourNode->SetData( m_LiveWireContour );
   m_LiveWireContourNode->SetProperty("name", StringProperty::New("active livewire node"));
   m_LiveWireContourNode->SetProperty("visible", BoolProperty::New(true));
   m_LiveWireContourNode->AddProperty( "color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );

@@ -467,7 +467,7 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
 
   // in any case we need more size to accomodate shifted slices
   typename ImageType::SizeType largerSize = resampler->GetSize(); // now the resampler already holds the input image's size.
-  largerSize[1] += static_cast<typename ImageType::SizeType::SizeValueType>(tiltInfo.GetTiltCorrectedAdditionalSize());
+  largerSize[1] += static_cast<typename ImageType::SizeType::SizeValueType>(tiltInfo.GetTiltCorrectedAdditionalSize() / input->GetSpacing()[1]+ 2.0);
   resampler->SetSize( largerSize );
 
   // in SOME cases this additional size is below/behind origin

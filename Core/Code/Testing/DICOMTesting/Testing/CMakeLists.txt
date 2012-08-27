@@ -18,8 +18,10 @@ if(NOT APPLE)
 set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/VerifyDICOMMitkImageDump)
 
 set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen)
-set(CT_TILT_DIR ${MITK_DATA_DIR}/TiltHead)
 set(MR_HEART_DIR ${MITK_DATA_DIR}/3D+t-Heart)
+set(CT_TILT_HEAD_DIR ${MITK_DATA_DIR}/TiltHead)
+set(CT_TILT_DIR ${MITK_DATA_DIR}/TiltedData)
+
 
 # these variables could be passed as parameters to a generic test creation function
 set(TESTS_DIR Tests)
@@ -70,6 +72,7 @@ endfunction(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_
 
 
 AddDicomTestsFromDataRepository(${CT_ABDOMEN_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
+AddDicomTestsFromDataRepository(${CT_TILT_HEAD_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 AddDicomTestsFromDataRepository(${CT_TILT_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 AddDicomTestsFromDataRepository(${MR_HEART_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 

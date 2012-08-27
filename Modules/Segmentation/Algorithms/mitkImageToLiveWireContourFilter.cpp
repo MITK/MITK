@@ -15,20 +15,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageToLiveWireContourFilter.h"
-#include <mitkInteractionConst.h>
+
 
 #include <itkShortestPathCostFunctionLiveWire.h>
 #include <itkImageRegionIterator.h>
 #include <itkShortestPathImageFilter.h>
 
 
-#include <mitkImageAccessByItk.h>
-#include <mitkImageCast.h>
-
 
 mitk::ImageToLiveWireContourFilter::ImageToLiveWireContourFilter()
 {
-
+  OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
+  this->SetNumberOfRequiredInputs(1);
+  this->SetNumberOfOutputs( 1 );
+  this->SetNthOutput(0, output.GetPointer());
 }
 
 
@@ -36,6 +36,43 @@ mitk::ImageToLiveWireContourFilter::ImageToLiveWireContourFilter()
 mitk::ImageToLiveWireContourFilter::~ImageToLiveWireContourFilter()
 {
 
+}
+
+
+
+void mitk::ImageToLiveWireContourFilter::SetInput ( const mitk::ImageToLiveWireContourFilter::InputType* input )
+{
+  this->SetInput( 0, input );
+}
+
+void mitk::ImageToLiveWireContourFilter::SetInput ( unsigned int idx, const mitk::ImageToLiveWireContourFilter::InputType* input )
+{
+  if ( idx + 1 > this->GetNumberOfInputs() )
+  {
+    this->SetNumberOfRequiredInputs(idx + 1);
+  }
+  if ( input != static_cast<InputType*> ( this->ProcessObject::GetInput ( idx ) ) )
+  {
+    this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
+    this->Modified();
+  }
+}
+
+
+
+const mitk::ImageToLiveWireContourFilter::InputType* mitk::ImageToLiveWireContourFilter::GetInput( void )
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+  return static_cast<const mitk::ImageToLiveWireContourFilter::InputType*>(this->ProcessObject::GetInput(0));
+}
+
+
+const mitk::ImageToLiveWireContourFilter::InputType* mitk::ImageToLiveWireContourFilter::GetInput( unsigned int idx )
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+  return static_cast<const mitk::ImageToLiveWireContourFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
 
 
@@ -71,87 +108,87 @@ void mitk::ImageToLiveWireContourFilter::GenerateData()
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::ImageToLiveWireContourFilter::ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
 {
-  typedef itk::Image< TPixel, VImageDimension >                              InputImageType;
-  typedef itk::Image< float,  2 >                                          FloatImageType;
+  //typedef itk::Image< TPixel, VImageDimension >                              InputImageType;
+  //typedef itk::Image< float,  2 >                                          FloatImageType;
 
-  typedef typename itk::ShortestPathImageFilter< InputImageType, InputImageType >     ShortestPathImageFilterType;
-  typedef typename itk::ShortestPathCostFunctionLiveWire< InputImageType >   CostFunctionType;
+  //typedef typename itk::ShortestPathImageFilter< InputImageType, InputImageType >     ShortestPathImageFilterType;
+  //typedef typename itk::ShortestPathCostFunctionLiveWire< InputImageType >   CostFunctionType;
 
-  typedef InputImageType::IndexType                                        IndexType;
-
-
-  /* compute the requested region for itk filters */
-
-  typename IndexType startPoint, endPoint;
-  
-  startPoint[0] = m_StartPointInIndex[0];
-  startPoint[1] = m_StartPointInIndex[1];
-
-  endPoint[0] = m_EndPointInIndex[0];
-  endPoint[1] = m_EndPointInIndex[1];
-
-  //minimum value in each direction for startRegion
-  typename IndexType startRegion;
-  startRegion[0] = startPoint[0] < endPoint[0] ? startPoint[0] : endPoint[0];
-  startRegion[1] = startPoint[1] < endPoint[1] ? startPoint[1] : endPoint[1];
-
-  //maximum value in each direction for size
-  typename InputImageType::SizeType size;
-  size[0] = startPoint[0] > endPoint[0] ? startPoint[0] : endPoint[0];
-  size[1] = startPoint[1] > endPoint[1] ? startPoint[1] : endPoint[1];
+  //typedef InputImageType::IndexType                                        IndexType;
 
 
-  typename InputImageType::RegionType region;
-  region.SetSize( size );
-  region.SetIndex( startRegion );
-  /*---------------------------------------------*/
+  ///* compute the requested region for itk filters */
+
+  //typename IndexType startPoint, endPoint;
+  //
+  //startPoint[0] = m_StartPointInIndex[0];
+  //startPoint[1] = m_StartPointInIndex[1];
+
+  //endPoint[0] = m_EndPointInIndex[0];
+  //endPoint[1] = m_EndPointInIndex[1];
+
+  ////minimum value in each direction for startRegion
+  //typename IndexType startRegion;
+  //startRegion[0] = startPoint[0] < endPoint[0] ? startPoint[0] : endPoint[0];
+  //startRegion[1] = startPoint[1] < endPoint[1] ? startPoint[1] : endPoint[1];
+
+  ////maximum value in each direction for size
+  //typename InputImageType::SizeType size;
+  //size[0] = startPoint[0] > endPoint[0] ? startPoint[0] : endPoint[0];
+  //size[1] = startPoint[1] > endPoint[1] ? startPoint[1] : endPoint[1];
 
 
-  /* extracts features from image and calculates costs */
-  typename CostFunctionType::Pointer costFunction = CostFunctionType::New();
-  costFunction->SetImage(inputImage);
-  costFunction->SetStartIndex(startPoint);
-  costFunction->SetEndIndex(endPoint);
-  costFunction->SetRequestedRegion(region);
-  /*---------------------------------------------*/
+  //typename InputImageType::RegionType region;
+  //region.SetSize( size );
+  //region.SetIndex( startRegion );
+  ///*---------------------------------------------*/
 
 
-  /* calculate shortest path between start and end point */
-  ShortestPathImageFilterType::Pointer shortestPathFilter = ShortestPathImageFilterType::New();
-  shortestPathFilter->SetFullNeighborsMode(true);
-  shortestPathFilter->SetInput(inputImage);
-  shortestPathFilter->SetMakeOutputImage(true);  
-  shortestPathFilter->SetStoreVectorOrder(false);  
-  //shortestPathFilter->SetActivateTimeOut(true); 
-  shortestPathFilter->SetStartIndex(startPoint);
-  shortestPathFilter->SetEndIndex(endPoint);
-
-  shortestPathFilter->Update();
-
-  /*---------------------------------------------*/
+  ///* extracts features from image and calculates costs */
+  //typename CostFunctionType::Pointer costFunction = CostFunctionType::New();
+  //costFunction->SetImage(inputImage);
+  //costFunction->SetStartIndex(startPoint);
+  //costFunction->SetEndIndex(endPoint);
+  //costFunction->SetRequestedRegion(region);
+  ///*---------------------------------------------*/
 
 
-  /* construct contour from path image */
-  //get the shortest path as vector
-  std::vector< itk::Index<3> > shortestPath = shortestPathFilter->GetVectorPath();
+  ///* calculate shortest path between start and end point */
+  //ShortestPathImageFilterType::Pointer shortestPathFilter = ShortestPathImageFilterType::New();
+  //shortestPathFilter->SetFullNeighborsMode(true);
+  //shortestPathFilter->SetInput(inputImage);
+  //shortestPathFilter->SetMakeOutputImage(true);  
+  //shortestPathFilter->SetStoreVectorOrder(false);  
+  ////shortestPathFilter->SetActivateTimeOut(true); 
+  //shortestPathFilter->SetStartIndex(startPoint);
+  //shortestPathFilter->SetEndIndex(endPoint);
 
-  //fill the output contour with controll points from the path
-  ImageToContourModelFilter::OutputType::Pointer outputContour = this->GetOutput();
-  mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
+  //shortestPathFilter->Update();
 
-  std::vector< itk::Index<3> >::iterator pathIterator = shortestPath.begin();
+  ///*---------------------------------------------*/
 
-  while(pathIterator != shortestPath.end())
-  {
-    mitk::Point3D currentPoint;
-    currentPoint[0] = (*pathIterator)[0];
-    currentPoint[1] = (*pathIterator)[1];
 
-    input->GetGeometry(0)->IndexToWorld(currentPoint, currentPoint);
-    outputContour->AddVertex(currentPoint);
-    
-    pathIterator++;
-  }
+  ///* construct contour from path image */
+  ////get the shortest path as vector
+  //std::vector< itk::Index<3> > shortestPath = shortestPathFilter->GetVectorPath();
+
+  ////fill the output contour with controll points from the path
+  //OutputType::Pointer outputContour = this->GetOutput();
+  //mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
+
+  //std::vector< itk::Index<3> >::iterator pathIterator = shortestPath.begin();
+
+  //while(pathIterator != shortestPath.end())
+  //{
+  //  mitk::Point3D currentPoint;
+  //  currentPoint[0] = (*pathIterator)[0];
+  //  currentPoint[1] = (*pathIterator)[1];
+
+  //  input->GetGeometry(0)->IndexToWorld(currentPoint, currentPoint);
+  //  outputContour->AddVertex(currentPoint);
+  //  
+  //  pathIterator++;
+  //}
   /*---------------------------------------------*/
 
 }

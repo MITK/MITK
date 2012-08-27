@@ -20,7 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkContourModel.h"
-#include "mitkImageToContourModelFilter.h"
+#include "mitkContourModelSource.h"
+
+#include <mitkImage.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+
 
 
 
@@ -33,13 +38,17 @@ namespace mitk {
   * \ingroup ContourModelFilters
   * \ingroup Process
   */
-  class Segmentation_EXPORT ImageToLiveWireContourFilter : public ImageToContourModelFilter
+  class Segmentation_EXPORT ImageToLiveWireContourFilter : public ContourModelSource
   {
 
   public:
 
-    mitkClassMacro(ImageToLiveWireContourFilter, ImageToContourModelFilter);
+    mitkClassMacro(ImageToLiveWireContourFilter, ContourModelSource);
     itkNewMacro(Self);
+
+    typedef ContourModel OutputType;
+    typedef OutputType::Pointer OutputTypePointer;
+    typedef mitk::Image InputType;
 
     itkSetMacro(StartPoint, mitk::Point3D);
     itkGetMacro(StartPoint, mitk::Point3D);
@@ -48,6 +57,14 @@ namespace mitk {
     itkGetMacro(EndPoint, mitk::Point3D);
 
 
+    virtual void SetInput( const InputType *input);
+
+    virtual void SetInput( unsigned int idx, const InputType * input);
+
+    const InputType* GetInput(void);
+
+    const InputType* GetInput(unsigned int idx);
+
   protected:
     ImageToLiveWireContourFilter();
 
@@ -55,14 +72,19 @@ namespace mitk {
 
     void GenerateData();
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
+    void GenerateOutputInformation() {};
 
     mitk::Point3D m_StartPoint;
     mitk::Point3D m_EndPoint;
 
     mitk::Point3D m_StartPointInIndex;
     mitk::Point3D m_EndPointInIndex;
+
+  private:
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
+
 
   };
 

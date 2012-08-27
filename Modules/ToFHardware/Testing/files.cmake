@@ -1,7 +1,7 @@
 set(MODULE_TESTS
   mitkThreadedToFRawDataReconstructionTest.cpp
   mitkToFCameraMITKPlayerControllerTest.cpp
-  #mitkToFCameraMITKPlayerDeviceTest.cpp
+  mitkToFCameraMITKPlayerDeviceTest.cpp
   mitkToFCameraPMDCamBoardControllerTest.cpp
   mitkToFCameraPMDCamBoardDeviceTest.cpp
   #mitkToFCameraPMDRawDataCamBoardDeviceTest.cpp

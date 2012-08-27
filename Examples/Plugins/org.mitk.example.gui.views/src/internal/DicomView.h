@@ -15,13 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MINIMALVIEW_H_
-#define MINIMALVIEW_H_
+#ifndef DICOMVIEW_H_
+#define DICOMVIEW_H_
 
 #include <QmitkAbstractView.h>
 #include <berryQtViewPart.h>
 
-//#include "ui_QmitkMinimalViewControls.h"
+//#include "ui_QmitkDicomViewControls.h"
 #include "ui_QmitkTestView1.h"
 
 #include <berryISelectionListener.h>
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include <berryIStructuredSelection.h>
 
-class MinimalView : public QmitkAbstractView
+class DicomView : public QmitkAbstractView
 {
 
   Q_OBJECT
@@ -38,9 +38,9 @@ public:
 
   static const std::string VIEW_ID;
 
-  MinimalView();
+  DicomView();
 
-  virtual ~MinimalView();
+  virtual ~DicomView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -49,7 +49,7 @@ public:
     //                 berry::ISelection::ConstPointer selection);
 
     //berry::ISelectionListener::Pointer m_SelectionListener;
-    //friend struct berry::SelectionChangedAdapter<MinimalView>;
+    //friend struct berry::SelectionChangedAdapter<DicomView>;
 
   //private slots:
   //   void ToggleRadioMethod(); //Debugging only!
@@ -67,4 +67,4 @@ protected:
 
 };
 
-#endif /*MINIMALVIEW_H_*/
+#endif /*DICOMVIEW_H_*/

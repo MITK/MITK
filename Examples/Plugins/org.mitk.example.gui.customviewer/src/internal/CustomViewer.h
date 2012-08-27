@@ -14,26 +14,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef CUSTOMVIEWER_H_
+#define CUSTOMVIEWER_H_
 
-#ifndef TESTPERSPECTIVE2_H_
-#define TESTPERSPECTIVE2_H_
-
-#include <berryIPerspectiveFactory.h>
+#include <berryIApplication.h>
 
 #include <QObject>
+#include <QScopedPointer>
 
+class CustomViewerWorkbenchAdvisor;
 
-class TestPerspective2 : public QObject, public berry::IPerspectiveFactory
+class CustomViewer : public QObject, public berry::IApplication
 {
   Q_OBJECT
-  Q_INTERFACES(berry::IPerspectiveFactory)
-
+  Q_INTERFACES(berry::IApplication)
+  
 public:
+  
+  CustomViewer();
+  ~CustomViewer();
+  
+  int Start();
+  void Stop();
 
-  TestPerspective2();
+private:
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
-
+  QScopedPointer<CustomViewerWorkbenchAdvisor> wbAdvisor;
 };
 
-#endif /* TESTPERSPECTIVE2_H_ */
+#endif /*CUSTOMVIEWER_H_*/

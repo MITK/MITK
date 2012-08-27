@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "TestApplicationWorkbenchWindowAdvisor.h"
+#include "CustomViewerWorkbenchWindowAdvisor.h"
 //#include "QmitkActionBarAdvisor.h"
 #include "QtPerspectiveSwitcherTabBar.h"
-#include "org_mitk_example_gui_testapplication_Activator.h"
+#include "org_mitk_example_gui_customviewer_Activator.h"
 
 #include <QMenu>
 #include <QMenuBar>
@@ -54,19 +54,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <QmitkDefaultDropTargetListener.h>
 //
 
-//TestApplicationWorkbenchWindowAdvisor::TestApplicationWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
+//CustomViewerWorkbenchWindowAdvisor::CustomViewerWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
 //: berry::WorkbenchWindowAdvisor(configurer)
 //, dropTargetListener(new QmitkDefaultDropTargetListener)
 //{
 //}
 
-TestApplicationWorkbenchWindowAdvisor::TestApplicationWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
+CustomViewerWorkbenchWindowAdvisor::CustomViewerWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
 : berry::WorkbenchWindowAdvisor(configurer), FileOpenAction(0)
 {
 }
 
 berry::ActionBarAdvisor::Pointer
-TestApplicationWorkbenchWindowAdvisor::CreateActionBarAdvisor(
+CustomViewerWorkbenchWindowAdvisor::CreateActionBarAdvisor(
   berry::IActionBarConfigurer::Pointer configurer)
 {
   berry::ActionBarAdvisor::Pointer actionBarAdvisor(new berry::ActionBarAdvisor(configurer));
@@ -74,7 +74,7 @@ TestApplicationWorkbenchWindowAdvisor::CreateActionBarAdvisor(
   delete FileOpenAction;
 }
 
-void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
+void CustomViewerWorkbenchWindowAdvisor::PostWindowCreate()
 {/*
   // very bad hack...
   berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
@@ -124,7 +124,7 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QLabel* title = new QLabel("Status Bar");
 
   title->setAlignment( Qt::AlignLeft );
-  title->setText("Test Application Status Bar");
+  title->setText("Custom Viewer Status Bar");
   title->setToolTip("This is the Status Bar");
     
   qStatusBar->addWidget(title);
@@ -153,22 +153,22 @@ void TestApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   qStatusBar->addPermanentWidget(memoryIndicator, 0);*/
 }
 
-void TestApplicationWorkbenchWindowAdvisor::PreWindowOpen()
+void CustomViewerWorkbenchWindowAdvisor::PreWindowOpen()
 {
   berry::IWorkbenchWindowConfigurer::Pointer configurer = this->GetWindowConfigurer();
   configurer->SetShowCoolBar(false);
   configurer->SetShowMenuBar(false);
   configurer->SetShowPerspectiveBar(true);
   configurer->SetShowStatusLine(false);
-  configurer->SetTitle("TestApplication");
+  configurer->SetTitle("CustomViewer");
 
-  this->GetWindowConfigurer()->SetTitle("Spartan DICOM Viewer");
+  this->GetWindowConfigurer()->SetTitle("Spartan Viewer");
 
   //this->GetWindowConfigurer()->AddEditorAreaTransfer(QStringList("text/uri-list"));
   //this->GetWindowConfigurer()->ConfigureEditorAreaDropListener(dropTargetListener);
 }
 
-void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::Pointer shell)
+void CustomViewerWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::Pointer shell)
 {
   /*berry::QtShell* qtShell = dynamic_cast<berry::QtShell*>(&(*shell));
   this->GetWindowConfigurer()->CreatePageComposite(static_cast<void*>(qtShell->GetWidget()));*/
@@ -260,9 +260,9 @@ void TestApplicationWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::P
   //this->GetWindowConfigurer()->CreatePageComposite(static_cast<void*>(shell*));
 }
 
-void TestApplicationWorkbenchWindowAdvisor::UpdateStyle()
+void CustomViewerWorkbenchWindowAdvisor::UpdateStyle()
 {
-  ctkPluginContext* pluginContext = org_mitk_example_gui_testapplication_Activator::GetPluginContext();
+  ctkPluginContext* pluginContext = org_mitk_example_gui_customviewer_Activator::GetPluginContext();
   ctkServiceReference serviceReference = pluginContext->getServiceReference<berry::IQtStyleManager>();
 
   //always granted by org.blueberry.ui.qt
@@ -271,5 +271,5 @@ void TestApplicationWorkbenchWindowAdvisor::UpdateStyle()
   berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
   Q_ASSERT(styleManager);
   
-  styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.testapplication/resources/teststyle.qss");
+  styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss");
 }

@@ -2,20 +2,20 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_example_gui_testapplication_Activator.cpp
-  TestApplication.cpp
-  TestPerspective.cpp
-  TestPerspective2.cpp
-  TestApplicationWorkbenchWindowAdvisor.cpp
+  org_mitk_example_gui_customviewer_Activator.cpp
+  CustomViewer.cpp
+  ViewerPerspective.cpp
+  DicomPerspective.cpp
+  CustomViewerWorkbenchWindowAdvisor.cpp
   QtPerspectiveSwitcherTabBar.cpp
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_example_gui_testapplication_Activator.h
-  src/internal/TestApplication.h
-  src/internal/TestPerspective.h
-  src/internal/TestPerspective2.h
-  src/internal/TestApplicationWorkbenchWindowAdvisor.h
+  src/internal/org_mitk_example_gui_customviewer_Activator.h
+  src/internal/CustomViewer.h
+  src/internal/ViewerPerspective.h
+  src/internal/DicomPerspective.h
+  src/internal/CustomViewerWorkbenchWindowAdvisor.h
   src/internal/QtPerspectiveSwitcherTabBar.h
 )
 
@@ -23,7 +23,7 @@ set(UI_FILES
 )
 
 set(QRC_FILES
-  resources/org_mitk_example_gui_testapplication.qrc
+  resources/org_mitk_example_gui_customviewer.qrc
 )
 
 set(CACHED_RESOURCE_FILES

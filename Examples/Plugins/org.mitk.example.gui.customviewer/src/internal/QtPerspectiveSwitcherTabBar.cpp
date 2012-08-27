@@ -40,7 +40,7 @@ struct QtPerspectiveSwitcherTabBarListener : public berry::IPerspectiveListener
   void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
     berry::IPerspectiveDescriptor::Pointer perspective)
   {
-    if (perspective->GetId() == "org.mitk.example.testperspective2" && switcher->currentIndex() != 1) switcher->setCurrentIndex(1);
+    if (perspective->GetId() == "org.mitk.example.dicomperspective" && switcher->currentIndex() != 1) switcher->setCurrentIndex(1);
   }
 
 private:
@@ -81,12 +81,12 @@ void QtPerspectiveSwitcherTabBar::SwitchPerspective()
   int index = this->currentIndex();
   if (index == 0)
   {
-    std::string perspectiveId = "org.mitk.example.testperspective";
+    std::string perspectiveId = "org.mitk.example.viewerperspective";
     this->window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
   }
   else if (index == 1)
   {
-    std::string perspectiveId = "org.mitk.example.testperspective2";
+    std::string perspectiveId = "org.mitk.example.dicomperspective";
     this->window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
   }
 }

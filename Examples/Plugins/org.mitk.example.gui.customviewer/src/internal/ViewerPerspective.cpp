@@ -14,17 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "TestPerspective2.h"
-//#include "MinimalView.h"
+#include "ViewerPerspective.h"
+//#include "DicomView.h"
 //#include "SimpleRenderWindowView.h"
 //#include "TestView.h"
 #include "berryIFolderLayout.h"
 
-TestPerspective2::TestPerspective2()
+ViewerPerspective::ViewerPerspective()
 {
 }
 
-void TestPerspective2::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void ViewerPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   //layout->SetFixed(true);
   std::string editorArea = layout->GetEditorArea();

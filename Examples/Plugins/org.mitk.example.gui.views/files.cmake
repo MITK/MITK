@@ -3,20 +3,20 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   TestView.cpp
-  MinimalView.cpp
+  DicomView.cpp
   SimpleRenderWindowView.cpp
   org_mitk_example_gui_views_Activator.cpp
 )
 
 set(MOC_H_FILES
   src/internal/TestView.h
-  src/internal/MinimalView.h
+  src/internal/DicomView.h
   src/internal/SimpleRenderWindowView.h
   src/internal/org_mitk_example_gui_views_Activator.h
 )
 
 set(UI_FILES
-  src/internal/QmitkMinimalViewControls.ui
+  src/internal/QmitkDicomViewControls.ui
   src/internal/QmitkTestView1.ui
   src/internal/QmitkTestViewControls.ui
 )

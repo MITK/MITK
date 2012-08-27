@@ -14,24 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "TestPerspective.h"
-//#include "MinimalView.h"
+#include "DicomPerspective.h"
+//#include "DicomView.h"
 //#include "TestView.h"
 #include "berryIFolderLayout.h"
 
-TestPerspective::TestPerspective()
+DicomPerspective::DicomPerspective()
 {
 }
 
-void TestPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void DicomPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   //layout->SetFixed(true);
   std::string editorArea = layout->GetEditorArea();
   layout->SetEditorAreaVisible(false);
-  layout->AddStandaloneView("org.mitk.views.minimalview", false, 1, 1.0f, layout->GetEditorArea());
-  //layout->AddView("org.mitk.views.minimalview", 1, 1.0f, editorArea);
-  layout->GetViewLayout("org.mitk.views.minimalview")->SetCloseable(false);
-  layout->GetViewLayout("org.mitk.views.minimalview")->SetMoveable(false);
+  layout->AddStandaloneView("org.mitk.views.dicomview", false, 1, 1.0f, layout->GetEditorArea());
+  //layout->AddView("org.mitk.views.dicomview", 1, 1.0f, editorArea);
+  layout->GetViewLayout("org.mitk.views.dicomview")->SetCloseable(false);
+  layout->GetViewLayout("org.mitk.views.dicomview")->SetMoveable(false);
 
   ////layout->AddStandaloneView(TestView::VIEW_ID,true,2,0.33f, layout->GetEditorArea());
   //layout->AddView(TestView::VIEW_ID, 2, 0.33f, editorArea);

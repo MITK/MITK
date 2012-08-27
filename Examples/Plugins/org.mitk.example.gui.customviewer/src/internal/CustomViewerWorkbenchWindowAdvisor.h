@@ -14,20 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef TESTAPPLICATIONWORKBENCHWINDOWADVISOR_H_
-#define TESTAPPLICATIONWORKBENCHWINDOWADVISOR_H_
+#ifndef CUSTOMVIEWERWORKBENCHWINDOWADVISOR_H_
+#define CUSTOMVIEWERWORKBENCHWINDOWADVISOR_H_
 
 #include <berryWorkbenchWindowAdvisor.h>
 #include <QObject.h>
 #include <QmitkFileOpenAction.h>
 
-class TestApplicationWorkbenchWindowAdvisor : public QObject, public berry::WorkbenchWindowAdvisor
+class CustomViewerWorkbenchWindowAdvisor : public QObject, public berry::WorkbenchWindowAdvisor
 {
   Q_OBJECT
 
 public:
 
-    TestApplicationWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer);
+    CustomViewerWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
     berry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
         berry::IActionBarConfigurer::Pointer configurer);
@@ -51,4 +51,4 @@ private:
 //    berry::IDropTargetListener::Pointer dropTargetListener;
 };
 
-#endif /*TESTAPPLICATIONWORKBENCHWINDOWADVISOR_H_*/
+#endif /*CUSTOMVIEWERWORKBENCHWINDOWADVISOR_H_*/

@@ -14,15 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "TestApplication.h"
+#include "CustomViewer.h"
 
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
-#include "TestApplicationWorkbenchWindowAdvisor.h"
+#include "CustomViewerWorkbenchWindowAdvisor.h"
 #include "berryIQtStyleManager.h"
-#include "org_mitk_example_gui_testapplication_Activator.h"
+#include "org_mitk_example_gui_customviewer_Activator.h"
 
-class TestWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
+class CustomViewerWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {
 
 public:
@@ -33,16 +33,16 @@ public:
       berry::IWorkbenchWindowConfigurer::Pointer configurer)
   {
     //wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
-    wwAdvisor.reset(new TestApplicationWorkbenchWindowAdvisor(configurer));
+    wwAdvisor.reset(new CustomViewerWorkbenchWindowAdvisor(configurer));
     return wwAdvisor.data();
   }
 
   void Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
   {
     berry::QtWorkbenchAdvisor::Initialize(configurer);
-    QString styleName = "TestStyle";
+    QString styleName = "CustomStyle";
 
-    ctkPluginContext* pluginContext = org_mitk_example_gui_testapplication_Activator::GetPluginContext();
+    ctkPluginContext* pluginContext = org_mitk_example_gui_customviewer_Activator::GetPluginContext();
     ctkServiceReference serviceReference = pluginContext->getServiceReference<berry::IQtStyleManager>();
 
     //always granted by org.blueberry.ui.qt
@@ -51,8 +51,8 @@ public:
     berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
     Q_ASSERT(styleManager);
     
-    styleManager->AddStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.testapplication/resources/teststyle.qss", styleName);
-    styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.testapplication/resources/teststyle.qss");
+    styleManager->AddStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss", styleName);
+    styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss");
 
 
   }
@@ -68,21 +68,21 @@ private:
 
 };
 
-const std::string TestWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.testperspective";
+const std::string CustomViewerWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.viewerperspective";
 
-TestApplication::TestApplication()
+CustomViewer::CustomViewer()
 {
 }
 
-TestApplication::~TestApplication()
+CustomViewer::~CustomViewer()
 {
 }
  
-int TestApplication::Start()
+int CustomViewer::Start()
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
 
-  wbAdvisor.reset(new TestWorkbenchAdvisor);
+  wbAdvisor.reset(new CustomViewerWorkbenchAdvisor);
   int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
   
   // exit the application with an appropriate return code
@@ -90,7 +90,7 @@ int TestApplication::Start()
               ? EXIT_RESTART : EXIT_OK;
 }
 
-void TestApplication::Stop()
+void CustomViewer::Stop()
 {
   
 }

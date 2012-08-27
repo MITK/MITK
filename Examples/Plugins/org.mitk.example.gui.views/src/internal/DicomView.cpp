@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MinimalView.h"
+#include "DicomView.h"
 
 #include <QMessageBox>
 
@@ -27,26 +27,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include <berryIWorkbenchPage.h>
 
-const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview"; 
+const std::string DicomView::VIEW_ID = "org.mitk.views.dicomview"; 
 
-//MinimalView::MinimalView()
+//DicomView::DicomView()
 //  : m_Parent(0)
-//  , m_SelectionListener(new berry::SelectionChangedAdapter<MinimalView>(this, &MinimalView::SelectionChanged))
+//  , m_SelectionListener(new berry::SelectionChangedAdapter<DicomView>(this, &DicomView::SelectionChanged))
 //{
 //}
 
-MinimalView::MinimalView()
+DicomView::DicomView()
   : m_Parent(0)
 {
 }
 
-MinimalView::~MinimalView()
+DicomView::~DicomView()
 {
   //berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   //s->RemoveSelectionListener(m_SelectionListener);
 }
 
-void MinimalView::CreateQtPartControl(QWidget *parent)
+void DicomView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets
   m_Parent = parent;
@@ -75,7 +75,7 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   m_Parent->setEnabled(true);
 }
 
-void MinimalView::AddDataNodeFromDICOM(const QStringList& Properties)
+void DicomView::AddDataNodeFromDICOM(const QStringList& Properties)
 {
   QString seriesUID = Properties.at(3);
   QString path = Properties.at(5);
@@ -114,24 +114,24 @@ void MinimalView::AddDataNodeFromDICOM(const QStringList& Properties)
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
       berry::IWorkbenchWindow::Pointer window = this->GetSite()->GetWorkbenchWindow();
-      std::string perspectiveId = "org.mitk.example.testperspective2";
+      std::string perspectiveId = "org.mitk.example.viewerperspective";
       window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
   }
 }
 
 
-//void MinimalView::ToggleRadioMethod()
+//void DicomView::ToggleRadioMethod()
 //{
 //  bool buttonState = m_Controls.radioButton->isChecked();
 //  if (buttonState) m_Controls.radioButton_2->toggle();
 //  else m_Controls.radioButton->toggle();
 //}
 
-void MinimalView::SetFocus ()
+void DicomView::SetFocus ()
 {
 }
 
-//void MinimalView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
+//void DicomView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
 //                               berry::ISelection::ConstPointer selection)
 //{
 //  if (sourcepart != this && 

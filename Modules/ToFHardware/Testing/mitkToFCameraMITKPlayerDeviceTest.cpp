@@ -81,6 +81,7 @@ int mitkToFCameraMITKPlayerDeviceTest(int /* argc */, char* /*argv*/[])
   float* distances = new float[numberOfPixels];
   float* amplitudes = new float[numberOfPixels];
   float* intensities = new float[numberOfPixels];
+  unsigned char* rgbDataArray = new unsigned char[numberOfPixels*3];
   char* sourceDataArray = new char[numberOfPixels];
   float* expectedDistances = NULL;
   float* expectedAmplitudes = NULL;
@@ -110,10 +111,13 @@ int mitkToFCameraMITKPlayerDeviceTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(amplitudes,amplitudeImage,numberOfPixels),"Check frame from GetAmplitudes()");
     tofCameraMITKPlayerDevice->GetIntensities(intensities,imageSequence);
     MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(intensities,intensityImage,numberOfPixels),"Check frame from GetIntensities()");
-    tofCameraMITKPlayerDevice->GetAllImages(distances,amplitudes,intensities,sourceDataArray,requiredImageSequence,imageSequence);
+    MITK_TEST_OUTPUT(<< "GetAllImages() with rgbDataArray");
+    tofCameraMITKPlayerDevice->GetAllImages(distances,amplitudes,intensities,sourceDataArray,requiredImageSequence,imageSequence,rgbDataArray);
     MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(distances,distanceImage,numberOfPixels),"Check distance frame from GetAllImages()");
     MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(amplitudes,amplitudeImage,numberOfPixels),"Check amplitude frame from GetAllImages()");
     MITK_TEST_CONDITION_REQUIRED(CheckValidFrame(intensities,intensityImage,numberOfPixels),"Check intensity frame from GetAllImages()");    //expectedDistances = (float*)distanceImage->GetSliceData(i,0,0)->GetData();
+    MITK_TEST_OUTPUT(<< "GetAllImages() without rgbDataArray");
+    tofCameraMITKPlayerDevice->GetAllImages(distances,amplitudes,intensities,sourceDataArray,requiredImageSequence,imageSequence);
   }
   itksys::SystemTools::Delay(1000);
   tofCameraMITKPlayerDevice->StopCamera();
@@ -122,6 +126,7 @@ int mitkToFCameraMITKPlayerDeviceTest(int /* argc */, char* /*argv*/[])
   delete [] distances;
   delete [] intensities;
   delete [] amplitudes;
+  delete [] rgbDataArray;
   delete [] sourceDataArray;
   MITK_TEST_END();
 

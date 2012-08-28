@@ -22,7 +22,7 @@ set(MODULE_TESTS
   mitkToFImageRecorderTest.cpp
   mitkToFImageRecorderFilterTest.cpp
   mitkToFImageWriterTest.cpp
-  #mitkToFNrrdImageWriterTest.cpp
+  mitkToFNrrdImageWriterTest.cpp
   mitkToFOpenCVImageGrabberTest.cpp
   #mitkKinectControllerTest.cpp
   #mitkKinectDeviceTest.cpp

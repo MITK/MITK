@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "CommandLineModulesView.h"
+#include "CommandLineModulesViewConstants.h"
 #include "CommandLineModulesViewControls.h"
 #include "CommandLineModulesPreferencesPage.h"
 #include "QmitkCmdLineModuleFactoryGui.h"
@@ -49,8 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkIOUtil.h>
-
-const std::string CommandLineModulesView::VIEW_ID = "org.mitk.gui.qt.cli";
 
 //-----------------------------------------------------------------------------
 CommandLineModulesView::CommandLineModulesView()
@@ -164,7 +163,7 @@ berry::IBerryPreferences::Pointer CommandLineModulesView::RetrievePreferences()
 
   assert( prefService );
 
-  std::string id = "/" + CommandLineModulesView::VIEW_ID;
+  std::string id = "/" + CommandLineModulesViewConstants::VIEW_ID;
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node(id))
         .Cast<berry::IBerryPreferences>();
@@ -182,7 +181,7 @@ void CommandLineModulesView::RetrieveAndStoreTemporaryDirectoryPreferenceValues(
 
   QString fallbackTmpDir = QDir::tempPath();
   m_TemporaryDirectoryName = QString::fromStdString(
-      prefs->Get(CommandLineModulesPreferencesPage::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString()));
+      prefs->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString()));
 }
 
 
@@ -192,13 +191,13 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
 
   // Get the flag for debug output, useful when parsing all the XML.
-  m_DebugOutput = prefs->GetBool(CommandLineModulesPreferencesPage::DEBUG_OUTPUT_NODE_NAME, false);
+  m_DebugOutput = prefs->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false);
   m_DirectoryWatcher->setDebug(m_DebugOutput);
 
-  bool loadApplicationDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_APPLICATION_DIR, false);
-  bool loadHomeDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_HOME_DIR, false);
-  bool loadCurrentDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_CURRENT_DIR, false);
-  bool loadAutoLoadDir = prefs->GetBool(CommandLineModulesPreferencesPage::LOAD_FROM_AUTO_LOAD_DIR, false);
+  bool loadApplicationDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, false);
+  bool loadHomeDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR, false);
+  bool loadCurrentDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR, false);
+  bool loadAutoLoadDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, false);
 
   // Get some default application paths.
   // Here we can use the preferences to set up the builder, before asking him for the paths to scan.
@@ -211,7 +210,7 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   QStringList defaultPaths = builder.build();
 
   // We get additional paths from preferences.
-  QString pathString = QString::fromStdString(prefs->Get(CommandLineModulesPreferencesPage::MODULE_DIRECTORIES_NODE_NAME, ""));
+  QString pathString = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));
   QStringList additionalPaths = pathString.split(";", QString::SkipEmptyParts);
 
   // Combine the sets of paths.

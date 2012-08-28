@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QWidget;
 class QCheckBox;
+class QmitkDirectoryListWidget;
 class ctkDirectoryButton;
-class ctkDirectoryListWidget;
 
 /**
  * \class CommandLineModulesPreferencesPage
@@ -39,48 +39,6 @@ class CommandLineModulesPreferencesPage : public QObject, public berry::IQtPrefe
 public:
   CommandLineModulesPreferencesPage();
   ~CommandLineModulesPreferencesPage();
-
-  /**
-   * \brief We store the node name that stores the temporary directory
-   * path as a static variable to avoid code duplication elsewhere.
-   */
-  static const std::string TEMPORARY_DIRECTORY_NODE_NAME;
-
-  /**
-   * \brief We store the node name that stores the list of modules
-   * paths as a static variable to avoid code duplication elsewhere.
-   */
-  static const std::string MODULE_DIRECTORIES_NODE_NAME;
-
-  /**
-   * \brief We store the node name that stores the boolean of whether we want
-   * debug output when loading modules as a static variable to avoid code duplication elsewhere.
-   */
-  static const std::string DEBUG_OUTPUT_NODE_NAME;
-
-  /**
-   * \brief We store the name of the node that stores the preference of whether
-   * we load modules from the application installation dir.
-   */
-  static const std::string LOAD_FROM_APPLICATION_DIR;
-
-  /**
-   * \brief We store the name of the node that stores the preference of whether
-   * we load modules from the users home dir.
-   */
-  static const std::string LOAD_FROM_HOME_DIR;
-
-  /**
-   * \brief We store the name of the node that stores the preference of whether
-   * we load modules from the application current working dir.
-   */
-  static const std::string LOAD_FROM_CURRENT_DIR;
-
-  /**
-   * \brief We store the name of the node that stores the preference of whether
-   * we load modules from the path determined by CTK_MODULE_LOAD_PATH.
-   */
-  static const std::string LOAD_FROM_AUTO_LOAD_DIR;
 
   /**
    * \brief Called by framework to initialise this preference page, but currently does nothing.
@@ -118,14 +76,15 @@ public:
 public slots:
 
 protected:
-  QWidget                *m_MainControl;
-  QCheckBox              *m_DebugOutput;
-  ctkDirectoryButton     *m_TemporaryDirectory;
-  ctkDirectoryListWidget *m_ModulesDirectories;
-  QCheckBox              *m_LoadFromHomeDir;
-  QCheckBox              *m_LoadFromCurrentDir;
-  QCheckBox              *m_LoadFromApplicationDir;
-  QCheckBox              *m_LoadFromAutoLoadPathDir;
+
+  QWidget                  *m_MainControl;
+  QCheckBox                *m_DebugOutput;
+  ctkDirectoryButton       *m_TemporaryDirectory;
+  QmitkDirectoryListWidget *m_ModulesDirectories;
+  QCheckBox                *m_LoadFromHomeDir;
+  QCheckBox                *m_LoadFromCurrentDir;
+  QCheckBox                *m_LoadFromApplicationDir;
+  QCheckBox                *m_LoadFromAutoLoadPathDir;
 
   berry::IPreferences::Pointer m_CLIPreferencesNode;
 };

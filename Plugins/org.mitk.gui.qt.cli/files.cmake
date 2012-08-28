@@ -7,13 +7,16 @@ set(INTERNAL_CPP_FILES
   QmitkCmdLineModuleGui.cpp
   QmitkCmdLineModuleFactoryGui.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
+  QmitkDirectoryListWidget.cpp
   org_mitk_gui_qt_cli_Activator.cpp
+  CommandLineModulesViewConstants.cpp
   CommandLineModulesViewControls.cpp
   CommandLineModulesPreferencesPage.cpp
   CommandLineModulesView.cpp
 )
 
 set(UI_FILES
+  src/internal/QmitkDirectoryListWidget.ui
   src/internal/CommandLineModulesViewControls.ui
 )
 
@@ -21,6 +24,7 @@ set(MOC_H_FILES
   src/internal/QmitkUiLoader.h
   src/internal/QmitkCmdLineModuleGui.h
   src/internal/QmitkDataStorageComboBoxWithSelectNone.h
+  src/internal/QmitkDirectoryListWidget.h
   src/internal/org_mitk_gui_qt_cli_Activator.h
   src/internal/CommandLineModulesViewControls.h
   src/internal/CommandLineModulesPreferencesPage.h

@@ -61,8 +61,6 @@ class CommandLineModulesView : public QmitkAbstractView
   
 public:
 
-  static const std::string VIEW_ID;
-
   CommandLineModulesView();
   virtual ~CommandLineModulesView();
 

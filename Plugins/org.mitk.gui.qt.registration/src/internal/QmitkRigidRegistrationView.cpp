@@ -463,6 +463,7 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImag
     // Set slider to a default value
     int avg = (min+max) / 2;
     m_Controls.m_ContourSlider->setSliderPosition(avg);
+    m_Controls.m_ThresholdLabel->setText(QString::number(avg));
 
   }
   else
@@ -688,6 +689,9 @@ void QmitkRigidRegistrationView::ShowContour(int threshold)
   if(m_FixedNode.IsNull() || !show)
     return;
 
+
+  // Update the label next to the slider
+  m_Controls.m_ThresholdLabel->setText(QString::number(threshold));
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
 

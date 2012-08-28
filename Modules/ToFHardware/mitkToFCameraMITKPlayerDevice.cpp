@@ -303,11 +303,17 @@ namespace mitk
         distanceArray[i] = this->m_DistanceDataBuffer[pos][i];
         amplitudeArray[i] = this->m_AmplitudeDataBuffer[pos][i];
         intensityArray[i] = this->m_IntensityDataBuffer[pos][i];
-        rgbDataArray[i] = this->m_RGBDataBuffer[pos][i];
+        if (rgbDataArray)
+        {
+          rgbDataArray[i] = this->m_RGBDataBuffer[pos][i];
+        }
       }
-      for (int j=this->m_PixelNumber; j<this->m_PixelNumber*3; j++)
+      if (rgbDataArray)
       {
-        rgbDataArray[j] = this->m_RGBDataBuffer[pos][j];
+        for (int j=this->m_PixelNumber; j<this->m_PixelNumber*3; j++)
+        {
+          rgbDataArray[j] = this->m_RGBDataBuffer[pos][j];
+        }
       }
     }
     m_ImageMutex->Unlock();

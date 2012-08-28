@@ -35,7 +35,7 @@ namespace mitk
     this->m_AmplitudeImageSelected = true;
     this->m_IntensityImageSelected = true;
     this->m_RGBImageSelected = true;
-    this->m_Abort = true;
+    this->m_Abort = false;
     this->m_CaptureWidth = 0;
     this->m_CaptureHeight = 0;
     this->m_FileFormat = "";
@@ -140,6 +140,11 @@ namespace mitk
     this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->RecordData, this);
   }
 
+  void ToFImageRecorder::WaitForThreadBeingTerminated()
+  {
+    this->m_MultiThreader->TerminateThread(this->m_ThreadID);
+  }
+
   ITK_THREAD_RETURN_TYPE ToFImageRecorder::RecordData(void* pInfoStruct)
   {
     struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
@@ -172,7 +177,7 @@ namespace mitk
       toFImageRecorder->m_AbortMutex->Lock();
       abort = toFImageRecorder->m_Abort;
       toFImageRecorder->m_AbortMutex->Unlock();
-      while ( !abort )
+      while ( abort==false )
       {
         if ( ((toFImageRecorder->m_RecordMode == ToFImageRecorder::PerFrames) && (numOfFramesRecorded < toFImageRecorder->m_NumOfFrames)) ||
               (toFImageRecorder->m_RecordMode == ToFImageRecorder::Infinite) )

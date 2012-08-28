@@ -110,8 +110,8 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   typedef itk::Image< TPixel, VImageDimension >                              InputImageType;
   typedef itk::Image< float,  2 >                                          FloatImageType;
 
-  typedef typename itk::ShortestPathImageFilter< InputImageType, InputImageType >     ShortestPathImageFilterType;
-  typedef typename itk::ShortestPathCostFunctionLiveWire< InputImageType >   CostFunctionType;
+  typedef  itk::ShortestPathImageFilter< typename InputImageType, typename InputImageType >     ShortestPathImageFilterType;
+  typedef  itk::ShortestPathCostFunctionLiveWire< itk::Image< TPixel, VImageDimension > >   CostFunctionType;
 
   typedef InputImageType::IndexType                                        IndexType;
 
@@ -137,7 +137,7 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   size[1] = startPoint[1] > endPoint[1] ? startPoint[1] : endPoint[1];
 
 
-  typename InputImageType::RegionType region;
+  typename CostFunctionType::RegionType region;
   region.SetSize( size );
   region.SetIndex( startRegion );
   /*---------------------------------------------*/
@@ -148,7 +148,7 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   costFunction->SetImage(inputImage);
   costFunction->SetStartIndex(startPoint);
   costFunction->SetEndIndex(endPoint);
-  //costFunction->SetRequestedRegion(region);
+  costFunction->SetRequestedRegion(region);
   /*---------------------------------------------*/
 
 

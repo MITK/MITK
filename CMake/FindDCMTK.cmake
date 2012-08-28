@@ -46,45 +46,64 @@ if(NOT DCMTK_FOUND AND NOT DCMTK_DIR)
   mark_as_advanced(DCMTK_DIR)
 endif()
 
+# Find all libraries, store debug and release separately
 foreach(lib
-    dcmdata
+    dcmpstat
+    dcmsr
+    dcmsign
+    dcmtls
+    dcmqrdb
+    dcmnet
+    dcmjpeg
     dcmimage
     dcmimgle
-    dcmjpeg
-    dcmnet
-    dcmpstat
-    dcmqrdb
-    dcmsign
-    dcmsr
-    dcmtls
+    dcmdata
+    oflog
+    ofstd
     ijg12
     ijg16
     ijg8
-    oflog
-    ofstd)
+    )
 
-  find_library(DCMTK_${lib}_LIBRARY
+  # Find Release libraries
+  find_library(DCMTK_${lib}_LIBRARY_RELEASE
     ${lib}
     PATHS
     ${DCMTK_DIR}/${lib}/libsrc
     ${DCMTK_DIR}/${lib}/libsrc/Release
-    ${DCMTK_DIR}/${lib}/libsrc/Debug
     ${DCMTK_DIR}/${lib}/Release
-    ${DCMTK_DIR}/${lib}/Debug
     ${DCMTK_DIR}/lib
+    ${DCMTK_DIR}/lib/Release
+    ${DCMTK_DIR}/dcmjpeg/lib${lib}/Release
     NO_DEFAULT_PATH
     )
 
-  mark_as_advanced(DCMTK_${lib}_LIBRARY)
-
-  #message("** DCMTKs ${lib} found at ${DCMTK_${lib}_LIBRARY}")
-
-  if(DCMTK_${lib}_LIBRARY)
-    list(APPEND DCMTK_LIBRARIES ${DCMTK_${lib}_LIBRARY})
+  # Find Debug libraries
+  find_library(DCMTK_${lib}_LIBRARY_DEBUG
+    ${lib}
+    PATHS
+    ${DCMTK_DIR}/${lib}/libsrc
+    ${DCMTK_DIR}/${lib}/libsrc/Debug
+    ${DCMTK_DIR}/${lib}/Debug
+    ${DCMTK_DIR}/lib
+    ${DCMTK_DIR}/lib/Debug
+    ${DCMTK_DIR}/dcmjpeg/lib${lib}/Debug
+    NO_DEFAULT_PATH
+    )
+    
+  mark_as_advanced(DCMTK_${lib}_LIBRARY_RELEASE)
+  mark_as_advanced(DCMTK_${lib}_LIBRARY_DEBUG)
+  
+  # Add libraries to variable according to build type
+  if(DCMTK_${lib}_LIBRARY_RELEASE)
+    list(APPEND DCMTK_LIBRARIES optimized ${DCMTK_${lib}_LIBRARY_RELEASE})
+  endif()
+  
+  if(DCMTK_${lib}_LIBRARY_DEBUG)
+    list(APPEND DCMTK_LIBRARIES debug ${DCMTK_${lib}_LIBRARY_DEBUG})
   endif()
 
 endforeach()
-
 
 set(DCMTK_config_TEST_HEADER osconfig.h)
 set(DCMTK_dcmdata_TEST_HEADER dctypes.h)
@@ -147,11 +166,15 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(DCMTK DEFAULT_MSG
   DCMTK_config_INCLUDE_DIR
   DCMTK_ofstd_INCLUDE_DIR
-  DCMTK_ofstd_LIBRARY
+  DCMTK_ofstd_LIBRARY_RELEASE
+  DCMTK_ofstd_LIBRARY_DEBUG
   DCMTK_dcmdata_INCLUDE_DIR
-  DCMTK_dcmdata_LIBRARY
+  DCMTK_dcmdata_LIBRARY_RELEASE
+  DCMTK_dcmdata_LIBRARY_DEBUG
   DCMTK_dcmimgle_INCLUDE_DIR
-  DCMTK_dcmimgle_LIBRARY)
+  DCMTK_dcmimgle_LIBRARY_RELEASE
+  DCMTK_dcmimgle_LIBRARY_DEBUG
+  )
 
 # Compatibility: This variable is deprecated
 set(DCMTK_INCLUDE_DIR ${DCMTK_INCLUDE_DIRS})

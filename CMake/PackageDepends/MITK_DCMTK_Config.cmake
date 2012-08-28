@@ -28,9 +28,12 @@ file(READ ${DCMTK_config_INCLUDE_DIR}/osconfig.h _osconfig_h)
   set(MITK_USE_DCMTK_NEWER_THAN_3_5_4 TRUE)
   # assume the new oflog library is located next to the others
   # this can be removed if FindDCMTK is adapted for 3.5.5 
-  get_filename_component(_DCMTK_lib_dir ${DCMTK_ofstd_LIBRARY} PATH)
-  find_library(DCMTK_oflog_LIBRARY oflog ${_DCMTK_lib_dir} )
-  list(APPEND DCMTK_LIBRARIES ${DCMTK_oflog_LIBRARY})
+  # treat Debug and Release separately
+  get_filename_component(_DCMTK_lib_dir_release ${DCMTK_ofstd_LIBRARY_RELEASE} PATH)
+  get_filename_component(_DCMTK_lib_dir_debug ${DCMTK_ofstd_LIBRARY_DEBUG} PATH)
+  find_library(DCMTK_oflog_LIBRARY_RELEASE oflog ${_DCMTK_lib_dir_release} )
+  find_library(DCMTK_oflog_LIBRARY_DEBUG oflog ${_DCMTK_lib_dir_debug} )
+  list(APPEND DCMTK_LIBRARIES optimized ${DCMTK_oflog_LIBRARY_RELEASE} debug ${DCMTK_oflog_LIBRARY_DEBUG} )
   endif(NOT _osconfig_h MATCHES "PACKAGE_VERSION_NUMBER \"354\"")
 endif(EXISTS ${DCMTK_config_INCLUDE_DIR}/osconfig.h)
 

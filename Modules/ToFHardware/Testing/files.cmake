@@ -4,10 +4,10 @@ set(MODULE_TESTS
   mitkToFCameraMITKPlayerDeviceTest.cpp
   mitkToFCameraPMDCamBoardControllerTest.cpp
   mitkToFCameraPMDCamBoardDeviceTest.cpp
-  mitkToFCameraPMDRawDataCamBoardDeviceTest.cpp
+#  mitkToFCameraPMDRawDataCamBoardDeviceTest.cpp
   mitkToFCameraPMDCamCubeControllerTest.cpp
   mitkToFCameraPMDCamCubeDeviceTest.cpp
-  #mitkToFCameraPMDRawDataCamCubeDeviceTest.cpp
+# mitkToFCameraPMDRawDataCamCubeDeviceTest.cpp
   mitkToFCameraPMDControllerTest.cpp
   mitkToFCameraPMDDeviceTest.cpp
   mitkToFCameraPMDRawDataDeviceTest.cpp
@@ -19,7 +19,7 @@ set(MODULE_TESTS
   mitkToFCameraPMDPlayerDeviceTest.cpp
   mitkToFImageCsvWriterTest.cpp
   mitkToFImageGrabberTest.cpp
-  #mitkToFImageRecorderTest.cpp
+  mitkToFImageRecorderTest.cpp
   #mitkToFImageRecorderFilterTest.cpp
   mitkToFImageWriterTest.cpp
   #mitkToFNrrdImageWriterTest.cpp

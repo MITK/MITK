@@ -17,7 +17,7 @@ namespace itk
   {
     SetSigma (5.0); // standard value
     m_UseRepulsivePoint = false;
-    m_UseApproximateGradient = false;
+    m_UseApproximateGradient = true;
   }
 
   
@@ -43,6 +43,10 @@ namespace itk
     ::GetCost(IndexType p1 ,IndexType  p2)
   {   
      
+    unsigned long xMAX = this->m_Image->GetLargestPossibleRegion().GetSize()[0];
+    unsigned long yMAX = this->m_Image->GetLargestPossibleRegion().GetSize()[1];
+
+
     /* ++++++++++++++++++++ GradientMagnitude costs ++++++++++++++++++++++++++*/
     
     if( m_UseApproximateGradient)
@@ -51,11 +55,11 @@ namespace itk
 
       // dI(x,y)/dx
       IndexType x1;
-      x1[0] = p1[0] +1;
+      x1[0] = (p1[0] == xMAX) ? (p1[0]) :( p1[0] +1);//check for pixels at the edge of the image => x==xMAX
       x1[1] = p1[1];
 
       IndexType x2;
-      x2[0] = p1[0] -1;
+      x2[0] = (p1[0] == 0) ? (0) :( p1[0] -1);//x==0
       x2[1] = p1[1];
 
       double gradientX = (this->m_Image->GetPixel(x1) - this->m_Image->GetPixel(x2)) / 2;
@@ -64,11 +68,11 @@ namespace itk
       // dI(x,y)/dy
       IndexType y1;
       y1[0] = p1[0];
-      y1[1] = p1[1] +1;
+      y1[1] = (p1[1] == yMAX) ? (p1[1]) :( p1[1] +1);//y==yMAX
 
       IndexType y2;
       y2[0] = p1[0];
-      y2[1] = p1[1] -1;
+      y2[1] = (p1[1] == 0) ? (0) :( p1[1] -1);//y==0
 
       double gradientY = (this->m_Image->GetPixel(y1) - this->m_Image->GetPixel(y2)) / 2;
 
@@ -108,7 +112,53 @@ namespace itk
     // f(p) =     0;   if I(p)=0
     //     or     1;   if I(p)!=0
     double laplacianCost;
-    double laplaceImageValue = this->m_LaplacianImage->GetPixel(p2);
+    Superclass::PixelType laplaceImageValue;
+
+    if(!m_UseApproximateGradient)
+    {
+      laplaceImageValue = this->m_LaplacianImage->GetPixel(p2);
+    }
+    else
+    {
+      //compute pointwise with laplacian kernel
+      // 0  1  0
+      // 1 -4  1
+      // 0  1  0
+
+      Superclass::PixelType up, down, left, right;
+      IndexType currentIndex;
+
+      // up 
+      currentIndex[0] = p1[0];
+      currentIndex[1] = (p1[1] == yMAX) ? (p1[1]) :( p1[1] +1);//y==yMAX ?
+
+      up = this->m_Image->GetPixel(currentIndex);
+
+
+      // down
+      currentIndex[0] = p1[0];
+      currentIndex[1] = (p1[1] == 0) ? (0) :( p1[1] -1);//y==0 ?
+
+      down = this->m_Image->GetPixel(currentIndex);
+
+
+      // left
+      currentIndex[0] = (p1[0] == 0) ? (0) :( p1[0] -1);//x==0 ?
+      currentIndex[1] = p1[1];
+
+      left = this->m_Image->GetPixel(currentIndex);
+
+
+      // right
+      currentIndex[0] = (p1[0] == xMAX) ? (p1[0]) :( p1[0] +1);//x==xMAX ?
+      currentIndex[1] = p1[1];
+
+      right = this->m_Image->GetPixel(currentIndex);
+
+      //convolution
+      laplaceImageValue = -4.0 * this->m_Image->GetPixel(p1) + up + down + right + left;
+    }
+
     if(laplaceImageValue < 0 || laplaceImageValue > 0)
     {
       laplacianCost = 1;
@@ -121,30 +171,9 @@ namespace itk
     /* -----------------------------------------------------------------------------*/
 
 
-    ///////////////////
-    // REPULSIVE COSTS 
-    // check repulsive path energy       
-    double repulsiveCosts = 0;
-    double repulsiveCostsSig = 0;
-    if ( m_UseRepulsivePoint )
-    {
-       // Find the nearest Repulsive Point
-       repulsiveCosts = -1;
-       for (int i=0; i<m_RepulsivePoints.size(); i++)
-       {
-          itk::Vector<float,3> vec;
-          vec[0] = m_RepulsivePoints[i][0] - p2[0];
-          vec[1] = m_RepulsivePoints[i][1] - p2[1];
-          vec[2] = m_RepulsivePoints[i][2] - p2[2];
-
-          if (( vec.GetNorm() > repulsiveCosts) || (repulsiveCosts == -1))
-            repulsiveCosts = vec.GetNorm();
-       }
-
-       // repulsiveCosts is value between 0 (bad) and ImageX*ImageY*ImageZ (~100) (Good)
-       // mean = 50 .. var= 60
-       repulsiveCostsSig = SigmoidFunction(repulsiveCosts,1.0,0.0,-20,20);  
-    }
+    /* ++++++++++++++++++++ Gradient direction costs ++++++++++++++++++++++++++*/
+    //double gradientDirectionCost = M_1_PI * ( 1/ cos(foo) + 1/ cos(bar) );
+    /*------------------------------------------------------------------------*/
 
 
     /*+++++++++++++++++++++  local component costs +++++++++++++++++++++++++++*/
@@ -155,9 +184,7 @@ namespace itk
 
     double costs = w1 * laplacianCost + w2 * iDifference;
 
-    //if (m_UseRepulsivePoint)       
-    //   costs = (iDifferenceSig * 0.5) + (repulsiveCostsSig * 0.52); // das mit den repulsive costs muss mann nochmal überarbeiten
-    //
+
     return costs;
 
   }
@@ -187,16 +214,24 @@ namespace itk
 
       gradientFilter->Update();
       m_GradImage = gradientFilter->GetOutput();
+
+      //typename LaplacianFilterType::Pointer laplacianFilter = LaplacianFilterType::New();
+      //laplacianFilter->SetInput( this->m_Image );
+      ////laplacianFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
+
+      //laplacianFilter->Update();
+
+      //m_LaplacianImage = laplacianFilter->GetOutput();//typename LaplacianFilterType::Pointer laplacianFilter = LaplacianFilterType::New();
+      //laplacianFilter->SetInput( this->m_Image );
+      ////laplacianFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
+
+      //laplacianFilter->Update();
+
+      //m_LaplacianImage = laplacianFilter->GetOutput();
     }//else no filter just approximate the gradient during cost estimation
 
 
-    //typename LaplacianFilterType::Pointer laplacianFilter = LaplacianFilterType::New();
-    //laplacianFilter->SetInput( this->m_Image );
-    ////laplacianFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
 
-    //laplacianFilter->Update();
-
-    //m_LaplacianImage = laplacianFilter->GetOutput();
 
     // check start/end point value 
     startValue= this->m_Image->GetPixel(this->m_StartIndex);

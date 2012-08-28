@@ -4,9 +4,11 @@
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "itkShortestPathCostFunction.h" // Superclass of Metrics
-#include <itkGradientMagnitudeImageFilter.h>
-#include <itkGradientMagnitudeRecursiveGaussianImageFilter.h>
+
 #include <itkImageRegionConstIterator.h>
+
+#include <itkGradientMagnitudeImageFilter.h>
+#include <itkLaplacianImageFilter.h>
 
 
 namespace itk
@@ -23,18 +25,18 @@ namespace itk
     typedef SmartPointer<const Self>                        ConstPointer;    
     typedef itk::ImageRegionConstIterator<TInputImageType>  ConstIteratorType;
 
+
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
     /** Run-time type information (and related methods). */
     itkTypeMacro(ShortestPathCostFunctionLiveWire, ShortestPathCostFunction);
 
-    // more Typdefs for convinience    
+
     typedef typename TInputImageType::IndexType             IndexType;
     typedef TInputImageType                                 ImageType;
     typedef itk::ImageRegion<2>                             RegionType;
 
-    typedef itk::GradientMagnitudeImageFilter<TInputImageType, TInputImageType> GradientMagnitudeFilterType;  
 
     // \brief calculates the costs for going from p1 to p2
     virtual double GetCost(IndexType p1, IndexType p2);
@@ -63,12 +65,18 @@ namespace itk
     itkSetMacro (RequestedRegion, RegionType);
     itkGetMacro (RequestedRegion, RegionType);
 
+    // Set/Get function for sigma parameter
+    itkSetMacro (UseApproximateGradient, bool);
+    itkGetMacro (UseApproximateGradient, bool);
+
   protected:
 
     virtual ~ShortestPathCostFunctionLiveWire() {};
 
     double m_Sigma;
+
     typename ImageType::Pointer m_GradImage;
+    typename ImageType::Pointer m_LaplacianImage;
 
     double iDifference;
     double pSmoothness;
@@ -87,6 +95,8 @@ namespace itk
     typename Superclass::PixelType endValue;
 
     RegionType m_RequestedRegion;
+
+    bool m_UseApproximateGradient;
 
   private:
 

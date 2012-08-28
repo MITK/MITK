@@ -5,6 +5,9 @@
 
 #include <math.h>
 
+#include <itkLaplacianOperator.h>
+
+
 namespace itk
 { 
   // Constructor
@@ -14,6 +17,7 @@ namespace itk
   {
     SetSigma (5.0); // standard value
     m_UseRepulsivePoint = false;
+    m_UseApproximateGradient = false;
   }
 
   
@@ -38,13 +42,83 @@ namespace itk
   double ShortestPathCostFunctionLiveWire<TInputImageType>
     ::GetCost(IndexType p1 ,IndexType  p2)
   {   
-     ///////////////////
-    // INTENSITY COSTS 
-    // the whiter the better
-   val = this->m_Image->GetPixel(p2);
-    iDifference=255-val; 
-    // iDIfference is value between 0 (good) and 255 (bad)
-    double iDifferenceSig = SigmoidFunction(iDifference,1.0,0.0,23, 70);  
+     
+    /* ++++++++++++++++++++ GradientMagnitude costs ++++++++++++++++++++++++++*/
+    
+    if( m_UseApproximateGradient)
+    {
+      //approximate gradient magnitude
+
+      // dI(x,y)/dx
+      IndexType x1;
+      x1[0] = p1[0] +1;
+      x1[1] = p1[1];
+
+      IndexType x2;
+      x2[0] = p1[0] -1;
+      x2[1] = p1[1];
+
+      double gradientX = (this->m_Image->GetPixel(x1) - this->m_Image->GetPixel(x2)) / 2;
+
+
+      // dI(x,y)/dy
+      IndexType y1;
+      y1[0] = p1[0];
+      y1[1] = p1[1] +1;
+
+      IndexType y2;
+      y2[0] = p1[0];
+      y2[1] = p1[1] -1;
+
+      double gradientY = (this->m_Image->GetPixel(y1) - this->m_Image->GetPixel(y2)) / 2;
+
+
+      // sqrt (x^2 + y^2)
+      val = sqrt( ( pow( gradientX, 2) + pow( gradientY, 2) ) );
+      
+    }
+    else
+    {
+      val = this->m_GradImage->GetPixel(p2);
+    }
+
+    //scale by euclidian distance
+    double gradientScale;
+    if( p1[0] == p2[0] || p1[1] == p2[1])
+    {
+      //horizontal or vertical neighbor
+      gradientScale = 1 / sqrt(2.0);
+    }
+    else
+    {
+      //diagonal neighbor
+      gradientScale = 1.0;
+    }
+
+    // iDIfference is value between 0 (good) and 1 (bad)
+    iDifference = 1 - val / 255;
+    iDifference *= gradientScale;
+    
+    // double iDifferenceSig = SigmoidFunction(iDifference,1.0,0.0,23, 70);  
+
+    /* -----------------------------------------------------------------------------*/
+
+
+    /* ++++++++++++++++++++ Laplacian zero crossing costs ++++++++++++++++++++++++++*/
+    // f(p) =     0;   if I(p)=0
+    //     or     1;   if I(p)!=0
+    double laplacianCost;
+    double laplaceImageValue = this->m_LaplacianImage->GetPixel(p2);
+    if(laplaceImageValue < 0 || laplaceImageValue > 0)
+    {
+      laplacianCost = 1;
+    }
+    else
+    {
+      laplacianCost = 0;
+    }
+
+    /* -----------------------------------------------------------------------------*/
 
 
     ///////////////////
@@ -73,13 +147,17 @@ namespace itk
     }
 
 
-    ///////////////////
-    // return costs
-    double costs = iDifferenceSig;
+    /*+++++++++++++++++++++  local component costs +++++++++++++++++++++++++++*/
+    /*weights*/
+    double w1 = 0.43;
+    double w2 = 0.43;
+    double w3 = 0.14;
 
-    if (m_UseRepulsivePoint)       
-       costs = (iDifferenceSig * 0.5) + (repulsiveCostsSig * 0.52); // das mit den repulsive costs muss mann nochmal überarbeiten
-    
+    double costs = w1 * laplacianCost + w2 * iDifference;
+
+    //if (m_UseRepulsivePoint)       
+    //   costs = (iDifferenceSig * 0.5) + (repulsiveCostsSig * 0.52); // das mit den repulsive costs muss mann nochmal überarbeiten
+    //
     return costs;
 
   }
@@ -96,14 +174,29 @@ namespace itk
   void ShortestPathCostFunctionLiveWire<TInputImageType>
     ::Initialize()
   {
-    // init gradient magnitude image
-    typename GradientMagnitudeFilterType::Pointer GradientFilter = GradientMagnitudeFilterType::New();
-    GradientFilter->SetInput(this->m_Image);
-    //GradientFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
-    //GradientFilter->SetSigma( 1.0 );
-    //GradientFilter->SetNormalizeAcrossScale(true);
-    //GradientFilter->Update();
-    m_GradImage = GradientFilter->GetOutput();
+
+    typedef  itk::GradientMagnitudeImageFilter< typename TInputImageType, typename TInputImageType> GradientMagnitudeFilterType;
+    //typedef  itk::LaplacianImageFilter< typename TInputImageType, typename TInputImageType > LaplacianFilterType;
+
+    if( !m_UseApproximateGradient)
+    {
+      // init gradient magnitude image
+      typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
+      gradientFilter->SetInput(this->m_Image);
+      gradientFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
+
+      gradientFilter->Update();
+      m_GradImage = gradientFilter->GetOutput();
+    }//else no filter just approximate the gradient during cost estimation
+
+
+    //typename LaplacianFilterType::Pointer laplacianFilter = LaplacianFilterType::New();
+    //laplacianFilter->SetInput( this->m_Image );
+    ////laplacianFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
+
+    //laplacianFilter->Update();
+
+    //m_LaplacianImage = laplacianFilter->GetOutput();
 
     // check start/end point value 
     startValue= this->m_Image->GetPixel(this->m_StartIndex);
@@ -111,8 +204,6 @@ namespace itk
 
     // set minCosts
     minCosts = 0.3; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs everything is fine. If estimation is higher than actual costs, you might not get the shortest but a different path.
-    if (m_UseRepulsivePoint)
-       minCosts = 0.3;
   }
 
 

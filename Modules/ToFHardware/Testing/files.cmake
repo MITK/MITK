@@ -20,7 +20,7 @@ set(MODULE_TESTS
   mitkToFImageCsvWriterTest.cpp
   mitkToFImageGrabberTest.cpp
   mitkToFImageRecorderTest.cpp
-  #mitkToFImageRecorderFilterTest.cpp
+  mitkToFImageRecorderFilterTest.cpp
   mitkToFImageWriterTest.cpp
   #mitkToFNrrdImageWriterTest.cpp
   mitkToFOpenCVImageGrabberTest.cpp

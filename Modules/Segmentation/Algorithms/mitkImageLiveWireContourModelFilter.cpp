@@ -29,6 +29,7 @@ mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
   this->SetNthOutput(0, output.GetPointer());
 
 }
+
 mitk::ImageLiveWireContourModelFilter::~ImageLiveWireContourModelFilter()
 {
 
@@ -183,15 +184,14 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
 
   while(pathIterator != shortestPath.end())
   {
-    mitk::Point2D currentPoint;
+    mitk::Point3D currentPoint;
     currentPoint[0] = (*pathIterator)[0];
     currentPoint[1] = (*pathIterator)[1];
-    
-    mitk::Point3D currentPoint3D;
+    currentPoint[2] = 0;
 
-    m_Geo2D->IndexToWorld(currentPoint, currentPoint);
-    m_Geo2D->Map(currentPoint, currentPoint3D);
-    output->AddVertex(currentPoint3D);
+
+    input->GetGeometry()->IndexToWorld(currentPoint, currentPoint);
+    output->AddVertex(currentPoint);
     
     pathIterator++;
   }

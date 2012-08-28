@@ -126,7 +126,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
 
   m_ToolManager->GetDataStorage()->Add( m_LiveWireContourNode );
   
-  //m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
+
   m_Contour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
 
 
@@ -135,7 +135,6 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_LiveWireFilter->SetInput(m_WorkingSlice);
   //set initial start point
   m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
-  m_LiveWireFilter->SetGeo2D(positionEvent->GetSender()->GetCurrentWorldGeometry2D());
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -177,7 +176,7 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
 
   //clear the livewire contour and reset the corresponding datanode
   m_LiveWireContour->Clear(timestep);
-  //m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
+
   //set new start point
   m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
@@ -215,8 +214,7 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
 
   this->m_LiveWireContour = this->m_LiveWireFilter->GetOutput();
   this->m_LiveWireContourNode->SetData(this->m_LiveWireFilter->GetOutput());
-  /*m_LiveWireContour->AddVertex(*currentVertex, timestep);
-  m_LiveWireContour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );*/
+
   /* END actual LiveWire computation */
 
 

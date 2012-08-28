@@ -58,8 +58,6 @@ namespace mitk {
     itkSetMacro(EndPoint, mitk::Point3D);
     itkGetMacro(EndPoint, mitk::Point3D);
 
-    itkSetConstObjectMacro(Geo2D, mitk::Geometry2D);
-    itkGetConstObjectMacro(Geo2D, mitk::Geometry2D);
 
 
     virtual void SetInput( const InputType *input);
@@ -87,7 +85,6 @@ namespace mitk {
     mitk::Point3D m_StartPointInIndex;
     mitk::Point3D m_EndPointInIndex;
 
-    mitk::Geometry2D::ConstPointer m_Geo2D;
 
   private:
 

@@ -114,6 +114,10 @@ namespace mitk
     \brief Stops the recording by setting the m_Abort flag to false
     */
     void StopRecording();
+    /*!
+    \brief Wait until thread is terinated
+    */
+    void WaitForThreadBeingTerminated();
 
   protected:
 

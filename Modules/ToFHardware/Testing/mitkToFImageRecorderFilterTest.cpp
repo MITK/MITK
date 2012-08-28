@@ -17,7 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 
 #include <mitkImageDataItem.h>
-#include <mitkPicFileReader.h>
+#include <mitkItkImageFileReader.h>
+#include <mitkToFConfig.h>
 #include <mitkToFImageRecorderFilter.h>
 #include <mitkToFImageWriter.h>
 
@@ -90,18 +91,22 @@ int mitkToFImageRecorderFilterTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("ToFImageRecorder");
   mitk::ToFImageRecorderFilter::Pointer tofImageRecorderFilter = mitk::ToFImageRecorderFilter::New();
-
+  std::string dirName = MITK_TOF_DATA_DIR;
   MITK_TEST_OUTPUT(<< "Test SetFileName()");
-  std::string testFileName = "test.pic";
+  std::string testFileName = dirName + "test.pic";
+  MITK_TEST_FOR_EXCEPTION_BEGIN(std::logic_error);
+  tofImageRecorderFilter->SetFileName(testFileName);
+  MITK_TEST_FOR_EXCEPTION_END(std::logic_error);
+  testFileName = dirName + "test.nrrd";
   tofImageRecorderFilter->SetFileName(testFileName);
   mitk::ToFImageWriter::Pointer tofImageWriter = tofImageRecorderFilter->GetToFImageWriter();
-  std::string requiredName = "test_DistanceImage.pic";
+  std::string requiredName = dirName + "test_DistanceImage.nrrd";
   std::string name = tofImageWriter->GetDistanceImageFileName();
   MITK_TEST_CONDITION_REQUIRED(requiredName==name,"Test for distance image file name");
-  requiredName = "test_AmplitudeImage.pic";
+  requiredName = dirName + "test_AmplitudeImage.nrrd";
   name = tofImageWriter->GetAmplitudeImageFileName();
   MITK_TEST_CONDITION_REQUIRED(requiredName==name,"Test for amplitude image file name");
-  requiredName = "test_IntensityImage.pic";
+  requiredName = dirName + "test_IntensityImage.nrrd";
   name = tofImageWriter->GetIntensityImageFileName();
   MITK_TEST_CONDITION_REQUIRED(requiredName==name,"Test for intensity image file name");
 
@@ -126,32 +131,35 @@ int mitkToFImageRecorderFilterTest(int /* argc */, char* /*argv*/[])
   tofImageRecorderFilter->StopRecording();
 
   MITK_TEST_OUTPUT(<< "Test content of written files");
-  mitk::PicFileReader::Pointer imageReader = mitk::PicFileReader::New();
-  imageReader->SetFileName("test_DistanceImage.pic");
+  mitk::ItkImageFileReader::Pointer imageReader = mitk::ItkImageFileReader::New();
+  std::string testDistanceImageName = dirName + "test_DistanceImage.nrrd";
+  imageReader->SetFileName(testDistanceImageName);
   imageReader->Update();
   mitk::Image::Pointer loadedDistanceImage = imageReader->GetOutput();
   MITK_TEST_CONDITION_REQUIRED(CompareImages(testDistanceImage,loadedDistanceImage),"Test loaded image 0 (distance image)");
-  imageReader->SetFileName("test_AmplitudeImage.pic");
+  std::string testAmplitudeImageName = dirName + "test_AmplitudeImage.nrrd";
+  imageReader->SetFileName(testAmplitudeImageName);
   imageReader->Update();
   mitk::Image::Pointer loadedAmplitudeImage = imageReader->GetOutput();
   MITK_TEST_CONDITION_REQUIRED(CompareImages(testAmplitudeImage,loadedAmplitudeImage),"Test loaded image 1 (amplitude image)");
-  imageReader->SetFileName("test_IntensityImage.pic");
+  std::string testIntensityImageName = dirName + "test_IntensityImage.nrrd";
+  imageReader->SetFileName(testIntensityImageName);
   imageReader->Update();
   mitk::Image::Pointer loadedIntensityImage = imageReader->GetOutput();
   MITK_TEST_CONDITION_REQUIRED(CompareImages(testIntensityImage,loadedIntensityImage),"Test loaded image 2 (intensity image)");
 
   //clean up and delete saved image files
-  if( remove( "test_DistanceImage.pic" ) != 0 )
+  if( remove( testDistanceImageName.c_str() ) != 0 )
   {
-    MITK_ERROR<<"File: test_DistanceImage.pic not successfully deleted!";
+    MITK_ERROR<<"File: test_DistanceImage.nrrd not successfully deleted!";
   }
-  if( remove( "test_AmplitudeImage.pic" ) != 0 )
+  if( remove( testAmplitudeImageName.c_str() ) != 0 )
   {
-    MITK_ERROR<<"File: test_AmplitudeImage.pic not successfully deleted!";
+    MITK_ERROR<<"File: test_AmplitudeImage.nrrd not successfully deleted!";
   }
-  if( remove( "test_IntensityImage.pic" ) != 0 )
+  if( remove( testIntensityImageName.c_str() ) != 0 )
   {
-    MITK_ERROR<<"File: test_IntensityImage.pic not successfully deleted!";
+    MITK_ERROR<<"File: test_IntensityImage.nrrd not successfully deleted!";
   }
   MITK_TEST_END();
 }

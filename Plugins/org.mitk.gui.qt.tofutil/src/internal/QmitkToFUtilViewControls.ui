@@ -19,15 +19,18 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QPushButton" name="m_ConKin">
-     <property name="text">
-      <string>ConnectKinect</string>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QmitkToFConnectionWidget" name="m_ToFConnectionWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <widget class="QmitkToFRecorderWidget" name="m_ToFRecorderWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -37,7 +40,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0">
     <widget class="QmitkToFVisualisationSettingsWidget" name="m_ToFVisualisationSettingsWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -47,7 +50,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0">
     <widget class="QmitkToFCompositeFilterWidget" name="m_ToFCompositeFilterWidget" native="true">
      <property name="enabled">
       <bool>true</bool>
@@ -60,8 +63,11 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_3">
+   <item row="4" column="0">
+    <widget class="QGroupBox" name="SurfacePropertiesBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="title">
       <string>Surface</string>
      </property>
@@ -99,10 +105,10 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="5" column="0">
     <widget class="QmitkToFPointSetWidget" name="tofMeasurementWidget" native="true"/>
    </item>
-   <item>
+   <item row="6" column="0">
     <spacer name="m_Spacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -116,15 +122,15 @@
     </spacer>
    </item>
   </layout>
-  <zorder>m_ToFRecorderWidget</zorder>
-  <zorder>m_ToFVisualisationSettingsWidget</zorder>
-  <zorder>groupBox_3</zorder>
-  <zorder>m_ToFCompositeFilterWidget</zorder>
-  <zorder>tofMeasurementWidget</zorder>
-  <zorder>m_ConKin</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
+  <customwidget>
+   <class>QmitkToFConnectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkToFConnectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>QmitkToFRecorderWidget</class>
    <extends>QWidget</extends>

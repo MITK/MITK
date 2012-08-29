@@ -93,7 +93,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     //        connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
     //        connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
     //        connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
-    connect( (QObject*)(m_Controls->m_ConKin), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
+    //connect( (QObject*)(m_Controls->m_ConKin), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
@@ -105,7 +105,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 
 void QmitkToFUtilView::SetFocus()
 {
-  m_Controls->m_ConKin->setFocus();
+  m_Controls->m_ToFRecorderWidget->setFocus();
  }
 
 void QmitkToFUtilView::Activated()

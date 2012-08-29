@@ -44,7 +44,7 @@ namespace mitk
     /*!
     \brief opens a connection to the ToF camera
     */
-    virtual bool ConnectCamera();
+    virtual bool OnConnectCamera();
     /*!
     \brief closes the connection to the camera
     */

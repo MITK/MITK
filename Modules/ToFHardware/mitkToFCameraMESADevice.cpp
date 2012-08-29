@@ -29,7 +29,7 @@ namespace mitk
   {
   }
 
-  bool ToFCameraMESADevice::ConnectCamera()
+  bool ToFCameraMESADevice::OnConnectCamera()
   {
     bool ok = false;
     if (m_Controller)

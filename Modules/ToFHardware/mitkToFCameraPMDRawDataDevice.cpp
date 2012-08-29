@@ -33,7 +33,7 @@ namespace mitk
     this->CleanUpSourceData();
   }
 
-  bool ToFCameraPMDRawDataDevice::ConnectCamera()
+  bool ToFCameraPMDRawDataDevice::OnConnectCamera()
   {
     bool ok = false;
     if (m_Controller.IsNotNull())

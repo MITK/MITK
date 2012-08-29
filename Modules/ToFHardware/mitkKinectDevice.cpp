@@ -30,7 +30,7 @@ namespace mitk
   {
   }
 
-  bool KinectDevice::ConnectCamera()
+  bool KinectDevice::OnConnectCamera()
   {
     bool ok = false;
     if (m_Controller)

@@ -32,7 +32,7 @@ namespace mitk
     CleanupPixelArrays();
   }
 
-  bool ToFCameraPMDDevice::ConnectCamera()
+  bool ToFCameraPMDDevice::OnConnectCamera()
   {
     bool ok = false;
     if (m_Controller)

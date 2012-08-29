@@ -22,6 +22,20 @@ SET(CPP_FILES
   mitkToFNrrdImageWriter.cpp
   mitkToFImageCsvWriter.cpp
   mitkThreadedToFRawDataReconstruction.cpp
+  mitkIToFDeviceFactory.cpp
+  mitkAbstractToFDeviceFactory.cpp
+  mitkToFHardwareActivator.cpp
+  mitkKinectDeviceFactory.cpp
+  mitkToFCameraMESADeviceFactory.cpp
+  mitkToFCameraMESASR4000DeviceFactory.cpp
+  mitkToFDeviceFactoryManager.cpp
+  mitkToFPMDCamBoardDeviceFactory.cpp
+  mitkToFPMDCamCubeDeviceFactory.cpp
+  mitkToFPMDO3DeviceFactory.cpp
+  mitkToFPlayerDeviceFactory.cpp
+  mitkToFPMDPlayerDeviceFactory.cpp
+  mitkToFPMDRawDataCamCubeDeviceFactory.cpp
+  mitkToFPMDRawDataCamBoardDeviceFactory.cpp
 )
 
 IF(MITK_USE_TOF_PMDCAMCUBE)

@@ -16,6 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraDevice.h"
 #include <itksys/SystemTools.hxx>
 
+//Microservices
+#include <usGetModuleContext.h>
+#include "mitkModuleContext.h"
 
 namespace mitk
 {
@@ -167,5 +170,19 @@ namespace mitk
     bool ok = m_CameraActive;
     m_CameraActiveMutex->Unlock();
     return ok;
+}
+  bool ToFCameraDevice::ConnectCamera()
+  {
+      // Prepare connection, fail if this fails.
+      if (! this->OnConnectCamera()) return false;
+
+      // Get Context and Module
+      mitk::ModuleContext* context = GetModuleContext();
+
+      // Define ServiceProps
+//      ServiceProperties props;
+//      props["Manufacturer"] = this->m_Metadata->GetDeviceManufacturer();
+      m_ServiceRegistration = context->RegisterService<mitk::ToFCameraDevice>(this);
+      return true;
   }
 }

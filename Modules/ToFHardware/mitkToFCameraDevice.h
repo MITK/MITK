@@ -27,6 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiThreader.h"
 #include "itkFastMutexLock.h"
 
+// Microservices
+#include <usServiceInterface.h>
+#include <usServiceRegistration.h>
+
 namespace mitk
 {
   /**
@@ -42,7 +46,9 @@ namespace mitk
     /*!
     \brief opens a connection to the ToF camera
     */
-    virtual bool ConnectCamera() = 0;
+    virtual bool OnConnectCamera() = 0;
+
+    virtual bool ConnectCamera();
     /*!
     \brief closes the connection to the camera
     */
@@ -217,6 +223,10 @@ namespace mitk
 
   private:
 
+    mitk::ServiceRegistration m_ServiceRegistration;
+
   };
 } //END mitk namespace
+// This is the microservice declaration. Do not meddle!
+US_DECLARE_SERVICE_INTERFACE(mitk::ToFCameraDevice, "org.mitk.services.ToFCameraDevice")
 #endif

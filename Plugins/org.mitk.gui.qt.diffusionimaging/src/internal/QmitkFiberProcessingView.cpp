@@ -995,6 +995,7 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
 
 
     newNode->AddProperty( "shownormal", mitk::BoolProperty::New( true ) );
+    newNode->AddProperty( "mirrornormal", mitk::BoolProperty::New(false) );
 
 
 

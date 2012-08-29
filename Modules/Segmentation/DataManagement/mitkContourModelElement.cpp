@@ -241,12 +241,15 @@ void mitk::ContourModelElement::SetIsClosed( bool isClosed)
 
 void mitk::ContourModelElement::Concatenate(mitk::ContourModelElement* other)
 {
-  ConstVertexIterator it =  other->m_Vertices->begin();
-  ConstVertexIterator end =  other->m_Vertices->end();
-  while(it != end)
+  if( other->GetSize() > 0)
   {
-    this->m_Vertices->push_back(*it);
-    it++;
+    ConstVertexIterator it =  other->m_Vertices->begin();
+    ConstVertexIterator end =  other->m_Vertices->end();
+    while(it != end)
+    {
+      this->m_Vertices->push_back(*it);
+      it++;
+    }
   }
 }
 

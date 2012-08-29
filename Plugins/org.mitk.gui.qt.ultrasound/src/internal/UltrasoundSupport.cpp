@@ -99,7 +99,7 @@ void UltrasoundSupport::OnClickedViewDevice()
     m_Controls.m_BtnView->setText("Stop Viewing");
   }
   else
-  { //deactivate Imaging
+  { //deactivate imaging
     m_Controls.m_BtnView->setText("Start Viewing");
     m_Timer->stop();
     m_Node->ReleaseData();

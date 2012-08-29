@@ -96,7 +96,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     T* GetSelectedServiceAsClass()
     {
       mitk::ServiceReference ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
-      return dynamic_cast<T*> ( m_Context->GetService<T>(ref) );
+      return ( m_Context->GetService<T>(ref) );
     }
 
     /**

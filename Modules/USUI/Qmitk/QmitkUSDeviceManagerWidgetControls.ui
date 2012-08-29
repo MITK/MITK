@@ -47,11 +47,19 @@
     </widget>
    </item>
    <item row="1" column="0" colspan="2">
-    <widget class="QListWidget" name="m_ConnectedDevices"/>
+    <widget class="QmitkServiceListWidget" name="m_ConnectedDevices" native="true"/>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkServiceListWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkServiceListWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

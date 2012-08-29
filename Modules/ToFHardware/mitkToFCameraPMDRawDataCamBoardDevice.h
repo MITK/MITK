@@ -69,8 +69,8 @@ namespace mitk
   protected:
 
     ToFCameraPMDRawDataCamBoardDevice();
-    ~ToFCameraPMDRawDataCamBoardDevice();
 
+    ~ToFCameraPMDRawDataCamBoardDevice();
   private:
     /*!
     \brief Method performs resizing of the image data and flips it upside down

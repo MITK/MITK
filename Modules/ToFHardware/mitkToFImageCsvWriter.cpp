@@ -33,8 +33,8 @@ namespace mitk
     this->CheckForFileExtension(this->m_AmplitudeImageFileName);
     this->CheckForFileExtension(this->m_IntensityImageFileName);
 
-    this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
-    this->m_ImageSizeInBytes = this->m_PixelNumber * sizeof(float);
+    this->m_ToFPixelNumber = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
+    this->m_ToFImageSizeInBytes = this->m_ToFPixelNumber * sizeof(float);
 
     if (this->m_DistanceImageSelected)
     {
@@ -86,7 +86,7 @@ namespace mitk
 
   void ToFImageCsvWriter::WriteCsvFile(FILE* outfile, float* floatData)
   {
-    for(int i=0; i<this->m_PixelNumber; i++)
+    for(int i=0; i<this->m_ToFPixelNumber; i++)
     {
       if (this->m_NumOfFrames==0 && i==0)
       {

@@ -39,8 +39,11 @@ namespace mitk
     this->CheckForFileExtension(this->m_IntensityImageFileName);
     this->CheckForFileExtension(this->m_RGBImageFileName);
 
-    this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
-    this->m_ImageSizeInBytes = this->m_PixelNumber * sizeof(float);
+    this->m_ToFPixelNumber = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
+    this->m_ToFImageSizeInBytes = this->m_ToFPixelNumber * sizeof(float);
+
+    this->m_RGBPixelNumber = this->m_RGBCaptureWidth * this->m_RGBCaptureHeight;
+    this->m_RGBImageSizeInBytes = this->m_RGBPixelNumber * sizeof(unsigned char) * 3;
 
     if (this->m_DistanceImageSelected)
     {
@@ -85,19 +88,19 @@ namespace mitk
   {
     if (this->m_DistanceImageSelected)
     {
-      this->m_DistanceOutfile.write( (char*) distanceFloatData, this->m_ImageSizeInBytes);
+      this->m_DistanceOutfile.write( (char*) distanceFloatData, this->m_ToFImageSizeInBytes);
     }
     if (this->m_AmplitudeImageSelected)
     {
-      this->m_AmplitudeOutfile.write( (char*)amplitudeFloatData, this->m_ImageSizeInBytes);
+      this->m_AmplitudeOutfile.write( (char*)amplitudeFloatData, this->m_ToFImageSizeInBytes);
     }
     if (this->m_IntensityImageSelected)
     {
-      this->m_IntensityOutfile.write(( char* )intensityFloatData, this->m_ImageSizeInBytes);
+      this->m_IntensityOutfile.write(( char* )intensityFloatData, this->m_ToFImageSizeInBytes);
     }
     if (this->m_RGBImageSelected)
     {
-      this->m_RGBOutfile.write(( char* )rgbData, this->m_PixelNumber*3 * sizeof(unsigned char));
+      this->m_RGBOutfile.write(( char* )rgbData, this->m_RGBImageSizeInBytes);
     }
     this->m_NumOfFrames++;
   }
@@ -130,6 +133,23 @@ namespace mitk
 
   void ToFNrrdImageWriter::ConvertStreamToNrrdFormat( std::string fileName )
   {
+    int CaptureWidth = 0;
+    int CaptureHeight = 0;
+    int PixelNumber = 0;
+    int ImageSizeInBytes = 0;
+    if (fileName==this->m_RGBImageFileName)
+    {
+        CaptureWidth = this->m_RGBCaptureWidth;
+        CaptureHeight = this->m_RGBCaptureHeight;
+        PixelNumber = this->m_RGBPixelNumber;
+        ImageSizeInBytes = this->m_RGBImageSizeInBytes;
+    } else
+    {
+        CaptureWidth = this->m_ToFCaptureWidth;
+        CaptureHeight = this->m_ToFCaptureHeight;
+        PixelNumber = this->m_ToFPixelNumber;
+        ImageSizeInBytes = this->m_ToFImageSizeInBytes;
+    }
     Image::Pointer imageTemplate = Image::New();
     int dimension ;
     unsigned int* dimensions;
@@ -137,8 +157,8 @@ namespace mitk
     {
       dimension = 4;
       dimensions = new unsigned int[dimension];
-      dimensions[0] = this->m_CaptureWidth;
-      dimensions[1] = this->m_CaptureHeight;
+      dimensions[0] = CaptureWidth;
+      dimensions[1] = CaptureHeight;
       dimensions[2] = 1;
       dimensions[3] = this->m_NumOfFrames;
     }
@@ -146,8 +166,8 @@ namespace mitk
     {
       dimension = 3;
       dimensions = new unsigned int[dimension];
-      dimensions[0] = this->m_CaptureWidth;
-      dimensions[1] = this->m_CaptureHeight;
+      dimensions[0] = CaptureWidth;
+      dimensions[1] = CaptureHeight;
       dimensions[2] = this->m_NumOfFrames;
     }
     else
@@ -158,8 +178,8 @@ namespace mitk
     unsigned char* rgbData;
     if (fileName==this->m_RGBImageFileName)
     {
-      rgbData = new unsigned char[this->m_PixelNumber*3];
-      for(int i=0; i<this->m_PixelNumber*3; i++)
+      rgbData = new unsigned char[PixelNumber*3];
+      for(int i=0; i<PixelNumber*3; i++)
       {
         rgbData[i] = i + 0.0;
       }
@@ -169,8 +189,8 @@ namespace mitk
     }
     else
     {
-      floatData = new float[this->m_PixelNumber];
-      for(int i=0; i<this->m_PixelNumber; i++)
+      floatData = new float[PixelNumber];
+      for(int i=0; i<PixelNumber; i++)
       {
         floatData[i] = i + 0.0;
       }
@@ -218,7 +238,7 @@ namespace mitk
     std::ifstream stream(fileName.c_str(), std::ifstream::binary);
     if (fileName==m_RGBImageFileName)
     {
-      unsigned int size = this->m_PixelNumber*3 * this->m_NumOfFrames;
+      unsigned int size = PixelNumber*3 * this->m_NumOfFrames;
       unsigned int sizeInBytes = size * sizeof(unsigned char);
       unsigned char* data = new unsigned char[size];
       stream.read((char*)data, sizeInBytes);
@@ -228,7 +248,7 @@ namespace mitk
     }
     else
     {
-      unsigned int size = this->m_PixelNumber * this->m_NumOfFrames;
+      unsigned int size = PixelNumber * this->m_NumOfFrames;
       unsigned int sizeInBytes = size * sizeof(float);
       float* data = new float[size];
       stream.read((char*)data, sizeInBytes);

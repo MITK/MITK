@@ -107,7 +107,7 @@ namespace mitk
     virtual void StopCapturing();
     ////##Documentation
     ////## @brief rotate image according to the set angle.
-    virtual IplImage* RotateImage(IplImage* input);
+    virtual IplImage* FlipImage(IplImage* input);
     ////##Documentation
     ////## @brief EnableOnlineImageUndistortion allows for an online image undistortion directly after capturing an image.
     ////## The function has to be called after setting up the video input; the result is made accessible via the normal
@@ -127,6 +127,9 @@ namespace mitk
     ///
     itkGetConstMacro( VideoFileName, std::string );
 
+    virtual void SetEnableXAxisFlip(bool enable);
+    virtual void SetEnableYAxisFlip(bool enable);
+
     ///
     /// Returns the GrabbingDeviceNumber (maybe -1 if a video file is used)
     ///
@@ -134,21 +137,8 @@ namespace mitk
 
     itkGetMacro( RepeatVideo, bool );
     itkSetMacro( RepeatVideo, bool );
-    ///
-    /// \return advices this class to enable online rotation (has to be
-    /// implemented in subclasses)
-    ///
-    virtual void EnableRotation(bool enable);
 
-    ///
-    /// \return sets the current rotation angle
-    ///
-    virtual void SetRotationAngle(double rotationAngle);
 
-    ///
-    /// \return the current rotation angle (might be 0)
-    ///
-    virtual double GetRotationAngle();
   protected:
     OpenCVVideoSource();
     virtual ~OpenCVVideoSource();
@@ -193,15 +183,16 @@ namespace mitk
     // On-the-fly undistortion of the captured video image
     bool m_UndistortImage;
     mitk::UndistortCameraImage::Pointer m_UndistortCameraImage;
-    /**
-    * Angle for rotating the video image
-    **/
-    double m_RotationAngle;
 
     /**
-    * Flag to enable or disable video rotation used for performance enhancement.
+    * Flag to enable or disable video flipping by X Axis.
     **/
-    bool m_RotationEnabled;
+    bool m_FlipXAxisEnabled;
+
+    /**
+    * Flag to enable or disable video flipping by Y Axis.
+    **/
+    bool m_FlipYAxisEnabled;
   };
 }
 #endif // Header

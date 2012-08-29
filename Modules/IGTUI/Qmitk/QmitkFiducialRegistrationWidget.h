@@ -72,13 +72,16 @@ public:
   void HideImageFiducialButton(bool on); ///< show or hide  "Add image fiducial" button in the UI
   void HideTrackingFiducialButton(bool on); ///< show or hide  "Add tracking fiducial" button in the UI
   void AdjustButtonSpacing(); ///< Rearrange spacing when buttons are turned on or off
-
-
+  
   signals:
     void AddedTrackingFiducial();      ///< signal if a world instrument position was added to a tracking space fiducial
     void AddedImageFiducial();      ///< signal if an image position was added to a image space fiducial
     void PerformFiducialRegistration();        ///< signal if all fiducial were added and registration can be performed
     void FindFiducialCorrespondences(bool on); ///< signal if automatic correspondences search is toggled
+
+  protected slots:
+    void DisableEditButtonRegistrationImagePoints(bool);///< Disables the edit button of the widget RegistrationImagePoints if the activated variable is true.
+    void DisableEditButtonRegistrationTrackingPoints(bool);///< Disables the edit button of the widget RegistrationTrackingPoints if the activated variable is true.
 
 protected:
 

@@ -60,6 +60,19 @@ void QmitkFiducialRegistrationWidget::CreateConnections()
   connect( (QObject*)(m_Controls->m_AddImageFiducialBtn), SIGNAL(clicked()), this, SIGNAL(AddedImageFiducial()) );
   connect( (QObject*)(m_Controls->m_RegisterFiducialsBtn), SIGNAL(clicked()), this, SIGNAL(PerformFiducialRegistration()) );
   connect( (QObject*)(m_Controls->m_UseICPRegistration), SIGNAL(toggled(bool)), this, SIGNAL(FindFiducialCorrespondences(bool)) );
+
+  //unselects the edit button of the other widget if one is selected
+  connect( (QObject*)(m_Controls->m_RegistrationImagePoints), SIGNAL(EditPointSets(bool)), this, SLOT(DisableEditButtonRegistrationTrackingPoints(bool)));
+  connect( (QObject*)(m_Controls->m_RegistrationTrackingPoints), SIGNAL(EditPointSets(bool)), this, SLOT(DisableEditButtonRegistrationImagePoints(bool)));
+}
+
+void QmitkFiducialRegistrationWidget::DisableEditButtonRegistrationImagePoints(bool activated)
+{
+if (activated) m_Controls->m_RegistrationImagePoints->UnselectEditButton();
+}
+void QmitkFiducialRegistrationWidget::DisableEditButtonRegistrationTrackingPoints(bool activated)
+{
+if (activated) m_Controls->m_RegistrationTrackingPoints->UnselectEditButton();
 }
 
 void QmitkFiducialRegistrationWidget::SetWidgetAppearanceMode(WidgetAppearanceMode widgetMode)

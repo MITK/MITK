@@ -51,9 +51,9 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_BtnActivate,   SIGNAL(clicked()), this, SLOT(OnClickedActivateDevice()) );
-    connect( m_Controls->m_BtnDisconnect, SIGNAL(clicked()), this, SLOT(OnClickedDisconnectDevice()) );
-    connect( m_Controls->m_ConnectedDevices, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnDeviceSelectionChanged()) );
+    connect( m_Controls->m_BtnActivate,   SIGNAL( clicked() ), this, SLOT(OnClickedActivateDevice()) );
+    connect( m_Controls->m_BtnDisconnect, SIGNAL( clicked() ), this, SLOT(OnClickedDisconnectDevice()) );
+    connect( m_Controls->m_ConnectedDevices, SIGNAL( ServiceSelectionChanged(mitk::ServiceReference) ), this, SLOT(OnDeviceSelectionChanged(mitk::ServiceReference)) );
   }
 }
 
@@ -66,6 +66,9 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
   if (device.IsNull()) return;
   if (device->GetIsActive()) device->Deactivate();
   else device->Activate();
+
+  // Manually reevaluate Button logic
+  OnDeviceSelectionChanged(m_Controls->m_ConnectedDevices->GetSelectedService());
 }
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
@@ -74,10 +77,25 @@ void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
   device->Disconnect();
 }
 
-void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(){
-  mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedServiceAsClass<mitk::USDevice>();
-  if (device.IsNull()) return;
-  if (device->GetIsActive()) m_Controls->m_BtnActivate->setText("Deactivate");
-    else m_Controls->m_BtnActivate->setText("Activate");
+void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(mitk::ServiceReference reference){
+  if (! reference)
+  {
+    m_Controls->m_BtnActivate->setEnabled(false);
+    m_Controls->m_BtnDisconnect->setEnabled(false);
+    return;
+  }
+  std::string isActive = reference.GetProperty("IsActive").ToString();
+  if (isActive.compare("true") == 0) 
+  {
+    m_Controls->m_BtnActivate->setEnabled(true);
+    m_Controls->m_BtnDisconnect->setEnabled(false);
+    m_Controls->m_BtnActivate->setText("Deactivate");
+  }
+  else
+  {
+    m_Controls->m_BtnActivate->setEnabled(true);
+    m_Controls->m_BtnDisconnect->setEnabled(true);
+    m_Controls->m_BtnActivate->setText("Activate");
+  }
 }
 

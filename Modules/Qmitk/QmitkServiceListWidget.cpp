@@ -25,8 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //microservices
 #include <usGetModuleContext.h>
-#include "mitkModuleContext.h"
+#include <mitkModuleContext.h>
 #include <usServiceProperties.h>
+
+#include <mitkCommon.h>
 
 
 const std::string QmitkServiceListWidget::VIEW_ID = "org.mitk.views.QmitkServiceListWidget";
@@ -141,13 +143,23 @@ QListWidgetItem* QmitkServiceListWidget::AddServiceToList(mitk::ServiceReference
   //TODO allow more complex formatting
   if (m_NamingProperty.empty())
     caption = m_Interface;
-  else
-    caption = serviceRef.GetProperty(m_NamingProperty).ToString();
+  else 
+  {
+    mitk::Any prop = serviceRef.GetProperty(m_NamingProperty);
+    if (prop.Empty())
+    {
+      MITK_WARN << "QmitkServiceListWidget tried to resolve property '" + m_NamingProperty + "' but failed. Resorting to interface name for display.";
+      caption = m_Interface;
+    }
+    else
+      caption = prop.ToString();
+  }
 
   newItem->setText(caption.c_str());
 
-  //Add new item to QListWidget
+  // Add new item to QListWidget
   m_Controls->m_ServiceList->addItem(newItem);
+  m_Controls->m_ServiceList->sortItems();
   // Construct link and add to internal List for reference
   QmitkServiceListWidget::ServiceListLink link;
   link.service = serviceRef;

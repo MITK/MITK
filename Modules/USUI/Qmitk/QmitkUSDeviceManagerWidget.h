@@ -31,9 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
 * @brief This Widget is used to manage available Ultrasound Devices.
 *
+* It allows activation, deactivation and disconnection of connected devices.
+*
 * @ingroup USUI
 */
-class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk::ServiceTrackerCustomizer<> // this extension is necessary if one wants to use ServiceTracking instead of filtering
+class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -56,17 +58,17 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget //, public mitk
   protected slots:
   
     /*
-    \brief Called, when the button "Activate Device" was clicked
+    \brief Called, when the button "Activate Device" was clicked.
     */
     void OnClickedActivateDevice();
 
     /*
-    \brief Called, when the button "Disconnect Device" was clicked
+    \brief Called, when the button "Disconnect Device" was clicked.
     */
     void OnClickedDisconnectDevice();   
 
     /*
-    \brief Called, when the selection in the devicelist changes
+    \brief Called, when the selection in the devicelist changes.
     */
     void OnDeviceSelectionChanged();   
 

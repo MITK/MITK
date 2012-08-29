@@ -41,6 +41,10 @@ void QmitkUSDeviceManagerWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
   }
+
+  // Initializations
+  std::string empty = "";
+  m_Controls->m_ConnectedDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL, empty);
 }
 
 void QmitkUSDeviceManagerWidget::CreateConnections()
@@ -51,10 +55,6 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
     connect( m_Controls->m_BtnDisconnect, SIGNAL(clicked()), this, SLOT(OnClickedDisconnectDevice()) );
     connect( m_Controls->m_ConnectedDevices, SIGNAL(currentItemChanged( QListWidgetItem *, QListWidgetItem *)), this, SLOT(OnDeviceSelectionChanged()) );
   }
-
-  // Initializations
-  std::string empty = "";
-  m_Controls->m_ConnectedDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL, empty);
 }
 
 

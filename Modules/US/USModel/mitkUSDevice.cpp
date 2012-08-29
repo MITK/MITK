@@ -55,14 +55,11 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata) : mitk::ImageS
   this->SetNthOutput(0,newOutput);
 }
 
-
 mitk::USDevice::~USDevice()
 {
 
 }
 
-
-// Constructing Service Properties for the device
 mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 {
   ServiceProperties props;
@@ -89,11 +86,13 @@ mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
   return props;
 }
 
-
 bool mitk::USDevice::Connect()
 {
-  //TODO Throw Exception is already activated before connection
-
+  if (GetIsConnected())
+  {
+    MITK_WARN << "Tried to connect an ultrasound device that was already connected. Ignoring call...";
+    return false;
+  }
   // Prepare connection, fail if this fails.
   if (! this->OnConnection()) return false;
 
@@ -102,23 +101,32 @@ bool mitk::USDevice::Connect()
   ServiceProperties props = ConstructServiceProperties();
 
   m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
+
+  // This makes sure that the SmartPointer to this device does not invalidate while the device is connected
+  this->Register(); 
+
   return true; 
 }
 
-
-
 bool mitk::USDevice::Disconnect()
 {
+  if ( ! GetIsConnected())
+  {
+    MITK_WARN << "Tried to disconnect an ultrasound device that was not connected. Ignoring call...";
+    return false;
+  }
   // Prepare connection, fail if this fails.
   if (! this->OnDisconnection()) return false;
 
   // Unregister
   m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
+  
+  // Undo the manual registration done in Connect(). Pointer will invalidte, if no one holds a reference to this object anymore.
+  this->UnRegister();
   return true;
 }
 
-//Changed
 bool mitk::USDevice::Activate()
 {
   if (! this->GetIsConnected()) return false;
@@ -151,7 +159,7 @@ void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
 
 
 void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
-  // currently, we may just add the probe. This behaviour must be changed, should more complicated SDK applications emerge 
+  // currently, we may just add the probe. This behaviour should be changed, should more complicated SDK applications emerge 
   AddProbe(probe);
   int index = -1;
   for(int i = 0; i < m_ConnectedProbes.size(); i++)
@@ -165,12 +173,6 @@ void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
 
 void mitk::USDevice::DeactivateProbe(){
   m_ActiveProbe = 0;
-}
-
-
-void mitk::USDevice::GenerateData()
-{
-
 }
 
 
@@ -259,7 +261,7 @@ bool mitk::USDevice::GetIsActive()
 
 bool mitk::USDevice::GetIsConnected()
 {
-  // a device is connected if it is registered with the service
+  // a device is connected if it is registered with the Microservice Registry
   return (m_ServiceRegistration != 0);
 }
 

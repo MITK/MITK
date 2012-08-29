@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk header
 
 /**
-* @brief TODO
+* @brief This Widget enables the USer to create and connect Video Devices.
 *
 * @ingroup USUI
 */

@@ -99,8 +99,11 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
   input->GetGeometry()->WorldToIndex(m_StartPoint, m_StartPointInIndex);
   input->GetGeometry()->WorldToIndex(m_EndPoint, m_EndPointInIndex);
 
-
-  AccessFixedDimensionByItk(input, ItkProcessImage, 2);
+  //only start calculating if both indices are inside image geometry
+  if( input->GetGeometry()->IsIndexInside(this->m_StartPointInIndex) && input->GetGeometry()->IsIndexInside(this->m_EndPointInIndex) )
+  {
+    AccessFixedDimensionByItk(input, ItkProcessImage, 2);
+  }
 }
 
 

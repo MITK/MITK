@@ -169,6 +169,8 @@ void mitk::PlanarCircleMapper3D::UpdateVtkObjects(mitk::PlanarCircle* PFCircle)
 
   bool showNormal;
   bool hasNormalProp = this->GetDataNode()->GetBoolProperty("shownormal",showNormal);
+  bool mirrorNormal;
+  bool hasMirrorNormal = this->GetDataNode()->GetBoolProperty("mirrornormal", mirrorNormal);
 
   if(hasNormalProp && showNormal)
   {
@@ -181,9 +183,19 @@ void mitk::PlanarCircleMapper3D::UpdateVtkObjects(mitk::PlanarCircle* PFCircle)
     vtkSmartPointer<vtkPoints> points = vtkPoints::New();
 
     double p0[3] = {V1[0],V1[1],V1[2]};
+
+
+
     double p1[3] = {V1[0]+(double)N[0],
                     V1[1]+(double)N[1],
                     V1[2]+(double)N[2]};
+
+    if(hasMirrorNormal && mirrorNormal)
+    {
+      p1[0] = V1[0]-(double)N[0];
+      p1[1] = V1[1]-(double)N[1];
+      p1[2] = V1[2]-(double)N[2];
+    }
 
 
 

@@ -5,7 +5,7 @@ if(MITK_SHOW_CONSOLE_WINDOW)
   list(APPEND _app_options SHOW_CONSOLE)
 endif()
 
-MITK_USE_MODULE(qtsingleapplication)
+MITK_USE_MODULE(qtsingleapplication Mitk)
 include_directories(${ALL_INCLUDE_DIRECTORIES})
 
 # Create a cache entry for the provisioning file which is used to export

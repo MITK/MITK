@@ -515,9 +515,14 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
     m_WorkingDataObserverTags.erase(tempNode);
   }
+
+  if((m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0) == node)||
+    (m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0) == node))
+  {
   //as we don't know which node was actually remove e.g. our reference node, disable 'New Segmentation' button.
   //consider the case that there is no more image in the datastorage
-  this->SetToolManagerSelection(NULL, NULL);
+    this->SetToolManagerSelection(NULL, NULL);
+  }
 }
 
 void QmitkSegmentationView::CreateSegmentationFromSurface()

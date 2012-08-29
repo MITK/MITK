@@ -76,6 +76,7 @@ protected:
   virtual ~PointSetGLMapper2D();
 
   bool m_Polygon;
+  bool m_PolygonClosed;
   bool m_ShowPoints;
   bool m_ShowDistances;
   int m_DistancesDecimalDigits;

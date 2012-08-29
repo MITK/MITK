@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTriangleFilter.h>
 #include <vtkSmartPointer.h>
 
+
 namespace mitk {
 
 const std::string IOUtil::DEFAULTIMAGEEXTENSION = ".nrrd";
@@ -102,76 +103,67 @@ DataStorage::Pointer IOUtil::LoadFiles(const std::vector<std::string>& fileNames
 DataNode::Pointer IOUtil::LoadDataNode(const std::string path)
 {
     mitk::DataNodeFactory::Pointer reader = mitk::DataNodeFactory::New();
-    try //Try to read the file. Return NULL if something goes wrong.
+    try
     {
         reader->SetFileName( path );
         reader->Update();
 
-        if(reader->GetNumberOfOutputs()<1)
+        if((reader->GetNumberOfOutputs()<1))
         {
             MITK_ERROR << "Could not find data '" << path << "'";
-            return NULL; //No data found, thus we return NULL.
+            mitkThrow() << "An exception occured during loading the file " << path << ". Exception says could not find data.";
         }
+
+        mitk::DataNode::Pointer node = reader->GetOutput(0);
+
+        if(node.IsNull())
+        {
+            MITK_ERROR << "Could not find path: '" << path << "'" << " datanode is NULL" ;
+            mitkThrow() << "An exception occured during loading the file " << path << ". Exception says datanode is NULL.";
+        }
+
         return reader->GetOutput( 0 );
-    }
+     }
     catch ( itk::ExceptionObject & e )
     {
         MITK_ERROR << "Exception occured during load data of '" << path << "': Exception: " << e.what();
-        return NULL; //Exception occured, thus we return NULL.
+        mitkThrow() << "An exception occured during loading the file " << path << ". Exception says: " << e.what();
     }
 }
 
 Image::Pointer IOUtil::LoadImage(const std::string path)
 {
     mitk::DataNode::Pointer node = LoadDataNode(path);
-    if(node.IsNull())
-    {
-        MITK_ERROR << "DataNode is NULL'" << path << "'";
-        return NULL; //No data found, thus we return NULL.
-    }
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
     if(image.IsNull())
     {
         MITK_ERROR << "Image is NULL '" << path << "'";
-        return NULL; //No data found, thus we return NULL.
+        mitkThrow() << "An exception occured during loading the image " << path << ". Exception says: Image is NULL.";
     }
-    //Success
     return image;
 }
 
 Surface::Pointer IOUtil::LoadSurface(const std::string path)
 {
     mitk::DataNode::Pointer node = LoadDataNode(path);
-    if(node.IsNull())
-    {
-        MITK_ERROR << "DataNode is NULL'" << path << "'";
-        return NULL; //No data found, thus we return NULL.
-    }
     mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
     if(surface.IsNull())
     {
         MITK_ERROR << "Surface is NULL '" << path << "'";
-        return NULL; //No data found, thus we return NULL.
+        mitkThrow() << "An exception occured during loading the file " << path << ". Exception says: Surface is NULL.";
     }
-    //Success
     return surface;
 }
 
 PointSet::Pointer IOUtil::LoadPointSet(const std::string path)
 {
     mitk::DataNode::Pointer node = LoadDataNode(path);
-    if(node.IsNull())
-    {
-        MITK_ERROR << "DataNode is NULL'" << path << "'";
-        return NULL; //No data found, thus we return NULL.
-    }
     mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(node->GetData());
     if(pointset.IsNull())
     {
-        MITK_ERROR << "Surface is NULL '" << path << "'";
-        return NULL; //No data found, thus we return NULL.
+        MITK_ERROR << "PointSet is NULL '" << path << "'";
+        mitkThrow() << "An exception occured during loading the file " << path << ". Exception says: Pointset is NULL.";
     }
-    //Success
     return pointset;
 }
 
@@ -211,7 +203,7 @@ bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string path)
     {
         MITK_ERROR << " during attempt to write '" << finalFileName + extension << "' Exception says:";
         MITK_ERROR << e.what();
-        return false;
+        mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
     }
     return true;
 }
@@ -271,14 +263,15 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
         {
             // file extension not suitable for writing specified data type
             MITK_ERROR << "File extension is not suitable for writing'" << finalFileName;
-            return false;
+            mitkThrow() << "An exception occured during writing the file " << finalFileName <<
+                           ". File extension " << extension << " is not suitable for writing.";
         }
     }
     catch(std::exception& e)
     {
         MITK_ERROR << " during attempt to write '" << finalFileName << "' Exception says:";
         MITK_ERROR << e.what();
-        return false;
+        mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
     }
     return true;
 }
@@ -317,7 +310,7 @@ bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
     {
         MITK_ERROR << " during attempt to write '" << finalFileName << "' Exception says:";
         MITK_ERROR << e.what();
-        return false;
+        mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
     }
     return true;
 }

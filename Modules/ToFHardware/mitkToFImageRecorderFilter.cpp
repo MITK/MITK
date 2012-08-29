@@ -126,13 +126,13 @@ void mitk::ToFImageRecorderFilter::SetInput( unsigned int idx,  mitk::Image* inp
   {
     this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
   }
-  else
+  else if(idx == 0 || idx == 1 || idx == 2)
   {
     this->ProcessObject::SetNthInput(idx, input);   // Process object is not const-correct so the const_cast is required here
     unsigned int xDim = input->GetDimension(0);
     unsigned int yDim = input->GetDimension(1);
-    m_ToFImageWriter->SetCaptureWidth(xDim);
-    m_ToFImageWriter->SetCaptureWidth(yDim);
+    m_ToFImageWriter->SetToFCaptureWidth(xDim);
+    m_ToFImageWriter->SetToFCaptureWidth(yDim);
   }
 
   this->CreateOutputsForAllInputs();

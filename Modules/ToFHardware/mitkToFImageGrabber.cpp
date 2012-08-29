@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  ToFImageGrabber::ToFImageGrabber():m_CaptureWidth(204),m_CaptureHeight(204),m_PixelNumber(41616),m_ImageSequence(0),
+  ToFImageGrabber::ToFImageGrabber():m_CaptureWidth(204),m_CaptureHeight(204),m_PixelNumber(41616),
+    m_ImageSequence(0), m_RGBImageWidth(0), m_RGBImageHeight(0), m_RGBPixelNumber(0),
     m_IntensityArray(NULL), m_DistanceArray(NULL), m_AmplitudeArray(NULL), m_SourceDataArray(NULL), m_RgbDataArray(NULL)
   {
     // Create the output. We use static_cast<> here because we know the default
@@ -87,11 +88,15 @@ namespace mitk
       intensityImage->Initialize(FloatType, 3, dimensions, 1);
     }
 
+    unsigned int rgbDimension[3];
+    rgbDimension[0] = this->GetRGBImageWidth();
+    rgbDimension[1] = this->GetRGBImageHeight();
+    rgbDimension[2] = 1 ;
     mitk::Image::Pointer rgbImage = this->GetOutput(3);
     if (!rgbImage->IsInitialized())
     {
       rgbImage->ReleaseData();
-      rgbImage->Initialize(mitk::PixelType(MakePixelType<unsigned char, itk::RGBPixel<unsigned char>, 3>()),3,dimensions,1);
+      rgbImage->Initialize(mitk::PixelType(MakePixelType<unsigned char, itk::RGBPixel<unsigned char>, 3>()), 3, rgbDimension,1);
     }
 
     capturedImageSequence = this->m_ImageSequence;
@@ -118,10 +123,15 @@ namespace mitk
     bool ok = m_ToFCameraDevice->ConnectCamera();
     if (ok)
     {
-      m_CaptureWidth = m_ToFCameraDevice->GetCaptureWidth();
-      m_CaptureHeight = m_ToFCameraDevice->GetCaptureHeight();
-      m_PixelNumber = m_CaptureWidth * m_CaptureHeight;
-      m_SourceDataSize = m_ToFCameraDevice->GetSourceDataSize();
+      this->m_CaptureWidth = this->m_ToFCameraDevice->GetCaptureWidth();
+      this->m_CaptureHeight = this->m_ToFCameraDevice->GetCaptureHeight();
+      this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
+
+      this->m_RGBImageWidth = this->m_ToFCameraDevice->GetRGBCaptureWidth();
+      this->m_RGBImageHeight = this->m_ToFCameraDevice->GetRGBCaptureHeight();
+      this->m_RGBPixelNumber = this->m_RGBImageWidth * this->m_RGBImageHeight;
+
+      this->m_SourceDataSize = m_ToFCameraDevice->GetSourceDataSize();
       this->AllocateImageArrays();
     }
     return ok;
@@ -178,10 +188,26 @@ namespace mitk
     return m_PixelNumber;
   }
 
+  int ToFImageGrabber::GetRGBImageWidth()
+  {
+    return m_RGBImageWidth;
+  }
+
+  int ToFImageGrabber::GetRGBImageHeight()
+  {
+    return m_RGBImageHeight;
+  }
+
+  int ToFImageGrabber::GetRGBPixelNumber()
+  {
+    return m_RGBPixelNumber;
+  }
+
   int ToFImageGrabber::SetModulationFrequency(int modulationFrequency)
   {
     this->m_ToFCameraDevice->SetProperty("ModulationFrequency",mitk::IntProperty::New(modulationFrequency));
     this->Modified();
+    modulationFrequency = this->GetModulationFrequency(); // return the new valid modulation frequency from the camera
     return modulationFrequency;
   }
 
@@ -189,6 +215,7 @@ namespace mitk
   {
     this->m_ToFCameraDevice->SetProperty("IntegrationTime",mitk::IntProperty::New(integrationTime));
     this->Modified();
+    integrationTime = this->GetIntegrationTime(); // return the new valid integration time from the camera
     return integrationTime;
   }
 
@@ -274,6 +301,6 @@ namespace mitk
     m_DistanceArray = new float[m_PixelNumber];
     m_AmplitudeArray = new float[m_PixelNumber];
     m_SourceDataArray = new char[m_SourceDataSize];
-    m_RgbDataArray = new unsigned char[m_PixelNumber*3];
+    m_RgbDataArray = new unsigned char[m_RGBPixelNumber*3];
   }
 }

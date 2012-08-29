@@ -120,8 +120,13 @@ namespace mitk
 
   int ToFCameraPMDController::SetIntegrationTime(unsigned int integrationTime)
   {
+    if(!m_ConnectionCheck)
+    {
+      return integrationTime;
+    }
     unsigned int result;
-    this->m_PMDRes = pmdGetValidIntegrationTime(m_PMDHandle, &result, 0, AtLeast, integrationTime);
+    this->m_PMDRes = pmdGetValidIntegrationTime(m_PMDHandle, &result, 0, CloseTo, integrationTime);
+    MITK_INFO << "Valid Integration Time = " << result;
     ErrorText(this->m_PMDRes);
     if (this->m_PMDRes != 0)
     {
@@ -142,8 +147,13 @@ namespace mitk
 
   int ToFCameraPMDController::SetModulationFrequency(unsigned int modulationFrequency)
   {
+    if(!m_ConnectionCheck)
+    {
+      return modulationFrequency;
+    }
     unsigned int result;
     this->m_PMDRes = pmdGetValidModulationFrequency(m_PMDHandle, &result, 0, AtLeast, (modulationFrequency*1000000));
+    MITK_INFO << "Valid Modulation Frequency = " << result;
     ErrorText(this->m_PMDRes);
     if (this->m_PMDRes != 0)
     {

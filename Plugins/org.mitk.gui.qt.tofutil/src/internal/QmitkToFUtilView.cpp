@@ -67,6 +67,7 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
+
 }
 
 void QmitkToFUtilView::SetFocus()
@@ -503,10 +504,27 @@ void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
       this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
     }
   }
-  else
+}
+
+void QmitkToFUtilView::OnChangeCoronalWindowOutput(int index)
+{
+  this->OnToFCameraStopped();
+  if(index == 0)
   {
-    this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
+    if(this->m_IntensityImageNode.IsNotNull())
+      this->m_IntensityImageNode->SetVisibility(false);
+    if(this->m_RGBImageNode.IsNotNull())
+      this->m_RGBImageNode->SetVisibility(true);
   }
+  else if(index == 1)
+  {
+    if(this->m_IntensityImageNode.IsNotNull())
+      this->m_IntensityImageNode->SetVisibility(true);
+    if(this->m_RGBImageNode.IsNotNull())
+      this->m_RGBImageNode->SetVisibility(false);
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->OnToFCameraStarted();
 }
 
 mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName, mitk::BaseData* data )

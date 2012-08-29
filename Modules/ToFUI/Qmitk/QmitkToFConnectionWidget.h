@@ -73,6 +73,8 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     */
     void ToFCameraSelected(const QString selectedText);
 
+    void ChangeCoronalWindowSelection(int);
+
   protected slots:
   
     /*!
@@ -98,7 +100,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
   private:
 
     void ShowParameterWidget();
-
+    void HideAllParameterWidgets();
 };
 
 #endif // _QMITKTOFCONNECTIONWIDGET_H_INCLUDED

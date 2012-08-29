@@ -96,7 +96,7 @@
          <number>18</number>
         </property>
         <property name="maximum">
-         <number>40</number>
+         <number>100</number>
         </property>
         <property name="singleStep">
          <number>1</number>

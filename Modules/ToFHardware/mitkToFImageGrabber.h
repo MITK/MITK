@@ -112,6 +112,22 @@ namespace mitk
     \return number of pixel
     */
     int GetPixelNumber();
+    /*!
+    \brief Get the dimension in x direction of the ToF image
+    \return width of the image
+    */
+    int GetRGBImageWidth();
+    /*!
+    \brief Get the dimension in y direction of the ToF image
+    \return height of the image
+    */
+    int GetRGBImageHeight();
+    /*!
+    \brief Get the number of pixel in the ToF image
+    \return number of pixel
+    */
+    int GetRGBPixelNumber();
+
 // properties
     void SetBoolProperty( const char* propertyKey, bool boolValue );
 
@@ -139,10 +155,13 @@ namespace mitk
     */
     virtual void AllocateImageArrays();
 
-    ToFCameraDevice::Pointer m_ToFCameraDevice; ///< Device allowing acces to ToF image data
+    ToFCameraDevice::Pointer m_ToFCameraDevice; ///< Device allowing access to ToF image data
     int m_CaptureWidth; ///< Width of the captured ToF image
     int m_CaptureHeight; ///< Height of the captured ToF image
     int m_PixelNumber; ///< Number of pixels in the image
+    int m_RGBImageWidth;
+    int m_RGBImageHeight;
+    int m_RGBPixelNumber;
     int m_ImageSequence; ///< counter for currently acquired images
     int m_SourceDataSize; ///< size of the source data in bytes
     float* m_IntensityArray; ///< member holding the current intensity array
@@ -150,7 +169,7 @@ namespace mitk
     float* m_AmplitudeArray; ///< member holding the current amplitude array
     char* m_SourceDataArray;///< member holding the current source data array
     unsigned char* m_RgbDataArray; ///< member holding the current rgb data array
-    unsigned long m_DeviceObserverTag; ///< tag of the oberver for the the ToFCameraDevice
+    unsigned long m_DeviceObserverTag; ///< tag of the observer for the ToFCameraDevice
 
     ToFImageGrabber();
 

@@ -194,8 +194,8 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   nrrdReader->Update();
   recordedImage = nrrdReader->GetOutput()->Clone();
 
-  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(0) == tofImageRecorder->GetCaptureWidth(), "Testing capture width");
-  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(1) == tofImageRecorder->GetCaptureHeight(), "Testing capture height");
+  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(0) == tofImageRecorder->GetToFCaptureWidth(), "Testing capture width");
+  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(1) == tofImageRecorder->GetToFCaptureHeight(), "Testing capture height");
   int numFramesOrig = originalImage->GetDimension(2);
   int numFramesRec = recordedImage->GetDimension(2);
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(2) == recordedImage->GetDimension(2), "Testing number of frames");
@@ -213,8 +213,8 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   nrrdReader->Update();
   recordedImage = nrrdReader->GetOutput()->Clone();
 
-  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(0) == tofImageRecorder->GetCaptureWidth(), "Testing capture width");
-  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(1) == tofImageRecorder->GetCaptureHeight(), "Testing capture height");
+  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(0) == tofImageRecorder->GetToFCaptureWidth(), "Testing capture width");
+  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(1) == tofImageRecorder->GetToFCaptureHeight(), "Testing capture height");
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(2) == recordedImage->GetDimension(2), "Testing number of frames");
 
   MITK_TEST_CONDITION_REQUIRED(CompareImages(originalImage, recordedImage), "Compare original and saved amplitude image");
@@ -230,8 +230,8 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   nrrdReader->Update();
   recordedImage = nrrdReader->GetOutput()->Clone();
 
-  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(0) == tofImageRecorder->GetCaptureWidth(), "Testing capture width");
-  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(1) == tofImageRecorder->GetCaptureHeight(), "Testing capture height");
+  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(0) == tofImageRecorder->GetToFCaptureWidth(), "Testing capture width");
+  MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(1) == tofImageRecorder->GetToFCaptureHeight(), "Testing capture height");
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(2) == recordedImage->GetDimension(2), "Testing number of frames");
 
   MITK_TEST_CONDITION_REQUIRED(CompareImages(originalImage, recordedImage), "Compare original and saved intensity image");

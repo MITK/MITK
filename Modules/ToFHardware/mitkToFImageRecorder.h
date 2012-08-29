@@ -55,8 +55,10 @@ namespace mitk
     itkGetMacro( AmplitudeImageFileName, std::string );
     itkGetMacro( IntensityImageFileName, std::string );
     itkGetMacro( RGBImageFileName, std::string );
-    itkGetMacro( CaptureWidth, int );
-    itkGetMacro( CaptureHeight, int );
+    itkGetMacro( ToFCaptureWidth, int );
+    itkGetMacro( ToFCaptureHeight, int );
+    itkGetMacro( RGBCaptureWidth, int );
+    itkGetMacro( RGBCaptureHeight, int );
     itkGetMacro( DistanceImageSelected, bool );
     itkGetMacro( AmplitudeImageSelected, bool );
     itkGetMacro( IntensityImageSelected, bool );
@@ -128,9 +130,12 @@ namespace mitk
 
     // data acquisition
     ToFCameraDevice::Pointer m_ToFCameraDevice; ///< ToFCameraDevice used for acquiring the images
-    int m_CaptureWidth; ///< width (x-dimension) of the images to record.
-    int m_CaptureHeight; ///< height (y-dimension) of the images to record.
-    int m_PixelNumber; ///< number of pixels (widht*height) of the images to record
+    int m_ToFCaptureWidth; ///< width (x-dimension) of the images to record.
+    int m_ToFCaptureHeight; ///< height (y-dimension) of the images to record.
+    int m_ToFPixelNumber; ///< number of pixels (widht*height) of the images to record
+    int m_RGBCaptureWidth; ///< width (x-dimension) of the images to record.
+    int m_RGBCaptureHeight; ///< height (y-dimension) of the images to record.
+    int m_RGBPixelNumber; ///< number of pixels (widht*height) of the images to record
     int m_SourceDataSize; ///< size of the source data provided by the device
     int m_ImageSequence; ///< number of images currently acquired
     float* m_IntensityArray; ///< array holding the intensity data

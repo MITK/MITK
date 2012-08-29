@@ -41,6 +41,10 @@ namespace mitk
         this->m_CaptureWidth = m_Controller->GetCaptureWidth();
         this->m_CaptureHeight = m_Controller->GetCaptureHeight();
         this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
+        
+        this->m_RGBImageWidth = m_CaptureWidth;
+        this->m_RGBImageHeight = m_CaptureHeight;
+        this->m_RGBPixelNumber = this->m_RGBImageWidth * this->m_RGBImageHeight;
 
         // allocate buffer
         this->m_IntensityArray = new float[this->m_PixelNumber];
@@ -420,5 +424,15 @@ namespace mitk
       GetBoolProperty(propertyKey, ir);
       m_Controller->SetUseIR(ir);
     }
+  }
+
+  int KinectDevice::GetRGBCaptureWidth()
+  {
+    return this->GetCaptureWidth();
+  }
+
+  int KinectDevice::GetRGBCaptureHeight()
+  {
+    return this->GetCaptureHeight();
   }
 }

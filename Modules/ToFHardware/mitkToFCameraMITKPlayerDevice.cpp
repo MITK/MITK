@@ -90,28 +90,6 @@ namespace mitk
     }
   }
 
-  void ToFCameraMITKPlayerDevice::StopCamera()
-  {
-    m_CameraActiveMutex->Lock();
-    m_CameraActive = false;
-    m_CameraActiveMutex->Unlock();
-    itksys::SystemTools::Delay(100);
-    if (m_MultiThreader.IsNotNull())
-    {
-      m_MultiThreader->TerminateThread(m_ThreadID);
-    }
-    // wait a little to make sure that the thread is terminated
-    itksys::SystemTools::Delay(100);
-  }
-
-  bool ToFCameraMITKPlayerDevice::IsCameraActive()
-  {
-    m_CameraActiveMutex->Lock();
-    bool ok = m_CameraActive;
-    m_CameraActiveMutex->Unlock();
-    return ok;
-  }
-
   void ToFCameraMITKPlayerDevice::UpdateCamera()
   {
     m_Controller->UpdateCamera();

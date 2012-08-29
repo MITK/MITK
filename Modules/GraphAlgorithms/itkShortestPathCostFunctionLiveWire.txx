@@ -54,6 +54,7 @@ namespace itk
     double gradientX, gradientY;
     gradientX = gradientY = 0.0;
 
+    double gradientCost;
 
     /* ++++++++++++++++++++ GradientMagnitude costs ++++++++++++++++++++++++++*/
     
@@ -108,10 +109,10 @@ namespace itk
     }
 
     // iDIfference is value between 0 (good) and 1 (bad)
-    iDifference = 1 - val / 255;
+    gradientCost = 1 - val / 255;
 
     //iDifference = val;
-    iDifference *= gradientScale;
+    gradientCost *= gradientScale;
     
     //double iDifferenceSig = SigmoidFunction(iDifference,1.0,0.0,23, 70);
 
@@ -250,14 +251,27 @@ namespace itk
     /*------------------------------------------------------------------------*/
 
 
+    /*+++++++++++++++++++++ intensity difference costs +++++++++++++++++++++++++++*/
+    double a,b,intensityDifferenceCost;    
+
+    a = this->m_Image->GetPixel(p1);
+
+    b = this->m_Image->GetPixel(p2);
+    intensityDifferenceCost = abs(b-a)/255;
+
+
+    //intensityDifferenceCost = SigmoidFunction(intensityDifferenceCost,1.0,0.0,10,20);
+    /*------------------------------------------------------------------------*/
+
 
     /*+++++++++++++++++++++  local component costs +++++++++++++++++++++++++++*/
     /*weights*/
-    double w1 = 0.43;
-    double w2 = 0.43;
-    double w3 = 0.14;
+    double w1 = 0.33;
+    double w2 = 0.55;
+    double w3 = 0.12;
+    double w4 = 0.05;
 
-    double costs = w1 * laplacianCost + w2 * iDifference;// + w3 * gradientDirectionCost;
+    double costs = w1 * laplacianCost + w2 * gradientCost + w3 * intensityDifferenceCost;// + w4 * gradientDirectionCost;
 
 
     return costs;

@@ -101,6 +101,11 @@ namespace mitk {
     itkGetMacro( MedianFiberLength, float )
     itkGetMacro( LengthStDev, float )
 
+    std::vector<int> GetPointsRoi()
+    {
+      return m_PointsRoi;
+    }
+
     // copy fiber bundle
     mitk::FiberBundleX::Pointer GetDeepCopy();
 
@@ -139,7 +144,7 @@ namespace mitk {
     float m_LengthStDev;
 
 
-    std::vector<long> m_PointsRoi; // this global variable needs to be refactored
+    std::vector<int> m_PointsRoi; // this global variable needs to be refactored
 
   };
 

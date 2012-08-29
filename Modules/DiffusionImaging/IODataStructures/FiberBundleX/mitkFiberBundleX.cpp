@@ -598,10 +598,7 @@ void mitk::FiberBundleX::GenerateFiberIds()
 
 std::vector<mitk::FiberBundleX::Pointer> mitk::FiberBundleX::CutFiberBundle(mitk::PlanarFigure *pf)
 {
-
-
     std::vector<mitk::FiberBundleX::Pointer> bundles;
-
 
     // Get all fibers that do not pass the roi. these can be used directly.
     mitk::PlanarFigureComposite::Pointer PFCNot = mitk::PlanarFigureComposite::New();
@@ -1300,7 +1297,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
                 MITK_INFO << "ERROR in ExtractFiberIdSubset; impossible fiber id detected";
         }
 
-        m_PointsRoi = FibersInROI;
+        m_PointsRoi = PointsInROI;
 
     }
 

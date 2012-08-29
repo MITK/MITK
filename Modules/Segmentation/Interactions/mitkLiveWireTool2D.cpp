@@ -168,7 +168,10 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
 
   /* TODO fix this hack*/
   //set last to active added point
-  const_cast<mitk::ContourModel::VertexType*>( m_LiveWireContour->GetVertexAt(m_LiveWireContour->GetNumberOfVertices(timestep)-1, timestep) )->IsActive = true;
+  if( m_LiveWireContour->GetNumberOfVertices(timestep) > 0)
+  {
+    const_cast<mitk::ContourModel::VertexType*>( m_LiveWireContour->GetVertexAt(m_LiveWireContour->GetNumberOfVertices(timestep)-1, timestep) )->IsActive = true;
+  }
 
   //merge contours
   m_Contour->Concatenate(m_LiveWireContour, timestep);
@@ -300,7 +303,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 
   //set the livewire interactor to edit control points
   mitk::ContourModelLiveWireInteractor::Pointer interactor = mitk::ContourModelLiveWireInteractor::New(m_ContourModelNode);
-  interactor->SetWorkingImage(this->m_WorkingSlice);
+  //interactor->SetWorkingImage(this->m_WorkingSlice);
   m_ContourModelNode->SetInteractor(interactor);
 
   //add interactor to globalInteraction instance

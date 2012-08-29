@@ -108,11 +108,12 @@ namespace itk
     }
 
     // iDIfference is value between 0 (good) and 1 (bad)
-    //iDifference = 1 - val / 255;
-    iDifference = val;
+    iDifference = 1 - val / 255;
+
+    //iDifference = val;
     iDifference *= gradientScale;
     
-    double iDifferenceSig = SigmoidFunction(iDifference,1.0,0.0,23, 70);  
+    //double iDifferenceSig = SigmoidFunction(iDifference,1.0,0.0,23, 70);
 
     /* -----------------------------------------------------------------------------*/
 
@@ -183,70 +184,70 @@ namespace itk
 
 
 
-    // /* ++++++++++++++++++++ Gradient direction costs ++++++++++++++++++++++++++*/
-    ////vector q-p   i.e. p2-p1
-    //double vQP[2];
-    //vQP[0] = p2[0] - p1[0];
-    //vQP[1] = p2[1] - p1[1];
-    ////-------
+     /* ++++++++++++++++++++ Gradient direction costs ++++++++++++++++++++++++++*/
+    //vector q-p   i.e. p2-p1
+    double vQP[2];
+    vQP[0] = p2[0] - p1[0];
+    vQP[1] = p2[1] - p1[1];
+    //-------
 
-    ////vector p-q   i.e. p1-p2
-    //double vPQ[2];
-    //vPQ[0] = p1[0] - p2[0];
-    //vPQ[1] = p1[1] - p2[1];
-    ////-------
+    //vector p-q   i.e. p1-p2
+    double vPQ[2];
+    vPQ[0] = p1[0] - p2[0];
+    vPQ[1] = p1[1] - p2[1];
+    //-------
 
-    ////vector perpendicular to gradient at p1
-    //double vDp[2];
-    //vDp[0] = gradientY;//previously computed for gradient magnitude
-    //vDp[1] = -gradientX;
-    ////-------
+    //vector perpendicular to gradient at p1
+    double vDp[2];
+    vDp[0] = gradientY;//previously computed for gradient magnitude
+    vDp[1] = -gradientX;
+    //-------
 
-    ////vector perpendicular to gradient at p1
-    //double vDq[2];
-    //
-    //  // dI(x,y)/dx
-    //  IndexType x1;
-    //  x1[0] = (p2[0] == xMAX) ? (p1[0]) :( p2[0] +1);//check for pixels at the edge of the image => x==xMAX
-    //  x1[1] = p2[1];
+    //vector perpendicular to gradient at p1
+    double vDq[2];
+    
+      // dI(x,y)/dx
+      IndexType x1;
+      x1[0] = (p2[0] == xMAX) ? (p1[0]) :( p2[0] +1);//check for pixels at the edge of the image => x==xMAX
+      x1[1] = p2[1];
 
-    //  IndexType x2;
-    //  x2[0] = (p2[0] == 0) ? (0) :( p2[0] -1);//x==0
-    //  x2[1] = p2[1];
-    //  gradientX = (this->m_Image->GetPixel(x1) - this->m_Image->GetPixel(x2)) / 2;
+      IndexType x2;
+      x2[0] = (p2[0] == 0) ? (0) :( p2[0] -1);//x==0
+      x2[1] = p2[1];
+      gradientX = (this->m_Image->GetPixel(x1) - this->m_Image->GetPixel(x2)) / 2;
 
-    //  // dI(x,y)/dy
-    //  IndexType y1;
-    //  y1[0] = p2[0];
-    //  y1[1] = (p2[1] == yMAX) ? (p2[1]) :( p2[1] +1);//y==yMAX
+      // dI(x,y)/dy
+      IndexType y1;
+      y1[0] = p2[0];
+      y1[1] = (p2[1] == yMAX) ? (p2[1]) :( p2[1] +1);//y==yMAX
 
-    //  IndexType y2;
-    //  y2[0] = p2[0];
-    //  y2[1] = (p2[1] == 0) ? (0) :( p2[1] -1);//y==0
-    //  gradientY = (this->m_Image->GetPixel(y1) - this->m_Image->GetPixel(y2)) / 2;
+      IndexType y2;
+      y2[0] = p2[0];
+      y2[1] = (p2[1] == 0) ? (0) :( p2[1] -1);//y==0
+      gradientY = (this->m_Image->GetPixel(y1) - this->m_Image->GetPixel(y2)) / 2;
 
-    //vDq[0] = gradientY;
-    //vDq[1] = -gradientX;
-    ////--------
+    vDq[0] = gradientY;
+    vDq[1] = -gradientX;
+    //--------
 
-    ////birictional link between the points p1 and p2
-    //double vectorLink[2];
-    //double checkVectorDotProduct = (vDp[0] * ( p2[0] - p1[0] )) + (vDp[1] * ( p2[1] - p1[1] ));
+    //birictional link between the points p1 and p2
+    double vectorLink[2];
+    double checkVectorDotProduct = (vDp[0] * ( p2[0] - p1[0] )) + (vDp[1] * ( p2[1] - p1[1] ));
 
-    ////if < 0 vector link is p2-p1
-    //if(checkVectorDotProduct < 0)
-    //{
-    //  vectorLink[0] = vPQ[0];
-    //  vectorLink[1] = vPQ[1];
-    //}
-    //else
-    //{
-    //  vectorLink[0] = vQP[0];
-    //  vectorLink[1] = vQP[1];
-    //}
+    //if < 0 vector link is p2-p1
+    if(checkVectorDotProduct < 0)
+    {
+      vectorLink[0] = vPQ[0];
+      vectorLink[1] = vPQ[1];
+    }
+    else
+    {
+      vectorLink[0] = vQP[0];
+      vectorLink[1] = vQP[1];
+    }
 
-    //double gradientDirectionCost = (1/3.14159265) * ( acos( vDp[0]* vectorLink[0] + vDp[1]*vectorLink[1] ) + acos( vDq[0]* vectorLink[0] + vDq[1]*vectorLink[1] ) );
-    //*------------------------------------------------------------------------*/
+    double gradientDirectionCost = (1/3.14159265) * ( acos( vDp[0]* vectorLink[0] + vDp[1]*vectorLink[1] ) + acos( vDq[0]* vectorLink[0] + vDq[1]*vectorLink[1] ) );
+    /*------------------------------------------------------------------------*/
 
 
 
@@ -313,7 +314,7 @@ namespace itk
     endValue= this->m_Image->GetPixel(this->m_EndIndex);  
 
     // set minCosts
-    minCosts = 0.001; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs everything is fine. If estimation is higher than actual costs, you might not get the shortest but a different path.
+    minCosts = 0.0; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs everything is fine. If estimation is higher than actual costs, you might not get the shortest but a different path.
   }
 
 

@@ -33,7 +33,8 @@ int mitkToFImageWriterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(tofWriter->GetIntensityImageFileName()== "", "Test initialization of member intnensityImageFileName!");
   MITK_TEST_CONDITION_REQUIRED(tofWriter->GetDistanceImageSelected(), "Test initialization of member distanceImageSelected!");
   MITK_TEST_CONDITION_REQUIRED(tofWriter->GetAmplitudeImageSelected(), "Test initialization of member amplitudeImageSelected!");
-  MITK_TEST_CONDITION_REQUIRED(tofWriter->GetIntensityImageSelected(), "Test initialization of member intnensityImageSelected!");
+  MITK_TEST_CONDITION_REQUIRED(tofWriter->GetIntensityImageSelected(), "Test initialization of member intensityImageSelected!");
+  MITK_TEST_CONDITION_REQUIRED(tofWriter->GetRGBImageSelected(), "Test initialization of member rgbImageSelected!");
   MITK_TEST_CONDITION_REQUIRED(tofWriter->GetCaptureWidth()== 200, "Test initialization of member captureWidth!");
   MITK_TEST_CONDITION_REQUIRED(tofWriter->GetCaptureHeight()== 200, "Test initialization of member captureHeight!");
   MITK_TEST_CONDITION_REQUIRED(tofWriter->GetToFImageType()== mitk::ToFImageWriter::ToFImageType3D, "Test initialization of member ToFImageType!");
@@ -44,30 +45,36 @@ int mitkToFImageWriterTest(int /* argc */, char* /*argv*/[])
   std::string distanceImageFileName("distImg.pic");
   std::string amplitudeImageFileName("amplImg.pic");
   std::string intensityImageFileName("intImg.pic");
+  std::string rgbImageFileName("rgbImg.pic");
   std::string fileExtension(".test");
   bool distanceImageSelected = false;
   bool amplitudeImageSelected = false;
   bool intensityImageSelected = false;
+  bool rgbImageSelected = false;
   
   tofWriter->SetCaptureWidth(dimX);
   tofWriter->SetCaptureHeight(dimY);
   tofWriter->SetDistanceImageFileName(distanceImageFileName);
   tofWriter->SetAmplitudeImageFileName(amplitudeImageFileName);
   tofWriter->SetIntensityImageFileName(intensityImageFileName);
+  tofWriter->SetRGBImageFileName(rgbImageFileName);
   tofWriter->SetExtension(fileExtension);
   tofWriter->SetDistanceImageSelected(distanceImageSelected);
   tofWriter->SetAmplitudeImageSelected(amplitudeImageSelected);
   tofWriter->SetIntensityImageSelected(intensityImageSelected);
+  tofWriter->SetRGBImageSelected(rgbImageSelected);
   tofWriter->SetToFImageType(mitk::ToFImageWriter::ToFImageType2DPlusT);
 
   MITK_TEST_CONDITION_REQUIRED(distanceImageFileName==tofWriter->GetDistanceImageFileName(), "Testing set/get distance image file name");
   MITK_TEST_CONDITION_REQUIRED(amplitudeImageFileName==tofWriter->GetAmplitudeImageFileName(), "Testing set/get amplitude image file name");
   MITK_TEST_CONDITION_REQUIRED(intensityImageFileName==tofWriter->GetIntensityImageFileName(), "Testing set/get intensity image file name");
+  MITK_TEST_CONDITION_REQUIRED(rgbImageFileName==tofWriter->GetRGBImageFileName(), "Testing set/get rgb image file name");
   MITK_TEST_CONDITION_REQUIRED(dimX==tofWriter->GetCaptureWidth(), "Testing set/get CaptureWidth");
   MITK_TEST_CONDITION_REQUIRED(dimY==tofWriter->GetCaptureHeight(), "Testing set/get CaptureHeight");
   MITK_TEST_CONDITION_REQUIRED(distanceImageSelected==tofWriter->GetDistanceImageSelected(), "Testing set/get distance image selection");
   MITK_TEST_CONDITION_REQUIRED(amplitudeImageSelected==tofWriter->GetAmplitudeImageSelected(), "Testing set/get amplitude image selection");
   MITK_TEST_CONDITION_REQUIRED(intensityImageSelected==tofWriter->GetIntensityImageSelected(), "Testing set/get intensity image selection");
+  MITK_TEST_CONDITION_REQUIRED(rgbImageSelected==tofWriter->GetRGBImageSelected(), "Testing set/get rgb image selection");
   MITK_TEST_CONDITION_REQUIRED(fileExtension==tofWriter->GetExtension(), "Testing set/get file extension");
   MITK_TEST_CONDITION_REQUIRED(mitk::ToFImageWriter::ToFImageType2DPlusT==tofWriter->GetToFImageType(), "Testing set/get ToFImageType");
 

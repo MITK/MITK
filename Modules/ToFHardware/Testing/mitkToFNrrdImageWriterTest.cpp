@@ -56,6 +56,7 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
   tofNrrdWriter->SetCaptureWidth(dimX);
   tofNrrdWriter->SetCaptureHeight(dimY);
   tofNrrdWriter->SetToFImageType(mitk::ToFNrrdImageWriter::ToFImageType3D);
+  tofNrrdWriter->SetRGBImageSelected(false);
 
   //buffer for each slice
   float* distanceArray;

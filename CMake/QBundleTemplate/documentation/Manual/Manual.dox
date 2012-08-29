@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{@PLUGIN_ID@} @PLUGIN_NAME@
+\page @PLUGIN_ID@ @PLUGIN_NAME@
 
 \image html icon.png "Icon of @PLUGIN_NAME@"
 

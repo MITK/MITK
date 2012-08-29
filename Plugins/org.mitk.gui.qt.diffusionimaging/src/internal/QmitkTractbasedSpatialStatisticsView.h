@@ -153,7 +153,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
 
-    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, int index=-1);
+    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL, int index=-1);
 
     void InitPointsets();
 

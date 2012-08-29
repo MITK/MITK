@@ -116,11 +116,16 @@ struct TbssSelListener : ISelectionListener
       bool found3dImage = false;
       bool found4dImage = false;
       bool foundFiberBundle = false;
+      bool foundStartRoi = false;
+      bool foundEndRoi = false;
 
       mitk::TbssRoiImage* roiImage;
       mitk::TbssImage* image;
       mitk::Image* img;
       mitk::FiberBundleX* fib;
+      mitk::PlanarFigure* start;
+      mitk::PlanarFigure* end;
+
 
 
       // iterate selection
@@ -167,6 +172,22 @@ struct TbssSelListener : ISelectionListener
               fib = static_cast<mitk::FiberBundleX*>(nodeData);
               m_View->m_CurrentFiberNode = node;
             }
+
+
+            std::string name = nodeData->GetNameOfClass();
+            if(QString("PlanarCircle").compare(nodeData->GetNameOfClass())==0)
+            {
+              if(!foundStartRoi)
+              {
+                start = dynamic_cast<mitk::PlanarFigure*>(nodeData);
+                foundStartRoi =  true;
+              }
+              else
+              {
+                end = dynamic_cast<mitk::PlanarFigure*>(nodeData);
+                foundEndRoi = true;
+              }
+            }
           } // end CHECK nodeData != NULL
 
         }
@@ -176,19 +197,25 @@ struct TbssSelListener : ISelectionListener
       m_View->m_Controls->m_CreateRoi->setEnabled(found3dImage);
       m_View->m_Controls->m_ImportFsl->setEnabled(found4dImage);
 
-      if(found3dImage)
-      {
-        m_View->InitPointsets();
-      }
+
 
       if(foundTbss && foundTbssRoi)
       {
         m_View->Plot(image, roiImage);
       }
 
-      if(found3dImage == true && foundFiberBundle)
+      if(found3dImage == true && foundFiberBundle && foundStartRoi && foundEndRoi)
+      {
+        m_View->PlotFiberBundle(fib, img, start, end);
+      }
+      else if(found3dImage == true && foundFiberBundle)
       {
         m_View->PlotFiberBundle(fib, img);        
+      }
+
+      if(found3dImage)
+      {
+        m_View->InitPointsets();
       }
 
     }
@@ -392,7 +419,7 @@ void QmitkTractbasedSpatialStatisticsView::Replot(int index)
 
   if(m_CanReplot)
   {
-    PlotFiberBundle(fib, img, index);
+    PlotFiberBundle(fib, img, NULL, NULL, index);
 
     mitk::IntProperty::Pointer selectedFiberProp = mitk::IntProperty::New(index-1);
 
@@ -1225,56 +1252,163 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
 
 
-void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img, int index)
-{     
+void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img,
+                                                           mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, int index)
+{
 
-  m_Fib = fib;
   m_CurrentGeometry = fib->GetGeometry();
-
-  int num = fib->GetNumFibers();
-  std::cout << "number of fibers: " << num << std::endl;
-
-
-  vtkSmartPointer<vtkPolyData> fiberPolyData = fib->GetFiberPolyData();
-
-  vtkCellArray* lines = fiberPolyData->GetLines();
-  lines->InitTraversal();
-
-  int lineSize = lines->GetSize();
-  std::cout << "line size: " << lineSize << std::cout;
-
   typedef itk::Point<float,3>               PointType;
   typedef std::vector< PointType>           TractType;
   typedef std::vector< TractType > TractContainerType;
 
-
   TractContainerType tracts;
 
-  for( int fiberID( 0 ); fiberID < num; fiberID++ )
+  if(startRoi != NULL && endRoi != NULL)
   {
-    vtkIdType   numPointsInCell(0);
-    vtkIdType*  pointsInCell(NULL);
-    lines->GetNextCell ( numPointsInCell, pointsInCell );
+    // Plot using ROIs
 
-    TractType singleTract;
-    for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
+    mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
+    std::vector<int> pointsInStart = fib->GetPointsRoi();
+
+    for(int i=0; i<pointsInStart.size(); i++)
+        std::cout << pointsInStart[i] << std::endl;
+
+    mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
+    std::vector<int> pointsInEnd = inStart->GetPointsRoi();
+
+
+    int num = inBoth->GetNumFibers();
+
+    vtkSmartPointer<vtkPolyData> fiberPolyData = inBoth->GetFiberPolyData();
+    vtkCellArray* lines = fiberPolyData->GetLines();
+    lines->InitTraversal();
+
+
+    // Now find out for each fiber which ROI is encountered first. If this is the startRoi, the direction is ok
+    // Otherwise the plot should be in the reverse direction
+    for( int fiberID( 0 ); fiberID < num; fiberID++ )
     {
-      // push back point
-      double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
-      PointType point;
-      point[0] = p[0];
-      point[1] = p[1];
-      point[2] = p[2];
+      vtkIdType   numPointsInCell(0);
+      vtkIdType*  pointsInCell(NULL);
+      lines->GetNextCell ( numPointsInCell, pointsInCell );
 
-      singleTract.push_back( point );
+      int startId = 0;
+      int endId = 0;
+      bool foundStart = false;
+      bool foundEnd = false;
+
+      for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
+      {
+
+        int id = pointsInCell[pointInCellID];
+
+
+        bool isPresent = (std::find(pointsInStart.begin(), pointsInStart.end(), id) != pointsInStart.end());
+
+        if(isPresent)
+        {
+          startId = pointInCellID;
+          foundStart = true;
+        }
+
+        isPresent = (std::find(pointsInEnd.begin(), pointsInEnd.end(), id) != pointsInEnd.end());
+        if(isPresent)
+        {
+          endId = pointInCellID;
+          foundEnd = true;
+        }
+
+        if(foundStart && foundEnd)
+          continue;
+
+      }
+
+      /* We found the start and end points of of the part that should be plottet for
+         the current fiber. now we need to plot them. If the endId is smaller than the startId the plot order
+         must be reversed*/
+
+      TractType singleTract;
+      PointType point;
+
+      if(startId < endId)
+      {
+        for( int pointInCellID( startId ); pointInCellID < endId ; pointInCellID++)
+        {
+          // push back point
+          double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+
+          point[0] = p[0];
+          point[1] = p[1];
+          point[2] = p[2];
+
+          singleTract.push_back( point );
+
+        }
+      }
+      else{
+        for( int pointInCellID( endId ); pointInCellID < startId ; pointInCellID++)
+        {
+          // push back point
+          double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+
+          point[0] = p[0];
+          point[1] = p[1];
+          point[2] = p[2];
+
+          singleTract.push_back( point );
+
+        }
+
+      }
+
+
+      tracts.push_back(singleTract);
 
     }
 
-    tracts.push_back(singleTract);
+
+
   }
+  else{
+    // Just plot everything
+     // m_Fib = fib;
+      int num = fib->GetNumFibers();
+      std::cout << "number of fibers: " << num << std::endl;
+
+      vtkSmartPointer<vtkPolyData> fiberPolyData = fib->GetFiberPolyData();
+
+      vtkCellArray* lines = fiberPolyData->GetLines();
+      lines->InitTraversal();
+
+      int lineSize = lines->GetSize();
+      std::cout << "line size: " << lineSize << std::cout;
 
 
+      for( int fiberID( 0 ); fiberID < num; fiberID++ )
+      {
+        vtkIdType   numPointsInCell(0);
+        vtkIdType*  pointsInCell(NULL);
+        lines->GetNextCell ( numPointsInCell, pointsInCell );
 
+        TractType singleTract;
+        for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
+        {
+          // push back point
+          double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+          PointType point;
+          point[0] = p[0];
+          point[1] = p[1];
+          point[2] = p[2];
+
+          singleTract.push_back( point );
+
+        }
+
+        tracts.push_back(singleTract);
+      }
+
+
+  }
 
   // pass index to the plot widget so it can get a separate color
   // needs index-1 because the first entry in the list should paint all fibers the same
@@ -1310,6 +1444,7 @@ void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *f
 
 
   m_CanReplot = true;
+
 
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 

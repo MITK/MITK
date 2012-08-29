@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
-    <height>374</height>
+    <width>364</width>
+    <height>375</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -21,7 +21,77 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="m_VBoxLayout"/>
+    <widget class="QToolBox" name="m_ToolBox">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="page_6">
+      <attribute name="label">
+       <string>Configuration</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QmitkNDIConfigurationWidget" name="m_NDIConfigWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>414</width>
+        <height>85</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>Initial Registration</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QmitkFiducialRegistrationWidget" name="m_RegistrationWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="m_PermanentRegistrationToolSelectionWidgetPage">
+      <attribute name="label">
+       <string>Permanent Registration</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QmitkToolSelectionWidget" name="m_PermanentRegistrationToolSelectionWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="m_PointSetRecordingPage">
+      <attribute name="label">
+       <string>PointSet Recording</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <layout class="QVBoxLayout" name="m_PointSetRecordingLayout"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_5">
+      <attribute name="label">
+       <string>Virtual Camera</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QmitkToolSelectionWidget" name="m_VirtualViewToolSelectionWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkToolTrackingStatusWidget" name="m_ToolStatusWidget" native="true">
+     <zorder>m_RenderingTimerWidget</zorder>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkUpdateTimerWidget" name="m_RenderingTimerWidget" native="true"/>
    </item>
    <item>
     <spacer name="spacer1">
@@ -42,6 +112,38 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkFiducialRegistrationWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkFiducialRegistrationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkNDIConfigurationWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkNDIConfigurationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkToolSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkToolSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkToolTrackingStatusWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkToolTrackingStatusWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUpdateTimerWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkUpdateTimerWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

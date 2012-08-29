@@ -77,9 +77,7 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
   
-  m_ToolBox = new QToolBox(parent);
-  m_Controls.m_VBoxLayout->addWidget(m_ToolBox);
-
+  m_ToolBox = m_Controls.m_ToolBox;
 
   this->CreateBundleWidgets( parent );
   this->CreateConnections();
@@ -88,46 +86,35 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
 
 void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
 {
-    // configuration widget
-  m_NDIConfigWidget = new QmitkNDIConfigurationWidget(parent);
+  //initialize configuration widget
+  m_NDIConfigWidget = m_Controls.m_NDIConfigWidget;
   m_NDIConfigWidget->SetToolTypes(QStringList () << "Instrument" << "Fiducial" << "Skinmarker" << "Unknown" );
 
-  m_ToolBox->addItem(m_NDIConfigWidget, "Configuration");
-
-
-  // registration widget
-  m_RegistrationWidget = new QmitkFiducialRegistrationWidget(parent);
+  //initialize registration widget
+  m_RegistrationWidget = m_Controls.m_RegistrationWidget;
   m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
   m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
   m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
 
-  m_ToolBox->addItem(m_RegistrationWidget, "Initial Registration");
-
-  // permanent registration widget
-  m_PermanentRegistrationToolSelectionWidget = new QmitkToolSelectionWidget(parent);
+  //initialize permanent registration widget
+  m_PermanentRegistrationToolSelectionWidget = m_Controls.m_PermanentRegistrationToolSelectionWidget;
   m_PermanentRegistrationToolSelectionWidget->SetCheckboxtText("Use this tool for permanent registration");
 
-  m_ToolBox->addItem(m_PermanentRegistrationToolSelectionWidget, "Permanent Registration");
+  
+  //create widget for pointset recording
+  m_Controls.m_PointSetRecordingLayout->addWidget(this->CreatePointSetRecordingWidget(parent));
 
-  // pointset recording
-  m_ToolBox->addItem(this->CreatePointSetRecordingWidget(parent), "PointSet Recording");
-
-  // virtual view
-  m_VirtualViewToolSelectionWidget = new QmitkToolSelectionWidget(parent);
+  //initialize virtual view tab
+  m_VirtualViewToolSelectionWidget = m_Controls.m_VirtualViewToolSelectionWidget;
   m_VirtualViewToolSelectionWidget->SetCheckboxtText("Enable Virtual Camera");
 
-  m_ToolBox->addItem(m_VirtualViewToolSelectionWidget, "Virtual Camera");
-
-  // tracking status
-  m_ToolStatusWidget = new QmitkToolTrackingStatusWidget( parent );
-  m_Controls.m_VBoxLayout->addWidget(m_ToolStatusWidget);
-
-  // update timer
-  m_RenderingTimerWidget = new QmitkUpdateTimerWidget( parent );
+  //initialize tracking status widget
+  m_ToolStatusWidget = m_Controls.m_ToolStatusWidget;
+  
+  //initialize update timer
+  m_RenderingTimerWidget = m_Controls.m_RenderingTimerWidget;
   m_RenderingTimerWidget->SetPurposeLabelText(QString("Navigation"));
   m_RenderingTimerWidget->SetTimerInterval( 50 );  // set rendering timer at 20Hz (updating every 50msec)
-
-  m_Controls.m_VBoxLayout->addWidget(m_RenderingTimerWidget);
 }
 
 
@@ -395,7 +382,7 @@ void QmitkIGTTrackingLabView::OnTrackerDisconnected()
 
 
 mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateInstrumentVisualization(mitk::DataStorage* ds, const char* toolName)
-{	  
+{    
     //const char* toolName = tracker->GetTool(i)->GetToolName();
     mitk::DataNode::Pointer toolRepresentationNode;
     toolRepresentationNode = ds->GetNamedNode(toolName); // check if node with same name already exists

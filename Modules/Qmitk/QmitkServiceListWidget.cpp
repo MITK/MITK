@@ -159,6 +159,7 @@ QListWidgetItem* QmitkServiceListWidget::AddServiceToList(mitk::ServiceReference
 
   // Add new item to QListWidget
   m_Controls->m_ServiceList->addItem(newItem);
+  m_Controls->m_ServiceList->sortItems();
   // Construct link and add to internal List for reference
   QmitkServiceListWidget::ServiceListLink link;
   link.service = serviceRef;

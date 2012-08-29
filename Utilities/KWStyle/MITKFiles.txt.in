@@ -338,8 +338,8 @@
 @MITK_SOURCE_DIR@/Modules/Bundles/org.mitk.diffusionimaging/src/*.h
 @MITK_SOURCE_DIR@/Modules/Bundles/org.mitk.diffusionimaging/src/internal/*.cpp
 @MITK_SOURCE_DIR@/Modules/Bundles/org.mitk.diffusionimaging/src/internal/*.h
-@MITK_SOURCE_DIR@/Applications/ExtApp/*.cpp
-@MITK_SOURCE_DIR@/Applications/ExtApp/*.h
+@MITK_SOURCE_DIR@/Applications/mitkWorkbench/*.cpp
+@MITK_SOURCE_DIR@/Applications/mitkWorkbench/*.h
 @MITK_SOURCE_DIR@/Applications/Tutorial/*.cpp
 @MITK_SOURCE_DIR@/Applications/Tutorial/*.h
 @MITK_SOURCE_DIR@/Applications/CoreApp/*.cpp

@@ -35,9 +35,7 @@ namespace mitk
   \ingroup Interaction
   \ingroup ToolManagerEtAl
 
-  \warning Only to be instantiated by mitk::ToolManager.
 
-  $Author$
 */
 class Segmentation_EXPORT ContourModelInteractor : public Interactor
 {

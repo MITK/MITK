@@ -159,15 +159,8 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(tofImageRecorder->GetRecordMode() == mitk::ToFImageRecorder::PerFrames, "Testing Set/GetRecordMode()");
   tofImageRecorder->SetNumOfFrames(20);
   MITK_TEST_CONDITION_REQUIRED(tofImageRecorder->GetNumOfFrames() == 20, "Testing Set/GetNumOfFrames()");
-  tofImageRecorder->SetFileFormat(".pic");
-  MITK_TEST_CONDITION_REQUIRED(tofImageRecorder->GetFileFormat() == ".pic", "Testing Set/GetFileFormat()");
-
-  MITK_TEST_OUTPUT(<< "Test StartRecording() with wrong file format");
-  MITK_TEST_FOR_EXCEPTION_BEGIN(std::logic_error);
-  tofImageRecorder->StartRecording();
-  MITK_TEST_FOR_EXCEPTION_END(std::logic_error);
-  MITK_TEST_OUTPUT(<< "Test StartRecording() with correct file format");
   tofImageRecorder->SetFileFormat(".nrrd");
+  MITK_TEST_OUTPUT(<< "Test StartRecording()");
   tofImageRecorder->StartRecording();
   tofImageRecorder->WaitForThreadBeingTerminated(); // wait to allow recording
   MITK_TEST_OUTPUT(<< "Test StopRecording()");

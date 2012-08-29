@@ -278,7 +278,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   //int view = this->GetRenderWindow1()->GetSliceNavigationController()->GetDefaultViewDirection();
   //QString layoutName;
   //if( view == mitk::SliceNavigationController::Transversal )
-  //  layoutName = "Transversal";
+  //  layoutName = "Transverse";
   //else if( view == mitk::SliceNavigationController::Sagittal )
   //  layoutName = "Sagittal";
   //else if( view == mitk::SliceNavigationController::Frontal )
@@ -290,7 +290,7 @@ void QmitkStdMultiWidget::InitializeWidget()
 
   //Render Window 1 == transversal
   m_CornerAnnotaions[0].cornerText = vtkCornerAnnotation::New();
-  m_CornerAnnotaions[0].cornerText->SetText(0, "Transversal");
+  m_CornerAnnotaions[0].cornerText->SetText(0, "Transverse");
   m_CornerAnnotaions[0].cornerText->SetMaximumFontSize(12);
   m_CornerAnnotaions[0].textProp = vtkTextProperty::New();
   m_CornerAnnotaions[0].textProp->SetColor( 1.0, 0.0, 0.0 );

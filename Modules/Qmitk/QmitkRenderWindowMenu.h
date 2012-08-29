@@ -178,7 +178,7 @@ protected slots:
   /*! Slot for changing layout to Big 3D layout. The slot is connected to the triggered() signal of m_Big3DLayoutAction. */
   void OnChangeLayoutToBig3D(bool);
 
-  /*! Slot for changing layout design to Transversal plane layout. The slot is connected to the triggered() signal of m_Widget1LayoutAction. */
+  /*! Slot for changing layout design to Transverse plane layout. The slot is connected to the triggered() signal of m_Widget1LayoutAction. */
   void OnChangeLayoutToWidget1(bool);
 
   /*! Slot for changing layout design to Sagittal plane layout. The slot is connected to the triggered() signal of m_Widget2LayoutAction. */
@@ -196,10 +196,10 @@ protected slots:
   /*! Slot for changing layout design to Sagittal top, Coronal n 3D bottom layout. The slot is connected to the triggered() signal of m_SmallUpperWidget2Big3and4LayoutAction. */
   void OnChangeLayoutToSmallUpperWidget2Big3and4(bool);
 
-  /*! Slot for changing layout design to Transversal n Sagittal left, 3D right layout. The slot is connected to the triggered() signal of m_2x2Dand3DWidgetLayoutAction. */
+  /*! Slot for changing layout design to Transverse n Sagittal left, 3D right layout. The slot is connected to the triggered() signal of m_2x2Dand3DWidgetLayoutAction. */
   void OnChangeLayoutTo2x2Dand3DWidget(bool);
 
-  /*! Slot for changing layout design to Transversal n 3D left, Sagittal right layout. The slot is connected to the triggered() signal of m_Left2Dand3DRight2DLayoutAction. */
+  /*! Slot for changing layout design to Transverse n 3D left, Sagittal right layout. The slot is connected to the triggered() signal of m_Left2Dand3DRight2DLayoutAction. */
   void OnChangeLayoutToLeft2Dand3DRight2D(bool);
   
   void OnCrossHairMenuAboutToShow();

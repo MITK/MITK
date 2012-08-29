@@ -52,7 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::map<QAction*, unsigned int> QmitkSlicesInterpolator::createActionToSliceDimension()
 {
   std::map<QAction*, unsigned int> actionToSliceDimension;
-  actionToSliceDimension[new QAction("Transversal (red window)", 0)] = 2;
+  actionToSliceDimension[new QAction("Transverse (red window)", 0)] = 2;
   actionToSliceDimension[new QAction("Sagittal (green window)", 0)] = 0;
   actionToSliceDimension[new QAction("Coronal (blue window)", 0)] = 1;
   return actionToSliceDimension;

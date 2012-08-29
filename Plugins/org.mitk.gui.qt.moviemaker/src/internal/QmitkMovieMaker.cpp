@@ -580,8 +580,8 @@ void QmitkMovieMaker::CreateQtPartControl(QWidget *parent)
       QString name(mitk::BaseRenderer::GetInstance((*iter))->GetName());
       if (name=="stdmulti.widget1")
       {
-        m_Controls->cmbSelectedStepperWindow->insertItem(i, "Transversal");
-        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "Transversal");
+        m_Controls->cmbSelectedStepperWindow->insertItem(i, "Transverse");
+        m_Controls->cmbSelectedRecordingWindow->insertItem(i++, "Transverse");
       }
       else if (name=="stdmulti.widget2")
       {

@@ -55,11 +55,11 @@ namespace mitk
     /*!
     \brief stops the continuous updating of the camera
     */
-    virtual void StopCamera() = 0;
+    virtual void StopCamera();
     /*!
     \brief returns true if the camera is connected and started
     */
-    virtual bool IsCameraActive() = 0;
+    virtual bool IsCameraActive();
     /*!
     \brief updates the camera for image acquisition
     */

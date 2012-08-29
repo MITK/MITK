@@ -59,17 +59,9 @@ namespace mitk
     */
     virtual void StartCamera();
     /*!
-    \brief stops the continuous updating of the camera
-    */
-    virtual void StopCamera();
-    /*!
-    \brief updates the camera for image acquisition
+    \brief updated the controller hold by this device
     */
     virtual void UpdateCamera();
-    /*!
-    \brief returns whether the camera is currently active or not
-    */
-    virtual bool IsCameraActive();
     /*!
     \brief gets the amplitude data from the ToF camera as the strength of the active illumination of every pixel. Caution! The user is responsible for allocating and deleting the images.
     These values can be used to determine the quality of the distance values. The higher the amplitude value, the higher the accuracy of the according distance value

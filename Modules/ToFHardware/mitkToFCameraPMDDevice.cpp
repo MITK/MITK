@@ -97,29 +97,7 @@ namespace mitk
       MITK_INFO<<"Camera not connected";
     }
   }
-
-  void ToFCameraPMDDevice::StopCamera()
-  {
-    m_CameraActiveMutex->Lock();
-    m_CameraActive = false;
-    m_CameraActiveMutex->Unlock();
-    itksys::SystemTools::Delay(100);
-    if (m_MultiThreader.IsNotNull())
-    {
-      m_MultiThreader->TerminateThread(m_ThreadID);
-    }
-    // wait a little to make sure that the thread is terminated
-    itksys::SystemTools::Delay(10);
-  }
-
-  bool ToFCameraPMDDevice::IsCameraActive()
-  {
-    m_CameraActiveMutex->Lock();
-    bool ok = m_CameraActive;
-    m_CameraActiveMutex->Unlock();
-    return ok;
-  }
-
+  
   void ToFCameraPMDDevice::UpdateCamera()
   {
     if (m_Controller)

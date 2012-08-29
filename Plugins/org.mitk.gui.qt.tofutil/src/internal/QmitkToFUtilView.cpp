@@ -503,6 +503,7 @@ void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
     {
       this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
     }
+  }
 }
 
 void QmitkToFUtilView::OnChangeCoronalWindowOutput(int index)

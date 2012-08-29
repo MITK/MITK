@@ -71,7 +71,6 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
 
 void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
   m_Active = false;
-  MITK_INFO << "NewDeviceWidget: ClickedDone()";
   
   // Assemble Metadata
   mitk::USImageMetadata::Pointer metadata = mitk::USImageMetadata::New();
@@ -112,9 +111,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
 void QmitkUSNewVideoDeviceWidget::OnClickedCancel(){
   m_TargetDevice = 0;
   m_Active = false;
-   MITK_INFO << "NewDeviceWidget: OnClickedCancel()";
   emit Finished();
-
 }
 
 void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection(){
@@ -134,7 +131,6 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
     // TODO Alert if bad path
     mitkThrow() << "NewVideoDevcieWidget recieved an incompatible Device Type to edit. Devicetype was: " << device->GetDeviceClass();
   }
-  MITK_INFO << "NewDeviceWidget: EditDevice()";
   m_TargetDevice = static_cast<mitk::USVideoDevice*> (device.GetPointer());
   m_Active = true;
 }
@@ -142,7 +138,6 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 
 void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 {
-  MITK_INFO << "NewDeviceWidget: CreateNewDevice()";
   m_TargetDevice = 0;
   InitFields(mitk::USImageMetadata::New());
   m_Active = true;

@@ -90,7 +90,6 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 
 void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
 {
-  MITK_INFO << "Activated Device";
   mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_ConnectedDevices->currentItem());
   if (device.IsNull()) return;
   if (device->GetIsActive()) device->Deactivate();
@@ -98,7 +97,6 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
 }
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
-  MITK_INFO << "Disconnected Device";
   mitk::USDevice::Pointer device = this->GetDeviceForListItem(this->m_Controls->m_ConnectedDevices->currentItem());
   if (device.IsNull()) return;
   device->Disconnect();

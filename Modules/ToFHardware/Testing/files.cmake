@@ -19,10 +19,10 @@ set(MODULE_TESTS
   mitkToFCameraPMDPlayerDeviceTest.cpp
   mitkToFImageCsvWriterTest.cpp
   mitkToFImageGrabberTest.cpp
-  mitkToFImageRecorderTest.cpp
-  #mitkToFImageRecorderFilterTest.cpp
+#  mitkToFImageRecorderTest.cpp
+  mitkToFImageRecorderFilterTest.cpp
   mitkToFImageWriterTest.cpp
-  #mitkToFNrrdImageWriterTest.cpp
+  mitkToFNrrdImageWriterTest.cpp
   mitkToFOpenCVImageGrabberTest.cpp
   mitkKinectControllerTest.cpp
   mitkKinectDeviceTest.cpp

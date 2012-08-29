@@ -168,7 +168,7 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_Big3DLayoutAction = new QAction( "Big 3D", m_Settings );
   m_Big3DLayoutAction->setDisabled( false );
 
-  m_Widget1LayoutAction = new QAction( "Transversal plane", m_Settings );
+  m_Widget1LayoutAction = new QAction( "Transverse plane", m_Settings );
   m_Widget1LayoutAction->setDisabled( false );
 
   m_Widget2LayoutAction = new QAction( "Sagittal plane", m_Settings );
@@ -186,10 +186,10 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_SmallUpperWidget2Big3and4LayoutAction = new QAction( "Sagittal top, Coronal n 3D bottom", m_Settings );
   m_SmallUpperWidget2Big3and4LayoutAction->setDisabled( false );
 
-  m_2x2Dand3DWidgetLayoutAction = new QAction( "Transversal n Sagittal left, 3D right", m_Settings );
+  m_2x2Dand3DWidgetLayoutAction = new QAction( "Transverse n Sagittal left, 3D right", m_Settings );
   m_2x2Dand3DWidgetLayoutAction->setDisabled( false );
 
-  m_Left2Dand3DRight2DLayoutAction = new QAction( "Transversal n 3D left, Sagittal right", m_Settings );
+  m_Left2Dand3DRight2DLayoutAction = new QAction( "Transverse n 3D left, Sagittal right", m_Settings );
   m_Left2Dand3DRight2DLayoutAction->setDisabled( false );
 
   m_Settings->addAction(m_DefaultLayoutAction);

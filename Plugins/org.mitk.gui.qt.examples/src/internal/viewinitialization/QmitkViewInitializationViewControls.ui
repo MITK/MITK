@@ -63,7 +63,7 @@
       <item>
        <widget class="QRadioButton" name="rbTransversal" >
         <property name="text" >
-         <string>transversal</string>
+         <string>transverse</string>
         </property>
         <property name="checked" >
          <bool>true</bool>

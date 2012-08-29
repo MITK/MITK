@@ -178,7 +178,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     * \brief Draws the contour of the fixed image according to a threshold
     * @param show if true, then images will be shown in red and green
     */
-    void ShowContour(int threshold);
+    void ShowContour();
 
     /*!
     * \brief Stores whether the contour of the fixed image will be shhown

@@ -251,7 +251,7 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect(m_Controls.m_UseMovingImageMask, SIGNAL(toggled(bool)), this, SLOT(UseMovingMaskImageChecked(bool)));
   connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(valueChanged(int)), this, SLOT(OpacityUpdate(int)));
-  connect(m_Controls.m_ContourSlider, SIGNAL(valueChanged(int)), this, SLOT(ShowContour(int)));
+  connect(m_Controls.m_ContourSlider, SIGNAL(sliderReleased()), this, SLOT(ShowContour()));
 
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
   connect(m_Controls.m_UndoTransformation,SIGNAL(clicked()),this,SLOT(UndoTransformation()));
@@ -463,6 +463,7 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImag
     // Set slider to a default value
     int avg = (min+max) / 2;
     m_Controls.m_ContourSlider->setSliderPosition(avg);
+    m_Controls.m_ThresholdLabel->setText(QString::number(avg));
 
   }
   else
@@ -668,7 +669,7 @@ void QmitkRigidRegistrationView::ShowRedGreen(bool redGreen)
 void QmitkRigidRegistrationView::EnableContour(bool show)
 {
   if(show)
-    ShowContour(m_Controls.m_ContourSlider->value());
+    ShowContour();
 
   // Can happen when the m_ContourHelperNode was deleted before and now the show contour checkbox is turned off
   if(m_ContourHelperNode.IsNull())
@@ -681,13 +682,18 @@ void QmitkRigidRegistrationView::EnableContour(bool show)
 
 }
 
-void QmitkRigidRegistrationView::ShowContour(int threshold)
+void QmitkRigidRegistrationView::ShowContour()
 {
+  int threshold = m_Controls.m_ContourSlider->value();
+
   bool show = m_Controls.m_ShowContour->isChecked();
 
   if(m_FixedNode.IsNull() || !show)
     return;
 
+
+  // Update the label next to the slider
+  m_Controls.m_ThresholdLabel->setText(QString::number(threshold));
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
 
@@ -1396,7 +1402,7 @@ void QmitkRigidRegistrationView::SwitchImages()
   {
 
     // Update the contour
-    ShowContour(m_Controls.m_ContourSlider->value());
+    ShowContour();
 
 
   }

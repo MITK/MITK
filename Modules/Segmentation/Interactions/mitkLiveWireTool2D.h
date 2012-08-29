@@ -57,22 +57,22 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     virtual void Activated();
     virtual void Deactivated();
     
-    //initialize tool
+    /// \brief Initialize tool
     virtual bool OnInitLiveWire (Action*, const StateEvent*);
 
-    //add a control point and finish current segment
+    /// \brief Add a control point and finish current segment
     virtual bool OnAddPoint   (Action*, const StateEvent*);
 
-    // actual LiveWire computation
+    /// \breif Actual LiveWire computation
     virtual bool OnMouseMoved(Action*, const StateEvent*);
 
-    //check double click on first control point to finish the LiveWire tool
+    /// \brief Check double click on first control point to finish the LiveWire tool
     virtual bool OnCheckPoint(Action*, const StateEvent*);
 
-    //finish LiveWire tool
+    /// \brief Finish LiveWire tool
     virtual bool OnFinish(Action*, const StateEvent*);
 
-    //close the contour
+    /// \brief Close the contour
     virtual bool OnCloseContour(Action*, const StateEvent*);
 
 

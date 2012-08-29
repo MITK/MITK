@@ -108,10 +108,11 @@ namespace itk
     }
 
     // iDIfference is value between 0 (good) and 1 (bad)
-    iDifference = 1 - val / 255;
+    //iDifference = 1 - val / 255;
+    iDifference = val;
     iDifference *= gradientScale;
     
-    // double iDifferenceSig = SigmoidFunction(iDifference,1.0,0.0,23, 70);  
+    double iDifferenceSig = SigmoidFunction(iDifference,1.0,0.0,23, 70);  
 
     /* -----------------------------------------------------------------------------*/
 
@@ -168,6 +169,7 @@ namespace itk
       laplaceImageValue = -4.0 * this->m_Image->GetPixel(p1) + up + down + right + left;
     }
 
+
     if(laplaceImageValue < 0 || laplaceImageValue > 0)
     {
       laplacianCost = 1;
@@ -181,7 +183,7 @@ namespace itk
 
 
 
-    ///* ++++++++++++++++++++ Gradient direction costs ++++++++++++++++++++++++++*/
+    // /* ++++++++++++++++++++ Gradient direction costs ++++++++++++++++++++++++++*/
     ////vector q-p   i.e. p2-p1
     //double vQP[2];
     //vQP[0] = p2[0] - p1[0];
@@ -243,8 +245,8 @@ namespace itk
     //  vectorLink[1] = vQP[1];
     //}
 
-    //double gradientDirectionCost = (1/3.14159265) * ( 1/ cos( vDp[0]* vectorLink[0] + vDp[1]*vectorLink[1] ) + 1/ cos( vDq[0]* vectorLink[0] + vDq[1]*vectorLink[1] ) );
-    ///*------------------------------------------------------------------------*/
+    //double gradientDirectionCost = (1/3.14159265) * ( acos( vDp[0]* vectorLink[0] + vDp[1]*vectorLink[1] ) + acos( vDq[0]* vectorLink[0] + vDq[1]*vectorLink[1] ) );
+    //*------------------------------------------------------------------------*/
 
 
 
@@ -311,7 +313,7 @@ namespace itk
     endValue= this->m_Image->GetPixel(this->m_EndIndex);  
 
     // set minCosts
-    minCosts = 0.3; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs everything is fine. If estimation is higher than actual costs, you might not get the shortest but a different path.
+    minCosts = 0.001; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs everything is fine. If estimation is higher than actual costs, you might not get the shortest but a different path.
   }
 
 

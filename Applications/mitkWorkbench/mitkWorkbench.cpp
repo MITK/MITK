@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 {
   // Create a QApplication instance first
   QtSafeApplication qSafeApp(argc, argv);
-  qSafeApp.setApplicationName("ExtApp");
+  qSafeApp.setApplicationName("mitkWorkbench");
   qSafeApp.setOrganizationName("DKFZ");
 
   // This function checks if an instance is already running
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
   basePath.setFileName("");
   
   Poco::Path provFile(basePath);
-  provFile.setFileName("ExtApp.provisioning");
+  provFile.setFileName("mitkWorkbench.provisioning");
 
   Poco::Path extPath(basePath);
   extPath.pushDirectory("ExtBundles");

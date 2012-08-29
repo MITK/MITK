@@ -3,8 +3,8 @@
 # allow early dependency checking
 
 option(MITK_BUILD_APP_CoreApp "Build the MITK CoreApp" OFF)
-option(MITK_BUILD_APP_ExtApp "Build the MITK ExtApp" ON)
-option(MITK_BUILD_APP_mitkDiffusion "Build MITK Diffusion executable" OFF)
+option(MITK_BUILD_APP_mitkWorkbench "Build the MITK Workbench executable" ON)
+option(MITK_BUILD_APP_mitkDiffusion "Build the MITK Diffusion executable" OFF)
 
 # This variable is fed to ctkFunctionSetupPlugins() macro in the
 # top-level MITK CMakeLists.txt file. This allows to automatically
@@ -17,6 +17,6 @@ option(MITK_BUILD_APP_mitkDiffusion "Build MITK Diffusion executable" OFF)
 
 set(MITK_APPS
   CoreApp^^MITK_BUILD_APP_CoreApp
-  ExtApp^^MITK_BUILD_APP_ExtApp
+  mitkWorkbench^^MITK_BUILD_APP_mitkWorkbench
   mitkDiffusion^^MITK_BUILD_APP_mitkDiffusion
 )

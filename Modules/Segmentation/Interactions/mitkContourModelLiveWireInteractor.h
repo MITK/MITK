@@ -36,9 +36,9 @@ namespace mitk
   \sa ContourModelInteractor
 
   \ingroup Interaction
-  \ingroup ToolManagerEtAl
 
-  \warning Only to be instantiated by mitk::ToolManager.
+
+  \warning 
 
   */
   class Segmentation_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
@@ -49,12 +49,11 @@ namespace mitk
     mitkNewMacro1Param(Self, DataNode*);
 
 
-    itkSetObjectMacro(WorkingImage, mitk::Image);
     virtual void SetWorkingImage (mitk::Image* _arg)
     { 
-      if (this->m_SetWorkingImage != _arg)
+      if (this->m_WorkingImage != _arg)
       { 
-        this->m_SetWorkingImage = _arg;
+        this->m_WorkingImage = _arg;
         this->m_LiveWireFilter->SetInput(this->m_WorkingImage);
         this->Modified(); 
       } 

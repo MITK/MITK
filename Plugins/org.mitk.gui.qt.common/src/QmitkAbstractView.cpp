@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryIBerryPreferences.h>
 #include <berryIEditorPart.h>
+#include <berryUIException.h>
 
 // CTK Includes
 #include <ctkServiceTracker.h>
@@ -366,19 +367,29 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPa
   {
     // This will create a default editor for the given input. If an editor
     // with that input is already open, the editor is brought to the front.
-    editorPart = mitk::WorkbenchUtil::OpenEditor(page, input, activate);
+    try
+    {
+      editorPart = mitk::WorkbenchUtil::OpenEditor(page, input, activate);
+    }
+    catch (const berry::PartInitException&)
+    {
+      // There is no editor registered which can handle the given input.
+    }
   }
   else if (activate || (strategies & BRING_TO_FRONT))
   {
     // check if a suitable editor is already opened
     editorPart = page->FindEditor(input);
-    if (activate)
+    if (editorPart)
     {
-      page->Activate(editorPart);
-    }
-    else
-    {
-      page->BringToTop(editorPart);
+      if (activate)
+      {
+        page->Activate(editorPart);
+      }
+      else
+      {
+        page->BringToTop(editorPart);
+      }
     }
   }
 

@@ -22,7 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QObject>
 
-
+/**
+* \brief Perspective class used as viewer perspective within the custom viewer plug-in.
+*
+* This is the perspective class that is used as viewer perspective within the custom viewer plug-in. The ViewerPerspective holds an instance of each the QmitkDataManagerView and the SimpleRenderWindowView.
+*/
 class ViewerPerspective : public QObject, public berry::IPerspectiveFactory
 {
   Q_OBJECT
@@ -32,6 +36,9 @@ public:
 
   ViewerPerspective();
 
+  /**
+  * An instance of each the QmitkDataManagerView and the SimpleRenderWindowView are initially being laid out.
+  */
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 
 };

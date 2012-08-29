@@ -22,7 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QObject>
 
-
+/**
+* \brief Perspective class used as DICOM perspective within the custom viewer plug-in.
+*
+* This is the perspective class that is used as viewer perspective within the custom viewer plug-in. The ViewerPerspective holds a single instance of DicomView.
+*/
 class DicomPerspective : public QObject, public berry::IPerspectiveFactory
 {
   Q_OBJECT
@@ -32,6 +36,9 @@ public:
 
   DicomPerspective();
 
+  /**
+  * An instance of DicomView is initially being laid out.
+  */
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 
 };

@@ -21,34 +21,60 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QObject.h>
 #include <QmitkFileOpenAction.h>
 
+/**
+* \brief A berry::WorkbenchWindowAdvisor class for the custom viewer plug-in.
+*
+* This class suits the custom viewer plug-in. Menu bar, tool bar and status bar are made invisible, and the window title is being set. The workbench window is being customized, i.e. a perspectives tab-bar is arranged according to the PageComposite. The PageComposite is then laid out according to perspective related contents by the WindowConfigurer. 
+* @see{ CustomViewerWorkbenchWindowAdvisor::PreWindowOpen(), CustomViewerWorkbenchWindowAdvisor::CreateWindowContents() }
+*/
 class CustomViewerWorkbenchWindowAdvisor : public QObject, public berry::WorkbenchWindowAdvisor
 {
   Q_OBJECT
 
 public:
 
+    /**
+    * Standard constructor.
+    */
     CustomViewerWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-    berry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
-        berry::IActionBarConfigurer::Pointer configurer);
+    /**
+    * Standard destructor.
+    */
+    ~CustomViewerWorkbenchWindowAdvisor();
 
+    /**
+    * Customizes the workbench window, i.e. arrange a perspectives tab-bar according to the PageComposite. The PageComposite is given to the WindowConfigurer for perspective related layout.
+    */
     void CreateWindowContents(berry::Shell::Pointer shell);
 
+    /**
+    * For arbitrary actions after the window has been created but not yet opened.
+    */
     void PostWindowCreate();
 
+    /**
+    * Menu bar, tool bar and status bar are made invisible, and the window title is being set.
+    */
     void PreWindowOpen();
 
 private:
 
 private slots:
 
+  /**
+  * Allows for runtime stylesheet update.
+  */
   void UpdateStyle();
+  void OpenFile();
 
 private:
+
+  /**
+  * For direct data loading from file.
+  */
   QmitkFileOpenAction* FileOpenAction;
 
-
-//    berry::IDropTargetListener::Pointer dropTargetListener;
 };
 
 #endif /*CUSTOMVIEWERWORKBENCHWINDOWADVISOR_H_*/

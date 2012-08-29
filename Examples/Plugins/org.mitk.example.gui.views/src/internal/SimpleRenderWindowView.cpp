@@ -50,8 +50,7 @@ public:
   berry::IBerryPreferences::Pointer m_Prefs;
 };
 
-//const std::string SimpleRenderWindowView::VIEW_ID = "org.mitk.editors.stdmultiwidget";
-const std::string SimpleRenderWindowView::VIEW_ID = "org.mitk.views.stdmultiwidget";
+const std::string SimpleRenderWindowView::VIEW_ID = "org.mitk.views.simplerenderwindowview";
 
 
 SimpleRenderWindowView::SimpleRenderWindowView()

@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include <berryQtViewPart.h>
 
-//#include "ui_QmitkDicomViewControls.h"
-#include "ui_QmitkTestView1.h"
+#include "ui_QmitkDicomViewControls.h"
 
 #include <berryISelectionListener.h>
 #include <berryISelectionService.h>
@@ -61,7 +60,7 @@ protected:
 
   void SetFocus();
 
-  Ui::QmitkTestView1 m_Controls;
+  Ui::QmitkDicomViewControls m_Controls;
 
   QWidget* m_Parent;
 

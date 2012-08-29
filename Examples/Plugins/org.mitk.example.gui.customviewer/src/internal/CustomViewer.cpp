@@ -15,60 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "CustomViewer.h"
+#include "CustomViewerWorkbenchAdvisor.h"
 
 #include <berryPlatformUI.h>
-#include <berryQtWorkbenchAdvisor.h>
-#include "CustomViewerWorkbenchWindowAdvisor.h"
-#include "berryIQtStyleManager.h"
-#include "org_mitk_example_gui_customviewer_Activator.h"
 
-class CustomViewerWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
-{
-
-public:
-
-  static const std::string DEFAULT_PERSPECTIVE_ID;
-
-  berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-      berry::IWorkbenchWindowConfigurer::Pointer configurer)
-  {
-    //wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
-    wwAdvisor.reset(new CustomViewerWorkbenchWindowAdvisor(configurer));
-    return wwAdvisor.data();
-  }
-
-  void Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
-  {
-    berry::QtWorkbenchAdvisor::Initialize(configurer);
-    QString styleName = "CustomStyle";
-
-    ctkPluginContext* pluginContext = org_mitk_example_gui_customviewer_Activator::GetPluginContext();
-    ctkServiceReference serviceReference = pluginContext->getServiceReference<berry::IQtStyleManager>();
-
-    //always granted by org.blueberry.ui.qt
-    Q_ASSERT(serviceReference);
-    
-    berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
-    Q_ASSERT(styleManager);
-    
-    styleManager->AddStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss", styleName);
-    styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss");
-
-
-  }
-
-  std::string GetInitialWindowPerspectiveId()
-  {
-    return DEFAULT_PERSPECTIVE_ID;
-  }
-
-private:
-
-  QScopedPointer<berry::WorkbenchWindowAdvisor> wwAdvisor;
-
-};
-
-const std::string CustomViewerWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.viewerperspective";
 
 CustomViewer::CustomViewer()
 {
@@ -91,6 +41,5 @@ int CustomViewer::Start()
 }
 
 void CustomViewer::Stop()
-{
-  
+{ 
 }

@@ -19,11 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIApplication.h>
 
+/// Qt
 #include <QObject>
 #include <QScopedPointer>
 
 class CustomViewerWorkbenchAdvisor;
 
+/** Documentation 
+*   \ingroup org_mitk_example_gui_customviewer
+*
+*   \brief A blueberry application class as an entry point for the custom viewer plug-in. 
+*
+*   This class acts as an entry point application class for the dedicated custom viewer plug-in.
+*/
 class CustomViewer : public QObject, public berry::IApplication
 {
   Q_OBJECT
@@ -31,14 +39,21 @@ class CustomViewer : public QObject, public berry::IApplication
   
 public:
   
+/** Standard constructor.*/
   CustomViewer();
+
+/** Standard destructor.*/
   ~CustomViewer();
   
+/** Starts the application.*/
   int Start();
+
+/** Exits the application.*/
   void Stop();
 
 private:
 
+/** The WorkbenchAdvisor for the CustomViewer application.*/
   QScopedPointer<CustomViewerWorkbenchAdvisor> wbAdvisor;
 };
 

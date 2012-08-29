@@ -51,7 +51,7 @@ struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
    *
    * @see mitk::IDataNodeReader
    */
-  static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd);
+  static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd, bool openEditor = true);
 
   /**
      * Opens an editor on the given object.

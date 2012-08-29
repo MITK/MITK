@@ -25,6 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 class QmitkRenderWindow;
 class AbstractRenderWindowViewPrivate;
 
+/**
+ * \brief A view class suited for the custom viewer plug-in.
+ *
+ * This view class being a subclass of QmitkAbstractView yields access to the data storage and thus is interconnected with the mitk::QmitkDataManagerView present in the same perspective. As a subclass of mitk::IRenderWindowPart, this class can provide an instance of QmitkRenderWindow.
+ */
 class SimpleRenderWindowView : public QmitkAbstractView, public mitk::IRenderWindowPart
 {
   Q_OBJECT
@@ -35,6 +40,9 @@ public:
 
   static const std::string VIEW_ID;
 
+  /**
+   * Standard constructor.
+   */
   SimpleRenderWindowView();
 
 
@@ -80,22 +88,40 @@ public:
    */
   QStringList GetDecorations() const;
 
+  /**
+   * \see mitk::QmitkAbstractRenderEditor::GetRenderingManager()
+   */
   mitk::IRenderingManager* GetRenderingManager() const;
 
+  /**
+   * \see mitk::QmitkAbstractRenderEditor::RequestUpdate()
+   */
   void RequestUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL);
 
+  /**
+   * \see mitk::QmitkAbstractRenderEditor::ForceImmediateUpdate()
+   */
   void ForceImmediateUpdate(mitk::RenderingManager::RequestType);
 
+  /**
+   * \see mitk::QmitkAbstractRenderEditor::GetTimeNavigationController()
+   */
   mitk::SliceNavigationController *GetTimeNavigationController() const;
 
 protected:
 
   void SetFocus();
 
+  /**
+   * Creates the QmitkRenderWindow whose renderer is being delivered with the view's data storage.
+   */
   void CreateQtPartControl(QWidget* parent);
 
 private:
 
+  /**
+   * The view's render window.
+   */
   QmitkRenderWindow* m_RenderWindow;
 
   QScopedPointer<AbstractRenderWindowViewPrivate> d;

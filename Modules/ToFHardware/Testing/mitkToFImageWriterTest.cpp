@@ -69,8 +69,8 @@ int mitkToFImageWriterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(amplitudeImageFileName==tofWriter->GetAmplitudeImageFileName(), "Testing set/get amplitude image file name");
   MITK_TEST_CONDITION_REQUIRED(intensityImageFileName==tofWriter->GetIntensityImageFileName(), "Testing set/get intensity image file name");
   MITK_TEST_CONDITION_REQUIRED(rgbImageFileName==tofWriter->GetRGBImageFileName(), "Testing set/get rgb image file name");
-  MITK_TEST_CONDITION_REQUIRED(dimX==tofWriter->GetCaptureWidth(), "Testing set/get CaptureWidth");
-  MITK_TEST_CONDITION_REQUIRED(dimY==tofWriter->GetCaptureHeight(), "Testing set/get CaptureHeight");
+  MITK_TEST_CONDITION_REQUIRED(dimX==tofWriter->GetToFCaptureWidth(), "Testing set/get CaptureWidth");
+  MITK_TEST_CONDITION_REQUIRED(dimY==tofWriter->GetToFCaptureHeight(), "Testing set/get CaptureHeight");
   MITK_TEST_CONDITION_REQUIRED(distanceImageSelected==tofWriter->GetDistanceImageSelected(), "Testing set/get distance image selection");
   MITK_TEST_CONDITION_REQUIRED(amplitudeImageSelected==tofWriter->GetAmplitudeImageSelected(), "Testing set/get amplitude image selection");
   MITK_TEST_CONDITION_REQUIRED(intensityImageSelected==tofWriter->GetIntensityImageSelected(), "Testing set/get intensity image selection");

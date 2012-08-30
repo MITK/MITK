@@ -256,6 +256,9 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     mitk::DataNode::Pointer m_CurrentFiberNode; // needed for the index property when interacting with the plot widget
 
+    mitk::DataNode::Pointer m_CurrentStartRoi; // needed when a plot should only show values between a start end end roi
+    mitk::DataNode::Pointer m_CurrentEndRoi; // idem dito
+
 
 };
 

@@ -207,23 +207,32 @@ protected slots:
 public:
   
   /*! enum for layout direction*/
-  enum {
-    TRANSVERSAL,
-    AXIAL = TRANSVERSAL,
+  enum
+  {
+#ifdef _MSC_VER
+    TRANSVERSAL, // deprecated
+#endif
+    AXIAL = 0,
     SAGITTAL,
     CORONAL,
     THREE_D
   };
 
+#ifdef __GNUC__
+    __attribute__ ((deprecated)) static const int TRANSVERSAL = AXIAL;
+#endif
 
   /*! enum for layout design */
-  enum {
+  enum
+  {
     LAYOUT_DEFAULT,
     LAYOUT_2DIMAGEUP,
     LAYOUT_2DIMAGELEFT,
     LAYOUT_BIG3D,
-    LAYOUT_TRANSVERSAL,
-    LAYOUT_AXIAL = LAYOUT_TRANSVERSAL,
+#ifdef _MSC_VER
+    LAYOUT_TRANSVERSAL, // deprecated
+#endif
+    LAYOUT_AXIAL = LAYOUT_BIG3D + 1,
     LAYOUT_SAGITTAL,
     LAYOUT_CORONAL,
     LAYOUT_2X2DAND3DWIDGET,
@@ -233,6 +242,10 @@ public:
     LAYOUT_SMALLUPPERWIDGET2BIGAND4,
     LAYOUT_LEFT2DAND3DRIGHT2D
   };
+
+#ifdef __GNUC__
+    __attribute__ ((deprecated)) static const int LAYOUT_TRANSVERSAL = LAYOUT_AXIAL;
+#endif
 
   void ShowMenu();
   void HideMenu();

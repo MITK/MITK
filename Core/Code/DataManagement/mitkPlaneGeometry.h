@@ -46,11 +46,17 @@ public:
 
   enum PlaneOrientation
   {
-    Transversal,
-    Axial = Transversal,
+#ifdef _MSC_VER
+    Transversal, // deprecated
+#endif
+    Axial = 0,
     Sagittal,
     Frontal
   };
+
+#ifdef __GNUC__
+  __attribute__ ((deprecated)) static const PlaneOrientation Transversal = PlaneOrientation(Axial);
+#endif
 
   virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;
   

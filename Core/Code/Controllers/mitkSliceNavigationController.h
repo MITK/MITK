@@ -154,12 +154,18 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      */
     enum ViewDirection
     {
-      Transversal,
-      Axial = Transversal,
+#ifdef _MSC_VER
+      Transversal, // deprecated
+#endif
+      Axial = 0,
       Sagittal,
       Frontal,
       Original
     };
+
+#ifdef __GNUC__
+    __attribute__ ((deprecated)) static const ViewDirection Transversal = ViewDirection(Axial);
+#endif
 
     /**
      * \brief Set the input world geometry out of which the

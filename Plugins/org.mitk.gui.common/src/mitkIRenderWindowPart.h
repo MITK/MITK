@@ -50,7 +50,8 @@ class SliceNavigationController;
  * to use one of the following ids for certain QmitkRenderWindow instances to maximize
  * reusability (they are free to map multiple ids to one QmitkRenderWindow internally):
  * <ul>
- * <li>axial (transversal)</li>
+ * <li>transversal (deprecated, use axial instead)</li>
+ * <li>axial</li>
  * <li>sagittal</li>
  * <li>coronal</li>
  * <li>3d</li>

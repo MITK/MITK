@@ -155,7 +155,17 @@ QHash<QString, QmitkRenderWindow *> QmitkStdMultiWidgetEditor::GetRenderWindows(
 
 QmitkRenderWindow *QmitkStdMultiWidgetEditor::GetRenderWindow(const QString &id) const
 {
-  if (d->m_RenderWindows.contains(id)) return d->m_RenderWindows[id];
+  static bool alreadyWarned = false;
+
+  if(!alreadyWarned)
+  {
+    MITK_WARN(id == "axial") << "QmitkStdMultiWidgetEditor::GetRenderWindow(\"transversal\") is deprecated. Use \"axial\" instead.";
+    alreadyWarned = true;
+  }
+
+  if (d->m_RenderWindows.contains(id))
+    return d->m_RenderWindows[id];
+
   return 0;
 }
 

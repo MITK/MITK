@@ -113,7 +113,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
     */
-    void OnTransversalTimeChanged(itk::Object* sender, const itk::EventObject&);
+    DEPRECATED(void OnTransversalTimeChanged(itk::Object* sender, const itk::EventObject&));
 
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
@@ -133,7 +133,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
     */
-    void OnTransversalSliceChanged(const itk::EventObject&);
+    DEPRECATED(void OnTransversalSliceChanged(const itk::EventObject&));
 
     /**
       Just public because it is called by itk::Commands. You should not need to call this.

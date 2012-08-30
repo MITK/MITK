@@ -72,7 +72,7 @@ public:
     msgBox.setText("An error occurred. You should save all data and quit the program to prevent possible data loss.");
     msgBox.setDetailedText(msg);
     msgBox.setIcon(QMessageBox::Critical);
-    msgBox.addButton(trUtf8("Exit"), QMessageBox::YesRole);
+    msgBox.addButton(trUtf8("Exit immediately"), QMessageBox::YesRole);
     msgBox.addButton(trUtf8("Ignore"), QMessageBox::NoRole);
 
     int ret = msgBox.exec();

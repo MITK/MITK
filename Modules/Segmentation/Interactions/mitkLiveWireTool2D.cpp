@@ -303,7 +303,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 
   //set the livewire interactor to edit control points
   mitk::ContourModelLiveWireInteractor::Pointer interactor = mitk::ContourModelLiveWireInteractor::New(m_ContourModelNode);
-  //interactor->SetWorkingImage(this->m_WorkingSlice);
+  interactor->SetWorkingImage(this->m_WorkingSlice);
   m_ContourModelNode->SetInteractor(interactor);
 
   //add interactor to globalInteraction instance

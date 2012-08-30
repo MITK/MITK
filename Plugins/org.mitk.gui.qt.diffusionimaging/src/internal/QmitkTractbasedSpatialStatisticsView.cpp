@@ -126,6 +126,8 @@ struct TbssSelListener : ISelectionListener
       mitk::PlanarFigure* start;
       mitk::PlanarFigure* end;
 
+      m_View->m_CurrentStartRoi = NULL;
+      m_View->m_CurrentEndRoi = NULL;
 
 
       // iterate selection
@@ -180,11 +182,13 @@ struct TbssSelListener : ISelectionListener
               if(!foundStartRoi)
               {
                 start = dynamic_cast<mitk::PlanarFigure*>(nodeData);
+                m_View->m_CurrentStartRoi = node;
                 foundStartRoi =  true;
               }
               else
               {
                 end = dynamic_cast<mitk::PlanarFigure*>(nodeData);
+                m_View->m_CurrentEndRoi = node;
                 foundEndRoi = true;
               }
             }
@@ -419,7 +423,23 @@ void QmitkTractbasedSpatialStatisticsView::Replot(int index)
 
   if(m_CanReplot)
   {
-    PlotFiberBundle(fib, img, NULL, NULL, index);
+
+    if(m_CurrentStartRoi.IsNotNull() && m_CurrentEndRoi.IsNotNull())
+    {
+      mitk::BaseData* startData = m_CurrentStartRoi->GetData();
+      mitk::BaseData* endData = m_CurrentEndRoi->GetData();
+
+      mitk::PlanarFigure* start = dynamic_cast<mitk::PlanarFigure*>(startData);
+      mitk::PlanarFigure* end = dynamic_cast<mitk::PlanarFigure*>(endData);
+
+      PlotFiberBundle(fib, img, start, end, index);
+
+    }
+    else
+    {
+      PlotFiberBundle(fib, img, NULL, NULL, index);
+    }
+
 
     mitk::IntProperty::Pointer selectedFiberProp = mitk::IntProperty::New(index-1);
 

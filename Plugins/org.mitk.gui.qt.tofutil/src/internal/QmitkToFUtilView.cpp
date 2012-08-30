@@ -126,13 +126,6 @@ void QmitkToFUtilView::Activated()
     m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
     m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
 
-    if (this->GetDataStorage()->Exists(this->GetDataStorage()->GetNamedNode("Distance image")))
-    {
-        mitk::Image::Pointer distanceImage = dynamic_cast<mitk::Image*>(this->GetDataStorage()->GetNamedNode("Distance image")->GetData());
-        m_Controls->tofMeasurementWidget->SetDistanceImage(distanceImage);
-    }
-    m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage());
-
     if (this->m_ToFImageGrabber.IsNull())
     {
       m_Controls->m_ToFRecorderWidget->setEnabled(false);
@@ -175,6 +168,8 @@ void QmitkToFUtilView::OnToFCameraConnected()
   m_Controls->m_ToFRecorderWidget->setEnabled(true);
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
 
+  // initialize measurement widget
+  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage());
 
   //TODO
   this->m_RealTimeClock = mitk::RealTimeClock::New();
@@ -259,15 +254,14 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
   m_Controls->tofMeasurementWidget->setEnabled(false);
   m_Controls->SurfacePropertiesBox->setEnabled(false);
-
-
+  //clean up measurement widget
+  m_Controls->tofMeasurementWidget->CleanUpWidget();
 
   if(this->m_VideoSource)
   {
     this->m_VideoSource->StopCapturing();
     this->m_VideoSource = NULL;
   }
-//  this->RequestRenderWindowUpdate();
 }
 
 void QmitkToFUtilView::OnToFCameraStarted()
@@ -312,6 +306,8 @@ void QmitkToFUtilView::OnToFCameraStarted()
     m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
     // initialize visualization widget
     m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
+    // set distance image to measurement widget
+    m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
 
     this->m_Frametimer->start(0);
 
@@ -330,8 +326,6 @@ void QmitkToFUtilView::OnToFCameraStarted()
     }
   }
   m_Controls->m_TextureCheckBox->setEnabled(true);
-  // set distance image for point set measurement
-  m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()

@@ -43,6 +43,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 * 1. Measure the distance between two points in 3D ToF space by clicking the points in the 2D slices
 * 2. Defining a ToF PointSet both in 2D and 3D. CameraIntrinsics are used for calculation between 2D and 3D
 *
+* NOTE:
+* You have to make sure that the widget is initialized at a position in the plugin using it, where the distance
+* image is available. CleanUp has to be called to make sure that all observers and renderers are removed correctly.
+*
 * @ingroup ToFUI
 */
 class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
@@ -63,21 +67,22 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     virtual void CreateConnections();
 
     /*!
-    \brief initializes the widget
+    \brief initializes the widget. Observers to the change events of the point sets are created, text actors are activated
+    to be rendered into the foreground of the render window.
     \param stdMultiWidget QmitkStdMultiWidget used for painting overlays for measurement
     \param dataStorage DataStorage to add PointSets
     \param distanceImage range image used to calculate 3D PointSet from 2D index
     */
-    void InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage);
+    void InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage, mitk::CameraIntrinsics::Pointer cameraIntrinsics=NULL);
     /*!
-    \brief specify the image that is used for measurement
+    \brief cleans up the widget when it's functionality is not used anymore.
+    Removes observers and deletes foreground renderer
+    */
+    void CleanUpWidget();
+    /*!
+    \brief set the image holding the distance information used for measuring
     */
     void SetDistanceImage(mitk::Image::Pointer distanceImage);
-
-    /*!
-    \brief specify the intrinsic parameters of the camera (holds focal length, principal point, distortion coefficients)
-    */
-    void SetCameraIntrinsics(mitk::CameraIntrinsics::Pointer cameraIntrinsics);
 
   signals:
 
@@ -104,6 +109,8 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     Ui::QmitkToFPointSetWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
+    mitk::DataStorage::Pointer m_DataStorage; ///< member holding the set DataStorage
+
     mitk::Image::Pointer m_DistanceImage; ///< image holding the range data of the ToF camera
     mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< intrinsic parameters of the camera
 
@@ -126,6 +133,7 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     long m_MeasurementPointSetChangedObserverTag; ///< observer tag for measurement PointSet observer
     long m_PointSetChangedObserverTag; ///< observer tag for PointSet observer
+//    long m_DistanceImageChangedObserverTag; ///< observer tag for distance image observer
 
     int m_WindowHeight; ///< Height of the renderWindow
 

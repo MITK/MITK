@@ -67,7 +67,8 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
-
+        OnToFCameraStopped();
+        OnToFCameraDisconnected();
 }
 
 void QmitkToFUtilView::SetFocus()
@@ -124,6 +125,12 @@ void QmitkToFUtilView::Activated()
 
     m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
     m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
+
+    if (this->GetDataStorage()->Exists(this->GetDataStorage()->GetNamedNode("Distance image")))
+    {
+        mitk::Image::Pointer distanceImage = dynamic_cast<mitk::Image*>(this->GetDataStorage()->GetNamedNode("Distance image")->GetData());
+        m_Controls->tofMeasurementWidget->SetDistanceImage(distanceImage);
+    }
     m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage());
 
     if (this->m_ToFImageGrabber.IsNull())
@@ -144,9 +151,7 @@ void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Point
 
 void QmitkToFUtilView::Deactivated()
 {
-  OnToFCameraStopped();
-  OnToFCameraDisconnected();
-  ResetGUIToDefault();
+
 }
 
 void QmitkToFUtilView::Visible()
@@ -155,6 +160,8 @@ void QmitkToFUtilView::Visible()
 
 void QmitkToFUtilView::Hidden()
 {
+
+    ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::OnToFCameraConnected()
@@ -260,7 +267,7 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
     this->m_VideoSource->StopCapturing();
     this->m_VideoSource = NULL;
   }
-  this->RequestRenderWindowUpdate();
+//  this->RequestRenderWindowUpdate();
 }
 
 void QmitkToFUtilView::OnToFCameraStarted()

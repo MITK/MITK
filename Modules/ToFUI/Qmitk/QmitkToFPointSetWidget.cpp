@@ -176,15 +176,22 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
     m_MeasurementPointSet3DNode->SetData(measurementPointSet3D);
     dataStorage->Add(m_MeasurementPointSet3DNode);
     // initialize PointSets
+
+    mitk::DataNode::Pointer pointSet2DNode;
     if(!dataStorage->Exists(dataStorage->GetNamedNode("ToF PointSet 2D")))
     {
       m_PointSet2D = mitk::PointSet::New();
-      mitk::DataNode::Pointer pointSet2DNode = mitk::DataNode::New();
+      pointSet2DNode = mitk::DataNode::New();
       pointSet2DNode->SetName("ToF PointSet 2D");
       pointSet2DNode->SetVisibility(false, renderWindowHashMap.value("3d")->GetRenderer());
       pointSet2DNode->SetData(m_PointSet2D);
       dataStorage->Add(pointSet2DNode);
       m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor",pointSet2DNode);
+    }
+    else
+    {
+        pointSet2DNode = dataStorage->GetNamedNode("ToF PointSet 2D");
+        m_PointSet2D = dynamic_cast<mitk::PointSet*>(pointSet2DNode->GetData());
     }
     // create observer for m_MeasurementPointSet2D
     itk::SimpleMemberCommand<QmitkToFPointSetWidget>::Pointer pointSetChangedCommand;

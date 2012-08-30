@@ -31,23 +31,23 @@ namespace itk
   template <class TInputImageType, class TOutputImageType>
   ShortestPathImageFilter<TInputImageType, TOutputImageType>
     ::ShortestPathImageFilter() :
-    m_FullNeighborsMode(false),   
+  m_FullNeighborsMode(false),   
     m_MakeOutputImage(true),
     m_StoreVectorOrder(false),    
     m_CalcAllDistances(false),
     m_ActivateTimeOut(false),
-      multipleEndPoints(false),
-      m_Nodes(0),
-      m_Graph_NumberOfNodes(0)
+    multipleEndPoints(false),
+    m_Nodes(0),
+    m_Graph_NumberOfNodes(0)
   {
-      m_endPoints.clear();
-      m_endPointsClosed.clear();
+    m_endPoints.clear();
+    m_endPointsClosed.clear();
 
-      if (m_MakeOutputImage)
-      {
-         this->SetNumberOfRequiredOutputs(1);
-       this->SetNthOutput( 0, OutputImageType::New() ); 
-      }
+    if (m_MakeOutputImage)
+    {
+      this->SetNumberOfRequiredOutputs(1);
+      this->SetNthOutput( 0, OutputImageType::New() ); 
+    }
   }
 
 
@@ -113,13 +113,13 @@ namespace itk
       node = (coord[2]*size[0]*size[1]) + (coord[1]*size[0]) + coord[0];
     }
     if ((m_Graph_NumberOfNodes > 0) && (node >= m_Graph_NumberOfNodes))
-      {
-         MITK_INFO << "WARNING! Coordinates outside image!";
-         MITK_INFO << "Coords = " << coord ;
-         MITK_INFO << "ImageDim = " << dim ;
-         MITK_INFO << "RequestedRegionSize = " << size ;
+    {
+      MITK_INFO << "WARNING! Coordinates outside image!";
+      MITK_INFO << "Coords = " << coord ;
+      MITK_INFO << "ImageDim = " << dim ;
+      MITK_INFO << "RequestedRegionSize = " << size ;
       node = 0;
-      }
+    }
 
     return node;
   }
@@ -171,7 +171,7 @@ namespace itk
 
     int neighborDistance = 1; //if i increase that, i might not hit the endnote
 
-      // maybe use itkNeighborhoodIterator here, might be faster
+    // maybe use itkNeighborhoodIterator here, might be faster
 
     if ( dim == 2)
     {
@@ -401,9 +401,9 @@ namespace itk
     {
       m_StartIndex[i] = StartIndex[i];
     }    
-      m_Graph_StartNode = CoordToNode(m_StartIndex); 
-      //MITK_INFO << "StartIndex = " << StartIndex;
-      //MITK_INFO << "StartNode = " << m_Graph_StartNode;
+    m_Graph_StartNode = CoordToNode(m_StartIndex); 
+    //MITK_INFO << "StartIndex = " << StartIndex;
+    //MITK_INFO << "StartNode = " << m_Graph_StartNode;
   }
 
 
@@ -415,23 +415,23 @@ namespace itk
     {
       m_EndIndex[i] = EndIndex[i];
     }
-      m_Graph_EndNode = CoordToNode(m_EndIndex); 
-      //MITK_INFO << "EndNode = " << m_Graph_EndNode;
+    m_Graph_EndNode = CoordToNode(m_EndIndex); 
+    //MITK_INFO << "EndNode = " << m_Graph_EndNode;
   }
 
-   template <class TInputImageType, class TOutputImageType>
+  template <class TInputImageType, class TOutputImageType>
   void ShortestPathImageFilter<TInputImageType, TOutputImageType>::
-   AddEndIndex (const typename TInputImageType::IndexType &index)
+    AddEndIndex (const typename TInputImageType::IndexType &index)
   {
-      // ONLY FOR MULTIPLE END POINTS SEARCH
-      IndexType newEndIndex;
+    // ONLY FOR MULTIPLE END POINTS SEARCH
+    IndexType newEndIndex;
     for (unsigned int i=0;i<TInputImageType::ImageDimension;++i)
     {
       newEndIndex[i] = index[i];
     }
-      m_endPoints.push_back(newEndIndex);            
-      SetEndIndex( m_endPoints[0] );      
-      multipleEndPoints = true;
+    m_endPoints.push_back(newEndIndex);            
+    SetEndIndex( m_endPoints[0] );      
+    multipleEndPoints = true;
   }
 
   template <class TInputImageType, class TOutputImageType>
@@ -439,12 +439,12 @@ namespace itk
     getEstimatedCostsToTarget (const typename TInputImageType::IndexType &a)
   {
     // Returns the minimal possible costs for a path from "a" to targetnode.
-      itk::Vector<float,3> v;
+    itk::Vector<float,3> v;
     v[0] = m_EndIndex[0]-a[0];
     v[1] = m_EndIndex[1]-a[1];
     v[2] = m_EndIndex[2]-a[2];
 
-      return  m_CostFunction->GetMinCost() * v.GetNorm();
+    return  m_CostFunction->GetMinCost() * v.GetNorm();
   }
 
 
@@ -476,12 +476,12 @@ namespace itk
       m_Nodes[i].distance = -1; 
       m_Nodes[i].prevNode = -1;
       m_Nodes[i].mainListIndex=i;
-         m_Nodes[i].closed=false;
+      m_Nodes[i].closed=false;
     }
 
     // In the beginning, the Startnode needs a distance of 0
     m_Nodes[m_Graph_StartNode].distance = 0;
-      m_Nodes[m_Graph_StartNode].distAndEst = 0;
+    m_Nodes[m_Graph_StartNode].distAndEst = 0;
   }
 
   template <class TInputImageType, class TOutputImageType>
@@ -489,67 +489,67 @@ namespace itk
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     StartShortestPathSearch()
   {
-      // Setup Timer
+    // Setup Timer
     clock_t startAll = clock();
     clock_t stopAll = clock();
 
-      // init variables
+    // init variables
     double durationAll = 0;
     bool timeout = false; 
     bool makeNewHeapNecessary = false;
-      NodeNumType mainNodeListIndex = 0;
+    NodeNumType mainNodeListIndex = 0;
     DistanceType curNodeDistance = 0;
     DistanceType curNodeDistAndEst = 0;
-      NodeNumType numberOfNodesChecked = 0;
+    NodeNumType numberOfNodesChecked = 0;
 
-      // Create Multimap (tree structure for fast searching)
-      std::multimap<double,ShortestPathNode*> myMap;
-      std::pair< std::multimap<double,ShortestPathNode*>::iterator, std::multimap<double,ShortestPathNode*>::iterator> ret;
-      std::multimap<double,ShortestPathNode*>::iterator it;
+    // Create Multimap (tree structure for fast searching)
+    std::multimap<double,ShortestPathNode*> myMap;
+    std::pair< std::multimap<double,ShortestPathNode*>::iterator, std::multimap<double,ShortestPathNode*>::iterator> ret;
+    std::multimap<double,ShortestPathNode*>::iterator it;
 
-      // At first, only startNote is discovered.
-      myMap.insert( std::pair<double,ShortestPathNode*> (m_Nodes[m_Graph_StartNode].distAndEst, &m_Nodes[m_Graph_StartNode]) );
+    // At first, only startNote is discovered.
+    myMap.insert( std::pair<double,ShortestPathNode*> (m_Nodes[m_Graph_StartNode].distAndEst, &m_Nodes[m_Graph_StartNode]) );
 
     // While there are discovered Nodes, pick the one with lowest distance,
-      // update its neighbors and eventually delete it from the discovered Nodes list.
+    // update its neighbors and eventually delete it from the discovered Nodes list.
     while(!myMap.empty())
     {     
-         numberOfNodesChecked++;
-         if ( (numberOfNodesChecked % (m_Graph_NumberOfNodes/100)) == 0)
-         {
-            MITK_INFO << "Checked " << ( numberOfNodesChecked / (m_Graph_NumberOfNodes/100) ) << "% List: " << myMap.size() << "\n";            
-         }
-         
-         // Get element with lowest score
-         mainNodeListIndex = myMap.begin()->second->mainListIndex; 
+      numberOfNodesChecked++;
+      if ( (numberOfNodesChecked % (m_Graph_NumberOfNodes/100)) == 0)
+      {
+        MITK_INFO << "Checked " << ( numberOfNodesChecked / (m_Graph_NumberOfNodes/100) ) << "% List: " << myMap.size() << "\n";            
+      }
+
+      // Get element with lowest score
+      mainNodeListIndex = myMap.begin()->second->mainListIndex; 
       curNodeDistAndEst = myMap.begin()->second->distAndEst; 
       curNodeDistance = myMap.begin()->second->distance; 
-         myMap.begin()->second->closed = true; // close it
+      myMap.begin()->second->closed = true; // close it
 
-         // Debug:         
-         //MITK_INFO << "INFO: size " << myMap.size();
-         /*
-         for (it = myMap.begin(); it != myMap.end(); ++it)
-         {
-            MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
-         }
-         */
-         
+      // Debug:         
+      //MITK_INFO << "INFO: size " << myMap.size();
+      /*
+      for (it = myMap.begin(); it != myMap.end(); ++it)
+      {
+      MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
+      }
+      */
+
       // Kicks out element with lowest score
-         myMap.erase( myMap.begin() );
+      myMap.erase( myMap.begin() );
 
-         // if wanted, store vector order
+      // if wanted, store vector order
       if (m_StoreVectorOrder)
-         {
+      {
         m_VectorOrder.push_back(mainNodeListIndex);
-         }
+      }
 
       // Check neighbors
       std::vector<ShortestPathNode*> neighborNodes = GetNeighbors(mainNodeListIndex, m_Graph_fullNeighbors);
       for (NodeNumType i=0; i<neighborNodes.size(); i++)
       {         
-            if (neighborNodes[i]->closed)
-               continue; // this nodes is already closed, go to next neighbor
+        if (neighborNodes[i]->closed)
+          continue; // this nodes is already closed, go to next neighbor
 
         IndexType coordCurNode = NodeToCoord(mainNodeListIndex);
         IndexType coordNeighborNode = NodeToCoord(neighborNodes[i]->mainListIndex);
@@ -564,120 +564,120 @@ namespace itk
           // if that neighbornode is not in discoverednodeList yet, Push it there and update
           if (neighborNodes[i]->distance == -1)
           {
-                  
+
             neighborNodes[i]->distance = newDistance;
             neighborNodes[i]->distAndEst = newDistance + getEstimatedCostsToTarget(coordNeighborNode);
             neighborNodes[i]->prevNode = mainNodeListIndex;                                    
-                  myMap.insert( std::pair<double,ShortestPathNode*> (m_Nodes[neighborNodes[i]->mainListIndex].distAndEst, &m_Nodes[neighborNodes[i]->mainListIndex]) );
-                  /*
-                  MITK_INFO << "Inserted: " << m_Nodes[neighborNodes[i]->mainListIndex].distAndEst << "|" << m_Nodes[neighborNodes[i]->mainListIndex].mainListIndex;
-                  MITK_INFO << "INFO: size " << myMap.size();
-                  for (it = myMap.begin(); it != myMap.end(); ++it)
-                  {
-                     MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
-                  }
-                  */
+            myMap.insert( std::pair<double,ShortestPathNode*> (m_Nodes[neighborNodes[i]->mainListIndex].distAndEst, &m_Nodes[neighborNodes[i]->mainListIndex]) );
+            /*
+            MITK_INFO << "Inserted: " << m_Nodes[neighborNodes[i]->mainListIndex].distAndEst << "|" << m_Nodes[neighborNodes[i]->mainListIndex].mainListIndex;
+            MITK_INFO << "INFO: size " << myMap.size();
+            for (it = myMap.begin(); it != myMap.end(); ++it)
+            {
+            MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
+            }
+            */
           }
           // or if is already in discoverednodelist, update
           else
           {
 
+            /*
+            it = myMap.find(neighborNodes[i]->distAndEst);
+            if (it == myMap.end() )
+            {
+            MITK_INFO << "Nothing!";
+            // look further
+            for (it = myMap.begin(); it != myMap.end(); ++it)
+            {
+            if ((*it).second->mainListIndex == lookForId)
+            {
+            MITK_INFO << "But it is there!!!";
+            MITK_INFO << "Searched for: " << lookFor << "   but had: " << (*it).second->distAndEst;
+            }
+
+            }
+            }   
+            */
+
+            // 1st : find and delete old element
+            bool found = false;
+            double lookFor = neighborNodes[i]->distAndEst;
+            unsigned int lookForId = neighborNodes[i]->mainListIndex;
+            ret = myMap.equal_range(neighborNodes[i]->distAndEst);
+
+            if ((ret.first == ret.second))
+            {
+              MITK_INFO << "No exact match!"; // if this happens, you are screwed
+              /*
+              MITK_INFO << "Was looking for: " << lookFor << "  ID: " << lookForId;
+              if (ret.first != myMap.end() )
+              {
+              it = ret.first;
+              MITK_INFO << "Found: " << it->first << "  ID: " << it->second->mainListIndex;
+              ++it;
+              MITK_INFO << "Found: " << it->first << "  ID: " << it->second->mainListIndex;
+              --it; 
+              --it;
+              MITK_INFO << "Found: " << it->first << "  ID: " << it->second->mainListIndex;
+              }
+
+              // look if that ID is found in the map
+              for (it = myMap.begin(); it != myMap.end(); ++it)
+              {
+              if ((*it).second->mainListIndex == lookForId)
+              {
+              MITK_INFO << "But it is there!!!";
+              MITK_INFO << "Searched dist: " << lookFor << "  found dist: " << (*it).second->distAndEst;
+              }
+
+              }
+              */
+            }
+            else 
+            {
+              for (it=ret.first; it!=ret.second; ++it)
+              {
+                if (it->second->mainListIndex == neighborNodes[i]->mainListIndex)
+                {
+                  found = true;                           
+                  myMap.erase(it);
                   /*
-                  it = myMap.find(neighborNodes[i]->distAndEst);
-                  if (it == myMap.end() )
-                  {
-                     MITK_INFO << "Nothing!";
-                     // look further
-                     for (it = myMap.begin(); it != myMap.end(); ++it)
-                     {
-                        if ((*it).second->mainListIndex == lookForId)
-                        {
-                           MITK_INFO << "But it is there!!!";
-                           MITK_INFO << "Searched for: " << lookFor << "   but had: " << (*it).second->distAndEst;
-                        }
+                  MITK_INFO << "INFO: size " << myMap.size();
+                  MITK_INFO << "Erase: " << it->first << "|" << it->second->mainListIndex;
 
-                     }
-                  }   
+                  MITK_INFO << "INFO: size " << myMap.size();
+                  for (it = myMap.begin(); it != myMap.end(); ++it)
+                  {
+                  MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
+                  }
                   */
+                  break;
+                }
+              }
+            }
 
-                  // 1st : find and delete old element
-                  bool found = false;
-                  double lookFor = neighborNodes[i]->distAndEst;
-                  unsigned int lookForId = neighborNodes[i]->mainListIndex;
-                  ret = myMap.equal_range(neighborNodes[i]->distAndEst);
-                  
-                  if ((ret.first == ret.second))
-                  {
-                     MITK_INFO << "No exact match!"; // if this happens, you are screwed
-                     /*
-                     MITK_INFO << "Was looking for: " << lookFor << "  ID: " << lookForId;
-                     if (ret.first != myMap.end() )
-                     {
-                        it = ret.first;
-                        MITK_INFO << "Found: " << it->first << "  ID: " << it->second->mainListIndex;
-                        ++it;
-                        MITK_INFO << "Found: " << it->first << "  ID: " << it->second->mainListIndex;
-                        --it; 
-                        --it;
-                        MITK_INFO << "Found: " << it->first << "  ID: " << it->second->mainListIndex;
-                     }
-                     
-                     // look if that ID is found in the map
-                     for (it = myMap.begin(); it != myMap.end(); ++it)
-                     {
-                        if ((*it).second->mainListIndex == lookForId)
-                        {
-                           MITK_INFO << "But it is there!!!";
-                           MITK_INFO << "Searched dist: " << lookFor << "  found dist: " << (*it).second->distAndEst;
-                        }
 
-                     }
-                     */
-                  }
-                  else 
-                  {
-                     for (it=ret.first; it!=ret.second; ++it)
-                     {
-                        if (it->second->mainListIndex == neighborNodes[i]->mainListIndex)
-                        {
-                           found = true;                           
-                           myMap.erase(it);
-                           /*
-                           MITK_INFO << "INFO: size " << myMap.size();
-                           MITK_INFO << "Erase: " << it->first << "|" << it->second->mainListIndex;
-                           
-                           MITK_INFO << "INFO: size " << myMap.size();
-                           for (it = myMap.begin(); it != myMap.end(); ++it)
-                           {
-                              MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
-                           }
-                           */
-                           break;
-                        }
-                     }
-                  }
+            if (!found)
+            {
+              MITK_INFO << "Could not find it! :(";
+              continue;
+            }
 
-                  
-                  if (!found)
-                  {
-                     MITK_INFO << "Could not find it! :(";
-                     continue;
-                  }
-
-                  // 2nd: update and insert new element
-                  neighborNodes[i]->distance = newDistance;
+            // 2nd: update and insert new element
+            neighborNodes[i]->distance = newDistance;
             neighborNodes[i]->distAndEst = newDistance + getEstimatedCostsToTarget(coordNeighborNode);
             neighborNodes[i]->prevNode = mainNodeListIndex;                          
-                  //myMap.insert( std::pair<double,ShortestPathNode*> (neighborNodes[i]->distAndEst, neighborNodes[i]));
-                  myMap.insert( std::pair<double,ShortestPathNode*> (m_Nodes[neighborNodes[i]->mainListIndex].distAndEst, &m_Nodes[neighborNodes[i]->mainListIndex]) );
+            //myMap.insert( std::pair<double,ShortestPathNode*> (neighborNodes[i]->distAndEst, neighborNodes[i]));
+            myMap.insert( std::pair<double,ShortestPathNode*> (m_Nodes[neighborNodes[i]->mainListIndex].distAndEst, &m_Nodes[neighborNodes[i]->mainListIndex]) );
 
-                  //MITK_INFO << "Re-Inserted: " << m_Nodes[neighborNodes[i]->mainListIndex].distAndEst << "|" << m_Nodes[neighborNodes[i]->mainListIndex].mainListIndex;
-                  //MITK_INFO << "INFO: size " << myMap.size();
-                  /*for (it = myMap.begin(); it != myMap.end(); ++it)
-                  {
-                     MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
-                  }*/
-                  
+            //MITK_INFO << "Re-Inserted: " << m_Nodes[neighborNodes[i]->mainListIndex].distAndEst << "|" << m_Nodes[neighborNodes[i]->mainListIndex].mainListIndex;
+            //MITK_INFO << "INFO: size " << myMap.size();
+            /*for (it = myMap.begin(); it != myMap.end(); ++it)
+            {
+            MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
+            }*/
+
           }
         }
       }   
@@ -695,34 +695,34 @@ namespace itk
         }
       }
 
-         // Check end criteria:
-         // For multiple points
-         if ( multipleEndPoints )         
-         {
-            // super slow, make it faster
-            for (int i=0 ;i<m_endPoints.size(); i++)
-            { 
-               if (CoordToNode(m_endPoints[i]) == mainNodeListIndex)
-               {
-                  m_endPointsClosed.push_back(NodeToCoord(mainNodeListIndex));
-                  m_endPoints.erase(m_endPoints.begin()+i);
-                  if (m_endPoints.empty())
-                  {
-                     // Finished! break
-                     return;
-                  }
-                  if (m_Graph_EndNode == mainNodeListIndex)
-                  {
-                     // set new end 
-                     SetEndIndex( m_endPoints[0] );                    
-                  }
-               }
-            }            
-         }      
-         // if single end point, then end, if this one is reached or timeout happened.
+      // Check end criteria:
+      // For multiple points
+      if ( multipleEndPoints )         
+      {
+        // super slow, make it faster
+        for (int i=0 ;i<m_endPoints.size(); i++)
+        { 
+          if (CoordToNode(m_endPoints[i]) == mainNodeListIndex)
+          {
+            m_endPointsClosed.push_back(NodeToCoord(mainNodeListIndex));
+            m_endPoints.erase(m_endPoints.begin()+i);
+            if (m_endPoints.empty())
+            {
+              // Finished! break
+              return;
+            }
+            if (m_Graph_EndNode == mainNodeListIndex)
+            {
+              // set new end 
+              SetEndIndex( m_endPoints[0] );                    
+            }
+          }
+        }            
+      }      
+      // if single end point, then end, if this one is reached or timeout happened.
       else if ( ( mainNodeListIndex == m_Graph_EndNode || timeout) && !m_CalcAllDistances)
       {
-            if (m_StoreVectorOrder)
+        if (m_StoreVectorOrder)
           MITK_INFO << "Number of Nodes checked: " << m_VectorOrder.size() ;
         return;
       }
@@ -734,69 +734,69 @@ namespace itk
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     MakeOutputs()
   {
-      MITK_INFO << "Make Output";
+    MITK_INFO << "Make Output";
 
-      if (m_MakeOutputImage)
+    if (m_MakeOutputImage)
+    {
+      OutputImagePointer output0 = this->GetOutput(0);
+      output0->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );      
+      output0->Allocate();
+      OutputImageIteratorType shortestPathImageIt (output0, output0->GetRequestedRegion());        
+      // Create ShortestPathImage (Output 0)    
+      for (shortestPathImageIt.GoToBegin(); !shortestPathImageIt.IsAtEnd(); ++shortestPathImageIt)
       {
-       OutputImagePointer output0 = this->GetOutput(0);
-       output0->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );      
-         output0->Allocate();
-         OutputImageIteratorType shortestPathImageIt (output0, output0->GetRequestedRegion());        
-         // Create ShortestPathImage (Output 0)    
-       for (shortestPathImageIt.GoToBegin(); !shortestPathImageIt.IsAtEnd(); ++shortestPathImageIt)
-       {
-         // First intialize with background color
-         shortestPathImageIt.Set( BACKGROUND ) ;           
-       }
+        // First intialize with background color
+        shortestPathImageIt.Set( BACKGROUND ) ;           
+      }
 
-         if (!multipleEndPoints) // Only one path was calculated
-         {
-          for (int i=0; i< m_VectorPath.size(); i++)
+      if (!multipleEndPoints) // Only one path was calculated
+      {
+        for (int i=0; i< m_VectorPath.size(); i++)
+        {
+          shortestPathImageIt.SetIndex( m_VectorPath[i] );
+          shortestPathImageIt.Set( FOREGROUND ) ;
+        }
+      }
+      else // multiple pathes has been calculated, draw all
+      {
+        for (int i =0; i<m_MultipleVectorPaths.size(); i++)
+        {
+          for (int j=0; j< m_MultipleVectorPaths[i].size(); j++)
           {
-            shortestPathImageIt.SetIndex( m_VectorPath[i] );
+            shortestPathImageIt.SetIndex( m_MultipleVectorPaths[i][j] );
             shortestPathImageIt.Set( FOREGROUND ) ;
           }
-         }
-         else // multiple pathes has been calculated, draw all
-         {
-            for (int i =0; i<m_MultipleVectorPaths.size(); i++)
-            {
-               for (int j=0; j< m_MultipleVectorPaths[i].size(); j++)
-               {
-                  shortestPathImageIt.SetIndex( m_MultipleVectorPaths[i][j] );
-                  shortestPathImageIt.Set( FOREGROUND ) ;
-               }
-            }
-         }
+        }
       }
+    }
   }
 
 
   template <class TInputImageType, class TOutputImageType>
-   typename ShortestPathImageFilter<TInputImageType, TOutputImageType>::OutputImagePointer
+  typename ShortestPathImageFilter<TInputImageType, TOutputImageType>::OutputImagePointer
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     GetVectorOrderImage()
   {
-      // Create Vector Order Image
-      // Return it
-    
-      OutputImagePointer image = OutputImageType::New();    
-      image->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );
-      image->Allocate();
-      OutputImageIteratorType vectorOrderImageIt  (image, image->GetRequestedRegion());     
+    // Create Vector Order Image
+    // Return it
+
+    OutputImagePointer image = OutputImageType::New();    
+    image->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );
+    image->Allocate();
+    OutputImageIteratorType vectorOrderImageIt  (image, image->GetRequestedRegion());     
 
 
-      MITK_INFO << "GetVectorOrderImage";
-      for (vectorOrderImageIt.GoToBegin(); !vectorOrderImageIt.IsAtEnd(); ++vectorOrderImageIt)
-      {
-         // First intialize with background color
-         vectorOrderImageIt.Value() =  BACKGROUND ;
-      }
-      for (int i=0; i< m_VectorOrder.size(); i++)
-      {
-         vectorOrderImageIt.SetIndex(NodeToCoord(m_VectorOrder[i]) );
-         vectorOrderImageIt.Set( BACKGROUND+i)  ;
-      }
+    MITK_INFO << "GetVectorOrderImage";
+    for (vectorOrderImageIt.GoToBegin(); !vectorOrderImageIt.IsAtEnd(); ++vectorOrderImageIt)
+    {
+      // First intialize with background color
+      vectorOrderImageIt.Value() =  BACKGROUND ;
+    }
+    for (int i=0; i< m_VectorOrder.size(); i++)
+    {
+      vectorOrderImageIt.SetIndex(NodeToCoord(m_VectorOrder[i]) );
+      vectorOrderImageIt.Set( BACKGROUND+i)  ;
+    }
     return image;
   }
 
@@ -806,26 +806,26 @@ namespace itk
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     GetDistanceImage()
   {
-      // Create Distance Image
-      // Return it
+    // Create Distance Image
+    // Return it
 
-      OutputImagePointer image = OutputImageType::New();    
-      image->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );
-      image->Allocate();;
-      OutputImageIteratorType distanceImageIt     (image, image->GetRequestedRegion());
-      // Create Distance Image (Output 1)          
-      NodeNumType myNodeNum;    
-      for (distanceImageIt.GoToBegin(); !distanceImageIt.IsAtEnd(); ++distanceImageIt)
-      {
-         IndexType index = distanceImageIt.GetIndex();
-         myNodeNum = CoordToNode(index); 
-         double newVal = m_Nodes[myNodeNum].distance;
-         distanceImageIt.Set(newVal);     
-      }
-   }
+    OutputImagePointer image = OutputImageType::New();    
+    image->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );
+    image->Allocate();;
+    OutputImageIteratorType distanceImageIt     (image, image->GetRequestedRegion());
+    // Create Distance Image (Output 1)          
+    NodeNumType myNodeNum;    
+    for (distanceImageIt.GoToBegin(); !distanceImageIt.IsAtEnd(); ++distanceImageIt)
+    {
+      IndexType index = distanceImageIt.GetIndex();
+      myNodeNum = CoordToNode(index); 
+      double newVal = m_Nodes[myNodeNum].distance;
+      distanceImageIt.Set(newVal);     
+    }
+  }
 
 
- 
+
   template <class TInputImageType, class TOutputImageType>
   std::vector< typename ShortestPathImageFilter<TInputImageType, TOutputImageType>::IndexType >
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
@@ -834,8 +834,8 @@ namespace itk
     return m_VectorPath;
   }
 
-   template <class TInputImageType, class TOutputImageType>
-   std::vector< std::vector< typename ShortestPathImageFilter<TInputImageType, TOutputImageType>::IndexType > >
+  template <class TInputImageType, class TOutputImageType>
+  std::vector< std::vector< typename ShortestPathImageFilter<TInputImageType, TOutputImageType>::IndexType > >
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     GetMultipleVectorPaths()
   {
@@ -847,53 +847,53 @@ namespace itk
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     MakeShortestPathVector()
   {
-      MITK_INFO << "Make ShortestPath Vec";
-      
-      // single end point
-      if ( !multipleEndPoints )
-      {
-         // fill m_VectorPath with the Shortest Path
-         m_VectorPath.clear();
+    MITK_INFO << "Make ShortestPath Vec";
 
-         // Go backwards from endnote to startnode    
-         NodeNumType prevNode = m_Graph_EndNode;       
-         while (prevNode != -1) 
-         { 
-            m_VectorPath.push_back( NodeToCoord(prevNode) );           
+    // single end point
+    if ( !multipleEndPoints )
+    {
+      // fill m_VectorPath with the Shortest Path
+      m_VectorPath.clear();
 
-            if (prevNode == m_Graph_StartNode)
-               break;
+      // Go backwards from endnote to startnode    
+      NodeNumType prevNode = m_Graph_EndNode;       
+      while (prevNode != -1) 
+      { 
+        m_VectorPath.push_back( NodeToCoord(prevNode) );           
 
-            prevNode = m_Nodes[prevNode].prevNode;     
-         }
+        if (prevNode == m_Graph_StartNode)
+          break;
 
-         // reverse it 
-         std::reverse(m_VectorPath.begin(), m_VectorPath.end() ); 
+        prevNode = m_Nodes[prevNode].prevNode;     
       }
-      // Multiple end end points and pathes
-      else
+
+      // reverse it 
+      std::reverse(m_VectorPath.begin(), m_VectorPath.end() ); 
+    }
+    // Multiple end end points and pathes
+    else
+    {
+      for (int i=0; i<m_endPointsClosed.size(); i++)
       {
-         for (int i=0; i<m_endPointsClosed.size(); i++)
-         {
-            m_VectorPath.clear();
-            // Go backwards from endnote to startnode    
-            NodeNumType prevNode = CoordToNode(m_endPointsClosed[i]);       
-            while (prevNode != -1) 
-            { 
-               m_VectorPath.push_back( NodeToCoord(prevNode) );           
+        m_VectorPath.clear();
+        // Go backwards from endnote to startnode    
+        NodeNumType prevNode = CoordToNode(m_endPointsClosed[i]);       
+        while (prevNode != -1) 
+        { 
+          m_VectorPath.push_back( NodeToCoord(prevNode) );           
 
-               if (prevNode == m_Graph_StartNode)
-                  break;
+          if (prevNode == m_Graph_StartNode)
+            break;
 
-               prevNode = m_Nodes[prevNode].prevNode;     
-            }
+          prevNode = m_Nodes[prevNode].prevNode;     
+        }
 
-            // reverse it 
-            std::reverse(m_VectorPath.begin(), m_VectorPath.end() ); 
-            // push_back
-            m_MultipleVectorPaths.push_back( m_VectorPath );
-         }         
-      }
+        // reverse it 
+        std::reverse(m_VectorPath.begin(), m_VectorPath.end() ); 
+        // push_back
+        m_MultipleVectorPaths.push_back( m_VectorPath );
+      }         
+    }
   }
 
 
@@ -902,19 +902,19 @@ namespace itk
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     CleanUp()
   {      
-      
 
-      m_VectorPath.clear();
-      //TODO: if multiple Path, clear all multiple Paths
+
+    m_VectorPath.clear();
+    //TODO: if multiple Path, clear all multiple Paths
     /*
     for (NodeNumType i=0; i<m_Graph_NumberOfNodes; i++)
     {      
     delete m_Nodes[i];
     }*/
 
-      // This is properly not a proper cleanup
-      if (m_Nodes)
-       delete m_Nodes;
+    // This is properly not a proper cleanup
+    if (m_Nodes)
+      delete [] m_Nodes;
     m_VectorOrder.clear();
 
   }

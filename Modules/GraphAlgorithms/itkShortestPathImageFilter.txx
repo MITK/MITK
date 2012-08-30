@@ -48,7 +48,19 @@ namespace itk
          this->SetNumberOfRequiredOutputs(1);
        this->SetNthOutput( 0, OutputImageType::New() ); 
       }
-  } 
+  }
+
+
+
+  template <class TInputImageType, class TOutputImageType>
+  ShortestPathImageFilter<TInputImageType, TOutputImageType>
+    ::~ShortestPathImageFilter()
+  {
+    delete [] m_Nodes;
+  }
+
+
+
 
   template <class TInputImageType, class TOutputImageType>
   inline typename ShortestPathImageFilter<TInputImageType, TOutputImageType>::IndexType

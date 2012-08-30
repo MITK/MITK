@@ -186,7 +186,7 @@ namespace itk
 
       ShortestPathImageFilter();
 
-      
+      ~ShortestPathImageFilter();
 
       // \brief Create all the outputs
       void MakeOutputs();

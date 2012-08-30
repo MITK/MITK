@@ -154,7 +154,7 @@ m_CrosshairNavigationEnabled(false)
   //Create RenderWindows 1
   mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, "stdmulti.widget1", NULL, m_RenderingManager);
   mitkWidget1->setMaximumSize(2000,2000);
-  mitkWidget1->SetLayoutIndex( TRANSVERSAL );
+  mitkWidget1->SetLayoutIndex( AXIAL );
   mitkWidgetLayout1->addWidget(mitkWidget1); 
 
   //Create RenderWindows 2
@@ -263,7 +263,7 @@ void QmitkStdMultiWidget::InitializeWidget()
 
   // Set default view directions for SNCs
   mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(
-    mitk::SliceNavigationController::Transversal );
+    mitk::SliceNavigationController::Axial );
   mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Sagittal );
   mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(
@@ -277,8 +277,8 @@ void QmitkStdMultiWidget::InitializeWidget()
   //Info for later: 
   //int view = this->GetRenderWindow1()->GetSliceNavigationController()->GetDefaultViewDirection();
   //QString layoutName;
-  //if( view == mitk::SliceNavigationController::Transversal )
-  //  layoutName = "Transverse";
+  //if( view == mitk::SliceNavigationController::Axial )
+  //  layoutName = "Axial";
   //else if( view == mitk::SliceNavigationController::Sagittal )
   //  layoutName = "Sagittal";
   //else if( view == mitk::SliceNavigationController::Frontal )
@@ -288,9 +288,9 @@ void QmitkStdMultiWidget::InitializeWidget()
   //if( view >= 0 && view < 4 )
   //  //write LayoutName --> Viewer 3D shoudn't write the layoutName.
 
-  //Render Window 1 == transversal
+  //Render Window 1 == axial
   m_CornerAnnotaions[0].cornerText = vtkCornerAnnotation::New();
-  m_CornerAnnotaions[0].cornerText->SetText(0, "Transverse");
+  m_CornerAnnotaions[0].cornerText->SetText(0, "Axial");
   m_CornerAnnotaions[0].cornerText->SetMaximumFontSize(12);
   m_CornerAnnotaions[0].textProp = vtkTextProperty::New();
   m_CornerAnnotaions[0].textProp->SetColor( 1.0, 0.0, 0.0 );

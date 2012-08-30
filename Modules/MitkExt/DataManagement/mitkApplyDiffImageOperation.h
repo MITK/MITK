@@ -63,7 +63,7 @@ class MitkExt_EXPORT ApplyDiffImageOperation : public Operation
     /**
       Pass only 2D images here.
       \param sliceIndex brief Which slice to extract (first one has index 0).
-      \param sliceDimension Number of the dimension which is constant for all pixels of the desired slice (e.g. 0 for transversal)
+      \param sliceDimension Number of the dimension which is constant for all pixels of the desired slice (e.g. 0 for axial)
     */
     ApplyDiffImageOperation(OperationType operationType, Image* image, Image* diffImage, unsigned int timeStep = 0, unsigned int sliceDimension = 2, unsigned int sliceIndex = 0);
     virtual ~ApplyDiffImageOperation();

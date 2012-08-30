@@ -96,7 +96,7 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
   bool isRotated = false;
 
   mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
-  plane->InitializeStandardPlane(workingImage->GetGeometry(), mitk::PlaneGeometry::Transversal, sliceindex, isFrontside, isRotated);
+  plane->InitializeStandardPlane(workingImage->GetGeometry(), mitk::PlaneGeometry::Axial, sliceindex, isFrontside, isRotated);
   mitk::Point3D origin = plane->GetOrigin();
   mitk::Vector3D normal;
   normal = plane->GetNormal();    

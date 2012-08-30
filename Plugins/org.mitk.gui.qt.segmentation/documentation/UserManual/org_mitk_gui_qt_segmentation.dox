@@ -114,7 +114,7 @@ If you have to delineate a lot of images, you should try using shortcuts to swit
 
 \subsection org_mitk_gui_qt_segmentationUserManualManualKringeling4 Using Editing Tools
 
-All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations transverse, sagittal, or frontal), move the mouse while holding the mouse button and release to finish the editing action.
+All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations axial, sagittal, or frontal), move the mouse while holding the mouse button and release to finish the editing action.
 
 Multi-step undo and redo is fully supported by all editing tools. Use the application-wide undo button in the toolbar to revert erroneous %actions.
 

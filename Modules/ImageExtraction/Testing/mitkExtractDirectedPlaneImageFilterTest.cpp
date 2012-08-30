@@ -224,7 +224,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //return NULL;
 //  }
 //
-//  static mitk::Geometry2D::Pointer TestTransversal()
+//  static mitk::Geometry2D::Pointer TestAxial()
 //  {
 //return NULL;
 //  }

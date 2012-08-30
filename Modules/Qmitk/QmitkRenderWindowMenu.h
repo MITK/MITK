@@ -58,7 +58,7 @@ public:
   virtual ~QmitkRenderWindowMenu();
 
   /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes 
-  layout direction (transversal, coronal .. ) and layout design (standard layout, 2D images top, 
+  layout direction (axial, coronal .. ) and layout design (standard layout, 2D images top,
   3D bottom ... ). */
   bool GetSettingsMenuVisibilty()
   { 
@@ -68,10 +68,10 @@ public:
       return m_Settings->isVisible();  
   }
 
-  /*! Set layout index. Defines layout direction (transversal, coronal, sagital or threeD) of the parent. */
+  /*! Set layout index. Defines layout direction (axial, coronal, sagital or threeD) of the parent. */
   void SetLayoutIndex( unsigned int layoutIndex );
   
-  /*! Return layout direction of parent (transversal, coronal, sagital or threeD) */
+  /*! Return layout direction of parent (axial, coronal, sagital or threeD) */
   unsigned int GetLayoutIndex()
   {  return m_Layout;  }
 
@@ -105,7 +105,7 @@ protected:
   /*! Reimplemented from QWidget. The paint event is a request to repaint all or part of a widget.*/
   void paintEvent(QPaintEvent *event);
 
-  /*! Update list of layout direction (transversal, coronal, sagital or threeD). Set action of currect layout direction
+  /*! Update list of layout direction (axial, coronal, sagital or threeD). Set action of currect layout direction
   to disable and all other to enable. Normaly the user can switch here between the different layout direction, but 
   this is not supported yet. */
   void UpdateLayoutList();
@@ -162,7 +162,7 @@ protected slots:
   void OnFullScreenButton( bool checked );
  
   /*! Slot for opening setting menu. The slot is connected to the clicked() event of m_SettingsButton. 
-  The settings menu includes differen layout directions (transversal, coronal, saggital and 3D) as well all layout design 
+  The settings menu includes differen layout directions (axial, coronal, saggital and 3D) as well all layout design
   (standard layout, 2D images top, 3D bottom ..)*/
   void OnSettingsButton( bool checked );
 
@@ -178,7 +178,7 @@ protected slots:
   /*! Slot for changing layout to Big 3D layout. The slot is connected to the triggered() signal of m_Big3DLayoutAction. */
   void OnChangeLayoutToBig3D(bool);
 
-  /*! Slot for changing layout design to Transverse plane layout. The slot is connected to the triggered() signal of m_Widget1LayoutAction. */
+  /*! Slot for changing layout design to Axial plane layout. The slot is connected to the triggered() signal of m_Widget1LayoutAction. */
   void OnChangeLayoutToWidget1(bool);
 
   /*! Slot for changing layout design to Sagittal plane layout. The slot is connected to the triggered() signal of m_Widget2LayoutAction. */
@@ -196,10 +196,10 @@ protected slots:
   /*! Slot for changing layout design to Sagittal top, Coronal n 3D bottom layout. The slot is connected to the triggered() signal of m_SmallUpperWidget2Big3and4LayoutAction. */
   void OnChangeLayoutToSmallUpperWidget2Big3and4(bool);
 
-  /*! Slot for changing layout design to Transverse n Sagittal left, 3D right layout. The slot is connected to the triggered() signal of m_2x2Dand3DWidgetLayoutAction. */
+  /*! Slot for changing layout design to Axial n Sagittal left, 3D right layout. The slot is connected to the triggered() signal of m_2x2Dand3DWidgetLayoutAction. */
   void OnChangeLayoutTo2x2Dand3DWidget(bool);
 
-  /*! Slot for changing layout design to Transverse n 3D left, Sagittal right layout. The slot is connected to the triggered() signal of m_Left2Dand3DRight2DLayoutAction. */
+  /*! Slot for changing layout design to Axial n 3D left, Sagittal right layout. The slot is connected to the triggered() signal of m_Left2Dand3DRight2DLayoutAction. */
   void OnChangeLayoutToLeft2Dand3DRight2D(bool);
   
   void OnCrossHairMenuAboutToShow();
@@ -209,6 +209,7 @@ public:
   /*! enum for layout direction*/
   enum {
     TRANSVERSAL,
+    AXIAL = TRANSVERSAL,
     SAGITTAL,
     CORONAL,
     THREE_D
@@ -222,6 +223,7 @@ public:
     LAYOUT_2DIMAGELEFT,
     LAYOUT_BIG3D,
     LAYOUT_TRANSVERSAL,
+    LAYOUT_AXIAL = LAYOUT_TRANSVERSAL,
     LAYOUT_SAGITTAL,
     LAYOUT_CORONAL,
     LAYOUT_2X2DAND3DWIDGET,
@@ -259,7 +261,7 @@ protected:
   /*! QAction for big 3D layout design */
   QAction*            m_Big3DLayoutAction;
 
-  /*! QAction for big transversal layout design */
+  /*! QAction for big axial layout design */
   QAction*            m_Widget1LayoutAction;
 
   /*! QAction for big saggital layout design */
@@ -277,10 +279,10 @@ protected:
   /*! QAction for sagittal top, coronal n 3D bottom layout design */
   QAction*            m_SmallUpperWidget2Big3and4LayoutAction;
 
-  /*! QAction for transversal n sagittal left, 3D right layout design */
+  /*! QAction for axial n sagittal left, 3D right layout design */
   QAction*            m_2x2Dand3DWidgetLayoutAction;
 
-  /*! QAction for transversal n 3D left, sagittal right layout design*/
+  /*! QAction for axial n 3D left, sagittal right layout design*/
   QAction*            m_Left2Dand3DRight2DLayoutAction;
 
   QLabel *m_TSLabel;
@@ -291,11 +293,11 @@ protected:
   
   QMenu*              m_CrosshairMenu;
 
-  /*! Index of layout direction. 0: transversal; 1: saggital; 2: coronal; 3: threeD */
+  /*! Index of layout direction. 0: axial; 1: saggital; 2: coronal; 3: threeD */
   unsigned int        m_Layout;
 
   /*! Index of layout design. 0: LAYOUT_DEFAULT; 1: LAYOUT_2DIMAGEUP; 2: LAYOUT_2DIMAGELEFT; 3: LAYOUT_BIG3D
-  4: LAYOUT_TRANSVERSAL; 5: LAYOUT_SAGITTAL; 6: LAYOUT_CORONAL; 7: LAYOUT_2X2DAND3DWIDGET; 8: LAYOUT_ROWWIDGET3AND4;
+  4: LAYOUT_AXIAL; 5: LAYOUT_SAGITTAL; 6: LAYOUT_CORONAL; 7: LAYOUT_2X2DAND3DWIDGET; 8: LAYOUT_ROWWIDGET3AND4;
   9: LAYOUT_COLUMNWIDGET3AND4; 10: LAYOUT_ROWWIDGETSMALL3ANDBIG4; 11: LAYOUT_SMALLUPPERWIDGET2BIGAND4; 12: LAYOUT_LEFT2DAND3DRIGHT2D */
   unsigned int        m_LayoutDesign;
 

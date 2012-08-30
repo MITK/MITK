@@ -97,7 +97,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   imageNormal2.Set_vnl_vector( vnl_cross_3d<ScalarType>(normal.Get_vnl_vector(),imageNormal2.Get_vnl_vector()) );
 
   double eps( 0.00001 );
-  // transversal
+  // axial
   if ( imageNormal2.GetNorm() <= eps )
   {
     affectedDimension = 2;

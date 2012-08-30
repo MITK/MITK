@@ -287,6 +287,7 @@ public:
 
   enum {
     TRANSVERSAL,
+    AXIAL = TRANSVERSAL,
     SAGITTAL,
     CORONAL,
     THREE_D

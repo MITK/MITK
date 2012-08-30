@@ -182,7 +182,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
       An array of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
       has at least one pixel that is not 0 (which would mean that it has to be considered by the interpolation algorithm).
 
-      E.g. flags for transversal slices are stored in m_SegmentationCountInSlice[0][index].
+      E.g. flags for axial slices are stored in m_SegmentationCountInSlice[0][index].
 
       Enhanced with time steps it is now m_SegmentationCountInSlice[timeStep][0][index]
     */

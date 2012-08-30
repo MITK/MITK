@@ -108,6 +108,11 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
     */
+    void OnAxialTimeChanged(itk::Object* sender, const itk::EventObject&);
+
+    /**
+      Just public because it is called by itk::Commands. You should not need to call this.
+    */
     void OnTransversalTimeChanged(itk::Object* sender, const itk::EventObject&);
 
     /**
@@ -119,6 +124,11 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
       Just public because it is called by itk::Commands. You should not need to call this.
     */
     void OnFrontalTimeChanged(itk::Object* sender, const itk::EventObject&);
+
+    /**
+      Just public because it is called by itk::Commands. You should not need to call this.
+    */
+    void OnAxialSliceChanged(const itk::EventObject&);
  
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
@@ -223,7 +233,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
       and calls Interpolate to further process this PlaneGeometry into an interpolation.
 
       \param e is a actually a mitk::SliceNavigationController::GeometrySliceEvent, sent by a SliceNavigationController
-      \param windowID is 2 for transversal, 1 for frontal, 0 for sagittal (similar to sliceDimension in other methods)
+      \param windowID is 2 for axial, 1 for frontal, 0 for sagittal (similar to sliceDimension in other methods)
           */
     bool TranslateAndInterpolateChangedSlice(const itk::EventObject& e, unsigned int windowID);
     
@@ -242,7 +252,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     
     /**
      * Tries to figure out the slice position and orientation for a given render window.
-     * \param windowID is 2 for transversal, 1 for frontal, 0 for sagittal (similar to sliceDimension in other methods)
+     * \param windowID is 2 for axial, 1 for frontal, 0 for sagittal (similar to sliceDimension in other methods)
      * \return false if orientation could not be determined
      */
     bool GetSliceForWindowsID(unsigned windowID, int& sliceDimension, int& sliceIndex);

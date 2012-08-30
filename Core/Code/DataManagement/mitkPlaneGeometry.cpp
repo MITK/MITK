@@ -172,7 +172,7 @@ PlaneGeometry::InitializeStandardPlane( mitk::ScalarType width,
   int normalDirection;
   switch(planeorientation)
   {
-    case Transversal:
+    case Axial:
       if(frontside)
       {
         if(rotated==false)
@@ -325,7 +325,7 @@ PlaneGeometry::InitializeStandardPlane( const Geometry3D *geometry3D,
   }
   switch(planeorientation)
   {
-    case Transversal:
+    case Axial:
       width  = geometry3D->GetExtent(0);
       height = geometry3D->GetExtent(1);
       break;
@@ -365,7 +365,7 @@ PlaneGeometry::InitializeStandardPlane( const Geometry3D *geometry3D,
 
   switch(planeorientation)
   {
-    case Transversal:
+    case Axial:
       zPosition = (top ? 0.5 : geometry3D->GetExtent(2)-1+0.5);
       break;
     case Frontal:

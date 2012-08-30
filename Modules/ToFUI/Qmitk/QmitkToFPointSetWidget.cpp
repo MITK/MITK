@@ -115,7 +115,7 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
 {
   // initialize members
   //  m_RenderWindowPart = renderWindowPart;
-  m_RenderWindow1 = renderWindowHashMap.value("transversal")->GetRenderWindow();
+  m_RenderWindow1 = renderWindowHashMap.value("axial")->GetRenderWindow();
   m_RenderWindow2 = renderWindowHashMap.value("sagittal")->GetRenderWindow();
   m_RenderWindow3 = renderWindowHashMap.value("coronal")->GetRenderWindow();
   m_RenderWindow4 = renderWindowHashMap.value("3d")->GetRenderWindow();
@@ -127,7 +127,7 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
     // initialize overlays
     this->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
     this->m_VtkTextActor->SetInput("Choose measurement points with SHIFT+Click");
-    m_WindowHeight = renderWindowHashMap.value("transversal")->GetRenderer()->GetSizeY();
+    m_WindowHeight = renderWindowHashMap.value("axial")->GetRenderer()->GetSizeY();
     this->m_VtkTextActor->SetDisplayPosition(10,m_WindowHeight-30);
     this->m_VtkTextActor->GetTextProperty()->SetFontSize(16);
 //    this->m_VtkTextActor->GetTextProperty()->SetColor(1,0,0);

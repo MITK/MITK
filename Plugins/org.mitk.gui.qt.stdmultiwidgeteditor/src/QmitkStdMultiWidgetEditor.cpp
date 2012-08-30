@@ -277,6 +277,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     d->m_StdMultiWidget = new QmitkStdMultiWidget(parent);
 
     d->m_RenderWindows.insert("transversal", d->m_StdMultiWidget->GetRenderWindow1());
+    d->m_RenderWindows.insert("axial", d->m_StdMultiWidget->GetRenderWindow1());
     d->m_RenderWindows.insert("sagittal", d->m_StdMultiWidget->GetRenderWindow2());
     d->m_RenderWindows.insert("coronal", d->m_StdMultiWidget->GetRenderWindow3());
     d->m_RenderWindows.insert("3d", d->m_StdMultiWidget->GetRenderWindow4());
@@ -292,7 +293,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     // Tell the multiWidget which (part of) the tree to render
     d->m_StdMultiWidget->SetDataStorage(ds);
 
-    // Initialize views as transversal, sagittal, coronar to all data objects in DataStorage
+    // Initialize views as axial, sagittal, coronar to all data objects in DataStorage
     // (from top-left to bottom)
     mitk::TimeSlicedGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
     mitk::RenderingManager::GetInstance()->InitializeViews(geo);

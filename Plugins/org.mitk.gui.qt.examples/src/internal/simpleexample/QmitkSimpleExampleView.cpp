@@ -74,7 +74,7 @@ void QmitkSimpleExampleView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMu
 {
   m_MultiWidget = &stdMultiWidget;
 
-  new QmitkStepperAdapter(m_Controls->sliceNavigatorTransversal, m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
+  new QmitkStepperAdapter(m_Controls->sliceNavigatorAxial, m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice(), "sliceNavigatorAxialFromSimpleExample");
   new QmitkStepperAdapter(m_Controls->sliceNavigatorSagittal, m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
   new QmitkStepperAdapter(m_Controls->sliceNavigatorFrontal, m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
   new QmitkStepperAdapter(m_Controls->sliceNavigatorTime, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");

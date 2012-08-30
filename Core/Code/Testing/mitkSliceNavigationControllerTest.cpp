@@ -143,8 +143,8 @@ int testGeometry(const mitk::Geometry3D * geometry,
   sliceCtrl->SetInputWorldGeometry(geometry);
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing SetViewDirection(mitk::SliceNavigationController::Transversal): ";
-  sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Transversal);
+  std::cout << "Testing SetViewDirection(mitk::SliceNavigationController::Axial): ";
+  sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Axial);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing Update(): ";
@@ -152,9 +152,9 @@ int testGeometry(const mitk::Geometry3D * geometry,
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing result of CreatedWorldGeometry(): ";
-  mitk::Point3D transversalcornerpoint0;
-  transversalcornerpoint0 = cornerpoint0+bottom+normal*(numSlices-1+0.5); //really -1?
-  result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(), width, height, numSlices, widthInMM, heightInMM, thicknessInMM*numSlices, transversalcornerpoint0, right, bottom*(-1.0), normal*(-1.0));
+  mitk::Point3D axialcornerpoint0;
+  axialcornerpoint0 = cornerpoint0+bottom+normal*(numSlices-1+0.5); //really -1?
+  result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(), width, height, numSlices, widthInMM, heightInMM, thicknessInMM*numSlices, axialcornerpoint0, right, bottom*(-1.0), normal*(-1.0));
   if(result!=EXIT_SUCCESS)
   {
     std::cout<<"[FAILED]"<<std::endl;

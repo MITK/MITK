@@ -589,7 +589,7 @@
                           </font>
                          </property>
                          <property name="text">
-                          <string>z-Direction (Transverse):</string>
+                          <string>z-Direction (Axial):</string>
                          </property>
                          <property name="wordWrap">
                           <bool>false</bool>
@@ -715,7 +715,7 @@
                           </font>
                          </property>
                          <property name="text">
-                          <string>z-Axis (Transverse):</string>
+                          <string>z-Axis (Axial):</string>
                          </property>
                          <property name="wordWrap">
                           <bool>false</bool>
@@ -841,7 +841,7 @@
                           </font>
                          </property>
                          <property name="text">
-                          <string>z-Direction (Transverse):</string>
+                          <string>z-Direction (Axial):</string>
                          </property>
                          <property name="wordWrap">
                           <bool>false</bool>

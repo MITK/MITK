@@ -157,7 +157,7 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     void ResetTransferFunction(vtkColorTransferFunction* colorTransferFunction, int type, double min, double max);
     /*!
     \brief Reset the color transfer function for the given widget
-    \param widget 0: transversal, 1: coronal, 2: sagittal
+    \param widget 0: axial, 1: coronal, 2: sagittal
     \param type: type of the transfer function: 0 = gray scale, 1 = color
     */
     void ReinitTransferFunction(int widget, int type);

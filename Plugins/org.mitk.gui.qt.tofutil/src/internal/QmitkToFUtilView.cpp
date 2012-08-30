@@ -111,11 +111,11 @@ void QmitkToFUtilView::Activated()
     {
       linkedRenderWindowPart->EnableSlicingPlanes(false);
     }
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOn();
-    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+    GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+    GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOn();
+    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
     GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOn();
-    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
     GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
 
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
@@ -230,8 +230,8 @@ void QmitkToFUtilView::ResetGUIToDefault()
     {
       linkedRenderWindowPart->EnableSlicingPlanes(true);
     }
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOff();
+    GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+    GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOff();
     GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
     GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
     GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
@@ -561,7 +561,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   if (m_AmplitudeImageNode.IsNotNull())
   {
     this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("transversal")->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("coronal")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetBoolProperty("use color",!useToF);
@@ -570,7 +570,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   if (m_IntensityImageNode.IsNotNull())
   {
     this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("transversal")->GetRenderWindow() ) );
+    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow() ) );
     this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow() ) );
     this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
     this->m_IntensityImageNode->SetBoolProperty("use color",!useToF);
@@ -579,7 +579,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   if ((m_RGBImageNode.IsNotNull()))
   {
     this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("transversal")->GetRenderWindow() ) );
+    this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow() ) );
     this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow() ) );
     this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
   }

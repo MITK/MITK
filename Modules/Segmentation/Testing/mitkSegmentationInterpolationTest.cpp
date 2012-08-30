@@ -173,7 +173,7 @@ bool mitkSegmentationInterpolationTestClass::CreateTwoSlices(int slicedim)
 bool mitkSegmentationInterpolationTestClass::TestInterpolation(int slicedim)
 {
   int slice = 1;
-  mitk::Image::Pointer interpolated = m_Interpolator->Interpolate( slicedim, slice, 0 ); // interpolate second slice transversal
+  mitk::Image::Pointer interpolated = m_Interpolator->Interpolate( slicedim, slice, 0 ); // interpolate second slice axial
   if (interpolated.IsNull())
   {
     std::cerr << "  (EE) Interpolation did not return anything for slicedim == " << slicedim << " (although it should)." << std::endl;

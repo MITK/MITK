@@ -137,8 +137,8 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
 
   //maximum value in each direction for size
   typename InputImageType::SizeType size;
-  size[0] = startPoint[0] > endPoint[0] ? startPoint[0] : endPoint[0];
-  size[1] = startPoint[1] > endPoint[1] ? startPoint[1] : endPoint[1];
+  size[0] = abs( startPoint[0] - endPoint[0] );
+  size[1] = abs( startPoint[1] - endPoint[1] );
 
 
   typename CostFunctionType::RegionType region;
@@ -146,6 +146,7 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   region.SetIndex( startRegion );
   /*---------------------------------------------*/
 
+  //inputImage->SetRequestedRegion(region);
 
   /* extracts features from image and calculates costs */
   typename CostFunctionType::Pointer costFunction = CostFunctionType::New();

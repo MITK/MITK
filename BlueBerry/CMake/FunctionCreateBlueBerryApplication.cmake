@@ -23,7 +23,7 @@
 #! FunctionCreateBlueBerryApplication(
 #!   NAME MyApp
 #!   DESCRIPTION "MyApp - New ways to explore medical data"
-#!   EXCLUDE_PLUGINS org.mitk.gui.qt.mitkworkbenchlication
+#!   EXCLUDE_PLUGINS org.mitk.gui.qt.extapplication
 #!   SHOW_CONSOLE
 #! )
 #! \endcode

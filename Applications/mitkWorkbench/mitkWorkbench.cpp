@@ -46,7 +46,7 @@ public:
     {
       return QApplication::notify(receiver, event);
     }
-    catch (mitk::Exception e)
+    catch (mitk::Exception& e)
     {
       msg = QString("MITK Exception:\n\n") 
             + QString("Desciption: ") 
@@ -73,7 +73,7 @@ public:
     msgBox.setDetailedText(msg);
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.addButton(trUtf8("Exit"), QMessageBox::YesRole);
-    msgBox.addButton(trUtf8("Ingore"), QMessageBox::NoRole);
+    msgBox.addButton(trUtf8("Ignore"), QMessageBox::NoRole);
 
     int ret = msgBox.exec();
     

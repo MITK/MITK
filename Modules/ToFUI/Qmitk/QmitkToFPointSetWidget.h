@@ -109,6 +109,8 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     Ui::QmitkToFPointSetWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
+    mitk::DataStorage::Pointer m_DataStorage; ///< member holding the set DataStorage
+
     mitk::Image::Pointer m_DistanceImage; ///< image holding the range data of the ToF camera
     mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< intrinsic parameters of the camera
 
@@ -131,6 +133,7 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     long m_MeasurementPointSetChangedObserverTag; ///< observer tag for measurement PointSet observer
     long m_PointSetChangedObserverTag; ///< observer tag for PointSet observer
+//    long m_DistanceImageChangedObserverTag; ///< observer tag for distance image observer
 
     int m_WindowHeight; ///< Height of the renderWindow
 

@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkToFPointSetWidget::VIEW_ID = "org.mitk.views.qmitktofpointsetwidget";
 
 QmitkToFPointSetWidget::QmitkToFPointSetWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
+, m_DataStorage(NULL)
 , m_DistanceImage(NULL)
 , m_CameraIntrinsics(NULL)
 , m_VtkTextActor(NULL)
@@ -80,6 +81,7 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
 {
   // initialize members
   m_CameraIntrinsics = cameraIntrinsics;
+  m_DataStorage = dataStorage;
   //  m_RenderWindowPart = renderWindowPart;
   m_RenderWindow1 = renderWindowHashMap.value("transversal")->GetRenderWindow();
   m_RenderWindow2 = renderWindowHashMap.value("sagittal")->GetRenderWindow();
@@ -162,7 +164,6 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
     pointSet2DNode = mitk::DataNode::New();
     pointSet2DNode->SetName("ToF PointSet 2D");
     pointSet2DNode->SetVisibility(false, renderWindowHashMap.value("3d")->GetRenderer());
-    pointSet2DNode->SetIntProperty("label",0);
     pointSet2DNode->SetData(m_PointSet2D);
     dataStorage->Add(pointSet2DNode);
     m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor",pointSet2DNode);
@@ -209,6 +210,10 @@ void QmitkToFPointSetWidget::CleanUpWidget()
   {
     m_PointSet2D->RemoveObserver(m_PointSetChangedObserverTag);
   }
+//  if (m_DistanceImage.IsNotNull())
+//  {
+//    m_DistanceImage->RemoveObserver(m_DistanceImageChangedObserverTag);
+//  }
   // remove foreground renderer
   if (m_ForegroundRenderer1&&m_RenderWindow1)
   {
@@ -242,11 +247,27 @@ void QmitkToFPointSetWidget::CleanUpWidget()
 
 void QmitkToFPointSetWidget::SetDistanceImage(mitk::Image::Pointer distanceImage)
 {
+//  // remove existing observer
+//  if (m_DistanceImage.IsNotNull())
+//  {
+//    m_DistanceImage->RemoveObserver(m_DistanceImageChangedObserverTag);
+//  }
   m_DistanceImage = distanceImage;
+//  // create observer for m_DistanceImage
+//  itk::SimpleMemberCommand<QmitkToFPointSetWidget>::Pointer distanceImageChangedCommand;
+//  distanceImageChangedCommand = itk::SimpleMemberCommand<QmitkToFPointSetWidget>::New();
+//  distanceImageChangedCommand->SetCallbackFunction(this, &QmitkToFPointSetWidget::MeasurementPointSetChanged);
+//  m_DistanceImageChangedObserverTag = m_DistanceImage->AddObserver(itk::ModifiedEvent(), distanceImageChangedCommand);
 }
 
 void QmitkToFPointSetWidget::OnMeasurement()
 {
+  // always show 2D PointSet in foreground
+  mitk::DataNode::Pointer pointSetNode = m_DataStorage->GetNamedNode("Measurement PointSet 2D");
+  if (pointSetNode.IsNotNull())
+  {
+    pointSetNode->SetIntProperty("layer",100);
+  }
   if (m_Controls->measureButton->isChecked())
   {
     // disable point set interaction
@@ -275,6 +296,12 @@ void QmitkToFPointSetWidget::OnMeasurement()
 
 void QmitkToFPointSetWidget::OnPointSet()
 {
+  // always show 2D PointSet in foreground
+  mitk::DataNode::Pointer pointSetNode = m_DataStorage->GetNamedNode("ToF PointSet 2D");
+  if (pointSetNode.IsNotNull())
+  {
+    pointSetNode->SetIntProperty("layer",100);
+  }
   if (m_Controls->pointSetButton->isChecked())
   {
     // disable measurement
@@ -305,13 +332,13 @@ void QmitkToFPointSetWidget::MeasurementPointSetChanged()
 {
   // replace text actor
   this->m_VtkTextActor->SetDisplayPosition(10,m_WindowHeight-30);
-  // check if points are inside the image range
-  int imageSizeX = m_DistanceImage->GetDimensions()[0];
-  int imageSizeY = m_DistanceImage->GetDimensions()[1];
-  mitk::Point3D point1 = m_MeasurementPointSet2D->GetPoint(0);
-  mitk::Point3D point2 = m_MeasurementPointSet2D->GetPoint(1);
-  if (m_MeasurementPointSet2D->GetSize()>0)
+  if (m_MeasurementPointSet2D->GetSize()==2)
   {
+    // check if points are inside the image range
+    int imageSizeX = m_DistanceImage->GetDimensions()[0];
+    int imageSizeY = m_DistanceImage->GetDimensions()[1];
+    mitk::Point3D point1 = m_MeasurementPointSet2D->GetPoint(0);
+    mitk::Point3D point2 = m_MeasurementPointSet2D->GetPoint(1);
     if ((point1[0]>=0.0f)&&(point1[0]<imageSizeX)&&(point1[1]>=0)&&(point1[1]<imageSizeY)&&
         (point2[0]>=0.0f)&&(point2[0]<imageSizeX)&&(point2[1]>=0)&&(point2[1]<imageSizeY))
     {

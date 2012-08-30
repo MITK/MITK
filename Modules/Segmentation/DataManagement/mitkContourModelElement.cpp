@@ -51,6 +51,20 @@ void mitk::ContourModelElement::AddVertex(VertexType &vertex)
 
 
 
+void mitk::ContourModelElement::AddVertexAtFront(mitk::Point3D &vertex, bool isActive)
+{
+  this->m_Vertices->push_front(new VertexType(vertex, isActive));
+}
+
+
+
+void mitk::ContourModelElement::AddVertexAtFront(VertexType &vertex)
+{
+  this->m_Vertices->push_front(&vertex);
+}
+
+
+
 void mitk::ContourModelElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isActive, int index)
 {
   if(index > 0 && this->GetSize() > index)

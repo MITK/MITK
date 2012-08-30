@@ -136,7 +136,6 @@ namespace mitk
     //##
     //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     //## will not be added, the TimeSlicedGeometry will not be expanded.
-    //## @Note Also if the contour is closed the vertex will not be added.
     //##
     void AddVertex(mitk::Point3D &vertex, int timestep=0);
 
@@ -149,7 +148,6 @@ namespace mitk
     //##
     //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     //## will not be added, the TimeSlicedGeometry will not be expanded.
-    //## @Note Also if the contour is closed the vertex will not be added.
     //##
     void AddVertex(VertexType &vertex, int timestep=0);
 
@@ -164,9 +162,46 @@ namespace mitk
     //##
     //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     //## will not be added, the TimeSlicedGeometry will not be expanded.
-    //## @Note Also if the contour is closed the vertex will not be added.
     //##
     void AddVertex(mitk::Point3D &vertex, bool isActive, int timestep=0);
+
+    //##Documentation
+    //## @brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
+    //## The vertex is added at the FRONT of contour.
+    //##
+    //## @param vertex - coordinate representation of a control point
+    //## @param timestep - the timestep at which the vertex will be add ( default 0)
+    //##
+    //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    //## will not be added, the TimeSlicedGeometry will not be expanded.
+    //##
+    void AddVertexAtFront(mitk::Point3D &vertex, int timestep=0);
+
+    //##Documentation
+    //## @brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
+    //## The vertex is added at the FRONT of contour.
+    //##
+    //## @param vertex - coordinate representation of a control point
+    //## @param timestep - the timestep at which the vertex will be add ( default 0)
+    //##
+    //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    //## will not be added, the TimeSlicedGeometry will not be expanded.
+    //##
+    void AddVertexAtFront(VertexType &vertex, int timestep=0);
+
+    //##Documentation
+    //## @brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
+    //##
+    //## @param vertex - coordinate representation of a control point
+    //## @param timestep - the timestep at which the vertex will be add ( default 0)
+    //## @param isActive - specifies wether the vertex is active or not (Active 
+    //## vertices will be rendered).
+    //##
+    //##
+    //## @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    //## will not be added, the TimeSlicedGeometry will not be expanded.
+    //##
+    void AddVertexAtFront(mitk::Point3D &vertex, bool isActive, int timestep=0);
 
     //##Documentation
     //## @brief Insert a vertex at given index.

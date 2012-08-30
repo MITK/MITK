@@ -73,6 +73,40 @@ void mitk::ContourModel::AddVertex(VertexType &vertex, int timestep)
 
 
 
+void mitk::ContourModel::AddVertexAtFront(mitk::Point3D &vertex, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep) )
+  {
+    this->AddVertexAtFront(vertex, false, timestep);
+  }
+}
+
+
+
+void mitk::ContourModel::AddVertexAtFront(mitk::Point3D &vertex, bool isActive, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+      this->m_ContourSeries[timestep]->AddVertexAtFront(vertex, isActive);
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
+      this->Modified();
+  }
+}
+
+
+
+void mitk::ContourModel::AddVertexAtFront(VertexType &vertex, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+      this->m_ContourSeries[timestep]->AddVertexAtFront(vertex);
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
+      this->Modified();
+  }
+}
+
+
+
 void mitk::ContourModel::InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isActive, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))

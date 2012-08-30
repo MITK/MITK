@@ -130,6 +130,16 @@ namespace mitk
     //##Documentation
     //## @brief
     //##
+    virtual void AddVertexAtFront(mitk::Point3D &vertex, bool isActive);
+
+    //##Documentation
+    //## @brief
+    //##
+    virtual void AddVertexAtFront(VertexType &vertex);
+
+    //##Documentation
+    //## @brief
+    //##
     virtual void InsertVertexAtIndex(mitk::Point3D &vertex, bool isActive, int index);
 
     //##Documentation

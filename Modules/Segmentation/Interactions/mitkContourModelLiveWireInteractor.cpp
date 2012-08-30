@@ -91,11 +91,71 @@ bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const 
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
 
-  contour->RemoveVertex(contour->GetSelectedVertex());
+  mitk::ContourModel::VertexIterator end =contour->IteratorEnd();
+  mitk::ContourModel::VertexIterator begin =contour->IteratorBegin();
 
   //search next active control point to left and rigth and set as start and end point for filter
+  mitk::ContourModel::VertexIterator itUp = contour->IteratorBegin();
 
-  //recompute contour between neighbored two active control points
+  //move iterator to position
+  while((*itUp) != contour->GetSelectedVertex())
+  {
+    itUp++;
+  }
+
+  mitk::ContourModel::VertexIterator itDown = itUp;
+
+  //step once down otherwise the the loop breaks immediately
+  itUp++;
+  itDown--;
+
+  while(!((*itUp)->IsActive)){ itUp++; }
+
+  while(!((*itDown)->IsActive)){ itDown--; }
+
+    //recompute contour between neighbored two active control points
+  this->m_LiveWireFilter->SetStartPoint( (*itDown)->Coordinates );
+  this->m_LiveWireFilter->SetEndPoint( (*itUp)->Coordinates );
+  this->m_LiveWireFilter->Update();
+
+  mitk::ContourModel::Pointer liveWireContour = mitk::ContourModel::New();
+  liveWireContour = this->m_LiveWireFilter->GetOutput();
+
+  //construct a new contour
+  mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
+  mitk::ContourModel::VertexIterator it = contour->IteratorBegin();
+
+  //copy from begin to itUP
+  while(it != itDown)
+  {
+    newContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
+    it++;
+  }
+
+  //add vertex at itDown - it's not considered during while loop
+  if( it != end)
+  {
+    newContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
+  }
+
+  //insert new liveWire computed points
+  newContour->Concatenate( liveWireContour, timestep);
+
+  //copy the rest of the original contour
+  it = itUp;
+  while(it != end)
+  {
+    newContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
+    it++;
+  }
+
+  newContour->SetIsClosed(contour->IsClosed(timestep), timestep);
+
+  m_DataNode->SetData(newContour);
+
+
+  assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
+  mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
 
   return true;
 }

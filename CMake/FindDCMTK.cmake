@@ -162,6 +162,25 @@ if(DCMTK_ofstd_INCLUDE_DIR)
   mark_as_advanced(DCMTK_dcmtk_INCLUDE_DIR)
 endif()
 
+# If either Debug or Release has been build, but the other has not 
+# we return still should not return a not found
+
+foreach(lib
+    dcmimgle
+    dcmdata
+    ofstd
+    )
+
+  if( DCMTK_${lib}_LIBRARY_RELEASE AND NOT DCMTK_${lib}_LIBRARY_DEBUG )
+    set(DCMTK_${lib}_LIBRARY_DEBUG ${DCMTK_${lib}_LIBRARY_RELEASE} )
+  endif()
+  
+  if( DCMTK_${lib}_LIBRARY_DEBUG AND NOT DCMTK_${lib}_LIBRARY_RELEASE )
+    set(DCMTK_${lib}_LIBRARY_RELEASE ${DCMTK_${lib}_LIBRARY_DEBUG} )
+  endif()
+
+endforeach()
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(DCMTK DEFAULT_MSG
   DCMTK_config_INCLUDE_DIR

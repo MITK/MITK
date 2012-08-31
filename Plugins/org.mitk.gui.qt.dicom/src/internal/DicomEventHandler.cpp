@@ -70,13 +70,19 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
         MITK_ERROR << "Could not load series: " << seriesUID.toStdString();
     }
     else
-    {        
+    {
+        //Get Reference for default data storage.
         ctkServiceReference serviceReference =mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
         mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+        mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
-        storageService->GetActiveDataStorage().GetPointer()->GetDataStorage()->Add(node);
-        mitk::RenderingManager::GetInstance()->SetDataStorage(storageService->GetActiveDataStorage().GetPointer()->GetDataStorage());
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        dataStorage->Add(node);
+
+        // Initialize the RenderWindow
+        mitk::TimeSlicedGeometry::Pointer geometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
+        mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
+
+
     }
 }
 

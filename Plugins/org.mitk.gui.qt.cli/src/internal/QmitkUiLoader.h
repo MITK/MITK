@@ -16,18 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkUiLoader_h
 #define QmitkUiLoader_h
 
-#include <QUiLoader>
+#include <ctkCmdLineModuleQtUiLoader.h>
 #include <QStringList>
 #include "mitkDataStorage.h"
 
 /**
  * \class QmitkUiLoader
- * \brief Derived from QUiLoader to enable us to instantiate widgets from Qmitk at runtime,
+ * \brief Derived from ctkCmdLineModuleQtGuiLoader to enable us to instantiate widgets from Qmitk at runtime,
  * and currently we instatiate QmitkDataStorageComboBoxWithSelectNone, used for image input widgets.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cli_internal
  */
-class QmitkUiLoader : public QUiLoader
+class QmitkUiLoader : public ctkCmdLineModuleQtUiLoader
 {
 
   Q_OBJECT
@@ -37,15 +37,15 @@ public:
   virtual ~QmitkUiLoader();
 
   /**
-   * \brief Returns the list of available widgets in QUiLoader and also QmitkDataStorageComboBoxWithSelectNone.
-   * \see QUiLoader::availableWidgets()
+   * \brief Returns the list of available widgets in ctkCmdLineModuleQtGuiLoader and also QmitkDataStorageComboBoxWithSelectNone.
+   * \see ctkCmdLineModuleQtGuiLoader::availableWidgets()
    */
   QStringList availableWidgets () const;
 
   /**
    * \brief If className is QmitkDataStorageComboBox, instantiates QmitkDataStorageComboBoxWithSelectNone and
    * otherwise delegates to base class.
-   * \see QUiLoader::createWidget()
+   * \see ctkCmdLineModuleQtGuiLoader::createWidget()
    */
   virtual QWidget* createWidget(const QString & className, QWidget * parent = 0, const QString & name = QString() );
 

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //-----------------------------------------------------------------------------
 QmitkUiLoader::QmitkUiLoader(const mitk::DataStorage* dataStorage, QObject *parent)
-  : QUiLoader(parent)
+  : ctkCmdLineModuleQtUiLoader(parent)
 , m_DataStorage(dataStorage)
 {
 
@@ -36,7 +36,7 @@ QmitkUiLoader::~QmitkUiLoader()
 //-----------------------------------------------------------------------------
 QStringList QmitkUiLoader::availableWidgets () const
 {
-  QStringList availableWidgets = QUiLoader::availableWidgets();
+  QStringList availableWidgets = ctkCmdLineModuleQtUiLoader::availableWidgets();
   availableWidgets << "QmitkDataStorageComboBoxWithSelectNone";
   return availableWidgets;
 }
@@ -58,7 +58,7 @@ QWidget* QmitkUiLoader::createWidget(const QString& className, QWidget* parent, 
   }
   else
   {
-    widget = QUiLoader::createWidget(className, parent, name);
+    widget = ctkCmdLineModuleQtUiLoader::createWidget(className, parent, name);
   }
   return widget;
 }

@@ -6,5 +6,6 @@
         <file>network-workgroup_32.png</file>
         <file>network-idle_16.png</file>
         <file>network-offline_16.png</file>
+        <file>network-error_16.png</file>
     </qresource>
 </RCC>

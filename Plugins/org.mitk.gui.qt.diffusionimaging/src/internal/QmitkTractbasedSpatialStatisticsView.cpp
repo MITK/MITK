@@ -1272,9 +1272,14 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
 
 
-void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img,
+void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img,
                                                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, int index)
 {
+
+
+
+  mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
+  mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
 
   m_CurrentGeometry = fib->GetGeometry();
   typedef itk::Point<float,3>               PointType;
@@ -1288,13 +1293,7 @@ void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *f
     // Plot using ROIs
 
     mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
-    std::vector<int> pointsInStart = fib->GetPointsRoi();
-
-    for(int i=0; i<pointsInStart.size(); i++)
-        std::cout << pointsInStart[i] << std::endl;
-
     mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
-    std::vector<int> pointsInEnd = inStart->GetPointsRoi();
 
 
     int num = inBoth->GetNumFibers();
@@ -1314,32 +1313,40 @@ void QmitkTractbasedSpatialStatisticsView::PlotFiberBundle(mitk::FiberBundleX *f
 
       int startId = 0;
       int endId = 0;
-      bool foundStart = false;
-      bool foundEnd = false;
+
+      float minDistStart = std::numeric_limits<float>::max();
+      float minDistEnd = std::numeric_limits<float>::max();
+
+
 
       for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
       {
 
-        int id = pointsInCell[pointInCellID];
+
+        double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
 
 
-        bool isPresent = (std::find(pointsInStart.begin(), pointsInStart.end(), id) != pointsInStart.end());
+        mitk::Point3D point;
+        point[0] = p[0];
+        point[1] = p[1];
+        point[2] = p[2];
 
-        if(isPresent)
+        float distanceToStart = point.EuclideanDistanceTo(startCenter);
+        float distanceToEnd = point.EuclideanDistanceTo(endCenter);
+
+        if(distanceToStart < minDistStart)
         {
+          minDistStart = distanceToStart;
           startId = pointInCellID;
-          foundStart = true;
         }
 
-        isPresent = (std::find(pointsInEnd.begin(), pointsInEnd.end(), id) != pointsInEnd.end());
-        if(isPresent)
+        if(distanceToEnd < minDistEnd)
         {
+          minDistEnd = distanceToEnd;
           endId = pointInCellID;
-          foundEnd = true;
         }
 
-        if(foundStart && foundEnd)
-          continue;
+
 
       }
 

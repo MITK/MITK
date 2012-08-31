@@ -135,7 +135,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   this->GetDataNode()->GetBoolProperty("show contour", makeContour);
   if (makeContour)
   {
-    this->CreateContour(NULL);
+    this->CreateContour();
   }
 
   //now fill selected and unselected pointList
@@ -532,7 +532,7 @@ void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRende
   this->GetDataNode()->GetBoolProperty("show contour", makeContour, renderer);
   if(makeContour && (m_ContourActor != NULL) )
   {
-    this->CreateContour(renderer);
+    this->CreateContour();
     m_ContourActor->GetProperty()->SetColor(contourColor);
     m_ContourActor->GetProperty()->SetOpacity(opacity);
   }
@@ -545,7 +545,7 @@ void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRende
 
 }
 
-void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::CreateContour()
 {
   vtkSmartPointer<vtkAppendPolyData> vtkContourPolyData = vtkSmartPointer<vtkAppendPolyData>::New();
   vtkSmartPointer<vtkPolyDataMapper> vtkContourPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New(); 

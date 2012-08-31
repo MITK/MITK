@@ -21,34 +21,44 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QmitkServiceListWidget" name="m_DeviceFactoryServiceListWidget" native="true"/>
-   </item>
-   <item>
-    <widget class="QmitkServiceListWidget" name="m_ConnectedDeviceServiceListWidget" native="true"/>
-   </item>
-   <item>
-    <widget class="QPushButton" name="m_GetRegistered">
+    <widget class="QLabel" name="m_DeviceFactoryLabel">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="text">
-      <string>Get Registered Factories</string>
+      <string>Available Device Factories</string>
+     </property>
+     <property name="margin">
+      <number>10</number>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="m_GetConnect">
+    <widget class="QmitkServiceListWidget" name="m_DeviceFactoryServiceListWidget" native="true">
+     <zorder>m_DeviceFactoryLabel</zorder>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="m_CreatedDevicesLabel">
      <property name="text">
-      <string>Get Connected Devices</string>
+      <string>Created Devices</string>
+     </property>
+     <property name="margin">
+      <number>10</number>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="m_ConnectDevice">
-     <property name="text">
-      <string>Connect Device</string>
-     </property>
+    <widget class="QmitkServiceListWidget" name="m_ConnectedDeviceServiceListWidget" native="true">
+     <zorder>m_CreatedDevicesLabel</zorder>
     </widget>
    </item>
    <item>
-    <widget class="QmitkToFRecorderWidget" name="m_TofRecorderWidget" native="true"/>
+    <widget class="QPushButton" name="m_CreateDevice">
+     <property name="text">
+      <string>Create Device from selected Factory</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -58,12 +68,6 @@
    <class>QmitkServiceListWidget</class>
    <extends>QWidget</extends>
    <header location="global">QmitkServiceListWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkToFRecorderWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkToFRecorderWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

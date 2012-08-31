@@ -49,27 +49,13 @@ class QmitkToFConnectView : public QmitkAbstractView
 
     virtual void CreateQtPartControl(QWidget *parent);
 
+
   protected slots:
 
     /*!
-    \brief Slot called when the "Get Registered Devices" button of the ConnectionWidget is pressed
-    */
-    void GetRegisteredDeviceFactories();
-
-    /*!
-    \brief Slot called when the "Connect Device" button of the ConnectionWidget is pressed
+    \brief Slot called when the "Create Device" button of the ConnectionWidget is pressed
     */
     void OnToFCameraConnected();
-
-    /*!
-    \brief Slot called when the "Get Connected Devices" button of the ConnectionWidget is pressed
-    */
-    void GetConnectedDevices();
-
-    /*!
-    \brief Slot called when the "Connect" button of the ConnectionWidget is pressed
-    */
-    //void OnToFCameraConnected();
 
   protected:
 

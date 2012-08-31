@@ -42,6 +42,7 @@ namespace mitk
     std::stringstream out;
     out << "Microsoft Kinect Device ";
     out << kinectnumber;
+    kinectnumber= kinectnumber++;
     return out.str();
   }
   //----------------------------------------------------------------------------------------------------------------------

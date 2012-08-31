@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QString>
 #include <QStringList>
+#include <QMessageBox>
 
 #include <usServiceReference.h>
 #include <mitkGetModuleContext.h>
@@ -61,49 +62,32 @@ void QmitkToFConnectView::SetFocus()
 }
 
 void QmitkToFConnectView::CreateQtPartControl( QWidget *parent )
-{
-  // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi( parent );
+  {
+    // create GUI widgets from the Qt Designer's .ui file
+    m_Controls.setupUi( parent );
 
-  //GetRegistered-Button
-  connect( (QObject*)(m_Controls.m_GetRegistered), SIGNAL(clicked()), this, SLOT(GetRegisteredDeviceFactories()) );
-  //GetConnect-Button
-  connect( (QObject*)(m_Controls.m_GetConnect), SIGNAL(clicked()), this, SLOT(GetConnectedDevices()) );
+    //CreateDevice-Button
+    connect( (QObject*)(m_Controls.m_CreateDevice), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
 
-  //TODO: Connect Device-Button
-  connect( (QObject*)(m_Controls.m_ConnectDevice), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
+    //Initializing the ServiceListWidget with DeviceFactories and Devices on start-uo
+    std::string empty= "";
+    m_Controls.m_DeviceFactoryServiceListWidget->Initialize<mitk::IToFDeviceFactory>("ToFFactoryName", empty);
+    m_Controls.m_ConnectedDeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
+  }
 
-        std::string empty= "";
-  m_Controls.m_ConnectedDeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
-  m_Controls.m_DeviceFactoryServiceListWidget->Initialize<mitk::IToFDeviceFactory>("ToFFactoryName", empty);
-}
-
-
-void QmitkToFConnectView::GetRegisteredDeviceFactories()
-{
-}
-
-
-// TODO: Method to Connect Camera
+//Creating a Device
 void QmitkToFConnectView::OnToFCameraConnected()
 {
-  MITK_INFO << m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>()->GetFactoryName();
+  if (m_Controls.m_DeviceFactoryServiceListWidget->GetIsServiceSelected() )
+    {
+      MITK_INFO << m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>()->GetFactoryName();
 
-  //ServiceReference serviceRef = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedServiceReference();
+      mitk::IToFDeviceFactory* factory = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>();
+      dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice();
+    }
+    else
+    {
+      QMessageBox::warning(NULL, "Warning", QString("No Device Factory selected. Unable to create a Device!\nPlease select an other Factory!"));
+    }
 
-  mitk::IToFDeviceFactory* factory = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>();
-  dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice();
-}
-
-
-void QmitkToFConnectView::GetConnectedDevices()
-{
-  // Might checking the Device-Number here be a better idea?
-  /*
-  //Putting the Device Name in KinectDeviceProps
-  ServiceProperties KinectDeviceProps;
-  KinectDeviceProps["ToFFDeviceName"] = KinectDevice->GetDeviceName();
-  */
-  //Initializing the new Device Name in our ListWidget
-  MITK_INFO <<"affs";
 }

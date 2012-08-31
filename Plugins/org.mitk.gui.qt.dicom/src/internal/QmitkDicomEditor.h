@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "DicomEventHandler.h"
 #include "QmitkDicomDataEventPublisher.h"
 
+#include <QObject>
 #include <QTextEdit>
 #include <QModelIndex>
 #include <QString>
@@ -37,6 +38,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QThread>
 #include <QProcess>
 #include <QStringList>
+#include <QLabel>
+#include <QProgressDialog>
+#include <ctkFileDialog.h>
 #include <org_mitk_gui_qt_dicom_Export.h>
 /*!
 \brief QmitkDicomEditor
@@ -48,7 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class DICOM_EXPORT QmitkDicomEditor : public berry::QtEditorPart, virtual public berry::IPartListener
 {
-    // this is needed for all Qt objects that should have a Qt meta-object
+// this is needed for all Qt objects that should have a Qt meta-object
     // (everything that derives from QObject and wants to have signal/slots)
     Q_OBJECT
 
@@ -71,46 +75,61 @@ public:
     
 signals:
 
+    void SignalStartDicomImport(const QString&);
 
-    protected slots:
+protected slots:
 
-        /// \brief Called when StoreSCP shold start
-        void StartStoreSCP();
+    void OnImportProgress(int progress);
 
-        /// \brief Called when StoreSCP should stop
-        void StopStoreSCP();
+    /// \brief Called when import is finished
+    void OnDicomImportFinished();
 
-        /// \brief Called when import is finished
-        void OnDicomImportFinished(const QString& path);
+    /// \brief Called when Query Retrieve or Import Folder was clicked.
+    void OnQueryRetrieve();
 
-        /// \brief Called when import is finished
-        void OnDicomImportFinished(const QStringList& path);
+    /// \brief Called when LocalStorageButton was clicked.
+    void OnLocalStorage();
 
-        /// \brief Called when Query Retrieve or Import Folder was clicked.
-        void OnQueryRetrieve();
+    /// \brief Called when FolderCDButton was clicked.
+    void OnFolderCDImport();
 
-        /// \brief Called when LocalStorageButton was clicked.
-        void OnLocalStorage();
+    /// \brief Called when ok on import dialog is clicked was clicked.
+    void OnFileSelected(QString);
 
-        /// \brief Called when FolderCDButton was clicked.
-        void OnFolderCDImport();
+    /// \brief Called when view button is clicked. Sends out an event for adding the current selected file to the mitkDataStorage.
+    void OnViewButtonAddToDataManager(const QStringList& eventProperties);
 
-        /// \brief Called when view button is clicked. Sends out an event for adding the current selected file to the mitkDataStorage.
-        void OnViewButtonAddToDataManager(const QStringList& eventProperties);
+    void OnChangePage(int);
 
-        void StartDicomDirectoryListener();
+    void OnStoreSCPStatusChanged(const QString& status);
 
-        void OnChangePage(int);
-
-        void OnStoreSCPStatusChanged(const QString& status);
-
-        void TestHandler();
-
-        void SetDatabaseDirectory(const QString& databaseDirectory);
-    
-        void SetListenerDirectory(const QString& listenerDirectory);
+    void OnDicomNetworkError(const QString& status);
 
 protected:
+
+    /// \brief Called when StoreSCP shold start
+    void StartStoreSCP();
+
+    /// \brief Called when StoreSCP should stop
+    void StopStoreSCP();
+
+    void TestHandler();
+
+    void SetDatabaseDirectory(const QString& databaseDirectory);
+
+    void SetListenerDirectory(const QString& listenerDirectory);
+
+    void StartDicomDirectoryListener();
+
+    void SetupProgressDialog(QWidget* parent);
+
+    void SetupImportDialog();
+
+    ctkFileDialog* m_ImportDialog;
+
+    QProgressDialog* m_ProgressDialog;
+
+    QLabel* m_ProgressDialogLabel;
 
     void CreateQtPartControl(QWidget *parent);
 

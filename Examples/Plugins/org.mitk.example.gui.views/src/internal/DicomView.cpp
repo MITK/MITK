@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "DicomView.h"
 
-#include <QMessageBox>
+//#include <QMessageBox>
 
 #include "org_mitk_example_gui_views_Activator.h"
 
@@ -29,12 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string DicomView::VIEW_ID = "org.mitk.views.dicomview"; 
 
-//DicomView::DicomView()
-//  : m_Parent(0)
-//  , m_SelectionListener(new berry::SelectionChangedAdapter<DicomView>(this, &DicomView::SelectionChanged))
-//{
-//}
-
 DicomView::DicomView()
   : m_Parent(0)
 {
@@ -42,8 +36,6 @@ DicomView::DicomView()
 
 DicomView::~DicomView()
 {
-  //berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  //s->RemoveSelectionListener(m_SelectionListener);
 }
 
 void DicomView::CreateQtPartControl(QWidget *parent)
@@ -52,25 +44,14 @@ void DicomView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
   m_Controls.setupUi(parent);
 
-  //ctkPluginContext* pluginContext = org_mitk_example_gui_views_Activator::GetPluginContext();
-  //ctkServiceReference serviceReference = pluginContext->getServiceReference<berry::idata>();
-
-  ////always granted by org.blueberry.ui.qt
-  //Q_ASSERT(serviceReference);
-  //
-  //berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
-  //Q_ASSERT(styleManager);
-
-  ctkServiceReference serviceReference = org_mitk_example_gui_views_Activator::GetPluginContext()->getServiceReference<mitk::IDataStorageService>();
-  mitk::IDataStorageService* storageService = org_mitk_example_gui_views_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
-
-  storageService->GetActiveDataStorage().GetPointer()->GetDataStorage();
+  //remove unused widgets
+  QPushButton* downloadButton = parent->findChild<QPushButton*>("downloadButton");
+  downloadButton->setVisible(false);
+  QDockWidget* searchWidget = parent->findChild<QDockWidget*>("ExternalSearchDockWidget");
+  searchWidget->setVisible(false);
 
   connect(m_Controls.importButton, SIGNAL(clicked()), m_Controls.widget, SLOT(OnFolderCDImport()));
   connect(m_Controls.widget, SIGNAL(SignalDicomToDataManager(const QStringList&)), this, SLOT(AddDataNodeFromDICOM(const QStringList&)));
-  
-  // register selection listener
-  //GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
 
   m_Parent->setEnabled(true);
 }
@@ -119,25 +100,6 @@ void DicomView::AddDataNodeFromDICOM(const QStringList& Properties)
   }
 }
 
-
-//void DicomView::ToggleRadioMethod()
-//{
-//  bool buttonState = m_Controls.radioButton->isChecked();
-//  if (buttonState) m_Controls.radioButton_2->toggle();
-//  else m_Controls.radioButton->toggle();
-//}
-
 void DicomView::SetFocus ()
 {
 }
-
-//void DicomView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
-//                               berry::ISelection::ConstPointer selection)
-//{
-//  if (sourcepart != this && 
-//      selection.Cast<const berry::IStructuredSelection>())
-//  {
-//    ToggleRadioMethod();
-//    //DoSomething(selection.Cast<const berry::IStructuredSelection>());
-//  }
-//}

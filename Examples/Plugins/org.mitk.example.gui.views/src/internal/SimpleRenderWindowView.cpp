@@ -29,6 +29,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QVBoxLayout>
 
+/**
+ * \brief Helper class adapted from QmitkAbstractRenderEditor by defining the correct plugin context. 
+ *
+ *  This helper class adapted from QmitkAbstractRenderEditor provides the rendering manager interface.
+ */
 class AbstractRenderWindowViewPrivate
 {
 public:
@@ -153,11 +158,6 @@ void SimpleRenderWindowView::CreateQtPartControl(QWidget* parent)
 
   mitk::DataStorage::Pointer ds = this->GetDataStorage();
   m_RenderWindow->GetRenderer()->SetDataStorage(ds);
-
-  // Initialize the QmitkRenderWindow as transversal to all data objects in DataStorage
-//  mitk::TimeSlicedGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
-//  m_RenderWindow->
-//  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
   this->RequestUpdate();
 }

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
 * \brief Perspective class used as DICOM perspective within the custom viewer plug-in.
 *
-* This is the perspective class that is used as viewer perspective within the custom viewer plug-in. The ViewerPerspective holds a single instance of DicomView.
+* This is the perspective class that is used as DICOM import perspective within the custom viewer plug-in. The DicomPerspective holds a single instance of DicomView. The editor area is made invisible, and the DicomView instance is integrated as a non-closeable fixated standalone view.
 */
 class DicomPerspective : public QObject, public berry::IPerspectiveFactory
 {

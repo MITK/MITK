@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
 * \brief Perspective class used as viewer perspective within the custom viewer plug-in.
 *
-* This is the perspective class that is used as viewer perspective within the custom viewer plug-in. The ViewerPerspective holds an instance of each the QmitkDataManagerView and the SimpleRenderWindowView.
+* This is the perspective class that is used as viewer perspective within the custom viewer plug-in. The ViewerPerspective holds an instance of each the QmitkDataManagerView and the SimpleRenderWindowView. The editor area is made invisible, and QmitkDataManagerView and the SimpleRenderWindowView instances are integrated as non-closeable fixated standalone views.
 */
 class ViewerPerspective : public QObject, public berry::IPerspectiveFactory
 {

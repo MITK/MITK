@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
 * \brief A WorkbenchAdvisor class for the custom viewer plug-in. 
 *
-* This WorkbenchAdvisor class for the custom viewer plug-in gets the style manager during the initialization in order to add and set a Qt-Stylesheet file for customization purpose. 
+* This WorkbenchAdvisor class for the custom viewer plug-in adds and sets a Qt-Stylesheet file to the berry::QtStyleManager during the initialization phase for customization purpose. 
 */
 class CustomViewerWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {

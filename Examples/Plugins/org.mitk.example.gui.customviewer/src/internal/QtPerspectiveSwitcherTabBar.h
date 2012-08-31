@@ -24,17 +24,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPerspectiveListener.h>
 #include <berryIWorkbenchWindow.h>
 
+/**
+ *  \brief A QTabBar providing perspective bar functionality in BlueBerry applications.
+ *
+ *  This subclass of QTabBar acts as a perspective bar in BlueBerry applications. Providing perspective switching functionality in a tab-bar like outfit, this class serves as an alternative to the ToolBar based berry::QtPerspectiveSwitcher class.
+ */
 class QtPerspectiveSwitcherTabBar : public QTabBar
 {
   Q_OBJECT
 
 public:
 
+  /**
+   *  Constructor.
+   */
   QtPerspectiveSwitcherTabBar(berry::IWorkbenchWindow::Pointer window);
+
+  /**
+   *  Standard destructor.
+   */
   ~QtPerspectiveSwitcherTabBar();
 
 private slots:
 
+  /**
+   *  Implements perspective switching.
+   */
   void SwitchPerspective();
 
 
@@ -45,8 +60,14 @@ private:
 
   QHash<QString, QAction*> perspIdToActionMap;
 
+  /**
+   *  Neccessary to prevent initial tab switching.
+   */
   bool tabChanged;
 
+  /**
+   *  Listener for perspective changes. Neccessary for consistent tab activation.
+   */
   friend struct QtPerspectiveSwitcherTabBarListener;
 };
 

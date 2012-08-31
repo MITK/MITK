@@ -30,8 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
-  * @brief Interface for all representations of MESA ToF devices. 
-  * KinectDevice internally holds an instance of KinectController and starts a thread 
+  * @brief Interface for all representations of MESA ToF devices.
+  * KinectDevice internally holds an instance of KinectController and starts a thread
   * that continuously grabs images from the controller. A buffer structure buffers the last acquired images
   * to provide the image data loss-less.
   *
@@ -39,7 +39,8 @@ namespace mitk
   */
   class MITK_TOFHARDWARE_EXPORT KinectDevice : public ToFCameraDevice
   {
-  public: 
+  public:
+
 
     mitkClassMacro( KinectDevice , ToFCameraDevice );
 
@@ -54,7 +55,7 @@ namespace mitk
     */
     virtual bool DisconnectCamera();
     /*!
-    \brief starts the continuous updating of the camera. 
+    \brief starts the continuous updating of the camera.
     A separate thread updates the source data, the main thread processes the source data and creates images and coordinates
     */
     virtual void StartCamera();
@@ -146,6 +147,7 @@ namespace mitk
     float** m_AmplitudeDataBuffer; ///< buffer holding the last amplitude images
     float** m_IntensityDataBuffer; ///< buffer holding the last intensity images
     unsigned char** m_RGBDataBuffer; ///< buffer holding the last RGB image
+    int m_KinectDeviceNumber;
 
   private:
 

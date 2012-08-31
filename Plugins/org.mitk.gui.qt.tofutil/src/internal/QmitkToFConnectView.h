@@ -57,6 +57,11 @@ class QmitkToFConnectView : public QmitkAbstractView
     void GetRegisteredDeviceFactories();
 
     /*!
+    \brief Slot called when the "Connect Device" button of the ConnectionWidget is pressed
+    */
+    void OnToFCameraConnected();
+
+    /*!
     \brief Slot called when the "Get Connected Devices" button of the ConnectionWidget is pressed
     */
     void GetConnectedDevices();

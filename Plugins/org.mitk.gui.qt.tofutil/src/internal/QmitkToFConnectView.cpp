@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIToFDeviceFactory.h>
 #include <mitkToFDeviceFactoryManager.h>
 #include <mitkToFCameraDevice.h>
+#include <mitkIToFDeviceFactory.h>
+
+#include <mitkAbstractToFDeviceFactory.h>
 
 #include <QmitkServiceListWidget.h>
 
@@ -43,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkToFConnectView::VIEW_ID = "org.mitk.views.tofconnectview";
 
 QmitkToFConnectView::QmitkToFConnectView()
-    : QmitkAbstractView()
+: QmitkAbstractView()
 {
 }
 
@@ -53,42 +56,54 @@ QmitkToFConnectView::~QmitkToFConnectView()
 
 void QmitkToFConnectView::SetFocus()
 {
-//    this->m_Controls.m_CameraList->setFocus();
-//    GetRegisteredDeviceFactories();
+  //    this->m_Controls.m_CameraList->setFocus();
+  //    GetRegisteredDeviceFactories();
 }
 
 void QmitkToFConnectView::CreateQtPartControl( QWidget *parent )
 {
-        // create GUI widgets from the Qt Designer's .ui file
-        m_Controls.setupUi( parent );
+  // create GUI widgets from the Qt Designer's .ui file
+  m_Controls.setupUi( parent );
 
-        //GetRegistered-Button
-        connect( (QObject*)(m_Controls.m_GetRegistered), SIGNAL(clicked()), this, SLOT(GetRegisteredDeviceFactories()) );
-        //GetConnect-Button
-        connect( (QObject*)(m_Controls.m_GetConnect), SIGNAL(clicked()), this, SLOT(GetConnectedDevices()) );
+  //GetRegistered-Button
+  connect( (QObject*)(m_Controls.m_GetRegistered), SIGNAL(clicked()), this, SLOT(GetRegisteredDeviceFactories()) );
+  //GetConnect-Button
+  connect( (QObject*)(m_Controls.m_GetConnect), SIGNAL(clicked()), this, SLOT(GetConnectedDevices()) );
 
-        //TODO: Connect Device-Button
-        //connect( (QObject*)(m_Controls->m_ConnectDeive), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
+  //TODO: Connect Device-Button
+  connect( (QObject*)(m_Controls.m_ConnectDevice), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
 
-
+        std::string empty= "";
+  m_Controls.m_ConnectedDeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
+  m_Controls.m_DeviceFactoryServiceListWidget->Initialize<mitk::IToFDeviceFactory>("ToFFactoryName", empty);
 }
 
 
 void QmitkToFConnectView::GetRegisteredDeviceFactories()
 {
-    std::string empty= "";
-    m_Controls.m_DeviceFactoryServiceListWidget->Initialize<mitk::IToFDeviceFactory>("ToFFactoryName", empty);
+}
+
+
+// TODO: Method to Connect Camera
+void QmitkToFConnectView::OnToFCameraConnected()
+{
+  MITK_INFO << m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>()->GetFactoryName();
+
+  //ServiceReference serviceRef = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedServiceReference();
+
+  mitk::IToFDeviceFactory* factory = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>();
+  dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice();
 }
 
 
 void QmitkToFConnectView::GetConnectedDevices()
 {
-    std::string empty= "";
-    m_Controls.m_ConnectedDeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFFactoryName", empty);
+  // Might checking the Device-Number here be a better idea?
+  /*
+  //Putting the Device Name in KinectDeviceProps
+  ServiceProperties KinectDeviceProps;
+  KinectDeviceProps["ToFFDeviceName"] = KinectDevice->GetDeviceName();
+  */
+  //Initializing the new Device Name in our ListWidget
+  MITK_INFO <<"affs";
 }
-
-/* TODO: Method to Connect Camera
-void QmitkToFConnectView::OnToFCameraConnected()
-{
-}
-*/

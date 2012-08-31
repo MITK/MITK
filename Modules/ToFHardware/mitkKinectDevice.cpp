@@ -19,8 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiThreader.h"
 #include <itksys/SystemTools.hxx>
 
+
 namespace mitk
 {
+
   KinectDevice::KinectDevice()
   {
     m_Controller = mitk::KinectController::New();
@@ -29,6 +31,21 @@ namespace mitk
   KinectDevice::~KinectDevice()
   {
   }
+
+  //----------------------------J´s Implementation of Device Names?--------------------------------------------
+  /*!
+  \brief Defining the Device´s Name+Suffix, here for the Kinect.
+  */
+  std::string GetDeviceName()
+  {
+    int kinectnumber = 1;
+    std::stringstream out;
+    out << "Microsoft Kinect Device ";
+    out << kinectnumber;
+    return out.str();
+  }
+  //----------------------------------------------------------------------------------------------------------------------
+
 
   bool KinectDevice::OnConnectCamera()
   {
@@ -41,7 +58,7 @@ namespace mitk
         this->m_CaptureWidth = m_Controller->GetCaptureWidth();
         this->m_CaptureHeight = m_Controller->GetCaptureHeight();
         this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
-        
+
         this->m_RGBImageWidth = m_CaptureWidth;
         this->m_RGBImageHeight = m_CaptureHeight;
         this->m_RGBPixelNumber = this->m_RGBImageWidth * this->m_RGBImageHeight;

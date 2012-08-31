@@ -20,7 +20,23 @@
    <string>QmitkTemplate</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="8" column="0">
+    <spacer name="m_Spacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>311</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0">
+    <widget class="QmitkServiceListWidget" name="m_DeviceServiceListWidget" native="true"/>
+   </item>
+   <item row="2" column="0">
     <widget class="QmitkToFConnectionWidget" name="m_ToFConnectionWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -30,7 +46,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="3" column="0">
     <widget class="QmitkToFRecorderWidget" name="m_ToFRecorderWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -40,7 +56,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="4" column="0">
     <widget class="QmitkToFVisualisationSettingsWidget" name="m_ToFVisualisationSettingsWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -50,7 +66,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="5" column="0">
     <widget class="QmitkToFCompositeFilterWidget" name="m_ToFCompositeFilterWidget" native="true">
      <property name="enabled">
       <bool>true</bool>
@@ -63,7 +79,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="6" column="0">
     <widget class="QGroupBox" name="SurfacePropertiesBox">
      <property name="enabled">
       <bool>true</bool>
@@ -105,36 +121,36 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="7" column="0">
     <widget class="QmitkToFPointSetWidget" name="tofMeasurementWidget" native="true"/>
    </item>
-   <item row="6" column="0">
-    <spacer name="m_Spacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="0" column="0">
+    <widget class="QPushButton" name="m_ConnectCameraDev">
+     <property name="text">
+      <string>m_ConnectCameraDev</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>311</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkToFConnectionWidget</class>
+   <class>QmitkServiceListWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkToFConnectionWidget.h</header>
+   <header location="global">QmitkServiceListWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QmitkToFRecorderWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkToFRecorderWidget.h</header>
+   <header location="global">QmitkToFRecorderWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkToFConnectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkToFConnectionWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

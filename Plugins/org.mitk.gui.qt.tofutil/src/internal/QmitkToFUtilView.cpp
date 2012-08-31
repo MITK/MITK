@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionProperty.h>
 
 #include <mitkToFDeviceFactoryManager.h>
+#include <mitkToFCameraDevice.h>
 
 //itk headers
 #include <itksys/SystemTools.hxx>
@@ -93,20 +94,23 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     //        connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
     //        connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
     //        connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
-    //connect( (QObject*)(m_Controls->m_ConKin), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
+    connect( (QObject*)(m_Controls->m_ConnectCameraDev), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStopped()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
+
+    std::string empty= "";
+    m_Controls->m_DeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
   }
 }
 
 void QmitkToFUtilView::SetFocus()
 {
   m_Controls->m_ToFRecorderWidget->setFocus();
- }
+}
 
 void QmitkToFUtilView::Activated()
 {
@@ -170,8 +174,8 @@ void QmitkToFUtilView::Hidden()
 
 void QmitkToFUtilView::HackForPlayer()
 {
-      QString tmpFileName("");
-    QString fileFilter("");
+  QString tmpFileName("");
+  QString fileFilter("");
   //... open a QFileDialog to chose the corresponding file from the disc
   tmpFileName = QFileDialog::getOpenFileName(NULL, "Play Image From...", "", fileFilter);
   if (tmpFileName.isEmpty())
@@ -263,12 +267,15 @@ void QmitkToFUtilView::OnToFCameraConnected()
   this->m_SurfaceDisplayCount = 0;
   this->m_2DDisplayCount = 0;
 
-  mitk::ToFDeviceFactoryManager::Pointer manager = mitk::ToFDeviceFactoryManager::New();
-  mitk::ToFCameraDevice::Pointer device = manager->GetInstanceOfDevice(0);
+  //mitk::ToFDeviceFactoryManager::Pointer manager = mitk::ToFDeviceFactoryManager::New();
+  //mitk::ToFCameraDevice::Pointer device = manager->GetInstanceOfDevice(0);
+
+  mitk::ToFCameraDevice* device = m_Controls->m_DeviceServiceListWidget->GetSelectedService<mitk::ToFCameraDevice>();
+  //mitk::IToFDeviceFactory* factory = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>();
 
   this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
   m_ToFImageGrabber->SetCameraDevice(device);
-  //this->HackForPlayer();
+  this->HackForPlayer();
   m_ToFImageGrabber->ConnectCamera();
 
   //    this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();

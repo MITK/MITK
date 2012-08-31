@@ -32,7 +32,7 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-struct AbstractToFDeviceFactory : public IToFDeviceFactory {
+struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFactory {
    public:
 
    ToFCameraDevice::Pointer ConnectToFDevice()

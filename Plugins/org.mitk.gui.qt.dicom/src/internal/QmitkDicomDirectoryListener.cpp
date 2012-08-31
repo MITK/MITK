@@ -55,16 +55,16 @@ void QmitkDicomDirectoryListener::OnDirectoryChanged(const QString&)
         }
         if(!m_FilesToImport.isEmpty())
         {
-            emit SignalAddDicomData(m_FilesToImport);
+            emit SignalStartDicomImport(m_FilesToImport);
         }
     }
 }
 
-void QmitkDicomDirectoryListener::OnImportFinished(const QStringList& files)
+void QmitkDicomDirectoryListener::OnImportFinished()
 {
     m_IsListening = false;
-    RemoveTemporaryFiles(files);
-    RemoveAlreadyImportedEntries(files);
+    RemoveTemporaryFiles();
+    m_AlreadyImportedFiles.clear();
     m_IsListening = true;
 }
 
@@ -72,6 +72,7 @@ void QmitkDicomDirectoryListener::OnDicomNetworkError(const QString& errorMsg)
 {
     m_IsListening = false;
     m_AlreadyImportedFiles.clear();
+    m_IsListening = true;
 }
 
 void QmitkDicomDirectoryListener::RemoveAlreadyImportedEntries(const QStringList& fileEntries)

@@ -65,6 +65,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
 #include <vtkCellArray.h>
+#include <vtkPolyLine.h>
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -208,9 +209,10 @@ struct TbssSelListener : ISelectionListener
         m_View->Plot(image, roiImage);
       }
 
-      if(found3dImage == true && foundFiberBundle && foundStartRoi && foundEndRoi)
+      if(found3dImage && foundFiberBundle && foundStartRoi && foundEndRoi)
       {
         m_View->PlotFiberBundle(fib, img, start, end);
+
       }
       else if(found3dImage == true && foundFiberBundle)
       {
@@ -221,6 +223,8 @@ struct TbssSelListener : ISelectionListener
       {
         m_View->InitPointsets();
       }
+
+      m_View->m_Controls->m_Cut->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi);
 
     }
   }
@@ -379,6 +383,7 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
     connect( (QObject*)(m_Controls->m_FiberSelector), SIGNAL(currentIndexChanged(int)), this, SLOT(Replot(int)) );
+    connect( (QObject*)(m_Controls->m_Cut), SIGNAL(clicked()), this, SLOT(Cut()) );
 
   }
 }
@@ -689,37 +694,247 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
   else if(m_Fib != NULL && m_CurrentGeometry != NULL && m_Controls->m_RoiPlotWidget->IsPlottingFiber() )
   {
 
-    int fibIndex;
-    bool fibSelected = m_CurrentFiberNode->GetIntProperty("SelectedFiber", fibIndex);
+    mitk::BaseData* fibData = m_CurrentFiberNode->GetData();
+    mitk::FiberBundleX* fib = static_cast<mitk::FiberBundleX*>(fibData);
+
+    mitk::BaseData* startData = m_CurrentStartRoi->GetData();
+    mitk::PlanarFigure* startRoi = static_cast<mitk::PlanarFigure*>(startData);
+
+    mitk::BaseData* endData = m_CurrentEndRoi->GetData();
+    mitk::PlanarFigure* endRoi = static_cast<mitk::PlanarFigure*>(endData);
+
+    mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
+    mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
 
 
-    // Select fiber by fibIndex
-    if(fibSelected)
+    mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
+    mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
+
+    // check wich fiber is selected. if they are all shown take the first one from the bundle
+    int selectedFiber = std::max(m_Controls->m_FiberSelector->currentIndex()-1, 0);
+    int num = inBoth->GetNumFibers();
+
+    if(num < selectedFiber)
+      return;
+
+    std::vector<long> ids;
+    ids.push_back(selectedFiber);
+
+    vtkSmartPointer<vtkPolyData> singlefib = inBoth->GeneratePolyDataByIds(ids);
+    vtkCellArray* lines = singlefib->GetLines();
+    lines->InitTraversal();
+
+
+
+
+    // Select fiber by selectedFiber
+    vtkIdType   numPointsInCell(0);
+    vtkIdType*  pointsInCell(NULL);
+    lines->GetCell(selectedFiber, numPointsInCell, pointsInCell);
+
+
+    int startId = 0;
+    int endId = 0;
+
+    float minDistStart = std::numeric_limits<float>::max();
+    float minDistEnd = std::numeric_limits<float>::max();
+
+
+    for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
     {
-      std::vector<long> ids;
-      ids.push_back(fibIndex);
 
-      vtkSmartPointer<vtkPolyData> singlefib = m_Fib->GeneratePolyDataByIds(ids);
 
-      vtkCellArray* lines = singlefib->GetLines();
-      lines->InitTraversal();
+      double *p = singlefib->GetPoint( pointsInCell[ pointInCellID ] );
 
-      vtkIdType   numPointsInCell(0);
-      vtkIdType*  pointsInCell(NULL);
-      lines->GetNextCell ( numPointsInCell, pointsInCell );
 
-      index = std::min( (int)numPointsInCell-1, std::max(0, index) );
-
-      double *p = singlefib->GetPoint( pointsInCell[ index ] );
-      PointType point;
+      mitk::Point3D point;
       point[0] = p[0];
       point[1] = p[1];
       point[2] = p[2];
 
-      m_MultiWidget->MoveCrossToPosition(point);
+      float distanceToStart = point.EuclideanDistanceTo(startCenter);
+      float distanceToEnd = point.EuclideanDistanceTo(endCenter);
+
+      if(distanceToStart < minDistStart)
+      {
+        minDistStart = distanceToStart;
+        startId = pointInCellID;
+      }
+
+      if(distanceToEnd < minDistEnd)
+      {
+        minDistEnd = distanceToEnd;
+        endId = pointInCellID;
+      }
+
     }
 
+
+    if(startId < endId)
+    {
+      index = startId + index;
+    }
+    else
+    {
+      index = startId- index;
+    }
+
+
+    // In case the possible range of indices exceeds the range of fiber oints
+    index = std::min( (int)numPointsInCell-1, std::max(0, index) );
+
+    double *p = singlefib->GetPoint( pointsInCell[ index ] );
+    PointType point;
+    point[0] = p[0];
+    point[1] = p[1];
+    point[2] = p[2];
+
+    m_MultiWidget->MoveCrossToPosition(point);
+
+
   }
+
+
+}
+
+void QmitkTractbasedSpatialStatisticsView::Cut()
+{
+  mitk::BaseData* fibData = m_CurrentFiberNode->GetData();
+  mitk::FiberBundleX* fib = static_cast<mitk::FiberBundleX*>(fibData);
+
+  mitk::BaseData* startData = m_CurrentStartRoi->GetData();
+  mitk::PlanarFigure* startRoi = static_cast<mitk::PlanarFigure*>(startData);
+
+  mitk::BaseData* endData = m_CurrentEndRoi->GetData();
+  mitk::PlanarFigure* endRoi = static_cast<mitk::PlanarFigure*>(endData);
+
+  mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
+  mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
+
+  mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
+  mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
+
+  int num = inBoth->GetNumFibers();
+
+  vtkSmartPointer<vtkPolyData> fiberPolyData = inBoth->GetFiberPolyData();
+  vtkCellArray* lines = fiberPolyData->GetLines();
+  lines->InitTraversal();
+
+
+  // initialize new vtk polydata
+  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+
+  int pointIndex=0;
+
+
+  // find start and endpoint
+  for( int fiberID( 0 ); fiberID < num; fiberID++ )
+  {
+    vtkIdType   numPointsInCell(0);
+    vtkIdType*  pointsInCell(NULL);
+    lines->GetNextCell ( numPointsInCell, pointsInCell );
+
+    int startId = 0;
+    int endId = 0;
+
+    float minDistStart = std::numeric_limits<float>::max();
+    float minDistEnd = std::numeric_limits<float>::max();
+
+
+    vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
+    int lineIndex=0;
+
+
+    for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
+    {
+      double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+
+      mitk::Point3D point;
+      point[0] = p[0];
+      point[1] = p[1];
+      point[2] = p[2];
+
+      float distanceToStart = point.EuclideanDistanceTo(startCenter);
+      float distanceToEnd = point.EuclideanDistanceTo(endCenter);
+
+      if(distanceToStart < minDistStart)
+      {
+        minDistStart = distanceToStart;
+        startId = pointInCellID;
+      }
+
+      if(distanceToEnd < minDistEnd)
+      {
+        minDistEnd = distanceToEnd;
+        endId = pointInCellID;
+      }
+
+
+
+    }
+
+    /* We found the start and end points of of the part that should be plottet for
+       the current fiber. now we need to plot them. If the endId is smaller than the startId the plot order
+       must be reversed*/
+
+    if(startId < endId)
+    {
+      for( int pointInCellID( startId ); pointInCellID < endId ; pointInCellID++)
+      {
+        // create new polyline for new polydata
+        double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+        points->InsertNextPoint(p);
+
+
+        // add point to line
+        polyLine->GetPointIds()->InsertId(lineIndex,pointIndex);
+        lineIndex++;
+        pointIndex++;
+
+      }
+    }
+    else{
+      for( int pointInCellID( startId ); pointInCellID > endId ; pointInCellID--)
+      {
+        // create new polyline for new polydata
+        double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+        points->InsertNextPoint(p);
+
+
+        // add point to line
+        polyLine->GetPointIds()->InsertId(lineIndex,pointIndex);
+
+        lineIndex++;
+        pointIndex++;
+
+      }
+
+    }
+
+
+    // add polyline to vtk cell array
+     cells->InsertNextCell(polyLine);
+
+  }
+
+
+  // Add the points to the dataset
+  polyData->SetPoints(points);
+
+  // Add the lines to the dataset
+  polyData->SetLines(cells);
+
+  mitk::FiberBundleX::Pointer cutBundle = mitk::FiberBundleX::New(polyData);
+
+
+  mitk::DataNode::Pointer cutNode = mitk::DataNode::New();
+  cutNode->SetData(cutBundle);
+  std::string name = "fiberCut";
+  cutNode->SetName(name);
+  GetDataStorage()->Add(cutNode);
+
 
 
 }
@@ -1276,11 +1491,6 @@ void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *
                                                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, int index)
 {
 
-
-
-  mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
-  mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
-
   m_CurrentGeometry = fib->GetGeometry();
   typedef itk::Point<float,3>               PointType;
   typedef std::vector< PointType>           TractType;
@@ -1291,10 +1501,14 @@ void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *
   if(startRoi != NULL && endRoi != NULL)
   {
     // Plot using ROIs
+    mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
+    mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
 
     mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
     mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
 
+    m_Fib = mitk::FiberBundleX::New();
+    m_Fib = inBoth; // This is needed in case the user starts clickin in the plot widget and the corresponding location in world space must be found
 
     int num = inBoth->GetNumFibers();
 
@@ -1373,7 +1587,7 @@ void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *
         }
       }
       else{
-        for( int pointInCellID( endId ); pointInCellID < startId ; pointInCellID++)
+        for( int pointInCellID( startId ); pointInCellID > endId ; pointInCellID--)
         {
           // push back point
           double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );

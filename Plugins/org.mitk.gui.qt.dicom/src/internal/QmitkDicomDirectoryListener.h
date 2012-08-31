@@ -50,8 +50,8 @@ public:
     void SetListening(bool listening);
 
 signals:
-    /// @brief signal starts the dicom import of the given file (the QStringList will only contain one file here).
-    void SignalAddDicomData(const QStringList&);
+    /// @brief signal starts the dicom import of the given file list.
+    void SignalStartDicomImport(const QStringList&);
 
 public slots:
     /// \brief called when listener directory changes
@@ -61,7 +61,7 @@ public slots:
     void OnDicomNetworkError(const QString&);
 
     /// \brief called when import of files is finished.
-    void OnImportFinished(const QStringList&);
+    void OnImportFinished();
 
 
 protected:

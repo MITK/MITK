@@ -61,84 +61,35 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->CancelButton, SIGNAL(clicked()), this , SLOT(OnCancelButtonClicked()));
         connect(m_Controls->viewInternalDataButton, SIGNAL(clicked()), this , SLOT(OnViewButtonClicked()));
         connect(m_Controls->SearchOption, SIGNAL(parameterChanged()), this, SLOT(OnSearchParameterChanged()));
+
+        connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SLOT(OnFinishedImport()));
+        connect(m_LocalIndexer, SIGNAL(indexingComplete()),this, SIGNAL(SignalFinishedImport()));
+
+        connect(m_LocalIndexer, SIGNAL(indexingFilePath(QString)),this, SIGNAL(SignalProcessingFile(QString)));
+        connect(m_LocalIndexer, SIGNAL(progress(int)),this, SIGNAL(SignalProgress(int)));
+        connect(this, SIGNAL(SignalCancelImport()),m_LocalIndexer, SLOT(cancel()));
     }
 }
 
-void QmitkDicomLocalStorageWidget::StartDicomImport(const QString& dicomData)
-{
-    if (m_Watcher.isRunning()){
-        m_Watcher.waitForFinished();
-    }
-    SetupProgressDialog();
-    m_Future = QtConcurrent::run(this,(void (QmitkDicomLocalStorageWidget::*)(const QString&)) &QmitkDicomLocalStorageWidget::AddDICOMData,dicomData);
-    m_Watcher.setFuture(m_Future); 
-}
-
-void QmitkDicomLocalStorageWidget::StartDicomImport(const QStringList& dicomData)
-{
-    //mitk::ProgressBar::GetInstance()->AddStepsToDo(dicomData.count());
-    if (m_Watcher.isRunning())
-    {
-        m_Watcher.waitForFinished();
-    }
-    m_Future = QtConcurrent::run(this,(void (QmitkDicomLocalStorageWidget::*)(const QStringList&)) &QmitkDicomLocalStorageWidget::AddDICOMData,dicomData);
-    m_Watcher.setFuture(m_Future);
-}
-
-void QmitkDicomLocalStorageWidget::AddDICOMData(const QString& directory)
+void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QString& dicomData)
 {
     if(m_LocalDatabase->isOpen())
     {
-        m_LocalIndexer->addDirectory(*m_LocalDatabase,directory,m_LocalDatabase->databaseDirectory());
+        m_LocalIndexer->addDirectory(*m_LocalDatabase,dicomData,m_LocalDatabase->databaseDirectory());
     }
-    m_LocalModel->setDatabase(m_LocalDatabase->database());
-    emit FinishedImport(directory);
 }
 
-void QmitkDicomLocalStorageWidget::AddDICOMData(const QStringList& patientFiles)
+void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QStringList& dicomData)
 {
     if(m_LocalDatabase->isOpen())
     {
-        QStringListIterator fileIterator(patientFiles);
-        while(fileIterator.hasNext())
-        {
-            m_LocalIndexer->addFile(*m_LocalDatabase,fileIterator.next(),m_LocalDatabase->databaseDirectory());
-            //mitk::ProgressBar::GetInstance()->Progress();
-        }
+        m_LocalIndexer->addListOfFiles(*m_LocalDatabase,dicomData,m_LocalDatabase->databaseDirectory());
     }
+}
+
+void QmitkDicomLocalStorageWidget::OnFinishedImport()
+{
     m_LocalModel->setDatabase(m_LocalDatabase->database());
-    emit FinishedImport(patientFiles);
-}
-
-void QmitkDicomLocalStorageWidget::SetupProgressDialog()
-{
-    m_ProgressDialog = new QProgressDialog("DICOM Import", "Cancel", 0, 100, this,Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-    m_ProgressDialogLabel = new QLabel(tr("Initialization..."));
-    m_ProgressDialog->setLabel(m_ProgressDialogLabel);
-#ifdef Q_WS_MAC
-    // BUG: avoid deadlock of dialogs on mac
-    m_ProgressDialog->setWindowModality(Qt::NonModal);
-#else
-    m_ProgressDialog->setWindowModality(Qt::ApplicationModal);
-#endif
-
-    m_ProgressDialog->setMinimumDuration(0);
-    m_ProgressDialog->setValue(0);
-    m_ProgressDialog->show();
-
-    connect(m_ProgressDialog, SIGNAL(canceled()), m_LocalIndexer, SLOT(cancel()));
-    connect(m_LocalIndexer, SIGNAL(indexingFilePath(QString)),
-            m_ProgressDialogLabel, SLOT(setText(QString)));
-    connect(m_LocalIndexer, SIGNAL(progress(int)),
-            m_ProgressDialog, SLOT(setValue(int)));
-    connect(m_LocalIndexer, SIGNAL(progress(int)),
-            this, SLOT(OnProgress(int)));
-}
-
-void QmitkDicomLocalStorageWidget::OnProgress(int progress)
-{
-  Q_UNUSED(progress);
-  QApplication::processEvents();
 }
 
 void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
@@ -158,13 +109,6 @@ void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
         m_LocalDatabase->removePatient(currentUID);
     }
     m_LocalModel->reset();
-}
-
-void QmitkDicomLocalStorageWidget::OnCancelButtonClicked()
-{
-    m_Watcher.cancel();
-    m_Watcher.waitForFinished();
-    m_LocalDatabase->closeDatabase();
 }
 
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()

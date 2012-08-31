@@ -13,36 +13,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKDIRECTORYLISTWIDGET_H
-#define QMITKDIRECTORYLISTWIDGET_H
+#ifndef QMITKFILELISTWIDGET_H
+#define QMITKFILELISTWIDGET_H
 
 #include "ui_QmitkPathListWidget.h"
 #include <QWidget>
 
 /**
- * \class QmitkDirectoryListWidget
+ * \class QmitkFileListWidget
  * \brief Widget to contain a ctkPathListWidget and a ctkPathListButtonsWidget
- * and provide simple directory access for readable, executable directories.
+ * and provide simple file access for readable, executable files.
  */
-class QmitkDirectoryListWidget : public QWidget, public Ui::QmitkPathListWidget
+class QmitkFileListWidget : public QWidget, public Ui::QmitkPathListWidget
 {
   Q_OBJECT
 
 public:
-  QmitkDirectoryListWidget(QWidget* parent=0);
+  QmitkFileListWidget(QWidget* parent=0);
 
   /**
-   * \brief Get all directory entries.
+   * \brief Get all file entries.
    * \param absolutePath If <code>true</code>, resolve all entries to absolute paths.
-   * \return A list of all directory entries.
+   * \return A list of all file entries.
    */
-  QStringList directories(bool absolutePath = false) const;
+  QStringList files(bool absolutePath = false) const;
 
   /**
-   * \brief Sets the list of directory entries.
+   * \brief Sets the list of file entries.
    * \param paths The new path list.
    */
-  void setDirectories(const QStringList& paths);
+  void setFiles(const QStringList& paths);
 
 Q_SIGNALS:
 

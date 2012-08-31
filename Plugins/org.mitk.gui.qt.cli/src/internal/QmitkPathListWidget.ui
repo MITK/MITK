@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkDirectoryListWidget</class>
- <widget class="QWidget" name="QmitkDirectoryListWidget">
+ <class>QmitkPathListWidget</class>
+ <widget class="QWidget" name="QmitkPathListWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="m_Label">
      <property name="text">
-      <string>The following list of paths will be searched for executables which provide a XML parameter description when called with a &quot;--xml&quot; command line argument:</string>
+      <string>Enter Label Text</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

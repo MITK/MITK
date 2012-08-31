@@ -25,12 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 
 #include "QmitkDirectoryListWidget.h"
+#include "QmitkFileListWidget.h"
 
 //-----------------------------------------------------------------------------
 CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 : m_MainControl(0)
 , m_TemporaryDirectory(0)
 , m_ModulesDirectories(0)
+, m_ModulesFiles(0)
 , m_LoadFromHomeDir(0)
 , m_LoadFromCurrentDir(0)
 , m_LoadFromApplicationDir(0)
@@ -70,7 +72,9 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_TemporaryDirectory = new ctkDirectoryButton(m_MainControl);
   m_TemporaryDirectory->setCaption("Select a directory for temporary files ... ");
   m_ModulesDirectories = new QmitkDirectoryListWidget(m_MainControl);
-
+  m_ModulesDirectories->m_Label->setText("The following list of paths will be searched for executables which provide an XML parameter description when called with a \"--xml\" command line argument:");
+  m_ModulesFiles = new QmitkFileListWidget(m_MainControl);
+  m_ModulesFiles->m_Label->setText("The following list of files should be executables that can be run with a \"--xml\" command line argument and provide an XML parameter description:");
   m_DebugOutput = new QCheckBox(m_MainControl);
 
   m_LoadFromApplicationDir = new QCheckBox(m_MainControl);
@@ -83,7 +87,8 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   formLayout->addRow("scan current directory:", m_LoadFromCurrentDir);
   formLayout->addRow("scan installation directory:", m_LoadFromApplicationDir);
   formLayout->addRow("scan CTK_MODULE_LOAD_PATH:", m_LoadFromAutoLoadPathDir);
-  formLayout->addRow("additional module paths:", m_ModulesDirectories);
+  formLayout->addRow("additional module directories:", m_ModulesDirectories);
+  formLayout->addRow("additional modules:", m_ModulesFiles);
   formLayout->addRow("temporary directory:", m_TemporaryDirectory);
   formLayout->addRow("debug output:", m_DebugOutput);
   m_MainControl->setLayout(formLayout);
@@ -100,6 +105,18 @@ QWidget* CommandLineModulesPreferencesPage::GetQtControl() const
 
 
 //-----------------------------------------------------------------------------
+std::string CommandLineModulesPreferencesPage::ConvertToStdString(const QStringList& list)
+{
+  std::string output;
+  for (int i = 0; i < list.count(); i++)
+  {
+    QString path = list[i] + ";";
+    output += path.toStdString();
+  }
+  return output;
+}
+
+//-----------------------------------------------------------------------------
 bool CommandLineModulesPreferencesPage::PerformOk()
 {
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory().toStdString());
@@ -109,15 +126,12 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR, m_LoadFromCurrentDir->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, m_LoadFromAutoLoadPathDir->isChecked());
 
-  // Convert paths to a single item.
-  QStringList directoryList = m_ModulesDirectories->directories();
-  std::string paths;
-  for (int i = 0; i < directoryList.count(); i++)
-  {
-    QString path = directoryList[i] + ";";
-    paths += path.toStdString();
-  }
+  std::string paths = this->ConvertToStdString(m_ModulesDirectories->directories());
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, paths);
+
+  std::string modules = this->ConvertToStdString(m_ModulesFiles->files());
+  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, modules);
+
   return true;
 }
 
@@ -140,8 +154,11 @@ void CommandLineModulesPreferencesPage::Update()
   m_LoadFromCurrentDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR, false));
   m_LoadFromAutoLoadPathDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, false));
 
-  // Load paths from a single item, and split into a StringList.
   QString paths = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));
   QStringList directoryList = paths.split(";", QString::SkipEmptyParts);
   m_ModulesDirectories->setDirectories(directoryList);
+
+  QString files = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, ""));
+  QStringList fileList = files.split(";", QString::SkipEmptyParts);
+  m_ModulesFiles->setFiles(fileList);
 }

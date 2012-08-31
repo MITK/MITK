@@ -36,6 +36,11 @@ struct CommandLineModulesViewConstants
   static const std::string MODULE_DIRECTORIES_NODE_NAME;
 
   /**
+   * \brief The name of the preferences node containing the additional files to add to the module list.
+   */
+  static const std::string MODULE_FILES_NODE_NAME;
+
+  /**
    * \brief The name of the preferences node containing whether we are producing debug output.
    */
   static const std::string DEBUG_OUTPUT_NODE_NAME;

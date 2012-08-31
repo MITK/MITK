@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QWidget;
 class QCheckBox;
 class QmitkDirectoryListWidget;
+class QmitkFileListWidget;
 class ctkDirectoryButton;
 
 /**
@@ -81,12 +82,17 @@ protected:
   QCheckBox                *m_DebugOutput;
   ctkDirectoryButton       *m_TemporaryDirectory;
   QmitkDirectoryListWidget *m_ModulesDirectories;
+  QmitkFileListWidget      *m_ModulesFiles;
   QCheckBox                *m_LoadFromHomeDir;
   QCheckBox                *m_LoadFromCurrentDir;
   QCheckBox                *m_LoadFromApplicationDir;
   QCheckBox                *m_LoadFromAutoLoadPathDir;
 
   berry::IPreferences::Pointer m_CLIPreferencesNode;
+
+private:
+
+  std::string ConvertToStdString(const QStringList& list);
 };
 
 #endif // COMMANDLINEMODULESPREFERENCESPAGE_H

@@ -3,12 +3,14 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  QmitkUiLoader.cpp
-  QmitkCmdLineModuleGui.cpp
-  QmitkCmdLineModuleFactoryGui.cpp
+  ctkCmdLineModuleMenuFactoryQtGui.cpp
+  ctkCmdLineModuleMenuComboBox.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDirectoryListWidget.cpp
   QmitkFileListWidget.cpp
+  QmitkCmdLineModuleGui.cpp
+  QmitkCmdLineModuleFactoryGui.cpp
+  QmitkUiLoader.cpp
   org_mitk_gui_qt_cli_Activator.cpp
   CommandLineModulesViewConstants.cpp
   CommandLineModulesViewControls.cpp
@@ -22,11 +24,12 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/QmitkUiLoader.h
-  src/internal/QmitkCmdLineModuleGui.h
+  src/internal/ctkCmdLineModuleMenuComboBox.h
   src/internal/QmitkDataStorageComboBoxWithSelectNone.h
   src/internal/QmitkDirectoryListWidget.h
   src/internal/QmitkFileListWidget.h
+  src/internal/QmitkCmdLineModuleGui.h
+  src/internal/QmitkUiLoader.h
   src/internal/org_mitk_gui_qt_cli_Activator.h
   src/internal/CommandLineModulesViewControls.h
   src/internal/CommandLineModulesPreferencesPage.h

@@ -37,9 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTextBrowser>
 
 // CTK
+#include "ctkCmdLineModuleMenuFactoryQtGui.h"
 #include <ctkCmdLineModuleManager.h>
 #include <ctkCmdLineModuleFrontend.h>
-#include <ctkCmdLineModuleMenuFactoryQtGui.h>
 #include <ctkCmdLineModuleBackendLocalProcess.h>
 #include <ctkCmdLineModuleDefaultPathBuilder.h>
 #include <ctkCmdLineModuleDirectoryWatcher.h>

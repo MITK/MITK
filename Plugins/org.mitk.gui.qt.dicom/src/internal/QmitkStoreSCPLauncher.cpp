@@ -119,7 +119,7 @@ void QmitkStoreSCPLauncher::OnProcessError(QProcess::ProcessError err)
         m_ErrorText.clear();
         break;
     case QProcess::Crashed:
-        m_ErrorText.prepend("Storage provider crashed: ");
+        m_ErrorText.prepend("Storage provider closed: ");
         m_ErrorText.append(m_StoreSCP->errorString());
         emit SignalStoreSCPError(m_ErrorText);
         m_ErrorText.clear();

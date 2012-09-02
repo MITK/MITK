@@ -22,13 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIBerryPreferences.h>
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleResult.h>
-#include <QFutureWatcher>
 
-class ctkCmdLineModuleManager;
 class QmitkCmdLineModuleFactoryGui;
+class ctkCmdLineModuleManager;
 class ctkCmdLineModuleFrontend;
 class ctkCmdLineModuleBackendLocalProcess;
 class ctkCmdLineModuleDirectoryWatcher;
+class ctkCmdLineModuleFutureWatcher;
 class CommandLineModulesViewControls;
 class QAction;
 
@@ -99,26 +99,38 @@ protected Q_SLOTS:
   void OnRestoreButtonPressed();
 
   /**
-   * \brief Slot called from QFutureWatcher<ctkCmdLineModuleResult> when the module has been launched.
+   * \brief Slot called from ctkCmdLineModuleFutureWatcher when the module has been launched.
    */
   void OnModuleStarted();
 
   /**
-   * \brief Slot called from QFutureWatcher<ctkCmdLineModuleResult> when the module has finished.
+   * \brief Slot called from ctkCmdLineModuleFutureWatcher when the module has finished.
    */
   void OnModuleFinished();
 
   /**
-   * \brief Slot called from QFutureWatcher<ctkCmdLineModuleResult> to notify of any progress,
+   * \brief Slot called from ctkCmdLineModuleFutureWatcher to notify of any progress,
    * currently just printing console debug messages.
    */
   void OnModuleProgressValueChanged(int);
 
   /**
-   * \brief Slot called from QFutureWatcher<ctkCmdLineModuleResult> to notify of any progress,
+   * \brief Slot called from ctkCmdLineModuleFutureWatcher to notify of any progress,
    * currently just printing console debug messages.
    */
   void OnModuleProgressTextChanged(QString);
+
+  /**
+   * \brief Slot called from ctkCmdLineModuleFutureWatcher to notify of any standard
+   * output progress information.
+   */
+  void OnModuleOutputDataReady();
+
+  /**
+   * \brief Slot called from ctkCmdLineModuleFutureWatcher to notify of any standard
+   * error progress information.
+   */
+  void OnModuleErrorDataReady();
 
 protected:
 
@@ -241,7 +253,7 @@ private:
   /**
    * \brief This is the QFutureWatcher that will watch for when the process has finished, and call OnFutureFinished() slot.
    */
-  QFutureWatcher<ctkCmdLineModuleResult>* m_Watcher;
+  ctkCmdLineModuleFutureWatcher* m_Watcher;
 
   /**
    * \brief We use this map to decide if we want to create more tabs or not.

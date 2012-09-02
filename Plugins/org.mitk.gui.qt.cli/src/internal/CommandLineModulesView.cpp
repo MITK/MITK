@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDebug>
 #include <QTabWidget>
 #include <QTextBrowser>
+#include <QByteArray>
 
 // CTK
 #include <ctkCmdLineModuleManager.h>
@@ -44,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleDirectoryWatcher.h>
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleFuture.h>
+#include <ctkCmdLineModuleFutureWatcher.h>
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleParameter.h>
 
@@ -557,11 +559,13 @@ void CommandLineModulesView::Run()
     delete m_Watcher;
   }
 
-  m_Watcher = new QFutureWatcher<ctkCmdLineModuleResult>();
+  m_Watcher = new ctkCmdLineModuleFutureWatcher();
   QObject::connect(m_Watcher, SIGNAL(started()), this, SLOT(OnModuleStarted()));
   QObject::connect(m_Watcher, SIGNAL(finished()), this, SLOT(OnModuleFinished()));
   QObject::connect(m_Watcher, SIGNAL(progressValueChanged(int)), this, SLOT(OnModuleProgressValueChanged(int)));
   QObject::connect(m_Watcher, SIGNAL(progressTextChanged(QString)), this, SLOT(OnModuleProgressTextChanged(QString)));
+  QObject::connect(m_Watcher, SIGNAL(outputDataReady()), this, SLOT(OnModuleOutputDataReady()));
+  QObject::connect(m_Watcher, SIGNAL(errorDataReady()), this, SLOT(OnModuleErrorDataReady()));
 
   ctkCmdLineModuleFuture future = m_ModuleManager->run(moduleInstance);
   m_Watcher->setFuture(future);
@@ -709,5 +713,26 @@ void CommandLineModulesView::OnModuleFinished()
   m_Controls->Finished();
 
   message = "finished.";
+  this->PublishMessage(message);
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnModuleOutputDataReady()
+{
+  QByteArray bytes = m_Watcher->readPendingOutputData();
+  QString standardOutput(bytes.data());
+  QString message = "OUTPUT:" + standardOutput;
+  this->PublishMessage(message);
+}
+
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnModuleErrorDataReady()
+{
+  QByteArray bytes = m_Watcher->readPendingErrorData();
+  QString standardError(bytes.data());
+  QString message = "ERROR:" + standardError;
   this->PublishMessage(message);
 }

@@ -129,8 +129,6 @@ void QmitkCmdLineModuleMenuComboBox::RebuildMenu()
   // Sort list, so menu comes out in some sort of nice order.
   listOfModules.sort();
 
-  qDebug() << "QmitkCmdLineModuleMenuComboBox::RebuildMenu, listOfModules=" << listOfModules;
-
   // Temporary data structure to enable connecting menus together.
   QList< QHash<QString, QMenu*>* > list;
 

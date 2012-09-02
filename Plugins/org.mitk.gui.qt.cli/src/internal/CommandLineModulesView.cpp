@@ -37,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTextBrowser>
 
 // CTK
-#include "ctkCmdLineModuleMenuFactoryQtGui.h"
 #include <ctkCmdLineModuleManager.h>
 #include <ctkCmdLineModuleFrontend.h>
 #include <ctkCmdLineModuleBackendLocalProcess.h>
@@ -58,7 +57,6 @@ CommandLineModulesView::CommandLineModulesView()
 , m_ModuleManager(NULL)
 , m_ModuleBackend(NULL)
 , m_ModuleFactory(NULL)
-, m_MenuFactory(NULL)
 , m_DirectoryWatcher(NULL)
 , m_Watcher(NULL)
 , m_TemporaryDirectoryName("")
@@ -85,11 +83,6 @@ CommandLineModulesView::~CommandLineModulesView()
   if (m_ModuleFactory != NULL)
   {
     delete m_ModuleFactory;
-  }
-
-  if (m_MenuFactory != NULL)
-  {
-    delete m_MenuFactory;
   }
 
   if (m_DirectoryWatcher != NULL)
@@ -131,18 +124,13 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     // Create the command line module infrastructure.
     m_ModuleBackend = new ctkCmdLineModuleBackendLocalProcess();
     m_ModuleFactory = new QmitkCmdLineModuleFactoryGui(this->GetDataStorage());
-    m_MenuFactory = new ctkCmdLineModuleMenuFactoryQtGui();
     m_ModuleManager = new ctkCmdLineModuleManager(ctkCmdLineModuleManager::STRICT_VALIDATION, m_TemporaryDirectoryName);
-    m_ModuleManager->registerBackend(m_ModuleBackend);
+
+    m_Controls->m_ComboBox->SetManager(m_ModuleManager);
     m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
 
-    // This connect must come before we update the preferences for the first time,
-    // so that as you retrieve the preference values, and set up a load path, the m_ModuleManager
-    // is already listening.
-    connect(this->m_ModuleManager, SIGNAL(moduleRegistered(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
-    connect(this->m_ModuleManager, SIGNAL(moduleUnregistered(ctkCmdLineModuleReference)), this, SLOT(OnModulesChanged()));
+    m_ModuleManager->registerBackend(m_ModuleBackend);
 
-    // Loads the preferences like directory settings into member variables.
     this->RetrieveAndStorePreferenceValues();
 
     // Connect signals to slots after we have set up GUI.
@@ -235,15 +223,6 @@ void CommandLineModulesView::OnPreferencesChanged(const berry::IBerryPreferences
 {
   this->RetrieveAndStoreTemporaryDirectoryPreferenceValues();
   this->RetrieveAndStorePreferenceValues();
-}
-
-
-//-----------------------------------------------------------------------------
-void CommandLineModulesView::OnModulesChanged()
-{
-  QList<ctkCmdLineModuleReference> refs = this->m_ModuleManager->moduleReferences();
-  QMenu *menu = m_MenuFactory->create(refs);
-  this->m_Controls->m_ComboBox->setMenu(menu);
 }
 
 

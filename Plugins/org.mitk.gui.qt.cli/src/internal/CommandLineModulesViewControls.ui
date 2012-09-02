@@ -39,13 +39,7 @@
       </widget>
      </item>
      <item>
-      <widget class="ctkMenuComboBox" name="m_ComboBox" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+      <widget class="QmitkCmdLineModuleMenuComboBox" name="m_ComboBox" native="true">
       </widget>
      </item>
      <item>
@@ -160,15 +154,15 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>ctkMenuComboBox</class>
-   <extends>QWidget</extends>
-   <header location="global">ctkMenuComboBox.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>ctkCollapsibleGroupBox</class>
    <extends>QGroupBox</extends>
    <header>ctkCollapsibleGroupBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkCmdLineModuleMenuComboBox</class>
+   <extends>QWidget</extends>
+   <header>QmitkCmdLineModuleMenuComboBox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

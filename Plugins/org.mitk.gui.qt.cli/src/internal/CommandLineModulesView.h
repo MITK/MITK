@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class ctkCmdLineModuleManager;
 class QmitkCmdLineModuleFactoryGui;
-class ctkCmdLineModuleMenuFactoryQtGui;
 class ctkCmdLineModuleFrontend;
 class ctkCmdLineModuleBackendLocalProcess;
 class ctkCmdLineModuleDirectoryWatcher;
@@ -120,13 +119,6 @@ protected Q_SLOTS:
    * currently just printing console debug messages.
    */
   void OnModuleProgressTextChanged(QString);
-
-  /**
-   * \brief We register this slot with the ctkCmdLineModuleManager so that if
-   * the modulesAdded or modulesRemoved signals are emmitted from ctkCmdLineModuleManager
-   * we rebuild the whole menu. In future this could be made more efficient, and only add/remove single items.
-   */
-  void OnModulesChanged();
 
 protected:
 
@@ -239,11 +231,6 @@ private:
    * \brief The QmitkCmdLineModuleFactoryGui builds a gui for each plugin.
    */
   QmitkCmdLineModuleFactoryGui *m_ModuleFactory;
-
-  /**
-   * \brief The ctkCmdLineModuleMenuFactoryQtGui will build a QMenu from the list of available modules.
-   */
-  ctkCmdLineModuleMenuFactoryQtGui *m_MenuFactory;
 
   /**
    * \brief The ctkCmdLineModuleDirectoryWatcher maintains the list of directories

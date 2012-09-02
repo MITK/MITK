@@ -1,10 +1,8 @@
 set(SRC_CPP_FILES
-  
+  QmitkCmdLineModuleMenuComboBox.cpp
 )
 
 set(INTERNAL_CPP_FILES
-  ctkCmdLineModuleMenuFactoryQtGui.cpp
-  ctkCmdLineModuleMenuComboBox.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDirectoryListWidget.cpp
   QmitkFileListWidget.cpp
@@ -24,7 +22,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/ctkCmdLineModuleMenuComboBox.h
+  src/QmitkCmdLineModuleMenuComboBox.h
   src/internal/QmitkDataStorageComboBoxWithSelectNone.h
   src/internal/QmitkDirectoryListWidget.h
   src/internal/QmitkFileListWidget.h

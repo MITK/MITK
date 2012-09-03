@@ -109,6 +109,7 @@ mitk::ServiceReference QmitkServiceListWidget::GetSelectedService(){
 
 void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
 
+  //MITK_INFO << "ServiceEvent" << event.GetType();
   switch (event.GetType())
   {
     case mitk::ServiceEvent::MODIFIED:

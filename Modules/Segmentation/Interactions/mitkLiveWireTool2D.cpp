@@ -125,16 +125,20 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_ToolManager->GetDataStorage()->Add( m_ContourModelNode );
 
   m_ToolManager->GetDataStorage()->Add( m_LiveWireContourNode );
-  
-
-  m_Contour->AddVertex( const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()), true, timestep );
-
 
   //set current slice as input for ImageToLiveWireContourFilter
   m_WorkingSlice = this->GetAffectedReferenceSlice(positionEvent);
   m_LiveWireFilter->SetInput(m_WorkingSlice);
+
+  //map click to pixel coordinates
+  mitk::Point3D click = const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition());
+  m_WorkingSlice->GetGeometry()->WorldToIndex(click, click);
+  m_WorkingSlice->GetGeometry()->IndexToWorld(click, click);
+
+  m_Contour->AddVertex( click, true, timestep );
+
   //set initial start point
-  m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
+  m_LiveWireFilter->SetStartPoint(click);
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );

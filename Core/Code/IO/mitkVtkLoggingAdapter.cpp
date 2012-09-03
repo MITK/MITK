@@ -16,10 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkLoggingAdapter.h"
 #include "mitkLogMacros.h"
+#include <vtkObjectFactory.h>
+
+namespace mitk
+{
+  vtkStandardNewMacro(VtkLoggingAdapter);
+}
 
 void mitk::VtkLoggingAdapter::Initialize()
 {
-  vtkOutputWindow::SetInstance(mitk::VtkLoggingAdapter::New());
+  mitk::VtkLoggingAdapter* vtklog = mitk::VtkLoggingAdapter::New();
+  vtkOutputWindow::SetInstance(vtklog);
+  vtklog->Delete();
 }
 
 void mitk::VtkLoggingAdapter::DisplayText(const char* t)

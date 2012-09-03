@@ -29,7 +29,9 @@ namespace mitk {
 class MITK_CORE_EXPORT VtkLoggingAdapter : public vtkOutputWindow
 {
 public:
-    
+  
+  static VtkLoggingAdapter* New();
+
   static void Initialize();
   
   virtual void DisplayText(const char* t);

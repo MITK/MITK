@@ -60,19 +60,12 @@ namespace mitk {
     public:
       mitkClassMacro(USDevice, mitk::ImageSource);
 
-      /**
-      * \brief Enforces minimal Metadata to be set. 
+     /**
+      *\brief These constants are used in conjunction with Microservices
       */
-     // mitkNewMacro3Param(Self, std::string, std::string, bool);
-
-      
-      /**
-      * \brief Constructs a device with the given Metadata. Make sure the Metadata contains meaningful content!
-      *      
-      */
-     // mitkNewMacro2Param(Self, mitk::USImageMetadata::Pointer, bool);
-
-
+      static const std::string US_INTERFACE_NAME;     // Common Interface name of all US Devices. Used to refer to this device via Microservices
+      static const std::string US_PROPKEY_LABEL;      // Human readable text represntation of this device 
+      static const std::string US_PROPKEY_ISACTIVE;   // Whether this Device is active or not.
 
       /**
       * \brief Connects this device. A connected device is ready to deliver images (i.e. be Activated). A Connected Device can be active. A disconnected Device cannot be active.

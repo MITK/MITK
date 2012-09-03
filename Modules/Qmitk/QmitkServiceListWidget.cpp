@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL HEaders
 #include <list>
 
-//QT headers
-#include <QColor>
-
 //microservices
 #include <usGetModuleContext.h>
 #include <mitkModuleContext.h>

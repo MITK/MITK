@@ -23,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include "mitkModuleContext.h"
 
+const std::string mitk::USDevice::US_INTERFACE_NAME = "org.mitk.services.UltrasoundDevice";     // Common Interface name of all US Devices. Used to refer to this device via Microservices
+const std::string mitk::USDevice::US_PROPKEY_LABEL = US_INTERFACE_NAME + ".label";      // Human readable text represntation of this device 
+const std::string mitk::USDevice::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";   // Whether this Device is active or not.
+
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::ImageSource()
 {
@@ -30,7 +34,6 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::Im
   m_Metadata = mitk::USImageMetadata::New();
   m_Metadata->SetDeviceManufacturer(manufacturer);
   m_Metadata->SetDeviceModel(model);
-  //m_Metadata->SetDeviceClass(GetDeviceClass());
   m_IsActive = false;
   
   //set number of outputs

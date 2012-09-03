@@ -804,9 +804,11 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
 
   mitk::BaseData* startData = m_CurrentStartRoi->GetData();
   mitk::PlanarFigure* startRoi = static_cast<mitk::PlanarFigure*>(startData);
+  mitk::PlaneGeometry* startGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(startRoi->GetGeometry2D()) );
 
   mitk::BaseData* endData = m_CurrentEndRoi->GetData();
   mitk::PlanarFigure* endRoi = static_cast<mitk::PlanarFigure*>(endData);
+  mitk::PlaneGeometry* endGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(endRoi->GetGeometry2D()) );
 
   mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
   mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
@@ -881,7 +883,108 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
 
     if(startId < endId)
     {
-      for( int pointInCellID( startId ); pointInCellID < endId ; pointInCellID++)
+
+
+      double *p = fiberPolyData->GetPoint( pointsInCell[ startId ] );
+
+      mitk::Vector3D p0;
+      p0[0] = p[0];
+      p0[1] = p[1];
+      p0[2] = p[2];
+
+      p = fiberPolyData->GetPoint( pointsInCell[ startId+1 ] );
+
+      mitk::Vector3D p1;
+      p1[0] = p[0];
+      p1[1] = p[1];
+      p1[2] = p[2];
+
+
+      // Check if p and p2 are both on the same side of the plane
+      mitk::Vector3D normal = startGeometry2D->GetNormal();
+      double A = normal[0];
+      double B = normal[1];
+      double C = normal[2];
+      double D = - (A + (B + C) );
+
+
+      bool startOnPositive = false;
+      if(A*p0[0]+B*p0[1]+C*p0[2]+D > 0)
+        startOnPositive = true;
+
+      bool secondOnPositive = false;
+      if(A*p1[0]+B*p1[1]+C*p1[2]+D > 0)
+        secondOnPositive = true;
+
+
+      // Calculate intersection with the plane
+
+      mitk::Vector3D onPlane;
+      onPlane[0] = startCenter[0];
+      onPlane[1] = startCenter[1];
+      onPlane[2] = startCenter[2];
+
+      if(secondOnPositive ^ startOnPositive)
+      {
+        // The start point lies on the other side of the plane so should not be included
+
+        // intersection = p + u(p2-p1)
+
+      //  double u = (A*point1[0]+B*point1[1]+C*point1[2] + D) /
+                 // ( A*(point1[0]-point2[0]) +B*(point1[1]-point2[1]) +C*(point1[2]-point2[2]) );
+
+        double d = ( (onPlane-p0)*normal) / ( (p1-p0) * normal );
+
+
+
+        mitk::Vector3D newPoint = (p1-p0) * p0;
+        newPoint[0] = d*newPoint[0];
+        newPoint[1] = d*newPoint[1];
+        newPoint[2] = d*newPoint[2];
+
+
+        double insertPoint[3];
+        insertPoint[0] = newPoint[0];
+        insertPoint[1] = newPoint[1];
+        insertPoint[2] = newPoint[2];
+
+        points->InsertNextPoint(insertPoint);
+
+
+      }
+      else
+      {
+        // The startpoint should also be included
+        // need one point before the startpoint to calculate intersection with the plane
+        p = fiberPolyData->GetPoint( pointsInCell[ startId-1 ] );
+        p1[0] = p[0];
+        p1[1] = p[1];
+        p1[2] = p[2];
+
+        double d = ( (onPlane-p0)*normal) / ( (p1-p0) * normal );
+
+        mitk::Vector3D newPoint = (p1-p0)* p0;
+        newPoint[0] = d*newPoint[0];
+        newPoint[1] = d*newPoint[1];
+        newPoint[2] = d*newPoint[2];
+
+
+        double insertPoint[3];
+        insertPoint[0] = newPoint[0];
+        insertPoint[1] = newPoint[1];
+        insertPoint[2] = newPoint[2];
+
+        points->InsertNextPoint(insertPoint);
+
+       // double d = (A*point1[0]+B*point1[1]+C*point1[2] +) /
+        //          ( A*(point1[0]-point2[0]) +B*(point1[1]-point2[1]) +C*(point1[2]-point2[2]) );
+
+
+      }
+
+
+
+      for( int pointInCellID( startId+1 ); pointInCellID <= endId ; pointInCellID++)
       {
         // create new polyline for new polydata
         double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
@@ -896,7 +999,7 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
       }
     }
     else{
-      for( int pointInCellID( startId ); pointInCellID > endId ; pointInCellID--)
+      for( int pointInCellID( startId ); pointInCellID >= endId ; pointInCellID--)
       {
         // create new polyline for new polydata
         double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
@@ -1517,6 +1620,7 @@ void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *
     lines->InitTraversal();
 
 
+
     // Now find out for each fiber which ROI is encountered first. If this is the startRoi, the direction is ok
     // Otherwise the plot should be in the reverse direction
     for( int fiberID( 0 ); fiberID < num; fiberID++ )
@@ -1538,7 +1642,6 @@ void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *
 
 
         double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
-
 
         mitk::Point3D point;
         point[0] = p[0];
@@ -1573,7 +1676,7 @@ void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *
 
       if(startId < endId)
       {
-        for( int pointInCellID( startId ); pointInCellID < endId ; pointInCellID++)
+        for( int pointInCellID( startId ); pointInCellID <= endId ; pointInCellID++)
         {
           // push back point
           double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
@@ -1587,7 +1690,7 @@ void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *
         }
       }
       else{
-        for( int pointInCellID( startId ); pointInCellID > endId ; pointInCellID--)
+        for( int pointInCellID( startId ); pointInCellID >= endId ; pointInCellID--)
         {
           // push back point
           double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );

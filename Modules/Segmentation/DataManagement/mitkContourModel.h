@@ -363,7 +363,7 @@ namespace mitk
     virtual void SetRequestedRegion (itk::DataObject *data);
 
     //##Documentation
-    //## @brief Expand the timebounds of the TimeSlicedGeometry.
+    //## @brief Expand the timebounds of the TimeSlicedGeometry to given number of timesteps.
     //##
     virtual void Expand( int timeSteps );
 

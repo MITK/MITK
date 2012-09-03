@@ -38,7 +38,7 @@ namespace mitk
   \ingroup Interaction
 
 
-  \warning 
+  \warning Make sure the working image is properly set, otherwise the algorithm for computing livewire contour segments will not work!
 
   */
   class Segmentation_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
@@ -69,8 +69,18 @@ namespace mitk
     virtual bool OnMovePoint(Action*, const StateEvent*);
     virtual bool OnCheckPointClick( Action* action, const StateEvent* stateEvent);
 
+    int SplitContourFromSelectedVertex(mitk::ContourModel* sourceContour,
+      mitk::ContourModel* destinationContour,
+      bool fromSelectedUpwards,
+      int timestep);
+
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
     mitk::Image::Pointer m_WorkingImage;
+
+    mitk::Point3D m_NextActiveVertexDown;
+    mitk::Point3D m_NextActiveVertexUp;
+    mitk::ContourModel::Pointer m_ContourLeft;
+    mitk::ContourModel::Pointer m_ContourRight;
 
   };
 

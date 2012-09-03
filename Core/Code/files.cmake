@@ -257,6 +257,7 @@ set(CPP_FILES
   IO/mitkSTLFileReader.cpp
   IO/mitkSurfaceVtkWriter.cpp
   IO/mitkSurfaceVtkWriterFactory.cpp
+  IO/mitkVtkLoggingAdapter.cpp
   IO/mitkVtiFileIOFactory.cpp
   IO/mitkVtiFileReader.cpp
   IO/mitkVtkImageIOFactory.cpp

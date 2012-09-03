@@ -75,7 +75,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("pointcolor", renderer));
     if(!selectedcolor)
     {
-      selectedcolor = mitk::ColorProperty::New(0.5,0.5,0.1);
+      selectedcolor = mitk::ColorProperty::New(1.0,0.0,0.1);
     }
 
 

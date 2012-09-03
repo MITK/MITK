@@ -737,7 +737,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
           contrast.SetAuto( static_cast<mitk::Image*>(node->GetData()), false, true ); // we need this as a fallback
         }
 
-        contrast.SetLevelWindow( level, window);
+        contrast.SetLevelWindow( level, window, true );
         node->SetProperty( "levelwindow", LevelWindowProperty::New( contrast ), renderer );
       }
     }

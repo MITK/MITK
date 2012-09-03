@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
 * @brief This widget provides abstraction for the handling of MicroServices . Place one in your Plugin and set it to look for a certain interface.
-* One can also specify a filter and / or a property to use for captioning of the services. It also offers functionality to signal 
+* One can also specify a filter and / or a property to use for captioning of the services. It also offers functionality to signal
 * ServiceEvents and to return the actual classes, so only a minimum of interaction with the MicroserviceInterface is required.
 * To get started, just put it in your Plugin or Widget, call the Initialize Method and optionally connect it's signals.
 * As QT limits templating possibilities, events only throw ServiceReferences. You can manually dereference them using TranslateServiceReference()
@@ -83,17 +83,17 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * If no Service is selected, the result will probably be a bad pointer. call GetIsServiceSelected()
     * beforehand to avoid this
     */
-    mitk::ServiceReference GetSelectedService();
+    mitk::ServiceReference GetSelectedServiceReference();
 
     /**
     * \brief Use this function to return the currently selected service as a class directly.
     *
     *  Make sure you pass the appropriate type, or else this call will fail.
     *  Usually, you will pass the class itself, not the SmartPointer, but the function returns a pointer. Example:
-    *  \verbatim mitk::USDevice::Pointer device = GetSelectedServiceAsClass<mitk::USDevice>(); \endverbatim
+    *  \verbatim mitk::USDevice::Pointer device = GetSelectedService<mitk::USDevice>(); \endverbatim
     */
     template <class T>
-    T* GetSelectedServiceAsClass()
+    T* GetSelectedService()
     {
       mitk::ServiceReference ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
       return ( m_Context->GetService<T>(ref) );
@@ -103,17 +103,17 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * \brief  Initializes the Widget with essential parameters.
     *
     * The string filter is an LDAP parsable String, compare mitk::ModuleContext for examples on filtering.
-    * This. Pass class T to tell the widget which class it should filter for - only services of this class will be listed.
+    * Pass class T to tell the widget which class it should filter for - only services of this class will be listed.
     * NamingProperty is a property that will be used to caption the Items in the list. If no filter is supplied, all
     * matching interfaces are shown. If no namingProperty is supplied, the interfaceName will be used to caption Items in the list.
     * For example, this Initialization will filter for all USDevices that are set to active. The USDevice's model will be used to display it in the list:
     * \verbatim
-    *   std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(IsActive=true))";
-    *   m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL ,filter);
+        std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(IsActive=true))";
+        m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL ,filter);
     * \endverbatim
     */
     template <class T>
-    void Initialize(const std::string& namingProperty, std::string& filter)
+    void Initialize(const std::string& namingProperty = static_cast< std::string >(""), std::string& filter = static_cast< std::string >(""))
       {
         std::string interfaceName ( us_service_interface_iid<T*>() );
         m_Interface = interfaceName;

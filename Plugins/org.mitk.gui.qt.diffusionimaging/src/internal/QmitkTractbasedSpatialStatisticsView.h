@@ -144,6 +144,8 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void Replot(int index);
 
+    void Cut();
+
 
   protected:
 

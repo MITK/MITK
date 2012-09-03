@@ -301,6 +301,13 @@
                </item>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="m_Cut">
+               <property name="text">
+                <string>Cut</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

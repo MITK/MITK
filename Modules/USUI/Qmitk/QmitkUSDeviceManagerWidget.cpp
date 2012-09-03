@@ -62,17 +62,17 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 
 void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
 {
-  mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedServiceAsClass<mitk::USDevice>();
+  mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
   if (device.IsNull()) return;
   if (device->GetIsActive()) device->Deactivate();
   else device->Activate();
 
   // Manually reevaluate Button logic
-  OnDeviceSelectionChanged(m_Controls->m_ConnectedDevices->GetSelectedService());
+  OnDeviceSelectionChanged(m_Controls->m_ConnectedDevices->GetSelectedServiceReference());
 }
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
-  mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedServiceAsClass<mitk::USDevice>();
+  mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
   if (device.IsNull()) return;
   device->Disconnect();
 }

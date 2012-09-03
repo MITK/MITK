@@ -261,7 +261,7 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
     }
     else
     {
-      return itUp._Myoff;
+      return itUp._Myoff - 1;//take last vertex if iterator is at end
     }
 
   }

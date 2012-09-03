@@ -72,7 +72,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       glColor4f(red,green,blue,0.5);
     }
 
-    mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("selectedcolor", renderer));
+    mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("pointcolor", renderer));
     if(!selectedcolor)
     {
       selectedcolor = mitk::ColorProperty::New(0.5,0.5,0.1);
@@ -241,9 +241,9 @@ const mitk::ContourModel* mitk::ContourModelGLMapper2D::GetInput(void)
 void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
-  node->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), renderer, overwrite );
+  node->AddProperty( "pointcolor", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite );
   node->AddProperty( "width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
-  node->AddProperty( "use cutting plane", mitk::BoolProperty::New( true ), renderer, overwrite );
+
   node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);

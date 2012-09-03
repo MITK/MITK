@@ -23,9 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include "mitkModuleContext.h"
 
-const std::string mitk::USDevice::US_INTERFACE_NAME = "org.mitk.services.UltrasoundDevice";     // Common Interface name of all US Devices. Used to refer to this device via Microservices
-const std::string mitk::USDevice::US_PROPKEY_LABEL = US_INTERFACE_NAME + ".label";      // Human readable text represntation of this device 
-const std::string mitk::USDevice::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";   // Whether this Device is active or not.
+const std::string mitk::USDevice::US_INTERFACE_NAME = "org.mitk.services.UltrasoundDevice";     
+const std::string mitk::USDevice::US_PROPKEY_LABEL = US_INTERFACE_NAME + ".label";      
+const std::string mitk::USDevice::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";  
+const std::string mitk::USDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";  
 
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::ImageSource()
@@ -47,7 +48,6 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::Im
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata) : mitk::ImageSource()
 {
   m_Metadata = metadata;
-  //m_Metadata->SetDeviceClass(GetDeviceClass());
   m_IsActive = false;
 
   //set number of outputs
@@ -70,22 +70,29 @@ mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
   std::string no = "false";
 
   if(this->GetIsActive())
-    props["IsActive"] = yes;
+    props[mitk::USDevice::US_PROPKEY_ISACTIVE] = yes;
   else
-    props["IsActive"] = no;
+    props[mitk::USDevice::US_PROPKEY_ISACTIVE] = no;
+
+  std::string isActive;
+  if (GetIsActive()) isActive = " (Active)";
+  else isActive = " (Inactive)";
+  // e.g.: Zonare MyLab5 (Active)
+  props[ mitk::USDevice::US_PROPKEY_LABEL] = m_Metadata->GetDeviceManufacturer() + " " + m_Metadata->GetDeviceModel() + isActive;
 
   if( m_Calibration.IsNotNull() )
     props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = yes;
   else
     props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = no;
 
-  props[ "DeviceClass" ] = GetDeviceClass();
+  props[ mitk::USDevice::US_PROPKEY_CLASS ] = GetDeviceClass();
   props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
   props[ mitk::USImageMetadata::PROP_DEV_MODEL ] = m_Metadata->GetDeviceModel();
   props[ mitk::USImageMetadata::PROP_DEV_COMMENT ] = m_Metadata->GetDeviceComment();
   props[ mitk::USImageMetadata::PROP_PROBE_NAME ] = m_Metadata->GetProbeName();
   props[ mitk::USImageMetadata::PROP_PROBE_FREQUENCY ] = m_Metadata->GetProbeFrequency();
   props[ mitk::USImageMetadata::PROP_ZOOM ] = m_Metadata->GetZoom();
+
   return props;
 }
 

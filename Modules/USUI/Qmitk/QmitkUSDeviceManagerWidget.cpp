@@ -44,7 +44,7 @@ void QmitkUSDeviceManagerWidget::CreateQtPartControl(QWidget *parent)
 
   // Initializations
   std::string empty = "";
-  m_Controls->m_ConnectedDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL, empty);
+  m_Controls->m_ConnectedDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL, empty);
 }
 
 void QmitkUSDeviceManagerWidget::CreateConnections()
@@ -84,7 +84,7 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(mitk::ServiceReference
     m_Controls->m_BtnDisconnect->setEnabled(false);
     return;
   }
-  std::string isActive = reference.GetProperty("IsActive").ToString();
+  std::string isActive = reference.GetProperty( mitk::USDevice::US_PROPKEY_ISACTIVE ).ToString();
   if (isActive.compare("true") == 0) 
   {
     m_Controls->m_BtnActivate->setEnabled(true);

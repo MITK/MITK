@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org_diffusion} MITK Diffusion Imaging (MITK-DI)
+\page org_diffusion MITK Diffusion Imaging (MITK-DI)
 
 This module provides means to diffusion weighted image reconstruction, visualization and quantification. Diffusion tensors as well as different q-ball reconstruction schemes are supported. Q-ball imaging aims at recovering more detailed information about the orientations of fibers from diffusion MRI measurements and, in particular, to resolve the orientations of crossing fibers.
 

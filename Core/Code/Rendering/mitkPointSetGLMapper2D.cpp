@@ -255,6 +255,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 
     Point2D lastPt2DInPointSet; // The last point in the pointset in display coordinates
     mitk::PointSet::DataType::PointType plob;
+    plob.Fill(0);
     itkPointSet->GetPoint( itkPointSet->GetNumberOfPoints()-1, &plob);
 
     //map lastPt2DInPointSet to display coordinates

@@ -99,10 +99,10 @@ namespace itk
 
 
     // iDIfference is value between 0 (good) and 1 (bad)
-    gradientCost = 1 - gradientMagnitude / 255;
+    gradientCost = 1 - gradientMagnitude / SHRT_MAX;
 
     
-    //double iDifferenceSig = SigmoidFunction(iDifference,1.0,0.0,23, 70);
+    gradientCost = SigmoidFunction(gradientCost, 1.0, 0.0, 23, 70);
 
     /* -----------------------------------------------------------------------------*/
 

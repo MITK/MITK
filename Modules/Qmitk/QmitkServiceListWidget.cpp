@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL HEaders
 #include <list>
 
-//QT headers
-#include <QColor>
-
 //microservices
 #include <usGetModuleContext.h>
 #include <mitkModuleContext.h>
@@ -112,6 +109,7 @@ mitk::ServiceReference QmitkServiceListWidget::GetSelectedService(){
 
 void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
 
+  //MITK_INFO << "ServiceEvent" << event.GetType();
   switch (event.GetType())
   {
     case mitk::ServiceEvent::MODIFIED:

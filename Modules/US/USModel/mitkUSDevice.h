@@ -40,7 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 
 
-
 namespace mitk {
 
     /**Documentation
@@ -51,6 +50,8 @@ namespace mitk {
     * US Devices support output of calibrated images, i.e. images that include a specific geometry.
     * To achieve this, call SetCalibration, and make sure that the subclass also calls apply
     * transformation at some point (The USDevice does not automatically apply the transformation to the image)
+    *
+    * Note that SmartPointers to USDevices will not invalidate while the device is still connected.
     * \ingroup US
     */
 
@@ -59,18 +60,13 @@ namespace mitk {
     public:
       mitkClassMacro(USDevice, mitk::ImageSource);
 
-      /**
-      * \brief Enforces minimal Metadata to be set. 
+     /**
+      *\brief These constants are used in conjunction with Microservices
       */
-     // mitkNewMacro3Param(Self, std::string, std::string, bool);
-
-      
-      /**
-      * \brief Constructs a device with the given Metadata. Make sure the Metadata contains meaningful content!
-      *      
-      */
-     // mitkNewMacro2Param(Self, mitk::USImageMetadata::Pointer, bool);
-
+      static const std::string US_INTERFACE_NAME;     // Common Interface name of all US Devices. Used to refer to this device via Microservices
+      static const std::string US_PROPKEY_LABEL;      // Human readable text represntation of this device 
+      static const std::string US_PROPKEY_ISACTIVE;   // Whether this Device is active or not.
+      static const std::string US_PROPKEY_CLASS;      // Class Name of this Object
 
 
       /**
@@ -202,7 +198,7 @@ namespace mitk {
       * \brief Returns the currently active probe or null, if none is active
       */
       itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
-
+    
       std::string GetDeviceManufacturer();
       std::string GetDeviceModel();
       std::string GetDeviceComment();
@@ -269,7 +265,7 @@ namespace mitk {
       /**
       *  \brief Grabs the next frame from the Video input. This method is called internally, whenever Update() is invoked by an Output.
       */
-       void GenerateData();
+       void GenerateData() = 0;
 
       /**
       *  \brief The Calibration Transformation of this US-Device. This will automatically be written into the image once
@@ -286,7 +282,12 @@ namespace mitk {
 
      private:
        
+      /**
+      *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
+      */
        mitk::ServiceRegistration m_ServiceRegistration;
+       
+
 
     };
 } // namespace mitk

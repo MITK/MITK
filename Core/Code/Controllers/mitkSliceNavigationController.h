@@ -85,7 +85,7 @@ class BaseRenderer;
  * sliceCtrl->SetInputWorldGeometry(geometry.GetPointer());
  *
  * // Tell the navigator in which direction it shall slice the data
- * sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Transversal);
+ * sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Axial);
  *
  * // Connect one or more BaseRenderer to this navigator, i.e.: events sent 
  * // by the navigator when stepping through the slices (e.g. by 
@@ -152,7 +152,20 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      * the Geometry2D instances in a SlicedGeometry3D provided
      * as input world geometry (by SetInputWorldGeometry).
      */
-    enum ViewDirection{Transversal, Sagittal, Frontal, Original};
+    enum ViewDirection
+    {
+#ifdef _MSC_VER
+      Transversal, // deprecated
+#endif
+      Axial = 0,
+      Sagittal,
+      Frontal,
+      Original
+    };
+
+#ifdef __GNUC__
+    __attribute__ ((deprecated)) static const ViewDirection Transversal = ViewDirection(Axial);
+#endif
 
     /**
      * \brief Set the input world geometry out of which the

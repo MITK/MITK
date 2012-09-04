@@ -31,7 +31,7 @@ The workflow is repeatedly useable with the same or different measurement figure
 
 \image html Basic_Screen_edited.JPG
 
-The standard working plane is "Transverse" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to 3M Application Bundle User Manual.
+The standard working plane is "Axial" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to 3M Application Bundle User Manual.
 
 \section QmitkMeasurementUserManualFeatures Features
 

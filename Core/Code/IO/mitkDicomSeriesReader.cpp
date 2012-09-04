@@ -293,7 +293,7 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   sf.SetFile(reader.GetFile());
 
   gdcm::Attribute<0x0028,0x0011> dimTagX; // coloumns || sagittal
-  gdcm::Attribute<0x3001,0x1001, gdcm::VR::UL, gdcm::VM::VM1> dimTagZ; //I have no idea what is VM1. // (Philips specific) // transversal
+  gdcm::Attribute<0x3001,0x1001, gdcm::VR::UL, gdcm::VM::VM1> dimTagZ; //I have no idea what is VM1. // (Philips specific) // axial
   gdcm::Attribute<0x0028,0x0010> dimTagY; // rows || coronal
   gdcm::Attribute<0x0028,0x0008> dimTagT; // how many frames
   gdcm::Attribute<0x0018,0x602c> spaceTagX; // Spacing in X , unit is "physicalTagx" (usually centimeter)

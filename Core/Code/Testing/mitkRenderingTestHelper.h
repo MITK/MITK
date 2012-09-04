@@ -55,7 +55,7 @@ public:
     **/
     void SetProperty(const char *propertyKey, mitk::BaseProperty *property);
 
-    /** @brief Set the view direction of the renderwindow (e.g. sagittal, coronal, transversal)
+    /** @brief Set the view direction of the renderwindow (e.g. sagittal, coronal, axial)
     **/
     void SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection);
 

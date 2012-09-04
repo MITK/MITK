@@ -38,7 +38,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
     this->setObjectName(name);
 
   popUp = new QMenu(this);
-  popUp->addAction("Transverse");
+  popUp->addAction("Axial");
   popUp->addAction("Frontal");
   popUp->addAction("Sagittal");
 
@@ -46,7 +46,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
   setPopUpEnabled(false);
 
   m_SlicedGeometry = 0;
-  m_View = mitk::SliceNavigationController::Transversal;
+  m_View = mitk::SliceNavigationController::Axial;
 
   QHBoxLayout *hlayout = new QHBoxLayout(container);
   hlayout->setMargin(0);
@@ -186,10 +186,10 @@ void QmitkSliceWidget::InitWidget(
   mitk::SliceNavigationController* controller =
       m_RenderWindow->GetSliceNavigationController();
 
-  if (viewDirection == mitk::SliceNavigationController::Transversal)
+  if (viewDirection == mitk::SliceNavigationController::Axial)
   {
     controller->SetViewDirection(
-        mitk::SliceNavigationController::Transversal);
+        mitk::SliceNavigationController::Axial);
   }
   else if (viewDirection == mitk::SliceNavigationController::Frontal)
   {
@@ -302,9 +302,9 @@ void QmitkSliceWidget::wheelEvent(QWheelEvent * e)
 
 void QmitkSliceWidget::ChangeView(QAction* val)
 {
-  if (val->text() == "Transverse")
+  if (val->text() == "Axial")
   {
-    InitWidget(mitk::SliceNavigationController::Transversal);
+    InitWidget(mitk::SliceNavigationController::Axial);
   }
   else if (val->text() == "Frontal")
   {

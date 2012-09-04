@@ -35,7 +35,7 @@ int mitkImageVtkMapper2DSwivelTest(int argc, char* argv[])
     if ( argc < 2 )
     {
         MITK_TEST_OUTPUT( << "Usage: " << std::string(*argv) << " [file1 file2 ...] outputfile" )
-                MITK_TEST_OUTPUT( << "Will render a central transversal slice of all given files into outputfile" )
+                MITK_TEST_OUTPUT( << "Will render a central axial slice of all given files into outputfile" )
                 exit( EXIT_SUCCESS );
     }
 

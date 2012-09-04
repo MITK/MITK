@@ -136,7 +136,7 @@ class QmitkMeasurementView : public QmitkAbstractView
     void CreateQtPartControl(QWidget* parent);
     ///
     /// Set widget planes visibility to false.
-    /// Show only transversal view.
+    /// Show only axial view.
     /// Add an interactor to all PlanarFigures in the DataStorage (if they dont have one yet).
     /// Add their interactor to the global interaction.
     ///

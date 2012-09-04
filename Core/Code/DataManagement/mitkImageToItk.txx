@@ -199,8 +199,8 @@ template<class TOutputImage>
   unsigned int j;
   const AffineTransform3D::MatrixType& matrix = input->GetGeometry()->GetIndexToWorldTransform()->GetMatrix();
 
-  /// \warning 2D MITK images could have a 3D rotation, since they have a 3x3 geometry matrix. 
-  /// If it is only a rotation around the transversal plane normal, it can be express with a 2x2 matrix. 
+  /// \warning 2D MITK images could have a 3D rotation, since they have a 3x3 geometry matrix.
+  /// If it is only a rotation around the axial plane normal, it can be express with a 2x2 matrix.
   /// In this case, the ITK image conservs this information and is identical to the MITK image!
   /// If the MITK image contains any other rotation, the ITK image will have no rotation at all.
   /// Spacing is of course conserved in both cases.

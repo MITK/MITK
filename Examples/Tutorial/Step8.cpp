@@ -58,7 +58,7 @@ void Step8::SetupWidgets()
   // Tell the multiWidget which DataStorage to render
   multiWidget->SetDataStorage(m_DataStorage);
 
-  // Initialize views as transversal, sagittal, coronar (from
+  // Initialize views as axial, sagittal, coronar (from
   // top-left to bottom)
   mitk::TimeSlicedGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(
       m_DataStorage->GetAll());

@@ -68,7 +68,7 @@ class Segmentation_EXPORT SegTool2D : public Tool
       \brief Calculates for a given Image and PlaneGeometry, which slice of the image (in index corrdinates) is meant by the plane.
 
       \return false, if no slice direction seems right (e.g. rotated planes)
-      \param affectedDimension The image dimension, which is constant for all points in the plane, e.g. Transversal --> 2
+      \param affectedDimension The image dimension, which is constant for all points in the plane, e.g. Axial --> 2
       \param affectedSlice The index of the image slice
     */
     static bool DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice );

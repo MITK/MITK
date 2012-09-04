@@ -44,7 +44,7 @@ namespace mitk
   This class takes a 3D mitk::Image as input and tries to replace one slice in it with the second input image, which is specified
   by calling SetSliceImage with a 2D mitk::Image.
 
-  Two parameters determine which slice is replaced: the "slice dimension" is that one, which is constant for all points in the plane, e.g. transversal would mean 2.
+  Two parameters determine which slice is replaced: the "slice dimension" is that one, which is constant for all points in the plane, e.g. axial would mean 2.
   The "slice index" is the slice index in the image direction you specified with "affected dimension". Indices count from zero.
 
   This class works with all kind of image types, the only restrictions being that the input is 3D, and the slice image is 2D.
@@ -70,7 +70,7 @@ class Segmentation_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
     /**
       \brief The orientation of the slice to overwrite.
 
-      \a Parameter \a SliceDimension Number of the dimension which is constant for all pixels of the desired slices (e.g. 0 for transversal)
+      \a Parameter \a SliceDimension Number of the dimension which is constant for all pixels of the desired slices (e.g. 0 for axial)
     */
     itkSetMacro(SliceDimension, unsigned int);
     itkGetConstMacro(SliceDimension, unsigned int);

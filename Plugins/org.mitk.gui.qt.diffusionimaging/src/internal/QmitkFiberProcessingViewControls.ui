@@ -709,7 +709,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Transverse</string>
+          <string>Axial</string>
          </property>
         </item>
        </widget>

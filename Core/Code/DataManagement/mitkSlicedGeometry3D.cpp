@@ -277,7 +277,7 @@ mitk::SlicedGeometry3D::InitializePlanes(
 
   switch ( planeorientation )
   {
-    case PlaneGeometry::Transversal:
+    case PlaneGeometry::Axial:
       viewSpacing = geometry3D->GetSpacing()[2];
       slices = (unsigned int) geometry3D->GetExtent( 2 );
       break;

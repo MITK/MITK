@@ -57,22 +57,29 @@ void QmitkOtsuAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 
   QVBoxLayout *layout = new QVBoxLayout;
   layout->setContentsMargins(0, 0, 0, 0);
+  QHBoxLayout* spinBoxLayout = new QHBoxLayout;
+  QHBoxLayout* buttonLayout = new QHBoxLayout;
 
   m_OtsuSpinBox = new QSpinBox;
   m_OtsuSpinBox->setRange(2, 32);
   m_OtsuSpinBox->setValue(2);
 
   m_OtsuPushButton = new QPushButton("OK");
+  QPushButton* CancelButton = new QPushButton("Cancel");
 
   connect(m_OtsuPushButton, SIGNAL(clicked()), this, SLOT(OtsuSegmentationDone()));
+  connect(CancelButton, SIGNAL(clicked()), m_OtsuSegmentationDialog, SLOT(reject()));
 
   QLabel* numberOfThresholdsLabel = new QLabel("Select number of Regions of Interest:");
-  //numberOfThresholdsLabel->setAlignment(Qt::AlignmentFlag::AlignHCenter);
-  //numberOfThresholdsLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter);
   numberOfThresholdsLabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
   layout->addWidget(numberOfThresholdsLabel);
-  layout->addWidget(m_OtsuSpinBox);
-  layout->addWidget(m_OtsuPushButton);
+  layout->addLayout(spinBoxLayout);
+  spinBoxLayout->addSpacing(50);
+  spinBoxLayout->addWidget(m_OtsuSpinBox);
+  spinBoxLayout->addSpacing(50);
+  layout->addLayout(buttonLayout);
+  buttonLayout->addWidget(m_OtsuPushButton);
+  buttonLayout->addWidget(CancelButton);
 
   m_OtsuSegmentationDialog->setLayout(layout);
   m_OtsuSegmentationDialog->setFixedSize(300, 80);

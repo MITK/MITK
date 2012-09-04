@@ -877,13 +877,14 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
 
     }
 
+
+
     /* We found the start and end points of of the part that should be plottet for
        the current fiber. now we need to plot them. If the endId is smaller than the startId the plot order
        must be reversed*/
 
     if(startId < endId)
     {
-
 
       double *p = fiberPolyData->GetPoint( pointsInCell[ startId ] );
 
@@ -908,13 +909,20 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
       double D = - (A + (B + C) );
 
 
-      bool startOnPositive = false;
-      if(A*p0[0]+B*p0[1]+C*p0[2]+D > 0)
-        startOnPositive = true;
 
-      bool secondOnPositive = false;
-      if(A*p1[0]+B*p1[1]+C*p1[2]+D > 0)
-        secondOnPositive = true;
+      mitk::Point3D pStart;
+      pStart[0] = p0[0];
+      pStart[1] = p0[1];
+      pStart[2] = p0[2];
+
+      bool startOnPositive = startGeometry2D->IsAbove(pStart);
+
+      mitk::Point3D pSecond;
+      pSecond[0] = p1[0];
+      pSecond[1] = p1[1];
+      pSecond[2] = p1[2];
+
+      bool secondOnPositive = startGeometry2D->IsAbove(pSecond);
 
 
       // Calculate intersection with the plane
@@ -924,67 +932,55 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
       onPlane[1] = startCenter[1];
       onPlane[2] = startCenter[2];
 
-      if(secondOnPositive ^ startOnPositive)
+
+      if(! (secondOnPositive ^ startOnPositive) )
       {
-        // The start point lies on the other side of the plane so should not be included
-
-        // intersection = p + u(p2-p1)
-
-      //  double u = (A*point1[0]+B*point1[1]+C*point1[2] + D) /
-                 // ( A*(point1[0]-point2[0]) +B*(point1[1]-point2[1]) +C*(point1[2]-point2[2]) );
-
-        double d = ( (onPlane-p0)*normal) / ( (p1-p0) * normal );
-
-
-
-        mitk::Vector3D newPoint = (p1-p0) * p0;
-        newPoint[0] = d*newPoint[0];
-        newPoint[1] = d*newPoint[1];
-        newPoint[2] = d*newPoint[2];
-
-
-        double insertPoint[3];
-        insertPoint[0] = newPoint[0];
-        insertPoint[1] = newPoint[1];
-        insertPoint[2] = newPoint[2];
-
-        points->InsertNextPoint(insertPoint);
-
-
-      }
-      else
-      {
-        // The startpoint should also be included
-        // need one point before the startpoint to calculate intersection with the plane
+        /* startId and startId+1 lie on the same side of the plane, so we need
+           need startId-1 to calculate the intersection with the planar figure*/
         p = fiberPolyData->GetPoint( pointsInCell[ startId-1 ] );
         p1[0] = p[0];
         p1[1] = p[1];
         p1[2] = p[2];
-
-        double d = ( (onPlane-p0)*normal) / ( (p1-p0) * normal );
-
-        mitk::Vector3D newPoint = (p1-p0)* p0;
-        newPoint[0] = d*newPoint[0];
-        newPoint[1] = d*newPoint[1];
-        newPoint[2] = d*newPoint[2];
+      }
 
 
-        double insertPoint[3];
-        insertPoint[0] = newPoint[0];
-        insertPoint[1] = newPoint[1];
-        insertPoint[2] = newPoint[2];
+      double d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
 
-        points->InsertNextPoint(insertPoint);
+      mitk::Vector3D newPoint = (p0-p1);
 
-       // double d = (A*point1[0]+B*point1[1]+C*point1[2] +) /
-        //          ( A*(point1[0]-point2[0]) +B*(point1[1]-point2[1]) +C*(point1[2]-point2[2]) );
+      newPoint[0] = d*newPoint[0] + p0[0];
+      newPoint[1] = d*newPoint[1] + p0[1];
+      newPoint[2] = d*newPoint[2] + p0[2];
+
+
+      double insertPoint[3];
+      insertPoint[0] = newPoint[0];
+      insertPoint[1] = newPoint[1];
+      insertPoint[2] = newPoint[2];
+
+
+      // First insert the intersection with the start roi
+      points->InsertNextPoint(insertPoint);
+      polyLine->GetPointIds()->InsertId(lineIndex,pointIndex);
+      lineIndex++;
+      pointIndex++;
+
+      if(! (secondOnPositive ^ startOnPositive) )
+      {
+        /* StartId and startId+1 lie on the same side of the plane
+           so startId is also part of the ROI*/
+
+        double *start = fiberPolyData->GetPoint( pointsInCell[startId] );
+        points->InsertNextPoint(start);
+        polyLine->GetPointIds()->InsertId(lineIndex,pointIndex);
+        lineIndex++;
+        pointIndex++;
 
 
       }
 
-
-
-      for( int pointInCellID( startId+1 ); pointInCellID <= endId ; pointInCellID++)
+      // Insert the rest up and to including endId-1
+      for( int pointInCellID( startId+1 ); pointInCellID <= endId-1 ; pointInCellID++)
       {
         // create new polyline for new polydata
         double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
@@ -997,7 +993,97 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
         pointIndex++;
 
       }
+
+
+
+      /* endId must be included if endId and endId-1 lie on the same side of the
+         plane defined by endRoi*/
+
+
+      p = fiberPolyData->GetPoint( pointsInCell[ endId ] );
+      p0[0] = p[0];
+      p0[1] = p[1];
+      p0[2] = p[2];
+
+
+      p = fiberPolyData->GetPoint( pointsInCell[ endId-1 ] );
+      p1[0] = p[0];
+      p1[1] = p[1];
+      p1[2] = p[2];
+
+
+      mitk::Point3D pLast;
+      pLast[0] = p0[0];
+      pLast[1] = p0[1];
+      pLast[2] = p0[2];
+
+      bool lastOnPositive = startGeometry2D->IsAbove(pLast);
+
+      mitk::Point3D pBeforeLast;
+      pBeforeLast[0] = p1[0];
+      pBeforeLast[1] = p1[1];
+      pBeforeLast[2] = p1[2];
+
+      bool secondLastOnPositive = startGeometry2D->IsAbove(pBeforeLast);
+
+
+
+      onPlane[0] = endCenter[0];
+      onPlane[1] = endCenter[1];
+      onPlane[2] = endCenter[2];
+
+
+
+      if(! (lastOnPositive ^ secondLastOnPositive) )
+      {
+        /* endId and endId-1 lie on the same side of the plane, so we need
+           need endId+1 to calculate the intersection with the planar figure.
+           this should exist since we know that the fiber crosses the planar figure*/
+        p = fiberPolyData->GetPoint( pointsInCell[ endId+1 ] );
+        p1[0] = p[0];
+        p1[1] = p[1];
+        p1[2] = p[2];
+      }
+
+      d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
+
+      newPoint = (p0-p1);
+
+      newPoint[0] = d*newPoint[0] + p0[0];
+      newPoint[1] = d*newPoint[1] + p0[1];
+      newPoint[2] = d*newPoint[2] + p0[2];
+
+
+      insertPoint[3];
+      insertPoint[0] = newPoint[0];
+      insertPoint[1] = newPoint[1];
+      insertPoint[2] = newPoint[2];
+
+
+      if(! (secondOnPositive ^ startOnPositive) )
+      {
+        /* EndId and EndId-1 lie on the same side of the plane
+           so endId is also part of the ROI*/
+
+        double *end = fiberPolyData->GetPoint( pointsInCell[startId] );
+        points->InsertNextPoint(end);
+        polyLine->GetPointIds()->InsertId(lineIndex,pointIndex);
+        lineIndex++;
+        pointIndex++;
+
+      }
+
+      //Insert the Last Point (intersection with the end roi)
+
+      points->InsertNextPoint(insertPoint);
+      polyLine->GetPointIds()->InsertId(lineIndex,pointIndex);
+      lineIndex++;
+      pointIndex++;
+
+
     }
+/*
+    // Need to reverse walking order
     else{
       for( int pointInCellID( startId ); pointInCellID >= endId ; pointInCellID--)
       {
@@ -1016,7 +1102,7 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
 
     }
 
-
+*/
     // add polyline to vtk cell array
      cells->InsertNextCell(polyLine);
 

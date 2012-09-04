@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 
+#include <itkShortestPathCostFunctionLiveWire.h>
+#include <itkShortestPathImageFilter.h>
+
 
 namespace mitk {
 
@@ -50,6 +53,10 @@ namespace mitk {
     typedef ContourModel OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef mitk::Image InputType;
+
+    typedef itk::Image< float,  2 > FloatImageType;
+    typedef itk::ShortestPathImageFilter< FloatImageType, FloatImageType > ShortestPathImageFilterType;
+    typedef itk::ShortestPathCostFunctionLiveWire< FloatImageType >        CostFunctionType;
 
 
     itkSetMacro(StartPoint, mitk::Point3D);
@@ -85,6 +92,8 @@ namespace mitk {
     mitk::Point3D m_StartPointInIndex;
     mitk::Point3D m_EndPointInIndex;
 
+    CostFunctionType::Pointer m_CostFunction;
+    ShortestPathImageFilterType::Pointer m_ShortestPathFilter;
 
   private:
 

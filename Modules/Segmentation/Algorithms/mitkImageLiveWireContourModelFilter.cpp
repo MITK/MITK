@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageLiveWireContourModelFilter.h"
 
-#include <itkShortestPathCostFunctionLiveWire.h>
+
 #include <itkImageRegionIterator.h>
-#include <itkShortestPathImageFilter.h>
+#include <itkCastImageFilter.h>
 
 
 mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
@@ -27,7 +27,9 @@ mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
   this->SetNumberOfRequiredInputs(1);
   this->SetNumberOfOutputs( 1 );
   this->SetNthOutput(0, output.GetPointer());
-
+  m_CostFunction = CostFunctionType::New();
+  m_ShortestPathFilter = ShortestPathImageFilterType::New();
+  m_ShortestPathFilter->SetCostFunction(m_CostFunction);
 }
 
 mitk::ImageLiveWireContourModelFilter::~ImageLiveWireContourModelFilter()
@@ -111,13 +113,8 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
 {
-  typedef itk::Image< TPixel, VImageDimension >                              InputImageType;
-  typedef itk::Image< float,  2 >                                          FloatImageType;
-
-  typedef  itk::ShortestPathImageFilter< typename InputImageType, typename InputImageType >     ShortestPathImageFilterType;
-  typedef  itk::ShortestPathCostFunctionLiveWire< itk::Image< TPixel, VImageDimension > >   CostFunctionType;
-
-  typedef InputImageType::IndexType                                        IndexType;
+  typedef itk::Image< TPixel, VImageDimension >   InputImageType;
+  typedef InputImageType::IndexType               IndexType;
 
 
   /* compute the requested region for itk filters */
@@ -148,35 +145,36 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
 
   //inputImage->SetRequestedRegion(region);
 
+  typedef itk::CastImageFilter< InputImageType, FloatImageType > CastFilterType;
+  CastFilterType::Pointer castFilter = CastFilterType::New();
+  castFilter->SetInput(inputImage);
+  castFilter->Update();
   /* extracts features from image and calculates costs */
-  typename CostFunctionType::Pointer costFunction = CostFunctionType::New();
-  costFunction->SetImage(inputImage);
-  costFunction->SetStartIndex(startPoint);
-  costFunction->SetEndIndex(endPoint);
-  costFunction->SetRequestedRegion(region);
+  m_CostFunction->SetImage(castFilter->GetOutput());
+  m_CostFunction->SetStartIndex(startPoint);
+  m_CostFunction->SetEndIndex(endPoint);
+  m_CostFunction->SetRequestedRegion(region);
   /*---------------------------------------------*/
 
 
   /* calculate shortest path between start and end point */
-  ShortestPathImageFilterType::Pointer shortestPathFilter = ShortestPathImageFilterType::New();
-  shortestPathFilter->SetFullNeighborsMode(true);
-  shortestPathFilter->SetInput(inputImage);
-  shortestPathFilter->SetMakeOutputImage(false);  
+  m_ShortestPathFilter->SetFullNeighborsMode(true);
+  m_ShortestPathFilter->SetInput(castFilter->GetOutput());
+  m_ShortestPathFilter->SetMakeOutputImage(false);  
 
-  //shortestPathFilter->SetCalcAllDistances(true);
-  shortestPathFilter->SetStartIndex(startPoint);
-  shortestPathFilter->SetEndIndex(endPoint);
+  //m_ShortestPathFilter->SetCalcAllDistances(true);
+  m_ShortestPathFilter->SetStartIndex(startPoint);
+  m_ShortestPathFilter->SetEndIndex(endPoint);
 
-  shortestPathFilter->SetCostFunction(costFunction);
 
-  shortestPathFilter->Update();
+  m_ShortestPathFilter->Update();
 
   /*---------------------------------------------*/
 
 
   /* construct contour from path image */
   //get the shortest path as vector
-  typename std::vector< ShortestPathImageFilterType::IndexType> shortestPath = shortestPathFilter->GetVectorPath();
+  typename std::vector< ShortestPathImageFilterType::IndexType> shortestPath = m_ShortestPathFilter->GetVectorPath();
 
   //fill the output contour with controll points from the path
   OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );

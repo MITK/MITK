@@ -7,8 +7,7 @@
 
 #include <itkImageRegionConstIterator.h>
 
-#include <itkGradientMagnitudeImageFilter.h>
-#include <itkLaplacianImageFilter.h>
+
 
 
 namespace itk
@@ -32,6 +31,13 @@ namespace itk
     /** Run-time type information (and related methods). */
     itkTypeMacro(ShortestPathCostFunctionLiveWire, ShortestPathCostFunction);
 
+
+    typedef itk::Image<unsigned char, 2>  UnsignedCharImageType;
+    typedef itk::Image<float, 2>  FloatImageType;
+
+    typedef float ComponentType;
+    typedef itk::CovariantVector< ComponentType, 2  > OutputPixelType;
+    typedef itk::Image< OutputPixelType, 2 > VectorOutputImageType;
 
     typedef typename TInputImageType::IndexType             IndexType;
     typedef TInputImageType                                 ImageType;
@@ -58,9 +64,6 @@ namespace itk
 
     ShortestPathCostFunctionLiveWire();
 
-    // Set/Get function for sigma parameter
-    itkSetMacro (Sigma, double);
-    itkGetMacro (Sigma, double);
 
     itkSetMacro (RequestedRegion, RegionType);
     itkGetMacro (RequestedRegion, RegionType);
@@ -69,18 +72,25 @@ namespace itk
     itkSetMacro (UseApproximateGradient, bool);
     itkGetMacro (UseApproximateGradient, bool);
 
+    virtual void SetImage(const TInputImageType* _arg) 
+    { 
+      if (this->m_Image != _arg) 
+      { 
+        this->m_Image = _arg; 
+        this->Modified(); 
+        this->m_Initialized = false;
+      } 
+    } 
+
   protected:
 
     virtual ~ShortestPathCostFunctionLiveWire() {};
 
-    double m_Sigma;
 
     typename ImageType::Pointer m_GradImage;
-    typename ImageType::Pointer m_LaplacianImage;
-
-    double iDifference;
-    double pSmoothness;
-    double sIDifference;
+    typename UnsignedCharImageType::Pointer m_ZeroCrossingsImage;
+    typename FloatImageType::Pointer m_EdgeImage;
+    typename VectorOutputImageType::Pointer m_GradientImage;
 
     double minCosts;
 
@@ -88,7 +98,6 @@ namespace itk
 
     std::vector<  itk::Index<3>  > m_RepulsivePoints;
 
-    //typename Superclass::PixelType a,b, a2, b2;
     typename Superclass::PixelType val;
 
     typename Superclass::PixelType startValue;
@@ -99,6 +108,8 @@ namespace itk
     RegionType m_RequestedRegion;
 
     bool m_UseApproximateGradient;
+
+    bool m_Initialized;
 
   private:
 

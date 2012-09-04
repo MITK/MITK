@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include <itkLaplacianOperator.h>
+#include <itkStatisticsImageFilter.h>
 
 
 namespace itk
@@ -18,7 +19,8 @@ namespace itk
   {
     SetSigma (5.0); // standard value
     m_UseRepulsivePoint = false;
-    m_UseApproximateGradient = true;
+    m_UseApproximateGradient = false;
+    m_GradientMax = 0.0;
   }
 
 
@@ -66,24 +68,24 @@ namespace itk
 
       // dI(x,y)/dx
       IndexType x1;
-      x1[0] = (p1[0] == xMAX) ? (p1[0]) :( p1[0] +1);//check for pixels at the edge of the image => x==xMAX
-      x1[1] = p1[1];
+      x1[0] = (p2[0] == xMAX) ? (p2[0]) :( p2[0] +1);//check for pixels at the edge of the image => x==xMAX
+      x1[1] = p2[1];
 
       IndexType x2;
-      x2[0] = (p1[0] == 0) ? (0) :( p1[0] -1);//x==0
-      x2[1] = p1[1];
+      x2[0] = (p2[0] == 0) ? (0) :( p2[0] -1);//x==0
+      x2[1] = p2[1];
 
       gradientX = (this->m_Image->GetPixel(x1) - this->m_Image->GetPixel(x2)) / 2;
 
 
       // dI(x,y)/dy
       IndexType y1;
-      y1[0] = p1[0];
-      y1[1] = (p1[1] == yMAX) ? (p1[1]) :( p1[1] +1);//y==yMAX
+      y1[0] = p2[0];
+      y1[1] = (p2[1] == yMAX) ? (p2[1]) :( p2[1] +1);//y==yMAX
 
       IndexType y2;
-      y2[0] = p1[0];
-      y2[1] = (p1[1] == 0) ? (0) :( p1[1] -1);//y==0
+      y2[0] = p2[0];
+      y2[1] = (p2[1] == 0) ? (0) :( p2[1] -1);//y==0
 
       gradientY = (this->m_Image->GetPixel(y1) - this->m_Image->GetPixel(y2)) / 2;
 
@@ -99,10 +101,11 @@ namespace itk
 
 
     // iDIfference is value between 0 (good) and 1 (bad)
-    gradientCost = 1 - gradientMagnitude / SHRT_MAX;
+    gradientCost = 1.0 - (gradientMagnitude / m_GradientMax);
+    //gradientCost = 1.0 / gradientMagnitude;
 
     
-    gradientCost = SigmoidFunction(gradientCost, 1.0, 0.0, 23, 70);
+    //gradientCost = SigmoidFunction(gradientCost, 1.0, 0.0, 0.001, 0.001);
 
     /* -----------------------------------------------------------------------------*/
 
@@ -114,7 +117,7 @@ namespace itk
     double laplacianCost;
     Superclass::PixelType laplaceImageValue;
 
-    if(!m_UseApproximateGradient)
+    if(false && !m_UseApproximateGradient)
     {
       laplaceImageValue = this->m_LaplacianImage->GetPixel(p2);
     }
@@ -129,44 +132,44 @@ namespace itk
       IndexType currentIndex;
 
       // up 
-      currentIndex[0] = p1[0];
-      currentIndex[1] = (p1[1] == yMAX) ? (p1[1]) :( p1[1] +1);//y==yMAX ?
+      currentIndex[0] = p2[0];
+      currentIndex[1] = (p2[1] == yMAX) ? (p2[1]) :( p2[1] +1);//y==yMAX ?
 
       up = this->m_Image->GetPixel(currentIndex);
 
 
       // down
-      currentIndex[0] = p1[0];
-      currentIndex[1] = (p1[1] == 0) ? (0) :( p1[1] -1);//y==0 ?
+      currentIndex[0] = p2[0];
+      currentIndex[1] = (p2[1] == 0) ? (0) :( p2[1] -1);//y==0 ?
 
       down = this->m_Image->GetPixel(currentIndex);
 
 
       // left
-      currentIndex[0] = (p1[0] == 0) ? (0) :( p1[0] -1);//x==0 ?
-      currentIndex[1] = p1[1];
+      currentIndex[0] = (p2[0] == 0) ? (0) :( p2[0] -1);//x==0 ?
+      currentIndex[1] = p2[1];
 
       left = this->m_Image->GetPixel(currentIndex);
 
 
       // right
-      currentIndex[0] = (p1[0] == xMAX) ? (p1[0]) :( p1[0] +1);//x==xMAX ?
-      currentIndex[1] = p1[1];
+      currentIndex[0] = (p2[0] == xMAX) ? (p2[0]) :( p2[0] +1);//x==xMAX ?
+      currentIndex[1] = p2[1];
 
       right = this->m_Image->GetPixel(currentIndex);
 
       //convolution
-      laplaceImageValue = -4.0 * this->m_Image->GetPixel(p1) + up + down + right + left;
+      laplaceImageValue = -4.0 * this->m_Image->GetPixel(p2) + up + down + right + left;
     }
 
 
     if(laplaceImageValue < 0 || laplaceImageValue > 0)
     {
-      laplacianCost = 1;
+      laplacianCost = 1.0;
     }
     else
     {
-      laplacianCost = 0;
+      laplacianCost = 0.0;
     }
 
     /* -----------------------------------------------------------------------------*/
@@ -239,7 +242,7 @@ namespace itk
     a = this->m_Image->GetPixel(p1);
 
     b = this->m_Image->GetPixel(p2);
-    intensityDifferenceCost = abs(b-a)/255;
+    intensityDifferenceCost = pow((b-a),2) / SHRT_MAX;
 
 
     //intensityDifferenceCost = SigmoidFunction(intensityDifferenceCost,1.0,0.0,10,20);
@@ -248,12 +251,12 @@ namespace itk
 
     /*+++++++++++++++++++++  local component costs +++++++++++++++++++++++++++*/
     /*weights*/
-    double w1 = 0.33;
-    double w2 = 0.55;
-    double w3 = 0.12;
-    double w4 = 0.05;
+    double w1 = 0.40;
+    double w2 = 0.43;
+    double w3 = 0.05;
+    double w4 = 0.12;
 
-    double costs = w1 * laplacianCost + w2 * gradientCost + w3 * intensityDifferenceCost + w4 * gradientDirectionCost;
+    double costs = w1 * laplacianCost + w2 * gradientCost /*+ w3 * intensityDifferenceCost*/ + w4 * gradientDirectionCost;
 
 
     //scale by euclidian distance
@@ -261,12 +264,12 @@ namespace itk
     if( p1[0] == p2[0] || p1[1] == p2[1])
     {
       //horizontal or vertical neighbor
-      costScale = 1 / sqrt(2.0);
+      costScale = 1.0;
     }
     else
     {
       //diagonal neighbor
-      costScale = 1.0;
+      costScale = sqrt(2.0);
     }
 
     costs *= costScale;
@@ -302,6 +305,14 @@ namespace itk
       gradientFilter->Update();
       m_GradImage = gradientFilter->GetOutput();
 
+      typedef itk::StatisticsImageFilter<TInputImageType> StatisticsImageFilterType;
+      StatisticsImageFilterType::Pointer statisticsImageFilter = StatisticsImageFilterType::New();
+      statisticsImageFilter->SetInput(this->m_GradImage);
+      statisticsImageFilter->Update();
+
+      m_GradientMax = statisticsImageFilter->GetMaximum();
+
+
       //typename LaplacianFilterType::Pointer laplacianFilter = LaplacianFilterType::New();
       //laplacianFilter->SetInput( this->m_Image );
       ////laplacianFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
@@ -316,6 +327,7 @@ namespace itk
 
       //m_LaplacianImage = laplacianFilter->GetOutput();
     }//else no filter just approximate the gradient during cost estimation
+
 
 
 

@@ -94,6 +94,8 @@ namespace itk
     typename Superclass::PixelType startValue;
     typename Superclass::PixelType endValue;
 
+    double m_GradientMax;
+
     RegionType m_RequestedRegion;
 
     bool m_UseApproximateGradient;

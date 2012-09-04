@@ -3838,6 +3838,9 @@
     <transition NAME="mouseMove" NEXT_STATE_ID="2" EVENT_ID="520"> <!-- MouseMove = 520 -->
      <action ID="92" /> <!-- AcMOVE = 92 -->
     </transition>
+    <transition NAME="Delete" NEXT_STATE_ID="2" EVENT_ID="12"> <!-- Delete = 12 -->
+     <action ID="120"/> <!-- AcDELETEPOINT = 120 -->
+    </transition>
     <transition NAME="doubleClick" NEXT_STATE_ID="20" EVENT_ID="8">
      <!-- transition to checkState -->
      <action ID="21"/> <!-- AcCHECKPOINT = 21 -->

@@ -75,6 +75,9 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     /// \brief Close the contour
     virtual bool OnCloseContour(Action*, const StateEvent*);
 
+    /// \brief Close the contour
+    virtual bool OnLastSegmentDelete(Action*, const StateEvent*);
+
 
     //the contour already set by the user
     mitk::ContourModel::Pointer m_Contour;

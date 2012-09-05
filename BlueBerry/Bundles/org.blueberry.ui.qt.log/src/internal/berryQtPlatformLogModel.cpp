@@ -290,7 +290,7 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
     {
       switch (section) 
       {
-        case 0: return QVariant("Severtiy");
+        case 0: return QVariant("Level");
         case 1: return QVariant("Message");
         case 2: return QVariant("Category");
       }

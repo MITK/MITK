@@ -178,6 +178,8 @@ protected:
   bool m_PlottingFiberBundle; // true when the plot results from a fiber tracking result (vtk .fib file)
 
 
+  // Resample a collection of tracts so that every tract contains #number equidistant samples
+  TractContainerType ParameterizeTracts(TractContainerType tracts, int number);
 
 
 

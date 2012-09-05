@@ -72,9 +72,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, m
   int num = inBoth->GetNumFibers();
 
 
-  typedef itk::Point<float,3>               PointType;
-  typedef std::vector< PointType>           TractType;
-  typedef std::vector< TractType > TractContainerType;
+
 
   TractContainerType tracts;
 
@@ -386,9 +384,89 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, m
   }
 
 
+  //todo: Make number of samples selectable by user
+  TractContainerType resampledTracts = ParameterizeTracts(tracts, 25);
 
-  std::cout << "pause";
+  std::cout << "resampled tracts";
 
+
+
+}
+
+TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainerType tracts, int number)
+{
+  TractContainerType resampledTracts;
+
+
+
+  for(TractContainerType::iterator it = tracts.begin(); it != tracts.end(); ++it)
+  {
+    TractType resampledTract;
+    TractType tract = *it;
+
+    // Calculate the total length
+    float totalLength = 0;
+
+    if(tract.size() < 2)
+      continue;
+
+    PointType p0 = tract.at(0);
+    for(int i = 1; i<tract.size(); i++)
+    {
+      PointType p1 = tract.at(i);
+      float length = p0.EuclideanDistanceTo(p1);
+      totalLength += length;
+      p0 = p1;
+    }
+
+    float stepSize = totalLength / number;
+
+
+
+    p0 = tract.at(0);
+    PointType p1 = tract.at(1);
+    int tractCounter = 2;
+    float distance = p0.EuclideanDistanceTo(p1);
+    float locationBetween = 0;
+
+    for(float position = 0;
+        position <= totalLength && resampledTract.size() <= (number+1);
+        position+=stepSize)
+    {
+
+      /* In case we walked to far we need to find the next segment we are on and on what relative position on that
+         tract we are on */
+      while(locationBetween > distance)
+      {
+
+        // Determine by what distance we are no on the next segment
+        locationBetween = locationBetween - distance;
+        p0 = p1;
+        p1 = tract.at(tractCounter);
+        tractCounter++;
+
+        distance = p0.EuclideanDistanceTo(p1);
+
+      }
+
+      // Direction
+      PointType::VectorType direction = p1-p0;
+      direction.Normalize();
+
+      PointType newSample = p0 + direction*locationBetween;
+      resampledTract.push_back(newSample);
+
+
+      locationBetween += stepSize;
+
+
+    }
+
+    resampledTracts.push_back(resampledTract);
+
+
+  }
+  return resampledTracts;
 }
 
 

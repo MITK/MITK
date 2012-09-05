@@ -561,22 +561,6 @@ void QmitkSegmentationView::CreateSegmentationFromSurface()
 
 }
 
-void QmitkSegmentationView::ManualToolSelected(int id)
-{
-  // disable crosshair movement when a manual drawing tool is active (otherwise too much visual noise)
-  if (m_MultiWidget)
-  {
-    if (id >= 0)
-    {
-      m_MultiWidget->DisableNavigationControllerEventListening();
-    }
-    else
-    {
-      m_MultiWidget->EnableNavigationControllerEventListening();
-    }
-  }
-}
-
 void QmitkSegmentationView::ToolboxStackPageChanged(int id)
 {
   // interpolation only with manual tools visible
@@ -1176,7 +1160,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
     this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
   connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
-  connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );
   connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
 
   connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 

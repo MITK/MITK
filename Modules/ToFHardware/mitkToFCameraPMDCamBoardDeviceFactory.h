@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkToFPMDCamBoardDeviceFactory_h
-#define __mitkToFPMDCamBoardDeviceFactory_h
+#ifndef __mitkToFCameraPMDCamBoardDeviceFactory_h
+#define __mitkToFCameraPMDCamBoardDeviceFactory_h
 
 #include "mitkToFHardwareExports.h"
 #include "mitkToFCameraPMDCamBoardDevice.h"
@@ -29,7 +29,7 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-class MITK_TOFHARDWARE_EXPORT ToFPMDCamBoardDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITK_TOFHARDWARE_EXPORT ToFCameraPMDCamBoardDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
   /*!
@@ -37,7 +37,7 @@ public:
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD Cam Board Device Factory");
+       return std::string("PMD CamBoard Factory");
    }
 
 private:

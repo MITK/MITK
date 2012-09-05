@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkToFPlayerDeviceFactory_h
-#define __mitkToFPlayerDeviceFactory_h
+#ifndef __mitkToFCameraMITKPlayerDeviceFactory_h
+#define __mitkToFCameraMITKPlayerDeviceFactory_h
 
 #include "mitkToFHardwareExports.h"
 #include "mitkToFCameraMITKPlayerDevice.h"
@@ -29,7 +29,7 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-class MITK_TOFHARDWARE_EXPORT ToFPlayerDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
 
@@ -38,7 +38,7 @@ public:
    */
    std::string GetFactoryName()
    {
-       return std::string("MITK Player for ToF Cameras");
+       return std::string("MITK Player Factory");
    }
 
 private:

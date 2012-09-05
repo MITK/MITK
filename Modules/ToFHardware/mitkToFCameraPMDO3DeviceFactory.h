@@ -13,40 +13,40 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkToFCameraPMDCamCubeDeviceFactory_h
-#define __mitkToFCameraPMDCamCubeDeviceFactory_h
+#ifndef __mitkToFCameraPMDO3DeviceFactory_h
+#define __mitkToFCameraPMDO3DeviceFactory_h
 
 #include "mitkToFHardwareExports.h"
-#include "mitkToFCameraPMDCamCubeDevice.h"
+#include "mitkToFCameraPMDO3Device.h"
 #include "mitkAbstractToFDeviceFactory.h"
 
 namespace mitk
 {
   /**
-  * \brief ToFPMDCamBoardDeviceFactory is an implementation of the factory pattern to generate Cam Cube Devices.
+  * \brief ToFCameraPMDO3DeviceFactory is an implementation of the factory pattern to generate Do3 Devices.
   * ToFPMDCamCubeDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
   * This offers users the oppertunity to generate new Cam Cube Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
 
-class MITK_TOFHARDWARE_EXPORT ToFPMDCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITK_TOFHARDWARE_EXPORT ToFCameraPMDO3DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
    /*!
-   \brief Defining the Factorie´s Name, here for the ToFPMDCamCube.
+   \brief Defining the Factorie´s Name, here for the ToFPMDO3Device
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD Cam Cube 2.0/3.0 Device Factory");
+       return std::string("PMD O3D Factory");
    }
 
 private:
      /*!
-   \brief Create an instance of a ToFPMDCamCubeDevice.
+   \brief Create an instance of a ToFPMDO3DeviceFactory.
    */
    ToFCameraDevice::Pointer createToFCameraDevice()
    {
-     ToFCameraPMDCamCubeDevice::Pointer device = ToFCameraPMDCamCubeDevice::New();
+     ToFCameraPMDO3Device::Pointer device = ToFCameraPMDO3Device::New();
 
      return device.GetPointer();
    }

@@ -25,16 +25,17 @@ SET(CPP_FILES
   mitkIToFDeviceFactory.cpp
   mitkAbstractToFDeviceFactory.cpp
   mitkToFHardwareActivator.cpp
-  mitkToFDeviceFactoryManager.cpp
   mitkKinectDeviceFactory.cpp
+  mitkToFCameraMESADeviceFactory.cpp
   mitkToFCameraMESASR4000DeviceFactory.cpp
-  mitkToFCameraPMDCamBoardDeviceFactory.cpp
-  mitkToFCameraPMDCamCubeDeviceFactory.cpp
-  mitkToFCameraPMDO3DeviceFactory.cpp
-  mitkToFCameraPMDPlayerDeviceFactory.cpp
-  mitkToFCameraMITKPlayerDeviceFactory.cpp
-  mitkToFCameraPMDRawDataCamCubeDeviceFactory.cpp
-  mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
+  mitkToFDeviceFactoryManager.cpp
+  mitkToFPMDCamBoardDeviceFactory.cpp
+  mitkToFPMDCamCubeDeviceFactory.cpp
+  mitkToFPMDO3DeviceFactory.cpp
+  mitkToFPlayerDeviceFactory.cpp
+  mitkToFPMDPlayerDeviceFactory.cpp
+  mitkToFPMDRawDataCamCubeDeviceFactory.cpp
+  mitkToFPMDRawDataCamBoardDeviceFactory.cpp
 )
 
 IF(MITK_USE_TOF_PMDCAMCUBE)
@@ -115,4 +116,3 @@ SET(CPP_FILES ${CPP_FILES}
   mitkKinectControllerStub.cpp
 )
 ENDIF(MITK_USE_TOF_KINECT)
-

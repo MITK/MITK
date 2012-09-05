@@ -91,9 +91,6 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     m_Controls->setupUi( parent );
 
     connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
-    //        connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
-    //        connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
-    //        connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
     connect( (QObject*)(m_Controls->m_ConnectCameraDev), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
@@ -267,18 +264,23 @@ void QmitkToFUtilView::OnToFCameraConnected()
   this->m_SurfaceDisplayCount = 0;
   this->m_2DDisplayCount = 0;
 
-  //mitk::ToFDeviceFactoryManager::Pointer manager = mitk::ToFDeviceFactoryManager::New();
-  //mitk::ToFCameraDevice::Pointer device = manager->GetInstanceOfDevice(0);
-
   mitk::ToFCameraDevice* device = m_Controls->m_DeviceServiceListWidget->GetSelectedService<mitk::ToFCameraDevice>();
-  //mitk::IToFDeviceFactory* factory = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>();
 
   this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
   m_ToFImageGrabber->SetCameraDevice(device);
-  this->HackForPlayer();
+
+
+  //----------------------------------------------J´s stuff------------------------------------------------------------
+
+  if ( ((std::string)(device->GetNameOfClass())).compare ("ToFCameraMITKPlayerDevice")  == 0 )  //
+    {
+      this->HackForPlayer();
+      MITK_INFO << "HackForPlayer enabled";
+    }
+
+
   m_ToFImageGrabber->ConnectCamera();
 
-  //    this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();
 
   this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
   m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);

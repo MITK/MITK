@@ -41,7 +41,9 @@ struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFacto
       m_Devices.push_back(device);
 
      ModuleContext* context = GetModuleContext();
-     m_DeviceRegistrations.insert(std::make_pair(device.GetPointer(), context->RegisterService<ToFCameraDevice>(device.GetPointer())));
+     ServiceProperties deviceProps;
+     deviceProps["ToFDeviceName"] = GetFactoryName() + " Device";
+     m_DeviceRegistrations.insert(std::make_pair(device.GetPointer(), context->RegisterService<ToFCameraDevice>(device.GetPointer(),deviceProps)));
 
      return device;
    }

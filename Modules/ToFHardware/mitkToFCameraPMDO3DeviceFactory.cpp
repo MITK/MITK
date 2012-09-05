@@ -13,4 +13,4 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include "mitkToFCameraMESADeviceFactory.h"
+#include "mitkToFCameraPMDO3DeviceFactory.h"

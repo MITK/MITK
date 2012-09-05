@@ -37,7 +37,7 @@ public:
    */
    std::string GetFactoryName()
    {
-       return std::string("MESA SR4000 Device Factory");
+       return std::string("MESA SR4000 Factory");
    }
 
 private:

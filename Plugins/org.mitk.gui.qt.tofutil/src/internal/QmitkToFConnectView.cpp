@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //Microservices
 #include <usGetModuleContext.h>
 #include <usModule.h>
-//#include <usServiceProperties.h>
 #include "mitkModuleContext.h"
 #include <usServiceInterface.h>
 #include <usServiceRegistration.h>

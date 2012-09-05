@@ -38,11 +38,11 @@ namespace mitk
   */
   std::string GetDeviceName()
   {
-    int kinectnumber = 1;
+    //int kinectnumber = 1;
     std::stringstream out;
     out << "Microsoft Kinect Device ";
-    out << kinectnumber;
-    kinectnumber= kinectnumber++;
+    //out << kinectnumber;
+    //kinectnumber= kinectnumber++;
     return out.str();
   }
   //----------------------------------------------------------------------------------------------------------------------

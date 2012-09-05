@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkToFPMDRawDataCamCubeDeviceFactory_h
-#define __mitkToFPMDRawDataCamCubeDeviceFactory_h
+#ifndef __mitkToFCameraPMDRawDataCamCubeDeviceFactory_h
+#define __mitkToFCameraPMDRawDataCamCubeDeviceFactory_h
 
 #include "mitkToFHardwareExports.h"
 #include "mitkToFCameraPMDRawDataCamCubeDevice.h"
@@ -29,7 +29,7 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-class MITK_TOFHARDWARE_EXPORT ToFPMDRawDataCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITK_TOFHARDWARE_EXPORT ToFCameraPMDRawDataCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
    /*!
@@ -37,7 +37,7 @@ public:
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD RAW Data Cam Cube Device Factory");
+       return std::string("PMD RAW Data Camcube Factory");
    }
 
 private:

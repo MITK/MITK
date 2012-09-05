@@ -36,7 +36,7 @@ public:
    */
    std::string GetFactoryName()
    {
-       return std::string("Microsoft Kinect Device Factory");
+       return std::string("Kinect Factory");
    }
 
 private:

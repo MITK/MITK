@@ -58,12 +58,12 @@ public:
   QmitkRenderWindow* GetActiveQmitkRenderWindow() const;
 
   /**
-   * \see mitk::IRenderWindowPart::GetRenderWindows()
+   * \see mitk::IRenderWindowPart::GetQmitkRenderWindows()
    */
   QHash<QString,QmitkRenderWindow*> GetQmitkRenderWindows() const;
 
   /**
-   * \see mitk::IRenderWindowPart::GetRenderWindow(QString)
+   * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(QString)
    */
   QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const;
 

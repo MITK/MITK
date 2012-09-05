@@ -159,7 +159,7 @@ QmitkRenderWindow *QmitkStdMultiWidgetEditor::GetRenderWindow(const QString &id)
 
   if(!alreadyWarned)
   {
-    MITK_WARN(id == "axial") << "QmitkStdMultiWidgetEditor::GetRenderWindow(\"transversal\") is deprecated. Use \"axial\" instead.";
+    MITK_WARN(id == "transversal") << "QmitkStdMultiWidgetEditor::GetRenderWindow(\"transversal\") is deprecated. Use \"axial\" instead.";
     alreadyWarned = true;
   }
 

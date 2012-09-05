@@ -505,9 +505,13 @@ int mitk::ToolManager::GetToolID( const Tool* tool )
 
 void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode* node)
 {
-  //check all storage vectors
-  OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode*>(node), itk::DeleteEvent());
-  OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
-  OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
+  //check if the data of the node is typeof Image
+  if(dynamic_cast<mitk::Image*>(node->GetData()))
+  {
+    //check all storage vectors
+    OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode*>(node), itk::DeleteEvent());
+    OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
+    OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
+  }
 }
 

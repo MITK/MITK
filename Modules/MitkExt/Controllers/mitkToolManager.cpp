@@ -56,6 +56,10 @@ mitk::ToolManager::~ToolManager()
   for (DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
     (*dataIter)->RemoveObserver(m_WorkingDataObserverTags[(*dataIter)]);
 
+  if(this->GetDataStorage() != NULL)
+    this->GetDataStorage()->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<ToolManager, const mitk::DataNode*>
+        ( this, &ToolManager::OnNodeRemoved ));
+
   if (m_ActiveTool)
   {
     m_ActiveTool->Deactivated();
@@ -65,6 +69,7 @@ mitk::ToolManager::~ToolManager()
     m_ActiveToolID = -1; // no tool active
 
     ActiveToolChanged.Send();
+
   }
   for ( NodeTagMapType::iterator observerTagMapIter = m_ReferenceDataObserverTags.begin(); observerTagMapIter != m_ReferenceDataObserverTags.end(); ++observerTagMapIter )
   {
@@ -506,12 +511,12 @@ int mitk::ToolManager::GetToolID( const Tool* tool )
 void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode* node)
 {
   //check if the data of the node is typeof Image
-  if(dynamic_cast<mitk::Image*>(node->GetData()))
-  {
+  /*if(dynamic_cast<mitk::Image*>(node->GetData()))
+  {*/
     //check all storage vectors
     OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode*>(node), itk::DeleteEvent());
     OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
     OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
-  }
+  //}
 }
 

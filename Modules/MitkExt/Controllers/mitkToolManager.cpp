@@ -114,6 +114,10 @@ bool mitk::ToolManager::ActivateTool(int id)
   //MITK_INFO << "ToolManager::ActivateTool("<<id<<")"<<std::endl;
   //if( GetToolById(id) == NULL ) return false; // NO, invalid IDs are actually used here. Parameter -1 or anything that does not exists will deactivate all tools!
 
+  //If a tool is deactivated set the event notification policy of the global interaction to multiple again
+  if (id == -1)
+    GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_MULTIPLE);
+
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
 
   static int nextTool = -1;
@@ -148,6 +152,8 @@ bool mitk::ToolManager::ActivateTool(int id)
       {
         m_ActiveTool->Activated();
         GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+        //If a tool is activated set event notification policy to one
+        GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
       }
     }
   }

@@ -74,7 +74,14 @@ namespace mitk {
     typedef std::vector<Interactor::Pointer>    InteractorList;
     typedef InteractorList::iterator            InteractorListIter;
     typedef std::multimap<float, Interactor::Pointer, std::greater<double> > InteractorMap;
+    typedef std::multimap<float, StateMachine::Pointer, std::greater<double> > StateMachineMap;
     typedef InteractorMap::iterator             InteractorMapIter;
+    typedef StateMachineMap::iterator             StateMachineMapIter;
+
+    enum EVENT_NOTIFICATION_POLICY
+    {
+      INFORM_MULTIPLE, INFORM_ONE
+    };
     
     //##Documentation
     //## @brief add an Interactor to the list of all interactors that are asked for handling an event
@@ -168,7 +175,21 @@ namespace mitk {
 
     //##Documentation
     //## @brief Check if GlobalInteraction has already been initialized. Init must! be done before usage.
-    bool IsInitialized() {return m_IsInitialized;};
+    bool IsInitialized() {return m_IsInitialized;}
+
+    /**
+      * @brief Set the policy of how the global interaction informs listeners and interactors
+      *
+      * INFORM_MULTIPLE broadcasts the event to all listeners and interactors that can handle the event
+      * INFORM_ONE only informs the listener or interactor which can handle the event best
+      **/
+    void SetEventNotificationPolicy(EVENT_NOTIFICATION_POLICY);
+
+    /**
+      * Return the current set eventspreading policy
+      * @returns the current event spreading policy
+      **/
+    EVENT_NOTIFICATION_POLICY GetEventNotificationPolicy();
 
 
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
@@ -218,10 +239,16 @@ namespace mitk {
     bool AskCurrentInteractor(mitk::StateEvent const* stateEvent);
 
     //##Documentation
-    //##@brief filling m_JurisdictionMap 
+    //##@brief filling m_InteractorJurisdictionMap
     //##
-    //## @ params swell: if the calculated jurisdiction value is above swell, then add it to the map
-    void FillJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold);
+    //## @ params threshold: if the calculated jurisdiction value is above swell, then add it to the map
+    void FillInteractorJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold);
+
+    //##Documentation
+    //##@brief filling m_ListenerJurisdictionMap
+    //##
+    //## @ params threshold: if the calculated jurisdiction value is above swell, then add it to the map
+    void FillListenerJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold);
 
     void RemoveFlaggedListeners();
 
@@ -243,7 +270,13 @@ namespace mitk {
     //## @brief map for sorting all interactors by the value returned from CanHandleEvent(..).
     //##
     //## With that list certain interactors can be looped through like diving through layers
-    InteractorMap m_JurisdictionMap;
+    InteractorMap m_InteractorJurisdictionMap;
+
+    //##Documentation
+    //## @brief map for sorting all listeners by the value returned from CanHandleEvent(..).
+    //##
+    //## With that list certain listeners can be looped through like diving through layers
+    StateMachineMap m_ListenerJurisdictionMap;
 
     //##Documentation
     //## @brief iterator on an entry in m_JurisdictionMap for stepping through interactors
@@ -266,6 +299,8 @@ namespace mitk {
     bool m_CurrentlyInInformListenersLoop;
     bool m_CurrentlyInInformInteractorsLoop;
     bool m_IsInitialized;
+
+    EVENT_NOTIFICATION_POLICY m_EventNotificationPolicy;
   };
 } // namespace mitk
 

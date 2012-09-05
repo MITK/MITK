@@ -49,6 +49,23 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* itkNotUsed( oper
   
 }
 
+float mitk::DisplayVectorInteractor::CanHandleEvent(const StateEvent *stateEvent) const
+{
+  const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
+  if(posEvent==NULL) return 0.0;
+
+  //StateEvents from "moveNzoom", "alternativePan", "alternativeZoom" interaction pattern. If EventID can be handled by these statemachine patterns return a high value
+  if (stateEvent->GetId() == 2 || stateEvent->GetId() == 4 || stateEvent->GetId() == 7 || stateEvent->GetId() == 506 || stateEvent->GetId() == 507
+      || stateEvent->GetId() == 531 || stateEvent->GetId() == 533 || stateEvent->GetId() == 535 || stateEvent->GetId() == 538)
+  {
+    return 0.9;
+  }
+  else
+  {
+    return 0.0;
+  }
+}
+
 bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok=false;

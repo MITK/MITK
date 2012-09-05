@@ -69,10 +69,17 @@ float mitk::SegTool2D::CanHandleEvent( StateEvent const *stateEvent) const
 
   if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return 0.0; // we don't want anything but 2D
 
-  if( m_LastEventSender != positionEvent->GetSender()) return 0.0;
-  if( m_LastEventSlice != positionEvent->GetSender()->GetSlice() ) return 0.0;
-
-  return 1.0;
+  //This are the mouse event that are used by the statemachine patterns for zooming and panning. This must be possible although a tool is activ
+  if (stateEvent->GetId() == 2 || stateEvent->GetId() == 4 || stateEvent->GetId() == 7 || stateEvent->GetId() == 506 || stateEvent->GetId() == 507
+      || stateEvent->GetId() == 531 || stateEvent->GetId() == 533 || stateEvent->GetId() == 535 || stateEvent->GetId() == 538)
+  {
+    //Since the usual segmentation tools currently do not need right click interaction but the mitkDisplayVectorInteractor
+    return 0.0;
+  }
+  else
+  {
+    return 1.0;
+  }
 }
 
 

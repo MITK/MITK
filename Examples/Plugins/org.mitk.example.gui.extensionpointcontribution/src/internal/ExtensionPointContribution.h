@@ -18,30 +18,21 @@
 #define EXTENSIONPOINTCONTRIBUTION_H_
 
 /// Berry
-#include <berryIApplication.h>
 
 /// Qt
-#include <QObject>
-#include <QScopedPointer>
+#include "IChangeText.h"
 
-class MinimalWorkbenchAdvisor;
 
-class ExtensionPointContribution : public QObject, public berry::IApplication
+class ExtensionPointContribution : public IChangeText
 {
-  Q_OBJECT
-  Q_INTERFACES(berry::IApplication)
   
 public:
   
   ExtensionPointContribution();
   ~ExtensionPointContribution();
-  
-  int Start();
-  void Stop();
 
-private:
+  void ChangeExtensionLabelText(QString s);
 
-  QScopedPointer<MinimalWorkbenchAdvisor> wbAdvisor;
 };
 
 #endif /*EXTENSIONPOINTCONTRIBUTION_H_*/

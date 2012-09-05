@@ -17,43 +17,10 @@
 #include "ExtensionPointContribution.h"
 
 /// Berry
-#include <berryPlatformUI.h>
-#include <berryQtWorkbenchAdvisor.h>
 
 /// Qt
-//#include <QMessageBox.h>
+#include <QMessageBox.h>
 
-class MinimalWorkbenchAdvisor : public berry::WorkbenchAdvisor
-{
-
-public:
-
-  static const std::string DEFAULT_PERSPECTIVE_ID;
-
-  berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-      berry::IWorkbenchWindowConfigurer::Pointer configurer)
-  {
-    // Set an individual initial size
-    configurer->SetInitialSize(berry::Point(600,400));
-    // Enable or disable the perspective bar
-    configurer->SetShowPerspectiveBar(false);
-
-    wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
-    return wwAdvisor.data();
-  }
-
-  std::string GetInitialWindowPerspectiveId()
-  {
-    return DEFAULT_PERSPECTIVE_ID;
-  }
-
-private:
-
-  QScopedPointer<berry::WorkbenchWindowAdvisor> wwAdvisor;
-
-};
-
-const std::string MinimalWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.minimalperspective";
 
 ExtensionPointContribution::ExtensionPointContribution()
 {
@@ -62,22 +29,8 @@ ExtensionPointContribution::ExtensionPointContribution()
 ExtensionPointContribution::~ExtensionPointContribution()
 {
 }
- 
-int ExtensionPointContribution::Start()
+void ExtensionPointContribution::ChangeExtensionLabelText(QString s)
 {
-  //QMessageBox::critical(0, "Error", "Starting...");
-
-  berry::Display* display = berry::PlatformUI::CreateDisplay();
-
-  wbAdvisor.reset(new MinimalWorkbenchAdvisor);
-  int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
-  
-  // exit the application with an appropriate return code
-  return code == berry::PlatformUI::RETURN_RESTART
-              ? EXIT_RESTART : EXIT_OK;
+  QMessageBox::critical(0, "Error", "Provided by extension!");
 }
 
-void ExtensionPointContribution::Stop()
-{
-  //nothing to do
-}

@@ -36,14 +36,9 @@ void ExtendedPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout
   //  layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.3f, editorAreaId);
   //left->AddView("org.mitk.views.datamanager");
 
-  //layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.3f, editorAreaId);
-  layout->AddView("org.mitk.views.selectionview", berry::IPageLayout::LEFT,0.5f, editorAreaId);
+  //layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::RIGHT, 0.3f, editorAreaId);
+  
+  layout->AddView("org.mitk.views.selectionview", berry::IPageLayout::LEFT,0.3f, editorAreaId);
 
-  layout->AddView("org.mitk.views.listenerview", berry::IPageLayout::RIGHT,0.5f, editorAreaId);
-
-  //layout->AddView("org.mitk.views.modules", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
-  //layout->AddView("org.mitk.views.rigidregistration", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
-  //layout->AddView("org.mitk.views.mitkigttrackingtoolbox", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
-  //layout->AddView("org.mitk.views.imagecropper", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
-  //layout->AddView("org.mitk.views.imagenavigator", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
+  layout->AddView("org.mitk.views.listenerview", berry::IPageLayout::RIGHT,0.4f, editorAreaId);
 }

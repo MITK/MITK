@@ -21,12 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryObject.h>
 #include <berryMacros.h>
 
+#include <org_blueberry_ui_qt_Export.h>
+
 #include <QModelIndex>
 
 namespace berry
 {
 
-class QModelIndexObject : public Object
+class BERRY_UI_QT QModelIndexObject : public Object
 {
 
 public:

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// Qt
 #include <QMessageBox>
 
+#include <mitkDataNode.h>
 
 const std::string SelectionView::VIEW_ID = "org.mitk.views.selectionview"; 
 
@@ -36,17 +37,19 @@ void SelectionView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
   m_Controls.setupUi(parent);
 
-  m_SelectionProvider = new QmitkDataNodeSelectionProvider();
-  m_SelectionProvider->SetItemSelectionModel(m_Controls.m_SelectionList->selectionModel());
-  GetSite()->SetSelectionProvider(m_SelectionProvider);
+  //mitk::DataNode node1 = mitk::DataNode;
+  //node1.SetName("Node 1");
+  //mitk::DataNode mode2 = mitk::DataNode;
+  //node2.SetName("Node 2");
+
+  //m_Controls.m_SelectionList->setModel();
+  //m_Controls.m_SelectionList->addItem
 
   // set selection mode to single selection
   m_Controls.m_SelectionList->setSelectionMode(QAbstractItemView::SingleSelection);
 
   // pre-select the first item of the list
   m_Controls.m_SelectionList->setCurrentRow(0);
-  
-  connect(m_Controls.m_SelectionList, SIGNAL(itemSelectionChanged()), this, SLOT(TestMethod()));  //Debugging only!
 
   m_Parent->setEnabled(true);
 
@@ -56,7 +59,7 @@ void SelectionView::SetFocus ()
 {
 }
 
-void SelectionView::TestMethod()  //Debugging only!
+QItemSelectionModel* SelectionView::GetDataNodeSelectionModel() const
 {
-  //QMessageBox::critical(0, "Error", " List selection changed! ");
+  return m_Controls.m_SelectionList->selectionModel();
 }

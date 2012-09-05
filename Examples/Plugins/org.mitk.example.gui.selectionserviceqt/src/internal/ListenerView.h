@@ -49,13 +49,12 @@ private:
     friend struct berry::SelectionChangedAdapter<ListenerView>;
 
   private slots:
-    void ToggleRadioMethod(); 
-    //void ToggleRadioMethod(berry::IStructuredSelection::ConstPointer m_CurrentSelection); //Debugging only!
+    void ToggleRadioMethod(QString selectStr);
 
 protected:
 
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-
+  
   void SetFocus();
 
   Ui::ListenerViewControls m_Controls;

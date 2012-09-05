@@ -19,13 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define SELECTIONVIEW_H_
 
 /// Qmitk
-#include <berryQtViewPart.h>//#include <QmitkFunctionality.h>
-#include <QmitkDataNodeSelectionProvider.h>
+#include <QmitkAbstractView.h>
+
+#include <berryQtViewPart.h>
 
 #include "ui_SelectionViewControls.h"
 
 
-class SelectionView : public berry::QtViewPart//public QmitkFunctionality
+class SelectionView : public QmitkAbstractView
 {
 
   Q_OBJECT
@@ -33,8 +34,6 @@ class SelectionView : public berry::QtViewPart//public QmitkFunctionality
 public:
 
   static const std::string VIEW_ID;
-
-  QmitkDataNodeSelectionProvider::Pointer m_SelectionProvider;
 
   SelectionView();
 
@@ -44,9 +43,7 @@ public:
 
 private:
 
-  
-  private slots:
-     void TestMethod(); //Debugging only!
+  QItemSelectionModel* GetDataNodeSelectionModel() const;
 
 protected:
 

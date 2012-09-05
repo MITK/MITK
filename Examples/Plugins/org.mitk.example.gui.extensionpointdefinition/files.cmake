@@ -1,12 +1,15 @@
 set(SRC_CPP_FILES
 )
 
+set(SRC_H_FILES
+  IChangeText.h
+)
+
 set(INTERNAL_CPP_FILES
   org_mitk_example_gui_extensionpointdefinition_Activator.cpp
   ExtensionPointDefinition.cpp
   MinimalPerspective.cpp
   MinimalView.cpp
-  IChangeText.cpp
 )
 
 set(UI_FILES
@@ -19,7 +22,6 @@ set(MOC_H_FILES
   src/internal/ExtensionPointDefinition.h
   src/internal/MinimalPerspective.h
   src/internal/MinimalView.h
-  src/internal/IChangeText.h
 )
 
 set(CACHED_RESOURCE_FILES

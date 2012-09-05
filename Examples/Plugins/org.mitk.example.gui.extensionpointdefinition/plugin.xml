@@ -22,11 +22,7 @@
       class="MinimalView">
     </view>
   </extension>
-
-<!--  <extension point="">
-      id="org.mitk.example.extensionpointdefinition.changetext" 
-      name="Change Text of Label"
-      class="IChangeText">
-  </extension> -->
   
+  <extension-point id="org.mitk.example.extensionpointdefinition.changetext" name="Change Text of Label" schema="schema/changetext.exsd"/>
+
 </plugin>

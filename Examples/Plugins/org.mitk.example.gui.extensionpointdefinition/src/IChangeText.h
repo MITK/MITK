@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class IChangeText {
 
 public:
-  virtual ~IChangeText();
+  virtual ~IChangeText() {}
   virtual void ChangeExtensionLabelText(QString s) = 0;
 
 };

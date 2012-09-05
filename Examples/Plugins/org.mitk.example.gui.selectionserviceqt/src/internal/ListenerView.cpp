@@ -19,11 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// Berry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
+#include <berryQModelIndexObject.h>
 
 /// Qt
 #include <QMessageBox>
 #include <QString>
-#include <QListWidgetItem>
+#include <QModelIndex>
+#include <QVariant>
 
 const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview"; 
 
@@ -51,13 +53,10 @@ void ListenerView::CreateQtPartControl(QWidget *parent)
   m_Parent->setEnabled(true);
 }
 
-//void ListenerView::ToggleRadioMethod(berry::IStructuredSelection::ConstPointer m_CurrentSelection)
-void ListenerView::ToggleRadioMethod()
+void ListenerView::ToggleRadioMethod(QString selectStr)
 {
-  
-  bool buttonState = m_Controls.radioButton->isChecked();
-  if (buttonState) m_Controls.radioButton_2->toggle();
-  else m_Controls.radioButton->toggle();
+  if (selectStr == "Selection 1") m_Controls.radioButton->toggle();
+  else if (selectStr == "Selection 2") m_Controls.radioButton_2->toggle();
 }
 
 void ListenerView::SetFocus ()
@@ -75,12 +74,16 @@ void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
   if (sourcepart != this && 
       selection.Cast<const berry::IStructuredSelection>())
   {
-    ToggleRadioMethod();
     m_CurrentSelection = selection.Cast<const berry::IStructuredSelection>();
-    // check if we can cast it to listwidgetitem
-    m_CurrentSelection->Begin();
-    //berry::Object::Pointer m_CurrentItem = m_CurrentSelection->GetFirstElement();
-    QMessageBox::critical(0, "Error", "TEST");
-    //ToggleRadioMethod(selection.Cast<const berry::IStructuredSelection>());
+
+    for (berry::IStructuredSelection::iterator itr = m_CurrentSelection->Begin();
+      itr != m_CurrentSelection->End(); ++itr)
+    {
+      if (berry::QModelIndexObject::Pointer object = itr->Cast<berry::QModelIndexObject>())
+      {
+        QVariant text = object->GetQModelIndex().data();
+        ToggleRadioMethod(text.toString());
+      }
+    }
   }
 }

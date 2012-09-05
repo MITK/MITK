@@ -26,14 +26,15 @@ const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview";
 ListenerView::ListenerView()
   //: QmitkFunctionality()
   : m_Parent(0)
-  , m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))//m_SelectionListener(NULL)
+  //, m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))
+  , m_SelectionListener(NULL)
 {
 }
 
 ListenerView::~ListenerView()
 {
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  s->RemoveSelectionListener(m_SelectionListener);
+  //berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  //s->RemoveSelectionListener(m_SelectionListener);
 }
 
 void ListenerView::CreateQtPartControl(QWidget *parent)
@@ -41,8 +42,6 @@ void ListenerView::CreateQtPartControl(QWidget *parent)
   // create GUI widgets
   m_Parent = parent;
   m_Controls.setupUi(parent);
-
-  connect(m_Controls.selectButton, SIGNAL(clicked()), this, SLOT(ToggleRadioMethod()));
   
   // register selection listener
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
@@ -50,26 +49,26 @@ void ListenerView::CreateQtPartControl(QWidget *parent)
   m_Parent->setEnabled(true);
 }
 
-void ListenerView::ToggleRadioMethod()
+void ListenerView::ToggleRadioMethod(QString selectStr)
 {
-  bool buttonState = m_Controls.radioButton->isChecked();
-  if (buttonState) m_Controls.radioButton_2->toggle();
-  else m_Controls.radioButton->toggle();
+  if (selectStr == "Selection 1") m_Controls.radioButton->toggle();
+  else if (selectStr == "Selection 2") m_Controls.radioButton_2->toggle();
 }
 
 void ListenerView::SetFocus ()
 {
 }
 
-void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
-                               berry::ISelection::ConstPointer selection)//void ListenerView::::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+//void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
+//                               berry::ISelection::ConstPointer selection)
+void ListenerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
 {
-    //any nodes there?
-  //if (!nodes.empty())
-  //{
+  //any nodes there?
+  if (!nodes.empty())
+  {
   //  //get the selected Node
-  //  mitk::DataNode::Pointer dataNode = nodes.front();
-  //  ToggleRadioMethod();
+  //mitk::DataNode::Pointer dataNode = nodes.front();
+  //ToggleRadioMethod(stringstringsrting);
   //  //DoSomething(selection.Cast<const berry::IStructuredSelection>());
-  //}
+  }
 }

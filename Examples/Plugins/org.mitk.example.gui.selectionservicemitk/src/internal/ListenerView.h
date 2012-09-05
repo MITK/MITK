@@ -28,9 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include <berryIStructuredSelection.h>
 
+#include <QString.h>
+
 #include "ui_ListenerViewControls.h"
 
-class ListenerView : public QmitkAbstractView//public QmitkFunctionality
+class ListenerView : public QmitkAbstractView
+  //public QmitkFunctionality
 {
 
   Q_OBJECT
@@ -45,18 +48,18 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  //virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
 
 private:
 
-    void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
-                     berry::ISelection::ConstPointer selection);
+  //void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
+  //  berry::ISelection::ConstPointer selection);
 
-    berry::ISelectionListener::Pointer m_SelectionListener;
-    friend struct berry::SelectionChangedAdapter<ListenerView>;
+  berry::ISelectionListener::Pointer m_SelectionListener;
+  //friend struct berry::SelectionChangedAdapter<ListenerView>;
 
   private slots:
-     void ToggleRadioMethod(); //Debugging only!
+    void ToggleRadioMethod(QString selectStr);
 
 protected:
 

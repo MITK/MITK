@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 #include "itkVectorImage.h"
+#include <mitkFiberBundleX.h>
+#include <mitkPlanarCircle.h>
 
 
 //#include <itkHistogram.h>
@@ -128,7 +130,14 @@ public:
   }
 
 
+  void PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
+                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, int index=-1);
+
+  mitk::FiberBundleX::Pointer m_Fib;
+
 protected:
+
+
 
   std::vector< std::vector<double> > m_Vals;
 
@@ -167,6 +176,11 @@ protected:
   std::string m_Measure;
 
   bool m_PlottingFiberBundle; // true when the plot results from a fiber tracking result (vtk .fib file)
+
+
+  // Resample a collection of tracts so that every tract contains #number equidistant samples
+  TractContainerType ParameterizeTracts(TractContainerType tracts, int number);
+
 
 
 };

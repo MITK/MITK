@@ -164,6 +164,7 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
   newContour->Expand(contour->GetTimeSteps());
 
+  /*++++++++++++++ concatenate LEFT ++++++++++++++++++++++++++++++*/
   newContour->Concatenate( m_ContourLeft, timestep );
 
 
@@ -179,9 +180,8 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   mitk::ContourModel::Pointer liveWireContour = mitk::ContourModel::New();
   liveWireContour = this->m_LiveWireFilter->GetOutput();
 
-  //avoid duplicate adding of current point where the mouse is
-  liveWireContour->RemoveVertexAt(liveWireContour->GetNumberOfVertices(timestep)-1,timestep);
 
+  /*++++++++++++++ concatenate LIVEWIRE ++++++++++++++++++++++++++++++*/
   //insert new liveWire computed points
   newContour->Concatenate( liveWireContour, timestep );
 
@@ -196,6 +196,7 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   //make point at mouse position active again, so it is drawn
   const_cast<mitk::ContourModel::VertexType*>( liveWireContour->GetVertexAt(0, timestep) )->IsActive = true;
 
+  /*++++++++++++++ concatenate RIGHT ++++++++++++++++++++++++++++++*/
   //insert new liveWire computed points
   newContour->Concatenate( liveWireContour, timestep );
   /*------------------------------------------------*/
@@ -254,14 +255,14 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
       it++;
     }
 
-    //return the offset of iterator at next vertex upwards
-    if(itUp != end)
+    //return the offset of iterator at one before next-vertex-upwards
+    if(itUp != begin)
     {
-      return itUp._Myoff + 1;
+      return itUp._Myoff - 1;
     }
     else
     {
-      return itUp._Myoff - 1;//take last vertex if iterator is at end
+      return itUp._Myoff;
     }
 
   }
@@ -278,7 +279,7 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
 
     mitk::ContourModel::VertexIterator it = sourceContour->IteratorBegin();
 
-    if(it != end)
+    if(it != end)//if not empty
     {
       //always add the first vertex
       destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
@@ -295,17 +296,17 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
     //add vertex at itDown - it's not considered during while loop
     if( it != begin && it != end)
     {
-      destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
+      //destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
     }
 
-    //return the offset of iterator at next vertex downwards
-    if( itDown != begin)
+    //return the offset of iterator at one after next-vertex-downwards
+    if( itDown != end)
     {
-      return itDown._Myoff - 1;//index of next vertex
+      return itDown._Myoff + 1;//index of next vertex
     }
     else
     {
-      return itDown._Myoff;
+      return itDown._Myoff - 1;
     }
   }
 }

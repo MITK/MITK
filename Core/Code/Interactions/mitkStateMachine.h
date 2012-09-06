@@ -176,7 +176,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
      *  Standard function to override if needed.
      *  (Used by GlobalInteraction to decide which DESELECTED statemachine to send the event to.)
     **/
-    virtual float CanHandleEvent(StateEvent const* stateEvent) const;
+    virtual float CanHandleEvent(const StateEvent *) const;
 
     /**
     * @brief Enables or disabled Undo.

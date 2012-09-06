@@ -78,9 +78,13 @@ namespace mitk {
     typedef InteractorMap::iterator             InteractorMapIter;
     typedef StateMachineMap::iterator             StateMachineMapIter;
 
+    /**
+      * Enum for setting the event notification policy of the GlobalInteraction.
+      */
     enum EVENT_NOTIFICATION_POLICY
     {
-      INFORM_MULTIPLE, INFORM_ONE
+      INFORM_MULTIPLE, /** For setting that all registered listeners are informed */
+      INFORM_ONE /** For setting that just the listener that can handle the event best is informed */
     };
     
     //##Documentation
@@ -189,7 +193,7 @@ namespace mitk {
       * Return the current set eventspreading policy
       * @returns the current event spreading policy
       **/
-    EVENT_NOTIFICATION_POLICY GetEventNotificationPolicy();
+    EVENT_NOTIFICATION_POLICY GetEventNotificationPolicy() const;
 
 
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()

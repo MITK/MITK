@@ -100,7 +100,7 @@ void mitk::StateMachine::ResetStatemachineToStartState(unsigned int timeStep)
 
 }
 
-float mitk::StateMachine::CanHandleEvent(const StateEvent /**stateEvent*/) const
+float mitk::StateMachine::CanHandleEvent(const StateEvent* /*stateEvent*/) const
 {
   return 0.5;
 }

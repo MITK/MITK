@@ -12,7 +12,25 @@
 
 namespace itk
 {
-
+  /** \brief Cost function for LiveWire purposes.
+   Specific features are considered to calculate cummulative
+   costs of a link between two pixels. These are:
+   
+      - Gradient Magnitude
+      - Gradient Direction
+      - Laplacian Zero Crossing
+   
+   By default the Gradient Magnitude is mapped linear to costs
+   between 0 (good) and 1 (bad). Via SetDynamicCostMap( std::map< int, int > &costMap)
+   a cost map can be set to dynamically map Gradient Magnitude (non
+   linear). Thus lower values can be considered with lower costs
+   than higher values of gradient magnitudes.
+   To compute  the costs of the gradient magnitude dynamically
+   a map of the histogram of gradient magnitude image is used.
+   With the histogram gradient map costs are interpolated
+   with a gaussing function summation of next two bins right and left
+   to current position x.
+  */
   template <class TInputImageType>
   class ITK_EXPORT ShortestPathCostFunctionLiveWire : public ShortestPathCostFunction<TInputImageType>
   {

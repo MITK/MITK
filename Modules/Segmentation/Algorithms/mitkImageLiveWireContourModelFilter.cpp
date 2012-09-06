@@ -204,6 +204,14 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   /*++++++++++ create dynamic cost transfer map ++++++++++*/ 
   if(this->m_UseDynamicCostTransferForNextUpdate)
   {
+    /* Compute  the costs of the gradient magnitude dynamically.
+    * using a map of the histogram of gradient magnitude image.
+    * Use the histogram gradient map to interpolate the costs
+    * with gaussing function including next two bins right and left
+    * to current position x. With the histogram gradient costs are interpolated
+    * with a gaussing function summation of next two bins right and left
+    * to current position x.
+    */
 
     /*+++ filter image gradient magnitude +++*/
     typedef  itk::GradientMagnitudeImageFilter< itk::Image<TPixel, VImageDimension>,  itk::Image<TPixel, VImageDimension>> GradientMagnitudeFilterType;
@@ -230,18 +238,92 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
     }
 
 
+    std::map<int,int>::iterator itMAX;
+
     //get max of histogramm
     int max = 0;
     std::map< int, int>::iterator it = histogram.begin();
     while( it != histogram.end())
     {
       if((*it).second > max)
+      {
+        itMAX = it;
         max = (*it).second;
+      }
       it++;
     }
 
+    
 
-    //invert map according to 1-x/max
+    //first compute the to max of gaussian summation
+
+    //fill empty bins between first and last bin containing a value
+    it = histogram.begin();
+    int i = (*it).first;
+    while( it != histogram.rbegin())
+    {
+      it = histogram[i];
+      if(it != end)
+        (*it).second = 0;
+      i++;
+    }
+     
+    std::map<int,int>::iterator end = m_CostMap.end();
+
+    //current position
+    std::map<int,int>::iterator x;
+    x = m_CostMap.find(static_cast<int>(gradientMagnitude) );
+
+    std::map<int,int>::iterator left2;
+    std::map<int,int>::iterator left1;
+    std::map<int,int>::iterator right1;
+    std::map<int,int>::iterator right2;
+
+    if( x == end )
+    {
+      //search next key within map from x upwards and downwards
+      int up, down;
+      up = down = static_cast<int>(gradientMagnitude);
+      while( (right1 = m_CostMap.find(up)) == end)
+      {
+        up++;
+      }
+      while( (left1 = m_CostMap.find(down)) == end)
+      {
+        down--;
+      }
+
+      //get next elements
+      if( right1 != (end-1) )
+      {
+        right2 = right1 + 1;
+      }
+      else
+      {
+        right2 = end;
+      }
+
+      if( left1 != (m_CostMap.begin() + 1) )
+      {
+        left2 = left1 - 1;
+      }
+      else
+      {
+        left2 = end;
+      }
+
+    }
+    else
+    {
+      left2 = x - 2;
+      left1 = x - 1;
+      right1 = x + 1;
+      right2 = x + 2;        
+    }
+
+
+    
+    //invert map according to 1-x/maxGaussian
     it = histogram.begin();
     while( it != histogram.end())
     {
@@ -250,6 +332,6 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
     }
 
     this->m_CostFunction->SetDynamicCostMap(histogram);
-    this->m_CostFunction->SetCostMapMAX(max);
+
   }
 }

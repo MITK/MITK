@@ -28,6 +28,7 @@ namespace itk
     m_UseApproximateGradient = false;
     m_GradientMax = 0.0;
     m_Initialized = false;
+    m_UseCostMap = false;
   }
 
 
@@ -109,13 +110,26 @@ namespace itk
     }
 
 
-    //value between 0 (good) and 1 (bad)
-    gradientCost = 1.0 - (gradientMagnitude / m_GradientMax);
-    //gradientCost = 1.0 / gradientMagnitude;
+    if(m_UseCostMap)
+    {
+      std::map<int,int>::iterator it;
 
+      it = m_CostMap.find(static_cast<int>(gradientMagnitude) );
+      if( it != m_CostMap.end() )
+      {
+        gradientCost = (*it).second;
+      }
+      else
+      {
+        gradientCost = 1.0;
+      }
+    }
+    else
+    {
+      //value between 0 (good) and 1 (bad)
+      gradientCost = 1.0 - (gradientMagnitude / m_GradientMax);
 
-    //gradientCost = SigmoidFunction(gradientCost, 1.0, 0.0, 0.001, 0.001);
-
+    }
     /* -----------------------------------------------------------------------------*/
 
 
@@ -341,7 +355,7 @@ namespace itk
         typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
         gradientFilter->SetInput(this->m_Image);
         //gradientFilter->SetNumberOfThreads(4);
-        gradientFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
+        //gradientFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
 
         gradientFilter->Update();
         m_GradientMagnImage = gradientFilter->GetOutput();

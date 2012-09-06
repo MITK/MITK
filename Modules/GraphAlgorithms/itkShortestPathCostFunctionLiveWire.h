@@ -82,6 +82,26 @@ namespace itk
       } 
     } 
 
+    void SetDynamicCostMap( std::map< int, int > &costMap)
+    {
+      this->m_CostMap = costMap;
+      this->m_UseCostMap = true;
+      this->Modified();
+    }
+
+    void SetUseCostMap(bool useCostMap)
+    {
+      this->m_UseCostMap = useCostMap;
+    }
+
+    /** \brief Set the maximum of the values in Dynamic.
+    \Note This is just a container to save computation time - use wisely!
+    */
+    void SetCostMapMAX(int max)
+    {
+      this->m_CostMapMAX = max;
+    }
+
   protected:
 
     virtual ~ShortestPathCostFunctionLiveWire() {};
@@ -110,6 +130,12 @@ namespace itk
     bool m_UseApproximateGradient;
 
     bool m_Initialized;
+
+    std::map< int, int > m_CostMap;
+
+    int m_CostMapMAX;
+
+    bool m_UseCostMap;
 
   private:
 

@@ -87,7 +87,7 @@ namespace itk
     virtual ~ShortestPathCostFunctionLiveWire() {};
 
 
-    typename ImageType::Pointer m_GradImage;
+    typename ImageType::Pointer m_GradientMagnImage;
     typename UnsignedCharImageType::Pointer m_ZeroCrossingsImage;
     typename FloatImageType::Pointer m_EdgeImage;
     typename VectorOutputImageType::Pointer m_GradientImage;

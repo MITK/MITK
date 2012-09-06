@@ -9,9 +9,10 @@
 #include <itkZeroCrossingImageFilter.h>
 #include <itkCannyEdgeDetectionImageFilter.h>
 #include <itkCastImageFilter.h>
+#include <itkGradientImageFilter.h>
 #include <itkGradientRecursiveGaussianImageFilter.h>
-#include <itkGradientMagnitudeRecursiveGaussianImageFilter.h>
 #include <itkGradientMagnitudeImageFilter.h>
+#include <itkGradientMagnitudeRecursiveGaussianImageFilter.h>
 #include <itkLaplacianImageFilter.h>
 
 
@@ -102,7 +103,7 @@ namespace itk
     }
     else
     {
-      gradientMagnitude = this->m_GradImage->GetPixel(p2);
+      gradientMagnitude = this->m_GradientMagnImage->GetPixel(p2);
       gradientX = m_GradientImage->GetPixel(p2)[0];
       gradientY = m_GradientImage->GetPixel(p2)[1];
     }
@@ -208,49 +209,69 @@ namespace itk
     //-------
 
     // gradient vector at p1
-    double pGradientP1[2];
-    pGradientP1[0] = gradientX;//previously computed for gradient magnitude
-    pGradientP1[1] = gradientY;
+    double nGradientAtP1[2];
+    nGradientAtP1[0] = gradientX;//previously computed for gradient magnitude
+    nGradientAtP1[1] = gradientY;
 
     //gradient direction unit vector of p1
-    pGradientP1[0] /= gradientMagnitude;
-    pGradientP1[1] /= gradientMagnitude;
+    nGradientAtP1[0] /= gradientMagnitude;
+    nGradientAtP1[1] /= gradientMagnitude;
     //-------
 
     // gradient vector at p1
-    double pGradientP2[2];
+    double nGradientAtP2[2];
 
-    // dI(x,y)/dx
-    IndexType x1;
-    x1[0] = (p2[0] == xMAX) ? (p1[0]) :( p2[0] +1);//check for pixels at the edge of the image => x==xMAX
-    x1[1] = p2[1];
+    if(m_UseApproximateGradient)
+    {
+      // dI(x,y)/dx
+      IndexType x1;
+      x1[0] = (p2[0] == xMAX) ? (p1[0]) :( p2[0] +1);//check for pixels at the edge of the image => x==xMAX
+      x1[1] = p2[1];
 
-    IndexType x2;
-    x2[0] = (p2[0] == 0) ? (0) :( p2[0] -1);//x==0
-    x2[1] = p2[1];
-    gradientX = (this->m_Image->GetPixel(x1) - this->m_Image->GetPixel(x2)) / 2;
+      IndexType x2;
+      x2[0] = (p2[0] == 0) ? (0) :( p2[0] -1);//x==0
+      x2[1] = p2[1];
+      gradientX = (this->m_Image->GetPixel(x1) - this->m_Image->GetPixel(x2)) / 2;
 
-    // dI(x,y)/dy
-    IndexType y1;
-    y1[0] = p2[0];
-    y1[1] = (p2[1] == yMAX) ? (p2[1]) :( p2[1] +1);//y==yMAX
+      // dI(x,y)/dy
+      IndexType y1;
+      y1[0] = p2[0];
+      y1[1] = (p2[1] == yMAX) ? (p2[1]) :( p2[1] +1);//y==yMAX
 
-    IndexType y2;
-    y2[0] = p2[0];
-    y2[1] = (p2[1] == 0) ? (0) :( p2[1] -1);//y==0
-    gradientY = (this->m_Image->GetPixel(y1) - this->m_Image->GetPixel(y2)) / 2;
+      IndexType y2;
+      y2[0] = p2[0];
+      y2[1] = (p2[1] == 0) ? (0) :( p2[1] -1);//y==0
+      gradientY = (this->m_Image->GetPixel(y1) - this->m_Image->GetPixel(y2)) / 2;
 
-    pGradientP2[0] = gradientX;
-    pGradientP2[1] = gradientY;
+      nGradientAtP2[0] = gradientX;
+      nGradientAtP2[1] = gradientY;
 
-    gradientMagnitude = sqrt( pGradientP2[0] * pGradientP2[0] + pGradientP2[1] * pGradientP2[1]);
+      gradientMagnitude = sqrt( nGradientAtP2[0] * nGradientAtP2[0] + nGradientAtP2[1] * nGradientAtP2[1]);
 
-    //gradient direction unit vector of p2
-    pGradientP2[0] /= gradientMagnitude;
-    pGradientP2[1] /= gradientMagnitude;
-    //--------
+      //gradient direction unit vector of p2
+      nGradientAtP2[0] /= gradientMagnitude;
+      nGradientAtP2[1] /= gradientMagnitude;
+      //--------
 
-    double gradientDirectionCost = acos( (pGradientP1[0] * pGradientP2[0]) + (pGradientP1[1] * pGradientP2[1]) ) / 3.14159265;
+    }
+    else
+    {
+      nGradientAtP2[0] = m_GradientImage->GetPixel(p2)[0];
+      nGradientAtP2[1] = m_GradientImage->GetPixel(p2)[1];
+
+      nGradientAtP2[0] /= m_GradientMagnImage->GetPixel(p2);
+      nGradientAtP2[1] /= m_GradientMagnImage->GetPixel(p2);
+
+    }
+
+    double scalarProduct = (nGradientAtP1[0] * nGradientAtP2[0]) + (nGradientAtP1[1] * nGradientAtP2[1]);
+    if( abs(scalarProduct) >= 1.0)
+    {
+      //this should probably not happen; make sure the input for acos is valid
+      scalarProduct = 0.999999999;
+    }
+
+    double gradientDirectionCost = acos( scalarProduct ) / 3.14159265;
     /*------------------------------------------------------------------------*/
 
 
@@ -319,15 +340,15 @@ namespace itk
         typedef  itk::GradientMagnitudeImageFilter< typename TInputImageType, typename TInputImageType> GradientMagnitudeFilterType;
         typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
         gradientFilter->SetInput(this->m_Image);
-        gradientFilter->SetNumberOfThreads(4);
+        //gradientFilter->SetNumberOfThreads(4);
         gradientFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
 
         gradientFilter->Update();
-        m_GradImage = gradientFilter->GetOutput();
+        m_GradientMagnImage = gradientFilter->GetOutput();
 
         typedef itk::StatisticsImageFilter<TInputImageType> StatisticsImageFilterType;
         StatisticsImageFilterType::Pointer statisticsImageFilter = StatisticsImageFilterType::New();
-        statisticsImageFilter->SetInput(this->m_GradImage);
+        statisticsImageFilter->SetInput(this->m_GradientMagnImage);
         statisticsImageFilter->Update();
 
         m_GradientMax = statisticsImageFilter->GetMaximum();
@@ -335,11 +356,13 @@ namespace itk
 
 
         //Filter class is instantiated
-        typedef itk::GradientRecursiveGaussianImageFilter<TInputImageType, VectorOutputImageType> GradientFilterType;
+        /*typedef itk::GradientRecursiveGaussianImageFilter<TInputImageType, VectorOutputImageType> GradientFilterType;*/
+
+        typedef itk::GradientImageFilter< TInputImageType >  GradientFilterType;
 
         GradientFilterType::Pointer filter = GradientFilterType::New();
         //sigma is specified in millimeters
-        filter->SetSigma( 1.5 );
+        //filter->SetSigma( 1.5 );
         filter->SetInput(this->m_Image); 
         filter->Update();
 

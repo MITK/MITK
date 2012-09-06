@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkKinectDevice_h
 #define __mitkKinectDevice_h
 
-#include "mitkToFHardwareExports.h"
+#include "mitkKinectModuleExports.h"
 #include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
 #include "mitkKinectController.h"
@@ -37,7 +37,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT KinectDevice : public ToFCameraDevice
+  class MITK_KINECTMODULE_EXPORT KinectDevice : public ToFCameraDevice
   {
   public:
 

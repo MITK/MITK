@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkKinectDeviceFactory_h
 #define __mitkKinectDeviceFactory_h
 
-#include "mitkToFHardwareExports.h"
+#include "mitkKinectModuleExports.h"
 #include "mitkKinectDevice.h"
 #include "mitkAbstractToFDeviceFactory.h"
 
@@ -28,7 +28,7 @@ namespace mitk
   * This offers users the oppertunity to generate new KinectDevices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-class MITK_TOFHARDWARE_EXPORT KinectDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITK_KINECTMODULE_EXPORT KinectDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
      /*!

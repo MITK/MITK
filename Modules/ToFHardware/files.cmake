@@ -1,5 +1,4 @@
 SET(CPP_FILES
-  mitkKinectDevice.cpp
   mitkToFImageGrabber.cpp
   mitkToFOpenCVImageGrabber.cpp
   mitkToFCameraDevice.cpp
@@ -26,7 +25,7 @@ SET(CPP_FILES
   mitkAbstractToFDeviceFactory.cpp
   mitkToFHardwareActivator.cpp
   mitkToFDeviceFactoryManager.cpp
-  mitkKinectDeviceFactory.cpp
+  #mitkKinectDeviceFactory.cpp
   mitkToFCameraMESASR4000DeviceFactory.cpp
   mitkToFCameraPMDCamBoardDeviceFactory.cpp
   mitkToFCameraPMDCamCubeDeviceFactory.cpp
@@ -106,13 +105,13 @@ SET(CPP_FILES ${CPP_FILES}
 )
 ENDIF(MITK_USE_TOF_MESASR4000)
 
-IF(MITK_USE_TOF_KINECT)
-SET(CPP_FILES ${CPP_FILES}
-  mitkKinectController.cpp
-)
-ELSE()
-SET(CPP_FILES ${CPP_FILES}
-  mitkKinectControllerStub.cpp
-)
-ENDIF(MITK_USE_TOF_KINECT)
+#IF(MITK_USE_TOF_KINECT)
+#SET(CPP_FILES ${CPP_FILES}
+#  mitkKinectController.cpp
+#)
+#ELSE()
+#SET(CPP_FILES ${CPP_FILES}
+#  mitkKinectControllerStub.cpp
+#)
+#ENDIF(MITK_USE_TOF_KINECT)
 

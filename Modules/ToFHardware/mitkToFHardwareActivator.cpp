@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIToFDeviceFactory.h"
 
 #include "mitkToFConfig.h"
-#include "mitkKinectDeviceFactory.h"
+//#include "mitkKinectDeviceFactory.h"
 #include "mitkToFCameraMESASR4000DeviceFactory.h"
 #include "mitkToFCameraPMDPlayerDeviceFactory.h"
 #include "mitkToFCameraPMDCamBoardDeviceFactory.h"
@@ -55,10 +55,11 @@ public:
         std::cout << "cameras " << string << std::endl;
 
         //Implementing KinectDeiveFactory
-        KinectDeviceFactory* kinectFactory = new KinectDeviceFactory();
-        ServiceProperties kinectFactoryProps;
-        kinectFactoryProps["ToFFactoryName"] = kinectFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(kinectFactory, kinectFactoryProps);
+        //KinectDeviceFactory* kinectFactory = new KinectDeviceFactory();
+        //ServiceProperties kinectFactoryProps;
+        //kinectFactoryProps["ToFFactoryName"] = kinectFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(kinectFactory, kinectFactoryProps);
+        LoadLibrary(TEXT("mitkKinectModule.dll"));
 
         //Implementing MESASR4000DeviceFactory
         ToFCameraMESASR4000DeviceFactory* toFCameraMESASR4000DeviceFactory = new ToFCameraMESASR4000DeviceFactory();
@@ -108,7 +109,7 @@ public:
         rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
 
-        m_Factories.push_back( kinectFactory );
+        //m_Factories.push_back( kinectFactory );
     }
 
     void Unload(mitk::ModuleContext* )

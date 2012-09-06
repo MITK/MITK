@@ -36,5 +36,3 @@ int mitkKinectControllerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_END();
 
 }
-
-

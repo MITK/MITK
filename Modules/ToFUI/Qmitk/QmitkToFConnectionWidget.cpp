@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraPMDMITKPlayerDevice.h"
 #include "mitkToFCameraMITKPlayerDevice.h"
 #include "mitkToFCameraMESASR4000Device.h"
-#include "mitkKinectDevice.h"
+//#include "mitkKinectDevice.h"
 
 //itk headers
 #include <itksys/SystemTools.hxx>
@@ -130,7 +130,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
   bool playerMode = false;
 
   if (m_Controls->m_ConnectCameraButton->text()=="Connect")
-  {   
+  {
     //reset the status of the GUI buttons
     m_Controls->m_ConnectCameraButton->setEnabled(false);
     m_Controls->m_SelectCameraCombobox->setEnabled(false);
@@ -168,7 +168,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     }
     else if (selectedCamera == "Microsoft Kinect")
     {//KINECT
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::KinectDevice::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::KinectDevice::New());
     }
     else if (selectedCamera == "PMD Player")
     {//PMD player
@@ -299,8 +299,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
       this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
-      if ((selectedCamera == "PMD CamCube 2.0/3.0") || (selectedCamera == "PMD CamBoard") || 
-        (selectedCamera== "PMD O3D") || (selectedCamera== "PMD CamBoardRaw") || 
+      if ((selectedCamera == "PMD CamCube 2.0/3.0") || (selectedCamera == "PMD CamBoard") ||
+        (selectedCamera== "PMD O3D") || (selectedCamera== "PMD CamBoardRaw") ||
         (selectedCamera== "PMD CamCubeRaw 2.0/3.0"))
       {
         this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();

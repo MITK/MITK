@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkKinectController_h
 #define __mitkKinectController_h
 
-#include "mitkToFHardwareExports.h"
+#include "mitkKinectModuleExports.h"
 #include "mitkCommon.h"
 #include "mitkToFConfig.h"
 
@@ -27,13 +27,13 @@ namespace mitk
 {
   /**
   * @brief Interface to the Kinect camera
-  * 
+  *
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT KinectController : public itk::Object
+  class MITK_KINECTMODULE_EXPORT KinectController : public itk::Object
   {
-  public: 
+  public:
 
     mitkClassMacro( KinectController , itk::Object );
 

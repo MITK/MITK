@@ -138,9 +138,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     void AddGroup();
     void RemoveGroup();
 
-    void CopyToClipboard();
-
-    void CopyToClipboardIndividuals();
+    void CopyToClipboard();  
 
     void Cut();
 

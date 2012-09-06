@@ -119,6 +119,12 @@ public:
   }
 
 
+  std::vector<double> GetAverageProfile()
+  {
+    return m_Average;
+  }
+
+
   void SetPlottingFiber(bool b)
   {
     m_PlottingFiberBundle = b;
@@ -148,6 +154,10 @@ protected:
   std::vector< std::vector<double> > m_Vals;
 
   std::vector< std::vector<double> > m_IndividualProfiles;
+  std::vector< double > m_Average;
+
+
+
 
 
   std::vector< std::vector<double> > CalculateGroupProfiles(std::string preprocessed);
@@ -191,6 +201,8 @@ protected:
 
 
   TractContainerType m_CurrentTracts;
+
+
 
   mitk::Image* m_CurrentImage;
 

@@ -850,9 +850,11 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     ++it;
   }
 
+
   if(profiles.size() == 0)
     return;
 
+  m_IndividualProfiles = profiles;
 
 
   std::string title = "Fiber bundle plot";
@@ -894,6 +896,8 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 
   }
 
+  m_Average = averageProfile;
+
 
   if(avg)
   {
@@ -907,6 +911,8 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 
     int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
     this->SetCurveData( curveId, xAxis, averageProfile );
+
+
 
 
     QPen pen( Qt::SolidLine );
@@ -923,6 +929,9 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
   }
 
   this->Replot();
+
+
+
 
 
 }

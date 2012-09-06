@@ -384,7 +384,6 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( (QObject*)(m_Controls->m_AddGroup), SIGNAL(clicked()), this, SLOT(AddGroup()) );
     connect( (QObject*)(m_Controls->m_RemoveGroup), SIGNAL(clicked()), this, SLOT(RemoveGroup()) );
     connect( (QObject*)(m_Controls->m_Clipboard), SIGNAL(clicked()), this, SLOT(CopyToClipboard()) );
-    connect( (QObject*)(m_Controls->m_IndividualsClipBoard), SIGNAL(clicked()), this, SLOT(CopyToClipboardIndividuals()) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );   
     connect( (QObject*)(m_Controls->m_Cut), SIGNAL(clicked()), this, SLOT(Cut()) );
@@ -395,48 +394,94 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
 }
 
 
-void QmitkTractbasedSpatialStatisticsView::CopyToClipboardIndividuals()
-{
-  std::vector<std::vector<double> > vals = m_Controls->m_RoiPlotWidget->GetIndividualProfiles();
-  QString clipboardText;
-  for (std::vector<std::vector<double> >::iterator it = vals.begin(); it
-                                                         != vals.end(); ++it)
-  {
-    for (std::vector<double>::iterator it2 = (*it).begin(); it2 !=
-          (*it).end(); ++it2)
-    {
-      clipboardText.append(QString("%1 \t").arg(*it2));
-
-      double d = *it2;
-      std::cout << d <<std::endl;
-    }
-    clipboardText.append(QString("\n"));
-  }
-
-  QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
-
-
-}
-
 void QmitkTractbasedSpatialStatisticsView::CopyToClipboard()
 {
-  std::vector<std::vector<double> > vals = m_Controls->m_RoiPlotWidget->GetVals();
-  QString clipboardText;
-  for (std::vector<std::vector<double> >::iterator it = vals.begin(); it
-                                                         != vals.end(); ++it)
-  {
-    for (std::vector<double>::iterator it2 = (*it).begin(); it2 !=
-          (*it).end(); ++it2)
-    {
-      clipboardText.append(QString("%1 \t").arg(*it2));
 
-      double d = *it2;
-      std::cout << d <<std::endl;
+
+
+  if(m_Controls->m_RoiPlotWidget->IsPlottingFiber())
+  {
+    // Working with fiber bundles
+    std::vector <std::vector<double> > profiles = m_Controls->m_RoiPlotWidget->GetIndividualProfiles();
+
+
+
+    QString clipboardText;
+    for (std::vector<std::vector<double> >::iterator it = profiles.begin(); it
+                                                           != profiles.end(); ++it)
+    {
+      for (std::vector<double>::iterator it2 = (*it).begin(); it2 !=
+            (*it).end(); ++it2)
+      {
+        clipboardText.append(QString("%1 \t").arg(*it2));
+      }
+      clipboardText.append(QString("\n"));
     }
-    clipboardText.append(QString("\n"));
+
+
+
+    if(m_Controls->m_Average->isChecked())
+    {
+      std::vector<double> averages = m_Controls->m_RoiPlotWidget->GetAverageProfile();
+      clipboardText.append(QString("\nAverage\n"));
+
+      for (std::vector<double>::iterator it2 = averages.begin(); it2 !=
+            averages.end(); ++it2)
+      {
+        clipboardText.append(QString("%1 \t").arg(*it2));
+
+      }
+    }
+
+    QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
+
   }
 
-  QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
+  else{
+
+    // Working with TBSS Data
+    if(m_Controls->m_Average->isChecked())
+    {
+      std::vector<std::vector<double> > vals = m_Controls->m_RoiPlotWidget->GetVals();
+      QString clipboardText;
+      for (std::vector<std::vector<double> >::iterator it = vals.begin(); it
+                                                             != vals.end(); ++it)
+      {
+        for (std::vector<double>::iterator it2 = (*it).begin(); it2 !=
+              (*it).end(); ++it2)
+        {
+          clipboardText.append(QString("%1 \t").arg(*it2));
+
+          double d = *it2;
+          std::cout << d <<std::endl;
+        }
+        clipboardText.append(QString("\n"));
+      }
+
+      QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
+    }
+    else
+    {
+      std::vector<std::vector<double> > vals = m_Controls->m_RoiPlotWidget->GetIndividualProfiles();
+      QString clipboardText;
+      for (std::vector<std::vector<double> >::iterator it = vals.begin(); it
+                                                             != vals.end(); ++it)
+      {
+        for (std::vector<double>::iterator it2 = (*it).begin(); it2 !=
+              (*it).end(); ++it2)
+        {
+          clipboardText.append(QString("%1 \t").arg(*it2));
+
+          double d = *it2;
+          std::cout << d <<std::endl;
+        }
+        clipboardText.append(QString("\n"));
+      }
+      QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
+    }
+
+  }
+
 
 }
 

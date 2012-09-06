@@ -26,10 +26,8 @@ namespace itk
    linear). Thus lower values can be considered with lower costs
    than higher values of gradient magnitudes.
    To compute  the costs of the gradient magnitude dynamically
-   a map of the histogram of gradient magnitude image is used.
-   With the histogram gradient map costs are interpolated
-   with a gaussing function summation of next two bins right and left
-   to current position x.
+   a iverted map of the histogram of gradient magnitude image is used.
+   
   */
   template <class TInputImageType>
   class ITK_EXPORT ShortestPathCostFunctionLiveWire : public ShortestPathCostFunction<TInputImageType>
@@ -112,14 +110,6 @@ namespace itk
       this->m_UseCostMap = useCostMap;
     }
 
-    /** \brief Set the maximum of the values in Dynamic.
-    \Note This is just a container to save computation time - use wisely!
-    */
-    void SetCostMapMAX(int max)
-    {
-      this->m_CostMapMAX = max;
-    }
-
   protected:
 
     virtual ~ShortestPathCostFunctionLiveWire() {};
@@ -150,8 +140,6 @@ namespace itk
     bool m_Initialized;
 
     std::map< int, int > m_CostMap;
-
-    int m_CostMapMAX;
 
     bool m_UseCostMap;
 

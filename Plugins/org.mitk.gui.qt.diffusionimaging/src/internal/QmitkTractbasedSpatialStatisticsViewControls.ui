@@ -288,17 +288,25 @@
              <item>
               <widget class="QLabel" name="label_5">
                <property name="text">
-                <string>Fiber</string>
+                <string>#segments</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="m_FiberSelector">
-               <item>
-                <property name="text">
-                 <string>All</string>
-                </property>
-               </item>
+              <widget class="QSpinBox" name="m_Segments">
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>25</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="m_Average">
+               <property name="text">
+                <string>Average</string>
+               </property>
               </widget>
              </item>
              <item>

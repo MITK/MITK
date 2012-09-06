@@ -142,9 +142,9 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void CopyToClipboardIndividuals();
 
-    void Replot(int index);
-
     void Cut();
+
+    void PerformChange();
 
 
   protected:
@@ -155,7 +155,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
 
-    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL, int index=-1);
+    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
 
     void InitPointsets();
 
@@ -252,9 +252,6 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     VectorImageType::Pointer ConvertToVectorImage(mitk::Image::Pointer mitkImg);
 
-
-
-    bool m_CanReplot;
 
     mitk::DataNode::Pointer m_CurrentFiberNode; // needed for the index property when interacting with the plot widget
 

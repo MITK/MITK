@@ -72,7 +72,7 @@ public:
   void DrawProfiles(std::string preprocessed);
 
 
-  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, int index=-1);
+  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, bool avg=false);
 
 
   void Boxplots();
@@ -131,17 +131,18 @@ public:
 
 
   void PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
-                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, int index=-1);
+                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg=-1, int number=25);
 
-  mitk::FiberBundleX::Pointer m_Fib;
 
 
 
   // Takes an index which is an x coordinate from the plot and finds the corresponding position in world space
   mitk::Point3D GetPositionInWorld(int index);
+  void ModifyPlot(int number, bool avg);
 
 protected:
 
+  mitk::FiberBundleX* m_Fib;
 
 
   std::vector< std::vector<double> > m_Vals;
@@ -187,7 +188,21 @@ protected:
   TractContainerType ParameterizeTracts(TractContainerType tracts, int number);
 
 
+
+
   TractContainerType m_CurrentTracts;
+
+  mitk::Image* m_CurrentImage;
+
+  mitk::PlanarFigure* m_CurrentStartRoi;
+  mitk::PlanarFigure* m_CurrentEndRoi;
+
+
+  void DoPlotFiberBundles(mitk::FiberBundleX *fib, mitk::Image* img,
+                          mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg=false, int number=25);
+
+
+
 
 
 

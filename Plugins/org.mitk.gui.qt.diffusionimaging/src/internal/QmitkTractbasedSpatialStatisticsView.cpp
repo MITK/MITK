@@ -260,6 +260,12 @@ QmitkTractbasedSpatialStatisticsView::~QmitkTractbasedSpatialStatisticsView()
 {
 }
 
+
+void QmitkTractbasedSpatialStatisticsView::PerformChange()
+{
+  m_Controls->m_RoiPlotWidget->ModifyPlot(m_Controls->m_Segments->value(), m_Controls->m_Average->isChecked());
+}
+
 void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
   //datamanager selection changed
@@ -382,6 +388,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );   
     connect( (QObject*)(m_Controls->m_Cut), SIGNAL(clicked()), this, SLOT(Cut()) );
+    connect( (QObject*)(m_Controls->m_Average), SIGNAL(stateChanged(int)), this, SLOT(PerformChange()) );
+    connect( (QObject*)(m_Controls->m_Segments), SIGNAL(valueChanged(int)), this, SLOT(PerformChange()) );
 
   }
 }
@@ -1759,9 +1767,11 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
 
 void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img,
-                                                           mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, int index)
+                                                           mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi)
 {
-  m_Controls->m_RoiPlotWidget->PlotFiberBetweenRois(fib, img, startRoi ,endRoi);
+  bool avg = m_Controls->m_Average->isChecked();
+  int segments = m_Controls->m_Segments->value();
+  m_Controls->m_RoiPlotWidget->PlotFiberBetweenRois(fib, img, startRoi ,endRoi, avg, segments);
   m_Controls->m_RoiPlotWidget->SetPlottingFiber(true);
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 }

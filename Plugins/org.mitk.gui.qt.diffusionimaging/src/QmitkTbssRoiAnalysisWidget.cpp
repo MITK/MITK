@@ -47,12 +47,10 @@ QmitkTbssRoiAnalysisWidget::QmitkTbssRoiAnalysisWidget( QWidget * parent )
 }
 
 
-void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
-                                mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, int index)
-{
 
-  if(fib == NULL || img == NULL || startRoi == NULL || endRoi == NULL)
-    return;
+void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mitk::Image* img,
+                                                    mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
+{
 
   mitk::Geometry3D* currentGeometry = fib->GetGeometry();
 
@@ -66,12 +64,9 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, m
   mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
   mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
 
-  m_Fib = mitk::FiberBundleX::New();
-  m_Fib = inBoth; // This is needed in case the user starts clickin in the plot widget and the corresponding location in world space must be found
+
 
   int num = inBoth->GetNumFibers();
-
-
 
 
   TractContainerType tracts;
@@ -385,16 +380,46 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, m
 
 
   //todo: Make number of samples selectable by user
-  TractContainerType resampledTracts = ParameterizeTracts(tracts, 25);
+  TractContainerType resampledTracts = ParameterizeTracts(tracts, number);
 
   // Now we have the resampled tracts. Next we should use these points to read out the values
 
-  PlotFiberBundles(resampledTracts, img);
-  m_CurrentTracts = resampledTracts;
 
+
+  PlotFiberBundles(resampledTracts, img, avg);
+  m_CurrentTracts = resampledTracts;
+}
+
+void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
+                                mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
+{
+
+  if(fib == NULL || img == NULL || startRoi == NULL || endRoi == NULL)
+    return;
+
+
+  m_Fib = fib;
+  m_CurrentImage = img;
+  m_CurrentStartRoi = startRoi;
+  m_CurrentEndRoi = endRoi;
+
+
+  DoPlotFiberBundles(fib, img, startRoi, endRoi, avg, number);
+}
+
+
+
+void QmitkTbssRoiAnalysisWidget::ModifyPlot(int number, bool avg)
+{
+  if(m_Fib == NULL || m_CurrentImage == NULL || m_CurrentStartRoi == NULL || m_CurrentEndRoi == NULL)
+    return;
+
+  DoPlotFiberBundles(m_Fib, m_CurrentImage, m_CurrentStartRoi, m_CurrentEndRoi, avg, number);
 
 
 }
+
+
 
 TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainerType tracts, int number)
 {
@@ -699,17 +724,16 @@ void QmitkTbssRoiAnalysisWidget::DrawProfiles(std::string preprocessed)
 
 
 
-void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img, int index)
+void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img, bool avg)
 {
   this->Clear();
-
-
-
   std::vector<TractType>::iterator it = tracts.begin();
 
 
   // Match points on tracts. Take the smallest tract and match all others on this one
 
+
+  /*
 
   int min = std::numeric_limits<int>::max();
   TractType smallestTract;
@@ -792,7 +816,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 
     ++it;
   }
-
+*/
 
 
 
@@ -826,20 +850,27 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     ++it;
   }
 
+  if(profiles.size() == 0)
+    return;
 
 
 
   std::string title = "Fiber bundle plot";
   this->SetPlotTitle( title.c_str() );
-  QPen pen( Qt::SolidLine );
-  pen.setWidth(2);
+
+
+  // initialize average profile
+  std::vector<double> averageProfile;
+  std::vector<double> profile = profiles.at(0); // can do this because we checked the size of profiles before
+  for(int i=0; i<profile.size(); ++i)
+  {
+    averageProfile.push_back(0.0);
+  }
 
 
   std::vector< std::vector<double> >::iterator profit = profiles.begin();
 
   int id=0;
-
-
   while(profit != profiles.end())
   {
     std::vector<double> profile = *profit;
@@ -850,34 +881,48 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     for(int i=0; i<profile.size(); ++i)
     {
       xAxis.push_back((double)i);
+      averageProfile.at(i) += profile.at(i) / profiles.size();
     }
 
     int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
-
-
-    if(id == index)
-    {
-      pen.setColor(Qt::red);
-      this->SetCurvePen( curveId, pen );
-    }
-
 
     this->SetCurveData( curveId, xAxis, profile );
 
     ++profit;
     id++;
 
+
+  }
+
+
+  if(avg)
+  {
+
+    // Draw the average profile
+    std::vector<double> xAxis;
+    for(int i=0; i<averageProfile.size(); ++i)
+    {
+      xAxis.push_back((double)i);
+    }
+
+    int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
+    this->SetCurveData( curveId, xAxis, averageProfile );
+
+
+    QPen pen( Qt::SolidLine );
+    pen.setWidth(3);
+    pen.setColor(Qt::red);
+
+    this->SetCurvePen( curveId, pen );
+
+
+
+    id++;
+
+
   }
 
   this->Replot();
-
-
-
-
-
-
-
-
 
 
 }

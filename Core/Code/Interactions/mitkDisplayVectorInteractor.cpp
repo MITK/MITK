@@ -55,8 +55,9 @@ float mitk::DisplayVectorInteractor::CanHandleEvent(const StateEvent *stateEvent
   if(posEvent==NULL) return 0.0;
 
   //StateEvents from "moveNzoom", "alternativePan", "alternativeZoom" interaction pattern. If EventID can be handled by these statemachine patterns return a high value
-  if (stateEvent->GetId() == 2 || stateEvent->GetId() == 4 || stateEvent->GetId() == 7 || stateEvent->GetId() == 506 || stateEvent->GetId() == 507
-      || stateEvent->GetId() == 531 || stateEvent->GetId() == 533 || stateEvent->GetId() == 535 || stateEvent->GetId() == 538)
+  if (stateEvent->GetId() == EIDRIGHTMOUSEBTN || stateEvent->GetId() == EIDMIDDLEMOUSEBTN || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDCTRL ||
+      stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
+      stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
   {
     return 0.9;
   }

@@ -188,6 +188,9 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   //set new start point
   m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
+  //use dynamic cost map for next update
+  //m_LiveWireFilter->SetUseDynamicCostTransferForNextUpdate(true);
+
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -216,6 +219,7 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
    m_LiveWireFilter->SetEndPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
    m_LiveWireFilter->Update();
+   m_LiveWireFilter->SetUseDynamicCostTransferForNextUpdate(false);//no dynamic map creation after mouse move
 
 
   //ContourModel::VertexType* currentVertex = const_cast<ContourModel::VertexType*>(m_LiveWireContour->GetVertexAt(0));

@@ -85,9 +85,6 @@ namespace mitk {
     void                            GenerateFiberIds(); // TODO: make protected
 
 
-    // cutting fibers
-    std::vector<FiberBundleX::Pointer>           CutFiberBundle(PlanarFigure *pf);
-
 
     // get/set data
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);

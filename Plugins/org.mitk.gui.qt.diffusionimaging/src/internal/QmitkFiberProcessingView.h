@@ -99,7 +99,6 @@ protected slots:
   void DoFaColorCoding();
   void Extract3d();
   void ApplyCurvatureThreshold();
-  void CutFibers();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
                                       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );

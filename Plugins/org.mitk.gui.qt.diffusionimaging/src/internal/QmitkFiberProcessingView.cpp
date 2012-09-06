@@ -103,54 +103,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
         connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
         connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
-        connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
-        connect( m_Controls->m_CutBundle, SIGNAL(clicked()), this, SLOT(CutFibers()) );
-
-    }
-}
-
-
-void QmitkFiberProcessingView::CutFibers()
-{
-    for (int i=0; i<m_SelectedFB.size(); i++)
-    {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        mitk::PlanarFigure::Pointer roi = dynamic_cast<mitk::PlanarFigure*> (m_SelectedPF.at(0)->GetData());
-
-        std::vector<mitk::FiberBundleX::Pointer> extFB = fib->CutFiberBundle(roi);
-
-        if(!(extFB.size() == 3))
-          return;
-
-        mitk::DataNode::Pointer node;
-
-        node = mitk::DataNode::New();
-        node->SetData(extFB.at(0));
-        QString name(m_SelectedFB.at(i)->GetName().c_str());
-        name += "not_in_roi";
-        node->SetName(name.toStdString());
-        GetDataStorage()->Add(node);
-
-
-        node = mitk::DataNode::New();
-        node->SetData(extFB.at(1));
-        name = "pos_side";
-        node->SetName(name.toStdString());
-        GetDataStorage()->Add(node);
-
-
-        node = mitk::DataNode::New();
-        node->SetData(extFB.at(2));
-        name = "neg_side_not_in_roi";
-        node->SetName(name.toStdString());
-        GetDataStorage()->Add(node);
-        m_SelectedFB.at(i)->SetVisibility(false);
-
-
-
-
-
-
+        connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );        
 
     }
 }
@@ -795,8 +748,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
         m_Controls->m_FaColorFibersButton->setEnabled(false);
         m_Controls->m_PruneFibersButton->setEnabled(false);
-        m_Controls->m_CurvatureThresholdButton->setEnabled(false);
-        m_Controls->m_CutBundle->setEnabled(false);
+        m_Controls->m_CurvatureThresholdButton->setEnabled(false);       
 
         if (m_Surfaces.size()>0)
             m_Controls->m_MirrorFibersButton->setEnabled(true);
@@ -820,7 +772,6 @@ void QmitkFiberProcessingView::UpdateGui()
         if (!m_SelectedPF.empty())
         {
             m_Controls->doExtractFibersButton->setEnabled(true);
-            m_Controls->m_CutBundle->setEnabled(true);
         }
 
         // more than two bundles needed to join/subtract
@@ -843,7 +794,6 @@ void QmitkFiberProcessingView::UpdateGui()
     if ( m_SelectedPF.empty() )
     {
         m_Controls->doExtractFibersButton->setEnabled(false);
-        m_Controls->m_CutBundle->setEnabled(false);
         m_Controls->PFCompoANDButton->setEnabled(false);
         m_Controls->PFCompoORButton->setEnabled(false);
         m_Controls->PFCompoNOTButton->setEnabled(false);
@@ -992,12 +942,6 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
     newNode->SetName(name.toStdString());
     newNode->SetData(figure);
-
-
-    newNode->AddProperty( "shownormal", mitk::BoolProperty::New( true ) );
-    newNode->AddProperty( "mirrornormal", mitk::BoolProperty::New(false) );
-
-
 
     newNode->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,0.0,0.0));
     newNode->AddProperty( "planarfigure.line.width", mitk::FloatProperty::New(2.0));

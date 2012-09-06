@@ -113,7 +113,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * \endverbatim
     */
     template <class T>
-    void Initialize(const std::string& namingProperty = static_cast< std::string >(""), std::string& filter = static_cast< std::string >(""))
+    void Initialize(const std::string& namingProperty = static_cast< std::string >(""),const std::string& filter = static_cast< std::string >(""))
       {
         std::string interfaceName ( us_service_interface_iid<T*>() );
         m_Interface = interfaceName;

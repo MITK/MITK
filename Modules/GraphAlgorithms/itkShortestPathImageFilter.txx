@@ -114,10 +114,10 @@ namespace itk
     }
     if ((m_Graph_NumberOfNodes > 0) && (node >= m_Graph_NumberOfNodes))
     {
-      MITK_INFO << "WARNING! Coordinates outside image!";
+      /*MITK_INFO << "WARNING! Coordinates outside image!";
       MITK_INFO << "Coords = " << coord ;
       MITK_INFO << "ImageDim = " << dim ;
-      MITK_INFO << "RequestedRegionSize = " << size ;
+      MITK_INFO << "RequestedRegionSize = " << size ;*/
       node = 0;
     }
 
@@ -515,10 +515,10 @@ namespace itk
     while(!myMap.empty())
     {     
       numberOfNodesChecked++;
-      if ( (numberOfNodesChecked % (m_Graph_NumberOfNodes/100)) == 0)
+      /*if ( (numberOfNodesChecked % (m_Graph_NumberOfNodes/100)) == 0)
       {
         MITK_INFO << "Checked " << ( numberOfNodesChecked / (m_Graph_NumberOfNodes/100) ) << "% List: " << myMap.size() << "\n";            
-      }
+      }*/
 
       // Get element with lowest score
       mainNodeListIndex = myMap.begin()->second->mainListIndex; 
@@ -608,7 +608,8 @@ namespace itk
 
             if ((ret.first == ret.second))
             {
-              MITK_INFO << "No exact match!"; // if this happens, you are screwed
+              /*+++++++++++++ no exact match +++++++++++++*/
+              //MITK_INFO << "No exact match!"; // if this happens, you are screwed
               /*
               MITK_INFO << "Was looking for: " << lookFor << "  ID: " << lookForId;
               if (ret.first != myMap.end() )
@@ -660,7 +661,7 @@ namespace itk
 
             if (!found)
             {
-              MITK_INFO << "Could not find it! :(";
+              //MITK_INFO << "Could not find it! :(";
               continue;
             }
 
@@ -690,7 +691,7 @@ namespace itk
         durationAll =  (double)(stopAll - startAll) / CLOCKS_PER_SEC;   
         if (durationAll >= 30)
         {
-          MITK_INFO << "TIMEOUT!! Search took over 30 seconds"; 
+          //MITK_INFO << "TIMEOUT!! Search took over 30 seconds"; 
           timeout = true ;
         }
       }
@@ -722,8 +723,8 @@ namespace itk
       // if single end point, then end, if this one is reached or timeout happened.
       else if ( ( mainNodeListIndex == m_Graph_EndNode || timeout) && !m_CalcAllDistances)
       {
-        if (m_StoreVectorOrder)
-          MITK_INFO << "Number of Nodes checked: " << m_VectorOrder.size() ;
+        /*if (m_StoreVectorOrder)
+          MITK_INFO << "Number of Nodes checked: " << m_VectorOrder.size() ;*/
         return;
       }
     }
@@ -734,7 +735,7 @@ namespace itk
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     MakeOutputs()
   {
-    MITK_INFO << "Make Output";
+    //MITK_INFO << "Make Output";
 
     if (m_MakeOutputImage)
     {
@@ -786,7 +787,7 @@ namespace itk
     OutputImageIteratorType vectorOrderImageIt  (image, image->GetRequestedRegion());     
 
 
-    MITK_INFO << "GetVectorOrderImage";
+    //MITK_INFO << "GetVectorOrderImage";
     for (vectorOrderImageIt.GoToBegin(); !vectorOrderImageIt.IsAtEnd(); ++vectorOrderImageIt)
     {
       // First intialize with background color
@@ -847,7 +848,7 @@ namespace itk
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     MakeShortestPathVector()
   {
-    MITK_INFO << "Make ShortestPath Vec";
+    //MITK_INFO << "Make ShortestPath Vec";
 
     // single end point
     if ( !multipleEndPoints )

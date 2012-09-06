@@ -206,7 +206,7 @@ namespace mitk
     void Concatenate(mitk::ContourModel* other, int timestep=0);
 
     /** \brief Returns a const VertexIterator at the start element of the contour.
-
+    */
     VertexIterator IteratorBegin( int timestep=0);
 
     /** \brief Close the contour.
@@ -361,16 +361,16 @@ namespace mitk
   protected:
 
     ContourModel();
-    ContourModel(const mitk::ContourModel &other);*/
-      virtual ~ContourModel();
+    ContourModel(const mitk::ContourModel &other);
+    virtual ~ContourModel();
 
-    //inherit from BaseData. called by Clear()*/
+    //inherit from BaseData. called by Clear()
     virtual void ClearData();
 
-    //inherit from BaseData. Initial state of a contour with no vertices and a single timestep.*/
+    //inherit from BaseData. Initial state of a contour with no vertices and a single timestep.
     virtual void InitializeEmpty();
 
-    //Shift a vertex*/
+    //Shift a vertex
     void ShiftVertex(VertexType* vertex, mitk::Vector3D &vector);
 
 

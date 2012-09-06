@@ -691,9 +691,13 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
     m_Controls->m_RoiPlotWidget->drawBar(index);
   }
 
-  else if(m_Fib != NULL && m_CurrentGeometry != NULL && m_Controls->m_RoiPlotWidget->IsPlottingFiber() )
+  else if(m_Controls->m_RoiPlotWidget->IsPlottingFiber() )
   {
 
+    mitk::Point3D point = m_Controls->m_RoiPlotWidget->GetPositionInWorld(index);
+    m_MultiWidget->MoveCrossToPosition(point);
+
+    /*
     mitk::BaseData* fibData = m_CurrentFiberNode->GetData();
     mitk::FiberBundleX* fib = static_cast<mitk::FiberBundleX*>(fibData);
 
@@ -789,8 +793,8 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
     point[1] = p[1];
     point[2] = p[2];
 
-    m_MultiWidget->MoveCrossToPosition(point);
 
+*/
 
   }
 
@@ -1828,10 +1832,11 @@ void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *
 
   m_Controls->m_RoiPlotWidget->PlotFiberBetweenRois(fib, img, startRoi ,endRoi);
 
+  m_Controls->m_RoiPlotWidget->SetPlottingFiber(true);
 
 
   /*
-  // pass index to the plot widget so it can get a separate color
+  // pass index to the plot widget so it can get a separate colorhttp://www.google.com/search?client=ubuntu&channel=fs&q=fiat+panda+verbruik&ie=utf-8&oe=utf-8
   // needs index-1 because the first entry in the list should paint all fibers the same
   m_Controls->m_RoiPlotWidget->PlotFiberBundles(tracts, img, index-1);
 

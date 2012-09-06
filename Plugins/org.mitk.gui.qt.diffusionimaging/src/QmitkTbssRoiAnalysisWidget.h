@@ -135,6 +135,11 @@ public:
 
   mitk::FiberBundleX::Pointer m_Fib;
 
+
+
+  // Takes an index which is an x coordinate from the plot and finds the corresponding position in world space
+  mitk::Point3D GetPositionInWorld(int index);
+
 protected:
 
 
@@ -180,6 +185,9 @@ protected:
 
   // Resample a collection of tracts so that every tract contains #number equidistant samples
   TractContainerType ParameterizeTracts(TractContainerType tracts, int number);
+
+
+  TractContainerType m_CurrentTracts;
 
 
 

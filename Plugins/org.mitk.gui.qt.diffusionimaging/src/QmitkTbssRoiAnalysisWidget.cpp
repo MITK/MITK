@@ -387,7 +387,10 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, m
   //todo: Make number of samples selectable by user
   TractContainerType resampledTracts = ParameterizeTracts(tracts, 25);
 
-  std::cout << "resampled tracts";
+  // Now we have the resampled tracts. Next we should use these points to read out the values
+
+  PlotFiberBundles(resampledTracts, img);
+  m_CurrentTracts = resampledTracts;
 
 
 
@@ -430,14 +433,17 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
     float locationBetween = 0;
 
     for(float position = 0;
-        position <= totalLength && resampledTract.size() <= (number+1);
+        position <= totalLength+0.001 && resampledTract.size() <= (number+1);
         position+=stepSize)
     {
 
       /* In case we walked to far we need to find the next segment we are on and on what relative position on that
-         tract we are on */
-      while(locationBetween > distance)
+         tract we are on. Small correction for rounding errors */
+      while(locationBetween > distance+0.001)
       {
+
+        if(tractCounter == tract.size())
+          std::cout << "problem";
 
         // Determine by what distance we are no on the next segment
         locationBetween = locationBetween - distance;
@@ -467,6 +473,39 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
 
   }
   return resampledTracts;
+}
+
+
+mitk::Point3D QmitkTbssRoiAnalysisWidget::GetPositionInWorld(int index)
+{
+  TractContainerType tractsAtIndex;
+
+  float xSum = 0.0;
+  float ySum = 0.0;
+  float zSum = 0.0;
+  for(TractContainerType::iterator it = m_CurrentTracts.begin();
+      it!=m_CurrentTracts.end(); ++it)
+  {
+    TractType tract = *it;
+    PointType p = tract.at(index);
+    xSum += p[0];
+    ySum += p[1];
+    zSum += p[2];
+  }
+
+  int number = m_CurrentTracts.size();
+
+  float xPos = xSum / number;
+  float yPos = ySum / number;
+  float zPos = zSum / number;
+
+
+  mitk::Point3D pos;
+  pos[0] = xPos;
+  pos[1] = yPos;
+  pos[2] = zPos;
+
+  return pos;
 }
 
 

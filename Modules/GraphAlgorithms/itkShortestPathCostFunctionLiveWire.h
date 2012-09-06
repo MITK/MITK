@@ -44,20 +44,20 @@ namespace itk
     typedef itk::ImageRegion<2>                             RegionType;
 
 
-    // \brief calculates the costs for going from p1 to p2
+    /** \brief calculates the costs for going from p1 to p2*/
     virtual double GetCost(IndexType p1, IndexType p2);
 
-    // \brief returns the minimal costs possible (needed for A*)
+    /** \brief returns the minimal costs possible (needed for A*)*/
     virtual double GetMinCost();
 
-    // \brief Initialize the metric
+    /** \brief Initialize the metric*/
     virtual void Initialize ();
 
 
-    // \brief Set repulsive path
+    /** \brief Set repulsive path*/
     virtual void AddRepulsivePoint( itk::Index<3>  );
 
-    // \brief Clear repulsive path
+    /** \brief Clear repulsive path*/
     virtual void ClearRepulsivePoints(  );
 
 

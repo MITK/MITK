@@ -252,7 +252,6 @@ QmitkTractbasedSpatialStatisticsView::QmitkTractbasedSpatialStatisticsView()
 : QmitkFunctionality()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
-, m_CanReplot (true)
 {
   
 }
@@ -381,79 +380,12 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( (QObject*)(m_Controls->m_Clipboard), SIGNAL(clicked()), this, SLOT(CopyToClipboard()) );
     connect( (QObject*)(m_Controls->m_IndividualsClipBoard), SIGNAL(clicked()), this, SLOT(CopyToClipboardIndividuals()) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
-    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
-    connect( (QObject*)(m_Controls->m_FiberSelector), SIGNAL(currentIndexChanged(int)), this, SLOT(Replot(int)) );
+    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );   
     connect( (QObject*)(m_Controls->m_Cut), SIGNAL(clicked()), this, SLOT(Cut()) );
 
   }
 }
 
-
-void QmitkTractbasedSpatialStatisticsView::Replot(int index)
-{
-  bool foundImg = false;
-  bool foundFib = false;
-  mitk::FiberBundleX* fib;
-  mitk::Image* img;
-  mitk::DataNode::Pointer fibNode;
-
-
-  for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-    i != m_CurrentSelection->End(); ++i)
-  {
-    // extract datatree node
-    if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-    {
-      mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-      mitk::BaseData* nodeData = node->GetData();
-      if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
-      {
-        img = static_cast<mitk::Image*>(nodeData);
-        if(img->GetDimension() == 3)
-        {
-          foundImg = true;
-        }
-      }
-
-      else if (QString("FiberBundleX").compare(nodeData->GetNameOfClass())==0)
-      {
-        foundFib = true;
-        fib = static_cast<mitk::FiberBundleX*>(nodeData);
-        fibNode = node;
-      }
-
-    }
-  }
-
-
-  if(m_CanReplot)
-  {
-
-    if(m_CurrentStartRoi.IsNotNull() && m_CurrentEndRoi.IsNotNull())
-    {
-      mitk::BaseData* startData = m_CurrentStartRoi->GetData();
-      mitk::BaseData* endData = m_CurrentEndRoi->GetData();
-
-      mitk::PlanarFigure* start = dynamic_cast<mitk::PlanarFigure*>(startData);
-      mitk::PlanarFigure* end = dynamic_cast<mitk::PlanarFigure*>(endData);
-
-      PlotFiberBundle(fib, img, start, end, index);
-
-    }
-    else
-    {
-      PlotFiberBundle(fib, img, NULL, NULL, index);
-    }
-
-
-    mitk::IntProperty::Pointer selectedFiberProp = mitk::IntProperty::New(index-1);
-
-    fibNode->SetProperty("SelectedFiber", selectedFiberProp);
-
-  }
-
-
-}
 
 void QmitkTractbasedSpatialStatisticsView::CopyToClipboardIndividuals()
 {
@@ -1829,51 +1761,9 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img,
                                                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, int index)
 {
-
   m_Controls->m_RoiPlotWidget->PlotFiberBetweenRois(fib, img, startRoi ,endRoi);
-
   m_Controls->m_RoiPlotWidget->SetPlottingFiber(true);
-
-
-  /*
-  // pass index to the plot widget so it can get a separate colorhttp://www.google.com/search?client=ubuntu&channel=fs&q=fiat+panda+verbruik&ie=utf-8&oe=utf-8
-  // needs index-1 because the first entry in the list should paint all fibers the same
-  m_Controls->m_RoiPlotWidget->PlotFiberBundles(tracts, img, index-1);
-
-  int numberOfFibers = tracts.size();
-
-  m_CanReplot = false;
-
-  // Change widget that makes fibers selectable
-  m_Controls->m_FiberSelector->clear();
-
-  if(numberOfFibers < 100)
-  {
-
-    m_Controls->m_FiberSelector->setEnabled(true);
-    m_Controls->m_FiberSelector->addItem("All");
-
-    for(int i=0; i<numberOfFibers; i++)
-    {
-      m_Controls->m_FiberSelector->addItem(QString::number(i));
-    }
-
-  }
-  else{
-    m_Controls->m_FiberSelector->setEnabled(false);
-  }
-
-  m_Controls->m_FiberSelector->setCurrentIndex( std::max(0,index) );
-
-  m_Controls->m_RoiPlotWidget->PlotFiberBundles(tracts, img, index-1);
-  m_Controls->m_RoiPlotWidget->SetPlottingFiber(true);
-
-
-  m_CanReplot = true;
-*/
-
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-
 }
 
 

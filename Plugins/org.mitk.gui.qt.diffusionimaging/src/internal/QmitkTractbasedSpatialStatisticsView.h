@@ -142,8 +142,6 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void CopyToClipboardIndividuals();
 
-    void Replot(int index);
-
     void Cut();
 
 
@@ -252,9 +250,6 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     VectorImageType::Pointer ConvertToVectorImage(mitk::Image::Pointer mitkImg);
 
-
-
-    bool m_CanReplot;
 
     mitk::DataNode::Pointer m_CurrentFiberNode; // needed for the index property when interacting with the plot widget
 

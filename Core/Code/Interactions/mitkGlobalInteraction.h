@@ -45,19 +45,23 @@ namespace mitk {
   //## Listeners only receive the event to process it, but don't change any data. They want to listen to all events.
   //## Interactors do change data according to the received event. They do not need to receive all events, only
   //## those they are interested in.
+  //## Additional to that a EVENT_NOTIFICATION_POLICY can be set. This can be either INFORM_MULTIPLE (the event is passed
+  //## to all listeners) or INFORM_ONE (event is passed to the listener which can handle the event best and only to this one).
   //##
-  //## To divide these two types of statemachine this class holds three lists and one map:
-  //## m_ListenerList, m_InteractorList, m_SelectedList and m_JurisdictionMap
+  //## To divide these two types of statemachine this class holds three lists and two maps:
+  //## m_ListenerList, m_InteractorList, m_SelectedList and m_InteractorRelevanceMap and m_ListenerRelevanceMap
   //## The list m_ListenerList holds all listeners.
   //## m_InteractorList holds all interactors, and the List m_SelectedList holds all machines, that were set to SELECTED or SUBSELECTED.
-  //## m_JurisdictionMap maps values returned from CanHandleEvent to the asked Interactors.
-  //## Through this map stepping through interactors, that were not selected and could handle that event, can be done.
+  //## m_InteractorRelevanceMap and m_ListenerRelevanceMap map values returned from CanHandleEvent to the asked Interactors and Listeners.
+  //## Through m_InteractorRelevanceMap stepping through interactors, that were not selected and could handle that event, can be done.
+  //## Through m_ListenerRelevanceMap the listener which can handle the event best can be determined. In case of the INFORM_ONE notification policy
+  //## the event is passed to just this listener
   //## 
   //## First the listeners are informed with the event.
   //## Then the selected or subselected interactors are asked if they can handle that event.
   //## They can handle it, if the mode of the interactor after HandleEvent(..) is still in SMSELECTED or SMSUBSELECTED.
   //## They can't handle it, if the mode changed to SMDESELECTED. Then the interactor is removed from the selected-list.
-  //## In that case, all interactors are asked to calculate and return their area of jurisdiction.
+  //## In that case, all interactors are asked to calculate and return their area of Relevance.
   //## An iterator is held on one interactor in the map. With the iterator, the map can be looped through so 
   //## so that several geometric objects, that lie on top of each other, can be selected.
   //## @ingroup Interaction
@@ -239,20 +243,20 @@ namespace mitk {
     bool AskSelected(mitk::StateEvent const* stateEvent);
 
     //##Documentation
-    //##@brief asking next interactor of m_JurisdictionMap
+    //##@brief asking next interactor of m_RelevanceMap
     bool AskCurrentInteractor(mitk::StateEvent const* stateEvent);
 
     //##Documentation
-    //##@brief filling m_InteractorJurisdictionMap
+    //##@brief filling m_InteractorRelevanceMap
     //##
-    //## @ params threshold: if the calculated jurisdiction value is above swell, then add it to the map
-    void FillInteractorJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold);
+    //## @ params threshold: if the calculated Relevance value is above threshold, then add it to the map
+    void FillInteractorRelevanceMap(mitk::StateEvent const* stateEvent, float threshold);
 
     //##Documentation
-    //##@brief filling m_ListenerJurisdictionMap
+    //##@brief filling m_ListenerRelevanceMap
     //##
-    //## @ params threshold: if the calculated jurisdiction value is above swell, then add it to the map
-    void FillListenerJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold);
+    //## @ params threshold: if the calculated Relevance value is above threshold, then add it to the map
+    void FillListenerRelevanceMap(mitk::StateEvent const* stateEvent, float threshold);
 
     void RemoveFlaggedListeners();
 
@@ -274,16 +278,16 @@ namespace mitk {
     //## @brief map for sorting all interactors by the value returned from CanHandleEvent(..).
     //##
     //## With that list certain interactors can be looped through like diving through layers
-    InteractorMap m_InteractorJurisdictionMap;
+    InteractorMap m_InteractorRelevanceMap;
 
     //##Documentation
     //## @brief map for sorting all listeners by the value returned from CanHandleEvent(..).
     //##
     //## With that list certain listeners can be looped through like diving through layers
-    StateMachineMap m_ListenerJurisdictionMap;
+    StateMachineMap m_ListenerRelevanceMap;
 
     //##Documentation
-    //## @brief iterator on an entry in m_JurisdictionMap for stepping through interactors
+    //## @brief iterator on an entry in m_RelevanceMap for stepping through interactors
     InteractorMapIter m_CurrentInteractorIter;
     
     //##Documentation

@@ -54,8 +54,8 @@ mitk::GlobalInteraction::~GlobalInteraction()
   m_ListenerList.clear();
   m_InteractorList.clear();
   m_SelectedList.clear();
-  m_InteractorJurisdictionMap.clear();
-  m_ListenerJurisdictionMap.clear();
+  m_InteractorRelevanceMap.clear();
+  m_ListenerRelevanceMap.clear();
   m_FocusManager = NULL;
 }
 
@@ -99,12 +99,12 @@ bool mitk::GlobalInteraction::RemoveListener(mitk::StateMachine* listener)
 
   RemoveFlaggedListeners();
 
-  //check if in JurisdictionMap
-  for (StateMachineMapIter it = m_ListenerJurisdictionMap.begin(); it != m_ListenerJurisdictionMap.end(); it++)
+  //check if in RelevanceMap
+  for (StateMachineMapIter it = m_ListenerRelevanceMap.begin(); it != m_ListenerRelevanceMap.end(); it++)
   {
     if ((*it).second == listener)
     {
-      m_ListenerJurisdictionMap.erase(it);
+      m_ListenerRelevanceMap.erase(it);
       break;
     }
   }
@@ -170,14 +170,14 @@ bool mitk::GlobalInteraction::RemoveInteractor(mitk::Interactor* interactor)
   //check if the interactor is also held in SelectedList
   this->RemoveFromSelectedInteractors(interactor);  
 
-  //check if in JurisdictionMap
-  for (InteractorMapIter it = m_InteractorJurisdictionMap.begin(); it != m_InteractorJurisdictionMap.end(); it++)
+  //check if in RelevanceMap
+  for (InteractorMapIter it = m_InteractorRelevanceMap.begin(); it != m_InteractorRelevanceMap.end(); it++)
   {
     if ((*it).second == interactor)
     {
       if (m_CurrentInteractorIter == it)
-        m_CurrentInteractorIter = m_InteractorJurisdictionMap.end();
-      m_InteractorJurisdictionMap.erase(it);
+        m_CurrentInteractorIter = m_InteractorRelevanceMap.end();
+      m_InteractorRelevanceMap.erase(it);
       break;
     }
   }
@@ -222,9 +222,9 @@ bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent)
 }
 
 
-void mitk::GlobalInteraction::FillInteractorJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold)
+void mitk::GlobalInteraction::FillInteractorRelevanceMap(mitk::StateEvent const* stateEvent, float threshold)
 {
-  m_InteractorJurisdictionMap.clear();
+  m_InteractorRelevanceMap.clear();
 
   for (InteractorListIter it = m_InteractorList.begin(); it != m_InteractorList.end(); it++)
   {
@@ -234,20 +234,20 @@ void mitk::GlobalInteraction::FillInteractorJurisdictionMap(mitk::StateEvent con
       float value = (*it)->CanHandleEvent(stateEvent);
       if (value > threshold)
       {
-        m_InteractorJurisdictionMap.insert(InteractorMap::value_type(value, (*it)));
+        m_InteractorRelevanceMap.insert(InteractorMap::value_type(value, (*it)));
       }
     }
   }
   //set the iterator to the first element to start stepping through interactors
-  if (! m_InteractorJurisdictionMap.empty())
-    m_CurrentInteractorIter = m_InteractorJurisdictionMap.begin();
+  if (! m_InteractorRelevanceMap.empty())
+    m_CurrentInteractorIter = m_InteractorRelevanceMap.begin();
   else
-    m_CurrentInteractorIter = m_InteractorJurisdictionMap.end();
+    m_CurrentInteractorIter = m_InteractorRelevanceMap.end();
 }
 
-void mitk::GlobalInteraction::FillListenerJurisdictionMap(const mitk::StateEvent *stateEvent, float threshold)
+void mitk::GlobalInteraction::FillListenerRelevanceMap(const mitk::StateEvent *stateEvent, float threshold)
 {
-  m_ListenerJurisdictionMap.clear();
+  m_ListenerRelevanceMap.clear();
 
   for (StateMachineListIter it = m_ListenerList.begin(); it != m_ListenerList.end(); it++)
   {
@@ -256,7 +256,7 @@ void mitk::GlobalInteraction::FillListenerJurisdictionMap(const mitk::StateEvent
       float value = (*it)->CanHandleEvent(stateEvent);
       if (value > threshold)
       {
-        m_ListenerJurisdictionMap.insert(StateMachineMap::value_type(value, (*it)));
+        m_ListenerRelevanceMap.insert(StateMachineMap::value_type(value, (*it)));
       }
     }
   }
@@ -269,12 +269,12 @@ void mitk::GlobalInteraction::FillListenerJurisdictionMap(const mitk::StateEvent
 */
 bool mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* stateEvent)
 {
-  //no need to check if we don't have any interactors. nearly equal to m_CurrentInteractorIter == m_InteractorJurisdictionMap.end
-  if (m_InteractorJurisdictionMap.empty())
+  //no need to check if we don't have any interactors. nearly equal to m_CurrentInteractorIter == m_InteractorRelevanceMap.end
+  if (m_InteractorRelevanceMap.empty())
     return false;
 
   bool handled = false;
-  while ( m_CurrentInteractorIter != m_InteractorJurisdictionMap.end()&& !handled)
+  while ( m_CurrentInteractorIter != m_InteractorRelevanceMap.end()&& !handled)
   {
     handled = (*m_CurrentInteractorIter).second->HandleEvent(stateEvent);
 
@@ -283,8 +283,8 @@ bool mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* state
   }
 
   //loop for later usage
-  if (m_CurrentInteractorIter == m_InteractorJurisdictionMap.end())
-    m_CurrentInteractorIter = m_InteractorJurisdictionMap.begin();
+  if (m_CurrentInteractorIter == m_InteractorRelevanceMap.end())
+    m_CurrentInteractorIter = m_InteractorRelevanceMap.begin();
   return handled;
 }
 
@@ -344,10 +344,10 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
     else
     {
       //0.5 since this is the default value which is returned by the superclass implementation of statemachine
-      this->FillListenerJurisdictionMap(stateEvent, 0.5);
-      if (!m_ListenerJurisdictionMap.empty())
+      this->FillListenerRelevanceMap(stateEvent, 0.5);
+      if (!m_ListenerRelevanceMap.empty())
       {
-        StateMachineMapIter iter = m_ListenerJurisdictionMap.begin();
+        StateMachineMapIter iter = m_ListenerRelevanceMap.begin();
         ok = (*iter).second->HandleEvent(stateEvent);
       }
       break;
@@ -355,9 +355,9 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
   case AcASKINTERACTORS:
     if (! AskSelected(stateEvent))//no interactor selected anymore
     {
-      //fill the jurisdictionMap to ask them bit by bit.
+      //fill the RelevanceMap to ask them bit by bit.
       //currentInteractor is set here to the beginning
-      FillInteractorJurisdictionMap(stateEvent, 0);
+      FillInteractorRelevanceMap(stateEvent, 0);
 
       //ask the Interactors to handle that event
       AskCurrentInteractor(stateEvent);
@@ -503,7 +503,7 @@ void mitk::GlobalInteraction::SetEventNotificationPolicy(EVENT_NOTIFICATION_POLI
   this->m_EventNotificationPolicy = policy;
 }
 
-mitk::GlobalInteraction::EVENT_NOTIFICATION_POLICY mitk::GlobalInteraction::GetEventNotificationPolicy()
+mitk::GlobalInteraction::EVENT_NOTIFICATION_POLICY mitk::GlobalInteraction::GetEventNotificationPolicy() const
 {
   return this->m_EventNotificationPolicy;
 }

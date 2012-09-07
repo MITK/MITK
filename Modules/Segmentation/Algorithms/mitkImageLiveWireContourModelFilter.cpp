@@ -28,7 +28,7 @@ mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
   this->SetNumberOfRequiredInputs(1);
   this->SetNumberOfOutputs( 1 );
   this->SetNthOutput(0, output.GetPointer());
-  m_CostFunction = CostFunctionType::New();
+  m_CostFunction = ImageLiveWireContourModelFilter::CostFunctionType::New();
   m_ShortestPathFilter = ShortestPathImageFilterType::New();
   m_ShortestPathFilter->SetCostFunction(m_CostFunction);
   m_UseDynamicCostTransferForNextUpdate = false;
@@ -207,7 +207,7 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
 
   /*++++++++++ create dynamic cost transfer map ++++++++++*/ 
   if(this->m_UseDynamicCostTransferForNextUpdate)
-  {/*
+  {
     /* Compute  the costs of the gradient magnitude dynamically.
     * using a map of the histogram of gradient magnitude image.
     * Use the histogram gradient map to interpolate the costs
@@ -215,9 +215,9 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
     * to current position x. With the histogram gradient costs are interpolated
     * with a gaussing function summation of next two bins right and left
     * to current position x.
-    * /
+    */
 
-    /*+++ filter image gradient magnitude +++* /
+    /*+++ filter image gradient magnitude +++*/
     typedef  itk::GradientMagnitudeImageFilter< itk::Image<TPixel, VImageDimension>,  itk::Image<TPixel, VImageDimension>> GradientMagnitudeFilterType;
     typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
     gradientFilter->SetInput(inputImage);
@@ -230,112 +230,121 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
     //iterator of path
     typename std::vector< ShortestPathImageFilterType::IndexType>::iterator pathIterator = shortestPath.begin();
 
-    std::map< int, int> histogram;
+    std::map< int, int > histogram;
 
     //create histogram within path
     while(pathIterator != shortestPath.end())
     {
       //count pixel values
-      histogram[ static_cast<int>( gradientMagnImage->GetPixel((*pathIterator)) ) ] += 1;
+      histogram[ static_cast<int>( gradientMagnImage->GetPixel((*pathIterator)) * 1000 ) ] += 1;
 
       pathIterator++;
     }
 
 
-    std::map<int,int>::iterator itMAX;
+    std::map< int, int >::iterator itMAX;
 
     //get max of histogramm
-    int max = 0;
-    std::map< int, int>::iterator it = histogram.begin();
+    int currentMaxValue = 0;
+    std::map< int, int >::iterator it = histogram.begin();
     while( it != histogram.end())
     {
-      if((*it).second > max)
+      if((*it).second > currentMaxValue)
       {
         itMAX = it;
-        max = (*it).second;
+        currentMaxValue = (*it).second;
       }
       it++;
     }
 
-    
 
-    //first compute the to max of gaussian summation
+    std::map< int, int >::key_type keyOfMax = itMAX->first;
 
-    //fill empty bins between first and last bin containing a value
-    it = histogram.begin();
-    int i = (*it).first;
-    while( it != histogram.rbegin())
+    double max = 1.0;
+
+    /*+++++++++++++++++++++++++ compute the to max of gaussian summation ++++++++++++++++++++++++*/
+    std::map< int, int >::iterator end = histogram.end();
+    std::map< int, int >::iterator last = --(histogram.end());
+
+    std::map< int, int >::iterator left2;
+    std::map< int, int >::iterator left1;
+    std::map< int, int >::iterator right1;
+    std::map< int, int >::iterator right2;
+
+    right1 = itMAX;       
+
+
+    if(right1 == end || right1 == last )
     {
-      it = histogram[i];
-      if(it != end)
-        (*it).second = 0;
-      i++;
+      right2 = end;   
     }
-     
-    std::map<int,int>::iterator end = m_CostMap.end();
-
-    //current position
-    std::map<int,int>::iterator x;
-    x = m_CostMap.find(static_cast<int>(gradientMagnitude) );
-
-    std::map<int,int>::iterator left2;
-    std::map<int,int>::iterator left1;
-    std::map<int,int>::iterator right1;
-    std::map<int,int>::iterator right2;
-
-    if( x == end )
+    else//( right1 <= last )
     {
-      //search next key within map from x upwards and downwards
-      int up, down;
-      up = down = static_cast<int>(gradientMagnitude);
-      while( (right1 = m_CostMap.find(up)) == end)
-      {
-        up++;
-      }
-      while( (left1 = m_CostMap.find(down)) == end)
-      {
-        down--;
-      }
+      std::map< int, int >::iterator temp = right1;
+      right2 = ++right1;//rght1 + 1
+      right1 = temp;
+    }
 
-      //get next elements
-      if( right1 != (end-1) )
-      {
-        right2 = right1 + 1;
-      }
-      else
-      {
-        right2 = end;
-      }
 
-      if( left1 != (m_CostMap.begin() + 1) )
-      {
-        left2 = left1 - 1;
-      }
-      else
-      {
-        left2 = end;
-      }
-
+    if( right1 == histogram.begin() )
+    {
+      left1 = end;
+      left2 = end;
+    }
+    else if( right1 == (++(histogram.begin())) )
+    {
+      std::map< int, int >::iterator temp = right1;
+      left1  = --right1;//rght1 - 1
+      right1 = temp;
+      left2  = end;
     }
     else
     {
-      left2 = x - 2;
-      left1 = x - 1;
-      right1 = x + 1;
-      right2 = x + 2;        
+      std::map< int, int >::iterator temp = right1;
+      left1 = --right1;//rght1 - 1
+      left2 = --right1;//rght1 - 2
     }
 
+    double partRight1, partRight2, partLeft1, partLeft2;
+    partRight1 = partRight2 = partLeft1 = partLeft2 = 0.0;
 
-    
-    //invert map according to 1-x/maxGaussian
-    it = histogram.begin();
-    while( it != histogram.end())
+
+    /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    f(x) = v(bin) * e^ ( -1/2 * (|x-k(bin)| / sigma)^2 )
+
+    gaussian approximation
+
+    where
+    v(bin) is the value in the map
+    k(bin) is the key
+    */
+    if( left2 != end )
     {
-      (*it).second = 1 - (*it).second / max;
-      it++;
+      partLeft2 = left2->second * exp( -0.5 * pow( (abs(keyOfMax - left2->first) / 2.0), 2) );
     }
+
+    if( left1 != end )
+    {
+      partLeft1 = left1->second * exp( -0.5 * pow( (abs(keyOfMax - left1->first) / 2.0), 2) );
+    }
+
+    if( right1 != end )
+    {
+      partRight1 = right1->second * exp( -0.5 * pow( (abs(keyOfMax - right1->first) / 2.0), 2) );
+    }
+
+    if( right2 != end )
+    {
+      partRight2 = right2->second * exp( -0.5 * pow( (abs(keyOfMax - right2->first) / 2.0), 2) );
+    }
+    /*----------------------------------------------------------------------------*/
+
+    max = (partRight1 + partRight2 + partLeft1 + partLeft2);
+
 
     this->m_CostFunction->SetDynamicCostMap(histogram);
-    //*/
+    this->m_CostFunction->SetUseCostMap(true);
+    this->m_CostFunction->SetCostMapMaximum(max);
+
   }
 }

@@ -13,21 +13,21 @@
 namespace itk
 {
   /** \brief Cost function for LiveWire purposes.
-   Specific features are considered to calculate cummulative
-   costs of a link between two pixels. These are:
-   
-      - Gradient Magnitude
-      - Gradient Direction
-      - Laplacian Zero Crossing
-   
-   By default the Gradient Magnitude is mapped linear to costs
-   between 0 (good) and 1 (bad). Via SetDynamicCostMap( std::map< int, int > &costMap)
-   a cost map can be set to dynamically map Gradient Magnitude (non
-   linear). Thus lower values can be considered with lower costs
-   than higher values of gradient magnitudes.
-   To compute  the costs of the gradient magnitude dynamically
-   a iverted map of the histogram of gradient magnitude image is used.
-   
+  Specific features are considered to calculate cummulative
+  costs of a link between two pixels. These are:
+
+  - Gradient Magnitude
+  - Gradient Direction
+  - Laplacian Zero Crossing
+
+  By default the Gradient Magnitude is mapped linear to costs
+  between 0 (good) and 1 (bad). Via SetDynamicCostMap( std::map< int, int > &costMap)
+  a cost map can be set to dynamically map Gradient Magnitude (non
+  linear). Thus lower values can be considered with lower costs
+  than higher values of gradient magnitudes.
+  To compute  the costs of the gradient magnitude dynamically
+  a iverted map of the histogram of gradient magnitude image is used.
+
   */
   template <class TInputImageType>
   class ITK_EXPORT ShortestPathCostFunctionLiveWire : public ShortestPathCostFunction<TInputImageType>
@@ -58,6 +58,7 @@ namespace itk
     typedef typename TInputImageType::IndexType             IndexType;
     typedef TInputImageType                                 ImageType;
     typedef itk::ImageRegion<2>                             RegionType;
+
 
 
     /** \brief calculates the costs for going from p1 to p2*/
@@ -101,13 +102,22 @@ namespace itk
     void SetDynamicCostMap( std::map< int, int > &costMap)
     {
       this->m_CostMap = costMap;
-      this->m_UseCostMap = true;
+      this->m_UseCostMap = true;  
+      this->m_MaxMapCosts = -1;
       this->Modified();
     }
 
     void SetUseCostMap(bool useCostMap)
     {
       this->m_UseCostMap = useCostMap;
+    }
+
+    /**
+    \brief Set the maximum of the dynamic cost map to save computation time.
+    */
+    void SetCostMapMaximum(double max)
+    {
+      this->m_MaxMapCosts = max;
     }
 
   protected:
@@ -142,6 +152,8 @@ namespace itk
     std::map< int, int > m_CostMap;
 
     bool m_UseCostMap;
+
+    double m_MaxMapCosts;
 
   private:
 

@@ -29,6 +29,7 @@ namespace itk
     m_GradientMax = 0.0;
     m_Initialized = false;
     m_UseCostMap = false;
+    m_MaxMapCosts = -1.0;
   }
 
 
@@ -112,20 +113,109 @@ namespace itk
 
     if(m_UseCostMap)
     {
-      std::map<int,int>::iterator it;
+      std::map< int, int >::iterator end = m_CostMap.end();
+      std::map< int, int >::iterator last = --(m_CostMap.end());
 
-      it = m_CostMap.find(static_cast<int>(gradientMagnitude) );
-      if( it != m_CostMap.end() )
-      {
-        gradientCost = (*it).second;
+      //current position
+      std::map< int, int >::iterator x;
+      //std::map< int, int >::key_type keyOfX = static_cast<std::map< int, int >::key_type>(gradientMagnitude * 1000);
+      int keyOfX = static_cast<int >(gradientMagnitude * 1000);
+      x = m_CostMap.find( keyOfX );
+
+      std::map< int, int >::iterator left2;
+      std::map< int, int >::iterator left1;
+      std::map< int, int >::iterator right1;
+      std::map< int, int >::iterator right2;
+
+      if( x == end )
+      {//x can also be == end if the key is not in the map but between two other keys
+        //search next key within map from x upwards
+        right1 = m_CostMap.lower_bound( keyOfX );
       }
       else
       {
-        gradientCost = 1.0;
+        right1 = x;       
       }
+
+      if(right1 == end || right1 == last )
+      {
+        right2 = end;   
+      }
+      else//( right1 != (end-1) )
+      {
+        std::map< int, int >::iterator temp = right1;
+        right2 = ++right1;//rght1 + 1
+        right1 = temp;
+      }
+
+
+      if( right1 == m_CostMap.begin() )
+      {
+        left1 = end;
+        left2 = end;
+      }
+      else if( right1 == (++(m_CostMap.begin())) )
+      {
+        std::map< int, int >::iterator temp = right1;
+        left1  = --right1;//rght1 - 1
+        right1 = temp;
+        left2 = end;
+      }
+      else
+      {
+        std::map< int, int >::iterator temp = right1;
+        left1  = --right1;//rght1 - 1
+        left2 = --right1;//rght1 - 2
+        right1 = temp;
+      }
+
+      double partRight1, partRight2, partLeft1, partLeft2;
+      partRight1 = partRight2 = partLeft1 = partLeft2 = 0.0;
+
+
+      /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      f(x) = v(bin) * e^ ( -1/2 * (|x-k(bin)| / sigma)^2 )
+
+      gaussian approximation
+
+      where
+      v(bin) is the value in the map
+      k(bin) is the key
+      */
+      if( left2 != end )
+      {
+        partLeft2 = left2->second * exp( -0.5 * pow( (abs(keyOfX - left2->first) / 2.0), 2) );
+      }
+
+      if( left1 != end )
+      {
+        partLeft1 = left1->second * exp( -0.5 * pow( (abs(keyOfX - left1->first) / 2.0), 2) );
+      }
+
+      if( right1 != end )
+      {
+        partRight1 = right1->second * exp( -0.5 * pow( (abs(keyOfX - right1->first) / 2.0), 2) );
+      }
+
+      if( right2 != end )
+      {
+        partRight2 = right2->second * exp( -0.5 * pow( (abs(keyOfX - right2->first) / 2.0), 2) );
+      }
+      /*----------------------------------------------------------------------------*/
+
+
+      if( m_MaxMapCosts > 0.0 )
+      {
+        gradientCost = 1.0 - ( (partRight1 + partRight2 + partLeft1 + partLeft2) / m_MaxMapCosts );
+      }
+      else
+      {//TODO compute max
+        gradientCost = 1.0 - (gradientMagnitude / m_GradientMax);
+      }
+
     }
     else
-    {
+    {//use linear mapping
       //value between 0 (good) and 1 (bad)
       gradientCost = 1.0 - (gradientMagnitude / m_GradientMax);
 
@@ -425,11 +515,11 @@ namespace itk
 
 
 
-       
+
 
       // set minCosts
       minCosts = 0.0; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs everything is fine. If estimation is higher than actual costs, you might not get the shortest but a different path.
-      
+
       m_Initialized = true;
     }
 

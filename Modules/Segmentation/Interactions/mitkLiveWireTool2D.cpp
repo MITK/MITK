@@ -189,7 +189,7 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
   //use dynamic cost map for next update
-  //m_LiveWireFilter->SetUseDynamicCostTransferForNextUpdate(true);
+  m_LiveWireFilter->SetUseDynamicCostTransferForNextUpdate(true);
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );

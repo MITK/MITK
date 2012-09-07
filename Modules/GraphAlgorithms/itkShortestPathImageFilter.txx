@@ -37,6 +37,7 @@ namespace itk
     m_CalcAllDistances(false),
     m_ActivateTimeOut(false),
     multipleEndPoints(false),
+    m_Initialized(false),
     m_Nodes(0),
     m_Graph_NumberOfNodes(0)
   {
@@ -404,6 +405,7 @@ namespace itk
     m_Graph_StartNode = CoordToNode(m_StartIndex); 
     //MITK_INFO << "StartIndex = " << StartIndex;
     //MITK_INFO << "StartNode = " << m_Graph_StartNode;
+    m_Initialized = false;
   }
 
 
@@ -453,35 +455,40 @@ namespace itk
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     InitGraph()
   {
-    // Clean up previous stuff
-    CleanUp();
+    if(!m_Initialized)
+    {
+      // Clean up previous stuff
+      CleanUp();
 
-    // initalize cost function
-    m_CostFunction->Initialize();
+      // Calc Number of nodes
+      m_ImageDimensions = TInputImageType::ImageDimension;
+      const InputImageSizeType &size = this->GetInput()->GetRequestedRegion().GetSize();
+      m_Graph_NumberOfNodes = 1;
+      for (NodeNumType i=0; i<m_ImageDimensions; ++i)
+        m_Graph_NumberOfNodes=m_Graph_NumberOfNodes*size[i];
 
-    // Calc Number of nodes
-    m_ImageDimensions = TInputImageType::ImageDimension;
-    const InputImageSizeType &size = this->GetInput()->GetRequestedRegion().GetSize();
-    m_Graph_NumberOfNodes = 1;
-    for (NodeNumType i=0; i<m_ImageDimensions; ++i)
-      m_Graph_NumberOfNodes=m_Graph_NumberOfNodes*size[i];
+      // Initialize mainNodeList with that number
+      m_Nodes = new ShortestPathNode[m_Graph_NumberOfNodes];
 
-    // Initialize mainNodeList with that number
-    m_Nodes = new ShortestPathNode[m_Graph_NumberOfNodes];
+      // Initialize each node in nodelist    
+      for (NodeNumType i=0; i<m_Graph_NumberOfNodes; i++)
+      {  
+        m_Nodes[i].distAndEst = -1; 
+        m_Nodes[i].distance = -1; 
+        m_Nodes[i].prevNode = -1;
+        m_Nodes[i].mainListIndex=i;
+        m_Nodes[i].closed=false;
+      }
 
-    // Initialize each node in nodelist    
-    for (NodeNumType i=0; i<m_Graph_NumberOfNodes; i++)
-    {  
-      m_Nodes[i].distAndEst = -1; 
-      m_Nodes[i].distance = -1; 
-      m_Nodes[i].prevNode = -1;
-      m_Nodes[i].mainListIndex=i;
-      m_Nodes[i].closed=false;
+      m_Initialized = true;
     }
 
     // In the beginning, the Startnode needs a distance of 0
     m_Nodes[m_Graph_StartNode].distance = 0;
     m_Nodes[m_Graph_StartNode].distAndEst = 0;
+
+    // initalize cost function
+    m_CostFunction->Initialize();
   }
 
   template <class TInputImageType, class TOutputImageType>
@@ -904,21 +911,14 @@ namespace itk
     CleanUp()
   {      
 
-
+    m_VectorOrder.clear();
     m_VectorPath.clear();
     //TODO: if multiple Path, clear all multiple Paths
-    /*
-    for (NodeNumType i=0; i<m_Graph_NumberOfNodes; i++)
-    {      
-    delete m_Nodes[i];
-    }*/
 
-    // This is properly not a proper cleanup
     if (m_Nodes)
       delete [] m_Nodes;
-    m_VectorOrder.clear();
-
   }
+
 
   template <class TInputImageType, class TOutputImageType>
   void

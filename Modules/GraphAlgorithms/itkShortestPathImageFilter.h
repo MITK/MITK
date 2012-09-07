@@ -174,6 +174,10 @@ namespace itk
       bool multipleEndPoints;
 
       bool m_ActivateTimeOut; // if true, then i search max. 30 secs. then abort
+
+      bool m_Initialized;
+
+
       CostFunctionTypePointer m_CostFunction;
       IndexType m_StartIndex, m_EndIndex; 
       std::vector< IndexType > m_VectorPath;

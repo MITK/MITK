@@ -32,6 +32,7 @@ mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
   m_ShortestPathFilter = ShortestPathImageFilterType::New();
   m_ShortestPathFilter->SetCostFunction(m_CostFunction);
   m_UseDynamicCostTransferForNextUpdate = false;
+  m_ImageModified = false;
 }
 
 mitk::ImageLiveWireContourModelFilter::~ImageLiveWireContourModelFilter()
@@ -60,6 +61,7 @@ void mitk::ImageLiveWireContourModelFilter::SetInput ( unsigned int idx, const m
   {
     this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
     this->Modified();
+    this->m_ImageModified = true;
   }
 }
 
@@ -107,6 +109,7 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
   if( input->GetGeometry()->IsIndexInside(this->m_StartPointInIndex) && input->GetGeometry()->IsIndexInside(this->m_EndPointInIndex) )
   {
     AccessFixedDimensionByItk(input, ItkProcessImage, 2);
+    m_ImageModified = false;
   }
 }
 
@@ -152,7 +155,8 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   castFilter->SetInput(inputImage);
   castFilter->Update();
   /* extracts features from image and calculates costs */
-  m_CostFunction->SetImage(castFilter->GetOutput());
+  if( m_ImageModified )
+    m_CostFunction->SetImage(castFilter->GetOutput());
   m_CostFunction->SetStartIndex(startPoint);
   m_CostFunction->SetEndIndex(endPoint);
   m_CostFunction->SetRequestedRegion(region);
@@ -203,7 +207,7 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
 
   /*++++++++++ create dynamic cost transfer map ++++++++++*/ 
   if(this->m_UseDynamicCostTransferForNextUpdate)
-  {
+  {/*
     /* Compute  the costs of the gradient magnitude dynamically.
     * using a map of the histogram of gradient magnitude image.
     * Use the histogram gradient map to interpolate the costs
@@ -211,9 +215,9 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
     * to current position x. With the histogram gradient costs are interpolated
     * with a gaussing function summation of next two bins right and left
     * to current position x.
-    */
+    * /
 
-    /*+++ filter image gradient magnitude +++*/
+    /*+++ filter image gradient magnitude +++* /
     typedef  itk::GradientMagnitudeImageFilter< itk::Image<TPixel, VImageDimension>,  itk::Image<TPixel, VImageDimension>> GradientMagnitudeFilterType;
     typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
     gradientFilter->SetInput(inputImage);
@@ -332,6 +336,6 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
     }
 
     this->m_CostFunction->SetDynamicCostMap(histogram);
-
+    //*/
   }
 }

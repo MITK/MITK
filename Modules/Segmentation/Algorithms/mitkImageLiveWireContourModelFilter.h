@@ -120,6 +120,8 @@ namespace mitk {
     /** \brief Create dynamic cost tranfer map - on the fly training*/
     bool m_UseDynamicCostTransferForNextUpdate;
 
+    bool m_ImageModified;
+
     template<typename TPixel, unsigned int VImageDimension>
     void ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
   };

@@ -190,32 +190,38 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   bool loadAutoLoadDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, false);
 
   // Get some default application paths.
-  // Here we can use the preferences to set up the builder, before asking him for the paths to scan.
+
+  // Here we can use the preferences to set up the builder,
   ctkCmdLineModuleDefaultPathBuilder builder;
   builder.setLoadFromApplicationDir(loadApplicationDir);
   builder.setLoadFromHomeDir(loadHomeDir);
   builder.setLoadFromCurrentDir(loadCurrentDir);
   builder.setLoadFromCtkModuleLoadPath(loadAutoLoadDir);
 
+  // and then we ask the builder to set up the paths.
   QStringList defaultPaths = builder.build();
 
-  // We get additional paths from preferences.
+  // We get additional directory paths from preferences.
   QString pathString = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));
   QStringList additionalPaths = pathString.split(";", QString::SkipEmptyParts);
 
-  // Combine the sets of paths.
+  // Combine the sets of directory paths.
   QStringList totalPaths;
   totalPaths << defaultPaths;
   totalPaths << additionalPaths;
 
+  QString additionalModulesString = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, ""));
+  QStringList additionalModules = additionalModulesString.split(";", QString::SkipEmptyParts);
+
   // OnPreferencesChanged can be called for each preference in a dialog box, so
-  // when you hit "OK", it is called repeatedly, whereas we want to only call this once,
-  // so I am checking if the list of directory names has changed.
+  // when you hit "OK", it is called repeatedly, whereas we want to only call these only once.
   if (this->m_DirectoryWatcher->directories() != totalPaths)
   {
-    // This should update the directory watcher, which should sort out if any new modules have been loaded
-    // and if so, should signal ModulesChanged, which is caught by this class, and re-build the GUI.
     m_DirectoryWatcher->setDirectories(totalPaths);
+  }
+  if (this->m_DirectoryWatcher->additionalModules() != additionalModules)
+  {
+    m_DirectoryWatcher->setAdditionalModules(additionalModules);
   }
 }
 

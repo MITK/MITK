@@ -739,6 +739,8 @@ void QmitkBrainNetworkAnalysisView::OnCreateConnectivityMatrixImagePushButtonCli
       {
         itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::Pointer filter = itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::New();
         filter->SetInputNetwork( network );
+        filter->SetBinaryConnectivity(m_Controls->binaryCheckBox->isChecked());
+        filter->SetRescaleConnectivity(m_Controls->rescaleCheckBox->isChecked());
         filter->Update();
 
         mitk::Image::Pointer connectivityMatrixImage = mitk::ImportItkImage( filter->GetOutput());

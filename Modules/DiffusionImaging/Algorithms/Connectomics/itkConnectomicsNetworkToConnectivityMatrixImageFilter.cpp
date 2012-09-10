@@ -21,9 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 
 itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::ConnectomicsNetworkToConnectivityMatrixImageFilter()
-: m_BinaryConnectivity(false)
-, m_RescaleConnectivity(false)
-, m_InputNetwork(NULL)
+  : m_BinaryConnectivity(false)
+  , m_RescaleConnectivity(false)
+  , m_InputNetwork(NULL)
 {
 }
 
@@ -141,11 +141,43 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
 
   int counter( 0 );
 
-  // Colour pixels according to connectivity
-  while( !it_connect.IsAtEnd() )
+  double rescaleFactor( 1.0 );
+  double rescaleMax( 255.0 );
+
+  if( m_RescaleConnectivity )
   {
-    it_connect.Set( ( unsigned short ) connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ] );
-    ++it_connect;
-    counter++;
+    rescaleFactor = rescaleMax / m_InputNetwork->GetMaximumWeight();
   }
+
+  // Colour pixels according to connectivity
+  if(  m_BinaryConnectivity )
+  {
+    // binary connectivity
+    while( !it_connect.IsAtEnd() )
+    {
+      if( connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ] )
+      {
+        it_connect.Set( 1 ); 
+      }
+      else
+      {
+        it_connect.Set( 0 ); 
+      }
+      ++it_connect;
+      counter++;
+    }
+  }
+  else
+  {
+    // if desired rescale to the 0-255 range
+    while( !it_connect.IsAtEnd() )
+    {
+      it_connect.Set( ( unsigned short ) rescaleFactor * 
+        connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ] 
+      );
+      ++it_connect;
+      counter++;
+    }
+  }
+
 }

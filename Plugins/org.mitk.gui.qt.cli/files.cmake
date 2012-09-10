@@ -1,5 +1,6 @@
 set(SRC_CPP_FILES
   QmitkCmdLineModuleMenuComboBox.cpp
+  QmitkCmdLineModuleProgressWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -17,12 +18,14 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
+  src/QmitkCmdLineModuleProgressWidget.ui
   src/internal/QmitkPathListWidget.ui
   src/internal/CommandLineModulesViewControls.ui
 )
 
 set(MOC_H_FILES
   src/QmitkCmdLineModuleMenuComboBox.h
+  src/QmitkCmdLineModuleProgressWidget.h
   src/internal/QmitkDataStorageComboBoxWithSelectNone.h
   src/internal/QmitkDirectoryListWidget.h
   src/internal/QmitkFileListWidget.h

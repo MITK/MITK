@@ -229,6 +229,7 @@ set(H_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingManager.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
+  Algorithms/Connectomics/itkConnectomicsNetworkToConnectivityMatrixImageFilter.h
 
 
 )

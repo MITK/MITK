@@ -679,7 +679,6 @@ void CommandLineModulesView::PublishMessage(const QString& message)
 {
   QString prefix = "Command Line Module ... ";
   qDebug() << prefix << message;
-  m_Controls->m_ConsoleOutputTextEdit->appendPlainText(prefix + message);
 }
 
 

@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 CommandLineModulesViewControls::CommandLineModulesViewControls(QWidget *parent)
 {
   this->setupUi(parent);
-  this->m_ConsoleOutput->setCollapsed(true);
   this->m_RunButton->setIcon(QIcon(":/CommandLineModulesResources/run.png"));
   this->m_StopButton->setIcon(QIcon(":/CommandLineModulesResources/stop.png"));
   this->m_RestoreDefaults->setIcon(QIcon(":/CommandLineModulesResources/undo.png"));

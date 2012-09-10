@@ -95,6 +95,10 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
     thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolRegistrationLandmarks())));
     thisTool->AddProperty("ToolCalibrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolCalibrationLandmarks())));
 
+  //Tool Tip
+    thisTool->AddProperty("ToolTipPosition",mitk::StringProperty::New(ConvertPointToString(Tool->GetToolTipPosition())));
+    thisTool->AddProperty("ToolTipOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolTipOrientation())));
+
   //Material is not needed, to avoid errors in scene serialization we have to do this:
     thisTool->ReplaceProperty("material",NULL);
 
@@ -118,7 +122,21 @@ std::string mitk::NavigationToolWriter::ConvertPointSetToString(mitk::PointSet::
   for ( it = pointSet->GetPointSet()->GetPointData()->Begin();it != pointSet->GetPointSet()->GetPointData()->End();it++ )
     {
     mitk::Point3D thisPoint = pointSet->GetPoint(it->Index());
-    returnValue << it->Index() << ";" << thisPoint[0] << ";" << thisPoint[1] << ";" << thisPoint[2] << "|";
+    returnValue << it->Index() << ";" << ConvertPointToString(thisPoint) << "|";
     }
   return returnValue.str();
   }
+
+std::string mitk::NavigationToolWriter::ConvertPointToString(mitk::Point3D point)
+{
+std::stringstream returnValue;
+returnValue << point[0] << ";" << point[1] << ";" << point[2];
+return returnValue.str();
+}
+
+std::string mitk::NavigationToolWriter::ConvertQuaternionToString(mitk::Quaternion quat)
+{
+std::stringstream returnValue;
+returnValue << quat.x() << ";" << quat.y() << ";" << quat.z() << ";" << quat.r();
+return returnValue.str();
+}

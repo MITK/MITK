@@ -279,9 +279,9 @@ bool QmitkPropertyTreeModel::setData(const QModelIndex &index, const QVariant &v
       }
       else if (mitk::FloatProperty *floatProperty = dynamic_cast<mitk::FloatProperty *>(property))
       {
-        int floatValue = value.toFloat();
+        float floatValue = value.toFloat();
 
-        if (floatValue != floatProperty->GetValue())
+        if (abs(floatValue - floatProperty->GetValue()) >= mitk::eps)
         {
           floatProperty->SetValue(floatValue);
           m_Properties->InvokeEvent(itk::ModifiedEvent());

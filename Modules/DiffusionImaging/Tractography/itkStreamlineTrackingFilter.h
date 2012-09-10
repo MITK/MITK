@@ -72,11 +72,14 @@ namespace itk{
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
     itkSetMacro( SeedsPerVoxel, int)
     itkSetMacro( FaThreshold, float)
-    itkSetMacro( AngularThreshold, float)
     itkSetMacro( StepSize, float)
     itkSetMacro( F, float )
     itkSetMacro( G, float )
     itkSetMacro( Interpolate, bool )
+    itkSetMacro( MinTractLength, float )
+    itkGetMacro( MinTractLength, float )
+    itkSetMacro( MinCurvatureRadius, float )
+    itkGetMacro( MinCurvatureRadius, float )
 
   protected:
     StreamlineTrackingFilter();
@@ -84,8 +87,8 @@ namespace itk{
     void PrintSelf(std::ostream& os, Indent indent) const;
 
     void CalculateNewPosition(itk::ContinuousIndex<double, 3>& pos, vnl_vector_fixed<double,3>& dir, typename InputImageType::IndexType& index);
-    void FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids);
-
+    float FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids);
+    bool IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType& index, vnl_vector_fixed< float, 8 >& interpWeights);
 
     double RoundToNearest(double num);
     void BeforeThreadedGenerateData();
@@ -104,9 +107,10 @@ namespace itk{
     typename InputImageType::Pointer m_InputImage;
 
     float m_FaThreshold;
-    float m_AngularThreshold;
+    float m_MinCurvatureRadius;
     float m_StepSize;
     int m_MaxLength;
+    float m_MinTractLength;
     int m_SeedsPerVoxel;
     float m_F;
     float m_G;

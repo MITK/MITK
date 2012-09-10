@@ -117,6 +117,14 @@ namespace mitk
     \brief set a BaseProperty
     */
     virtual void SetProperty( const char *propertyKey, BaseProperty* propertyValue );
+    /*!
+    \brief returns the width of the RGB image
+    */
+    int GetRGBCaptureWidth();
+    /*!
+    \brief returns the height of the RGB image
+    */
+    int GetRGBCaptureHeight();
 
   protected:
 
@@ -132,7 +140,6 @@ namespace mitk
     \brief moves the position pointer m_CurrentPos to the next position in the buffer if that's not the next free position to prevent reading from an empty buffer
     */
     void GetNextPos();
-
     KinectController::Pointer m_Controller; ///< corresponding CameraController
 
     float** m_DistanceDataBuffer; ///< buffer holding the last distance images

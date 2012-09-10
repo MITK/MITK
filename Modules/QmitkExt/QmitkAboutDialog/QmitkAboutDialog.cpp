@@ -43,8 +43,6 @@ void QmitkAboutDialog::ShowModules()
 {
   QmitkModulesDialog dialog(this);
   dialog.exec();
-
-  SetCaptionText("MITK Diffusion");
 }
 
 QString QmitkAboutDialog::GetAboutText() const

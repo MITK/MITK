@@ -124,6 +124,7 @@ class MitkExt_EXPORT ToolManager : public itk::Object
     /**
       \param id The tool to activate. Provide -1 for disabling any tools.
       Counting starts with 0.
+      Registeres a listner for NodeRemoved event at DataStorage (see mitk::ToolManager::OnNodeRemoved).
     */
     bool ActivateTool(int id);
 
@@ -278,6 +279,9 @@ class MitkExt_EXPORT ToolManager : public itk::Object
     int m_RegisteredClients;
 
     WeakPointer<DataStorage> m_DataStorage;
+
+    /// \brief Callback for NodeRemove events
+    void OnNodeRemoved(const mitk::DataNode* node);
 };
 
 } // namespace

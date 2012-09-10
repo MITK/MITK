@@ -30,8 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
  /** Documentation:
   *   \brief An object of this class offers an UI to manage NavigationTools and 
-  *			 NavigationToolStorages. This means a user may create, save and load 
-  *  		 single NavigationTools and/or NavigationToolStorages with this widget.
+  *       NavigationToolStorages. This means a user may create, save and load 
+  *       single NavigationTools and/or NavigationToolStorages with this widget.
   *
   *      Be sure to call the Initialize-methode before you start the widget
   *      otherwise some errors might occure.
@@ -56,6 +56,8 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
     void OnAddTool();
     void OnDeleteTool();
     void OnEditTool();
+    void OnLoadTool();
+    void OnSaveTool();
     void OnLoadStorage();
     void OnSaveStorage();
 

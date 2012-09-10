@@ -343,7 +343,7 @@ endif()
 # Set MITK specific options and variables (NOT available during superbuild)
 #-----------------------------------------------------------------------------
 
-# ASK THE USER TO SHOW THE CONSOLE WINDOW FOR CoreApp and ExtApp
+# ASK THE USER TO SHOW THE CONSOLE WINDOW FOR CoreApp and mitkWorkbench
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
 

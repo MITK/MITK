@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -127,8 +127,27 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
 
   // Do the actual work of loading the data into the data storage
   std::vector<std::string> fileNames2;
-  ctk::qListToSTLVector(fileNames, fileNames2);
+
+  // Correct conversion for File names.(BUG 12252)
+  fileNames2.resize(fileNames.size());
+  for (int i = 0; i< fileNames.size(); i++)
+    fileNames2[i] = std::string(QFile::encodeName(fileNames[i]).data());
+
+  // Old conversion which returns wrong encoded Non-Latin-Characters.
+  //ctk::qListToSTLVector(fileNames, fileNames2);
+
+  // Turn off ASSERT
+  #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
+      int lastCrtReportType = _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_DEBUG );
+  #endif
+
   const bool dsmodified = mitk::IOUtil::LoadFiles(fileNames2, *dataStorage);
+
+  // Set ASSERT status back to previous status.
+  #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
+    if (lastCrtReportType)
+      _CrtSetReportMode( _CRT_ASSERT, lastCrtReportType );
+  #endif
 
   // Check if there is an open perspective. If not, open the default perspective.
   if (window->GetActivePage().IsNull())

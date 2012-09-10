@@ -24,7 +24,7 @@ namespace berry
 const std::string PartPlaceholder::WILD_CARD = "*"; //$NON-NLS-1$
 
 PartPlaceholder::PartPlaceholder(const std::string& id) :
-  StackablePart(id)
+  LayoutPart(id)
 {
 
 }
@@ -41,7 +41,7 @@ void* PartPlaceholder::GetControl()
 
 bool PartPlaceholder::HasWildCard()
 {
-  return this->GetId().find_first_of(WILD_CARD) != std::string::npos;
+  return this->GetID().find_first_of(WILD_CARD) != std::string::npos;
 }
 
 bool PartPlaceholder::IsPlaceHolder() const

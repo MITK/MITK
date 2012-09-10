@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolygon.h>
 #include <vtkCleanPolyData.h>
 #include <cmath>
+#include <boost/progress.hpp>
 
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 //const char* mitk::FiberBundleX::COLORCODING_FA_AS_OPACITY = "Color_Orient_FA_Opacity";
@@ -50,7 +51,6 @@ using namespace std;
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_CurrentColorCoding(NULL)
     , m_NumFibers(0)
-    , m_RemoveFibers(true)
 {
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != NULL)
@@ -748,22 +748,6 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
         plane->SetOrigin(planeOrigin[0],planeOrigin[1],planeOrigin[2]);
         plane->SetNormal(planeNormal[0],planeNormal[1],planeNormal[2]);
 
-        //same plane but opposite normal direction. so point cloud will be reduced -> better performance
-        //        vtkSmartPointer<vtkPlane> planeR = vtkSmartPointer<vtkPlane>::New();
-
-        //define new origin along the normal but close to the original one
-        // OriginNew = OriginOld + 1*Normal
-        //        Vector3D extendedNormal;
-        //        int multiplyFactor = 1;
-        //        extendedNormal[0] = planeNormal[0] * multiplyFactor;
-        //        extendedNormal[1] = planeNormal[1] * multiplyFactor;
-        //        extendedNormal[2] = planeNormal[2] * multiplyFactor;
-        //        Point3D RplaneOrigin = planeOrigin - extendedNormal;
-        //        planeR->SetOrigin(RplaneOrigin[0],RplaneOrigin[1],RplaneOrigin[2]);
-        //        planeR->SetNormal(-planeNormal[0],-planeNormal[1],-planeNormal[2]);
-        //        MITK_DEBUG << "RPlaneOrigin: " << RplaneOrigin[0] << " | " << RplaneOrigin[1]
-        //                  << " | " << RplaneOrigin[2];
-
         /* get all points/fibers cutting the plane */
         MITK_DEBUG << "start clipping";
         vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
@@ -774,41 +758,10 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
         vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
         MITK_DEBUG << "end clipping";
 
-        /* for some reason clipperoutput is not initialized for futher processing
-      * so far only writing out clipped polydata provides requested
-      */
-        //        MITK_DEBUG << "writing clipper output";
-        //        vtkSmartPointer<vtkPolyDataWriter> writerC = vtkSmartPointer<vtkPolyDataWriter>::New();
-        //        writerC->SetInput(clipperout1);
-        //        writerC->SetFileName("/vtkOutput/Clipping.vtk");
-        //        writerC->SetFileTypeToASCII();
-        //        writerC->Write();
-        //        MITK_DEBUG << "writing done";
-
         MITK_DEBUG << "init and update clipperoutput";
         clipperout->GetPointData()->Initialize();
         clipperout->Update();
         MITK_DEBUG << "init and update clipperoutput completed";
-
-        //        MITK_DEBUG << "start clippingRecursive";
-        //        vtkSmartPointer<vtkClipPolyData> Rclipper = vtkSmartPointer<vtkClipPolyData>::New();
-        //        Rclipper->SetInput(clipperout1);
-        //        Rclipper->SetClipFunction(planeR);
-        //        Rclipper->GenerateClipScalarsOn();
-        //        Rclipper->GenerateClippedOutputOn();
-        //        vtkSmartPointer<vtkPolyData> clipperout = Rclipper->GetClippedOutput();
-        //        MITK_DEBUG << "end clipping recursive";
-
-        //        MITK_DEBUG << "writing clipper output 2";
-        //        vtkSmartPointer<vtkPolyDataWriter> writerC1 = vtkSmartPointer<vtkPolyDataWriter>::New();
-        //        writerC1->SetInput(clipperout);
-        //        writerC1->SetFileName("/vtkOutput/RClipping.vtk");
-        //        writerC1->SetFileTypeToASCII();
-        //        writerC1->Write();
-        //        MITK_DEBUG << "init and update clipperoutput";
-        //        clipperout->GetPointData()->Initialize();
-        //        clipperout->Update();
-        //        MITK_DEBUG << "init and update clipperoutput completed";
 
         MITK_DEBUG << "STEP 1: find all points which have distance 0 to the given plane";
         /*======STEP 1======
@@ -827,13 +780,6 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
             if (distance[0] >= -0.01 && distance[0] <= 0.01)
                 PointsOnPlane.push_back(i);
         }
-
-        // DEBUG print out all interesting points, stop where array starts with value -1. after -1 no more interesting idx are set!
-        //        std::vector<int>::iterator rit = PointsOnPlane.begin();
-        //        while (rit != PointsOnPlane.end() ) {
-        //            std::cout << "interesting point: " << *rit << " coord: " << clipperout->GetPoint(*rit)[0] << " | " <<  clipperout->GetPoint(*rit)[1] << " | " << clipperout->GetPoint(*rit)[2] << endl;
-        //            rit++;
-        //        }
 
 
         MITK_DEBUG << "Num Of points on plane: " <<  PointsOnPlane.size();
@@ -1132,6 +1078,9 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
     if (axis>2)
         return;
 
+    MITK_INFO << "Mirroring fibers";
+    boost::progress_display disp(m_NumFibers);
+
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();
 
@@ -1139,6 +1088,7 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
     vLines->InitTraversal();
     for (int i=0; i<m_NumFibers; i++)
     {
+        ++disp ;
         vtkIdType   numPoints(0);
         vtkIdType*  pointIds(NULL);
         vLines->GetNextCell ( numPoints, pointIds );
@@ -1161,9 +1111,9 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
     UpdateFiberGeometry();
 }
 
-bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
+bool mitk::FiberBundleX::ApplyCurvatureThreshold(float minRadius, bool deleteFibers)
 {
-    if (maxDeg<=0 || mm<=0)
+    if (minRadius<0)
         return true;
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
@@ -1171,18 +1121,17 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
     vtkSmartPointer<vtkCellArray> vtkOldCells = m_FiberPolyData->GetLines();
     vtkOldCells->InitTraversal();
 
+    MITK_INFO << "Applying curvature threshold";
+    boost::progress_display disp(m_FiberPolyData->GetNumberOfCells());
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
-        MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
+        ++disp ;
         vtkIdType   numPoints(0);
         vtkIdType*  points(NULL);
         vtkOldCells->GetNextCell ( numPoints, points );
 
-        float curv = 0;
-        float dist = 0;
         // calculate curvatures
         vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-
         for (int j=0; j<numPoints-2; j++)
         {
             double p1[3];
@@ -1192,7 +1141,7 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
             double p3[3];
             m_FiberPolyData->GetPoint(points[j+2], p3);
 
-            vnl_vector_fixed< float, 3 > v1, v2;
+            vnl_vector_fixed< float, 3 > v1, v2, v3;
 
             v1[0] = p2[0]-p1[0];
             v1[1] = p2[1]-p1[1];
@@ -1202,35 +1151,36 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float maxDeg, float mm)
             v2[1] = p3[1]-p2[1];
             v2[2] = p3[2]-p2[2];
 
-            dist += v1.magnitude()+v2.magnitude();
-            v1.normalize(); v2.normalize();
-            curv += 180*acos(dot_product(v1,v2))/M_PI;
+            v3[0] = p1[0]-p3[0];
+            v3[1] = p1[1]-p3[1];
+            v3[2] = p1[2]-p3[2];
+
+            float a = v1.magnitude();
+            float b = v2.magnitude();
+            float c = v3.magnitude();
+            float r = a*b*c/std::sqrt((a+b+c)*(a+b-c)*(b+c-a)*(a-b+c)); // radius of triangle via Heron's formula (area of triangle)
 
             vtkIdType id = vtkNewPoints->InsertNextPoint(p1);
             container->GetPointIds()->InsertNextId(id);
 
-            if (m_RemoveFibers && dist>=mm && curv>maxDeg)
+            if (deleteFibers && r<minRadius)
                 break;
 
-            if (j==numPoints-3)
+            if (r<minRadius)
+            {
+                j += 2;
+//                id = vtkNewPoints->InsertNextPoint(p2);
+//                container->GetPointIds()->InsertNextId(id);
+                vtkNewCells->InsertNextCell(container);
+                container = vtkSmartPointer<vtkPolyLine>::New();
+            }
+            else if (j==numPoints-3)
             {
                 id = vtkNewPoints->InsertNextPoint(p2);
                 container->GetPointIds()->InsertNextId(id);
                 id = vtkNewPoints->InsertNextPoint(p3);
                 container->GetPointIds()->InsertNextId(id);
                 vtkNewCells->InsertNextCell(container);
-            }
-            else if (dist>=mm)
-            {
-                if (curv>maxDeg)
-                {
-                    id = vtkNewPoints->InsertNextPoint(p2);
-                    container->GetPointIds()->InsertNextId(id);
-                    vtkNewCells->InsertNextCell(container);
-                    container = vtkSmartPointer<vtkPolyLine>::New();
-                }
-                dist = 0;
-                curv = 0;
             }
         }
     }
@@ -1261,9 +1211,12 @@ bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
     vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
     vLines->InitTraversal();
     float min = m_MaxFiberLength;
+
+    MITK_INFO << "Removing short fibers";
+    boost::progress_display disp(m_NumFibers);
     for (int i=0; i<m_NumFibers; i++)
     {
-        MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
+        ++disp;
         vtkIdType   numPoints(0);
         vtkIdType*  pointIds(NULL);
         vLines->GetNextCell ( numPoints, pointIds );
@@ -1307,9 +1260,12 @@ bool mitk::FiberBundleX::RemoveLongFibers(float lengthInMM)
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();
     vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
     vLines->InitTraversal();
+
+    MITK_INFO << "Removing long fibers";
+    boost::progress_display disp(m_NumFibers);
     for (int i=0; i<m_NumFibers; i++)
     {
-        MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
+        ++disp;
         vtkIdType   numPoints(0);
         vtkIdType*  pointIds(NULL);
         vLines->GetNextCell ( numPoints, pointIds );
@@ -1348,9 +1304,11 @@ void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm)
     vLines->InitTraversal();
     vtkIdType pointHelperCnt = 0;
 
+    MITK_INFO << "Resampling fibers";
+    boost::progress_display disp(m_NumFibers);
     for (int i=0; i<m_NumFibers; i++)
     {
-        MITK_INFO << "Processing fiber " << i << "/" << m_NumFibers;
+        ++disp;
         vtkIdType   numPoints(0);
         vtkIdType*  pointIds(NULL);
         vLines->GetNextCell ( numPoints, pointIds );
@@ -1413,8 +1371,11 @@ void mitk::FiberBundleX::ResampleFibers(float pointDistance)
     vLines->InitTraversal();
     int numberOfLines = m_NumFibers;
 
+    MITK_INFO << "Resampling fibers";
+    boost::progress_display disp(m_NumFibers);
     for (int i=0; i<numberOfLines; i++)
     {
+        ++disp;
         vtkIdType   numPoints(0);
         vtkIdType*  points(NULL);
         vLines->GetNextCell ( numPoints, points );

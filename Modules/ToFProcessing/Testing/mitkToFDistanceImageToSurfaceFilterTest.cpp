@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <mitkToFSurfaceGenerationFilter.h>
 
 #include <mitkImage.h>
+#include <mitkImageGenerator.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
 #include <mitkVector.h>
@@ -47,7 +48,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   // create test image
   unsigned int dimX =204;
   unsigned int dimY =204;
-  mitk::Image::Pointer image = mitk::ToFTestingCommon::CreateTestImage(dimX,dimY);
+  mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(dimX,dimY);
   //initialize intrinsic parameters with some arbitrary values
   ToFScalarType focalLengthX = 295.78960;
   ToFScalarType focalLengthY = 296.348535;

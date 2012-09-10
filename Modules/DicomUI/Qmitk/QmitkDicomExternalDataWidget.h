@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkDICOMDatabase.h>
 #include <ctkDICOMModel.h>
 #include <ctkDICOMIndexer.h>
-#include <ctkFileDialog.h>
 
 //include QT
 #include <QWidget>
@@ -71,55 +70,50 @@ public:
    void Initialize();
 
 signals:
-    void SignalChangePage(int);
-    void SignalAddDicomData(const QString&);
-    void SignalAddDicomData(const QStringList&);
+
+    /// @brief emitted when import into database is finished.
+    void SignalStartDicomImport(const QStringList&);
+
+        /// @brief emitted when import into database is finished.
+    void SignalFinishedImport();
+
+    /// @brief emitted when view button is clicked.
     void SignalDicomToDataManager(const QStringList&);
+    void SignalProgress(int);
+    void SignalProcessingFile(QString);
+    void SignalCancelImport();
 
-   public slots:
+public slots:
 
-       /// @brief Called when import CD or import Folder was clicked.
-       void OnFolderCDImport();
+    /// @brief Called when download button was clicked.
+    void OnDownloadButtonClicked();
 
-       /// @brief Called when import directory was selected.
-       void OnFileSelectedAddExternalData(QString);
+    /// @brief Called when view button was clicked.
+    void OnViewButtonClicked();
 
-       /// @brief Called when download button was clicked.
-       void OnDownloadButtonClicked();
+    /// @brief   Called when search parameters change.
+    void OnSearchParameterChanged();
 
-       /// @brief Called when view button was clicked.
-       void OnViewButtonClicked();
-    
-       /// @brief Called when cancel button was clicked.
-       void OnCancelButtonClicked();
+    /// @brief   Called when adding a dicom directory. Starts a thread adding the directory.
+    void OnStartDicomImport(const QString&);
 
-       /// @brief   Called when search parameters change.
-        void OnSearchParameterChanged();
-
-        /// @brief   Called when import progress change.
-        void OnProgress(int progress);
+    /// @brief Called when indexing into database is finished.
+    /// In this slot the models database with new imports is set.
+    /// This causes a model update.
+    void OnFinishedImport();
 
 protected:
 
     /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index will be returned.
-    void GetFileNamesFromIndex(QStringList& filePaths);
-
-    void AddDicomTemporary(QString directory);
+    QStringList GetFileNamesFromIndex();
 
     ctkDICOMDatabase* m_ExternalDatabase;
     ctkDICOMModel* m_ExternalModel;
     ctkDICOMIndexer* m_ExternalIndexer;
-    
-    ctkFileDialog* m_ImportDialog;
-    QProgressDialog* m_ProgressDialog;
-    QLabel* m_ProgressDialogLabel;
 
     Ui::QmitkDicomExternalDataWidgetControls* m_Controls;
 
-    QFuture<void> m_Future;
-    QFutureWatcher<void> m_Watcher;
-    QTimer* m_Timer;
-    QString* m_DirectoryName;
+    QString m_LastImportDirectory;
 
 };
 

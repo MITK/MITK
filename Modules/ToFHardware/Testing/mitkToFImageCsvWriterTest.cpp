@@ -69,8 +69,8 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   csvWriter->SetAmplitudeImageFileName(amplitudeImageFileName);
   csvWriter->SetIntensityImageFileName(intensityImageFileName);
 
-  csvWriter->SetCaptureWidth(dimX);
-  csvWriter->SetCaptureHeight(dimY);
+  csvWriter->SetToFCaptureWidth(dimX);
+  csvWriter->SetToFCaptureHeight(dimY);
   csvWriter->SetToFImageType(mitk::ToFImageWriter::ToFImageType3D);
 
   mitk::ImageSliceSelector::Pointer distanceSelector = mitk::ImageSliceSelector::New();

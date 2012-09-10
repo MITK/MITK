@@ -36,11 +36,11 @@ A sequence diagram, which illustrates the actions after calling the Render() fun
 
 \section QVTKRendering_programmerGuide User Guide: Programming hints for rendering related stuff (in plugins)
 
-\li The QmitkRenderWindow can be accessed like this: this->GetRenderWindowPart()->GetRenderWindow("transversal");
-\li The vtkRenderWindow can be accessed like this: this->GetRenderWindowPart()->GetRenderWindow("transversal")->GetVtkRenderWindow();
+\li The QmitkRenderWindow can be accessed like this: this->GetRenderWindowPart()->GetRenderWindow("axial");
+\li The vtkRenderWindow can be accessed like this: this->GetRenderWindowPart()->GetRenderWindow("axial")->GetVtkRenderWindow();
 \li The mitkBaseRenderer can be accessed like this: mitk::BaseRenderer* renderer  = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow());
 \li An update request of the overall QmitkStdMultiWidget can be performed with: this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
-\li A single QmitkRenderWindow update request can be done like this: this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdate(this->GetRenderWindowPart()->GetRenderWindow("transversal")->GetVtkRenderWindow());
+\li A single QmitkRenderWindow update request can be done like this: this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdate(this->GetRenderWindowPart()->GetRenderWindow("axial")->GetVtkRenderWindow());
 
 \note The usage of ForceImmediateUpdateAll() is not desired in most common use-cases.
 

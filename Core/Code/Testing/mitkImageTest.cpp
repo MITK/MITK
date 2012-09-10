@@ -284,6 +284,8 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetGeometry()->GetSpacing() == image->GetGeometry()->GetSpacing(), "Clone (testing spacing)");
   MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetGeometry()->GetIndexToWorldTransform()->GetMatrix(), image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix()),
                                "Clone (testing transformation matrix)");
+  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(cloneImage->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix(), 
+    cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(image->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix()), "Clone(testing time sliced geometry)");
 
   for (unsigned int i = 0u; i < cloneImage->GetDimension(); ++i)
   {

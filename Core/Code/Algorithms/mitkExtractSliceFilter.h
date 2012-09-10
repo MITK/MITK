@@ -34,7 +34,7 @@ namespace mitk
   /**
   \brief ExtractSliceFilter extracts a 2D abitrary oriented slice from a 3D volume.
 
-  The filter can reslice in all orthogonal planes such as sagittal, coronal and transversal,
+  The filter can reslice in all orthogonal planes such as sagittal, coronal and axial,
   and is also able to reslice a abitrary oriented oblique plane.
   Curved planes are specified via an AbstractTransformGeometry as the input worldgeometry.
 
@@ -160,7 +160,7 @@ namespace mitk
 
     ResliceInterpolation m_InterpolationMode;
 
-    const Geometry3D* m_ResliceTransform;
+    Geometry3D::ConstPointer m_ResliceTransform;
 
     bool m_InPlaneResampleExtentByGeometry;//Resampling grid corresponds to:  false->image    true->worldgeometry
 

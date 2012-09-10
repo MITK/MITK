@@ -135,7 +135,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   this->GetDataNode()->GetBoolProperty("show contour", makeContour);
   if (makeContour)
   {
-    this->CreateContour(NULL);
+    this->CreateContour();
   }
 
   //now fill selected and unselected pointList
@@ -530,13 +530,9 @@ void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRende
   //check if a contour shall be drawn
   bool makeContour = false;
   this->GetDataNode()->GetBoolProperty("show contour", makeContour, renderer);
-  int visibleBefore = m_ContourActor->GetVisibility();
   if(makeContour && (m_ContourActor != NULL) )
   {
-    if ( visibleBefore == 0)
-    {//was not visible before, so create it.
-      this->CreateContour(renderer);
-    }
+    this->CreateContour();
     m_ContourActor->GetProperty()->SetColor(contourColor);
     m_ContourActor->GetProperty()->SetOpacity(opacity);
   }
@@ -549,7 +545,7 @@ void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRende
 
 }
 
-void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::CreateContour()
 {
   vtkSmartPointer<vtkAppendPolyData> vtkContourPolyData = vtkSmartPointer<vtkAppendPolyData>::New();
   vtkSmartPointer<vtkPolyDataMapper> vtkContourPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New(); 
@@ -580,11 +576,8 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
       polys->InsertNextCell(2,cell);
   }
 
-  bool close;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetPropertyList()->GetProperty("close contour"), renderer) == NULL)
-    close = false;
-  else
-    close = dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetPropertyList()->GetProperty("close contour"), renderer)->GetValue();
+  bool close = false;
+  this->GetDataNode()->GetBoolProperty("close contour", close);
   if (close) 
   {
     vtkIdType cell[2] = {j-1,0};
@@ -625,6 +618,7 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
   node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
   node->AddProperty( "contoursize", mitk::FloatProperty::New(0.5), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );

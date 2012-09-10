@@ -52,8 +52,10 @@ namespace mitk
     itkGetMacro( IntensityImageFileName, std::string );
     itkGetMacro( RGBImageFileName, std::string );
     itkGetMacro( Extension, std::string );
-    itkGetMacro( CaptureWidth, int );
-    itkGetMacro( CaptureHeight, int );
+    itkGetMacro( ToFCaptureWidth, int );
+    itkGetMacro( ToFCaptureHeight, int );
+    itkGetMacro( RGBCaptureWidth, int );
+    itkGetMacro( RGBCaptureHeight, int );
     itkGetMacro( DistanceImageSelected, bool );
     itkGetMacro( AmplitudeImageSelected, bool );
     itkGetMacro( IntensityImageSelected, bool );
@@ -64,8 +66,10 @@ namespace mitk
     itkSetMacro( IntensityImageFileName, std::string );
     itkSetMacro( RGBImageFileName, std::string );
     itkSetMacro( Extension, std::string );
-    itkSetMacro( CaptureWidth, int );
-    itkSetMacro( CaptureHeight, int );
+    itkSetMacro( ToFCaptureWidth, int );
+    itkSetMacro( ToFCaptureHeight, int );
+    itkSetMacro( RGBCaptureWidth, int );
+    itkSetMacro( RGBCaptureHeight, int );
     itkSetMacro( DistanceImageSelected, bool );
     itkSetMacro( AmplitudeImageSelected, bool );
     itkSetMacro( IntensityImageSelected, bool );
@@ -109,10 +113,14 @@ namespace mitk
     std::string m_RGBImageFileName; ///< file name for saving the RGB image
     std::string m_Extension; ///< file extension used for saving images
 
-    int m_CaptureWidth; ///< width (x-dimension) of the images to record.
-    int m_CaptureHeight; ///< height (y-dimension) of the images to record.
-    int m_PixelNumber; ///< number of pixels (widht*height) of the images to record
-    int m_ImageSizeInBytes; ///< size of the image to save in bytes
+    int m_ToFCaptureWidth; ///< width (x-dimension) of the images to record.
+    int m_ToFCaptureHeight; ///< height (y-dimension) of the images to record.
+    int m_ToFPixelNumber; ///< number of pixels (widht*height) of the images to record
+    int m_ToFImageSizeInBytes; ///< size of the image to save in bytes
+    int m_RGBCaptureWidth; ///< width (x-dimension) of the images to record.
+    int m_RGBCaptureHeight; ///< height (y-dimension) of the images to record.
+    int m_RGBPixelNumber; ///< number of pixels (widht*height) of the images to record
+    int m_RGBImageSizeInBytes; ///< size of the image to save in bytes
     int m_NumOfFrames; ///< number of frames written to the image. Used for pic header.
     ToFImageWriter::ToFImageType m_ToFImageType; ///< type of image to be recorded: ToFImageType3D (0) or ToFImageType2DPlusT (1)
 

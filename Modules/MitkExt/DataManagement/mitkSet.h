@@ -128,7 +128,7 @@ public:
   int IndexOf(const T& obj) const
   {
     int index = -1;
-    typename std::vector<T>::const_iterator it = m_Objects.begin();
+
     for(unsigned int i=0; i<m_Objects.size(); ++i)
     {
       if(m_Objects.at(i) == obj)

@@ -94,7 +94,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="m_TransversalLabel">
+    <widget class="QLabel" name="m_AxialLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -102,12 +102,12 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Transversal</string>
+      <string>Axial</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1" colspan="3">
-    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorTransversal" native="true">
+    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorAxial" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>

@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
   //*************************************************************************
-  // Part Vb: 2D view for slicing transversally
+  // Part Vb: 2D view for slicing axially
   //*************************************************************************
 
   // Create QmitkSliceWidget, which is based on the class
@@ -160,10 +160,10 @@ int main(int argc, char* argv[])
   layout.addWidget(&view2);
 
   // Tell the QmitkSliceWidget which (part of) the tree to render.
-  // By default, it slices the data transversally
+  // By default, it slices the data axially
   view2.SetDataStorage(ds);
   mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetAll();
-  view2.SetData(rs->Begin(), mitk::SliceNavigationController::Transversal);
+  view2.SetData(rs->Begin(), mitk::SliceNavigationController::Axial);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
   ds->Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());

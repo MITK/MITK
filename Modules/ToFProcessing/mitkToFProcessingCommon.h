@@ -149,7 +149,7 @@ namespace mitk
     inline static ToFPoint3D IndexToCartesianCoordinatesWithInterpixdist(mitk::Index3D index, ToFScalarType distance, ToFScalarType focalLength,
       ToFPoint2D interPixelDistance, ToFPoint2D principalPoint)
     {
-      return IndexToCartesianCoordinatesWithInterpixdist(index[0],index[1],distance,focalLength,interPixelDistance[0], interPixelDistance[0],principalPoint[0], principalPoint[0]);
+      return IndexToCartesianCoordinatesWithInterpixdist(index[0],index[1],distance,focalLength,interPixelDistance[0], interPixelDistance[1],principalPoint[0], principalPoint[1]);
     }
     /*!
     \brief Convenience method to convert index based distances to cartesian coordinates using array as input

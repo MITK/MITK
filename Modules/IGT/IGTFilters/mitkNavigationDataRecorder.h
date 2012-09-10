@@ -70,11 +70,11 @@ public:
     * xml:  XML format, also default, can be read by NavigationDataPlayer
     * csv:  use to export in excel, matlab, etc.
     */
-	enum OutputFormatEnum
-	{
-	  xml,
-	  csv
-	};
+    enum OutputFormatEnum
+    {
+      xml,
+      csv
+    };
 
     /**
     * \brief sets the file name for the OutputMode NormalFile and ZipFile
@@ -130,15 +130,22 @@ public:
                                  , const std::string& attributeValue );
     void RemoveAdditionalAttribute( const NavigationData* nd );
 
-    /**Documentation
-    * \brief Starts the recording with the presetted OutputMode 
-    * this method calls StartRecording(std::ostream*)
-    */
+    /**
+     * Documentation
+     * \brief Starts the recording with the presetted OutputMode.
+     *        This method calls StartRecording(std::ostream*). 
+     *        Does nothing if the recorder is already recording and 
+     *        the method StartRecording is called again.
+     * @throw mitk::IGTException Throws an exception if no file name or file path is set. 
+     */
     void StartRecording();
 
-    /**Documentation
-    * \brief Starts the recording with an own preinitialized stream
-    */
+    /**
+     * Documentation
+     * \brief Starts the recording with an own preinitialized stream
+     * Does nothing if it is already recording and method StartRecorded is called
+     * @throw mitk::IGTException Throws an exception if the stream is not good.
+     */
     void StartRecording(std::ostream* stream);
 
     /**Documentation
@@ -149,6 +156,7 @@ public:
     /**Documentation
     * \brief Every call of update causes one line for each added NavigationData in the output if the recording was started
     */
+
     virtual void Update();
 
 
@@ -158,11 +166,11 @@ public:
     */
     void SetRecordingMode(RecordingMode mode);
 
-	/**Documentation
+    /**Documentation
     * \brief Sets the output format which causes different formats of output streams. The XML format is default.
     *  Also see enum OutputFormat for more information.
     */
-	itkSetMacro(OutputFormat,mitk::NavigationDataRecorder::OutputFormatEnum);
+    itkSetMacro(OutputFormat,mitk::NavigationDataRecorder::OutputFormatEnum);
 
 protected:
 
@@ -186,7 +194,7 @@ protected:
 
     RecordingMode m_RecordingMode; ///< stores the mode see enum RecordingMode
 
-  	OutputFormatEnum m_OutputFormat; ///< stores the output format; see enum OutputFormat
+    OutputFormatEnum m_OutputFormat; ///< stores the output format; see enum OutputFormat
 
     bool m_Recording; ///< indicates whether the recording is started or not
 

@@ -33,6 +33,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
+#include <mitkShowSegmentationAsSurface.h>
+#include "mitkManualSegmentationToSurfaceFilter.h"
+#include <mitkSegmentationSink.h>
+
+#include <mitkImageStatisticsHolder.h>
+
+
+#include <itkBinaryThresholdImageFilter.h>
+
 
 const std::string QmitkRigidRegistrationView::VIEW_ID = "org.mitk.views.rigidregistration";
 
@@ -237,10 +246,13 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect( m_Controls.m_ManualRegistrationCheckbox, SIGNAL(toggled(bool)), this, SLOT(ShowManualRegistrationFrame(bool)));
   connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
+  connect(m_Controls.m_ShowContour, SIGNAL(toggled(bool)), this, SLOT(EnableContour(bool)));
   connect(m_Controls.m_UseFixedImageMask, SIGNAL(toggled(bool)), this, SLOT(UseFixedMaskImageChecked(bool)));
   connect(m_Controls.m_UseMovingImageMask, SIGNAL(toggled(bool)), this, SLOT(UseMovingMaskImageChecked(bool)));
   connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(valueChanged(int)), this, SLOT(OpacityUpdate(int)));
+  connect(m_Controls.m_ContourSlider, SIGNAL(sliderReleased()), this, SLOT(ShowContour()));
+
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
   connect(m_Controls.m_UndoTransformation,SIGNAL(clicked()),this,SLOT(UndoTransformation()));
   connect(m_Controls.m_RedoTransformation,SIGNAL(clicked()),this,SLOT(RedoTransformation()));
@@ -382,6 +394,12 @@ void QmitkRigidRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* no
     m_Controls.m_ShowRedGreenValues->setEnabled(false);
     m_Controls.m_SwitchImages->hide();
   }
+
+  else if(node == m_ContourHelperNode)
+  {
+    // can this cause a memory leak?
+    m_ContourHelperNode = NULL;
+  }
 }
 
 void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImage)
@@ -435,6 +453,18 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImag
       this->CheckForMaskImages();
       m_FixedMaskNode = NULL;
     }
+
+    // Modify slider range
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
+    int min = (int)image->GetStatistics()->GetScalarValueMin();
+    int max = (int)image->GetStatistics()->GetScalarValueMax();
+    m_Controls.m_ContourSlider->setRange(min, max);
+
+    // Set slider to a default value
+    int avg = (min+max) / 2;
+    m_Controls.m_ContourSlider->setSliderPosition(avg);
+    m_Controls.m_ThresholdLabel->setText(QString::number(avg));
+
   }
   else
   {
@@ -635,6 +665,101 @@ void QmitkRigidRegistrationView::ShowRedGreen(bool redGreen)
   m_ShowRedGreen = redGreen;
   this->SetImageColor(m_ShowRedGreen);
 }
+
+void QmitkRigidRegistrationView::EnableContour(bool show)
+{
+  if(show)
+    ShowContour();
+
+  // Can happen when the m_ContourHelperNode was deleted before and now the show contour checkbox is turned off
+  if(m_ContourHelperNode.IsNull())
+    return;
+
+  m_Controls.m_ContourSlider->setEnabled(show);
+  m_ContourHelperNode->SetProperty("visible", mitk::BoolProperty::New(show));
+
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+
+}
+
+void QmitkRigidRegistrationView::ShowContour()
+{
+  int threshold = m_Controls.m_ContourSlider->value();
+
+  bool show = m_Controls.m_ShowContour->isChecked();
+
+  if(m_FixedNode.IsNull() || !show)
+    return;
+
+
+  // Update the label next to the slider
+  m_Controls.m_ThresholdLabel->setText(QString::number(threshold));
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
+
+  typedef itk::Image<float,3> FloatImageType;
+  typedef itk::Image<short,3> ShortImageType;
+
+  // Create a binary image using the given treshold
+  typedef itk::BinaryThresholdImageFilter<FloatImageType, ShortImageType> ThresholdFilterType;
+
+  FloatImageType::Pointer floatImage = FloatImageType::New();
+  mitk::CastToItkImage(image, floatImage);
+
+
+  ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
+  thresholdFilter->SetInput(floatImage);
+  thresholdFilter->SetLowerThreshold(threshold);
+  thresholdFilter->SetUpperThreshold((int)image->GetStatistics()->GetScalarValueMax());
+  thresholdFilter->SetInsideValue(1);
+  thresholdFilter->SetOutsideValue(0);
+  thresholdFilter->Update();
+
+  ShortImageType::Pointer binaryImage = thresholdFilter->GetOutput();
+  mitk::Image::Pointer mitkBinaryImage = mitk::Image::New();
+  mitk::CastToMitkImage(binaryImage, mitkBinaryImage);
+
+
+
+
+  // Create a contour from the binary image
+  mitk::ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = mitk::ManualSegmentationToSurfaceFilter::New();
+  surfaceFilter->SetInput( mitkBinaryImage );
+  surfaceFilter->SetThreshold( 1 ); //expects binary image with zeros and ones
+  surfaceFilter->SetUseGaussianImageSmooth(false); // apply gaussian to thresholded image ?
+  surfaceFilter->SetMedianFilter3D(false); // apply median to segmentation before marching cubes ?
+  surfaceFilter->SetDecimate( mitk::ImageToSurfaceFilter::NoDecimation );
+
+  surfaceFilter->UpdateLargestPossibleRegion();
+
+  // calculate normals for nicer display
+  mitk::Surface::Pointer surface = surfaceFilter->GetOutput();
+
+
+  if(m_ContourHelperNode.IsNull())
+  {
+    m_ContourHelperNode = mitk::DataNode::New();
+    m_ContourHelperNode->SetData(surface);
+    m_ContourHelperNode->SetProperty("opacity", mitk::FloatProperty::New(1.0) );
+    m_ContourHelperNode->SetProperty("line width", mitk::IntProperty::New(2) );
+    m_ContourHelperNode->SetProperty("scalar visibility", mitk::BoolProperty::New(false) );
+    m_ContourHelperNode->SetProperty( "name", mitk::StringProperty::New("surface") );
+    m_ContourHelperNode->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0));
+    m_ContourHelperNode->SetBoolProperty("helper object", true);
+    this->GetDataStorage()->Add(m_ContourHelperNode);
+
+  }
+  else
+  {
+    m_ContourHelperNode->SetData(surface);
+  }
+
+
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+
+
+}
+
 
 void QmitkRigidRegistrationView::SetImageColor(bool redGreen)
 {
@@ -1272,4 +1397,14 @@ void QmitkRigidRegistrationView::SwitchImages()
   mitk::DataNode::Pointer newFixed = m_MovingNode;
   this->FixedSelected(newFixed);
   this->MovingSelected(newMoving);
+
+  if(m_ContourHelperNode.IsNotNull())
+  {
+
+    // Update the contour
+    ShowContour();
+
+
+  }
+
 }

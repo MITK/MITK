@@ -12,23 +12,25 @@ endif(MITK_USE_MICROBIRD_TRACKER)
 
 MITK_CREATE_MODULE(MitkIGT
   SUBPROJECTS MITK-IGT
-  INCLUDE_DIRS IGTFilters IGTTrackingDevices IGTToolManagement
+  INCLUDE_DIRS IGTFilters IGTTrackingDevices IGTToolManagement IGTExceptionHandling
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   DEPENDS Mitk tinyxml SceneSerialization
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
 )
 
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/ClaronMicron.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/IntuitiveDaVinci.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAurora.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAurora_Dome.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraCompactFG_Dome.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraPlanarFG_Dome.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraTabletopFG_Dome.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraTabletopFG_Prototype_Dome.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIPolaris.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIPolarisVicra.stl )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/StandardVolume.stl )
+if(MitkIGT_IS_ENABLED)
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/ClaronMicron.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/IntuitiveDaVinci.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAurora.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAurora_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraCompactFG_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraPlanarFG_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraTabletopFG_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraTabletopFG_Prototype_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIPolaris.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIPolarisVicra.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/StandardVolume.stl )
+endif()
 
 MITK_CHECK_MODULE(_RESULT MitkIGT)
 if(_RESULT)

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include<QObject>
 #include<QString>
+#include<QHash>
 #include <QStringList>
 #include <QFileSystemWatcher>
 #include <QDir>
@@ -33,46 +34,62 @@ class QmitkDicomDirectoryListener : public QObject
 public:
 
     QmitkDicomDirectoryListener();
-    
+
     virtual ~QmitkDicomDirectoryListener();
 
     /// @brief sets listened directory, note that only one directory can be set.
     void SetDicomListenerDirectory(const QString&);
 
     /// @brief get filepath to the listened directory.
-    const QString& GetDicomListenerDirectory();
+    QString GetDicomListenerDirectory();
+
+    /// @brief get the status whether the directorey listener is listening or not.
+    bool IsListening();
+
+    /// @brief set the directory listener listening.
+    void SetListening(bool listening);
 
 signals:
-    /// @brief signal starts the dicom import of the given file (the QStringList will only contain one file here).
-    void SignalAddDicomData(const QStringList&);
+    /// @brief signal starts the dicom import of the given file list.
+    void SignalStartDicomImport(const QStringList&);
 
 public slots:
     /// \brief called when listener directory changes
     void OnDirectoryChanged(const QString&);
 
-    /// \brief called when import is finished
-    void OnDicomImportFinished(const QStringList&);
+    /// \brief called when error occours during dicom store request
+    void OnDicomNetworkError(const QString&);
 
+    /// \brief called when import of files is finished.
+    void OnImportFinished();
 
 
 protected:
 
-    /// \brief creates directory if it's not already existing.  
+    /// \brief creates directory if it's not already existing.
     void CreateListenerDirectory(const QDir& directory);
 
-    /// \brief checks wheter the given directory is the only directory that is listened.
-    bool isOnlyListenedDirectory(const QString& directory);
-
-    /// \brief Composes the filename and initializes m_LastRetrievedFile with it
+    /// \brief Composes the filename and initializes m_LastRetrievedFile with it.
     void SetFilesToImport();
 
-    /// \brief removes files from 
-    void RemoveFilesFromDirectoryAndImportingFilesList(const QStringList& files);
+    /// \brief removes files from listener directory.
+    void RemoveTemporaryFiles();
+
+    /// \brief removes files in the files list from listener directory.
+    void RemoveTemporaryFiles(const QStringList& files);
+
+    /// \brief removes entries from m_AlreadyImportedFiles hash table.
+    void RemoveAlreadyImportedEntries(const QStringList& files);
 
     QFileSystemWatcher* m_FileSystemWatcher;
+
     QStringList m_FilesToImport;
-    QStringList m_ImportingFiles;
-    QString m_DicomListenerDirectory;
+
+    QHash<QString,QString> m_AlreadyImportedFiles;
+
+    QDir m_DicomListenerDirectory;
+
+    bool m_IsListening;
 };
 
 #endif // QmitkDicomListener_h

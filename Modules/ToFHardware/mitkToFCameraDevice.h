@@ -55,11 +55,11 @@ namespace mitk
     /*!
     \brief stops the continuous updating of the camera
     */
-    virtual void StopCamera() = 0;
+    virtual void StopCamera();
     /*!
     \brief returns true if the camera is connected and started
     */
-    virtual bool IsCameraActive() = 0;
+    virtual bool IsCameraActive();
     /*!
     \brief updates the camera for image acquisition
     */
@@ -172,6 +172,10 @@ namespace mitk
     */
     bool GetIntProperty(const char *propertyKey, int& integer);
 
+    virtual int GetRGBCaptureWidth();
+
+    virtual int GetRGBCaptureHeight();
+
   protected:
 
     ToFCameraDevice();
@@ -197,6 +201,9 @@ namespace mitk
     int m_CaptureWidth; ///< width of the range image (x dimension)
     int m_CaptureHeight; ///< height of the range image (y dimension)
     int m_PixelNumber; ///< number of pixels in the range image (m_CaptureWidth*m_CaptureHeight)
+    int m_RGBImageWidth;
+    int m_RGBImageHeight;
+    int m_RGBPixelNumber;
     int m_SourceDataSize; ///< size of the PMD source data
     itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
     itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the range camera

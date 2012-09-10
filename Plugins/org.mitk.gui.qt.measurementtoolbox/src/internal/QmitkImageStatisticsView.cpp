@@ -46,7 +46,6 @@ m_DataNodeSelectionChanged ( false ),
 m_Visible(false)
 {
   this->m_CalculationThread = new QmitkImageStatisticsCalculationThread;
-  this->m_SelectedDataNodes = SelectedDataNodeVectorType(2);    // maximum number of selected nodes is exactly two!
 }
 
 QmitkImageStatisticsView::~QmitkImageStatisticsView()
@@ -153,7 +152,14 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
 void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*part*/,
                                                   const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
-  this->SelectionChanged( selectedNodes );
+  if (this->m_Visible)
+  {
+    this->SelectionChanged( selectedNodes );
+  }
+  else
+  {
+    this->m_DataNodeSelectionChanged = true;
+  }
 }
 
 void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Pointer> &selectedNodes)
@@ -163,6 +169,21 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
     this->m_DataNodeSelectionChanged = true;
     return; // not ready for new data now!
   }
+
+  if (selectedNodes.size() == this->m_SelectedDataNodes.size())
+  {
+    int i = 0;
+    for (; i < selectedNodes.size(); ++i)
+    {
+      if (selectedNodes.at(i) != this->m_SelectedDataNodes.at(i))
+      {
+        break;
+      }
+    }
+    // node selection did not change
+    if (i == selectedNodes.size()) return;
+  }
+
   this->ReinitData();
   if(selectedNodes.size() == 1 || selectedNodes.size() == 2)
   {
@@ -402,7 +423,7 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
   {
     if(this->m_DataNodeSelectionChanged)
     {
-      this->SelectionChanged( this->GetDataManagerSelection());  
+      this->SelectionChanged(this->GetCurrentSelection());
     }
     else
     {
@@ -436,7 +457,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
     m_Controls->m_HistogramWidget->SetHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
     m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
-    int timeStep = this->m_CalculationThread->GetTimeStep();
+    //int timeStep = this->m_CalculationThread->GetTimeStep();
     this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
   }
   else
@@ -559,8 +580,18 @@ void QmitkImageStatisticsView::Deactivated()
 void QmitkImageStatisticsView::Visible()
 {
   m_Visible = true;
-  this->OnSelectionChanged(this->GetSite()->GetPage()->FindView("org.mitk.views.datamanager"),
-    this->GetDataManagerSelection());
+  if (m_DataNodeSelectionChanged)
+  {
+    if (this->IsCurrentSelectionValid())
+    {
+      this->SelectionChanged(this->GetCurrentSelection());
+    }
+    else
+    {
+      this->SelectionChanged(this->GetDataManagerSelection());
+    }
+    m_DataNodeSelectionChanged = false;
+  }
 }
 
 void QmitkImageStatisticsView::Hidden()

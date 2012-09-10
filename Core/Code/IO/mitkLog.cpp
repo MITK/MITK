@@ -90,34 +90,53 @@ void mitk::LoggingBackend::Unregister()
 
 void mitk::LoggingBackend::SetLogFile(const char *file)
 {
-  logMutex.Lock();
-  if(logFile)
+  // closing old logfile
   {
-    MITK_INFO << "closing logfile (" << logFileName << ")" ;
-    logFile->close();
-    delete logFile;
-    logFile = 0;
+    bool closed = false;
+    std::string closedFileName;
+
+    logMutex.Lock();
+    if(logFile)
+    {
+      closed = true;
+      closedFileName = logFileName;
+      logFile->close();
+      delete logFile;
+      logFile = 0;
+      logFileName = "";
+    }
+    logMutex.Unlock();
+    if(closed)
+    {
+      MITK_INFO << "closing logfile (" << closedFileName << ")" ;
+    }
   }
+
+  // opening new logfile
   if(file)
   {
-      logFile = new std::ofstream( file,  std::ios_base::out | std::ios_base::app );
-      logFileName = file;
-    /*
-    if(*logFile)
+    logMutex.Lock();
+
+    logFileName = file;
+    logFile = new std::ofstream( );
+    
+    logFile->open( file,  std::ios_base::out | std::ios_base::app );
+    
+    if(logFile->good())
     {
-      std::cout << "opening logfile '" << file << "' for writing failed";
-      MITK_INFO << "logging to '" << file << "'";
+      logMutex.Unlock();
+      MITK_INFO << "Logfile: " << logFileName ;
     }
     else
     {
-      std::cerr << "opening logfile '" << file << "' for writing failed";
-      MITK_ERROR << "opening logfile '" << file << "' for writing failed";
       delete logFile;
       logFile = 0;
+      logMutex.Unlock();
+      MITK_WARN << "opening logfile '" << file << "' for writing failed";
     }
-    */
+
+    // mutex is now unlocked
   }
-  logMutex.Unlock();
 }
 
 std::string mitk::LoggingBackend::GetLogFile()

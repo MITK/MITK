@@ -99,28 +99,30 @@ void QmitkToFConnectionWidget::OnSelectCamera(const QString selectedCamera)
   if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
     (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw 2.0/3.0") )
   {
+    this->HideAllParameterWidgets();
     this->m_Controls->m_PMDParameterWidget->show();
-    this->m_Controls->m_MESAParameterWidget->hide();
-    this->m_Controls->m_KinectParameterWidget->hide();
   }
   else if (selectedCamera=="MESA Swissranger 4000")
   {
-    this->m_Controls->m_PMDParameterWidget->hide();
+    this->HideAllParameterWidgets();
     this->m_Controls->m_MESAParameterWidget->show();
-    this->m_Controls->m_KinectParameterWidget->hide();
   }
   else if (selectedCamera=="Microsoft Kinect")
   {
-    this->m_Controls->m_PMDParameterWidget->hide();
-    this->m_Controls->m_MESAParameterWidget->hide();
+    this->HideAllParameterWidgets();
     this->m_Controls->m_KinectParameterWidget->show();
   }
   else
   {
-    this->m_Controls->m_PMDParameterWidget->hide();
-    this->m_Controls->m_MESAParameterWidget->hide();
-    this->m_Controls->m_KinectParameterWidget->hide();
+    this->HideAllParameterWidgets();
   }
+}
+
+void QmitkToFConnectionWidget::HideAllParameterWidgets()
+{
+  this->m_Controls->m_PMDParameterWidget->hide();
+  this->m_Controls->m_MESAParameterWidget->hide();
+  this->m_Controls->m_KinectParameterWidget->hide();
 }
 
 void QmitkToFConnectionWidget::OnConnectCamera()
@@ -254,7 +256,6 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           }
           if (!itksys::SystemTools::FileExists(amplitudeImageFileName.c_str(), true))
           {
-            this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", "");
           }
           else
           {
@@ -288,31 +289,31 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           return;
         }
       }
-
-    }
-
-    this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
-    this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
-    this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
-
-    if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
-        (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw 2.0/3.0"))
-    {
-      this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
-    }
-    else if (selectedCamera=="MESA Swissranger 4000")
-    {
-      this->m_Controls->m_MESAParameterWidget->ActivateAllParameters();
-    }
-    else if (selectedCamera=="Microsoft Kinect")
-    {
-      this->m_Controls->m_KinectParameterWidget->ActivateAllParameters();
     }
     m_Controls->m_ConnectCameraButton->setText("Disconnect");
 
     //if a connection could be established
     if (this->m_ToFImageGrabber->ConnectCamera())
     {
+      this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
+      this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
+      this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
+
+      if ((selectedCamera == "PMD CamCube 2.0/3.0") || (selectedCamera == "PMD CamBoard") || 
+        (selectedCamera== "PMD O3D") || (selectedCamera== "PMD CamBoardRaw") || 
+        (selectedCamera== "PMD CamCubeRaw 2.0/3.0"))
+      {
+        this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
+      }
+      else if (selectedCamera=="MESA Swissranger 4000")
+      {
+        this->m_Controls->m_MESAParameterWidget->ActivateAllParameters();
+      }
+      else if (selectedCamera=="Microsoft Kinect")
+      {
+        this->m_Controls->m_KinectParameterWidget->ActivateAllParameters();
+      }
+
       // send connect signal to the caller functionality
       emit ToFCameraConnected();
     }

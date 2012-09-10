@@ -78,12 +78,12 @@ void PartSashContainer::SashContainerDropTarget::Drop()
 {
   if (side != Constants::NONE)
   {
-    StackablePart::Pointer visiblePart = sourcePart.Cast<StackablePart> ();
+    LayoutPart::Pointer visiblePart = sourcePart.Cast<LayoutPart> ();
 
-    if (sourcePart.Cast<IStackableContainer> () != 0)
+    if (sourcePart.Cast<ILayoutContainer> () != 0)
     {
       visiblePart = partSashContainer->GetVisiblePart(sourcePart.Cast<
-          IStackableContainer> ());
+          ILayoutContainer> ());
     }
 
     partSashContainer->DropObject(
@@ -93,7 +93,7 @@ void PartSashContainer::SashContainerDropTarget::Drop()
 }
 
 void PartSashContainer::DropObject(const std::vector<PartPane::Pointer>& toDrop,
-    StackablePart::Pointer visiblePart, Object::Pointer targetPart, int side)
+    LayoutPart::Pointer visiblePart, Object::Pointer targetPart, int side)
 {
   //getControl().setRedraw(false);
 
@@ -127,7 +127,7 @@ void PartSashContainer::DropObject(const std::vector<PartPane::Pointer>& toDrop,
 
       for (unsigned int idx = 0; idx < toDrop.size(); idx++)
       {
-        StackablePart::Pointer next = toDrop[idx];
+        LayoutPart::Pointer next = toDrop[idx];
         this->Stack(next, targetStack);
       }
     }
@@ -145,7 +145,7 @@ void PartSashContainer::DropObject(const std::vector<PartPane::Pointer>& toDrop,
 
     for (unsigned int idx = 0; idx < toDrop.size(); idx++)
     {
-      StackablePart::Pointer next = toDrop[idx];
+      LayoutPart::Pointer next = toDrop[idx];
       this->Stack(next, newPart);
     }
 
@@ -181,10 +181,10 @@ Rectangle PartSashContainer::SashContainerDropTarget::GetSnapRectangle()
     targetBounds = DragUtil::GetDisplayBounds(
         targetPart.Cast<LayoutPart> ()->GetControl());
   }
-  else if (targetPart.Cast<StackablePart> () != 0)
+  else if (targetPart.Cast<LayoutPart> () != 0)
   {
     targetBounds = DragUtil::GetDisplayBounds(
-        targetPart.Cast<StackablePart> ()->GetControl());
+        targetPart.Cast<LayoutPart> ()->GetControl());
   }
   else
   {
@@ -199,10 +199,10 @@ Rectangle PartSashContainer::SashContainerDropTarget::GetSnapRectangle()
   int distance = Geometry::GetDimension(targetBounds, !Geometry::IsHorizontal(
       side));
 
-  IStackableContainer::Pointer stack = targetPart.Cast<IStackableContainer> ();
-  if (stack == 0 && targetPart.Cast<StackablePart> () != 0)
+  ILayoutContainer::Pointer stack = targetPart.Cast<ILayoutContainer> ();
+  if (stack == 0 && targetPart.Cast<LayoutPart> () != 0)
   {
-    stack = targetPart.Cast<StackablePart> ()->GetContainer();
+    stack = targetPart.Cast<LayoutPart> ()->GetContainer();
   }
 
   return Geometry::GetExtrudedEdge(targetBounds, (int) (distance
@@ -236,8 +236,8 @@ std::vector<PartPane::Pointer> PartSashContainer::GetVisibleParts(
   else if (pane.Cast<PartStack> ().IsNotNull())
   {
     PartStack::Pointer stack = pane.Cast<PartStack> ();
-    std::list<StackablePart::Pointer> children = stack->GetChildren();
-    for (std::list<StackablePart::Pointer>::iterator iter = children.begin(); iter
+    std::list<LayoutPart::Pointer> children = stack->GetChildren();
+    for (std::list<LayoutPart::Pointer>::iterator iter = children.begin(); iter
         != children.end(); ++iter)
     {
       if (iter->Cast<PartPane> () != 0)
@@ -280,7 +280,7 @@ void PartSashContainer::Add(LayoutPart::Pointer child)
   this->AddEnhanced(child, Constants::RIGHT, 0.5f, this->FindBottomRight());
 }
 
-void PartSashContainer::AddPart(StackablePart::Pointer child)
+void PartSashContainer::AddPart(LayoutPart::Pointer child)
 {
   if (child.IsNull())
   {
@@ -693,7 +693,7 @@ Rectangle PartSashContainer::GetBounds()
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->parent);
 }
 
-ILayoutContainer::ChildrenType PartSashContainer::GetChildren()
+ILayoutContainer::ChildrenType PartSashContainer::GetChildren() const
 {
   return children;
 }
@@ -777,7 +777,7 @@ void PartSashContainer::FlushLayout()
 }
 
 void PartSashContainer::Replace(LayoutPart::Pointer oldChild,
-    LayoutPart::Pointer newChild)
+                                LayoutPart::Pointer newChild)
 {
 
   if (!this->IsChild(oldChild))
@@ -1001,7 +1001,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
       }
 
       if ((sourceContainer != 0) && (sourceContainer == targetPart)
-          && this->GetVisibleChildrenCount(sourceContainer.Cast<IStackableContainer>()) <= 1)
+          && this->GetVisibleChildrenCount(sourceContainer.Cast<ILayoutContainer>()) <= 1)
       {
         pointlessDrop = true;
       }
@@ -1037,7 +1037,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
 
     if (/*(this->IsStackType(sourceContainer) && sourceContainer == this)
         ||*/ (this->IsPaneType(sourcePart) && this->GetVisibleChildrenCount(
-            sourceContainer.Cast<IStackableContainer>()) <= 1) && sourceContainer->GetContainer() == this)
+            sourceContainer.Cast<ILayoutContainer>()) <= 1) && sourceContainer->GetContainer() == this)
     {
       if (root == 0 || this->GetVisibleChildrenCount(ILayoutContainer::Pointer(this)) <= 1)
       {
@@ -1078,8 +1078,8 @@ PartSashContainer::CreateDropTarget(
   return dropTarget;
 }
 
-void PartSashContainer::Stack(StackablePart::Pointer newPart,
-    IStackableContainer::Pointer container)
+void PartSashContainer::Stack(LayoutPart::Pointer newPart,
+    ILayoutContainer::Pointer container)
 {
   //this->GetControl().setRedraw(false);
 
@@ -1093,7 +1093,7 @@ void PartSashContainer::Stack(StackablePart::Pointer newPart,
     IViewReference::Pointer vRef = newPartRef.Cast<IViewReference> ();
     if (vRef != 0)
     {
-      StackablePart::Pointer fpp = pres->FindPart(vRef->GetId(),
+      LayoutPart::Pointer fpp = pres->FindPart(vRef->GetId(),
           vRef->GetSecondaryId());
 
       if (fpp != 0)
@@ -1117,9 +1117,9 @@ void PartSashContainer::Stack(StackablePart::Pointer newPart,
 
 }
 
-void PartSashContainer::DerefPart(StackablePart::Pointer sourcePart)
+void PartSashContainer::DerefPart(LayoutPart::Pointer sourcePart)
 {
-  IStackableContainer::Pointer container = sourcePart->GetContainer();
+  ILayoutContainer::Pointer container = sourcePart->GetContainer();
   if (container != 0)
   {
     container->Remove(sourcePart);
@@ -1137,7 +1137,7 @@ void PartSashContainer::DerefPart(StackablePart::Pointer sourcePart)
 }
 
 std::size_t PartSashContainer::GetVisibleChildrenCount(
-    IStackableContainer::Pointer container)
+    ILayoutContainer::Pointer container)
 {
   // Treat null as an empty container
   if (container == 0)
@@ -1145,10 +1145,10 @@ std::size_t PartSashContainer::GetVisibleChildrenCount(
     return 0;
   }
 
-  IStackableContainer::ChildrenType children = container->GetChildren();
+  ILayoutContainer::ChildrenType children = container->GetChildren();
 
   std::size_t count = 0;
-  for (IStackableContainer::ChildrenType::iterator iter = children.begin(); iter
+  for (ILayoutContainer::ChildrenType::iterator iter = children.begin(); iter
       != children.end(); ++iter)
   {
     if (!(*iter)->IsPlaceHolder())
@@ -1160,20 +1160,8 @@ std::size_t PartSashContainer::GetVisibleChildrenCount(
   return count;
 }
 
-std::size_t PartSashContainer::GetVisibleChildrenCount(
-    ILayoutContainer::Pointer container)
-{
-  // Treat null as an empty container
-  if (container == 0)
-  {
-    return 0;
-  }
-
-  return container->GetChildren().size();
-}
-
 float PartSashContainer::GetDockingRatio(Object::Pointer /*dragged*/,
-    IStackableContainer::Pointer  /*target*/)
+    ILayoutContainer::Pointer  /*target*/)
 {
   return 0.5f;
 }

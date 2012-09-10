@@ -64,13 +64,13 @@ namespace mitk
     /*!
     \brief Returns all image data at once.
     */
-    void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray, int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray);
+    void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray, int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
 
   protected:
 
     ToFCameraPMDRawDataCamBoardDevice();
-    ~ToFCameraPMDRawDataCamBoardDevice();
 
+    ~ToFCameraPMDRawDataCamBoardDevice();
   private:
     /*!
     \brief Method performs resizing of the image data and flips it upside down

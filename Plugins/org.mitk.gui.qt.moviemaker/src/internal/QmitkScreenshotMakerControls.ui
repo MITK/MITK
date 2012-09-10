@@ -129,7 +129,7 @@
       <item row="0" column="1">
        <widget class="QPushButton" name="m_Shot">
         <property name="toolTip">
-         <string>Writes screenshots of the transversal, sagittal and coronal render window.</string>
+         <string>Writes screenshots of the axial, sagittal and coronal render window.</string>
         </property>
         <property name="text">
          <string>Multiplanar Screenshot</string>

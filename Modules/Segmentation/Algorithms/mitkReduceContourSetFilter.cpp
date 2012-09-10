@@ -26,6 +26,7 @@ mitk::ReduceContourSetFilter::ReduceContourSetFilter()
   m_MinSpacing = -1;
   this->m_UseProgressBar = false;
   this->m_ProgressStepSize = 1;
+  m_NumberOfPointsAfterReduction = 0;
 }
 
 mitk::ReduceContourSetFilter::~ReduceContourSetFilter()

@@ -37,7 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // vtk
 #include <vtkSphereSource.h>
-
+//for exceptions
+#include <mitkIGTException.h>
+#include <mitkIGTIOException.h>
 
 
 
@@ -137,14 +139,24 @@ void QmitkMITKIGTTrackingToolboxView::StdMultiWidgetNotAvailable()
 void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 {
   //read in filename
-  QString filename = QFileDialog::getOpenFileName(NULL,tr("Open Toolfile"), "/", tr("All Files (*.*)")); //later perhaps: tr("Toolfile (*.tfl)"
+  QString filename = QFileDialog::getOpenFileName(NULL,tr("Open Tool Storage"), "/", tr("Tool Storage Files (*.IGTToolStorage)"));
   if (filename.isNull()) return;
 
   //read tool storage from disk
   std::string errorMessage = "";
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(GetDataStorage());
+  // try-catch block for exceptions
+  try
+  {
   m_toolStorage = myDeserializer->Deserialize(filename.toStdString());
-  
+  }
+  catch(mitk::IGTException)
+  {
+   std::string errormessage = "Error during deserializing. Problems with file,please check the file?";
+   QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+   return;
+  }
+
   if(m_toolStorage->isEmpty())
     {
     errorMessage = myDeserializer->GetErrorMessage();
@@ -196,14 +208,27 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
     data = mitk::GetDeviceDataByName(str); //Data will be set later, after device generation
   }
 
+  //Create Navigation Data Source with the factory class
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
 
+  //First check if the created object is valid
   if (m_TrackingDeviceSource.IsNull())
   {
     MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
     return;
   }
+
+  //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
+  mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();
+  if ((toolsInNewOrder.IsNotNull()) && (toolsInNewOrder->GetToolCount() > 0))
+    {
+    //so delete the old tools in wrong order and add them in the right order
+    //we cannot simply replace the tool storage because the new storage is
+    //not correctly initialized with the right data storage
+    m_toolStorage->DeleteAllTools();
+    for (int i=0; i < toolsInNewOrder->GetToolCount(); i++) {m_toolStorage->AddTool(toolsInNewOrder->GetTool(i));}
+    }
 
   //connect to device
   try
@@ -436,14 +461,24 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
       if (ret == 16384) //yes
         {
         //ask the user for a filename
-        QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"),"/",tr("*.*"));
+        QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"),"/",tr("*.IGTToolStorage"));
         //check for empty filename
         if(fileName == "") {return;}
         mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-        if (!mySerializer->Serialize(fileName.toStdString(),m_toolStorage)) MessageBox(mySerializer->GetErrorMessage());
+
+        //when Serialize method is used exceptions are thrown, need to be adapted
+        //try-catch block for exception handling in Serializer
+        try
+        {
+        mySerializer->Serialize(fileName.toStdString(),m_toolStorage);
+        }
+        catch(mitk::IGTException)
+        {
+        std::string errormessage = "Error during serialization. Please check the Zip file.";
+        QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());}
         return;
         }
-      else if (ret == 65536) //no
+        else if (ret == 65536) //no
         {
         return;
         }
@@ -481,6 +516,7 @@ void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
   this->m_Controls->m_LoggingFileName->setText(filename);
   }
 
+
 void QmitkMITKIGTTrackingToolboxView::StartLogging()
   {
   if (!m_logging)
@@ -490,14 +526,34 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
     m_loggingFilter->SetRecordingMode(mitk::NavigationDataRecorder::NormalFile);
     if (m_Controls->m_xmlFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::xml);
     else if (m_Controls->m_csvFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::csv);
-    m_loggingFilter->SetFileName(m_Controls->m_LoggingFileName->text().toStdString().c_str());
+    std::string filename = m_Controls->m_LoggingFileName->text().toStdString().c_str();
+    // this part has been changed in order to prevent crash of the  program
+    if(!filename.empty())
+    m_loggingFilter->SetFileName(filename);
+    else if(filename.empty()){
+     std::string errormessage = "File name has not been set, please set the file name";
+     mitkThrowException(mitk::IGTIOException)<<errormessage;
+     QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+     m_loggingFilter->SetFileName(filename);
+    }
+
     if (m_Controls->m_LoggingLimit->isChecked()){m_loggingFilter->SetRecordCountLimit(m_Controls->m_LoggedFramesLimit->value());}
 
     //connect filter
     for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfOutputs(); i++){m_loggingFilter->AddNavigationData(m_ToolVisualizationFilter->GetOutput(i));}
 
-    //start filter
+    //start filter with try-catch block for exceptions
+    try
+    {
     m_loggingFilter->StartRecording();
+    }
+    catch(mitk::IGTException)
+    {
+    std::string errormessage = "Error during start recording. Recorder already started recording?";
+    QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+    m_loggingFilter->StopRecording();
+    return;
+    }
 
     //update labels / logging variables
     this->m_Controls->m_LoggingLabel->setText("Logging ON");
@@ -505,8 +561,10 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
     m_loggedFrames = 0;
     m_logging = true;
     DisableLoggingButtons();
-    }
   }
+  }
+
+
 
 void QmitkMITKIGTTrackingToolboxView::StopLogging()
   {

@@ -42,7 +42,7 @@ namespace mitk
 
   This class takes a 3D mitk::Image as input and tries to extract one slice from it.
 
-  Two parameters determine which slice is extracted: the "slice dimension" is that one, which is constant for all points in the plane, e.g. transversal would mean 2.
+  Two parameters determine which slice is extracted: the "slice dimension" is that one, which is constant for all points in the plane, e.g. axial would mean 2.
   The "slice index" is the slice index in the image direction you specified with "affected dimension". Indices count from zero.
 
   Output will not be set if there was a problem extracting the desired slice.
@@ -65,7 +65,7 @@ class ImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
     /**
       \brief The orientation of the slice to be extracted.
 
-      \a Parameter SliceDimension Number of the dimension which is constant for all pixels of the desired slice (e.g. 2 for transversal)
+      \a Parameter SliceDimension Number of the dimension which is constant for all pixels of the desired slice (e.g. 2 for axial)
     */
     itkSetMacro(SliceDimension, unsigned int);
     itkGetConstMacro(SliceDimension, unsigned int);

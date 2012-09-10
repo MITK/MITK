@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -56,6 +56,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkConfigure.h>
 #include <vtkConfigure.h>
 #include <mitkVersion.h>
+#include <mitkIDataStorageService.h>
+#include <mitkIDataStorageReference.h>
+#include <mitkDataStorageEditorInput.h>
+#include <mitkWorkbenchUtil.h>
 
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
@@ -244,7 +248,7 @@ public:
      if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
      {
        windowAdvisor->closePerspAction->setEnabled(true);
-     }   
+     }
     }
 
     perspectivesClosed = false;
@@ -284,7 +288,7 @@ public:
      if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
      {
        windowAdvisor->closePerspAction->setEnabled(false);
-     }     
+     }
     }
    }
 
@@ -737,6 +741,26 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 
  configurer->AddEditorAreaTransfer(QStringList("text/uri-list"));
  configurer->ConfigureEditorAreaDropListener(dropTargetListener);
+
+}
+
+void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
+{
+  // Force Rendering Window Creation on startup.
+  berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
+
+  ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
+  ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
+  if (serviceRef)
+  {
+    mitk::IDataStorageService *dsService = context->getService<mitk::IDataStorageService>(serviceRef);
+    if (dsService)
+    {
+      mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
+      mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
+      mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
+    }
+  }
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()

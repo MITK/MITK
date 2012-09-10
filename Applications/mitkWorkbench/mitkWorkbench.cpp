@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QtSingleApplication>
 
+#include <mitkCommon.h>
+#include <mitkException.h>
+
 class QtSafeApplication : public QtSingleApplication
 {
 
@@ -43,6 +46,14 @@ public:
     {
       return QApplication::notify(receiver, event);
     }
+    catch (mitk::Exception& e)
+    {
+      msg = QString("MITK Exception:\n\n") 
+            + QString("Desciption: ") 
+            + QString(e.GetDescription()) + QString("\n\n")
+            + QString("Filename: ") + QString(e.GetFile()) + QString("\n\n")
+            + QString("Line: ") + QString::number(e.GetLine());
+    }
     catch (Poco::Exception& e)
     {
       msg = QString::fromStdString(e.displayText());
@@ -55,12 +66,28 @@ public:
     {
       msg = "Unknown exception";
     }
+    MITK_ERROR << "An error occurred: " << msg.toStdString();
 
-    QString text("An error occurred. You should save all data and quit the program to "
-                 "prevent possible data loss.\nSee the error log for details.\n\n");
-    text += msg;
+    QMessageBox msgBox;
+    msgBox.setText("An error occurred. You should save all data and quit the program to prevent possible data loss.");
+    msgBox.setDetailedText(msg);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.addButton(trUtf8("Exit immediately"), QMessageBox::YesRole);
+    msgBox.addButton(trUtf8("Ignore"), QMessageBox::NoRole);
 
-    QMessageBox::critical(0, "Error", text);
+    int ret = msgBox.exec();
+    
+    switch(ret)
+      {
+      case 0:
+        MITK_ERROR << "The program was closed.";
+        this->closeAllWindows();
+        break;
+      case 1:
+        MITK_ERROR << "The error was ignored by the user. The program may be in a corrupt state and don't behave like expected!";
+        break;
+      }
+
     return false;
   }
 
@@ -71,7 +98,7 @@ int main(int argc, char** argv)
 {
   // Create a QApplication instance first
   QtSafeApplication qSafeApp(argc, argv);
-  qSafeApp.setApplicationName("ExtApp");
+  qSafeApp.setApplicationName("mitkWorkbench");
   qSafeApp.setOrganizationName("DKFZ");
 
   // This function checks if an instance is already running
@@ -89,7 +116,7 @@ int main(int argc, char** argv)
   basePath.setFileName("");
   
   Poco::Path provFile(basePath);
-  provFile.setFileName("ExtApp.provisioning");
+  provFile.setFileName("mitkWorkbench.provisioning");
 
   Poco::Path extPath(basePath);
   extPath.pushDirectory("ExtBundles");
@@ -110,7 +137,7 @@ int main(int argc, char** argv)
   // which have difficulties with multiple dynamic opening and closing of shared libraries with
   // many global static initializers. It also helps if dependent libraries have weird static
   // initialization methods and/or missing de-initialization code.
-  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, "liborg_mitk_gui_qt_ext");
+  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, "liborg_mitk_gui_qt_ext,libCTKDICOMCore:0.1");
 
   return berry::Starter::Run(argc, argv, extConfig);
 }

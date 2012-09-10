@@ -74,13 +74,13 @@ namespace mitk
   unsigned int KinectController::GetCaptureWidth() const
   {
     MITK_WARN("ToF") << "Error: Kinect camera currently not available";
-    return 0;
+    return 640;
   }
 
   unsigned int KinectController::GetCaptureHeight() const
   {
     MITK_WARN("ToF") << "Error: Kinect camera currently not available";
-    return 0;
+    return 480;
   }
 
   bool KinectController::GetUseIR() const

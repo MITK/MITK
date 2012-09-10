@@ -118,7 +118,7 @@ namespace mitk {
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     virtual void ResetMapper( BaseRenderer* renderer );
     virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
-    virtual void CreateContour(mitk::BaseRenderer* renderer);
+    virtual void CreateContour();
     virtual void CreateVTKRenderObjects();
 
     vtkSmartPointer<vtkAppendPolyData> m_vtkSelectedPointList;

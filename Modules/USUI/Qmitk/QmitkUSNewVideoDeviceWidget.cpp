@@ -70,8 +70,7 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
 void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
-   m_Active = false;
-  MITK_INFO << "NewDeviceWidget: ClickedDone()";
+  m_Active = false;
   
   // Assemble Metadata
   mitk::USImageMetadata::Pointer metadata = mitk::USImageMetadata::New();
@@ -92,6 +91,18 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
     newDevice = mitk::USVideoDevice::New(filepath, metadata);
   }
 
+  // Set Video Options
+   newDevice->GetSource()->SetColorOutput(! m_Controls->m_CheckGreyscale->isChecked());
+
+  // If Resolution override is activated, apply it
+  if (m_Controls->m_CheckResolutionOverride->isChecked())
+  {
+    int width  = m_Controls->m_ResolutionWidth->value();
+    int height = m_Controls->m_ResolutionHeight->value();
+    newDevice->GetSource()->OverrideResolution(width, height);
+    newDevice->GetSource()->SetResolutionOverride(true);
+  }
+
   newDevice->Connect();
 
   emit Finished();
@@ -100,9 +111,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
 void QmitkUSNewVideoDeviceWidget::OnClickedCancel(){
   m_TargetDevice = 0;
   m_Active = false;
-   MITK_INFO << "NewDeviceWidget: OnClickedCancel()";
   emit Finished();
-
 }
 
 void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection(){
@@ -122,7 +131,6 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
     // TODO Alert if bad path
     mitkThrow() << "NewVideoDevcieWidget recieved an incompatible Device Type to edit. Devicetype was: " << device->GetDeviceClass();
   }
-  MITK_INFO << "NewDeviceWidget: EditDevice()";
   m_TargetDevice = static_cast<mitk::USVideoDevice*> (device.GetPointer());
   m_Active = true;
 }
@@ -130,7 +138,6 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 
 void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 {
-  MITK_INFO << "NewDeviceWidget: CreateNewDevice()";
   m_TargetDevice = 0;
   InitFields(mitk::USImageMetadata::New());
   m_Active = true;

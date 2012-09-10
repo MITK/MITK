@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{MITKUserManualPage} The MITK User Manual
+\page MITKUserManualPage The MITK User Manual
 
 Welcome to the basic MITK user manual. This document tries to give a concise overview of the basic functions of MITK and be an comprehensible guide on using them. 
 
@@ -37,7 +37,7 @@ The datamanager and the \ref MITKUserManualPagePerspectives have their own help 
   
 \subsection MITKUserManualPageMultiWidgetOverview Overview
 
-The four window view is the heart of the MITK image viewing. The standard layout is three 2D windows and one 3D window, with the transversal window in the top left quarter, the sagittal window in the top right quarter, the coronal window in the lower left quarter and the 3D window in the lower right quarter. The different planes form a crosshair that can be seen in the 3D window.
+The four window view is the heart of the MITK image viewing. The standard layout is three 2D windows and one 3D window, with the axial window in the top left quarter, the sagittal window in the top right quarter, the coronal window in the lower left quarter and the 3D window in the lower right quarter. The different planes form a crosshair that can be seen in the 3D window.
   
 Once you select a point within the picture, informations about it are displayed at the bottom of the screen.
 

@@ -105,9 +105,12 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
   // Set the necessary information for imageIO
   imageIO->SetNumberOfDimensions(dimension);
   imageIO->SetPixelTypeInfo( pixelType.GetTypeId() );
+  // Set also the PixelTypeIO information since it is available after
+  // the changes in PixelType for Bug #12838
+  imageIO->SetPixelType( pixelType.GetPixelTypeId() );
 
   if(pixelType.GetNumberOfComponents() > 1)
-    imageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());
+    imageIO->SetNumberOfComponents( pixelType.GetNumberOfComponents() );
 
   itk::ImageIORegion ioRegion( dimension );
 
@@ -172,7 +175,26 @@ void mitk::ImageWriter::GenerateData()
   fclose(tempFile);
   remove(m_FileName.c_str());
 
-  mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
+  // Creating clone of input image, since i might change the geometry 
+  mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput())->Clone();
+
+  // Check if geometry information will be lost
+  if (input->GetDimension() == 2)
+  {
+     if (!input->GetGeometry()->Is2DConvertable())
+     {
+        MITK_WARN << "Saving a 2D image with 3D geometry information. Geometry information will be lost! You might consider using Convert2Dto3DImageFilter before saving.";
+        
+        // set matrix to identity
+        mitk::AffineTransform3D::Pointer affTrans = mitk::AffineTransform3D::New();
+        affTrans->SetIdentity();
+        mitk::Vector3D spacing = input->GetGeometry()->GetSpacing();
+        mitk::Point3D origin = input->GetGeometry()->GetOrigin();
+        input->GetGeometry()->SetIndexToWorldTransform(affTrans); 
+        input->GetGeometry()->SetSpacing(spacing);
+        input->GetGeometry()->SetOrigin(origin);
+     }
+  }
 
   bool vti = (m_Extension.find(".vti") != std::string::npos);
 

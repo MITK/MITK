@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointOperation.h"
 #include "mitkPositionEvent.h"
 #include "mitkPlanarFigure.h"
+#include "mitkPlanarPolygon.h"
 #include "mitkStatusBar.h"
 #include "mitkDataNode.h"
 #include "mitkInteractionConst.h"
@@ -416,13 +417,22 @@ bool mitk::PlanarFigureInteractor
       }
 
       // TODO: check segement of polyline we clicked in
-      int nextIndex = this->IsPositionOverFigure(
-        stateEvent, planarFigure,
-        planarFigureGeometry,
-        projectionPlane,
-        renderer->GetDisplayGeometry(),
-        projectedPoint
-        );
+      int nextIndex = -1;
+      
+      // We only need to check which position to insert the control point 
+      // when interacting with a PlanarPolygon. For all other types
+      // new control points will always be appended
+      if ( dynamic_cast<mitk::PlanarPolygon*>( planarFigure ) )
+      {
+        nextIndex = this->IsPositionOverFigure(
+          stateEvent, planarFigure,
+          planarFigureGeometry,
+          projectionPlane,
+          renderer->GetDisplayGeometry(),
+          projectedPoint
+          );
+      }
+
 
       // Add point as new control point
       renderer->GetDisplayGeometry()->DisplayToWorld( projectedPoint, projectedPoint );
@@ -659,16 +669,8 @@ bool mitk::PlanarFigureInteractor
         planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
       }
   
-      // if this was a right mouse button click, invoke the event
-      if ( theEvent->GetButton() == 2 )
-      {
-        planarFigure->InvokeEvent( ContextMenuPlanarFigureEvent() );
-        ok = true;
-      }
-      else
-      {
-        ok = false;  
-      }
+      planarFigure->InvokeEvent( ContextMenuPlanarFigureEvent() );
+      ok = true;
 
       // we HAVE TO proceed with 'EIDNO' here to ensure correct states
       // and convenient application behaviour

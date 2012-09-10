@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkPointSetInteractor.h>
 #include <QmitkStdMultiWidget.h>
-
+#include <mitkSliceNavigationController.h>
 
 #include <QPushButton>
 
@@ -61,26 +61,41 @@ public:
 
     void SetupConnections();
 
-    /// assign a point set (contained in a node of DataStorage) for observation
+
+    ///@{
+    /**
+    * \brief Sets the SliceNavigationController of the three 2D Renderwindows.
+    *  If they are defined, they can be used to automatically set the crosshair to the selected point
+    */
+    void SetSnc1(mitk::SliceNavigationController* snc);
+    void SetSnc2(mitk::SliceNavigationController* snc);
+    void SetSnc3(mitk::SliceNavigationController* snc);
+    ///@}
+
+
+    /** @brief assign a point set (contained in a node of DataStorage) for observation */
     void SetPointSet(mitk::PointSet* newPs);
     mitk::PointSet* GetPointSet();
 
-    /// assign a point set (contained in a node of DataStorage) for observation
+    /** @brief assign a point set (contained in a node of DataStorage) for observation */
     void SetPointSetNode(mitk::DataNode* newNode);
     mitk::DataNode* GetPointSetNode();
 
-    /// assign a QmitkStdMultiWidget for updating render window crosshair
+    /** @brief assign a QmitkStdMultiWidget for updating render window crosshair */
     void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
 
-    /// itk observer for node "delete" events
+    /** @brief itk observer for node "delete" events */
     void OnNodeDeleted( const itk::EventObject & e );
+
+    /** @brief Unselects the edit button if it is selected. */
+    void UnselectEditButton(); 
 
 public slots:
     void DeactivateInteractor(bool deactivate);
-    void EnableEditButton(bool enabled);
+    void EnableEditButton(bool enabled); 
 
 signals:
-    /// signal to inform about the state of the EditPointSetButton, whether an interactor for setting points is active or not
+    /** @brief signal to inform about the state of the EditPointSetButton, whether an interactor for setting points is active or not */
     void EditPointSets(bool active);
     /// signal to inform that the selection of a point in the pointset has changed
     void PointSelectionChanged();
@@ -124,6 +139,9 @@ protected:
     QPushButton* m_ToggleAddPoint;
     QPushButton* m_AddPoint;
 
+    mitk::SliceNavigationController* m_Snc1;
+    mitk::SliceNavigationController* m_Snc2;
+    mitk::SliceNavigationController* m_Snc3;
 
     mitk::PointSetInteractor::Pointer   m_Interactor;
     int     m_TimeStep;

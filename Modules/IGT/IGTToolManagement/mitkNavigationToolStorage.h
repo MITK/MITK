@@ -125,6 +125,12 @@ namespace mitk {
      * @return Returns true if the storage is empty, false if not.
      */
     bool isEmpty();
+
+    /**
+     * @return Returns the corresponding data storage if one is set to this NavigationToolStorage.
+     *         Returns NULL if none is set.
+     */
+    itkGetMacro(DataStorage,mitk::DataStorage::Pointer);
     
   protected:
     NavigationToolStorage();

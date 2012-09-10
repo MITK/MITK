@@ -67,6 +67,11 @@ ILayoutContainer::Pointer LayoutPart::GetContainer()
   return container;
 }
 
+bool LayoutPart::IsPlaceHolder() const
+{
+  return false;
+}
+
 std::string LayoutPart::GetID() const
 {
   return id;
@@ -245,7 +250,11 @@ void LayoutPart::SetContainer(ILayoutContainer::Pointer container)
 //  if (container != 0)
 //  {
 //    setZoomed(container.childIsZoomed(this));
-//  }
+  //  }
+}
+
+void LayoutPart::SetFocus()
+{
 }
 
 void LayoutPart::SetID(const std::string& str)

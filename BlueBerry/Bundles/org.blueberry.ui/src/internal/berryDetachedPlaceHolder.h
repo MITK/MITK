@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYDETACHEDPLACEHOLDER_H_
 #define BERRYDETACHEDPLACEHOLDER_H_
 
-#include "berryContainerPlaceholder.h"
+#include "berryPartPlaceholder.h"
+#include "berryILayoutContainer.h"
 
 #include "berryIMemento.h"
 #include "berryRectangle.h"
@@ -31,12 +32,12 @@ namespace berry {
  * DetachedPlaceHolder is the placeholder for detached views.
  *
  */
-class DetachedPlaceHolder : public ContainerPlaceholder
+class DetachedPlaceHolder : public PartPlaceholder, public ILayoutContainer
 {
 
 private:
 
-    std::list<StackablePart::Pointer> children;
+    std::list<LayoutPart::Pointer> children;
 
     Rectangle bounds;
 
@@ -54,7 +55,7 @@ public:
     /**
      * Add a child to the container.
      */
-    void Add(StackablePart::Pointer newPart);
+    void Add(LayoutPart::Pointer newPart);
 
     /**
      * Return true if the container allows its
@@ -65,21 +66,25 @@ public:
      */
     bool AllowsBorder();
 
+    bool AllowsAdd(LayoutPart::Pointer toAdd);
+
+    bool AllowsAutoFocus();
+
     Rectangle GetBounds();
 
     /**
      * Returns a list of layout children.
      */
-    std::list<StackablePart::Pointer> GetChildren();
+    std::list<LayoutPart::Pointer> GetChildren();
     /**
      * Remove a child from the container.
      */
-    void Remove(StackablePart::Pointer part);
+    void Remove(LayoutPart::Pointer part);
 
     /**
      * Replace one child with another
      */
-    void Replace(StackablePart::Pointer oldPart, StackablePart::Pointer newPart);
+    void Replace(LayoutPart::Pointer oldPart, LayoutPart::Pointer newPart);
 
 
     /**
@@ -95,6 +100,10 @@ public:
     void SaveState(IMemento::Pointer memento);
 
     void FindSashes(LayoutPart::Pointer part, PartPane::Sashes& sashes);
+
+    ILayoutContainer::ChildrenType GetChildren() const;
+
+    void ResizeChild(LayoutPart::Pointer childThatChanged);
 
 };
 

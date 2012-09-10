@@ -168,7 +168,7 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_Big3DLayoutAction = new QAction( "Big 3D", m_Settings );
   m_Big3DLayoutAction->setDisabled( false );
 
-  m_Widget1LayoutAction = new QAction( "Transversal plane", m_Settings );
+  m_Widget1LayoutAction = new QAction( "Axial plane", m_Settings );
   m_Widget1LayoutAction->setDisabled( false );
 
   m_Widget2LayoutAction = new QAction( "Sagittal plane", m_Settings );
@@ -186,10 +186,10 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_SmallUpperWidget2Big3and4LayoutAction = new QAction( "Sagittal top, Coronal n 3D bottom", m_Settings );
   m_SmallUpperWidget2Big3and4LayoutAction->setDisabled( false );
 
-  m_2x2Dand3DWidgetLayoutAction = new QAction( "Transversal n Sagittal left, 3D right", m_Settings );
+  m_2x2Dand3DWidgetLayoutAction = new QAction( "Axial n Sagittal left, 3D right", m_Settings );
   m_2x2Dand3DWidgetLayoutAction->setDisabled( false );
 
-  m_Left2Dand3DRight2DLayoutAction = new QAction( "Transversal n 3D left, Sagittal right", m_Settings );
+  m_Left2Dand3DRight2DLayoutAction = new QAction( "Axial n 3D left, Sagittal right", m_Settings );
   m_Left2Dand3DRight2DLayoutAction->setDisabled( false );
 
   m_Settings->addAction(m_DefaultLayoutAction);
@@ -335,9 +335,9 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
 
     switch( m_Layout )
     {
-    case TRANSVERSAL:
+    case AXIAL:
       {
-        emit SignalChangeLayoutDesign( LAYOUT_TRANSVERSAL );
+        emit SignalChangeLayoutDesign( LAYOUT_AXIAL );
         break;
       }
 
@@ -464,8 +464,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget1(bool)
   m_FullScreenMode = false;
   this->ChangeFullScreenIcon();
 
-  m_LayoutDesign = LAYOUT_TRANSVERSAL;
-  emit SignalChangeLayoutDesign( LAYOUT_TRANSVERSAL );
+  m_LayoutDesign = LAYOUT_AXIAL;
+  emit SignalChangeLayoutDesign( LAYOUT_AXIAL );
 
   DeferredShowMenu( );
 }
@@ -622,7 +622,7 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList( int layoutDesignIndex )
       m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
       break;
     }
-  case LAYOUT_TRANSVERSAL:
+  case LAYOUT_AXIAL:
     {
       m_DefaultLayoutAction->setEnabled(true);
       m_2DImagesUpLayoutAction->setEnabled(true);

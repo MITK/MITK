@@ -60,7 +60,7 @@
          <number>1</number>
         </property>
         <property name="maximum">
-         <number>10</number>
+         <number>100</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -70,16 +70,16 @@
       <item row="1" column="1">
        <widget class="QSlider" name="m_AngularThresholdSlider">
         <property name="toolTip">
-         <string>Fractional Anisotropy Threshold</string>
+         <string>Minimally allowed curcature radius (in mm, interpolated auto = 0.5 minimal spacing, noninterpolated auto = 0.1 minimal spacing)</string>
         </property>
         <property name="minimum">
-         <number>0</number>
+         <number>-1</number>
         </property>
         <property name="maximum">
-         <number>90</number>
+         <number>50</number>
         </property>
         <property name="value">
-         <number>45</number>
+         <number>-1</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -108,7 +108,7 @@
       <item row="6" column="0">
        <widget class="QLabel" name="m_SeedsPerVoxelLabel">
         <property name="toolTip">
-         <string>Number of tracts started in each voxel of the seed ROI.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Seeds per Voxel: 1</string>
@@ -172,7 +172,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="m_FaThresholdLabel">
         <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
+         <string/>
         </property>
         <property name="text">
          <string>FA Threshold: 0.2</string>
@@ -182,7 +182,7 @@
       <item row="5" column="0">
        <widget class="QLabel" name="m_MinTractLengthLabel">
         <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Min. Tract Length: 40mm</string>
@@ -211,7 +211,7 @@
       <item row="3" column="0">
        <widget class="QLabel" name="m_gLabel">
         <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
+         <string/>
         </property>
         <property name="text">
          <string>g: 0</string>
@@ -240,17 +240,17 @@
       <item row="1" column="0">
        <widget class="QLabel" name="m_AngularThresholdLabel">
         <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
+         <string/>
         </property>
         <property name="text">
-         <string>Angular Threshold: 45°</string>
+         <string>Min. Curvature Radius: auto</string>
         </property>
        </widget>
       </item>
       <item row="4" column="0">
        <widget class="QLabel" name="m_StepsizeLabel">
         <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Step Size: auto</string>
@@ -260,7 +260,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="m_fLabel">
         <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
+         <string/>
         </property>
         <property name="text">
          <string>f: 1</string>
@@ -274,6 +274,9 @@
         </property>
         <property name="text">
          <string>Enable trilinear interpolation</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

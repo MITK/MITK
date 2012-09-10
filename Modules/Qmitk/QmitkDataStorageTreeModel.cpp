@@ -354,6 +354,10 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   {
     return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));
   }
+  else if(role == QmitkDataNodeRawPointerRole)
+  {
+    return QVariant::fromValue<mitk::DataNode*>(dataNode);
+  }
 
   return QVariant();
 }

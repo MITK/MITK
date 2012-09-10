@@ -1,12 +1,12 @@
 /**
-\bundlemainpage{$(plugin-symbolic-name)} $(plugin-name)
+\page $(plugin-target) $(plugin-name)
 
 \image html icon.xpm "Icon of $(plugin-name)"
 
 Available sections:
-  - \ref $(plugin-symbolic-name)Overview
+  - \ref $(plugin-target)Overview
 
-\section $(plugin-symbolic-name)Overview
+\section $(plugin-target)Overview
 Describe the features of your awesome plugin here
 <ul>
 <li>Increases productivity

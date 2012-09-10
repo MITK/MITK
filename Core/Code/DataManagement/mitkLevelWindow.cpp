@@ -112,19 +112,35 @@ mitk::ScalarType mitk::LevelWindow::GetUpperWindowBound() const
 
 void mitk::LevelWindow::SetDefaultLevelWindow(mitk::ScalarType level, mitk::ScalarType window)
 {
-  SetDefaultBoundaries((level-(window/2)), (level+(window/2)));
+  SetDefaultBoundaries((level-(window/2.0)), (level+(window/2.0)));
 }
 
-void mitk::LevelWindow::SetLevelWindow(mitk::ScalarType level, mitk::ScalarType window)
+void mitk::LevelWindow::SetLevelWindow(mitk::ScalarType level, mitk::ScalarType window, bool expandRangesIfNecessary)
 {
-  SetWindowBounds((level-(window/2.0)), (level+(window/2.0)));
+  SetWindowBounds( (level-(window/2.0)), (level+(window/2.0)), expandRangesIfNecessary );
 }
 
-void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::ScalarType upperBound)
+void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::ScalarType upperBound, bool expandRangesIfNecessary)
 {
   if ( IsFixed() ) return;
+
   m_LowerWindowBound = lowerBound;
   m_UpperWindowBound = upperBound;
+
+  if (expandRangesIfNecessary)
+  {
+    /* if caller is sure he wants exactly that level/window, we make sure the limits match */
+    if ( m_LowerWindowBound < m_RangeMin ) 
+    {
+      m_RangeMin = m_LowerWindowBound;
+    }
+    
+    if ( m_UpperWindowBound > m_RangeMax )
+    {
+      m_RangeMax = m_UpperWindowBound;
+    }
+  }
+
   EnsureConsistency();
 }
 
@@ -285,7 +301,9 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
-  if (image->GetPixelType()== typeid(int)  && image->GetPixelType().GetBpe() >= 8)
+  if (   image->GetPixelType().GetPixelTypeId()==itk::ImageIOBase::SCALAR
+      && image->GetPixelType().GetTypeId() == typeid(int)
+      && image->GetPixelType().GetBpe() >= 8)
   {
     // the windows compiler complains about ambiguos 'pow' call, therefore static casting to (double, int)
     if (minValue == -( pow( (double) 2.0, static_cast<int>(image->GetPixelType().GetBpe()/2) ) ) )

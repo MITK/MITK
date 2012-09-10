@@ -61,9 +61,9 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2" >
       <item>
-       <widget class="QRadioButton" name="rbTransversal" >
+       <widget class="QRadioButton" name="rbAxial" >
         <property name="text" >
-         <string>transversal</string>
+         <string>axial</string>
         </property>
         <property name="checked" >
          <bool>true</bool>

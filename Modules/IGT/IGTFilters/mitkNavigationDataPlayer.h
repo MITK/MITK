@@ -57,77 +57,77 @@ namespace mitk {
     */
     itkGetStringMacro(FileName);
 
-
+    
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update
     */
     virtual void UpdateOutputInformation();
 
     /**
-    * \brief This method starts the player. 
-    *
-    * Before the stream has to be set. Either with a PlayingMode (SetStream(PlayerMode)) and FileName. Or
-    * with an own inputstream (SetStream(istream*)).
-    */
+     * \brief This method starts the player. 
+     *
+     * Before the stream has to be set. Either with a PlayingMode (SetStream(PlayerMode)) and FileName. Or
+     * with an own inputstream (SetStream(istream*)).
+     *
+     * @throw mitk::IGTIOException Throws an exception if the file cannot be opened.
+     * @throw mitk::IGTIOException Throws an exception if there is no valid filename. 
+     * @throw mitk::IGTIOException Throws an exception if the file is damaged.
+     * @throw mitk::IGTException Throws an exception if there is no stream (i.e stream=NULL).
+     */
     void StartPlaying();
 
     /**
-    * \brief Stops the player and closes the stream. After a call of StopPlaying()
-    * StartPlaying() must be called to get new output data
-    *
-    * \warning the output is generated in this method because we know first about the number of output after
-    * reading the first lines of the XML file. Therefore you should assign your output after the call of this method
-    */
+     * \brief Stops the player and closes the stream. After a call of StopPlaying()
+     * StartPlaying() must be called to get new output data
+     *
+     * \warning the output is generated in this method because we know first about the number of output after
+     * reading the first lines of the XML file. Therefore you should assign your output after the call of this method
+     */
     void StopPlaying();
 
     /**
-    * \brief This method pauses the player. If you want to play again call Resume()
-    * 
-    *\warning This method is not tested yet. It is not save to use!
-    */
+     * \brief This method pauses the player. If you want to play again call Resume()
+     */
     void Pause();
 
     /**
-    * \brief This method resumes the player when it was paused. 
-    * 
-    *\warning This method is not tested yet. It is not save to use!
-    */
+     * \brief This method resumes the player when it was paused. 
+     */
     void Resume();
 
 
     /**
-    * \brief This method checks if player arrived at end of file.
-    * 
-    *\warning This method is not tested yet. It is not save to use!
-    */
+     * \brief This method checks if player arrived at end of file.
+     * 
+     */
     bool IsAtEnd();
 
     /**
-    * \brief The PlayerMode is used for generating a presetted output stream. You do not need to
-    * set it if you want to use your own stream.
-    *
-    * There are:
-    * NormalFile: ifstream
-    * ZipFile: not implemented yet
-    *
-    *\warning The ZipFile Mode is not implemented yet
-    */
+     * \brief The PlayerMode is used for generating a presetted output stream. You do not need to
+     * set it if you want to use your own stream.
+     *
+     * There are:
+     * NormalFile: ifstream
+     * ZipFile: not implemented yet
+     *
+     *\warning The ZipFile Mode is not implemented yet
+     */
     enum PlayerMode
     {
       NormalFile,
       ZipFile
     };
 
-    /**
-    * \brief sets the recording mode which causes different types of output streams
-    * This method is overloaded with SetStream( ostream* )
-    */
-    void SetStream(PlayerMode mode);
+    /** @return Returns the current playing mode of the player. */
+    itkGetMacro(PlayerMode,PlayerMode);
+
+    /** @brief Sets the playing mode of the player. */
+    itkSetMacro(PlayerMode,PlayerMode);
 
     /**
-    * \brief sets the recording mode which causes different types of output streams
-    * This method is overloaded with SetStream( PlayerMode )
-    */
+     * \brief Sets the stream of this player.
+     * @throw mitk::IGTException Throws an exception if stream is NULL or if it is not good.
+     */
     void SetStream(std::istream* stream);
 
   protected:
@@ -137,34 +137,48 @@ namespace mitk {
     typedef mitk::NavigationData::TimeStampType TimeStampType;
 
     /**
-    * \brief filter execute method 
-    */
+     * \brief filter execute method 
+     */
     virtual void GenerateData();
 
     /**
-    * \brief Returns the file version out of the XML document. 
-    */
+     * \brief Creates a stream out of the filename given by the variable m_FileName. 
+     * The stream is then set to m_Stream.
+     *
+     * @throw mitk::IGTIOException Throws an exception if file does not exist
+     * @throw mitk::IGTException Throws an exception if the stream is NULL
+     */
+    void CreateStreamFromFilename();
+
+    /**
+     * \brief Returns the file version out of the XML document.
+     * @throw mitk::IGTException Throws an mitk::IGTException an exception if stream is NULL or not good.
+     * @throw mitk::IGTIOException Throws an mitk::IGTIOException if the stream has an incompatible XML format.
+     */
     unsigned int GetFileVersion(std::istream* stream);
 
     /**
-    * \brief Returns the number of tracked tools out of the XML document.
-    */
+     * \brief Returns the number of tracked tools out of the XML document.
+     * @throw Throws an exception if stream is NULL.
+     * @throw Throws an exception if the input stream has an XML incompatible format.
+     */
     unsigned int GetNumberOfNavigationDatas(std::istream* stream);
 
     /**
-    * \brief Gets the first data for initializing the player
-    */
+     * \brief Gets the first data for initializing the player
+     */
     void GetFirstData();
 
     /**
-    * \brief This method reads one line of the XML document and returns the data as a NavigationData object
-    * If there is a new file version another method must be added which reads this data.
-    */
+     * \brief This method reads one line of the XML document and returns the data as a NavigationData object
+     * If there is a new file version another method must be added which reads this data.
+     * @throw mitk::IGTException Throws an exceptions if file is damaged.
+     */
     mitk::NavigationData::Pointer ReadVersion1();
 
     /**
-    * \brief This method initializes the player with first data  
-    */
+     * \brief This method initializes the player with first data  
+     */
     void InitPlayer();
 
     std::istream* m_Stream; ///< stores a pointer to the input stream
@@ -196,7 +210,13 @@ namespace mitk {
     TiXmlNode * m_currentNode;
 
     bool m_StreamEnd; ///< stores if the input stream arrived at end
-
+    
+    /**
+     * @brief This is a helping method which gives an error message and throws an exception with the given message.
+     *        It can be used if a stream is found to be invalid.
+     *
+     * @throw mitk::IGTIOException Always throws an exception.
+     */
     void StreamInvalid(std::string message);  ///< help method which sets the stream invalid and displays an error
    
   };

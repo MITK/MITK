@@ -56,64 +56,33 @@ mitk::SegTool2D::SegTool2D(const char* type)
  m_Contourmarkername ("Position"),
  m_ShowMarkerNodes (true)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-  CONNECT_ACTION( 49014, OnInvertLogic );
-
-
 }
 
 mitk::SegTool2D::~SegTool2D()
 {
 }
 
-bool mitk::SegTool2D::OnMousePressed (Action*, const StateEvent* stateEvent)
+float mitk::SegTool2D::CanHandleEvent( StateEvent const *stateEvent) const
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
+  if (!positionEvent) return 0.0;
 
-  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return false; // we don't want anything but 2D
+  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return 0.0; // we don't want anything but 2D
 
-  m_LastEventSender = positionEvent->GetSender();
-  m_LastEventSlice = m_LastEventSender->GetSlice();
-
-  return true;
+  //This are the mouse event that are used by the statemachine patterns for zooming and panning. This must be possible although a tool is activ
+  if (stateEvent->GetId() == EIDRIGHTMOUSEBTN || stateEvent->GetId() == EIDMIDDLEMOUSEBTN || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDCTRL ||
+      stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
+      stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
+  {
+    //Since the usual segmentation tools currently do not need right click interaction but the mitkDisplayVectorInteractor
+    return 0.0;
+  }
+  else
+  {
+    return 1.0;
+  }
 }
 
-bool mitk::SegTool2D::OnMouseMoved   (Action*, const StateEvent* stateEvent)
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if ( m_LastEventSender != positionEvent->GetSender() ) return false;
-  if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-
-  return true;
-}
-
-bool mitk::SegTool2D::OnMouseReleased(Action*, const StateEvent* stateEvent)
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if ( m_LastEventSender != positionEvent->GetSender() ) return false;
-  if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-
-  return true;
-}
-
-bool mitk::SegTool2D::OnInvertLogic(Action*, const StateEvent* stateEvent)
-{
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  if ( m_LastEventSender != positionEvent->GetSender() ) return false;
-  if ( m_LastEventSlice  != m_LastEventSender->GetSlice() ) return false;
-
-  return true;
-}
 
 bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice )
 {
@@ -136,7 +105,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   imageNormal2.Set_vnl_vector( vnl_cross_3d<ScalarType>(normal.Get_vnl_vector(),imageNormal2.Get_vnl_vector()) );
 
   double eps( 0.00001 );
-  // transversal
+  // axial
   if ( imageNormal2.GetNorm() <= eps )
   {
     affectedDimension = 2;

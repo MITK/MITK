@@ -6,117 +6,308 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>411</width>
-    <height>358</height>
+    <width>568</width>
+    <height>388</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_4">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QRadioButton" name="m_rbStaticRegistration">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>static Fiducial Registration</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QRadioButton" name="m_rbContinousRegistration">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>hybrid continuous  Fiducial Registration</string>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QGroupBox" name="registrationGroupBox">
+    <widget class="QGroupBox" name="m_gbFiducialRegistration">
      <property name="title">
-      <string>Select fiducials in image and OR (world)</string>
+      <string>Fiducial Registration method</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="sourceLandmarksGroupBox">
-        <property name="title">
-         <string> Image fiducials</string>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QRadioButton" name="m_rbStaticRegistration">
+        <property name="enabled">
+         <bool>true</bool>
         </property>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QmitkPointListWidget" name="m_RegistrationImagePoints">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QPushButton" name="m_AddImageFiducialBtn">
-           <property name="text">
-            <string>Add image fiducial</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="text">
+         <string>Static</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QGroupBox" name="targetLandmarksGroupBox">
-        <property name="title">
-         <string>OR fiducials </string>
+      <item>
+       <widget class="QRadioButton" name="m_rbContinousRegistration">
+        <property name="enabled">
+         <bool>true</bool>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QmitkPointListWidget" name="m_RegistrationTrackingPoints"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QPushButton" name="m_AddTrackingFiducialBtn">
-           <property name="text">
-            <string>&amp;Add current 
-instrument position</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="text">
+         <string>Hybrid Continuous</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QPushButton" name="m_RegisterFiducialsBtn">
-     <property name="text">
-      <string>Execute Fiducial Registration</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
+   <item row="0" column="1">
     <widget class="QCheckBox" name="m_UseICPRegistration">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Find fiducial correspondences (needs 6+ fiducial pairs)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
-      <string>Find fiducial correspondences (needs 6+ fiducial pairs)</string>
+      <string>    Find fiducial 
+ correspondences</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="m_RegistrationQualityDisplay">
+   <item row="0" column="2">
+    <widget class="QPushButton" name="m_RegisterFiducialsBtn">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
      <property name="text">
-      <string>Registration still pending...</string>
+      <string>  Register
+ Fiducials</string>
      </property>
     </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QGroupBox" name="sourceLandmarksGroupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string> Image fiducials</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="margin">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QmitkPointListWidget" name="m_RegistrationImagePoints">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="m_spaceHolderGroupBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>37</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>37</height>
+           </size>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="m_AddImageFiducialBtn">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>35</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Add image fiducial</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="targetLandmarksGroupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Real world fiducials </string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="margin">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QmitkPointListWidget" name="m_RegistrationTrackingPoints">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="m_spaceHolderGroupBox2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>37</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>37</height>
+           </size>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="m_AddTrackingFiducialBtn">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>35</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&amp;Add current 
+instrument position</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="statusLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Status:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="m_RegistrationQualityDisplay">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
+  <zorder>m_RegisterFiducialsBtn</zorder>
+  <zorder>m_UseICPRegistration</zorder>
+  <zorder>m_gbFiducialRegistration</zorder>
+  <zorder>sourceLandmarksGroupBox</zorder>
+  <zorder>targetLandmarksGroupBox</zorder>
+  <zorder>statusLabel</zorder>
+  <zorder>m_RegistrationQualityDisplay</zorder>
+  <zorder>statusLabel</zorder>
  </widget>
  <customwidgets>
   <customwidget>

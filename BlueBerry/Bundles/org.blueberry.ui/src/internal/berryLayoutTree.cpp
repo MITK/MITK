@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryLayoutTreeNode.h"
 #include "berryLayoutPartSash.h"
-#include "berryContainerPlaceholder.h"
 
 #include "berryConstants.h"
 
@@ -403,7 +402,7 @@ bool LayoutTree::IsCompressible()
 
 bool LayoutTree::IsVisible()
 {
-  return part.Cast<ContainerPlaceholder>().IsNull();
+  return !part->IsPlaceHolder();
 }
 
 void LayoutTree::RecomputeRatio()

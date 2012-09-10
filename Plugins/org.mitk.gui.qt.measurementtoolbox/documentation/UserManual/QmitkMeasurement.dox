@@ -10,18 +10,18 @@ The Measurement module enables the user to interact with 2D images or single sli
 Available Sections:
 - \ref QmitkMeasurementUserManualOverview
 - \ref QmitkMeasurementUserManualFeatures
-	- \ref SubOne
-	- \ref SubTwo
-	- \ref SubThree
-	- \ref SubFour
-	- \ref SubFive
-	- \ref SubSix
-	- \ref SubSeven
+  - \ref SubOne
+  - \ref SubTwo
+  - \ref SubThree
+  - \ref SubFour
+  - \ref SubFive
+  - \ref SubSix
+  - \ref SubSeven
 - \ref QmitkMeasurementUserManualUsage
-	- \ref One
-	- \ref Two
-	- \ref Three
-	- \ref Four
+  - \ref One
+  - \ref Two
+  - \ref Three
+  - \ref Four
 
 The workflow to use this module is:
 
@@ -31,7 +31,7 @@ The workflow is repeatedly useable with the same or different measurement figure
 
 \image html Basic_Screen_edited.JPG
 
-The standard working plane is "Transversal" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to 3M Application Bundle User Manual.
+The standard working plane is "Axial" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to 3M Application Bundle User Manual.
 
 \section QmitkMeasurementUserManualFeatures Features
 
@@ -73,11 +73,11 @@ This Section is subdivided into four subsections:
     <li><b>Add an image</b>
     <li><b>Work with measurement figures</b>
     <li><b>Save the image with measurement information</b>
-	<li><b>Remove measurement figures or image</b>
+  <li><b>Remove measurement figures or image</b>
 </ol>
 
 Let's start with subsection 1
-\subsection One 	Add an image
+\subsection One   Add an image
 
 There are two possible ways to add an image to the programm. One is to grap the image with left mouse click from your prefered file browser and simply drag&drop it to the View Plane field. The other way is to use the 
 \image html OpenButton.png

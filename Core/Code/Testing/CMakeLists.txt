@@ -29,7 +29,7 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper
                         ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/rgbaImage640x480REF.png #corresponding reference screenshot
 )
-mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2DTest #test for standard Pic3D transversal slice
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2DTest #test for standard Pic3D axial slice
                         ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3d640x480REF.png #corresponding reference screenshot
 )
@@ -45,12 +45,12 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVt
 #                        ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
 #                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dOpacity640x480REF.png #corresponding reference screenshot
 #)
-#mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DSwivelTest #test for a randomly chosen Pic3D swivelled slice
-#                        ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
-#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dSwivel640x480REF.png #corresponding reference screenshot
-#)
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DSwivelTest #test for a randomly chosen Pic3D swivelled slice
+                        ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dSwivel640x480REF.png #corresponding reference screenshot
+)
 
-SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 #mitkImageVtkMapper2D_pic3dOpacity640x480 mitkImageVtkMapper2D_pic3dSwivel640x480
+SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 #mitkImageVtkMapper2D_pic3dOpacity640x480
 PROPERTY RUN_SERIAL TRUE)
 
 endif()
@@ -63,9 +63,12 @@ endif()
 
 add_test(mitkImageWriterTest_nrrdImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
 add_test(mitkImageWriterTest_2DPNGImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/Png2D-bw.png)
+add_test(mitkImageWriterTest_rgbPNGImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/RenderingTestData/rgbImage.png)
+add_test(mitkImageWriterTest_rgbaPNGImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png)
 set_property(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_2DPNGImage PROPERTY LABELS MITK-Core)
-
+set_property(TEST mitkImageWriterTest_rgbPNGImage PROPERTY LABELS MITK-Core)
+set_property(TEST mitkImageWriterTest_rgbaPNGImage PROPERTY LABELS MITK-Core)
 
 add_subdirectory(DICOMTesting)
 

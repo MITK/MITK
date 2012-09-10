@@ -39,7 +39,7 @@ public:
     int m_NumCellOverflows;     // number of cell overflows
     float m_ParticleLength;
 
-    ParticleGrid(ItkFloatImageType* image, float particleLength);
+    ParticleGrid(ItkFloatImageType* image, float particleLength, int cellCapacity);
     ~ParticleGrid();
 
     Particle* GetParticle(int ID);

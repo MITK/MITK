@@ -135,6 +135,9 @@ protected:
     std::string     m_LutPath;              // path to lookuptables used by the sphere interpolator
 
     FiberPolyDataType m_FiberPolyData;      // container for reconstructed fibers
+
+    //Constant values
+    static const int m_ParticleGridCellCapacity = 1024;
 };
 }
 

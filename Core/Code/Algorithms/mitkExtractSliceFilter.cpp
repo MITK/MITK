@@ -193,7 +193,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     //set the tranform for reslicing.
     // Use inverse transform of the input geometry for reslicing the 3D image.
     // This is needed if the image volume already transformed 
-    if(m_ResliceTransform != NULL)
+    if(m_ResliceTransform.IsNotNull())
       m_Reslicer->SetResliceTransform(m_ResliceTransform->GetVtkTransform()->GetLinearInverse());
 
 
@@ -258,7 +258,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
   }
 
-  if(m_ResliceTransform != NULL){
+  if(m_ResliceTransform.IsNotNull()){
     //if the resliceTransform is set the reslice axis are recalculated.
     //Thus the geometry information is not fitting. Therefor a unitSpacingFilter
     //is used to set up a global spacing of 1 and compensate the transform.

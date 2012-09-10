@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkToFCameraDevice.h"
+#include <itksys/SystemTools.hxx>
 
 
 namespace mitk
@@ -30,6 +31,10 @@ namespace mitk
     this->m_MultiThreader = itk::MultiThreader::New();
     this->m_ImageMutex = itk::FastMutexLock::New();
     this->m_CameraActiveMutex = itk::FastMutexLock::New();
+
+    this->m_RGBImageWidth  = this->m_CaptureWidth;
+    this->m_RGBImageHeight  = this->m_CaptureHeight;
+    this->m_RGBPixelNumber = this->m_RGBImageWidth* this->m_RGBImageHeight;
   }
 
   ToFCameraDevice::~ToFCameraDevice()
@@ -130,5 +135,37 @@ namespace mitk
     for(int i=0; i<this->m_PixelNumber; i++) {this->m_DistanceArray[i]=0.0;}
     this->m_AmplitudeArray = new float[this->m_PixelNumber];
     for(int i=0; i<this->m_PixelNumber; i++) {this->m_AmplitudeArray[i]=0.0;}
+  }
+
+  int ToFCameraDevice::GetRGBCaptureWidth()
+  {
+    return this->m_RGBImageWidth;
+  }
+
+  int ToFCameraDevice::GetRGBCaptureHeight()
+  {
+    return this->m_RGBImageHeight;
+  }
+
+  void ToFCameraDevice::StopCamera()
+  {
+    m_CameraActiveMutex->Lock();
+    m_CameraActive = false;
+    m_CameraActiveMutex->Unlock();
+    itksys::SystemTools::Delay(100);
+    if (m_MultiThreader.IsNotNull())
+    {
+      m_MultiThreader->TerminateThread(m_ThreadID);
+    }
+    // wait a little to make sure that the thread is terminated
+    itksys::SystemTools::Delay(100);
+  }
+
+  bool ToFCameraDevice::IsCameraActive()
+  {
+    m_CameraActiveMutex->Lock();
+    bool ok = m_CameraActive;
+    m_CameraActiveMutex->Unlock();
+    return ok;
   }
 }

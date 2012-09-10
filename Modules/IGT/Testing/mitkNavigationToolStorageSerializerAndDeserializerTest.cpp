@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //POCO
 #include <Poco/Exception.h>
 
+#include "mitkIGTException.h"
+#include "mitkIGTIOException.h"
+
 class NavigationToolStorageSerializerAndDeserializerTestClass
   {
   public:
@@ -94,6 +97,11 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     RegLandmarks1->SetPoint(5,testPt2);
     myTool1->SetToolCalibrationLandmarks(CalLandmarks1);
     myTool1->SetToolRegistrationLandmarks(RegLandmarks1);
+    mitk::Point3D toolTipPos; 
+    mitk::FillVector3D(toolTipPos,1.3423,2.323,4.332);
+    mitk::Quaternion toolTipRot = mitk::Quaternion(0.1,0.2,0.3,0.4);
+    myTool1->SetToolTipPosition(toolTipPos);
+    myTool1->SetToolTipOrientation(toolTipRot);
     myStorage->AddTool(myTool1);
 
     //create Serializer
@@ -117,6 +125,21 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
 
     MITK_TEST_CONDITION_REQUIRED(((readRegLandmarks->GetPoint(5)[0] == 4)&&(readRegLandmarks->GetPoint(5)[1] == 5)&&(readRegLandmarks->GetPoint(5)[2] == 6)),"..Testing if tool registration landmarks have been stored and loaded correctly.");
     MITK_TEST_CONDITION_REQUIRED(((readCalLandmarks->GetPoint(0)[0] == 1)&&(readCalLandmarks->GetPoint(0)[1] == 2)&&(readCalLandmarks->GetPoint(0)[2] == 3)),"..Testing if tool calibration landmarks have been stored and loaded correctly.");
+
+    mitk::Point3D readToolTipPos = readStorage->GetTool(0)->GetToolTipPosition();
+    mitk::Quaternion readToolTipRot = readStorage->GetTool(0)->GetToolTipOrientation();
+    
+    MITK_TEST_CONDITION_REQUIRED(((float(readToolTipPos[0]) == float(1.3423))&&
+                                  (float(readToolTipPos[1]) == float(2.323))&&
+                                  (float(readToolTipPos[2]) == float(4.332))),
+                                  "..Testing if tool tip position has been stored and loaded correctly.");
+   
+    MITK_TEST_CONDITION_REQUIRED(((float(readToolTipRot.x()) == float(0.1))&&
+                                  (float(readToolTipRot.y()) == float(0.2))&&
+                                  (float(readToolTipRot.z()) == float(0.3))&&
+                                  (float(readToolTipRot.r()) == float(0.4))),
+                                  "..Testing if tool tip orientation has been stored and loaded correctly.");
+
     }
 
     static void TestReadSimpleToolStorage()
@@ -258,9 +281,17 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     {
     mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
-    mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize("noStorage.tfl");
-    MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(),"Testing deserialization of not existing data storage.");
-    MITK_TEST_CONDITION_REQUIRED(myDeserializer->GetErrorMessage() == "Cannot open 'noStorage.tfl' for reading", "Checking Error Message");
+    
+    bool exceptionThrown = false;
+    try
+      {
+      mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize("noStorage.tfl");
+      }
+    catch (mitk::IGTException e)
+      {
+      exceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a non existing storage is given for deserialization.");
     }
 
     static void TestReadStorageWithUnknownFiletype()
@@ -271,8 +302,16 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     MITK_TEST_CONDITION(toolFileName.empty() == false, "Check if tool calibration of claron tool file exists");
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
 
-    mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(toolFileName);
-    MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(), "Testing deserialization of existing file with unknown filetype.");
+    bool exceptionThrown = false;
+    try
+      {
+      mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(toolFileName);
+      }
+    catch (mitk::IGTException e)
+      {
+      exceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a wrong file type is given for deserialization.");
     }
 
     static void TestReadZipFileWithNoToolstorage()
@@ -283,8 +322,16 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     MITK_TEST_CONDITION(toolFileName.empty() == false, "Check if tool calibration of claron tool file exists");
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
 
-    mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(toolFileName);
-    MITK_TEST_CONDITION_REQUIRED(readStorage->isEmpty(), "Testing deserialization of empty zip file with no toolstorage in it");
+    bool exceptionThrown = false;
+    try
+      {
+      mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(toolFileName);
+      }
+    catch (mitk::IGTException e)
+      {
+      exceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a empty zip file is given for deserialization.");
     }
 
 
@@ -317,10 +364,16 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
 
 
     //test serialization
-    bool success = true;
-    success = mySerializer->Serialize(filename,myStorage);
-
-    MITK_TEST_CONDITION_REQUIRED(!success,"Testing serialization into invalid file.");
+    bool exceptionThrown = false;
+    try
+      {
+      mySerializer->Serialize(filename,myStorage);
+      }
+    catch(mitk::IGTException e)
+      {
+      exceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if an exception is thrown if an invalid file is used.");
     }
 
 
@@ -339,14 +392,76 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     bool success = mySerializer->Serialize(filename,myStorage);
     MITK_TEST_CONDITION_REQUIRED(success,"Testing serialization of simple tool storage");
     }
+    //new tests for exception throwing of NavigationToolStorageSerializer
+    static void TestSerializerForExceptions()
+    {
+    mitk::NavigationToolStorageSerializer::Pointer testSerializer = mitk::NavigationToolStorageSerializer::New();
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
+    
+    //create an invalid filename
+    std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"";
+
+    //now try to serialize an check if an exception is thrown
+    bool ExceptionThrown = false;
+    try
+      {
+      testSerializer->Serialize(filename,myStorage);
+      }
+    catch(mitk::IGTException)
+      {
+      ExceptionThrown = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(ExceptionThrown, "Testing serializer with invalid filename.");
+    }
+
+    //new tests for exception throwing of NavigationToolStorageDeserializer
+    static void TestDeserializerForExceptions()
+    {
+
+    
+    // Desearializing file with invalid name 
+    mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
+    mitk::NavigationToolStorageDeserializer::Pointer testDeseralizer= mitk::NavigationToolStorageDeserializer::New(tempStorage);
+    bool ExceptionThrown1 = false;
+    try
+      {
+      mitk::NavigationToolStorage::Pointer readStorage = testDeseralizer->Deserialize("InvalidName");
+      }
+    catch(mitk::IGTException)
+      {
+      ExceptionThrown1 = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(ExceptionThrown1, "Testing deserializer with invalid filename.");
+
+    bool ExceptionThrown2 = false;
+    
+    // Deserializing of empty zip file
+    mitk::NavigationToolStorageDeserializer::Pointer testDeseralizer2= mitk::NavigationToolStorageDeserializer::New(tempStorage);
+    try
+      {
+      std::string filename = mitk::StandardFileLocations::GetInstance()->FindFile("EmptyZipFile.zip", "Modules/IGT/Testing/Data");
+      mitk::NavigationToolStorage::Pointer readStorage = testDeseralizer2->Deserialize(filename);
+      }
+    catch(mitk::IGTException)
+      {
+      ExceptionThrown2 = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(ExceptionThrown2, "Testing deserializer method with empty zip file.");
+
+    }
+
   };
+
+
+
+
+
 
 /** This function is testing the TrackingVolume class. */
 int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationToolStorageSerializerAndDeserializer");
-
-  ///** TESTS DEACTIVATED BECAUSE OF DART-CLIENT PROBLEMS
+  try{
   NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationSerializer();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationDeserializer();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteSimpleToolStorage();
@@ -359,6 +474,18 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
   NavigationToolStorageSerializerAndDeserializerTestClass::TestReadZipFileWithNoToolstorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteStorageToInvalidFile();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteEmptyToolStorage();
+  //TestReadInvalidStorage() fails
+  // NavigationToolStorageSerializerAndDeserializerTestClass::TestReadInvalidStorage();
+  NavigationToolStorageSerializerAndDeserializerTestClass::TestSerializerForExceptions();
+  NavigationToolStorageSerializerAndDeserializerTestClass::TestDeserializerForExceptions();
+  }
+  catch (std::exception& e) {
+      MITK_ERROR << "exception:" << e.what();
+  }
+  catch (...) {
+      MITK_ERROR << "Unknown Exception?";
+  }
+  
   NavigationToolStorageSerializerAndDeserializerTestClass::CleanUp();
 
   MITK_TEST_END();

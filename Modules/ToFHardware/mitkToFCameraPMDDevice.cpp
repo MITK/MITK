@@ -97,29 +97,7 @@ namespace mitk
       MITK_INFO<<"Camera not connected";
     }
   }
-
-  void ToFCameraPMDDevice::StopCamera()
-  {
-    m_CameraActiveMutex->Lock();
-    m_CameraActive = false;
-    m_CameraActiveMutex->Unlock();
-    itksys::SystemTools::Delay(100);
-    if (m_MultiThreader.IsNotNull())
-    {
-      m_MultiThreader->TerminateThread(m_ThreadID);
-    }
-    // wait a little to make sure that the thread is terminated
-    itksys::SystemTools::Delay(10);
-  }
-
-  bool ToFCameraPMDDevice::IsCameraActive()
-  {
-    m_CameraActiveMutex->Lock();
-    bool ok = m_CameraActive;
-    m_CameraActiveMutex->Unlock();
-    return ok;
-  }
-
+  
   void ToFCameraPMDDevice::UpdateCamera()
   {
     if (m_Controller)
@@ -157,6 +135,8 @@ namespace mitk
         // get the source data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataBuffer[toFCameraDevice->m_FreePos]);
+        
+
         toFCameraDevice->m_ImageMutex->Unlock();
         // call modified to indicate that cameraDevice was modified
         toFCameraDevice->Modified();
@@ -182,7 +162,6 @@ namespace mitk
         }
         if (overflow)
         {
-          //itksys::SystemTools::Delay(10);
           overflow = false;
         }
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -366,20 +345,24 @@ namespace mitk
   void ToFCameraPMDDevice::SetProperty( const char *propertyKey, BaseProperty* propertyValue )
   {
     ToFCameraDevice::SetProperty(propertyKey,propertyValue);
-    this->m_PropertyList->SetProperty(propertyKey, propertyValue);
     if (strcmp(propertyKey, "ModulationFrequency") == 0)
     {
       int modulationFrequency = 0;
       GetIntProperty(propertyKey, modulationFrequency);
-      m_Controller->SetModulationFrequency(modulationFrequency);
+     modulationFrequency = m_Controller->SetModulationFrequency(modulationFrequency);
+     static_cast<mitk::IntProperty*>(propertyValue)->SetValue(modulationFrequency);
+     this->m_PropertyList->SetProperty(propertyKey, propertyValue );
     }
     else if (strcmp(propertyKey, "IntegrationTime") == 0)
     {
       int integrationTime = 0;
       GetIntProperty(propertyKey, integrationTime);
-      m_Controller->SetIntegrationTime(integrationTime);
+      integrationTime = m_Controller->SetIntegrationTime(integrationTime);
+      static_cast<mitk::IntProperty*>(propertyValue)->SetValue(integrationTime);
+      this->m_PropertyList->SetProperty(propertyKey, propertyValue );
+
     }
-  }
+  } 
 
   void ToFCameraPMDDevice::AllocateSourceData()
   {

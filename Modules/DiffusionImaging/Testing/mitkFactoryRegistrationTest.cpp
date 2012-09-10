@@ -28,18 +28,25 @@ int mitkFactoryRegistrationTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("FactoryRegistrationTest");
 
+  MITK_INFO << "Starting Factory registration test.";
+
   RegisterDiffusionImagingObjectFactory();
+
+  MITK_INFO << "Factory has been registered.";
 
   bool canWrite = false;
   mitk::DiffusionImage<short>::Pointer img = mitk::DiffusionImage<short>::New();
   mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+  MITK_INFO << "Looking for diffusion image writer.";
   for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it) 
-            {
-              if ( (*it)->CanWriteBaseDataType(img.GetPointer()) ) {
-                canWrite = true;
-                break;
-              } 
-            }
+  {
+    if ( (*it)->CanWriteBaseDataType(img.GetPointer()) )
+    {
+      MITK_INFO << "Found diffusion image writer.";
+      canWrite = true;
+      break;
+    }
+  }
 
   MITK_TEST_CONDITION_REQUIRED(canWrite,"Testing factory registration");
 

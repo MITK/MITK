@@ -32,7 +32,7 @@ namespace mitk
  * Interpolation algorithms estimate a binary image (segmentation) given
  * manual segmentations of neighboring slices. They get the following inputs:
  *
- *   - slice orientation of given and requested slices (dimension which is constant for all pixels of the meant orientation, e.g. 2 for transversal).
+ *   - slice orientation of given and requested slices (dimension which is constant for all pixels of the meant orientation, e.g. 2 for axial).
  *   - slice indices of the neighboring slices (for upper and lower slice)
  *   - slice data of the neighboring slices (for upper and lower slice)
  *   - slice index of the requested slice (guaranteed to be between upper and lower index)

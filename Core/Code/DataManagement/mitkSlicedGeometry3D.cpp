@@ -277,7 +277,7 @@ mitk::SlicedGeometry3D::InitializePlanes(
 
   switch ( planeorientation )
   {
-    case PlaneGeometry::Transversal:
+    case PlaneGeometry::Axial:
       viewSpacing = geometry3D->GetSpacing()[2];
       slices = (unsigned int) geometry3D->GetExtent( 2 );
       break;
@@ -753,6 +753,25 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         }
 
         Geometry3D::ExecuteOperation( &centeredRotation );
+      }
+      else
+      {
+        // we also have to consider the case, that there is no reference geometry available.      
+        if ( m_Geometry2Ds.size() > 0 )
+        {
+           // Reach through to all slices in my container
+           for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
+              iter != m_Geometry2Ds.end();
+              ++iter)
+           {
+              (*iter)->ExecuteOperation(operation);
+           }
+      
+          // rotate overall geometry
+          RotationOperation *rotOp = dynamic_cast< RotationOperation * >( operation );
+          Geometry3D::ExecuteOperation( rotOp);
+        }
+
       }
     }
     else

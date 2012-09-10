@@ -1,12 +1,12 @@
 /**
-\bundlemainpage{org.mitk.gui.qt.ultrasound} Ultrasound
+\page org_mitk_gui_qt_ultrasound Ultrasound
 
 \image html icon.xpm "Icon of Ultrasound"
 
 Available sections:
-  - \ref org.mitk.gui.qt.ultrasoundOverview
+  - \ref org_mitk_gui_qt_ultrasoundOverview
 
-\section org.mitk.gui.qt.ultrasoundOverview
+\section org_mitk_gui_qt_ultrasoundOverview
 Describe the features of your awesome plugin here
 <ul>
 <li>Increases productivity

@@ -44,7 +44,19 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  enum PlaneOrientation { Transversal, Sagittal, Frontal };
+  enum PlaneOrientation
+  {
+#ifdef _MSC_VER
+    Transversal, // deprecated
+#endif
+    Axial = 0,
+    Sagittal,
+    Frontal
+  };
+
+#ifdef __GNUC__
+  __attribute__ ((deprecated)) static const PlaneOrientation Transversal = PlaneOrientation(Axial);
+#endif
 
   virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;
   
@@ -82,7 +94,7 @@ public:
 
   /**
    * \brief Initialize a plane with orientation \a planeorientation
-   * (default: transversal) with respect to \a geometry3D (default: identity). 
+   * (default: axial) with respect to \a geometry3D (default: identity).
    * Spacing also taken from \a geometry3D.
    *
    * \warning A former version of this method created a geometry with unit 
@@ -98,42 +110,42 @@ public:
    * \endcode
    */
   virtual void InitializeStandardPlane( const Geometry3D* geometry3D, 
-    PlaneOrientation planeorientation = Transversal, ScalarType zPosition = 0, 
+    PlaneOrientation planeorientation = Axial, ScalarType zPosition = 0,
     bool frontside=true, bool rotated=false );
 
 
   /**
    * \brief Initialize a plane with orientation \a planeorientation
-   * (default: transversal) with respect to \a geometry3D (default: identity).
+   * (default: axial) with respect to \a geometry3D (default: identity).
    * Spacing also taken from \a geometry3D.
    *
    * \param top if \a true, create plane at top, otherwise at bottom 
-   * (for PlaneOrientation Transversal, for other plane locations respectively)
+   * (for PlaneOrientation Axial, for other plane locations respectively)
    */
   virtual void InitializeStandardPlane( const Geometry3D* geometry3D, bool top,
-    PlaneOrientation planeorientation = Transversal,
+    PlaneOrientation planeorientation = Axial,
     bool frontside=true, bool rotated=false );
 
 
   /**
    * \brief Initialize a plane with orientation \a planeorientation 
-   * (default: transversal) with respect to \a transform (default: identity)
+   * (default: axial) with respect to \a transform (default: identity)
    * given width and height in units.
    *
    */
   virtual void InitializeStandardPlane( ScalarType width, ScalarType height, 
     const AffineTransform3D* transform = NULL, 
-    PlaneOrientation planeorientation = Transversal, 
+    PlaneOrientation planeorientation = Axial,
     ScalarType zPosition = 0, bool frontside=true, bool rotated=false );
 
 
   /**
    * \brief Initialize plane with orientation \a planeorientation
-   * (default: transversal) given width, height and spacing.
+   * (default: axial) given width, height and spacing.
    *
    */
   virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
-    const Vector3D & spacing, PlaneOrientation planeorientation = Transversal, 
+    const Vector3D & spacing, PlaneOrientation planeorientation = Axial,
     ScalarType zPosition = 0, bool frontside = true, bool rotated = false );
 
   /**

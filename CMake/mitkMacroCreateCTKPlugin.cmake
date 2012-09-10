@@ -15,8 +15,16 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
       set(is_test_plugin)
     endif()
 
+    set(_mitk_tagfile )
+
+    if(EXISTS ${MITK_DOXYGEN_TAGFILE_NAME})
+      # Todo: Point to stable documentations for stable builds
+      set(_mitk_tagfile "${MITK_DOXYGEN_TAGFILE_NAME}=http://docs.mitk.org/nightly-qt4/")
+    endif()
+
     MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}
                             EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
+                            DOXYGEN_TAGFILES ${_PLUGIN_DOXYGEN_TAGFILES} ${_mitk_tagfile}
                             ${is_test_plugin})
 
     target_link_libraries(${PLUGIN_TARGET} ${ALL_LIBRARIES})
@@ -33,9 +41,9 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
     endif()
   else(NOT _MODULE_CHECK_RESULT)
     if(NOT MITK_BUILD_ALL_PLUGINS)
-      message(SEND_ERROR "${PLUGIN_TARGET} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")
+      message(SEND_ERROR "${PROJECT_NAME} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")
     else()
-      message(STATUS "${PLUGIN_TARGET} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")
+      message(STATUS "${PROJECT_NAME} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")
     endif()
   endif(NOT _MODULE_CHECK_RESULT)
 endmacro()

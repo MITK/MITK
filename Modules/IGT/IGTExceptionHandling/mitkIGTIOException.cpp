@@ -1,6 +1,6 @@
 /*===================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center, 
 Division of Medical and Biological Informatics.
@@ -14,13 +14,4 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "berryIStackableContainer.h"
-
-
-namespace berry {
-
-IStackableContainer::~IStackableContainer()
-{
-}
-
-}
+#include "mitkIGTIOException.h"

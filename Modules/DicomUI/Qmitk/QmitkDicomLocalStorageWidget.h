@@ -30,13 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QString>
 #include <QStringList>
-//For running dicom import in background
-#include <QtConcurrentRun>
-#include <QFuture>
-#include <QFutureWatcher>
-#include <QTimer>
-#include <QLabel>
-#include <QProgressDialog>
+
 /*!
 \brief QmitkDicomLocalStorageWidget 
 
@@ -56,6 +50,7 @@ public:
     static const std::string Widget_ID;
 
     QmitkDicomLocalStorageWidget(QWidget *parent);
+
     virtual ~QmitkDicomLocalStorageWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);
@@ -63,54 +58,46 @@ public:
     void SetDatabaseDirectory(QString newDatabaseDirectory);
 
 signals:
-    void FinishedImport(const QString&);
-    void FinishedImport(const QStringList&);
+
+    /// @brief emitted when import into database is finished.
+    void SignalFinishedImport();
+
+    /// @brief emitted when view button is clicked.
     void SignalDicomToDataManager(const QStringList&);
-    
-    public slots:
+    void SignalProgress(int);
+    void SignalProcessingFile(QString);
+    void SignalCancelImport();
 
-        /// @brief Called when cancel button was clicked.
-       void OnViewButtonClicked();
+public slots:
 
-       /// @brief Called when cancel button was clicked.
-       void OnCancelButtonClicked();
+    /// @brief Called when indexing into database is finished.
+    /// In this slot the models database with new imports is set.
+    /// This causes a model update.
+    void OnFinishedImport();
 
-        /// @brief   Called delete button was clicked.
-        void OnDeleteButtonClicked();
+    /// @brief Called when view button was clicked.
+   void OnViewButtonClicked();
 
-        /// @brief   Called when adding a dicom directory. Starts a thread adding the directory.
-        void StartDicomImport(const QString& dicomData);
+    /// @brief   Called delete button was clicked.
+    void OnDeleteButtonClicked();
 
-        /// @brief   Called when adding a list of dicom files. Starts a thread adding the dicom files.
-        void StartDicomImport(const QStringList& dicomData);
+    /// @brief   Called when adding a dicom directory. Starts a thread adding the directory.
+    void OnStartDicomImport(const QString& dicomData);
 
-        /// @brief   Called when search parameters change.
-        void OnSearchParameterChanged();
+    /// @brief   Called when adding a list of dicom files. Starts a thread adding the dicom files.
+    void OnStartDicomImport(const QStringList& dicomData);
 
-        void OnProgress(int progress);
+    /// @brief   Called when search parameters change.
+    void OnSearchParameterChanged();
 
 protected:
 
-    // adds dicom files from a directory containing dicom files to the local storage. 
-    void AddDICOMData(const QString& dicomDirectory);
-
-    // adds dicom files from a string list containing the filepath to the local storage.
-    void AddDICOMData(const QStringList& dicomFiles);
-
     void SetDatabase(QString databaseFile);
-
-    void SetupProgressDialog();
-
-    QProgressDialog* m_ProgressDialog;
-    QLabel* m_ProgressDialogLabel;
 
     ctkDICOMDatabase* m_LocalDatabase;
     ctkDICOMModel* m_LocalModel;
     ctkDICOMIndexer* m_LocalIndexer;
     Ui::QmitkDicomLocalStorageWidgetControls* m_Controls;
-
-    QFuture<void> m_Future;
-    QFutureWatcher<void> m_Watcher;
 };
 
 

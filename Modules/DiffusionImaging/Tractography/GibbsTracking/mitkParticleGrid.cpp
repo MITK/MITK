@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength)
+ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength, int cellCapacity)
 {
     // initialize counters
     m_NumParticles = 0;
@@ -38,8 +38,8 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength)
     m_GridScale[1] = 1/cellSize;
     m_GridScale[2] = 1/cellSize;
 
-    m_CellCapacity = 1024;          // maximum number of particles per grid cell
-    m_ContainerCapacity = 100000;   // initial particle container capacity
+    m_CellCapacity = cellCapacity;          // maximum number of particles per grid cell
+    m_ContainerCapacity = 100000;           // initial particle container capacity
     int numCells = m_GridSize[0]*m_GridSize[1]*m_GridSize[2];   // number of grid cells
 
     m_Particles.resize(m_ContainerCapacity);        // allocate and initialize particles

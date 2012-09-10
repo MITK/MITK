@@ -744,6 +744,7 @@ void QmitkBrainNetworkAnalysisView::OnCreateConnectivityMatrixImagePushButtonCli
         mitk::Image::Pointer connectivityMatrixImage = mitk::ImportItkImage( filter->GetOutput());
         mitk::DataNode::Pointer connectivityMatrixImageNode = mitk::DataNode::New();
         connectivityMatrixImageNode->SetData ( connectivityMatrixImage );
+        connectivityMatrixImageNode->SetName( "Connectivity matrix" );
         this->GetDefaultDataStorage()->Add(connectivityMatrixImageNode, node );
       }
     }

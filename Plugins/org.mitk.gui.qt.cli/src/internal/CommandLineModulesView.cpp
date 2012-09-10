@@ -137,7 +137,6 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
 
     // Connect signals to slots after we have set up GUI.
     connect(this->m_Controls->m_RunButton, SIGNAL(pressed()), this, SLOT(OnRunPauseButtonPressed()));
-    connect(this->m_Controls->m_StopButton, SIGNAL(pressed()), this, SLOT(OnStopButtonPressed()));
     connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
   }

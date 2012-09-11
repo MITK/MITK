@@ -25,13 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "CommandLineModulesViewControls.h"
 #include "CommandLineModulesPreferencesPage.h"
 #include "QmitkCmdLineModuleFactoryGui.h"
+#include "QmitkCmdLineModuleProgressWidget.h"
 
 // Qt
 #include <QDebug>
 #include <QDir>
 #include <QAction>
-#include <QTabWidget>
-#include <QTextBrowser>
+#include <QVBoxLayout>
+#include <QLayoutItem>
+#include <QWidgetItem>
 
 // CTK
 #include <ctkCmdLineModuleManager.h>
@@ -46,9 +48,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 CommandLineModulesView::CommandLineModulesView()
 : m_Controls(NULL)
 , m_Parent(NULL)
+, m_Layout(NULL)
 , m_ModuleManager(NULL)
 , m_ModuleBackend(NULL)
-, m_ModuleFactory(NULL)
 , m_DirectoryWatcher(NULL)
 , m_TemporaryDirectoryName("")
 , m_DebugOutput(false)
@@ -69,14 +71,14 @@ CommandLineModulesView::~CommandLineModulesView()
     delete m_ModuleBackend;
   }
 
-  if (m_ModuleFactory != NULL)
-  {
-    delete m_ModuleFactory;
-  }
-
   if (m_DirectoryWatcher != NULL)
   {
     delete m_DirectoryWatcher;
+  }
+
+  if (m_Layout != NULL)
+  {
+    delete m_Layout;
   }
 }
 
@@ -93,30 +95,32 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
 {
   if (!m_Controls)
   {
-    m_MapTabToModuleInstance.clear();
-
     // We create CommandLineModulesViewControls, which derives from the Qt generated class.
     m_Controls = new CommandLineModulesViewControls(parent);
+
+    // Create a layout to contain a display of QmitkCmdLineModuleProgressWidget.
+    m_Layout = new QVBoxLayout(m_Controls->m_GeneratedGuiWidget);
+    m_Layout->setContentsMargins(0,0,0,0);
+    m_Layout->setSpacing(0);
 
     // This must be done independent of other preferences, as we need it before
     // we create the ctkCmdLineModuleManager to initialise the Cache.
     this->RetrieveAndStoreTemporaryDirectoryPreferenceValues();
 
-    // Create the command line module infrastructure.
+    // Start to create the command line module infrastructure.
     m_ModuleBackend = new ctkCmdLineModuleBackendLocalProcess();
-    m_ModuleFactory = new QmitkCmdLineModuleFactoryGui(this->GetDataStorage());
     m_ModuleManager = new ctkCmdLineModuleManager(ctkCmdLineModuleManager::STRICT_VALIDATION, m_TemporaryDirectoryName);
 
+    // Set the main object, the ctkCmdLineModuleManager onto all the objects that need it.
     m_Controls->m_ComboBox->SetManager(m_ModuleManager);
     m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
-
     m_ModuleManager->registerBackend(m_ModuleBackend);
 
     // Setup the remaining preferences.
     this->RetrieveAndStorePreferenceValues();
 
     // Connect signals to slots after we have set up GUI.
-    connect(this->m_Controls->m_RunButton, SIGNAL(pressed()), this, SLOT(OnRunPauseButtonPressed()));
+    connect(this->m_Controls->m_RunButton, SIGNAL(pressed()), this, SLOT(OnRunButtonPressed()));
     connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
   }
@@ -214,128 +218,7 @@ void CommandLineModulesView::OnPreferencesChanged(const berry::IBerryPreferences
 
 
 //-----------------------------------------------------------------------------
-void CommandLineModulesView::AddModuleTab(const ctkCmdLineModuleReference& moduleRef)
-{
-  // We don't want to repeatedly create new tabs. If the moduleRef points to
-  // an existing tab, make that tab the current tab.
-  for (int i = 0; i < m_Controls->m_TabWidget->count(); i++)
-  {
-    if (m_Controls->m_TabWidget->tabText(i) == moduleRef.description().title())
-    {
-      m_Controls->m_TabWidget->setCurrentIndex(i);
-      return;
-    }
-  }
-
-  // Otherwise, create a new tab.
-  ctkCmdLineModuleFrontend* moduleInstance = m_ModuleFactory->create(moduleRef);
-  if (!moduleInstance) return;
-
-  // Build up the GUI layout programmatically (manually).
-
-  QTabWidget *documentationTabWidget = new QTabWidget();
-  documentationTabWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-  QWidget *aboutWidget = new QWidget();
-  QWidget *helpWidget = new QWidget();
-
-  QTextBrowser *aboutBrowser = new QTextBrowser(aboutWidget);
-  aboutBrowser->setReadOnly(true);
-  aboutBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-  QTextBrowser *helpBrowser = new QTextBrowser(helpWidget);
-  helpBrowser->setReadOnly(true);
-  helpBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-  QHBoxLayout *aboutLayout = new QHBoxLayout(aboutWidget);
-  aboutLayout->addWidget(aboutBrowser);
-  aboutLayout->setContentsMargins(0,0,0,0);
-  aboutLayout->setSpacing(0);
-
-  QHBoxLayout *helpLayout = new QHBoxLayout(helpWidget);
-  helpLayout->addWidget(helpBrowser);
-  helpLayout->setContentsMargins(0,0,0,0);
-  helpLayout->setSpacing(0);
-
-  documentationTabWidget->addTab(aboutWidget, "About");
-  documentationTabWidget->addTab(helpWidget, "Help");
-
-  QObject* guiHandle = moduleInstance->guiHandle();
-  QWidget* generatedGuiWidgets = qobject_cast<QWidget*>(guiHandle);
-
-  QWidget *topLevelWidget = new QWidget();
-  QGridLayout *topLevelLayout = new QGridLayout(topLevelWidget);
-
-  topLevelLayout->setContentsMargins(0,0,0,0);
-  topLevelLayout->setSpacing(0);
-  topLevelLayout->addWidget(documentationTabWidget, 0, 0);
-  topLevelLayout->setRowStretch(0, 1);
-  topLevelLayout->addWidget(generatedGuiWidgets, 1, 0);
-  topLevelLayout->setRowStretch(1, 10);
-
-  ctkCmdLineModuleDescription description = moduleRef.description();
-
-  QString helpString = "";
-
-  if (!description.title().isEmpty())
-  {
-    QString titleHtml = "<h1>" + description.title() + "</h1>";
-    helpString += titleHtml;
-  }
-
-  if (!description.description().isEmpty())
-  {
-    QString descriptionHtml = "<p>" + description.description() + "</p>";
-    helpString += descriptionHtml;
-  }
-
-  if (!description.documentationURL().isEmpty())
-  {
-    QString docUrlHtml = "<p>For more information please see <a href=\"" + description.documentationURL() \
-                         + "\">the online documentation</a>.</p>";
-    helpString += docUrlHtml;
-  }
-
-  QString aboutString = "";
-
-  if (!description.title().isEmpty())
-  {
-    QString titleHtml = "<h1>" + description.title() + "</h1>";
-    aboutString += titleHtml;
-  }
-
-  if (!description.contributor().isEmpty())
-  {
-    QString contributorHtml = "<h2>Contributed By</h2><p>" + description.contributor() + "</p>";
-    aboutString += contributorHtml;
-  }
-
-  if (!description.license().isEmpty())
-  {
-    QString licenseHtml = "<h2>License</h2><p>" + description.license() + "</p>";
-    aboutString += licenseHtml;
-  }
-
-  if (!description.acknowledgements().isEmpty())
-  {
-    QString acknowledgementsHtml = "<h2>Acknowledgements</h2><p>" + description.acknowledgements() + "</p>";
-    aboutString += acknowledgementsHtml;
-  }
-
-  helpBrowser->clear();
-  helpBrowser->setHtml(helpString);
-  aboutBrowser->clear();
-  aboutBrowser->setHtml(aboutString);
-
-  int tabIndex = m_Controls->m_TabWidget->addTab(topLevelWidget, moduleRef.description().title());
-  m_Controls->m_TabWidget->setCurrentIndex(tabIndex);
-  m_MapTabToModuleInstance[tabIndex] = moduleInstance;
-
-}
-
-
-//-----------------------------------------------------------------------------
-ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QString identifier)
+ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByFullName(QString fullName)
 {
   ctkCmdLineModuleReference result;
 
@@ -344,7 +227,8 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QStri
   ctkCmdLineModuleReference ref;
   foreach(ref, references)
   {
-    if (ref.description().title() == identifier)
+    QString name = ref.description().category() + "." + ref.description().title();
+    if (name == fullName)
     {
       result = ref;
     }
@@ -355,26 +239,80 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByIdentifier(QStri
 
 
 //-----------------------------------------------------------------------------
-void CommandLineModulesView::OnRestoreButtonPressed()
+QmitkCmdLineModuleProgressWidget* CommandLineModulesView::GetWidget(const int& indexNumber)
 {
-  ctkCmdLineModuleFrontend* moduleInstance = m_MapTabToModuleInstance[m_Controls->m_TabWidget->currentIndex()];
-  if (!moduleInstance)
+  QmitkCmdLineModuleProgressWidget *result = NULL;
+
+  QLayoutItem *layoutItem = m_Layout->itemAt(indexNumber);
+  if (layoutItem != NULL)
   {
-    qWarning() << "Invalid module instance";
-    return;
+    QWidgetItem *widgetItem = dynamic_cast<QWidgetItem*>(layoutItem);
+    if (widgetItem != NULL)
+    {
+      result = dynamic_cast<QmitkCmdLineModuleProgressWidget*>(widgetItem->widget());
+    }
   }
-  moduleInstance->resetValues();
+
+  return result;
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnActionChanged(QAction* action)
 {
-  ctkCmdLineModuleReference ref = this->GetReferenceByIdentifier(action->text());
+  QString fullName = action->objectName();
+  ctkCmdLineModuleReference ref = this->GetReferenceByFullName(fullName);
+
   if (ref)
   {
-    this->AddModuleTab(ref);
+    QmitkCmdLineModuleProgressWidget *widget = this->GetWidget(0);
+    if (widget == NULL
+        || widget->IsStarted())
+    {
+      // Create new widget.
+      QmitkCmdLineModuleProgressWidget* newWidget = new QmitkCmdLineModuleProgressWidget(m_Controls->m_GeneratedGuiWidget);
+
+      // Configure new widget.
+      newWidget->SetTemporaryDirectory(this->m_TemporaryDirectoryName);
+      newWidget->SetDataStorage(this->GetDataStorage());
+      newWidget->SetManager(this->m_ModuleManager);
+      newWidget->SetModule(ref);
+
+      // Add new widget to the top (nearest top of screen) of layout.
+      m_Layout->insertWidget(0, newWidget);
+    }
+    else
+    {
+      // If the first widget has not even started, we can simply replace the GUI,
+      // with the correct GUI for the newly selected command line module.
+
+      // Note: At the moment, I'm getting 3 signals instead of 1 ???
+      if (widget->GetFullName() != fullName)
+      {
+        widget->SetModule(ref);
+      }
+    }
   }
 }
 
 
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnRestoreButtonPressed()
+{
+  QmitkCmdLineModuleProgressWidget *widget = this->GetWidget(0);
+  if (widget != NULL && !widget->IsStarted())
+  {
+    widget->Reset();
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnRunButtonPressed()
+{
+  QmitkCmdLineModuleProgressWidget *widget = this->GetWidget(0);
+  if (widget != NULL && !widget->IsStarted())
+  {
+    widget->Run();
+  }
+}

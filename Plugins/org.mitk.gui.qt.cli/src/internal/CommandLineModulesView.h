@@ -23,14 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleResult.h>
 
-class QmitkCmdLineModuleFactoryGui;
 class ctkCmdLineModuleManager;
-class ctkCmdLineModuleFrontend;
 class ctkCmdLineModuleBackendLocalProcess;
 class ctkCmdLineModuleDirectoryWatcher;
-class ctkCmdLineModuleFutureWatcher;
 class CommandLineModulesViewControls;
+class QmitkCmdLineModuleProgressWidget;
 class QAction;
+class QVBoxLayout;
 
 namespace berry
 {
@@ -71,15 +70,21 @@ protected Q_SLOTS:
   
   /**
    * \brief Called when the ctkMenuComboBox has the menu selection changed,
-   * meaning that a new GUI page be created in another tab.
+   * and causes the corresponding GUI to be displayed.
    */
   void OnActionChanged(QAction*);
 
   /**
    * \brief Slot that is called when the restore defaults button is pressed,
-   * to reset the current GUI form to the default values.
+   * to reset the current GUI form to the default values, if the XML specifies them.
    */
   void OnRestoreButtonPressed();
+
+  /**
+   * \brief Slot that is called when the Run button (green arrow) is pressed,
+   * to run the current module.
+   */
+  void OnRunButtonPressed();
 
 protected:
 
@@ -110,28 +115,35 @@ private:
   berry::IBerryPreferences::Pointer RetrievePreferences();
 
   /**
-   * \brief Search the internal datastructure (QHash) to find the reference that matches the identifier.
-   * \param identifier The identifier used in the front end combo box widget, currently title.
-   * \return ctkCmdLineModuleReference the reference corresponding to the identifier, or an invalid reference if non found.
+   * \brief Search all modules for the one matching the given identifier.
+   * \param fullName The "fullName" is the <category>.<title> from the XML.
+   * \return ctkCmdLineModuleReference the reference corresponding to the fullName, or an invalid reference if non found.
    */
-  ctkCmdLineModuleReference GetReferenceByIdentifier(QString identifier);
+  ctkCmdLineModuleReference GetReferenceByFullName(QString fullName);
 
   /**
-   * \brief Adds a module to the views tabbed widget, creating a new tab each time.
-   * \param moduleRef A ctkCmdLineModuleReference.
+   * \brief Returns the QmitkCmdLineModuleProgressWidget from the layout.
+   * \param indexNumber the number of the widget in the layout, starting at zero.
    */
-  void AddModuleTab(const ctkCmdLineModuleReference& moduleRef);
+  QmitkCmdLineModuleProgressWidget* GetWidget(const int& indexNumber);
 
   /**
-   * \brief The GUI controls contain a run/stop button, and a tabbed widget, and the GUI component
-   * for each command line module is added to the tabbed widget dynamically at run time.
+   * \brief The GUI controls contain a reset and run button, and a QWidget container, and the GUI component
+   * for each command line module is added to the QWidget dynamically at run time.
    */
   CommandLineModulesViewControls *m_Controls;
 
   /**
-   * \brief We store the parent, passed in via CommandLineModulesView::CreateQtPartControl, as this class itself is not a QWidget.
+   * \brief We store the parent, passed in via CommandLineModulesView::CreateQtPartControl,
+   * as this class itself is not a QWidget.
    */
   QWidget *m_Parent;
+
+  /**
+   * \brief We keep a local layout, and arrange a display of QmitkCmdLineModuleProgressWidget,
+   * where each QmitkCmdLineModuleProgressWidget represents a single running job.
+   */
+  QVBoxLayout *m_Layout;
 
   /**
    * \brief The manager is responsible for loading and instantiating command line modules.
@@ -144,20 +156,10 @@ private:
   ctkCmdLineModuleBackendLocalProcess *m_ModuleBackend;
 
   /**
-   * \brief The QmitkCmdLineModuleFactoryGui builds a gui for each plugin.
-   */
-  QmitkCmdLineModuleFactoryGui *m_ModuleFactory;
-
-  /**
    * \brief The ctkCmdLineModuleDirectoryWatcher maintains the list of directories
    * we are using to load modules, to provide automatic updates.
    */
   ctkCmdLineModuleDirectoryWatcher *m_DirectoryWatcher;
-
-  /**
-   * \brief We use this map to decide if we want to create more tabs or not.
-   */
-  QHash<int, ctkCmdLineModuleFrontend*> m_MapTabToModuleInstance;
 
   /**
    * \brief We store a temporary folder name, accessible via user preferences.

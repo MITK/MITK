@@ -1,6 +1,5 @@
 set(SRC_CPP_FILES
   QmitkCmdLineModuleMenuComboBox.cpp
-  QmitkCmdLineModuleProgressWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -15,17 +14,17 @@ set(INTERNAL_CPP_FILES
   CommandLineModulesViewControls.cpp
   CommandLineModulesPreferencesPage.cpp
   CommandLineModulesView.cpp
+  QmitkCmdLineModuleProgressWidget.cpp  
 )
 
 set(UI_FILES
-  src/QmitkCmdLineModuleProgressWidget.ui
   src/internal/QmitkPathListWidget.ui
   src/internal/CommandLineModulesViewControls.ui
+  src/internal/QmitkCmdLineModuleProgressWidget.ui
 )
 
 set(MOC_H_FILES
   src/QmitkCmdLineModuleMenuComboBox.h
-  src/QmitkCmdLineModuleProgressWidget.h
   src/internal/QmitkDataStorageComboBoxWithSelectNone.h
   src/internal/QmitkDirectoryListWidget.h
   src/internal/QmitkFileListWidget.h
@@ -35,6 +34,7 @@ set(MOC_H_FILES
   src/internal/CommandLineModulesViewControls.h
   src/internal/CommandLineModulesPreferencesPage.h
   src/internal/CommandLineModulesView.h
+  src/internal/QmitkCmdLineModuleProgressWidget.h
 )
 
 # list of resource files which can be used by the plug-in

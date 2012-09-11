@@ -22,7 +22,7 @@ class QHBoxLayout;
 
 /**
  * \class CommandLineModulesViewControls
- * \brief Class derived from Ui_CommandLineModulesViewControls to provide programatic access to GUI.
+ * \brief Class derived from Ui_CommandLineModulesViewControls to provide access to GUI widgets.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cli_internal
  */
@@ -36,18 +36,10 @@ public:
   CommandLineModulesViewControls(QWidget *parent = 0);
   virtual ~CommandLineModulesViewControls();
 
-  void Initial();
-  void Running();
-  void Cancel();
-  void Pause();
-  void Resume();
-  void Finished();
-
 protected:
 
 private:
 
-  void Enable(bool enable);
 };
 
 #endif // CommandLineModulesViewControls_h

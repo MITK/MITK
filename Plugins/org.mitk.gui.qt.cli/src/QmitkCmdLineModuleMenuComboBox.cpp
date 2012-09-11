@@ -31,6 +31,7 @@ QmitkCmdLineModuleMenuComboBox::QmitkCmdLineModuleMenuComboBox(QWidget* parent)
 : ctkMenuComboBox(parent)
 , m_ModuleManager(NULL)
 {
+  qRegisterMetaType<ctkCmdLineModuleReference>();
 }
 
 

@@ -103,7 +103,7 @@ void mitk::LiveWireTool2D::Activated()
 
 void mitk::LiveWireTool2D::Deactivated()
 {
-  this->OnFinish();
+  this->FinishTool();
   Superclass::Deactivated();
 }
 
@@ -117,7 +117,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
-
+  
   if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
 
@@ -296,19 +296,37 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   if (!positionEvent) return false;
   /* END check if event can be handled */
 
+
   //actual timestep
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
+  //remove last control point being added by double click
+  m_Contour->RemoveVertexAt(m_Contour->GetNumberOfVertices(timestep) - 1, timestep);
 
-  m_Contour->Close(timestep);
+  this->FinishTool();
+
+  return true;
+}
+
+
+
+void mitk::LiveWireTool2D::FinishTool()
+{
+  //const mitk::TimeBounds &timeBounds = m_Contour->GetGeometry()->GetTimeBounds();
+
+  unsigned int numberOfTimesteps = m_Contour->GetTimeSlicedGeometry()->GetTimeSteps();
+
+  //close contour in each timestep
+  for( int i = 0; i <= numberOfTimesteps; i++)
+  {
+    m_Contour->Close(i);
+  }
 
   //clear LiveWire node
   m_ToolManager->GetDataStorage()->Remove( m_LiveWireContourNode );
   m_LiveWireContourNode = NULL;
   m_LiveWireContour = NULL;
 
-  //remove last control point being added by double click
-  m_Contour->RemoveVertexAt(m_Contour->GetNumberOfVertices(timestep) -1 , timestep);
 
   //TODO visual feedback for completing livewire tool
   m_ContourModelNode->AddProperty( "color", ColorProperty::New(1.0, 1.0, 0.1), NULL, true );
@@ -340,12 +358,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   m_LiveWireContourNode->AddProperty( "color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
   /* END reset contours and datanodes */
-
-
-  return true;
 }
-
-
 
 
 

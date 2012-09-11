@@ -73,10 +73,10 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     virtual bool OnFinish(Action*, const StateEvent*);
 
     /// \brief Close the contour
-    virtual bool OnCloseContour(Action*, const StateEvent*);
-
-    /// \brief Close the contour
     virtual bool OnLastSegmentDelete(Action*, const StateEvent*);
+
+    /// \brief Finish contour interaction.
+    void FinishTool();
 
 
     //the contour already set by the user
@@ -93,6 +93,7 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     mitk::Image::Pointer m_WorkingSlice;
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
+
 };
 
 } // namespace

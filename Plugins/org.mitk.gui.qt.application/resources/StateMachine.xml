@@ -3848,7 +3848,6 @@
    </state>
    <state NAME="Guard_lastPointClicked" ID="20" ><!-- check doubleClick on last point -->
     <transition NAME="yes" NEXT_STATE_ID="1" EVENT_ID="1004"> <!-- EIDYES = 1004 -->
-     <action ID="7007" /> <!-- AcCLOSECONTOUR = 7007 -->
      <action ID="44" /> <!-- AcFINISH = 44 -->
     </transition>
     <transition NAME="no" NEXT_STATE_ID="2" EVENT_ID="1003"> <!-- EIDNO = 1003 -->

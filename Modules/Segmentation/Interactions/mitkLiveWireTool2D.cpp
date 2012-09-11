@@ -64,7 +64,6 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   CONNECT_ACTION( AcMOVE, OnMouseMoved );
   CONNECT_ACTION( AcCHECKPOINT, OnCheckPoint );
   CONNECT_ACTION( AcFINISH, OnFinish );
-  CONNECT_ACTION( AcCLOSECONTOUR, OnCloseContour );
   CONNECT_ACTION( AcDELETEPOINT, OnLastSegmentDelete );
 }
 
@@ -104,6 +103,7 @@ void mitk::LiveWireTool2D::Activated()
 
 void mitk::LiveWireTool2D::Deactivated()
 {
+  this->OnFinish();
   Superclass::Deactivated();
 }
 
@@ -299,6 +299,9 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   //actual timestep
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
+
+  m_Contour->Close(timestep);
+
   //clear LiveWire node
   m_ToolManager->GetDataStorage()->Remove( m_LiveWireContourNode );
   m_LiveWireContourNode = NULL;
@@ -338,31 +341,12 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   m_LiveWireContourNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
   /* END reset contours and datanodes */
 
-  //deactivate tool and go to initial state
-  this->Deactivated();
 
   return true;
 }
 
 
 
-
-bool mitk::LiveWireTool2D::OnCloseContour( Action* action, const StateEvent* stateEvent)
-{
-  if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
-
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-
-  m_Contour->Close(timestep);
-
-  assert( positionEvent->GetSender()->GetRenderWindow() );
-  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-
-  return true;
-}
 
 
 

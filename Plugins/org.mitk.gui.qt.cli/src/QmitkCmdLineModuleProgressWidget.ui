@@ -28,6 +28,19 @@
     </widget>
    </item>
    <item>
+    <widget class="ctkCollapsibleGroupBox" name="m_ParametersGroupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Parameters</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QProgressBar" name="m_ProgressBar">
@@ -78,19 +91,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="ctkCollapsibleGroupBox" name="m_ParametersGroupBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Parameters</string>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="ctkCollapsibleGroupBox" name="m_ConsoleGroupBox">

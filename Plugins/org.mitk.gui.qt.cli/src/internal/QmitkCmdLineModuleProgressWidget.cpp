@@ -177,6 +177,9 @@ void QmitkCmdLineModuleProgressWidget::OnModuleStarted()
 //-----------------------------------------------------------------------------
 void QmitkCmdLineModuleProgressWidget::OnModuleCanceled()
 {
+  QString message = "cancelling.";
+  this->PublishMessage(message);
+
   this->m_UI->m_PauseButton->setEnabled(false);
   this->m_UI->m_PauseButton->setChecked(false);
   this->m_UI->m_CancelButton->setEnabled(false);
@@ -185,29 +188,34 @@ void QmitkCmdLineModuleProgressWidget::OnModuleCanceled()
   this->m_UI->m_ParametersGroupBox->setCollapsed(true);
   this->m_UI->m_ConsoleGroupBox->setCollapsed(true);
   this->m_UI->m_ProgressTitle->setText(this->GetTitle() + ": cancelled");
+
+  message = "cancelled.";
+  this->PublishMessage(message);
 }
 
 
 //-----------------------------------------------------------------------------
 void QmitkCmdLineModuleProgressWidget::OnModuleFinished()
 {
-  QString message = "finishing.";
-  this->PublishMessage(message);
-
   this->m_UI->m_PauseButton->setEnabled(false);
   this->m_UI->m_PauseButton->setChecked(false);
   this->m_UI->m_CancelButton->setEnabled(false);
   this->m_UI->m_RemoveButton->setEnabled(true);
-  this->m_UI->m_ProgressTitle->setText(this->GetTitle() + ": finished");
 
   if (!this->m_FutureWatcher->isCanceled())
   {
+    QString message = "finishing.";
+    this->PublishMessage(message);
+
+    this->m_UI->m_ProgressTitle->setText(this->GetTitle() + ": finished");
+
     this->LoadOutputData();
     this->ClearUpTemporaryFiles();
-  }
 
-  message = "finished.";
-  this->PublishMessage(message);
+    message = "finished.";
+    this->PublishMessage(message);
+
+  }
 }
 
 

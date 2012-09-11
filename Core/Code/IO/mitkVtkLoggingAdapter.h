@@ -32,6 +32,9 @@ public:
   
   static VtkLoggingAdapter* New();
 
+  /** @brief Initializes the logging adapter. Vtk logging 
+    *        messages are redirected to MITK logging afterwards. 
+    */
   static void Initialize();
   
   virtual void DisplayText(const char* t);

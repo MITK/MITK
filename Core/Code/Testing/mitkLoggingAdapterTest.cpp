@@ -17,10 +17,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 #include <mitkVtkLoggingAdapter.h>
+#include <mitkItkLoggingAdapter.h>
+#include <mitkCommon.h>
 
+class ItkLoggingTestClass : public itk::Object
+  {
+  public: 
 
+    mitkClassMacro( ItkLoggingTestClass , itk::Object );
+    itkNewMacro( ItkLoggingTestClass );
 
-class VtkLoggingAdapterTestClass
+    void TestItkWarningMessage()
+      {
+      itkWarningMacro("Test ITK Warning message");
+      }
+   
+  };
+
+/** @brief This test tests all logging adapters of MITK. */
+class LoggingAdapterTestClass
 {
 public: 
   
@@ -45,12 +60,27 @@ public:
     vtkOutputWindow::GetInstance()->DisplayErrorText("Test Vtk Error Message");
     MITK_TEST_CONDITION_REQUIRED(true,"Testing if Vtk logging with MITK logging adapter runs without errors.");
     }
+
+  static void TestItkLoggingWithoutAdapter()
+    {
+    ItkLoggingTestClass::Pointer myItkLogger = ItkLoggingTestClass::New();
+    myItkLogger->TestItkWarningMessage();
+    }
+
+  static void TestItkLoggingWithAdapter()
+    {
+    mitk::ItkLoggingAdapter::Initialize();
+    ItkLoggingTestClass::Pointer myItkLogger = ItkLoggingTestClass::New();
+    myItkLogger->TestItkWarningMessage();
+    }
 };
 
-int mitkVtkLoggingAdapterTest(int /*argc*/, char* /*argv*/[])
+int mitkLoggingAdapterTest(int /*argc*/, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("VtkLoggingAdapter");
-  VtkLoggingAdapterTestClass::TestVtkLoggingWithoutAdapter();
-  VtkLoggingAdapterTestClass::TestVtkLoggingWithAdapter();
+  MITK_TEST_BEGIN("LoggingAdapters: VTK, ITK");
+  LoggingAdapterTestClass::TestVtkLoggingWithoutAdapter();
+  LoggingAdapterTestClass::TestVtkLoggingWithAdapter();
+  LoggingAdapterTestClass::TestItkLoggingWithoutAdapter();
+  LoggingAdapterTestClass::TestItkLoggingWithAdapter();
   MITK_TEST_END();
 }

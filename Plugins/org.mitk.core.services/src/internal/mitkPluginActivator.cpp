@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkModule.h>
 #include <mitkModuleContext.h>
 #include <mitkVtkLoggingAdapter.h>
+#include <mitkItkLoggingAdapter.h>
 
 
 namespace mitk
@@ -75,6 +76,7 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   QFileInfo path = context->getDataFile(filename);
   mitk::LoggingBackend::SetLogFile(path.absoluteFilePath().toStdString().c_str());
   mitk::VtkLoggingAdapter::Initialize();
+  mitk::ItkLoggingAdapter::Initialize();
 
   //initialize data storage service
   DataStorageService* service = new DataStorageService();

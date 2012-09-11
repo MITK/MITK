@@ -64,14 +64,14 @@ ctkCmdLineModuleManager* QmitkCmdLineModuleMenuComboBox::GetManager() const
 
 
 // -------------------------------------------------------------------------
-void QmitkCmdLineModuleMenuComboBox::OnModuleRegistered(const ctkCmdLineModuleReference& ref)
+void QmitkCmdLineModuleMenuComboBox::OnModuleRegistered(const ctkCmdLineModuleReference&)
 {
   this->RebuildMenu();
 }
 
 
 // -------------------------------------------------------------------------
-void QmitkCmdLineModuleMenuComboBox::OnModuleUnRegistered(const ctkCmdLineModuleReference& ref)
+void QmitkCmdLineModuleMenuComboBox::OnModuleUnRegistered(const ctkCmdLineModuleReference&)
 {
   this->RebuildMenu();
 }
@@ -167,7 +167,12 @@ void QmitkCmdLineModuleMenuComboBox::RebuildMenu()
       else
       {
         // Leaf node, just add the action.
-        currentMenu->addAction(part);
+        QAction *action = currentMenu->addAction(part);
+
+        // We set the object name, so we can retrieve it later when we want to
+        // rebuild a new GUI depending on the name of the action.
+        // see QmitkCmdLineModuleProgressWidget.
+        action->setObjectName(fullName);
       }
     }
   }

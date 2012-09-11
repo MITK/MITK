@@ -180,6 +180,8 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   mitk::ContourModel::Pointer liveWireContour = mitk::ContourModel::New();
   liveWireContour = this->m_LiveWireFilter->GetOutput();
 
+  //remove point at current position because it is included in next livewire segment too.
+  liveWireContour->RemoveVertexAt( liveWireContour->GetNumberOfVertices(timestep) - 1, timestep);
 
   /*++++++++++++++ concatenate LIVEWIRE ++++++++++++++++++++++++++++++*/
   //insert new liveWire computed points

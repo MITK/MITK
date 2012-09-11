@@ -143,6 +143,19 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetV
     }//while
     if(nearestlist.size() > 0)
     {
+      /*++++++++++++++++++++ return the nearest active point if one was found++++++++++++++++++*/
+      std::deque< std::pair<double, VertexType*> >::iterator it = nearestlist.begin();
+      std::deque< std::pair<double, VertexType*> >::iterator end = nearestlist.end();
+      while(it != end)
+      {
+        if( (*it).second->IsActive )
+        {
+          return (*it).second;
+        }
+        it++;
+      }
+      /*---------------------------------------------------------------------------------------*/
+
       //return closest point
       return nearestlist.front().second;
     }

@@ -37,6 +37,7 @@ class QmitkCmdLineModuleGuiPrivate;
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cli_internal
  * \sa QmitkCmdLineModuleFactoryGui
+ * \sa ctkCmdLineModuleFrontendQtGui
  */
 class QmitkCmdLineModuleGui : public ctkCmdLineModuleFrontendQtGui
 {

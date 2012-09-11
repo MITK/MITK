@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  * \class CommandLineModulesViewConstants
  * \brief Structure to define a namespace for constants used privately within this view.
+ * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
+ * \ingroup org_mitk_gui_qt_cli_internal
  */
 struct CommandLineModulesViewConstants
 {

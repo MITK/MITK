@@ -21,6 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+/**
+ * \class org_mitk_gui_qt_cli_Activator
+ * \brief Blueberry plugin activator for CommandLineModulesView.
+ * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
+ * \ingroup org_mitk_gui_qt_cli_internal
+ */
 class org_mitk_gui_qt_cli_Activator :
   public QObject, public ctkPluginActivator
 {

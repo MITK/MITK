@@ -26,10 +26,11 @@ class QmitkCmdLineModuleFactoryGuiPrivate;
 
 /**
  * \class QmitkCmdLineModuleFactoryGui
- * \brief Derived from ctkCmdLineModuleFactory to instantiate QmitkCmdLineModuleGui
+ * \brief Derived from ctkCmdLineModuleFactory to instantiate QmitkCmdLineModuleGui front ends.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cli_internal
  * \sa QmitkCmdLineModuleGui
+ * \sa ctkCmdLineModuleFrontendFactoryQtGui
  */
 class QmitkCmdLineModuleFactoryGui
     : public ctkCmdLineModuleFrontendFactoryQtGui
@@ -40,7 +41,7 @@ public:
   virtual ~QmitkCmdLineModuleFactoryGui();
 
   /**
-   * \brief Simply creates QmitkCmdLineModuleGui which is an MITK specific module.
+   * \brief Simply creates QmitkCmdLineModuleGui which is an MITK specific Qt front end.
    */
   ctkCmdLineModuleFrontendQtGui* create(const ctkCmdLineModuleReference& moduleRef);
 

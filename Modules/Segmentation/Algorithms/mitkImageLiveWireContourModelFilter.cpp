@@ -236,7 +236,8 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
     while(pathIterator != shortestPath.end())
     {
       //count pixel values
-      histogram[ static_cast<int>( gradientMagnImage->GetPixel((*pathIterator)) * 1000 ) ] += 1;
+      //use scale factor to avoid mapping gradients between 0.0 and 1.0 to same bin
+      histogram[ static_cast<int>( gradientMagnImage->GetPixel((*pathIterator)) * ImageLiveWireContourModelFilter::CostFunctionType::MAPSCALEFACTOR ) ] += 1;
 
       pathIterator++;
     }

@@ -119,7 +119,7 @@ namespace itk
       //current position
       std::map< int, int >::iterator x;
       //std::map< int, int >::key_type keyOfX = static_cast<std::map< int, int >::key_type>(gradientMagnitude * 1000);
-      int keyOfX = static_cast<int >(gradientMagnitude * 1000);
+      int keyOfX = static_cast<int >(gradientMagnitude * ShortestPathCostFunctionLiveWire::MAPSCALEFACTOR);
       x = m_CostMap.find( keyOfX );
 
       std::map< int, int >::iterator left2;

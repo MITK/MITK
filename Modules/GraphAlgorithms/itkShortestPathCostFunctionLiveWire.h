@@ -120,6 +120,10 @@ namespace itk
       this->m_MaxMapCosts = max;
     }
 
+    enum Constants{
+      MAPSCALEFACTOR = 10
+    };
+
   protected:
 
     virtual ~ShortestPathCostFunctionLiveWire() {};

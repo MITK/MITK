@@ -1,4 +1,4 @@
-/*===================================================================
+﻿/*===================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
@@ -39,7 +39,7 @@ public:
 
     void Load(mitk::ModuleContext* context)
     {
-        //Implementing KinectDeiveFactory
+        //Implementing KinectDeviceFactory
         KinectDeviceFactory* kinectFactory = new KinectDeviceFactory();
         ServiceProperties kinectFactoryProps;
         kinectFactoryProps["ToFFactoryName"] = kinectFactory->GetFactoryName();

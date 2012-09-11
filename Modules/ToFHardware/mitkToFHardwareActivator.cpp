@@ -25,15 +25,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIToFDeviceFactory.h"
 
 #include "mitkToFConfig.h"
-//#include "mitkKinectDeviceFactory.h"
+
+//  #include "mitkKinectDeviceFactory.h"
+//  #include "mitkToFCameraPMDCamCubeDeviceFactory.h"
+//  #include "mitkToFCameraPMDRawDataCamCubeDeviceFactory.h"
 #include "mitkToFCameraMESASR4000DeviceFactory.h"
-#include "mitkToFCameraPMDPlayerDeviceFactory.h"
-#include "mitkToFCameraPMDCamBoardDeviceFactory.h"
-#include "mitkToFCameraPMDCamCubeDeviceFactory.h"
+//#include "mitkToFCameraPMDPlayerDeviceFactory.h"
 #include "mitkToFCameraMITKPlayerDeviceFactory.h"
-#include "mitkToFCameraPMDO3DeviceFactory.h"
-#include "mitkToFCameraPMDRawDataCamCubeDeviceFactory.h"
-#include "mitkToFCameraPMDRawDataCamBoardDeviceFactory.h"
+//#include "mitkToFCameraPMDO3DeviceFactory.h"
+//#include "mitkToFCameraPMDCamBoardDeviceFactory.h"
+//#include "mitkToFCameraPMDRawDataCamBoardDeviceFactory.h"
 
 
 /*
@@ -54,12 +55,34 @@ public:
         //       string.replace(";"," ");
         std::cout << "cameras " << string << std::endl;
 
-        //Implementing KinectDeiveFactory
+//Loading mitkKinectModule.dll of KinectModule
+        //Implementing KinectDeviceFactory
         //KinectDeviceFactory* kinectFactory = new KinectDeviceFactory();
         //ServiceProperties kinectFactoryProps;
         //kinectFactoryProps["ToFFactoryName"] = kinectFactory->GetFactoryName();
         //context->RegisterService<IToFDeviceFactory>(kinectFactory, kinectFactoryProps);
-        LoadLibrary(TEXT("mitkKinectModule.dll"));
+      LoadLibrary(TEXT("mitkKinectModule.dll"));
+
+//Loading mitkPMDCamCubeModule.dll of PMCCamCubeModule
+        ////Implementing PMD Player DeviceFactory
+        //ToFCameraPMDPlayerDeviceFactory* toFCameraPMDPlayerDeviceFactory = new ToFCameraPMDPlayerDeviceFactory();
+        //ServiceProperties pMDPlayerFactoryProps;
+        //pMDPlayerFactoryProps["ToFFactoryName"] = toFCameraPMDPlayerDeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDPlayerDeviceFactory,pMDPlayerFactoryProps);
+
+        ////Implementing PMD Raw Data Cam Cube DeviceFactory
+        //ToFCameraPMDRawDataCamCubeDeviceFactory* toFCameraPMDRawDataCamCubeDeviceFactory = new ToFCameraPMDRawDataCamCubeDeviceFactory();
+        //ServiceProperties rawCamCubeFactoryProps;
+        //rawCamCubeFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamCubeDeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamCubeDeviceFactory,rawCamCubeFactoryProps);
+
+        ////Implementing CamCubeDeviceFactory
+        //ToFCameraPMDCamCubeDeviceFactory* toFCameraPMDCamCubeDeviceFactory = new ToFCameraPMDCamCubeDeviceFactory();
+        //ServiceProperties camCubeFactoryProps;
+        //camCubeFactoryProps["ToFFactoryName"] = toFCameraPMDCamCubeDeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamCubeDeviceFactory,camCubeFactoryProps);
+      LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
+
 
         //Implementing MESASR4000DeviceFactory
         ToFCameraMESASR4000DeviceFactory* toFCameraMESASR4000DeviceFactory = new ToFCameraMESASR4000DeviceFactory();
@@ -73,41 +96,23 @@ public:
         mitkPlayerFactoryProps["ToFFactoryName"] = toFCameraMITKPlayerDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraMITKPlayerDeviceFactory, mitkPlayerFactoryProps);
 
-        //Implementing CamBoardDeviceFactory
-        ToFCameraPMDCamBoardDeviceFactory* toFCameraPMDCamBoardDeviceFactory = new ToFCameraPMDCamBoardDeviceFactory();
-        ServiceProperties camBoardFactoryProps;
-        camBoardFactoryProps["ToFFactoryName"] = toFCameraPMDCamBoardDeviceFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamBoardDeviceFactory, camBoardFactoryProps);
-
-        //Implementing CamCubeDeviceFactory
-        ToFCameraPMDCamCubeDeviceFactory* toFCameraPMDCamCubeDeviceFactory = new ToFCameraPMDCamCubeDeviceFactory();
-        ServiceProperties camCubeFactoryProps;
-        camCubeFactoryProps["ToFFactoryName"] = toFCameraPMDCamCubeDeviceFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamCubeDeviceFactory,camCubeFactoryProps);
-
         //Implementing PMD O3D DeviceFactory
-        ToFCameraPMDO3DeviceFactory* toFCameraPMDO3DeviceFactory = new ToFCameraPMDO3DeviceFactory();
-        ServiceProperties o3FactoryProps;
-        o3FactoryProps["ToFFactoryName"] = toFCameraPMDO3DeviceFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(toFCameraPMDO3DeviceFactory,o3FactoryProps);
+        //ToFCameraPMDO3DeviceFactory* toFCameraPMDO3DeviceFactory = new ToFCameraPMDO3DeviceFactory();
+        //ServiceProperties o3FactoryProps;
+        //o3FactoryProps["ToFFactoryName"] = toFCameraPMDO3DeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDO3DeviceFactory,o3FactoryProps);
 
-        //Implementing PMD Player DeviceFactory
-        ToFCameraPMDPlayerDeviceFactory* toFCameraPMDPlayerDeviceFactory = new ToFCameraPMDPlayerDeviceFactory();
-        ServiceProperties pMDPlayerFactoryProps;
-        pMDPlayerFactoryProps["ToFFactoryName"] = toFCameraPMDPlayerDeviceFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(toFCameraPMDPlayerDeviceFactory,pMDPlayerFactoryProps);
-
-        //Implementing PMD Raw Data Cam Cube DeviceFactory
-        ToFCameraPMDRawDataCamCubeDeviceFactory* toFCameraPMDRawDataCamCubeDeviceFactory = new ToFCameraPMDRawDataCamCubeDeviceFactory();
-        ServiceProperties rawCamCubeFactoryProps;
-        rawCamCubeFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamCubeDeviceFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamCubeDeviceFactory,rawCamCubeFactoryProps);
+        //Implementing CamBoardDeviceFactory
+        //ToFCameraPMDCamBoardDeviceFactory* toFCameraPMDCamBoardDeviceFactory = new ToFCameraPMDCamBoardDeviceFactory();
+        //ServiceProperties camBoardFactoryProps;
+        //camBoardFactoryProps["ToFFactoryName"] = toFCameraPMDCamBoardDeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamBoardDeviceFactory, camBoardFactoryProps);
 
         //Implementing PMD Raw Data Cam Board DeviceFactory
-        ToFCameraPMDRawDataCamBoardDeviceFactory* toFCameraPMDRawDataCamBoardDeviceFactory = new ToFCameraPMDRawDataCamBoardDeviceFactory();
-        ServiceProperties rawCamBoardFactoryProps;
-        rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
+        //ToFCameraPMDRawDataCamBoardDeviceFactory* toFCameraPMDRawDataCamBoardDeviceFactory = new ToFCameraPMDRawDataCamBoardDeviceFactory();
+        //ServiceProperties rawCamBoardFactoryProps;
+        //rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
 
         //m_Factories.push_back( kinectFactory );
     }

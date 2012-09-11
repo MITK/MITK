@@ -1,4 +1,4 @@
 set(MODULE_TESTS
-  #mitkKinectControllerTest.cpp
-  #mitkKinectDeviceTest.cpp
+  mitkKinectControllerTest.cpp
+  mitkKinectDeviceTest.cpp
 )

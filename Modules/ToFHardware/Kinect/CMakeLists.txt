@@ -16,7 +16,7 @@ MITK_CREATE_MODULE(mitkKinectModule
   EXPORT_DEFINE MITK_KINECTMODULE_EXPORT
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
 )
-  Message("Kinect Module erfolgreicht erstellt")
+  Message("Kinect Module erfolgreich erstellt")
 
 add_subdirectory(Testing)
 ENDIF(MITK_USE_TOF_KINECT)

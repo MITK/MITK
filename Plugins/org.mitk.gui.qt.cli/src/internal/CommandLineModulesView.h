@@ -42,14 +42,6 @@ namespace berry
  * \brief Provides basic GUI interface to the CTK command line modules.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cli_internal
- *
- * This class is a basic interface to the CTK command line modules library.
- * Ideally, an MITK base application would load command line modules dynamically
- * at runtime, and promote them to the main window menu bar to appear as fully
- * fledged Views. However, currently this is not supported, and so this view
- * provides a simplified interface, contained within one plugin in order to
- * facilitate testing, debugging, and understanding of use-cases.
- *
  * \sa QmitkAbstractView
  */
 class CommandLineModulesView : public QmitkAbstractView
@@ -84,53 +76,10 @@ protected Q_SLOTS:
   void OnActionChanged(QAction*);
 
   /**
-   * \brief Slot that is called when the Run button is pressed.
-   */
-  void OnRunPauseButtonPressed();
-
-  /**
-   * \brief Slot that is called when the Stop button is pressed.
-   */
-  void OnStopButtonPressed();
-
-  /**
-   * \brief Slot that is called when the restore defaults button is pressed.
+   * \brief Slot that is called when the restore defaults button is pressed,
+   * to reset the current GUI form to the default values.
    */
   void OnRestoreButtonPressed();
-
-  /**
-   * \brief Slot called from ctkCmdLineModuleFutureWatcher when the module has been launched.
-   */
-  void OnModuleStarted();
-
-  /**
-   * \brief Slot called from ctkCmdLineModuleFutureWatcher when the module has finished.
-   */
-  void OnModuleFinished();
-
-  /**
-   * \brief Slot called from ctkCmdLineModuleFutureWatcher to notify of any progress,
-   * currently just printing console debug messages.
-   */
-  void OnModuleProgressValueChanged(int);
-
-  /**
-   * \brief Slot called from ctkCmdLineModuleFutureWatcher to notify of any progress,
-   * currently just printing console debug messages.
-   */
-  void OnModuleProgressTextChanged(QString);
-
-  /**
-   * \brief Slot called from ctkCmdLineModuleFutureWatcher to notify of any standard
-   * output progress information.
-   */
-  void OnModuleOutputDataReady();
-
-  /**
-   * \brief Slot called from ctkCmdLineModuleFutureWatcher to notify of any standard
-   * error progress information.
-   */
-  void OnModuleErrorDataReady();
 
 protected:
 
@@ -142,33 +91,23 @@ protected:
 
 private:
 
-  enum ProcessingInstruction {
-    RunPauseButton,
-    StopButton
-  };
-
   /**
-   * \brief Called on startup and by OnPreferencesChanged to load the preferences into member variables.
-   *
-   * Does not do the temporary folder.
+   * \brief Called on startup and by OnPreferencesChanged to load all
+   * preferences except the temporary folder into member variables.
    */
   void RetrieveAndStorePreferenceValues();
 
   /**
-   * \brief Called on startup and by OnPreferencesChanged to load the temporary folder preference into member variables.
+   * \brief Called on startup and by OnPreferencesChanged to load the temporary folder
+   * preference into member variable m_TemporaryDirectoryName.
    */
   void RetrieveAndStoreTemporaryDirectoryPreferenceValues();
 
 
   /**
-   * \brief Called to get hold of the actual prefefences node.
+   * \brief Called to get hold of the actual preferences node.
    */
   berry::IBerryPreferences::Pointer RetrievePreferences();
-
-  /**
-   * \brief Used to write output to console.
-   */
-  void PublishMessage(const QString& message);
 
   /**
    * \brief Search the internal datastructure (QHash) to find the reference that matches the identifier.
@@ -182,41 +121,6 @@ private:
    * \param moduleRef A ctkCmdLineModuleReference.
    */
   void AddModuleTab(const ctkCmdLineModuleReference& moduleRef);
-
-  /**
-   * \brief Destroys any images listed in m_TemporaryFileNames, silently failing.
-   */
-  void ClearUpTemporaryFiles();
-
-  /**
-   * \brief Loads any data listed in m_OutputDataToLoad into the mitk::DataStorage.
-   */
-  void LoadOutputData();
-
-  /**
-   * \brief Called by OnRunButtonPressed() and OnStopButtonPressed() to actually decide what to run.
-   */
-  void ProcessInstruction(const ProcessingInstruction& instruction);
-
-  /**
-   * \brief Slot to launch the command line module.
-   */
-  void Run();
-
-  /**
-   * \brief Slot to stop (kill) the command line module.
-   */
-  void Stop();
-
-  /**
-   * \brief Slot to pause the command line module.
-   */
-  void Pause();
-
-  /**
-   * \brief Slot to resume the command line module.
-   */
-  void Resume();
 
   /**
    * \brief The GUI controls contain a run/stop button, and a tabbed widget, and the GUI component
@@ -251,11 +155,6 @@ private:
   ctkCmdLineModuleDirectoryWatcher *m_DirectoryWatcher;
 
   /**
-   * \brief This is the QFutureWatcher that will watch for when the process has finished, and call OnFutureFinished() slot.
-   */
-  ctkCmdLineModuleFutureWatcher* m_Watcher;
-
-  /**
    * \brief We use this map to decide if we want to create more tabs or not.
    */
   QHash<int, ctkCmdLineModuleFrontend*> m_MapTabToModuleInstance;
@@ -266,23 +165,9 @@ private:
   QString m_TemporaryDirectoryName;
 
   /**
-   * \brief We store a list of temporary file names that are saved to disk before
-   * launching a command line app, and then must be cleared up when the command line
-   * app successfully finishes.
-   */
-  QStringList m_TemporaryFileNames;
-
-  /**
-   * \brief We store a list of output images, so that on successfull completion of
-   * a command line module, we load the output data into the mitk::DataStorage.
-   */
-  QStringList m_OutputDataToLoad;
-
-  /**
    * \brief Member variable, taken from preference page.
    */
   bool m_DebugOutput;
-
 };
 
 #endif // CommandLineModulesView_h

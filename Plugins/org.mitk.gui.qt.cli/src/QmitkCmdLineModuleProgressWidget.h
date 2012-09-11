@@ -17,17 +17,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKCMDLINEMODULEPROGRESSWIDGET_H
 #define QMITKCMDLINEMODULEPROGRESSWIDGET_H
 
-#include "ctkCmdLineModuleResult.h"
-#include "ctkCmdLineModuleFutureWatcher.h"
-
 #include <QWidget>
-#include <QFutureWatcher>
 #include <QTimer>
+#include <ctkCmdLineModuleFutureWatcher.h>
 
+class ctkCmdLineModuleManager;
+class ctkCmdLineModuleFrontend;
 class ctkCmdLineModuleFuture;
 
 namespace Ui {
 class QmitkCmdLineModuleProgressWidget;
+}
+
+namespace mitk {
+class DataStorage;
 }
 
 /**
@@ -44,8 +47,7 @@ public:
   QmitkCmdLineModuleProgressWidget(QWidget *parent = 0);
   ~QmitkCmdLineModuleProgressWidget();
 
-  void setFuture(const ctkCmdLineModuleFuture& future);
-
+  void Run(ctkCmdLineModuleFrontend* moduleInstance);
   void setTitle(const QString& title);
 
 Q_SIGNALS:
@@ -72,11 +74,42 @@ private Q_SLOTS:
   void moduleProgressValueChanged(int progressValue);
 
 private:
+
+  /**
+   * \brief Used to write output to console widget, and qDebug().
+   */
+  void PublishMessage(const QString& message);
+
+  /**
+   * \brief Destroys any images listed in m_TemporaryFileNames.
+   */
+  void ClearUpTemporaryFiles();
+
+  /**
+   * \brief Loads any data listed in m_OutputDataToLoad into the mitk::DataStorage.
+   */
+  void LoadOutputData();
+
+
   Ui::QmitkCmdLineModuleProgressWidget *m_UI;
-
   ctkCmdLineModuleFutureWatcher m_FutureWatcher;
+  ctkCmdLineModuleManager* m_ModuleManager;
   QTimer m_PollPauseTimer;
+  mitk::DataStorage* m_DataStorage;
+  QString m_TemporaryDirectoryName;
 
+  /**
+   * \brief We store a list of temporary file names that are saved to disk before
+   * launching a command line app, and then must be cleared up when the command line
+   * app successfully finishes.
+   */
+  QStringList m_TemporaryFileNames;
+
+  /**
+   * \brief We store a list of output images, so that on successfull completion of
+   * a command line module, we load the output data into the mitk::DataStorage.
+   */
+  QStringList m_OutputDataToLoad;
 };
 
 #endif // QMITKCMDLINEMODULEPROGRESSWIDGET_H

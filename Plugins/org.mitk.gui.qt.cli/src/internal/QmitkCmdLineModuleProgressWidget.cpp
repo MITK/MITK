@@ -328,7 +328,7 @@ void QmitkCmdLineModuleProgressWidget::SetModule(const ctkCmdLineModuleReference
   }
 
   m_Layout = new QVBoxLayout();
-  m_Layout->setContentsMargins(0,0,0,0);
+  m_Layout->setContentsMargins(5,0,5,0);
   m_Layout->setSpacing(0);
 
   m_UI->m_ParametersGroupBox->setLayout(m_Layout);

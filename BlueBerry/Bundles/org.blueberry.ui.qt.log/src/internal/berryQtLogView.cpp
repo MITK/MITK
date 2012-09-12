@@ -63,7 +63,7 @@ QtLogView::QtLogView(QWidget *parent)
   filterModel->setFilterKeyColumn(-1);
 
   ui.tableView->setModel(filterModel);
-
+ 
   ui.tableView->verticalHeader()->setVisible(false);
   ui.tableView->horizontalHeader()->setStretchLastSection(true);
              
@@ -144,7 +144,18 @@ void QtLogView::on_ShowCategory_clicked( bool checked )
 void QtLogView::on_SaveToClipboard_clicked()
 {
   QClipboard *clipboard = QApplication::clipboard();
-  clipboard->setText(model->GetDataAsString());
+  QString loggingMessagesAsText = QString("");
+  for (int i=0; i<ui.tableView->model()->rowCount(); i++)
+    {
+    for (int j=0; j<ui.tableView->model()->columnCount(); j++)
+      {
+      QModelIndex index = ui.tableView->model()->index(i, j);
+      loggingMessagesAsText += ui.tableView->model()->data(index, Qt::DisplayRole).toString() + " ";
+      }
+    loggingMessagesAsText += "\n";
+    }
+
+  clipboard->setText(loggingMessagesAsText);
 }
 
 }

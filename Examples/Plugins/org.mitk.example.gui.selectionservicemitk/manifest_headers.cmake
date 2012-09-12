@@ -5,5 +5,4 @@ set(Plugin-ContactAddress "http://www.mitk.org")
 set(Require-Plugin 
   org.blueberry.ui.qt
   org.mitk.gui.qt.common
-  org.mitk.gui.qt.common.legacy
 )

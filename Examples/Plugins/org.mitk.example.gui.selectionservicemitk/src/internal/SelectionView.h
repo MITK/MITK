@@ -21,10 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// Qmitk
 #include <QmitkAbstractView.h>
 
-#include <berryQtViewPart.h>
+//#include <berryQtViewPart.h>
 
 #include "ui_SelectionViewControls.h"
 
+
+//class QmitkDataStorageTreeModel;
 
 class SelectionView : public QmitkAbstractView
 {
@@ -46,6 +48,11 @@ private:
   QItemSelectionModel* GetDataNodeSelectionModel() const;
 
 protected:
+
+  ///
+  /// \brief A plain widget as the base pane.
+  ///
+  //QmitkDataStorageTreeModel* m_NodeTreeModel;
 
   void SetFocus();
 

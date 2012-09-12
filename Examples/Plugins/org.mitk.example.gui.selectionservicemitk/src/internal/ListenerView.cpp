@@ -44,7 +44,7 @@ void ListenerView::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
   
   // register selection listener
-  GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
+  //GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
 
   m_Parent->setEnabled(true);
 }

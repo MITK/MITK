@@ -99,6 +99,16 @@ public:
    */
   void Run();
 
+  /**
+   * \brief Shows the progress bar widgets, which can be turned off / on to save space.
+   */
+  void ShowProgressBar(bool visible);
+
+  /**
+   * \brief Shows the console widget, which can be turned off / on to save space.
+   */
+  void ShowConsole(bool visible);
+
 Q_SIGNALS:
 
   // These signals so that container classes such as CommandLineModuleView

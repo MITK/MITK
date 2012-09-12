@@ -109,6 +109,22 @@ void QmitkCmdLineModuleProgressWidget::SetTemporaryDirectory(const QString& dire
 
 
 //-----------------------------------------------------------------------------
+void QmitkCmdLineModuleProgressWidget::ShowProgressBar(bool visible)
+{
+  m_UI->m_ProgressBar->setVisible(visible);
+  m_UI->m_PauseButton->setVisible(visible);
+  m_UI->m_CancelButton->setVisible(visible);
+  m_UI->m_RemoveButton->setVisible(visible);
+}
+
+
+//-----------------------------------------------------------------------------
+void QmitkCmdLineModuleProgressWidget::ShowConsole(bool visible)
+{
+  m_UI->m_ConsoleGroupBox->setVisible(visible);
+}
+
+//-----------------------------------------------------------------------------
 QString QmitkCmdLineModuleProgressWidget::GetTitle()
 {
   assert(m_ModuleFrontEnd);
@@ -490,6 +506,8 @@ void QmitkCmdLineModuleProgressWidget::SetModule(const ctkCmdLineModuleReference
   m_UI->m_ProgressTitle->setText(description.title());
   m_UI->m_ConsoleGroupBox->setCollapsed(true);
   m_UI->m_ParametersGroupBox->setCollapsed(false);
+  this->ShowProgressBar(false);
+  this->ShowConsole(false);
 }
 
 
@@ -631,6 +649,8 @@ void QmitkCmdLineModuleProgressWidget::Run()
   m_UI->m_RemoveButton->setEnabled(!future.isRunning());
 
   // Configure some other niceties.
+  this->ShowProgressBar(true);
+  this->ShowConsole(true);
   m_UI->m_ParametersGroupBox->setCollapsed(true);
   m_UI->m_ConsoleGroupBox->setCollapsed(true);
 

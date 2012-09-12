@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 #include <QLayoutItem>
 #include <QTextBrowser>
+#include <QByteArray>
 
 // CTK
 #include <ctkCmdLineModuleFuture.h>
@@ -249,6 +250,20 @@ void QmitkCmdLineModuleProgressWidget::OnModuleProgressValueChanged(int progress
 
 
 //-----------------------------------------------------------------------------
+void QmitkCmdLineModuleProgressWidget::OnOutputDataReady()
+{
+  this->PublishByteArray(this->m_FutureWatcher->readPendingOutputData());
+}
+
+
+//-----------------------------------------------------------------------------
+void QmitkCmdLineModuleProgressWidget::OnErrorDataReady()
+{
+  this->PublishByteArray(this->m_FutureWatcher->readPendingErrorData());
+}
+
+
+//-----------------------------------------------------------------------------
 void QmitkCmdLineModuleProgressWidget::PublishMessage(const QString& message)
 {
   QString prefix = ""; // Can put additional prefix here if needed.
@@ -256,6 +271,14 @@ void QmitkCmdLineModuleProgressWidget::PublishMessage(const QString& message)
 
   qDebug() << outputMessage;
   this->m_UI->m_Console->appendPlainText(outputMessage);
+}
+
+
+//-----------------------------------------------------------------------------
+void QmitkCmdLineModuleProgressWidget::PublishByteArray(const QByteArray& array)
+{
+  QString message = array.data();
+  this->PublishMessage(message);
 }
 
 
@@ -581,6 +604,8 @@ void QmitkCmdLineModuleProgressWidget::Run()
     connect(m_FutureWatcher, SIGNAL(progressRangeChanged(int,int)), SLOT(OnModuleProgressRangeChanged(int,int)));
     connect(m_FutureWatcher, SIGNAL(progressTextChanged(QString)), SLOT(OnModuleProgressTextChanged(QString)));
     connect(m_FutureWatcher, SIGNAL(progressValueChanged(int)), SLOT(OnModuleProgressValueChanged(int)));
+    connect(m_FutureWatcher, SIGNAL(outputDataReady()), SLOT(OnOutputDataReady()));
+    connect(m_FutureWatcher, SIGNAL(errorDataReady()), SLOT(OnErrorDataReady()));
 
     connect(m_UI->m_CancelButton, SIGNAL(clicked()), m_FutureWatcher, SLOT(cancel()));
     connect(m_UI->m_PauseButton, SIGNAL(toggled(bool)), this, SLOT(OnPauseButtonToggled(bool)));

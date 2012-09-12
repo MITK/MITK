@@ -121,6 +121,8 @@ private Q_SLOTS:
   void OnModuleProgressRangeChanged(int progressMin, int progressMax);
   void OnModuleProgressTextChanged(const QString& progressText);
   void OnModuleProgressValueChanged(int progressValue);
+  void OnOutputDataReady();
+  void OnErrorDataReady();
 
 private:
 
@@ -128,6 +130,11 @@ private:
    * \brief Used to write output to the console widget, and also to qDebug().
    */
   void PublishMessage(const QString& message);
+
+  /**
+   * \brief Used to write output to the console widget, and also to qDebug().
+   */
+  void PublishByteArray(const QByteArray& array);
 
   /**
    * \brief Destroys any images listed in m_TemporaryFileNames.

@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleFrontend.h>
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleParameter.h>
+#include <ctkCollapsibleGroupBox.h>
 
 // MITK
 #include <mitkIOUtil.h>
@@ -378,47 +379,49 @@ void QmitkCmdLineModuleProgressWidget::SetModule(const ctkCmdLineModuleReference
 
   // Build up the GUI layout programmatically (manually).
 
-  QTabWidget *documentationTabWidget = new QTabWidget();
-  documentationTabWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  QWidget *aboutBoxContainerWidget = new QWidget();
 
-  QWidget *aboutWidget = new QWidget();
-  QWidget *helpWidget = new QWidget();
+  ctkCollapsibleGroupBox *aboutBox = new ctkCollapsibleGroupBox(aboutBoxContainerWidget);
+  aboutBox->setTitle("About");
 
-  QTextBrowser *aboutBrowser = new QTextBrowser(aboutWidget);
+  QTextBrowser *aboutBrowser = new QTextBrowser(aboutBox);
   aboutBrowser->setReadOnly(true);
   aboutBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  aboutBrowser->setOpenExternalLinks(true);
+  aboutBrowser->setOpenLinks(true);
 
-  QTextBrowser *helpBrowser = new QTextBrowser(helpWidget);
+  QVBoxLayout *aboutLayout = new QVBoxLayout(aboutBox);
+  aboutLayout->addWidget(aboutBrowser);
+
+  QVBoxLayout *aboutBoxContainerWidgetLayout = new QVBoxLayout(aboutBoxContainerWidget);
+  aboutBoxContainerWidgetLayout->addWidget(aboutBox);
+
+  QWidget *helpBoxContainerWidget = new QWidget();
+
+  ctkCollapsibleGroupBox *helpBox = new ctkCollapsibleGroupBox();
+  helpBox->setTitle("Help");
+
+  QTextBrowser *helpBrowser = new QTextBrowser(helpBox);
   helpBrowser->setReadOnly(true);
   helpBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
   helpBrowser->setOpenExternalLinks(true);
   helpBrowser->setOpenLinks(true);
 
-  QHBoxLayout *aboutLayout = new QHBoxLayout(aboutWidget);
-  aboutLayout->addWidget(aboutBrowser);
-  aboutLayout->setContentsMargins(0,0,0,0);
-  aboutLayout->setSpacing(0);
-
-  QHBoxLayout *helpLayout = new QHBoxLayout(helpWidget);
+  QVBoxLayout *helpLayout = new QVBoxLayout(helpBox);
   helpLayout->addWidget(helpBrowser);
-  helpLayout->setContentsMargins(0,0,0,0);
-  helpLayout->setSpacing(0);
 
-  documentationTabWidget->addTab(aboutWidget, "About");
-  documentationTabWidget->addTab(helpWidget, "Help");
+  QVBoxLayout *helpBoxContainerWidgetLayout = new QVBoxLayout(helpBoxContainerWidget);
+  helpBoxContainerWidgetLayout->addWidget(helpBox);
 
   QObject* guiHandle = m_ModuleFrontEnd->guiHandle();
   QWidget* generatedGuiWidgets = qobject_cast<QWidget*>(guiHandle);
 
   QWidget *topLevelWidget = new QWidget();
-  QGridLayout *topLevelLayout = new QGridLayout(topLevelWidget);
 
-  topLevelLayout->setContentsMargins(0,0,0,0);
-  topLevelLayout->setSpacing(0);
-  topLevelLayout->addWidget(documentationTabWidget, 0, 0);
-  topLevelLayout->setRowStretch(0, 1);
-  topLevelLayout->addWidget(generatedGuiWidgets, 1, 0);
-  topLevelLayout->setRowStretch(1, 10);
+  QGridLayout *topLevelLayout = new QGridLayout(topLevelWidget);
+  topLevelLayout->addWidget(aboutBoxContainerWidget, 0, 0);
+  topLevelLayout->addWidget(helpBoxContainerWidget, 1, 0);
+  topLevelLayout->addWidget(generatedGuiWidgets, 2, 0);
 
   ctkCmdLineModuleDescription description = reference.description();
 

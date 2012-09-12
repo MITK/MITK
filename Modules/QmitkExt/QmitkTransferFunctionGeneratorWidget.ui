@@ -145,11 +145,6 @@ Or save and load your own created transferfunctions in a folder in XML format.</
              <height>25</height>
             </size>
            </property>
-           <property name="font">
-            <font>
-             <pointsize>7</pointsize>
-            </font>
-           </property>
            <property name="text">
             <string/>
            </property>

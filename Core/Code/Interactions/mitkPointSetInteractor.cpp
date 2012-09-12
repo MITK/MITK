@@ -266,17 +266,13 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 
       if (dispPosEvent != NULL)
       {
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
-        this->HandleEvent( newStateEvent );
-        delete newStateEvent;
+        mitk::StateEvent newStateEvent(EIDYES, stateEvent->GetEvent());
+        this->HandleEvent( &newStateEvent );
       }
       else
       {
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
-        this->HandleEvent( newStateEvent );
-        delete newStateEvent;
+        mitk::StateEvent newStateEvent(EIDNO, stateEvent->GetEvent());
+        this->HandleEvent( &newStateEvent );
       }
       ok = true;
       break;
@@ -409,15 +405,12 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           sumVec[1] = pt[1];
           sumVec[2] = pt[2];
           resultPoint = sumVec + dirVector;
-          PointOperation* doOp = new mitk::PointOperation(OpMOVE, timeInMS, 
-            resultPoint, position);
+          PointOperation doOp(OpMOVE, timeInMS, resultPoint, position);
 
           //execute the Operation
           //here no undo is stored, because the movement-steps aren't interesting. 
           // only the start and the end is interisting to store for undo.
-          pointSet->ExecuteOperation(doOp);
-          
-          delete doOp;
+          pointSet->ExecuteOperation(&doOp);
         }
         ++it;
       }
@@ -617,11 +610,9 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           if ( points->IndexExists( position ) )
           {
             pt = pointSet->GetPoint( position, m_TimeStep );
-            PointOperation* doOp = 
-              new mitk::PointOperation( OpREMOVE, timeInMS, pt, position );
+            PointOperation doOp( OpREMOVE, timeInMS, pt, position );
             ++it;
-            pointSet->ExecuteOperation( doOp );
-            delete doOp;
+            pointSet->ExecuteOperation( &doOp );
           }
           else it++;
         }
@@ -651,23 +642,18 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           mitk::Point2D displPoint;
           displPoint[0] = worldPoint[0]; displPoint[1] = worldPoint[1];
           //new Event with information YES and with the correct point
-          mitk::PositionEvent const* newPosEvent = 
-            new mitk::PositionEvent(posEvent->GetSender(), Type_None, 
+          mitk::PositionEvent newPosEvent(posEvent->GetSender(), Type_None,
             BS_NoButton, BS_NoButton, Key_none, displPoint, pt);
-          mitk::StateEvent* newStateEvent =
-            new mitk::StateEvent(EIDYES, newPosEvent);
+          mitk::StateEvent newStateEvent(EIDYES, &newPosEvent);
           //call HandleEvent to leave the guard-state
-          this->HandleEvent( newStateEvent );
-          delete newStateEvent;
-          delete newPosEvent;
+          this->HandleEvent( &newStateEvent );
           ok = true;
         }
         else
         {
           //new Event with information NO
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
-          this->HandleEvent(newStateEvent );
-          delete newStateEvent;
+          mitk::StateEvent newStateEvent(EIDNO, posEvent);
+          this->HandleEvent(&newStateEvent );
           ok = true;
         }
       }
@@ -681,10 +667,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         if (disPosEvent != NULL)
         { //2d Koordinates for 3D Interaction; return false to redo
           //the last statechange
-          mitk::StateEvent* newStateEvent = 
-            new mitk::StateEvent(EIDNO, disPosEvent);
-          this->HandleEvent(newStateEvent );
-          delete newStateEvent;
+          mitk::StateEvent newStateEvent(EIDNO, disPosEvent);
+          this->HandleEvent(&newStateEvent);
           ok = true;
         }
       }
@@ -696,19 +680,14 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
     {
       if (pointSet->GetNumberOfSelected(m_TimeStep)>0)
       {
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent( EIDYES, theEvent);
-        this->HandleEvent( newStateEvent );
-        delete newStateEvent;
-
+        mitk::StateEvent newStateEvent( EIDYES, theEvent);
+        this->HandleEvent( &newStateEvent );
       }
       else //not selected then call event EIDNO
       {
         //new Event with information NO
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent( EIDNO, theEvent);
-        this->HandleEvent( newStateEvent );
-        delete newStateEvent;
+        mitk::StateEvent newStateEvent( EIDNO, theEvent);
+        this->HandleEvent( &newStateEvent );
       }
       ok = true;
       break;
@@ -743,10 +722,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         //if selected on true, then call Event EIDYES
         if (pointSet->GetSelectInfo(position, m_TimeStep))
         {
-          mitk::StateEvent* newStateEvent = 
-            new mitk::StateEvent( EIDYES, newPosEvent );
-          this->HandleEvent( newStateEvent );
-          delete newStateEvent;
+          mitk::StateEvent newStateEvent( EIDYES, newPosEvent );
+          this->HandleEvent( &newStateEvent );
           ok = true;
 
           //saving the spot for calculating the direction vector in moving
@@ -755,10 +732,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         else //not selected then call event EIDNO
         {
           //new Event with information NO
-          mitk::StateEvent* newStateEvent = 
-            new mitk::StateEvent( EIDNO, newPosEvent );
-          this->HandleEvent( newStateEvent );
-          delete newStateEvent;
+          mitk::StateEvent newStateEvent( EIDNO, newPosEvent );
+          this->HandleEvent( &newStateEvent );
           ok = true;
         }
         delete newPosEvent;
@@ -786,10 +761,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       // "Amount of points in Set is smaller then N-1"
       if (m_N<0)
       {
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent(EIDSTSMALERNMINUS1, stateEvent->GetEvent());
-        this->HandleEvent( newStateEvent );
-        delete newStateEvent;
+        mitk::StateEvent newStateEvent(EIDSTSMALERNMINUS1, stateEvent->GetEvent());
+        this->HandleEvent( &newStateEvent );
         ok = true;
       }
       else
@@ -797,19 +770,15 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         if (pointSet->GetSize( m_TimeStep ) < m_N-1 )
           //pointset after addition won't be full
         {
-          mitk::StateEvent* newStateEvent = 
-            new mitk::StateEvent(EIDSTSMALERNMINUS1, stateEvent->GetEvent());
-          this->HandleEvent( newStateEvent );
-          delete newStateEvent;
+          mitk::StateEvent newStateEvent(EIDSTSMALERNMINUS1, stateEvent->GetEvent());
+          this->HandleEvent( &newStateEvent );
           ok = true;
         }
         else
           //after the addition of a point, the container will be full
         {
-          mitk::StateEvent* newStateEvent = 
-            new mitk::StateEvent(EIDSTLARGERNMINUS1, stateEvent->GetEvent());
-          this->HandleEvent(newStateEvent );
-          delete newStateEvent;
+          mitk::StateEvent newStateEvent(EIDSTLARGERNMINUS1, stateEvent->GetEvent());
+          this->HandleEvent( &newStateEvent );
           ok = true;
         }//else
       }//else
@@ -820,18 +789,14 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       //the number of points in the list is 1 (or smaler)
       if (pointSet->GetSize( m_TimeStep ) <= 1)
       {
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
-        this->HandleEvent( newStateEvent );
-        delete newStateEvent;
+        mitk::StateEvent newStateEvent(EIDYES, stateEvent->GetEvent());
+        this->HandleEvent( &newStateEvent );
         ok = true;
       }
       else //more than 1 points in list, so stay in the state!
       {
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
-        this->HandleEvent(newStateEvent );
-        delete newStateEvent;
+        mitk::StateEvent newStateEvent(EIDNO, stateEvent->GetEvent());
+        this->HandleEvent( &newStateEvent );
         ok = true;
       }
     }
@@ -841,10 +806,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       //the number of points in the list is 1 (or smaler), so will be empty after delete
      if (pointSet->GetSize( m_TimeStep ) <= 1)
       {
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent(EIDEMPTY, stateEvent->GetEvent());
-        this->HandleEvent( newStateEvent );
-        delete newStateEvent;
+        mitk::StateEvent newStateEvent(EIDEMPTY, stateEvent->GetEvent());
+        this->HandleEvent( &newStateEvent );
         ok = true;
       }
       else if (pointSet->GetSize( m_TimeStep ) <= m_N || m_N <= -1)
@@ -853,19 +816,15 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
        // if the number of points equals m_N and no point of the point set is selected switch to state EIDEQUALSN
        if ((pointSet->GetSize( m_TimeStep ) == m_N)&&(pointSet->GetNumberOfSelected()==0))
        {
-         mitk::StateEvent* newStateEvent =
-           new mitk::StateEvent(EIDEQUALSN, stateEvent->GetEvent());
-         this->HandleEvent(newStateEvent );
-         delete newStateEvent;
+         mitk::StateEvent newStateEvent(EIDEQUALSN, stateEvent->GetEvent());
+         this->HandleEvent( &newStateEvent );
          ok = true;
        }
        // if the number of points is small than or equal m_N and point(s) are selected stay in state
        else
        {
-         mitk::StateEvent* newStateEvent =
-             new mitk::StateEvent(EIDSMALLERN, stateEvent->GetEvent());
-         this->HandleEvent(newStateEvent );
-         delete newStateEvent;
+         mitk::StateEvent newStateEvent(EIDSMALLERN, stateEvent->GetEvent());
+         this->HandleEvent( &newStateEvent );
          ok = true;
        }
      }
@@ -874,10 +833,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         // This can happen if the points were not added 
         // by interaction but by loading a .mps file
       {
-        mitk::StateEvent* newStateEvent = 
-          new mitk::StateEvent(EIDEQUALSN, stateEvent->GetEvent());
-        this->HandleEvent(newStateEvent );
-        delete newStateEvent;
+        mitk::StateEvent newStateEvent(EIDEQUALSN, stateEvent->GetEvent());
+        this->HandleEvent( &newStateEvent );
         ok = true;
       }
     }
@@ -1147,12 +1104,9 @@ void mitk::PointSetInteractor::InitAccordingToNumberOfPoints()
         if (numberOfPoints<m_N || m_N <= -1)//if less than specified or specified as unlimited
         {
           //get the currentState to state "SpaceLeft"
-          const mitk::Event* nullEvent = new mitk::Event(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
-          mitk::StateEvent* newStateEvent = 
-            new mitk::StateEvent(EIDSMALLERN, nullEvent);
-          this->HandleEvent( newStateEvent );
-          delete newStateEvent;
-          delete nullEvent;
+          const mitk::Event nullEvent(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
+          mitk::StateEvent newStateEvent(EIDSMALLERN, &nullEvent);
+          this->HandleEvent( &newStateEvent );
         }
         else if (numberOfPoints>=m_N)
         {
@@ -1161,12 +1115,9 @@ void mitk::PointSetInteractor::InitAccordingToNumberOfPoints()
             STATEMACHINE_WARN<<"Point Set contains more points than needed!\n";//display a warning that there are too many points
           }
           //get the currentState to state "Set full"
-          const mitk::Event* nullEvent = new mitk::Event(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
-          mitk::StateEvent* newStateEvent = 
-            new mitk::StateEvent(EIDEQUALSN, nullEvent);
-          this->HandleEvent( newStateEvent );
-          delete newStateEvent;
-          delete nullEvent;
+          const mitk::Event nullEvent(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
+          mitk::StateEvent newStateEvent(EIDEQUALSN, &nullEvent);
+          this->HandleEvent( &newStateEvent );
         }
       }
     }

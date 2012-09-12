@@ -522,13 +522,13 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         move = false;
       }
       
-      StateEvent *newStateEvent(NULL);
+      std::auto_ptr<StateEvent> newStateEvent;
 
       // question in state machine is: "rotate?"
       if (move)
       {
         // move all planes to posEvent->GetWorldPosition()
-        newStateEvent = new StateEvent(EIDNO, stateEvent->GetEvent());
+        newStateEvent.reset(new StateEvent(EIDNO, stateEvent->GetEvent()));
       }
       else
       {
@@ -544,14 +544,13 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         m_LastCursorPosition = intersection.Project(cursor);
         if (!planeGeometry2->IntersectionPoint(intersection, m_CenterOfRotation)) break;
         // everything's fine
-        newStateEvent = new StateEvent(EIDYES, stateEvent->GetEvent());
+        newStateEvent.reset(new StateEvent(EIDYES, stateEvent->GetEvent()));
 
       }
 
-      if (!newStateEvent) MITK_ERROR << "rotation would be nice but is impossible... " << std::endl;
+      if (!newStateEvent.get()) MITK_ERROR << "rotation would be nice but is impossible... " << std::endl;
       
-      this->HandleEvent( newStateEvent );
-      delete newStateEvent;
+      this->HandleEvent( newStateEvent.get() );
 
       ok = true;
       break;

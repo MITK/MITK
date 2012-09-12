@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 CommandLineModulesViewControls::CommandLineModulesViewControls(QWidget *parent)
 {
   this->setupUi(parent);
+  this->m_ChooseLabel->setVisible(false);
+  this->m_ComboBox->setToolTip("Choose a command line module");
   this->m_RunButton->setIcon(QIcon(":/CommandLineModulesResources/run.png"));
   this->m_RestoreDefaults->setIcon(QIcon(":/CommandLineModulesResources/undo.png"));
 }

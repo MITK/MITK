@@ -91,6 +91,7 @@ void QmitkDicomDirectoryListener::RemoveAlreadyImportedEntries(const QStringList
 
 void QmitkDicomDirectoryListener::RemoveTemporaryFiles(const QStringList& fileEntries)
 {
+  /**
     QStringListIterator it(fileEntries);
     QString currentEntry;
     while(it.hasNext())
@@ -98,16 +99,21 @@ void QmitkDicomDirectoryListener::RemoveTemporaryFiles(const QStringList& fileEn
         currentEntry = m_DicomListenerDirectory.absoluteFilePath(it.next());
         m_DicomListenerDirectory.remove(currentEntry);
     }
+  */
 }
 
 void QmitkDicomDirectoryListener::RemoveTemporaryFiles()
 {
-    QDirIterator it( m_DicomListenerDirectory.absolutePath() , QDir::AllEntries , QDirIterator::Subdirectories);
+/**
+* dangerous code !!!
+  
+  QDirIterator it( m_DicomListenerDirectory.absolutePath() , QDir::AllEntries , QDirIterator::Subdirectories);
     while(it.hasNext())
     {
         it.next();
         m_DicomListenerDirectory.remove(it.fileInfo().absoluteFilePath());
     }
+*/
 }
 
 void QmitkDicomDirectoryListener::SetDicomListenerDirectory(const QString& directory)

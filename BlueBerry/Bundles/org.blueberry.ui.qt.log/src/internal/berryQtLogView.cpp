@@ -90,23 +90,26 @@ void QtLogView::slotFilterChange( const QString& q )
   filterModel->setFilterRegExp(QRegExp(q, Qt::CaseInsensitive, QRegExp::FixedString));
 }
 
+
 void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int end )
 {
-  static int first=false;
+  ui.tableView->resizeRowsToContents();
 
-  if(!first)
-  {
-    first=true;
-    ui.tableView->resizeColumnsToContents();
-    ui.tableView->resizeRowsToContents();
-  }
-  else
-    for(int r=start;r<=end;r++)
+  //only resize columns when first entry is added
+  static bool first = true;
+  if(first)
     {
-      ui.tableView->resizeRowToContents(r);
+    ui.tableView->resizeColumnsToContents();
+    first = false;
     }
 
   QTimer::singleShot(0,this,SLOT( slotScrollDown() ) );
+}
+
+void QtLogView::showEvent( QShowEvent * event )
+{
+  ui.tableView->resizeColumnsToContents();
+  ui.tableView->resizeRowsToContents();  
 }
 
 void QtLogView::on_ShowAdvancedFields_clicked( bool checked )

@@ -69,7 +69,6 @@ QtLogView::QtLogView(QWidget *parent)
              
   connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
   connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
-  connect( ui.ShowCategory, SIGNAL( clicked(bool checked)),this, SLOT(on_ShowAdvancedFields_clicked(checked)));
   connect( ui.SaveToClipboard, SIGNAL( clicked()),this, SLOT(on_SaveToClipboard_clicked()));
   
   ui.ShowAdvancedFields->setChecked( showAdvancedFields );

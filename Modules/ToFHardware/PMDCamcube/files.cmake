@@ -3,6 +3,7 @@ SET(CPP_FILES
   mitkToFCameraPMDCamCubeDevice.cpp
   mitkToFCameraPMDCamCubeDeviceFactory.cpp
   mitkToFCameraPMDCamCubeController.cpp
+
   PMDCamCubeModuleActivator.cpp
 
   mitkToFCameraPMDController.cpp
@@ -17,6 +18,17 @@ SET(CPP_FILES
   mitkToFCameraPMDPlayerDevice.cpp
   mitkToFCameraPMDPlayerDeviceFactory.cpp
   mitkToFCameraPMDPlayerController.cpp
+
+  mitkToFCameraPMDDevice.cpp
+
+  mitkToFCameraPMDO3Device.cpp
+  mitkToFCameraPMDO3DeviceFactory.cpp
+  mitkToFCameraPMDO3Controller.cpp
+
+  #mitkToFCameraPMDMITKPlayerDevice.cpp
+  #mitkToFCameraPMDCamBoardDevice.cpp
+  #mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
+  #mitkToFCameraPMDCamBoardDeviceFactory.cpp
 
 )
 ENDIF(MITK_USE_TOF_PMDCAMCUBE)

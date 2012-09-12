@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDO3Device_h
 #define __mitkToFCameraPMDO3Device_h
 
-#include "mitkToFHardwareExports.h"
+#include "mitkPMDCamCubeModuleExports.h"
 #include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
 #include "mitkToFCameraPMDDevice.h"
@@ -35,9 +35,9 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFCameraPMDO3Device : public ToFCameraPMDDevice
+  class MITK_PMDCAMCUBEMODULE_EXPORT ToFCameraPMDO3Device : public ToFCameraPMDDevice
   {
-  public: 
+  public:
 
     mitkClassMacro( ToFCameraPMDO3Device , ToFCameraPMDDevice );
 

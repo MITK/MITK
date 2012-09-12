@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -97,7 +97,7 @@ namespace mitk
       MITK_INFO<<"Camera not connected";
     }
   }
-  
+
   void ToFCameraPMDDevice::UpdateCamera()
   {
     if (m_Controller)
@@ -135,7 +135,6 @@ namespace mitk
         // get the source data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataBuffer[toFCameraDevice->m_FreePos]);
-        
 
         toFCameraDevice->m_ImageMutex->Unlock();
         // call modified to indicate that cameraDevice was modified
@@ -362,7 +361,7 @@ namespace mitk
       this->m_PropertyList->SetProperty(propertyKey, propertyValue );
 
     }
-  } 
+  }
 
   void ToFCameraPMDDevice::AllocateSourceData()
   {

@@ -81,6 +81,12 @@ public:
         //ServiceProperties camCubeFactoryProps;
         //camCubeFactoryProps["ToFFactoryName"] = toFCameraPMDCamCubeDeviceFactory->GetFactoryName();
         //context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamCubeDeviceFactory,camCubeFactoryProps);
+
+        //Implementing PMD O3D DeviceFactory
+        //ToFCameraPMDO3DeviceFactory* toFCameraPMDO3DeviceFactory = new ToFCameraPMDO3DeviceFactory();
+        //ServiceProperties o3FactoryProps;
+        //o3FactoryProps["ToFFactoryName"] = toFCameraPMDO3DeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDO3DeviceFactory,o3FactoryProps);
       LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
 
 
@@ -95,12 +101,6 @@ public:
         ServiceProperties mitkPlayerFactoryProps;
         mitkPlayerFactoryProps["ToFFactoryName"] = toFCameraMITKPlayerDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraMITKPlayerDeviceFactory, mitkPlayerFactoryProps);
-
-        //Implementing PMD O3D DeviceFactory
-        //ToFCameraPMDO3DeviceFactory* toFCameraPMDO3DeviceFactory = new ToFCameraPMDO3DeviceFactory();
-        //ServiceProperties o3FactoryProps;
-        //o3FactoryProps["ToFFactoryName"] = toFCameraPMDO3DeviceFactory->GetFactoryName();
-        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDO3DeviceFactory,o3FactoryProps);
 
         //Implementing CamBoardDeviceFactory
         //ToFCameraPMDCamBoardDeviceFactory* toFCameraPMDCamBoardDeviceFactory = new ToFCameraPMDCamBoardDeviceFactory();

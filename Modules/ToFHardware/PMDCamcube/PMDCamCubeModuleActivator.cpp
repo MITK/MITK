@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraPMDCamCubeDeviceFactory.h"
 #include "mitkToFCameraPMDRawDataCamCubeDeviceFactory.h"
 #include "mitkToFCameraPMDPlayerDeviceFactory.h"
+#include "mitkToFCameraPMDO3DeviceFactory.h"
+
 
 /*
   * This is the module activator for the "mitkPMDCamCubeModule" module. It registers services
@@ -61,9 +63,16 @@ public:
         pMDPlayerFactoryProps["ToFFactoryName"] = toFCameraPMDPlayerDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDPlayerDeviceFactory,pMDPlayerFactoryProps);
 
+        //Implementing PMD O3D DeviceFactory
+        ToFCameraPMDO3DeviceFactory* toFCameraPMDO3DeviceFactory = new ToFCameraPMDO3DeviceFactory();
+        ServiceProperties o3FactoryProps;
+        o3FactoryProps["ToFFactoryName"] = toFCameraPMDO3DeviceFactory->GetFactoryName();
+        context->RegisterService<IToFDeviceFactory>(toFCameraPMDO3DeviceFactory,o3FactoryProps);
+
         m_Factories.push_back(toFCameraPMDCamCubeDeviceFactory);
         m_Factories.push_back(toFCameraPMDRawDataCamCubeDeviceFactory);
         m_Factories.push_back(toFCameraPMDPlayerDeviceFactory);
+        m_Factories.push_back(toFCameraPMDO3DeviceFactory);
     }
 
     void Unload(mitk::ModuleContext* )

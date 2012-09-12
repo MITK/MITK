@@ -2,39 +2,38 @@ SET(CPP_FILES
   mitkToFImageGrabber.cpp
   mitkToFOpenCVImageGrabber.cpp
   mitkToFCameraDevice.cpp
+     #mitkKinectDeviceFactory.cpp
   mitkToFCameraMITKPlayerController.cpp
   mitkToFCameraMITKPlayerDevice.cpp
-  mitkToFCameraPMDDevice.cpp
-  #mitkToFCameraPMDRawDataDevice.cpp
-  #mitkToFCameraPMDPlayerDevice.cpp
+      #mitkToFCameraPMDRawDataDevice.cpp
+      #mitkToFCameraPMDPlayerDevice.cpp
+      #mitkToFCameraPMDCamCubeDevice.cpp
+      #mitkToFCameraPMDRawDataCamCubeDevice.cpp
+      #mitkToFCameraPMDCamCubeDeviceFactory.cpp
+      #mitkToFCameraPMDController.cpp
+      #mitkToFCameraPMDRawDataCamBoardDevice.cpp
+      #mitkToFCameraPMDPlayerDeviceFactory.cpp
+      #mitkToFCameraPMDRawDataCamCubeDeviceFactory.cpp
+      #mitkThreadedToFRawDataReconstruction.cpp
+  #mitkToFCameraPMDDevice.cpp
   #mitkToFCameraPMDMITKPlayerDevice.cpp
   #mitkToFCameraPMDO3Device.cpp
-  #mitkToFCameraPMDCamCubeDevice.cpp
-  #mitkToFCameraPMDRawDataCamCubeDevice.cpp
-  #mitkToFCameraPMDCamCubeDeviceFactory.cpp
-  #mitkToFCameraPMDRawDataCamCubeDeviceFactory.cpp
   #mitkToFCameraPMDCamBoardDevice.cpp
-  #mitkToFCameraPMDRawDataCamBoardDevice.cpp
-  mitkToFCameraMESADevice.cpp
+  #mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
+  #mitkToFCameraPMDCamBoardDeviceFactory.cpp
+  #mitkToFCameraPMDO3DeviceFactory.cpp
   mitkToFCameraMESASR4000Device.cpp
   mitkToFImageRecorder.cpp
   mitkToFImageRecorderFilter.cpp
   mitkToFImageWriter.cpp
   mitkToFNrrdImageWriter.cpp
   mitkToFImageCsvWriter.cpp
-  #mitkThreadedToFRawDataReconstruction.cpp
   mitkIToFDeviceFactory.cpp
   mitkAbstractToFDeviceFactory.cpp
   mitkToFHardwareActivator.cpp
-  #mitkToFDeviceFactoryManager.cpp
-  #mitkKinectDeviceFactory.cpp
   mitkToFCameraMESASR4000DeviceFactory.cpp
-  #mitkToFCameraPMDCamBoardDeviceFactory.cpp
-  #mitkToFCameraPMDO3DeviceFactory.cpp
-  #mitkToFCameraPMDPlayerDeviceFactory.cpp
   mitkToFCameraMITKPlayerDeviceFactory.cpp
-  #mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
-  #mitkToFCameraPMDController.cpp
+  mitkToFCameraMESADevice.cpp
 )
 
 #IF(MITK_USE_TOF_PMDCAMCUBE)

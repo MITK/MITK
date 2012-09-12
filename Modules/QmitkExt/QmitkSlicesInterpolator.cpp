@@ -321,6 +321,11 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
     m_DataStorage->Remove(m_3DContourNode);
   if(m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     m_DataStorage->Remove(m_InterpolatedSurfaceNode);
+
+  // remove observer
+  m_Interpolator->RemoveObserver( InterpolationInfoChangedObserverTag );
+  m_SurfaceInterpolator->RemoveObserver( SurfaceInterpolationInfoChangedObserverTag );
+
   delete m_Timer;
 }
 

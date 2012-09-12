@@ -1,5 +1,5 @@
 /**
-\page org_mitkexamples Examples for the use of MITK
+\page org_mitk_gui_qt_examples Examples for the use of MITK
 
 
 \section QmitkExamplesUserManualSummary Summary
@@ -7,12 +7,12 @@
 This module is a collection of examples for developing with mitk. The following examples are included:
 
 <ul>
- <li> \subpage org_simpleexample
- <li> \subpage org_simplemeasurement
- <li> \subpage org_regiongrowing
- <li> \subpage org_isosurface
- <li> \subpage org_colourimageprocessing
- <li> \subpage org_viewinitialitzation
+ <li> \subpage org_mitk_views_simpleexample
+ <li> \subpage org_mitk_views_simplemeasurement
+ <li> \subpage org_mitk_views_regiongrowing
+ <li> \subpage org_mitk_views_isosurface
+ <li> \subpage org_mitk_views_colourimageprocessing
+ <li> \subpage org_mitk_views_viewinitialitzation
  <li> The Volumetry Module
 </ul>
 */

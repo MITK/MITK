@@ -1,5 +1,5 @@
 /**
-\page org_diffusion MITK Diffusion Imaging (MITK-DI)
+\page org_mitk_gui_qt_diffusionimaging MITK Diffusion Imaging (MITK-DI)
 
 This module provides means to diffusion weighted image reconstruction, visualization and quantification. Diffusion tensors as well as different q-ball reconstruction schemes are supported. Q-ball imaging aims at recovering more detailed information about the orientations of fibers from diffusion MRI measurements and, in particular, to resolve the orientations of crossing fibers.
 
@@ -110,13 +110,13 @@ The diffusion imaging module uses additional properties beside the ones in use i
 
 The MITK Diffusion tools consist of further components, which have their own documentation, see:
 
-  \li \subpage org_fiberprocessing
-  \li \subpage org_gibbstracking
-  \li \subpage org_odfdetails
-  \li \subpage org_pvanalysis
-  \li \subpage screenshot_maker
-  \li \subpage org_stochastictracking
-  \li \subpage org_ivim
-  \li \subpage org_brainnetworkanalysis
-  \li \subpage org_tractbasedspatialstatistics
+  \li \subpage org_mitk_views_fiberprocessing
+  \li \subpage org_mitk_views_gibbstracking
+  \li \subpage org_mitk_views_odfdetails
+  \li \subpage org_mitk_views_partialvolumeanalysisview
+  \li \subpage org_mitk_views_screenshotmaker
+  \li \subpage org_mitk_views_stochasticfibertracking
+  \li \subpage org_mitk_views_ivim
+  \li \subpage org_mitk_views_brainnetworkanalysis
+  \li \subpage org_mitk_views_tractbasedspatialstatistics
 */

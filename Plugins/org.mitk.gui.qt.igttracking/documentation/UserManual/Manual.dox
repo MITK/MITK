@@ -6,9 +6,9 @@ This bundle offers basic tracking functionalities. This includes connecting to a
 The bundle includes different views, which are described in different pages in detail:
 
 <ul>
-<li> \subpage org_igttrackingtoolbox : Allows for connecting to a tracking system and logging/recording of the tracked data.
-<li> \subpage org_igtnavigationtoolmanager : Navigation Tool Manager: This view offers functionality to manage tool storages. Each tool storage holds a preconfigured tool collection. Once saved you can load a tool storage in the Tracking Toolbox and don't need to add every tool seperately.
-<li> \subpage org_navigationdataplayer : Navigation Data Player: Plays navigation data which was recorded with the Tracking Toolbox for example.
+<li> \subpage org_mitk_views_igttrackingtoolbox : Allows for connecting to a tracking system and logging/recording of the tracked data.
+<li> \subpage org_mitk_views_igtnavigationtoolmanager : Navigation Tool Manager: This view offers functionality to manage tool storages. Each tool storage holds a preconfigured tool collection. Once saved you can load a tool storage in the Tracking Toolbox and don't need to add every tool seperately.
+<li> \subpage org_mitk_views_navigationdataplayer : Navigation Data Player: Plays navigation data which was recorded with the Tracking Toolbox for example.
 </ul>
 
 */

@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIBerryPreferences.h>
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleResult.h>
+#include <ctkCmdLineModuleManager.h>
 
-class ctkCmdLineModuleManager;
 class ctkCmdLineModuleBackendLocalProcess;
 class ctkCmdLineModuleDirectoryWatcher;
 class CommandLineModulesViewControls;
@@ -108,6 +108,10 @@ private:
    */
   void RetrieveAndStoreTemporaryDirectoryPreferenceValues();
 
+  /**
+   * \brief Called on startup and by OnPreferencesChanged to set the validation mode, but will require a restart.
+   */
+  void RetrieveAndStoreValidationMode();
 
   /**
    * \brief Called to get hold of the actual preferences node.
@@ -165,6 +169,11 @@ private:
    * \brief We store a temporary folder name, accessible via user preferences.
    */
   QString m_TemporaryDirectoryName;
+
+  /**
+   * \brief We store the validation mode, accessisble via user preferences.
+   */
+  ctkCmdLineModuleManager::ValidationMode m_ValidationMode;
 
   /**
    * \brief Member variable, taken from preference page.

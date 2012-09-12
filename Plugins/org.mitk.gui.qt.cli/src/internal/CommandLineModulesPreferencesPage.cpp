@@ -20,7 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include <QFormLayout>
 #include <QCheckBox>
+#include <QComboBox>
+#include <QMessageBox>
 #include <ctkDirectoryButton.h>
+#include <ctkCmdLineModuleManager.h>
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
@@ -37,6 +40,7 @@ CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 , m_LoadFromCurrentDir(0)
 , m_LoadFromApplicationDir(0)
 , m_LoadFromAutoLoadPathDir(0)
+, m_ValidationMode(0)
 , m_CLIPreferencesNode(0)
 {
 
@@ -81,6 +85,11 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_LoadFromAutoLoadPathDir = new QCheckBox(m_MainControl);
   m_LoadFromHomeDir = new QCheckBox(m_MainControl);
   m_LoadFromCurrentDir = new QCheckBox(m_MainControl);
+  m_ValidationMode = new QComboBox(m_MainControl);
+  m_ValidationMode->addItem("strict", ctkCmdLineModuleManager::STRICT_VALIDATION);
+  m_ValidationMode->addItem("none", ctkCmdLineModuleManager::SKIP_VALIDATION);
+  m_ValidationMode->addItem("weak", ctkCmdLineModuleManager::WEAK_VALIDATION);
+  m_ValidationMode->setCurrentIndex(0);
 
   QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("scan home directory:", m_LoadFromHomeDir);
@@ -91,6 +100,8 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   formLayout->addRow("additional modules:", m_ModulesFiles);
   formLayout->addRow("temporary directory:", m_TemporaryDirectory);
   formLayout->addRow("debug output:", m_DebugOutput);
+  formLayout->addRow("XML validation mode:", m_ValidationMode);
+
   m_MainControl->setLayout(formLayout);
 
   this->Update();
@@ -132,6 +143,15 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   std::string modules = this->ConvertToStdString(m_ModulesFiles->files());
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, modules);
 
+  int currentValidationMode = m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0);
+  if (currentValidationMode != m_ValidationMode->currentIndex())
+  {
+    QMessageBox msgBox;
+     msgBox.setText("Changing the XML validation mode will require a restart of the application.");
+     msgBox.exec();
+  }
+
+  m_CLIPreferencesNode->PutInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, m_ValidationMode->currentIndex());
   return true;
 }
 
@@ -161,4 +181,6 @@ void CommandLineModulesPreferencesPage::Update()
   QString files = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, ""));
   QStringList fileList = files.split(";", QString::SkipEmptyParts);
   m_ModulesFiles->setFiles(fileList);
+
+  m_ValidationMode->setCurrentIndex(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0));
 }

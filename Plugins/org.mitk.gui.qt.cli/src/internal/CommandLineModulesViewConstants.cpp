@@ -24,4 +24,4 @@ const std::string CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR = "
 const std::string CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR = "load from home dir";
 const std::string CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR = "load from current dir";
 const std::string CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR = "load from auto-load dir";
-
+const std::string CommandLineModulesViewConstants::XML_VALIDATION_MODE = "xml validation mode";

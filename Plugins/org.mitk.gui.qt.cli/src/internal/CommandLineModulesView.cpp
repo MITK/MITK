@@ -93,6 +93,8 @@ void CommandLineModulesView::SetFocus()
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
 {
+  m_Parent = parent;
+
   if (!m_Controls)
   {
     // We create CommandLineModulesViewControls, which derives from the Qt generated class.
@@ -106,10 +108,13 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     // This must be done independent of other preferences, as we need it before
     // we create the ctkCmdLineModuleManager to initialise the Cache.
     this->RetrieveAndStoreTemporaryDirectoryPreferenceValues();
+    this->RetrieveAndStoreValidationMode();
+
+    qDebug() << "CommandLineModulesView: Creating ctkCmdLineModuleManager with mode=" << m_ValidationMode << ", temp directory=" << m_TemporaryDirectoryName;
 
     // Start to create the command line module infrastructure.
     m_ModuleBackend = new ctkCmdLineModuleBackendLocalProcess();
-    m_ModuleManager = new ctkCmdLineModuleManager(ctkCmdLineModuleManager::STRICT_VALIDATION, m_TemporaryDirectoryName);
+    m_ModuleManager = new ctkCmdLineModuleManager(m_ValidationMode, m_TemporaryDirectoryName);
 
     // Set the main object, the ctkCmdLineModuleManager onto all the objects that need it.
     m_Controls->m_ComboBox->SetManager(m_ModuleManager);
@@ -155,6 +160,27 @@ void CommandLineModulesView::RetrieveAndStoreTemporaryDirectoryPreferenceValues(
   QString fallbackTmpDir = QDir::tempPath();
   m_TemporaryDirectoryName = QString::fromStdString(
       prefs->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString()));
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::RetrieveAndStoreValidationMode()
+{
+  berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
+
+  int value = prefs->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0);
+  if (value == 0)
+  {
+    m_ValidationMode = ctkCmdLineModuleManager::STRICT_VALIDATION;
+  }
+  else if (value == 1)
+  {
+    m_ValidationMode = ctkCmdLineModuleManager::SKIP_VALIDATION;
+  }
+  else
+  {
+    m_ValidationMode = ctkCmdLineModuleManager::WEAK_VALIDATION;
+  }
 }
 
 
@@ -213,6 +239,7 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
 void CommandLineModulesView::OnPreferencesChanged(const berry::IBerryPreferences* /*prefs*/)
 {
   this->RetrieveAndStoreTemporaryDirectoryPreferenceValues();
+  this->RetrieveAndStoreValidationMode();
   this->RetrieveAndStorePreferenceValues();
 }
 

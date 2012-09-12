@@ -1,7 +1,7 @@
 /**
 \bundlemainpage{org.mitk.gui.qt.cli} The Command Line Interface (CLI) View
 
-\image html icon.xpm "Icon of CLI"
+\image html CLIIcon.png "Icon of CLI"
 
 \li \ref CLIIntroduction
 \li \ref CLIPreferences
@@ -71,7 +71,14 @@ This temporary directory will default to a platform specific temporary folder, b
 of temporary workspace.
 \li debug output: If checked the view will try to provide more output, either on the console window or 
 event log depending on the host platform.
-
+\li XML validation mode: The user may select a different mode for XML validation. If this is changed, the applicatioin will
+need to be restarted.  There are 3 modes available.  If the user selects "strict" mode, the XML schema produced by the command line application
+must exactly conform to <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">
+this definition</a>. For "none", there will be no validation. For "weak"  validation, the application will report errors, 
+but try to carry on and load as many modules as possible. Many third party modules included with Slicer currently have
+incorrect XML, and so "weak" mode may assist in loading them. Future work will improve the error reporting.  By default
+the "strict" mode is chosen so that only valid modules are loaded.
+ 
 \section CLIUsage Usage
 
 When the view is launched, a simple interface is presented, as shown in Figure 4.

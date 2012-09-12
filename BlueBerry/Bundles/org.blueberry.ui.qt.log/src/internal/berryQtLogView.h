@@ -38,6 +38,8 @@ public:
     
 private:
     Ui::QtLogViewClass ui;
+
+    void showEvent ( QShowEvent * event );
     
 protected slots:
     void slotFilterChange( const QString& );

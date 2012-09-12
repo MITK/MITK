@@ -476,6 +476,10 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
   temp->InsertElement(0,workingData);
   mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(temp);
 
+  
+  // Reinit current node
+  ForceDisplayPreferencesUponAllImages();
+
   // initialize the views to the bounding geometry
   /*mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();*/
@@ -1079,6 +1083,10 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
       if(!node->IsSelected() || (node->IsSelected() && !node->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))))
         node->SetVisibility((node == referenceData) || node->IsSelected() );
     }
+
+    // Reinit current node
+    mitk::RenderingManager::GetInstance()->InitializeViews(
+       referenceData->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
   }
 
   // 2.

@@ -52,7 +52,7 @@ void QmitkOtsuAction::Run(const QList<DataNode::Pointer> &selectedNodes)
   this->m_DataNode = selectedNodes[0];
   //this->m_selectedNodes = selectedNodes;
 
-  m_OtsuSegmentationDialog = new QDialog(QApplication::activeWindow());
+  m_OtsuSegmentationDialog = new QDialog(QApplication::activeWindow(),Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
   
 
   QVBoxLayout *layout = new QVBoxLayout;
@@ -116,6 +116,8 @@ void QmitkOtsuAction::SetFunctionality(QtViewPart* /*functionality*/)
 
 void QmitkOtsuAction::PerformOtsuSegmentation()
 {
+  this->m_OtsuSegmentationDialog->setCursor(Qt::WaitCursor);
+
   int numberOfThresholds = this->m_OtsuSpinBox->value() - 1;
   int proceed;
   
@@ -200,6 +202,8 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
 
 
     this->m_DataStorage->Add(resultNode, this->m_DataNode);
+
+    this->m_OtsuSegmentationDialog->setCursor(Qt::ArrowCursor);
 
   }
   catch( std::exception& err )

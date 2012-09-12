@@ -208,6 +208,22 @@ void QmitkCmdLineModuleProgressWidget::OnModuleFinished()
     QString message = "finishing.";
     this->PublishMessage(message);
 
+    // If no incremental results from stdout, try getting hold of the whole buffer and printing it.
+    if (m_OutputCount == 0)
+    {
+      message = "Output channel is:";
+      this->PublishMessage(message);
+      this->PublishByteArray(this->m_FutureWatcher->readAllOutputData());
+    }
+
+    // If no incremental results from stderr, try getting hold of the whole buffer and printing it.
+    if (m_ErrorCount == 0)
+    {
+      message = "Error channel is:";
+      this->PublishMessage(message);
+      this->PublishByteArray(this->m_FutureWatcher->readAllErrorData());
+    }
+
     this->m_UI->m_ProgressTitle->setText(this->GetTitle() + ": finished");
 
     this->LoadOutputData();
@@ -252,6 +268,7 @@ void QmitkCmdLineModuleProgressWidget::OnModuleProgressValueChanged(int progress
 //-----------------------------------------------------------------------------
 void QmitkCmdLineModuleProgressWidget::OnOutputDataReady()
 {
+  m_OutputCount++;
   this->PublishByteArray(this->m_FutureWatcher->readPendingOutputData());
 }
 
@@ -259,6 +276,7 @@ void QmitkCmdLineModuleProgressWidget::OnOutputDataReady()
 //-----------------------------------------------------------------------------
 void QmitkCmdLineModuleProgressWidget::OnErrorDataReady()
 {
+  m_ErrorCount++;
   this->PublishByteArray(this->m_FutureWatcher->readPendingErrorData());
 }
 
@@ -584,10 +602,13 @@ void QmitkCmdLineModuleProgressWidget::Run()
     {
       m_OutputDataToLoad.push_back(outputFileName);
 
-      message = "Command Line Module ... Registered " + outputFileName + " to auto load upon completion.";
+      message = "Registered " + outputFileName + " to auto load upon completion.";
       this->PublishMessage(message);
     }
   }
+
+  m_OutputCount = 0;
+  m_ErrorCount = 0;
 
   // Now we run stuff.
   message = "starting.";

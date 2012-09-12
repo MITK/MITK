@@ -203,6 +203,16 @@ private:
    * the command line module, we automatically load the output data into the mitk::DataStorage.
    */
   QStringList m_OutputDataToLoad;
+
+  /**
+   * \brief We track how many times the OnOutputDataReady is called.
+   */
+  int m_OutputCount;
+
+  /**
+   * \brief We track how many times the OnErrorDataReady is called.
+   */
+  int m_ErrorCount;
 };
 
 #endif // QMITKCMDLINEMODULEPROGRESSWIDGET_H

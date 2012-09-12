@@ -356,31 +356,13 @@ void QmitkCmdLineModuleProgressWidget::SetModule(const ctkCmdLineModuleReference
   assert(m_ModuleManager);
   assert(m_DataStorage);
 
-  // If a widget exists, remove it from the layout and delete.
+  // If a widget exists, make it invisible.
+  // This seems to cause less problems than deleting widgets on the fly.
   QLayoutItem *item = m_Layout->itemAt(0);
   if (item != NULL)
   {
-     m_Layout->removeItem(item);
-     delete item;
+    item->widget()->setVisible(false);
   }
-
-  // Also make sure we delete the layout.
-  if (m_Layout != NULL)
-  {
-    delete m_Layout;
-  }
-
-  // If the corresponding front end exists, destroy it.
-  if (m_ModuleFrontEnd != NULL)
-  {
-    delete m_ModuleFrontEnd;
-  }
-
-  m_Layout = new QVBoxLayout();
-  m_Layout->setContentsMargins(5,0,5,0);
-  m_Layout->setSpacing(0);
-
-  m_UI->m_ParametersGroupBox->setLayout(m_Layout);
 
   // This method is called when the user selects a new module to display.
   // Aim of this method is to create a default GUI, and attach it to this widget.

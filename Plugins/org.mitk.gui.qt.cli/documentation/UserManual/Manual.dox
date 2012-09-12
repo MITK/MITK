@@ -8,6 +8,12 @@
 \li \ref CLIUsage
 \li \ref CLITechnicalNotes
 
+\section CLIPrefix Contribution
+
+This plugin was developed at the <a href="http://cmic.cs.ucl.ac.uk/">Centre For Medical Image Computing</a> (CMIC),
+part of <a href="http://www.ucl.ac.uk/">University College London</a> and contributed back to the 
+<a href="http://www.mitk.org">MITK</a> community with thanks.
+
 \section CLIIntroduction Introduction
 
 This view provides the facility to run third party command line programs, and load the data back

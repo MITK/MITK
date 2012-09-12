@@ -368,6 +368,8 @@ void QmitkCmdLineModuleProgressWidget::SetModule(const ctkCmdLineModuleReference
   QTextBrowser *helpBrowser = new QTextBrowser(helpWidget);
   helpBrowser->setReadOnly(true);
   helpBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  helpBrowser->setOpenExternalLinks(true);
+  helpBrowser->setOpenLinks(true);
 
   QHBoxLayout *aboutLayout = new QHBoxLayout(aboutWidget);
   aboutLayout->addWidget(aboutBrowser);
@@ -413,8 +415,8 @@ void QmitkCmdLineModuleProgressWidget::SetModule(const ctkCmdLineModuleReference
 
   if (!description.documentationURL().isEmpty())
   {
-    QString docUrlHtml = "<p>For more information please see <a href=\"" + description.documentationURL() \
-                         + "\">the online documentation</a>.</p>";
+    QString docUrlHtml = "<p>For more information please see <a href=\"" + description.documentationURL()
+        + "\">" + description.documentationURL() + "</a></p>";
     helpString += docUrlHtml;
   }
 

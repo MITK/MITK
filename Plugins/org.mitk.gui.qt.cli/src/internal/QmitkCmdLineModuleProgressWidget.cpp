@@ -53,6 +53,8 @@ QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *pare
   m_UI->m_RemoveButton->setIcon(QApplication::style()->standardIcon(QStyle::SP_TitleBarCloseButton));
 
   m_Layout = new QVBoxLayout();
+  m_Layout->setContentsMargins(0,0,0,0);
+  m_Layout->setSpacing(0);
   m_UI->m_ParametersGroupBox->setLayout(m_Layout);
 
   qRegisterMetaType<mitk::DataNode::Pointer>();
@@ -419,6 +421,8 @@ void QmitkCmdLineModuleProgressWidget::SetModule(const ctkCmdLineModuleReference
   QWidget *topLevelWidget = new QWidget();
 
   QGridLayout *topLevelLayout = new QGridLayout(topLevelWidget);
+  topLevelLayout->setContentsMargins(0,0,0,0);
+  topLevelLayout->setSpacing(0);
   topLevelLayout->addWidget(aboutBoxContainerWidget, 0, 0);
   topLevelLayout->addWidget(helpBoxContainerWidget, 1, 0);
   topLevelLayout->addWidget(generatedGuiWidgets, 2, 0);
@@ -474,8 +478,10 @@ void QmitkCmdLineModuleProgressWidget::SetModule(const ctkCmdLineModuleReference
 
   helpBrowser->clear();
   helpBrowser->setHtml(helpString);
+  helpBox->setCollapsed(true);
   aboutBrowser->clear();
   aboutBrowser->setHtml(aboutString);
+  aboutBox->setCollapsed(true);
 
   // So, we put the new GUI into the layout.
   m_Layout->insertWidget(0, topLevelWidget);

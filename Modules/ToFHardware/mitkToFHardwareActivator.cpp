@@ -87,6 +87,19 @@ public:
         //ServiceProperties o3FactoryProps;
         //o3FactoryProps["ToFFactoryName"] = toFCameraPMDO3DeviceFactory->GetFactoryName();
         //context->RegisterService<IToFDeviceFactory>(toFCameraPMDO3DeviceFactory,o3FactoryProps);
+
+        //Implementing CamBoardDeviceFactory
+        //ToFCameraPMDCamBoardDeviceFactory* toFCameraPMDCamBoardDeviceFactory = new ToFCameraPMDCamBoardDeviceFactory();
+        //ServiceProperties camBoardFactoryProps;
+        //camBoardFactoryProps["ToFFactoryName"] = toFCameraPMDCamBoardDeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamBoardDeviceFactory, camBoardFactoryProps);
+
+        //Implementing PMD Raw Data Cam Board DeviceFactory
+        //ToFCameraPMDRawDataCamBoardDeviceFactory* toFCameraPMDRawDataCamBoardDeviceFactory = new ToFCameraPMDRawDataCamBoardDeviceFactory();
+        //ServiceProperties rawCamBoardFactoryProps;
+        //rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
+
       LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
 
 

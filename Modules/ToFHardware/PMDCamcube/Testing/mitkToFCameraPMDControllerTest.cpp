@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "ToFCameraPMDController".
  */
-//creating a concrete test implementation of the abstract class 
+//creating a concrete test implementation of the abstract class
 namespace mitk
 {
   class ToFCameraPMDControllerTest : public ToFCameraPMDController
@@ -54,7 +54,7 @@ int mitkToFCameraPMDControllerTest(int /* argc */, char* /*argv*/[])
   mitk::ToFCameraPMDControllerTest::Pointer testObject = mitk::ToFCameraPMDControllerTest::New();
   MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == NULL) ,"Testing initialization class");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth"); 
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth");
   int numberOfPixels = testObject->GetCaptureHeight()*testObject->GetCaptureWidth();
   float* dataArray = new float[numberOfPixels];
   char* sourceArray = new char[numberOfPixels];
@@ -75,5 +75,3 @@ int mitkToFCameraPMDControllerTest(int /* argc */, char* /*argv*/[])
   delete [] shortSource;
   MITK_TEST_END();
 }
-
-

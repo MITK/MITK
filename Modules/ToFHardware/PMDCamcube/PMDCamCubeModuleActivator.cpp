@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraPMDRawDataCamCubeDeviceFactory.h"
 #include "mitkToFCameraPMDPlayerDeviceFactory.h"
 #include "mitkToFCameraPMDO3DeviceFactory.h"
+#include "mitkToFCameraPMDCamBoardDeviceFactory.h"
+#include "mitkToFCameraPMDRawDataCamBoardDeviceFactory.h"
 
 
 /*
@@ -69,10 +71,25 @@ public:
         o3FactoryProps["ToFFactoryName"] = toFCameraPMDO3DeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDO3DeviceFactory,o3FactoryProps);
 
+        //Implementing CamBoardDeviceFactory
+        ToFCameraPMDCamBoardDeviceFactory* toFCameraPMDCamBoardDeviceFactory = new ToFCameraPMDCamBoardDeviceFactory();
+        ServiceProperties camBoardFactoryProps;
+        camBoardFactoryProps["ToFFactoryName"] = toFCameraPMDCamBoardDeviceFactory->GetFactoryName();
+        context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamBoardDeviceFactory, camBoardFactoryProps);
+
+        //Implementing PMD Raw Data Cam Board DeviceFactory
+        ToFCameraPMDRawDataCamBoardDeviceFactory* toFCameraPMDRawDataCamBoardDeviceFactory = new ToFCameraPMDRawDataCamBoardDeviceFactory();
+        ServiceProperties rawCamBoardFactoryProps;
+        rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
+        context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
+
+
         m_Factories.push_back(toFCameraPMDCamCubeDeviceFactory);
         m_Factories.push_back(toFCameraPMDRawDataCamCubeDeviceFactory);
         m_Factories.push_back(toFCameraPMDPlayerDeviceFactory);
         m_Factories.push_back(toFCameraPMDO3DeviceFactory);
+        m_Factories.push_back(toFCameraPMDCamBoardDeviceFactory);
+        m_Factories.push_back(toFCameraPMDRawDataCamBoardDeviceFactory);
     }
 
     void Unload(mitk::ModuleContext* )

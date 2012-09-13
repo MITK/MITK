@@ -42,7 +42,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
      */
     void onHelp();
 
-    void onHelpContents();
+    void onHelpOpenHelpPerspective();
     
     /**
      * @brief This slot is called if the user clicks in help menu the about button

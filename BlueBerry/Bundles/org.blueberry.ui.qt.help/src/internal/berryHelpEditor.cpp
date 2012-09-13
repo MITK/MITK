@@ -117,9 +117,11 @@ void HelpEditor::CreateQtPartControl(QWidget* parent)
 
   m_ToolBar->addSeparator();
 
-  m_OpenHelpMode = m_ToolBar->addAction("Switch to Help mode", this, SLOT(OpenHelpPerspective()));
+  m_OpenHelpMode = m_ToolBar->addAction("Open Help Perspective", this, SLOT(OpenHelpPerspective()));
+  m_CloseHelpMode = m_ToolBar->addAction("Close Help Perspective", this, SLOT(CloseHelpPerspective()));
   IPerspectiveDescriptor::Pointer currPersp = this->GetSite()->GetPage()->GetPerspective();
-  m_OpenHelpMode->setEnabled(!(currPersp.IsNotNull() && currPersp->GetId() == HelpPerspective::ID));
+  m_OpenHelpMode->setVisible(!(currPersp.IsNotNull() && currPersp->GetId() == HelpPerspective::ID));
+  m_CloseHelpMode->setVisible((currPersp.IsNotNull() && currPersp->GetId() == HelpPerspective::ID));
 
   connect(m_WebView, SIGNAL(backwardAvailable(bool)), m_BackAction, SLOT(setEnabled(bool)));
   connect(m_WebView, SIGNAL(forwardAvailable(bool)), m_ForwardAction, SLOT(setEnabled(bool)));
@@ -201,6 +203,14 @@ void HelpEditor::OpenHelpPerspective()
   PlatformUI::GetWorkbench()->ShowPerspective(HelpPerspective::ID, this->GetSite()->GetPage()->GetWorkbenchWindow());
 }
 
+void HelpEditor::CloseHelpPerspective()
+{
+  berry::IWorkbenchPage::Pointer
+    page =
+    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+  page->ClosePerspective(page->GetPerspective(), true, true);
+}
+
 void HelpEditor::InitializeTitle()
 {
   std::string title = m_WebView->title().toStdString();
@@ -244,7 +254,8 @@ void HelpEditor::PerspectiveActivated(SmartPointer<IWorkbenchPage> page, IPerspe
 {
   if (perspective->GetId() == HelpPerspective::ID)
   {
-    m_OpenHelpMode->setEnabled(false);
+    m_OpenHelpMode->setVisible(false);
+    m_CloseHelpMode->setVisible(true);
   }
 }
 
@@ -252,7 +263,8 @@ void HelpEditor::PerspectiveDeactivated(SmartPointer<IWorkbenchPage> page, IPers
 {
   if (perspective->GetId() == HelpPerspective::ID)
   {
-    m_OpenHelpMode->setEnabled(true);
+    m_OpenHelpMode->setVisible(true);
+    m_CloseHelpMode->setVisible(false);
   }
 }
 

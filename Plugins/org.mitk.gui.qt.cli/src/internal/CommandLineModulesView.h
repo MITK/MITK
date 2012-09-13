@@ -106,7 +106,7 @@ private slots:
   void OnJobStarted();
 
   /**
-   * \brief Called from QmitkCmdLineModuleProgressWidget to indicate a job has started.
+   * \brief Called from QmitkCmdLineModuleProgressWidget to indicate a job has finished.
    */
   void OnJobFinished();
 

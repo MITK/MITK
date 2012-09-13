@@ -128,7 +128,9 @@ protected:
   {
     PF_DEFAULT = 0,
     PF_HOVER,
-    PF_SELECTED
+    PF_SELECTED,
+
+    PF_COUNT
   };
 
   PlanarFigureMapper2D();

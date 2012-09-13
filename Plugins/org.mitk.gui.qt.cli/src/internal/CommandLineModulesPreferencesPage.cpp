@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QCheckBox>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QSpinBox>
 #include <ctkDirectoryButton.h>
 #include <ctkCmdLineModuleManager.h>
 #include <berryIPreferencesService.h>
@@ -41,6 +42,7 @@ CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 , m_LoadFromApplicationDir(0)
 , m_LoadFromAutoLoadPathDir(0)
 , m_ValidationMode(0)
+, m_MaximumNumberProcesses(0)
 , m_CLIPreferencesNode(0)
 {
 
@@ -90,6 +92,9 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_ValidationMode->addItem("none", ctkCmdLineModuleManager::SKIP_VALIDATION);
   m_ValidationMode->addItem("weak", ctkCmdLineModuleManager::WEAK_VALIDATION);
   m_ValidationMode->setCurrentIndex(0);
+  m_MaximumNumberProcesses = new QSpinBox(m_MainControl);
+  m_MaximumNumberProcesses->setMinimum(1);
+  m_MaximumNumberProcesses->setMaximum(1000000);
 
   QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("scan home directory:", m_LoadFromHomeDir);
@@ -101,6 +106,7 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   formLayout->addRow("temporary directory:", m_TemporaryDirectory);
   formLayout->addRow("debug output:", m_DebugOutput);
   formLayout->addRow("XML validation mode:", m_ValidationMode);
+  formLayout->addRow("max. concurrent:", m_MaximumNumberProcesses);
 
   m_MainControl->setLayout(formLayout);
 
@@ -152,6 +158,7 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   }
 
   m_CLIPreferencesNode->PutInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, m_ValidationMode->currentIndex());
+  m_CLIPreferencesNode->PutInt(CommandLineModulesViewConstants::MAX_CONCURRENT, m_MaximumNumberProcesses->value());
   return true;
 }
 
@@ -183,4 +190,5 @@ void CommandLineModulesPreferencesPage::Update()
   m_ModulesFiles->setFiles(fileList);
 
   m_ValidationMode->setCurrentIndex(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0));
+  m_MaximumNumberProcesses->setValue(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4));
 }

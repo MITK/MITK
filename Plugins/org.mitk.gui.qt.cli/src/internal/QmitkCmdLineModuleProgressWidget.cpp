@@ -199,6 +199,8 @@ void QmitkCmdLineModuleProgressWidget::OnModuleStarted()
 
   QString message = "started.";
   this->PublishMessage(message);
+
+  emit started();
 }
 
 
@@ -260,6 +262,8 @@ void QmitkCmdLineModuleProgressWidget::OnModuleFinished()
     this->PublishMessage(message);
 
   }
+
+  emit finished();
 }
 
 

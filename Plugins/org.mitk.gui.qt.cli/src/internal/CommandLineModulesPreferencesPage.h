@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QWidget;
 class QCheckBox;
 class QComboBox;
+class QSpinBox;
 class QmitkDirectoryListWidget;
 class QmitkFileListWidget;
 class ctkDirectoryButton;
@@ -89,6 +90,7 @@ protected:
   QCheckBox                *m_LoadFromApplicationDir;
   QCheckBox                *m_LoadFromAutoLoadPathDir;
   QComboBox                *m_ValidationMode;
+  QSpinBox                 *m_MaximumNumberProcesses;
 
   berry::IPreferences::Pointer m_CLIPreferencesNode;
 

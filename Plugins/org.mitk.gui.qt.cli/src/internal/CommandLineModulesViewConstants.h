@@ -77,6 +77,11 @@ struct CommandLineModulesViewConstants
   static const std::string XML_VALIDATION_MODE;
 
   /**
+   * \brief The name of the preferences node containing the maximum number of concurrent processes.
+   */
+  static const std::string MAX_CONCURRENT;
+
+  /**
    * \brief The View ID = org.mitk.gui.qt.cli, and should match that in plugin.xml.
    */
   static const std::string VIEW_ID;

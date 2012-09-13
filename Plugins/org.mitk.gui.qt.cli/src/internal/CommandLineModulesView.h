@@ -100,6 +100,16 @@ private slots:
    */
   void OnTabCloseRequested(int tabNumber);
 
+  /**
+   * \brief Called from QmitkCmdLineModuleProgressWidget to indicate a job has started.
+   */
+  void OnJobStarted();
+
+  /**
+   * \brief Called from QmitkCmdLineModuleProgressWidget to indicate a job has started.
+   */
+  void OnJobFinished();
+
 private:
 
   /**
@@ -135,6 +145,11 @@ private:
    * \brief Raises a message box asking the user to select a module first.
    */
   void AskUserToSelectAModule() const;
+
+  /**
+   * \brief Enables or Disables the Run Button.
+   */
+  void UpdateRunButtonEnabledStatus();
 
   /**
    * \brief The GUI controls contain a reset and run button, and a QWidget container, and the GUI component
@@ -179,6 +194,16 @@ private:
    * \brief We store the validation mode, accessisble via user preferences.
    */
   ctkCmdLineModuleManager::ValidationMode m_ValidationMode;
+
+  /**
+   * \brief We store the maximum number of concurrent processes, and disable the run button accordingly.
+   */
+  int m_MaximumConcurrentProcesses;
+
+  /**
+   * \brief Counts the number of currently running processes.
+   */
+  int m_CurrentlyRunningProcesses;
 
   /**
    * \brief Member variable, taken from preference page.

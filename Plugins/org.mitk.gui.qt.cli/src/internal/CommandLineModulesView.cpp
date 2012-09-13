@@ -55,6 +55,8 @@ CommandLineModulesView::CommandLineModulesView()
 , m_ModuleBackend(NULL)
 , m_DirectoryWatcher(NULL)
 , m_TemporaryDirectoryName("")
+, m_MaximumConcurrentProcesses(4)
+, m_CurrentlyRunningProcesses(0)
 , m_DebugOutput(false)
 {
 }
@@ -134,6 +136,8 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
     connect(this->m_Controls->m_TabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(OnTabCloseRequested(int)));
+
+    this->UpdateRunButtonEnabledStatus();
   }
 }
 
@@ -194,6 +198,8 @@ void CommandLineModulesView::RetrieveAndStoreValidationMode()
 void CommandLineModulesView::RetrieveAndStorePreferenceValues()
 {
   berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
+
+  m_MaximumConcurrentProcesses = prefs->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4);
 
   // Get the flag for debug output, useful when parsing all the XML.
   m_DebugOutput = prefs->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false);
@@ -380,11 +386,45 @@ void CommandLineModulesView::OnRunButtonPressed()
     // 3. Copy parameters. This MUST come after widget->SetFrontEnd
     newFrontEndGui->copyParameters(*frontEndGuiOnCurrentTab);
 
-    // 4. GO.
+    // 4. Connect widget signals to here, to count how many jobs running.
+    connect(widget, SIGNAL(started()), this, SLOT(OnJobStarted()));
+    connect(widget, SIGNAL(finished()), this, SLOT(OnJobFinished()));
+
+    // 5. GO.
     widget->Run();
   }
   else
   {
     this->AskUserToSelectAModule();
   }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::UpdateRunButtonEnabledStatus()
+{
+  if (m_CurrentlyRunningProcesses >= m_MaximumConcurrentProcesses)
+  {
+    m_Controls->m_RunButton->setEnabled(false);
+  }
+  else
+  {
+    m_Controls->m_RunButton->setEnabled(true);
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnJobStarted()
+{
+  m_CurrentlyRunningProcesses++;
+  this->UpdateRunButtonEnabledStatus();
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnJobFinished()
+{
+  m_CurrentlyRunningProcesses--;
+  this->UpdateRunButtonEnabledStatus();
 }

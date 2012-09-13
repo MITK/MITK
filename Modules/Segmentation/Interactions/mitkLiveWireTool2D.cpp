@@ -40,7 +40,7 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   m_Contour = mitk::ContourModel::New();
   m_ContourModelNode = mitk::DataNode::New();
   m_ContourModelNode->SetData( m_Contour );
-  m_ContourModelNode->SetProperty("name", StringProperty::New("contour node"));
+  m_ContourModelNode->SetProperty("name", StringProperty::New("working contour node"));
   m_ContourModelNode->SetProperty("visible", BoolProperty::New(true));
   m_ContourModelNode->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), NULL, true );
   m_ContourModelNode->AddProperty( "selectedcolor", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );
@@ -104,6 +104,24 @@ void mitk::LiveWireTool2D::Activated()
 void mitk::LiveWireTool2D::Deactivated()
 {
   this->FinishTool();
+
+  //search for all contours and write them as segmentation
+  mitk::DataStorage::SetOfObjects::ConstPointer allNodes = m_ToolManager->GetDataStorage()->GetAll();
+  mitk::DataStorage::SetOfObjects::ConstIterator it = allNodes->Begin();
+  while(it != allNodes->End() )
+  {
+    std::string classname("ContourModel");
+    if(it->Value()->GetData() && classname.compare(it->Value()->GetData()->GetNameOfClass())==0)
+    {
+
+      //remove contour node from datastorage
+      m_ToolManager->GetDataStorage()->Remove(it->Value());
+    }
+
+    ++it;
+  }
+
+
   Superclass::Deactivated();
 }
 
@@ -133,7 +151,11 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
 
   //map click to pixel coordinates
   mitk::Point3D click = const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition());
-  m_WorkingSlice->GetGeometry()->WorldToIndex(click, click);
+  itk::Index<3> idx;
+  m_WorkingSlice->GetGeometry()->WorldToIndex(click, idx);
+  click[0] = idx[0];
+  click[1] = idx[1];
+  click[2] = idx[2];
   m_WorkingSlice->GetGeometry()->IndexToWorld(click, click);
 
   m_Contour->AddVertex( click, true, timestep );
@@ -308,6 +330,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 
   //remove last control point being added by double click
   m_Contour->RemoveVertexAt(m_Contour->GetNumberOfVertices(timestep) - 1, timestep);
+  //m_Contour->SetGeometry(static_cast<mitk::Geometry2D*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()->Clone().GetPointer()));
 
   m_LiveWireFilter->SetUseDynamicCostMap(false);
   this->FinishTool();
@@ -337,6 +360,7 @@ void mitk::LiveWireTool2D::FinishTool()
 
   //TODO visual feedback for completing livewire tool
   m_ContourModelNode->AddProperty( "color", ColorProperty::New(1.0, 1.0, 0.1), NULL, true );
+  m_ContourModelNode->SetProperty("name", StringProperty::New("contour node"));
 
   //set the livewire interactor to edit control points
   mitk::ContourModelLiveWireInteractor::Pointer interactor = mitk::ContourModelLiveWireInteractor::New(m_ContourModelNode);
@@ -352,7 +376,7 @@ void mitk::LiveWireTool2D::FinishTool()
   m_Contour = mitk::ContourModel::New();
   m_ContourModelNode = mitk::DataNode::New();
   m_ContourModelNode->SetData( m_Contour );
-  m_ContourModelNode->SetProperty("name", StringProperty::New("contour node"));
+  m_ContourModelNode->SetProperty("name", StringProperty::New("working contour node"));
   m_ContourModelNode->SetProperty("visible", BoolProperty::New(true));
   m_ContourModelNode->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), NULL, true );
   m_ContourModelNode->AddProperty( "selectedcolor", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );

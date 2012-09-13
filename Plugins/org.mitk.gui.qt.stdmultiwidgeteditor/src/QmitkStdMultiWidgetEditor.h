@@ -53,19 +53,19 @@ public:
   // -------------------  mitk::IRenderWindowPart  ----------------------
 
   /**
-   * \see mitk::IRenderWindowPart::GetActiveRenderWindow()
+   * \see mitk::IRenderWindowPart::GetActiveQmitkRenderWindow()
    */
-  QmitkRenderWindow* GetActiveRenderWindow() const;
+  QmitkRenderWindow* GetActiveQmitkRenderWindow() const;
 
   /**
-   * \see mitk::IRenderWindowPart::GetRenderWindows()
+   * \see mitk::IRenderWindowPart::GetQmitkRenderWindows()
    */
-  QHash<QString,QmitkRenderWindow*> GetRenderWindows() const;
+  QHash<QString,QmitkRenderWindow*> GetQmitkRenderWindows() const;
 
   /**
-   * \see mitk::IRenderWindowPart::GetRenderWindow(QString)
+   * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(QString)
    */
-  QmitkRenderWindow* GetRenderWindow(const QString& id) const;
+  QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const;
 
   /**
    * \see mitk::IRenderWindowPart::GetSelectionPosition()

@@ -615,7 +615,7 @@ void QmitkPartialVolumeAnalysisView::FindRenderWindow(mitk::DataNode* node)
     m_SelectedRenderWindow = 0;
     bool PlanarFigureInitializedWindow = false;
 
-    foreach(QmitkRenderWindow * window, this->GetRenderWindowPart()->GetRenderWindows().values())
+    foreach(QmitkRenderWindow * window, this->GetRenderWindowPart()->GetQmitkRenderWindows().values())
     {
       if (!m_SelectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, window->GetRenderer()))
       {

@@ -111,7 +111,7 @@ namespace itk
     }
 
 
-    if(m_UseCostMap)
+    if(m_UseCostMap && !m_CostMap.empty())
     {
       std::map< int, int >::iterator end = m_CostMap.end();
       std::map< int, int >::iterator last = --(m_CostMap.end());
@@ -209,7 +209,7 @@ namespace itk
         gradientCost = 1.0 - ( (partRight1 + partRight2 + partLeft1 + partLeft2) / m_MaxMapCosts );
       }
       else
-      {//TODO compute max
+      {//use linear mapping
         gradientCost = 1.0 - (gradientMagnitude / m_GradientMax);
       }
 

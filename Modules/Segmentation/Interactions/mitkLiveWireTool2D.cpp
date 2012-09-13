@@ -141,6 +141,8 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   //set initial start point
   m_LiveWireFilter->SetStartPoint(click);
 
+  m_CreateAndUseDynamicCosts = true;
+
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -188,8 +190,13 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   //set new start point
   m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
-  //use dynamic cost map for next update
-  m_LiveWireFilter->SetUseDynamicCostTransferForNextUpdate(true);
+  if(m_CreateAndUseDynamicCosts)//only once after first segment
+  {
+    //use dynamic cost map for next update
+    m_LiveWireFilter->CreateDynamicCostMap(m_Contour);
+    m_LiveWireFilter->SetUseDynamicCostMap(true);
+    m_CreateAndUseDynamicCosts = false;
+  }
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -219,7 +226,7 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
    m_LiveWireFilter->SetEndPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
    m_LiveWireFilter->Update();
-   m_LiveWireFilter->SetUseDynamicCostTransferForNextUpdate(false);//no dynamic map creation after mouse move
+
 
 
   //ContourModel::VertexType* currentVertex = const_cast<ContourModel::VertexType*>(m_LiveWireContour->GetVertexAt(0));
@@ -228,7 +235,6 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
   this->m_LiveWireContourNode->SetData(this->m_LiveWireFilter->GetOutput());
 
   /* END actual LiveWire computation */
-
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -303,6 +309,7 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   //remove last control point being added by double click
   m_Contour->RemoveVertexAt(m_Contour->GetNumberOfVertices(timestep) - 1, timestep);
 
+  m_LiveWireFilter->SetUseDynamicCostMap(false);
   this->FinishTool();
 
   return true;

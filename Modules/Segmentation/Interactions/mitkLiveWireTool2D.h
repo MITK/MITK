@@ -94,6 +94,7 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
 
+    bool m_CreateAndUseDynamicCosts;
 };
 
 } // namespace

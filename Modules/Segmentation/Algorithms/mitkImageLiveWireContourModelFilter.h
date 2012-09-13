@@ -76,8 +76,8 @@ namespace mitk {
     \Note On the fly training will be used for next update only.
     The computation uses the last calculated segment to map cost according to features in the area of the segment.
     */
-    itkSetMacro(UseDynamicCostTransferForNextUpdate, bool);
-    itkGetMacro(UseDynamicCostTransferForNextUpdate, bool);
+    itkSetMacro(UseDynamicCostMap, bool);
+    itkGetMacro(UseDynamicCostMap, bool);
 
 
     virtual void SetInput( const InputType *input);
@@ -89,6 +89,10 @@ namespace mitk {
     const InputType* GetInput(unsigned int idx);
 
     virtual OutputType* GetOutput();
+
+
+    /** \brief Create dynamic cost tranfer map - on the fly training*/
+    bool CreateDynamicCostMap(mitk::ContourModel* path=NULL);
 
   protected:
     ImageLiveWireContourModelFilter();
@@ -117,13 +121,16 @@ namespace mitk {
     /** \brief Shortest path filter according to cost function m_CostFunction*/
     ShortestPathImageFilterType::Pointer m_ShortestPathFilter;
 
-    /** \brief Create dynamic cost tranfer map - on the fly training*/
-    bool m_UseDynamicCostTransferForNextUpdate;
+
+    bool m_UseDynamicCostMap;
 
     bool m_ImageModified;
 
     template<typename TPixel, unsigned int VImageDimension>
     void ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void CreateDynamicCostMapByITK(itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path=NULL);
   };
 
 }

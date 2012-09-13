@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "CommandLineModulesViewControls.h"
 #include "CommandLineModulesPreferencesPage.h"
 #include "QmitkCmdLineModuleFactoryGui.h"
+#include "QmitkCmdLineModuleGui.h"
 #include "QmitkCmdLineModuleProgressWidget.h"
 
 // Qt
@@ -34,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 #include <QLayoutItem>
 #include <QWidgetItem>
+#include <QMessageBox>
 
 // CTK
 #include <ctkCmdLineModuleManager.h>
@@ -80,6 +82,11 @@ CommandLineModulesView::~CommandLineModulesView()
   {
     delete m_Layout;
   }
+
+  for (int i = 0; i < m_ListOfModules.size(); i++)
+  {
+    delete m_ListOfModules[i];
+  }
 }
 
 
@@ -101,7 +108,7 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     m_Controls = new CommandLineModulesViewControls(parent);
 
     // Create a layout to contain a display of QmitkCmdLineModuleProgressWidget.
-    m_Layout = new QVBoxLayout(m_Controls->m_GeneratedGuiWidget);
+    m_Layout = new QVBoxLayout(m_Controls->m_RunningWidgets);
     m_Layout->setContentsMargins(0,0,0,0);
     m_Layout->setSpacing(0);
 
@@ -109,8 +116,6 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     // we create the ctkCmdLineModuleManager to initialise the Cache.
     this->RetrieveAndStoreTemporaryDirectoryPreferenceValues();
     this->RetrieveAndStoreValidationMode();
-
-    qDebug() << "CommandLineModulesView: Creating ctkCmdLineModuleManager with mode=" << m_ValidationMode << ", temp directory=" << m_TemporaryDirectoryName;
 
     // Start to create the command line module infrastructure.
     m_ModuleBackend = new ctkCmdLineModuleBackendLocalProcess();
@@ -128,6 +133,7 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     connect(this->m_Controls->m_RunButton, SIGNAL(pressed()), this, SLOT(OnRunButtonPressed()));
     connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
+    connect(this->m_Controls->m_TabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(OnTabCloseRequested(int)));
   }
 }
 
@@ -254,29 +260,10 @@ ctkCmdLineModuleReference CommandLineModulesView::GetReferenceByFullName(QString
   ctkCmdLineModuleReference ref;
   foreach(ref, references)
   {
-    QString name = ref.description().category() + "." + ref.description().title();
+    QString name = ref.description().categoryDotTitle();
     if (name == fullName)
     {
       result = ref;
-    }
-  }
-
-  return result;
-}
-
-
-//-----------------------------------------------------------------------------
-QmitkCmdLineModuleProgressWidget* CommandLineModulesView::GetWidget(const int& indexNumber)
-{
-  QmitkCmdLineModuleProgressWidget *result = NULL;
-
-  QLayoutItem *layoutItem = m_Layout->itemAt(indexNumber);
-  if (layoutItem != NULL)
-  {
-    QWidgetItem *widgetItem = dynamic_cast<QWidgetItem*>(layoutItem);
-    if (widgetItem != NULL)
-    {
-      result = dynamic_cast<QmitkCmdLineModuleProgressWidget*>(widgetItem->widget());
     }
   }
 
@@ -290,46 +277,78 @@ void CommandLineModulesView::OnActionChanged(QAction* action)
   QString fullName = action->objectName();
   ctkCmdLineModuleReference ref = this->GetReferenceByFullName(fullName);
 
+  // ref should never be invalid, as the menu was generated from each ctkCmdLineModuleReference.
+  // But just to be sure ... if invalid, don't do anything.
   if (ref)
   {
-    QmitkCmdLineModuleProgressWidget *widget = this->GetWidget(0);
-    if (widget == NULL
-        || widget->IsStarted())
+    // Check if we already have the reference.
+    int tabIndex = -1;
+    for (int i = 0; i < m_ListOfModules.size(); i++)
     {
-      // Create new widget.
-      QmitkCmdLineModuleProgressWidget* newWidget = new QmitkCmdLineModuleProgressWidget(m_Controls->m_GeneratedGuiWidget);
-
-      // Configure new widget.
-      newWidget->SetTemporaryDirectory(this->m_TemporaryDirectoryName);
-      newWidget->SetDataStorage(this->GetDataStorage());
-      newWidget->SetManager(this->m_ModuleManager);
-      newWidget->SetModule(ref);
-
-      // Add new widget to the top (nearest top of screen) of layout.
-      m_Layout->insertWidget(0, newWidget);
-    }
-    else
-    {
-      // If the first widget has not even started, we can simply replace the GUI,
-      // with the correct GUI for the newly selected command line module.
-
-      // Note: At the moment, I'm getting 3 signals instead of 1 ???
-      if (widget->GetFullName() != fullName)
+      ctkCmdLineModuleReference tabsReference = m_ListOfModules[i]->moduleReference();
+      if (ref.location() == tabsReference.location())
       {
-        widget->SetModule(ref);
+        tabIndex = i;
+        break;
       }
+    }
+
+    // i.e. we found a matching tab, so just switch to it.
+    if (tabIndex != -1)
+    {
+      m_Controls->m_TabWidget->setCurrentIndex(tabIndex);
+    }
+    else // i.e. we did not find a matching tab
+    {
+      // In this case, we need to create a new tab, and give
+      // it a GUI for the user to setup the parameters with.
+      QmitkCmdLineModuleFactoryGui factory(this->GetDataStorage());
+      ctkCmdLineModuleFrontend *frontEnd = factory.create(ref);
+      QmitkCmdLineModuleGui *theGui = dynamic_cast<QmitkCmdLineModuleGui*>(frontEnd);
+
+      // Add to list and tab wigdget
+      m_ListOfModules.push_back(frontEnd);
+      m_Controls->m_TabWidget->addTab(theGui->getGui(), ref.description().title());
     }
   }
 }
 
 
 //-----------------------------------------------------------------------------
+void CommandLineModulesView::OnTabCloseRequested(int tabNumber)
+{
+
+  ctkCmdLineModuleFrontend *frontEnd = m_ListOfModules[tabNumber];
+
+  m_Controls->m_TabWidget->removeTab(tabNumber);
+  m_ListOfModules.removeAt(tabNumber);
+
+  delete frontEnd;
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::AskUserToSelectAModule() const
+{
+  QMessageBox msgBox;
+  msgBox.setText("Please select a module!");
+  msgBox.setIcon(QMessageBox::Warning);
+  msgBox.exec();
+}
+
+
+//-----------------------------------------------------------------------------
 void CommandLineModulesView::OnRestoreButtonPressed()
 {
-  QmitkCmdLineModuleProgressWidget *widget = this->GetWidget(0);
-  if (widget != NULL && !widget->IsStarted())
+  int tabNumber = m_Controls->m_TabWidget->currentIndex();
+  if (tabNumber >= 0)
   {
-    widget->Reset();
+    ctkCmdLineModuleFrontend *frontEnd = m_ListOfModules[tabNumber];
+    frontEnd->resetValues();
+  }
+  else
+  {
+    this->AskUserToSelectAModule();
   }
 }
 
@@ -337,9 +356,35 @@ void CommandLineModulesView::OnRestoreButtonPressed()
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::OnRunButtonPressed()
 {
-  QmitkCmdLineModuleProgressWidget *widget = this->GetWidget(0);
-  if (widget != NULL && !widget->IsStarted())
+  int tabNumber = m_Controls->m_TabWidget->currentIndex();
+  if (tabNumber >= 0)
   {
+    // 1. Create a new QmitkCmdLineModuleProgressWidget to represent the running widget.
+    QmitkCmdLineModuleProgressWidget *widget = new QmitkCmdLineModuleProgressWidget(m_Controls->m_RunningWidgets);
+    widget->SetDataStorage(this->GetDataStorage());
+    widget->SetManager(m_ModuleManager);
+    widget->SetTemporaryDirectory(m_TemporaryDirectoryName);
+
+    // 2. Create a new front end.
+    QmitkCmdLineModuleFactoryGui factory(this->GetDataStorage());
+
+    ctkCmdLineModuleFrontend *frontEndOnCurrentTab = m_ListOfModules[tabNumber];
+    QmitkCmdLineModuleGui *frontEndGuiOnCurrentTab = dynamic_cast<QmitkCmdLineModuleGui*>(frontEndOnCurrentTab);
+    ctkCmdLineModuleReference currentTabFrontendReferences = frontEndGuiOnCurrentTab->moduleReference();
+
+    ctkCmdLineModuleFrontend *newFrontEnd = factory.create(currentTabFrontendReferences);
+    QmitkCmdLineModuleGui *newFrontEndGui = dynamic_cast<QmitkCmdLineModuleGui*>(newFrontEnd);
+    widget->SetFrontend(newFrontEndGui);
+    m_Layout->insertWidget(0, widget);
+
+    // 3. Copy parameters. This MUST come after widget->SetFrontEnd
+    newFrontEndGui->copyParameters(*frontEndGuiOnCurrentTab);
+
+    // 4. GO.
     widget->Run();
+  }
+  else
+  {
+    this->AskUserToSelectAModule();
   }
 }

@@ -27,6 +27,7 @@ namespace mitk
   class DataStorage;
 }
 class QmitkCmdLineModuleGuiPrivate;
+class QWidget;
 
 /**
  * \class QmitkCmdLineModuleGui
@@ -47,6 +48,58 @@ public:
   QmitkCmdLineModuleGui(const mitk::DataStorage* dataStorage, const ctkCmdLineModuleReference& moduleRef);
   virtual ~QmitkCmdLineModuleGui();
 
+  /**
+   * \brief Returns the top level widget containing the whole GUI, and
+   * should be used in preference to ctkCmdLineModuleFrontend::guiHandle.
+   */
+  QWidget* getGui();
+
+  /**
+   * \brief Used to disable the editable parameters, but leave group boxes
+   * and collapsible items still usable.
+   */
+  void lockGui();
+
+  /**
+   * \brief Copies the visible parameters from another QmitkCmdLineModuleGui;
+   * \param another a QmitkCmdLineModuleGui frontend.
+   */
+  void copyParameters(QmitkCmdLineModuleGui& another);
+
+  /**
+   * \brief A custom method to enable access to a mitk::DataNode::Pointer for input images.
+   * \param parameter The name of the parameter as specified in XML.
+   * \param role The role, \see ctkCmdLineModuleFrontend.
+   * \return QVariant
+   *
+   * If role==UserRole and the parameter specified by parameter name is an
+   * input image, will return a mitk::DataNode::Pointer wrapped in a QVariant.
+   *
+   * If role==UserRole and the parameter specified is not an input image,
+   * returns an Empty QVariant.
+   *
+   * For any other scenario, calls base class.
+   *
+   * \sa ctkCmdLineModuleFrontend::value
+   */
+  virtual QVariant value(const QString &parameter, int role) const;
+
+  /**
+   * \brief A custom method to enable the setting of mitk::DataNode::Pointer for input images.
+   * \param parameter The name of the parameter as specified in XML.
+   * \param value QVariant containing a mitk::DataNode::Pointer
+   * \param role The role, \see ctkCmdLineModuleFrontend.
+   *
+   * If role==UserRole and the parameter specified by parameter name is an
+   * input image, will set the value for that parameter.
+   *
+   *
+   * For any other scenario, calls base class.
+   *
+   * \sa ctkCmdLineModuleFrontend::setValue
+   */
+  virtual void setValue(const QString& parameter, const QVariant& value, int role = DisplayRole);
+
 protected:
 
   /**
@@ -60,22 +113,6 @@ protected:
    * \see ctkCmdLineModuleFrontendQtGui::xslTransform()
    */
   virtual ctkCmdLineModuleXslTransform* xslTransform() const;
-
-  /**
-   * \brief A custom method to enable access to a mitk::DataNode::Pointer for input images.
-   * \param parameter The name of the parameter as specified in XML.
-   * \param role The role, see ctkCmdLineModuleFrontend.
-   * \return QVariant
-   *
-   * If role==UserRole and the parameter specified by parameter name is an
-   * input image, will return a mitk::DataNode::Pointer wrapped in a QVariant.
-   *
-   * If role==UserRole and the parameter specified is not an input image,
-   * returns an Empty QVariant.
-   *
-   * For any other role, calls base class.
-   */
-  virtual QVariant value(const QString &parameter, int role) const;
 
 private:
 

@@ -18,14 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidget>
 #include <QTimer>
-#include <ctkCmdLineModuleFutureWatcher.h>
-#include <ctkCmdLineModuleReference.h>
 
-class ctkCmdLineModuleManager;
-class ctkCmdLineModuleFrontend;
-class ctkCmdLineModuleFuture;
-class QmitkCmdLineModuleFactoryGui;
 class QVBoxLayout;
+class QmitkCmdLineModuleGui;
+class ctkCmdLineModuleManager;
+class ctkCmdLineModuleFutureWatcher;
 
 namespace Ui {
 class QmitkCmdLineModuleProgressWidget;
@@ -50,7 +47,7 @@ class QmitkCmdLineModuleProgressWidget : public QWidget
 public:
 
   QmitkCmdLineModuleProgressWidget(QWidget *parent = 0);
-  ~QmitkCmdLineModuleProgressWidget();
+  virtual ~QmitkCmdLineModuleProgressWidget();
 
   /**
    * \brief Sets the manager on this object, and must be called immediately
@@ -71,43 +68,15 @@ public:
   void SetTemporaryDirectory(const QString& directoryName);
 
   /**
-   * \brief Tells this widget, which module it is pertaining to, which is looked up via the ModuleManager.
-   * \param reference
+   * \brief Tells this widget, which module frontend it is running
+   * \param frontEnd our QmitkCmdLineModuleGui class derived from ctkCmdLineModuleFrontend
    */
-  void SetModule(const ctkCmdLineModuleReference& reference);
-
-  /**
-   * \brief Returns <category>.<title>, derived from the ctkCmdLineModuleReference and
-   * hence from the ctkCmdLineModuleDescription.
-   */
-  QString GetFullName() const;
-
-  /**
-   * \brief Called from CommandLineModulesView to see if this job has started or not,
-   * as it affects the decision on when to create new widgets.
-   */
-  bool IsStarted() const;
-
-  /**
-   * \brief Resets this widget to the default parameters specified in the
-   * command line modules XML file.
-   */
-  void Reset();
+  void SetFrontend(QmitkCmdLineModuleGui* frontEnd);
 
   /**
    * \brief Runs the module that this widget is currently referring to.
    */
   void Run();
-
-  /**
-   * \brief Shows the progress bar widgets, which can be turned off / on to save space.
-   */
-  void ShowProgressBar(bool visible);
-
-  /**
-   * \brief Shows the console widget, which can be turned off / on to save space.
-   */
-  void ShowConsole(bool visible);
 
 Q_SIGNALS:
 
@@ -137,6 +106,11 @@ private Q_SLOTS:
 private:
 
   /**
+   * \brief Simply returns true if this widget is considered as having been started.
+   */
+  bool IsStarted() const;
+
+  /**
    * \brief Used to write output to the console widget, and also to qDebug().
    */
   void PublishMessage(const QString& message);
@@ -160,6 +134,12 @@ private:
    * \brief Utility method to look up the title from the description.
    */
   QString GetTitle();
+
+  /**
+   * \brief Returns <category>.<title>, derived from the ctkCmdLineModuleReference and
+   * hence from the ctkCmdLineModuleDescription.
+   */
+  QString GetFullName() const;
 
   /**
    * \brief This must be injected before the Widget is used.
@@ -187,9 +167,10 @@ private:
   QVBoxLayout *m_Layout;
 
   /**
-   * \brief The ctkCmdLineModuleFrontend is created by the QmitkCmdLineModuleFactoryGui.
+   * \brief The QmitkCmdLineModuleGui is created by the QmitkCmdLineModuleFactoryGui outside
+   * of this class and injected into this class before being run.
    */
-  ctkCmdLineModuleFrontend *m_ModuleFrontEnd;
+  QmitkCmdLineModuleGui *m_ModuleFrontEnd;
 
   /**
    * \brief Main object to keep track of a running command line module.

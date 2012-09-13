@@ -89,7 +89,17 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="m_GeneratedGuiWidget" native="true">
+    <widget class="QTabWidget" name="m_TabWidget">
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+     <property name="tabsClosable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="m_RunningWidgets" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>

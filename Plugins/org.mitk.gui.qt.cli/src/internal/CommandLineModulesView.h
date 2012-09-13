@@ -76,13 +76,12 @@ protected Q_SLOTS:
 
   /**
    * \brief Slot that is called when the restore defaults button is pressed,
-   * to reset the current GUI form to the default values, if the XML specifies them.
+   * to reset the current GUI form to the default values, if the XML specifies defaults.
    */
   void OnRestoreButtonPressed();
 
   /**
-   * \brief Slot that is called when the Run button (green arrow) is pressed,
-   * to run the current module.
+   * \brief Slot that is called when the Run button is pressed to run the current module.
    */
   void OnRunButtonPressed();
 
@@ -90,9 +89,16 @@ protected:
 
   /**
    * \brief Called by framework to set the focus on the right widget
-   * when this view has focus, so currently, thats the combo box.
+   * when this view has focus, so currently, thats the ctkMenuCombo box.
    */
   virtual void SetFocus();
+
+private slots:
+
+  /**
+   * \brief Called when the user clicks to close a tab, and removes the front end from m_ListOfModules
+   */
+  void OnTabCloseRequested(int tabNumber);
 
 private:
 
@@ -126,10 +132,9 @@ private:
   ctkCmdLineModuleReference GetReferenceByFullName(QString fullName);
 
   /**
-   * \brief Returns the QmitkCmdLineModuleProgressWidget from the layout.
-   * \param indexNumber the number of the widget in the layout, starting at zero.
+   * \brief Raises a message box asking the user to select a module first.
    */
-  QmitkCmdLineModuleProgressWidget* GetWidget(const int& indexNumber);
+  void AskUserToSelectAModule() const;
 
   /**
    * \brief The GUI controls contain a reset and run button, and a QWidget container, and the GUI component
@@ -179,6 +184,11 @@ private:
    * \brief Member variable, taken from preference page.
    */
   bool m_DebugOutput;
+
+  /**
+   * \brief We keep a list of front ends to match the m_TabWidget.
+   */
+  QList<ctkCmdLineModuleFrontend*> m_ListOfModules;
 };
 
 #endif // CommandLineModulesView_h

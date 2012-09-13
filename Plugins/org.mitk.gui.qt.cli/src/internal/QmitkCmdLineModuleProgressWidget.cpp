@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // CTK
 #include <ctkCmdLineModuleFuture.h>
+#include <ctkCmdLineModuleFutureWatcher.h>
 #include <ctkCmdLineModuleManager.h>
 #include <ctkCmdLineModuleFrontend.h>
 #include <ctkCmdLineModuleDescription.h>
@@ -37,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <QmitkCommonFunctionality.h>
 #include <QmitkCustomVariants.h>
-#include "QmitkCmdLineModuleFactoryGui.h"
+#include "QmitkCmdLineModuleGui.h"
 
 //-----------------------------------------------------------------------------
 QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *parent)
@@ -46,6 +47,7 @@ QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *pare
 , m_DataStorage(NULL)
 , m_TemporaryDirectoryName("")
 , m_UI(new Ui::QmitkCmdLineModuleProgressWidget)
+, m_Layout(NULL)
 , m_ModuleFrontEnd(NULL)
 , m_FutureWatcher(NULL)
 {
@@ -60,15 +62,14 @@ QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *pare
   qRegisterMetaType<mitk::DataNode::Pointer>();
   qRegisterMetaType<ctkCmdLineModuleReference>();
 
+  connect(m_UI->m_RemoveButton, SIGNAL(clicked()), this, SLOT(OnRemoveButtonClicked()));
+
   // Due to Qt bug 12152, we cannot listen to the "paused" signal because it is
   // not emitted directly when the QFuture is paused. Instead, it is emitted after
   // resuming the future, after the "resume" signal has been emitted... we use
   // a polling approach instead.
-  m_PollPauseTimer.setInterval(300);
   connect(&m_PollPauseTimer, SIGNAL(timeout()), SLOT(OnCheckModulePaused()));
-
-  connect(m_UI->m_RemoveButton, SIGNAL(clicked()), this, SLOT(OnRemoveButtonClicked()));
-
+  m_PollPauseTimer.setInterval(300);
   m_PollPauseTimer.start();
 }
 
@@ -109,22 +110,6 @@ void QmitkCmdLineModuleProgressWidget::SetTemporaryDirectory(const QString& dire
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::ShowProgressBar(bool visible)
-{
-  m_UI->m_ProgressBar->setVisible(visible);
-  m_UI->m_PauseButton->setVisible(visible);
-  m_UI->m_CancelButton->setVisible(visible);
-  m_UI->m_RemoveButton->setVisible(visible);
-}
-
-
-//-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::ShowConsole(bool visible)
-{
-  m_UI->m_ConsoleGroupBox->setVisible(visible);
-}
-
-//-----------------------------------------------------------------------------
 QString QmitkCmdLineModuleProgressWidget::GetTitle()
 {
   assert(m_ModuleFrontEnd);
@@ -135,6 +120,29 @@ QString QmitkCmdLineModuleProgressWidget::GetTitle()
   return description.title();
 }
 
+
+//-----------------------------------------------------------------------------
+QString QmitkCmdLineModuleProgressWidget::GetFullName() const
+{
+  assert(m_ModuleFrontEnd);
+
+  ctkCmdLineModuleReference reference = m_ModuleFrontEnd->moduleReference();
+  ctkCmdLineModuleDescription description = reference.description();
+
+  return description.categoryDotTitle();
+}
+
+
+//-----------------------------------------------------------------------------
+bool QmitkCmdLineModuleProgressWidget::IsStarted() const
+{
+  bool isStarted = false;
+  if (m_FutureWatcher != NULL && m_FutureWatcher->isStarted())
+  {
+    isStarted = true;
+  }
+  return isStarted;
+}
 
 //-----------------------------------------------------------------------------
 void QmitkCmdLineModuleProgressWidget::OnCheckModulePaused()
@@ -369,178 +377,25 @@ void QmitkCmdLineModuleProgressWidget::LoadOutputData()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetModule(const ctkCmdLineModuleReference& reference)
+void QmitkCmdLineModuleProgressWidget::SetFrontend(QmitkCmdLineModuleGui* frontEnd)
 {
-
+  assert(frontEnd);
   assert(m_ModuleManager);
   assert(m_DataStorage);
 
-  // If a widget exists, make it invisible.
-  // This seems to cause less problems than deleting widgets on the fly.
-  QLayoutItem *item = m_Layout->itemAt(0);
-  if (item != NULL)
-  {
-    item->widget()->setVisible(false);
-  }
+  // We are assuming that this method is ONLY EVER CALLED ONCE.
+  assert(!m_ModuleFrontEnd);
 
-  // This method is called when the user selects a new module to display.
-  // Aim of this method is to create a default GUI, and attach it to this widget.
+  // Assign the frontEnd to the member variable.
+  m_ModuleFrontEnd = frontEnd;
 
-  QmitkCmdLineModuleFactoryGui factory(m_DataStorage);
-  m_ModuleFrontEnd = factory.create(reference);
-
-  if (!m_ModuleFrontEnd)
-  {
-    qDebug() << "QmitkCmdLineModuleProgressWidget: Failed to SetModule() for " << reference.description().title();
-    return;
-  }
-
-  // Build up the GUI layout programmatically (manually).
-
-  QWidget *aboutBoxContainerWidget = new QWidget();
-
-  ctkCollapsibleGroupBox *aboutBox = new ctkCollapsibleGroupBox(aboutBoxContainerWidget);
-  aboutBox->setTitle("About");
-
-  QTextBrowser *aboutBrowser = new QTextBrowser(aboutBox);
-  aboutBrowser->setReadOnly(true);
-  aboutBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-  aboutBrowser->setOpenExternalLinks(true);
-  aboutBrowser->setOpenLinks(true);
-
-  QVBoxLayout *aboutLayout = new QVBoxLayout(aboutBox);
-  aboutLayout->addWidget(aboutBrowser);
-
-  QVBoxLayout *aboutBoxContainerWidgetLayout = new QVBoxLayout(aboutBoxContainerWidget);
-  aboutBoxContainerWidgetLayout->addWidget(aboutBox);
-
-  QWidget *helpBoxContainerWidget = new QWidget();
-
-  ctkCollapsibleGroupBox *helpBox = new ctkCollapsibleGroupBox();
-  helpBox->setTitle("Help");
-
-  QTextBrowser *helpBrowser = new QTextBrowser(helpBox);
-  helpBrowser->setReadOnly(true);
-  helpBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-  helpBrowser->setOpenExternalLinks(true);
-  helpBrowser->setOpenLinks(true);
-
-  QVBoxLayout *helpLayout = new QVBoxLayout(helpBox);
-  helpLayout->addWidget(helpBrowser);
-
-  QVBoxLayout *helpBoxContainerWidgetLayout = new QVBoxLayout(helpBoxContainerWidget);
-  helpBoxContainerWidgetLayout->addWidget(helpBox);
-
-  QObject* guiHandle = m_ModuleFrontEnd->guiHandle();
-  QWidget* generatedGuiWidgets = qobject_cast<QWidget*>(guiHandle);
-
-  QWidget *topLevelWidget = new QWidget();
-
-  QGridLayout *topLevelLayout = new QGridLayout(topLevelWidget);
-  topLevelLayout->setContentsMargins(0,0,0,0);
-  topLevelLayout->setSpacing(0);
-  topLevelLayout->addWidget(aboutBoxContainerWidget, 0, 0);
-  topLevelLayout->addWidget(helpBoxContainerWidget, 1, 0);
-  topLevelLayout->addWidget(generatedGuiWidgets, 2, 0);
-
-  ctkCmdLineModuleDescription description = reference.description();
-
-  QString helpString = "";
-
-  if (!description.title().isEmpty())
-  {
-    QString titleHtml = "<h1>" + description.title() + "</h1>";
-    helpString += titleHtml;
-  }
-
-  if (!description.description().isEmpty())
-  {
-    QString descriptionHtml = "<p>" + description.description() + "</p>";
-    helpString += descriptionHtml;
-  }
-
-  if (!description.documentationURL().isEmpty())
-  {
-    QString docUrlHtml = "<p>For more information please see <a href=\"" + description.documentationURL()
-        + "\">" + description.documentationURL() + "</a></p>";
-    helpString += docUrlHtml;
-  }
-
-  QString aboutString = "";
-
-  if (!description.title().isEmpty())
-  {
-    QString titleHtml = "<h1>" + description.title() + "</h1>";
-    aboutString += titleHtml;
-  }
-
-  if (!description.contributor().isEmpty())
-  {
-    QString contributorHtml = "<h2>Contributed By</h2><p>" + description.contributor() + "</p>";
-    aboutString += contributorHtml;
-  }
-
-  if (!description.license().isEmpty())
-  {
-    QString licenseHtml = "<h2>License</h2><p>" + description.license() + "</p>";
-    aboutString += licenseHtml;
-  }
-
-  if (!description.acknowledgements().isEmpty())
-  {
-    QString acknowledgementsHtml = "<h2>Acknowledgements</h2><p>" + description.acknowledgements() + "</p>";
-    aboutString += acknowledgementsHtml;
-  }
-
-  helpBrowser->clear();
-  helpBrowser->setHtml(helpString);
-  helpBox->setCollapsed(true);
-  aboutBrowser->clear();
-  aboutBrowser->setHtml(aboutString);
-  aboutBox->setCollapsed(true);
-
-  // So, we put the new GUI into the layout.
-  m_Layout->insertWidget(0, topLevelWidget);
+  // We put the new GUI into the layout.
+  m_Layout->insertWidget(0, m_ModuleFrontEnd->getGui());
 
   // And configure a few other niceties.
-  m_UI->m_ProgressTitle->setText(description.title());
-  m_UI->m_ConsoleGroupBox->setCollapsed(true);
-  m_UI->m_ParametersGroupBox->setCollapsed(false);
-  this->ShowProgressBar(false);
-  this->ShowConsole(false);
-}
-
-
-//-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::GetFullName() const
-{
-  assert(m_ModuleFrontEnd);
-
-  ctkCmdLineModuleDescription description = m_ModuleFrontEnd->moduleReference().description();
-  QString fullName = description.category() + "." + description.title();
-
-  return fullName;
-}
-
-
-//-----------------------------------------------------------------------------
-bool QmitkCmdLineModuleProgressWidget::IsStarted() const
-{
-  bool isStarted = false;
-  if (m_FutureWatcher != NULL && m_FutureWatcher->isStarted())
-  {
-    isStarted = true;
-  }
-  return isStarted;
-}
-
-
-//-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::Reset()
-{
-  assert(m_ModuleFrontEnd);
-
-  m_ModuleFrontEnd->resetValues();
+  m_UI->m_ProgressTitle->setText(this->GetTitle());
+  m_UI->m_ConsoleGroupBox->setCollapsed(true);     // We basically call SetFrontend then Run
+  m_UI->m_ParametersGroupBox->setCollapsed(true);  // so in practice the user will only want the progress bar.
 }
 
 
@@ -548,6 +403,7 @@ void QmitkCmdLineModuleProgressWidget::Reset()
 void QmitkCmdLineModuleProgressWidget::Run()
 {
   assert(m_ModuleManager);
+  assert(m_DataStorage);
   assert(m_ModuleFrontEnd);
 
   m_OutputDataToLoad.clear();
@@ -605,7 +461,7 @@ void QmitkCmdLineModuleProgressWidget::Run()
   foreach (ctkCmdLineModuleParameter parameter, parameters)
   {
     parameterName = parameter.name();
-    QString outputFileName = m_ModuleFrontEnd->value(parameterName).toString();
+    QString outputFileName = m_ModuleFrontEnd->value(parameterName, ctkCmdLineModuleFrontend::DisplayRole).toString();
 
     if (!outputFileName.isEmpty())
     {
@@ -648,14 +504,8 @@ void QmitkCmdLineModuleProgressWidget::Run()
   m_UI->m_CancelButton->setEnabled(future.canCancel());
   m_UI->m_RemoveButton->setEnabled(!future.isRunning());
 
-  // Configure some other niceties.
-  this->ShowProgressBar(true);
-  this->ShowConsole(true);
-  m_UI->m_ParametersGroupBox->setCollapsed(true);
-  m_UI->m_ConsoleGroupBox->setCollapsed(true);
-
   // Lock parameters, as once the module is running the user can't change them.
-  m_Layout->itemAt(0)->widget()->setEnabled(false);
+  m_ModuleFrontEnd->lockGui();
 
   // Give some immediate indication that we are running.
   m_UI->m_ProgressTitle->setText(description.title() + ": running");

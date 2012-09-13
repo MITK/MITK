@@ -369,9 +369,14 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
       shadow[1] = 0;
       shadow[2] = 0;
 
+      //set shadow opacity
+      float shadowOpacity = 0.0f;
+      if( opacity > 0.2f )
+        shadowOpacity = opacity - 0.2f;
+
       this->PaintPolyLine( polyline, 
         figure->IsClosed(),    
-        shadow, opacity, lineWidth*shadowWidthFactor, firstPoint,
+        shadow, shadowOpacity, lineWidth*shadowWidthFactor, firstPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
       delete shadow;
@@ -425,7 +430,7 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
       // paint shadow by painting the figure twice
       // one in black with a slightly broader line-width ...
       this->PaintPolyLine( helperPolyLine, false,
-        shadow, opacity, lineWidth*shadowWidthFactor, firstPoint,
+        shadow, shadowOpacity, lineWidth*shadowWidthFactor, firstPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
       delete shadow;
@@ -618,17 +623,32 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
     m_ControlPointShape = styleProperty->GetShape();
   }
 
-  node->GetColor( m_LineColor[PF_DEFAULT], NULL, "color" );
+  //Set default color and opacity
+  //If property "planarfigure.default.*.color" exists, then use that color. Otherwise global "color" property is used.
+  if( !node->GetColor( m_LineColor[PF_DEFAULT], NULL, "planarfigure.default.line.color"))
+  {
+    node->GetColor( m_LineColor[PF_DEFAULT], NULL, "color" );
+  }
   node->GetFloatProperty( "planarfigure.default.line.opacity", m_LineOpacity[PF_DEFAULT] );
-  node->GetColor( m_OutlineColor[PF_DEFAULT], NULL, "color" );
+
+  if( !node->GetColor( m_OutlineColor[PF_DEFAULT], NULL, "planarfigure.default.outline.color"))
+  {
+    node->GetColor( m_OutlineColor[PF_DEFAULT], NULL, "color" );
+  }
   node->GetFloatProperty( "planarfigure.default.outline.opacity", m_OutlineOpacity[PF_DEFAULT] );
-  node->GetColor( m_HelperlineColor[PF_DEFAULT], NULL, "color" );
+
+  if( !node->GetColor( m_HelperlineColor[PF_DEFAULT], NULL, "planarfigure.default.helperline.color"))
+  {
+    node->GetColor( m_HelperlineColor[PF_DEFAULT], NULL, "color" );
+  }
   node->GetFloatProperty( "planarfigure.default.helperline.opacity", m_HelperlineOpacity[PF_DEFAULT] );
+
   node->GetColor( m_MarkerlineColor[PF_DEFAULT], NULL, "planarfigure.default.markerline.color" );
   node->GetFloatProperty( "planarfigure.default.markerline.opacity", m_MarkerlineOpacity[PF_DEFAULT] );
   node->GetColor( m_MarkerColor[PF_DEFAULT], NULL, "planarfigure.default.marker.color" );
   node->GetFloatProperty( "planarfigure.default.marker.opacity", m_MarkerOpacity[PF_DEFAULT] );
 
+  //Set hover color and opacity
   node->GetColor( m_LineColor[PF_HOVER], NULL, "planarfigure.hover.line.color" );
   node->GetFloatProperty( "planarfigure.hover.line.opacity", m_LineOpacity[PF_HOVER] );
   node->GetColor( m_OutlineColor[PF_HOVER], NULL, "planarfigure.hover.outline.color" );
@@ -640,6 +660,7 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetColor( m_MarkerColor[PF_HOVER], NULL, "planarfigure.hover.marker.color" );
   node->GetFloatProperty( "planarfigure.hover.marker.opacity", m_MarkerOpacity[PF_HOVER] );
 
+  //Set selected color and opacity
   node->GetColor( m_LineColor[PF_SELECTED], NULL, "planarfigure.selected.line.color" );
   node->GetFloatProperty( "planarfigure.selected.line.opacity", m_LineOpacity[PF_SELECTED] );
   node->GetColor( m_OutlineColor[PF_SELECTED], NULL, "planarfigure.selected.outline.color" );
@@ -651,7 +672,7 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetColor( m_MarkerColor[PF_SELECTED], NULL, "planarfigure.selected.marker.color" );
   node->GetFloatProperty( "planarfigure.selected.marker.opacity", m_MarkerOpacity[PF_SELECTED] );
 
-  //adapt opacity values
+  //adapt opacity values to global "opacity" property
   for( unsigned int i = 0; i < PF_COUNT; ++i )
   {
     m_LineOpacity[i] *= globalOpacity;

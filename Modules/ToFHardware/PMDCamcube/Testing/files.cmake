@@ -7,18 +7,19 @@ set(MODULE_TESTS
   mitkToFCameraPMDPlayerControllerTest.cpp
   mitkToFCameraPMDPlayerDeviceTest.cpp
 
+
   mitkToFCameraPMDCamBoardControllerTest.cpp
+  mitkToFCameraPMDCamBoardDeviceTest.cpp
 
+  mitkToFCameraPMDRawDataCamBoardDeviceTest.cpp
 
-#  mitkKinectControllerTest.cpp
-#  mitkKinectDeviceTest.cpp
-# mitkToFCameraPMDRawDataCamBoardDeviceTest.cpp
-#  mitkToFCameraPMDControllerTest.cpp
-#  mitkToFCameraPMDDeviceTest.cpp
-#  mitkToFCameraPMDRawDataDeviceTest.cpp
+  mitkToFCameraPMDRawDataDeviceTest.cpp
 
-#  mitkToFCameraPMDO3ControllerTest.cpp
-#  mitkToFCameraPMDO3DeviceTest.cpp
+  mitkToFCameraPMDO3ControllerTest.cpp
+  mitkToFCameraPMDO3DeviceTest.cpp
+
+  mitkToFCameraPMDControllerTest.cpp
+  mitkToFCameraPMDDeviceTest.cpp
 
   #mitkToFCameraPMDMITKPlayerControllerTest.cpp
   #mitkToFCameraPMDMITKPlayerDeviceTest.cpp

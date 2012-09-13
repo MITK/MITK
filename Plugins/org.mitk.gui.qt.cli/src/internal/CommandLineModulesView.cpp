@@ -314,7 +314,8 @@ void CommandLineModulesView::OnActionChanged(QAction* action)
 
       // Add to list and tab wigdget
       m_ListOfModules.push_back(frontEnd);
-      m_Controls->m_TabWidget->addTab(theGui->getGui(), ref.description().title());
+      int tabIndex = m_Controls->m_TabWidget->addTab(theGui->getGui(), ref.description().title());
+      m_Controls->m_TabWidget->setTabToolTip(tabIndex, ref.description().title() + ":" + ref.xmlValidationErrorString());
     }
   }
 }

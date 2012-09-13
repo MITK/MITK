@@ -72,6 +72,7 @@ private Q_SLOTS:
 
   void HomePageChanged(const QString& page);
   void OpenHelpPerspective();
+  void CloseHelpPerspective();
 
   void InitializeTitle();
   void ShowTextSearch();
@@ -101,6 +102,7 @@ private:
   QAction* m_ZoomIn;
   QAction* m_ZoomOut;
   QAction* m_OpenHelpMode;
+  QAction* m_CloseHelpMode;
   QAction* m_HomeAction;
 };
 

@@ -24,7 +24,7 @@ If you are interested in using a specific application, currently developed by th
 <ul>
   <li> \subpage org_mitkworkbench
   <li> \subpage org_dti_atlas_application
-  <li> \subpage org_diffusionapplication
+  <li> \subpage org_mitk_gui_qt_diffusionimagingapp
 </ul>
 
 */

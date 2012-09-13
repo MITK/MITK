@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
 {
   Q_OBJECT
-  Q_PROPERTY(mitk::DataNode::Pointer GetSelectedNode READ GetSelectedNode)
+  Q_PROPERTY(mitk::DataNode::Pointer SelectedNode READ GetSelectedNode WRITE SetSelectedNode)
   Q_PROPERTY(QString currentValue READ currentValue WRITE setCurrentValue)
 
   public:
@@ -86,6 +86,11 @@ class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
      * \brief Returns the selected DataNode or NULL if there is none, or the current index is zero.
      */
     virtual mitk::DataNode::Pointer GetSelectedNode() const;
+
+    /**
+     * \brief Sets the combo box to the index that contains the specified node, or 0 if the node cannot be found.
+     */
+    virtual void SetSelectedNode(const mitk::DataNode::Pointer& node);
 
     /**
      * \brief Removes a node from the ComboBox at a specified index (if the index exists).

@@ -80,6 +80,30 @@ mitk::DataNode::Pointer QmitkDataStorageComboBoxWithSelectNone::GetSelectedNode(
 
 
 //-----------------------------------------------------------------------------
+void QmitkDataStorageComboBoxWithSelectNone::SetSelectedNode(const mitk::DataNode::Pointer& node)
+{
+  int currentIndex = -1;
+  for (int i = 0; i < m_Nodes.size(); i++)
+  {
+    if (m_Nodes[i] == node.GetPointer())
+    {
+      currentIndex = i;
+      break;
+    }
+  }
+  if (currentIndex == -1)
+  {
+    // didn't find it, so set the value to 0.
+    currentIndex = 0;
+  }
+  else
+  {
+    currentIndex += 1; // because the combo box contains "please select" at position zero.
+  }
+  this->setCurrentIndex(currentIndex);
+}
+
+//-----------------------------------------------------------------------------
 void QmitkDataStorageComboBoxWithSelectNone::RemoveNode( int index )
 {
   if(index > 0 && this->HasIndex(index))

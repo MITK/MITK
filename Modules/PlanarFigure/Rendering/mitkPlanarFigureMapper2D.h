@@ -127,10 +127,10 @@ protected:
   enum PlanarFigureDisplayMode
   {
     PF_DEFAULT = 0,
-    PF_HOVER,
-    PF_SELECTED,
+    PF_HOVER = 1,
+    PF_SELECTED = 2,
 
-    PF_COUNT
+    PF_COUNT = 3 //helper variable
   };
 
   PlanarFigureMapper2D();

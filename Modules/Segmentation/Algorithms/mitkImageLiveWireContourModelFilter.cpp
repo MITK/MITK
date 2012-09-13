@@ -62,6 +62,8 @@ void mitk::ImageLiveWireContourModelFilter::SetInput ( unsigned int idx, const m
     this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
     this->Modified();
     this->m_ImageModified = true;
+    m_ShortestPathFilter = ShortestPathImageFilterType::New();
+    m_ShortestPathFilter->SetCostFunction(m_CostFunction);
   }
 }
 
@@ -167,7 +169,7 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   /* calculate shortest path between start and end point */
   m_ShortestPathFilter->SetFullNeighborsMode(true);
   m_ShortestPathFilter->SetInput(castFilter->GetOutput());
-  m_ShortestPathFilter->SetMakeOutputImage(false);  
+  m_ShortestPathFilter->SetMakeOutputImage(false);
 
   //m_ShortestPathFilter->SetCalcAllDistances(true);
   m_ShortestPathFilter->SetStartIndex(startPoint);
@@ -403,18 +405,5 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
 
   this->m_CostFunction->SetDynamicCostMap(histogram);
   this->m_CostFunction->SetCostMapMaximum(max);
-
-
-  MITK_INFO << "total: " << histogram.size();
-  it = histogram.begin();
-  int i = 0;
-  while( it != histogram.end())
-  {
-    MITK_INFO << i << ": " << ((*it).first) << "=" << ((*it).second);
-    it++;i++;
-  }
-  MITK_INFO << "max: " << ((*itMAX).first) << "=" << ((*itMAX).second) << " => " << max;
-  MITK_INFO << "\n" << "\n";
-  
 
 }

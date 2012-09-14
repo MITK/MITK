@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/org.mitk.gui.qt.welcomescreen">
+        <file>style.css</file>
+        <file>function.js</file>
+        <file>pics/background.jpg</file>
+        <file>pics/popup_bttn_close.png</file>
+        <file>pics/experimental.png</file>
+        <file>pics/button_mitka.png</file>
+        <file>pics/button_mitk.png</file>
+        <file>mitkworkbenchwelcomeview.html</file>
+    </qresource>
+</RCC>

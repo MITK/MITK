@@ -183,6 +183,8 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
+  m_Contour->Expand(timestep+1);
+
   m_ToolManager->GetDataStorage()->Add( m_ContourModelNode );
 
   m_ToolManager->GetDataStorage()->Add( m_LiveWireContourNode );
@@ -289,6 +291,7 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
 
   m_LiveWireFilter->SetEndPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
+  m_LiveWireFilter->SetTimestep(timestep);
   m_LiveWireFilter->Update();
 
 
@@ -450,7 +453,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
 
 
   mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
-  newContour->Expand(m_Contour->GetTimeSteps());
+  newContour->Expand(m_Contour->GetTimeSteps()+1);
 
   mitk::ContourModel::VertexIterator begin = m_Contour->IteratorBegin();
 

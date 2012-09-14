@@ -33,6 +33,7 @@ mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
   m_ShortestPathFilter->SetCostFunction(m_CostFunction);
   m_UseDynamicCostMap = false;
   m_ImageModified = false;
+  m_Timestep = 0;
 }
 
 mitk::ImageLiveWireContourModelFilter::~ImageLiveWireContourModelFilter()
@@ -189,6 +190,8 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
   this->SetNthOutput(0, output.GetPointer());
 
+  output->Expand(m_Timestep+1);
+
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
 
   typename std::vector< ShortestPathImageFilterType::IndexType>::iterator pathIterator = shortestPath.begin();
@@ -202,7 +205,7 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
 
 
     input->GetGeometry()->IndexToWorld(currentPoint, currentPoint);
-    output->AddVertex(currentPoint);
+    output->AddVertex(currentPoint, false, m_Timestep);
 
     pathIterator++;
   }
@@ -301,107 +304,111 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     pathIterator++;
   }
 
-
-  std::map< int, int >::iterator itMAX;
-
-  //get max of histogramm
-  int currentMaxValue = 0;
-  std::map< int, int >::iterator it = histogram.begin();
-  while( it != histogram.end())
-  {
-    if((*it).second > currentMaxValue)
-    {
-      itMAX = it;
-      currentMaxValue = (*it).second;
-    }
-    it++;
-  }
-
-
-  std::map< int, int >::key_type keyOfMax = itMAX->first;
-
   double max = 1.0;
 
-  /*+++++++++++++++++++++++++ compute the to max of gaussian summation ++++++++++++++++++++++++*/
-  std::map< int, int >::iterator end = histogram.end();
-  std::map< int, int >::iterator last = --(histogram.end());
-
-  std::map< int, int >::iterator left2;
-  std::map< int, int >::iterator left1;
-  std::map< int, int >::iterator right1;
-  std::map< int, int >::iterator right2;
-
-  right1 = itMAX;       
-
-
-  if(right1 == end || right1 == last )
+  if( !histogram.empty() )
   {
-    right2 = end;   
+
+    std::map< int, int >::iterator itMAX;
+
+    //get max of histogramm
+    int currentMaxValue = 0;
+    std::map< int, int >::iterator it = histogram.begin();
+    while( it != histogram.end())
+    {
+      if((*it).second > currentMaxValue)
+      {
+        itMAX = it;
+        currentMaxValue = (*it).second;
+      }
+      it++;
+    }
+
+
+    std::map< int, int >::key_type keyOfMax = itMAX->first;
+
+
+    /*+++++++++++++++++++++++++ compute the to max of gaussian summation ++++++++++++++++++++++++*/
+    std::map< int, int >::iterator end = histogram.end();
+    std::map< int, int >::iterator last = --(histogram.end());
+
+    std::map< int, int >::iterator left2;
+    std::map< int, int >::iterator left1;
+    std::map< int, int >::iterator right1;
+    std::map< int, int >::iterator right2;
+
+    right1 = itMAX;       
+
+
+    if(right1 == end || right1 == last )
+    {
+      right2 = end;   
+    }
+    else//( right1 <= last )
+    {
+      std::map< int, int >::iterator temp = right1;
+      right2 = ++right1;//rght1 + 1
+      right1 = temp;
+    }
+
+
+    if( right1 == histogram.begin() )
+    {
+      left1 = end;
+      left2 = end;
+    }
+    else if( right1 == (++(histogram.begin())) )
+    {
+      std::map< int, int >::iterator temp = right1;
+      left1  = --right1;//rght1 - 1
+      right1 = temp;
+      left2  = end;
+    }
+    else
+    {
+      std::map< int, int >::iterator temp = right1;
+      left1 = --right1;//rght1 - 1
+      left2 = --right1;//rght1 - 2
+      right1 = temp;
+    }
+
+    double partRight1, partRight2, partLeft1, partLeft2;
+    partRight1 = partRight2 = partLeft1 = partLeft2 = 0.0;
+
+
+    /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    f(x) = v(bin) * e^ ( -1/2 * (|x-k(bin)| / sigma)^2 )
+
+    gaussian approximation
+
+    where
+    v(bin) is the value in the map
+    k(bin) is the key
+    */
+    if( left2 != end )
+    {
+      partLeft2 = left2->second * exp( -0.5 * pow( (abs(keyOfMax - left2->first) / 2.0), 2) );
+    }
+
+    if( left1 != end )
+    {
+      partLeft1 = left1->second * exp( -0.5 * pow( (abs(keyOfMax - left1->first) / 2.0), 2) );
+    }
+
+    if( right1 != end )
+    {
+      partRight1 = right1->second * exp( -0.5 * pow( (abs(keyOfMax - right1->first) / 2.0), 2) );
+    }
+
+    if( right2 != end )
+    {
+      partRight2 = right2->second * exp( -0.5 * pow( (abs(keyOfMax - right2->first) / 2.0), 2) );
+    }
+    /*----------------------------------------------------------------------------*/
+
+    max = (partRight1 + partRight2 + partLeft1 + partLeft2);
+
   }
-  else//( right1 <= last )
-  {
-    std::map< int, int >::iterator temp = right1;
-    right2 = ++right1;//rght1 + 1
-    right1 = temp;
-  }
-
-
-  if( right1 == histogram.begin() )
-  {
-    left1 = end;
-    left2 = end;
-  }
-  else if( right1 == (++(histogram.begin())) )
-  {
-    std::map< int, int >::iterator temp = right1;
-    left1  = --right1;//rght1 - 1
-    right1 = temp;
-    left2  = end;
-  }
-  else
-  {
-    std::map< int, int >::iterator temp = right1;
-    left1 = --right1;//rght1 - 1
-    left2 = --right1;//rght1 - 2
-    right1 = temp;
-  }
-
-  double partRight1, partRight2, partLeft1, partLeft2;
-  partRight1 = partRight2 = partLeft1 = partLeft2 = 0.0;
-
-
-  /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  f(x) = v(bin) * e^ ( -1/2 * (|x-k(bin)| / sigma)^2 )
-
-  gaussian approximation
-
-  where
-  v(bin) is the value in the map
-  k(bin) is the key
-  */
-  if( left2 != end )
-  {
-    partLeft2 = left2->second * exp( -0.5 * pow( (abs(keyOfMax - left2->first) / 2.0), 2) );
-  }
-
-  if( left1 != end )
-  {
-    partLeft1 = left1->second * exp( -0.5 * pow( (abs(keyOfMax - left1->first) / 2.0), 2) );
-  }
-
-  if( right1 != end )
-  {
-    partRight1 = right1->second * exp( -0.5 * pow( (abs(keyOfMax - right1->first) / 2.0), 2) );
-  }
-
-  if( right2 != end )
-  {
-    partRight2 = right2->second * exp( -0.5 * pow( (abs(keyOfMax - right2->first) / 2.0), 2) );
-  }
-  /*----------------------------------------------------------------------------*/
-
-  max = (partRight1 + partRight2 + partLeft1 + partLeft2);
-
 
   this->m_CostFunction->SetDynamicCostMap(histogram);
   this->m_CostFunction->SetCostMapMaximum(max);

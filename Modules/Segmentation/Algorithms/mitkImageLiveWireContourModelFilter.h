@@ -94,6 +94,16 @@ namespace mitk {
     /** \brief Create dynamic cost tranfer map - on the fly training*/
     bool CreateDynamicCostMap(mitk::ContourModel* path=NULL);
 
+    void SetTimestep( unsigned int timestep )
+    {
+      m_Timestep = timestep;
+    }
+
+    unsigned int GetTimestep()
+    {
+      return m_Timestep;
+    }
+
   protected:
     ImageLiveWireContourModelFilter();
 
@@ -125,6 +135,8 @@ namespace mitk {
     bool m_UseDynamicCostMap;
 
     bool m_ImageModified;
+
+    unsigned int m_Timestep;
 
     template<typename TPixel, unsigned int VImageDimension>
     void ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);

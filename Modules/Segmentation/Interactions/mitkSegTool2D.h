@@ -94,6 +94,12 @@ class Segmentation_EXPORT SegTool2D : public Tool
     Image::Pointer GetAffectedImageSliceAs2DImage(const PositionEvent*, const Image* image);
 
     /**
+      \brief Extract the slice of an image cut by given plane.
+      \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem getting the image data at that position.
+    */
+    Image::Pointer GetAffectedImageSliceAs2DImage(const PlaneGeometry* planeGeometry, const Image* image, unsigned int timeStep);
+
+    /**
       \brief Extract the slice of the currently selected working image that the user just scribbles on.
       \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem getting the image data at that position,
                    or just no working image is selected.
@@ -108,6 +114,8 @@ class Segmentation_EXPORT SegTool2D : public Tool
     Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
 
     void WriteBackSegmentationResult (const PositionEvent*, Image*);
+
+    void WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image*, unsigned int timeStep);
 
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure. 

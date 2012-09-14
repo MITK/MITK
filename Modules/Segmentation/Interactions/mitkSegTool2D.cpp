@@ -136,6 +136,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   return true;
 }
 
+
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PositionEvent* positionEvent, const Image* image)
 {
   if (!positionEvent) return NULL;
@@ -145,7 +146,13 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
   // first, we determine, which slice is affected
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+  
+  return this->GetAffectedImageSliceAs2DImage(planeGeometry, image, timeStep);
+}
 
+
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry* planeGeometry, const Image* image, unsigned int timeStep)
+{
   if ( !image || !planeGeometry ) return NULL;
 
   //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
@@ -175,6 +182,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   return slice;
 }
 
+
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEvent* positionEvent)
 {
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
@@ -185,6 +193,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEven
 
   return GetAffectedImageSliceAs2DImage( positionEvent, workingImage );
 }
+
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEvent* positionEvent)
 {
@@ -199,12 +208,44 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
 
 void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* positionEvent, Image* slice)
 {
+  if(!positionEvent) return;
+
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+
+  if( planeGeometry && slice)
+  {
+    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+    Image* image = dynamic_cast<Image*>(workingNode->GetData());
+    unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
+    this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
+
+
+    ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
+    contourExtractor->SetInput(slice);
+    contourExtractor->Update();
+    mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+
+    if (contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
+    {
+      unsigned int pos = this->AddContourmarker(positionEvent);
+      mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+      PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+      mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
+      contour->DisconnectPipeline();
+    }
+
+  }
+}
+
+
+void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image* slice, unsigned int timeStep)
+{
+  if(!planeGeometry || !slice) return;
+
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
-  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -243,23 +284,10 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   m_undoOperation = NULL;
   m_doOperation = NULL;
   /*============= END undo feature block ========================*/
-  
   slice->DisconnectPipeline();
-  ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
-  contourExtractor->SetInput(slice);
-  contourExtractor->Update();
-  mitk::Surface::Pointer contour = contourExtractor->GetOutput();
-
-  if (contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
-  {
-    unsigned int pos = this->AddContourmarker(positionEvent);
-    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
-    PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
-    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
-    contour->DisconnectPipeline();
-  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
 }
 
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)

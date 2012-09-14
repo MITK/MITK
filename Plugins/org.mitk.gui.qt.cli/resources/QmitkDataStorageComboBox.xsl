@@ -1,7 +1,7 @@
   <!--
   =========================================================================================
     For an input image, we use QmitkDataStorageComboBoxWithSelectNone and no Browse button.
-    But for output image, we use standard ctkPathLineEdit and a Browse button.
+    But for output image, we use standard ctkPathLineEdit which has its own browse button.
   =========================================================================================
   -->
   <xsl:template match="parameters/*[name()=('image')]" priority="2">
@@ -26,14 +26,7 @@
               <xsl:call-template name="commonWidgetProperties"/>
               <xsl:call-template name="createQtDesignerStringListProperty"/>
               <property name="filters">
-                <set>ctkPathLineEdit::Files</set>
-              </property>
-            </widget>
-          </item>
-          <item>
-            <widget class="QPushButton"  name="{name}BrowseButton">
-              <property name="text">
-                <string>Browse...</string>
+                <set>ctkPathLineEdit::Files,ctkPathLineEdit::Writable</set>
               </property>
             </widget>
           </item>
@@ -42,22 +35,3 @@
       </layout>
     </item>
   </xsl:template>
-
-  <!--
-  =========================================================================================
-    For an input image, we use QmitkDataStorageComboBoxWithSelectNone and no Browse button.
-    But for output image, we use standard ctkPathLineEdit and a Browse button.
-  =========================================================================================
-  -->
-
-  <xsl:template match="parameters/*[name()=('image')]" mode="connections" priority="2">
-    <xsl:if test="channel = 'output'">
-      <connection>
-        <sender><xsl:value-of select="name"/>BrowseButton</sender>
-        <signal>clicked()</signal>
-        <receiver>parameter:<xsl:value-of select="name"/></receiver>
-        <slot>browse()</slot>
-      </connection>
-    </xsl:if>
-  </xsl:template>
-

@@ -5,13 +5,13 @@ set(INTERNAL_CPP_FILES
   QmitkExtApplication.cpp
   QmitkExtApplicationPlugin.cpp
   QmitkExtAppWorkbenchAdvisor.cpp
-  QmitkExtDefaultPerspective.cpp
+  perspectives/QmitkExtDefaultPerspective.cpp
 )
 
 set(MOC_H_FILES
   src/internal/QmitkExtApplication.h
   src/internal/QmitkExtApplicationPlugin.h
-  src/internal/QmitkExtDefaultPerspective.h
+  src/internal/perspectives/QmitkExtDefaultPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES

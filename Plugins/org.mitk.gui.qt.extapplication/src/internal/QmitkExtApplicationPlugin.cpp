@@ -15,7 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkExtApplicationPlugin.h"
-#include "QmitkExtDefaultPerspective.h"
+#include "perspectives/QmitkExtDefaultPerspective.h"
+#include "perspectives/QmitkEditorPerspective.h"
+#include "QmitkMitkWorkbenchIntroPart.h"
 #include "QmitkExtApplication.h"
 
 #include <mitkVersion.h>
@@ -51,6 +53,8 @@ void QmitkExtApplicationPlugin::start(ctkPluginContext* context)
   this->context = context;
   
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExtDefaultPerspective, context);
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkEditorPerspective, context);
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkMitkWorkbenchIntroPart, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExtApplication, context);
 
 

@@ -7,12 +7,27 @@
     </application>
   </extension>
   
+  <extension point="org.blueberry.ui.intro">
+    <intro id="org.mitk.qt.extapplicationintro"
+      class="QmitkMitkWorkbenchIntroPart"
+      role="editor"/>
+    <introProductBinding
+      productId=""
+      introId="org.mitk.qt.extapplicationintro"/>
+  </extension>
+  
   <extension point="org.blueberry.ui.perspectives">
     <perspective
       id="org.mitk.extapp.defaultperspective"
       name="Research"
       class="QmitkExtDefaultPerspective"
-	  icon="resources/icon_research.xpm">
+      icon="resources/icon_research.xpm">
+    </perspective>
+    <perspective 
+      id="org.mitk.mitkworkbench.perspectives.editor"
+      name="Viewer"
+      class="QmitkEditorPerspective"
+      icon="resources/perspectives/icon_home.png">
     </perspective>
   </extension>
 </plugin>

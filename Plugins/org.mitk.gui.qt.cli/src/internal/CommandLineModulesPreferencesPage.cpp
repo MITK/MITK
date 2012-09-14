@@ -97,6 +97,9 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_MaximumNumberProcesses->setMaximum(1000000);
 
   QFormLayout *formLayout = new QFormLayout;
+  formLayout->addRow("show debug output:", m_DebugOutput);
+  formLayout->addRow("XML validation mode:", m_ValidationMode);
+  formLayout->addRow("max. concurrent processes:", m_MaximumNumberProcesses);
   formLayout->addRow("scan home directory:", m_LoadFromHomeDir);
   formLayout->addRow("scan current directory:", m_LoadFromCurrentDir);
   formLayout->addRow("scan installation directory:", m_LoadFromApplicationDir);
@@ -104,9 +107,6 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   formLayout->addRow("additional module directories:", m_ModulesDirectories);
   formLayout->addRow("additional modules:", m_ModulesFiles);
   formLayout->addRow("temporary directory:", m_TemporaryDirectory);
-  formLayout->addRow("debug output:", m_DebugOutput);
-  formLayout->addRow("XML validation mode:", m_ValidationMode);
-  formLayout->addRow("max. concurrent:", m_MaximumNumberProcesses);
 
   m_MainControl->setLayout(formLayout);
 

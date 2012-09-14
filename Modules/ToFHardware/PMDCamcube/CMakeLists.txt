@@ -24,7 +24,6 @@ IF(MITK_USE_TOF_PMDCAMCUBE)
    MITK_INSTALL(FILES ${MITK_PMD_SDK_DIR}/plugins/camcubeproc.W64.ppp  CONFIGURATIONS Release)
    MITK_INSTALL(FILES ${MITK_PMD_SDK_DIR}/plugins/pmdfile.W32.pcp  CONFIGURATIONS Release)
   ENDIf(WIN32)
-ENDIF(MITK_USE_TOF_PMDCAMCUBE)
 
 #Keinerlei Abfrage ueber Raw Data CamCube
 
@@ -39,3 +38,4 @@ MITK_CREATE_MODULE(mitkPMDCamCubeModule
   Message("CamCube Module erfolgreich erstellt")
 
 add_subdirectory(Testing)
+ENDIF(MITK_USE_TOF_PMDCAMCUBE)

@@ -1,0 +1,76 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+#ifndef __mitkMesaSr4000Activator_h
+#define __mitkMesaSr4000Activator_h
+
+// Microservices
+#include <usServiceRegistration.h>
+#include <usModuleActivator.h>
+#include "mitkModuleContext.h"
+
+#include <mitkModuleActivator.h>
+#include "mitkIToFDeviceFactory.h"
+
+#include "mitkToFConfig.h"
+#include "mitkToFCameraMESASR4000DeviceFactory.h"
+
+
+
+/*
+  * This is the module activator for the "mitkPMDCamCubeModule" module. It registers services
+  * like the IToFDeviceFactory.
+  */
+
+namespace mitk
+{
+class MesaSr4000ModuleActivator : public mitk::ModuleActivator {
+public:
+
+    void Load(mitk::ModuleContext* context)
+    {
+      //Implementing MESASR4000DeviceFactory
+        ToFCameraMESASR4000DeviceFactory* toFCameraMESASR4000DeviceFactory = new ToFCameraMESASR4000DeviceFactory();
+        ServiceProperties mitkMESASR4000FactoryProps;
+        mitkMESASR4000FactoryProps["ToFFactoryName"] = toFCameraMESASR4000DeviceFactory->GetFactoryName();
+        context->RegisterService<IToFDeviceFactory>(toFCameraMESASR4000DeviceFactory, mitkMESASR4000FactoryProps);
+
+        m_Factories.push_back(toFCameraMESASR4000DeviceFactory);
+    }
+
+    void Unload(mitk::ModuleContext* )
+    {
+    }
+
+    ~MesaSr4000ModuleActivator()
+    {
+        //todo iterieren über liste m_Factories und löschen
+        if(m_Factories.size() > 0)
+        {
+            for(std::list< IToFDeviceFactory* >::iterator it = m_Factories.begin(); it != m_Factories.end(); ++it)
+            {
+                delete (*it); //todo wie genau löschen?
+            }
+        }
+    }
+
+private:
+
+    std::list< IToFDeviceFactory* > m_Factories;
+
+};
+}
+US_EXPORT_MODULE_ACTIVATOR(mitkMesaSr4000Module, mitk::MesaSr4000ModuleActivator)
+#endif

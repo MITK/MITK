@@ -27,15 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFConfig.h"
 
 //  #include "mitkKinectDeviceFactory.h"
+//  #include "mitkToFCameraMESASR4000DeviceFactory.h"
 //  #include "mitkToFCameraPMDCamCubeDeviceFactory.h"
 //  #include "mitkToFCameraPMDRawDataCamCubeDeviceFactory.h"
-#include "mitkToFCameraMESASR4000DeviceFactory.h"
-//#include "mitkToFCameraPMDPlayerDeviceFactory.h"
+//  #include "mitkToFCameraPMDPlayerDeviceFactory.h"
+//  #include "mitkToFCameraPMDO3DeviceFactory.h"
+//  #include "mitkToFCameraPMDCamBoardDeviceFactory.h"
+//  #include "mitkToFCameraPMDRawDataCamBoardDeviceFactory.h"
 #include "mitkToFCameraMITKPlayerDeviceFactory.h"
-//#include "mitkToFCameraPMDO3DeviceFactory.h"
-//#include "mitkToFCameraPMDCamBoardDeviceFactory.h"
-//#include "mitkToFCameraPMDRawDataCamBoardDeviceFactory.h"
-
 
 /*
   * This is the module activator for the "ToFHardware" module. It registers services
@@ -94,27 +93,6 @@ public:
         //camBoardFactoryProps["ToFFactoryName"] = toFCameraPMDCamBoardDeviceFactory->GetFactoryName();
         //context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamBoardDeviceFactory, camBoardFactoryProps);
 
-        //Implementing PMD Raw Data Cam Board DeviceFactory
-        //ToFCameraPMDRawDataCamBoardDeviceFactory* toFCameraPMDRawDataCamBoardDeviceFactory = new ToFCameraPMDRawDataCamBoardDeviceFactory();
-        //ServiceProperties rawCamBoardFactoryProps;
-        //rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
-        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
-
-      LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
-
-
-        //Implementing MESASR4000DeviceFactory
-        ToFCameraMESASR4000DeviceFactory* toFCameraMESASR4000DeviceFactory = new ToFCameraMESASR4000DeviceFactory();
-        ServiceProperties mitkMESASR4000FactoryProps;
-        mitkMESASR4000FactoryProps["ToFFactoryName"] = toFCameraMESASR4000DeviceFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(toFCameraMESASR4000DeviceFactory, mitkMESASR4000FactoryProps);
-
-        //Implementing MITKPlayerDevice
-        ToFCameraMITKPlayerDeviceFactory* toFCameraMITKPlayerDeviceFactory = new ToFCameraMITKPlayerDeviceFactory();
-        ServiceProperties mitkPlayerFactoryProps;
-        mitkPlayerFactoryProps["ToFFactoryName"] = toFCameraMITKPlayerDeviceFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(toFCameraMITKPlayerDeviceFactory, mitkPlayerFactoryProps);
-
         //Implementing CamBoardDeviceFactory
         //ToFCameraPMDCamBoardDeviceFactory* toFCameraPMDCamBoardDeviceFactory = new ToFCameraPMDCamBoardDeviceFactory();
         //ServiceProperties camBoardFactoryProps;
@@ -126,6 +104,29 @@ public:
         //ServiceProperties rawCamBoardFactoryProps;
         //rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
         //context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
+
+        //Implementing PMD Raw Data Cam Board DeviceFactory
+        //ToFCameraPMDRawDataCamBoardDeviceFactory* toFCameraPMDRawDataCamBoardDeviceFactory = new ToFCameraPMDRawDataCamBoardDeviceFactory();
+        //ServiceProperties rawCamBoardFactoryProps;
+        //rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
+
+      LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
+
+
+        ////Implementing MESASR4000DeviceFactory
+        //ToFCameraMESASR4000DeviceFactory* toFCameraMESASR4000DeviceFactory = new ToFCameraMESASR4000DeviceFactory();
+        //ServiceProperties mitkMESASR4000FactoryProps;
+        //mitkMESASR4000FactoryProps["ToFFactoryName"] = toFCameraMESASR4000DeviceFactory->GetFactoryName();
+        //context->RegisterService<IToFDeviceFactory>(toFCameraMESASR4000DeviceFactory, mitkMESASR4000FactoryProps);
+      LoadLibrary(TEXT("mitk.dllMesaSr4000Module.dll"));
+
+
+        //Implementing MITKPlayerDevice
+        ToFCameraMITKPlayerDeviceFactory* toFCameraMITKPlayerDeviceFactory = new ToFCameraMITKPlayerDeviceFactory();
+        ServiceProperties mitkPlayerFactoryProps;
+        mitkPlayerFactoryProps["ToFFactoryName"] = toFCameraMITKPlayerDeviceFactory->GetFactoryName();
+        context->RegisterService<IToFDeviceFactory>(toFCameraMITKPlayerDeviceFactory, mitkPlayerFactoryProps);
 
         //m_Factories.push_back( kinectFactory );
     }

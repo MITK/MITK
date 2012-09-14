@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraMESASR4000DeviceFactory_h
 #define __mitkToFCameraMESASR4000DeviceFactory_h
 
-#include "mitkToFHardwareExports.h"
+#include "mitkMesaSr4000ModuleExports.h"
 #include "mitkToFCameraMESASR4000Device.h"
 #include "mitkAbstractToFDeviceFactory.h"
 
@@ -29,7 +29,7 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-class MITK_TOFHARDWARE_EXPORT ToFCameraMESASR4000DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITK_MESASR4000MODULE_EXPORT ToFCameraMESASR4000DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
    /*!

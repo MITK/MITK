@@ -1,28 +1,4 @@
 SET(CPP_FILES
-  mitkToFImageGrabber.cpp
-  mitkToFOpenCVImageGrabber.cpp
-  mitkToFCameraDevice.cpp
-     #mitkKinectDeviceFactory.cpp
-  mitkToFCameraMITKPlayerController.cpp
-  mitkToFCameraMITKPlayerDevice.cpp
-      #mitkToFCameraPMDRawDataDevice.cpp
-      #mitkToFCameraPMDPlayerDevice.cpp
-      #mitkToFCameraPMDCamCubeDevice.cpp
-      #mitkToFCameraPMDRawDataCamCubeDevice.cpp
-      #mitkToFCameraPMDCamCubeDeviceFactory.cpp
-      #mitkToFCameraPMDController.cpp
-      #mitkToFCameraPMDRawDataCamBoardDevice.cpp
-      #mitkToFCameraPMDPlayerDeviceFactory.cpp
-      #mitkToFCameraPMDRawDataCamCubeDeviceFactory.cpp
-      #mitkThreadedToFRawDataReconstruction.cpp
-  #mitkToFCameraPMDDevice.cpp
-  #mitkToFCameraPMDMITKPlayerDevice.cpp
-  #mitkToFCameraPMDO3Device.cpp
-  #mitkToFCameraPMDCamBoardDevice.cpp
-  #mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
-  #mitkToFCameraPMDCamBoardDeviceFactory.cpp
-  #mitkToFCameraPMDO3DeviceFactory.cpp
-  mitkToFCameraMESASR4000Device.cpp
   mitkToFImageRecorder.cpp
   mitkToFImageRecorderFilter.cpp
   mitkToFImageWriter.cpp
@@ -31,9 +7,41 @@ SET(CPP_FILES
   mitkIToFDeviceFactory.cpp
   mitkAbstractToFDeviceFactory.cpp
   mitkToFHardwareActivator.cpp
-  mitkToFCameraMESASR4000DeviceFactory.cpp
   mitkToFCameraMITKPlayerDeviceFactory.cpp
-  mitkToFCameraMESADevice.cpp
+  mitkToFImageGrabber.cpp
+  mitkToFOpenCVImageGrabber.cpp
+  mitkToFCameraDevice.cpp
+  mitkToFCameraMITKPlayerController.cpp
+  mitkToFCameraMITKPlayerDevice.cpp
+#-----------PMD Devices-------
+  #mitkToFCameraPMDRawDataDevice.cpp
+  #mitkToFCameraPMDPlayerDevice.cpp
+  #mitkToFCameraPMDCamCubeDevice.cpp
+  #mitkToFCameraPMDRawDataCamCubeDevice.cpp
+  #mitkToFCameraPMDCamCubeDeviceFactory.cpp
+  #mitkToFCameraPMDController.cpp
+   #mitkToFCameraPMDRawDataCamBoardDevice.cpp
+   #mitkToFCameraPMDPlayerDeviceFactory.cpp
+   #mitkToFCameraPMDRawDataCamCubeDeviceFactory.cpp
+   #mitkThreadedToFRawDataReconstruction.cpp
+  #mitkToFCameraPMDDevice.cpp
+  #mitkToFCameraPMDMITKPlayerDevice.cpp
+  #mitkToFCameraPMDO3Device.cpp
+  #mitkToFCameraPMDCamBoardDevice.cpp
+  #mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
+  #mitkToFCameraPMDCamBoardDeviceFactory.cpp
+  #mitkToFCameraPMDO3DeviceFactory.cpp
+#---------Mesa Devices--------
+#  mitkToFCameraMESAController.cpp
+#  mitkToFCameraMESAControllerStub.cpp
+#  mitkToFCameraMESADevice.cpp
+#  mitkToFCameraMESASR4000Controller.cpp
+#  mitkToFCameraMESASR4000ControllerStub.cpp
+#  mitkToFCameraMESASR4000Device.cpp
+#  mitkToFCameraMESASR4000DeviceFactory.cpp
+#--------Kinect Device------
+#  mitkKinectDeviceFactory.cpp
+
 )
 
 #IF(MITK_USE_TOF_PMDCAMCUBE)
@@ -93,17 +101,17 @@ SET(CPP_FILES
 #ENDIF(NOT MITK_USE_TOF_PMDCAMBOARD)
 #ENDIF(NOT MITK_USE_TOF_PMDCAMCUBE)
 
-IF(MITK_USE_TOF_MESASR4000)
-SET(CPP_FILES ${CPP_FILES}
-  mitkToFCameraMESASR4000Controller.cpp
-  mitkToFCameraMESAController.cpp
-)
-ELSE()
-SET(CPP_FILES ${CPP_FILES}
-  mitkToFCameraMESAControllerStub.cpp
-  mitkToFCameraMESASR4000ControllerStub.cpp
-)
-ENDIF(MITK_USE_TOF_MESASR4000)
+#IF(MITK_USE_TOF_MESASR4000)
+#SET(CPP_FILES ${CPP_FILES}
+#  mitkToFCameraMESASR4000Controller.cpp
+#  mitkToFCameraMESAController.cpp
+#)
+#ELSE()
+#SET(CPP_FILES ${CPP_FILES}
+#  mitkToFCameraMESAControllerStub.cpp
+#  mitkToFCameraMESASR4000ControllerStub.cpp
+#)
+#ENDIF(MITK_USE_TOF_MESASR4000)
 
 #IF(MITK_USE_TOF_KINECT)
 #SET(CPP_FILES ${CPP_FILES}

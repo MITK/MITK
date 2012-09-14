@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkToFCameraPMDPlayerDevice.h"
 //#include "mitkToFCameraPMDMITKPlayerDevice.h"
 #include "mitkToFCameraMITKPlayerDevice.h"
-#include "mitkToFCameraMESASR4000Device.h"
+//#include "mitkToFCameraMESASR4000Device.h"
 //#include "mitkKinectDevice.h"
 
 //itk headers
@@ -164,7 +164,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     }
     else if (selectedCamera == "MESA Swissranger 4000")
     {//MESA SR4000
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraMESASR4000Device::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraMESASR4000Device::New());
     }
     else if (selectedCamera == "Microsoft Kinect")
     {//KINECT

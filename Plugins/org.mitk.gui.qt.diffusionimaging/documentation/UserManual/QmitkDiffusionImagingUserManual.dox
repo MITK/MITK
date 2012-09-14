@@ -104,7 +104,7 @@ This is how a visualization with activated glyphs should look like:
 
 \section QmitkDiffusionImagingUserManualTechnicalDetail Technical Information for Developers
 
-The diffusion imaging module uses additional properties beside the ones in use in other modules, for further information see \subpage DiffusionImagingPropertiesPage .
+The diffusion imaging module uses additional properties beside the ones in use in other modules, for further information see \ref DiffusionImagingPropertiesPage .
 
 \section QmitkDiffusionImagingUserManualSubManuals Manuals of componentes
 

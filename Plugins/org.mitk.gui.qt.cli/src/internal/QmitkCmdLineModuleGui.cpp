@@ -248,13 +248,6 @@ QWidget* QmitkCmdLineModuleGui::getGui()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleGui::lockGui()
-{
-  // TODO
-}
-
-
-//-----------------------------------------------------------------------------
 void QmitkCmdLineModuleGui::copyParameters(QmitkCmdLineModuleGui& another)
 {
 

@@ -508,9 +508,6 @@ void QmitkCmdLineModuleProgressWidget::Run()
   m_UI->m_CancelButton->setEnabled(future.canCancel());
   m_UI->m_RemoveButton->setEnabled(!future.isRunning());
 
-  // Lock parameters, as once the module is running the user can't change them.
-  m_ModuleFrontEnd->lockGui();
-
   // Give some immediate indication that we are running.
   m_UI->m_ProgressTitle->setText(description.title() + ": running");
 }

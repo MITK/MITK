@@ -55,12 +55,6 @@ public:
   QWidget* getGui();
 
   /**
-   * \brief Used to disable the editable parameters, but leave group boxes
-   * and collapsible items still usable.
-   */
-  void lockGui();
-
-  /**
    * \brief Copies the visible parameters from another QmitkCmdLineModuleGui;
    * \param another a QmitkCmdLineModuleGui frontend.
    */

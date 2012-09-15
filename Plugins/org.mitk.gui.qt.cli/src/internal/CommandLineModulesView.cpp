@@ -386,6 +386,7 @@ void CommandLineModulesView::OnRunButtonPressed()
 
     // 3. Copy parameters. This MUST come after widget->SetFrontEnd
     newFrontEndGui->copyParameters(*frontEndGuiOnCurrentTab);
+    newFrontEndGui->setParametersEnabled(false);
 
     // 4. Connect widget signals to here, to count how many jobs running.
     connect(widget, SIGNAL(started()), this, SLOT(OnJobStarted()));

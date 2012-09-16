@@ -84,11 +84,7 @@ ctkCmdLineModuleXslTransform* QmitkCmdLineModuleGui::xslTransform() const
   if (transform != NULL)
   {
     transform->bindVariable("imageInputWidget", QVariant(QString("QmitkDataStorageComboBoxWithSelectNone")));
-    QIODevice* transformQmitkDataStorageComboBox(new QFile(":/CommandLineModulesResources/QmitkDataStorageComboBox.xsl"));
-    if (transformQmitkDataStorageComboBox)
-    {
-      transform->setXslExtraTransformation(transformQmitkDataStorageComboBox);
-    }
+    transform->bindVariable("imageInputValueProperty", "currentValue");
   }
   return transform;
 }

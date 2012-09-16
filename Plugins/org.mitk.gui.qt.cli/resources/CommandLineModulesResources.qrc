@@ -4,6 +4,5 @@
         <file>stop.png</file>
         <file>undo.png</file>
         <file>pause.png</file>
-        <file>QmitkDataStorageComboBox.xsl</file>
     </qresource>
 </RCC>

@@ -318,6 +318,14 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   {
     minValue = maxValue-1;
   }
+  else
+  {
+      //Due to bug #8690 level window now is no longer of fixed range by default but the range adapts according to levelwindow interaction
+      //This is done because the range should be a little bit larger from the beginning so that the scale doesn't start to resize right from the beginning
+      double additionalRange = 0.15*(maxValue-minValue);
+      minValue -= additionalRange;
+      maxValue += additionalRange;
+  }
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
 /*

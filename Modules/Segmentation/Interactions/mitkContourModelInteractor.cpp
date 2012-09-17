@@ -138,7 +138,7 @@ bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const Stat
 
   if (contour->SelectVertexAt(click, 1.5, timestep) )
   {
-    contour->SetSelectedVertexAcitve();
+    contour->SetSelectedVertexAsControlPoint();
     assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
     mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
     newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());

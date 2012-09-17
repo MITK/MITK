@@ -142,7 +142,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       
 
         //draw active points
-        if ((*pointsIt)->IsActive)
+        if ((*pointsIt)->IsControlPoint)
         {
           float pointsize = 4;
           Point2D  tmp;

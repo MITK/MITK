@@ -243,7 +243,7 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   //set last to active added point
   if( m_LiveWireContour->GetNumberOfVertices(timestep) > 0)
   {
-    const_cast<mitk::ContourModel::VertexType*>( m_LiveWireContour->GetVertexAt(m_LiveWireContour->GetNumberOfVertices(timestep)-1, timestep) )->IsActive = true;
+    const_cast<mitk::ContourModel::VertexType*>( m_LiveWireContour->GetVertexAt(m_LiveWireContour->GetNumberOfVertices(timestep)-1, timestep) )->IsControlPoint = true;
   }
 
   //merge contours
@@ -467,7 +467,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
   }
 
   //search next active control point
-  while(newLast != begin && !((*newLast)->IsActive) )
+  while(newLast != begin && !((*newLast)->IsControlPoint) )
   {
     newLast--;
   }
@@ -480,7 +480,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
   //fill new Contour
   while(it <= newLast)
   {
-    newContour->AddVertex((*it)->Coordinates, (*it)->IsActive, timestep);
+    newContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timestep);
     it++;
   }
 

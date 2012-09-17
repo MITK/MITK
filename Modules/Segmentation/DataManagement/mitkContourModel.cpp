@@ -50,11 +50,11 @@ void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, int timestep)
 
 
 
-void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isActive, int timestep)
+void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isControlPoint, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-    this->m_ContourSeries[timestep]->AddVertex(vertex, isActive);
+    this->m_ContourSeries[timestep]->AddVertex(vertex, isControlPoint);
     this->InvokeEvent( ContourModelSizeChangeEvent() );
     this->Modified();
   }
@@ -84,11 +84,11 @@ void mitk::ContourModel::AddVertexAtFront(mitk::Point3D &vertex, int timestep)
 
 
 
-void mitk::ContourModel::AddVertexAtFront(mitk::Point3D &vertex, bool isActive, int timestep)
+void mitk::ContourModel::AddVertexAtFront(mitk::Point3D &vertex, bool isControlPoint, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-    this->m_ContourSeries[timestep]->AddVertexAtFront(vertex, isActive);
+    this->m_ContourSeries[timestep]->AddVertexAtFront(vertex, isControlPoint);
     this->InvokeEvent( ContourModelSizeChangeEvent() );
     this->Modified();
   }
@@ -108,13 +108,13 @@ void mitk::ContourModel::AddVertexAtFront(VertexType &vertex, int timestep)
 
 
 
-void mitk::ContourModel::InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isActive, int timestep)
+void mitk::ContourModel::InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isControlPoint, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
     if(index > 0 && this->m_ContourSeries[timestep]->GetSize() > index)
     {
-      this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isActive, index);
+      this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isControlPoint, index);
       this->InvokeEvent( ContourModelSizeChangeEvent() );
       this->Modified();
     }

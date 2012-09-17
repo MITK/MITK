@@ -70,7 +70,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
 
   if (contour->SelectVertexAt(click, 1.5, timestep) )
   {
-    contour->SetSelectedVertexAcitve();
+    contour->SetSelectedVertexAsControlPoint();
 
     assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
     mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
@@ -196,7 +196,7 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   liveWireContour = this->m_LiveWireFilter->GetOutput();
 
   //make point at mouse position active again, so it is drawn
-  const_cast<mitk::ContourModel::VertexType*>( liveWireContour->GetVertexAt(0, timestep) )->IsActive = true;
+  const_cast<mitk::ContourModel::VertexType*>( liveWireContour->GetVertexAt(0, timestep) )->IsControlPoint = true;
 
   /*++++++++++++++ concatenate RIGHT ++++++++++++++++++++++++++++++*/
   //insert new liveWire computed points
@@ -246,14 +246,14 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
       itUp++;//step once up otherwise the the loop breaks immediately
     }
 
-    while( itUp != end && !((*itUp)->IsActive)){ itUp++; }
+    while( itUp != end && !((*itUp)->IsControlPoint)){ itUp++; }
 
     mitk::ContourModel::VertexIterator it = itUp;
 
     //copy the rest of the original contour
     while(it != end)
     {
-      destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
+      destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsControlPoint, timestep);
       it++;
     }
 
@@ -277,28 +277,28 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
       itDown--;//step once down otherwise the the loop breaks immediately
     }
 
-    while( itDown != begin && !((*itDown)->IsActive)){ itDown--; }
+    while( itDown != begin && !((*itDown)->IsControlPoint)){ itDown--; }
 
     mitk::ContourModel::VertexIterator it = sourceContour->IteratorBegin();
 
     if(it != end)//if not empty
     {
       //always add the first vertex
-      destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
+      destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsControlPoint, timestep);
       it++;
     }
 
     //copy from begin to itDown
     while(it <= itDown)
     {
-      destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
+      destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsControlPoint, timestep);
       it++;
     }
 
     //add vertex at itDown - it's not considered during while loop
     if( it != begin && it != end)
     {
-      //destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsActive, timestep);
+      //destinationContour->AddVertex( (*it)->Coordinates, (*it)->IsControlPoint, timestep);
     }
 
     //return the offset of iterator at one after next-vertex-downwards

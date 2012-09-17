@@ -209,9 +209,9 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
 
       /*++++ <point> ++++*/
       std::vector<std::string> attr;
-      attr.push_back("isActive");
+      attr.push_back("IsControlPoint");
       std::vector<std::string> value;
-      value.push_back(ConvertToString(v->IsActive));
+      value.push_back(ConvertToString(v->IsControlPoint));
       WriteStartElementWithAttribut( XML_POINT, attr, value, out );
 
 

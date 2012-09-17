@@ -27,27 +27,26 @@ namespace mitk
 {
 
   /** 
-  \brief ContourModel is a structure of linked control points defining a contour in 3D space.
-  Vertices are stored in a VertexList in mitk::ContourModelControl.
-  For timeresolved purposes a mitk::ContourModelElement is stored for each timestep.
-  The contour line segments are implicitly defined by the given control points.
+  \brief ContourModel is a structure of linked vertices defining a contour in 3D space.
+  The vertices are stored in a mitk::ContourModelElement is stored for each timestep.
+  The contour line segments are implicitly defined by the given linked vertices.
+  By default two control points are are linked by a straight line.It is possible to add 
+  vertices at front and end of the contour and to iterate in both directions.
 
-  Points are specified as vertices containing coordinates additional (data) information,
+  Points are specified containing coordinates and additional (data) information,
   see mitk::ContourModelElement.
-  The vertices are best accessed by using a VertexIterator.
   For accessing a specific vertex either an index or a position in 3D Space can be used.
-  Interaction with the contour is available without any mitk interactor class using the
+  The vertices are best accessed by using a VertexIterator.
+  Interaction with the contour is thus available without any mitk interactor class using the
   api of ContourModel. It is possible to shift single vertices also as shifting the whole
   contour.
 
   A contour can be either open like a single curved line segment or
   closed. A closed contour can for example represent a jordan curve.
-  By default two control points are are linked by a straight line. The interpolation
-  can be set via enum property (mitk::ContourModel::LineSegmentInterpolation).
 
   \section mitkPointSetDisplayOptions
 
-  The default mappers for this data structure are mitk::ContourModelMapper2D and
+  The default mappers for this data structure are mitk::ContourModelGLMapper2D and
   mitk::ContourModelMapper3D. See these classes for display options which can
   can be set via properties.
   */
@@ -96,11 +95,11 @@ namespace mitk
 
     /** \brief Deselect vertex.
     */
-    void SetSelectedVertexAcitve(bool active=true)
+    void SetSelectedVertexAsControlPoint(bool isControlPoint=true)
     {
-      if(this->m_SelectedVertex && (this->m_SelectedVertex->IsActive != active) )
+      if(this->m_SelectedVertex && (this->m_SelectedVertex->IsControlPoint != isControlPoint) )
       {
-        m_SelectedVertex->IsActive = active;
+        m_SelectedVertex->IsControlPoint = isControlPoint;
         this->Modified();
       }
     }
@@ -148,14 +147,14 @@ namespace mitk
 
     \pararm vertex - coordinate representation of a control point
     \pararm timestep - the timestep at which the vertex will be add ( default 0)
-    \pararm isActive - specifies wether the vertex is active or not (Active 
-    vertices will be rendered).
+    \pararm isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
+    will be rendered).
 
 
     @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeSlicedGeometry will not be expanded.
     */
-    void AddVertex(mitk::Point3D &vertex, bool isActive, int timestep=0);
+    void AddVertex(mitk::Point3D &vertex, bool isControlPoint, int timestep=0);
 
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
     The vertex is added at the FRONT of contour.
@@ -183,18 +182,18 @@ namespace mitk
 
     \pararm vertex - coordinate representation of a control point
     \pararm timestep - the timestep at which the vertex will be add ( default 0)
-    \pararm isActive - specifies wether the vertex is active or not (Active 
-    vertices will be rendered).
+    \pararm isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
+    will be rendered).
 
 
     @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeSlicedGeometry will not be expanded.
     */
-    void AddVertexAtFront(mitk::Point3D &vertex, bool isActive, int timestep=0);
+    void AddVertexAtFront(mitk::Point3D &vertex, bool isControlPoint, int timestep=0);
 
     /** \brief Insert a vertex at given index.
     */
-    void InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isActive=false, int timestep=0);
+    void InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isControlPoint=false, int timestep=0);
 
     /** \brief Return if the contour is closed or not.
     */
@@ -206,6 +205,7 @@ namespace mitk
     void Concatenate(mitk::ContourModel* other, int timestep=0);
 
     /** \brief Returns a const VertexIterator at the start element of the contour.
+    \throws exception for invalid timesteps
     */
     VertexIterator IteratorBegin( int timestep=0);
 
@@ -227,6 +227,7 @@ namespace mitk
     virtual void SetIsClosed(bool isClosed, int timestep=0);
 
     /** \brief Returns a const VertexIterator at the end element of the contour.
+    \throws exception for invalid timesteps
     */
     VertexIterator IteratorEnd( int timestep=0);
 

@@ -41,8 +41,11 @@ namespace mitk {
   
    The filter is able to create dynamic cost tranfer map and thus use on the fly training.
    \Note On the fly training will only be used for next update.
-   The computation uses the last calculated segment to map cost according to features in the area of the segment. 
-  
+   The computation uses the last calculated segment to map cost according to features in the area of the segment.
+
+   For time resolved purposes use ImageLiveWireContourModelFilter::SetTimestep( unsigned int ) to create the LiveWire contour
+   at a specific timestep.
+
    \ingroup ContourModelFilters
    \ingroup Process
   */
@@ -131,7 +134,7 @@ namespace mitk {
     /** \brief Shortest path filter according to cost function m_CostFunction*/
     ShortestPathImageFilterType::Pointer m_ShortestPathFilter;
 
-
+    /** \brief Flag to use a dynmic cost map or not*/
     bool m_UseDynamicCostMap;
 
     bool m_ImageModified;

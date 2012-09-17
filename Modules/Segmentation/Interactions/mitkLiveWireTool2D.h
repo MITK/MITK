@@ -30,9 +30,14 @@ namespace mitk
 
 
 /**
-  \brief 
+  \brief A 2D segmentation tool based on LiveWire approach.
+  The contour between the last user added point and the current mouse position
+  is computed by searching the shortest path according to specific features of
+  the image. The contour thus snappest to the boundary of objects.
+
 
   \sa SegTool2D
+  \sa ImageLiveWireContourModelFilter
   
   \ingroup Interaction
   \ingroup ToolManagerEtAl

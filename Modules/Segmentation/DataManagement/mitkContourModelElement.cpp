@@ -37,9 +37,9 @@ mitk::ContourModelElement::~ContourModelElement()
 
 
 
-void mitk::ContourModelElement::AddVertex(mitk::Point3D &vertex, bool isActive)
+void mitk::ContourModelElement::AddVertex(mitk::Point3D &vertex, bool isControlPoint)
 {
-  this->m_Vertices->push_back(new VertexType(vertex, isActive));
+  this->m_Vertices->push_back(new VertexType(vertex, isControlPoint));
 }
 
 
@@ -51,9 +51,9 @@ void mitk::ContourModelElement::AddVertex(VertexType &vertex)
 
 
 
-void mitk::ContourModelElement::AddVertexAtFront(mitk::Point3D &vertex, bool isActive)
+void mitk::ContourModelElement::AddVertexAtFront(mitk::Point3D &vertex, bool isControlPoint)
 {
-  this->m_Vertices->push_front(new VertexType(vertex, isActive));
+  this->m_Vertices->push_front(new VertexType(vertex, isControlPoint));
 }
 
 
@@ -65,13 +65,13 @@ void mitk::ContourModelElement::AddVertexAtFront(VertexType &vertex)
 
 
 
-void mitk::ContourModelElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isActive, int index)
+void mitk::ContourModelElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isControlPoint, int index)
 {
   if(index > 0 && this->GetSize() > index)
   {
     VertexIterator _where = this->m_Vertices->begin();
     _where += index;
-    this->m_Vertices->insert(_where, new VertexType(vertex, isActive));
+    this->m_Vertices->insert(_where, new VertexType(vertex, isControlPoint));
   }
 }
 
@@ -95,7 +95,7 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::GetVertexAt(co
       return this->m_Vertices->at(0);
     }
 
-    if(this->m_Vertices->size() < 10000)
+    if(this->m_Vertices->size() < 1000000)
     {
       return BruteForceGetVertexAt(point, eps);
     }
@@ -148,7 +148,7 @@ mitk::ContourModelElement::VertexType* mitk::ContourModelElement::BruteForceGetV
       std::deque< std::pair<double, VertexType*> >::iterator end = nearestlist.end();
       while(it != end)
       {
-        if( (*it).second->IsActive )
+        if( (*it).second->IsControlPoint )
         {
           return (*it).second;
         }
@@ -272,6 +272,7 @@ void mitk::ContourModelElement::Concatenate(mitk::ContourModelElement* other)
   {
     ConstVertexIterator it =  other->m_Vertices->begin();
     ConstVertexIterator end =  other->m_Vertices->end();
+    //add all vertices of other after last vertex
     while(it != end)
     {
       this->m_Vertices->push_back(*it);
@@ -288,6 +289,7 @@ bool mitk::ContourModelElement::RemoveVertex(mitk::ContourModelElement::VertexTy
 
   ConstVertexIterator end = this->m_Vertices->end();
 
+  //search for vertex and remove it if exists
   while(it != end)
   {
     if((*it) == vertex)

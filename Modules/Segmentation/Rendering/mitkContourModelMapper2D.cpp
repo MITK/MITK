@@ -257,7 +257,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
 
-        if ( currentControlPoint->IsActive )
+        if ( currentControlPoint->IsControlPoint )
         { 
           double coordinates[3];
           coordinates[0] = currentControlPoint->Coordinates[0];
@@ -282,7 +282,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
       }//end while (it!=end)
 
       //check if last control point is enabled to draw it
-      if ( (*current)->IsActive )
+      if ( (*current)->IsControlPoint )
       {
         double coordinates[3];
         coordinates[0] = (*current)->Coordinates[0];

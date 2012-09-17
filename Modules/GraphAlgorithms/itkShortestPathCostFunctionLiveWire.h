@@ -113,16 +113,28 @@ namespace itk
     }
 
     /**
-    \brief Set the maximum of the dynamic cost map to save computation time.
+     \brief Set the maximum of the dynamic cost map to save computation time.
     */
     void SetCostMapMaximum(double max)
     {
       this->m_MaxMapCosts = max;
     }
 
+
     enum Constants{
       MAPSCALEFACTOR = 10
     };
+
+    /** \brief Returns the y value of gaussian with given offset and amplitude
+
+       gaussian approximation
+       f(x) = v(bin) * e^ ( -1/2 * (|x-k(bin)| / sigma)^2 )
+
+       \param x
+       \param xOfGaussian - offset
+       \param yOfGaussian - amplitude
+    */
+    static double Gaussian(double x, double xOfGaussian, double yOfGaussian);
 
   protected:
 

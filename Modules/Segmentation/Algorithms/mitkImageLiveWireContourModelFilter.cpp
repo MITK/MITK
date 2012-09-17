@@ -387,22 +387,22 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     */
     if( left2 != end )
     {
-      partLeft2 = left2->second * exp( -0.5 * pow( (abs(keyOfMax - left2->first) / 2.0), 2) );
+      partLeft2 = ImageLiveWireContourModelFilter::CostFunctionType::Gaussian(keyOfMax, left2->first, left2->second);
     }
 
     if( left1 != end )
     {
-      partLeft1 = left1->second * exp( -0.5 * pow( (abs(keyOfMax - left1->first) / 2.0), 2) );
+      partLeft1 = ImageLiveWireContourModelFilter::CostFunctionType::Gaussian(keyOfMax, left1->first, left1->second);
     }
 
     if( right1 != end )
     {
-      partRight1 = right1->second * exp( -0.5 * pow( (abs(keyOfMax - right1->first) / 2.0), 2) );
+      partRight1 = ImageLiveWireContourModelFilter::CostFunctionType::Gaussian(keyOfMax, right1->first, right1->second);
     }
 
     if( right2 != end )
     {
-      partRight2 = right2->second * exp( -0.5 * pow( (abs(keyOfMax - right2->first) / 2.0), 2) );
+      partRight2 = ImageLiveWireContourModelFilter::CostFunctionType::Gaussian(keyOfMax, right2->first, right2->second);
     }
     /*----------------------------------------------------------------------------*/
 

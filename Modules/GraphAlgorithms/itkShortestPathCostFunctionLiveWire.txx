@@ -184,22 +184,22 @@ namespace itk
       */
       if( left2 != end )
       {
-        partLeft2 = left2->second * exp( -0.5 * pow( (abs(keyOfX - left2->first) / 2.0), 2) );
+        partLeft2 = ShortestPathCostFunctionLiveWire<TInputImageType>::Gaussian(keyOfX, left2->first, left2->second);
       }
 
       if( left1 != end )
       {
-        partLeft1 = left1->second * exp( -0.5 * pow( (abs(keyOfX - left1->first) / 2.0), 2) );
+        partLeft1 = ShortestPathCostFunctionLiveWire<TInputImageType>::Gaussian(keyOfX, left1->first, left1->second);
       }
 
       if( right1 != end )
       {
-        partRight1 = right1->second * exp( -0.5 * pow( (abs(keyOfX - right1->first) / 2.0), 2) );
+        partRight1 = ShortestPathCostFunctionLiveWire<TInputImageType>::Gaussian(keyOfX, right1->first, right1->second);
       }
 
       if( right2 != end )
       {
-        partRight2 = right2->second * exp( -0.5 * pow( (abs(keyOfX - right2->first) / 2.0), 2) );
+        partRight2 = ShortestPathCostFunctionLiveWire<TInputImageType>::Gaussian(keyOfX, right2->first, right2->second);
       }
       /*----------------------------------------------------------------------------*/
 
@@ -539,6 +539,13 @@ namespace itk
     double newI = (max - min) * Factor + min;
 
     return newI;
+  }
+
+
+  template<class TInputImageType>
+  double ShortestPathCostFunctionLiveWire<TInputImageType>::Gaussian(double x, double xOfGaussian, double yOfGaussian)
+  {
+    return yOfGaussian * exp( -0.5 * pow( ( abs(x - xOfGaussian) / (2.0 * ShortestPathCostFunctionLiveWire<TInputImageType>::MAPSCALEFACTOR) ), 2) );
   }
 
 } // end namespace itk

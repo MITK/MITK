@@ -34,7 +34,7 @@ namespace mitk
     CleanUpDataBuffers();
   }
 
-  bool ToFCameraMITKPlayerDevice::ConnectCamera()
+  bool ToFCameraMITKPlayerDevice::OnConnectCamera()
   {
     bool ok = m_Controller->OpenCameraConnection();
     if (ok)

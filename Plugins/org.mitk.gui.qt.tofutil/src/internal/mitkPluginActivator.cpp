@@ -17,17 +17,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 #include "QmitkToFUtilView.h"
+#include "QmitkToFConnectView.h"
 
 namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkToFUtilView, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkToFUtilView, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkToFConnectView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)
 {
-  Q_UNUSED(context)
+    Q_UNUSED(context)
 }
 
 }

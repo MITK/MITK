@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,7 +53,7 @@ class QTimer;
   \ingroup Functionalities
 */
 class QmitkToFUtilView : public QmitkAbstractView, public mitk::IZombieViewPart
-{  
+{
     // this is needed for all Qt objects that should have a Qt meta-object
     // (everything that derives from QObject and wants to have signal/slots)
     Q_OBJECT
@@ -64,6 +64,9 @@ public:
 
     QmitkToFUtilView();
     ~QmitkToFUtilView();
+
+    //TODO bitte loeschen, wenn besserer weg gefunden
+    void HackForPlayer();
 
     virtual void CreateQtPartControl(QWidget *parent);
     /// \brief Called when the functionality is activated.

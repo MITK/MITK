@@ -1,5 +1,10 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource prefix="/QmitkToFUtilView">
-     <file>icon.xpm</file>
+     <file>iconToFUtilView.xpm</file>
  </qresource>
  </RCC>
+#<!DOCTYPE RCC><RCC version="1.0">
+# <qresource prefix="/iconGenerationView">
+#     <file>iconToFUtilView.xpm</file>
+# </qresource>
+# </RCC>

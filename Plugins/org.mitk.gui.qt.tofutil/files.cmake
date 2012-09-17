@@ -23,7 +23,8 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-  resources/icon.xpm
+  #resources/iconGenerationView.xpm
+  resources/iconToFUtilView.xpm
 )
 
 set(QRC_FILES

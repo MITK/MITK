@@ -102,6 +102,9 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     bool m_CreateAndUseDynamicCosts;
 
     std::vector< std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> > m_Contours;
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex);
 };
 
 } // namespace

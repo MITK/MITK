@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourUtils.h"
 #include "mitkContour.h"
 
+#include <itkGradientMagnitudeImageFilter.h>
+
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
@@ -197,17 +199,28 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   mitk::Point3D click = const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition());
   itk::Index<3> idx;
   m_WorkingSlice->GetGeometry()->WorldToIndex(click, idx);
-  click[0] = idx[0];
-  click[1] = idx[1];
-  click[2] = idx[2];
+
+  /*+++++++++++++++++++++++ get the pixel the gradient in region of 5x5 ++++++++++++++++++++++++++*/
+  itk::Index<3> indexWithHighestGradient;
+  AccessFixedDimensionByItk_2(m_WorkingSlice, FindHighestGradientMagnitudeByITK, 2, idx, indexWithHighestGradient);
+  /*----------------------------------------------------------------------------------------------------------------*/
+
+  //itk::Index to mitk::Point3D
+  click[0] = indexWithHighestGradient[0];
+  click[1] = indexWithHighestGradient[1];
+  click[2] = indexWithHighestGradient[2];
   m_WorkingSlice->GetGeometry()->IndexToWorld(click, click);
 
-  m_Contour->AddVertex( click, true, timestep );
-
   //set initial start point
+  m_Contour->AddVertex( click, true, timestep );
   m_LiveWireFilter->SetStartPoint(click);
 
   m_CreateAndUseDynamicCosts = true;
+
+  //save contour and corresponding plane geometry to list
+  std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> contourPair(m_ContourModelNode.GetPointer(), dynamic_cast<mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()->Clone().GetPointer()) );
+  m_Contours.push_back(contourPair);
+
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -376,9 +389,6 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   //remove last control point being added by double click
   m_Contour->RemoveVertexAt(m_Contour->GetNumberOfVertices(timestep) - 1, timestep);
 
-  //save contour and corresponding plane geometry to list
-  std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> contourPair(m_ContourModelNode.GetPointer(), dynamic_cast<mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()->Clone().GetPointer()) );
-  m_Contours.push_back(contourPair);
 
   m_LiveWireFilter->SetUseDynamicCostMap(false);
   this->FinishTool();
@@ -495,4 +505,75 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
   mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
 
   return true;
+}
+
+
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex)
+{
+  typedef itk::Image<TPixel, VImageDimension>  InputImageType;
+  typedef InputImageType::IndexType            IndexType;
+
+  returnIndex[0] = index[0];
+  returnIndex[1] = index[1];
+  returnIndex[2] = 0.0;
+
+
+  double gradientMagnitude = 0.0;
+  double maxGradientMagnitude = 0.0;
+
+  IndexType currentIndex;
+  currentIndex[0] = index[0];
+  currentIndex[1] = index[1];
+
+
+    //minimum value in each direction for startRegion
+  typename IndexType startRegion;
+  startRegion[0] = index[0] - 3;
+  startRegion[1] = index[1] - 3;
+
+  //maximum value in each direction for size
+  typename InputImageType::SizeType size;
+  size[0] = 7;
+  size[1] = 7;
+
+
+  typename InputImageType::RegionType region;
+  region.SetSize( size );
+  region.SetIndex( startRegion );
+
+  typedef  itk::GradientMagnitudeImageFilter< typename InputImageType, typename InputImageType> GradientMagnitudeFilterType;
+  typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
+  gradientFilter->SetInput(inputImage);
+  gradientFilter->GetOutput()->SetRequestedRegion(region);
+
+  gradientFilter->Update();
+  InputImageType::Pointer gradientMagnImage;
+  gradientMagnImage = gradientFilter->GetOutput();
+
+
+  // seerch max (approximate) gradient magnitude
+  for( int x = -2; x <= 2; ++x)
+  {
+    currentIndex[0] = index[0] + x;
+
+    for( int y = -2; y <= 2; ++y)
+    {
+      currentIndex[1] = index[1] + y;
+
+      gradientMagnitude = gradientMagnImage->GetPixel(currentIndex);
+
+      //check for new max
+      if(maxGradientMagnitude < gradientMagnitude)
+      {
+        maxGradientMagnitude = gradientMagnitude;
+        returnIndex[0] = currentIndex[0];
+        returnIndex[1] = currentIndex[1];
+        returnIndex[2] = 0.0;
+      }//end if
+    }//end for y
+
+    currentIndex[1] = index[1];
+  }//end for x
+
 }

@@ -6,11 +6,11 @@
     <view id="org.mitk.views.tofutil"
           name="ToFUtil"
           class="QmitkToFUtilView" 
-          icon="resources/icon.xpm" />
+          icon="resources/iconToFUtilView.xpm" />
     <view id="org.mitk.views.tofconnectview"
           name="tofconnectview"
           class="QmitkToFConnectView"
-          icon="resources/icon.xpm" />
+          icon="resources/iconGenerationView.xpm" />
   </extension>
 
 </plugin>

@@ -23,7 +23,7 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-  #resources/iconGenerationView.xpm
+  resources/iconGenerationView.xpm
   resources/iconToFUtilView.xpm
 )
 

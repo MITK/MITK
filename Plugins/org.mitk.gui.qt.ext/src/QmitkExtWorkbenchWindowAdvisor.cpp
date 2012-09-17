@@ -351,7 +351,7 @@ showNewWindowMenuItem(false),
 showClosePerspectiveMenuItem(true),
 dropTargetListener(new QmitkDefaultDropTargetListener)
 {
- productName = berry::Platform::GetConfiguration().getString("application.baseName");
+ productName = QCoreApplication::applicationName().toStdString();
 }
 
 berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(

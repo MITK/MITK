@@ -195,7 +195,7 @@ void QmitkAbstractRenderEditor::handleEvent(const ctkEvent& event)
   catch (const ctkRuntimeException& e)
   {
     MITK_ERROR << "QmitkAbstractRenderEditor::handleEvent, failed with:" << e.what() \
-        << ", caused by " << e.getCause().toLocal8Bit().constData() \
+        << ", caused by " << e.message().toLocal8Bit().constData() \
         << std::endl;
   }
 }

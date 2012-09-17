@@ -49,8 +49,6 @@ void mitk::MouseModeSwitcher::InitializeListeners()
   mitk::StateMachine::Pointer listener = moveAndZoomInteractor.GetPointer();
   m_ListenersForMITK.push_back( listener );
 
-/* Trac 1366 - temporarily turn these off 
-
   mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New( 
     "alternativeScroll", new mitk::DisplayInteractor() );
   listener = scrollInteractor;
@@ -70,7 +68,6 @@ void mitk::MouseModeSwitcher::InitializeListeners()
   listener = crtlZoomInteractor;
   m_ListenersForPACS.push_back( listener );
 
- **** Trac 1366 - temporarily turn these off. */
 }
 
 void mitk::MouseModeSwitcher::SetInteractionScheme( InteractionScheme scheme )

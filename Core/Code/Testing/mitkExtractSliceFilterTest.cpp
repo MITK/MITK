@@ -460,7 +460,7 @@ public:
 
                 PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Frontal);
                 PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Sagittal);
-                PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Transversal);
+                PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Axial);
 
   }
 
@@ -477,7 +477,7 @@ public:
     bool isRotated = false;
 
 
-                if( orientation == mitk::PlaneGeometry::Transversal)
+                if( orientation == mitk::PlaneGeometry::Axial)
     {
       /*isFrontside = false;
       isRotated = true;*/
@@ -902,24 +902,24 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 
 
-  /* transversal plane */
-  mitk::PlaneGeometry::Pointer geometryTransversal = mitk::PlaneGeometry::New();
-        geometryTransversal->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Transversal, sphereCenter, false, true);
-  geometryTransversal->ChangeImageGeometryConsideringOriginOffset(true);
+  /* axial plane */
+  mitk::PlaneGeometry::Pointer geometryAxial = mitk::PlaneGeometry::New();
+        geometryAxial->InitializeStandardPlane(planeSize, planeSize, spacing, mitk::PlaneGeometry::Axial, sphereCenter, false, true);
+  geometryAxial->ChangeImageGeometryConsideringOriginOffset(true);
 
-  mitk::Point3D origin = geometryTransversal->GetOrigin();
+  mitk::Point3D origin = geometryAxial->GetOrigin();
   mitk::Vector3D normal;
-  normal = geometryTransversal->GetNormal();
+  normal = geometryAxial->GetNormal();
 
 
   normal.Normalize();
 
   origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
 
-  //geometryTransversal->SetOrigin(origin);
+  //geometryAxial->SetOrigin(origin);
 
-  mitkExtractSliceFilterTestClass::TestSlice(geometryTransversal, "Testing transversal plane");
-  /* end transversal plane */
+  mitkExtractSliceFilterTestClass::TestSlice(geometryAxial, "Testing axial plane");
+  /* end axial plane */
 
 
 
@@ -1095,7 +1095,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
     //These two points define the axes of the plane in combination with the origin.
     //Point 1 is the x-axis and point 2 the y-axis.
-    //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
+    //Each plane is transformed according to the view (axial, coronal and saggital) afterwards.
     vtkPlane->SetPoint1(1.0, 0.0, 0.0); //P1: (xMax, yMin, depth)
     vtkPlane->SetPoint2(0.0, 1.0, 0.0); //P2: (xMin, yMax, depth)
     //these are not the correct values for all slices, only a square plane by now

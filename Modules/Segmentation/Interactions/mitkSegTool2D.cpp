@@ -69,10 +69,18 @@ float mitk::SegTool2D::CanHandleEvent( StateEvent const *stateEvent) const
 
   if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D ) return 0.0; // we don't want anything but 2D
 
-  if( m_LastEventSender != positionEvent->GetSender()) return 0.0;
-  if( m_LastEventSlice != positionEvent->GetSender()->GetSlice() ) return 0.0;
-
-  return 1.0;
+  //This are the mouse event that are used by the statemachine patterns for zooming and panning. This must be possible although a tool is activ
+  if (stateEvent->GetId() == EIDRIGHTMOUSEBTN || stateEvent->GetId() == EIDMIDDLEMOUSEBTN || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDCTRL ||
+      stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
+      stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
+  {
+    //Since the usual segmentation tools currently do not need right click interaction but the mitkDisplayVectorInteractor
+    return 0.0;
+  }
+  else
+  {
+    return 1.0;
+  }
 }
 
 
@@ -97,7 +105,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   imageNormal2.Set_vnl_vector( vnl_cross_3d<ScalarType>(normal.Get_vnl_vector(),imageNormal2.Get_vnl_vector()) );
 
   double eps( 0.00001 );
-  // transversal
+  // axial
   if ( imageNormal2.GetNorm() <= eps )
   {
     affectedDimension = 2;

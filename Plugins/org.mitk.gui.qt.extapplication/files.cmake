@@ -5,13 +5,21 @@ set(INTERNAL_CPP_FILES
   QmitkExtApplication.cpp
   QmitkExtApplicationPlugin.cpp
   QmitkExtAppWorkbenchAdvisor.cpp
-  QmitkExtDefaultPerspective.cpp
+  QmitkMitkWorkbenchIntroPart.cpp
+  perspectives/QmitkEditorPerspective.cpp
+  perspectives/QmitkExtDefaultPerspective.cpp
 )
 
 set(MOC_H_FILES
   src/internal/QmitkExtApplication.h
   src/internal/QmitkExtApplicationPlugin.h
-  src/internal/QmitkExtDefaultPerspective.h
+  src/internal/QmitkMitkWorkbenchIntroPart.h
+  src/internal/perspectives/QmitkEditorPerspective.h
+  src/internal/perspectives/QmitkExtDefaultPerspective.h
+)
+
+set(UI_FILES
+  src/internal/perspectives/QmitkWelcomeScreenViewControls.ui
 )
 
 set(CACHED_RESOURCE_FILES
@@ -26,6 +34,7 @@ set(CACHED_RESOURCE_FILES
 set(QRC_FILES
 # uncomment the following line if you want to use Qt resources
 #  resources/QmitkExtApplication.qrc
+resources/welcome/QmitkWelcomeScreenView.qrc
 )
 
 set(CPP_FILES )

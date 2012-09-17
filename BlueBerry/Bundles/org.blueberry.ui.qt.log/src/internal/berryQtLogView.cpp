@@ -63,13 +63,12 @@ QtLogView::QtLogView(QWidget *parent)
   filterModel->setFilterKeyColumn(-1);
 
   ui.tableView->setModel(filterModel);
-
+ 
   ui.tableView->verticalHeader()->setVisible(false);
   ui.tableView->horizontalHeader()->setStretchLastSection(true);
              
   connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
   connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
-  connect( ui.ShowCategory, SIGNAL( clicked(bool checked)),this, SLOT(on_ShowAdvancedFields_clicked(checked)));
   connect( ui.SaveToClipboard, SIGNAL( clicked()),this, SLOT(on_SaveToClipboard_clicked()));
   
   ui.ShowAdvancedFields->setChecked( showAdvancedFields );
@@ -90,23 +89,26 @@ void QtLogView::slotFilterChange( const QString& q )
   filterModel->setFilterRegExp(QRegExp(q, Qt::CaseInsensitive, QRegExp::FixedString));
 }
 
+
 void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int end )
 {
-  static int first=false;
+  ui.tableView->resizeRowsToContents();
 
-  if(!first)
-  {
-    first=true;
-    ui.tableView->resizeColumnsToContents();
-    ui.tableView->resizeRowsToContents();
-  }
-  else
-    for(int r=start;r<=end;r++)
+  //only resize columns when first entry is added
+  static bool first = true;
+  if(first)
     {
-      ui.tableView->resizeRowToContents(r);
+    ui.tableView->resizeColumnsToContents();
+    first = false;
     }
 
   QTimer::singleShot(0,this,SLOT( slotScrollDown() ) );
+}
+
+void QtLogView::showEvent( QShowEvent * event )
+{
+  ui.tableView->resizeColumnsToContents();
+  ui.tableView->resizeRowsToContents();  
 }
 
 void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
@@ -144,7 +146,18 @@ void QtLogView::on_ShowCategory_clicked( bool checked )
 void QtLogView::on_SaveToClipboard_clicked()
 {
   QClipboard *clipboard = QApplication::clipboard();
-  clipboard->setText(model->GetDataAsString());
+  QString loggingMessagesAsText = QString("");
+  for (int i=0; i<ui.tableView->model()->rowCount(); i++)
+    {
+    for (int j=0; j<ui.tableView->model()->columnCount(); j++)
+      {
+      QModelIndex index = ui.tableView->model()->index(i, j);
+      loggingMessagesAsText += ui.tableView->model()->data(index, Qt::DisplayRole).toString() + " ";
+      }
+    loggingMessagesAsText += "\n";
+    }
+
+  clipboard->setText(loggingMessagesAsText);
 }
 
 }

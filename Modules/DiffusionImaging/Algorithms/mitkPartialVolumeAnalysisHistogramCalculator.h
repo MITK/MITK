@@ -43,7 +43,7 @@ namespace mitk
  * polygon. When masking with a planar figure, the slice corresponding to the
  * plane containing the figure is extracted and then clipped with contour
  * defined by the figure. Planar figures need to be aligned along the main axes
- * of the image (transversal, sagittal, coronal). Planar figures on arbitrary
+ * of the image (axial, sagittal, coronal). Planar figures on arbitrary
  * rotated planes are not supported.
  *
  * For each operating mode (no masking, masking by image, masking by planar

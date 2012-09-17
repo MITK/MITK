@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org_imagenavigator} The Image Navigator
+\page org_mitk_views_imagenavigator The Image Navigator
 
 \image html Slider.png "Icon of the Module"
 

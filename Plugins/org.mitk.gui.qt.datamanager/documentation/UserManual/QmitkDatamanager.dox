@@ -1,6 +1,6 @@
 /**
 
-\bundlemainpage{org_datamanager} The DataManager
+\page org_mitk_views_datamanager The DataManager
 
 \image html DataManager_48.png "Icon of the Module"
 
@@ -15,10 +15,10 @@ Available sections:
   - \ref QmitkDataManagerLoading
   - \ref QmitkDataManagerSaving
   - \ref QmitkDataManagerProperties
-	- \ref QmitkDataManagerPropertiesList
-	- \ref QmitkDataManagerPropertiesVisibility
-	- \ref QmitkDataManagerPropertiesRepresentation
-	- \ref QmitkDataManagerPropertiesPreferences
+  - \ref QmitkDataManagerPropertiesList
+  - \ref QmitkDataManagerPropertiesVisibility
+  - \ref QmitkDataManagerPropertiesRepresentation
+  - \ref QmitkDataManagerPropertiesPreferences
   - \ref QmitkDataManagerPropertyList
 
 

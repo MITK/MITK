@@ -69,7 +69,7 @@ protected slots:
   void stereoSelectionChanged(int id);
 
   /*!
-  initialize the transversal, sagittal, coronal and temporal slider according to the image dimensions
+  initialize the axial, sagittal, coronal and temporal slider according to the image dimensions
   */
   void initNavigators();
 

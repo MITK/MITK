@@ -51,8 +51,8 @@ SliceNavigationController::SliceNavigationController( const char *type )
 : BaseController( type ),
   m_InputWorldGeometry( NULL ),
   m_CreatedWorldGeometry( NULL ), 
-  m_ViewDirection( Transversal ),
-  m_DefaultViewDirection( Transversal ),
+  m_ViewDirection( Axial ),
+  m_DefaultViewDirection( Axial ),
   m_RenderingManager( NULL ),
   m_Renderer( NULL ),
   m_Top( false ),
@@ -140,9 +140,9 @@ void SliceNavigationController::Update()
 {
   if ( !m_BlockUpdate )
   {
-    if ( m_ViewDirection == Transversal )
+    if ( m_ViewDirection == Axial )
     {
-      this->Update( Transversal, false, false, true );
+      this->Update( Axial, false, false, true );
     }
     else
     {
@@ -219,12 +219,12 @@ SliceNavigationController::Update(
           break;
         }
       }
-      //else: use Transversal: no "break" here!!
+      //else: use Axial: no "break" here!!
 
-    case Transversal:
+    case Axial:
       slicedWorldGeometry = SlicedGeometry3D::New();
       slicedWorldGeometry->InitializePlanes(
-        m_InputWorldGeometry, PlaneGeometry::Transversal,
+        m_InputWorldGeometry, PlaneGeometry::Axial,
         top, frontside, rotated );
       slicedWorldGeometry->SetSliceNavigationController( this );
       break;

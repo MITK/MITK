@@ -43,6 +43,12 @@ namespace mitk {
     **/
     virtual void ExecuteOperation(Operation* operation);
 
+    /**
+     * @brief Method that returns how well this event can be handled by the DisplayVectorInteractor
+     *        a right click into a 2D renderwindow can be handled very well!
+     **/
+    float CanHandleEvent(const StateEvent *stateEvent) const;
+
   protected:
     /**
     * @brief Default Constructor

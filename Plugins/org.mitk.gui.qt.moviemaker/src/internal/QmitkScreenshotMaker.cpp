@@ -149,7 +149,7 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
   // only works correctly for 3D RenderWindow
   vtkRenderer* renderer = m_MultiWidget->mitkWidget1->GetRenderer()->GetVtkRenderer();
   if (renderer != NULL)
-    this->TakeScreenshot(renderer, 1, fileName+"/transversal.png");
+    this->TakeScreenshot(renderer, 1, fileName+"/axial.png");
 
   renderer = m_MultiWidget->mitkWidget2->GetRenderer()->GetVtkRenderer();
   if (renderer != NULL)

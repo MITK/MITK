@@ -67,7 +67,7 @@ namespace mitk
     bool FinishCalibration(mitk::Action* a, const mitk::StateEvent* e);
 
     // slice scrolling
-    mitk::BaseRenderer::Pointer m_TransversalBR;
+    mitk::BaseRenderer::Pointer m_AxialBR;
     double m_InitialScrollValue;
     int m_UpdateFrequency;
 

@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org_segment} The Segmentation Module
+\page org_mitk_views_segmentation The Segmentation Module
 
 \image html segmentation.png "Icon of the Module"
 
@@ -48,7 +48,7 @@ However, the distinction between a foreground and a background structure is requ
 <li>as a necessary pre-processing step for therapy planning, therapy support, and therapy monitoring
 </ul>
 Creating this distinction between foreground and background is called <i>segmentation</i>.
-The Segmentation perspective of the MITK ExtApp uses a voxel based approach to segmentation, i.e. each voxel of an image must be completely assigned to either foreground or background.
+The Segmentation perspective of the MITK Workbench uses a voxel based approach to segmentation, i.e. each voxel of an image must be completely assigned to either foreground or background.
 This is in contrast to some other applications which might use an approach based on contours, where the border of a structure might cut a voxel into two %parts.
 
 The remainder of this document will summarize the features of the Segmentation perspective and how they are used.
@@ -103,7 +103,7 @@ When there are multiple segmentations, the unselected ones will remain in the Da
 
 \subsection org_mitk_gui_qt_segmentationUserManualManualKringeling3 Selecting Editing Tools
 
-If you are familiar with the MITK ExtApp, you know that clicking and moving the mouse in any of the 2D render windows will move around the crosshair that defines what part of the image is displayed.
+If you are familiar with the MITK Workbench, you know that clicking and moving the mouse in any of the 2D render windows will move around the crosshair that defines what part of the image is displayed.
 This behavior is disabled while any of the manual segmentation tools are active -- otherwise you might have a hard time concentrating on the contour you are drawing.
 
 To %start using one of the editing tools, click its button the the displayed toolbox.
@@ -114,7 +114,7 @@ If you have to delineate a lot of images, you should try using shortcuts to swit
 
 \subsection org_mitk_gui_qt_segmentationUserManualManualKringeling4 Using Editing Tools
 
-All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations transversal, sagittal, or frontal), move the mouse while holding the mouse button and release to finish the editing action.
+All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations axial, sagittal, or frontal), move the mouse while holding the mouse button and release to finish the editing action.
 
 Multi-step undo and redo is fully supported by all editing tools. Use the application-wide undo button in the toolbar to revert erroneous %actions.
 

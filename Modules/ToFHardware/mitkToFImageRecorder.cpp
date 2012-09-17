@@ -35,11 +35,14 @@ namespace mitk
     this->m_AmplitudeImageSelected = true;
     this->m_IntensityImageSelected = true;
     this->m_RGBImageSelected = true;
-    this->m_Abort = true;
-    this->m_CaptureWidth = 0;
-    this->m_CaptureHeight = 0;
+    this->m_Abort = false;
+    this->m_ToFCaptureWidth = 0;
+    this->m_ToFCaptureHeight = 0;
+    this->m_RGBCaptureWidth = 0;
+    this->m_RGBCaptureHeight = 0;
     this->m_FileFormat = "";
-    this->m_PixelNumber = 0;
+    this->m_ToFPixelNumber = 0;
+    this->m_RGBPixelNumber = 0;
     this->m_SourceDataSize = 0;
     this->m_ToFImageType = ToFImageWriter::ToFImageType3D;
     this->m_RecordMode = ToFImageRecorder::PerFrames;
@@ -94,27 +97,32 @@ namespace mitk
       throw std::logic_error("No file format specified!");
     }
 
-    this->m_CaptureWidth = this->m_ToFCameraDevice->GetCaptureWidth();
-    this->m_CaptureHeight = this->m_ToFCameraDevice->GetCaptureHeight();
-    this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
+    this->m_RGBCaptureWidth = this->m_ToFCameraDevice->GetRGBCaptureWidth();
+    this->m_RGBCaptureHeight = this->m_ToFCameraDevice->GetRGBCaptureHeight();
+    this->m_RGBPixelNumber = this->m_RGBCaptureWidth * this->m_RGBCaptureHeight;
+
+    this->m_ToFCaptureWidth = this->m_ToFCameraDevice->GetCaptureWidth();
+    this->m_ToFCaptureHeight = this->m_ToFCameraDevice->GetCaptureHeight();
+    this->m_ToFPixelNumber = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
+
     this->m_SourceDataSize = this->m_ToFCameraDevice->GetSourceDataSize();
 
     // allocate buffer
     if(m_IntensityArray == NULL)
     {
-      this->m_IntensityArray = new float[m_PixelNumber];
+      this->m_IntensityArray = new float[m_ToFPixelNumber];
     }
     if(this->m_DistanceArray == NULL)
     {
-      this->m_DistanceArray = new float[m_PixelNumber];
+      this->m_DistanceArray = new float[m_ToFPixelNumber];
     }
     if(this->m_AmplitudeArray == NULL)
     {
-      this->m_AmplitudeArray = new float[m_PixelNumber];
+      this->m_AmplitudeArray = new float[m_ToFPixelNumber];
     }
     if(this->m_RGBArray == NULL)
     {
-      this->m_RGBArray = new unsigned char[m_PixelNumber*3];
+      this->m_RGBArray = new unsigned char[m_RGBPixelNumber*3];
     }
     if(this->m_SourceDataArray == NULL)
     {
@@ -125,8 +133,11 @@ namespace mitk
     this->m_ToFImageWriter->SetAmplitudeImageFileName(this->m_AmplitudeImageFileName);
     this->m_ToFImageWriter->SetIntensityImageFileName(this->m_IntensityImageFileName);
     this->m_ToFImageWriter->SetRGBImageFileName(this->m_RGBImageFileName);
-    this->m_ToFImageWriter->SetCaptureWidth(this->m_CaptureWidth);
-    this->m_ToFImageWriter->SetCaptureHeight(this->m_CaptureHeight);
+    this->m_ToFImageWriter->SetRGBCaptureWidth(this->m_RGBCaptureWidth);
+    this->m_ToFImageWriter->SetRGBCaptureHeight(this->m_RGBCaptureHeight);
+    this->m_ToFImageWriter->SetToFCaptureHeight(this->m_ToFCaptureHeight);
+    this->m_ToFImageWriter->SetToFCaptureWidth(this->m_ToFCaptureWidth);
+    this->m_ToFImageWriter->SetToFCaptureHeight(this->m_ToFCaptureHeight);
     this->m_ToFImageWriter->SetToFImageType(this->m_ToFImageType);
     this->m_ToFImageWriter->SetDistanceImageSelected(this->m_DistanceImageSelected);
     this->m_ToFImageWriter->SetAmplitudeImageSelected(this->m_AmplitudeImageSelected);
@@ -138,6 +149,11 @@ namespace mitk
     this->m_Abort = false;
     this->m_AbortMutex->Unlock();
     this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->RecordData, this);
+  }
+
+  void ToFImageRecorder::WaitForThreadBeingTerminated()
+  {
+    this->m_MultiThreader->TerminateThread(this->m_ThreadID);
   }
 
   ITK_THREAD_RETURN_TYPE ToFImageRecorder::RecordData(void* pInfoStruct)

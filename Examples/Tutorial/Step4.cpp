@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## We use the class QmitkSliceWidget, which is based on the class
 //## QmitkRenderWindow, but additionally provides sliders
 //## to slice through the data. We create two instances of
-//## QmitkSliceWidget, one for transversal and one for sagittal slicing.
+//## QmitkSliceWidget, one for axial and one for sagittal slicing.
 //## The two slices are also shown at their correct position in 3D as
 //## well as intersection-line, each in the other 2D view.
 int main(int argc, char* argv[])
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
   // *******************************************************
 
   //*************************************************************************
-  // Part IVb: 2D view for slicing transversally
+  // Part IVb: 2D view for slicing axially
   //*************************************************************************
 
   // Create QmitkSliceWidget, which is based on the class
@@ -134,10 +134,10 @@ int main(int argc, char* argv[])
   layout.addWidget(&view2);
   view2.SetLevelWindowEnabled(true);
   // Tell the QmitkSliceWidget which (part of) the tree to render.
-  // By default, it slices the data transversally
+  // By default, it slices the data axially
   view2.SetDataStorage(ds);
   mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetAll();
-  view2.SetData(rs->Begin(),mitk::SliceNavigationController::Transversal);
+  view2.SetData(rs->Begin(),mitk::SliceNavigationController::Axial);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!
   ds->Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());

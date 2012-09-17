@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
   //tell the navigator the geometry to be sliced (with geometry a Geometry3D::ConstPointer)
   sliceCtrl->SetInputWorldGeometry(geometry.GetPointer());
   //tell the navigator in which direction it shall slice the data
-  sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Transversal);
+  sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Axial);
   //Connect one or more BaseRenderer to this navigator, i.e.: events sent 
   //by the navigator when stepping through the slices (e.g. by 
   //sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer 

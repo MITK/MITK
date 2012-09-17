@@ -1,5 +1,5 @@
 /**
-\page screenshot_maker The Screenshot Maker
+\page org_mitk_views_screenshotmaker The Screenshot Maker
 
 This module provides the functionality to create and save screenshots of the data.
 

@@ -424,7 +424,7 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer par
       if( linkedRenderWindow )
       {
         mitk::Point3D centerP = _PlanarFigure->GetGeometry()->GetOrigin();
-        linkedRenderWindow->GetRenderWindow("transversal")->GetSliceNavigationController()->SelectSliceByPoint(centerP);
+        linkedRenderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SelectSliceByPoint(centerP);
       }
       break;
     }

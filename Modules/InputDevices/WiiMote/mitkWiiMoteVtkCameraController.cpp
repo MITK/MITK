@@ -50,7 +50,7 @@ mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController()
 , m_SensitivityX (0)
 , m_SensitivityY (0)
 , m_Calibrated (false)
-, m_TransversalBR( NULL )
+, m_AxialBR( NULL )
 , m_InitialScrollValue( 0 )
 , m_UpdateFrequency( 0 )
 , m_CurrentElevationAngle ( 0 )
@@ -236,7 +236,7 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   //This ensures that no props are cut off
   vtkRenderer->ResetCameraClippingRange();
 
-  // ------------ transversal scrolling -----------------------
+  // ------------ axial scrolling -----------------------
 
   // get renderer
   const RenderingManager::RenderWindowVector& renderWindows 
@@ -248,20 +248,20 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
     if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard2D )
     {
       if( mitk::BaseRenderer::GetInstance((*iter))->GetSliceNavigationController()
-        ->GetViewDirection() == mitk::SliceNavigationController::ViewDirection::Transversal )
+        ->GetViewDirection() == mitk::SliceNavigationController::ViewDirection::Axial )
       {
-        m_TransversalBR = mitk::BaseRenderer::GetInstance((*iter));
+        m_AxialBR = mitk::BaseRenderer::GetInstance((*iter));
       }
     }
   }  
 
   SlicedGeometry3D* slicedWorldGeometry
     = dynamic_cast<SlicedGeometry3D*>
-    (m_TransversalBR->GetSliceNavigationController()->GetCreatedWorldGeometry()->GetGeometry3D(m_TimeStep));
+    (m_AxialBR->GetSliceNavigationController()->GetCreatedWorldGeometry()->GetGeometry3D(m_TimeStep));
 
   int numberOfSlices = slicedWorldGeometry->GetSlices();
 
-  const mitk::Geometry2D* currentGeo = m_TransversalBR->GetCurrentWorldGeometry2D();
+  const mitk::Geometry2D* currentGeo = m_AxialBR->GetCurrentWorldGeometry2D();
   mitk::Point3D origin = currentGeo->GetOrigin();
 
   int sliceValue = wiiMoteIREvent->GetSliceNavigationValue();
@@ -305,7 +305,7 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
     m_InitialScrollValue = 0;
   }
 
-  m_TransversalBR->GetSliceNavigationController()->SelectSliceByPoint(origin);
+  m_AxialBR->GetSliceNavigationController()->SelectSliceByPoint(origin);
 
   mitk::RenderingManager::GetInstance()
     ->RequestUpdateAll();

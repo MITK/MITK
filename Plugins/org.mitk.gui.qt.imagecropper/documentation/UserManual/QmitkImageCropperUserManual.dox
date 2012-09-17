@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{org_imagecropper} The Image Cropper Module
+\page org_mitk_views_imagecropper The Image Cropper Module
 
 \image html icon.png "Icon of the Module"
 
@@ -21,7 +21,7 @@ ImageCropper is a functionality which allows the user to manually crop an image 
 
 
 \section QmitkImageCropperUserManualUsage Usage
-First select from the drop down menu the image to crop. The three 2D widgets show yellow rectangles representing the bounding box in each plane (transversal, sagital, coronal ), the lower right 3D widget shows the entire volume of the bounding box.\n
+First select from the drop down menu the image to crop. The three 2D widgets show yellow rectangles representing the bounding box in each plane (axial, sagital, coronal), the lower right 3D widget shows the entire volume of the bounding box.\n
 
 - To change the <b>size</b> of bounding box press <i> control + right click </i> and move the cursor up/down or left/right in one of the three 2D views.\n
 - To change the <b>orientation</b> of the bounding box press <i> control + middle click </i> and move the cursor up/down or left/right in one of the three 2D views.\n

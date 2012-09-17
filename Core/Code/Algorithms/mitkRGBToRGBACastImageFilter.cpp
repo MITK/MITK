@@ -46,10 +46,13 @@ bool mitk::RGBToRGBACastImageFilter::IsRGBImage( const mitk::Image *image )
 {
   const mitk::PixelType &inputPixelType = image->GetPixelType();
 
-  if ( (inputPixelType == typeid( UCRGBPixelType) ) 
-    || (inputPixelType == typeid( USRGBPixelType) ) 
-    || (inputPixelType == typeid( FloatRGBPixelType) ) 
-    || (inputPixelType == typeid( DoubleRGBPixelType) ) )
+  if ( (inputPixelType.GetPixelTypeId() == itk::ImageIOBase::RGB )
+    && ( (inputPixelType.GetTypeId() == typeid( unsigned char) )
+      || (inputPixelType.GetTypeId() == typeid( unsigned short) )
+      || (inputPixelType.GetTypeId() == typeid( float) )
+      || (inputPixelType.GetTypeId() == typeid( double) )
+       )
+     )
   {
     return true;
   }
@@ -92,23 +95,23 @@ void mitk::RGBToRGBACastImageFilter::GenerateOutputInformation()
   typedef itk::Image< FloatRGBPixelType > FloatCRGBItkImageType;
   typedef itk::Image< DoubleRGBPixelType > DoubleRGBItkImageType;
 
-  if ( inputPixelType == typeid( UCRGBPixelType ) )
+  if ( inputPixelType == mitk::MakePixelType< UCRGBItkImageType>() )
   {
     const mitk::PixelType refPtype = MakePixelType<UCRGBItkImageType>();
     output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
 
   }
-  else if ( inputPixelType == typeid( USRGBPixelType ) )
+  else if ( inputPixelType == mitk::MakePixelType< USRGBItkImageType>( ) )
   {
     const mitk::PixelType refPtype = MakePixelType<USRGBItkImageType>();
     output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
   }
-  else if ( inputPixelType == typeid( FloatRGBPixelType ) )
+  else if ( inputPixelType == mitk::MakePixelType< FloatCRGBItkImageType>( ) )
   {
     const mitk::PixelType refPtype = MakePixelType<FloatCRGBItkImageType>();
     output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
   }
-  else if ( inputPixelType == typeid( DoubleRGBPixelType ) )
+  else if ( inputPixelType == mitk::MakePixelType< DoubleRGBItkImageType>( ) )
   {
     const mitk::PixelType refPtype = MakePixelType<DoubleRGBItkImageType>();
     output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
@@ -159,19 +162,19 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
     const mitk::PixelType &pixelType = image->GetPixelType();
 
     // Check if the pixel type is supported
-    if ( pixelType == typeid( UCRGBPixelType ) )
+    if ( pixelType == MakePixelType< itk::Image<UCRGBPixelType> >() )
     {
       AccessFixedPixelTypeByItk_2( image, InternalCast, (UCRGBPixelType), this, 255 );
     }
-    else if ( pixelType == typeid( USRGBPixelType ) )
+    else if ( pixelType == MakePixelType< itk::Image< USRGBPixelType> >() )
     {
       AccessFixedPixelTypeByItk_2( image, InternalCast, (USRGBPixelType), this, 65535 );
     }
-    else if ( pixelType == typeid( FloatRGBPixelType ) )
+    else if ( pixelType == MakePixelType< itk::Image< FloatRGBPixelType> >() )
     {
       AccessFixedPixelTypeByItk_2( image, InternalCast, (FloatRGBPixelType), this, 1.0 );
     }
-    else if ( pixelType == typeid( DoubleRGBPixelType ) )
+    else if ( pixelType == MakePixelType< itk::Image< DoubleRGBPixelType> >() )
     {
       AccessFixedPixelTypeByItk_2( image, InternalCast, (DoubleRGBPixelType), this, 1.0 );
     }

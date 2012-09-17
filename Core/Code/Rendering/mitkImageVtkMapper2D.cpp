@@ -78,7 +78,7 @@ void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloa
   localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], depth);
   //These two points define the axes of the plane in combination with the origin.
   //Point 1 is the x-axis and point 2 the y-axis.
-  //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
+  //Each plane is transformed according to the view (axial, coronal and saggital) afterwards.
   localStorage->m_Plane->SetPoint1(planeBounds[1] , planeBounds[2], depth); //P1: (xMax, yMin, depth)
   localStorage->m_Plane->SetPoint2(planeBounds[0], planeBounds[3], depth); //P2: (xMin, yMax, depth)
 }
@@ -758,12 +758,13 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
           contrast.SetAuto( static_cast<mitk::Image*>(node->GetData()), false, true ); // we need this as a fallback
         }
 
-        contrast.SetLevelWindow( level, window);
+        contrast.SetLevelWindow( level, window, true );
         node->SetProperty( "levelwindow", LevelWindowProperty::New( contrast ), renderer );
       }
     }
     if(((overwrite) || (node->GetProperty("opaclevelwindow", renderer)==NULL))
-      && image->GetPixelType().GetPixelTypeId() == typeid(itk::RGBAPixel<unsigned char>))
+       && (image->GetPixelType().GetPixelTypeId() == itk::ImageIOBase::RGBA)
+       && (image->GetPixelType().GetTypeId() == typeid( unsigned char)) )
     {
       mitk::LevelWindow opaclevwin;
       opaclevwin.SetRangeMinMax(0,255);
@@ -933,11 +934,11 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
 void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
+  //get the transformation matrix of the reslicer in order to render the slice as axial, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_Reslicer->GetResliceAxes();
   trans->SetMatrix(matrix);
-  //transform the plane/contour (the actual actor) to the corresponding view (transversal, coronal or saggital)
+  //transform the plane/contour (the actual actor) to the corresponding view (axial, coronal or saggital)
   localStorage->m_Actor->SetUserTransform(trans);
   //transform the origin to center based coordinates, because MITK is center based.
   localStorage->m_Actor->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);

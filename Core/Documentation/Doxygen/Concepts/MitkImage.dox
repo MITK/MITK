@@ -19,7 +19,7 @@ The MITK Image obviously is a very central class to MITK and one of those you ar
 
 \image html mitkimagehierarchy.png
 
-Image is a direct descendant of SlicedData which itself inherits from Basedata. In MITK, Basedata is the common DataType from which all other Datatypes stem. SlicedData specifies this class to contain image slices, a typical example being a CT scan, and introduces properties and methods necessary to give the data a well defined geometry. Image further specializes the concept to allow for multiple channels, volumes and slices as well as additional information like image properties.
+Image is a direct descendant of SlicedData which itself inherits from BaseData. In MITK, BaseData is the common DataType from which all other Datatypes stem. SlicedData specifies this class to contain image slices, a typical example being a CT scan, and introduces properties and methods necessary to give the data a well defined geometry. Image further specializes the concept to allow for multiple channels, volumes and slices as well as additional information like image properties.
 
 For the sake of this introduction, we will have a look at three different aspects:
 
@@ -54,7 +54,7 @@ When duplicating an image, be sure to duplicate all data that you want to transf
 
 \verbatim
 mitk::Image::Pointer new = mitk::Image::New(); // Create new, empty image
-new->Initialize(old); // new no has the geometry information from old image
+new->Initialize(old); // new now has the geometry information from old image
 new->SetVolume(old->GetData()); // new now additionally contains the old images visual data
 new->SetPropertyList(old->GetPropertyList()) // new now additionally contains the old image's properties
 \endverbatim

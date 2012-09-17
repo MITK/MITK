@@ -2,7 +2,7 @@
  
 \page Step09Page MITK Tutorial - Step 9: A plug-in
 
-MITK uses a very modular concept to maximize reusability and portability. You start an application (for example ExtApp, the sample application provided by MITK). An application has several bundles (or plug-ins). A bundle can be a functionality, which in turn can be a view, each of these terms specifying certain behaviour and attributes.
+MITK uses a very modular concept to maximize reusability and portability. You start an application (for example mitkWorkbench, the sample application provided by MITK). An application has several bundles (or plug-ins). A bundle can be a functionality, which in turn can be a view, each of these terms specifying certain behaviour and attributes.
 
 The creation of a MITK plug-in is considerably facilitated by using the MITK BundleGenerator as described in \ref NewPluginPage .
 

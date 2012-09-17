@@ -26,7 +26,7 @@ const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenaviga
 
 
 QmitkImageNavigatorView::QmitkImageNavigatorView()
-  : m_TransversalStepper(0)
+  : m_AxialStepper(0)
   , m_SagittalStepper(0)
   , m_FrontalStepper(0)
   , m_TimeStepper(0)
@@ -44,7 +44,7 @@ void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
   // create GUI widgets
   m_Parent = parent;
   m_Controls.setupUi(parent);
-  m_Controls.m_SliceNavigatorTransversal->SetInverseDirection(true);
+  m_Controls.m_SliceNavigatorAxial->SetInverseDirection(true);
 
   connect(m_Controls.m_XWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
   connect(m_Controls.m_YWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
@@ -68,22 +68,22 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     this->m_IRenderWindowPart = renderWindowPart;
     this->m_Parent->setEnabled(true);
 
-    QmitkRenderWindow* renderWindow = renderWindowPart->GetRenderWindow("transversal");
+    QmitkRenderWindow* renderWindow = renderWindowPart->GetRenderWindow("axial");
     if (renderWindow)
     {
-      if (m_TransversalStepper) m_TransversalStepper->deleteLater();
-      m_TransversalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTransversal,
+      if (m_AxialStepper) m_AxialStepper->deleteLater();
+      m_AxialStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorAxial,
                                                      renderWindow->GetSliceNavigationController()->GetSlice(),
-                                                     "sliceNavigatorTransversalFromSimpleExample");
-      m_Controls.m_SliceNavigatorTransversal->setEnabled(true);
-      m_Controls.m_TransversalLabel->setEnabled(true);
+                                                     "sliceNavigatorAxialFromSimpleExample");
+      m_Controls.m_SliceNavigatorAxial->setEnabled(true);
+      m_Controls.m_AxialLabel->setEnabled(true);
       m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(true);
-      connect(m_TransversalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+      connect(m_AxialStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
     }
     else
     {
-      m_Controls.m_SliceNavigatorTransversal->setEnabled(false);
-      m_Controls.m_TransversalLabel->setEnabled(false);
+      m_Controls.m_SliceNavigatorAxial->setEnabled(false);
+      m_Controls.m_AxialLabel->setEnabled(false);
       m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(false);
     }
 
@@ -203,7 +203,7 @@ void QmitkImageNavigatorView::SetBorderColors()
 {
   if (m_IRenderWindowPart)
   {
-    QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetRenderWindow("transversal");
+    QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetRenderWindow("axial");
     if (renderWindow)
     {
       mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -274,7 +274,7 @@ void QmitkImageNavigatorView::SetStepSize(int axis)
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
 
     if (geometry.IsNotNull())
     {
@@ -320,7 +320,7 @@ void QmitkImageNavigatorView::OnMillimetreCoordinateValueChanged()
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
 
     if (geometry.IsNotNull())
     {
@@ -338,7 +338,7 @@ void QmitkImageNavigatorView::OnRefetch()
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
 
     if (geometry.IsNotNull())
     {

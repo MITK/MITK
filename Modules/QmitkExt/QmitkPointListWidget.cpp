@@ -464,3 +464,8 @@ void QmitkPointListWidget::SetSnc3(mitk::SliceNavigationController* snc)
    m_Snc3 = snc;
    m_PointListView->SetSnc3(snc);
 }
+
+void QmitkPointListWidget::UnselectEditButton()
+{
+  m_ToggleAddPoint->setChecked(false);
+}

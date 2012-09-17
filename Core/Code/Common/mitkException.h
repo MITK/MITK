@@ -102,7 +102,7 @@ namespace mitk {
   struct ReThrowData
     {
     std::string RethrowClassname;
-    int RethrowLine;
+    unsigned int RethrowLine;
     std::string RethrowMessage;
     };
    

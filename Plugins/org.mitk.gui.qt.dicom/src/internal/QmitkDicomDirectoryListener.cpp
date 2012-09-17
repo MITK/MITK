@@ -19,98 +19,130 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFile>
 #include <mitkLogMacros.h>
 #include <QFileInfoList>
+#include <QDirIterator>
 
 QmitkDicomDirectoryListener::QmitkDicomDirectoryListener()
 : m_FileSystemWatcher(new QFileSystemWatcher())
+, m_IsListening(true)
 {
-    connect(m_FileSystemWatcher,SIGNAL(directoryChanged(const QString&)),this,SLOT(OnDirectoryChanged(const QString&))); 
+    connect(m_FileSystemWatcher,SIGNAL(directoryChanged(const QString&)),this,SLOT(OnDirectoryChanged(const QString&)));
 }
 
 QmitkDicomDirectoryListener::~QmitkDicomDirectoryListener()
 {
+    m_IsListening = false;
+    RemoveTemporaryFiles();
     delete m_FileSystemWatcher;
 }
 
-
 void QmitkDicomDirectoryListener::OnDirectoryChanged(const QString&)
-{   
-    SetFilesToImport();
-    m_ImportingFiles.append(m_FilesToImport);
-    emit SignalAddDicomData(m_FilesToImport);
-}
-
-void QmitkDicomDirectoryListener::OnDicomImportFinished(const QStringList& finishedFiles)
 {
-    RemoveFilesFromDirectoryAndImportingFilesList(finishedFiles);
-}
-
-void QmitkDicomDirectoryListener::SetFilesToImport()
-{   
-    m_FilesToImport.clear();
-    QDir listenerDirectory(m_DicomListenerDirectory);
-    QFileInfoList entries = listenerDirectory.entryInfoList(QDir::Files);
-    if(!entries.isEmpty())
+    if(m_IsListening)
     {
-        QFileInfoList::const_iterator file;
-        for(file = entries.constBegin(); file != entries.constEnd(); ++file )
+        QDirIterator it( m_DicomListenerDirectory.absolutePath() , QDir::Files , QDirIterator::Subdirectories);
+        QString currentPath;
+
+        m_FilesToImport.clear();
+        while(it.hasNext())
         {
-            if(!m_ImportingFiles.contains((*file).absoluteFilePath()))
+            it.next();
+            currentPath = it.fileInfo().absoluteFilePath();
+            if(!m_AlreadyImportedFiles.contains(currentPath))
             {
-                m_FilesToImport.append((*file).absoluteFilePath());
+                m_AlreadyImportedFiles.insert( currentPath , currentPath );
+                m_FilesToImport.append(currentPath);
             }
         }
-    } 
-}
-
-void QmitkDicomDirectoryListener::RemoveFilesFromDirectoryAndImportingFilesList(const QStringList& files)
-{
-    QStringListIterator fileToDeleteIterator(files);
-    while(fileToDeleteIterator.hasNext())
-    {
-        QFile file(fileToDeleteIterator.next());
-        if(m_ImportingFiles.contains(file.fileName()))
+        if(!m_FilesToImport.isEmpty())
         {
-            m_ImportingFiles.removeOne(file.fileName());
-            file.remove();
+            emit SignalStartDicomImport(m_FilesToImport);
         }
     }
+}
+
+void QmitkDicomDirectoryListener::OnImportFinished()
+{
+    m_IsListening = false;
+    RemoveTemporaryFiles();
+    m_AlreadyImportedFiles.clear();
+    m_IsListening = true;
+}
+
+void QmitkDicomDirectoryListener::OnDicomNetworkError(const QString& errorMsg)
+{
+    m_IsListening = false;
+    m_AlreadyImportedFiles.clear();
+    m_IsListening = true;
+}
+
+void QmitkDicomDirectoryListener::RemoveAlreadyImportedEntries(const QStringList& fileEntries)
+{
+    QStringListIterator it(fileEntries);
+    QString currentEntry;
+    while(it.hasNext())
+    {
+        currentEntry = m_DicomListenerDirectory.absoluteFilePath(it.next());
+        if(m_AlreadyImportedFiles.contains(currentEntry))
+        {
+            m_AlreadyImportedFiles.remove(currentEntry);
+        }
+    }
+}
+
+void QmitkDicomDirectoryListener::RemoveTemporaryFiles(const QStringList& fileEntries)
+{
+  /**
+    QStringListIterator it(fileEntries);
+    QString currentEntry;
+    while(it.hasNext())
+    {
+        currentEntry = m_DicomListenerDirectory.absoluteFilePath(it.next());
+        m_DicomListenerDirectory.remove(currentEntry);
+    }
+  */
+}
+
+void QmitkDicomDirectoryListener::RemoveTemporaryFiles()
+{
+/**
+* dangerous code !!!
+  
+  QDirIterator it( m_DicomListenerDirectory.absolutePath() , QDir::AllEntries , QDirIterator::Subdirectories);
+    while(it.hasNext())
+    {
+        it.next();
+        m_DicomListenerDirectory.remove(it.fileInfo().absoluteFilePath());
+    }
+*/
 }
 
 void QmitkDicomDirectoryListener::SetDicomListenerDirectory(const QString& directory)
 {
-    if(isOnlyListenedDirectory(directory))
+    QDir dir(directory);
+    if(dir.exists())
     {
-        QDir listenerDirectory = QDir(directory);
-        CreateListenerDirectory(listenerDirectory);
-        
-        m_DicomListenerDirectory=listenerDirectory.absolutePath();
-        m_FileSystemWatcher->addPath(m_DicomListenerDirectory);
-        MITK_INFO << m_DicomListenerDirectory.toStdString();
+        m_DicomListenerDirectory=dir;
+        m_FileSystemWatcher->addPath(m_DicomListenerDirectory.absolutePath());
+    }
+    else
+    {
+        dir.mkpath(directory);
+        m_DicomListenerDirectory=dir;
+        m_FileSystemWatcher->addPath(m_DicomListenerDirectory.absolutePath());
     }
 }
 
-const QString& QmitkDicomDirectoryListener::GetDicomListenerDirectory()
+QString QmitkDicomDirectoryListener::GetDicomListenerDirectory()
 {
-    return m_DicomListenerDirectory;
+    return m_DicomListenerDirectory.absolutePath();
 }
 
-void QmitkDicomDirectoryListener::CreateListenerDirectory(const QDir& directory)
-{   
-    if(!directory.exists())
-    {
-        directory.mkpath(directory.absolutePath());
-    }
-}
-
-bool QmitkDicomDirectoryListener::isOnlyListenedDirectory(const QString& directory)
+bool QmitkDicomDirectoryListener::IsListening()
 {
-    bool isOnlyListenedDirectory = false;
-    if(m_FileSystemWatcher->directories().count()==0||m_FileSystemWatcher->directories().count()==1)
-    {
-        if(!m_FileSystemWatcher->directories().contains(directory))
-        {
-            isOnlyListenedDirectory = true;
-        }
-    }
-    return isOnlyListenedDirectory;
+    return m_IsListening;
+}
+
+void QmitkDicomDirectoryListener::SetListening(bool listening)
+{
+    m_IsListening = listening;
 }

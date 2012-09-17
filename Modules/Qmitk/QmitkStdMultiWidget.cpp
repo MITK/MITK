@@ -60,6 +60,7 @@ m_Layout(LAYOUT_DEFAULT),
 m_PlaneMode(PLANE_MODE_SLICING),
 m_RenderingManager(renderingManager),
 m_GradientBackgroundFlag(true),
+m_TimeNavigationController(NULL),
 m_MainSplit(NULL),
 m_LayoutSplit(NULL),
 m_SubSplit1(NULL),
@@ -72,12 +73,13 @@ m_PendingCrosshairPositionEvent(false),
 m_CrosshairNavigationEnabled(false)
 {
   /******************************************************
-   * Use the global RenderingManager is none was specified
+   * Use the global RenderingManager if none was specified
    * ****************************************************/
   if (m_RenderingManager == NULL)
   {
     m_RenderingManager = mitk::RenderingManager::GetInstance();
   }
+  m_TimeNavigationController = m_RenderingManager->GetTimeNavigationController();
 
   /*******************************/
   //Create Widget manually
@@ -152,7 +154,7 @@ m_CrosshairNavigationEnabled(false)
   //Create RenderWindows 1
   mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, "stdmulti.widget1", NULL, m_RenderingManager);
   mitkWidget1->setMaximumSize(2000,2000);
-  mitkWidget1->SetLayoutIndex( TRANSVERSAL );
+  mitkWidget1->SetLayoutIndex( AXIAL );
   mitkWidgetLayout1->addWidget(mitkWidget1); 
 
   //Create RenderWindows 2
@@ -261,7 +263,7 @@ void QmitkStdMultiWidget::InitializeWidget()
 
   // Set default view directions for SNCs
   mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(
-    mitk::SliceNavigationController::Transversal );
+    mitk::SliceNavigationController::Axial );
   mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Sagittal );
   mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(
@@ -275,8 +277,8 @@ void QmitkStdMultiWidget::InitializeWidget()
   //Info for later: 
   //int view = this->GetRenderWindow1()->GetSliceNavigationController()->GetDefaultViewDirection();
   //QString layoutName;
-  //if( view == mitk::SliceNavigationController::Transversal )
-  //  layoutName = "Transversal";
+  //if( view == mitk::SliceNavigationController::Axial )
+  //  layoutName = "Axial";
   //else if( view == mitk::SliceNavigationController::Sagittal )
   //  layoutName = "Sagittal";
   //else if( view == mitk::SliceNavigationController::Frontal )
@@ -286,7 +288,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   //if( view >= 0 && view < 4 )
   //  //write LayoutName --> Viewer 3D shoudn't write the layoutName.
 
-  //Render Window 1 == transversal
+  //Render Window 1 == axial
   m_CornerAnnotaions[0].cornerText = vtkCornerAnnotation::New();
   m_CornerAnnotaions[0].cornerText->SetText(0, "Axial");
   m_CornerAnnotaions[0].cornerText->SetMaximumFontSize(12);
@@ -346,8 +348,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_SlicesSwiveller->AddSliceController(
     mitkWidget3->GetSliceNavigationController() );
 
-  //initialize m_TimeNavigationController: send time via sliceNavigationControllers
-  m_TimeNavigationController = mitk::SliceNavigationController::New("dummy");
+  //connect to the "time navigation controller": send time via sliceNavigationControllers
   m_TimeNavigationController->ConnectGeometryTimeEvent(
     mitkWidget1->GetSliceNavigationController() , false);
   m_TimeNavigationController->ConnectGeometryTimeEvent(
@@ -359,19 +360,15 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget1->GetSliceNavigationController()
     ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
 
-  // Set TimeNavigationController to RenderingManager
-  // (which uses it internally for views initialization!)
-  m_RenderingManager->SetTimeNavigationController( m_TimeNavigationController );
-
   //reverse connection between sliceNavigationControllers and m_TimeNavigationController
   mitkWidget1->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget2->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget3->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget4->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New( mitk::GlobalInteraction::GetInstance() );
 
@@ -448,6 +445,11 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
   DisablePositionTracking();
   DisableNavigationControllerEventListening();
+
+  m_TimeNavigationController->Disconnect(mitkWidget1->GetSliceNavigationController());
+  m_TimeNavigationController->Disconnect(mitkWidget2->GetSliceNavigationController());
+  m_TimeNavigationController->Disconnect(mitkWidget3->GetSliceNavigationController());
+  m_TimeNavigationController->Disconnect(mitkWidget4->GetSliceNavigationController());
 
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[0].ren );
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[1].ren );
@@ -1354,7 +1356,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
 
 mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
 {
-  return m_TimeNavigationController.GetPointer();
+  return m_TimeNavigationController;
 }
 
 

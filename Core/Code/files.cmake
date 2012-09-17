@@ -236,6 +236,7 @@ set(CPP_FILES
   IO/mitkImageWriterFactory.cpp
   IO/mitkItkImageFileIOFactory.cpp
   IO/mitkItkImageFileReader.cpp
+  IO/mitkItkLoggingAdapter.cpp
   IO/mitkItkPictureWrite.cpp
   IO/mitkIOUtil.cpp
   IO/mitkLookupTableProperty.cpp
@@ -257,6 +258,7 @@ set(CPP_FILES
   IO/mitkSTLFileReader.cpp
   IO/mitkSurfaceVtkWriter.cpp
   IO/mitkSurfaceVtkWriterFactory.cpp
+  IO/mitkVtkLoggingAdapter.cpp
   IO/mitkVtiFileIOFactory.cpp
   IO/mitkVtiFileReader.cpp
   IO/mitkVtkImageIOFactory.cpp

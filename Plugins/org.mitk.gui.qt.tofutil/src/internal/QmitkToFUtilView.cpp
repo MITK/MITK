@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -67,9 +67,8 @@ QmitkToFUtilView::QmitkToFUtilView()
 
 QmitkToFUtilView::~QmitkToFUtilView()
 {
-  OnToFCameraStopped();
-  OnToFCameraDisconnected();
-  ResetGUIToDefault();
+        OnToFCameraStopped();
+        OnToFCameraDisconnected();
 }
 
 void QmitkToFUtilView::SetFocus()
@@ -113,11 +112,11 @@ void QmitkToFUtilView::Activated()
     {
       linkedRenderWindowPart->EnableSlicingPlanes(false);
     }
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOn();
-    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+    GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+    GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOn();
+    GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
     GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOn();
-    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
+    GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
     GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
 
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
@@ -131,6 +130,9 @@ void QmitkToFUtilView::Activated()
     {
       m_Controls->m_ToFRecorderWidget->setEnabled(false);
       m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+      m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
+      m_Controls->tofMeasurementWidget->setEnabled(false);
+      m_Controls->SurfacePropertiesBox->setEnabled(false);
     }
   }
 }
@@ -142,6 +144,7 @@ void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Point
 
 void QmitkToFUtilView::Deactivated()
 {
+
 }
 
 void QmitkToFUtilView::Visible()
@@ -150,6 +153,8 @@ void QmitkToFUtilView::Visible()
 
 void QmitkToFUtilView::Hidden()
 {
+
+    ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::OnToFCameraConnected()
@@ -163,6 +168,8 @@ void QmitkToFUtilView::OnToFCameraConnected()
   m_Controls->m_ToFRecorderWidget->setEnabled(true);
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
 
+  // initialize measurement widget
+  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());
 
   //TODO
   this->m_RealTimeClock = mitk::RealTimeClock::New();
@@ -225,8 +232,8 @@ void QmitkToFUtilView::ResetGUIToDefault()
     {
       linkedRenderWindowPart->EnableSlicingPlanes(true);
     }
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Transversal);
-    GetRenderWindowPart()->GetRenderWindow("transversal")->GetSliceNavigationController()->SliceLockedOff();
+    GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+    GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOff();
     GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
     GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
     GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
@@ -245,12 +252,16 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
   m_Controls->m_ToFRecorderWidget->OnStop();
   m_Controls->m_ToFRecorderWidget->setEnabled(false);
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+  m_Controls->tofMeasurementWidget->setEnabled(false);
+  m_Controls->SurfacePropertiesBox->setEnabled(false);
+  //clean up measurement widget
+  m_Controls->tofMeasurementWidget->CleanUpWidget();
+
   if(this->m_VideoSource)
   {
     this->m_VideoSource->StopCapturing();
     this->m_VideoSource = NULL;
   }
-  this->RequestRenderWindowUpdate();
 }
 
 void QmitkToFUtilView::OnToFCameraStarted()
@@ -295,10 +306,15 @@ void QmitkToFUtilView::OnToFCameraStarted()
     m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
     // initialize visualization widget
     m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
+    // set distance image to measurement widget
+    m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
 
     this->m_Frametimer->start(0);
 
     m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
+    m_Controls->m_ToFCompositeFilterWidget->setEnabled(true);
+    m_Controls->tofMeasurementWidget->setEnabled(true);
+    m_Controls->SurfacePropertiesBox->setEnabled(true);
 
     if (m_Controls->m_TextureCheckBox->isChecked())
     {
@@ -310,13 +326,15 @@ void QmitkToFUtilView::OnToFCameraStarted()
     }
   }
   m_Controls->m_TextureCheckBox->setEnabled(true);
-  // initialize point set measurement
-  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage(),m_MitkDistanceImage);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()
 {
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+  m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
+  m_Controls->tofMeasurementWidget->setEnabled(false);
+  m_Controls->SurfacePropertiesBox->setEnabled(false);
+
   this->m_Frametimer->stop();
 }
 
@@ -487,10 +505,27 @@ void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
       this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
     }
   }
-  else
+}
+
+void QmitkToFUtilView::OnChangeCoronalWindowOutput(int index)
+{
+  this->OnToFCameraStopped();
+  if(index == 0)
   {
-    this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
+    if(this->m_IntensityImageNode.IsNotNull())
+      this->m_IntensityImageNode->SetVisibility(false);
+    if(this->m_RGBImageNode.IsNotNull())
+      this->m_RGBImageNode->SetVisibility(true);
   }
+  else if(index == 1)
+  {
+    if(this->m_IntensityImageNode.IsNotNull())
+      this->m_IntensityImageNode->SetVisibility(true);
+    if(this->m_RGBImageNode.IsNotNull())
+      this->m_RGBImageNode->SetVisibility(false);
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->OnToFCameraStarted();
 }
 
 mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName, mitk::BaseData* data )
@@ -527,7 +562,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   if (m_AmplitudeImageNode.IsNotNull())
   {
     this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("transversal")->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("coronal")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetBoolProperty("use color",!useToF);
@@ -536,7 +571,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   if (m_IntensityImageNode.IsNotNull())
   {
     this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("transversal")->GetRenderWindow() ) );
+    this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow() ) );
     this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow() ) );
     this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
     this->m_IntensityImageNode->SetBoolProperty("use color",!useToF);
@@ -545,7 +580,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   if ((m_RGBImageNode.IsNotNull()))
   {
     this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("transversal")->GetRenderWindow() ) );
+    this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow() ) );
     this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow() ) );
     this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
   }
@@ -557,7 +592,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if(this->m_SurfaceNode.IsNotNull())
   {
-    QHash<QString, QmitkRenderWindow*> renderWindowHashMap = this->GetRenderWindowPart()->GetRenderWindows();
+    QHash<QString, QmitkRenderWindow*> renderWindowHashMap = this->GetRenderWindowPart()->GetQmitkRenderWindows();
     QHashIterator<QString, QmitkRenderWindow*> i(renderWindowHashMap);
     while (i.hasNext()){
       i.next();

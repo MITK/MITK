@@ -52,7 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::map<QAction*, unsigned int> QmitkSlicesInterpolator::createActionToSliceDimension()
 {
   std::map<QAction*, unsigned int> actionToSliceDimension;
-  actionToSliceDimension[new QAction("Transversal (red window)", 0)] = 2;
+  actionToSliceDimension[new QAction("Axial (red window)", 0)] = 2;
   actionToSliceDimension[new QAction("Sagittal (green window)", 0)] = 0;
   actionToSliceDimension[new QAction("Coronal (blue window)", 0)] = 1;
   return actionToSliceDimension;
@@ -248,13 +248,13 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
       m_TimeStep[2] = slicer->GetTime()->GetPos();
       {
         itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
-        command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnTransversalTimeChanged );
+        command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnAxialTimeChanged );
         TTimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
       }
 
       {
         itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
-        command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnTransversalSliceChanged );
+        command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnAxialSliceChanged );
         TSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
       }
 
@@ -321,6 +321,11 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
     m_DataStorage->Remove(m_3DContourNode);
   if(m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     m_DataStorage->Remove(m_InterpolatedSurfaceNode);
+
+  // remove observer
+  m_Interpolator->RemoveObserver( InterpolationInfoChangedObserverTag );
+  m_SurfaceInterpolator->RemoveObserver( SurfaceInterpolationInfoChangedObserverTag );
+
   delete m_Timer;
 }
 
@@ -381,8 +386,7 @@ void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
   }
 }
 
-
-void QmitkSlicesInterpolator::OnTransversalTimeChanged(itk::Object* sender, const itk::EventObject& e)
+void QmitkSlicesInterpolator::OnAxialTimeChanged(itk::Object* sender, const itk::EventObject& e)
 {
   const mitk::SliceNavigationController::GeometryTimeEvent& event = dynamic_cast<const mitk::SliceNavigationController::GeometryTimeEvent&>(e);
   m_TimeStep[2] = event.GetPos();
@@ -392,6 +396,11 @@ void QmitkSlicesInterpolator::OnTransversalTimeChanged(itk::Object* sender, cons
     mitk::SliceNavigationController* snc = dynamic_cast<mitk::SliceNavigationController*>( sender );
     if (snc) snc->SendSlice(); // will trigger a new interpolation
   }
+}
+
+void QmitkSlicesInterpolator::OnTransversalTimeChanged(itk::Object* sender, const itk::EventObject& e)
+{
+  this->OnAxialTimeChanged(sender, e);
 }
 
 void QmitkSlicesInterpolator::OnSagittalTimeChanged(itk::Object* sender, const itk::EventObject& e)
@@ -418,8 +427,7 @@ void QmitkSlicesInterpolator::OnFrontalTimeChanged(itk::Object* sender, const it
   }
 }
 
-
-void QmitkSlicesInterpolator::OnTransversalSliceChanged(const itk::EventObject& e)
+void QmitkSlicesInterpolator::OnAxialSliceChanged(const itk::EventObject& e)
 {
   if ( TranslateAndInterpolateChangedSlice( e, 2 ) )
   {
@@ -428,6 +436,11 @@ void QmitkSlicesInterpolator::OnTransversalSliceChanged(const itk::EventObject& 
       mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->RequestUpdate();
     }
   }
+}
+
+void QmitkSlicesInterpolator::OnTransversalSliceChanged(const itk::EventObject& e)
+{
+  this->OnAxialSliceChanged(e);
 }
 
 void QmitkSlicesInterpolator::OnSagittalSliceChanged(const itk::EventObject& e)
@@ -947,7 +960,7 @@ bool QmitkSlicesInterpolator::GetSliceForWindowsID(unsigned windowID, int& slice
   mitk::BaseRenderer* renderer(NULL);
 
   // find sliceDimension for windowID:
-  //   windowID 2: transversal window = renderWindow1
+  //   windowID 2: axial window = renderWindow1
   //   windowID 1: frontal window = renderWindow3
   //   windowID 0: sagittal window = renderWindow2
   if ( m_MultiWidget )

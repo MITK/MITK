@@ -79,13 +79,13 @@ void mitk::ExtractImageFilter::GenerateData()
     return;
   }
 
-  PlaneGeometry::PlaneOrientation orientation = PlaneGeometry::Transversal;
+  PlaneGeometry::PlaneOrientation orientation = PlaneGeometry::Axial;
 
   switch ( m_SliceDimension )
   {
     default:
     case 2: 
-      orientation = PlaneGeometry::Transversal;
+      orientation = PlaneGeometry::Axial;
       break;
     case 1: 
       orientation = PlaneGeometry::Frontal;
@@ -211,7 +211,7 @@ void mitk::ExtractImageFilter::GenerateOutputInformation()
   {
     default:
     case 2: 
-      // orientation = PlaneGeometry::Transversal;
+      // orientation = PlaneGeometry::Axial;
       tmpDimensions[0] = input->GetDimension(0);
       tmpDimensions[1] = input->GetDimension(1);
       break;

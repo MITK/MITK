@@ -1,3 +1,10 @@
+set(QT_USE_QTWEBKIT TRUE)
+include(${QT_USE_FILE})
+
+if(QT_QTWEBKIT_FOUND)
+  add_definitions(-DQT_WEBKIT)
+endif(QT_QTWEBKIT_FOUND)
+
 project(org_mitk_gui_qt_extapplication)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(

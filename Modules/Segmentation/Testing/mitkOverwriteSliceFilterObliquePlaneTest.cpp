@@ -47,7 +47,7 @@ static void OverwriteObliquePlaneTest(mitk::Image* workingImage, mitk::Image* re
   bool isRotated = false;
 
   mitk::PlaneGeometry::Pointer obliquePlane = mitk::PlaneGeometry::New();
-  obliquePlane->InitializeStandardPlane(workingImage->GetGeometry(), mitk::PlaneGeometry::Transversal, sliceindex, isFrontside, isRotated);
+  obliquePlane->InitializeStandardPlane(workingImage->GetGeometry(), mitk::PlaneGeometry::Axial, sliceindex, isFrontside, isRotated);
   mitk::Point3D origin = obliquePlane->GetOrigin();
   mitk::Vector3D normal;
   normal = obliquePlane->GetNormal();    

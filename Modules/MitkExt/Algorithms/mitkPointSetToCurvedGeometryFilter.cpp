@@ -120,7 +120,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateData()
     m_XYPlane = mitk::PlaneGeometry::New();
     m_XZPlane = mitk::PlaneGeometry::New();
     m_YZPlane = mitk::PlaneGeometry::New();
-    m_XYPlane->InitializeStandardPlane ( imageGeometry, mitk::PlaneGeometry::Transversal );
+    m_XYPlane->InitializeStandardPlane ( imageGeometry, mitk::PlaneGeometry::Axial );
     m_YZPlane->InitializeStandardPlane ( imageGeometry, mitk::PlaneGeometry::Sagittal );
     m_XZPlane->InitializeStandardPlane ( imageGeometry, mitk::PlaneGeometry::Frontal );
   }

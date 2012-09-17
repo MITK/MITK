@@ -56,6 +56,10 @@ mitk::ToolManager::~ToolManager()
   for (DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
     (*dataIter)->RemoveObserver(m_WorkingDataObserverTags[(*dataIter)]);
 
+  if(this->GetDataStorage() != NULL)
+    this->GetDataStorage()->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<ToolManager, const mitk::DataNode*>
+        ( this, &ToolManager::OnNodeRemoved ));
+
   if (m_ActiveTool)
   {
     m_ActiveTool->Deactivated();
@@ -65,6 +69,7 @@ mitk::ToolManager::~ToolManager()
     m_ActiveToolID = -1; // no tool active
 
     ActiveToolChanged.Send();
+
   }
   for ( NodeTagMapType::iterator observerTagMapIter = m_ReferenceDataObserverTags.begin(); observerTagMapIter != m_ReferenceDataObserverTags.end(); ++observerTagMapIter )
   {
@@ -111,8 +116,19 @@ mitk::Tool* mitk::ToolManager::GetToolById(int id)
 
 bool mitk::ToolManager::ActivateTool(int id)
 {
+
+  if(this->GetDataStorage())
+    {
+      this->GetDataStorage()->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<ToolManager, const mitk::DataNode*>
+        ( this, &ToolManager::OnNodeRemoved ) );
+    }
+
   //MITK_INFO << "ToolManager::ActivateTool("<<id<<")"<<std::endl;
   //if( GetToolById(id) == NULL ) return false; // NO, invalid IDs are actually used here. Parameter -1 or anything that does not exists will deactivate all tools!
+
+  //If a tool is deactivated set the event notification policy of the global interaction to multiple again
+  if (id == -1)
+    GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_MULTIPLE);
 
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
 
@@ -148,6 +164,8 @@ bool mitk::ToolManager::ActivateTool(int id)
       {
         m_ActiveTool->Activated();
         GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+        //If a tool is activated set event notification policy to one
+        GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
       }
     }
   }
@@ -178,6 +196,8 @@ void mitk::ToolManager::SetReferenceData(DataVectorType data)
     m_ReferenceDataObserverTags.clear();
     for ( DataVectorType::iterator dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter )
     {
+      
+
       //MITK_INFO << "Observing " << (void*)(*dataIter) << std::endl;
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheReferenceDataDeleted );
@@ -491,5 +511,18 @@ int mitk::ToolManager::GetToolID( const Tool* tool )
     }
   }
   return -1;
+}
+
+
+void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode* node)
+{
+  //check if the data of the node is typeof Image
+  /*if(dynamic_cast<mitk::Image*>(node->GetData()))
+  {*/
+    //check all storage vectors
+    OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode*>(node), itk::DeleteEvent());
+    OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
+    OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
+  //}
 }
 

@@ -178,7 +178,7 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Setting planegeometry3 to the backside of planegeometry2: " <<std::endl;
   mitk::PlaneGeometry::Pointer planegeometry3 = mitk::PlaneGeometry::New();
-  planegeometry3->InitializeStandardPlane(planegeometry2, mitk::PlaneGeometry::Transversal, 0, false);
+  planegeometry3->InitializeStandardPlane(planegeometry2, mitk::PlaneGeometry::Axial, 0, false);
 
 
   std::cout << "Testing SlicedGeometry3D::InitializeEvenlySpaced(planegeometry3, zSpacing = 1, slices = 5, flipped = false): " <<std::endl;

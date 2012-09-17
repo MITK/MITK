@@ -32,7 +32,7 @@ class QmitkStepperAdapter;
  *
  * \class QmitkImageNavigatorView
  *
- * \brief Provides a means to scan quickly through a dataset via Transversal,
+ * \brief Provides a means to scan quickly through a dataset via Axial,
  * Coronal and Sagittal sliders, displaying millimetre location and stepper position.
  *
  * For images, the stepper position corresponds to a voxel index. For other datasets
@@ -83,7 +83,7 @@ protected:
 
   Ui::QmitkImageNavigatorViewControls m_Controls;
 
-  QmitkStepperAdapter* m_TransversalStepper;
+  QmitkStepperAdapter* m_AxialStepper;
   QmitkStepperAdapter* m_SagittalStepper;
   QmitkStepperAdapter* m_FrontalStepper;
   QmitkStepperAdapter* m_TimeStepper;

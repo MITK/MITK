@@ -30,9 +30,20 @@ See LICENSE.txt or http://www.mitk.org for details.
   *        can be used to test if logging is thread-save by using multiple objects and let 
   *        them log simuntanously.
   */
-class mitkTestLoggingThread
+class mitkTestLoggingThread : public itk::Object
 {
+public:
+
+mitkClassMacro(mitkTestLoggingThread,itk::Object);
+mitkNewMacro2Param(mitkTestLoggingThread,int,itk::MultiThreader::Pointer);
+
 protected:
+
+mitkTestLoggingThread(int number, itk::MultiThreader::Pointer MultiThreader)
+  {
+  ThreadID = number;
+  m_MultiThreader = MultiThreader;
+  }
 
 bool LoggingRunning;
 
@@ -50,6 +61,7 @@ void LogMessages()
     MITK_DEBUG << "Test debugging stream in thread " << ThreadID;
     MITK_ERROR << "Test error stream in thread " << ThreadID;
     MITK_FATAL << "Test fatal stream in thread " << ThreadID;
+
     }
   }
 
@@ -76,16 +88,11 @@ static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* pInfoStruct)
 
 public:
 
-mitkTestLoggingThread(int number, itk::MultiThreader::Pointer MultiThreader)
-  {
-  ThreadID = number;
-  m_MultiThreader = MultiThreader;
-  }
-
 void Start()
   {
   LoggingRunning = true;
   m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);
+
   }
 
 void Stop()
@@ -151,31 +158,34 @@ static void TestObjectInfoLogging()
     MITK_TEST_CONDITION_REQUIRED(testSucceded,"Test logging of object information.");
     }
 
+
+
+
 static void TestThreadSaveLog()
     {
     bool testSucceded = true;
-
+    
     try
       {
       //initialize two threads...
-      itk::MultiThreader::Pointer myThreader = itk::MultiThreader::New();
-      mitkTestLoggingThread myThreadClass1 = mitkTestLoggingThread(1,myThreader);
-      mitkTestLoggingThread myThreadClass2 = mitkTestLoggingThread(2,myThreader);
+      itk::MultiThreader::Pointer multiThreader = itk::MultiThreader::New();
+      mitkTestLoggingThread::Pointer myThreadClass1 = mitkTestLoggingThread::New(1,multiThreader);
+      mitkTestLoggingThread::Pointer myThreadClass2 = mitkTestLoggingThread::New(2,multiThreader);
       
       //start them
-      myThreadClass1.Start();
-      myThreadClass2.Start();
-      
+      myThreadClass1->Start();
+      myThreadClass2->Start();
 
       //wait for 500 ms
       itksys::SystemTools::Delay(500);
 
       //stop them
-      myThreadClass1.Stop();
-      myThreadClass2.Stop();
+      myThreadClass1->Stop();
+      myThreadClass2->Stop();
 
-      //sleep again to let all threads end
-      itksys::SystemTools::Delay(500);
+      //Wait for all threads to end
+      multiThreader->TerminateThread(1);
+      multiThreader->TerminateThread(2);
       }
     catch(...)
       {

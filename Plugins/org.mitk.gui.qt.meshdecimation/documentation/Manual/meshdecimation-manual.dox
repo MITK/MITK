@@ -1,6 +1,6 @@
 /**
 
-\bundlemainpage{org_meshdecimation} The Mesh Decimation Module
+\page org_mitk_views_meshdecimation The Mesh Decimation Module
 
 \image html meshdecimation.png "Icon of the Module"
 

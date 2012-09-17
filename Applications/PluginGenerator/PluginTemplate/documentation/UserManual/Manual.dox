@@ -1,5 +1,5 @@
 /**
-\bundlemainpage{$(plugin-target)} $(plugin-name)
+\page $(plugin-target) $(plugin-name)
 
 \image html icon.xpm "Icon of $(plugin-name)"
 

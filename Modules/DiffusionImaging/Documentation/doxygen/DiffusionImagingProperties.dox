@@ -16,7 +16,7 @@ These properties govern the rendering of diffusion imaging data and the visualiz
   <li> VisibleOdfs - are there visible glyphs
   <li> VisibleOdfs_C - Toggles coronally visible glyphs
   <li> VisibleOdfs_S - Toggles sagittally visible glyphs
-  <li> VisibleOdfs_T - Toggles transversally visible glyphs
+  <li> VisibleOdfs_T - Toggles transversely visible glyphs
 </ul>
 
 */

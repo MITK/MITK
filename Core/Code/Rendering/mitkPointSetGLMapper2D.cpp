@@ -61,6 +61,7 @@ void mitk::PointSetGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     return;
 
   node->GetBoolProperty("show contour",            m_Polygon);
+  node->GetBoolProperty("close contour",            m_PolygonClosed);
   node->GetBoolProperty("show points",        m_ShowPoints);
   node->GetBoolProperty("show distances",     m_ShowDistances);
   node->GetIntProperty("distance decimal digits",     m_DistancesDecimalDigits);
@@ -254,6 +255,23 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     Point2D lastPt2d;   // last projected_p in display coordinates
     Point2D preLastPt2d;// projected_p in display coordinates before lastPt2d
 
+    Point2D lastPt2DInPointSet; // The last point in the pointset in display coordinates
+    mitk::PointSet::DataType::PointType plob;
+    plob.Fill(0);
+    itkPointSet->GetPoint( itkPointSet->GetNumberOfPoints()-1, &plob);
+
+    //map lastPt2DInPointSet to display coordinates
+    float vtkp[3];
+
+    itk2vtk(plob, vtkp);
+    transform->TransformPoint(vtkp, vtkp);
+    vtk2itk(vtkp,p);
+
+    displayGeometry->Project(p, projected_p);
+
+    displayGeometry->Map(projected_p, lastPt2DInPointSet);
+    displayGeometry->WorldToDisplay(lastPt2DInPointSet, lastPt2DInPointSet);
+
     while(it!=end) // iterate over all points
     {
       lastP = p;        // valid only for counter > 0
@@ -262,7 +280,6 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
       preLastPt2d = lastPt2d; // valid only for counter > 1
       lastPt2d = pt2d;  // valid only for counter > 0
 
-      float vtkp[3];
 
       itk2vtk(it->Value(), vtkp);
       transform->TransformPoint(vtkp, vtkp);
@@ -413,77 +430,84 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
           if ( currentDistance * lastDistance > 0.5 ) // points on same side of plane
             drawLinesEtc = false;
         }
- 
-        if ( m_Polygon && counter > 0 && drawLinesEtc) // draw a line
+
+        // draw a line
+        if ((m_Polygon && counter>0 && drawLinesEtc) ||
+            (m_Polygon && m_PolygonClosed && drawLinesEtc))
         {
-          //get contour color property
-          float contourColor[4] = {unselectedColor[0], unselectedColor[1], unselectedColor[2], unselectedColor[3]};//so if no property set, then use unselected color
-          if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("contourcolor")) != NULL)
-          {
-            mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("contourcolor"))->GetValue();
-            contourColor[0] = tmpColor[0];
-            contourColor[1] = tmpColor[1];
-            contourColor[2] = tmpColor[2];
-            contourColor[3] = 1.0f;
-          }
-          else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("contourcolor")) != NULL)
-          {
-            mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("contourcolor"))->GetValue();
-            contourColor[0] = tmpColor[0];
-            contourColor[1] = tmpColor[1];
-            contourColor[2] = tmpColor[2];
-            contourColor[3] = 1.0f;
-          }
-          //set this color
-          glColor3f(contourColor[0],contourColor[1],contourColor[2]);
+           if ((counter == 0) && ( m_PolygonClosed))
+           {
+               lastPt2d = lastPt2DInPointSet;
+           }
 
-          glLineWidth( m_LineWidth );
-          glBegin (GL_LINES);
-          glVertex2fv(&pt2d[0]);
-          glVertex2fv(&lastPt2d[0]);
-          glEnd ();
-          glLineWidth(1.0);
-          if(m_ShowDistances) // calculate and print a distance
-          {
-            std::stringstream buffer;
-            float distance = vec.GetNorm();
-            buffer<<std::fixed <<std::setprecision(m_DistancesDecimalDigits)<<distance<<" mm";
+           //get contour color property
+           float contourColor[4] = {unselectedColor[0], unselectedColor[1], unselectedColor[2], unselectedColor[3]};//so if no property set, then use unselected color
+           if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("contourcolor")) != NULL)
+           {
+              mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("contourcolor"))->GetValue();
+              contourColor[0] = tmpColor[0];
+              contourColor[1] = tmpColor[1];
+              contourColor[2] = tmpColor[2];
+              contourColor[3] = 1.0f;
+           }
+           else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("contourcolor")) != NULL)
+           {
+              mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("contourcolor"))->GetValue();
+              contourColor[0] = tmpColor[0];
+              contourColor[1] = tmpColor[1];
+              contourColor[2] = tmpColor[2];
+              contourColor[3] = 1.0f;
+           }
+           //set this color
+           glColor3f(contourColor[0],contourColor[1],contourColor[2]);
 
-            Vector2D vec2d = pt2d-lastPt2d;
-            makePerpendicularVector2D(vec2d, vec2d);
+           glLineWidth( m_LineWidth );
+           glBegin (GL_LINES);
+           glVertex2fv(&pt2d[0]);
+           glVertex2fv(&lastPt2d[0]);
+           glEnd ();
+           glLineWidth(1.0);
+           if(m_ShowDistances) // calculate and print a distance
+           {
+              std::stringstream buffer;
+              float distance = vec.GetNorm();
+              buffer<<std::fixed <<std::setprecision(m_DistancesDecimalDigits)<<distance<<" mm";
 
-            Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d)*0.5+vec2d*text2dDistance;
+              Vector2D vec2d = pt2d-lastPt2d;
+              makePerpendicularVector2D(vec2d, vec2d);
 
-            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-            OpenGLrenderer->WriteSimpleText(buffer.str(), pos2d[0], pos2d[1]);
-            //this->WriteTextXY(pos2d[0], pos2d[1], buffer.str(),renderer);
-          }
+              Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d)*0.5+vec2d*text2dDistance;
 
-          if(m_ShowAngles && counter > 1 ) // calculate and print the angle btw. two lines
-          {
-            std::stringstream buffer;
-            //buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << "�";
-            buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << (char)176;
+              mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+              OpenGLrenderer->WriteSimpleText(buffer.str(), pos2d[0], pos2d[1]);
+              //this->WriteTextXY(pos2d[0], pos2d[1], buffer.str(),renderer);
+           }
 
-            Vector2D vec2d = pt2d-lastPt2d;
-            vec2d.Normalize();
-            Vector2D lastVec2d = lastPt2d-preLastPt2d;
-            lastVec2d.Normalize();
-            vec2d=vec2d-lastVec2d;
-            vec2d.Normalize();
+           if(m_ShowAngles && counter > 1 ) // calculate and print the angle btw. two lines
+           {
+              std::stringstream buffer;
+              //buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << "�";
+              buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << (char)176;
 
-            Vector2D pos2d = lastPt2d.GetVectorFromOrigin()+vec2d*text2dDistance*text2dDistance;
+              Vector2D vec2d = pt2d-lastPt2d;
+              vec2d.Normalize();
+              Vector2D lastVec2d = lastPt2d-preLastPt2d;
+              lastVec2d.Normalize();
+              vec2d=vec2d-lastVec2d;
+              vec2d.Normalize();
 
-            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-            OpenGLrenderer->WriteSimpleText(buffer.str(), pos2d[0], pos2d[1]);
-            //this->WriteTextXY(pos2d[0], pos2d[1], buffer.str(),renderer);
-          }
-      }
+              Vector2D pos2d = lastPt2d.GetVectorFromOrigin()+vec2d*text2dDistance*text2dDistance;
+
+              mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+              OpenGLrenderer->WriteSimpleText(buffer.str(), pos2d[0], pos2d[1]);
+              //this->WriteTextXY(pos2d[0], pos2d[1], buffer.str(),renderer);
+           }
+        }
         counter++;
       }
       ++it;
       if(selIt != selEnd && !pointDataBroken)
-        ++selIt;
+         ++selIt;
       j++;
     }
 
@@ -498,6 +522,7 @@ void mitk::PointSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::
   node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite ); //width of the cross marking a point
   node->AddProperty( "point 2D size", mitk::IntProperty::New(8), renderer, overwrite ); // length of the cross marking a point // length of an edge of the box marking a point
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite ); // contour of the line between points
+  node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite ); 
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite ); //show or hide points 
   node->AddProperty( "show distances", mitk::BoolProperty::New(false), renderer, overwrite ); //show or hide distance measure (not always available)
   node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite ); //set the number of decimal digits to be shown

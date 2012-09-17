@@ -111,6 +111,10 @@ protected slots:
     \brief Slot invoked when the video texture checkbox is checked. Enables the texture of the surface
     */
     void OnVideoTextureCheckBoxChecked(bool checked);
+    /*!
+    \brief Slot invoked when user alters the coronal window input from RGB to Intensity or vice versa.
+    */
+    void OnChangeCoronalWindowOutput(int index);
 
 protected:
 

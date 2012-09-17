@@ -702,10 +702,10 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
 
-  std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Transversal, zPosition = 0, frontside=true): " <<std::endl;
+  std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition = 0, frontside=true): " <<std::endl;
   planegeometry->InitializeStandardPlane(clonedplanegeometry);
 
-  std::cout << "Testing origin of transversally initialized version: ";
+  std::cout << "Testing origin of axially initialized version: ";
   if(mitk::Equal(planegeometry->GetOrigin(), origin)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -713,7 +713,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing GetCornerPoint(0) of transversally initialized version: ";
+  std::cout << "Testing GetCornerPoint(0) of axially initialized version: ";
   if(mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -721,7 +721,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing width, height and thickness (in units) of transversally initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ";
+  std::cout << "Testing width, height and thickness (in units) of axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ";
   if(!mitk::Equal(planegeometry->GetExtent(0), width) || !mitk::Equal(planegeometry->GetExtent(1), height) || !mitk::Equal(planegeometry->GetExtent(2), 1))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -729,7 +729,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing width, height and thickness (in mm) of transversally initialized version: ";
+  std::cout << "Testing width, height and thickness (in mm) of axially initialized version: ";
   if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM) || !mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM) || !mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -737,7 +737,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing GetAxisVector() of transversally initialized version: ";
+  std::cout << "Testing GetAxisVector() of axially initialized version: ";
   if((mitk::Equal(planegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), bottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), normal)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -929,14 +929,14 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
 
 
 
-  //set origin back to the one of the transversal slice:
+  //set origin back to the one of the axial slice:
   origin = clonedplanegeometry->GetOrigin();
-  std::cout << "Testing backside initialization: InitializeStandardPlane(clonedplanegeometry, planeorientation = Transversal, zPosition = 0, frontside=false, rotated=true): " <<std::endl;
-  planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Transversal, 0, false, true);
+  std::cout << "Testing backside initialization: InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition = 0, frontside=false, rotated=true): " <<std::endl;
+  planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Axial, 0, false, true);
   mitk::Point3D backsideorigin;
   backsideorigin=origin+clonedplanegeometry->GetAxisVector(1);//+clonedplanegeometry->GetAxisVector(2);
 
-  std::cout << "Testing origin of backsidedly, transversally initialized version: ";
+  std::cout << "Testing origin of backsidedly, axially initialized version: ";
   if(mitk::Equal(planegeometry->GetOrigin(), backsideorigin)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -954,7 +954,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing width, height and thickness (in units) of backsidedly, transversally initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ";
+  std::cout << "Testing width, height and thickness (in units) of backsidedly, axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ";
   if(!mitk::Equal(planegeometry->GetExtent(0), width) || !mitk::Equal(planegeometry->GetExtent(1), height) || !mitk::Equal(planegeometry->GetExtent(2), 1))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -962,7 +962,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing width, height and thickness (in mm) of backsidedly, transversally initialized version: ";
+  std::cout << "Testing width, height and thickness (in mm) of backsidedly, axially initialized version: ";
   if(!mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM) || !mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM) || !mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -970,7 +970,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing GetAxisVector() of backsidedly, transversally initialized version: ";
+  std::cout << "Testing GetAxisVector() of backsidedly, axially initialized version: ";
   if((mitk::Equal(planegeometry->GetAxisVector(0), right)==false) || (mitk::Equal(planegeometry->GetAxisVector(1), -bottom)==false) || (mitk::Equal(planegeometry->GetAxisVector(2), -normal)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;

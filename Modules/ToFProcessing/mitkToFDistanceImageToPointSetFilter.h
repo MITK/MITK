@@ -95,9 +95,14 @@ namespace mitk
     void SetSubset( mitk::PointSet::Pointer pointSet);
 
     /*!
-    \brief Set the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units (=true) or interpixeldistances and focal length in mm (=false)
+    \brief Sets the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units (=true) or interpixeldistances and focal length in mm (=false)
     */
     void SetReconstructionMode(bool withoutInterpixdist = true);
+
+    /*!
+    \brief Returns the reconstruction mode
+    */
+    bool GetReconstructionMode();
 
 
   protected:

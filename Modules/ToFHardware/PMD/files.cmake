@@ -4,7 +4,7 @@ SET(CPP_FILES
   mitkToFCameraPMDCamCubeDeviceFactory.cpp
   mitkToFCameraPMDCamCubeController.cpp
 
-  PMDCamCubeModuleActivator.cpp
+  mitkPMDModuleActivator.cpp
 
   mitkToFCameraPMDController.cpp
 

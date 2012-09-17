@@ -39,8 +39,6 @@ SET(CPP_FILES
 #  mitkToFCameraMESASR4000ControllerStub.cpp
 #  mitkToFCameraMESASR4000Device.cpp
 #  mitkToFCameraMESASR4000DeviceFactory.cpp
-#--------Kinect Device------
-#  mitkKinectDeviceFactory.cpp
 
 )
 

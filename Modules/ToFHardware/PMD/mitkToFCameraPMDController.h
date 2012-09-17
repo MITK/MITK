@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPMDCamCubeModuleExports.h"
 #include "mitkCommon.h"
-#include "mitkToFCameraPMDController.h"
+
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"

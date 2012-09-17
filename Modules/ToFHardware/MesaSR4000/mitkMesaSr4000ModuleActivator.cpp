@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkMesaSr4000Activator_h
-#define __mitkMesaSr4000Activator_h
+#ifndef __mitkMESASR4000Activator_h
+#define __mitkMESASR4000Activator_h
 
 // Microservices
 #include <usServiceRegistration.h>
@@ -72,5 +72,5 @@ private:
 
 };
 }
-US_EXPORT_MODULE_ACTIVATOR(mitkMesaSr4000Module, mitk::MesaSr4000ModuleActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitkMESASR4000Module, mitk::MESASR4000Activator)
 #endif

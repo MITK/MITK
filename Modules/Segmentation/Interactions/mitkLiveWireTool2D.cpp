@@ -321,32 +321,32 @@ bool mitk::LiveWireTool2D::OnCheckPoint( Action* action, const StateEvent* state
   //Transition YES if click close to first control point 
   //
 
-  /* check if event can be handled */
-  if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
-
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-  /* END check if event can be handled */
-
-
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-
-
   mitk::StateEvent* newStateEvent = NULL;
 
-  mitk::Point3D click = positionEvent->GetWorldPosition();
-
-  mitk::Point3D first = this->m_Contour->GetVertexAt(0, timestep)->Coordinates;
-
-
-  if (first.EuclideanDistanceTo(click) < 1.5)
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent)
   {
-    //finish
-    newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
-  }else
-  {
-    //stay active
+    //stay in current state
     newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+  }
+  else
+  {
+    int timestep = positionEvent->GetSender()->GetTimeStep();
+
+    mitk::Point3D click = positionEvent->GetWorldPosition();
+
+    mitk::Point3D first = this->m_Contour->GetVertexAt(0, timestep)->Coordinates;
+
+
+    if (first.EuclideanDistanceTo(click) < 1.5)
+    {
+      //finish
+      newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+    }else
+    {
+      //stay active
+      newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+    }
   }
 
   this->HandleEvent( newStateEvent );

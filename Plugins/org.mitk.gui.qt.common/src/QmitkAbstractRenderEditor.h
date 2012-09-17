@@ -28,13 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_common_Export.h>
 
-// CTK for event handling
-#include "service/event/ctkEventHandler.h"
-#include "service/event/ctkEventAdmin.h"
-
 class QmitkAbstractRenderEditorPrivate;
-class ctkPluginContext;
-struct ctkEventAdmin;
 
 /**
  * \ingroup org_mitk_gui_qt_common
@@ -65,11 +59,10 @@ struct ctkEventAdmin;
  * \see ILinkedRenderWindowPart
  */
 class MITK_QT_COMMON QmitkAbstractRenderEditor : public berry::QtEditorPart,
-    public virtual mitk::IRenderWindowPart, public ctkEventHandler
+    public virtual mitk::IRenderWindowPart
 {
   Q_OBJECT
   Q_INTERFACES(mitk::IRenderWindowPart)
-  Q_INTERFACES(ctkEventHandler)
 
 public:
 
@@ -151,25 +144,7 @@ protected:
   /** \see berry::IEditorPart::IsSaveAsAllowed */
   bool IsSaveAsAllowed() const;
 
-  /**
-   * \see mitk::IRenderWindowPart::EnableInteractors(), providing default implementation in this class to minimise impact.
-   */
-  void EnableInteractors(bool enable, const QStringList& interactors = QStringList());
-
-  /**
-   * \see mitk::IRenderWindowPart::IsInteractorEnabled(), providing default implementation in this class to minimise impact.
-   */
-  bool IsInteractorEnabled(const QString& interactor) const;
-
-  /**
-   * \see mitk::IRenderWindowPart::GetInteractors(), providing default implementation in this class to minimise impact.
-   */
-  QStringList GetInteractors() const;
-
 public Q_SLOTS:
-
-  /// \brief Handle events coming from the event admin service.
-  void handleEvent(const ctkEvent& event);
 
 private:
 

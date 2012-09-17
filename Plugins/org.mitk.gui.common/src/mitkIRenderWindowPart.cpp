@@ -23,10 +23,6 @@ const QString IRenderWindowPart::DECORATION_LOGO = "logo";
 const QString IRenderWindowPart::DECORATION_MENU = "menu";
 const QString IRenderWindowPart::DECORATION_BACKGROUND = "background";
 
-const QString IRenderWindowPart::INTERACTOR_OFF = "off";
-const QString IRenderWindowPart::INTERACTOR_MITK = "mitk";
-const QString IRenderWindowPart::INTERACTOR_PACS = "pacs";
-
 IRenderWindowPart::~IRenderWindowPart() {}
 
 }

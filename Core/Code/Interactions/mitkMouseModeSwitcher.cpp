@@ -108,28 +108,10 @@ void mitk::MouseModeSwitcher::SetInteractionScheme( InteractionScheme scheme )
       this->SelectMouseMode( MousePointer );
       break;
     } // case PACS
-  case OFF:
-    {
-      ListenerList::iterator iter;
-      for ( iter=m_ListenersForMITK.begin(); iter!=m_ListenersForMITK.end(); iter++ )
-      {
-        m_GlobalInteraction->RemoveListener( (*iter) );
-      }
-      for ( iter=m_ListenersForPACS.begin(); iter!=m_ListenersForPACS.end(); iter++ )
-      {
-        m_GlobalInteraction->RemoveListener( (*iter) );
-      }
-      break;
-    } // case OFF
   } // switch
 
 
   m_ActiveInteractionScheme = scheme;
-}
-
-mitk::MouseModeSwitcher::InteractionScheme mitk::MouseModeSwitcher::GetInteractionScheme() const
-{
-  return m_ActiveInteractionScheme;
 }
 
 void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )

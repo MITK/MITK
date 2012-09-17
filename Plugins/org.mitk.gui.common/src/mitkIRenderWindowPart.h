@@ -68,10 +68,6 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   static const QString DECORATION_MENU; // = "menu"
   static const QString DECORATION_BACKGROUND; // = "background;
 
-  static const QString INTERACTOR_OFF; // - "off"
-  static const QString INTERACTOR_MITK; // = "mitk"
-  static const QString INTERACTOR_PACS; // = "pacs"
-
   virtual ~IRenderWindowPart();
 
   /**
@@ -225,42 +221,6 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    * \return A list of supported decoration names.
    */
   virtual QStringList GetDecorations() const = 0;
-
-  /**
-   * Enable \e interactors like mouse interactors, keyboard interactors, etc.
-   *
-   * Interactors are implementation specific. A set of standardized interactor names is listed in
-   * GetInteractors();
-   *
-   * \param enable If <code>true</code> enable the interactors specified in <code>interactors</code>,
-   *        otherwise disable them.
-   * \param interactors A list of interactor names. If empty, all supported interactors are affected.
-   *
-   * \see GetInteractors()
-   */
-  virtual void EnableInteractors(bool enable, const QStringList& interactors = QStringList()) = 0;
-
-  /**
-   * Return if a specific interactor is enabled.
-   *
-   * \return <code>true</code> if the interactor is enabled, <code>false</code> if it is disabled or unknown.
-   *
-   * \see GetInteractors()
-   */
-  virtual bool IsInteractorEnabled(const QString& interactor) const = 0;
-
-  /**
-   * Get a list of supported interactors.
-   *
-   * The following interactor names are standardized and should not be used for other interactor types:
-   * <ul>
-   * <li>\e INTERACTOR_MITK
-   * <li>\e INTERACTOR_PACS
-   * </ul>
-   *
-   * \return A list of supported decoration names.
-   */
-  virtual QStringList GetInteractors() const = 0;
 };
 
 }

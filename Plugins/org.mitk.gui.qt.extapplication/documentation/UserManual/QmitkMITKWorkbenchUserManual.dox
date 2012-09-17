@@ -7,7 +7,7 @@ The MITK Workbench is used by developers. As such the kind and number of views i
 
 If you have been given such an executable by someone, please refer to the appropriate section of the online documentation for up to date usage information on any module. 
 
-<a href="http://docs.mitk.org/nightly-qt4/ModuleListPage.html">Nightly online documentation</a>
+<a href="http://docs.mitk.org/nightly-qt4/PluginListPage.html">Nightly online documentation</a>
 
 
 If you are using a nightly installer, the MITK Workbench will contain nearly all views available in MITK and as such most likely will seem confusing. Again the list of modules might be a good starting point if you want to have a rough idea of what could be of interest to you. 

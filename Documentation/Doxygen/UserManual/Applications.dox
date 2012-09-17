@@ -8,7 +8,7 @@ Available sections:
 
 \section ApplicationsPageUsingMITK Using MITK
 
-Many of the applications created with the use of MITK share common basic functionalities. Due to this, there is one manual which explains the basic usage of MITK. For more information on the use of the advanced features of an application please take a look the \ref ApplicationsPageApplicationsList , whereas if you are interested in a certain view further information can be found in \ref ModuleListPage .
+Many of the applications created with the use of MITK share common basic functionalities. Due to this, there is one manual which explains the basic usage of MITK. For more information on the use of the advanced features of an application please take a look the \ref ApplicationsPageApplicationsList , whereas if you are interested in a certain view further information can be found in \ref PluginListPage .
 
 The basic usage information on MITK can be found in \subpage MITKUserManualPage .
 

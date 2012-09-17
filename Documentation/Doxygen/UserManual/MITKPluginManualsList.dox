@@ -1,0 +1,37 @@
+/**
+\page PluginListPage MITK Plugin Manuals
+
+\section PluginListPageOverview Overview
+
+The plugins and bundles provide much of the extended functionality of MITK. Each encapsulates a solution to a problem and associated features. This way one can easily assemble the necessary capabilites for a workflow without adding a lot of bloat, by combining plugins as needed.
+
+The distinction between developer and end user use is for convenience only and mainly distinguishes which group a plugin is primarily aimed at.
+
+\section PluginListPageEndUserPluginList List of Plugins for End User Use
+
+  \li \subpage org_mitk_views_basicimageprocessing
+  \li \subpage org_mitk_views_datamanager
+  \li \subpage org_mitk_gui_qt_diffusionimaging
+  \li \subpage org_mitk_views_imagecropper
+  \li \subpage org_mitk_views_imagenavigator
+  \li \subpage org_mitk_gui_qt_measurementtoolbox
+  \li \subpage org_mitk_views_moviemaker
+  \li \subpage org_mitk_views_meshdecimation
+  \li \subpage org_mitk_views_pointsetinteraction
+  \li \subpage org_mitk_gui_qt_registration
+  \li \subpage org_mitk_views_segmentation
+  \li \subpage org_mitk_views_volumevisualization
+  \li \subpage org_mitk_gui_qt_dicom
+  \li \subpage org_mitk_gui_qt_ultrasound
+
+\section PluginListPageDevPluginList List of Plugins for Developer Use and Examples
+
+  \li \subpage org_surfacematerialeditor
+  \li \subpage org_toftutorial
+  \li \subpage org_mitk_gui_qt_examples
+  \li \subpage org_mitkexamplesopencv
+  \li \ref org_mitk_gui_qt_igtexample
+  \li \ref org_mitk_gui_qt_igttracking
+
+
+*/

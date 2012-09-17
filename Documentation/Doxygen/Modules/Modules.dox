@@ -90,9 +90,9 @@
 */
  
 /**
-  \defgroup ToolManagerEtAl Classes related to the Segmentation bundle
+  \defgroup ToolManagerEtAl Classes related to the Segmentation plugin
 
-  \brief A couple of classes related to the Segmentation bundle. See also
+  \brief A couple of classes related to the Segmentation plugin. See also
   \ref QmitkSegmentationTechnicalPage
 */
 

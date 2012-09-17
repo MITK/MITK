@@ -39,7 +39,7 @@ The view also allows the generation of artificial diffusion weighted or Q-Ball i
 
 \section QmitkDiffusionImagingUserManualQBallReconstruction Q-Ball Reconstruction
 
-The q-ball reonstruction bundle implements a variety of reconstruction methods. The different reconstruction methods are described in the following:
+The q-ball reonstruction view implements a variety of reconstruction methods. The different reconstruction methods are described in the following:
 \li <b>Numerical:</b> The original, numerical q-ball reconstruction presented by Tuch et al. [5]
 \li <b>Standard (SH):</b> Descoteaux's reconstruction based on spherical harmonic basis functions [6]
 \li <b>Solid Angle (SH):</b> Aganj's reconstruction with solid angle consideration [7]

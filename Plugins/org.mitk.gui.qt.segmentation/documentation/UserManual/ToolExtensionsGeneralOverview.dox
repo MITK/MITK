@@ -1,6 +1,6 @@
 /**
 
-\page toolextensions How to extend the Segmentation bundle with external tools
+\page toolextensions How to extend the Segmentation view with external tools
 
 <ul>
 <li> \ref ToolExtensionsGeneralOverview2 </li>
@@ -17,7 +17,7 @@
 
 \section ToolExtensionsGeneralOverview2 Introduction
 
-The application for manual segmentation in MITK (Segmentation bundle) comes
+The application for manual segmentation in MITK (Segmentation view) comes
 with a tool class framework that is extensible with new tools (description at
 \ref QmitkSegmentationTechnicalPage). The usual way
 to create new tools (since it is mostly used inside DKFZ) is to just add new

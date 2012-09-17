@@ -27,15 +27,15 @@ The workflow to use this view is:
 
 \image html Workflow.png
 
-The workflow is repeatedly useable with the same or different measurement figures, which are correlated to the choosen image and can be saved together with it for future use. On pressing the Measurement icon (see picture below the page title) in the view button line the basic appearance of the bundle is as follws.
+The workflow is repeatedly useable with the same or different measurement figures, which are correlated to the choosen image and can be saved together with it for future use. On pressing the Measurement icon (see picture below the page title) in the view button line the basic appearance of the view is as follws.
 
 \image html Basic_Screen_edited.JPG
 
-The standard working plane is "Axial" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to 3M Application Bundle User Manual.
+The standard working plane is "Axial" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to the application user manual.
 
 \section QmitkMeasurementUserManualFeatures Features
 
-The bundle as it is depicted below offers the following features in the order of apperance on the image from top to bottom: 
+The view as it is depicted below offers the following features in the order of apperance on the image from top to bottom: 
 \image html Measurement_View.JPG
 The first information is the selected image's name (here: DICOM-MRI-Image) followed by the measurement figures button line with the seven measurement figures. From left to right the buttons are connected with the following functions:
 
@@ -64,7 +64,7 @@ Below the buttonline the statistics window is situated, it displays the results 
 
 \image html  Image_processed.JPG
 
-The last row contains again a button line to swap from the measurement bundle (activated in the image) to other supported MITK 3M3 bundles.
+The last row contains again a button line to swap from the measurement perspective (activated in the image) to other supported MITK perspectives.
   
 \section QmitkMeasurementUserManualUsage Usage
 

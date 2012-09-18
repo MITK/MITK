@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <QMessageBox>
 
-#include "org_mitk_example_gui_views_Activator.h"
+#include "org_mitk_example_gui_customviewer_views_Activator.h"
 
 #include "mitkIDataStorageService.h"
 #include "mitkDicomSeriesReader.h"
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include <berryIWorkbenchPage.h>
 
-const std::string DicomView::VIEW_ID = "org.mitk.views.dicomview"; 
+const std::string DicomView::VIEW_ID = "org.mitk.customviewer.views.dicomview"; 
 
 DicomView::DicomView()
   : m_Parent(0)
@@ -37,7 +37,7 @@ DicomView::DicomView()
 DicomView::~DicomView()
 {
 }
-
+//! [DicomViewCreatePartControl]
 void DicomView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets
@@ -55,12 +55,14 @@ void DicomView::CreateQtPartControl(QWidget *parent)
 
   m_Parent->setEnabled(true);
 }
-
+//! [DicomViewCreatePartControl]
+//! [DicomViewCreateAddDataNodeInformation]
 void DicomView::AddDataNodeFromDICOM(const QStringList& Properties)
 {
   QString seriesUID = Properties.at(3);
   QString path = Properties.at(5);
-  
+//! [DicomViewCreateAddDataNodeInformation]  
+//! [DicomViewCreateAddDataNodeLoadSeries] 
   std::list<std::string> qualifiedUIDs;
   mitk::DicomSeriesReader::StringContainer seriesToLoad;
   std::size_t found;
@@ -81,22 +83,24 @@ void DicomView::AddDataNodeFromDICOM(const QStringList& Properties)
   }
 
   mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(seriesToLoad);
+//! [DicomViewCreateAddDataNodeLoadSeries] 
   if (node.IsNull())
   {
       MITK_ERROR << "Could not load series: " << seriesUID.toStdString();
   }
   else
   {        
+//! [DicomViewCreateAddDataNode] 
       this->GetDataStorage()->Add(node);
-
-      ctkServiceReference serviceReference = org_mitk_example_gui_views_Activator::GetPluginContext()->getServiceReference<mitk::IDataStorageService>();
-      mitk::IDataStorageService* storageService = org_mitk_example_gui_views_Activator::GetPluginContext()->getService<mitk::IDataStorageService>(serviceReference);
-      mitk::RenderingManager::GetInstance()->SetDataStorage(storageService->GetActiveDataStorage().GetPointer()->GetDataStorage());
+//! [DicomViewCreateAddDataNode] 
+      mitk::RenderingManager::GetInstance()->SetDataStorage(this->GetDataStorage());
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
+//! [DicomViewCreateAddDataNodeActivatePersp] 
       berry::IWorkbenchWindow::Pointer window = this->GetSite()->GetWorkbenchWindow();
       std::string perspectiveId = "org.mitk.example.viewerperspective";
       window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
+//! [DicomViewCreateAddDataNodeActivatePersp] 
   }
 }
 

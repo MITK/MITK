@@ -15,29 +15,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef org_mitk_example_gui_views_Activator_H
-#define org_mitk_example_gui_views_Activator_H
+#ifndef VIEWERPERSPECTIVE_H_
+#define VIEWERPERSPECTIVE_H_
 
-#include <ctkPluginActivator.h>
-class ctkPluginContext;
+#include <berryIPerspectiveFactory.h>
 
-class org_mitk_example_gui_views_Activator :
-  public QObject, public ctkPluginActivator
+#include <QObject>
+//! [MinimalViewerPerspectiveClassDeclaration]
+class ViewerPerspective : public QObject, public berry::IPerspectiveFactory
 {
   Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
+  Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  ViewerPerspective();
 
-  static ctkPluginContext* GetPluginContext();
-
-private:
-
-  static ctkPluginContext* PluginContext;
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 
 };
-
-#endif // org_mitk_example_gui_views_Activator_H
+//! [MinimalViewerPerspectiveClassDeclaration]
+#endif /* VIEWERPERSPECTIVE_H_ */

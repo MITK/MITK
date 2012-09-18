@@ -5,7 +5,5 @@ set(Plugin-ContactAddress "http://www.mitk.org")
 set(Require-Plugin
  org.mitk.core.ext # Registers file reader factories 
  org.mitk.gui.qt.application # Initializes GlobalInteraction and registers MITK Core factories
- #org.mitk.gui.qt.datamanager
- #org.mitk.example.gui.views # for the views
  )
 

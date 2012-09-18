@@ -29,16 +29,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWorkbenchUtil.h>
 
 #include <berryIQtStyleManager.h>
+#include <berryIWorkbench.h>
 
 
 CustomViewerWorkbenchWindowAdvisor::CustomViewerWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
-: berry::WorkbenchWindowAdvisor(configurer), FileOpenAction(0)
+: berry::WorkbenchWindowAdvisor(configurer)
 {
 }
 
 CustomViewerWorkbenchWindowAdvisor::~CustomViewerWorkbenchWindowAdvisor()
 {
-  delete this->FileOpenAction;
 }
 
 void CustomViewerWorkbenchWindowAdvisor::PostWindowCreate()
@@ -47,25 +47,23 @@ void CustomViewerWorkbenchWindowAdvisor::PostWindowCreate()
   //static_cast<QMainWindow*>(this->GetWindowConfigurer()->GetWindow()->GetShell()->GetControl())->dumpObjectTree();
 }
 
+// //! [CustomViewerWorkbenchWindowAdvisorPreWindowOpen]
 void CustomViewerWorkbenchWindowAdvisor::PreWindowOpen()
 {
   berry::IWorkbenchWindowConfigurer::Pointer configurer = this->GetWindowConfigurer();
-  configurer->SetTitle("CustomViewer");
+  configurer->SetTitle("Spartan Viewer");
   configurer->SetShowMenuBar(false);
   configurer->SetShowCoolBar(false);
-  configurer->SetShowPerspectiveBar(true);
+  configurer->SetShowPerspectiveBar(false);
   configurer->SetShowStatusLine(false);
-
-  this->GetWindowConfigurer()->SetTitle("Spartan Viewer");
 }
-
+// //! [CustomViewerWorkbenchWindowAdvisorPreWindowOpen]
+// //! [WorkbenchWindowAdvisorCreateWindowContentsHead]
 void CustomViewerWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::Pointer shell)
 {
-  berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
-  if (!this->FileOpenAction) this->FileOpenAction = new QmitkFileOpenAction(window);
-
   //the all containing main window
   QMainWindow* mainWindow = static_cast<QMainWindow*>(shell->GetControl());
+// //! [WorkbenchWindowAdvisorCreateWindowContentsHead]
   mainWindow->setVisible(true);
 
   //the widgets
@@ -89,7 +87,6 @@ void CustomViewerWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::Poin
   OpenFileButton->setMaximumWidth(100);
   OpenFileButton->setObjectName("FileOpenButton");
   OpenFileButton->setText("Open File");
-  //OpenFileButton->setDefaultAction(this->FileOpenAction);
   QObject::connect(OpenFileButton, SIGNAL( clicked() ), this, SLOT( OpenFile() ));
 
   QWidget* PageComposite = new QWidget(CentralWidget);
@@ -110,7 +107,7 @@ void CustomViewerWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::Poin
   PageCompositeLayout->setContentsMargins(0,0,0,0);
   PageCompositeLayout->setSpacing(0);
   PageComposite->setLayout(PageCompositeLayout);
-  
+// //! [WorkbenchWindowAdvisorCreateWindowContents]    
   //all glued together
   mainWindow->setCentralWidget(CentralWidget);
   CentralWidgetLayout->addLayout(PerspectivesLayer);
@@ -120,13 +117,18 @@ void CustomViewerWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::Poin
   PerspectivesLayer->addSpacing(300);
   PerspectivesLayer->addWidget(OpenFileButton);
 
+  //for style customization convenience
+  /*PerspectivesLayer->addSpacing(10);
+  PerspectivesLayer->addWidget(StyleUpdateButton);*/
+
   //for correct initial layout, see also bug#1654
   CentralWidgetLayout->activate();
   CentralWidgetLayout->update();
 
   this->GetWindowConfigurer()->CreatePageComposite(static_cast<void*>(PageComposite));
+// //! [WorkbenchWindowAdvisorCreateWindowContents]  
 }
-
+// //! [WorkbenchWindowAdvisorUpdateStyle]
 void CustomViewerWorkbenchWindowAdvisor::UpdateStyle()
 {
   ctkPluginContext* pluginContext = org_mitk_example_gui_customviewer_Activator::GetPluginContext();
@@ -140,7 +142,8 @@ void CustomViewerWorkbenchWindowAdvisor::UpdateStyle()
   
   styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss");
 }
-
+// //! [WorkbenchWindowAdvisorUpdateStyle]
+// //! [WorkbenchWindowAdvisorOpenFile]
 void CustomViewerWorkbenchWindowAdvisor::OpenFile()
 {
   
@@ -151,10 +154,12 @@ void CustomViewerWorkbenchWindowAdvisor::OpenFile()
 
   if (fileNames.empty()) 
     return;
-/*
-  d->setLastFileOpenPath(fileNames.front());*/
 
   mitk::WorkbenchUtil::LoadFiles(fileNames, this->GetWindowConfigurer()->GetWindow(), false);
-
-
+// //! [WorkbenchWindowAdvisorOpenFile]
+// //! [WorkbenchWindowAdvisorOpenFilePerspActive]
+  berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
+  std::string perspectiveId = "org.mitk.example.viewerperspective";
+  window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
+// //! [WorkbenchWindowAdvisorOpenFilePerspActive]
 }

@@ -20,9 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginActivator.h>
 class ctkPluginContext;
-
-class org_mitk_example_gui_customviewer_Activator :
-  public QObject, public ctkPluginActivator
+// //! [PluginActivatorHeader]
+class org_mitk_example_gui_customviewer_Activator : public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)
@@ -39,5 +38,5 @@ private:
   static ctkPluginContext* PluginContext;
 
 };
-
+// //! [PluginActivatorHeader]
 #endif // org_mitk_example_gui_customviewer_Activator_H

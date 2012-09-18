@@ -23,7 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  *  \brief A Listener class for perspective changes. Neccessary for consistent tab activation in QtPerspectiveSwitcherTabBar instances.
  */
+// //! [SwitchPerspectiveListener]
 struct QtPerspectiveSwitcherTabBarListener : public berry::IPerspectiveListener
+// //! [SwitchPerspectiveListener]
 {
   /**
    * Constructor. 
@@ -43,11 +45,14 @@ struct QtPerspectiveSwitcherTabBarListener : public berry::IPerspectiveListener
   /**
    * Sets the corresponding perspective index within the associated QtPerspectiveSwitcherTabBar instance.
    */
+// //! [SwitchPerspectiveListenerPerspectiveActivated]
   void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
     berry::IPerspectiveDescriptor::Pointer perspective)
   {
-    if (perspective->GetId() == "org.mitk.example.dicomperspective" && switcher->currentIndex() != 1) switcher->setCurrentIndex(1);
+    int index = perspective->GetId() == "org.mitk.example.viewerperspective" ? 0 : 1;
+    switcher->setCurrentIndex(index);
   }
+// //! [SwitchPerspectiveListenerPerspectiveActivated]
 
 private:
 
@@ -76,6 +81,7 @@ QtPerspectiveSwitcherTabBar::~QtPerspectiveSwitcherTabBar()
 {
 }
 
+// //! [PerspectiveSwitcherSwitchPerspective]
 void QtPerspectiveSwitcherTabBar::SwitchPerspective()
 {
   if (!this->tabChanged)
@@ -96,3 +102,4 @@ void QtPerspectiveSwitcherTabBar::SwitchPerspective()
     this->window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
   }
 }
+// //! [PerspectiveSwitcherSwitchPerspective]

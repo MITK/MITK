@@ -29,7 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  *  This subclass of QTabBar acts as a perspective bar in BlueBerry applications. Providing perspective switching functionality in a tab-bar like outfit, this class serves as an alternative to the ToolBar based berry::QtPerspectiveSwitcher class.
  */
+// //! [PerspectiveSwitcherDeclaration]
 class QtPerspectiveSwitcherTabBar : public QTabBar
+// //! [PerspectiveSwitcherDeclaration]
 {
   Q_OBJECT
 

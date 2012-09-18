@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkServiceTracker.h>
 #include <berryIBerryPreferences.h>
 #include <mitkIRenderingManager.h>
-#include "org_mitk_example_gui_views_Activator.h"
+#include "org_mitk_example_gui_customviewer_views_Activator.h"
 
 #include <QVBoxLayout>
 
@@ -40,7 +40,7 @@ public:
 
   AbstractRenderWindowViewPrivate()
     : m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance()))
-    , m_PrefServiceTracker(org_mitk_example_gui_views_Activator::GetPluginContext())
+    , m_PrefServiceTracker(org_mitk_example_gui_customviewer_views_Activator::GetPluginContext())
   {
     m_PrefServiceTracker.open();
   }
@@ -55,7 +55,7 @@ public:
   berry::IBerryPreferences::Pointer m_Prefs;
 };
 
-const std::string SimpleRenderWindowView::VIEW_ID = "org.mitk.views.simplerenderwindowview";
+const std::string SimpleRenderWindowView::VIEW_ID = "org.mitk.customviewer.views.simplerenderwindowview";
 
 
 SimpleRenderWindowView::SimpleRenderWindowView()

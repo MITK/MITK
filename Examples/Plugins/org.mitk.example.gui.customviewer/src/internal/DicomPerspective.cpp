@@ -16,19 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "DicomPerspective.h"
 #include "berryIFolderLayout.h"
-//#include "DicomView.h"
 
 DicomPerspective::DicomPerspective()
 {
 }
-
+// //! [DicomPerspCreateLayout]
 void DicomPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
-  //layout->SetFixed(true);
   std::string editorArea = layout->GetEditorArea();
   layout->SetEditorAreaVisible(false);
-  layout->AddStandaloneView("org.mitk.views.dicomview", false, 1, 1.0f, layout->GetEditorArea());
-  //layout->AddStandaloneView(DicomView::VIEW_ID, false, 1, 1.0f, layout->GetEditorArea());
-  layout->GetViewLayout("org.mitk.views.dicomview")->SetCloseable(false);
-  layout->GetViewLayout("org.mitk.views.dicomview")->SetMoveable(false);
+  layout->AddStandaloneView("org.mitk.customviewer.views.dicomview", false, berry::IPageLayout::LEFT, 1.0f, layout->GetEditorArea());
+  layout->GetViewLayout("org.mitk.customviewer.views.dicomview")->SetCloseable(false);
+  layout->GetViewLayout("org.mitk.customviewer.views.dicomview")->SetMoveable(false);
 }
+// //! [DicomPerspCreateLayout]

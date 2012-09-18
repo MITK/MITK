@@ -3,13 +3,13 @@
 <plugin>
   
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.dicomview"
+    <view id="org.mitk.customviewer.views.dicomview"
           name="Dicom View"
           class="DicomView"/>
   </extension>
   
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.simplerenderwindowview" 
+    <view id="org.mitk.customviewer.views.simplerenderwindowview" 
       name="Simple Render Window View" 
       class="SimpleRenderWindowView" />
   </extension>

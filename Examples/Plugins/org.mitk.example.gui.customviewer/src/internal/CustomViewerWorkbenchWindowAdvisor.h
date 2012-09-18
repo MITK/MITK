@@ -27,7 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 * This class suits the custom viewer plug-in. Menu bar, tool bar and status bar are made invisible, and the window title for the custom viewer is being set. The workbench window is being customized, i.e. a perspectives tab-bar is arranged according to the PageComposite. The PageComposite is then laid out according to perspective related contents by the WindowConfigurer. 
 * @see{ CustomViewerWorkbenchWindowAdvisor::PreWindowOpen(), CustomViewerWorkbenchWindowAdvisor::CreateWindowContents() }
 */
+// //! [CustomViewerWorkbenchWindowAdvisorClassDeclaration]
 class CustomViewerWorkbenchWindowAdvisor : public QObject, public berry::WorkbenchWindowAdvisor
+// //! [CustomViewerWorkbenchWindowAdvisorClassDeclaration]
 {
   Q_OBJECT
 
@@ -67,13 +69,6 @@ private slots:
   */
   void UpdateStyle();
   void OpenFile();
-
-private:
-
-  /**
-  * For direct data loading from file.
-  */
-  QmitkFileOpenAction* FileOpenAction;
 
 };
 

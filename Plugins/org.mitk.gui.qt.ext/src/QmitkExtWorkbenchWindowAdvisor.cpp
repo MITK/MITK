@@ -467,7 +467,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
 {
- openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
+ openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
 }
 
  berry::IViewRegistry* viewRegistry =

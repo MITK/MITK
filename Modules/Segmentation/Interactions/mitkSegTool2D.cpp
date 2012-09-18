@@ -54,7 +54,8 @@ mitk::SegTool2D::SegTool2D(const char* type)
  m_LastEventSender(NULL),
  m_LastEventSlice(0),
  m_Contourmarkername ("Position"),
- m_ShowMarkerNodes (true)
+ m_ShowMarkerNodes (true),
+ m_3DInterpolationEnabled(true)
 {
 }
 
@@ -258,7 +259,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   contourExtractor->Update();
   mitk::Surface::Pointer contour = contourExtractor->GetOutput();
 
-  if (contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
+  if (m_3DInterpolationEnabled && contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
   {
     unsigned int pos = this->AddContourmarker(positionEvent);
     mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
@@ -273,6 +274,11 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)
 {
     m_ShowMarkerNodes = status;
+}
+
+void mitk::SegTool2D::Enable3DInterpolation(bool enabled)
+{
+  m_3DInterpolationEnabled = enabled;
 }
 
 unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )

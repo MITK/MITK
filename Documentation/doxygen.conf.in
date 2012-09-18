@@ -1630,7 +1630,8 @@ PREDEFINED             = itkNotUsed(x)= \
                          "US_BEGIN_NAMESPACE= namespace mitk {" \
                          "US_END_NAMESPACE=}" \
                          "US_BASECLASS_NAME=itk::LightObject" \
-                         US_EXPORT=
+                         US_EXPORT= \
+                         "DEPRECATED(func)=func"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

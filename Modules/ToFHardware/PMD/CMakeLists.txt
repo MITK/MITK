@@ -33,7 +33,7 @@ MITK_CREATE_MODULE(mitkPMDCamCubeModule
   EXPORT_DEFINE MITK_PMDCAMCUBEMODULE_EXPORT
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
 )
-  Message("CamCube Module erfolgreich erstellt")
+  Message("PMD Module erfolgreich erstellt")
 
 add_subdirectory(Testing)
 ENDIF(MITK_USE_TOF_PMDCAMCUBE)

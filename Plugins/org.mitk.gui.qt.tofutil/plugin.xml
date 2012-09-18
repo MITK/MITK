@@ -7,9 +7,9 @@
           name="ToFUtil"
           class="QmitkToFUtilView" 
           icon="resources/iconToFUtilView.xpm" />
-    <view id="org.mitk.views.tofconnectview"
-          name="tofconnectview"
-          class="QmitkToFConnectView"
+    <view id="org.mitk.views.tofgeneration"
+          name="tofconnectview2"
+          class="QmitkToFDeviceGeneration"
           icon="resources/iconGenerationView.xpm" />
   </extension>
 

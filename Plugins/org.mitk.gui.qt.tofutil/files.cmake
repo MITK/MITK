@@ -4,19 +4,19 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   QmitkToFUtilView.cpp
-  QmitkToFConnectView.cpp
+  QmitkToFDeviceGeneration.cpp
   QmitkToFImageBackground.cpp
   mitkPluginActivator.cpp
 )
 
 set(UI_FILES
+  src/internal/QmitkToFDeviceGenerationControls.ui
   src/internal/QmitkToFUtilViewControls.ui
-  src/internal/QmitkToFConnectViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/QmitkToFUtilView.h
-  src/internal/QmitkToFConnectView.h
+  src/internal/QmitkToFDeviceGeneration.h
   src/internal/QmitkToFImageBackground.h
   src/internal/mitkPluginActivator.h
 )

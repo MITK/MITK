@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkToFConnectView_h
-#define QmitkToFConnectView_h
+#ifndef QmitkToFDeviceGeneration_h
+#define QmitkToFDeviceGeneration_h
 
 
-#include <ui_QmitkToFConnectViewControls.h>
+#include <ui_QmitkToFDeviceGenerationControls.h>
 #include <QmitkAbstractView.h>
 
 #include <QStringList>
@@ -27,12 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 /*!
-  \brief QmitkToFConnectView
+  \brief QmitkToFDeviceGeneration
 
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class QmitkToFConnectView : public QmitkAbstractView
+class QmitkToFDeviceGeneration : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -42,8 +42,8 @@ class QmitkToFConnectView : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
-    QmitkToFConnectView();
-    ~QmitkToFConnectView();
+    QmitkToFDeviceGeneration();
+    ~QmitkToFDeviceGeneration();
 
     void SetFocus();
 
@@ -59,10 +59,10 @@ class QmitkToFConnectView : public QmitkAbstractView
 
   protected:
 
-    Ui::QmitkToFConnectViewControls m_Controls;
+    Ui::QmitkToFDeviceGenerationControls m_Controls;
 
   private:
 
 };
 
-#endif // _QmitkToFConnectView_H_INCLUDED
+#endif // _QmitkToFDeviceGeneration_H_INCLUDED

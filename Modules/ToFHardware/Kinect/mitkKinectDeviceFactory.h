@@ -38,6 +38,11 @@ public:
    {
        return std::string("Kinect Factory");
    }
+//--------------------------Renaming the Device should be implemted in this method. it should be called by tge ToFAbstractDeviceFactory later on!
+         //   std::string GetCurrentDeviceName()
+         //{
+         //    return std::string("Kinect Divice")+Counter;
+         //}
 
 private:
 
@@ -50,6 +55,8 @@ private:
 
      return device.GetPointer();
    }
+//------------This member variable should be set here and is used to produce kinect1,kinect2, kinect m_DeviceNumber
+           //int m_DeviceNumber
 };
 }
 #endif

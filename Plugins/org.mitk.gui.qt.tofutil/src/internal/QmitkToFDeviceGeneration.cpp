@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // Qmitk
-#include "QmitkToFConnectView.h"
+#include "QmitkToFDeviceGeneration.h"
 
 // Qt
 #include <QString>
@@ -43,24 +43,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceRegistration.h>
 
 
-const std::string QmitkToFConnectView::VIEW_ID = "org.mitk.views.tofconnectview";
+const std::string QmitkToFDeviceGeneration::VIEW_ID = "org.mitk.views.tofgeneration";
 
-QmitkToFConnectView::QmitkToFConnectView()
+QmitkToFDeviceGeneration::QmitkToFDeviceGeneration()
 : QmitkAbstractView()
 {
 }
 
-QmitkToFConnectView::~QmitkToFConnectView()
+QmitkToFDeviceGeneration::~QmitkToFDeviceGeneration()
 {
 }
 
-void QmitkToFConnectView::SetFocus()
+void QmitkToFDeviceGeneration::SetFocus()
 {
-  //    this->m_Controls.m_CameraList->setFocus();
-  //    GetRegisteredDeviceFactories();
 }
 
-void QmitkToFConnectView::CreateQtPartControl( QWidget *parent )
+void QmitkToFDeviceGeneration::CreateQtPartControl( QWidget *parent )
   {
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
@@ -75,14 +73,14 @@ void QmitkToFConnectView::CreateQtPartControl( QWidget *parent )
   }
 
 //Creating a Device
-void QmitkToFConnectView::OnToFCameraConnected()
+void QmitkToFDeviceGeneration::OnToFCameraConnected()
 {
   if (m_Controls.m_DeviceFactoryServiceListWidget->GetIsServiceSelected() )
     {
       MITK_INFO << m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>()->GetFactoryName();
 
       mitk::IToFDeviceFactory* factory = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>();
-      dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice();
+      dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice(); // This line should be copied to the DeviceActivator to produce
     }
     else
     {

@@ -164,6 +164,10 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   double annotationOffset = 0.0;
 
+  //Get Global Opacity
+  float globalOpacity = 1.0;
+  node->GetFloatProperty("opacity", globalOpacity);
+
   // draw name near the first point (if present)
   std::string name = node->GetName();
   if ( m_DrawName && !name.empty() )
@@ -175,12 +179,14 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
         firstPoint[0] + 6.0, firstPoint[1] + 4.0,
         0,
         0,
-        0); //this is a shadow 
+        0,
+        globalOpacity ); //this is a shadow
       openGLrenderer->WriteSimpleText( name,
         firstPoint[0] + 5.0, firstPoint[1] + 5.0,
         m_LineColor[lineDisplayMode][0],
         m_LineColor[lineDisplayMode][1],
-        m_LineColor[lineDisplayMode][2] );
+        m_LineColor[lineDisplayMode][2],
+        globalOpacity );
     
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;
@@ -216,13 +222,15 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
         firstPoint[0] + 6.0, firstPoint[1] + 4.0 + annotationOffset,
         0,
         0,
-        0); //this is a shadow 
+        0,
+        globalOpacity ); //this is a shadow
 
       openGLrenderer->WriteSimpleText( quantityString.str().c_str(),
         firstPoint[0] + 5.0, firstPoint[1] + 5.0 + annotationOffset,
         m_LineColor[lineDisplayMode][0],
         m_LineColor[lineDisplayMode][1],
-        m_LineColor[lineDisplayMode][2] );
+        m_LineColor[lineDisplayMode][2],
+        globalOpacity );
 
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;
@@ -361,9 +369,14 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
       shadow[1] = 0;
       shadow[2] = 0;
 
+      //set shadow opacity
+      float shadowOpacity = 0.0f;
+      if( opacity > 0.2f )
+        shadowOpacity = opacity - 0.2f;
+
       this->PaintPolyLine( polyline, 
         figure->IsClosed(),    
-        shadow, 0.8, lineWidth*shadowWidthFactor, firstPoint,
+        shadow, shadowOpacity, lineWidth*shadowWidthFactor, firstPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
       delete shadow;
@@ -409,10 +422,15 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
       shadow[1] = 0;
       shadow[2] = 0;
 
+      //set shadow opacity
+      float shadowOpacity = 0.0f;
+      if( opacity > 0.2f )
+        shadowOpacity = opacity - 0.2f;
+
       // paint shadow by painting the figure twice
       // one in black with a slightly broader line-width ...
       this->PaintPolyLine( helperPolyLine, false,
-        shadow, 0.8, lineWidth*shadowWidthFactor, firstPoint,
+        shadow, shadowOpacity, lineWidth*shadowWidthFactor, firstPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
       delete shadow;
@@ -581,11 +599,15 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
     return;
   }
 
+  //Get Global Opacity
+  float globalOpacity = 1.0;
+  node->GetFloatProperty("opacity", globalOpacity);
+
   node->GetBoolProperty( "selected", m_IsSelected );
   node->GetBoolProperty( "planarfigure.ishovering", m_IsHovering );
   node->GetBoolProperty( "planarfigure.drawoutline", m_DrawOutline );
-  node->GetBoolProperty( "planarfigure.drawquantities", m_DrawQuantities );
   node->GetBoolProperty( "planarfigure.drawshadow", m_DrawShadow );
+  node->GetBoolProperty( "planarfigure.drawquantities", m_DrawQuantities );
   node->GetBoolProperty( "planarfigure.drawcontrolpoints", m_DrawControlPoints );
   node->GetBoolProperty( "planarfigure.drawname", m_DrawName );
 
@@ -601,17 +623,32 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
     m_ControlPointShape = styleProperty->GetShape();
   }
 
-  node->GetColor( m_LineColor[PF_DEFAULT], NULL, "planarfigure.default.line.color" );
+  //Set default color and opacity
+  //If property "planarfigure.default.*.color" exists, then use that color. Otherwise global "color" property is used.
+  if( !node->GetColor( m_LineColor[PF_DEFAULT], NULL, "planarfigure.default.line.color"))
+  {
+    node->GetColor( m_LineColor[PF_DEFAULT], NULL, "color" );
+  }
   node->GetFloatProperty( "planarfigure.default.line.opacity", m_LineOpacity[PF_DEFAULT] );
-  node->GetColor( m_OutlineColor[PF_DEFAULT], NULL, "planarfigure.default.outline.color" );
+
+  if( !node->GetColor( m_OutlineColor[PF_DEFAULT], NULL, "planarfigure.default.outline.color"))
+  {
+    node->GetColor( m_OutlineColor[PF_DEFAULT], NULL, "color" );
+  }
   node->GetFloatProperty( "planarfigure.default.outline.opacity", m_OutlineOpacity[PF_DEFAULT] );
-  node->GetColor( m_HelperlineColor[PF_DEFAULT], NULL, "planarfigure.default.helperline.color" );
+
+  if( !node->GetColor( m_HelperlineColor[PF_DEFAULT], NULL, "planarfigure.default.helperline.color"))
+  {
+    node->GetColor( m_HelperlineColor[PF_DEFAULT], NULL, "color" );
+  }
   node->GetFloatProperty( "planarfigure.default.helperline.opacity", m_HelperlineOpacity[PF_DEFAULT] );
+
   node->GetColor( m_MarkerlineColor[PF_DEFAULT], NULL, "planarfigure.default.markerline.color" );
   node->GetFloatProperty( "planarfigure.default.markerline.opacity", m_MarkerlineOpacity[PF_DEFAULT] );
   node->GetColor( m_MarkerColor[PF_DEFAULT], NULL, "planarfigure.default.marker.color" );
   node->GetFloatProperty( "planarfigure.default.marker.opacity", m_MarkerOpacity[PF_DEFAULT] );
 
+  //Set hover color and opacity
   node->GetColor( m_LineColor[PF_HOVER], NULL, "planarfigure.hover.line.color" );
   node->GetFloatProperty( "planarfigure.hover.line.opacity", m_LineOpacity[PF_HOVER] );
   node->GetColor( m_OutlineColor[PF_HOVER], NULL, "planarfigure.hover.outline.color" );
@@ -623,6 +660,7 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetColor( m_MarkerColor[PF_HOVER], NULL, "planarfigure.hover.marker.color" );
   node->GetFloatProperty( "planarfigure.hover.marker.opacity", m_MarkerOpacity[PF_HOVER] );
 
+  //Set selected color and opacity
   node->GetColor( m_LineColor[PF_SELECTED], NULL, "planarfigure.selected.line.color" );
   node->GetFloatProperty( "planarfigure.selected.line.opacity", m_LineOpacity[PF_SELECTED] );
   node->GetColor( m_OutlineColor[PF_SELECTED], NULL, "planarfigure.selected.outline.color" );
@@ -634,6 +672,15 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetColor( m_MarkerColor[PF_SELECTED], NULL, "planarfigure.selected.marker.color" );
   node->GetFloatProperty( "planarfigure.selected.marker.opacity", m_MarkerOpacity[PF_SELECTED] );
 
+  //adapt opacity values to global "opacity" property
+  for( unsigned int i = 0; i < PF_COUNT; ++i )
+  {
+    m_LineOpacity[i] *= globalOpacity;
+    m_OutlineOpacity[i] *= globalOpacity;
+    m_HelperlineOpacity[i] *= globalOpacity;
+    m_MarkerlineOpacity[i] *= globalOpacity;
+    m_MarkerOpacity[i] *= globalOpacity;
+  }
 }
 
 
@@ -655,11 +702,8 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
   node->AddProperty("planarfigure.outline.width", mitk::FloatProperty::New(2.0) );
   node->AddProperty("planarfigure.helperline.width", mitk::FloatProperty::New(2.0) );
 
-  node->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
   node->AddProperty( "planarfigure.default.line.opacity", mitk::FloatProperty::New(1.0) );
-  node->AddProperty( "planarfigure.default.outline.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
   node->AddProperty( "planarfigure.default.outline.opacity", mitk::FloatProperty::New(1.0) );
-  node->AddProperty( "planarfigure.default.helperline.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
   node->AddProperty( "planarfigure.default.helperline.opacity", mitk::FloatProperty::New(1.0) );
   node->AddProperty( "planarfigure.default.markerline.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
   node->AddProperty( "planarfigure.default.markerline.opacity", mitk::FloatProperty::New(1.0) );

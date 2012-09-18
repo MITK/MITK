@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 
 #include "QmitkPropertyListView.h"
-#include "QmitkPropertyTreeView.h"
 #include "../QmitkDataManagerView.h"
 #include "../QmitkDataManagerPreferencePage.h"
 #include "../QmitkDataManagerHotkeysPrefPage.h"
@@ -29,7 +28,6 @@ void PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDataManagerView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPropertyListView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkPropertyTreeView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDataManagerPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDataManagerHotkeysPrefPage, context)
 }

@@ -25,8 +25,9 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
   m_GUI.setupUi(this);
 
   QString mitkRevision(MITK_REVISION);
+  QString mitkRevisionDescription(MITK_REVISION_DESC);
 
-  m_GUI.m_RevisionLabel->setText(m_GUI.m_RevisionLabel->text().arg(mitkRevision));
+  m_GUI.m_RevisionLabel->setText(m_GUI.m_RevisionLabel->text().arg(mitkRevision).arg(mitkRevisionDescription));
 
   QPushButton* btnModules = new QPushButton(QIcon(":/qmitk/ModuleView.png"), "Modules");
   m_GUI.m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);

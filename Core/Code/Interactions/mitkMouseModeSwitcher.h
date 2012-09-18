@@ -46,8 +46,6 @@ namespace mitk {
 *   - ctrl + right button : zooming
 *   - shift+ right button : panning
 *   
-* - OFF : Turns all interactors for MITK mode and PACS mode off.
-*
 *   There are 5 different MouseModes that are available in the PACS scheme.
 *   Each MouseMode defines the interaction that is performed on a left 
 *   mouse button click:
@@ -80,8 +78,7 @@ namespace mitk {
     enum InteractionScheme
     {
       PACS = 0,
-      MITK = 1,
-      OFF = 2
+      MITK = 1
     };
 
     // enum of available mouse modes for PACS interaction scheme
@@ -99,11 +96,6 @@ namespace mitk {
     */
     void SetInteractionScheme( InteractionScheme );
     
-    /**
-     * \brief Getter for InteractionScheme.
-     */
-    InteractionScheme GetInteractionScheme() const;
-
     /**
     * \brief Setter for mouse mode
     */

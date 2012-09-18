@@ -276,7 +276,7 @@ void mitk::SegTool2D::SetShowMarkerNodes(bool status)
     m_ShowMarkerNodes = status;
 }
 
-void mitk::SegTool2D::Enable3DInterpolation(bool enabled)
+void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
 {
   m_3DInterpolationEnabled = enabled;
 }

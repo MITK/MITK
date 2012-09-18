@@ -197,7 +197,8 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "BlueBerry=\if BLUEBERRY" \
                          "endBlueBerry=\endif" \
                          "bundlemainpage{1}=\page \1" \
-                         "embmainpage{1}=\page \1"
+                         "embmainpage{1}=\page \1" \
+                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" "
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding

@@ -66,7 +66,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Seaches for a given node and returns a valid index or -1 if the node was not found.
     ///
-    int Find( const mitk::DataNode* _DataNode ) const;
+    virtual int Find( const mitk::DataNode* _DataNode ) const;
 
   //#PUBLIC GETTER  
   public:
@@ -81,11 +81,11 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Returns the _DataNode at Index index or 0 if the index is out of bounds.
     ///
-    mitk::DataNode::Pointer GetNode(int index) const;   
+    virtual mitk::DataNode::Pointer GetNode(int index) const;
     ///
     /// \brief Returns the selected _DataNode or 0 if there is none.
     ///
-    mitk::DataNode::Pointer GetSelectedNode() const;     
+    virtual mitk::DataNode::Pointer GetSelectedNode() const;
     ///
     /// \brief Returns all nodes that are stored in this combobox.
     ///
@@ -189,7 +189,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Reset function whenever datastorage or predicate changes.
     ///
-    void Reset();
+    virtual void Reset();
 
   protected:
     //#PROTECTED MEMBER VARS

@@ -1,0 +1,170 @@
+/**
+\bundlemainpage{org.mitk.gui.qt.cli} The Command Line Interface (CLI) View
+
+\image html CLIIcon.png "Icon of CLI"
+
+\li \ref CLIIntroduction
+\li \ref CLIPreferences
+\li \ref CLIUsage
+\li \ref CLITechnicalNotes
+
+\section CLIPrefix Contribution
+
+This plugin was developed at the <a href="http://cmic.cs.ucl.ac.uk/">Centre For Medical Image Computing</a> (CMIC),
+part of <a href="http://www.ucl.ac.uk/">University College London</a> (UCL) and contributed back to the 
+<a href="http://www.mitk.org">MITK</a> community with thanks.
+
+\section CLIIntroduction Introduction
+
+This view provides the facility to run third party command line programs, and load the data back
+into the <a href="qthelp://org.mitk.gui.qt.datamanager/bundle/index.html">DataManager</a> for
+immediate visualisation. All that is required is that the command line application can be called 
+with an argument of --xml and respond with a valid XML description of the necessary parameters. 
+This view can then generate a Graphical User Interface (GUI) dynamically from the XML to enable the 
+user to interact with the command line application. This provides an easy to use, and potentially 
+very flexible way to integrate almost any third party, medical imaging, command line application. 
+
+As a high level introduction, this view performs the following steps:
+
+\li The view searches for available programs to run, and for each valid module, stores the XML document describing
+the interface, and populates a searchable list of available programs.
+\li When a program is selected, the GUI is generated.
+\li The user can then set the necessary parameters and run the program.
+\li Multiple programs can be launched simultaneously, and where available on the host platform, 
+the user can pause, resume or cancel running jobs and see console output for each job.
+
+As a consequence of the very flexible nature of this plugin, these instructions can only describe how to launch
+command line modules in a general sense. The examples shown have been constructed by downloading the latest version
+of the NiftyReg package, available <a href="http://sourceforge.net/projects/niftyreg/">here</a>, and described further
+<a href="http://www.cmpbjournal.com/article/S0169-2607(09)00253-3/abstract">here</a>. NiftyReg provides valid XML descriptors
+to enable the integration of the NiftyReg affine (RegAladin) and and non-rigid (RegF3D) image registration algorithms, as well
+as utility programs to resample an image, and calculate a Jacobian image. These same XML descriptors work within 
+<a href="http://www.slicer.org/">Slicer</a> and <a href="http://www.mitk.org/">MITK</a> based applications.
+
+\section CLIPreferences Preferences
+
+The first time that the CLI View is launched, it is advisable to set the user preferences for the view. Please refer
+to Figure 1.
+ 
+\image html CLIPreferences.png "Figure 1. The CLI Preferences Page"
+
+Each of these preferences is now explained in some detail.
+
+\li show debug output: If checked will output more messages to the console for debugging purposes.
+\li XML validation mode: The user may select a different mode for XML validation. If this is changed, the application will
+need to be restarted.  There are 3 modes available.  If the user selects "strict" mode, the XML schema produced by the 
+command line application must exactly conform to <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">
+this definition</a>. For "none", there will be no validation. For "weak"  validation, the application will report errors, 
+but try to carry on and load as many modules as possible. The XML validation errors are available as tool-tips on
+the tab widget when the module is launched. Many third party modules included with Slicer currently have
+incorrect XML, and so the "weak" or "none" mode may assist in loading them. By default the "strict" mode is chosen 
+so that only valid modules are loaded.
+\li max concurrent processes: Sets the maximum number of concurrent jobs that can be run via this interface. The default is 4.
+When the maximum number is reached, the green "Run" button is disabled until a job finishes.
+
+The next four preferences are to control where the view will search for valid command line programs. By default these are off
+as the searching process can take a long time and slow down the startup time of the GUI. The options provided are:
+
+\li scan home directory: Scan the users home directory. Most useful on unix systems where users can install their own software.
+\li scan current directory: This is the current working directory. Most useful on unix systems where users launch the application from the console.
+\li scan installation directory: This is the directory where the actual application is stored.
+\li scan CTK_MODULE_LOAD_PATH: If the environment variable CTK_MODULE_LOAD_PATH points to a valid directory, this will also be scanned.
+
+In addition, for the first 3 of these options, the sub-directory "cli-modules" will also be scanned if it exists.
+In most cases, the user will leave these options unchecked, as the user can also specify custom directories, and 
+even cherry-pick specific command line programs to load. Figure 2 shows a selection box that enables the user to
+specify custom directories to scan, and Figure 3. shows a selection box that enables the user to select specific modules.
+
+\image html CLIPreferencesAdditionalDirectories.png "Figure 2. The User can specify specific directories to scan".
+\image html CLIPreferencesAdditionalModules.png "Figure 3. The User can specify specific command line programs to load".
+
+These directory and file selection boxes enable directories or files to be added, removed and updated in a similar fashion.
+
+The user must make sure that the list of files selected in the "additional modules" section are not already contained within
+the directories specified in the "additional module directories" section.
+
+In addition, the preferences page provides:
+
+\li temporary directory: Images stored in the DataManager are first written to a temporary folder as 
+<a href="http://niftilib.sourceforge.net/">Nifti</a> images before being passed to each command line program.
+This temporary directory will default to a platform specific temporary folder, but the user may select their preferred choice
+of temporary workspace.
+ 
+\section CLIUsage Usage
+
+When the view is launched, a simple interface is presented, as shown in Figure 4.
+
+\image html CLIInitial.png "Figure 4. The initial interface, with no command line programs available."
+
+In this example, all the above check-box preferences were off, and the "additional module directories" 
+was empty, and the "additional modules" list was empty so no command line applications were found.
+The "Search" box displays zero entries, and there is nothing to search.
+
+If the available search paths contain programs that are compatible (i.e. runnable) with this view, 
+the name of the programs are displayed in the "Search" box in a nested menu, shown in Figure 5.
+
+\image html CLIWithPrograms.png "Figure 5. When valid paths are set, and programs are discovered, the menu is recalculated to show available programs."
+
+When a program is selected, the relevant interface is displayed, by default as collapsed group boxes to save space. 
+Each section can be individually expanded if necessary to see the parameters.
+
+\image html CLINiftyReg.png "Figure 6. An example program, showing parameters for NiftyReg's program RegAladin."
+
+In this example, the parameters are displayed for <a href="http://www0.cs.ucl.ac.uk/staff/m.modat/Marcs_Page/Software.html">NiftyReg</a>
+produced at <a href="http://www.ucl.ac.uk">UCL</a>, and more specifically for the affine registration program called
+RegAladin. The interface can contain a wide variety of controls. If a parameter for a command line program is an input image, 
+then the widget displayed is linked to the DataManager, so that as new images are loaded, the correct image can be easily 
+selected from the combo box.
+
+At this stage, multiple tabs can be opened, with one tab for each command line program. Figure 7 shows 2 tabs,
+for the RegAladin and RegF3D programs.
+
+\image html CLIF3D.png "Figure 7. Multiple tabs can be opened, one for each command line program."
+
+The main view provides some simple controls:
+
+\li Green arrow: Launch (run) the command line executable of the currently selected tab.
+\li Yellow undo arrow: Resets the GUI controls of the currently selected tab to default values, if and only if the original XML specified a default value.
+
+At this stage, nothing has been launched.  When the user hits the green arrow button, a job is launched.
+Each running job is shown as a new progress reporting widget under the main tabbed widget, as shown in Figure 8.
+
+\image html CLINiftyRegRunning2.png "Figure 8. Multiple programs can be run, each with individual controls and console output."
+
+The controls for each running job are:
+
+\li Blue pause button: If supported on the host platform, this button will be enabled and can be toggled off (pause) or on (resume).
+\li Red square: If supported on the host platform, this button will kill the command line program.
+\li Black cross: Will remove the progress reporting widget from the GUI.
+
+When the user hits the green arrow in the main view:
+
+\li The currently selected tab is designated the "current" job, and contains the "current" set of parameters.
+\li A new progress reporting widget is created.
+\li The current parameters are copied to the progress reporting widget. In Figure 8. a parameters section 
+is visible, and by default is collapsed, as they are simply for referring back to.
+\li All the output for the command line program is shown in the console widget, with a separate console for each job.
+\li Each new progress reporting widget is simply stacked vertically (newest is top-most), and it is up to the 
+user to delete them when they are finished.
+
+It is easy to run multiple jobs. The green button simply launches the job corresponding to the current tab repeatedly.
+It is up to the user to make sure that any output file names are changed between successive invocations of the same command
+line module to avoid overwritting output data.
+
+In addition, each set of parameters contains an "About" section containing details of the contributors, the licence and acknowledgements and also
+a "Help" section containing a description and a link to any on-line documentation.
+
+These documentation features are provided by the developers of the third party plugin, and not by the host program.
+If information is missing, the user must contact the third party developers.
+
+\section CLITechnicalNotes Technical Notes
+
+From a technical perspective, the Command Line Interface (CLI) View is a simple view, harnessing the power of the CTK
+command line modules framework. For technical information see:
+
+\li The doxygen generated <a href="http://www.commontk.org/docs/html/CommandLineModules_Page.html">manual page</a>.
+\li The <a href="http://www.commontk.org/index.php/Documentation/Command_Line_Interface">wiki page</a>.
+
+and obviously the CTK code base.
+*/
+

@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/CommandLineModulesResources/">
+        <file>run.png</file>
+        <file>stop.png</file>
+        <file>undo.png</file>
+        <file>pause.png</file>
+    </qresource>
+</RCC>

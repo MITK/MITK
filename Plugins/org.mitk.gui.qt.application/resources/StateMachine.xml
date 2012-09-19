@@ -3849,6 +3849,9 @@
      <!-- transition to checkState -->
      <action ID="12"/> <!-- AcADDLINE = 12 -->
     </transition>
+    <transition NAME="ctrlAddPoint" NEXT_STATE_ID="2" EVENT_ID="5"> <!-- left mbtn + ctrl = 5 -->
+     <action ID="10" /> <!-- AcADDPOINT = 10 -->
+    </transition>
    </state>
    <state NAME="Guard_lastPointClicked" ID="20" ><!-- check doubleClick on last point -->
     <transition NAME="yes" NEXT_STATE_ID="1" EVENT_ID="1004"> <!-- EIDYES = 1004 -->

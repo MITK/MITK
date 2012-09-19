@@ -69,6 +69,7 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   CONNECT_ACTION( AcCHECKPOINT, OnCheckPoint );
   CONNECT_ACTION( AcFINISH, OnFinish );
   CONNECT_ACTION( AcDELETEPOINT, OnLastSegmentDelete );
+  CONNECT_ACTION( AcADDLINE, OnMouseMoveNoDynamicCosts );
 }
 
 
@@ -269,7 +270,7 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   //set new start point
   m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
-  if( m_CreateAndUseDynamicCosts )//only once after first segment
+  if( m_CreateAndUseDynamicCosts )
   {
     //use dynamic cost map for next update
     m_LiveWireFilter->CreateDynamicCostMap(m_Contour);
@@ -308,7 +309,6 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
   m_LiveWireFilter->Update();
 
 
-
   //ContourModel::VertexType* currentVertex = const_cast<ContourModel::VertexType*>(m_LiveWireContour->GetVertexAt(0));
 
   this->m_LiveWireContour = this->m_LiveWireFilter->GetOutput();
@@ -322,6 +322,18 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
 
   return true;
 }
+
+
+
+bool mitk::LiveWireTool2D::OnMouseMoveNoDynamicCosts(Action* action, const StateEvent* stateEvent)
+{
+  //do not use dynamic cost map
+  m_LiveWireFilter->SetUseDynamicCostMap(false);
+  OnMouseMoved(action, stateEvent);
+  m_LiveWireFilter->SetUseDynamicCostMap(true);
+  return true;
+}
+
 
 
 
@@ -454,55 +466,68 @@ void mitk::LiveWireTool2D::FinishTool()
 
 bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent* stateEvent)
 {
-
   int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
 
-  m_LiveWireContour = mitk::ContourModel::New();
-
-  m_LiveWireContourNode->SetData(m_LiveWireContour);
-
-
-  mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
-  newContour->Expand(m_Contour->GetTimeSteps()+1);
-
-  mitk::ContourModel::VertexIterator begin = m_Contour->IteratorBegin();
-
-  //iterate from last point to next active point
-  mitk::ContourModel::VertexIterator newLast = m_Contour->IteratorBegin() + (m_Contour->GetNumberOfVertices() - 1);
-
-  //go at least one down
-  if(newLast != begin)
+  //if last point of current contour will be removed go to start state and remove nodes
+  if( m_Contour->GetNumberOfVertices(timestep) <= 1 )
   {
-    newLast--;
+    m_ToolManager->GetDataStorage()->Remove( m_LiveWireContourNode );
+    m_ToolManager->GetDataStorage()->Remove( m_ContourModelNode );
+    m_LiveWireContour = mitk::ContourModel::New();
+    m_Contour = mitk::ContourModel::New();
+    m_ContourModelNode->SetData( m_Contour );
+    Superclass::Deactivated(); //go to start state
   }
-
-  //search next active control point
-  while(newLast != begin && !((*newLast)->IsControlPoint) )
+  else //remove last segment from contour and reset livewire contour
   {
-    newLast--;
+
+    m_LiveWireContour = mitk::ContourModel::New();
+
+    m_LiveWireContourNode->SetData(m_LiveWireContour);
+
+
+    mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
+    newContour->Expand(m_Contour->GetTimeSteps()+1);
+
+    mitk::ContourModel::VertexIterator begin = m_Contour->IteratorBegin();
+
+    //iterate from last point to next active point
+    mitk::ContourModel::VertexIterator newLast = m_Contour->IteratorBegin() + (m_Contour->GetNumberOfVertices() - 1);
+
+    //go at least one down
+    if(newLast != begin)
+    {
+      newLast--;
+    }
+
+    //search next active control point
+    while(newLast != begin && !((*newLast)->IsControlPoint) )
+    {
+      newLast--;
+    }
+
+    //set position of start point for livewire filter to coordinates of the new last point
+    m_LiveWireFilter->SetStartPoint((*newLast)->Coordinates);
+
+    mitk::ContourModel::VertexIterator it = m_Contour->IteratorBegin();
+
+    //fill new Contour
+    while(it <= newLast)
+    {
+      newContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timestep);
+      it++;
+    }
+
+    newContour->SetIsClosed(m_Contour->IsClosed());
+
+    //set new contour visible
+    m_ContourModelNode->SetData(newContour);
+
+    m_Contour = newContour;
+
+    assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
+    mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
   }
-
-  //set position of start point for livewire filter to coordinates of the new last point
-  m_LiveWireFilter->SetStartPoint((*newLast)->Coordinates);
-
-  mitk::ContourModel::VertexIterator it = m_Contour->IteratorBegin();
-
-  //fill new Contour
-  while(it <= newLast)
-  {
-    newContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timestep);
-    it++;
-  }
-
-  newContour->SetIsClosed(m_Contour->IsClosed());
-
-  //set new contour visible
-  m_ContourModelNode->SetData(newContour);
-
-  m_Contour = newContour;
-
-  assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
-  mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
 
   return true;
 }
@@ -527,7 +552,7 @@ void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, 
   currentIndex[1] = index[1];
 
 
-    //minimum value in each direction for startRegion
+  //minimum value in each direction for startRegion
   typename IndexType startRegion;
   startRegion[0] = index[0] - 3;
   startRegion[1] = index[1] - 3;

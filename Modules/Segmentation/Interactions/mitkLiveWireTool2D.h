@@ -80,6 +80,9 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     /// \brief Close the contour
     virtual bool OnLastSegmentDelete(Action*, const StateEvent*);
 
+    /// \brief Don't use dynamic cost map for LiveWire calculation
+    virtual bool OnMouseMoveNoDynamicCosts(Action*, const StateEvent*);
+
     /// \brief Finish contour interaction.
     void FinishTool();
 

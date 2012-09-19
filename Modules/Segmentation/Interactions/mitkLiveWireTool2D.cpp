@@ -476,6 +476,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
     m_LiveWireContour = mitk::ContourModel::New();
     m_Contour = mitk::ContourModel::New();
     m_ContourModelNode->SetData( m_Contour );
+    m_LiveWireContourNode->SetData( m_LiveWireContour );
     Superclass::Deactivated(); //go to start state
   }
   else //remove last segment from contour and reset livewire contour
@@ -539,6 +540,9 @@ void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, 
   typedef itk::Image<TPixel, VImageDimension>  InputImageType;
   typedef InputImageType::IndexType            IndexType;
 
+  unsigned long xMAX = inputImage->GetLargestPossibleRegion().GetSize()[0];
+  unsigned long yMAX = inputImage->GetLargestPossibleRegion().GetSize()[1];
+
   returnIndex[0] = index[0];
   returnIndex[1] = index[1];
   returnIndex[2] = 0.0;
@@ -547,20 +551,23 @@ void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, 
   double gradientMagnitude = 0.0;
   double maxGradientMagnitude = 0.0;
 
-  IndexType currentIndex;
-  currentIndex[0] = index[0];
-  currentIndex[1] = index[1];
-
+    //maximum value in each direction for size
+  typename InputImageType::SizeType size;
+  size[0] = 7;
+  size[1] = 7;
 
   //minimum value in each direction for startRegion
   typename IndexType startRegion;
   startRegion[0] = index[0] - 3;
   startRegion[1] = index[1] - 3;
+  if(startRegion[0] < 0) startRegion[0] = 0;
+  if(startRegion[1] < 0) startRegion[1] = 0;
+  if(xMAX - index[0] < 7) startRegion[0] = xMAX - 7;
+  if(yMAX - index[1] < 7) startRegion[1] = yMAX - 7;
 
-  //maximum value in each direction for size
-  typename InputImageType::SizeType size;
-  size[0] = 7;
-  size[1] = 7;
+  index[0] = startRegion[0] + 3;
+  index[1] = startRegion[1] + 3;
+
 
 
   typename InputImageType::RegionType region;
@@ -577,7 +584,11 @@ void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, 
   gradientMagnImage = gradientFilter->GetOutput();
 
 
-  // seerch max (approximate) gradient magnitude
+  IndexType currentIndex;
+  currentIndex[0] = 0;
+  currentIndex[1] = 0;
+
+  // search max (approximate) gradient magnitude
   for( int x = -2; x <= 2; ++x)
   {
     currentIndex[0] = index[0] + x;

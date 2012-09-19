@@ -14,4 +14,3 @@ The DICOM editor is an experimental editor which allows for loading of DICOM ima
 
 It is based on the <a href="http://www.commontk.org/index.php/Documentation/Dicom_Overview">commonTK (CTK) DICOM funcionality</a>.
 */
-

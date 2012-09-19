@@ -77,6 +77,7 @@ mitk::LiveWireTool2D::LiveWireTool2D()
 
 mitk::LiveWireTool2D::~LiveWireTool2D()
 {
+  m_Contours.clear();
 }
 
 
@@ -217,11 +218,6 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_LiveWireFilter->SetStartPoint(click);
 
   m_CreateAndUseDynamicCosts = true;
-
-  //save contour and corresponding plane geometry to list
-  std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> contourPair(m_ContourModelNode.GetPointer(), dynamic_cast<mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()->Clone().GetPointer()) );
-  m_Contours.push_back(contourPair);
-
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -401,6 +397,9 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   //remove last control point being added by double click
   m_Contour->RemoveVertexAt(m_Contour->GetNumberOfVertices(timestep) - 1, timestep);
 
+  //save contour and corresponding plane geometry to list
+  std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> contourPair(m_ContourModelNode.GetPointer(), dynamic_cast<mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()->Clone().GetPointer()) );
+  m_Contours.push_back(contourPair);
 
   m_LiveWireFilter->SetUseDynamicCostMap(false);
   this->FinishTool();
@@ -412,7 +411,6 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 
 void mitk::LiveWireTool2D::FinishTool()
 {
-  //const mitk::TimeBounds &timeBounds = m_Contour->GetGeometry()->GetTimeBounds();
 
   unsigned int numberOfTimesteps = m_Contour->GetTimeSlicedGeometry()->GetTimeSteps();
 

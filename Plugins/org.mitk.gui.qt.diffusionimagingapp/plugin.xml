@@ -58,6 +58,10 @@
       name="Utility"
       class="QmitkDIAppUtilityPerspective"
       icon="resources/perspectives/utility.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.imageprocessing"
+      name="Image Processing"
+      class="QmitkDIAppImageProcessingPerspective"
+      icon="resources/perspectives/imageprocessing.png"/>
   </extension>
 
 </plugin>

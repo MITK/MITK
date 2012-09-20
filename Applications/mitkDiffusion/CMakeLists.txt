@@ -46,6 +46,7 @@ set(_plugins
   org.mitk.gui.qt.diffusionimaging
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
+  org.mitk.gui.qt.basicimageprocessing
 )
 
 # Plug-ins listed below will not be

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Perspectives/QmitkDIAppDicomImportPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppFiberTractographyPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppIVIMPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppImageProcessingPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppTBSSPerspective.h"
@@ -68,6 +69,7 @@ void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppConnectomicsPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppDicomImportPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppImageProcessingPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppFiberTractographyPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppIVIMPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppPreprocessingReconstructionPerspective, context)

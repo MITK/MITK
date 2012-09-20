@@ -16,6 +16,7 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkDIAppQuantificationPerspective.cpp
   Perspectives/QmitkDIAppTBSSPerspective.cpp
   Perspectives/QmitkDIAppUtilityPerspective.cpp
+  Perspectives/QmitkDIAppImageProcessingPerspective.cpp
 )
 
 set(UI_FILES
@@ -36,6 +37,7 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h
   src/internal/Perspectives/QmitkDIAppTBSSPerspective.h
   src/internal/Perspectives/QmitkDIAppUtilityPerspective.h
+  src/internal/Perspectives/QmitkDIAppImageProcessingPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -59,6 +61,7 @@ set(CACHED_RESOURCE_FILES
   resources/perspectives/quantification.png
   resources/perspectives/tbss.png
   resources/perspectives/utility.png
+  resources/perspectives/imageprocessing.png
 )
 
 set(QRC_FILES

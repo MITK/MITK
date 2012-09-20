@@ -720,16 +720,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
     this->UnmaskedStatisticsProgressUpdate();
   }
 
-  // Calculate histogram
-  typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
-  histogramGenerator->SetInput( image );
-  histogramGenerator->SetMarginalScale( 100 ); // Defines y-margin width of histogram
-  histogramGenerator->SetNumberOfBins( 768 ); // CT range [-1024, +2048] --> bin size 4 values
-  histogramGenerator->SetHistogramMin( -1024.0 );
-  histogramGenerator->SetHistogramMax( 2048.0 );
-  histogramGenerator->Compute();
 
-  histogramContainer->push_back( histogramGenerator->GetOutput() );
 
   // Calculate statistics (separate filter)
   typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
@@ -757,6 +748,17 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
     + statistics.Sigma * statistics.Sigma );
 
   statisticsContainer->push_back( statistics );
+
+   // Calculate histogram
+  typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
+  histogramGenerator->SetInput( image );
+  histogramGenerator->SetMarginalScale( 100 );
+  histogramGenerator->SetNumberOfBins( 768 );
+  histogramGenerator->SetHistogramMin( statistics.Min );
+  histogramGenerator->SetHistogramMax( statistics.Max );
+  histogramGenerator->Compute();
+
+  histogramContainer->push_back( histogramGenerator->GetOutput() );
 }
 
 template < typename TPixel, unsigned int VImageDimension >
@@ -842,7 +844,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       }
     }
   }
-  
+
   // Make sure that the voxels of mask and image are correctly "aligned", i.e., voxel boundaries are the same in both images
   PointType imageOrigin = image->GetOrigin();
   PointType maskOrigin = maskImage->GetOrigin();
@@ -905,22 +907,26 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     extractImageFilter->SetInput( image );
     extractImageFilter->SetExtractionRegion( adaptedMaskImage->GetBufferedRegion() );
     extractImageFilter->Update();
-    adaptedImage = extractImageFilter->GetOutput();    
+    adaptedImage = extractImageFilter->GetOutput();
   }
   else
   {
     adaptedImage = image;
   }
 
-
-
   // Initialize Filter
+  typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
+  typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
+  statisticsFilter->SetInput( adaptedImage );
+
+  statisticsFilter->Update();
+
   typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
   labelStatisticsFilter = LabelStatisticsFilterType::New();
   labelStatisticsFilter->SetInput( adaptedImage );
   labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
   labelStatisticsFilter->UseHistogramsOn();
-  labelStatisticsFilter->SetHistogramParameters( 384, -1024.0, 2048.0);
+  labelStatisticsFilter->SetHistogramParameters( 384, statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum() );
 
   
   // Add progress listening
@@ -948,6 +954,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   this->InvokeEvent( itk::EndEvent() );
 
   labelStatisticsFilter->RemoveObserver( observerTag );
+
 
 
   // Find all relevant labels of mask (other than 0)

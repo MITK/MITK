@@ -84,6 +84,8 @@ namespace mitk {
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected
     void                            GenerateFiberIds(); // TODO: make protected
 
+
+
     // get/set data
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData();
@@ -95,6 +97,11 @@ namespace mitk {
     itkGetMacro( MeanFiberLength, float )
     itkGetMacro( MedianFiberLength, float )
     itkGetMacro( LengthStDev, float )
+
+    std::vector<int> GetPointsRoi()
+    {
+      return m_PointsRoi;
+    }
 
     // copy fiber bundle
     mitk::FiberBundleX::Pointer GetDeepCopy();
@@ -132,6 +139,10 @@ namespace mitk {
     float m_MeanFiberLength;
     float m_MedianFiberLength;
     float m_LengthStDev;
+
+
+    std::vector<int> m_PointsRoi; // this global variable needs to be refactored
+
   };
 
 } // namespace mitk

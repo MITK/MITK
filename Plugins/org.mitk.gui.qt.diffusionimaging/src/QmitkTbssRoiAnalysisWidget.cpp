@@ -32,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <limits>
 
+#include <vtkCellArray.h>
+
+
 
 QmitkTbssRoiAnalysisWidget::QmitkTbssRoiAnalysisWidget( QWidget * parent )
   : QmitkPlotWidget(parent)
@@ -39,7 +42,497 @@ QmitkTbssRoiAnalysisWidget::QmitkTbssRoiAnalysisWidget( QWidget * parent )
   m_PlotPicker = new QwtPlotPicker(m_Plot->canvas());
   m_PlotPicker->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::ClickSelection | QwtPicker::DragSelection);
   m_PlotPicker->setTrackerMode(QwtPicker::ActiveOnly);
+
+  m_PlottingFiberBundle = false;
 }
+
+
+
+void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mitk::Image* img,
+                                                    mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
+{
+
+  mitk::Geometry3D* currentGeometry = fib->GetGeometry();
+
+  mitk::PlaneGeometry* startGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(startRoi->GetGeometry2D()) );
+  mitk::PlaneGeometry* endGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(endRoi->GetGeometry2D()) );
+
+
+  mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
+  mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
+
+  mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
+  mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
+
+
+
+  int num = inBoth->GetNumFibers();
+
+
+  TractContainerType tracts;
+
+
+  vtkSmartPointer<vtkPolyData> fiberPolyData = inBoth->GetFiberPolyData();
+  vtkCellArray* lines = fiberPolyData->GetLines();
+  lines->InitTraversal();
+
+
+
+  // Now find out for each fiber which ROI is encountered first. If this is the startRoi, the direction is ok
+  // Otherwise the plot should be in the reverse direction
+  for( int fiberID( 0 ); fiberID < num; fiberID++ )
+  {
+    vtkIdType   numPointsInCell(0);
+    vtkIdType*  pointsInCell(NULL);
+    lines->GetNextCell ( numPointsInCell, pointsInCell );
+
+    int startId = 0;
+    int endId = 0;
+
+    float minDistStart = std::numeric_limits<float>::max();
+    float minDistEnd = std::numeric_limits<float>::max();
+
+
+
+    for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
+    {
+
+
+      double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+
+      mitk::Point3D point;
+      point[0] = p[0];
+      point[1] = p[1];
+      point[2] = p[2];
+
+      float distanceToStart = point.EuclideanDistanceTo(startCenter);
+      float distanceToEnd = point.EuclideanDistanceTo(endCenter);
+
+      if(distanceToStart < minDistStart)
+      {
+        minDistStart = distanceToStart;
+        startId = pointInCellID;
+      }
+
+      if(distanceToEnd < minDistEnd)
+      {
+        minDistEnd = distanceToEnd;
+        endId = pointInCellID;
+      }
+
+
+
+    }
+
+    /* We found the start and end points of of the part that should be plottet for
+       the current fiber. now we need to plot them. If the endId is smaller than the startId the plot order
+       must be reversed*/
+
+    TractType singleTract;
+    PointType point;
+
+    if(startId < endId)
+    {
+
+      // Calculate the intersection of the ROI with the startRoi and decide if the startId is part of the roi or must be cut of
+      double *p = fiberPolyData->GetPoint( pointsInCell[ startId ] );
+      mitk::Vector3D p0;
+      p0[0] = p[0];      p0[1] = p[1];      p0[2] = p[2];
+
+      p = fiberPolyData->GetPoint( pointsInCell[ startId+1 ] );
+      mitk::Vector3D p1;
+      p1[0] = p[0];       p1[1] = p[1];       p1[2] = p[2];
+
+      // Check if p and p2 are both on the same side of the plane
+      mitk::Vector3D normal = startGeometry2D->GetNormal();
+
+      mitk::Point3D pStart;
+      pStart[0] = p0[0];      pStart[1] = p0[1];      pStart[2] = p0[2];
+
+      mitk::Point3D pSecond;
+      pSecond[0] = p1[0];      pSecond[1] = p1[1];      pSecond[2] = p1[2];
+
+      bool startOnPositive = startGeometry2D->IsAbove(pStart);
+      bool secondOnPositive = startGeometry2D->IsAbove(pSecond);
+
+
+      mitk::Vector3D onPlane;
+      onPlane[0] = startCenter[0];      onPlane[1] = startCenter[1];      onPlane[2] = startCenter[2];
+
+
+
+      if(! (secondOnPositive ^ startOnPositive) )
+      {
+        /* startId and startId+1 lie on the same side of the plane, so we need
+           need startId-1 to calculate the intersection with the planar figure*/
+        p = fiberPolyData->GetPoint( pointsInCell[ startId-1 ] );
+        p1[0] = p[0];        p1[1] = p[1];        p1[2] = p[2];
+      }
+
+
+      double d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
+      mitk::Vector3D newPoint = (p0-p1);
+
+      point[0] = d*newPoint[0] + p0[0];
+      point[1] = d*newPoint[1] + p0[1];
+      point[2] = d*newPoint[2] + p0[2];
+
+      singleTract.push_back(point);
+
+      if(! (secondOnPositive ^ startOnPositive) )
+      {
+        /* StartId and startId+1 lie on the same side of the plane
+           so startId is also part of the ROI*/
+
+        double *start = fiberPolyData->GetPoint( pointsInCell[startId] );
+        point[0] = start[0]; point[1] = start[1]; point[2] = start[2];
+        singleTract.push_back(point);
+      }
+
+
+
+      for( int pointInCellID( startId+1 ); pointInCellID < endId ; pointInCellID++)
+      {
+        // push back point
+        double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+        point[0] = p[0]; point[1] = p[1]; point[2] = p[2];
+        singleTract.push_back( point );
+
+      }
+
+      /* endId must be included if endId and endId-1 lie on the same side of the
+               plane defined by endRoi*/
+
+
+      p = fiberPolyData->GetPoint( pointsInCell[ endId ] );
+      p0[0] = p[0];      p0[1] = p[1];      p0[2] = p[2];
+
+      p = fiberPolyData->GetPoint( pointsInCell[ endId-1 ] );
+      p1[0] = p[0];      p1[1] = p[1];      p1[2] = p[2];
+
+      mitk::Point3D pLast;
+      pLast[0] = p0[0];      pLast[1] = p0[1];      pLast[2] = p0[2];
+
+      mitk::Point3D pBeforeLast;
+      pBeforeLast[0] = p1[0];      pBeforeLast[1] = p1[1];      pBeforeLast[2] = p1[2];
+
+      normal = endGeometry2D->GetNormal();
+      bool lastOnPositive = endGeometry2D->IsAbove(pLast);
+      bool secondLastOnPositive = endGeometry2D->IsAbove(pBeforeLast);
+
+
+      onPlane[0] = endCenter[0];
+      onPlane[1] = endCenter[1];
+      onPlane[2] = endCenter[2];
+
+      if(! (lastOnPositive ^ secondLastOnPositive) )
+      {
+        /* endId and endId-1 lie on the same side of the plane, so we need
+           need endId+1 to calculate the intersection with the planar figure.
+           this should exist since we know that the fiber crosses the planar figure
+           endId is also part of the tract and can be inserted here */
+
+        p = fiberPolyData->GetPoint( pointsInCell[ endId ] );
+        point[0] = p[0]; point[1] = p[1]; point[2] = p[2];
+        singleTract.push_back( point );
+
+        p = fiberPolyData->GetPoint( pointsInCell[ endId+1 ] );
+      }
+
+      d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
+
+      newPoint = (p0-p1);
+
+      point[0] = d*newPoint[0] + p0[0];
+      point[1] = d*newPoint[1] + p0[1];
+      point[2] = d*newPoint[2] + p0[2];
+
+      singleTract.push_back(point);
+
+
+
+    }
+    else{
+
+      // Calculate the intersection of the ROI with the startRoi and decide if the startId is part of the roi or must be cut of
+      double *p = fiberPolyData->GetPoint( pointsInCell[ startId ] );
+      mitk::Vector3D p0;
+      p0[0] = p[0];      p0[1] = p[1];      p0[2] = p[2];
+
+      p = fiberPolyData->GetPoint( pointsInCell[ startId-1 ] );
+      mitk::Vector3D p1;
+      p1[0] = p[0];       p1[1] = p[1];       p1[2] = p[2];
+
+      // Check if p and p2 are both on the same side of the plane
+      mitk::Vector3D normal = startGeometry2D->GetNormal();
+
+      mitk::Point3D pStart;
+      pStart[0] = p0[0];      pStart[1] = p0[1];      pStart[2] = p0[2];
+
+      mitk::Point3D pSecond;
+      pSecond[0] = p1[0];      pSecond[1] = p1[1];      pSecond[2] = p1[2];
+
+      bool startOnPositive = startGeometry2D->IsAbove(pStart);
+      bool secondOnPositive = startGeometry2D->IsAbove(pSecond);
+
+      mitk::Vector3D onPlane;
+      onPlane[0] = startCenter[0];      onPlane[1] = startCenter[1];      onPlane[2] = startCenter[2];
+
+
+      if(! (secondOnPositive ^ startOnPositive) )
+      {
+        /* startId and startId+1 lie on the same side of the plane, so we need
+           need startId-1 to calculate the intersection with the planar figure*/
+        p = fiberPolyData->GetPoint( pointsInCell[ startId-1 ] );
+        p1[0] = p[0];        p1[1] = p[1];        p1[2] = p[2];
+      }
+
+
+      double d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
+      mitk::Vector3D newPoint = (p0-p1);
+
+
+      point[0] = d*newPoint[0] + p0[0];
+      point[1] = d*newPoint[1] + p0[1];
+      point[2] = d*newPoint[2] + p0[2];
+
+
+      singleTract.push_back(point);
+
+      if(! (secondOnPositive ^ startOnPositive) )
+      {
+        /* StartId and startId+1 lie on the same side of the plane
+           so startId is also part of the ROI*/
+
+        double *start = fiberPolyData->GetPoint( pointsInCell[startId] );
+        point[0] = start[0]; point[1] = start[1]; point[2] = start[2];
+        singleTract.push_back(point);
+      }
+
+
+
+      for( int pointInCellID( startId-1 ); pointInCellID > endId ; pointInCellID--)
+      {
+        // push back point
+        double *p = fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] );
+        point[0] = p[0]; point[1] = p[1]; point[2] = p[2];
+        singleTract.push_back( point );
+
+      }
+
+      /* endId must be included if endId and endI+1 lie on the same side of the
+               plane defined by endRoi*/
+
+
+      p = fiberPolyData->GetPoint( pointsInCell[ endId ] );
+      p0[0] = p[0];      p0[1] = p[1];      p0[2] = p[2];
+
+      p = fiberPolyData->GetPoint( pointsInCell[ endId+1 ] );
+      p1[0] = p[0];      p1[1] = p[1];      p1[2] = p[2];
+
+      mitk::Point3D pLast;
+      pLast[0] = p0[0];      pLast[1] = p0[1];      pLast[2] = p0[2];
+
+      mitk::Point3D pBeforeLast;
+      pBeforeLast[0] = p1[0];      pBeforeLast[1] = p1[1];      pBeforeLast[2] = p1[2];
+
+      bool lastOnPositive = endGeometry2D->IsAbove(pLast);
+      bool secondLastOnPositive = endGeometry2D->IsAbove(pBeforeLast);
+      normal = endGeometry2D->GetNormal();
+
+
+
+      onPlane[0] = endCenter[0];
+      onPlane[1] = endCenter[1];
+      onPlane[2] = endCenter[2];
+
+      if(! (lastOnPositive ^ secondLastOnPositive) )
+      {
+        /* endId and endId+1 lie on the same side of the plane, so we need
+           need endId-1 to calculate the intersection with the planar figure.
+           this should exist since we know that the fiber crosses the planar figure
+           endId is also part of the tract and can be inserted here */
+
+        p = fiberPolyData->GetPoint( pointsInCell[ endId ] );
+        point[0] = p[0]; point[1] = p[1]; point[2] = p[2];
+        singleTract.push_back( point );
+
+        p = fiberPolyData->GetPoint( pointsInCell[ endId-1 ] );
+      }
+
+      d = ( (onPlane-p0)*normal) / ( (p0-p1) * normal );
+
+      newPoint = (p0-p1);
+
+      point[0] = d*newPoint[0] + p0[0];
+      point[1] = d*newPoint[1] + p0[1];
+      point[2] = d*newPoint[2] + p0[2];
+
+      singleTract.push_back(point);
+
+    }
+
+
+    tracts.push_back(singleTract);
+
+
+  }
+
+
+  //todo: Make number of samples selectable by user
+  TractContainerType resampledTracts = ParameterizeTracts(tracts, number);
+
+  // Now we have the resampled tracts. Next we should use these points to read out the values
+
+
+
+  PlotFiberBundles(resampledTracts, img, avg);
+  m_CurrentTracts = resampledTracts;
+}
+
+void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
+                                mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
+{
+
+  if(fib == NULL || img == NULL || startRoi == NULL || endRoi == NULL)
+    return;
+
+
+  m_Fib = fib;
+  m_CurrentImage = img;
+  m_CurrentStartRoi = startRoi;
+  m_CurrentEndRoi = endRoi;
+
+
+  DoPlotFiberBundles(fib, img, startRoi, endRoi, avg, number);
+}
+
+
+
+void QmitkTbssRoiAnalysisWidget::ModifyPlot(int number, bool avg)
+{
+  if(m_Fib == NULL || m_CurrentImage == NULL || m_CurrentStartRoi == NULL || m_CurrentEndRoi == NULL)
+    return;
+
+  DoPlotFiberBundles(m_Fib, m_CurrentImage, m_CurrentStartRoi, m_CurrentEndRoi, avg, number);
+
+
+}
+
+
+
+TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainerType tracts, int number)
+{
+  TractContainerType resampledTracts;
+
+
+
+  for(TractContainerType::iterator it = tracts.begin(); it != tracts.end(); ++it)
+  {
+    TractType resampledTract;
+    TractType tract = *it;
+
+    // Calculate the total length
+    float totalLength = 0;
+
+    if(tract.size() < 2)
+      continue;
+
+    PointType p0 = tract.at(0);
+    for(int i = 1; i<tract.size(); i++)
+    {
+      PointType p1 = tract.at(i);
+      float length = p0.EuclideanDistanceTo(p1);
+      totalLength += length;
+      p0 = p1;
+    }
+
+    float stepSize = totalLength / number;
+
+
+
+    p0 = tract.at(0);
+    PointType p1 = tract.at(1);
+    int tractCounter = 2;
+    float distance = p0.EuclideanDistanceTo(p1);
+    float locationBetween = 0;
+
+    for(float position = 0;
+        position <= totalLength+0.001 && resampledTract.size() <= (number+1);
+        position+=stepSize)
+    {
+
+      /* In case we walked to far we need to find the next segment we are on and on what relative position on that
+         tract we are on. Small correction for rounding errors */
+      while(locationBetween > distance+0.001)
+      {
+
+        if(tractCounter == tract.size())
+          std::cout << "problem";
+
+        // Determine by what distance we are no on the next segment
+        locationBetween = locationBetween - distance;
+        p0 = p1;
+        p1 = tract.at(tractCounter);
+        tractCounter++;
+
+        distance = p0.EuclideanDistanceTo(p1);
+
+      }
+
+      // Direction
+      PointType::VectorType direction = p1-p0;
+      direction.Normalize();
+
+      PointType newSample = p0 + direction*locationBetween;
+      resampledTract.push_back(newSample);
+
+
+      locationBetween += stepSize;
+
+
+    }
+
+    resampledTracts.push_back(resampledTract);
+
+
+  }
+  return resampledTracts;
+}
+
+
+mitk::Point3D QmitkTbssRoiAnalysisWidget::GetPositionInWorld(int index)
+{
+  TractContainerType tractsAtIndex;
+
+  float xSum = 0.0;
+  float ySum = 0.0;
+  float zSum = 0.0;
+  for(TractContainerType::iterator it = m_CurrentTracts.begin();
+      it!=m_CurrentTracts.end(); ++it)
+  {
+    TractType tract = *it;
+    PointType p = tract.at(index);
+    xSum += p[0];
+    ySum += p[1];
+    zSum += p[2];
+  }
+
+  int number = m_CurrentTracts.size();
+
+  float xPos = xSum / number;
+  float yPos = ySum / number;
+  float zPos = zSum / number;
+
+
+  mitk::Point3D pos;
+  pos[0] = xPos;
+  pos[1] = yPos;
+  pos[2] = zPos;
+
+  return pos;
+}
+
 
 std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfiles(std::string preprocessed)
 {
@@ -231,17 +724,16 @@ void QmitkTbssRoiAnalysisWidget::DrawProfiles(std::string preprocessed)
 
 
 
-void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img)
+void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img, bool avg)
 {
   this->Clear();
-
-
-
   std::vector<TractType>::iterator it = tracts.begin();
 
 
   // Match points on tracts. Take the smallest tract and match all others on this one
 
+
+  /*
 
   int min = std::numeric_limits<int>::max();
   TractType smallestTract;
@@ -255,10 +747,6 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     }
     ++it;
   }
-
-
-
-
 
 
   it = tracts.begin();
@@ -328,7 +816,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 
     ++it;
   }
-
+*/
 
 
 
@@ -363,19 +851,28 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
   }
 
 
+  if(profiles.size() == 0)
+    return;
+
+  m_IndividualProfiles = profiles;
 
 
   std::string title = "Fiber bundle plot";
   this->SetPlotTitle( title.c_str() );
-  QPen pen( Qt::SolidLine );
-  pen.setWidth(2);
+
+
+  // initialize average profile
+  std::vector<double> averageProfile;
+  std::vector<double> profile = profiles.at(0); // can do this because we checked the size of profiles before
+  for(int i=0; i<profile.size(); ++i)
+  {
+    averageProfile.push_back(0.0);
+  }
 
 
   std::vector< std::vector<double> >::iterator profit = profiles.begin();
 
   int id=0;
-
-
   while(profit != profiles.end())
   {
     std::vector<double> profile = *profit;
@@ -386,22 +883,52 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     for(int i=0; i<profile.size(); ++i)
     {
       xAxis.push_back((double)i);
+      averageProfile.at(i) += profile.at(i) / profiles.size();
     }
 
     int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
+
     this->SetCurveData( curveId, xAxis, profile );
 
     ++profit;
     id++;
 
+
+  }
+
+  m_Average = averageProfile;
+
+
+  if(avg)
+  {
+
+    // Draw the average profile
+    std::vector<double> xAxis;
+    for(int i=0; i<averageProfile.size(); ++i)
+    {
+      xAxis.push_back((double)i);
+    }
+
+    int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
+    this->SetCurveData( curveId, xAxis, averageProfile );
+
+
+
+
+    QPen pen( Qt::SolidLine );
+    pen.setWidth(3);
+    pen.setColor(Qt::red);
+
+    this->SetCurvePen( curveId, pen );
+
+
+
+    id++;
+
+
   }
 
   this->Replot();
-
-
-
-
-
 
 
 

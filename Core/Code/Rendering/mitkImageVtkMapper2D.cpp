@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK Rendering
 #include "mitkImageVtkMapper2D.h"
 #include "vtkMitkThickSlicesFilter.h"
-#include "vtkMitkApplyLevelWindowToRGBFilter.h"
 #include "vtkMitkLevelWindowFilter.h"
 
 //VTK
@@ -1116,9 +1115,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 
   //set the mapper for the actor
   m_Actor->SetMapper(m_Mapper);
-
-  //filter for RGB(A) images
-  //DEL m_LevelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
   
+  //level window filter
   m_LevelWindowFilter = new vtkMitkLevelWindowFilter();
 }

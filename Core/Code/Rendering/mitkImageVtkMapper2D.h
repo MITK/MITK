@@ -167,9 +167,7 @@ namespace mitk {
       /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
       mitk::ScalarType* m_mmPerPixel;
 
-      /** \brief This filter is used to apply the level window to RBG(A) images. */
-      //DEL vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
-      
+      /** \brief This filter is used to apply the level window to RBG(A) images. */      
       vtkMitkLevelWindowFilter* m_LevelWindowFilter;
 
       /** \brief Default constructor of the local storage. */
@@ -252,10 +250,6 @@ namespace mitk {
     * to calcualte the depth of the object (e.g. image or contour). The depth is used
     * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer* renderer);
-
-    /** \brief This method applies a level window on RBG(A) images.
-    * It should only be called for internally for RGB(A) images. */
-   //DEL void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
 
     /** \brief This method applies (or modifies) the lookuptable for all types of images. */
     void ApplyLookuptable( mitk::BaseRenderer* renderer, vtkFloatingPointType* bounds );

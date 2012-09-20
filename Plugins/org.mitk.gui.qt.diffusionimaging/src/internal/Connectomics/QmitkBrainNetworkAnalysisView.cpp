@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsSimulatedAnnealingManager.h"
 #include "mitkConnectomicsSimulatedAnnealingPermutationModularity.h"
 #include "mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h"
+#include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -73,6 +74,7 @@ void QmitkBrainNetworkAnalysisView::CreateQtPartControl( QWidget *parent )
     QObject::connect( (QObject*)( m_Controls->syntheticNetworkComboBox ), SIGNAL(currentIndexChanged (int)),  this, SLOT(OnSyntheticNetworkComboBoxCurrentIndexChanged(int)) );
     QObject::connect( (QObject*)( m_Controls->modularizePushButton ), SIGNAL(clicked()),  this, SLOT(OnModularizePushButtonClicked()) );
     QObject::connect( (QObject*)( m_Controls->prunePushButton ), SIGNAL(clicked()),  this, SLOT(OnPrunePushButtonClicked()) );
+    QObject::connect( (QObject*)( m_Controls->createConnectivityMatrixImagePushButton ), SIGNAL(clicked()),  this, SLOT(OnCreateConnectivityMatrixImagePushButtonClicked()) );
   }
 
   // GUI is different for developer and demo mode
@@ -684,7 +686,7 @@ void QmitkBrainNetworkAnalysisView::OnPrunePushButtonClicked()
   std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
   if ( nodes.empty() )
   {
-    QMessageBox::information( NULL, "Network pruning", "Please select one or more network.");
+    QMessageBox::information( NULL, "Network pruning", "Please select one or more networks.");
     return;
   }
 
@@ -705,6 +707,47 @@ void QmitkBrainNetworkAnalysisView::OnPrunePushButtonClicked()
       {
         // Edge pruning will also do node pruning
         network->PruneEdgesBelowWeight( this->m_Controls->pruneEdgeWeightSpinBox->value() );
+      }
+    }
+  }
+}
+
+
+void QmitkBrainNetworkAnalysisView::OnCreateConnectivityMatrixImagePushButtonClicked()
+{
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  if ( nodes.empty() )
+  {
+    QMessageBox::information( NULL, "Connectivity Matrix Image creation", "Please select one or more networks.");
+    return;
+  }
+
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
+    it != nodes.end();
+    ++it )
+  {
+    mitk::DataNode::Pointer node = *it;
+
+    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+    {
+      return;
+    }
+
+    {
+      mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( node->GetData() );
+      if( node.IsNotNull() && network )
+      {
+        itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::Pointer filter = itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::New();
+        filter->SetInputNetwork( network );
+        filter->SetBinaryConnectivity(m_Controls->binaryCheckBox->isChecked());
+        filter->SetRescaleConnectivity(m_Controls->rescaleCheckBox->isChecked());
+        filter->Update();
+
+        mitk::Image::Pointer connectivityMatrixImage = mitk::ImportItkImage( filter->GetOutput());
+        mitk::DataNode::Pointer connectivityMatrixImageNode = mitk::DataNode::New();
+        connectivityMatrixImageNode->SetData ( connectivityMatrixImage );
+        connectivityMatrixImageNode->SetName( "Connectivity matrix" );
+        this->GetDefaultDataStorage()->Add(connectivityMatrixImageNode, node );
       }
     }
   }

@@ -54,15 +54,10 @@
       name="Connectomics"
       class="QmitkDIAppConnectomicsPerspective"
       icon="resources/perspectives/connectomics.png"/>
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.volumevisualization"
-      name="Volume Visualization"
-      class="QmitkDIAppVolumeVisualizationPerspective"
-      icon="resources/perspectives/volumevizualization.png"/>
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.screenshotsmovies"
-      name="Screenshots Movies"
-      class="QmitkDIAppScreenshotsMoviesPerspective"
-      icon="resources/perspectives/screenshotsmovies.png"/>
-
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.utility"
+      name="Utility"
+      class="QmitkDIAppUtilityPerspective"
+      icon="resources/perspectives/utility.png"/>
   </extension>
 
 </plugin>

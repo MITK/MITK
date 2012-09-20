@@ -10,8 +10,7 @@ var moduleNames = new Array("Dicom Import",
                             "TBSS",
                             "Connectomics",
                             "IVIM",
-                            "Volume Visualization",
-                            "Screenshots & Movies",
+                            "Utility",
                             "MITK Downloads & News");
 
 // add the MITK-link to your module
@@ -22,8 +21,7 @@ var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.diffusionimaginga
                             "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.tbss?clear=false",
                             "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.connectomics?clear=false",
                             "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.ivim?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.volumevisualization?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.screenshotsmovies?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.utility?clear=false",
                             "http://www.mitk.org");
 
 // add the filename of your icon for the module. Place the picture in subdirectory "pics".
@@ -35,8 +33,7 @@ var picFilenames = new Array("01dicomimport.png",
                              "05tbss.png",
                              "06connectomics.png",
                              "07ivim.png",
-                             "08volumevisualization.png",
-                             "09screenshotsmovies.png",
+                             "09utility.png",
                              "button_mitk.png");
 
 // if you want to create an animated icon, add the name of your animated gif (placed in subdirectory "pics"). Otherwise enter an empty string "".
@@ -48,14 +45,12 @@ var aniFilenames = new Array("01adicomimport.png",
                              "05atbss.png",
                              "06aconnectomics.png",
                              "07aivim.png",
-                             "08avolumevisualization.png",
-                             "09ascreenshotsmovies.png",
+                             "09autility.png",
                              "button_mitka.png");
 
 // if your module is not stable, you can mark it as experimental.
 // just set true for experimental or false for stable.
 var experimental = new Array(false,
-                             false,
                              false,
                              false,
                              false,
@@ -73,8 +68,7 @@ var moduleDescriptions = new Array("'Dicom Import' supports direct import of Sie
                             "'TBSS' does *not* reimplement the original Tract Based Spatial Statistics method available in FSL. Aim of this module is to read TBSS output and to provide means to interactively explore and evaluate the datasets.",
                             "'Connectomics' aims at building graphs (nodes and edges) from a global tractogram and applying graph theory for data analysis. fMRI-data might be incorporated in future.",
                             "'IVIM' stands for Intravoxel Incoherent Motion. The technique allows for the estimation of tissue perfusion on basis of diffusion measurements. Several models are supported by this module. Interactive exploration of the data is supported.",
-                            "'Volume Visualization' provides easy to use and fast volume rendering of images. Transfer-functions can be loaded, saved, and adapted interactively.",
-                            "'Screenshots & Movies' provides means to capture high resolution screenshots as well as movies of the 3D sceen.",
+                            "'Utility' provides easy to use and fast volume rendering of images, means to capture high resolution screenshots as well as movies of the 3D sceen. Also includes a logging mechanism.",
                             "Open the MITK website in an external browser.");
 
 var bttns = new Array();

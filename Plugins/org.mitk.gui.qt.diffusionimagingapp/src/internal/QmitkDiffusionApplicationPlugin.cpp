@@ -27,9 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Perspectives/QmitkDIAppIVIMPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h"
-#include "src/internal/Perspectives/QmitkDIAppScreenshotsMoviesPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppTBSSPerspective.h"
-#include "src/internal/Perspectives/QmitkDIAppVolumeVisualizationPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppUtilityPerspective.h"
 
 #include <mitkVersion.h>
 #include <mitkLogMacros.h>
@@ -73,9 +72,8 @@ void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppIVIMPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppPreprocessingReconstructionPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppQuantificationPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppScreenshotsMoviesPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppTBSSPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppVolumeVisualizationPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppUtilityPerspective, context)
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
   ctkConfigurationAdmin* configAdmin = 0;

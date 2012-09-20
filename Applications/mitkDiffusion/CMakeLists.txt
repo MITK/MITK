@@ -26,6 +26,7 @@ set(_plugins
   org.blueberry.core.commands
   org.blueberry.ui
   org.blueberry.ui.qt
+  org.blueberry.ui.qt.log
   org.blueberry.ui.qt.help
   org.mitk.core.services
   org.mitk.gui.common

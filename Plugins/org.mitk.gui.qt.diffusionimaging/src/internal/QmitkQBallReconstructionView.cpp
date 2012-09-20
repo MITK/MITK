@@ -411,6 +411,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
     break;
   case 1:
     m_Controls->m_Description->setText("Spherical harmonics recon. (Descoteaux2007)");
+    m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   case 2:
     m_Controls->m_Description->setText("SH recon. with solid angle consideration (Aganj2009)");

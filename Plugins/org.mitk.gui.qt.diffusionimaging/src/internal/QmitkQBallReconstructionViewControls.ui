@@ -166,7 +166,7 @@
          <item row="4" column="0">
           <widget class="QCheckBox" name="m_OutputCoeffsImage">
            <property name="text">
-            <string>Output SH-Coeffs-Image</string>
+            <string>Output SH-Coefficient Image</string>
            </property>
           </widget>
          </item>

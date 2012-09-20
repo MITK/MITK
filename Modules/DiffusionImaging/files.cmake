@@ -204,7 +204,7 @@ set(H_FILES
   Algorithms/itkGaussianInterpolateImageFunction.h
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.h
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.h
-  Algorithms/itkDiffusionTensorPrincipleDirectionImageFilter.h
+  Algorithms/itkDiffusionTensorPrincipalDirectionImageFilter.h
   Algorithms/itkCartesianToPolarVectorImageFilter.h
   Algorithms/itkPolarToCartesianVectorImageFilter.h
   Algorithms/itkDistanceMapFilter.h
@@ -215,6 +215,11 @@ set(H_FILES
   Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
   Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
   Algorithms/itkMergeDiffusionImagesFilter.h
+  Algorithms/itkDwiPhantomGenerationFilter.h
+  Algorithms/itkFiniteDiffOdfMaximaExtractionFilter.h
+  Algorithms/itkFslPeakImageConverter.h
+  Algorithms/itkFslShCoefficientImageConverter.h
+  Algorithms/itkOdfMaximaExtractionFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h

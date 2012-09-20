@@ -2,22 +2,22 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkDIAppVolumeVisualizationPerspective.h"
+#include "QmitkDIAppImageProcessingPerspective.h"
 #include "berryIViewLayout.h"
 
-void QmitkDIAppVolumeVisualizationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void QmitkDIAppImageProcessingPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   /////////////////////////////////////////////////////
   // all di-app perspectives should have the following:
@@ -42,8 +42,15 @@ void QmitkDIAppVolumeVisualizationPerspective::CreateInitialLayout(berry::IPageL
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.volumevisualization");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.volumevisualization");
+  left->AddView("org.mitk.views.segmentation");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.segmentation");
   lo->SetCloseable(false);
 
+  left->AddView("org.mitk.views.segmentationboolean");
+  lo = layout->GetViewLayout("org.mitk.views.segmentationboolean");
+  lo->SetCloseable(false);
+
+  left->AddView("org.mitk.views.basicimageprocessing");
+  lo = layout->GetViewLayout("org.mitk.views.basicimageprocessing");
+  lo->SetCloseable(false);
 }

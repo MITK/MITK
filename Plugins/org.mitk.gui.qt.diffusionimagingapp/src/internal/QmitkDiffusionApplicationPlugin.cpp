@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppTBSSPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppUtilityPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppRegistrationPerspective.h"
 
 #include <mitkVersion.h>
 #include <mitkLogMacros.h>
@@ -76,6 +78,8 @@ void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppQuantificationPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppTBSSPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppUtilityPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppSyntheticDataGenerationPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppRegistrationPerspective, context)
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
   ctkConfigurationAdmin* configAdmin = 0;

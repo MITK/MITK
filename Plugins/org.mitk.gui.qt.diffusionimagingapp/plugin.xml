@@ -54,6 +54,14 @@
       name="Connectomics"
       class="QmitkDIAppConnectomicsPerspective"
       icon="resources/perspectives/connectomics.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.registration"
+      name="Registration"
+      class="QmitkDIAppRegistrationPerspective"
+      icon="resources/perspectives/utility.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.syntheticdata"
+      name="Synthetic Data Generation"
+      class="QmitkDIAppSyntheticDataGenerationPerspective"
+      icon="resources/perspectives/utility.png"/>
     <perspective id="org.mitk.diffusionimagingapp.perspectives.utility"
       name="Utility"
       class="QmitkDIAppUtilityPerspective"

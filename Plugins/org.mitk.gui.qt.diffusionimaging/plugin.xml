@@ -129,4 +129,18 @@
           icon="resources/QmitkBrainNetworkAnalysisViewIcon_48.png" />
   </extension>
 
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.dwisoftwarephantomview"
+          name="DWI Software Phantoms (Experimental)"
+          class="QmitkDwiSoftwarePhantomView"
+          icon="resources/phantom.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.odfmaximaextraction"
+          name="Peak Extraction"
+          class="QmitkOdfMaximaExtractionView"
+          icon="resources/qball_peaks.png" />
+  </extension>
+
 </plugin>

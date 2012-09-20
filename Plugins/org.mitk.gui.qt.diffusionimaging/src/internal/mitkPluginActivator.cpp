@@ -37,6 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkTbssSkeletonizationView.h"
 #include "src/internal/QmitkStreamlineTrackingView.h"
 #include "src/internal/Connectomics/QmitkBrainNetworkAnalysisView.h"
+#include "src/internal/QmitkDwiSoftwarePhantomView.h"
+#include "src/internal/QmitkOdfMaximaExtractionView.h"
 
 namespace mitk {
 
@@ -61,6 +63,8 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTbssSkeletonizationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkBrainNetworkAnalysisView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkStreamlineTrackingView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkOdfMaximaExtractionView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDwiSoftwarePhantomView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

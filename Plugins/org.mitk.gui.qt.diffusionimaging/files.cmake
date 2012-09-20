@@ -31,6 +31,8 @@ set(INTERNAL_CPP_FILES
   QmitkTbssSkeletonizationView.cpp
   Connectomics/QmitkBrainNetworkAnalysisView.cpp
   Connectomics/QmitkNetworkHistogramCanvas.cpp
+  QmitkDwiSoftwarePhantomView.cpp
+  QmitkOdfMaximaExtractionView.cpp
 )
 
 set(UI_FILES
@@ -51,6 +53,8 @@ set(UI_FILES
   src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui
   src/internal/QmitkTbssSkeletonizationViewControls.ui
   src/internal/Connectomics/QmitkBrainNetworkAnalysisViewControls.ui
+  src/internal/QmitkDwiSoftwarePhantomViewControls.ui
+  src/internal/QmitkOdfMaximaExtractionViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -80,6 +84,8 @@ set(MOC_H_FILES
   src/QmitkResidualViewWidget.h
   src/internal/Connectomics/QmitkBrainNetworkAnalysisView.h
   src/internal/Connectomics/QmitkNetworkHistogramCanvas.h
+  src/internal/QmitkDwiSoftwarePhantomView.h
+  src/internal/QmitkOdfMaximaExtractionView.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -104,6 +110,8 @@ set(CACHED_RESOURCE_FILES
   resources/tbss.png
   resources/QmitkBrainNetworkAnalysisViewIcon_48.png
   resources/arrow.png
+  resources/qball_peaks.png
+  resources/phantom.png
 )
 
 set(QRC_FILES

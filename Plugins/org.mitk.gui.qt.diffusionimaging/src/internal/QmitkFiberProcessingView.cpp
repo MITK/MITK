@@ -103,10 +103,11 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
         connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
         connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
-        connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
+        connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );        
 
     }
 }
+
 
 void QmitkFiberProcessingView::Extract3d()
 {
@@ -747,7 +748,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
         m_Controls->m_FaColorFibersButton->setEnabled(false);
         m_Controls->m_PruneFibersButton->setEnabled(false);
-        m_Controls->m_CurvatureThresholdButton->setEnabled(false);
+        m_Controls->m_CurvatureThresholdButton->setEnabled(false);       
 
         if (m_Surfaces.size()>0)
             m_Controls->m_MirrorFibersButton->setEnabled(true);
@@ -766,9 +767,12 @@ void QmitkFiberProcessingView::UpdateGui()
         if (m_Surfaces.size()>0)
             m_Controls->m_Extract3dButton->setEnabled(true);
 
+
         // one bundle and one planar figure needed to extract fibers
         if (!m_SelectedPF.empty())
+        {
             m_Controls->doExtractFibersButton->setEnabled(true);
+        }
 
         // more than two bundles needed to join/subtract
         if (m_SelectedFB.size() > 1)
@@ -888,6 +892,7 @@ void QmitkFiberProcessingView::OnDrawCircle()
     //  return;
 
     mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+
     this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_EllipseCounter));
 
     this->GetDataStorage()->Modified();

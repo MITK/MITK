@@ -48,12 +48,15 @@
           <item>
            <widget class="QFrame" name="frame_6">
             <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+             <enum>QFrame::NoFrame</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <property name="margin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="QTableView" name="m_GroupInfo">
                <property name="toolTip">
@@ -67,12 +70,15 @@
              <item>
               <widget class="QFrame" name="frame_5">
                <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
+                <enum>QFrame::NoFrame</enum>
                </property>
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6">
+                <property name="margin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QPushButton" name="m_AddGroup">
                   <property name="toolTip">
@@ -115,12 +121,15 @@
           <item>
            <widget class="QFrame" name="frame_7">
             <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+             <enum>QFrame::NoFrame</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <property name="margin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="QLabel" name="label_2">
                <property name="text">
@@ -277,6 +286,49 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
+           <widget class="QWidget" name="widget" native="true">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>50</height>
+             </size>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>#segments</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="m_Segments">
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>25</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="m_Average">
+               <property name="text">
+                <string>Average</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="m_Cut">
+               <property name="text">
+                <string>Cut</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <widget class="QmitkTbssRoiAnalysisWidget" name="m_RoiPlotWidget" native="true">
             <property name="toolTip">
              <string>To plot, load a tbss image with subject information and a region of interest corresponding to the study and select them both</string>
@@ -287,13 +339,6 @@
            <widget class="QPushButton" name="m_Clipboard">
             <property name="text">
              <string>Copy to clipboard</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="m_IndividualsClipBoard">
-            <property name="text">
-             <string>Copy to clipboard all individuals</string>
             </property>
            </widget>
           </item>

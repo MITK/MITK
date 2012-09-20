@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 #include "itkVectorImage.h"
+#include <mitkFiberBundleX.h>
+#include <mitkPlanarCircle.h>
 
 
 //#include <itkHistogram.h>
@@ -70,7 +72,7 @@ public:
   void DrawProfiles(std::string preprocessed);
 
 
-  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img);
+  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, bool avg=false);
 
 
   void Boxplots();
@@ -117,11 +119,45 @@ public:
   }
 
 
+  std::vector<double> GetAverageProfile()
+  {
+    return m_Average;
+  }
+
+
+  void SetPlottingFiber(bool b)
+  {
+    m_PlottingFiberBundle = b;
+  }
+
+  bool IsPlottingFiber()
+  {
+    return m_PlottingFiberBundle;
+  }
+
+
+  void PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
+                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg=-1, int number=25);
+
+
+
+
+  // Takes an index which is an x coordinate from the plot and finds the corresponding position in world space
+  mitk::Point3D GetPositionInWorld(int index);
+  void ModifyPlot(int number, bool avg);
+
 protected:
+
+  mitk::FiberBundleX* m_Fib;
+
 
   std::vector< std::vector<double> > m_Vals;
 
   std::vector< std::vector<double> > m_IndividualProfiles;
+  std::vector< double > m_Average;
+
+
+
 
 
   std::vector< std::vector<double> > CalculateGroupProfiles(std::string preprocessed);
@@ -154,6 +190,31 @@ protected:
   RoiType m_Roi;
   std::string m_Structure;
   std::string m_Measure;
+
+  bool m_PlottingFiberBundle; // true when the plot results from a fiber tracking result (vtk .fib file)
+
+
+  // Resample a collection of tracts so that every tract contains #number equidistant samples
+  TractContainerType ParameterizeTracts(TractContainerType tracts, int number);
+
+
+
+
+  TractContainerType m_CurrentTracts;
+
+
+
+  mitk::Image* m_CurrentImage;
+
+  mitk::PlanarFigure* m_CurrentStartRoi;
+  mitk::PlanarFigure* m_CurrentEndRoi;
+
+
+  void DoPlotFiberBundles(mitk::FiberBundleX *fib, mitk::Image* img,
+                          mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg=false, int number=25);
+
+
+
 
 
 

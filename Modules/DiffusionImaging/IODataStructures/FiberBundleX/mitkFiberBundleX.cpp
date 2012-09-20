@@ -596,12 +596,14 @@ void mitk::FiberBundleX::GenerateFiberIds()
 
 }
 
+
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarFigure* pf)
 {
     if (pf==NULL)
         return NULL;
 
     std::vector<long> tmp = ExtractFiberIdSubset(pf);
+
     if (tmp.size()<=0)
         return mitk::FiberBundleX::New();
     vtkSmartPointer<vtkPolyData> pTmp = GeneratePolyDataByIds(tmp);
@@ -898,6 +900,8 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
             else
                 MITK_INFO << "ERROR in ExtractFiberIdSubset; impossible fiber id detected";
         }
+
+        m_PointsRoi = PointsInROI;
 
     }
 

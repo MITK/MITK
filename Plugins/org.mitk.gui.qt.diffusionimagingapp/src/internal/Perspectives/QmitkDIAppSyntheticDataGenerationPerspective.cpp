@@ -2,22 +2,22 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkDIAppQuantificationPerspective.h"
+#include "QmitkDIAppSyntheticDataGenerationPerspective.h"
 #include "berryIViewLayout.h"
 
-void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void QmitkDIAppSyntheticDataGenerationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   /////////////////////////////////////////////////////
   // all di-app perspectives should have the following:
@@ -42,24 +42,8 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.odfmaximaextraction");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.odfmaximaextraction");
-  lo->SetCloseable(false);
-
-  left->AddView("org.mitk.views.partialvolumeanalysisview");
-  lo = layout->GetViewLayout("org.mitk.views.partialvolumeanalysisview");
-  lo->SetCloseable(false);
-
-  left->AddView("org.mitk.views.diffusionquantification");
-  lo = layout->GetViewLayout("org.mitk.views.diffusionquantification");
-  lo->SetCloseable(false);
-
-  left->AddView("org.mitk.views.measurement");
-  lo = layout->GetViewLayout("org.mitk.views.measurement");
-  lo->SetCloseable(false);
-
-  left->AddView("org.mitk.views.imagestatistics");
-  lo = layout->GetViewLayout("org.mitk.views.imagestatistics");
+  left->AddView("org.mitk.views.dwisoftwarephantomview");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.dwisoftwarephantomview");
   lo->SetCloseable(false);
 
 }

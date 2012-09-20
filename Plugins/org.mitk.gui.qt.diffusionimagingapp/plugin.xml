@@ -54,15 +54,22 @@
       name="Connectomics"
       class="QmitkDIAppConnectomicsPerspective"
       icon="resources/perspectives/connectomics.png"/>
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.volumevisualization"
-      name="Volume Visualization"
-      class="QmitkDIAppVolumeVisualizationPerspective"
-      icon="resources/perspectives/volumevizualization.png"/>
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.screenshotsmovies"
-      name="Screenshots Movies"
-      class="QmitkDIAppScreenshotsMoviesPerspective"
-      icon="resources/perspectives/screenshotsmovies.png"/>
-
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.registration"
+      name="Registration"
+      class="QmitkDIAppRegistrationPerspective"
+      icon="resources/perspectives/utility.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.syntheticdata"
+      name="Synthetic Data Generation"
+      class="QmitkDIAppSyntheticDataGenerationPerspective"
+      icon="resources/perspectives/utility.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.utility"
+      name="Utility"
+      class="QmitkDIAppUtilityPerspective"
+      icon="resources/perspectives/utility.png"/>
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.imageprocessing"
+      name="Image Processing"
+      class="QmitkDIAppImageProcessingPerspective"
+      icon="resources/perspectives/imageprocessing.png"/>
   </extension>
 
 </plugin>

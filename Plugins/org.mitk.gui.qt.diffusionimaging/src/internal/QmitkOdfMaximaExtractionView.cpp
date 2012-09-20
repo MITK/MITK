@@ -283,7 +283,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
         return;
 
     typedef itk::DiffusionTensorPrincipalDirectionImageFilter< float, float > MaximaExtractionFilterType;
-    typename MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
+    MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
 
     mitk::Geometry3D::Pointer geometry;
     try{
@@ -314,7 +314,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
 
     if (m_Controls->m_OutputDirectionImagesBox->isChecked())
     {
-        typename MaximaExtractionFilterType::OutputImageType::Pointer itkImg = filter->GetOutput();
+        MaximaExtractionFilterType::OutputImageType::Pointer itkImg = filter->GetOutput();
         mitk::Image::Pointer img = mitk::Image::New();
         img->InitializeByItk( itkImg.GetPointer() );
         img->SetVolume( itkImg->GetBufferPointer() );

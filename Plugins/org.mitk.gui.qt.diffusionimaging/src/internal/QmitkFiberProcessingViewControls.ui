@@ -480,12 +480,12 @@
         </property>
         <item>
          <property name="text">
-          <string>Tract Density Image</string>
+          <string>Tract Density Image (TDI)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Tract Density Image (normalize image values)</string>
+          <string>Normalized TDI</string>
          </property>
         </item>
         <item>

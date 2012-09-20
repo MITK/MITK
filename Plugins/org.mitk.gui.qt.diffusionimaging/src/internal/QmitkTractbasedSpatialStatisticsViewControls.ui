@@ -48,12 +48,15 @@
           <item>
            <widget class="QFrame" name="frame_6">
             <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+             <enum>QFrame::NoFrame</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <property name="margin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="QTableView" name="m_GroupInfo">
                <property name="toolTip">
@@ -67,12 +70,15 @@
              <item>
               <widget class="QFrame" name="frame_5">
                <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
+                <enum>QFrame::NoFrame</enum>
                </property>
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6">
+                <property name="margin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QPushButton" name="m_AddGroup">
                   <property name="toolTip">
@@ -115,12 +121,15 @@
           <item>
            <widget class="QFrame" name="frame_7">
             <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+             <enum>QFrame::NoFrame</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <property name="margin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="QLabel" name="label_2">
                <property name="text">

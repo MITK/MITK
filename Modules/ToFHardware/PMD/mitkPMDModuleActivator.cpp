@@ -32,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraPMDCamBoardDeviceFactory.h"
 #include "mitkToFCameraPMDRawDataCamBoardDeviceFactory.h"
 
+//Implementing a Device on start
+#include "mitkAbstractToFDeviceFactory.h"
+
 
 /*
   * This is the module activator for the "mitkPMDCamCubeModule" module. It registers services
@@ -82,6 +85,7 @@ public:
         ServiceProperties rawCamBoardFactoryProps;
         rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
+
 
 
         m_Factories.push_back(toFCameraPMDCamCubeDeviceFactory);

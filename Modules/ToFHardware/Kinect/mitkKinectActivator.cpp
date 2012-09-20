@@ -44,6 +44,8 @@ public:
         ServiceProperties kinectFactoryProps;
         kinectFactoryProps["ToFFactoryName"] = kinectFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(kinectFactory, kinectFactoryProps);
+  //-----------------Test for startup initzialisation------------
+        //dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice();
 
         m_Factories.push_back( kinectFactory );
     }

@@ -142,6 +142,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
     //select the camera to connect with
     QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
+
+
     if (selectedCamera == "PMD CamCube 2.0/3.0")
     { //PMD CamCube
       //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDCamCubeDevice::New());
@@ -188,6 +190,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
       this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraMITKPlayerDevice::New());
     }
+
 
     // if a player was selected ...
     if (playerMode)

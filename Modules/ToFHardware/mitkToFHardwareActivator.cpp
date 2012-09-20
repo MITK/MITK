@@ -55,7 +55,7 @@ public:
         std::cout << "cameras " << string << std::endl;
 
 //Loading mitkKinectModule.dll of KinectModule
-      LoadLibrary(TEXT("mitkKinectModule.dll"));
+        LoadLibrary(TEXT("mitkKinectModule.dll"));
 
 //Loading mitkPMDCamCubeModule.dll of PMCCamCubeModule
         ////Implementing PMD Player DeviceFactory
@@ -114,7 +114,7 @@ public:
         //ServiceProperties mitkMESASR4000FactoryProps;
         //mitkMESASR4000FactoryProps["ToFFactoryName"] = toFCameraMESASR4000DeviceFactory->GetFactoryName();
         //context->RegisterService<IToFDeviceFactory>(toFCameraMESASR4000DeviceFactory, mitkMESASR4000FactoryProps);
-      LoadLibrary(TEXT("mitk.dllMesaSR4000Module.dll"));
+      LoadLibrary(TEXT("MesaSR4000Module.dll"));
 
 
         //Implementing MITKPlayerDevice

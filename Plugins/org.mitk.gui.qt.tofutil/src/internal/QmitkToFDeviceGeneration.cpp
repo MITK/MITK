@@ -80,7 +80,7 @@ void QmitkToFDeviceGeneration::OnToFCameraConnected()
       MITK_INFO << m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>()->GetFactoryName();
 
       mitk::IToFDeviceFactory* factory = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>();
-      dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice(); // This line should be copied to the DeviceActivator to produce
+      dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice(); // This line should be copied to the DeviceActivator to produce a device on startr up
     }
     else
     {

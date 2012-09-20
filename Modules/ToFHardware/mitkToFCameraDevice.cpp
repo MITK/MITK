@@ -178,11 +178,6 @@ namespace mitk
 
       // Get Context and Module
       mitk::ModuleContext* context = GetModuleContext();
-
-      // Define ServiceProps
-//      ServiceProperties props;
-//      props["Manufacturer"] = this->m_Metadata->GetDeviceManufacturer();
-//      m_ServiceRegistration = context->RegisterService<mitk::ToFCameraDevice>(this);
       return true;
   }
 }

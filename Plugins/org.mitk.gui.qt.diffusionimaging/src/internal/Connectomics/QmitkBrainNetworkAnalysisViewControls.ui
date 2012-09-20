@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>227</width>
-    <height>1045</height>
+    <height>1106</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -107,6 +107,44 @@
      <property name="text">
       <string>Divide in Modules</string>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="connectivityMatrixImageGroupBox">
+     <property name="title">
+      <string>Connectivity Matrix Image Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QPushButton" name="createConnectivityMatrixImagePushButton">
+        <property name="text">
+         <string>Create Connectivity Matrix Image</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QCheckBox" name="rescaleCheckBox">
+          <property name="text">
+           <string>Rescale</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QCheckBox" name="binaryCheckBox">
+          <property name="text">
+           <string>Binary</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

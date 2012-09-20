@@ -77,6 +77,9 @@ public:
     /// \brief Prune network
     void OnPrunePushButtonClicked();
 
+    /// \brief Create 2D Connecivity Matrix image from network
+    void OnCreateConnectivityMatrixImagePushButtonClicked();
+
 protected:
 
   // ####### Functions #######

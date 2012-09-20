@@ -42,8 +42,8 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.segmentation");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.segmentation");
+  left->AddView("org.mitk.views.odfmaximaextraction");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.odfmaximaextraction");
   lo->SetCloseable(false);
 
   left->AddView("org.mitk.views.partialvolumeanalysisview");

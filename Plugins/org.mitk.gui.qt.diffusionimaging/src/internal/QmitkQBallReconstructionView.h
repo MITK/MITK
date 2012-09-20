@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -80,18 +80,8 @@ class QmitkQBallReconstructionView : public QmitkFunctionality
 protected slots:
 
   void ReconstructStandard();
-  //void ReconstructNormalized1();
-  //void ReconstructNormalized2();
-  //void ReconstructNonNormalized();
-  //void AnalyticallyReconstructStandard();
-  //void AnalyticallyReconstructSolidAngle();
-  //void AnalyticallyReconstructNonNegSolidAngle();
-  //void AnalyticallyReconstructAdc();
-  //void AnalyticallyReconstructRaw();
-
   void AdvancedCheckboxClicked();
   void MethodChoosen(int method);
-
   void Reconstruct(int method, int normalization);
 
   void NumericalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);

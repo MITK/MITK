@@ -76,7 +76,6 @@ protected slots:
 
   void AverageGradients();
   void ExtractB0();
-  void BrainMask();
   void MergeDwis();
   void DoApplyMesurementFrame();
   void DoReduceGradientDirections();

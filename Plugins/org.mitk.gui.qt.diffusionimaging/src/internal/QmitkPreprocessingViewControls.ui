@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>389</width>
-    <height>992</height>
+    <width>892</width>
+    <height>1079</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -138,27 +138,65 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="m_ReduceSizeLayout">
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Reduce size</string>
+      <string>Non diffusion weighted image</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="label_3">
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>70</height>
+          <height>30</height>
          </size>
         </property>
         <property name="text">
-         <string>Multiple acquistions of one gradient direction can be averaged. Due to rounding errors, similar gradients often differ in the last decimal positions. The Merge radius allows to average them anyway by taking into account all directions within a certain radius.</string>
+         <string>Average and extract all images that were acquired without diffusion weighting.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_ButtonExtractB0">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>If multiple baseline acquisitions are present, the default behaviour is to output an averaged image.</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Extract B0</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="m_CheckExtractAll">
+        <property name="toolTip">
+         <string>Create a 3D+t data set containing all b0 images as timesteps</string>
+        </property>
+        <property name="text">
+         <string>Extract all B0 images without averaging</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_ReduceSizeLayout">
+     <property name="title">
+      <string>Modify DWI</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
        <widget class="QFrame" name="frame">
         <property name="frameShape">
@@ -221,7 +259,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Multiple acquistions of one gradient direction can be averaged. Due to rounding errors, similar gradients often differ in the last decimal positions. The Merge radius allows to average them by taking all directions within a certain radius into account.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -235,26 +273,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCommandLinkButton" name="m_MirrorGradientToHalfSphereButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Mirror all gradients around one axis.</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string>Mirror gradients to half sphere</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line">
+       <widget class="Line" name="line_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -270,22 +289,22 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
          <property name="margin">
-          <number>9</number>
+          <number>0</number>
          </property>
          <property name="spacing">
           <number>9</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Specify desired number of gradients per shell.</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="1">
           <widget class="QLabel" name="label_6">
            <property name="text">
             <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Specify desired number of gradients per shell:</string>
            </property>
           </widget>
          </item>
@@ -298,7 +317,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>Retain only the specified number of gradient directions and according image volumes. The retained directions are spread equally over the half sphere.</string>
+         <string>Retain only the specified number of gradient directions and according image volumes. The retained directions are spread equally over the half sphere using an iterative energy repulsion strategy.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -311,38 +330,20 @@
         </property>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Non diffusion weighted image</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QLabel" name="label_3">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Average and extract all images that were acquired without diffusion weighting.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCommandLinkButton" name="m_ButtonExtractB0">
+       <widget class="QCommandLinkButton" name="m_MirrorGradientToHalfSphereButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Sometimes the gradient directions are not located on one half sphere.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -351,17 +352,7 @@
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>Extract B0</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="m_CheckExtractAll">
-        <property name="toolTip">
-         <string>Create a 3D+t data set containing all b0 images as timesteps</string>
-        </property>
-        <property name="text">
-         <string>Extract all B0 without averaging</string>
+         <string>Mirror gradients to half sphere</string>
         </property>
        </widget>
       </item>
@@ -380,7 +371,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Merges selected DWIs of same dimension. If several b-values are present, the resulting image will contain multiple b-shells.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -389,35 +380,7 @@
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>Merge</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>Brain mask</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <item>
-       <widget class="QCommandLinkButton" name="m_ButtonBrainMask">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string>Estimate binary brain mask</string>
+         <string>Merge selected DWIs</string>
         </property>
        </widget>
       </item>
@@ -462,8 +425,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>10</width>
-          <height>10</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
         <property name="cursor" stdset="0">
@@ -492,6 +455,9 @@
         </attribute>
         <attribute name="horizontalHeaderHighlightSections">
          <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>0</number>
         </attribute>
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>

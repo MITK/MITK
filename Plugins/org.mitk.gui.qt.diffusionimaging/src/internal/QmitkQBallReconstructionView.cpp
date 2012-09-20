@@ -55,10 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <boost/version.hpp>
 
-const std::string QmitkQBallReconstructionView::VIEW_ID =
-    "org.mitk.views.qballreconstruction";
-
-#define DI_INFO MITK_INFO("DiffusionImaging")
+const std::string QmitkQBallReconstructionView::VIEW_ID = "org.mitk.views.qballreconstruction";
 
 
 typedef float TTensorPixelType;
@@ -404,21 +401,26 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
   m_Controls->m_QBallSelectionBox->setHidden(true);
   m_Controls->m_OutputCoeffsImage->setHidden(true);
 
+  if (method==0)
+      m_Controls->m_ShFrame->setVisible(false);
+  else
+      m_Controls->m_ShFrame->setVisible(true);
+
   switch(method)
   {
   case 0:
-    m_Controls->m_Description->setText("Numerical recon. (Tuch2004)");
+    m_Controls->m_Description->setText("Numerical recon. (Tuch 2004)");
     break;
   case 1:
-    m_Controls->m_Description->setText("Spherical harmonics recon. (Descoteaux2007)");
+    m_Controls->m_Description->setText("Spherical harmonics recon. (Descoteaux 2007)");
     m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   case 2:
-    m_Controls->m_Description->setText("SH recon. with solid angle consideration (Aganj2009)");
+    m_Controls->m_Description->setText("SH recon. with solid angle consideration (Aganj 2009)");
     m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   case 3:
-    m_Controls->m_Description->setText("SH solid angle with non-neg. constraint (Goh2009)");
+    m_Controls->m_Description->setText("SH solid angle with non-neg. constraint (Goh 2009)");
     break;
   case 4:
     m_Controls->m_Description->setText("SH recon. of the plain ADC-profiles");
@@ -427,7 +429,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
     m_Controls->m_Description->setText("SH recon. of the raw diffusion signal");
     break;
   case 6:
-    m_Controls->m_Description->setText("SH Multi q-Ball recon. of the multi q-Ball diffusion signal");
+    m_Controls->m_Description->setText("SH recon. of the multi shell diffusion signal (Aganj 2010)");
     m_Controls->m_QBallSelectionBox->setHidden(false);
     m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
@@ -438,8 +440,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
 
 void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
 {
-  bool check = m_Controls->
-      m_AdvancedCheckbox->isChecked();
+  bool check = m_Controls->m_AdvancedCheckbox->isChecked();
 
   m_Controls->m_QBallReconstructionMaxLLevelTextLabel_2->setVisible(check);
   m_Controls->m_QBallReconstructionMaxLLevelComboBox->setVisible(check);
@@ -448,13 +449,7 @@ void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
 
   m_Controls->m_QBallReconstructionThresholdLabel_2->setVisible(check);
   m_Controls->m_QBallReconstructionThreasholdEdit->setVisible(check);
-  m_Controls->m_OutputB0Image->setVisible(check);
   m_Controls->label_2->setVisible(check);
-
-  //m_Controls->textLabel1_2->setVisible(check);
-  //m_Controls->m_QBallReconstructionLambdaStepLineEdit->setVisible(check);
-  //m_Controls->textLabel1_3->setVisible(check);
-
   m_Controls->frame_2->setVisible(check);
 }
 
@@ -551,7 +546,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
           QballReconstructionImageFilterType::New();
       filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
       filter->SetBValue(vols->GetB_Value());
-      filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
+      filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
 
       switch(normalization)
       {
@@ -597,21 +592,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
       newname = newname.append("_QN%1").arg(normalization);
       SetDefaultNodeProperties(node, newname.toStdString());
       nodes.push_back(node);
-
-      // B-Zero TO DATATREE
-      if(m_Controls->m_OutputB0Image->isChecked())
-      {
-        mitk::Image::Pointer image4 = mitk::Image::New();
-        image4->InitializeByItk( filter->GetBZeroImage().GetPointer() );
-        image4->SetVolume( filter->GetBZeroImage()->GetBufferPointer() );
-        mitk::DataNode::Pointer node4=mitk::DataNode::New();
-        node4->SetData( image4 );
-        node4->SetProperty( "name", mitk::StringProperty::New(
-                              QString(nodename.c_str()).append("_b0").toStdString()) );
-        nodes.push_back(node4);
-      }
       mitk::ProgressBar::GetInstance()->Progress();
-
     }
 
     std::vector<mitk::DataNode::Pointer>::iterator nodeIt;
@@ -641,7 +622,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
     if (!nrFiles) return;
 
     std::vector<float> lambdas;
-    float minLambda  = m_Controls->m_QBallReconstructionLambdaLineEdit->text().toFloat();
+    float minLambda  = m_Controls->m_QBallReconstructionLambdaLineEdit->value();
     lambdas.push_back(minLambda);
     int nLambdas = lambdas.size();
 
@@ -744,7 +725,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
   typename FilterType::Pointer filter = FilterType::New();
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
   filter->SetBValue(vols->GetB_Value());
-  filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
+  filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 
   switch(normalization)
@@ -809,29 +790,6 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
   SetDefaultNodeProperties(node, newname.toStdString());
   nodes->push_back(node);
 
-
-  //  mitk::Image::Pointer image5 = mitk::Image::New();
-  //  image5->InitializeByItk( filter->GetODFSumImage().GetPointer() );
-  //  image5->SetVolume( filter->GetODFSumImage()->GetBufferPointer() );
-  //  mitk::DataNode::Pointer node5=mitk::DataNode::New();
-  //  node5->SetData( image5 );
-  //  node5->SetProperty( "name", mitk::StringProperty::New(
-  //    QString(nodename.c_str()).append("_ODF").toStdString()) );
-  //  nodes->push_back(node5);
-
-  // B-Zero TO DATATREE
-  if(m_Controls->m_OutputB0Image->isChecked())
-  {
-    mitk::Image::Pointer image4 = mitk::Image::New();
-    image4->InitializeByItk( filter->GetBZeroImage().GetPointer() );
-    image4->SetVolume( filter->GetBZeroImage()->GetBufferPointer() );
-    mitk::DataNode::Pointer node4=mitk::DataNode::New();
-    node4->SetData( image4 );
-    node4->SetProperty( "name", mitk::StringProperty::New(
-                          QString(nodename.c_str()).append("_b0").toStdString()) );
-    nodes->push_back(node4);
-  }
-
   if(m_Controls->m_OutputCoeffsImage->isChecked())
   {
     mitk::Image::Pointer coeffsImage = mitk::Image::New();
@@ -857,7 +815,7 @@ void QmitkQBallReconstructionView::MultiQBallReconstruction(
     if (!nrFiles) return;
 
     std::vector<float> lambdas;
-    float minLambda  = m_Controls->m_QBallReconstructionLambdaLineEdit->text().toFloat();
+    float minLambda  = m_Controls->m_QBallReconstructionLambdaLineEdit->value();
     lambdas.push_back(minLambda);
     int nLambdas = lambdas.size();
 
@@ -962,7 +920,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage(), vols->GetB_Value() );
 
   //filter->SetBValue(vols->GetB_Value());
-  filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
+  filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 
 
@@ -979,19 +937,6 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
   newname = newname.append("_QAMultiShell");
   SetDefaultNodeProperties(node, newname.toStdString());
   nodes->push_back(node);
-
-  // B-Zero TO DATATREE
-  if(m_Controls->m_OutputB0Image->isChecked())
-  {
-    mitk::Image::Pointer image4 = mitk::Image::New();
-    image4->InitializeByItk( filter->GetBZeroImage().GetPointer() );
-    image4->SetVolume( filter->GetBZeroImage()->GetBufferPointer() );
-    mitk::DataNode::Pointer node4=mitk::DataNode::New();
-    node4->SetData( image4 );
-    node4->SetProperty( "name", mitk::StringProperty::New(
-                          QString(nodename.c_str()).append("_b0").toStdString()) );
-    nodes->push_back(node4);
-  }
 
   if(m_Controls->m_OutputCoeffsImage->isChecked())
   {

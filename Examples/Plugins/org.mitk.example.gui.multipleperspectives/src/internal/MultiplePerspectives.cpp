@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MultiplePerspectives.h"
 
-/// Berry
+// berry Includes
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
@@ -30,8 +30,11 @@ public:
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
       berry::IWorkbenchWindowConfigurer::Pointer configurer)
   {
+    //! [initial window size]
     // Set an individual initial size
     configurer->SetInitialSize(berry::Point(600,400));
+    //! [initial window size]
+
     //! [Visibility of perspective bar]
     // Enable or disable the perspective bar
     configurer->SetShowPerspectiveBar(true);

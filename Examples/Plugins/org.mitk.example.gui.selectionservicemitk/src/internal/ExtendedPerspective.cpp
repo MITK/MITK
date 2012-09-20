@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ExtendedPerspective.h"
 
-/// Berry
+// berry Includes
 #include "berryIViewLayout.h"
 
 ExtendedPerspective::ExtendedPerspective()
@@ -27,18 +27,11 @@ void ExtendedPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout
 {
   // Editors are placed for free.
   std::string editorAreaId = layout->GetEditorArea();
-  //! [Visibility of editor area]
   // Hides the editor area.
   layout->SetEditorAreaVisible(false);
-  //! [Visibility of editor area]
 
-  //berry::IFolderLayout::Pointer left =
-  //  layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.3f, editorAreaId);
-  //left->AddView("org.mitk.views.datamanager");
-
-  //layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::RIGHT, 0.3f, editorAreaId);
-  
-  layout->AddView("org.mitk.views.selectionview", berry::IPageLayout::LEFT,0.3f, editorAreaId);
-
-  layout->AddView("org.mitk.views.listenerview", berry::IPageLayout::RIGHT,0.4f, editorAreaId);
+  // add the selection view (for providing selection events for the listener view) to the perspective  
+  layout->AddView("org.mitk.views.selectionviewmitk", berry::IPageLayout::LEFT,0.3f, editorAreaId);
+  // add the listener view (listening for selection events of the selection view) to the perspective
+  layout->AddView("org.mitk.views.listenerviewmitk", berry::IPageLayout::RIGHT,0.4f, editorAreaId);
 }

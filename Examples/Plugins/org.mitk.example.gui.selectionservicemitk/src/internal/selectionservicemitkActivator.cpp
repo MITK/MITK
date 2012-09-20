@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SelectionServiceMITK.h"
 #include "ExtendedPerspective.h"
-#include "ListenerView.h"
-#include "SelectionView.h"
+#include "ListenerViewMitk.h"
+#include "SelectionViewMitk.h"
 
 #include <QtPlugin>
 
@@ -29,8 +29,8 @@ void selectionservicemitkActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(SelectionServiceMITK, context)
     BERRY_REGISTER_EXTENSION_CLASS(ExtendedPerspective, context)
-    BERRY_REGISTER_EXTENSION_CLASS(ListenerView, context)
-    BERRY_REGISTER_EXTENSION_CLASS(SelectionView, context)
+    BERRY_REGISTER_EXTENSION_CLASS(ListenerViewMitk, context)
+    BERRY_REGISTER_EXTENSION_CLASS(SelectionViewMitk, context)
 }
 
 void selectionservicemitkActivator::stop(ctkPluginContext* context)

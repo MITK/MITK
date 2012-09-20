@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ListenerViewControls</class>
- <widget class="QWidget" name="ListenerViewControls">
+ <class>ListenerViewMitkControls</class>
+ <widget class="QWidget" name="ListenerViewMitkControls">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -34,7 +34,7 @@
         <item>
          <widget class="QRadioButton" name="radioButton">
           <property name="text">
-           <string>Selection 1</string>
+           <string>DataNode 1</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -44,7 +44,7 @@
         <item>
          <widget class="QRadioButton" name="radioButton_2">
           <property name="text">
-           <string>Selection 2</string>
+           <string>DataNode 2</string>
           </property>
          </widget>
         </item>

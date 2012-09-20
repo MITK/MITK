@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ExtendedPerspective.h"
 
-/// Berry
+// berry Includes
 #include "berryIViewLayout.h"
 
 ExtendedPerspective::ExtendedPerspective()
@@ -25,12 +25,13 @@ ExtendedPerspective::ExtendedPerspective()
 
 void ExtendedPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
-  // Editors are placed for free.
+  // Editors are placed for free
   std::string editorAreaId = layout->GetEditorArea();
 
-  // Hides the editor area.
+  // Hide editor area
   layout->SetEditorAreaVisible(false);
-
+  
+  // add emptyviews to perspective
   layout->AddView("org.mitk.views.emptyview1", berry::IPageLayout::LEFT,0.3f, editorAreaId);
   layout->AddView("org.mitk.views.emptyview2", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
 }

@@ -5,21 +5,21 @@ set(INTERNAL_CPP_FILES
   selectionservicemitkActivator.cpp
   SelectionServiceMITK.cpp
   ExtendedPerspective.cpp
-  ListenerView.cpp
-  SelectionView.cpp
+  ListenerViewMitk.cpp
+  SelectionViewMitk.cpp
 )
 
 set(UI_FILES
-  src/internal/ListenerViewControls.ui
-  src/internal/SelectionViewControls.ui
+  src/internal/ListenerViewMitkControls.ui
+  src/internal/SelectionViewMitkControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/selectionservicemitkActivator.h
   src/internal/SelectionServiceMITK.h
   src/internal/ExtendedPerspective.h
-  src/internal/ListenerView.h
-  src/internal/SelectionView.h
+  src/internal/ListenerViewMitk.h
+  src/internal/SelectionViewMitk.h
 )
 
 set(CACHED_RESOURCE_FILES

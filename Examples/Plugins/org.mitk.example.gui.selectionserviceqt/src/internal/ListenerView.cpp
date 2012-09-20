@@ -16,13 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ListenerView.h"
 
-/// Berry
+// berry Includes
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryQModelIndexObject.h>
 
-/// Qt
-#include <QMessageBox>
+// qt Includes
 #include <QString>
 #include <QModelIndex>
 #include <QVariant>
@@ -37,6 +36,7 @@ ListenerView::ListenerView()
 
 ListenerView::~ListenerView()
 {
+  // destroy selection service
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   s->RemoveSelectionListener(m_SelectionListener);
 }
@@ -55,6 +55,7 @@ void ListenerView::CreateQtPartControl(QWidget *parent)
 
 void ListenerView::ToggleRadioMethod(QString selectStr)
 {
+  // change the radio button state according to the name of the selected element
   if (selectStr == "Selection 1") m_Controls.radioButton->toggle();
   else if (selectStr == "Selection 2") m_Controls.radioButton_2->toggle();
 }
@@ -63,27 +64,32 @@ void ListenerView::SetFocus ()
 {
 }
 
+//! [Qt Selection Listener method implementation]
 void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
                                berry::ISelection::ConstPointer selection)
 {
+  // check for null selection
   if (selection.IsNull())
   {
     return;
   }
-
+  // exclude own selection events and check whether this kind of selection can be handled
   if (sourcepart != this && 
       selection.Cast<const berry::IStructuredSelection>())
   {
     m_CurrentSelection = selection.Cast<const berry::IStructuredSelection>();
-
+    // iterate over the selections (for the BlueBerry example this is always 1
     for (berry::IStructuredSelection::iterator itr = m_CurrentSelection->Begin();
       itr != m_CurrentSelection->End(); ++itr)
     {
       if (berry::QModelIndexObject::Pointer object = itr->Cast<berry::QModelIndexObject>())
       {
+        // get name of selected ListWidgetElement
         QVariant text = object->GetQModelIndex().data();
+        // pass name of element to method for radio button state checking
         ToggleRadioMethod(text.toString());
       }
     }
   }
 }
+//! [Qt Selection Listener method implementation]

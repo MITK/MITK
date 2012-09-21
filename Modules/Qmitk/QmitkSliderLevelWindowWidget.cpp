@@ -383,13 +383,6 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
     if ( window < 0 )
       window = 0;
 
-    if ( level - wh < minv )
-      m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMin() + wh, m_LevelWindow.GetWindow() );
-
-    else if ( level + wh > maxv )
-      m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMax() - wh, m_LevelWindow.GetWindow() );
-
-    else
       m_LevelWindow.SetLevelWindow( level, window );
       }
       m_Manager->SetLevelWindow(m_LevelWindow);

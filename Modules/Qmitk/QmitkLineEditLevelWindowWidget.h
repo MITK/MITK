@@ -78,24 +78,6 @@ private:
   /// change notifications from the mitkLevelWindowManager
   void OnPropertyModified(const itk::EventObject& e);
 
-  /*!
-  * tests if new level + window/2 <= maxRange, if not level would be set to maxRange - window/2
-  *
-  * tests if new level - window/2 >= maxRange, if not level would be set to minRange + window/2
-  *
-  * window keeps its old value
-  */
-  void validLevel();
-
-  /*!
-  * tests if current level + window/2 <= maxRange, if not window/2 would be set to maxRange - level
-  *
-  * tests if current level - window/2 >= minRange, if not window/2 would be set to level - minRange
-  *
-  * level keeps its old value
-  */
-  void validWindow();
-
 public slots:
 
   /// called when return is pressed in levelinput field

@@ -123,10 +123,24 @@
 
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.brainnetworkanalysis"
-          name="Brain Network Analysis"
-          class="QmitkBrainNetworkAnalysisView"
-          icon="resources/QmitkBrainNetworkAnalysisViewIcon_48.png" />
+    <view id="org.mitk.views.connectomicsnetworkoperations"
+          name="Network Operations"
+          class="QmitkConnectomicsNetworkOperationsView"
+          icon="resources/connectomics/QmitkConnectomicsNetworkOperationsViewIcon_48.png" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.connectomicsdata"
+          name="Network Data"
+          class="QmitkConnectomicsDataView"
+          icon="resources/connectomics/QmitkConnectomicsDataViewIcon_48.png" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.connectomicsstatistics"
+          name="Network Statistics"
+          class="QmitkConnectomicsStatisticsView"
+          icon="resources/connectomics/QmitkConnectomicsStatisticsViewIcon_48.png" />
   </extension>
 
   <extension point="org.blueberry.ui.views">

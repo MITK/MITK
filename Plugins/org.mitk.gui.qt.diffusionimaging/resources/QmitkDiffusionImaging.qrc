@@ -19,8 +19,8 @@
         <file>glyphson_S.png</file>
         <file>glyphson_T.png</file>
         <file>FiberBundle.png</file>
-	<file>FiberBundleX.png</file>
-        <file>ConnectomicsNetwork.png</file>
+        <file>FiberBundleX.png</file>
+        <file>connectomics/ConnectomicsNetwork.png</file>
         <file>rectangle.png</file>
         <file>circle.png</file>
         <file>polygon.png</file>
@@ -30,7 +30,7 @@
         <file>crosshair.png</file>
         <file>paint2.png</file>
         <file>IVIM_48.png</file>
-	<file>reset.png</file>
+  <file>reset.png</file>
         <file>MapperEfx2D.png</file>
 
     </qresource>

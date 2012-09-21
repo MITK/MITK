@@ -29,7 +29,9 @@ set(INTERNAL_CPP_FILES
   QmitkTbssTableModel.cpp
   QmitkTbssMetaTableModel.cpp
   QmitkTbssSkeletonizationView.cpp
-  Connectomics/QmitkBrainNetworkAnalysisView.cpp
+  Connectomics/QmitkConnectomicsDataView.cpp
+  Connectomics/QmitkConnectomicsNetworkOperationsView.cpp
+  Connectomics/QmitkConnectomicsStatisticsView.cpp
   Connectomics/QmitkNetworkHistogramCanvas.cpp
   QmitkDwiSoftwarePhantomView.cpp
   QmitkOdfMaximaExtractionView.cpp
@@ -52,7 +54,9 @@ set(UI_FILES
   src/internal/QmitkIVIMViewControls.ui
   src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui
   src/internal/QmitkTbssSkeletonizationViewControls.ui
-  src/internal/Connectomics/QmitkBrainNetworkAnalysisViewControls.ui
+  src/internal/Connectomics/QmitkConnectomicsDataViewControls.ui
+  src/internal/Connectomics/QmitkConnectomicsNetworkOperationsViewControls.ui
+  src/internal/Connectomics/QmitkConnectomicsStatisticsViewControls.ui
   src/internal/QmitkDwiSoftwarePhantomViewControls.ui
   src/internal/QmitkOdfMaximaExtractionViewControls.ui
 )
@@ -82,7 +86,9 @@ set(MOC_H_FILES
   src/QmitkTbssRoiAnalysisWidget.h
   src/QmitkResidualAnalysisWidget.h
   src/QmitkResidualViewWidget.h
-  src/internal/Connectomics/QmitkBrainNetworkAnalysisView.h
+  src/internal/Connectomics/QmitkConnectomicsDataView.h
+  src/internal/Connectomics/QmitkConnectomicsNetworkOperationsView.h
+  src/internal/Connectomics/QmitkConnectomicsStatisticsView.h
   src/internal/Connectomics/QmitkNetworkHistogramCanvas.h
   src/internal/QmitkDwiSoftwarePhantomView.h
   src/internal/QmitkOdfMaximaExtractionView.h
@@ -108,7 +114,9 @@ set(CACHED_RESOURCE_FILES
   resources/IVIM_48.png
   resources/stochFB.png
   resources/tbss.png
-  resources/QmitkBrainNetworkAnalysisViewIcon_48.png
+  resources/connectomics/QmitkConnectomicsDataViewIcon_48.png
+  resources/connectomics/QmitkConnectomicsNetworkOperationsViewIcon_48.png
+  resources/connectomics/QmitkConnectomicsStatisticsViewIcon_48.png
   resources/arrow.png
   resources/qball_peaks.png
   resources/phantom.png

@@ -113,6 +113,7 @@ set(CPP_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingManager.cpp
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.cpp
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
+  Algorithms/Connectomics/itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp
 
   # Tractography
   Tractography/GibbsTracking/mitkParticleGrid.cpp

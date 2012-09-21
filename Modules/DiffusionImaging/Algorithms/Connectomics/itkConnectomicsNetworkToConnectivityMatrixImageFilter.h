@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_H
-#define _ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_H
+#ifndef ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_H
+#define ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_H
 
 // ITK includes
 #include <itkImageSource.h>
@@ -24,10 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK includes
 #include "mitkConnectomicsNetwork.h"
 
+#include "MitkDiffusionImagingExports.h"
+
 namespace itk
 {
 
-  class ConnectomicsNetworkToConnectivityMatrixImageFilter : public ImageSource< itk::Image< unsigned short, 2 > >
+  class MitkDiffusionImaging_EXPORT ConnectomicsNetworkToConnectivityMatrixImageFilter : public ImageSource< itk::Image< unsigned short, 2 > >
   {
 
   public:
@@ -72,9 +74,9 @@ namespace itk
 
 }
 
-#ifndef ITK_MANUAL_INSTANTIATION
-#include "itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp"
-#endif
+//#ifndef ITK_MANUAL_INSTANTIATION
+//#include "itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp"
+//#endif
 
 
-#endif /* _ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_H */
+#endif /* ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_H */

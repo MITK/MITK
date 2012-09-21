@@ -295,7 +295,10 @@
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
-              <widget class="QLabel" name="label_5">
+              <widget class="QLabel" name="m_SegmentLabel">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>#segments</string>
                </property>
@@ -303,6 +306,9 @@
              </item>
              <item>
               <widget class="QSpinBox" name="m_Segments">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="maximum">
                 <number>100</number>
                </property>
@@ -313,6 +319,9 @@
              </item>
              <item>
               <widget class="QCheckBox" name="m_Average">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Average</string>
                </property>
@@ -320,6 +329,9 @@
              </item>
              <item>
               <widget class="QPushButton" name="m_Cut">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Cut</string>
                </property>

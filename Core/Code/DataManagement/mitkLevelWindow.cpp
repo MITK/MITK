@@ -130,11 +130,13 @@ void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::Scala
   if (expandRangesIfNecessary)
   {
     /* if caller is sure he wants exactly that level/window, we make sure the limits match */
-    if ( m_LowerWindowBound < m_RangeMin ) 
+    if (m_LowerWindowBound > m_UpperWindowBound)
+      std::swap(m_LowerWindowBound, m_UpperWindowBound);
+    if ( m_LowerWindowBound < m_RangeMin )
     {
       m_RangeMin = m_LowerWindowBound;
     }
-    
+
     if ( m_UpperWindowBound > m_RangeMax )
     {
       m_RangeMax = m_UpperWindowBound;

@@ -17,9 +17,7 @@
 #ifndef EXTENSIONPOINTCONTRIBUTION_H_
 #define EXTENSIONPOINTCONTRIBUTION_H_
 
-/// Berry
-
-/// Qt
+// qt Includes
 #include "IChangeText.h"
 
 

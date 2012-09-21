@@ -16,9 +16,7 @@
 
 #include "ExtensionPointContribution.h"
 
-/// Berry
-
-/// Qt
+// qt Includes
 #include <QMessageBox.h>
 
 

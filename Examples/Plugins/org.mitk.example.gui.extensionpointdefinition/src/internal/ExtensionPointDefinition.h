@@ -17,10 +17,10 @@
 #ifndef EXTENSIONPOINTDEFINITION_H_
 #define EXTENSIONPOINTDEFINITION_H_
 
-/// Berry
+// berry Includes
 #include <berryIApplication.h>
 
-/// Qt
+// qt Includes
 #include <QObject>
 #include <QScopedPointer>
 

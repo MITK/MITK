@@ -16,12 +16,9 @@
 
 #include "ExtensionPointDefinition.h"
 
-/// Berry
+// berry Includes
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
-
-/// Qt
-//#include <QMessageBox.h>
 
 class MinimalWorkbenchAdvisor : public berry::WorkbenchAdvisor
 {
@@ -65,7 +62,6 @@ ExtensionPointDefinition::~ExtensionPointDefinition()
  
 int ExtensionPointDefinition::Start()
 {
-  //QMessageBox::critical(0, "Error", "Starting...");
 
   berry::Display* display = berry::PlatformUI::CreateDisplay();
 

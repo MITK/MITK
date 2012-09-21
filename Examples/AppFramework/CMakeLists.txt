@@ -32,6 +32,7 @@ FunctionCreateBlueBerryApplication(
   PLUGINS ${MITK_EXAMPLE_PLUGIN_TARGETS}
   NO_PROVISIONING
   NO_INSTALL
+  SHOW_CONSOLE
 )
 
 # subproject support

@@ -93,8 +93,9 @@ struct WorkbenchUtilPrivate {
     return editorDesc;
   }
 };
-
-void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWindow::Pointer window)
+// //! [UtilLoadFiles]
+void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWindow::Pointer window, bool openEditor)
+// //! [UtilLoadFiles]
 {
   if (fileNames.empty())
      return;
@@ -156,33 +157,36 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
     window->GetWorkbench()->ShowPerspective(defaultPerspId, window);
   }
 
-  try
+  if (openEditor)
   {
-    // Activate the editor using the same data storage or open the default editor
-    mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(dataStorageRef));
-    berry::IEditorPart::Pointer editor = mitk::WorkbenchUtil::OpenEditor(window->GetActivePage(), input, true);
-    mitk::IRenderWindowPart* renderEditor = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
-    mitk::IRenderingManager* renderingManager = renderEditor == 0 ? 0 : renderEditor->GetRenderingManager();
-
-    if(dsmodified && renderingManager)
+    try
     {
-      // get all nodes that have not set "includeInBoundingBox" to false
-      mitk::NodePredicateNot::Pointer pred
-          = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
-                                                                         , mitk::BoolProperty::New(false)));
+      // Activate the editor using the same data storage or open the default editor
+      mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(dataStorageRef));
+      berry::IEditorPart::Pointer editor = mitk::WorkbenchUtil::OpenEditor(window->GetActivePage(), input, true);
+      mitk::IRenderWindowPart* renderEditor = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
+      mitk::IRenderingManager* renderingManager = renderEditor == 0 ? 0 : renderEditor->GetRenderingManager();
 
-      mitk::DataStorage::SetOfObjects::ConstPointer rs = dataStorage->GetSubset(pred);
-      // calculate bounding geometry of these nodes
-      mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
-      // initialize the views to the bounding geometry
-      renderingManager->InitializeViews(bounds);
+      if(dsmodified && renderingManager)
+      {
+        // get all nodes that have not set "includeInBoundingBox" to false
+        mitk::NodePredicateNot::Pointer pred
+            = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+                                                                           , mitk::BoolProperty::New(false)));
+
+        mitk::DataStorage::SetOfObjects::ConstPointer rs = dataStorage->GetSubset(pred);
+        // calculate bounding geometry of these nodes
+        mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
+        // initialize the views to the bounding geometry
+        renderingManager->InitializeViews(bounds);
+      }
     }
-  }
-  catch (const berry::PartInitException& e)
-  {
-    QString msg = "An error occurred when displaying the file(s): %1";
-    QMessageBox::warning(QApplication::activeWindow(), "Error displaying file",
-                         msg.arg(QString::fromStdString(e.message())));
+    catch (const berry::PartInitException& e)
+    {
+      QString msg = "An error occurred when displaying the file(s): %1";
+      QMessageBox::warning(QApplication::activeWindow(), "Error displaying file",
+                           msg.arg(QString::fromStdString(e.message())));
+    }
   }
 }
 

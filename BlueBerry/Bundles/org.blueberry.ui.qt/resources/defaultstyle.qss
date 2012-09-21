@@ -63,5 +63,9 @@ QWidget#ViewForm {
 }
 
 QWidget#StandaloneViewForm {
-      border: 1px solid palette(mid); 
+    border: 1px solid palette(mid); 
+}
+
+QWidget#PageCompositeControlWidget {
+    margin: 3px;
 }

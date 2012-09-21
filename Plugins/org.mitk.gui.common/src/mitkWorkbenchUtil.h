@@ -48,10 +48,12 @@ struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
    *            A list of file names with absolute path.
    * @param wnd
    *            The Workbench window in which the data will be loaded.
+   * @param openEditor
+   *            Whether an Editor is to be opened on file loading (for cases there is none).
    *
    * @see mitk::IDataNodeReader
    */
-  static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd);
+  static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd, bool openEditor = true);
 
   /**
      * Opens an editor on the given object.

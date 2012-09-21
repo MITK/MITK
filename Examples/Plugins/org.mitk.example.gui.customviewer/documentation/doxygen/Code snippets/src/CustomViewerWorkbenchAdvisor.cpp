@@ -1,0 +1,55 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#include "CustomViewerWorkbenchAdvisor.h"
+#include "CustomViewerWorkbenchWindowAdvisor.h"
+#include "berryIQtStyleManager.h"
+#include "org_mitk_example_gui_customviewer_Activator.h"
+
+const std::string CustomViewerWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.viewerperspective";
+
+berry::WorkbenchWindowAdvisor* CustomViewerWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
+{
+  wwAdvisor.reset(new CustomViewerWorkbenchWindowAdvisor(configurer));
+  return wwAdvisor.data();
+}
+
+CustomViewerWorkbenchAdvisor::~CustomViewerWorkbenchAdvisor()
+{
+}
+
+void CustomViewerWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
+{
+  berry::QtWorkbenchAdvisor::Initialize(configurer);
+
+  ctkPluginContext* pluginContext = org_mitk_example_gui_customviewer_Activator::GetPluginContext();
+  ctkServiceReference serviceReference = pluginContext->getServiceReference<berry::IQtStyleManager>();
+
+  //always granted by org.blueberry.ui.qt
+  Q_ASSERT(serviceReference);
+  
+  berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
+  Q_ASSERT(styleManager);
+
+  QString styleName = "CustomStyle";
+  styleManager->AddStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss", styleName);
+  styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss");
+}
+
+std::string CustomViewerWorkbenchAdvisor::GetInitialWindowPerspectiveId()
+{
+  return DEFAULT_PERSPECTIVE_ID;
+}

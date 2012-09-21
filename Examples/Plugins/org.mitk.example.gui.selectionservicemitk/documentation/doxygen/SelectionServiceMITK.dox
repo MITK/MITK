@@ -1,6 +1,6 @@
 /**
 
-\page Example03Page Blueberry Examples - Selection service QT
+\page org_mitk_example_gui_selectionservicemitk Blueberry Examples - Selection service QT
 
   \brief An example application plug-in with a minimal selection service based on QT elements.
 
@@ -38,6 +38,6 @@
   
   GESAMTEN SOURCE ALS LINK
   
-\ref Example02Page "[Previous example]" \ref Example04Page "[Next example]" \ref ExamplePage "[Main example page]"
+\ref org_mitk_example_gui_multipleperspectives "[Previous example]" \ref org_mitk_example_gui_selectionserviceqt "[Next example]" \ref ExamplePage "[Main example page]"
 
 */

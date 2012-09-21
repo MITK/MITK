@@ -3,8 +3,8 @@
 \page ExampleBlueBerryGeneral BlueBerry in general
 
 -# \subpage IntroductionBlueBerry "Introduction"
--# \subpage Example01Page "Example: Minimal application"
--# \subpage Example02Page "Example: Multiple perspectives and views"
+-# \subpage org_mitk_example_gui_minimalapplication "Example: Minimal application"
+-# \subpage org_mitk_example_gui_multipleperspectives "Example: Multiple perspectives and views"
 
 \page IntroductionBlueBerry Introduction: What are Views, Editors, Perspectives? 
 
@@ -65,6 +65,6 @@ BlueBerry makes use of the eclipse ui guidlines which state some concepts on how
 \section ClassDiagram Summary as class diagram
 \image html class-diagram.jpg "Summary as class diagram"
 
-\ref Example01Page "[First example: Minimal application]" \ref Example02Page "[Second example: Multiple perspectives and views]" \ref ExamplePage "[Main example page]"
+\ref org_mitk_example_gui_minimalapplication "[First example: Minimal application]" \ref org_mitk_example_gui_multipleperspectives "[Second example: Multiple perspectives and views]" \ref ExamplePage "[Main example page]"
 
 */

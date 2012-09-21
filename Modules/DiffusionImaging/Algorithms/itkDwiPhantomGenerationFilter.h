@@ -60,7 +60,7 @@ public:
 
     itkSetMacro( BValue, float )
     itkSetMacro( SignalScale, float )
-    itkSetMacro( NoiseLevel, float )
+    itkSetMacro( SNR, float )
 
     itkSetMacro( Spacing, mitk::Vector3D )
     itkSetMacro( Origin, mitk::Point3D )
@@ -93,13 +93,15 @@ private:
     std::vector< itk::DiffusionTensor3D<float> >    m_TensorList;
     float                                           m_BValue;
     float                                           m_SignalScale;
-    float                                           m_NoiseLevel;
+    float                                           m_SNR;
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
     int                                             m_BaselineImages;
     double                                          m_MaxBaseline;
+    double                                          m_MeanBaseline;
+    double                                          m_NoiseFactor;
 
     double GetTensorL2Norm(itk::DiffusionTensor3D<float>& T);
-    void GenerateTensors();
+    void GenerateTensors(vnl_vector< double > num);
     typename OutputImageType::PixelType SimulateMeasurement(itk::DiffusionTensor3D<float>& tensor, float weight);
 };
 

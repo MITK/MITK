@@ -97,6 +97,10 @@ void QmitkOdfMaximaExtractionView::UpdateGui()
             m_Controls->m_StartFiniteDiff->setEnabled(true);
             m_Controls->m_GenerateImageButton->setEnabled(true);
             m_Controls->m_CoeffImageFrame->setEnabled(true);
+            m_Controls->m_ShOrderBox->setEnabled(true);
+            m_Controls->m_MaxNumPeaksBox->setEnabled(true);
+            m_Controls->m_PeakThresholdBox->setEnabled(true);
+            m_Controls->m_AbsoluteThresholdBox->setEnabled(true);
         }
     }
     else

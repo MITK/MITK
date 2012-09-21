@@ -19,6 +19,7 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkDIAppImageProcessingPerspective.cpp
   Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
   Perspectives/QmitkDIAppRegistrationPerspective.cpp
+  Perspectives/QmitkDIAppVisualizationPerspective.cpp
 )
 
 set(UI_FILES
@@ -42,6 +43,7 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkDIAppImageProcessingPerspective.h
   src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
   src/internal/Perspectives/QmitkDIAppRegistrationPerspective.h
+  src/internal/Perspectives/QmitkDIAppVisualizationPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -64,8 +66,12 @@ set(CACHED_RESOURCE_FILES
   resources/perspectives/preprocessingreconstruction.png
   resources/perspectives/quantification.png
   resources/perspectives/tbss.png
-  resources/perspectives/utility.png
-  resources/perspectives/imageprocessing.png
+  resources/perspectives/utilities.png
+  resources/perspectives/imageProcessing.png
+  resources/perspectives/registration.png
+  resources/perspectives/phantomData2.png
+  resources/perspectives/eye.png
+  resources/perspectives/registration.xpm
 )
 
 set(QRC_FILES

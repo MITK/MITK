@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkDIAppQuantificationPerspective.h"
+#include "QmitkDIAppVisualizationPerspective.h"
 #include "berryIViewLayout.h"
 
-void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void QmitkDIAppVisualizationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   /////////////////////////////////////////////////////
   // all di-app perspectives should have the following:
@@ -35,27 +35,22 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
     layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
     berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
 
-  layout->AddStandaloneView("org.mitk.views.imagenavigator",
-    false, berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols");
+  layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
+    berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols", false);
 
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.diffusionquantification");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.diffusionquantification");
+  left->AddView("org.mitk.views.volumevisualization");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.volumevisualization");
   lo->SetCloseable(false);
 
-  left->AddView("org.mitk.views.partialvolumeanalysisview");
-  lo = layout->GetViewLayout("org.mitk.views.partialvolumeanalysisview");
+  left->AddView("org.mitk.views.screenshotmaker");
+  lo = layout->GetViewLayout("org.mitk.views.screenshotmaker");
   lo->SetCloseable(false);
 
-  left->AddView("org.mitk.views.measurement");
-  lo = layout->GetViewLayout("org.mitk.views.measurement");
+  left->AddView("org.mitk.views.moviemaker");
+  lo = layout->GetViewLayout("org.mitk.views.moviemaker");
   lo->SetCloseable(false);
-
-  left->AddView("org.mitk.views.imagestatistics");
-  lo = layout->GetViewLayout("org.mitk.views.imagestatistics");
-  lo->SetCloseable(false);
-
 }

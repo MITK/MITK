@@ -157,7 +157,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     FilterType::Pointer filter = FilterType::New();
     filter->SetGradientList(gradientList);
     filter->SetBValue(bVal);
-    filter->SetNoiseLevel(m_Controls->m_NoiseLevel->value());
+    filter->SetSNR(m_Controls->m_NoiseLevel->value());
     filter->SetSignalScale(m_Controls->m_SignalScale->value());
     filter->SetImageRegion(imageRegion);
     filter->SetSpacing(spacing);
@@ -199,9 +199,15 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
 void QmitkDwiSoftwarePhantomView::UpdateGui()
 {
     if (!m_SignalRegionNodes.empty())
+    {
         m_Controls->m_SignalRegionBox->setVisible(true);
+        m_Controls->m_Instruction->setVisible(false);
+    }
     else
+    {
         m_Controls->m_SignalRegionBox->setVisible(false);
+        m_Controls->m_Instruction->setVisible(true);
+    }
 
     QLayout* layout = m_Controls->m_SignalRegionBox->layout();
 

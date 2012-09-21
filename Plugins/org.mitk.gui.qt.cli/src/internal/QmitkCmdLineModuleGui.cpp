@@ -85,7 +85,7 @@ ctkCmdLineModuleXslTransform* QmitkCmdLineModuleGui::xslTransform() const
   {
     transform->bindVariable("imageInputWidget", QVariant(QString("QmitkDataStorageComboBoxWithSelectNone")));
     transform->bindVariable("imageInputValueProperty", "currentValue");
-    transform->bindVariable("imageInputFilterProperty", ""); // Don't need this, as we are connected to DataStorage.
+    transform->bindVariable("imageInputSetProperty", ""); // Don't need this, as we are connected to DataStorage.
   }
   return transform;
 }

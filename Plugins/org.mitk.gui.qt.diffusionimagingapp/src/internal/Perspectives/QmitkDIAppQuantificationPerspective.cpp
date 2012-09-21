@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,16 +42,12 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.odfmaximaextraction");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.odfmaximaextraction");
+  left->AddView("org.mitk.views.diffusionquantification");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.diffusionquantification");
   lo->SetCloseable(false);
 
   left->AddView("org.mitk.views.partialvolumeanalysisview");
   lo = layout->GetViewLayout("org.mitk.views.partialvolumeanalysisview");
-  lo->SetCloseable(false);
-
-  left->AddView("org.mitk.views.diffusionquantification");
-  lo = layout->GetViewLayout("org.mitk.views.diffusionquantification");
   lo->SetCloseable(false);
 
   left->AddView("org.mitk.views.measurement");

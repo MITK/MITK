@@ -5,7 +5,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.qballreconstruction"
           name="Q-Balls"
-          icon="resources/reconodf.png"
+          icon="resources/qball.png"
           class="QmitkQBallReconstructionView" />
   </extension>
 
@@ -20,12 +20,12 @@
     <view id="org.mitk.views.diffusionpreprocessing"
           name="Preprocessing"
           class="QmitkPreprocessingView"
-          icon="resources/preprocessing.png" />
+          icon="resources/dwi2.png" />
   </extension>
 
     <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.diffusionquantification"
-          name="Quantification"
+          name="Scalar Indices"
           class="QmitkDiffusionQuantificationView"
           icon="resources/quantification.png"/>
   </extension>
@@ -33,7 +33,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.tensorreconstruction"
           name="Tensors"
-          icon="resources/recontensor.png"
+          icon="resources/tensor.png"
           class="QmitkTensorReconstructionView" />
   </extension>
 
@@ -83,7 +83,7 @@
     <view id="org.mitk.views.streamlinetracking"
           name="Streamline Tracking"
           class="QmitkStreamlineTrackingView"
-          icon="resources/stochFB.png" />
+          icon="resources/StreamlineTracking.png" />
   </extension>
 
   <extension point="org.blueberry.ui.views">
@@ -145,7 +145,7 @@
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.dwisoftwarephantomview"
-          name="DWI Software Phantoms (Experimental)"
+          name="DWI Software Phantoms"
           class="QmitkDwiSoftwarePhantomView"
           icon="resources/phantom.png" />
   </extension>

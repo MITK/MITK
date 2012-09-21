@@ -120,6 +120,10 @@ set(CACHED_RESOURCE_FILES
   resources/arrow.png
   resources/qball_peaks.png
   resources/phantom.png
+  resources/tensor.png
+  resources/qball.png
+  resources/StreamlineTracking.png
+  resources/dwi2.png
 )
 
 set(QRC_FILES

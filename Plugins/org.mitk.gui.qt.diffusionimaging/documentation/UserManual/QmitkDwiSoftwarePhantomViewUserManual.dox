@@ -4,26 +4,26 @@
 This view provides the user interface to generate artificial diffusion weighted images. This view is regarded as experimental and it has not been tested extensively!
 
 Available sections:
-  - \ref UserManualInputData
-  - \ref UserManualParameters
+  - \ref SwpUserManualInputData
+  - \ref SwpUserManualParameters
 
 \image html dwisoftwarephantomsview.png DWI Software Phantoms View
 
-\section UserManualInputData Input Data
+\section SwpUserManualInputData Input Data
 
-The input of the algorithm consits of an arbitrary number of binary masks. For each mask, the according parameters of the diffusion tensor used to generate the artificial diffusion signal can be specified. If no mask is set, the whole image is filled with an isotropic default signal plus the specified noise. To generate for example a crossing situation one would use two masks with different directions of the respective diffusion tensor.
+The input of the algorithm consists of an arbitrary number of binary masks. For each mask, the according parameters of the diffusion tensor used to generate the artificial diffusion signal can be specified. If no mask is set, the whole image is filled with an isotropic default signal plus the specified noise. To generate for example a crossing situation one would use two masks with different directions of the respective diffusion tensor.
 
 \image html sw_phantom_rois.png Possible ROIs to generate a 90° crossing situation.
-\image html sw_phantom_crossing_view.png Parameters to generate a phantom image using the ROIs illustrated above and a little bit of noise. Note the tensor directions defined for the two ROIs!
+\image html sw_phantom_crossing_view.png Parameters to generate a phantom image using the ROIs illustrated above while adding a small amount of noise. Note the perpendicular tensor directions for the two ROIs!
 \image html sw_phantom_crossing_qballs.png Q-Ball reconstruction of the signal generated with the configuration illustrated above.
 
-\section UserManualParameters Input Parameters
+\section SwpUserManualParameters Input Parameters
 
 \li Image Name: Name of the resulting data node containing the generated phantom image.
 \li B-Value: B-Value of the resulting DWI
 \li #Gradient Directions: Number of gradient directions of the resulting DWI.
-\li Noise level: Value between 0 (no noise) and 1 (noise values have same order of magnitude as the image values). The noise values are sampled from a rician distribution.
-\li Scale of the baseline image values: Usually there is no need to change the dafult value.
+\li SNR: Signal to noise ratio. For values > 99, no noise at all is added to the image. The noise values are sampled from a rician distribution.
+\li Scale of the baseline image values: Usually there is no need to change the dafault value.
 \li Image Dimensions: Size of the resulting DWI (x,y,z)
 \li Image spacing: Spacing of the resulting DWI
 
@@ -31,7 +31,7 @@ Parameters per mask image:
 
 \li FA of the tensor used to generate the artificial signal.
 \li ADC of the tensor used to generate the artificial signal.
-\li Direction of the tensors main eigenvector.
+\li Direction of the tensors main eigenvector (x,y and z component).
 \li Weighting factor for the signal generated from this tensor.
 
 */

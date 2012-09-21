@@ -59,11 +59,6 @@ void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry
   lo->SetCloseable(false);
 
   left->AddView("org.mitk.views.odfmaximaextraction");
-  lo = layout->GetViewLayout("org.mitk.views.odfmaximaextraction");
+  layout->GetViewLayout("org.mitk.views.odfmaximaextraction");
   lo->SetCloseable(false);
-
-  left->AddView("org.mitk.views.dwisoftwarephantomview");
-  lo = layout->GetViewLayout("org.mitk.views.dwisoftwarephantomview");
-  lo->SetCloseable(false);
-
 }

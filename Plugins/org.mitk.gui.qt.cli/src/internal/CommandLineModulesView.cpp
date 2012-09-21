@@ -375,6 +375,7 @@ void CommandLineModulesView::OnRunButtonPressed()
     widget->SetDataStorage(this->GetDataStorage());
     widget->SetManager(m_ModuleManager);
     widget->SetTemporaryDirectory(m_TemporaryDirectoryName);
+    widget->SetOutputDirectory(m_OutputDirectoryName);
 
     // 2. Create a new front end.
     QmitkCmdLineModuleFactoryGui factory(this->GetDataStorage());

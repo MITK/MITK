@@ -68,6 +68,12 @@ public:
   void SetTemporaryDirectory(const QString& directoryName);
 
   /**
+   * \brief Sets the Output Directory on this widget, and must be called
+   * immediately after construction, before using the widget.
+   */
+  void SetOutputDirectory(const QString& directoryName);
+
+  /**
    * \brief Tells this widget, which module frontend it is running
    * \param frontEnd our QmitkCmdLineModuleGui class derived from ctkCmdLineModuleFrontend
    */
@@ -155,6 +161,11 @@ private:
    * \brief This must be injected before the Widget is used.
    */
   QString m_TemporaryDirectoryName;
+
+  /**
+   * \brief This must be injected before the Widget is used.
+   */
+  QString m_OutputDirectoryName;
 
   /**
    * \brief We instantiate the main widgets from this .ui file.

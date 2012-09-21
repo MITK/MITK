@@ -110,6 +110,13 @@ void QmitkCmdLineModuleProgressWidget::SetTemporaryDirectory(const QString& dire
 
 
 //-----------------------------------------------------------------------------
+void QmitkCmdLineModuleProgressWidget::SetOutputDirectory(const QString& directoryName)
+{
+  this->m_OutputDirectoryName = directoryName;
+}
+
+
+//-----------------------------------------------------------------------------
 QString QmitkCmdLineModuleProgressWidget::GetTitle()
 {
   assert(m_ModuleFrontEnd);

@@ -20,10 +20,12 @@ template< class TOutputScalarType >
 DwiPhantomGenerationFilter< TOutputScalarType >
 ::DwiPhantomGenerationFilter()
     : m_BValue(1000)
-    , m_NoiseLevel(0.0)
     , m_SignalScale(1.0)
     , m_BaselineImages(0)
     , m_MaxBaseline(0)
+    , m_MeanBaseline(0)
+    , m_SNR(4)
+    , m_NoiseFactor(0)
 {
     this->SetNumberOfRequiredOutputs (1);
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
@@ -50,11 +52,12 @@ DwiPhantomGenerationFilter< TOutputScalarType >
 
 template< class TOutputScalarType >
 void DwiPhantomGenerationFilter< TOutputScalarType >
-::GenerateTensors()
+::GenerateTensors(vnl_vector<double> num)
 {
     MITK_INFO << "Generating tensors";
 
     m_MaxBaseline = 0;
+    vnl_vector<double> signal; signal.set_size(m_SignalRegions.size());
     for (int i=0; i<m_SignalRegions.size(); i++)
     {
         float ADC = m_TensorADC.at(i);
@@ -69,6 +72,7 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
         kernel.SetElement(5,e3);
 
         double l2 = GetTensorL2Norm(kernel);
+        signal[i] = l2;
         if (l2>m_MaxBaseline)
             m_MaxBaseline = l2;
 
@@ -96,6 +100,23 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
 
         m_TensorList.push_back(tensor);
     }
+    if (m_SNR<=99)
+    {
+        m_MeanBaseline = 0;
+        double sum = 0;
+        for (int i=0; i<m_SignalRegions.size(); i++)
+        {
+            m_MeanBaseline += signal[i]/m_MaxBaseline*num[i];
+            sum += num[i];
+        }
+        if (sum>0)
+            m_MeanBaseline /= sum;
+
+        m_NoiseFactor = m_MeanBaseline/m_SNR;
+        m_NoiseFactor *= m_NoiseFactor;
+    }
+    else
+        m_NoiseFactor = 0;
 }
 
 
@@ -135,7 +156,7 @@ DwiPhantomGenerationFilter< TOutputScalarType >::SimulateMeasurement(itk::Diffus
             if (res>=0)
             {
                 res = weight*b0*exp ( -m_BValue * res );
-                res = sqrt(pow(res + m_NoiseLevel*m_SignalScale*m_RandGen->GetNormalVariate(), 2) +  m_NoiseLevel*m_SignalScale*pow(m_RandGen->GetNormalVariate(),2));
+                res = sqrt(pow(res + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseFactor), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseFactor),2));
 
                 out[i] = static_cast<TOutputScalarType>( res );
             }
@@ -145,7 +166,7 @@ DwiPhantomGenerationFilter< TOutputScalarType >::SimulateMeasurement(itk::Diffus
             float val = 0;
             for (int k=0; k<10; k++)
             {
-                val += sqrt(pow(b0 + m_NoiseLevel*m_SignalScale*m_RandGen->GetNormalVariate(), 2) +  m_NoiseLevel*m_SignalScale*pow(m_RandGen->GetNormalVariate(),2));
+                val += sqrt(pow(b0 + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseFactor), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseFactor),2));
             }
             val /= 10;
             out[i] = val;
@@ -160,7 +181,10 @@ template< class TOutputScalarType >
 void DwiPhantomGenerationFilter< TOutputScalarType >
 ::GenerateData()
 {
-    MITK_INFO << "Noise level: " << m_NoiseLevel;
+    if (m_SNR<=0.001)
+        m_SNR = 0.001;
+
+    MITK_INFO << "SNR: " << m_SNR;
     MITK_INFO << "Output signal scaled by " << m_SignalScale;
     m_RandGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
     m_RandGen->SetSeed();
@@ -185,7 +209,26 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
         if (m_GradientList[i].GetNorm()<=0.0001)
             m_BaselineImages++;
 
-    GenerateTensors();
+    typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
+    IteratorOutputType it (outImage, m_ImageRegion);
+
+    // estimate mean baseline
+    vnl_vector< double > num; num.set_size(m_SignalRegions.size()); num.fill(0.0);
+    while(!it.IsAtEnd())
+    {
+        for (int i=0; i<m_SignalRegions.size(); i++)
+        {
+            ItkUcharImgType::Pointer region = m_SignalRegions.at(i);
+            typename OutputImageType::IndexType index = it.GetIndex();
+            if (region->GetPixel(index)!=0)
+                num[i] += 1;
+        }
+        ++it;
+    }
+    for (int i=0; i<m_SignalRegions.size(); i++)
+        num[i] *= m_TensorWeight[i];
+    it.GoToBegin();
+
     if (m_SignalRegions.empty())
     {
         ItkUcharImgType::Pointer binary = ItkUcharImgType::New();
@@ -214,9 +257,9 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
 
         m_MaxBaseline = GetTensorL2Norm(tensor);
     }
+    else
+        GenerateTensors(num);
 
-    typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
-    IteratorOutputType it (outImage, m_ImageRegion);
 
     while(!it.IsAtEnd())
     {

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Perspectives/QmitkDIAppUtilityPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppRegistrationPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppVisualizationPerspective.h"
 
 #include <mitkVersion.h>
 #include <mitkLogMacros.h>
@@ -62,9 +63,9 @@ QmitkDiffusionApplicationPlugin* QmitkDiffusionApplicationPlugin::GetDefault()
 void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
 {
   berry::AbstractUICTKPlugin::start(context);
-  
+
   this->context = context;
-  
+
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppApplication, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppIntroPart, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
@@ -80,6 +81,7 @@ void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppUtilityPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppSyntheticDataGenerationPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppRegistrationPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppVisualizationPerspective, context)
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
   ctkConfigurationAdmin* configAdmin = 0;

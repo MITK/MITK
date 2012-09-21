@@ -35,6 +35,10 @@ A few seconds (depending on the image size) after the reconstruction button is h
 
 \image html tensor4.png Tensor image after reconstruction
 
+To assess the quality of the tensor fit it has been proposed to calculate the model residual [9]. This calculates the residual between the measured signal and the signal predicted by the model. Large residuals indicate an inadequacy of the model or the presence of artefacts in the signal intensity (noise, head motion, etc.). To use this option: Select a DWI dataset, estimate a tensor, select both the DWI node and the tensor node in the datamanager and press Residual Image Calculation. MITK-Diffusion can show the residual for every voxel averaged over all volumes or (in the plot widget) summarized per volume or for every slice in every volume. Clicking in the widget where the residual is shown per slice will automatically let the cross-hair jump to that position in the DWI dataset. If Percentage of outliers is checked, the per volume plot will show the percentage of outliers per volume. Otherwise it will show the mean together with the first and third quantile of residuals. See [9] for more information.
+
+\image html residuals.png The residual widget
+
 The view also allows the generation of artificial diffusion weighted or Q-Ball images from the selected tensor image. The ODFs of the Q-Ball image are directly initialized from the tensor values and afterwards normalized. The diffusion weighted image is estimated using the l2-norm image of the tensor image as B0. The gradient images are afterwards generated using the standard tensor equation.
 
 \section QmitkDiffusionImagingUserManualQBallReconstruction Q-Ball Reconstruction
@@ -101,6 +105,8 @@ This is how a visualization with activated glyphs should look like:
 7. Aganj, I., Lenglet, C., Sapiro, G., 2009. ODF reconstruction in q-ball imaging with solid angle consideration. Proceedings of the Sixth IEEE International Symposium on Biomedical Imaging Boston, MA.
 
 8. Goh, A., Lenglet, C., Thompson, P.M., Vidal, R., 2009. Estimating Orientation Distribution Functions with Probability Density Constraints and Spatial Regularity. Med Image Comput Comput Assist Interv Int Conf Med Image Comput Comput Assist Interv LNCS 5761, 877 ff.
+
+9. J.-D. Tournier, S. Mori, A. Leemans., 2011. Diffusion Tensor Imaging and Beyond. Magn Reson Med 65, 1532-1556.
 
 \section QmitkDiffusionImagingUserManualTechnicalDetail Technical Information for Developers
 

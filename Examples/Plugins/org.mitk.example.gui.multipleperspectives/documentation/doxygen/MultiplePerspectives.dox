@@ -2,28 +2,34 @@
 
 \page org_mitk_example_gui_multipleperspectives Blueberry Examples - Multiple perspectives and views
 
-    \image html MultiplePerspectives.png
+  \image html MultiplePerspectives.png
 
-    The second example creates two perspectives. The first perspective has a visible editor area and uses a folder to bring the first view to the left side. The second perspective sets the editor area to invisible. The two views are filled with an empty QListWidget. The perspective bar is enabled.
+  The second example creates two perspectives. The first perspective has a visible editor area and uses a folder to bring the first view to the left side. The second perspective sets the editor area to invisible. The two views are filled with an empty QListWidget. The perspective bar is enabled.
 
-    The visibility of the editor area is set in the corresponding perspective cpp file by:
-    \snippet MinimalPerspective.cpp Visibility of editor area
+  The visibility of the editor area is set in the corresponding perspective cpp file by:
+  \snippet MinimalPerspective.cpp Visibility of editor area
 
-    The visibility of the perspective bar is set in the applications MultiplePerspectives.cpp:
-    \snippet MultiplePerspectives.cpp Visibility of perspective bar
+  The visibility of the perspective bar is set in the applications MultiplePerspectives.cpp:
+  \snippet MultiplePerspectives.cpp Visibility of perspective bar
 
-    Here we can also set/change some other general preferences (e.g. the initial size):
-    \snippet MultiplePerspectives.cpp initial window size
-    
-    The perspective bar:
-    \image html Perspectivebar.png
+  Here we can also set/change some other general preferences (e.g. the initial size):
+  \snippet MultiplePerspectives.cpp initial window size
+  
+  The perspective bar:
+  \image html Perspectivebar.png
 
-    The icons of the perspectives are definded by the extension declaration in the plugin.xml
-    of the example and lie in the resources directory of the plug-in:
-    \include plugin.xml
+  The icons of the perspectives are definded by the extension declaration in the plugin.xml
+  of the example and lie in the resources directory of the plug-in:
+  \include plugin.xml
 
-    
-    GESAMTEN SOURCE ALS LINK
+  
+  View complete source files:
+  \li MultiplePerspectives.cpp
+  \li MultiplePerspectives.h
+  \li MinimalPerspective.cpp
+  \li MinimalPerspective.h
+  \li ExtendedPerspective.cpp
+  \li ExtendedPerspective.h
 
 \ref IntroductionBlueBerry "[BlueBerry Introduction]" \ref org_mitk_example_gui_minimalapplication "[First example: Minimal application]" \ref ExamplePage "[Main BlueBerry example page]"
 

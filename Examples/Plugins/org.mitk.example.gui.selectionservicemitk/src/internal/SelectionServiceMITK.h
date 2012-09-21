@@ -26,6 +26,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class SelectionServiceMITKWorkbenchAdvisor;
 
+ /** Documentation:
+  *   \ingroup org_mitk_example_gui_selectionservicemitk
+  *
+  *   \brief This BlueBerry plugin is part of the BlueBerry example 
+  *   "Selection service MITK". It creates a perspective with two views
+  *   that demonstrate the MitkDataNode-based selection service.
+  */
 class SelectionServiceMITK : public QObject, public berry::IApplication
 {
   Q_OBJECT

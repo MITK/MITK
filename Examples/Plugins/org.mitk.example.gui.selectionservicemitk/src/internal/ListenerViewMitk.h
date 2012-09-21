@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_ListenerViewMitkControls.h"
 
  /** Documentation:
+  *   \ingroup org_mitk_example_gui_selectionservicemitk
+  *
   *   \brief This BlueBerry view is part of the BlueBerry example 
   *   "Selection service MITK". It creates two radio buttons that listen
   *   for selection events of the Qlistwidget (SelectionProvider) and

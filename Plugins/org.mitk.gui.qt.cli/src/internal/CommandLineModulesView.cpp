@@ -199,6 +199,10 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
 {
   berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
 
+  QString fallbackHomeDir = QDir::homePath();
+  m_OutputDirectoryName = QString::fromStdString(
+      prefs->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackHomeDir.toStdString()));
+
   m_MaximumConcurrentProcesses = prefs->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4);
 
   // Get the flag for debug output, useful when parsing all the XML.

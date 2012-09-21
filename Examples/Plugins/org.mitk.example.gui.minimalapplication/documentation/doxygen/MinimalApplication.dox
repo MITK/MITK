@@ -10,6 +10,6 @@ The first example creates a minimal application with an empty perspective.
 minimal perspective:
 \include MinimalPerspective.cpp
 
-\ref org_mitk_example_gui_multipleperspectives "[Next example]" \ref ExamplePage "[Main example page]"
+\ref IntroductionBlueBerry "[BlueBerry Introduction]" \ref org_mitk_example_gui_multipleperspectives "[Second example: Multiple perspectives and views]" \ref ExamplePage "[Main BlueBerry example page]"
 
 */

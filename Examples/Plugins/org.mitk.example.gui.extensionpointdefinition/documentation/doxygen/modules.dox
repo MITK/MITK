@@ -3,7 +3,6 @@
   \ingroup MITKExamplePlugins
 
   \brief A minimal applictaion that definines an extension point.
-  
 */
 
 /**

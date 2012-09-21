@@ -12,7 +12,6 @@ Open the Examples by executing startAppFrameworkDemo_release.bat. All examples c
 
 \section ExampleSection Examples
 
-New outline:
 \li \subpage ExampleBlueBerryGeneral "BlueBerry in general"
 \li \subpage ExampleSelectionService "Selection Service"
 \li \subpage ExampleExtensionPoint "Extension Points"

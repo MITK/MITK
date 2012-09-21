@@ -25,6 +25,6 @@
     
     GESAMTEN SOURCE ALS LINK
 
-\ref org_mitk_example_gui_minimalapplication "[Previous example]" \ref org_mitk_example_gui_selectionservicemitk "[Next example]" \ref ExamplePage "[Main example page]"
+\ref IntroductionBlueBerry "[BlueBerry Introduction]" \ref org_mitk_example_gui_minimalapplication "[First example: Minimal application]" \ref ExamplePage "[Main BlueBerry example page]"
 
 */

@@ -17,6 +17,7 @@ Sections:
 - \ref QmitkTractbasedSpatialStatisticsUserManualFSLImport
 - \ref QmitkTractbasedSpatialStatisticsUserManualRois
 - \ref QmitkTractbasedSpatialStatisticsUserManualProfiles
+- \ref QmitkTractbasedSpatialStatisticsUserManualFiberPlotting
 - \ref QmitkTractbasedSpatialStatisticsUserManualTroubleshooting
 - \ref QmitkTractbasedSpatialStatisticsUserManualReferences
 
@@ -44,6 +45,12 @@ To create a ROI the mean FA skeleton (typically called mean_FA_skeleton.nii.gz) 
 y selecting a tbss image with group information and a region of interest image (as was created in a previous stap). A profile plot is drawn in the plot canvas. By clicking in the graph the crosshairs jump to the corresponding location in the image.
 
 \image html profiles.png "Profile plots"
+
+\section QmitkTractbasedSpatialStatisticsUserManualFiberPlotting 
+It is also possible to use fiber bundles to plot values in images. However, unlike TBSS this only works on 3D volumes (one subject only). To plot the values of a 3D volume using fiber tracking results, we need, fiber data and two planar circles as Regions of Interest that define the region that must be plotted. For every fiber that passes through both ROIs the values at the corresponding positions in the volume are plotted. Every fiber is resampled to the number of segments specified in the GUI. The average value can also be plotted. The subset of the fibers between the ROIs can be cut out by pressing the Cut button.
+
+\image html trackingplot.png "Plot of fiber tracts"
+
 
 \section QmitkTractbasedSpatialStatisticsUserManualTroubleshooting Troubleshooting
 

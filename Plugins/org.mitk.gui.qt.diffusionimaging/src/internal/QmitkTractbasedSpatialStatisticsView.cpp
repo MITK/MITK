@@ -225,6 +225,10 @@ struct TbssSelListener : ISelectionListener
       }
 
       m_View->m_Controls->m_Cut->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi);
+      m_View->m_Controls->m_SegmentLabel->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
+      m_View->m_Controls->m_Segments->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
+      m_View->m_Controls->m_Average->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
+
 
     }
   }

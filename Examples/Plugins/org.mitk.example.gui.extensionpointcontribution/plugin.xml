@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension point="org.mitk.example.extensionpointdefinition.changetext">
+    <labelextension id="org.mitk.example.extensionpointdefinition.example1" name="Example1" class="ExtensionPointContribution">
+        <description>Example extension for the Plugin org.mitk.example.extensionpointdefinition </description>
+    </labelextension>
+  </extension>  
+</plugin>

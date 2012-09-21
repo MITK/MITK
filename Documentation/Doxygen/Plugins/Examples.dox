@@ -1,0 +1,26 @@
+/**
+
+\page ExamplePage Blueberry Examples
+ 
+The following examples give an introduction to Blueberry...
+
+The source code of the examples can be found in mitk/Examples/Plugins/ \n
+
+Open the Examples by executing startAppFrameworkDemo_release.bat. All examples can be found among the shown list.
+
+\image html AppFrameworkDemoDialog.png
+
+\section ExampleSection Examples
+
+New outline:
+\li \subpage ExampleBlueBerryGeneral "BlueBerry in general"
+\li \subpage ExampleSelectionService "Selection Service"
+\li \subpage ExampleExtensionPoint "Extension Points"
+\li \subpage ExampleCustomisation "Customisation"
+
+Old outline:
+\li \subpage Example01Page "Minimal application"
+\li \subpage Example02Page "Multiple perspectives and views"
+\li \subpage Example03Page "Selection service QT"
+\li \subpage Example04Page "Selection service MITK"
+*/

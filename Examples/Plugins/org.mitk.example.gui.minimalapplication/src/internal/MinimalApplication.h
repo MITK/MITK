@@ -17,8 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MINIMALAPPLICATION_H_
 #define MINIMALAPPLICATION_H_
 
+/// Berry
 #include <berryIApplication.h>
 
+/// Qt
 #include <QObject>
 #include <QScopedPointer>
 

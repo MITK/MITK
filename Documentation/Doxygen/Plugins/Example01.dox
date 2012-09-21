@@ -1,0 +1,15 @@
+/**
+
+\page Example01Page Blueberry Examples - Minimal application
+
+\image html MinimalApplication.png
+
+The first example creates a minimal application with an empty perspective. 
+
+\include MinimalApplication.cpp
+minimal perspective:
+\include MinimalPerspective.cpp
+
+\ref Example02Page "[Next example]" \ref ExamplePage "[Main example page]"
+
+*/

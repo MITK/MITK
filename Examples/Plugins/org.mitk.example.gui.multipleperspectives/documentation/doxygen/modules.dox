@@ -1,0 +1,39 @@
+/**
+  \defgroup org_mitk_example_gui_multipleperspectives org.mitk.example.gui.multipleperspectives
+  \ingroup MITKExamplePlugins
+
+  \brief An example application plug-in with multiple perspectives.
+
+    \image html MultiplePerspectives.png
+
+    The second example creates two perspectives. The first perspective has a visible editor area and uses a folder to bring the first view to the left side. The second perspective sets the editor area to invisible. The two views are filled with an empty QListWidget. The perspective bar is enabled.
+
+    The visibility of the editor area is set in the corresponding perspective cpp file by:
+    \snippet MinimalPerspective.cpp Visibility of editor area
+
+    The visibility of the perspective bar is set in the applications MultiplePerspectives.cpp:
+    \snippet MultiplePerspectives.cpp Visibility of perspective bar
+
+    Here we can also set/change some other general preferences (e.g. the initial size):
+    \snippet MultiplePerspectives.cpp initial window size
+    
+    The perspective bar:
+    \image html Perspectivebar.png
+
+    The icons of the perspectives are definded by the extension declaration in the plugin.xml
+    of the example and lie in the resources directory of the plug-in:
+    \include plugin.xml
+
+    
+    GESAMTEN SOURCE ALS LINK
+  
+*/
+
+/**
+  \defgroup org_mitk_example_gui_multipleperspectives_internal Internal
+  \ingroup org_mitk_example_gui_multipleperspectives
+
+  \brief This subcategory includes the internal classes of the org.mitk.example.gui.multipleperspectives plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

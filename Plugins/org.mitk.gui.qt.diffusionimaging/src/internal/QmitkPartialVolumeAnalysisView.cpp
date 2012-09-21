@@ -827,6 +827,7 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
     }
 
     //mask
+    this->m_Controls->m_EstimateCircle->setEnabled(isMask && selectedImage->GetDimension()==3);
     if(isMask && selectedImage->GetDimension()==3)
     {
       if(selectedImage != m_SelectedImage.GetPointer())

@@ -33,6 +33,11 @@ struct CommandLineModulesViewConstants
   static const std::string TEMPORARY_DIRECTORY_NODE_NAME;
 
   /**
+   * \brief The name of the preferences node containing the output directory.
+   */
+  static const std::string OUTPUT_DIRECTORY_NODE_NAME;
+
+  /**
    * \brief The name of the preferences node containing the list of directories to scan.
    */
   static const std::string MODULE_DIRECTORIES_NODE_NAME;

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string CommandLineModulesViewConstants::VIEW_ID = "org.mitk.gui.qt.cli";
 const std::string CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME = "temporary directory";
+const std::string CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME = "output directory";
 const std::string CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME = "module directories";
 const std::string CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME = "module files";
 const std::string CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME = "debug output";

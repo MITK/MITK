@@ -82,6 +82,7 @@ protected:
 
   QWidget                  *m_MainControl;
   QCheckBox                *m_DebugOutput;
+  ctkDirectoryButton       *m_OutputDirectory;
   ctkDirectoryButton       *m_TemporaryDirectory;
   QmitkDirectoryListWidget *m_ModulesDirectories;
   QmitkFileListWidget      *m_ModulesFiles;

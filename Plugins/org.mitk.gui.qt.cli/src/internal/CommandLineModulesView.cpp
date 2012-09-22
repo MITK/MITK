@@ -45,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleDirectoryWatcher.h>
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleDescription.h>
+#include <ctkCmdLineModuleParameter.h>
 
 //-----------------------------------------------------------------------------
 CommandLineModulesView::CommandLineModulesView()
@@ -199,6 +200,10 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
 {
   berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
 
+  QString fallbackHomeDir = QDir::homePath();
+  m_OutputDirectoryName = QString::fromStdString(
+      prefs->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackHomeDir.toStdString()));
+
   m_MaximumConcurrentProcesses = prefs->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4);
 
   // Get the flag for debug output, useful when parsing all the XML.
@@ -316,6 +321,35 @@ void CommandLineModulesView::OnActionChanged(QAction* action)
       m_ListOfModules.push_back(frontEnd);
       int tabIndex = m_Controls->m_TabWidget->addTab(theGui->getGui(), ref.description().title());
       m_Controls->m_TabWidget->setTabToolTip(tabIndex, ref.description().title() + ":" + ref.xmlValidationErrorString());
+
+      // Here lies a small caveat.
+      //
+      // The XML may specify a default output file name.
+      // However, this will probably have no file path, so we should probably add one.
+      // Otherwise you will likely be trying to write in the application installation folder
+      // eg. C:/Program Files (Windows) or /Applications/ (Mac)
+      //
+      // Also, we may find that 3rd party apps crash when they can't write.
+      // So lets plan for the worst and hope for the best :-)
+
+      QString parameterName;
+      QList<ctkCmdLineModuleParameter> parameters;
+      parameters = frontEnd->parameters("image", ctkCmdLineModuleFrontend::Output);
+      parameters << frontEnd->parameters("file", ctkCmdLineModuleFrontend::Output);
+      parameters << frontEnd->parameters("geometry", ctkCmdLineModuleFrontend::Output);
+      foreach (ctkCmdLineModuleParameter parameter, parameters)
+      {
+        parameterName = parameter.name();
+        QString outputFileName = frontEnd->value(parameterName, ctkCmdLineModuleFrontend::DisplayRole).toString();
+        QFileInfo outputFileInfo(outputFileName);
+
+        if (outputFileInfo.absoluteFilePath() != outputFileName)
+        {
+          QDir defaultOutputDir(m_OutputDirectoryName);
+          QFileInfo replacementFileInfo(defaultOutputDir, outputFileName);
+          frontEnd->setValue(parameterName, replacementFileInfo.absoluteFilePath(), ctkCmdLineModuleFrontend::DisplayRole);
+        }
+      }
     }
   }
 }
@@ -371,6 +405,7 @@ void CommandLineModulesView::OnRunButtonPressed()
     widget->SetDataStorage(this->GetDataStorage());
     widget->SetManager(m_ModuleManager);
     widget->SetTemporaryDirectory(m_TemporaryDirectoryName);
+    widget->SetOutputDirectory(m_OutputDirectoryName);
 
     // 2. Create a new front end.
     QmitkCmdLineModuleFactoryGui factory(this->GetDataStorage());

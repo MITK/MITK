@@ -191,6 +191,12 @@ private:
   QString m_TemporaryDirectoryName;
 
   /**
+   * \brief We store an output folder name, accessible via user preferences for when
+   * the file specified in a default output path is not within a writable directory.
+   */
+  QString m_OutputDirectoryName;
+
+  /**
    * \brief We store the validation mode, accessisble via user preferences.
    */
   ctkCmdLineModuleManager::ValidationMode m_ValidationMode;

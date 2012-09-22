@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //-----------------------------------------------------------------------------
 CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 : m_MainControl(0)
+, m_OutputDirectory(0)
 , m_TemporaryDirectory(0)
 , m_ModulesDirectories(0)
 , m_ModulesFiles(0)
@@ -77,6 +78,9 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
 
   m_TemporaryDirectory = new ctkDirectoryButton(m_MainControl);
   m_TemporaryDirectory->setCaption("Select a directory for temporary files ... ");
+  m_OutputDirectory = new ctkDirectoryButton(m_MainControl);
+  m_OutputDirectory->setCaption("Select a default directory for output files ... ");
+
   m_ModulesDirectories = new QmitkDirectoryListWidget(m_MainControl);
   m_ModulesDirectories->m_Label->setText("Select directories to scan:");
   m_ModulesFiles = new QmitkFileListWidget(m_MainControl);
@@ -107,6 +111,7 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   formLayout->addRow("additional module directories:", m_ModulesDirectories);
   formLayout->addRow("additional modules:", m_ModulesFiles);
   formLayout->addRow("temporary directory:", m_TemporaryDirectory);
+  formLayout->addRow("default output directory:", m_OutputDirectory);
 
   m_MainControl->setLayout(formLayout);
 
@@ -137,6 +142,7 @@ std::string CommandLineModulesPreferencesPage::ConvertToStdString(const QStringL
 bool CommandLineModulesPreferencesPage::PerformOk()
 {
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory().toStdString());
+  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, m_OutputDirectory->directory().toStdString());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, m_DebugOutput->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, m_LoadFromApplicationDir->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR, m_LoadFromHomeDir->isChecked());
@@ -174,6 +180,9 @@ void CommandLineModulesPreferencesPage::Update()
 {
   QString fallbackTmpDir = QDir::tempPath();
   m_TemporaryDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString())));
+
+  QString fallbackOutputDir = QDir::homePath();
+  m_OutputDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackOutputDir.toStdString())));
 
   m_DebugOutput->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false));
   m_LoadFromApplicationDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, false));

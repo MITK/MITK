@@ -315,9 +315,9 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic.gz", "DKFZ Pic"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", "MetaImage"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.seq.gz", "DKFZ Pic"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "High Dynamic Range File"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img", "High Dynamic Range File"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img.gz", "High Dynamic Range File"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "Analyze Format"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img", "Analyze Format"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img.gz", "Analyze Format"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", "Nearly Raw Raster Data"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", "NRRD with detached header"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mps", "Point sets"));
@@ -345,7 +345,7 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", "MetaImage"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Surface Files"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vti", "VTK Image Data Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "High Dynamic Range File"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "Analyze Format"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", "Sets of 2D slices"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", "Sets of 2D slices"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tif", "Sets of 2D slices"));

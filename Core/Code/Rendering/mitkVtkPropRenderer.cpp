@@ -625,7 +625,7 @@ mitk::DataNode *
 \brief Writes some 2D text as overlay. Function returns an unique int Text_ID for each call, which can be used via the GetTextLabelProperty(int text_id) function
 in order to get a vtkTextProperty. This property enables the setup of font, font size, etc.
 */
-int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double posY, double color1, double color2, double color3)
+int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double posY, double color1, double color2, double color3, float opacity)
 {
   if(text.size() > 0)
   {
@@ -634,6 +634,7 @@ int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double
     textActor->SetPosition(posX,posY);
     textActor->SetInput(text.c_str());
     textActor->GetTextProperty()->SetColor(color1, color2, color3); //TODO: Read color from node property
+    textActor->GetTextProperty()->SetOpacity( opacity );
     int text_id = m_TextCollection.size();
     m_TextCollection.insert(TextMapType::value_type(text_id,textActor));
     return text_id;

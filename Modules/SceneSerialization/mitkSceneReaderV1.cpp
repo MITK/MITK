@@ -58,7 +58,14 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     if( dataXmlElement && dataXmlElement->FirstChildElement("properties") )
     {
       TiXmlElement *baseDataElement = dataXmlElement->FirstChildElement("properties");
-      DecorateBaseDataWithProperties( node->GetData(), baseDataElement, workingDirectory);
+      if ( node->GetData() )
+      {
+        DecorateBaseDataWithProperties( node->GetData(), baseDataElement, workingDirectory);
+      }
+      else
+      {
+        MITK_WARN << "BaseData properties stored in scene file, but BaseData can't be read" << std::endl;
+      }
     }
 
     //   2. check child nodes

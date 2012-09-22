@@ -351,7 +351,7 @@ showNewWindowMenuItem(false),
 showClosePerspectiveMenuItem(true),
 dropTargetListener(new QmitkDefaultDropTargetListener)
 {
- productName = berry::Platform::GetConfiguration().getString("application.baseName");
+ productName = QCoreApplication::applicationName().toStdString();
 }
 
 berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
@@ -467,7 +467,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
 {
- openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
+ openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
 }
 
  berry::IViewRegistry* viewRegistry =

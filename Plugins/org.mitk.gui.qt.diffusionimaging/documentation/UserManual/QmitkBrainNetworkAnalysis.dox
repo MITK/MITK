@@ -1,16 +1,16 @@
 /**
-\page org_mitk_views_brainnetworkanalysis The Brain Network Analysis Module
+\page org_mitk_views_brainnetworkanalysis The Brain Network Analysis View
 
-\image html QmitkBrainNetworkAnalysisViewIcon_64.png "Icon of the Module"
+\image html QmitkBrainNetworkAnalysisViewIcon_64.png "Icon of the View"
 
 \section QmitkBrainNetworkAnalysisUserManualSummary Summary
 
-This module can be used to create a network from a parcellation and a fiber image as well as to calculate and display network statistics.
+This view can be used to create a network from a parcellation and a fiber image as well as to calculate and display network statistics.
 
-This document will tell you how to use this module, but it is assumed that you already know how to use MITK in general.
+This document will tell you how to use this view, but it is assumed that you already know how to use MITK in general.
 
 Please see \ref QmitkBrainNetworkAnalysisUserManualDetails for more detailed information on usage and supported filters.
-If you encounter problems using the module, please have a look at the \ref QmitkBrainNetworkAnalysisUserManualTrouble page.
+If you encounter problems using the view, please have a look at the \ref QmitkBrainNetworkAnalysisUserManualTrouble page.
 
 \section QmitkBrainNetworkAnalysisUserManualDetails Details
 
@@ -22,7 +22,7 @@ Manual sections:
 
 \section QmitkBrainNetworkAnalysisUserManualOverview Overview
 
-This module is currently under heavy development and as such the interface as well as the capabilities are likely to change significantly between different versions.
+This view is currently under heavy development and as such the interface as well as the capabilities are likely to change significantly between different versions.
 
 This documentation describes the features of this current version.
 
@@ -30,7 +30,7 @@ This documentation describes the features of this current version.
 
 \section QmitkBrainNetworkAnalysisUserManualUsage Usage
 
-To create a network select first a parcellation of the brain (e.g. as provided by <a href="http://surfer.nmr.mgh.harvard.edu/">freesurfer</a>  ) by CTRL+Leftclick and secondly a fiber image ( as created using tractography module). Then click on the "Create Network" button.
+To create a network select first a parcellation of the brain (e.g. as provided by <a href="http://surfer.nmr.mgh.harvard.edu/">freesurfer</a>  ) by CTRL+Leftclick and secondly a fiber image ( as created using tractography view). Then click on the "Create Network" button.
 
 To calculate network statistics select a network in the datamanager. At this time the following statistics are calculated for the entire network:
 

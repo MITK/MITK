@@ -1616,7 +1616,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
   std::string statusText;
-  mitk::Image::Pointer image3D;
+  mitk::Image::Pointer image;
   int  maxlayer = -32768;
 
   mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
@@ -1632,7 +1632,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       {
         if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible( baseRenderer ) )
         {
-          image3D = dynamic_cast<mitk::Image*>(nodes->at(x)->GetData());
+          image = dynamic_cast<mitk::Image*>(nodes->at(x)->GetData());
           maxlayer = layer;
         }
       }
@@ -1642,20 +1642,22 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   std::stringstream stream;
 
   mitk::Index3D p;
-  if(image3D.IsNotNull())
+  int timestep = baseRenderer->GetTimeStep();
+
+  if(image.IsNotNull() && (image->GetTimeSteps() > timestep ))
   {
-    image3D->GetGeometry()->WorldToIndex(crosshairPos, p);
+    image->GetGeometry()->WorldToIndex(crosshairPos, p);
     stream.precision(2);
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
-    mitk::ScalarType pixelValue = image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep());
+    mitk::ScalarType pixelValue = image->GetPixelValueByIndex(p, timestep);
     if (fabs(pixelValue)>1000000)
     {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<std::scientific<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<std::scientific<<image->GetPixelValueByIndex(p, timestep)<<"  ";
     }
     else
     {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image->GetPixelValueByIndex(p, timestep)<<"  ";
     }
   }
   else

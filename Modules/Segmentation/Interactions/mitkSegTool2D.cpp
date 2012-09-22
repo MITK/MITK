@@ -292,6 +292,13 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   unsigned int id = service->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos());
 
   mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
+  mitk::Point2D p1;
+  plane->Map(plane->GetCenter(), p1);
+  mitk::Point2D p2 = p1;
+  p2[0] -= plane->GetSpacing()[0];
+  p2[1] -= plane->GetSpacing()[1];
+  contourMarker->PlaceFigure( p1 );
+  contourMarker->SetCurrentControlPoint( p1 );
   contourMarker->SetGeometry2D( const_cast<Geometry2D*>(plane));
 
   std::stringstream markerStream;
@@ -309,6 +316,10 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
   rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
   rotatedContourNode->SetProperty( "helper object", mitk::BoolProperty::New(!m_ShowMarkerNodes));
+  rotatedContourNode->SetProperty( "planarfigure.drawcontrolpoints", BoolProperty::New(false));
+  rotatedContourNode->SetProperty( "planarfigure.drawname", BoolProperty::New(false));
+  rotatedContourNode->SetProperty( "planarfigure.drawoutline", BoolProperty::New(false));
+  rotatedContourNode->SetProperty( "planarfigure.drawshadow", BoolProperty::New(false));
 
   if (plane)
   {

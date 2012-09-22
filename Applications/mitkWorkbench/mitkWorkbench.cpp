@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 {
   // Create a QApplication instance first
   QtSafeApplication qSafeApp(argc, argv);
-  qSafeApp.setApplicationName("mitkWorkbench");
+  qSafeApp.setApplicationName("MITK Workbench");
   qSafeApp.setOrganizationName("DKFZ");
 
   // This function checks if an instance is already running

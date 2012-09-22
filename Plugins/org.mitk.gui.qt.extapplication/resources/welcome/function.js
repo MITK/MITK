@@ -3,10 +3,10 @@
 // The buttons will be generated in order to the array's index. e.g. data at array's index '0' will generate the first button.
 
 // enter the name of your module here
-var moduleNames = new Array("MITK Downloads & News");
+var moduleNames = new Array("MITK Website");
 
 // add the MITK-link to your module
-var moduleLinks = new Array("http://www.mitk.org");
+var moduleLinks = new Array("http://www.mitk.org/");
 
 // add the filename of your icon for the module. Place the picture in subdirectory "pics".
 // The picture's width should be 136 pixel; the height 123 pixel.
@@ -21,7 +21,7 @@ var aniFilenames = new Array("button_mitka.png");
 var experimental = new Array(false);
 
 // add the description for your module. The description is displayed in a PopUp-window.
-var moduleDescriptions = new Array("Open the MITK website in an external browser.");
+var moduleDescriptions = new Array("");
 
 var bttns = new Array();
 
@@ -98,15 +98,17 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
     bttnWrapper.appendChild(bttnTxtLink);
 
     // create pop-up link for module description
-    bttnPopUpLink = document.createElement("a");
-    modName = this.modName;
-    modDescr = this.modDescr;
-    bttnPopUpLink.onclick = function(){showPopUpWindow();};
-    bttnPopUpLink.className = "popUpLink";
-    bttnPopUpLink.id = "popup" + this.modName;
-    bttnPopUpLink.appendChild(document.createTextNode("more info >>"));
-    bttnWrapper.appendChild(document.createElement("br"));
-    bttnWrapper.appendChild(bttnPopUpLink);
+    if (this.modDescr.length != 0) {
+      bttnPopUpLink = document.createElement("a");
+      modName = this.modName;
+      modDescr = this.modDescr;
+      bttnPopUpLink.onclick = function(){showPopUpWindow();};
+      bttnPopUpLink.className = "popUpLink";
+      bttnPopUpLink.id = "popup" + this.modName;
+      bttnPopUpLink.appendChild(document.createTextNode("more info >>"));
+      bttnWrapper.appendChild(document.createElement("br"));
+      bttnWrapper.appendChild(bttnPopUpLink);
+    }
 
     return bttn;
   }

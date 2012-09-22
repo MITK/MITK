@@ -312,6 +312,7 @@ include(MacroParseArguments)
 include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionGetVersion)
+include(mitkFunctionGetVersionDescription)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionCompileSnippets)
@@ -363,6 +364,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 mitkFunctionGetVersion(${MITK_SOURCE_DIR} MITK)
+mitkFunctionGetVersionDescription(${MITK_SOURCE_DIR} MITK)
 
 #-----------------------------------------------------------------------------
 # Installation preparation

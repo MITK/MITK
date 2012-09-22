@@ -120,11 +120,6 @@ Click right mouse button to delete a point.</string>
             <height>16777215</height>
            </size>
           </property>
-          <property name="font">
-           <font>
-            <pointsize>7</pointsize>
-           </font>
-          </property>
           <property name="toolTip">
            <string>Edit x-coordinate (grayvalue) of currently selected point.</string>
           </property>
@@ -203,11 +198,6 @@ Click right mouse button to delete a point.</string>
             <height>16777215</height>
            </size>
           </property>
-          <property name="font">
-           <font>
-            <pointsize>7</pointsize>
-           </font>
-          </property>
           <property name="toolTip">
            <string>Edit y-coordinate (opacity) of currently selected point.</string>
           </property>
@@ -282,11 +272,6 @@ Double-click left mouse button to change color of a point.</string>
             <width>48</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>7</pointsize>
-           </font>
           </property>
           <property name="toolTip">
            <string>Edit x-coordinate (grayvalue) of currently selected point.</string>
@@ -378,11 +363,6 @@ Click right mouse button to delete a point.</string>
             <height>16777215</height>
            </size>
           </property>
-          <property name="font">
-           <font>
-            <pointsize>7</pointsize>
-           </font>
-          </property>
           <property name="toolTip">
            <string>Edit x-coordinate (grayvalue) of currently selected point.</string>
           </property>
@@ -448,11 +428,6 @@ Click right mouse button to delete a point.</string>
             <width>48</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>7</pointsize>
-           </font>
           </property>
           <property name="toolTip">
            <string>Edit y-coordinate (opacity) of currently selected point.</string>

@@ -18,10 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QFile>
+#include <QFileInfo>
+#include <QDir>
+#include <QMessageBox>
 #include <QVBoxLayout>
 #include <QLayoutItem>
 #include <QTextBrowser>
 #include <QByteArray>
+#include <QApplication>
 
 // CTK
 #include <ctkCmdLineModuleFuture.h>
@@ -419,18 +423,76 @@ void QmitkCmdLineModuleProgressWidget::Run()
 
   m_OutputDataToLoad.clear();
 
+  QString parameterName;
+  QString message;
+  QList<ctkCmdLineModuleParameter> parameters;
+
   ctkCmdLineModuleReference reference = m_ModuleFrontEnd->moduleReference();
   ctkCmdLineModuleDescription description = reference.description();
 
-  QString message = "Saving image data to temporary storage...";
+  // Check we have valid output. If at all possible, they should be somewhere writable.
+
+  parameters = m_ModuleFrontEnd->parameters("image", ctkCmdLineModuleFrontend::Output);
+  parameters << m_ModuleFrontEnd->parameters("file", ctkCmdLineModuleFrontend::Output);
+  parameters << m_ModuleFrontEnd->parameters("geometry", ctkCmdLineModuleFrontend::Output);
+
+  foreach (ctkCmdLineModuleParameter parameter, parameters)
+  {
+    parameterName = parameter.name();
+    QString outputFileName = m_ModuleFrontEnd->value(parameterName, ctkCmdLineModuleFrontend::DisplayRole).toString();
+
+    // Try to make sure we are not running in the application installation folder,
+    // as more likely than not, it should not have write access, and you certainly
+    // don't want users output files dumped there.
+    //
+    // eg. C:/Program Files (Windows), /Applications (Mac), /usr/local (Linux) etc.
+
+    QFileInfo outputFileInfo(outputFileName);
+
+    QString applicationDir = QApplication::applicationDirPath();
+    QString outputDir = outputFileInfo.dir().absolutePath();
+
+    if (applicationDir == outputDir)
+    {
+      qDebug() << "QmitkCmdLineModuleProgressWidget::Run(), output folder = application folder, so will swap to defaultOutputDir, specified in CLI module preferences";
+
+      QFileInfo newOutputFileInfo(m_OutputDirectoryName, outputFileInfo.fileName());
+      QString newOutputFileAbsolutePath = newOutputFileInfo.absoluteFilePath();
+
+      qDebug() << "QmitkCmdLineModuleProgressWidget::Run(), swapping " << outputFileName << " to " << newOutputFileAbsolutePath;
+
+      QMessageBox msgBox;
+        msgBox.setText("The output directory is the same as the application installation directory");
+        msgBox.setInformativeText(tr("Output file:\n%1\n\nwill be swapped to\n%2").arg(outputFileName).arg(newOutputFileAbsolutePath));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+
+      m_ModuleFrontEnd->setValue(parameterName, newOutputFileAbsolutePath, ctkCmdLineModuleFrontend::DisplayRole);
+    }
+  }
+
+  // For each output image or file, store the filename, so we can auto-load it once the process finishes.
+  foreach (ctkCmdLineModuleParameter parameter, parameters)
+  {
+    parameterName = parameter.name();
+    QString outputFileName = m_ModuleFrontEnd->value(parameterName, ctkCmdLineModuleFrontend::DisplayRole).toString();
+
+    if (!outputFileName.isEmpty())
+    {
+      m_OutputDataToLoad.push_back(outputFileName);
+
+      message = "Registered " + outputFileName + " to auto load upon completion.";
+      this->PublishMessage(message);
+    }
+  }
+
+  // For each input image, write a temporary file as a Nifti image (TODO - iterate through list of file formats).
+  // and then save the full path name back on the parameter.
+
+  message = "Saving image data to temporary storage...";
   this->PublishMessage(message);
 
-  // Sanity check we have actually specified some input:
-  QString parameterName;
-  QList<ctkCmdLineModuleParameter> parameters;
-
-  // For each input image, write a temporary file as a Nifti image,
-  // and then save the full path name back on the parameter.
   parameters = m_ModuleFrontEnd->parameters("image", ctkCmdLineModuleFrontend::Input);
   foreach (ctkCmdLineModuleParameter parameter, parameters)
   {
@@ -464,24 +526,6 @@ void QmitkCmdLineModuleProgressWidget::Run()
       } // end if image
     } // end if node
   } // end foreach input image
-
-  // For each output image or file, store the filename, so we can auto-load it once the process finishes.
-  parameters = m_ModuleFrontEnd->parameters("image", ctkCmdLineModuleFrontend::Output);
-  parameters << m_ModuleFrontEnd->parameters("file", ctkCmdLineModuleFrontend::Output);
-
-  foreach (ctkCmdLineModuleParameter parameter, parameters)
-  {
-    parameterName = parameter.name();
-    QString outputFileName = m_ModuleFrontEnd->value(parameterName, ctkCmdLineModuleFrontend::DisplayRole).toString();
-
-    if (!outputFileName.isEmpty())
-    {
-      m_OutputDataToLoad.push_back(outputFileName);
-
-      message = "Registered " + outputFileName + " to auto load upon completion.";
-      this->PublishMessage(message);
-    }
-  }
 
   m_OutputCount = 0;
   m_ErrorCount = 0;

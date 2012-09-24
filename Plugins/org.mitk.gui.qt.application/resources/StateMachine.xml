@@ -786,6 +786,9 @@
       <transition NAME="Shift+press" NEXT_STATE_ID="1" EVENT_ID="3">
         <action ID="10" />
       </transition>
+      <transition NAME="Shift+pressRMB" NEXT_STATE_ID="1" EVENT_ID="2000">
+        <action ID="6000" />
+      </transition>
       <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="90" />
       </transition>

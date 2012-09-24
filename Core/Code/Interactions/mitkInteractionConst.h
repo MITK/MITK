@@ -266,6 +266,7 @@ enum EActions
   AcINITNEUTRAL = 47,  // used in SeedsInteractor for setting the neutral seeds (rubber)
   AcINITUPDATE = 1235,  // For shape model deformation
   AcADDPOINT = 10,
+  AcADDPOINTRMB = 6000, // in mitralPointSetInteractor used to set a different type of point
   AcADD = 11,
   AcADDLINE = 12,
   AcADDANDFINISH = 13,

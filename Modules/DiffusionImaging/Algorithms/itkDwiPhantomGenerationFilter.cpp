@@ -7,10 +7,18 @@
 #include <stdlib.h>
 
 #include "itkDwiPhantomGenerationFilter.h"
-#include "itkImageRegionConstIterator.h"
-#include "itkImageRegionConstIteratorWithIndex.h"
-#include "itkImageRegionIterator.h"
-#include "itkOrientationDistributionFunction.h"
+#include <itkImageRegionConstIterator.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkImageRegionIterator.h>
+#include <itkOrientationDistributionFunction.h>
+
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+#include <vtkPolyLine.h>
+
+#include <boost/progress.hpp>
 
 namespace itk {
 
@@ -26,6 +34,7 @@ DwiPhantomGenerationFilter< TOutputScalarType >
     , m_MeanBaseline(0)
     , m_SNR(4)
     , m_NoiseFactor(0)
+    , m_GreyMatterAdc(0.01)
 {
     this->SetNumberOfRequiredOutputs (1);
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
@@ -52,11 +61,10 @@ DwiPhantomGenerationFilter< TOutputScalarType >
 
 template< class TOutputScalarType >
 void DwiPhantomGenerationFilter< TOutputScalarType >
-::GenerateTensors(vnl_vector<double> num)
+::GenerateTensors()
 {
     MITK_INFO << "Generating tensors";
 
-    m_MaxBaseline = 0;
     vnl_vector<double> signal; signal.set_size(m_SignalRegions.size());
     for (int i=0; i<m_SignalRegions.size(); i++)
     {
@@ -100,26 +108,23 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
 
         m_TensorList.push_back(tensor);
     }
-    if (m_SNR<=99)
-    {
-        m_MeanBaseline = 0;
-        double sum = 0;
-        for (int i=0; i<m_SignalRegions.size(); i++)
-        {
-            m_MeanBaseline += signal[i]/m_MaxBaseline*num[i];
-            sum += num[i];
-        }
-        if (sum>0)
-            m_MeanBaseline /= sum;
-
-        m_NoiseFactor = m_MeanBaseline/m_SNR;
-        m_NoiseFactor *= m_NoiseFactor;
-    }
-    else
-        m_NoiseFactor = 0;
 }
 
+template< class TOutputScalarType >
+void DwiPhantomGenerationFilter< TOutputScalarType >::AddNoise(typename OutputImageType::PixelType& pix)
+{
+    for( unsigned int i=0; i<m_GradientList.size(); i++)
+    {
+        float signal = pix[i];
+        float val = 0;
 
+        for (int k=0; k<10; k++)
+            val += sqrt(pow(signal + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseFactor), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseFactor),2));
+
+        val /= 10;
+        pix[i] += val;
+    }
+}
 
 template< class TOutputScalarType >
 typename DwiPhantomGenerationFilter< TOutputScalarType >::OutputImageType::PixelType
@@ -128,7 +133,6 @@ DwiPhantomGenerationFilter< TOutputScalarType >::SimulateMeasurement(itk::Diffus
     typename OutputImageType::PixelType out;
     out.SetSize(m_GradientList.size());
     out.Fill(0);
-
 
     double l2 = GetTensorL2Norm(T);
     TOutputScalarType b0 = (l2/m_MaxBaseline)*m_SignalScale;
@@ -147,30 +151,19 @@ DwiPhantomGenerationFilter< TOutputScalarType >::SimulateMeasurement(itk::Diffus
             S[4] = g[2]*g[1];
             S[5] = g[2]*g[2];
 
-            double res =
-                    T[0]*S[0] + T[1]*S[1] + T[2]*S[2] +
-                    T[1]*S[1] + T[3]*S[3] + T[4]*S[4] +
-                    T[2]*S[2] + T[4]*S[4] + T[5]*S[5];
+            double res = T[0]*S[0] + T[1]*S[1] + T[2]*S[2] +
+                         T[1]*S[1] + T[3]*S[3] + T[4]*S[4] +
+                         T[2]*S[2] + T[4]*S[4] + T[5]*S[5];
 
             // check for corrupted tensor
             if (res>=0)
             {
                 res = weight*b0*exp ( -m_BValue * res );
-                res = sqrt(pow(res + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseFactor), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseFactor),2));
-
                 out[i] = static_cast<TOutputScalarType>( res );
             }
         }
         else
-        {
-            float val = 0;
-            for (int k=0; k<10; k++)
-            {
-                val += sqrt(pow(b0 + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseFactor), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseFactor),2));
-            }
-            val /= 10;
-            out[i] = val;
-        }
+            out[i] = b0;
     }
 
 
@@ -204,6 +197,36 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
     outImage->FillBuffer(pix);
     this->SetNthOutput (0, outImage);
 
+    double minSpacing = m_Spacing[0];
+    if (m_Spacing[1]<minSpacing)
+        minSpacing = m_Spacing[1];
+    if (m_Spacing[2]<minSpacing)
+        minSpacing = m_Spacing[2];
+
+    m_DirectionImageContainer = ItkDirectionImageContainer::New();
+    for (int i=0; i<m_SignalRegions.size(); i++)
+    {
+        itk::Vector< float, 3 > nullVec; nullVec.Fill(0.0);
+        ItkDirectionImage::Pointer img = ItkDirectionImage::New();
+        img->SetSpacing( m_Spacing );
+        img->SetOrigin( m_Origin );
+        img->SetDirection( m_DirectionMatrix );
+        img->SetRegions( m_ImageRegion );
+        img->Allocate();
+        img->FillBuffer(nullVec);
+        m_DirectionImageContainer->InsertElement(m_DirectionImageContainer->Size(), img);
+    }
+    m_NumDirectionsImage = ItkUcharImgType::New();
+    m_NumDirectionsImage->SetSpacing( m_Spacing );
+    m_NumDirectionsImage->SetOrigin( m_Origin );
+    m_NumDirectionsImage->SetDirection( m_DirectionMatrix );
+    m_NumDirectionsImage->SetRegions( m_ImageRegion );
+    m_NumDirectionsImage->Allocate();
+    m_NumDirectionsImage->FillBuffer(0);
+
+    vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
+    vtkSmartPointer<vtkPoints>    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
+
     m_BaselineImages = 0;
     for( unsigned int i=0; i<m_GradientList.size(); i++)
         if (m_GradientList[i].GetNorm()<=0.0001)
@@ -212,81 +235,113 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
     typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
     IteratorOutputType it (outImage, m_ImageRegion);
 
-    // estimate mean baseline
-    vnl_vector< double > num; num.set_size(m_SignalRegions.size()); num.fill(0.0);
+    // isotropic tensor
+    itk::DiffusionTensor3D<float> isoTensor;
+    isoTensor.Fill(0);
+    float e1 = m_GreyMatterAdc;
+    float e2 = m_GreyMatterAdc;
+    float e3 = m_GreyMatterAdc;
+    isoTensor.SetElement(0,e1);
+    isoTensor.SetElement(3,e2);
+    isoTensor.SetElement(5,e3);
+    m_MaxBaseline = GetTensorL2Norm(isoTensor);
+
+    GenerateTensors();
+
+    // simulate measurement
+    m_MeanBaseline = 0;
     while(!it.IsAtEnd())
     {
+        pix = it.Get();
+        typename OutputImageType::IndexType index = it.GetIndex();
+
+        int numDirs = 0;
         for (int i=0; i<m_SignalRegions.size(); i++)
         {
             ItkUcharImgType::Pointer region = m_SignalRegions.at(i);
-            typename OutputImageType::IndexType index = it.GetIndex();
-            if (region->GetPixel(index)!=0)
-                num[i] += 1;
-        }
-        ++it;
-    }
-    for (int i=0; i<m_SignalRegions.size(); i++)
-        num[i] *= m_TensorWeight[i];
-    it.GoToBegin();
-
-    if (m_SignalRegions.empty())
-    {
-        ItkUcharImgType::Pointer binary = ItkUcharImgType::New();
-        binary->SetSpacing( m_Spacing );   // Set the image spacing
-        binary->SetOrigin( m_Origin );     // Set the image origin
-        binary->SetDirection( m_DirectionMatrix );  // Set the image direction
-        binary->SetLargestPossibleRegion( m_ImageRegion );
-        binary->SetBufferedRegion( m_ImageRegion );
-        binary->SetRequestedRegion( m_ImageRegion );
-        binary->Allocate();
-        binary->FillBuffer(1);
-        m_SignalRegions.push_back(binary);
-
-        // kernel tensor
-        itk::DiffusionTensor3D<float> tensor;
-        float ADC = 0.001;
-        tensor.Fill(0);
-        float e1=ADC;
-        float e2=ADC;
-        float e3=e2;
-        tensor.SetElement(0,e1);
-        tensor.SetElement(3,e2);
-        tensor.SetElement(5,e3);
-        m_TensorList.push_back(tensor);
-        m_TensorWeight.push_back(1);
-
-        m_MaxBaseline = GetTensorL2Norm(tensor);
-    }
-    else
-        GenerateTensors(num);
-
-
-    while(!it.IsAtEnd())
-    {
-        // generate artificial signal
-        int count = 0;
-        for (int i=0; i<m_SignalRegions.size(); i++)
-        {
-            ItkUcharImgType::Pointer region = m_SignalRegions.at(i);
-            typename OutputImageType::IndexType index = it.GetIndex();
 
             if (region->GetPixel(index)!=0)
             {
-                count++;
-                pix = it.Get();
-                it.Set(pix+SimulateMeasurement(m_TensorList[i], m_TensorWeight[i]));
+                numDirs++;
+                pix += SimulateMeasurement(m_TensorList[i], m_TensorWeight[i]);
+
+                // set direction image pixel
+                ItkDirectionImage::Pointer img = m_DirectionImageContainer->GetElement(i);
+                itk::Vector< float, 3 > pixel = img->GetPixel(index);
+                vnl_vector_fixed<double, 3> dir = m_TensorDirection.at(i);
+                dir.normalize();
+                dir *= m_TensorWeight.at(i);
+                pixel.SetElement(0, dir[0]);
+                pixel.SetElement(1, dir[1]);
+                pixel.SetElement(2, dir[2]);
+                img->SetPixel(index, pixel);
+
+                vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+                itk::ContinuousIndex<double, 3> center;
+                center[0] = index[0];
+                center[1] = index[1];
+                center[2] = index[2];
+                itk::Point<double> worldCenter;
+                outImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
+                itk::Point<double> worldStart;
+                worldStart[0] = worldCenter[0]-dir[0]/2 * minSpacing;
+                worldStart[1] = worldCenter[1]-dir[1]/2 * minSpacing;
+                worldStart[2] = worldCenter[2]-dir[2]/2 * minSpacing;
+                vtkIdType id = m_VtkPoints->InsertNextPoint(worldStart.GetDataPointer());
+                container->GetPointIds()->InsertNextId(id);
+                itk::Point<double> worldEnd;
+                worldEnd[0] = worldCenter[0]+dir[0]/2 * minSpacing;
+                worldEnd[1] = worldCenter[1]+dir[1]/2 * minSpacing;
+                worldEnd[2] = worldCenter[2]+dir[2]/2 * minSpacing;
+                id = m_VtkPoints->InsertNextPoint(worldEnd.GetDataPointer());
+                container->GetPointIds()->InsertNextId(id);
+                m_VtkCellArray->InsertNextCell(container);
             }
         }
 
-        if (count>1)
+        if (numDirs>1)
         {
-            pix = it.Get();
             for (int i=0; i<m_BaselineImages; i++)
-                pix[i] /= count;
-            it.Set(pix);
+                pix[i] /= numDirs;
         }
+        else if (numDirs==0)
+            pix = SimulateMeasurement(isoTensor, 1.0);
+
+        m_MeanBaseline += pix[0];
+        it.Set(pix);
+        m_NumDirectionsImage->SetPixel(index, numDirs);
         ++it;
     }
+    m_MeanBaseline /= (m_ImageRegion.GetNumberOfPixels()*m_SignalScale);
+
+    // calculate noise level
+    if (m_SNR<=99)
+    {
+        m_NoiseFactor = m_MeanBaseline/m_SNR;
+        m_NoiseFactor *= m_NoiseFactor;
+    }
+    else
+        m_NoiseFactor = 0;
+
+    MITK_INFO << "Mean baseline:" << m_MeanBaseline;
+    MITK_INFO << "SNR:" << m_SNR;
+    MITK_INFO << "Noise level:" << m_NoiseFactor;
+
+    // add rician noise
+    it.GoToBegin();
+    while(!it.IsAtEnd())
+    {
+        pix = it.Get();
+        AddNoise(pix);
+        it.Set(pix);
+        ++it;
+    }
+
+    // generate fiber bundle
+    vtkSmartPointer<vtkPolyData> directionsPolyData = vtkSmartPointer<vtkPolyData>::New();
+    directionsPolyData->SetPoints(m_VtkPoints);
+    directionsPolyData->SetLines(m_VtkCellArray);
+    m_OutputFiberBundle = mitk::FiberBundleX::New(directionsPolyData);
 }
 template< class TOutputScalarType >
 double DwiPhantomGenerationFilter< TOutputScalarType >::GetTensorL2Norm(itk::DiffusionTensor3D<float>& T)

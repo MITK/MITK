@@ -215,11 +215,11 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
 
     if (m_Controls->m_OutputDirectionImagesBox->isChecked())
     {
-        typedef typename FilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
-        typename ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
+        typedef FilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
+        ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
         for (int i=0; i<container->Size(); i++)
         {
-            typename FilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
+            FilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
             mitk::Image::Pointer img = mitk::Image::New();
             img->InitializeByItk( itkImg.GetPointer() );
             img->SetVolume( itkImg->GetBufferPointer() );

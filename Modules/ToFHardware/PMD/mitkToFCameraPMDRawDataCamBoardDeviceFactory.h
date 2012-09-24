@@ -32,12 +32,25 @@ namespace mitk
 class MITK_PMDCAMCUBEMODULE_EXPORT ToFCameraPMDRawDataCamBoardDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
+
+  ToFCameraPMDRawDataCamBoardDeviceFactory()
+  {
+    this->m_DeviceNumber=0;
+  }
+
   /*!
    \brief Defining the Factorie´s Name, here for the RawDataCamBoardDeviceFactory.
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD RAW Data CamBoard Factory");
+       return std::string("PMD Raw Data CamBoard Factory");
+   }
+
+   std::string GetCurrentDeviceName()
+   {
+     std::stringstream name;
+     name<<"PMD Raw Data CamBoard Device" << m_DeviceNumber;
+     return name.str ();
    }
 
 private:
@@ -50,6 +63,7 @@ private:
 
      return device.GetPointer();
    }
+   int m_DeviceNumber;
 };
 }
 #endif

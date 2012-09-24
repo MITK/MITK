@@ -28,35 +28,42 @@ namespace mitk
   * This offers users the oppertunity to generate new KinectDevices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-class MITK_KINECTMODULE_EXPORT KinectDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+  class MITK_KINECTMODULE_EXPORT KinectDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
-public:
-     /*!
-   \brief Defining the Factorie´s Name, here for the Kinect.
-   */
-   std::string GetFactoryName()
-   {
-       return std::string("Kinect Factory");
-   }
-//--------------------------Renaming the Device should be implemted in this method. it should be called by tge ToFAbstractDeviceFactory later on!
-         //   std::string GetCurrentDeviceName()
-         //{
-         //    return std::string("Kinect Divice")+Counter;
-         //}
+  public:
 
-private:
+    KinectDeviceFactory()
+    {
+      this->m_DeviceNumber = 0;
+    }
+    /*!
+    \brief Defining the Factorie´s Name, here for the Kinect.
+    */
+    std::string GetFactoryName()
+    {
+      return std::string("Kinect Factory");
+    }
+    //--------------------------Renaming the Device should be implemted in this method. it should be called by tge ToFAbstractDeviceFactory later on!
+    std::string GetCurrentDeviceName()
+    {
+      std::stringstream name;
+      name << "Kinect Device " << m_DeviceNumber;
+      return name.str();
+      //return std::string("Kinect Device")+m_DeviceNumber;
+    }
 
-   /*!
-   \brief Create an instance of a KinectDevice.
-   */
-   ToFCameraDevice::Pointer createToFCameraDevice()
-   {
-     KinectDevice::Pointer device = KinectDevice::New();
+  private:
 
-     return device.GetPointer();
-   }
-//------------This member variable should be set here and is used to produce kinect1,kinect2, kinect m_DeviceNumber
-           //int m_DeviceNumber
-};
+    /*!
+    \brief Create an instance of a KinectDevice.
+    */
+    ToFCameraDevice::Pointer createToFCameraDevice()
+    {
+      KinectDevice::Pointer device = KinectDevice::New();
+      return device.GetPointer();
+    }
+    //------------This member variable should be set here and is used to produce kinect1,kinect2, kinect m_DeviceNumber
+    int m_DeviceNumber;
+  };
 }
 #endif

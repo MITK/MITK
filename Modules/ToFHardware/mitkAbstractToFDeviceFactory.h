@@ -43,7 +43,7 @@ struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFacto
      ModuleContext* context = GetModuleContext();
      ServiceProperties deviceProps;
 //-------------Take a look at this part to change the name given to a device
-     deviceProps["ToFDeviceName"] = GetFactoryName() + " Device";
+     deviceProps["ToFDeviceName"] = GetCurrentDeviceName();
      m_DeviceRegistrations.insert(std::make_pair(device.GetPointer(), context->RegisterService<ToFCameraDevice>(device.GetPointer(),deviceProps)));
 
      return device;

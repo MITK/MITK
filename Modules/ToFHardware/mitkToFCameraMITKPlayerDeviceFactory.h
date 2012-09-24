@@ -33,6 +33,12 @@ class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerDeviceFactory : public itk::Lig
 
 public:
 
+
+  ToFCameraMITKPlayerDeviceFactory()
+  {
+    m_DeviceNumber = 0;
+  }
+
      /*!
    \brief Defining the Factorie´s Name, here for the ToFPlayer.
    */
@@ -40,6 +46,14 @@ public:
    {
        return std::string("MITK Player Factory");
    }
+
+    std::string GetCurrentDeviceName()
+    {
+      std::stringstream name;
+      name << "ToFCameraMITKPlayerDeviceFactory " << m_DeviceNumber;
+      return name.str();
+      //return std::string("Kinect Device")+m_DeviceNumber;
+    }
 
 private:
    /*!
@@ -51,6 +65,8 @@ private:
 
      return device.GetPointer();
    }
+
+   int m_DeviceNumber;
 
 };
 }

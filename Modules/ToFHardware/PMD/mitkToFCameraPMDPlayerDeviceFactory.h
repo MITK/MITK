@@ -32,6 +32,10 @@ namespace mitk
 class MITK_PMDCAMCUBEMODULE_EXPORT ToFCameraPMDPlayerDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
+  ToFCameraPMDPlayerDeviceFactory()
+  {
+    this->m_DeviceNumber;
+  }
   /*!
    \brief Defining the Factorie´s Name, here for the ToFPMDPlayer.
    */
@@ -39,6 +43,14 @@ public:
    {
        return std::string("PMD Player Factory");
    }
+
+   std::string GetCurrentDeviceName()
+   {
+     std::stringstream name;
+     name<<"PMD Player Device" << m_DeviceNumber;
+     return name.str();
+   }
+
 private:
      /*!
    \brief Create an instance of a ToFPMDPlayerDevice.
@@ -50,7 +62,7 @@ private:
      return device.GetPointer();
    }
 
-
+   int m_DeviceNumber;
 };
 }
 #endif

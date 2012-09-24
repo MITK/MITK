@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFConfig.h"
 #include "mitkKinectDeviceFactory.h"
 
+#include "mitkAbstractToFDeviceFactory.h"
+
 /*
   * This is the module activator for the "mitkKinectModule" module. It registers services
   * like the IToFDeviceFactory.
@@ -34,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class KinectActivator : public mitk::ModuleActivator {
+class KinectActivator : public ModuleActivator {
 public:
 
     void Load(mitk::ModuleContext* context)
@@ -42,10 +44,9 @@ public:
         //Implementing KinectDeviceFactory
         KinectDeviceFactory* kinectFactory = new KinectDeviceFactory();
         ServiceProperties kinectFactoryProps;
-        kinectFactoryProps["ToFFactoryName"] = kinectFactory->GetFactoryName();
+        kinectFactoryProps["ToFFactoryName"] =kinectFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(kinectFactory, kinectFactoryProps);
-  //-----------------Test for startup initzialisation------------
-        //dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice();
+        kinectFactory->ConnectToFDevice();    //aufrufen der ConnectToFDevice-Methode der kinectFactory
 
         m_Factories.push_back( kinectFactory );
     }

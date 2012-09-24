@@ -22,20 +22,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-struct IToFDeviceFactory {
+  struct IToFDeviceFactory {
 
     virtual ~IToFDeviceFactory(); // leer in mitkIToFDeviceFactory.cpp implementieren
 
     //create a specialized device factory in the inherited class
 
+    virtual std::string GetFactoryName() = 0;
 
-      virtual std::string GetFactoryName() = 0;
+    virtual std::string GetCurrentDeviceName() = 0;
 
     virtual ToFCameraDevice::Pointer createToFCameraDevice() = 0;
     //create a specialized device factory in the inherited class
 
 
-};
+  };
 }
 US_DECLARE_SERVICE_INTERFACE(mitk::IToFDeviceFactory, "org.mitk.services.IToFDeviceFactory")
 #endif

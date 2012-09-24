@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
   /**
   * \brief ToFPMDRawPlayerDeviceFactory is an implementation of the factory pattern to generate Raw Player Devices.
   * ToFPMDRawPlayerDeviceFactory inherits from AbstractToFDeviceFactory which is a MicroService interface.
@@ -31,12 +32,23 @@ namespace mitk
 class MITK_PMDCAMCUBEMODULE_EXPORT ToFCameraPMDRawDataCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
-   /*!
+
+  ToFCameraPMDRawDataCamCubeDeviceFactory()
+  {
+    this->m_DeviceNumber = 0;
+  }
+  /*!
    \brief Defining the Factorie´s Name, here for the RawDataDeviceFactory.
    */
    std::string GetFactoryName()
    {
        return std::string("PMD RAW Data Camcube Factory");
+   }
+   std::string GetCurrentDeviceName()
+   {
+     std::stringstream name;
+     name << "PMD Raw Data CamCube Device"<< m_DeviceNumber;
+     return name.str();
    }
 
 private:
@@ -49,6 +61,7 @@ private:
 
      return device.GetPointer();
    }
+   int m_DeviceNumber;
 };
 }
 #endif

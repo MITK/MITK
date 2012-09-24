@@ -21,6 +21,7 @@
 #include <itkVectorImage.h>
 #include <itkDiffusionTensor3D.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
+#include <mitkFiberBundleX.h>
 
 namespace itk{
 /** \class DwiPhantomGenerationFilter
@@ -51,6 +52,9 @@ public:
     typedef itk::Matrix<double, 3, 3>                   MatrixType;
     typedef itk::Image<unsigned char, 3>                ItkUcharImgType;
 
+    typedef Image< Vector< float, 3 >, 3>                                 ItkDirectionImage;
+    typedef VectorContainer< unsigned int, ItkDirectionImage::Pointer >   ItkDirectionImageContainer;
+
     void SetGradientList(GradientListType gradientList){m_GradientList = gradientList;}
     void SetSignalRegions(std::vector< ItkUcharImgType::Pointer > signalRegions){m_SignalRegions = signalRegions;}
     void SetTensorFA(std::vector< float > faList){m_TensorFA = faList;}
@@ -58,14 +62,20 @@ public:
     void SetTensorWeight(std::vector< float > weightList){m_TensorWeight = weightList;}
     void SetTensorDirection(std::vector< vnl_vector_fixed<double, 3> > directionList){m_TensorDirection = directionList;}
 
+    // input parameters
     itkSetMacro( BValue, float )
     itkSetMacro( SignalScale, float )
     itkSetMacro( SNR, float )
-
+    itkSetMacro( GreyMatterAdc, float )
     itkSetMacro( Spacing, mitk::Vector3D )
     itkSetMacro( Origin, mitk::Point3D )
     itkSetMacro( DirectionMatrix, MatrixType )
     itkSetMacro( ImageRegion, ImageRegion<3> )
+
+    // output
+    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)
+    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)
+    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)
 
     protected:
     DwiPhantomGenerationFilter();
@@ -76,10 +86,13 @@ public:
 private:
 
     // image variables
-    mitk::Vector3D                  m_Spacing;
-    mitk::Point3D                   m_Origin;
-    itk::Matrix<double, 3, 3>       m_DirectionMatrix;
-    ImageRegion<3>                  m_ImageRegion;
+    mitk::Vector3D                                  m_Spacing;
+    mitk::Point3D                                   m_Origin;
+    itk::Matrix<double, 3, 3>                       m_DirectionMatrix;
+    ImageRegion<3>                                  m_ImageRegion;
+    ItkDirectionImageContainer::Pointer             m_DirectionImageContainer;
+    ItkUcharImgType::Pointer                        m_NumDirectionsImage;
+    mitk::FiberBundleX::Pointer                     m_OutputFiberBundle;
 
     // signal regions
     std::vector< ItkUcharImgType::Pointer >         m_SignalRegions;
@@ -99,10 +112,12 @@ private:
     double                                          m_MaxBaseline;
     double                                          m_MeanBaseline;
     double                                          m_NoiseFactor;
+    float                                           m_GreyMatterAdc;
 
     double GetTensorL2Norm(itk::DiffusionTensor3D<float>& T);
-    void GenerateTensors(vnl_vector< double > num);
+    void GenerateTensors();
     typename OutputImageType::PixelType SimulateMeasurement(itk::DiffusionTensor3D<float>& tensor, float weight);
+    void AddNoise(typename OutputImageType::PixelType& pix);
 };
 
 }

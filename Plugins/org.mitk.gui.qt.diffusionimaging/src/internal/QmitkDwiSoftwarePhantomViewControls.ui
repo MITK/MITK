@@ -7,37 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>389</width>
-    <height>383</height>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="4" column="0" colspan="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QCommandLinkButton" name="m_GeneratePhantomButton">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Start</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="2">
+   <item row="2" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Image Parameters</string>
@@ -170,7 +147,7 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_4">
            <property name="text">
             <string>Baseline scale:</string>
@@ -195,11 +172,11 @@
             <double>0.500000000000000</double>
            </property>
            <property name="value">
-            <double>4.000000000000000</double>
+            <double>8.000000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QDoubleSpinBox" name="m_SignalScale">
            <property name="decimals">
             <number>1</number>
@@ -241,6 +218,35 @@
           <widget class="QLineEdit" name="m_ImageName">
            <property name="text">
             <string>phantom</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_5">
+           <property name="text">
+            <string>Grey Matter ADC:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QDoubleSpinBox" name="m_GmAdc">
+           <property name="toolTip">
+            <string>Set ADC for isotropic regions (air, liquor, ...)</string>
+           </property>
+           <property name="decimals">
+            <number>5</number>
+           </property>
+           <property name="minimum">
+            <double>0.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.000010000000000</double>
+           </property>
+           <property name="value">
+            <double>0.010000000000000</double>
            </property>
           </widget>
          </item>
@@ -351,14 +357,24 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <widget class="QGroupBox" name="m_SignalRegionBox">
      <property name="title">
       <string>Signal Regions</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
+   <item row="5" column="0" colspan="2">
+    <widget class="QCommandLinkButton" name="m_GeneratePhantomButton">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" rowspan="2" colspan="2">
     <widget class="QLabel" name="m_Instruction">
      <property name="palette">
       <palette>
@@ -460,6 +476,73 @@
      <property name="text">
       <string>Please select at least one binary image!</string>
      </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Additional Output</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="m_OutputVectorFieldBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Visualization of the used tensor directions.</string>
+        </property>
+        <property name="text">
+         <string>Vector Field</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
+        <property name="toolTip">
+         <string>Output unsigned char image containing the number of directions per voxel.</string>
+        </property>
+        <property name="text">
+         <string>#Directions per Voxel</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="m_OutputDirectionImagesBox">
+        <property name="toolTip">
+         <string>Output one image per signal region containing the tensor direction vecors as pixel values.</string>
+        </property>
+        <property name="text">
+         <string>Direction Images</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

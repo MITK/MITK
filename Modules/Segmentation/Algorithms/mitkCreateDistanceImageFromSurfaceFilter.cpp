@@ -234,14 +234,14 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   }
 
   Vector3D extentMM;
-  extentMM[0] = xmax - xmin + 2;
-  extentMM[1] = ymax - ymin + 2;
-  extentMM[2] = zmax - zmin + 2;
+  extentMM[0] = xmax - xmin + 5;
+  extentMM[1] = ymax - ymin + 5;
+  extentMM[2] = zmax - zmin + 5;
 
   //Shifting the distance image's offest to achieve an exact distance calculation
-  xmin = xmin - 2;
-  ymin = ymin - 2;
-  zmin = zmin - 2;
+  xmin = xmin - 5;
+  ymin = ymin - 5;
+  zmin = zmin - 5;
 
   /*
     Now create an empty distance image. The create image will always have the same size, independent from
@@ -397,7 +397,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
   CastToMitkImage(distanceImg, resultImage);
   resultImage->GetGeometry()->SetOrigin(origin);
-  resultImage->SetOrigin(origin);
 }
 
 

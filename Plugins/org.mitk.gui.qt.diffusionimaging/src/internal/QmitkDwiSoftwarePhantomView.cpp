@@ -162,6 +162,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     filter->SetImageRegion(imageRegion);
     filter->SetSpacing(spacing);
     filter->SetSignalRegions(m_SignalRegions);
+    filter->SetGreyMatterAdc(m_Controls->m_GmAdc->value());
 
     std::vector< float >                            tensorFA;
     std::vector< float >                            tensorADC;
@@ -194,6 +195,67 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     node->SetData( image );
     node->SetName(m_Controls->m_ImageName->text().toStdString());
     GetDataStorage()->Add(node);
+
+    if (m_Controls->m_OutputNumDirectionsBox->isChecked())
+    {
+        ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();
+        mitk::Image::Pointer image2 = mitk::Image::New();
+        image2->InitializeByItk( numDirImage.GetPointer() );
+        image2->SetVolume( numDirImage->GetBufferPointer() );
+        mitk::DataNode::Pointer node2 = mitk::DataNode::New();
+        node2->SetData(image2);
+        QString name(m_Controls->m_ImageName->text());
+        name += "_NumDirections";
+        node2->SetName(name.toStdString().c_str());
+        GetDataStorage()->Add(node2);
+    }
+
+    if (m_SignalRegionNodes.size()==0)
+        return;
+
+    if (m_Controls->m_OutputDirectionImagesBox->isChecked())
+    {
+        typedef typename FilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
+        typename ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
+        for (int i=0; i<container->Size(); i++)
+        {
+            typename FilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
+            mitk::Image::Pointer img = mitk::Image::New();
+            img->InitializeByItk( itkImg.GetPointer() );
+            img->SetVolume( itkImg->GetBufferPointer() );
+            mitk::DataNode::Pointer node = mitk::DataNode::New();
+            node->SetData(img);
+            QString name(m_Controls->m_ImageName->text());
+            name += "_Direction";
+            name += QString::number(i+1);
+            node->SetName(name.toStdString().c_str());
+            GetDataStorage()->Add(node);
+        }
+    }
+
+    if (m_Controls->m_OutputVectorFieldBox->isChecked())
+    {
+        mitk::Geometry3D::Pointer geometry = image->GetGeometry();
+        mitk::Vector3D outImageSpacing = geometry->GetSpacing();
+        float minSpacing = 1;
+        if(outImageSpacing[0]<outImageSpacing[1] && outImageSpacing[0]<outImageSpacing[2])
+            minSpacing = outImageSpacing[0];
+        else if (outImageSpacing[1] < outImageSpacing[2])
+            minSpacing = outImageSpacing[1];
+        else
+            minSpacing = outImageSpacing[2];
+
+        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        directions->SetGeometry(geometry);
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(directions);
+        QString name(m_Controls->m_ImageName->text());
+        name += "_VectorField";
+        node->SetName(name.toStdString().c_str());
+        node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
+        node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
+        GetDataStorage()->Add(node);
+    }
 }
 
 void QmitkDwiSoftwarePhantomView::UpdateGui()

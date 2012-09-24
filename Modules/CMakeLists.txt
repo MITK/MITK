@@ -11,6 +11,7 @@ set(module_dirs
     MitkExt
     SceneSerialization
     Segmentation
+    PlanarFigureSegmentation
     Qmitk
     QmitkExt
     GraphAlgorithms

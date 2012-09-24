@@ -54,17 +54,21 @@ public:
         //       string.replace(";"," ");
         std::cout << "cameras " << string << std::endl;
 
-        LoadLibrary(TEXT("mitkKinectModule.dll"));
+//.dll do not get deleted automaticaly, so one has to either delete them manualy or just call them if device is actual activated
 
-
+ // // If kinect activated through CMake, please Load the .dll! else do nothing
+ //if (MITK_USE_OF_KINECT)
+ //{
+ //       LoadLibrary(TEXT("mitkKinectModule.dll"));
+ //}
 
 //Loading mitkPMDCamCubeModule.dll of PMDCamCubeModule
-      LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
+      //LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
 
 
 
 //Loading MesaSR4000Module.dll of the MesaModule
-      LoadLibrary(TEXT("MesaSR4000Module.dll"));
+      //LoadLibrary(TEXT("MesaSR4000Module.dll"));
 
 
         //Implementing MITKPlayerDevice
@@ -72,6 +76,7 @@ public:
         ServiceProperties mitkPlayerFactoryProps;
         mitkPlayerFactoryProps["ToFFactoryName"] = toFCameraMITKPlayerDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraMITKPlayerDeviceFactory, mitkPlayerFactoryProps);
+        toFCameraMITKPlayerDeviceFactory->ConnectToFDevice();
 
         //m_Factories.push_back( kinectFactory );
     }

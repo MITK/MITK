@@ -92,7 +92,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     m_Controls->setupUi( parent );
 
     connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
-    connect( (QObject*)(m_Controls->m_ConnectCameraDev), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
+    //connect( (QObject*)(m_Controls->m_ConnectCameraDev), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
@@ -101,7 +101,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
 
     std::string empty= "";
-    m_Controls->m_DeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
+    //m_Controls->m_DeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
   }
 }
 
@@ -264,19 +264,19 @@ void QmitkToFUtilView::OnToFCameraConnected()
   this->m_SurfaceDisplayCount = 0;
   this->m_2DDisplayCount = 0;
 
-  mitk::ToFCameraDevice* device = m_Controls->m_DeviceServiceListWidget->GetSelectedService<mitk::ToFCameraDevice>();
+  //mitk::ToFCameraDevice* device = m_Controls->m_DeviceServiceListWidget->GetSelectedService<mitk::ToFCameraDevice>();
 
   this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
-  m_ToFImageGrabber->SetCameraDevice(device);
+  //m_ToFImageGrabber->SetCameraDevice(device);
 
 
-  //----------------------------------------------J´s stuff------------------------------------------------------------
+  ////----------------------------------------------J´s stuff------------------------------------------------------------
 
-  if ( ((std::string)(device->GetNameOfClass())).compare ("ToFCameraMITKPlayerDevice")  == 0 )  //
-    {
-      this->HackForPlayer();
-      MITK_INFO << "HackForPlayer enabled";
-    }
+  //if ( ((std::string)(device->GetNameOfClass())).compare ("ToFCameraMITKPlayerDevice")  == 0 )  //
+  //  {
+  //    this->HackForPlayer();
+  //    MITK_INFO << "HackForPlayer enabled";
+  //  }
 
 
   m_ToFImageGrabber->ConnectCamera();

@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
-#define _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
+#ifndef _QMITKTOFCONNECTIONWIDGET2_H_INCLUDED
+#define _QMITKTOFCONNECTIONWIDGET2_H_INCLUDED
 
 #include "mitkTOFUIExports.h"
-#include "ui_QmitkToFConnectionWidgetControls.h"
+#include "ui_QmitkToFConnectionWidgetControls2.h"
 
 //QT headers
 #include <QWidget>
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup ToFUI
 */
-class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
+class mitkTOFUI_EXPORT QmitkToFConnectionWidget2 :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -43,8 +43,8 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFConnectionWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkToFConnectionWidget();
+    QmitkToFConnectionWidget2(QWidget* p = 0, Qt::WindowFlags f1 = 0);
+    virtual ~QmitkToFConnectionWidget2();
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);
@@ -90,7 +90,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 
   protected:
 
-    Ui::QmitkToFConnectionWidgetControls* m_Controls; ///< member holding the UI elements of this widget
+    Ui::QmitkToFConnectionWidgetControls2* m_Controls; ///< member holding the UI elements of this widget
 
     mitk::ToFImageGrabber::Pointer m_ToFImageGrabber; ///< member holding the current ToFImageGrabber
 
@@ -103,4 +103,4 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     void HideAllParameterWidgets();
 };
 
-#endif // _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
+#endif // _QMITKTOFCONNECTIONWIDGET2_H_INCLUDED

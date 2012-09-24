@@ -36,7 +36,7 @@ public:
 
   ToFCameraMITKPlayerDeviceFactory()
   {
-    m_DeviceNumber = 0;
+    m_DeviceNumber = 1;
   }
 
      /*!
@@ -50,9 +50,9 @@ public:
     std::string GetCurrentDeviceName()
     {
       std::stringstream name;
-      name << "ToFCameraMITKPlayerDeviceFactory " << m_DeviceNumber;
+      name << "ToFCameraMITKPlayerDevice" << m_DeviceNumber;
+      MITK_INFO << name.str();
       return name.str();
-      //return std::string("Kinect Device")+m_DeviceNumber;
     }
 
 private:

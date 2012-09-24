@@ -6,7 +6,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MITK application for processing of MR dif
 # Major version is the year of release
 set(CPACK_PACKAGE_VERSION_MAJOR "2012")
 # Minor version is the month of release
-set(CPACK_PACKAGE_VERSION_MINOR "")
+set(CPACK_PACKAGE_VERSION_MINOR "09")
 # Patch versioning is not intended to be done
 set(CPACK_PACKAGE_VERSION_PATCH "")
 

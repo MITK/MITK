@@ -55,6 +55,9 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
     }
   case AcLEVELWINDOW:
     {
+
+      this->InvokeEvent( StartInteractionEvent() );
+
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
   
@@ -105,6 +108,8 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
     // MITK_INFO << "AcFINISHMOVE";
     {
       ok = true;
+      this->InvokeEvent( EndInteractionEvent() );
+      
       break;
     }
   default:

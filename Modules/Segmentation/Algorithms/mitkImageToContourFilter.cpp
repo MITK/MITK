@@ -94,30 +94,30 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction (itk::Image<TPixel, VIma
 
     for (unsigned int j = 0; j < currentPath->Size(); j++)
     {
-      currentPoint[0] = currentPath->ElementAt(j)[0] + 0.5;
-      currentPoint[1] = currentPath->ElementAt(j)[1] + 0.5;
+      currentPoint[0] = currentPath->ElementAt(j)[0];
+      currentPoint[1] = currentPath->ElementAt(j)[1];
       currentPoint[2] = 0;
 
       m_SliceGeometry->IndexToWorld(currentPoint, currentWorldPoint);
 
-  
+
         points->InsertPoint(pointId, currentWorldPoint[0],currentWorldPoint[1],currentWorldPoint[2]);
         polygon->GetPointIds()->SetId(j,pointId);
-        pointId++;        
+        pointId++;
 
 
     }//for2
-  
+
       polygons->InsertNextCell(polygon);
     
   }//for1
 
   contourSurface->SetPoints( points );
   contourSurface->SetPolys( polygons );
-	contourSurface->BuildLinks();
+  contourSurface->BuildLinks();
   Surface::Pointer finalSurface = this->GetOutput();
 
-  finalSurface->SetVtkPolyData( contourSurface );   
+  finalSurface->SetVtkPolyData( contourSurface );
 }
 
 void mitk::ImageToContourFilter::GenerateOutputInformation()

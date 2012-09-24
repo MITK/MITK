@@ -811,6 +811,8 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
            mitk::Vector3D helpNormal;
            helpNormal = currentNormal;
            helpNormal[0] += 1;
+           helpNormal[1] -= 1;
+           helpNormal[2] += 1;
            helpNormal.Normalize();
            rotationAxis = itk::CrossProduct( helpNormal, currentNormal );
         }
@@ -829,14 +831,16 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         planeGeometry = dynamic_cast< PlaneGeometry * >( 
            geometry2D.GetPointer() );
 
-        /*
+/*
         // This code was just to figure out if the rotation was good
         mitk::Vector3D normalAfterwards = planeGeometry->GetNormal();
         normalAfterwards.Normalize();
         float angleAfter = acos (normalAfterwards[0]*newNormal[0] + normalAfterwards[1]*newNormal[1] + normalAfterwards[2]*newNormal[2]);
         angleAfter *= 180.0 / vnl_math::pi;
         MITK_INFO <<" rotangleAfter: " << angleAfter;
-        */
+*/
+
+
 
         // Clear the slice stack and adjust it according to the center of
         // rotation and plane position (see documentation of ReinitializePlanes)
@@ -864,15 +868,13 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
            rotationAngle = acos (VecAxisCurr[0]*vecAxixNew[0] + VecAxisCurr[1]*vecAxixNew[1] + VecAxisCurr[2]*vecAxixNew[2]);
            rotationAngle = rotationAngle * 180 / PI;            
            rotationAxis = itk::CrossProduct( VecAxisCurr, vecAxixNew  );
+           // A Prerequisite is that VexAxisCur and VecAxis New lie BOTH in the plane
+           // rotationAxis is either the normal or the negative normal. To find out we need the crossproduct.
+           // but in case of a 180° rotation, we can simply take the current normal. 
            if (abs(rotationAngle-180) < mitk::eps )
            {
               // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0). 
-              // Rotation Axis should be ANY vector that is 90° to current Normal
-              mitk::Vector3D helpNormal;
-              helpNormal = VecAxisCurr;
-              helpNormal[0] += 1;
-              helpNormal.Normalize();
-              rotationAxis = itk::CrossProduct( helpNormal, currentNormal );
+              rotationAxis = newNormal;
            }
 
            mitk::RotationOperation op(mitk::OpROTATE, center, rotationAxis, rotationAngle);   

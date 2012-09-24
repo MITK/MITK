@@ -406,6 +406,14 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     void ReorientSlices( 
       const mitk::Point3D &point, const mitk::Vector3D &normal );
 
+
+    /** \brief Re-orients the slice stack to include the plane specified by
+    * the given point an normal vector and rotates to fit the given axis vector
+    */
+    void ReorientSlices( 
+       const mitk::Point3D &point, const mitk::Vector3D &normal, const mitk::Vector3D &axisVec0 );
+
+
     virtual bool ExecuteAction( 
       Action* action, mitk::StateEvent const* stateEvent);
 

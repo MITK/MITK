@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "mitkSliceNavigationController.h"
 
+const float PI = 3.14159265359;
 
 mitk::SlicedGeometry3D::SlicedGeometry3D()
 : m_EvenlySpaced( true ),
@@ -770,14 +771,19 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
   case OpORIENT:
     if ( m_EvenlySpaced )
     {
-      // Save first slice
-      Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
+       // The "orient" operation assings a new normal vector to the sliced geometry an all its
+       // containing 2D planes. Keep in mind, that this might change the axis vectors as well quite a lot.
+       // After the orientation, the orient function can also rotate the plane around its normal
+       // to fit a given axis vector (if desired)
 
+      // Get first slice
+      Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
       PlaneGeometry *planeGeometry = dynamic_cast< PlaneGeometry * >( 
         geometry2D.GetPointer() );
 
+      // get operation data
       PlaneOperation *planeOp = dynamic_cast< PlaneOperation * >( operation );
-
+      
       // Need a PlaneGeometry, a PlaneOperation and a reference frame to
       // carry out the re-orientation
       if ( m_ReferenceGeometry && planeGeometry && planeOp )
@@ -789,17 +795,26 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // the current and the requested slice orientation
         Point3D center = m_ReferenceGeometry->GetCenter();
 
-        const mitk::Vector3D &currentNormal = planeGeometry->GetNormal();
-        const mitk::Vector3D &newNormal = planeOp->GetNormal();
+        mitk::Vector3D currentNormal = planeGeometry->GetNormal();
+        mitk::Vector3D newNormal = planeOp->GetNormal();
 
-        Vector3D rotationAxis = itk::CrossProduct( newNormal, currentNormal );
-
-        vtkFloatingPointType rotationAngle = - atan2( 
-          (double) rotationAxis.GetNorm(),
-          (double) (newNormal * currentNormal) );
-
+        // Get Rotation axis und angle
+        currentNormal.Normalize();
+        newNormal.Normalize();
+        float rotationAngle = acos (currentNormal[0]*newNormal[0] + currentNormal[1]*newNormal[1] + currentNormal[2]*newNormal[2]);
         rotationAngle *= 180.0 / vnl_math::pi;
-
+        Vector3D rotationAxis = itk::CrossProduct( currentNormal, newNormal );
+        if (abs(rotationAngle-180) < mitk::eps )
+        {
+           // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0). 
+           // Rotation Axis should be ANY vector that is 90° to current Normal
+           mitk::Vector3D helpNormal;
+           helpNormal = currentNormal;
+           helpNormal[0] += 1;
+           helpNormal.Normalize();
+           rotationAxis = itk::CrossProduct( helpNormal, currentNormal );
+        }
+  
         RotationOperation centeredRotation(
           mitk::OpROTATE,
           center,
@@ -810,17 +825,76 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // Rotate first slice
         geometry2D->ExecuteOperation( &centeredRotation );
 
+        // check if rotation direction was correct, or standing on top
+        planeGeometry = dynamic_cast< PlaneGeometry * >( 
+           geometry2D.GetPointer() );
+
+        /*
+        // This code was just to figure out if the rotation was good
+        mitk::Vector3D normalAfterwards = planeGeometry->GetNormal();
+        normalAfterwards.Normalize();
+        float angleAfter = acos (normalAfterwards[0]*newNormal[0] + normalAfterwards[1]*newNormal[1] + normalAfterwards[2]*newNormal[2]);
+        angleAfter *= 180.0 / vnl_math::pi;
+        MITK_INFO <<" rotangleAfter: " << angleAfter;
+        */
+
         // Clear the slice stack and adjust it according to the center of
         // rotation and plane position (see documentation of ReinitializePlanes)
         this->ReinitializePlanes( center, planeOp->GetPoint() );
 
         if ( m_SliceNavigationController )
         {
-          m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
-          m_SliceNavigationController->AdjustSliceStepperRange();
+           m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
+           m_SliceNavigationController->AdjustSliceStepperRange();
         }
 
+        // Also apply rotation on the slicedGeometry - Geometry3D (Bounding geometry)
         Geometry3D::ExecuteOperation( &centeredRotation );
+
+        
+        // Re-Orientation of the Normalvector is now finished!
+        // Now, if AxisVec0 was defined, rotate plane around normal so it fits Axis Vector
+        if (planeOp->IsAxisVec0Defined())
+        {                      
+           mitk::Vector3D vecAxixNew = planeOp->GetAxisVec0();
+           vecAxixNew.Normalize();
+           mitk::Vector3D VecAxisCurr = geometry2D->GetAxisVector(0);           
+           VecAxisCurr.Normalize();
+
+           rotationAngle = acos (VecAxisCurr[0]*vecAxixNew[0] + VecAxisCurr[1]*vecAxixNew[1] + VecAxisCurr[2]*vecAxixNew[2]);
+           rotationAngle = rotationAngle * 180 / PI;            
+           rotationAxis = itk::CrossProduct( VecAxisCurr, vecAxixNew  );
+           if (abs(rotationAngle-180) < mitk::eps )
+           {
+              // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0). 
+              // Rotation Axis should be ANY vector that is 90° to current Normal
+              mitk::Vector3D helpNormal;
+              helpNormal = VecAxisCurr;
+              helpNormal[0] += 1;
+              helpNormal.Normalize();
+              rotationAxis = itk::CrossProduct( helpNormal, currentNormal );
+           }
+
+           mitk::RotationOperation op(mitk::OpROTATE, center, rotationAxis, rotationAngle);   
+           geometry2D->ExecuteOperation( &op );
+
+           /*
+           // This code was just to determine if rotation was correct
+           VecAxisCurr = geometry2D->GetAxisVector(0);
+           VecAxisCurr.Normalize();
+           angleAfter = acos (VecAxisCurr[0]*vecAxixNew[0] + VecAxisCurr[1]*vecAxixNew[1] + VecAxisCurr[2]*vecAxixNew[2]);
+           angleAfter = angleAfter * 180 / PI;
+           MITK_INFO << "angle nach rotrot: " << angleAfter;
+           */
+
+           // Apply changes on first slice to whole slice stack (
+           // Todo: Is this really done?? Is Axis Vector adapted?
+           this->ReinitializePlanes( center, planeOp->GetPoint() );
+
+           // Also apply rotation on the slicedGeometry - Geometry3D (Bounding geometry)
+           Geometry3D::ExecuteOperation( &op );
+        }
+
       }
     }
     else

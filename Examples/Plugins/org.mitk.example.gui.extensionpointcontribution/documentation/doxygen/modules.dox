@@ -3,7 +3,6 @@
   \ingroup MITKExamplePlugins
 
   \brief A minimal applictaion that contributes an extension to an extension point.
-  
 */
 
 /**

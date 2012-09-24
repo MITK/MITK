@@ -3,8 +3,8 @@
 \page ExampleSelectionService Selection Service
 
 -# \subpage IntroductionSelectionService "Introduction"
--# \subpage Example03Page "Selection service QT"
--# \subpage Example04Page "Selection service MITK"
+-# \subpage org_mitk_example_gui_selectionservicemitk "Selection service QT"
+-# \subpage org_mitk_example_gui_selectionserviceqt "Selection service MITK"
 
 \page IntroductionSelectionService Introduction: Selection Service Concept
 
@@ -32,6 +32,6 @@ The following two examples describe different ways of implementing and using the
 
 Knowing and using the existing selection mechanisms gives your plug-ins a clean design, smoothly integrates them into the workbench and opens them for future extensions. 
 
-\ref Example03Page "[First example: Qt-based selections]" \ref Example04Page "[Second example: MITK Data node selections]" \ref ExamplePage "[Main example page]"
+\ref org_mitk_example_gui_selectionservicemitk "[First example: Qt-based selections]" \ref org_mitk_example_gui_selectionserviceqt "[Second example: MITK Data node selections]" \ref ExamplePage "[Main example page]"
 
 */

@@ -1,6 +1,6 @@
 /**
 
-\page Example04Page Blueberry Examples - Selection service MITK
+\page org_mitk_example_gui_selectionserviceqt Blueberry Examples - Selection service MITK
 
   \brief An example application plug-in with a minimal selection service based on MITK elements.
   
@@ -31,8 +31,12 @@
   The simple implementation of this method looks as follows:
   \snippet ListenerViewMitk.cpp MITK Selection Listener method implementation
   
-  GESAMTEN SOURCE ALS LINK
+  View complete source files:
+  \li SelectionViewMitk.cpp
+  \li SelectionViewMitk.h
+  \li ListenerViewMitk.cpp
+  \li ListenerViewMitk.h
   
-\ref Example03Page "[Previous example]" \ref ExamplePage "[Main example page]"
+\ref IntroductionSelectionService "[Selection Service Introduction]" \ref org_mitk_example_gui_selectionservicemitk "[Second example: MITK Data node selections]" \ref ExamplePage "[Main BlueBerry example page]"
 
 */

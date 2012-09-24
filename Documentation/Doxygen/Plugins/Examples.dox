@@ -12,15 +12,9 @@ Open the Examples by executing startAppFrameworkDemo_release.bat. All examples c
 
 \section ExampleSection Examples
 
-New outline:
 \li \subpage ExampleBlueBerryGeneral "BlueBerry in general"
 \li \subpage ExampleSelectionService "Selection Service"
 \li \subpage ExampleExtensionPoint "Extension Points"
-\li \subpage ExampleCustomisation "Customisation"
+\li \subpage org_mitk_example_gui_customviewer "Customisation"
 
-Old outline:
-\li \subpage Example01Page "Minimal application"
-\li \subpage Example02Page "Multiple perspectives and views"
-\li \subpage Example03Page "Selection service QT"
-\li \subpage Example04Page "Selection service MITK"
 */

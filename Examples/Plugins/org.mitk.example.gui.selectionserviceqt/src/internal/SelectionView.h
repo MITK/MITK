@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_SelectionViewControls.h"
 
  /** Documentation:
+  *   \ingroup org_mitk_example_gui_selectionserviceqt
+  *
   *   \brief This BlueBerry view is part of the BlueBerry example 
   *   "Selection service QT". It creates a QListWidget that provides
   *   the selection events for the selection listener. The selection

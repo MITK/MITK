@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 class SelectionServiceQTWorkbenchAdvisor;
 
  /** Documentation:
+  *   \ingroup org_mitk_example_gui_selectionserviceqt
+  *
   *   \brief This BlueBerry plugin is part of the BlueBerry example 
   *   "Selection service QT". It creates a perspective with two views
   *   that demonstrate the Qt-based selection service.

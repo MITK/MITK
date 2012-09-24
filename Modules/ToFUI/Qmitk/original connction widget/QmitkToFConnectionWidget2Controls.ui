@@ -32,6 +32,42 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="0">
+    <widget class="QComboBox" name="m_SelectCameraCombobox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+     <property name="maxVisibleItems">
+      <number>7</number>
+     </property>
+     <property name="insertPolicy">
+      <enum>QComboBox::InsertAtBottom</enum>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContents</enum>
+     </property>
+     <property name="frame">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="1">
     <widget class="QPushButton" name="m_ConnectCameraButton">
      <property name="minimumSize">
@@ -76,9 +112,6 @@
    <item row="4" column="0" colspan="2">
     <widget class="QmitkKinectParameterWidget" name="m_KinectParameterWidget" native="true"/>
    </item>
-   <item row="1" column="0">
-    <widget class="QmitkServiceListWidget" name="m_ConnectedDeviceServiceListWidget" native="true"/>
-   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -99,12 +132,6 @@
    <class>QmitkKinectParameterWidget</class>
    <extends>QWidget</extends>
    <header>QmitkKinectParameterWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkServiceListWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkServiceListWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

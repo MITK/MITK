@@ -24,9 +24,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include "mitkToFConfig.h"
-
+//#include "mitkToFCameraPMDCamCubeDevice.h"
+//#include "mitkToFCameraPMDRawDataCamCubeDevice.h"
+//#include "mitkToFCameraPMDCamBoardDevice.h"
+//#include "mitkToFCameraPMDRawDataCamBoardDevice.h"
+//#include "mitkToFCameraPMDO3Device.h"
+//#include "mitkToFCameraPMDPlayerDevice.h"
+//#include "mitkToFCameraPMDMITKPlayerDevice.h"
 #include "mitkToFCameraMITKPlayerDevice.h"
-
+//#include "mitkToFCameraMESASR4000Device.h"
+//#include "mitkKinectDevice.h"
 
 //itk headers
 #include <itksys/SystemTools.hxx>
@@ -58,7 +65,7 @@ void QmitkToFConnectionWidget::CreateQtPartControl(QWidget *parent)   //Definiti
     QString string(MITK_TOF_CAMERAS);                           // Initializin a QString "string"(same behaviour), der die Namen der Kameras beinhaltet
     string.replace(";"," ");                                    // erstezen von ";" durch ","
     QStringList list = string.split(",");
-    //m_Controls->m_SelectCameraCombobox->addItems(list);
+    m_Controls->m_SelectCameraCombobox->addItems(list);
 
     ShowParameterWidget();
   }
@@ -69,18 +76,17 @@ void QmitkToFConnectionWidget::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_ConnectCameraButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnConnectCamera()) );
-    //connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(OnSelectCamera(const QString)) );
-    //connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SLOT(OnSelectCamera(const QString)) );
-    //connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SIGNAL(ToFCameraSelected(const QString)) );
+    connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(OnSelectCamera(const QString)) );
+    connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SLOT(OnSelectCamera(const QString)) );
+    connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SIGNAL(ToFCameraSelected(const QString)) );
   }
 }
 
 void QmitkToFConnectionWidget::ShowParameterWidget()
 {
-  //QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
+  QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
 
-  //this->OnSelectCamera(selectedCamera);
-  QString selectedCamera = "hallo";
+  this->OnSelectCamera(selectedCamera);
 }
 
 mitk::ToFImageGrabber* QmitkToFConnectionWidget::GetToFImageGrabber()
@@ -90,7 +96,6 @@ mitk::ToFImageGrabber* QmitkToFConnectionWidget::GetToFImageGrabber()
 
 void QmitkToFConnectionWidget::OnSelectCamera(const QString selectedCamera)
 {
-
   if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
     (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw 2.0/3.0") )
   {
@@ -128,7 +133,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
   {
     //reset the status of the GUI buttons
     m_Controls->m_ConnectCameraButton->setEnabled(false);
-    //m_Controls->m_SelectCameraCombobox->setEnabled(false);
+    m_Controls->m_SelectCameraCombobox->setEnabled(false);
     //repaint the widget
     this->repaint();
 
@@ -136,8 +141,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     QString fileFilter("");
 
     //select the camera to connect with
-    //QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
-    QString selectedCamera = "hallo";
+    QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
+
 
     if (selectedCamera == "PMD CamCube 2.0/3.0")
     { //PMD CamCube
@@ -195,8 +200,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       {
         m_Controls->m_ConnectCameraButton->setChecked(false);
         m_Controls->m_ConnectCameraButton->setEnabled(true);
-        //m_Controls->m_SelectCameraCombobox->setEnabled(true);
-        //this->(mOnSelectCamera_Controls->m_SelectCameraCombobox->currentText());
+        m_Controls->m_SelectCameraCombobox->setEnabled(true);
+        this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
         QMessageBox::information( this, "Template functionality", "Please select a valid image before starting some action.");
         return;
       }
@@ -282,8 +287,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           QMessageBox::critical( this, "Error", e.what() );
           m_Controls->m_ConnectCameraButton->setChecked(false);
           m_Controls->m_ConnectCameraButton->setEnabled(true);
-          //m_Controls->m_SelectCameraCombobox->setEnabled(true);
-          //this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
+          m_Controls->m_SelectCameraCombobox->setEnabled(true);
+          this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
           return;
         }
       }
@@ -320,8 +325,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       QMessageBox::critical( this, "Error", "Connection failed. Check if you have installed the latest driver for your system." );
       m_Controls->m_ConnectCameraButton->setChecked(false);
       m_Controls->m_ConnectCameraButton->setEnabled(true);
-      //m_Controls->m_SelectCameraCombobox->setEnabled(true);
-      //this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
+      m_Controls->m_SelectCameraCombobox->setEnabled(true);
+      this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
       return;
 
     }
@@ -333,8 +338,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     this->m_ToFImageGrabber->StopCamera();
     this->m_ToFImageGrabber->DisconnectCamera();
     m_Controls->m_ConnectCameraButton->setText("Connect");
-    //m_Controls->m_SelectCameraCombobox->setEnabled(true);
-    //this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
+    m_Controls->m_SelectCameraCombobox->setEnabled(true);
+    this->OnSelectCamera(m_Controls->m_SelectCameraCombobox->currentText());
 
     // send disconnect signal to the caller functionality
     emit ToFCameraDisconnected();

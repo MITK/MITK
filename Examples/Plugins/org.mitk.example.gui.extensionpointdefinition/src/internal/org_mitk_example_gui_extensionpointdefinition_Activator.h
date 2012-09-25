@@ -36,7 +36,7 @@ public:
   /**
   * Get the Registry (for extensions).
   */
-  static ChangeTextRegistry* GetChangeTextRegistry();
+  static ChangeTextRegistry* getChangeTextRegistry();
 
 };
 

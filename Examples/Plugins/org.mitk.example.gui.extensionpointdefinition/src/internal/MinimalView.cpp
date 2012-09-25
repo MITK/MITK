@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "org_mitk_example_gui_extensionpointdefinition_Activator.h"
 
+#include <QMessageBox.h>
+
 const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview"; 
 
 MinimalView::MinimalView() : m_Parent(0)
@@ -46,4 +48,6 @@ void MinimalView::ChangeExtensionLabelText(QString s)
 {
   m_Controls.extensionLabel->setText(s);
 
+  ChangeTextRegistry* registry = org_mitk_example_gui_extensionpointdefinition_Activator::getChangeTextRegistry();
+  QMessageBox::critical(0, "Error", "Test");
 }

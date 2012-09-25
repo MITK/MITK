@@ -1,0 +1,89 @@
+/**
+\page org_mitk_diffusionimagingapp_perspectives_connectomics The Connectomics Perspective
+
+\image html connectomics_perspective.png "Icon of the Perspective"
+
+The connectomics perspective is a collection of views which provide functionality for the work with brain connectivity networks. Currently there exist the following views:
+
+\subpage org_mitk_views_connectomicsdata provides network generation either from data or synthetically.
+
+\subpage org_mitk_views_connectomicsnetworkoperations provides functionalies to operate and process on networks and other data.
+
+\subpage org_mitk_views_connectomicsstatistics provides statistical measures for networks.
+
+\section org_mitk_diffusionimagingapp_perspectives_connectomicsTrouble Troubleshooting
+
+No known problems.
+
+<B>All other problems.</B><BR>
+Please report to the MITK mailing list.
+See http://www.mitk.org/wiki/Mailinglist on how to do this.
+
+*/
+
+/**
+\page org_mitk_views_connectomicsdata The Connectomics Network Data View
+
+\image html QmitkConnectomicsDataViewIcon_48.png "Icon of the View"
+
+This view can be used to create a network from a parcellation and a fiber image as well as to create synthetic networks.
+
+\image html dataview.png "The user interface"
+
+To create a network select first a parcellation of the brain (e.g. as provided by <a href="http://surfer.nmr.mgh.harvard.edu/">freesurfer</a>  ) by CTRL+Leftclick and secondly a fiber image ( as created using a tractography view). Then click on the "Create Network" button.
+
+Additionally you have the option to create artificial networks, for testing purposes. Currently choices are:
+<ul>
+  <li> A regular lattice, where each node is placed in a cubic pattern and only connected to its neighbours
+  <li> A heterogenic sphere, where one node is placed in the center and connected to all nodes on the shell
+  <li> A random network, where nodes are randomly placed on a spherical shell and randomly connected
+</ul>
+
+*/
+
+/**
+\page org_mitk_views_connectomicsnetworkoperations The Connectomics Network Operations View
+
+\image html QmitkConnectomicsNetworkOperationsViewIcon_48.png "Icon of the View"
+
+This view can be used modify networks and related data.
+
+\image html operationsview.png "The user interface"
+
+Select a parcellation and press "Convert to RGBA" to create a RGBA image. By doing this conversion it is much easier to discern the different parcels. Furthermore MITK supports 3D visualization of an RGBA image.
+
+Select a network and press "Create Connectivity Matrix Image" to create a 2D image of the connectivity matrix. By default the weight of a connection is used as grey value. Using the "Rescale" option will rescale the weights so highest one is 255. Using the "Binary" option will result in a binary connectivity matrix.
+
+*/
+
+
+/**
+\page org_mitk_views_connectomicsstatistics The Connectomics Statistics View
+
+\image html QmitkConnectomicsStatisticsViewIcon_48.png "Icon of the View"
+
+This view can be used to show statistical analysis of a network.
+
+\image html statisticsview.png "The user interface"
+
+To calculate network statistics select a network in the datamanager. At this time the following statistics are calculated for the entire network:
+
+<ul>
+  <li> The number of vertices in the network
+  <li> The number of edges in the network
+  <li> The number of edges which have the same vertex as beginning and end point
+  <li> The average degree of the nodes in the network
+  <li> The connection density the network (the number of edges divided by the number of possible edges)
+  <li> The unweighted efficiency of the network ( 1 divided by average path length, this is zero for disconnected graphs)
+  <li> The global clustering
+</ul>
+
+Furthermore some statistics are calculated on a per node basis and displayed as histograms:
+
+<ul>
+  <li> The degree of each node
+  <li> The (unweighted) betweenness centrality of each node
+  <li> The spread of shortest paths between each pair of nodes (For disconnected graphs the shortest paths with infinite length are omitted for readability)
+</ul>
+
+*/

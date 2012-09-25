@@ -29,4 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
     virtual ~IChangeText() {}
   };
 
+  Q_DECLARE_INTERFACE(IChangeText, "org.mitk.example.IChangeText")
+
 #endif /*ICHANGETEXT_H_*/

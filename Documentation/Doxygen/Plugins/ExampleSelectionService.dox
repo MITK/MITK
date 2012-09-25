@@ -10,7 +10,7 @@
 
 The selection service provided by the BlueBerry workbench allows efficient linking of different parts within the workbench window: View parts that provide additional information for particular objects and update their content automatically whenever such objects are selected somewhere in the workbench window. For example the "Properties" view in MITK applications behaves in this way: Wherever an element is selected in the workbench this view lists the properties of that element. 
 
-\image html  "image properties"
+\image html properties.png "image properties"
 
 Other aspects of the workbench like the enablement of global actions may also depend on the current selection. 
 

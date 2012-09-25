@@ -1,12 +1,14 @@
 set(SRC_CPP_FILES
   ChangeTextDescriptor.cpp
   ChangeTextRegistry.cpp
+  ExtensionPointDefinitionConstants.cpp
 )
 
 set(SRC_H_FILES
   IChangeText.h
   ChangeTextRegistry.h
   ChangeTextDescriptor.h
+  ExtensionPointDefinitionConstants.h
 )
 
 set(INTERNAL_CPP_FILES

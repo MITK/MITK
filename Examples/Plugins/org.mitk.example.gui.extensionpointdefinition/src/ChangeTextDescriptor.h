@@ -18,16 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define CHANGETEXTDESCRIPTOR_H_
 
 #include <berryIConfigurationElement.h>
+#include <berryObject.h>
 
 #include <string>
 
 #include "IChangeText.h"
 
-  class ChangeTextDescriptor
+  class ChangeTextDescriptor : public berry::Object
   {
 
   public:
 
+    berryObjectMacro(ChangeTextDescriptor)
     /**
     * Initialize the "ChangeText" Descriptor with the given extension point.
     *

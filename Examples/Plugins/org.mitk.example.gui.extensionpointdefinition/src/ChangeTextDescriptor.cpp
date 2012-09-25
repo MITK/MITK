@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "ChangeTextDescriptor.h"
-#include "ExtensionPointDefinitionConstants.h" // <= kann nach Änderungen weg!!!
+#include "ExtensionPointDefinitionConstants.h"
 
 
 ChangeTextDescriptor::ChangeTextDescriptor(berry::IConfigurationElement::Pointer changeTextExtensionPoint)
@@ -33,15 +33,7 @@ IChangeText::Pointer ChangeTextDescriptor::CreateChangeText()
   {
     // "class" refers to xml attribute in a xml tag
     this->m_ChangeText = this->m_ChangeTextExtensionPoint
-      ->CreateExecutableExtension<IChangeText>(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_CLASS); // <= muss auch geändert werden!!!
-    if (this->m_ChangeText == 0)
-    {
-      // support legacy BlueBerry extensions                        // <= ist das überhaupt notwendig?!
-      this->m_ChangeText = this->m_ChangeTextExtensionPoint
-          ->CreateExecutableExtension<IChangeText>(
-            ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_CLASS, // <= müsste auch geändert werden!!!
-            IChangeText::GetManifestName());
-    }
+      ->CreateExecutableExtension<IChangeText>(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_CLASS);
   }
   return this->m_ChangeText;
 }
@@ -49,14 +41,14 @@ IChangeText::Pointer ChangeTextDescriptor::CreateChangeText()
 std::string ChangeTextDescriptor::GetID() const 
 {
   std::string idOfExtensionPoint;
-  this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID,idOfExtensionPoint); // <= muss auch geändert werden!!!
+  this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID,idOfExtensionPoint);
   return idOfExtensionPoint;
 }
 
 std::string ChangeTextDescriptor::GetDescription() const
 {
   std::vector<berry::IConfigurationElement::Pointer> 
-    descriptions(this->m_ChangeTextExtensionPoint->GetChildren(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_DESCRIPTION)); // <= muss auch geändert werden!!!
+    descriptions(this->m_ChangeTextExtensionPoint->GetChildren(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_DESCRIPTION));
 
   if(!descriptions.empty())
   {
@@ -68,7 +60,7 @@ std::string ChangeTextDescriptor::GetDescription() const
 std::string ChangeTextDescriptor::GetName() const
 {
   std::string name;
-  this->m_ChangeTextExtensionPoint->GetAttribute(ExtentionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME,name);
+  this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME,name);
   return name;
 }
 

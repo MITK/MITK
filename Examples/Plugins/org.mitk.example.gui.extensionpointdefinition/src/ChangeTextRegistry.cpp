@@ -18,14 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIExtensionPointService.h>
 #include <berryIConfigurationElement.h>
 #include <ChangeTextRegistry.h>
-#include "ExtensionPointDefinitionConstants.h" // <= kann nach Änderungen weg!!!
+#include "ExtensionPointDefinitionConstants.h"
 
 ChangeTextRegistry::ChangeTextRegistry()
 {
   //initialize the registry by copying all available extension points into a local variable
   berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
   std::vector<berry::IConfigurationElement::Pointer> allExtensionsChangeTexts 
-    = extensionPointService->GetConfigurationElementsFor(ExtensionPointDefinitionConstants::CHANGETEXT_EXTENSION_NAME); // <= welcher name kommt hier hin?
+    = extensionPointService->GetConfigurationElementsFor(ExtensionPointDefinitionConstants::CHANGETEXT_EXTENSION_NAME);
 
   for(std::vector<berry::IConfigurationElement::Pointer>::const_iterator it = allExtensionsChangeTexts.begin();
     it != allExtensionsChangeTexts.end();++it)
@@ -69,16 +69,5 @@ std::vector<ChangeTextRegistry::ChangeTextDescriptorPtr> ChangeTextRegistry::Get
     temp.push_back(it->second);
   }
   return temp;
-}
-
-bool ChangeTextRegistry::IsA(const std::type_info& type) const
-{
-  std::string name(GetType().name());
-  return name == type.name() || berry::Service::IsA(type);
-}
-
-const std::type_info& ChangeTextRegistry::GetType() const
-{
-  return typeid(IChangeTextRegistry);
 }
 

@@ -30,6 +30,11 @@ public:
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
+  
+  /**
+  * Activates the input device modules.
+  */
+  ChangeTextRegistry::Pointer GetChangeTextRegistry();
 
 };
 

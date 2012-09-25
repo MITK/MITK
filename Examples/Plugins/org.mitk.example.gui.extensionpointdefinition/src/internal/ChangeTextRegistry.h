@@ -21,9 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <vector>
 
-#include <ChangeTextDescriptor.h>
+#include <berryObject.h>
 
-  class ChangeTextRegistry
+#include "ChangeTextDescriptor.h"
+
+class ChangeTextRegistry : public berry::Object
   {
   public:
 

@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MinimalView.h"
 
+#include "org_mitk_example_gui_extensionpointdefinition_Activator.h"
+
 const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview"; 
 
 MinimalView::MinimalView() : m_Parent(0)
@@ -43,4 +45,5 @@ void MinimalView::SetFocus ()
 void MinimalView::ChangeExtensionLabelText(QString s)
 {
   m_Controls.extensionLabel->setText(s);
+
 }

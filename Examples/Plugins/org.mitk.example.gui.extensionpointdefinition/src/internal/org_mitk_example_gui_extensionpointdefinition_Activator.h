@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginActivator.h>
 
+#include "ChangeTextRegistry.h"
+
 class org_mitk_example_gui_extensionpointdefinition_Activator :
   public QObject, public ctkPluginActivator
 {
@@ -32,9 +34,9 @@ public:
   void stop(ctkPluginContext* context);
   
   /**
-  * Activates the input device modules.
+  * Get the Registry (for extensions).
   */
-  ChangeTextRegistry::Pointer GetChangeTextRegistry();
+  static ChangeTextRegistry* GetChangeTextRegistry();
 
 };
 

@@ -1,14 +1,4 @@
 set(SRC_CPP_FILES
-  ChangeTextDescriptor.cpp
-  ChangeTextRegistry.cpp
-  ExtensionPointDefinitionConstants.cpp
-)
-
-set(SRC_H_FILES
-  IChangeText.h
-  ChangeTextRegistry.h
-  ChangeTextDescriptor.h
-  ExtensionPointDefinitionConstants.h
 )
 
 set(INTERNAL_CPP_FILES
@@ -16,6 +6,9 @@ set(INTERNAL_CPP_FILES
   ExtensionPointDefinition.cpp
   MinimalPerspective.cpp
   MinimalView.cpp
+  ChangeTextDescriptor.cpp
+  ChangeTextRegistry.cpp
+  ExtensionPointDefinitionConstants.cpp
 )
 
 set(UI_FILES
@@ -27,6 +20,10 @@ set(MOC_H_FILES
   src/internal/ExtensionPointDefinition.h
   src/internal/MinimalPerspective.h
   src/internal/MinimalView.h
+  src/internal/IChangeText.h
+  src/internal/ChangeTextRegistry.h
+  src/internal/ChangeTextDescriptor.h
+  src/internal/ExtensionPointDefinitionConstants.h
 )
 
 set(CACHED_RESOURCE_FILES

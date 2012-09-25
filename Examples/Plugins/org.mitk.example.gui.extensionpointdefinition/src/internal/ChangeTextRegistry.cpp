@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 #include <berryIExtensionPointService.h>
 #include <berryIConfigurationElement.h>
-#include <ChangeTextRegistry.h>
+#include "ChangeTextRegistry.h"
 #include "ExtensionPointDefinitionConstants.h"
 
 ChangeTextRegistry::ChangeTextRegistry()

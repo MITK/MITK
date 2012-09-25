@@ -35,6 +35,12 @@ void org_mitk_example_gui_extensionpointdefinition_Activator::stop(ctkPluginCont
   Q_UNUSED(context)
 }
 
+ChangeTextRegistry* org_mitk_example_gui_extensionpointdefinition_Activator::GetChangeTextRegistry()
+{
+  static ChangeTextRegistry registry;
+  return &registry;
+}
+
 Q_EXPORT_PLUGIN2(org_mitk_example_gui_extensionpointdefinition, org_mitk_example_gui_extensionpointdefinition_Activator)
 
 

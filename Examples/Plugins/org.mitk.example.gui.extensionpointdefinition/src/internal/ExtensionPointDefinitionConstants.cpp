@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <ExtensionPointDefinitionConstants.h>
+#include "ExtensionPointDefinitionConstants.h"
 
 #include "ChangeTextRegistry.h"
 

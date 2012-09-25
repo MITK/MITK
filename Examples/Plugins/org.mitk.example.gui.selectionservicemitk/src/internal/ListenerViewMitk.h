@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 // qt Includes
-#include <QString.h>
+#include <QString>
 
 // ui Includes
 #include "ui_ListenerViewMitkControls.h"

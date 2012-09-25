@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QString>
 
-  class IChangeText : public berry::Object
+  class IChangeText : public virtual berry::Object
   {
   public:
     virtual void ChangeExtensionLabelText(QString s) = 0;

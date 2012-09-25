@@ -20,7 +20,6 @@ set(MOC_H_FILES
   src/internal/ExtensionPointDefinition.h
   src/internal/MinimalPerspective.h
   src/internal/MinimalView.h
-  src/internal/IChangeText.h
   src/internal/ChangeTextRegistry.h
   src/internal/ChangeTextDescriptor.h
   src/internal/ExtensionPointDefinitionConstants.h

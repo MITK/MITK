@@ -21,14 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// Berry
 #include <berryQtViewPart.h>
 
-#include <QString.h>
-
-#include "IChangeText.h"
+#include <QString>
 
 #include "ui_MinimalViewControls.h"
 
 
-class MinimalView : public berry::QtViewPart, public IChangeText
+class MinimalView : public berry::QtViewPart
 {
 
   Q_OBJECT

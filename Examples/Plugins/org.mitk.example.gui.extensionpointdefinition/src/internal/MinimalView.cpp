@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "org_mitk_example_gui_extensionpointdefinition_Activator.h"
 
-#include <QMessageBox.h>
+#include <QMessageBox>
 
 const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview"; 
 

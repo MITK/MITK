@@ -43,6 +43,8 @@ public:
    */
   SimpleRenderWindowView();
 
+  ~SimpleRenderWindowView();
+
   /**
    *  String based view identifier.
    */

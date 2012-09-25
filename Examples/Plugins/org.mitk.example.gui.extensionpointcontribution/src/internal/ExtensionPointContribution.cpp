@@ -17,7 +17,7 @@
 #include "ExtensionPointContribution.h"
 
 // qt Includes
-#include <QMessageBox.h>
+#include <QMessageBox>
 
 
 ExtensionPointContribution::ExtensionPointContribution()

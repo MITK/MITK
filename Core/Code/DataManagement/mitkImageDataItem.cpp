@@ -32,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkUnsignedLongArray.h>
 #include <vtkUnsignedShortArray.h>
 
+#include <mitkImageVtkAccessor.h>
+#include <mitkImage.h>
+
 
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::ImageDescriptor::Pointer desc, unsigned int dimension, void *data, bool manageMemory, size_t offset) :
   m_Data(NULL), m_ManageMemory(false), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false), m_Size(0),
@@ -137,9 +140,9 @@ void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsign
   }
 }
 
-void mitk::ImageDataItem::ConstructVtkImageData() const
+void mitk::ImageDataItem::ConstructVtkImageData(ImagePointer iP) const
 {
-  vtkImageData *inData = vtkImageData::New();
+  mitk::ImageVtkAccessor *inData = ImageVtkAccessor::New(iP); //vtkImageData::New();
   vtkDataArray *scalars = NULL;
 
   const unsigned int *dims = m_Dimensions;
@@ -255,4 +258,11 @@ void mitk::ImageDataItem::Modified() const
     m_VtkImageData->Modified();
 }
 
+
+mitk::ImageVtkAccessor* mitk::ImageDataItem::GetVtkImageData(mitk::ImagePointer iP) const
+{
+  if(m_VtkImageData==NULL)
+    ConstructVtkImageData(iP);
+  return m_VtkImageData;
+}
 

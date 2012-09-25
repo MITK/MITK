@@ -49,6 +49,11 @@ set(H_FILES
   Algorithms/mitkConvert2Dto3DImageFilter.h 
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
+  DataManagement/mitkImagePixelAccessor.h
+  DataManagement/mitkImagePixelReadAccessor.h
+  DataManagement/mitkImagePixelWriteAccessor.h
+  DataManagement/mitkImageReadAccessor.h
+  DataManagement/mitkImageWriteAccessor.h
   DataManagement/mitkITKImageImport.h
   DataManagement/mitkITKImageImport.txx
   DataManagement/mitkImageToItk.h
@@ -130,6 +135,7 @@ set(CPP_FILES
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGroupTagProperty.cpp
   DataManagement/mitkImage.cpp
+  DataManagement/mitkImageAccessorBase.cpp
   DataManagement/mitkImageCaster.cpp
   DataManagement/mitkImageCastPart1.cpp
   DataManagement/mitkImageCastPart2.cpp
@@ -137,6 +143,7 @@ set(CPP_FILES
   DataManagement/mitkImageCastPart4.cpp
   DataManagement/mitkImageDataItem.cpp
   DataManagement/mitkImageDescriptor.cpp
+  DataManagement/mitkImageVtkAccessor.cpp
   DataManagement/mitkImageStatisticsHolder.cpp
   DataManagement/mitkLandmarkBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp

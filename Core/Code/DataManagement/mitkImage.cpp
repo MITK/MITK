@@ -198,7 +198,7 @@ double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position
   return value;
 }
 
-vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
+mitk::ImageVtkAccessor* mitk::Image::GetVtkImageData(int t, int n)
 {
   if(m_Initialized==false)
   {
@@ -208,15 +208,15 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
       GetSource()->UpdateOutputInformation();
   }
   ImageDataItemPointer volume=GetVolumeData(t, n);
-  if(volume.GetPointer()==NULL || volume->GetVtkImageData() == NULL)
+  if(volume.GetPointer()==NULL || volume->GetVtkImageData(this) == NULL)
     return NULL;
 
 
   float *fspacing = const_cast<float *>(GetSlicedGeometry(t)->GetFloatSpacing());
   double dspacing[3] = {fspacing[0],fspacing[1],fspacing[2]};
-  volume->GetVtkImageData()->SetSpacing( dspacing );
+  volume->GetVtkImageData(this)->SetSpacing( dspacing );
 
-  return volume->GetVtkImageData();
+  return volume->GetVtkImageData(this);
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement)

@@ -128,7 +128,7 @@ public:
    * multiple outputs of different types, then that class must provide
    * an implementation of MakeOutput(). */
   virtual DataObjectPointer MakeOutput(unsigned int idx);
-  virtual void* GetData();
+//  virtual void* GetData();
 
   virtual vtkImageData* GetVtkImageData();
 

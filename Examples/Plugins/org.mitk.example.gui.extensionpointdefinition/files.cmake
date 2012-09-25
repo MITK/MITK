@@ -1,8 +1,12 @@
 set(SRC_CPP_FILES
+  ChangeTextDescriptor.cpp
+  ChangeTextRegistry.cpp
 )
 
 set(SRC_H_FILES
   IChangeText.h
+  ChangeTextRegistry.h
+  ChangeTextDescriptor.h
 )
 
 set(INTERNAL_CPP_FILES
@@ -18,7 +22,6 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/org_mitk_example_gui_extensionpointdefinition_Activator.h
-
   src/internal/ExtensionPointDefinition.h
   src/internal/MinimalPerspective.h
   src/internal/MinimalView.h

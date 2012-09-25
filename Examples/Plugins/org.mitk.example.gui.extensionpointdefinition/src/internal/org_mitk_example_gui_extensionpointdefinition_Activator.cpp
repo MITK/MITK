@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ExtensionPointDefinition.h"
 #include "MinimalPerspective.h"
 #include "MinimalView.h"
-//#include "IChangeText.h"
 
 #include <QtPlugin>
 
@@ -29,7 +28,6 @@ void org_mitk_example_gui_extensionpointdefinition_Activator::start(ctkPluginCon
   BERRY_REGISTER_EXTENSION_CLASS(ExtensionPointDefinition, context)
   BERRY_REGISTER_EXTENSION_CLASS(MinimalPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(MinimalView, context)
-  //BERRY_REGISTER_EXTENSION_CLASS(IChangeText, context)
 }
 
 void org_mitk_example_gui_extensionpointdefinition_Activator::stop(ctkPluginContext* context)

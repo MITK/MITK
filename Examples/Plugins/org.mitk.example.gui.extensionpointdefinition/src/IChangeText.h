@@ -1,6 +1,6 @@
 /*===================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center, 
 Division of Medical and Biological Informatics.
@@ -14,18 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef CHANGELABELTEXT_H_
-#define CHANGELABELTEXT_H_
+#ifndef ICHANGETEXT_H_
+#define ICHANGETEXT_H_
 
-/// Qt
-#include <QString.h>
+#include <berryObject.h>
 
-class IChangeText {
+#include <QString>
 
-public:
-  virtual ~IChangeText() {}
-  virtual void ChangeExtensionLabelText(QString s) = 0;
+  class IChangeText : public berry::Object
+  {
+  public:
+    virtual void ChangeExtensionLabelText(QString s) = 0;
 
-};
+    virtual ~IChangeText() {}
+  };
 
-#endif /*BERRYIEDITORSITE_H_*/
+#endif /*ICHANGETEXT_H_*/

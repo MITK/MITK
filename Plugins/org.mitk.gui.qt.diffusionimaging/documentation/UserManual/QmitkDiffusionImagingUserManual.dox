@@ -123,6 +123,6 @@ The MITK Diffusion tools consist of further components, which have their own doc
   \li \subpage org_mitk_views_screenshotmaker
   \li \subpage org_mitk_views_stochasticfibertracking
   \li \subpage org_mitk_views_ivim
-  \li \subpage org_mitk_views_brainnetworkanalysis
+  \li \subpage org_mitk_diffusionimagingapp_perspectives_connectomics
   \li \subpage org_mitk_views_tractbasedspatialstatistics
 */

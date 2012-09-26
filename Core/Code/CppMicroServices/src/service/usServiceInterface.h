@@ -28,8 +28,12 @@
 template<class T> inline const char* us_service_interface_iid()
 { return 0; }
 
+template<class T> inline const char* us_service_impl_name(T* /*impl*/)
+{ return "(unknown implementation)"; }
+
 #if defined(QT_DEBUG) || defined(QT_NO_DEBUG)
 #include <qobject.h>
+#include US_BASECLASS_HEADER
 
 #define US_DECLARE_SERVICE_INTERFACE(IFace, IId)                                 \
   template<> inline const char* qobject_interface_iid<IFace *>()                 \
@@ -48,8 +52,5 @@ template<class T> inline const char* us_service_interface_iid()
   { return IId; }                                                                \
 
 #endif
-
-template<class T> inline const char* us_service_impl_name(T* /*impl*/)
-{ return "(unknown implementation)"; }
 
 #endif // USSERVICEINTERFACE_H

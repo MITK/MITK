@@ -180,7 +180,9 @@ struct QbrSelListener : ISelectionListener
     if(m_View->m_CurrentSelection)
     {
       bool foundDwiVolume = false;
-      m_View->m_Controls->m_DiffusionImageLabel->setText("-");
+
+      m_View->m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
+      m_View->m_Controls->m_InputData->setTitle("Please Select Input Data");
 
       QString selected_images = "";
 
@@ -213,6 +215,10 @@ struct QbrSelListener : ISelectionListener
       m_View->GenerateShellSelectionUI(set);
       m_View->m_Controls->m_DiffusionImageLabel->setText(selected_images);
       m_View->m_Controls->m_ButtonStandard->setEnabled(foundDwiVolume);
+      if (foundDwiVolume)
+          m_View->m_Controls->m_InputData->setTitle("Input Data");
+      else
+          m_View->m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
     }
   }
 
@@ -265,6 +271,8 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkQBallReconstructionViewControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
+
+    m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
 
     QStringList items;
     items << "2" << "4" << "6" << "8" << "10" << "12";

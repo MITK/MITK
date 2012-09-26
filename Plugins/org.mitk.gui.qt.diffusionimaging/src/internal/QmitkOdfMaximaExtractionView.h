@@ -93,7 +93,6 @@ protected:
 
   std::vector< mitk::DataNode::Pointer > m_BinaryImageNodes;
   std::vector< mitk::DataNode::Pointer > m_ImageNodes;
-  std::vector< mitk::DataNode::Pointer > m_QballImageNodes;
   std::vector< mitk::DataNode::Pointer > m_TensorImageNodes;
 
   void UpdateGui();

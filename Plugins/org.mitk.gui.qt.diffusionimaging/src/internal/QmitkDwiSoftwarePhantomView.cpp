@@ -392,12 +392,6 @@ void QmitkDwiSoftwarePhantomView::StdMultiWidgetNotAvailable()
 
 void QmitkDwiSoftwarePhantomView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-    if ( !this->IsVisible() )
-    {
-        // do nothing if nobody wants to see me :-(
-        return;
-    }
-
     m_SignalRegionNodes.clear();
 
     // iterate all selected objects, adjust warning visibility

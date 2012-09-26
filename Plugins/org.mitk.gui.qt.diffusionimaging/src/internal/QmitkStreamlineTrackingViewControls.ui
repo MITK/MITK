@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
-    <height>553</height>
+    <width>368</width>
+    <height>449</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -29,7 +29,7 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <item row="6" column="0">
+   <item row="8" column="0">
     <spacer name="spacer1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -45,77 +45,43 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="0">
+   <item row="1" column="0">
+    <widget class="QCommandLinkButton" name="commandLinkButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Start Tractography</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Parameters</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="6" column="1">
-       <widget class="QSlider" name="m_SeedsPerVoxelSlider">
-        <property name="toolTip">
-         <string>Number of tracts started in each voxel of the seed ROI.</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSlider" name="m_AngularThresholdSlider">
-        <property name="toolTip">
-         <string>Minimally allowed curcature radius (in mm, interpolated auto = 0.5 minimal spacing, noninterpolated auto = 0.1 minimal spacing)</string>
-        </property>
-        <property name="minimum">
-         <number>-1</number>
-        </property>
-        <property name="maximum">
-         <number>50</number>
-        </property>
-        <property name="value">
-         <number>-1</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QSlider" name="m_MinTractLengthSlider">
-        <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
-        </property>
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>500</number>
-        </property>
-        <property name="value">
-         <number>40</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="m_SeedsPerVoxelLabel">
+      <item row="3" column="0">
+       <widget class="QLabel" name="m_fLabel">
         <property name="toolTip">
          <string/>
         </property>
         <property name="text">
-         <string>Seeds per Voxel: 1</string>
+         <string>f: 1</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
+      <item row="4" column="0">
+       <widget class="QLabel" name="m_gLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>g: 0</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -131,26 +97,17 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="1">
-       <widget class="QSlider" name="m_FaThresholdSlider">
+      <item row="5" column="0">
+       <widget class="QLabel" name="m_StepsizeLabel">
         <property name="toolTip">
-         <string>Fractional Anisotropy Threshold</string>
+         <string/>
         </property>
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>20</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+        <property name="text">
+         <string>Step Size: auto</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="QSlider" name="m_fSlider">
         <property name="toolTip">
          <string>Weighting factor between first eigenvector (f=1 equals FACT tracking) and input vector dependent direction (f=0).</string>
@@ -169,27 +126,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="m_FaThresholdLabel">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>FA Threshold: 0.2</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="m_MinTractLengthLabel">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Min. Tract Length: 40mm</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <widget class="QSlider" name="m_StepsizeSlider">
         <property name="toolTip">
          <string>Stepsize in mm (auto = 0.1*minimal spacing)</string>
@@ -208,17 +145,17 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="m_gLabel">
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_FaThresholdLabel">
         <property name="toolTip">
          <string/>
         </property>
         <property name="text">
-         <string>g: 0</string>
+         <string>FA Threshold: 0.2</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="QSlider" name="m_gSlider">
         <property name="toolTip">
          <string>Weighting factor between input vector (g=0) and tensor deflection (g=1 equals TEND tracking)</string>
@@ -237,37 +174,33 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="m_AngularThresholdLabel">
+      <item row="7" column="0">
+       <widget class="QLabel" name="m_SeedsPerVoxelLabel">
         <property name="toolTip">
          <string/>
         </property>
         <property name="text">
-         <string>Min. Curvature Radius: auto</string>
+         <string>Seeds per Voxel: 1</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="m_StepsizeLabel">
+      <item row="7" column="1">
+       <widget class="QSlider" name="m_SeedsPerVoxelSlider">
         <property name="toolTip">
-         <string/>
+         <string>Number of tracts started in each voxel of the seed ROI.</string>
         </property>
-        <property name="text">
-         <string>Step Size: auto</string>
+        <property name="minimum">
+         <number>1</number>
         </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="m_fLabel">
-        <property name="toolTip">
-         <string/>
+        <property name="maximum">
+         <number>100</number>
         </property>
-        <property name="text">
-         <string>f: 1</string>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
+      <item row="9" column="0">
        <widget class="QCheckBox" name="m_InterpolationBox">
         <property name="toolTip">
          <string>Default is nearest neighbor interpolation.</string>
@@ -280,109 +213,149 @@
         </property>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="m_SeedsPerVoxelLabel_2">
-     <property name="toolTip">
-      <string>Number of tracts started in each voxel of the seed ROI.</string>
-     </property>
-     <property name="text">
-      <string>Mori et al. Annals Neurology 1999</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QCommandLinkButton" name="commandLinkButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Start Tracking</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Data</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
-       <widget class="QLabel" name="m_TensorImageLabel">
+      <item row="2" column="1">
+       <widget class="QSlider" name="m_AngularThresholdSlider">
+        <property name="toolTip">
+         <string>Minimally allowed curcature radius (in mm, interpolated auto = 0.5 minimal spacing, noninterpolated auto = 0.1 minimal spacing)</string>
+        </property>
+        <property name="minimum">
+         <number>-1</number>
+        </property>
+        <property name="maximum">
+         <number>50</number>
+        </property>
+        <property name="value">
+         <number>-1</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="m_MinTractLengthLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
         <property name="text">
-         <string>-</string>
+         <string>Min. Tract Length: 40mm</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
+       <widget class="QSlider" name="m_FaThresholdSlider">
+        <property name="toolTip">
+         <string>Fractional Anisotropy Threshold</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>20</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QSlider" name="m_MinTractLengthSlider">
+        <property name="toolTip">
+         <string>Minimum tract length in mm.</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>500</number>
+        </property>
+        <property name="value">
+         <number>40</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_AngularThresholdLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Min. Curvature Radius: auto</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="m_InputData">
+     <property name="title">
+      <string>Please Select Input Data</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="1">
        <widget class="QLabel" name="m_RoiImageLabel">
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_6">
+        <property name="toolTip">
+         <string>Binary seed ROI. If not specified, the whole image area is seeded.</string>
+        </property>
         <property name="text">
-         <string>Seed ROI Image:</string>
+         <string>Seed ROI:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
+        <property name="toolTip">
+         <string>Input DTI</string>
+        </property>
         <property name="text">
          <string>Tensor Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="toolTip">
-         <string>Stop tracking if leaving mask</string>
-        </property>
-        <property name="text">
-         <string>Mask Image:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="m_MaskImageLabel">
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="toolTip">
+         <string>Only track insida mask area.</string>
+        </property>
+        <property name="text">
+         <string>Mask Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="m_TensorImageLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="m_SeedsPerVoxelLabel_3">
-     <property name="toolTip">
-      <string>Number of tracts started in each voxel of the seed ROI.</string>
-     </property>
-     <property name="text">
-      <string>Lazar et al. Human Brain Mapping 2003</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="m_SeedsPerVoxelLabel_4">
-     <property name="toolTip">
-      <string>Number of tracts started in each voxel of the seed ROI.</string>
-     </property>
-     <property name="text">
-      <string>Weinstein et al. Proceedings of IEEE Visualization 1999</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <tabstops>
-  <tabstop>commandLinkButton</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -58,6 +58,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTensorImageToQBallImageFilter.h>
 #include <itkResidualImageFilter.h>
 
+#include <berryIWorkbenchWindow.h>
+#include <berryISelectionService.h>
+
 const std::string QmitkTensorReconstructionView::VIEW_ID = "org.mitk.views.tensorreconstruction";
 
 typedef float                                       TTensorPixelType;
@@ -222,6 +225,7 @@ void QmitkTensorReconstructionView::Advanced1CheckboxClicked()
 void QmitkTensorReconstructionView::Activated()
 {
     QmitkFunctionality::Activated();
+
 }
 
 void QmitkTensorReconstructionView::Deactivated()
@@ -821,17 +825,15 @@ void QmitkTensorReconstructionView::TensorsToQbi()
 
 void QmitkTensorReconstructionView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-    if ( !this->IsVisible() )
-        return;
-
     m_DiffusionImages = mitk::DataStorage::SetOfObjects::New();
     m_TensorImages = mitk::DataStorage::SetOfObjects::New();
     bool foundDwiVolume = false;
     bool foundTensorVolume = false;
-    m_Controls->m_DiffusionImageLabel->setText("-");
-    m_Controls->m_TensorImageLabel->setText("-");
+    m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
     m_DiffusionImage = NULL;
     m_TensorImage = NULL;
+
+    m_Controls->m_InputData->setTitle("Please Select Input Data");
 
     // iterate selection
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
@@ -851,7 +853,7 @@ void QmitkTensorReconstructionView::OnSelectionChanged( std::vector<mitk::DataNo
         else if(dynamic_cast<mitk::TensorImage*>(node->GetData()))
         {
             foundTensorVolume = true;
-            m_Controls->m_TensorImageLabel->setText(node->GetName().c_str());
+            m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
             m_TensorImages->push_back(node);
             m_TensorImage = node;
         }
@@ -861,6 +863,9 @@ void QmitkTensorReconstructionView::OnSelectionChanged( std::vector<mitk::DataNo
 
     m_Controls->m_TensorsToDWIButton->setEnabled(foundTensorVolume);
     m_Controls->m_TensorsToQbiButton->setEnabled(foundTensorVolume);
+
+    if (foundDwiVolume || foundTensorVolume)
+        m_Controls->m_InputData->setTitle("Input Data");
 
     m_Controls->m_ResidualButton->setEnabled(foundDwiVolume && foundTensorVolume);
     m_Controls->m_PercentagesOfOutliers->setEnabled(foundDwiVolume && foundTensorVolume);

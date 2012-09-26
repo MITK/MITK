@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -59,7 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Smoothing
 #include <itkMedianImageFilter.h>
-#include <itkDiscreteGaussianImageFilter.h> 
+#include <itkDiscreteGaussianImageFilter.h>
 #include <itkTotalVariationDenoisingImageFilter.h>
 
 // Threshold
@@ -97,7 +97,7 @@ typedef itk::Image<itk::Vector<float,3>, 3>                                     
 
 typedef itk::BinaryBallStructuringElement<ImageType::PixelType, 3>                      BallType;
 typedef itk::GrayscaleDilateImageFilter<ImageType, ImageType, BallType>                 DilationFilterType;
-typedef itk::GrayscaleErodeImageFilter<ImageType, ImageType, BallType>                  ErosionFilterType; 
+typedef itk::GrayscaleErodeImageFilter<ImageType, ImageType, BallType>                  ErosionFilterType;
 typedef itk::GrayscaleMorphologicalOpeningImageFilter<ImageType, ImageType, BallType>   OpeningFilterType;
 typedef itk::GrayscaleMorphologicalClosingImageFilter<ImageType, ImageType, BallType>   ClosingFilterType;
 
@@ -227,7 +227,7 @@ void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> 
   if (!nodes.empty())
   {
   // reset GUI
-  this->ResetOneImageOpPanel();
+//  this->ResetOneImageOpPanel();
   m_Controls->sliceNavigatorTime->setEnabled(false);
   m_Controls->leImage1->setText("Select an Image in Data Manager");
   m_Controls->tlWhat1->setEnabled(false);
@@ -500,14 +500,14 @@ void QmitkBasicImageProcessing::SelectAction(int action)
   m_Controls->cbHideOrig->setEnabled(true);
 }
 
-void QmitkBasicImageProcessing::StartButtonClicked() 
+void QmitkBasicImageProcessing::StartButtonClicked()
 {
   if(!m_SelectedImageNode->GetNode()) return;
 
   this->BusyCursorOn();
 
   mitk::Image::Pointer newImage;
-  
+
   try
   {
     newImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
@@ -520,7 +520,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
     this->BusyCursorOff();
     return;
   }
-  
+
   // check if input image is valid, casting does not throw exception when casting from 'NULL-Object'
   if ( (! newImage) || (newImage->IsInitialized() == false) )
   {
@@ -529,7 +529,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
     QMessageBox::warning( NULL, "Basic Image Processing", "Input image is broken or not initialized. Returning.", QMessageBox::Ok, QMessageBox::NoButton );
     return;
   }
-  
+
   // check if operation is done on 4D a image time step
   if(newImage->GetDimension() > 3)
   {
@@ -831,7 +831,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   }
 
   // reset GUI to ease further processing
-  this->ResetOneImageOpPanel();
+//  this->ResetOneImageOpPanel();
 
   // add new image to data storage and set as active to ease further processing
   GetDefaultDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
@@ -874,7 +874,7 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
     m_SelectedOperation = XOR;
     break;
   default:
-    this->ResetTwoImageOpPanel();
+//    this->ResetTwoImageOpPanel();
     return;
   }
   m_Controls->tlImage2->setEnabled(true);
@@ -882,7 +882,7 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
   m_Controls->btnDoIt2->setEnabled(true);
 }
 
-void QmitkBasicImageProcessing::StartButton2Clicked() 
+void QmitkBasicImageProcessing::StartButton2Clicked()
 {
   mitk::Image::Pointer newImage1 = dynamic_cast<mitk::Image*>
     (m_SelectedImageNode->GetNode()->GetData());
@@ -897,7 +897,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   }
 
   this->BusyCursorOn();
-  this->ResetTwoImageOpPanel();
+//  this->ResetTwoImageOpPanel();
 
   // check if 4D image and use filter on correct time step
   int time = ((QmitkSliderNavigatorWidget*)m_Controls->sliceNavigatorTime)->GetPos();
@@ -919,7 +919,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   }
 
   // reset GUI for better usability
-  this->ResetTwoImageOpPanel();
+//  this->ResetTwoImageOpPanel();
 
   ImageType::Pointer itkImage1 = ImageType::New();
   ImageType::Pointer itkImage2 = ImageType::New();

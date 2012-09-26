@@ -197,6 +197,8 @@ protected:
   typedef std::map< mitk::Image *, mitk::PartialVolumeAnalysisHistogramCalculator::Pointer >
     PartialVolumeAnalysisMapType;
 
+//  void OnSelectionChanged(const QList<mitk::DataNode::Pointer> &nodes);
+
   /*!
   * controls containing sliders for scrolling through the slices
   */

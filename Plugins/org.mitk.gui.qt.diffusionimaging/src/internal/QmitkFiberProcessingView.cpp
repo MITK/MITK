@@ -103,7 +103,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
         connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
         connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
-        connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );        
+        connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
 
     }
 }
@@ -739,6 +739,8 @@ void QmitkFiberProcessingView::UpdateGui()
     // are fiber bundles selected?
     if ( m_SelectedFB.empty() )
     {
+        m_Controls->m_InputData->setTitle("Please Select Input Data");
+
         m_Controls->m_JoinBundles->setEnabled(false);
         m_Controls->m_SubstractBundles->setEnabled(false);
         m_Controls->m_ProcessFiberBundleButton->setEnabled(false);
@@ -748,7 +750,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
         m_Controls->m_FaColorFibersButton->setEnabled(false);
         m_Controls->m_PruneFibersButton->setEnabled(false);
-        m_Controls->m_CurvatureThresholdButton->setEnabled(false);       
+        m_Controls->m_CurvatureThresholdButton->setEnabled(false);
 
         if (m_Surfaces.size()>0)
             m_Controls->m_MirrorFibersButton->setEnabled(true);
@@ -757,6 +759,8 @@ void QmitkFiberProcessingView::UpdateGui()
     }
     else
     {
+        m_Controls->m_InputData->setTitle("Input Data");
+
         m_Controls->m_PlanarFigureButtonsFrame->setEnabled(true);
         m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
         m_Controls->m_ResampleFibersButton->setEnabled(true);
@@ -766,7 +770,6 @@ void QmitkFiberProcessingView::UpdateGui()
 
         if (m_Surfaces.size()>0)
             m_Controls->m_Extract3dButton->setEnabled(true);
-
 
         // one bundle and one planar figure needed to extract fibers
         if (!m_SelectedPF.empty())
@@ -823,26 +826,35 @@ void QmitkFiberProcessingView::UpdateGui()
 
 void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-    if ( !this->IsVisible() )
-        return;
-
     //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
     m_SelectedFB.clear();
     m_SelectedPF.clear();
     m_Surfaces.clear();
     m_SelectedImage = NULL;
 
+    m_Controls->m_FibLabel->setText("<font color='red'>mandatory</font>");
+    m_Controls->m_PfLabel->setText("<font color='grey'>needed for extraction</font>");
+
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
     {
         mitk::DataNode::Pointer node = *it;
         if ( dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
+        {
+            m_Controls->m_FibLabel->setText(node->GetName().c_str());
             m_SelectedFB.push_back(node);
+        }
         else if (dynamic_cast<mitk::PlanarFigure*>(node->GetData()))
+        {
+            m_Controls->m_PfLabel->setText(node->GetName().c_str());
             m_SelectedPF.push_back(node);
+        }
         else if (dynamic_cast<mitk::Image*>(node->GetData()))
             m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
         else if (dynamic_cast<mitk::Surface*>(node->GetData()))
+        {
+            m_Controls->m_PfLabel->setText(node->GetName().c_str());
             m_Surfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
+        }
     }
     UpdateGui();
     GenerateStats();
@@ -1600,7 +1612,6 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateFiberEndingsImage(mitk
     typedef itk::TractsToFiberEndingsImageFilter< OutImageType > ImageGeneratorType;
     ImageGeneratorType::Pointer generator = ImageGeneratorType::New();
     generator->SetFiberBundle(fib);
-    generator->SetInvertImage(m_Controls->m_InvertCheckbox->isChecked());
     generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
     if (m_SelectedImage.IsNotNull())
     {
@@ -1664,7 +1675,6 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
     generator->SetFiberBundle(fib);
     generator->SetBinaryOutput(binary);
     generator->SetOutputAbsoluteValues(absolute);
-    generator->SetInvertImage(m_Controls->m_InvertCheckbox->isChecked());
     generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
     if (m_SelectedImage.IsNotNull())
     {

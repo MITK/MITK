@@ -240,7 +240,7 @@ private:
   QItemSelectionModel* GetDataNodeSelectionModel() const;
 
   /// Reopen multi widget editor if it has been closed
-  mitk::IRenderWindowPart *OpenRenderWindowPart();
+  mitk::IRenderWindowPart *OpenRenderWindowPart(bool activatedEditor = true);
 };
 
 #endif /*QMITKDATAMANAGERVIEW_H_*/

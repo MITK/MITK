@@ -59,7 +59,7 @@ vtkStandardNewMacro(StateMachineFactory);
 }
 
 mitk::StateMachineFactory::StateMachineFactory()
-: m_AktStateMachineName(""), m_SkipStateMachine(false)
+: m_AktTransition(NULL), m_AktStateMachineName(""), m_SkipStateMachine(false)
 {}
 
 mitk::StateMachineFactory::~StateMachineFactory()
@@ -75,10 +75,6 @@ mitk::StateMachineFactory::~StateMachineFactory()
   
   //should not be necessary due to SmartPointers
   m_StartStates.clear();
-  
-  //delete WeakPointer
-  if (m_AktTransition)
-    delete m_AktTransition;
 }
 
 
@@ -270,12 +266,22 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
     std::string transitionName = ReadXMLStringAttribut( NAME, atts ) ;
     int nextStateId = ReadXMLIntegerAttribut( NEXT_STATE_ID, atts );
     int eventId = ReadXMLIntegerAttribut( EVENT_ID, atts );
-    m_AktTransition = new Transition(transitionName, nextStateId, eventId);
     if ( m_AktState )
-      m_AktState->AddTransition( m_AktTransition );  
+    {
+      mitk::Transition* transition = new Transition(transitionName, nextStateId, eventId);
+      if (!m_AktState->AddTransition( transition ))
+      {
+        delete transition;
+        m_AktTransition = const_cast<Transition*>(m_AktState->GetTransition(eventId));
+      }
+      else
+      {
+        m_AktTransition = transition;
+      }
+    }
   }
 
-  else if ( name == ACTION )
+  else if ( name == ACTION && m_AktTransition)
   {
     int actionId = ReadXMLIntegerAttribut( ID, atts );
     m_AktAction = Action::New( actionId );
@@ -358,7 +364,7 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
   {
     //doesn't have to be done
   } 
-  else if ( name == TRANSITION ) 
+  else if ( name == TRANSITION )
   {
     m_AktTransition = NULL; //pointer stored in its state. memory will be freed in destructor of class state
   } 

@@ -512,7 +512,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
       return "";
     }
     // check if extension is suitable for writing image data
-    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();    
+    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
     if (!imageWriter->IsExtensionValid(extension))
     {
       // muellerm, 12-05-02, using default file extension

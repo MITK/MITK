@@ -182,11 +182,6 @@ void HelpContentView::showContextMenu(const QPoint &pos)
   if (!m_ContentWidget->indexAt(pos).isValid())
       return;
 
-  //QHelpContentModel* contentModel =
-  //    qobject_cast<QHelpContentModel*>(m_ContentWidget->model());
-  //QHelpContentItem *itm =
-  //    contentModel->contentItemAt(m_ContentWidget->currentIndex());
-
   QModelIndex index = m_ContentWidget->indexAt(pos);
   QUrl url = m_ContentWidget->GetUrl(index);
 

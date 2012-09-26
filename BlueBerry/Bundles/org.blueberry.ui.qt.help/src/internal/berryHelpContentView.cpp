@@ -111,15 +111,15 @@ QUrl HelpContentWidget::GetUrl(const QModelIndex &index)
 {
   QHelpContentModel *contentModel = qobject_cast<QHelpContentModel*>(m_SourceModel);
   if (!contentModel)
-    return 0;
+    return QUrl();
 
   QHelpContentItem *item = contentModel->contentItemAt(m_SortModel->mapToSource(index));
   if (!item)
-    return 0;
+    return QUrl();
   QUrl url = item->url();
     if (url.isValid())
       return url;
-  return 0;
+  return QUrl();
 }
 
 void HelpContentWidget::showLink(const QModelIndex &index)

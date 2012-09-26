@@ -100,7 +100,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
 
-    std::string empty= "";
+    //std::string empty= "";
     //m_Controls->m_DeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
   }
 }
@@ -169,7 +169,7 @@ void QmitkToFUtilView::Hidden()
     ResetGUIToDefault();
 }
 
-void QmitkToFUtilView::HackForPlayer()
+void QmitkToFUtilView::HackForPlayer()//--------------Hack For Player Could be deleted?------------------------------------------------------------------------------------------------
 {
   QString tmpFileName("");
   QString fileFilter("");
@@ -257,7 +257,7 @@ void QmitkToFUtilView::HackForPlayer()
     //QMessageBox::critical( this, "Error", e.what() );
     return;
   }
-}
+}//-----------------------------------------------------------------------------------------------------------------------------
 
 void QmitkToFUtilView::OnToFCameraConnected()
 {

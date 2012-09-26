@@ -25,15 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIToFDeviceFactory.h"
 
 #include "mitkToFConfig.h"
-
-//  #include "mitkKinectDeviceFactory.h"
-//  #include "mitkToFCameraMESASR4000DeviceFactory.h"
-//  #include "mitkToFCameraPMDCamCubeDeviceFactory.h"
-//  #include "mitkToFCameraPMDRawDataCamCubeDeviceFactory.h"
-//  #include "mitkToFCameraPMDPlayerDeviceFactory.h"
-//  #include "mitkToFCameraPMDO3DeviceFactory.h"
-//  #include "mitkToFCameraPMDCamBoardDeviceFactory.h"
-//  #include "mitkToFCameraPMDRawDataCamBoardDeviceFactory.h"
 #include "mitkToFCameraMITKPlayerDeviceFactory.h"
 
 /*
@@ -78,7 +69,7 @@ public:
         context->RegisterService<IToFDeviceFactory>(toFCameraMITKPlayerDeviceFactory, mitkPlayerFactoryProps);
         toFCameraMITKPlayerDeviceFactory->ConnectToFDevice();
 
-        //m_Factories.push_back( kinectFactory );
+        m_Factories.push_back( toFCameraMITKPlayerDeviceFactory );
     }
 
     void Unload(mitk::ModuleContext* )

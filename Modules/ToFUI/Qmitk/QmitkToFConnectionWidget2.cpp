@@ -32,7 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 const std::string QmitkToFConnectionWidget2::VIEW_ID = "org.mitk.views.qmitktofconnectionwidget2";
-//Konstruktor des QmitkToFConnectionWidget2s
+
+//Konstruktor des QmitkToFConnectionWidget2
 QmitkToFConnectionWidget2::QmitkToFConnectionWidget2(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 {
   this->m_IntegrationTime = 0;
@@ -41,15 +42,18 @@ QmitkToFConnectionWidget2::QmitkToFConnectionWidget2(QWidget* parent, Qt::Window
   m_Controls = NULL;
   CreateQtPartControl(this);
 }
-//Destruktor of QmitkToFConnectionWidget2 ->"Q...." for a Qt created Method,in MITK-TOF ->"..mitkToF..."
+
+//Destruktor of QmitkToFConnectionWidget2
 QmitkToFConnectionWidget2::~QmitkToFConnectionWidget2()
 {
   //evtl. deinizialisieren von keno´s widget
+  //_____________________________________________KENO FRAGEN!!!!!!!!!_____________________________________________
+  //RemoveServiceFromList (mitk::ServiceReference ServiceReferencePrivate);  ?!
 }
 
 void QmitkToFConnectionWidget2::CreateQtPartControl(QWidget *parent)   //Definition of CreateQtPartControll-Methode in QmitkToFConnectionWidget2; Input= Pointer
 {
-  if (!m_Controls)  //Define if not alreaddy exists
+  if (!m_Controls)
   {
     // create GUI widgets
     m_Controls = new Ui::QmitkToFConnectionWidgetControls2;
@@ -58,7 +62,9 @@ void QmitkToFConnectionWidget2::CreateQtPartControl(QWidget *parent)   //Definit
 
     ShowParameterWidget();
 
-    //Keno´s Device initizialisieren
+    //Keno´s Device  hier initizialisieren-> überall sonst wo die Methode ShowParameterWidget aufgerufen wird, kann die "externe" inizilaisierung weggelassen werden!
+    std::string empty= "";
+    m_Controls->m_DeviceList->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
   }
 }
 
@@ -67,10 +73,27 @@ void QmitkToFConnectionWidget2::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_ConnectCameraButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnConnectCamera()) );
+
+
+    //QString slectedCamera = m_Controls->m_DeviceList->GetSelectedService<mitk::ToFCameraDevice>();
+
+    ////todo finde ein equivalent: zB currentIndexChanged in Keno's Widget???  ServiceProperties deviceProps -> ServiceSelectionChanged(ServiceReference)
+    //    std::string CamName = ServiceProperties.GetProperty();
+
+    //              mitk::Any prop = ServiceProperties.GetProperty(deviceProps);
+    //              if (prop.Empty())
+    //              {
+    //                MITK_WARN << "QmitkServiceListWidget tried to resolve property '" + m_NamingProperty + "' but failed. Resorting to interface name for display.";
+    //                caption = m_Interface;
+    //              }
+    //              else
+    //                caption = prop.ToString();
+
+    //    QString selectedCam(CamName);
+
+
     //connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(OnSelectCamera(const QString)) );
-    //todo finde ein equivalent: zB currentIndexChanged in Keno's Widget???
     //connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SLOT(OnSelectCamera(const QString)) );
-    //todo finde ein equivalent: zB currentIndexChanged in Keno's Widget???
     //connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SIGNAL(ToFCameraSelected(const QString)) );
     //todo klären was das hier war
   }
@@ -92,18 +115,15 @@ void QmitkToFConnectionWidget2::OnSelectCamera(const QString selectedCamera)
   //verstecke alle widgets
   this->HideAllParameterWidgets();
 
-  //finde Teilsstrings in einem string
-  //enhält er PMD ????
-  if ((selectedCamera == "PMD CamCube 2.0/3.0")||(selectedCamera == "PMD CamBoard")||(selectedCamera=="PMD O3D")||
-    (selectedCamera=="PMD CamBoardRaw")||(selectedCamera=="PMD CamCubeRaw 2.0/3.0") ) //todo ersetzen durch "enthaelt PMD"?
+  if (selectedCamera.contains("PMD")) // Changed IF  //finde Teilsstrings in einem string
   {
     this->m_Controls->m_PMDParameterWidget->show();
   }
-  else if (selectedCamera=="MESA Swissranger 4000")
+  else if (selectedCamera.contains("MESA"))
   {
     this->m_Controls->m_MESAParameterWidget->show();
   }
-  else if (selectedCamera=="Microsoft Kinect")
+  else if (selectedCamera.contains("Kinect"))
   {
     this->m_Controls->m_KinectParameterWidget->show();
   }
@@ -120,54 +140,62 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
 {
   bool playerMode = false;
 
+  //Changes to be done after connecting
   if (m_Controls->m_ConnectCameraButton->text()=="Connect")
   {
-    //reset the status of the GUI buttons
+    //Disabling some GUI-Elements
     m_Controls->m_ConnectCameraButton->setEnabled(false);
-    //m_Controls->m_SelectCameraCombobox->setEnabled(false);
-    //todo keno's widget deaktivieren
+    m_Controls->m_DeviceList->setEnabled(false);
     //repaint the widget
     this->repaint();
 
     QString tmpFileName("");
     QString fileFilter("");
 
-    //this->m_ToFImageGrabber->SetCameraDevice() //todo device aus keno's widget holen und hier setzen
+    //this->m_ToFImageGrabber->SetCameraDevice() //todo device aus keno's widget holen und hier setzen---------------------------------
 
-    QString selectedCamera;
-    //Beginn playerMode
-    if (selectedCamera == "PMD Player") //todo, wenn aktuelles device ein player ist
-    {//PMD player
+    //  this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
+    //  m_ToFImageGrabber->SetCameraDevice(device);
+
+    QString selectedCamera;   //------------------------------------------------------------------------------Defining an empty String ?
+
+    //Activation of "PlayerMode". If the selectedCamera String contains "Player", we start the Player Mode-------------------Should be checked soon
+    if (selectedCamera.contains("Player"))
+    {
       playerMode = true;
-
-      //if(GetDeviceName() enthält "PMD Player"
-      //{
-      //  fileFilter.append("PMD Files (*.pmd)");
-      //}
-      //todo möglicherweise ist das der default fall
-      //if(GetDeviceName() enthält "MITK Player" oder "PMD Raw Data Player"
-      //{
-      //        fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
-      //}
+      //IF PMD-Player selected
+      if (selectedCamera== "PMD Player")
+      {
+        fileFilter.append("PMD Files (*.pmd)");
+      }
+      else
+      {
+        fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
+      }
     }
 
-    // if a player was selected ...
+  // if a player was selected ...
     if (playerMode)
     { //... open a QFileDialog to chose the corresponding file from the disc
       tmpFileName = QFileDialog::getOpenFileName(NULL, "Play Image From...", "", fileFilter);
+
+      //If no fileName is returned by the Dialog,Button and Widget have to return to default + Opening a MessageBox
       if (tmpFileName.isEmpty())
       {
         m_Controls->m_ConnectCameraButton->setChecked(false);
         m_Controls->m_ConnectCameraButton->setEnabled(true);
-        //todo keno's widget aktivieren
+        m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
+
         this->ShowParameterWidget();
         QMessageBox::information( this, "Template functionality", "Please select a valid image before starting some action.");
         return;
       }
+
       if(selectedCamera == "PMD Player") //if current device name enhält
       { //set the PMD file name
         this->m_ToFImageGrabber->SetStringProperty("PMDFileName", tmpFileName.toStdString().c_str() );
       }
+
       if (selectedCamera == "PMD Raw Data Player" || selectedCamera == "MITK Player") //todo eventuell default
       {
         std::string msg = "";
@@ -252,7 +280,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
         }
       }
     }
-    //End PlayerMode
+    //End "PlayerMode"
 
     m_Controls->m_ConnectCameraButton->setText("Disconnect");
 
@@ -265,10 +293,8 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
       this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
 
-      //todo nochmal gleiche fallunterscheidung. Oder aber if/else eventuell komplett weglassen
-      if (/*(selectedCamera == "PMD CamCube 2.0/3.0") ||*/ (selectedCamera == "PMD CamBoard") ||
-        (selectedCamera== "PMD O3D") || (selectedCamera== "PMD CamBoardRaw") ||
-        (selectedCamera== "PMD CamCubeRaw 2.0/3.0"))
+      //todo nochmal gleiche fallunterscheidung. Oder aber if/else eventuell komplett weglassen------------------------------------------------------------------
+      if (selectedCamera.contains("PMD"))
       {
         this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
       }
@@ -288,8 +314,8 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
       QMessageBox::critical( this, "Error", "Connection failed. Check if you have installed the latest driver for your system." );
       m_Controls->m_ConnectCameraButton->setChecked(false);
       m_Controls->m_ConnectCameraButton->setEnabled(true);
-          //todo keno widet aktivieren
-          this->ShowParameterWidget();
+      m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
+      this->ShowParameterWidget();
       return;
 
     }
@@ -301,8 +327,9 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
     this->m_ToFImageGrabber->StopCamera();
     this->m_ToFImageGrabber->DisconnectCamera();
     m_Controls->m_ConnectCameraButton->setText("Connect");
-          //todo keno widet aktivieren
-          this->ShowParameterWidget();
+    m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
+    this->ShowParameterWidget();
+
     // send disconnect signal to the caller functionality
     emit ToFCameraDisconnected();
   }

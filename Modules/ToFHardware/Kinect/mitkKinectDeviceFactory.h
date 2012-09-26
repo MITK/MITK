@@ -47,7 +47,7 @@ namespace mitk
     std::string GetCurrentDeviceName()
     {
       std::stringstream name;
-      name << "Kinect Device " << m_DeviceNumber;
+      name << "Kinect Device " << m_DeviceNumber++;
       return name.str();
       //return std::string("Kinect Device")+m_DeviceNumber;
     }

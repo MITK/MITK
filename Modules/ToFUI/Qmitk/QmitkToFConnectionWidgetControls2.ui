@@ -32,11 +32,6 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QmitkServiceListWidget" name="m_DeviceList" native="true">
-     <zorder>m_ConnectCameraButton</zorder>
-    </widget>
-   </item>
    <item row="2" column="0">
     <widget class="QPushButton" name="m_ConnectCameraButton">
      <property name="minimumSize">
@@ -71,6 +66,9 @@
       <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QmitkServiceListWidget" name="m_DeviceList" native="true"/>
    </item>
    <item row="3" column="0">
     <widget class="QmitkToFPMDParameterWidget" name="m_PMDParameterWidget" native="true"/>

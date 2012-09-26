@@ -47,7 +47,7 @@ public:
     std::string GetCurrentDeviceName()
     {
      std::stringstream name;
-      name << "PMD CamBoard Device " << m_DeviceNumber;
+      name << "PMD CamBoard Device " << m_DeviceNumber++;
       return name.str();
     }
 

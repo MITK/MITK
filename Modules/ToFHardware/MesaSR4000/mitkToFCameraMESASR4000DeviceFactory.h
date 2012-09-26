@@ -32,6 +32,10 @@ namespace mitk
 class MITK_MESASR4000MODULE_EXPORT ToFCameraMESASR4000DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
+    ToFCameraMESASR4000DeviceFactory()
+    {
+      this->m_DeviceNumber = 0;
+    }
    /*!
    \brief Defining the Factorie´s Name, here for the MESASR4000DeviceFactory
    */
@@ -39,6 +43,12 @@ public:
    {
        return std::string("MESA SR4000 Factory");
    }
+       std::string GetCurrentDeviceName()
+    {
+      std::stringstream name;
+      name << "Mesa SR4000 Device " << m_DeviceNumber++;
+      return name.str();
+    }
 
 private:
      /*!
@@ -50,6 +60,7 @@ private:
 
      return device.GetPointer();
    }
+    int m_DeviceNumber;
 };
 }
 #endif

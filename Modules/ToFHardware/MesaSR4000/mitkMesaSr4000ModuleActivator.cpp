@@ -47,6 +47,8 @@ public:
         mitkMESASR4000FactoryProps["ToFFactoryName"] = toFCameraMESASR4000DeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraMESASR4000DeviceFactory, mitkMESASR4000FactoryProps);
 
+        toFCameraMESASR4000DeviceFactory->ConnectToFDevice();
+
         m_Factories.push_back(toFCameraMESASR4000DeviceFactory);
     }
 

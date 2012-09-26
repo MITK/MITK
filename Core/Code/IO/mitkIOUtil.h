@@ -133,8 +133,6 @@ public:
    */
   static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string path);
 
-  static bool savebasedata(mitk::BaseData::Pointer data, std::string path);
-
   static const std::string DEFAULTIMAGEEXTENSION;
   static const std::string DEFAULTSURFACEEXTENSION;
   static const std::string DEFAULTPOINTSETEXTENSION;

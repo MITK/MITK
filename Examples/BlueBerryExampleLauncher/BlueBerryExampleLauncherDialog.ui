@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AppFrameworkDemoDialog</class>
- <widget class="QDialog" name="AppFrameworkDemoDialog">
+ <class>BlueBerryExampleLauncherDialog</class>
+ <widget class="QDialog" name="BlueBerryExampleLauncherDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -41,7 +41,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>AppFrameworkDemoDialog</receiver>
+   <receiver>BlueBerryExampleLauncherDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -57,7 +57,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>AppFrameworkDemoDialog</receiver>
+   <receiver>BlueBerryExampleLauncherDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

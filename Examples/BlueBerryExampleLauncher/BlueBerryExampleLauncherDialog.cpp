@@ -15,17 +15,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "AppFrameworkDemoDialog.h"
-#include "ui_AppFrameworkDemoDialog.h"
+#include "BlueBerryExampleLauncherDialog.h"
+#include "ui_BlueBerryExampleLauncherDialog.h"
 
 #include <QCoreApplication>
 #include <QEventLoop>
 #include <QDir>
 #include <QPushButton>
 
-AppFrameworkDemoDialog::AppFrameworkDemoDialog(QWidget *parent) :
+BlueBerryExampleLauncherDialog::BlueBerryExampleLauncherDialog(QWidget *parent) :
   QDialog(parent),
-  ui(new Ui::AppFrameworkDemoDialog)
+  ui(new Ui::BlueBerryExampleLauncherDialog)
 {
   ui->setupUi(this);
 
@@ -33,7 +33,7 @@ AppFrameworkDemoDialog::AppFrameworkDemoDialog(QWidget *parent) :
   connect(this, SIGNAL(rejected()), this, SLOT(dialogCanceled()));
   connect(ui->appList, SIGNAL(currentRowChanged(int)), this, SLOT(selectionChanged(int)));
 
-  // Get all AppFrameworkDemo_*.provisioning files
+  // Get all BlueBerryExampleLauncher_*.provisioning files
   QDir appDir(QApplication::applicationDirPath());
 #ifdef CMAKE_INTDIR
   appDir.cdUp();
@@ -54,12 +54,12 @@ AppFrameworkDemoDialog::AppFrameworkDemoDialog(QWidget *parent) :
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
-AppFrameworkDemoDialog::~AppFrameworkDemoDialog()
+BlueBerryExampleLauncherDialog::~BlueBerryExampleLauncherDialog()
 {
   delete ui;
 }
 
-QString AppFrameworkDemoDialog::getDemoConfiguration()
+QString BlueBerryExampleLauncherDialog::getDemoConfiguration()
 {
   this->show();
 
@@ -77,17 +77,17 @@ QString AppFrameworkDemoDialog::getDemoConfiguration()
   return QString();
 }
 
-void AppFrameworkDemoDialog::configurationSelected()
+void BlueBerryExampleLauncherDialog::configurationSelected()
 {
   eventLoop.exit(0);
 }
 
-void AppFrameworkDemoDialog::dialogCanceled()
+void BlueBerryExampleLauncherDialog::dialogCanceled()
 {
   eventLoop.exit(1);
 }
 
-void AppFrameworkDemoDialog::selectionChanged(int row)
+void BlueBerryExampleLauncherDialog::selectionChanged(int row)
 {
   if (row > -1)
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);

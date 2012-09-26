@@ -6,9 +6,11 @@ The following examples give an introduction to Blueberry...
 
 The source code of the examples can be found in mitk/Examples/Plugins/ \n
 
-Open the Examples by executing startAppFrameworkDemo_release.bat. All examples can be found among the shown list.
+Open the Examples by executing startBlueBerryExampleLauncher_release.bat
+(or startBlueBerryExampleLauncher_debug.bat depending on the configured build type).
+All examples can be found among the shown list.
 
-\image html AppFrameworkDemoDialog.png
+\image html BlueBerryExampleLauncherDialog.png
 
 \section ExampleSection Examples
 

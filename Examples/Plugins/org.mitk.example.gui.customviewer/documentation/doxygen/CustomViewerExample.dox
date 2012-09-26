@@ -35,9 +35,9 @@ Proceed to the previous page \ref org_mitk_example_gui_customviewer. Or proceed 
 
 \page ViewerPluginCreation Creating the CustomViewer plugin
 
-As we want to develop our Custom Viewer as part of BlueBerry to demonstrate the customization capabilities of the application framework, we have to integrate the components of our example application as BlueBerry plugins in order to make the application framework's functionalities available to our application. For example plugin startup with BlueBerry, a convenience framework called AppFrameworkDemo is already provided in the Examples directory of MITK. This Application Framework acts as a BlueBerry loading mechanism for any example application provided. 
+As we want to develop our Custom Viewer as part of BlueBerry to demonstrate the customization capabilities of the application framework, we have to integrate the components of our example application as BlueBerry plugins in order to make the application framework's functionalities available to our application. For example plugin startup with BlueBerry, a convenience application called BlueBerryExampleLauncher is already provided in the Examples/BlueBerryExampleLauncher directory of MITK. This application acts as a BlueBerry loading mechanism for any example application provided. 
 
-To make an application startable by the BlueBerry loader, we have to provide a folder inside Examples/Plugins containing all files making up the application plugin itself. Additionally, we have to add entries to the PluginList.cmake in the Examples/Plugins directory for plugin registration and create a new file in the Examples/AppFramework/Configurations folder containing the plugin itself as well as any further required plugin. 
+To make an example application startable by the BlueBerry example launcher, we have to provide a folder inside Examples/Plugins containing all files making up the application plugin itself. Additionally, we have to add entries to the PluginList.cmake in the Examples/Plugins directory for plugin registration and create a new file in the Examples/BlueBerryExampleLauncher/Configurations folder containing the plugin itself as well as any further required plugin. 
 
 The resulting plugin folder for our custom viewer application consists of several subfolders and files:
 
@@ -81,7 +81,7 @@ In order to connect our application and its perspectives to the BlueBerry compon
 
 \image html plugin_xml_0.png "Extension point contributions of our initial custom viewer application"
 
-When we start the AppFrameworkDemo, we can now choose our bulk application (among others present), and a window is presented showing our empty initial perspective.
+When we start the BlueBerryExampleLauncher (either directly or via the provided batch files), we can now choose our bulk application (among others present), and a window is presented showing our empty initial perspective.
 
 \image html MinimalApplicationWindow.png "Our first application window showing one single perspective"
 

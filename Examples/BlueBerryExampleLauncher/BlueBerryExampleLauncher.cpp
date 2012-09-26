@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QApplication>
 
-#include "AppFrameworkDemoDialog.h"
+#include "BlueBerryExampleLauncherDialog.h"
 
 class QSafeApplication : public QApplication
 {
@@ -67,10 +67,10 @@ public:
 int main(int argc, char** argv)
 {
   QSafeApplication safeApp(argc, argv);
-  safeApp.setApplicationName("AppFrameworkDemo");
+  safeApp.setApplicationName("BlueBerryExampleLauncher");
   safeApp.setOrganizationName("DKFZ");
 
-  AppFrameworkDemoDialog demoDialog;
+  BlueBerryExampleLauncherDialog demoDialog;
   QString selectedConfiguration = demoDialog.getDemoConfiguration();
 
   if (selectedConfiguration.isEmpty()) return EXIT_SUCCESS;

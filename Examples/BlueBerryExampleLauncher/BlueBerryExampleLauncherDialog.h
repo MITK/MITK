@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef APPFRAMEWORKDEMODIALOG_H
-#define APPFRAMEWORKDEMODIALOG_H
+#ifndef BLUEBERRYEXAMPLELAUNCHERDIALOG_H
+#define BLUEBERRYEXAMPLELAUNCHERDIALOG_H
 
 #include <QDialog>
 
@@ -24,16 +24,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 
 namespace Ui {
-class AppFrameworkDemoDialog;
+class BlueBerryExampleLauncherDialog;
 }
 
-class AppFrameworkDemoDialog : public QDialog
+class BlueBerryExampleLauncherDialog : public QDialog
 {
   Q_OBJECT
   
 public:
-  explicit AppFrameworkDemoDialog(QWidget *parent = 0);
-  ~AppFrameworkDemoDialog();
+  explicit BlueBerryExampleLauncherDialog(QWidget *parent = 0);
+  ~BlueBerryExampleLauncherDialog();
 
   QString getDemoConfiguration();
 
@@ -46,9 +46,9 @@ private:
   
 private:
 
-  Ui::AppFrameworkDemoDialog *ui;
+  Ui::BlueBerryExampleLauncherDialog *ui;
   QStringList provisioningFiles;
   QEventLoop eventLoop;
 };
 
-#endif // APPFRAMEWORKDEMODIALOG_H
+#endif // BLUEBERRYEXAMPLELAUNCHERDIALOG_H

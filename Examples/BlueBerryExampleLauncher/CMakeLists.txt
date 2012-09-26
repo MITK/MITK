@@ -1,16 +1,16 @@
-project(AppFrameworkDemo)
+project(BlueBerryExampleLauncher)
 
 set(_source_files
-  AppFrameworkDemo.cpp
-  AppFrameworkDemoDialog.cpp
+  BlueBerryExampleLauncher.cpp
+  BlueBerryExampleLauncherDialog.cpp
 )
 
 set(_source_moc_h_files
-  AppFrameworkDemoDialog.h
+  BlueBerryExampleLauncherDialog.h
 )
 
 set(_source_ui_files
-  AppFrameworkDemoDialog.ui
+  BlueBerryExampleLauncherDialog.ui
 )
 
 # this is a workaround for Visual Studio. The relative include paths in the generated

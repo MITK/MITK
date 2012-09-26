@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <memory>
+
 #include <usConfig.h>
 
 #include <usTestingMacros.h>

@@ -58,8 +58,10 @@ namespace mitk
 
     //==== GUI ====
     static const char* CONNECTOMICS_GUI_DASH;
+    static const char* CONNECTOMICS_GUI_CONNECTOMICS;
     static const char* CONNECTOMICS_GUI_CONNECTOMICS_CREATION;
     static const char* CONNECTOMICS_GUI_SELECTION_WARNING;
+    static const char* CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING;
     static const char* CONNECTOMICS_GUI_PERFORMING_IMAGE_PROCESSING_FOR_IMAGE;
 
     //==== Properties ====

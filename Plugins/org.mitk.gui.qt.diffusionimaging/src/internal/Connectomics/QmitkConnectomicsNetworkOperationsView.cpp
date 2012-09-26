@@ -115,12 +115,6 @@ void QmitkConnectomicsNetworkOperationsView::OnSelectionChanged( std::vector<mit
   this->WipeDisplay();
 
   // Valid options are either
-  // 1 image (parcellation)
-  //
-  // 1 image (parcellation)
-  // 1 fiber bundle
-  //
-  // 1 network
   if( nodes.size() > 2 )
   {
     return;
@@ -189,7 +183,7 @@ void QmitkConnectomicsNetworkOperationsView::OnConvertToRGBAImagePushButtonClick
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING);
+    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
     return;
   }
 
@@ -220,6 +214,16 @@ void QmitkConnectomicsNetworkOperationsView::OnConvertToRGBAImagePushButtonClick
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
+    else
+    {
+      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+      return;
+    }
+  }
+  else
+  {
+    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+    return;
   }
 }
 

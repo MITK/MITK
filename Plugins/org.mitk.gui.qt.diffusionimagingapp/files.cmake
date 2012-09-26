@@ -72,6 +72,8 @@ set(CACHED_RESOURCE_FILES
   resources/perspectives/phantomData2.png
   resources/perspectives/eye.png
   resources/perspectives/registration.xpm
+  resources/perspectives/chart.png
+  resources/perspectives/preprocessing.png
 )
 
 set(QRC_FILES

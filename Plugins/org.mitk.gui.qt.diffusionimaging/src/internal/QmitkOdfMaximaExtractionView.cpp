@@ -86,6 +86,8 @@ void QmitkOdfMaximaExtractionView::UpdateGui()
 
     if (!m_ImageNodes.empty() || !m_TensorImageNodes.empty())
     {
+        m_Controls->m_InputData->setTitle("Input Data");
+
         if (!m_TensorImageNodes.empty())
         {
             m_Controls->m_DwiFibLabel->setText(m_TensorImageNodes.front()->GetName().c_str());
@@ -104,7 +106,7 @@ void QmitkOdfMaximaExtractionView::UpdateGui()
         }
     }
     else
-        m_Controls->m_DwiFibLabel->setText("-");
+        m_Controls->m_DwiFibLabel->setText("<font color='red'>mandatory</font>");
 
 
     if (m_ImageNodes.empty())
@@ -124,7 +126,7 @@ void QmitkOdfMaximaExtractionView::UpdateGui()
     }
     else
     {
-        m_Controls->m_MaskLabel->setText("-");
+        m_Controls->m_MaskLabel->setText("<font color='grey'>optional</font>");
     }
 }
 
@@ -627,15 +629,12 @@ void QmitkOdfMaximaExtractionView::StdMultiWidgetNotAvailable()
 
 void QmitkOdfMaximaExtractionView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-    if ( !this->IsVisible() )
-    {
-        // do nothing if nobody wants to see me :-(
-        return;
-    }
+    m_Controls->m_InputData->setTitle("Please Select Input Data");
+    m_Controls->m_DwiFibLabel->setText("<font color='red'>mandatory</font>");
+    m_Controls->m_MaskLabel->setText("<font color='grey'>optional</font>");
 
     m_BinaryImageNodes.clear();
     m_ImageNodes.clear();
-    m_QballImageNodes.clear();
     m_TensorImageNodes.clear();
 
     // iterate all selected objects, adjust warning visibility
@@ -643,11 +642,7 @@ void QmitkOdfMaximaExtractionView::OnSelectionChanged( std::vector<mitk::DataNod
     {
         mitk::DataNode::Pointer node = *it;
 
-        if ( node.IsNotNull() && dynamic_cast<mitk::QBallImage*>(node->GetData()) )
-        {
-            m_QballImageNodes.push_back(node);
-        }
-        else if ( node.IsNotNull() && dynamic_cast<mitk::TensorImage*>(node->GetData()) )
+        if ( node.IsNotNull() && dynamic_cast<mitk::TensorImage*>(node->GetData()) )
         {
             m_TensorImageNodes.push_back(node);
         }

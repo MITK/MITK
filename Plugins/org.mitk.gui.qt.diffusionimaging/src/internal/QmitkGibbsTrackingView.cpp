@@ -370,13 +370,19 @@ void QmitkGibbsTrackingView::UpdateTrackingStatus()
 void QmitkGibbsTrackingView::UpdateGUI()
 {
     if (m_ImageNode.IsNotNull())
+    {
         m_Controls->m_QballImageLabel->setText(m_ImageNode->GetName().c_str());
+        m_Controls->m_DataFrame->setTitle("Input Data");
+    }
     else
-        m_Controls->m_QballImageLabel->setText("-");
+    {
+        m_Controls->m_QballImageLabel->setText("<font color='red'>mandatory</font>");
+        m_Controls->m_DataFrame->setTitle("Please Select Input Data");
+    }
     if (m_MaskImageNode.IsNotNull())
         m_Controls->m_MaskImageLabel->setText(m_MaskImageNode->GetName().c_str());
     else
-        m_Controls->m_MaskImageLabel->setText("-");
+        m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
 
     if (!m_ThreadIsRunning && m_ImageNode.IsNotNull())
     {

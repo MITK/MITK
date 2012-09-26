@@ -137,12 +137,9 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
     m_TensorImage = NULL;
     m_SeedRoi = NULL;
     m_MaskImage = NULL;
-    m_Controls->m_TensorImageLabel->setText("-");
-    m_Controls->m_RoiImageLabel->setText("-");
-    m_Controls->m_MaskImageLabel->setText("-");
-
-    if(nodes.empty())
-        return;
+    m_Controls->m_TensorImageLabel->setText("<font color='red'>mandatory</font>");
+    m_Controls->m_RoiImageLabel->setText("<font color='grey'>optional</font>");
+    m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
 
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
     {
@@ -174,10 +171,16 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
         }
     }
 
-    if(m_TensorImage.IsNotNull())
+    if(m_TensorImageNode.IsNotNull())
+    {
+        m_Controls->m_InputData->setTitle("Input Data");
         m_Controls->commandLinkButton->setEnabled(true);
+    }
     else
+    {
+        m_Controls->m_InputData->setTitle("Please Select Input Data");
         m_Controls->commandLinkButton->setEnabled(false);
+    }
 }
 
 

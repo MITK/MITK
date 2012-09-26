@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>499</width>
-    <height>652</height>
+    <width>430</width>
+    <height>401</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -62,13 +62,13 @@
          <item>
           <widget class="QToolButton" name="m_Reinit">
            <property name="toolTip">
-            <string comment="Reinit view" extracomment="Reinit view">Reinit view</string>
+            <string>Reinit view</string>
            </property>
            <property name="statusTip">
-            <string comment="Reinit view" extracomment="Reinit view">Reinit view</string>
+            <string/>
            </property>
            <property name="whatsThis">
-            <string comment="Reinit view" extracomment="Reinit view">Reinit view</string>
+            <string/>
            </property>
            <property name="text">
             <string/>
@@ -84,13 +84,13 @@
          <item>
           <widget class="QToolButton" name="m_TextureIntON">
            <property name="toolTip">
-            <string comment="Texture interpolation ON" extracomment="Texture interpolation ON">Texture interpolation ON</string>
+            <string>Texture interpolation ON</string>
            </property>
            <property name="statusTip">
-            <string comment="Texture interpolation ON" extracomment="Texture interpolation ON">Texture interpolation ON</string>
+            <string/>
            </property>
            <property name="whatsThis">
-            <string comment="Texture interpolation ON" extracomment="Texture interpolation ON">Texture interpolation ON</string>
+            <string/>
            </property>
            <property name="text">
             <string/>
@@ -106,13 +106,13 @@
          <item>
           <widget class="QToolButton" name="m_VisibleOdfsON_T">
            <property name="toolTip">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+            <string>Toggle visibility of ODF glyphs (axial)</string>
            </property>
            <property name="statusTip">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+            <string/>
            </property>
            <property name="whatsThis">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+            <string/>
            </property>
            <property name="text">
             <string/>
@@ -133,13 +133,13 @@
          <item>
           <widget class="QToolButton" name="m_VisibleOdfsON_S">
            <property name="toolTip">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+            <string>Toggle visibility of ODF glyphs (sagittal)</string>
            </property>
            <property name="statusTip">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+            <string/>
            </property>
            <property name="whatsThis">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+            <string/>
            </property>
            <property name="text">
             <string/>
@@ -160,13 +160,13 @@
          <item>
           <widget class="QToolButton" name="m_VisibleOdfsON_C">
            <property name="toolTip">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+            <string>Toggle visibility of ODF glyphs (coronal)</string>
            </property>
            <property name="statusTip">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+            <string/>
            </property>
            <property name="whatsThis">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+            <string/>
            </property>
            <property name="text">
             <string/>
@@ -187,13 +187,13 @@
          <item>
           <widget class="QToolButton" name="m_TSMenu">
            <property name="toolTip">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Multislice Projection</string>
+            <string>Multislice Projection</string>
            </property>
            <property name="statusTip">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Multislice Projection</string>
+            <string/>
            </property>
            <property name="whatsThis">
-            <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Multislice Projection</string>
+            <string/>
            </property>
            <property name="text">
             <string>MIP</string>
@@ -388,7 +388,11 @@
                 </widget>
                </item>
                <item>
-                <widget class="QDoubleSpinBox" name="m_ScalingFactor"/>
+                <widget class="QDoubleSpinBox" name="m_ScalingFactor">
+                 <property name="toolTip">
+                  <string>Additional scaling factor</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -420,6 +424,9 @@
             </item>
             <item row="0" column="0">
              <widget class="QComboBox" name="m_NormalizationDropdown">
+              <property name="toolTip">
+               <string>ODF normalization</string>
+              </property>
               <property name="frame">
                <bool>false</bool>
               </property>
@@ -905,13 +912,6 @@ p, li { white-space: pre-wrap; }
       </size>
      </property>
     </spacer>
-   </item>
-   <item>
-    <widget class="QToolButton" name="m_Welcome">
-     <property name="text">
-      <string>Show Welcome Screen</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

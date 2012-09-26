@@ -1414,9 +1414,12 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
     //If more than one time step add postfix ".t" + timestep
     if(timeStep != 0)
     {
-      propertyKeySliceLocation.append(".t" + timeStep);
-      propertyKeyInstanceNumber.append(".t" + timeStep);
-      propertyKeySOPInstanceNumber.append(".t" + timeStep);
+      std::ostringstream postfix;
+      postfix << ".t" << timeStep;
+
+      propertyKeySliceLocation.append(postfix.str());
+      propertyKeyInstanceNumber.append(postfix.str());
+      propertyKeySOPInstanceNumber.append(postfix.str());
     }
     image->SetProperty( propertyKeySliceLocation.c_str(), StringLookupTableProperty::New( sliceLocationForSlices ) );
     image->SetProperty( propertyKeyInstanceNumber.c_str(), StringLookupTableProperty::New( instanceNumberForSlices ) );

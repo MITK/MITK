@@ -74,23 +74,12 @@ void QmitkToFConnectionWidget2::CreateConnections()
   {
     connect( (QObject*)(m_Controls->m_ConnectCameraButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnConnectCamera()) );
 
+ //todo finde ein equivalent: zB currentIndexChanged in Keno's Widget???  ServiceProperties deviceProps -> ServiceSelectionChanged(ServiceReference)
+    //std::string CamName =mitk::ToFCameraMITKPlayerDevice::TOF_INTERFACE_NAME;
 
-    //QString slectedCamera = m_Controls->m_DeviceList->GetSelectedService<mitk::ToFCameraDevice>();
 
-    ////todo finde ein equivalent: zB currentIndexChanged in Keno's Widget???  ServiceProperties deviceProps -> ServiceSelectionChanged(ServiceReference)
-    //    std::string CamName = ServiceProperties.GetProperty();
-
-    //              mitk::Any prop = ServiceProperties.GetProperty(deviceProps);
-    //              if (prop.Empty())
-    //              {
-    //                MITK_WARN << "QmitkServiceListWidget tried to resolve property '" + m_NamingProperty + "' but failed. Resorting to interface name for display.";
-    //                caption = m_Interface;
-    //              }
-    //              else
-    //                caption = prop.ToString();
-
-    //    QString selectedCam(CamName);
-
+    QString selectedCam= QString::fromStdString(mitk::ToFCameraMITKPlayerDevice::TOF_INTERFACE_NAME);
+    connect( m_Controls->m_DeviceList, SIGNAL(ServiceSelectionChanged()), this, SLOT(OnConnectCamera(selectedCam)));
 
     //connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(OnSelectCamera(const QString)) );
     //connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SLOT(OnSelectCamera(const QString)) );

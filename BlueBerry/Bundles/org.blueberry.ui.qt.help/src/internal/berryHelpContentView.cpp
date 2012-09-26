@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -107,6 +107,21 @@ bool HelpContentWidget::searchContentItem(QHelpContentModel *model,
   return false;
 }
 
+QUrl HelpContentWidget::GetUrl(const QModelIndex &index)
+{
+  QHelpContentModel *contentModel = qobject_cast<QHelpContentModel*>(m_SourceModel);
+  if (!contentModel)
+    return 0;
+
+  QHelpContentItem *item = contentModel->contentItemAt(m_SortModel->mapToSource(index));
+  if (!item)
+    return 0;
+  QUrl url = item->url();
+    if (url.isValid())
+      return url;
+  return 0;
+}
+
 void HelpContentWidget::showLink(const QModelIndex &index)
 {
   QHelpContentModel *contentModel = qobject_cast<QHelpContentModel*>(m_SourceModel);
@@ -167,27 +182,26 @@ void HelpContentView::showContextMenu(const QPoint &pos)
   if (!m_ContentWidget->indexAt(pos).isValid())
       return;
 
-  QHelpContentModel* contentModel =
-      qobject_cast<QHelpContentModel*>(m_ContentWidget->model());
-  QHelpContentItem *itm =
-      contentModel->contentItemAt(m_ContentWidget->currentIndex());
+  QModelIndex index = m_ContentWidget->indexAt(pos);
+  QUrl url = m_ContentWidget->GetUrl(index);
 
   QMenu menu;
   QAction *curTab = menu.addAction(tr("Open Link"));
   QAction *newTab = menu.addAction(tr("Open Link in New Tab"));
-  if (!HelpWebView::canOpenPage(itm->url().path()))
-      newTab->setEnabled(false);
+
+  if (!HelpWebView::canOpenPage(url.path()))
+    newTab->setEnabled(false);
 
   menu.move(m_ContentWidget->mapToGlobal(pos));
 
   QAction *action = menu.exec();
   if (curTab == action)
   {
-    linkActivated(itm->url());
+    linkActivated(url);
   }
   else if (newTab == action)
   {
-    IEditorInput::Pointer input(new HelpEditorInput(itm->url()));
+    IEditorInput::Pointer input(new HelpEditorInput(url));
     this->GetSite()->GetPage()->OpenEditor(input, HelpEditor::EDITOR_ID);
   }
 }

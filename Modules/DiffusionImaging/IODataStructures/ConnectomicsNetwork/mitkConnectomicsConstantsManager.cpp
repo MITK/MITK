@@ -46,8 +46,10 @@ const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_CAN_NOT_COM
 
 //==== GUI ====
 const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH = "-";
+const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS = "Connectomics";
 const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION = "Connectomics Creation";
 const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING = "Please load and select exactly one parcellation image and one fiber image before starting network creation.";
+const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING = "Please load and select one parcellation image.";
 const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_PERFORMING_IMAGE_PROCESSING_FOR_IMAGE = "Performing image processing for image ";
 
 //==== Properties ====

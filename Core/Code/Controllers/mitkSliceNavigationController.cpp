@@ -631,9 +631,9 @@ SliceNavigationController
         if ( baseRenderer )
           if ( baseRenderer->GetMapperID() == 1 )
           {
-            PointOperation* doOp = new mitk::PointOperation(OpMOVE, posEvent->GetWorldPosition());
+            PointOperation doOp(OpMOVE, posEvent->GetWorldPosition());
 
-            this->ExecuteOperation( doOp );
+            this->ExecuteOperation( &doOp );
 
             // If click was performed in this render window than we have to update the status bar information about position and pixel value.
             if(baseRenderer == m_Renderer)

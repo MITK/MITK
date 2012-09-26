@@ -27,24 +27,22 @@ mitk::PlanePositionManagerService::PlanePositionManagerService()
 
 mitk::PlanePositionManagerService::~PlanePositionManagerService()
 {
-  for (unsigned int i = 0; i < m_PositionList.size(); i++)
-  {
-    delete m_PositionList.at(i);
-  }
+  for (unsigned int i = 0; i < m_PositionList.size(); ++i)
+    delete m_PositionList[i];
 }
 
 unsigned int mitk::PlanePositionManagerService::AddNewPlanePosition ( const Geometry2D* plane, unsigned int sliceIndex )
 {
-    for (unsigned int i = 0; i < m_PositionList.size(); i++)
+    for (unsigned int i = 0; i < m_PositionList.size(); ++i)
     {
-        if (m_PositionList.at(i) != 0)
+        if (m_PositionList[i] != 0)
         {
             bool isSameMatrix(true);
             bool isSameOffset(true);
-            isSameOffset =  mitk::Equal(m_PositionList.at(i)->GetTransform()->GetOffset(), plane->GetIndexToWorldTransform()->GetOffset());
-            if(!isSameOffset || sliceIndex != m_PositionList.at(i)->GetPos())
+            isSameOffset =  mitk::Equal(m_PositionList[i]->GetTransform()->GetOffset(), plane->GetIndexToWorldTransform()->GetOffset());
+            if(!isSameOffset || sliceIndex != m_PositionList[i]->GetPos())
                 continue;
-            isSameMatrix = mitk::MatrixEqualElementWise(m_PositionList.at(i)->GetTransform()->GetMatrix(), plane->GetIndexToWorldTransform()->GetMatrix());
+            isSameMatrix = mitk::MatrixEqualElementWise(m_PositionList[i]->GetTransform()->GetMatrix(), plane->GetIndexToWorldTransform()->GetMatrix());
             if(isSameMatrix)
                 return i;
         }
@@ -76,8 +74,9 @@ bool mitk::PlanePositionManagerService::RemovePlanePosition( unsigned int ID )
 {
   if (m_PositionList.size() > ID)
   {
-      m_PositionList.erase(m_PositionList.begin()+ID);
-      return true;
+    delete m_PositionList[ID];
+    m_PositionList.erase(m_PositionList.begin()+ID);
+    return true;
   }
   else
   {
@@ -89,12 +88,12 @@ mitk::RestorePlanePositionOperation* mitk::PlanePositionManagerService::GetPlane
 {
   if ( ID < m_PositionList.size() )
   {
-    return m_PositionList.at(ID);
+    return m_PositionList[ID];
   }
   else
   {
-      MITK_WARN<<"GetPlanePosition returned NULL!";
-      return 0;
+    MITK_WARN<<"GetPlanePosition returned NULL!";
+    return 0;
   }
 }
 
@@ -105,5 +104,8 @@ unsigned int mitk::PlanePositionManagerService::GetNumberOfPlanePositions()
 
 void mitk::PlanePositionManagerService::RemoveAllPlanePositions()
 {
+  for (unsigned int i = 0; i < m_PositionList.size(); ++i)
+    delete m_PositionList[i];
+
   m_PositionList.clear();
 }

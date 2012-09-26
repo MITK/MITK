@@ -83,6 +83,9 @@ void mitk::Interactor::CreateModeOperation(ModeType mode)
     m_UndoController->SetOperationEvent(operationEvent);
   }
   this->ExecuteOperation(doOp);
+
+  if (!m_UndoEnabled)
+    delete doOp;
 }
 
 bool mitk::Interactor::OnModeDeselect(Action* /*action*/, StateEvent const*)

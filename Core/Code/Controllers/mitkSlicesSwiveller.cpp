@@ -332,7 +332,7 @@ bool SlicesSwiveller
         }
       }
 
-      StateEvent *newStateEvent( NULL );
+      std::auto_ptr<StateEvent> newStateEvent;
 
       mitk::Line3D line;
       mitk::Point3D point;
@@ -345,7 +345,7 @@ bool SlicesSwiveller
         if ( m_CenterOfRotation.EuclideanDistanceTo( cursor ) 
            < ThresholdDistancePixels )
         {
-          newStateEvent = new StateEvent(EIDNO, stateEvent->GetEvent());
+          newStateEvent.reset(new StateEvent(EIDNO, stateEvent->GetEvent()));
         }
         else
         {
@@ -369,16 +369,15 @@ bool SlicesSwiveller
           m_PreviousRotationAxis[2] = 1.0;
           m_PreviousRotationAngle = 0.0;
 
-          newStateEvent = new StateEvent(EIDYES, stateEvent->GetEvent());
+          newStateEvent.reset(new StateEvent(EIDYES, stateEvent->GetEvent()));
         }
       }
       else
       {
-        newStateEvent = new StateEvent(EIDNO, stateEvent->GetEvent());
+        newStateEvent.reset(new StateEvent(EIDNO, stateEvent->GetEvent()));
       }
     
-      this->HandleEvent( newStateEvent );
-      delete newStateEvent;
+      this->HandleEvent( newStateEvent.get() );
 
       ok = true;
       break;

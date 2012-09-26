@@ -119,5 +119,11 @@
 /**
   \defgroup MITKPlugins MITK Plugins
   
-  \brief This group includes all MITK Plugins
+  \brief This group includes all MITK Plugins.
+*/
+
+/**
+  \defgroup MITKExamplePlugins MITK Example Plugins
+  
+  \brief This group includes all MITK example plugins demonstrating specific framework features.
 */

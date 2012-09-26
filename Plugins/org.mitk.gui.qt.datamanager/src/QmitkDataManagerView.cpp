@@ -642,7 +642,7 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
 
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
-  mitk::IRenderWindowPart* renderWindow = this->OpenRenderWindowPart();
+  mitk::IRenderWindowPart* renderWindow = this->OpenRenderWindowPart(false);
 
   QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
 
@@ -920,7 +920,14 @@ void QmitkDataManagerView::ShowIn(const QString &editorId)
   page->OpenEditor(input, editorId.toStdString(), false, berry::IWorkbenchPage::MATCH_ID);
 }
 
-mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart()
+mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart(bool activatedEditor)
 {
-  return this->GetRenderWindowPart(QmitkAbstractView::ACTIVATE | QmitkAbstractView::OPEN);
+  if (activatedEditor)
+  {
+    return this->GetRenderWindowPart(QmitkAbstractView::ACTIVATE | QmitkAbstractView::OPEN);
+  }
+  else
+  {
+    return this->GetRenderWindowPart(QmitkAbstractView::BRING_TO_FRONT | QmitkAbstractView::OPEN);
+  }
 }

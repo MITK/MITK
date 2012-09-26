@@ -19,27 +19,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
-  /////////////////////////////////////////////////////
-  // all di-app perspectives should have the following:
-  /////////////////////////////////////////////////////
-
   std::string editorArea = layout->GetEditorArea();
 
   layout->AddStandaloneView("org.mitk.views.datamanager",
     false, berry::IPageLayout::LEFT, 0.3f, editorArea);
 
   layout->AddStandaloneView("org.mitk.views.controlvisualizationpropertiesview",
-    false, berry::IPageLayout::BOTTOM, .2f, "org.mitk.views.datamanager");
+    false, berry::IPageLayout::BOTTOM, .15f, "org.mitk.views.datamanager");
 
   berry::IFolderLayout::Pointer left =
-    layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
-    berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
+    layout->CreateFolder("org.mitk.views.leftcontrols2",
+    berry::IPageLayout::BOTTOM, 0.1f, "org.mitk.views.controlvisualizationpropertiesview");
+
+  berry::IFolderLayout::Pointer bottomleft =
+    layout->CreateFolder("org.mitk.views.leftcontrols",
+    berry::IPageLayout::BOTTOM, 0.5f, "org.mitk.views.leftcontrols2");
 
   layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
-    berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols", false);
+    berry::IPageLayout::BOTTOM, .6f, "org.mitk.views.leftcontrols", false);
 
   /////////////////////////////////////////////
-  // here goes the perspective specific stuff
+  // add the views
   /////////////////////////////////////////////
 
   left->AddView("org.mitk.views.diffusionpreprocessing");
@@ -54,11 +54,15 @@ void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry
   lo = layout->GetViewLayout("org.mitk.views.qballreconstruction");
   lo->SetCloseable(false);
 
-  left->AddView("org.mitk.views.odfdetails");
-  lo = layout->GetViewLayout("org.mitk.views.odfdetails");
-  lo->SetCloseable(false);
+  bottomleft->AddView("org.mitk.views.diffusionquantification");
+  berry::IViewLayout::Pointer lo2 = layout->GetViewLayout("org.mitk.views.diffusionquantification");
+  lo2->SetCloseable(false);
 
-  left->AddView("org.mitk.views.odfmaximaextraction");
+  bottomleft->AddView("org.mitk.views.odfmaximaextraction");
   layout->GetViewLayout("org.mitk.views.odfmaximaextraction");
-  lo->SetCloseable(false);
+  lo2->SetCloseable(false);
+
+  bottomleft->AddView("org.mitk.views.odfdetails");
+  lo2 = layout->GetViewLayout("org.mitk.views.odfdetails");
+  lo2->SetCloseable(false);
 }

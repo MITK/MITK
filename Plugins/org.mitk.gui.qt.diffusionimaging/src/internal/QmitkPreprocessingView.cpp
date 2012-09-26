@@ -165,6 +165,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
 
     if (foundDwiVolume)
     {
+        m_Controls->m_InputData->setTitle("Input Data");
         vnl_matrix_fixed< double, 3, 3 > mf = m_DiffusionImage->GetMeasurementFrame();
         for (int r=0; r<3; r++)
             for (int c=0; c<3; c++)
@@ -233,7 +234,8 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
         m_Controls->m_BvalueTable->setHorizontalHeaderLabels(headerList);
         m_Controls->m_BvalueTable->setItem(0,0,new QTableWidgetItem("-"));
         m_Controls->m_BvalueTable->setItem(0,1,new QTableWidgetItem("-"));
-        m_Controls->m_DiffusionImageLabel->setText("-");
+        m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
+        m_Controls->m_InputData->setTitle("Please Select Input Data");
     }
 }
 

@@ -29,11 +29,11 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
     false, berry::IPageLayout::LEFT, 0.3f, editorArea);
 
   layout->AddStandaloneView("org.mitk.views.controlvisualizationpropertiesview",
-    false, berry::IPageLayout::BOTTOM, .2f, "org.mitk.views.datamanager");
+    false, berry::IPageLayout::BOTTOM, .15f, "org.mitk.views.datamanager");
 
   berry::IFolderLayout::Pointer left =
     layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
-    berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
+    berry::IPageLayout::BOTTOM, 0.1f, "org.mitk.views.controlvisualizationpropertiesview");
 
   layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
     berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols", false);
@@ -42,20 +42,19 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.diffusionquantification");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.diffusionquantification");
-  lo->SetCloseable(false);
-
   left->AddView("org.mitk.views.partialvolumeanalysisview");
-  lo = layout->GetViewLayout("org.mitk.views.partialvolumeanalysisview");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.partialvolumeanalysisview");
   lo->SetCloseable(false);
 
-  left->AddView("org.mitk.views.measurement");
-  lo = layout->GetViewLayout("org.mitk.views.measurement");
+  left->AddView("org.mitk.views.tractbasedspatialstatistics");
+  lo = layout->GetViewLayout("org.mitk.views.tractbasedspatialstatistics");
   lo->SetCloseable(false);
 
   left->AddView("org.mitk.views.imagestatistics");
   lo = layout->GetViewLayout("org.mitk.views.imagestatistics");
   lo->SetCloseable(false);
 
+  left->AddView("org.mitk.views.measurement");
+  lo = layout->GetViewLayout("org.mitk.views.measurement");
+  lo->SetCloseable(false);
 }

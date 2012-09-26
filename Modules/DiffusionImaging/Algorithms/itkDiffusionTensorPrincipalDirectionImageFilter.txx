@@ -100,7 +100,6 @@ void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType,
 TPDPixelType>
 ::AfterThreadedGenerateData()
 {
-    MITK_INFO << "Generating vector field";
     vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints>    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
@@ -114,13 +113,8 @@ TPDPixelType>
     if (spacing[2]<minSpacing)
         minSpacing = spacing[2];
 
-    int maxProgress = directionImage->GetLargestPossibleRegion().GetSize()[0]*directionImage->GetLargestPossibleRegion().GetSize()[1]*directionImage->GetLargestPossibleRegion().GetSize()[2];
-    boost::progress_display disp(maxProgress);
-
     while( !it.IsAtEnd() )
     {
-        ++disp;
-
         typename OutputImageType::IndexType index = it.GetIndex();
         if (m_MaskImage->GetPixel(index)==0)
         {

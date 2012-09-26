@@ -6,66 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>955</height>
+    <width>392</width>
+    <height>739</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="2" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Output</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_2">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="m_OutputVectorFieldBox">
-        <property name="toolTip">
-         <string>Only for visualization purposes! The vectors are automatically corrected for image spacing and for the largest eigenvalue in case of the tensor peak extraction.</string>
-        </property>
-        <property name="text">
-         <string>Vector Field</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
-        <property name="toolTip">
-         <string>Output unsigned char image containing the number of directions per voxel.</string>
-        </property>
-        <property name="text">
-         <string>#Directions per Voxel</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="m_OutputDirectionImagesBox">
-        <property name="toolTip">
-         <string>Output one image per extracted direction containing the direction vecors as pixel values.</string>
-        </property>
-        <property name="text">
-         <string>Direction Images</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="5" column="0">
+   <item row="3" column="0">
     <widget class="QCommandLinkButton" name="m_GenerateImageButton">
      <property name="enabled">
       <bool>false</bool>
@@ -79,9 +28,9 @@
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox_3">
+    <widget class="QGroupBox" name="m_InputData">
      <property name="title">
-      <string>Data</string>
+      <string>Please Select Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
       <item row="0" column="0">
@@ -104,85 +53,24 @@
       <item row="0" column="1">
        <widget class="QLabel" name="m_DwiFibLabel">
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="m_MaskLabel">
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="11" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>259</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="0">
-    <widget class="QCommandLinkButton" name="m_StartTensor">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="toolTip">
-      <string>Extract principal eigenvectors of input tensors.</string>
-     </property>
-     <property name="text">
-      <string>Start Tensor Principal Direction Extraction</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0">
-    <widget class="QGroupBox" name="groupBox_4">
-     <property name="title">
-      <string>Convert FSL Files</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_7">
-      <item row="1" column="0">
-       <widget class="QCommandLinkButton" name="m_ConvertShFromFsl">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Generate Q-Ball image and MITK compatible SH coefficient from the FSL qboot SH output.</string>
-        </property>
-        <property name="text">
-         <string>Convert SH - Coefficients</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCommandLinkButton" name="m_ConvertFromFsl">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Generate vector field and direction images from the FSL qboot peak extraction output.</string>
-        </property>
-        <property name="text">
-         <string>Convert Peak Image</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="0">
+   <item row="5" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>fODF Generation</string>
+      <string>Parameters</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
@@ -326,7 +214,7 @@
             <double>0.010000000000000</double>
            </property>
            <property name="value">
-            <double>0.100000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -390,7 +278,55 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="15" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>259</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="14" column="0">
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Convert FSL Files</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_7">
+      <item row="1" column="0">
+       <widget class="QCommandLinkButton" name="m_ConvertShFromFsl">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Generate Q-Ball image and MITK compatible SH coefficient from the FSL qboot SH output.</string>
+        </property>
+        <property name="text">
+         <string>Convert SH - Coefficients</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCommandLinkButton" name="m_ConvertFromFsl">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Generate vector field and direction images from the FSL qboot peak extraction output.</string>
+        </property>
+        <property name="text">
+         <string>Convert Peak Image</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
     <widget class="QCommandLinkButton" name="m_StartFiniteDiff">
      <property name="enabled">
       <bool>false</bool>
@@ -401,6 +337,70 @@
      <property name="text">
       <string>Start Finite Differences Extraction</string>
      </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QCommandLinkButton" name="m_StartTensor">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="toolTip">
+      <string>Extract principal eigenvectors of input tensors.</string>
+     </property>
+     <property name="text">
+      <string>Start Tensor Principal Direction Extraction</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Output</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="m_OutputVectorFieldBox">
+        <property name="toolTip">
+         <string>Only for visualization purposes! The vectors are automatically corrected for image spacing and for the largest eigenvalue in case of the tensor peak extraction.</string>
+        </property>
+        <property name="text">
+         <string>Vector Field</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
+        <property name="toolTip">
+         <string>Output unsigned char image containing the number of directions per voxel.</string>
+        </property>
+        <property name="text">
+         <string>#Directions per Voxel</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="m_OutputDirectionImagesBox">
+        <property name="toolTip">
+         <string>Output one image per extracted direction containing the direction vecors as pixel values.</string>
+        </property>
+        <property name="text">
+         <string>Direction Images</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

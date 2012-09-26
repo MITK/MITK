@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
-    <height>553</height>
+    <width>340</width>
+    <height>258</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -29,7 +29,33 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <item row="3" column="0">
+   <item row="1" column="0">
+    <widget class="QCommandLinkButton" name="commandLinkButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Start Tractography</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <spacer name="spacer1">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>220</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Parameters</string>
@@ -138,85 +164,46 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="0">
-    <spacer name="spacer1">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Expanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>220</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="4" column="0">
-    <widget class="QCommandLinkButton" name="commandLinkButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Start Tracking</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="m_InputData">
      <property name="title">
-      <string>Data</string>
+      <string>Please Select Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Diffusion Image:</string>
+         <string>Raw DWI:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="m_DiffusionImageLabel">
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Seed ROI Image:</string>
+         <string>Seed ROI:</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="m_RoiImageLabel">
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="m_MaxCacheSizeLabel_2">
-     <property name="toolTip">
-      <string>Likelihood cache in Megabytes.</string>
-     </property>
-     <property name="text">
-      <string>Friman et al. IEEE Transactions on Medical Imaging 2006</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <tabstops>
-  <tabstop>commandLinkButton</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

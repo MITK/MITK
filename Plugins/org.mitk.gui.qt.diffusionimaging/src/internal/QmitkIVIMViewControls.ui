@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>360</width>
-    <height>922</height>
+    <height>928</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -45,36 +45,51 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="m_InputData">
      <property name="title">
-      <string>Data</string>
+      <string>Please Select Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QLabel" name="label_7">
+        <property name="toolTip">
+         <string>DWI to analyze</string>
+        </property>
         <property name="text">
-         <string>Diffusion Image:</string>
+         <string>Raw DWI:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="m_DiffusionImageLabel">
+        <property name="toolTip">
+         <string>DWI to analyze</string>
+        </property>
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_8">
+        <property name="toolTip">
+         <string>Optional ROI image</string>
+        </property>
         <property name="text">
-         <string>Mask Image:</string>
+         <string>ROI:</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="m_MaskImageLabel">
+        <property name="toolTip">
+         <string>Optional ROI image</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -180,6 +195,9 @@
          </item>
          <item row="0" column="1">
           <widget class="QScrollBar" name="m_BThreshSlider">
+           <property name="toolTip">
+            <string/>
+           </property>
            <property name="maximum">
             <number>250</number>
            </property>
@@ -301,6 +319,9 @@
                 <width>15</width>
                 <height>16777215</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string>Calculate threshold from histogram</string>
               </property>
               <property name="text">
                <string>*</string>
@@ -465,6 +486,9 @@
                 <height>16777215</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Calculate threshold from histogram</string>
+              </property>
               <property name="text">
                <string>*</string>
               </property>
@@ -607,24 +631,13 @@
       <item>
        <widget class="QLabel" name="m_Warning">
         <property name="styleSheet">
-         <string notr="true">color: rgb(255, 0, 0);
-font: 75 14pt &quot;Ubuntu&quot;;</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>warning display</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="m_DisplayResultsCheckbox">
-        <property name="text">
-         <string>display voxel-wise results</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -712,18 +725,18 @@ font: 75 14pt &quot;Ubuntu&quot;;</string>
             <item>
              <widget class="QPushButton" name="m_CurveClipboard">
               <property name="text">
-               <string>Curve to Clipboard</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="m_ValuesClipboard">
-              <property name="text">
-               <string>Values to Clipboard</string>
+               <string>Datapoints to Clipboard</string>
               </property>
              </widget>
             </item>
            </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_ValuesClipboard">
+           <property name="text">
+            <string>Parameters to Clipboard</string>
+           </property>
           </widget>
          </item>
          <item>

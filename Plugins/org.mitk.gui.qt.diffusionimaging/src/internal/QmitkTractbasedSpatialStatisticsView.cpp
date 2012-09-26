@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -216,7 +216,7 @@ struct TbssSelListener : ISelectionListener
       }
       else if(found3dImage == true && foundFiberBundle)
       {
-        m_View->PlotFiberBundle(fib, img);        
+        m_View->PlotFiberBundle(fib, img);
       }
 
       if(found3dImage)
@@ -257,7 +257,7 @@ QmitkTractbasedSpatialStatisticsView::QmitkTractbasedSpatialStatisticsView()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
 {
-  
+
 }
 
 QmitkTractbasedSpatialStatisticsView::~QmitkTractbasedSpatialStatisticsView()
@@ -273,7 +273,7 @@ void QmitkTractbasedSpatialStatisticsView::PerformChange()
 void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
   //datamanager selection changed
-  if (!this->IsActivated())  
+  if (!this->IsActivated())
     return;
 
 
@@ -326,7 +326,7 @@ void QmitkTractbasedSpatialStatisticsView::InitPointsets()
     m_P1->SetData( m_PointSetNode );
     m_P1->SetProperty( "name", mitk::StringProperty::New( "PointSet" ) );
     m_P1->SetProperty( "opacity", mitk::FloatProperty::New( 1 ) );
-    m_P1->SetProperty( "helper object", mitk::BoolProperty::New(false) ); // CHANGE if wanted
+    m_P1->SetProperty( "helper object", mitk::BoolProperty::New(true) ); // CHANGE if wanted
     m_P1->SetProperty( "pointsize", mitk::FloatProperty::New( 0.1 ) );
     m_P1->SetColor( 1.0, 0.0, 0.0 );
     this->GetDefaultDataStorage()->Add(m_P1);
@@ -342,7 +342,7 @@ void QmitkTractbasedSpatialStatisticsView::CreateQtPartControl( QWidget *parent 
   {
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkTractbasedSpatialStatisticsViewControls;
-    m_Controls->setupUi( parent ); 
+    m_Controls->setupUi( parent );
     this->CreateConnections();
   }
 
@@ -382,14 +382,14 @@ void QmitkTractbasedSpatialStatisticsView::Deactivated()
 void QmitkTractbasedSpatialStatisticsView::CreateConnections()
 {
   if ( m_Controls )
-  {    
+  {
     connect( (QObject*)(m_Controls->m_CreateRoi), SIGNAL(clicked()), this, SLOT(CreateRoi()) );
     connect( (QObject*)(m_Controls->m_ImportFsl), SIGNAL(clicked()), this, SLOT(TbssImport()) );
     connect( (QObject*)(m_Controls->m_AddGroup), SIGNAL(clicked()), this, SLOT(AddGroup()) );
     connect( (QObject*)(m_Controls->m_RemoveGroup), SIGNAL(clicked()), this, SLOT(RemoveGroup()) );
     connect( (QObject*)(m_Controls->m_Clipboard), SIGNAL(clicked()), this, SLOT(CopyToClipboard()) );
     connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
-    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );   
+    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
     connect( (QObject*)(m_Controls->m_Cut), SIGNAL(clicked()), this, SLOT(Cut()) );
     connect( (QObject*)(m_Controls->m_Average), SIGNAL(stateChanged(int)), this, SLOT(PerformChange()) );
     connect( (QObject*)(m_Controls->m_Segments), SIGNAL(valueChanged(int)), this, SLOT(PerformChange()) );
@@ -503,7 +503,7 @@ void QmitkTractbasedSpatialStatisticsView::RemoveGroup()
   foreach(index, indices)
   {
     int row = index.row();
-    m_GroupModel->removeRows(row, 1, QModelIndex());   
+    m_GroupModel->removeRows(row, 1, QModelIndex());
   }
 
 }
@@ -1836,7 +1836,7 @@ void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::Tb
     m_CurrentGeometry = image->GetGeometry();
 
 
-    std::string resultfile = "";    
+    std::string resultfile = "";
     std::string structure = roiImage->GetStructure();
 
     m_Controls->m_RoiPlotWidget->SetGroups(image->GetGroupInfo());
@@ -1861,7 +1861,7 @@ void QmitkTractbasedSpatialStatisticsView::Masking()
   QString faFiles = filename + "/AxD";
   QString maskFiles = filename + "/bin_masks";
 
-   
+
   QDirIterator faDirIt(faFiles, QDir::Files | QDir::NoSymLinks, QDirIterator::Subdirectories);
   QDirIterator maskDirIt(maskFiles, QDir::Files | QDir::NoSymLinks, QDirIterator::Subdirectories);
 
@@ -1873,10 +1873,10 @@ void QmitkTractbasedSpatialStatisticsView::Masking()
   {
     faDirIt.next();
     maskDirIt.next();
-    if((faDirIt.fileInfo().completeSuffix() == "nii" 
+    if((faDirIt.fileInfo().completeSuffix() == "nii"
        || faDirIt.fileInfo().completeSuffix() == "mhd"
        || faDirIt.fileInfo().completeSuffix() == "nii.gz")
-       && (maskDirIt.fileInfo().completeSuffix() == "nii" 
+       && (maskDirIt.fileInfo().completeSuffix() == "nii"
        || maskDirIt.fileInfo().completeSuffix() == "mhd"
        || maskDirIt.fileInfo().completeSuffix() == "nii.gz"))
     {
@@ -1922,12 +1922,12 @@ void QmitkTractbasedSpatialStatisticsView::Masking()
     std::string s = faFiles.toStdString().append("/"+*outputIt);
     floatWriter->SetFileName(s.c_str());
     floatWriter->SetInput(multiplicationFilter->GetOutput());
-    floatWriter->Update();  
-    
+    floatWriter->Update();
+
     ++faIt;
     ++maskIt;
     ++outputIt;
-  }  
+  }
 }
 
 
@@ -2000,16 +2000,16 @@ void QmitkTractbasedSpatialStatisticsView::InitializeGridByVectorImage()
   vectorReader->SetFileName("E:\\tbss\\testing\\Gradient.mhd");
   vectorReader->Update();
   FloatVectorImageType::Pointer directions = vectorReader->GetOutput();
-  
 
-  // Read roi from file.   
+
+  // Read roi from file.
   CharReaderType::Pointer roiReader = CharReaderType::New();
   roiReader->SetFileName("E:\\tbss\\testing\\debugging skeletonization\\segment2.mhd");
   roiReader->Update();
   CharImageType::Pointer roi = roiReader->GetOutput();
 
   DoInitializeGridByVectorImage(directions, roi, std::string("directions"));
-  
+
 
 }
 
@@ -2021,7 +2021,7 @@ void QmitkTractbasedSpatialStatisticsView::DoInitializeGridByVectorImage(FloatVe
   //vtkStructuredGrid* grid = vtkStructuredGrid::New();
   itk::Matrix<double,3,3> itkdirection = vectorpic->GetDirection();
   itk::Matrix<double,3,3> itkinversedirection = itk::Matrix<double,3,3>(itkdirection.GetInverse());
-  std::vector<VectorType> GridPoints; 
+  std::vector<VectorType> GridPoints;
   vtkPoints *points = vtkPoints::New();
   mitk::Geometry3D::Pointer geom = mitk::Geometry3D::New();
   vtkLinearTransform *vtktransform;
@@ -2034,7 +2034,7 @@ void QmitkTractbasedSpatialStatisticsView::DoInitializeGridByVectorImage(FloatVe
   vtkFloatArray * directions = vtkFloatArray::New();
   directions->SetName("Vectors");
   directions->SetNumberOfComponents(3);
-  
+
   // Iterator for the vector image
   itk::ImageRegionIterator<FloatVectorImageType> it_input(vectorpic, vectorpic->GetLargestPossibleRegion());
   FloatVectorType nullvector;
@@ -2063,8 +2063,8 @@ void QmitkTractbasedSpatialStatisticsView::DoInitializeGridByVectorImage(FloatVe
       mitkvector[1] = transvec[1];
       mitkvector[2] = transvec[2];
       //mitkvector[2] = 0.0;
-     
-      
+
+
       mitkpoint[0] = it_input.GetIndex()[0];
       mitkpoint[1] = it_input.GetIndex()[1];
       mitkpoint[2] = it_input.GetIndex()[2];

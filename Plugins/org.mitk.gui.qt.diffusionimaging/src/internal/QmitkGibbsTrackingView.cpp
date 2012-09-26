@@ -66,8 +66,13 @@ void QmitkTrackingWorker::run()
     m_View->m_GlobalTracker->SetMinFiberLength(m_View->m_Controls->m_FiberLengthSlider->value());
     m_View->m_GlobalTracker->SetCurvatureThreshold(cos((float)m_View->m_Controls->m_CurvatureThresholdSlider->value()*M_PI/180));
     m_View->m_GlobalTracker->SetRandomSeed(m_View->m_Controls->m_RandomSeedSlider->value());
-
-    m_View->m_GlobalTracker->Update();
+    try{
+      m_View->m_GlobalTracker->Update();
+    }
+    catch( mitk::Exception e )
+    {
+      MITK_ERROR << "Internal error occured: " <<  e.what() << "\nAborting";
+    }
     m_View->m_TrackingThread.quit();
 }
 
@@ -107,11 +112,12 @@ QmitkGibbsTrackingView::~QmitkGibbsTrackingView()
 // update tracking status and generate fiber bundle
 void QmitkGibbsTrackingView::TimerUpdate()
 {
-    int currentStep = m_GlobalTracker->GetCurrentStep();
-    mitk::ProgressBar::GetInstance()->Progress(currentStep-m_LastStep);
-    UpdateTrackingStatus();
-    GenerateFiberBundle();
-    m_LastStep = currentStep;
+  int currentStep = m_GlobalTracker->GetCurrentStep();
+
+  mitk::ProgressBar::GetInstance()->Progress(currentStep-m_LastStep);
+  UpdateTrackingStatus();
+  GenerateFiberBundle();
+  m_LastStep = currentStep;
 }
 
 // tell global tractography filter to stop after current step
@@ -134,6 +140,13 @@ void QmitkGibbsTrackingView::AfterThread()
 
     mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetSteps()-m_LastStep+1);
     UpdateGUI();
+
+    if( !m_GlobalTracker->GetIsInValidState() )
+    {
+      QMessageBox::critical( NULL, "Gibbs Tracking", "An internal error occured. Tracking aborted.\n Please check the log for details." );
+      m_FiberBundleNode = NULL;
+      return;
+    }
     UpdateTrackingStatus();
 
     if(m_Controls->m_ParticleWeightSlider->value()==0)
@@ -515,8 +528,8 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
     m_LastStep = 1;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
 
-    // start worker thread
-    m_TrackingThread.start(QThread::LowestPriority);
+      // start worker thread
+      m_TrackingThread.start(QThread::LowestPriority);
 }
 
 // generate mitkFiberBundle from tracking filter output

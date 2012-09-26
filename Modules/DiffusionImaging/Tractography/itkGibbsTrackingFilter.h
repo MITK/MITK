@@ -80,6 +80,7 @@ public:
     itkGetMacro( NumAcceptedFibers, int )
     itkGetMacro( ProposalAcceptance, float )
     itkGetMacro( Steps, unsigned int)
+    itkGetMacro( IsInValidState, bool)
 
     // input data
     itkSetMacro(QBallImage, typename ItkQBallImageType::Pointer)
@@ -133,6 +134,7 @@ protected:
     std::string     m_LoadParameterFile;    // filename of parameter file (reader)
     std::string     m_SaveParameterFile;    // filename of parameter file (writer)
     std::string     m_LutPath;              // path to lookuptables used by the sphere interpolator
+    bool            m_IsInValidState;       // Whether the filter is in a valid state, false if error occured
 
     FiberPolyDataType m_FiberPolyData;      // container for reconstructed fibers
 

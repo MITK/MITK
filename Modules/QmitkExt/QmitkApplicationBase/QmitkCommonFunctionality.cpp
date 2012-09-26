@@ -40,6 +40,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <Poco/Path.h>
 
+#include <mitkIOUtil.h>
+
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName, const char* propFileName)
 { 
    // Check if desired format is supported
@@ -115,7 +117,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
       QString classname(data->GetNameOfClass());
       if ( image.IsNotNull() && (classname.compare("Image")==0 || classname.compare("SeedsImage")==0  ) )
       {
-        fileNameUsed = CommonFunctionality::SaveImage(image, aFileName, true);
+        fileNameUsed = CommonFunctionality::SaveImageWithQDialog(image, aFileName, true);
         if(!(fileNameUsed.length()>0)){
           return;
         } else {
@@ -474,7 +476,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
 #include "mitkImageWriter.h"
 #include <itksys/SystemTools.hxx>
 
-std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName, bool askForDifferentFilename)
+std::string CommonFunctionality::SaveImageWithQDialog(mitk::Image* image, const char* aFileName, bool askForDifferentFilename)
 {
   QString selected_suffix("Nearly Raw Raster Data (*.nrrd)");
   std::string defaultExtension = ".nrrd";
@@ -496,8 +498,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
 
   try
   {
-    std::string dir = itksys::SystemTools::GetFilenamePath( fileName );
-    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
+
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
 
     if( extension == "" )
@@ -506,40 +507,16 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     if (extension == ".gz")
     {
       QMessageBox::critical( NULL, "SaveDialog", "Warning: You can not save an image in the compressed \n"
-        ".pic.gz format. You must save as a normal .pic file.\n"
-        "Please press Save again and choose a filename with a .pic ending.",
+        ".pic.gz format. You must save as a normal .nrrd file.\n"
+        "Please press Save again and choose a filename with a .nrrd ending.",
         QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
       return "";
     }
-    // check if extension is suitable for writing image data
-    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();    
-    if (!imageWriter->IsExtensionValid(extension))
-    {
-      // muellerm, 12-05-02, using default file extension
-      // if no valid extension was given, see bug 11799
 
-      MITK_WARN << extension << " extension is unknown. Writing image to file " << fileName
-                   << defaultExtension;
-      extension = defaultExtension;
-      baseFilename = itksys::SystemTools::GetFilenameName( fileName );
-      //MITK_INFO << baseFilename;
-
-      /*
-      QString message;
-      message.append("File extension not suitable for writing image data. Choose one extension of this list: ");
-      message.append(imageWriter->GetPossibleFileExtensionsAsString().c_str());
-      QMessageBox::critical(NULL,"ERROR",message);
-      return "";
-      */
-    }
-
-    dir += "/";
-    dir += baseFilename;
-
-    if( itksys::SystemTools::FileExists( (dir + extension).c_str() ) )
+    if( itksys::SystemTools::FileExists( fileName.c_str() ) )
     {
       int answer = QMessageBox::question( QApplication::topLevelWidgets().at(0), "Warning",
-                                          QString("File %1 already exists. Overwrite?").arg( QString::fromStdString(dir + extension) ),
+                                          QString("File %1 already exists. Overwrite?").arg( QString::fromStdString(fileName) ),
                                           QMessageBox::Yes,
                                           QMessageBox::No );
       if( answer == QMessageBox::No )
@@ -584,12 +561,8 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
        }
     }
 
-    // write image
-    imageWriter->SetInput(image);
-    imageWriter->SetFileName(dir.c_str());
-    imageWriter->SetExtension(extension.c_str());
-    imageWriter->Write();
-    fileName = dir + extension;
+    mitk::IOUtil::SaveImage(image,fileName);
+
   }
   catch ( itk::ExceptionObject &err)
   {

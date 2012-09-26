@@ -125,7 +125,7 @@ namespace CommonFunctionality
   QmitkExt_EXPORT mitk::DataNode::Pointer FileOpen();
   QmitkExt_EXPORT mitk::DataNode::Pointer OpenVolumeOrSliceStack();
 
-  QmitkExt_EXPORT std::string SaveImage(mitk::Image* image, const char* aFileName = NULL, bool askForDifferentFilename = false);
+  QmitkExt_EXPORT std::string SaveImageWithQDialog(mitk::Image* image, const char* aFileName = NULL, bool askForDifferentFilename = false);
 
   QmitkExt_EXPORT std::string SaveSurface(mitk::Surface* surface, const char* fileName = NULL);
   

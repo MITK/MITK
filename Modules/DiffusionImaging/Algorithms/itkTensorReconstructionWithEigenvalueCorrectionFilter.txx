@@ -334,35 +334,50 @@ namespace itk
               CalculateAttenuation(org_data,atten,nof,numberb0);
               CalculateTensor(pseudoInverse,atten,tensor,nof,numberb0);
 
+              bool tensor_invalid = false;
 
+              // verify tensor, check for -nan values
+              for( unsigned int j=0; j<tensor.size(); j++)
+              {
+                if( tensor[j] != tensor[j])
+                {
+                  tensor[j] = 0;
+                  tensor_invalid = true;
+                  continue;
+                }
+              }
 
+              // process only for valid tensors
+              if(!tensor_invalid)
+              {
+                ///////////////testing
+                ten(0,0) = tensor[0];
+                ten(0,1) = tensor[3];
+                ten(0,2) = tensor[5];
+                ten(1,1) = tensor[1];
+                ten(1,2) = tensor[4];
+                ten(2,2) = tensor[2];
 
-              ///////////////testing
-              ten(0,0) = tensor[0];
-              ten(0,1) = tensor[3];
-              ten(0,2) = tensor[5];
-              ten(1,1) = tensor[1];
-              ten(1,2) = tensor[4];
-              ten(2,2) = tensor[2];
+                typename TensorPixelType::EigenValuesArrayType eigenvalues;
+                ten.ComputeEigenValues(eigenvalues);
 
-              typename TensorPixelType::EigenValuesArrayType eigenvalues;
-              ten.ComputeEigenValues(eigenvalues);
+                temp_tensor[0][0]= tensor[0]; temp_tensor[1][0]= tensor[3]; temp_tensor[2][0]= tensor[5];
+                temp_tensor[0][1]= tensor[3]; temp_tensor[1][1]= tensor[1]; temp_tensor[2][1]= tensor[4];
+                temp_tensor[0][2]= tensor[5]; temp_tensor[1][2]= tensor[4]; temp_tensor[2][2]= tensor[2];
 
+                vnl_symmetric_eigensystem<double> eigen_tensor(temp_tensor);
 
+                eigen_vals[0]=eigen_tensor.get_eigenvalue(0);
+                eigen_vals[1]=eigen_tensor.get_eigenvalue(1);
+                eigen_vals[2]=eigen_tensor.get_eigenvalue(2);
 
-
-
-              temp_tensor[0][0]= tensor[0]; temp_tensor[1][0]= tensor[3]; temp_tensor[2][0]= tensor[5];
-              temp_tensor[0][1]= tensor[3]; temp_tensor[1][1]= tensor[1]; temp_tensor[2][1]= tensor[4];
-              temp_tensor[0][2]= tensor[5]; temp_tensor[1][2]= tensor[4]; temp_tensor[2][2]= tensor[2];
-
-              vnl_symmetric_eigensystem<double> eigen_tensor(temp_tensor);
-
-              eigen_vals[0]=eigen_tensor.get_eigenvalue(0);
-              eigen_vals[1]=eigen_tensor.get_eigenvalue(1);
-              eigen_vals[2]=eigen_tensor.get_eigenvalue(2);
-
-
+              }
+              else
+              // the tensor is invalid, i.e. contains some NAN entries
+              {
+                // set the eigenvalues manually to -1 to force the idx to be marked as bad voxel
+                eigen_vals[0] = eigen_vals[1] = eigen_vals[2] = -1;
+              }
 
 
 
@@ -566,7 +581,7 @@ namespace itk
     {
       atten[i]=log((double)atten[i]);
     }
-      tensor = pseudoInverse*atten;
+    tensor = pseudoInverse*atten;
   }// end of void calculate tensor
 
 } // end of namespace

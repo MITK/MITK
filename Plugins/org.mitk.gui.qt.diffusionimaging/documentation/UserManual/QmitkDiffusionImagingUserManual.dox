@@ -125,4 +125,7 @@ The MITK Diffusion tools consist of further components, which have their own doc
   \li \subpage org_mitk_views_ivim
   \li \subpage org_mitk_diffusionimagingapp_perspectives_connectomics
   \li \subpage org_mitk_views_tractbasedspatialstatistics
+  \li \subpage org_mitk_views_odfmaximaextraction
+  \li \subpage org_mitk_views_streamlinetracking
+  \li \subpage org_mitk_views_dwisoftwarephantomview
 */

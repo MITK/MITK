@@ -52,6 +52,9 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   //initialize intrinsic parameters with some arbitrary values
   ToFScalarType focalLengthX = 295.78960;
   ToFScalarType focalLengthY = 296.348535;
+  ToFPoint2D focalLengthXY;
+  focalLengthXY[0]=focalLengthX;
+  focalLengthXY[1]=focalLengthY;
   ToFScalarType k1=-0.36,k2=-0.14,p1=0.001,p2=-0.00;
   ToFPoint2D principalPoint;
   principalPoint[0] = 103.576546;
@@ -75,16 +78,18 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   ToFPoint2D ipD = filter->GetInterPixelDistance();
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(ipD,interPixelDistance),"Testing Set/GetInterPixelDistance()");
 
+  // test SetReconstructionMode()
   filter->SetReconstructionMode(false);
+  MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == false,"Testing Set/GetReconstructionMode()");
 
   // test Set/GetInput()
   filter->SetInput(image);
   MITK_TEST_CONDITION_REQUIRED((image==filter->GetInput()),"Testing Set/GetInput()");
 
-  // test filter without subset
-  MITK_INFO<<"Test filter ";
-  // calculate focal length considering inter pixel distance
-  ToFScalarType focalLength = (focalLengthX*interPixelDistance[0]+focalLengthY*interPixelDistance[1])/2.0;
+  // test filter without subset (without interpixeldistance)
+  MITK_INFO<<"Test filter with subset without interpixeldistance ";
+  filter->SetReconstructionMode(true);
+
   vtkSmartPointer<vtkPoints> expectedResult = vtkSmartPointer<vtkPoints>::New();
   expectedResult->SetDataTypeToDouble();
   unsigned int counter = 0;
@@ -102,7 +107,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
       index[1] = j;
       index[2] = 0;
       ToFScalarType distance = image->GetPixelValueByIndex(index);
-      ToFPoint3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
+      ToFPoint3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthX,focalLengthY,principalPoint[0],principalPoint[1]);
 //      if ((i==0)&&(j==0))
 //      {
 //        MITK_INFO<<"Distance test: "<<distance;
@@ -152,8 +157,115 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   }
   MITK_TEST_CONDITION_REQUIRED(pointSetsEqual,"Testing filter without subset");
 
-  //Backwardtransformation test
+
+  // test filter without subset (with interpixeldistance)
+  MITK_INFO<<"Test filter with subset with interpixeldistance ";
+  filter->SetReconstructionMode(false);
+  // calculate focal length considering inter pixel distance
+  ToFScalarType focalLength = (focalLengthX*interPixelDistance[0]+focalLengthY*interPixelDistance[1])/2.0;
+  expectedResult = vtkSmartPointer<vtkPoints>::New();
+  expectedResult->SetDataTypeToDouble();
+  counter = 0;
+  point = new double[3];
+//  MITK_INFO<<"Test";
+//  MITK_INFO<<"focal: "<<focalLength;
+//  MITK_INFO<<"inter: "<<interPixelDistance;
+//  MITK_INFO<<"prinicipal: "<<principalPoint;
+  for (unsigned int j=0; j<dimX; j++)
+  {
+    for (unsigned int i=0; i<dimY; i++)
+    {
+      mitk::Index3D index;
+      index[0] = i;
+      index[1] = j;
+      index[2] = 0;
+      ToFScalarType distance = image->GetPixelValueByIndex(index);
+      ToFPoint3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
+//      if ((i==0)&&(j==0))
+//      {
+//        MITK_INFO<<"Distance test: "<<distance;
+//        MITK_INFO<<"coordinate test: "<<coordinate;
+//      }
+      point[0] = coordinate[0];
+      point[1] = coordinate[1];
+      point[2] = coordinate[2];
+      unsigned int pointID = index[0] + index[1]*dimY;
+      //MITK_INFO<<"id: "<<pointID;
+      //MITK_INFO<<"counter: "<<counter;
+      if (distance!=0)
+      {
+        expectedResult->InsertPoint(pointID,point);
+      }
+      counter++;
+    }
+  }
+  filter->Modified();
+  filter->Update();
+  resultSurface = filter->GetOutput();
+  result = vtkSmartPointer<vtkPoints>::New();
+  result->SetDataTypeToDouble();
+  result = resultSurface->GetVtkPolyData()->GetPoints();
+  MITK_TEST_CONDITION_REQUIRED((expectedResult->GetNumberOfPoints()==result->GetNumberOfPoints()),"Test if number of points in surface is equal");
+  pointSetsEqual = true;
+  for (unsigned int i=0; i<expectedResult->GetNumberOfPoints(); i++)
+  {
+    double* expected = expectedResult->GetPoint(i);
+    double* res = result->GetPoint(i);
+
+    ToFPoint3D expectedPoint;
+    expectedPoint[0] = expected[0];
+    expectedPoint[1] = expected[1];
+    expectedPoint[2] = expected[2];
+    ToFPoint3D resultPoint;
+    resultPoint[0] = res[0];
+    resultPoint[1] = res[1];
+    resultPoint[2] = res[2];
+
+    if (!mitk::Equal(expectedPoint,resultPoint))
+    {
+//      MITK_INFO << i;
+      MITK_INFO<<"expected: "<<expectedPoint;
+      MITK_INFO<<"result: "<<resultPoint;
+      pointSetsEqual = false;
+    }
+  }
+  MITK_TEST_CONDITION_REQUIRED(pointSetsEqual,"Testing filter without subset");
+
+
+  //Backwardtransformation test without interpixeldistance
   bool backwardTransformationsPointsEqual = true;
+  for (unsigned int i=0; i<expectedResult->GetNumberOfPoints(); i++)
+  {
+    double* expected = expectedResult->GetPoint(i);
+    double* res = result->GetPoint(i);
+
+    ToFPoint3D expectedPoint;
+    expectedPoint[0] = expected[0];
+    expectedPoint[1] = expected[1];
+    expectedPoint[2] = expected[2];
+    ToFPoint3D resultPoint;
+    resultPoint[0] = res[0];
+    resultPoint[1] = res[1];
+    resultPoint[2] = res[2];
+
+    ToFPoint3D expectedPointBackward =
+        mitk::ToFProcessingCommon::CartesianToIndexCoordinates(expectedPoint,focalLengthXY,principalPoint);
+
+    ToFPoint3D resultPointBackward =
+        mitk::ToFProcessingCommon::CartesianToIndexCoordinates(resultPoint,focalLengthXY,principalPoint);
+
+    if (!mitk::Equal(expectedPointBackward,resultPointBackward))
+    {
+//      MITK_INFO << i;
+//      MITK_INFO<<"expected: "<<expectedPoint;
+//      MITK_INFO<<"result: "<<resultPoint;
+      backwardTransformationsPointsEqual = false;
+    }
+  }
+  MITK_TEST_CONDITION_REQUIRED(backwardTransformationsPointsEqual,"Testing backward transformation without interpixeldistance");
+
+  //Backwardtransformation test with interpixeldistance
+  backwardTransformationsPointsEqual = true;
   for (unsigned int i=0; i<expectedResult->GetNumberOfPoints(); i++)
   {
     double* expected = expectedResult->GetPoint(i);
@@ -182,10 +294,40 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
       backwardTransformationsPointsEqual = false;
     }
   }
-  MITK_TEST_CONDITION_REQUIRED(backwardTransformationsPointsEqual,"Testing backward transformation");
+  MITK_TEST_CONDITION_REQUIRED(backwardTransformationsPointsEqual,"Testing backward transformation with interpixeldistance");
 
-  //Backwardtransformation test compare to original input
+
+  //Backwardtransformation test compare to original input without interpixeldistance
   bool compareToInput = true;
+  for (unsigned int i=0; i<result->GetNumberOfPoints(); i++)
+  {
+    double* res = result->GetPoint(i);
+
+    ToFPoint3D resultPoint;
+    resultPoint[0] = res[0];
+    resultPoint[1] = res[1];
+    resultPoint[2] = res[2];
+
+    ToFPoint3D resultPointBackward =
+        mitk::ToFProcessingCommon::CartesianToIndexCoordinates(resultPoint,focalLengthXY,principalPoint);
+
+    mitk::Index3D pixelIndex;
+    pixelIndex[0] = (int) (resultPointBackward[0]+0.5);
+    pixelIndex[1] = (int) (resultPointBackward[1]+0.5);
+    pixelIndex[2] = 0;
+
+    if (!mitk::Equal(image->GetPixelValueByIndex(pixelIndex),resultPointBackward[2]))
+    {
+//      MITK_INFO<<"expected: "<< image->GetPixelValueByIndex(pixelIndex);
+//      MITK_INFO<<"result: "<< resultPoint;
+      compareToInput = false;
+    }
+  }
+  MITK_TEST_CONDITION_REQUIRED(compareToInput,"Testing backward transformation compared to original image without interpixeldistance");
+
+
+  //Backwardtransformation test compare to original input with interpixeldistance
+  compareToInput = true;
   for (unsigned int i=0; i<result->GetNumberOfPoints(); i++)
   {
     double* res = result->GetPoint(i);
@@ -210,7 +352,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
       compareToInput = false;
     }
   }
-  MITK_TEST_CONDITION_REQUIRED(compareToInput,"Testing backward transformation compared to original image");
+  MITK_TEST_CONDITION_REQUIRED(compareToInput,"Testing backward transformation compared to original image with interpixeldistance");
 
   //clean up
   delete point;

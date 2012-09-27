@@ -57,10 +57,10 @@ void mitk::ApplyDiffImageOperation::OnImageDeleted()
   m_ImageStillValid = false;
 }
 
-mitk::Image::ConstPointer mitk::ApplyDiffImageOperation::GetDiffImage()
+mitk::Image::Pointer mitk::ApplyDiffImageOperation::GetDiffImage()
 {
   // uncompress image to create a valid mitk::Image
-  Image::ConstPointer image = zlibContainer->GetImage().GetPointer();
+  Image::Pointer image = zlibContainer->GetImage().GetPointer();
 
   return image; 
 }

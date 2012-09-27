@@ -122,19 +122,19 @@ public:
   //## If you only want to access a slice, volume at a specific time or single channel
   //## use one of the SubImageSelector classes.
 
-  virtual void* GetData();
+  DEPRECATED(virtual void* GetData());
 
 public:
   //## @brief Get the pixel value at one specific index position.
   //## @brief Get the pixel value at one specific position.
   //##
   //## The pixel type is always being converted to double.
-  double GetPixelValueByIndex(const mitk::Index3D& position, unsigned int timestep = 0);
+  DEPRECATED(double GetPixelValueByIndex(const mitk::Index3D& position, unsigned int timestep = 0));
 
   //## @brief Get the pixel value at one specific world position.
   //##
   //## The pixel type is always being converted to double.
-  double GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep = 0);
+  DEPRECATED(double GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep = 0));
 
   //##Documentation
   //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
@@ -616,11 +616,16 @@ protected:
 
 private:
 
-  std::vector<ImageAccessorBase*> m_readers;
-  std::vector<ImageAccessorBase*> m_writers;
-  std::vector<ImageAccessorBase*> m_vtkReaders;
+  /** Stores all existing ImageReadAccessors */
+  std::vector<ImageAccessorBase*> m_Readers;
+  /** Stores all existing ImageWriteAccessors */
+  std::vector<ImageAccessorBase*> m_Writers;
+  /** Stores all existing ImageVtkAccessors */
+  std::vector<ImageAccessorBase*> m_VtkReaders;
 
+  /** A mutex, which needs to be locked to manage m_Readers and m_Writers */
   itk::SimpleFastMutexLock m_ReadWriteLock;
+  /** A mutex, which needs to be locked to manage m_VtkReaders */
   itk::SimpleFastMutexLock m_VtkReadersLock;
 
 };

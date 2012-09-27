@@ -36,8 +36,8 @@ mitk::ImageVtkAccessor::ImageVtkAccessor(
     {
       m_Image->m_VtkReadersLock.Lock();
 
-      m_Image->m_vtkReaders.push_back(this);
-      printf("m_vtkReaders.size(): %d\n", (int) m_Image->m_vtkReaders.size());
+      m_Image->m_VtkReaders.push_back(this);
+      //printf("m_VtkReaders.size(): %d\n", (int) m_Image->m_VtkReaders.size());
 
       m_Image->m_VtkReadersLock.Unlock();
 

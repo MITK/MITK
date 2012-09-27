@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIpPic.h>
 #include "mitkImage.h"
+#include "mitkImageWriteAccessor.h"
 
 /** \file mitkLegacyAdaptors.h
   *
@@ -39,16 +40,33 @@ namespace mitk
 
    Meant to support legacy code, which was base on mitkIpPicDescriptor types. Please remind that such code should be migrated towards ITK/VTK solutions.
  */
-  LegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitkIpPicDescriptor* picDesc);
+  LegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitk::ImageWriteAccessor*, mitkIpPicDescriptor* picDesc);
 
   /**
-    \brief Constructs a legacy mitkIpPicDescriptor form mitk::ImageDataItem
+    \brief Constructs a legacy mitkIpPicDescriptor from mitk::ImageDataItem
 
     \warning The returned IpPicDescriptor is only referencing the memory block with the data managed by the given ImageDataItem parameter.
     Simply calling ipPicFree( desc ) will delete the data and so will the ImageDataItem try when it get deleted. Simplest way to avoid the duplicate
     deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
   */
-  LegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitkIpPicDescriptor *picDesc );
+  LegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitk::ImageWriteAccessor*, mitkIpPicDescriptor *picDesc );
+
+ /**
+   \brief Constructs a deprecated legacy mitkIpPicDescriptor from mitk::Image
+
+   Meant to support legacy code, which was base on mitkIpPicDescriptor types. Please remind that such code should be migrated towards ITK/VTK solutions.
+ */
+  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitkIpPicDescriptor* picDesc));
+
+  /**
+    \brief Constructs a deprecated legacy mitkIpPicDescriptor from mitk::ImageDataItem
+
+    \warning The returned IpPicDescriptor is only referencing the memory block with the data managed by the given ImageDataItem parameter.
+    Simply calling ipPicFree( desc ) will delete the data and so will the ImageDataItem try when it get deleted. Simplest way to avoid the duplicate
+    deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
+  */
+  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitkIpPicDescriptor *picDesc));
+
 
   /**
     \brief Constructs an ImageDescriptor from legacy mitkIpPicDescriptor

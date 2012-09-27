@@ -81,7 +81,7 @@ namespace mitk {
 
     ImageDataItem(const ImageDataItem &other);
 
-    void* GetData() const
+    DEPRECATED(void* GetData() const)
     {
       return m_Data;
     }

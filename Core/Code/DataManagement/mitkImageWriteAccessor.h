@@ -62,18 +62,18 @@ public:
     m_Image->m_ReadWriteLock.Lock();
 
     // delete self from list of ImageReadAccessors in Image
-    std::vector<ImageAccessorBase*>::iterator it = std::find(m_Image->m_writers.begin(),m_Image->m_writers.end(),this);
-    m_Image->m_writers.erase(it);
+    std::vector<ImageAccessorBase*>::iterator it = std::find(m_Image->m_Writers.begin(),m_Image->m_Writers.end(),this);
+    m_Image->m_Writers.erase(it);
 
     // delete lock, if there are no waiting ImageAccessors
-    if(m_waitLock->m_WaiterCount <= 0)
+    if(m_WaitLock->m_WaiterCount <= 0)
     {
-      m_waitLock->m_mutex.Unlock();
-      delete m_waitLock;
+      m_WaitLock->m_Mutex.Unlock();
+      delete m_WaitLock;
     }
     else
     {
-      m_waitLock->m_mutex.Unlock();
+      m_WaitLock->m_Mutex.Unlock();
     }
 
     m_Image->m_ReadWriteLock.Unlock();
@@ -92,14 +92,14 @@ private:
     ImageAccessorWaitLock* overlapLock;
 
     // Check, if there is any Read-Access going on
-    if(m_Image->m_readers.size() > 0)
+    if(m_Image->m_Readers.size() > 0)
     {
 
       // Check for every ReadAccessor, if the Region of this ImageAccessors overlaps
       // make sure this iterator is not used, when m_ReadWriteLock is Unlocked!
-      std::vector<ImageAccessorBase*>::iterator it = m_Image->m_readers.begin();
+      std::vector<ImageAccessorBase*>::iterator it = m_Image->m_Readers.begin();
 
-      for(; it!=m_Image->m_readers.end(); ++it)
+      for(; it!=m_Image->m_Readers.end(); ++it)
       {
         ImageAccessorBase* r = *it;
 
@@ -107,21 +107,21 @@ private:
         {
           // An Overlap was detected.
           readOverlap = true;
-          overlapLock = r->m_waitLock;
+          overlapLock = r->m_WaitLock;
           break;
         } // if
       } // for
     } // if
 
     // Check, if there is any Write-Access going on
-    if(m_Image->m_writers.size() > 0)
+    if(m_Image->m_Writers.size() > 0)
     {
 
       // Check for every WriteAccessor, if the Region of this ImageAccessors overlaps
       // make sure this iterator is not used, when m_ReadWriteLock is Unlocked!
-      std::vector<ImageAccessorBase*>::iterator it = m_Image->m_writers.begin();
+      std::vector<ImageAccessorBase*>::iterator it = m_Image->m_Writers.begin();
 
-      for(; it!=m_Image->m_writers.end(); ++it)
+      for(; it!=m_Image->m_Writers.end(); ++it)
       {
         ImageAccessorBase* w = *it;
 
@@ -129,7 +129,7 @@ private:
         {
           // An Overlap was detected.
           writeOverlap = true;
-          overlapLock = w->m_waitLock;
+          overlapLock = w->m_WaitLock;
           break;
         } // if
       } // for
@@ -160,12 +160,12 @@ private:
 
     // Now, we know, that there is no conflict with a Read- or Write-Access
     // Lock the Mutex in ImageAccessorBase, to make sure that every other ImageAccessor has to wait
-    m_waitLock->m_mutex.Lock();
+    m_WaitLock->m_Mutex.Lock();
 
-    // insert self into writers list in Image
-    m_Image->m_writers.push_back(this);
+    // insert self into Writers list in Image
+    m_Image->m_Writers.push_back(this);
 
-    //printf("WriteAccess %d %d\n",(int) m_Image->m_readers.size(),(int) m_Image->m_writers.size());
+    //printf("WriteAccess %d %d\n",(int) m_Image->m_Readers.size(),(int) m_Image->m_Writers.size());
     //fflush(0);
     m_Image->m_ReadWriteLock.Unlock();
 

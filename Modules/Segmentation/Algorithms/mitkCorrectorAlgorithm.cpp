@@ -61,24 +61,28 @@ void mitk::CorrectorAlgorithm::GenerateData()
   {
     itkExceptionMacro("Original image does not have a 'Time sliced geometry'! Cannot copy.");
   }
- 
+
+  Image::Pointer temporarySlice;
   // Convert to ipMITKSegmentationTYPE (because TobiasHeimannCorrectionAlgorithm relys on that data type)
-  itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
-  CastToItkImage( m_WorkingImage, correctPixelTypeImage );
-  assert (correctPixelTypeImage.IsNotNull() );
+  {
+    itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
+    CastToItkImage( m_WorkingImage, correctPixelTypeImage );
+    assert (correctPixelTypeImage.IsNotNull() );
 
-  // possible bug in CastToItkImage ?
-  // direction maxtrix is wrong/broken/not working after CastToItkImage, leading to a failed assertion in
-  // mitk/Core/DataStructures/mitkSlicedGeometry3D.cpp, 479:
-  // virtual void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D&): Assertion `aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0' failed
-  // solution here: we overwrite it with an unity matrix
-  itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
-  imageDirection.SetIdentity();
-  //correctPixelTypeImage->SetDirection(imageDirection);
+    // possible bug in CastToItkImage ?
+    // direction maxtrix is wrong/broken/not working after CastToItkImage, leading to a failed assertion in
+    // mitk/Core/DataStructures/mitkSlicedGeometry3D.cpp, 479:
+    // virtual void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D&): Assertion `aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0' failed
+    // solution here: we overwrite it with an unity matrix
+    itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
+    imageDirection.SetIdentity();
+    //correctPixelTypeImage->SetDirection(imageDirection);
 
-  Image::Pointer temporarySlice = this->GetOutput();
-  //  temporarySlice = ImportItkImage( correctPixelTypeImage );
-  CastToMitkImage( correctPixelTypeImage, temporarySlice );
+    temporarySlice = this->GetOutput();
+    //  temporarySlice = ImportItkImage( correctPixelTypeImage );
+    CastToMitkImage( correctPixelTypeImage, temporarySlice );
+  }
+
 
   mitkIpPicDescriptor* temporarySlicePic = mitkIpPicNew();
   CastToIpPicDescriptor( temporarySlice, temporarySlicePic );

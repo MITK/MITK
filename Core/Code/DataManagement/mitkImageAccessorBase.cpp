@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
     m_CoherentMemory(false)
     {
       // Initialize WaitLock
-      m_waitLock = new ImageAccessorWaitLock();
-      m_waitLock->m_WaiterCount = 0;
+      m_WaitLock = new ImageAccessorWaitLock();
+      m_WaitLock->m_WaiterCount = 0;
 
 
       // Check validity of ImageAccessor
@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
       // update channel's data
       // if data was not available at creation point, the m_Data of channel descriptor is NULL
       // if data present, it won't be overwritten
-      m_Image->m_ImageDescriptor->GetChannelDescriptor(0).SetData(m_Image->m_CompleteData->GetData());
+      m_Image->m_ImageDescriptor->GetChannelDescriptor(0).SetData(m_Image->m_CompleteData->m_Data);
 
       // Investigate 4 cases of possible image parts/regions
 
@@ -123,7 +123,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   /** \brief Uses the WaitLock to wait for another ImageAccessor*/
   void mitk::ImageAccessorBase::WaitForReleaseOf(ImageAccessorWaitLock* wL) {
-    wL->m_mutex.Lock();
+    wL->m_Mutex.Lock();
 
     // Decrement
     wL->m_WaiterCount -= 1;
@@ -132,12 +132,12 @@ See LICENSE.txt or http://www.mitk.org for details.
     // (Der Letzte macht das Licht aus!)
     if(wL->m_WaiterCount <= 0)
     {
-      wL->m_mutex.Unlock();
+      wL->m_Mutex.Unlock();
       delete wL;
     }
     else
     {
-      wL->m_mutex.Unlock();
+      wL->m_Mutex.Unlock();
     }
   }
 

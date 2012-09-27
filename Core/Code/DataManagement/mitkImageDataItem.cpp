@@ -41,7 +41,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::Ima
   m_Parent(&aParent)
 {
   m_PixelType = new mitk::PixelType(aParent.GetPixelType());
-  m_Data = static_cast<unsigned char*>(aParent.GetData())+offset;
+  m_Data = static_cast<unsigned char*>(aParent.m_Data)+offset;
 
   // compute size
   //const unsigned int *dims = desc->GetDimensions();

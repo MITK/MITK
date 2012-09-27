@@ -86,7 +86,7 @@ public:
     typedef itk::Image<pixeltype, dimension> ImageType;                                  \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
-    imagetoitk->SetInput(constImage);                                                  \
+    imagetoitk->SetInput(nonConstImage);                                                  \
     imagetoitk->Update();                                                              \
     itkImageTypeFunction(imagetoitk->GetOutput());                                     \
   } else
@@ -114,7 +114,7 @@ public:
     typedef itk::Image<pixeltype, dimension> ImageType; \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
-    imagetoitk->SetInput(constImage);                                                  \
+    imagetoitk->SetInput(nonConstImage);                                                  \
     imagetoitk->Update();                                                              \
     itkImageTypeFunction(imagetoitk->GetOutput(), MITK_PP_TUPLE_REM(MITK_PP_SEQ_HEAD(args))MITK_PP_SEQ_TAIL(args)); \
   } else                                                                               
@@ -304,10 +304,11 @@ public:
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
   const mitk::Image* constImage = mitkImage;                                           \
-  const_cast<mitk::Image*>(constImage)->Update();                                      \
-  _checkSpecificDimension(mitkImage, dimSeq);                                          \
+  mitk::Image* nonConstImage = const_cast<mitk::Image*>(constImage);                   \
+  nonConstImage->Update();                                                             \
+  _checkSpecificDimension(nonConstImage, dimSeq);                                          \
   _accessFixedTypeByItk(itkImageTypeFunction, pixelTypeSeq, dimSeq)                    \
-  _accessByItkPixelTypeException(mitkImage->GetPixelType(), pixelTypeSeq)              \
+  _accessByItkPixelTypeException(nonConstImage->GetPixelType(), pixelTypeSeq)              \
 }
 
 //------------------------------ n-Arg Access Macros -----------------------------------
@@ -487,10 +488,11 @@ public:
 {                                                                                          \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                            \
   const mitk::Image* constImage = mitkImage;                                               \
-  const_cast<mitk::Image*>(constImage)->Update();                                          \
-  _checkSpecificDimension(mitkImage, dimSeq);                                              \
+  mitk::Image* nonConstImage = const_cast<mitk::Image*>(constImage);                   \
+  nonConstImage->Update();                                                             \
+  _checkSpecificDimension(nonConstImage, dimSeq);                                              \
   _accessFixedTypeByItk_n(itkImageTypeFunction, pixelTypeSeq, dimSeq, va_tuple)            \
-  _accessByItkPixelTypeException(mitkImage->GetPixelType(), pixelTypeSeq)                  \
+  _accessByItkPixelTypeException(nonConstImage->GetPixelType(), pixelTypeSeq)                  \
 }
 
 //------------------------- For back-wards compatibility -------------------------------
@@ -525,10 +527,10 @@ public:
     typedef mitk::ImageToItk<ImageType1> ImageToItkType1;                               \
     typedef mitk::ImageToItk<ImageType2> ImageToItkType2;                               \
     itk::SmartPointer<ImageToItkType1> imagetoitk1 = ImageToItkType1::New();            \
-    imagetoitk1->SetInput(constImage1);                                                 \
+    imagetoitk1->SetInput(nonConstImage1);                                                 \
     imagetoitk1->Update();                                                              \
     itk::SmartPointer<ImageToItkType2> imagetoitk2 = ImageToItkType2::New();            \
-    imagetoitk2->SetInput(constImage2);                                                 \
+    imagetoitk2->SetInput(nonConstImage2);                                                 \
     imagetoitk2->Update();                                                              \
     itkImageTypeFunction(imagetoitk1->GetOutput(), imagetoitk2->GetOutput());           \
   } else
@@ -600,10 +602,12 @@ public:
 {                                                                                                   \
   const mitk::PixelType& pixelType1 = mitkImage1->GetPixelType();                                   \
   const mitk::PixelType& pixelType2 = mitkImage2->GetPixelType();                                   \
-  const mitk::Image* constImage1 = mitkImage1;                                                      \
-  const mitk::Image* constImage2 = mitkImage2;                                                      \
-  const_cast<mitk::Image*>(constImage1)->Update();                                                  \
-  const_cast<mitk::Image*>(constImage2)->Update();                                                  \
+  const mitk::Image* constImage1 = mitkImage1;                                               \
+  const mitk::Image* constImage2 = mitkImage2;                                               \
+  mitk::Image* nonConstImage1 = const_cast<mitk::Image*>(constImage1);                   \
+  mitk::Image* nonConstImage2 = const_cast<mitk::Image*>(constImage2);                   \
+  nonConstImage1->Update();                                                             \
+  nonConstImage2->Update();                                                             \
   _checkSpecificDimension(mitkImage1, (dimension));                                                 \
   _checkSpecificDimension(mitkImage2, (dimension));                                                 \
   _accessTwoImagesByItkForEach(itkImageTypeFunction, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension), MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)) \

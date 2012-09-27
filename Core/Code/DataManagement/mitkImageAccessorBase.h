@@ -40,7 +40,7 @@ struct ImageAccessorWaitLock {
   unsigned int m_WaiterCount;
 
   /** \brief A mutex that allows other ImageAccessors to wait for the represented ImageAccessor. */
-  itk::SimpleFastMutexLock m_mutex;
+  itk::SimpleFastMutexLock m_Mutex;
 };
 
 class MITK_CORE_EXPORT ImageAccessorBase {
@@ -109,12 +109,12 @@ protected:
   bool m_CoherentMemory;
 
   /** \brief Pointer to a WaitLock struct, that allows other ImageAccessors to wait for this ImageAccessor */
-  ImageAccessorWaitLock* m_waitLock;
+  ImageAccessorWaitLock* m_WaitLock;
 
   /** \brief Increments m_WaiterCount. A call of this method is prohibited unless the Mutex m_ReadWriteLock in the mitk::Image class is Locked. */
   inline void Increment()
   {
-    m_waitLock->m_WaiterCount += 1;
+    m_WaitLock->m_WaiterCount += 1;
   }
 
   /** \brief Computes if there is an Overlap of the image part between this instantiation and another ImageAccessor object

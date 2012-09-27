@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryIEditorRegistry.h>
 #include <berryUIException.h>
+#include <berryIPreferencesService.h>
 
 #include <mitkDataNodeFactory.h>
 #include "mitkIDataStorageService.h"
@@ -39,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QMessageBox>
 #include <QApplication>
+#include <QDateTime>
 
 #include "internal/org_mitk_gui_common_Activator.h"
 
@@ -268,6 +270,75 @@ berry::IEditorDescriptor::Pointer WorkbenchUtil::GetDefaultEditor(const QString&
 
   // Try lookup with filename
   return editorReg->GetDefaultEditor(name.toStdString()); //, contentType);
+}
+
+bool WorkbenchUtil::SetDepartmentLogoPreference(const QString &logoResource, ctkPluginContext *context)
+{
+  // The logo must be available in the local filesystem. We check if we have not already extracted the
+  // logo from the plug-in or if this plug-ins timestamp is newer then the already extracted logo timestamp.
+  // If one of the conditions is true, extract it and write it to the plug-in specific storage location.
+  const QString logoFileName = logoResource.mid(logoResource.lastIndexOf('/')+1);
+  const QString logoPath = context->getDataFile("").absoluteFilePath();
+
+  bool extractLogo = true;
+  QFileInfo logoFileInfo(logoPath + "/" + logoFileName);
+
+  if (logoFileInfo.exists())
+  {
+    // The logo has been extracted previously. Check if the plugin timestamp is newer, which
+    // means it might contain an updated logo.
+    QString pluginLocation = QUrl(context->getPlugin()->getLocation()).toLocalFile();
+    if (!pluginLocation.isEmpty())
+    {
+      QFileInfo pluginFileInfo(pluginLocation);
+      if (logoFileInfo.lastModified() > pluginFileInfo.lastModified())
+      {
+        extractLogo = false;
+      }
+    }
+  }
+
+  if (extractLogo)
+  {
+    // Extract the logo from the shared library and write it to disk.
+    QFile logo(logoResource);
+    if (logo.open(QIODevice::ReadOnly))
+    {
+      QFile localLogo(logoPath + "/" + logoFileName);
+      if (localLogo.open(QIODevice::WriteOnly))
+      {
+        localLogo.write(logo.readAll());
+      }
+    }
+  }
+
+  logoFileInfo.refresh();
+  if (logoFileInfo.exists())
+  {
+    // Get the preferences service
+    ctkServiceReference prefServiceRef = context->getServiceReference<berry::IPreferencesService>();
+    berry::IPreferencesService* prefService = NULL;
+    if (prefServiceRef)
+    {
+      prefService = context->getService<berry::IPreferencesService>(prefServiceRef);
+    }
+
+    if (prefService)
+    {
+      prefService->GetSystemPreferences()->Put("DepartmentLogo", qPrintable(logoFileInfo.absoluteFilePath()));
+    }
+    else
+    {
+      BERRY_WARN << "Preferences service not available, unable to set custom logo.";
+      return false;
+    }
+  }
+  else
+  {
+    BERRY_WARN << "Custom logo at " << logoFileInfo.absoluteFilePath().toStdString() << " does not exist";
+    return false;
+  }
+  return true;
 }
 
 } // namespace mitk

@@ -25,12 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryIEditorDescriptor.h>
 
+class ctkPluginContext;
+
 namespace mitk {
 
 /**
  * @ingroup org_mitk_gui_common
  *
- * @brief Utility class for loading data and opening editors in a MITK Workbench.
+ * @brief Utility class for loading data, opening editors and other tasks in a MITK Workbench.
  *
  * @note Infering the content type is not yet supported (ignore the comments about it
  *       in the method documentation). 
@@ -166,6 +168,17 @@ struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
      */
   static berry::IEditorDescriptor::Pointer GetDefaultEditor(const QString& file,
                                                             bool determineContentType);
+  /**
+   * Set the "DepartmentLogo" preference using a Qt resource path.
+   *
+   * This is a convenience method to set the preference for a "deparment" logo which is usually
+   * shown in render windows in the MITK workbench.
+   *
+   * @param logoResource A Qt resource path to the logo, e.g. ":/MyLogo.png".
+   * @param context The plugin context of the plug-in containing the logo resource.
+   * @return \c true if the preference was set successfully, \c false otherwise.
+   */
+  static bool SetDepartmentLogoPreference(const QString& logoResource, ctkPluginContext* context);
 
 };
 

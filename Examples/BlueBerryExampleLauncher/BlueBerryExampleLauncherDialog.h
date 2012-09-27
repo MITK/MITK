@@ -48,6 +48,7 @@ private:
 
   Ui::BlueBerryExampleLauncherDialog *ui;
   QStringList provisioningFiles;
+  QList<QString> descriptions;
   QEventLoop eventLoop;
 };
 

@@ -52,10 +52,16 @@ set(_plugins_for_all_demos
 file(GLOB _demo_configurations Configurations/*.cmake)
 
 foreach(_demo_config_file ${_demo_configurations})
+  set(REQUIRED_PLUGINS )
+  set(DESCRIPTION )
   include(${_demo_config_file})
   get_filename_component(_name ${_demo_config_file} NAME_WE)
   FunctionCreateProvisioningFile(FILE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}_${_name}.provisioning
                                  PLUGINS ${REQUIRED_PLUGINS} ${_plugins_for_all_demos}
                                  NO_INSTALL
                                 )
+  if(DESCRIPTION)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/BlueBerryExampleDescription.txt 
+                   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}_${_name}.txt @ONLY)
+  endif()
 endforeach()

@@ -48,6 +48,18 @@ BlueBerryExampleLauncherDialog::BlueBerryExampleLauncherDialog(QWidget *parent) 
     int startIndex = provFile.indexOf('_');
     int endIndex = provFile.lastIndexOf('.');
     ui->appList->addItem(provFile.mid(startIndex+1, endIndex-startIndex-1));
+
+    descriptions.push_back(QString());
+    QString descriptionFileName = provFile.left(provFile.lastIndexOf('.')) + ".txt";
+    QFile descriptionFile(appDir.filePath(descriptionFileName));
+
+    if (descriptionFile.exists())
+    {
+      if (descriptionFile.open(QIODevice::ReadOnly))
+      {
+        descriptions.back() = descriptionFile.readAll();
+      }
+    }
   }
 
   if (ui->appList->currentRow() == -1)
@@ -90,5 +102,12 @@ void BlueBerryExampleLauncherDialog::dialogCanceled()
 void BlueBerryExampleLauncherDialog::selectionChanged(int row)
 {
   if (row > -1)
+  {
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    ui->description->setHtml(this->descriptions[row]);
+  }
+  else
+  {
+    ui->description->clear();
+  }
 }

@@ -337,25 +337,42 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
 {
   // Enable change of logo. If no DepartmentLogo was set explicitly, MBILogo is used.
   // Set new department logo by prefs->Set("DepartmentLogo", "PathToImage");
-  std::vector<std::string> keys = prefs->Keys();
-  
-  for( int i = 0; i < keys.size(); ++i )
-  {
-    if( keys[i] == "DepartmentLogo")
-    {
-      std::string departmentLogoLocation = prefs->Get("DepartmentLogo", "");
 
-      if (departmentLogoLocation.empty())
+  // If no logo was set for this plug-in specifically, walk the parent preference nodes
+  // and lookup a logo value there.
+
+  const berry::IPreferences* currentNode = prefs;
+
+  while(currentNode)
+  {
+    std::vector<std::string> keys = currentNode->Keys();
+
+    bool logoFound = false;
+    for( std::size_t i = 0; i < keys.size(); ++i )
+    {
+      if( keys[i] == "DepartmentLogo")
       {
-        d->m_StdMultiWidget->DisableDepartmentLogo();
+        std::string departmentLogoLocation = currentNode->Get("DepartmentLogo", "");
+
+        if (departmentLogoLocation.empty())
+        {
+          d->m_StdMultiWidget->DisableDepartmentLogo();
+        }
+        else
+        {
+          // we need to disable the logo first, otherwise setting a new logo will have
+          // no effect due to how mitkManufacturerLogo works...
+          d->m_StdMultiWidget->DisableDepartmentLogo();
+          d->m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
+          d->m_StdMultiWidget->EnableDepartmentLogo();
+        }
+        logoFound = true;
+        break;
       }
-      else
-      {
-        d->m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
-        d->m_StdMultiWidget->EnableDepartmentLogo();
-      }
-      break;
     }
+
+    if (logoFound) break;
+    currentNode = currentNode->Parent().GetPointer();
   }
  
   // preferences for gradient background

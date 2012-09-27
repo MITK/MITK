@@ -184,8 +184,10 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   filter->SetInput(image);
   MITK_TEST_CONDITION_REQUIRED((image==filter->GetInput()),"Testing Set/GetInput()");
 
-  // test filter without subset
-  MITK_INFO<<"Test filter without subset";
+
+  // test filter without subset (without using the interpixeldistance)
+  MITK_INFO<<"Test filter without subset without using the interpixeldistance";
+  filter->SetReconstructionMode(true);
   mitk::PointSet::Pointer expectedResult = mitk::PointSet::New();
   unsigned int counter = 0;
   for (unsigned int j=0; j<dimY; j++)
@@ -197,7 +199,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
       index[1] = j;
       index[2] = 0;
       mitk::ScalarType distance = image->GetPixelValueByIndex(index);
-      mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
+      mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthX,focalLengthY,principalPoint[0],principalPoint[1]);
       expectedResult->InsertPoint(counter,coordinate);
       counter++;
     }
@@ -208,11 +210,12 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(PointSetsEqual(expectedResult,result),"Testing filter without subset");
 
   // compare filter result with ToFDistanceImageToSurfaceFilter
+  MITK_INFO<<"Compare filter result with ToFDistanceImageToSurfaceFilter";
   mitk::ToFDistanceImageToSurfaceFilter::Pointer surfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
   surfaceFilter->SetInput(image);
   surfaceFilter->SetInterPixelDistance(interPixelDistance);
   surfaceFilter->SetCameraIntrinsics(cameraIntrinsics);
-  surfaceFilter->SetReconstructionMode(false);
+  surfaceFilter->SetReconstructionMode(true);
   mitk::Surface::Pointer surface = surfaceFilter->GetOutput();
   surface->Update();
   // create point set from surface
@@ -230,9 +233,91 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   }
   MITK_TEST_CONDITION_REQUIRED((pointSet->GetSize()==result->GetSize()),"Test if point set size is equal");
   MITK_TEST_CONDITION_REQUIRED(PointSetsEqual(pointSet,result),"Compare with surface points");
+
+
+  // test filter without subset (with using the interpixeldistance)
+  MITK_INFO<<"Test filter without subset with using the interpixeldistance";
+  filter->Modified();
+  filter->SetReconstructionMode(false);
+  expectedResult = mitk::PointSet::New();
+  counter = 0;
+  for (unsigned int j=0; j<dimY; j++)
+  {
+    for (unsigned int i=0; i<dimX; i++)
+    {
+      mitk::Index3D index;
+      index[0] = i;
+      index[1] = j;
+      index[2] = 0;
+      mitk::ScalarType distance = image->GetPixelValueByIndex(index);
+      mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
+      expectedResult->InsertPoint(counter,coordinate);
+      counter++;
+    }
+  }
+  filter->Update();
+  result = filter->GetOutput();
+  MITK_TEST_CONDITION_REQUIRED((expectedResult->GetSize()==result->GetSize()),"Test if point set size is equal");
+  MITK_TEST_CONDITION_REQUIRED(PointSetsEqual(expectedResult,result),"Testing filter without subset");
+
+  // compare filter result with ToFDistanceImageToSurfaceFilter
+  MITK_INFO<<"Compare filter result with ToFDistanceImageToSurfaceFilter";
+  surfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
+  surfaceFilter->SetInput(image);
+  surfaceFilter->SetInterPixelDistance(interPixelDistance);
+  surfaceFilter->SetCameraIntrinsics(cameraIntrinsics);
+  surfaceFilter->SetReconstructionMode(false);
+  surface = surfaceFilter->GetOutput();
+  surface->Update();
+  // create point set from surface
+  polyData = surface->GetVtkPolyData();
+  numberOfPoints = polyData->GetNumberOfPoints();
+  pointSet = mitk::PointSet::New();
+  for (int i=0; i<numberOfPoints; i++)
+  {
+    double* currentPoint = polyData->GetPoint(i);
+    mitk::Point3D point;
+    point[0] = currentPoint[0];
+    point[1] = currentPoint[1];
+    point[2] = currentPoint[2];
+    pointSet->InsertPoint(i,point);
+  }
+  MITK_TEST_CONDITION_REQUIRED((pointSet->GetSize()==result->GetSize()),"Test if point set size is equal");
+  MITK_TEST_CONDITION_REQUIRED(PointSetsEqual(pointSet,result),"Compare with surface points");
+
+
+  // test filter with subset (without using the interpixeldistance)
+  MITK_INFO<<"Test filter with subset without using the interpixeldistance";
+  filter = mitk::ToFDistanceImageToPointSetFilter::New();
+  filter->SetInput(image);
+  filter->SetInterPixelDistance(interPixelDistance);
+  filter->SetCameraIntrinsics(cameraIntrinsics);
+  filter->SetReconstructionMode(true);
+  expectedResult = mitk::PointSet::New();
+  counter = 0;
+  for (unsigned int i=0; i<subSet->GetSize(); i++)
+  {
+    mitk::Point3D point = subSet->GetPoint(i);
+    mitk::Index3D index;
+    index[0] = point[0];
+    index[1] = point[1];
+    index[2] = 0;
+    mitk::ScalarType distance = image->GetPixelValueByIndex(index);
+    mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(point[0],point[1],
+                                                                                      distance,focalLengthX,focalLengthY,principalPoint[0],principalPoint[1]);
+    expectedResult->InsertPoint(counter,coordinate);
+    counter++;
+  }
+  filter->SetSubset(subSet);
+  filter->Modified();
+  filter->Update();
+  result = filter->GetOutput();
+  MITK_TEST_CONDITION_REQUIRED((expectedResult->GetSize()==result->GetSize()),"Test if point set size is equal");
+  MITK_TEST_CONDITION_REQUIRED(PointSetsEqual(expectedResult,result),"Testing filter with subset");
+
   
-  // test filter with subset
-  MITK_INFO<<"Test filter with subset";
+  // test filter with subset (with using the interpixeldistance)
+  MITK_INFO<<"Test filter with subset with using the interpixeldistance";
   filter = mitk::ToFDistanceImageToPointSetFilter::New();
   filter->SetInput(image);
   filter->SetInterPixelDistance(interPixelDistance);

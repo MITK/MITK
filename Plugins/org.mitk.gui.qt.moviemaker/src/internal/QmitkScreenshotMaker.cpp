@@ -121,11 +121,11 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
 {
     if (m_LastPath.size()==0)
         m_LastPath = QDir::currentPath();
-    QString fileName = QFileDialog::getExistingDirectory(NULL, "Save screenshots to...", m_LastPath);
-    if (fileName.size()>0)
-        m_LastPath = fileName;
+    QString filePath = QFileDialog::getExistingDirectory(NULL, "Save screenshots to...", m_LastPath);
+    if (filePath.size()>0)
+        m_LastPath = filePath;
 
-    if( fileName.isEmpty() )
+    if( filePath.isEmpty() )
     {
         return;
     }
@@ -137,55 +137,75 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
     if(n)
     {
         n->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ) );
-        //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
     }
 
     n = this->m_MultiWidget->GetWidgetPlane2();
     if(n)
     {
         n->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ) );
-        //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
     }
 
     n = this->m_MultiWidget->GetWidgetPlane3();
     if(n)
     {
         n->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ) );
-        //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
     }
 
-    // only works correctly for 3D RenderWindow
+    QString fileName = "/axial.png";
+    int c = 1;
+    while (QFile::exists(filePath+fileName))
+    {
+        fileName = QString("/axial_");
+        fileName += QString::number(c);
+        fileName += ".png";
+        c++;
+    }
     vtkRenderer* renderer = m_MultiWidget->mitkWidget1->GetRenderer()->GetVtkRenderer();
     if (renderer != NULL)
-        this->TakeScreenshot(renderer, 1, fileName+"/axial.png");
+        this->TakeScreenshot(renderer, 1, filePath+fileName);
 
+    fileName = "/sagittal.png";
+    c = 1;
+    while (QFile::exists(filePath+fileName))
+    {
+        fileName = QString("/sagittal_");
+        fileName += QString::number(c);
+        fileName += ".png";
+        c++;
+    }
     renderer = m_MultiWidget->mitkWidget2->GetRenderer()->GetVtkRenderer();
     if (renderer != NULL)
-        this->TakeScreenshot(renderer, 1, fileName+"/sagittal.png");
+        this->TakeScreenshot(renderer, 1, filePath+fileName);
 
+    fileName = "/coronal.png";
+    c = 1;
+    while (QFile::exists(filePath+fileName))
+    {
+        fileName = QString("/coronal_");
+        fileName += QString::number(c);
+        fileName += ".png";
+        c++;
+    }
     renderer = m_MultiWidget->mitkWidget3->GetRenderer()->GetVtkRenderer();
     if (renderer != NULL)
-        this->TakeScreenshot(renderer, 1, fileName+"/coronal.png");
+        this->TakeScreenshot(renderer, 1, filePath+fileName);
 
     n = this->m_MultiWidget->GetWidgetPlane1();
     if(n)
     {
         n->SetProperty( "color", mitk::ColorProperty::New( 1,0,0 ) );
-        //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
     }
 
     n = this->m_MultiWidget->GetWidgetPlane2();
     if(n)
     {
         n->SetProperty( "color", mitk::ColorProperty::New( 0,1,0 ) );
-        //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
     }
 
     n = this->m_MultiWidget->GetWidgetPlane3();
     if(n)
     {
         n->SetProperty( "color", mitk::ColorProperty::New( 0,0,1 ) );
-        //    n->SetProperty("helper object", mitk::BoolProperty::New(false));
     }
 }
 
@@ -203,27 +223,54 @@ void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
 {
     if (m_LastPath.size()==0)
         m_LastPath = QDir::currentPath();
-    QString fileName = QFileDialog::getExistingDirectory( NULL, "Save screenshots to...", m_LastPath);
-    if (fileName.size()>0)
-        m_LastPath = fileName;
+    QString filePath = QFileDialog::getExistingDirectory( NULL, "Save screenshots to...", m_LastPath);
+    if (filePath.size()>0)
+        m_LastPath = filePath;
 
-    if( fileName.isEmpty() )
+    if( filePath.isEmpty() )
     {
         return;
     }
 
+    QString fileName = "/3D_View1.png";
+    int c = 1;
+    while (QFile::exists(filePath+fileName))
+    {
+        fileName = QString("/3D_View1_");
+        fileName += QString::number(c);
+        fileName += ".png";
+        c++;
+    }
     GetCam()->Azimuth( -7.5 );
     GetCam()->Roll(-4);
-    GenerateHR3DAtlasScreenshots(fileName+"/3D_1.png");
+    GenerateHR3DAtlasScreenshots(filePath+fileName);
     GetCam()->Roll(4);
 
+    fileName = "/3D_View2.png";
+    c = 1;
+    while (QFile::exists(filePath+fileName))
+    {
+        fileName = QString("/3D_View2_");
+        fileName += QString::number(c);
+        fileName += ".png";
+        c++;
+    }
     GetCam()->Azimuth( 90 );
     GetCam()->Elevation( 4 );
-    GenerateHR3DAtlasScreenshots(fileName+"/3D_2.png");
+    GenerateHR3DAtlasScreenshots(filePath+fileName);
 
+    fileName = "/3D_View3.png";
+    c = 1;
+    while (QFile::exists(filePath+fileName))
+    {
+        fileName = QString("/3D_View3_");
+        fileName += QString::number(c);
+        fileName += ".png";
+        c++;
+    }
     GetCam()->Elevation( 90 );
     GetCam()->Roll( -2.5 );
-    GenerateHR3DAtlasScreenshots(fileName+"/3D_3.png");
+    GenerateHR3DAtlasScreenshots(filePath+fileName);
 }
 
 void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName)

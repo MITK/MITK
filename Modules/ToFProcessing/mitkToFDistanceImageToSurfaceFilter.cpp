@@ -266,3 +266,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::SetReconstructionMode(bool withoutIn
 {
   this->m_ReconstructionMode = withoutInterpixdist;
 }
+
+bool mitk::ToFDistanceImageToSurfaceFilter::GetReconstructionMode()
+{
+  return (this->m_ReconstructionMode);
+}

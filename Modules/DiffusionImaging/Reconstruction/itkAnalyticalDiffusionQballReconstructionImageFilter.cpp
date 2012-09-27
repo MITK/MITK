@@ -241,9 +241,9 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
     // There need to be at least 6 gradient directions to be able to compute the
     // tensor basis
-    if( m_NumberOfGradientDirections < 6 )
+    if( m_NumberOfGradientDirections < (L*L + L + 2)/2 + L )
     {
-        itkExceptionMacro( << "At least 6 gradient directions are required" );
+        itkExceptionMacro( << "Not enough gradient directions supplied (" << m_NumberOfGradientDirections << "). At least " << (L*L + L + 2)/2 + L << " needed for SH-order " << L);
     }
 
     // Input must be an itk::VectorImage.
@@ -505,9 +505,9 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
     //for(int i=-6;i<7;i++)
     //  std::cout << boost::math::legendre_p<double>(6, i, 0.65657) << std::endl;
 
-    if( m_NumberOfGradientDirections < 6 )
+    if( m_NumberOfGradientDirections < (L*L + L + 2)/2 + L )
     {
-        itkExceptionMacro( << "Not enough gradient directions supplied. Need to supply at least 6" );
+        itkExceptionMacro( << "Not enough gradient directions supplied (" << m_NumberOfGradientDirections << "). At least " << (L*L + L + 2)/2 + L << " needed for SH-order " << L);
     }
 
     {

@@ -686,7 +686,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
 
             // TENSOR RECONSTRUCTION
             clock.Start();
-            MBI_INFO << "Tensor reconstruction ";
+            MITK_DEBUG << "Tensor reconstruction ";
             mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Tensor reconstruction for %s", nodename.c_str()).toAscii());
             typedef itk::DiffusionTensor3DReconstructionImageFilter<
                     DiffusionPixelType, DiffusionPixelType, TTensorPixelType > TensorReconstructionImageFilterType;
@@ -697,7 +697,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
             tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorReconstructionThreshold->value() );
             tensorReconstructionFilter->Update();
             clock.Stop();
-            MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
+            MITK_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
             // TENSORS TO DATATREE
             mitk::TensorImage::Pointer image = mitk::TensorImage::New();
@@ -761,8 +761,9 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
     }
     catch (itk::ExceptionObject &ex)
     {
-        MBI_INFO << ex ;
-        return ;
+        MITK_INFO << ex ;
+        throw ex;
+        return;
     }
 }
 
@@ -1018,7 +1019,8 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
     }
     catch (itk::ExceptionObject &ex)
     {
-        MBI_INFO << ex ;
+        MITK_INFO << ex ;
+        throw ex;
         return ;
     }
 }

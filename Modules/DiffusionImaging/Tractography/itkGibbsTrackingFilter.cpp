@@ -114,12 +114,12 @@ GibbsTrackingFilter< ItkQBallImageType >
     // instantiate all necessary components
     SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
     // handle lookup table not found cases
-    if( !interpolator->LoadLookuptables(m_LutPath) )
+    if( !interpolator->IsInValidState() )
     {
       m_IsInValidState = false;
       m_AbortTracking = true;
       m_BuildFibers = false;
-      mitkThrow() << "Unable to load lookup table.";
+      mitkThrow() << "Unable to load lookup tables.";
     }
     ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength, m_ParticleGridCellCapacity);
     GibbsEnergyComputer* encomp = new GibbsEnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
@@ -242,12 +242,12 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
 
     // handle lookup table not found cases
-    if( !interpolator->LoadLookuptables(m_LutPath) )
+    if( !interpolator->IsInValidState() )
     {
       m_IsInValidState = false;
       m_AbortTracking = true;
       m_BuildFibers = false;
-      mitkThrow() << "Unable to load lookup table.";
+      mitkThrow() << "Unable to load lookup tables.";
     }
 
     // initialize the actual tracking components (ParticleGrid, Metropolis Hastings Sampler and Energy Computer)

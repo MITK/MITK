@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkImage.h"
-#include "mitkImagePixelReadAccessor.h"
-#include "mitkImagePixelWriteAccessor.h"
+#include "mitkImageReadAccessor.h"
+#include "mitkImageWriteAccessor.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkImageTimeSelector.h"
 #include <itksys/SystemTools.hxx>
@@ -57,8 +57,8 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
 
   mitk::Image::Pointer im = threadData->data;
 
-  int xlength = im->GetDimension(0);
-  int ylength = im->GetDimension(1);
+  //int xlength = im->GetDimension(0);
+  //int ylength = im->GetDimension(1);
   int nrSlices = im->GetDimension(2);
 
   // Create randomly a PixelRead- or PixelWriteAccessor for a slice and access all pixels in it.
@@ -66,8 +66,8 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
     if(rand() % 2) {
       mitk::ImageDataItem* iDi = im->GetSliceData(rand() % nrSlices);
       while(!iDi->IsComplete());
-      mitk::ImagePixelReadAccessor<short,2>* iRA = new mitk::ImagePixelReadAccessor<short,2>(im,iDi);
-      itk::Index<2> idx;
+      mitk::ImageReadAccessor* iRA = new mitk::ImageReadAccessor(im,iDi);
+      /*itk::Index<2> idx;
 
       for(int i=0; i<xlength; ++i) {
         for(int j=0; j<ylength; ++j) {
@@ -76,7 +76,7 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
           short value = iRA->GetPixelByIndexSafe(idx);
           value = 0;
         }
-      }
+      }*/
 
       delete iRA;
     }
@@ -85,14 +85,16 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
       try {
         mitk::ImageDataItem* iDi = im->GetSliceData(rand() % nrSlices);
         while(!iDi->IsComplete());
-        mitk::ImagePixelWriteAccessor<short,2> iB(im,iDi);
+        mitk::ImageWriteAccessor iB(im,iDi);
+        void* pointer = iB.GetData();
+        *((char*) pointer) = 0;
 
-        for(int i=0; i<xlength; ++i) {
+        /*for(int i=0; i<xlength; ++i) {
           for(int j=0; j<ylength; ++j) {
             itk::Index<2> idx = {{ i, j }};
             iB.SetPixelByIndexSafe(idx, rand() % 16000);
           }
-        }
+        }*/
 
       }
       catch(mitk::MemoryIsLockedException e) {

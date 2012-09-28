@@ -40,9 +40,9 @@ namespace mitk
     mitkClassMacro( TensorImage, Image );
     itkNewMacro(Self);
     
-    virtual vtkImageData* GetNonRgbVtkImageData(int t = 0, int n = 0);
+    virtual ImageVtkAccessor* GetNonRgbVtkImageData(int t = 0, int n = 0);
 
-    virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
+    virtual ImageVtkAccessor* GetVtkImageData(int t = 0, int n = 0);
 
     virtual void ConstructRgbImage();
 

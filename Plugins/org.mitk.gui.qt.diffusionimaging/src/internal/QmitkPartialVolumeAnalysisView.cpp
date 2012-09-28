@@ -1656,7 +1656,7 @@ void QmitkPartialVolumeAnalysisView::RemoveOrphanImages()
 }
 
 void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
-        mitk::Image::ConstPointer tensorimage)
+        mitk::Image::Pointer tensorimage)
 {
     typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
 

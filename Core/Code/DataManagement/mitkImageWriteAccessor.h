@@ -89,7 +89,7 @@ private:
     bool readOverlap = false;
     bool writeOverlap = false;
 
-    ImageAccessorWaitLock* overlapLock;
+    ImageAccessorWaitLock* overlapLock = 0;
 
     // Check, if there is any Read-Access going on
     if(m_Image->m_Readers.size() > 0)

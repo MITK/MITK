@@ -192,7 +192,7 @@ protected:
   void FindRenderWindow(mitk::DataNode* node);
 
   void ExtractTensorImages(
-      mitk::Image::ConstPointer tensorimage);
+      mitk::Image::Pointer tensorimage);
 
   typedef std::map< mitk::Image *, mitk::PartialVolumeAnalysisHistogramCalculator::Pointer >
     PartialVolumeAnalysisMapType;

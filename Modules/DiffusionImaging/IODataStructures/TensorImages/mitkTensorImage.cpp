@@ -37,7 +37,7 @@ mitk::TensorImage::~TensorImage()
 
 }
 
-vtkImageData* mitk::TensorImage::GetVtkImageData(int t, int n)
+mitk::ImageVtkAccessor* mitk::TensorImage::GetVtkImageData(int t, int n)
 {
   if(m_RgbImage.IsNull())
   {
@@ -62,7 +62,7 @@ void mitk::TensorImage::ConstructRgbImage()
     m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
 }
 
-vtkImageData* mitk::TensorImage::GetNonRgbVtkImageData(int t, int n)
+mitk::ImageVtkAccessor* mitk::TensorImage::GetNonRgbVtkImageData(int t, int n)
 {
   return Superclass::GetVtkImageData(t,n);
 }

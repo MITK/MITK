@@ -608,7 +608,7 @@ namespace mitk
   template < typename TPixel, unsigned int VImageDimension >
       void PartialVolumeAnalysisClusteringCalculator::InternalQuantify(
           const itk::Image< TPixel, VImageDimension > *image,
-          mitk::Image::ConstPointer clusteredImage, double* retval, mitk::Image::Pointer mask ) const
+          mitk::Image::Pointer clusteredImage, double* retval, mitk::Image::Pointer mask ) const
   {
     typedef itk::Image< TPixel, VImageDimension > ImageType;
     typedef itk::Image< float, VImageDimension > ProbImageType;

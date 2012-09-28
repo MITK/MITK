@@ -110,7 +110,9 @@ calling object*/
 
   \todo maybe there is something in external toolkits (ITK, VTK,...) that we could reulse -- would be much preferable
 */
-#ifdef __GNUC__
+#ifdef MITK_NO_DEPRECATED_WARNINGS
+  #define DEPRECATED(func) func
+#elif defined(__GNUC__)
   #define DEPRECATED(...) __VA_ARGS__ __attribute__ ((deprecated))
 #elif defined(_MSC_VER)
   #define DEPRECATED(...) __declspec(deprecated) ##__VA_ARGS__

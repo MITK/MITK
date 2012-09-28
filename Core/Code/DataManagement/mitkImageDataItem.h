@@ -23,12 +23,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <mitkIpPic.h>
 //#include "mitkPixelType.h"
 #include "mitkImageDescriptor.h"
+//#include "mitkImageVtkAccessor.h"
 
 class vtkImageData;
 
 namespace mitk {
 
   class PixelType;
+  class ImageVtkAccessor;
+
+  class Image;
+
+  typedef itk::SmartPointer<mitk::Image> ImagePointer;
+
 
   //##Documentation
   //## @brief Internal class for managing references on sub-images
@@ -46,6 +53,21 @@ namespace mitk {
   //## @ingroup Data
   class MITK_CORE_EXPORT ImageDataItem : public itk::LightObject
   {
+
+  friend class ImageAccessorBase;
+  friend class ImageWriteAccessor;
+  friend class ImageReadAccessor;
+
+  template <class TPixel, unsigned int VDimension>
+  friend class ImagePixelReadAccessor;
+  template <class TPixel, unsigned int VDimension>
+  friend class ImagePixelWriteAccessor;
+
+  friend class Image;
+
+//  template<class TOutputImage>
+//  friend class ImageToItk;
+
   public:
     mitkClassMacro(ImageDataItem, itk::LightObject);
 
@@ -59,7 +81,7 @@ namespace mitk {
 
     ImageDataItem(const ImageDataItem &other);
 
-    void* GetData() const
+    DEPRECATED(void* GetData() const)
     {
       return m_Data;
     }
@@ -105,12 +127,12 @@ namespace mitk {
     }
 
     //## Returns a vtkImageData; if non is present, a new one is constructed.
-    vtkImageData* GetVtkImageData() const
-    {
+    ImageVtkAccessor* GetVtkImageData(ImagePointer) const;
+    /*{
       if(m_VtkImageData==NULL)
-        ConstructVtkImageData();
+        ConstructVtkImageData(iP);
       return m_VtkImageData;
-    }
+    }*/
 
     // Returns if image data should be deleted on destruction of ImageDataItem.
     bool GetManageMemory() const
@@ -118,7 +140,7 @@ namespace mitk {
       return m_ManageMemory;
     }
 
-    virtual void ConstructVtkImageData() const;
+    virtual void ConstructVtkImageData(ImagePointer) const;
 
     unsigned long GetSize() const
     {
@@ -134,7 +156,7 @@ namespace mitk {
 
     bool m_ManageMemory;
 
-    mutable vtkImageData* m_VtkImageData;
+    mutable ImageVtkAccessor* m_VtkImageData;
     int m_Offset;
 
     bool m_IsComplete;

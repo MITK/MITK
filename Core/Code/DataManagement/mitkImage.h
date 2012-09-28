@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 #include "mitkImageDataItem.h"
 #include "mitkImageDescriptor.h"
+#include "mitkImageAccessorBase.h"
+#include "mitkImageVtkAccessor.h"
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
@@ -64,6 +66,14 @@ class ImageStatisticsHolder;
 class MITK_CORE_EXPORT Image : public SlicedData
 {
   friend class SubImageSelector;
+
+  friend class ImageAccessorBase;
+  friend class ImageVtkAccessor;
+  friend class ImageReadAccessor;
+  friend class ImageWriteAccessor;
+
+
+//    friend class ImageWriteAccessor;
 
 public:
   mitkClassMacro(Image, SlicedData);
@@ -111,22 +121,24 @@ public:
   //##
   //## If you only want to access a slice, volume at a specific time or single channel
   //## use one of the SubImageSelector classes.
-  virtual void* GetData();
 
+  DEPRECATED(virtual void* GetData());
+
+public:
   //## @brief Get the pixel value at one specific index position.
   //## @brief Get the pixel value at one specific position.
   //##
   //## The pixel type is always being converted to double.
-  double GetPixelValueByIndex(const mitk::Index3D& position, unsigned int timestep = 0);
+  DEPRECATED(double GetPixelValueByIndex(const mitk::Index3D& position, unsigned int timestep = 0));
 
   //## @brief Get the pixel value at one specific world position.
   //##
   //## The pixel type is always being converted to double.
-  double GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep = 0);
+  DEPRECATED(double GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep = 0));
 
   //##Documentation
   //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
-  virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
+  virtual ImageVtkAccessor* GetVtkImageData(int t = 0, int n = 0);
 
   //##Documentation
   //## @brief Get the complete image, i.e., all channels linked together, as a @a mitkIpPicDescriptor.
@@ -601,6 +613,20 @@ protected:
   // Image statistics Holder replaces the former implementation directly inside this class
   friend class ImageStatisticsHolder;
   StatisticsHolderPointer m_ImageStatistics;
+
+private:
+
+  /** Stores all existing ImageReadAccessors */
+  std::vector<ImageAccessorBase*> m_Readers;
+  /** Stores all existing ImageWriteAccessors */
+  std::vector<ImageAccessorBase*> m_Writers;
+  /** Stores all existing ImageVtkAccessors */
+  std::vector<ImageAccessorBase*> m_VtkReaders;
+
+  /** A mutex, which needs to be locked to manage m_Readers and m_Writers */
+  itk::SimpleFastMutexLock m_ReadWriteLock;
+  /** A mutex, which needs to be locked to manage m_VtkReaders */
+  itk::SimpleFastMutexLock m_VtkReadersLock;
 
 };
 

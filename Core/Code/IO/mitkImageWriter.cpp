@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageReadAccessor.h"
 
 #include <itkImageIOBase.h>
 #include <itkImageIOFactory.h>
@@ -139,8 +140,8 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
   imageIO->SetIORegion(ioRegion);
   imageIO->SetFileName(fileName);
 
-  const void * data = image->GetData();
-  imageIO->Write(data);
+  ImageReadAccessor imageAccess(image);
+  imageIO->Write(imageAccess.GetData());
 }
 
 void mitk::ImageWriter::GenerateData()

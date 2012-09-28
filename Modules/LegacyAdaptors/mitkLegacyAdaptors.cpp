@@ -14,6 +14,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkLegacyAdaptors.h"
+#include <mitkImageWriteAccessor.h>
+
+mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mitk::ImageWriteAccessor* imageAccess, mitkIpPicDescriptor* picDesc)
+{
+  const mitk::ImageDescriptor::Pointer imDesc = refImg->GetImageDescriptor();
+
+  // initialize dimension information
+  for (unsigned int i=0; i<8; i++)
+  {
+      picDesc->n[i] = 1;
+  }
+
+  // set dimension information
+  picDesc->dim = refImg->GetDimension();
+  memcpy( picDesc->n, imDesc->GetDimensions(), picDesc->dim * sizeof(unsigned int) );
+
+  picDesc->type = CastToIpPicType( refImg->GetPixelType().GetTypeId() );
+  picDesc->bpe = refImg->GetPixelType().GetBpe();
+  picDesc->data = imageAccess->GetData();
+
+  return picDesc;
+}
+
+mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem> refItem, mitk::ImageWriteAccessor* imageAccess, mitkIpPicDescriptor *picDesc)
+{
+  // initialize dimension information
+  for (unsigned int i=0; i<8; i++)
+  {
+      picDesc->n[i] = 1;
+  }
+
+  // get the dimensionality information from image item
+  picDesc->dim = refItem->GetDimension();
+  for( unsigned int i=0; i<picDesc->dim; i++)
+  {
+    picDesc->n[i] = refItem->GetDimension(i);
+  }
+
+  picDesc->type = CastToIpPicType( refItem->GetPixelType().GetTypeId() );
+  picDesc->bpe = refItem->GetPixelType().GetBpe();
+  picDesc->data = imageAccess->GetData();
+
+  return picDesc;
+
+}
 
 mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mitkIpPicDescriptor* picDesc)
 {
@@ -58,6 +103,7 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDa
   return picDesc;
 
 }
+
 
 mitk::ImageDescriptor::Pointer mitk::CastToImageDescriptor(mitkIpPicDescriptor *desc)
 {

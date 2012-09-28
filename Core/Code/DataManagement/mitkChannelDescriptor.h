@@ -57,6 +57,7 @@ public:
 protected:
 
     friend class Image;
+    friend class ImageAccessorBase;
 
     void SetData( void* dataPtr )
     {

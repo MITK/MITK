@@ -27,6 +27,10 @@ include(${CMAKE_CURRENT_BINARY_DIR}/CppMicroServices/CppMicroServicesConfig.cmak
 
 set(TOOL_CPPS "")
 
+# temporary suppress warnings in the following files until image accessors are fully integrated.
+set_source_files_properties( DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
+set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
+
 MITK_CREATE_MODULE( Mitk
   INCLUDE_DIRS
     ${CppMicroServices_INCLUDE_DIRS} Algorithms Common DataManagement Controllers

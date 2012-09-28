@@ -487,7 +487,7 @@ namespace mitk
     template < typename TPixel, unsigned int VImageDimension >
         void InternalQuantify(
             const itk::Image< TPixel, VImageDimension > *image,
-            mitk::Image::ConstPointer clusteredImage, double* retval, mitk::Image::Pointer mask ) const;
+            mitk::Image::Pointer clusteredImage, double* retval, mitk::Image::Pointer mask ) const;
 
     template < typename TPixel, unsigned int VImageDimension >
         void InternalGenerateQuantileImage(

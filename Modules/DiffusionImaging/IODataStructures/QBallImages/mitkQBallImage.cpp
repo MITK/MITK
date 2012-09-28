@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkQBallImage.h"
 #include "mitkImageCast.h"
 #include "itkImage.h"
+#include "mitkImageVtkAccessor.h"
 #include "itkQBallToRgbImageFilter.h"
 
 mitk::QBallImage::QBallImage() : Image()
@@ -29,7 +30,7 @@ mitk::QBallImage::~QBallImage()
 
 }
 
-vtkImageData* mitk::QBallImage::GetVtkImageData(int t, int n)
+mitk::ImageVtkAccessor* mitk::QBallImage::GetVtkImageData(int t, int n)
 {
   if(m_RgbImage.IsNull())
     ConstructRgbImage();
@@ -52,7 +53,7 @@ void mitk::QBallImage::ConstructRgbImage()
   m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
 }
 
-vtkImageData* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n)
+mitk::ImageVtkAccessor* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n)
 {
   return Superclass::GetVtkImageData(t,n);
 }
@@ -67,6 +68,6 @@ vtkImageData* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n)
 //  m_Slices.push_back(img->GetSliceData(0).GetPointer());
 //  m_Dimension = img->GetDimension();
 //  m_Dimensions = img->GetDimensions();
-//  m_PixelType	 = img->GetPixelType();
+//  m_PixelType = img->GetPixelType();
 //}
 

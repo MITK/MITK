@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,12 +31,12 @@ namespace itk {
 
 #define QBALL_RECON_PI       M_PI
 
-  template< class TReferenceImagePixelType, 
+  template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
   class TOdfPixelType,
     int NrOdfDirections,
     int NrBasisFunctionCenters>
-    DiffusionQballReconstructionImageFilter< TReferenceImagePixelType, 
+    DiffusionQballReconstructionImageFilter< TReferenceImagePixelType,
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
     ::DiffusionQballReconstructionImageFilter() :
@@ -51,32 +51,32 @@ namespace itk {
   {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
-    this->SetNumberOfRequiredInputs( 1 ); 
+    this->SetNumberOfRequiredInputs( 1 );
   }
 
-  template< class TReferenceImagePixelType, 
+  template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
   class TOdfPixelType,
     int NrOdfDirections,
     int NrBasisFunctionCenters>
-    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType, 
+    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType,
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
     ::BeforeThreadedGenerateData()
   {
-    // If we have more than 2 inputs, then each input, except the first is a 
+    // If we have more than 2 inputs, then each input, except the first is a
     // gradient image. The number of gradient images must match the number of
     // gradient directions.
     const unsigned int numberOfInputs = this->GetNumberOfInputs();
 
-    // There need to be at least 6 gradient directions to be able to compute the 
+    // There need to be at least 6 gradient directions to be able to compute the
     // tensor basis
-    if( m_NumberOfGradientDirections < 6 )
+    if( m_NumberOfGradientDirections < 1 )
     {
-      itkExceptionMacro( << "At least 6 gradient directions are required" );
+        itkExceptionMacro( << "Your image contains no diffusion gradients!" );
     }
 
-    // If there is only 1 gradient image, it must be an itk::VectorImage. Otherwise 
+    // If there is only 1 gradient image, it must be an itk::VectorImage. Otherwise
     // we must have a container of (numberOfInputs-1) itk::Image. Check to make sure
     if ( numberOfInputs == 1
       && m_GradientImageTypeEnumeration != GradientIsInASingleImage )
@@ -85,7 +85,7 @@ namespace itk {
         this->ProcessObject::GetInput(0)->GetNameOfClass());
       if ( strcmp(gradientImageClassName.c_str(),"VectorImage") != 0 )
       {
-        itkExceptionMacro( << 
+        itkExceptionMacro( <<
           "There is only one Gradient image. I expect that to be a VectorImage. "
           << "But its of type: " << gradientImageClassName );
       }
@@ -109,7 +109,7 @@ namespace itk {
     // The gradients are specified in a single multi-component image
     else if( m_GradientImageTypeEnumeration == GradientIsInASingleImage )
     {
-      typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >( 
+      typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >(
         this->ProcessObject::GetInput(0) );
       m_BZeroImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
       m_BZeroImage->SetOrigin( img->GetOrigin() );     // Set the image origin
@@ -117,22 +117,22 @@ namespace itk {
       m_BZeroImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
       m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
     }
-    
+
     m_BZeroImage->Allocate();
 
   }
 
-  template< class TReferenceImagePixelType, 
+  template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
   class TOdfPixelType,
     int NrOdfDirections,
     int NrBasisFunctionCenters>
-    typename itk::DiffusionQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType, NrOdfDirections, NrBasisFunctionCenters>::OdfPixelType 
+    typename itk::DiffusionQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType, NrOdfDirections, NrBasisFunctionCenters>::OdfPixelType
     itk::DiffusionQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType, NrOdfDirections, NrBasisFunctionCenters>::Normalize( OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
   {
     switch( m_NormalizationMethod )
     {
-    
+
       // divide by sum to retreive a PDF
     case QBR_STANDARD:
       {
@@ -169,7 +169,7 @@ namespace itk {
   }
 
 
-  template< class TReferenceImagePixelType, 
+  template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
   class TOdfPixelType,
     int NrOdfDirections,
@@ -212,19 +212,19 @@ namespace itk {
     return vec;
   }
 
-  template< class TReferenceImagePixelType, 
+  template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
   class TOdfPixelType,
     int NrOdfDirections,
     int NrBasisFunctionCenters>
-    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType, 
+    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType,
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-    int ) 
+    int )
   {
     // init output and b-zero iterators
-    typename OutputImageType::Pointer outputImage = 
+    typename OutputImageType::Pointer outputImage =
       static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();
@@ -241,8 +241,8 @@ namespace itk {
     if( m_GradientImageTypeEnumeration == GradientIsInManyImages )
     {
       // b-zero reference image iterator
-      ImageRegionConstIterator< ReferenceImageType > 
-        it(static_cast< ReferenceImageType * >(this->ProcessObject::GetInput(0)), 
+      ImageRegionConstIterator< ReferenceImageType >
+        it(static_cast< ReferenceImageType * >(this->ProcessObject::GetInput(0)),
         outputRegionForThread);
       it.GoToBegin();
 
@@ -259,9 +259,9 @@ namespace itk {
         // init and pushback current input image iterator
         typename GradientImageType::Pointer gradientImagePointer = NULL;
         // dynamic_cast would be nice, static because of SGI
-        gradientImagePointer = static_cast< GradientImageType * >( 
+        gradientImagePointer = static_cast< GradientImageType * >(
           this->ProcessObject::GetInput(index) );
-        GradientIteratorType *git = new GradientIteratorType( 
+        GradientIteratorType *git = new GradientIteratorType(
           gradientImagePointer, outputRegionForThread );
         git->GoToBegin();
         gradientItContainer.push_back(git);
@@ -299,13 +299,16 @@ namespace itk {
           // post-normalization according to m_NormalizationMethod
           odf.Normalize();
 
+          for (int i=0; i<odf.Size(); i++)
+              if (odf.GetElement(i)!=odf.GetElement(i))
+                  odf.Fill(0.0);
         }
         else
         {
           // in case we fall below threshold, we just increment to next voxel
           for( unsigned int i = 0; i< m_NumberOfGradientDirections; i++ )
           {
-            ++(*gradientItContainer[i]);  
+            ++(*gradientItContainer[i]);
           }
         }
 
@@ -332,7 +335,7 @@ namespace itk {
       typedef typename GradientImagesType::PixelType         GradientVectorType;
       typename GradientImagesType::Pointer gradientImagePointer = NULL;
       // dynamic_cast would be nice, static because of SGI
-      gradientImagePointer = static_cast< GradientImagesType * >( 
+      gradientImagePointer = static_cast< GradientImagesType * >(
         this->ProcessObject::GetInput(0) );
       GradientIteratorType git(gradientImagePointer, outputRegionForThread );
       git.GoToBegin();
@@ -410,20 +413,20 @@ namespace itk {
     std::cout << "One Thread finished reconstruction" << std::endl;
   }
 
-  template< class TReferenceImagePixelType, 
+  template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
   class TOdfPixelType,
     int NrOdfDirections,
     int NrBasisFunctionCenters>
-    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType, 
+    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType,
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
     ::ComputeReconstructionMatrix()
   {
 
-    if( m_NumberOfGradientDirections < 6 )
+    if( m_NumberOfGradientDirections < 1 )
     {
-      itkExceptionMacro( << "Not enough gradient directions supplied. Need to supply at least 6" );
+      itkExceptionMacro( << "Your image contains no diffusion gradients!" );
     }
 
     {
@@ -534,7 +537,7 @@ namespace itk {
       for(int i=0; i<NOdfDirections; i++)
       {
         vnl_vector_fixed<double,3> ui   = (*U).get_column(i);
-        vnl_matrix<double> *RC 
+        vnl_matrix<double> *RC
           = new vnl_matrix<double>(3,m_NumberOfEquatorSamplingPoints);
 
         if( (z(0)*ui(0)+z(1)*ui(1)+z(2)*ui(2)+1) != 0 )
@@ -568,7 +571,7 @@ namespace itk {
       double start = 0.01;
       double minCondition = NumericTraits<double>::max();
 
-      vnl_matrix<double> *H 
+      vnl_matrix<double> *H
         = new vnl_matrix<double>(m_NumberOfGradientDirections,NBasisFunctionCenters,(double)0);
 
       {
@@ -650,7 +653,7 @@ namespace itk {
       }
     }
 
-    vnl_matrix<double> *GH_plus = 
+    vnl_matrix<double> *GH_plus =
       new vnl_matrix<double>(m_NumberOfEquatorSamplingPoints*NOdfDirections,m_NumberOfGradientDirections);
 
     // simple matrix multiplication, manual cause of stack overflow using operator
@@ -702,22 +705,22 @@ namespace itk {
 
   }
 
-  template< class TReferenceImagePixelType, 
+  template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
   class TOdfPixelType,
     int NrOdfDirections,
     int NrBasisFunctionCenters>
-    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType, 
+    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType,
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
-    ::AddGradientImage( const GradientDirectionType &gradientDirection, 
+    ::AddGradientImage( const GradientDirectionType &gradientDirection,
     const GradientImageType *gradientImage )
   {
-    // Make sure crazy users did not call both AddGradientImage and 
+    // Make sure crazy users did not call both AddGradientImage and
     // SetGradientImage
     if( m_GradientImageTypeEnumeration == GradientIsInASingleImage)
     {
-      itkExceptionMacro( << "Cannot call both methods:" 
+      itkExceptionMacro( << "Cannot call both methods:"
         << "AddGradientImage and SetGradientImage. Please call only one of them.");
     }
 
@@ -730,31 +733,31 @@ namespace itk {
 
     this->m_NumberOfGradientDirections = m_GradientDirectionContainer->Size();
 
-    m_GradientDirectionContainer->InsertElement( this->m_NumberOfGradientDirections, 
+    m_GradientDirectionContainer->InsertElement( this->m_NumberOfGradientDirections,
       gradientDirection / gradientDirection.two_norm() );
 
-    this->ProcessObject::SetNthInput( this->m_NumberOfGradientDirections, 
+    this->ProcessObject::SetNthInput( this->m_NumberOfGradientDirections,
       const_cast< GradientImageType* >(gradientImage) );
 
     m_GradientImageTypeEnumeration = GradientIsInManyImages;
   }
 
-  template< class TReferenceImagePixelType, 
+  template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
   class TOdfPixelType,
     int NrOdfDirections,
     int NrBasisFunctionCenters>
-    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType, 
+    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType,
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
-    ::SetGradientImage( GradientDirectionContainerType *gradientDirection, 
+    ::SetGradientImage( GradientDirectionContainerType *gradientDirection,
     const GradientImagesType *gradientImage )
   {
-    // Make sure crazy users did not call both AddGradientImage and 
+    // Make sure crazy users did not call both AddGradientImage and
     // SetGradientImage
     if( m_GradientImageTypeEnumeration == GradientIsInManyImages )
     {
-      itkExceptionMacro( << "Cannot call both methods:" 
+      itkExceptionMacro( << "Cannot call both methods:"
         << "AddGradientImage and SetGradientImage. Please call only one of them.");
     }
 
@@ -777,7 +780,7 @@ namespace itk {
 
     this->m_NumberOfGradientDirections = numImages - this->m_NumberOfBaselineImages;
 
-    // ensure that the gradient image we received has as many components as 
+    // ensure that the gradient image we received has as many components as
     // the number of gradient directions
     if( gradientImage->GetVectorLength() != this->m_NumberOfBaselineImages + m_NumberOfGradientDirections )
     {
@@ -787,18 +790,18 @@ namespace itk {
         << " components.");
     }
 
-    this->ProcessObject::SetNthInput( 0, 
+    this->ProcessObject::SetNthInput( 0,
       const_cast< GradientImagesType* >(gradientImage) );
     m_GradientImageTypeEnumeration = GradientIsInASingleImage;
   }
 
 
-  template< class TReferenceImagePixelType, 
+  template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
   class TOdfPixelType,
     int NrOdfDirections,
     int NrBasisFunctionCenters>
-    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType, 
+    void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType,
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
     ::PrintSelf(std::ostream& os, Indent indent) const
@@ -817,12 +820,12 @@ namespace itk {
     }
     else
     {
-      os << indent << 
+      os << indent <<
         "GradientDirectionContainer: (Gradient directions not set)" << std::endl;
     }
-    os << indent << "NumberOfGradientDirections: " << 
+    os << indent << "NumberOfGradientDirections: " <<
       m_NumberOfGradientDirections << std::endl;
-    os << indent << "NumberOfBaselineImages: " << 
+    os << indent << "NumberOfBaselineImages: " <<
       m_NumberOfBaselineImages << std::endl;
     os << indent << "Threshold for reference B0 image: " << m_Threshold << std::endl;
     os << indent << "BValue: " << m_BValue << std::endl;

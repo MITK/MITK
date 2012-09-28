@@ -103,7 +103,7 @@ protected:
 
   template<int L>
   void TemplatedMultiQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,
-    float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes);
+    float lambda, const mitk::DataNode * , std::vector<mitk::DataNode::Pointer>* nodes);
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
@@ -115,7 +115,7 @@ protected:
 
 private:
 
-  std::map< std::string, QbrShellSelection * > m_ShellSelectorMap;
+  std::map< const mitk::DataNode *, QbrShellSelection * > m_ShellSelectorMap;
   void GenerateShellSelectionUI(mitk::DataStorage::SetOfObjects::Pointer set);
 };
 

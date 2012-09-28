@@ -542,7 +542,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
 
             // QBALL RECONSTRUCTION
             clock.Start();
-            MBI_INFO << "QBall reconstruction ";
+            MITK_DEBUG << "QBall reconstruction ";
             mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
                                                             "QBall reconstruction for %s", nodename.c_str()).toAscii());
 
@@ -613,8 +613,8 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
     }
     catch (itk::ExceptionObject &ex)
     {
-        MITK_INFO << ex ;
-        throw ex;
+        MITK_INFO << ex;
+        QMessageBox::information(0, "Reconstruction not possible:", ex.GetDescription());
         return ;
     }
 }
@@ -657,7 +657,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
 
             // QBALL RECONSTRUCTION
             clock.Start();
-            MBI_INFO << "QBall reconstruction ";
+            MITK_DEBUG << "QBall reconstruction ";
             mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
                                                             "QBall reconstruction for %s", nodename.c_str()).toAscii());
 
@@ -719,7 +719,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
     catch (itk::ExceptionObject &ex)
     {
         MITK_INFO << ex;
-        throw ex;
+        QMessageBox::information(0, "Reconstruction not possible:", ex.GetDescription());
         return;
     }
 }
@@ -851,7 +851,7 @@ void QmitkQBallReconstructionView::MultiQBallReconstruction(
 
             // QBALL RECONSTRUCTION
             clock.Start();
-            MBI_INFO << "QBall reconstruction ";
+            MITK_DEBUG << "QBall reconstruction ";
             mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
                                                             "QBall reconstruction for %s", nodename.c_str()).toAscii());
 

@@ -636,6 +636,8 @@ void QmitkPartialVolumeAnalysisView::OnSelectionChanged(berry::IWorkbenchPart::P
 {
     m_Controls->m_InputData->setTitle("Please Select Input Data");
 
+    if (!m_Visible)
+        return;
 
     if ( nodes.empty() )
     {
@@ -1862,16 +1864,6 @@ void QmitkPartialVolumeAnalysisView::Activated()
             mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
         }
     }
-
-    berry::IWorkbenchPart::Pointer bla;
-    if (!this->GetCurrentSelection().empty())
-    {
-        this->OnSelectionChanged(bla, this->GetCurrentSelection());
-    }
-    else
-    {
-        this->OnSelectionChanged(bla, this->GetDataManagerSelection());
-    }
 }
 
 void QmitkPartialVolumeAnalysisView::Deactivated()
@@ -1907,12 +1899,27 @@ void QmitkPartialVolumeAnalysisView::ActivatedZombieView(berry::IWorkbenchPartRe
 
 void QmitkPartialVolumeAnalysisView::Hidden()
 {
+    if (m_ClusteringResult.IsNotNull())
+    {
+        this->GetDataStorage()->Remove(m_ClusteringResult);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    Select(NULL, true, true);
     m_Visible = false;
 }
 
 void QmitkPartialVolumeAnalysisView::Visible()
 {
     m_Visible = true;
+    berry::IWorkbenchPart::Pointer bla;
+    if (!this->GetCurrentSelection().empty())
+    {
+        this->OnSelectionChanged(bla, this->GetCurrentSelection());
+    }
+    else
+    {
+        this->OnSelectionChanged(bla, this->GetDataManagerSelection());
+    }
 }
 
 void QmitkPartialVolumeAnalysisView::SetFocus()

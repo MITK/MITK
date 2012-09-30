@@ -22,41 +22,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-bool BundleUtility::IsActive(IBundle::Pointer bundle)
+bool BundleUtility::IsActive(ctkPlugin* plugin)
 {
-  if (!bundle)
+  if (!plugin)
   {
     return false;
   }
-  return bundle->GetState() == IBundle::BUNDLE_ACTIVE;
+  return plugin->getState() == ctkPlugin::ACTIVE;
 }
 
-bool BundleUtility::IsActivated(IBundle::Pointer bundle)
+bool BundleUtility::IsActivated(ctkPlugin* plugin)
 {
-  if (bundle && bundle->GetState() == IBundle::BUNDLE_STARTING)
+  if (plugin && plugin->getState() == ctkPlugin::STARTING)
     return true;
     //return WorkbenchPlugin::GetDefault()->IsStarting(bundle);
 
-  return bundle && (bundle->GetState() == IBundle::BUNDLE_ACTIVE
-      || bundle->GetState() == IBundle::BUNDLE_STOPPING);
+  return plugin && (plugin->getState() == ctkPlugin::ACTIVE
+                    || plugin->getState() == ctkPlugin::STOPPING);
 }
 
-bool BundleUtility::IsReady(IBundle::Pointer bundle)
+bool BundleUtility::IsReady(ctkPlugin* plugin)
 {
-  return bundle && IsReady(bundle->GetState());
-}
-
-bool BundleUtility::IsReady(QSharedPointer<ctkPlugin> plugin)
-{
-  return !plugin.isNull() && IsReady(plugin->getState());
-}
-
-bool BundleUtility::IsReady(IBundle::State bundleState)
-{
-  return (bundleState == IBundle::BUNDLE_RESOLVED ||
-          bundleState == IBundle::BUNDLE_STARTING ||
-          bundleState == IBundle::BUNDLE_ACTIVE ||
-          bundleState == IBundle::BUNDLE_STOPPING);
+  return plugin && IsReady(plugin->getState());
 }
 
 bool BundleUtility::IsReady(ctkPlugin::State pluginState)
@@ -69,17 +56,17 @@ bool BundleUtility::IsReady(ctkPlugin::State pluginState)
 
 bool BundleUtility::IsActive(const QString& bundleId)
 {
-  return IsActive(Platform::GetBundle(bundleId));
+  return IsActive(Platform::GetPlugin(bundleId).data());
 }
 
 bool BundleUtility::IsActivated(const QString& bundleId)
 {
-  return IsActivated(Platform::GetBundle(bundleId));
+  return IsActivated(Platform::GetPlugin(bundleId).data());
 }
 
 bool BundleUtility::IsReady(const QString& bundleId)
 {
-  return IsReady(Platform::GetBundle(bundleId));
+  return IsReady(Platform::GetPlugin(bundleId).data());
 }
 
 QSharedPointer<ctkPlugin> BundleUtility::FindPlugin(const QString& symbolicName)

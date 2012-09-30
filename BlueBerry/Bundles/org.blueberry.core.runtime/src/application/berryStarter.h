@@ -31,7 +31,7 @@ class org_blueberry_core_runtime_EXPORT Starter
 
 public:
 
-  static const std::string XP_APPLICATIONS;
+  static const QString XP_APPLICATIONS;
 
   static int Run(int& argc, char** argv, Poco::Util::AbstractConfiguration* config = 0);
 

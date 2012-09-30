@@ -251,13 +251,6 @@ public:
 
   /**
    * Returns the extension registry for this platform.
-   *
-   * @return the extension registry
-   */
-  static IExtensionPointService* GetExtensionPointService();
-
-  /**
-   * Returns the extension registry for this platform.
    * May return <code>null</code> if the registry has not been created yet.
    *
    * @return existing extension registry or <code>null</code>
@@ -328,8 +321,6 @@ public:
    */
   static bool GetStatePath(QDir& statePath, const QSharedPointer<ctkPlugin>& plugin, bool create = true);
 
-  static bool GetStatePath(QDir& statePath, const SmartPointer<IBundle>& bundle, bool create = true);
-
   /**
    * Returns the path of the platform's user data area.  The user data area is a location on the system
    * which is specific to the system's current user.  By default it is located relative to the
@@ -375,20 +366,6 @@ public:
   static void GetOptionSet(Poco::Util::OptionSet &os);
 
   static ServiceRegistry& GetServiceRegistry();
-
-  /**
-   * Returns the resolved bundle with the specified symbolic name that has the
-   * highest version.  If no resolved bundles are installed that have the
-   * specified symbolic name then null is returned.
-   *
-   * @param id the symbolic name of the bundle to be returned.
-   * @return the bundle that has the specified symbolic name with the
-   * highest version, or <tt>null</tt> if no bundle is found.
-   * @deprecated Use GetPlugin(const QString&) instead
-   */
-  static SmartPointer<IBundle> GetBundle(const QString& id);
-
-  static std::vector<SmartPointer<IBundle> > GetBundles();
 
   /**
    * @param symbolicName

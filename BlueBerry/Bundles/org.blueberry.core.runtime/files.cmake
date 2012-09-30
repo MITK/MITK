@@ -3,7 +3,7 @@ set(MOC_H_FILES
 
   src/internal/berryCTKPluginListener_p.h
   src/internal/berryCTKPluginActivator.h
-  src/internal/berryExtensionPointService.h
+  #src/internal/berryExtensionPointService.h
   src/internal/berryPreferencesService.h
 )
 
@@ -21,7 +21,7 @@ set(SRC_CPP_FILES
   berryExtensionType.cpp
   berryIAdaptable.cpp
   berryIAdapterManager.cpp
-  berryIBundleManifest.cpp
+  #berryIBundleManifest.cpp
   berryIDebugObjectListener.cpp
   berryILog.cpp
   berryIPreferences.cpp
@@ -86,7 +86,7 @@ set(INTERNAL_CPP_FILES
   berryConfigurationElementHandle.cpp
   berryCTKPluginActivator.cpp
   berryCTKPluginListener.cpp
-  berryDefaultActivator.cpp
+  #berryDefaultActivator.cpp
   berryExtension.cpp
   #berryExtensionDelta.cpp
   berryExtensionHandle.cpp
@@ -119,9 +119,9 @@ set(INTERNAL_CPP_FILES
   berryRegistryStrategy.cpp
   berryRegistryTimestamp.cpp
   berryRegistrySupport.cpp
-  berrySystemBundle.cpp
-  berrySystemBundleActivator.cpp
-  berrySystemBundleManifest.cpp
+  #berrySystemBundle.cpp
+  #berrySystemBundleActivator.cpp
+  #berrySystemBundleManifest.cpp
   berryTemporaryObjectManager.cpp
   berryThirdLevelConfigurationElementHandle.cpp
   berryXMLPreferencesStorage.cpp

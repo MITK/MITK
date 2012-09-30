@@ -78,9 +78,7 @@ set(SRC_CPP_FILES
   berryPlatformUI.cpp
   berryPoint.cpp
   berryPropertyChangeEvent.cpp
-  berryQCHPluginListener.cpp
   berryQModelIndexObject.cpp
-  berryQtAssistantUtil.cpp
   berryQtEditorPart.cpp
   berryQtItemSelection.cpp
   berryQtIntroPart.cpp
@@ -372,8 +370,6 @@ set(MOC_H_FILES
   src/berryWorkbenchPart.h
   src/intro/berryIntroPart.h
 
-
-  src/berryQCHPluginListener.h
   src/berryQtSelectionProvider.h
 
   src/internal/berryMMMenuListener.h

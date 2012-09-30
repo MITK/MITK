@@ -254,7 +254,7 @@ SmartPointer<ImageDescriptor> AbstractUICTKPlugin::ImageDescriptorFromPlugin(
 
   // if the plug-in is not ready then there is no image
   QSharedPointer<ctkPlugin> plugin = BundleUtility::FindPlugin(pluginId);
-  if (!BundleUtility::IsReady(plugin))
+  if (!BundleUtility::IsReady(plugin.data()))
   {
     return ImageDescriptor::Pointer(0);
   }

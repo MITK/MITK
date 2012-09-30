@@ -56,7 +56,7 @@ struct IContributor;
  * </p>
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct IExtension : public virtual Object
+struct org_blueberry_core_runtime_EXPORT IExtension : public virtual Object
 {
   berryInterfaceMacro(IExtension, berry)
 

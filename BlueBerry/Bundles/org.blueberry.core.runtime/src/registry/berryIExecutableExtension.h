@@ -43,7 +43,7 @@ struct IConfigurationElement;
  *
  * @see IConfigurationElement#createExecutableExtension
  */
-struct IExecutableExtension
+struct org_blueberry_core_runtime_EXPORT IExecutableExtension
 {
   virtual ~IExecutableExtension();
 

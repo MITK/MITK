@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYBUNDLEUTILITY_H_
 #define BERRYBUNDLEUTILITY_H_
 
-#include <berryIBundle.h>
-
 #include <ctkPlugin.h>
 
 #include <QSharedPointer>
@@ -34,16 +32,12 @@ class BundleUtility
 {
 public:
 
-  static bool IsActive(IBundle::Pointer bundle);
+  static bool IsActive(ctkPlugin* plugin);
 
-  static bool IsActivated(IBundle::Pointer bundle);
+  static bool IsActivated(ctkPlugin* plugin);
 
   // TODO: needs a better name
-  static bool IsReady(IBundle::Pointer bundle);
-
-  static bool IsReady(QSharedPointer<ctkPlugin> plugin);
-
-  static bool IsReady(IBundle::State bundleState);
+  static bool IsReady(ctkPlugin* plugin);
 
   static bool IsReady(ctkPlugin::State pluginState);
 

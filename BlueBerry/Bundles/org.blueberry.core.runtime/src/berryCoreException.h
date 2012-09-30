@@ -34,7 +34,7 @@ struct IStatus;
  * </p>
  * @see IStatus
  */
-class CoreException : public ctkException
+class org_blueberry_core_runtime_EXPORT CoreException : public ctkException
 {
 
 public:

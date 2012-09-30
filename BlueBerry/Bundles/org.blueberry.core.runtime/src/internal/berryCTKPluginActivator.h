@@ -26,8 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-class CTKPluginListener;
-class ExtensionPointService;
+//class CTKPluginListener;
 class PreferencesService;
 
 class org_blueberry_core_runtime_Activator : public QObject, public ctkPluginActivator
@@ -57,9 +56,7 @@ private:
 
   static ctkPluginContext* context;
 
-  QScopedPointer<CTKPluginListener> pluginListener;
-
-  SmartPointer<ExtensionPointService> m_ExtensionPointService;
+  //QScopedPointer<CTKPluginListener> pluginListener;
 
   SmartPointer<PreferencesService> m_PreferencesService;
   ctkServiceRegistration m_PrefServiceReg;

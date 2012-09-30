@@ -27,8 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "service/berryServiceRegistry.h"
 //#include "berryExtensionPointService.h"
 
-#include <berryIBundle.h>
-
 #include <ctkServiceTracker.h>
 
 #include <QDir>
@@ -40,17 +38,12 @@ class ctkPluginContext;
 
 namespace berry {
 
-struct IBundle;
-struct IExtensionPointService;
 struct IExtensionRegistry;
 struct IPreferencesService;
 struct ILog;
 
-class CodeCache;
-class BundleLoader;
 class LogImpl;
 class PlatformLogChannel;
-class SystemBundle;
 
 class org_blueberry_core_runtime_EXPORT InternalPlatform : private Poco::Util::Application
 {
@@ -74,11 +67,6 @@ private:
   QDir m_ConfigPath;
 
   QStringList m_FilteredArgs;
-
-  CodeCache* m_CodeCache;
-  BundleLoader* m_BundleLoader;
-
-  SystemBundle* m_SystemBundle;
 
   Poco::AutoPtr<Poco::SimpleFileChannel> m_PlatformLogChannel;
   Poco::Logger* m_PlatformLogger;
@@ -127,11 +115,6 @@ public:
   /// and accessing services from different plugins
   ServiceRegistry& GetServiceRegistry();
 
-  /// Convenience method to quickly get the extension
-  /// point service, which is automatically started
-  /// by the platform
-  IExtensionPointService* GetExtensionPointService();
-
   IExtensionRegistry* GetExtensionRegistry();
 
   IPreferencesService* GetPreferencesService();
@@ -145,8 +128,6 @@ public:
   QDir GetInstancePath();
 
   bool GetStatePath(QDir& statePath, const QSharedPointer<ctkPlugin>& plugin, bool create = true);
-
-  bool GetStatePath(QDir& statePath, const SmartPointer<IBundle>& bundle, bool create = true);
 
   QDir GetUserPath();
 
@@ -168,10 +149,6 @@ public:
   QStringList GetApplicationArgs() const;
 
   int& GetRawApplicationArgs(char**& argv);
-
-  IBundle::Pointer GetBundle(const QString& id);
-
-  std::vector<IBundle::Pointer> GetBundles() const;
 
   QSharedPointer<ctkPlugin> GetPlugin(const QString& symbolicName);
 

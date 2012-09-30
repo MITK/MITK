@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "internal/berryInternalPlatform.h"
 
-#include <berryIExtensionPointService.h>
+#include <berryIExtensionRegistry.h>
 #include <berryIConfigurationElement.h>
 //#include <berryIConfigurationElementLegacy.h>
 #include <berryIContributor.h>
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::string Starter::XP_APPLICATIONS = "org.blueberry.osgi.applications";
+const QString Starter::XP_APPLICATIONS = "org.blueberry.osgi.applications";
 
 int Starter::Run(int& argc, char** argv,
     Poco::Util::AbstractConfiguration* config)
@@ -70,7 +70,7 @@ int Starter::Run(int& argc, char** argv,
   bool consoleLog = platform->ConsoleLog();
 
   // Add search paths for Qt plugins
-  foreach(QString qtPluginPath, QString::fromStdString(Platform::GetProperty(Platform::PROP_QTPLUGIN_PATH)).split(';', QString::SkipEmptyParts))
+  foreach(QString qtPluginPath, Platform::GetProperty(Platform::PROP_QTPLUGIN_PATH).split(';', QString::SkipEmptyParts))
   {
     if (QFile::exists(qtPluginPath))
     {
@@ -101,22 +101,23 @@ int Starter::Run(int& argc, char** argv,
   }
 
   // run the application
-  IExtensionPointService* service = platform->GetExtensionPointService();
+  IExtensionRegistry* service = platform->GetExtensionRegistry();
   if (service == 0)
   {
+    std::string msg = "The extension point service could not be retrieved. This usually indicates that the org.blueberry.core.runtime plug-in could not be loaded.";
     platform->GetLogger()->log(
         Poco::Message(
             "Starter",
-            "The extension point service could not be retrieved. This usually indicates that the BlueBerry OSGi plug-in could not be loaded.",
+            msg,
             Poco::Message::PRIO_FATAL));
-    std::unexpected();
+    BERRY_FATAL << msg;
     returnCode = 1;
   }
   else
   {
-    std::vector<IConfigurationElement::Pointer> extensions(
+    QList<IConfigurationElement::Pointer> extensions(
         service->GetConfigurationElementsFor(Starter::XP_APPLICATIONS));
-    std::vector<IConfigurationElement::Pointer>::iterator iter;
+    QList<IConfigurationElement::Pointer>::iterator iter;
 
     for (iter = extensions.begin(); iter != extensions.end();)
     {

@@ -61,7 +61,7 @@ class Handle;
  * </p>
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct IConfigurationElement : public virtual Object
+struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual Object
 {
 
   berryInterfaceMacro(IConfigurationElement, berry)

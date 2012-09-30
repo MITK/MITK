@@ -79,11 +79,6 @@ QDir Platform::GetConfigurationPath()
   return InternalPlatform::GetInstance()->GetConfigurationPath();
 }
 
-IExtensionPointService* Platform::GetExtensionPointService()
-{
-  return InternalPlatform::GetInstance()->GetExtensionPointService();
-}
-
 IExtensionRegistry *Platform::GetExtensionRegistry()
 {
   return InternalPlatform::GetInstance()->GetExtensionRegistry();
@@ -169,11 +164,6 @@ bool Platform::GetStatePath(QDir& statePath, const QSharedPointer<ctkPlugin>& pl
   return InternalPlatform::GetInstance()->GetStatePath(statePath, plugin, create);
 }
 
-bool Platform::GetStatePath(QDir& statePath, const IBundle::Pointer& bundle, bool create)
-{
-  return InternalPlatform::GetInstance()->GetStatePath(statePath, bundle, create);
-}
-
 QDir Platform::GetUserPath()
 {
   return InternalPlatform::GetInstance()->GetUserPath();
@@ -217,16 +207,6 @@ Poco::Util::LayeredConfiguration& Platform::GetConfiguration()
 ServiceRegistry& Platform::GetServiceRegistry()
 {
   return InternalPlatform::GetInstance()->GetServiceRegistry();
-}
-
-IBundle::Pointer Platform::GetBundle(const QString& id)
-{
-  return InternalPlatform::GetInstance()->GetBundle(id);
-}
-
-std::vector<IBundle::Pointer> Platform::GetBundles()
-{
-  return InternalPlatform::GetInstance()->GetBundles();
 }
 
 QSharedPointer<ctkPlugin> Platform::GetCTKPlugin(const QString& symbolicName)

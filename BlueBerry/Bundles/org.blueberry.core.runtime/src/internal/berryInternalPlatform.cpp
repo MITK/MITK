@@ -40,11 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryDebugUtil.h"
 //#include "event/berryPlatformEvents.h"
 //#include "berryPlatformLogChannel.h"
-#include "berryIBundle.h"
-#include "berryCodeCache.h"
-#include "berryBundleLoader.h"
-#include "berrySystemBundle.h"
-#include "berryBundleDirectory.h"
 #include "berryProvisioningInfo.h"
 #include "berryCTKPluginActivator.h"
 #include "berryLogImpl.h"
@@ -62,7 +57,7 @@ Poco::Mutex InternalPlatform::m_Mutex;
 
 InternalPlatform::InternalPlatform() : m_Initialized(false), m_Running(false),
   m_ConsoleLog(false), m_ServiceRegistry(0),
-  m_CodeCache(0), m_BundleLoader(0), m_SystemBundle(0), m_PlatformLogger(0),
+  m_PlatformLogger(0),
   m_ctkPluginFrameworkFactory(0)
 //, m_EventStarted(PlatformEvent::EV_PLATFORM_STARTED)
 {
@@ -162,10 +157,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
 
   QFileInfo userFile(m_UserPath.absolutePath());
 
-  if (!QDir().mkpath(userFile.absolutePath()) || !userFile.isWritable())
+  if (!QDir().mkpath(userFile.absoluteFilePath()) || !userFile.isWritable())
   {
     QString tmpPath = QDir::temp().absoluteFilePath(QString::fromStdString(this->commandName()));
-    BERRY_WARN << "Storage dir " << userFile.absolutePath() << " is not writable. Falling back to temporary path " << tmpPath;
+    BERRY_WARN << "Storage dir " << userFile.absoluteFilePath() << " is not writable. Falling back to temporary path " << tmpPath;
     QDir().mkpath(tmpPath);
     userFile.setFile(tmpPath);
   }
@@ -206,7 +201,6 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   {
     BERRY_INFO(m_ConsoleLog) << "Using provisioning file: " << provisioningFile;
     ProvisioningInfo provInfo(provisioningFile);
-
     // it can still happen, that the encoding is not compatible with the fromUtf8 function ( i.e. when manipulating the LANG variable
     // in such case, the QStringList in provInfo is empty which we can easily check for
     if( provInfo.getPluginDirs().empty() )
@@ -215,7 +209,6 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
                      "This can occur if there are some special (non-ascii) characters in the install path.";
       throw berry::PlatformException("No provisioning file specified. Terminating...");
     }
-
     foreach(QString pluginPath, provInfo.getPluginDirs())
     {
       ctkPluginFrameworkLauncher::addSearchPath(pluginPath);
@@ -258,100 +251,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   m_PlatformLogChannel = new Poco::SimpleFileChannel(logPath.toStdString());
   m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
 
-  try
-  {
-    m_CodeCache = new CodeCache(this->GetConfiguration().getString(Platform::ARG_PLUGIN_CACHE.toStdString()));
-  }
-  catch (Poco::NotFoundException&)
-  {
-    QString cachePath(m_UserPath.absoluteFilePath("bb-plugin_cache"));
-    m_CodeCache = new CodeCache(cachePath.toStdString());
-  }
-  m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
-
-  // tell the BundleLoader about the installed CTK plug-ins
-  QStringList installedCTKPlugins;
-  foreach(QSharedPointer<ctkPlugin> plugin, pfwContext->getPlugins())
-  {
-    installedCTKPlugins << plugin->getSymbolicName();
-  }
-  m_BundleLoader->SetCTKPlugins(installedCTKPlugins);
-
   m_Initialized = true;
-
-  // Clear the CodeCache
-  if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN.toStdString()))
-    m_CodeCache->Clear();
-
-//  try
-//  {
-//    // assemble a list of base plugin-directories (which contain
-//    // the real plugins as directories)
-//    std::vector<std::string> pluginBaseDirs;
-
-//    Poco::StringTokenizer tokenizer(this->GetConfiguration().getString(Platform::ARG_PLUGIN_DIRS.toStdString(), ""), ";",
-//                                    Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
-
-//    for (Poco::StringTokenizer::Iterator token = tokenizer.begin();
-//         token != tokenizer.end(); ++token)
-//    {
-//      pluginBaseDirs.push_back(*token);
-//    }
-
-//    std::vector<Poco::Path> pluginPaths;
-//    for (std::vector<std::string>::iterator pluginBaseDir = pluginBaseDirs.begin();
-//         pluginBaseDir != pluginBaseDirs.end(); ++pluginBaseDir)
-//    {
-//      BERRY_INFO(m_ConsoleLog) << "Plugin base directory: " << *pluginBaseDir;
-//      Poco::File pluginDir(*pluginBaseDir);
-
-//      if (!pluginDir.exists() || !pluginDir.isDirectory())
-//      {
-//        BERRY_WARN(m_ConsoleLog) << *pluginBaseDir << " is not a direcotry or does not exist. SKIPPED.\n";
-//        continue;
-//      }
-
-//      std::vector<std::string> pluginList;
-//      pluginDir.list(pluginList);
-
-//      std::vector<std::string>::iterator iter;
-//      for (iter = pluginList.begin(); iter != pluginList.end(); iter++)
-//      {
-//        Poco::Path pluginPath = Poco::Path::forDirectory(*pluginBaseDir);
-//        pluginPath.pushDirectory(*iter);
-
-//        Poco::File file(pluginPath);
-//        if (file.exists() && file.isDirectory())
-//        {
-//          pluginPaths.push_back(pluginPath);
-//        }
-//      }
-//    }
-
-//    std::vector<Poco::Path>::iterator pathIter;
-//    for (pathIter = pluginPaths.begin(); pathIter != pluginPaths.end(); pathIter++)
-//    {
-//      try
-//      {
-//      Bundle::Pointer bundle = m_BundleLoader->LoadBundle(*pathIter);
-//      if (bundle)
-//      {
-//        BERRY_INFO(m_ConsoleLog) << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
-//      }
-//      }
-//      catch (const BundleStateException& exc)
-//      {
-//        BERRY_WARN << exc.what() << std::endl;
-//      }
-//    }
-
-//    // resolve plugins
-//    m_BundleLoader->ResolveAllBundles();
-//  }
-//  catch (Poco::Exception& exc)
-//  {
-//    this->logger().log(exc);
-//  }
 
 #ifdef BLUEBERRY_DEBUG_SMARTPOINTER
   DebugUtil::RestoreState();
@@ -415,8 +315,6 @@ void InternalPlatform::Shutdown()
   {
     Poco::Mutex::ScopedLock lock(m_Mutex);
     delete m_ServiceRegistry;
-    delete m_BundleLoader;
-    delete m_CodeCache;
   }
 }
 
@@ -425,14 +323,6 @@ void InternalPlatform::AssertInitialized()
 {
   if (!m_Initialized)
     throw Poco::SystemException("The Platform has not been initialized yet!");
-}
-
-IExtensionPointService* InternalPlatform::GetExtensionPointService()
-{
-  Poco::Mutex::ScopedLock lock(m_Mutex);
-  this->AssertInitialized();
-
-  return m_ServiceRegistry->GetServiceById<IExtensionPointService>(IExtensionPointService::SERVICE_ID).GetPointer();
 }
 
 IExtensionRegistry* InternalPlatform::GetExtensionRegistry()
@@ -469,35 +359,6 @@ QDir InternalPlatform::GetInstancePath()
 bool InternalPlatform::GetStatePath(QDir& statePath, const QSharedPointer<ctkPlugin>& plugin, bool create)
 {
   QFileInfo tmpStatePath(m_BaseStatePath.absoluteFilePath(plugin->getSymbolicName()));
-  if (tmpStatePath.exists())
-  {
-    if (tmpStatePath.isDir() && tmpStatePath.isWritable() && tmpStatePath.isReadable())
-    {
-      statePath.setPath(tmpStatePath.absoluteFilePath());
-      return true;
-  }
-    else
-  {
-    return false;
-  }
-
-  }
-  else if (create)
-  {
-    bool created = statePath.mkpath(tmpStatePath.absoluteFilePath());
-    if (created)
-    {
-      statePath.setPath(tmpStatePath.absoluteFilePath());
-  return true;
-    }
-    return false;
-  }
-  return false;
-}
-
-bool InternalPlatform::GetStatePath(QDir& statePath, const SmartPointer<IBundle>& bundle, bool create)
-{
-  QFileInfo tmpStatePath(m_BaseStatePath.absoluteFilePath(QString::fromStdString(bundle->GetSymbolicName())));
   if (tmpStatePath.exists())
   {
     if (tmpStatePath.isDir() && tmpStatePath.isWritable() && tmpStatePath.isReadable())
@@ -556,20 +417,6 @@ bool InternalPlatform::IsRunning() const
 {
   Poco::Mutex::ScopedLock lock(m_Mutex);
   return (m_Initialized && m_Running);
-}
-
-IBundle::Pointer InternalPlatform::GetBundle(const QString& id)
-{
-  Poco::Mutex::ScopedLock lock(m_Mutex);
-
-  AssertInitialized();
-
-  return m_BundleLoader->FindBundle(id.toStdString());
-}
-
-std::vector<IBundle::Pointer> InternalPlatform::GetBundles() const
-{
-  return m_BundleLoader->GetBundles();
 }
 
 QSharedPointer<ctkPlugin> InternalPlatform::GetPlugin(const QString &symbolicName)
@@ -722,12 +569,6 @@ int InternalPlatform::main(const std::vector<std::string>& args)
 
   ctkPluginContext* context = GetCTKPluginFrameworkContext();
   QFileInfo storageDir = context->getDataFile("");
-  BundleDirectory::Pointer bundleStorage(new BundleDirectory(Poco::Path(storageDir.absolutePath().toStdString())));
-  SystemBundle::Pointer systemBundle(new SystemBundle(*m_BundleLoader, bundleStorage));
-  if (systemBundle == 0)
-    throw PlatformException("Could not find the system bundle");
-  m_BundleLoader->m_SystemBundle = systemBundle;
-  m_BundleLoader->LoadBundle(systemBundle);
 
   m_ctkPluginFrameworkFactory->getFramework()->start();
   foreach(long pluginId, m_CTKPluginsToStart)
@@ -737,10 +578,6 @@ int InternalPlatform::main(const std::vector<std::string>& args)
     // do not change the autostart setting of this plugin
     context->getPlugin(pluginId)->start(ctkPlugin::START_TRANSIENT | ctkPlugin::START_ACTIVATION_POLICY);
   }
-
-  m_BundleLoader->StartSystemBundle(systemBundle);
-
-  systemBundle->Resume();
 
   return EXIT_OK;
 }

@@ -68,8 +68,8 @@ public:
   static void AddObjectListener(IDebugObjectListener* listener);
   static void RemoveObjectListener(IDebugObjectListener* listener);
 
-  static void SaveState();
-  static void RestoreState();
+  static void SaveState(const QDir& path);
+  static void RestoreState(const QDir& path);
 
   // ******* for internal use only *************
   static unsigned int& GetSmartPointerCounter();

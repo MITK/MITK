@@ -76,9 +76,8 @@ private:
 QtObjectTableModel::QtObjectTableModel(QObject* parent) :
   QAbstractItemModel(parent), objectListener(new DebugObjectListener(this))
 {
-  std::vector<const Object*> objects;
-  DebugUtil::GetRegisteredObjects(objects);
-  for (std::vector<const Object*>::const_iterator i = objects.begin(); i
+  QList<const Object*> objects = DebugUtil::GetRegisteredObjects();
+  for (QList<const Object*>::const_iterator i = objects.begin(); i
       != objects.end(); ++i)
   {
     const char* name = (*i)->GetClassName();
@@ -97,12 +96,11 @@ QtObjectTableModel::QtObjectTableModel(QObject* parent) :
 
     ObjectItem* instanceItem = new ObjectItem(*i, 0);
     // get smartpointer ids
-    std::list<unsigned int> spIds(DebugUtil::GetSmartPointerIDs(*i));
-    for (std::list<unsigned int>::const_iterator spIdIter = spIds.begin(); spIdIter
+    QList<unsigned int> spIds(DebugUtil::GetSmartPointerIDs(*i));
+    for (QList<unsigned int>::const_iterator spIdIter = spIds.begin(); spIdIter
         != spIds.end(); ++spIdIter)
     {
-      ObjectItem* spItem = new ObjectItem((unsigned int) (*spIdIter),
-          instanceItem);
+      ObjectItem* spItem = new ObjectItem((unsigned int) (*spIdIter), instanceItem);
       instanceItem->children.push_back(spItem);
     }
 
@@ -126,12 +124,15 @@ QtObjectTableModel::QtObjectTableModel(QObject* parent) :
   connect(timer, SIGNAL(timeout()), this, SLOT(UpdatePendingData()));
   timer->start(500);
 
-  DebugUtil::AddObjectListener(objectListener);
+  DebugUtil::AddObjectListener(objectListener.GetPointer());
 }
 
 QtObjectTableModel::~QtObjectTableModel()
 {
-  DebugUtil::RemoveObjectListener(objectListener);
+  DebugUtil::RemoveObjectListener(objectListener.GetPointer());
+
+  qDeleteAll(pendingData);
+  qDeleteAll(indexData);
 }
 
 QModelIndex QtObjectTableModel::index(int row, int column,

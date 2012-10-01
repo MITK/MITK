@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryConfig.h>
 
 #if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
-#include "berryDebugUtil.h"
+#include <QMutex>
 #endif
 
 namespace berry
@@ -296,54 +296,17 @@ private:
 #if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
 
   unsigned int m_Id;
-  Poco::FastMutex m_Mutex;
+  QMutex m_Mutex;
 
-  void DebugInitSmartPointer()
-  {
-    {
-      Poco::FastMutex::ScopedLock lock(m_Mutex);
-      if (m_Pointer)
-      {
-        unsigned int& counter = DebugUtil::GetSmartPointerCounter();
-        m_Id = ++counter;
-        DebugUtil::RegisterSmartPointer(m_Id, m_Pointer);
-      }
-      else m_Id = 0;
-    }
+  void DebugInitSmartPointer();
 
-    //if (DebugUtil::GetSmartPointerCounter() == Platform::GetConfiguration().getInt(Platform::DEBUG_ARG_SMARTPOINTER_ID))
-    //throw 1;
-  }
+  void DebugRemoveSmartPointer();
 
-  void DebugRemoveSmartPointer()
-  {
-    Poco::FastMutex::ScopedLock lock(m_Mutex);
-    DebugUtil::UnregisterSmartPointer(m_Id, m_Pointer);
-  }
-
-  void DebugAssignSmartPointer(const ObjectType* newObject, const ObjectType* oldObject)
-  {
-    Poco::FastMutex::ScopedLock lock(m_Mutex);
-    if (oldObject)
-      DebugUtil::UnregisterSmartPointer(m_Id, oldObject);
-
-    if (newObject)
-    {
-      if (m_Id < 1)
-      {
-        unsigned int& counter = DebugUtil::GetSmartPointerCounter();
-        m_Id = ++counter;
-      }
-      DebugUtil::RegisterSmartPointer(m_Id, newObject);
-    }
-  }
+  void DebugAssignSmartPointer(const ObjectType* newObject, const ObjectType* oldObject);
 
 public:
 
-  int GetId()
-  {
-    return m_Id;
-  }
+  int GetId();
 
 private:
 #endif
@@ -409,5 +372,64 @@ QDebug SmartPointer<T>::Print(QDebug os) const
 }
 
 }
+
+#if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
+
+#include "berryDebugUtil.h"
+
+namespace berry {
+
+template<class T>
+void SmartPointer<T>::DebugInitSmartPointer()
+{
+  {
+    QMutexLocker lock(&m_Mutex);
+    if (m_Pointer)
+    {
+      unsigned int& counter = DebugUtil::GetSmartPointerCounter();
+      m_Id = ++counter;
+      DebugUtil::RegisterSmartPointer(m_Id, m_Pointer);
+    }
+    else m_Id = 0;
+  }
+
+  //if (DebugUtil::GetSmartPointerCounter() == Platform::GetConfiguration().getInt(Platform::DEBUG_ARG_SMARTPOINTER_ID))
+  //throw 1;
+}
+
+template<class T>
+void SmartPointer<T>::DebugRemoveSmartPointer()
+{
+  QMutexLocker lock(&m_Mutex);
+  DebugUtil::UnregisterSmartPointer(m_Id, m_Pointer);
+}
+
+template<class T>
+void SmartPointer<T>::DebugAssignSmartPointer(const ObjectType* newObject, const ObjectType* oldObject)
+{
+  QMutexLocker lock(&m_Mutex);
+  if (oldObject)
+    DebugUtil::UnregisterSmartPointer(m_Id, oldObject);
+
+  if (newObject)
+  {
+    if (m_Id < 1)
+    {
+      unsigned int& counter = DebugUtil::GetSmartPointerCounter();
+      m_Id = ++counter;
+    }
+    DebugUtil::RegisterSmartPointer(m_Id, newObject);
+  }
+}
+
+template<class T>
+int SmartPointer<T>::GetId()
+{
+  return m_Id;
+}
+
+}
+
+#endif
 
 #endif /*BERRYSMARTPOINTER_H_*/

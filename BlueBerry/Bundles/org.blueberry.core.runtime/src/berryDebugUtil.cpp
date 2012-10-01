@@ -140,7 +140,7 @@ void DebugUtil::StopTracing(unsigned int traceId)
 {
 
   BERRY_INFO << "Tracing stopped for: " << traceId << std::endl;
-  m_TracedObjects.erase(traceId);
+  m_TracedObjects.remove(traceId);
   TraceIdToObjectType::ConstIterator i = m_TraceIdToObjectMap.find(traceId);
   if (i != m_TraceIdToObjectMap.end())
     _G_ObjectEvents.objTracingEvent(traceId, false, i.value());
@@ -157,7 +157,7 @@ void DebugUtil::StopTracing(unsigned int /*traceId*/)
 void DebugUtil::StopTracing(const Object* obj)
 {
   BERRY_INFO << "Tracing stopped for: " << obj->GetTraceId() << std::endl;
-  m_TracedObjects.erase(obj->GetTraceId());
+  m_TracedObjects.remove(obj->GetTraceId());
   _G_ObjectEvents.objTracingEvent(obj->GetTraceId(), false, obj);
 }
 #else
@@ -170,7 +170,7 @@ void DebugUtil::StopTracing(const Object* /*obj*/)
 void DebugUtil::StopTracing(const QString& className)
 {
   BERRY_INFO << "Tracing stopped for: " << className << std::endl;
-  m_TracedClasses.erase(className);
+  m_TracedClasses.remove(className);
   //_G_ObjectEvents.objTracingEvent(obj->GetTraceId(), false, obj);
 }
 #else
@@ -249,7 +249,7 @@ QList<unsigned int> DebugUtil::GetSmartPointerIDs(
   QList<unsigned int> ids = m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()];
   for (QList<unsigned int>::const_iterator iter = excludeList.begin();
       iter != excludeList.end(); ++iter)
-  ids.remove(*iter);
+  ids.removeAll(*iter);
   return ids;
 }
 #else
@@ -357,7 +357,7 @@ void DebugUtil::UnregisterSmartPointer(unsigned int smartPointerId, const Object
 {
   poco_assert(objectPointer != 0);
 
-  m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()].remove(smartPointerId);
+  m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()].removeAll(smartPointerId);
   _G_ObjectEvents.spDestroyedEvent(smartPointerId, objectPointer);
 }
 #else
@@ -390,11 +390,15 @@ void DebugUtil::RegisterSmartPointer(unsigned int  /*smartPointerId*/, const Obj
 #ifdef BLUEBERRY_DEBUG_SMARTPOINTER
 void DebugUtil::RegisterObject(const Object* objectPointer)
 {
-  m_TraceIdToObjectMap.insert(std::make_pair(objectPointer->GetTraceId(), objectPointer));
+  m_TraceIdToObjectMap.insert(objectPointer->GetTraceId(), objectPointer);
   _G_ObjectEvents.objCreatedEvent(objectPointer);
 
   if (GetBreakpointManager()->BreakAtObject(objectPointer->GetTraceId()))
-  poco_debugger_msg("SmartPointer Breakpoint reached");
+  {
+    std::string msg = "SmartPointer Breakpoint reached for ";
+    msg += objectPointer->GetClassName();
+    poco_debugger_msg(msg.c_str());
+  }
 }
 #else
 void DebugUtil::RegisterObject(const Object* /*objectPointer*/)
@@ -405,7 +409,7 @@ void DebugUtil::RegisterObject(const Object* /*objectPointer*/)
 #ifdef BLUEBERRY_DEBUG_SMARTPOINTER
 void DebugUtil::UnregisterObject(const Object* objectPointer)
 {
-  m_TraceIdToObjectMap.erase(objectPointer->GetTraceId());
+  m_TraceIdToObjectMap.remove(objectPointer->GetTraceId());
   _G_ObjectEvents.objDestroyedEvent(objectPointer);
 }
 #else
@@ -417,14 +421,12 @@ void DebugUtil::UnregisterObject(const Object* /*objectPointer*/)
 bool DebugUtil::GetPersistencePath(QDir& path)
 {
   QFileInfo statePath = CTKPluginActivator::getPluginContext()->getDataFile(QString());
-  path = statePath.absoluteDir();
+  path = statePath.absoluteFilePath();
+  return true;
 }
 
-void DebugUtil::SaveState()
+void DebugUtil::SaveState(const QDir& path)
 {
-  QDir path;
-  if (!GetPersistencePath(path)) return;
-
   QString saveFile = path.absoluteFilePath(DEBUG_UTIL_XML);
 
   Poco::XML::Document* doc = new Poco::XML::Document();
@@ -467,11 +469,8 @@ void DebugUtil::SaveState()
 
 }
 
-void DebugUtil::RestoreState()
+void DebugUtil::RestoreState(const QDir& path)
 {
-  QDir path;
-  if (!GetPersistencePath(path)) return;
-
   QString restoreFile = path.absoluteFilePath(DEBUG_UTIL_XML);
 
   try

@@ -60,11 +60,7 @@ ObjectItem::ObjectItem(const ObjectItem& item) :
 
 ObjectItem::~ObjectItem()
 {
-  QListIterator<ObjectItem*> iter(children);
-  while (iter.hasNext())
-  {
-    delete iter.next();
-  }
+  qDeleteAll(children);
 }
 
 ObjectItem& ObjectItem::operator=(const ObjectItem& item)

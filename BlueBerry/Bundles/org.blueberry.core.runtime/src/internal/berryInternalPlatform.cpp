@@ -255,7 +255,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   m_Initialized = true;
 
 #ifdef BLUEBERRY_DEBUG_SMARTPOINTER
-  DebugUtil::RestoreState();
+  DebugUtil::RestoreState(m_UserPath);
 #endif
 
 }
@@ -301,7 +301,7 @@ void InternalPlatform::Shutdown()
   {
     Poco::Mutex::ScopedLock lock(m_Mutex);
     AssertInitialized();
-    DebugUtil::SaveState();
+    DebugUtil::SaveState(m_UserPath);
     ctkPluginFW = m_ctkPluginFrameworkFactory->getFramework();
     m_Initialized = false;
   }

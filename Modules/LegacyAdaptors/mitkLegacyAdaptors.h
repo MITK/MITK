@@ -55,6 +55,7 @@ namespace mitk
    \brief Constructs a deprecated legacy mitkIpPicDescriptor from mitk::Image
 
    Meant to support legacy code, which was base on mitkIpPicDescriptor types. Please remind that such code should be migrated towards ITK/VTK solutions.
+   \deprecatedSince{2012_09} Please use image accessors instead! An image accessor (ImageWriteAccessor) can be commited to CastToIpPicDescriptor.
  */
   LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitkIpPicDescriptor* picDesc));
 
@@ -64,6 +65,7 @@ namespace mitk
     \warning The returned IpPicDescriptor is only referencing the memory block with the data managed by the given ImageDataItem parameter.
     Simply calling ipPicFree( desc ) will delete the data and so will the ImageDataItem try when it get deleted. Simplest way to avoid the duplicate
     deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
+   \deprecatedSince{2012_09} Please use image accessors instead! An image accessor (ImageWriteAccessor) can be commited to CastToIpPicDescriptor.
   */
   LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitkIpPicDescriptor *picDesc));
 

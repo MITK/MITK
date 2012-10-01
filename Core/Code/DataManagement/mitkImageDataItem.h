@@ -81,6 +81,8 @@ namespace mitk {
 
     ImageDataItem(const ImageDataItem &other);
 
+   /**
+   \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by ImageWriteAccessor::GetData() or ImageReadAccessor::GetData() */
     DEPRECATED(void* GetData() const)
     {
       return m_Data;

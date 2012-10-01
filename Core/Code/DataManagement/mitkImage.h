@@ -117,23 +117,24 @@ public:
   //## @sa GetDimensions()
   unsigned int GetDimension(int i) const;
 
-  //## @brief Get the data vector of the complete image, i.e., of all channels linked together.
-  //##
-  //## If you only want to access a slice, volume at a specific time or single channel
-  //## use one of the SubImageSelector classes.
+  /** @brief Get the data vector of the complete image, i.e., of all channels linked together.
 
+  If you only want to access a slice, volume at a specific time or single channel
+  use one of the SubImageSelector classes.
+   \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by ImageWriteAccessor::GetData() or ImageReadAccessor::GetData() */
   DEPRECATED(virtual void* GetData());
 
 public:
-  //## @brief Get the pixel value at one specific index position.
-  //## @brief Get the pixel value at one specific position.
-  //##
-  //## The pixel type is always being converted to double.
+  /** @brief Get the pixel value at one specific index position.
+
+  The pixel type is always being converted to double.
+   \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by a method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
   DEPRECATED(double GetPixelValueByIndex(const mitk::Index3D& position, unsigned int timestep = 0));
 
-  //## @brief Get the pixel value at one specific world position.
-  //##
-  //## The pixel type is always being converted to double.
+  /** @brief Get the pixel value at one specific world position.
+
+  The pixel type is always being converted to double.
+   \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by a method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
   DEPRECATED(double GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep = 0));
 
   //##Documentation

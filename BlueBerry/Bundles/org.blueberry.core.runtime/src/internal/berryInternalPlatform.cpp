@@ -45,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryLogImpl.h"
 
 #include <berryIPreferencesService.h>
+#include <berryIExtensionRegistry.h>
 #include <berryIExtensionPointService.h>
 
 #include <QCoreApplication>
@@ -327,8 +328,12 @@ void InternalPlatform::AssertInitialized()
 
 IExtensionRegistry* InternalPlatform::GetExtensionRegistry()
 {
-  // TODO
-  return 0;
+  if (m_RegistryTracker.isNull())
+  {
+    m_RegistryTracker.reset(new ctkServiceTracker<berry::IExtensionRegistry*>(berry::CTKPluginActivator::getPluginContext()));
+    m_RegistryTracker->open();
+  }
+  return m_RegistryTracker->getService();
 }
 
 IPreferencesService *InternalPlatform::GetPreferencesService()

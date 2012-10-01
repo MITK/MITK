@@ -20,6 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryInternalPlatform.h"
 //#include "berryCTKPluginListener_p.h"
 #include "berryPreferencesService.h"
+#include "berryExtensionRegistry.h"
+#include "berryRegistryConstants.h"
+#include "berryRegistryProperties.h"
+#include "berryRegistryStrategy.h"
 
 #include <QCoreApplication>
 #include <QtPlugin>
@@ -34,9 +38,12 @@ void org_blueberry_core_runtime_Activator::start(ctkPluginContext* context)
 {
   this->context = context;
 
+  RegistryProperties::SetContext(context);
+  //ProcessCommandLine();
+  this->startRegistry();
 
-  m_PreferencesService = new PreferencesService(context->getDataFile("").absolutePath());
-  m_PrefServiceReg = context->registerService<IPreferencesService>(m_PreferencesService.GetPointer());
+  preferencesService = new PreferencesService(context->getDataFile("").absolutePath());
+  prefServiceReg = context->registerService<IPreferencesService>(preferencesService.GetPointer());
 
 //  // register a listener to catch new plugin installations/resolutions.
 //  pluginListener.reset(new CTKPluginListener(m_ExtensionPointService));
@@ -59,10 +66,13 @@ void org_blueberry_core_runtime_Activator::stop(ctkPluginContext* context)
 
   //Platform::GetServiceRegistry().UnRegisterService(IExtensionPointService::SERVICE_ID);
 
-  m_PrefServiceReg.unregister();
-  m_PreferencesService->ShutDown();
-  m_PreferencesService = 0;
-  m_PrefServiceReg = 0;
+  prefServiceReg.unregister();
+  preferencesService->ShutDown();
+  preferencesService = 0;
+  prefServiceReg = 0;
+
+  this->stopRegistry();
+  RegistryProperties::SetContext(NULL);
 
   this->context = 0;
 }
@@ -96,6 +106,77 @@ QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
   return QString();
 }
 
+void org_blueberry_core_runtime_Activator::startRegistry()
+{
+  // see if the customer suppressed the creation of default registry
+  QString property = context->getProperty(RegistryConstants::PROP_DEFAULT_REGISTRY).toString();
+  if (property.compare("false", Qt::CaseInsensitive) == 0) return;
+
+  // check to see if we need to use null as a userToken
+  if (context->getProperty(RegistryConstants::PROP_REGISTRY_NULL_USER_TOKEN).toString().compare("true", Qt::CaseInsensitive) == 0)
+  {
+    userRegistryKey.reset(0);
+  }
+
+  // Determine primary and alternative registry locations. BlueBerry extension registry cache
+  // can be found in one of the two locations:
+  // a) in the local configuration area (standard location passed in by the platform) -> priority
+  // b) in the shared configuration area (typically, shared install is used)
+  QList<QString> registryLocations;
+  QList<bool> readOnlyLocations;
+
+  RegistryStrategy* strategy = NULL;
+  //Location configuration = OSGIUtils.getDefault().getConfigurationLocation();
+  QString configuration = context->getDataFile("").absoluteFilePath();
+  if (configuration.isEmpty())
+  {
+    RegistryProperties::SetProperty(RegistryConstants::PROP_NO_REGISTRY_CACHE, "true");
+    RegistryProperties::SetProperty(RegistryConstants::PROP_NO_LAZY_CACHE_LOADING, "true");
+    strategy = new RegistryStrategy(QList<QString>(), QList<bool>(), masterRegistryKey.data());
+  }
+  else
+  {
+    //File primaryDir = new File(configuration.getURL().getPath() + '/' + STORAGE_DIR);
+    //bool primaryReadOnly = configuration.isReadOnly();
+    QString primaryDir = configuration;
+    bool primaryReadOnly = false;
+
+    //Location parentLocation = configuration.getParentLocation();
+    QString parentLocation;
+    if (!parentLocation.isEmpty())
+    {
+//      File secondaryDir = new File(parentLocation.getURL().getFile() + '/' + IRegistryConstants.RUNTIME_NAME);
+//      registryLocations << primaryDir << secondaryDir;
+//      readOnlyLocations << primaryReadOnly <<  true; // secondary BlueBerry location is always read only
+    }
+    else
+    {
+      registryLocations << primaryDir;
+      readOnlyLocations << primaryReadOnly;
+    }
+    strategy = new RegistryStrategy(registryLocations, readOnlyLocations, masterRegistryKey.data());
+  }
+
+  ExtensionRegistry* registry = new ExtensionRegistry(strategy, masterRegistryKey.data(), userRegistryKey.data());
+  defaultRegistry.reset(registry);
+
+  registryServiceReg = context->registerService<IExtensionRegistry>(registry);
+  //commandRegistration = EquinoxUtils.registerCommandProvider(Activator.getContext());
+}
+
+void org_blueberry_core_runtime_Activator::stopRegistry()
+{
+  if (!defaultRegistry.isNull())
+  {
+    registryServiceReg.unregister();
+    defaultRegistry->Stop(masterRegistryKey.data());
+  }
+//  if (!commandRegistration.isNull())
+//  {
+//    commandRegistration.unregister();
+//  }
+}
+
 #elif defined(Q_CC_MSVC)
 
 #include <ctkBackTrace.h>
@@ -120,6 +201,12 @@ QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
 }
 
 #endif
+
+org_blueberry_core_runtime_Activator::org_blueberry_core_runtime_Activator()
+  : userRegistryKey(new QObject())
+  , masterRegistryKey(new QObject())
+{
+}
 
 org_blueberry_core_runtime_Activator::~org_blueberry_core_runtime_Activator()
 {

@@ -99,6 +99,8 @@ class AbstractPreferencesStorage;
 
   protected:
 
+    SmartPointer<IPreferences> GetUserPreferences_unlocked(const QString& name);
+
     ///
     /// Helper func for ImportPreferences(). Imports all nodes of an IPreferences tree recursively
     ///

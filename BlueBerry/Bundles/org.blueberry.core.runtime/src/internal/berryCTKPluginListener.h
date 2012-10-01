@@ -15,19 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef BERRYCTKPLUGINLISTENER_P_H
-#define BERRYCTKPLUGINLISTENER_P_H
+#ifndef BERRYCTKPLUGINLISTENER_H
+#define BERRYCTKPLUGINLISTENER_H
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QMutex>
 
 #include <ctkPluginEvent.h>
 
-#include <berryIExtensionPointService.h>
-
-class ctkPlugin;
-
 namespace berry {
+
+class ExtensionRegistry;
+class RegistryStrategy;
 
 /**
  * A listener for CTK plugin events. When plugins come and go we look to see
@@ -46,32 +46,35 @@ private:
 
   static const QString PLUGIN_MANIFEST; // = "plugin.xml"
 
-  IExtensionPointService::Pointer registry;
+  ExtensionRegistry* registry;
+  RegistryStrategy* strategy;
+  QObject* token;
+
+  QList<long> currentStateStamp;
+  QMutex mutex;
 
 public:
 
-  CTKPluginListener(IExtensionPointService::Pointer registry);
+  CTKPluginListener(ExtensionRegistry* registry, QObject* key, RegistryStrategy* strategy);
 
-  void processPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins);
+  void ProcessPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins);
 
 public slots:
 
-  void pluginChanged(const ctkPluginEvent& event);
+  void PluginChanged(const ctkPluginEvent& event);
 
 private:
 
-  bool isPluginResolved(QSharedPointer<ctkPlugin> plugin);
+  bool IsPluginResolved(QSharedPointer<ctkPlugin> plugin);
 
-  void removePlugin(QSharedPointer<ctkPlugin> plugin);
+  void RemovePlugin(QSharedPointer<ctkPlugin> plugin);
 
-  static QString getExtensionPath(QSharedPointer<ctkPlugin> plugin);
+  static QString GetExtensionPath(QSharedPointer<ctkPlugin> plugin);
 
-  void addPlugin(QSharedPointer<ctkPlugin> plugin);
-
-  QList<QSharedPointer<ctkPlugin> > sortPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins);
+  void AddPlugin(QSharedPointer<ctkPlugin> plugin);
 
 };
 
 }
 
-#endif // BERRYCTKPLUGINLISTENER_P_H
+#endif // BERRYCTKPLUGINLISTENER_H

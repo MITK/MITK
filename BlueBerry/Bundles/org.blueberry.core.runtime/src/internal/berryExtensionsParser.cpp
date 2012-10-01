@@ -109,6 +109,7 @@ bool ExtensionsParser::characters(const QString& ch)
     if (!configurationElementValue.isEmpty())
       currentConfigElement->SetValue(configurationElementValue);
   }
+  return true;
 }
 
 bool ExtensionsParser::endElement(const QString& uri, const QString& elementName, const QString& /*qName*/)
@@ -118,13 +119,13 @@ bool ExtensionsParser::endElement(const QString& uri, const QString& elementName
   case IGNORED_ELEMENT_STATE :
   {
     stateStack.pop();
-    break;
+    return true;
   }
   case INITIAL_STATE :
   {
     // shouldn't get here
     internalError(QString("Element/end element mismatch for element \"%1\".").arg(elementName));
-    break;
+    return false;
   }
   case PLUGIN_STATE :
   {
@@ -157,7 +158,7 @@ bool ExtensionsParser::endElement(const QString& uri, const QString& elementName
       extensions.clear();
     }
     contribution->SetRawChildren(namespaceChildren);
-    break;
+    return true;
   }
   case PLUGIN_EXTENSION_POINT_STATE :
   {
@@ -165,7 +166,7 @@ bool ExtensionsParser::endElement(const QString& uri, const QString& elementName
     {
       stateStack.pop();
     }
-    break;
+    return true;
   }
   case PLUGIN_EXTENSION_STATE :
   {
@@ -178,8 +179,8 @@ bool ExtensionsParser::endElement(const QString& uri, const QString& elementName
         currentExtension->SetNamespaceIdentifier(contribution->GetDefaultNamespace());
       currentExtension->SetContributorId(contribution->GetContributorId());
       scratchVectors[EXTENSION_INDEX].push_back(currentExtension);
-      }
-    break;
+    }
+    return true;
   }
   case CONFIGURATION_ELEMENT_STATE :
   {
@@ -203,8 +204,11 @@ bool ExtensionsParser::endElement(const QString& uri, const QString& elementName
     currentConfigElement->SetParentId(parent->GetObjectId());
     currentConfigElement->SetParentType(parent.Cast<ConfigurationElement>() ?
                                           RegistryObjectManager::CONFIGURATION_ELEMENT : RegistryObjectManager::EXTENSION);
-    break;
+    return true;
   }
+  default:
+    // should never get here
+    return false;
   }
 }
 
@@ -266,6 +270,7 @@ bool ExtensionsParser::startDocument()
   {
     scratchVectors[i].clear();
   }
+  return true;
 }
 
 bool ExtensionsParser::startElement(const QString& uri, const QString& elementName,

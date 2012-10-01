@@ -15,85 +15,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "berryCTKPluginListener_p.h"
+#include "berryCTKPluginListener.h"
+#include "berryExtensionRegistry.h"
+#include "berryRegistryStrategy.h"
+#include "berryIContributor.h"
+#include "berryContributorFactory.h"
 
 #include <ctkPlugin.h>
 
 #include <QSet>
 #include <QStringList>
-
-#include <sstream>
+#include <QBuffer>
 
 const QString berry::CTKPluginListener::PLUGIN_MANIFEST = "plugin.xml";
 
 namespace berry {
 
-CTKPluginListener::CTKPluginListener(IExtensionPointService::Pointer registry)
-  : registry(registry)
+CTKPluginListener::CTKPluginListener(ExtensionRegistry* registry, QObject* key, RegistryStrategy* strategy)
+  : registry(registry), strategy(strategy), token(key)
 {
 }
 
-void CTKPluginListener::processPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins)
+void CTKPluginListener::ProcessPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins)
 {
   // sort the plugins according to their dependencies
-  const QList<QSharedPointer<ctkPlugin> > sortedPlugins = sortPlugins(plugins);
+  //const QList<QSharedPointer<ctkPlugin> > sortedPlugins = sortPlugins(plugins);
 
-  foreach (QSharedPointer<ctkPlugin> plugin, sortedPlugins)
+  foreach (QSharedPointer<ctkPlugin> plugin, plugins)
   {
-    if (isPluginResolved(plugin))
-      addPlugin(plugin);
+    if (IsPluginResolved(plugin))
+      AddPlugin(plugin);
     else
-      removePlugin(plugin);
+      RemovePlugin(plugin);
   }
 }
 
-QList<QSharedPointer<ctkPlugin> >
-CTKPluginListener::sortPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins)
-{
-  QList<QSharedPointer<ctkPlugin> > sortedPlugins(plugins);
-  QSet<QString> installedSymbolicNames;
-
-  QHash<long, QStringList> mapPluginIdToDeps;
-  foreach(QSharedPointer<ctkPlugin> plugin, sortedPlugins)
-  {
-    installedSymbolicNames.insert((plugin->getSymbolicName()));
-
-    QString requirePlugin = plugin->getHeaders()[ctkPluginConstants::REQUIRE_PLUGIN];
-    QStringList requiredList = requirePlugin.split(QRegExp("\\s*,\\s*"), QString::SkipEmptyParts);
-
-    QStringList requiredSymbolicNames;
-    foreach(QString require, requiredList)
-    {
-      requiredSymbolicNames.append(require.split(';').front());
-    }
-    mapPluginIdToDeps[plugin->getPluginId()] = requiredSymbolicNames;
-  }
-
-  QStringList stableSymbolicNames;
-  for (int i = 0; i < sortedPlugins.size();)
-  {
-    QStringList currDeps = mapPluginIdToDeps[sortedPlugins.at(i)->getPluginId()];
-    bool moved = false;
-    foreach(QString currDep, currDeps)
-    {
-      if (!stableSymbolicNames.contains(currDep) && installedSymbolicNames.contains(currDep))
-      {
-        sortedPlugins.move(i, sortedPlugins.size()-1);
-        moved = true;
-        break;
-      }
-    }
-    if (!moved)
-    {
-      stableSymbolicNames.append(sortedPlugins.at(i)->getSymbolicName());
-      ++i;
-    }
-  }
-
-  return sortedPlugins;
-}
-
-void CTKPluginListener::pluginChanged(const ctkPluginEvent& event)
+void CTKPluginListener::PluginChanged(const ctkPluginEvent& event)
 {
   /* Only should listen for RESOLVED and UNRESOLVED events.
    *
@@ -108,27 +65,46 @@ void CTKPluginListener::pluginChanged(const ctkPluginEvent& event)
   QSharedPointer<ctkPlugin> plugin = event.getPlugin();
   switch (event.getType())
   {
-    case ctkPluginEvent::RESOLVED :
-      addPlugin(plugin);
-      break;
-    case ctkPluginEvent::UNRESOLVED :
-      removePlugin(plugin);
+  case ctkPluginEvent::RESOLVED :
+  {
+    {
+      QMutexLocker l(&mutex);
+      long newStateStamp = registry->ComputeState();
+      if (currentStateStamp[0] != newStateStamp)
+      {
+        // new state stamp
+        currentStateStamp[0] = newStateStamp;
+      }
+    }
+    AddPlugin(plugin);
+    break;
+  }
+  case ctkPluginEvent::UNRESOLVED :
+      RemovePlugin(plugin);
       break;
   }
 }
 
-bool CTKPluginListener::isPluginResolved(QSharedPointer<ctkPlugin> plugin)
+bool CTKPluginListener::IsPluginResolved(QSharedPointer<ctkPlugin> plugin)
 {
   return (plugin->getState() & (ctkPlugin::RESOLVED | ctkPlugin::ACTIVE | ctkPlugin::STARTING | ctkPlugin::STOPPING)) != 0;
 }
 
-void CTKPluginListener::removePlugin(QSharedPointer<ctkPlugin> plugin)
+void CTKPluginListener::RemovePlugin(QSharedPointer<ctkPlugin> plugin)
 {
-  // The BlueBerry extension point registry does not support the removal of contributions
-  //registry->remove(plugin->getPluginId(), timestamp);
+  long timestamp = 0;
+  if (strategy->CheckContributionsTimestamp())
+  {
+    QString pluginManifest = GetExtensionPath(plugin);
+    if (!pluginManifest.isEmpty())
+    {
+      timestamp = strategy->GetExtendedTimestamp(plugin, pluginManifest);
+    }
+  }
+  registry->Remove(QString::number(plugin->getPluginId()), timestamp);
 }
 
-QString CTKPluginListener::getExtensionPath(QSharedPointer<ctkPlugin> plugin)
+QString CTKPluginListener::GetExtensionPath(QSharedPointer<ctkPlugin> plugin)
 {
   // bail out if system plugin
   if (plugin->getPluginId() == 0)
@@ -140,17 +116,17 @@ QString CTKPluginListener::getExtensionPath(QSharedPointer<ctkPlugin> plugin)
   return PLUGIN_MANIFEST;
 }
 
-void CTKPluginListener::addPlugin(QSharedPointer<ctkPlugin> plugin)
+void CTKPluginListener::AddPlugin(QSharedPointer<ctkPlugin> plugin)
 {
   // if the given plugin already exists in the registry then return.
   // note that this does not work for update cases.
-  std::string contributor = plugin->getSymbolicName().toStdString();
-  if (registry->HasContributionFrom(contributor))
+  IContributor::Pointer contributor = ContributorFactory::CreateContributor(plugin);
+  if (registry->HasContributor(contributor))
   {
     return;
   }
 
-  QString pluginManifest = getExtensionPath(plugin);
+  QString pluginManifest = GetExtensionPath(plugin);
   if (pluginManifest.isEmpty())
     return;
 
@@ -158,11 +134,15 @@ void CTKPluginListener::addPlugin(QSharedPointer<ctkPlugin> plugin)
   if (ba.isEmpty())
     return;
 
-  std::string strContent(ba.data());
-  std::stringbuf strBuf(strContent, std::ios_base::in);
-  std::istream is(&strBuf);
+  long timestamp = 0;
+  if (strategy->CheckContributionsTimestamp())
+  {
+    timestamp = strategy->GetExtendedTimestamp(plugin, pluginManifest);
+  }
 
-  registry->AddContribution(is, contributor);
+  QBuffer buffer(&ba);
+  //buffer.open(QIODevice::ReadOnly);
+  registry->AddContribution(&buffer, contributor, true, pluginManifest, NULL, token, timestamp);
 }
 
 }

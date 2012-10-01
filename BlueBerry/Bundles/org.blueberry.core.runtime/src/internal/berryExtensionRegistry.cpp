@@ -593,7 +593,7 @@ SmartPointer<IExtension> ExtensionRegistry::GetExtension(const QString& extensio
   return IExtension::Pointer();
 }
 
-SmartPointer<IExtension> ExtensionRegistry::GetExtension(const QString& extensionPointId, const QString& extensionId)
+SmartPointer<IExtension> ExtensionRegistry::GetExtension(const QString& extensionPointId, const QString& extensionId) const
 {
   // this is just a convenience API - no need to do any sync'ing here
   int lastdot = extensionPointId.lastIndexOf('.');
@@ -779,9 +779,9 @@ ExtensionRegistry::ExtensionRegistry(RegistryStrategy* registryStrategy, QObject
   isMultiLanguage = RegistryProperties::GetProperty(RegistryConstants::PROP_MULTI_LANGUAGE) == "true";
 
   if (registryStrategy != NULL)
-    strategy = registryStrategy;
+    strategy.reset(registryStrategy);
   else
-    strategy = new RegistryStrategy(QList<QString>(), QList<bool>());
+    strategy.reset(new RegistryStrategy(QList<QString>(), QList<bool>(), NULL));
 
   this->masterToken = masterToken;
   this->userToken = userToken;
@@ -893,6 +893,10 @@ ExtensionRegistry::ExtensionRegistry(RegistryStrategy* registryStrategy, QObject
 
   // Do extra start processing if specified in the registry strategy
   strategy->OnStart(this, isRegistryFilledFromCache);
+}
+
+ExtensionRegistry::~ExtensionRegistry()
+{
 }
 
 void ExtensionRegistry::Stop(QObject* key)

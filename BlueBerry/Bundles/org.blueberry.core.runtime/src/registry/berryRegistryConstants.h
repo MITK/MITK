@@ -33,12 +33,13 @@ struct org_blueberry_core_runtime_EXPORT RegistryConstants
   static const QString RUNTIME_NAME; // = "org.blueberry.core.runtime";
 
   // System options
-  static const QString PROP_NO_REGISTRY_FLUSHING; // = "blueberry.noRegistryFlushing";
-  static const QString PROP_NO_LAZY_CACHE_LOADING; // = "blueberry.noLazyRegistryCacheLoading";
-  static const QString PROP_NO_REGISTRY_CACHE; // = "blueberry.noRegistryCache";
-  static const QString PROP_DEFAULT_REGISTRY; // = "blueberry.createRegistry";
-  static const QString PROP_REGISTRY_NULL_USER_TOKEN; // = "blueberry.registry.nulltoken";
-  static const QString PROP_MULTI_LANGUAGE; // = "blueberry.registry.MultiLanguage";
+  static const QString PROP_NO_REGISTRY_FLUSHING; // = "BlueBerry.noRegistryFlushing";
+  static const QString PROP_NO_LAZY_CACHE_LOADING; // = "BlueBerry.noLazyRegistryCacheLoading";
+  static const QString PROP_CHECK_CONFIG; // = "osgi.checkConfiguration";
+  static const QString PROP_NO_REGISTRY_CACHE; // = "BlueBerry.noRegistryCache";
+  static const QString PROP_DEFAULT_REGISTRY; // = "BlueBerry.createRegistry";
+  static const QString PROP_REGISTRY_NULL_USER_TOKEN; // = "BlueBerry.registry.nulltoken";
+  static const QString PROP_MULTI_LANGUAGE; // = "BlueBerry.registry.MultiLanguage";
 
   /**
    * Specific error code supplied to the Status objects

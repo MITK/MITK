@@ -90,6 +90,11 @@ bool RegistryObjectManager::ShouldPersist(int id) const
 QList<SmartPointer<RegistryObject> > RegistryObjectManager::GetObjects(const QList<int>& values, short type) const
 {
   QMutexLocker l(&mutex);
+  return this->GetObjects_unlocked(values, type);
+}
+
+QList<SmartPointer<RegistryObject> > RegistryObjectManager::GetObjects_unlocked(const QList<int>& values, short type) const
+{
   if (values.empty())
   {
     return QList<RegistryObject::Pointer>();
@@ -294,6 +299,11 @@ void RegistryObjectManager::AddContribution(const SmartPointer<RegistryContribut
 QList<int> RegistryObjectManager::GetExtensionPointsFrom(const QString& id) const
 {
   QMutexLocker l(&mutex);
+  return this->GetExtensionPointsFrom_unlocked(id);
+}
+
+QList<int> RegistryObjectManager::GetExtensionPointsFrom_unlocked(const QString& id) const
+{
   KeyedElement::Pointer tmp = newContributions.GetByKey(id);
   if (tmp.IsNull())
     tmp = GetFormerContributions().GetByKey(id);
@@ -313,6 +323,11 @@ bool RegistryObjectManager::HasContribution(const QString& id) const
 void RegistryObjectManager::Remove(int id, bool release)
 {
   QMutexLocker l(&mutex);
+  this->Remove_unlocked(id, release);
+}
+
+void RegistryObjectManager::Remove_unlocked(int id, bool release)
+{
   RegistryObject::Pointer toRemove = cache->Get(id);
 //  if (fileOffsets != null)
 //    fileOffsets.removeKey(id);
@@ -353,6 +368,11 @@ SmartPointer<ExtensionPointHandle> RegistryObjectManager::GetExtensionPointHandl
 QList<int> RegistryObjectManager::GetExtensionsFrom(const QString& contributorId) const
 {
   QMutexLocker l(&mutex);
+  return this->GetExtensionsFrom(contributorId);
+}
+
+QList<int> RegistryObjectManager::GetExtensionsFrom_unlocked(const QString& contributorId) const
+{
   KeyedElement::Pointer tmp = newContributions.GetByKey(contributorId);
   if (tmp.IsNull())
     tmp = GetFormerContributions().GetByKey(contributorId);
@@ -381,7 +401,7 @@ void RegistryObjectManager::RemoveExtensionPoint(const QString& extensionPointId
 
   int pointId = pointIdIter.value();
   extensionPoints.erase(pointIdIter);
-  Remove(pointId, true);
+  Remove_unlocked(pointId, true);
 }
 
 void RegistryObjectManager::RemoveContribution(const QString& contributorId)
@@ -531,8 +551,8 @@ QHash<int, SmartPointer<RegistryObject> > RegistryObjectManager::GetAssociatedOb
 {
   QMutexLocker l(&mutex);
   //Collect all the objects associated with this contribution
-  QList<int> xpts = GetExtensionPointsFrom(contributionId);
-  QList<int> exts = GetExtensionsFrom(contributionId);
+  QList<int> xpts = GetExtensionPointsFrom_unlocked(contributionId);
+  QList<int> exts = GetExtensionsFrom_unlocked(contributionId);
   QHash<int, RegistryObject::Pointer> actualObjects;
   for (int i = 0; i < exts.size(); i++)
   {
@@ -689,7 +709,7 @@ void RegistryObjectManager::UpdateNamespaceIndex(const SmartPointer<RegistryCont
 {
   // if all extension points are from the same namespace combine them in one block and add them all together
   QList<int> contribExtensionPoints = contribution->GetExtensionPoints();
-  QList<RegistryObject::Pointer> extensionPointObjects = GetObjects(contribExtensionPoints, EXTENSION_POINT);
+  QList<RegistryObject::Pointer> extensionPointObjects = GetObjects_unlocked(contribExtensionPoints, EXTENSION_POINT);
   QString commonExptsNamespace;
   if (contribExtensionPoints.size() > 1)
   {
@@ -712,7 +732,7 @@ void RegistryObjectManager::UpdateNamespaceIndex(const SmartPointer<RegistryCont
 
   // if all extensions are from the same namespace combine them in one block and add them all together
   QList<int> contrExtensions = contribution->GetExtensions();
-  QList<RegistryObject::Pointer> extensionObjects = GetObjects(contrExtensions, EXTENSION);
+  QList<RegistryObject::Pointer> extensionObjects = GetObjects_unlocked(contrExtensions, EXTENSION);
   QString commonExtNamespace;
   if (contrExtensions.size() > 1)
   {

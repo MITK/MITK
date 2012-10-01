@@ -123,10 +123,14 @@ protected:
   void AddContribution(const SmartPointer<RegistryContribution>& contribution);
 
   QList<int> GetExtensionPointsFrom(const QString& id) const;
+  QList<int> GetExtensionPointsFrom_unlocked(const QString& id) const;
 
   bool HasContribution(const QString& id) const;
 
   void Remove(int id, bool release);
+  void Remove_unlocked(int id, bool release);
+
+  QList<SmartPointer<RegistryObject> > GetObjects_unlocked(const QList<int>& values, short type) const;
 
   SmartPointer<ExtensionPoint> GetExtensionPointObject(const QString& xptUniqueId) const;
 
@@ -135,6 +139,7 @@ protected:
   SmartPointer<ExtensionPointHandle> GetExtensionPointHandle(const QString& xptUniqueId);
 
   QList<int> GetExtensionsFrom(const QString& contributorId) const;
+  QList<int> GetExtensionsFrom_unlocked(const QString& contributorId) const;
 
   bool AddExtensionPoint(const SmartPointer<ExtensionPoint>& currentExtPoint, bool hold);
 

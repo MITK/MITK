@@ -1,9 +1,10 @@
 set(MOC_H_FILES
   src/berryPlugin.h
 
-  src/internal/berryCTKPluginListener_p.h
+  src/internal/berryCTKPluginListener.h
   src/internal/berryCTKPluginActivator.h
   #src/internal/berryExtensionPointService.h
+  src/internal/berryExtensionRegistry.h
   src/internal/berryPreferencesService.h
 )
 
@@ -14,6 +15,7 @@ set(CACHED_RESOURCE_FILES
 set(SRC_CPP_FILES
   berryBackingStoreException.cpp
   #berryBundleLoader.cpp
+  berryContributorFactory.cpp
   berryCoreException.cpp
   berryDebugBreakpointManager.cpp
   berryDebugUtil.cpp
@@ -86,6 +88,7 @@ set(INTERNAL_CPP_FILES
   berryConfigurationElementHandle.cpp
   berryCTKPluginActivator.cpp
   berryCTKPluginListener.cpp
+  berryCTKPluginUtils.cpp
   #berryDefaultActivator.cpp
   berryExtension.cpp
   #berryExtensionDelta.cpp

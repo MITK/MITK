@@ -31,7 +31,7 @@ const int RegistryObject::PERSIST_MASK = 0x40000000; // only taking bit #30
 const int RegistryObject::OFFSET_MASK = 0x3FFFFFFF; // all bits but #30, #31
 
 RegistryObject::RegistryObject()
-  : objectId(RegistryObjectManager::UNKNOWN), extraDataOffset(EMPTY_MASK)
+  : registry(NULL), objectId(RegistryObjectManager::UNKNOWN), extraDataOffset(EMPTY_MASK)
 {
   objectKey = QString::number(objectId);
 }
@@ -47,8 +47,9 @@ bool RegistryObject::IsEqual(const KeyedElement& other) const
 }
 
 RegistryObject::RegistryObject(ExtensionRegistry* registry, bool persist)
-  : registry(registry)
+  : registry(registry), objectId(RegistryObjectManager::UNKNOWN), extraDataOffset(EMPTY_MASK)
 {
+  objectKey = QString::number(objectId);
   SetPersist(persist);
 }
 

@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berrySmartPointer.h>
 
 #include <QList>
+#include <QSharedPointer>
+
+class ctkPlugin;
 
 class QTranslator;
 class QLocale;
@@ -33,6 +36,7 @@ struct IRegistryEventListener;
 struct IStatus;
 
 class CombinedEventDelta;
+class CTKPluginListener;
 class RegistryContributor;
 
 /**
@@ -68,6 +72,21 @@ private:
    */
   QList<bool> cacheReadOnly;
 
+  /**
+   * Registry access key
+   */
+  QObject* token;
+
+  /**
+   * Value of the query "should we track contributions timestamps" is cached
+   * in this variable
+   */
+  bool trackTimestamp;
+
+  /**
+   * Listening to the plugin events.
+   */
+  QScopedPointer<CTKPluginListener> pluginListener;
 
 public:
 
@@ -89,8 +108,10 @@ public:
    *
    * @param storageDirs array of file system directories, or <code>null</code>
    * @param cacheReadOnly array of read only attributes, or <code>null</code>
+   * @param key control key for the registry
    */
-  RegistryStrategy(const QList<QString>& storageDirs, const QList<bool>& cacheReadOnly);
+  RegistryStrategy(const QList<QString>& storageDirs, const QList<bool>& cacheReadOnly,
+                   QObject* key);
 
   ~RegistryStrategy();
 
@@ -133,7 +154,7 @@ public:
    *
    * @param status the status to log
    */
-  virtual void Log(const SmartPointer<IStatus>& status);
+  void Log(const SmartPointer<IStatus>& status);
 
   /**
    * Translates key using the supplied resource bundle. The resource bundle is
@@ -148,7 +169,7 @@ public:
    * @param resources resource bundle, or <code>null</code>
    * @return the translated string, must not be <code>null</code>
    */
-  virtual QString Translate(const QString& key, QTranslator* resources);
+  QString Translate(const QString& key, QTranslator* resources);
 
   /**
    * Override this method to provide additional processing performed
@@ -159,7 +180,7 @@ public:
    * @param loadedFromCache true is registry contents was loaded from
    * cache when the registry was created
    */
-  virtual void OnStart(IExtensionRegistry* registry, bool loadedFromCache);
+  void OnStart(IExtensionRegistry* registry, bool loadedFromCache);
 
   /**
    * Override this method to provide additional processing to be performed
@@ -167,7 +188,7 @@ public:
    * <code>super.onStop()</code> at the end of the processing.
    * @param registry the extension registry being stopped
    */
-  virtual void OnStop(IExtensionRegistry* registry);
+  void OnStop(IExtensionRegistry* registry);
 
   /**
    * Creates an executable extension. Override this method to supply an alternative processing
@@ -190,7 +211,7 @@ public:
    * @see IConfigurationElement#createExecutableExtension(String)
    * @see IExecutableExtension
    */
-  virtual QObject* CreateExecutableExtension(const SmartPointer<RegistryContributor>& contributor,
+  QObject* CreateExecutableExtension(const SmartPointer<RegistryContributor>& contributor,
                                              const QString& className, const QString& overridenContributorName);
 
   /*
@@ -226,32 +247,24 @@ public:
 //                                                  IExtensionRegistry* registry);
 
   /**
-   * Override this method to specify debug requirements to the registry. In the default
+   * This method to specifies debug requirements for the registry. In the default
    * implementation this method returns <code>false</code> indicating that debug functionality
    * is turned off.
-   * <p>
-   * Note that in a general case the extension registry plug-in doesn't depend on OSGI and
-   * therefore cannot use Eclipse .options files to discover debug options.
-   * </p>
    *
    * @return <code>true</code> if debug logging and validation should be performed and
-   *   <code>false</code> otherwise
+   *         <code>false</code> otherwise
    */
-  virtual bool Debug() const;
+  bool Debug() const;
 
   /**
-   * Override this method to specify debug requirements for the registry event processing.
+   * This method to specifies debug requirements for the registry event processing.
    * In the default implementation this method returns <code>false</code> indicating that
    * debug of the registry events is turned off.
-   * <p>
-   * Note that in a general case the extension registry plug-in doesn't depend on OSGI and
-   * therefore cannot use Eclipse .options files to discover debug options.
-   * </p>
    *
    * @return <code>true</code> if debug logging and validation of the registry events
-   *   should be performed and <code>false</code> otherwise
+   *         should be performed and <code>false</code> otherwise
    */
-  virtual bool DebugRegistryEvents() const;
+  bool DebugRegistryEvents() const;
 
   /**
    * Specifies if the extension registry should use cache to store registry data between
@@ -262,7 +275,7 @@ public:
    *
    * @return <code>true</code> if the cache should be used and <code>false</code> otherwise
    */
-  virtual bool CacheUse() const;
+  bool CacheUse() const;
 
   /**
    * Specifies if lazy cache loading is used.
@@ -273,7 +286,7 @@ public:
    *
    * @return <code>true</code> if lazy cache loading is used and <code>false</code> otherwise
    */
-  virtual bool CacheLazyLoading() const;
+  bool CacheLazyLoading() const;
 
   /**
    * This method is called as a part of the registry cache validation. The cache is valid
@@ -299,12 +312,12 @@ public:
    *
    * @return number indicating state of the application data
    */
-  virtual long GetContainerTimestamp() const;
+  long GetContainerTimestamp() const;
 
   /**
    * This method is called as a part of the registry cache validation. The method calculates
    * a number describing the time when the originating contributions (i.e., plugin.xml files
-   * in case of the Eclipse registry) were last modified.
+   * in case of the BlueBerry registry) were last modified.
    * <p>
    * The value returned by the method is compared with the timestamp tracked by the registry.
    * If contributions changed since they have been added to the registry (i.e., plugin.xml
@@ -320,7 +333,11 @@ public:
    * @return a value corresponding to the last modification time of contributions contained
    * in the registry
    */
-  virtual long GetContributionsTimestamp() const;
+  long GetContributionsTimestamp() const;
+
+  bool CheckContributionsTimestamp() const;
+
+  long GetExtendedTimestamp(const QSharedPointer<ctkPlugin>& plugin, const QString& pluginManifest) const;
 
   /**
    * Returns the parser used by the registry to parse descriptions of extension points and extensions.
@@ -329,7 +346,7 @@ public:
    * @return this strategy's parser
    * @see IExtensionRegistry#AddContribution
    */
-  virtual QXmlReader* GetXMLParser() const;
+  QXmlReader* GetXMLParser() const;
 
   /**
    * Translates array of keys supplied by the contributor to the requested locale.
@@ -348,9 +365,9 @@ public:
    * @see IExtensionRegistry#isMultiLanguage()
    * @since org.eclipse.equinox.registry 3.5
    */
-  virtual QList<QString> Translate(const QList<QString>& nonTranslated,
-                                   const SmartPointer<IContributor>& contributor,
-                                   const QLocale& locale);
+  QList<QString> Translate(const QList<QString>& nonTranslated,
+                           const SmartPointer<IContributor>& contributor,
+                           const QLocale& locale);
 
   /**
    * Returns the current locale for the extension registry with enabled
@@ -370,7 +387,7 @@ public:
    * @see IExtensionRegistry#isMultiLanguage()
    * @return the default locale
    */
-  virtual QLocale GetLocale() const;
+  QLocale GetLocale() const;
 };
 
 }

@@ -32,7 +32,8 @@ namespace berry
 const QString AbstractUICTKPlugin::FN_DIALOG_SETTINGS = "dialog_settings.xml";
 
 AbstractUICTKPlugin::AbstractUICTKPlugin()
-  : context(0)
+  : preferencesService(0)
+  , context(0)
 {
 
 }

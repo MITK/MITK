@@ -243,12 +243,12 @@ namespace berry
     /// Checks if this node is about to be removed.
     /// \throws IllegalStateException
     ///
-    void AssertValid() const;
+    void AssertValid_unlocked() const;
     ///
     /// Checks a path value for validity.
     /// \throws invalid_argument
     ///
-    static void AssertPath(const QString& pathName);
+    static void AssertPath_unlocked(const QString& pathName);
 //    ///
 //    /// Converts any value to a string (using stream operator "<<")
 //    ///
@@ -260,14 +260,19 @@ namespace berry
 //      s.imbue(C);
 //      s.precision(precision); s << obj; return s.str();
 //    }
+
+    bool Has_unlocked(const QString& key) const;
+
     ///
     /// Sets the dirty flag recursively on all child nodes.
     ///
     void SetDirty(bool _Dirty);
+    void SetDirty_unlocked(bool _Dirty);
     ///
     /// Sets the removed flag recursively on all child nodes.
     ///
     void SetRemoved(bool _Removed);
+    void SetRemoved_unlocked(bool _Removed);
 
   protected:
     ///
@@ -281,19 +286,19 @@ namespace berry
     ///
     /// Saves the absolute path of this node (calculated in the constructor)
     ///
-    QString m_Path;
+    const QString m_Path;
     ///
     /// Saves the name of this node (set when read from backend)
     ///
-    QString m_Name;
+    const QString m_Name;
     ///
     /// Saves the parent of this node
     ///
-    Preferences* m_Parent;
+    Preferences* const m_Parent;
     ///
     /// Saves the root of this tree
     ///
-    Preferences* m_Root;
+    Preferences* const m_Root;
     ///
     /// Saves if something changed on this branch.
     /// Meaning that you would have to rewrite it.
@@ -306,7 +311,7 @@ namespace berry
     ///
     /// A storage to call the flush method.
     ///
-    AbstractPreferencesStorage* m_Storage;
+    AbstractPreferencesStorage* const m_Storage;
     ///
     /// A mutex to avoid concurrency crashes. Mutable because we need to use Mutex::lock() in const functions
     ///

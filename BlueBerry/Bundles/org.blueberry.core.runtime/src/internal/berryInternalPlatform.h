@@ -59,6 +59,7 @@ private:
   ServiceRegistry* m_ServiceRegistry;
 
   QScopedPointer<ctkServiceTracker<berry::IPreferencesService*> > m_PreferencesTracker;
+  QScopedPointer<ctkServiceTracker<berry::IExtensionRegistry*> > m_RegistryTracker;
 
   QDir m_BaseStatePath;
   QDir m_InstallPath;

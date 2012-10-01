@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryObjectString.h"
 #include "berryObjectStringMap.h"
 
+#include <QRegExp>
+
 namespace berry {
 
 ConfigurationElement::ConfigurationElement(ExtensionRegistry* registry, bool persist)
@@ -209,11 +211,11 @@ QObject* ConfigurationElement::CreateExecutableExtension(const QString& attribut
   else
   {
     // simple property or element value, parse it into its components
-    i = prop.indexOf(':');
+    i = prop.indexOf(QRegExp("[^:]:[^:]"));
     if (i != -1)
     {
-      executable = prop.left(i).trimmed();
-      initData = new ObjectString(prop.mid(i + 1).trimmed());
+      executable = prop.left(i+1).trimmed();
+      initData = new ObjectString(prop.mid(i + 2).trimmed());
     }
     else
     {

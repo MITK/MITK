@@ -46,8 +46,10 @@ class RegistryStrategy;
 /**
  * An implementation for the extension registry API.
  */
-class ExtensionRegistry : public IExtensionRegistry
+class ExtensionRegistry : public QObject, public IExtensionRegistry
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IExtensionRegistry)
 
 private:
 
@@ -189,7 +191,7 @@ protected:
   // Table reader associated with this extension registry
   //TableReader theTableReader = new TableReader(this);
 
-  RegistryStrategy* strategy; // overridable portions of the registry functionality
+  QScopedPointer<RegistryStrategy> strategy; // overridable portions of the registry functionality
 
   /**
    * Sets new cache file manager. If existing file manager was owned by the registry,
@@ -254,7 +256,7 @@ public:
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtension(java.lang.  QString, java.lang.  QString)
    */
-  SmartPointer<IExtension> GetExtension(const QString& extensionPointId, const QString& extensionId);
+  SmartPointer<IExtension> GetExtension(const QString& extensionPointId, const QString& extensionId) const;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtension(java.lang.  QString, java.lang.  QString, java.lang.  QString)
@@ -318,6 +320,8 @@ public:
   void RemoveListener(IRegistryEventListener* listener);
 
   ExtensionRegistry(RegistryStrategy* registryStrategy, QObject* masterToken, QObject* userToken);
+
+  ~ExtensionRegistry();
 
   /**
    * Stops the registry. Registry has to be stopped to properly

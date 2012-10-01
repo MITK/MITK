@@ -28,6 +28,7 @@ namespace berry {
 
 //class CTKPluginListener;
 class PreferencesService;
+class IExtensionRegistry;
 
 class org_blueberry_core_runtime_Activator : public QObject, public ctkPluginActivator
 {
@@ -39,6 +40,7 @@ class org_blueberry_core_runtime_Activator : public QObject, public ctkPluginAct
 
 public:
 
+  org_blueberry_core_runtime_Activator();
   ~org_blueberry_core_runtime_Activator();
 
   void start(ctkPluginContext* context);
@@ -54,12 +56,21 @@ public:
 
 private:
 
+  void startRegistry();
+  void stopRegistry();
+
   static ctkPluginContext* context;
 
   //QScopedPointer<CTKPluginListener> pluginListener;
 
-  SmartPointer<PreferencesService> m_PreferencesService;
-  ctkServiceRegistration m_PrefServiceReg;
+  SmartPointer<PreferencesService> preferencesService;
+  ctkServiceRegistration prefServiceReg;
+
+  QScopedPointer<IExtensionRegistry> defaultRegistry;
+  ctkServiceRegistration registryServiceReg;
+
+  QScopedPointer<QObject> userRegistryKey;
+  QScopedPointer<QObject> masterRegistryKey;
 
 };
 

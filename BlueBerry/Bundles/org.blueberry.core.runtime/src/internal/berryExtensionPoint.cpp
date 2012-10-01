@@ -50,12 +50,17 @@ QList<QString> ExtensionPoint::GetExtraData() const
 ExtensionPoint::ExtensionPoint(ExtensionRegistry* registry, bool persist)
   : RegistryObject(registry, persist)
 {
+  for (int i = 0; i < EXTRA_SIZE; ++i)
+    extraInformation << QString();
 }
 
 ExtensionPoint::ExtensionPoint(int self, const QList<int>& children, int dataOffset,
                ExtensionRegistry* registry, bool persist)
   : RegistryObject(registry, persist)
 {
+  for (int i = 0; i < EXTRA_SIZE; ++i)
+    extraInformation << QString();
+
   SetObjectId(self);
   SetRawChildren(children);
   SetExtraDataOffset(dataOffset);

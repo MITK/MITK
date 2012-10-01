@@ -42,6 +42,7 @@ QList<SmartPointer<IExtension> > ExtensionPointHandle::GetExtensions() const
   {
     result.push_back(handle.Cast<IExtension>());
   }
+  return result;
 }
 
 QString ExtensionPointHandle::GetNamespaceIdentifier() const
@@ -86,7 +87,7 @@ QList<SmartPointer<IConfigurationElement> > ExtensionPointHandle::GetConfigurati
                                                                RegistryObjectManager::CONFIGURATION_ELEMENT);
     for (int j = 0; j < handles.size(); ++j)
     {
-      result.push_back(handles[i].Cast<IConfigurationElement>());
+      result.push_back(handles[j].Cast<IConfigurationElement>());
     }
   }
   return result;

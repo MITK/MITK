@@ -213,7 +213,6 @@ QDebug Object::PrintSelf(QDebug os, Indent Indent) const
   os << Indent << "RTTI typeinfo:   " << typeid( *this ).name() << '\n';
 #endif
   os << Indent << "Reference Count: " << m_ReferenceCount << '\n';
-  os << Indent << "ToString: " << ToString() << '\n';
 }
 
 /**

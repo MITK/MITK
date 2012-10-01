@@ -20,12 +20,13 @@ namespace berry {
 
 const QString RegistryConstants::RUNTIME_NAME = "org.blueberry.core.runtime";
 
-const QString RegistryConstants::PROP_NO_REGISTRY_FLUSHING = "blueberry.noRegistryFlushing";
-const QString RegistryConstants::PROP_NO_LAZY_CACHE_LOADING = "blueberry.noLazyRegistryCacheLoading";
-const QString RegistryConstants::PROP_NO_REGISTRY_CACHE = "blueberry.noRegistryCache";
-const QString RegistryConstants::PROP_DEFAULT_REGISTRY = "blueberry.createRegistry";
-const QString RegistryConstants::PROP_REGISTRY_NULL_USER_TOKEN = "blueberry.registry.nulltoken";
-const QString RegistryConstants::PROP_MULTI_LANGUAGE = "blueberry.registry.MultiLanguage";
+const QString RegistryConstants::PROP_NO_REGISTRY_FLUSHING = "BlueBerry.noRegistryFlushing";
+const QString RegistryConstants::PROP_NO_LAZY_CACHE_LOADING = "BlueBerry.noLazyRegistryCacheLoading";
+const QString RegistryConstants::PROP_CHECK_CONFIG = "osgi.checkConfiguration";
+const QString RegistryConstants::PROP_NO_REGISTRY_CACHE = "BlueBerry.noRegistryCache";
+const QString RegistryConstants::PROP_DEFAULT_REGISTRY = "BlueBerry.createRegistry";
+const QString RegistryConstants::PROP_REGISTRY_NULL_USER_TOKEN = "BlueBerry.registry.nulltoken";
+const QString RegistryConstants::PROP_MULTI_LANGUAGE = "BlueBerry.registry.MultiLanguage";
 
 const int RegistryConstants::PLUGIN_ERROR = 1;
 

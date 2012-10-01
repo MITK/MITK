@@ -47,6 +47,8 @@ QList<QString> Extension::GetExtraData() const
 Extension::Extension(ExtensionRegistry* registry, bool persist)
   : RegistryObject(registry, persist)
 {
+  for (int i = 0; i < EXTRA_SIZE; ++i)
+    extraInformation << QString();
 }
 
 Extension::Extension(int self, const QString& simpleId, const QString& namespaze,
@@ -54,6 +56,9 @@ Extension::Extension(int self, const QString& simpleId, const QString& namespaze
           ExtensionRegistry* registry, bool persist)
   : RegistryObject(registry, persist), simpleId(simpleId), namespaceIdentifier(namespaze)
 {
+  for (int i = 0; i < EXTRA_SIZE; ++i)
+    extraInformation << QString();
+
   SetObjectId(self);
   SetRawChildren(children);
   SetExtraDataOffset(extraData);

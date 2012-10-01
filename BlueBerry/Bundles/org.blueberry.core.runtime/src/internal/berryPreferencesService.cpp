@@ -76,12 +76,17 @@ berry::IPreferences::Pointer berry::PreferencesService::GetSystemPreferences()
 {
   QMutexLocker scopedMutex(&m_Mutex);
   // sys prefs are indicated by an empty user QString
-  return this->GetUserPreferences("");
+  return this->GetUserPreferences_unlocked("");
 }
 
 berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences(const QString& name)
 {
   QMutexLocker scopedMutex(&m_Mutex);
+  return this->GetUserPreferences_unlocked(name);
+}
+
+berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences_unlocked(const QString& name)
+{
   IPreferences::Pointer userPrefs(0);
 
   QHash<QString, AbstractPreferencesStorage::Pointer>::const_iterator it

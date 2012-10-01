@@ -31,8 +31,8 @@ namespace berry
 const QString LayoutPart::PROP_VISIBILITY = "PROP_VISIBILITY";
 
 
-LayoutPart::LayoutPart(const QString& id_) :
-  id(id_), deferCount(0)
+LayoutPart::LayoutPart(const QString& id_)
+  : container(0), id(id_), deferCount(0)
 {
 
 }
@@ -65,7 +65,7 @@ Rectangle LayoutPart::GetBounds()
 
 ILayoutContainer::Pointer LayoutPart::GetContainer()
 {
-  return container;
+  return ILayoutContainer::Pointer(container);
 }
 
 bool LayoutPart::IsPlaceHolder() const
@@ -245,7 +245,7 @@ void LayoutPart::SetBounds(const Rectangle& r)
 void LayoutPart::SetContainer(ILayoutContainer::Pointer container)
 {
 
-  this->container = container;
+  this->container = container.GetPointer();
 
   //TODO Zoom
 //  if (container != 0)

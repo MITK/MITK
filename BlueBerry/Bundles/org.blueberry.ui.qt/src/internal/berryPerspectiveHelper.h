@@ -53,7 +53,7 @@ private:
   WorkbenchPage* page;
 
 protected:
-  Perspective::Pointer perspective;
+  Perspective* perspective;
 
 protected:
   void* parentWidget;
@@ -186,7 +186,7 @@ private:
    */
 public:
   PerspectiveHelper(WorkbenchPage* workbenchPage,
-      ViewSashContainer::Pointer mainLayout, Perspective::Pointer perspective);
+      ViewSashContainer::Pointer mainLayout, Perspective* perspective);
 
   /**
    * Show the presentation.

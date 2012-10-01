@@ -20,7 +20,7 @@ namespace berry
 {
 
 PlaceholderFolderLayout::PlaceholderFolderLayout(
-    PageLayout::Pointer pageLayout, ContainerPlaceholder::Pointer folder)
+    PageLayout* pageLayout, ContainerPlaceholder::Pointer folder)
 {
   this->placeholder = folder;
   this->pageLayout = pageLayout;

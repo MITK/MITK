@@ -80,7 +80,43 @@ PartSite::PartSite(IWorkbenchPartReference::Pointer ref,
 
 PartSite::~PartSite()
 {
+//  if (menuExtenders != null)
+//  {
+//    HashSet managers = new HashSet(menuExtenders.size());
+//    for (int i = 0; i < menuExtenders.size(); i++)
+//    {
+//      PopupMenuExtender ext = (PopupMenuExtender) menuExtenders.get(i);
+//      managers.add(ext.getManager());
+//      ext.dispose();
+//    }
+//    if (managers.size()>0)
+//    {
+//      for (Iterator iterator = managers.iterator(); iterator
+//           .hasNext();)
+//      {
+//        MenuManager mgr = (MenuManager) iterator.next();
+//        mgr.dispose();
+//      }
+//    }
+//    menuExtenders = null;
+//  }
 
+//  if (keyBindingService != null)
+//  {
+//    keyBindingService.dispose();
+//    keyBindingService = null;
+//  }
+
+//  if (progressService != null)
+//  {
+//    progressService.dispose();
+//    progressService = null;
+//  }
+
+  if (serviceLocator.IsNotNull())
+  {
+    serviceLocator->Dispose();
+  }
 }
 
 PartSite::ServiceLocatorOwner::ServiceLocatorOwner(PartSite* s)

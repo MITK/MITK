@@ -1757,7 +1757,7 @@ void Workbench::Shutdown()
   // ((GrabFocus) Tweaklets.get(GrabFocus.KEY)).dispose();
 
   // Bring down all of the services.
-  // serviceLocator.dispose();
+  serviceLocator->Dispose();
 
   // workbenchActivitySupport.dispose();
   // WorkbenchHelpSystem.disposeIfNecessary();

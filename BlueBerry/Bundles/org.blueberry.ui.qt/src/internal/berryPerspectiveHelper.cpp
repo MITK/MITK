@@ -190,7 +190,7 @@ bool PerspectiveHelper::CompareMatchingParts::operator()(const MatchingPart& m1,
 }
 
 PerspectiveHelper::PerspectiveHelper(WorkbenchPage* workbenchPage,
-    ViewSashContainer::Pointer mainLayout, Perspective::Pointer persp)
+    ViewSashContainer::Pointer mainLayout, Perspective* persp)
 : page(workbenchPage), perspective(persp),
 mainLayout(mainLayout),
 detachable(false), active(false)

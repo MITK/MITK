@@ -44,13 +44,13 @@ public:
 
 private:
 
-  PageLayout::Pointer pageLayout;
+  PageLayout* pageLayout;
 
   ContainerPlaceholder::Pointer placeholder;
 
 public:
 
-  PlaceholderFolderLayout(PageLayout::Pointer pageLayout,
+  PlaceholderFolderLayout(PageLayout* pageLayout,
       ContainerPlaceholder::Pointer folder);
 
   /**

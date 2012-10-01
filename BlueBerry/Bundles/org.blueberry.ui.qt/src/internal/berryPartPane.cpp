@@ -117,12 +117,14 @@ Rectangle PartPane::GetParentBounds()
 {
   void* ctrl = this->GetControl();
 
-  if (this->GetContainer() != 0 && this->GetContainer().Cast<LayoutPart>() != 0) {
-      LayoutPart::Pointer part = this->GetContainer().Cast<LayoutPart>();
+  if (this->GetContainer() != 0 && this->GetContainer().Cast<LayoutPart>() != 0)
+  {
+    LayoutPart::Pointer part = this->GetContainer().Cast<LayoutPart>();
 
-      if (part->GetControl() != 0) {
-          ctrl = part->GetControl();
-      }
+    if (part->GetControl() != 0)
+    {
+      ctrl = part->GetControl();
+    }
   }
 
   return DragUtil::GetDisplayBounds(ctrl);

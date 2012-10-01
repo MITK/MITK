@@ -346,6 +346,16 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      */
   protected: void OnActivate();
 
+private:
+
+    /**
+     * An 'orphan' perspective is one that was originally created through a
+     * contribution but whose contributing bundle is no longer available. In
+     * order to allow it to behave correctly within the environment (for Close,
+     * Reset...) we turn it into a 'custom' perspective on its first activation.
+     */
+    void FixOrphan();
+
   /**
      * deactivate.
      */

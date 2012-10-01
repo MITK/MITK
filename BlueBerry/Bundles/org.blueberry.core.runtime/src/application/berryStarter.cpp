@@ -218,6 +218,7 @@ int Starter::Run(int& argc, char** argv,
     else
     {
       returnCode = app->Start();
+      delete app;
     }
   }
 

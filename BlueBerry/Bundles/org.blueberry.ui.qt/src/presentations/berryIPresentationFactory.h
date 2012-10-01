@@ -37,8 +37,6 @@ class BERRY_UI_QT IPresentationFactory {
 
 public:
 
-  berryManifestMacro(IPresentationFactory, berry);
-
   virtual ~IPresentationFactory();
 
   /**

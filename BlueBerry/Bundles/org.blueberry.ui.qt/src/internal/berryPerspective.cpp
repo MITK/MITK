@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "intro/berryIntroConstants.h"
 #include "dialogs/berryMessageDialog.h"
 #include "berryWorkbenchWindow.h"
+#include "berryStatusUtil.h"
 
 #include "presentations/berryIStackPresentationSite.h"
 
@@ -117,6 +118,7 @@ Perspective::~Perspective()
   }
 
   mapIDtoViewLayoutRec.clear();
+  delete presentation;
 }
 
 void Perspective::DisposeViewRefs() {
@@ -552,7 +554,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   showViewShortcuts = layout->GetShowViewShortcuts();
 
   // Create presentation.
-  presentation = new PerspectiveHelper(page, container, Perspective::Pointer(this));
+  presentation = new PerspectiveHelper(page, container, this);
 
   // Hide editor area if requested by factory
   if (!layout->IsEditorAreaVisible())
@@ -692,7 +694,29 @@ void Perspective::OnActivate()
 //    setEditorAreaTrimVisibility(editorAreaState == IStackPresentationSite.STATE_MINIMIZED);
   }
 
-  layout = 0;
+  FixOrphan();
+}
+
+void Perspective::FixOrphan()
+{
+  PerspectiveRegistry* reg = static_cast<PerspectiveRegistry*>(PlatformUI::GetWorkbench()->GetPerspectiveRegistry());
+  IPerspectiveDescriptor::Pointer regDesc = reg->FindPerspectiveWithId(descriptor->GetId());
+  if (regDesc.IsNull())
+  {
+    QString msg = "Perspective " + descriptor->GetLabel() + " has been made into a local copy";
+    IStatus::Pointer status = StatusUtil::NewStatus(IStatus::WARNING_TYPE, msg, BERRY_STATUS_LOC);
+    //StatusManager.getManager().handle(status, StatusManager.LOG);
+    WorkbenchPlugin::Log(status);
+
+    QString localCopyLabel("<%1>");
+    QString newDescId = localCopyLabel.arg(descriptor->GetLabel());
+    while (reg->FindPerspectiveWithId(newDescId).IsNotNull())
+    {
+      newDescId = localCopyLabel.arg(newDescId);
+    }
+    PerspectiveDescriptor::Pointer newDesc = reg->CreatePerspective(newDescId, descriptor);
+    page->SavePerspectiveAs(newDesc);
+  }
 }
 
 void Perspective::OnDeactivate()
@@ -878,7 +902,7 @@ bool Perspective::RestoreState()
   //      void runWithException() throws Throwable
   //      {
           ViewSashContainer::Pointer mainLayout(new ViewSashContainer(page, this->GetClientComposite()));
-          pres = new PerspectiveHelper(page, mainLayout, Perspective::Pointer(this));
+          pres = new PerspectiveHelper(page, mainLayout, this);
   //      }});
 
 

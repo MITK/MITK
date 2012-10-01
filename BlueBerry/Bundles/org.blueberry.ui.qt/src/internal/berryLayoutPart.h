@@ -44,7 +44,7 @@ public:
 
   berryObjectMacro(LayoutPart)
 
-protected: SmartPointer<ILayoutContainer> container;
+protected: ILayoutContainer* container;
 
     protected: QString id;
 

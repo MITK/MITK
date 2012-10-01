@@ -318,7 +318,7 @@ IPlaceholderFolderLayout::Pointer PageLayout::CreatePlaceholderFolder(
   this->AddPart(folder, folderId, relationship, ratio, refId);
 
   // Create a wrapper.
-  IPlaceholderFolderLayout::Pointer layout(new PlaceholderFolderLayout(PageLayout::Pointer(this), folder));
+  IPlaceholderFolderLayout::Pointer layout(new PlaceholderFolderLayout(this, folder));
 
   mapFolderToFolderLayout.insert(folder, layout);
 
@@ -604,8 +604,7 @@ void PageLayout::AddStandaloneViewPlaceholder(const QString& viewId,
   this->AddPart(folder, stackId, relationship, ratio, refId);
 
   // Create a wrapper.
-  PlaceholderFolderLayout::Pointer placeHolder(new PlaceholderFolderLayout(PageLayout::Pointer(this),
-      folder));
+  PlaceholderFolderLayout::Pointer placeHolder(new PlaceholderFolderLayout(this, folder));
 
   // Add the standalone view immediately
   placeHolder->AddPlaceholder(viewId);

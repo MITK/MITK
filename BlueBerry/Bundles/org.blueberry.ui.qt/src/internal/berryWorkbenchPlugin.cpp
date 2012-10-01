@@ -65,6 +65,7 @@ WorkbenchPlugin::WorkbenchPlugin()
 
 WorkbenchPlugin::~WorkbenchPlugin()
 {
+  delete presentationFactory;
   delete editorRegistry;
   delete viewRegistry;
   delete perspRegistry;

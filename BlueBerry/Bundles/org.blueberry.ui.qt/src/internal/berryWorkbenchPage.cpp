@@ -1831,32 +1831,6 @@ WorkbenchPage::~WorkbenchPage()
       }
       perspList = PerspectiveList();
 
-      // Capture views.
-      QList<IViewReference::Pointer> refs = viewFactory->GetViews();
-
-      //  if (refs.size() > 0)
-      //  {
-      //    // Dispose views.
-      //    for (unsigned int i = 0; i < refs.size(); i++)
-      //    {
-      //      WorkbenchPartReference::Pointer ref = refs[i].Cast<WorkbenchPartReference>();
-      //      //partList.RemovePart(ref);
-      //      //this->FirePartClosed(refs[i]);
-      //      //              Platform.run(new SafeRunnable() {
-      //      //                  public void run() {
-      //      // //                       WorkbenchPlugin.log(new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
-      //      // //                               Status.OK, "WorkbenchPage leaked a refcount for view " + ref.getId(), 0));  //$NON-NLS-1$//$NON-NLS-2$
-      //
-      //      ref.dispose();
-      //      //                  }
-      //
-      //      //                  public void handleException(Throwable e) {
-      //      //                   }
-      //      //              });
-      //    }
-      //  }
-
-
       // Get rid of editor presentation.
       //editorPresentation->Dispose();
 

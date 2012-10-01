@@ -24,14 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const QString PerspectiveExtensionReader::VAL_LEFT = "left";//$NON-NLS-1$
-const QString PerspectiveExtensionReader::VAL_RIGHT = "right";//$NON-NLS-1$
-const QString PerspectiveExtensionReader::VAL_TOP = "top";//$NON-NLS-1$
-const QString PerspectiveExtensionReader::VAL_BOTTOM = "bottom";//$NON-NLS-1$
-const QString PerspectiveExtensionReader::VAL_STACK = "stack";//$NON-NLS-1$
-const QString PerspectiveExtensionReader::VAL_FAST = "fast";//$NON-NLS-1$
-const QString PerspectiveExtensionReader::VAL_TRUE = "true";//$NON-NLS-1$
-//const QString PerspectiveExtensionReader::VAL_FALSE = "false";//$NON-NLS-1$
+const QString PerspectiveExtensionReader::VAL_LEFT = "left";
+const QString PerspectiveExtensionReader::VAL_RIGHT = "right";
+const QString PerspectiveExtensionReader::VAL_TOP = "top";
+const QString PerspectiveExtensionReader::VAL_BOTTOM = "bottom";
+const QString PerspectiveExtensionReader::VAL_STACK = "stack";
+const QString PerspectiveExtensionReader::VAL_FAST = "fast";
+const QString PerspectiveExtensionReader::VAL_TRUE = "true";
+//const QString PerspectiveExtensionReader::VAL_FALSE = "false";
 
 bool PerspectiveExtensionReader::IncludeTag(const QString& tag)
 {

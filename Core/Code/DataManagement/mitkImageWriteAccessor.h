@@ -103,7 +103,7 @@ private:
       {
         ImageAccessorBase* r = *it;
 
-        if(/*r->m_Active &&*/  Overlap(r))
+        if(Overlap(r))
         {
           // An Overlap was detected.
           readOverlap = true;
@@ -125,12 +125,21 @@ private:
       {
         ImageAccessorBase* w = *it;
 
-        if(/*w->m_Active &&*/  Overlap(w))
+        if(Overlap(w))
         {
           // An Overlap was detected.
+
+          // Prevent deadlock
+          itk::ThreadProcessIDType id = mitk::CurrentThreadHandle();
+          if(id == w->m_Thread) {
+            mitkThrow() << "This image part is already in use and cannot be requested from this thread, since we would end in a deadlock!";
+          }
+
+          // save overlapping Waitlock
           writeOverlap = true;
           overlapLock = w->m_WaitLock;
           break;
+
         } // if
       } // for
     } // if
@@ -139,6 +148,7 @@ private:
       // Throw an exception or wait for the WriteAccessor w until it is released and start again with the request afterwards.
       if(!(m_Options & ExceptionIfLocked))
       {
+
         // WAIT
         overlapLock->m_WaiterCount += 1;
         m_Image->m_ReadWriteLock.Unlock();

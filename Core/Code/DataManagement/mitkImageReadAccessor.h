@@ -115,6 +115,12 @@ private:
           // Throw an exception or wait for the WriteAccessor w until it is released and start again with the request afterwards.
           if(!(m_Options & ExceptionIfLocked))
           {
+            // Deadlock prevention
+            itk::ThreadProcessIDType id = mitk::CurrentThreadHandle();
+            if(id == w->m_Thread) {
+              mitkThrow() << "This image part is already in use and cannot be requested from this thread, since we would end in a deadlock!";
+            }
+
             // WAIT
             w->Increment();
             m_Image->m_ReadWriteLock.Unlock();

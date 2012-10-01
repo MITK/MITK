@@ -17,21 +17,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessorBase.h"
 #include "mitkImage.h"
 
+itk::ThreadProcessIDType mitk::CurrentThreadHandle() {
+  #ifdef ITK_USE_SPROC
+    return GetCurrentThread();
+  #endif
+
+  #ifdef ITK_USE_PTHREADS
+    return pthread_self();
+  #endif
+
+  #ifdef ITK_USE_WIN32_THREADS
+    return GetCurrentThread();
+  #endif
+}
+
   mitk::ImageAccessorBase::ImageAccessorBase(
       ImagePointer iP,
       ImageDataItem* imageDataItem,
       int OptionFlags
     ) :
     m_Image(iP),
-//    imageDataItem(iDI),
+    // imageDataItem(iDI),
     m_SubRegion(NULL),
     m_Options(OptionFlags),
     m_CoherentMemory(false)
     {
+      m_Thread = mitk::CurrentThreadHandle();
+
       // Initialize WaitLock
       m_WaitLock = new ImageAccessorWaitLock();
       m_WaitLock->m_WaiterCount = 0;
-
 
       // Check validity of ImageAccessor
 

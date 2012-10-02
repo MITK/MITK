@@ -76,7 +76,7 @@ void SlicesRotator::OnSliceControllerAdded(SliceNavigationController* snc)
 void SlicesRotator::OnSliceControllerRemoved(SliceNavigationController* snc)
 {
   if (!snc) return;
-  // nothing to do
+  // nothing to do, base class does the bookkeeping
 }
 
 /// Is called whenever a SliceNavigationController invokes an event. Will update the list
@@ -281,131 +281,151 @@ bool SlicesRotator::DoSelectSlice(Action* a, const StateEvent* e)
 
 bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const StateEvent* e)
 {
-  const ScalarType ThreshHoldDistancePixels = 12.0;
+  // Decide between moving and rotation slices.
+  // For basic decision logic see class documentation.
 
-  // decide between moving and rotation 
+  /*
+    Detail logic:
 
-  // for basic decision logic see class documentation.
-
-  // Alle SNCs (Anzahl N) nach dem Abstand von posEvent->GetWorldPosition() zur aktuellen Ebene fragen.
-  // Anzahl der Ebenen zaehlen, die naeher als ein gewisser Schwellwertwert sind -> nNah.
-  // Wenn nNah == N
-  //   Generiere ein PointEvent und schicke das an alle SNCs -> bewege den kreuz-mittelpunkt
-  // Wenn nNah == 2
-  //   Streiche stateEvent->Sender aus der Liste der nahen Ebenen
-  //   fuer die uebrigen generiere eine RotationOperation und fuehre die aus
-  // sonst
-  //   
+     1. Find the SliceNavigationController that has sent the event: this one defines our rendering plane and will NOT be rotated. Must not even be counted or checked..
+     2. Inspect every other SliceNavigationController
+       - calculate the line intersection of this SliceNavigationController's plane with our rendering plane
+       - if there is no interesection, ignore and continue
+       - IF there is an intersection
+         - check the mouse cursor's distance from that line. 
+         0. if the line is NOT near the cursor, remember the plane as "one of the other planes" (which can be rotated in "locked" mode)
+         1. on first line near the cursor,  just remember this intersection line as THE other plane that we want to rotate
+         2. on every consecutive line near the cursor, check if the line is geometrically identical to the line that we want to rotate
+            - if yes, we just push this line to the "other" lines and rotate it along
+            - if no, then we have a situation where the mouse is near two other lines (e.g. crossing point) and don't want to rotate
+  */
   const DisplayPositionEvent* posEvent = dynamic_cast<const DisplayPositionEvent*>(e->GetEvent());
   if (!posEvent) return false;
+    
+  BaseRenderer* clickedRenderer = e->GetEvent()->GetSender();
+  const PlaneGeometry* ourViewportGeometry = dynamic_cast<const PlaneGeometry*>( clickedRenderer->GetCurrentWorldGeometry2D() );
+  if (!ourViewportGeometry) return false;
 
-  Point3D cursor = posEvent->GetWorldPosition();
-  //m_LastCursorPosition = cursor;
+  DisplayGeometry* clickedDisplayGeometry = clickedRenderer->GetDisplayGeometry();
+  if (!clickedDisplayGeometry) return false;
 
-  unsigned int numNearPlanes = 0;
+  MITK_DEBUG << "=============================================";
+  MITK_DEBUG << "Renderer under cursor is " << clickedRenderer->GetName();
+  
+  Point3D cursorPosition = posEvent->GetWorldPosition();
+  const PlaneGeometry* geometryToBeRotated = NULL;  // this one is under the mouse cursor
+  const PlaneGeometry* anyOtherGeometry = NULL;    // this is also visible (for calculation of intersection ONLY)
+  Line3D intersectionLineWithGeometryToBeRotated;
+
+  bool hitMultipleLines(false);
   m_SNCsToBeRotated.clear();
-  Geometry2D* geometryToBeRotated = NULL;  // this one is grabbed
-  Geometry2D* otherGeometry = NULL;        // this is also visible (for calculation of intersection)
-  Geometry2D* clickedGeometry = NULL;      // the event originates from this one
-  //SlicedGeometry3D* clickedSlicedGeometry;
+
+  const double threshholdDistancePixels = 12.0;
 
   for (SNCVector::iterator iter = m_RotatableSNCs.begin(); iter != m_RotatableSNCs.end(); ++iter)
   {
-    unsigned int slice = (*iter)->GetSlice()->GetPos();
-    unsigned int time  = (*iter)->GetTime()->GetPos();
-
-    const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
-    const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>( geometry3D );
-    if (!timeSlicedGeometry) continue;
-
-    const SlicedGeometry3D* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>( timeSlicedGeometry->GetGeometry3D(time) );
-    if (!slicedGeometry) continue;
-
-    Geometry2D* geometry2D = slicedGeometry->GetGeometry2D(slice);
-    if (!geometry2D) continue; // this is not necessary?
-
-    ScalarType distanceMM = geometry2D->Distance( cursor );
-
-    BaseRenderer* renderer = e->GetEvent()->GetSender(); // TODO this is NOT SNC-specific! Should be!
-
-    DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
-    if (!displayGeometry) continue;
-
-    ScalarType distancePixels = distanceMM / displayGeometry->GetScaleFactorMMPerDisplayUnit();
-    if ( distancePixels <= ThreshHoldDistancePixels )
+    const PlaneGeometry* otherRenderersRenderPlane = (*iter)->GetCurrentPlaneGeometry();
+    if (otherRenderersRenderPlane == NULL) continue; // ignore, we don't see a plane
+    MITK_DEBUG << "  Checking plane of renderer " << (*iter)->GetRenderer()->GetName();
+  
+    // check if there is an intersection
+    Line3D intersectionLine; // between rendered/clicked geometry and the one being analyzed
+    if (!ourViewportGeometry->IntersectionLine( otherRenderersRenderPlane, intersectionLine ))
     {
-      ++numNearPlanes; // count this one as a plane near to the cursor
+      continue; // we ignore this plane, it's parallel to our plane
     }
 
-    if ( *iter == renderer->GetSliceNavigationController() ) // don't rotate the one where the user clicked
+    // check distance from intersection line
+    double distanceFromIntersectionLine = intersectionLine.Distance( cursorPosition );
+    ScalarType distancePixels = distanceFromIntersectionLine / clickedDisplayGeometry->GetScaleFactorMMPerDisplayUnit();
+    MITK_DEBUG << "    Distance of plane from cursor " << distanceFromIntersectionLine << " mm, which is around " << distancePixels << " px" ;
+
+    // far away line, only remember for linked rotation if necessary
+    if (distanceFromIntersectionLine > threshholdDistancePixels)
     {
-      clickedGeometry = geometry2D;
-      //clickedSlicedGeometry = const_cast<SlicedGeometry3D*>(slicedGeometry);
-    }
-    else
-    {
-      // @TODO here waits some bug to be found - maybe fixed by the || m_LinkPlanes in next line
-      if ( (distancePixels <= ThreshHoldDistancePixels)
-          && !(*iter)->GetSliceRotationLocked()
-          && (m_SNCsToBeRotated.empty() || m_LinkPlanes) )
+      MITK_DEBUG << "    Plane is too far away --> remember as otherRenderersRenderPlane";
+      anyOtherGeometry = otherRenderersRenderPlane; // we just take the last one, so overwrite each iteration (we just need some crossing point) 
+                                                   // TODO what about multiple crossings? NOW we have undefined behavior / random crossing point is used
+
+      if (m_LinkPlanes)
       {
-        // this one is behind the clicked "line"
         m_SNCsToBeRotated.push_back(*iter);
-        geometryToBeRotated = geometry2D;
+      }
+    }
+    else // close to cursor
+    {
+      MITK_DEBUG << "    Plane is close enough to cursor...";
+      if ( geometryToBeRotated == NULL ) // first one close to the cursor
+      {
+        MITK_DEBUG << "    It is the first close enough geometry, remember as geometryToBeRotated";
+        geometryToBeRotated = otherRenderersRenderPlane;
+        intersectionLineWithGeometryToBeRotated = intersectionLine;
+        m_SNCsToBeRotated.push_back(*iter);
       }
       else
       {
-        otherGeometry = geometry2D;
+        MITK_DEBUG << "    Second or later close enough geometry";
+        // compare to the line defined by geometryToBeRotated: if identical, just rotate this otherRenderersRenderPlane together with the primary one
+        //                                                     if different, DON'T rotate
 
-        if ( m_LinkPlanes )
+        if ( intersectionLine.IsParallel( intersectionLineWithGeometryToBeRotated )
+          && intersectionLine.Distance( intersectionLineWithGeometryToBeRotated.GetPoint1() ) < mitk::eps ) 
         {
-          // All slices are rotated, i.e. the relative angles between
-          // slices remain fixed
+          MITK_DEBUG << "    This line is the same as intersectionLineWithGeometryToBeRotated which we already know";
           m_SNCsToBeRotated.push_back(*iter);
+        }
+        else
+        {
+          MITK_DEBUG << "    This line is NOT the same as intersectionLineWithGeometryToBeRotated which we already know";
+          hitMultipleLines = true;
         }
       }
     }
+
   }
 
-  bool move (true);
+  bool moveSlices(true);
 
-  if ( geometryToBeRotated && otherGeometry && clickedGeometry
-      && ( numNearPlanes == 2 ) )
+  if ( geometryToBeRotated && anyOtherGeometry && ourViewportGeometry && !hitMultipleLines )
   {
     // assure all three are valid, so calculation of center of rotation can be done
-    move = false;
+    moveSlices = false;
   }
 
-  StateEvent *newStateEvent(NULL);
+  MITK_DEBUG << "geometryToBeRotated:   " << (void*)geometryToBeRotated;
+  MITK_DEBUG << "anyOtherGeometry:    " << (void*)anyOtherGeometry;
+  MITK_DEBUG << "ourViewportGeometry: " << (void*)ourViewportGeometry;
+  MITK_DEBUG << "hitMultipleLines?    " << hitMultipleLines;
+  MITK_DEBUG << "moveSlices?          " << moveSlices;
+
+
+  StateEvent* decidedEvent(NULL);
 
   // question in state machine is: "rotate?"
-  if (move)
+  if (moveSlices) // i.e. NOT rotate
   {
     // move all planes to posEvent->GetWorldPosition()
-    newStateEvent = new StateEvent(EIDNO, e->GetEvent());
+    decidedEvent = new StateEvent(EIDNO, e->GetEvent());
+      MITK_DEBUG << "Rotation not possible, not enough information (other planes crossing rendering plane) ";
   }
   else
-  {
-    // determine center of rotation TODO requires two plane geometries...
-    PlaneGeometry* planeGeometry  = dynamic_cast<PlaneGeometry*>(clickedGeometry);
-    PlaneGeometry* planeGeometry1 = dynamic_cast<PlaneGeometry*>(geometryToBeRotated);
-    PlaneGeometry* planeGeometry2 = dynamic_cast<PlaneGeometry*>(otherGeometry);
+  { // we DO have enough information for rotation
+    m_LastCursorPosition = intersectionLineWithGeometryToBeRotated.Project(cursorPosition); // remember where the last cursor position ON THE LINE has been observed
 
-    if (!planeGeometry || !planeGeometry1 || !planeGeometry2) return false; 
-
-    Line3D intersection;
-    if (!planeGeometry->IntersectionLine( planeGeometry1, intersection ))   return false;
-    m_LastCursorPosition = intersection.Project(cursor);
-    if (!planeGeometry2->IntersectionPoint(intersection, m_CenterOfRotation)) return false;
-    // everything's fine
-    newStateEvent = new StateEvent(EIDYES, e->GetEvent());
-
+    if (anyOtherGeometry->IntersectionPoint(intersectionLineWithGeometryToBeRotated, m_CenterOfRotation)) // find center of rotation by intersection with any of the OTHER lines
+    {
+      decidedEvent = new StateEvent(EIDYES, e->GetEvent());
+      MITK_DEBUG << "Rotation possible";
+    }
+    else
+    {
+      MITK_DEBUG << "Rotation not possible, cannot determine the center of rotation!?";
+      decidedEvent = new StateEvent(EIDNO, e->GetEvent());
+    }
   }
 
-  if (!newStateEvent) MITK_ERROR << "rotation would be nice but is impossible... " << std::endl;
-
-  this->HandleEvent( newStateEvent );
-  delete newStateEvent;
+  this->HandleEvent( decidedEvent );
+  delete decidedEvent;
 
   return true;
 }
@@ -426,7 +446,7 @@ bool SlicesRotator::DoEndRotation(Action*, const StateEvent*)
 
 
 bool SlicesRotator::DoRotationStep(Action*, const StateEvent* e)
-{ // TODO check function
+{
   const DisplayPositionEvent* posEvent = dynamic_cast<const DisplayPositionEvent*>(e->GetEvent());
   if (!posEvent) return false;
 
@@ -436,7 +456,6 @@ bool SlicesRotator::DoRotationStep(Action*, const StateEvent* e)
   Vector3D toCursor    = cursor - m_CenterOfRotation;
 
   // cross product: | A x B | = |A| * |B| * sin(angle)
-// TODO use ITK CrossProduct
   Vector3D axisOfRotation;
   vnl_vector_fixed< ScalarType, 3 > vnlDirection = vnl_cross_3d( toCursor.GetVnlVector(), toProjected.GetVnlVector() );
   axisOfRotation.SetVnlVector(vnlDirection);

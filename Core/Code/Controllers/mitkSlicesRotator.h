@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
-  \brief Enables rotation of visible slices (for sliced geometries).
+  \brief Coordinates rotation of multiple visible rendering planes (represented as lines in other render windows).
   \ingroup NavigationControl
  
   This class takes care of several SliceNavigationControllers and handles slice selection

@@ -64,6 +64,21 @@ namespace mitk {
     **/
     virtual void ExecuteOperation(Operation* operation);
 
+    /**
+    * \brief If set, horizontal movement modifies the level instead of the window.
+    */
+    void SetHorizontalLevelling( bool enabled );
+
+    /**
+    * \brief If set, the interaction for modifying the level are inverted.
+    */
+    void SetInvertLevel( bool inverted );
+
+    /**
+    * \brief If set, the interaction for modifying the window are inverted.
+    */
+    void SetInvertWindow( bool inverted );
+
   protected:
     /**
     * @brief Default Constructor
@@ -86,6 +101,10 @@ namespace mitk {
     mitk::Point2D m_StartDisplayCoordinate;
     mitk::Point2D m_LastDisplayCoordinate;
     mitk::Point2D m_CurrentDisplayCoordinate;
+
+    bool m_HorizontalLevelling;
+    bool m_InvertLevel;
+    bool m_InvertWindow;
   };
 
 } // namespace mitk

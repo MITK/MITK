@@ -47,6 +47,11 @@ namespace mitk {
     mitkClassMacro(DisplayVectorInteractorLevelWindow, StateMachine);
     mitkNewMacro1Param(Self, const char*);
 
+    itkEventMacro( InteractionEvent, itk::AnyEvent );
+    itkEventMacro( StartInteractionEvent, InteractionEvent );
+    itkEventMacro( EndInteractionEvent, InteractionEvent );
+
+
     //static Pointer New(const char* type) 
     //{ 
     //  Pointer smartPtr = new DisplayVectorInteractorLevelWindow ( type ); 

@@ -42,9 +42,6 @@ namespace mitk
       this->m_CaptureWidth = m_Controller->GetCaptureWidth();
       this->m_CaptureHeight = m_Controller->GetCaptureHeight();
       this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
-      this->m_RGBImageHeight = m_Controller->GetRGBCaptureHeight();
-      this->m_RGBImageWidth = m_Controller->GetRGBCaptureWidth();
-      this->m_RGBPixelNumber = this->m_RGBImageWidth * this->m_RGBImageHeight;
 
       AllocatePixelArrays();
       AllocateDataBuffers();
@@ -291,7 +288,7 @@ namespace mitk
       }
       if (rgbDataArray)
       {
-        for (int j=this->m_PixelNumber; j<this->m_RGBPixelNumber*3; j++)
+        for (int j=this->m_PixelNumber; j<this->m_PixelNumber*3; j++)
         {
           rgbDataArray[j] = this->m_RGBDataBuffer[pos][j];
         }
@@ -391,7 +388,7 @@ namespace mitk
     this->m_RGBDataBuffer = new unsigned char*[this->m_MaxBufferSize];
     for(int i=0; i<this->m_MaxBufferSize; i++)
     {
-      this->m_RGBDataBuffer[i] = new unsigned char[this->m_RGBPixelNumber*3];
+      this->m_RGBDataBuffer[i] = new unsigned char[this->m_PixelNumber*3];
     }
   }
 }

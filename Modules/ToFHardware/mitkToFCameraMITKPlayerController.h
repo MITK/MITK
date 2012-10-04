@@ -76,8 +76,6 @@ namespace mitk
 
     itkGetMacro(CaptureWidth, int);
     itkGetMacro(CaptureHeight, int);
-    itkGetMacro(RGBCaptureWidth, int);
-    itkGetMacro(RGBCaptureHeight, int);
     itkGetMacro( DistanceImageFileName, std::string );
     itkGetMacro( AmplitudeImageFileName, std::string );
     itkGetMacro( IntensityImageFileName, std::string );
@@ -99,10 +97,6 @@ namespace mitk
     int m_NumberOfBytes; ///< holds the number of bytes contained in the image
     int m_CaptureWidth; ///< holds the width of the image
     int m_CaptureHeight; ///< holds the height of the image
-    int m_RGBPixelNumber; ///< holds the number of pixels contained in the image
-    int m_RGBNumberOfBytes; ///< holds the number of bytes contained in the image
-    int m_RGBCaptureWidth; ///< holds the width of the image
-    int m_RGBCaptureHeight; ///< holds the height of the image
     bool m_ConnectionCheck; ///< flag showing whether the camera is connected (true) or not (false)
 
     std::string m_InputFileName;

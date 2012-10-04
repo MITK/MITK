@@ -109,6 +109,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="m_FramerateLabel">
+         <property name="text">
+          <string>Current Framerate: 0 FPS</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_3">
          <property name="font">
           <font>
@@ -117,7 +124,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Framerate:</string>
+          <string>Framerate Limit:</string>
          </property>
         </widget>
        </item>

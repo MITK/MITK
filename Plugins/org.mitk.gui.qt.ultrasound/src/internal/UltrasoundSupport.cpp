@@ -80,13 +80,19 @@ void UltrasoundSupport::DisplayImage()
   m_Node->SetData(m_Device->GetOutput());
   this->RequestRenderWindowUpdate();
   
-  m_Counter ++;
-  if (m_Counter == 1000) MITK_INFO << "STAHP";
+  m_FrameCounter ++;
+  if (m_FrameCounter == 10)
+  {
+    int nMilliseconds = m_Clock.restart();
+    float fps = 10000.0f / (nMilliseconds );
+    m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(fps) +" FPS");
+    m_FrameCounter = 0;
+  }
 }
 
 void UltrasoundSupport::OnClickedViewDevice()
 {
-  m_Counter = 0;
+  m_FrameCounter = 0;
   // We use the activity state of the timer to determine whether we are currently viewing images
   if ( ! m_Timer->isActive() ) // Activate Imaging
   {
@@ -101,7 +107,6 @@ void UltrasoundSupport::OnClickedViewDevice()
     int interval = (1000 / m_Controls.m_FrameRate->value());
     m_Timer->setInterval(interval);
     m_Timer->start();
-    m_Counter = 0;
     m_Controls.m_BtnView->setText("Stop Viewing");
   }
   else

@@ -140,7 +140,7 @@ bool mitk::USDevice::Disconnect()
 bool mitk::USDevice::Activate()
 {
   if (! this->GetIsConnected()) return false;
-
+  m_IsActive = true; // <- Necessary to safely allow Subclasses to start threading based on activity state
   m_IsActive = OnActivation();
 
   ServiceProperties props = ConstructServiceProperties();

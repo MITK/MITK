@@ -55,8 +55,16 @@ namespace mitk {
       void GenerateData();
 
       itkGetMacro(Source, mitk::USImageVideoSource::Pointer);
+      itkGetMacro(Image, mitk::USImage::Pointer);
+
+      void GrabImage();
 
     protected:
+
+      static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
+
+      
+
       /**
       * \brief Creates a new device that will deliver USImages taken from a video device.
       *  under windows, try -1 for device number, which will grab the first available one
@@ -80,6 +88,10 @@ namespace mitk {
 
       virtual ~USVideoDevice();
 
+      /**
+      * \brief Initializes common properties for all constructors.
+      */
+      void Init();
 
       /**
       * \brief Is called during the connection process. 
@@ -123,6 +135,13 @@ namespace mitk {
       * \brief The Filepath id to connect to. Undefined, if m_SourceIsFile == false;
       */
       std::string m_FilePath;
+
+      // Threading-Related
+      itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
+      itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the range camera
+      itk::FastMutexLock::Pointer m_CameraActiveMutex; ///< mutex for the cameraActive flag
+      int m_ThreadID; ///< ID of the started thread
+      mitk::USImage::Pointer m_Image;
 
     };
 } // namespace mitk

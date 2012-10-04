@@ -67,13 +67,15 @@ class UltrasoundSupport : public QmitkAbstractView
 
   protected:
 
+    int m_Counter;
+
     /*
     * \brief This timer triggers periodic updates to the pipeline
     */
     QTimer *m_Timer;
 
     /*
-    * \brief The device that is currently used to quire images
+    * \brief The device that is currently used to aquire images
     */
     mitk::USDevice::Pointer m_Device;
 

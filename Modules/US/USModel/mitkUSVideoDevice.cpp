@@ -19,43 +19,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model)
 {
-  this->SetNumberOfInputs(1);
-  this->SetNumberOfOutputs(1);
+  Init();
   m_SourceIsFile = false;
   m_DeviceID = videoDeviceNumber;
-  m_Source = mitk::USImageVideoSource::New();
 }
 
 mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model)
 {
-  this->SetNumberOfInputs(1);
-  this->SetNumberOfOutputs(1);
+  Init();
   m_SourceIsFile = true;
   m_FilePath = videoFilePath;
-  m_Source = mitk::USImageVideoSource::New();
 }
 
 mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, mitk::USImageMetadata::Pointer metadata) : mitk::USDevice(metadata)
 {
-  this->SetNumberOfInputs(1);
-  this->SetNumberOfOutputs(1);
+  Init();
   m_SourceIsFile = false;
   m_DeviceID = videoDeviceNumber;
-  m_Source = mitk::USImageVideoSource::New();
 }
 
 mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetadata::Pointer metadata) : mitk::USDevice(metadata)
 {
-  this->SetNumberOfInputs(1);
-  this->SetNumberOfOutputs(1);
+  Init();
   m_SourceIsFile = true;
   m_FilePath = videoFilePath;
-  m_Source = mitk::USImageVideoSource::New();
 }
 
 mitk::USVideoDevice::~USVideoDevice()
 {
-  
+ 
+}
+
+void mitk::USVideoDevice::Init()
+{
+  m_Source = mitk::USImageVideoSource::New();
+  //this->SetNumberOfInputs(1);
+  this->SetNumberOfOutputs(1);
+
+  // mitk::USImage::Pointer output = mitk::USImage::New();
+  // output->Initialize();
+  this->SetNthOutput(0, this->MakeOutput(0));
+
+  this->m_MultiThreader = itk::MultiThreader::New();
+  this->m_ImageMutex = itk::FastMutexLock::New();
+  this->m_CameraActiveMutex= itk::FastMutexLock::New();
+  m_IsActive = false;
 }
 
 std::string mitk::USVideoDevice::GetDeviceClass(){
@@ -75,27 +83,28 @@ bool mitk::USVideoDevice::OnConnection()
 
 bool mitk::USVideoDevice::OnDisconnection()
 {
-    // TODO Implement Disconnection Behaviour
+  if (m_IsActive) this->Deactivate();
   return true;
 }
 
 
 bool mitk::USVideoDevice::OnActivation()
 {
-    // TODO Implement Activation Behaviour
+  MITK_INFO << "Activated UsVideoDevice!";
+  this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
   return true;
 }  
 
 
 void mitk::USVideoDevice::OnDeactivation()
 {
-    // TODO Implement Deactivation Behaviour
+   // happens automatically when m_Active is set to false
 }
 
 void mitk::USVideoDevice::GenerateData()
 {
   mitk::USImage::Pointer result;
-  result = m_Source->GetNextImage();
+  result = m_Image;
   
   // Set Metadata
   result->SetMetadata(this->m_Metadata);
@@ -104,3 +113,23 @@ void mitk::USVideoDevice::GenerateData()
   // Set Output
   this->SetNthOutput(0, result);
 }
+
+void mitk::USVideoDevice::GrabImage()
+{
+  m_Image = m_Source->GetNextImage();
+  //this->SetNthOutput(0, m_Image);
+  //this->Modified();
+}
+
+ITK_THREAD_RETURN_TYPE mitk::USVideoDevice::Acquire(void* pInfoStruct)
+{
+  /* extract this pointer from Thread Info structure */
+  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  mitk::USVideoDevice * device = (mitk::USVideoDevice *) pInfo->UserData;
+  while (device->GetIsActive())
+  {
+    device->GrabImage();
+  }
+  return ITK_THREAD_RETURN_VALUE;
+}
+

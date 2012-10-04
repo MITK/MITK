@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_UltrasoundSupportControls.h"
 
+#include <QTime>
 
 /*!
   \brief UltrasoundSupport
@@ -67,13 +68,17 @@ class UltrasoundSupport : public QmitkAbstractView
 
   protected:
 
+    int m_FrameCounter;
+
     /*
     * \brief This timer triggers periodic updates to the pipeline
     */
     QTimer *m_Timer;
 
+    QTime m_Clock;
+
     /*
-    * \brief The device that is currently used to quire images
+    * \brief The device that is currently used to aquire images
     */
     mitk::USDevice::Pointer m_Device;
 

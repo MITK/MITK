@@ -37,6 +37,7 @@ mitk::USImageMetadata::USImageMetadata() : itk::Object()
   this->SetProbeFrequency("Unknown Frequency");
   this->SetProbeName("Unknown Probe");
   this->SetZoom("Unknown Zoom Factor");
+  m_DeviceIsCalibrated = false;
 }
 
 mitk::USImageMetadata::~USImageMetadata()

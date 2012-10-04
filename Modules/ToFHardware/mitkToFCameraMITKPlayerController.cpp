@@ -202,7 +202,6 @@ namespace mitk
 
         // Check for dimension type
         mitk::Image::Pointer infoImage = NULL;
-        mitk::Image::Pointer infoRGBImage = NULL;
         if(m_ImageStatus.at(0))
         {  
           infoImage = m_DistanceImage;
@@ -215,9 +214,9 @@ namespace mitk
         {
           infoImage = m_IntensityImage;
         }
-        if(m_ImageStatus.at(3))
+        else if(m_ImageStatus.at(3))
         {
-          infoRGBImage = m_RGBImage;
+          infoImage = m_RGBImage;
         }
 
         if (infoImage->GetDimension() == 2)
@@ -237,11 +236,6 @@ namespace mitk
         this->m_PixelNumber = this->m_CaptureWidth*this->m_CaptureHeight;
         this->m_NumberOfBytes = this->m_PixelNumber * sizeof(float);
 
-        this->m_RGBCaptureWidth = infoRGBImage->GetDimension(0);
-        this->m_RGBCaptureHeight = infoRGBImage->GetDimension(1);
-        this->m_RGBPixelNumber = this->m_RGBCaptureWidth*this->m_RGBCaptureHeight;
-        this->m_RGBNumberOfBytes = this->m_RGBPixelNumber * sizeof(unsigned char) * 3;
-
         if (this->m_ToFImageType == ToFImageType2DPlusT)
         {
           this->m_NumOfFrames = infoImage->GetDimension(3);
@@ -258,8 +252,8 @@ namespace mitk
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_AmplitudeArray[i]=0.0;}
         this->m_IntensityArray = new float[this->m_PixelNumber];
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_IntensityArray[i]=0.0;}
-        this->m_RGBArray = new unsigned char[this->m_RGBPixelNumber*3];
-        for(int i=0; i<this->m_RGBPixelNumber*3; i++) {this->m_RGBArray[i]=0.0;}
+        this->m_RGBArray = new unsigned char[this->m_PixelNumber*3];
+        for(int i=0; i<this->m_PixelNumber*3; i++) {this->m_RGBArray[i]=0.0;}
 
         MITK_INFO << "NumOfFrames: " << this->m_NumOfFrames;
 
@@ -353,11 +347,11 @@ namespace mitk
     {
       if(!this->m_ToFImageType)
       {
-        memcpy(m_RGBArray, m_RGBImage->GetSliceData(m_CurrentFrame)->GetData(),m_RGBPixelNumber * sizeof(unsigned char)*3 );
+        memcpy(m_RGBArray, m_RGBImage->GetSliceData(m_CurrentFrame)->GetData(),m_PixelNumber * sizeof(unsigned char)*3 );
       }
       else if(this->m_ToFImageType)
       {
-        memcpy(m_RGBArray, m_RGBImage->GetVolumeData(m_CurrentFrame)->GetData(), m_RGBPixelNumber * sizeof(unsigned char)*3);
+        memcpy(m_RGBArray, m_RGBImage->GetVolumeData(m_CurrentFrame)->GetData(), m_PixelNumber * sizeof(unsigned char)*3);
       }
     }
     itksys::SystemTools::Delay(50);
@@ -392,7 +386,7 @@ namespace mitk
 
   void ToFCameraMITKPlayerController::GetRgb(unsigned char* rgbArray)
   {
-    memcpy(rgbArray, this->m_RGBArray, m_RGBPixelNumber * sizeof(unsigned char)*3);
+    memcpy(rgbArray, this->m_RGBArray, m_PixelNumber * sizeof(unsigned char)*3);
   }
 
   void ToFCameraMITKPlayerController::SetInputFileName(std::string inputFileName)

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 itk::ThreadProcessIDType mitk::CurrentThreadHandle() {
   #ifdef ITK_USE_SPROC
-    return GetCurrentThread();
+    return reinterpret_cast<itk::ThreadProcessIDType>(GetCurrentThreadId());
   #endif
 
   #ifdef ITK_USE_PTHREADS
@@ -27,7 +27,7 @@ itk::ThreadProcessIDType mitk::CurrentThreadHandle() {
   #endif
 
   #ifdef ITK_USE_WIN32_THREADS
-    return GetCurrentThread();
+    return reinterpret_cast<itk::ThreadProcessIDType>(GetCurrentThreadId());
   #endif
 }
 

@@ -89,6 +89,9 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
         void* pointer = iB.GetData();
         *((char*) pointer) = 0;
 
+        for(int i=0; i<1e8; ++i)
+          *((char*) pointer) = i;
+
         /*for(int i=0; i<xlength; ++i) {
           for(int j=0; j<ylength; ++j) {
             itk::Index<2> idx = {{ i, j }};

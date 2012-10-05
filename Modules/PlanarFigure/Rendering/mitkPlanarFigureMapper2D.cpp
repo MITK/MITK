@@ -266,6 +266,23 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
         }
       }
 
+      if ( m_DrawOutline )
+      {
+        // draw outlines for markers as well
+        // linewidth for the contour is only half, as full width looks 
+        // much too thick!
+        this->DrawMarker( planarFigure->GetControlPoint( i ),
+          m_OutlineColor[lineDisplayMode],
+          m_MarkerlineOpacity[pointDisplayMode],
+          m_OutlineColor[lineDisplayMode],
+          m_MarkerOpacity[pointDisplayMode],
+          m_OutlineWidth/2,
+          m_ControlPointShape,
+          planarFigureGeometry2D, 
+          rendererGeometry2D, 
+          displayGeometry );
+      }
+
       this->DrawMarker( planarFigure->GetControlPoint( i ),
         m_MarkerlineColor[pointDisplayMode],
         m_MarkerlineOpacity[pointDisplayMode],

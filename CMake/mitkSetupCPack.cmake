@@ -63,5 +63,42 @@ else()
   set(CPACK_PACKAGE_VERSION_PATCH "${MITK_VERSION_PATCH}")
 endif()
 
+# set version
+set(CPACK_PACKAGE_VERSION
+  "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+
+# determine possible system specific extension
+set(CPACK_PACKAGE_ARCH "unkown-architecture")
+
+if(${CMAKE_SYSTEM_NAME} MATCHES Windows)
+  if(CMAKE_CL_64)
+    set(CPACK_PACKAGE_ARCH "win64")
+  elseif(MINGW)
+    set(CPACK_PACKAGE_ARCH "mingw32")
+  elseif(WIN32)
+    set(CPACK_PACKAGE_ARCH "win32")
+  endif()
+endif(${CMAKE_SYSTEM_NAME} MATCHES Windows)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES Linux)
+  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES i686)
+    set(CPACK_PACKAGE_ARCH "linux32")
+  elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES x86_64)
+    if(${CMAKE_CXX_FLAGS} MATCHES " -m32 ")
+      set(CPACK_PACKAGE_ARCH "linux32")
+    else()
+      set(CPACK_PACKAGE_ARCH "linux64")
+    endif(${CMAKE_CXX_FLAGS} MATCHES " -m32 ")
+  else()
+    set(CPACK_PACKAGE_ARCH "linux")
+  endif()
+endif(${CMAKE_SYSTEM_NAME} MATCHES Linux)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES Darwin)
+  set(CPACK_PACKAGE_ARCH "mac64")
+endif(${CMAKE_SYSTEM_NAME} MATCHES Darwin)
+
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_ARCH}")
+
 
 

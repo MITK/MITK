@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "org_mitk_gui_qt_cli_Activator.h"
+#include "org_mitk_gui_qt_cmdlinemodules_Activator.h"
 
 #include <QtPlugin>
 
@@ -23,17 +23,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-void org_mitk_gui_qt_cli_Activator::start(ctkPluginContext* context)
+void org_mitk_gui_qt_cmdlinemodules_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(CommandLineModulesView, context)
   BERRY_REGISTER_EXTENSION_CLASS(CommandLineModulesPreferencesPage, context)
 }
 
-void org_mitk_gui_qt_cli_Activator::stop(ctkPluginContext* context)
+void org_mitk_gui_qt_cmdlinemodules_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_cli, mitk::org_mitk_gui_qt_cli_Activator)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_cmdlinemodules, mitk::org_mitk_gui_qt_cmdlinemodules_Activator)

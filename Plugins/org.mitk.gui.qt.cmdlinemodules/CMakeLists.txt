@@ -1,4 +1,4 @@
-project(org_mitk_gui_qt_cli)
+project(org_mitk_gui_qt_cmdlinemodules)
 
 set(QT_USE_QTUITOOLS 1)
 include(${QT_USE_FILE})

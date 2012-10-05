@@ -1,7 +1,7 @@
 /**
-\bundlemainpage{org.mitk.gui.qt.cli} The Command Line Interface (CLI) View
+\bundlemainpage{org.mitk.gui.qt.cmdlinemodules} The Command Line Modules View
 
-\image html CLIIcon.png "Icon of CLI"
+\image html CLIIcon.png "Icon of the Command Line Modules View"
 
 \li \ref CLIIntroduction
 \li \ref CLIPreferences
@@ -43,10 +43,10 @@ as utility programs to resample an image, and calculate a Jacobian image. These 
 
 \section CLIPreferences Preferences
 
-The first time that the CLI View is launched, it is advisable to set the user preferences for the view. Please refer
+The first time that the Command Line Modules View is launched, it is advisable to set the user preferences for the view. Please refer
 to Figure 1.
  
-\image html CLIPreferences.png "Figure 1. The CLI Preferences Page"
+\image html CLIPreferences.png "Figure 1. The Command Line Modules Preferences Page"
 
 Each of these preferences is now explained in some detail.
 
@@ -159,7 +159,7 @@ If information is missing, the user must contact the third party developers.
 
 \section CLITechnicalNotes Technical Notes
 
-From a technical perspective, the Command Line Interface (CLI) View is a simple view, harnessing the power of the CTK
+From a technical perspective, the Command Line Modules View is a simple view, harnessing the power of the CTK
 command line modules framework. For technical information see:
 
 \li The doxygen generated <a href="http://www.commontk.org/docs/html/CommandLineModules_Page.html">manual page</a>.

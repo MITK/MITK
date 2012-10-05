@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \class QmitkCmdLineModuleMenuComboBox
  * \brief Subclass of ctkMenuComboBox to listen to ctkCmdLineModuleManager
  * moduleRegistered and moduleUnregistered signals, and update the menu accordingly.
- * \ingroup org_mitk_gui_qt_cli_internal
+ * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa ctkMenuComboBox
  */
 class QmitkCmdLineModuleMenuComboBox : public ctkMenuComboBox {

@@ -36,7 +36,7 @@ class QWidget;
  * for any "imageInputWidget" type, and also provides QmitkDataStorageComboBox.xsl to override
  * the standard CTK xslt transformation.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
- * \ingroup org_mitk_gui_qt_cli_internal
+ * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa QmitkCmdLineModuleFactoryGui
  * \sa ctkCmdLineModuleFrontendQtGui
  */

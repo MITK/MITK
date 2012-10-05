@@ -9,7 +9,7 @@ set(INTERNAL_CPP_FILES
   QmitkCmdLineModuleGui.cpp
   QmitkCmdLineModuleFactoryGui.cpp
   QmitkUiLoader.cpp
-  org_mitk_gui_qt_cli_Activator.cpp
+  org_mitk_gui_qt_cmdlinemodules_Activator.cpp
   CommandLineModulesViewConstants.cpp
   CommandLineModulesViewControls.cpp
   CommandLineModulesPreferencesPage.cpp
@@ -30,7 +30,7 @@ set(MOC_H_FILES
   src/internal/QmitkFileListWidget.h
   src/internal/QmitkCmdLineModuleGui.h
   src/internal/QmitkUiLoader.h
-  src/internal/org_mitk_gui_qt_cli_Activator.h
+  src/internal/org_mitk_gui_qt_cmdlinemodules_Activator.h
   src/internal/CommandLineModulesViewControls.h
   src/internal/CommandLineModulesPreferencesPage.h
   src/internal/CommandLineModulesView.h

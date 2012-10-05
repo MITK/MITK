@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIQtPreferencePage.h"
 #include "berryIPreferences.h"
-#include <org_mitk_gui_qt_cli_Export.h>
+#include <org_mitk_gui_qt_cmdlinemodules_Export.h>
 
 class QWidget;
 class QCheckBox;
@@ -32,7 +32,7 @@ class ctkDirectoryButton;
  * \class CommandLineModulesPreferencesPage
  * \brief Preference page for CommandLineModulesView
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
- * \ingroup org_mitk_gui_qt_cli_internal
+ * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  */
 class CommandLineModulesPreferencesPage : public QObject, public berry::IQtPreferencePage
 {

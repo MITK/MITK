@@ -63,5 +63,5 @@ private:
   ctkCmdLineModuleManager* m_ModuleManager;
 };
 
-#endif QMITKCMDLINEMODULEMENUCOMBOBOX_H
+#endif // QMITKCMDLINEMODULEMENUCOMBOBOX_H
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.gui.qt.cmdlinemodules"
+          name="Command Line Modules"
+          class="CommandLineModulesView"
+          icon="resources/icon.xpm" />
+  </extension>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.cmdlinemodules.CommandLineModulesPreferencesPage" name="Command Line Modules" class="CommandLineModulesPreferencesPage">
+      <keywordreference id="org.mitk.gui.qt.cmdlinemodules.CommandLineModulesPreferencesPageKeywords"></keywordreference>
+    </page>
+  </extension>
+
+</plugin>

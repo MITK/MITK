@@ -40,7 +40,7 @@ namespace berry
  * \class CommandLineModulesView
  * \brief Provides basic GUI interface to the CTK command line modules.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
- * \ingroup org_mitk_gui_qt_cli_internal
+ * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa QmitkAbstractView
  */
 class CommandLineModulesView : public QmitkAbstractView

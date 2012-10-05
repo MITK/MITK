@@ -24,7 +24,7 @@ class QHBoxLayout;
  * \class CommandLineModulesViewControls
  * \brief Class derived from Ui_CommandLineModulesViewControls to provide access to GUI widgets.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
- * \ingroup org_mitk_gui_qt_cli_internal
+ * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  */
 class CommandLineModulesViewControls : public QWidget, public Ui_CommandLineModulesViewControls
 {

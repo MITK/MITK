@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \class CommandLineModulesViewConstants
  * \brief Structure to define a namespace for constants used privately within this view.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
- * \ingroup org_mitk_gui_qt_cli_internal
+ * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  */
 struct CommandLineModulesViewConstants
 {
@@ -87,7 +87,7 @@ struct CommandLineModulesViewConstants
   static const std::string MAX_CONCURRENT;
 
   /**
-   * \brief The View ID = org.mitk.gui.qt.cli, and should match that in plugin.xml.
+   * \brief The View ID = org.mitk.gui.qt.cmdlinemodules, and should match that in plugin.xml.
    */
   static const std::string VIEW_ID;
 

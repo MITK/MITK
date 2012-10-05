@@ -37,7 +37,7 @@ class DataStorage;
  * \brief Based on ctkCmdLineModuleExplorerProgressWidget, implements a progress widget
  * with console output, and space for storing the GUI widgets.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
- * \ingroup org_mitk_gui_qt_cli_internal
+ * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa ctkCmdLineModuleExplorerProgressWidget
  */
 class QmitkCmdLineModuleProgressWidget : public QWidget

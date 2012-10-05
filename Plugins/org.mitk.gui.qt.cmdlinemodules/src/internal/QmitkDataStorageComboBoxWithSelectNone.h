@@ -27,12 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  * and additionally, index 0 is always "please select", indicating no selection, and will
  * hence always return a NULL mitk::DataNode* if asked for the node at index 0.
  *
- * In addition, to support the integration of CTK command line modules, the methods
- * currentValue() and setCurrentValue() are provided. See also the .xsl file
- * in org.mitk.gui.qt.cli/resources/QmitkDataStorageComboBox.xsl.
- *
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
- * \ingroup org_mitk_gui_qt_cli_internal
+ * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa QmitkDataStorageComboBox
  */
 class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox

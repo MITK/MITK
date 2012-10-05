@@ -14,13 +14,5 @@ set(CPACK_PACKAGE_VERSION_PATCH "")
 # version has to be set explicitly to avoid such things as CMake creating the install directory "MITK Diffusion 2011.."
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}${CPACK_PACKAGE_VERSION_MINOR}")
 
-if(CMAKE_CL_64)
-  set(CPACK_PACKAGE_FILE_NAME "MITK-Diffusion-${CPACK_PACKAGE_VERSION}-win64")
-elseif(MINGW)
-  set(CPACK_PACKAGE_FILE_NAME "MITK-Diffusion-${CPACK_PACKAGE_VERSION}-mingw32")
-elseif(WIN32)
-  set(CPACK_PACKAGE_FILE_NAME "MITK-Diffusion-${CPACK_PACKAGE_VERSION}-win32")
-else()
-  set(CPACK_PACKAGE_FILE_NAME "MITK-Diffusion-${CPACK_PACKAGE_VERSION}")
-endif()
+set(CPACK_PACKAGE_FILE_NAME "MITK-Diffusion-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_ARCH}")
 

@@ -103,19 +103,12 @@ bool Object::operator<(const Object* o) const
 
 void Object::Register() const
 {
-  QMutexLocker lock(&m_ReferenceCountLock);
-  m_ReferenceCount++;
+  m_ReferenceCount.ref();
 }
 
 void Object::UnRegister(bool del) const
 {
-  m_ReferenceCountLock.lock();
-  int tmpReferenceCount = --m_ReferenceCount;
-  m_ReferenceCountLock.unlock();
-
-  // ReferenceCount in now unlocked.  We may have a race condition
-  // to delete the object.
-  if (tmpReferenceCount <= 0 && del)
+  if (!m_ReferenceCount.deref() && del)
   {
     delete this;
   }
@@ -123,11 +116,9 @@ void Object::UnRegister(bool del) const
 
 void Object::SetReferenceCount(int ref)
 {
-  m_ReferenceCountLock.lock();
+  QMutexLocker lock(&m_ReferenceCountLock);
   m_ReferenceCount = ref;
-  m_ReferenceCountLock.unlock();
-
-  if (m_ReferenceCount <= 0)
+  if (ref == 0)
   {
     delete this;
   }

@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QString>
 #include <QMetaType>
 #include <QMutex>
+#include <QAtomicInt>
 
 #ifdef _MSC_VER
 // disable inheritance by dominance warnings
@@ -208,7 +209,7 @@ protected:
   virtual QDebug PrintTrailer(QDebug os, Indent indent) const;
 
   /** Number of uses of this object by other objects. */
-  mutable volatile int m_ReferenceCount;
+  mutable QAtomicInt m_ReferenceCount;
 
   /** Mutex lock to protect modification to the reference count */
   mutable QMutex m_ReferenceCountLock;

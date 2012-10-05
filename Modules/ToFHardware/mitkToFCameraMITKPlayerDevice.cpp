@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiThreader.h"
 #include <itksys/SystemTools.hxx>
 
- const std::string mitk::ToFCameraMITKPlayerDevice::TOF_INTERFACE_NAME = "org.mitk.services.MitkPlayerDevice";
+
 
 
 namespace mitk

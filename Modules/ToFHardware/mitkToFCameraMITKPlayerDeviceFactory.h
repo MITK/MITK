@@ -50,7 +50,7 @@ public:
     std::string GetCurrentDeviceName()
     {
       std::stringstream name;
-      name << "ToFCameraMITKPlayerDevice " << m_DeviceNumber++;
+      name << "MITK Player Device " << m_DeviceNumber++;
       MITK_INFO << name.str();          // Can be deleted later on! Just gave feedback, while ServiceListWidget has not been initialized
       return name.str();
     }

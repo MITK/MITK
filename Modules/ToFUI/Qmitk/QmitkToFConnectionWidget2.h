@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 //mitk headers
-#include "mitkToFImageGrabber.h"
+#include <mitkToFImageGrabber.h>
 
 /**
 * @brief Widget allowing to connect to different ToF / range cameras (located in module ToFProcessing)
@@ -35,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class mitkTOFUI_EXPORT QmitkToFConnectionWidget2 :public QWidget
 {
-
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
@@ -55,7 +54,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget2 :public QWidget
     \brief returns the ToFImageGrabber which was configured after selecting a camera / player
     \return ToFImageGrabber currently used by the widget
     */
-    mitk::ToFImageGrabber* GetToFImageGrabber();
+    mitk::ToFImageGrabber::Pointer GetToFImageGrabber();
 
   signals:
 
@@ -86,7 +85,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget2 :public QWidget
     /*!
     \brief slot updating the GUI elements after the selection of the camera combo box has changed
     */
-    void OnSelectCamera(const QString selectedCamera);
+    void OnSelectCamera();
 
   protected:
 
@@ -99,7 +98,6 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget2 :public QWidget
 
   private:
 
-    void ShowParameterWidget();
     void HideAllParameterWidgets();
 };
 

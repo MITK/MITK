@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIToFDeviceFactory.h>
 #include <mitkToFDeviceFactoryManager.h>
 #include <mitkToFCameraDevice.h>
-#include <mitkIToFDeviceFactory.h>
+
 
 #include <mitkAbstractToFDeviceFactory.h>
 
@@ -78,6 +78,7 @@ void QmitkToFDeviceGeneration::OnToFCameraConnected()
   if (m_Controls.m_DeviceFactoryServiceListWidget->GetIsServiceSelected() )
     {
       MITK_INFO << m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>()->GetFactoryName();
+
 
       mitk::IToFDeviceFactory* factory = m_Controls.m_DeviceFactoryServiceListWidget->GetSelectedService<mitk::IToFDeviceFactory>();
       dynamic_cast<mitk::AbstractToFDeviceFactory*>(factory)->ConnectToFDevice(); // This line should be copied to the DeviceActivator to produce a device on startr up

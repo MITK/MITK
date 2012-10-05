@@ -55,6 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 
+//Constructor
 QmitkToFUtilView::QmitkToFUtilView()
 : QmitkAbstractView()
 , m_Controls(NULL), m_MultiWidget( NULL )
@@ -76,12 +77,14 @@ QmitkToFUtilView::QmitkToFUtilView()
   this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 }
 
+//Destructor, specifically calling OnToFCameraStopped() and OnToFCammeraDiconnected()
 QmitkToFUtilView::~QmitkToFUtilView()
 {
         OnToFCameraStopped();
         OnToFCameraDisconnected();
 }
 
+//Createing the PartControl Signal-Slot principal
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
@@ -91,8 +94,11 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkToFUtilViewControls;
     m_Controls->setupUi( parent );
 
+    //Looking for Input and Defining reaction
     connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
-    //connect( (QObject*)(m_Controls->m_ConnectCameraDev), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
@@ -100,16 +106,20 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
 
+  ////m_ConnectCameraDev does not exist anymore, neither does m_DeviceServiceListWidget->uncommenting both actions
+    //connect( (QObject*)(m_Controls->m_ConnectCameraDev), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
     //std::string empty= "";
     //m_Controls->m_DeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
   }
 }
 
+//SetFocus-Method -> actually seting Focus to the Recorder
 void QmitkToFUtilView::SetFocus()
 {
   m_Controls->m_ToFRecorderWidget->setFocus();
 }
 
+//Activated-Method->Generating RenderWindow
 void QmitkToFUtilView::Activated()
 {
   //get the current RenderWindowPart or open a new one if there is none
@@ -149,6 +159,7 @@ void QmitkToFUtilView::Activated()
   }
 }
 
+//ZomnnieView-Method -> Resetting GUI to default. Why not just QmitkToFUtilView()?!
 void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer /*zombieView*/)
 {
   ResetGUIToDefault();
@@ -163,135 +174,25 @@ void QmitkToFUtilView::Visible()
 {
 }
 
+//Reset of the ToFUtilView
 void QmitkToFUtilView::Hidden()
 {
-
     ResetGUIToDefault();
 }
 
-void QmitkToFUtilView::HackForPlayer()//--------------Hack For Player Could be deleted?------------------------------------------------------------------------------------------------
-{
-  QString tmpFileName("");
-  QString fileFilter("");
-  //... open a QFileDialog to chose the corresponding file from the disc
-  tmpFileName = QFileDialog::getOpenFileName(NULL, "Play Image From...", "", fileFilter);
-  if (tmpFileName.isEmpty())
-  {
-    MITK_ERROR << "Please select a valid image before starting some action.";
-    return;
-  }
-  std::string msg = "";
-  try
-  {
-    //get 3 corresponding file names
-    std::string dir = itksys::SystemTools::GetFilenamePath( tmpFileName.toStdString() );
-    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( tmpFileName.toStdString() );
-    std::string extension = itksys::SystemTools::GetFilenameLastExtension( tmpFileName.toStdString() );
-
-    if (extension != ".pic" && extension != ".nrrd")
-    {
-      msg = msg + "Invalid file format, please select a \".nrrd\"-file";
-      throw std::logic_error(msg.c_str());
-    }
-    int found = baseFilename.rfind("_DistanceImage");
-    if (found == std::string::npos)
-    {
-      found = baseFilename.rfind("_AmplitudeImage");
-    }
-    if (found == std::string::npos)
-    {
-      found = baseFilename.rfind("_IntensityImage");
-    }
-    if (found == std::string::npos)
-    {
-      found = baseFilename.rfind("_RGBImage");
-    }
-    if (found == std::string::npos)
-    {
-      msg = msg + "Input file name must end with \"_DistanceImage\", \"_AmplitudeImage\", \"_IntensityImage\" or \"_RGBImage\"!";
-      throw std::logic_error(msg.c_str());
-    }
-    std::string baseFilenamePrefix = baseFilename.substr(0,found);
-
-    std::string distanceImageFileName = dir + "/" + baseFilenamePrefix + "_DistanceImage" + extension;
-    std::string amplitudeImageFileName = dir + "/" + baseFilenamePrefix + "_AmplitudeImage" + extension;
-    std::string intensityImageFileName = dir + "/" + baseFilenamePrefix + "_IntensityImage" + extension;
-    std::string rgbImageFileName = dir + "/" + baseFilenamePrefix + "_RGBImage" + extension;
-
-    if (!itksys::SystemTools::FileExists(distanceImageFileName.c_str(), true))
-    {
-      this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", "");
-    }
-    else
-    {
-      this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", distanceImageFileName.c_str());
-    }
-    if (!itksys::SystemTools::FileExists(amplitudeImageFileName.c_str(), true))
-    {
-      this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", "");
-    }
-    else
-    {
-      this->m_ToFImageGrabber->SetStringProperty("AmplitudeImageFileName", amplitudeImageFileName.c_str());
-    }
-    if (!itksys::SystemTools::FileExists(intensityImageFileName.c_str(), true))
-    {
-      this->m_ToFImageGrabber->SetStringProperty("IntensityImageFileName", "");
-    }
-    else
-    {
-      this->m_ToFImageGrabber->SetStringProperty("IntensityImageFileName", intensityImageFileName.c_str());
-    }
-    if (!itksys::SystemTools::FileExists(rgbImageFileName.c_str(), true))
-    {
-      this->m_ToFImageGrabber->SetStringProperty("RGBImageFileName", "");
-    }
-    else
-    {
-      this->m_ToFImageGrabber->SetStringProperty("RGBImageFileName", rgbImageFileName.c_str());
-    }
-  }
-  catch (std::exception &e)
-  {
-    MITK_ERROR << e.what();
-    //QMessageBox::critical( this, "Error", e.what() );
-    return;
-  }
-}//-----------------------------------------------------------------------------------------------------------------------------
-
 void QmitkToFUtilView::OnToFCameraConnected()
 {
+  MITK_INFO <<"OnToFCameraConnected";
   this->m_SurfaceDisplayCount = 0;
   this->m_2DDisplayCount = 0;
 
-  //mitk::ToFCameraDevice* device = m_Controls->m_DeviceServiceListWidget->GetSelectedService<mitk::ToFCameraDevice>();
-
-  this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
-  //m_ToFImageGrabber->SetCameraDevice(device);
-
-
-  ////----------------------------------------------J´s stuff------------------------------------------------------------
-
-  //if ( ((std::string)(device->GetNameOfClass())).compare ("ToFCameraMITKPlayerDevice")  == 0 )  //
-  //  {
-  //    this->HackForPlayer();
-  //    MITK_INFO << "HackForPlayer enabled";
-  //  }
-
-
-  m_ToFImageGrabber->ConnectCamera();
-
+  this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget2->GetToFImageGrabber();
 
   this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
   m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
   m_Controls->m_ToFRecorderWidget->setEnabled(true);
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
-  m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
-
-  this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
-  m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
-  m_Controls->m_ToFRecorderWidget->setEnabled(true);
-  m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
+    m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true); //todo ist das richtig?
 
   // initialize measurement widget
   m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());
@@ -466,7 +367,7 @@ void QmitkToFUtilView::OnToFCameraStopped()
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
   m_SelectedCamera = selected;
-  if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
+  if ((selected.contains("CamBoard"))||(selected.contains("O3D")))
   {
     MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
     this->m_Controls->m_SurfaceCheckBox->setEnabled(false);

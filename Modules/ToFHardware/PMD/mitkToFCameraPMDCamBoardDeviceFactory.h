@@ -41,7 +41,7 @@ public:
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD CamBoard Factory");
+       return std::string("PMD CamBoard Factory ");
    }
 
     std::string GetCurrentDeviceName()

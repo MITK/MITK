@@ -50,11 +50,11 @@ public:
  // // If kinect activated through CMake, please Load the .dll! else do nothing
  //if (MITK_USE_OF_KINECT)
  //{
- //       LoadLibrary(TEXT("mitkKinectModule.dll"));
+        LoadLibrary(TEXT("mitkKinectModule.dll"));
  //}
 
 //Loading mitkPMDCamCubeModule.dll of PMDCamCubeModule
-      //LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
+      LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
 
 
 

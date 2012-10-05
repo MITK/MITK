@@ -41,13 +41,13 @@ public:
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD Camcube 2.0/3.0 Factory");
+       return std::string("PMD Camcube 2.0/3.0 Factory ");
    }
 
    std::string GetCurrentDeviceName()
    {
      std::stringstream name;
-     name << "PMD CamCube Device "<< m_DeviceNumber++;
+     name << "PMD CamCube 2.0/3.0 Device "<< m_DeviceNumber++;
      return name.str();
    }
 

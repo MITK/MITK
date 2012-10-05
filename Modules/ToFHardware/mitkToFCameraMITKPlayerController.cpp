@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,7 +51,7 @@ namespace mitk
     m_RGBImageFileName(""),
     m_PixelStartInFile(0),
     m_CurrentFrame(-1),
-    m_NumOfFrames(0)   
+    m_NumOfFrames(0)
   {
     m_ImageStatus = std::vector<bool>(4,true);
   }
@@ -156,12 +156,12 @@ namespace mitk
   bool ToFCameraMITKPlayerController::OpenCameraConnection()
   {
     if(!this->m_ConnectionCheck)
-    {  
+    {
       try
       {
         // Check for file type, only .nrrd and .pic files are supported!
         if( this->CheckCurrentFileType())
-        { 
+        {
           if(m_Extension == ".nrrd")
           {
             this->OpenNrrdImageFile(this->m_DistanceImageFileName, m_DistanceImage);
@@ -203,7 +203,7 @@ namespace mitk
         // Check for dimension type
         mitk::Image::Pointer infoImage = NULL;
         if(m_ImageStatus.at(0))
-        {  
+        {
           infoImage = m_DistanceImage;
         }
         else if (m_ImageStatus.at(1))
@@ -247,7 +247,7 @@ namespace mitk
         // allocate buffer
         this->m_DistanceArray = new float[this->m_PixelNumber];
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_DistanceArray[i]=0.0;}
-        this->m_AmplitudeArray = new float[this->m_PixelNumber]; 
+        this->m_AmplitudeArray = new float[this->m_PixelNumber];
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_AmplitudeArray[i]=0.0;}
         this->m_IntensityArray = new float[this->m_PixelNumber];
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_IntensityArray[i]=0.0;}
@@ -266,7 +266,7 @@ namespace mitk
         return false;
       }
     }
-    else 
+    else
       return this->m_ConnectionCheck;
   }
 
@@ -307,7 +307,7 @@ namespace mitk
     }
     else
     {
-      MITK_ERROR << "Error opening ToF data file " << outfileName;
+      MITK_ERROR << "Error opening ToF data file 2" << outfileName;
     }
   }
 
@@ -320,7 +320,7 @@ namespace mitk
       return true;
     }
     return false;
-  } 
+  }
 
   void ToFCameraMITKPlayerController::UpdateCamera()
   {

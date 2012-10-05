@@ -112,7 +112,7 @@
     <widget class="QmitkToFPointSetWidget" name="tofMeasurementWidget" native="true"/>
    </item>
    <item row="0" column="0">
-    <widget class="QmitkToFConnectionWidget2" name="m_ToFConnectionWidget" native="true"/>
+    <widget class="QmitkToFConnectionWidget2" name="m_ToFConnectionWidget2" native="true"/>
    </item>
   </layout>
  </widget>

@@ -38,7 +38,6 @@ namespace mitk
   {
   public:
 
-      static const std::string TOF_INTERFACE_NAME;     // Common Interface name of all US Devices. Used to refer to this device via Microservices
 
     mitkClassMacro( ToFCameraMITKPlayerDevice , ToFCameraDevice );
 

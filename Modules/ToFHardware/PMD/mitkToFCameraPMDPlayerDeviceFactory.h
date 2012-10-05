@@ -34,7 +34,7 @@ class MITK_PMDCAMCUBEMODULE_EXPORT ToFCameraPMDPlayerDeviceFactory : public itk:
 public:
   ToFCameraPMDPlayerDeviceFactory()
   {
-    this->m_DeviceNumber;
+    this->m_DeviceNumber=0;
   }
   /*!
    \brief Defining the Factorie´s Name, here for the ToFPMDPlayer.

@@ -42,7 +42,7 @@ public:
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD RAW Data Camcube Factory");
+       return std::string("PMD RAW Data Camcube Factory ");
    }
    std::string GetCurrentDeviceName()
    {

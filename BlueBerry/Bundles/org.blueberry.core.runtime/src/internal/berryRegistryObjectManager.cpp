@@ -368,7 +368,7 @@ SmartPointer<ExtensionPointHandle> RegistryObjectManager::GetExtensionPointHandl
 QList<int> RegistryObjectManager::GetExtensionsFrom(const QString& contributorId) const
 {
   QMutexLocker l(&mutex);
-  return this->GetExtensionsFrom(contributorId);
+  return this->GetExtensionsFrom_unlocked(contributorId);
 }
 
 QList<int> RegistryObjectManager::GetExtensionsFrom_unlocked(const QString& contributorId) const

@@ -263,6 +263,8 @@ namespace berry
 
     bool Has_unlocked(const QString& key) const;
 
+    Preferences::Pointer Node_unlocked(const QString& pathName);
+
     ///
     /// Sets the dirty flag recursively on all child nodes.
     ///

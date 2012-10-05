@@ -205,23 +205,31 @@ namespace berry
 
   IPreferences::Pointer Preferences::Node(const QString& path)
   {
+    QMutexLocker scopedMutex(&m_Mutex);
+    return this->Node_unlocked(path);
+  }
+
+  Preferences::Pointer Preferences::Node_unlocked(const QString& path)
+  {
     QString pathName = path;
 
-    QMutexLocker scopedMutex(&m_Mutex);
     AssertValid_unlocked();
     AssertPath_unlocked(pathName);
 
-    IPreferences::Pointer node;
+    Preferences::Pointer node;
 
     // self reference
     if(pathName == "")
-      return IPreferences::Pointer(this);
+      return Preferences::Pointer(this);
     // absolute path
     else if(pathName[0] == '/')
     {
       pathName = pathName.mid(1);
       // call root with this relative path
-      return m_Root->Node(pathName);
+      if (this == m_Root)
+        return m_Root->Node_unlocked(pathName);
+      else
+        return m_Root->Node(pathName).Cast<Preferences>();
     }
     // relative path
     else
@@ -245,7 +253,7 @@ namespace berry
         // node found
         if((*it)->Name() == name && (*it)->IsRemoved() == false)
         {
-          node = IPreferences::Pointer((*it).GetPointer());
+          node = *it;
           break;
         }
       }
@@ -262,7 +270,12 @@ namespace berry
 
       // call Node() again if there are any names left on the path
       if(pos != -1)
-        node = node->Node(pathName);
+      {
+        if (this == node.GetPointer())
+          node = node->Node_unlocked(pathName);
+        else
+          node = node->Node(pathName).Cast<Preferences>();
+      }
     }
 
     return node;

@@ -157,10 +157,13 @@ void ExpressionAuthority::Dispose()
   }
   providers.clear();
 
-  // prevent double delete
-  this->Register();
-  context = 0;
-  this->UnRegister(false);
+  if (context.IsNotNull())
+  {
+    // prevent double delete
+    this->Register();
+    context = 0;
+    //this->UnRegister(false);
+  }
 }
 
 SmartPointer<IEvaluationContext> ExpressionAuthority::GetCurrentState() const

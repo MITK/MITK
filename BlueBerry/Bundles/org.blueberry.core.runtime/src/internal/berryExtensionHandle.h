@@ -34,6 +34,7 @@ public:
   berryObjectMacro(berry::ExtensionHandle)
 
   ExtensionHandle(const SmartPointer<const IObjectManager>& objectManager, int id);
+  ExtensionHandle(const IObjectManager* objectManager, int id);
 
   QString GetNamespaceIdentifier() const;
 

@@ -283,6 +283,7 @@ WorkbenchTestable::Pointer Workbench::GetWorkbenchTestable()
 
 Workbench::~Workbench()
 {
+  this->instance = 0;
   this->UnRegister(false);
 }
 
@@ -1394,11 +1395,11 @@ IIntroManager* Workbench::GetIntroManager()
 
 WorkbenchIntroManager* Workbench::GetWorkbenchIntroManager()
 {
-  if (introManager == 0)
+  if (introManager.isNull())
   {
-    introManager = new WorkbenchIntroManager(this);
+    introManager.reset(new WorkbenchIntroManager(this));
   }
-  return introManager;
+  return introManager.data();
 }
 
 IntroDescriptor::Pointer Workbench::GetIntroDescriptor() const

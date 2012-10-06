@@ -44,6 +44,10 @@ struct ISourceProvider;
 class ExpressionAuthority : public ISourceProviderListener
 {
 
+public:
+
+  berryObjectMacro(berry::ExpressionAuthority)
+
 private:
 
   /**

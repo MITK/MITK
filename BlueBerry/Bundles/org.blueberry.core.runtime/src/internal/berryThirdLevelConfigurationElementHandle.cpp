@@ -26,6 +26,11 @@ ThirdLevelConfigurationElementHandle::ThirdLevelConfigurationElementHandle(const
 {
 }
 
+ThirdLevelConfigurationElementHandle::ThirdLevelConfigurationElementHandle(const IObjectManager *objectManager, int id)
+  : ConfigurationElementHandle(objectManager, id)
+{
+}
+
 QList<SmartPointer<IConfigurationElement> >
 ThirdLevelConfigurationElementHandle::GetChildren() const
 {

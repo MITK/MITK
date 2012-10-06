@@ -34,6 +34,11 @@ ConfigurationElementHandle::ConfigurationElementHandle(const SmartPointer<const 
 {
 }
 
+ConfigurationElementHandle::ConfigurationElementHandle(const IObjectManager *objectManager, int id)
+  : Handle(objectManager, id)
+{
+}
+
 QString ConfigurationElementHandle::GetAttribute(const QString& propertyName) const
 {
   return GetConfigurationElement()->GetAttribute(propertyName);
@@ -81,7 +86,7 @@ QObject* ConfigurationElementHandle::CreateExecutableExtension(const QString& pr
     Status::Pointer status(new Status(IStatus::ERROR_TYPE, RegistryMessages::OWNER_NAME,
                                       RegistryConstants::PLUGIN_ERROR, "Invalid registry object",
                                       e, BERRY_STATUS_LOC));
-    if (RegistryObjectManager::ConstPointer regObjMgr = objectManager.Cast<const RegistryObjectManager>())
+    if (const RegistryObjectManager* regObjMgr = dynamic_cast<const RegistryObjectManager*>(objectManager))
     {
       regObjMgr->GetRegistry()->Log(status);
     }

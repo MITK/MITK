@@ -59,10 +59,10 @@ MinimalApplication::~MinimalApplication()
 
 int MinimalApplication::Start()
 {
-  berry::Display* display = berry::PlatformUI::CreateDisplay();
+  QScopedPointer<berry::Display> display(berry::PlatformUI::CreateDisplay());
 
-  wbAdvisor.reset(new MinimalWorkbenchAdvisor);
-  int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
+  QScopedPointer<MinimalWorkbenchAdvisor> wbAdvisor(new MinimalWorkbenchAdvisor());
+  int code = berry::PlatformUI::CreateAndRunWorkbench(display.data(), wbAdvisor.data());
 
   // exit the application with an appropriate return code
   return code == berry::PlatformUI::RETURN_RESTART

@@ -500,7 +500,7 @@ private:
   WindowManager windowManager;
   SmartPointer<WorkbenchWindow> activatedWindow;
 
-  WorkbenchIntroManager* introManager;
+  QScopedPointer<WorkbenchIntroManager> introManager;
 
   /**
    * The descriptor for the intro extension that is valid for this workspace,

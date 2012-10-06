@@ -35,13 +35,13 @@ public:
 
   virtual QString GetKey() const = 0;
 
+  uint HashCode() const;
+
 private:
 
   virtual bool IsEqual(const KeyedElement& other) const = 0;
 };
 
 }
-
-uint qHash(const berry::SmartPointer<berry::KeyedElement>& element);
 
 #endif // BERRYKEYEDELEMENT_H

@@ -155,16 +155,15 @@ QList<berry::IMemento::Pointer> berry::XMLMemento::GetChildren(
 {
   QList<IMemento::Pointer> mementos;
   Poco::XML::NodeList* elementList = element->getElementsByTagName(type.toStdString());
-  mementos.reserve(elementList->length());
   for (unsigned long i = 0; i < elementList->length(); i++)
   {
     Poco::XML::Element* elem =
         dynamic_cast<Poco::XML::Element*> (elementList->item(i));
-    mementos[i] = berry::XMLMemento::New(factory, elem);
+    mementos << berry::XMLMemento::New(factory, elem);
   }
+  elementList->release();
 
   return mementos;
-
 }
 
 bool berry::XMLMemento::GetFloat(const QString& key, double& value) const

@@ -125,7 +125,8 @@ bool ViewDescriptor::GetAllowMultiple() const
 
 bool ViewDescriptor::IsRestorable() const
 {
-  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_RESTORABLE).compare("true", Qt::CaseInsensitive) == 0;
+  QString str = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_RESTORABLE);
+  return str.isNull() ? true : str.compare("true", Qt::CaseInsensitive) == 0;
 }
 
 Poco::Any ViewDescriptor::GetAdapter(const QString& adapter)

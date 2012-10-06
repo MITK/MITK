@@ -32,6 +32,11 @@ ExtensionPointHandle::ExtensionPointHandle(const SmartPointer<const IObjectManag
 {
 }
 
+ExtensionPointHandle::ExtensionPointHandle(const IObjectManager *objectManager, int id)
+  : Handle(objectManager, id)
+{
+}
+
 QList<SmartPointer<IExtension> > ExtensionPointHandle::GetExtensions() const
 {
   QList<Handle::Pointer> handles =

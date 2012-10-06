@@ -28,6 +28,11 @@ ExtensionHandle::ExtensionHandle(const SmartPointer<const IObjectManager> &objec
 {
 }
 
+ExtensionHandle::ExtensionHandle(const IObjectManager *objectManager, int id)
+  : Handle(objectManager, id)
+{
+}
+
 QString ExtensionHandle::GetNamespaceIdentifier() const
 {
   return GetExtension()->GetNamespaceIdentifier();

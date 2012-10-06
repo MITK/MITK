@@ -33,6 +33,7 @@ public:
   berryObjectMacro(berry::ExtensionPointHandle)
 
   ExtensionPointHandle(const SmartPointer<const IObjectManager>& objectManager, int id);
+  ExtensionPointHandle(const IObjectManager* objectManager, int id);
 
   QList<SmartPointer<IExtension> > GetExtensions() const;
 

@@ -26,6 +26,7 @@ struct IObjectManager;
 
 class RegistryObject;
 
+
 /**
  * A handle is the super class to all registry objects that are now served to users.
  * The handles never hold on to any "real" content of the object being represented.
@@ -37,7 +38,10 @@ public:
 
   berryObjectMacro(berry::Handle)
 
-  Handle(const SmartPointer<const IObjectManager>& objectManager, int value);
+  explicit Handle(const SmartPointer<const IObjectManager>& objectManager, int value);
+  explicit Handle(const IObjectManager* objectManager, int value);
+
+  ~Handle();
 
   /**
    * Return the actual object corresponding to this handle.
@@ -53,12 +57,12 @@ public:
 
 protected:
 
-  SmartPointer<const IObjectManager> objectManager;
+  const IObjectManager* const objectManager;
 
 private:
 
   int objectId;
-
+  bool isStrongRef;
 };
 
 }

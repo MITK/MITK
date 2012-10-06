@@ -29,6 +29,7 @@ public:
   berryObjectMacro(berry::ThirdLevelConfigurationElementHandle)
 
   ThirdLevelConfigurationElementHandle(const SmartPointer<const IObjectManager>& objectManager, int id);
+  ThirdLevelConfigurationElementHandle(const IObjectManager* objectManager, int id);
 
   QList<SmartPointer<IConfigurationElement> > GetChildren() const;
 

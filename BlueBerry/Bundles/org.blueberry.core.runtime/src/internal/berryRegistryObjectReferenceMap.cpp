@@ -110,6 +110,11 @@ void RegistryObjectReferenceMap::Put(int key, const SmartPointer<RegistryObject>
 
   Purge();
 
+  ReferenceMapType::Iterator i = references.find(key);
+  if (i != references.end())
+  {
+    delete *i;
+  }
   references.insert(key, NewEntry(value));
 }
 

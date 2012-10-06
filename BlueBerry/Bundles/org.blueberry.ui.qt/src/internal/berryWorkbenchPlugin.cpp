@@ -70,6 +70,8 @@ WorkbenchPlugin::~WorkbenchPlugin()
   delete viewRegistry;
   delete perspRegistry;
   delete introRegistry;
+
+  inst = 0;
 }
 
 bool WorkbenchPlugin::HasExecutableExtension(
@@ -318,6 +320,7 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
   styleManager = IQtStyleManager::Pointer(manager);
   context->registerService<berry::IQtStyleManager>(manager);
 
+
   // The UI plugin needs to be initialized so that it can install the callback in PrefUtil,
   // which needs to be done as early as possible, before the workbench
   // accesses any API preferences.
@@ -373,4 +376,4 @@ QString WorkbenchPlugin::GetDataLocation() const
 
 }
 
-Q_EXPORT_PLUGIN2(org_blueberry_ui, berry::WorkbenchPlugin)
+Q_EXPORT_PLUGIN2(org_blueberry_ui_qt, berry::WorkbenchPlugin)

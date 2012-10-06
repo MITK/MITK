@@ -31,7 +31,8 @@ public:
 
   berryObjectMacro(berry::ConfigurationElementHandle)
 
-  ConfigurationElementHandle(const SmartPointer<const IObjectManager> &objectManager, int id);
+  explicit ConfigurationElementHandle(const SmartPointer<const IObjectManager> &objectManager, int id);
+  explicit ConfigurationElementHandle(const IObjectManager* objectManager, int id);
 
   QString GetAttribute(const QString& propertyName) const;
 

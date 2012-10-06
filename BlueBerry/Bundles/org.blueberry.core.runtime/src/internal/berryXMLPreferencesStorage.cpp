@@ -122,7 +122,6 @@ namespace berry
 
   XMLPreferencesStorage::~XMLPreferencesStorage()
   {
-
   }
 
   void XMLPreferencesStorage::ToPreferencesTree( Poco::XML::Node* DOMNode, Preferences* prefParentNode )
@@ -159,6 +158,8 @@ namespace berry
         newNode->Put(QString::fromStdString(key), QString::fromStdString(value));
       }
     }
+
+    childNodes->release();
   }
 
   void XMLPreferencesStorage::ToDOMTree( Preferences* prefNode, Poco::XML::Node* parentDOMNode )
@@ -194,5 +195,6 @@ namespace berry
       this->ToDOMTree((*it).GetPointer(), newNode);
     }
 
+    newNode->release();
   }
 }

@@ -139,28 +139,28 @@ QList<SmartPointer<Handle> > RegistryObjectManager::GetHandles(const QList<int>&
   case EXTENSION_POINT :
     for (int i = 0; i < ids.size(); i++)
     {
-      Handle::Pointer handle(new ExtensionPointHandle(IObjectManager::ConstPointer(this), ids[i]));
+      Handle::Pointer handle(new ExtensionPointHandle(this, ids[i]));
       results.push_back(handle);
     }
     break;
   case EXTENSION :
     for (int i = 0; i < ids.size(); i++)
     {
-      Handle::Pointer handle(new ExtensionHandle(IObjectManager::ConstPointer(this), ids[i]));
+      Handle::Pointer handle(new ExtensionHandle(this, ids[i]));
       results.push_back(handle);
     }
     break;
   case CONFIGURATION_ELEMENT :
     for (int i = 0; i < ids.size(); i++)
     {
-      Handle::Pointer handle(new ConfigurationElementHandle(IObjectManager::ConstPointer(this), ids[i]));
+      Handle::Pointer handle(new ConfigurationElementHandle(this, ids[i]));
       results.push_back(handle);
     }
     break;
   case THIRDLEVEL_CONFIGURATION_ELEMENT :
     for (int i = 0; i < ids.size(); i++)
     {
-      Handle::Pointer handle(new ThirdLevelConfigurationElementHandle(IObjectManager::ConstPointer(this), ids[i]));
+      Handle::Pointer handle(new ThirdLevelConfigurationElementHandle(this, ids[i]));
       results.push_back(handle);
     }
     break;

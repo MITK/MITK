@@ -35,6 +35,10 @@ class Shell;
 class EvaluationAuthority : public ExpressionAuthority
 {
 
+public:
+
+  berryObjectMacro(berry::EvaluationAuthority)
+
 private:
 
   static const QString COMPONENT;

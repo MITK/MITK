@@ -22,8 +22,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 Handle::Handle(const SmartPointer<const IObjectManager> &objectManager, int value)
-  : objectManager(objectManager), objectId(value)
+  : objectManager(objectManager.GetPointer())
+  , objectId(value)
+  , isStrongRef(true)
 {
+  const_cast<IObjectManager*>(this->objectManager)->Register();
+}
+
+Handle::Handle(const IObjectManager *objectManager, int value)
+  : objectManager(objectManager)
+  , objectId(value)
+  , isStrongRef(false)
+{
+}
+
+Handle::~Handle()
+{
+  if (isStrongRef)
+  {
+    const_cast<IObjectManager*>(objectManager)->UnRegister();
+  }
 }
 
 int Handle::GetId() const

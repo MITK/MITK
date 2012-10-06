@@ -35,9 +35,9 @@ bool KeyedElement::operator ==(const KeyedElement* other) const
   return (typeid(this) == typeid(other) && IsEqual(*other));
 }
 
-uint qHash(const berry::SmartPointer<berry::KeyedElement>& element)
+uint KeyedElement::HashCode() const
 {
-  return qHash(element->GetKey());
+  return qHash(this->GetKey());
 }
 
 }

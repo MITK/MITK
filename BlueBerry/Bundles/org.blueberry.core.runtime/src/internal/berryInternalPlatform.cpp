@@ -168,7 +168,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
 
   // Initialize the CTK Plugin Framework
   ctkProperties fwProps;
-  fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE, userFile.absolutePath());
+  fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE, userFile.absoluteFilePath());
   if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN.toStdString()))
   {
     fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN, ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);

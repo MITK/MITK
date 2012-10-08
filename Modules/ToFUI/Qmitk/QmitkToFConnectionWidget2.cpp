@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkToFConnectionWidget2::VIEW_ID = "org.mitk.views.qmitktofconnectionwidget2";
 
-//Konstruktor des QmitkToFConnectionWidget2
+//Constructor of QmitkToFConnectionWidget2
 QmitkToFConnectionWidget2::QmitkToFConnectionWidget2(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 {
   this->m_IntegrationTime = 0;
@@ -40,7 +40,7 @@ QmitkToFConnectionWidget2::QmitkToFConnectionWidget2(QWidget* parent, Qt::Window
   CreateQtPartControl(this);
 }
 
-//Destruktor of QmitkToFConnectionWidget2
+//Destructor of QmitkToFConnectionWidget2
 QmitkToFConnectionWidget2::~QmitkToFConnectionWidget2()
 {
   //MitkServiceListWidget must not be deinizialized here. Qmitk methods destroy ther children automatically before destucting themselfes!

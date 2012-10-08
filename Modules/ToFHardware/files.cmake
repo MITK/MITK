@@ -13,32 +13,6 @@ SET(CPP_FILES
   mitkToFCameraDevice.cpp
   mitkToFCameraMITKPlayerController.cpp
   mitkToFCameraMITKPlayerDevice.cpp
-#-----------PMD Devices-------
-  #mitkToFCameraPMDRawDataDevice.cpp
-  #mitkToFCameraPMDPlayerDevice.cpp
-  #mitkToFCameraPMDCamCubeDevice.cpp
-  #mitkToFCameraPMDRawDataCamCubeDevice.cpp
-  #mitkToFCameraPMDCamCubeDeviceFactory.cpp
-  #mitkToFCameraPMDController.cpp
-   #mitkToFCameraPMDRawDataCamBoardDevice.cpp
-   #mitkToFCameraPMDPlayerDeviceFactory.cpp
-   #mitkToFCameraPMDRawDataCamCubeDeviceFactory.cpp
-   #mitkThreadedToFRawDataReconstruction.cpp
-  #mitkToFCameraPMDDevice.cpp
-  #mitkToFCameraPMDMITKPlayerDevice.cpp
-  #mitkToFCameraPMDO3Device.cpp
-  #mitkToFCameraPMDCamBoardDevice.cpp
-  #mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
-  #mitkToFCameraPMDCamBoardDeviceFactory.cpp
-  #mitkToFCameraPMDO3DeviceFactory.cpp
-#---------Mesa Devices--------
-#  mitkToFCameraMESAController.cpp
-#  mitkToFCameraMESAControllerStub.cpp
-#  mitkToFCameraMESADevice.cpp
-#  mitkToFCameraMESASR4000Controller.cpp
-#  mitkToFCameraMESASR4000ControllerStub.cpp
-#  mitkToFCameraMESASR4000Device.cpp
-#  mitkToFCameraMESASR4000DeviceFactory.cpp
 
 )
 

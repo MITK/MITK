@@ -653,7 +653,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
     catch (itk::ExceptionObject &ex)
     {
         MITK_INFO << ex ;
-        throw ex;
+        QMessageBox::information(0, "Reconstruction not possible:", ex.GetDescription());
     }
 }
 
@@ -762,7 +762,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
     catch (itk::ExceptionObject &ex)
     {
         MITK_INFO << ex ;
-        throw ex;
+        QMessageBox::information(0, "Reconstruction not possible:", ex.GetDescription());
         return;
     }
 }
@@ -1020,7 +1020,7 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
     catch (itk::ExceptionObject &ex)
     {
         MITK_INFO << ex ;
-        throw ex;
+        QMessageBox::information(0, "DWI estimation failed:", ex.GetDescription());
         return ;
     }
 }

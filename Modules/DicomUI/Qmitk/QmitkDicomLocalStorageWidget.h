@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QString>
 #include <QStringList>
+#include <QHash>
+#include <QVariant>
 
 /*!
 \brief QmitkDicomLocalStorageWidget 
@@ -63,7 +65,7 @@ signals:
     void SignalFinishedImport();
 
     /// @brief emitted when view button is clicked.
-    void SignalDicomToDataManager(const QStringList&);
+    void SignalDicomToDataManager(QHash<QString,QVariant>);
     void SignalProgress(int);
     void SignalProcessingFile(QString);
     void SignalCancelImport();

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QMessageBox>
 #include <QModelIndex>
-#include <QMap>
+#include <QHash>
 #include <QVariant>
 
 const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
@@ -126,16 +126,16 @@ void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
         QModelIndex patientIndex = m_LocalModel->parent(studyIndex);
         QString patientName = m_LocalModel->data(patientIndex).toString();
 
-        QString filePath;
-        filePath.append(m_LocalDatabase->databaseDirectory());
-        filePath.append("/dicom/");
-        filePath.append(studyUID);
-        filePath.append("/");
-        filePath.append(seriesUID);
-        filePath.append("/");
+        QStringList filesForSeries;
+        filesForSeries = m_LocalDatabase->filesForSeries(seriesUID);
 
-        QStringList eventProperties;
-        eventProperties << patientName << studyUID <<studyName << seriesUID << seriesName << filePath;
+        QHash<QString,QVariant> eventProperties;
+        eventProperties.insert("PatientName",patientName);
+        eventProperties.insert("StudyUID",studyUID);
+        eventProperties.insert("StudyName",studyName);
+        eventProperties.insert("SeriesUID",seriesUID);
+        eventProperties.insert("SeriesName",seriesName);
+        eventProperties.insert("FilesForSeries",filesForSeries);
         emit SignalDicomToDataManager(eventProperties);
     }
 }

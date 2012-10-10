@@ -133,14 +133,6 @@ public:
    */
   static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string path);
 
-  /**
-   * @brief SaveBaseData A helper method to save a generic mitk::BaseData.
-   * @param data The path to the data including file name and file extension.
-   * @param path Path to save the data.
-   * @return Returns true for success else false.
-   */
-  static bool SaveBaseData(mitk::BaseData::Pointer data, std::string path);
-
   static const std::string DEFAULTIMAGEEXTENSION;
   static const std::string DEFAULTSURFACEEXTENSION;
   static const std::string DEFAULTPOINTSETEXTENSION;

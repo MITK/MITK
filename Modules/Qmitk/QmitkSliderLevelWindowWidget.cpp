@@ -498,6 +498,10 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
     contextMenu->addAction(tr("Show Scale"), this, SLOT(showScale()));
   contextMenu->addSeparator();
   m_Contextmenu->getContextMenu(contextMenu);
+
+  // Fix: Bug #13327 we need to reset the m_MouseDown value
+  // otherwise the cursor is not correctly restored afterwards
+  m_MouseDown = false;
 }
 
 void QmitkSliderLevelWindowWidget::hideScale()

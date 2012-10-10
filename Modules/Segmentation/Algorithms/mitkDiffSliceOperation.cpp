@@ -37,6 +37,12 @@ mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
 
 {
   m_WorldGeometry = currentWorldGeometry->Clone();
+
+  /* guard object - fix this when clone method of PlaneGeometry is cloning the reference geometry*/
+  m_GuardReferenceGeometry = mitk::Geometry3D::New();
+  m_GuardReferenceGeometry = dynamic_cast<mitk::Geometry2D*>(m_WorldGeometry.GetPointer())->GetReferenceGeometry();
+  /*---------------------------------------------------------------------------------------------------*/
+
   m_SliceGeometry = sliceGeometry->Clone();
 
   m_TimeStep = timestep;

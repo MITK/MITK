@@ -370,7 +370,8 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   }
   if (m_3DInterpolationEnabled)
   {
-    On3DInterpolationActivated( true);
+    //On3DInterpolationActivated( true);
+    SetCurrentContourListID();
   }
 }
 
@@ -1019,7 +1020,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
 
     if (workingNode)
     {
-      int listID;
+      //int listID;
       bool isInterpolationResult(false);
       workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
 
@@ -1028,17 +1029,8 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
           !isInterpolationResult)
       {
         QWidget::setEnabled( true );
-        if (workingNode->GetIntProperty("3DInterpolationListID", listID))
-        {
-          m_SurfaceInterpolator->SetCurrentListID(listID);
-        }
-        else
-        {
-          listID = m_SurfaceInterpolator->CreateNewContourList();
-          workingNode->SetIntProperty("3DInterpolationListID", listID);
-          this->Show3DInterpolationResult(false);
-          m_BtnAccept3DInterpolation->setEnabled(false);
-        }
+
+        m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(dynamic_cast<mitk::Image*>(workingNode->GetData()));
 
         mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( m_MultiWidget->GetRenderWindow3()->GetRenderer()->GetTimeStep() )->GetSpacing();
         double minSpacing (100);
@@ -1055,7 +1047,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
           }
         }
 
-        m_SurfaceInterpolator->SetWorkingImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
+        m_SurfaceInterpolator->SetSegmentationImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
         m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
         m_SurfaceInterpolator->SetMinSpacing(minSpacing);
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
@@ -1071,4 +1063,6 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
 
    if (m_3DContourNode.IsNotNull())
       m_3DContourNode->SetVisibility(status, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+
+   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

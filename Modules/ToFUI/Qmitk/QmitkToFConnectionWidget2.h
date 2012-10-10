@@ -68,7 +68,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget2 :public QWidget
      */
     void ToFCameraDisconnected();
     /*!
-    \brief signal that is emitted when a ToF camera is selected in the combo box
+    \brief signal that is emitted when a ToF camera is selected
     */
     void ToFCameraSelected(const QString selectedText);
 

@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //itk headers
 #include <itksys/SystemTools.hxx>
 
+//Setting the View_ID
 const std::string QmitkToFConnectionWidget2::VIEW_ID = "org.mitk.views.qmitktofconnectionwidget2";
 
 //Constructor of QmitkToFConnectionWidget2
@@ -36,14 +37,16 @@ QmitkToFConnectionWidget2::QmitkToFConnectionWidget2(QWidget* parent, Qt::Window
   this->m_IntegrationTime = 0;
   this->m_ModulationFrequency = 0;
   this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
+  //Setting m_Controls= NULL on Startup-> CreateQtPartControl will generate the Gui Widget if !m_Controls
   m_Controls = NULL;
+  //Calling CreateQtPartControl
   CreateQtPartControl(this);
 }
 
 //Destructor of QmitkToFConnectionWidget2
 QmitkToFConnectionWidget2::~QmitkToFConnectionWidget2()
 {
-  //MitkServiceListWidget must not be deinizialized here. Qmitk methods destroy ther children automatically before destucting themselfes!
+  //Keno´s MitkServiceListWidget must not be deinizialized here. Qmitk methods destroy their children automatically before self-destruction
 }
 
 void QmitkToFConnectionWidget2::CreateQtPartControl(QWidget *parent)   //Definition of CreateQtPartControll-Methode in QmitkToFConnectionWidget2; Input= Pointer
@@ -56,18 +59,21 @@ void QmitkToFConnectionWidget2::CreateQtPartControl(QWidget *parent)   //Definit
 
     // initzializing MitkServiceListWidget here
     std::string empty= "";
-    m_Controls->m_DeviceList->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
+    m_Controls->m_DeviceList->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);// the empty could just be any kind of filter
 
     this->CreateConnections();
-    //OnSelectCamera(); //todo: warum geht das hier nicht?
+    //OnSelectCamera(); //todo: warum geht das hier nicht? -> Sasch fragen
   }
 }
-
+//Creating the SIGNAL-SLOT-Connectuions
 void QmitkToFConnectionWidget2::CreateConnections()
 {
   if ( m_Controls )
   {
+    //ConnectCameraButton as a trigger for OnConnectCamera()
     connect( (QObject*)(m_Controls->m_ConnectCameraButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnConnectCamera()) );
+
+    //QmitkServiceListWidget::ServiceSelectionChanged as a Signal for the OnSlectCamera() slot
     connect( m_Controls->m_DeviceList, SIGNAL(ServiceSelectionChanged(mitk::ServiceReference)), this, SLOT(OnSelectCamera()));
   }
 }
@@ -77,16 +83,21 @@ mitk::ToFImageGrabber::Pointer QmitkToFConnectionWidget2::GetToFImageGrabber()
   return m_ToFImageGrabber;
 }
 
+//The OnSelectCamer-Method is in charge of activating the appropiate ParameterWidgets
 void QmitkToFConnectionWidget2::OnSelectCamera()
 {
+  //Here we are getting our decvie through the QmitkServiceListWidget-Instance m_DeviceList through the GetSelectedService-Method
   mitk::ToFCameraDevice* device = m_Controls->m_DeviceList->GetSelectedService<mitk::ToFCameraDevice>();
+
+  //getting the selectedCamera through a static Method used to transform the device->GetNameOfClass
   QString selectedCamera = QString::fromStdString(device->GetNameOfClass());
-  //verstecke alle widgets
+  //Hide all ParameterWidgets
   this->HideAllParameterWidgets();
 
-  if (selectedCamera.contains("PMD")) // Changed IF  //finde Teilsstrings in einem string
+  //reactivating the Widgets on slecting a device
+  if (selectedCamera.contains("PMD")) //Check if selectedCamera string contains ".." for each device
   {
-    this->m_Controls->m_PMDParameterWidget->show();
+    this->m_Controls->m_PMDParameterWidget->show(); //and activate the correct widget
   }
   else if (selectedCamera.contains("MESA"))
   {
@@ -96,7 +107,7 @@ void QmitkToFConnectionWidget2::OnSelectCamera()
   {
     this->m_Controls->m_KinectParameterWidget->show();
   }
-  emit ToFCameraSelected(selectedCamera);
+  emit  (selectedCamera);
 }
 
 void QmitkToFConnectionWidget2::HideAllParameterWidgets()
@@ -106,28 +117,33 @@ void QmitkToFConnectionWidget2::HideAllParameterWidgets()
   this->m_Controls->m_KinectParameterWidget->hide();
 }
 
+//OnConnectCamera-Method; represents one of the main parts of ToFConnectionWidget2.
 void QmitkToFConnectionWidget2::OnConnectCamera()
 {
+  //Introducing the boolean variable playerMode and set it to false by default
   bool playerMode = false;
 
-  //Changes to be done after connecting
+  //After connecting a device
   if (m_Controls->m_ConnectCameraButton->text()=="Connect")
   {
     //Disabling some GUI-Elements
-    m_Controls->m_ConnectCameraButton->setEnabled(false);
-    m_Controls->m_DeviceList->setEnabled(false);
+    m_Controls->m_ConnectCameraButton->setEnabled(false); //ConnectCameraButton gets disabled, what leads to other changes later
+    m_Controls->m_DeviceList->setEnabled(false);          //Deactivating the Instance of QmitkServiceListWidget
     //repaint the widget
     this->repaint();
 
     QString tmpFileName("");
     QString fileFilter("");
 
+    //Getting the device- and the slectedCamera-Variables using the ServiceListWidget as we did it in the CameraSelect-Method
     mitk::ToFCameraDevice* device = m_Controls->m_DeviceList->GetSelectedService<mitk::ToFCameraDevice>();
     QString selectedCamera = QString::fromStdString(device->GetNameOfClass());
 
+    //Creating a new  inctace of m_ToFImageGrabber
     this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
 
-    this->m_ToFImageGrabber->SetCameraDevice(device); //todo device aus keno's widget holen und hier setzen---------------------------------
+    //Feeding it with the Info from ServiceListWidget
+    this->m_ToFImageGrabber->SetCameraDevice(device);
 
     //Activation of "PlayerMode". If the selectedCamera String contains "Player", we start the Player Mode
     if (selectedCamera.contains("Player"))
@@ -136,7 +152,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
       //IF PMD-Player selected
       if (selectedCamera.contains("PMD"))
       {
-        fileFilter.append("PMD Files (*.pmd)");
+        fileFilter.append("PMD Files (*.pmd)");   //And seting the corresponding fileFilter
       }
       else
       {
@@ -144,33 +160,30 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
       }
     }
 
-    // if a player was selected ...
+    // if a player was selected
     if (playerMode)
     {
-      //... open a QFileDialog to chose the corresponding file from the disc
+      //open a QFileDialog to chose the corresponding file from the disc
       tmpFileName = QFileDialog::getOpenFileName(NULL, "Play Image From...", "", fileFilter);
-      MITK_INFO << tmpFileName.toStdString();
 
-      //If no fileName is returned by the Dialog,Button and Widget have to return to default + Opening a MessageBox
+      //If no fileName is returned by the Dialog,Button and Widget have to return to default(disconnected) + Opening a MessageBox
       if (tmpFileName.isEmpty())
       {
         m_Controls->m_ConnectCameraButton->setChecked(false);
-        m_Controls->m_ConnectCameraButton->setEnabled(true);
+        m_Controls->m_ConnectCameraButton->setEnabled(true);  //re-enabling the ConnectCameraButton
         m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
 
-        this->OnSelectCamera();
+        this->OnSelectCamera();       //Calling the OnSelctCamera-Method -> Hides all Widget and just activates the needed ones
         QMessageBox::information( this, "Template functionality", "Please select a valid image before starting some action.");
         return;
       }
 
-      if(selectedCamera.contains("PMDPlayer")) //if current device name enhält
-      { //set the PMD file name
-        this->m_ToFImageGrabber->SetStringProperty("PMDFileName", tmpFileName.toStdString().c_str() );
-        MITK_INFO <<"PMD selected";
-      }
-      else    //The PMD RAW Data Player does not exist anymore so we can just use (selectedCamera.contains("PMD Raw Data Player") || selectedCamera.contains("MITK Player") ) //todo eventuell default
+      if(selectedCamera.contains("PMDPlayer"))
       {
-        MITK_INFO << "An other Player than PMD is selected. Maybe the MITK-Player";
+        this->m_ToFImageGrabber->SetStringProperty("PMDFileName", tmpFileName.toStdString().c_str() );
+      }
+      else    //Default action
+      {
         std::string msg = "";
         try
         {
@@ -179,12 +192,17 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
           std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( tmpFileName.toStdString() );
           std::string extension = itksys::SystemTools::GetFilenameLastExtension( tmpFileName.toStdString() );
 
+          //"Incorrect format"-warning while using .nrrd or .pic files
           if (extension != ".pic" && extension != ".nrrd")
           {
             msg = msg + "Invalid file format, please select a \".nrrd\"-file";
             throw std::logic_error(msg.c_str());
           }
+
+          //Defining "found" Variable
           int found = baseFilename.rfind("_DistanceImage");
+
+//THOMAS fragen, ob hier unterschiedliches im baseFilename gefunden werden kann? Zudem wird nach der IF-Abfrage doch weitergesucht oder?Besitzt jedes "Bild" ein "_DistanceImage"-------------------------------
           if (found == std::string::npos)
           {
             found = baseFilename.rfind("_AmplitudeImage");
@@ -216,7 +234,6 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
           else
           {
             this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", distanceImageFileName.c_str());
-            MITK_INFO << "DistanceImageFileName " << distanceImageFileName.c_str();
           }
           if (!itksys::SystemTools::FileExists(amplitudeImageFileName.c_str(), true))
           {

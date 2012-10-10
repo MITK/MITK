@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup ToFUI
 */
+
+//#pragma deprecated ()
 class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 {
 

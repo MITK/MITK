@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -81,21 +81,32 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   // examine stateEvent and create a contour that matches the pixel mask that we are going to draw
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return;
-  
+
   // create a copy of this slice (at least match the pixel sizes/spacings),
   // then draw the desired mask on it and create a contour from it
 
   // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
-  itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
-  CastToItkImage(m_WorkingSlice/*dynamic_cast<mitk::Image*>(m_WorkingNode->GetData())*/, correctPixelTypeImage );
-  assert (correctPixelTypeImage.IsNotNull() );
+//   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
+//   CastToItkImage(m_WorkingSlice/*dynamic_cast<mitk::Image*>(m_WorkingNode->GetData())*/, correctPixelTypeImage );
+//   assert (correctPixelTypeImage.IsNotNull() );
+//
+//   itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
+//   imageDirection.SetIdentity();
+//   correctPixelTypeImage->SetDirection(imageDirection);
+//
+//   Image::Pointer temporarySlice = Image::New();
+//   CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-  itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
-  imageDirection.SetIdentity();
-  correctPixelTypeImage->SetDirection(imageDirection);
+  //Cloning Working slice and set direction to identity
+  Image::Pointer temporarySlice = m_WorkingSlice->Clone();
+  temporarySlice->GetGeometry()->SetIdentity();
 
-  Image::Pointer temporarySlice = Image::New();
-  CastToMitkImage( correctPixelTypeImage, temporarySlice );
+//
+// AffineTransform3D::Pointer trans = AffineTransform3D::New();
+// trans->SetIdentity();
+
+
+
 
   //mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
   mitkIpPicDescriptor* stupidClone = mitkIpPicNew();
@@ -107,10 +118,10 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   {
     MITK_INFO << "Brush size is bigger than your working image. Reconsider this...\n"
                 "(Or tell your progammer until (s)he fixes this message.)" << std::endl;
-    mitkIpPicFree( stupidClone );
+    //mitkIpPicFree( stupidClone );
     return;
   }
-  
+
   unsigned int lineLength( stupidClone->n[0] );
   unsigned int oneContourOffset(0);
   float circleCenterX = (float)m_Size / 2.0;
@@ -140,17 +151,17 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
       }
     }
   }
-      
+
   int numberOfContourPoints( 0 );
   int newBufferSize( 0 );
   float* contourPoints = ipMITKSegmentationGetContour8N( stupidClone, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
-  if (!contourPoints) 
+  if (!contourPoints)
   {
-    mitkIpPicFree( stupidClone );
+    //mitkIpPicFree( stupidClone );
     return;
   }
 
-  // copy point from float* to mitk::Contour 
+  // copy point from float* to mitk::Contour
   Contour::Pointer contourInImageIndexCoordinates = Contour::New();
   contourInImageIndexCoordinates->Initialize();
   Point3D newPoint;
@@ -173,7 +184,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   // The PicDescriptor is only REFERENCING(!) the data, the temporarySlice takes care of deleting the data also the descriptor is pointing on
   // because they got allocated by the ImageDataItem, not the descriptor.
   stupidClone->data = NULL;
-  mitkIpPicFree( stupidClone );
+  //mitkIpPicFree( stupidClone );
 }
 
 
@@ -248,7 +259,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     MITK_DEBUG << "." << std::flush;
     return false;
   }
-    
+
   MITK_DEBUG << "Mouse at C " << indexCoordinates;
 
   Contour::Pointer contour = Contour::New();
@@ -262,7 +273,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
     contour->AddVertex( point );
   }
-  
+
 
   if (leftMouseButtonPressed)
   {
@@ -308,7 +319,7 @@ bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent*
 }
 
 /**
-  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0. 
+  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
   */
 bool mitk::PaintbrushTool::OnInvertLogic(Action* itkNotUsed(action), const StateEvent* stateEvent)
 {

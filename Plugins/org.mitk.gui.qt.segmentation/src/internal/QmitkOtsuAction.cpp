@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkLevelWindowProperty.h>
 
-#include <MitkLookupTable.h>
-#include <MitkLookupTableProperty.h>
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
 
 // ITK
 #include <itkMultiplyImageFilter.h>

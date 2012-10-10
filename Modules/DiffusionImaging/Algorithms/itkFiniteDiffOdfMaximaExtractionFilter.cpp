@@ -35,7 +35,8 @@ FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 ::FiniteDiffOdfMaximaExtractionFilter()
     : m_MaxNumPeaks(2)
     , m_PeakThreshold(0.4)
-    , m_AngularThreshold(0.9)
+    , m_ClusteringThreshold(0.9)
+    , m_AngularThreshold(0.7)
     , m_NumCoeffs((ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder)
     , m_NormalizationMethod(MAX_VEC_NORM)
     , m_AbsolutePeakThreshold(0)
@@ -110,13 +111,13 @@ std::vector< vnl_vector_fixed< double, 3 > >  FiniteDiffOdfMaximaExtractionFilte
             for (int i=0; i<inDirs.size(); i++)
             {
                 angle = dot_product(workingMean, inDirs[i]);
-                if (angle>m_AngularThreshold)
+                if (angle>=m_ClusteringThreshold)
                 {
                     currentMean += inDirs[i];
                     touched[i] = 1;
                     counter++;
                 }
-                else if (-angle>m_AngularThreshold)
+                else if (-angle>=m_ClusteringThreshold)
                 {
                     currentMean -= inDirs[i];
                     touched[i] = 1;
@@ -219,6 +220,8 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     MITK_INFO << "Maximum peaks: " << m_MaxNumPeaks;
     MITK_INFO << "Relative threshold: " << m_PeakThreshold;
     MITK_INFO << "Absolute threshold: " << m_AbsolutePeakThreshold;
+    MITK_INFO << "Clustering threshold: " << m_ClusteringThreshold;
+    MITK_INFO << "Angular threshold: " << m_AngularThreshold;
 }
 
 template< class PixelType, int ShOrder, int NrOdfDirections >
@@ -371,7 +374,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
                     DirectionType v2 = peaks.at(j);
                     double val2 = v2.magnitude();
                     double angle = fabs(dot_product(v1,v2)/(val*val2));
-                    if (angle>0.7 && val<val2)
+                    if (angle>m_AngularThreshold && val<val2)
                     {
                         flag = false;
                         break;

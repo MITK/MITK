@@ -141,22 +141,49 @@
          <property name="horizontalSpacing">
           <number>6</number>
          </property>
-         <item row="3" column="1">
-          <widget class="QSpinBox" name="m_MaxNumPeaksBox">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>SH Order:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Absolute threshold:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QDoubleSpinBox" name="m_AbsoluteThresholdBox">
            <property name="enabled">
             <bool>false</bool>
            </property>
            <property name="toolTip">
-            <string>Maximum number of peaks to extract.</string>
+            <string>Absolute peak threshold (only used for the finite differences method). The value is additionally scaled by 1/GFA.</string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
            </property>
            <property name="minimum">
-            <number>1</number>
+            <double>0.000000000000000</double>
            </property>
            <property name="maximum">
-            <number>1000</number>
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.001000000000000</double>
            </property>
            <property name="value">
-            <number>3</number>
+            <double>0.010000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Max. Peaks:</string>
            </property>
           </widget>
          </item>
@@ -182,10 +209,22 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Absolute threshold:</string>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="m_MaxNumPeaksBox">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>Maximum number of peaks to extract.</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>3</number>
            </property>
           </widget>
          </item>
@@ -193,35 +232,6 @@
           <widget class="QLabel" name="label_6">
            <property name="text">
             <string>Relative threshold:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QDoubleSpinBox" name="m_AbsoluteThresholdBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="toolTip">
-            <string>Absolute peak threshold (only used for the finite differences method). The value is additionally scaled by 1/GFA.</string>
-           </property>
-           <property name="minimum">
-            <double>0.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.010000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Max. Peaks:</string>
            </property>
           </widget>
          </item>
@@ -265,10 +275,46 @@
            </item>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_9">
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_10">
            <property name="text">
-            <string>SH Order:</string>
+            <string>Clustering angle:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QSpinBox" name="m_ClusteringAngleBox">
+           <property name="toolTip">
+            <string>Cluster close directions. Define &quot;close&quot; here.</string>
+           </property>
+           <property name="maximum">
+            <number>90</number>
+           </property>
+           <property name="value">
+            <number>25</number>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Angular threshold:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QSpinBox" name="m_AngularThreshold">
+           <property name="toolTip">
+            <string>Discard smaller peaks in the defined angle around the maximum peaks.</string>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>90</number>
+           </property>
+           <property name="value">
+            <number>0</number>
            </property>
           </widget>
          </item>

@@ -181,17 +181,20 @@ protected:
         QString path(lutPath.c_str()); path += "FiberTrackingLUTBaryCoords.bin";
         std::ifstream BaryCoordsStream;
         BaryCoordsStream.open(path.toStdString().c_str(), ios::in | ios::binary);
+        MITK_INFO << "SphereInterpolator: 1 " << path.toStdString().c_str();
         if (BaryCoordsStream.is_open())
         {
             try
             {
                 float tmp;
                 BaryCoordsStream.seekg (0, ios::beg);
+                MITK_INFO << "SphereInterpolator: 2";
                 while (!BaryCoordsStream.eof())
                 {
                     BaryCoordsStream.read((char *)&tmp, sizeof(tmp));
                     barycoords.push_back(tmp);
                 }
+                MITK_INFO << "SphereInterpolator: 3";
                 BaryCoordsStream.close();
             }
             catch (const std::exception& e)
@@ -204,21 +207,25 @@ protected:
             MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTBaryCoords.bin from " << path.toStdString();
             return false;
         }
+        MITK_INFO << "SphereInterpolator: first lut loaded successfully";
 
         ifstream IndicesStream;
         path = lutPath.c_str(); path += "FiberTrackingLUTIndices.bin";
         IndicesStream.open(path.toStdString().c_str(), ios::in | ios::binary);
+        MITK_INFO << "SphereInterpolator: 1 " << path.toStdString().c_str();
         if (IndicesStream.is_open())
         {
             try
             {
                 int tmp;
                 IndicesStream.seekg (0, ios::beg);
+                MITK_INFO << "SphereInterpolator: 2";
                 while (!IndicesStream.eof())
                 {
                     IndicesStream.read((char *)&tmp, sizeof(tmp));
                     indices.push_back(tmp);
                 }
+                MITK_INFO << "SphereInterpolator: 3";
                 IndicesStream.close();
             }
             catch (const std::exception& e)
@@ -231,13 +238,14 @@ protected:
             MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTIndices.bin from " << path.toStdString();
             return false;
         }
+        MITK_INFO << "SphereInterpolator: second lut loaded successfully";
 
         return true;
     }
 
     bool LoadLookuptables()
     {
-        std::cout << "SphereInterpolator: loading lookuptables" << std::endl;
+        MITK_INFO << "SphereInterpolator: loading lookuptables";
         QString applicationDir = QCoreApplication::applicationDirPath();
         applicationDir.append("/");
         mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );

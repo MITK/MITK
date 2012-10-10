@@ -112,6 +112,8 @@ namespace mitk
 
     unsigned long m_DeleteObserverTag;
 
+    mitk::Geometry3D::Pointer m_GuardReferenceGeometry;
+
   };
 }
 #endif

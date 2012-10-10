@@ -1059,7 +1059,7 @@ std::vector<unsigned int> DiffusionMultiShellQballReconstructionImageFilter<T,TG
     bool directionExist = false;
     while(containerIt != directioncontainer.end())
     {
-      if (fabs(dot(m_GradientDirectionContainer->ElementAt(*containerIt), m_GradientDirectionContainer->ElementAt(shell1[wntIndex])))  > 0.9998)
+      if (fabs(dot(m_GradientDirectionContainer->ElementAt(*containerIt), m_GradientDirectionContainer->ElementAt(wntIndex)))  > 0.9998)
       {
         directionExist = true;
         break;
@@ -1081,7 +1081,7 @@ std::vector<unsigned int> DiffusionMultiShellQballReconstructionImageFilter<T,TG
     bool directionExist = false;
     while(containerIt != directioncontainer.end())
     {
-      if (fabs(dot(m_GradientDirectionContainer->ElementAt(*containerIt), m_GradientDirectionContainer->ElementAt(shell2[wntIndex])))  > 0.9998)
+      if (fabs(dot(m_GradientDirectionContainer->ElementAt(*containerIt), m_GradientDirectionContainer->ElementAt(wntIndex)))  > 0.9998)
       {
         directionExist = true;
         break;
@@ -1103,7 +1103,7 @@ std::vector<unsigned int> DiffusionMultiShellQballReconstructionImageFilter<T,TG
     bool directionExist = false;
     while(containerIt != directioncontainer.end())
     {
-      if (fabs(dot(m_GradientDirectionContainer->ElementAt(*containerIt), m_GradientDirectionContainer->ElementAt(shell3[wntIndex])))  > 0.9998)
+      if (fabs(dot(m_GradientDirectionContainer->ElementAt(*containerIt), m_GradientDirectionContainer->ElementAt(wntIndex)))  > 0.9998)
       {
         directionExist = true;
         break;

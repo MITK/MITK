@@ -298,10 +298,6 @@ namespace itk {
 
           // post-normalization according to m_NormalizationMethod
           odf.Normalize();
-
-          for (int i=0; i<odf.Size(); i++)
-              if (odf.GetElement(i)!=odf.GetElement(i))
-                  odf.Fill(0.0);
         }
         else
         {
@@ -311,6 +307,10 @@ namespace itk {
             ++(*gradientItContainer[i]);
           }
         }
+
+        for (int i=0; i<odf.Size(); i++)
+            if (odf.GetElement(i)!=odf.GetElement(i))
+                odf.Fill(0.0);
 
         // set and increment output iterators
         oit.Set( odf );
@@ -400,6 +400,10 @@ namespace itk {
           odf = Normalize(odf, b0);
 
         }
+
+        for (int i=0; i<odf.Size(); i++)
+            if (odf.GetElement(i)!=odf.GetElement(i))
+                odf.Fill(0.0);
 
         // set and increment output iterators
         oit.Set( odf );

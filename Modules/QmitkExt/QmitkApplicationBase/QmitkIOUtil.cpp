@@ -24,10 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //ITK
 #include <itksys/SystemTools.hxx>
-
 #include <Poco/Path.h>
 
-void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string path)
+void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string fileName, QWidget* parent)
 {
     try
     {
@@ -38,7 +37,7 @@ void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string
             QString classname(data->GetNameOfClass());
             if ( image.IsNotNull() && (classname.compare("Image")==0 || classname.compare("SeedsImage")==0  ) )
             {
-                SaveImageWithDialog(image, path);
+                SaveImageWithDialog(image, fileName, parent);
                 return; //succes. we can return
             }
             //########### End Check if we can save as standard image type via itkImageWriter
@@ -47,7 +46,7 @@ void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string
             mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data);
             if(pointset.IsNotNull())
             {
-                SavePointSetWithDialog(pointset, path);
+                SavePointSetWithDialog(pointset, fileName, parent);
                 return; //succes. we can return
             }
             //########### End Check if we can save as standard pointset type via mitkPointSetWriter
@@ -56,7 +55,7 @@ void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string
             mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(data);
             if(surface.IsNotNull())
             {
-                SaveSurfaceWithDialog(surface, path);
+                SaveSurfaceWithDialog(surface, fileName, parent);
                 return; //succes. we can return
             }
             //########### End Check if we can save as standard surface type via mitkVtkSurfaceWriter
@@ -71,33 +70,34 @@ void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string
                 if ( (*it)->CanWriteBaseDataType(data) )
                 {
                     writerFound = true;
-                    SaveToFileWriter(*it, data, NULL, path.c_str());
-//                    std::string tmpFileName = (*it)->GetFileName();
+                    SaveToFileWriter(*it, data, fileName.c_str());
+                    //TODO: testen ob das so bleiben kann:
+                    //                    std::string tmpFileName = (*it)->GetFileName();
                     return;
                     // correct writer has been found->break
-//                    if(!(tmpFileName.length()>0)){
-//                        return;
-//                    } else {
-//                        writingSuccessful = true;
-//                        break;
-//                    }
+                    //                    if(!(tmpFileName.length()>0)){
+                    //                        return;
+                    //                    } else {
+                    //                        writingSuccessful = true;
+                    //                        break;
+                    //                    }
                 }
             }
             if(!writerFound)
             {
                 // no appropriate writer has been found
-                QMessageBox::critical(NULL,"ERROR","Could not find file writer for this data type");
+                QMessageBox::critical(parent,"ERROR","Could not find file writer for this data type");
                 return;
             }
 
         }
     }catch(itk::ExceptionObject e)
     {
-        QMessageBox::critical( NULL, "Exception during saving", e.GetDescription(),QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+        QMessageBox::critical( parent, "Exception during saving", e.GetDescription(),QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
     }
 }
 
-void mitk::QmitkIOUtil::SaveSurfaceWithDialog(mitk::Surface::Pointer surface, std::string fileName)
+void mitk::QmitkIOUtil::SaveSurfaceWithDialog(mitk::Surface::Pointer surface, std::string fileName, QWidget* parent)
 {
     //default selected suffix for surfaces
     QString selected_suffix("STL File (*.stl)");
@@ -132,7 +132,7 @@ void mitk::QmitkIOUtil::SaveSurfaceWithDialog(mitk::Surface::Pointer surface, st
     }
 }
 
-void mitk::QmitkIOUtil::SaveImageWithDialog(mitk::Image::Pointer image, std::string fileName)
+void mitk::QmitkIOUtil::SaveImageWithDialog(mitk::Image::Pointer image, std::string fileName, QWidget *parent)
 {
     //default selected suffix for images
     QString selected_suffix("Nearly Raw Raster Data (*.nrrd)");
@@ -167,7 +167,7 @@ void mitk::QmitkIOUtil::SaveImageWithDialog(mitk::Image::Pointer image, std::str
                                QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
     }
 }
-void mitk::QmitkIOUtil::SavePointSetWithDialog(mitk::PointSet::Pointer pointset, std::string fileName)
+void mitk::QmitkIOUtil::SavePointSetWithDialog(mitk::PointSet::Pointer pointset, std::string fileName, QWidget *parent)
 {
     //default selected suffix for point sets
     QString selected_suffix("MITK Point-Sets (*.mps)");
@@ -202,60 +202,69 @@ void mitk::QmitkIOUtil::SavePointSetWithDialog(mitk::PointSet::Pointer pointset,
     }
 }
 
-QString mitk::QmitkIOUtil::GetFileNameWithQDialog(QString caption, QString defaultFilename, QString filter, QString* selectedFilter)
+QString mitk::QmitkIOUtil::GetFileNameWithQDialog(QString caption, QString defaultFilename, QString filter, QString* selectedFilter, QWidget* parent)
 {
     QString returnfileName = "";
     static QString lastDirectory = "";
     QString filename = lastDirectory + defaultFilename;
-    returnfileName = QFileDialog::getSaveFileName(NULL,caption,filename,filter,selectedFilter);
-    if (returnfileName != "")
+    returnfileName = QFileDialog::getSaveFileName(parent,caption,filename,filter,selectedFilter, QFileDialog::DontConfirmOverwrite);
+    if (!returnfileName.isEmpty())
     {
         std::string dir = itksys::SystemTools::GetFilenamePath( returnfileName.toStdString() );
         dir += Poco::Path::separator();
         lastDirectory = dir.c_str(); // remember path for next save dialog
+        std::string extension = itksys::SystemTools::GetFilenameLastExtension( returnfileName.toStdString() );
+        if(extension.empty()) // if no extension has been entered manually into the filename
+        {
+            // get from combobox selected file extension
+            extension = itksys::SystemTools::GetFilenameLastExtension( selectedFilter->toLocal8Bit().constData());
+            extension = extension.substr(0, extension.size()-1); //remove the last char ")" from the extension
+            returnfileName += QString::fromStdString(extension); //add it to the path which is returned
+        }
     }
-    std::string extension = itksys::SystemTools::GetFilenameLastExtension( returnfileName.toStdString() );
-    if (extension == "") // if no extension has been entered manually into the filename
+
+    //check if the file exists
+    if( itksys::SystemTools::FileExists( returnfileName.toLocal8Bit().constData() ))
     {
-      // get from combobox selected file extension
-      extension = itksys::SystemTools::GetFilenameLastExtension( selectedFilter->toLocal8Bit().constData());
-      extension = extension.substr(0, extension.size()-1); //remove the last char ")" from the extension
-      returnfileName += QString::fromStdString(extension); //add it to the path which is returned
+        int answer = QMessageBox::question( parent, "Warning",
+                                            QString("File %1 already exists. Overwrite?").arg( returnfileName ),
+                                            QMessageBox::Yes,
+                                            QMessageBox::No );
+        if( answer == QMessageBox::No )
+        {
+            //if the user doesn't want to overwrite the file, return an emtpy string.
+            return QString("");
+        }
     }
     return returnfileName;
 }
 
-void mitk::QmitkIOUtil::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName, const char* propFileName)
+void mitk::QmitkIOUtil::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const std::string fileName)
 {
     // Check if desired format is supported
-    if (! fileWriter->CanWriteBaseDataType(data) ) {
+    if (! fileWriter->CanWriteBaseDataType(data) )
+    {
         QMessageBox::critical(NULL,"ERROR","Could not write file. Invalid data type for file writer.");
         return;
     }
 
     // Ensure a valid filename
-    QString fileName;
-    if (aFileName == NULL)
+    QString qFileName(QString::fromStdString(fileName));
+    if (qFileName.isEmpty())
     {
-        QString proposedName("");
-        if(propFileName == NULL)
-        {
-            proposedName.append(fileWriter->GetDefaultFilename());
-        }
-        else
-        {
-            proposedName.append(propFileName).append(fileWriter->GetDefaultExtension());
-        }
-        fileName = GetFileNameWithQDialog("Save file", proposedName,QString::fromAscii(fileWriter->GetFileDialogPattern()));
+        QString qProposedFileName(fileWriter->GetDefaultFilename());
+        qProposedFileName.append(fileWriter->GetDefaultExtension());
+        qFileName = GetFileNameWithQDialog("Save file", qProposedFileName,
+                                           QString::fromAscii(fileWriter->GetFileDialogPattern()));
 
         // Check if an extension exists already and if not, append the default extension
-        if ( !fileName.contains( QRegExp("\\.\\w+$") ) )
+        if ( !qFileName.contains( QRegExp("\\.\\w+$") ) )
         {
-            fileName.append( fileWriter->GetDefaultExtension() );
+            qFileName.append( fileWriter->GetDefaultExtension() );
         }
         else
         {
-            std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName.toLocal8Bit().constData() );
+            std::string extension = itksys::SystemTools::GetFilenameLastExtension( qFileName.toLocal8Bit().constData() );
             if (!fileWriter->IsExtensionValid(extension))
             {
                 QString message;
@@ -266,14 +275,11 @@ void mitk::QmitkIOUtil::SaveToFileWriter( mitk::FileWriterWithInformation::Point
             }
         }
     }
-    else
-        fileName = aFileName;
-
-
-    // Write
-    if (fileName.isEmpty() == false )
+    //Write only if a valid name was set
+    if(qFileName.isEmpty() == false)
     {
-        fileWriter->SetFileName( fileName.toLocal8Bit().constData() );
+        fileWriter->SetFileName( qFileName.toLocal8Bit().constData() );
         fileWriter->DoWrite( data );
     }
+
 }

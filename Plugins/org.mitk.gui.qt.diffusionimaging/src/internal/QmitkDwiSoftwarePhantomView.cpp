@@ -63,6 +63,7 @@ void QmitkDwiSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_SignalRegionBox->setVisible(false);
 
         connect((QObject*) m_Controls->m_GeneratePhantomButton, SIGNAL(clicked()), (QObject*) this, SLOT(GeneratePhantom()));
+        connect((QObject*) m_Controls->m_SimulateBaseline, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnSimulateBaselineToggle(int)));
     }
 }
 
@@ -93,6 +94,25 @@ std::vector<itk::Vector<double,3> > QmitkDwiSoftwarePhantomView::MakeGradientLis
     }
 
     return retval;
+}
+
+void QmitkDwiSoftwarePhantomView::OnSimulateBaselineToggle(int state)
+{
+    if (state)
+    {
+        m_Controls->m_NoiseLabel->setText("Noise Variance:");
+        m_Controls->m_NoiseLevel->setValue(1.0/(m_Controls->m_NoiseLevel->value()*m_Controls->m_NoiseLevel->value()));
+        m_Controls->m_NoiseLevel->setToolTip("Variance of Rician noise.");
+    }
+    else
+    {
+        m_Controls->m_NoiseLabel->setText("SNR:");
+        if (m_Controls->m_NoiseLevel->value()>0)
+            m_Controls->m_NoiseLevel->setValue(1.0/(sqrt(m_Controls->m_NoiseLevel->value())));
+        else
+            m_Controls->m_NoiseLevel->setValue(0.0001);
+        m_Controls->m_NoiseLevel->setToolTip("Signal to noise ratio (for values > 99, no noise at all is added to the image).");
+    }
 }
 
 void QmitkDwiSoftwarePhantomView::GeneratePhantom()
@@ -157,8 +177,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     FilterType::Pointer filter = FilterType::New();
     filter->SetGradientList(gradientList);
     filter->SetBValue(bVal);
-    filter->SetSNR(m_Controls->m_NoiseLevel->value());
-    filter->SetSignalScale(m_Controls->m_SignalScale->value());
+    filter->SetNoiseVariance(m_Controls->m_NoiseLevel->value());
     filter->SetImageRegion(imageRegion);
     filter->SetSpacing(spacing);
     filter->SetSignalRegions(m_SignalRegions);
@@ -184,6 +203,8 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     filter->SetTensorADC(tensorADC);
     filter->SetTensorWeight(tensorWeight);
     filter->SetTensorDirection(tensorDirection);
+    if (!m_Controls->m_SimulateBaseline->isChecked())
+        filter->SetSimulateBaseline(false);
     filter->Update();
 
     mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
@@ -199,13 +220,27 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     if (m_Controls->m_OutputNumDirectionsBox->isChecked())
     {
         ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();
-        mitk::Image::Pointer image2 = mitk::Image::New();
-        image2->InitializeByItk( numDirImage.GetPointer() );
-        image2->SetVolume( numDirImage->GetBufferPointer() );
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk( numDirImage.GetPointer() );
+        image->SetVolume( numDirImage->GetBufferPointer() );
         mitk::DataNode::Pointer node2 = mitk::DataNode::New();
-        node2->SetData(image2);
+        node2->SetData(image);
         QString name(m_Controls->m_ImageName->text());
         name += "_NumDirections";
+        node2->SetName(name.toStdString().c_str());
+        GetDataStorage()->Add(node2);
+    }
+
+    if (m_Controls->m_OutputSnrImageBox->isChecked())
+    {
+        ItkFloatImgType::Pointer snrImage = filter->GetSNRImage();
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk( snrImage.GetPointer() );
+        image->SetVolume( snrImage->GetBufferPointer() );
+        mitk::DataNode::Pointer node2 = mitk::DataNode::New();
+        node2->SetData(image);
+        QString name(m_Controls->m_ImageName->text());
+        name += "_SNR";
         node2->SetName(name.toStdString().c_str());
         GetDataStorage()->Add(node2);
     }

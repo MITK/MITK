@@ -168,7 +168,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   // create a QFuture and a QFutureWatcher
 
   connect(&m_Watcher, SIGNAL(started()), this, SLOT(StartUpdateInterpolationTimer()));
-  connect(&m_Watcher, SIGNAL(finished()), this, SLOT(SurfaceInterpolationFinished()));
+  connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(StopUpdateInterpolationTimer()));
   m_Timer = new QTimer(this);
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(ChangeSurfaceColor()));
@@ -534,7 +534,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
   }
 }
 
-void QmitkSlicesInterpolator::SurfaceInterpolationFinished()
+void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 {
   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
 

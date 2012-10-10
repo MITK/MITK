@@ -364,26 +364,24 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
       }
       else
       {
-        float maxv = m_LevelWindow.GetRangeMax();
-        float minv = m_LevelWindow.GetRangeMin();
-        float wh = m_LevelWindow.GetWindow() / 2;
-  
-    float level = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
+        const float minv = m_LevelWindow.GetRangeMin();
 
-    double diff = (mouseEvent->pos().x()) / fact;
-    diff -= (m_StartPos.x()) / fact;
-    m_StartPos = mouseEvent->pos();
+        const float level = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
 
-    float window;
-    if (m_Bottom)
-      window = m_LevelWindow.GetWindow() + ( ( 2 * diff ) );
-    else
-      window = m_LevelWindow.GetWindow() - ( ( 2 * diff ) );
+        double diff = (mouseEvent->pos().x()) / fact;
+        diff -= (m_StartPos.x()) / fact;
+        m_StartPos = mouseEvent->pos();
 
-    if ( window < 0 )
-      window = 0;
+        float window;
+        if (m_Bottom)
+          window = m_LevelWindow.GetWindow() + ( ( 2 * diff ) );
+        else
+          window = m_LevelWindow.GetWindow() - ( ( 2 * diff ) );
 
-      m_LevelWindow.SetLevelWindow( level, window );
+        if ( window < 0 )
+          window = 0;
+
+        m_LevelWindow.SetLevelWindow( level, window );
       }
       m_Manager->SetLevelWindow(m_LevelWindow);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

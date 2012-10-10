@@ -104,11 +104,11 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(false);
 
     connect(m_Controls.externalDataWidget,SIGNAL(SignalStartDicomImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(const QStringList&)),this,SLOT(OnViewButtonAddToDataManager(const QStringList&)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(QHash<QString,QVariant>)),this,SLOT(OnViewButtonAddToDataManager(QHash<QString,QVariant>)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalChangePage(int)), this, SLOT(OnChangePage(int)));
 
     connect(m_Controls.internalDataWidget,SIGNAL(SignalFinishedImport()),this,SLOT(OnDicomImportFinished()));
-    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(const QStringList&)),this,SLOT(OnViewButtonAddToDataManager(const QStringList&)));
+    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(QHash<QString,QVariant>)),this,SLOT(OnViewButtonAddToDataManager(QHash<QString,QVariant>)));
 
     connect(m_Controls.CDButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
     connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
@@ -256,15 +256,15 @@ void QmitkDicomEditor::TestHandler()
     m_Handler->SubscribeSlots();
 }
 
-void QmitkDicomEditor::OnViewButtonAddToDataManager(const QStringList& eventProperties)
+void QmitkDicomEditor::OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties)
 {
     ctkDictionary properties;
-    properties["PatientName"] = eventProperties.at(0);
-    properties["StudyUID"] = eventProperties.at(1);
-    properties["StudyName"] = eventProperties.at(2);
-    properties["SeriesUID"] = eventProperties.at(3);
-    properties["SeriesName"] = eventProperties.at(4);
-    properties["Path"] = eventProperties.at(5);
+    properties["PatientName"] = eventProperties["PatientName"];
+    properties["StudyUID"] = eventProperties["StudyUID"];
+    properties["StudyName"] = eventProperties["StudyName"];
+    properties["SeriesUID"] = eventProperties["SeriesUID"];
+    properties["SeriesName"] = eventProperties["SeriesName"];
+    properties["FilesForSeries"] = eventProperties["FilesForSeries"];
 
     m_Publisher->PublishSignals(mitk::PluginActivator::getContext());
     m_Publisher->AddSeriesToDataManagerEvent(properties);

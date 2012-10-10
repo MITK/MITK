@@ -97,7 +97,7 @@ protected slots:
     void OnFileSelected(QString);
 
     /// \brief Called when view button is clicked. Sends out an event for adding the current selected file to the mitkDataStorage.
-    void OnViewButtonAddToDataManager(const QStringList& eventProperties);
+    void OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties);
 
     void OnChangePage(int);
 

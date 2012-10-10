@@ -58,12 +58,14 @@ public:
   virtual void StdMultiWidgetNotAvailable();
 
   typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
+  typedef itk::Image<float, 3>          ItkFloatImgType;
 
   template<int ndirs> std::vector<itk::Vector<double,3> > MakeGradientList() ;
 
   protected slots:
 
   void GeneratePhantom();
+  void OnSimulateBaselineToggle(int state);
 
 protected:
 

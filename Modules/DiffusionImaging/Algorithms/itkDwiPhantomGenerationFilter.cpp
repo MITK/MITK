@@ -28,13 +28,14 @@ template< class TOutputScalarType >
 DwiPhantomGenerationFilter< TOutputScalarType >
 ::DwiPhantomGenerationFilter()
     : m_BValue(1000)
-    , m_SignalScale(1.0)
+    , m_SignalScale(1000)
     , m_BaselineImages(0)
     , m_MaxBaseline(0)
     , m_MeanBaseline(0)
-    , m_SNR(4)
-    , m_NoiseFactor(0)
+    , m_NoiseVariance(0.004)
     , m_GreyMatterAdc(0.01)
+    , m_SimulateBaseline(true)
+    , m_DefaultBaseline(1000)
 {
     this->SetNumberOfRequiredOutputs (1);
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
@@ -65,7 +66,6 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
 {
     MITK_INFO << "Generating tensors";
 
-    vnl_vector<double> signal; signal.set_size(m_SignalRegions.size());
     for (int i=0; i<m_SignalRegions.size(); i++)
     {
         float ADC = m_TensorADC.at(i);
@@ -79,10 +79,12 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
         kernel.SetElement(3,e2);
         kernel.SetElement(5,e3);
 
-        double l2 = GetTensorL2Norm(kernel);
-        signal[i] = l2;
-        if (l2>m_MaxBaseline)
-            m_MaxBaseline = l2;
+        if (m_SimulateBaseline)
+        {
+            double l2 = GetTensorL2Norm(kernel);
+            if (l2>m_MaxBaseline)
+                m_MaxBaseline = l2;
+        }
 
         MITK_INFO << "Kernel FA: " << kernel.GetFractionalAnisotropy();
         vnl_vector_fixed<double, 3> kernelDir; kernelDir[0]=1; kernelDir[1]=0; kernelDir[2]=0;
@@ -116,12 +118,7 @@ void DwiPhantomGenerationFilter< TOutputScalarType >::AddNoise(typename OutputIm
     for( unsigned int i=0; i<m_GradientList.size(); i++)
     {
         float signal = pix[i];
-        float val = 0;
-
-        for (int k=0; k<10; k++)
-            val += sqrt(pow(signal + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseFactor), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseFactor),2));
-
-        val /= 10;
+        float val = sqrt(pow(signal + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseVariance),2));
         pix[i] += val;
     }
 }
@@ -134,8 +131,9 @@ DwiPhantomGenerationFilter< TOutputScalarType >::SimulateMeasurement(itk::Diffus
     out.SetSize(m_GradientList.size());
     out.Fill(0);
 
-    double l2 = GetTensorL2Norm(T);
-    TOutputScalarType b0 = (l2/m_MaxBaseline)*m_SignalScale;
+    TOutputScalarType s0 = m_DefaultBaseline;
+    if (m_SimulateBaseline)
+        s0 = (GetTensorL2Norm(T)/m_MaxBaseline)*m_SignalScale;
 
     for( unsigned int i=0; i<m_GradientList.size(); i++)
     {
@@ -151,21 +149,20 @@ DwiPhantomGenerationFilter< TOutputScalarType >::SimulateMeasurement(itk::Diffus
             S[4] = g[2]*g[1];
             S[5] = g[2]*g[2];
 
-            double res = T[0]*S[0] + T[1]*S[1] + T[2]*S[2] +
-                         T[1]*S[1] + T[3]*S[3] + T[4]*S[4] +
-                         T[2]*S[2] + T[4]*S[4] + T[5]*S[5];
+            double D = T[0]*S[0] + T[1]*S[1] + T[2]*S[2] +
+                       T[1]*S[1] + T[3]*S[3] + T[4]*S[4] +
+                       T[2]*S[2] + T[4]*S[4] + T[5]*S[5];
 
-            // check for corrupted tensor
-            if (res>=0)
+            // check for corrupted tensor and generate signal
+            if (D>=0)
             {
-                res = weight*b0*exp ( -m_BValue * res );
-                out[i] = static_cast<TOutputScalarType>( res );
+                D = weight*s0*exp ( -m_BValue * D );
+                out[i] = static_cast<TOutputScalarType>( D );
             }
         }
         else
-            out[i] = b0;
+            out[i] = s0;
     }
-
 
     return out;
 }
@@ -174,11 +171,23 @@ template< class TOutputScalarType >
 void DwiPhantomGenerationFilter< TOutputScalarType >
 ::GenerateData()
 {
-    if (m_SNR<=0.001)
-        m_SNR = 0.001;
+    if (m_NoiseVariance < 0)
+        m_NoiseVariance = 0.001;
 
-    MITK_INFO << "SNR: " << m_SNR;
-    MITK_INFO << "Output signal scaled by " << m_SignalScale;
+    if (!m_SimulateBaseline)
+    {
+        MITK_INFO << "Baseline image values are set to default. Noise variance value is treated as SNR!";
+        if (m_NoiseVariance <= 0)
+            m_NoiseVariance = 0.0001;
+        if (m_NoiseVariance>99)
+            m_NoiseVariance = 0;
+        else
+        {
+            m_NoiseVariance = m_DefaultBaseline/(m_NoiseVariance*m_SignalScale);
+            m_NoiseVariance *= m_NoiseVariance;
+        }
+    }
+
     m_RandGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
     m_RandGen->SetSeed();
 
@@ -224,6 +233,14 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
     m_NumDirectionsImage->Allocate();
     m_NumDirectionsImage->FillBuffer(0);
 
+    m_SNRImage = ItkFloatImgType::New();
+    m_SNRImage->SetSpacing( m_Spacing );
+    m_SNRImage->SetOrigin( m_Origin );
+    m_SNRImage->SetDirection( m_DirectionMatrix );
+    m_SNRImage->SetRegions( m_ImageRegion );
+    m_SNRImage->Allocate();
+    m_SNRImage->FillBuffer(0);
+
     vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints>    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
@@ -250,6 +267,7 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
 
     // simulate measurement
     m_MeanBaseline = 0;
+    double noiseStdev = sqrt(m_NoiseVariance);
     while(!it.IsAtEnd())
     {
         pix = it.Get();
@@ -301,7 +319,7 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
 
         if (numDirs>1)
         {
-            for (int i=0; i<m_BaselineImages; i++)
+            for (int i=0; i<m_GradientList.size(); i++)
                 pix[i] /= numDirs;
         }
         else if (numDirs==0)
@@ -310,22 +328,15 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
         m_MeanBaseline += pix[0];
         it.Set(pix);
         m_NumDirectionsImage->SetPixel(index, numDirs);
+        if (m_NoiseVariance>0)
+            m_SNRImage->SetPixel(index, pix[0]/(noiseStdev*m_SignalScale));
         ++it;
     }
-    m_MeanBaseline /= (m_ImageRegion.GetNumberOfPixels()*m_SignalScale);
-
-    // calculate noise level
-    if (m_SNR<=99)
-    {
-        m_NoiseFactor = m_MeanBaseline/m_SNR;
-        m_NoiseFactor *= m_NoiseFactor;
-    }
+    m_MeanBaseline /= m_ImageRegion.GetNumberOfPixels();
+    if (m_NoiseVariance>0)
+        MITK_INFO << "Mean SNR: " << m_MeanBaseline/(noiseStdev*m_SignalScale);
     else
-        m_NoiseFactor = 0;
-
-    MITK_INFO << "Mean baseline:" << m_MeanBaseline;
-    MITK_INFO << "SNR:" << m_SNR;
-    MITK_INFO << "Noise level:" << m_NoiseFactor;
+        MITK_INFO << "No noise added";
 
     // add rician noise
     it.GoToBegin();

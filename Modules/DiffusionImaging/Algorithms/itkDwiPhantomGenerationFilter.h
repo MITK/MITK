@@ -51,6 +51,7 @@ public:
     typedef std::vector<GradientType>                   GradientListType;
     typedef itk::Matrix<double, 3, 3>                   MatrixType;
     typedef itk::Image<unsigned char, 3>                ItkUcharImgType;
+    typedef itk::Image<float, 3>                        ItkFloatImgType;
 
     typedef Image< Vector< float, 3 >, 3>                                 ItkDirectionImage;
     typedef VectorContainer< unsigned int, ItkDirectionImage::Pointer >   ItkDirectionImageContainer;
@@ -65,16 +66,18 @@ public:
     // input parameters
     itkSetMacro( BValue, float )
     itkSetMacro( SignalScale, float )
-    itkSetMacro( SNR, float )
+    itkSetMacro( NoiseVariance, double )
     itkSetMacro( GreyMatterAdc, float )
     itkSetMacro( Spacing, mitk::Vector3D )
     itkSetMacro( Origin, mitk::Point3D )
     itkSetMacro( DirectionMatrix, MatrixType )
     itkSetMacro( ImageRegion, ImageRegion<3> )
+    itkSetMacro( SimulateBaseline, bool )
 
     // output
     itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)
+    itkGetMacro( SNRImage, ItkFloatImgType::Pointer)
     itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)
 
     protected:
@@ -92,6 +95,7 @@ private:
     ImageRegion<3>                                  m_ImageRegion;
     ItkDirectionImageContainer::Pointer             m_DirectionImageContainer;
     ItkUcharImgType::Pointer                        m_NumDirectionsImage;
+    ItkFloatImgType::Pointer                        m_SNRImage;
     mitk::FiberBundleX::Pointer                     m_OutputFiberBundle;
 
     // signal regions
@@ -106,13 +110,14 @@ private:
     std::vector< itk::DiffusionTensor3D<float> >    m_TensorList;
     float                                           m_BValue;
     float                                           m_SignalScale;
-    float                                           m_SNR;
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
     int                                             m_BaselineImages;
     double                                          m_MaxBaseline;
     double                                          m_MeanBaseline;
-    double                                          m_NoiseFactor;
+    double                                          m_NoiseVariance;
     float                                           m_GreyMatterAdc;
+    bool                                            m_SimulateBaseline;
+    TOutputScalarType                               m_DefaultBaseline;
 
     double GetTensorL2Norm(itk::DiffusionTensor3D<float>& T);
     void GenerateTensors();

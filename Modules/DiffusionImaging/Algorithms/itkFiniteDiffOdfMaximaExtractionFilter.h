@@ -74,6 +74,8 @@ Image< Vector< PixelType, 3 >, 3 > >
     itkSetMacro( MaxNumPeaks, unsigned int)
     itkSetMacro( PeakThreshold, double)
     itkSetMacro( AbsolutePeakThreshold, double)
+    itkSetMacro( ClusteringThreshold, double)
+    itkSetMacro( AngularThreshold, double)
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
     itkSetMacro( NormalizationMethod, NormalizationMethods)
 
@@ -106,6 +108,7 @@ Image< Vector< PixelType, 3 >, 3 > >
     double                                      m_PeakThreshold;
     double                                      m_AbsolutePeakThreshold;
     vnl_matrix< double >                        m_ShBasis;
+    double                                      m_ClusteringThreshold;
     double                                      m_AngularThreshold;
     const int                                   m_NumCoeffs;
 

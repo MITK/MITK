@@ -497,7 +497,7 @@ namespace itk
     if(y==0)
       init_j=y;
     else if(y==size[1]-1)
-      init_j=y-1;
+      limit_j=y+1;
 
     init_c=z-1;
     limit_c=z+2;

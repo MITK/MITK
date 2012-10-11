@@ -496,7 +496,9 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   bool isHelperObject(false);
   node->GetBoolProperty("helper object", isHelperObject);
   node->GetBoolProperty("binary", isSeg);
-  if(isSeg && !isHelperObject)
+
+  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+  if(isSeg && !isHelperObject && image)
   {
     mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
       , mitk::BoolProperty::New(true)));
@@ -523,6 +525,8 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
     node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
     m_WorkingDataObserverTags.erase(tempNode);
+
+    mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(image);
   }
 
   if((m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0) == node)||

@@ -256,3 +256,11 @@ void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationLi
   }
   Modified();
 }
+
+void mitk::SurfaceInterpolationController::RemoveSegmentationFromContourList(mitk::Image *segmentation)
+{
+  if (segmentation != 0)
+  {
+    m_MapOfContourLists.erase(segmentation);
+  }
+}

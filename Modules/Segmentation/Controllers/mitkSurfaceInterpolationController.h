@@ -106,6 +106,12 @@ namespace mitk
      */
     void SetCurrentSegmentationInterpolationList(mitk::Image* segmentation);
 
+    /**
+     * Removes the segmentation and all its contours from the list
+     * @param segmentation The segmentation to be removed
+     */
+    void RemoveSegmentationFromContourList(mitk::Image* segmentation);
+
     mitk::Image* GetImage();
 
     /**

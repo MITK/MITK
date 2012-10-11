@@ -79,6 +79,7 @@ void QmitkToFConnectionWidget::CreateConnections()
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(OnSelectCamera(const QString)) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SLOT(OnSelectCamera(const QString)) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SIGNAL(ToFCameraSelected(const QString)) );
+    connect( m_Controls->m_KinectParameterWidget, SIGNAL(AcquisitionModeChanged()), this, SIGNAL(KinectAcquisitionModeChanged()) );
   }
 }
 

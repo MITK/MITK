@@ -47,6 +47,8 @@ void QmitkKinectParameterWidget::CreateConnections()
   {
     connect( m_Controls->m_RGB, SIGNAL(toggled(bool)), this, SLOT(OnAcquisitionModeChanged()) );
     connect( m_Controls->m_IR, SIGNAL(toggled(bool)), this, SLOT(OnAcquisitionModeChanged()) );
+    connect( m_Controls->m_RGB, SIGNAL(toggled(bool)), this, SIGNAL(AcquisitionModeChanged()) );
+    connect( m_Controls->m_IR, SIGNAL(toggled(bool)), this, SIGNAL(AcquisitionModeChanged()) );
   }
 }
 

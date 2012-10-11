@@ -272,14 +272,14 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
     {
       setCursor(Qt::SizeVerCursor);
       m_UpperBound.setRect(m_Rect.topLeft().x(), m_Rect.topLeft().y() - 3, 17, 7);
-      QToolTip::showText(mouseEvent->globalPos(), "Ctrl + left click to change only upper bound", this, m_UpperBound);
+      this->setToolTip("Ctrl + left click to change only upper bound");
       m_Resize = true;
     }
     else if ( mouseEvent->pos().y() >= (m_Rect.bottomLeft().y() - 3) )
     {
       setCursor(Qt::SizeVerCursor);
       m_LowerBound.setRect(m_Rect.bottomLeft().x(), m_Rect.bottomLeft().y() - 3, 17, 7);
-      QToolTip::showText(mouseEvent->globalPos(), "Ctrl + left click to change only lower bound", this, m_LowerBound);
+      this->setToolTip("Ctrl + left click to change only lower bound");
       m_Resize = true;
       m_Bottom = true;
     }

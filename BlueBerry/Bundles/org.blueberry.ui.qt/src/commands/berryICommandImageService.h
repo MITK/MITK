@@ -98,4 +98,6 @@ struct BERRY_UI_QT ICommandImageService : public IDisposable {
 
 }
 
+Q_DECLARE_INTERFACE(berry::ICommandImageService, "org.blueberry.ui.qt.ICommandImageService")
+
 #endif /* BERRYICOMMANDIMAGESERVICE_H_ */

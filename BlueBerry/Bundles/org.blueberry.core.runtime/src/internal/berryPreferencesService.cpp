@@ -23,22 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDateTime>
 
 
-bool berry::PreferencesService::IsA( const std::type_info& type ) const
-{
-  QString name(GetType().name());
-  return name == type.name() || Service::IsA(type);
-}
-
-const std::type_info& berry::PreferencesService::GetType() const
-{
-  return typeid(berry::IPreferencesService);
-}
-
 QString berry::PreferencesService::GetDefaultPreferencesDirPath()
 {
   return Platform::GetUserPath().absolutePath() + "/.BlueBerryPrefs";
 }
-
 
 QString berry::PreferencesService::GetDefaultPreferencesFileName()
 {

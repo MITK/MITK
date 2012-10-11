@@ -48,13 +48,13 @@ PropertyListenerProxy::PropertyChange(PropertyChangeEvent::Pointer e)
   }
 }
 
-IPropertyChangeListener::Pointer PresentablePart::GetPropertyListenerProxy()
+IPropertyChangeListener* PresentablePart::GetPropertyListenerProxy()
 {
   if (lazyPropertyListenerProxy == 0)
   {
-    lazyPropertyListenerProxy = new PropertyListenerProxy(this);
+    lazyPropertyListenerProxy.reset(new PropertyListenerProxy(this));
   }
-  return lazyPropertyListenerProxy;
+  return lazyPropertyListenerProxy.data();
 }
 
 WorkbenchPartReference::Pointer PresentablePart::GetPartReference() const
@@ -99,13 +99,12 @@ PresentablePart::~PresentablePart()
   this->GetPane()->RemovePropertyListener(this->GetPropertyListenerProxy());
 }
 
-void PresentablePart::AddPropertyListener(IPropertyChangeListener::Pointer listener)
+void PresentablePart::AddPropertyListener(IPropertyChangeListener* listener)
 {
   partPropertyChangeEvents.AddListener(listener);
 }
 
-void PresentablePart::RemovePropertyListener(
-    IPropertyChangeListener::Pointer listener)
+void PresentablePart::RemovePropertyListener(IPropertyChangeListener* listener)
 {
   partPropertyChangeEvents.RemoveListener(listener);
 }

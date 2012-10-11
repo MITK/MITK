@@ -208,12 +208,12 @@ void WorkbenchPart::FirePropertyChange(int propertyId)
   }
 }
 
-void WorkbenchPart::AddPropertyListener(IPropertyChangeListener::Pointer l)
+void WorkbenchPart::AddPropertyListener(IPropertyChangeListener* l)
 {
   partChangeEvents.AddListener(l);
 }
 
-void WorkbenchPart::RemovePropertyListener(IPropertyChangeListener::Pointer l)
+void WorkbenchPart::RemovePropertyListener(IPropertyChangeListener* l)
 {
   partChangeEvents.RemoveListener(l);
 }

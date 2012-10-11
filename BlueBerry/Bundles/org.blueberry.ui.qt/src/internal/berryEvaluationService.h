@@ -43,7 +43,7 @@ public:
    * @see IEvaluationService#AddEvaluationListener(Expression, IPropertyChangeListener, QString)
    */
   SmartPointer<IEvaluationReference> AddEvaluationListener(const SmartPointer<Expression>& expression,
-                                                           const SmartPointer<IPropertyChangeListener>& listener,
+                                                           IPropertyChangeListener* listener,
                                                            const QString& property);
 
   /*
@@ -79,12 +79,12 @@ public:
   /*
    * @see IEvaluationService#AddServiceListener(IPropertyChangeListener)
    */
-  void AddServiceListener(const SmartPointer<IPropertyChangeListener>& listener);
+  void AddServiceListener(IPropertyChangeListener *listener);
 
   /*
    * @see IEvaluationService#removeServiceListener(IPropertyChangeListener)
    */
-  void RemoveServiceListener(const SmartPointer<IPropertyChangeListener>& listener);
+  void RemoveServiceListener(IPropertyChangeListener* listener);
 
   /*
    * @see IEvaluationService#RequestEvaluation(QString)

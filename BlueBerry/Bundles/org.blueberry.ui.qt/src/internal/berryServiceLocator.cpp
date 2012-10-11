@@ -25,27 +25,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-ServiceLocator::ParentLocator::ParentLocator(const IServiceLocator::WeakPtr parent,
-    const QString& serviceInterface) :
-  locator(parent), key(serviceInterface)
+ServiceLocator::ParentLocator::ParentLocator(
+    IServiceLocator* parent,
+    const QString& serviceInterface)
+  : locator(parent), key(serviceInterface)
 {
-
 }
 
-Object::Pointer ServiceLocator::ParentLocator::GetService(
-    const QString& api)
+Object* ServiceLocator::ParentLocator::GetService(const QString& api)
 {
   if (key == api)
   {
     try {
-      return locator.Lock()->GetService(key);
+      return locator->GetService(key);
     }
     catch (const BadWeakPointerException& /*e*/)
     {
 
     }
   }
-  return Object::Pointer(0);
+  return NULL;
 }
 
 bool ServiceLocator::ParentLocator::HasService(const QString& api) const
@@ -63,7 +62,7 @@ ServiceLocator::ServiceLocator() :
 
 }
 
-ServiceLocator::ServiceLocator(const IServiceLocator::WeakPtr _parent,
+ServiceLocator::ServiceLocator(IServiceLocator* _parent,
     const IServiceFactory::ConstPointer _factory, IDisposable::WeakPtr _owner) :
   activated(false), factory(_factory), parent(_parent),
   disposed(false), owner(_owner)
@@ -77,8 +76,8 @@ void ServiceLocator::Activate()
   for (KeyToServiceMapType::iterator serviceItr = services.begin(); serviceItr
       != services.end(); ++serviceItr)
   {
-    Object::Pointer service = serviceItr.value();
-    if (INestable::Pointer nestableService = service.Cast<INestable>())
+    Object* service = serviceItr.value();
+    if (INestable* nestableService = dynamic_cast<INestable*>(service))
     {
       nestableService->Activate();
     }
@@ -92,8 +91,8 @@ void ServiceLocator::Deactivate()
   for (KeyToServiceMapType::iterator serviceItr = services.begin(); serviceItr
       != services.end(); ++serviceItr)
   {
-    Object::Pointer service = serviceItr.value();
-    if (INestable::Pointer nestableService = service.Cast<INestable>())
+    Object* service = serviceItr.value();
+    if (INestable* nestableService = dynamic_cast<INestable*>(service))
     {
       nestableService->Deactivate();
     }
@@ -106,27 +105,27 @@ void ServiceLocator::Dispose()
   for (KeyToServiceMapType::iterator serviceItr = services.begin(); serviceItr
       != services.end(); ++serviceItr)
   {
-    Object::Pointer object = serviceItr.value();
-    if (IDisposable::Pointer service = object.Cast<IDisposable>())
+    Object* object = serviceItr.value();
+    if (IDisposable* service = dynamic_cast<IDisposable*>(object))
     {
       service->Dispose();
     }
   }
   services.clear();
 
-  parent.Reset();
+  parent = 0;
   disposed = true;
 }
 
-Object::Pointer ServiceLocator::GetService(const QString& key)
+Object* ServiceLocator::GetService(const QString& key)
 {
   if (disposed)
   {
-    return Object::Pointer(0);
+    return NULL;
   }
 
   KeyToServiceMapType::const_iterator iter = services.find(key);
-  Object::Pointer service;
+  Object* service = NULL;
 
   if (iter != services.end())
   {
@@ -138,19 +137,20 @@ Object::Pointer ServiceLocator::GetService(const QString& key)
     // 1. check our local factory
     // 2. go to the registry
     // or 3. use the parent service
-    IServiceLocator::Pointer factoryParent(WorkbenchServiceRegistry::GLOBAL_PARENT);
-    if (!parent.Expired())
+    IServiceLocator::Pointer factoryParent = WorkbenchServiceRegistry::GLOBAL_PARENT;
+    if (parent)
     {
       factoryParent = new ParentLocator(parent, key);
     }
     if (factory)
     {
-      service = factory->Create(key, factoryParent, IServiceLocator::Pointer(this));
+      service = factory->Create(key, factoryParent.GetPointer(), this);
     }
     if (!service)
     {
       service = WorkbenchServiceRegistry::GetRegistry()->GetService(key,
-          factoryParent, ServiceLocator::Pointer(this));
+                                                                    factoryParent.GetPointer(),
+                                                                    this);
     }
     if (!service)
     {
@@ -180,7 +180,7 @@ bool ServiceLocator::HasService(const QString& key) const
 }
 
 void ServiceLocator::RegisterService(const QString& api,
-    Object::Pointer service) const
+    Object* service) const
 {
   if (api.isEmpty())
   {
@@ -194,9 +194,9 @@ void ServiceLocator::RegisterService(const QString& api,
 
   if (services.find(api) != services.end())
   {
-    Object::Pointer currentService = services[api];
+    Object* currentService = services[api];
     services.remove(api);
-    if (IDisposable::Pointer disposable = currentService.Cast<IDisposable>())
+    if (IDisposable* disposable = dynamic_cast<IDisposable*>(currentService))
     {
       disposable->Dispose();
     }
@@ -205,7 +205,7 @@ void ServiceLocator::RegisterService(const QString& api,
   if (service)
   {
     services.insert(api, service);
-    if (INestable::Pointer nestable = service.Cast<INestable>())
+    if (INestable* nestable = dynamic_cast<INestable*>(service))
     {
       if (activated)
       {

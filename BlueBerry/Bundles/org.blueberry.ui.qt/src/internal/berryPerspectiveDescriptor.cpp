@@ -84,7 +84,7 @@ PerspectiveDescriptor::PerspectiveDescriptor(const QString& id,
   {
     IStatus::Pointer status(new Status(
                               IStatus::ERROR_TYPE,
-                              PlatformUI::PLUGIN_ID,
+                              PlatformUI::PLUGIN_ID(),
                               0,
                               QString("Invalid extension (missing label, id or class name): ") + GetId()));
     throw CoreException(status);

@@ -22,8 +22,6 @@ namespace berry
 {
   struct IBerryPreferencesService : public IPreferencesService
   {
-    berryInterfaceMacro(IBerryPreferencesService, berry);
-
     ///
     /// Try to import the prefs from the given file.
     /// Existing properties will be overridden!
@@ -38,5 +36,7 @@ namespace berry
 
   };
 }  // namespace berry
+
+Q_DECLARE_INTERFACE(berry::IBerryPreferencesService, "org.blueberry.core.runtime.IBerryPreferencesService")
 
 #endif /*BERRYIBERRYPREFERENCESSERVICE_H_*/

@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryInternalMenuService.h"
 
+#include "berryIPropertyChangeListener.h"
+
 #include <QString>
 #include <QSet>
 
@@ -27,7 +29,6 @@ namespace berry {
 
 struct IEvaluationService;
 struct IEvaluationReference;
-struct IPropertyChangeListener;
 struct IContributionManager;
 struct IConfigurationElement;
 struct IRegistryChangeEvent;
@@ -44,7 +45,7 @@ class ToolBarManager;
  * This class is only intended for internal use.
  * </p>
  */
-class WorkbenchMenuService : public InternalMenuService
+class WorkbenchMenuService : public InternalMenuService, private IPropertyChangeListener
 {
 
 private:
@@ -110,8 +111,6 @@ private:
    * window.
    */
   IEvaluationService* evaluationService;
-
-  SmartPointer<IPropertyChangeListener> serviceListener;
 
   /**
    * The service locator into which this service will be inserted.
@@ -244,7 +243,9 @@ private:
 
   //SmartPointer<IActivityManagerListener> GetActivityManagerListener();
 
-  SmartPointer<IPropertyChangeListener> GetServiceListener();
+  void PropertyChange(const PropertyChangeEvent::Pointer& event);
+
+  IPropertyChangeListener* GetServiceListener();
 
   //void UpdateTrim(ToolBarManager* mgr);
 

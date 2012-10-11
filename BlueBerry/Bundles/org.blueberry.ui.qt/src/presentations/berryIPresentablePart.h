@@ -127,14 +127,14 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
      *
      * @param listener a property listener (not null)
      */
-    virtual void AddPropertyListener(IPropertyChangeListener::Pointer listener) = 0;
+    virtual void AddPropertyListener(IPropertyChangeListener* listener) = 0;
 
     /**
      * Remove a listener that was previously added using addPropertyListener.
      *
      * @param listener a property listener (not null)
      */
-    virtual void RemovePropertyListener(IPropertyChangeListener::Pointer listener) = 0;
+    virtual void RemovePropertyListener(IPropertyChangeListener* listener) = 0;
 
     /**
      * Returns the short name of the part. This is used as the text on

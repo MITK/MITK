@@ -39,10 +39,10 @@ private:
 
   IIntroSite::Pointer introSite;
 
-  IPropertyChangeListener::Pointer propChangeListener;
+  QScopedPointer<IPropertyChangeListener> propChangeListener;
   friend struct PropertyChangeIntAdapter<ViewIntroAdapterPart> ;
 
-  void PropertyChange(Object::Pointer source, int propId);
+  void PropertyChange(const Object::Pointer& source, int propId);
 
   //     bool handleZoomEvents = true;
 

@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-  const QString IPreferencesService::ID = "org.blueberry.core.runtime.preferences";
+IPreferencesService::~IPreferencesService()
+{
+}
 
 }

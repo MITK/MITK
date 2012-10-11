@@ -107,7 +107,7 @@ void PresentablePartFolder::InternalRemove(IPresentablePart::Pointer toRemove)
 
   if (std::find(partList.begin(), partList.end(), toRemove) != partList.end())
   {
-    toRemove->RemovePropertyListener(childPropertyChangeListener);
+    toRemove->RemovePropertyListener(childPropertyChangeListener.data());
     partList.removeAll(toRemove);
   }
 }
@@ -173,7 +173,7 @@ PresentablePartFolder::~PresentablePartFolder()
   for (QList<IPresentablePart::Pointer>::iterator iter = partList.begin(); iter
       != partList.end(); ++iter)
   {
-    (*iter)->RemovePropertyListener(childPropertyChangeListener);
+    (*iter)->RemovePropertyListener(childPropertyChangeListener.data());
   }
 
   for (QWidget* currentWidget = contentProxy; currentWidget != 0 && currentWidget
@@ -273,7 +273,7 @@ void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
 
   this->InitTab(item, part);
 
-  part->AddPropertyListener(childPropertyChangeListener);
+  part->AddPropertyListener(childPropertyChangeListener.data());
   partList.push_back(part);
 }
 

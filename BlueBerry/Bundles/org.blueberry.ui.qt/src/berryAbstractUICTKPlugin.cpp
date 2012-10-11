@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryImageDescriptor.h"
 #include "berryPlatformUI.h"
 #include "berryIPreferencesService.h"
+#include "berryIPreferences.h"
 
 #include <QIcon>
 #include <QImage>
@@ -68,6 +69,14 @@ IPreferencesService* AbstractUICTKPlugin::GetPreferencesService() const
     preferencesService = context->getService<IPreferencesService>(serviceRef);
   }
   return preferencesService;
+}
+
+SmartPointer<IPreferences> AbstractUICTKPlugin::GetPreferences() const
+{
+  IPreferencesService* prefService = this->GetPreferencesService();
+  if (prefService == NULL) return IPreferences::Pointer(0);
+
+  return prefService->GetSystemPreferences();
 }
 
 IWorkbench* AbstractUICTKPlugin::GetWorkbench()

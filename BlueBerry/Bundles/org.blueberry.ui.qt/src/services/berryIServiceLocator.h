@@ -23,18 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryObject.h>
 #include <berryMacros.h>
 
+#include <QObject>
+
 namespace berry {
 
 /**
  * <p>
  * A component with which one or more services are registered. The services can
- * be retrieved from this locator using some key -- typically the class
- * representing the interface the service must implement. For example:
+ * be retrieved from this locator using the service type. For example:
  * </p>
  *
  * <pre>
- * IHandlerService service = (IHandlerService) workbenchWindow
- *    .getService(IHandlerService.class);
+ * IHandlerService* service = workbenchWindow->GetService<IHandlerService>();
  * </pre>
  *
  * <p>
@@ -52,13 +52,17 @@ struct BERRY_UI_QT IServiceLocator : public virtual Object {
   /**
    * Retrieves the service corresponding to the given API.
    *
-   * @param api
+   * @tparam S
    *            This is the interface that the service implements. Must not be
    *            <code>null</code>.
    * @return The service, or <code>null</code> if no such service could be
    *         found.
    */
-  virtual Object::Pointer GetService(const QString& api) = 0;
+  template<class S>
+  S* GetService()
+  {
+    return dynamic_cast<S*>(this->GetService(qobject_interface_iid<S*>()));
+  }
 
   /**
    * Whether this service exists within the scope of this service locator.
@@ -66,14 +70,20 @@ struct BERRY_UI_QT IServiceLocator : public virtual Object {
    * parents. This method can be used to determine whether a particular
    * service supports nesting in this scope.
    *
-   * @param api
+   * @tparam S
    *            This is the interface that the service implements. Must not be
    *            <code>null</code>.
    * @return <code>true</code> iff the service locator can find a service
-   *         for the given API; <code>false</code> otherwise.
+   *         for the given interface; <code>false</code> otherwise.
    */
-  virtual bool HasService(const QString& api) const = 0;
+  template<class S>
+  bool HasService() const
+  {
+    return this->HasService(qobject_interface_iid<S*>());
+  }
 
+  virtual Object* GetService(const QString& api) = 0;
+  virtual bool HasService(const QString& api) const = 0;
 };
 
 }

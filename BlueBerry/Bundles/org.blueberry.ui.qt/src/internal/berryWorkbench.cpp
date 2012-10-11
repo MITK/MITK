@@ -253,12 +253,13 @@ Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor)
   this->advisor = advisor;
   Workbench::instance = this;
 
-  IServiceLocatorCreator::Pointer slc(new ServiceLocatorCreator());
-  this->serviceLocator =
-  slc->CreateServiceLocator(IServiceLocator::WeakPtr(),
-      IServiceFactory::ConstPointer(0),
-      IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
-  serviceLocator->RegisterService(IServiceLocatorCreator::GetManifestName(), slc);
+  serviceLocatorCreator.reset(new ServiceLocatorCreator());
+  serviceLocatorCreator->Register();
+  this->serviceLocator = serviceLocatorCreator->CreateServiceLocator(
+        NULL,
+        IServiceFactory::ConstPointer(0),
+        IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
+  serviceLocator->RegisterService(serviceLocatorCreator.data());
   returnCode = PlatformUI::RETURN_UNSTARTABLE;
 }
 
@@ -287,7 +288,7 @@ Workbench::~Workbench()
   this->UnRegister(false);
 }
 
-Object::Pointer Workbench::GetService(const QString& key)
+Object* Workbench::GetService(const QString& key)
 {
   return serviceLocator->GetService(key);
 }
@@ -318,12 +319,13 @@ bool Workbench::Init()
   // TODO Correctly order service initialization
   // there needs to be some serious consideration given to
   // the services, and hooking them up in the correct order
-  EvaluationService::Pointer evaluationService(new EvaluationService());
+  evaluationService.reset(new EvaluationService());
+  evaluationService->Register();
 
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
   //
   //      public void runWithException() {
-  serviceLocator->RegisterService(IEvaluationService::GetManifestName(), evaluationService);
+  serviceLocator->RegisterService(evaluationService.data());
   //      }
   //    });
 
@@ -600,9 +602,9 @@ void Workbench::InitializeDefaultServices()
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
   //
   //      public void runWithException() {
-  Object::Pointer service(new SaveablesList());
-  serviceLocator->RegisterService(ISaveablesLifecycleListener::GetManifestName(),
-      service);
+  saveablesList.reset(new SaveablesList());
+  saveablesList->Register();
+  serviceLocator->RegisterService(saveablesList.data());
   //      }});
   //
 
@@ -622,9 +624,10 @@ void Workbench::InitializeDefaultServices()
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
   //
   //      public void runWithException() {
-  ICommandService::Pointer commandService(new CommandService(commandManager.data()));
+  commandService.reset(new CommandService(commandManager.data()));
+  commandService->Register();
   commandService->ReadRegistry();
-  serviceLocator->RegisterService(ICommandService::GetManifestName(), commandService);
+  serviceLocator->RegisterService(commandService.data());
   //      }});
   //
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
@@ -668,9 +671,10 @@ void Workbench::InitializeDefaultServices()
   //    serviceLocator.registerService(ICommandImageService.class,
   //        commandImageService);
 
-  WorkbenchMenuService::Pointer menuService(new WorkbenchMenuService(serviceLocator.GetPointer()));
+  menuService.reset(new WorkbenchMenuService(serviceLocator.GetPointer()));
+  menuService->Register();
 
-  serviceLocator->RegisterService(IMenuService::GetManifestName(), menuService);
+  serviceLocator->RegisterService(menuService.data());
   // the service must be registered before it is initialized - its
   // initialization uses the service locator to address a dependency on
   // the menu service

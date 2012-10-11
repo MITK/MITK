@@ -56,7 +56,7 @@ void ViewIntroAdapterPart::CreatePartControl(void* parent)
 ViewIntroAdapterPart::~ViewIntroAdapterPart()
 {
   //setBarVisibility(true);
-  introPart->RemovePropertyListener(propChangeListener);
+  introPart->RemovePropertyListener(propChangeListener.data());
   GetSite()->GetWorkbenchWindow()->GetWorkbench()->GetIntroManager()->CloseIntro(
       introPart);
 }
@@ -86,7 +86,7 @@ void ViewIntroAdapterPart::Init(IViewSite::Pointer site,
     introPart = workbench->GetWorkbenchIntroManager() ->CreateNewIntroPart();
     // reset the part name of this view to be that of the intro title
     SetPartName(introPart->GetPartName());
-    introPart->AddPropertyListener(propChangeListener);
+    introPart->AddPropertyListener(propChangeListener.data());
     introSite
         = IIntroSite::Pointer(new IntroPartAdapterSite(site, workbench->GetIntroDescriptor()));
     introPart->Init(introSite, memento);
@@ -102,7 +102,7 @@ void ViewIntroAdapterPart::Init(IViewSite::Pointer site,
   }
 }
 
-void ViewIntroAdapterPart::PropertyChange(Object::Pointer /*source*/,
+void ViewIntroAdapterPart::PropertyChange(const Object::Pointer& /*source*/,
     int propId)
 {
   FirePropertyChange(propId);

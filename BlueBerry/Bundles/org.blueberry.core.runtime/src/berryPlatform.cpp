@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "berryPlatform.h"
-#include <berryIExtensionPointService.h>
 #include "internal/berryInternalPlatform.h"
 
 namespace berry {
@@ -77,6 +76,11 @@ QString Platform::ARG_XARGS = "xargs";
 QDir Platform::GetConfigurationPath()
 {
   return InternalPlatform::GetInstance()->GetConfigurationPath();
+}
+
+IAdapterManager* Platform::GetAdapterManager()
+{
+  return InternalPlatform::GetInstance()->GetAdapterManager();
 }
 
 IExtensionRegistry *Platform::GetExtensionRegistry()
@@ -202,11 +206,6 @@ void Platform::GetOptionSet(Poco::Util::OptionSet& os)
 Poco::Util::LayeredConfiguration& Platform::GetConfiguration()
 {
   return InternalPlatform::GetInstance()->GetConfiguration();
-}
-
-ServiceRegistry& Platform::GetServiceRegistry()
-{
-  return InternalPlatform::GetInstance()->GetServiceRegistry();
 }
 
 QSharedPointer<ctkPlugin> Platform::GetCTKPlugin(const QString& symbolicName)

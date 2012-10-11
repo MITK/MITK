@@ -311,10 +311,10 @@ namespace berry {
 //
 //  const QString WorkbenchRegistryConstants::EXTENSION_ACCELERATOR_SCOPES = PlatformUI::PLUGIN_ID
 //      + '.' + PL_ACCELERATOR_SCOPES;
-//
-//  const QString WorkbenchRegistryConstants::EXTENSION_ACTION_DEFINITIONS = PlatformUI::PLUGIN_ID
-//      + '.' + PL_ACTION_DEFINITIONS;
-//
+
+  const QString WorkbenchRegistryConstants::EXTENSION_ACTION_DEFINITIONS = PlatformUI::PLUGIN_ID()
+      + '.' + PL_ACTION_DEFINITIONS;
+
 //  const QString WorkbenchRegistryConstants::EXTENSION_ACTION_SETS = PlatformUI::PLUGIN_ID
 //      + '.' + WorkbenchRegistryConstants::PL_ACTION_SETS;
 //
@@ -323,30 +323,30 @@ namespace berry {
 //
 //  const QString WorkbenchRegistryConstants::EXTENSION_COMMAND_IMAGES = PlatformUI::PLUGIN_ID
 //      + '.' + PL_COMMAND_IMAGES;
-//
-//  const QString WorkbenchRegistryConstants::EXTENSION_COMMANDS = PlatformUI::PLUGIN_ID + '.'
-//      + PL_COMMANDS;
-//
+
+  const QString WorkbenchRegistryConstants::EXTENSION_COMMANDS = PlatformUI::PLUGIN_ID() + '.'
+      + PL_COMMANDS;
+
 //  const QString WorkbenchRegistryConstants::EXTENSION_CONTEXTS = PlatformUI::PLUGIN_ID + '.'
 //      + PL_CONTEXTS;
 //
 //  const QString WorkbenchRegistryConstants::EXTENSION_EDITOR_ACTIONS = PlatformUI::PLUGIN_ID
 //      + '.' + PL_EDITOR_ACTIONS;
-//
-//  const QString WorkbenchRegistryConstants::EXTENSION_HANDLERS = PlatformUI::PLUGIN_ID + '.'
-//      + PL_HANDLERS;
-//
-//  const QString WorkbenchRegistryConstants::EXTENSION_MENUS = PlatformUI::PLUGIN_ID + '.'
-//      + PL_MENUS;
-//
-//  const QString WorkbenchRegistryConstants::COMMON_MENU_ADDITIONS = PlatformUI::PLUGIN_ID + '.'
-//      + PL_MENUS + '2';
-//
-//  const QString WorkbenchRegistryConstants::EXTENSION_POPUP_MENUS = PlatformUI::PLUGIN_ID
-//      + '.' + PL_POPUP_MENU;
-//
-//  const QString WorkbenchRegistryConstants::EXTENSION_VIEW_ACTIONS = PlatformUI::PLUGIN_ID
-//      + '.' + PL_VIEW_ACTIONS;
+
+  const QString WorkbenchRegistryConstants::EXTENSION_HANDLERS = PlatformUI::PLUGIN_ID() + '.'
+      + PL_HANDLERS;
+
+  const QString WorkbenchRegistryConstants::EXTENSION_MENUS = PlatformUI::PLUGIN_ID() + '.'
+      + PL_MENUS;
+
+  const QString WorkbenchRegistryConstants::COMMON_MENU_ADDITIONS = PlatformUI::PLUGIN_ID() + '.'
+      + PL_MENUS + '2';
+
+  const QString WorkbenchRegistryConstants::EXTENSION_POPUP_MENUS = PlatformUI::PLUGIN_ID()
+      + '.' + PL_POPUP_MENU;
+
+  const QString WorkbenchRegistryConstants::EXTENSION_VIEW_ACTIONS = PlatformUI::PLUGIN_ID()
+      + '.' + PL_VIEW_ACTIONS;
 
   const QString WorkbenchRegistryConstants::POSITION_AFTER = "after"; //$NON-NLS-1$
 

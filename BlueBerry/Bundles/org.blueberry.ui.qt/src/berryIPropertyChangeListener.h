@@ -43,25 +43,23 @@ namespace berry
  * </pre>
  * </p>
  */
-struct BERRY_UI_QT IPropertyChangeListener: public virtual Object
+struct BERRY_UI_QT IPropertyChangeListener
 {
-
-  berryInterfaceMacro(IPropertyChangeListener, berry);
 
   virtual ~IPropertyChangeListener();
 
   struct BERRY_UI_QT Events {
 
-    typedef Message1<PropertyChangeEvent::Pointer> EventType;
+    typedef Message1<const PropertyChangeEvent::Pointer&> EventType;
 
     EventType propertyChange;
 
-    void AddListener(IPropertyChangeListener::Pointer listener);
-    void RemoveListener(IPropertyChangeListener::Pointer listener);
+    void AddListener(IPropertyChangeListener* listener);
+    void RemoveListener(IPropertyChangeListener* listener);
 
   private:
 
-    typedef MessageDelegate1<IPropertyChangeListener, PropertyChangeEvent::Pointer> Delegate;
+    typedef MessageDelegate1<IPropertyChangeListener, const PropertyChangeEvent::Pointer&> Delegate;
   };
 
   /**
@@ -74,18 +72,18 @@ struct BERRY_UI_QT IPropertyChangeListener: public virtual Object
    * @param event the property change event object describing which property
    * changed and how
    */
-  virtual void PropertyChange(PropertyChangeEvent::Pointer event);
+  virtual void PropertyChange(const PropertyChangeEvent::Pointer& event);
 
-  virtual void PropertyChange(Object::Pointer /*source*/, int /*propId*/) {}
+  virtual void PropertyChange(const Object::Pointer& /*source*/, int /*propId*/) {}
 };
 
 template<typename R>
-struct PropertyChangeAdapter: public IPropertyChangeListener
+struct PropertyChangeAdapter : public IPropertyChangeListener
 {
 
   typedef R Listener;
   typedef void
-      (R::*Callback)(PropertyChangeEvent::Pointer);
+      (R::*Callback)(const PropertyChangeEvent::Pointer&);
 
   PropertyChangeAdapter(R* l, Callback c) :
     listener(l), callback(c)
@@ -96,7 +94,7 @@ struct PropertyChangeAdapter: public IPropertyChangeListener
 
   using IPropertyChangeListener::PropertyChange;
 
-  void PropertyChange(PropertyChangeEvent::Pointer event)
+  void PropertyChange(const PropertyChangeEvent::Pointer& event)
   {
     (listener->*callback)(event);
   }
@@ -113,7 +111,7 @@ struct PropertyChangeIntAdapter: public IPropertyChangeListener
 
   typedef R Listener;
   typedef void
-      (R::*Callback)(Object::Pointer, int);
+      (R::*Callback)(const Object::Pointer&, int);
 
   PropertyChangeIntAdapter(R* l, Callback c) :
     listener(l), callback(c)
@@ -124,7 +122,7 @@ struct PropertyChangeIntAdapter: public IPropertyChangeListener
 
   using IPropertyChangeListener::PropertyChange;
 
-  void PropertyChange(Object::Pointer source, int propId)
+  void PropertyChange(const Object::Pointer& source, int propId)
   {
     (listener->*callback)(source, propId);
   }

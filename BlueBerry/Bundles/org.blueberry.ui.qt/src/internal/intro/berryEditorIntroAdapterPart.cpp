@@ -64,7 +64,7 @@ EditorIntroAdapterPart::~EditorIntroAdapterPart()
   //setBarVisibility(true);
   if(introPart)
   {
-    introPart->RemovePropertyListener(propChangeListener);
+    introPart->RemovePropertyListener(propChangeListener.data());
     GetSite()->GetWorkbenchWindow()->GetWorkbench()->GetIntroManager()->CloseIntro(
       introPart);
   }
@@ -94,7 +94,7 @@ void EditorIntroAdapterPart::Init(IEditorSite::Pointer site,
     introPart = workbench->GetWorkbenchIntroManager()->CreateNewIntroPart();
     // reset the part name of this view to be that of the intro title
     SetPartName(introPart->GetPartName());
-    introPart->AddPropertyListener(propChangeListener);
+    introPart->AddPropertyListener(propChangeListener.data());
     introSite
         = IIntroSite::Pointer(new IntroPartAdapterSite(site, workbench->GetIntroDescriptor()));
     introPart->Init(introSite, IMemento::Pointer(0));
@@ -133,7 +133,7 @@ bool EditorIntroAdapterPart::IsSaveAsAllowed() const
   return false;
 }
 
-void EditorIntroAdapterPart::PropertyChange(Object::Pointer /*source*/,
+void EditorIntroAdapterPart::PropertyChange(const Object::Pointer& /*source*/,
     int propId)
 {
   FirePropertyChange(propId);

@@ -78,7 +78,7 @@ private:
 
   struct GlobalParentLocator: public IServiceLocator
   {
-    Object::Pointer GetService(const QString& api);
+    Object* GetService(const QString& api);
     bool HasService(const QString& api) const;
   };
 
@@ -91,8 +91,8 @@ public:
    */
   static const IServiceLocator::Pointer GLOBAL_PARENT; // = new GlobalParentLocator();
 
-  Object::Pointer GetService(const QString& key,
-      const IServiceLocator::Pointer parentLocator, const SmartPointer<const ServiceLocator> locator);
+  Object* GetService(const QString& key,
+                     IServiceLocator* parentLocator, ServiceLocator* locator);
 
   QList<SmartPointer<ISourceProvider> > GetSourceProviders() const;
 

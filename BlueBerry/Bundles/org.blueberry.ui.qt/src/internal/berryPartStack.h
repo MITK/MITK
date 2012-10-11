@@ -234,9 +234,9 @@ public:
      *
      * @param listener
      */
-    public: void AddListener(IPropertyChangeListener::Pointer listener);
+    public: void AddListener(IPropertyChangeListener* listener);
 
-    public: void RemoveListener(IPropertyChangeListener::Pointer listener);
+    public: void RemoveListener(IPropertyChangeListener* listener);
 
     public: int GetAppearance() const;
 

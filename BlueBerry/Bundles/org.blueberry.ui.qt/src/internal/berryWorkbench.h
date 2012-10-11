@@ -42,6 +42,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+struct ICommandService;
+struct IEvaluationService;
+struct IMenuService;
+struct IServiceLocatorCreator;
+struct ISaveablesLifecycleListener;
+
 class CommandManager;
 class ViewRegistry;
 class EditorRegistry;
@@ -114,7 +120,7 @@ public:
    *
    * @see org.blueberry.ui.services.IServiceLocator#getService(java.lang.Object)
    */
-  Object::Pointer GetService(const QString& key);
+  Object* GetService(const QString& key);
 
   /*
    * (non-Javadoc)
@@ -446,6 +452,10 @@ private:
    */
   ServiceLocator::Pointer serviceLocator;
 
+  QScopedPointer<IEvaluationService, QScopedPointerObjectDeleter> evaluationService;
+
+  QScopedPointer<ISaveablesLifecycleListener, QScopedPointerObjectDeleter> saveablesList;
+
   /**
    * The single instance of the command manager used by the workbench. This is
    * initialized in <code>Workbench.init(Display)</code> and then never
@@ -453,6 +463,10 @@ private:
    * initialization call has not yet completed.
    */
   QScopedPointer<CommandManager> commandManager;
+
+  QScopedPointer<ICommandService, QScopedPointerObjectDeleter> commandService;
+
+  QScopedPointer<IMenuService, QScopedPointerObjectDeleter> menuService;
 
   /**
    * A count of how many plug-ins were loaded while restoring the workbench
@@ -480,6 +494,8 @@ private:
   friend struct ServiceLocatorOwner;
 
   IDisposable::Pointer serviceLocatorOwner;
+
+  QScopedPointer<IServiceLocatorCreator, QScopedPointerObjectDeleter> serviceLocatorCreator;
 
   /**
    * A count of how many large updates are going on. This tracks nesting of

@@ -135,7 +135,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object { // IAdaptable {
      *
      * @param listener a property listener
      */
-    virtual void AddPropertyListener(IPropertyChangeListener::Pointer listener) = 0;
+    virtual void AddPropertyListener(IPropertyChangeListener* listener) = 0;
 
     /**
      * Creates the SWT controls for this intro part.
@@ -192,7 +192,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object { // IAdaptable {
      *
      * @param listener a property listener
      */
-    virtual void RemovePropertyListener(IPropertyChangeListener::Pointer listener) = 0;
+    virtual void RemovePropertyListener(IPropertyChangeListener* listener) = 0;
 
     /**
      * Asks this part to take focus within the workbench.

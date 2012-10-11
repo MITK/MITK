@@ -224,12 +224,12 @@ void EvaluationAuthority::RemoveEvaluationListener(const SmartPointer<IEvaluatio
   FirePropertyChange(ref, ValueOf(result), Object::Pointer(0));
 }
 
-void EvaluationAuthority::AddServiceListener(const SmartPointer<IPropertyChangeListener>& listener)
+void EvaluationAuthority::AddServiceListener(IPropertyChangeListener* listener)
 {
   serviceListeners.AddListener(listener);
 }
 
-void EvaluationAuthority::RemoveServiceListener(const SmartPointer<IPropertyChangeListener>& listener)
+void EvaluationAuthority::RemoveServiceListener(IPropertyChangeListener* listener)
 {
   serviceListeners.RemoveListener(listener);
 }

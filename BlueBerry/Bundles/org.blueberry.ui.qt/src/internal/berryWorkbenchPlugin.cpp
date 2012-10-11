@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIContributor.h"
 #include "berryILog.h"
 
+#include "berryIExtension.h"
+
 #include <QDebug>
 
 namespace berry
@@ -316,10 +318,23 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QtStylePreferencePage, context)
 
-  QtStyleManager* manager = new QtStyleManager();
-  styleManager = IQtStyleManager::Pointer(manager);
-  context->registerService<berry::IQtStyleManager>(manager);
+  styleManager.reset(new QtStyleManager());
+  context->registerService<berry::IQtStyleManager>(styleManager.data());
 
+  qDebug() << Platform::GetExtensionRegistry()->GetNamespaces();
+  QList<IExtension::Pointer> exs = Platform::GetExtensionRegistry()->GetExtensions("org.blueberry.ui.qt");
+  foreach(IExtension::Pointer ex, exs)
+  {
+    qDebug() << "org.blueberry.ui.qt extension: label" << ex->GetLabel();
+    qDebug() << "org.blueberry.ui.qt extension: unique id" << ex->GetUniqueIdentifier();
+  }
+  IExtensionPoint::Pointer xp = Platform::GetExtensionRegistry()->GetExtensionPoint("org.blueberry.ui.commands");
+  exs = xp->GetExtensions();
+  foreach(IExtension::Pointer ex, exs)
+  {
+    qDebug() << "org.blueberry.ui.commands extension:" << ex->GetUniqueIdentifier();
+    qDebug() << "\tcommand id:" << ex->GetConfigurationElements().front()->GetAttribute("id");
+  }
 
   // The UI plugin needs to be initialized so that it can install the callback in PrefUtil,
   // which needs to be done as early as possible, before the workbench
@@ -360,7 +375,7 @@ void WorkbenchPlugin::stop(ctkPluginContext* context)
 {
   AbstractUICTKPlugin::stop(context);
 
-  styleManager = 0;
+  styleManager.reset();
 
   delete perspRegistry;
   // avoid possible crash, see bug #18399

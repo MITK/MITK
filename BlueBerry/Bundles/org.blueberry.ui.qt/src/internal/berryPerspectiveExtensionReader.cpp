@@ -357,7 +357,7 @@ void PerspectiveExtensionReader::ExtendLayout(const QString& id,
   //tracker = extensionTracker;
   targetID = id;
   pageLayout = out;
-  this->ReadRegistry(PlatformUI::PLUGIN_ID,
+  this->ReadRegistry(PlatformUI::PLUGIN_ID(),
       WorkbenchRegistryConstants::PL_PERSPECTIVE_EXTENSIONS);
 }
 

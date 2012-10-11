@@ -94,7 +94,7 @@ void PartList::AddPart(WorkbenchPartReference::Pointer ref)
 {
   poco_assert(ref.IsNotNull());
 
-  ref->AddPropertyListener(IPropertyChangeListener::Pointer(this));
+  ref->AddPropertyListener(this);
 
 //  if (!this->Contains(ref))
 //  {
@@ -184,7 +184,7 @@ void PartList::RemovePart(WorkbenchPartReference::Pointer ref)
   }
 
   //std::remove(parts.begin(), parts.end(), ref);
-  ref->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
+  ref->RemovePropertyListener(this);
 
   this->FirePartRemoved(ref);
 }
@@ -318,8 +318,8 @@ void PartList::PartOpened(WorkbenchPartReference::Pointer ref)
   // open event was fired or that a closed editor was somehow activated)
   poco_assert((void*)activeEditorReference.Lock().GetPointer() != (void*)ref.GetPointer());
 
-  SaveablesList::Pointer modelManager = actualPart
-  ->GetSite()->GetService(ISaveablesLifecycleListener::GetManifestName()).Cast<SaveablesList>();
+  SaveablesList* modelManager = dynamic_cast<SaveablesList*>(
+        actualPart->GetSite()->GetService<ISaveablesLifecycleListener>());
   modelManager->PostOpen(actualPart);
 
   // Fire the "part opened" event

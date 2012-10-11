@@ -117,4 +117,6 @@ struct IMenuService : public IServiceWithSources
 
 }
 
+Q_DECLARE_INTERFACE(berry::IMenuService, "org.blueberry.ui.qt.IMenuService")
+
 #endif /* BERRYIMENUSERVICE_H_ */

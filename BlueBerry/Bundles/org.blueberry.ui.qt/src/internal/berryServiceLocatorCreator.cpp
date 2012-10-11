@@ -24,12 +24,11 @@ namespace berry {
 
 SmartPointer<IServiceLocator>
 ServiceLocatorCreator::CreateServiceLocator(
-      const WeakPointer<IServiceLocator> parent,
+      IServiceLocator* parent,
       const SmartPointer<const IServiceFactory> factory,
       WeakPointer<IDisposable> owner)
 {
-  IServiceLocator::WeakPtr weakParent(parent);
-  IServiceLocator::Pointer locator(new ServiceLocator(weakParent, factory, owner));
+  IServiceLocator::Pointer locator(new ServiceLocator(parent, factory, owner));
   return locator;
 }
 

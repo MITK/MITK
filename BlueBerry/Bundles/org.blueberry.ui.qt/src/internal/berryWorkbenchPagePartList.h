@@ -34,7 +34,7 @@ class WorkbenchPagePartList : public PartList
 {
 public:
 
-  berryObjectMacro(WorkbenchPagePartList);
+  berryObjectMacro(WorkbenchPagePartList)
 
 private:
 

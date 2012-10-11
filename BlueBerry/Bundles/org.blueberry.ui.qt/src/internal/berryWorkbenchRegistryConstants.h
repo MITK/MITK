@@ -129,7 +129,7 @@ struct WorkbenchRegistryConstants {
   static const QString ATT_CONTRIBUTOR_CLASS; // "contributorClass";
 
   /**
-   * The name of the attribute storing the AbstractParameterValueConverter for
+   * The name of the attribute storing the IParameterValueConverter for
    * a commandParameterType.
    */
   static const QString ATT_CONVERTER; // "converter";

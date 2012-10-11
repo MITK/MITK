@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPlatform.h"
 #include "berryIConfigurationElement.h"
-#include "berryIExtensionPointService.h"
 
 #include "internal/berryWorkbench.h"
 
@@ -28,9 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const QString PlatformUI::PLUGIN_ID = "org.blueberry.ui";
-const QString PlatformUI::XP_WORKBENCH = PlatformUI::PLUGIN_ID + ".workbench";
-const QString PlatformUI::XP_VIEWS = PlatformUI::PLUGIN_ID + ".views";
+const QString PlatformUI::PLUGIN_ID() { static QString str = "org.blueberry.ui"; return str; }
+const QString PlatformUI::XP_WORKBENCH = PlatformUI::PLUGIN_ID() + ".workbench";
+const QString PlatformUI::XP_VIEWS = PlatformUI::PLUGIN_ID() + ".views";
 
 const int PlatformUI::RETURN_OK = 0;
 const int PlatformUI::RETURN_RESTART = 1;
@@ -40,22 +39,6 @@ const int PlatformUI::RETURN_EMERGENCY_CLOSE = 3;
 int
 PlatformUI::CreateAndRunWorkbench(Display* display, WorkbenchAdvisor* advisor)
 {
-//  QList<IConfigurationElement::Pointer> extensions(
-//    Platform::GetExtensionPointService()->GetConfigurationElementsFor(PlatformUI::XP_WORKBENCH));
-//
-//  for (unsigned int i = 0; i < extensions.size(); ++i)
-//  {
-//    if (extensions[i]->GetName() == "workbench")
-//    {
-//
-//      m_Workbench = extensions[i]->CreateExecutableExtension<berry::Workbench>("berryWorkbench", "class");
-//      m_Workbench->InternalInit(advisor);
-//      return m_Workbench->RunUI();
-//    }
-//  }
-//
-//  throw WorkbenchException("No registered workbench extension found");
-
   return Workbench::CreateAndRunWorkbench(display, advisor);
 }
 

@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QList>
 
+#include <org_blueberry_core_runtime_Export.h>
+
 namespace berry {
 
 struct IExtension;
@@ -35,7 +37,7 @@ struct IExtensionPoint;
  * <p>
  * @see IExtensionRegistry#AddListener(IRegistryEventListener, QString)
  */
-struct IRegistryEventListener
+struct org_blueberry_core_runtime_EXPORT IRegistryEventListener
 {
 
   struct Events {

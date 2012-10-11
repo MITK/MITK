@@ -51,7 +51,7 @@ private:
   //List listeners = new ArrayList();
 
   // Lazily initialized. Use getPropertyListenerProxy() to access.
-  IPropertyChangeListener::Pointer lazyPropertyListenerProxy;
+  QScopedPointer<IPropertyChangeListener> lazyPropertyListenerProxy;
 
   //ListenerList partPropertyChangeListeners = new ListenerList();
   IPropertyChangeListener::Events partPropertyChangeEvents;
@@ -92,7 +92,7 @@ private:
 
   friend struct PropertyListenerProxy;
 
-  IPropertyChangeListener::Pointer GetPropertyListenerProxy();
+  IPropertyChangeListener* GetPropertyListenerProxy();
 
   WorkbenchPartReference::Pointer GetPartReference() const;
 
@@ -124,9 +124,9 @@ public:
   //        }
   //    }
 
-  void AddPropertyListener(IPropertyChangeListener::Pointer listener);
+  void AddPropertyListener(IPropertyChangeListener* listener);
 
-  void RemovePropertyListener(IPropertyChangeListener::Pointer listener);
+  void RemovePropertyListener(IPropertyChangeListener* listener);
 
   //    void addPartPropertyListener(IPropertyChangeListener listener) {
   //      partPropertyChangeListeners.add(listener);

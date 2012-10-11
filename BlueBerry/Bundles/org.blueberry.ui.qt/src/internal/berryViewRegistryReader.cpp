@@ -38,8 +38,8 @@ void ViewRegistryReader::ReadViews(ViewRegistry* out)
 {
   // this does not seem to really ever be throwing an the exception
   viewRegistry = out;
-  this->ReadRegistry(PlatformUI::PLUGIN_ID,
-      WorkbenchRegistryConstants::PL_VIEWS);
+  this->ReadRegistry(PlatformUI::PLUGIN_ID(),
+                     WorkbenchRegistryConstants::PL_VIEWS);
 }
 
 void ViewRegistryReader::ReadCategory(const IConfigurationElement::Pointer& element)

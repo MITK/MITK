@@ -200,7 +200,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     //PartPane pane = getPane();
     IViewReference::Pointer viewRef(this);
     ViewSite::Pointer site(new ViewSite(viewRef, part,
-        factory->GetWorkbenchPage(), GetId(), PlatformUI::PLUGIN_ID, label));
+                                        factory->GetWorkbenchPage(), GetId(), PlatformUI::PLUGIN_ID(), label));
     //site.setActionBars(new ViewActionBars(factory.page.getActionBars(),
     //    site, (ViewPane) pane));
     try

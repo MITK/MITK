@@ -1156,9 +1156,9 @@ void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
  // hook up the listeners to update the window title
  titlePartListener = new PartListenerForTitle(this);
  titlePerspectiveListener = new PerspectiveListenerForTitle(this);
- editorPropertyListener = new berry::PropertyChangeIntAdapter<
+ editorPropertyListener.reset(new berry::PropertyChangeIntAdapter<
   QmitkExtWorkbenchWindowAdvisor>(this,
-  &QmitkExtWorkbenchWindowAdvisor::PropertyChange);
+  &QmitkExtWorkbenchWindowAdvisor::PropertyChange));
 
  //    configurer.getWindow().addPageListener(new IPageListener() {
  //      public void pageActivated(IWorkbenchPage page) {
@@ -1290,7 +1290,7 @@ void QmitkExtWorkbenchWindowAdvisor::UpdateTitle(bool editorHidden)
 
  if (!lastActiveEditor.Expired())
  {
-  lastActiveEditor.Lock()->RemovePropertyListener(editorPropertyListener);
+  lastActiveEditor.Lock()->RemovePropertyListener(editorPropertyListener.data());
  }
 
  lastActiveEditor = activeEditor;
@@ -1300,13 +1300,13 @@ void QmitkExtWorkbenchWindowAdvisor::UpdateTitle(bool editorHidden)
 
  if (activeEditor)
  {
-  activeEditor->AddPropertyListener(editorPropertyListener);
+  activeEditor->AddPropertyListener(editorPropertyListener.data());
  }
 
  RecomputeTitle();
 }
 
-void QmitkExtWorkbenchWindowAdvisor::PropertyChange(berry::Object::Pointer /*source*/, int propId)
+void QmitkExtWorkbenchWindowAdvisor::PropertyChange(const berry::Object::Pointer& /*source*/, int propId)
 {
  if (propId == berry::IWorkbenchPartConstants::PROP_TITLE)
  {

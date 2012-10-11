@@ -136,7 +136,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#addPropertyListener(org.eclipse.ui.IPropertyListener)
    */
-  void AddPropertyListener(IPropertyChangeListener::Pointer l);
+  void AddPropertyListener(IPropertyChangeListener* l);
 
   /**
    * The <code>IntroPart</code> implementation of this
@@ -194,7 +194,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#removePropertyListener(org.eclipse.ui.IPropertyListener)
    */
-  void RemovePropertyListener(IPropertyChangeListener::Pointer l);
+  void RemovePropertyListener(IPropertyChangeListener* l);
 
   /**
    * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart} method does nothing.

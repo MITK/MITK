@@ -55,7 +55,9 @@ public:
    * @param listener
    *            The listener to add; must not be <code>null</code>.
    */
-  void AddListener(IStateListener::Pointer listener);
+  virtual void AddListener(IStateListener* listener);
+
+  void AddListener(const IStateListener::Events::StateEvent::AbstractDelegate& delegate);
 
   /**
    * Returns the identifier for this state.
@@ -72,7 +74,7 @@ public:
    * @return The current value; may be anything.
    */
 
-  Object::Pointer GetValue() const;
+  virtual Object::Pointer GetValue() const;
 
   /**
    * Removes a listener to changes from this state.
@@ -80,7 +82,9 @@ public:
    * @param listener
    *            The listener to remove; must not be <code>null</code>.
    */
-  void RemoveListener(IStateListener::Pointer listener);
+  virtual void RemoveListener(IStateListener* listener);
+
+  void RemoveListener(const IStateListener::Events::StateEvent::AbstractDelegate& delegate);
 
   /**
    * Sets the identifier for this object.  This method should only be called
@@ -89,7 +93,7 @@ public:
    * @param id
    *            The id; must not be <code>null</code>.
    */
-  void SetId(const QString& id);
+  virtual void SetId(const QString& id);
 
   /**
    * Sets the value for this state object.
@@ -97,7 +101,7 @@ public:
    * @param value
    *            The value to set; may be anything.
    */
-  void SetValue(const Object::Pointer value);
+  virtual void SetValue(const Object::Pointer& value);
 
 
 protected:
@@ -108,8 +112,9 @@ protected:
    * @param oldValue
    *            The old value; may be anything.
    */
-  void FireStateChanged(Object::Pointer oldValue);
+  void FireStateChanged(const Object::Pointer& oldValue);
 
+  IStateListener::Events stateEvents;
 
 private:
 
@@ -124,10 +129,10 @@ private:
    */
   Object::Pointer value;
 
-  IStateListener::Events stateEvents;
-
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::State, "org.blueberry.core.commands.State")
 
 #endif /*BERRYSTATE_H_*/

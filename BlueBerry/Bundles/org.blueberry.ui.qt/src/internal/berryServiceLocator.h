@@ -39,20 +39,20 @@ private:
   class ParentLocator: public IServiceLocator
   {
 
-    const IServiceLocator::WeakPtr locator;
+    IServiceLocator* const locator;
     const QString& key;
 
   public:
 
-    ParentLocator(const IServiceLocator::WeakPtr parent,
-        const QString& serviceInterface);
+    ParentLocator(IServiceLocator* parent,
+                  const QString& serviceInterface);
 
     /*
      * (non-Javadoc)
      *
      * @see org.blueberry.ui.services.IServiceLocator#getService(java.lang.Class)
      */
-    Object::Pointer GetService(const QString& api);
+    Object* GetService(const QString& api);
 
     /*
      * (non-Javadoc)
@@ -69,13 +69,13 @@ private:
    * locator, then the parent is asked. This value may be <code>null</code>
    * if there is no parent.
    */
-  IServiceLocator::WeakPtr parent;
+  IServiceLocator* parent;
 
   /**
    * The map of services This value is <code>null</code> until a service is
    * registered.
    */
-  typedef QHash<const QString, Object::Pointer> KeyToServiceMapType;
+  typedef QHash<const QString, Object*> KeyToServiceMapType;
   mutable KeyToServiceMapType services;
 
   bool disposed;
@@ -101,7 +101,7 @@ public:
    *            a local factory that can provide services at this level
    * @param owner
    */
-  ServiceLocator(const IServiceLocator::WeakPtr parent, const SmartPointer<const IServiceFactory> factory,
+  ServiceLocator(IServiceLocator* parent, const SmartPointer<const IServiceFactory> factory,
       IDisposable::WeakPtr owner);
 
   void Activate();
@@ -110,7 +110,8 @@ public:
 
   void Dispose();
 
-  Object::Pointer GetService(const QString& key);
+  using IServiceLocator::GetService;
+  Object* GetService(const QString& key);
 
   bool HasService(const QString& key) const;
 
@@ -126,7 +127,11 @@ public:
    *            The service to register. This must be some implementation of
    *            <code>api</code>. This value must not be <code>null</code>.
    */
-  void RegisterService(const QString& api, Object::Pointer service) const;
+  template<class S>
+  void RegisterService(S* service) const
+  {
+    this->RegisterService(qobject_interface_iid<S*>(), service);
+  }
 
   /**
    * @return
@@ -139,6 +144,10 @@ public:
    * available). Notify the owner of the locator about this.
    */
   void UnregisterServices(const QList<QString> &serviceNames);
+
+private:
+
+  void RegisterService(const QString& api, Object* service) const;
 
 };
 

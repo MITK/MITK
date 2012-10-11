@@ -27,23 +27,23 @@ IPropertyChangeListener::~IPropertyChangeListener()
 
 void
 IPropertyChangeListener::Events
-::AddListener(IPropertyChangeListener::Pointer listener)
+::AddListener(IPropertyChangeListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  this->propertyChange += Delegate(listener.GetPointer(), &IPropertyChangeListener::PropertyChange);
+  this->propertyChange += Delegate(listener, &IPropertyChangeListener::PropertyChange);
 }
 
 void
 IPropertyChangeListener::Events
-::RemoveListener(IPropertyChangeListener::Pointer listener)
+::RemoveListener(IPropertyChangeListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  this->propertyChange -= Delegate(listener.GetPointer(), &IPropertyChangeListener::PropertyChange);
+  this->propertyChange -= Delegate(listener, &IPropertyChangeListener::PropertyChange);
 }
 
-void IPropertyChangeListener::PropertyChange(PropertyChangeEvent::Pointer event)
+void IPropertyChangeListener::PropertyChange(const PropertyChangeEvent::Pointer& event)
 {
   if (event->GetProperty() == IWorkbenchPartConstants::INTEGER_PROPERTY)
   {

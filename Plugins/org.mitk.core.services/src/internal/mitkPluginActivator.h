@@ -30,7 +30,8 @@ class ModuleContext;
 
 namespace mitk
 {
-struct IDataStorageService;
+
+class DataStorageService;
 
 class org_mitk_core_services_Activator : public QObject, public ctkPluginActivator
 {
@@ -54,7 +55,7 @@ public:
 
 private:
 
-  berry::SmartPointer<IDataStorageService> dataStorageService;
+  QScopedPointer<DataStorageService> dataStorageService;
 
   QMap<long, QObject*> mapMitkIdToAdapter;
   QMap<long, ctkServiceRegistration> mapMitkIdToRegistration;

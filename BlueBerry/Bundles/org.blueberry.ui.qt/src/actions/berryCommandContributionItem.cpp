@@ -69,7 +69,9 @@ ContributionItem::Modes CommandContributionItem::modes = ContributionItem::MODE_
 
 CommandContributionItem::CommandContributionItem(
     const SmartPointer<CommandContributionItemParameter>& contributionParameters)
-  : ContributionItem(contributionParameters->id), action(0)
+  : ContributionItem(contributionParameters->id)
+  , action(0)
+  , checkedState(false)
 {
   this->icon = contributionParameters->icon;
   this->label = contributionParameters->label;
@@ -80,12 +82,9 @@ CommandContributionItem::CommandContributionItem(
   this->visibleEnabled = contributionParameters->visibleEnabled;
   this->mode = contributionParameters->mode;
 
-  menuService = contributionParameters->serviceLocator->GetService(
-        IMenuService::GetManifestName()).Cast<IMenuService> ();
-  commandService = contributionParameters->serviceLocator->GetService(
-      ICommandService::GetManifestName()).Cast<ICommandService> ();
-  handlerService = contributionParameters->serviceLocator->GetService(
-      IHandlerService::GetManifestName()).Cast<IHandlerService> ();
+  menuService = contributionParameters->serviceLocator->GetService<IMenuService>();
+  commandService = contributionParameters->serviceLocator->GetService<ICommandService>();
+  handlerService = contributionParameters->serviceLocator->GetService<IHandlerService>();
   //    bindingService = (IBindingService) contributionParameters.serviceLocator
   //        .getService(IBindingService.class);
 
@@ -411,8 +410,7 @@ void CommandContributionItem::SetImages(IServiceLocator* locator,
 {
   if (icon.isNull())
   {
-    ICommandImageService::Pointer service(
-          locator->GetService(ICommandImageService::GetManifestName()).Cast<ICommandImageService> ());
+    ICommandImageService* service = locator->GetService<ICommandImageService>();
     icon = service->GetImage(command->GetId(), iconStyle);
   }
 }

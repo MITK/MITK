@@ -29,8 +29,8 @@ namespace berry
 void EditorRegistryReader::AddEditors(EditorRegistry* registry)
 {
   this->editorRegistry = registry;
-  this->ReadRegistry(PlatformUI::PLUGIN_ID,
-      WorkbenchRegistryConstants::PL_EDITOR);
+  this->ReadRegistry(PlatformUI::PLUGIN_ID(),
+                     WorkbenchRegistryConstants::PL_EDITOR);
 }
 
 bool EditorRegistryReader::ReadElement(const IConfigurationElement::Pointer& element)

@@ -32,8 +32,8 @@ PerspectiveRegistryReader::PerspectiveRegistryReader()
 void PerspectiveRegistryReader::ReadPerspectives(PerspectiveRegistry* out)
 {
   registry = out;
-  this->ReadRegistry(PlatformUI::PLUGIN_ID,
-      WorkbenchRegistryConstants::PL_PERSPECTIVES);
+  this->ReadRegistry(PlatformUI::PLUGIN_ID(),
+                     WorkbenchRegistryConstants::PL_PERSPECTIVES);
 }
 
 bool PerspectiveRegistryReader::ReadElement(const IConfigurationElement::Pointer &element)

@@ -158,11 +158,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_runtime_Export.h>
 
-//#include "event/berryPlatformEvents.h"
-#include "service/berryServiceRegistry.h"
-
 #include <Poco/Util/LayeredConfiguration.h>
 #include <Poco/Util/OptionSet.h>
+
+#include <QDir>
+#include <QSharedPointer>
+
+class ctkPlugin;
 
 namespace Poco {
 
@@ -172,6 +174,7 @@ class Path;
 
 namespace berry {
 
+struct IAdapterManager;
 struct IBundle;
 struct IExtensionPointService;
 struct IExtensionRegistry;
@@ -250,6 +253,15 @@ public:
   static QString ARG_XARGS;
 
   /**
+   * Returns the adapter manager used for extending
+   * <code>IAdaptable</code> objects.
+   *
+   * @return the adapter manager for this platform
+   * @see IAdapterManager
+   */
+  static IAdapterManager* GetAdapterManager();
+
+  /**
    * Returns the extension registry for this platform.
    * May return <code>null</code> if the registry has not been created yet.
    *
@@ -270,8 +282,6 @@ public:
    * @return an object to interface into the preference mechanism
    */
   static IPreferencesService* GetPreferencesService();
-
-  //static PlatformEvents& GetEvents();
 
   /**
    * Returns the path of the configuration information
@@ -364,8 +374,6 @@ public:
   static QString GetExtendedApplicationArgs();
 
   static void GetOptionSet(Poco::Util::OptionSet &os);
-
-  static ServiceRegistry& GetServiceRegistry();
 
   /**
    * @param symbolicName

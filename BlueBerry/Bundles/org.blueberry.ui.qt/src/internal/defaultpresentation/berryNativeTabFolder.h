@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <internal/util/berryAbstractTabFolder.h>
 
-#include <berryIQtStyleManager.h>
-
 #include <QObject>
 
 class QFrame;
@@ -28,6 +26,8 @@ class QWidget;
 
 namespace berry
 {
+
+struct IQtStyleManager;
 
 class QCTabBar;
 
@@ -64,7 +64,7 @@ private:
   //
   //    };
 
-  IQtStyleManager::Pointer skinManager;
+  IQtStyleManager* skinManager;
 
   /**
    * @param item

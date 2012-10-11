@@ -3,7 +3,6 @@ set(MOC_H_FILES
 
   src/internal/berryCTKPluginListener.h
   src/internal/berryCTKPluginActivator.h
-  #src/internal/berryExtensionPointService.h
   src/internal/berryExtensionRegistry.h
   src/internal/berryPreferencesService.h
 )
@@ -14,7 +13,6 @@ set(CACHED_RESOURCE_FILES
 
 set(SRC_CPP_FILES
   berryBackingStoreException.cpp
-  #berryBundleLoader.cpp
   berryContributorFactory.cpp
   berryCoreException.cpp
   berryDebugBreakpointManager.cpp
@@ -23,7 +21,6 @@ set(SRC_CPP_FILES
   berryExtensionType.cpp
   berryIAdaptable.cpp
   berryIAdapterManager.cpp
-  #berryIBundleManifest.cpp
   berryIDebugObjectListener.cpp
   berryILog.cpp
   berryIPreferences.cpp
@@ -56,30 +53,20 @@ set(SRC_CPP_FILES
 
   # registry
   registry/berryIConfigurationElement.cpp
-  registry/berryIConfigurationElementLegacy.h
   registry/berryIContributor.cpp
   registry/berryIExecutableExtension.cpp
   registry/berryIExecutableExtensionFactory.cpp
   registry/berryIExtension.cpp
   registry/berryIExtensionPoint.cpp
-  registry/berryIExtensionPointService.cpp
   registry/berryIExtensionRegistry.cpp
   registry/berryInvalidRegistryObjectException.cpp
   registry/berryIRegistryEventListener.cpp
   registry/berryRegistryConstants.cpp
 
-  # service
-  service/berryService.cpp
-  service/berryServiceRegistry.cpp
 )
 
 set(INTERNAL_CPP_FILES
   berryAbstractPreferencesStorage.cpp
-  #berryBundle.cpp
-  #berryBundleContext.cpp
-  #berryBundleDirectory.cpp
-  #berryBundleManifest.cpp
-  #berryCodeCache.cpp
   berryCombinedEventDelta.cpp
   berryConfigurationElement.h
   berryConfigurationElement.cpp
@@ -89,12 +76,10 @@ set(INTERNAL_CPP_FILES
   berryCTKPluginActivator.cpp
   berryCTKPluginListener.cpp
   berryCTKPluginUtils.cpp
-  #berryDefaultActivator.cpp
   berryExtension.cpp
   #berryExtensionDelta.cpp
   berryExtensionHandle.cpp
   berryExtensionPoint.cpp
-  #berryExtensionPointService.cpp
   berryExtensionPointHandle.cpp
   berryExtensionRegistry.cpp
   berryExtensionsParser.cpp
@@ -122,9 +107,6 @@ set(INTERNAL_CPP_FILES
   berryRegistryStrategy.cpp
   berryRegistryTimestamp.cpp
   berryRegistrySupport.cpp
-  #berrySystemBundle.cpp
-  #berrySystemBundleActivator.cpp
-  #berrySystemBundleManifest.cpp
   berryTemporaryObjectManager.cpp
   berryThirdLevelConfigurationElementHandle.cpp
   berryXMLPreferencesStorage.cpp

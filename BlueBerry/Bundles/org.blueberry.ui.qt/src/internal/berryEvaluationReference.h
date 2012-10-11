@@ -28,7 +28,7 @@ class EvaluationReference : public EvaluationResultCache, public IEvaluationRefe
 
 private:
 
-  SmartPointer<IPropertyChangeListener> listener;
+  QScopedPointer<IPropertyChangeListener> listener;
   QString property;
   bool postingChanges;
 
@@ -40,13 +40,13 @@ public:
    * @param expression
    */
   EvaluationReference(const SmartPointer<Expression>& expression,
-                      const SmartPointer<IPropertyChangeListener>& listener,
+                      IPropertyChangeListener *listener,
                       const QString& property);
 
   /*
    * @see IEvaluationReference#GetListener()
    */
-  SmartPointer<IPropertyChangeListener> GetListener() const;
+  IPropertyChangeListener* GetListener() const;
 
   QString GetProperty() const;
 

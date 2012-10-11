@@ -23,7 +23,7 @@ namespace berry {
 IStatus::Pointer StatusUtil::NewStatus(IStatus::Severity severity, const QString& message,
                                        const Status::SourceLocation& sl)
 {
-  IStatus::Pointer status(new Status(severity, PlatformUI::PLUGIN_ID, severity, message, sl));
+  IStatus::Pointer status(new Status(severity, PlatformUI::PLUGIN_ID(), severity, message, sl));
   return status;
 }
 
@@ -43,7 +43,7 @@ IStatus::Pointer StatusUtil::NewStatus(IStatus::Severity severity, const QString
     }
   }
 
-  IStatus::Pointer status(new Status(severity, PlatformUI::PLUGIN_ID, severity,
+  IStatus::Pointer status(new Status(severity, PlatformUI::PLUGIN_ID(), severity,
                                      statusMessage, GetCause(exc), sl));
   return status;
 }

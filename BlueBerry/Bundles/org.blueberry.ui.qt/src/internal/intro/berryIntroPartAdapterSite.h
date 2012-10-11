@@ -57,7 +57,7 @@ public:
 //        return viewSite.getAdapter(adapter);
 //    }
 
-    Object::Pointer GetService(const QString& key);
+    Object* GetService(const QString& key);
 
     bool HasService(const QString& key) const;
 

@@ -80,11 +80,13 @@ struct BERRY_UI_QT IServiceLocatorCreator : public virtual Object
    *         an instance of {@link IDisposable}.
    */
   virtual SmartPointer<IServiceLocator> CreateServiceLocator(
-      const WeakPointer<IServiceLocator> parent,
+      IServiceLocator* parent,
       const SmartPointer<const IServiceFactory> factory,
       WeakPointer<IDisposable> owner) = 0;
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IServiceLocatorCreator, "org.blueberry.ui.qt.IServiceLocatorCreator")
 
 #endif /* BERRYISERVICELOCATORCREATOR_H_ */

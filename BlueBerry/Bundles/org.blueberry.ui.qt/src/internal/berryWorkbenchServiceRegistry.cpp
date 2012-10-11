@@ -30,8 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchRegistryConstants.h"
 #include "berrySourcePriorityNameMapping.h"
 
-#include <berryIExtensionPointService.h>
-
 namespace berry
 {
 
@@ -186,10 +184,10 @@ void WorkbenchServiceRegistry::ProcessVariables(
   }
 }
 
-Object::Pointer WorkbenchServiceRegistry::GlobalParentLocator::GetService(
+Object* WorkbenchServiceRegistry::GlobalParentLocator::GetService(
     const QString& /*api*/)
 {
-  return Object::Pointer(0);
+  return NULL;
 }
 
 bool WorkbenchServiceRegistry::GlobalParentLocator::HasService(
@@ -207,8 +205,8 @@ WorkbenchServiceRegistry* WorkbenchServiceRegistry::GetRegistry()
   return registry;
 }
 
-Object::Pointer WorkbenchServiceRegistry::GetService(const QString& key,
-    const IServiceLocator::Pointer parentLocator, const ServiceLocator::ConstPointer locator)
+Object* WorkbenchServiceRegistry::GetService(const QString& key,
+    IServiceLocator* parentLocator, ServiceLocator* locator)
 {
   ServiceFactoryHandle::Pointer handle(factories[key]);
   if (!handle)
@@ -217,14 +215,14 @@ Object::Pointer WorkbenchServiceRegistry::GetService(const QString& key,
   }
   if (handle)
   {
-    Object::Pointer result(handle->factory->Create(key, parentLocator, locator));
+    Object* result(handle->factory->Create(key, parentLocator, locator));
     if (result)
     {
       //handle->serviceLocators.insert(locator, new Object());
       return result;
     }
   }
-  return Object::Pointer(0);
+  return NULL;
 }
 
 QList<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProviders() const

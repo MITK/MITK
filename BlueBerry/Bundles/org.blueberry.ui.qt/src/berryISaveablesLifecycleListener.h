@@ -77,4 +77,6 @@ struct ISaveablesLifecycleListener : public virtual Object {
 
 }
 
+Q_DECLARE_INTERFACE(berry::ISaveablesLifecycleListener, "org.blueberry.ui.qt.ISaveablesLifecycleListener")
+
 #endif /* BERRYISAVEABLESLIFECYCLELISTENER_H_ */

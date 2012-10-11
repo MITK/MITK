@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <berryIExtensionPointService.h>
-
 #include "berryViewRegistry.h"
 
 #include "berryPlatformUI.h"

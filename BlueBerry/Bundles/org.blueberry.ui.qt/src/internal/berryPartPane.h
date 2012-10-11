@@ -392,9 +392,9 @@ public:
      */
   public: virtual void RemoveContributions();
 
-  public: void AddPropertyListener(IPropertyChangeListener::Pointer listener);
+  public: void AddPropertyListener(IPropertyChangeListener* listener);
 
-  public: void RemovePropertyListener(IPropertyChangeListener::Pointer listener);
+  public: void RemovePropertyListener(IPropertyChangeListener* listener);
 
   public: void FirePropertyChange(PropertyChangeEvent::Pointer event);
 

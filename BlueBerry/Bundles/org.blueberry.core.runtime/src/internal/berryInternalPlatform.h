@@ -23,10 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/SimpleFileChannel.h>
 #include <Poco/Util/Application.h>
 
-//#include "event/berryPlatformEvents.h"
-#include "service/berryServiceRegistry.h"
-//#include "berryExtensionPointService.h"
-
 #include <ctkServiceTracker.h>
 
 #include <QDir>
@@ -38,6 +34,7 @@ class ctkPluginContext;
 
 namespace berry {
 
+struct IAdapterManager;
 struct IExtensionRegistry;
 struct IPreferencesService;
 struct ILog;
@@ -45,7 +42,7 @@ struct ILog;
 class LogImpl;
 class PlatformLogChannel;
 
-class org_blueberry_core_runtime_EXPORT InternalPlatform : private Poco::Util::Application
+class InternalPlatform : private Poco::Util::Application
 {
 private:
 
@@ -55,8 +52,6 @@ private:
   bool m_Running;
 
   bool m_ConsoleLog;
-
-  ServiceRegistry* m_ServiceRegistry;
 
   QScopedPointer<ctkServiceTracker<berry::IPreferencesService*> > m_PreferencesTracker;
   QScopedPointer<ctkServiceTracker<berry::IExtensionRegistry*> > m_RegistryTracker;
@@ -88,7 +83,7 @@ private:
   InternalPlatform();
   //InternalPlatform(const InternalPlatform&) : m_EventStarted(PlatformEvent::EV_PLATFORM_STARTED) {};
 
-  void AssertInitialized();
+  void AssertInitialized() const;
 
   void handlePreloadLibraryOption(const std::string &name, const std::string &value);
 
@@ -112,9 +107,7 @@ public:
 
   ctkPluginContext* GetCTKPluginFrameworkContext() const;
 
-  /// Returns a ServiceRegistry object for registering
-  /// and accessing services from different plugins
-  ServiceRegistry& GetServiceRegistry();
+  IAdapterManager* GetAdapterManager() const;
 
   IExtensionRegistry* GetExtensionRegistry();
 

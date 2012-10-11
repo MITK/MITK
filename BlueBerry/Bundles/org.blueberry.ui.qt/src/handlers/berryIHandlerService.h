@@ -79,7 +79,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    *         activation that is passed as a parameter).
    * @since 3.2
    */
-  virtual SmartPointer<IHandlerActivation> ActivateHandler(SmartPointer<IHandlerActivation> activation) = 0;
+  virtual SmartPointer<IHandlerActivation> ActivateHandler(const SmartPointer<IHandlerActivation>& activation) = 0;
 
   /**
    * <p>
@@ -106,7 +106,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    *         which this service was retrieved is destroyed.
    */
   virtual SmartPointer<IHandlerActivation> ActivateHandler(
-      const QString& commandId, SmartPointer<IHandler> handler) = 0;
+      const QString& commandId, const SmartPointer<IHandler>& handler) = 0;
 
   /**
    * <p>
@@ -142,7 +142,8 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    */
   virtual SmartPointer<IHandlerActivation> ActivateHandler(
       const QString& commandId,
-      SmartPointer<IHandler> handler, SmartPointer<Expression> expression) = 0;
+      const SmartPointer<IHandler>& handler,
+      const SmartPointer<Expression>& expression) = 0;
 
   /**
    * <p>
@@ -181,8 +182,10 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    * @see org.eclipse.ui.ISources
    * @since 3.2
    */
-  virtual SmartPointer<IHandlerActivation> ActivateHandler(const QString& commandId,
-      SmartPointer<IHandler> handler, SmartPointer<Expression> expression, bool global) = 0;
+  virtual SmartPointer<IHandlerActivation> ActivateHandler(
+      const QString& commandId,
+      const SmartPointer<IHandler>& handler,
+      const SmartPointer<Expression>& expression, bool global) = 0;
 
   /**
    * <p>
@@ -218,8 +221,10 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    *             {@link IHandlerService#activateHandler(String, IHandler, Expression)}
    *             instead.
    */
-  virtual SmartPointer<IHandlerActivation> ActivateHandler(const QString& commandId,
-      SmartPointer<IHandler> handler, SmartPointer<Expression> expression,
+  virtual SmartPointer<IHandlerActivation> ActivateHandler(
+      const QString& commandId,
+      const SmartPointer<IHandler>& handler,
+      const SmartPointer<Expression>& expression,
       int sourcePriorities) = 0;
 
   /**
@@ -238,7 +243,8 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    * @see Command#executeWithChecks(ExecutionEvent)
    */
   virtual SmartPointer<const ExecutionEvent> CreateExecutionEvent(
-      SmartPointer<const Command> command, SmartPointer<const UIElement> uielement) = 0;
+      const SmartPointer<const Command>& command,
+      const SmartPointer<const UIElement>& uielement) = 0;
 
   /**
    * Creates a parameterized execution event based on an SWT event and a
@@ -258,8 +264,8 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    * @see Command#executeWithChecks(ExecutionEvent)
    */
   virtual SmartPointer<const ExecutionEvent> CreateExecutionEvent(
-      SmartPointer<const ParameterizedCommand> command,
-      SmartPointer<const UIElement> uielement) = 0;
+      const SmartPointer<const ParameterizedCommand>& command,
+      const SmartPointer<const UIElement>& uielement) = 0;
 
   /**
    * Deactivates the given handler within the context of this service. If the
@@ -272,7 +278,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    *            The token that was returned from a call to
    *            <code>activateHandler</code>; must not be <code>null</code>.
    */
-  virtual void DeactivateHandler(SmartPointer<IHandlerActivation> activation) = 0;
+  virtual void DeactivateHandler(const SmartPointer<IHandlerActivation>& activation) = 0;
 
   /**
    * Deactivates the given handlers within the context of this service. If the
@@ -312,9 +318,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    * @see Command#executeWithChecks(ExecutionEvent)
    */
   virtual Object::Pointer ExecuteCommand(const QString& commandId,
-      SmartPointer<const UIElement> uielement)
-      throw(ExecutionException, NotDefinedException,
-      NotEnabledException, NotHandledException) = 0;
+                                         const SmartPointer<const UIElement>& uielement) = 0;
 
   /**
    * Executes the given parameterized command.
@@ -337,11 +341,8 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    * @since 3.2
    * @see Command#executeWithChecks(ExecutionEvent)
    */
-  virtual Object::Pointer ExecuteCommand(
-      SmartPointer<ParameterizedCommand> command,
-      SmartPointer<const UIElement> uielement)
-      throw(ExecutionException, NotDefinedException,
-      NotEnabledException, NotHandledException) = 0;
+  virtual Object::Pointer ExecuteCommand(const SmartPointer<ParameterizedCommand>& command,
+                                         const SmartPointer<const UIElement>& uielement) = 0;
 
   /**
    * Executes the given parameterized command in the provided context. It
@@ -372,11 +373,9 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    * @see #createContextSnapshot(boolean)
    */
   virtual Object::Pointer ExecuteCommandInContext(
-      SmartPointer<ParameterizedCommand> command,
-      SmartPointer<const UIElement> uielement,
-      SmartPointer<IEvaluationContext> context)
-    throw(ExecutionException,
-      NotDefinedException, NotEnabledException, NotHandledException) = 0;
+      const SmartPointer<ParameterizedCommand>& command,
+      const SmartPointer<const UIElement>& uielement,
+      const SmartPointer<IEvaluationContext>& context) = 0;
 
   /**
    * This method creates a copy of the application context returned by
@@ -402,7 +401,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    *      Object)
    * @see org.eclipse.ui.services.IEvaluationService
    */
-  virtual SmartPointer<IEvaluationContext> GetCurrentState() const = 0;
+  virtual IEvaluationContext* GetCurrentState() const = 0;
 
   /**
    * <p>
@@ -426,9 +425,11 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    *            removed.
    * @since 3.2
    */
-  virtual void SetHelpContextId(SmartPointer<IHandler> handler, const QString& helpContextId) = 0;
+  virtual void SetHelpContextId(const SmartPointer<IHandler>& handler, const QString& helpContextId) = 0;
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IHandlerService, "org.blueberry.ui.qt.IHandlerService")
 
 #endif /* BERRYIHANDLERSERVICE_H_ */

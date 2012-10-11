@@ -125,7 +125,7 @@ private: struct PropertyChangeListener : public IPropertyChangeListener
    private: WorkbenchPartReference* partRef;
     };
 
-private: IPropertyChangeListener::Pointer propertyChangeListener;
+private: QScopedPointer<IPropertyChangeListener> propertyChangeListener;
 
 /**
  * Calling this with deferEvents(true) will queue all property change events until a subsequent
@@ -179,12 +179,12 @@ public: virtual void Init(const QString& id, const QString& tooltip,
     /**
      * @see IWorkbenchPart
      */
-public: virtual void AddPropertyListener(IPropertyChangeListener::Pointer listener);
+public: virtual void AddPropertyListener(IPropertyChangeListener* listener);
 
     /**
      * @see IWorkbenchPart
      */
-public: virtual void RemovePropertyListener(IPropertyChangeListener::Pointer listener);
+public: virtual void RemovePropertyListener(IPropertyChangeListener* listener);
 
 public: QString GetId() const;
 

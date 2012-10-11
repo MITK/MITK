@@ -16,8 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPlatformObject.h"
 
-#include <berryPlatform.h>
-#include "berryRuntime.h"
+#include "berryPlatform.h"
 #include "berryIAdapterManager.h"
 
 namespace berry {
@@ -30,11 +29,15 @@ PlatformObject::PlatformObject()
 
 Poco::Any PlatformObject::GetAdapter(const std::string& adapter)
 {
-  IAdapterManager::Pointer adapterManager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>(Runtime::ADAPTER_SERVICE_ID);
+  IAdapterManager* adapterManager = Platform::GetAdapterManager();
   if (adapterManager)
+  {
     return adapterManager->GetAdapter(Object::Pointer(this), adapter);
-
-  return Poco::Any();
+  }
+  else
+  {
+    return Poco::Any();
+  }
 }
 
 }

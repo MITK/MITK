@@ -160,9 +160,9 @@ public:
   /* (non-Javadoc)
    * Method declared on IWorkbenchPart.
    */
-  void AddPropertyListener(IPropertyChangeListener::Pointer l);
+  void AddPropertyListener(IPropertyChangeListener* l);
 
-  void RemovePropertyListener(IPropertyChangeListener::Pointer l);
+  void RemovePropertyListener(IPropertyChangeListener* l);
 
   void SetPartProperty(const QString& key, const QString& value);
 

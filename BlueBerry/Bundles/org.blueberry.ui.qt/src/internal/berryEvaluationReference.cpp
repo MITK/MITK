@@ -22,16 +22,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 EvaluationReference::EvaluationReference(const SmartPointer<Expression>& expression,
-                                         const SmartPointer<IPropertyChangeListener>& listener,
+                                         IPropertyChangeListener* listener,
                                          const QString& property)
   : EvaluationResultCache(expression),
     listener(listener), property(property), postingChanges(true)
 {
 }
 
-SmartPointer<IPropertyChangeListener> EvaluationReference::GetListener() const
+IPropertyChangeListener* EvaluationReference::GetListener() const
 {
-  return listener;
+  return listener.data();
 }
 
 QString EvaluationReference::GetProperty() const

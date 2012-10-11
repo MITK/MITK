@@ -188,7 +188,7 @@ WorkbenchMenuService::WorkbenchMenuService(IServiceLocator* serviceLocator)
   : evaluationService(0), serviceLocator(serviceLocator)
 {
   //this.menuPersistence = new MenuPersistence(this);
-  evaluationService = serviceLocator->GetService(IEvaluationService::GetManifestName()).Cast<IEvaluationService>().GetPointer();
+  evaluationService = serviceLocator->GetService<IEvaluationService>();
   evaluationService->AddServiceListener(GetServiceListener());
 //  IWorkbenchLocationService wls = (IWorkbenchLocationService) serviceLocator
 //    .getService(IWorkbenchLocationService.class);
@@ -234,11 +234,7 @@ void WorkbenchMenuService::Dispose()
   evaluationsByItem.clear();
 
   managersAwaitingUpdates.clear();
-  if (serviceListener.IsNotNull())
-  {
-    evaluationService->RemoveServiceListener(serviceListener);
-    serviceListener = 0;
-  }
+  evaluationService->RemoveServiceListener(GetServiceListener());
 
 //  if (activityManagerListener != null)
 //  {
@@ -698,6 +694,19 @@ void WorkbenchMenuService::ReleaseContributions(ContributionRoot* items)
   ReleaseCache(items);
 }
 
+void WorkbenchMenuService::PropertyChange(const PropertyChangeEvent::Pointer& event)
+{
+  if (event->GetProperty() == IEvaluationService::PROP_NOTIFYING)
+  {
+    if (!(event->GetNewValue().Cast<ObjectBool>()->GetValue()))
+    {
+      // if it's false, the evaluation service has
+      // finished with its latest round of updates
+      this->UpdateManagers();
+    }
+  }
+}
+
 //SmartPointer<IActivityManagerListener> WorkbenchMenuService::GetActivityManagerListener()
 //{
 //  if (activityManagerListener == null) {
@@ -717,32 +726,9 @@ void WorkbenchMenuService::ReleaseContributions(ContributionRoot* items)
 //  return activityManagerListener;
 //}
 
-SmartPointer<IPropertyChangeListener> WorkbenchMenuService::GetServiceListener()
+IPropertyChangeListener* WorkbenchMenuService::GetServiceListener()
 {
-  if (serviceListener.IsNull())
-  {
-    struct ServiceListener : public IPropertyChangeListener {
-
-      WorkbenchMenuService* wms;
-
-      ServiceListener(WorkbenchMenuService* wms) : wms(wms) {}
-
-      void PropertyChange(PropertyChangeEvent::Pointer event)
-      {
-        if (event->GetProperty() == IEvaluationService::PROP_NOTIFYING)
-        {
-          if (!(event->GetNewValue().Cast<ObjectBool>()->GetValue()))
-          {
-            // if it's false, the evaluation service has
-            // finished with its latest round of updates
-            wms->UpdateManagers();
-          }
-        }
-      }
-    };
-    serviceListener = new ServiceListener(this);
-  }
-  return serviceListener;
+  return this;
 }
 
 //void WorkbenchMenuService::UpdateTrim(ToolBarManager* mgr)

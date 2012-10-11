@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <berryIExtensionPointService.h>
-
 #include "berryEditorRegistry.h"
 
 #include "berryWorkbenchPlugin.h"
@@ -1152,7 +1150,7 @@ void EditorRegistry::RemoveEditorFromMapping(
 IExtensionPoint::Pointer EditorRegistry::GetExtensionPointFilter()
 {
   return Platform::GetExtensionRegistry()->GetExtensionPoint(
-      PlatformUI::PLUGIN_ID + WorkbenchRegistryConstants::PL_EDITOR);
+        PlatformUI::PLUGIN_ID(), WorkbenchRegistryConstants::PL_EDITOR);
 }
 
 QList<IFileEditorMapping::Pointer> EditorRegistry::GetUnifiedMappings()

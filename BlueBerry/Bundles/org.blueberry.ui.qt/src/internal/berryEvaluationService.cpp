@@ -37,7 +37,7 @@ EvaluationService::~EvaluationService()
 }
 
 IEvaluationReference::Pointer EvaluationService::AddEvaluationListener(const SmartPointer<Expression>& expression,
-                                                                       const SmartPointer<IPropertyChangeListener>& listener,
+                                                                       IPropertyChangeListener* listener,
                                                                        const QString& property)
 {
   IEvaluationReference::Pointer expressionReference(new EvaluationReference(
@@ -80,12 +80,12 @@ SmartPointer<IEvaluationContext> EvaluationService::GetCurrentState() const
   return evaluationAuthority->GetCurrentState();
 }
 
-void EvaluationService::AddServiceListener(const SmartPointer<IPropertyChangeListener>& listener)
+void EvaluationService::AddServiceListener(IPropertyChangeListener* listener)
 {
   evaluationAuthority->AddServiceListener(listener);
 }
 
-void EvaluationService::RemoveServiceListener(const SmartPointer<IPropertyChangeListener>& listener)
+void EvaluationService::RemoveServiceListener(IPropertyChangeListener* listener)
 {
   evaluationAuthority->RemoveServiceListener(listener);
 }

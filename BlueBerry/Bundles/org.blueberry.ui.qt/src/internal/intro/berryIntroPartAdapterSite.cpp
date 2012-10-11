@@ -29,7 +29,7 @@ IntroPartAdapterSite::IntroPartAdapterSite(IWorkbenchPartSite::Pointer site,
 
 }
 
-Object::Pointer IntroPartAdapterSite::GetService(const QString& key)
+Object* IntroPartAdapterSite::GetService(const QString& key)
 {
   return partSite->GetService(key);
 }

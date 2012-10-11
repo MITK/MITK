@@ -41,7 +41,7 @@ struct IEvaluationReference : public virtual IEvaluationResultCache
    *
    * @return the listener for updates.
    */
-  virtual SmartPointer<IPropertyChangeListener> GetListener() const = 0;
+  virtual IPropertyChangeListener* GetListener() const = 0;
 
   /**
    * The property used in change notifications.

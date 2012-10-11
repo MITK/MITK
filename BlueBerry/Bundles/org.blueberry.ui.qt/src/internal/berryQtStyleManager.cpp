@@ -36,17 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-bool QtStyleManager::IsA(const std::type_info& type) const
-{
-  QString name(GetType().name());
-  return name == type.name() || Service::IsA(type);
-}
-
-const std::type_info& QtStyleManager::GetType() const
-{
-  return typeid(berry::IQtStyleManager);
-}
-
 QtStyleManager::QtStyleManager()
 {
   AddDefaultStyle();

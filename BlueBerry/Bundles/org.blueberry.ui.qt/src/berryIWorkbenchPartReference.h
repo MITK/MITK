@@ -71,12 +71,12 @@ struct BERRY_UI_QT IWorkbenchPartReference : public Object
     /**
      * @see IWorkbenchPart#addPropertyListener
      */
-    virtual void AddPropertyListener(IPropertyChangeListener::Pointer listener) = 0;
+    virtual void AddPropertyListener(IPropertyChangeListener* listener) = 0;
 
     /**
      * @see IWorkbenchPart#removePropertyListener
      */
-    virtual void RemovePropertyListener(IPropertyChangeListener::Pointer listener) = 0;
+    virtual void RemovePropertyListener(IPropertyChangeListener* listener) = 0;
 
     /**
      * Returns the workbench page that contains this part

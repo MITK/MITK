@@ -51,7 +51,7 @@ void PartPane::CreateControl(void* parent) {
     return;
   }
 
-  partReference.Lock()->AddPropertyListener(IPropertyChangeListener::Pointer(this));
+  partReference.Lock()->AddPropertyListener(this);
 
   // Create view form.
   control = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreatePaneControl(parent);
@@ -94,7 +94,7 @@ PartPane::~PartPane()
 //
   if (!partReference.Expired())
   {
-    partReference.Lock()->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
+    partReference.Lock()->RemovePropertyListener(this);
   }
 //  partReference.removePartPropertyListener(this);
 
@@ -418,12 +418,12 @@ void PartPane::RemoveContributions()
 
 }
 
-void PartPane::AddPropertyListener(IPropertyChangeListener::Pointer listener)
+void PartPane::AddPropertyListener(IPropertyChangeListener *listener)
 {
   propertyChangeEvents.AddListener(listener);
 }
 
-void PartPane::RemovePropertyListener(IPropertyChangeListener::Pointer listener)
+void PartPane::RemovePropertyListener(IPropertyChangeListener *listener)
 {
   propertyChangeEvents.RemoveListener(listener);
 }

@@ -42,8 +42,8 @@ void org_blueberry_core_runtime_Activator::start(ctkPluginContext* context)
   //ProcessCommandLine();
   this->startRegistry();
 
-  preferencesService = new PreferencesService(context->getDataFile("").absolutePath());
-  prefServiceReg = context->registerService<IPreferencesService>(preferencesService.GetPointer());
+  preferencesService.reset(new PreferencesService(context->getDataFile("").absolutePath()));
+  prefServiceReg = context->registerService<IPreferencesService>(preferencesService.data());
 
 //  // register a listener to catch new plugin installations/resolutions.
 //  pluginListener.reset(new CTKPluginListener(m_ExtensionPointService));
@@ -68,7 +68,7 @@ void org_blueberry_core_runtime_Activator::stop(ctkPluginContext* context)
 
   prefServiceReg.unregister();
   preferencesService->ShutDown();
-  preferencesService = 0;
+  preferencesService.reset();
   prefServiceReg = 0;
 
   this->stopRegistry();

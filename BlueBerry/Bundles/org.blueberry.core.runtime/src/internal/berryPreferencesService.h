@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QObject>
 #include <QHash>
+#include <QMutex>
 
 namespace berry
 {
@@ -34,15 +35,9 @@ class AbstractPreferencesStorage;
   class org_blueberry_core_runtime_EXPORT PreferencesService : public QObject, public IBerryPreferencesService
   {
     Q_OBJECT
-    Q_INTERFACES(berry::IPreferencesService)
+    Q_INTERFACES(berry::IBerryPreferencesService berry::IPreferencesService)
 
   public:
-
-    berryObjectMacro(PreferencesService)
-
-    //# From berry::Service
-    virtual bool IsA(const std::type_info& type) const;
-    virtual const std::type_info& GetType() const;
 
     ///
     /// Returns the default name for the preferences data file

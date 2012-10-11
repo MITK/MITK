@@ -70,14 +70,12 @@ WorkbenchWindow::WorkbenchWindow(int number) :
   // Make sure there is a workbench. This call will throw
   // an exception if workbench not created yet.
   IWorkbench* workbench = PlatformUI::GetWorkbench();
-  IServiceLocatorCreator::Pointer slc =
-      workbench->GetService(IServiceLocatorCreator::GetManifestName()).Cast<
-          IServiceLocatorCreator> ();
+  IServiceLocatorCreator* slc = workbench->GetService<IServiceLocatorCreator>();
 
-  IServiceLocator::Pointer locator(workbench);
-  this->serviceLocator = slc->CreateServiceLocator(IServiceLocator::WeakPtr(
-      locator), IServiceFactory::ConstPointer(0), IDisposable::WeakPtr(
-      serviceLocatorOwner)).Cast<ServiceLocator> ();
+  this->serviceLocator = slc->CreateServiceLocator(
+        workbench,
+        IServiceFactory::ConstPointer(0),
+        IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
 
   //  initializeDefaultServices();
 
@@ -100,7 +98,7 @@ WorkbenchWindow::~WorkbenchWindow()
   //BERRY_INFO << "WorkbenchWindow::~WorkbenchWindow()";
 }
 
-Object::Pointer WorkbenchWindow::GetService(const QString& key)
+Object* WorkbenchWindow::GetService(const QString& key)
 {
   return serviceLocator->GetService(key);
 }
@@ -357,7 +355,7 @@ void WorkbenchWindow::FillActionBars(ActionBarAdvisor::FillFlags flags)
   //try {
   this->GetActionBarAdvisor()->FillActionBars(flags);
 
-  IMenuService::Pointer menuService = serviceLocator->GetService(IMenuService::GetManifestName()).Cast<IMenuService>();
+  IMenuService* menuService = serviceLocator->GetService<IMenuService>();
   menuService->PopulateContributionManager(dynamic_cast<ContributionManager*>(GetActionBars()->GetMenuManager()),
                                            MenuUtil::MAIN_MENU);
   //    ICoolBarManager coolbar = getActionBars().getCoolBarManager();

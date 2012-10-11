@@ -83,7 +83,7 @@ AdaptExpression::Evaluate(IEvaluationContext* context) const
     return EvaluationResult::FALSE_EVAL;
   Object::Pointer var = context->GetDefaultVariable();
   Object::Pointer adapted;
-  IAdapterManager::Pointer manager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>(Runtime::ADAPTER_SERVICE_ID);
+  IAdapterManager* manager = Platform::GetAdapterManager();
   if (Expressions::IsInstanceOf(var.GetPointer(), fTypeName))
   {
     adapted = var;

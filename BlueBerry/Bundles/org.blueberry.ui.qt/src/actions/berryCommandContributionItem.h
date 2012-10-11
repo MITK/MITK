@@ -68,11 +68,11 @@ private:
 
   QAction* action;
 
-  SmartPointer<IMenuService> menuService;
+  IMenuService* menuService;
 
-  SmartPointer<ICommandService> commandService;
+  ICommandService* commandService;
 
-  SmartPointer<IHandlerService> handlerService;
+  IHandlerService* handlerService;
 
   //IBindingService bindingService;
 

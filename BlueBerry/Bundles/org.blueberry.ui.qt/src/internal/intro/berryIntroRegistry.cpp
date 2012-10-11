@@ -83,7 +83,7 @@ QList<IIntroDescriptor::Pointer> IntroRegistry::GetIntros() const
 {
   IExtensionPoint::Pointer point =
       Platform::GetExtensionRegistry()->GetExtensionPoint(
-        PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_INTRO);
+        PlatformUI::PLUGIN_ID() + "." + WorkbenchRegistryConstants::PL_INTRO);
   if (!point)
   {
     return QList<IIntroDescriptor::Pointer>();
@@ -125,7 +125,7 @@ IIntroDescriptor::Pointer IntroRegistry::GetIntroForProduct(
 {
   IExtensionPoint::Pointer point =
       Platform::GetExtensionRegistry()->GetExtensionPoint(
-       PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_INTRO);
+        PlatformUI::PLUGIN_ID() + "." + WorkbenchRegistryConstants::PL_INTRO);
   if (!point)
   {
     return IIntroDescriptor::Pointer();

@@ -39,7 +39,7 @@ struct IServiceLocator;
  */
 struct BERRY_UI_QT IServiceFactory : public virtual Object {
 
-  berryInterfaceMacro(IServiceFactory, berry);
+  berryInterfaceMacro(IServiceFactory, berry)
 
   ~IServiceFactory();
 
@@ -65,8 +65,14 @@ struct BERRY_UI_QT IServiceFactory : public virtual Object {
    *            services. Will not be <code>null</code>
    * @return the created service or <code>null</code>
    */
-  virtual Object::Pointer Create(const QString& serviceInterface,
-      const SmartPointer<const IServiceLocator> parentLocator, const SmartPointer<const IServiceLocator> locator) const = 0;
+  template<class S>
+  S* Create(const IServiceLocator* parentLocator, const IServiceLocator* locator) const
+  {
+    return dynamic_cast<S*>(this->Create(qobject_interface_iid<S*>(), parentLocator, locator));
+  }
+
+  virtual Object* Create(const QString& serviceInterface,
+                         const IServiceLocator* parentLocator, const IServiceLocator* locator) const = 0;
 };
 
 }

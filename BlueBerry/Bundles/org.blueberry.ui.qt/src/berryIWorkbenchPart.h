@@ -128,7 +128,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      *
      * @param listener a property listener
      */
-    virtual void AddPropertyListener(IPropertyChangeListener::Pointer listener) = 0;
+    virtual void AddPropertyListener(IPropertyChangeListener* listener) = 0;
 
     /**
      * Creates the controls for this workbench part.
@@ -220,7 +220,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      *
      * @param listener a property listener
      */
-    virtual void RemovePropertyListener(IPropertyChangeListener::Pointer listener) = 0;
+    virtual void RemovePropertyListener(IPropertyChangeListener* listener) = 0;
 
     /**
      * Return the value for the arbitrary property key, or <code>null</code>.

@@ -63,7 +63,7 @@ private:
 
   //QScopedPointer<CTKPluginListener> pluginListener;
 
-  SmartPointer<PreferencesService> preferencesService;
+  QScopedPointer<PreferencesService> preferencesService;
   ctkServiceRegistration prefServiceReg;
 
   QScopedPointer<IExtensionRegistry> defaultRegistry;

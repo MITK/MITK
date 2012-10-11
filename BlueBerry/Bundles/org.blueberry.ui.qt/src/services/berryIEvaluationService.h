@@ -106,7 +106,7 @@ struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
    *            The listener to be notified. Must not be <code>null</code>.
    *            Has no effect if the listener has already been added.
    */
-  virtual void AddServiceListener(const SmartPointer<IPropertyChangeListener>& listener) = 0;
+  virtual void AddServiceListener(IPropertyChangeListener* listener) = 0;
 
   /**
    * Remove the listener for {@link #PROP_NOTIFYING} property changes.
@@ -115,7 +115,7 @@ struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
    *            The listener to remove. Must not be <code>null</code>. Has
    *            no effect if the listener is not currently registered.
    */
-  virtual void RemoveServiceListener(const SmartPointer<IPropertyChangeListener>& listener) = 0;
+  virtual void RemoveServiceListener(IPropertyChangeListener* listener) = 0;
 
   /**
    * Add a listener that can be notified when the workbench application
@@ -137,7 +137,7 @@ struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
    */
   virtual SmartPointer<IEvaluationReference> AddEvaluationListener(
       const SmartPointer<Expression>& expression,
-      const SmartPointer<IPropertyChangeListener>& listener,
+      IPropertyChangeListener* listener,
       const QString& property) = 0;
 
   /**
@@ -207,5 +207,7 @@ struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IEvaluationService, "org.blueberry.ui.qt.IEvaluationService")
 
 #endif // BERRYIEVALUATIONSERVICE_H

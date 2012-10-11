@@ -126,12 +126,12 @@ public:
   /**
    * @param listener
    */
-  void AddServiceListener(const SmartPointer<IPropertyChangeListener>& listener);
+  void AddServiceListener(IPropertyChangeListener* listener);
 
   /**
    * @param listener
    */
-  void RemoveServiceListener(const SmartPointer<IPropertyChangeListener>& listener);
+  void RemoveServiceListener(IPropertyChangeListener* listener);
 
 };
 

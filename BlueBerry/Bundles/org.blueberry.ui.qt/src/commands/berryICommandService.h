@@ -371,4 +371,6 @@ struct BERRY_UI_QT ICommandService : public IDisposable
 
 }
 
+Q_DECLARE_INTERFACE(berry::ICommandService, "org.blueberry.ui.qt.ICommandService")
+
 #endif /* BERRYICOMMANDSERVICE_H_ */

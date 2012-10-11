@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-struct IQtStyleManager;
+struct QtStyleManager;
 
 /**
  * \ingroup org_blueberry_ui_internal
@@ -95,7 +95,7 @@ private:
 
   //SharedImages sharedImages;
 
-  SmartPointer<IQtStyleManager> styleManager;
+  QScopedPointer<QtStyleManager> styleManager;
 
 
 public:
@@ -288,7 +288,7 @@ private:
                      const QString& targetID)
   {
     IExtensionPoint::Pointer extensionPoint = Platform::GetExtensionRegistry()
-        ->GetExtensionPoint(PlatformUI::PLUGIN_ID + "." + extensionPointId);
+        ->GetExtensionPoint(PlatformUI::PLUGIN_ID() + "." + extensionPointId);
     if (extensionPoint == 0)
     {
       WorkbenchPlugin::Log("Unable to find extension. Extension point: " +
@@ -299,7 +299,7 @@ private:
     // Loop through the config elements.
     IConfigurationElement::Pointer targetElement(0);
     QList<IConfigurationElement::Pointer> elements(
-          Platform::GetExtensionRegistry()->GetConfigurationElementsFor(PlatformUI::PLUGIN_ID + "." + extensionPointId));
+          Platform::GetExtensionRegistry()->GetConfigurationElementsFor(PlatformUI::PLUGIN_ID() + "." + extensionPointId));
     for (unsigned int j = 0; j < elements.size(); j++)
     {
       if (elementName == "" || elementName == elements[j]->GetName())

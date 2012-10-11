@@ -299,12 +299,12 @@ bool PartStack::AllowsDrop(PartPane::Pointer part)
   return false;
 }
 
-void PartStack::AddListener(IPropertyChangeListener::Pointer listener)
+void PartStack::AddListener(IPropertyChangeListener *listener)
 {
   propEvents.AddListener(listener);
 }
 
-void PartStack::RemoveListener(IPropertyChangeListener::Pointer listener)
+void PartStack::RemoveListener(IPropertyChangeListener *listener)
 {
   propEvents.RemoveListener(listener);
 }

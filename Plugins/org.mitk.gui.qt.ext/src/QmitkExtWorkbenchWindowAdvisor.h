@@ -115,7 +115,7 @@ private:
    */
   void UpdateTitle(bool editorHidden);
 
-  void PropertyChange(berry::Object::Pointer /*source*/, int propId);
+  void PropertyChange(const berry::Object::Pointer& /*source*/, int propId);
 
   static QString QT_SETTINGS_FILENAME;
 
@@ -124,7 +124,7 @@ private:
   berry::IPerspectiveListener::Pointer menuPerspectiveListener;
   berry::IPartListener::Pointer imageNavigatorPartListener;
   berry::IPartListener::Pointer viewNavigatorPartListener;
-  berry::IPropertyChangeListener::Pointer editorPropertyListener;
+  QScopedPointer<berry::IPropertyChangeListener> editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
   friend class PerspectiveListenerForTitle;

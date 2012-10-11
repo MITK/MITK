@@ -292,7 +292,7 @@ protected: void* GetAdapterImpl(const std::type_info& adapter) const;
    */
 //public: virtual WorkbenchSiteProgressService GetSiteProgressService();
 
-public: Object::Pointer GetService(const QString& api);
+public: Object* GetService(const QString& api);
 
 public: bool HasService(const QString& api) const;
 

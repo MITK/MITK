@@ -22,22 +22,24 @@ namespace berry {
 
 void
 IStateListener::Events
-::AddListener(IStateListener::Pointer l)
+::AddListener(IStateListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == NULL) return;
 
-  stateChanged += Delegate(l.GetPointer(), &IStateListener::HandleStateChange);
+  stateChanged += Delegate(l, &IStateListener::HandleStateChange);
 }
 
 void
 IStateListener::Events
-::RemoveListener(IStateListener::Pointer l)
+::RemoveListener(IStateListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == NULL) return;
 
-  stateChanged -= Delegate(l.GetPointer(), &IStateListener::HandleStateChange);
+  stateChanged -= Delegate(l, &IStateListener::HandleStateChange);
+}
+
+IStateListener::~IStateListener()
+{
 }
 
 }
-
-

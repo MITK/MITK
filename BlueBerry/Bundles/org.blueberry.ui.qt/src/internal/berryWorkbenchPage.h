@@ -370,7 +370,7 @@ private:
 
   PageSelectionService* selectionService;
 
-  WorkbenchPagePartList::Pointer partList; // = new WorkbenchPagePartList(selectionService);
+  QScopedPointer<WorkbenchPagePartList> partList; // = new WorkbenchPagePartList(selectionService);
 
   //IActionBars actionBars;
 

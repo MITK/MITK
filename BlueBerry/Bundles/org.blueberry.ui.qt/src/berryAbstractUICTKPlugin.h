@@ -25,6 +25,7 @@ namespace berry {
 
 template<class T> class SmartPointer;
 
+struct IPreferences;
 struct IPreferencesService;
 struct IWorkbench;
 
@@ -199,6 +200,8 @@ public:
      * @return the preferences service
      */
     IPreferencesService* GetPreferencesService() const;
+
+    SmartPointer<IPreferences> GetPreferences() const;
 
     /**
      * Returns the Platform UI workbench.

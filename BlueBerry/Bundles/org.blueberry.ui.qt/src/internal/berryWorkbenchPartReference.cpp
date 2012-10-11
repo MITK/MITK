@@ -54,10 +54,12 @@ void WorkbenchPartReference::PropertyChangeListener::PropertyChange(
   }
 }
 
-WorkbenchPartReference::WorkbenchPartReference() :
-  state(STATE_LAZY), pinned(false), image(0)
+WorkbenchPartReference::WorkbenchPartReference()
+  : state(STATE_LAZY)
+  , pinned(false)
+  , image(0)
+  , propertyChangeListener(new PropertyChangeListener(this))
 {
-  propertyChangeListener = new PropertyChangeListener(this);
 }
 
 WorkbenchPartReference::~WorkbenchPartReference()
@@ -241,8 +243,7 @@ void WorkbenchPartReference::Init(const QString& id,
 /**
  * @see IWorkbenchPart
  */
-void WorkbenchPartReference::AddPropertyListener(
-    IPropertyChangeListener::Pointer listener)
+void WorkbenchPartReference::AddPropertyListener(IPropertyChangeListener *listener)
 {
   propChangeEvents.AddListener(listener);
 }
@@ -250,8 +251,7 @@ void WorkbenchPartReference::AddPropertyListener(
 /**
  * @see IWorkbenchPart
  */
-void WorkbenchPartReference::RemovePropertyListener(
-    IPropertyChangeListener::Pointer listener)
+void WorkbenchPartReference::RemovePropertyListener(IPropertyChangeListener *listener)
 {
   propChangeEvents.RemoveListener(listener);
 }
@@ -472,7 +472,7 @@ IWorkbenchPart::Pointer WorkbenchPartReference::GetPart(bool restore)
         // if the part's widgets get disposed unexpectedly. The workbench part reference is the only
         // object that should dispose this control, and it will remove the listener before it does so.
         //this->GetPane().getControl().addDisposeListener(prematureDisposeListener);
-        part->AddPropertyListener(propertyChangeListener);
+        part->AddPropertyListener(propertyChangeListener.data());
 
         this->RefreshFromPart();
 
@@ -596,7 +596,7 @@ void WorkbenchPartReference::DoDisposePart()
     // Don't let exceptions in client code bring us down. Log them and continue.
     try
     {
-      part->RemovePropertyListener(propertyChangeListener);
+      part->RemovePropertyListener(propertyChangeListener.data());
 //      if (part instanceof IWorkbenchPart3)
 //      {
 //        ((IWorkbenchPart3) part).removePartPropertyListener(

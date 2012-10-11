@@ -94,7 +94,7 @@ private:
     PresentablePartFolder* presentablePartFolder;
   };
 
-  IPropertyChangeListener::Pointer childPropertyChangeListener;
+  QScopedPointer<IPropertyChangeListener> childPropertyChangeListener;
 
   //    /**
   //     * Dispose listener that is attached to the main control. It triggers cleanup of

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryPlatform.h>
 #include <berryCoreException.h>
-#include <service/berryServiceRegistry.h>
 
 #include <berryIAdapterManager.h>
 #include <berryIConfigurationElement.h>
@@ -100,7 +99,7 @@ namespace berry
     }
     else
     {
-      IAdapterManager::Pointer manager= Platform::GetServiceRegistry().GetServiceById<IAdapterManager>("org.blueberry.service.adaptermanager");
+      IAdapterManager* manager= Platform::GetAdapterManager();
       Object::Pointer result;
       Poco::Any any(manager->GetAdapter(var, IIterable::GetStaticClassName()));
       if (!any.empty() && any.type() == typeid(Object::Pointer))
@@ -134,7 +133,7 @@ namespace berry
     }
     else
     {
-      IAdapterManager::Pointer manager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>("org.blueberry.service.adaptermanager");
+      IAdapterManager* manager = Platform::GetAdapterManager();
       Object::Pointer result;
       Poco::Any any(manager->GetAdapter(var, ICountable::GetStaticClassName()));
       if (!any.empty() && any.type() == typeid(Object::Pointer))

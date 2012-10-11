@@ -46,7 +46,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIPreferencesService.h>
 #include <berryIExtensionRegistry.h>
-#include <berryIExtensionPointService.h>
 
 #include <QCoreApplication>
 #include <QDesktopServices>
@@ -56,11 +55,12 @@ namespace berry {
 
 Poco::Mutex InternalPlatform::m_Mutex;
 
-InternalPlatform::InternalPlatform() : m_Initialized(false), m_Running(false),
-  m_ConsoleLog(false), m_ServiceRegistry(0),
-  m_PlatformLogger(0),
-  m_ctkPluginFrameworkFactory(0)
-//, m_EventStarted(PlatformEvent::EV_PLATFORM_STARTED)
+InternalPlatform::InternalPlatform()
+  : m_Initialized(false)
+  , m_Running(false)
+  , m_ConsoleLog(false)
+  , m_PlatformLogger(0)
+  , m_ctkPluginFrameworkFactory(0)
 {
 }
 
@@ -90,10 +90,10 @@ ctkPluginContext* InternalPlatform::GetCTKPluginFrameworkContext() const
   return 0;
 }
 
-ServiceRegistry& InternalPlatform::GetServiceRegistry()
+IAdapterManager* InternalPlatform::GetAdapterManager() const
 {
   AssertInitialized();
-  return *m_ServiceRegistry;
+  return NULL;
 }
 
 void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractConfiguration* config)
@@ -117,8 +117,6 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   {
     this->config().add(config, 50, false);
   }
-
-  m_ServiceRegistry = new ServiceRegistry();
 
   m_ConsoleLog = this->GetConfiguration().hasProperty(Platform::ARG_CONSOLELOG.toStdString());
 
@@ -312,15 +310,10 @@ void InternalPlatform::Shutdown()
 
   // wait 10 seconds for the CTK plugin framework to stop
   ctkPluginFW->waitForStop(10000);
-
-  {
-    Poco::Mutex::ScopedLock lock(m_Mutex);
-    delete m_ServiceRegistry;
-  }
 }
 
 
-void InternalPlatform::AssertInitialized()
+void InternalPlatform::AssertInitialized() const
 {
   if (!m_Initialized)
     throw Poco::SystemException("The Platform has not been initialized yet!");

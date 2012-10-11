@@ -111,7 +111,7 @@ void IntroPart::SetTitle(const QString& titleLabel)
   FirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
 }
 
-void IntroPart::AddPropertyListener(IPropertyChangeListener::Pointer l)
+void IntroPart::AddPropertyListener(IPropertyChangeListener *l)
 {
   propChangeEvents.AddListener(l);
 }
@@ -150,7 +150,7 @@ void IntroPart::Init(IIntroSite::Pointer site, IMemento::Pointer /*memento*/)
   SetSite(site);
 }
 
-void IntroPart::RemovePropertyListener(IPropertyChangeListener::Pointer l)
+void IntroPart::RemovePropertyListener(IPropertyChangeListener *l)
 {
   propChangeEvents.RemoveListener(l);
 }

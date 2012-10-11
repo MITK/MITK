@@ -35,7 +35,7 @@ public:
   berryObjectMacro(ServiceLocatorCreator);
 
   SmartPointer<IServiceLocator> CreateServiceLocator(
-      const WeakPointer<IServiceLocator> parent,
+      IServiceLocator* parent,
       const SmartPointer<const IServiceFactory> factory,
       WeakPointer<IDisposable> owner);
 };

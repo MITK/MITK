@@ -96,7 +96,7 @@ Shell::Pointer DetachedWindow::GetShell()
 
 void DetachedWindow::Create()
 {
-  folder->AddListener(IPropertyChangeListener::Pointer(this));
+  folder->AddListener(this);
 
   windowShell
       = page->GetWorkbenchWindow().Cast<WorkbenchWindow> () ->GetDetachedWindowPool()->AllocateShell(
@@ -303,12 +303,12 @@ void DetachedWindow::ActivePartChanged(
 
   if (activePart != 0)
   {
-    activePart->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
+    activePart->RemovePropertyListener(this);
   }
   activePart = partReference;
   if (partReference != 0)
   {
-    partReference->AddPropertyListener(IPropertyChangeListener::Pointer(this));
+    partReference->AddPropertyListener(this);
   }
   this->UpdateTitle();
 }

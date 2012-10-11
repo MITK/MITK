@@ -195,6 +195,8 @@ public:
 
 protected:
 
+  friend class QScopedPointerObjectDeleter;
+
   Object();
   virtual ~Object();
 
@@ -219,6 +221,22 @@ private:
   Object(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
+};
+
+// A custom deleter for QScopedPointer
+// berry::Object instances in a QScopedPointer should have reference count one,
+// such that they are not accidentally deleted when a temporary smart pointer
+// pointing to it goes out of scope. This deleter fixes the reference count and
+// always deletes the instance. Use a berry::SmartPointer if the lifetime should
+// exceed the one of the pointer.
+struct QScopedPointerObjectDeleter
+{
+  static inline void cleanup(Object* obj)
+  {
+    if (obj == NULL) return;
+    obj->UnRegister(false);
+    delete obj;
+  }
 };
 
 org_blueberry_core_runtime_EXPORT QDebug operator<<(QDebug os, const berry::Indent& o);

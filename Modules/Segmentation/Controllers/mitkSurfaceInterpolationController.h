@@ -55,8 +55,8 @@ namespace mitk
 
   public:
 
-    mitkClassMacro(SurfaceInterpolationController, itk::Object);
-    itkNewMacro(Self);
+    mitkClassMacro(SurfaceInterpolationController, itk::Object)
+    itkNewMacro(Self)
 
     static SurfaceInterpolationController* GetInstance();
 
@@ -94,23 +94,23 @@ namespace mitk
      * Sets the current segmentation which is used by the interpolation
      * This is needed because the calculation of the normals needs to now wheather a normal points inside a segmentation or not
      */
-    void SetWorkingImage(Image* workingImage);
+    void SetSegmentationImage(Image* workingImage);
 
     Surface* GetContoursAsSurface();
 
     void SetDataStorage(DataStorage &ds);
 
     /**
-     * Creates a new contourlist.
-     * \returns the new ContourList ID
+     * Sets the current list of contourpoints which is used for the surface interpolation
+     * @param segmentation The current selected segmentation
      */
-    unsigned int CreateNewContourList();
+    void SetCurrentSegmentationInterpolationList(mitk::Image* segmentation);
 
     /**
-     * Sets the ID for the ContourList which will be used for interpolation.
-     * This is neccessary since MITK allows to load / create multiple segmentations and each segmentation must have its own contour list.
+     * Removes the segmentation and all its contours from the list
+     * @param segmentation The segmentation to be removed
      */
-    void SetCurrentListID (unsigned int ID);
+    void RemoveSegmentationFromContourList(mitk::Image* segmentation);
 
     mitk::Image* GetImage();
 
@@ -134,6 +134,7 @@ namespace mitk
    };
 
     typedef std::vector<ContourPositionPair> ContourPositionPairList;
+    typedef std::map<mitk::Image* , ContourPositionPairList> ContourListMap;
 
     ContourPositionPairList::iterator m_Iterator;
 
@@ -154,13 +155,13 @@ namespace mitk
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
-    std::vector<ContourPositionPairList> m_ListOfContourLists;
-
-    unsigned int m_CurrentContourListID;
+    ContourListMap m_MapOfContourLists;
 
     mitk::Surface::Pointer m_InterpolationResult;
 
     unsigned int m_CurrentNumberOfReducedContours;
+
+    mitk::Image* m_SelectedSegmentation;
  };
 }
 #endif

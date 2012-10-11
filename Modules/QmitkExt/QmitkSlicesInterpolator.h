@@ -213,7 +213,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void Run3DInterpolation();
 
-    void SurfaceInterpolationFinished();
+    void OnSurfaceInterpolationFinished();
 
     void StartUpdateInterpolationTimer();
 

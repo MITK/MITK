@@ -1030,8 +1030,6 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
       {
         QWidget::setEnabled( true );
 
-        m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(dynamic_cast<mitk::Image*>(workingNode->GetData()));
-
         mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( m_MultiWidget->GetRenderWindow3()->GetRenderer()->GetTimeStep() )->GetSpacing();
         double minSpacing (100);
         double maxSpacing (0);
@@ -1051,6 +1049,9 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
         m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
         m_SurfaceInterpolator->SetMinSpacing(minSpacing);
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
+
+        m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(dynamic_cast<mitk::Image*>(workingNode->GetData()));
+
       }
     }
   }

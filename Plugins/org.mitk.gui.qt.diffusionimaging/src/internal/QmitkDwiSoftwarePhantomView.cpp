@@ -34,6 +34,8 @@
 #include <mitkImageCast.h>
 #include <mitkProperties.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 const std::string QmitkDwiSoftwarePhantomView::VIEW_ID = "org.mitk.views.dwisoftwarephantomview";
 
@@ -65,6 +67,52 @@ void QmitkDwiSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_GeneratePhantomButton, SIGNAL(clicked()), (QObject*) this, SLOT(GeneratePhantom()));
         connect((QObject*) m_Controls->m_SimulateBaseline, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnSimulateBaselineToggle(int)));
     }
+}
+
+QmitkDwiSoftwarePhantomView::GradientListType QmitkDwiSoftwarePhantomView::GenerateHalfShell(int NPoints)
+{
+    NPoints *= 2;
+    vnl_vector<double> theta; theta.set_size(NPoints);
+
+    vnl_vector<double> phi; phi.set_size(NPoints);
+
+    double C = sqrt(4*M_PI);
+
+    phi(0) = 0.0;
+    phi(NPoints-1) = 0.0;
+
+    for(int i=0; i<NPoints; i++)
+    {
+        theta(i) = acos(-1.0+2.0*i/(NPoints-1.0)) - M_PI / 2.0;
+        if( i>0 && i<NPoints-1)
+        {
+            phi(i) = (phi(i-1) + C /
+                      sqrt(NPoints*(1-(-1.0+2.0*i/(NPoints-1.0))*(-1.0+2.0*i/(NPoints-1.0)))));
+            // % (2*DIST_POINTSHELL_PI);
+        }
+    }
+
+    GradientListType pointshell;
+
+    int numB0 = NPoints/10;
+    if (numB0==0)
+        numB0=1;
+    GradientType g;
+    g.Fill(0.0);
+    for (int i=0; i<numB0; i++)
+        pointshell.push_back(g);
+
+    for(int i=0; i<NPoints; i++)
+    {
+        g[2] = sin(theta(i));
+        if (g[2]<0)
+            continue;
+        g[0] = cos(theta(i)) * cos(phi(i));
+        g[1] = cos(theta(i)) * sin(phi(i));
+        pointshell.push_back(g);
+    }
+
+    return pointshell;
 }
 
 template<int ndirs>
@@ -129,41 +177,44 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
         m_SignalRegions.push_back(signalRegion);
     }
 
-    switch(m_Controls->m_TensorsToDWINumDirsSelect->currentIndex())
-    {
-    case 0:
-        gradientList = MakeGradientList<12>();
-        break;
-    case 1:
-        gradientList = MakeGradientList<42>();
-        break;
-    case 2:
-        gradientList = MakeGradientList<92>();
-        break;
-    case 3:
-        gradientList = MakeGradientList<162>();
-        break;
-    case 4:
-        gradientList = MakeGradientList<252>();
-        break;
-    case 5:
-        gradientList = MakeGradientList<362>();
-        break;
-    case 6:
-        gradientList = MakeGradientList<492>();
-        break;
-    case 7:
-        gradientList = MakeGradientList<642>();
-        break;
-    case 8:
-        gradientList = MakeGradientList<812>();
-        break;
-    case 9:
-        gradientList = MakeGradientList<1002>();
-        break;
-    default:
-        gradientList = MakeGradientList<92>();
-    }
+    gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());
+
+    //    switch(m_Controls->m_NumGradientsBox->value())
+    //    {
+    //    case 0:
+    //        gradientList = MakeGradientList<12>();
+    //        break;
+    //    case 1:
+    //        gradientList = MakeGradientList<42>();
+    //        break;
+    //    case 2:
+    //        gradientList = MakeGradientList<92>();
+    //        break;
+    //    case 3:
+    //        gradientList = MakeGradientList<162>();
+    //        break;
+    //    case 4:
+    //        gradientList = MakeGradientList<252>();
+    //        break;
+    //    case 5:
+    //        gradientList = MakeGradientList<362>();
+    //        break;
+    //    case 6:
+    //        gradientList = MakeGradientList<492>();
+    //        break;
+    //    case 7:
+    //        gradientList = MakeGradientList<642>();
+    //        break;
+    //    case 8:
+    //        gradientList = MakeGradientList<812>();
+    //        break;
+    //    case 9:
+    //        gradientList = MakeGradientList<1002>();
+    //        break;
+    //    default:
+    //        gradientList = MakeGradientList<92>();
+    //    }
+
     double bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
     itk::ImageRegion<3> imageRegion;
     imageRegion.SetSize(0, m_Controls->m_SizeX->value());
@@ -205,6 +256,8 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     filter->SetTensorDirection(tensorDirection);
     if (!m_Controls->m_SimulateBaseline->isChecked())
         filter->SetSimulateBaseline(false);
+    else
+        filter->SetSimulateBaseline(true);
     filter->Update();
 
     mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();

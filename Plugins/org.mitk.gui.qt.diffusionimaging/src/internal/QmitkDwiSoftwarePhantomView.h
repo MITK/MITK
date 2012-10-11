@@ -59,6 +59,8 @@ public:
 
   typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
   typedef itk::Image<float, 3>          ItkFloatImgType;
+  typedef itk::Vector<double,3>         GradientType;
+  typedef std::vector<GradientType>     GradientListType;
 
   template<int ndirs> std::vector<itk::Vector<double,3> > MakeGradientList() ;
 
@@ -71,6 +73,7 @@ protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  GradientListType GenerateHalfShell(int NPoints);
 
   Ui::QmitkDwiSoftwarePhantomViewControls* m_Controls;
 

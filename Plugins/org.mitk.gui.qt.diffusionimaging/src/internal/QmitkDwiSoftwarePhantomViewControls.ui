@@ -506,6 +506,25 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>m_GeneratePhantomButton</tabstop>
+  <tabstop>m_ImageName</tabstop>
+  <tabstop>m_TensorsToDWIBValueEdit</tabstop>
+  <tabstop>m_NumGradientsBox</tabstop>
+  <tabstop>m_NoiseLevel</tabstop>
+  <tabstop>m_GmAdc</tabstop>
+  <tabstop>m_SizeX</tabstop>
+  <tabstop>m_SizeY</tabstop>
+  <tabstop>m_SizeZ</tabstop>
+  <tabstop>m_SpacingX</tabstop>
+  <tabstop>m_SpacingY</tabstop>
+  <tabstop>m_SpacingZ</tabstop>
+  <tabstop>m_SimulateBaseline</tabstop>
+  <tabstop>m_OutputVectorFieldBox</tabstop>
+  <tabstop>m_OutputNumDirectionsBox</tabstop>
+  <tabstop>m_OutputDirectionImagesBox</tabstop>
+  <tabstop>m_OutputSnrImageBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

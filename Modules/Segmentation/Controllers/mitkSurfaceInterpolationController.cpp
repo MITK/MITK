@@ -42,9 +42,9 @@ mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
 
   for (ContourListMap::iterator it = m_MapOfContourLists.begin(); it != m_MapOfContourLists.end(); it++)
   {
-      for (unsigned int j = 0; j < m_MapOfContourLists.at((*it).first).size(); ++j)
+      for (unsigned int j = 0; j < m_MapOfContourLists[(*it).first].size(); ++j)
       {
-          delete(m_MapOfContourLists.at((*it).first).at(j).position);
+          delete(m_MapOfContourLists[(*it).first].at(j).position);
       }
       m_MapOfContourLists.erase(it);
   }
@@ -70,9 +70,9 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
   mitk::Vector3D direction = op->GetDirectionVector();
   int pos (-1);
 
-  for (unsigned int i = 0; i < m_MapOfContourLists.at(m_SelectedSegmentation).size(); i++)
+  for (unsigned int i = 0; i < m_MapOfContourLists[m_SelectedSegmentation].size(); i++)
   {
-      itk::Matrix<float> diffM = transform->GetMatrix()-m_MapOfContourLists.at(m_SelectedSegmentation).at(i).position->GetTransform()->GetMatrix();
+      itk::Matrix<float> diffM = transform->GetMatrix()-m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetMatrix();
       bool isSameMatrix(true);
       for (unsigned int j = 0; j < 3; j++)
       {
@@ -82,8 +82,8 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
           break;
         }
       }
-      itk::Vector<float> diffV = m_MapOfContourLists.at(m_SelectedSegmentation).at(i).position->GetTransform()->GetOffset()-transform->GetOffset();
-      if ( isSameMatrix && m_MapOfContourLists.at(m_SelectedSegmentation).at(i).position->GetPos() == op->GetPos() && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
+      itk::Vector<float> diffV = m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetOffset()-transform->GetOffset();
+      if ( isSameMatrix && m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetPos() == op->GetPos() && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
       {
         pos = i;
         break;
@@ -100,13 +100,13 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
     newData.contour = newContour;
     newData.position = newOp;
 
-    m_ReduceFilter->SetInput(m_MapOfContourLists.at(m_SelectedSegmentation).size(), newContour);
-    m_MapOfContourLists.at(m_SelectedSegmentation).push_back(newData);
+    m_ReduceFilter->SetInput(m_MapOfContourLists[m_SelectedSegmentation].size(), newContour);
+    m_MapOfContourLists[m_SelectedSegmentation].push_back(newData);
   }
   else
   {
     //MITK_INFO<<"Modified Contour";
-    m_MapOfContourLists.at(m_SelectedSegmentation).at(pos).contour = newContour;
+    m_MapOfContourLists[m_SelectedSegmentation].at(pos).contour = newContour;
     m_ReduceFilter->SetInput(pos, newContour);
   }
 
@@ -239,9 +239,9 @@ void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationLi
   }
   else
   {
-    for (unsigned int i = 0; i < m_MapOfContourLists.at(m_SelectedSegmentation).size(); i++)
+    for (unsigned int i = 0; i < m_MapOfContourLists[m_SelectedSegmentation].size(); i++)
     {
-      m_ReduceFilter->SetInput(i, m_MapOfContourLists.at(m_SelectedSegmentation).at(i).contour);
+      m_ReduceFilter->SetInput(i, m_MapOfContourLists[m_SelectedSegmentation].at(i).contour);
     }
 
     m_ReduceFilter->Update();

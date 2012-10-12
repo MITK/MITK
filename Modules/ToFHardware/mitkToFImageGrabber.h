@@ -139,15 +139,15 @@ namespace mitk
 
     void SetProperty( const char *propertyKey, BaseProperty* propertyValue );
 
-    bool ToFImageGrabber::GetBoolProperty( const char* propertyKey);
+    bool GetBoolProperty( const char* propertyKey);
 
-    int ToFImageGrabber::GetIntProperty( const char* propertyKey);
+    int GetIntProperty( const char* propertyKey);
 
-    float ToFImageGrabber::GetFloatProperty( const char* propertyKey);
+    float GetFloatProperty( const char* propertyKey);
 
-    const char* ToFImageGrabber::GetStringProperty( const char* propertyKey);
+    const char* GetStringProperty( const char* propertyKey);
 
-    BaseProperty* ToFImageGrabber::GetProperty( const char *propertyKey);
+    BaseProperty* GetProperty( const char *propertyKey);
 
   protected:
 

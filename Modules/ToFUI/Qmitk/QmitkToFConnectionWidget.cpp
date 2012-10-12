@@ -171,6 +171,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     else if (selectedCamera == "Microsoft Kinect")
     {//KINECT
       this->m_ToFImageGrabber->SetCameraDevice(mitk::KinectDevice::New());
+      this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());
+      this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());
     }
     else if (selectedCamera == "PMD Player")
     {//PMD player

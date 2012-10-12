@@ -88,3 +88,13 @@ void QmitkKinectParameterWidget::OnAcquisitionModeChanged()
   }
 }
 
+bool QmitkKinectParameterWidget::IsAcquisitionModeRGB()
+{
+  return m_Controls->m_RGB->isChecked();
+}
+
+bool QmitkKinectParameterWidget::IsAcquisitionModeIR()
+{
+  return m_Controls->m_IR->isChecked();
+}
+

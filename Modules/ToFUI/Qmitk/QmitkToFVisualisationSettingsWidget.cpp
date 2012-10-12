@@ -294,15 +294,18 @@ void QmitkToFVisualisationSettingsWidget::ReinitTransferFunction(int widget, int
     if (m_MitkAmplitudeImageNode)
     {
       mitk::Image::Pointer amplitudeImage = dynamic_cast<mitk::Image*>(m_MitkAmplitudeImageNode->GetData());
-      m_RangeSliderMin = amplitudeImage->GetStatistics()->GetScalarValueMin();
-      m_RangeSliderMax = amplitudeImage->GetStatistics()->GetScalarValueMax();
-      MITK_INFO<<"Amplitude Min: "<<m_RangeSliderMin;
-      MITK_INFO<<"Amplitude Max: "<<m_RangeSliderMax;
-      ResetTransferFunction(this->m_Widget2ColorTransferFunction, type, this->m_RangeSliderMin, this->m_RangeSliderMax);
-      m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget2ColorTransferFunction );
-      mitk::TransferFunction::Pointer tf2 = mitk::TransferFunction::New();
-      tf2->SetColorTransferFunction( m_Widget2ColorTransferFunction );
-      m_MitkAmplitudeImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf2));
+      if (amplitudeImage.IsNotNull())
+      {
+        m_RangeSliderMin = amplitudeImage->GetStatistics()->GetScalarValueMin();
+        m_RangeSliderMax = amplitudeImage->GetStatistics()->GetScalarValueMax();
+        MITK_INFO<<"Amplitude Min: "<<m_RangeSliderMin;
+        MITK_INFO<<"Amplitude Max: "<<m_RangeSliderMax;
+        ResetTransferFunction(this->m_Widget2ColorTransferFunction, type, this->m_RangeSliderMin, this->m_RangeSliderMax);
+        m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget2ColorTransferFunction );
+        mitk::TransferFunction::Pointer tf2 = mitk::TransferFunction::New();
+        tf2->SetColorTransferFunction( m_Widget2ColorTransferFunction );
+        m_MitkAmplitudeImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf2));
+      }
     }
     break;
   }
@@ -311,15 +314,18 @@ void QmitkToFVisualisationSettingsWidget::ReinitTransferFunction(int widget, int
     if (m_MitkIntensityImageNode)
     {
       mitk::Image::Pointer intensityImage = dynamic_cast<mitk::Image*>(m_MitkIntensityImageNode->GetData());
-      m_RangeSliderMin = intensityImage->GetStatistics()->GetScalarValueMin();
-      m_RangeSliderMax = intensityImage->GetStatistics()->GetScalarValueMax();
-      MITK_INFO<<"Intensity Min: "<<m_RangeSliderMin;
-      MITK_INFO<<"Intensity Max: "<<m_RangeSliderMax;
-      ResetTransferFunction(this->m_Widget3ColorTransferFunction, type, this->m_RangeSliderMin, this->m_RangeSliderMax);
-      m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget3ColorTransferFunction );
-      mitk::TransferFunction::Pointer tf3 = mitk::TransferFunction::New();
-      tf3->SetColorTransferFunction( m_Widget3ColorTransferFunction );
-      m_MitkIntensityImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf3));
+      if (intensityImage.IsNotNull())
+      {
+        m_RangeSliderMin = intensityImage->GetStatistics()->GetScalarValueMin();
+        m_RangeSliderMax = intensityImage->GetStatistics()->GetScalarValueMax();
+        MITK_INFO<<"Intensity Min: "<<m_RangeSliderMin;
+        MITK_INFO<<"Intensity Max: "<<m_RangeSliderMax;
+        ResetTransferFunction(this->m_Widget3ColorTransferFunction, type, this->m_RangeSliderMin, this->m_RangeSliderMax);
+        m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->m_Widget3ColorTransferFunction );
+        mitk::TransferFunction::Pointer tf3 = mitk::TransferFunction::New();
+        tf3->SetColorTransferFunction( m_Widget3ColorTransferFunction );
+        m_MitkIntensityImageNode->SetProperty("Image Rendering.Transfer Function",mitk::TransferFunctionProperty::New(tf3));
+      }
     }
     break;
   }

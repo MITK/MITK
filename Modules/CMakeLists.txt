@@ -31,6 +31,7 @@ set(module_dirs
     ToFUI
     ClippingTools
     US  
+    BreakpadCrashReporting
 )
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

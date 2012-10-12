@@ -23,9 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
 
+#include "mitkBreakpadCrashReporting.h"
+
 // Load image (nrrd format) and display it in a 2D view
 int main(int argc, char* argv[])
 {
+
+  mitk::BreakpadCrashReporting myBreakpad;
+  myBreakpad.Initialize();
+
   QApplication qtapplication( argc, argv );
 
   if (argc < 2)
@@ -98,6 +104,8 @@ int main(int argc, char* argv[])
   //*************************************************************************
   renderWindow.show();
   renderWindow.resize( 256, 256 );
+
+  myBreakpad.CrashAppForTestPurpose();
   
   qtapplication.exec();
 

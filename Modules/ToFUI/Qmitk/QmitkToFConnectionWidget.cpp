@@ -130,9 +130,9 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 {
   bool playerMode = false;
 
-  this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
   if (m_Controls->m_ConnectCameraButton->text()=="Connect")
   {   
+    this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
     //reset the status of the GUI buttons
     m_Controls->m_ConnectCameraButton->setEnabled(false);
     m_Controls->m_SelectCameraCombobox->setEnabled(false);

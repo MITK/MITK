@@ -89,6 +89,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(KinectAcquisitionModeChanged()), this, SLOT(OnKinectAcquisitionModeChanged()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
@@ -264,6 +265,26 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
   }
 }
 
+void QmitkToFUtilView::OnKinectAcquisitionModeChanged()
+{
+  if (m_ToFCompositeFilter.IsNotNull())
+  {
+    if (m_SelectedCamera=="Microsoft Kinect")
+    {
+      if (m_ToFImageGrabber->GetBoolProperty("RGB"))
+      {
+        this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+      }
+      else if (m_ToFImageGrabber->GetBoolProperty("IR"))
+      {
+        this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+        this->m_AmplitudeImageNode = ReplaceNodeData("IR image",m_MitkAmplitudeImage);
+      }
+    }
+    this->UseToFVisibilitySettings(true);
+  }
+}
+
 void QmitkToFUtilView::OnToFCameraStarted()
 {
   if (m_ToFImageGrabber.IsNotNull())
@@ -279,20 +300,28 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_ToFCompositeFilter->Update();
     this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
     this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
-    this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
-    this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-    this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
-    this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
 
     std::string rgbFileName;
     m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
     if ((m_SelectedCamera=="Microsoft Kinect")||(rgbFileName!=""))
     {
-      this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+      if (m_ToFImageGrabber->GetBoolProperty("RGB"))
+      {
+        this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+      }
+      else if (m_ToFImageGrabber->GetBoolProperty("IR"))
+      {
+        this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+        this->m_AmplitudeImageNode = ReplaceNodeData("IR image",m_MitkAmplitudeImage);
+      }
     }
     else
     {
       this->m_RGBImageNode = NULL;
+      this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+      this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
+      this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+      this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
     }
 
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);

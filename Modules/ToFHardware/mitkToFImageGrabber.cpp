@@ -257,6 +257,35 @@ namespace mitk
     this->m_ToFCameraDevice->SetProperty(propertyKey, propertyValue);
   }
 
+  bool ToFImageGrabber::GetBoolProperty( const char* propertyKey)
+  {
+    mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey));
+    return boolProp->GetValue();
+  }
+
+  int ToFImageGrabber::GetIntProperty( const char* propertyKey)
+  {
+    mitk::IntProperty::Pointer intProp = dynamic_cast<mitk::IntProperty*>(GetProperty(propertyKey));
+    return intProp->GetValue();
+  }
+
+  float ToFImageGrabber::GetFloatProperty( const char* propertyKey)
+  {
+    mitk::FloatProperty::Pointer floatProp = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey));
+    return floatProp->GetValue();
+  }
+
+  const char* ToFImageGrabber::GetStringProperty( const char* propertyKey)
+  {
+    mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey));
+    return stringProp->GetValue();
+  }
+
+  BaseProperty* ToFImageGrabber::GetProperty( const char *propertyKey)
+  {
+    return this->m_ToFCameraDevice->GetProperty(propertyKey);
+  }
+
   void ToFImageGrabber::OnToFCameraDeviceModified()
   {
     this->Modified();

@@ -79,6 +79,7 @@ void QmitkToFConnectionWidget::CreateConnections()
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(OnSelectCamera(const QString)) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SLOT(OnSelectCamera(const QString)) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SIGNAL(ToFCameraSelected(const QString)) );
+    connect( m_Controls->m_KinectParameterWidget, SIGNAL(AcquisitionModeChanged()), this, SIGNAL(KinectAcquisitionModeChanged()) );
   }
 }
 
@@ -129,9 +130,9 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 {
   bool playerMode = false;
 
-  this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
   if (m_Controls->m_ConnectCameraButton->text()=="Connect")
   {   
+    this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
     //reset the status of the GUI buttons
     m_Controls->m_ConnectCameraButton->setEnabled(false);
     m_Controls->m_SelectCameraCombobox->setEnabled(false);

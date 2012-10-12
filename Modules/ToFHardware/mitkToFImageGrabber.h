@@ -139,6 +139,16 @@ namespace mitk
 
     void SetProperty( const char *propertyKey, BaseProperty* propertyValue );
 
+    bool GetBoolProperty( const char* propertyKey);
+
+    int GetIntProperty( const char* propertyKey);
+
+    float GetFloatProperty( const char* propertyKey);
+
+    const char* GetStringProperty( const char* propertyKey);
+
+    BaseProperty* GetProperty( const char *propertyKey);
+
   protected:
 
     ///

@@ -115,6 +115,10 @@ protected slots:
     \brief Slot invoked when user alters the coronal window input from RGB to Intensity or vice versa.
     */
     void OnChangeCoronalWindowOutput(int index);
+    /*!
+    \brief Slot invoked when acquisition mode of Kinect is changed
+    */
+    void OnKinectAcquisitionModeChanged();
 
 protected:
 

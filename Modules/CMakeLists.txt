@@ -51,6 +51,7 @@ set(module_dirs
     Persistence
     IGTUI
     VtkShaders
+    BreakpadCrashReporting
 )
 
 if(MITK_ENABLE_PIC_READER)

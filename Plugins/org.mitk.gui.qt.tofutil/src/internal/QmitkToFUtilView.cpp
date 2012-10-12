@@ -28,6 +28,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QString>
 
+//QT headers
+#include <qmessagebox.h>
+#include <qfiledialog.h>
+#include <qcombobox.h>
+
 // MITK
 #include <mitkBaseRenderer.h>
 #include <mitkGlobalInteraction.h>
@@ -35,6 +40,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFDistanceImageToPointSetFilter.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
+
+#include <mitkToFDeviceFactoryManager.h>
+#include <mitkToFCameraDevice.h>
+
+//itk headers
+#include <itksys/SystemTools.hxx>
 
 // VTK
 #include <vtkCamera.h>
@@ -44,6 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 
+//Constructor
 QmitkToFUtilView::QmitkToFUtilView()
 : QmitkAbstractView()
 , m_Controls(NULL), m_MultiWidget( NULL )
@@ -65,17 +77,14 @@ QmitkToFUtilView::QmitkToFUtilView()
   this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 }
 
+//Destructor, specifically calling OnToFCameraStopped() and OnToFCammeraDiconnected()
 QmitkToFUtilView::~QmitkToFUtilView()
 {
         OnToFCameraStopped();
         OnToFCameraDisconnected();
 }
 
-void QmitkToFUtilView::SetFocus()
-{
-  m_Controls->m_ToFConnectionWidget->setFocus();
-}
-
+//Createing the PartControl Signal-Slot principal
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
@@ -85,20 +94,34 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkToFUtilViewControls;
     m_Controls->setupUi( parent );
 
+    //Looking for Input and Defining reaction
     connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(KinectAcquisitionModeChanged()), this, SLOT(OnKinectAcquisitionModeChanged()) );
+
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(KinectAcquisitionModeChanged()), this, SLOT(OnKinectAcquisitionModeChanged()) ); // Todo in Widget2
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStopped()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
+
+  ////m_ConnectCameraDev does not exist anymore, neither does m_DeviceServiceListWidget->uncommenting both actions
+    //connect( (QObject*)(m_Controls->m_ConnectCameraDev), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
+    //std::string empty= "";
+    //m_Controls->m_DeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
   }
 }
 
+//SetFocus-Method -> actually seting Focus to the Recorder
+void QmitkToFUtilView::SetFocus()
+{
+  m_Controls->m_ToFRecorderWidget->setFocus();
+}
+
+//Activated-Method->Generating RenderWindow
 void QmitkToFUtilView::Activated()
 {
   //get the current RenderWindowPart or open a new one if there is none
@@ -138,6 +161,7 @@ void QmitkToFUtilView::Activated()
   }
 }
 
+//ZomnnieView-Method -> Resetting GUI to default. Why not just QmitkToFUtilView()?!
 void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer /*zombieView*/)
 {
   ResetGUIToDefault();
@@ -152,14 +176,15 @@ void QmitkToFUtilView::Visible()
 {
 }
 
+//Reset of the ToFUtilView
 void QmitkToFUtilView::Hidden()
 {
-
     ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::OnToFCameraConnected()
 {
+  MITK_INFO <<"OnToFCameraConnected";
   this->m_SurfaceDisplayCount = 0;
   this->m_2DDisplayCount = 0;
 
@@ -168,12 +193,13 @@ void QmitkToFUtilView::OnToFCameraConnected()
   this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
   this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 
-  this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();
+  this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget2->GetToFImageGrabber();
 
   this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
   m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
   m_Controls->m_ToFRecorderWidget->setEnabled(true);
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
+    m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true); //todo ist das richtig?
 
   // initialize measurement widget
   m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());
@@ -375,7 +401,7 @@ void QmitkToFUtilView::OnToFCameraStopped()
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
   m_SelectedCamera = selected;
-  if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
+  if ((selected.contains("CamBoard"))||(selected.contains("O3D")))
   {
     MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
     this->m_Controls->m_SurfaceCheckBox->setEnabled(false);

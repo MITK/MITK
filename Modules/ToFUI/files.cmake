@@ -1,6 +1,9 @@
 SET(CPP_FILES
   Qmitk/QmitkKinectParameterWidget.cpp
-  Qmitk/QmitkToFConnectionWidget.cpp
+  #Qmitk/QmitkToFConnectionWidget.cpp
+
+  Qmitk/QmitkToFConnectionWidget2.cpp
+
   Qmitk/QmitkToFPointSetWidget.cpp
   Qmitk/QmitkToFRecorderWidget.cpp
   Qmitk/QmitkToFVisualisationSettingsWidget.cpp
@@ -10,7 +13,10 @@ SET(CPP_FILES
 )
 SET(UI_FILES
   Qmitk/QmitkKinectParameterWidgetControls.ui
-  Qmitk/QmitkToFConnectionWidgetControls.ui
+  #Qmitk/QmitkToFConnectionWidgetControls.ui
+
+  Qmitk/QmitkToFConnectionWidgetControls2.ui
+
   Qmitk/QmitkToFPointSetWidgetControls.ui
   Qmitk/QmitkToFRecorderWidgetControls.ui
   Qmitk/QmitkToFVisualisationSettingsWidgetControls.ui
@@ -21,7 +27,11 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   Qmitk/QmitkKinectParameterWidget.h
-  Qmitk/QmitkToFConnectionWidget.h
+
+  #Qmitk/QmitkToFConnectionWidget.h
+
+  Qmitk/QmitkToFConnectionWidget2.h
+
   Qmitk/QmitkToFPointSetWidget.h
   Qmitk/QmitkToFRecorderWidget.h
   Qmitk/QmitkToFVisualisationSettingsWidget.h

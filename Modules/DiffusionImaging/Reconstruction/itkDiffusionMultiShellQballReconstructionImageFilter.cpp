@@ -418,44 +418,31 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       {
         m_Interpolation_Flag = true;
         MITK_INFO << "Shell interpolation: shells with different numbers of directions";
-      }else // if each shell holds same numbers of directions, but the gradient direction differ more than one 1 degree
+      }
+      else
       {
+        // else if each shell holds same numbers of directions, but the gradient direction differ more than one 1 degree
         m_Interpolation_Flag = CheckForDifferingShellDirections();
-        if(m_Interpolation_Flag) MITK_INFO << "Shell interpolation: gradient direction differ more than one 1 degree";
+        MITK_INFO << "Shell interpolation: gradient direction differ more than one 1 degree";
       }
 
       m_ReconstructionType = Mode_Analytical3Shells;
 
       if(m_Interpolation_Flag)
       {
-        IndiciesVector min_shell;
-        IndiciesVector max_shell;
-        int Interpolation_SHOrder = 10;
+        const int Interpolation_SHOrder = L;
 
-        //fewer directions
-        if (vecSize1 <= vecSize2 )      { min_shell = shell1;}
-        else                            { min_shell = shell2;}
-        if (min_shell.size() > vecSize3){ min_shell = shell3;}
+        // Create direction container for all directions (no duplicates, different directions from all shells)
+        IndiciesVector  all_directions_container = GetAllDirections();
 
-        //most directions
-        if (vecSize1 >= vecSize2 )      { max_shell = shell1;}
-        else                            { max_shell = shell2;}
-        if (max_shell.size() < vecSize3){ max_shell = shell3;}
-
-        m_MaxDirections = max_shell.size();
-
-        //SH-order determination
-        while( ((Interpolation_SHOrder+1)*(Interpolation_SHOrder+2)/2) > min_shell.size() && Interpolation_SHOrder > L )
-          Interpolation_SHOrder -= 2 ;
-
-        MITK_INFO << "Interpolation enabeled, using SH of order : " << Interpolation_SHOrder;
+        m_MaxDirections = all_directions_container.size();
 
         // create target SH-Basis
-        vnl_matrix<double> * Q = new vnl_matrix<double>(3, max_shell.size());
-        ComputeSphericalFromCartesian(Q, max_shell);
+        vnl_matrix<double> * Q = new vnl_matrix<double>(3, m_MaxDirections);
+        ComputeSphericalFromCartesian(Q, all_directions_container);
 
-        int NumberOfCoeffs = (int)(Interpolation_SHOrder*Interpolation_SHOrder + Interpolation_SHOrder + 2.0)/2.0 + Interpolation_SHOrder;
-        m_Interpolation_TARGET_SH = new vnl_matrix<double>(max_shell.size(), NumberOfCoeffs);
+        const int NumberOfCoeffs = (int)(Interpolation_SHOrder*Interpolation_SHOrder + Interpolation_SHOrder + 2.0)/2.0 + Interpolation_SHOrder;
+        m_Interpolation_TARGET_SH = new vnl_matrix<double>(m_MaxDirections, NumberOfCoeffs);
         ComputeSphericalHarmonicsBasis(Q, m_Interpolation_TARGET_SH, Interpolation_SHOrder);
         delete Q;
         // end creat target SH-Basis
@@ -508,7 +495,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         delete temp;
         delete tempSHBasis;
 
-        ComputeReconstructionMatrix(max_shell);
+        ComputeReconstructionMatrix(all_directions_container);
         return;
       }else
       {
@@ -1049,6 +1036,88 @@ bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   return value;
 }
 
+template< class T, class TG, class TO, int L, int NODF>
+std::vector<unsigned int> DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
+::GetAllDirections()
+{
+  IndiciesVector directioncontainer;
+
+  BValueMapIteraotr mapIterator = m_BValueMap.begin();
+  mapIterator++;
+  IndiciesVector shell1 = mapIterator->second;
+  mapIterator++;
+  IndiciesVector shell2 = mapIterator->second;
+  mapIterator++;
+  IndiciesVector shell3 = mapIterator->second;
+
+  while(shell1.size()>0)
+  {
+    unsigned int wntIndex = shell1.back();
+    shell1.pop_back();
+
+    IndiciesVector::iterator containerIt = directioncontainer.begin();
+    bool directionExist = false;
+    while(containerIt != directioncontainer.end())
+    {
+      if (fabs(dot(m_GradientDirectionContainer->ElementAt(*containerIt), m_GradientDirectionContainer->ElementAt(wntIndex)))  > 0.9998)
+      {
+        directionExist = true;
+        break;
+      }
+      containerIt++;
+    }
+    if(!directionExist)
+    {
+      directioncontainer.push_back(wntIndex);
+    }
+  }
+
+  while(shell2.size()>0)
+  {
+    unsigned int wntIndex = shell2.back();
+    shell2.pop_back();
+
+    IndiciesVector::iterator containerIt = directioncontainer.begin();
+    bool directionExist = false;
+    while(containerIt != directioncontainer.end())
+    {
+      if (fabs(dot(m_GradientDirectionContainer->ElementAt(*containerIt), m_GradientDirectionContainer->ElementAt(wntIndex)))  > 0.9998)
+      {
+        directionExist = true;
+        break;
+      }
+      containerIt++;
+    }
+    if(!directionExist)
+    {
+      directioncontainer.push_back(wntIndex);
+    }
+  }
+
+  while(shell3.size()>0)
+  {
+    unsigned int wntIndex = shell3.back();
+    shell3.pop_back();
+
+    IndiciesVector::iterator containerIt = directioncontainer.begin();
+    bool directionExist = false;
+    while(containerIt != directioncontainer.end())
+    {
+      if (fabs(dot(m_GradientDirectionContainer->ElementAt(*containerIt), m_GradientDirectionContainer->ElementAt(wntIndex)))  > 0.9998)
+      {
+        directionExist = true;
+        break;
+      }
+      containerIt++;
+    }
+    if(!directionExist)
+    {
+      directioncontainer.push_back(wntIndex);
+    }
+  }
+
+  return directioncontainer;
+}
 
 // corresponding directions between shells (e.g. dir1_shell1 vs dir1_shell2) differ more than 1 degree.
 template< class T, class TG, class TO, int L, int NODF>
@@ -1059,11 +1128,11 @@ bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
   BValueMapIteraotr mapIterator = m_BValueMap.begin();
   mapIterator++;
-  std::vector<unsigned int> shell1 = mapIterator->second;
+  IndiciesVector shell1 = mapIterator->second;
   mapIterator++;
-  std::vector<unsigned int> shell2 = mapIterator->second;
+  IndiciesVector shell2 = mapIterator->second;
   mapIterator++;
-  std::vector<unsigned int> shell3 = mapIterator->second;
+  IndiciesVector shell3 = mapIterator->second;
 
   for (int i=0; i< shell1.size(); i++)
     if (fabs(dot(m_GradientDirectionContainer->ElementAt(shell1[i]), m_GradientDirectionContainer->ElementAt(shell2[i])))  <= 0.9998) {interp_flag=true; break;}

@@ -54,7 +54,7 @@ mitk::SegTool2D::SegTool2D(const char* type)
  m_LastEventSender(NULL),
  m_LastEventSlice(0),
  m_Contourmarkername ("Position"),
- m_ShowMarkerNodes (true),
+ m_ShowMarkerNodes (false),
  m_3DInterpolationEnabled(true)
 {
 }

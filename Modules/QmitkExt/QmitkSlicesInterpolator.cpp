@@ -89,7 +89,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   grid->addWidget(m_BtnAccept3DInterpolation, 0,1);
 
   m_CbShowMarkers = new QCheckBox("Show Position Nodes", this);
-  m_CbShowMarkers->setChecked(true);
+  m_CbShowMarkers->setChecked(false);
   connect(m_CbShowMarkers, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
   connect(m_CbShowMarkers, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
   grid->addWidget(m_CbShowMarkers,0,2);

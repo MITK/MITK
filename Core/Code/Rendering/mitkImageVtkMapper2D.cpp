@@ -804,10 +804,11 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
+  // We take the pointer to the first pixel of the image
+  currentPixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer() );
+
   while (y <= yMax) 
   { 
-    currentPixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer(x, y, 0));
-
     //if the current pixel value is set to something
     if ((currentPixel) && (*currentPixel != 0)) 
     {
@@ -907,7 +908,14 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       x = xMin;
       y++;
     }
-  }//end of while
+    
+    // Increase the pointer-position to the next pixel.
+    // This is safe, as the while-loop and the x-reset logic above makes 
+    // sure we do not exceed the bounds of the image
+    currentPixel++;
+  
+
+}//end of while
 
 
   // Create a polydata to store everything in

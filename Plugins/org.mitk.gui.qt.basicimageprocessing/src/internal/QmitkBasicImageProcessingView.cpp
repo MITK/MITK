@@ -88,6 +88,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkAndImageFilter.h>
 #include <itkXorImageFilter.h>
 
+// Flip Image
+#include <itkFlipImageFilter.h>
+
 
 // Convenient Definitions
 typedef itk::Image<short, 3>                                                            ImageType;
@@ -124,6 +127,8 @@ typedef itk::DivideImageFilter< ImageType, ImageType, FloatImageType >          
 typedef itk::OrImageFilter< ImageType, ImageType >                                      OrImageFilterType;
 typedef itk::AndImageFilter< ImageType, ImageType >                                     AndImageFilterType;
 typedef itk::XorImageFilter< ImageType, ImageType >                                     XorImageFilterType;
+
+typedef itk::FlipImageFilter< ImageType >                                               FlipImageFilterType;
 
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
@@ -204,6 +209,7 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat1->insertItem( THRESHOLD, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Threshold", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( INVERSION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Image Inversion", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( DOWNSAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Downsampling", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( FLIPPING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Flipping", 0, QApplication::UnicodeUTF8) ));
 
   this->m_Controls->cbWhat2->clear();
   this->m_Controls->cbWhat2->insertItem( TWOIMAGESNOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select on operation", 0, QApplication::UnicodeUTF8) ) );
@@ -486,6 +492,18 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->setMinimum( 1 );
       m_Controls->sbParam1->setMaximum( 100 );
       m_Controls->sbParam1->setValue( 2 );
+      break;
+    }
+
+  case 18:
+    {
+      m_SelectedAction = FLIPPING;
+      m_Controls->tlParam1->setEnabled(true);
+      m_Controls->sbParam1->setEnabled(true);
+      text1 = "Flip across axis:";
+      m_Controls->sbParam1->setMinimum( 0 );
+      m_Controls->sbParam1->setMaximum( 2 );
+      m_Controls->sbParam1->setValue( 1 );
       break;
     }
 
@@ -785,6 +803,29 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       newImage = mitk::ImportItkImage(downsampler->GetOutput());
       nameAddition << "_Downsampled_by_" << param1;
       std::cout << "Downsampling successful." << std::endl;
+      break;
+    }
+
+  case FLIPPING:
+    {
+      FlipImageFilterType::Pointer flipper = FlipImageFilterType::New();
+      flipper->SetInput( itkImage );
+      itk::FixedArray<bool, 3> flipAxes;
+      for(int i=0; i<3; ++i)
+      {
+        if(i == param1)
+        {
+          flipAxes[i] = true;
+        }
+        else
+        {
+          flipAxes[i] = false;
+        }
+      }
+      flipper->SetFlipAxes(flipAxes);
+      flipper->UpdateLargestPossibleRegion();
+      newImage = mitk::ImportItkImage(flipper->GetOutput());
+      std::cout << "Image flipping successful." << std::endl;
       break;
     }
 

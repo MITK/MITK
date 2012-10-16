@@ -19,6 +19,9 @@ SET(MITK_TOF_AVAILABLE_CAMERAS MITK Player)
 OPTION(MITK_ENABLE_TOF_HARDWARE "Support for range cameras" OFF)
 IF(MITK_ENABLE_TOF_HARDWARE)
 
+
+
+
 #Begin PMD Camcube hardware
 #OPTION(MITK_USE_TOF_PMDCAMCUBE "Enable support for PMD camcube" OFF)
 
@@ -46,6 +49,10 @@ IF(MITK_ENABLE_TOF_HARDWARE)
 #ENDIF(MITK_USE_TOF_PMDCAMCUBE)
 #End PMD Camcube Hardware
 
+
+
+
+
 #Begin PMD CamBoard hardware
 #OPTION(MITK_USE_TOF_PMDCAMBOARD "Enable support for PMD camboard" OFF)
 
@@ -72,6 +79,9 @@ IF(MITK_ENABLE_TOF_HARDWARE)
 #ENDIF(MITK_USE_TOF_PMDCAMBOARD)
 #End PMD CamBoard Hardware
 
+
+
+
 ##Begin MESA SR4000 hardware
 #OPTION(MITK_USE_TOF_MESASR4000 "Enable support for MESA SR4000" OFF)
 
@@ -87,6 +97,9 @@ IF(MITK_ENABLE_TOF_HARDWARE)
 #  ENDIf(WIN32)
 #ENDIF(MITK_USE_TOF_MESASR4000)
 ##End MESA SR4000 Hardware
+
+
+
 
 #IF (WIN32)
 

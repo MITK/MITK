@@ -51,7 +51,7 @@ QmitkToFConnectionWidget2::~QmitkToFConnectionWidget2()
 
 void QmitkToFConnectionWidget2::CreateQtPartControl(QWidget *parent)   //Definition of CreateQtPartControll-Methode in QmitkToFConnectionWidget2; Input= Pointer
 {
-  if (!m_Controls)
+  if (!m_Controls) //Define if not alreaddy exists
   {
     // create GUI widgets
     m_Controls = new Ui::QmitkToFConnectionWidgetControls2;
@@ -75,6 +75,11 @@ void QmitkToFConnectionWidget2::CreateConnections()
 
     //QmitkServiceListWidget::ServiceSelectionChanged as a Signal for the OnSlectCamera() slot
     connect( m_Controls->m_DeviceList, SIGNAL(ServiceSelectionChanged(mitk::ServiceReference)), this, SLOT(OnSelectCamera()));
+
+    /*Creating an other Datanode structur for Kinect is done here: As soon as a Kinect is connected, the KinectParameterWidget is enabled,
+    which can be used to trigger the KinectAcqusitionModeChanged-Method, to create a working Data-Node-structure*/
+   connect( m_Controls->m_KinectParameterWidget, SIGNAL(AcquisitionModeChanged()), this, SIGNAL(KinectAcquisitionModeChanged()) );
+
   }
 }
 
@@ -145,6 +150,13 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
     //Feeding it with the Info from ServiceListWidget
     this->m_ToFImageGrabber->SetCameraDevice(device);
 
+    if (selectedCamera.contains("Kinect") )
+    {
+      MITK_INFO<< "Kinect connected";
+      this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());//--------------------------------------------------------
+      this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());
+    }
+
     //Activation of "PlayerMode". If the selectedCamera String contains "Player", we start the Player Mode
     if (selectedCamera.contains("Player"))
     {
@@ -202,7 +214,6 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
           //Defining "found" Variable
           int found = baseFilename.rfind("_DistanceImage");
 
-//THOMAS fragen, ob hier unterschiedliches im baseFilename gefunden werden kann? Zudem wird nach der IF-Abfrage doch weitergesucht oder?Besitzt jedes "Bild" ein "_DistanceImage"-------------------------------
           if (found == std::string::npos)
           {
             found = baseFilename.rfind("_AmplitudeImage");
@@ -283,8 +294,6 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
       this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
       this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
-
-      //todo nochmal gleiche fallunterscheidung. Oder aber if/else eventuell komplett weglassen------------------------------------------------------------------
       if (selectedCamera.contains("PMD"))
       {
         this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();

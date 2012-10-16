@@ -28,11 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Load image (nrrd format) and display it in a 2D view
 int main(int argc, char* argv[])
 {
-
-  mitk::BreakpadCrashReporting myBreakpad;
-  myBreakpad.Initialize();
-
   QApplication qtapplication( argc, argv );
+
+  
+  mitk::BreakpadCrashReporting myBreakpad;
+  myBreakpad.StartCrashServer(true);
+  myBreakpad.InitializeClientHandler(true);
 
   if (argc < 2)
   {

@@ -6,7 +6,7 @@ if(MITK_USE_BREAKPAD_CRASH_REPORTING)
   if(CMAKE_SYSTEM MATCHES "Windows") 
   
     FIND_PATH(MITK_BREAKPAD_SRC_DIR breakpad_googletest_includes.h ${MITK_BREAKPAD_SRC_DIR} DOC  "Directory breakpad/src/")
-    #FIND_PATH(MITK_PMD_INCLUDE_DIR pmdsdk2.h ${MITK_PMD_SDK_DIR}/include DOC  "Include directory of PMD-SDK.")
+ 
     SET(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_BREAKPAD_SRC_DIR})
     SET(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_BREAKPAD_SRC_DIR}/client/windows/Release/lib/common.lib)
     SET(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_BREAKPAD_SRC_DIR}/client/windows/Release/lib/crash_generation_client.lib)
@@ -24,7 +24,21 @@ if(MITK_USE_BREAKPAD_CRASH_REPORTING)
     ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
     QT_MODULE
     )
-  
+    
+    
+    if(WIN32) # crash report server without console window
+     
+     # how to create main.moc ??
+     #QT4_WRAP_CPP(SERVER_MOC_CPP mitkCrashReportingServer.cpp)
+        
+     #use this for windows console: 
+     # add_executable(CrashReportingServer mitkCrashReportingServer.cpp ${SERVER_MOC_CPP})
+     add_executable(CrashReportingServer WIN32 mitkCrashReportingServer.cpp ${SERVER_MOC_CPP})
+     
+     target_link_libraries(CrashReportingServer ${ALL_LIBRARIES} ${QT_QTMAIN_LIBRARY} BreakpadCrashReporting)
+   
+    endif()
+
   endif()
 
 endif(MITK_USE_BREAKPAD_CRASH_REPORTING)

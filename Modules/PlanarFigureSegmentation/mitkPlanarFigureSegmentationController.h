@@ -56,6 +56,8 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
 
     virtual ~PlanarFigureSegmentationController();
 
+    typedef std::vector<PlanarFigure::Pointer> PlanarFigureListType;
+
     /**
     * \brief Setter for the reference image.
     * 
@@ -104,6 +106,8 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
     * all points of the PlanarFigure's polyline.
     */
     static Surface::Pointer CreateSurfaceFromPlanarFigure( PlanarFigure::Pointer figure );
+
+    PlanarFigureListType GetAllPlanarFigures();
    
 
 
@@ -111,7 +115,13 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
 
     PlanarFigureSegmentationController();
 
-    typedef std::vector<PlanarFigure::Pointer> PlanarFigureListType;
+    /*!
+    \brief Internal templated method calling the ITK bilteral filter. Here the actual filtering is performed.
+    */
+    template<typename TPixel, unsigned int VImageDimension>
+    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage );
+
+
 
     PlanarFigureListType m_PlanarFigureList;
 
@@ -132,6 +142,8 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
     CreateDistanceImageFromSurfaceFilter::Pointer m_DistanceImageCreator;
     
     Image::Pointer m_ReferenceImage;
+
+    Image::Pointer m_SegmentationAsImage;
 
 
 };

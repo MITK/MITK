@@ -729,7 +729,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       min2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMin();
       max2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMax();
     }
-    if ( minValue == maxValue )
+    if ((maxValue == min2ndValue && minValue == max2ndValue) || minValue == maxValue)
     {
       // centralSlice is strange, lets look at all data
       minValue    = image->GetStatistics()->GetScalarValueMin();

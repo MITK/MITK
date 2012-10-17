@@ -133,8 +133,8 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
       unsigned int offset = lineLength * y + x;
       ipMITKSegmentationTYPE* current = (ipMITKSegmentationTYPE*)stupidClone->data + offset;
 
-      float pixelCenterX = x + 0.5;
-      float pixelCenterY = y + 0.5;
+      float pixelCenterX = x;
+      float pixelCenterY = y;
 
       float xoff = pixelCenterX - circleCenterX;
       float yoff = pixelCenterY - circleCenterY;

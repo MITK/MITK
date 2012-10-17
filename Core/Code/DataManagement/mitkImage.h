@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,21 +45,21 @@ class ImageStatisticsHolder;
 //##Documentation
 //## @brief Image class for storing images
 //##
-//## Can be asked for header information, the data vector, 
+//## Can be asked for header information, the data vector,
 //## the mitkIpPicDescriptor struct or vtkImageData objects. If not the complete
 //## data is required, the appropriate SubImageSelector class should be used
 //## for access.
 //## Image organizes sets of slices (s x 2D), volumes (t x 3D) and channels (n
-//## x ND). Channels are for different kind of data, e.g., morphology in 
-//## channel 0, velocities in channel 1. All channels must have the same Geometry! In 
+//## x ND). Channels are for different kind of data, e.g., morphology in
+//## channel 0, velocities in channel 1. All channels must have the same Geometry! In
 //## particular, the dimensions of all channels are the same, only the pixel-type
 //## may differ between channels.
 //##
 //## For importing ITK images use of mitk::ITKImageImport is recommended, see
 //## \ref Adaptor.
 //##
-//## For ITK v3.8 and older: Converting coordinates from the ITK physical 
-//## coordinate system (which does not support rotated images) to the MITK world 
+//## For ITK v3.8 and older: Converting coordinates from the ITK physical
+//## coordinate system (which does not support rotated images) to the MITK world
 //## coordinate system should be performed via the Geometry3D of the Image, see
 //## Geometry3D::WorldToItkPhysicalPoint.
 //## @ingroup Data
@@ -88,9 +88,9 @@ public:
   typedef mitk::ImageStatisticsHolder* StatisticsHolderPointer;
 
   //## @param ImportMemoryManagementType This parameter is evaluated when setting new data to an image.
-  //## The different options are: 
+  //## The different options are:
   //## CopyMemory: Data to be set is copied and assigned to a new memory block. Data memory block will be freed on deletion of mitk::Image.
-  //## MamageMemory: Data to be set will be referenced, and Data memory block will be freed on deletion of mitk::Image. 
+  //## MamageMemory: Data to be set will be referenced, and Data memory block will be freed on deletion of mitk::Image.
   //## Reference Memory: Data to be set will be referenced, but Data memory block will not be freed on deletion of mitk::Image.
   //## DontManageMemory = ReferenceMemory.
   enum ImportMemoryManagementType { CopyMemory, ManageMemory, ReferenceMemory, DontManageMemory = ReferenceMemory };
@@ -98,7 +98,7 @@ public:
   //##Documentation
   //## @brief Vector container of SmartPointers to ImageDataItems;
   //## Class is only for internal usage to allow convenient access to all slices over iterators;
-  //## See documentation of ImageDataItem for details. 
+  //## See documentation of ImageDataItem for details.
   typedef std::vector<ImageDataItemPointer> ImageDataItemPointerArray;
 
 public:
@@ -162,10 +162,10 @@ public:
 
   //##Documentation
   //## @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data 
-  //## is really a slice (at least is not smaller than a slice), since there is 
+  //## the responsibility of the caller to ensure that the data vector @a data
+  //## is really a slice (at least is not smaller than a slice), since there is
   //## no chance to check this.
-  //## 
+  //##
   //## The data is copied to an array managed by the image. If the image shall
   //## reference the data, use SetImportSlice with ImportMemoryManagementType
   //## set to ReferenceMemory. For importing ITK images use of mitk::
@@ -175,10 +175,10 @@ public:
 
   //##Documentation
   //## @brief Set @a data as volume at time @a t in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data 
-  //## is really a volume (at least is not smaller than a volume), since there is 
+  //## the responsibility of the caller to ensure that the data vector @a data
+  //## is really a volume (at least is not smaller than a volume), since there is
   //## no chance to check this.
-  //## 
+  //##
   //## The data is copied to an array managed by the image. If the image shall
   //## reference the data, use SetImportVolume with ImportMemoryManagementType
   //## set to ReferenceMemory. For importing ITK images use of mitk::
@@ -188,10 +188,10 @@ public:
 
   //##Documentation
   //## @brief Set @a data in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data 
-  //## is really a channel (at least is not smaller than a channel), since there is 
+  //## the responsibility of the caller to ensure that the data vector @a data
+  //## is really a channel (at least is not smaller than a channel), since there is
   //## no chance to check this.
-  //## 
+  //##
   //## The data is copied to an array managed by the image. If the image shall
   //## reference the data, use SetImportChannel with ImportMemoryManagementType
   //## set to ReferenceMemory. For importing ITK images use of mitk::
@@ -201,30 +201,30 @@ public:
 
   //##Documentation
   //## @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data 
-  //## is really a slice (at least is not smaller than a slice), since there is 
+  //## the responsibility of the caller to ensure that the data vector @a data
+  //## is really a slice (at least is not smaller than a slice), since there is
   //## no chance to check this.
-  //## 
+  //##
   //## The data is managed according to the parameter \a importMemoryManagement.
   //## @sa SetPicSlice
   virtual bool SetImportSlice(void *data, int s = 0, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
 
   //##Documentation
   //## @brief Set @a data as volume at time @a t in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data 
-  //## is really a volume (at least is not smaller than a volume), since there is 
+  //## the responsibility of the caller to ensure that the data vector @a data
+  //## is really a volume (at least is not smaller than a volume), since there is
   //## no chance to check this.
-  //## 
+  //##
   //## The data is managed according to the parameter \a importMemoryManagement.
   //## @sa SetPicVolume
   virtual bool SetImportVolume(void *data, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
 
   //##Documentation
   //## @brief Set @a data in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data 
-  //## is really a channel (at least is not smaller than a channel), since there is 
+  //## the responsibility of the caller to ensure that the data vector @a data
+  //## is really a channel (at least is not smaller than a channel), since there is
   //## no chance to check this.
-  //## 
+  //##
   //## The data is managed according to the parameter \a importMemoryManagement.
   //## @sa SetPicChannel
   virtual bool SetImportChannel(void *data, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
@@ -243,7 +243,7 @@ public:
   //##Documentation
   //## initialize new (or re-initialize) image information by a Geometry2D and number of slices
   //##
-  //## Initializes the bounding box according to the width/height of the 
+  //## Initializes the bounding box according to the width/height of the
   //## Geometry2D and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
   //## The spacing is calculated from the Geometry2D.
   //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
@@ -260,8 +260,8 @@ public:
   virtual void Initialize(const mitk::ImageDescriptor::Pointer inDesc);
 
   //##Documentation
-  //## initialize new (or re-initialize) image information by @a pic. 
-  //## Dimensions and @a Geometry3D /@a Geometry2D are set according 
+  //## initialize new (or re-initialize) image information by @a pic.
+  //## Dimensions and @a Geometry3D /@a Geometry2D are set according
   //## to the tags in @a pic.
   //## Only the header is used, not the data vector! Use SetPicVolume(pic)
   //## to set the data vector.
@@ -273,18 +273,19 @@ public:
 
   //##Documentation
   //## initialize new (or re-initialize) image information by @a vtkimagedata,
-  //## a vtk-image. 
-  //## Only the header is used, not the data vector! Use 
+  //## a vtk-image.
+  //## Only the header is used, not the data vector! Use
   //## SetVolume(vtkimage->GetScalarPointer()) to set the data vector.
   //##
   //## @param tDim override time dimension in @a vtkimagedata (if >0 and <)
   //## @param sDim override z-space dimension in @a vtkimagedata (if >0 and <)
-  virtual void Initialize(vtkImageData* vtkimagedata, int channels = 1, int tDim = -1, int sDim = -1);
+  //## @param pDim override y-space dimension in @a vtkimagedata (if >0 and <)
+  virtual void Initialize(vtkImageData* vtkimagedata, int channels = 1, int tDim = -1, int sDim = -1, int pDim = -1);
 
   //##Documentation
-  //## initialize new (or re-initialize) image information by @a itkimage, 
-  //## a templated itk-image. 
-  //## Only the header is used, not the data vector! Use 
+  //## initialize new (or re-initialize) image information by @a itkimage,
+  //## a templated itk-image.
+  //## Only the header is used, not the data vector! Use
   //## SetVolume(itkimage->GetBufferPointer()) to set the data vector.
   //##
   //## @param tDim override time dimension in @a itkimage (if >0 and <)
@@ -297,7 +298,7 @@ public:
     // build array with dimensions in each direction with at least 4 entries
     m_Dimension=itkimage->GetImageDimension();
     unsigned int i, *tmpDimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
-    for(i=0;i<m_Dimension;++i) 
+    for(i=0;i<m_Dimension;++i)
       tmpDimensions[i]=itkimage->GetLargestPossibleRegion().GetSize().GetSize()[i];
     if(m_Dimension<4)
     {
@@ -318,10 +319,10 @@ public:
 
 
     Initialize(MakePixelType<itkImageType>(),
-      m_Dimension, 
+      m_Dimension,
       tmpDimensions,
       channels);
-    const typename itkImageType::SpacingType & itkspacing = itkimage->GetSpacing();  
+    const typename itkImageType::SpacingType & itkspacing = itkimage->GetSpacing();
 
     MITK_DEBUG << "ITK spacing " << itkspacing;
     // access spacing of itk::Image
@@ -334,7 +335,7 @@ public:
 
     // access origin of itk::Image
     Point3D origin;
-    const typename itkImageType::PointType & itkorigin = itkimage->GetOrigin();  
+    const typename itkImageType::PointType & itkorigin = itkimage->GetOrigin();
     MITK_DEBUG << "ITK origin " << itkorigin;
     FillVector3D(origin, itkorigin[0], 0.0, 0.0);
     if(m_Dimension>=2)
@@ -343,7 +344,7 @@ public:
       origin[2]=itkorigin[2];
 
     // access direction of itk::Imagm_PixelType = new mitk::PixelType(type);e and include spacing
-    const typename itkImageType::DirectionType & itkdirection = itkimage->GetDirection();  
+    const typename itkImageType::DirectionType & itkdirection = itkimage->GetDirection();
     MITK_DEBUG << "ITK direction " << itkdirection;
     mitk::Matrix3D matrix;
     matrix.SetIdentity();
@@ -369,7 +370,7 @@ public:
         // In these cases spacing is not determind by ITK correctly (because it distinguishes correctly
         // between slice thickness and inter slice distance -- slice distance is meaningless for
         // single slices).
-        // I experienced that ITK produced something meaningful nonetheless because is is 
+        // I experienced that ITK produced something meaningful nonetheless because is is
         // evaluating the tag "(0018,0088) Spacing between slices" as a fallback. This tag is not
         // reliable (http://www.itk.org/pipermail/insight-users/2005-September/014711.html)
         // but gives at least a hint.
@@ -413,7 +414,7 @@ public:
 
     // re-initialize TimeSlicedGeometry
     GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
-    
+
     // clean-up
     delete [] tmpDimensions;
 
@@ -421,22 +422,22 @@ public:
   };
 
   //##Documentation
-  //## @brief Check whether slice @a s at time @a t in channel @a n is valid, i.e., 
+  //## @brief Check whether slice @a s at time @a t in channel @a n is valid, i.e.,
   //## is (or can be) inside of the image
   virtual bool IsValidSlice(int s = 0, int t = 0, int n = 0) const;
 
   //##Documentation
-  //## @brief Check whether volume at time @a t in channel @a n is valid, i.e., 
+  //## @brief Check whether volume at time @a t in channel @a n is valid, i.e.,
   //## is (or can be) inside of the image
   virtual bool IsValidVolume(int t = 0, int n = 0) const;
 
   //##Documentation
-  //## @brief Check whether the channel @a n is valid, i.e., 
+  //## @brief Check whether the channel @a n is valid, i.e.,
   //## is (or can be) inside of the image
   virtual bool IsValidChannel(int n = 0) const;
 
   //##Documentation
-  //## @brief Returns true if an image is rotated, i.e. its geometry's 
+  //## @brief Returns true if an image is rotated, i.e. its geometry's
   //## transformation matrix has nonzero elements besides the diagonal.
   //## Non-diagonal elements are checked if larger then 1/1000 of the matrix' trace.
   bool IsRotated() const;
@@ -568,7 +569,7 @@ public:
   }
 
 protected:
-  
+
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 
   int GetVolumeIndex(int t = 0, int n = 0) const;
@@ -639,7 +640,7 @@ private:
 //## If you get a compile error, try image.GetPointer();
 //## @ingroup Adaptor
 //## \sa mitkITKImageImport
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
 {
   if(mitkoutputimage.IsNull())
@@ -658,7 +659,7 @@ void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk:
 //## If you get a compile error, try image.GetPointer();
 //## @ingroup Adaptor
 //## \sa mitkITKImageImport
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
 {
   if(mitkoutputimage.IsNull())

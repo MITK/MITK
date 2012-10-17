@@ -178,10 +178,10 @@ protected:
     {
         MITK_INFO << "SphereInterpolator: loading lookuptables from custom path: " << lutPath;
 
-        QString path(lutPath.c_str()); path += "FiberTrackingLUTBaryCoords.bin";
+        string path = lutPath; path.append("FiberTrackingLUTBaryCoords.bin");
         std::ifstream BaryCoordsStream;
-        BaryCoordsStream.open(path.toStdString().c_str(), ios::in | ios::binary);
-        MITK_INFO << "SphereInterpolator: 1 " << path.toStdString().c_str();
+        BaryCoordsStream.open(path.c_str(), ios::in | ios::binary);
+        MITK_INFO << "SphereInterpolator: 1 " << path;
         if (BaryCoordsStream.is_open())
         {
             try
@@ -204,15 +204,15 @@ protected:
         }
         else
         {
-            MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTBaryCoords.bin from " << path.toStdString();
+            MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTBaryCoords.bin from " << path;
             return false;
         }
         MITK_INFO << "SphereInterpolator: first lut loaded successfully";
 
         ifstream IndicesStream;
-        path = lutPath.c_str(); path += "FiberTrackingLUTIndices.bin";
-        IndicesStream.open(path.toStdString().c_str(), ios::in | ios::binary);
-        MITK_INFO << "SphereInterpolator: 1 " << path.toStdString().c_str();
+        path = lutPath; path.append("FiberTrackingLUTIndices.bin");
+        IndicesStream.open(path.c_str(), ios::in | ios::binary);
+        MITK_INFO << "SphereInterpolator: 1 " << path;
         if (IndicesStream.is_open())
         {
             try
@@ -235,7 +235,7 @@ protected:
         }
         else
         {
-            MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTIndices.bin from " << path.toStdString();
+            MITK_INFO << "SphereInterpolator: could not load FiberTrackingLUTIndices.bin from " << path;
             return false;
         }
         MITK_INFO << "SphereInterpolator: second lut loaded successfully";

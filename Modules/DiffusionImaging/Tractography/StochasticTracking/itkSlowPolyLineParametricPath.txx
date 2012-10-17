@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -58,7 +58,7 @@ SlowPolyLineParametricPath<VDimension>
   IndexType   currentImageIndex;
   IndexType   nextImageIndex;
   IndexType   finalImageIndex;
-  
+
   iterationCount    = 0;
   inputStepSize     = this->GetDefaultInputStepSize();
 
@@ -72,14 +72,14 @@ SlowPolyLineParametricPath<VDimension>
     {
     return this->GetZeroOffset();
     }
-  
+
   do
     {
-    if( iterationCount++ > 10000 ) {itkExceptionMacro(<<"Too many iterations");}
-    
+    if( iterationCount++ > 10000 ) {return this->GetZeroOffset(); itkExceptionMacro(<<"Too many iterations");}
+
     nextImageIndex    = this->EvaluateToIndex( input + inputStepSize );
     offset            = nextImageIndex - currentImageIndex;
-    
+
     tooBig = false;
     tooSmall = ( offset == this->GetZeroOffset() );
     if( tooSmall )
@@ -98,7 +98,7 @@ SlowPolyLineParametricPath<VDimension>
         {
         tooBig = ( offset[i] >= 2 || offset[i] <= -2 );
         }
-      
+
       if( tooBig ){
         //inputStepSize /= 1.5;
         inputStepSize -= (this->GetDefaultInputStepSize()/0.5);
@@ -106,7 +106,7 @@ SlowPolyLineParametricPath<VDimension>
     }
   }
   while( tooSmall || tooBig );
-  
+
   input += inputStepSize;
   return offset;
 }

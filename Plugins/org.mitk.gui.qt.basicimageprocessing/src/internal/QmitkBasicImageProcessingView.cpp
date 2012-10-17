@@ -204,6 +204,7 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat1->insertItem( THRESHOLD, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Threshold", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( INVERSION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Image Inversion", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( DOWNSAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Downsampling", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( UPSAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Upsampling", 0, QApplication::UnicodeUTF8) ));
 
   this->m_Controls->cbWhat2->clear();
   this->m_Controls->cbWhat2->insertItem( TWOIMAGESNOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select on operation", 0, QApplication::UnicodeUTF8) ) );
@@ -483,6 +484,18 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->tlParam1->setEnabled(true);
       m_Controls->sbParam1->setEnabled(true);
       text1 = "Downsampling by Factor:";
+      m_Controls->sbParam1->setMinimum( 1 );
+      m_Controls->sbParam1->setMaximum( 100 );
+      m_Controls->sbParam1->setValue( 2 );
+      break;
+    }
+
+  case 18:
+    {
+      m_SelectedAction = UPSAMPLING;
+      m_Controls->tlParam1->setEnabled(true);
+      m_Controls->sbParam1->setEnabled(true);
+      text1 = "Upsampling by Factor:";
       m_Controls->sbParam1->setMinimum( 1 );
       m_Controls->sbParam1->setMaximum( 100 );
       m_Controls->sbParam1->setValue( 2 );
@@ -785,6 +798,38 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       newImage = mitk::ImportItkImage(downsampler->GetOutput());
       nameAddition << "_Downsampled_by_" << param1;
       std::cout << "Downsampling successful." << std::endl;
+      break;
+    }
+
+  case UPSAMPLING:
+    {
+      ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
+      resampler->SetInput( itkImage );
+
+      typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double > InterpolatorType;
+      InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      resampler->SetInterpolator( interpolator );
+
+      resampler->SetDefaultPixelValue( 0 );
+
+      ResampleImageFilterType::SpacingType spacing = itkImage->GetSpacing();
+      spacing *= 1.0/param1;
+      resampler->SetOutputSpacing( spacing );
+
+      resampler->SetOutputOrigin( itkImage->GetOrigin() );
+      resampler->SetOutputDirection( itkImage->GetDirection() );
+
+      ResampleImageFilterType::SizeType size = itkImage->GetLargestPossibleRegion().GetSize();
+      for ( int i = 0; i < 3; ++i )
+      {
+        size[i] *= param1;
+      }
+      resampler->SetSize( size );
+      resampler->UpdateLargestPossibleRegion();
+
+      newImage = mitk::ImportItkImage(resampler->GetOutput());
+      nameAddition << "_Upsampled_by_" << param1;
+      std::cout << "Upsampling successful." << std::endl;
       break;
     }
 

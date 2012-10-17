@@ -50,13 +50,14 @@ int mitkNavigationDataSourceTest(int /* argc */, char* /*argv*/[])
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(myFilter.IsNotNull(), "Testing instantiation");
 
-  MITK_TEST_CONDITION(myFilter->GetInputs().size() == 0, "testing initial number of inputs"); 
-  MITK_TEST_CONDITION(myFilter->GetOutputs().size() == 0, "testing initial number of outputs");
+  // testing create outputs
+  MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 0, "testing initial number of inputs"); 
+  MITK_TEST_CONDITION(myFilter->GetNumberOfOutputs() == 0, "testing initial number of outputs");
   myFilter->CreateOutput();
-  MITK_TEST_CONDITION(myFilter->GetOutputs().size() == 1, "testing SetNumberOfOutputs() and MakeOutput()");
+  MITK_TEST_CONDITION(myFilter->GetNumberOfOutputs() == 1, "testing SetNumberOfOutputs() and MakeOutput()");
   MITK_TEST_CONDITION(dynamic_cast<mitk::NavigationData*>(myFilter->GetOutput()) != NULL, "test GetOutput() returning valid output object");
 
-
+  //create and initialize test objects
   mitk::NavigationData::PositionType initialPos;
   mitk::FillVector3D(initialPos, 1.0, 2.0, 3.0);
   mitk::NavigationData::OrientationType initialOri(0.1, 0.2, 0.3, 0.4);
@@ -68,6 +69,7 @@ int mitkNavigationDataSourceTest(int /* argc */, char* /*argv*/[])
   nd1->SetPositionAccuracy(initialError);
   nd1->SetDataValid(initialValid);
   
+  //test method graft
   MITK_TEST_OUTPUT(<< "testing Graftoutput()");
   myFilter->GraftOutput(nd1);
   mitk::NavigationData::Pointer out = myFilter->GetOutput();
@@ -78,8 +80,21 @@ int mitkNavigationDataSourceTest(int /* argc */, char* /*argv*/[])
                        (out->IsDataValid() == nd1->IsDataValid()) &&
                        mitk::Equal(out->GetTimeStamp(), nd1->GetTimeStamp()), "testing if content of output is equal to input of Graft");
 
+  //test method GetParameters()
   mitk::PropertyList::ConstPointer list = myFilter->GetParameters();
   MITK_TEST_CONDITION(list.IsNotNull(), "testing GetParameters()");
+
+  //test invalid call of methods
+  myFilter = MyNavigationDataSourceTest::New();
+
+  mitk::NavigationData::Pointer testOutput = myFilter->GetOutput(0);
+  MITK_TEST_CONDITION(testOutput.IsNull(), "testing GetOutput(int) before initialization");
+
+  mitk::NavigationData::Pointer testOutput = myFilter->GetOutput("test");
+  MITK_TEST_CONDITION(testOutput.IsNull(), "testing GetOutput(string) before initialization");
+
+  //bool exceptionThrown
+  
   // always end with this!
   MITK_TEST_END();
 }

@@ -54,6 +54,8 @@ public:
   itkSetMacro( UseImageGeometry, bool)
   itkGetMacro( UseImageGeometry, bool)
 
+  itkSetMacro( BinaryOutput, bool)
+
   void GenerateData();
 
 protected:
@@ -67,6 +69,7 @@ protected:
   float m_UpsamplingFactor;
   bool m_InvertImage;
   bool m_UseImageGeometry;
+  bool m_BinaryOutput;
   typename OutputImageType::Pointer m_InputImage;
 };
 

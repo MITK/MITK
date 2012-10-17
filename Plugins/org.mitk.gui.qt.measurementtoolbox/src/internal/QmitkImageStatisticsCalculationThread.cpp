@@ -111,15 +111,28 @@ void QmitkImageStatisticsCalculationThread::run()
   {
     statisticCalculationSuccessful = false;
   }
-  if(this->m_BinaryMask.IsNotNull())
+
+  // Bug 13416 : The ImageStatistics::SetImageMask() method can throw exceptions, i.e. when the dimensionality
+  // of the masked and input image differ, we need to catch them and mark the calculation as failed
+  // the same holds for the ::SetPlanarFigure()
+  try
   {
-    calculator->SetImageMask(m_BinaryMask);
-    calculator->SetMaskingModeToImage();
+    if(this->m_BinaryMask.IsNotNull())
+    {
+
+      calculator->SetImageMask(m_BinaryMask);
+      calculator->SetMaskingModeToImage();
+    }
+    if(this->m_PlanarFigureMask.IsNotNull())
+    {
+      calculator->SetPlanarFigure(m_PlanarFigureMask);
+      calculator->SetMaskingModeToPlanarFigure();
+    }
   }
-  if(this->m_PlanarFigureMask.IsNotNull())
+  catch( const itk::ExceptionObject& e)
   {
-    calculator->SetPlanarFigure(m_PlanarFigureMask);
-    calculator->SetMaskingModeToPlanarFigure();
+    MITK_ERROR << "ITK Exception:" << e.what();
+    statisticCalculationSuccessful = false;
   }
   bool statisticChanged = false;
 

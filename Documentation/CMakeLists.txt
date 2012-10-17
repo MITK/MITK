@@ -9,6 +9,18 @@ find_package(Doxygen)
 
 if(DOXYGEN_FOUND)
 
+# Different doxygen versions produce different significantly different behaviour in the MITK documentation
+# especially in regards to the MITK Qt assistant help files. For this reason we support only one version at a time
+set(supported_doxygen_version "1.8.0")
+
+if(CMAKE_VERSION VERSION_LESS "2.8.8")
+  EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} "--version" OUTPUT_VARIABLE DOXYGEN_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
+
+if(NOT DOXYGEN_VERSION VERSION_EQUAL ${supported_doxygen_version})
+  MESSAGE("Unsupported doxygen version ${DOXYGEN_VERSION}. MITK documentation has been tested to work with doxygen ${supported_doxygen_version}")
+endif()
+
 option(USE_DOT "Use dot program for generating graphical class diagrams with doxygen, if available" ON)
 option(MITK_DOXYGEN_BUILD_ALWAYS "Always build the MITK documentation when building the default target" OFF)
 option(MITK_DOXYGEN_GENERATE_QCH_FILES "Use doxygen to generate Qt compressed help files for MITK docs" OFF)

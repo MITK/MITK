@@ -52,7 +52,9 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_Interpolation_SHT1_inv(0),
   m_Interpolation_SHT2_inv(0),
   m_Interpolation_SHT3_inv(0),
-  m_Interpolation_TARGET_SH(0)
+  m_TARGET_SH_shell1(0),
+  m_TARGET_SH_shell2(0),
+  m_TARGET_SH_shell3(0)
 {
   // At least 1 inputs is necessary for a vector image.
   // For images added one at a time we need at least six
@@ -396,25 +398,25 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
     BValueMapIteraotr it = m_BValueMap.begin();
     it++; // skip b0 entry
-    const int b1 = it->first;
-    const int vecSize1 = it->second.size();
+    const int bValue_shell1 = it->first;
+    const int size_shell1 = it->second.size();
     IndiciesVector shell1 = it->second;
     it++;
-    const int b2 = it->first;
-    const int vecSize2 = it->second.size();
+    const int bValue_shell2 = it->first;
+    const int size_shell2 = it->second.size();
     IndiciesVector shell2 = it->second;
     it++;
-    const int b3 = it->first;
-    const int vecSize3 = it->second.size();
+    const int bValue_shell3 = it->first;
+    const int size_shell3 = it->second.size();
     IndiciesVector shell3 = it->second;
 
     // arithmetic progrssion
-    if(b2 - b1 == b1 && b3 - b2 == b1 )
+    if(bValue_shell2 - bValue_shell1 == bValue_shell1 && bValue_shell3 - bValue_shell2 == bValue_shell1 )
     {
       // check if Interpolation is needed
       // if shells with different numbers of directions exist
       m_Interpolation_Flag = false;
-      if(vecSize1 != vecSize2 || vecSize2 != vecSize3 || vecSize1 != vecSize3)
+      if(size_shell1 != size_shell2 || size_shell2 != size_shell3 || size_shell1 != size_shell3)
       {
         m_Interpolation_Flag = true;
         MITK_INFO << "Shell interpolation: shells with different numbers of directions";
@@ -430,7 +432,24 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       if(m_Interpolation_Flag)
       {
-        const int Interpolation_SHOrder = L;
+        int interp_SHOrder_shell1 = 10;
+        while( ((interp_SHOrder_shell1+1)*(interp_SHOrder_shell1+2)/2) > size_shell1 && interp_SHOrder_shell1 > L )
+          interp_SHOrder_shell1 -= 2 ;
+
+        const int number_coeffs_shell1 = (int)(interp_SHOrder_shell1*interp_SHOrder_shell1 + interp_SHOrder_shell1 + 2.0)/2.0 + interp_SHOrder_shell1;
+
+        int interp_SHOrder_shell2 = 10;
+        while( ((interp_SHOrder_shell2+1)*(interp_SHOrder_shell2+2)/2) > size_shell2 && interp_SHOrder_shell2 > L )
+          interp_SHOrder_shell2 -= 2 ;
+
+        const int number_coeffs_shell2 = (int)(interp_SHOrder_shell2*interp_SHOrder_shell2 + interp_SHOrder_shell2 + 2.0)/2.0 + interp_SHOrder_shell2;
+
+        int interp_SHOrder_shell3 = 10;
+        while( ((interp_SHOrder_shell3+1)*(interp_SHOrder_shell3+2)/2) > size_shell3 && interp_SHOrder_shell3 > L )
+          interp_SHOrder_shell3 -= 2 ;
+
+        const int number_coeffs_shell3 = (int)(interp_SHOrder_shell3*interp_SHOrder_shell3 + interp_SHOrder_shell3 + 2.0)/2.0 + interp_SHOrder_shell3;
+
 
         // Create direction container for all directions (no duplicates, different directions from all shells)
         IndiciesVector  all_directions_container = GetAllDirections();
@@ -440,11 +459,24 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         // create target SH-Basis
         vnl_matrix<double> * Q = new vnl_matrix<double>(3, m_MaxDirections);
         ComputeSphericalFromCartesian(Q, all_directions_container);
-
-        const int NumberOfCoeffs = (int)(Interpolation_SHOrder*Interpolation_SHOrder + Interpolation_SHOrder + 2.0)/2.0 + Interpolation_SHOrder;
-        m_Interpolation_TARGET_SH = new vnl_matrix<double>(m_MaxDirections, NumberOfCoeffs);
-        ComputeSphericalHarmonicsBasis(Q, m_Interpolation_TARGET_SH, Interpolation_SHOrder);
+        m_TARGET_SH_shell1 = new vnl_matrix<double>(m_MaxDirections, number_coeffs_shell1);
+        ComputeSphericalHarmonicsBasis(Q, m_TARGET_SH_shell1, interp_SHOrder_shell1);
         delete Q;
+
+        Q = new vnl_matrix<double>(3, m_MaxDirections);
+        ComputeSphericalFromCartesian(Q, all_directions_container);
+        m_TARGET_SH_shell2 = new vnl_matrix<double>(m_MaxDirections, number_coeffs_shell2);
+        ComputeSphericalHarmonicsBasis(Q, m_TARGET_SH_shell2, interp_SHOrder_shell2);
+        delete Q;
+
+        Q = new vnl_matrix<double>(3, m_MaxDirections);
+        ComputeSphericalFromCartesian(Q, all_directions_container);
+        m_TARGET_SH_shell3 = new vnl_matrix<double>(m_MaxDirections, number_coeffs_shell3);
+        ComputeSphericalHarmonicsBasis(Q, m_TARGET_SH_shell3, interp_SHOrder_shell3);
+        delete Q;
+
+
+
         // end creat target SH-Basis
 
         // create measured-SHBasis
@@ -455,8 +487,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         Q = new vnl_matrix<double>(3, shell1.size());
         ComputeSphericalFromCartesian(Q, shell1);
 
-        tempSHBasis = new vnl_matrix<double>(shell1.size(), NumberOfCoeffs);
-        ComputeSphericalHarmonicsBasis(Q, tempSHBasis, Interpolation_SHOrder);
+        tempSHBasis = new vnl_matrix<double>(shell1.size(), number_coeffs_shell1);
+        ComputeSphericalHarmonicsBasis(Q, tempSHBasis, interp_SHOrder_shell1);
         temp = new vnl_matrix_inverse<double>((*tempSHBasis));
 
         m_Interpolation_SHT1_inv = new vnl_matrix<double>(temp->inverse());
@@ -469,8 +501,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         Q = new vnl_matrix<double>(3, shell2.size());
         ComputeSphericalFromCartesian(Q, shell2);
 
-        tempSHBasis = new vnl_matrix<double>(shell2.size(), NumberOfCoeffs);
-        ComputeSphericalHarmonicsBasis(Q, tempSHBasis, Interpolation_SHOrder);
+        tempSHBasis = new vnl_matrix<double>(shell2.size(), number_coeffs_shell2);
+        ComputeSphericalHarmonicsBasis(Q, tempSHBasis, interp_SHOrder_shell2);
+
         temp = new vnl_matrix_inverse<double>((*tempSHBasis));
 
         m_Interpolation_SHT2_inv = new vnl_matrix<double>(temp->inverse());
@@ -483,9 +516,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         Q = new vnl_matrix<double>(3, shell3.size());
         ComputeSphericalFromCartesian(Q, shell3);
 
-        tempSHBasis = new vnl_matrix<double>(shell3.size(), NumberOfCoeffs);
-
-        ComputeSphericalHarmonicsBasis(Q, tempSHBasis, Interpolation_SHOrder);
+        tempSHBasis = new vnl_matrix<double>(shell3.size(), number_coeffs_shell3);
+        ComputeSphericalHarmonicsBasis(Q, tempSHBasis, interp_SHOrder_shell3);
 
         temp = new vnl_matrix_inverse<double>((*tempSHBasis));
 
@@ -692,9 +724,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
   if(m_Interpolation_Flag)
   {
-    tempInterpolationMatrixShell1 = (*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT1_inv);
-    tempInterpolationMatrixShell2 = (*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT2_inv);
-    tempInterpolationMatrixShell3 = (*m_Interpolation_TARGET_SH) * (*m_Interpolation_SHT3_inv);
+    tempInterpolationMatrixShell1 = (*m_TARGET_SH_shell1) * (*m_Interpolation_SHT1_inv);
+    tempInterpolationMatrixShell2 = (*m_TARGET_SH_shell2) * (*m_Interpolation_SHT2_inv);
+    tempInterpolationMatrixShell3 = (*m_TARGET_SH_shell3) * (*m_Interpolation_SHT3_inv);
   }
 
   OdfPixelType odf(0.0);

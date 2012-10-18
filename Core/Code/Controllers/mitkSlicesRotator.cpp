@@ -399,13 +399,13 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
   MITK_DEBUG << "moveSlices?          " << moveSlices;
 
 
-  StateEvent* decidedEvent(NULL);
+  std::auto_ptr<StateEvent> decidedEvent;
 
   // question in state machine is: "rotate?"
   if (moveSlices) // i.e. NOT rotate
   {
     // move all planes to posEvent->GetWorldPosition()
-    decidedEvent = new StateEvent(EIDNO, e->GetEvent());
+    decidedEvent.reset( new StateEvent(EIDNO, e->GetEvent()) );
       MITK_DEBUG << "Rotation not possible, not enough information (other planes crossing rendering plane) ";
   }
   else
@@ -414,18 +414,17 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
 
     if (anyOtherGeometry->IntersectionPoint(intersectionLineWithGeometryToBeRotated, m_CenterOfRotation)) // find center of rotation by intersection with any of the OTHER lines
     {
-      decidedEvent = new StateEvent(EIDYES, e->GetEvent());
+      decidedEvent.reset( new StateEvent(EIDYES, e->GetEvent()) );
       MITK_DEBUG << "Rotation possible";
     }
     else
     {
       MITK_DEBUG << "Rotation not possible, cannot determine the center of rotation!?";
-      decidedEvent = new StateEvent(EIDNO, e->GetEvent());
+      decidedEvent.reset( new StateEvent(EIDNO, e->GetEvent()) );
     }
   }
 
-  this->HandleEvent( decidedEvent );
-  delete decidedEvent;
+  this->HandleEvent( decidedEvent.get() );
 
   return true;
 }

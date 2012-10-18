@@ -36,7 +36,7 @@ class MITK_CORE_EXPORT ChannelDescriptor
 public:
     ChannelDescriptor(mitk::PixelType type, size_t numOfElements, bool allocate = false);
 
-    ~ChannelDescriptor(){}
+    ~ChannelDescriptor();
 
     /** \brief Get the type of channel's elements */
     PixelType GetPixelType() const

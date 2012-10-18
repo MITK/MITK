@@ -112,13 +112,13 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
     }
   case AcMOVE:
     {
-      DisplayCoordinateOperation* doOp = new DisplayCoordinateOperation(OpMOVE,  m_Sender, m_StartDisplayCoordinate, m_CurrentDisplayCoordinate, posEvent->GetDisplayPosition());
+      DisplayCoordinateOperation doOp(OpMOVE,  m_Sender, m_StartDisplayCoordinate, m_CurrentDisplayCoordinate, posEvent->GetDisplayPosition());
       //make Operation
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
       
       //execute the Operation
-      m_Destination->ExecuteOperation(doOp);
+      m_Destination->ExecuteOperation(&doOp);
       ok = true;
       break;
     }
@@ -129,7 +129,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
     }
   case AcZOOM:
     {
-      DisplayCoordinateOperation* doOp = new DisplayCoordinateOperation(OpZOOM,  m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, posEvent->GetDisplayPosition(),m_StartCoordinateInMM);
+      DisplayCoordinateOperation doOp(OpZOOM,  m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, posEvent->GetDisplayPosition(),m_StartCoordinateInMM);
             
       //make Operation
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
@@ -137,7 +137,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
       //MITK_INFO << m_CurrentDisplayCoordinate << std::endl;
       
       //execute the Operation
-      m_Destination->ExecuteOperation(doOp);
+      m_Destination->ExecuteOperation(&doOp);
       ok = true;
       break;
     }

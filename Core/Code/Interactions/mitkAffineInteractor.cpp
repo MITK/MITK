@@ -76,7 +76,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       /* now we have a worldpoint. check if it is inside our object and select/deselect it accordingly */
       mitk::BoolProperty::Pointer selected;
       mitk::ColorProperty::Pointer color;
-      mitk::StateEvent* newStateEvent = NULL;
+      std::auto_ptr<StateEvent> newStateEvent;
 
       selected = dynamic_cast<mitk::BoolProperty*>(m_DataNode->GetProperty("selected"));
 
@@ -94,13 +94,13 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 
       if (this->CheckSelected(worldPoint, m_TimeStep))
       {
-        newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+        newStateEvent.reset(new mitk::StateEvent(EIDYES, stateEvent->GetEvent()));
         selected->SetValue(true);
         color->SetColor(1.0, 1.0, 0.0);
       }
       else
       {
-        newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+        newStateEvent.reset(new mitk::StateEvent(EIDNO, stateEvent->GetEvent()));
         selected = mitk::BoolProperty::New(false);
         color->SetColor(0.0, 0.0, 1.0);
 
@@ -116,25 +116,25 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       }
 
       /* write new state (selected/not selected) to the property */      
-      this->HandleEvent( newStateEvent );
+      this->HandleEvent( newStateEvent.get() );
       ok = true;
       break;
     }
   case AcADD:
     {
       mitk::Point3D worldPoint = event->GetWorldPosition();
-      mitk::StateEvent* newStateEvent = NULL;
+      std::auto_ptr<StateEvent> newStateEvent;
       if (this->CheckSelected(worldPoint, m_TimeStep))
       {
-        newStateEvent = new mitk::StateEvent(EIDYES, event);
+        newStateEvent.reset(new mitk::StateEvent(EIDYES, event));
         m_DataNode->GetPropertyList()->SetProperty("selected", mitk::BoolProperty::New(true));  // TODO: Generate an Select Operation and send it to the undo controller ?
       }
       else  // if not selected, do nothing (don't deselect)
       {
-        newStateEvent = new mitk::StateEvent(EIDNO, event);
+        newStateEvent.reset(new mitk::StateEvent(EIDNO, event));
       }
       //call HandleEvent to leave the guard-state
-      this->HandleEvent( newStateEvent );
+      this->HandleEvent( newStateEvent.get() );
       ok = true;
       break;
     }
@@ -165,6 +165,10 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       }
       /* execute the Operation */
       geometry->ExecuteOperation(doOp);
+
+      if (!m_UndoEnabled)
+        delete doOp;
+
       ok = true;
       break;
     }
@@ -207,6 +211,10 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       }
       /* execute the Operation */
       geometry->ExecuteOperation(doOp);
+
+      if(!m_UndoEnabled)
+        delete doOp;
+
       ok = true;
       break;
     }
@@ -261,6 +269,10 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       }
       /* execute the Operation */
       geometry->ExecuteOperation(doOp);
+
+      if(!m_UndoEnabled)
+        delete doOp;
+
       /* Update Volume Property with new value */
       /*
       mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataNode->GetData());

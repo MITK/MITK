@@ -64,15 +64,15 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
       mitk::Point3D worldPoint = posEvent->GetWorldPosition();
       /* now we have a worldpoint. check if it is inside our object and select/deselect it accordingly */
 
-      mitk::StateEvent* newStateEvent = NULL;
+      std::auto_ptr<StateEvent> newStateEvent;
       const Geometry3D* geometry = GetData()->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
       if (geometry->IsInside(worldPoint))
-        newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+        newStateEvent.reset(new mitk::StateEvent(EIDYES, stateEvent->GetEvent()));
       else
-        newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+        newStateEvent.reset(new mitk::StateEvent(EIDNO, stateEvent->GetEvent()));
 
       /* write new state (selected/not selected) to the property */      
-      this->HandleEvent( newStateEvent );
+      this->HandleEvent( newStateEvent.get() );
     
     ok = true;
     break;

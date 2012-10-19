@@ -1,3 +1,4 @@
+IF(MITK_ENABLE_TOF_HARDWARE)
 #Begin MESA SR4000 hardware
 OPTION(MITK_USE_TOF_MESASR4000 "Enable support for MESA SR4000" OFF)
 
@@ -27,3 +28,4 @@ MITK_CREATE_MODULE(mitkMesaSR4000Module
   Message("MesaSR4000 Module erfolgreich erstellt")
   add_subdirectory(Testing)
 ENDIF(MITK_USE_TOF_MESASR4000)
+ENDIF(MITK_ENABLE_TOF_HARDWARE)

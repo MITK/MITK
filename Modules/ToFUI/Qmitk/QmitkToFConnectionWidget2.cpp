@@ -114,7 +114,7 @@ void QmitkToFConnectionWidget2::OnSelectCamera()
   }
   emit  (selectedCamera);
 }
-
+//This Methods hides all Widgets (later each widget is activated on its own)
 void QmitkToFConnectionWidget2::HideAllParameterWidgets()
 {
   this->m_Controls->m_PMDParameterWidget->hide();
@@ -150,9 +150,11 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
     //Feeding it with the Info from ServiceListWidget
     this->m_ToFImageGrabber->SetCameraDevice(device);
 
+    // Calling Alex FixForKinect, if the Kinect is selected
     if (selectedCamera.contains("Kinect") )
     {
       MITK_INFO<< "Kinect connected";
+      //If the particular property is selected, the suitable data-node will be generated
       this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());//--------------------------------------------------------
       this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());
     }
@@ -172,7 +174,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
       }
     }
 
-    // if a player was selected
+    // if a player was selected, the playerMode-variable is true, and we will enter the following code
     if (playerMode)
     {
       //open a QFileDialog to chose the corresponding file from the disc
@@ -190,7 +192,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
         return;
       }
 
-      if(selectedCamera.contains("PMDPlayer"))
+      if(selectedCamera.contains("PMDPlayer"))  //If PMD-Player is selected, set ToFImageGrabberProperty correspondingly
       {
         this->m_ToFImageGrabber->SetStringProperty("PMDFileName", tmpFileName.toStdString().c_str() );
       }
@@ -211,12 +213,13 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
             throw std::logic_error(msg.c_str());
           }
 
-          //Defining "found" Variable
-          int found = baseFilename.rfind("_DistanceImage");
+          //Checking for npos. If available, check for the Amplitude-, Intensity- and RGBImage
+
+          int found = baseFilename.rfind("_DistanceImage"); //Defining "found" variable+checking if baseFilname contains "_DistanceImage". If not, found = npos
 
           if (found == std::string::npos)
           {
-            found = baseFilename.rfind("_AmplitudeImage");
+            found = baseFilename.rfind("_AmplitudeImage");  // if "_AmplitudeImage" is found, the found variable is 1
           }
           if (found == std::string::npos)
           {

@@ -51,7 +51,12 @@ SlicesRotator::Pointer SlicesRotator::New()
 SlicesRotator::SlicesRotator(const char* machine)
 : SlicesCoordinator(machine)
 {
-
+  // make sure that AcSWITCHON and AcSWITCHOFF are defined int constants somewhere (e.g. mitkInteractionConst.h)
+  CONNECT_ACTION( AcMOVE, DoSelectSlice );
+  CONNECT_ACTION( AcCHECKPOINT, DoDecideBetweenRotationAndSliceSelection );
+  CONNECT_ACTION( AcROTATESTART, DoStartRotation );
+  CONNECT_ACTION( AcROTATE, DoRotationStep );
+  CONNECT_ACTION( AcROTATEEND, DoEndRotation );
 }
 
 SlicesRotator::~SlicesRotator()
@@ -60,7 +65,6 @@ SlicesRotator::~SlicesRotator()
 }
 
 
-// check if the slices of this SliceNavigationController can be rotated (???) Possible
 void SlicesRotator::OnSliceControllerAdded(SliceNavigationController* snc)
 {
   if (!snc) return;
@@ -72,7 +76,7 @@ void SlicesRotator::OnSliceControllerAdded(SliceNavigationController* snc)
 void SlicesRotator::OnSliceControllerRemoved(SliceNavigationController* snc)
 {
   if (!snc) return;
-  // nothing to do
+  // nothing to do, base class does the bookkeeping
 }
 
 /// Is called whenever a SliceNavigationController invokes an event. Will update the list
@@ -81,7 +85,7 @@ void SlicesRotator::SetGeometry(const itk::EventObject& /*EventObject*/)
 {
   // there is no way to determine the sender?
   // ==> update whole list of SNCs
-  UpdateRelevantSNCs();
+  UpdateRotatableSNCs();
 }
 
 
@@ -92,7 +96,7 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
   SliceNavigationController *thirdSNC = NULL;
 
   SNCVector::iterator iter;
-  for ( iter = m_RelevantSNCs.begin(); iter != m_RelevantSNCs.end(); ++iter )
+  for ( iter = m_RotatableSNCs.begin(); iter != m_RotatableSNCs.end(); ++iter )
   {
     if ( ((*iter) != rotationPlaneSNC)
       && ((*iter) != rotatedPlaneSNC) )
@@ -196,7 +200,7 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
   else
   {
     SNCVector::iterator iter;
-    for ( iter = m_RelevantSNCs.begin(); iter != m_RelevantSNCs.end(); ++iter )
+    for ( iter = m_RotatableSNCs.begin(); iter != m_RotatableSNCs.end(); ++iter )
     {
       BaseRenderer *renderer = (*iter)->GetRenderer();
       if ( renderer == NULL )
@@ -231,13 +235,13 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
       (*iter)->SendCreatedWorldGeometryUpdate();
     } 
   }
-}
+} // end RotateToPoint
 
 
 /// Updates the list of SliceNavigationControllers that can handle rotation 
-void SlicesRotator::UpdateRelevantSNCs()
+void SlicesRotator::UpdateRotatableSNCs()
 {
-  m_RelevantSNCs.clear();
+  m_RotatableSNCs.clear();
 
   for (SNCVector::iterator iter = m_SliceNavigationControllers.begin(); iter != m_SliceNavigationControllers.end(); ++iter)
   {
@@ -248,332 +252,261 @@ void SlicesRotator::UpdateRelevantSNCs()
     const SlicedGeometry3D* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>( timeSlicedGeometry->GetGeometry3D(0) );
     if (!slicedGeometry) continue;
 
-    Geometry2D* firstSlice(NULL);
-    //Geometry2D* secondSlice(NULL);
-    if (slicedGeometry->IsValidSlice(0))  firstSlice = slicedGeometry->GetGeometry2D(0);
-    //if (slicedGeometry->IsValidSlice(1)) secondSlice = slicedGeometry->GetGeometry2D(1);
-    
-    // if the direction vector of these two slices is the same, then accept this slice stack as rotatable
-    Vector3D right1 = firstSlice->GetAxisVector(0);
-    Vector3D up1 = firstSlice->GetAxisVector(1);
-    vnl_vector_fixed< ScalarType, 3 > vnlDirection1 = vnl_cross_3d(right1.GetVnlVector(), up1.GetVnlVector());
-    Vector3D direction1;
-    direction1.SetVnlVector(vnlDirection1);
-    
-    Vector3D right2 = firstSlice->GetAxisVector(0);
-    Vector3D up2 = firstSlice->GetAxisVector(1);
-    vnl_vector_fixed< ScalarType, 3 > vnlDirection2 = vnl_cross_3d(right2.GetVnlVector(), up2.GetVnlVector());
-    Vector3D direction2;
-    direction2.SetVnlVector(vnlDirection2);
-
-    bool equal = true;
-    const ScalarType eps = 0.0001;
-    for (int i = 0; i < 3; ++i)
-      if ( fabs(direction1[i] - direction2[i]) > eps ) 
-        equal = false;
-
-    if (equal) // equal direction vectors
+    if (slicedGeometry->IsValidSlice(0))  
     {
-      m_RelevantSNCs.push_back( *iter );
+      // there were some lines of additional checks here in previous versions,
+      // all of which would always evaluate to true, so the check was irrelevant.
+      // Since the original intent was not documented, I removed all checks,
+      // i.e. m_RotatableSNCs ends up being a list of all the registered
+      // SliceNavigationControllers which have a SlicedGeometry3D with at least one slice,
+      // which covers most standard cases.
+      m_RotatableSNCs.push_back( *iter );
     }
   }
 }
 
-bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
+bool SlicesRotator::DoSelectSlice(Action* a, const StateEvent* e)
 {
-  const ScalarType ThreshHoldDistancePixels = 12.0;
-  
-  bool ok = false;
-  
-  switch ( action->GetActionId() )
+  // just reach through
+  for (SNCVector::iterator iter = m_RotatableSNCs.begin(); iter != m_RotatableSNCs.end(); ++iter)
   {
-    case AcMOVE:
+    if ( !(*iter)->GetSliceLocked()  )
     {
-      // just reach through
-      for (SNCVector::iterator iter = m_RelevantSNCs.begin(); iter != m_RelevantSNCs.end(); ++iter)
-      {
-        if ( !(*iter)->GetSliceLocked()  )
-        {
-          (*iter)->ExecuteAction(action, stateEvent);
-        }
-      }
-      
-      ok = true;
-      break;
-    }
-    case AcROTATE:
-    {
-      const DisplayPositionEvent* posEvent = dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
-      if (!posEvent) break;
-      
-      Point3D cursor = posEvent->GetWorldPosition();
-  
-      Vector3D toProjected = m_LastCursorPosition - m_CenterOfRotation;
-      Vector3D toCursor    = cursor - m_CenterOfRotation;
-     
-      // cross product: | A x B | = |A| * |B| * sin(angle)
-      Vector3D axisOfRotation;
-      vnl_vector_fixed< ScalarType, 3 > vnlDirection = vnl_cross_3d( toCursor.GetVnlVector(), toProjected.GetVnlVector() );
-      axisOfRotation.SetVnlVector(vnlDirection);
-      
-      // scalar product: A * B = |A| * |B| * cos(angle)
-      // tan = sin / cos
-      ScalarType angle = - atan2( (double)(axisOfRotation.GetNorm()), (double)(toCursor * toProjected) );
-      angle *= 180.0 / vnl_math::pi;
-      m_LastCursorPosition = cursor;
-
-      // create RotationOperation and apply to all SNCs that should be rotated
-      RotationOperation op(OpROTATE, m_CenterOfRotation, axisOfRotation, angle);
-
-      // TEST
-      int i = 0;
-
-      for (SNCVector::iterator iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
-      {
-        BaseRenderer *renderer = (*iter)->GetRenderer();
-        if ( renderer == NULL )
-        {
-          continue;
-        }
-
-        DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
-
-        // MITK_INFO << i << ":" << std::endl;
-
-        Point2D point2DWorld, point2DDisplayPre, point2DDisplayPost;
-        displayGeometry->Map( m_CenterOfRotation, point2DWorld );
-        displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
-
-        // MITK_INFO << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
-
-        const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
-        const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
-        if (!timeSlicedGeometry) continue;
-        
-        const_cast<TimeSlicedGeometry*>(timeSlicedGeometry)->ExecuteOperation(&op);
-
-        //vtkLinearTransform *inverseTransformVtk = 
-        //  displayGeometry->GetVtkTransform()->GetLinearInverse();
-
-        //ScalarType pvtkCenterOfRotation[3];
-        //pvtkCenterOfRotation[0] = m_CenterOfRotation[0];
-        //pvtkCenterOfRotation[1] = m_CenterOfRotation[1];
-        //pvtkCenterOfRotation[2] = m_CenterOfRotation[2];
-
-        //ScalarType scaleFactorMMPerUnitX = 
-        //  displayGeometry->GetExtentInMM(0) / displayGeometry->GetExtent(0);
-        //ScalarType scaleFactorMMPerUnitY = 
-        //  displayGeometry->GetExtentInMM(1) / displayGeometry->GetExtent(1);  
-
-        //ScalarType scaleFactorMMPerDisplayUnit = displayGeometry->GetScaleFactorMMPerDisplayUnit();
-        //Vector2D &originInMM = displayGeometry->GetOriginInMM();
-
-        ////displayGeometry->Map( m_CenterOfRotation, point2DWorld );
-
-        //ScalarType pvtkDisplayPost[3];
-        //inverseTransformVtk->TransformPoint( pvtkCenterOfRotation, pvtkDisplayPost );
-
-        //pvtkDisplayPost[0] *= scaleFactorMMPerUnitX;
-        //pvtkDisplayPost[1] *= scaleFactorMMPerUnitY;
-
-        ////displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
-        //pvtkDisplayPost[0] -= originInMM[0];
-        //pvtkDisplayPost[1] -= originInMM[1];
-
-        //pvtkDisplayPost[0] /= scaleFactorMMPerDisplayUnit;
-        //pvtkDisplayPost[1] /= scaleFactorMMPerDisplayUnit;
-
-        //point2DDisplayPost[0] = pvtkDisplayPost[0];
-        //point2DDisplayPost[1] = pvtkDisplayPost[1];
-
-
-        displayGeometry->Map( m_CenterOfRotation, point2DWorld );
-        displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
-        Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
-
-        //Vector2D origin = displayGeometry->GetOriginInMM();
-        // MITK_INFO << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
-        // MITK_INFO << "  Diff   - " << vector2DDisplayDiff << std::endl;
-        // MITK_INFO << "  Origin - " << origin << std::endl;
-        ++i;
-
-        displayGeometry->MoveBy( vector2DDisplayDiff );
-
-        (*iter)->SendCreatedWorldGeometryUpdate();
-      } 
-      // MITK_INFO << "--------------------------------" << std::endl;
-
-      
-      
-      // TEST
-      //BaseRenderer* renderer = stateEvent->GetEvent()->GetSender(); // TODO this is NOT SNC-specific! Should be!
-      //
-      //DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
-      //if (!displayGeometry) break;
-
-      //Point2D point2DWorld, point2DDisplay;
-      //displayGeometry->Map( m_CenterOfRotation, point2DWorld );
-      //displayGeometry->WorldToDisplay( point2DWorld, point2DDisplay );
-
-      //MITK_INFO << "RotationCenter: " << m_CenterOfRotation << std::endl;
-      //MITK_INFO << "PointWorld:     " << point2DWorld << std::endl;
-      //MITK_INFO << "PointDisplay:   " << point2DDisplay << std::endl;
-      //MITK_INFO << "--------------------------------------------" << std::endl;
-
-
-
-      RenderingManager::GetInstance()->RequestUpdateAll();
-      
-      this->InvokeEvent( SliceRotationEvent() ); // notify listeners
-      
-      ok = true;
-      break;
-    }
-    case AcCHECKPOINT:
-    {
-      // decide between moving and rotation 
-
-      // Alle SNCs (Anzahl N) nach dem Abstand von posEvent->GetWorldPosition() zur aktuellen Ebene fragen.
-      // Anzahl der Ebenen zaehlen, die naeher als ein gewisser Schwellwertwert sind -> nNah.
-      // Wenn nNah == N
-      //   Generiere ein PointEvent und schicke das an alle SNCs -> bewege den kreuz-mittelpunkt
-      // Wenn nNah == 2
-      //   Streiche stateEvent->Sender aus der Liste der nahen Ebenen
-      //   fuer die uebrigen generiere eine RotationOperation und fuehre die aus
-      // sonst
-      //   
-      const DisplayPositionEvent* posEvent = dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
-      if (!posEvent) break;
-
-      Point3D cursor = posEvent->GetWorldPosition();
-      //m_LastCursorPosition = cursor;
-      
-      unsigned int numNearPlanes = 0;
-      m_SNCsToBeRotated.clear();
-      Geometry2D* geometryToBeRotated = NULL;  // this one is grabbed
-      Geometry2D* otherGeometry = NULL;        // this is also visible (for calculation of intersection)
-      Geometry2D* clickedGeometry = NULL;      // the event originates from this one
-      //SlicedGeometry3D* clickedSlicedGeometry;
-
-      for (SNCVector::iterator iter = m_RelevantSNCs.begin(); iter != m_RelevantSNCs.end(); ++iter)
-      {
-        unsigned int slice = (*iter)->GetSlice()->GetPos();
-        unsigned int time  = (*iter)->GetTime()->GetPos();
-        
-        const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
-        const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>( geometry3D );
-        if (!timeSlicedGeometry) continue;
-    
-        const SlicedGeometry3D* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>( timeSlicedGeometry->GetGeometry3D(time) );
-        if (!slicedGeometry) continue;
-
-        Geometry2D* geometry2D = slicedGeometry->GetGeometry2D(slice);
-        if (!geometry2D) continue; // this is not necessary?
-
-        ScalarType distanceMM = geometry2D->Distance( cursor );
-
-        BaseRenderer* renderer = stateEvent->GetEvent()->GetSender(); // TODO this is NOT SNC-specific! Should be!
-        
-        DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
-        if (!displayGeometry) continue;
-        
-        ScalarType distancePixels = distanceMM / displayGeometry->GetScaleFactorMMPerDisplayUnit();
-        if ( distancePixels <= ThreshHoldDistancePixels )
-        {
-          ++numNearPlanes; // count this one as a plane near to the cursor
-        }
-       
-        if ( *iter == renderer->GetSliceNavigationController() ) // don't rotate the one where the user clicked
-        {
-          clickedGeometry = geometry2D;
-          //clickedSlicedGeometry = const_cast<SlicedGeometry3D*>(slicedGeometry);
-        }
-        else
-        {
-          // @TODO here waits some bug to be found - maybe fixed by the || m_LinkPlanes in next line
-          if ( (distancePixels <= ThreshHoldDistancePixels)
-            && !(*iter)->GetSliceRotationLocked()
-            && (m_SNCsToBeRotated.empty() || m_LinkPlanes) )
-          {
-            // this one is behind the clicked "line"
-            m_SNCsToBeRotated.push_back(*iter);
-            geometryToBeRotated = geometry2D;
-          }
-          else
-          {
-            otherGeometry = geometry2D;
-
-            if ( m_LinkPlanes )
-            {
-              // All slices are rotated, i.e. the relative angles between
-              // slices remain fixed
-              m_SNCsToBeRotated.push_back(*iter);
-            }
-          }
-        }
-      }
-
-      bool move (true);
-
-      if ( geometryToBeRotated && otherGeometry && clickedGeometry
-        && ( numNearPlanes == 2 ) )
-      {
-        // assure all three are valid, so calculation of center of rotation can be done
-        move = false;
-      }
-      
-      std::auto_ptr<StateEvent> newStateEvent;
-
-      // question in state machine is: "rotate?"
-      if (move)
-      {
-        // move all planes to posEvent->GetWorldPosition()
-        newStateEvent.reset(new StateEvent(EIDNO, stateEvent->GetEvent()));
-      }
-      else
-      {
-        // determine center of rotation TODO requires two plane geometries...
-        PlaneGeometry* planeGeometry  = dynamic_cast<PlaneGeometry*>(clickedGeometry);
-        PlaneGeometry* planeGeometry1 = dynamic_cast<PlaneGeometry*>(geometryToBeRotated);
-        PlaneGeometry* planeGeometry2 = dynamic_cast<PlaneGeometry*>(otherGeometry);
-
-        if (!planeGeometry || !planeGeometry1 || !planeGeometry2) break; 
-        
-        Line3D intersection;
-        if (!planeGeometry->IntersectionLine( planeGeometry1, intersection ))   break;
-        m_LastCursorPosition = intersection.Project(cursor);
-        if (!planeGeometry2->IntersectionPoint(intersection, m_CenterOfRotation)) break;
-        // everything's fine
-        newStateEvent.reset(new StateEvent(EIDYES, stateEvent->GetEvent()));
-
-      }
-
-      if (!newStateEvent.get()) MITK_ERROR << "rotation would be nice but is impossible... " << std::endl;
-      
-      this->HandleEvent( newStateEvent.get() );
-
-      ok = true;
-      break;
-    }
-    case AcROTATESTART:
-    {
-      this->SetMouseCursor( rotate_cursor_xpm, 0, 0 );
-      this->InvokeEvent( SliceRotationEvent() ); // notify listeners
-      break;
-    }
-    case AcROTATEEND:
-    {
-      this->ResetMouseCursor();
-      this->InvokeEvent( SliceRotationEvent() ); // notify listeners
-      break;
-    }
-    default:
-    {
-      break;
+      (*iter)->ExecuteAction(a,e);
     }
   }
 
-  return ok;
+  return true;
+}
+
+bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const StateEvent* e)
+{
+  // Decide between moving and rotation slices.
+  // For basic decision logic see class documentation.
+
+  /*
+    Detail logic:
+
+     1. Find the SliceNavigationController that has sent the event: this one defines our rendering plane and will NOT be rotated. Must not even be counted or checked..
+     2. Inspect every other SliceNavigationController
+       - calculate the line intersection of this SliceNavigationController's plane with our rendering plane
+       - if there is no interesection, ignore and continue
+       - IF there is an intersection
+         - check the mouse cursor's distance from that line. 
+         0. if the line is NOT near the cursor, remember the plane as "one of the other planes" (which can be rotated in "locked" mode)
+         1. on first line near the cursor,  just remember this intersection line as THE other plane that we want to rotate
+         2. on every consecutive line near the cursor, check if the line is geometrically identical to the line that we want to rotate
+            - if yes, we just push this line to the "other" lines and rotate it along
+            - if no, then we have a situation where the mouse is near two other lines (e.g. crossing point) and don't want to rotate
+  */
+  const DisplayPositionEvent* posEvent = dynamic_cast<const DisplayPositionEvent*>(e->GetEvent());
+  if (!posEvent) return false;
+    
+  BaseRenderer* clickedRenderer = e->GetEvent()->GetSender();
+  const PlaneGeometry* ourViewportGeometry = dynamic_cast<const PlaneGeometry*>( clickedRenderer->GetCurrentWorldGeometry2D() );
+  if (!ourViewportGeometry) return false;
+
+  DisplayGeometry* clickedDisplayGeometry = clickedRenderer->GetDisplayGeometry();
+  if (!clickedDisplayGeometry) return false;
+
+  MITK_DEBUG << "=============================================";
+  MITK_DEBUG << "Renderer under cursor is " << clickedRenderer->GetName();
+  
+  Point3D cursorPosition = posEvent->GetWorldPosition();
+  const PlaneGeometry* geometryToBeRotated = NULL;  // this one is under the mouse cursor
+  const PlaneGeometry* anyOtherGeometry = NULL;    // this is also visible (for calculation of intersection ONLY)
+  Line3D intersectionLineWithGeometryToBeRotated;
+
+  bool hitMultipleLines(false);
+  m_SNCsToBeRotated.clear();
+
+  const double threshholdDistancePixels = 12.0;
+
+  for (SNCVector::iterator iter = m_RotatableSNCs.begin(); iter != m_RotatableSNCs.end(); ++iter)
+  {
+    const PlaneGeometry* otherRenderersRenderPlane = (*iter)->GetCurrentPlaneGeometry();
+    if (otherRenderersRenderPlane == NULL) continue; // ignore, we don't see a plane
+    MITK_DEBUG << "  Checking plane of renderer " << (*iter)->GetRenderer()->GetName();
+  
+    // check if there is an intersection
+    Line3D intersectionLine; // between rendered/clicked geometry and the one being analyzed
+    if (!ourViewportGeometry->IntersectionLine( otherRenderersRenderPlane, intersectionLine ))
+    {
+      continue; // we ignore this plane, it's parallel to our plane
+    }
+
+    // check distance from intersection line
+    double distanceFromIntersectionLine = intersectionLine.Distance( cursorPosition );
+    ScalarType distancePixels = distanceFromIntersectionLine / clickedDisplayGeometry->GetScaleFactorMMPerDisplayUnit();
+    MITK_DEBUG << "    Distance of plane from cursor " << distanceFromIntersectionLine << " mm, which is around " << distancePixels << " px" ;
+
+    // far away line, only remember for linked rotation if necessary
+    if (distanceFromIntersectionLine > threshholdDistancePixels)
+    {
+      MITK_DEBUG << "    Plane is too far away --> remember as otherRenderersRenderPlane";
+      anyOtherGeometry = otherRenderersRenderPlane; // we just take the last one, so overwrite each iteration (we just need some crossing point) 
+                                                   // TODO what about multiple crossings? NOW we have undefined behavior / random crossing point is used
+
+      if (m_LinkPlanes)
+      {
+        m_SNCsToBeRotated.push_back(*iter);
+      }
+    }
+    else // close to cursor
+    {
+      MITK_DEBUG << "    Plane is close enough to cursor...";
+      if ( geometryToBeRotated == NULL ) // first one close to the cursor
+      {
+        MITK_DEBUG << "    It is the first close enough geometry, remember as geometryToBeRotated";
+        geometryToBeRotated = otherRenderersRenderPlane;
+        intersectionLineWithGeometryToBeRotated = intersectionLine;
+        m_SNCsToBeRotated.push_back(*iter);
+      }
+      else
+      {
+        MITK_DEBUG << "    Second or later close enough geometry";
+        // compare to the line defined by geometryToBeRotated: if identical, just rotate this otherRenderersRenderPlane together with the primary one
+        //                                                     if different, DON'T rotate
+
+        if ( intersectionLine.IsParallel( intersectionLineWithGeometryToBeRotated )
+          && intersectionLine.Distance( intersectionLineWithGeometryToBeRotated.GetPoint1() ) < mitk::eps ) 
+        {
+          MITK_DEBUG << "    This line is the same as intersectionLineWithGeometryToBeRotated which we already know";
+          m_SNCsToBeRotated.push_back(*iter);
+        }
+        else
+        {
+          MITK_DEBUG << "    This line is NOT the same as intersectionLineWithGeometryToBeRotated which we already know";
+          hitMultipleLines = true;
+        }
+      }
+    }
+
+  }
+
+  bool moveSlices(true);
+
+  if ( geometryToBeRotated && anyOtherGeometry && ourViewportGeometry && !hitMultipleLines )
+  {
+    // assure all three are valid, so calculation of center of rotation can be done
+    moveSlices = false;
+  }
+
+  MITK_DEBUG << "geometryToBeRotated:   " << (void*)geometryToBeRotated;
+  MITK_DEBUG << "anyOtherGeometry:    " << (void*)anyOtherGeometry;
+  MITK_DEBUG << "ourViewportGeometry: " << (void*)ourViewportGeometry;
+  MITK_DEBUG << "hitMultipleLines?    " << hitMultipleLines;
+  MITK_DEBUG << "moveSlices?          " << moveSlices;
+
+
+  std::auto_ptr<StateEvent> decidedEvent;
+
+  // question in state machine is: "rotate?"
+  if (moveSlices) // i.e. NOT rotate
+  {
+    // move all planes to posEvent->GetWorldPosition()
+    decidedEvent.reset( new StateEvent(EIDNO, e->GetEvent()) );
+      MITK_DEBUG << "Rotation not possible, not enough information (other planes crossing rendering plane) ";
+  }
+  else
+  { // we DO have enough information for rotation
+    m_LastCursorPosition = intersectionLineWithGeometryToBeRotated.Project(cursorPosition); // remember where the last cursor position ON THE LINE has been observed
+
+    if (anyOtherGeometry->IntersectionPoint(intersectionLineWithGeometryToBeRotated, m_CenterOfRotation)) // find center of rotation by intersection with any of the OTHER lines
+    {
+      decidedEvent.reset( new StateEvent(EIDYES, e->GetEvent()) );
+      MITK_DEBUG << "Rotation possible";
+    }
+    else
+    {
+      MITK_DEBUG << "Rotation not possible, cannot determine the center of rotation!?";
+      decidedEvent.reset( new StateEvent(EIDNO, e->GetEvent()) );
+    }
+  }
+
+  this->HandleEvent( decidedEvent.get() );
+
+  return true;
+}
+
+bool SlicesRotator::DoStartRotation(Action*, const StateEvent*)
+{
+  this->SetMouseCursor( rotate_cursor_xpm, 0, 0 );
+  this->InvokeEvent( SliceRotationEvent() ); // notify listeners
+  return true;
+}
+
+bool SlicesRotator::DoEndRotation(Action*, const StateEvent*)
+{
+  this->ResetMouseCursor();
+  this->InvokeEvent( SliceRotationEvent() ); // notify listeners
+  return true;
+}
+
+
+bool SlicesRotator::DoRotationStep(Action*, const StateEvent* e)
+{
+  const DisplayPositionEvent* posEvent = dynamic_cast<const DisplayPositionEvent*>(e->GetEvent());
+  if (!posEvent) return false;
+
+  Point3D cursor = posEvent->GetWorldPosition();
+
+  Vector3D toProjected = m_LastCursorPosition - m_CenterOfRotation;
+  Vector3D toCursor    = cursor - m_CenterOfRotation;
+
+  // cross product: | A x B | = |A| * |B| * sin(angle)
+  Vector3D axisOfRotation;
+  vnl_vector_fixed< ScalarType, 3 > vnlDirection = vnl_cross_3d( toCursor.GetVnlVector(), toProjected.GetVnlVector() );
+  axisOfRotation.SetVnlVector(vnlDirection);
+
+  // scalar product: A * B = |A| * |B| * cos(angle)
+  // tan = sin / cos
+  ScalarType angle = - atan2( (double)(axisOfRotation.GetNorm()), (double)(toCursor * toProjected) );
+  angle *= 180.0 / vnl_math::pi;
+  m_LastCursorPosition = cursor;
+
+  // create RotationOperation and apply to all SNCs that should be rotated
+  RotationOperation rotationOperation(OpROTATE, m_CenterOfRotation, axisOfRotation, angle);
+
+  // iterate the OTHER slice navigation controllers: these are filled in DoDecideBetweenRotationAndSliceSelection
+  for (SNCVector::iterator iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
+  {
+    //  - remember the center of rotation on the 2D display BEFORE rotation
+    //  - execute rotation
+    //  - calculate new center of rotation on 2D display
+    //  - move display IF the center of rotation has moved slightly before and after rotation
+    
+    // DM 2012-10: this must probably be due to rounding errors only, right? 
+    //             We don't have documentation on if/why this code is needed
+    BaseRenderer *renderer = (*iter)->GetRenderer();
+    if ( !renderer ) continue;
+
+    DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
+
+    Point2D rotationCenter2DWorld, point2DDisplayPreRotation, point2DDisplayPostRotation;
+    displayGeometry->Map( m_CenterOfRotation, rotationCenter2DWorld );
+    displayGeometry->WorldToDisplay( rotationCenter2DWorld, point2DDisplayPreRotation );
+
+    const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
+    const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
+    if (!timeSlicedGeometry) continue;
+
+    const_cast<TimeSlicedGeometry*>(timeSlicedGeometry)->ExecuteOperation(&rotationOperation);
+
+    displayGeometry->Map( m_CenterOfRotation, rotationCenter2DWorld );
+    displayGeometry->WorldToDisplay( rotationCenter2DWorld, point2DDisplayPostRotation );
+    Vector2D vector2DDisplayDiff = point2DDisplayPostRotation - point2DDisplayPreRotation;
+
+    displayGeometry->MoveBy( vector2DDisplayDiff );
+
+    (*iter)->SendCreatedWorldGeometryUpdate();
+  } 
+
+  RenderingManager::GetInstance()->RequestUpdateAll();
+
+  this->InvokeEvent( SliceRotationEvent() ); // notify listeners
+
+  return true;
 }
 
 } // namespace 

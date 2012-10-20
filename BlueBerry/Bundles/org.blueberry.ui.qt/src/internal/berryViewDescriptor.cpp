@@ -129,13 +129,13 @@ bool ViewDescriptor::IsRestorable() const
   return str.isNull() ? true : str.compare("true", Qt::CaseInsensitive) == 0;
 }
 
-Poco::Any ViewDescriptor::GetAdapter(const QString& adapter)
+Object* ViewDescriptor::GetAdapter(const QString& adapter)
 {
-  if (adapter == IConfigurationElement::GetStaticClassName())
+  if (adapter == qobject_interface_iid<IConfigurationElement*>())
   {
-    return Poco::Any(GetConfigurationElement());
+    return GetConfigurationElement().GetPointer();
   }
-  return Poco::Any();
+  return NULL;
 }
 
 void

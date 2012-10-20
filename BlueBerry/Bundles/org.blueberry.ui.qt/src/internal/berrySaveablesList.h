@@ -38,15 +38,13 @@ namespace berry
  *
  * @see Saveable
  * @see ISaveablesSource
- *
- * @since 3.2
  */
 class SaveablesList: public ISaveablesLifecycleListener
 {
 
 public:
 
-  berryObjectMacro(SaveablesList);
+  berryObjectMacro(SaveablesList)
 
 private:
 
@@ -254,7 +252,7 @@ public:
    * This method must be called on the UI thread.
    * </p>
    */
-  void HandleLifecycleEvent(SaveablesLifecycleEvent::Pointer event);
+  void HandleLifecycleEvent(const SaveablesLifecycleEvent::Pointer& event);
 
   /**
    * Adds the given listener to the list of listeners. Has no effect if the
@@ -270,7 +268,7 @@ public:
    *
    * @param listener
    */
-  void AddModelLifecycleListener(ISaveablesLifecycleListener::Pointer listener);
+  void AddModelLifecycleListener(ISaveablesLifecycleListener* listener);
 
   /**
    * Removes the given listener from the list of listeners. Has no effect if
@@ -278,8 +276,7 @@ public:
    *
    * @param listener
    */
-  void RemoveModelLifecycleListener(
-      ISaveablesLifecycleListener::Pointer listener);
+  void RemoveModelLifecycleListener(ISaveablesLifecycleListener* listener);
 
   /**
    * @param partsToClose

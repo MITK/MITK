@@ -103,7 +103,7 @@ void RegistryReader::ReadElementChildren(
 void RegistryReader::ReadElements(
     const QList<IConfigurationElement::Pointer>& elements)
 {
-  for (unsigned int i = 0; i < elements.size(); i++)
+  for (int i = 0; i < elements.size(); i++)
   {
     if (!this->ReadElement(elements[i]))
     {
@@ -127,7 +127,7 @@ void RegistryReader::ReadRegistry(
   }
   QList<IExtension::Pointer> extensions(point->GetExtensions());
   extensions = this->OrderExtensions(extensions);
-  for (unsigned int i = 0; i < extensions.size(); i++)
+  for (int i = 0; i < extensions.size(); i++)
   {
     this->ReadExtension(extensions[i]);
   }

@@ -83,7 +83,7 @@ void EditorSashContainer::AddDropSupport()
 
   QtDnDControlWidget* dropWidget = static_cast<QtDnDControlWidget*>(GetParent());
   dropWidget->SetTransferTypes(winConfigurer->GetTransfers());
-  dropWidget->AddDropListener(winConfigurer->GetDropTargetListener().GetPointer());
+  dropWidget->AddDropListener(winConfigurer->GetDropTargetListener());
 }
 
 PartStack::Pointer EditorSashContainer::NewEditorWorkbook()
@@ -356,7 +356,7 @@ bool EditorSashContainer::RestoreState(IMemento::Pointer memento)
   QList<IMemento::Pointer> infos(memento->GetChildren(WorkbenchConstants::TAG_INFO));
   QHash<QString, LayoutPart::Pointer> mapIDtoPart;
 
-  for (std::size_t i = 0; i < infos.size(); i++)
+  for (int i = 0; i < infos.size(); i++)
   {
     // Get the info details.
     IMemento::Pointer childMem = infos[i];
@@ -433,7 +433,7 @@ bool EditorSashContainer::SaveState(IMemento::Pointer memento)
 //          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsSavingPerspective, 0);
   bool result = true;
 
-  for (std::size_t i = 0; i < relationships.size(); i++)
+  for (int i = 0; i < relationships.size(); i++)
   {
     // Save the relationship info ..
     //    private LayoutPart part;

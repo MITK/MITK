@@ -52,7 +52,7 @@ struct InternalMenuService : public IMenuService
    */
   virtual void RegisterVisibleWhen(const SmartPointer<IContributionItem>& item,
                                    const SmartPointer<Expression>& visibleWhen,
-                                   const QSet<SmartPointer<IEvaluationReference> >& restriction,
+                                   QSet<SmartPointer<IEvaluationReference> >& restriction,
                                    const QString& identifierID) = 0;
 
   /**
@@ -63,7 +63,7 @@ struct InternalMenuService : public IMenuService
    *            the item to unbind
    */
   virtual void UnregisterVisibleWhen(const SmartPointer<IContributionItem>& item,
-                                     const QSet<SmartPointer<IEvaluationReference> >& restriction) = 0;
+                                     QSet<SmartPointer<IEvaluationReference> >& restriction) = 0;
 
   /**
    * Return a list of {@link MenuAdditionCacheEntry} objects that are

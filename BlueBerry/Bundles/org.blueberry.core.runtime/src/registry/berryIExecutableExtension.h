@@ -139,6 +139,6 @@ struct org_blueberry_core_runtime_EXPORT IExecutableExtension
 
 }
 
-Q_DECLARE_INTERFACE(berry::IExecutableExtension, "org.blueberry.IExecutableExtension")
+Q_DECLARE_INTERFACE(berry::IExecutableExtension, "org.blueberry.ui.IExecutableExtension")
 
 #endif /*BERRYIEXECUTABLEEXTENSION_H_*/

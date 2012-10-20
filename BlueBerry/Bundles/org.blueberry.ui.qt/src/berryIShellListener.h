@@ -41,12 +41,11 @@ namespace berry {
  *
  * @see ShellEvent
  */
-struct BERRY_UI_QT IShellListener : public virtual Object {
+struct BERRY_UI_QT IShellListener
+{
 
-  berryInterfaceMacro(IShellListener, berry);
-
-  struct BERRY_UI_QT Events {
-    typedef Message1<ShellEvent::Pointer> ShellEventType;
+  struct Events {
+    typedef Message1<const ShellEvent::Pointer&> ShellEventType;
 
     enum Type {
      NONE        = 0x00000000,
@@ -59,7 +58,7 @@ struct BERRY_UI_QT IShellListener : public virtual Object {
      ALL         = 0xffffffff
     };
 
-    BERRY_DECLARE_FLAGS(Types, Type)
+    Q_DECLARE_FLAGS(Types, Type)
 
     ShellEventType shellActivated;
     ShellEventType shellClosed;
@@ -67,52 +66,54 @@ struct BERRY_UI_QT IShellListener : public virtual Object {
     ShellEventType shellDeiconified;
     ShellEventType shellIconified;
 
-    void AddListener(IShellListener::Pointer listener);
-    void RemoveListener(IShellListener::Pointer listener);
+    void AddListener(IShellListener* listener);
+    void RemoveListener(IShellListener* listener);
 
   private:
 
-    typedef MessageDelegate1<IShellListener, ShellEvent::Pointer> Delegate;
+    typedef MessageDelegate1<IShellListener, const ShellEvent::Pointer&> Delegate;
   };
 
-/**
- * Sent when a shell becomes the active window.
- *
- * @param e an event containing information about the activation
- */
-virtual void ShellActivated(ShellEvent::Pointer e);
+  virtual ~IShellListener();
 
-/**
- * Sent when a shell is closed.
- *
- * @param e an event containing information about the close
- */
-virtual void ShellClosed(ShellEvent::Pointer e);
+  /**
+   * Sent when a shell becomes the active window.
+   *
+   * @param e an event containing information about the activation
+   */
+  virtual void ShellActivated(const ShellEvent::Pointer& e);
 
-/**
- * Sent when a shell stops being the active window.
- *
- * @param e an event containing information about the deactivation
- */
-virtual void ShellDeactivated(ShellEvent::Pointer e);
+  /**
+   * Sent when a shell is closed.
+   *
+   * @param e an event containing information about the close
+   */
+  virtual void ShellClosed(const ShellEvent::Pointer& e);
 
-/**
- * Sent when a shell is un-minimized.
- *
- * @param e an event containing information about the un-minimization
- */
-virtual void ShellDeiconified(ShellEvent::Pointer e);
+  /**
+   * Sent when a shell stops being the active window.
+   *
+   * @param e an event containing information about the deactivation
+   */
+  virtual void ShellDeactivated(const ShellEvent::Pointer& e);
 
-/**
- * Sent when a shell is minimized.
- *
- * @param e an event containing information about the minimization
- */
-virtual void ShellIconified(ShellEvent::Pointer e);
+  /**
+   * Sent when a shell is un-minimized.
+   *
+   * @param e an event containing information about the un-minimization
+   */
+  virtual void ShellDeiconified(const ShellEvent::Pointer& e);
+
+  /**
+   * Sent when a shell is minimized.
+   *
+   * @param e an event containing information about the minimization
+   */
+  virtual void ShellIconified(const ShellEvent::Pointer& e);
 };
 
 }
 
-BERRY_DECLARE_OPERATORS_FOR_FLAGS(berry::IShellListener::Events::Types)
+Q_DECLARE_OPERATORS_FOR_FLAGS(berry::IShellListener::Events::Types)
 
 #endif /* BERRYISHELLLISTENER_H_ */

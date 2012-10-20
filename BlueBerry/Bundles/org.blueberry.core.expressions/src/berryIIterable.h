@@ -34,9 +34,10 @@ namespace berry {
 struct BERRY_EXPRESSIONS IIterable : public Object
 {
 
-  berryInterfaceMacro(IIterable, berry)
+  berryObjectMacro(berry::IIterable)
 
   typedef QList<Object::Pointer>::iterator iterator;
+  typedef QList<Object::Pointer>::const_iterator const_iterator;
 
   virtual ~IIterable();
 
@@ -48,8 +49,13 @@ struct BERRY_EXPRESSIONS IIterable : public Object
   virtual iterator begin() = 0;
   virtual iterator end() = 0;
 
+  virtual const_iterator begin() const = 0;
+  virtual const_iterator end() const = 0;
+
 };
 
 }  // namespace berry
+
+Q_DECLARE_INTERFACE(berry::IIterable, "org.blueberry.core.IIterable")
 
 #endif /*BERRYIITERABLE_H_*/

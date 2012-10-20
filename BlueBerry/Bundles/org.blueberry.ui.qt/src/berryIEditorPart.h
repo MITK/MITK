@@ -68,9 +68,10 @@ struct IEditorSite;
  * @see org.blueberry.ui.part.EditorPart
  */
 struct BERRY_UI_QT IEditorPart : public virtual IWorkbenchPart,
-                               public ISaveablePart {
+    public ISaveablePart
+{
 
-  berryInterfaceMacro(IEditorPart, berry);
+  berryObjectMacro(berry::IEditorPart)
 
   virtual ~IEditorPart();
 
@@ -125,6 +126,6 @@ struct BERRY_UI_QT IEditorPart : public virtual IWorkbenchPart,
 
 }
 
-Q_DECLARE_INTERFACE(berry::IEditorPart, "org.blueberry.IEditorPart")
+Q_DECLARE_INTERFACE(berry::IEditorPart, "org.blueberry.ui.IEditorPart")
 
 #endif /*BERRYIEDITORPART_H_*/

@@ -27,27 +27,9 @@ int ISources::WORKBENCH()
   return val;
 }
 
-int ISources::LEGACY_LEGACY()
-{
-  static int val = 1;
-  return val;
-}
-
-int ISources::LEGACY_LOW()
-{
-  static int val = 1 << 1;
-  return val;
-}
-
-int ISources::LEGACY_MEDIUM()
-{
-  static int val = 1 << 2;
-  return val;
-}
-
 int ISources::ACTIVE_CONTEXT()
 {
-  static int val = 1 << 6;
+  static int val = 1 << 3;
   return val;
 }
 
@@ -59,7 +41,7 @@ const QString ISources::ACTIVE_CONTEXT_NAME()
 
 int ISources::ACTIVE_ACTION_SETS()
 {
-  static int val = 1 << 8;
+  static int val = 1 << 5;
   return val;
 }
 
@@ -71,7 +53,7 @@ const QString ISources::ACTIVE_ACTION_SETS_NAME()
 
 int ISources::ACTIVE_SHELL()
 {
-  static int val = 1 << 10;
+  static int val = 1 << 7;
   return val;
 }
 
@@ -83,7 +65,7 @@ const QString ISources::ACTIVE_SHELL_NAME()
 
 int ISources::ACTIVE_WORKBENCH_WINDOW_SHELL()
 {
-  static int val = 1 << 12;
+  static int val = 1 << 9;
   return val;
 }
 
@@ -95,7 +77,7 @@ const QString ISources::ACTIVE_WORKBENCH_WINDOW_SHELL_NAME()
 
 int ISources::ACTIVE_WORKBENCH_WINDOW()
 {
-  static int val = 1 << 14;
+  static int val = 1 << 11;
   return val;
 }
 
@@ -107,14 +89,14 @@ const QString ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
 
 int ISources::ACTIVE_WORKBENCH_WINDOW_SUBORDINATE()
 {
-  static int val = 1 << 15;
+  static int val = 1 << 12;
   return val;
 }
 
-const QString ISources::ACTIVE_WORKBENCH_WINDOW_IS_COOLBAR_VISIBLE_NAME()
+const QString ISources::ACTIVE_WORKBENCH_WINDOW_IS_TOOLBAR_VISIBLE_NAME()
 {
   static const QString val = ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
-      + ".isCoolbarVisible";
+      + ".isToolbarVisible";
   return val;
 }
 
@@ -122,6 +104,13 @@ const QString ISources::ACTIVE_WORKBENCH_WINDOW_IS_PERSPECTIVEBAR_VISIBLE_NAME()
 {
   static const QString val = ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
       + ".isPerspectiveBarVisible";
+  return val;
+}
+
+const QString ISources::ACTIVE_WORKBENCH_WINDOW_IS_STATUS_LINE_VISIBLE_NAME()
+{
+  static const QString val = ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
+      + ".isStatusLineVisible";
   return val;
 }
 
@@ -134,7 +123,7 @@ const QString ISources::ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME()
 
 int ISources::ACTIVE_EDITOR()
 {
-  static int val = 1 << 16;
+  static int val = 1 << 13;
   return val;
 }
 
@@ -144,9 +133,15 @@ const QString ISources::ACTIVE_EDITOR_NAME()
   return val;
 }
 
+const QString ISources::ACTIVE_EDITOR_INPUT_NAME()
+{
+  static const QString val = "activeEditorInput";
+  return val;
+}
+
 int ISources::ACTIVE_EDITOR_ID()
 {
-  static int val = 1 << 18;
+  static int val = 1 << 15;
   return val;
 }
 
@@ -158,7 +153,7 @@ const QString ISources::ACTIVE_EDITOR_ID_NAME()
 
 int ISources::ACTIVE_PART()
 {
-  static int val = 1 << 20;
+  static int val = 1 << 17;
   return val;
 }
 
@@ -170,7 +165,7 @@ const QString ISources::ACTIVE_PART_NAME()
 
 int ISources::ACTIVE_PART_ID()
 {
-  static int val = 1 << 22;
+  static int val = 1 << 19;
   return val;
 }
 
@@ -182,7 +177,7 @@ const QString ISources::ACTIVE_PART_ID_NAME()
 
 int ISources::ACTIVE_SITE()
 {
-  static int val = 1 << 26;
+  static int val = 1 << 23;
   return val;
 }
 
@@ -206,7 +201,7 @@ const QString ISources::SHOW_IN_INPUT()
 
 int ISources::ACTIVE_CURRENT_SELECTION()
 {
-  static int val = 1 << 30;
+  static int val = 1 << 27;
   return val;
 }
 
@@ -218,7 +213,7 @@ const QString ISources::ACTIVE_CURRENT_SELECTION_NAME()
 
 int ISources::ACTIVE_MENU()
 {
-  static int val = 1 << 31;
+  static int val = 1 << 30;
   return val;
 }
 

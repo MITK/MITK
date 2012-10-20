@@ -93,7 +93,8 @@ void DetachedPlaceHolder::RestoreState(IMemento::Pointer memento)
   // Restore the placeholders.
   QList<IMemento::Pointer> childrenMem(memento
          ->GetChildren(WorkbenchConstants::TAG_VIEW));
-  for (std::size_t i = 0; i < childrenMem.size(); i++) {
+  for (int i = 0; i < childrenMem.size(); i++)
+  {
      QString id;
      childrenMem[i]->GetString(WorkbenchConstants::TAG_ID, id);
      PartPlaceholder::Pointer holder(new PartPlaceholder(id));
@@ -112,7 +113,8 @@ void DetachedPlaceHolder::SaveState(IMemento::Pointer memento)
 
   // Save the views.
   for (QList<LayoutPart::Pointer>::iterator i = children.begin();
-      i != children.end(); ++i) {
+      i != children.end(); ++i)
+  {
      IMemento::Pointer childMem = memento
              ->CreateChild(WorkbenchConstants::TAG_VIEW);
      childMem->PutString(WorkbenchConstants::TAG_ID, (*i)->GetID());

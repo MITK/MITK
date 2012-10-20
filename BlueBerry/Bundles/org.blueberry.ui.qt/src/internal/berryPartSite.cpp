@@ -21,11 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchWindow.h"
 #include "berryPartPane.h"
 #include "berryIContributor.h"
+#include "berryIServiceScopes.h"
 
 #include "services/berryIServiceFactory.h"
 
 #include "berryIServiceLocatorCreator.h"
 #include "berryWorkbenchPartReference.h"
+#include "berryWorkbenchLocationService.h"
 
 namespace berry
 {
@@ -71,10 +73,10 @@ PartSite::PartSite(IWorkbenchPartReference::Pointer ref,
   // Initialize the service locator.
   IServiceLocator* parentServiceLocator = page->GetWorkbenchWindow().GetPointer();
   IServiceLocatorCreator* slc = parentServiceLocator->GetService<IServiceLocatorCreator>();
-  this->serviceLocator = slc->CreateServiceLocator(parentServiceLocator,
-      IServiceFactory::Pointer(0), IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
+  this->serviceLocator = slc->CreateServiceLocator(parentServiceLocator, NULL,
+                                                   IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
 
-  //initializeDefaultServices();
+  InitializeDefaultServices();
 }
 
 PartSite::~PartSite()
@@ -134,21 +136,13 @@ void PartSite::ServiceLocatorOwner::Dispose()
 
 void PartSite::InitializeDefaultServices()
 {
-  //    serviceLocator.registerService(IWorkbenchPartSite.class, this);
-  //    final Expression defaultExpression = new ActivePartExpression(part);
-  //
-  //    final IContextService parentContextService = (IContextService) serviceLocator
-  //        .getService(IContextService.class);
-  //    final IContextService contextService = new SlaveContextService(
-  //        parentContextService, defaultExpression);
-  //    serviceLocator.registerService(IContextService.class, contextService);
-  //
-  //    final ICommandService parentCommandService = (ICommandService) serviceLocator
-  //        .getService(ICommandService.class);
-  //    final ICommandService commandService = new SlaveCommandService(
-  //        parentCommandService, IServiceScopes.PARTSITE_SCOPE,
-  //        this);
-  //    serviceLocator.registerService(ICommandService.class, commandService);
+  workbenchLocationService.reset(
+        new WorkbenchLocationService(IServiceScopes::PARTSITE_SCOPE,
+                                     GetWorkbenchWindow()->GetWorkbench(),
+                                     GetWorkbenchWindow().GetPointer(), this, 2)
+        );
+  workbenchLocationService->Register();
+  serviceLocator->RegisterService(workbenchLocationService.data());
 }
 
 //IActionBars
@@ -156,7 +150,7 @@ void PartSite::InitializeDefaultServices()
 //    return actionBars;
 //  }
 
-QString PartSite::GetId()
+QString PartSite::GetId() const
 {
   return extensionID;
 }
@@ -181,12 +175,12 @@ IWorkbenchPartReference::Pointer PartSite::GetPartReference()
   return partReference.Lock();
 }
 
-QString PartSite::GetPluginId()
+QString PartSite::GetPluginId() const
 {
   return pluginID;
 }
 
-QString PartSite::GetRegisteredName()
+QString PartSite::GetRegisteredName() const
 {
   return extensionName;
 }
@@ -384,7 +378,7 @@ PartSite::HasService(const QString& api) const {
   return serviceLocator->HasService(api);
 }
 
-QString PartSite::ToString()
+QString PartSite::ToString() const
 {
   QString buffer = "PartSite(id=" + this->GetId() + ",pluginId="
       + this->GetPluginId() + ",registeredName=" + this->GetRegisteredName()

@@ -32,9 +32,10 @@ namespace berry {
  *
  * @since 3.0
  */
-struct BERRY_UI_QT IIntroDescriptor : public Object {
+struct BERRY_UI_QT IIntroDescriptor : public Object
+{
 
-  berryInterfaceMacro(IIntroDescriptor, berry);
+  berryObjectMacro(berry::IIntroDescriptor)
 
   ~IIntroDescriptor();
 

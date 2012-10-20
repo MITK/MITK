@@ -31,7 +31,7 @@ namespace berry {
  */
 struct IPluginContribution : public virtual Object
 {
-  berryInterfaceMacro(IPluginContribution, berry)
+  berryObjectMacro(berry::IPluginContribution)
 
   /**
    * @return the local id of the contribution. Must not be <code>null</code>.

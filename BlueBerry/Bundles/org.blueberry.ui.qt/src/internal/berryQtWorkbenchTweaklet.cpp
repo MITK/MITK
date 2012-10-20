@@ -36,11 +36,6 @@ QtWorkbenchTweaklet::QtWorkbenchTweaklet()
 
 }
 
-QtWorkbenchTweaklet::QtWorkbenchTweaklet(const QtWorkbenchTweaklet& other)
-{
-
-}
-
 Display* QtWorkbenchTweaklet::CreateDisplay()
 {
   return new QtDisplay();

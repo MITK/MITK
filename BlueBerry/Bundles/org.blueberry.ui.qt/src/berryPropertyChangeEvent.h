@@ -42,11 +42,12 @@ namespace berry {
  *
  * @see IPropertyChangeListener
  */
-class BERRY_UI_QT PropertyChangeEvent : public Object {
+class BERRY_UI_QT PropertyChangeEvent : public Object
+{
 
 public:
 
-  berryObjectMacro(PropertyChangeEvent);
+  berryObjectMacro(PropertyChangeEvent)
 
 private:
 

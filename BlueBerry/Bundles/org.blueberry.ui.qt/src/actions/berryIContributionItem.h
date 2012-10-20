@@ -55,7 +55,7 @@ struct IContributionManager;
 struct IContributionItem : public virtual Object
 {
 
-  berryInterfaceMacro(IContributionItem, berry)
+  berryObjectMacro(berry::IContributionItem)
 
 
   /**

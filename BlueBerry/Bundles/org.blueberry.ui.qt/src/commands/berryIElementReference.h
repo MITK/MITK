@@ -37,7 +37,7 @@ class UIElement;
 struct IElementReference : public Object
 {
 
-  berryInterfaceMacro(IElementReference, berry)
+  berryObjectMacro(berry::IElementReference)
 
   /**
    * The command id that this callback was registered against.

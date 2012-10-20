@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryWorkbenchActionConstants.h>
 
 #include "berryAbstractMenuAdditionCacheEntry.h"
+#include "berryAlwaysEnabledExpression.h"
 #include "berryContributionItem.h"
 #include "berryContributionRoot.h"
 #include "berryMenuManager.h"
@@ -104,10 +105,12 @@ public:
 //      identifier->RemoveIdentifierListener(this);
   }
 
+  using IPropertyChangeListener::PropertyChange;
+
   /*
    * @see IPropertyChangeListener#PropertyChange(PropertyChangeEvent)
    */
-  void PropertyChange(PropertyChangeEvent::Pointer event)
+  void PropertyChange(const PropertyChangeEvent::Pointer& event)
   {
     if (event->GetProperty() == WorkbenchMenuService::PROP_VISIBLE)
     {
@@ -249,7 +252,7 @@ void WorkbenchMenuService::Dispose()
 //  }
 }
 
-void WorkbenchMenuService::AddSourceProvider(SmartPointer<ISourceProvider> provider)
+void WorkbenchMenuService::AddSourceProvider(const SmartPointer<ISourceProvider>& /*provider*/)
 {
   // no-op
 }
@@ -259,7 +262,7 @@ void WorkbenchMenuService::ReadRegistry()
   //menuPersistence.read();
 }
 
-void WorkbenchMenuService::RemoveSourceProvider(SmartPointer<ISourceProvider> provider)
+void WorkbenchMenuService::RemoveSourceProvider(const SmartPointer<ISourceProvider>& /*provider*/)
 {
   // no-op
 }
@@ -464,8 +467,8 @@ SmartPointer<IEvaluationContext> WorkbenchMenuService::GetCurrentState() const
 
 void WorkbenchMenuService::RegisterVisibleWhen(const SmartPointer<IContributionItem>& item,
                          const SmartPointer<Expression>& visibleWhen,
-                         const QSet<SmartPointer<IEvaluationReference> >& restriction,
-                         const QString& identifierID)
+                         QSet<SmartPointer<IEvaluationReference> >& /*restriction*/,
+                         const QString& /*identifierID*/)
 {
   if (item.IsNull())
   {
@@ -489,24 +492,21 @@ void WorkbenchMenuService::RegisterVisibleWhen(const SmartPointer<IContributionI
 //    identifier = PlatformUI.getWorkbench().getActivitySupport()
 //        .getActivityManager().getIdentifier(identifierID);
 //  }
-//  ContributionItemUpdater listener = new ContributionItemUpdater(item,
-//      identifier);
+//  ContributionItemUpdater* listener =
+//      new ContributionItemUpdater(item, identifier);
 
-//  if (visibleWhen != AlwaysEnabledExpression.INSTANCE)
+//  if (visibleWhen != AlwaysEnabledExpression::INSTANCE)
 //  {
-//    IEvaluationReference ref = evaluationService.addEvaluationListener(
-//        visibleWhen, listener, PROP_VISIBLE);
-//    if (restriction != null)
-//    {
-//      restriction.add(ref);
-//    }
-//    evaluationsByItem.put(item, ref);
+//    IEvaluationReference::Pointer ref = evaluationService->AddEvaluationListener(
+//          visibleWhen, listener, PROP_VISIBLE);
+//    restriction.insert(ref);
+//    evaluationsByItem.insert(item, ref);
 //  }
 //  activityListenersByItem.put(item, listener);
 }
 
 void WorkbenchMenuService::UnregisterVisibleWhen(const SmartPointer<IContributionItem>& item,
-                           const QSet<SmartPointer<IEvaluationReference> >& restriction)
+                                                 QSet<SmartPointer<IEvaluationReference> >& restriction)
 {
   // TODO activity support
 //  ContributionItemUpdater identifierListener = (ContributionItemUpdater) activityListenersByItem
@@ -515,16 +515,14 @@ void WorkbenchMenuService::UnregisterVisibleWhen(const SmartPointer<IContributio
 //    identifierListener.dispose();
 //  }
 
-//  IEvaluationReference ref = (IEvaluationReference) evaluationsByItem
-//      .remove(item);
-//  if (ref == null) {
-//    return;
-//  }
+  IEvaluationReference::Pointer ref = evaluationsByItem.take(item);
+  if (ref.IsNull())
+  {
+    return;
+  }
 
-//  evaluationService.removeEvaluationListener(ref);
-//  if (restriction !=null) {
-//    restriction.remove(ref);
-//  }
+  evaluationService->RemoveEvaluationListener(ref);
+  restriction.remove(ref);
 }
 
 void WorkbenchMenuService::ReleaseContributions(ContributionManager* mgr)
@@ -740,7 +738,7 @@ IPropertyChangeListener* WorkbenchMenuService::GetServiceListener()
 //  LayoutUtil.resize(control);
 //}
 
-bool WorkbenchMenuService::UpdateToolBar(ToolBarManager* mgr)
+bool WorkbenchMenuService::UpdateToolBar(ToolBarManager* /*mgr*/)
 {
 //  QList<IWorkbenchWindow::Pointer> windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
 //  QList<IWorkbenchWindow::Pointer>::iterator wend = windows.end();
@@ -996,7 +994,7 @@ int WorkbenchMenuService::GetInsertionIndex(ContributionManager* mgr, const QStr
   return additionsIndex;
 }
 
-void WorkbenchMenuService::ReleaseItem(const SmartPointer<IContributionItem>& item, const QSet<SmartPointer<IEvaluationReference> >& restriction)
+void WorkbenchMenuService::ReleaseItem(const SmartPointer<IContributionItem>& item, QSet<SmartPointer<IEvaluationReference> >& restriction)
 {
   UnregisterVisibleWhen(item, restriction);
   if (ContributionManager::Pointer cm = item.Cast<ContributionManager>())

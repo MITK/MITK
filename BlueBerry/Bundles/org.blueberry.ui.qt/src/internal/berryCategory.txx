@@ -63,15 +63,15 @@ void Category<T>::AddElement(ElementType element)
 }
 
 template<class T>
-Poco::Any Category<T>::GetAdapter(const QString& adapter)
+Object* Category<T>::GetAdapter(const QString& adapter)
 {
-  if (adapter == IConfigurationElement::GetStaticClassName())
+  if (adapter == qobject_interface_iid<IConfigurationElement*>())
   {
-    return Poco::Any(configurationElement);
+    return configurationElement.GetPointer();
   }
   else
   {
-    return Poco::Any();
+    return NULL;
   }
 }
 

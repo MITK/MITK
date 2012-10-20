@@ -36,7 +36,7 @@ private:
 
 public:
 
-  berryObjectMacro(DefaultStackPresentationSite);
+  berryObjectMacro(DefaultStackPresentationSite)
 
   DefaultStackPresentationSite();
 
@@ -72,6 +72,8 @@ public:
    */
   void DragStart(IPresentablePart::Pointer beingDragged,
       Point& initialPosition, bool keyboard);
+
+  using IStackPresentationSite::Close;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.skins.IPresentationSite#close(org.blueberry.ui.internal.skins.IPresentablePart)

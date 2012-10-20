@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berrySaveablesLifecycleEvent.h"
 
 #include <berryMessage.h>
-#include <berryMacros.h>
 
 namespace berry {
 
@@ -48,35 +47,35 @@ namespace berry {
  * <li>This service is available globally.</li>
  * </ul>
  * </p>
- *
- * @since 3.2
  */
-struct ISaveablesLifecycleListener : public virtual Object {
-
-  berryInterfaceMacro(ISaveablesLifecycleListener, berry);
+struct ISaveablesLifecycleListener : public virtual Object
+{
+  berryObjectMacro(berry::ISaveablesLifecycleListener)
 
   struct Events {
-    Message1<SaveablesLifecycleEvent::Pointer> lifecycleChange;
+    Message1<const SaveablesLifecycleEvent::Pointer&> lifecycleChange;
 
-    void AddListener(ISaveablesLifecycleListener::Pointer listener);
-    void RemoveListener(ISaveablesLifecycleListener::Pointer listener);
+    void AddListener(ISaveablesLifecycleListener* listener);
+    void RemoveListener(ISaveablesLifecycleListener* listener);
 
   private:
 
-    typedef MessageDelegate1<ISaveablesLifecycleListener, SaveablesLifecycleEvent::Pointer> Delegate;
+    typedef MessageDelegate1<ISaveablesLifecycleListener, const SaveablesLifecycleEvent::Pointer&> Delegate;
   };
+
+  virtual ~ISaveablesLifecycleListener();
 
   /**
    * Handle the given event. This method must be called on the UI thread.
    *
    * @param event
    */
-  virtual void HandleLifecycleEvent(SaveablesLifecycleEvent::Pointer event) = 0;
+  virtual void HandleLifecycleEvent(const SaveablesLifecycleEvent::Pointer& event) = 0;
 
 };
 
 }
 
-Q_DECLARE_INTERFACE(berry::ISaveablesLifecycleListener, "org.blueberry.ui.qt.ISaveablesLifecycleListener")
+Q_DECLARE_INTERFACE(berry::ISaveablesLifecycleListener, "org.blueberry.ui.ISaveablesLifecycleListener")
 
 #endif /* BERRYISAVEABLESLIFECYCLELISTENER_H_ */

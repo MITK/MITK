@@ -172,7 +172,7 @@ bool ViewFactory::RestoreState(IMemento::Pointer memento)
 {
   QList<IMemento::Pointer> mem(memento->GetChildren(
       WorkbenchConstants::TAG_VIEW));
-  for (std::size_t i = 0; i < mem.size(); i++)
+  for (int i = 0; i < mem.size(); i++)
   {
     //for dynamic UI - add the next line to replace subsequent code that is commented out
     RestoreViewState(mem[i]);
@@ -187,7 +187,7 @@ bool ViewFactory::SaveState(IMemento::Pointer memento)
   //      IStatus.OK, WorkbenchMessages.ViewFactory_problemsSavingViews, null);
   bool result = true;
   QList<IViewReference::Pointer> refs(GetViews());
-  for (std::size_t i = 0; i < refs.size(); i++)
+  for (int i = 0; i < refs.size(); i++)
   {
     IViewDescriptor::Pointer desc = viewReg->Find(refs[i]->GetId());
     if (desc->IsRestorable())

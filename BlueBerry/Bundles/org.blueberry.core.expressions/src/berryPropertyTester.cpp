@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPlatform.h"
 #include "berryIContributor.h"
 
+#include <ctkPlugin.h>
+
 namespace berry
 {
 

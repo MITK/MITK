@@ -56,7 +56,7 @@ struct IWorkbenchWindow;
 struct BERRY_UI_QT IWorkbenchWindowConfigurer : public Object
 {
 
-  berryInterfaceMacro(IWorkbenchWindowConfigurer, berry)
+  berryObjectMacro(berry::IWorkbenchWindowConfigurer)
 
   ~IWorkbenchWindowConfigurer();
 
@@ -293,7 +293,7 @@ struct BERRY_UI_QT IWorkbenchWindowConfigurer : public Object
    *
    * @see #AddEditorAreaTransfer
    */
-  virtual void ConfigureEditorAreaDropListener(const SmartPointer<IDropTargetListener>& dropTargetListener) = 0;
+  virtual void ConfigureEditorAreaDropListener(IDropTargetListener* dropTargetListener) = 0;
 
   /**
    * Creates the menu bar for the window's shell.

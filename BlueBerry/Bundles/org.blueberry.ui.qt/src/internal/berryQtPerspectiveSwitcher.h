@@ -38,7 +38,7 @@ public:
 private:
 
   IWorkbenchWindow::Pointer window;
-  IPerspectiveListener::Pointer perspListener;
+  QScopedPointer<IPerspectiveListener> perspListener;
 
   QHash<QString, QAction*> perspIdToActionMap;
 

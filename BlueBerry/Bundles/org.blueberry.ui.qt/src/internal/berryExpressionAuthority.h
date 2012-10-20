@@ -41,7 +41,7 @@ struct ISourceProvider;
  * @see Expression
  * @see IEvaluationContext
  */
-class ExpressionAuthority : public ISourceProviderListener
+class ExpressionAuthority : public Object, private ISourceProviderListener
 {
 
 public:
@@ -111,7 +111,7 @@ protected:
    *            The name of the variable to get; must not be <code>null</code>.
    * @return The variable of the given name; <code>null</code> if none.
    */
-  Object::Pointer GetVariable(const QString& name) const;
+  Object::ConstPointer GetVariable(const QString& name) const;
 
   /**
    * Changes the variable of the given name. If the <code>value</code> is
@@ -124,7 +124,7 @@ protected:
    *            The new value; the variable should be removed if this is
    *            <code>null</code>.
    */
-  void ChangeVariable(const QString& name, const Object::Pointer& value);
+  void ChangeVariable(const QString& name, const Object::ConstPointer& value);
 
   /**
    * Carries out the actual source change notification. It assumed that by the
@@ -171,7 +171,7 @@ protected:
    *            The new value of the variable. If this value is
    *            <code>null</code>, then the variable is removed.
    */
-  void UpdateEvaluationContext(const QString& name, const Object::Pointer& value);
+  void UpdateEvaluationContext(const QString& name, const Object::ConstPointer& value);
 
 public:
 
@@ -211,10 +211,10 @@ public:
   void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider);
 
   void SourceChanged(int sourcePriority,
-                     const QHash<QString, Object::Pointer>& sourceValuesByName);
+                     const QHash<QString, Object::ConstPointer>& sourceValuesByName);
 
   void SourceChanged(int sourcePriority, const QString& sourceName,
-                     Object::Pointer sourceValue);
+                     Object::ConstPointer sourceValue);
 
 };
 

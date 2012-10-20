@@ -37,11 +37,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
+struct IEvaluationReference;
 struct IWorkbench;
 struct IWorkbenchPage;
 struct IPartService;
 struct ISelectionService;
 struct IPerspectiveDescriptor;
+struct IWorkbenchLocationService;
 
 class Workbench;
 class WorkbenchPage;
@@ -56,7 +58,24 @@ class BERRY_UI_QT WorkbenchWindow: public Window, public IWorkbenchWindow
 
 public:
 
-  berryObjectMacro(WorkbenchWindow);
+  /**
+   * Toolbar visibility change property.
+   */
+  static const QString PROP_TOOLBAR_VISIBLE; // = "toolbarVisible";
+
+  /**
+   * Perspective bar visibility change property.
+   */
+  static const QString PROP_PERSPECTIVEBAR_VISIBLE; // = "perspectiveBarVisible";
+
+  /**
+   * The status line visibility change property.  for internal use only.
+   */
+  static const QString PROP_STATUS_LINE_VISIBLE; // = "statusLineVisible";
+
+public:
+
+  berryObjectMacro(WorkbenchWindow)
 
   WorkbenchWindow(int number);
 
@@ -69,17 +88,17 @@ public:
   int Open();
   bool Close();
 
-  Shell::Pointer GetShell();
+  Shell::Pointer GetShell() const;
 
   /**
    * @see org.blueberry.ui.IPageService
    */
-  void AddPerspectiveListener(IPerspectiveListener::Pointer l);
+  void AddPerspectiveListener(IPerspectiveListener* l);
 
   /**
    * @see org.blueberry.ui.IPageService
    */
-  void RemovePerspectiveListener(IPerspectiveListener::Pointer l);
+  void RemovePerspectiveListener(IPerspectiveListener* l);
 
   /**
    * @see org.blueberry.ui.IPageService
@@ -91,7 +110,7 @@ public:
    */
   WWinActionBars* GetActionBars();
 
-  SmartPointer<IWorkbenchPage> GetActivePage();
+  SmartPointer<IWorkbenchPage> GetActivePage() const;
 
   SmartPointer<IWorkbenchPage> GetPage(int i);
 
@@ -120,6 +139,39 @@ public:
   IPartService* GetPartService();
 
   ISelectionService* GetSelectionService();
+
+  /**
+   * @return whether the tool bar should be shown. This is only applicable if
+   *         the window configurer also wishes the cool bar to be visible.
+   */
+  bool GetToolBarVisible() const;
+
+  /**
+   * @return whether the perspective bar should be shown. This is only
+   *         applicable if the window configurer also wishes the perspective
+   *         bar to be visible.
+   */
+  bool GetPerspectiveBarVisible() const;
+
+  /**
+   * @return whether the status line should be shown. This is only applicable if
+   *         the window configurer also wishes status line to be visible.
+   */
+  bool GetStatusLineVisible() const;
+
+  /**
+   * Add a generic property listener.
+   *
+   * @param listener the listener to add
+   */
+  void AddPropertyChangeListener(IPropertyChangeListener* listener);
+
+  /**
+   * Removes a generic property listener.
+   *
+   * @param listener the listener to remove
+   */
+  void RemovePropertyChangeListener(IPropertyChangeListener* listener);
 
   SmartPointer<IWorkbenchPage> OpenPage(const QString& perspectiveId,
       IAdaptable* input);
@@ -185,6 +237,8 @@ public:
    */
   void LargeUpdateEnd();
 
+  QSet<SmartPointer<IEvaluationReference> > GetMenuRestrictions() const;
+
 protected:
 
   friend class WorkbenchConfigurer;
@@ -237,7 +291,7 @@ protected:
    * only to the application.
    * </p>
    */
-  WorkbenchWindowConfigurer::Pointer GetWindowConfigurer();
+  WorkbenchWindowConfigurer::Pointer GetWindowConfigurer() const;
 
   bool CanHandleShellCloseEvent();
 
@@ -316,13 +370,15 @@ private:
    *
    * @since 3.0
    */
-  WorkbenchWindowConfigurer::Pointer windowConfigurer;
+  mutable WorkbenchWindowConfigurer::Pointer windowConfigurer;
 
   WorkbenchWindowAdvisor* windowAdvisor;
 
   ActionBarAdvisor::Pointer actionBarAdvisor;
 
   SmartPointer<WWinActionBars> actionBars;
+
+  IPropertyChangeListener::Events genericPropertyListeners;
 
   int number;
 
@@ -336,12 +392,18 @@ private:
   bool shellActivated;
   bool updateDisabled;
 
+  bool toolBarVisible;
+  bool perspectiveBarVisible;
+  bool statusLineVisible;
+
   /**
    * The map of services maintained by the workbench window. These services
    * are initialized during workbench window during the
    * {@link #configureShell(Shell)}.
    */
   ServiceLocator::Pointer serviceLocator;
+
+  QScopedPointer<IWorkbenchLocationService, QScopedPointerObjectDeleter> workbenchLocationService;
 
   bool emptyWindowContentsCreated;
   void* emptyWindowContents;
@@ -403,7 +465,7 @@ private:
 
     void SetActive(SmartPointer<IWorkbenchPage> page);
 
-    SmartPointer<WorkbenchPage> GetActive();
+    SmartPointer<WorkbenchPage> GetActive() const;
 
     SmartPointer<WorkbenchPage> GetNextActive();
   };
@@ -609,16 +671,16 @@ private:
   {
     ShellActivationListener(WorkbenchWindow::Pointer window);
 
-    void ShellActivated(ShellEvent::Pointer event);
+    void ShellActivated(const ShellEvent::Pointer& event);
 
-    void ShellDeactivated(ShellEvent::Pointer event);
+    void ShellDeactivated(const ShellEvent::Pointer& event);
 
   private:
 
     WorkbenchWindow::WeakPtr window;
   };
 
-  IShellListener::Pointer shellActivationListener;
+  QScopedPointer<IShellListener> shellActivationListener;
 
   /**
    * Hooks a listener to track the activation and deactivation of the window's
@@ -659,6 +721,15 @@ private:
    * @return true iff we are deferring UI updates.
    */
   bool UpdatesDeferred() const;
+
+  /**
+   * Initializes all of the default command-based services for the workbench
+   * window.
+   */
+  void InitializeDefaultServices();
+
+  void FirePropertyChanged(const  QString& property, const Object::Pointer& oldValue,
+                           const Object::Pointer& newValue);
 
 };
 

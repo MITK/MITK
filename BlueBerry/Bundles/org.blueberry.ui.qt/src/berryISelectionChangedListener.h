@@ -38,28 +38,29 @@ class SelectionChangedEvent;
  * @see ISelectionProvider
  * @see SelectionChangedEvent
  */
-struct BERRY_UI_QT ISelectionChangedListener : public virtual Object {
-
-  berryInterfaceMacro(ISelectionChangedListener, berry);
+struct BERRY_UI_QT ISelectionChangedListener
+{
 
   struct BERRY_UI_QT Events {
 
-    Message1<SelectionChangedEvent::Pointer > selectionChanged;
+    Message1<const SelectionChangedEvent::Pointer&> selectionChanged;
 
-    void AddListener(ISelectionChangedListener::Pointer listener);
-    void RemoveListener(ISelectionChangedListener::Pointer listener);
+    void AddListener(ISelectionChangedListener* listener);
+    void RemoveListener(ISelectionChangedListener* listener);
 
   private:
 
-    typedef MessageDelegate1<ISelectionChangedListener, SelectionChangedEvent::Pointer> Delegate;
+    typedef MessageDelegate1<ISelectionChangedListener, const SelectionChangedEvent::Pointer&> Delegate;
   };
+
+  virtual ~ISelectionChangedListener();
 
     /**
      * Notifies that the selection has changed.
      *
      * @param event event object describing the change
      */
-  virtual void SelectionChanged(SelectionChangedEvent::Pointer event) = 0;
+  virtual void SelectionChanged(const SelectionChangedEvent::Pointer& event) = 0;
 };
 
 }

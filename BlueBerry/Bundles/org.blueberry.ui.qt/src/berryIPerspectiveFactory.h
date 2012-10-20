@@ -83,9 +83,10 @@ namespace berry {
  * the layout is persisted by the workbench and the factory is not used.
  * </p>
  */
-struct BERRY_UI_QT IPerspectiveFactory : public Object {
+struct BERRY_UI_QT IPerspectiveFactory : public Object
+{
 
-  berryInterfaceMacro(IPerspectiveFactory, berry);
+  berryObjectMacro(berry::IPerspectiveFactory)
 
   ~IPerspectiveFactory();
 
@@ -106,6 +107,6 @@ struct BERRY_UI_QT IPerspectiveFactory : public Object {
 
 }
 
-Q_DECLARE_INTERFACE(berry::IPerspectiveFactory, "org.blueberry.IPerspectiveFactory")
+Q_DECLARE_INTERFACE(berry::IPerspectiveFactory, "org.blueberry.ui.IPerspectiveFactory")
 
 #endif /* BERRYIPERSPECTIVEFACTORY_H_ */

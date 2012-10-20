@@ -42,4 +42,9 @@ QHash<QString, Object::Pointer> ElementReference::GetParameters() const
   return parameters;
 }
 
+void ElementReference::AddParameter(const QString &name, const Object::Pointer &value)
+{
+  parameters.insert(name, value);
+}
+
 }

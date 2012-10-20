@@ -20,44 +20,48 @@ namespace berry {
 
 void
 IPartListener::Events
-::AddListener(IPartListener::Pointer l)
+::AddListener(IPartListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == NULL) return;
 
   Types t = l->GetPartEventTypes();
 
   if (t & ACTIVATED)
-    partActivated += Delegate(l.GetPointer(), &IPartListener::PartActivated);
+    partActivated += Delegate(l, &IPartListener::PartActivated);
   if (t & BROUGHT_TO_TOP)
-    partBroughtToTop += Delegate(l.GetPointer(), &IPartListener::PartBroughtToTop);
+    partBroughtToTop += Delegate(l, &IPartListener::PartBroughtToTop);
   if (t & CLOSED)
-    partClosed += Delegate(l.GetPointer(), &IPartListener::PartClosed);
+    partClosed += Delegate(l, &IPartListener::PartClosed);
   if (t & DEACTIVATED)
-    partDeactivated += Delegate(l.GetPointer(), &IPartListener::PartDeactivated);
+    partDeactivated += Delegate(l, &IPartListener::PartDeactivated);
   if (t & OPENED)
-    partOpened += Delegate(l.GetPointer(), &IPartListener::PartOpened);
+    partOpened += Delegate(l, &IPartListener::PartOpened);
   if (t & HIDDEN)
-    partHidden += Delegate(l.GetPointer(), &IPartListener::PartHidden);
+    partHidden += Delegate(l, &IPartListener::PartHidden);
   if (t & VISIBLE)
-    partVisible += Delegate(l.GetPointer(), &IPartListener::PartVisible);
+    partVisible += Delegate(l, &IPartListener::PartVisible);
   if (t & INPUT_CHANGED)
-    partInputChanged += Delegate(l.GetPointer(), &IPartListener::PartInputChanged);
+    partInputChanged += Delegate(l, &IPartListener::PartInputChanged);
 }
 
 void
 IPartListener::Events
-::RemoveListener(IPartListener::Pointer l)
+::RemoveListener(IPartListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == NULL) return;
 
-  partActivated -= Delegate(l.GetPointer(), &IPartListener::PartActivated);
-  partBroughtToTop -= Delegate(l.GetPointer(), &IPartListener::PartBroughtToTop);
-  partClosed -= Delegate(l.GetPointer(), &IPartListener::PartClosed);
-  partDeactivated -= Delegate(l.GetPointer(), &IPartListener::PartDeactivated);
-  partOpened -= Delegate(l.GetPointer(), &IPartListener::PartOpened);
-  partHidden -= Delegate(l.GetPointer(), &IPartListener::PartHidden);
-  partVisible -= Delegate(l.GetPointer(), &IPartListener::PartVisible);
-  partInputChanged -= Delegate(l.GetPointer(), &IPartListener::PartInputChanged);
+  partActivated -= Delegate(l, &IPartListener::PartActivated);
+  partBroughtToTop -= Delegate(l, &IPartListener::PartBroughtToTop);
+  partClosed -= Delegate(l, &IPartListener::PartClosed);
+  partDeactivated -= Delegate(l, &IPartListener::PartDeactivated);
+  partOpened -= Delegate(l, &IPartListener::PartOpened);
+  partHidden -= Delegate(l, &IPartListener::PartHidden);
+  partVisible -= Delegate(l, &IPartListener::PartVisible);
+  partInputChanged -= Delegate(l, &IPartListener::PartInputChanged);
+}
+
+IPartListener::~IPartListener()
+{
 }
 
 }

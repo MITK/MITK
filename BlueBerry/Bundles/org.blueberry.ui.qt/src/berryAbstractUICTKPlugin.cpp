@@ -34,9 +34,7 @@ const QString AbstractUICTKPlugin::FN_DIALOG_SETTINGS = "dialog_settings.xml";
 
 AbstractUICTKPlugin::AbstractUICTKPlugin()
   : preferencesService(0)
-  , context(0)
 {
-
 }
 
 //    IDialogSettings getDialogSettings() {
@@ -61,12 +59,12 @@ IPreferencesService* AbstractUICTKPlugin::GetPreferencesService() const
   // Create the preference store lazily.
   if (preferencesService == 0)
   {
-    ctkServiceReference serviceRef = context->getServiceReference<IPreferencesService>();
+    ctkServiceReference serviceRef = m_Context->getServiceReference<IPreferencesService>();
     if (!serviceRef)
     {
       BERRY_ERROR << "Preferences service not available";
     }
-    preferencesService = context->getService<IPreferencesService>(serviceRef);
+    preferencesService = m_Context->getService<IPreferencesService>(serviceRef);
   }
   return preferencesService;
 }
@@ -199,7 +197,7 @@ IWorkbench* AbstractUICTKPlugin::GetWorkbench()
 
 void AbstractUICTKPlugin::start(ctkPluginContext* context)
 {
-  this->context = context;
+  Plugin::start(context);
 
   // Should only attempt refreshPluginActions() once the bundle
   // has been fully started.  Otherwise, action delegates
@@ -238,7 +236,6 @@ void AbstractUICTKPlugin::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 
-  this->context = 0;
   //  try
   //  {
   //    if (bundleListener != null)
@@ -252,6 +249,8 @@ void AbstractUICTKPlugin::stop(ctkPluginContext* context)
   //    imageRegistry.dispose();
   //    imageRegistry = null;
   //}
+
+  Plugin::stop(context);
 }
 
 SmartPointer<ImageDescriptor> AbstractUICTKPlugin::ImageDescriptorFromPlugin(

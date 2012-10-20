@@ -451,7 +451,7 @@ bool ExtensionRegistry::RemoveObject(const SmartPointer<RegistryObject>& registr
   return true;
 }
 
-void ExtensionRegistry::SetFileManager(const QString& cacheBase, bool isCacheReadOnly)
+void ExtensionRegistry::SetFileManager(const QString& /*cacheBase*/, bool /*isCacheReadOnly*/)
 {
 //  if (cacheStorageManager != NULL)
 //    cacheStorageManager->Close(); // close existing file manager first
@@ -899,7 +899,7 @@ ExtensionRegistry::~ExtensionRegistry()
 {
 }
 
-void ExtensionRegistry::Stop(QObject* key)
+void ExtensionRegistry::Stop(QObject* /*key*/)
 {
   // If the registry creator specified a key token, check that the key mathches it
   // (it is assumed that registry owner keeps the key to prevent unautorized accesss).

@@ -41,7 +41,7 @@ struct IContributionItem;
 struct BERRY_UI_QT IContributionManagerOverrides : virtual Object
 {
 
-  berryInterfaceMacro(IContributionManagerOverrides, berry)
+  berryObjectMacro(berry::IContributionManagerOverrides)
 
   /**
    * Id for the enabled property. Value is <code>"enabled"</code>.

@@ -18,13 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYISTATELISTENER_H_
 #define BERRYISTATELISTENER_H_
 
-#include "berryObject.h"
-#include "berryMacros.h"
-
 #include <org_blueberry_core_commands_Export.h>
+
+#include "berryMessage.h"
 
 namespace berry {
 
+template<class T> class SmartPointer;
+
+class Object;
 class State;
 
 /**
@@ -35,13 +37,12 @@ class State;
  * Clients may implement, but must not extend this interface.
  * </p>
  */
-struct BERRY_COMMANDS IStateListener {
-
-  berryInterfaceMacro(IStateListener, berry);
+struct BERRY_COMMANDS IStateListener
+{
 
   struct Events {
 
-    typedef Message2<const SmartPointer<State>&, const Object::Pointer&> StateEvent;
+    typedef Message2<const SmartPointer<State>&, const SmartPointer<Object>&> StateEvent;
 
     StateEvent stateChanged;
 
@@ -49,7 +50,7 @@ struct BERRY_COMMANDS IStateListener {
     void RemoveListener(IStateListener* listener);
 
     private:
-    typedef MessageDelegate2<IStateListener, const SmartPointer<State>&, const Object::Pointer&> Delegate;
+    typedef MessageDelegate2<IStateListener, const SmartPointer<State>&, const SmartPointer<Object>&> Delegate;
   };
 
   virtual ~IStateListener();
@@ -64,7 +65,7 @@ struct BERRY_COMMANDS IStateListener {
    *            The old value; may be anything.
    */
   virtual void HandleStateChange(const SmartPointer<State>& state,
-                                 const Object::Pointer& oldValue) = 0;
+                                 const SmartPointer<Object>& oldValue) = 0;
 };
 
 

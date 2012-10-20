@@ -124,7 +124,8 @@ public:
   /**
    * reactions to selection events from views
    */
-  void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+  void BlueBerrySelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
+                                 const berry::ISelection::ConstPointer& selection)
   {
     if(sourcepart.IsNull() || sourcepart.GetPointer() == static_cast<berry::IWorkbenchPart*>(q))
       return;
@@ -175,7 +176,7 @@ public:
   /**
    * object to observe BlueBerry selections
    */
-  berry::ISelectionListener::Pointer m_BlueBerrySelectionListener;
+  QScopedPointer<berry::ISelectionListener> m_BlueBerrySelectionListener;
 
   /**
    * Saves if this class is currently working on DataStorage changes.
@@ -246,10 +247,9 @@ void QmitkAbstractView::AfterCreateQtPartControl()
                                                                               &QmitkAbstractView::OnPreferencesChanged));
 
   // REGISTER FOR WORKBENCH SELECTION EVENTS
-  d->m_BlueBerrySelectionListener = berry::ISelectionListener::Pointer(
-        new berry::NullSelectionChangedAdapter<QmitkAbstractViewPrivate>(d.data(),
-                                                             &QmitkAbstractViewPrivate::BlueBerrySelectionChanged));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(d->m_BlueBerrySelectionListener);
+  d->m_BlueBerrySelectionListener.reset(new berry::NullSelectionChangedAdapter<QmitkAbstractViewPrivate>(
+                                          d.data(), &QmitkAbstractViewPrivate::BlueBerrySelectionChanged));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(d->m_BlueBerrySelectionListener.data());
 
   // EMULATE INITIAL SELECTION EVENTS
 
@@ -291,7 +291,7 @@ QmitkAbstractView::~QmitkAbstractView()
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
   {
-    s->RemovePostSelectionListener(d->m_BlueBerrySelectionListener);
+    s->RemovePostSelectionListener(d->m_BlueBerrySelectionListener.data());
   }
 
   this->UnRegister(false);

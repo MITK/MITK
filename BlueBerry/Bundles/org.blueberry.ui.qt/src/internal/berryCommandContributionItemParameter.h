@@ -32,7 +32,7 @@ struct IServiceLocator;
  * contributions. Mandatory parameters are in the constructor, and public fields
  * can be set to fill in other parameters.
  */
-class CommandContributionItemParameter : public Object
+class CommandContributionItemParameter : public virtual Object
 {
 
 public:

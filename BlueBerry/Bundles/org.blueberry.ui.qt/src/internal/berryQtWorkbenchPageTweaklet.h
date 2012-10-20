@@ -32,10 +32,9 @@ class BERRY_UI_QT QtWorkbenchPageTweaklet : public QObject, public WorkbenchPage
 
 public:
 
-  berryObjectMacro(QtWorkbenchPageTweaklet);
+  berryObjectMacro(QtWorkbenchPageTweaklet)
 
   QtWorkbenchPageTweaklet();
-  QtWorkbenchPageTweaklet(const QtWorkbenchPageTweaklet& other);
 
   void* CreateClientComposite(void* pageControl);
   void* CreatePaneControl(void* parent);

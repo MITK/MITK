@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryParameterization.h"
 #include "berryCommand.h"
 #include "berryCommandCategory.h"
+#include "berryState.h"
 
 #include "berryExecutionEvent.h"
 #include "berryCommandEvent.h"
@@ -59,13 +60,13 @@ void CommandManager::ExecutionListener::PostExecuteFailure(const QString& comman
 }
 
 void CommandManager::ExecutionListener::PostExecuteSuccess(const QString& commandId,
-                                                           const Object::Pointer returnValue)
+                                                           const Object::Pointer& returnValue)
 {
   commandManager->executionEvents.postExecuteSuccess(commandId, returnValue);
 }
 
 void CommandManager::ExecutionListener::PreExecute(const QString& commandId,
-                                                   const ExecutionEvent::ConstPointer event)
+                                                   const ExecutionEvent::ConstPointer& event)
 {
   commandManager->executionEvents.preExecute(commandId, event);
 }
@@ -76,7 +77,7 @@ CommandManager::CommandCategoryListener::CommandCategoryListener(CommandManager*
 
 }
 
-void CommandManager::CommandCategoryListener::CategoryChanged(const CommandCategoryEvent::ConstPointer categoryEvent)
+void CommandManager::CommandCategoryListener::CategoryChanged(const CommandCategoryEvent::ConstPointer& categoryEvent)
 {
   if (categoryEvent->IsDefinedChanged())
   {
@@ -104,7 +105,7 @@ CommandManager::CommandListener::CommandListener(CommandManager* commandManager)
 
 }
 
-void CommandManager::CommandListener::CommandChanged(const SmartPointer<const CommandEvent> commandEvent)
+void CommandManager::CommandListener::CommandChanged(const SmartPointer<const CommandEvent>& commandEvent)
 {
   if (commandEvent->IsDefinedChanged())
   {
@@ -133,7 +134,7 @@ CommandManager::ParameterTypeListener::ParameterTypeListener(CommandManager* com
 }
 
 void CommandManager::ParameterTypeListener::ParameterTypeChanged(
-    const ParameterTypeEvent::ConstPointer parameterTypeEvent)
+    const ParameterTypeEvent::ConstPointer& parameterTypeEvent)
 {
   if (parameterTypeEvent->IsDefinedChanged())
   {
@@ -188,14 +189,14 @@ void CommandManager::AddExecutionListener(IExecutionListener *listener)
   if (executionEvents.IsEmpty())
   {
     // Add an execution listener to every command.
-    executionListener = new ExecutionListener(this);
+    executionListener.reset(new ExecutionListener(this));
     for (HandleObjectsByIdMap::Iterator itr = handleObjectsById.begin();
          itr != handleObjectsById.end(); ++itr)
     {
       Command::Pointer command = itr.value().Cast<Command>();
       if (command)
       {
-        command->AddExecutionListener(executionListener.GetPointer());
+        command->AddExecutionListener(executionListener.data());
       }
     }
   }
@@ -278,7 +279,7 @@ SmartPointer<CommandCategory> CommandManager::GetCategory(const QString& categor
   {
     category = new CommandCategory(categoryId);
     categoriesById[categoryId] = category;
-    category->AddCategoryListener(categoryListener.GetPointer());
+    category->AddCategoryListener(categoryListener.data());
   }
 
   return category;
@@ -293,11 +294,11 @@ SmartPointer<Command> CommandManager::GetCommand(const QString& commandId)
   {
     command = new Command(commandId);
     handleObjectsById[commandId] = command;
-    command->AddCommandListener(commandListener.GetPointer());
+    command->AddCommandListener(commandListener.data());
 
     if (executionListener)
     {
-      command->AddExecutionListener(executionListener.GetPointer());
+      command->AddExecutionListener(executionListener.data());
     }
   }
 
@@ -388,7 +389,7 @@ SmartPointer<ParameterType> CommandManager::GetParameterType(const QString& para
   {
     parameterType = new ParameterType(parameterTypeId);
     parameterTypesById[parameterTypeId] = parameterType;
-    parameterType->AddListener(parameterTypeListener.GetPointer());
+    parameterType->AddListener(parameterTypeListener.data());
   }
 
   return parameterType;
@@ -420,10 +421,9 @@ void CommandManager::RemoveExecutionListener(IExecutionListener *listener)
          commandItr != handleObjectsById.end(); ++commandItr)
     {
       Command::Pointer command(commandItr.value().Cast<Command>());
-      command->RemoveExecutionListener(executionListener.GetPointer());
+      command->RemoveExecutionListener(executionListener.data());
     }
-    executionListener = 0;
-
+    executionListener.reset();
   }
 }
 
@@ -616,7 +616,7 @@ QList<Parameterization> CommandManager::GetParameterizations(
       parameterValue = this->Unescape(idEqualsValue.mid(equalsPosition + 1));
     }
 
-    for (unsigned int i = 0; i < parameters.size(); i++)
+    for (int i = 0; i < parameters.size(); i++)
     {
       const IParameter::Pointer parameter(parameters[i]);
       if (parameter->GetId() == parameterId)

@@ -54,7 +54,7 @@ public:
   std::string m_WidgetDecorationColor[4];
   std::string m_WidgetAnnotation[4];
   bool m_MenuWidgetsEnabled;
-  berry::IPartListener::Pointer m_PartListener;
+  QScopedPointer<berry::IPartListener> m_PartListener;
 
   QHash<QString, QmitkRenderWindow*> m_RenderWindows;
 
@@ -73,7 +73,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
   }
 
-  void PartClosed (berry::IWorkbenchPartReference::Pointer partRef)
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -87,7 +87,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     }
   }
 
-  void PartHidden (berry::IWorkbenchPartReference::Pointer partRef)
+  void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef)
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -101,7 +101,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     }
   }
 
-  void PartVisible (berry::IWorkbenchPartReference::Pointer partRef)
+  void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef)
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -140,7 +140,7 @@ QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
 
 QmitkStdMultiWidgetEditor::~QmitkStdMultiWidgetEditor()
 {
-  this->GetSite()->GetPage()->RemovePartListener(d->m_PartListener);
+  this->GetSite()->GetPage()->RemovePartListener(d->m_PartListener.data());
 }
 
 QmitkStdMultiWidget* QmitkStdMultiWidgetEditor::GetStdMultiWidget()
@@ -324,7 +324,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     // Store the initial visibility status of the menu widget.
     d->m_MenuWidgetsEnabled = d->m_StdMultiWidget->IsMenuWidgetEnabled();
 
-    this->GetSite()->GetPage()->AddPartListener(d->m_PartListener);
+    this->GetSite()->GetPage()->AddPartListener(d->m_PartListener.data());
 
     berry::IBerryPreferences* berryprefs = dynamic_cast<berry::IBerryPreferences*>(prefs.GetPointer());
     InitializePreferences(berryprefs);

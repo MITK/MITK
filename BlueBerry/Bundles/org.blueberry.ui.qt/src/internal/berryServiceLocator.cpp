@@ -56,14 +56,17 @@ bool ServiceLocator::ParentLocator::HasService(const QString& api) const
   return false;
 }
 
-ServiceLocator::ServiceLocator() :
-  activated(false), disposed(false)
+ServiceLocator::ServiceLocator()
+  : activated(false)
+  , factory(NULL)
+  , parent(NULL)
+  , disposed(false)
 {
 
 }
 
 ServiceLocator::ServiceLocator(IServiceLocator* _parent,
-    const IServiceFactory::ConstPointer _factory, IDisposable::WeakPtr _owner) :
+    const IServiceFactory* _factory, IDisposable::WeakPtr _owner) :
   activated(false), factory(_factory), parent(_parent),
   disposed(false), owner(_owner)
 {
@@ -148,9 +151,12 @@ Object* ServiceLocator::GetService(const QString& key)
     }
     if (!service)
     {
-      service = WorkbenchServiceRegistry::GetRegistry()->GetService(key,
-                                                                    factoryParent.GetPointer(),
-                                                                    this);
+      Object::Pointer factoryService =
+          WorkbenchServiceRegistry::GetRegistry()->GetService(key,
+                                                              factoryParent.GetPointer(),
+                                                              this);
+      managedFactoryServices.push_back(factoryService);
+      service = factoryService.GetPointer();
     }
     if (!service)
     {
@@ -170,12 +176,10 @@ bool ServiceLocator::HasService(const QString& key) const
   {
     return false;
   }
-   if (services.find(key) != services.end())
-    {
-      return true;
-    }
-
-
+  if (services.find(key) != services.end())
+  {
+    return true;
+  }
   return false;
 }
 

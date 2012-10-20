@@ -33,17 +33,15 @@ set(SRC_CPP_FILES
   berryObjectGeneric.h
   berryObjectList.h
   berryObjects.cpp
-  berryObjectString.h
+  berryObjectString.cpp
   berryObjectStringMap.cpp
   berryOperationCanceledException.cpp
   berryPlatform.cpp
   berryPlatformException.cpp
   berryPlatformObject.cpp
   berryPlugin.cpp
-  berryRuntime.cpp
   berrySafeRunner.cpp
   berrySmartPointer.h
-  berryStackTrace.cpp
   berryStatus.cpp
   berryWeakPointer.h
 
@@ -77,7 +75,6 @@ set(INTERNAL_CPP_FILES
   berryCTKPluginListener.cpp
   berryCTKPluginUtils.cpp
   berryExtension.cpp
-  #berryExtensionDelta.cpp
   berryExtensionHandle.cpp
   berryExtensionPoint.cpp
   berryExtensionPointHandle.cpp
@@ -95,7 +92,6 @@ set(INTERNAL_CPP_FILES
   berryProvisioningInfo.cpp
   berryRegistryContribution.cpp
   berryRegistryContributor.cpp
-  #berryRegistryDelta.cpp
   berryRegistryObjectFactory.cpp
   berryRegistryIndexChildren.cpp
   berryRegistryIndexElement.cpp

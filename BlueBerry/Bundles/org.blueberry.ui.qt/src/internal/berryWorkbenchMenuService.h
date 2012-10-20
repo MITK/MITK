@@ -133,11 +133,11 @@ public:
 
   void Dispose();
 
-  void AddSourceProvider(SmartPointer<ISourceProvider> provider);
+  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider);
 
   void ReadRegistry();
 
-  void RemoveSourceProvider(SmartPointer<ISourceProvider> provider);
+  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider);
 
   void UpdateManagers();
 
@@ -180,14 +180,14 @@ public:
    */
   void RegisterVisibleWhen(const SmartPointer<IContributionItem>& item,
                            const SmartPointer<Expression>& visibleWhen,
-                           const QSet<SmartPointer<IEvaluationReference> >& restriction,
+                           QSet<SmartPointer<IEvaluationReference> >& restriction,
                            const QString& identifierID);
 
   /*
    * @see IMenuService#UnregisterVisibleWhen(IContributionItem)
    */
   void UnregisterVisibleWhen(const SmartPointer<IContributionItem>& item,
-                             const QSet<SmartPointer<IEvaluationReference> >& restriction);
+                             QSet<SmartPointer<IEvaluationReference> >& restriction);
 
   /*
    * @see IMenuService#ReleaseMenu(ContributionManager)
@@ -243,6 +243,7 @@ private:
 
   //SmartPointer<IActivityManagerListener> GetActivityManagerListener();
 
+  using IPropertyChangeListener::PropertyChange;
   void PropertyChange(const PropertyChangeEvent::Pointer& event);
 
   IPropertyChangeListener* GetServiceListener();
@@ -301,7 +302,7 @@ private:
   /**
    * @param item
    */
-  void ReleaseItem(const SmartPointer<IContributionItem>& item, const QSet<SmartPointer<IEvaluationReference> >& restriction);
+  void ReleaseItem(const SmartPointer<IContributionItem>& item, QSet<SmartPointer<IEvaluationReference> >& restriction);
 
   /**
    * Return whether or not this contribution is programmatic (ie: has a class attribute).

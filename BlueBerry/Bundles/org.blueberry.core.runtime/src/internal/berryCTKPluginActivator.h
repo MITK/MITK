@@ -28,7 +28,7 @@ namespace berry {
 
 //class CTKPluginListener;
 class PreferencesService;
-class IExtensionRegistry;
+struct IExtensionRegistry;
 
 class org_blueberry_core_runtime_Activator : public QObject, public ctkPluginActivator
 {

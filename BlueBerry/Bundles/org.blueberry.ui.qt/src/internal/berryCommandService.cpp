@@ -23,8 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryParameterizedCommand.h>
 #include <berryUIElement.h>
 
+#include "berryPersistentState.h"
 #include "berryWorkbenchPlugin.h"
 #include "berryElementReference.h"
+#include "berryIPreferences.h"
 
 #include <berryIHandler.h>
 #include <berryIElementUpdater.h>
@@ -47,12 +49,12 @@ const QString CommandService::CreatePreferenceKey(const SmartPointer<Command>& c
 
 CommandService::CommandService( CommandManager* commandManager)
   : commandManager(commandManager)
+  , commandPersistence(this)
 {
   if (commandManager == 0)
   {
     throw std::invalid_argument("Cannot create a command service with a null manager");
   }
-  //this.commandPersistence = new CommandPersistence(this);
 }
 
 CommandService::~CommandService()
@@ -78,29 +80,27 @@ SmartPointer<ParameterizedCommand> CommandService::Deserialize(const QString& se
 
 void CommandService::Dispose()
 {
-  //commandPersistence.dispose();
-
   /*
    * All state on all commands neeeds to be disposed. This is so that the
    * state has a chance to persist any changes.
    */
-//  final Command[] commands = commandManager.getAllCommands();
-//  for (int i = 0; i < commands.length; i++) {
-//    final Command command = commands[i];
-//    final String[] stateIds = command.getStateIds();
-//    for (int j = 0; j < stateIds.length; j++) {
-//      final String stateId = stateIds[j];
-//      final State state = command.getState(stateId);
-//      if (state instanceof PersistentState) {
-//        final PersistentState persistentState = (PersistentState) state;
-//        if (persistentState.shouldPersist()) {
-//          persistentState.save(PrefUtil
-//              .getInternalPreferenceStore(),
-//              createPreferenceKey(command, stateId));
-//        }
-//      }
-//    }
-//  }
+  const QList<Command::Pointer> commands = commandManager->GetAllCommands();
+  foreach (const Command::Pointer& command, commands)
+  {
+    const QList<QString> stateIds = command->GetStateIds();
+    foreach(const QString& stateId, stateIds)
+    {
+      const State::Pointer state = command->GetState(stateId);
+      if (PersistentState::Pointer persistentState = state.Cast<PersistentState>())
+      {
+        if (persistentState->ShouldPersist())
+        {
+          persistentState->Save(WorkbenchPlugin::GetDefault()->GetPreferences(),
+                                CreatePreferenceKey(command, stateId));
+        }
+      }
+    }
+  }
   commandCallbacks.clear();
 }
 
@@ -162,7 +162,7 @@ SmartPointer<ParameterType> CommandService::GetParameterType(const QString& para
 
 void CommandService::ReadRegistry()
 {
-  //commandPersistence.read();
+  commandPersistence.Read();
 }
 
 void CommandService::RemoveExecutionListener(IExecutionListener* listener)
@@ -310,9 +310,9 @@ void CommandService::UnregisterElement(const SmartPointer<IElementReference>& el
   }
 }
 
-//CommandPersistence* CommandService::GetCommandPersistence() const
-//{
-//  return commandPersistence;
-//}
+const CommandPersistence* CommandService::GetCommandPersistence() const
+{
+  return &commandPersistence;
+}
 
 }

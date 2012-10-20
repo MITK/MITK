@@ -31,11 +31,6 @@ QtWorkbenchPageTweaklet::QtWorkbenchPageTweaklet()
 
 }
 
-QtWorkbenchPageTweaklet::QtWorkbenchPageTweaklet(const QtWorkbenchPageTweaklet& other)
-{
-  Q_UNUSED(other)
-}
-
 void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
 {
   QWidget* parent = static_cast<QWidget*>(pageControl);

@@ -44,12 +44,12 @@ PartService::PartService(const QString& debugListenersKey,
   this->debugListenersKey = debugListenersKey;
 }
 
-void PartService::AddPartListener(IPartListener::Pointer l)
+void PartService::AddPartListener(IPartListener* l)
 {
   partEvents.AddListener(l);
 }
 
-void PartService::RemovePartListener(IPartListener::Pointer l)
+void PartService::RemovePartListener(IPartListener* l)
 {
   partEvents.RemoveListener(l);
 }

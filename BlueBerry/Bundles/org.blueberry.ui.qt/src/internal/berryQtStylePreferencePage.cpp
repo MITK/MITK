@@ -32,11 +32,6 @@ QtStylePreferencePage::QtStylePreferencePage()
 
 }
 
-QtStylePreferencePage::QtStylePreferencePage(const QtStylePreferencePage& other)
-{
-  Q_UNUSED(other)
-}
-
 void QtStylePreferencePage::Init(IWorkbench::Pointer )
 {
 

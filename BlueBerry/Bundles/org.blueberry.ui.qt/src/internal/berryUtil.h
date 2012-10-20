@@ -17,8 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYUTIL_H_
 #define BERRYUTIL_H_
 
-namespace berry
-{
+#include "berryObject.h"
+#include "berryIAdaptable.h"
+
+namespace berry {
+
+class Shell;
 
 class Util
 {
@@ -81,6 +85,17 @@ public:
 
     return 0;
   }
+
+  /**
+   * Return an appropriate shell to parent dialogs on. This will be one of the
+   * workbench windows (the active one) should any exist. Otherwise
+   * <code>null</code> is returned.
+   *
+   * @return the shell to parent on or <code>null</code> if there is no
+   *         appropriate shell
+   */
+  static SmartPointer<Shell> GetShellToParentOn();
+
 };
 
 }

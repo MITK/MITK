@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
+
 /**
  * \ingroup org_blueberry_ui_qt
  *
@@ -48,7 +49,8 @@ namespace berry
  */
 struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAdaptable
 {
-  berryInterfaceMacro(IViewDescriptor, berry);
+
+  berryObjectMacro(berry::IViewDescriptor)
 
   ~IViewDescriptor();
 
@@ -59,7 +61,6 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
    * @throws CoreException thrown if there is a problem creating the part
    */
   virtual IViewPart::Pointer CreateView() = 0;
-
 
   virtual std::vector< std::string> GetKeywordReferences() const = 0;
 
@@ -102,6 +103,7 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
 
   virtual bool operator==(const Object*) const = 0;
 };
+
 }
 
 #endif /*BERRYIVIEWDESCRIPTOR_H_*/

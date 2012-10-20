@@ -64,6 +64,8 @@ public:
    * @see IElementReference#GetParameters()
    */
   QHash<QString, Object::Pointer> GetParameters() const;
+
+  void AddParameter(const QString& name, const Object::Pointer& value);
 };
 
 }

@@ -54,11 +54,13 @@ public:
   QWebPage* GetQWebPage() const;
 
   IPartListener::Events::Types GetPartEventTypes() const;
-  void PartDeactivated(IWorkbenchPartReference::Pointer /*partRef*/);
+  void PartDeactivated(const IWorkbenchPartReference::Pointer& /*partRef*/);
 
   IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const;
-  void PerspectiveActivated(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective);
-  void PerspectiveDeactivated(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective);
+  void PerspectiveActivated(const SmartPointer<IWorkbenchPage>& page,
+                            const IPerspectiveDescriptor::Pointer& perspective);
+  void PerspectiveDeactivated(const SmartPointer<IWorkbenchPage>& page,
+                              const IPerspectiveDescriptor::Pointer& perspective);
 
 protected:
 

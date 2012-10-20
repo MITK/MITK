@@ -37,9 +37,10 @@ namespace berry {
  * user requesting it.
  *
  */
-struct BERRY_UI_QT IntroContentDetector : public Object {
+struct BERRY_UI_QT IntroContentDetector : public Object
+{
 
-  berryInterfaceMacro(IntroContentDetector, berry);
+  berryObjectMacro(berry::IntroContentDetector)
 
   /**
    * Returns <code>true</code> if new intro content is available.
@@ -52,6 +53,6 @@ struct BERRY_UI_QT IntroContentDetector : public Object {
 
 }
 
-Q_DECLARE_INTERFACE(berry::IntroContentDetector, "org.blueberr.IntroContentDetector")
+Q_DECLARE_INTERFACE(berry::IntroContentDetector, "org.blueberry.ui.IntroContentDetector")
 
 #endif /* BERRYINTROCONTENTDETECTOR_H_ */

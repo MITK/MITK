@@ -264,7 +264,7 @@ IIntroPart::Pointer WorkbenchIntroManager::GetIntro() const
 IWorkbenchPart::Pointer WorkbenchIntroManager::GetIntroAdapterPart() const
 {
   QList<IWorkbenchWindow::Pointer> windows(this->workbench->GetWorkbenchWindows());
-  for (std::size_t i = 0; i < windows.size(); i++)
+  for (int i = 0; i < windows.size(); i++)
   {
     IWorkbenchWindow::Pointer window = windows[i];
     WorkbenchPage::Pointer page = window->GetActivePage().Cast<WorkbenchPage>();
@@ -276,7 +276,7 @@ IWorkbenchPart::Pointer WorkbenchIntroManager::GetIntroAdapterPart() const
     if (IntroIsView())
     {
       QList<IPerspectiveDescriptor::Pointer> perspDescs(page->GetOpenPerspectives());
-      for (std::size_t j = 0; j < perspDescs.size(); j++)
+      for (int j = 0; j < perspDescs.size(); j++)
       {
         IPerspectiveDescriptor::Pointer descriptor = perspDescs[j];
         IViewReference::Pointer reference = page->FindPerspective(descriptor)->FindView(

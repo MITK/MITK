@@ -30,7 +30,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IViewCategory : public Object
 {
-  berryInterfaceMacro(IViewCategory, berry);
+  berryObjectMacro(berry::IViewCategory)
 
   virtual QString GetId() const = 0;
   virtual QString GetLabel() const = 0;

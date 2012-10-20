@@ -37,9 +37,8 @@ struct IWorkbenchPage;
  * @see IPageService#addPerspectiveListener(IPerspectiveListener)
  * @see PerspectiveAdapter
  */
-struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
-
-  berryInterfaceMacro(IPerspectiveListener, berry);
+struct BERRY_UI_QT IPerspectiveListener
+{
 
   struct Events {
 
@@ -57,28 +56,30 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
       ALL            = 0xffffffff
     };
 
-    BERRY_DECLARE_FLAGS(Types, Type)
+    Q_DECLARE_FLAGS(Types, Type)
 
-    Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectiveActivated;
-    Message3<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, const QString&> perspectiveChanged;
-    Message4<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IWorkbenchPartReference::Pointer, const QString&> perspectivePartChanged;
-    Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectiveOpened;
-    Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectiveClosed;
-    Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectiveDeactivated;
-    Message3<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IPerspectiveDescriptor::Pointer> perspectiveSavedAs;
-    Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectivePreDeactivate;
+    Message2<const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&> perspectiveActivated;
+    Message3<const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&, const QString&> perspectiveChanged;
+    Message4<const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&, const SmartPointer<IWorkbenchPartReference>&, const QString&> perspectivePartChanged;
+    Message2<const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&> perspectiveOpened;
+    Message2<const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&> perspectiveClosed;
+    Message2<const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&> perspectiveDeactivated;
+    Message3<const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&, const IPerspectiveDescriptor::Pointer&> perspectiveSavedAs;
+    Message2<const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&> perspectivePreDeactivate;
 
-    void AddListener(IPerspectiveListener::Pointer l);
-    void RemoveListener(IPerspectiveListener::Pointer l);
+    void AddListener(IPerspectiveListener* l);
+    void RemoveListener(IPerspectiveListener* l);
 
   private:
 
-    typedef MessageDelegate2<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer > Delegate2;
-    typedef MessageDelegate3<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, const QString&> PerspChangedDelegate;
-    typedef MessageDelegate3<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IPerspectiveDescriptor::Pointer> PerspSavedAsDelegate;
-    typedef MessageDelegate4<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IWorkbenchPartReference::Pointer, const QString&> PerspPartChangedDelegate;
+    typedef MessageDelegate2<IPerspectiveListener, const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer& > Delegate2;
+    typedef MessageDelegate3<IPerspectiveListener, const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&, const QString&> PerspChangedDelegate;
+    typedef MessageDelegate3<IPerspectiveListener, const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&, const IPerspectiveDescriptor::Pointer&> PerspSavedAsDelegate;
+    typedef MessageDelegate4<IPerspectiveListener, const SmartPointer<IWorkbenchPage>&, const IPerspectiveDescriptor::Pointer&, const SmartPointer<IWorkbenchPartReference>&, const QString&> PerspPartChangedDelegate;
 
   };
+
+  virtual ~IPerspectiveListener();
 
   virtual Events::Types GetPerspectiveEventTypes() const = 0;
 
@@ -90,8 +91,8 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    * @param perspective the perspective descriptor that was activated
    * @see IWorkbenchPage#setPerspective
    */
-  virtual void PerspectiveActivated(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective);
+  virtual void PerspectiveActivated(const SmartPointer<IWorkbenchPage>& page,
+                                    const IPerspectiveDescriptor::Pointer& perspective);
 
   /**
    * Notifies this listener that a perspective has changed in some way
@@ -102,8 +103,8 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    * @param perspective the perspective descriptor
    * @param changeId one of the <code>CHANGE_*</code> constants on IWorkbenchPage
    */
-  virtual void PerspectiveChanged(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective, const QString& changeId);
+  virtual void PerspectiveChanged(const SmartPointer<IWorkbenchPage>& page,
+          const IPerspectiveDescriptor::Pointer& perspective, const QString& changeId);
 
   /**
    * Notifies this listener that a part in the given page's perspective
@@ -114,9 +115,9 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    * @param partRef the reference to the affected part
    * @param changeId one of the <code>CHANGE_*</code> constants on IWorkbenchPage
    */
-  virtual void PerspectiveChanged(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective,
-          IWorkbenchPartReference::Pointer partRef, const QString& changeId);
+  virtual void PerspectiveChanged(const SmartPointer<IWorkbenchPage>& page,
+          const IPerspectiveDescriptor::Pointer& perspective,
+          const SmartPointer<IWorkbenchPartReference>& partRef, const QString& changeId);
 
   /**
    * Notifies this listener that a perspective in the given page has been
@@ -128,8 +129,8 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    *            the perspective descriptor that was opened
    * @see IWorkbenchPage#setPerspective(IPerspectiveDescriptor)
    */
-  virtual void PerspectiveOpened(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective);
+  virtual void PerspectiveOpened(const SmartPointer<IWorkbenchPage>& page,
+          const IPerspectiveDescriptor::Pointer& perspective);
 
   /**
    * Notifies this listener that a perspective in the given page has been
@@ -142,8 +143,8 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    * @see IWorkbenchPage#closePerspective(IPerspectiveDescriptor, boolean, boolean)
    * @see IWorkbenchPage#closeAllPerspectives(boolean, boolean)
    */
-  virtual void PerspectiveClosed(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective);
+  virtual void PerspectiveClosed(const SmartPointer<IWorkbenchPage>& page,
+          const IPerspectiveDescriptor::Pointer& perspective);
 
   /**
    * Notifies this listener that a perspective in the given page has been
@@ -155,8 +156,8 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    *            the perspective descriptor that was deactivated
    * @see IWorkbenchPage#setPerspective(IPerspectiveDescriptor)
    */
-  virtual void PerspectiveDeactivated(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective);
+  virtual void PerspectiveDeactivated(const SmartPointer<IWorkbenchPage>& page,
+          const IPerspectiveDescriptor::Pointer& perspective);
 
   /**
    * Notifies this listener that a perspective in the given page has been
@@ -170,9 +171,9 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    *            the new perspective descriptor
    * @see IWorkbenchPage#savePerspectiveAs(IPerspectiveDescriptor)
    */
-  virtual void PerspectiveSavedAs(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer oldPerspective,
-          IPerspectiveDescriptor::Pointer newPerspective);
+  virtual void PerspectiveSavedAs(const SmartPointer<IWorkbenchPage>& page,
+          const IPerspectiveDescriptor::Pointer& oldPerspective,
+          const IPerspectiveDescriptor::Pointer& newPerspective);
 
   /**
    * <p>
@@ -189,12 +190,12 @@ struct BERRY_UI_QT IPerspectiveListener : public virtual Object {
    *            the perspective descriptor that was deactivated
    * @see IWorkbenchPage#setPerspective(IPerspectiveDescriptor)
    */
-  virtual void PerspectivePreDeactivate(SmartPointer<IWorkbenchPage> page,
-      IPerspectiveDescriptor::Pointer perspective);
+  virtual void PerspectivePreDeactivate(const SmartPointer<IWorkbenchPage>& page,
+      const IPerspectiveDescriptor::Pointer& perspective);
 };
 
 }
 
-BERRY_DECLARE_OPERATORS_FOR_FLAGS(berry::IPerspectiveListener::Events::Types)
+Q_DECLARE_OPERATORS_FOR_FLAGS(berry::IPerspectiveListener::Events::Types)
 
 #endif /* BERRYIPERSPECTIVELISTENER_H_ */

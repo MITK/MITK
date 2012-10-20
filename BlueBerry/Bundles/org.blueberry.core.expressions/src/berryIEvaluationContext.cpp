@@ -22,7 +22,7 @@ struct UndefinedVariable : public Object
 {
 };
 
-Object::Pointer IEvaluationContext::UNDEFINED_VARIABLE(new UndefinedVariable());
+Object::ConstPointer IEvaluationContext::UNDEFINED_VARIABLE(new UndefinedVariable());
 
 IEvaluationContext::~IEvaluationContext()
 {}

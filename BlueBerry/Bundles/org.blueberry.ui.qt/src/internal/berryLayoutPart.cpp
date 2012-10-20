@@ -335,7 +335,7 @@ bool LayoutPart::AllowsAdd(LayoutPart::Pointer  /*toAdd*/)
   return false;
 }
 
-QString LayoutPart::ToString()
+QString LayoutPart::ToString() const
 {
   return "";
 }

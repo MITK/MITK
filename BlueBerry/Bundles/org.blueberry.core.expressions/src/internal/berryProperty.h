@@ -37,14 +37,14 @@ public:
   typedef Poco::SharedPtr<const Self> ConstPointer;
 
 private:
-  Object::Pointer fType;
+  Object::ConstPointer fType;
   QString fNamespace;
   QString fName;
 
   IPropertyTester::Pointer fTester;
 
   friend class TypeExtensionManager;
-  /* package */ Property(Object::Pointer type,
+  /* package */ Property(Object::ConstPointer type,
                          const QString& namespaze, const QString& name);
 
   /* package */ void SetPropertyTester(IPropertyTester::Pointer tester);
@@ -56,7 +56,7 @@ public:
 
   bool IsValidCacheEntry(bool forcePluginActivation);
 
-  bool Test(Object::Pointer receiver, const QList<Object::Pointer>& args,
+  bool Test(Object::ConstPointer receiver, const QList<Object::Pointer>& args,
             Object::Pointer expectedValue);
 
   bool operator==(Property& obj);

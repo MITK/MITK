@@ -29,14 +29,13 @@ namespace berry {
 
 /**
  * Event object describing a change to a set of Saveable objects.
- *
- * @since 3.2
  */
-class BERRY_UI_QT SaveablesLifecycleEvent : public Object {
+class BERRY_UI_QT SaveablesLifecycleEvent : public Object
+{
 
 public:
 
-  berryObjectMacro(SaveablesLifecycleEvent);
+  berryObjectMacro(SaveablesLifecycleEvent)
 
   /**
    * Event type constant specifying that the given saveables have been opened.

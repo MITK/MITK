@@ -45,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 #include <QMenuBar>
 #include <QToolBar>
+#include <QApplication>
 
 namespace berry
 {
@@ -148,7 +149,7 @@ CommandContributionItem::CommandContributionItem(
           this->helpContextId = commandService->GetHelpContextId(
                 contributionParameters->commandId);
         }
-        catch (const NotDefinedException& e)
+        catch (const NotDefinedException& /*e*/)
         {
           // it's OK to not have a helpContextId
         }
@@ -160,7 +161,7 @@ CommandContributionItem::CommandContributionItem(
       //          this->workbenchHelpSystem = workbench->GetHelpSystem();
       //        }
     }
-    catch (const NotDefinedException& e)
+    catch (const NotDefinedException& /*e*/)
     {
       WorkbenchPlugin::Log(QString("Unable to register menu item \"") + this->GetId()
                            + "\", command \"" + contributionParameters->commandId
@@ -196,11 +197,13 @@ QAction* CommandContributionItem::Fill(QMenu* parent, QAction* before)
     item = parent->addAction(icon, label);
   }
   item->setData(QVariant::fromValue(Object::Pointer(this)));
+  item->setProperty("contributionItem", QVariant::fromValue(Object::Pointer(this)));
   //  if (workbenchHelpSystem != null)
   //  {
   //    workbenchHelpSystem.setHelp(item, helpContextId);
   //  }
-  //item->AddListener(this->GetItemListener());
+
+  connect(item, SIGNAL(triggered()), this, SLOT(HandleWidgetSelection()));
   action = item;
 
   this->Update();
@@ -233,6 +236,7 @@ QAction *CommandContributionItem::Fill(QToolBar *parent, QAction *before)
     parent->insertAction(before, item);
   }
   item->setData(QVariant::fromValue(Object::Pointer(this)));
+  item->setProperty("contributionItem", QVariant::fromValue(Object::Pointer(this)));
 
   //item->AddListener(this->GetItemListener());
   action = item;
@@ -245,7 +249,12 @@ QAction *CommandContributionItem::Fill(QToolBar *parent, QAction *before)
   return item;
 }
 
-void CommandContributionItem::Update(const QString& id)
+void CommandContributionItem::Update()
+{
+  this->Update(QString());
+}
+
+void CommandContributionItem::Update(const QString& /*id*/)
 {
   if (action)
   {
@@ -382,7 +391,7 @@ CommandContributionItem::~CommandContributionItem()
   }
   if (commandListener)
   {
-    command->GetCommand()->RemoveCommandListener(commandListener.GetPointer());
+    command->GetCommand()->RemoveCommandListener(commandListener.data());
   }
 }
 
@@ -431,7 +440,7 @@ ICommandListener* CommandContributionItem::GetCommandListener()
         : item(item)
       {}
 
-      void CommandChanged(SmartPointer<const CommandEvent> commandEvent)
+      void CommandChanged(const SmartPointer<const CommandEvent>& commandEvent)
       {
         if (commandEvent->IsHandledChanged() || commandEvent->IsEnabledChanged()
             || commandEvent->IsDefinedChanged())
@@ -442,9 +451,9 @@ ICommandListener* CommandContributionItem::GetCommandListener()
 
     };
 
-    commandListener = ICommandListener::Pointer(new MyCommandListener(this));
+    commandListener.reset(new MyCommandListener(this));
   }
-  return commandListener.GetPointer();
+  return commandListener.data();
 }
 
 void CommandContributionItem::UpdateCommandProperties(const SmartPointer<
@@ -598,37 +607,47 @@ QString CommandContributionItem::UpdateMnemonic(const QString &s)
 //  return itemListener;
 //}
 
-void CommandContributionItem::HandleWidgetSelection(const UIElement::Pointer& element)
+void CommandContributionItem::HandleWidgetSelection()
 {
 //  // Special check for ToolBar dropdowns...
 //  if (this->OpenDropDownMenu(event))
 //  //return;
 
-//  if ((style & (UIElement::STYLE_TOGGLE | UIElement::STYLE_CHECK)) != 0)
-//  {
-//    checkedState = element->GetChecked();
-//  }
+  if ((style & STYLE_CHECK) != 0)
+  {
+    checkedState = action->isChecked();
+  }
 
-//  try
-//  {
-//    handlerService->ExecuteCommand(command, element);
-//  } catch (const ExecutionException& e)
-//  {
-//    WorkbenchPlugin::Log("Failed to execute item " //$NON-NLS-1$
-//        + GetId(), e);
-//  } catch (const NotDefinedException& e)
-//  {
-//    WorkbenchPlugin::Log("Failed to execute item " //$NON-NLS-1$
-//        + GetId(), e);
-//  } catch (const NotEnabledException& e)
-//  {
-//    WorkbenchPlugin::Log("Failed to execute item " //$NON-NLS-1$
-//        + GetId(), e);
-//  } catch (const NotHandledException& e)
-//  {
-//    WorkbenchPlugin::Log("Failed to execute item " //$NON-NLS-1$
-//        + GetId(), e);
-//  }
+  try
+  {
+    handlerService->ExecuteCommand(command, UIElement::Pointer(0));
+  }
+  catch (const ExecutionException& e)
+  {
+    WorkbenchPlugin::Log("Failed to execute item " + GetId(), e);
+  }
+  catch (const NotDefinedException& e)
+  {
+    WorkbenchPlugin::Log("Failed to execute item " + GetId(), e);
+  }
+  catch (const NotEnabledException& e)
+  {
+    WorkbenchPlugin::Log("Failed to execute item " + GetId(), e);
+  }
+  catch (const NotHandledException& e)
+  {
+    WorkbenchPlugin::Log("Failed to execute item " + GetId(), e);
+  }
+}
+
+void CommandContributionItem::connectNotify(const char *signal)
+{
+  qDebug() << "Connected to:" << signal;
+}
+
+void CommandContributionItem::disconnectNotify(const char *signal)
+{
+  qDebug() << "Disconnected from:" << signal;
 }
 
 //TODO Tool item drop down menu contributions

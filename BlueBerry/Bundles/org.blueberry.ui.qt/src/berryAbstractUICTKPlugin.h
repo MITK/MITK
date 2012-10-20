@@ -29,7 +29,7 @@ struct IPreferences;
 struct IPreferencesService;
 struct IWorkbench;
 
-class ImageDescriptor;
+struct ImageDescriptor;
 
 /**
  * \ingroup org_blueberry_ui_qt
@@ -136,9 +136,6 @@ private:
      * The bundle listener used for kicking off refreshPluginActions().
      */
     //BundleListener bundleListener;
-
-    ctkPluginContext* context;
-
 
 public:
 

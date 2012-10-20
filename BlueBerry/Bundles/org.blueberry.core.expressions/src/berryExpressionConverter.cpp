@@ -57,7 +57,7 @@ ExpressionConverter::ExpressionConverter(const QList<ElementHandler::Pointer>& h
 Expression::Pointer
 ExpressionConverter::Perform(const IConfigurationElement::Pointer& root)
 {
-  for (unsigned int i = 0; i < fHandlers.size(); i++) {
+  for (int i = 0; i < fHandlers.size(); i++) {
     ElementHandler::Pointer handler = fHandlers[i];
     Expression::Pointer result = handler->Create(this, root);
     if (!result.IsNull())
@@ -69,7 +69,7 @@ ExpressionConverter::Perform(const IConfigurationElement::Pointer& root)
 Expression::Pointer
 ExpressionConverter::Perform(Poco::XML::Element* root)
 {
-  for (unsigned int i = 0; i < fHandlers.size(); i++) {
+  for (int i = 0; i < fHandlers.size(); i++) {
     ElementHandler::Pointer handler = fHandlers[i];
     Expression::Pointer result = handler->Create(this, root);
     if (!result.IsNull())

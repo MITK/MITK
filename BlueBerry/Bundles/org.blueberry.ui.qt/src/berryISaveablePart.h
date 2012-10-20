@@ -32,12 +32,12 @@ namespace berry {
  * in the enablement and execution of the <code>Save</code> and
  * <code>Save As</code> actions.
  *
- * @since 2.1
- * @see org.blueberry.ui.IEditorPart
+ * @see IEditorPart
  */
-struct BERRY_UI_QT ISaveablePart : public virtual Object {
+struct BERRY_UI_QT ISaveablePart : public virtual Object
+{
 
-  berryInterfaceMacro(ISaveablePart, berry);
+  berryObjectMacro(berry::ISaveablePart)
 
     /**
      * The property id for <code>isDirty</code>.
@@ -115,7 +115,7 @@ struct BERRY_UI_QT ISaveablePart : public virtual Object {
 
 }
 
-Q_DECLARE_INTERFACE(berry::ISaveablePart, "org.blueberry.ISaveablePart")
+Q_DECLARE_INTERFACE(berry::ISaveablePart, "org.blueberry.ui.ISaveablePart")
 
 
 #endif /* BERRYISAVEABLEPART_H_ */

@@ -60,6 +60,8 @@ public:
      */
     SubContributionItem(IContributionItem::Pointer item);
 
+    using IContributionItem::Fill;
+
     /*
      * Method declared on IContributionItem.
      */

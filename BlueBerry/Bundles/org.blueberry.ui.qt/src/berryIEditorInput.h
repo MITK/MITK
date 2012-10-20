@@ -65,7 +65,7 @@ namespace berry
  */
 struct BERRY_UI_QT IEditorInput : public Object // public IAdaptable
 {
-  berryInterfaceMacro(IEditorInput, berry)
+  berryObjectMacro(berry::IEditorInput)
 
   ~IEditorInput();
 

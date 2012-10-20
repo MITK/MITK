@@ -22,78 +22,82 @@ namespace berry {
 
 void
 IPerspectiveListener::Events
-::AddListener(IPerspectiveListener::Pointer listener)
+::AddListener(IPerspectiveListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
   Types types = listener->GetPerspectiveEventTypes();
 
   if (types & ACTIVATED)
-    this->perspectiveActivated += Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectiveActivated);
+    this->perspectiveActivated += Delegate2(listener, &IPerspectiveListener::PerspectiveActivated);
   if (types & CHANGED)
-    this->perspectiveChanged += PerspChangedDelegate(listener.GetPointer(), &IPerspectiveListener::PerspectiveChanged);
+    this->perspectiveChanged += PerspChangedDelegate(listener, &IPerspectiveListener::PerspectiveChanged);
   if (types & PART_CHANGED)
-    this->perspectivePartChanged += PerspPartChangedDelegate(listener.GetPointer(), &IPerspectiveListener::PerspectiveChanged);
+    this->perspectivePartChanged += PerspPartChangedDelegate(listener, &IPerspectiveListener::PerspectiveChanged);
   if (types & OPENED)
-    this->perspectiveOpened += Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectiveOpened);
+    this->perspectiveOpened += Delegate2(listener, &IPerspectiveListener::PerspectiveOpened);
   if (types & CLOSED)
-    this->perspectiveClosed += Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectiveClosed);
+    this->perspectiveClosed += Delegate2(listener, &IPerspectiveListener::PerspectiveClosed);
   if (types & DEACTIVATED)
-    this->perspectiveDeactivated += Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectiveDeactivated);
+    this->perspectiveDeactivated += Delegate2(listener, &IPerspectiveListener::PerspectiveDeactivated);
   if (types & SAVED_AS)
-    this->perspectiveSavedAs += PerspSavedAsDelegate(listener.GetPointer(), &IPerspectiveListener::PerspectiveSavedAs);
+    this->perspectiveSavedAs += PerspSavedAsDelegate(listener, &IPerspectiveListener::PerspectiveSavedAs);
   if (types & PRE_DEACTIVATE)
-    this->perspectivePreDeactivate += Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectivePreDeactivate);
+    this->perspectivePreDeactivate += Delegate2(listener, &IPerspectiveListener::PerspectivePreDeactivate);
 }
 
 void
 IPerspectiveListener::Events
-::RemoveListener(IPerspectiveListener::Pointer listener)
+::RemoveListener(IPerspectiveListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  this->perspectiveActivated -= Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectiveActivated);
-  this->perspectiveChanged -= PerspChangedDelegate(listener.GetPointer(), &IPerspectiveListener::PerspectiveChanged);
-  this->perspectivePartChanged -= PerspPartChangedDelegate(listener.GetPointer(), &IPerspectiveListener::PerspectiveChanged);
-  this->perspectiveOpened -= Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectiveOpened);
-  this->perspectiveClosed -= Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectiveClosed);
-  this->perspectiveDeactivated -= Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectiveDeactivated);
-  this->perspectiveSavedAs -= PerspSavedAsDelegate(listener.GetPointer(), &IPerspectiveListener::PerspectiveSavedAs);
-  this->perspectivePreDeactivate -= Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectivePreDeactivate);
+  this->perspectiveActivated -= Delegate2(listener, &IPerspectiveListener::PerspectiveActivated);
+  this->perspectiveChanged -= PerspChangedDelegate(listener, &IPerspectiveListener::PerspectiveChanged);
+  this->perspectivePartChanged -= PerspPartChangedDelegate(listener, &IPerspectiveListener::PerspectiveChanged);
+  this->perspectiveOpened -= Delegate2(listener, &IPerspectiveListener::PerspectiveOpened);
+  this->perspectiveClosed -= Delegate2(listener, &IPerspectiveListener::PerspectiveClosed);
+  this->perspectiveDeactivated -= Delegate2(listener, &IPerspectiveListener::PerspectiveDeactivated);
+  this->perspectiveSavedAs -= PerspSavedAsDelegate(listener, &IPerspectiveListener::PerspectiveSavedAs);
+  this->perspectivePreDeactivate -= Delegate2(listener, &IPerspectiveListener::PerspectivePreDeactivate);
 }
 
-void IPerspectiveListener::PerspectiveActivated(SmartPointer<IWorkbenchPage> /*page*/,
-          IPerspectiveDescriptor::Pointer  /*perspective*/)
+IPerspectiveListener::~IPerspectiveListener()
+{
+}
+
+void IPerspectiveListener::PerspectiveActivated(const SmartPointer<IWorkbenchPage>& /*page*/,
+          const IPerspectiveDescriptor::Pointer&  /*perspective*/)
 {}
 
-void IPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> /*page*/,
-          IPerspectiveDescriptor::Pointer  /*perspective*/, const QString&  /*changeId*/)
+void IPerspectiveListener::PerspectiveChanged(const SmartPointer<IWorkbenchPage>& /*page*/,
+          const IPerspectiveDescriptor::Pointer&  /*perspective*/, const QString&  /*changeId*/)
 {}
 
-void IPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> /*page*/,
-          IPerspectiveDescriptor::Pointer /*perspective*/,
-          IWorkbenchPartReference::Pointer  /*partRef*/, const QString&  /*changeId*/)
+void IPerspectiveListener::PerspectiveChanged(const SmartPointer<IWorkbenchPage>& /*page*/,
+          const IPerspectiveDescriptor::Pointer& /*perspective*/,
+          const IWorkbenchPartReference::Pointer&  /*partRef*/, const QString&  /*changeId*/)
 {}
 
-void IPerspectiveListener::PerspectiveOpened(SmartPointer<IWorkbenchPage> /*page*/,
-          IPerspectiveDescriptor::Pointer  /*perspective*/)
+void IPerspectiveListener::PerspectiveOpened(const SmartPointer<IWorkbenchPage>& /*page*/,
+          const IPerspectiveDescriptor::Pointer&  /*perspective*/)
 {}
 
-void IPerspectiveListener::PerspectiveClosed(SmartPointer<IWorkbenchPage> /*page*/,
-          IPerspectiveDescriptor::Pointer  /*perspective*/)
+void IPerspectiveListener::PerspectiveClosed(const SmartPointer<IWorkbenchPage>& /*page*/,
+          const IPerspectiveDescriptor::Pointer&  /*perspective*/)
 {}
 
-void IPerspectiveListener::PerspectiveDeactivated(SmartPointer<IWorkbenchPage> /*page*/,
-          IPerspectiveDescriptor::Pointer  /*perspective*/)
+void IPerspectiveListener::PerspectiveDeactivated(const SmartPointer<IWorkbenchPage>& /*page*/,
+          const IPerspectiveDescriptor::Pointer&  /*perspective*/)
 {}
 
-void IPerspectiveListener::PerspectiveSavedAs(SmartPointer<IWorkbenchPage> /*page*/,
-          IPerspectiveDescriptor::Pointer /*oldPerspective*/,
-          IPerspectiveDescriptor::Pointer  /*newPerspective*/)
+void IPerspectiveListener::PerspectiveSavedAs(const SmartPointer<IWorkbenchPage>& /*page*/,
+          const IPerspectiveDescriptor::Pointer& /*oldPerspective*/,
+          const IPerspectiveDescriptor::Pointer&  /*newPerspective*/)
 {};
 
-void IPerspectiveListener::PerspectivePreDeactivate(SmartPointer<IWorkbenchPage> /*page*/,
-      IPerspectiveDescriptor::Pointer  /*perspective*/)
+void IPerspectiveListener::PerspectivePreDeactivate(const SmartPointer<IWorkbenchPage>& /*page*/,
+      const IPerspectiveDescriptor::Pointer&  /*perspective*/)
 {}
 
 }

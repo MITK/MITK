@@ -18,6 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+Shell::Shell()
+  : extraShellListener(NULL)
+{
+}
+
 Object::Pointer Shell::GetData(const QString& id) const
 {
   QHash<QString, Object::Pointer>::const_iterator iter = data.find(id);
@@ -25,9 +30,19 @@ Object::Pointer Shell::GetData(const QString& id) const
   return iter.value();
 }
 
-void Shell::SetData(Object::Pointer data, const QString& id)
+void Shell::SetData(const Object::Pointer& data, const QString& id)
 {
   this->data[id] = data;
+}
+
+IShellListener* Shell::GetExtraShellListener() const
+{
+  return extraShellListener;
+}
+
+void Shell::SetExtraShellListener(IShellListener* l)
+{
+  extraShellListener = l;
 }
 
 void Shell::SetBounds(int x, int y, int width, int height)

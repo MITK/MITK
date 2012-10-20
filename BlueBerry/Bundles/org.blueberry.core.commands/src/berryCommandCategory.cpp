@@ -32,7 +32,8 @@ void CommandCategory::AddCategoryListener(ICommandCategoryListener* categoryList
   categoryEvents.AddListener(categoryListener);
 }
 
-void CommandCategory::Define(const QString& name, const QString& description) {
+void CommandCategory::Define(const QString& name, const QString& description)
+{
   if (name.isEmpty())
   {
     throw Poco::InvalidArgumentException(

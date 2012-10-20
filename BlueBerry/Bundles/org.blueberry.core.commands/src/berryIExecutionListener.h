@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYIEXECUTIONLISTENER_H_
 
 #include <berryObject.h>
-#include <berryMacros.h>
 #include <berryMessage.h>
 
 #include <org_blueberry_core_commands_Export.h>
@@ -36,19 +35,16 @@ class ExecutionEvent;
  * possible for the listener to prevent the execution, only to respond to it in
  * some way.
  * </p>
- *
- * @since 3.1
  */
-struct BERRY_COMMANDS IExecutionListener : public virtual Object {
-
-  berryInterfaceMacro(IExecutionListener, berry);
+struct BERRY_COMMANDS IExecutionListener
+{
 
   struct Events {
 
     Message2<const QString&, const NotHandledException*> notHandled;
     Message2<const QString&, const ExecutionException*> postExecuteFailure;
-    Message2<const QString&, Object::Pointer> postExecuteSuccess;
-    Message2<const QString&, const SmartPointer<const ExecutionEvent> > preExecute;
+    Message2<const QString&, const Object::Pointer&> postExecuteSuccess;
+    Message2<const QString&, const SmartPointer<const ExecutionEvent>& > preExecute;
 
     virtual ~Events();
 
@@ -61,8 +57,8 @@ struct BERRY_COMMANDS IExecutionListener : public virtual Object {
 
     typedef MessageDelegate2<IExecutionListener, const QString&, const NotHandledException* > NotHandledDelegate;
     typedef MessageDelegate2<IExecutionListener, const QString&, const ExecutionException*> PostExecuteFailureDelegate;
-    typedef MessageDelegate2<IExecutionListener, const QString&, Object::Pointer> PostExecuteSuccessDelegate;
-    typedef MessageDelegate2<IExecutionListener, const QString&, const SmartPointer<const ExecutionEvent> > PreExecuteDelegate;
+    typedef MessageDelegate2<IExecutionListener, const QString&, const Object::Pointer&> PostExecuteSuccessDelegate;
+    typedef MessageDelegate2<IExecutionListener, const QString&, const SmartPointer<const ExecutionEvent>& > PreExecuteDelegate;
   };
 
   virtual ~IExecutionListener();
@@ -101,7 +97,7 @@ struct BERRY_COMMANDS IExecutionListener : public virtual Object {
    * @param returnValue
    *            The return value from the command; may be <code>null</code>.
    */
-  virtual void PostExecuteSuccess(const QString& commandId, const Object::Pointer returnValue) = 0;
+  virtual void PostExecuteSuccess(const QString& commandId, const Object::Pointer& returnValue) = 0;
 
   /**
    * Notifies the listener that a command is about to execute.
@@ -113,7 +109,7 @@ struct BERRY_COMMANDS IExecutionListener : public virtual Object {
    *            The event that will be passed to the <code>execute</code>
    *            method; never <code>null</code>.
    */
-  virtual void PreExecute(const QString& commandId, const SmartPointer<const ExecutionEvent> event) = 0;
+  virtual void PreExecute(const QString& commandId, const SmartPointer<const ExecutionEvent>& event) = 0;
 };
 
 }

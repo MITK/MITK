@@ -80,7 +80,7 @@ void StickyViewManager::Update(Perspective::Pointer oldPersp,
   IViewRegistry* viewReg = WorkbenchPlugin::GetDefault()->GetViewRegistry();
   QList<IStickyViewDescriptor::Pointer> stickyDescs(
       viewReg->GetStickyViews());
-  for (std::size_t i = 0; i < stickyDescs.size(); i++)
+  for (int i = 0; i < stickyDescs.size(); i++)
   {
     const QString viewId = stickyDescs[i]->GetId();
     try

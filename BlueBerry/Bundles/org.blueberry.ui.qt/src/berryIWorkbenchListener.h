@@ -20,9 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_ui_qt_Export.h>
 
-#include <berryMacros.h>
-#include <berryObject.h>
-#include <berryMessage.h>
+#include "berryMessage.h"
 
 namespace berry
 {
@@ -37,11 +35,9 @@ struct IWorkbench;
  *
  * @see IWorkbench#addWorkbenchListener
  * @see IWorkbench#removeWorkbenchListener
- * @since 3.2
  */
-struct BERRY_UI_QT IWorkbenchListener : public virtual Object {
-
-  berryInterfaceMacro(IWorkbenchListener, berry);
+struct BERRY_UI_QT IWorkbenchListener
+{
 
   struct Events {
       typedef Message2<IWorkbench*, bool, bool> PreShutdownEvent;
@@ -50,14 +46,16 @@ struct BERRY_UI_QT IWorkbenchListener : public virtual Object {
       PreShutdownEvent preShutdown;
       PostShutdownEvent postShutdown;
 
-      void AddListener(IWorkbenchListener::Pointer listener);
-      void RemoveListener(IWorkbenchListener::Pointer listener);
+      void AddListener(IWorkbenchListener* listener);
+      void RemoveListener(IWorkbenchListener* listener);
 
   private:
 
     typedef MessageDelegate2<IWorkbenchListener, IWorkbench*, bool, bool> Delegate2;
     typedef MessageDelegate1<IWorkbenchListener, IWorkbench*> Delegate1;
   };
+
+  virtual ~IWorkbenchListener();
 
   /**
    * Notifies that the workbench is about to shut down.
@@ -81,7 +79,7 @@ struct BERRY_UI_QT IWorkbenchListener : public virtual Object {
    * @return <code>true</code> to allow the workbench to proceed with shutdown,
    *   <code>false</code> to veto a non-forced shutdown
    */
-  virtual bool PreShutdown(IWorkbench*  /*workbench*/, bool  /*forced*/) { return true; };
+  virtual bool PreShutdown(IWorkbench*  /*workbench*/, bool  /*forced*/) { return true; }
 
   /**
    * Performs arbitrary finalization after the workbench stops running.
@@ -92,7 +90,7 @@ struct BERRY_UI_QT IWorkbenchListener : public virtual Object {
    *
    * @param workbench the workbench
    */
-  virtual void PostShutdown(IWorkbench*  /*workbench*/) {};
+  virtual void PostShutdown(IWorkbench*  /*workbench*/) {}
 
 };
 

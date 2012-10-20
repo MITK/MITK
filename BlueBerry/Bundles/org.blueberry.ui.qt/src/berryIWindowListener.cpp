@@ -20,26 +20,30 @@ namespace berry {
 
 void
 IWindowListener::Events
-::AddListener(IWindowListener::Pointer listener)
+::AddListener(IWindowListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  windowActivated += Delegate(listener.GetPointer(), &IWindowListener::WindowActivated);
-  windowDeactivated += Delegate(listener.GetPointer(), &IWindowListener::WindowDeactivated);
-  windowClosed += Delegate(listener.GetPointer(), &IWindowListener::WindowClosed);
-  windowOpened += Delegate(listener.GetPointer(), &IWindowListener::WindowOpened);
+  windowActivated += Delegate(listener, &IWindowListener::WindowActivated);
+  windowDeactivated += Delegate(listener, &IWindowListener::WindowDeactivated);
+  windowClosed += Delegate(listener, &IWindowListener::WindowClosed);
+  windowOpened += Delegate(listener, &IWindowListener::WindowOpened);
 }
 
 void
 IWindowListener::Events
-::RemoveListener(IWindowListener::Pointer listener)
+::RemoveListener(IWindowListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  windowActivated -= Delegate(listener.GetPointer(), &IWindowListener::WindowActivated);
-  windowDeactivated -= Delegate(listener.GetPointer(), &IWindowListener::WindowDeactivated);
-  windowClosed -= Delegate(listener.GetPointer(), &IWindowListener::WindowClosed);
-  windowOpened -= Delegate(listener.GetPointer(), &IWindowListener::WindowOpened);
+  windowActivated -= Delegate(listener, &IWindowListener::WindowActivated);
+  windowDeactivated -= Delegate(listener, &IWindowListener::WindowDeactivated);
+  windowClosed -= Delegate(listener, &IWindowListener::WindowClosed);
+  windowOpened -= Delegate(listener, &IWindowListener::WindowOpened);
+}
+
+IWindowListener::~IWindowListener()
+{
 }
 
 }

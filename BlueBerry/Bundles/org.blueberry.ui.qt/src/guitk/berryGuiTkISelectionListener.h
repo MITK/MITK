@@ -47,7 +47,7 @@ namespace GuiTk
 struct BERRY_UI_QT ISelectionListener: public virtual Object
 {
 
-  berryInterfaceMacro(ISelectionListener, berry);
+  berryObjectMacro(berry::GuiTk::ISelectionListener)
 
   struct BERRY_UI_QT Events {
 

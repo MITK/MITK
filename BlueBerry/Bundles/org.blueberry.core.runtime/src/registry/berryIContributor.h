@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYICONTRIBUTOR_H
 
 #include "berryObject.h"
-#include "berryMacros.h"
 
 #include <org_blueberry_core_runtime_Export.h>
 
@@ -43,7 +42,7 @@ namespace berry {
  */
 struct org_blueberry_core_runtime_EXPORT IContributor : public Object
 {
-  berryInterfaceMacro(IContributor, berry)
+  berryObjectMacro(berry::IContributor)
 
   virtual ~IContributor();
 

@@ -20,14 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIJobStatus.h"
 #include "berryStatus.h"
 #include "berryJob.h"
-#include <string>
 
 namespace berry {
 
-  class BERRY_JOBS JobStatus : public IJobStatus {
+class BERRY_JOBS JobStatus : public Status, public IJobStatus
+{
 
-
-  public:
+public:
 
   berryObjectMacro(JobStatus);
 
@@ -37,69 +36,21 @@ namespace berry {
    * @param job
    * @param message
    */
-   JobStatus( const Status::Severity& severity, Job::Pointer sptr_job, const std::string& message) ;
+  JobStatus(const Severity& severity, Job::Pointer sptr_job, const QString& message,
+            const Status::SourceLocation& sl);
 
   /**
    * @see IJobStatus#GetJob()
    */
-   Job::Pointer GetJob() ;
+  Job::Pointer GetJob();
 
-  /**
-   *  @see org.blueberry.solstice.common IStatus GetChildren()
-   */
-   std::vector<IStatus::Pointer> GetChildren() const ;
+private:
 
-  /**
-   * @see org.blueberry.solstice.common IStatus GetCode()
-   */
-   int GetCode() const ;
+  Job::Pointer m_myJob;
 
-  /**
-   *@see org.blueberry.solstice.common IStatus GetException ()
-   */
-   std::exception GetException() const ;
-
-  /**
-   * @see org.blueberry.solstice.common GetMessage ()
-   */
-   std::string GetMessage() const ;
-
-  /**
-   * @see org.blueberry.solstice.common IStatus GetPlugin()
-   */
-   std::string GetPlugin() const ;
-
-  /**
-   * @see org.blueberry.solstice.common IStatus GetSeverity ()
-   */
-   Severity GetSeverity() const ;
-
-  /**
-   * @see org.blueberry.solstice.common IsMultiStatus ()
-   */
-   bool IsMultiStatus() const ;
-
-  /**
-   * @see org.blueberry.solstice.common IStatus IsOk ()
-   */
-   bool IsOK() const ;
-
-  /**
-   * @see org.blueberry.solstice.common IStatus Matches ()
-   */
-   bool Matches(const Severities& severityMask) const ;
+};
 
 
-  private:
-
-    Job::Pointer m_myJob ;
-
-    Status::Pointer m_internalStatus ;
-
-
-  };
-
-
- }
+}
 
 #endif /* _BERRYJOBSTATUS_H */

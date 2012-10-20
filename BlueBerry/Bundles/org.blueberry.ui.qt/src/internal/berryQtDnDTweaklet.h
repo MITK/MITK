@@ -30,7 +30,6 @@ class QtDnDTweaklet : public QObject, public DnDTweaklet
 public:
 
   QtDnDTweaklet();
-  QtDnDTweaklet(const QtDnDTweaklet& other);
 
   ITracker* CreateTracker();
 };

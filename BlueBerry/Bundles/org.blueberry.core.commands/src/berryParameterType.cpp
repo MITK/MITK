@@ -42,21 +42,21 @@ bool ParameterType::operator<(const Object* object) const
   return compareTo < 0;
 }
 
-void ParameterType::Define(
-    const SmartPointer<IParameterValueConverter> parameterTypeConverter)
+void ParameterType::Define(const QString&  type,
+                           const QSharedPointer<IParameterValueConverter>& parameterTypeConverter)
 {
-
   const bool definedChanged = !this->defined;
   this->defined = true;
 
+  this->type = type.isNull() ? QObject::staticMetaObject.className() : type;
   this->parameterTypeConverter = parameterTypeConverter;
 
   ParameterTypeEvent::Pointer event(
       new ParameterTypeEvent(ParameterType::Pointer(this), definedChanged));
   this->FireParameterTypeChanged(event);
 }
-
-SmartPointer<IParameterValueConverter> ParameterType::GetValueConverter() const
+#include <qplugin.h>
+IParameterValueConverter* ParameterType::GetValueConverter() const
 {
   if (!this->IsDefined())
   {
@@ -64,17 +64,17 @@ SmartPointer<IParameterValueConverter> ParameterType::GetValueConverter() const
         "Cannot use GetValueConverter() with an undefined ParameterType"); //$NON-NLS-1$
   }
 
-  return parameterTypeConverter;
+  return parameterTypeConverter.data();
 }
 
-bool ParameterType::IsCompatible(const Object::ConstPointer value) const
+bool ParameterType::IsCompatible(const QObject* const value) const
 {
   if (!this->IsDefined())
   {
     throw NotDefinedException(
         "Cannot use IsCompatible() with an undefined ParameterType");
   }
-  return parameterTypeConverter->IsCompatible(value);
+  return value->inherits(qPrintable(type));
 }
 
 void ParameterType::RemoveListener(IParameterTypeListener* listener)
@@ -99,7 +99,7 @@ void ParameterType::Undefine()
   const bool definedChanged = defined;
   defined = false;
 
-  parameterTypeConverter = 0;
+  parameterTypeConverter.clear();
 
   ParameterTypeEvent::Pointer event(
       new ParameterTypeEvent(ParameterType::Pointer(this), definedChanged));

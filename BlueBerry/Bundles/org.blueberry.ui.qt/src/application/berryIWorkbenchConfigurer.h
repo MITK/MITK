@@ -39,9 +39,10 @@ namespace berry {
  * @see WorkbenchAdvisor#Initialize()
  * @note This interface is not intended to be implemented by clients.
  */
-struct BERRY_UI_QT IWorkbenchConfigurer : public Object {
+struct BERRY_UI_QT IWorkbenchConfigurer : public Object
+{
 
-  berryInterfaceMacro(IWorkbenchConfigurer, berry);
+  berryObjectMacro(berry::IWorkbenchConfigurer)
 
   ~IWorkbenchConfigurer();
 

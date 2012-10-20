@@ -34,11 +34,11 @@ class ExecutionEvent;
  * handler, if any.
  *
  * @see AbstractHandler
- * @since 3.1
  */
-struct BERRY_COMMANDS IHandler : public Object {
+struct BERRY_COMMANDS IHandler : public virtual Object
+{
 
-  berryInterfaceMacro(IHandler, berry);
+  berryObjectMacro(berry::IHandler)
 
   /**
    * Registers an instance of <code>IHandlerListener</code> to listen for
@@ -49,13 +49,14 @@ struct BERRY_COMMANDS IHandler : public Object {
    *            an attempt is made to register an instance which is already
    *            registered with this instance, no operation is performed.
    */
-  virtual void AddHandlerListener(SmartPointer<IHandlerListener> handlerListener) = 0;
+  virtual void AddHandlerListener(IHandlerListener* handlerListener) = 0;
 
   /**
-   * Disposes of this handler. This can be used as an opportunity to unhook listeners
+   * Disposes of this handler. This method is run once when the object is no
+   * longer referenced. This can be used as an opportunity to unhook listeners
    * from other objects.
    */
-  virtual ~IHandler() {}
+  virtual void Dispose() = 0;
 
   /**
    * Executes with the map of parameter values by name.
@@ -68,7 +69,7 @@ struct BERRY_COMMANDS IHandler : public Object {
    * @throws ExecutionException
    *             if an exception occurred during execution.
    */
-  virtual Object::Pointer Execute(const SmartPointer<const ExecutionEvent> event) = 0;
+  virtual Object::Pointer Execute(const SmartPointer<const ExecutionEvent>& event) = 0;
 
   /**
      * Called by the framework to allow the handler to update its enabled state.
@@ -78,7 +79,7 @@ struct BERRY_COMMANDS IHandler : public Object {
      *            which indicates that the handler can query whatever model that
      *            is necessary. This context must not be cached.
      */
-  virtual void SetEnabled(Object::ConstPointer evaluationContext) = 0;
+  virtual void SetEnabled(const Object::Pointer& evaluationContext) = 0;
 
   /**
    * Returns whether this handler is capable of executing at this moment in
@@ -113,11 +114,13 @@ struct BERRY_COMMANDS IHandler : public Object {
    *            already registered with this instance, no operation is
    *            performed.
    */
-  virtual void RemoveHandlerListener(SmartPointer<IHandlerListener> handlerListener) = 0;
+  virtual void RemoveHandlerListener(IHandlerListener* handlerListener) = 0;
 
 
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IHandler, "org.blueberry.core.commands.IHandler")
 
 #endif /*BERRYIHANDLER_H_*/

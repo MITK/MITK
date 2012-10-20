@@ -83,6 +83,7 @@ void CTKPluginListener::PluginChanged(const ctkPluginEvent& event)
   case ctkPluginEvent::UNRESOLVED :
       RemovePlugin(plugin);
       break;
+  default: break;
   }
 }
 
@@ -142,7 +143,6 @@ void CTKPluginListener::AddPlugin(QSharedPointer<ctkPlugin> plugin)
   }
 
   QBuffer buffer(&ba);
-  //buffer.open(QIODevice::ReadOnly);
   registry->AddContribution(&buffer, contributor, true, pluginManifest, NULL, token, timestamp);
 }
 

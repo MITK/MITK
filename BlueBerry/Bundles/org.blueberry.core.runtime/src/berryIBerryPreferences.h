@@ -31,7 +31,7 @@ namespace berry
   ///
   struct org_blueberry_core_runtime_EXPORT IBerryPreferences : virtual public IPreferences
   {
-    berryInterfaceMacro(IBerryPreferences, berry);
+    berryObjectMacro(berry::IBerryPreferences)
 
     virtual ~IBerryPreferences();
 

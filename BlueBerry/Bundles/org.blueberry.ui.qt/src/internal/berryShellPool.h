@@ -33,7 +33,7 @@ namespace berry
  *
  * @since 3.1
  */
-class ShellPool: public IShellListener
+class ShellPool: public Object, public IShellListener
 {
 
   int flags;
@@ -59,9 +59,9 @@ class ShellPool: public IShellListener
 
 public:
 
-  berryObjectMacro(ShellPool);
+  berryObjectMacro(ShellPool)
 
-  void ShellClosed(ShellEvent::Pointer e);
+  void ShellClosed(const ShellEvent::Pointer& e);
 
   /**
    * Creates a shell pool that allocates shells that are children of the
@@ -78,7 +78,7 @@ public:
    * Once the shell is closed, it will be returned to the shell pool. Note: callers must
    * remove all listeners from the shell before closing it.
    */
-  Shell::Pointer AllocateShell(IShellListener::Pointer closeListener);
+  Shell::Pointer AllocateShell(IShellListener* closeListener);
 
 };
 

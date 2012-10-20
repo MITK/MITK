@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QString>
 
-std::stringstream& operator<<(std::stringstream& os, const QString& str)
+std::ostream& operator<<(std::ostream& os, const QString& str)
 {
   os << str.toStdString();
   return os;

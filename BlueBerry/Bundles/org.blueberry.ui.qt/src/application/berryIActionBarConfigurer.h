@@ -46,7 +46,7 @@ struct IToolBarManager;
 struct BERRY_UI_QT IActionBarConfigurer : public Object
 {
 
-  berryInterfaceMacro(IActionBarConfigurer, berry)
+  berryObjectMacro(berry::IActionBarConfigurer)
 
   ~IActionBarConfigurer();
 

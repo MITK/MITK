@@ -123,12 +123,12 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#getTitleImage()
    */
-  void* GetTitleImage();
+  void* GetTitleImage() const;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.part.WorkbenchPart#GetPartName()
    */
-  QString GetPartName();
+  QString GetPartName() const;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)

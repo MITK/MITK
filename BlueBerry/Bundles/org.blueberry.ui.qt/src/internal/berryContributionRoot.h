@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 struct IEvaluationReference;
+struct InternalMenuService;
 
-class InternalMenuService;
 class ContributionManager;
 class AbstractContributionFactory;
 

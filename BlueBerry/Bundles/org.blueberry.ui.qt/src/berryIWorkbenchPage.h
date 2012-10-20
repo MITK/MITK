@@ -64,9 +64,10 @@ namespace berry {
  * @see IEditorPart
  * @see IViewPart
  */
-struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionService, public Object {
+struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionService, public Object
+{
 
-  berryInterfaceMacro(IWorkbenchPage, berry)
+  berryObjectMacro(berry::IWorkbenchPage)
 
   ~IWorkbenchPage();
 

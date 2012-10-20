@@ -28,12 +28,12 @@ QtSelectionProvider::QtSelectionProvider() : qSelectionModel(0)
 
 }
 
-void QtSelectionProvider::AddSelectionChangedListener(ISelectionChangedListener::Pointer l)
+void QtSelectionProvider::AddSelectionChangedListener(ISelectionChangedListener* l)
 {
   selectionEvents.AddListener(l);
 }
 
-void QtSelectionProvider::RemoveSelectionChangedListener(ISelectionChangedListener::Pointer l)
+void QtSelectionProvider::RemoveSelectionChangedListener(ISelectionChangedListener* l)
 {
   selectionEvents.RemoveListener(l);
 }
@@ -49,12 +49,13 @@ ISelection::ConstPointer QtSelectionProvider::GetSelection() const
   return ISelection::ConstPointer(0);
 }
 
-void QtSelectionProvider::SetSelection(ISelection::ConstPointer selection)
+void QtSelectionProvider::SetSelection(const ISelection::ConstPointer& selection)
 {
   this->SetSelection(selection, QItemSelectionModel::ClearAndSelect);
 }
 
-void QtSelectionProvider::SetSelection(ISelection::ConstPointer selection, QItemSelectionModel::SelectionFlags flags)
+void QtSelectionProvider::SetSelection(const ISelection::ConstPointer& selection,
+                                       QItemSelectionModel::SelectionFlags flags)
 {
   if (!qSelectionModel) return;
 

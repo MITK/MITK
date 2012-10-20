@@ -38,12 +38,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cxxabi.h>
 #endif
 
+#if defined(_WIN32) && defined(NDEBUG)
+// exported from VC CRT
+extern "C"
+char * _unDName(char * outputString, const char * name, int maxStringLength,
+                void * (* pAlloc )(size_t), void (* pFree )(void *),
+                unsigned short disableFlags);
+#endif
+
 namespace berry
 {
 
 void Object::Delete()
 {
   this->UnRegister();
+}
+
+QString Object::DemangleName(const char* mangledName)
+{
+  QString name(mangledName);
+#ifdef GCC_USEDEMANGLE
+  int status;
+  char* unmangled = abi::__cxa_demangle(mangledName, 0, 0, &status);
+
+  if(status == 0)
+  {
+    name = QString(unmangled);
+    free(unmangled);
+  }
+#elif defined(_WIN32) && defined(NDEBUG)
+  char * const unmangled = _unDName(0, mangledName, 0, malloc, free, 0x2800);
+  if (unmangled)
+  {
+    name = QString(unmangled);
+    free(unmangled);
+  }
+#endif
+  return name;
 }
 
 #ifdef _WIN32
@@ -75,6 +106,16 @@ Object
   delete [] (char*)m;
 }
 #endif
+
+const char* Object::GetStaticClassName()
+{
+  return "berry::Object";
+}
+
+QString Object::GetClassName() const
+{
+  return DemangleName(typeid(*this).name());
+}
 
 QDebug Object::Print(QDebug os, Indent indent) const
 {
@@ -182,28 +223,10 @@ Object::~Object()
 
 QDebug Object::PrintSelf(QDebug os, Indent Indent) const
 {
-#ifdef GCC_USEDEMANGLE
-  char const * mangledName = typeid(*this).name();
-  int status;
-  char* unmangled = abi::__cxa_demangle(mangledName, 0, 0, &status);
-
-  os << Indent << "RTTI typeinfo:   ";
-
-  if(status == 0)
-  {
-    os << unmangled;
-    free(unmangled);
-  }
-  else
-  {
-    os << mangledName;
-  }
-
-  os << '\n';
-#else
-  os << Indent << "RTTI typeinfo:   " << typeid( *this ).name() << '\n';
-#endif
+  QString demangledName = DemangleName(typeid(*this).name());
+  os << Indent << "RTTI typeinfo:   " << demangledName << '\n';
   os << Indent << "Reference Count: " << m_ReferenceCount << '\n';
+  return os;
 }
 
 /**
@@ -226,12 +249,6 @@ QDebug Object::PrintTrailer(QDebug os, Indent /*Indent*/) const
 // ============== Indent related implementations ==============
 
 static const char blanks[41] = "                                        ";
-
-//Indent*
-//Indent::New()
-//{
-//  return new Self;
-//}
 
 Indent Indent::GetNextIndent()
 {

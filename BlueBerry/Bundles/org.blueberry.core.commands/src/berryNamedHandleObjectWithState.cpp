@@ -17,17 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryNamedHandleObjectWithState.h"
 #include "berryINamedHandleStateIds.h"
 
-#include <Poco/Exception.h>
+#include "berryState.h"
 
 namespace berry
 {
 
 void NamedHandleObjectWithState::AddState(const QString& stateId,
-    const State::Pointer state)
+                                          const State::Pointer& state)
 {
   if (!state)
   {
-    throw Poco::NullPointerException("Cannot add a null state"); //$NON-NLS-1$
+    throw Poco::NullPointerException("Cannot add a null state");
   }
 
   states[stateId] = state;
@@ -81,14 +81,14 @@ State::Pointer NamedHandleObjectWithState::GetState(
   return iter.value();
 }
 
-QStringList NamedHandleObjectWithState::GetStateIds() const
+QList<QString> NamedHandleObjectWithState::GetStateIds() const
 {
   if (states.empty())
   {
-    return QStringList();
+    return QList<QString>();
   }
 
-  QStringList stateIds;
+  QList<QString> stateIds;
   for (QHash<QString, State::Pointer>::const_iterator iter = states.begin();
       iter != states.end(); ++iter)
   {

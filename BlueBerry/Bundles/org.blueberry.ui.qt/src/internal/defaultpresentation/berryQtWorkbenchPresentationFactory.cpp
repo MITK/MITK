@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryNativeTabFolder.h"
 #include "berryEmptyTabFolder.h"
+#include "berryShell.h"
+#include "berryIMemento.h"
 
 #include "internal/util/berryPresentablePartFolder.h"
 #include "internal/util/berryTabbedStackPresentation.h"
@@ -34,7 +36,8 @@ QtWorkbenchPresentationFactory::QtWorkbenchPresentationFactory()
 {}
 
 QtWorkbenchPresentationFactory::QtWorkbenchPresentationFactory(
-  const QtWorkbenchPresentationFactory& other)
+  const QtWorkbenchPresentationFactory& /*other*/)
+  : QObject()
 {
 
 }

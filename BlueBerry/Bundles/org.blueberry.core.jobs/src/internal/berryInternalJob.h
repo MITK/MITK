@@ -93,7 +93,7 @@ struct BERRY_JOBS InternalJob : public Object
   /**
    * @see Job#GetName()
    */
-  std::string GetName() const;
+  QString GetName() const;
 
   /*
    * @see Job#setRule(ISchedulingRule::Pointer)
@@ -204,7 +204,7 @@ struct BERRY_JOBS InternalJob : public Object
    * Prints a string-based representation of this job instance.
    * For debugging purposes only.
    */
-  std::string ToString();
+  QString ToString() const;
 
   /**
    * @param waitQueueStamp The waitQueueStamp to set.
@@ -218,12 +218,12 @@ struct BERRY_JOBS InternalJob : public Object
 
 protected:
 
-  InternalJob(std::string name);
+  InternalJob(const QString& name);
 
   /*
-   * @see Job#AddJobListener(IJobChangeListener::Pointer)
+   * @see Job#AddJobListener(IJobChangeListener*)
    */
-  void AddJobChangeListener(IJobChangeListener::Pointer listener);
+  void AddJobChangeListener(IJobChangeListener* listener);
 
   /*
    * @see Job#BelongsTo(Object)
@@ -284,7 +284,7 @@ protected:
   /*
    * @see Job#RemoveJobListener(IJobChangeListener)
    */
-  void RemoveJobChangeListener(IJobChangeListener::Pointer listener);
+  void RemoveJobChangeListener(IJobChangeListener* listener);
 
   /*
    * @see Job#Schedule(long)
@@ -294,7 +294,7 @@ protected:
   /*
    * @see Job#SetName(std::string)
    */
-  void SetName(const std::string& name);
+  void SetName(const QString& name);
 
   /*
    * @see Job#SetPriority(int)
@@ -401,7 +401,7 @@ private:
   volatile int flags;
   /// ListenerList listeners ;
 
-  std::string name;
+  QString name;
 
   /**
    * The job ahead of me in a queue or list.

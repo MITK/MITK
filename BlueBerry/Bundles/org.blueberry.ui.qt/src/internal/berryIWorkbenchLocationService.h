@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYIWORKBENCHLOCATIONSERVICE_H_
 
 #include <berryObject.h>
-#include <berryMacros.h>
 
 #include <org_blueberry_ui_qt_Export.h>
 
@@ -34,10 +33,10 @@ struct IPageSite;
  * Query where you are in the workbench hierarchy.
  *
  */
-struct BERRY_UI_QT IWorkbenchLocationService : public Object
+struct BERRY_UI_QT IWorkbenchLocationService : public virtual Object
 {
 
-  berryInterfaceMacro(IWorkbenchLocationService, berry);
+  berryObjectMacro(berry::IWorkbenchLocationService)
 
   ~IWorkbenchLocationService();
 
@@ -65,22 +64,23 @@ struct BERRY_UI_QT IWorkbenchLocationService : public Object
    * @return the workbench window in this service locator hierarchy. May
    *  return <code>null</code>.
    */
-  virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow() const = 0;
+  virtual IWorkbenchWindow* GetWorkbenchWindow() const = 0;
 
   /**
    * @return the part site in this service locator hierarchy. May return
    *  <code>null</code>.
    */
-  virtual SmartPointer<IWorkbenchPartSite> GetPartSite() const = 0;
+  virtual IWorkbenchPartSite* GetPartSite() const = 0;
 
   /**
    * @return the inner page site for a page based view in this service locator
    *  hierarchy. May return <code>null</code>.
    * @see PageBookView
    */
-  virtual SmartPointer<IPageSite> GetPageSite() const = 0;
+  //virtual SmartPointer<IPageSite> GetPageSite() const = 0;
 };
 
 }
+Q_DECLARE_INTERFACE(berry::IWorkbenchLocationService, "org.blueberry.ui.IWorkbenchLocationService")
 
 #endif /* BERRYIWORKBENCHLOCATIONSERVICE_H_ */

@@ -50,13 +50,13 @@ const std::string DebugBreakpointManager::ENABLED_ATTR = "enabled";
 void DebugBreakpointManager::AddSmartpointerBreakpoint(int smartPointerId,
     const Object* obj)
 {
-  BERRY_INFO << "Smartpointer breakpoint added: " << smartPointerId;
+  //BERRY_INFO << "Smartpointer breakpoint added: " << smartPointerId;
   m_SmartPointerBreakpoints[smartPointerId] = obj;
 }
 
 void DebugBreakpointManager::AddObjectBreakpoint(unsigned long objectTraceId)
 {
-  BERRY_INFO << "Object breakpoint added: " << objectTraceId;
+  //BERRY_INFO << "Object breakpoint added: " << objectTraceId;
   m_ObjectBreakpoints.insert(objectTraceId);
 }
 
@@ -110,7 +110,7 @@ void DebugBreakpointManager::SaveState(const QString& path) const
     const Object* obj = DebugUtil::GetObject(*i);
     if (obj)
     {
-      objectBreakpoint->setAttribute(CLASSNAME_ATTR, obj->GetClassName());
+      objectBreakpoint->setAttribute(CLASSNAME_ATTR, obj->GetClassName().toStdString());
 
     }
   }
@@ -127,7 +127,7 @@ void DebugBreakpointManager::SaveState(const QString& path) const
     const Object* obj = i->second;
     if (i->second)
     {
-      spBreakpoint->setAttribute(CLASSNAME_ATTR, obj->GetClassName());
+      spBreakpoint->setAttribute(CLASSNAME_ATTR, obj->GetClassName().toStdString());
       ss.clear();
       ss << obj->GetTraceId();
       spBreakpoint->setAttribute(OBJECTID_ATTR, ss.str());

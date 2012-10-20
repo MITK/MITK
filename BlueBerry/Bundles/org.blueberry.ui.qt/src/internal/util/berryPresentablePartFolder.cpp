@@ -54,13 +54,13 @@ PresentablePartFolder::ShellListener::ShellListener(AbstractTabFolder* _folder) 
 {
 }
 
-void PresentablePartFolder::ShellListener::ShellActivated(ShellEvent::Pointer  /*e*/)
+void PresentablePartFolder::ShellListener::ShellActivated(const ShellEvent::Pointer& /*e*/)
 {
   folder->ShellActive(true);
 }
 
 void PresentablePartFolder::ShellListener::ShellDeactivated(
-    ShellEvent::Pointer  /*e*/)
+    const ShellEvent::Pointer& /*e*/)
 {
   folder->ShellActive(false);
 }
@@ -72,7 +72,7 @@ PresentablePartFolder::ChildPropertyChangeListener::ChildPropertyChangeListener(
 }
 
 void PresentablePartFolder::ChildPropertyChangeListener::PropertyChange(
-    Object::Pointer source, int property)
+    const Object::Pointer& source, int property)
 {
 
   if (source.Cast<IPresentablePart> () != 0)
@@ -169,7 +169,7 @@ void PresentablePartFolder::ChildPropertyChanged(
 PresentablePartFolder::~PresentablePartFolder()
 {
   Tweaklets::Get(QtWidgetsTweaklet::KEY)->GetShell(folder->GetControl())->RemoveShellListener(
-      shellListener);
+      shellListener.data());
   for (QList<IPresentablePart::Pointer>::iterator iter = partList.begin(); iter
       != partList.end(); ++iter)
   {
@@ -210,7 +210,7 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
 {
   Shell::Pointer controlShell =
       Tweaklets::Get(QtWidgetsTweaklet::KEY)->GetShell(folder->GetControl());
-  controlShell->AddShellListener(shellListener);
+  controlShell->AddShellListener(shellListener.data());
   folder->ShellActive(Tweaklets::Get(QtWidgetsTweaklet::KEY)->GetActiveShell()
       == controlShell);
 
@@ -237,7 +237,7 @@ QList<IPresentablePart::Pointer> PresentablePartFolder::GetPartList()
   QList<AbstractTabItem*> items = folder->GetItems();
   QList<IPresentablePart::Pointer> result;
 
-  for (unsigned int i = 0; i < items.size(); i++)
+  for (int i = 0; i < items.size(); i++)
   {
     result.push_back(this->GetPartForTab(items[i]));
   }

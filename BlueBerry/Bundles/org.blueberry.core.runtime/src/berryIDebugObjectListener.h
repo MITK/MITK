@@ -18,18 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIDEBUGOBJECTLISTENER_H_
 #define BERRYIDEBUGOBJECTLISTENER_H_
 
-#include <berryObject.h>
-#include <berryMacros.h>
+#include "berryMessage.h"
 
 #include <org_blueberry_core_runtime_Export.h>
 
 namespace berry
 {
 
-struct org_blueberry_core_runtime_EXPORT IDebugObjectListener: public Object
-{
+class Object;
 
-  berryInterfaceMacro(IDebugObjectListener, berry)
+struct org_blueberry_core_runtime_EXPORT IDebugObjectListener
+{
 
   struct org_blueberry_core_runtime_EXPORT Events {
 
@@ -44,7 +43,7 @@ struct org_blueberry_core_runtime_EXPORT IDebugObjectListener: public Object
      ALL       = 0xffffffff
     };
 
-    BERRY_DECLARE_FLAGS(Types, Type)
+    Q_DECLARE_FLAGS(Types, Type)
 
     typedef Message1<const Object*> ObjectEventType;
     typedef Message3<unsigned int, bool, const Object*> TracingEventType;
@@ -64,9 +63,7 @@ struct org_blueberry_core_runtime_EXPORT IDebugObjectListener: public Object
     typedef MessageDelegate2<IDebugObjectListener, unsigned int, const Object*> SPDelegate;
   };
 
-  virtual ~IDebugObjectListener()
-  {
-  }
+  virtual ~IDebugObjectListener();
 
   virtual Events::Types GetEventTypes() const = 0;
 
@@ -94,6 +91,6 @@ struct org_blueberry_core_runtime_EXPORT IDebugObjectListener: public Object
 
 }
 
-BERRY_DECLARE_OPERATORS_FOR_FLAGS(berry::IDebugObjectListener::Events::Types)
+Q_DECLARE_OPERATORS_FOR_FLAGS(berry::IDebugObjectListener::Events::Types)
 
 #endif /* BERRYIDEBUGOBJECTLISTENER_H_ */

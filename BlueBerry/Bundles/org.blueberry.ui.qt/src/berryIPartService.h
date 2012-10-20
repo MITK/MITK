@@ -52,7 +52,7 @@ struct BERRY_UI_QT IPartService {
    * @param listener a part listener
    * @see #removePartListener(IPartListener)
    */
-    virtual void AddPartListener(IPartListener::Pointer listener) = 0;
+    virtual void AddPartListener(IPartListener* listener) = 0;
 
     /**
      * Returns the active part.
@@ -75,10 +75,12 @@ struct BERRY_UI_QT IPartService {
      *
      * @param listener a part listener
      */
-    virtual void RemovePartListener(IPartListener::Pointer listener) = 0;
+    virtual void RemovePartListener(IPartListener* listener) = 0;
 
 };
 
 }  // namespace berry
+
+Q_DECLARE_INTERFACE(berry::IPartService, "org.blueberry.ui.IPartService")
 
 #endif /*BERRYIPARTSERVICE_H_*/

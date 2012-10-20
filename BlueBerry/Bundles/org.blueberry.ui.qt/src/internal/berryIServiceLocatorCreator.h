@@ -49,7 +49,7 @@ struct IDisposable;
 struct BERRY_UI_QT IServiceLocatorCreator : public virtual Object
 {
 
-  berryInterfaceMacro(IServiceLocatorCreator, berry)
+  berryObjectMacro(berry::IServiceLocatorCreator)
 
   ~IServiceLocatorCreator();
 
@@ -81,12 +81,12 @@ struct BERRY_UI_QT IServiceLocatorCreator : public virtual Object
    */
   virtual SmartPointer<IServiceLocator> CreateServiceLocator(
       IServiceLocator* parent,
-      const SmartPointer<const IServiceFactory> factory,
+      const IServiceFactory* factory,
       WeakPointer<IDisposable> owner) = 0;
 };
 
 }
 
-Q_DECLARE_INTERFACE(berry::IServiceLocatorCreator, "org.blueberry.ui.qt.IServiceLocatorCreator")
+Q_DECLARE_INTERFACE(berry::IServiceLocatorCreator, "org.blueberry.ui.IServiceLocatorCreator")
 
 #endif /* BERRYISERVICELOCATORCREATOR_H_ */

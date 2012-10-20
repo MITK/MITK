@@ -33,7 +33,6 @@ public:
   berryObjectMacro(QtWorkbenchTweaklet);
 
   QtWorkbenchTweaklet();
-  QtWorkbenchTweaklet(const QtWorkbenchTweaklet& other);
 
   Display* CreateDisplay();
 

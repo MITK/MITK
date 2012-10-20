@@ -52,11 +52,11 @@ namespace berry {
  * @noimplement This interface is not intended to be implemented by clients.
  * @noextend This interface is not intended to be extended by clients.
  *
- * @since 3.4
  */
-struct BERRY_UI_QT ICommandImageService : public IDisposable {
+struct BERRY_UI_QT ICommandImageService : public IDisposable
+{
 
-  berryInterfaceMacro(ICommandImageService, berry)
+  berryObjectMacro(berry::ICommandImageService)
 
   /**
    * The default image style. This is provided when no style is requested or
@@ -98,6 +98,6 @@ struct BERRY_UI_QT ICommandImageService : public IDisposable {
 
 }
 
-Q_DECLARE_INTERFACE(berry::ICommandImageService, "org.blueberry.ui.qt.ICommandImageService")
+Q_DECLARE_INTERFACE(berry::ICommandImageService, "org.blueberry.ui.ICommandImageService")
 
 #endif /* BERRYICOMMANDIMAGESERVICE_H_ */

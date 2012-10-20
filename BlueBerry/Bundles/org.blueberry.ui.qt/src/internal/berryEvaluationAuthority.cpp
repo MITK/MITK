@@ -84,7 +84,7 @@ void EvaluationAuthority::RefsWithSameExpression(const QList<SmartPointer<Evalua
   }
 }
 
-void EvaluationAuthority::StartSourceChange(const QStringList& sourceNames)
+void EvaluationAuthority::StartSourceChange(const QStringList& /*sourceNames*/)
 {
   notifying++;
   if (notifying == 1)
@@ -94,7 +94,7 @@ void EvaluationAuthority::StartSourceChange(const QStringList& sourceNames)
   }
 }
 
-void EvaluationAuthority::EndSourceChange(const QStringList& sourceNames)
+void EvaluationAuthority::EndSourceChange(const QStringList& /*sourceNames*/)
 {
   if (notifying == 1) {
     FireServiceChange(IEvaluationService::PROP_NOTIFYING, ValueOf(true),
@@ -129,7 +129,7 @@ Object::Pointer EvaluationAuthority::ValueOf(bool result)
   return ObjectBool::Pointer(new ObjectBool(result));
 }
 
-void EvaluationAuthority::SourceChanged(int sourcePriority)
+void EvaluationAuthority::SourceChanged(int /*sourcePriority*/)
 {
   // no-op, we want the other one
 }
@@ -176,9 +176,9 @@ EvaluationAuthority::EvaluationAuthority()
   serviceListeners.propertyChange.SetExceptionHandler(serviceExceptionHandler);
 }
 
-SmartPointer<Shell> EvaluationAuthority::GetActiveShell() const
+SmartPointer<const Shell> EvaluationAuthority::GetActiveShell() const
 {
-  return GetVariable(ISources::ACTIVE_SHELL_NAME()).Cast<Shell>();
+  return GetVariable(ISources::ACTIVE_SHELL_NAME()).Cast<const Shell>();
 }
 
 void EvaluationAuthority::AddEvaluationListener(const SmartPointer<IEvaluationReference>& ref)

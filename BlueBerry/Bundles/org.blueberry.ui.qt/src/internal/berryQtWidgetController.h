@@ -45,8 +45,8 @@ public:
   void AddControlListener(GuiTk::IControlListener::Pointer listener);
   void RemoveControlListener(GuiTk::IControlListener::Pointer listener);
 
-  void AddShellListener(IShellListener::Pointer listener);
-  void RemoveShellListener(IShellListener::Pointer listener);
+  void AddShellListener(IShellListener* listener);
+  void RemoveShellListener(IShellListener* listener);
 
   SmartPointer<Shell> GetShell();
 

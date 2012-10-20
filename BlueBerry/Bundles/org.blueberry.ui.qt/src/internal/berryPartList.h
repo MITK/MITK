@@ -39,7 +39,8 @@ private:
 
 public:
 
-  void PropertyChange(Object::Pointer source, int propId);
+  using IPropertyChangeListener::PropertyChange;
+  void PropertyChange(const Object::Pointer& source, int propId);
 
   IWorkbenchPartReference::Pointer GetActivePartReference();
 

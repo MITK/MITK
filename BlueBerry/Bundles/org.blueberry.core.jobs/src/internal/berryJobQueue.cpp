@@ -29,7 +29,7 @@ public:
 
   IStatus::Pointer Run(IProgressMonitor::Pointer)
   {
-  return Status::OK_STATUS;
+    return Status::OK_STATUS(BERRY_STATUS_LOC);
   }
 
   DummyJob() :

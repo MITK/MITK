@@ -48,7 +48,7 @@ public:
 
   EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
-  void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info) const;
 
   bool operator==(const Object* object) const;
 
@@ -56,7 +56,7 @@ public:
 
 protected:
 
-  uint ComputeHashCode();
+  uint ComputeHashCode() const ;
 
 };
 

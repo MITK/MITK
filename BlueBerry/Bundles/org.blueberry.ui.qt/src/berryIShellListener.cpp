@@ -21,39 +21,43 @@ namespace berry {
 
 void
 IShellListener::Events
-::AddListener(IShellListener::Pointer listener)
+::AddListener(IShellListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  shellActivated += Delegate(listener.GetPointer(), &IShellListener::ShellActivated);
-  shellClosed += Delegate(listener.GetPointer(), &IShellListener::ShellClosed);
-  shellDeactivated += Delegate(listener.GetPointer(), &IShellListener::ShellDeactivated);
-  shellDeiconified += Delegate(listener.GetPointer(), &IShellListener::ShellDeiconified);
-  shellIconified += Delegate(listener.GetPointer(), &IShellListener::ShellIconified);
+  shellActivated += Delegate(listener, &IShellListener::ShellActivated);
+  shellClosed += Delegate(listener, &IShellListener::ShellClosed);
+  shellDeactivated += Delegate(listener, &IShellListener::ShellDeactivated);
+  shellDeiconified += Delegate(listener, &IShellListener::ShellDeiconified);
+  shellIconified += Delegate(listener, &IShellListener::ShellIconified);
 }
 
 void
 IShellListener::Events
-::RemoveListener(IShellListener::Pointer listener)
+::RemoveListener(IShellListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  shellActivated -= Delegate(listener.GetPointer(), &IShellListener::ShellActivated);
-  shellClosed -= Delegate(listener.GetPointer(), &IShellListener::ShellClosed);
-  shellDeactivated -= Delegate(listener.GetPointer(), &IShellListener::ShellDeactivated);
-  shellDeiconified -= Delegate(listener.GetPointer(), &IShellListener::ShellDeiconified);
-  shellIconified -= Delegate(listener.GetPointer(), &IShellListener::ShellIconified);
+  shellActivated -= Delegate(listener, &IShellListener::ShellActivated);
+  shellClosed -= Delegate(listener, &IShellListener::ShellClosed);
+  shellDeactivated -= Delegate(listener, &IShellListener::ShellDeactivated);
+  shellDeiconified -= Delegate(listener, &IShellListener::ShellDeiconified);
+  shellIconified -= Delegate(listener, &IShellListener::ShellIconified);
 }
 
-void IShellListener::ShellActivated(ShellEvent::Pointer  /*e*/)
+IShellListener::~IShellListener()
+{
+}
+
+void IShellListener::ShellActivated(const ShellEvent::Pointer& /*e*/)
 {}
-void IShellListener::ShellClosed(ShellEvent::Pointer  /*e*/)
+void IShellListener::ShellClosed(const ShellEvent::Pointer& /*e*/)
 {}
-void IShellListener::ShellDeactivated(ShellEvent::Pointer  /*e*/)
+void IShellListener::ShellDeactivated(const ShellEvent::Pointer& /*e*/)
 {}
-void IShellListener::ShellDeiconified(ShellEvent::Pointer  /*e*/)
+void IShellListener::ShellDeiconified(const ShellEvent::Pointer& /*e*/)
 {}
-void IShellListener::ShellIconified(ShellEvent::Pointer  /*e*/)
+void IShellListener::ShellIconified(const ShellEvent::Pointer& /*e*/)
 {}
 
 }

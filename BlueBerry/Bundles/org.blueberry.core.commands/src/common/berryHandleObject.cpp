@@ -22,7 +22,7 @@ namespace berry
 
 const uint HandleObject::HASH_CODE_NOT_COMPUTED = 0;
 const uint HandleObject::HASH_FACTOR = 89;
-const uint HandleObject::HASH_INITIAL = qHash("berry::HandleObject");
+const uint HandleObject::HASH_INITIAL = qHash(HandleObject::GetStaticClassName());
 
 HandleObject::HandleObject(const QString& ID) :
   hashCode(HASH_CODE_NOT_COMPUTED), defined(false), id(ID)

@@ -13,6 +13,7 @@ set(SRC_CPP_FILES
   berryExpressionConverter.cpp
   berryExpressionInfo.cpp
   berryExpressionTagNames.cpp
+  berryICountable.h
   berryIEvaluationContext.cpp
   berryIIterable.cpp
   berryIPropertyTester.cpp

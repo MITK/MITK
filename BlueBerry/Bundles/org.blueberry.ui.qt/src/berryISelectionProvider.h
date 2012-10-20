@@ -34,9 +34,10 @@ namespace berry
  * @see ISelectionChangedListener
  * @see SelectionChangedEvent
  */
-struct BERRY_UI_QT ISelectionProvider : public virtual Object {
+struct BERRY_UI_QT ISelectionProvider : public virtual Object
+{
 
-  berryInterfaceMacro(ISelectionProvider, berry);
+  berryObjectMacro(berry::ISelectionProvider)
 
   ~ISelectionProvider();
 
@@ -46,7 +47,7 @@ struct BERRY_UI_QT ISelectionProvider : public virtual Object {
      *
      * @param listener a selection changed listener
      */
-    virtual void AddSelectionChangedListener(ISelectionChangedListener::Pointer listener) = 0;
+    virtual void AddSelectionChangedListener(ISelectionChangedListener* listener) = 0;
 
     /**
      * Returns the current selection for this provider.
@@ -62,14 +63,14 @@ struct BERRY_UI_QT ISelectionProvider : public virtual Object {
      * @param listener a selection changed listener
      */
     virtual void RemoveSelectionChangedListener(
-            ISelectionChangedListener::Pointer listener) = 0;
+            ISelectionChangedListener* listener) = 0;
 
     /**
      * Sets the current selection for this selection provider.
      *
      * @param selection the new selection
      */
-    virtual void SetSelection(ISelection::ConstPointer selection) = 0;
+    virtual void SetSelection(const ISelection::ConstPointer& selection) = 0;
 };
 
 }

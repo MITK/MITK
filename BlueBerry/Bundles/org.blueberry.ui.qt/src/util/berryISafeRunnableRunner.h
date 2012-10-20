@@ -38,11 +38,12 @@ namespace berry {
  * @see SafeRunnable#SetRunner(ISafeRunnableRunner::Pointer)
  * @see SafeRunnable#Run(ISafeRunnable::Pointer)
  */
-struct BERRY_UI_QT ISafeRunnableRunner : public Object {
+struct BERRY_UI_QT ISafeRunnableRunner : public Object
+{
 
 public:
 
-  berryInterfaceMacro(ISafeRunnableRunner, berry);
+  berryObjectMacro(berry::ISafeRunnableRunner)
 
   ~ISafeRunnableRunner();
 

@@ -40,7 +40,7 @@ namespace berry {
     this->InitializeCaches();
   }
 
-  Property::Pointer TypeExtensionManager::GetProperty(Object::Pointer receiver,
+  Property::Pointer TypeExtensionManager::GetProperty(Object::ConstPointer receiver,
       const QString& namespaze, const QString& method)
   {
     return GetProperty(receiver, namespaze, method, false);
@@ -48,7 +48,7 @@ namespace berry {
 
   /*synchronized*/Property::Pointer
   TypeExtensionManager::GetProperty(
-      Object::Pointer receiver, const QString& namespaze,
+      Object::ConstPointer receiver, const QString& namespaze,
       const QString& method, bool forcePluginActivation)
   {
     std::clock_t start= 0;
@@ -121,7 +121,7 @@ namespace berry {
       IExtensionRegistry* registry = Platform::GetExtensionRegistry();
       QList<IConfigurationElement::Pointer> ces(
             registry->GetConfigurationElementsFor(QString("org.blueberry.core.expressions.") + fExtensionPoint));
-      for (unsigned int i= 0; i < ces.size(); i++)
+      for (int i= 0; i < ces.size(); i++)
       {
         IConfigurationElement::Pointer config(ces[i]);
         QString typeAttr = config->GetAttribute(TYPE);
@@ -132,7 +132,7 @@ namespace berry {
     QList<IConfigurationElement::Pointer> typeConfigs = fConfigurationElementMap.take(typeName);
 
     QList<IPropertyTester::Pointer> result;
-    for (unsigned int i= 0; i < typeConfigs.size(); i++)
+    for (int i= 0; i < typeConfigs.size(); i++)
     {
       IConfigurationElement::Pointer config(typeConfigs[i]);
       try
@@ -140,7 +140,7 @@ namespace berry {
         IPropertyTester::Pointer descr(new PropertyTesterDescriptor(config));
         result.push_back(descr);
       }
-      catch (const CoreException& e)
+      catch (const CoreException& /*e*/)
       {
         //TODO
         //ExpressionPlugin.getDefault().getLog().log(e.getStatus());

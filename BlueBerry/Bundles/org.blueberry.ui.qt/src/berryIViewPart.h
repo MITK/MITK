@@ -71,9 +71,10 @@ namespace berry {
  * @see org.blueberry.ui.part.ViewPart
  * @see ISizeProvider
  */
-struct BERRY_UI_QT IViewPart : public virtual IWorkbenchPart {
+struct BERRY_UI_QT IViewPart : public virtual IWorkbenchPart
+{
 
-  berryInterfaceMacro(IViewPart, berry);
+  berryObjectMacro(berry::IViewPart)
 
   virtual ~IViewPart();
 
@@ -119,6 +120,6 @@ struct BERRY_UI_QT IViewPart : public virtual IWorkbenchPart {
 
 }
 
-Q_DECLARE_INTERFACE(berry::IViewPart, "org.blueberry.IViewPart")
+Q_DECLARE_INTERFACE(berry::IViewPart, "org.blueberry.ui.IViewPart")
 
 #endif /*BERRYIVIEWPART_H_*/

@@ -39,6 +39,10 @@ ICommandCategoryListener::Events
   categoryChanged -= Delegate(l, &ICommandCategoryListener::CategoryChanged);
 }
 
+ICommandCategoryListener::~ICommandCategoryListener()
+{
+}
+
 }
 
 

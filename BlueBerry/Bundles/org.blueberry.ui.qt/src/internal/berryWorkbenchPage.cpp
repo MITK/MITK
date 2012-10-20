@@ -479,7 +479,7 @@ SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveRe
     if (IViewReference::Pointer viewRef = ref.Cast<IViewReference>())
     {
       //if (ref == getActiveFastView() || !((IViewReference) ref).isFastView()) {
-      for (unsigned int j = 0; j < views.size(); j++)
+      for (int j = 0; j < views.size(); j++)
       {
         if (views[j] == viewRef)
         {
@@ -520,7 +520,7 @@ QList<SmartPointer<IWorkbenchPartReference> > WorkbenchPage::ActivationList::Get
     if (IViewReference::Pointer ref = iterator->Cast<IViewReference>())
     {
       //Filter views from other perspectives
-      for (unsigned int i = 0; i < views.size(); i++)
+      for (int i = 0; i < views.size(); i++)
       {
         if (ref == views[i])
         {
@@ -716,7 +716,7 @@ IExtensionPoint::Pointer WorkbenchPage::GetPerspectiveExtensionPoint()
 }
 
 WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, const QString& layoutID,
-    IAdaptable* input)
+                             IAdaptable* input)
 {
   if (layoutID == "")
   {
@@ -782,30 +782,30 @@ void WorkbenchPage::ActivatePart(const IWorkbenchPart::Pointer part)
   //      );
 }
 
-void WorkbenchPage::AddPartListener(IPartListener::Pointer l)
+void WorkbenchPage::AddPartListener(IPartListener* l)
 {
   partList->GetPartService()->AddPartListener(l);
 }
 
-void WorkbenchPage::AddSelectionListener(ISelectionListener::Pointer listener)
+void WorkbenchPage::AddSelectionListener(ISelectionListener* listener)
 {
   selectionService->AddSelectionListener(listener);
 }
 
 void WorkbenchPage::AddSelectionListener(const QString& partId,
-    ISelectionListener::Pointer listener)
+    ISelectionListener* listener)
 {
   selectionService->AddSelectionListener(partId, listener);
 }
 
 void WorkbenchPage::AddPostSelectionListener(
-    ISelectionListener::Pointer listener)
+    ISelectionListener* listener)
 {
   selectionService->AddPostSelectionListener(listener);
 }
 
 void WorkbenchPage::AddPostSelectionListener(const QString& partId,
-    ISelectionListener::Pointer listener)
+    ISelectionListener* listener)
 {
   selectionService->AddPostSelectionListener(partId, listener);
 }
@@ -1177,7 +1177,7 @@ void WorkbenchPage::BusyShowView(IViewPart::Pointer part, int mode)
       IViewReference::Pointer activeView = ref.Cast<IViewReference> ();
       QList<IViewReference::Pointer> viewStack =
           this->GetViewReferenceStack(part);
-      for (unsigned int i = 0; i < viewStack.size(); i++)
+      for (int i = 0; i < viewStack.size(); i++)
       {
         if (viewStack[i] == activeView)
         {
@@ -1407,7 +1407,7 @@ bool WorkbenchPage::CloseEditors(
 
   // notify the model manager before the close
   QList<IWorkbenchPart::Pointer> partsToClose;
-  for (unsigned int i = 0; i < editorRefs.size(); i++)
+  for (int i = 0; i < editorRefs.size(); i++)
   {
     IWorkbenchPart::Pointer refPart = editorRefs[i]->GetPart(false);
     if (refPart != 0)
@@ -1431,7 +1431,7 @@ bool WorkbenchPage::CloseEditors(
   }
 
   // Fire pre-removal changes
-  for (unsigned int i = 0; i < editorRefs.size(); i++)
+  for (int i = 0; i < editorRefs.size(); i++)
   {
     IEditorReference::Pointer ref = editorRefs[i];
 
@@ -1450,7 +1450,7 @@ bool WorkbenchPage::CloseEditors(
     }
 
     // Close all editors.
-    for (unsigned int i = 0; i < editorRefs.size(); i++)
+    for (int i = 0; i < editorRefs.size(); i++)
     {
       IEditorReference::Pointer ref = editorRefs[i];
 
@@ -1503,7 +1503,7 @@ void WorkbenchPage::HandleDeferredEvents()
   this->UpdateActivePart();
   QList<WorkbenchPartReference::Pointer> disposals = pendingDisposals;
   pendingDisposals.clear();
-  for (unsigned int i = 0; i < disposals.size(); i++)
+  for (int i = 0; i < disposals.size(); i++)
   {
     this->DisposePart(disposals[i]);
   }
@@ -1568,7 +1568,7 @@ void WorkbenchPage::ClosePerspective(Perspective::Pointer persp,
   // collect views that will go away and views that are dirty
   QList<IViewReference::Pointer> viewReferences =
       persp->GetViewReferences();
-  for (unsigned int i = 0; i < viewReferences.size(); i++)
+  for (int i = 0; i < viewReferences.size(); i++)
   {
     IViewReference::Pointer reference = viewReferences[i];
     if (this->GetViewFactory()->GetReferenceCount(reference) == 1)
@@ -1816,7 +1816,7 @@ WorkbenchPage::~WorkbenchPage()
       QList<IWorkbenchPartReference::Pointer> partsToClose =
           this->GetOpenParts();
       QList<IWorkbenchPart::Pointer> dirtyParts;
-      for (unsigned int i = 0; i < partsToClose.size(); i++)
+      for (int i = 0; i < partsToClose.size(); i++)
       {
         IWorkbenchPart::Pointer part = partsToClose[i]->GetPart(false);
         if (part != 0 && part.Cast<IViewPart> () != 0)
@@ -2049,7 +2049,7 @@ QList<ISaveablePart::Pointer> WorkbenchPage::GetDirtyParts()
 {
   QList<ISaveablePart::Pointer> result;
   QList<IWorkbenchPartReference::Pointer> allParts = this->GetAllParts();
-  for (unsigned int i = 0; i < allParts.size(); i++)
+  for (int i = 0; i < allParts.size(); i++)
   {
     IWorkbenchPartReference::Pointer reference = allParts[i];
 
@@ -2181,7 +2181,7 @@ QList<IViewPart::Pointer> WorkbenchPage::GetViews(
   if (persp != 0)
   {
     QList<IViewReference::Pointer> refs = persp->GetViewReferences();
-    for (unsigned int i = 0; i < refs.size(); i++)
+    for (int i = 0; i < refs.size(); i++)
     {
       IViewPart::Pointer part = refs[i]->GetPart(restore).Cast<IViewPart> ();
       if (part != 0)
@@ -2816,7 +2816,7 @@ bool WorkbenchPage::IsEditorPinned(IEditorPart::Pointer editor)
 /**
  * Removes an IPartListener from the part service.
  */
-void WorkbenchPage::RemovePartListener(IPartListener::Pointer l)
+void WorkbenchPage::RemovePartListener(IPartListener* l)
 {
   partList->GetPartService()->RemovePartListener(l);
 }
@@ -2836,26 +2836,24 @@ void WorkbenchPage::RemovePartListener(IPartListener::Pointer l)
 //    }
 
 
-void WorkbenchPage::RemoveSelectionListener(
-    ISelectionListener::Pointer listener)
+void WorkbenchPage::RemoveSelectionListener(ISelectionListener* listener)
 {
   selectionService->RemoveSelectionListener(listener);
 }
 
 void WorkbenchPage::RemoveSelectionListener(const QString& partId,
-    ISelectionListener::Pointer listener)
+                                            ISelectionListener* listener)
 {
   selectionService->RemoveSelectionListener(partId, listener);
 }
 
-void WorkbenchPage::RemovePostSelectionListener(
-    ISelectionListener::Pointer listener)
+void WorkbenchPage::RemovePostSelectionListener(ISelectionListener* listener)
 {
   selectionService->RemovePostSelectionListener(listener);
 }
 
 void WorkbenchPage::RemovePostSelectionListener(const QString& partId,
-    ISelectionListener::Pointer listener)
+                                                ISelectionListener* listener)
 {
   selectionService->RemovePostSelectionListener(partId, listener);
 }
@@ -3011,7 +3009,7 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
       Perspective::Pointer activePerspective;
 
       IPerspectiveDescriptor::Pointer validPersp;
-      for (std::size_t i = 0; i < perspMems.size(); i++)
+      for (int i = 0; i < perspMems.size(); i++)
       {
 
         IMemento::Pointer current = perspMems[i];
@@ -3555,7 +3553,7 @@ void WorkbenchPage::UpdateVisibility(Perspective::Pointer oldPersp,
   if (oldPersp != 0)
   {
     oldRefs = oldPersp->GetViewReferences();
-    for (unsigned int i = 0; i < oldRefs.size(); i++)
+    for (int i = 0; i < oldRefs.size(); i++)
     {
       PartPane::Pointer pane =
       oldRefs[i].Cast<WorkbenchPartReference> ()->GetPane();
@@ -3570,7 +3568,7 @@ void WorkbenchPage::UpdateVisibility(Perspective::Pointer oldPersp,
     pres = newPersp->GetPresentation();
     QList<IViewReference::Pointer> newRefs =
     newPersp->GetViewReferences();
-    for (unsigned int i = 0; i < newRefs.size(); i++)
+    for (int i = 0; i < newRefs.size(); i++)
     {
       WorkbenchPartReference::Pointer ref = newRefs[i].Cast<
       WorkbenchPartReference> ();
@@ -3587,7 +3585,7 @@ void WorkbenchPage::UpdateVisibility(Perspective::Pointer oldPersp,
   this->UpdateActivePart();
 
   // Hide any parts in the old perspective that are no longer visible
-  for (unsigned int i = 0; i < oldRefs.size(); i++)
+  for (int i = 0; i < oldRefs.size(); i++)
   {
     WorkbenchPartReference::Pointer ref = oldRefs[i].Cast<
     WorkbenchPartReference> ();
@@ -3845,7 +3843,7 @@ QList<IViewPart::Pointer> WorkbenchPage::GetViewStack(
 
   QList<IViewPart::Pointer> result;
 
-  for (unsigned int i = 0; i < refStack.size(); i++)
+  for (int i = 0; i < refStack.size(); i++)
   {
     IViewPart::Pointer next = refStack[i]->GetView(false);
     if (next != 0)
@@ -3972,7 +3970,7 @@ QList<IWorkbenchPartReference::Pointer> WorkbenchPage::GetAllParts()
 
   QList<IWorkbenchPartReference::Pointer> result;
 
-  for (unsigned int i = 0; i < views.size(); i++)
+  for (int i = 0; i < views.size(); i++)
   {
     result.push_back(views[i]);
   }
@@ -3991,7 +3989,7 @@ QList<IWorkbenchPartReference::Pointer> WorkbenchPage::GetOpenParts()
   QList<IWorkbenchPartReference::Pointer> refs = this->GetAllParts();
   QList<IWorkbenchPartReference::Pointer> result;
 
-  for (unsigned int i = 0; i < refs.size(); i++)
+  for (int i = 0; i < refs.size(); i++)
   {
     IWorkbenchPartReference::Pointer reference = refs[i];
 

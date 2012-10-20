@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIParameterValueConverter.h"
 #include "berryExecutionEvent.h"
 #include "berryCommandCategory.h"
+#include "berryState.h"
 #include "berryIHandler.h"
 
 namespace berry {

@@ -45,7 +45,7 @@ protected:
   virtual EvaluationResult::ConstPointer EvaluateAnd(IEvaluationContext* scope) const;
   virtual EvaluationResult::ConstPointer EvaluateOr(IEvaluationContext* scope) const;
 
-  virtual uint ComputeHashCode();
+  virtual uint ComputeHashCode() const;
 
 public:
 
@@ -53,7 +53,7 @@ public:
 
   virtual QList<Expression::Pointer> GetChildren();
 
-  virtual void CollectExpressionInfo(ExpressionInfo* info);
+  virtual void CollectExpressionInfo(ExpressionInfo* info) const;
 
 };
 

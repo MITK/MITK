@@ -66,9 +66,9 @@ namespace berry {
  * @noextend This interface is not intended to be extended by clients.
  *
  * @see org.blueberry.ui.ISourceProvider
- * @since 3.1
  */
-struct BERRY_UI_QT ISources {
+struct BERRY_UI_QT ISources
+{
 
   /**
    * The priority given to default handlers and handlers that are active
@@ -77,262 +77,218 @@ struct BERRY_UI_QT ISources {
   static int WORKBENCH(); // = 0;
 
   /**
-   * The priority given when the activation is defined by a handler submission
-   * with a legacy priority.
-   */
-  static int LEGACY_LEGACY(); // = 1;
-
-  /**
-   * The priority given when the activation is defined by a handler submission
-   * with a low priority.
-   */
-  static int LEGACY_LOW(); // = 1 << 1;
-
-  /**
-   * The priority given when the activation is defined by a handler submission
-   * with a medium priority.
-   */
-  static int LEGACY_MEDIUM(); // = 1 << 2;
-
-  /**
    * The priority given when the source includes a particular context.
    */
-  static int ACTIVE_CONTEXT(); // = 1 << 6;
+  static int ACTIVE_CONTEXT(); // = 1 << 3;
 
   /**
    * The variable name for the active contexts. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
-   * @since 3.2
    */
-  static const QString ACTIVE_CONTEXT_NAME(); // = "activeContexts";
+  static const QString ACTIVE_CONTEXT_NAME();
 
   /**
    * The priority given when the source includes a particular action set.
-   * @since 3.2
    */
-  static int ACTIVE_ACTION_SETS(); // = 1 << 8;
+  static int ACTIVE_ACTION_SETS(); // = 1 << 5;
 
   /**
    * The variable name for the active action sets. This is for use with the
    * {@link ISourceProvider} and {@link IEvaluationContext}.
-   * @since 3.2
    */
-  static const QString ACTIVE_ACTION_SETS_NAME(); // = "activeActionSets"();
+  static const QString ACTIVE_ACTION_SETS_NAME();
 
   /**
    * The priority given when the source includes the currently active shell.
    */
-  static int ACTIVE_SHELL(); // = 1 << 10();
+  static int ACTIVE_SHELL(); // = 1 << 7();
 
   /**
    * The variable name for the active shell. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    */
-  static const QString ACTIVE_SHELL_NAME(); // = "activeShell"();
+  static const QString ACTIVE_SHELL_NAME();
 
   /**
    * The priority given when the source includes the currently active
    * workbench window shell.
-   * @since 3.2
    */
-  static int ACTIVE_WORKBENCH_WINDOW_SHELL(); // = 1 << 12();
+  static int ACTIVE_WORKBENCH_WINDOW_SHELL(); // = 1 << 9();
 
   /**
    * The variable name for the active workbench window shell. This is for use
    * with the <code>ISourceProvider</code> and
    * <code>IEvaluationContext</code>.
-   * @since 3.2
    */
-  static const QString ACTIVE_WORKBENCH_WINDOW_SHELL_NAME(); // = "activeWorkbenchWindowShell"();
+  static const QString ACTIVE_WORKBENCH_WINDOW_SHELL_NAME();
 
   /**
    * The priority given when the source includes the currently active
    * workbench window.
    */
-  static int ACTIVE_WORKBENCH_WINDOW(); // = 1 << 14();
+  static int ACTIVE_WORKBENCH_WINDOW(); // = 1 << 11();
 
   /**
    * The variable name for the active workbench window. This is for use with
    * the <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    */
-  static const QString ACTIVE_WORKBENCH_WINDOW_NAME(); // = "activeWorkbenchWindow"();
+  static const QString ACTIVE_WORKBENCH_WINDOW_NAME();
 
   /**
    * The priority given when the source includes subordinate properties of the currently active
    * workbench window.
-   *
-   * @since 3.3
    */
-  static int ACTIVE_WORKBENCH_WINDOW_SUBORDINATE(); // = 1 << 15();
+  static int ACTIVE_WORKBENCH_WINDOW_SUBORDINATE(); // = 1 << 12();
 
   /**
    * The variable name for the coolbar visibility state of the active
    * workbench window. This is for use with the <code>ISourceProvider</code>
    * and <code>IEvaluationContext</code>.
-   *
-   * @since 3.3
    */
-  static const QString ACTIVE_WORKBENCH_WINDOW_IS_COOLBAR_VISIBLE_NAME(); // = ACTIVE_WORKBENCH_WINDOW_NAME
-     // + ".isCoolbarVisible"();
+  static const QString ACTIVE_WORKBENCH_WINDOW_IS_TOOLBAR_VISIBLE_NAME();
 
   /**
    * The variable name for the perspective bar visibility state of the active
    * workbench window. This is for use with the <code>ISourceProvider</code>
    * and <code>IEvaluationContext</code>.
-   *
-   * @since 3.3
    */
-  static const QString ACTIVE_WORKBENCH_WINDOW_IS_PERSPECTIVEBAR_VISIBLE_NAME(); // = ACTIVE_WORKBENCH_WINDOW_NAME
-     // + ".isPerspectiveBarVisible"();
+  static const QString ACTIVE_WORKBENCH_WINDOW_IS_PERSPECTIVEBAR_VISIBLE_NAME();
+
+  /**
+   * The variable name for the status line visibility state of the active
+   * workbench window. This is for use with the <code>ISourceProvider</code>
+   * and <code>IEvaluationContext</code>.
+   */
+  static const QString ACTIVE_WORKBENCH_WINDOW_IS_STATUS_LINE_VISIBLE_NAME();
 
   /**
    * The variable name for the current perspective of the active workbench
    * window. This is for use with the <code>ISourceProvider</code> and
    * <code>IEvaluationContext</code>.
-   *
-   * @since 3.4
    */
-  static const QString ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME(); // = ACTIVE_WORKBENCH_WINDOW_NAME
-   //+ ".activePerspective"();
+  static const QString ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME();
 
   /**
    * The priority given when the source includes the active editor part.
    */
-  static int ACTIVE_EDITOR(); // = 1 << 16();
+  static int ACTIVE_EDITOR(); // = 1 << 13();
 
   /**
    * The variable name for the active editor part. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
-   * @since 3.2
    */
-  static const QString ACTIVE_EDITOR_NAME(); // = "activeEditor"();
+  static const QString ACTIVE_EDITOR_NAME();
+
+  /**
+   * The editor input of the currently active editor.
+   */
+  static const QString ACTIVE_EDITOR_INPUT_NAME();
 
   /**
    * The priority given when the source includes the active editor identifier.
-   *
-   * @since 3.2
    */
-  static int ACTIVE_EDITOR_ID(); // = 1 << 18();
+  static int ACTIVE_EDITOR_ID(); // = 1 << 15();
 
   /**
    * The variable name for the active editor identifier. This is for use with
    * the <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
-   *
-   * @since 3.2
    */
-  static const QString ACTIVE_EDITOR_ID_NAME(); // = "activeEditorId"();
+  static const QString ACTIVE_EDITOR_ID_NAME();
 
   /**
    * The priority given when the source includes the active part.
    */
-  static int ACTIVE_PART(); // = 1 << 20();
+  static int ACTIVE_PART(); // = 1 << 17();
 
   /**
    * The variable name for the active part. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    */
-  static const QString ACTIVE_PART_NAME(); // = "activePart"();
+  static const QString ACTIVE_PART_NAME();
 
   /**
    * The priority given when the source includes the active part id.
-   *
-   * @since 3.2
    */
-  static int ACTIVE_PART_ID(); // = 1 << 22();
+  static int ACTIVE_PART_ID(); // = 1 << 19();
 
   /**
    * The variable name for the active part id. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
-   *
-   * @since 3.2
    */
-  static const QString ACTIVE_PART_ID_NAME(); // = "activePartId"();
+  static const QString ACTIVE_PART_ID_NAME();
 
   /**
    * The priority given when the source includes the active workbench site. In
    * the case of nesting components, one should be careful to only activate
    * the most nested component.
    */
-  static int ACTIVE_SITE(); // = 1 << 26();
+  static int ACTIVE_SITE(); // = 1 << 23();
 
   /**
    * The variable name for the active workbench site. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
    */
-  static const QString ACTIVE_SITE_NAME(); // = "activeSite"();
+  static const QString ACTIVE_SITE_NAME();
 
   /**
    * The variable for the showIn selection.  This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
-   * @since 3.4
    * @see IShowInSource
    */
-  static const QString SHOW_IN_SELECTION(); // = "showInSelection"();
+  static const QString SHOW_IN_SELECTION();
 
   /**
    * The variable for the showIn input.  This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
-   * @since 3.4
    * @see IShowInSource
    */
-  static const QString SHOW_IN_INPUT(); // = "showInInput"();
+  static const QString SHOW_IN_INPUT();
 
   /**
    * The priority given when the source includes the current selection.
    */
-  static int ACTIVE_CURRENT_SELECTION(); // = 1 << 30();
+  static int ACTIVE_CURRENT_SELECTION(); // = 1 << 27();
 
   /**
    * The variable name for the active selection. This is for use with the
    * <code>ISourceProvider</code> and <code>IEvaluationContext</code>.
-   * @since 3.2
    */
-  static const QString ACTIVE_CURRENT_SELECTION_NAME(); // = "selection"();
+  static const QString ACTIVE_CURRENT_SELECTION_NAME();
 
   /**
    * The priority given when the source includes the current menu.
-   * @since 3.2
    */
-  static int ACTIVE_MENU(); // = 1 << 31();
+  static int ACTIVE_MENU(); // = 1 << 30();
 
   /**
    * The variable name for the active menu. This is for use with the
    * {@link ISourceProvider} and {@link IEvaluationContext}.
-   * @since 3.2
    */
-  static const QString ACTIVE_MENU_NAME(); // = "activeMenu"();
+  static const QString ACTIVE_MENU_NAME();
 
   /**
    * The variable name for the <b>local</b> selection, available while a
    * context menu is visible.
-   *
-   * @since 3.3
    */
-  static const QString ACTIVE_MENU_SELECTION_NAME(); // = "activeMenuSelection"();
+  static const QString ACTIVE_MENU_SELECTION_NAME();
 
   /**
    * The variable name for the <b>local</b> editor input which is sometimes
    * available while a context menu is visible.
-   *
-   * @since 3.3
    */
-  static const QString ACTIVE_MENU_EDITOR_INPUT_NAME(); // = "activeMenuEditorInput"();
+  static const QString ACTIVE_MENU_EDITOR_INPUT_NAME();
 
   /**
    * The variable name for the active focus Control, when provided by the
    * IFocusService.
-   *
-   * @since 3.3
    */
-  static const QString ACTIVE_FOCUS_CONTROL_NAME(); // = "activeFocusControl"();
+  static const QString ACTIVE_FOCUS_CONTROL_NAME();
 
   /**
    * The variable name for the active focus Control id, when provided by the
    * IFocusService.
-   *
-   * @since 3.3
    */
-  static const QString ACTIVE_FOCUS_CONTROL_ID_NAME(); // = "activeFocusControlId"();
+  static const QString ACTIVE_FOCUS_CONTROL_ID_NAME();
 };
 
 }

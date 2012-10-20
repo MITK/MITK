@@ -39,7 +39,7 @@ PerspectiveHelper::DragOverListener::DragOverListener(PerspectiveHelper* perspHe
 }
 
 IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
-    void* /*currentControl*/, Object::Pointer draggedObject, const Point& /*position*/,
+    void* /*currentControl*/, const Object::Pointer& draggedObject, const Point& /*position*/,
     const Rectangle& dragRectangle)
 {
 
@@ -200,7 +200,7 @@ detachable(false), active(false)
   // use the plug-in customization file to disable), and if the platform
   // supports detaching.
 
-  this->dragTarget = new DragOverListener(this);
+  this->dragTarget.reset(new DragOverListener(this));
 
   //TODO preference store
   //  IPreferenceStore store = PlatformUI.getPreferenceStore();
@@ -1029,12 +1029,12 @@ void PerspectiveHelper::AddDetachedPart(LayoutPart::Pointer part,
 
 void PerspectiveHelper::DisableAllDrag()
 {
-  DragUtil::RemoveDragTarget(0, dragTarget);
+  DragUtil::RemoveDragTarget(0, dragTarget.data());
 }
 
 void PerspectiveHelper::EnableAllDrag()
 {
-  DragUtil::AddDragTarget(0, dragTarget);
+  DragUtil::AddDragTarget(0, dragTarget.data());
 }
 
 LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& id)
@@ -1348,7 +1348,7 @@ void PerspectiveHelper::ReplacePlaceholderWithPart(LayoutPart::Pointer part)
   // Look for a PartPlaceholder that will tell us how to position this
   // object
   QList<PartPlaceholder::Pointer> placeholders = this->CollectPlaceholders();
-  for (unsigned int i = 0; i < placeholders.size(); i++)
+  for (int i = 0; i < placeholders.size(); i++)
   {
     if (placeholders[i]->GetID() == part->GetID())
     {

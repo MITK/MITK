@@ -31,7 +31,7 @@ namespace berry {
  * This class can be used without OSGi running.
  * </p>
  */
-class org_blueberry_core_runtime_EXPORT Status : public IStatus
+class org_blueberry_core_runtime_EXPORT Status : public virtual IStatus
 {
 
 public:

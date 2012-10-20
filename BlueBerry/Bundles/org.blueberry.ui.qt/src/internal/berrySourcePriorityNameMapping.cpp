@@ -66,7 +66,7 @@ SourcePriorityNameMapping::Initializer::Initializer()
   SourcePriorityNameMapping::AddMapping(ISources::ACTIVE_WORKBENCH_WINDOW_SHELL_NAME(),
       ISources::ACTIVE_WORKBENCH_WINDOW_SHELL());
   SourcePriorityNameMapping::AddMapping(
-      ISources::ACTIVE_WORKBENCH_WINDOW_IS_COOLBAR_VISIBLE_NAME(),
+      ISources::ACTIVE_WORKBENCH_WINDOW_IS_TOOLBAR_VISIBLE_NAME(),
       ISources::ACTIVE_WORKBENCH_WINDOW_SUBORDINATE());
   SourcePriorityNameMapping::AddMapping(
       ISources::ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME(),
@@ -74,7 +74,6 @@ SourcePriorityNameMapping::Initializer::Initializer()
   SourcePriorityNameMapping::AddMapping(
       ISources::ACTIVE_WORKBENCH_WINDOW_IS_PERSPECTIVEBAR_VISIBLE_NAME(),
       ISources::ACTIVE_WORKBENCH_WINDOW_SUBORDINATE());
-  SourcePriorityNameMapping::AddMapping(LEGACY_LEGACY_NAME(), LEGACY_LEGACY());
   SourcePriorityNameMapping::AddMapping("workbench", ISources::WORKBENCH());
 }
 

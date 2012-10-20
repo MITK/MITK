@@ -177,7 +177,7 @@ void* LayoutPartSash::GetControl()
   return sash;
 }
 
-QString LayoutPartSash::GetID()
+QString LayoutPartSash::GetID() const
 {
   return "";
 }

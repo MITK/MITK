@@ -174,7 +174,7 @@ protected:
   /* (non-Javadoc)
    * Method declared on IAdaptable.
    */
-  Poco::Any GetAdapter(const QString& adapter);
+  Object* GetAdapter(const QString& adapter);
 };
 
 } // namespace berry

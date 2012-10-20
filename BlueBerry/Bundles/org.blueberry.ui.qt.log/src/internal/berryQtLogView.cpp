@@ -91,7 +91,7 @@ void QtLogView::slotFilterChange( const QString& q )
 }
 
 
-void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int end )
+void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int /*start*/, int /*end*/ )
 {
   ui.tableView->setVisible(false);
   ui.tableView->resizeRowsToContents();
@@ -108,7 +108,7 @@ void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int e
   QTimer::singleShot(0,this,SLOT( slotScrollDown() ) );
 }
 
-void QtLogView::showEvent( QShowEvent * event )
+void QtLogView::showEvent( QShowEvent * /*event*/ )
 {
     ui.tableView->setVisible(false);
   ui.tableView->resizeColumnsToContents();

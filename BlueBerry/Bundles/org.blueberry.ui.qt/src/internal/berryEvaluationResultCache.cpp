@@ -52,7 +52,7 @@ bool EvaluationResultCache::Evaluate(IEvaluationContext* context) const
     {
       evaluationResult = expression->Evaluate(context);
     }
-    catch (const CoreException& e)
+    catch (const CoreException& /*e*/)
     {
       /*
        * Swallow the exception. It simply means the variable is not

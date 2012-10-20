@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYIAPPLICATION_H_
 
 #include <org_blueberry_core_runtime_Export.h>
-#include "berryMacros.h"
 
 #include <QObject>
 
@@ -32,12 +31,9 @@ namespace berry {
  * <p>
  * Clients may implement this interface.
  * </p>
- *
- * @since 1.0
  */
-struct org_blueberry_core_runtime_EXPORT IApplication {
-
-  berryManifestMacro(IApplication, berry);
+struct org_blueberry_core_runtime_EXPORT IApplication
+{
 
     /**
      * Exit object indicating normal termination

@@ -34,12 +34,8 @@ namespace berry {
  * <p>
  * Clients may implement.
  * </p>
- *
- * @since 3.2
  */
 struct BERRY_COMMANDS IExecutionListenerWithChecks : public IExecutionListener {
-
-  berryInterfaceMacro(IExecutionListenerWithChecks, berry);
 
   struct Events : public IExecutionListener::Events {
 

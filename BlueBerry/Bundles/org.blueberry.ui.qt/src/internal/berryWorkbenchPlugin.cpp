@@ -35,6 +35,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryQtWidgetsTweaklet.h"
 #include "berryQtStylePreferencePage.h"
 #include "berryStatusUtil.h"
+#include "berryHandlerServiceFactory.h"
+#include "berryMenuServiceFactory.h"
+#include "berryCommandServiceFactory.h"
+#include "berryWorkbenchSourceProvider.h"
+#include "berryObjectString.h"
+#include "berryObjects.h"
+
+#include "berryShowViewHandler.h"
 
 #include "berryIQtStyleManager.h"
 #include "berryImageDescriptor.h"
@@ -263,7 +271,10 @@ void WorkbenchPlugin::Log(const QString& message)
 
 void WorkbenchPlugin::Log(const ctkException &exc)
 {
-  BERRY_INFO << "LOG: " << exc.what() << std::endl;
+  QString str;
+  QDebug dbg(&str);
+  dbg << exc.printStackTrace();
+  BERRY_INFO << "LOG: " << str << std::endl;
   //inst->GetLog().log(exc);
 }
 
@@ -318,23 +329,16 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QtStylePreferencePage, context)
 
+  BERRY_REGISTER_EXTENSION_CLASS(HandlerServiceFactory, context)
+  BERRY_REGISTER_EXTENSION_CLASS(MenuServiceFactory, context)
+  BERRY_REGISTER_EXTENSION_CLASS(CommandServiceFactory, context)
+
+  BERRY_REGISTER_EXTENSION_CLASS(WorkbenchSourceProvider, context)
+
+  BERRY_REGISTER_EXTENSION_CLASS(ShowViewHandler, context)
+
   styleManager.reset(new QtStyleManager());
   context->registerService<berry::IQtStyleManager>(styleManager.data());
-
-  qDebug() << Platform::GetExtensionRegistry()->GetNamespaces();
-  QList<IExtension::Pointer> exs = Platform::GetExtensionRegistry()->GetExtensions("org.blueberry.ui.qt");
-  foreach(IExtension::Pointer ex, exs)
-  {
-    qDebug() << "org.blueberry.ui.qt extension: label" << ex->GetLabel();
-    qDebug() << "org.blueberry.ui.qt extension: unique id" << ex->GetUniqueIdentifier();
-  }
-  IExtensionPoint::Pointer xp = Platform::GetExtensionRegistry()->GetExtensionPoint("org.blueberry.ui.commands");
-  exs = xp->GetExtensions();
-  foreach(IExtension::Pointer ex, exs)
-  {
-    qDebug() << "org.blueberry.ui.commands extension:" << ex->GetUniqueIdentifier();
-    qDebug() << "\tcommand id:" << ex->GetConfigurationElements().front()->GetAttribute("id");
-  }
 
   // The UI plugin needs to be initialized so that it can install the callback in PrefUtil,
   // which needs to be done as early as possible, before the workbench

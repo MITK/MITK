@@ -32,11 +32,9 @@ namespace berry
 
 /**
  * TODO: Drag from detached to fast view bar back to detached causes NPE
- *
- * @since 3.1
  */
-class DetachedWindow: public IPropertyChangeListener,
-    public IDragOverListener
+class DetachedWindow: public Object, private IPropertyChangeListener,
+    private IDragOverListener
 {
 
 public:
@@ -57,13 +55,13 @@ private:
   {
     ShellListener(DetachedWindow* wnd);
 
-    void ShellClosed(ShellEvent::Pointer e);
+    void ShellClosed(const ShellEvent::Pointer& e);
 
   private:
     DetachedWindow* window;
   };
 
-  IShellListener::Pointer shellListener;
+  QScopedPointer<IShellListener> shellListener;
 
   struct ShellControlListener: public GuiTk::IControlListener
   {
@@ -101,8 +99,9 @@ public:
    * Create a new FloatingWindow.
    */
   DetachedWindow(WorkbenchPage* workbenchPage);
+  using IPropertyChangeListener::PropertyChange;
 
-  void PropertyChange(Object::Pointer source, int propId);
+  void PropertyChange(const Object::Pointer& source, int propId);
 
   Shell::Pointer GetShell();
 
@@ -122,7 +121,7 @@ public:
    * @see org.blueberry.ui.internal.IDragOverListener#Drag(void*, Object::Pointer, const Point&, const Rectangle& )
    */
   IDropTarget::Pointer Drag(void* currentControl,
-      Object::Pointer draggedObject, const Point& position,
+      const Object::Pointer& draggedObject, const Point& position,
       const Rectangle& dragRectangle);
 
   ILayoutContainer::ChildrenType GetChildren() const;

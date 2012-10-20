@@ -137,7 +137,7 @@ void SaveablesList::RemoveModels(Object::Pointer source,
     const QList<Saveable::Pointer>& modelArray)
 {
   QList<Saveable::Pointer> removed;
-  for (unsigned int i = 0; i < modelArray.size(); i++)
+  for (int i = 0; i < modelArray.size(); i++)
   {
     Saveable::Pointer model = modelArray[i];
     if (this->RemoveModel(source, model))
@@ -158,7 +158,7 @@ void SaveablesList::AddModels(Object::Pointer source,
     const QList<Saveable::Pointer>& modelArray)
 {
   QList<Saveable::Pointer> added;
-  for (unsigned int i = 0; i < modelArray.size(); i++)
+  for (int i = 0; i < modelArray.size(); i++)
   {
     Saveable::Pointer model = modelArray[i];
     if (this->AddModel(source, model))
@@ -264,7 +264,7 @@ Saveable::Set SaveablesList::GetOpenModels()
   return allDistinctModels;
 }
 
-void SaveablesList::HandleLifecycleEvent(SaveablesLifecycleEvent::Pointer event)
+void SaveablesList::HandleLifecycleEvent(const SaveablesLifecycleEvent::Pointer& event)
 {
   if (event->GetSource().Cast<IWorkbenchPart> () == 0)
   {
@@ -284,7 +284,7 @@ void SaveablesList::HandleLifecycleEvent(SaveablesLifecycleEvent::Pointer event)
     QList<Saveable::Pointer> models = event->GetSaveables();
     QHash<Saveable::Pointer, int> modelsDecrementing;
     Saveable::Set modelsClosing;
-    for (unsigned int i = 0; i < models.size(); i++)
+    for (int i = 0; i < models.size(); i++)
     {
       this->IncrementRefCount(modelsDecrementing, models[i]);
     }
@@ -311,14 +311,12 @@ void SaveablesList::HandleLifecycleEvent(SaveablesLifecycleEvent::Pointer event)
   }
 }
 
-void SaveablesList::AddModelLifecycleListener(
-    ISaveablesLifecycleListener::Pointer listener)
+void SaveablesList::AddModelLifecycleListener(ISaveablesLifecycleListener* listener)
 {
   events.AddListener(listener);
 }
 
-void SaveablesList::RemoveModelLifecycleListener(
-    ISaveablesLifecycleListener::Pointer listener)
+void SaveablesList::RemoveModelLifecycleListener(ISaveablesLifecycleListener* listener)
 {
   events.RemoveListener(listener);
 }
@@ -362,7 +360,7 @@ SaveablesList::PostCloseInfo::Pointer SaveablesList::PreCloseParts(
 //      }
 //    }
     QList<Saveable::Pointer> modelsFromSource = this->GetSaveables(part);
-    for (unsigned int i = 0; i < modelsFromSource.size(); i++)
+    for (int i = 0; i < modelsFromSource.size(); i++)
     {
       this->IncrementRefCount(postCloseInfo->modelsDecrementing, modelsFromSource[i]);
     }

@@ -36,7 +36,6 @@ namespace mitk
   */
   struct IContextMenuAction
   {
-    berryInterfaceMacro(IContextMenuAction, mitk);
 
       /**
       * @brief Executes the action, that linked to the context menu entry.

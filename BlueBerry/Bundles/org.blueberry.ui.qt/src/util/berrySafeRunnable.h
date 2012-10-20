@@ -49,6 +49,8 @@ private:
 
 public:
 
+  using ISafeRunnable::Run;
+
   /**
    * Creates a new instance of SafeRunnable with the given error message.
    *

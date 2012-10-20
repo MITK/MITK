@@ -33,7 +33,7 @@ SameShellProvider::SameShellProvider(Shell::Pointer sh) :
 
 }
 
-Shell::Pointer SameShellProvider::GetShell()
+Shell::Pointer SameShellProvider::GetShell() const
 {
   if (shell != 0)
   {

@@ -93,7 +93,6 @@ private:
 public:
 
   EditorIntroAdapterPart();
-  EditorIntroAdapterPart(const EditorIntroAdapterPart& other);
 
   /**
    * Forces the standby state of the intro part.
@@ -124,12 +123,12 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#getTitleImage()
    */
-  void* GetTitleImage();
+  void* GetTitleImage() const;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.part.WorkbenchPart#GetPartName()
    */
-  QString GetPartName();
+  QString GetPartName() const;
 
   void Init(IEditorSite::Pointer site, IEditorInput::Pointer input);
 

@@ -29,10 +29,10 @@ bool KeyedElement::operator ==(const KeyedElement& other) const
   return (typeid(*this) == typeid(other) && IsEqual(other));
 }
 
-bool KeyedElement::operator ==(const KeyedElement* other) const
+bool KeyedElement::operator ==(const Object* other) const
 {
   if (other == NULL) return false;
-  return (typeid(this) == typeid(other) && IsEqual(*other));
+  return (typeid(this) == typeid(other) && IsEqual(*static_cast<const KeyedElement*>(other)));
 }
 
 uint KeyedElement::HashCode() const

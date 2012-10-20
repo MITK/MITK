@@ -32,7 +32,7 @@ LogImpl::~LogImpl()
 {
 }
 
-void LogImpl::AddLogListener(ILogListener* listener)
+void LogImpl::AddLogListener(ILogListener* /*listener*/)
 {
 }
 
@@ -69,7 +69,7 @@ void LogImpl::Log(const SmartPointer<IStatus>& status)
   }
 }
 
-void LogImpl::RemoveLogListener(ILogListener* listener)
+void LogImpl::RemoveLogListener(ILogListener* /*listener*/)
 {
 }
 

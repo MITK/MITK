@@ -61,12 +61,12 @@ ViewIntroAdapterPart::~ViewIntroAdapterPart()
       introPart);
 }
 
-void* ViewIntroAdapterPart::GetTitleImage()
+void* ViewIntroAdapterPart::GetTitleImage() const
 {
   return introPart->GetTitleImage();
 }
 
-QString ViewIntroAdapterPart::GetPartName()
+QString ViewIntroAdapterPart::GetPartName() const
 {
   // this method is called eagerly before our init method is called (and
   // therefore before our intropart is created).  By default return

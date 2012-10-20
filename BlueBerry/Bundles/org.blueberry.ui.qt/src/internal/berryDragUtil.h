@@ -34,15 +34,16 @@ namespace berry {
 /**
  * Provides the methods for attaching drag-and-drop listeners to SWT controls.
  */
-class BERRY_UI_QT DragUtil {
+class BERRY_UI_QT DragUtil
+{
 
 public:
 
-  typedef ObjectList<IDragOverListener::Pointer> TargetListType;
+  typedef ObjectList<IDragOverListener*> TargetListType;
 
 private:
 
-  static const QString DROP_TARGET_ID; //$NON-NLS-1$
+  static const QString DROP_TARGET_ID;
 
     /**
      * The location where all drags will end. If this is non-null, then
@@ -54,7 +55,7 @@ private:
     /**
      * List of IDragOverListener
      */
-    static QList<IDragOverListener::Pointer> defaultTargets;
+    static QList<IDragOverListener*> defaultTargets;
 
     /**
      * Return the list of 'IDragOverListener' elements associated with
@@ -77,7 +78,7 @@ private:
      * @param dragRectangle
      * @return
      */
-    static IDropTarget::Pointer GetDropTarget(const QList<IDragOverListener::Pointer>& toSearch,
+    static IDropTarget::Pointer GetDropTarget(const QList<IDragOverListener*>& toSearch,
             void* mostSpecificControl, Object::Pointer draggedObject, const Point &position,
             const Rectangle& dragRectangle);
 
@@ -112,7 +113,7 @@ public:
      * to indicate the default target
      * @param target the drag target to handle the given control
      */
-    static void AddDragTarget(void* control, IDragOverListener::Pointer target);
+    static void AddDragTarget(void* control, IDragOverListener* target);
 
     /**
      * Removes a drop target from the given control.
@@ -120,8 +121,7 @@ public:
      * @param control
      * @param target
      */
-    static void RemoveDragTarget(void* control,
-            IDragOverListener::Pointer target);
+    static void RemoveDragTarget(void* control, IDragOverListener* target);
 
     /**
      * Shorthand method. Returns the bounding rectangle for the given control, in

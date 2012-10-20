@@ -73,7 +73,7 @@ protected:
      IPropertyTester* Instantiate() {
        return this;
      }
-     bool Test(Object::Pointer /*receiver*/, const QString& /*method*/,
+     bool Test(Object::ConstPointer /*receiver*/, const QString& /*method*/,
                const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/) {
        return false;
      }

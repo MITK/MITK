@@ -205,7 +205,7 @@ public:
       return EvaluationResult::TRUE_EVAL;
   }
 
-  void CollectExpressionInfo(ExpressionInfo* /*info*/) {}
+  void CollectExpressionInfo(ExpressionInfo* /*info*/) const {}
 };
 
 class FALSE_EVALExpression : public Expression
@@ -216,7 +216,7 @@ public:
       return EvaluationResult::FALSE_EVAL;
   }
 
-  void CollectExpressionInfo(ExpressionInfo* /*info*/) {}
+  void CollectExpressionInfo(ExpressionInfo* /*info*/) const {}
 };
 
 } // namespace berry

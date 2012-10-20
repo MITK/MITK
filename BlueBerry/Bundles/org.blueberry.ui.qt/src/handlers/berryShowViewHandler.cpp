@@ -33,16 +33,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const QString ShowViewHandler::PARAMETER_NAME_VIEW_ID = "org.blueberry.ui.showView.viewId"; //$NON-NLS-1$
+const QString ShowViewHandler::PARAMETER_NAME_VIEW_ID = "org.blueberry.ui.views.showView.viewId";
 
 ShowViewHandler::ShowViewHandler()
 {
 }
 
-Object::Pointer ShowViewHandler::Execute(
-    const ExecutionEvent::Pointer event)
+Object::Pointer ShowViewHandler::Execute(const ExecutionEvent::ConstPointer& event)
 {
-  IWorkbenchWindow::Pointer window = HandlerUtil::GetActiveWorkbenchWindowChecked(event);
+  IWorkbenchWindow::ConstPointer window = HandlerUtil::GetActiveWorkbenchWindowChecked(event);
   // Get the view identifier, if any.
   const ExecutionEvent::ParameterMap& parameters = event->GetParameters();
   ExecutionEvent::ParameterMap::const_iterator result = parameters.find(PARAMETER_NAME_VIEW_ID);
@@ -68,7 +67,7 @@ Object::Pointer ShowViewHandler::Execute(
   return Object::Pointer(0);
 }
 
-void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
+void ShowViewHandler::OpenOther(IWorkbenchWindow::ConstPointer window)
 {
   const IWorkbenchPage::Pointer page = window->GetActivePage();
   if (page.IsNull())
@@ -88,7 +87,7 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
 
   const QList<IViewDescriptor::Pointer> descriptors =
       dialog->GetSelection();
-  for (unsigned int i = 0; i < descriptors.size(); ++i)
+  for (int i = 0; i < descriptors.size(); ++i)
   {
     try
     {
@@ -104,7 +103,7 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
   }
 }
 
-void ShowViewHandler::OpenView(const QString& viewId, IWorkbenchWindow::Pointer activeWorkbenchWindow)
+void ShowViewHandler::OpenView(const QString& viewId, IWorkbenchWindow::ConstPointer activeWorkbenchWindow)
 {
   const IWorkbenchPage::Pointer activePage = activeWorkbenchWindow->GetActivePage();
   if (activePage.IsNull())

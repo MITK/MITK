@@ -17,11 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryParameterizedCommand.h"
 
 #include "berryIParameter.h"
+#include "berryIParameterValues.h"
 #include "berryCommand.h"
 #include "berryParameterization.h"
 #include "berryExecutionEvent.h"
 #include "berryCommandManager.h"
 #include "berryCommandCategory.h"
+#include "berryState.h"
 #include "berryIHandler.h"
 
 #include "internal/berryCommandUtils.h"
@@ -61,9 +63,9 @@ ParameterizedCommand::ParameterizedCommand(const SmartPointer<Command>& command,
   }
   if (!params.empty() && !parameters.empty())
   {
-    for (unsigned int j = 0; j < parameters.size(); j++)
+    for (int j = 0; j < parameters.size(); j++)
     {
-      for (unsigned int i = 0; i < params.size(); i++)
+      for (int i = 0; i < params.size(); i++)
       {
         if (parameters[j] == params[i].GetParameter())
         {
@@ -120,8 +122,8 @@ bool ParameterizedCommand::operator==(const Object* object) const
   return false;
 }
 
-Object::Pointer ParameterizedCommand::ExecuteWithChecks(const Object::ConstPointer trigger,
-    const Object::ConstPointer applicationContext)
+Object::Pointer ParameterizedCommand::ExecuteWithChecks(const Object::ConstPointer& trigger,
+    const Object::Pointer& applicationContext)
 {
   ExecutionEvent::Pointer excEvent(new ExecutionEvent(command,
           this->GetParameterMap(), trigger, applicationContext));
@@ -153,7 +155,7 @@ QString ParameterizedCommand::GetName() const
       {
         nameBuffer << parameterization.GetValueName();
       }
-      catch (const ParameterValuesException* /*e*/)
+      catch (const ParameterValuesException& /*e*/)
       {
         /*
          * Just let it go for now. If someone complains we can
@@ -176,7 +178,7 @@ QString ParameterizedCommand::GetName() const
 QHash<QString, QString> ParameterizedCommand::GetParameterMap() const
 {
   QHash<QString, QString> parameterMap;
-  for (unsigned int i = 0; i < parameterizations.size(); i++)
+  for (int i = 0; i < parameterizations.size(); i++)
   {
     const Parameterization& parameterization = parameterizations[i];
     parameterMap.insert(parameterization.GetParameter()->GetId(),
@@ -191,7 +193,7 @@ uint ParameterizedCommand::HashCode() const
   {
     hashCode = HASH_INITIAL * HASH_FACTOR + (command ? command->HashCode() : 0);
     hashCode = hashCode * HASH_FACTOR;
-    for (unsigned int i = 0; i < parameterizations.size(); i++)
+    for (int i = 0; i < parameterizations.size(); i++)
     {
       hashCode += parameterizations[i].HashCode();
     }
@@ -217,7 +219,7 @@ QString ParameterizedCommand::Serialize()
   QTextStream buffer(&str);
   buffer << CommandManager::PARAMETER_START_CHAR;
 
-  for (unsigned int i = 0; i < parameterizations.size(); i++)
+  for (int i = 0; i < parameterizations.size(); i++)
   {
 
     if (i> 0)
@@ -314,8 +316,7 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
       }
       else
       {
-        IParameterValueConverter::Pointer valueConverter(parameterType
-            ->GetValueConverter());
+        IParameterValueConverter* valueConverter(parameterType->GetValueConverter());
         if (valueConverter)
         {
           QString val(valueConverter->ConvertToString(i.value()));
@@ -377,7 +378,7 @@ QList<QList<Parameterization> > ParameterizedCommand::ExpandParameters(
 {
   typedef QList<QList<Parameterization> > ReturnType;
 
-  const unsigned int nextIndex = startIndex + 1;
+  const int nextIndex = startIndex + 1;
   const bool noMoreParameters = (nextIndex >= parameters.size());
 
   const IParameter::Pointer parameter(parameters[startIndex]);
@@ -388,8 +389,24 @@ QList<QList<Parameterization> > ParameterizedCommand::ExpandParameters(
     parameterizations.push_back(QList<Parameterization>());
   }
 
-  IParameter::ParameterValues parameterValues(parameter->GetValues());
-  for (IParameter::ParameterValues::iterator parameterValueItr =
+  IParameterValues* values = NULL;
+  try
+  {
+    values = parameter->GetValues();
+  }
+  catch (const ParameterValuesException& /*e*/)
+  {
+    if (noMoreParameters)
+    {
+      return parameterizations;
+    }
+
+    // Make recursive call
+    return ExpandParameters(nextIndex, parameters);
+  }
+
+  const QHash<QString,QString> parameterValues = values->GetParameterValues();
+  for (IParameter::ParameterValues::const_iterator parameterValueItr =
       parameterValues.begin(); parameterValueItr != parameterValues.end(); ++parameterValueItr)
   {
     QList<Parameterization> combination;

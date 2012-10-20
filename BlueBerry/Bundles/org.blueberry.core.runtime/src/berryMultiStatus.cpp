@@ -24,7 +24,7 @@ namespace berry
 IStatus::Severity MultiStatus::GetMaxSeverity(const QList<IStatus::Pointer>& children) const
 {
   Severity maxSeverity = this->GetSeverity();
-  for (unsigned int i = 0; i < children.size(); i++)
+  for (int i = 0; i < children.size(); i++)
   {
     Q_ASSERT(children[i]);
     Severity severity = children[i]->GetSeverity();
@@ -79,7 +79,7 @@ void MultiStatus::AddAll(IStatus::Pointer status)
 {
   Q_ASSERT(status);
   QList<IStatus::Pointer> statuses(status->GetChildren());
-  for (unsigned int i = 0; i < statuses.size(); i++)
+  for (int i = 0; i < statuses.size(); i++)
   {
     this->Add(statuses[i]);
   }
@@ -113,7 +113,7 @@ QString MultiStatus::ToString() const
   QString str;
   QTextStream buf(&str);
   buf << Status::ToString() << " children=[";
-  for (unsigned int i = 0; i < children.size(); i++)
+  for (int i = 0; i < children.size(); i++)
   {
     if (i != 0)
     {

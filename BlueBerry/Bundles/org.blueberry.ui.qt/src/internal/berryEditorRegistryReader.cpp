@@ -85,7 +85,7 @@ bool EditorRegistryReader::ReadElement(const IConfigurationElement::Pointer& ele
 
   QList<IConfigurationElement::Pointer> bindings = element->GetChildren(
                                                      WorkbenchRegistryConstants::TAG_CONTENT_TYPE_BINDING);
-  for (unsigned int i = 0; i < bindings.size(); ++i)
+  for (int i = 0; i < bindings.size(); ++i)
   {
     QString contentTypeId = bindings[i]->GetAttribute(
                               WorkbenchRegistryConstants::ATT_CONTENT_TYPE_ID);

@@ -31,9 +31,10 @@ namespace berry {
  * the workbench may change its contents instead of
  * opening a new editor.
  */
-struct BERRY_UI_QT IReusableEditor : public virtual IEditorPart {
+struct BERRY_UI_QT IReusableEditor : public virtual IEditorPart
+{
 
-  berryInterfaceMacro(IReusableEditor, berry);
+  berryObjectMacro(berry::IReusableEditor)
 
   virtual ~IReusableEditor();
 

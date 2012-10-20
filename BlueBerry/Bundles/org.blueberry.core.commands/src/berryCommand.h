@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryNamedHandleObjectWithState.h"
 
 #include <berryICommandListener.h>
+#include <berryIHandlerListener.h>
 #include <berryIExecutionListenerWithChecks.h>
 #include <berryIParameter.h>
 
@@ -31,7 +32,6 @@ namespace berry
 class CommandCategory;
 class ExecutionEvent;
 struct IHandler;
-struct IHandlerListener;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ struct IHandlerListener;
  * </p>
  *
  */
-class BERRY_COMMANDS Command : public NamedHandleObjectWithState
+class BERRY_COMMANDS Command : public NamedHandleObjectWithState, private IHandlerListener
 { // implements Comparable {
 
 public:
@@ -132,12 +132,6 @@ private:
    */
   SmartPointer<ParameterType> returnType;
 
-  /**
-   * Our command will listen to the active handler for enablement changes so
-   * that they can be fired from the command itself.
-   */
-  SmartPointer<IHandlerListener> handlerListener;
-
 protected:
 
   /**
@@ -190,7 +184,7 @@ public:
    * @param state
    *            The state to add; must not be <code>null</code>.
    */
-  void AddState(const QString& id, const State::Pointer state);
+  void AddState(const QString& id, const SmartPointer<State>& state);
 
   /**
    * Compares this command with another command by comparing each of its
@@ -428,7 +422,7 @@ public:
    *            which indicates that the handler can query whatever model that
    *            is necessary.  This context must not be cached.
    */
-  void SetEnabled(Object::ConstPointer evaluationContext);
+  void SetEnabled(const Object::Pointer& evaluationContext);
 
   /**
    * Returns whether this command has a handler, and whether this handler is
@@ -488,7 +482,13 @@ private:
   /**
    * @return the handler listener
    */
-  SmartPointer<IHandlerListener> GetHandlerListener();
+  IHandlerListener* GetHandlerListener();
+
+  /**
+   * Our command will listen to the active handler for enablement changes so
+   * that they can be fired from the command itself.
+   */
+  void HandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent);
 
 
 public:

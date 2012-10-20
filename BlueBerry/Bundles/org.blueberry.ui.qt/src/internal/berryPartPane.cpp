@@ -428,12 +428,12 @@ void PartPane::RemovePropertyListener(IPropertyChangeListener *listener)
   propertyChangeEvents.RemoveListener(listener);
 }
 
-void PartPane::FirePropertyChange(PropertyChangeEvent::Pointer event)
+void PartPane::FirePropertyChange(const PropertyChangeEvent::Pointer& event)
 {
   propertyChangeEvents.propertyChange(event);
 }
 
-void PartPane::PropertyChange(PropertyChangeEvent::Pointer event)
+void PartPane::PropertyChange(const PropertyChangeEvent::Pointer& event)
 {
   this->FirePropertyChange(event);
 }

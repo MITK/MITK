@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryCommand.h"
 #include "berryCommandEvent.h"
 #include "berryCommandCategory.h"
+#include "berryState.h"
 #include "berryIHandler.h"
 
 namespace berry {
@@ -39,6 +40,10 @@ ICommandListener::Events
   if (l == 0) return;
 
   commandChanged -= Delegate(l, &ICommandListener::CommandChanged);
+}
+
+ICommandListener::~ICommandListener()
+{
 }
 
 }

@@ -84,7 +84,7 @@ struct IWorkbenchPage;
  */
 struct BERRY_UI_QT IWorkbench : public IServiceLocator {
 
-  berryInterfaceMacro(IWorkbench, berry);
+  berryObjectMacro(berry::IWorkbench)
 
   virtual ~IWorkbench();
 
@@ -107,7 +107,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *            the workbench listener to add
    * @since 3.2
    */
-  virtual void AddWorkbenchListener(IWorkbenchListener::Pointer listener) = 0;
+  virtual void AddWorkbenchListener(IWorkbenchListener* listener) = 0;
 
   /**
    * Removes a workbench listener.
@@ -116,7 +116,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *            the workbench listener to remove
    * @since 3.2
    */
-  virtual void RemoveWorkbenchListener(IWorkbenchListener::Pointer listener) = 0;
+  virtual void RemoveWorkbenchListener(IWorkbenchListener* listener) = 0;
 
   /**
    * Returns the workbench events object
@@ -130,7 +130,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *            the window listener to add
    * @since 2.0
    */
-  virtual void AddWindowListener(IWindowListener::Pointer listener) = 0;
+  virtual void AddWindowListener(IWindowListener* listener) = 0;
 
   /**
    * Removes a window listener.
@@ -139,7 +139,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *            the window listener to remove
    * @since 2.0
    */
-  virtual void RemoveWindowListener(IWindowListener::Pointer listener) = 0;
+  virtual void RemoveWindowListener(IWindowListener* listener) = 0;
 
   /**
    * Returns the window events object
@@ -167,7 +167,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    * @return the active workbench window, or <code>null</code> if there is
    *         no active workbench window or if called from a non-UI thread
    */
-  virtual IWorkbenchWindow::Pointer GetActiveWorkbenchWindow() = 0;
+  virtual IWorkbenchWindow::Pointer GetActiveWorkbenchWindow() const = 0;
 
   /**
    * Returns the perspective registry for the workbench.

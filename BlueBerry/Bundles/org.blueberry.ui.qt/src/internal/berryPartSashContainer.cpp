@@ -128,7 +128,7 @@ void PartSashContainer::DropObject(const QList<PartPane::Pointer>& toDrop,
     if (this->IsStackType(targetStack))
     {
 
-      for (unsigned int idx = 0; idx < toDrop.size(); idx++)
+      for (int idx = 0; idx < toDrop.size(); idx++)
       {
         LayoutPart::Pointer next = toDrop[idx];
         this->Stack(next, targetStack);
@@ -146,7 +146,7 @@ void PartSashContainer::DropObject(const QList<PartPane::Pointer>& toDrop,
       toDrop[0]->GetStack()->CopyAppearanceProperties(newPart);
     }
 
-    for (unsigned int idx = 0; idx < toDrop.size(); idx++)
+    for (int idx = 0; idx < toDrop.size(); idx++)
     {
       LayoutPart::Pointer next = toDrop[idx];
       this->Stack(next, newPart);
@@ -469,7 +469,7 @@ void PartSashContainer::AddChildForPlaceholder(LayoutPart::Pointer child,
 
   // find the relationship info for the placeholder
   QList<RelationshipInfo> relationships = this->ComputeRelation();
-  for (unsigned int i = 0; i < relationships.size(); i++)
+  for (int i = 0; i < relationships.size(); i++)
   {
     RelationshipInfo info = relationships[i];
     if (info.part == placeholder)
@@ -548,8 +548,8 @@ void PartSashContainer::SetActive(bool isActive)
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(parent,
         resizeListener);
 
-    DragUtil::AddDragTarget(parent, IDragOverListener::Pointer(this));
-    DragUtil::AddDragTarget(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parent)->GetControl(), IDragOverListener::Pointer(this));
+    DragUtil::AddDragTarget(parent, this);
+    DragUtil::AddDragTarget(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parent)->GetControl(), this);
 
     ILayoutContainer::ChildrenType children = this->children;
     for (ILayoutContainer::ChildrenType::iterator childIter = children.begin(); childIter
@@ -584,8 +584,8 @@ void PartSashContainer::SetActive(bool isActive)
   }
   else
   {
-    DragUtil::RemoveDragTarget(parent, IDragOverListener::Pointer(this));
-    DragUtil::RemoveDragTarget(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parent)->GetControl(), IDragOverListener::Pointer(this));
+    DragUtil::RemoveDragTarget(parent, this);
+    DragUtil::RemoveDragTarget(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parent)->GetControl(), this);
 
     // remove all Listeners
     if (resizeListener != 0 && parent != 0)
@@ -890,7 +890,7 @@ void PartSashContainer::SetBounds(const Rectangle& r)
 }
 
 IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
-    Object::Pointer draggedObject, const Point& position,
+    const Object::Pointer& draggedObject, const Point& position,
     const Rectangle&  /*dragRectangle*/)
 {
   if (!(draggedObject.Cast<PartStack> () != 0

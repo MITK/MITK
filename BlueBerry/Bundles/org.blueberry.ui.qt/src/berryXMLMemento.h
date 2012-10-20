@@ -38,11 +38,11 @@ namespace berry {
  *
  * @see IMemento
  */
-class BERRY_UI_QT XMLMemento : public IMemento {
+class BERRY_UI_QT XMLMemento : public IMemento
+{
 
   public:
     berryObjectMacro(XMLMemento)
-    berryNewMacro2Param(XMLMemento, Poco::XML::Document*, Poco::XML::Element*)
 
     /**
      * Defines a std::ostream as XML output stream

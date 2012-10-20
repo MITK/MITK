@@ -33,7 +33,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IEditorSite : public virtual IWorkbenchPartSite {
 
-  berryInterfaceMacro(IEditorSite, berry);
+  berryObjectMacro(berry::IEditorSite)
 
   virtual ~IEditorSite();
 

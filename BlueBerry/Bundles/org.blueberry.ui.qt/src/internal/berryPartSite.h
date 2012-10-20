@@ -30,6 +30,7 @@ namespace berry {
 struct IWorkbenchPart;
 struct IWorkbenchPage;
 struct IWorkbenchWindow;
+struct IWorkbenchLocationService;
 class  PartPane;
 class  Shell;
 
@@ -55,10 +56,11 @@ class  Shell;
  * <li>the site is activated, causing the actions to become visible </li>
  * </ol>
  */
-class PartSite : public virtual IWorkbenchPartSite {
+class PartSite : public virtual IWorkbenchPartSite
+{
 
 public:
-  berryObjectMacro(PartSite);
+  berryObjectMacro(PartSite)
 
   /**
    * This is a helper method for the register context menu functionality. It
@@ -113,6 +115,8 @@ private:
 
   ServiceLocatorOwner::Pointer serviceLocatorOwner;
 
+  QScopedPointer<IWorkbenchLocationService, QScopedPointerObjectDeleter> workbenchLocationService;
+
 protected:
   ServiceLocator::Pointer serviceLocator;
 
@@ -152,7 +156,7 @@ public: ~PartSite();
    *
    * @return the registry extension ID
    */
-public: virtual QString GetId();
+public: virtual QString GetId() const;
 
   /**
    * Returns the page containing this workbench site's part.
@@ -181,12 +185,12 @@ public: virtual IWorkbenchPartReference::Pointer GetPartReference();
    *
    * @return the registry plugin ID
    */
-public: virtual QString GetPluginId();
+public: virtual QString GetPluginId() const;
 
   /**
    * Returns the registered name for this part.
    */
-public: virtual QString GetRegisteredName();
+public: virtual QString GetRegisteredName() const;
 
   /**
    * Returns the selection provider for a part.
@@ -302,7 +306,7 @@ public: bool HasService(const QString& api) const;
    *
    * @since 3.2
    */
-public: virtual QString ToString();
+public: virtual QString ToString() const;
 };
 
 }  // namespace berry

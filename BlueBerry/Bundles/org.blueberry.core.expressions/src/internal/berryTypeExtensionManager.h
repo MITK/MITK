@@ -57,7 +57,7 @@ private:
     {
       return this;
     }
-    bool Test(Object::Pointer, const QString& /*property*/,
+    bool Test(Object::ConstPointer, const QString& /*property*/,
               const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/)
     {
       return false;
@@ -86,10 +86,10 @@ public:
   TypeExtensionManager(const QString& extensionPoint);
   ~TypeExtensionManager();
 
-  Property::Pointer GetProperty(Object::Pointer receiver,
+  Property::Pointer GetProperty(Object::ConstPointer receiver,
                                 const QString& namespaze, const QString& method);
 
-  /*synchronized*/Property::Pointer GetProperty(Object::Pointer receiver,
+  /*synchronized*/Property::Pointer GetProperty(Object::ConstPointer receiver,
       const QString& namespaze, const QString& method, bool forcePluginActivation);
 
 protected:

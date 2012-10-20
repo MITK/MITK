@@ -71,7 +71,7 @@ berry::XMLMemento::Pointer berry::XMLMemento::CreateReadRoot(
 
     Poco::XML::Element* elem = doc->documentElement();
 
-    XMLMemento::Pointer memento = XMLMemento::New(doc, elem);
+    XMLMemento::Pointer memento(new XMLMemento(doc, elem));
 
     doc->release();
 
@@ -100,7 +100,7 @@ berry::XMLMemento::Pointer berry::XMLMemento::CreateWriteRoot(
   Poco::XML::Element* elem = doc->createElement(type.toStdString());
   doc->appendChild(elem)->release();
 
-  XMLMemento::Pointer memento = XMLMemento::New(doc, elem);
+  XMLMemento::Pointer memento(new XMLMemento(doc, elem));
   doc->release();
   return memento;
   //}catch() //TODO: look for poco exceptions
@@ -113,7 +113,8 @@ berry::IMemento::Pointer berry::XMLMemento::CreateChild(
 {
   Poco::XML::Element* child = factory->createElement(type.toStdString());
   element->appendChild(child)->release();
-  return XMLMemento::New(factory, child);
+  IMemento::Pointer xmlChild(new XMLMemento(factory,child));
+  return xmlChild;
 }
 
 berry::IMemento::Pointer berry::XMLMemento::CreateChild(
@@ -122,7 +123,8 @@ berry::IMemento::Pointer berry::XMLMemento::CreateChild(
   Poco::XML::Element* child = factory->createElement(type.toStdString());
   child->setAttribute(TAG_ID.toStdString(), id.toStdString());
   element->appendChild(child)->release();
-  return XMLMemento::New(factory, child);
+  IMemento::Pointer xmlChild(new XMLMemento(factory,child));
+  return xmlChild;
 }
 
 berry::IMemento::Pointer berry::XMLMemento::CopyChild(IMemento::Pointer child)
@@ -132,7 +134,8 @@ berry::IMemento::Pointer berry::XMLMemento::CopyChild(IMemento::Pointer child)
   Poco::XML::Element* newElement =
       dynamic_cast<Poco::XML::Element*> (factory->importNode(elem, true));
   element->appendChild(newElement)->release();
-  return XMLMemento::New(factory, newElement);
+  IMemento::Pointer xmlCopy(new XMLMemento(factory, newElement));
+  return xmlCopy;
 
 }
 
@@ -143,7 +146,7 @@ berry::IMemento::Pointer berry::XMLMemento::GetChild(const QString& type) const
   Poco::XML::Element* child = element->getChildElement(type.toStdString()); // Find the first node which is a child of this node
   if (child)
   {
-    memento = berry::XMLMemento::New(factory, child);
+    memento = new berry::XMLMemento(factory, child);
     return memento;
   }
   // A child was not found.
@@ -159,7 +162,8 @@ QList<berry::IMemento::Pointer> berry::XMLMemento::GetChildren(
   {
     Poco::XML::Element* elem =
         dynamic_cast<Poco::XML::Element*> (elementList->item(i));
-    mementos << berry::XMLMemento::New(factory, elem);
+    IMemento::Pointer child(new berry::XMLMemento(factory, elem));
+    mementos << child;
   }
   elementList->release();
 
@@ -175,7 +179,7 @@ bool berry::XMLMemento::GetFloat(const QString& key, double& value) const
   try
   {
     value = Poco::NumberParser::parseFloat(attr);
-  } catch (const Poco::SyntaxException& e)
+  } catch (const Poco::SyntaxException& /*e*/)
   {
     std::string _qnan = Poco::NumberFormatter::format(std::numeric_limits<double>::quiet_NaN());
     if (_qnan == attr)
@@ -220,7 +224,7 @@ bool berry::XMLMemento::GetInteger(const QString& key, int& value) const
   {
     value = Poco::NumberParser::parse(attr);
   }
-  catch (const Poco::SyntaxException& e)
+  catch (const Poco::SyntaxException& /*e*/)
   {
     WorkbenchPlugin::Log("Memento problem - invalid integer for key: " + key
                          + " value: " + QString::fromStdString(attr));

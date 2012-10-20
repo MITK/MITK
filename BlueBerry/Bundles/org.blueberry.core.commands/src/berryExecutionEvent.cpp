@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "common/berryCommandExceptions.h"
 #include "berryIParameterValueConverter.h"
 #include "berryCommandCategory.h"
+#include "berryState.h"
 #include "berryIHandler.h"
 
 #include <berryObjectString.h>
@@ -33,15 +34,15 @@ ExecutionEvent::ExecutionEvent()
 
 }
 
-ExecutionEvent::ExecutionEvent(const Command::ConstPointer cmd,
-    const ParameterMap& params, const Object::ConstPointer trg,
-    const Object::ConstPointer appContext)
+ExecutionEvent::ExecutionEvent(const Command::ConstPointer& cmd,
+                               const ParameterMap& params, const Object::ConstPointer& trg,
+                               const Object::Pointer& appContext)
 : applicationContext(appContext), command(cmd), parameters(params), trigger(trg)
 {
 
 }
 
-const Object::ConstPointer ExecutionEvent::GetApplicationContext() const
+const Object::Pointer ExecutionEvent::GetApplicationContext() const
 {
   return applicationContext;
 }
@@ -116,7 +117,7 @@ QString ExecutionEvent::ToString() const
   QString str;
   QTextStream ss(&str);
   ss << "ExecutionEvent(" << command->ToString() << ',' << parameters.size() << ','
-      << trigger->ToString() << ',' << applicationContext->ToString() << ')';
+     << (trigger ? trigger->ToString() : QString()) << ',' << applicationContext->ToString() << ')';
 
   return str;
 }

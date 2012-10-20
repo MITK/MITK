@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryExpressionConverter.h"
 #include "berryExpressionStatus.h"
 #include "berryCoreException.h"
+#include "berryElementHandler.h"
 
 #include "berryPlatform.h"
 #include "berryPlatformException.h"
@@ -64,7 +65,7 @@ Expression::Pointer DefinitionRegistry::GetExpression(const QString& id)
           foundExpression= this->GetExpression(id, *i);
           break;
         }
-        catch (const InvalidRegistryObjectException& e)
+        catch (const InvalidRegistryObjectException& /*e*/)
         {
           IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::MISSING_EXPRESSION,
                                                        QString("Unable to locate expression definition ") + id,

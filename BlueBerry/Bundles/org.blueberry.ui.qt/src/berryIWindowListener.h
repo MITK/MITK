@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_ui_qt_Export.h>
 
-#include <berryMacros.h>
 #include <berryMessage.h>
 
 #include "berryIWorkbenchWindow.h"
@@ -34,25 +33,26 @@ namespace berry
  * This interface may be implemented by clients.
  * </p>
  */
-struct BERRY_UI_QT IWindowListener : public virtual Object {
-
-  berryInterfaceMacro(IWindowListener, berry);
+struct BERRY_UI_QT IWindowListener
+{
 
   struct Events {
-    typedef Message1<IWorkbenchWindow::Pointer> WindowEvent;
+    typedef Message1<const IWorkbenchWindow::Pointer&> WindowEvent;
 
     WindowEvent windowActivated;
     WindowEvent windowDeactivated;
     WindowEvent windowClosed;
     WindowEvent windowOpened;
 
-    void AddListener(IWindowListener::Pointer listener);
-    void RemoveListener(IWindowListener::Pointer listener);
+    void AddListener(IWindowListener* listener);
+    void RemoveListener(IWindowListener* listener);
 
   private:
 
-    typedef MessageDelegate1<IWindowListener, IWorkbenchWindow::Pointer> Delegate;
+    typedef MessageDelegate1<IWindowListener, const IWorkbenchWindow::Pointer&> Delegate;
   };
+
+  virtual ~IWindowListener();
 
   /**
    * Notifies this listener that the given window has been activated.
@@ -63,7 +63,7 @@ struct BERRY_UI_QT IWindowListener : public virtual Object {
    *
    * @param window the window that was activated
    */
-  virtual void WindowActivated(IWorkbenchWindow::Pointer /*window*/) {};
+  virtual void WindowActivated(const IWorkbenchWindow::Pointer& /*window*/) {}
 
   /**
    * Notifies this listener that the given window has been deactivated.
@@ -74,7 +74,7 @@ struct BERRY_UI_QT IWindowListener : public virtual Object {
    *
    * @param window the window that was activated
    */
-  virtual void WindowDeactivated(IWorkbenchWindow::Pointer /*window*/) {};
+  virtual void WindowDeactivated(const IWorkbenchWindow::Pointer& /*window*/) {}
 
   /**
    * Notifies this listener that the given window has been closed.
@@ -82,7 +82,7 @@ struct BERRY_UI_QT IWindowListener : public virtual Object {
    * @param window the window that was closed
    * @see IWorkbenchWindow#close
    */
-  virtual void WindowClosed(IWorkbenchWindow::Pointer /*window*/) {};
+  virtual void WindowClosed(const IWorkbenchWindow::Pointer& /*window*/) {}
 
   /**
    * Notifies this listener that the given window has been opened.
@@ -90,7 +90,7 @@ struct BERRY_UI_QT IWindowListener : public virtual Object {
    * @param window the window that was opened
    * @see IWorkbench#openWorkbenchWindow
    */
-  virtual void WindowOpened(IWorkbenchWindow::Pointer /*window*/) {};
+  virtual void WindowOpened(const IWorkbenchWindow::Pointer& /*window*/) {}
 
 };
 

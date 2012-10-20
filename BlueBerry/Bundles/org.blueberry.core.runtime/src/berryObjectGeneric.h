@@ -99,14 +99,14 @@ class org_blueberry_core_runtime_EXPORT ObjectGeneric : public Object
  * @param ObjectName the name of the instantiation of ObjectGeneric
  * @param Type the value type
  */
-#define berrySpecializeGenericObject(ObjectName,Type,DefaultValue)  \
-class org_blueberry_core_runtime_EXPORT ObjectName: public ::berry::ObjectGeneric< Type >           \
+#define berrySpecializeGenericObject(ObjectName,Type,DefaultValue)   \
+class org_blueberry_core_runtime_EXPORT ObjectName: public ::berry::ObjectGeneric< Type > \
 {                                                                    \
 public:                                                              \
   berryObjectMacro(ObjectName);                                      \
-  ObjectName() : ::berry::ObjectGeneric< Type >(DefaultValue) { }                           \
-  ObjectName(Type x) : ::berry::ObjectGeneric<Type>(x) {}                     \
-  /*ObjectName(const ObjectName& o) : ObjectGeneric< Type >(o) {} */ \
+  ObjectName() : ::berry::ObjectGeneric< Type >(DefaultValue) { }    \
+  ObjectName(Type x) : ::berry::ObjectGeneric<Type>(x) {}            \
+  QString ToString() const { QString txt; QTextStream ts(&txt); ts << m_Value; return txt; } \
 };
 
 

@@ -31,7 +31,7 @@ void WWinActionBars::ClearGlobalActionHandlers()
 {
 }
 
-Action* WWinActionBars::GetGlobalActionHandler(const QString& actionID) const
+Action* WWinActionBars::GetGlobalActionHandler(const QString& /*actionID*/) const
 {
   return 0;
 }
@@ -60,7 +60,7 @@ IToolBarManager* WWinActionBars::GetToolBarManager()
   return 0;
 }
 
-void WWinActionBars::SetGlobalActionHandler(const QString& actionID, Action* handler)
+void WWinActionBars::SetGlobalActionHandler(const QString& /*actionID*/, Action* /*handler*/)
 {
 }
 

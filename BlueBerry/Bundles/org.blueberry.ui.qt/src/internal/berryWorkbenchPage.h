@@ -461,33 +461,33 @@ private:
    * Adds an IPartListener to the part service.
    */
 public:
-  void AddPartListener(IPartListener::Pointer l);
+  void AddPartListener(IPartListener* l);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
-  void AddSelectionListener(ISelectionListener::Pointer listener);
+  void AddSelectionListener(ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
   void AddSelectionListener(const QString& partId,
-      ISelectionListener::Pointer listener);
+      ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
-  void AddPostSelectionListener(ISelectionListener::Pointer listener);
+  void AddPostSelectionListener(ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
   void AddPostSelectionListener(const QString& partId,
-      ISelectionListener::Pointer listener);
+      ISelectionListener* listener);
 
 private:
   ILayoutContainer::Pointer GetContainer(IWorkbenchPart::Pointer part);
@@ -1180,33 +1180,33 @@ public:
    * Removes an IPartListener from the part service.
    */
 public:
-  void RemovePartListener(IPartListener::Pointer l);
+  void RemovePartListener(IPartListener* l);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
-  void RemoveSelectionListener(ISelectionListener::Pointer listener);
+  void RemoveSelectionListener(ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
   void RemoveSelectionListener(const QString& partId,
-      ISelectionListener::Pointer listener);
+                               ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
-  void RemovePostSelectionListener(ISelectionListener::Pointer listener);
+  void RemovePostSelectionListener(ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
 public:
   void RemovePostSelectionListener(const QString& partId,
-      ISelectionListener::Pointer listener);
+                                   ISelectionListener* listener);
 
   /**
    * This method is called when a part is activated by clicking within it. In

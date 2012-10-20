@@ -38,14 +38,15 @@ struct IteratePool : public IEvaluationContext
 {
 
 private:
-  QList<Object::Pointer>::iterator fIterator;
-  QList<Object::Pointer>::iterator fIterEnd;
-  Object::Pointer fDefaultVariable;
+  QList<Object::Pointer>::const_iterator fIterator;
+  QList<Object::Pointer>::const_iterator fIterEnd;
+  Object::ConstPointer fDefaultVariable;
   IEvaluationContext* fParent;
 
 public:
 
-  IteratePool(IEvaluationContext* parent, QList<Object::Pointer>::iterator begin, QList<Object::Pointer>::iterator end)
+  IteratePool(IEvaluationContext* parent, QList<Object::Pointer>::const_iterator begin,
+              QList<Object::Pointer>::const_iterator end)
   {
     poco_check_ptr(parent);
 
@@ -58,11 +59,11 @@ public:
     return fParent;
   }
 
-  IEvaluationContext* GetRoot() {
+  IEvaluationContext* GetRoot() const {
     return fParent->GetRoot();
   }
 
-  Object::Pointer GetDefaultVariable() const {
+  Object::ConstPointer GetDefaultVariable() const {
     return fDefaultVariable;
   }
 
@@ -74,19 +75,19 @@ public:
     fParent->SetAllowPluginActivation(value);
   }
 
-  void AddVariable(const QString& name, const Object::Pointer& value) {
+  void AddVariable(const QString& name, const Object::ConstPointer& value) {
     fParent->AddVariable(name, value);
   }
 
-  Object::Pointer RemoveVariable(const QString& name) {
+  Object::ConstPointer RemoveVariable(const QString& name) {
     return fParent->RemoveVariable(name);
   }
 
-  Object::Pointer GetVariable(const QString& name) const {
+  Object::ConstPointer GetVariable(const QString& name) const {
     return fParent->GetVariable(name);
   }
 
-  Object::Pointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) {
+  Object::ConstPointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) const {
     return fParent->ResolveVariable(name, args);
   }
 
@@ -166,8 +167,8 @@ void IterateExpression::InitializeEmptyResultValue(const QString& value)
 
 EvaluationResult::ConstPointer IterateExpression::Evaluate(IEvaluationContext* context) const
 {
-  Object::Pointer var = context->GetDefaultVariable();
-  ObjectList<Object::Pointer>* col = dynamic_cast<ObjectList<Object::Pointer>*>(var.GetPointer());
+  Object::ConstPointer var = context->GetDefaultVariable();
+  const ObjectList<Object::Pointer>* col = dynamic_cast<const ObjectList<Object::Pointer>*>(var.GetPointer());
   if (col)
   {
     switch (col->size())
@@ -217,7 +218,7 @@ EvaluationResult::ConstPointer IterateExpression::Evaluate(IEvaluationContext* c
   }
   else
   {
-    IIterable::Pointer iterable = Expressions::GetAsIIterable(Object::Pointer(var),
+    IIterable::ConstPointer iterable = Expressions::GetAsIIterable(var,
                                                               Expression::ConstPointer(this));
     if (iterable.IsNull())
       return EvaluationResult::NOT_LOADED;
@@ -264,7 +265,7 @@ EvaluationResult::ConstPointer IterateExpression::Evaluate(IEvaluationContext* c
   }
 }
 
-void IterateExpression::CollectExpressionInfo(ExpressionInfo* info)
+void IterateExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   // Although we access every single variable we only mark the default
   // variable as accessed since we don't have single variables for the
@@ -283,7 +284,7 @@ bool IterateExpression::operator==(const Object* object) const
   return false;
 }
 
-uint IterateExpression::ComputeHashCode()
+uint IterateExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fExpressions)
       * HASH_FACTOR + fOperator;

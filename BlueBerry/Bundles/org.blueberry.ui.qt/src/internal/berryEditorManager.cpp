@@ -726,7 +726,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       // Loop through the editors.
 
       QList<IMemento::Pointer> editorMems(memento->GetChildren(WorkbenchConstants::TAG_EDITOR));
-      for (std::size_t x = 0; x < editorMems.size(); x++)
+      for (int x = 0; x < editorMems.size(); x++)
       {
         // for dynamic UI - call restoreEditorState to replace code which is
         // commented out
@@ -747,7 +747,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //            public void runWithException() throws Throwable
 //              {
                 // Update each workbook with its visible editor.
-                for (std::size_t i = 0; i < visibleEditors.size(); i++)
+                for (int i = 0; i < visibleEditors.size(); i++)
                 {
                   SetVisibleEditor(visibleEditors[i], false);
                 }

@@ -87,6 +87,7 @@ CombinedEventDelta::~CombinedEventDelta()
 CombinedEventDelta &CombinedEventDelta::operator =(const CombinedEventDelta &other)
 {
   d = other.d;
+  return *this;
 }
 
 void CombinedEventDelta::Reset()

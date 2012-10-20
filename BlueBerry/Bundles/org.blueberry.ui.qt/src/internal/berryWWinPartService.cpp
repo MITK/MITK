@@ -35,42 +35,42 @@ struct WWinListener: public IPartListener
     return Events::ALL;
   }
 
-  void PartActivated(IWorkbenchPartReference::Pointer  /*ref*/)
+  void PartActivated(const IWorkbenchPartReference::Pointer&  /*ref*/)
   {
     wwps->UpdateActivePart();
   }
 
-  void PartBroughtToTop(IWorkbenchPartReference::Pointer ref)
+  void PartBroughtToTop(const IWorkbenchPartReference::Pointer& ref)
   {
     wwps->partService.FirePartBroughtToTop(ref);
   }
 
-  void PartClosed(IWorkbenchPartReference::Pointer ref)
+  void PartClosed(const IWorkbenchPartReference::Pointer& ref)
   {
     wwps->partService.FirePartClosed(ref);
   }
 
-  void PartDeactivated(IWorkbenchPartReference::Pointer  /*ref*/)
+  void PartDeactivated(const IWorkbenchPartReference::Pointer& /*ref*/)
   {
     wwps->UpdateActivePart();
   }
 
-  void PartOpened(IWorkbenchPartReference::Pointer ref)
+  void PartOpened(const IWorkbenchPartReference::Pointer& ref)
   {
     wwps->partService.FirePartOpened(ref);
   }
 
-  void PartHidden(IWorkbenchPartReference::Pointer ref)
+  void PartHidden(const IWorkbenchPartReference::Pointer& ref)
   {
     wwps->partService.FirePartHidden(ref);
   }
 
-  void PartVisible(IWorkbenchPartReference::Pointer ref)
+  void PartVisible(const IWorkbenchPartReference::Pointer& ref)
   {
     wwps->partService.FirePartVisible(ref);
   }
 
-  void PartInputChanged(IWorkbenchPartReference::Pointer ref)
+  void PartInputChanged(const IWorkbenchPartReference::Pointer& ref)
   {
     wwps->partService.FirePartInputChanged(ref);
   }
@@ -91,12 +91,12 @@ WWinPartService::WWinPartService(IWorkbenchWindow* window) :
 
 }
 
-void WWinPartService::AddPartListener(IPartListener::Pointer l)
+void WWinPartService::AddPartListener(IPartListener* l)
 {
   partService.AddPartListener(l);
 }
 
-void WWinPartService::RemovePartListener(IPartListener::Pointer l)
+void WWinPartService::RemovePartListener(IPartListener* l)
 {
   partService.RemovePartListener(l);
 }
@@ -152,7 +152,7 @@ void WWinPartService::PageActivated(SmartPointer<IWorkbenchPage> newPage)
     QList<IWorkbenchPartReference::Pointer> refs(newPage.Cast<
         WorkbenchPage> ()->GetOpenParts());
 
-    for (std::size_t i = 0; i < refs.size(); i++)
+    for (int i = 0; i < refs.size(); i++)
     {
       IWorkbenchPartReference::Pointer reference = refs[i];
 
@@ -182,7 +182,7 @@ void WWinPartService::PageActivated(SmartPointer<IWorkbenchPage> newPage)
 
   if (newPage)
   {
-    newPage->AddPartListener(partListener);
+    newPage->AddPartListener(partListener.data());
   }
 
 }
@@ -211,7 +211,7 @@ void WWinPartService::Reset()
 
     QList<IWorkbenchPartReference::Pointer> refs(page->GetOpenParts());
 
-    for (std::size_t i = 0; i < refs.size(); i++)
+    for (int i = 0; i < refs.size(); i++)
     {
       IWorkbenchPartReference::Pointer reference = refs[i];
 
@@ -223,7 +223,7 @@ void WWinPartService::Reset()
       partService.FirePartClosed(reference);
     }
 
-    tempPage->RemovePartListener(partListener);
+    tempPage->RemovePartListener(partListener.data());
   }
 
 }

@@ -45,12 +45,12 @@ InstanceofExpression::InstanceofExpression(const QString& typeName)
 EvaluationResult::ConstPointer
 InstanceofExpression::Evaluate(IEvaluationContext* context) const
 {
-  Object::Pointer element= context->GetDefaultVariable();
+  Object::ConstPointer element= context->GetDefaultVariable();
   return EvaluationResult::ValueOf(Expressions::IsInstanceOf(element.GetPointer(), fTypeName));
 }
 
 void
-InstanceofExpression::CollectExpressionInfo(ExpressionInfo* info)
+InstanceofExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   info->MarkDefaultVariableAccessed();
 }
@@ -72,7 +72,7 @@ InstanceofExpression::ToString() const
 }
 
 uint
-InstanceofExpression::ComputeHashCode()
+InstanceofExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + qHash(fTypeName);
 }

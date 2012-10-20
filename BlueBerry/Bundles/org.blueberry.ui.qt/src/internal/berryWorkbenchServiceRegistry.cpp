@@ -29,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchRegistryConstants.h"
 #include "berrySourcePriorityNameMapping.h"
+#include "berryAbstractSourceProvider.h"
+#include "berryStatus.h"
+#include "berryPlatformUI.h"
 
 namespace berry
 {
@@ -37,8 +40,6 @@ const QString WorkbenchServiceRegistry::WORKBENCH_LEVEL = "workbench";
 
 const QString WorkbenchServiceRegistry::EXT_ID_SERVICES =
     "org.blueberry.ui.services"; //$NON-NLS-1$
-
-WorkbenchServiceRegistry* WorkbenchServiceRegistry::registry = 0;
 
 const IServiceLocator::Pointer WorkbenchServiceRegistry::GLOBAL_PARENT =
     IServiceLocator::Pointer(new GlobalParentLocator());
@@ -69,7 +70,7 @@ WorkbenchServiceRegistry::WorkbenchServiceRegistry()
 }
 
 WorkbenchServiceRegistry::ServiceFactoryHandle::ServiceFactoryHandle(
-    IServiceFactory::ConstPointer _factory)
+    const IServiceFactory* _factory)
 : factory(_factory)
 {
 
@@ -84,12 +85,12 @@ WorkbenchServiceRegistry::ServiceFactoryHandle::Pointer WorkbenchServiceRegistry
   try
   {
     bool done = false;
-    for (unsigned int i = 0; i < serviceFactories.size() && !done; i++)
+    for (int i = 0; i < serviceFactories.size() && !done; i++)
     {
       QList<IConfigurationElement::Pointer> serviceNameElements =
           serviceFactories[i]->GetChildren(
               WorkbenchRegistryConstants::TAG_SERVICE);
-      for (unsigned int j = 0; j < serviceNameElements.size() && !done; j++)
+      for (int j = 0; j < serviceNameElements.size() && !done; j++)
       {
         QString serviceName = serviceNameElements[j]->GetAttribute(
               WorkbenchRegistryConstants::ATTR_SERVICE_CLASS);
@@ -100,22 +101,15 @@ WorkbenchServiceRegistry::ServiceFactoryHandle::Pointer WorkbenchServiceRegistry
       }
       if (done)
       {
-        IServiceFactory::Pointer f(
-                serviceFactories[i]->CreateExecutableExtension<IServiceFactory>(
-                    WorkbenchRegistryConstants::ATTR_FACTORY_CLASS));
-        if (f.IsNull())
-        {
-          // support legacy BlueBerry extensions
-          f = serviceFactories[i]->CreateExecutableExtension<IServiceFactory>(
-                WorkbenchRegistryConstants::ATTR_FACTORY_CLASS);
-        }
+        IServiceFactory* f = serviceFactories[i]->CreateExecutableExtension<IServiceFactory>(
+              WorkbenchRegistryConstants::ATTR_FACTORY_CLASS);
         ServiceFactoryHandle::Pointer handle(new ServiceFactoryHandle(f));
 //        PlatformUI.getWorkbench().getExtensionTracker().registerObject(
 //            serviceFactories[i].getDeclaringExtension(), handle,
 //            IExtensionTracker.REF_WEAK);
 
         QList<QString> serviceNames;
-        for (unsigned int j = 0; j < serviceNameElements.size(); j++)
+        for (int j = 0; j < serviceNameElements.size(); j++)
         {
           QString serviceName = serviceNameElements[j]->GetAttribute(
                 WorkbenchRegistryConstants::ATTR_SERVICE_CLASS);
@@ -150,7 +144,7 @@ IExtensionPoint::Pointer WorkbenchServiceRegistry::GetExtensionPoint() const
 void WorkbenchServiceRegistry::ProcessVariables(
     const QList<IConfigurationElement::Pointer>& children) const
 {
-  for (unsigned int i = 0; i < children.size(); i++)
+  for (int i = 0; i < children.size(); i++)
   {
     QString name = children[i]->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);
     if (name.isEmpty())
@@ -198,58 +192,59 @@ bool WorkbenchServiceRegistry::GlobalParentLocator::HasService(
 
 WorkbenchServiceRegistry* WorkbenchServiceRegistry::GetRegistry()
 {
-  if (registry == 0)
-  {
-    registry = new WorkbenchServiceRegistry();
-  }
-  return registry;
+  static WorkbenchServiceRegistry registry;
+  return &registry;
 }
 
-Object* WorkbenchServiceRegistry::GetService(const QString& key,
+Object::Pointer WorkbenchServiceRegistry::GetService(const QString& key,
     IServiceLocator* parentLocator, ServiceLocator* locator)
 {
-  ServiceFactoryHandle::Pointer handle(factories[key]);
+  ServiceFactoryHandle::Pointer handle = factories.value(key);
   if (!handle)
   {
     handle = this->LoadFromRegistry(key);
   }
   if (handle)
   {
-    Object* result(handle->factory->Create(key, parentLocator, locator));
+    Object::Pointer result(handle->factory->Create(key, parentLocator, locator));
     if (result)
     {
       //handle->serviceLocators.insert(locator, new Object());
       return result;
     }
   }
-  return NULL;
+  return Object::Pointer(0);
 }
 
-QList<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProviders() const
+QList<AbstractSourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProviders() const
 {
-  QList<ISourceProvider::Pointer> providers;
+  QList<AbstractSourceProvider::Pointer> providers;
   IExtensionPoint::Pointer ep = this->GetExtensionPoint();
-  QList<IConfigurationElement::Pointer> elements =
-      ep->GetConfigurationElements();
-  for (unsigned int i = 0; i < elements.size(); i++)
+  QList<IConfigurationElement::Pointer> elements = ep->GetConfigurationElements();
+  for (int i = 0; i < elements.size(); i++)
   {
-    if (elements[i]->GetName() ==
-        WorkbenchRegistryConstants::TAG_SOURCE_PROVIDER)
+    if (elements[i]->GetName() == WorkbenchRegistryConstants::TAG_SOURCE_PROVIDER)
     {
       try
       {
-        ISourceProvider::Pointer provider(elements[i]->CreateExecutableExtension<ISourceProvider>(
-            WorkbenchRegistryConstants::ATTR_PROVIDER));
-        if (provider.IsNull())
+        ISourceProvider* sourceProvider(elements[i]->CreateExecutableExtension<ISourceProvider>(
+                                          WorkbenchRegistryConstants::ATTR_PROVIDER));
+        if (AbstractSourceProvider* asp = dynamic_cast<AbstractSourceProvider*>(sourceProvider))
         {
-          // support legacy BlueBerry extensions
-          provider = elements[i]->CreateExecutableExtension<ISourceProvider>(
-                WorkbenchRegistryConstants::ATTR_PROVIDER);
+          providers.push_back(AbstractSourceProvider::Pointer(asp));
         }
-        providers.push_back(provider);
-        this->ProcessVariables(elements[i]->GetChildren(
-            WorkbenchRegistryConstants::TAG_VARIABLE));
-      } catch (CoreException& e)
+        else
+        {
+          const QString attributeName = elements[i]->GetAttribute(WorkbenchRegistryConstants::ATTR_PROVIDER);
+          const QString message = "Source Provider '" + attributeName +
+              "' should extend AbstractSourceProvider";
+          const IStatus::Pointer status(new Status(IStatus::ERROR_TYPE,
+                                                   PlatformUI::PLUGIN_ID(), message, BERRY_STATUS_LOC));
+          WorkbenchPlugin::Log(status);
+          continue;
+        }
+      }
+      catch (const CoreException& e)
       {
         //StatusManager.getManager().handle(e.getStatus());
         BERRY_ERROR << "CoreException: " << e.what() << std::endl;
@@ -257,6 +252,19 @@ QList<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProviders() c
     }
   }
   return providers;
+}
+
+void WorkbenchServiceRegistry::InitializeSourcePriorities()
+{
+  IExtensionPoint::Pointer ep = GetExtensionPoint();
+  QList<IConfigurationElement::Pointer> elements = ep->GetConfigurationElements();
+  for (int i = 0; i < elements.size(); i++)
+  {
+    if (elements[i]->GetName() == WorkbenchRegistryConstants::TAG_SOURCE_PROVIDER)
+    {
+      ProcessVariables(elements[i]->GetChildren(WorkbenchRegistryConstants::TAG_VARIABLE));
+    }
+  }
 }
 
 }

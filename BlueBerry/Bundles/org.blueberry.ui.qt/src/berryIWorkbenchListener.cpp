@@ -20,22 +20,26 @@ namespace berry {
 
 void
 IWorkbenchListener::Events
-::AddListener(IWorkbenchListener::Pointer listener)
+::AddListener(IWorkbenchListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  preShutdown += Delegate2(listener.GetPointer(), &IWorkbenchListener::PreShutdown);
-  postShutdown += Delegate1(listener.GetPointer(), &IWorkbenchListener::PostShutdown);
+  preShutdown += Delegate2(listener, &IWorkbenchListener::PreShutdown);
+  postShutdown += Delegate1(listener, &IWorkbenchListener::PostShutdown);
 }
 
 void
 IWorkbenchListener::Events
-::RemoveListener(IWorkbenchListener::Pointer listener)
+::RemoveListener(IWorkbenchListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  preShutdown -= Delegate2(listener.GetPointer(), &IWorkbenchListener::PreShutdown);
-  postShutdown -= Delegate1(listener.GetPointer(), &IWorkbenchListener::PostShutdown);
+  preShutdown -= Delegate2(listener, &IWorkbenchListener::PreShutdown);
+  postShutdown -= Delegate1(listener, &IWorkbenchListener::PostShutdown);
+}
+
+IWorkbenchListener::~IWorkbenchListener()
+{
 }
 
 }

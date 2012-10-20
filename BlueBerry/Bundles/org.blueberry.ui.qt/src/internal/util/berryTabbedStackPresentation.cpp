@@ -16,10 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryLog.h"
 
+#include "berryIMemento.h"
+
 #include "berryTabbedStackPresentation.h"
 #include "berryAbstractTabItem.h"
 #include "berryLeftToRightTabOrder.h"
 #include "berryReplaceDragHandler.h"
+#include "berryShell.h"
 
 #include <berryConstants.h>
 

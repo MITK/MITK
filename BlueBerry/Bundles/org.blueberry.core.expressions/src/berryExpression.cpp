@@ -63,7 +63,7 @@ Expression::HashCode(const QList<Expression::Pointer>& array)
     return 0;
   }
   uint hashCode = qHash("QList<Expression::Pointer>");
-  for (unsigned int i= 0; i < array.size(); i++)
+  for (int i= 0; i < array.size(); i++)
   {
     hashCode = hashCode * HASH_FACTOR + HashCode(array[i]);
   }
@@ -78,7 +78,7 @@ Expression::HashCode(const QList<Object::Pointer>& array)
     return 0;
   }
   int hashCode = (int) Poco::hash("std::vector<Object::Pointer>");
-  for (unsigned int i= 0; i < array.size(); i++)
+  for (int i= 0; i < array.size(); i++)
   {
     hashCode = hashCode + (int) array[i]->HashCode();
   }

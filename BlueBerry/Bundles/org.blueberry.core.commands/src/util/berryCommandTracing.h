@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QString>
 
+#include <org_blueberry_core_commands_Export.h>
+
 namespace berry {
 
 /**
@@ -29,10 +31,9 @@ namespace berry {
  * <p>
  * Clients must not extend or instantiate this class.
  * </p>
- *
- * @since 3.2
  */
-class CommandTracing {
+class BERRY_COMMANDS CommandTracing
+{
 
 public:
 

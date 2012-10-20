@@ -122,7 +122,7 @@ namespace berry
    */
   struct org_blueberry_core_runtime_EXPORT IPreferences : virtual public Object
   {
-    berryInterfaceMacro(IPreferences, berry);
+    berryObjectMacro(berry::IPreferences)
 
     virtual ~IPreferences();
 

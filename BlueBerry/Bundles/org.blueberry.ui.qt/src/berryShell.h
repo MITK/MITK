@@ -133,10 +133,16 @@ class BERRY_UI_QT Shell : public virtual Object
 {
 public:
 
-  berryObjectMacro(Shell);
+  berryObjectMacro(Shell)
+
+  Shell();
 
   Object::Pointer GetData(const QString& id = "") const;
-  void SetData(Object::Pointer data, const QString& id = "");
+  void SetData(const Object::Pointer& data, const QString& id = "");
+
+  IShellListener* GetExtraShellListener() const;
+
+  void SetExtraShellListener(IShellListener* l);
 
   void SetBounds(int x, int y, int width, int height);
 
@@ -242,7 +248,7 @@ public:
    * @see IShellListener
    * @see #RemoveShellListener
    */
-  virtual void AddShellListener(IShellListener::Pointer listener) = 0;
+  virtual void AddShellListener(IShellListener* listener) = 0;
 
   /**
    * Removes the listener from the collection of listeners who will
@@ -253,7 +259,7 @@ public:
    * @see IShellListener
    * @see #AddShellListener
    */
-  virtual void RemoveShellListener(IShellListener::Pointer listener) = 0;
+  virtual void RemoveShellListener(IShellListener* listener) = 0;
 
   /**
    * Moves the receiver to the top of the drawing order for
@@ -321,9 +327,12 @@ public:
 private:
 
   QHash<QString, Object::Pointer> data;
+  IShellListener* extraShellListener;
 
 };
 
 }
+
+Q_DECLARE_METATYPE(berry::Shell*)
 
 #endif /* BERRYSHELL_H_ */

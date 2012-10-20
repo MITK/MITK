@@ -94,7 +94,7 @@ public:
     int result = (int) (leftArray.size() - rightArray.size());
     if (result == 0)
     {
-      for (unsigned int i = 0; i < leftArray.size(); ++i)
+      for (int i = 0; i < leftArray.size(); ++i)
       {
         if (!(leftArray[i] == rightArray[i]))
         {
@@ -134,7 +134,7 @@ public:
     QString str;
     QTextStream ss(&str);
     ss << "[";
-    for (unsigned int i = 0; i < vec.size(); ++i)
+    for (int i = 0; i < vec.size(); ++i)
     {
       if (i > 0) ss << ",";
       ss << vec[i];

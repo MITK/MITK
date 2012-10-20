@@ -87,7 +87,7 @@ namespace berry {
 struct BERRY_UI_QT IPageLayout : public Object
 {
 
-  berryInterfaceMacro(IPageLayout, berry)
+  berryObjectMacro(berry::IPageLayout)
 
     /**
      * The part id for the workbench's editor area.  This may only be used

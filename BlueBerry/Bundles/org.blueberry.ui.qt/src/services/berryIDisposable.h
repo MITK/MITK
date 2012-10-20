@@ -45,13 +45,11 @@ namespace berry {
  * <p>
  * This interface can be extended or implemented by clients.
  * </p>
- *
- * @since 3.2
  */
 struct IDisposable : public virtual Object
 {
 
-  berryInterfaceMacro(IDisposable, berry);
+  berryObjectMacro(berry::IDisposable)
 
   ~IDisposable();
 

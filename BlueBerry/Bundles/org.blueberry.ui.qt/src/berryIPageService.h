@@ -75,14 +75,14 @@ struct BERRY_UI_QT IPageService {
      * @param listener a perspective listener
      * @see #removePerspectiveListener(IPerspectiveListener)
      */
-    virtual void AddPerspectiveListener(IPerspectiveListener::Pointer listener) = 0;
+    virtual void AddPerspectiveListener(IPerspectiveListener* listener) = 0;
 
     /**
      * Returns the active page.
      *
      * @return the active page, or <code>null</code> if no page is currently active
      */
-    virtual SmartPointer<IWorkbenchPage> GetActivePage() = 0;
+    virtual SmartPointer<IWorkbenchPage> GetActivePage() const = 0;
 
     /**
      * Removes the given page listener.
@@ -98,11 +98,13 @@ struct BERRY_UI_QT IPageService {
      *
      * @param listener a perspective listener
      */
-    virtual void RemovePerspectiveListener(IPerspectiveListener::Pointer listener) = 0;
+    virtual void RemovePerspectiveListener(IPerspectiveListener* listener) = 0;
 
     virtual IPerspectiveListener::Events& GetPerspectiveEvents() = 0;
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IPageService, "org.blueberry.ui.IPageService")
 
 #endif /* BERRYIPAGESERVICE_H_ */

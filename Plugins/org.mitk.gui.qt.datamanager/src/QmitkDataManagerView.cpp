@@ -990,7 +990,7 @@ void QmitkDataManagerView::OtsuFilter( bool )
     }
     catch( std::exception& err )
     {
-      MITK_ERROR(this->GetClassName()) << err.what();
+      MITK_ERROR(qPrintable(this->GetClassName())) << err.what();
     }
 
   }

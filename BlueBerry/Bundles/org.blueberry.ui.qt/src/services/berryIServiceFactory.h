@@ -20,28 +20,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_ui_qt_Export.h>
 
-#include <berryObject.h>
-#include <berryMacros.h>
-
 #include <QObject>
 
 namespace berry {
 
 struct IServiceLocator;
 
+class Object;
+
 /**
  * A factory for creating services for use with the
  * <code>org.blueberry.ui.services</code> extension point. You are given a
  * service locator to look up other services, and can retrieve your parent
  * service (if one has already been created).
- *
- * @since 3.4
  */
-struct BERRY_UI_QT IServiceFactory : public virtual Object {
+struct BERRY_UI_QT IServiceFactory {
 
-  berryInterfaceMacro(IServiceFactory, berry)
-
-  ~IServiceFactory();
+  virtual ~IServiceFactory();
 
   /**
    * When a service locator cannot find a service it will request one from the
@@ -66,17 +61,17 @@ struct BERRY_UI_QT IServiceFactory : public virtual Object {
    * @return the created service or <code>null</code>
    */
   template<class S>
-  S* Create(const IServiceLocator* parentLocator, const IServiceLocator* locator) const
+  S* Create(IServiceLocator* parentLocator, IServiceLocator* locator) const
   {
     return dynamic_cast<S*>(this->Create(qobject_interface_iid<S*>(), parentLocator, locator));
   }
 
   virtual Object* Create(const QString& serviceInterface,
-                         const IServiceLocator* parentLocator, const IServiceLocator* locator) const = 0;
+                         IServiceLocator* parentLocator, IServiceLocator* locator) const = 0;
 };
 
 }
 
-Q_DECLARE_INTERFACE(berry::IServiceFactory, "org.blueberry.IServiceFactory")
+Q_DECLARE_INTERFACE(berry::IServiceFactory, "org.blueberry.ui.IServiceFactory")
 
 #endif /* BERRYISERVICEFACTORY_H_ */

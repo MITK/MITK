@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryICommandCategoryListener.h"
 #include "berryICommandManagerListener.h"
 
+#include <QScopedPointer>
+
 
 namespace berry
 {
@@ -79,10 +81,10 @@ private:
         const ExecutionException* exception);
 
     void PostExecuteSuccess(const QString& commandId,
-        const Object::Pointer returnValue);
+        const Object::Pointer& returnValue);
 
     void PreExecute(const QString& commandId, const SmartPointer<
-        const ExecutionEvent> event);
+        const ExecutionEvent>& event);
 
   private:
 
@@ -95,21 +97,21 @@ private:
     CommandCategoryListener(CommandManager* commandManager);
 
     void CategoryChanged(
-        const SmartPointer<const CommandCategoryEvent> categoryEvent);
+        const SmartPointer<const CommandCategoryEvent>& categoryEvent);
 
   private:
 
     CommandManager* commandManager;
   };
 
-  ICommandCategoryListener::Pointer categoryListener;
+  QScopedPointer<ICommandCategoryListener> categoryListener;
 
   struct CommandListener: public ICommandListener
   {
 
     CommandListener(CommandManager* commandManager);
 
-    void CommandChanged(const SmartPointer<const CommandEvent> commandEvent);
+    void CommandChanged(const SmartPointer<const CommandEvent>& commandEvent);
 
   private:
 
@@ -117,7 +119,7 @@ private:
 
   };
 
-  ICommandListener::Pointer commandListener;
+  QScopedPointer<ICommandListener> commandListener;
 
   struct ParameterTypeListener: public IParameterTypeListener
   {
@@ -125,7 +127,7 @@ private:
     ParameterTypeListener(CommandManager* commandManager);
 
     void ParameterTypeChanged(
-        const SmartPointer<const ParameterTypeEvent> parameterTypeEvent);
+        const SmartPointer<const ParameterTypeEvent>& parameterTypeEvent);
 
   private:
 
@@ -133,7 +135,7 @@ private:
 
   };
 
-  IParameterTypeListener::Pointer parameterTypeListener;
+  QScopedPointer<IParameterTypeListener> parameterTypeListener;
 
 public:
 
@@ -548,7 +550,7 @@ private:
    * events from commands controlled by this manager to listeners on this
    * manager.
    */
-  SmartPointer<IExecutionListenerWithChecks> executionListener;
+  QScopedPointer<IExecutionListenerWithChecks> executionListener;
 
   /**
    * The collection of execution listeners. This collection is

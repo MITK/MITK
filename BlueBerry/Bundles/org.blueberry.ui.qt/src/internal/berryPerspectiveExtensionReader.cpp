@@ -147,7 +147,7 @@ bool PerspectiveExtensionReader::ProcessView(
 
     // Get relationship details.
     bool stack = false;
-    bool fast = false;
+    //bool fast = false;
     int intRelation = 0;
     if (relationship == VAL_LEFT)
     {
@@ -169,10 +169,10 @@ bool PerspectiveExtensionReader::ProcessView(
     {
       stack = true;
     }
-    else if (relationship == VAL_FAST)
-    {
-      fast = true;
-    }
+//    else if (relationship == VAL_FAST)
+//    {
+//      fast = true;
+//    }
     else
     {
       return false;

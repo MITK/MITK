@@ -61,12 +61,12 @@ bool ExpressionAuthority::Evaluate(const SmartPointer<IEvaluationResultCache>& e
   return expression->Evaluate(contextWithDefaultVariable.GetPointer());
 }
 
-Object::Pointer ExpressionAuthority::GetVariable(const QString& name) const
+Object::ConstPointer ExpressionAuthority::GetVariable(const QString& name) const
 {
   return context->GetVariable(name);
 }
 
-void ExpressionAuthority::ChangeVariable(const QString& name, const Object::Pointer& value)
+void ExpressionAuthority::ChangeVariable(const QString& name, const Object::ConstPointer& value)
 {
   if (value.IsNull())
   {
@@ -78,7 +78,7 @@ void ExpressionAuthority::ChangeVariable(const QString& name, const Object::Poin
   }
 }
 
-void ExpressionAuthority::SourceChanged(const QStringList& sourceNames)
+void ExpressionAuthority::SourceChanged(const QStringList& /*sourceNames*/)
 {
   // this is a no-op, since we're late in the game
 }
@@ -88,12 +88,12 @@ void ExpressionAuthority::UpdateCurrentState()
   foreach (ISourceProvider::Pointer provider, providers)
   {
     ISourceProvider::StateMapType currentState = provider->GetCurrentState();
-    QHashIterator<QString,Object::Pointer> variableItr(currentState);
+    QHashIterator<QString,Object::ConstPointer> variableItr(currentState);
     while (variableItr.hasNext())
     {
       variableItr.next();
       const QString variableName = variableItr.key();
-      const Object::Pointer variableValue = variableItr.value();
+      const Object::ConstPointer variableValue = variableItr.value();
       /*
        * Bug 84056. If we update the active workbench window, then we
        * risk falling back to that shell when the active shell has
@@ -108,7 +108,7 @@ void ExpressionAuthority::UpdateCurrentState()
   }
 }
 
-void ExpressionAuthority::UpdateEvaluationContext(const QString& name, const Object::Pointer& value)
+void ExpressionAuthority::UpdateEvaluationContext(const QString& name, const Object::ConstPointer& value)
 {
   if (!name.isNull())
   {
@@ -123,12 +123,12 @@ void ExpressionAuthority::AddSourceProvider(const SmartPointer<ISourceProvider>&
 
   // Update the current state.
   ISourceProvider::StateMapType currentState = provider->GetCurrentState();
-  QHashIterator<QString,Object::Pointer> variableItr(currentState);
+  QHashIterator<QString,Object::ConstPointer> variableItr(currentState);
   while (variableItr.hasNext())
   {
     variableItr.next();
     const QString variableName = variableItr.key();
-    const Object::Pointer variableValue = variableItr.value();
+    const Object::ConstPointer variableValue = variableItr.value();
 
     /*
      * Bug 84056. If we update the active workbench window, then we risk
@@ -170,25 +170,25 @@ SmartPointer<IEvaluationContext> ExpressionAuthority::GetCurrentState() const
 {
   if (currentState.IsNull())
   {
-    const Object::Pointer defaultVariable =
+    const Object::ConstPointer defaultVariable =
         context->GetVariable(ISources::ACTIVE_CURRENT_SELECTION_NAME());
     IEvaluationContext::Pointer contextWithDefaultVariable;
-    if (IStructuredSelection::Pointer selection = defaultVariable.Cast<IStructuredSelection>())
+    if (IStructuredSelection::ConstPointer selection = defaultVariable.Cast<const IStructuredSelection>())
     {
       contextWithDefaultVariable = new EvaluationContext(context.GetPointer(),
                                                          selection->ToVector());
     }
-    else if (defaultVariable.Cast<ISelection>() &&
-             !defaultVariable.Cast<ISelection>()->IsEmpty())
+    else if (defaultVariable.Cast<const ISelection>() &&
+             !defaultVariable.Cast<const ISelection>()->IsEmpty())
     {
-      ObjectList<Object::Pointer>::Pointer defaultObj(new ObjectList<Object::Pointer>());
+      ObjectList<Object::ConstPointer>::Pointer defaultObj(new ObjectList<Object::ConstPointer>());
       defaultObj->push_back(defaultVariable);
       contextWithDefaultVariable = new EvaluationContext(context.GetPointer(),
                                                          defaultObj);
     }
     else
     {
-      ObjectList<Object::Pointer>::Pointer defaultObj(new ObjectList<Object::Pointer>());
+      ObjectList<Object::ConstPointer>::Pointer defaultObj(new ObjectList<Object::ConstPointer>());
       contextWithDefaultVariable = new EvaluationContext(context.GetPointer(), defaultObj);
     }
     currentState = contextWithDefaultVariable;
@@ -203,7 +203,7 @@ void ExpressionAuthority::RemoveSourceProvider(const SmartPointer<ISourceProvide
   providers.removeAll(provider);
 
   ISourceProvider::StateMapType currentState = provider->GetCurrentState();
-  QHashIterator<QString,Object::Pointer> variableItr(currentState);
+  QHashIterator<QString,Object::ConstPointer> variableItr(currentState);
   while (variableItr.hasNext())
   {
     variableItr.next();
@@ -213,7 +213,7 @@ void ExpressionAuthority::RemoveSourceProvider(const SmartPointer<ISourceProvide
 }
 
 void ExpressionAuthority::SourceChanged(int sourcePriority,
-                                        const QHash<QString, Object::Pointer> &sourceValuesByName)
+                                        const QHash<QString, Object::ConstPointer> &sourceValuesByName)
 {
   // If the selection has changed, invalidate the current state.
   if (sourceValuesByName.contains(ISources::ACTIVE_CURRENT_SELECTION_NAME()))
@@ -221,19 +221,19 @@ void ExpressionAuthority::SourceChanged(int sourcePriority,
     currentState = 0;
   }
 
-  QHashIterator<QString, Object::Pointer> entryItr(sourceValuesByName);
+  QHashIterator<QString, Object::ConstPointer> entryItr(sourceValuesByName);
   while (entryItr.hasNext())
   {
     entryItr.next();
     const QString sourceName = entryItr.key();
-    const Object::Pointer sourceValue = entryItr.value();
+    const Object::ConstPointer sourceValue = entryItr.value();
     UpdateEvaluationContext(sourceName, sourceValue);
   }
   SourceChanged(sourcePriority, sourceValuesByName.keys());
 }
 
 void ExpressionAuthority::SourceChanged(int sourcePriority, const QString &sourceName,
-                   Object::Pointer sourceValue)
+                   Object::ConstPointer sourceValue)
 {
   // If the selection has changed, invalidate the current state.
   if (ISources::ACTIVE_CURRENT_SELECTION_NAME() == sourceName)

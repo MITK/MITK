@@ -14,6 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include "berryInternalPlatform.h"
 #include "berryLog.h"
 
@@ -547,7 +551,7 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   Poco::Util::Application::defineOptions(options);
 }
 
-void InternalPlatform::handlePreloadLibraryOption(const std::string& name, const std::string& value)
+void InternalPlatform::handlePreloadLibraryOption(const std::string& /*name*/, const std::string& value)
 {
   std::string oldVal;
   if (this->config().hasProperty(Platform::ARG_PRELOAD_LIBRARY.toStdString()))

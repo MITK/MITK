@@ -116,7 +116,7 @@ PropertyTesterDescriptor::Instantiate()
 }
 
 bool
-PropertyTesterDescriptor::Test(Object::Pointer  /*receiver*/, const QString &  /*method*/,
+PropertyTesterDescriptor::Test(Object::ConstPointer  /*receiver*/, const QString &  /*method*/,
                                const QList<Object::Pointer> &  /*args*/, Object::Pointer  /*expectedValue*/)
 {
   poco_bugcheck_msg("Method should never be called");

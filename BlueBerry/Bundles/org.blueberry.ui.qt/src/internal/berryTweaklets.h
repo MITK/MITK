@@ -126,7 +126,7 @@ private:
     QList<IConfigurationElement::Pointer> elements =
         Platform::GetExtensionRegistry()
         ->GetConfigurationElementsFor("org.blueberry.ui.tweaklets");
-    for (unsigned int i = 0; i < elements.size(); i++)
+    for (int i = 0; i < elements.size(); i++)
     {
       QString attr = elements[i]->GetAttribute("definition");
       if (!attr.isNull() && definition.tweakClass == attr)

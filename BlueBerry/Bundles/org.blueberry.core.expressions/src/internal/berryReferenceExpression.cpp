@@ -61,14 +61,14 @@ ReferenceExpression::Evaluate(IEvaluationContext* context) const
 }
 
 void
-ReferenceExpression::CollectExpressionInfo(ExpressionInfo* info)
+ReferenceExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   Expression::Pointer expr;
   try
   {
     expr= GetDefinitionRegistry().GetExpression(fDefinitionId);
   }
-  catch (const CoreException& e)
+  catch (const CoreException& /*e*/)
   {
     // We didn't find the expression definition. So no
     // expression info can be collected.
@@ -87,8 +87,8 @@ ReferenceExpression::operator==(const Object* object) const
   return false;
 }
 
-std::size_t
-ReferenceExpression::ComputeHashCode()
+uint
+ReferenceExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + Poco::Hash<std::string>()(fDefinitionId.toStdString());
 }

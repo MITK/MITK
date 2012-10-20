@@ -71,7 +71,12 @@ bool DefaultSaveable::IsDirty() const
   return false;
 }
 
-bool DefaultSaveable::operator<(const Saveable* obj) const
+uint DefaultSaveable::HashCode() const
+{
+  return part.Lock()->HashCode();
+}
+
+bool DefaultSaveable::operator<(const Object* obj) const
 {
   if (this == obj)
     return false;
@@ -79,6 +84,8 @@ bool DefaultSaveable::operator<(const Saveable* obj) const
     return true;
 
   const DefaultSaveable* other = dynamic_cast<const DefaultSaveable*> (obj);
+  if (other == NULL) return true;
+
   if (part.Expired())
   {
     return !other->part.Expired();

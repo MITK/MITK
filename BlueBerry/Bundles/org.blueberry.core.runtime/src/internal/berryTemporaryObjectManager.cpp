@@ -103,7 +103,7 @@ SmartPointer<RegistryObject> TemporaryObjectManager::GetObject(int id, short typ
   {
     result = parent->GetObject(id, type);
   }
-  catch (const InvalidRegistryObjectException& e)
+  catch (const InvalidRegistryObjectException& /*e*/)
   {
     result = actualObjects.value(id);
   }

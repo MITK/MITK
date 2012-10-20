@@ -80,16 +80,16 @@ const uint CountExpression::HASH_INITIAL = qHash("berry::CountExpression");
   EvaluationResult::ConstPointer
   CountExpression::Evaluate(IEvaluationContext* context) const
   {
-    Object::Pointer var(context->GetDefaultVariable());
+    Object::ConstPointer var(context->GetDefaultVariable());
     ObjectList<Object::Pointer>::size_type size;
 
-    if(ObjectList<Object::Pointer>::Pointer coll = var.Cast<ObjectList<Object::Pointer> >())
+    if(ObjectList<Object::Pointer>::ConstPointer coll = var.Cast<const ObjectList<Object::Pointer> >())
     {
       size = coll->size();
     }
     else
     {
-      ICountable::Pointer countable = Expressions::GetAsICountable(var, Expression::ConstPointer(this));
+      ICountable::ConstPointer countable = Expressions::GetAsICountable(var, Expression::ConstPointer(this));
       if (!countable)
         return EvaluationResult::NOT_LOADED;
       size = countable->Count();
@@ -115,7 +115,7 @@ const uint CountExpression::HASH_INITIAL = qHash("berry::CountExpression");
   }
 
   void
-  CountExpression::CollectExpressionInfo(ExpressionInfo* info)
+  CountExpression::CollectExpressionInfo(ExpressionInfo* info) const
   {
     info->MarkDefaultVariableAccessed();
   }
@@ -131,7 +131,7 @@ const uint CountExpression::HASH_INITIAL = qHash("berry::CountExpression");
   }
 
   uint
-  CountExpression::ComputeHashCode()
+  CountExpression::ComputeHashCode() const
   {
     return HASH_INITIAL * HASH_FACTOR + fMode * HASH_FACTOR + fSize;
   }

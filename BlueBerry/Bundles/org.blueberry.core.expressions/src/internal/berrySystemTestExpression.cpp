@@ -60,7 +60,7 @@ SystemTestExpression::Evaluate(IEvaluationContext*  /*context*/) const
 }
 
 void
-SystemTestExpression::CollectExpressionInfo(ExpressionInfo* info)
+SystemTestExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   info->MarkSystemPropertyAccessed();
 }
@@ -77,7 +77,7 @@ SystemTestExpression::operator==(const Object* object) const
 }
 
 uint
-SystemTestExpression::ComputeHashCode()
+SystemTestExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + qHash(fExpectedValue)
       * HASH_FACTOR + qHash(fProperty);

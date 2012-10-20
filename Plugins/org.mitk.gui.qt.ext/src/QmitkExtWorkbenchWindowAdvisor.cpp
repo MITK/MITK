@@ -97,7 +97,7 @@ public:
      | Events::HIDDEN | Events::VISIBLE;
    }
 
-   void PartActivated(berry::IWorkbenchPartReference::Pointer ref)
+   void PartActivated(const berry::IWorkbenchPartReference::Pointer& ref)
    {
     if (ref.Cast<berry::IEditorReference> ())
     {
@@ -105,7 +105,7 @@ public:
     }
    }
 
-   void PartBroughtToTop(berry::IWorkbenchPartReference::Pointer ref)
+   void PartBroughtToTop(const berry::IWorkbenchPartReference::Pointer& ref)
    {
     if (ref.Cast<berry::IEditorReference> ())
     {
@@ -113,12 +113,12 @@ public:
     }
    }
 
-   void PartClosed(berry::IWorkbenchPartReference::Pointer /*ref*/)
+   void PartClosed(const berry::IWorkbenchPartReference::Pointer& /*ref*/)
    {
     windowAdvisor->UpdateTitle(false);
    }
 
-   void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
+   void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
    {
     if (!windowAdvisor->lastActiveEditor.Expired() &&
      ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
@@ -127,7 +127,7 @@ public:
     }
    }
 
-   void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
+   void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
    {
     if (!windowAdvisor->lastActiveEditor.Expired() &&
      ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
@@ -155,7 +155,7 @@ public:
                 Events::VISIBLE;
     }
 
-    void PartOpened(berry::IWorkbenchPartReference::Pointer ref)
+    void PartOpened(const berry::IWorkbenchPartReference::Pointer& ref)
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -163,7 +163,7 @@ public:
         }
     }
 
-    void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
+    void PartClosed(const berry::IWorkbenchPartReference::Pointer& ref)
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -171,7 +171,7 @@ public:
         }
     }
 
-    void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
+    void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -179,7 +179,7 @@ public:
         }
     }
 
-    void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
+    void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -207,7 +207,7 @@ public:
      Events::VISIBLE;
    }
 
-   void PartOpened(berry::IWorkbenchPartReference::Pointer ref)
+   void PartOpened(const berry::IWorkbenchPartReference::Pointer& ref)
    {
     if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
@@ -215,7 +215,7 @@ public:
     }
    }
 
-   void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
+   void PartClosed(const berry::IWorkbenchPartReference::Pointer& ref)
    {
     if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
@@ -223,7 +223,7 @@ public:
     }
    }
 
-   void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
+   void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
    {
     if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
@@ -231,7 +231,7 @@ public:
     }
    }
 
-   void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
+   void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
    {
     if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
@@ -260,27 +260,27 @@ public:
      | Events::CLOSED | Events::OPENED;
    }
 
-   void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
-    berry::IPerspectiveDescriptor::Pointer /*perspective*/)
+   void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
+                             const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
    {
     windowAdvisor->UpdateTitle(false);
    }
 
-   void PerspectiveSavedAs(berry::IWorkbenchPage::Pointer /*page*/,
-    berry::IPerspectiveDescriptor::Pointer /*oldPerspective*/,
-    berry::IPerspectiveDescriptor::Pointer /*newPerspective*/)
+   void PerspectiveSavedAs(const berry::IWorkbenchPage::Pointer& /*page*/,
+                           const berry::IPerspectiveDescriptor::Pointer& /*oldPerspective*/,
+                           const berry::IPerspectiveDescriptor::Pointer& /*newPerspective*/)
    {
     windowAdvisor->UpdateTitle(false);
    }
 
-   void PerspectiveDeactivated(berry::IWorkbenchPage::Pointer /*page*/,
-    berry::IPerspectiveDescriptor::Pointer /*perspective*/)
+   void PerspectiveDeactivated(const berry::IWorkbenchPage::Pointer& /*page*/,
+                               const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
    {
     windowAdvisor->UpdateTitle(false);
    }
 
-   void PerspectiveOpened(berry::IWorkbenchPage::Pointer /*page*/,
-    berry::IPerspectiveDescriptor::Pointer /*perspective*/)
+   void PerspectiveOpened(const berry::IWorkbenchPage::Pointer& /*page*/,
+                          const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
    {
     if (perspectivesClosed)
     {
@@ -315,8 +315,8 @@ public:
     perspectivesClosed = false;
    }
 
-   void PerspectiveClosed(berry::IWorkbenchPage::Pointer /*page*/,
-    berry::IPerspectiveDescriptor::Pointer /*perspective*/)
+   void PerspectiveClosed(const berry::IWorkbenchPage::Pointer& /*page*/,
+                          const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
    {
     berry::IWorkbenchWindow::Pointer wnd = windowAdvisor->GetWindowConfigurer()->GetWindow();
     bool allClosed = true;
@@ -377,8 +377,8 @@ public:
     return Events::ACTIVATED | Events::DEACTIVATED;
    }
 
-   void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
-    berry::IPerspectiveDescriptor::Pointer perspective)
+   void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
+                             const berry::IPerspectiveDescriptor::Pointer& perspective)
    {
      QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
      if (action)
@@ -387,8 +387,8 @@ public:
      }
    }
 
-   void PerspectiveDeactivated(berry::IWorkbenchPage::Pointer /*page*/,
-    berry::IPerspectiveDescriptor::Pointer perspective)
+   void PerspectiveDeactivated(const berry::IWorkbenchPage::Pointer& /*page*/,
+                               const berry::IPerspectiveDescriptor::Pointer& perspective)
    {
      QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
      if (action)
@@ -537,20 +537,17 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     searchPaths.push_front( QString(":/org_mitk_icons/icons/") );
     QIcon::setThemeSearchPaths( searchPaths );
 
-    berry::IPreferencesService::Pointer prefService
-      = berry::Platform::GetServiceRegistry()
-      .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
     berry::IPreferences::Pointer stylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
-    QString iconTheme = QString::fromStdString(stylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>"));
+    QString iconTheme = stylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>"));
     if( iconTheme == QString( "<<default>>" ) )
     {
       iconTheme = QString( "tango" );
     }
     QIcon::setThemeName( iconTheme );
 
- /*
  // ==== Application menu ============================
+ /*
  QMenuBar* menuBar = mainWindow->menuBar();
  menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
 
@@ -587,8 +584,7 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
 
  berry::IViewRegistry* viewRegistry =
   berry::PlatformUI::GetWorkbench()->GetViewRegistry();
- const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors =
-  viewRegistry->GetViews();
+ const QList<berry::IViewDescriptor::Pointer> viewDescriptors = viewRegistry->GetViews();
 
  // another bad hack to get an edit/undo menu...
  QMenu* editMenu = menuBar->addMenu("&Edit");
@@ -611,8 +607,8 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
    imageNavigatorAction->setCheckable(true);
 
    // add part listener for image navigator
-   imageNavigatorPartListener = new PartListenerForImageNavigator(imageNavigatorAction);
-   window->GetPartService()->AddPartListener(imageNavigatorPartListener);
+   imageNavigatorPartListener.reset(new PartListenerForImageNavigator(imageNavigatorAction));
+   window->GetPartService()->AddPartListener(imageNavigatorPartListener.data());
    berry::IViewPart::Pointer imageNavigatorView =
        window->GetActivePage()->FindView("org.mitk.views.imagenavigator");
    imageNavigatorAction->setChecked(false);
@@ -633,8 +629,8 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
         viewNavigatorAction->setCheckable(true);
 
         // add part listener for view navigator
-        viewNavigatorPartListener = new PartListenerForViewNavigator(viewNavigatorAction);
-        window->GetPartService()->AddPartListener(viewNavigatorPartListener);
+        viewNavigatorPartListener.reset(new PartListenerForViewNavigator(viewNavigatorAction));
+        window->GetPartService()->AddPartListener(viewNavigatorPartListener.data());
         berry::IViewPart::Pointer viewnavigatorview =
                 window->GetActivePage()->FindView("org.mitk.views.viewnavigatorview");
         viewNavigatorAction->setChecked(false);
@@ -718,11 +714,11 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
   window->GetWorkbench()->GetPerspectiveRegistry();
  QActionGroup* perspGroup = new QActionGroup(menuBar);
 
- std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(
+ QList<berry::IPerspectiveDescriptor::Pointer> perspectives(
   perspRegistry->GetPerspectives());
 
     bool skip = false;
-    for (std::vector<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
+    for (QList<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
       perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
     {
 
@@ -730,7 +726,7 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
       // should not appear as an menu-entry in the perspective menu
       if (perspectiveExcludeList.size() > 0)
       {
-        for (unsigned int i=0; i<perspectiveExcludeList.size(); i++)
+        for (int i=0; i<perspectiveExcludeList.size(); i++)
         {
           if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
           {
@@ -747,12 +743,12 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
 
       QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
         *perspIt, perspGroup);
-      mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
+      mapPerspIdToAction.insert((*perspIt)->GetId(), perspAction);
     }
  perspMenu->addActions(perspGroup->actions());
 
  // sort elements (converting vector to map...)
- std::vector<berry::IViewDescriptor::Pointer>::const_iterator iter;
+ QList<berry::IViewDescriptor::Pointer>::const_iterator iter;
  std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
 
  skip = false;
@@ -763,7 +759,7 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
    // should not appear as an menu-entry in the menu
    if (viewExcludeList.size() > 0)
    {
-     for (unsigned int i=0; i<viewExcludeList.size(); i++)
+     for (int i=0; i<viewExcludeList.size(); i++)
      {
        if (viewExcludeList.at(i) == (*iter)->GetId())
        {
@@ -886,16 +882,17 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 
  this->HookTitleUpdateListeners(configurer);
 
- menuPerspectiveListener = new PerspectiveListenerForMenu(this);
- configurer->GetWindow()->AddPerspectiveListener(menuPerspectiveListener);
+ menuPerspectiveListener.reset(new PerspectiveListenerForMenu(this));
+ configurer->GetWindow()->AddPerspectiveListener(menuPerspectiveListener.data());
 
  configurer->AddEditorAreaTransfer(QStringList("text/uri-list"));
- configurer->ConfigureEditorAreaDropListener(dropTargetListener);
+ configurer->ConfigureEditorAreaDropListener(dropTargetListener.data());
 
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
 {
+  berry::WorkbenchWindowAdvisor::PostWindowOpen();
   // Force Rendering Window Creation on startup.
   berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
 
@@ -1154,8 +1151,8 @@ void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
  berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
  // hook up the listeners to update the window title
- titlePartListener = new PartListenerForTitle(this);
- titlePerspectiveListener = new PerspectiveListenerForTitle(this);
+ titlePartListener.reset(new PartListenerForTitle(this));
+ //titlePerspectiveListener = new PerspectiveListenerForTitle(this);
  editorPropertyListener.reset(new berry::PropertyChangeIntAdapter<
   QmitkExtWorkbenchWindowAdvisor>(this,
   &QmitkExtWorkbenchWindowAdvisor::PropertyChange));
@@ -1174,8 +1171,8 @@ void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
  //      }
  //    });
 
- configurer->GetWindow()->AddPerspectiveListener(titlePerspectiveListener);
- configurer->GetWindow()->GetPartService()->AddPartListener(titlePartListener);
+ //configurer->GetWindow()->AddPerspectiveListener(titlePerspectiveListener);
+ configurer->GetWindow()->GetPartService()->AddPartListener(titlePartListener.data());
 }
 
 QString QmitkExtWorkbenchWindowAdvisor::ComputeTitle()

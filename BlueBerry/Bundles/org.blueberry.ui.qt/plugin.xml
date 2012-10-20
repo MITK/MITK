@@ -14,32 +14,58 @@
    <extension-point id="org.blueberry.ui.presentationFactories" name="Presentation Factories" schema="schema/presentationFactories.exsd"/>
    <extension-point id="org.blueberry.ui.services" name="Services" schema="schema/services.exsd"/>
 
-   <extension
-         point="org.eclipse.ui.services">
-      <serviceFactory
-            factoryClass="org.eclipse.ui.internal.WorkbenchSupportFactory">
-         <service
-               serviceClass="org.eclipse.ui.progress.IProgressService">
-         </service>
-         <service
-               serviceClass="org.eclipse.ui.progress.IWorkbenchSiteProgressService">
-         </service>
-         <service
-               serviceClass="org.eclipse.ui.IPartService">
-         </service>
-         <service
-               serviceClass="org.eclipse.ui.IPageService">
-         </service>
-         <service
-               serviceClass="org.eclipse.ui.ISelectionService">
-         </service>
+   <extension point="org.blueberry.ui.services">
+
+      <serviceFactory factoryClass="berry::WorkbenchSupportFactory">
+         <service serviceClass="org.blueberry.ui.IProgressService"/>
+         <service serviceClass="org.blueberry.ui.IWorkbenchSiteProgressService"/>
+         <service serviceClass="org.blueberry.ui.IPartService"/>
+         <service serviceClass="org.blueberry.ui.IPageService"/>
+         <service serviceClass="org.blueberry.ui.ISelectionService"/>
       </serviceFactory>
+
+      <serviceFactory factoryClass="berry::HandlerServiceFactory">
+         <service serviceClass="org.blueberry.ui.IHandlerService"/>
+      </serviceFactory>
+
+      <serviceFactory factoryClass="berry::EvaluationServiceFactory">
+         <service serviceClass="org.blueberry.ui.IEvaluationService"/>
+      </serviceFactory>
+<!--
+      <serviceFactory factoryClass="berry::ContextServiceFactory">
+         <service serviceClass="org.blueberry.ui.IContextService"/>
+      </serviceFactory>
+-->
+      <serviceFactory factoryClass="berry::CommandServiceFactory">
+         <service serviceClass="org.blueberry.ui.ICommandService"/>
+      </serviceFactory>
+
+      <serviceFactory factoryClass="berry::MenuServiceFactory">
+         <service serviceClass="org.blueberry.ui.IMenuService"/>
+      </serviceFactory>
+
+      <sourceProvider provider="berry::WorkbenchSourceProvider">
+         <variable name="selection" priorityLevel="workbench"/>
+         <variable name="activeShell" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindowShell" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow.isToolbarVisible" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow.isPerspectiveBarVisible" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow.isSatusLineVisible" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow.activePerspective" priorityLevel="workbench"/>
+         <variable name="activeEditor" priorityLevel="workbench"/>
+         <variable name="activeEditorId" priorityLevel="workbench"/>
+         <variable name="activePart" priorityLevel="workbench"/>
+         <variable name="activePartId" priorityLevel="workbench"/>
+         <variable name="activeSite" priorityLevel="workbench"/>
+         <variable name="activeEditorInput" priorityLevel="workbench"/>
+      </sourceProvider>
+
    </extension>
 
-   <extension
-     point="org.blueberry.ui.commands">
+   <extension point="org.blueberry.ui.commands">
      <command
-      name="Show View"
+        name="Show View"
         description="Shows a particular view"
         id="org.blueberry.ui.views.showView"
         defaultHandler="berry::ShowViewHandler">
@@ -54,8 +80,7 @@
     </command>
    </extension>
 
-   <extension
-         point="org.blueberry.ui.views">
+   <extension point="org.blueberry.ui.views">
       <category
             name="General"
             id="org.blueberry.ui"/>
@@ -69,8 +94,7 @@
             id="org.blueberry.ui.internal.introview"/>
    </extension>
 
-   <extension
-         point="org.blueberry.ui.editors">
+   <extension point="org.blueberry.ui.editors">
       <editor
             class="berry::EditorIntroAdapterPart"
             name="Welcome"
@@ -122,8 +146,7 @@
          implementation="berry::QtMessageDialogTweaklet" />
    </extension>
 
-   <extension
-         point="org.blueberry.ui.presentationFactories">
+   <extension point="org.blueberry.ui.presentationFactories">
       <factory
             name="Default"
             class="berry::QtWorkbenchPresentationFactory"

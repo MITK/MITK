@@ -41,15 +41,15 @@ struct ISourceProviderListener;
  * instead, as this provides some common support for listeners.
  * </p>
  *
- * @since 3.1
- * @see org.blueberry.ui.handlers.IHandlerService
- * @see org.blueberry.ui.ISources
+ * @see IHandlerService
+ * @see ISources
  */
-struct ISourceProvider : public virtual Object {
+struct ISourceProvider : public virtual Object
+{
 
-  berryInterfaceMacro(ISourceProvider, berry)
+  berryObjectMacro(berry::ISourceProvider)
 
-  typedef QHash<QString, Object::Pointer> StateMapType;
+  typedef QHash<QString, Object::ConstPointer> StateMapType;
 
   ~ISourceProvider();
 
@@ -77,7 +77,7 @@ struct ISourceProvider : public virtual Object {
    *         values (<code>Object</code>). This may be empty, and may be
    *         <code>null</code>.
    */
-  virtual StateMapType GetCurrentState() = 0;
+  virtual StateMapType GetCurrentState() const = 0;
 
   /**
    * Returns the names of those sources provided by this class. This is used
@@ -87,7 +87,7 @@ struct ISourceProvider : public virtual Object {
    * @return An array of source names. This value should never be
    *         <code>null</code> or empty.
    */
-  virtual QStringList GetProvidedSourceNames() = 0;
+  virtual QList<QString> GetProvidedSourceNames() const = 0;
 
   /**
    * Removes a listener from this source provider. This listener will be
@@ -101,6 +101,6 @@ struct ISourceProvider : public virtual Object {
 
 }
 
-Q_DECLARE_INTERFACE(berry::ISourceProvider, "org.blueberry.ISourceProvider")
+Q_DECLARE_INTERFACE(berry::ISourceProvider, "org.blueberry.ui.ISourceProvider")
 
 #endif /* BERRYISOURCEPROVIDER_H_ */

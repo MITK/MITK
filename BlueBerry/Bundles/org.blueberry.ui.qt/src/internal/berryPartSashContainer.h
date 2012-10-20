@@ -577,8 +577,8 @@ public:
    * @see org.blueberry.ui.internal.dnd.IDragOverListener#drag(org.blueberry.swt.widgets.Control, java.lang.Object, org.blueberry.swt.graphics.Point, org.blueberry.swt.graphics.Rectangle)
    */
 public:
-  IDropTarget::Pointer Drag(void* currentControl, Object::Pointer draggedObject,
-             const Point& position, const Rectangle& dragRectangle);
+  IDropTarget::Pointer Drag(void* currentControl, const Object::Pointer& draggedObject,
+                            const Point& position, const Rectangle& dragRectangle);
 
   /**
    * @param sourcePart

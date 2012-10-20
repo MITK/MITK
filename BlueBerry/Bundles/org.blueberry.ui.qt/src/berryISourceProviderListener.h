@@ -36,26 +36,26 @@ namespace berry {
  * <code>ISourceProvider</code> instances that are registered with them.
  * </p>
  *
- * @since 3.1
- * @see org.blueberry.ui.ISources
- * @see org.blueberry.ui.ISourceProvider
+ * @see ISources
+ * @see ISourceProvider
  */
-struct BERRY_UI_QT ISourceProviderListener : public virtual Object {
-
-  berryInterfaceMacro(ISourceProviderListener, berry)
+struct BERRY_UI_QT ISourceProviderListener
+{
 
   struct Events {
-    Message2<int, const QHash<QString, Object::Pointer>& > multipleSourcesChanged;
-    Message3<int, const QString&, Object::Pointer> singleSourceChanged;
+    Message2<int, const QHash<QString, Object::ConstPointer>& > multipleSourcesChanged;
+    Message3<int, const QString&, Object::ConstPointer> singleSourceChanged;
 
     void AddListener(ISourceProviderListener* l);
     void RemoveListener(ISourceProviderListener* l);
 
   private:
 
-    typedef MessageDelegate2<ISourceProviderListener, int, const QHash<QString, Object::Pointer>& > Delegate2;
-    typedef MessageDelegate3<ISourceProviderListener, int, const QString&, Object::Pointer> Delegate3;
+    typedef MessageDelegate2<ISourceProviderListener, int, const QHash<QString, Object::ConstPointer>& > Delegate2;
+    typedef MessageDelegate3<ISourceProviderListener, int, const QString&, Object::ConstPointer> Delegate3;
   };
+
+  virtual ~ISourceProviderListener();
 
   /**
    * Handles a change to multiple sources. The source priority should be a bit
@@ -74,7 +74,7 @@ struct BERRY_UI_QT ISourceProviderListener : public virtual Object {
    * @see ISources
    */
   virtual void SourceChanged(int sourcePriority,
-                             const QHash<QString, Object::Pointer>& sourceValuesByName) = 0;
+                             const QHash<QString, Object::ConstPointer>& sourceValuesByName) = 0;
 
   /**
    * Handles a change to one source. The source priority should indicate the
@@ -92,7 +92,7 @@ struct BERRY_UI_QT ISourceProviderListener : public virtual Object {
    * @see ISources
    */
   virtual void SourceChanged(int sourcePriority,
-                             const QString& sourceName, Object::Pointer sourceValue) = 0;
+                             const QString& sourceName, Object::ConstPointer sourceValue) = 0;
 };
 
 }

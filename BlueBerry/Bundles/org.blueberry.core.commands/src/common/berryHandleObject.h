@@ -125,7 +125,7 @@ public:
      */
    bool operator==(const Object* object) const;
 
-   virtual QString GetId() const;
+   QString GetId() const;
 
     /**
      * Computes the hash code for this object based on the id.
@@ -153,7 +153,7 @@ public:
      * @return <code>true</code> if this object is defined; <code>false</code>
      *         otherwise.
      */
-    virtual bool IsDefined() const;
+    bool IsDefined() const;
 
     /**
      * Makes this object becomes undefined. This method should make any defined

@@ -119,11 +119,11 @@ private:
 
   static QString QT_SETTINGS_FILENAME;
 
-  berry::IPartListener::Pointer titlePartListener;
-  berry::IPerspectiveListener::Pointer titlePerspectiveListener;
-  berry::IPerspectiveListener::Pointer menuPerspectiveListener;
-  berry::IPartListener::Pointer imageNavigatorPartListener;
-  berry::IPartListener::Pointer viewNavigatorPartListener;
+  QScopedPointer<berry::IPartListener> titlePartListener;
+  QScopedPointer<berry::IPerspectiveListener> titlePerspectiveListener;
+  QScopedPointer<berry::IPerspectiveListener> menuPerspectiveListener;
+  QScopedPointer<berry::IPartListener> imageNavigatorPartListener;
+  QScopedPointer<berry::IPartListener> viewNavigatorPartListener;
   QScopedPointer<berry::IPropertyChangeListener> editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
@@ -152,7 +152,7 @@ private:
   QString windowIcon;
 
   // enables DnD on the editor area
-  berry::SmartPointer<berry::IDropTargetListener> dropTargetListener;
+  QScopedPointer<berry::IDropTargetListener> dropTargetListener;
 
   // stringlist for excluding perspectives from the perspective menu entry (e.g. Welcome Perspective)
   QList<QString> perspectiveExcludeList;

@@ -61,7 +61,7 @@ WithExpression::operator==(const Object* object) const
 EvaluationResult::ConstPointer
 WithExpression::Evaluate(IEvaluationContext* context) const
 {
-  Object::Pointer variable(context->GetVariable(fVariable));
+  Object::ConstPointer variable(context->GetVariable(fVariable));
   if (variable.IsNull())
   {
     IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_NOT_DEFINED,
@@ -78,7 +78,7 @@ WithExpression::Evaluate(IEvaluationContext* context) const
 }
 
 void
-WithExpression::CollectExpressionInfo(ExpressionInfo* info)
+WithExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   ExpressionInfo* other = new ExpressionInfo();
   CompositeExpression::CollectExpressionInfo(other);
@@ -90,7 +90,7 @@ WithExpression::CollectExpressionInfo(ExpressionInfo* info)
 }
 
 uint
-WithExpression::ComputeHashCode()
+WithExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fExpressions)
   * HASH_FACTOR + qHash(fVariable);

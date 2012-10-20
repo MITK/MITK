@@ -32,8 +32,6 @@ struct IServiceLocator;
  * support. Subclasses need only call <code>fireSourceChanged</code> whenever
  * appropriate.
  * </p>
- *
- * @since 3.1
  */
 class AbstractSourceProvider : public ISourceProvider {
 
@@ -42,8 +40,6 @@ protected:
   /**
    * Whether source providers should print out debugging information to the
    * console when events arrive.
-   *
-   * @since 3.2
    */
   static bool DEBUG; // = Policy.DEBUG_SOURCES;
 
@@ -59,7 +55,7 @@ protected:
    *            The new value for the source; may be <code>null</code>.
    */
   void FireSourceChanged(int sourcePriority,
-                         const QString& sourceName, Object::Pointer sourceValue);
+                         const QString& sourceName, Object::ConstPointer sourceValue);
 
   /**
    * Notifies all listeners that multiple sources have changed.
@@ -73,7 +69,7 @@ protected:
    *            <code>null</code>, but the values may be <code>null</code>.
    */
   void FireSourceChanged(int sourcePriority,
-                         const QHash<QString, Object::Pointer>& sourceValuesByName);
+                         const QHash<QString, Object::ConstPointer>& sourceValuesByName);
 
   /**
    * Logs a debugging message in an appropriate manner. If the message is
@@ -83,7 +79,6 @@ protected:
    * @param message
    *            The debugging message to log; if <code>null</code>, then
    *            nothing is logged.
-   * @since 3.2
    */
   void LogDebuggingInfo(const QString& message);
 
@@ -95,6 +90,8 @@ private:
 
 
 public:
+
+  berryObjectMacro(berry::AbstractSourceProvider)
 
   void AddSourceProviderListener(ISourceProviderListener* listener);
 
@@ -108,9 +105,8 @@ public:
    * @param locator
    *            The global service locator. It can be used to retrieve
    *            services like the IContextService
-   * @since 3.4
    */
-  void Initialize(SmartPointer<const IServiceLocator> locator);
+  virtual void Initialize(IServiceLocator* locator);
 };
 
 }

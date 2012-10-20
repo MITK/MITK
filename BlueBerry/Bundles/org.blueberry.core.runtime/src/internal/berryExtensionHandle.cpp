@@ -91,7 +91,7 @@ bool ExtensionHandle::IsValid() const
   {
     GetExtension();
   }
-  catch (const InvalidRegistryObjectException& e)
+  catch (const InvalidRegistryObjectException& /*e*/)
   {
     return false;
   }

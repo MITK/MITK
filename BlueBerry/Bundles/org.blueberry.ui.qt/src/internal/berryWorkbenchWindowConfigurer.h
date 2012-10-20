@@ -167,7 +167,7 @@ public:
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  void ConfigureEditorAreaDropListener(const SmartPointer<IDropTargetListener> &listener);
+  void ConfigureEditorAreaDropListener(IDropTargetListener* listener);
 
   /**
    * Returns the array of <code>Transfer</code> added by the application
@@ -177,7 +177,7 @@ public:
   /**
    * Returns the drop listener provided by the application.
    */
-  SmartPointer<IDropTargetListener> GetDropTargetListener() const;
+  IDropTargetListener* GetDropTargetListener() const;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
@@ -385,7 +385,7 @@ private:
    * The <code>DropTargetListener</code> implementation for handling a
    * drop into the editor area.
    */
-  SmartPointer<IDropTargetListener> dropTargetListener;
+  IDropTargetListener* dropTargetListener;
 
   /**
    * The initial size to use for the shell.

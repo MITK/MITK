@@ -29,7 +29,7 @@ namespace berry {
  * An <code>IMenuManager</code> is also an <code>IContributionItem</code>,
  * allowing sub-menus to be nested in parent menus.
  * <p>
- * This interface is internal to the framework = 0; it should not be implemented outside
+ * This interface is internal to the framework; it should not be implemented outside
  * the framework.
  * </p>
  * <p>
@@ -41,7 +41,7 @@ namespace berry {
 struct IMenuManager : public virtual IContributionManager, public IContributionItem
 {
 
-  berryInterfaceMacro(IMenuManager, berry)
+  berryObjectMacro(berry::IMenuManager)
 
   /**
    * Adds a menu listener to this menu.

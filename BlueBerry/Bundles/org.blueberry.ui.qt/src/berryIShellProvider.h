@@ -33,9 +33,10 @@ namespace berry {
  *
  * @since 3.1
  */
-struct BERRY_UI_QT IShellProvider : public virtual Object {
+struct BERRY_UI_QT IShellProvider : public virtual Object
+{
 
-  berryInterfaceMacro(IShellProvider, berry);
+  berryObjectMacro(berry::IShellProvider)
 
   ~IShellProvider();
 
@@ -45,7 +46,7 @@ struct BERRY_UI_QT IShellProvider : public virtual Object {
      *
      * @return the current shell or null if none
      */
-   virtual Shell::Pointer GetShell() = 0;
+   virtual Shell::Pointer GetShell() const = 0;
 };
 
 }

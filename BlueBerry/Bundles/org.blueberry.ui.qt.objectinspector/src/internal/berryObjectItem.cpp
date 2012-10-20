@@ -22,11 +22,10 @@ namespace berry
 ObjectItem::ObjectItem()
 {
   type = CLASS;
-  className = 0;
   parent = 0;
 }
 
-ObjectItem::ObjectItem(const char* className) :
+ObjectItem::ObjectItem(const QString& className) :
   className(className), type(CLASS), parent(0)
 {
 }
@@ -93,8 +92,7 @@ bool ObjectItem::operator==(const ObjectItem& item) const
   {
   case CLASS:
   {
-    std::string str(className);
-    return str == item.className;
+    return className == item.className;
   }
   case INSTANCE:
     return obj == item.obj;

@@ -40,7 +40,7 @@ namespace berry
 struct BERRY_UI_QT IQtPreferencePage : public IPreferencePage
 {
 
-  berryInterfaceMacro(IQtPreferencePage, berry);
+  berryObjectMacro(berry::IQtPreferencePage);
 
   virtual void CreateQtControl(QWidget* parent) = 0;
   virtual QWidget* GetQtControl() const = 0;

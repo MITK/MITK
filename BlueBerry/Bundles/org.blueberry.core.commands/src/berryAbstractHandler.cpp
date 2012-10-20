@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryAbstractHandler.h"
 
+#include "berryHandlerEvent.h"
+
 namespace berry
 {
 
@@ -25,14 +27,43 @@ AbstractHandler::AbstractHandler() :
 
 }
 
-bool AbstractHandler::IsEnabled()
+void AbstractHandler::AddHandlerListener(IHandlerListener *handlerListener)
+{
+  handlerListeners.AddListener(handlerListener);
+}
+
+void AbstractHandler::Dispose()
+{
+  // Do nothing.
+}
+
+bool AbstractHandler::IsEnabled() const
 {
   return baseEnabled;
 }
 
-bool AbstractHandler::IsHandled()
+void AbstractHandler::SetEnabled(const Object::Pointer& /*evaluationContext*/)
+{
+}
+
+bool AbstractHandler::IsHandled() const
 {
   return true;
+}
+
+void AbstractHandler::RemoveHandlerListener(IHandlerListener *handlerListener)
+{
+  handlerListeners.RemoveListener(handlerListener);
+}
+
+void AbstractHandler::FireHandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent)
+{
+  if (handlerEvent.IsNull())
+  {
+    throw ctkInvalidArgumentException("Cannot fire a null handler event");
+  }
+
+  handlerListeners.handlerChanged(handlerEvent);
 }
 
 void AbstractHandler::SetBaseEnabled(bool state)
@@ -42,7 +73,13 @@ void AbstractHandler::SetBaseEnabled(bool state)
     return;
   }
   baseEnabled = state;
-  //fireHandlerChanged(new HandlerEvent(this, true, false));
+  HandlerEvent::Pointer event(new HandlerEvent(IHandler::Pointer(this), true, false));
+  FireHandlerChanged(event);
+}
+
+bool AbstractHandler::HasListeners() const
+{
+  return handlerListeners.handlerChanged.HasListeners();
 }
 
 }

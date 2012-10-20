@@ -37,7 +37,7 @@ struct ISourceProvider;
  */
 struct IServiceWithSources : public IDisposable {
 
-  berryInterfaceMacro(IServiceWithSources, berry);
+  berryObjectMacro(berry::IServiceWithSources)
 
   ~IServiceWithSources();
 
@@ -50,7 +50,7 @@ struct IServiceWithSources : public IDisposable {
    * @param provider
    *            The provider to add; must not be <code>null</code>.
    */
-  virtual void AddSourceProvider(SmartPointer<ISourceProvider> provider) = 0;
+  virtual void AddSourceProvider(const SmartPointer<ISourceProvider>& provider) = 0;
 
   /**
    * Removes a source provider from this service. Most of the time, this
@@ -60,7 +60,7 @@ struct IServiceWithSources : public IDisposable {
    * @param provider
    *            The provider to remove; must not be <code>null</code>.
    */
-  virtual void RemoveSourceProvider(SmartPointer<ISourceProvider> provider) = 0;
+  virtual void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider) = 0;
 };
 
 }

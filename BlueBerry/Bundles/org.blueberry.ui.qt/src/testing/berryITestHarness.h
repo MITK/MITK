@@ -32,9 +32,10 @@ namespace berry {
  *
  * @since 3.0
  */
-struct BERRY_UI_QT ITestHarness : public virtual Object {
+struct BERRY_UI_QT ITestHarness : public virtual Object
+{
 
-  berryInterfaceMacro(ITestHarness, berry);
+  berryObjectMacro(berry::ITestHarness)
 
     /**
      * Runs the tests.
@@ -45,6 +46,6 @@ struct BERRY_UI_QT ITestHarness : public virtual Object {
 
 }
 
-Q_DECLARE_INTERFACE(berry::ITestHarness, "org.blueberry.ITestHarness")
+Q_DECLARE_INTERFACE(berry::ITestHarness, "org.blueberry.ui.ITestHarness")
 
 #endif /* BERRYITESTHARNESS_H_ */

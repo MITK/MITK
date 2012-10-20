@@ -39,5 +39,9 @@ IParameterTypeListener::Events
   parameterTypeChanged -= Delegate(l, &IParameterTypeListener::ParameterTypeChanged);
 }
 
+IParameterTypeListener::~IParameterTypeListener()
+{
+}
+
 }
 

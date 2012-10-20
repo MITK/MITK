@@ -69,7 +69,7 @@ AbstractTabItem* AbstractTabFolder::GetItem(const QPoint& toFind)
 {
   QList<AbstractTabItem*> items = this->GetItems();
 
-  for (unsigned int i = 0; i < items.size(); i++)
+  for (int i = 0; i < items.size(); i++)
   {
     AbstractTabItem* item = items[i];
 
@@ -86,7 +86,7 @@ AbstractTabItem* AbstractTabFolder::FindItem(Object::Pointer dataToFind)
 {
   QList<AbstractTabItem*> items = this->GetItems();
 
-  for (unsigned int i = 0; i < items.size(); i++)
+  for (int i = 0; i < items.size(); i++)
   {
     AbstractTabItem* item = items[i];
 
@@ -103,7 +103,7 @@ int AbstractTabFolder::IndexOf(AbstractTabItem* item)
 {
   QList<AbstractTabItem*> items = this->GetItems();
 
-  for (unsigned int idx = 0; idx < items.size(); ++idx)
+  for (int idx = 0; idx < items.size(); ++idx)
   {
     AbstractTabItem* next = items[idx];
 

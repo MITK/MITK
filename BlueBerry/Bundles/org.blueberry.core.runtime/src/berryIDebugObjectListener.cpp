@@ -42,4 +42,8 @@ void IDebugObjectListener::Events::RemoveListener(IDebugObjectListener* l)
   spDestroyedEvent -= SPDelegate(l, &IDebugObjectListener::SmartPointerDestroyed);
 }
 
+IDebugObjectListener::~IDebugObjectListener()
+{
+}
+
 }

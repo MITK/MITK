@@ -60,9 +60,9 @@ JobManager::JobManager() :
 // DEBUG VARIABLES
 
 
-const std::string& JobManager::PI_JOBS()
+const QString& JobManager::PI_JOBS()
 {
-  static std::string id("org.blueberry.core.jobs");
+  static const QString id("org.blueberry.core.jobs");
   return id;
 }
 
@@ -278,35 +278,40 @@ bool JobManager::IsSuspended()
 //    return lockManager.newLock();
 //  }
 
-void JobManager::RemoveJobChangeListener(IJobChangeListener::Pointer listener)
+void JobManager::RemoveJobChangeListener(IJobChangeListener* listener)
 {
   m_JobListeners.Remove(listener);
 }
 
-void JobManager::ReportBlocked(IProgressMonitor::Pointer sptr_monitor, InternalJob::Pointer sptr_blockingJob) const {
-
+void JobManager::ReportBlocked(IProgressMonitor::Pointer sptr_monitor, InternalJob::Pointer sptr_blockingJob) const
+{
   if ( sptr_monitor.Cast<IProgressMonitorWithBlocking>() == 0 )
       return ;
 
   if (sptr_blockingJob == 0 || sptr_blockingJob->IsSystem())
-    {
-   Status::Pointer sptr_reason( new Status(IStatus::INFO_TYPE, JobManager::PI_JOBS(), 1, "the user operation is waiting for  background work to complete" ) );
-
-    }
+  {
+    Status::Pointer sptr_reason(
+          new Status(IStatus::INFO_TYPE, JobManager::PI_JOBS(), 1,
+                     "the user operation is waiting for  background work to complete",
+                     BERRY_STATUS_LOC));
+  }
   else
-    {
-   std::stringstream msg ;
-   msg << "the user operation is waiting for : " << sptr_blockingJob->GetName() << " to complete. " ;
-   JobStatus::Pointer sptr_reason(new JobStatus(IStatus::INFO_TYPE, sptr_blockingJob.Cast<Job>(), msg.str() ));
-    }
-    //  ((IProgressmonitorWithBlocking) sptr_monitor)->SetBlocked(sptr_reason);
+  {
+    QString msg = "the user operation is waiting for : " + sptr_blockingJob->GetName() +
+        " to complete. ";
+    JobStatus::Pointer sptr_reason(
+          new JobStatus(IStatus::INFO_TYPE, sptr_blockingJob.Cast<Job>(), msg,
+                        BERRY_STATUS_LOC));
   }
+  //  ((IProgressmonitorWithBlocking) sptr_monitor)->SetBlocked(sptr_reason);
+}
 
 
-void JobManager::ReportUnblocked(IProgressMonitor::Pointer sptr_monitor) const {
+void JobManager::ReportUnblocked(IProgressMonitor::Pointer sptr_monitor) const
+{
   if ( IProgressMonitorWithBlocking::Pointer sptr_monitorWithBlocking = sptr_monitor.Cast<IProgressMonitorWithBlocking>() )
-     sptr_monitorWithBlocking->ClearBlocked();
-  }
+    sptr_monitorWithBlocking->ClearBlocked();
+}
 
 
 void JobManager::Resume()
@@ -390,7 +395,7 @@ void JobManager::Suspend()
 //    }
 //  }
 
-void JobManager::AddJobChangeListener(IJobChangeListener::Pointer listener)
+void JobManager::AddJobChangeListener(IJobChangeListener* listener)
 {
   m_JobListeners.Add(listener);
 }
@@ -457,7 +462,7 @@ void JobManager::ChangeState(InternalJob::Pointer sptr_job, int newState)
 
     case Job::RUNNING:
     case InternalJob::ABOUT_TO_RUN:
-      m_running.erase(sptr_job);
+      m_running.remove(sptr_job);
       //add any blocked jobs back to the wait queue
       InternalJob::Pointer sptr_blocked(sptr_job->Previous());
       sptr_job->Remove();
@@ -791,7 +796,7 @@ bool JobManager::Cancel(InternalJob::Pointer sptr_job)
     return false;
   }
   //only notify listeners if the job was waiting or sleeping
-  m_JobListeners.Done(sptr_job.Cast<Job>(), Status::CANCEL_STATUS, false);
+  m_JobListeners.Done(sptr_job.Cast<Job>(), Status::CANCEL_STATUS(BERRY_STATUS_LOC), false);
   return true;
 }
 
@@ -807,7 +812,7 @@ IProgressMonitor::Pointer JobManager::CreateMonitor(
     NullProgressMonitor::Pointer sptr_defaultMonitor(new NullProgressMonitor());
       return sptr_defaultMonitor;
    }
-    return sptr_monitor ;
+    return sptr_monitor;
 }
 
 
@@ -885,7 +890,7 @@ InternalJob::Pointer JobManager::FindBlockingJob(InternalJob::Pointer waitingJob
     }
     //check the running jobs
     bool hasBlockedJobs = false;
-    Poco::HashSet<InternalJob::Pointer, Object::Hash>::Iterator it;
+    QSet<InternalJob::Pointer>::Iterator it;
     for ( it = m_running.begin(); it != m_running.end(); it ++ )
     {
       InternalJob::Pointer sptr_job = *it ++;
@@ -901,7 +906,7 @@ InternalJob::Pointer JobManager::FindBlockingJob(InternalJob::Pointer waitingJob
       return (dummy);
     }
     //check all jobs blocked by running jobs
-    Poco::HashSet<InternalJob::Pointer, Object::Hash>::Iterator it_blocked;
+    QSet<InternalJob::Pointer>::Iterator it_blocked;
     for( it_blocked = m_running.begin(); it_blocked != m_running.end(); it_blocked ++ )
     {
       InternalJob::Pointer sptr_job = *it_blocked ++;
@@ -1155,7 +1160,7 @@ Job::Pointer JobManager::StartJob()
     if (endJob)
     {
       //job has been vetoed or canceled, so mark it as done
-    EndJob(job,Status::CANCEL_STATUS, true);
+      EndJob(job,Status::CANCEL_STATUS(BERRY_STATUS_LOC), true);
       continue;
     }
   }

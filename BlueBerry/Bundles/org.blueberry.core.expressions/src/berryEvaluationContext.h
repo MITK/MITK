@@ -42,9 +42,9 @@ class BERRY_EXPRESSIONS EvaluationContext : public IEvaluationContext
 {
 
 private:
-  IEvaluationContext* fParent;
-  Object::Pointer fDefaultVariable;
-  QHash<QString, Object::Pointer> fVariables;
+  IEvaluationContext* const fParent;
+  Object::ConstPointer fDefaultVariable;
+  QHash<QString, Object::ConstPointer> fVariables;
   std::vector<IVariableResolver*> fVariableResolvers;
   int fAllowPluginActivation;
 
@@ -57,7 +57,7 @@ public:
    * @param parent the parent context. Can be <code>null</code>.
    * @param defaultVariable the default variable
    */
-  EvaluationContext(IEvaluationContext* parent, const Object::Pointer& defaultVariable);
+  EvaluationContext(IEvaluationContext* parent, const Object::ConstPointer& defaultVariable);
 
   /**
    * Create a new evaluation context with the given parent and default
@@ -70,7 +70,7 @@ public:
    *
    * @see #resolveVariable(String, Object[])
    */
-  EvaluationContext(IEvaluationContext* parent, const Object::Pointer& defaultVariable,
+  EvaluationContext(IEvaluationContext* parent, const Object::ConstPointer& defaultVariable,
                     const std::vector<IVariableResolver*>& resolvers);
 
 
@@ -82,12 +82,12 @@ public:
   /**
    * {@inheritDoc}
    */
-  IEvaluationContext* GetRoot();
+  IEvaluationContext* GetRoot() const;
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer GetDefaultVariable() const;
+  Object::ConstPointer GetDefaultVariable() const;
 
   /**
    * {@inheritDoc}
@@ -102,22 +102,22 @@ public:
   /**
    * {@inheritDoc}
    */
-  void AddVariable(const QString& name, const Object::Pointer& value);
+  void AddVariable(const QString& name, const Object::ConstPointer& value);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer RemoveVariable(const QString& name);
+  Object::ConstPointer RemoveVariable(const QString& name);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer GetVariable(const QString &name) const;
+  Object::ConstPointer GetVariable(const QString &name) const;
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args);
+  Object::ConstPointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) const;
 };
 
 }  // namespace berry

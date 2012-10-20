@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYICOMMANDCATEGORYLISTENER_H_
 #define BERRYICOMMANDCATEGORYLISTENER_H_
 
-#include <berryObject.h>
-#include <berryMacros.h>
 #include <berryMessage.h>
 
 namespace berry {
+
+template<class T> class SmartPointer;
 
 class CommandCategoryEvent;
 
@@ -33,17 +33,15 @@ class CommandCategoryEvent;
  * This interface may be implemented by clients.
  * </p>
  *
- * @since 3.1
  * @see CommandCategory#AddCategoryListener(ICommandCategoryListener)
  * @see CommandCategory#RemoveCategoryListener(ICommandCategoryListener)
  */
-struct ICommandCategoryListener : public virtual Object {
-
-  berryInterfaceMacro(ICommandCategoryListener, berry);
+struct ICommandCategoryListener
+{
 
   struct Events {
 
-    typedef Message1<const SmartPointer<const CommandCategoryEvent> > Event;
+    typedef Message1<const SmartPointer<const CommandCategoryEvent>& > Event;
 
     Event categoryChanged;
 
@@ -51,8 +49,10 @@ struct ICommandCategoryListener : public virtual Object {
     void RemoveListener(ICommandCategoryListener* listener);
 
 
-    typedef MessageDelegate1<ICommandCategoryListener, const SmartPointer<const CommandCategoryEvent> > Delegate;
+    typedef MessageDelegate1<ICommandCategoryListener, const SmartPointer<const CommandCategoryEvent>& > Delegate;
   };
+
+  virtual ~ICommandCategoryListener();
 
   /**
    * Notifies that one or more properties of an instance of
@@ -62,7 +62,7 @@ struct ICommandCategoryListener : public virtual Object {
    * @param categoryEvent
    *            the category event. Guaranteed not to be <code>null</code>.
    */
-  virtual void CategoryChanged(const SmartPointer<const CommandCategoryEvent> categoryEvent) = 0;
+  virtual void CategoryChanged(const SmartPointer<const CommandCategoryEvent>& categoryEvent) = 0;
 };
 
 }

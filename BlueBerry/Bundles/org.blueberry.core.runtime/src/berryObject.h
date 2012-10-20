@@ -49,17 +49,8 @@ public:
   /** Standard class typedefs. */
   typedef Indent  Self;
 
-  /** Method for creation through the object factory. */
-  //static Self* New();
-
-  /** Destroy this instance. */
-  //void Delete() {delete this;}
-
   /** Construct the object with an initial Indentation level. */
   Indent(int ind = 0) { m_Indent=ind; }
-
-  /** Return the name of the class. */
-  //static const char *GetClassName() {return "Indent";}
 
   /**
    * Determine the next Indentation level. Keep Indenting by two until the
@@ -68,7 +59,7 @@ public:
   Indent GetNextIndent();
 
   /** Print out the Indentation. Basically output a bunch of spaces.  */
-  friend QDebug operator<<(QDebug os, const Indent& o);
+  friend org_blueberry_core_runtime_EXPORT QDebug operator<<(QDebug os, const Indent& o);
 
 private:
 
@@ -87,42 +78,20 @@ private:
 class org_blueberry_core_runtime_EXPORT Object
 {
 
- /**
- *  The message macro is used to create a message object as well as add / remove functions
- *  (AddDestroyListener, RemoveDestroyListener)
- *  in order to register functions which will be called when the object is destroyed.
- *  More information about the NewMessageMacro can be found in @see berryMessage.h
- *
- */
- berryNewMessageMacro(Destroy)
+private:
+
+  mutable Message<> m_DestroyMessage;
 
 public:
 
-  berryObjectMacro(Object);
+  typedef Object Self;
+  typedef berry::SmartPointer<Self> Pointer;
+  typedef berry::SmartPointer<const Self>  ConstPointer;
+  typedef berry::WeakPointer<Self> WeakPtr;
+  typedef berry::WeakPointer<const Self> ConstWeakPtr;
 
-//  struct Hash {
-//    inline std::size_t operator()(const Self* value) const
-//    {
-//      return value->HashCode();
-//    }
-
-//    inline std::size_t operator()(Self::ConstPointer value) const
-//    {
-//      return value->HashCode();
-//    }
-
-//    inline std::size_t operator()(Self::WeakPtr value) const
-//    {
-//      try {
-//        const Self::ConstPointer sv(value.Lock());
-//        return sv->HashCode();
-//      }
-//      catch (BadWeakPointerException& /*e*/)
-//      {
-//        return 0;
-//      }
-//    }
-//  };
+  static const char* GetStaticClassName();
+  virtual QString GetClassName() const;
 
   /** Delete an BlueBerry object. This method should always be used to delete an
    * object when the new operator was used to create it. Using the C
@@ -137,6 +106,8 @@ public:
   void operator delete(void*);
   void operator delete[](void*, size_t);
 #endif
+
+  static QString DemangleName(const char* typeName);
 
   /**
    * Cause the object to print itself out. This is usually used to provide
@@ -179,6 +150,12 @@ public:
    * method, use it with care. */
   void SetReferenceCount(int);
 
+  inline void AddDestroyListener(const MessageAbstractDelegate<>& delegate) const
+  { m_DestroyMessage += delegate; }
+  inline void RemoveDestroyListener(const MessageAbstractDelegate<>& delegate) const
+  { m_DestroyMessage -= delegate; }
+
+
   /**
    * A generic comparison method. Override this method in subclasses and
    * cast to your derived class to provide a more detailed comparison.
@@ -195,7 +172,7 @@ public:
 
 protected:
 
-  friend class QScopedPointerObjectDeleter;
+  friend struct QScopedPointerObjectDeleter;
 
   Object();
   virtual ~Object();

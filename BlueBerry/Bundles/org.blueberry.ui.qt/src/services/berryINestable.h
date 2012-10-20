@@ -52,13 +52,11 @@ namespace berry {
  * <p>
  * This class should eventually move to <code>org.blueberry.ui.services</code>.
  * </p>
- *
- * @since 3.2
  */
 struct BERRY_UI_QT INestable : public virtual Object
 {
 
-  berryInterfaceMacro(INestable, berry);
+  berryObjectMacro(berry::INestable)
 
   ~INestable();
 

@@ -170,7 +170,7 @@ void EditorRegistry::AddExternalEditorsToEditorMap()
   // Add registered editors (may include external editors).
   QList<FileEditorMapping::Pointer> maps =
       typeEditorMappings.AllMappings();
-  for (unsigned int i = 0; i < maps.size(); ++i)
+  for (int i = 0; i < maps.size(); ++i)
   {
     FileEditorMapping::Pointer map = maps[i];
     QList<IEditorDescriptor::Pointer> descArray = map->GetEditors();
@@ -1006,7 +1006,7 @@ void EditorRegistry::SetFileEditorMappings(
     const QList<FileEditorMapping::Pointer>& newResourceTypes)
 {
   typeEditorMappings.Clear();
-  for (unsigned int i = 0; i < newResourceTypes.size(); i++)
+  for (int i = 0; i < newResourceTypes.size(); i++)
   {
     FileEditorMapping::Pointer mapping = newResourceTypes[i];
     typeEditorMappings.Put(this->MappingKeyFor(mapping), mapping);
@@ -1251,17 +1251,17 @@ QList<IEditorDescriptor::Pointer> MockMapping::GetDeletedEditors() const
   return QList<IEditorDescriptor::Pointer>();
 }
 
-QString MockMapping::GetExtension()
+QString MockMapping::GetExtension() const
 {
   return extension;
 }
 
-QString MockMapping::GetLabel()
+QString MockMapping::GetLabel() const
 {
   return filename + '.' + extension;
 }
 
-QString MockMapping::GetName()
+QString MockMapping::GetName() const
 {
   return filename;
 }

@@ -65,10 +65,9 @@ bool ViewRegistry::ViewCategoryProxy::operator==(const Object* o) const
   return false;
 }
 
-int ViewRegistry::ViewCategoryProxy::HashCode()
+uint ViewRegistry::ViewCategoryProxy::HashCode() const
 {
-  //return GetId().hashCode();
-  return 0;
+  return qHash(GetId());
 }
 
 QString ViewRegistry::EXTENSIONPOINT_UNIQUE_ID = "org.blueberry.ui.views";

@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryICommandService.h>
 
+#include "berryCommandPersistence.h"
+
 namespace berry {
 
 class CommandManager;
@@ -34,6 +36,8 @@ class CommandService : public ICommandService
 {
 
 private:
+
+  friend class CommandPersistence;
 
   /**
    * The preference key prefix for all handler state.
@@ -64,7 +68,7 @@ private:
   /**
    * The persistence class for this command service.
    */
-  //CommandPersistence commandPersistence;
+  CommandPersistence commandPersistence;
 
   /**
    * This is a map of commandIds to a list containing currently registered
@@ -135,7 +139,7 @@ public:
 
   void UnregisterElement(const SmartPointer<IElementReference>& elementReference);
 
-  //CommandPersistence* GetCommandPersistence() const;
+  const CommandPersistence* GetCommandPersistence() const;
 };
 
 }

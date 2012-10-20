@@ -407,6 +407,9 @@ private:
 
   QAction* FillMenu(QWidget* parent, QAction* before);
 
+  void DumpActionInfo(QMenuProxy* menu);
+  void DumpActionInfo(QWidget* widget, int level);
+
 protected:
 
   /**

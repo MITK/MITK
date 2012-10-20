@@ -60,7 +60,7 @@ struct IExtension;
 struct IExtensionPoint : public virtual Object
 {
 
-  berryInterfaceMacro(IExtensionPoint, berry)
+  berryObjectMacro(berry::IExtensionPoint)
 
   virtual ~IExtensionPoint();
 

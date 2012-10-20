@@ -80,14 +80,14 @@ QtObjectTableModel::QtObjectTableModel(QObject* parent) :
   for (QList<const Object*>::const_iterator i = objects.begin(); i
       != objects.end(); ++i)
   {
-    const char* name = (*i)->GetClassName();
+    QString name = (*i)->GetClassName();
     ObjectItem* classItem = 0;
     QListIterator<ObjectItem*> iter(indexData);
     bool classFound = false;
     while (iter.hasNext())
     {
       classItem = iter.next();
-      if (std::strcmp(classItem->className, name) == 0)
+      if (name == classItem->className)
       {
         classFound = true;
         break;
@@ -124,12 +124,12 @@ QtObjectTableModel::QtObjectTableModel(QObject* parent) :
   connect(timer, SIGNAL(timeout()), this, SLOT(UpdatePendingData()));
   timer->start(500);
 
-  DebugUtil::AddObjectListener(objectListener.GetPointer());
+  DebugUtil::AddObjectListener(objectListener.data());
 }
 
 QtObjectTableModel::~QtObjectTableModel()
 {
-  DebugUtil::RemoveObjectListener(objectListener.GetPointer());
+  DebugUtil::RemoveObjectListener(objectListener.data());
 
   qDeleteAll(pendingData);
   qDeleteAll(indexData);
@@ -535,8 +535,8 @@ ObjectItem* QtObjectTableModel::FindObjectItem(
       while (i.hasNext())
       {
         ObjectItem* next = i.next();
-        if (std::strcmp(next->className, item.className) == 0)
-        return next;
+        if (next->className == item.className)
+          return next;
         ++index;
       }
       return 0;

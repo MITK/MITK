@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIDRAGOVERLISTENER_H_
 #define BERRYIDRAGOVERLISTENER_H_
 
-#include <berryMacros.h>
 #include <berryMessage.h>
 
 #include "berryPoint.h"
@@ -32,21 +31,22 @@ namespace berry {
  * Implementers of this interface will receive notifications when objects are dragged over
  * a particular control.
  */
-struct IDragOverListener : public virtual Object {
-
-  berryObjectMacro(IDragOverListener);
+struct IDragOverListener
+{
 
   struct Events {
 
-    typedef Message4<void*, Object::Pointer, const Point&, const Rectangle&, IDropTarget::Pointer> DragEventType;
-    typedef MessageDelegate4<IDragOverListener, void*, Object::Pointer, const Point&, const Rectangle&, IDropTarget::Pointer> DragDelegate;
+    typedef Message4<void*, const Object::Pointer&, const Point&, const Rectangle&, IDropTarget::Pointer> DragEventType;
+    typedef MessageDelegate4<IDragOverListener, void*, const Object::Pointer&, const Point&, const Rectangle&, IDropTarget::Pointer> DragDelegate;
 
     DragEventType drag;
 
-    void AddListener(IDragOverListener::Pointer listener);
-    void RemoveListener(IDragOverListener::Pointer listener);
+    void AddListener(IDragOverListener* listener);
+    void RemoveListener(IDragOverListener* listener);
 
   };
+
+  virtual ~IDragOverListener();
 
   /**
    * Notifies the receiver that the given object has been dragged over
@@ -58,7 +58,7 @@ struct IDragOverListener : public virtual Object {
    * @param dragRectangle current drag rectangle (may be an empty rectangle if none)
    * @return a valid drop target or null if none
    */
-  virtual IDropTarget::Pointer Drag(void* currentControl, Object::Pointer draggedObject,
+  virtual IDropTarget::Pointer Drag(void* currentControl, const Object::Pointer& draggedObject,
           const Point& position, const Rectangle& dragRectangle) = 0;
 };
 

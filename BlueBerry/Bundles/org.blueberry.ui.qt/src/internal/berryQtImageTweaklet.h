@@ -30,7 +30,6 @@ class QtImageTweaklet : public QObject, public ImageTweaklet
 public:
 
   QtImageTweaklet();
-  QtImageTweaklet(const QtImageTweaklet& other);
 
   virtual SmartPointer<ImageDescriptor> CreateFromFile(const QString& filename, const QString& pluginid);
   virtual SmartPointer<ImageDescriptor> CreateFromImage(void* img);

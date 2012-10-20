@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-struct InputDeviceRegistry;
+class InputDeviceRegistry;
 
   /**
   * @brief The activator class for the org.mitk.core.ext plug-in.

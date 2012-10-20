@@ -170,7 +170,7 @@ QString EditorReference::GetFactoryId()
   return "";
 }
 
-QString EditorReference::ComputePartName()
+QString EditorReference::ComputePartName() const
 {
   return WorkbenchPartReference::ComputePartName();
 }

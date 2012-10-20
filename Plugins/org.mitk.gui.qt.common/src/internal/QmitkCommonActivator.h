@@ -59,7 +59,7 @@ private:
   static QmitkCommonActivator* m_Instance;
   static ctkPluginContext* m_Context;
 
-  QmitkViewCoordinator::Pointer m_ViewCoordinator;
+  QScopedPointer<QmitkViewCoordinator> m_ViewCoordinator;
   QScopedPointer<ctkServiceTracker<berry::IPreferencesService*> > m_PrefServiceTracker;
 
 };

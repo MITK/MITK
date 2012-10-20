@@ -182,7 +182,7 @@ bool ConfigurationElementHandle::IsValid() const
   {
     GetConfigurationElement();
   }
-  catch (const InvalidRegistryObjectException& e)
+  catch (const InvalidRegistryObjectException& /*e*/)
   {
     return false;
   }

@@ -58,7 +58,7 @@ bool ViewSashContainer::RestoreState(IMemento::Pointer memento)
   QHash<QString, LayoutPart::Pointer> mapIDtoPart;
 
   // Loop through the info elements.
-  for (std::size_t i = 0; i < children.size(); i++)
+  for (int i = 0; i < children.size(); i++)
   {
   // Get the info details.
   IMemento::Pointer childMem = children[i];
@@ -140,7 +140,7 @@ bool ViewSashContainer::SaveState(IMemento::Pointer memento)
 //          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsSavingPerspective, null);
 
   // Loop through the relationship array.
-  for (std::size_t i = 0; i < relationships.size(); ++i)
+  for (int i = 0; i < relationships.size(); ++i)
   {
     // Save the relationship info ..
     //    private LayoutPart part;

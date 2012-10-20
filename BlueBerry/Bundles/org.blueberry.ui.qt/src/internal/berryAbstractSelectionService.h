@@ -43,12 +43,12 @@ private:
     /**
      * The list of selection listeners (not per-part).
      */
-    QList<ISelectionListener::Pointer> fListeners;
+    QList<ISelectionListener*> fListeners;
 
     /**
      * The list of post selection listeners (not per-part).
      */
-    QList<ISelectionListener::Pointer> fPostListeners;
+    QList<ISelectionListener*> fPostListeners;
 
     /**
      * The currently active part.
@@ -70,7 +70,7 @@ private:
     {
       SelectionListener(AbstractSelectionService* tracker);
 
-      void SelectionChanged(SelectionChangedEvent::Pointer event);
+      void SelectionChanged(const SelectionChangedEvent::Pointer& event);
 
       AbstractSelectionService* m_SelectionService;
     };
@@ -82,7 +82,7 @@ private:
     {
       PostSelectionListener(AbstractSelectionService* tracker);
 
-      void SelectionChanged(SelectionChangedEvent::Pointer event);
+      void SelectionChanged(const SelectionChangedEvent::Pointer& event);
 
       AbstractSelectionService* m_SelectionService;
     };
@@ -92,12 +92,12 @@ private:
     /**
      * The JFace selection listener to hook on the active part's selection provider.
      */
-    ISelectionChangedListener::Pointer selListener;
+    QScopedPointer<ISelectionChangedListener> selListener;
 
     /**
      * The JFace post selection listener to hook on the active part's selection provider.
      */
-    ISelectionChangedListener::Pointer postSelListener;
+    QScopedPointer<ISelectionChangedListener> postSelListener;
 
 public:
 
@@ -106,47 +106,47 @@ public:
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void AddSelectionListener(ISelectionListener::Pointer l);
+    void AddSelectionListener(ISelectionListener* l);
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void AddSelectionListener(const QString& partId, ISelectionListener::Pointer listener);
+    void AddSelectionListener(const QString& partId, ISelectionListener* listener);
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void AddPostSelectionListener(ISelectionListener::Pointer l);
+    void AddPostSelectionListener(ISelectionListener* l);
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
     void AddPostSelectionListener(const QString& partId,
-            ISelectionListener::Pointer listener);
+            ISelectionListener* listener);
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void RemoveSelectionListener(ISelectionListener::Pointer l);
+    void RemoveSelectionListener(ISelectionListener* l);
 
     /*
      * (non-Javadoc)
      * Method declared on ISelectionListener.
      */
     void RemovePostSelectionListener(const QString& partId,
-            ISelectionListener::Pointer listener);
+            ISelectionListener* listener);
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void RemovePostSelectionListener(ISelectionListener::Pointer l);
+    void RemovePostSelectionListener(ISelectionListener* l);
 
     /*
      * (non-Javadoc)
      * Method declared on ISelectionListener.
      */
     void RemoveSelectionListener(const QString& partId,
-            ISelectionListener::Pointer listener);
+            ISelectionListener* listener);
 
 
 protected:
@@ -159,7 +159,8 @@ protected:
      * @param part the part or <code>null</code> if no active part
      * @param sel the selection or <code>null</code> if no active selection
      */
-    void FireSelection(IWorkbenchPart::Pointer part, ISelection::ConstPointer sel);
+    void FireSelection(const IWorkbenchPart::Pointer& part,
+                       const ISelection::ConstPointer& sel);
 
     /**
      * Fires a selection event to the given listeners.
@@ -167,8 +168,8 @@ protected:
      * @param part the part or <code>null</code> if no active part
      * @param sel the selection or <code>null</code> if no active selection
      */
-    void FirePostSelection(IWorkbenchPart::Pointer part,
-            ISelection::ConstPointer sel);
+    void FirePostSelection(const IWorkbenchPart::Pointer& part,
+                           const ISelection::ConstPointer& sel);
 
     /**
      * Returns the per-part selection tracker for the given part id.

@@ -46,12 +46,12 @@ private:
     /**
      * Part selection listener.
      */
-    INullSelectionListener::Pointer selListener;
+    QScopedPointer<INullSelectionListener> selListener;
 
     /**
      * Part post selection listener
      */
-    INullSelectionListener::Pointer postSelListener;
+    QScopedPointer<INullSelectionListener> postSelListener;
 
     /**
      * Sets the window this tracker is working in.

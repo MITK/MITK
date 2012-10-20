@@ -83,7 +83,8 @@ private:
 
     PropertyListenerProxy(PresentablePart* part);
 
-    void PropertyChange(PropertyChangeEvent::Pointer e);
+    using IPropertyChangeListener::PropertyChange;
+    void PropertyChange(const PropertyChangeEvent::Pointer& e);
 
   private:
     PresentablePart* part;
@@ -99,7 +100,7 @@ private:
 protected:
 
   void FirePropertyChange(int propId);
-  void FirePropertyChange(PropertyChangeEvent::Pointer event);
+  void FirePropertyChange(const PropertyChangeEvent::Pointer& event);
 
 public:
 

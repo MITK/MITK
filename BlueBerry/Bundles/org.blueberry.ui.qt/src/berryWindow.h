@@ -137,13 +137,13 @@ private:
   {
     WindowShellListener(Window* wnd);
 
-    void ShellClosed(ShellEvent::Pointer event);
+    void ShellClosed(const ShellEvent::Pointer& event);
 
   private:
     Window* window;
   };
 
-  IShellListener::Pointer windowShellListener;
+  QScopedPointer<IShellListener> windowShellListener;
 
   /**
    * Defines a default exception handler.
@@ -189,7 +189,7 @@ private:
    */
   struct DefaultModalParent: public IShellProvider
   {
-    Shell::Pointer GetShell();
+    Shell::Pointer GetShell() const;
   };
 
   friend struct DefaultModalParent;
@@ -454,7 +454,7 @@ protected:
    *
    * @return a shell listener
    */
-  virtual IShellListener::Pointer GetShellListener();
+  virtual IShellListener* GetShellListener();
 
   /**
    * Returns the shell style bits.
@@ -621,7 +621,7 @@ public:
    * @return this window's shell, or <code>null</code> if this window's
    *         shell has not been created yet
    */
-  Shell::Pointer GetShell();
+  Shell::Pointer GetShell() const;
 
   /**
    * Returns the window manager of this window.
@@ -727,5 +727,6 @@ public:
 };
 
 }
+
 
 #endif /* BERRYWINDOW_H_ */

@@ -118,8 +118,8 @@ public:
    * @throws NotHandledException
    *             If there is no handler.
    */
-  Object::Pointer ExecuteWithChecks(const Object::ConstPointer trigger,
-                                    const Object::ConstPointer applicationContext);
+  Object::Pointer ExecuteWithChecks(const Object::ConstPointer& trigger,
+                                    const Object::Pointer& applicationContext);
 
   /**
    * Returns the base command. It is possible for more than one parameterized

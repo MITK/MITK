@@ -48,7 +48,7 @@ namespace GuiTk
 struct BERRY_UI_QT IControlListener: public virtual Object
 {
 
-  berryInterfaceMacro(IControlListener, berry);
+  berryObjectMacro(berry::GuiTk::IControlListener)
 
   struct BERRY_UI_QT Events {
 
@@ -62,7 +62,7 @@ struct BERRY_UI_QT IControlListener: public virtual Object
      ALL       = 0xffffffff
     };
 
-    BERRY_DECLARE_FLAGS(Types, Type)
+    Q_DECLARE_FLAGS(Types, Type)
 
     typedef Message1<ControlEvent::Pointer> EventType;
 
@@ -235,6 +235,6 @@ private:
 
 }
 
-BERRY_DECLARE_OPERATORS_FOR_FLAGS(berry::GuiTk::IControlListener::Events::Types)
+Q_DECLARE_OPERATORS_FOR_FLAGS(berry::GuiTk::IControlListener::Events::Types)
 
 #endif /* BERRYGUITKICONTROLLISTENER_H_ */

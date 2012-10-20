@@ -36,6 +36,7 @@ namespace berry
  */
 class BERRY_UI_QT ShowViewHandler : public AbstractHandler
 {
+  Q_OBJECT
 
 public:
   berryObjectMacro(ShowViewHandler);
@@ -54,15 +55,14 @@ public:
    */
   ShowViewHandler();
 
-  Object::Pointer Execute(
-      const ExecutionEvent::Pointer event);
+  Object::Pointer Execute(const ExecutionEvent::ConstPointer& event);
 
 private:
 
   /**
    * Opens a view selection dialog, allowing the user to chose a view.
    */
-  void OpenOther(IWorkbenchWindow::Pointer window);
+  void OpenOther(IWorkbenchWindow::ConstPointer window);
 
   /**
    * Opens the view with the given identifier.
@@ -72,7 +72,7 @@ private:
    * @throws PartInitException
    *             If the part could not be initialized.
    */
-  void OpenView(const QString& viewId, IWorkbenchWindow::Pointer activeWorkbenchWindow);
+  void OpenView(const QString& viewId, IWorkbenchWindow::ConstPointer activeWorkbenchWindow);
 };
 
 }

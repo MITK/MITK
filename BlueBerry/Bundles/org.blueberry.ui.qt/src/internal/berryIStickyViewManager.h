@@ -29,9 +29,10 @@ namespace berry {
 
 class Perspective;
 
-struct BERRY_UI_QT IStickyViewManager : public Object {
+struct BERRY_UI_QT IStickyViewManager : public Object
+{
 
-  berryInterfaceMacro(IStickyViewManager, berry);
+  berryObjectMacro(berry::IStickyViewManager)
 
   ~IStickyViewManager();
 

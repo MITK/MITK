@@ -80,7 +80,7 @@ void CTKPluginUtils::CloseServices()
 //  }
 }
 
-bool CTKPluginUtils::GetBoolDebugOption(const QString& option, bool defaultValue) const
+bool CTKPluginUtils::GetBoolDebugOption(const QString& /*option*/, bool defaultValue) const
 {
 //  if (debugTracker == null) {
 //    RuntimeLog.log(new Status(IStatus.ERROR, RegistryMessages.OWNER_NAME, 0, RegistryMessages.bundle_not_activated, null));

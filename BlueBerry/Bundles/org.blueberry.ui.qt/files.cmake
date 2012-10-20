@@ -8,6 +8,7 @@ set(SRC_CPP_FILES
   berryGeometry.cpp
 
   berryIActionBars.h
+  berryIContextService.cpp
   berryIContributionRoot.h
   berryIDropTargetListener.cpp
   berryIEditorDescriptor.cpp
@@ -49,6 +50,8 @@ set(SRC_CPP_FILES
   berryISelectionService.cpp
   berryIShellListener.cpp
   berryIShellProvider.cpp
+  berryIShowInSource.h
+  berryIShowInTarget.h
   berryISizeProvider.cpp
   berryISourceProvider.cpp
   berryISourceProviderListener.cpp
@@ -92,6 +95,7 @@ set(SRC_CPP_FILES
   berrySelectionChangedEvent.cpp
   berryShell.cpp
   berryShellEvent.cpp
+  berryShowInContext.cpp
   berryUIException.cpp
   berryViewPart.cpp
   berryWindow.cpp
@@ -153,7 +157,10 @@ set(SRC_CPP_FILES
   handlers/berryHandlerUtil.cpp
   handlers/berryIHandlerActivation.cpp
   handlers/berryIHandlerService.cpp
+  handlers/berryRadioState.cpp
+  handlers/berryRegistryToggleState.cpp
   handlers/berryShowViewHandler.cpp
+  handlers/berryToggleState.cpp
 
   #intro
   intro/berryIIntroManager.cpp
@@ -185,7 +192,9 @@ set(SRC_CPP_FILES
   services/berryINestable.cpp
   services/berryIServiceFactory.cpp
   services/berryIServiceLocator.cpp
+  services/berryIServiceScopes.cpp
   services/berryIServiceWithSources.cpp
+  services/berryISourceProviderService.cpp
 
   #testing
   testing/berryTestableObject.cpp
@@ -233,10 +242,17 @@ set(INTERNAL_CPP_FILES
   berryAbstractMenuAdditionCacheEntry.cpp
   berryAbstractPartSelectionTracker.cpp
   berryAbstractSelectionService.cpp
+  berryActivePartExpression.cpp
   berryAlwaysEnabledExpression.cpp
+  berryAndExpression.cpp
   berryBundleUtility.cpp
   berryCommandContributionItemParameter.cpp
+  berryCommandParameter.cpp
+  berryCommandPersistence.cpp
   berryCommandService.cpp
+  berryCommandServiceFactory.cpp
+  berryCommandStateProxy.cpp
+  berryCompositeExpression.cpp
   berryContainerPlaceholder.cpp
   berryContributionRoot.cpp
   berryDetachedPlaceHolder.cpp
@@ -261,10 +277,17 @@ set(INTERNAL_CPP_FILES
   berryExpressionAuthority.cpp
   berryFileEditorMapping.cpp
   berryFolderLayout.cpp
+  berryHandlerActivation.cpp
+  berryHandlerAuthority.cpp
+  berryHandlerPersistence.cpp
+  berryHandlerProxy.cpp
+  berryHandlerService.cpp
+  berryHandlerServiceFactory.cpp
   berryIDragOverListener.cpp
   berryIDropTarget.cpp
   berryIEvaluationResultCache.cpp
   berryILayoutContainer.cpp
+  berryInternalMenuService.h
   berryIServiceLocatorCreator.cpp
   berryIStickyViewManager.cpp
   berryIWorkbenchLocationService.cpp
@@ -273,11 +296,14 @@ set(INTERNAL_CPP_FILES
   berryLayoutPartSash.cpp
   berryLayoutTree.cpp
   berryLayoutTreeNode.cpp
+  berryMenuServiceFactory.cpp
   berryMMMenuListener.cpp
+  berryNestableHandlerService.cpp
   berryNullEditorInput.cpp
   berryPageLayout.cpp
   berryPagePartSelectionTracker.cpp
   berryPageSelectionService.cpp
+  berryParameterValueConverterProxy.cpp
   berryPartList.cpp
   berryPartPane.cpp
   berryPartPlaceholder.cpp
@@ -286,6 +312,7 @@ set(INTERNAL_CPP_FILES
   berryPartSite.cpp
   berryPartStack.cpp
   berryPartTester.cpp
+  berryPersistentState.cpp
   berryPerspective.cpp
   berryPerspectiveDescriptor.cpp
   berryPerspectiveExtensionReader.cpp
@@ -323,17 +350,23 @@ set(INTERNAL_CPP_FILES
   berryQtWidgetsTweakletImpl.cpp
   berryQtWorkbenchPageTweaklet.cpp
   berryQtWorkbenchTweaklet.cpp
+  berryRegistryPersistence.cpp
   berryRegistryReader.cpp
   berrySaveablesList.cpp
   berryShowViewMenu.cpp
   berryServiceLocator.cpp
   berryServiceLocatorCreator.cpp
   berryShellPool.cpp
+  berrySlaveCommandService.cpp
+  berrySlaveHandlerService.cpp
+  berrySlaveMenuService.cpp
+  berrySourceProviderService.cpp
   berrySourcePriorityNameMapping.cpp
   berryStatusUtil.cpp
   berryStickyViewDescriptor.cpp
   berryStickyViewManager.cpp
   berryTweaklets.cpp
+  berryUtil.cpp
   berryViewDescriptor.cpp
   berryViewFactory.cpp
   berryViewLayout.cpp
@@ -349,15 +382,18 @@ set(INTERNAL_CPP_FILES
   berryWorkbench.cpp
   berryWorkbenchConfigurer.cpp
   berryWorkbenchConstants.cpp
+  berryWorkbenchLocationService.cpp
   berryWorkbenchMenuService.cpp
   berryWorkbenchPagePartList.cpp
   berryWorkbenchPartReference.cpp
   berryWorkbenchPlugin.cpp
   berryWorkbenchRegistryConstants.cpp
   berryWorkbenchServiceRegistry.cpp
+  berryWorkbenchSourceProvider.cpp
   berryWorkbenchTestable.cpp
   berryWorkbenchWindow.cpp
   berryWorkbenchWindowConfigurer.cpp
+  berryWorkbenchWindowExpression.cpp
   berryWWinActionBars.cpp
   berryWWinPartService.cpp
 
@@ -366,21 +402,21 @@ set(INTERNAL_CPP_FILES
 set(MOC_H_FILES
 
   src/berryEditorPart.h
+  src/berryQtSelectionProvider.h
   src/berryViewPart.h
   src/berryWorkbenchPart.h
+
+  src/actions/berryCommandContributionItem.h
+
   src/intro/berryIntroPart.h
 
-  src/berryQtSelectionProvider.h
+  src/handlers/berryShowViewHandler.h
 
+  src/internal/berryCommandServiceFactory.h
+  src/internal/berryHandlerServiceFactory.h
+  src/internal/berryMenuServiceFactory.h
   src/internal/berryMMMenuListener.h
-
-  src/internal/defaultpresentation/berryNativeTabFolder.h
-  src/internal/defaultpresentation/berryNativeTabItem.h
-  src/internal/defaultpresentation/berryQCTabBar.h
-  src/internal/defaultpresentation/berryQtWorkbenchPresentationFactory.h
-
-  src/internal/intro/berryEditorIntroAdapterPart.h
-
+  src/internal/berryWorkbenchSourceProvider.h
   src/internal/berryQtDisplay.h
   src/internal/berryQtDnDTweaklet.h
   src/internal/berryQtGlobalEventFilter.h
@@ -398,6 +434,13 @@ set(MOC_H_FILES
   src/internal/berryQtWidgetsTweakletImpl.h
   src/internal/berryQtWorkbenchTweaklet.h
   src/internal/berryQtWorkbenchPageTweaklet.h
+
+  src/internal/defaultpresentation/berryNativeTabFolder.h
+  src/internal/defaultpresentation/berryNativeTabItem.h
+  src/internal/defaultpresentation/berryQCTabBar.h
+  src/internal/defaultpresentation/berryQtWorkbenchPresentationFactory.h
+
+  src/internal/intro/berryEditorIntroAdapterPart.h
 )
 
 set(UI_FILES

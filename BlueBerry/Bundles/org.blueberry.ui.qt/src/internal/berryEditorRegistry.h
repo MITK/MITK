@@ -734,7 +734,7 @@ public:
   QList<IEditorDescriptor::Pointer> GetDeletedEditors() const;
 
 public:
-  QString GetExtension();
+  QString GetExtension() const;
 
   //  public: ImageDescriptor GetImageDescriptor() {
   //    IEditorDescriptor editor = getDefaultEditor();
@@ -747,10 +747,10 @@ public:
   //  }
 
 public:
-  QString GetLabel();
+  QString GetLabel() const;
 
 public:
-  QString GetName();
+  QString GetName() const;
 
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)

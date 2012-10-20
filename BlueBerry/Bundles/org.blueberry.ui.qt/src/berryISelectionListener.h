@@ -39,23 +39,23 @@ namespace berry
  * @see ISelectionService#AddSelectionListener(const QString&, ISelectionListener::Pointer)
  * @see INullSelectionListener
  */
-struct BERRY_UI_QT ISelectionListener: public virtual Object
+struct BERRY_UI_QT ISelectionListener
 {
-
-  berryInterfaceMacro(ISelectionListener, berry);
 
   struct Events
   {
 
-    Message2<IWorkbenchPart::Pointer, ISelection::ConstPointer>
+    Message2<const IWorkbenchPart::Pointer&, const ISelection::ConstPointer&>
         selectionChanged;
 
-    void AddListener(ISelectionListener::Pointer listener);
-    void RemoveListener(ISelectionListener::Pointer listener);
+    void AddListener(ISelectionListener* listener);
+    void RemoveListener(ISelectionListener* listener);
 
-    typedef MessageDelegate2<ISelectionListener, IWorkbenchPart::Pointer,
-        ISelection::ConstPointer> Delegate;
+    typedef MessageDelegate2<ISelectionListener, const IWorkbenchPart::Pointer&,
+        const ISelection::ConstPointer&> Delegate;
   };
+
+  virtual ~ISelectionListener();
 
   /**
    * Notifies this listener that the selection has changed.
@@ -71,8 +71,8 @@ struct BERRY_UI_QT ISelectionListener: public virtual Object
    * @param selection the current selection. This may be <code>null</code>
    *    if <code>INullSelectionListener</code> is implemented.
    */
-  virtual void SelectionChanged(IWorkbenchPart::Pointer part,
-      ISelection::ConstPointer selection) = 0;
+  virtual void SelectionChanged(const IWorkbenchPart::Pointer& part,
+                                const ISelection::ConstPointer& selection) = 0;
 };
 
 /**
@@ -106,7 +106,7 @@ struct SelectionChangedAdapter: public ISelectionListener
 
   typedef R Listener;
   typedef void
-      (R::*Callback)(IWorkbenchPart::Pointer, ISelection::ConstPointer);
+      (R::*Callback)(const IWorkbenchPart::Pointer&, const ISelection::ConstPointer&);
 
   SelectionChangedAdapter(R* l, Callback c) :
     listener(l), callback(c)
@@ -115,7 +115,7 @@ struct SelectionChangedAdapter: public ISelectionListener
     poco_assert(callback);
   }
 
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  void SelectionChanged(const IWorkbenchPart::Pointer& part, const ISelection::ConstPointer& selection)
   {
     (listener->*callback)(part, selection);
   }

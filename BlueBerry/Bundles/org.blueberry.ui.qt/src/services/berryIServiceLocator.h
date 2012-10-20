@@ -22,8 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryObject.h>
 #include <berryMacros.h>
+#include <berryLog.h>
 
 #include <QObject>
+
+#include <typeinfo>
 
 namespace berry {
 
@@ -40,12 +43,11 @@ namespace berry {
  * <p>
  * This interface is not to be implemented or extended by clients.
  * </p>
- *
- * @since 3.2
  */
-struct BERRY_UI_QT IServiceLocator : public virtual Object {
+struct BERRY_UI_QT IServiceLocator : public virtual Object
+{
 
-  berryInterfaceMacro(IServiceLocator, berry);
+  berryObjectMacro(berry::IServiceLocator)
 
   ~IServiceLocator();
 
@@ -61,7 +63,21 @@ struct BERRY_UI_QT IServiceLocator : public virtual Object {
   template<class S>
   S* GetService()
   {
-    return dynamic_cast<S*>(this->GetService(qobject_interface_iid<S*>()));
+    const char* typeName = qobject_interface_iid<S*>();
+    if (typeName == NULL)
+    {
+      BERRY_WARN << "Error getting service: Cannot get the interface id for type '" << Object::DemangleName(typeid(S).name())
+                 << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
+      return NULL;
+    }
+    Object* obj = this->GetService(typeName);
+    S* service = dynamic_cast<S*>(obj);
+    if (obj != NULL && service == NULL)
+    {
+      BERRY_WARN << "Error getting service: Class '" << obj->GetClassName() << "' cannot be cast to service interface "
+                 << "'" << Object::DemangleName(typeid(S).name()) << "'";
+    }
+    return service;
   }
 
   /**

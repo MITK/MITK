@@ -28,6 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #define BERRY_DEBUG MBI_DEBUG("BlueBerry")
 
-org_blueberry_core_runtime_EXPORT std::stringstream& operator<<(std::stringstream& os, const QString& str);
+org_blueberry_core_runtime_EXPORT std::ostream& operator<<(std::ostream& os, const QString& str);
 
 #endif /*__BERRY_LOG_H__*/

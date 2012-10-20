@@ -28,8 +28,10 @@ namespace berry {
 
 ContributionRoot::ContributionRoot(InternalMenuService* menuService, const QSet<SmartPointer<IEvaluationReference> > &restriction,
                  ContributionManager* mgr, AbstractContributionFactory* factory)
-  : menuService(menuService), restriction(restriction), mgr(mgr),
-    factory(factory)
+  : menuService(menuService)
+  , mgr(mgr)
+  , factory(factory)
+  , restriction(restriction)
 {
 }
 

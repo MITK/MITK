@@ -68,7 +68,7 @@ void LeftToRightTabOrder::RestoreState(IPresentationSerializer* serializer,
   QList<IMemento::Pointer> parts = savedState->GetChildren(
       WorkbenchConstants::TAG_PART);
 
-  for (std::size_t idx = 0; idx < parts.size(); idx++)
+  for (int idx = 0; idx < parts.size(); idx++)
   {
     QString id;
     parts[idx]->GetString(WorkbenchConstants::TAG_ID, id);

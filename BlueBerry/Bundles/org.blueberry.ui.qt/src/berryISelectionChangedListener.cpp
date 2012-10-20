@@ -21,20 +21,24 @@ namespace berry {
 
 void
 ISelectionChangedListener::Events
-::AddListener(ISelectionChangedListener::Pointer listener)
+::AddListener(ISelectionChangedListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  this->selectionChanged += Delegate(listener.GetPointer(), &ISelectionChangedListener::SelectionChanged);
+  this->selectionChanged += Delegate(listener, &ISelectionChangedListener::SelectionChanged);
 }
 
 void
 ISelectionChangedListener::Events
-::RemoveListener(ISelectionChangedListener::Pointer listener)
+::RemoveListener(ISelectionChangedListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  this->selectionChanged -= Delegate(listener.GetPointer(), &ISelectionChangedListener::SelectionChanged);
+  this->selectionChanged -= Delegate(listener, &ISelectionChangedListener::SelectionChanged);
+}
+
+ISelectionChangedListener::~ISelectionChangedListener()
+{
 }
 
 }

@@ -64,9 +64,10 @@ namespace berry {
  *
  * @since 3.2
  */
-struct BERRY_UI_QT ISaveablesSource : public virtual Object {
+struct BERRY_UI_QT ISaveablesSource : public virtual Object
+{
 
-  berryInterfaceMacro(ISaveablesSource, berry);
+  berryObjectMacro(berry::ISaveablesSource)
 
   ~ISaveablesSource();
 

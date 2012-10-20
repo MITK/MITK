@@ -64,7 +64,7 @@ struct BERRY_UI_QT ISelectionService {
    *
    * @param listener a selection listener
    */
-  virtual void AddSelectionListener(ISelectionListener::Pointer listener) = 0;
+  virtual void AddSelectionListener(ISelectionListener* listener) = 0;
 
   /**
    * Adds a part-specific selection listener which is notified when selection changes
@@ -84,7 +84,7 @@ struct BERRY_UI_QT ISelectionService {
    * @param listener a selection listener
    * @since 2.0
    */
-  virtual void AddSelectionListener(const QString& partId, ISelectionListener::Pointer listener) = 0;
+  virtual void AddSelectionListener(const QString& partId, ISelectionListener* listener) = 0;
 
   /**
    * Adds the given post selection listener.It is equivalent to selection
@@ -96,7 +96,7 @@ struct BERRY_UI_QT ISelectionService {
    *
    * @param listener a selection listener
    */
-  virtual void AddPostSelectionListener(ISelectionListener::Pointer listener) = 0;
+  virtual void AddPostSelectionListener(ISelectionListener* listener) = 0;
 
   /**
    * Adds a part-specific selection listener which is notified when selection changes
@@ -117,7 +117,7 @@ struct BERRY_UI_QT ISelectionService {
    * @since 2.0
    */
   virtual void AddPostSelectionListener(const QString& partId,
-          ISelectionListener::Pointer listener) = 0;
+                                        ISelectionListener* listener) = 0;
 
   /**
    * Returns the current selection in the active part.  If the selection in the
@@ -145,7 +145,7 @@ struct BERRY_UI_QT ISelectionService {
    *
    * @param listener a selection listener
    */
-  virtual void RemoveSelectionListener(ISelectionListener::Pointer listener) = 0;
+  virtual void RemoveSelectionListener(ISelectionListener* listener) = 0;
 
   /**
    * Removes the given part-specific selection listener.
@@ -156,7 +156,7 @@ struct BERRY_UI_QT ISelectionService {
    * @since 2.0
    */
   virtual void RemoveSelectionListener(const QString& partId,
-          ISelectionListener::Pointer listener) = 0;
+                                       ISelectionListener* listener) = 0;
 
   /**
    * Removes the given post selection listener.
@@ -164,7 +164,7 @@ struct BERRY_UI_QT ISelectionService {
    *
    * @param listener a selection listener
    */
-  virtual void RemovePostSelectionListener(ISelectionListener::Pointer listener) = 0;
+  virtual void RemovePostSelectionListener(ISelectionListener* listener) = 0;
 
   /**
    * Removes the given part-specific post selection listener.
@@ -175,9 +175,11 @@ struct BERRY_UI_QT ISelectionService {
    * @since 2.0
    */
   virtual void RemovePostSelectionListener(const QString& partId,
-          ISelectionListener::Pointer listener) = 0;
+                                           ISelectionListener* listener) = 0;
 };
 
 }  // namespace berry
+
+Q_DECLARE_INTERFACE(berry::ISelectionService, "org.blueberry.ui.ISelectionService")
 
 #endif /*BERRYISELECTIONSERVICE_H_*/

@@ -63,12 +63,12 @@ void QtWidgetController::RemoveControlListener(GuiTk::IControlListener::Pointer 
   controlEvents.RemoveListener(listener);
 }
 
-void QtWidgetController::AddShellListener(IShellListener::Pointer listener)
+void QtWidgetController::AddShellListener(IShellListener* listener)
 {
   shellEvents.AddListener(listener);
 }
 
-void QtWidgetController::RemoveShellListener(IShellListener::Pointer listener)
+void QtWidgetController::RemoveShellListener(IShellListener* listener)
 {
   shellEvents.RemoveListener(listener);
 }

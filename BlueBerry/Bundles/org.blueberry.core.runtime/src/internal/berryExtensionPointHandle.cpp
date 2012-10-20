@@ -134,7 +134,7 @@ bool ExtensionPointHandle::IsValid() const
   {
     GetExtensionPoint();
   }
-  catch (const InvalidRegistryObjectException& e)
+  catch (const InvalidRegistryObjectException& /*e*/)
   {
     return false;
   }

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryObject.h>
 #include <berryMacros.h>
-#include <berryFlags.h>
 
 #include <org_blueberry_core_runtime_Export.h>
 
@@ -56,8 +55,7 @@ namespace berry
  */
 struct org_blueberry_core_runtime_EXPORT IStatus: public Object
 {
-
-  berryInterfaceMacro(IStatus, berry);
+  berryObjectMacro(berry::IStatus)
 
   enum Severity
   {

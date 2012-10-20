@@ -69,16 +69,16 @@ private:
 
     ShellListener(AbstractTabFolder* folder);
 
-    void ShellActivated(ShellEvent::Pointer e);
+    void ShellActivated(const ShellEvent::Pointer& e);
 
-    void ShellDeactivated(ShellEvent::Pointer e);
+    void ShellDeactivated(const ShellEvent::Pointer& e);
 
   private:
 
     AbstractTabFolder* folder;
   };
 
-  IShellListener::Pointer shellListener;
+  QScopedPointer<IShellListener> shellListener;
 
   /**
    * Listener attached to all child parts. It responds to changes in part properties
@@ -87,7 +87,8 @@ private:
   {
     ChildPropertyChangeListener(PresentablePartFolder* folder);
 
-    void PropertyChange(Object::Pointer source, int property);
+    using IPropertyChangeListener::PropertyChange;
+    void PropertyChange(const Object::Pointer& source, int property);
 
   private:
 

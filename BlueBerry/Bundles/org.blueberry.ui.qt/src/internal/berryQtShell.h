@@ -61,8 +61,8 @@ public:
   void SetMaximized(bool maximized);
   void SetMinimized(bool minimized);
 
-  void AddShellListener(IShellListener::Pointer listener);
-  void RemoveShellListener(IShellListener::Pointer listener);
+  void AddShellListener(IShellListener* listener);
+  void RemoveShellListener(IShellListener* listener);
 
   void Open(bool block = false);
 

@@ -96,7 +96,7 @@ private:
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    int HashCode();
+    uint HashCode() const;
   };
 
 private:

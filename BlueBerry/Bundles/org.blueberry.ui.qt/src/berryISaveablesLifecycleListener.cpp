@@ -20,20 +20,24 @@ namespace berry {
 
 void
 ISaveablesLifecycleListener::Events
-::AddListener(ISaveablesLifecycleListener::Pointer listener)
+::AddListener(ISaveablesLifecycleListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  this->lifecycleChange += Delegate(listener.GetPointer(), &ISaveablesLifecycleListener::HandleLifecycleEvent);
+  this->lifecycleChange += Delegate(listener, &ISaveablesLifecycleListener::HandleLifecycleEvent);
 }
 
 void
 ISaveablesLifecycleListener::Events
-::RemoveListener(ISaveablesLifecycleListener::Pointer listener)
+::RemoveListener(ISaveablesLifecycleListener* listener)
 {
-  if (listener.IsNull()) return;
+  if (listener == NULL) return;
 
-  this->lifecycleChange -= Delegate(listener.GetPointer(), &ISaveablesLifecycleListener::HandleLifecycleEvent);
+  this->lifecycleChange -= Delegate(listener, &ISaveablesLifecycleListener::HandleLifecycleEvent);
+}
+
+ISaveablesLifecycleListener::~ISaveablesLifecycleListener()
+{
 }
 
 }

@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-struct QtStyleManager;
+class QtStyleManager;
 
 /**
  * \ingroup org_blueberry_ui_internal
@@ -300,7 +300,7 @@ private:
     IConfigurationElement::Pointer targetElement(0);
     QList<IConfigurationElement::Pointer> elements(
           Platform::GetExtensionRegistry()->GetConfigurationElementsFor(PlatformUI::PLUGIN_ID() + "." + extensionPointId));
-    for (unsigned int j = 0; j < elements.size(); j++)
+    for (int j = 0; j < elements.size(); j++)
     {
       if (elementName == "" || elementName == elements[j]->GetName())
       {
@@ -325,7 +325,7 @@ private:
     {
       return targetElement->CreateExecutableExtension<C>("class");
     }
-    catch (const CoreException& e)
+    catch (const CoreException& /*e*/)
     {
       // log it since we cannot safely display a dialog.
       WorkbenchPlugin::Log("Unable to create extension: " + targetID

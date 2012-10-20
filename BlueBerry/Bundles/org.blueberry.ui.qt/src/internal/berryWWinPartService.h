@@ -41,7 +41,7 @@ private:
 
   IWorkbenchPage* activePage;
 
-  IPartListener::Pointer partListener; // = new WWinListener();
+  QScopedPointer<IPartListener> partListener; // = new WWinListener();
 
 public:
 
@@ -54,13 +54,13 @@ public:
    * (non-Javadoc)
    * Method declared on IPartService
    */
-  void AddPartListener(IPartListener::Pointer l);
+  void AddPartListener(IPartListener* l);
 
   /*
    * (non-Javadoc)
    * Method declared on IPartService
    */
-  void RemovePartListener(IPartListener::Pointer l);
+  void RemovePartListener(IPartListener* l);
 
   /*
    * (non-Javadoc)

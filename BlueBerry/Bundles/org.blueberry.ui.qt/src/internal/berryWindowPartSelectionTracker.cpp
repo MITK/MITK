@@ -52,14 +52,14 @@ void WindowPartSelectionTracker::PageActivated(
 
 void WindowPartSelectionTracker::PageClosed(SmartPointer<IWorkbenchPage> page)
 {
-  page->RemoveSelectionListener(GetPartId(), selListener);
-  page->RemovePostSelectionListener(GetPartId(), postSelListener);
+  page->RemoveSelectionListener(GetPartId(), selListener.data());
+  page->RemovePostSelectionListener(GetPartId(), postSelListener.data());
 }
 
 void WindowPartSelectionTracker::PageOpened(SmartPointer<IWorkbenchPage> page)
 {
-  page->AddSelectionListener(GetPartId(), selListener);
-  page->AddPostSelectionListener(GetPartId(), postSelListener);
+  page->AddSelectionListener(GetPartId(), selListener.data());
+  page->AddPostSelectionListener(GetPartId(), postSelListener.data());
 }
 
 ISelection::ConstPointer WindowPartSelectionTracker::GetSelection()

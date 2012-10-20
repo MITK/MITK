@@ -54,9 +54,10 @@ struct IHandlerActivation;
  *
  * @since 3.1
  */
-struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
+struct BERRY_UI_QT IHandlerService : public IServiceWithSources
+{
 
-  berryInterfaceMacro(IHandlerService, berry);
+  berryObjectMacro(berry::IHandlerService)
 
   ~IHandlerService();
 
@@ -186,46 +187,6 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
       const QString& commandId,
       const SmartPointer<IHandler>& handler,
       const SmartPointer<Expression>& expression, bool global) = 0;
-
-  /**
-   * <p>
-   * Activates the given handler within the context of this service. The
-   * handler becomes active when <code>expression</code> evaluates to
-   * <code>true</code>.
-   * </p>
-   * <p>
-   * Also, it is guaranteed that the handlers submitted through a particular
-   * service will be cleaned up when that services is destroyed. So, for
-   * example, a service retrieved from a <code>IWorkbenchPartSite</code>
-   * would deactivate all of its handlers when the site is destroyed.
-   * </p>
-   *
-   * @param commandId
-   *            The identifier for the command which this handler handles;
-   *            must not be <code>null</code>.
-   * @param handler
-   *            The handler to activate; must not be <code>null</code>.
-   * @param expression
-   *            This expression must evaluate to <code>true</code> before
-   *            this handler will really become active. The expression may be
-   *            <code>null</code> if the handler should always be active.
-   * @param sourcePriorities
-   *            The source priorities for the expression.
-   * @return A token which can be used to later cancel the activation. Only
-   *         someone with access to this token can cancel the activation. The
-   *         activation will automatically be cancelled if the context from
-   *         which this service was retrieved is destroyed.
-   *
-   * @see org.eclipse.ui.ISources
-   * @deprecated Use
-   *             {@link IHandlerService#activateHandler(String, IHandler, Expression)}
-   *             instead.
-   */
-  virtual SmartPointer<IHandlerActivation> ActivateHandler(
-      const QString& commandId,
-      const SmartPointer<IHandler>& handler,
-      const SmartPointer<Expression>& expression,
-      int sourcePriorities) = 0;
 
   /**
    * Creates an execution event based on an SWT event. This execution event
@@ -386,7 +347,6 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    *            selection variables
    * @return an context filled with the current set of variables. If selection
    *         is not included, the default variable is an empty collection
-   * @since 3.4
    */
   virtual SmartPointer<IEvaluationContext> CreateContextSnapshot(bool includeSelection) = 0;
 
@@ -401,7 +361,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
    *      Object)
    * @see org.eclipse.ui.services.IEvaluationService
    */
-  virtual IEvaluationContext* GetCurrentState() const = 0;
+  virtual SmartPointer<IEvaluationContext> GetCurrentState() const = 0;
 
   /**
    * <p>
@@ -430,6 +390,6 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources {
 
 }
 
-Q_DECLARE_INTERFACE(berry::IHandlerService, "org.blueberry.ui.qt.IHandlerService")
+Q_DECLARE_INTERFACE(berry::IHandlerService, "org.blueberry.ui.IHandlerService")
 
 #endif /* BERRYIHANDLERSERVICE_H_ */

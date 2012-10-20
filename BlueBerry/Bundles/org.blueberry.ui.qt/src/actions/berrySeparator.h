@@ -52,6 +52,8 @@ public:
    */
   Separator(const QString& groupName);
 
+  using AbstractGroupMarker::Fill;
+
   QAction* Fill(QMenu* menu, QAction* before);
 
   QAction* Fill(QToolBar* toolbar, QAction* before);

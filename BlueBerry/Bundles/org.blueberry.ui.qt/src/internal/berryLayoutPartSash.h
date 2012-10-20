@@ -133,7 +133,7 @@ public:
    *
    */
 public:
-  QString GetID();
+  QString GetID() const;
 
 protected:
 

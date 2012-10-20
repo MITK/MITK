@@ -35,5 +35,9 @@ void ICommandManagerListener::Events::RemoveListener(ICommandManagerListener* l)
   commandManagerChanged -= Delegate(l, &ICommandManagerListener::CommandManagerChanged);
 }
 
+ICommandManagerListener::~ICommandManagerListener()
+{
+}
+
 }
 

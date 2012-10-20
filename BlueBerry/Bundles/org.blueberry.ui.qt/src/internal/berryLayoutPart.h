@@ -297,7 +297,7 @@ protected: ILayoutContainer* container;
      */
     public: virtual void TestInvariants();
 
-    public: virtual QString ToString();
+    public: virtual QString ToString() const;
 };
 
 }

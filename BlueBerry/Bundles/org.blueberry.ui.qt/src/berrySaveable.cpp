@@ -71,9 +71,9 @@ void Saveable::EnableUI(QList<IWorkbenchPart::Pointer>&  /*parts*/)
   //    }
 }
 
-Poco::Any Saveable::GetAdapter(const QString&  /*adapter*/)
+Object* Saveable::GetAdapter(const QString&  /*adapter*/)
 {
-  return Poco::Any();
+  return NULL;
 }
 
 }

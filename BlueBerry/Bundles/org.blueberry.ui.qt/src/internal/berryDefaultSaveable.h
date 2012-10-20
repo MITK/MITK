@@ -81,9 +81,14 @@ public:
   bool IsDirty() const;
 
   /* (non-Javadoc)
+   * @see Object#HashCode()
+   */
+  uint HashCode() const;
+
+  /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
-  bool operator<(const Saveable* obj) const;
+  bool operator<(const Object* obj) const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.Saveable#show(org.blueberry.ui.IWorkbenchPage)

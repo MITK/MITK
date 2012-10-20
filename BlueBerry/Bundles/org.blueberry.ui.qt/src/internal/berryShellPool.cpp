@@ -23,18 +23,17 @@ namespace berry
 
 const QString ShellPool::CLOSE_LISTENER = "close listener"; //$NON-NLS-1$
 
-void ShellPool::ShellClosed(ShellEvent::Pointer e)
+void ShellPool::ShellClosed(const ShellEvent::Pointer& e)
 {
 
   if (e->doit)
   {
     Shell::Pointer s = e->GetSource();
-    IShellListener::Pointer l =
-        s->GetData(CLOSE_LISTENER).Cast<IShellListener> ();
+    IShellListener* l =  s->GetExtraShellListener();
 
     if (l != 0)
     {
-      s->SetData(Object::Pointer(0), CLOSE_LISTENER);
+      s->SetExtraShellListener(NULL);
       l->ShellClosed(e);
 
       // The shell can 'cancel' the close by setting
@@ -47,7 +46,7 @@ void ShellPool::ShellClosed(ShellEvent::Pointer e)
       else
       {
         // Restore the listener
-        s->SetData(l, CLOSE_LISTENER);
+        s->SetExtraShellListener(l);
       }
     }
   }
@@ -60,7 +59,7 @@ ShellPool::ShellPool(Shell::Pointer parentShell, int childFlags) :
 
 }
 
-Shell::Pointer ShellPool::AllocateShell(IShellListener::Pointer closeListener)
+Shell::Pointer ShellPool::AllocateShell(IShellListener* closeListener)
 {
   Shell::Pointer result;
   if (!availableShells.empty())
@@ -72,11 +71,11 @@ Shell::Pointer ShellPool::AllocateShell(IShellListener::Pointer closeListener)
   {
     result = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->CreateShell(parentShell.Lock(),
         flags);
-    result->AddShellListener(IShellListener::Pointer(this));
+    result->AddShellListener(this);
     //result.addDisposeListener(disposeListener);
   }
 
-  result->SetData(closeListener, CLOSE_LISTENER);
+  result->SetExtraShellListener(closeListener);
   return result;
 }
 

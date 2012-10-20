@@ -29,12 +29,12 @@ namespace berry {
  * interface, which is not intended to be implemented or extended by clients.
  * </p>
  *
- * @since 3.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct BERRY_UI_QT IIntroSite : public IWorkbenchSite {
+struct BERRY_UI_QT IIntroSite : public IWorkbenchSite
+{
 
-  berryInterfaceMacro(IIntroSite, berry);
+  berryObjectMacro(berry::IIntroSite)
 
   ~IIntroSite();
 

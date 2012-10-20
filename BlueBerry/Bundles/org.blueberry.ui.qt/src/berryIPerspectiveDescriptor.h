@@ -60,9 +60,10 @@ namespace berry {
  * @see IPerspectiveRegistry
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct BERRY_UI_QT IPerspectiveDescriptor : public Object {
+struct BERRY_UI_QT IPerspectiveDescriptor : public Object
+{
 
-  berryInterfaceMacro(IPerspectiveDescriptor, berry);
+  berryObjectMacro(berry::IPerspectiveDescriptor)
 
   virtual ~IPerspectiveDescriptor();
 

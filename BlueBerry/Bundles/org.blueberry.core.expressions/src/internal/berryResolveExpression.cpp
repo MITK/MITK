@@ -52,7 +52,7 @@ ResolveExpression::ResolveExpression(const QString& variable, const QList<Object
 EvaluationResult::ConstPointer
 ResolveExpression::Evaluate(IEvaluationContext* context) const
 {
-  Object::Pointer variable= context->ResolveVariable(fVariable, fArgs);
+  Object::ConstPointer variable= context->ResolveVariable(fVariable, fArgs);
   if (variable.IsNull())
   {
     IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_NOT_DEFINED,
@@ -65,7 +65,7 @@ ResolveExpression::Evaluate(IEvaluationContext* context) const
 }
 
 void
-ResolveExpression::CollectExpressionInfo(ExpressionInfo* info)
+ResolveExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   ExpressionInfo other;
   this->CompositeExpression::CollectExpressionInfo(&other);
@@ -89,7 +89,7 @@ ResolveExpression::operator==(const Object* object) const
 }
 
 uint
-ResolveExpression::ComputeHashCode()
+ResolveExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fExpressions)
       * HASH_FACTOR + this->HashCode(fArgs)

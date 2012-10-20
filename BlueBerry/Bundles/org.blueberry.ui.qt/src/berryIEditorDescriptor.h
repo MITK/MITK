@@ -47,7 +47,7 @@ namespace berry
 struct BERRY_UI_QT IEditorDescriptor : public IWorkbenchPartDescriptor
 {
 
-  berryInterfaceMacro(IEditorDescriptor, berry);
+  berryObjectMacro(berry::IEditorDescriptor)
 
   virtual ~IEditorDescriptor();
 

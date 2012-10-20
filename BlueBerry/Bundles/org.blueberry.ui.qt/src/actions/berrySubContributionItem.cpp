@@ -91,7 +91,7 @@ bool SubContributionItem::IsVisible() const
   return visible && innerItem->IsVisible();
 }
 
-void SubContributionItem::SetParent(IContributionManager */*parent*/)
+void SubContributionItem::SetParent(IContributionManager* /*parent*/)
 {
   // do nothing, the parent of our inner item
   // is its SubContributionManager

@@ -210,6 +210,8 @@ public:
    */
   /* protected */void SetSelectedImage(const QPixmap* image);
 
+  using AbstractTabFolder::GetItem;
+
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getItem(org.blueberry.swt.graphics.Point)
    */

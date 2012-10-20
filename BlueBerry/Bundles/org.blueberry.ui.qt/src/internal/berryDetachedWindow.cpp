@@ -36,7 +36,7 @@ DetachedWindow::ShellListener::ShellListener(DetachedWindow* wnd) :
 
 }
 
-void DetachedWindow::ShellListener::ShellClosed(ShellEvent::Pointer e)
+void DetachedWindow::ShellListener::ShellClosed(const ShellEvent::Pointer& e)
 {
   // hold on to a reference of the DetachedWindow instance
   // (otherwise, wnd->HandleClose() woulde delete the DetachedWindow
@@ -67,17 +67,15 @@ void DetachedWindow::ShellControlListener::ControlResized(
 }
 
 DetachedWindow::DetachedWindow(WorkbenchPage* workbenchPage)
+  : folder(new PartStack(workbenchPage, false))
+  , page(workbenchPage)
+  , hideViewsOnClose(true)
+  , shellListener(new ShellListener(this))
+  , resizeListener(new ShellControlListener(this))
 {
-  shellListener = new ShellListener(this);
-  resizeListener = new ShellControlListener(this);
-
-  this->page = workbenchPage;
-  hideViewsOnClose = true;
-
-  folder = new PartStack(page, false);
 }
 
-void DetachedWindow::PropertyChange(Object::Pointer /*source*/, int propId)
+void DetachedWindow::PropertyChange(const Object::Pointer& /*source*/, int propId)
 {
   if (propId == IWorkbenchPartConstants::PROP_TITLE)
   {
@@ -100,12 +98,11 @@ void DetachedWindow::Create()
 
   windowShell
       = page->GetWorkbenchWindow().Cast<WorkbenchWindow> () ->GetDetachedWindowPool()->AllocateShell(
-          shellListener);
+          shellListener.data());
   windowShell->SetData(Object::Pointer(this));
-  windowShell->SetText(""); //$NON-NLS-1$
+  windowShell->SetText("");
 
-  DragUtil::AddDragTarget(windowShell->GetControl(),
-      IDragOverListener::Pointer(this));
+  DragUtil::AddDragTarget(windowShell->GetControl(), this);
   hideViewsOnClose = true;
   if (bounds.IsEmpty())
   {
@@ -166,7 +163,7 @@ bool DetachedWindow::Close()
 }
 
 IDropTarget::Pointer DetachedWindow::Drag(void* /*currentControl*/,
-    Object::Pointer draggedObject, const Point& position, const Rectangle& /*dragRectangle*/)
+    const Object::Pointer& draggedObject, const Point& position, const Rectangle& /*dragRectangle*/)
 {
 
   if (draggedObject.Cast<PartPane> () == 0)
@@ -473,8 +470,7 @@ bool DetachedWindow::HandleClose()
     //    windowShell.removeListener(SWT.Activate, activationListener);
     //    windowShell.removeListener(SWT.Deactivate, activationListener);
 
-    DragUtil::RemoveDragTarget(windowShell->GetControl(),
-        IDragOverListener::Pointer(this));
+    DragUtil::RemoveDragTarget(windowShell->GetControl(), this);
     bounds = windowShell->GetBounds();
 
     //TODO DetachedWindow unregister key bindings

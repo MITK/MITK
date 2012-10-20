@@ -18,24 +18,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-void
-IDragOverListener::Events
-::AddListener(IDragOverListener::Pointer l)
+void IDragOverListener::Events::AddListener(IDragOverListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == NULL) return;
 
-  drag += DragDelegate(l.GetPointer(), &IDragOverListener::Drag);
+  drag += DragDelegate(l, &IDragOverListener::Drag);
 
 }
 
-void
-IDragOverListener::Events
-::RemoveListener(IDragOverListener::Pointer l)
+void IDragOverListener::Events::RemoveListener(IDragOverListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == NULL) return;
 
-  drag -= DragDelegate(l.GetPointer(), &IDragOverListener::Drag);
+  drag -= DragDelegate(l, &IDragOverListener::Drag);
 
+}
+
+IDragOverListener::~IDragOverListener()
+{
 }
 
 }

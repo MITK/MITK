@@ -38,12 +38,11 @@ namespace berry {
  * This interface is not intended to be implemented by clients. Clients
  * should subclass type <code>PropertyTester</code>.
  * </p>
- *
- * @since 3.0
  */
-struct BERRY_EXPRESSIONS IPropertyTester : public Object {
+struct BERRY_EXPRESSIONS IPropertyTester : public Object
+{
 
-  berryInterfaceMacro(IPropertyTester, berry);
+  berryObjectMacro(berry::IPropertyTester)
 
   virtual ~IPropertyTester();
 
@@ -101,7 +100,7 @@ struct BERRY_EXPRESSIONS IPropertyTester : public Object {
    * @return returns <code>true<code> if the property is equal to the expected value;
    *  otherwise <code>false</code> is returned
    */
-  virtual bool Test(Object::Pointer receiver, const QString& property,
+  virtual bool Test(Object::ConstPointer receiver, const QString& property,
                     const QList<Object::Pointer>& args, Object::Pointer expectedValue) = 0;
 
 };

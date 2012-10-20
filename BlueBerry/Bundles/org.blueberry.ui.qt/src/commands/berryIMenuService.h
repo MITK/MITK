@@ -48,7 +48,7 @@ struct IEvaluationContext;
 struct IMenuService : public IServiceWithSources
 {
 
-  berryInterfaceMacro(IMenuService, berry)
+  berryObjectMacro(berry::IMenuService)
 
   /**
    * Contribute and initialize the contribution factory. This should only be
@@ -117,6 +117,6 @@ struct IMenuService : public IServiceWithSources
 
 }
 
-Q_DECLARE_INTERFACE(berry::IMenuService, "org.blueberry.ui.qt.IMenuService")
+Q_DECLARE_INTERFACE(berry::IMenuService, "org.blueberry.ui.IMenuService")
 
 #endif /* BERRYIMENUSERVICE_H_ */

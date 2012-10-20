@@ -36,8 +36,8 @@ struct QtPerspectiveSwitcherListener : public IPerspectiveListener
     return Events::ACTIVATED;
   }
 
-  void PerspectiveActivated(IWorkbenchPage::Pointer /*page*/,
-          IPerspectiveDescriptor::Pointer perspective)
+  void PerspectiveActivated(const IWorkbenchPage::Pointer& /*page*/,
+                            const IPerspectiveDescriptor::Pointer& perspective)
   {
     QAction* action = switcher->perspIdToActionMap[perspective->GetId()];
     if (action) action->setChecked(true);
@@ -70,13 +70,13 @@ QtPerspectiveSwitcher::QtPerspectiveSwitcher(IWorkbenchWindow::Pointer window)
   }
   this->addActions(perspGroup->actions());
 
-  perspListener = new QtPerspectiveSwitcherListener(this);
-  window->AddPerspectiveListener(perspListener);
+  perspListener.reset(new QtPerspectiveSwitcherListener(this));
+  window->AddPerspectiveListener(perspListener.data());
 }
 
 QtPerspectiveSwitcher::~QtPerspectiveSwitcher()
 {
-  window->RemovePerspectiveListener(perspListener);
+  window->RemovePerspectiveListener(perspListener.data());
 }
 
 }

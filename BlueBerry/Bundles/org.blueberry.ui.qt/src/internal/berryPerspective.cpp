@@ -121,35 +121,42 @@ Perspective::~Perspective()
   delete presentation;
 }
 
-void Perspective::DisposeViewRefs() {
-    if (!memento) {
-      return;
+void Perspective::DisposeViewRefs()
+{
+  if (!memento)
+  {
+    return;
+  }
+  QList<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
+  for (int x = 0; x < views.size(); x++)
+  {
+    // Get the view details.
+    IMemento::Pointer childMem = views[x];
+    QString id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
+    // skip creation of the intro reference - it's handled elsewhere.
+    if (id == IntroConstants::INTRO_VIEW_ID)
+    {
+      continue;
     }
-    QList<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
-    for (std::size_t x = 0; x < views.size(); x++) {
-      // Get the view details.
-      IMemento::Pointer childMem = views[x];
-      QString id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
-      // skip creation of the intro reference - it's handled elsewhere.
-      if (id == IntroConstants::INTRO_VIEW_ID) {
-        continue;
-      }
 
-      QString secondaryId = ViewFactory::ExtractSecondaryId(id);
-      if (!secondaryId.isEmpty()) {
-        id = ViewFactory::ExtractPrimaryId(id);
-      }
+    QString secondaryId = ViewFactory::ExtractSecondaryId(id);
+    if (!secondaryId.isEmpty())
+    {
+      id = ViewFactory::ExtractPrimaryId(id);
+    }
 
-      QString removed;
-      childMem->GetString(WorkbenchConstants::TAG_REMOVED, removed);
-      if (removed != "true") {
-        IViewReference::Pointer ref = viewFactory->GetView(id, secondaryId);
-        if (ref) {
-          viewFactory->ReleaseView(ref);
-        }
+    QString removed;
+    childMem->GetString(WorkbenchConstants::TAG_REMOVED, removed);
+    if (removed != "true")
+    {
+      IViewReference::Pointer ref = viewFactory->GetView(id, secondaryId);
+      if (ref)
+      {
+        viewFactory->ReleaseView(ref);
       }
     }
   }
+}
 
 IViewReference::Pointer Perspective::FindView(const QString& viewId)
 {
@@ -159,7 +166,7 @@ IViewReference::Pointer Perspective::FindView(const QString& viewId)
 IViewReference::Pointer Perspective::FindView(const QString& id, const QString& secondaryId)
 {
   QList<IViewReference::Pointer> refs(this->GetViewReferences());
-  for (unsigned int i = 0; i < refs.size(); i++)
+  for (int i = 0; i < refs.size(); i++)
   {
     IViewReference::Pointer ref = refs[i];
     if (id == ref->GetId()
@@ -437,7 +444,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
 
   QList<IStickyViewDescriptor::Pointer> descs(WorkbenchPlugin::GetDefault()
   ->GetViewRegistry()->GetStickyViews());
-  for (std::size_t i = 0; i < descs.size(); i++)
+  for (int i = 0; i < descs.size(); i++)
   {
     IStickyViewDescriptor::Pointer stickyViewDescriptor = descs[i];
     QString id = stickyViewDescriptor->GetId();
@@ -817,7 +824,7 @@ bool Perspective::CreateReferences(const QList<IMemento::Pointer>& views)
 //      WorkbenchMessages.Perspective_problemsRestoringViews, 0);
   bool result = true;
 
-  for (std::size_t x = 0; x < views.size(); x++)
+  for (int x = 0; x < views.size(); x++)
   {
     // Get the view details.
     IMemento::Pointer childMem = views[x];
@@ -923,7 +930,7 @@ bool Perspective::RestoreState()
   // Add the visible views.
   QList<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
 
-  for (std::size_t x = 0; x < views.size(); x++)
+  for (int x = 0; x < views.size(); x++)
   {
     // Get the view details.
     IMemento::Pointer childMem = views[x];
@@ -976,7 +983,7 @@ bool Perspective::RestoreState()
   // Load the view layout recs
   QList<IMemento::Pointer> recMementos(memento
   ->GetChildren(WorkbenchConstants::TAG_VIEW_LAYOUT_REC));
-  for (std::size_t i = 0; i < recMementos.size(); i++)
+  for (int i = 0; i < recMementos.size(); i++)
   {
     IMemento::Pointer recMemento = recMementos[i];
     QString compoundId;
@@ -1063,7 +1070,7 @@ bool Perspective::RestoreState()
 
     // Load "show view actions".
     actions = memento->GetChildren(WorkbenchConstants::TAG_SHOW_VIEW_ACTION);
-    for (std::size_t x = 0; x < actions.size(); x++)
+    for (int x = 0; x < actions.size(); x++)
     {
       QString id; actions[x]->GetString(WorkbenchConstants::TAG_ID, id);
       showViewShortcuts.push_back(id);
@@ -1105,7 +1112,7 @@ bool Perspective::RestoreState()
 
     // Load "perspective actions".
     actions = memento->GetChildren(WorkbenchConstants::TAG_PERSPECTIVE_ACTION);
-    for (std::size_t x = 0; x < actions.size(); x++)
+    for (int x = 0; x < actions.size(); x++)
     {
       QString id; actions[x]->GetString(WorkbenchConstants::TAG_ID, id);
       perspectiveShortcuts.push_back(id);

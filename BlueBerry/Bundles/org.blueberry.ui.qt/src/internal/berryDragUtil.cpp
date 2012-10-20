@@ -30,8 +30,7 @@ const QString DragUtil::DROP_TARGET_ID =
 
 TestDropLocation::Pointer DragUtil::forcedDropTarget(0);
 
-QList<IDragOverListener::Pointer> DragUtil::defaultTargets = QList<
-    IDragOverListener::Pointer>();
+QList<IDragOverListener*> DragUtil::defaultTargets = QList<IDragOverListener*>();
 
 DragUtil::TrackerMoveListener::TrackerMoveListener(Object::Pointer draggedItem,
     const Rectangle& sourceBounds, const Point& initialLocation,
@@ -110,16 +109,17 @@ DragUtil::TargetListType::Pointer DragUtil::GetTargetList(void* control)
   return list;
 }
 
-IDropTarget::Pointer DragUtil::GetDropTarget(const QList<
-    IDragOverListener::Pointer>& toSearch, void* mostSpecificControl,
-    Object::Pointer draggedObject, const Point& position,
-    const Rectangle& dragRectangle)
+IDropTarget::Pointer DragUtil::GetDropTarget(const QList<IDragOverListener*>& toSearch,
+                                             void* mostSpecificControl,
+                                             Object::Pointer draggedObject,
+                                             const Point& position,
+                                             const Rectangle& dragRectangle)
 {
 
-  for (QList<IDragOverListener::Pointer>::const_iterator iter =
+  for (QList<IDragOverListener*>::const_iterator iter =
       toSearch.begin(); iter != toSearch.end(); ++iter)
   {
-    IDragOverListener::Pointer next = *iter;
+    IDragOverListener* next = *iter;
 
     IDropTarget::Pointer dropTarget = next->Drag(mostSpecificControl,
         draggedObject, position, dragRectangle);
@@ -133,7 +133,7 @@ IDropTarget::Pointer DragUtil::GetDropTarget(const QList<
   return IDropTarget::Pointer(0);
 }
 
-void DragUtil::AddDragTarget(void* control, IDragOverListener::Pointer target)
+void DragUtil::AddDragTarget(void* control, IDragOverListener* target)
 {
   if (control == 0)
   {
@@ -153,8 +153,7 @@ void DragUtil::AddDragTarget(void* control, IDragOverListener::Pointer target)
   }
 }
 
-void DragUtil::RemoveDragTarget(void* control,
-    IDragOverListener::Pointer target)
+void DragUtil::RemoveDragTarget(void* control, IDragOverListener* target)
 {
   if (control == 0)
   {
@@ -331,7 +330,7 @@ IDropTarget::Pointer DragUtil::GetDropTarget(void* toSearch,
       GuiWidgetsTweaklet::KEY)->GetParent(current))
   {
     TargetListType::Pointer targetList = GetTargetList(current);
-    QList<IDragOverListener::Pointer> targets;
+    QList<IDragOverListener*> targets;
     if (targetList != 0)
       targets = *targetList;
 

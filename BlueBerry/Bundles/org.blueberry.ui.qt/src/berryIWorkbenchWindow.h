@@ -70,7 +70,7 @@ struct IWorkbench;
 struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocator, public virtual Object
 {
 
-  berryInterfaceMacro(IWorkbenchWindow, berry);
+  berryObjectMacro(berry::IWorkbenchWindow)
 
   /**
    * Closes this workbench window.
@@ -91,7 +91,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    *
    * @return the active page, or <code>null</code> if none
    */
-  virtual SmartPointer<IWorkbenchPage> GetActivePage() = 0;
+  virtual SmartPointer<IWorkbenchPage> GetActivePage() const = 0;
 
   /**
    * Sets or clears the currently active page for this workbench window.
@@ -123,7 +123,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    * @return the shell containing this window's controls or <code>null</code>
    *   if the shell has not been created yet or if the window has been closed
    */
-  virtual Shell::Pointer GetShell() = 0;
+  virtual Shell::Pointer GetShell() const = 0;
 
   /**
    * Returns the workbench for this window.

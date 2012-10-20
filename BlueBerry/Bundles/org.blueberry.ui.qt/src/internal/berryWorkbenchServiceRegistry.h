@@ -30,6 +30,7 @@ struct IServiceFactory;
 struct IExtensionPoint;
 struct IConfigurationElement;
 class ServiceLocator;
+class AbstractSourceProvider;
 
 /**
  * This class will create a service from the matching factory. If the factory
@@ -49,20 +50,18 @@ private:
 
   static const QString EXT_ID_SERVICES; // = "org.blueberry.ui.services"; //$NON-NLS-1$
 
-  static WorkbenchServiceRegistry* registry; // = 0;
-
   WorkbenchServiceRegistry();
 
   struct ServiceFactoryHandle : public Object
   {
     berryObjectMacro(ServiceFactoryHandle);
 
-    SmartPointer<const IServiceFactory> factory;
+    QScopedPointer<const IServiceFactory> factory;
     // TODO used in removeExtension to react to bundles being unloaded
     //WeakHashMap serviceLocators = new WeakHashMap();
     QList<QString> serviceNames;
 
-    ServiceFactoryHandle(SmartPointer<const IServiceFactory> factory);
+    ServiceFactoryHandle(const IServiceFactory* factory);
   };
 
   QHash<QString, ServiceFactoryHandle::Pointer> factories;
@@ -91,10 +90,12 @@ public:
    */
   static const IServiceLocator::Pointer GLOBAL_PARENT; // = new GlobalParentLocator();
 
-  Object* GetService(const QString& key,
-                     IServiceLocator* parentLocator, ServiceLocator* locator);
+  Object::Pointer GetService(const QString& key,
+                             IServiceLocator* parentLocator, ServiceLocator* locator);
 
-  QList<SmartPointer<ISourceProvider> > GetSourceProviders() const;
+  QList<SmartPointer<AbstractSourceProvider> > GetSourceProviders() const;
+
+  void InitializeSourcePriorities();
 
   //  void addExtension(IExtensionTracker tracker, IExtension extension) {
   //    // we don't need to react to adds because we are not caching the extensions we find -

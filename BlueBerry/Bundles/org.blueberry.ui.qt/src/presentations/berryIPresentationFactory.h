@@ -180,6 +180,6 @@ public:
 
 }
 
-Q_DECLARE_INTERFACE(berry::IPresentationFactory, "org.blueberry.IPresentationFactory")
+Q_DECLARE_INTERFACE(berry::IPresentationFactory, "org.blueberry.ui.IPresentationFactory")
 
 #endif /* BERRYABSTRACTPRESENTATIONFACTORY_H_ */

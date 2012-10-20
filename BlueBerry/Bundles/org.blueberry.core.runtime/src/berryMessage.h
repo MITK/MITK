@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * Adds a Message<> variable and methods to add/remove message delegates to/from
  * this variable.
  */
-#define berryNewMessageMacro(msgHandleObject)                                                                 \
+#define berryNewMessageMacro(msgHandleObject)                                                            \
   private: Message<> m_ ## msgHandleObject ## Message;                                                   \
   public:                                                                                                \
   inline void Add ## msgHandleObject ## Listener(const MessageAbstractDelegate<>& delegate)              \
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     { m_ ## msgHandleObject ## Message -= delegate; }                                                    \
 
 
-#define berryNewMessageWithReturnMacro(msgHandleObject, returnType)                                                 \
+#define berryNewMessageWithReturnMacro(msgHandleObject, returnType)                                            \
   private: Message<returnType> m_ ## msgHandleObject ## Message;                                               \
   public:                                                                                                      \
   inline void Add ## msgHandleObject ## Listener(const MessageAbstractDelegate<returnType>& delegate)          \
@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     { m_ ## msgHandleObject ## Message -= delegate; }                                                          \
 
 
-#define berryNewMessage1Macro(msgHandleObject, type1)                                                          \
+#define berryNewMessage1Macro(msgHandleObject, type1)                                                     \
   private: Message1< type1 > m_msgHandleObject ## Message;                                                \
   public:                                                                                                 \
   void Add ## msgHandleObject ## Listener(const MessageAbstractDelegate1< type1 >& delegate)              \

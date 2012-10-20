@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "common/berryNamedHandleObject.h"
 #include "berryICommandCategoryListener.h"
 
+#include <org_blueberry_core_commands_Export.h>
+
 namespace berry
 {
 
@@ -29,10 +31,8 @@ namespace berry
  * category. The category has no functional effect, but may be used in graphical
  * tools that want to group the set of commands somehow.
  * </p>
- *
- * @since 3.1
  */
-class CommandCategory: public NamedHandleObject
+class BERRY_COMMANDS CommandCategory: public NamedHandleObject
 {
 
 public:

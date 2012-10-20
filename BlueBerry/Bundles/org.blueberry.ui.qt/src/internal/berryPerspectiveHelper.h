@@ -112,7 +112,7 @@ private:
     DragOverListener(PerspectiveHelper* perspHelper);
 
     IDropTarget::Pointer Drag(void* currentControl,
-        Object::Pointer draggedObject, const Point& position,
+        const Object::Pointer& draggedObject, const Point& position,
         const Rectangle& dragRectangle);
 
   private:
@@ -120,7 +120,7 @@ private:
 
   };
 
-  IDragOverListener::Pointer dragTarget;
+  QScopedPointer<IDragOverListener> dragTarget;
 
   struct ActualDropTarget: public AbstractDropTarget
   {

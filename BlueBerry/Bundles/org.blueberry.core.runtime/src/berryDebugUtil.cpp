@@ -396,7 +396,7 @@ void DebugUtil::RegisterObject(const Object* objectPointer)
   if (GetBreakpointManager()->BreakAtObject(objectPointer->GetTraceId()))
   {
     std::string msg = "SmartPointer Breakpoint reached for ";
-    msg += objectPointer->GetClassName();
+    msg += objectPointer->GetClassName().toStdString();
     poco_debugger_msg(msg.c_str());
   }
 }

@@ -36,7 +36,7 @@ namespace berry {
  **/
 struct BERRY_UI_QT ISelection : public Object
 {
-  berryInterfaceMacro(ISelection, berry);
+  berryObjectMacro(berry::ISelection)
 
   ~ISelection();
 

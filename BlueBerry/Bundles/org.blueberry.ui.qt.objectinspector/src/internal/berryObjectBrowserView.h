@@ -49,7 +49,6 @@ public:
   static const std::string VIEW_ID;
 
   ObjectBrowserView();
-  ObjectBrowserView(const ObjectBrowserView& other);
 
   void Init(IViewSite::Pointer site, IMemento::Pointer memento);
 

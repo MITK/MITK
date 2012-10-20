@@ -18,11 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIDROPTARGETLISTENER_H
 #define BERRYIDROPTARGETLISTENER_H
 
-#include <berryMacros.h>
-#include <berryObject.h>
-
 #include <org_blueberry_ui_qt_Export.h>
 
+#include "berryMessage.h"
 
 class QDragEnterEvent;
 class QDragLeaveEvent;
@@ -31,9 +29,8 @@ class QDropEvent;
 
 namespace berry {
 
-struct BERRY_UI_QT IDropTargetListener : public Object {
-
-  berryInterfaceMacro(IDropTargetListener, berry);
+struct BERRY_UI_QT IDropTargetListener
+{
 
   struct Events {
 

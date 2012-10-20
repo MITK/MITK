@@ -14,6 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include "berryCTKPluginActivator.h"
 
 #include "berryPlatform.h"
@@ -106,6 +110,41 @@ QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
   return QString();
 }
 
+#elif defined(Q_CC_MSVC)
+
+#include <ctkBackTrace.h>
+#include <windows.h>
+#include <dbghelp.h>
+QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
+{
+  if (symbol == NULL) return QString();
+
+  if (ctk::DebugSymInitialize())
+  {
+    std::vector<char> moduleBuffer(sizeof(IMAGEHLP_MODULE64));
+    PIMAGEHLP_MODULE64 pModuleInfo = (PIMAGEHLP_MODULE64)&moduleBuffer.front();
+    pModuleInfo->SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
+    if (SymGetModuleInfo64(GetCurrentProcess(), (DWORD64)symbol, pModuleInfo))
+    {
+      QString pluginId = pModuleInfo->ModuleName;
+      return pluginId.replace('_', '.');
+    }
+  }
+  return QString();
+}
+
+#endif
+
+org_blueberry_core_runtime_Activator::org_blueberry_core_runtime_Activator()
+  : userRegistryKey(new QObject())
+  , masterRegistryKey(new QObject())
+{
+}
+
+org_blueberry_core_runtime_Activator::~org_blueberry_core_runtime_Activator()
+{
+}
+
 void org_blueberry_core_runtime_Activator::startRegistry()
 {
   // see if the customer suppressed the creation of default registry
@@ -175,41 +214,6 @@ void org_blueberry_core_runtime_Activator::stopRegistry()
 //  {
 //    commandRegistration.unregister();
 //  }
-}
-
-#elif defined(Q_CC_MSVC)
-
-#include <ctkBackTrace.h>
-#include <windows.h>
-#include <dbghelp.h>
-QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
-{
-  if (symbol == NULL) return QString();
-
-  if (ctk::DebugSymInitialize())
-  {
-    std::vector<char> moduleBuffer(sizeof(IMAGEHLP_MODULE64));
-    PIMAGEHLP_MODULE64 pModuleInfo = (PIMAGEHLP_MODULE64)&moduleBuffer.front();
-    pModuleInfo->SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
-    if (SymGetModuleInfo64(GetCurrentProcess(), (DWORD64)symbol, pModuleInfo))
-    {
-      QString pluginId = pModuleInfo->ModuleName;
-      return pluginId.replace('_', '.');
-    }
-  }
-  return QString();
-}
-
-#endif
-
-org_blueberry_core_runtime_Activator::org_blueberry_core_runtime_Activator()
-  : userRegistryKey(new QObject())
-  , masterRegistryKey(new QObject())
-{
-}
-
-org_blueberry_core_runtime_Activator::~org_blueberry_core_runtime_Activator()
-{
 }
 
 }

@@ -136,6 +136,7 @@ RegistryObjectReferenceMap::NewEntry(const SmartPointer<RegistryObject>& value) 
     return new SmartRef(value);
   case SOFT :
     return new WeakRef(value);
+  default: return NULL;
   }
 }
 

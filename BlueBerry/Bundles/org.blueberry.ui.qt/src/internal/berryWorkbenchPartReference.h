@@ -117,13 +117,16 @@ private: bool queueEvents;
 //        }
 //    };
 
-private: struct PropertyChangeListener : public IPropertyChangeListener
-   {
-  PropertyChangeListener(WorkbenchPartReference* ref);
-     void PropertyChange(PropertyChangeEvent::Pointer event);
+private:
 
-   private: WorkbenchPartReference* partRef;
-    };
+  struct PropertyChangeListener : public IPropertyChangeListener
+  {
+    PropertyChangeListener(WorkbenchPartReference* ref);
+    using IPropertyChangeListener::PropertyChange;
+    void PropertyChange(const PropertyChangeEvent::Pointer& event);
+
+  private: WorkbenchPartReference* partRef;
+  };
 
 private: QScopedPointer<IPropertyChangeListener> propertyChangeListener;
 
@@ -161,9 +164,9 @@ protected: virtual void SetImageDescriptor(SmartPointer<ImageDescriptor> descrip
 
 protected: virtual void SetToolTip(const QString& newToolTip);
 
-protected: virtual void PropertyChanged(Object::Pointer source, int propId);
+protected: virtual void PropertyChanged(const Object::Pointer& source, int propId);
 
-protected: virtual void PropertyChanged(PropertyChangeEvent::Pointer event);
+protected: virtual void PropertyChanged(const PropertyChangeEvent::Pointer& event);
 
     /**
      * Refreshes all cached values with the values from the real part
@@ -285,7 +288,7 @@ protected: void DoDisposePart();
  */
 public: virtual QString GetPartProperty(const QString& key) const;
 
-protected: virtual void FirePropertyChange(PropertyChangeEvent::Pointer event);
+protected: virtual void FirePropertyChange(const PropertyChangeEvent::Pointer& event);
 
 protected: virtual void CreatePartProperties(IWorkbenchPart::Pointer workbenchPart);
 

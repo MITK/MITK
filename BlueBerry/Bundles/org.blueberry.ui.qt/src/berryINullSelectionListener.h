@@ -39,8 +39,9 @@ namespace berry
  * @see ISelectionListener
  *
  */
-struct BERRY_UI_QT INullSelectionListener : public ISelectionListener {
-  berryInterfaceMacro(INullSelectionListener, berry)
+struct BERRY_UI_QT INullSelectionListener : public ISelectionListener
+{
+  berryObjectMacro(berry::INullSelectionListener)
 
   ~INullSelectionListener();
 };
@@ -76,7 +77,7 @@ struct NullSelectionChangedAdapter: public INullSelectionListener
 
   typedef R Listener;
   typedef void
-      (R::*Callback)(IWorkbenchPart::Pointer, ISelection::ConstPointer);
+      (R::*Callback)(const IWorkbenchPart::Pointer&, const ISelection::ConstPointer&);
 
   NullSelectionChangedAdapter(R* l, Callback c) :
     listener(l), callback(c)
@@ -85,7 +86,8 @@ struct NullSelectionChangedAdapter: public INullSelectionListener
     poco_assert(callback);
   }
 
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  void SelectionChanged(const IWorkbenchPart::Pointer& part,
+                        const ISelection::ConstPointer& selection)
   {
     (listener->*callback)(part, selection);
   }

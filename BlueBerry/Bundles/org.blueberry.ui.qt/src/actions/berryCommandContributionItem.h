@@ -48,8 +48,9 @@ class UIElement;
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
  */
-class BERRY_UI_QT CommandContributionItem : public ContributionItem
+class BERRY_UI_QT CommandContributionItem : public QObject, public ContributionItem
 {
+  Q_OBJECT
 
 public:
 
@@ -92,7 +93,7 @@ private:
 
   Style style;
 
-  SmartPointer<ICommandListener> commandListener;
+  QScopedPointer<ICommandListener> commandListener;
 
   QString dropDownMenuOverride;
 
@@ -128,11 +129,15 @@ public:
 
   ~CommandContributionItem();
 
+  using ContributionItem::Fill;
+
   QAction* Fill(QMenu* parent, QAction* before);
 
   QAction* Fill(QToolBar* parent, QAction* before);
 
-  void Update(const QString& id = QString());
+  void Update();
+
+  void Update(const QString& id);
 
   bool IsEnabled() const;
 
@@ -173,7 +178,8 @@ private:
 
   //SmartPointer<IUIElementListener> GetItemListener();
 
-  void HandleWidgetSelection(const SmartPointer<UIElement>& element);
+  void connectNotify(const char *signal);
+  void disconnectNotify(const char *signal);
 
   /**
    * Determines if the selection was on the dropdown affordance and, if so,
@@ -196,6 +202,10 @@ private:
   void SetChecked(bool checked);
 
   void SetToolTip(const QString& text);
+
+private slots:
+
+  void HandleWidgetSelection();
 
 };
 

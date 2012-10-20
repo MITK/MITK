@@ -37,7 +37,7 @@ NotExpression::Evaluate(IEvaluationContext* context) const
 }
 
 void
-NotExpression::CollectExpressionInfo(ExpressionInfo* info)
+NotExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   fExpression->CollectExpressionInfo(info);
 }
@@ -52,8 +52,8 @@ NotExpression::operator==(const Object* object) const
   return false;
 }
 
-std::size_t
-NotExpression::ComputeHashCode()
+uint
+NotExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + fExpression->HashCode();
 }

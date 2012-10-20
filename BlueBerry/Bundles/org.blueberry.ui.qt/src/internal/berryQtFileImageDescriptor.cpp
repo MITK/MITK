@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "tweaklets/berryImageTweaklet.h"
 
+#include <ctkPlugin.h>
+
 #include <QIcon>
 #include <QPixmap>
 #include <QByteArray>
@@ -47,6 +49,8 @@ void* QtFileImageDescriptor::CreateImage(bool returnMissingImageOnError)
       BERRY_ERROR << "Could not open file: " << filename;
       if (returnMissingImageOnError)
         return GetMissingImageDescriptor()->CreateImage();
+
+      return 0;
     }
   }
   else

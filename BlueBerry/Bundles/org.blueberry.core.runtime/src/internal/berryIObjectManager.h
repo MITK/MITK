@@ -26,7 +26,7 @@ class RegistryObject;
 
 struct IObjectManager : public Object
 {
-  berryInterfaceMacro(IObjectManager, berry)
+  berryObjectMacro(berry::IObjectManager)
 
   virtual ~IObjectManager();
 

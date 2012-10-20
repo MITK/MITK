@@ -129,7 +129,7 @@ public:
   QString GetFactoryId();
 
 protected:
-  QString ComputePartName();
+  QString ComputePartName() const;
 
 public:
   QString GetName();
@@ -194,6 +194,7 @@ protected:
    */
   IWorkbenchPart::Pointer CreatePart();
 
+  using WorkbenchPartReference::PropertyChanged;
   void PropertyChanged(Object::Pointer source, int propId);
 
   /**

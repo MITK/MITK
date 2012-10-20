@@ -32,12 +32,11 @@ namespace berry
  * if the selection change is triggered by keyboard navigation.
  *
  * @see ISelectionProvider
- *
- * @since 3.0
  */
-struct BERRY_UI_QT IPostSelectionProvider : public ISelectionProvider {
+struct BERRY_UI_QT IPostSelectionProvider : public ISelectionProvider
+{
 
-  berryInterfaceMacro(IPostSelectionProvider, berry);
+  berryObjectMacro(berry::IPostSelectionProvider)
 
   ~IPostSelectionProvider();
 
@@ -48,7 +47,7 @@ struct BERRY_UI_QT IPostSelectionProvider : public ISelectionProvider {
      * @param listener a selection changed listener
      */
   virtual void AddPostSelectionChangedListener(
-            ISelectionChangedListener::Pointer listener) = 0;
+            ISelectionChangedListener* listener) = 0;
 
     /**
      * Removes the given listener for post selection changes from this selection
@@ -58,7 +57,7 @@ struct BERRY_UI_QT IPostSelectionProvider : public ISelectionProvider {
      * @param listener a selection changed listener
      */
     virtual void RemovePostSelectionChangedListener(
-            ISelectionChangedListener::Pointer listener) = 0;
+            ISelectionChangedListener* listener) = 0;
 
 };
 

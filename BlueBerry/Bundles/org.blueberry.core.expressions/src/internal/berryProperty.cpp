@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-Property::Property(Object::Pointer type,
+Property::Property(Object::ConstPointer type,
                    const QString &namespaze, const QString &name)
  : fType(type), fNamespace(namespaze), fName(name)
 {
@@ -57,7 +57,7 @@ bool Property::IsValidCacheEntry(bool forcePluginActivation)
   }
 }
 
-bool Property::Test(Object::Pointer receiver, const QList<Object::Pointer>& args,
+bool Property::Test(Object::ConstPointer receiver, const QList<Object::Pointer>& args,
                     Object::Pointer expectedValue)
 {
   return fTester->Test(receiver, fName, args, expectedValue);

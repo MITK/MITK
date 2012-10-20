@@ -35,7 +35,7 @@ public:
   struct IListenerDoit
   {
     virtual void Notify(const IJobChangeListener::Events& listener,
-        const IJobChangeEvent::ConstPointer event) const = 0;
+        const IJobChangeEvent::ConstPointer& event) const = 0;
 
     virtual ~IListenerDoit() {}
   };
@@ -72,7 +72,7 @@ private:
    * on the given job.
    */
   void DoNotify(const IListenerDoit* doit,
-      const IJobChangeEvent::ConstPointer event);
+                const IJobChangeEvent::ConstPointer& event);
 
 
 public:
@@ -82,12 +82,12 @@ public:
 
   void HandleException(const std::exception& e);
 
-  void Add(IJobChangeListener::Pointer listener)
+  void Add(IJobChangeListener* listener)
   {
     global.AddListener(listener);
   }
 
-  void Remove(IJobChangeListener::Pointer listener)
+  void Remove(IJobChangeListener* listener)
   {
     global.RemoveListener(listener);
   }

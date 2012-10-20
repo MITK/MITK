@@ -271,13 +271,13 @@ QObject* ConfigurationElement::CreateExecutableExtension(const QString& attribut
   return result;
 }
 
-QString ConfigurationElement::GetAttribute(const QString& attrName, const QLocale& locale) const
+QString ConfigurationElement::GetAttribute(const QString& attrName, const QLocale& /*locale*/) const
 {
   registry->LogMultiLangError();
   return GetAttribute(attrName);
 }
 
-QString ConfigurationElement::GetValue(const QLocale& locale) const
+QString ConfigurationElement::GetValue(const QLocale& /*locale*/) const
 {
   registry->LogMultiLangError();
   return GetValue();

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryCommandEvent.h"
 #include "berryExecutionEvent.h"
 #include "berryCommandCategory.h"
+#include "berryState.h"
 
 #include "util/berryCommandTracing.h"
 #include "internal/berryCommandUtils.h"
@@ -33,9 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-bool Command::DEBUG_COMMAND_EXECUTION = false;
+bool Command::DEBUG_COMMAND_EXECUTION = true;
 
-bool Command::DEBUG_HANDLERS = false;
+bool Command::DEBUG_HANDLERS = true;
 
 QString Command::DEBUG_HANDLERS_COMMAND_ID = "";
 
@@ -63,7 +64,7 @@ void Command::AddExecutionListener(IExecutionListener* executionListener)
   executionEvents.AddListener(executionListener);
 }
 
-void Command::AddState(const QString& id, const State::Pointer state)
+void Command::AddState(const QString& id, const State::Pointer& state)
 {
   NamedHandleObjectWithState::AddState(id, state);
   state->SetId(id);
@@ -262,7 +263,8 @@ void Command::FirePostExecuteSuccess(const Object::Pointer returnValue)
   if (DEBUG_COMMAND_EXECUTION)
   {
     CommandTracing::PrintTrace("COMMANDS", "execute" + CommandTracing::SEPARATOR
-                               + "success: id=" + this->GetId() + "; returnValue=" + returnValue->ToString());
+                               + "success: id=" + this->GetId() + "; returnValue=" +
+                               (returnValue.IsNull() ? QString("NULL") : returnValue->ToString()));
   }
 
   executionEvents.postExecuteSuccess(this->GetId(), returnValue);
@@ -298,7 +300,7 @@ IParameter::Pointer Command::GetParameter(const QString& parameterId) const
           "Cannot get a parameter from an undefined command. " + id);
   }
 
-  for (unsigned int i = 0; i < parameters.size(); i++)
+  for (int i = 0; i < parameters.size(); i++)
   {
     IParameter::Pointer parameter(parameters[i]);
     if (parameter->GetId() == parameterId) {
@@ -351,9 +353,12 @@ bool Command::IsEnabled() const
   return handler->IsEnabled();
 }
 
-void Command::SetEnabled(Object::ConstPointer evaluationContext)
+void Command::SetEnabled(const Object::Pointer& evaluationContext)
 {
-  handler->SetEnabled(evaluationContext);
+  if (handler)
+  {
+    handler->SetEnabled(evaluationContext);
+  }
 }
 
 bool Command::IsHandled() const
@@ -411,8 +416,8 @@ bool Command::SetHandler(const IHandler::Pointer handler)
   }
 
   // Swap the state around.
-  const QStringList stateIds(this->GetStateIds());
-  for (unsigned int i = 0; i < stateIds.size(); ++i)
+  const QList<QString> stateIds(this->GetStateIds());
+  for (int i = 0; i < stateIds.size(); ++i)
   {
     const QString stateId = stateIds[i];
     if (IObjectWithState::Pointer stateHandler = this->handler.Cast<IObjectWithState>())
@@ -462,30 +467,19 @@ bool Command::SetHandler(const IHandler::Pointer handler)
   return true;
 }
 
-SmartPointer<IHandlerListener> Command::GetHandlerListener()
+IHandlerListener* Command::GetHandlerListener()
 {
-  if (!handlerListener)
-  {
-    struct HandlerListener : public IHandlerListener
-    {
-      HandlerListener(Command* command) : command(command) {}
+  return this;
+}
 
-      void HandlerChanged(SmartPointer<HandlerEvent> handlerEvent)
-      {
-        bool enabledChanged = handlerEvent->IsEnabledChanged();
-        bool handledChanged = handlerEvent->IsHandledChanged();
-        CommandEvent::Pointer cmdEvent(new CommandEvent(Command::Pointer(command), false,
-                                                        false, false, handledChanged, false, false, false,
-                                                        false, enabledChanged));
-        command->FireCommandChanged(cmdEvent);
-      }
-
-    private:
-      Command* command;
-    };
-    handlerListener = new HandlerListener(this);
-  }
-  return handlerListener;
+void Command::HandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent)
+{
+  bool enabledChanged = handlerEvent->IsEnabledChanged();
+  bool handledChanged = handlerEvent->IsHandledChanged();
+  CommandEvent::Pointer cmdEvent(new CommandEvent(Command::Pointer(this), false,
+                                                  false, false, handledChanged, false, false, false,
+                                                  false, enabledChanged));
+  this->FireCommandChanged(cmdEvent);
 }
 
 QString Command::ToString() const
@@ -498,7 +492,7 @@ QString Command::ToString() const
     buffer << description << ",\n\t\t" << (category ? category->ToString() : QString(""));
     buffer << ",\n\t\t" << (handler ? handler->ToString() : "");
     buffer << ",\n\t\t" << "[";
-    for (unsigned int i = 0; i < parameters.size(); ++i)
+    for (int i = 0; i < parameters.size(); ++i)
     {
       buffer << parameters[i]->GetId();
     }
@@ -532,9 +526,11 @@ void Command::Undefine()
   const bool returnTypeChanged = returnType;
   returnType = 0;
 
-  const QStringList stateIds(this->GetStateIds());
-  if (IObjectWithState::Pointer handlerWithState = handler.Cast<IObjectWithState>()) {
-    for (unsigned int i = 0; i < stateIds.size(); i++) {
+  const QList<QString> stateIds(this->GetStateIds());
+  if (IObjectWithState::Pointer handlerWithState = handler.Cast<IObjectWithState>())
+  {
+    for (int i = 0; i < stateIds.size(); i++)
+    {
       const QString stateId(stateIds[i]);
       handlerWithState->RemoveState(stateId);
 
@@ -542,8 +538,11 @@ void Command::Undefine()
       this->RemoveState(stateId);
       //state.dispose();
     }
-  } else {
-    for (unsigned int i = 0; i < stateIds.size(); ++i) {
+  }
+  else
+  {
+    for (int i = 0; i < stateIds.size(); ++i)
+    {
       const QString stateId(stateIds[i]);
       const State::Pointer state(this->GetState(stateId));
       this->RemoveState(stateId);

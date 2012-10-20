@@ -35,12 +35,12 @@ namespace berry {
  * </p>
  *
  * @see IPageLayout#createPlaceholderFolder
- * @since 2.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct BERRY_UI_QT IPlaceholderFolderLayout : public Object {
+struct BERRY_UI_QT IPlaceholderFolderLayout : public Object
+{
 
-  berryInterfaceMacro(IPlaceholderFolderLayout, berry);
+  berryObjectMacro(berry::IPlaceholderFolderLayout)
 
   virtual ~IPlaceholderFolderLayout();
 

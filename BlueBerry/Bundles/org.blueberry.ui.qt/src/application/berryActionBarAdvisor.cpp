@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIActionBarConfigurer.h>
 #include <berryIWorkbenchWindowConfigurer.h>
 #include <berryIWorkbenchWindow.h>
+#include <berryIMemento.h>
 
 namespace berry
 {

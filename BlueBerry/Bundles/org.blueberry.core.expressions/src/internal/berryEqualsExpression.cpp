@@ -50,12 +50,13 @@ EqualsExpression::EqualsExpression(Poco::XML::Element* element) {
 EvaluationResult::ConstPointer
 EqualsExpression::Evaluate(IEvaluationContext* context) const
 {
-  Object::Pointer element= context->GetDefaultVariable();
+  Object::ConstPointer element= context->GetDefaultVariable();
   return EvaluationResult::ValueOf(element == fExpectedValue);
 }
 
 void
-EqualsExpression::CollectExpressionInfo(ExpressionInfo* info) {
+EqualsExpression::CollectExpressionInfo(ExpressionInfo* info) const
+{
   info->MarkDefaultVariableAccessed();
 }
 
@@ -69,8 +70,9 @@ EqualsExpression::operator==(const Object* object) const
   return false;
 }
 
-std::size_t
-EqualsExpression::ComputeHashCode() {
+uint
+EqualsExpression::ComputeHashCode() const
+{
   return HASH_INITIAL * HASH_FACTOR + fExpectedValue->HashCode();
 }
 

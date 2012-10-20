@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-void PartList::PropertyChange(Object::Pointer source, int propId)
+void PartList::PropertyChange(const Object::Pointer& source, int propId)
 {
   WorkbenchPartReference::Pointer ref = source.Cast<
       WorkbenchPartReference> ();

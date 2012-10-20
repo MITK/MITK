@@ -31,7 +31,7 @@ public:
 
   bool operator==(const KeyedElement& other) const;
 
-  bool operator==(const KeyedElement* other) const;
+  bool operator==(const Object* other) const;
 
   virtual QString GetKey() const = 0;
 

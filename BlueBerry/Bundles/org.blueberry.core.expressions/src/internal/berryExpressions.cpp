@@ -89,10 +89,10 @@ namespace berry
     throw CoreException(status);
   }
 
-  IIterable::Pointer
-  Expressions::GetAsIIterable(Object::Pointer var, Expression::ConstPointer expression)
+  IIterable::ConstPointer
+  Expressions::GetAsIIterable(Object::ConstPointer var, Expression::ConstPointer expression)
   {
-    IIterable::Pointer iterable(var.Cast<IIterable>());
+    IIterable::ConstPointer iterable(var.Cast<const IIterable>());
     if (!iterable.IsNull())
     {
       return iterable;
@@ -100,20 +100,14 @@ namespace berry
     else
     {
       IAdapterManager* manager= Platform::GetAdapterManager();
-      Object::Pointer result;
-      Poco::Any any(manager->GetAdapter(var, IIterable::GetStaticClassName()));
-      if (!any.empty() && any.type() == typeid(Object::Pointer))
-      {
-        result = Poco::AnyCast<Object::Pointer>(any);
-      }
+      iterable = manager->GetAdapter<IIterable>(var.GetPointer());
 
-      if (result)
+      if (iterable)
       {
-        iterable = result.Cast<IIterable>();
         return iterable;
       }
 
-      if (manager->QueryAdapter(var->GetClassName(), IIterable::GetStaticClassName()) == IAdapterManager::NOT_LOADED)
+      if (manager->QueryAdapter<IIterable>(var.GetPointer()) == IAdapterManager::NOT_LOADED)
         return IIterable::Pointer();
 
       IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_IS_NOT_A_COLLECTION,
@@ -123,10 +117,10 @@ namespace berry
     }
   }
 
-  ICountable::Pointer
-  Expressions::GetAsICountable(Object::Pointer var, Expression::ConstPointer expression)
+  ICountable::ConstPointer
+  Expressions::GetAsICountable(Object::ConstPointer var, Expression::ConstPointer expression)
   {
-    ICountable::Pointer countable(var.Cast<ICountable>());
+    ICountable::ConstPointer countable(var.Cast<const ICountable>());
     if (!countable.IsNull())
     {
       return countable;
@@ -134,20 +128,14 @@ namespace berry
     else
     {
       IAdapterManager* manager = Platform::GetAdapterManager();
-      Object::Pointer result;
-      Poco::Any any(manager->GetAdapter(var, ICountable::GetStaticClassName()));
-      if (!any.empty() && any.type() == typeid(Object::Pointer))
-      {
-        result = Poco::AnyCast<Object::Pointer>(any);
-      }
-
+      ICountable::ConstPointer result(manager->GetAdapter<ICountable>(var.GetPointer()));
       if (result)
       {
-        countable = result.Cast<ICountable>();
+        return result;
       }
 
-      if (manager->QueryAdapter(var->GetClassName(), ICountable::GetStaticClassName()) == IAdapterManager::NOT_LOADED)
-        return ICountable::Pointer();
+      if (manager->QueryAdapter<ICountable>(var.GetPointer()) == IAdapterManager::NOT_LOADED)
+        return ICountable::ConstPointer();
 
       IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_IS_NOT_A_COLLECTION,
                                                    QString("The default variable is not countable. Failed expression: %1").arg(expression->ToString()),
@@ -217,7 +205,7 @@ namespace berry
   Expressions::FindNextComma(const QString& str, int start)
   {
     bool inString = false;
-    for (unsigned int i = start; i < str.size(); i++)
+    for (int i = start; i < str.size(); i++)
     {
       const QChar ch = str.at(i);
       if (ch == ',' && ! inString)
@@ -319,7 +307,7 @@ namespace berry
   Expressions::UnEscapeString(const QString& str)
   {
     QString result = "";
-    for (unsigned int i= 0; i < str.size(); i++)
+    for (int i= 0; i < str.size(); i++)
     {
       const QChar ch= str.at(i);
       if (ch == '\'')

@@ -54,9 +54,10 @@ namespace berry {
  * @see IIntroManager#ShowIntro(IWorkbenchWindow::Pointer, bool)
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct BERRY_UI_QT IIntroPart : public virtual Object { // IAdaptable {
+struct BERRY_UI_QT IIntroPart : public virtual Object
+{ // IAdaptable {
 
-  berryInterfaceMacro(IIntroPart, berry);
+  berryObjectMacro(berry::IIntroPart)
 
   ~IIntroPart();
 
@@ -207,6 +208,6 @@ struct BERRY_UI_QT IIntroPart : public virtual Object { // IAdaptable {
 
 }
 
-Q_DECLARE_INTERFACE(berry::IIntroPart, "org.blueberry.IIntroPart")
+Q_DECLARE_INTERFACE(berry::IIntroPart, "org.blueberry.ui.IIntroPart")
 
 #endif /* BERRYIINTROPART_H_ */

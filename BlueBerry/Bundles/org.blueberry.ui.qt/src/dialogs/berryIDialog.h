@@ -30,7 +30,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IDialog : public virtual Object
 {
-  berryInterfaceMacro(IDialog, berry);
+  berryObjectMacro(berry::IDialog)
 
   /**
    * Constant for a dialog with no image (value 0).

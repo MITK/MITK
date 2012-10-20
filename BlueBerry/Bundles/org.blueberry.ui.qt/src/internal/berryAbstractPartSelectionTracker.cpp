@@ -32,9 +32,10 @@ public:
 
   berryObjectMacro(SafeSelectionRunnable)
 
-  ISelectionListener::Pointer l;
+  ISelectionListener* l;
 
-  SafeSelectionRunnable(IWorkbenchPart::Pointer part, ISelection::ConstPointer sel)
+  SafeSelectionRunnable(const IWorkbenchPart::Pointer& part,
+                        const ISelection::ConstPointer& sel)
   : p(part), s(sel)
   {}
 
@@ -45,8 +46,8 @@ public:
 
 private:
 
-  IWorkbenchPart::Pointer p;
-  ISelection::ConstPointer s;
+  const IWorkbenchPart::Pointer p;
+  const ISelection::ConstPointer s;
 };
 
 AbstractPartSelectionTracker::AbstractPartSelectionTracker(
@@ -57,25 +58,25 @@ AbstractPartSelectionTracker::AbstractPartSelectionTracker(
 
 
 void AbstractPartSelectionTracker::AddSelectionListener(
-    ISelectionListener::Pointer listener)
+    ISelectionListener* listener)
 {
   fListeners.push_back(listener);
 }
 
 void AbstractPartSelectionTracker::AddPostSelectionListener(
-    ISelectionListener::Pointer listener)
+    ISelectionListener* listener)
 {
   fPostListeners.push_back(listener);
 }
 
 void AbstractPartSelectionTracker::RemoveSelectionListener(
-    ISelectionListener::Pointer listener)
+    ISelectionListener* listener)
 {
   fListeners.removeAll(listener);
 }
 
 void AbstractPartSelectionTracker::RemovePostSelectionListener(
-    ISelectionListener::Pointer listener)
+    ISelectionListener* listener)
 {
   fPostListeners.removeAll(listener);
 }
@@ -85,15 +86,15 @@ AbstractPartSelectionTracker::~AbstractPartSelectionTracker()
 
 }
 
-void AbstractPartSelectionTracker::FireSelection(IWorkbenchPart::Pointer part,
-    ISelection::ConstPointer sel)
+void AbstractPartSelectionTracker::FireSelection(const IWorkbenchPart::Pointer& part,
+                                                 const ISelection::ConstPointer& sel)
 {
   SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable(part, sel));
-  for (QList<ISelectionListener::Pointer>::iterator i = fListeners.begin();
+  for (QList<ISelectionListener*>::iterator i = fListeners.begin();
       i != fListeners.end(); ++i)
   {
-    ISelectionListener::Pointer l = *i;
-    if ((part && sel) || l.Cast<INullSelectionListener>())
+    ISelectionListener* l = *i;
+    if ((part && sel) || dynamic_cast<INullSelectionListener*>(l))
     {
       runnable->l = l;
       SafeRunner::Run(runnable);
@@ -101,15 +102,15 @@ void AbstractPartSelectionTracker::FireSelection(IWorkbenchPart::Pointer part,
   }
 }
 
-void AbstractPartSelectionTracker::FirePostSelection(IWorkbenchPart::Pointer part,
-    ISelection::ConstPointer sel)
+void AbstractPartSelectionTracker::FirePostSelection(const IWorkbenchPart::Pointer& part,
+                                                     const ISelection::ConstPointer& sel)
 {
   SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable(part, sel));
-  for (QList<ISelectionListener::Pointer>::iterator i = fPostListeners.begin();
+  for (QList<ISelectionListener*>::iterator i = fPostListeners.begin();
       i != fPostListeners.end(); ++i)
   {
-    ISelectionListener::Pointer l = *i;
-    if ((part && sel) || l.Cast<INullSelectionListener>())
+    ISelectionListener* l = *i;
+    if ((part && sel) || dynamic_cast<INullSelectionListener*>(l))
     {
       runnable->l = l;
       SafeRunner::Run(runnable);

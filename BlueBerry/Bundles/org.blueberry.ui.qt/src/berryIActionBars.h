@@ -70,7 +70,7 @@ class Action;
  */
 struct IActionBars : public Object
 {
-  berryInterfaceMacro(IActionBars, berry)
+  berryObjectMacro(berry::IActionBars)
 
   /**
    * Clears the global action handler list.

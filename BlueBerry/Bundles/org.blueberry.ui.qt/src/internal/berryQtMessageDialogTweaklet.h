@@ -30,7 +30,6 @@ class QtMessageDialogTweaklet: public QObject, public MessageDialogTweaklet
 public:
 
   QtMessageDialogTweaklet();
-  QtMessageDialogTweaklet(const QtMessageDialogTweaklet& other);
 
   bool OpenConfirm(Shell::Pointer, const QString& title,
       const QString& message);

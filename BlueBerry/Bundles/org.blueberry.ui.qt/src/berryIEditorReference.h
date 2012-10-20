@@ -37,7 +37,7 @@ namespace berry {
 struct BERRY_UI_QT IEditorReference : public virtual IWorkbenchPartReference
 {
 
-  berryInterfaceMacro(IEditorReference, berry);
+  berryObjectMacro(berry::IEditorReference)
 
   ~IEditorReference();
 

@@ -57,6 +57,8 @@ public:
    */
   bool IsDynamic() const;
 
+  using ContributionItem::Fill;
+
   QAction* Fill(QMenu* menu, QAction *before);
 
 private:

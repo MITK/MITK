@@ -49,7 +49,7 @@ public:
 
 
     QPushButton* defaultButton(NULL);
-    for (std::size_t i = 0; i < dialogButtonLabels.size(); ++i)
+    for (int i = 0; i < dialogButtonLabels.size(); ++i)
     {
       QPushButton* button = msgBox.addButton(dialogButtonLabels[i],
                                              QMessageBox::ActionRole);
@@ -69,11 +69,6 @@ public:
 };
 
 QtMessageDialogTweaklet::QtMessageDialogTweaklet()
-{
-
-}
-
-QtMessageDialogTweaklet::QtMessageDialogTweaklet(const QtMessageDialogTweaklet& other)
 {
 
 }

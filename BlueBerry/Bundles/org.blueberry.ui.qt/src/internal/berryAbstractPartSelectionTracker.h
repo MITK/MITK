@@ -39,12 +39,12 @@ private:
   /**
    * List of selection listeners for this tracker
    */
-  QList<ISelectionListener::Pointer> fListeners;
+  QList<ISelectionListener*> fListeners;
 
   /**
    * List of post selection listeners for this tracker
    */
-  QList<ISelectionListener::Pointer> fPostListeners;
+  QList<ISelectionListener*> fPostListeners;
 
   /**
    * The id of the part this tracker tracks
@@ -65,14 +65,14 @@ public:
    *
    * @param listener the listener to add
    */
-  void AddSelectionListener(ISelectionListener::Pointer listener);
+  void AddSelectionListener(ISelectionListener* listener);
 
   /**
    * Adds a post selection listener to this tracker
    *
    * @param listener the listener to add
    */
-  void AddPostSelectionListener(ISelectionListener::Pointer listener);
+  void AddPostSelectionListener(ISelectionListener* listener);
 
   /**
    * Returns the selection from the part being tracked,
@@ -85,14 +85,14 @@ public:
    *
    * @param listener the listener to remove
    */
-  void RemoveSelectionListener(ISelectionListener::Pointer listener);
+  void RemoveSelectionListener(ISelectionListener* listener);
 
   /**
    * Removes a post selection listener from this tracker.
    *
    * @param listener the listener to remove
    */
-  void RemovePostSelectionListener(ISelectionListener::Pointer listener);
+  void RemovePostSelectionListener(ISelectionListener* listener);
 
   /**
    * Disposes this selection tracker. This removes all listeners currently registered.
@@ -108,7 +108,7 @@ protected:
    * @param sel the selection or <code>null</code> if no active selection
    * @param listeners the list of listeners to notify
    */
-  void FireSelection(IWorkbenchPart::Pointer part, ISelection::ConstPointer sel);
+  void FireSelection(const IWorkbenchPart::Pointer& part, const ISelection::ConstPointer& sel);
 
   /**
    * Fires a post selection event to the listeners.
@@ -117,7 +117,7 @@ protected:
    * @param sel the selection or <code>null</code> if no active selection
    * @param listeners the list of listeners to notify
    */
-  void FirePostSelection(IWorkbenchPart::Pointer part, ISelection::ConstPointer sel);
+  void FirePostSelection(const IWorkbenchPart::Pointer& part, const ISelection::ConstPointer& sel);
 
   /**
    * Returns the id of the part that this tracks.

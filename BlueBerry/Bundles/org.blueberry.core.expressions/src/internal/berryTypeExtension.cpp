@@ -44,7 +44,7 @@ IPropertyTester::Pointer TypeExtension::FindTypeExtender(
   IPropertyTester::Pointer result;
 
   // handle extenders associated with this type extender
-  for (unsigned int i= 0; i < fExtenders.size(); i++)
+  for (int i= 0; i < fExtenders.size(); i++)
   {
     IPropertyTester::Pointer extender = fExtenders[i];
     if (extender.IsNull() || !extender->Handles(namespaze, method))

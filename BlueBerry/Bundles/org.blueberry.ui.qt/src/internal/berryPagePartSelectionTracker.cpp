@@ -35,7 +35,7 @@ public:
     return Events::CLOSED | Events::OPENED;
   }
 
-  void PartClosed(IWorkbenchPartReference::Pointer partRef)
+  void PartClosed(const IWorkbenchPartReference::Pointer& partRef)
   {
     if (tracker->GetPartId(partRef->GetPart(false))
         == tracker->AbstractPartSelectionTracker::GetPartId())
@@ -44,7 +44,7 @@ public:
     }
   }
 
-  void PartOpened(IWorkbenchPartReference::Pointer partRef)
+  void PartOpened(const IWorkbenchPartReference::Pointer& partRef)
   {
     if (tracker->GetPartId(partRef->GetPart(false))
         == tracker->AbstractPartSelectionTracker::GetPartId())
@@ -72,9 +72,11 @@ public:
     return IPerspectiveListener::Events::PART_CHANGED;
   }
 
-  void PerspectiveChanged(IWorkbenchPage::Pointer,
-      IPerspectiveDescriptor::Pointer,
-      IWorkbenchPartReference::Pointer partRef, const QString& changeId)
+  using IPerspectiveListener::PerspectiveChanged;
+  void PerspectiveChanged(const IWorkbenchPage::Pointer&,
+                          const IPerspectiveDescriptor::Pointer&,
+                          const IWorkbenchPartReference::Pointer& partRef,
+                          const QString& changeId)
   {
     if (!partRef)
       return;
@@ -104,7 +106,7 @@ public:
   : tracker(tracker)
   {}
 
-  void SelectionChanged(SelectionChangedEvent::Pointer event)
+  void SelectionChanged(const SelectionChangedEvent::Pointer& event)
   {
     tracker->FireSelection(tracker->GetPart(), event->GetSelection());
   }
@@ -122,7 +124,7 @@ PagePartSelectionTracker::PostSelectionListener::PostSelectionListener(
 }
 
 void PagePartSelectionTracker::PostSelectionListener::SelectionChanged(
-    SelectionChangedEvent::Pointer event)
+    const SelectionChangedEvent::Pointer& event)
 {
   m_Tracker->FirePostSelection(m_Tracker->GetPart(), event->GetSelection());
 }
@@ -131,15 +133,14 @@ PagePartSelectionTracker::PagePartSelectionTracker(
     IWorkbenchPage* page, const QString& partId) :
   AbstractPartSelectionTracker(partId)
 {
-  postSelectionListener = new PostSelectionListener(this);
-  perspListener = new SelTrackerPerspectiveListener(this);
-  selChangedListener = new SelTrackerSelectionChangedListener(this);
-  partListener = new SelTrackerPartListener(this);
+  postSelectionListener.reset(new PostSelectionListener(this));
+  perspListener.reset(new SelTrackerPerspectiveListener(this));
+  selChangedListener.reset(new SelTrackerSelectionChangedListener(this));
+  partListener.reset(new SelTrackerPartListener(this));
 
   this->SetPage(page);
-  page->AddPartListener(partListener);
-  page->GetWorkbenchWindow()->AddPerspectiveListener(
-      perspListener);
+  page->AddPartListener(partListener.data());
+  page->GetWorkbenchWindow()->AddPerspectiveListener(perspListener.data());
   QString secondaryId;
   QString primaryId = partId;
   int indexOfColon;
@@ -173,9 +174,8 @@ ISelection::ConstPointer PagePartSelectionTracker::GetSelection()
 PagePartSelectionTracker::~PagePartSelectionTracker()
 {
   IWorkbenchPage::Pointer page = GetPage();
-  page->GetWorkbenchWindow()->RemovePerspectiveListener(
-      perspListener);
-  page->RemovePartListener(partListener);
+  page->GetWorkbenchWindow()->RemovePerspectiveListener(perspListener.data());
+  page->RemovePartListener(partListener.data());
   this->SetPart(IWorkbenchPart::Pointer(0), false);
   this->SetPage(0);
 }
@@ -229,15 +229,15 @@ void PagePartSelectionTracker::SetPart(IWorkbenchPart::Pointer part,
     ISelectionProvider::Pointer sp = fPart->GetSite()->GetSelectionProvider();
     if (sp.IsNotNull())
     {
-      sp->RemoveSelectionChangedListener(selChangedListener);
+      sp->RemoveSelectionChangedListener(selChangedListener.data());
       if (sp.Cast<IPostSelectionProvider> ().IsNotNull())
       {
         sp.Cast<IPostSelectionProvider> () ->RemovePostSelectionChangedListener(
-            postSelectionListener);
+            postSelectionListener.data());
       }
       else
       {
-        sp->RemoveSelectionChangedListener(postSelectionListener);
+        sp->RemoveSelectionChangedListener(postSelectionListener.data());
       }
     }
   }
@@ -248,15 +248,15 @@ void PagePartSelectionTracker::SetPart(IWorkbenchPart::Pointer part,
     ISelectionProvider::Pointer sp = part->GetSite()->GetSelectionProvider();
     if (sp.IsNotNull())
     {
-      sp->AddSelectionChangedListener(selChangedListener);
+      sp->AddSelectionChangedListener(selChangedListener.data());
       if (sp.Cast<IPostSelectionProvider> ().IsNotNull())
       {
         sp.Cast<IPostSelectionProvider> () ->AddPostSelectionChangedListener(
-            postSelectionListener);
+            postSelectionListener.data());
       }
       else
       {
-        sp->AddSelectionChangedListener(postSelectionListener);
+        sp->AddSelectionChangedListener(postSelectionListener.data());
       }
       if (notify)
       {

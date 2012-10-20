@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryEvaluationReference.h"
 #include "berryEvaluationAuthority.h"
+#include "berryExpression.h"
 
 #include <berryIEvaluationContext.h>
 
@@ -27,8 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 EvaluationService::EvaluationService()
+  : evaluationAuthority(new EvaluationAuthority())
 {
-  evaluationAuthority = new EvaluationAuthority();
+  evaluationAuthority->Register();
 }
 
 EvaluationService::~EvaluationService()
@@ -60,12 +62,12 @@ void EvaluationService::RemoveEvaluationListener(const SmartPointer<IEvaluationR
   evaluationAuthority->RemoveEvaluationListener(ref);
 }
 
-void EvaluationService::AddSourceProvider(SmartPointer<ISourceProvider> provider)
+void EvaluationService::AddSourceProvider(const SmartPointer<ISourceProvider>& provider)
 {
   evaluationAuthority->AddSourceProvider(provider);
 }
 
-void EvaluationService::RemoveSourceProvider(SmartPointer<ISourceProvider> provider)
+void EvaluationService::RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider)
 {
   evaluationAuthority->RemoveSourceProvider(provider);
 }

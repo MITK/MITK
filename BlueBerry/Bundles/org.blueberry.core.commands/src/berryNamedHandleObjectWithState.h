@@ -39,35 +39,35 @@ public:
 
   berryObjectMacro(berry::NamedHandleObjectWithState)
 
-  void AddState(const QString& stateId, const State::Pointer state);
+  void AddState(const QString& stateId, const SmartPointer<State>& state);
 
   QString GetDescription() const;
 
   QString GetName() const;
 
-  State::Pointer GetState(const QString& stateId) const;
+  SmartPointer<State> GetState(const QString& stateId) const;
 
-  QStringList GetStateIds() const;
+  QList<QString> GetStateIds() const;
 
   void RemoveState(const QString& id);
 
-  private:
+private:
 
-    /**
-     * The map of states currently held by this command. If this command has no
-     * state, then this will be empty.
-     */
-    QHash<QString, State::Pointer> states;
+  /**
+   * The map of states currently held by this command. If this command has no
+   * state, then this will be empty.
+   */
+  QHash<QString, SmartPointer<State> > states;
 
-  protected:
+protected:
 
-    /**
-     * Constructs a new instance of <code>NamedHandleObject<WithState/code>.
-     *
-     * @param id
-     *            The identifier for this handle; must not be empty.
-     */
-    NamedHandleObjectWithState(const QString& id);
+  /**
+   * Constructs a new instance of <code>NamedHandleObject<WithState/code>.
+   *
+   * @param id
+   *            The identifier for this handle; must not be empty.
+   */
+  NamedHandleObjectWithState(const QString& id);
 
 };
 

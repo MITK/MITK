@@ -22,21 +22,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 PlatformObject::PlatformObject()
- : Object()
 {
-
 }
 
-Poco::Any PlatformObject::GetAdapter(const std::string& adapter)
+Object* PlatformObject::GetAdapter(const QString& adapter)
 {
   IAdapterManager* adapterManager = Platform::GetAdapterManager();
   if (adapterManager)
   {
-    return adapterManager->GetAdapter(Object::Pointer(this), adapter);
+    return adapterManager->GetAdapter(this, adapter);
   }
   else
   {
-    return Poco::Any();
+    return NULL;
   }
 }
 

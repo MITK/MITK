@@ -41,12 +41,15 @@ QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
     updatesDisabled = true;
 
     widget->setAttribute(Qt::WA_DeleteOnClose);
+
   }
   else
   {
     widget = new QtControlWidget(parent, this, flags | Qt::Dialog);
     widget->setObjectName("shell widget");
   }
+
+  widget->setProperty("shell", QVariant::fromValue(static_cast<Shell*>(this)));
 }
 
 QtShell::~QtShell()
@@ -137,7 +140,7 @@ void QtShell::SetMinimized(bool minimized)
   minimized ? widget->showMinimized() : widget->showNormal();
 }
 
-void QtShell::AddShellListener(IShellListener::Pointer listener)
+void QtShell::AddShellListener(IShellListener* listener)
 {
   QVariant variant = widget->property(QtWidgetController::PROPERTY_ID);
   poco_assert(variant.isValid());
@@ -146,7 +149,7 @@ void QtShell::AddShellListener(IShellListener::Pointer listener)
   controller->AddShellListener(listener);
 }
 
-void QtShell::RemoveShellListener(IShellListener::Pointer listener)
+void QtShell::RemoveShellListener(IShellListener* listener)
 {
   QVariant variant = widget->property(QtWidgetController::PROPERTY_ID);
   if (variant.isValid())
@@ -179,7 +182,7 @@ QList<Shell::Pointer> QtShell::GetShells()
   QList<Shell::Pointer> allShells(widgetTweaklet->GetShells());
   QList<Shell::Pointer> descendants;
 
-  for (std::size_t i = 0; i < allShells.size(); ++i)
+  for (int i = 0; i < allShells.size(); ++i)
   {
     Shell::Pointer shell = allShells[i];
     if (widgetTweaklet->GetShell(shell->GetControl()) == this)

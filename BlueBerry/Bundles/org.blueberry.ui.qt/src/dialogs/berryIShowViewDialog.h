@@ -30,7 +30,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IShowViewDialog : public IDialog
 {
-  berryInterfaceMacro(IShowViewDialog, berry);
+  berryObjectMacro(berry::IShowViewDialog);
 
   ~IShowViewDialog();
 

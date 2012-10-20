@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIParameterTypeListener.h"
 #include "berryIParameterValueConverter.h"
 
+#include <QSharedPointer>
+
 namespace berry
 {
 
@@ -92,12 +94,17 @@ void  AddListener(IParameterTypeListener* listener);
    * Notification is sent to all listeners that something has changed.
    * </p>
    *
+   * @param type
+   *            a string identifying the object type for this parameter
+   *            type; <code>null</code> is interpreted as
+   *            <code>"QObject"</code>
    * @param parameterTypeConverter
    *            an {@link AbstractParameterValueConverter} to perform
    *            string/object conversions for parameter values; may be
    *            <code>null</code>
    */
-  void Define(const SmartPointer<IParameterValueConverter> parameterTypeConverter);
+  void Define(const QString& type,
+              const QSharedPointer<IParameterValueConverter>& parameterTypeConverter);
 
   /**
    * Returns the value converter associated with this parameter, if any.
@@ -107,7 +114,7 @@ void  AddListener(IParameterTypeListener* listener);
    * @throws NotDefinedException
    *             if the parameter type is not currently defined
    */
-  SmartPointer<IParameterValueConverter> GetValueConverter() const;
+  IParameterValueConverter* GetValueConverter() const;
 
   /**
    * Returns whether the provided value is compatible with this parameter
@@ -122,7 +129,7 @@ void  AddListener(IParameterTypeListener* listener);
    * @throws NotDefinedException
    *             if the parameter type is not currently defined
    */
-  bool IsCompatible(const Object::ConstPointer value) const;
+  bool IsCompatible(const QObject* const value) const;
 
   /**
    * Unregisters listener for changes to properties of this parameter type.
@@ -182,7 +189,14 @@ private:
    * An {@link AbstractParameterValueConverter} for converting parameter
    * values between objects and strings. This may be <code>null</code>.
    */
-  SmartPointer<IParameterValueConverter> parameterTypeConverter;
+  QSharedPointer<IParameterValueConverter> parameterTypeConverter;
+
+  /**
+   * A string specifying the object type of this parameter type. This will be
+   * <code>null</code> when the parameter type is undefined but never null
+   * when it is defined.
+   */
+  QString type;
 
   IParameterTypeListener::Events parameterTypeEvents;
 

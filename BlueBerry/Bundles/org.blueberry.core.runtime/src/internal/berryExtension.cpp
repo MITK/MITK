@@ -119,7 +119,7 @@ QString Extension::GetLabelAsIs() const
   return GetExtraData()[LABEL];
 }
 
-QString Extension::GetLabel(const QLocale& locale) const
+QString Extension::GetLabel(const QLocale& /*locale*/) const
 {
   registry->LogMultiLangError();
   return GetLabel();

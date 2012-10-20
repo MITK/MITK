@@ -40,7 +40,7 @@ struct IWorkbenchPage;
 struct BERRY_UI_QT IWorkbenchPartReference : public Object
 {
 
-  berryInterfaceMacro(IWorkbenchPartReference, berry)
+  berryObjectMacro(berry::IWorkbenchPartReference)
 
   ~IWorkbenchPartReference();
 

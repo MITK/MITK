@@ -101,6 +101,8 @@ public:
      */
     public: SmartPointer<LayoutTreeNode> FindSash(LayoutPartSash::Pointer sash);
 
+    using LayoutTree::FindSashes;
+
     /**
      * Sets the elements in the array of sashes with the
      * Left,Rigth,Top and Botton sashes. The elements
@@ -120,6 +122,8 @@ public:
      * Returns true if this tree has visible parts otherwise returns false.
      */
     public: bool IsVisible();
+
+    using LayoutTree::Remove;
 
     /**
      * Remove the child and this node from the tree
@@ -195,7 +199,7 @@ public:
     /**
      * Returns a string representation of this object.
      */
-    public: QString ToString();
+    public: QString ToString() const;
 
     /**
      * Create the sashes if the children are visible

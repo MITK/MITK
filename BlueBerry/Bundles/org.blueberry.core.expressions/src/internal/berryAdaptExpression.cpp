@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryAdaptExpression.h"
 
 #include <berryPlatform.h>
-#include <berryRuntime.h>
 #include <berryIAdapterManager.h>
 #include <berryIConfigurationElement.h>
 
@@ -66,7 +65,7 @@ AdaptExpression::AdaptExpression(const QString& typeName)
 //}
 
 uint
-AdaptExpression::ComputeHashCode()
+AdaptExpression::ComputeHashCode() const
 {
   throw Poco::NotImplementedException("ComputeHashCode not implemented");
   //return HASH_INITIAL * HASH_FACTOR + HashCode(fExpressions)
@@ -81,8 +80,8 @@ AdaptExpression::Evaluate(IEvaluationContext* context) const
 {
   if (fTypeName.size() == 0)
     return EvaluationResult::FALSE_EVAL;
-  Object::Pointer var = context->GetDefaultVariable();
-  Object::Pointer adapted;
+  Object::ConstPointer var = context->GetDefaultVariable();
+  Object::ConstPointer adapted;
   IAdapterManager* manager = Platform::GetAdapterManager();
   if (Expressions::IsInstanceOf(var.GetPointer(), fTypeName))
   {
@@ -90,20 +89,16 @@ AdaptExpression::Evaluate(IEvaluationContext* context) const
   }
   else
   {
-    if (!manager->HasAdapter(var->GetClassName(), fTypeName.toStdString()))
+    if (!manager->HasAdapter(var.GetPointer(), fTypeName))
       return EvaluationResult::FALSE_EVAL;
 
-    Poco::Any anyAdapted(manager->GetAdapter(var.GetPointer(), fTypeName.toStdString()));
-    if (!anyAdapted.empty() && anyAdapted.type() == typeid(Object::Pointer))
-    {
-      adapted = Poco::AnyCast<Object::Pointer>(anyAdapted);
-    }
+    adapted = manager->GetAdapter(var.GetPointer(), fTypeName);
   }
   // the adapted result is null but hasAdapter returned TRUE_EVAL check
   // if the adapter is loaded.
   if (adapted.IsNull())
   {
-    if (manager->QueryAdapter(var->GetClassName(), fTypeName.toStdString()) == IAdapterManager::NOT_LOADED)
+    if (manager->QueryAdapter(var.GetPointer(), fTypeName) == IAdapterManager::NOT_LOADED)
     {
       return EvaluationResult::NOT_LOADED;
     }
@@ -117,7 +112,7 @@ AdaptExpression::Evaluate(IEvaluationContext* context) const
 }
 
 void
-AdaptExpression::CollectExpressionInfo(ExpressionInfo* info)
+AdaptExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   // Although the default variable is passed to the children of this
   // expression as an instance of the adapted type it is OK to only

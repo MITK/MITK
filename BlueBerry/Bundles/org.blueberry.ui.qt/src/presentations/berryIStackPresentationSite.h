@@ -40,7 +40,7 @@ namespace berry
 struct BERRY_UI_QT IStackPresentationSite : public Object
 {
 
-  berryInterfaceMacro(IStackPresentationSite, berry)
+  berryObjectMacro(berry::IStackPresentationSite)
 
   static int STATE_MINIMIZED; // = 0;
 

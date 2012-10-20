@@ -21,9 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 #include <org_blueberry_core_commands_Export.h>
 
-#include <QHash>
 
 namespace berry {
+
+struct IParameterValues;
 
 /**
  * <p>
@@ -36,7 +37,7 @@ namespace berry {
 struct BERRY_COMMANDS IParameter : public virtual Object
 {
 
-  berryInterfaceMacro(IParameter, berry)
+  berryObjectMacro(berry::IParameter)
 
   typedef QHash<QString, QString> ParameterValues;
 
@@ -62,7 +63,7 @@ struct BERRY_COMMANDS IParameter : public virtual Object
    * @throws ParameterValuesException
    *             If the values can't be retrieved for some reason.
    */
-  virtual ParameterValues GetValues() const = 0;
+  virtual IParameterValues* GetValues() const = 0;
 
   /**
    * Returns whether parameter is optional. Otherwise, it is required.

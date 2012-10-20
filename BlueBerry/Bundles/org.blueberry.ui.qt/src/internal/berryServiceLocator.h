@@ -62,7 +62,7 @@ private:
     bool HasService(const QString& api) const;
   };
 
-  const SmartPointer<const IServiceFactory> factory;
+  const IServiceFactory* const factory;
 
   /**
    * The parent for this service locator. If a service can't be found in this
@@ -81,6 +81,8 @@ private:
   bool disposed;
 
   IDisposable::WeakPtr owner;
+
+  QList<Object::Pointer> managedFactoryServices;
 
 public:
 
@@ -101,7 +103,7 @@ public:
    *            a local factory that can provide services at this level
    * @param owner
    */
-  ServiceLocator(IServiceLocator* parent, const SmartPointer<const IServiceFactory> factory,
+  ServiceLocator(IServiceLocator* parent, const IServiceFactory* factory,
       IDisposable::WeakPtr owner);
 
   void Activate();

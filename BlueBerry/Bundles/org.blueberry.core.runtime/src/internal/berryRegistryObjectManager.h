@@ -110,7 +110,7 @@ protected:
 
   static const int CACHE_INITIAL_SIZE; // = 512;
 
-  static uint UNKNOWN;
+  static int UNKNOWN;
 
   typedef QHash<QString, QList<int> > OrphansMapType;
   typedef QHash<QString, SmartPointer<RegistryContributor> > ContributorsMapType;
@@ -133,6 +133,7 @@ protected:
   QList<SmartPointer<RegistryObject> > GetObjects_unlocked(const QList<int>& values, short type) const;
 
   SmartPointer<ExtensionPoint> GetExtensionPointObject(const QString& xptUniqueId) const;
+  SmartPointer<ExtensionPoint> GetExtensionPointObject_unlocked(const QString& xptUniqueId) const;
 
   QList<SmartPointer<ExtensionPointHandle> > GetExtensionPointsHandles() const;
 

@@ -41,7 +41,7 @@ Window::WindowShellListener::WindowShellListener(Window* wnd)
 
  }
 
-void Window::WindowShellListener::ShellClosed(ShellEvent::Pointer event)
+void Window::WindowShellListener::ShellClosed(const ShellEvent::Pointer& event)
 {
   event->doit = false; // don't close now
   if (window->CanHandleShellCloseEvent())
@@ -56,7 +56,7 @@ void Window::DefaultExceptionHandler::HandleException(const std::exception& t)
   std::cerr << t.what();
 }
 
-Shell::Pointer Window::DefaultModalParent::GetShell()
+Shell::Pointer Window::DefaultModalParent::GetShell() const
 {
   Shell::Pointer parent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetActiveShell();
 
@@ -316,12 +316,12 @@ Shell::Pointer Window::GetParentShell()
   return parent;
 }
 
-IShellListener::Pointer Window::GetShellListener()
+IShellListener* Window::GetShellListener()
 {
-  if (windowShellListener == 0)
-    windowShellListener = new WindowShellListener(this);
+  if (windowShellListener.isNull())
+    windowShellListener.reset(new WindowShellListener(this));
 
-  return windowShellListener;
+  return windowShellListener.data();
 }
 
 int Window::GetShellStyle()
@@ -489,7 +489,7 @@ int Window::GetReturnCode()
   return returnCode;
 }
 
-Shell::Pointer Window::GetShell()
+Shell::Pointer Window::GetShell() const
 {
   return shell;
 }
@@ -553,7 +553,7 @@ void Window::SetWindowManager(WindowManager* manager)
   if (manager != 0)
   {
     QList<Window::Pointer> windows = manager->GetWindows();
-    for (unsigned int i = 0; i < windows.size(); i++)
+    for (int i = 0; i < windows.size(); i++)
     {
       if (windows[i] == this)
       {

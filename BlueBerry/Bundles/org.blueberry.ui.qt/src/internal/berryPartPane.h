@@ -396,13 +396,16 @@ public:
 
   public: void RemovePropertyListener(IPropertyChangeListener* listener);
 
-  public: void FirePropertyChange(PropertyChangeEvent::Pointer event);
+  public: void FirePropertyChange(const PropertyChangeEvent::Pointer& event);
 
 
   /* (non-Javadoc)
    * @see IPropertyChangeListener#PropertyChange(PropertyChangeEvent::Pointer)
    */
-  public: void PropertyChange(PropertyChangeEvent::Pointer event);
+  public:
+
+  using IPropertyChangeListener::PropertyChange;
+  void PropertyChange(const PropertyChangeEvent::Pointer& event);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.LayoutPart#computePreferredSize(boolean, int, int, int)

@@ -143,7 +143,7 @@ public:
    * @param object
    * @return true if this Saveable is equal to the given object
    */
-  virtual bool operator<(const Saveable* object) const = 0;
+  virtual bool operator<(const Object* object) const = 0;
 
   /**
    * Clients must implement equals and hashCode as defined in
@@ -167,7 +167,7 @@ public:
    *
    * @return a hash code
    */
-  //virtual int hashCode();
+  virtual uint HashCode() const = 0;
 
   /**
    * Saves this saveable, or prepares this saveable for a background save
@@ -278,7 +278,7 @@ protected:
    *
    * @since 3.3
    */
-  virtual Poco::Any GetAdapter(const QString& adapter);
+  virtual Object* GetAdapter(const QString& adapter);
 };
 
 }

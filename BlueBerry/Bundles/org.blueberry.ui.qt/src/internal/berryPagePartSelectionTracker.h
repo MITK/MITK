@@ -56,7 +56,7 @@ private:
   {
     PostSelectionListener(PagePartSelectionTracker* tracker);
 
-    void SelectionChanged(SelectionChangedEvent::Pointer event);
+    void SelectionChanged(const SelectionChangedEvent::Pointer& event);
 
     PagePartSelectionTracker* m_Tracker;
   };
@@ -66,10 +66,10 @@ private:
   friend class SelTrackerPerspectiveListener;
   friend class SelTrackerSelectionChangedListener;
 
-  ISelectionChangedListener::Pointer postSelectionListener;
-  IPerspectiveListener::Pointer perspListener;
-  ISelectionChangedListener::Pointer selChangedListener;
-  IPartListener::Pointer partListener;
+  QScopedPointer<ISelectionChangedListener> postSelectionListener;
+  QScopedPointer<IPerspectiveListener> perspListener;
+  QScopedPointer<ISelectionChangedListener> selChangedListener;
+  QScopedPointer<IPartListener> partListener;
 
 public:
 

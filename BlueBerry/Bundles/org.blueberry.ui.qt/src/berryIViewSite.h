@@ -33,9 +33,10 @@ namespace berry {
  * </p>
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct BERRY_UI_QT IViewSite : public virtual IWorkbenchPartSite {
+struct BERRY_UI_QT IViewSite : public virtual IWorkbenchPartSite
+{
 
-  berryInterfaceMacro(IViewSite, berry);
+  berryObjectMacro(berry::IViewSite)
 
   virtual ~IViewSite();
 
@@ -52,7 +53,6 @@ struct BERRY_UI_QT IViewSite : public virtual IWorkbenchPartSite {
      * or <code>null</code> if it has none.
      *
      * @see IWorkbenchPage#showView(String, String, int)
-     * @since 3.0
      */
     virtual QString GetSecondaryId() = 0;
 };

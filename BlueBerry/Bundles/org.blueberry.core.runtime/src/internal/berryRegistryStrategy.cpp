@@ -104,7 +104,7 @@ void RegistryStrategy::OnStart(IExtensionRegistry* reg, bool loadedFromCache)
     pluginListener->ProcessPlugins(org_blueberry_core_runtime_Activator::getPluginContext()->getPlugins());
 }
 
-void RegistryStrategy::OnStop(IExtensionRegistry* registry)
+void RegistryStrategy::OnStop(IExtensionRegistry* /*registry*/)
 {
   if (!pluginListener.isNull())
   {
@@ -258,8 +258,8 @@ QXmlReader* RegistryStrategy::GetXMLParser() const
 }
 
 QList<QString> RegistryStrategy::Translate(const QList<QString>& nonTranslated,
-                                 const SmartPointer<IContributor>& contributor,
-                                 const QLocale& locale)
+                                 const SmartPointer<IContributor>& /*contributor*/,
+                                 const QLocale& /*locale*/)
 {
   return nonTranslated;
 }

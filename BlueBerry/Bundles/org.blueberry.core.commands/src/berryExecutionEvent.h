@@ -37,8 +37,6 @@ namespace berry {
  * dependent. In the BlueBerry workbench, the trigger is an SWT event, and the
  * application context contains information about the selection and active part.
  * </p>
- *
- * @since 3.1
  */
 class BERRY_COMMANDS ExecutionEvent : public Object {
 
@@ -56,7 +54,7 @@ private:
    * part of the active selection (for example). This value may be
    * <code>null</code>.
    */
-  const Object::ConstPointer applicationContext;
+  const Object::Pointer applicationContext;
 
   /**
    * The command being executed. This value may be <code>null</code>.
@@ -84,8 +82,6 @@ public:
    * Constructs a new instance of <code>ExecutionEvent</code> with no
    * parameters, no trigger and no application context. This is just a
    * convenience method.
-   *
-   * @since 3.2
    */
   ExecutionEvent();
 
@@ -104,10 +100,9 @@ public:
    * @param applicationContext
    *            The state of the application at the time the execution was
    *            triggered; may be <code>null</code>.
-   * @since 3.2
    */
-  ExecutionEvent(const Command::ConstPointer command, const ParameterMap& parameters,
-      const Object::ConstPointer trigger, const Object::ConstPointer applicationContext);
+  ExecutionEvent(const Command::ConstPointer& command, const ParameterMap& parameters,
+                 const Object::ConstPointer& trigger, const Object::Pointer& applicationContext);
 
   /**
    * Returns the state of the application at the time the execution was
@@ -115,13 +110,12 @@ public:
    *
    * @return The application context; may be <code>null</code>.
    */
-  const Object::ConstPointer GetApplicationContext() const;
+  const Object::Pointer GetApplicationContext() const;
 
   /**
    * Returns the command being executed.
    *
    * @return The command being executed.
-   * @since 3.2
    */
   const Command::ConstPointer GetCommand() const;
 
@@ -140,7 +134,6 @@ public:
    * @throws ExecutionException
    *             if the parameter object value could not be obtained for any
    *             reason
-   * @since 3.2
    */
   const Object::ConstPointer GetObjectParameterForExecution(const QString& parameterId) const;
 

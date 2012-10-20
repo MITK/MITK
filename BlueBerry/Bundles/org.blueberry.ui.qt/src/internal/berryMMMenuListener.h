@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-struct MenuManager;
+class MenuManager;
 
 class MMMenuListener : public QObject
 {

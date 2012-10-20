@@ -46,7 +46,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IPathEditorInput : public IEditorInput {
 
-  berryInterfaceMacro(IPathEditorInput, berry);
+  berryObjectMacro(berry::IPathEditorInput)
 
   virtual ~IPathEditorInput();
 

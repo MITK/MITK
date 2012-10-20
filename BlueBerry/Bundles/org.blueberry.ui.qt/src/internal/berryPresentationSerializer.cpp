@@ -36,7 +36,7 @@ QString PresentationSerializer::GetId(IPresentablePart::Pointer part)
 IPresentablePart::Pointer PresentationSerializer::GetPart(const QString& id)
 {
   bool okay = false;
-  unsigned int index = id.toUInt(&okay);
+  int index = id.toInt(&okay);
   if (!okay) return IPresentablePart::Pointer(0);
 
   IPresentablePart::Pointer result;

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <Poco/Bugcheck.h>
 
+#include <berryShell.h>
 #include <berryActionBarAdvisor.h>
 #include <berryWorkbenchPreferenceConstants.h>
 #include <berryObjects.h>

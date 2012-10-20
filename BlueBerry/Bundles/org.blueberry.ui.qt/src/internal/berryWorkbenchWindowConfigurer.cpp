@@ -65,8 +65,14 @@ IToolBarManager* WorkbenchWindowConfigurer::WindowActionBarConfigurer::GetToolBa
 }
 
 WorkbenchWindowConfigurer::WorkbenchWindowConfigurer(const WorkbenchWindow::Pointer& window)
- : shellStyle(0), showPerspectiveBar(false), showStatusLine(true), showToolBar(true),
-   showMenuBar(true), showProgressIndicator(false), initialSize(1024,768)
+ : shellStyle(0)
+ , showPerspectiveBar(false)
+ , showStatusLine(true)
+ , showToolBar(true)
+ , showMenuBar(true)
+ , showProgressIndicator(false)
+ , dropTargetListener(NULL)
+ , initialSize(1024,768)
 {
   if (window.IsNull())
   {
@@ -203,7 +209,7 @@ void WorkbenchWindowConfigurer::AddEditorAreaTransfer(const QStringList& transfe
   }
 }
 
-void WorkbenchWindowConfigurer::ConfigureEditorAreaDropListener(const IDropTargetListener::Pointer& listener)
+void WorkbenchWindowConfigurer::ConfigureEditorAreaDropListener(IDropTargetListener* listener)
 {
   if (listener == 0) return;
   dropTargetListener = listener;
@@ -213,7 +219,7 @@ void WorkbenchWindowConfigurer::ConfigureEditorAreaDropListener(const IDropTarge
   {
     QtDnDControlWidget* dropTarget =
         static_cast<QtDnDControlWidget*>(page->GetEditorPresentation()->GetLayoutPart().Cast<EditorSashContainer>()->GetParent());
-    dropTarget->AddDropListener(listener.GetPointer());
+    dropTarget->AddDropListener(listener);
   }
 }
 
@@ -222,7 +228,7 @@ QStringList WorkbenchWindowConfigurer::GetTransfers() const
   return transferTypes.toList();
 }
 
-IDropTargetListener::Pointer WorkbenchWindowConfigurer::GetDropTargetListener() const
+IDropTargetListener* WorkbenchWindowConfigurer::GetDropTargetListener() const
 {
   return dropTargetListener;
 }
@@ -267,7 +273,7 @@ QMenuBar* WorkbenchWindowConfigurer::CreateMenuBar()
   return window.Lock()->GetMenuManager()->CreateMenuBar(window.Lock()->GetShell()->GetControl());
 }
 
-QWidget* WorkbenchWindowConfigurer::CreateToolBar(QWidget* parent)
+QWidget* WorkbenchWindowConfigurer::CreateToolBar(QWidget* /*parent*/)
 {
 //  IToolBarManager* toolBarManager = window->GetToolBarManager();
 //  if (toolBarManager)

@@ -34,16 +34,16 @@ namespace berry
 //}
 
 AbstractSelectionService::AbstractSelectionService()
+  : selListener(new SelectionListener(this))
+  , postSelListener(new PostSelectionListener(this))
 {
-  selListener = new SelectionListener(this);
-  postSelListener = new PostSelectionListener(this);
 }
 
 AbstractSelectionService::SelectionListener::SelectionListener(AbstractSelectionService* service)
  : m_SelectionService(service)
 { }
 
-void AbstractSelectionService::SelectionListener::SelectionChanged(SelectionChangedEvent::Pointer event)
+void AbstractSelectionService::SelectionListener::SelectionChanged(const SelectionChangedEvent::Pointer& event)
 {
   m_SelectionService->FireSelection(m_SelectionService->activePart, event->GetSelection());
 }
@@ -53,65 +53,64 @@ AbstractSelectionService::PostSelectionListener::PostSelectionListener(AbstractS
 { }
 
 void AbstractSelectionService::PostSelectionListener::SelectionChanged(
-    SelectionChangedEvent::Pointer event)
+    const SelectionChangedEvent::Pointer& event)
 {
   m_SelectionService->FirePostSelection(m_SelectionService->activePart, event->GetSelection());
 }
 
-void AbstractSelectionService::AddSelectionListener(ISelectionListener::Pointer l)
+void AbstractSelectionService::AddSelectionListener(ISelectionListener* l)
 {
   fListeners.push_back(l);
 }
 
 void AbstractSelectionService::AddSelectionListener(const QString& partId,
-    ISelectionListener::Pointer listener)
+                                                    ISelectionListener* listener)
 {
   this->GetPerPartTracker(partId)->AddSelectionListener(listener);
 }
 
-void AbstractSelectionService::AddPostSelectionListener(
-    ISelectionListener::Pointer l)
+void AbstractSelectionService::AddPostSelectionListener(ISelectionListener* l)
 {
   fPostListeners.push_back(l);
 }
 
 void AbstractSelectionService::AddPostSelectionListener(const QString& partId,
-    ISelectionListener::Pointer listener)
+                                                        ISelectionListener* listener)
 {
   this->GetPerPartTracker(partId)->AddPostSelectionListener(listener);
 }
 
-void AbstractSelectionService::RemoveSelectionListener(ISelectionListener::Pointer l)
+void AbstractSelectionService::RemoveSelectionListener(ISelectionListener* l)
 {
   fListeners.removeAll(l);
 }
 
 void AbstractSelectionService::RemovePostSelectionListener(
-    const QString& partId, ISelectionListener::Pointer listener)
+    const QString& partId, ISelectionListener* listener)
 {
   this->GetPerPartTracker(partId)->RemovePostSelectionListener(listener);
 }
 
 void AbstractSelectionService::RemovePostSelectionListener(
-    ISelectionListener::Pointer l)
+    ISelectionListener* l)
 {
   fPostListeners.removeAll(l);
 }
 
 void AbstractSelectionService::RemoveSelectionListener(const QString& partId,
-    ISelectionListener::Pointer listener)
+                                                       ISelectionListener* listener)
 {
   this->GetPerPartTracker(partId)->RemoveSelectionListener(listener);
 }
 
-void AbstractSelectionService::FireSelection(IWorkbenchPart::Pointer part,
-    ISelection::ConstPointer sel)
+void AbstractSelectionService::FireSelection(const IWorkbenchPart::Pointer& part,
+                                             const ISelection::ConstPointer& sel)
 {
-  for (QList<ISelectionListener::Pointer>::iterator i = fListeners.begin();
+  for (QList<ISelectionListener*>::iterator i = fListeners.begin();
       i != fListeners.end(); ++i)
   {
-    ISelectionListener::Pointer l = *i;
-    if ((part && sel) || l.Cast<INullSelectionListener>())
+    ISelectionListener* l = *i;
+    if ((part && sel) || dynamic_cast<INullSelectionListener*>(l))
     {
       try
       {
@@ -129,14 +128,14 @@ void AbstractSelectionService::FireSelection(IWorkbenchPart::Pointer part,
   }
 }
 
-void AbstractSelectionService::FirePostSelection(IWorkbenchPart::Pointer part,
-    ISelection::ConstPointer sel)
+void AbstractSelectionService::FirePostSelection(const IWorkbenchPart::Pointer& part,
+                                                 const ISelection::ConstPointer& sel)
 {
-  for (QList<ISelectionListener::Pointer>::iterator i = fPostListeners.begin();
+  for (QList<ISelectionListener*>::iterator i = fPostListeners.begin();
       i != fPostListeners.end(); ++i)
   {
-    ISelectionListener::Pointer l = *i;
-    if ((part && sel) || l.Cast<INullSelectionListener>())
+    ISelectionListener* l = *i;
+    if ((part && sel) || dynamic_cast<INullSelectionListener*>(l))
     {
       try
       {
@@ -218,16 +217,16 @@ void AbstractSelectionService::SetActivePart(IWorkbenchPart::Pointer newPart)
   {
     if (activeProvider.IsNotNull())
     {
-      activeProvider->RemoveSelectionChangedListener(selListener);
+      activeProvider->RemoveSelectionChangedListener(selListener.data());
       if (activeProvider.Cast<IPostSelectionProvider>().IsNotNull())
       {
         activeProvider.Cast<IPostSelectionProvider>()
-        ->RemovePostSelectionChangedListener(postSelListener);
+        ->RemovePostSelectionChangedListener(postSelListener.data());
       }
       else
       {
         activeProvider
-        ->RemoveSelectionChangedListener(postSelListener);
+        ->RemoveSelectionChangedListener(postSelListener.data());
       }
       activeProvider = 0;
     }
@@ -240,17 +239,17 @@ void AbstractSelectionService::SetActivePart(IWorkbenchPart::Pointer newPart)
   {
     activeProvider = selectionProvider;
     // Fire an event if there's an active provider
-    activeProvider->AddSelectionChangedListener(selListener);
+    activeProvider->AddSelectionChangedListener(selListener.data());
     ISelection::ConstPointer sel = activeProvider->GetSelection();
     this->FireSelection(newPart, sel);
     if (activeProvider.Cast<IPostSelectionProvider>().IsNotNull())
     {
       activeProvider.Cast<IPostSelectionProvider>()
-      ->AddPostSelectionChangedListener(postSelListener);
+      ->AddPostSelectionChangedListener(postSelListener.data());
     }
     else
     {
-      activeProvider->AddSelectionChangedListener(postSelListener);
+      activeProvider->AddSelectionChangedListener(postSelListener.data());
     }
     this->FirePostSelection(newPart, sel);
   }

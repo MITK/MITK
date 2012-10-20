@@ -143,7 +143,7 @@ IIntroDescriptor::Pointer IntroRegistry::GetIntroForProduct(
   IIntroDescriptor::Pointer descriptor;
 
   QList<IIntroDescriptor::Pointer> intros(GetIntros());
-  for (std::size_t i = 0; i < intros.size(); i++)
+  for (int i = 0; i < intros.size(); i++)
   {
     if (intros[i]->GetId() == targetIntroId)
     {
@@ -158,7 +158,7 @@ IIntroDescriptor::Pointer IntroRegistry::GetIntroForProduct(
 IIntroDescriptor::Pointer IntroRegistry::GetIntro(const QString& id) const
 {
   QList<IIntroDescriptor::Pointer> intros(GetIntros());
-  for (std::size_t i = 0; i < intros.size(); i++)
+  for (int i = 0; i < intros.size(); i++)
   {
     IIntroDescriptor::Pointer desc = intros[i];
     if (desc->GetId() == id)

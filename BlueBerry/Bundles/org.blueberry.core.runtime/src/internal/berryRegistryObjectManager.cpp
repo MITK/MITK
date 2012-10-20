@@ -14,6 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include "berryRegistryObjectManager.h"
 
 #include "berryConfigurationElementHandle.h"
@@ -37,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 const int RegistryObjectManager::CACHE_INITIAL_SIZE = 512;
-uint RegistryObjectManager::UNKNOWN = std::numeric_limits<uint>::max();
+int RegistryObjectManager::UNKNOWN = std::numeric_limits<int>::max();
 
 RegistryObjectManager::RegistryObjectManager(ExtensionRegistry* registry)
   : cache(NULL), nextId(1), orphanExtensionsLoaded(false), formerContributionsLoaded(false),
@@ -235,11 +239,11 @@ RegistryObjectManager::GetExtensionsFromNamespace(const QString& namespaceName) 
 
   // filter extensions with no extension point (orphan extensions)
   QList<ExtensionHandle::Pointer> result;
-  QList<RegistryObject::Pointer> exts = GetObjects(namespaceExtensions, EXTENSION);
+  QList<RegistryObject::Pointer> exts = GetObjects_unlocked(namespaceExtensions, EXTENSION);
   for (int i = 0; i < exts.size(); i++)
   {
     Extension::Pointer ext = exts[i].Cast<Extension>();
-    if (GetExtensionPointObject(ext->GetExtensionPointIdentifier()).IsNotNull())
+    if (GetExtensionPointObject_unlocked(ext->GetExtensionPointIdentifier()).IsNotNull())
     {
       result.push_back(GetHandle(ext->GetObjectId(), EXTENSION).Cast<ExtensionHandle>());
     }
@@ -247,7 +251,7 @@ RegistryObjectManager::GetExtensionsFromNamespace(const QString& namespaceName) 
   return result;
 }
 
-bool RegistryObjectManager::Init(long timeStamp)
+bool RegistryObjectManager::Init(long /*timeStamp*/)
 {
   return false;
 //  QMutexLocker l(&mutex);
@@ -338,7 +342,11 @@ void RegistryObjectManager::Remove_unlocked(int id, bool release)
 SmartPointer<ExtensionPoint> RegistryObjectManager::GetExtensionPointObject(const QString& xptUniqueId) const
 {
   QMutexLocker l(&mutex);
-  int id;
+  return this->GetExtensionPointObject_unlocked(xptUniqueId);
+}
+
+SmartPointer<ExtensionPoint> RegistryObjectManager::GetExtensionPointObject_unlocked(const QString& xptUniqueId) const
+{
   HashtableOfStringAndInt::const_iterator idIter = extensionPoints.find(xptUniqueId);
   if (idIter == extensionPoints.end())
     return ExtensionPoint::Pointer();
@@ -797,7 +805,7 @@ SmartPointer<RegistryObject> RegistryObjectManager::BasicGetObject(int id, short
   return result;
 }
 
-SmartPointer<RegistryObject> RegistryObjectManager::Load(int id, short type) const
+SmartPointer<RegistryObject> RegistryObjectManager::Load(int /*id*/, short /*type*/) const
 {
 //  TableReader reader = registry.getTableReader();
 //  if (fileOffsets == null)

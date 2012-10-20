@@ -645,7 +645,7 @@ void LayoutTreeNode::SetChild(bool left, LayoutTree::Pointer child)
   this->FlushCache();
 }
 
-QString LayoutTreeNode::ToString()
+QString LayoutTreeNode::ToString() const
 {
   QString str;
   QTextStream s(&str);

@@ -32,12 +32,12 @@ namespace berry {
  * This interface is not intended to be implemented by clients.
  * </p>
  *
- * @since 3.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct BERRY_UI_QT IViewLayout : public Object {
+struct BERRY_UI_QT IViewLayout : public Object
+{
 
-  berryInterfaceMacro(IViewLayout, berry);
+  berryObjectMacro(berry::IViewLayout)
 
   virtual  ~IViewLayout();
 

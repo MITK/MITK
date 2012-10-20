@@ -32,12 +32,11 @@ namespace berry {
  * given editor input.  This is used to find a matching editor during
  * {@link org.blueberry.ui.IWorkbenchPage#openEditor(IEditorInput, String, boolean)} and
  * {@link org.blueberry.ui.IWorkbenchPage#findEditor(IEditorInput)}.
- *
- * @since 3.1
  */
-struct BERRY_UI_QT IEditorMatchingStrategy : public Object {
+struct BERRY_UI_QT IEditorMatchingStrategy : public Object
+{
 
-  berryInterfaceMacro(IEditorMatchingStrategy, berry);
+  berryObjectMacro(berry::IEditorMatchingStrategy)
 
   ~IEditorMatchingStrategy();
 
@@ -61,6 +60,6 @@ struct BERRY_UI_QT IEditorMatchingStrategy : public Object {
 
 }
 
-Q_DECLARE_INTERFACE(berry::IEditorMatchingStrategy, "org.blueberry.IEditorMatchingStrategy")
+Q_DECLARE_INTERFACE(berry::IEditorMatchingStrategy, "org.blueberry.ui.IEditorMatchingStrategy")
 
 #endif /*BERRYIEDITORMATCHINGSTRATEGY_H_*/

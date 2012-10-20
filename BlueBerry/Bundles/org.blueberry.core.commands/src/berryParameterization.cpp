@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryParameterization.h"
 #include "berryIParameter.h"
+#include "berryIParameterValues.h"
 
 namespace berry
 {
@@ -85,7 +86,7 @@ QString Parameterization::GetValue() const
 
 QString Parameterization::GetValueName() const
 {
-  const IParameter::ParameterValues parameterValues = parameter->GetValues();
+  const QHash<QString,QString> parameterValues = parameter->GetValues()->GetParameterValues();
 
   QString returnValue;
   for (IParameter::ParameterValues::const_iterator parameterValueItr = parameterValues.begin();

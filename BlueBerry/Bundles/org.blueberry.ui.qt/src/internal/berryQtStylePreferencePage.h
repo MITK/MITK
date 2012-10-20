@@ -37,7 +37,6 @@ class QtStylePreferencePage : public QObject, public IQtPreferencePage
 public:
 
   QtStylePreferencePage();
-  QtStylePreferencePage(const QtStylePreferencePage& other);
 
   void Init(IWorkbench::Pointer workbench);
 

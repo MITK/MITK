@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "services/berryIServiceFactory.h"
 #include "util/berrySafeRunnable.h"
 
+#include "berryWorkbenchServiceRegistry.h"
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchConstants.h"
 #include "berryWorkbenchMenuService.h"
@@ -43,13 +44,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryCommandService.h"
 #include "berryCommandManager.h"
 #include "berryParameterType.h"
+#include "berrySourceProviderService.h"
+#include "berryWorkbenchLocationService.h"
 
 #include <berryCommandCategory.h>
 #include <berryIHandler.h>
+#include <berryIHandlerService.h>
 #include <berryIPreferencesService.h>
 #include <berryIPreferences.h>
+#include <berryISourceProvider.h>
+#include <berryIServiceScopes.h>
 
 #include <QDir>
+#include <QApplication>
 
 //#include <Poco/Thread.h>
 //#include <Poco/Bugcheck.h>
@@ -257,9 +264,15 @@ Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor)
   serviceLocatorCreator->Register();
   this->serviceLocator = serviceLocatorCreator->CreateServiceLocator(
         NULL,
-        IServiceFactory::ConstPointer(0),
+        NULL,
         IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
   serviceLocator->RegisterService(serviceLocatorCreator.data());
+
+  workbenchLocationService.reset(
+        new WorkbenchLocationService(IServiceScopes::WORKBENCH_SCOPE, this, NULL, NULL, 0));
+  workbenchLocationService->Register();
+  serviceLocator->RegisterService(workbenchLocationService.data());
+
   returnCode = PlatformUI::RETURN_UNSTARTABLE;
 }
 
@@ -300,6 +313,13 @@ bool Workbench::HasService(const QString& key) const
 
 bool Workbench::Init()
 {
+
+//  // setup debug mode if required.
+//  if (WorkbenchPlugin.getDefault().isDebugging()) {
+//    WorkbenchPlugin.DEBUG = true;
+//    ModalContext.setDebugMode(true);
+//  }
+
   bool bail = false;
 
   // create workbench window manager
@@ -342,6 +362,30 @@ bool Workbench::Init()
   // have a turn.
 
   advisor->InternalBasicInitialize(this->GetWorkbenchConfigurer());
+
+//  StartupThreading.runWithoutExceptions(new StartupRunnable() {
+
+//        public void runWithException() {
+  StartSourceProviders();
+//        }
+//      });
+
+//      StartupThreading.runWithoutExceptions(new StartupRunnable() {
+
+//        public void runWithException() {
+
+//          activateWorkbenchContext();
+
+//        }
+//      });
+
+//      StartupThreading.runWithoutExceptions(new StartupRunnable() {
+
+//        public void runWithException() {
+
+//          createApplicationMenu();
+//        }
+//      });
 
   // attempt to restore a previous workbench state
 
@@ -492,7 +536,7 @@ void Workbench::DoRestoreState(IMemento::Pointer memento, bool& status) // final
   createdWindows.clear();
 
   // Read the workbench windows.
-  for (std::size_t i = 0; i < children.size(); i++)
+  for (int i = 0; i < children.size(); i++)
   {
     childMem = children[i];
     WorkbenchWindow::Pointer newWindow;
@@ -560,7 +604,7 @@ void Workbench::OpenWindowsAfterRestore()
   }
   // now open the windows (except the ones that were nulled because we
   // closed them above)
-  for (std::size_t i = 0; i < createdWindows.size(); i++)
+  for (int i = 0; i < createdWindows.size(); i++)
   {
     if (createdWindows[i])
     {
@@ -594,9 +638,6 @@ void Workbench::InitializeDefaultServices()
   //    // TODO Correctly order service initialization
   //    // there needs to be some serious consideration given to
   //    // the services, and hooking them up in the correct order
-  //    final IEvaluationService evaluationService =
-  //      (IEvaluationService) serviceLocator.getService(IEvaluationService.class);
-  //
   //
   //
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
@@ -671,7 +712,8 @@ void Workbench::InitializeDefaultServices()
   //    serviceLocator.registerService(ICommandImageService.class,
   //        commandImageService);
 
-  menuService.reset(new WorkbenchMenuService(serviceLocator.GetPointer()));
+  WorkbenchMenuService* wms = new WorkbenchMenuService(serviceLocator.GetPointer());
+  menuService.reset(wms);
   menuService->Register();
 
   serviceLocator->RegisterService(menuService.data());
@@ -680,73 +722,40 @@ void Workbench::InitializeDefaultServices()
   // the menu service
   //StartupThreading.runWithoutExceptions(new StartupRunnable() {
   //      public void runWithException() {
-  // menuService->ReadRegistry();
+  wms->ReadRegistry();
   //      }});
 
-  //    /*
-  //     * Phase 2 of the initialization of commands. The source providers that
-  //     * the workbench provides are creating and registered with the above
-  //     * services. These source providers notify the services when particular
-  //     * pieces of workbench state change.
-  //     */
-  //    final SourceProviderService sourceProviderService = new SourceProviderService(serviceLocator);
-  //    serviceLocator.registerService(ISourceProviderService.class,
-  //        sourceProviderService);
-  //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //
-  //      public void runWithException() {
-  //        // this currently instantiates all players ... sigh
-  //        sourceProviderService.readRegistry();
-  //        ISourceProvider[] sp = sourceProviderService.getSourceProviders();
-  //        for (int i = 0; i < sp.length; i++) {
-  //          evaluationService.addSourceProvider(sp[i]);
-  //          if (!(sp[i] instanceof ActiveContextSourceProvider)) {
-  //            contextService.addSourceProvider(sp[i]);
-  //          }
-  //        }
-  //      }});
-  //
-  //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //
-  //      public void runWithException() {
-  //        // these guys are need to provide the variables they say
-  //        // they source
-  //        actionSetSourceProvider = (ActionSetSourceProvider) sourceProviderService
-  //            .getSourceProvider(ISources.ACTIVE_ACTION_SETS_NAME);
-  //
-  //        FocusControlSourceProvider focusControl = (FocusControlSourceProvider) sourceProviderService
-  //            .getSourceProvider(ISources.ACTIVE_FOCUS_CONTROL_ID_NAME);
-  //        serviceLocator.registerService(IFocusService.class,
-  //            focusControl);
-  //
-  //        menuSourceProvider = (MenuSourceProvider) sourceProviderService
-  //            .getSourceProvider(ISources.ACTIVE_MENU_NAME);
-  //      }});
-  //
-  //    /*
-  //     * Phase 3 of the initialization of commands. This handles the creation
-  //     * of wrappers for legacy APIs. By the time this phase completes, any
-  //     * code trying to access commands through legacy APIs should work.
-  //     */
-  //    final IHandlerService[] handlerService = new IHandlerService[1];
-  //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //
-  //      public void runWithException() {
-  //        handlerService[0] = (IHandlerService) serviceLocator
-  //            .getService(IHandlerService.class);
-  //      }
-  //    });
-  //    workbenchContextSupport = new WorkbenchContextSupport(this,
-  //        contextManager);
-  //    workbenchCommandSupport = new WorkbenchCommandSupport(bindingManager,
-  //        commandManager, contextManager, handlerService[0]);
-  //    initializeCommandResolver();
-  //
-  //    addWindowListener(windowListener);
-  //    bindingManager.addBindingManagerListener(bindingManagerListener);
-  //
-  //    serviceLocator.registerService(ISelectionConversionService.class,
-  //        new SelectionConversionService());
+  // the source providers are now initialized in phase 3, but source
+  // priorities have to be set before handler initialization
+  // StartupThreading.runWithoutExceptions(new StartupRunnable() {
+  // public void runWithException() {
+  InitializeSourcePriorities();
+  // }
+  // });
+
+  /*
+   * Phase 2 of the initialization of commands. This handles the creation
+   * of wrappers for legacy APIs. By the time this phase completes, any
+   * code trying to access commands through legacy APIs should work.
+   */
+  //IHandlerService* handlerService = NULL;
+//      StartupThreading.runWithoutExceptions(new StartupRunnable() {
+
+//        public void runWithException() {
+  /*handlerService = */serviceLocator->GetService<IHandlerService>();
+//        }
+//      });
+//      workbenchContextSupport = new WorkbenchContextSupport(this,
+//          contextManager);
+//      workbenchCommandSupport = new WorkbenchCommandSupport(bindingManager,
+//          commandManager, contextManager, handlerService[0]);
+//      initializeCommandResolver();
+
+//      addWindowListener(windowListener);
+//      bindingManager.addBindingManagerListener(bindingManagerListener);
+
+//      serviceLocator.registerService(ISelectionConversionService.class,
+//          new SelectionConversionService());
 }
 
 int Workbench::RunUI()
@@ -818,7 +827,7 @@ void Workbench::LargeUpdateStart()
     // workbenchContextSupport.setProcessing(false);
 
     QList<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
-    for (unsigned int i = 0; i < windows.size(); i++)
+    for (int i = 0; i < windows.size(); i++)
     {
       IWorkbenchWindow::Pointer window = windows[i];
       if (window.Cast<WorkbenchWindow>() != 0)
@@ -839,7 +848,7 @@ void Workbench::LargeUpdateEnd()
 
     // Perform window-specific blocking.
     QList<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
-    for (unsigned int i = 0; i < windows.size(); i++)
+    for (int i = 0; i < windows.size(); i++)
     {
       IWorkbenchWindow::Pointer window = windows[i];
       if (window.Cast<WorkbenchWindow>() != 0)
@@ -966,7 +975,7 @@ bool Workbench::BusyClose(bool force)
     // SafeRunner.run(new SafeRunnable() {
     //  public void run() {
     QList<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
-    for (unsigned int i = 0; i < windows.size(); i++)
+    for (int i = 0; i < windows.size(); i++)
     {
       IWorkbenchPage::Pointer page = windows[i]->GetActivePage();
       if (page)
@@ -1078,7 +1087,7 @@ bool Workbench::SaveMementoToFile(XMLMemento::Pointer memento)
   return true;
 }
 
-IWorkbenchWindow::Pointer Workbench::GetActiveWorkbenchWindow()
+IWorkbenchWindow::Pointer Workbench::GetActiveWorkbenchWindow() const
 {
   // Look for the window that was last known being
   // the active one
@@ -1142,7 +1151,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
     {
       QList<IPerspectiveDescriptor::Pointer> perspectives(page
           ->GetOpenPerspectives());
-      for (std::size_t i = 0; i < perspectives.size(); i++)
+      for (int i = 0; i < perspectives.size(); i++)
       {
         IPerspectiveDescriptor::Pointer persp = perspectives[i];
         if (perspectiveId == persp->GetId())
@@ -1160,7 +1169,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
   // perpective open and active, then the window is given focus.
   IAdaptable* input = GetDefaultPageInput();
   QList<IWorkbenchWindow::Pointer> windows(GetWorkbenchWindows());
-  for (std::size_t i = 0; i < windows.size(); i++)
+  for (int i = 0; i < windows.size(); i++)
   {
     win = windows[i].Cast<WorkbenchWindow>();
     if (window != win)
@@ -1435,7 +1444,7 @@ bool Workbench::IsClosing()
   return isClosing;
 }
 
-WorkbenchWindow::Pointer Workbench::GetActivatedWindow()
+WorkbenchWindow::Pointer Workbench::GetActivatedWindow() const
 {
   return activatedWindow;
 }
@@ -1568,7 +1577,7 @@ bool Workbench::SaveState(IMemento::Pointer memento)
 
   // Save the workbench windows.
   QList<IWorkbenchWindow::Pointer> windows(GetWorkbenchWindows());
-  for (std::size_t nX = 0; nX < windows.size(); nX++)
+  for (int nX = 0; nX < windows.size(); nX++)
   {
     WorkbenchWindow::Pointer window = windows[nX].Cast<WorkbenchWindow>();
     IMemento::Pointer childMem = memento->CreateChild(WorkbenchConstants::TAG_WINDOW);
@@ -1604,12 +1613,12 @@ XMLMemento::Pointer Workbench::RecordWorkbenchState()
   return memento;
 }
 
-void Workbench::AddWorkbenchListener(IWorkbenchListener::Pointer listener)
+void Workbench::AddWorkbenchListener(IWorkbenchListener* listener)
 {
   workbenchEvents.AddListener(listener);
 }
 
-void Workbench::RemoveWorkbenchListener(IWorkbenchListener::Pointer listener)
+void Workbench::RemoveWorkbenchListener(IWorkbenchListener* listener)
 {
   workbenchEvents.RemoveListener(listener);
 }
@@ -1619,12 +1628,12 @@ IWorkbenchListener::Events& Workbench::GetWorkbenchEvents()
   return workbenchEvents;
 }
 
-void Workbench::AddWindowListener(IWindowListener::Pointer l)
+void Workbench::AddWindowListener(IWindowListener* l)
 {
   windowEvents.AddListener(l);
 }
 
-void Workbench::RemoveWindowListener(IWindowListener::Pointer l)
+void Workbench::RemoveWindowListener(IWindowListener* l)
 {
   windowEvents.RemoveListener(l);
 }
@@ -1782,6 +1791,79 @@ void Workbench::Shutdown()
   //  }
 
   Tweaklets::Clear();
+}
+
+void Workbench::InitializeSourcePriorities()
+{
+  WorkbenchServiceRegistry::GetRegistry()->InitializeSourcePriorities();
+}
+
+void Workbench::StartSourceProviders()
+{
+  /*
+   * Phase 3 of the initialization of commands. The source providers that
+   * the workbench provides are creating and registered with the above
+   * services. These source providers notify the services when particular
+   * pieces of workbench state change.
+   */
+  IEvaluationService* const evaluationService = serviceLocator->GetService<IEvaluationService>();
+  //IContextService* const contextService = serviceLocator->GetService<IContextService>();
+
+  SourceProviderService* sps = new SourceProviderService(serviceLocator.GetPointer());
+  sourceProviderService.reset(sps);
+  sourceProviderService->Register();
+  serviceLocator->RegisterService<ISourceProviderService>(sourceProviderService.data());
+  struct SafeSourceProviderRunnable : public ISafeRunnable {
+
+    SafeSourceProviderRunnable(SourceProviderService* sps, IEvaluationService* es) : sps(sps), es(es)
+    {}
+
+    void Run() {
+      // this currently instantiates all players ... sigh
+      sps->ReadRegistry();
+      QList<ISourceProvider::Pointer> sp = sps->GetSourceProviders();
+      for (int i = 0; i < sp.size(); i++)
+      {
+        es->AddSourceProvider(sp[i]);
+        //if (!(sp[i] instanceof ActiveContextSourceProvider))
+        //{
+        //  contextService.addSourceProvider(sp[i]);
+        //}
+      }
+    }
+
+    void HandleException(const std::exception& exception)
+    {
+      WorkbenchPlugin::Log("Failed to initialize a source provider", ctkException(QString(exception.what())));
+    }
+
+  private:
+    SourceProviderService* sps;
+    IEvaluationService* es;
+  };
+  ISafeRunnable::Pointer sourceProviderRunnable(
+        new SafeSourceProviderRunnable(sps, evaluationService));
+  SafeRunner::Run(sourceProviderRunnable);
+
+//    SafeRunner.run(new ISafeRunnable() {
+//      public void run() throws Exception {
+//        // these guys are need to provide the variables they say
+//        // they source
+//        actionSetSourceProvider = (ActionSetSourceProvider) sourceProviderService
+//            .getSourceProvider(ISources.ACTIVE_ACTION_SETS_NAME);
+
+//        FocusControlSourceProvider focusControl = (FocusControlSourceProvider) sourceProviderService
+//            .getSourceProvider(ISources.ACTIVE_FOCUS_CONTROL_ID_NAME);
+//        serviceLocator.registerService(IFocusService.class, focusControl);
+
+//        menuSourceProvider = (MenuSourceProvider) sourceProviderService
+//            .getSourceProvider(ISources.ACTIVE_MENU_NAME);
+//      }
+
+//      public void handleException(Throwable exception) {
+//        WorkbenchPlugin.log("Failed to initialize a source provider", exception); //$NON-NLS-1$
+//      }
+//    });
 }
 
 }

@@ -169,7 +169,7 @@ QMenu* MenuManager::CreateContextMenu(QWidget* parent)
     menu = new QMenuProxy(QMenuProxy::Menu, parent);
     this->InitializeMenu();
   }
-  menu->menu;
+  return menu->menu;
 }
 
 QMenuBar* MenuManager::CreateMenuBar(QWidget* parent)
@@ -583,7 +583,7 @@ void MenuManager::Update(bool force, bool recursive)
       // remove obsolete (removed or non active)
       QList<QAction*> mi = menu->actions();
 
-      for (unsigned int i = 0; i < mi.size(); i++)
+      for (int i = 0; i < mi.size(); i++)
       {
         Object::Pointer data = mi[i]->data().value<Object::Pointer>();
 
@@ -627,8 +627,7 @@ void MenuManager::Update(bool force, bool recursive)
           srcIx++;
           destIx++;
         }
-        else if (dest && dest->IsSeparator()
-            && src->IsSeparator())
+        else if (dest && dest->IsSeparator() && src->IsSeparator())
         {
           mi[srcIx]->setData(QVariant::fromValue<Object::Pointer>(src));
           srcIx++;
@@ -694,6 +693,34 @@ void MenuManager::Update(bool force, bool recursive)
     }
   }
   this->UpdateMenuItem();
+}
+
+void MenuManager::DumpActionInfo(QMenuProxy* menu)
+{
+  if (menu->isMenuBar())
+  {
+    qDebug() << "QMenuBar [" << menu->menuBar << "]";
+    DumpActionInfo(menu->menuBar, 1);
+  }
+  else
+  {
+    qDebug() << "QMenu [" << menu->menu << "]" << menu->menu;
+    DumpActionInfo(menu->menu, 1);
+  }
+}
+
+void MenuManager::DumpActionInfo(QWidget* widget, int level)
+{
+  QString indent = " |";
+  for (int i = 0; i < level; ++i) indent += "--";
+  foreach(QAction* action, widget->actions())
+  {
+    qDebug() << qPrintable(indent) << action->text() << "[" << action << "]";
+    if (action->menu())
+    {
+      DumpActionInfo(action->menu(), level+1);
+    }
+  }
 }
 
 }

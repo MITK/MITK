@@ -66,7 +66,8 @@ EvaluationResult::EvaluationResult(int value)
 }
 
 EvaluationResult::EvaluationResult(const EvaluationResult &o)
-  : fValue(o.fValue)
+  : Object()
+  , fValue(o.fValue)
 {
 }
 

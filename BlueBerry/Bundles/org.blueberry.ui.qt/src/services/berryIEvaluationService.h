@@ -79,7 +79,7 @@ class Expression;
  */
 struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
 {
-  berryInterfaceMacro(IEvaluationService,  berry)
+  berryObjectMacro(berry::IEvaluationService)
 
   /**
    * A general property that can be used.
@@ -208,6 +208,6 @@ struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
 
 }
 
-Q_DECLARE_INTERFACE(berry::IEvaluationService, "org.blueberry.ui.qt.IEvaluationService")
+Q_DECLARE_INTERFACE(berry::IEvaluationService, "org.blueberry.ui.IEvaluationService")
 
 #endif // BERRYIEVALUATIONSERVICE_H

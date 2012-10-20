@@ -47,7 +47,7 @@ namespace berry
 struct BERRY_UI_QT IPreferencePage: virtual public Object
 {
 
-  berryInterfaceMacro(IPreferencePage, berry);
+  berryObjectMacro(berry::IPreferencePage)
 
   ~IPreferencePage();
 
@@ -104,6 +104,6 @@ struct BERRY_UI_QT IPreferencePage: virtual public Object
 
 }
 
-Q_DECLARE_INTERFACE(berry::IPreferencePage, "org.blueberry.IPreferencePage")
+Q_DECLARE_INTERFACE(berry::IPreferencePage, "org.blueberry.ui.IPreferencePage")
 
 #endif /*BERRYIPREFERENCEPAGE_H_*/

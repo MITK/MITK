@@ -39,7 +39,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
 
-  berryInterfaceMacro(IPresentablePart, berry);
+  berryObjectMacro(berry::IPresentablePart)
 
   ~IPresentablePart();
 

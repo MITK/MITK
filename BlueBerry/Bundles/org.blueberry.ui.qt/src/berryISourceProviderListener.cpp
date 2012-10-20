@@ -34,4 +34,8 @@ void ISourceProviderListener::Events::RemoveListener(ISourceProviderListener* l)
   singleSourceChanged -= Delegate3(l, &ISourceProviderListener::SourceChanged);
 }
 
+ISourceProviderListener::~ISourceProviderListener()
+{
+}
+
 }

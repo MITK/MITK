@@ -40,7 +40,6 @@ namespace mitk
    */
   struct IInputDeviceRegistry
   {
-    berryInterfaceMacro(IInputDeviceRegistry, mitk);
 
     /**
      * Return an input device descriptor with the given extension id. If no input device exists,

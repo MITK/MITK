@@ -137,6 +137,10 @@ void ProvisioningInfo::readProvisioningFile(const QString& filePath)
       {
         break;
       }
+      case UNKNOWN:
+      {
+        break; // error handled above
+      }
       }
     }
     ++count;

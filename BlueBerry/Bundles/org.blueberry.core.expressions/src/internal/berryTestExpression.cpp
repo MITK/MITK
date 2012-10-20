@@ -93,7 +93,7 @@ TestExpression::TestExpression(const QString &namespaze, const QString &property
 EvaluationResult::ConstPointer
 TestExpression::Evaluate(IEvaluationContext* context) const
 {
-  Object::Pointer element(context->GetDefaultVariable());
+  Object::ConstPointer element(context->GetDefaultVariable());
   if (typeid(Platform) == typeid(element.GetPointer()))
   {
     QString str = Platform::GetProperty(fProperty);
@@ -116,7 +116,7 @@ TestExpression::Evaluate(IEvaluationContext* context) const
 }
 
 void
-TestExpression::CollectExpressionInfo(ExpressionInfo* info)
+TestExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   info->MarkDefaultVariableAccessed();
   info->AddAccessedPropertyName(fNamespace + PROP_SEP + fProperty);
@@ -136,7 +136,7 @@ TestExpression::operator==(const Object* object) const
   return false;
 }
 
-uint TestExpression::ComputeHashCode()
+uint TestExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fArgs)
   * HASH_FACTOR + fExpectedValue->HashCode()
@@ -149,7 +149,7 @@ QString
 TestExpression::ToString() const
 {
   QString args("");
-  for (unsigned int i= 0; i < fArgs.size(); i++)
+  for (int i= 0; i < fArgs.size(); i++)
   {
     Object::Pointer arg= fArgs[i];
     ObjectString::Pointer strarg = arg.Cast<ObjectString>();

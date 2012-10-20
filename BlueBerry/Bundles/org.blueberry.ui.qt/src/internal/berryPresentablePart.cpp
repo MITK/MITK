@@ -33,7 +33,7 @@ PropertyListenerProxy::PropertyListenerProxy(PresentablePart* p)
 
 void
 PresentablePart::
-PropertyListenerProxy::PropertyChange(PropertyChangeEvent::Pointer e)
+PropertyListenerProxy::PropertyChange(const PropertyChangeEvent::Pointer& e)
 {
   if (e->GetProperty() == IWorkbenchPartConstants::INTEGER_PROPERTY)
   {
@@ -62,7 +62,7 @@ WorkbenchPartReference::Pointer PresentablePart::GetPartReference() const
   return part->GetPartReference().Cast<WorkbenchPartReference>();
 }
 
-void PresentablePart::FirePropertyChange(PropertyChangeEvent::Pointer event)
+void PresentablePart::FirePropertyChange(const PropertyChangeEvent::Pointer& event)
 {
   partPropertyChangeEvents.propertyChange(event);
 }

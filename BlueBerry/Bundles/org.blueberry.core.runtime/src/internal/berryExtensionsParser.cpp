@@ -112,7 +112,7 @@ bool ExtensionsParser::characters(const QString& ch)
   return true;
 }
 
-bool ExtensionsParser::endElement(const QString& uri, const QString& elementName, const QString& /*qName*/)
+bool ExtensionsParser::endElement(const QString& /*uri*/, const QString& elementName, const QString& /*qName*/)
 {
   switch (stateStack.back())
   {
@@ -273,8 +273,8 @@ bool ExtensionsParser::startDocument()
   return true;
 }
 
-bool ExtensionsParser::startElement(const QString& uri, const QString& elementName,
-                                    const QString& qName, const QXmlAttributes& attributes)
+bool ExtensionsParser::startElement(const QString& /*uri*/, const QString& elementName,
+                                    const QString& /*qName*/, const QXmlAttributes& attributes)
 {
   switch (stateStack.back())
   {
@@ -361,7 +361,7 @@ void ExtensionsParser::handleExtensionState(const QString& elementName, const QX
   addedRegistryObjects.push_back(currentConfigurationElement);
 }
 
-void ExtensionsParser::handleInitialState(const QString& elementName, const QXmlAttributes& attributes)
+void ExtensionsParser::handleInitialState(const QString& /*elementName*/, const QXmlAttributes& /*attributes*/)
 {
   // new manifests should have the plugin (or fragment) element empty
   stateStack.push(PLUGIN_STATE);

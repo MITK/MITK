@@ -42,7 +42,7 @@ WorkbenchPartReference::PropertyChangeListener::PropertyChangeListener(
 
 }
 void WorkbenchPartReference::PropertyChangeListener::PropertyChange(
-    PropertyChangeEvent::Pointer event)
+    const PropertyChangeEvent::Pointer& event)
 {
   if (event->GetProperty() == IWorkbenchPartConstants::INTEGER_PROPERTY)
   {
@@ -170,7 +170,7 @@ void WorkbenchPartReference::SetToolTip(const QString& newToolTip)
   this->FirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
 }
 
-void WorkbenchPartReference::PropertyChanged(Object::Pointer  /*source*/, int propId)
+void WorkbenchPartReference::PropertyChanged(const Object::Pointer& /*source*/, int propId)
 {
 
   // We handle these properties directly (some of them may be transformed
@@ -198,7 +198,7 @@ void WorkbenchPartReference::PropertyChanged(Object::Pointer  /*source*/, int pr
   //  }
 }
 
-void WorkbenchPartReference::PropertyChanged(PropertyChangeEvent::Pointer event)
+void WorkbenchPartReference::PropertyChanged(const PropertyChangeEvent::Pointer& event)
 {
   this->FirePropertyChange(event);
 }
@@ -675,7 +675,7 @@ QString WorkbenchPartReference::GetPartProperty(const QString& key) const
 }
 
 void WorkbenchPartReference::FirePropertyChange(
-    PropertyChangeEvent::Pointer event)
+    const PropertyChangeEvent::Pointer& event)
 {
   propChangeEvents.propertyChange(event);
 }

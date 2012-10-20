@@ -64,7 +64,7 @@ public:
    *
    * @throws CoreException if the var can't be adapted to an <code>IIterable</code>
    */
-  static IIterable::Pointer GetAsIIterable(Object::Pointer var, Expression::ConstPointer expression);
+  static IIterable::ConstPointer GetAsIIterable(Object::ConstPointer var, Expression::ConstPointer expression);
 
   /**
    * Converts the given variable into an <code>ICountable</code>. If a corresponding adapter can't be found an
@@ -77,7 +77,7 @@ public:
    *
    * @throws CoreException if the var can't be adapted to an <code>ICountable</code>
    */
-  static ICountable::Pointer GetAsICountable(Object::Pointer var, Expression::ConstPointer expression);
+  static ICountable::ConstPointer GetAsICountable(Object::ConstPointer var, Expression::ConstPointer expression);
 
   static bool GetOptionalBooleanAttribute(SmartPointer<IConfigurationElement> element, const QString& attributeName);
 

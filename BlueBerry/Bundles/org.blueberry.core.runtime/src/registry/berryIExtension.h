@@ -58,7 +58,7 @@ struct IContributor;
  */
 struct org_blueberry_core_runtime_EXPORT IExtension : public virtual Object
 {
-  berryInterfaceMacro(IExtension, berry)
+  berryObjectMacro(berry::IExtension)
 
   virtual ~IExtension();
 

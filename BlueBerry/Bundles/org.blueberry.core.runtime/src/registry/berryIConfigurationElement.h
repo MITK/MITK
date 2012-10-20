@@ -64,7 +64,7 @@ class Handle;
 struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual Object
 {
 
-  berryInterfaceMacro(IConfigurationElement, berry)
+  berryObjectMacro(berry::IConfigurationElement)
 
   virtual ~IConfigurationElement();
 
@@ -110,7 +110,7 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
     {
       BERRY_WARN << "The QObject subclass " << this->GetAttribute(propertyName).toStdString()
                  << " does not seem to implement the required interface \""
-                 << qobject_interface_iid<C>() << "\", or you forgot the Q_INTERFACES macro.";
+                 << qobject_interface_iid<C*>() << "\", or you forgot the Q_INTERFACES macro.";
     }
     return interface;
   }
@@ -297,6 +297,8 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
 };
 
 }  // namespace berry
+
+Q_DECLARE_INTERFACE(berry::IConfigurationElement, "org.blueberry.core.IConfigurationElement")
 
 
 #endif /*BERRYIEXTENSIONELEMENT_H_*/

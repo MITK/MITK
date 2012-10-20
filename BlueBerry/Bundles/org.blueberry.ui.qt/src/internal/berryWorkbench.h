@@ -47,6 +47,8 @@ struct IEvaluationService;
 struct IMenuService;
 struct IServiceLocatorCreator;
 struct ISaveablesLifecycleListener;
+struct ISourceProviderService;
+struct IWorkbenchLocationService;
 
 class CommandManager;
 class ViewRegistry;
@@ -68,7 +70,7 @@ class BERRY_UI_QT Workbench : public IWorkbench
 
 public:
 
-  berryObjectMacro(Workbench);
+  berryObjectMacro(Workbench)
 
   friend class RestoreStateRunnable;
 
@@ -145,12 +147,12 @@ public:
   /*
    *  Method declared on IWorkbench.
    */
-  void AddWorkbenchListener(IWorkbenchListener::Pointer listener);
+  void AddWorkbenchListener(IWorkbenchListener* listener);
 
   /*
    * Method declared on IWorkbench.
    */
-  void RemoveWorkbenchListener(IWorkbenchListener::Pointer listener);
+  void RemoveWorkbenchListener(IWorkbenchListener* listener);
 
   /*
    * Method declared on IWorkbench.
@@ -160,19 +162,19 @@ public:
   /*
    * Method declared on IWorkbench.
    */
-  void AddWindowListener(IWindowListener::Pointer l);
+  void AddWindowListener(IWindowListener* l);
 
   /*
    * Method declared on IWorkbench.
    */
-  void RemoveWindowListener(IWindowListener::Pointer l);
+  void RemoveWindowListener(IWindowListener* l);
 
   /*
    * Method declared on IWorkbench.
    */
   IWindowListener::Events& GetWindowEvents();
 
-  IWorkbenchWindow::Pointer GetActiveWorkbenchWindow();
+  IWorkbenchWindow::Pointer GetActiveWorkbenchWindow() const;
 
   IViewRegistry* GetViewRegistry();
   IEditorRegistry* GetEditorRegistry();
@@ -362,7 +364,7 @@ protected:
    * Returns the workbench window which was last known being the active one,
    * or <code> null </code> .
    */
-  SmartPointer<WorkbenchWindow> GetActivatedWindow();
+  SmartPointer<WorkbenchWindow> GetActivatedWindow() const;
 
   /*
    * Sets the workbench window which was last known being the active one, or
@@ -496,6 +498,9 @@ private:
   IDisposable::Pointer serviceLocatorOwner;
 
   QScopedPointer<IServiceLocatorCreator, QScopedPointerObjectDeleter> serviceLocatorCreator;
+  QScopedPointer<IWorkbenchLocationService, QScopedPointerObjectDeleter> workbenchLocationService;
+
+  QScopedPointer<ISourceProviderService, QScopedPointerObjectDeleter> sourceProviderService;
 
   /**
    * A count of how many large updates are going on. This tracks nesting of
@@ -619,6 +624,10 @@ private:
    */
   IWorkbenchWindow::Pointer BusyOpenWorkbenchWindow(const QString& perspID,
       IAdaptable* input);
+
+  void InitializeSourcePriorities();
+
+  void StartSourceProviders();
 };
 
 } // namespace berry

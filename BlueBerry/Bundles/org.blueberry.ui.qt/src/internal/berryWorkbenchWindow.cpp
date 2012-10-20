@@ -37,8 +37,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryQtControlWidget.h"
 #include "berryQtPerspectiveSwitcher.h"
 #include "berryWWinActionBars.h"
+#include "berryWorkbenchLocationService.h"
 
-#include "services/berryIServiceFactory.h"
+#include "berryIServiceFactory.h"
+#include "berryIServiceScopes.h"
+#include "berryIEvaluationReference.h"
 
 #include "berryPlatformUI.h"
 
@@ -51,17 +54,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const ActionBarAdvisor::FillFlags WorkbenchWindow::FILL_ALL_ACTION_BARS =
-    ActionBarAdvisor::FILL_MENU_BAR | ActionBarAdvisor::FILL_TOOL_BAR
-        | ActionBarAdvisor::FILL_STATUS_LINE;
+const QString WorkbenchWindow::PROP_TOOLBAR_VISIBLE = "toolbarVisible";
+const QString WorkbenchWindow::PROP_PERSPECTIVEBAR_VISIBLE = "perspectiveBarVisible";
+const QString WorkbenchWindow::PROP_STATUS_LINE_VISIBLE = "statusLineVisible";
 
-WorkbenchWindow::WorkbenchWindow(int number) :
-  Window(Shell::Pointer(0)), pageComposite(0), windowAdvisor(0),
-      actionBarAdvisor(0), number(number), largeUpdates(0), closing(false),
-      shellActivated(false), updateDisabled(true), emptyWindowContentsCreated(
-          false), emptyWindowContents(0), asMaximizedState(false), partService(
-          this), serviceLocatorOwner(
-          new ServiceLocatorOwner(this))
+const ActionBarAdvisor::FillFlags WorkbenchWindow::FILL_ALL_ACTION_BARS =
+    ActionBarAdvisor::FILL_MENU_BAR | ActionBarAdvisor::FILL_TOOL_BAR |
+    ActionBarAdvisor::FILL_STATUS_LINE;
+
+WorkbenchWindow::WorkbenchWindow(int number)
+  : Window(Shell::Pointer(0))
+  , pageComposite(0)
+  , windowAdvisor(0)
+  , actionBarAdvisor(0)
+  , number(number)
+  , largeUpdates(0)
+  , closing(false)
+  , shellActivated(false)
+  , updateDisabled(true)
+  , toolBarVisible(true)
+  , perspectiveBarVisible(true)
+  , statusLineVisible(true)
+  , emptyWindowContentsCreated(false)
+  , emptyWindowContents(0)
+  , asMaximizedState(false)
+  , partService(this)
+  , serviceLocatorOwner(new ServiceLocatorOwner(this))
 {
   this->Register(); // increase the reference count to avoid deleting
   // this object when temporary smart pointers
@@ -74,10 +92,10 @@ WorkbenchWindow::WorkbenchWindow(int number) :
 
   this->serviceLocator = slc->CreateServiceLocator(
         workbench,
-        IServiceFactory::ConstPointer(0),
+        nullptr,
         IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
 
-  //  initializeDefaultServices();
+  InitializeDefaultServices();
 
   // Add contribution managers that are exposed to other plugins.
   this->AddMenuBar();
@@ -108,7 +126,7 @@ bool WorkbenchWindow::HasService(const QString& key) const
   return serviceLocator->HasService(key);
 }
 
-Shell::Pointer WorkbenchWindow::GetShell()
+Shell::Pointer WorkbenchWindow::GetShell() const
 {
   return Window::GetShell();
 }
@@ -160,12 +178,12 @@ bool WorkbenchWindow::ClosePage(IWorkbenchPage::Pointer in, bool save)
   return true;
 }
 
-void WorkbenchWindow::AddPerspectiveListener(IPerspectiveListener::Pointer l)
+void WorkbenchWindow::AddPerspectiveListener(IPerspectiveListener* l)
 {
   perspectiveEvents.AddListener(l);
 }
 
-void WorkbenchWindow::RemovePerspectiveListener(IPerspectiveListener::Pointer l)
+void WorkbenchWindow::RemovePerspectiveListener(IPerspectiveListener* l)
 {
   perspectiveEvents.RemoveListener(l);
 }
@@ -358,16 +376,17 @@ void WorkbenchWindow::FillActionBars(ActionBarAdvisor::FillFlags flags)
   IMenuService* menuService = serviceLocator->GetService<IMenuService>();
   menuService->PopulateContributionManager(dynamic_cast<ContributionManager*>(GetActionBars()->GetMenuManager()),
                                            MenuUtil::MAIN_MENU);
-  //    ICoolBarManager coolbar = getActionBars().getCoolBarManager();
+//  ICoolBarManager coolbar = getActionBars().getCoolBarManager();
 //  if (coolbar != null)
 //  {
-  //      menuService.populateContributionManager(
-  //          (ContributionManager) coolbar,
-  //          MenuUtil.MAIN_TOOLBAR);
-  //    }
-  //  } finally {
-  //    workbench.largeUpdateEnd();
-  //  }
+//    menuService.populateContributionManager(
+//          (ContributionManager) coolbar,
+//          MenuUtil.MAIN_TOOLBAR);
+//  }
+
+//    } finally {
+//      workbench.largeUpdateEnd();
+//    }
 }
 
 Point WorkbenchWindow::GetInitialSize()
@@ -644,7 +663,8 @@ IWorkbenchPage::Pointer WorkbenchWindow::GetPage(int i)
 
     return IWorkbenchPage::Pointer();
 }
-IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage()
+
+IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage() const
 {
   return pageList.GetActive();
 }
@@ -662,6 +682,31 @@ IPartService* WorkbenchWindow::GetPartService()
 ISelectionService* WorkbenchWindow::GetSelectionService()
 {
   return partService.GetSelectionService();
+}
+
+bool WorkbenchWindow::GetToolBarVisible() const
+{
+  return GetWindowConfigurer()->GetShowToolBar() && toolBarVisible;
+}
+
+bool WorkbenchWindow::GetPerspectiveBarVisible() const
+{
+  return GetWindowConfigurer()->GetShowPerspectiveBar() && perspectiveBarVisible;
+}
+
+bool WorkbenchWindow::GetStatusLineVisible() const
+{
+  return GetWindowConfigurer()->GetShowStatusLine() && statusLineVisible;
+}
+
+void WorkbenchWindow::AddPropertyChangeListener(IPropertyChangeListener *listener)
+{
+  genericPropertyListeners.AddListener(listener);
+}
+
+void WorkbenchWindow::RemovePropertyChangeListener(IPropertyChangeListener *listener)
+{
+  genericPropertyListeners.RemoveListener(listener);
 }
 
 bool WorkbenchWindow::IsClosing()
@@ -748,7 +793,7 @@ void WorkbenchWindow::CreateDefaultContents(Shell::Pointer shell)
   CreatePageComposite(shell->GetControl());
 }
 
-void WorkbenchWindow::CreateTrimWidgets(SmartPointer<Shell> shell)
+void WorkbenchWindow::CreateTrimWidgets(SmartPointer<Shell> /*shell*/)
 {
   // do nothing -- trim widgets are created in CreateDefaultContents
 }
@@ -1051,7 +1096,7 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
   IWorkbenchPage::Pointer newActivePage;
   QList<IMemento::Pointer> pageArray = memento
   ->GetChildren(WorkbenchConstants::TAG_PAGE);
-  for (std::size_t i = 0; i < pageArray.size(); i++)
+  for (int i = 0; i < pageArray.size(); i++)
   {
     IMemento::Pointer pageMem = pageArray[i];
     QString strFocus; pageMem->GetString(WorkbenchConstants::TAG_FOCUS, strFocus);
@@ -1552,12 +1597,12 @@ bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
   return result;
 }
 
-WorkbenchWindowConfigurer::Pointer WorkbenchWindow::GetWindowConfigurer()
+WorkbenchWindowConfigurer::Pointer WorkbenchWindow::GetWindowConfigurer() const
 {
   if (windowConfigurer.IsNull())
   {
     // lazy initialize
-    windowConfigurer = new WorkbenchWindowConfigurer(WorkbenchWindow::Pointer(this));
+    windowConfigurer = new WorkbenchWindowConfigurer(WorkbenchWindow::Pointer(const_cast<WorkbenchWindow*>(this)));
   }
   return windowConfigurer;
 }
@@ -1707,7 +1752,7 @@ bool WorkbenchWindow::PageList::Remove(IWorkbenchPage::Pointer object)
     active = 0;
   }
   pagesInActivationOrder.removeAll(object);
-  std::size_t origSize = pagesInCreationOrder.size();
+  const int origSize = pagesInCreationOrder.size();
   pagesInCreationOrder.removeAll(object);
   return origSize != pagesInCreationOrder.size();
 }
@@ -1745,7 +1790,7 @@ void WorkbenchWindow::PageList::SetActive(IWorkbenchPage::Pointer page)
   }
 }
 
-WorkbenchPage::Pointer WorkbenchWindow::PageList::GetActive()
+WorkbenchPage::Pointer WorkbenchWindow::PageList::GetActive() const
 {
   return active.Cast<WorkbenchPage>();
 }
@@ -1775,7 +1820,7 @@ window(w)
 {
 }
 
-void WorkbenchWindow::ShellActivationListener::ShellActivated(ShellEvent::Pointer /*event*/)
+void WorkbenchWindow::ShellActivationListener::ShellActivated(const ShellEvent::Pointer& /*event*/)
 {
   WorkbenchWindow::Pointer wnd(window);
 
@@ -1802,7 +1847,7 @@ void WorkbenchWindow::ShellActivationListener::ShellActivated(ShellEvent::Pointe
   //liftRestrictions();
 }
 
-void WorkbenchWindow::ShellActivationListener::ShellDeactivated(ShellEvent::Pointer /*event*/)
+void WorkbenchWindow::ShellActivationListener::ShellDeactivated(const ShellEvent::Pointer& /*event*/)
 {
   WorkbenchWindow::Pointer wnd(window);
 
@@ -1830,8 +1875,8 @@ void WorkbenchWindow::ShellActivationListener::ShellDeactivated(ShellEvent::Poin
 
 void WorkbenchWindow::TrackShellActivation(Shell::Pointer shell)
 {
-  shellActivationListener = new ShellActivationListener(WorkbenchWindow::Pointer(this));
-  shell->AddShellListener(shellActivationListener);
+  shellActivationListener.reset(new ShellActivationListener(WorkbenchWindow::Pointer(this)));
+  shell->AddShellListener(shellActivationListener.data());
 }
 
 WorkbenchWindow::ControlResizeListener::ControlResizeListener(WorkbenchWindow* w)
@@ -1891,6 +1936,29 @@ void WorkbenchWindow::TrackShellResize(Shell::Pointer newShell)
 bool WorkbenchWindow::UpdatesDeferred() const
 {
   return largeUpdates > 0;
+}
+
+void WorkbenchWindow::InitializeDefaultServices()
+{
+  workbenchLocationService.reset(
+        new WorkbenchLocationService(IServiceScopes::WINDOW_SCOPE, GetWorkbench(), this, NULL, 1));
+  workbenchLocationService->Register();
+  serviceLocator->RegisterService(workbenchLocationService.data());
+
+  //ActionCommandMappingService* mappingService = new ActionCommandMappingService();
+  //serviceLocator->RegisterService(IActionCommandMappingService, mappingService);
+}
+
+QSet<SmartPointer<IEvaluationReference> > WorkbenchWindow::GetMenuRestrictions() const
+{
+  return QSet<SmartPointer<IEvaluationReference> >();
+}
+
+void WorkbenchWindow::FirePropertyChanged(const  QString& property, const Object::Pointer& oldValue,
+                                          const Object::Pointer& newValue)
+{
+  PropertyChangeEvent::Pointer event(new PropertyChangeEvent(Object::Pointer(this), property, oldValue, newValue));
+  genericPropertyListeners.propertyChange(event);
 }
 
 }

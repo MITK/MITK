@@ -98,7 +98,7 @@ protected:
    *
    * @return The currently active shell; may be <code>null</code>.
    */
-  SmartPointer<Shell> GetActiveShell() const;
+  SmartPointer<const Shell> GetActiveShell() const;
 
 public:
 

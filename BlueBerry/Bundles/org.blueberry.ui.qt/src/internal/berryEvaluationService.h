@@ -29,7 +29,7 @@ class EvaluationService : public IEvaluationService
 
 private:
 
-  SmartPointer<EvaluationAuthority> evaluationAuthority;
+  QScopedPointer<EvaluationAuthority, QScopedPointerObjectDeleter> evaluationAuthority;
 
 public:
 
@@ -59,12 +59,12 @@ public:
   /*
    * @see IServiceWithSources#AddSourceProvider(ISourceProvider)
    */
-  void AddSourceProvider(SmartPointer<ISourceProvider> provider);
+  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider);
 
   /*
    * @see IServiceWithSources#RemoveSourceProvider(ISourceProvider)
    */
-  void RemoveSourceProvider(SmartPointer<ISourceProvider> provider);
+  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider);
 
   /*
    * @see IDisposable#Dispose()

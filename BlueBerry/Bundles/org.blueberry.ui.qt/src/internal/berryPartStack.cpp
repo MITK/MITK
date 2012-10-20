@@ -493,7 +493,7 @@ bool PartStack::AllowsAutoFocus()
 
 void PartStack::Close(const QList<IPresentablePart::Pointer>& parts)
 {
-  for (unsigned int idx = 0; idx < parts.size(); idx++)
+  for (int idx = 0; idx < parts.size(); idx++)
   {
     IPresentablePart::Pointer part = parts[idx];
 
@@ -938,7 +938,7 @@ bool PartStack::RestoreState(IMemento::Pointer memento)
   QList<IMemento::Pointer> children = memento->GetChildren(WorkbenchConstants::TAG_PAGE);
 
   // Loop through the page elements.
-  for (std::size_t i = 0; i < children.size(); i++)
+  for (int i = 0; i < children.size(); i++)
   {
     // Get the info details.
     IMemento::Pointer childMem = children[i];
@@ -988,7 +988,7 @@ bool PartStack::RestoreState(IMemento::Pointer memento)
   QList<IMemento::Pointer> presentationMementos(memento
       ->GetChildren(WorkbenchConstants::TAG_PRESENTATION));
 
-  for (std::size_t idx = 0; idx < presentationMementos.size(); idx++)
+  for (int idx = 0; idx < presentationMementos.size(); idx++)
   {
     IMemento::Pointer child = presentationMementos[idx];
 
@@ -1005,7 +1005,7 @@ bool PartStack::RestoreState(IMemento::Pointer memento)
   if (propertiesState)
   {
     QList<IMemento::Pointer> props(propertiesState->GetChildren(WorkbenchConstants::TAG_PROPERTY));
-    for (std::size_t i = 0; i < props.size(); i++)
+    for (int i = 0; i < props.size(); i++)
     {
       QString id = props[i]->GetID();
       properties.insert(id, props[i]->GetTextData());

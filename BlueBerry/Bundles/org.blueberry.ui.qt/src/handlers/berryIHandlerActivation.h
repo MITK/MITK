@@ -38,20 +38,18 @@ struct IHandlerService;
  * This interface is not intended to be implemented or extended by clients.
  * </p>
  *
- * @since 3.1
  * @see org.eclipse.ui.ISources
  * @see org.eclipse.ui.ISourceProvider
  */
-struct BERRY_UI_QT IHandlerActivation : public IEvaluationResultCache {
+struct BERRY_UI_QT IHandlerActivation : public virtual IEvaluationResultCache
+{
 
-  berryInterfaceMacro(IHandlerActivation, berry);
+  berryObjectMacro(berry::IHandlerActivation)
 
   ~IHandlerActivation();
 
   /**
    * The depth at which the root exists.
-   *
-   * @since 3.2
    */
   static const int ROOT_DEPTH; // = 1;
 
@@ -80,7 +78,6 @@ struct BERRY_UI_QT IHandlerActivation : public IEvaluationResultCache {
    *
    * @return The depth at which the handler was inserted into the services
    *         hierarchy; should be a positive integer.
-   * @since 3.2
    */
   virtual int GetDepth() const = 0;
 
@@ -98,23 +95,8 @@ struct BERRY_UI_QT IHandlerActivation : public IEvaluationResultCache {
    *
    * @return The handler service; never <code>null</code>.
    */
-  virtual SmartPointer<IHandlerService> GetHandlerService() const = 0;
+  virtual IHandlerService* GetHandlerService() const = 0;
 
-  /**
-   * Returns whether this handler activation is currently active -- given the
-   * current state of the workbench. This method should cache its computation.
-   * The cache will be cleared by a call to <code>clearActive</code>.
-   *
-   * @param context
-   *            The context in which this state should be evaluated; must not
-   *            be <code>null</code>.
-   * @return <code>true</code> if the activation is currently active;
-   *         <code>false</code> otherwise.
-   * @deprecated Use
-   *             {@link IEvaluationResultCache#evaluate(IEvaluationContext)}
-   *             instead.
-   */
-  virtual bool IsActive(SmartPointer<IEvaluationContext> context) const = 0;
 };
 
 }

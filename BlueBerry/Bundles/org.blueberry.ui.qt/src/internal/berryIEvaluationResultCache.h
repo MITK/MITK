@@ -40,10 +40,10 @@ class Expression;
  * @see ISources
  * @see ISourceProvider
  */
-struct BERRY_UI_QT IEvaluationResultCache : public Object
+struct BERRY_UI_QT IEvaluationResultCache : public virtual Object
 {
 
-  berryInterfaceMacro(IEvaluationResultCache, berry);
+  berryObjectMacro(berry::IEvaluationResultCache)
 
   ~IEvaluationResultCache();
 

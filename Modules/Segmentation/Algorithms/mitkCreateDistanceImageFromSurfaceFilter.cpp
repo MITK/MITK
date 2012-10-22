@@ -241,9 +241,9 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   extentMM[2] = zmax - zmin + 5;
 
   //Shifting the distance image's offset to achieve an exact distance calculation
-  xmin = xmin - 5;
-  ymin = ymin - 5;
-  zmin = zmin - 5;
+  xmin = xmin - 2;
+  ymin = ymin - 2;
+  zmin = zmin - 2;
 
   /*
     Now create an empty distance image. The create image will always have the same size, independent from

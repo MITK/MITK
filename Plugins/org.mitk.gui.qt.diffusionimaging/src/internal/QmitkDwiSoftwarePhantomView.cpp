@@ -33,6 +33,9 @@
 #include <itkDwiPhantomGenerationFilter.h>
 #include <mitkImageCast.h>
 #include <mitkProperties.h>
+#include <mitkPlanarFigureInteractor.h>
+#include <mitkDataStorage.h>
+#include <itkFibersFromPointsFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -64,6 +67,9 @@ void QmitkDwiSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
         m_Controls->setupUi( parent );
         m_Controls->m_SignalRegionBox->setVisible(false);
 
+        connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
+        connect((QObject*) m_Controls->m_FiberButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnAddBundle()));
+        connect((QObject*) m_Controls->m_CircleButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnDrawCircle()));
         connect((QObject*) m_Controls->m_GeneratePhantomButton, SIGNAL(clicked()), (QObject*) this, SLOT(GeneratePhantom()));
         connect((QObject*) m_Controls->m_SimulateBaseline, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnSimulateBaselineToggle(int)));
     }
@@ -161,6 +167,67 @@ void QmitkDwiSoftwarePhantomView::OnSimulateBaselineToggle(int state)
             m_Controls->m_NoiseLevel->setValue(0.0001);
         m_Controls->m_NoiseLevel->setToolTip("Signal to noise ratio (for values > 99, no noise at all is added to the image).");
     }
+}
+
+void QmitkDwiSoftwarePhantomView::OnAddBundle()
+{
+    mitk::FiberBundleX::Pointer bundle = mitk::FiberBundleX::New();
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData( bundle );
+    QString name = QString("Bundle");
+    node->SetName(name.toStdString());
+    GetDataStorage()->Add(node);
+}
+
+void QmitkDwiSoftwarePhantomView::OnDrawCircle()
+{
+    if (m_SelectedBundle.IsNull())
+        return;
+    mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData( figure );
+//    QString name = QString("Fiducial_%1").arg(m_Bundles.size());
+    node->SetName("fiducial");
+    GetDataStorage()->Add(node, m_SelectedBundle);
+
+    mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+    if(figureInteractor.IsNull())
+        figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+
+}
+
+void QmitkDwiSoftwarePhantomView::GenerateFibers()
+{
+    if (m_SelectedBundle.IsNull())
+        return;
+
+    vector< vector< mitk::PlanarCircle::Pointer > > fiducials;
+    for (int i=0; i<m_SelectedBundles.size(); i++)
+    {
+        mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundles.at(i));
+        vector< mitk::PlanarCircle::Pointer > fib;
+        for( mitk::DataStorage::SetOfObjects::const_iterator it = children->begin(); it != children->end(); ++it )
+        {
+            mitk::DataNode::Pointer node = *it;
+
+            if ( node.IsNotNull() && dynamic_cast<mitk::PlanarCircle*>(node->GetData()) )
+                fib.push_back(dynamic_cast<mitk::PlanarCircle*>(node->GetData()));
+        }
+        if (fib.size()>1)
+            fiducials.push_back(fib);
+    }
+
+    itk::FibersFromPointsFilter::Pointer filter = itk::FibersFromPointsFilter::New();
+    filter->SetFiducials(fiducials);
+    filter->Update();
+    mitk::FiberBundleX::Pointer fiberBundle = filter->GetFiberBundle();
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData( fiberBundle );
+    QString name = QString("ArtificialFibers");
+    node->SetName(name.toStdString());
+    GetDataStorage()->Add(node);
 }
 
 void QmitkDwiSoftwarePhantomView::GeneratePhantom()
@@ -348,6 +415,15 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
 
 void QmitkDwiSoftwarePhantomView::UpdateGui()
 {
+    if (m_SelectedBundle.IsNotNull())
+    {
+        m_Controls->m_CircleButton->setEnabled(true);
+    }
+    else
+    {
+        m_Controls->m_CircleButton->setEnabled(false);
+    }
+
     if (!m_SignalRegionNodes.empty())
     {
         m_Controls->m_SignalRegionBox->setVisible(true);
@@ -481,6 +557,8 @@ void QmitkDwiSoftwarePhantomView::StdMultiWidgetNotAvailable()
 void QmitkDwiSoftwarePhantomView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
     m_SignalRegionNodes.clear();
+    m_SelectedBundles.clear();
+    m_SelectedBundle = NULL;
 
     // iterate all selected objects, adjust warning visibility
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
@@ -493,6 +571,11 @@ void QmitkDwiSoftwarePhantomView::OnSelectionChanged( std::vector<mitk::DataNode
             node->GetPropertyValue<bool>("binary", isBinary);
             if (isBinary)
                 m_SignalRegionNodes.push_back(node);
+        }
+        else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
+        {
+            m_SelectedBundle = node;
+            m_SelectedBundles.push_back(node);
         }
     }
     UpdateGui();

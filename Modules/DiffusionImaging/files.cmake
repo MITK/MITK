@@ -218,9 +218,11 @@ set(H_FILES
   Algorithms/itkMergeDiffusionImagesFilter.h
   Algorithms/itkDwiPhantomGenerationFilter.h
   Algorithms/itkFiniteDiffOdfMaximaExtractionFilter.h
+  Algorithms/itkMrtrixPeakImageConverter.h
   Algorithms/itkFslPeakImageConverter.h
   Algorithms/itkFslShCoefficientImageConverter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
+  Algorithms/itkFibersFromPointsFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h

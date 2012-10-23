@@ -1,6 +1,6 @@
 /**
 
-\page org_igttrackingtoolbox The MITK-IGT Tracking Toolbox
+\page org_mitk_views_igttrackingtoolbox The MITK-IGT Tracking Toolbox
 
 \image html iconTrackingToolbox.png "Icon of the module"
 
@@ -16,7 +16,7 @@ Available sections:
 
 \section QmitkMITKIGTTrackingToolboxIntroduction Introduction
 
-The MITK-IGT Tracking Toolbox is a bundle which allows you to connect to a tracking device, track and visualize navigation tools and write the tracked data into a log file. Currently the devices Polaris, Aurora (both Northern Digital Inc. (NDI); Waterloo, Ontario, Canada) and MicronTracker (Claron Technology, Inc.; Toronto, Ontario, Canada) are supported. The MicroBird family (Ascension Technology Corporation, Inc.; Burlington, USA) will hopefully follow soon since it is already supported by the tracking layer of IGT. The logging feature of the Tracking Toolbox supports logging in XML or CSV format.
+The MITK-IGT Tracking Toolbox is a view which allows you to connect to a tracking device, track and visualize navigation tools and write the tracked data into a log file. Currently the devices Polaris, Aurora (both Northern Digital Inc. (NDI); Waterloo, Ontario, Canada) and MicronTracker (Claron Technology, Inc.; Toronto, Ontario, Canada) are supported. The MicroBird family (Ascension Technology Corporation, Inc.; Burlington, USA) will hopefully follow soon since it is already supported by the tracking layer of IGT. The logging feature of the Tracking Toolbox supports logging in XML or CSV format.
 
 \image html screenshot_mitk.png "MITK Screenshot with the TrackingToolbox activated"
 
@@ -39,7 +39,7 @@ The tracking device can be specified in the tracking device configuration sectio
 
 \section QmitkMITKIGTTrackingToolboxLoadingTools Loading tools
 
-To load tools which can be tracked you need a predefined tracking tool storage. If you use the Aurora system you also have the possibility to automatically detect the connected tools. In this case a tracking tool storage is created by the software (see section below). Otherwise you can use the MITK bundle NavigationToolManager to define a navigation tool storage. There you can create navigation tools with the corresponding toolfiles, visualization surfaces and so on. Please see NavigationToolManager manual for more details.
+To load tools which can be tracked you need a predefined tracking tool storage. If you use the Aurora system you also have the possibility to automatically detect the connected tools. In this case a tracking tool storage is created by the software (see section below). Otherwise you can use the MITK view NavigationToolManager to define a navigation tool storage. There you can create navigation tools with the corresponding toolfiles, visualization surfaces and so on. Please see NavigationToolManager manual for more details.
 
 Navigation tool storages can be loaded by pressing the button "Load Tools". Please ensure that the tracking device type of the tools matches the chosen tracking device, otherwise you will get an error message if you try to start tracking. All loaded tools will then be displayed in grey as shown in the screenshot below. If you start tracking they will become green if the tools were found and red if they were not found inside the tracking volume.
 

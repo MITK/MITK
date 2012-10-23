@@ -197,7 +197,8 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "BlueBerry=\if BLUEBERRY" \
                          "endBlueBerry=\endif" \
                          "bundlemainpage{1}=\page \1" \
-                         "embmainpage{1}=\page \1"
+                         "embmainpage{1}=\page \1" \
+                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" "
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding
@@ -593,7 +594,7 @@ FILE_VERSION_FILTER    =
 # You can optionally specify a file name after the option, if omitted
 # DoxygenLayout.xml will be used as the name of the layout file.
 
-LAYOUT_FILE            =
+LAYOUT_FILE            = @MITK_SOURCE_DIR@/Documentation/MITKDoxygenLayout.xml
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files
 # containing the references data. This must be a list of .bib files. The
@@ -1629,7 +1630,8 @@ PREDEFINED             = itkNotUsed(x)= \
                          "US_BEGIN_NAMESPACE= namespace mitk {" \
                          "US_END_NAMESPACE=}" \
                          "US_BASECLASS_NAME=itk::LightObject" \
-                         US_EXPORT=
+                         US_EXPORT= \
+                         "DEPRECATED(func)=func"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

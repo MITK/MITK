@@ -1,8 +1,8 @@
 /**
 
-\page org_meshdecimation The Mesh Decimation Module
+\page org_mitk_views_meshdecimation The Mesh Decimation Plugin
 
-\image html meshdecimation.png "Icon of the Module"
+\image html meshdecimation.png "Icon of the Plugin"
 
 Available sections:
   - \ref meshdecimationOverview 
@@ -15,13 +15,13 @@ MeshDecimation is a user friendly tool to decimate a MITK surface.
 
 \section meshdecimationFeatures Features
 
-The module offers two basic procedures to decimate surfaces: One that reduces a surface with a possible loss of topology (quality), but with a garuanteed reduction rate that is expressed in terms of percent of the original mesh. The other variant preserves the topology and stops decimating when it detects heavy topological changes.   
+The view offers two basic procedures to decimate surfaces: One that reduces a surface with a possible loss of topology (quality), but with a garuanteed reduction rate that is expressed in terms of percent of the original mesh. The other variant preserves the topology and stops decimating when it detects heavy topological changes.   
  
 \section meshdecimationUsage Usage
 
-\image html meshdecimation-ui.png "The user interface of the Mesh Decimation Module"
+\image html meshdecimation-ui.png "The user interface of the Mesh Decimation View"
 
-The usage of the module should be straightforward, as shown in the screenshot. To decimate a MITK surface do the following:
+The usage of the view should be straightforward, as shown in the screenshot. To decimate a MITK surface do the following:
 - Select a surface in the datamanager
 - Enter a target reduction rate
 - Select a decimation method (\ref meshdecimationFeatures)

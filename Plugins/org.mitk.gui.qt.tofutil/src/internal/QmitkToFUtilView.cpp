@@ -169,7 +169,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
 
   // initialize measurement widget
-  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetRenderWindows(),this->GetDataStorage());
+  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());
 
   //TODO
   this->m_RealTimeClock = mitk::RealTimeClock::New();
@@ -592,7 +592,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if(this->m_SurfaceNode.IsNotNull())
   {
-    QHash<QString, QmitkRenderWindow*> renderWindowHashMap = this->GetRenderWindowPart()->GetRenderWindows();
+    QHash<QString, QmitkRenderWindow*> renderWindowHashMap = this->GetRenderWindowPart()->GetQmitkRenderWindows();
     QHashIterator<QString, QmitkRenderWindow*> i(renderWindowHashMap);
     while (i.hasNext()){
       i.next();

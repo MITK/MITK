@@ -1,12 +1,12 @@
 /**
 
-\page org_igtnavigationtoolmanager The MITK-IGT Navigation Tool Manager
+\page org_mitk_views_igtnavigationtoolmanager The MITK-IGT Navigation Tool Manager
 
 \image html iconNavigationToolManager.png "Icon of the Module"
 
 \section QmitkMITKIGTNavigationToolManager Introduction
 
-This bundle allows for creating and editing NavigationToolStorages. These storages contains naviagtion tools of a tracking device, can be saved permanently and used later for any other IGT application.
+This view allows for creating and editing NavigationToolStorages. These storages contains naviagtion tools of a tracking device, can be saved permanently and used later for any other IGT application.
 
 Available sections:
   - \ref QmitkMITKIGTNavigationToolManager
@@ -28,7 +28,7 @@ A navigation tool of MITK-IGT represents a tracking tool (e.g. an emt sensor or 
 <li> Type of the tool
 </ul>
 
-Note that not all properties are needed for all types of tools. A tool definition file, for example, is only needed by optical tracking tools (e.g. a .rom file for Polaris or a toolfile for the MicronTracker). A tool associated with the aurora system is alwalys identified by it's serial number. You can also detect Aurora tools automatically with the TrackingToolbox bundle and edit the automatically detected tool storage later with this bundle. 
+Note that not all properties are needed for all types of tools. A tool definition file, for example, is only needed by optical tracking tools (e.g. a .rom file for Polaris or a toolfile for the MicronTracker). A tool associated with the aurora system is alwalys identified by it's serial number. You can also detect Aurora tools automatically with the TrackingToolbox view and edit the automatically detected tool storage later with this view. 
 
 \section QmitkMITKIGTNavigationToolManagerManagingNavigationToolStorage Managing Navigation Tool Storage
 

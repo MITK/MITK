@@ -351,7 +351,7 @@ showNewWindowMenuItem(false),
 showClosePerspectiveMenuItem(true),
 dropTargetListener(new QmitkDefaultDropTargetListener)
 {
- productName = berry::Platform::GetConfiguration().getString("application.baseName");
+ productName = QCoreApplication::applicationName().toStdString();
 }
 
 berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
@@ -467,7 +467,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
 {
- openDicomEditorAction = new QmitkOpenDicomEditorAction(window);
+ openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
 }
 
  berry::IViewRegistry* viewRegistry =
@@ -685,10 +685,10 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
  // ====================================================
 
  // ===== Help menu ====================================
- QMenu* helpMenu = menuBar->addMenu("Help");
+ QMenu* helpMenu = menuBar->addMenu("&Help");
  helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
- helpMenu->addAction("&Contents", this, SLOT(onHelpContents()));
-  helpMenu->addAction("Context &Help",this, SLOT(onHelp()),  QKeySequence("F1"));
+ helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
+  helpMenu->addAction("&Context Help",this, SLOT(onHelp()),  QKeySequence("F1"));
  helpMenu->addAction("&About",this, SLOT(onAbout()));
  // =====================================================
 
@@ -773,9 +773,9 @@ void QmitkExtWorkbenchWindowAdvisor::onHelp()
   QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelp();
 }
 
-void QmitkExtWorkbenchWindowAdvisor::onHelpContents()
+void QmitkExtWorkbenchWindowAdvisor::onHelpOpenHelpPerspective()
 {
-  QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelpContents();
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelpOpenHelpPerspective();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onAbout()
@@ -970,7 +970,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
   }
 }
 
-void QmitkExtWorkbenchWindowAdvisorHack::onHelpContents()
+void QmitkExtWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
 {
   berry::PlatformUI::GetWorkbench()->ShowPerspective("org.blueberry.perspectives.help",
                                                      berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());

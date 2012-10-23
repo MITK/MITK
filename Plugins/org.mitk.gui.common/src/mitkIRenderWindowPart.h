@@ -76,15 +76,54 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    *
    * \return The active QmitkRenderWindow instance; <code>NULL</code>
    *         if no render window is active.
+   *
+   * \deprecated The method is deprecated, use the IRenderWindowPart::GetActiveQmitkRenderWindow() instead
    */
-  virtual QmitkRenderWindow* GetActiveRenderWindow() const = 0;
+  DEPRECATED( virtual QmitkRenderWindow* GetActiveRenderWindow() const)
+  {
+    return GetActiveQmitkRenderWindow();
+  }
+
+  /**
+   * Get all render windows with their ids.
+   *
+   * \return A hash map mapping the render window id to the QmitkRenderWindow instance.
+   *
+   * \deprecated The method is deprecated, use the IRenderWindowPart::GetQmitkRenderWindows() instead
+   */
+  DEPRECATED( virtual QHash<QString,QmitkRenderWindow*> GetRenderWindows() const )
+  {
+    return GetQmitkRenderWindows();
+  }
+
+  /**
+   * Get a render window with a specific id.
+   *
+   * \param id The render window id.
+   * \return The QmitkRenderWindow instance for <code>id</code>
+   *
+   * \deprecated The method is deprecated, use the IRenderWindowPart::GetQmitkRenderWindow(const QString& id) instead
+   */
+  DEPRECATED( virtual QmitkRenderWindow* GetRenderWindow(const QString& id) const )
+  {
+    return GetQmitkRenderWindow( id );
+  }
+
+  /**
+   * Get the currently active (focused) render window.
+   * Focus handling is implementation specific.
+   *
+   * \return The active QmitkRenderWindow instance; <code>NULL</code>
+   *         if no render window is active.
+   */
+  virtual QmitkRenderWindow* GetActiveQmitkRenderWindow() const = 0;
 
   /**
    * Get all render windows with their ids.
    *
    * \return A hash map mapping the render window id to the QmitkRenderWindow instance.
    */
-  virtual QHash<QString,QmitkRenderWindow*> GetRenderWindows() const = 0;
+  virtual QHash<QString,QmitkRenderWindow*> GetQmitkRenderWindows() const  = 0;
 
   /**
    * Get a render window with a specific id.
@@ -92,7 +131,7 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    * \param id The render window id.
    * \return The QmitkRenderWindow instance for <code>id</code>
    */
-  virtual QmitkRenderWindow* GetRenderWindow(const QString& id) const = 0;
+  virtual QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const = 0;
 
   /**
    * Get the rendering manager used by this render window part.

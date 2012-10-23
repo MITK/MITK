@@ -1,0 +1,16 @@
+/**
+\page org_mitk_gui_qt_dicom The Dicom Plugin
+
+\image html icon.png "Icon of Dicom"
+
+\warning This plugin is experimental and not all of the described features behave as expected.
+
+Available sections:
+  - \ref org_mitk_gui_qt_dicomOverview
+
+\section org_mitk_gui_qt_dicomOverview Overview
+
+The DICOM editor is an experimental editor which allows for loading of DICOM images as well as server communication. It features a highly experimental query/retrieve (you need to configure your PACS correspondingly) as well as a DICOM browser. The DICOM browser allows you to navigate the DICOM folder/cd depending on its metadata (patient/study/series) and import selected series for viewing in your MITK based application.
+
+It is based on the <a href="http://www.commontk.org/index.php/Documentation/Dicom_Overview">commonTK (CTK) DICOM funcionality</a>.
+*/

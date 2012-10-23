@@ -169,6 +169,16 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     virtual bool HandleEvent(StateEvent const* stateEvent);
 
     /**
+     * @brief calculates how good this statemachine can handle the event.
+     *
+     *  Returns a value between 0 and 1
+     *  where 0 represents not responsible and 1 represents definitive responsible!
+     *  Standard function to override if needed.
+     *  (Used by GlobalInteraction to decide which DESELECTED statemachine to send the event to.)
+    **/
+    virtual float CanHandleEvent(const StateEvent *) const;
+
+    /**
     * @brief Enables or disabled Undo.
     **/
     void EnableUndo(bool enable);

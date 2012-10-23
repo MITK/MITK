@@ -111,9 +111,9 @@ calling object*/
   \todo maybe there is something in external toolkits (ITK, VTK,...) that we could reulse -- would be much preferable
 */
 #ifdef __GNUC__
-  #define DEPRECATED(func) func __attribute__ ((deprecated))
+  #define DEPRECATED(...) __VA_ARGS__ __attribute__ ((deprecated))
 #elif defined(_MSC_VER)
-  #define DEPRECATED(func) __declspec(deprecated) func
+  #define DEPRECATED(...) __declspec(deprecated) ##__VA_ARGS__
 #else
   #pragma message("WARNING: You need to implement DEPRECATED for your compiler!")
   #define DEPRECATED(func) func

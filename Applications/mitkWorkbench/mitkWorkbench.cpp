@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 {
   // Create a QApplication instance first
   QtSafeApplication qSafeApp(argc, argv);
-  qSafeApp.setApplicationName("mitkWorkbench");
+  qSafeApp.setApplicationName("MITK Workbench");
   qSafeApp.setOrganizationName("DKFZ");
 
   // This function checks if an instance is already running
@@ -137,7 +137,7 @@ int main(int argc, char** argv)
   // which have difficulties with multiple dynamic opening and closing of shared libraries with
   // many global static initializers. It also helps if dependent libraries have weird static
   // initialization methods and/or missing de-initialization code.
-  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, "liborg_mitk_gui_qt_ext,libCTKDICOMCore");
+  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, "liborg_mitk_gui_qt_ext,libCTKDICOMCore:0.1");
 
   return berry::Starter::Run(argc, argv, extConfig);
 }

@@ -1,5 +1,5 @@
 /**
-\page org_deform_registration The Deformable Image Registration Module
+\page org_mitk_views_deformableregistration The Deformable Image Registration View
 
 Available sections:
   - \ref DeformableRegistrationUserManualOverview
@@ -7,19 +7,19 @@ Available sections:
 
 \section DeformableRegistrationUserManualOverview Overview
 
-This module allows you to register 2D as well as 3D images in a deformable manner. Register means to align two images, so that they become as similar as
+This view allows you to register 2D as well as 3D images in a deformable manner. Register means to align two images, so that they become as similar as
 possible. Registration results will directly be applied to the Moving Image.
 
-\image html QmitkDeformableRegistration_small.png "MITK with the DeformableRegistration module"
+\image html QmitkDeformableRegistration_small.png "MITK with the DeformableRegistration view"
 
-This document will tell you how to use this module, but it is assumed that you already know how to navigate through the slices of an image using the
+This document will tell you how to use this view, but it is assumed that you already know how to navigate through the slices of an image using the
 multi-widget.
 
 \section DeformableRegistrationUserManualDetails Details
 
 First of all you have to open the data sets which you want to register and select them in the Data Manager. You have to select exactly 2 images for registration. The image which was selected 
 first will become the fixed image, the other one the moving image. The two selected images will remain for registration until exactly two images were selected in the Data Manager again. While 
-there aren't two images for registration a message is viewed on top of the module saying that registration needs two images. If two images are selected the message disappears and the interaction 
+there aren't two images for registration a message is viewed on top of the view saying that registration needs two images. If two images are selected the message disappears and the interaction 
 areas for the fixed and moving data appears. On default only the fixed and moving image are shown in the render windows. If you want to have other images visible you have to set the visibility 
 via the Data Manager. Also if you want to perform a reinit on a specific node or a global reinit for all nodes you have to use the Data Manager.
 

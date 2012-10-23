@@ -19,11 +19,6 @@
       name="Property List" 
       icon="resources/propertylist.png"
       class="QmitkPropertyListView" />
-    <view
-      id="org.mitk.views.propertytreeview"
-      name="Properties"
-      icon="resources/propertylist.png"
-      class="QmitkPropertyTreeView" />
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">

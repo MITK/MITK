@@ -192,14 +192,20 @@ void QmitkStoreSCPLauncher::SetArgumentList(QmitkStoreSCPLauncherBuilder* builde
 
 void QmitkStoreSCPLauncher::DeleteTemporaryData()
 {
-    MITK_INFO << m_ArgumentList[7].toStdString();
-    QDir dir(m_ArgumentList[7]);
+    MITK_INFO << "About to delete: " << m_ArgumentList[7].toStdString();
+    
+    /* 
+     * Dangerous code, see bug 13021
+     *
+
+     QDir dir(m_ArgumentList[7]);
     QDirIterator it(dir);
     while(it.hasNext())
     {
         it.next();
         dir.remove(it.fileInfo().absoluteFilePath());
     }
+    */
 }
 
 QString QmitkStoreSCPLauncher::ArgumentListToQString()

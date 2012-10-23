@@ -1,5 +1,5 @@
 /**
-\page org_diffusion MITK Diffusion Imaging (MITK-DI)
+\page org_mitk_gui_qt_diffusionimaging MITK Diffusion Imaging (MITK-DI)
 
 This module provides means to diffusion weighted image reconstruction, visualization and quantification. Diffusion tensors as well as different q-ball reconstruction schemes are supported. Q-ball imaging aims at recovering more detailed information about the orientations of fibers from diffusion MRI measurements and, in particular, to resolve the orientations of crossing fibers.
 
@@ -39,7 +39,7 @@ The view also allows the generation of artificial diffusion weighted or Q-Ball i
 
 \section QmitkDiffusionImagingUserManualQBallReconstruction Q-Ball Reconstruction
 
-The q-ball reonstruction bundle implements a variety of reconstruction methods. The different reconstruction methods are described in the following:
+The q-ball reonstruction view implements a variety of reconstruction methods. The different reconstruction methods are described in the following:
 \li <b>Numerical:</b> The original, numerical q-ball reconstruction presented by Tuch et al. [5]
 \li <b>Standard (SH):</b> Descoteaux's reconstruction based on spherical harmonic basis functions [6]
 \li <b>Solid Angle (SH):</b> Aganj's reconstruction with solid angle consideration [7]
@@ -104,19 +104,19 @@ This is how a visualization with activated glyphs should look like:
 
 \section QmitkDiffusionImagingUserManualTechnicalDetail Technical Information for Developers
 
-The diffusion imaging module uses additional properties beside the ones in use in other modules, for further information see \subpage DiffusionImagingPropertiesPage .
+The diffusion imaging module uses additional properties beside the ones in use in other modules, for further information see \ref DiffusionImagingPropertiesPage .
 
 \section QmitkDiffusionImagingUserManualSubManuals Manuals of componentes
 
 The MITK Diffusion tools consist of further components, which have their own documentation, see:
 
-  \li \subpage org_fiberprocessing
-  \li \subpage org_gibbstracking
-  \li \subpage org_odfdetails
-  \li \subpage org_pvanalysis
-  \li \subpage screenshot_maker
-  \li \subpage org_stochastictracking
-  \li \subpage org_ivim
-  \li \subpage org_brainnetworkanalysis
-  \li \subpage org_tractbasedspatialstatistics
+  \li \subpage org_mitk_views_fiberprocessing
+  \li \subpage org_mitk_views_gibbstracking
+  \li \subpage org_mitk_views_odfdetails
+  \li \subpage org_mitk_views_partialvolumeanalysisview
+  \li \subpage org_mitk_views_screenshotmaker
+  \li \subpage org_mitk_views_stochasticfibertracking
+  \li \subpage org_mitk_views_ivim
+  \li \subpage org_mitk_views_brainnetworkanalysis
+  \li \subpage org_mitk_views_tractbasedspatialstatistics
 */

@@ -274,7 +274,7 @@ void QmitkImageNavigatorView::SetStepSize(int axis)
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
 
     if (geometry.IsNotNull())
     {
@@ -320,7 +320,7 @@ void QmitkImageNavigatorView::OnMillimetreCoordinateValueChanged()
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
 
     if (geometry.IsNotNull())
     {
@@ -338,7 +338,7 @@ void QmitkImageNavigatorView::OnRefetch()
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
+    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry();
 
     if (geometry.IsNotNull())
     {

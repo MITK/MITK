@@ -142,24 +142,24 @@ QmitkStdMultiWidget* QmitkStdMultiWidgetEditor::GetStdMultiWidget()
   return d->m_StdMultiWidget;
 }
 
-QmitkRenderWindow *QmitkStdMultiWidgetEditor::GetActiveRenderWindow() const
+QmitkRenderWindow *QmitkStdMultiWidgetEditor::GetActiveQmitkRenderWindow() const
 {
   if (d->m_StdMultiWidget) return d->m_StdMultiWidget->GetRenderWindow1();
   return 0;
 }
 
-QHash<QString, QmitkRenderWindow *> QmitkStdMultiWidgetEditor::GetRenderWindows() const
+QHash<QString, QmitkRenderWindow *> QmitkStdMultiWidgetEditor::GetQmitkRenderWindows() const
 {
   return d->m_RenderWindows;
 }
 
-QmitkRenderWindow *QmitkStdMultiWidgetEditor::GetRenderWindow(const QString &id) const
+QmitkRenderWindow *QmitkStdMultiWidgetEditor::GetQmitkRenderWindow(const QString &id) const
 {
   static bool alreadyWarned = false;
 
   if(!alreadyWarned)
   {
-    MITK_WARN(id == "axial") << "QmitkStdMultiWidgetEditor::GetRenderWindow(\"transversal\") is deprecated. Use \"axial\" instead.";
+    MITK_WARN(id == "transversal") << "QmitkStdMultiWidgetEditor::GetRenderWindow(\"transversal\") is deprecated. Use \"axial\" instead.";
     alreadyWarned = true;
   }
 

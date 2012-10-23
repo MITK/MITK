@@ -1,7 +1,7 @@
 /**
-\page org_pointbased_reg  The Point Based Registration Module
+\page org_mitk_views_pointbasedregistration  The Point Based Registration View
 
-\image html pointBasedIcon.png "Icon of the Module"
+\image html pointBasedIcon.png "Icon of the View"
 
 Available sections:
   - \ref PointBasedRegistrationUserManualOverview 
@@ -9,21 +9,21 @@ Available sections:
 
 \section PointBasedRegistrationUserManualOverview Overview
 
-This module allows you to register two datasets in a rigid and deformable manner via corresponding 
+This view allows you to register two datasets in a rigid and deformable manner via corresponding 
 PointSets. Register means to align two datasets, so that they become as similar as possible. 
 Therefore you have to set corresponding points in both datasets, which will be matched. The movement, which has to be 
 performed on the points to align them, will be performed on the moving data as well. The result is shown in the multi-widget. 
 
-\image html PointBasedRegistration_small.png "MITK with the PointBasedRegistration module"
+\image html PointBasedRegistration_small.png "MITK with the PointBasedRegistration view"
 
-This document will tell you how to use this module, but it is assumed that you already know how to navigate through 
+This document will tell you how to use this view, but it is assumed that you already know how to navigate through 
 the slices of a dataset using the multi-widget.
 
 \section PointBasedRegistrationUserManualDetails Details
 
 First of all you have to open the data sets which you want to register and select them in the Data Manager. You have to select exactly 2 images for registration. The image which was selected 
 first will become the fixed image, the other one the moving image. The two selected images will remain for registration until exactly two images were selected in the Data Manager again. While 
-there aren't two images for registration a message is viewed on top of the module saying that registration needs two images. If two images are selected the message disappears and the interaction 
+there aren't two images for registration a message is viewed on top of the view saying that registration needs two images. If two images are selected the message disappears and the interaction 
 areas for the fixed and moving data appears. The upper area is for interaction with the fixed data. Beneath this area is the interaction area for the moving data. On default only the fixed and 
 moving image with their corresponding pointsets are shown in the render windows. If you want to have other images visible you have to set the visibility via the Data Manager. Also if you want to 
 perform a reinit on a specific node or a global reinit for all nodes you have to use the Data Manager.

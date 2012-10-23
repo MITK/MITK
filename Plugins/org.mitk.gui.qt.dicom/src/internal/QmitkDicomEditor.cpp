@@ -78,7 +78,6 @@ QmitkDicomEditor::~QmitkDicomEditor()
     delete m_Thread;
     delete m_DicomDirectoryListener;
     delete m_ImportDialog;
-    delete m_ProgressDialog;
 }
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )

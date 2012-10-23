@@ -54,7 +54,8 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Revision %1</string>
+          <string>Revision %1
+Description %2</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

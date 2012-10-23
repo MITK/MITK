@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -54,6 +54,7 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_Controls(NULL)
 ,m_MultiWidget(NULL)
 ,m_RenderingManagerObserverTag(0)
+,m_DataSelectionChanged(false)
 {
   RegisterSegmentationObjectFactory();
 }
@@ -79,6 +80,14 @@ void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVecto
   {
     this->FireNodeSelected( *iter );
     // only last iteration meaningful, multiple generated objects are not taken into account here
+  }
+}
+
+void QmitkSegmentationView::Visible()
+{
+  if (m_DataSelectionChanged)
+  {
+    this->OnSelectionChanged(this->GetDataManagerSelection());
   }
 }
 
@@ -145,12 +154,12 @@ void QmitkSegmentationView::Deactivated()
     if (m_MultiWidget)
     {
       mitk::SlicesCoordinator *coordinator = m_MultiWidget->GetSlicesRotator();
-      
+
       if (coordinator)
         coordinator->RemoveObserver(m_SlicesRotationObserverTag1);
 
       coordinator = m_MultiWidget->GetSlicesSwiveller();
-      
+
       if (coordinator)
         coordinator->RemoveObserver(m_SlicesRotationObserverTag2);
 
@@ -387,7 +396,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
   if (!m_Parent || !m_Parent->isVisible()) return;
 
   // The new selection behaviour is:
-  // 
+  //
   // When clicking on the checkbox of a segmentation the node will e selected and its reference node either
   // The previous selected segmentation (if there is one) will be deselected. Additionally a reinit on the
   // selected segmenation will be performed.
@@ -526,7 +535,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 }
 
 void QmitkSegmentationView::CreateSegmentationFromSurface()
-{ 
+{
   mitk::DataNode::Pointer surfaceNode =
     m_Controls->MaskSurfaces->GetSelectedNode();
   mitk::Surface::Pointer surface(0);
@@ -566,22 +575,6 @@ void QmitkSegmentationView::CreateSegmentationFromSurface()
 
   this->GetDataStorage()->Add(resultNode, imageNode);
 
-}
-
-void QmitkSegmentationView::ManualToolSelected(int id)
-{
-  // disable crosshair movement when a manual drawing tool is active (otherwise too much visual noise)
-  if (m_MultiWidget)
-  {
-    if (id >= 0)
-    {
-      m_MultiWidget->DisableNavigationControllerEventListening();
-    }
-    else
-    {
-      m_MultiWidget->EnableNavigationControllerEventListening();
-    }
-  }
 }
 
 void QmitkSegmentationView::ToolboxStackPageChanged(int id)
@@ -694,7 +687,7 @@ void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 }
 
 void QmitkSegmentationView::OnSurfaceSelectionChanged()
-{   
+{
   // if Image and Surface are selected, enable button
   if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
     (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()))
@@ -724,7 +717,12 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   else
     m_Controls->CreateSegmentationFromSurface->setEnabled(true);
 
-  if (!m_Parent || !m_Parent->isVisible()) return;
+  m_DataSelectionChanged = false;
+  if (!m_Parent || !m_Parent->isVisible())
+  {
+    m_DataSelectionChanged = true;
+    return;
+  }
 
   // reaction to BlueBerry selection events
   //   this method will try to figure out if a relevant segmentation and its corresponding original image were selected
@@ -820,15 +818,15 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
     }
 
   }
-  else 
+  else
   {
     //set comboBox to reference image
-    disconnect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+    disconnect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
       this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
 
     m_Controls->refImageSelector->setCurrentIndex( m_Controls->refImageSelector->Find(referenceData) );
 
-    connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+    connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
       this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
 
     // if Image and Surface are selected, enable button
@@ -948,7 +946,7 @@ mitk::DataNode::Pointer QmitkSegmentationView::FindFirstSegmentation( std::vecto
     nodes.at(i)->GetBoolProperty("binary", isSegmentation);
 
     // return first proper binary mitk::Image
-    if (isImage && isSegmentation) 
+    if (isImage && isSegmentation)
     {
       return nodes.at(i);
     }
@@ -987,7 +985,7 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
 
   // check segmentation
   if (referenceData)
-  { 
+  {
     if (!workingData)
     {
       m_Controls->lblWorkingImageSelectionWarning->show();
@@ -1179,17 +1177,16 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
     mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::NewNodeObjectsGenerated );          // update the list of segmentations
 
   // create signal/slot connections
-  connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+  connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
     this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
   connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
-  connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );
   connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
 
-  connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+  connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
     this, SLOT( OnSurfaceSelectionChanged( ) ) );
 
-  connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+  connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
     this, SLOT( OnSurfaceSelectionChanged( ) ) );
 
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));

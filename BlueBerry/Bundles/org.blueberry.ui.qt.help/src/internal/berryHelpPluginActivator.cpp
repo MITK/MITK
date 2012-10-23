@@ -429,6 +429,7 @@ void HelpContextHandler::handleEvent(const ctkEvent &event)
               QString loc = "qthelp://" + pluginID + "/bundle/%1.html";
 
               QHelpEngineWrapper& helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();
+              // Get view help page if available
               QUrl contextUrl(loc.arg(viewID.replace(".", "_")));
               QUrl url = helpEngine.findFile(contextUrl);
               if (url.isValid()) return url;
@@ -436,6 +437,10 @@ void HelpContextHandler::handleEvent(const ctkEvent &event)
               {
                 BERRY_INFO << "Context help url invalid: " << contextUrl.toString().toStdString();
               }
+              // If no view help exists get plugin help if available
+              QUrl pluginContextUrl(loc.arg(pluginID.replace(".", "_")));
+              url = helpEngine.findFile(pluginContextUrl);
+              if (url.isValid()) return url;
               // Try to get the index.html file of the plug-in contributing the
               // currently active part.
               QUrl pluginIndexUrl(loc.arg("index"));

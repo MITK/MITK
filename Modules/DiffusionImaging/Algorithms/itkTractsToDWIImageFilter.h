@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // ITK
 #include <itkImage.h>
+#include <itkVectorImage.h>
 #include <itkProcessObject.h>
 #include <itkImageSource.h>
 
@@ -47,6 +48,7 @@ public:
     typedef Vector<double,3>                                GradientType;
     typedef std::vector<GradientType>                       GradientListType;
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
+    typedef itk::VectorImage< double, 3 >                   DoubleDwiType;
 
     itkNewMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
@@ -56,17 +58,14 @@ public:
     void SetGradientList(GradientListType gradientList) {m_GradientList = gradientList; }
 
 
-//    itkSetMacro( BValue, float )
-//    itkSetMacro( SignalScale, float )
+    itkSetMacro( BValue, float )
+    itkSetMacro( MaxFA, float )
 //    itkSetMacro( NoiseVariance, double )
 //    itkSetMacro( GreyMatterAdc, float )
     itkSetMacro( Spacing, mitk::Vector3D )
     itkSetMacro( Origin, mitk::Point3D )
     itkSetMacro( DirectionMatrix, MatrixType )
     itkSetMacro( ImageRegion, ImageRegion<3> )
-
-    // output
-    itkGetMacro(TensorImage, ItkTensorImageType::Pointer)
 
     void GenerateData();
 
@@ -76,17 +75,23 @@ protected:
     virtual ~TractsToDWIImageFilter();
     itk::Point<float, 3> GetItkPoint(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
+    DoubleDwiType::PixelType SimulateMeasurement(ItkTensorType& tensor, float weight);
 
-    mitk::Vector3D              m_Spacing;
-    mitk::Point3D               m_Origin;
-    itk::Matrix<double, 3, 3>   m_DirectionMatrix;
-    ImageRegion<3>              m_ImageRegion;
-
-    ItkTensorImageType::Pointer         m_TensorImage;
+    mitk::Vector3D                      m_Spacing;
+    mitk::Point3D                       m_Origin;
+    itk::Matrix<double, 3, 3>           m_DirectionMatrix;
+    ImageRegion<3>                      m_ImageRegion;
+    float                               m_BValue;
     typename OutputImageType::Pointer   m_DiffusionImage;
+    double                              m_NoiseVariance;
+    float                               m_GreyMatterAdc;
+    double                              m_DefaultBaseline;
+    int                                 m_MaxDensity;
+    ItkFloatImgType::Pointer            m_TractDensityImage;
+    float                               m_MaxFA;
 
-    GradientListType    m_GradientList;
-    FiberBundleType     m_FiberBundle;
+    GradientListType                    m_GradientList;
+    FiberBundleType                     m_FiberBundle;
 };
 }
 

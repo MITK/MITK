@@ -228,9 +228,19 @@ void QmitkDwiSoftwarePhantomView::GenerateFibers()
     filter->Update();
     vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
 
+    mitk::FiberBundleX::Pointer newBundle = mitk::FiberBundleX::New();
     for (int i=0; i<fiberBundles.size(); i++)
+    {
         m_SelectedBundles.at(i)->SetData( fiberBundles.at(i) );
+        m_SelectedBundles.at(i)->SetVisibility(false);
 
+        newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>(fiberBundles.at(i).GetPointer()));
+    }
+
+    mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
+    fbNode->SetData(newBundle);
+    fbNode->SetName("Synthetic_Bundle");
+    GetDataStorage()->Add(fbNode);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -263,13 +273,23 @@ void QmitkDwiSoftwarePhantomView::GenerateImage()
     filter->SetFiberBundle(dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundle->GetData()));
     filter->Update();
 
-    typedef itk::Image<itk::DiffusionTensor3D<float>, 3> TensorImageType;
-    TensorImageType::Pointer tensorImage = filter->GetTensorImage();
-    mitk::TensorImage::Pointer image = mitk::TensorImage::New();
-    image->InitializeByItk( tensorImage.GetPointer() );
-    image->SetVolume( tensorImage->GetBufferPointer() );
+//    typedef itk::Image<itk::DiffusionTensor3D<float>, 3> TensorImageType;
+//    TensorImageType::Pointer tensorImage = filter->GetTensorImage();
+//    mitk::TensorImage::Pointer image = mitk::TensorImage::New();
+//    image->InitializeByItk( tensorImage.GetPointer() );
+//    image->SetVolume( tensorImage->GetBufferPointer() );
+//    mitk::DataNode::Pointer node = mitk::DataNode::New();
+//    node->SetData( image );
+//    GetDataStorage()->Add(node, m_SelectedBundle);
+
+    mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
+    image->SetVectorImage( filter->GetOutput() );
+    image->SetB_Value(bVal);
+    image->SetDirections(gradientList);
+    image->InitializeFromVectorImage();
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );
+    node->SetName(m_Controls->m_ImageName->text().toStdString());
     GetDataStorage()->Add(node, m_SelectedBundle);
 }
 

@@ -193,9 +193,9 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
     m_RandGen->SetSeed();
 
     typename OutputImageType::Pointer outImage = OutputImageType::New();
-    outImage->SetSpacing( m_Spacing );   // Set the image spacing
-    outImage->SetOrigin( m_Origin );     // Set the image origin
-    outImage->SetDirection( m_DirectionMatrix );  // Set the image direction
+    outImage->SetSpacing( m_Spacing );
+    outImage->SetOrigin( m_Origin );
+    outImage->SetDirection( m_DirectionMatrix );
     outImage->SetLargestPossibleRegion( m_ImageRegion );
     outImage->SetBufferedRegion( m_ImageRegion );
     outImage->SetRequestedRegion( m_ImageRegion );

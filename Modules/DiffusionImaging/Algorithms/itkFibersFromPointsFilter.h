@@ -43,6 +43,7 @@ public:
     typedef SmartPointer< const Self > ConstPointer;
     typedef vector< vector< mitk::PlanarCircle::Pointer > > FiducialListType;
     typedef mitk::FiberBundleX::Pointer FiberType;
+    typedef vector< mitk::FiberBundleX::Pointer > FiberContainerType;
 
     itkNewMacro(Self)
     itkTypeMacro( FibersFromPointsFilter, ProcessObject )
@@ -54,7 +55,8 @@ public:
     }
 
     void SetFiducials(FiducialListType fiducials){ m_Fiducials = fiducials; }
-    itkGetMacro(FiberBundle, FiberType)
+    FiberContainerType GetFiberBundles(){ return m_FiberBundles; }
+    itkSetMacro(Density, int)
 
 protected:
 
@@ -62,7 +64,8 @@ protected:
     virtual ~FibersFromPointsFilter();
 
     FiducialListType    m_Fiducials;
-    FiberType           m_FiberBundle;
+    FiberContainerType  m_FiberBundles;
+    int                 m_Density;
 };
 }
 

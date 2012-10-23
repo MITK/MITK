@@ -223,6 +223,7 @@ set(H_FILES
   Algorithms/itkFslShCoefficientImageConverter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkFibersFromPointsFilter.h
+  Algorithms/itkTractsToDWIImageFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h

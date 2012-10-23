@@ -118,8 +118,6 @@ void MrtrixPeakImageConverter< PixelType >
                     dirVec.normalize();
                     dirVec = m_InputImage->GetDirection()*dirVec;
 
-                    if (index[0]==3 && index[1]==6)
-                    {
                     itk::Point<double> worldStart;
                     worldStart[0] = worldCenter[0]-dirVec[0]/2 * minSpacing;
                     worldStart[1] = worldCenter[1]-dirVec[1]/2 * minSpacing;
@@ -133,10 +131,6 @@ void MrtrixPeakImageConverter< PixelType >
                     id = m_VtkPoints->InsertNextPoint(worldEnd.GetDataPointer());
                     container->GetPointIds()->InsertNextId(id);
                     m_VtkCellArray->InsertNextCell(container);
-
-                        MITK_INFO << "MRtrix *********************";
-                        MITK_INFO << "worldCenter: " << worldCenter;
-                    }
 
                     // generate direction image
                     typename ItkDirectionImageType::IndexType index2;

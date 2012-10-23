@@ -74,6 +74,7 @@ protected slots:
     void OnDrawCircle();
     void OnAddBundle();
     void GenerateFibers();
+    void GenerateImage();
 
 protected:
 

@@ -7,27 +7,24 @@
     <x>0</x>
     <y>0</y>
     <width>389</width>
-    <height>601</height>
+    <height>606</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="4" column="2" colspan="3">
-    <widget class="QCheckBox" name="m_SimulateBaseline">
-     <property name="toolTip">
-      <string>Generate baseline signal (b0) as the l2 norm of the tensors. If not checked, the whole baseline volume is set to a default value.</string>
+   <item row="11" column="2" colspan="5">
+    <widget class="QCommandLinkButton" name="m_GeneratePhantomButton">
+     <property name="enabled">
+      <bool>true</bool>
      </property>
      <property name="text">
-      <string>Simulate Baseline Signal</string>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
+      <string>Start Phantom Generation</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2" colspan="3">
+   <item row="7" column="2" colspan="5">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Image Parameters</string>
@@ -303,24 +300,74 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="2" colspan="3">
-    <widget class="QGroupBox" name="m_SignalRegionBox">
+   <item row="10" column="2" colspan="5">
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Signal Regions</string>
+      <string>Additional Output</string>
      </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="m_OutputVectorFieldBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Visualization of the used tensor directions.</string>
+        </property>
+        <property name="text">
+         <string>Vector Field</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
+        <property name="toolTip">
+         <string>Output unsigned char image containing the number of directions per voxel.</string>
+        </property>
+        <property name="text">
+         <string>#Directions per Voxel</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="m_OutputDirectionImagesBox">
+        <property name="toolTip">
+         <string>Output one image per signal region containing the tensor direction vecors as pixel values.</string>
+        </property>
+        <property name="text">
+         <string>Direction Images</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="m_OutputSnrImageBox">
+        <property name="toolTip">
+         <string>Output one image per signal region containing the tensor direction vecors as pixel values.</string>
+        </property>
+        <property name="text">
+         <string>SNR Image</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="7" column="2" colspan="3">
-    <widget class="QCommandLinkButton" name="m_GeneratePhantomButton">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Start Phantom Generation</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="2" colspan="3">
+   <item row="12" column="2" colspan="5">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -333,7 +380,7 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="2" rowspan="2" colspan="3">
+   <item row="0" column="2" rowspan="2" colspan="5">
     <widget class="QLabel" name="m_Instruction">
      <property name="palette">
       <palette>
@@ -437,148 +484,151 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="2" colspan="3">
-    <widget class="QGroupBox" name="groupBox_2">
+   <item row="9" column="2" colspan="5">
+    <widget class="QGroupBox" name="m_SignalRegionBox">
      <property name="title">
-      <string>Additional Output</string>
+      <string>Signal Regions</string>
      </property>
-     <layout class="QFormLayout" name="formLayout_2">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
+    </widget>
+   </item>
+   <item row="8" column="2" colspan="5">
+    <widget class="QCheckBox" name="m_SimulateBaseline">
+     <property name="toolTip">
+      <string>Generate baseline signal (b0) as the l2 norm of the tensors. If not checked, the whole baseline volume is set to a default value.</string>
+     </property>
+     <property name="text">
+      <string>Simulate Baseline Signal</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-       <widget class="QCheckBox" name="m_OutputVectorFieldBox">
-        <property name="enabled">
+       <widget class="QPushButton" name="m_FiberButton">
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Draw circular ROI. Select reference fiber bundle to execute.</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <normaloff>:/QmitkDiffusionImaging/FiberBundle.png</normaloff>:/QmitkDiffusionImaging/FiberBundle.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
          <bool>true</bool>
         </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="m_CircleButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="toolTip">
-         <string>Visualization of the used tensor directions.</string>
+         <string>Draw circular ROI. Select reference fiber bundle to execute.</string>
         </property>
         <property name="text">
-         <string>Vector Field</string>
+         <string/>
         </property>
-        <property name="checked">
+        <property name="icon">
+         <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="checkable">
          <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
-        <property name="toolTip">
-         <string>Output unsigned char image containing the number of directions per voxel.</string>
+      <item row="0" column="2">
+       <widget class="QSpinBox" name="m_FiberDensityBox">
+        <property name="minimum">
+         <number>1</number>
         </property>
-        <property name="text">
-         <string>#Directions per Voxel</string>
+        <property name="maximum">
+         <number>10000</number>
         </property>
-        <property name="checked">
-         <bool>false</bool>
+        <property name="singleStep">
+         <number>10</number>
         </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="m_OutputDirectionImagesBox">
-        <property name="toolTip">
-         <string>Output one image per signal region containing the tensor direction vecors as pixel values.</string>
-        </property>
-        <property name="text">
-         <string>Direction Images</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="m_OutputSnrImageBox">
-        <property name="toolTip">
-         <string>Output one image per signal region containing the tensor direction vecors as pixel values.</string>
-        </property>
-        <property name="text">
-         <string>SNR Image</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
+        <property name="value">
+         <number>100</number>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="QPushButton" name="m_CircleButton">
-     <property name="enabled">
-      <bool>false</bool>
+   <item row="4" column="3">
+    <widget class="QFrame" name="frame_2">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>30</width>
-       <height>30</height>
-      </size>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
-     <property name="toolTip">
-      <string>Draw circular ROI. Select reference fiber bundle to execute.</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-       <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="checkable">
-      <bool>false</bool>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="m_FiberButton">
-     <property name="maximumSize">
-      <size>
-       <width>30</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string>Draw circular ROI. Select reference fiber bundle to execute.</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-       <normaloff>:/QmitkDiffusionImaging/FiberBundle.png</normaloff>:/QmitkDiffusionImaging/FiberBundle.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="checkable">
-      <bool>false</bool>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="4">
-    <widget class="QCommandLinkButton" name="m_GenerateFibersButton">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Go</string>
-     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="1">
+       <widget class="QCommandLinkButton" name="m_GenerateImageButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Generate Image</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCommandLinkButton" name="m_GenerateFibersButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Generate Fibers</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

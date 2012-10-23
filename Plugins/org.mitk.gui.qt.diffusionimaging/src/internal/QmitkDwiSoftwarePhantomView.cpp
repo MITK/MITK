@@ -36,6 +36,8 @@
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkDataStorage.h>
 #include <itkFibersFromPointsFilter.h>
+#include <itkTractsToDWIImageFilter.h>
+#include <mitkTensorImage.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -67,6 +69,7 @@ void QmitkDwiSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
         m_Controls->setupUi( parent );
         m_Controls->m_SignalRegionBox->setVisible(false);
 
+        connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
         connect((QObject*) m_Controls->m_FiberButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnAddBundle()));
         connect((QObject*) m_Controls->m_CircleButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnDrawCircle()));
@@ -221,13 +224,53 @@ void QmitkDwiSoftwarePhantomView::GenerateFibers()
 
     itk::FibersFromPointsFilter::Pointer filter = itk::FibersFromPointsFilter::New();
     filter->SetFiducials(fiducials);
+    filter->SetDensity(m_Controls->m_FiberDensityBox->value());
     filter->Update();
-    mitk::FiberBundleX::Pointer fiberBundle = filter->GetFiberBundle();
+    vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
+
+    for (int i=0; i<fiberBundles.size(); i++)
+        m_SelectedBundles.at(i)->SetData( fiberBundles.at(i) );
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkDwiSoftwarePhantomView::GenerateImage()
+{
+    if (m_SelectedBundle.IsNull())
+        return;
+
+    typedef itk::TractsToDWIImageFilter FilterType;
+    FilterType::GradientListType gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
+    double bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
+    itk::ImageRegion<3> imageRegion;
+    imageRegion.SetSize(0, m_Controls->m_SizeX->value());
+    imageRegion.SetSize(1, m_Controls->m_SizeY->value());
+    imageRegion.SetSize(2, m_Controls->m_SizeZ->value());
+    mitk::Vector3D spacing;
+    spacing[0] = m_Controls->m_SpacingX->value();
+    spacing[1] = m_Controls->m_SpacingY->value();
+    spacing[2] = m_Controls->m_SpacingZ->value();
+
+    FilterType::Pointer filter = FilterType::New();
+
+    filter->SetGradientList(gradientList);
+//    filter->SetBValue(bVal);
+//    filter->SetNoiseVariance(m_Controls->m_NoiseLevel->value());
+    filter->SetImageRegion(imageRegion);
+    filter->SetSpacing(spacing);
+//    filter->SetGreyMatterAdc(m_Controls->m_GmAdc->value());
+
+    filter->SetFiberBundle(dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundle->GetData()));
+    filter->Update();
+
+    typedef itk::Image<itk::DiffusionTensor3D<float>, 3> TensorImageType;
+    TensorImageType::Pointer tensorImage = filter->GetTensorImage();
+    mitk::TensorImage::Pointer image = mitk::TensorImage::New();
+    image->InitializeByItk( tensorImage.GetPointer() );
+    image->SetVolume( tensorImage->GetBufferPointer() );
     mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData( fiberBundle );
-    QString name = QString("ArtificialFibers");
-    node->SetName(name.toStdString());
-    GetDataStorage()->Add(node);
+    node->SetData( image );
+    GetDataStorage()->Add(node, m_SelectedBundle);
 }
 
 void QmitkDwiSoftwarePhantomView::GeneratePhantom()

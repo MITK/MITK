@@ -92,6 +92,7 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
         itk::DiffusionTensor3D<float> tensor;
         vnl_vector_fixed<double, 3> dir = m_TensorDirection.at(i);
         MITK_INFO << "Tensor direction: " << dir;
+
         dir.normalize();
 
         vnl_vector_fixed<double, 3> axis = vnl_cross_3d(kernelDir, dir); axis.normalize();

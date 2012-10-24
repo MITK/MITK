@@ -98,8 +98,9 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 //   CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
   //Cloning Working slice and set direction to identity
-  Image::Pointer temporarySlice = m_WorkingSlice->Clone();
-  temporarySlice->GetGeometry()->SetIdentity();
+  //Image::Pointer temporarySlice = m_WorkingSlice->Clone();
+  //temporarySlice->GetGeometry()->SetIdentity();
+  m_WorkingSlice->GetGeometry()->SetIdentity();
 
 //
 // AffineTransform3D::Pointer trans = AffineTransform3D::New();
@@ -110,7 +111,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 
   //mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
   mitkIpPicDescriptor* stupidClone = mitkIpPicNew();
-  CastToIpPicDescriptor( temporarySlice->GetSliceData(), stupidClone );
+  CastToIpPicDescriptor( m_WorkingSlice->GetSliceData(), stupidClone );
   unsigned int pixelWidth  = m_Size + 1;
   unsigned int pixelHeight = m_Size + 1;
 

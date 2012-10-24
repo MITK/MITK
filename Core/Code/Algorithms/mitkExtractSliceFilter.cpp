@@ -352,7 +352,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
   // todo:Make comment
   //m_Reslicer->SetOutputExtent(xMin, xMax-1, yMin, yMax-1, m_ZMin, m_ZMax );
-  m_Reslicer->SetOutputExtent(xMin, std::max(1, xMax-1), yMin, std::max(0, yMax-1), m_ZMin, m_ZMax );
+  m_Reslicer->SetOutputExtent(xMin, std::max(0, xMax-1), yMin, std::max(0, yMax-1), m_ZMin, m_ZMax );
   /*========== END setup extent of the slice ==========*/
 
 

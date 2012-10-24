@@ -350,7 +350,10 @@ void mitk::ExtractSliceFilter::GenerateData(){
   }
 
 
-  // todo:Make comment
+  // Set the output extents! First included pixel index and last included pixel index
+  // xMax and yMax are one after the last pixel. so they have to be decremented by 1.
+  // In case we have a 2D image, xMax or yMax might be 0. in this case, do not decrement, but take 0.
+
   //m_Reslicer->SetOutputExtent(xMin, xMax-1, yMin, yMax-1, m_ZMin, m_ZMax );
   m_Reslicer->SetOutputExtent(xMin, std::max(0, xMax-1), yMin, std::max(0, yMax-1), m_ZMin, m_ZMax );
   /*========== END setup extent of the slice ==========*/
@@ -403,8 +406,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
     {
        resultImage->Initialize(reslicedImage);
     }
-
-
 
 
     //transfer the voxel data

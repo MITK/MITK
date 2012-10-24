@@ -98,24 +98,23 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 //   CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
   //Cloning Working slice and set direction to identity
-  //Image::Pointer temporarySlice = m_WorkingSlice->Clone();
-  //temporarySlice->GetGeometry()->SetIdentity();
-  m_WorkingSlice->GetGeometry()->SetIdentity();
+  Image::Pointer temporarySlice = m_WorkingSlice->Clone();
+  temporarySlice->GetGeometry()->SetIdentity();
+  //m_WorkingSlice->GetGeometry()->SetIdentity();
 
 //
 // AffineTransform3D::Pointer trans = AffineTransform3D::New();
 // trans->SetIdentity();
 
 
-
-
   //mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
   mitkIpPicDescriptor* stupidClone = mitkIpPicNew();
-  CastToIpPicDescriptor( m_WorkingSlice->GetSliceData(), stupidClone );
+  CastToIpPicDescriptor( temporarySlice->GetSliceData(), stupidClone );
   unsigned int pixelWidth  = m_Size + 1;
   unsigned int pixelHeight = m_Size + 1;
-
-  if ( stupidClone->n[0] <= pixelWidth || stupidClone->n[1] <= pixelHeight )
+  MITK_INFO << "dim:" << temporarySlice->GetDimension() << "  " << temporarySlice->GetDimension(0) << "x" << temporarySlice->GetDimension(1) ;
+  MITK_INFO << stupidClone->n[0] << "x" << stupidClone->n[1] ;
+  if ( stupidClone->n[0] < m_Size || stupidClone->n[1] < m_Size )
   {
     MITK_INFO << "Brush size is bigger than your working image. Reconsider this...\n"
                 "(Or tell your progammer until (s)he fixes this message.)" << std::endl;

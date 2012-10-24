@@ -337,23 +337,19 @@ void TractsToDWIImageFilter::GenerateData()
         DoubleDwiType::IndexType index = it.GetIndex();
         doublePix = it.Get();
         bool simulateIsotropicDiffusion = false;
-        bool addIsotropicCompartment = false;
         for( unsigned int i=0; i<m_GradientList.size(); i++)
             if (m_GradientList.at(i).GetNorm()<0.0001)
             {
-                if (doublePix[i]<=m_MaxBaseline/100)
+                if (doublePix[i]<=0)
                 {
-                    if (doublePix[i]<=0)
-                        simulateIsotropicDiffusion = true;
-                    else
-                        addIsotropicCompartment = true;
+                    simulateIsotropicDiffusion = true;
                     break;
                 }
             }
-        if (addIsotropicCompartment)
-            doublePix += SimulateMeasurement(freeWaterTensor, m_MaxBaseline/100);
-        else if (simulateIsotropicDiffusion)
+        if (simulateIsotropicDiffusion)
             doublePix = SimulateMeasurement(freeWaterTensor, 2*m_MaxBaseline);
+//        else
+//            doublePix += SimulateMeasurement(freeWaterTensor, (m_MaxBaseline-doublePix[0])/10);
 
         doublePix = m_SignalScale*doublePix/m_MaxBaseline;
         AddNoise(doublePix);

@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk{
 
 FibersFromPointsFilter::FibersFromPointsFilter()
-    : m_Density(100)
+    : m_Density(1000)
 {
 
 }
@@ -50,6 +50,25 @@ FibersFromPointsFilter::FibersFromPointsFilter()
 FibersFromPointsFilter::~FibersFromPointsFilter()
 {
 
+}
+
+
+void FibersFromPointsFilter::GeneratePoints()
+{
+    m_2DPoints.clear();
+    int count = 0;
+
+    while (count < m_Density)
+    {
+        mitk::Point2D p;
+        p[0] = (float)(rand()%2001)/1000 - 1;
+        p[1] = (float)(rand()%2001)/1000 - 1;
+        if (sqrt(p[0]*p[0]+p[1]*p[1]) <= 1)
+        {
+            m_2DPoints.push_back(p);
+            count++;
+        }
+    }
 }
 
 // perform global tracking
@@ -60,64 +79,67 @@ void FibersFromPointsFilter::GenerateData()
         vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkPoints> m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-        vector< mitk::Point3D > centerPoints;
-        vector< mitk::Vector3D > directions;
-        vector< mitk::Vector3D > rotationAxes;
-        vector< float > radii;
-
         vector< mitk::PlanarCircle::Pointer > bundle = m_Fiducials.at(i);
-        for (int k=0; k<bundle.size(); k++)
+
+        GeneratePoints();
+        for (int j=0; j<m_Density; j++)
         {
-            mitk::PlanarCircle::Pointer figure = bundle.at(k);  // fiducial k on bundle i
-            mitk::Point3D c = figure->GetWorldControlPoint(0);  // center point
-            mitk::Point3D r = figure->GetWorldControlPoint(1);  // border point
-            mitk::Vector3D dir = r-c;                           // radius vector
-            float radius = c.EuclideanDistanceTo(r);            // radius
+            vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+
+            mitk::PlanarCircle::Pointer figure = bundle.at(0);
+            mitk::Point2D p1 = figure->GetControlPoint(0);
+            mitk::Point2D p2 = figure->GetControlPoint(1);
+            mitk::Vector2D dir = p2-p1; dir.Normalize();
+            float r = p1.EuclideanDistanceTo(p2);
+            p1[0] += m_2DPoints.at(j)[0]*r;
+            p1[1] += m_2DPoints.at(j)[1]*r;
+
             const mitk::Geometry2D* pfgeometry = figure->GetGeometry2D();
             const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(pfgeometry);
-            mitk::Vector3D axis = planeGeo->GetNormal();        // rotation axis
-            centerPoints.push_back(c);
-            directions.push_back(dir);
-            rotationAxes.push_back(axis);
-            radii.push_back(radius);
-        }
 
-        srand ( time(NULL) );
-        for (int j=0; j<=m_Density; j++)
-        {
-            float rscale = j*1.0/m_Density;
+            mitk::Point3D w;
+            planeGeo->Map(p1, w);
 
-            int onShell = rscale*m_Density;
-            int offset = rand()%360;
+            vtkIdType id = m_VtkPoints->InsertNextPoint(w.GetDataPointer());
+            container->GetPointIds()->InsertNextId(id);
 
-            for (int l=0; l<onShell; l++)
+            for (int k=1; k<bundle.size(); k++)
             {
-                float angle = offset + l*360.0/onShell;
+                figure = bundle.at(k);
+                p1 = figure->GetControlPoint(0);
+                p2 = figure->GetControlPoint(1);
+                r = p1.EuclideanDistanceTo(p2);
 
-                vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-                for (int k=0; k<bundle.size(); k++)
-                {
-                    mitk::Point3D c = centerPoints.at(k);               // center point
-                    mitk::Vector3D dir = directions.at(k);              // radius vector
+                // rotate vector
+                mitk::Vector2D dir2 = p2-p1; dir2.Normalize();
+                vnl_matrix_fixed<float, 2, 2> rot;
+                rot[0][0] = dir[0]*dir2[0] + dir[1]*dir2[1]; rot[1][1] = rot[0][0];
+                rot[1][0] = acos(rot[0][0]);
+                rot[0][1] = -rot[1][0];
 
-                    if (j>1)
-                    {
-                        dir.Normalize();
-                        float radius = radii.at(k);          // radius of fiducial k in bundle i
+                vnl_vector_fixed< float, 2 > newP;
+                newP[0] = m_2DPoints.at(j)[0];
+                newP[1] = m_2DPoints.at(j)[1];
+//                newP = rot*newP;
 
-                        mitk::Vector3D axis = rotationAxes.at(k);            // center axis
-                        vnl_quaternion<float> rotation(axis.GetVnlVector(), angle);
-                        rotation.normalize();
-                        dir.SetVnlVector(rotation.rotate(dir.GetVnlVector()));  // rotate
+//                vnl_vector_fixed<double, 2> axis = vnl_cross_3d(dir, dir2); axis.normalize();
+//                vnl_quaternion<double> rotation(axis, acos(dot_product(dir, dir2)));
+//                rotation.normalize();
 
-                        dir *= rscale*radius; c += dir;                          // shift outward
-                    }
+                p1[0] += newP[0]*r;
+                p1[1] += newP[1]*r;
 
-                    vtkIdType id = m_VtkPoints->InsertNextPoint(c.GetDataPointer());
-                    container->GetPointIds()->InsertNextId(id);
-                }
-                m_VtkCellArray->InsertNextCell(container);
+                const mitk::Geometry2D* pfgeometry = figure->GetGeometry2D();
+                const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(pfgeometry);
+
+                mitk::Point3D w;
+                planeGeo->Map(p1, w);
+
+                vtkIdType id = m_VtkPoints->InsertNextPoint(w.GetDataPointer());
+                container->GetPointIds()->InsertNextId(id);
             }
+
+            m_VtkCellArray->InsertNextCell(container);
         }
 
         vtkSmartPointer<vtkPolyData> fiberPolyData = vtkSmartPointer<vtkPolyData>::New();

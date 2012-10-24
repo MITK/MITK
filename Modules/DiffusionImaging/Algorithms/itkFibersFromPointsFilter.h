@@ -62,10 +62,13 @@ protected:
 
     FibersFromPointsFilter();
     virtual ~FibersFromPointsFilter();
+    void GeneratePoints();
 
     FiducialListType    m_Fiducials;
     FiberContainerType  m_FiberBundles;
     int                 m_Density;
+
+    vector< mitk::Point2D > m_2DPoints;
 };
 }
 

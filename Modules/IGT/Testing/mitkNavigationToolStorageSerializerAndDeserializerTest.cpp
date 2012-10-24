@@ -474,16 +474,16 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
   NavigationToolStorageSerializerAndDeserializerTestClass::TestReadZipFileWithNoToolstorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteStorageToInvalidFile();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteEmptyToolStorage();
-  //TestReadInvalidStorage() fails
-  // NavigationToolStorageSerializerAndDeserializerTestClass::TestReadInvalidStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestSerializerForExceptions();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestDeserializerForExceptions();
   }
   catch (std::exception& e) {
       MITK_ERROR << "exception:" << e.what();
+      MITK_TEST_FAILED_MSG(<<"Exception occured, test failed!");
   }
   catch (...) {
       MITK_ERROR << "Unknown Exception?";
+      MITK_TEST_FAILED_MSG(<<"Exception occured, test failed!");
   }
   
   NavigationToolStorageSerializerAndDeserializerTestClass::CleanUp();

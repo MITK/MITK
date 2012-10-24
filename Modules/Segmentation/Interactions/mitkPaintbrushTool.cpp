@@ -77,43 +77,62 @@ void mitk::PaintbrushTool::SetSize(int value)
 
 void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 {
-    //MITK_INFO<<"Update...";
+  //MITK_INFO<<"Update...";
   // examine stateEvent and create a contour that matches the pixel mask that we are going to draw
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return;
 
-  // create a copy of this slice (at least match the pixel sizes/spacings),
-  // then draw the desired mask on it and create a contour from it
+  // Get Spacing of current Slice
+  mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing();
 
-  // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
-//   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
-//   CastToItkImage(m_WorkingSlice/*dynamic_cast<mitk::Image*>(m_WorkingNode->GetData())*/, correctPixelTypeImage );
-//   assert (correctPixelTypeImage.IsNotNull() );
-//
-//   itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
-//   imageDirection.SetIdentity();
-//   correctPixelTypeImage->SetDirection(imageDirection);
-//
-//   Image::Pointer temporarySlice = Image::New();
-//   CastToMitkImage( correctPixelTypeImage, temporarySlice );
+  // Draw a contour in cross-shape according to selected brush size
 
+
+
+
+  mitk::Point3D pIndex;
+  pIndex[0] = 0;
+  pIndex[1] = 0;
+  pIndex[2] = 0;
+  Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+  contourInImageIndexCoordinates->Initialize();
+
+  mitk::Point3D p0,p1,p2,p3;
+  p0 = p1 = p2 = p3 = pIndex;
+
+  p0[0] -= vSpacing[0]*0.5;
+  p0[1] -= vSpacing[1]*0.5;
+  p1[0] -= vSpacing[0]*0.5;
+  p1[1] += vSpacing[1]*0.5;
+  p2[0] += vSpacing[0]*0.5;
+  p2[1] += vSpacing[1]*0.5;
+  p3[0] += vSpacing[0]*0.5;
+  p3[1] -= vSpacing[1]*0.5;
+
+
+
+  contourInImageIndexCoordinates->AddVertex( p0 );
+  contourInImageIndexCoordinates->AddVertex( p1 );
+  contourInImageIndexCoordinates->AddVertex( p2 );
+  contourInImageIndexCoordinates->AddVertex( p3 );
+
+  m_MasterContour = contourInImageIndexCoordinates;
+
+  MITK_INFO << "added Vertex: " << pIndex;
+
+  /*
   //Cloning Working slice and set direction to identity
   Image::Pointer temporarySlice = m_WorkingSlice->Clone();
   temporarySlice->GetGeometry()->SetIdentity();
-  //m_WorkingSlice->GetGeometry()->SetIdentity();
 
-//
-// AffineTransform3D::Pointer trans = AffineTransform3D::New();
-// trans->SetIdentity();
-
-
-  //mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
+  // Create clone of current Slice and draw the contour on.
+  // This is not really good approach
+  // We actually just need the spacing of the slice and a pixel-extends that can handle BrushSize
+  // also the whole ipPic stuff is deprecated
   mitkIpPicDescriptor* stupidClone = mitkIpPicNew();
   CastToIpPicDescriptor( temporarySlice->GetSliceData(), stupidClone );
   unsigned int pixelWidth  = m_Size + 1;
   unsigned int pixelHeight = m_Size + 1;
-  MITK_INFO << "dim:" << temporarySlice->GetDimension() << "  " << temporarySlice->GetDimension(0) << "x" << temporarySlice->GetDimension(1) ;
-  MITK_INFO << stupidClone->n[0] << "x" << stupidClone->n[1] ;
   if ( stupidClone->n[0] < m_Size || stupidClone->n[1] < m_Size )
   {
     MITK_INFO << "Brush size is bigger than your working image. Reconsider this...\n"
@@ -185,6 +204,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   // because they got allocated by the ImageDataItem, not the descriptor.
   stupidClone->data = NULL;
   //mitkIpPicFree( stupidClone );
+  */
 }
 
 

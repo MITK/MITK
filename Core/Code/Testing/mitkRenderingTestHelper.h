@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -71,6 +71,12 @@ public:
     **/
     mitk::DataStorage::Pointer GetDataStorage();
 protected:
+
+    /** @brief Prints the opengl information, e.g. version, vendor and extensions,
+     *         This function can only be called after an opengl context is active.
+     *         It only prints the context after the vtkRenderwindow is fully initialized.
+     **/
+    void printGLInfo();
 
     /** @brief This method tries to load the given file into a member datastorage, in order to render it.
         @param fileName The filename of the file to be loaded (including path).

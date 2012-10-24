@@ -147,8 +147,12 @@ class mitkNavigationDataSourceTestClass
     }
   static void TestMicroserviceAvailabilityAndUnregister()
     {
-    //todo
-  
+    //TODO: test if Microservice is available
+
+    //TODO: remove Microservice
+
+    //TODO: test if Microservice is not available any more
+    
     }
   };
 

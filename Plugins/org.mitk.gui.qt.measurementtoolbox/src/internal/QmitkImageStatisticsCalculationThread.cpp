@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 
 QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread():QThread(),
-  m_StatisticsImage(NULL), m_BinaryMask(NULL), m_PlanarFigureMask(NULL), m_TimeStep(0), 
+  m_StatisticsImage(NULL), m_BinaryMask(NULL), m_PlanarFigureMask(NULL), m_TimeStep(0),
   m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false)
 {
 }
@@ -144,12 +144,12 @@ void QmitkImageStatisticsCalculationThread::run()
 
   if(statisticCalculationSuccessful)
   {
-    this->m_StatisticsStruct = calculator->GetStatistics(m_TimeStep);  
+    this->m_StatisticsStruct = calculator->GetStatistics(m_TimeStep);
 
     if(this->m_TimeStepHistogram.IsNotNull())
     {
       this->m_TimeStepHistogram = NULL;
-    } 
+    }
     this->m_TimeStepHistogram = (HistogramType*) calculator->GetHistogram(m_TimeStep);
   }
 }

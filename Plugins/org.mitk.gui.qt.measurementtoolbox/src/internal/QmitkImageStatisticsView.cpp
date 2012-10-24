@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -86,7 +86,7 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*)(this->m_Controls->m_ButtonCopyStatisticsToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(OnClipboardStatisticsButtonClicked()) );
     connect( (QObject*)(this->m_Controls->m_IgnoreZerosCheckbox), SIGNAL(clicked()),(QObject*) this, SLOT(OnIgnoreZerosCheckboxClicked()) );
     connect( (QObject*) this->m_CalculationThread, SIGNAL(finished()),this, SLOT( OnThreadedStatisticsCalculationEnds()),Qt::QueuedConnection);
-    connect( (QObject*) this, SIGNAL(StatisticsUpdate()),this, SLOT( RequestStatisticsUpdate()), Qt::QueuedConnection); 
+    connect( (QObject*) this, SIGNAL(StatisticsUpdate()),this, SLOT( RequestStatisticsUpdate()), Qt::QueuedConnection);
   }
 }
 
@@ -219,7 +219,7 @@ void QmitkImageStatisticsView::ReinitData()
   {
     this->m_SelectedImageMask->RemoveObserver( this->m_ImageMaskObserverTag);
     this->m_SelectedImageMask = NULL;
-  }    
+  }
   if(this->m_SelectedPlanarFigure != NULL)
   {
     this->m_SelectedPlanarFigure->RemoveObserver( this->m_PlanarFigureObserverTag);
@@ -264,9 +264,9 @@ void QmitkImageStatisticsView::UpdateStatistics()
   ITKCommandType::Pointer changeListener = ITKCommandType::New();
   changeListener->SetCallbackFunction( this, &QmitkImageStatisticsView::SelectedDataModified );
 
-  mitk::Image::Pointer selectedImage = mitk::Image::New();
+  mitk::DataNode::Pointer planarFigureNode;
   for( int i= 0 ; i < this->m_SelectedDataNodes.size(); ++i)
-  { 
+  {
     mitk::PlanarFigure::Pointer planarFig = dynamic_cast<mitk::PlanarFigure*>(this->m_SelectedDataNodes.at(i)->GetData());
     if( imagePredicate->CheckNode(this->m_SelectedDataNodes.at(i)) )
     {
@@ -277,10 +277,10 @@ void QmitkImageStatisticsView::UpdateStatistics()
       {
         this->m_SelectedImageMask = dynamic_cast<mitk::Image*>(this->m_SelectedDataNodes.at(i)->GetData());
         this->m_ImageMaskObserverTag = this->m_SelectedImageMask->AddObserver(itk::ModifiedEvent(), changeListener);
-       
+
         maskName = this->m_SelectedDataNodes.at(i)->GetName();
         maskType = m_SelectedImageMask->GetNameOfClass();
-        maskDimension = 3;                                        
+        maskDimension = 3;
       }
       else if( !isMask )
       {
@@ -296,11 +296,12 @@ void QmitkImageStatisticsView::UpdateStatistics()
       if(this->m_SelectedPlanarFigure == NULL)
       {
         this->m_SelectedPlanarFigure = planarFig;
-        this->m_PlanarFigureObserverTag  = 
+        this->m_PlanarFigureObserverTag  =
           this->m_SelectedPlanarFigure->AddObserver(mitk::EndInteractionPlanarFigureEvent(), changeListener);
         maskName = this->m_SelectedDataNodes.at(i)->GetName();
         maskType = this->m_SelectedPlanarFigure->GetNameOfClass();
         maskDimension = 2;
+        planarFigureNode = m_SelectedDataNodes.at(i);
       }
     }
     else
@@ -319,8 +320,31 @@ void QmitkImageStatisticsView::UpdateStatistics()
     maskDimension = 0;
   }
 
+  if (m_SelectedPlanarFigure != NULL && m_SelectedImage == NULL)
+  {
+      mitk::DataStorage::SetOfObjects::ConstPointer parentSet = this->GetDataStorage()->GetSources(planarFigureNode);
+      for (int i=0; i<parentSet->Size(); i++)
+      {
+          mitk::DataNode::Pointer node = parentSet->ElementAt(i);
+          if( imagePredicate->CheckNode(node) )
+          {
+            bool isMask = false;
+            node->GetPropertyValue("binary", isMask);
+
+            if( !isMask )
+            {
+              if(this->m_SelectedImage == NULL)
+              {
+                this->m_SelectedImage = static_cast<mitk::Image*>(node->GetData());
+                this->m_ImageObserverTag = this->m_SelectedImage->AddObserver(itk::ModifiedEvent(), changeListener);
+              }
+            }
+          }
+      }
+  }
+
   unsigned int timeStep = renderPart->GetTimeNavigationController()->GetTime()->GetPos();
-  
+
   if ( m_SelectedImage != NULL && m_SelectedImage->IsInitialized())
   {
     // Check if a the selected image is a multi-channel image. If yes, statistics
@@ -348,7 +372,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       maskLabel << "  [" << maskDimension << "D " << maskType << "]";
     }
     m_Controls->m_SelectedMaskLabel->setText( maskLabel.str().c_str() );
-    
+
     // check time step validity
     if(m_SelectedImage->GetDimension() <= 3 && timeStep > m_SelectedImage->GetDimension(3)-1)
     {

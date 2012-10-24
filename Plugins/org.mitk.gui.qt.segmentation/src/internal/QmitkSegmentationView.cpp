@@ -403,7 +403,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
   // If more than one segmentation is selected the tools will be disabled.
 
   if (!m_Controls) return; // might happen on initialization (preferences loaded)
-  mitk::DataNode::Pointer referenceDataNew = mitk::DataNode::New();
+  mitk::DataNode::Pointer referenceDataNew;
   mitk::DataNode::Pointer workingData;
 
   bool workingNodeIsVisible (true);
@@ -441,7 +441,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
       bool isBinary(false);
 
       //Find topmost source or first source which is no binary image
-      while (referenceDataNew && this->GetDefaultDataStorage()->GetSources(referenceDataNew)->Size() != 0)
+      while (referenceDataNew.IsNotNull() && this->GetDefaultDataStorage()->GetSources(referenceDataNew)->Size() != 0)
       {
         referenceDataNew = this->GetDefaultDataStorage()->GetSources(referenceDataNew)->ElementAt(0);
 
@@ -478,6 +478,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
       node->SetVisibility((false));
     }
   }
+
   if(numberOfSelectedSegmentations == 1)
     SetToolManagerSelection(referenceDataNew, workingData);
 

@@ -90,7 +90,7 @@ int mitkNavigationDataSourceTest(int /* argc */, char* /*argv*/[])
   mitk::NavigationData::Pointer testOutput = myFilter->GetOutput(0);
   MITK_TEST_CONDITION(testOutput.IsNull(), "testing GetOutput(int) before initialization");
 
-  mitk::NavigationData::Pointer testOutput = myFilter->GetOutput("test");
+  testOutput = myFilter->GetOutput("test");
   MITK_TEST_CONDITION(testOutput.IsNull(), "testing GetOutput(string) before initialization");
 
   //bool exceptionThrown

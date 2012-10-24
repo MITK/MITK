@@ -42,7 +42,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
   unsigned int initialNumberFailed = numberFailed;
   bool exception = false;
   // first extract slices and rewrite them
-  for ( unsigned int sliceDimension = 0; sliceDimension < 6; ++sliceDimension )
+  for ( unsigned int sliceDimension = 0; sliceDimension < 3; ++sliceDimension )
   {
     mitk::ExtractImageFilter::Pointer extractor = mitk::ExtractImageFilter::New();
     extractor->SetInput( image );
@@ -67,7 +67,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       }
     }
 
-    mitk::Image::Pointer slice = extractor->GetOutput();
+    mitk::Image::Pointer slice = extractor->GetOutput()->Clone();
 
     filter->SetSliceDimension( sliceDimension );
     filter->SetSliceIndex( 1 ); // second slice in that direction
@@ -224,7 +224,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
   if ( numberFailed == initialNumberFailed )
   {
     std::cout << "  (II) Overwriting works nicely (gives result, pixels are good) "
-              << image->GetDimension() 
+              << image->GetDimension()
               << "-dimensional image." << "(l. " << __LINE__ << ")" << std::endl;
   }
 }

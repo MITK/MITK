@@ -1079,7 +1079,6 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
 
   if (!m_Controls) return; // might happen on initialization (preferences loaded)
   mitk::DataNode::Pointer referenceData = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
-  mitk::DataNode::Pointer workingData =   m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0);
 
   // 1.
   if (referenceData.IsNotNull())

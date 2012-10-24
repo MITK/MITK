@@ -1070,6 +1070,21 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     points->InsertNextPoint( point3D[i0], point3D[i1], 0 );
   }
 
+  // mark a malformed 2D planar figure ( i.e. area = 0 ) as out of bounds
+  // this can happen when all control points of a rectangle lie on the same line = two of the three extents are zero
+  double bounds[6] = {0, 0, 0, 0, 0, 0};
+  points->GetBounds( bounds );
+  bool extent_x = (fabs(bounds[0] - bounds[1])) < mitk::eps;
+  bool extent_y = (fabs(bounds[2] - bounds[3])) < mitk::eps;
+  bool extent_z = (fabs(bounds[4] - bounds[5])) < mitk::eps;
+
+  // throw an exception if a closed planar figure is deformed, i.e. has only one non-zero extent
+  if ( m_PlanarFigure->IsClosed() &&
+       ((extent_x && extent_y) || (extent_x && extent_z)  || (extent_y && extent_z)))
+  {
+    mitkThrow() << "Figure has a zero area and cannot be used for masking.";
+  }
+
   if ( outOfBounds )
   {
     throw std::runtime_error( "Figure at least partially outside of image bounds!" );

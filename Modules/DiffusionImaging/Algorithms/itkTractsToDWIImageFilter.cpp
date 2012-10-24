@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyLine.h>
 #include <itkTractDensityImageFilter.h>
 #include <itkStatisticsImageFilter.h>
+#include <itkTractsToVectorImageFilter.h>
 
 namespace itk
 {
@@ -27,6 +28,11 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     , m_GreyMatterAdc(0.01)
     , m_DefaultBaseline(1)
     , m_MaxFA(0.9)
+    , m_MinCrossingAngle(0.9)
+    , m_MaxCrossingComplexity(3)
+    , m_SNR(15)
+    , m_SignalScale(1000)
+    , m_MaxBaseline(0)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -40,15 +46,18 @@ TractsToDWIImageFilter::~TractsToDWIImageFilter()
 
 }
 
-TractsToDWIImageFilter::DoubleDwiType::PixelType TractsToDWIImageFilter::SimulateMeasurement(ItkTensorType& T, float weight)
+double TractsToDWIImageFilter::GetTensorL2Norm(itk::DiffusionTensor3D<float>& T)
 {
-    typename DoubleDwiType::PixelType out;
-    out.SetSize(m_GradientList.size());
-    out.Fill(0);
+    return sqrt(T[0]*T[0] + T[3]*T[3] + T[5]*T[5] + T[1]*T[2]*2.0 + T[2]*T[4]*2.0 + T[1]*T[4]*2.0);
+}
+
+TractsToDWIImageFilter::DoubleDwiType::PixelType TractsToDWIImageFilter::SimulateMeasurement(ItkTensorType& T, double scaleSignal)
+{
+    typename DoubleDwiType::PixelType pix;
+    pix.SetSize(m_GradientList.size());
+    pix.Fill(0);
 
     short s0 = m_DefaultBaseline;
-//    if (m_SimulateBaseline)
-//        s0 = (GetTensorL2Norm(T)/m_MaxBaseline)*m_SignalScale;
 
     for( unsigned int i=0; i<m_GradientList.size(); i++)
     {
@@ -70,19 +79,47 @@ TractsToDWIImageFilter::DoubleDwiType::PixelType TractsToDWIImageFilter::Simulat
 
             // check for corrupted tensor and generate signal
             if (D>=0)
-                out[i] = weight*s0*exp ( -m_BValue * D );
+                pix[i] = scaleSignal*s0*exp ( -m_BValue * D );
         }
         else
-            out[i] = s0;
+            pix[i] = scaleSignal*s0;
     }
 
-    return out;
+    return pix;
+}
+
+void TractsToDWIImageFilter::AddNoise(DoubleDwiType::PixelType& pix)
+{
+    for( unsigned int i=0; i<m_GradientList.size(); i++)
+    {
+        double signal = pix[i];
+        double val = sqrt(pow(signal + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseVariance),2));
+        pix[i] += val;
+    }
 }
 
 void TractsToDWIImageFilter::GenerateData()
 {
     if (m_FiberBundle.IsNull())
         itkExceptionMacro("Input fiber bundle is NULL!");
+
+    int numFibers = m_FiberBundle->GetNumFibers();
+    if (numFibers<=0)
+        itkExceptionMacro("Input fiber bundle contains no fibers!");
+
+    float minSpacing = 1;
+    if(m_Spacing[0]<m_Spacing[1] && m_Spacing[0]<m_Spacing[2])
+        minSpacing = m_Spacing[0];
+    else if (m_Spacing[1] < m_Spacing[2])
+        minSpacing = m_Spacing[1];
+    else
+        minSpacing = m_Spacing[2];
+
+    FiberBundleType fiberBundle = m_FiberBundle->GetDeepCopy();
+    fiberBundle->DoFiberSmoothing(ceil(10.0*5.0/minSpacing));
+
+    m_RandGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
+    m_RandGen->SetSeed();
 
     // initialize output dwi image
     m_DiffusionImage = OutputImageType::New();
@@ -140,27 +177,47 @@ void TractsToDWIImageFilter::GenerateData()
     statisticsFilter->Update();
     m_MaxDensity = statisticsFilter->GetMaximum();
 
+    // search crossing regions
+    ItkUcharImgType::Pointer maskImage = ItkUcharImgType::New();
+    maskImage->SetSpacing( m_Spacing );
+    maskImage->SetOrigin( m_Origin );
+    maskImage->SetDirection( m_DirectionMatrix );
+    maskImage->SetLargestPossibleRegion( m_ImageRegion );
+    maskImage->SetBufferedRegion( m_ImageRegion );
+    maskImage->SetRequestedRegion( m_ImageRegion );
+    maskImage->Allocate();
+    maskImage->FillBuffer(1);
+    itk::TractsToVectorImageFilter::Pointer crossingsFilter = itk::TractsToVectorImageFilter::New();
+    crossingsFilter->SetFiberBundle(fiberBundle);
+    crossingsFilter->SetAngularThreshold(m_MinCrossingAngle);
+    crossingsFilter->SetUseFastClustering(true);
+    crossingsFilter->SetFiberSampling(0);
+    crossingsFilter->SetNormalizeVectors(false);
+    crossingsFilter->SetMaxNumDirections(m_MaxCrossingComplexity);
+    crossingsFilter->SetMaskImage(maskImage);
+    crossingsFilter->Update();
+    ItkUcharImgType::Pointer numDirImage = crossingsFilter->GetNumDirectionsImage();
+
+    typedef itk::TractsToVectorImageFilter::DirectionImageContainerType DirectionImageContainerType;
+    typedef itk::TractsToVectorImageFilter::ItkDirectionImageType       DirectionImageType;
+    DirectionImageContainerType::Pointer dirImgContainer = crossingsFilter->GetDirectionImageContainer();
+
     // generate signal
+    if (m_SNR <= 0)
+        m_SNR = 0.0001;
+    if (m_SNR>99)
+        m_NoiseVariance = 0;
+    else
+    {
+        m_NoiseVariance = m_DefaultBaseline/m_SNR;
+        m_NoiseVariance *= m_NoiseVariance;
+    }
+    MITK_INFO << "Noise variance: " << m_NoiseVariance;
+
     ItkTensorType kernel; kernel.Fill(0.0);
     float ADC = 0.001;
     vnl_vector_fixed<double, 3> kernelDir; kernelDir[0]=1; kernelDir[1]=0; kernelDir[2]=0;
 
-    float minSpacing = 1;
-    if(m_Spacing[0]<m_Spacing[1] && m_Spacing[0]<m_Spacing[2])
-        minSpacing = m_Spacing[0];
-    else if (m_Spacing[1] < m_Spacing[2])
-        minSpacing = m_Spacing[1];
-    else
-        minSpacing = m_Spacing[2];
-
-    int numFibers = m_FiberBundle->GetNumFibers();
-
-    if (numFibers<=0)
-        itkExceptionMacro("Input fiber bundle contains no fibers!");
-
-    FiberBundleType fiberBundle = m_FiberBundle->GetDeepCopy();
-//    fiberBundle->ResampleFibers(minSpacing);
-    fiberBundle->DoFiberSmoothing(ceil(10.0*5.0/minSpacing));
     vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
     vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
     vLines->InitTraversal();
@@ -189,15 +246,38 @@ void TractsToDWIImageFilter::GenerateData()
                 dir = v-GetVnlVector(fiberPolyData->GetPoint(points[j-1]));
 
             itk::Index<3> index;
-//            itk::ContinuousIndex<float, 3> contIndex;
             m_DiffusionImage->TransformPhysicalPointToIndex(vertex, index);
-//            m_TensorImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
 
             if (!m_ImageRegion.IsInside(index))
                 continue;
 
-            // prepare kernel (todo: catch crossings before calculating FA)
+            // prepare kernel
             float td = m_TractDensityImage->GetPixel(index);
+
+            if (numDirImage->GetPixel(index)>1) // crossing fiber, adjust tract density
+            {
+                float maxMagn = 0;
+                float magn = td;
+                float minAngle = 0;
+                for (int i=0; i<dirImgContainer->Size(); i++)
+                {
+                    DirectionImageType::Pointer dirImg = dirImgContainer->GetElement(i);
+                    vnl_vector_fixed<double, 3> crossingDir = GetVnlVector(dirImg->GetPixel(index));
+
+                    float crossingMagn = crossingDir.magnitude();
+                    if (crossingMagn>maxMagn)
+                        maxMagn = crossingMagn;
+                    float angle = fabs(dot_product(crossingDir, dir));
+                    if (angle>minAngle)
+                    {
+                        magn = crossingMagn;
+                        minAngle = angle;
+                    }
+                }
+                if (maxMagn>0)
+                    td *= magn/maxMagn;
+            }
+
             float FA = m_MaxFA*td/m_MaxDensity;
             float e1 = ADC*(1+2*FA/sqrt(3-2*FA*FA));
             float e2 = ADC*(1-FA/sqrt(3-2*FA*FA));
@@ -222,21 +302,64 @@ void TractsToDWIImageFilter::GenerateData()
             tensor[3] = tensorMatrix[1][1]; tensor[4] = tensorMatrix[1][2]; tensor[5] = tensorMatrix[2][2];
 
             doublePix = doubleDwi->GetPixel(index);
-            doubleDwi->SetPixel(index, doublePix + SimulateMeasurement(tensor, 1.0));
+            doubleDwi->SetPixel(index, doublePix + SimulateMeasurement(tensor, 1));
         }
     }
 
+    // find maximum baseline value
     typedef ImageRegionIterator<DoubleDwiType>      IteratorOutputType;
     IteratorOutputType it (doubleDwi, m_ImageRegion);
     while(!it.IsAtEnd())
     {
         doublePix = it.Get();
-        DoubleDwiType::IndexType index = it.GetIndex();
-        m_DiffusionImage->SetPixel(index, doublePix);
+        for( unsigned int i=0; i<m_GradientList.size(); i++)
+            if (m_GradientList.at(i).GetNorm()<0.0001 && doublePix[i]>m_MaxBaseline)
+                m_MaxBaseline = doublePix[i];
         ++it;
     }
 
-    // add noise
+    // add isotropic diffusion, noise and rescale image
+    itk::DiffusionTensor3D<float> freeWaterTensor;
+    freeWaterTensor.Fill(0);
+    freeWaterTensor.SetElement(0,m_GreyMatterAdc);
+    freeWaterTensor.SetElement(3,m_GreyMatterAdc);
+    freeWaterTensor.SetElement(5,m_GreyMatterAdc);
+
+    itk::DiffusionTensor3D<float> freeCompartmentTensor;
+    freeCompartmentTensor.Fill(0);
+    freeCompartmentTensor.SetElement(0,ADC);
+    freeCompartmentTensor.SetElement(3,ADC);
+    freeCompartmentTensor.SetElement(5,ADC);
+
+    it.GoToBegin();
+    while(!it.IsAtEnd())
+    {
+        DoubleDwiType::IndexType index = it.GetIndex();
+        doublePix = it.Get();
+        bool simulateIsotropicDiffusion = false;
+        bool addIsotropicCompartment = false;
+        for( unsigned int i=0; i<m_GradientList.size(); i++)
+            if (m_GradientList.at(i).GetNorm()<0.0001)
+            {
+                if (doublePix[i]<=m_MaxBaseline/100)
+                {
+                    if (doublePix[i]<=0)
+                        simulateIsotropicDiffusion = true;
+                    else
+                        addIsotropicCompartment = true;
+                    break;
+                }
+            }
+        if (addIsotropicCompartment)
+            doublePix += SimulateMeasurement(freeWaterTensor, m_MaxBaseline/100);
+        else if (simulateIsotropicDiffusion)
+            doublePix = SimulateMeasurement(freeWaterTensor, 2*m_MaxBaseline);
+
+        doublePix = m_SignalScale*doublePix/m_MaxBaseline;
+        AddNoise(doublePix);
+        m_DiffusionImage->SetPixel(index, doublePix);
+        ++it;
+    }
 }
 
 itk::Point<float, 3> TractsToDWIImageFilter::GetItkPoint(double point[3])
@@ -254,6 +377,16 @@ vnl_vector_fixed<double, 3> TractsToDWIImageFilter::GetVnlVector(double point[3]
     vnlVector[0] = point[0];
     vnlVector[1] = point[1];
     vnlVector[2] = point[2];
+    return vnlVector;
+}
+
+
+vnl_vector_fixed<double, 3> TractsToDWIImageFilter::GetVnlVector(Vector<float,3>& vector)
+{
+    vnl_vector_fixed<double, 3> vnlVector;
+    vnlVector[0] = vector[0];
+    vnlVector[1] = vector[1];
+    vnlVector[2] = vector[2];
     return vnlVector;
 }
 

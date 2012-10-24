@@ -264,23 +264,14 @@ void QmitkDwiSoftwarePhantomView::GenerateImage()
     FilterType::Pointer filter = FilterType::New();
 
     filter->SetGradientList(gradientList);
-//    filter->SetBValue(bVal);
-//    filter->SetNoiseVariance(m_Controls->m_NoiseLevel->value());
+    filter->SetBValue(bVal);
+    filter->SetSNR(m_Controls->m_NoiseLevel->value());
     filter->SetImageRegion(imageRegion);
     filter->SetSpacing(spacing);
-//    filter->SetGreyMatterAdc(m_Controls->m_GmAdc->value());
-
+    filter->SetGreyMatterAdc(m_Controls->m_GmAdc->value());
     filter->SetFiberBundle(dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundle->GetData()));
+    filter->SetMaxFA(m_Controls->m_MaxFaBox->value());
     filter->Update();
-
-//    typedef itk::Image<itk::DiffusionTensor3D<float>, 3> TensorImageType;
-//    TensorImageType::Pointer tensorImage = filter->GetTensorImage();
-//    mitk::TensorImage::Pointer image = mitk::TensorImage::New();
-//    image->InitializeByItk( tensorImage.GetPointer() );
-//    image->SetVolume( tensorImage->GetBufferPointer() );
-//    mitk::DataNode::Pointer node = mitk::DataNode::New();
-//    node->SetData( image );
-//    GetDataStorage()->Add(node, m_SelectedBundle);
 
     mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
     image->SetVectorImage( filter->GetOutput() );

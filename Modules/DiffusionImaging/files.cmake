@@ -224,6 +224,7 @@ set(H_FILES
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkFibersFromPointsFilter.h
   Algorithms/itkTractsToDWIImageFilter.h
+  Algorithms/itkTractsToVectorImageFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h

@@ -97,64 +97,16 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
 {
   m_SegmentationAsImage = NULL;
 
-  itk::TimeProbe timer;
-  timer.Start();
   m_ReduceFilter->Update();
-  timer.Stop();
-  MITK_INFO << "Reduce: " << timer.GetMeanTime();
-
-
-  itk::TimeProbe timer2;
-  timer2.Start();
   m_NormalsFilter->Update();
-  timer2.Stop();
-  MITK_INFO << "Normals: " << timer2.GetMeanTime();
-
-
-  itk::TimeProbe timer3;
-  timer3.Start();
   m_DistanceImageCreator->Update();
-  timer3.Stop();
-  MITK_INFO << "Interpolate: " << timer3.GetMeanTime();
 
   mitk::Image::Pointer distanceImage = m_DistanceImageCreator->GetOutput();
-
-//   try
-//   {
-//     switch(distanceImage->GetDimension())
-//     {
-//     case 2:
-//       {
-//         AccessFixedDimensionByItk( distanceImage.GetPointer(), ItkImageProcessing, 2 ); break;
-//       }
-//     case 3:
-//       {
-//         AccessFixedDimensionByItk( distanceImage.GetPointer(), ItkImageProcessing, 3 ); break;
-//       }
-//     case 4:
-//       {
-//         AccessFixedDimensionByItk( distanceImage.GetPointer(), ItkImageProcessing, 4 ); break;
-//       }
-//     default: break;
-//     }
-//   }
-//   catch (std::exception e)
-//   {
-//     MITK_ERROR << "Exception caught: " << e.what();
-//   }
-
-
 
   vtkSmartPointer<vtkMarchingCubes> marchingCubes = vtkMarchingCubes::New();
   marchingCubes->SetInput( distanceImage->GetVtkImageData() );
   marchingCubes->SetValue(0,0);
-
-  itk::TimeProbe timer4;
-  timer4.Start();
   marchingCubes->Update();
-  timer4.Stop();
-  MITK_INFO << "marchingCubes: " << timer4.GetMeanTime();
-
 
   mitk::Surface::Pointer segmentationAsSurface = mitk::Surface::New();
   segmentationAsSurface->SetVtkPolyData(marchingCubes->GetOutput());
@@ -164,70 +116,14 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
   surfaceToImageFilter->SetInput( segmentationAsSurface );
   surfaceToImageFilter->SetImage( m_ReferenceImage );
   surfaceToImageFilter->SetMakeOutputBinary(true);
-
-  itk::TimeProbe timer5;
-  timer5.Start();
   surfaceToImageFilter->Update();
-  timer5.Stop();
-  MITK_INFO << "surfaceToImageFilter: " << timer5.GetMeanTime();
 
   m_SegmentationAsImage = surfaceToImageFilter->GetOutput();
 
- //mitk::Image::Pointer segmentationAsImage = distanceImage;
   return m_SegmentationAsImage;
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::PlanarFigureSegmentationController::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage )
-{
-  mitk::SlicedGeometry3D::Pointer referenceGeometry = m_ReferenceImage->GetSlicedGeometry();
-  double* spacing = new double[3];
-  spacing[0] = referenceGeometry->GetSpacing()[0];
-  spacing[1] = referenceGeometry->GetSpacing()[1];
-  spacing[2] = referenceGeometry->GetSpacing()[2];
 
-  double* origin = new double[3];
-  origin[0] = referenceGeometry->GetOrigin()[0];
-  origin[1] = referenceGeometry->GetOrigin()[1];
-  origin[2] = referenceGeometry->GetOrigin()[2];
-
-//   //ITK Image type given from the input image
-  typedef itk::Image< TPixel, VImageDimension > ItkImageType;
-  typedef itk::ResampleImageFilter<ItkImageType,ItkImageType> ResampleImageFilter;
-  typename ResampleImageFilter::Pointer resampleFilter = ResampleImageFilter::New();
-  resampleFilter->SetInput( itkImage );
-  resampleFilter->SetOutputSpacing( spacing );
-  resampleFilter->SetOutputOrigin( origin );
-
-  resampleFilter->UpdateLargestPossibleRegion();
-
-  delete[] spacing;
-  delete[] origin;
-
-  //bilateral filter with same type
-  typedef itk::BinaryThresholdImageFilter<ItkImageType,ItkImageType> BinaryThresholdImageFilter;
-  typename BinaryThresholdImageFilter::Pointer thresholdFilter = BinaryThresholdImageFilter::New();
-  thresholdFilter->SetInput( resampleFilter->GetOutput() );
-  thresholdFilter->SetUpperThreshold( 0 );
-  thresholdFilter->SetInsideValue(1);
-  thresholdFilter->SetOutsideValue(0);
-  //set parameters
-
-  thresholdFilter->UpdateLargestPossibleRegion();
-
-  typedef itk::InvertIntensityImageFilter<ItkImageType,ItkImageType> InvertIntensityImageFilter;
-  typename InvertIntensityImageFilter::Pointer invertFilter = InvertIntensityImageFilter::New();
-  invertFilter->SetInput( thresholdFilter->GetOutput() );
- // invertFilter->UpdateLargestPossibleRegion();
-
-  //get  Pointer to output image
-  //mitk::Image::Pointer resultImage = m_SegmentationAsImage;
-  //write into output image
-  mitk::CastToMitkImage(thresholdFilter->GetOutput(), m_SegmentationAsImage);
-}
-
-
-    
 mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFromPlanarFigure( mitk::PlanarFigure::Pointer figure )
 {
   if ( figure.IsNull() )

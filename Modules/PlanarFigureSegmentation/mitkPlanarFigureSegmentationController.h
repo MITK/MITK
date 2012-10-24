@@ -115,13 +115,6 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
 
     PlanarFigureSegmentationController();
 
-    /*!
-    \brief Internal templated method calling the ITK bilteral filter. Here the actual filtering is performed.
-    */
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage );
-
-
 
     PlanarFigureListType m_PlanarFigureList;
 

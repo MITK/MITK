@@ -15,16 +15,9 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
       set(is_test_plugin)
     endif()
 
-    set(_mitk_tagfile )
-
-    if(EXISTS ${MITK_DOXYGEN_TAGFILE_NAME})
-      # Todo: Point to stable documentations for stable builds
-      set(_mitk_tagfile "${MITK_DOXYGEN_TAGFILE_NAME}=http://docs.mitk.org/nightly-qt4/")
-    endif()
-
     MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}
                             EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
-                            DOXYGEN_TAGFILES ${_PLUGIN_DOXYGEN_TAGFILES} ${_mitk_tagfile}
+                            DOXYGEN_TAGFILES ${_PLUGIN_DOXYGEN_TAGFILES}
                             ${is_test_plugin})
 
     target_link_libraries(${PLUGIN_TARGET} ${ALL_LIBRARIES})

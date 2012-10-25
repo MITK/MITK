@@ -46,21 +46,20 @@ if(NOT DEFINED VTK_DIR)
      )
   endif()
 
-  if(APPLE)
-    set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.8.0.tar.gz)
-    set(VTK_URL_MD5 37b7297d02d647cc6ca95b38174cb41f)
-  else()
-    set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.10.0.tar.gz)
-    set(VTK_URL_MD5 a0363f78910f466ba8f1bd5ab5437cb9)
-  endif()
+  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.10.0.tar.gz)
+  set(VTK_URL_MD5 a0363f78910f466ba8f1bd5ab5437cb9)
 
-  ExternalProject_Add(${proj}
+  if(APPLE)
+    set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK-5.10-Mac.cmake)
+
+    ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
     BINARY_DIR ${proj}-build
     PREFIX ${proj}-cmake
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
     INSTALL_COMMAND ""
+    PATCH_COMMAND ${VTK_PATCH_COMMAND}
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
@@ -78,6 +77,36 @@ if(NOT DEFINED VTK_DIR)
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
+
+  else()
+
+    ExternalProject_Add(${proj}
+     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
+     BINARY_DIR ${proj}-build
+     PREFIX ${proj}-cmake
+     URL ${VTK_URL}
+     URL_MD5 ${VTK_URL_MD5}
+     INSTALL_COMMAND ""
+     CMAKE_GENERATOR ${gen}
+     CMAKE_ARGS
+         ${ep_common_args}
+         -DVTK_WRAP_TCL:BOOL=OFF
+         -DVTK_WRAP_PYTHON:BOOL=OFF
+         -DVTK_WRAP_JAVA:BOOL=OFF
+         -DBUILD_SHARED_LIBS:BOOL=ON
+         -DVTK_USE_PARALLEL:BOOL=ON
+         -DVTK_USE_CHARTS:BOOL=OFF
+         -DVTK_USE_QTCHARTS:BOOL=ON
+         -DVTK_USE_GEOVIS:BOOL=OFF
+         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
+         -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
+         -DVTK_LEGACY_REMOVE:BOOL=ON
+         ${additional_cmake_args}
+      DEPENDS ${proj_DEPENDENCIES}
+    )
+
+  endif()
+
   set(VTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
 
 else()

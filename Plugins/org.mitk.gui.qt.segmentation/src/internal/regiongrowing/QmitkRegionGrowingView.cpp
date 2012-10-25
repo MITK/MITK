@@ -55,7 +55,6 @@ void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )
     m_Controls->setupUi( parent );
 
     m_Controls->m_AdaptiveRGWidget->SetDataStorage(this->GetDataStorage());
-    m_Controls->m_AdaptiveRGWidget->CreateConnections();
   }
 }
 

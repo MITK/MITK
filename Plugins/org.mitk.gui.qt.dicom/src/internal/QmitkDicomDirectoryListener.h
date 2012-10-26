@@ -49,6 +49,9 @@ public:
     /// @brief set the directory listener listening.
     void SetListening(bool listening);
 
+    /// @brief set m_DicomFolderSuffix.
+    void SetDicomFolderSuffix(QString suffix);
+
 signals:
     /// @brief signal starts the dicom import of the given file list.
     void SignalStartDicomImport(const QStringList&);
@@ -59,10 +62,6 @@ public slots:
 
     /// \brief called when error occours during dicom store request
     void OnDicomNetworkError(const QString&);
-
-    /// \brief called when import of files is finished.
-    void OnImportFinished();
-
 
 protected:
 
@@ -75,11 +74,7 @@ protected:
     /// \brief removes files from listener directory.
     void RemoveTemporaryFiles();
 
-    /// \brief removes files in the files list from listener directory.
-    void RemoveTemporaryFiles(const QStringList& files);
-
-    /// \brief removes entries from m_AlreadyImportedFiles hash table.
-    void RemoveAlreadyImportedEntries(const QStringList& files);
+    QString m_DicomFolderSuffix;
 
     QFileSystemWatcher* m_FileSystemWatcher;
 

@@ -42,7 +42,6 @@ signals:
     void SignalFinishedImport();
 
 private:
-    void DeleteTemporaryData();
     void FindPathToStoreSCP();
     void SetArgumentList(QmitkStoreSCPLauncherBuilder* builder);
     QString ArgumentListToQString();

@@ -6,26 +6,37 @@
 #include <QtWebKit/QtWebKit>
 #include "QmitkExtExports.h"
 #include <QVariant>
-#include "itkHistogram.h"
+#include "mitkImage.h"
+
+
 
 class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
 {
   Q_OBJECT
 
-private:
-  QList<QVariant> Dataset;
-  QMap<int, QVariant> m_Dataset;
-
 public:
+  typedef mitk::Image::HistogramType HistogramType;
+  typedef mitk::Image::HistogramType::ConstIterator HistogramConstIteratorType;
+
   explicit QmitkHistogramJSWidget(QWidget *parent = 0);
   ~QmitkHistogramJSWidget();
   void resizeEvent(QResizeEvent* resizeEvent);
+  void ComputeHistogram(HistogramType* histogram);
+  void clearHistogram();
+
+private:
+  QList<QVariant> m_Frequency;
+  QList<QVariant> m_Measurement;
+  HistogramType::ConstPointer m_Histogram;
+
+  void clearData();
 
 private slots:
   void addJSObject();
 
 signals:
-  void sendData(QList<QVariant> data);
+  void sendFrequency(QList<QVariant> frequency);
+  void sendMeasurement(QList<QVariant> measurement);
 
 public slots:
   void emitData();

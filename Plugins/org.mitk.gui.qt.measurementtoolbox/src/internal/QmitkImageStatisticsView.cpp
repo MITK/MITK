@@ -514,6 +514,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
     m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
     m_Controls->m_HistogramWidget->SetHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
+    m_Controls->m_JSHistogram->ComputeHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
     m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
     //int timeStep = this->m_CalculationThread->GetTimeStep();
     this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
@@ -578,6 +579,7 @@ void QmitkImageStatisticsView::ComputeIntensityProfile( mitk::PlanarLine* line )
   }
   m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
   m_Controls->m_HistogramWidget->SetHistogram( histogram );
+  m_Controls->m_JSHistogram->ComputeHistogram( histogram );
   m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
 }
 

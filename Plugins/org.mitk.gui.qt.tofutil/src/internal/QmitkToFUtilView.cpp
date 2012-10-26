@@ -181,7 +181,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
   //TODO
   this->m_RealTimeClock = mitk::RealTimeClock::New();
   this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
-
+/*
   try
   {
     this->m_VideoSource = mitk::OpenCVVideoSource::New();
@@ -222,7 +222,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
     MITK_ERROR << e.what();
     return;
   }
-
+*/
   this->RequestRenderWindowUpdate();
 }
 
@@ -309,9 +309,9 @@ void QmitkToFUtilView::OnToFCameraStarted()
 
     std::string rgbFileName;
     m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
-    if ((m_SelectedCamera=="Microsoft Kinect")||(rgbFileName!=""))
+    if ((m_SelectedCamera=="Microsoft Kinect") || rgbFileName!="")
     {
-      if (m_ToFImageGrabber->GetBoolProperty("RGB"))
+      if (rgbFileName!="" || m_ToFImageGrabber->GetBoolProperty("RGB") )
       {
         this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
       }

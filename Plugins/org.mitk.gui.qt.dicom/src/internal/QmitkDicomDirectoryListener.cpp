@@ -30,6 +30,7 @@ QmitkDicomDirectoryListener::QmitkDicomDirectoryListener()
 
 QmitkDicomDirectoryListener::~QmitkDicomDirectoryListener()
 {
+    disconnect(m_FileSystemWatcher,SIGNAL(directoryChanged(const QString&)),this,SLOT(OnDirectoryChanged(const QString&)));
     m_IsListening = false;
     RemoveTemporaryFiles();
     delete m_FileSystemWatcher;
@@ -60,14 +61,6 @@ void QmitkDicomDirectoryListener::OnDirectoryChanged(const QString&)
     }
 }
 
-void QmitkDicomDirectoryListener::OnImportFinished()
-{
-    m_IsListening = false;
-    RemoveTemporaryFiles();
-    m_AlreadyImportedFiles.clear();
-    m_IsListening = true;
-}
-
 void QmitkDicomDirectoryListener::OnDicomNetworkError(const QString& errorMsg)
 {
     m_IsListening = false;
@@ -75,45 +68,18 @@ void QmitkDicomDirectoryListener::OnDicomNetworkError(const QString& errorMsg)
     m_IsListening = true;
 }
 
-void QmitkDicomDirectoryListener::RemoveAlreadyImportedEntries(const QStringList& fileEntries)
-{
-    QStringListIterator it(fileEntries);
-    QString currentEntry;
-    while(it.hasNext())
-    {
-        currentEntry = m_DicomListenerDirectory.absoluteFilePath(it.next());
-        if(m_AlreadyImportedFiles.contains(currentEntry))
-        {
-            m_AlreadyImportedFiles.remove(currentEntry);
-        }
-    }
-}
-
-void QmitkDicomDirectoryListener::RemoveTemporaryFiles(const QStringList& fileEntries)
-{
-  /**
-    QStringListIterator it(fileEntries);
-    QString currentEntry;
-    while(it.hasNext())
-    {
-        currentEntry = m_DicomListenerDirectory.absoluteFilePath(it.next());
-        m_DicomListenerDirectory.remove(currentEntry);
-    }
-  */
-}
-
 void QmitkDicomDirectoryListener::RemoveTemporaryFiles()
 {
-/**
-* dangerous code !!!
-  
-  QDirIterator it( m_DicomListenerDirectory.absolutePath() , QDir::AllEntries , QDirIterator::Subdirectories);
-    while(it.hasNext())
+    if(m_DicomListenerDirectory.absolutePath().contains(m_DicomFolderSuffix))
     {
-        it.next();
-        m_DicomListenerDirectory.remove(it.fileInfo().absoluteFilePath());
+        QDirIterator it( m_DicomListenerDirectory.absolutePath() , QDir::AllEntries , QDirIterator::Subdirectories);
+        while(it.hasNext())
+        {
+            it.next();
+            m_DicomListenerDirectory.remove(it.fileInfo().absoluteFilePath());
+        }
+        m_DicomListenerDirectory.rmdir(m_DicomListenerDirectory.absolutePath());
     }
-*/
 }
 
 void QmitkDicomDirectoryListener::SetDicomListenerDirectory(const QString& directory)
@@ -145,4 +111,9 @@ bool QmitkDicomDirectoryListener::IsListening()
 void QmitkDicomDirectoryListener::SetListening(bool listening)
 {
     m_IsListening = listening;
+}
+
+void QmitkDicomDirectoryListener::SetDicomFolderSuffix(QString suffix)
+{
+    m_DicomFolderSuffix = suffix;
 }

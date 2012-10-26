@@ -60,6 +60,7 @@ public:
 
     berryObjectMacro(QmitkDicomEditor)
     static const std::string EDITOR_ID;
+    static const QString TEMP_DICOM_FOLDER_SUFFIX;
 
     QmitkDicomEditor();
 
@@ -117,7 +118,7 @@ protected:
 
     void SetDatabaseDirectory(const QString& databaseDirectory);
 
-    void SetListenerDirectory(const QString& listenerDirectory);
+    void QmitkDicomEditor::CreateTemporaryDirectory();
 
     void StartDicomDirectoryListener();
 
@@ -139,14 +140,15 @@ protected:
 
     Ui::QmitkDicomEditorControls m_Controls;
 
-    QThread* m_Thread;
+    QThread m_Thread;
+
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
     QmitkStoreSCPLauncherBuilder m_Builder;
     QmitkStoreSCPLauncher* m_StoreSCPLauncher;
     DicomEventHandler* m_Handler;
     QmitkDicomDataEventPublisher* m_Publisher;
     QString m_PluginDirectory;
-    QString m_ListenerDirectory;
+    QString m_TempDirectory;
     QString m_DatabaseDirectory;
 
 };

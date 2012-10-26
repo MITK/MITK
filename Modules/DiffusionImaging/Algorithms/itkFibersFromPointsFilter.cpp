@@ -114,13 +114,13 @@ void FibersFromPointsFilter::GenerateData()
                 mitk::Vector2D dir2 = p2-p1; dir2.Normalize();
                 vnl_matrix_fixed<float, 2, 2> rot;
                 rot[0][0] = dir[0]*dir2[0] + dir[1]*dir2[1]; rot[1][1] = rot[0][0];
-                rot[1][0] = acos(rot[0][0]);
-                rot[0][1] = -rot[1][0];
+                rot[1][0] = sin(acos(rot[0][0]));
+                rot[0][1] = -sin(rot[1][0]);
 
                 vnl_vector_fixed< float, 2 > newP;
                 newP[0] = m_2DPoints.at(j)[0];
                 newP[1] = m_2DPoints.at(j)[1];
-//                newP = rot*newP;
+                newP = rot*newP;
 
 //                vnl_vector_fixed<double, 2> axis = vnl_cross_3d(dir, dir2); axis.normalize();
 //                vnl_quaternion<double> rotation(axis, acos(dot_product(dir, dir2)));

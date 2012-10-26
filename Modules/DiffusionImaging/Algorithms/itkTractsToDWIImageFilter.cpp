@@ -116,7 +116,7 @@ void TractsToDWIImageFilter::GenerateData()
         minSpacing = m_Spacing[2];
 
     FiberBundleType fiberBundle = m_FiberBundle->GetDeepCopy();
-    fiberBundle->DoFiberSmoothing(ceil(10.0*5.0/minSpacing));
+    fiberBundle->DoFiberSmoothing(ceil(10.0*2.0/minSpacing));
 
     m_RandGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
     m_RandGen->SetSeed();
@@ -348,8 +348,8 @@ void TractsToDWIImageFilter::GenerateData()
             }
         if (simulateIsotropicDiffusion)
             doublePix = SimulateMeasurement(freeWaterTensor, 2*m_MaxBaseline);
-//        else
-//            doublePix += SimulateMeasurement(freeWaterTensor, (m_MaxBaseline-doublePix[0])/10);
+        else
+            doublePix += SimulateMeasurement(freeWaterTensor, (m_MaxBaseline-doublePix[0])/10);
 
         doublePix = m_SignalScale*doublePix/m_MaxBaseline;
         AddNoise(doublePix);

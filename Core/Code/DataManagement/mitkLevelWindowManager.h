@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowProperty.h"
 #include "mitkBaseProperty.h"
 #include <map>
+#include <utility>
 
 namespace mitk
 {
@@ -45,16 +46,16 @@ namespace mitk
   there is a check to proof, if the active image is still available. If not, then m_AutoTopMost becomes true.
 */
 
-  class MITK_CORE_EXPORT LevelWindowManager : public itk::Object 
+  class MITK_CORE_EXPORT LevelWindowManager : public itk::Object
   {
   public:
 
     mitkClassMacro(LevelWindowManager, itk::Object)
-    itkNewMacro(Self); 
+    itkNewMacro(Self);
 
     void SetDataStorage(DataStorage* ds);
     DataStorage* GetDataStorage();  ///< returns the datastorage
-    
+
     /// if autoTopMost == true: sets the topmost layer image to be affected by changes
     /// if removedNode != NULL a node was removed from DataStorage
     void SetAutoTopMostImage(bool autoTopMost, const DataNode* removedNode = NULL);
@@ -74,10 +75,10 @@ namespace mitk
 
     /// returns the current mitkLevelWindowProperty object from the image that is affected by changes
     LevelWindowProperty::Pointer GetLevelWindowProperty();
-  
+
     /// true if changes on slider or line-edits will affect always the topmost layer image
     bool isAutoTopMost();
-  
+
     /// Change notifications from DataStorage
     void DataStorageChanged(const DataNode* n = NULL);
 
@@ -90,7 +91,7 @@ namespace mitk
     Image* GetCurrentImage(); ///< return the currently active image
 
     /**
-    *  returns all nodes in the DataStorage that have the following properties: 
+    *  returns all nodes in the DataStorage that have the following properties:
     *  "visible" == true, "binary" == false, "levelwindow", and DataType == Image
     */
     DataStorage::SetOfObjects::ConstPointer GetRelevantNodes();
@@ -101,7 +102,8 @@ namespace mitk
 
     DataStorage::Pointer         m_DataStorage;
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image
-    typedef std::map<unsigned long, BaseProperty::Pointer> ObserverToPropertyMap;
+    typedef std::pair<unsigned long, DataNode::Pointer> PropDataPair;
+    typedef std::map<PropDataPair, BaseProperty::Pointer> ObserverToPropertyMap;
     ObserverToPropertyMap        m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataNode큦 BaseProperty
     ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer ID큦 to every layer property of DataNode큦 BaseProperty
     bool                         m_AutoTopMost;

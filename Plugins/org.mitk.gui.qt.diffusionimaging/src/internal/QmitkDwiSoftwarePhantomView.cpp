@@ -39,6 +39,8 @@
 #include <itkTractsToDWIImageFilter.h>
 #include <mitkTensorImage.h>
 
+#include <QMessageBox>
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -48,6 +50,8 @@ QmitkDwiSoftwarePhantomView::QmitkDwiSoftwarePhantomView()
     : QmitkFunctionality()
     , m_Controls( 0 )
     , m_MultiWidget( NULL )
+    , m_SelectedImage( NULL )
+    , m_SelectedBundle( NULL )
 {
 
 }
@@ -174,24 +178,32 @@ void QmitkDwiSoftwarePhantomView::OnSimulateBaselineToggle(int state)
 
 void QmitkDwiSoftwarePhantomView::OnAddBundle()
 {
+    if (m_SelectedImage.IsNull())
+        return;
+
+    mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedImage);
+
     mitk::FiberBundleX::Pointer bundle = mitk::FiberBundleX::New();
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( bundle );
-    QString name = QString("Bundle");
+    QString name = QString("Bundle%1").arg(children->size());
     node->SetName(name.toStdString());
-    GetDataStorage()->Add(node);
+    GetDataStorage()->Add(node, m_SelectedImage);
 }
 
 void QmitkDwiSoftwarePhantomView::OnDrawCircle()
 {
     if (m_SelectedBundle.IsNull())
         return;
+    mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundle);
+
     mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( figure );
-//    QString name = QString("Fiducial_%1").arg(m_Bundles.size());
-    node->SetName("fiducial");
+
+    QString name = QString("Fiducial%1").arg(children->size());
+    node->SetName(name.toStdString());
     GetDataStorage()->Add(node, m_SelectedBundle);
 
     mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
@@ -220,6 +232,11 @@ void QmitkDwiSoftwarePhantomView::GenerateFibers()
         }
         if (fib.size()>1)
             fiducials.push_back(fib);
+        if (fib.size()<3)
+        {
+            QMessageBox::information(0, "Fiber generation not possible:", "At least 3 fiducials per bundle needed!");
+            return;
+        }
     }
 
     itk::FibersFromPointsFilter::Pointer filter = itk::FibersFromPointsFilter::New();
@@ -237,6 +254,12 @@ void QmitkDwiSoftwarePhantomView::GenerateFibers()
         newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>(fiberBundles.at(i).GetPointer()));
     }
 
+    if (newBundle->GetNumFibers()<=0)
+    {
+        QMessageBox::warning(0, "Error:", "Generated fiber bundle contains no fibers!");
+        return;
+    }
+
     mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
     fbNode->SetData(newBundle);
     fbNode->SetName("Synthetic_Bundle");
@@ -248,6 +271,13 @@ void QmitkDwiSoftwarePhantomView::GenerateImage()
 {
     if (m_SelectedBundle.IsNull())
         return;
+
+    mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundle->GetData());
+    if (fiberBundle->GetNumFibers()<=0)
+    {
+        QMessageBox::information(0, "Image generation not possible:", "Generated fiber bundle contains no fibers!");
+        return;
+    }
 
     typedef itk::TractsToDWIImageFilter FilterType;
     FilterType::GradientListType gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
@@ -269,7 +299,7 @@ void QmitkDwiSoftwarePhantomView::GenerateImage()
     filter->SetImageRegion(imageRegion);
     filter->SetSpacing(spacing);
     filter->SetGreyMatterAdc(m_Controls->m_GmAdc->value());
-    filter->SetFiberBundle(dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundle->GetData()));
+    filter->SetFiberBundle(fiberBundle);
     filter->SetMaxFA(m_Controls->m_MaxFaBox->value());
     filter->Update();
 
@@ -282,6 +312,14 @@ void QmitkDwiSoftwarePhantomView::GenerateImage()
     node->SetData( image );
     node->SetName(m_Controls->m_ImageName->text().toStdString());
     GetDataStorage()->Add(node, m_SelectedBundle);
+
+    mitk::BaseData::Pointer basedata = node->GetData();
+    if (basedata.IsNotNull())
+    {
+        mitk::RenderingManager::GetInstance()->InitializeViews(
+                    basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
 }
 
 void QmitkDwiSoftwarePhantomView::GeneratePhantom()
@@ -390,6 +428,13 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     node->SetData( image );
     node->SetName(m_Controls->m_ImageName->text().toStdString());
     GetDataStorage()->Add(node);
+    mitk::BaseData::Pointer basedata = node->GetData();
+    if (basedata.IsNotNull())
+    {
+        mitk::RenderingManager::GetInstance()->InitializeViews(
+                    basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
 
     if (m_Controls->m_OutputNumDirectionsBox->isChecked())
     {
@@ -469,13 +514,22 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
 
 void QmitkDwiSoftwarePhantomView::UpdateGui()
 {
+    if (m_SelectedImage.IsNotNull())
+        m_Controls->m_FiberButton->setEnabled(true);
+    else
+        m_Controls->m_FiberButton->setEnabled(false);
+
     if (m_SelectedBundle.IsNotNull())
     {
+        m_Controls->m_GenerateFibersButton->setEnabled(true);
         m_Controls->m_CircleButton->setEnabled(true);
+        m_Controls->m_GenerateImageButton->setEnabled(true);
     }
     else
     {
+        m_Controls->m_GenerateFibersButton->setEnabled(false);
         m_Controls->m_CircleButton->setEnabled(false);
+        m_Controls->m_GenerateImageButton->setEnabled(false);
     }
 
     if (!m_SignalRegionNodes.empty())
@@ -613,6 +667,7 @@ void QmitkDwiSoftwarePhantomView::OnSelectionChanged( std::vector<mitk::DataNode
     m_SignalRegionNodes.clear();
     m_SelectedBundles.clear();
     m_SelectedBundle = NULL;
+    m_SelectedImage = NULL;
 
     // iterate all selected objects, adjust warning visibility
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
@@ -621,6 +676,7 @@ void QmitkDwiSoftwarePhantomView::OnSelectionChanged( std::vector<mitk::DataNode
 
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
+            m_SelectedImage = node;
             bool isBinary = false;
             node->GetPropertyValue<bool>("binary", isBinary);
             if (isBinary)

@@ -101,6 +101,7 @@ protected:
 
 private:
 
+    mitk::DataNode::Pointer                         m_SelectedImage;
     mitk::DataNode::Pointer                         m_SelectedBundle;
     vector< mitk::DataNode::Pointer >               m_SelectedBundles;
 };

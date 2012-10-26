@@ -74,6 +74,11 @@ void FibersFromPointsFilter::GeneratePoints()
 // perform global tracking
 void FibersFromPointsFilter::GenerateData()
 {
+    // check if enough fiducials are available
+    for (int i=0; i<m_Fiducials.size(); i++)
+        if (m_Fiducials.at(i).size()<3)
+            itkExceptionMacro("At least 3 fiducials needed per fiber bundle!");
+
     for (int i=0; i<m_Fiducials.size(); i++)
     {
         vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
@@ -121,10 +126,6 @@ void FibersFromPointsFilter::GenerateData()
                 newP[0] = m_2DPoints.at(j)[0];
                 newP[1] = m_2DPoints.at(j)[1];
                 newP = rot*newP;
-
-//                vnl_vector_fixed<double, 2> axis = vnl_cross_3d(dir, dir2); axis.normalize();
-//                vnl_quaternion<double> rotation(axis, acos(dot_product(dir, dir2)));
-//                rotation.normalize();
 
                 p1[0] += newP[0]*r;
                 p1[1] += newP[1]*r;

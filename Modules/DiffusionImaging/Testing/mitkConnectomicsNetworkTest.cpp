@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImagingObjectFactory.h>
 #include "mitkConnectomicsNetwork.h"
 #include "mitkConnectomicsSyntheticNetworkGenerator.h"
+#include "mitkConnectomicsSimulatedAnnealingManager.h"
+#include "mitkConnectomicsSimulatedAnnealingPermutationModularity.h"
+#include "mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h"
 #include <vector>
 #include <string>
 #include <utility>
@@ -30,6 +33,209 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
 {
   // Test begins
   MITK_TEST_BEGIN("mitkConnectomicsNetworkTest");
+
+  // Typedefs
+  typedef mitk::ConnectomicsNetwork::VertexDescriptorType VertexType;
+  typedef mitk::ConnectomicsNetwork::EdgeDescriptorType EdgeType;
+  typedef mitk::ConnectomicsNetwork::NetworkNode NodeType;
+
+  // The test network
+
+  std::vector< NodeType > inNodes;
+
+  NodeType node;
+
+  node.id = 0;
+  node.label = "1-1";
+  node.coordinates.clear();
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 0 );
+  inNodes.push_back(node);
+
+  node.id = 1;
+  node.label = "2-1";
+  node.coordinates.clear();
+  node.coordinates.push_back( 10 );
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 0 );
+  inNodes.push_back(node);
+
+  node.id = 2;
+  node.label = "3-1";
+  node.coordinates.clear();
+  node.coordinates.push_back( 20 );
+  node.coordinates.push_back( 10 );
+  node.coordinates.push_back( 0 );
+  inNodes.push_back(node);
+
+  node.id = 3;
+  node.label = "4-1";
+  node.coordinates.clear();
+  node.coordinates.push_back( 30 );
+  node.coordinates.push_back( 20 );
+  node.coordinates.push_back( 0 );
+  inNodes.push_back(node);
+
+  node.id = 4;
+  node.label = "5-1";
+  node.coordinates.clear();
+  node.coordinates.push_back( 40 );
+  node.coordinates.push_back( 50 );
+  node.coordinates.push_back( 0 );
+  inNodes.push_back(node);
+
+  node.id = 5;
+  node.label = "6-2";
+  node.coordinates.clear();
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 10 );
+  inNodes.push_back(node);
+
+  node.id = 6;
+  node.label = "7-2";
+  node.coordinates.clear();
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 10 );
+  node.coordinates.push_back( 20 );
+  inNodes.push_back(node);
+
+  node.id = 7;
+  node.label = "8-2";
+  node.coordinates.clear();
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 20 );
+  node.coordinates.push_back( 30 );
+  inNodes.push_back(node);
+
+  node.id = 8;
+  node.label = "9-2";
+  node.coordinates.clear();
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 30 );
+  node.coordinates.push_back( 40 );
+  inNodes.push_back(node);
+
+  node.id = 9;
+  node.label = "10-3";
+  node.coordinates.clear();
+  node.coordinates.push_back( 20 );
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 10 );
+  inNodes.push_back(node);
+
+  node.id = 10;
+  node.label = "11-3";
+  node.coordinates.clear();
+  node.coordinates.push_back( 30 );
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 20 );
+  inNodes.push_back(node);
+
+  node.id = 11;
+  node.label = "12-3";
+  node.coordinates.clear();
+  node.coordinates.push_back( 40 );
+  node.coordinates.push_back( 0 );
+  node.coordinates.push_back( 30 );
+  inNodes.push_back(node);
+
+  std::vector< mitk::ConnectomicsNetwork::NetworkEdge > inEdges;
+
+  mitk::ConnectomicsNetwork::NetworkEdge edge;
+
+  edge.sourceId = 0;
+  edge.targetId = 1;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 0;
+  edge.targetId = 2;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 0;
+  edge.targetId = 4;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 1;
+  edge.targetId = 4;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 1;
+  edge.targetId = 3;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 2;
+  edge.targetId = 3;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 3;
+  edge.targetId = 4;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 4;
+  edge.targetId = 5;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 5;
+  edge.targetId = 6;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 5;
+  edge.targetId = 7;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 5;
+  edge.targetId = 8;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 7;
+  edge.targetId = 8;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 6;
+  edge.targetId = 8;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 6;
+  edge.targetId = 9;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 3;
+  edge.targetId = 10;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 9;
+  edge.targetId = 10;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 10;
+  edge.targetId = 11;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  edge.sourceId = 9;
+  edge.targetId = 11;
+  edge.weight = 2;
+  inEdges.push_back( edge );
+
+  // further variables
 
   double eps(0.001);
 
@@ -119,206 +325,6 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
   {
     // Testing network interface
 
-    typedef mitk::ConnectomicsNetwork::VertexDescriptorType VertexType;
-    typedef mitk::ConnectomicsNetwork::EdgeDescriptorType EdgeType;
-    typedef mitk::ConnectomicsNetwork::NetworkNode NodeType;
-
-    // The test network
-
-    std::vector< NodeType > inNodes;
-
-    NodeType node;
-
-    node.id = 0;
-    node.label = "1-1";
-    node.coordinates.clear();
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 0 );
-    inNodes.push_back(node);
-
-    node.id = 1;
-    node.label = "2-1";
-    node.coordinates.clear();
-    node.coordinates.push_back( 10 );
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 0 );
-    inNodes.push_back(node);
-
-    node.id = 2;
-    node.label = "3-1";
-    node.coordinates.clear();
-    node.coordinates.push_back( 20 );
-    node.coordinates.push_back( 10 );
-    node.coordinates.push_back( 0 );
-    inNodes.push_back(node);
-
-    node.id = 3;
-    node.label = "4-1";
-    node.coordinates.clear();
-    node.coordinates.push_back( 30 );
-    node.coordinates.push_back( 20 );
-    node.coordinates.push_back( 0 );
-    inNodes.push_back(node);
-
-    node.id = 4;
-    node.label = "5-1";
-    node.coordinates.clear();
-    node.coordinates.push_back( 40 );
-    node.coordinates.push_back( 50 );
-    node.coordinates.push_back( 0 );
-    inNodes.push_back(node);
-
-    node.id = 5;
-    node.label = "6-2";
-    node.coordinates.clear();
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 10 );
-    inNodes.push_back(node);
-
-    node.id = 6;
-    node.label = "7-2";
-    node.coordinates.clear();
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 10 );
-    node.coordinates.push_back( 20 );
-    inNodes.push_back(node);
-
-    node.id = 7;
-    node.label = "8-2";
-    node.coordinates.clear();
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 20 );
-    node.coordinates.push_back( 30 );
-    inNodes.push_back(node);
-
-    node.id = 8;
-    node.label = "9-2";
-    node.coordinates.clear();
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 30 );
-    node.coordinates.push_back( 40 );
-    inNodes.push_back(node);
-
-    node.id = 9;
-    node.label = "10-3";
-    node.coordinates.clear();
-    node.coordinates.push_back( 20 );
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 10 );
-    inNodes.push_back(node);
-
-    node.id = 10;
-    node.label = "11-3";
-    node.coordinates.clear();
-    node.coordinates.push_back( 30 );
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 20 );
-    inNodes.push_back(node);
-
-    node.id = 11;
-    node.label = "12-3";
-    node.coordinates.clear();
-    node.coordinates.push_back( 40 );
-    node.coordinates.push_back( 0 );
-    node.coordinates.push_back( 30 );
-    inNodes.push_back(node);
-
-    std::vector< mitk::ConnectomicsNetwork::NetworkEdge > inEdges;
-
-    mitk::ConnectomicsNetwork::NetworkEdge edge;
-
-    edge.sourceId = 0;
-    edge.targetId = 1;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 0;
-    edge.targetId = 2;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 0;
-    edge.targetId = 4;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 1;
-    edge.targetId = 4;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 1;
-    edge.targetId = 3;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 2;
-    edge.targetId = 3;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 3;
-    edge.targetId = 4;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 4;
-    edge.targetId = 5;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 5;
-    edge.targetId = 6;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 5;
-    edge.targetId = 7;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 5;
-    edge.targetId = 8;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 7;
-    edge.targetId = 8;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 6;
-    edge.targetId = 8;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 6;
-    edge.targetId = 9;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 3;
-    edge.targetId = 10;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 9;
-    edge.targetId = 10;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 10;
-    edge.targetId = 11;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
-    edge.sourceId = 9;
-    edge.targetId = 11;
-    edge.weight = 2;
-    inEdges.push_back( edge );
-
     // Create network
 
     mitk::ConnectomicsNetwork::Pointer network = mitk::ConnectomicsNetwork::New();
@@ -375,13 +381,144 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED( network->GetMaximumWeight() == 2, "Expected maximum weight")
 
     MITK_TEST_CONDITION_REQUIRED( network->GetVectorOfAllVertexDescriptors().size() == vertexVector.size(), "Expected number of vertex descriptors")
-
-
-
   }
   catch (...)
   {
     MITK_ERROR << "Unhandled exception caught while testing network interface [FAILED]" ;
+    return EXIT_FAILURE;
+  }
+
+  try
+  {
+    // Testing modularity calculation
+
+    typedef std::map< VertexType, int > ToModuleMapType;
+
+    // Create network
+
+    mitk::ConnectomicsNetwork::Pointer network = mitk::ConnectomicsNetwork::New();
+
+    std::vector< VertexType > vertexVector;
+    vertexVector.resize( inNodes.size() );
+
+    for(int loop(0); loop < inNodes.size(); loop++)
+    {
+      VertexType newVertex = network->AddVertex( inNodes[loop].id );
+      vertexVector[ inNodes[loop].id ] = newVertex;
+      network->SetLabel( newVertex, inNodes[loop].label );
+      network->SetCoordinates( newVertex, inNodes[loop].coordinates );
+    }
+
+    for(int loop(0); loop < inEdges.size(); loop++)
+    {
+      int sourceId = inEdges[loop].sourceId;
+      int targetId = inEdges[loop].targetId;
+      VertexType sourceVertex = vertexVector[ sourceId ];
+      VertexType targetVertex = vertexVector[ targetId ];
+
+      // there are two methods to add nodes
+      if( loop % 2 == 0 )
+      {
+        network->AddEdge(sourceVertex, targetVertex);
+        for( int remaining( inEdges[loop].weight ); remaining > 1; remaining-- )
+        {
+          network->IncreaseEdgeWeight( sourceVertex, targetVertex );
+        }
+      }
+      else
+      {
+        network->AddEdge(sourceVertex, targetVertex, sourceId, targetId, inEdges[loop].weight );
+      }
+    }
+
+    // Simulated annealing classes
+    mitk::ConnectomicsSimulatedAnnealingManager::Pointer manager = mitk::ConnectomicsSimulatedAnnealingManager::New();
+    mitk::ConnectomicsSimulatedAnnealingPermutationModularity::Pointer permutation = mitk::ConnectomicsSimulatedAnnealingPermutationModularity::New();
+    mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity::Pointer costFunction = mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity::New();
+
+    // Test whether modularity calculation behaves as expected
+
+    ToModuleMapType threeModuleSolution;
+    std::vector< VertexType > vertexInVector = network->GetVectorOfAllVertexDescriptors();
+
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 0 ], 0 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 1 ], 0 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 2 ], 0 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 3 ], 0 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 4 ], 0 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 5 ], 1 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 6 ], 1 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 7 ], 1 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 8 ], 1 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 9 ], 2 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 10 ], 2 ) );
+    threeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 11 ], 2 ) );
+
+    bool threeModuleModularity( std::abs(0.4753 - costFunction->CalculateModularity( network, &threeModuleSolution )) < eps);
+    MITK_TEST_CONDITION_REQUIRED( threeModuleModularity, "Expected three module modularity")
+
+    bool correctNumberOfModules( permutation->getNumberOfModules( &threeModuleSolution ) == 3 ); 
+    MITK_TEST_CONDITION_REQUIRED( correctNumberOfModules, "Expected number of modules")
+
+    bool correctNumberOfVertices( permutation->getNumberOfVerticesInModule( &threeModuleSolution, 0 ) == 5
+      && permutation->getNumberOfVerticesInModule( &threeModuleSolution, 1 ) == 4
+      && permutation->getNumberOfVerticesInModule( &threeModuleSolution, 2 ) == 3 );
+    MITK_TEST_CONDITION_REQUIRED( correctNumberOfVertices, "Expected number of vertices per module")
+
+    ToModuleMapType oneModuleSolution;
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 0 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 1 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 2 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 3 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 4 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 5 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 6 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 7 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 8 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 9 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 10 ], 0 ) );
+    oneModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 11 ], 0 ) );
+
+    bool oneModuleModularity( std::abs(0.0 - costFunction->CalculateModularity( network, &oneModuleSolution )) < eps);
+    MITK_TEST_CONDITION_REQUIRED( oneModuleModularity, "Expected one module modularity")
+
+    ToModuleMapType badTwoModuleSolution;
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 0 ], 0 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 1 ], 0 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 2 ], 0 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 3 ], 0 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 4 ], 0 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 5 ], 1 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 6 ], 1 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 7 ], 1 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 8 ], 0 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 9 ], 1 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 10 ], 1 ) );
+    badTwoModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 11 ], 0 ) );
+
+    bool badTwoModuleModularity( std::abs(0.097222 - costFunction->CalculateModularity( network, &badTwoModuleSolution )) < eps);
+    MITK_TEST_CONDITION_REQUIRED( badTwoModuleModularity, "Expected bad two module modularity")
+
+    ToModuleMapType noInternalLinksThreeModuleSolution;
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 0 ], 0 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 1 ], 2 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 2 ], 1 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 3 ], 0 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 4 ], 1 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 5 ], 2 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 6 ], 0 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 7 ], 0 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 8 ], 1 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 9 ], 2 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 10 ], 1 ) );
+    noInternalLinksThreeModuleSolution.insert( std::pair<VertexType, int>( vertexInVector[ 11 ], 0 ) );
+
+    bool noInternalThreeModuleModularity( std::abs(-0.3395 - costFunction->CalculateModularity( network, &noInternalLinksThreeModuleSolution )) < eps);
+    MITK_TEST_CONDITION_REQUIRED( noInternalThreeModuleModularity, "Expected three module modularity containing no internal links")
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unhandled exception caught while testing modularity calculation [FAILED]" ;
     return EXIT_FAILURE;
   }
   // Test ends

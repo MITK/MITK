@@ -44,22 +44,29 @@ public:
         std::string string(MITK_TOF_CAMERAS);
         //       string.replace(";"," ");
         std::cout << "cameras " << string << std::endl;
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//.dll do not get updated(deleted) automatically. One has to either to delete them manualy or just call them if a device is activated
 
-//.dll do not get deleted automaticaly, so one has to either delete them manualy or just call them if device is actual activated
-
- // // If kinect activated through CMake, please Load the .dll! else do nothing
- //if (MITK_USE_OF_KINECT)
- //{
-        LoadLibrary(TEXT("mitkKinectModule.dll"));
- //}
-
-//Loading mitkPMDCamCubeModule.dll of PMDCamCubeModule
-      LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
+     //If Kinect is activated through CMake, please load the .dll by uncommenting the next line!
+          LoadLibrary(TEXT("mitkKinectModule.dll"));
 
 
+    //If MesaSR4000Module is activated through CMake, please load the MesaSR4000Module.dll by uncommenting the next line
+          //LoadLibrary(TEXT("MesaSR4000Module.dll"));
 
-//Loading MesaSR4000Module.dll of the MesaModule
-      //LoadLibrary(TEXT("MesaSR4000Module.dll"));
+
+     //If CamBoard is activated through CMake, please load the .dll by uncommenting the next line!
+          LoadLibrary(TEXT("mitkPMDCamBoardModule.dll"));
+
+
+     //If CamCube is activated through CMake, please load the .dll by uncommenting the next line!
+          LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
+
+
+     //If PMDO3D is activated through CMake, please load the .dll by uncommenting the next line!
+          LoadLibrary(TEXT("mitkPMDO3Module.dll"));
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 
         //Implementing MITKPlayerDevice

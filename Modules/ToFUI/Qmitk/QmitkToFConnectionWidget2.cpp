@@ -159,7 +159,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
       this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());
     }
 
-    //Activation of "PlayerMode". If the selectedCamera String contains "Player", we start the Player Mode
+//Activation of "PlayerMode". If the selectedCamera String contains "Player", we start the Player Mode
     if (selectedCamera.contains("Player"))
     {
       playerMode = true;
@@ -215,32 +215,39 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
 
           //Checking for npos. If available, check for the Amplitude-, Intensity- and RGBImage
 
-          int found = baseFilename.rfind("_DistanceImage"); //Defining "found" variable+checking if baseFilname contains "_DistanceImage". If not, found = npos
+          int found = baseFilename.rfind("_DistanceImage");  //Defining "found" variable+checking if baseFilname contains "_DistanceImage". If not, found == npos(0)
+
+          if (found == std::string::npos)  //If found =0
+          {
+            found = baseFilename.rfind("_AmplitudeImage");  //If "_AmplitudeImage" is found, the found variable is 1-> the next if statment is false
+          }
 
           if (found == std::string::npos)
           {
-            found = baseFilename.rfind("_AmplitudeImage");  // if "_AmplitudeImage" is found, the found variable is 1
+            found = baseFilename.rfind("_IntensityImage"); //found = true if baseFilename cotains "_IntesityImage"
           }
-          if (found == std::string::npos)
-          {
-            found = baseFilename.rfind("_IntensityImage");
-          }
+
           if (found == std::string::npos)
           {
             found = baseFilename.rfind("_RGBImage");
           }
-          if (found == std::string::npos)
+
+          if (found == std::string::npos) //If none of the Nodes is found, display an error
           {
             msg = msg + "Input file name must end with \"_DistanceImage\", \"_AmplitudeImage\", \"_IntensityImage\" or \"_RGBImage\"!";
             throw std::logic_error(msg.c_str());
           }
-          std::string baseFilenamePrefix = baseFilename.substr(0,found);
 
-          std::string distanceImageFileName = dir + "/" + baseFilenamePrefix + "_DistanceImage" + extension;
+          std::string baseFilenamePrefix = baseFilename.substr(0,found);//Set the baseFilenamePrefix as a substring from baseFilname
+
+          //Set corresponding FileNames
+          std::string distanceImageFileName = dir + "/" + baseFilenamePrefix + "_DistanceImage" + extension; //Set the name as: directory+FilenamePrefix+""+extension
           std::string amplitudeImageFileName = dir + "/" + baseFilenamePrefix + "_AmplitudeImage" + extension;
           std::string intensityImageFileName = dir + "/" + baseFilenamePrefix + "_IntensityImage" + extension;
           std::string rgbImageFileName = dir + "/" + baseFilenamePrefix + "_RGBImage" + extension;
 
+
+//--------------------------------------------ASK THOMAS about this Part------------------------------------------------
           if (!itksys::SystemTools::FileExists(distanceImageFileName.c_str(), true))
           {
             this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", "");
@@ -273,6 +280,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
             this->m_ToFImageGrabber->SetStringProperty("RGBImageFileName", rgbImageFileName.c_str());
           }
         }
+
         catch (std::exception &e)
         {
           MITK_ERROR << e.what();
@@ -285,18 +293,18 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
         }
       }
     }
-    //End "PlayerMode"
+//End "PlayerMode"
 
-    m_Controls->m_ConnectCameraButton->setText("Disconnect");
+    m_Controls->m_ConnectCameraButton->setText("Disconnect");  //Reset the ConnectCameraButton to disconnected
 
     //if a connection could be established
     if (this->m_ToFImageGrabber->ConnectCamera())
     {
-      //todo: probieren ob das auch in CreateQtPartControl passieren kann
       this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
       this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
       this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
+      //Activating the respective widgets
       if (selectedCamera.contains("PMD"))
       {
         this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();
@@ -312,6 +320,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
       // send connect signal to the caller functionality
       emit ToFCameraConnected();
     }
+    //Throw an error if the Connection failed and reset the Widgets
     else
     {
       QMessageBox::critical( this, "Error", "Connection failed. Check if you have installed the latest driver for your system." );

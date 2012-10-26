@@ -50,8 +50,6 @@ namespace mitk
     // Set the permutation to be used
     void SetPermutation( mitk::ConnectomicsSimulatedAnnealingPermutationBase::Pointer permutation );
 
-    //void Testing( mitk::ConnectomicsNetwork::Pointer network );
-
   protected:
 
     //////////////////// Functions ///////////////////////

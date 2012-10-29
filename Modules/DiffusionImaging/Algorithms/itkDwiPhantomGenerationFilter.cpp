@@ -325,10 +325,10 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
         }
         else if (numDirs==0)
         {
-            pix = SimulateMeasurement(isoTensor, 1.0);
-            if (!m_SimulateBaseline)
-                for( unsigned int i=0; i<m_BaselineImages; i++)
-                    pix[i] = 0;
+            if (m_SimulateBaseline)
+                pix = SimulateMeasurement(isoTensor, 1.0);
+            else
+                pix.Fill(0.0);
         }
 
         m_MeanBaseline += pix[0];

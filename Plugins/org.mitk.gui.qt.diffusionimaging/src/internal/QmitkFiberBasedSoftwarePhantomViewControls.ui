@@ -1,224 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkDwiSoftwarePhantomViewControls</class>
- <widget class="QWidget" name="QmitkDwiSoftwarePhantomViewControls">
+ <class>QmitkFiberBasedSoftwarePhantomViewControls</class>
+ <widget class="QWidget" name="QmitkFiberBasedSoftwarePhantomViewControls">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>389</width>
-    <height>592</height>
+    <width>404</width>
+    <height>715</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="4" column="0" colspan="2">
-    <widget class="QGroupBox" name="m_SignalRegionBox">
-     <property name="title">
-      <string>Signal Regions</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Additional Output</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_2">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="m_OutputVectorFieldBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="toolTip">
-         <string>Visualization of the used tensor directions.</string>
-        </property>
-        <property name="text">
-         <string>Vector Field</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
-        <property name="toolTip">
-         <string>Output unsigned char image containing the number of directions per voxel.</string>
-        </property>
-        <property name="text">
-         <string>#Directions per Voxel</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="m_OutputDirectionImagesBox">
-        <property name="toolTip">
-         <string>Output one image per signal region containing the tensor direction vecors as pixel values.</string>
-        </property>
-        <property name="text">
-         <string>Direction Images</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="m_OutputSnrImageBox">
-        <property name="toolTip">
-         <string>Output one image per signal region containing the tensor direction vecors as pixel values.</string>
-        </property>
-        <property name="text">
-         <string>SNR Image</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="0" rowspan="2" colspan="2">
-    <widget class="QLabel" name="m_Instruction">
-     <property name="palette">
-      <palette>
-       <active>
-        <colorrole role="WindowText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>200</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>200</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ButtonText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>200</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </active>
-       <inactive>
-        <colorrole role="WindowText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>200</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>200</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ButtonText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>200</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </inactive>
-       <disabled>
-        <colorrole role="WindowText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>84</red>
-           <green>82</green>
-           <blue>78</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>84</red>
-           <green>82</green>
-           <blue>78</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ButtonText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>84</red>
-           <green>82</green>
-           <blue>78</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </disabled>
-      </palette>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Please select at least one binary image!</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="QCommandLinkButton" name="m_GeneratePhantomButton">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Start Phantom Generation</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
+   <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Image Parameters</string>
+      <string>Image Generation</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="4" column="2" rowspan="2">
@@ -485,29 +284,169 @@
            </property>
           </widget>
          </item>
+         <item row="6" column="1">
+          <widget class="QDoubleSpinBox" name="m_MaxFaBox">
+           <property name="minimum">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.700000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_6">
+           <property name="text">
+            <string>Max. FA:</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QCheckBox" name="m_SimulateBaseline">
-     <property name="toolTip">
-      <string>Generate baseline signal (b0) as the l2 norm of the tensors. If not checked, the whole baseline volume is set to a default value.</string>
+   <item row="6" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="0">
+    <widget class="QCommandLinkButton" name="m_GenerateImageButton">
+     <property name="enabled">
+      <bool>false</bool>
      </property>
      <property name="text">
-      <string>Simulate Baseline Signal</string>
+      <string>Generate Image</string>
      </property>
-     <property name="checked">
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Fiber Generation</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="m_CircleButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Draw circular ROI.</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QSpinBox" name="m_FiberDensityBox">
+        <property name="toolTip">
+         <string>Select number of fibers to generate for the selected bundle.</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1000000</number>
+        </property>
+        <property name="singleStep">
+         <number>1000</number>
+        </property>
+        <property name="value">
+         <number>10000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="m_FiberButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Create empty fiber bundle.</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <normaloff>:/QmitkDiffusionImaging/FiberBundle.png</normaloff>:/QmitkDiffusionImaging/FiberBundle.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QCommandLinkButton" name="m_GenerateFibersButton">
+     <property name="enabled">
       <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Generate Fibers</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>m_GeneratePhantomButton</tabstop>
   <tabstop>m_ImageName</tabstop>
   <tabstop>m_TensorsToDWIBValueEdit</tabstop>
   <tabstop>m_NumGradientsBox</tabstop>
@@ -519,12 +458,9 @@
   <tabstop>m_SpacingX</tabstop>
   <tabstop>m_SpacingY</tabstop>
   <tabstop>m_SpacingZ</tabstop>
-  <tabstop>m_SimulateBaseline</tabstop>
-  <tabstop>m_OutputVectorFieldBox</tabstop>
-  <tabstop>m_OutputNumDirectionsBox</tabstop>
-  <tabstop>m_OutputDirectionImagesBox</tabstop>
-  <tabstop>m_OutputSnrImageBox</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+ </resources>
  <connections/>
 </ui>

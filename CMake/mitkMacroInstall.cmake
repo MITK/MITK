@@ -103,14 +103,18 @@ macro(_fixup_target)
       # glob for Qt plugins
       \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
     
+    file(GLOB_RECURSE GLOBBED_CTK_DESIGNER_PLUGINS
+      # glob for Qt designer plugins
+      \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/designer/*${CMAKE_SHARED_MODULE_SUFFIX}\")
+      
     # use custom version of BundleUtilities
-    message(\"globbed plugins: \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS}\")
+    message(\"globbed plugins: \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS} \${GLOBBED_CTK_DESIGNER_PLUGINS} \")
     set(PLUGIN_DIRS)
-    set(PLUGINS ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS})
+    set(PLUGINS \${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS} \${GLOBBED_CTK_DESIGNER_PLUGINS})
     if(PLUGINS)
       list(REMOVE_DUPLICATES PLUGINS)
-    endif(PLUGINS)
-    foreach(_plugin \${GLOBBED_BLUEBERRY_PLUGINS})
+    endif(PLUGINS)    
+    foreach(_plugin \${GLOBBED_BLUEBERRY_PLUGINS} \${GLOBBED_CTK_DESIGNER_PLUGINS} )
       get_filename_component(_pluginpath \${_plugin} PATH)
       list(APPEND PLUGIN_DIRS \${_pluginpath})
     endforeach(_plugin)
@@ -121,7 +125,7 @@ macro(_fixup_target)
     # use custom version of BundleUtilities
     set(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
     include(BundleUtilities)
-    
+
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${DIRS}\")
   ")
 endmacro()

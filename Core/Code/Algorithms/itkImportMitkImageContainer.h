@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImportImageContainer.h>
 #include <mitkImageDataItem.h>
+#include <mitkImageWriteAccessor.h>
 
 namespace itk
 {
@@ -61,7 +62,8 @@ public:
   //TElement *GetImportPointer() {return m_ImportPointer;};
 
   /** \brief Set the mitk::ImageDataItem to be imported  */
-  void SetImageDataItem(mitk::ImageDataItem* imageDataItem);
+  //void SetImageDataItem(mitk::ImageDataItem* imageDataItem);
+  void SetImageAccessor(mitk::ImageWriteAccessor* imageAccess, size_t noBytes);
 
 protected:
   ImportMitkImageContainer();
@@ -76,7 +78,8 @@ private:
   ImportMitkImageContainer(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
-  mitk::ImageDataItem::Pointer m_ImageDataItem;
+  //mitk::ImageDataItem::Pointer m_ImageDataItem;
+  mitk::ImageWriteAccessor* m_imageAccess;
 };
 
 } // end namespace itk

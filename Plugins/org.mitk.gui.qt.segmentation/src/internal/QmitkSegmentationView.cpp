@@ -403,7 +403,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
   // If more than one segmentation is selected the tools will be disabled.
 
   if (!m_Controls) return; // might happen on initialization (preferences loaded)
-  mitk::DataNode::Pointer referenceDataNew = mitk::DataNode::New();
+  mitk::DataNode::Pointer referenceDataNew;
   mitk::DataNode::Pointer workingData;
 
   bool workingNodeIsVisible (true);
@@ -441,7 +441,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
       bool isBinary(false);
 
       //Find topmost source or first source which is no binary image
-      while (referenceDataNew && this->GetDefaultDataStorage()->GetSources(referenceDataNew)->Size() != 0)
+      while (referenceDataNew.IsNotNull() && this->GetDefaultDataStorage()->GetSources(referenceDataNew)->Size() != 0)
       {
         referenceDataNew = this->GetDefaultDataStorage()->GetSources(referenceDataNew)->ElementAt(0);
 
@@ -478,12 +478,17 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
       node->SetVisibility((false));
     }
   }
+
   if(numberOfSelectedSegmentations == 1)
     SetToolManagerSelection(referenceDataNew, workingData);
 
   mitk::DataStorage::SetOfObjects::Pointer temp = mitk::DataStorage::SetOfObjects::New();
   temp->InsertElement(0,workingData);
   mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(temp);
+
+  
+  // Reinit current node
+  ForceDisplayPreferencesUponAllImages();
 
   // initialize the views to the bounding geometry
   /*mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
@@ -496,7 +501,9 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   bool isHelperObject(false);
   node->GetBoolProperty("helper object", isHelperObject);
   node->GetBoolProperty("binary", isSeg);
-  if(isSeg && !isHelperObject)
+
+  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+  if(isSeg && !isHelperObject && image)
   {
     mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
       , mitk::BoolProperty::New(true)));
@@ -523,6 +530,8 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
     node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
     m_WorkingDataObserverTags.erase(tempNode);
+
+    mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(image);
   }
 
   if((m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0) == node)||
@@ -1070,7 +1079,6 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
 
   if (!m_Controls) return; // might happen on initialization (preferences loaded)
   mitk::DataNode::Pointer referenceData = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
-  mitk::DataNode::Pointer workingData =   m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0);
 
   // 1.
   if (referenceData.IsNotNull())
@@ -1093,6 +1101,10 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
       if(!node->IsSelected() || (node->IsSelected() && !node->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))))
         node->SetVisibility((node == referenceData) || node->IsSelected() );
     }
+
+    // Reinit current node
+    mitk::RenderingManager::GetInstance()->InitializeViews(
+       referenceData->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
   }
 
   // 2.

@@ -73,15 +73,26 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 
 void UltrasoundSupport::DisplayImage()
 {
+ // m_Device->UpdateOutputData(0);
+ // mitk::USImage::Pointer image = m_Device->GetOutput();
+  
   m_Device->UpdateOutputData(0);
-  mitk::USImage::Pointer image = m_Device->GetOutput();
-  m_Node->SetData(image);
- // m_Image->Update();
+  m_Node->SetData(m_Device->GetOutput());
   this->RequestRenderWindowUpdate();
+  
+  m_FrameCounter ++;
+  if (m_FrameCounter == 10)
+  {
+    int nMilliseconds = m_Clock.restart();
+    float fps = 10000.0f / (nMilliseconds );
+    m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(fps) +" FPS");
+    m_FrameCounter = 0;
+  }
 }
 
 void UltrasoundSupport::OnClickedViewDevice()
 {
+  m_FrameCounter = 0;
   // We use the activity state of the timer to determine whether we are currently viewing images
   if ( ! m_Timer->isActive() ) // Activate Imaging
   {
@@ -90,9 +101,9 @@ void UltrasoundSupport::OnClickedViewDevice()
       m_Timer->stop();
       return;
     }
-    m_Device->UpdateOutputData(0);
-    m_Image = m_Device->GetOutput(0);
-    m_Node->SetData(m_Device->GetOutput(0));
+    //m_Device->UpdateOutputData(0);
+    m_Device->Update();
+    m_Node->SetData(m_Device->GetOutput());
     int interval = (1000 / m_Controls.m_FrameRate->value());
     m_Timer->setInterval(interval);
     m_Timer->start();

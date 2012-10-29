@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -48,6 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK includes (general)
 #include <itkVectorImage.h>
+#include <itkImageFileWriter.h>
 
 // Morphological Operations
 #include <itkBinaryBallStructuringElement.h>
@@ -58,7 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Smoothing
 #include <itkMedianImageFilter.h>
-#include <itkDiscreteGaussianImageFilter.h> 
+#include <itkDiscreteGaussianImageFilter.h>
 #include <itkTotalVariationDenoisingImageFilter.h>
 
 // Threshold
@@ -87,15 +88,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkAndImageFilter.h>
 #include <itkXorImageFilter.h>
 
+// Flip Image
+#include <itkFlipImageFilter.h>
+
 
 // Convenient Definitions
 typedef itk::Image<short, 3>                                                            ImageType;
+typedef itk::Image<unsigned char, 3>                                                    SegmentationImageType;
 typedef itk::Image<double, 3>                                                           FloatImageType;
 typedef itk::Image<itk::Vector<float,3>, 3>                                             VectorImageType;
 
 typedef itk::BinaryBallStructuringElement<ImageType::PixelType, 3>                      BallType;
 typedef itk::GrayscaleDilateImageFilter<ImageType, ImageType, BallType>                 DilationFilterType;
-typedef itk::GrayscaleErodeImageFilter<ImageType, ImageType, BallType>                  ErosionFilterType; 
+typedef itk::GrayscaleErodeImageFilter<ImageType, ImageType, BallType>                  ErosionFilterType;
 typedef itk::GrayscaleMorphologicalOpeningImageFilter<ImageType, ImageType, BallType>   OpeningFilterType;
 typedef itk::GrayscaleMorphologicalClosingImageFilter<ImageType, ImageType, BallType>   ClosingFilterType;
 
@@ -112,6 +117,7 @@ typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType >             
 typedef itk::SobelEdgeDetectionImageFilter< FloatImageType, FloatImageType >            SobelFilterType;
 
 typedef itk::ResampleImageFilter< ImageType, ImageType >                                ResampleImageFilterType;
+typedef itk::ResampleImageFilter< ImageType, ImageType >                                ResampleImageFilterType2;
 
 typedef itk::AddImageFilter< ImageType, ImageType, ImageType >                          AddFilterType;
 typedef itk::SubtractImageFilter< ImageType, ImageType, ImageType >                     SubtractFilterType;
@@ -121,6 +127,8 @@ typedef itk::DivideImageFilter< ImageType, ImageType, FloatImageType >          
 typedef itk::OrImageFilter< ImageType, ImageType >                                      OrImageFilterType;
 typedef itk::AndImageFilter< ImageType, ImageType >                                     AndImageFilterType;
 typedef itk::XorImageFilter< ImageType, ImageType >                                     XorImageFilterType;
+
+typedef itk::FlipImageFilter< ImageType >                                               FlipImageFilterType;
 
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
@@ -174,7 +182,7 @@ void QmitkBasicImageProcessing::CreateConnections()
     connect( (QObject*)(m_Controls->rBTwoImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
   }
 
-  m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, 
+  m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime,
     GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromBIP");
 }
 
@@ -201,6 +209,7 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat1->insertItem( THRESHOLD, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Threshold", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( INVERSION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Image Inversion", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( DOWNSAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Downsampling", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( FLIPPING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Flipping", 0, QApplication::UnicodeUTF8) ));
 
   this->m_Controls->cbWhat2->clear();
   this->m_Controls->cbWhat2->insertItem( TWOIMAGESNOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select on operation", 0, QApplication::UnicodeUTF8) ) );
@@ -208,6 +217,7 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat2->insertItem( ADD, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Add to Image 1:", 0, QApplication::UnicodeUTF8) ) );
   this->m_Controls->cbWhat2->insertItem( SUBTRACT, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Subtract from Image 1:", 0, QApplication::UnicodeUTF8) ) );
   this->m_Controls->cbWhat2->insertItem( MULTIPLY, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Multiply with Image 1:", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( RESAMPLE_TO, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Resample Image 1 to fit geometry:", 0, QApplication::UnicodeUTF8) ) );
   this->m_Controls->cbWhat2->insertItem( DIVIDE, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Divide Image 1 by:", 0, QApplication::UnicodeUTF8) ) );
   this->m_Controls->cbWhat2->insertItem( CATEGORY_BOOLEAN, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Boolean operations ---", 0, QApplication::UnicodeUTF8) ) );
   this->m_Controls->cbWhat2->insertItem( AND, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "AND", 0, QApplication::UnicodeUTF8) ) );
@@ -223,7 +233,7 @@ void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> 
   if (!nodes.empty())
   {
   // reset GUI
-  this->ResetOneImageOpPanel();
+//  this->ResetOneImageOpPanel();
   m_Controls->sliceNavigatorTime->setEnabled(false);
   m_Controls->leImage1->setText("Select an Image in Data Manager");
   m_Controls->tlWhat1->setEnabled(false);
@@ -239,7 +249,7 @@ void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> 
   mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
 
     //no image
-    if( tempImage.IsNull() || (tempImage->IsInitialized() == false) ) 
+    if( tempImage.IsNull() || (tempImage->IsInitialized() == false) )
     {
       m_Controls->leImage1->setText("Not an image.");
       return;
@@ -256,7 +266,7 @@ void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> 
     m_Controls->leImage1->setText(QString(m_SelectedImageNode->GetNode()->GetName().c_str()));
 
     // button coding
-    if ( tempImage->GetDimension() > 3 ) 
+    if ( tempImage->GetDimension() > 3 )
     {
       m_Controls->sliceNavigatorTime->setEnabled(true);
       m_Controls->tlTime->setEnabled(true);
@@ -334,7 +344,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
   // check which operation the user has selected and set parameters and GUI accordingly
   switch (action)
   {
-  case 2: 
+  case 2:
     {
       m_SelectedAction = GAUSSIAN;
       m_Controls->tlParam1->setEnabled(true);
@@ -377,7 +387,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       break;
     }
 
-  case 6: 
+  case 6:
     {
       m_SelectedAction = DILATION;
       m_Controls->tlParam1->setEnabled(true);
@@ -389,7 +399,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       break;
     }
 
-  case 7: 
+  case 7:
     {
       m_SelectedAction = EROSION;
       m_Controls->tlParam1->setEnabled(true);
@@ -401,7 +411,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       break;
     }
 
-  case 8: 
+  case 8:
     {
       m_SelectedAction = OPENING;
       m_Controls->tlParam1->setEnabled(true);
@@ -434,7 +444,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->setMinimum( 0 );
       m_Controls->sbParam1->setMaximum( 200 );
       m_Controls->sbParam1->setValue( 2 );
-      break; 
+      break;
     }
 
   case 12:
@@ -449,7 +459,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       break;
     }
 
-  case 15: 
+  case 15:
     {
       m_SelectedAction = THRESHOLD;
       m_Controls->tlParam1->setEnabled(true);
@@ -467,7 +477,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       break;
     }
 
-  case 16: 
+  case 16:
     {
       m_SelectedAction = INVERSION;
       break;
@@ -485,6 +495,18 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       break;
     }
 
+  case 18:
+    {
+      m_SelectedAction = FLIPPING;
+      m_Controls->tlParam1->setEnabled(true);
+      m_Controls->sbParam1->setEnabled(true);
+      text1 = "Flip across axis:";
+      m_Controls->sbParam1->setMinimum( 0 );
+      m_Controls->sbParam1->setMaximum( 2 );
+      m_Controls->sbParam1->setValue( 1 );
+      break;
+    }
+
   default: return;
   }
 
@@ -496,14 +518,14 @@ void QmitkBasicImageProcessing::SelectAction(int action)
   m_Controls->cbHideOrig->setEnabled(true);
 }
 
-void QmitkBasicImageProcessing::StartButtonClicked() 
+void QmitkBasicImageProcessing::StartButtonClicked()
 {
   if(!m_SelectedImageNode->GetNode()) return;
 
   this->BusyCursorOn();
 
   mitk::Image::Pointer newImage;
-  
+
   try
   {
     newImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
@@ -516,16 +538,16 @@ void QmitkBasicImageProcessing::StartButtonClicked()
     this->BusyCursorOff();
     return;
   }
-  
+
   // check if input image is valid, casting does not throw exception when casting from 'NULL-Object'
-  if ( (! newImage) || (newImage->IsInitialized() == false) ) 
+  if ( (! newImage) || (newImage->IsInitialized() == false) )
   {
     this->BusyCursorOff();
-   
+
     QMessageBox::warning( NULL, "Basic Image Processing", "Input image is broken or not initialized. Returning.", QMessageBox::Ok, QMessageBox::NoButton );
     return;
   }
-  
+
   // check if operation is done on 4D a image time step
   if(newImage->GetDimension() > 3)
   {
@@ -784,6 +806,29 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       break;
     }
 
+  case FLIPPING:
+    {
+      FlipImageFilterType::Pointer flipper = FlipImageFilterType::New();
+      flipper->SetInput( itkImage );
+      itk::FixedArray<bool, 3> flipAxes;
+      for(int i=0; i<3; ++i)
+      {
+        if(i == param1)
+        {
+          flipAxes[i] = true;
+        }
+        else
+        {
+          flipAxes[i] = false;
+        }
+      }
+      flipper->SetFlipAxes(flipAxes);
+      flipper->UpdateLargestPossibleRegion();
+      newImage = mitk::ImportItkImage(flipper->GetOutput());
+      std::cout << "Image flipping successful." << std::endl;
+      break;
+    }
+
   default:
     this->BusyCursorOff();
     return;
@@ -798,13 +843,13 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   newImage->DisconnectPipeline();
 
-  // adjust level/window to new image 
+  // adjust level/window to new image
   mitk::LevelWindow levelwindow;
   levelwindow.SetAuto( newImage );
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   levWinProp->SetLevelWindow( levelwindow );
 
-  // compose new image name 
+  // compose new image name
   std::string name = m_SelectedImageNode->GetNode()->GetName();
   if (name.find(".pic.gz") == name.size() -7 )
   {
@@ -821,13 +866,13 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   // for vector images, a different mapper is needed
   if(isVectorImage > 1)
   {
-    mitk::VectorImageMapper2D::Pointer mapper = 
+    mitk::VectorImageMapper2D::Pointer mapper =
       mitk::VectorImageMapper2D::New();
     result->SetMapper(1,mapper);
   }
 
   // reset GUI to ease further processing
-  this->ResetOneImageOpPanel();
+//  this->ResetOneImageOpPanel();
 
   // add new image to data storage and set as active to ease further processing
   GetDefaultDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
@@ -854,20 +899,23 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
   case 4:
     m_SelectedOperation = MULTIPLY;
     break;
-  case 5: 
+  case 5:
     m_SelectedOperation = DIVIDE;
     break;
-  case 7: 
+  case 6:
+    m_SelectedOperation = RESAMPLE_TO;
+    break;
+  case 8:
     m_SelectedOperation = AND;
     break;
-  case 8: 
+  case 9:
     m_SelectedOperation = OR;
     break;
-  case 9: 
+  case 10:
     m_SelectedOperation = XOR;
     break;
-  default: 
-    this->ResetTwoImageOpPanel();
+  default:
+//    this->ResetTwoImageOpPanel();
     return;
   }
   m_Controls->tlImage2->setEnabled(true);
@@ -875,7 +923,7 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
   m_Controls->btnDoIt2->setEnabled(true);
 }
 
-void QmitkBasicImageProcessing::StartButton2Clicked() 
+void QmitkBasicImageProcessing::StartButton2Clicked()
 {
   mitk::Image::Pointer newImage1 = dynamic_cast<mitk::Image*>
     (m_SelectedImageNode->GetNode()->GetData());
@@ -883,14 +931,14 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
     (m_Controls->m_ImageSelector2->GetSelectedNode()->GetData());
 
   // check if images are valid
-  if( (!newImage1) || (!newImage2) || (newImage1->IsInitialized() == false) || (newImage2->IsInitialized() == false) ) 
+  if( (!newImage1) || (!newImage2) || (newImage1->IsInitialized() == false) || (newImage2->IsInitialized() == false) )
   {
     itkGenericExceptionMacro(<< "At least one of the input images are broken or not initialized. Returning");
     return;
   }
 
   this->BusyCursorOn();
-  this->ResetTwoImageOpPanel();
+//  this->ResetTwoImageOpPanel();
 
   // check if 4D image and use filter on correct time step
   int time = ((QmitkSliderNavigatorWidget*)m_Controls->sliceNavigatorTime)->GetPos();
@@ -912,7 +960,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   }
 
   // reset GUI for better usability
-  this->ResetTwoImageOpPanel();
+//  this->ResetTwoImageOpPanel();
 
   ImageType::Pointer itkImage1 = ImageType::New();
   ImageType::Pointer itkImage2 = ImageType::New();
@@ -1006,15 +1054,46 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       break;
     }
 
-  default: 
+  case RESAMPLE_TO:
+    {
+
+      itk::NearestNeighborInterpolateImageFunction<ImageType>::Pointer nn_interpolator
+        = itk::NearestNeighborInterpolateImageFunction<ImageType>::New();
+
+      ResampleImageFilterType2::Pointer resampleFilter = ResampleImageFilterType2::New();
+      resampleFilter->SetInput( itkImage1 );
+      resampleFilter->SetReferenceImage( itkImage2 );
+      resampleFilter->SetUseReferenceImage( true );
+      resampleFilter->SetInterpolator( nn_interpolator );
+      resampleFilter->SetDefaultPixelValue( 0 );
+
+      ImageType::Pointer resampledImage = resampleFilter->GetOutput();
+
+      try
+      {
+        resampleFilter->UpdateLargestPossibleRegion();
+      }
+      catch( const itk::ExceptionObject &e)
+      {
+        MITK_WARN << "Updating resampling filter failed. ";
+        MITK_WARN << "REASON: " << e.what();
+      }
+
+      newImage1 = mitk::ImportItkImage( resampledImage );
+      nameAddition = "_Resampled";
+      break;
+    }
+
+  default:
     std::cout << "Something went wrong..." << std::endl;
     this->BusyCursorOff();
     return;
   }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e )
   {
     this->BusyCursorOff();
+    QMessageBox::warning(NULL, "ITK Exception", e.what() );
     QMessageBox::warning(NULL, "Warning", "Problem when applying arithmetic operation to two images. Check dimensions of input images.");
     return;
   }
@@ -1036,7 +1115,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   }
 
   // create final result MITK data storage node
-  mitk::DataNode::Pointer result = mitk::DataNode::New();  
+  mitk::DataNode::Pointer result = mitk::DataNode::New();
   result->SetProperty( "levelwindow", levWinProp );
   result->SetProperty( "name", mitk::StringProperty::New( (name + nameAddition ).c_str() ));
   result->SetData( newImage1 );

@@ -92,10 +92,10 @@ void SlicesCoordinator::OnSliceControllerRemoved(SliceNavigationController*)
   // implement in subclasses
 }
 
-bool SlicesCoordinator::ExecuteAction(Action*, StateEvent const*)
+bool SlicesCoordinator::ExecuteAction(Action* a, StateEvent const* e)
 {
-  // implement in subclasses
-  return false;
+  // implement in subclasses, BUT call default implementation to make these CONNECT_ACTION statements work out
+  return Superclass::ExecuteAction(a,e);
 }
 
 } // namespace 

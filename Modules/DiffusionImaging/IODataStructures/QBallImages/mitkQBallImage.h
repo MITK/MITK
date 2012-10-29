@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "itkVectorImage.h"
+#include "mitkImageVtkAccessor.h"
 
 #include "MitkDiffusionImagingExports.h"
 
@@ -50,9 +51,9 @@ namespace mitk
     mitkClassMacro( QBallImage, Image );
     itkNewMacro(Self);
     
-    virtual vtkImageData* GetNonRgbVtkImageData(int t = 0, int n = 0);
+    virtual ImageVtkAccessor* GetNonRgbVtkImageData(int t = 0, int n = 0);
 
-    virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
+    virtual ImageVtkAccessor* GetVtkImageData(int t = 0, int n = 0);
 
     virtual void ConstructRgbImage();
 

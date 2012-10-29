@@ -235,6 +235,7 @@ namespace mitk
         this->m_CaptureHeight = infoImage->GetDimension(1);
         this->m_PixelNumber = this->m_CaptureWidth*this->m_CaptureHeight;
         this->m_NumberOfBytes = this->m_PixelNumber * sizeof(float);
+
         if (this->m_ToFImageType == ToFImageType2DPlusT)
         {
           this->m_NumOfFrames = infoImage->GetDimension(3);

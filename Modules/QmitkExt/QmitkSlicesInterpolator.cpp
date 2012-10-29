@@ -89,7 +89,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   grid->addWidget(m_BtnAccept3DInterpolation, 0,1);
 
   m_CbShowMarkers = new QCheckBox("Show Position Nodes", this);
-  m_CbShowMarkers->setChecked(true);
+  m_CbShowMarkers->setChecked(false);
   connect(m_CbShowMarkers, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
   connect(m_CbShowMarkers, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
   grid->addWidget(m_CbShowMarkers,0,2);
@@ -168,7 +168,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   // create a QFuture and a QFutureWatcher
 
   connect(&m_Watcher, SIGNAL(started()), this, SLOT(StartUpdateInterpolationTimer()));
-  connect(&m_Watcher, SIGNAL(finished()), this, SLOT(SurfaceInterpolationFinished()));
+  connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(StopUpdateInterpolationTimer()));
   m_Timer = new QTimer(this);
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(ChangeSurfaceColor()));
@@ -370,7 +370,8 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   }
   if (m_3DInterpolationEnabled)
   {
-    On3DInterpolationActivated( true);
+    //On3DInterpolationActivated( true);
+    SetCurrentContourListID();
   }
 }
 
@@ -534,7 +535,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
   }
 }
 
-void QmitkSlicesInterpolator::SurfaceInterpolationFinished()
+void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 {
   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
 
@@ -1019,7 +1020,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
 
     if (workingNode)
     {
-      int listID;
+      //int listID;
       bool isInterpolationResult(false);
       workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
 
@@ -1028,17 +1029,6 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
           !isInterpolationResult)
       {
         QWidget::setEnabled( true );
-        if (workingNode->GetIntProperty("3DInterpolationListID", listID))
-        {
-          m_SurfaceInterpolator->SetCurrentListID(listID);
-        }
-        else
-        {
-          listID = m_SurfaceInterpolator->CreateNewContourList();
-          workingNode->SetIntProperty("3DInterpolationListID", listID);
-          this->Show3DInterpolationResult(false);
-          m_BtnAccept3DInterpolation->setEnabled(false);
-        }
 
         mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( m_MultiWidget->GetRenderWindow3()->GetRenderer()->GetTimeStep() )->GetSpacing();
         double minSpacing (100);
@@ -1055,10 +1045,13 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
           }
         }
 
-        m_SurfaceInterpolator->SetWorkingImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
+        m_SurfaceInterpolator->SetSegmentationImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
         m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
         m_SurfaceInterpolator->SetMinSpacing(minSpacing);
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
+
+        m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(dynamic_cast<mitk::Image*>(workingNode->GetData()));
+
       }
     }
   }
@@ -1071,4 +1064,6 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
 
    if (m_3DContourNode.IsNotNull())
       m_3DContourNode->SetVisibility(status, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+
+   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

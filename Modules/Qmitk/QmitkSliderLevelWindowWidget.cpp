@@ -272,14 +272,14 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
     {
       setCursor(Qt::SizeVerCursor);
       m_UpperBound.setRect(m_Rect.topLeft().x(), m_Rect.topLeft().y() - 3, 17, 7);
-      QToolTip::showText(mouseEvent->globalPos(), "Ctrl + left click to change only upper bound", this, m_UpperBound);
+      this->setToolTip("Ctrl + left click to change only upper bound");
       m_Resize = true;
     }
     else if ( mouseEvent->pos().y() >= (m_Rect.bottomLeft().y() - 3) )
     {
       setCursor(Qt::SizeVerCursor);
       m_LowerBound.setRect(m_Rect.bottomLeft().x(), m_Rect.bottomLeft().y() - 3, 17, 7);
-      QToolTip::showText(mouseEvent->globalPos(), "Ctrl + left click to change only lower bound", this, m_LowerBound);
+      this->setToolTip("Ctrl + left click to change only lower bound");
       m_Resize = true;
       m_Bottom = true;
     }
@@ -364,33 +364,24 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
       }
       else
       {
-        float maxv = m_LevelWindow.GetRangeMax();
-        float minv = m_LevelWindow.GetRangeMin();
-        float wh = m_LevelWindow.GetWindow() / 2;
-  
-    float level = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
+        const float minv = m_LevelWindow.GetRangeMin();
 
-    double diff = (mouseEvent->pos().x()) / fact;
-    diff -= (m_StartPos.x()) / fact;
-    m_StartPos = mouseEvent->pos();
+        const float level = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
 
-    float window;
-    if (m_Bottom)
-      window = m_LevelWindow.GetWindow() + ( ( 2 * diff ) );
-    else
-      window = m_LevelWindow.GetWindow() - ( ( 2 * diff ) );
+        double diff = (mouseEvent->pos().x()) / fact;
+        diff -= (m_StartPos.x()) / fact;
+        m_StartPos = mouseEvent->pos();
 
-    if ( window < 0 )
-      window = 0;
+        float window;
+        if (m_Bottom)
+          window = m_LevelWindow.GetWindow() + ( ( 2 * diff ) );
+        else
+          window = m_LevelWindow.GetWindow() - ( ( 2 * diff ) );
 
-    if ( level - wh < minv )
-      m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMin() + wh, m_LevelWindow.GetWindow() );
+        if ( window < 0 )
+          window = 0;
 
-    else if ( level + wh > maxv )
-      m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMax() - wh, m_LevelWindow.GetWindow() );
-
-    else
-      m_LevelWindow.SetLevelWindow( level, window );
+        m_LevelWindow.SetLevelWindow( level, window );
       }
       m_Manager->SetLevelWindow(m_LevelWindow);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -505,6 +496,10 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
     contextMenu->addAction(tr("Show Scale"), this, SLOT(showScale()));
   contextMenu->addSeparator();
   m_Contextmenu->getContextMenu(contextMenu);
+
+  // Fix: Bug #13327 we need to reset the m_MouseDown value
+  // otherwise the cursor is not correctly restored afterwards
+  m_MouseDown = false;
 }
 
 void QmitkSliderLevelWindowWidget::hideScale()

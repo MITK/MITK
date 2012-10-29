@@ -110,7 +110,6 @@ void QmitkPreprocessingView::CreateConnections()
     {
         connect( (QObject*)(m_Controls->m_ButtonAverageGradients), SIGNAL(clicked()), this, SLOT(AverageGradients()) );
         connect( (QObject*)(m_Controls->m_ButtonExtractB0), SIGNAL(clicked()), this, SLOT(ExtractB0()) );
-        connect( (QObject*)(m_Controls->m_ButtonBrainMask), SIGNAL(clicked()), this, SLOT(BrainMask()) );
         connect( (QObject*)(m_Controls->m_ModifyMeasurementFrame), SIGNAL(clicked()), this, SLOT(DoApplyMesurementFrame()) );
         connect( (QObject*)(m_Controls->m_ReduceGradientsButton), SIGNAL(clicked()), this, SLOT(DoReduceGradientDirections()) );
         connect( (QObject*)(m_Controls->m_ShowGradientsButton), SIGNAL(clicked()), this, SLOT(DoShowGradientDirections()) );
@@ -140,7 +139,6 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
         }
     }
 
-    m_Controls->m_ButtonBrainMask->setEnabled(foundDwiVolume);
     m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);
     m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);
     m_Controls->m_CheckExtractAll->setEnabled(foundDwiVolume);
@@ -167,6 +165,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
 
     if (foundDwiVolume)
     {
+        m_Controls->m_InputData->setTitle("Input Data");
         vnl_matrix_fixed< double, 3, 3 > mf = m_DiffusionImage->GetMeasurementFrame();
         for (int r=0; r<3; r++)
             for (int c=0; c<3; c++)
@@ -235,7 +234,8 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
         m_Controls->m_BvalueTable->setHorizontalHeaderLabels(headerList);
         m_Controls->m_BvalueTable->setItem(0,0,new QTableWidgetItem("-"));
         m_Controls->m_BvalueTable->setItem(0,1,new QTableWidgetItem("-"));
-        m_Controls->m_DiffusionImageLabel->setText("-");
+        m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
+        m_Controls->m_InputData->setTitle("Please Select Input Data");
     }
 }
 
@@ -591,52 +591,6 @@ void QmitkPreprocessingView::AverageGradients()
                     (*itemiter)->GetData());
 
         vols->AverageRedundantGradients(m_Controls->m_Blur->value());
-
-        ++itemiter;
-    }
-}
-
-void QmitkPreprocessingView::BrainMask()
-{
-    int nrFiles = m_SelectedDiffusionNodes.size();
-    if (!nrFiles) return;
-
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
-
-    while ( itemiter != itemiterend ) // for all items
-    {
-
-        mitk::DiffusionImage<DiffusionPixelType>* vols =
-                static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
-                    (*itemiter)->GetData());
-
-        std::string nodename;
-        (*itemiter)->GetStringProperty("name", nodename);
-
-        // Extract image using found index
-        typedef itk::B0ImageExtractionImageFilter<short, short> FilterType;
-        FilterType::Pointer filter = FilterType::New();
-        filter->SetInput(vols->GetVectorImage());
-        filter->SetDirections(vols->GetDirections());
-
-        typedef itk::CastImageFilter<itk::Image<short,3>, itk::Image<unsigned short,3> > CastFilterType;
-        CastFilterType::Pointer castfilter = CastFilterType::New();
-        castfilter->SetInput(filter->GetOutput());
-
-        typedef itk::BrainMaskExtractionImageFilter<unsigned char> MaskFilterType;
-        MaskFilterType::Pointer maskfilter = MaskFilterType::New();
-        maskfilter->SetInput(castfilter->GetOutput());
-        maskfilter->Update();
-
-        mitk::Image::Pointer mitkImage = mitk::Image::New();
-        mitkImage->InitializeByItk( maskfilter->GetOutput() );
-        mitkImage->SetVolume( maskfilter->GetOutput()->GetBufferPointer() );
-        mitk::DataNode::Pointer node=mitk::DataNode::New();
-        node->SetData( mitkImage );
-        node->SetProperty( "name", mitk::StringProperty::New(nodename + "_Mask"));
-
-        GetDefaultDataStorage()->Add(node);
 
         ++itemiter;
     }

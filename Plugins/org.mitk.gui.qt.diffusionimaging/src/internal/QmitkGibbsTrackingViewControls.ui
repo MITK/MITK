@@ -25,66 +25,69 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="spacing">
-    <number>0</number>
-   </property>
-   <property name="leftMargin">
-    <number>9</number>
-   </property>
-   <property name="topMargin">
-    <number>3</number>
-   </property>
-   <property name="rightMargin">
-    <number>9</number>
-   </property>
-   <property name="bottomMargin">
-    <number>3</number>
-   </property>
-   <item>
-    <widget class="QGroupBox" name="m_DataFrame">
-     <property name="title">
-      <string>Data</string>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="1" column="0" colspan="2">
+    <widget class="QFrame" name="frame_4">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Q-Ball/Tensor Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="m_QballImageLabel">
-        <property name="toolTip">
-         <string>Mandatory input</string>
-        </property>
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_8">
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QCommandLinkButton" name="m_TrackingStart">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>No Q-Ball image selected.</string>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
         <property name="text">
-         <string>Mask Image:</string>
+         <string>Start Tractography</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
+          <normaloff>:/qmitk/play.xpm</normaloff>:/qmitk/play.xpm</iconset>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="m_MaskImageLabel">
+       <widget class="QCommandLinkButton" name="m_TrackingStop">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="toolTip">
-         <string>Optional input to limit the algorithms search space.</string>
+         <string/>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
         </property>
         <property name="text">
-         <string>-</string>
+         <string>Stop Tractography</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
+          <normaloff>:/qmitk/stop.xpm</normaloff>:/qmitk/stop.xpm</iconset>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0" colspan="2">
     <widget class="QGroupBox" name="m_ParametersFrame">
      <property name="title">
       <string>Parameters</string>
@@ -115,7 +118,7 @@
          <string>Specify number of iterations for the tracking algorithm.</string>
         </property>
         <property name="maximum">
-         <number>10</number>
+         <number>9</number>
         </property>
         <property name="value">
          <number>6</number>
@@ -228,7 +231,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0" colspan="2">
     <widget class="QFrame" name="m_AdvancedFrame">
      <property name="enabled">
       <bool>true</bool>
@@ -744,7 +747,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="4" column="0" colspan="2">
     <widget class="QFrame" name="frame_3">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -802,50 +805,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QCommandLinkButton" name="m_TrackingStart">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>No Q-Ball image selected.</string>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>Start Tractography</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
-          <normaloff>:/qmitk/play.xpm</normaloff>:/qmitk/play.xpm</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QCommandLinkButton" name="m_TrackingStop">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>Stop Tractography</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
-          <normaloff>:/qmitk/stop.xpm</normaloff>:/qmitk/stop.xpm</iconset>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="5" column="0">
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
       <string>Monitor</string>
@@ -1046,7 +1009,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="6" column="1">
     <spacer name="spacer1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -1062,7 +1025,7 @@
      </property>
     </spacer>
    </item>
-   <item>
+   <item row="7" column="0">
     <widget class="QLabel" name="m_CurvatureThresholdLabel_5">
      <property name="toolTip">
       <string/>
@@ -1076,6 +1039,49 @@
      <property name="text">
       <string>Reisert et al. NeuroImage 2011</string>
      </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="m_DataFrame">
+     <property name="title">
+      <string>Please Select Input Data</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Q-Ball/Tensor Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="m_QballImageLabel">
+        <property name="toolTip">
+         <string>Mandatory input</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Mask Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="m_MaskImageLabel">
+        <property name="toolTip">
+         <string>Optional input to limit the algorithms search space.</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

@@ -63,6 +63,12 @@ class mitkTOFUI_EXPORT QmitkKinectParameterWidget :public QWidget
     */
     void ActivateAllParameters();
 
+    bool IsAcquisitionModeRGB();
+    bool IsAcquisitionModeIR();
+
+    signals:
+      void AcquisitionModeChanged();
+
   protected slots:
     void OnAcquisitionModeChanged();
 

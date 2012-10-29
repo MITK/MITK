@@ -79,6 +79,7 @@ void QmitkToFConnectionWidget::CreateConnections()
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(OnSelectCamera(const QString)) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SLOT(OnSelectCamera(const QString)) );
     connect( m_Controls->m_SelectCameraCombobox, SIGNAL(activated(const QString)), this, SIGNAL(ToFCameraSelected(const QString)) );
+    connect( m_Controls->m_KinectParameterWidget, SIGNAL(AcquisitionModeChanged()), this, SIGNAL(KinectAcquisitionModeChanged()) );
   }
 }
 
@@ -131,6 +132,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
   if (m_Controls->m_ConnectCameraButton->text()=="Connect")
   {   
+    this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
     //reset the status of the GUI buttons
     m_Controls->m_ConnectCameraButton->setEnabled(false);
     m_Controls->m_SelectCameraCombobox->setEnabled(false);
@@ -169,6 +171,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     else if (selectedCamera == "Microsoft Kinect")
     {//KINECT
       this->m_ToFImageGrabber->SetCameraDevice(mitk::KinectDevice::New());
+      this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());
+      this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());
     }
     else if (selectedCamera == "PMD Player")
     {//PMD player

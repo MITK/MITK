@@ -138,9 +138,11 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     void AddGroup();
     void RemoveGroup();
 
-    void CopyToClipboard();
+    void CopyToClipboard();  
 
-    void CopyToClipboardIndividuals();
+    void Cut();
+
+    void PerformChange();
 
 
   protected:
@@ -151,7 +153,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
 
-    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img);
+    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
 
     void InitPointsets();
 
@@ -230,8 +232,9 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     std::string ReadFile(std::string whatfile);
 
-
     std::vector< itk::Index<3> > m_Roi;
+
+    mitk::FiberBundleX* m_Fib;
 
     std::string m_CurrentStructure;
 
@@ -248,6 +251,10 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     VectorImageType::Pointer ConvertToVectorImage(mitk::Image::Pointer mitkImg);
 
 
+    mitk::DataNode::Pointer m_CurrentFiberNode; // needed for the index property when interacting with the plot widget
+
+    mitk::DataNode::Pointer m_CurrentStartRoi; // needed when a plot should only show values between a start end end roi
+    mitk::DataNode::Pointer m_CurrentEndRoi; // idem dito
 
 
 };

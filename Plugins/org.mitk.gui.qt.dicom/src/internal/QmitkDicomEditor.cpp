@@ -58,6 +58,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
+const QString QmitkDicomEditor::TEMP_DICOM_FOLDER_SUFFIX="TmpDicomFolder";
 
 
 QmitkDicomEditor::QmitkDicomEditor()
@@ -70,13 +71,12 @@ QmitkDicomEditor::QmitkDicomEditor()
 
 QmitkDicomEditor::~QmitkDicomEditor()
 {
-    m_Thread->quit();
-    m_Thread->wait(1000);
+    m_Thread.quit();
+    m_Thread.wait(1000);
+    delete m_DicomDirectoryListener;
+    delete m_StoreSCPLauncher;
     delete m_Handler;
     delete m_Publisher;
-    delete m_StoreSCPLauncher;
-    delete m_Thread;
-    delete m_DicomDirectoryListener;
     delete m_ImportDialog;
 }
 
@@ -95,7 +95,7 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 
     SetPluginDirectory();
     SetDatabaseDirectory("DatabaseDirectory");
-    SetListenerDirectory("ListenerDirectory");
+    CreateTemporaryDirectory();
     StartDicomDirectoryListener();
 
     SetupImportDialog();
@@ -104,11 +104,11 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
     m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(false);
 
     connect(m_Controls.externalDataWidget,SIGNAL(SignalStartDicomImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
-    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(const QStringList&)),this,SLOT(OnViewButtonAddToDataManager(const QStringList&)));
+    connect(m_Controls.externalDataWidget,SIGNAL(SignalDicomToDataManager(QHash<QString,QVariant>)),this,SLOT(OnViewButtonAddToDataManager(QHash<QString,QVariant>)));
     connect(m_Controls.externalDataWidget,SIGNAL(SignalChangePage(int)), this, SLOT(OnChangePage(int)));
 
     connect(m_Controls.internalDataWidget,SIGNAL(SignalFinishedImport()),this,SLOT(OnDicomImportFinished()));
-    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(const QStringList&)),this,SLOT(OnViewButtonAddToDataManager(const QStringList&)));
+    connect(m_Controls.internalDataWidget,SIGNAL(SignalDicomToDataManager(QHash<QString,QVariant>)),this,SLOT(OnViewButtonAddToDataManager(QHash<QString,QVariant>)));
 
     connect(m_Controls.CDButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
     connect(m_Controls.FolderButton, SIGNAL(clicked()), this, SLOT(OnFolderCDImport()));
@@ -239,13 +239,14 @@ void QmitkDicomEditor::OnDicomImportFinished()
 
 void QmitkDicomEditor::StartDicomDirectoryListener()
 {
-    if(!m_Thread->isRunning())
+    if(!m_Thread.isRunning())
     {
-        m_DicomDirectoryListener->SetDicomListenerDirectory(m_ListenerDirectory);
+        m_DicomDirectoryListener->SetDicomListenerDirectory(m_TempDirectory);
+        m_DicomDirectoryListener->SetDicomFolderSuffix(TEMP_DICOM_FOLDER_SUFFIX);
         connect(m_DicomDirectoryListener,SIGNAL(SignalStartDicomImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)),Qt::DirectConnection);
         //connect(m_Controls.internalDataWidget,SIGNAL(SignalFinishedImport()),m_DicomDirectoryListener,SLOT(OnImportFinished()),Qt::DirectConnection);
-        m_DicomDirectoryListener->moveToThread(m_Thread);
-        m_Thread->start();
+        m_DicomDirectoryListener->moveToThread(&m_Thread);
+        m_Thread.start();
     }
 }
 
@@ -256,15 +257,15 @@ void QmitkDicomEditor::TestHandler()
     m_Handler->SubscribeSlots();
 }
 
-void QmitkDicomEditor::OnViewButtonAddToDataManager(const QStringList& eventProperties)
+void QmitkDicomEditor::OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties)
 {
     ctkDictionary properties;
-    properties["PatientName"] = eventProperties.at(0);
-    properties["StudyUID"] = eventProperties.at(1);
-    properties["StudyName"] = eventProperties.at(2);
-    properties["SeriesUID"] = eventProperties.at(3);
-    properties["SeriesName"] = eventProperties.at(4);
-    properties["Path"] = eventProperties.at(5);
+    properties["PatientName"] = eventProperties["PatientName"];
+    properties["StudyUID"] = eventProperties["StudyUID"];
+    properties["StudyName"] = eventProperties["StudyName"];
+    properties["SeriesUID"] = eventProperties["SeriesUID"];
+    properties["SeriesName"] = eventProperties["SeriesName"];
+    properties["FilesForSeries"] = eventProperties["FilesForSeries"];
 
     m_Publisher->PublishSignals(mitk::PluginActivator::getContext());
     m_Publisher->AddSeriesToDataManagerEvent(properties);
@@ -275,7 +276,7 @@ void QmitkDicomEditor::StartStoreSCP()
 {
     QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
     QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
-    m_Builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_ListenerDirectory);
+    m_Builder.AddPort(storagePort)->AddAETitle(storageAET)->AddTransferSyntax()->AddOtherNetworkOptions()->AddMode()->AddOutputDirectory(m_TempDirectory);
     m_StoreSCPLauncher = new QmitkStoreSCPLauncher(&m_Builder);
     connect(m_StoreSCPLauncher, SIGNAL(SignalStatusOfStoreSCP(const QString&)), this, SLOT(OnStoreSCPStatusChanged(const QString&)));
     connect(m_StoreSCPLauncher ,SIGNAL(SignalStartImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)));
@@ -315,9 +316,17 @@ void QmitkDicomEditor::SetDatabaseDirectory(const QString& databaseDirectory)
     m_Controls.internalDataWidget->SetDatabaseDirectory(m_DatabaseDirectory);
 }
 
-void QmitkDicomEditor::SetListenerDirectory(const QString& listenerDirectory)
+void QmitkDicomEditor::CreateTemporaryDirectory()
 {
-    m_ListenerDirectory.clear();
-    m_ListenerDirectory.append(m_PluginDirectory);
-    m_ListenerDirectory.append(listenerDirectory);
+    QDir tmp;
+    QString tmpPath = QDir::tempPath();
+    m_TempDirectory.clear();
+    m_TempDirectory.append(tmpPath);
+    m_TempDirectory.append(QString("/"));
+    m_TempDirectory.append(TEMP_DICOM_FOLDER_SUFFIX);
+    m_TempDirectory.append(QString("."));
+    m_TempDirectory.append(QTime::currentTime().toString("hhmmsszzz"));
+    m_TempDirectory.append(QString::number(QCoreApplication::applicationPid()));
+    tmp.mkdir(QDir::toNativeSeparators( m_TempDirectory ));
+
 }

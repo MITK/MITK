@@ -73,6 +73,7 @@ set(MODULE_IMAGE_TESTS
   # mitkVtkPropRendererTest.cpp
   mitkDataNodeFactoryTest.cpp
   #mitkSTLFileReaderTest.cpp
+  mitkImageAccessorTest.cpp
 )
 
 # list of images for which the tests are run
@@ -104,6 +105,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DOpacityTest.cpp
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
+    mitkIOUtilTest.cpp
 )
 
 # Create an artificial module initializing class for

@@ -422,7 +422,30 @@ bool mitk::PlanarFigureInteractor
       // We only need to check which position to insert the control point 
       // when interacting with a PlanarPolygon. For all other types
       // new control points will always be appended
-      if ( dynamic_cast<mitk::PlanarPolygon*>( planarFigure ) )
+
+      /*
+       * Added check for "initiallyplaced" due to bug 13097:
+       *
+       * There are two possible cases in which a point can be inserted into a PlanarPolygon:
+       *
+       * 1. The figure is currently drawn -> the point will be appended at the end of the figure
+       * 2. A point is inserted at a userdefined position after the initial placement of the figure is finished
+       *
+       * In the second case we need to determine the proper insertion index. In the first case the index always has
+       * to be -1 so that the point is appended to the end.
+       *
+       * These changes are neccessary because of a mac os x specific issue: If a users draws a PlanarPolygon then the
+       * next point to be added moves according to the mouse position. If then the user left clicks in order to add
+       * a point one would assume the last move position is identical to the left click position. This is actually the
+       * case for windows and linux but somehow NOT for mac. Because of the insertion logic of a new point in the
+       * PlanarFigure then for mac the wrong current selected point is determined.
+       *
+       * With this check here this problem can be avoided. However a redesign of the insertion logic should be considered
+       */
+      bool isFigureFinished = false;
+      planarFigure->GetPropertyList()->GetBoolProperty( "initiallyplaced", isFigureFinished );
+
+      if ( dynamic_cast<mitk::PlanarPolygon*>( planarFigure ) && isFigureFinished)
       {
         nextIndex = this->IsPositionOverFigure(
           stateEvent, planarFigure,

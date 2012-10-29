@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,14 +29,14 @@ void QmitkDIAppIVIMPerspective::CreateInitialLayout(berry::IPageLayout::Pointer 
     false, berry::IPageLayout::LEFT, 0.3f, editorArea);
 
   layout->AddStandaloneView("org.mitk.views.controlvisualizationpropertiesview",
-    false, berry::IPageLayout::BOTTOM, .2f, "org.mitk.views.datamanager");
+    false, berry::IPageLayout::BOTTOM, .15f, "org.mitk.views.datamanager");
 
   berry::IFolderLayout::Pointer left =
     layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
-    berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
+    berry::IPageLayout::BOTTOM, 0.1f, "org.mitk.views.controlvisualizationpropertiesview");
 
-  layout->AddStandaloneView("org.mitk.views.imagenavigator",
-    false, berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols");
+  layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
+    berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols", false);
 
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
@@ -44,5 +44,9 @@ void QmitkDIAppIVIMPerspective::CreateInitialLayout(berry::IPageLayout::Pointer 
 
   left->AddView("org.mitk.views.ivim");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.ivim");
+  lo->SetCloseable(false);
+
+  left->AddView("org.mitk.views.segmentation");
+  lo = layout->GetViewLayout("org.mitk.views.segmentation");
   lo->SetCloseable(false);
 }

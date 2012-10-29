@@ -143,6 +143,8 @@ protected:
     void ComputeODFSHBasis();
     bool CheckDuplicateDiffusionGradients();
     bool CheckForDifferingShellDirections();
+    IndiciesVector GetAllDirections();
+
     void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, int Lorder , vnl_matrix<double>* LaplaciaBaltramiOutput =0 , vnl_vector<int>* SHOrderAssociation =0 , vnl_matrix<double> * SHEigenvalues =0);
     //void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
     //bool CheckHemisphericalArrangementOfGradientDirections();
@@ -170,7 +172,9 @@ private:
     CoefficientMatrixType m_Interpolation_SHT1_inv;
     CoefficientMatrixType m_Interpolation_SHT2_inv;
     CoefficientMatrixType m_Interpolation_SHT3_inv;
-    CoefficientMatrixType m_Interpolation_TARGET_SH;
+    CoefficientMatrixType m_TARGET_SH_shell1;
+    CoefficientMatrixType m_TARGET_SH_shell2;
+    CoefficientMatrixType m_TARGET_SH_shell3;
     int m_MaxDirections;
 
     //CoefficientMatrixType m_ReconstructionMatrix;

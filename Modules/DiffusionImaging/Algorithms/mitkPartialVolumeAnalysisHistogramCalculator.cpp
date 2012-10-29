@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -205,7 +205,7 @@ namespace mitk
   bool PartialVolumeAnalysisHistogramCalculator::ComputeStatistics()
   {
 
-    MITK_INFO << "ComputeStatistics() start";
+    MITK_DEBUG << "ComputeStatistics() start";
 
     if ( m_Image.IsNull() )
     {
@@ -214,7 +214,7 @@ namespace mitk
 
     if ( m_Image->GetReferenceCount() == 1 )
     {
-      MITK_INFO << "No Stats calculated; no one else holds a reference on it";
+      MITK_DEBUG << "No Stats calculated; no one else holds a reference on it";
       return false;
     }
 
@@ -240,7 +240,7 @@ namespace mitk
         && ((m_MaskingMode != MASKING_MODE_IMAGE) || (m_ImageMask.IsNotNull() && maskedImageMTime > m_ImageMask->GetMTime() && !maskedImageStatisticsCalculationTrigger))
         && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (m_PlanarFigure.IsNotNull() && planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) ) ) )
     {
-      MITK_INFO << "Returning, statistics already up to date!";
+      MITK_DEBUG << "Returning, statistics already up to date!";
       if ( m_MaskingModeChanged )
       {
         m_MaskingModeChanged = false;
@@ -399,7 +399,7 @@ namespace mitk
   void PartialVolumeAnalysisHistogramCalculator::ExtractImageAndMask( )
   {
 
-    MITK_INFO << "ExtractImageAndMask( ) start";
+    MITK_DEBUG << "ExtractImageAndMask( ) start";
 
     if ( m_Image.IsNull() )
     {
@@ -565,7 +565,7 @@ namespace mitk
     m_InternalMask3D  =
         maskSO->GetAxisAlignedBoundingBoxRegion();
 
-    MITK_INFO << "Bounding Box Region: " << m_InternalMask3D;
+    MITK_DEBUG << "Bounding Box Region: " << m_InternalMask3D;
 
     typedef itk::RegionOfInterestImageFilter< ImageType, MaskImage3DType > ROIFilterType;
     ROIFilterType::Pointer roi = ROIFilterType::New();
@@ -575,7 +575,7 @@ namespace mitk
 
     m_InternalImageMask3D = roi->GetOutput();
 
-    MITK_INFO << "Created m_InternalImageMask3D";
+    MITK_DEBUG << "Created m_InternalImageMask3D";
 
   }
 
@@ -586,7 +586,7 @@ namespace mitk
           mitk::Geometry3D* imggeo, mitk::Geometry3D* planegeo3D, int additionalIndex )
   {
 
-    MITK_INFO << "InternalReorientImagePlane() start";
+    MITK_DEBUG << "InternalReorientImagePlane() start";
 
     typedef itk::Image< TPixel, VImageDimension > ImageType;
     typedef itk::Image< float, VImageDimension > FloatImageType;
@@ -615,7 +615,7 @@ namespace mitk
     size[0] = planegeo->GetParametricExtentInMM(0) / spacing[0];
     size[1] = planegeo->GetParametricExtentInMM(1) / spacing[1];
     size[2] = 1+2*m_PlanarFigureThickness; // klaus add +2*m_PlanarFigureThickness
-    MITK_INFO << "setting size2:="<<size[2] << " (before " << 1 << ")";
+    MITK_DEBUG << "setting size2:="<<size[2] << " (before " << 1 << ")";
     resampler->SetSize( size );
 
     // Origin
@@ -690,9 +690,9 @@ namespace mitk
     resampler->SetInput( image );
     resampler->SetDefaultPixelValue(0);
 
-    MITK_INFO << "Resampling requested image plane ... ";
+    MITK_DEBUG << "Resampling requested image plane ... ";
     resampler->Update();
-    MITK_INFO << " ... done";
+    MITK_DEBUG << " ... done";
 
     if(additionalIndex < 0)
     {
@@ -844,7 +844,7 @@ namespace mitk
           Statistics &statistics,
           typename HistogramType::ConstPointer *histogram )
   {
-    MITK_INFO << "InternalCalculateStatisticsUnmasked()";
+    MITK_DEBUG << "InternalCalculateStatisticsUnmasked()";
 
     typedef itk::Image< TPixel, VImageDimension > ImageType;
     typedef itk::Image< unsigned char, VImageDimension > MaskImageType;
@@ -911,7 +911,7 @@ namespace mitk
           Statistics &statistics,
           typename HistogramType::ConstPointer *histogram )
   {
-    MITK_INFO << "InternalCalculateStatisticsMasked() start";
+    MITK_DEBUG << "InternalCalculateStatisticsMasked() start";
 
     typedef itk::Image< TPixel, VImageDimension > ImageType;
     typedef itk::Image< unsigned char, VImageDimension > MaskImageType;
@@ -987,7 +987,7 @@ namespace mitk
           itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
   {
 
-    MITK_INFO << "InternalCalculateMaskFromPlanarFigure() start";
+    MITK_DEBUG << "InternalCalculateMaskFromPlanarFigure() start";
 
     typedef itk::Image< TPixel, VImageDimension > ImageType;
     typedef itk::CastImageFilter< ImageType, MaskImage3DType > CastFilterType;

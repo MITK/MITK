@@ -780,9 +780,6 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 
     connect((QObject*) m_Controls->m_LineWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(LineWidthChanged(int)));
     connect((QObject*) m_Controls->m_TubeRadius, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(TubeRadiusChanged(int)));
-
-    connect((QObject*) m_Controls->m_Welcome, SIGNAL(clicked()), (QObject*) this, SLOT(Welcome()));
-
   }
 }
 
@@ -846,12 +843,6 @@ void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *no
  implement SelectionService Listener explicitly */
 void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-  if ( !this->IsVisible() )
-  {
-    // do nothing if nobody wants to see me :-(
-    return;
-  }
-
   // deactivate channel slider if no diffusion weighted image or tbss image is selected
   m_Controls->m_DisplayIndex->setVisible(false);
   m_Controls->label_channel->setVisible(false);

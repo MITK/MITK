@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -145,19 +145,6 @@ namespace mitk
       {
         int sz = xVals.size();
         int incr = (int)((1.0*sz)/(1.0*nr));
-        MITK_INFO << "HISTOGRAM" << std::endl;
-        MITK_INFO << "xVals: ";
-        for(int i=0; i<sz; i = i+incr)
-        {
-          std::cout << xVals(i) << " ";
-        }
-        MITK_INFO << std::endl;
-        MITK_INFO << "hVals: ";
-        for(int i=0; i<sz; i = i+incr)
-        {
-          std::cout << hVals(i) << " ";
-        }
-        MITK_INFO << std::endl;
       }
 
       VecType xVals;
@@ -190,10 +177,10 @@ namespace mitk
 //      ClusterResultType operator= (const ClusterResultType *p)
 //      {
 
-//        MITK_INFO << "AOJHIFAHFOF";
+//        MITK_DEBUG << "AOJHIFAHFOF";
 //        if (this != &p) // protect against invalid self-assignment
 //        {
-//          MITK_INFO << "HRRRHRHRR";
+//          MITK_DEBUG << "HRRRHRHRR";
 //          this->vals.clear();
 //          this->mixedVals.clear();
 
@@ -318,29 +305,29 @@ namespace mitk
       }
 
 
-      void Print(VecType vec, int nr=10)
-      {
-        int sz = vec.size();
-        int incr = (int)((1.0*sz)/(1.0*nr));
-        for(int i=0; i<sz; i = i+incr)
-        {
-          std::cout << vec(i) << " ";
-        }
-        std::cout << std::endl;
-      }
+//      void Print(VecType vec, int nr=10)
+//      {
+//        int sz = vec.size();
+//        int incr = (int)((1.0*sz)/(1.0*nr));
+//        for(int i=0; i<sz; i = i+incr)
+//        {
+//          std::cout << vec(i) << " ";
+//        }
+//        std::cout << std::endl;
+//      }
 
-      void Print(int nr=10)
-      {
-        MITK_INFO << "CURVES" << std::endl;
-        MITK_INFO << "Fiber Vals: ";
-        Print(vals[0],nr);
-        MITK_INFO << "Non-Fiber Vals: ";
-        Print(vals[1],nr);
-        MITK_INFO << "Mixed Vals: ";
-        Print(mixedVals[0],nr);
-        MITK_INFO << "Combined Vals: ";
-        Print(combiVals,nr);
-      }
+//      void Print(int nr=10)
+//      {
+//        MITK_DEBUG << "CURVES" << std::endl;
+//        MITK_DEBUG << "Fiber Vals: ";
+//        Print(vals[0],nr);
+//        MITK_DEBUG << "Non-Fiber Vals: ";
+//        Print(vals[1],nr);
+//        MITK_DEBUG << "Mixed Vals: ";
+//        Print(mixedVals[0],nr);
+//        MITK_DEBUG << "Combined Vals: ";
+//        Print(combiVals,nr);
+//      }
 
       std::vector<VecType> vals;
       std::vector<VecType> mixedVals;
@@ -372,13 +359,13 @@ namespace mitk
         }
       }
 
-      void Print()
-      {
-        MITK_INFO << "PARAMS" << std::endl;
-        MITK_INFO << "Class 1:     " << means[0] << " +- " << sqrt(sigmas[0]) << " (p=" << ps[0] << ")" << std::endl;
-        MITK_INFO << "Class 2:     " << means[1] << " +- " << sqrt(sigmas[1]) << " (p=" << ps[1] << ")" << std::endl;
-        MITK_INFO << "Partial V: p=" << 1.0-ps[0]-ps[1] << std::endl;
-      }
+//      void Print()
+//      {
+//        MITK_DEBUG << "PARAMS" << std::endl;
+//        MITK_DEBUG << "Class 1:     " << means[0] << " +- " << sqrt(sigmas[0]) << " (p=" << ps[0] << ")" << std::endl;
+//        MITK_DEBUG << "Class 2:     " << means[1] << " +- " << sqrt(sigmas[1]) << " (p=" << ps[1] << ")" << std::endl;
+//        MITK_DEBUG << "Partial V: p=" << 1.0-ps[0]-ps[1] << std::endl;
+//      }
 
       double means[2];
       double sigmas[2];
@@ -487,7 +474,7 @@ namespace mitk
     template < typename TPixel, unsigned int VImageDimension >
         void InternalQuantify(
             const itk::Image< TPixel, VImageDimension > *image,
-            mitk::Image::ConstPointer clusteredImage, double* retval, mitk::Image::Pointer mask ) const;
+            mitk::Image::Pointer clusteredImage, double* retval, mitk::Image::Pointer mask ) const;
 
     template < typename TPixel, unsigned int VImageDimension >
         void InternalGenerateQuantileImage(

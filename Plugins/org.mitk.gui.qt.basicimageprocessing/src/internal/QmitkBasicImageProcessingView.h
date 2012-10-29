@@ -147,7 +147,7 @@ private:
     NOACTIONSELECTED,
     CATEGORY_DENOISING,
     GAUSSIAN,
-    MEDIAN,	
+    MEDIAN,
     TOTALVARIATION,
     CATEGORY_MORPHOLOGICAL,
     DILATION,
@@ -162,6 +162,7 @@ private:
     THRESHOLD,
     INVERSION,
     DOWNSAMPLING,
+    FLIPPING
   } m_SelectedAction; 
 
   enum OperationType{
@@ -171,6 +172,7 @@ private:
     SUBTRACT,
     MULTIPLY,
     DIVIDE,
+    RESAMPLE_TO,
     CATEGORY_BOOLEAN,
     AND,
     OR,

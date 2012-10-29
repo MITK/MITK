@@ -108,6 +108,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     }
 }
 
+
 void QmitkFiberProcessingView::Extract3d()
 {
     std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
@@ -329,7 +330,7 @@ void QmitkFiberProcessingView::InternalReorientImagePlane(
         const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* planegeo3D, int additionalIndex )
 {
 
-    MITK_INFO << "InternalReorientImagePlane() start";
+    MITK_DEBUG << "InternalReorientImagePlane() start";
 
     typedef itk::Image< TPixel, VImageDimension > ImageType;
     typedef itk::Image< float, VImageDimension > FloatImageType;
@@ -423,9 +424,9 @@ void QmitkFiberProcessingView::InternalReorientImagePlane(
     resampler->SetInput( image );
     resampler->SetDefaultPixelValue(0);
 
-    MITK_INFO << "Resampling requested image plane ... ";
+    MITK_DEBUG << "Resampling requested image plane ... ";
     resampler->Update();
-    MITK_INFO << " ... done";
+    MITK_DEBUG << " ... done";
 
     if(additionalIndex < 0)
     {
@@ -440,7 +441,7 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure(
         itk::Image< TPixel, VImageDimension > *image, unsigned int axis, std::string nodeName )
 {
 
-    MITK_INFO << "InternalCalculateMaskFromPlanarFigure() start";
+    MITK_DEBUG << "InternalCalculateMaskFromPlanarFigure() start";
 
     typedef itk::Image< TPixel, VImageDimension > ImageType;
     typedef itk::CastImageFilter< ImageType, itkUCharImageType > CastFilterType;
@@ -738,6 +739,8 @@ void QmitkFiberProcessingView::UpdateGui()
     // are fiber bundles selected?
     if ( m_SelectedFB.empty() )
     {
+        m_Controls->m_InputData->setTitle("Please Select Input Data");
+
         m_Controls->m_JoinBundles->setEnabled(false);
         m_Controls->m_SubstractBundles->setEnabled(false);
         m_Controls->m_ProcessFiberBundleButton->setEnabled(false);
@@ -756,6 +759,8 @@ void QmitkFiberProcessingView::UpdateGui()
     }
     else
     {
+        m_Controls->m_InputData->setTitle("Input Data");
+
         m_Controls->m_PlanarFigureButtonsFrame->setEnabled(true);
         m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
         m_Controls->m_ResampleFibersButton->setEnabled(true);
@@ -768,7 +773,9 @@ void QmitkFiberProcessingView::UpdateGui()
 
         // one bundle and one planar figure needed to extract fibers
         if (!m_SelectedPF.empty())
+        {
             m_Controls->doExtractFibersButton->setEnabled(true);
+        }
 
         // more than two bundles needed to join/subtract
         if (m_SelectedFB.size() > 1)
@@ -819,26 +826,35 @@ void QmitkFiberProcessingView::UpdateGui()
 
 void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-    if ( !this->IsVisible() )
-        return;
-
     //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
     m_SelectedFB.clear();
     m_SelectedPF.clear();
     m_Surfaces.clear();
     m_SelectedImage = NULL;
 
+    m_Controls->m_FibLabel->setText("<font color='red'>mandatory</font>");
+    m_Controls->m_PfLabel->setText("<font color='grey'>needed for extraction</font>");
+
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
     {
         mitk::DataNode::Pointer node = *it;
         if ( dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
+        {
+            m_Controls->m_FibLabel->setText(node->GetName().c_str());
             m_SelectedFB.push_back(node);
+        }
         else if (dynamic_cast<mitk::PlanarFigure*>(node->GetData()))
+        {
+            m_Controls->m_PfLabel->setText(node->GetName().c_str());
             m_SelectedPF.push_back(node);
+        }
         else if (dynamic_cast<mitk::Image*>(node->GetData()))
             m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
         else if (dynamic_cast<mitk::Surface*>(node->GetData()))
+        {
+            m_Controls->m_PfLabel->setText(node->GetName().c_str());
             m_Surfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
+        }
     }
     UpdateGui();
     GenerateStats();
@@ -854,7 +870,7 @@ void QmitkFiberProcessingView::OnDrawPolygon()
     figure->ClosedOn();
     this->AddFigureToDataStorage(figure, QString("Polygon%1").arg(++m_PolygonCounter));
 
-    MITK_INFO << "PlanarPolygon created ...";
+    MITK_DEBUG << "PlanarPolygon created ...";
 
     mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
     mitk::DataNode* node = 0;
@@ -888,10 +904,11 @@ void QmitkFiberProcessingView::OnDrawCircle()
     //  return;
 
     mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+
     this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_EllipseCounter));
 
     this->GetDataStorage()->Modified();
-    MITK_INFO << "PlanarCircle created ...";
+    MITK_DEBUG << "PlanarCircle created ...";
 
     //call
 
@@ -1137,15 +1154,15 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
                 // without having its parent anymore
                 //GetDataStorage()->Remove(savedPFchildNode);
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
 
                 }else{
-                    MITK_INFO << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
+                    MITK_DEBUG << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
                 }
                 // remove old child position in dataStorage
                 GetDataStorage()->Remove(savedPFchildNode);
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " still exists";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " still exists";
                 }
             }
             else
@@ -1163,22 +1180,22 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
 
 
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
 
                 }
                 else
                 {
-                    MITK_INFO << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
+                    MITK_DEBUG << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
                 }
                 // remove old child position in dataStorage
                 GetDataStorage()->Remove(savedPFchildNode);
 
                 if ( GetDataStorage()->Exists(savedPFchildNode))
                 {
-                    MITK_INFO << savedPFchildNode->GetName() << " still exists";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " still exists";
                 }
 
-                MITK_INFO << "adding " << newPFchildNode->GetName() << " to " << newPFCNode->GetName();
+                MITK_DEBUG << "adding " << newPFchildNode->GetName() << " to " << newPFCNode->GetName();
                 //add new child to datamanager with its new position as child of newPFCNode parent
                 GetDataStorage()->Add(newPFchildNode, newPFCNode);
             }
@@ -1189,11 +1206,11 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
     case 1:
     {
         if (!parentDataNode.IsNull()) {
-            MITK_INFO << "adding " << newPFCNode->GetName() << " to " << parentDataNode->GetName() ;
+            MITK_DEBUG << "adding " << newPFCNode->GetName() << " to " << parentDataNode->GetName() ;
             GetDataStorage()->Add(newPFCNode, parentDataNode);
 
         } else {
-            MITK_INFO << "adding " << newPFCNode->GetName();
+            MITK_DEBUG << "adding " << newPFCNode->GetName();
             GetDataStorage()->Add(newPFCNode);
 
         }
@@ -1225,10 +1242,10 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
                 //GetDataStorage()->Remove(savedPFchildNode);
 
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
 
                 }else{
-                    MITK_INFO << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
+                    MITK_DEBUG << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
 
                 }
                 // remove old child position in dataStorage
@@ -1236,7 +1253,7 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
 
 
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " still exists";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " still exists";
                 }
             } else {
 
@@ -1253,10 +1270,10 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
 
 
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
 
                 }else{
-                    MITK_INFO << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
+                    MITK_DEBUG << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
 
                 }
                 // remove old child position in dataStorage
@@ -1264,10 +1281,10 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
 
 
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " still exists";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " still exists";
                 }
 
-                MITK_INFO << "adding " << newPFchildNode->GetName() << " to " << newPFCNode->GetName();
+                MITK_DEBUG << "adding " << newPFchildNode->GetName() << " to " << newPFCNode->GetName();
                 //add new child to datamanager with its new position as child of newPFCNode parent
                 GetDataStorage()->Add(newPFchildNode, newPFCNode);
             }
@@ -1278,12 +1295,12 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
     case 2:
     {
         if (!parentDataNode.IsNull()) {
-            MITK_INFO << "adding " << newPFCNode->GetName() << " to " << parentDataNode->GetName() ;
+            MITK_DEBUG << "adding " << newPFCNode->GetName() << " to " << parentDataNode->GetName() ;
             GetDataStorage()->Add(newPFCNode, parentDataNode);
         }
         else
         {
-            MITK_INFO << "adding " << newPFCNode->GetName();
+            MITK_DEBUG << "adding " << newPFCNode->GetName();
             GetDataStorage()->Add(newPFCNode);
         }
 
@@ -1317,17 +1334,17 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
                 //GetDataStorage()->Remove(savedPFchildNode);
 
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
 
                 }else{
-                    MITK_INFO << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
+                    MITK_DEBUG << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
                 }
                 // remove old child position in dataStorage
                 GetDataStorage()->Remove(savedPFchildNode);
 
 
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " still exists";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " still exists";
                 }
 
 
@@ -1346,10 +1363,10 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
 
 
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " exists in DS...trying to remove it";
 
                 }else{
-                    MITK_INFO << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
+                    MITK_DEBUG << "[ERROR] does NOT exist, but can I read its Name? " << savedPFchildNode->GetName();
 
                 }
                 // remove old child position in dataStorage
@@ -1357,10 +1374,10 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
 
 
                 if ( GetDataStorage()->Exists(savedPFchildNode)) {
-                    MITK_INFO << savedPFchildNode->GetName() << " still exists";
+                    MITK_DEBUG << savedPFchildNode->GetName() << " still exists";
                 }
 
-                MITK_INFO << "adding " << newPFchildNode->GetName() << " to " << newPFCNode->GetName();
+                MITK_DEBUG << "adding " << newPFchildNode->GetName() << " to " << newPFCNode->GetName();
                 //add new child to datamanager with its new position as child of newPFCNode parent
                 GetDataStorage()->Add(newPFchildNode, newPFCNode);
             }
@@ -1369,7 +1386,7 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
         break;
     }
     default:
-        MITK_INFO << "we have an UNDEFINED composition... ERROR" ;
+        MITK_DEBUG << "we have an UNDEFINED composition... ERROR" ;
         break;
     }
 }
@@ -1595,7 +1612,6 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateFiberEndingsImage(mitk
     typedef itk::TractsToFiberEndingsImageFilter< OutImageType > ImageGeneratorType;
     ImageGeneratorType::Pointer generator = ImageGeneratorType::New();
     generator->SetFiberBundle(fib);
-    generator->SetInvertImage(m_Controls->m_InvertCheckbox->isChecked());
     generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
     if (m_SelectedImage.IsNotNull())
     {
@@ -1659,7 +1675,6 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
     generator->SetFiberBundle(fib);
     generator->SetBinaryOutput(binary);
     generator->SetOutputAbsoluteValues(absolute);
-    generator->SetInvertImage(m_Controls->m_InvertCheckbox->isChecked());
     generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
     if (m_SelectedImage.IsNotNull())
     {

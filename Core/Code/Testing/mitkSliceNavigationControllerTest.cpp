@@ -207,6 +207,137 @@ int testGeometry(const mitk::Geometry3D * geometry,
   return EXIT_SUCCESS;
 }
 
+int testReorientPlanes ()
+{
+   //Create PlaneGeometry
+   mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+
+   mitk::Point3D origin;
+   mitk::Vector3D right, bottom, normal;
+   mitk::ScalarType width, height;
+   mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+   width  = 100;    widthInMM  = width;
+   height = 200;    heightInMM = height;
+   thicknessInMM = 1.5;
+
+   mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+   mitk::FillVector3D(right,  widthInMM,          0, 0);
+   mitk::FillVector3D(bottom,         0, heightInMM, 0);
+   mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+
+   mitk::Vector3D spacing;
+   normal.Normalize(); normal *= thicknessInMM;
+   mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
+   planegeometry->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector(), &spacing);
+   planegeometry->SetOrigin(origin);
+
+   //Create SlicedGeometry3D out of planeGeometry
+   mitk::SlicedGeometry3D::Pointer slicedgeometry1 = mitk::SlicedGeometry3D::New();
+   unsigned int numSlices = 20;
+   slicedgeometry1->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices, false);
+
+
+
+   //Create another slicedgeo which will be rotated
+   mitk::SlicedGeometry3D::Pointer slicedgeometry2 = mitk::SlicedGeometry3D::New();
+   slicedgeometry2->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices, false);
+
+   //Create  geo3D as reference
+   mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+   geometry->SetBounds(slicedgeometry1->GetBounds());
+   geometry->SetIndexToWorldTransform(slicedgeometry1->GetIndexToWorldTransform());
+
+   //Initialize planes
+   for (int i=0; i < (int)numSlices; i++)
+   {
+      mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
+      geo2d->Initialize();
+      geo2d->SetReferenceGeometry(geometry);
+      slicedgeometry1->SetGeometry2D(geo2d,i);
+   }
+
+   for (int i=0; i < (int)numSlices; i++)
+   {
+      mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
+      geo2d->Initialize();
+      geo2d->SetReferenceGeometry(geometry);
+      slicedgeometry2->SetGeometry2D(geo2d,i);
+   }
+
+   slicedgeometry1->SetReferenceGeometry(geometry);
+   slicedgeometry2->SetReferenceGeometry(geometry);
+
+   //Create SNC
+   mitk::SliceNavigationController::Pointer sliceCtrl1 = mitk::SliceNavigationController::New();
+   sliceCtrl1->SetInputWorldGeometry(slicedgeometry1);
+   sliceCtrl1->Update();
+
+   mitk::SliceNavigationController::Pointer sliceCtrl2 = mitk::SliceNavigationController::New();
+   sliceCtrl2->SetInputWorldGeometry(slicedgeometry2);
+   sliceCtrl2->Update();
+
+   slicedgeometry1->SetSliceNavigationController(sliceCtrl1);
+   slicedgeometry2->SetSliceNavigationController(sliceCtrl2);
+
+
+
+   // Now reorient slices
+   mitk::Point3D newCenter;
+   newCenter = sliceCtrl1->GetCurrentPlaneGeometry()->GetCenter();
+   mitk::Vector3D newNormal, newAxis, curNormal, curAxis;
+   mitk::FillVector3D(newNormal, 0.0, 0.0, 1.0);
+   mitk::FillVector3D(newAxis, 1.0, 0.0, 0.0);
+
+   sliceCtrl1->ReorientSlices(newCenter,newNormal, newAxis);
+
+   
+   curNormal = sliceCtrl1->GetCurrentPlaneGeometry()->GetNormal();
+   curAxis = sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(0);
+   curNormal.Normalize();
+   curAxis.Normalize();
+   MITK_INFO << curNormal;
+   MITK_INFO << curAxis;
+
+   if (
+      ( !mitk::Equal(curNormal, newNormal) )  || 
+      ( !mitk::Equal(curAxis, newAxis) )  
+      )
+   {
+      MITK_INFO << "Reorient Planes not working as it should";
+      return EXIT_FAILURE;
+   }
+
+   // Now again with different values
+   mitk::FillVector3D(newNormal, 1.0, 0.0, 0.0);
+   mitk::FillVector3D(newAxis, 0.0, 0.0, 1.0);
+   sliceCtrl1->ReorientSlices(newCenter,newNormal, newAxis);
+
+   curNormal = sliceCtrl1->GetCurrentPlaneGeometry()->GetNormal();
+   curAxis = sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(0);
+   curNormal.Normalize();
+   curAxis.Normalize();
+   MITK_INFO << curNormal;
+   MITK_INFO << curAxis;
+
+
+   if (
+      ( !mitk::Equal(curNormal, newNormal) )  || 
+      ( !mitk::Equal(curAxis, newAxis) )  
+      )
+   {
+      MITK_INFO << "Reorient Planes not working as it should";
+      return EXIT_FAILURE;
+   }
+
+
+
+
+
+   return EXIT_SUCCESS;
+}
+
+
 int testRestorePlanePostionOperation ()
 {
     //Create PlaneGeometry
@@ -410,6 +541,14 @@ int mitkSliceNavigationControllerTest(int /*argc*/, char* /*argv*/[])
   result = testRestorePlanePostionOperation();
   if(result!=EXIT_SUCCESS)
     return result;
+
+
+
+  //Testing  ReorientPlanes
+  result = testReorientPlanes();
+  if(result!=EXIT_SUCCESS)
+     return result;
+
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

@@ -10,14 +10,14 @@ include(${ITK_USE_FILE})
 set(US_NAMESPACE "mitk")
 set(US_HEADER_PREFIX "mitk")
 set(US_BASECLASS_NAME "itk::LightObject")
-set(US_BASECLASS_HEADER "itkLightObject.h")
+set(US_BASECLASS_HEADER "mitkServiceBaseObject.h")
 set(US_BASECLASS_PACKAGE "ITK")
 set(US_ENABLE_THREADING_SUPPORT 1)
 set(US_EMBEDDING_LIBRARY Mitk)
 set(US_BUILD_TESTING ${BUILD_TESTING})
 if(BUILD_TESTING)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Testing)
-  set(US_BASECLASS_HEADER "uServicesBaseObject.h")
   set(US_TEST_LABELS MITK-Core)
 endif()
 
@@ -26,6 +26,10 @@ add_subdirectory(CppMicroServices)
 include(${CMAKE_CURRENT_BINARY_DIR}/CppMicroServices/CppMicroServicesConfig.cmake)
 
 set(TOOL_CPPS "")
+
+# temporary suppress warnings in the following files until image accessors are fully integrated.
+set_source_files_properties( DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
+set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 
 MITK_CREATE_MODULE( Mitk
   INCLUDE_DIRS

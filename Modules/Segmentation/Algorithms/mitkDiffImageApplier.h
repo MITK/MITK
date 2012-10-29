@@ -68,7 +68,7 @@ class Segmentation_EXPORT DiffImageApplier : public itk::Object, public Operatio
     void ItkInvertPixelValues( itk::Image<TPixel,VImageDimension>* itkImage );
 
     Image::Pointer m_Image;
-    Image::ConstPointer m_SliceDifferenceImage;
+    Image::Pointer m_SliceDifferenceImage;
     
     unsigned int m_SliceIndex;
     unsigned int m_SliceDimension;

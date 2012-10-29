@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //VTK
 #include <vtkSmartPointer.h>
+#include <vtkPropAssembly.h>
 
 class vtkActor;
 class vtkPolyDataMapper;
@@ -142,6 +143,8 @@ namespace mitk {
     public:
       /** \brief Actor of a 2D render window. */
       vtkSmartPointer<vtkActor> m_Actor;
+      
+      vtkSmartPointer<vtkPropAssembly> m_Actors;
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
       /** \brief Current slice of a 2D render window. */

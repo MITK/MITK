@@ -80,6 +80,10 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           }
           //execute the Operation
           m_Destination->ExecuteOperation(doOp);
+
+          if (!m_UndoEnabled)
+            delete doOp;
+
           ok = true;
           break;
         }
@@ -90,9 +94,9 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           //move the point to the coordinate //not used, cause same to MovePoint... check xml-file
           mitk::Point3D movePoint = posEvent->GetWorldPosition();
 
-          doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
+          mitk::PointOperation doPointOp(OpMOVE, timeInMS, movePoint, 0);
           //execute the Operation
-          m_Destination->ExecuteOperation(doOp);
+          m_Destination->ExecuteOperation(&doPointOp);
           ok = true;
           break;
         }
@@ -103,9 +107,9 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           m_CurrentPoint = movePoint;
           if (m_Destination == NULL)
             return false;
-          doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
+          mitk::PointOperation doPointOp(OpMOVE, timeInMS, movePoint, 0);
           //execute the Operation
-          m_Destination->ExecuteOperation(doOp);
+          m_Destination->ExecuteOperation(&doPointOp);
           ok = true;
           break;
         }
@@ -120,7 +124,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           mitk::Point3D oldMovePoint; oldMovePoint.Fill(0);
 
           doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
-          PointOperation* finishOp = new mitk::PointOperation(OpTERMINATE, movePoint, 0);
+          PointOperation finishOp(OpTERMINATE, movePoint, 0);
           if (m_UndoEnabled )
           {
             //get the last Position from the UndoList
@@ -139,9 +143,12 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           }
           //execute the Operation
           m_Destination->ExecuteOperation(doOp);
-          m_Destination->ExecuteOperation(finishOp);
+
+          if (!m_UndoEnabled)
+            delete doOp;
+
+          m_Destination->ExecuteOperation(&finishOp);
           ok = true;
-          delete finishOp;
 
           break;
         }

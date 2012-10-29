@@ -73,6 +73,8 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     */
     void ToFCameraSelected(const QString selectedText);
 
+    void KinectAcquisitionModeChanged();
+
     void ChangeCoronalWindowSelection(int);
 
   protected slots:

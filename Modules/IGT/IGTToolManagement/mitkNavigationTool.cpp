@@ -24,10 +24,11 @@ mitk::NavigationTool::NavigationTool() : m_Type(mitk::NavigationTool::Unknown),
                                          m_SerialNumber(""),
                                          m_ToolRegistrationLandmarks(mitk::PointSet::New()),
                                          m_ToolCalibrationLandmarks(mitk::PointSet::New()),
-                                         m_ToolTipPosition(mitk::Point3D()),
                                          m_ToolTipOrientation(mitk::Quaternion(0,0,0,1))
   {
-    
+    m_ToolTipPosition[0] = 0;
+    m_ToolTipPosition[1] = 0;
+    m_ToolTipPosition[2] = 0;
   }
  
 mitk::NavigationTool::~NavigationTool()

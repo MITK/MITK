@@ -24,7 +24,7 @@ namespace itk
 
 template <typename TElementIdentifier, typename TElement>
 ImportMitkImageContainer<TElementIdentifier , TElement>
-::ImportMitkImageContainer()
+::ImportMitkImageContainer() : m_imageAccess(NULL)
 {
 
 }
@@ -34,9 +34,12 @@ template <typename TElementIdentifier, typename TElement>
 ImportMitkImageContainer< TElementIdentifier , TElement >
 ::~ImportMitkImageContainer()
 {
-  m_ImageDataItem = NULL;
+  if(m_imageAccess != NULL)
+    delete m_imageAccess;
+  m_imageAccess = NULL;
 }
 
+/*
 template <typename TElementIdentifier, typename TElement>
 void
 ImportMitkImageContainer< TElementIdentifier , TElement >
@@ -48,6 +51,19 @@ ImportMitkImageContainer< TElementIdentifier , TElement >
 
   this->Modified();
 }
+*/
+
+template <typename TElementIdentifier, typename TElement>
+void
+ImportMitkImageContainer< TElementIdentifier , TElement >
+::SetImageAccessor(mitk::ImageWriteAccessor* imageAccess, size_t noOfBytes)
+{
+  m_imageAccess = imageAccess;
+
+  this->SetImportPointer( (TElement*) m_imageAccess->GetData(), noOfBytes/sizeof(Element), false);
+
+  this->Modified();
+}
 
 template <typename TElementIdentifier, typename TElement>
 void
@@ -56,7 +72,7 @@ ImportMitkImageContainer< TElementIdentifier , TElement >
 {
   Superclass::PrintSelf(os,indent);
 
-  os << indent << "ImageDataItem: " << m_ImageDataItem << std::endl;
+  os << indent << "ImageAccessor: " << m_imageAccess << std::endl;
 }
 
 } // end namespace itk

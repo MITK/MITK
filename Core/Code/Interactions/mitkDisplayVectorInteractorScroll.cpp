@@ -157,6 +157,9 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
 
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
+      
+      ok = true;
+      break;
     }
   case AcFINISHMOVE:
     {

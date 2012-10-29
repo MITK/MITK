@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkConnectomicsNetworkOperationsViewControls</class>
+ <widget class="QWidget" name="QmitkConnectomicsNetworkOperationsViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>227</width>
+    <height>639</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="inputDataGroupBox">
+     <property name="title">
+      <string>Data</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QLabel" name="lblWarning">
+        <property name="styleSheet">
+         <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
+        </property>
+        <property name="text">
+         <string>Please select data!</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="inputImageOneLabel">
+          <property name="text">
+           <string>Image 1:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="inputImageOneNameLabel">
+          <property name="text">
+           <string>-</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="convertToRGBAImagePushButton">
+     <property name="toolTip">
+      <string>Convert the selected image to RGBA format</string>
+     </property>
+     <property name="text">
+      <string>Convert to RGBA</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="modularizePushButton">
+     <property name="text">
+      <string>Divide in Modules</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="connectivityMatrixImageGroupBox">
+     <property name="title">
+      <string>Connectivity Matrix Image Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QPushButton" name="createConnectivityMatrixImagePushButton">
+        <property name="text">
+         <string>Create Connectivity Matrix Image</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QCheckBox" name="rescaleCheckBox">
+          <property name="text">
+           <string>Rescale</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QCheckBox" name="binaryCheckBox">
+          <property name="text">
+           <string>Binary</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="pruneOptionsGroupBox">
+     <property name="title">
+      <string>Prune Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QPushButton" name="prunePushButton">
+        <property name="text">
+         <string>Prune Network</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="edgeWeightLabel">
+          <property name="text">
+           <string>Prune edge weight below</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="pruneEdgeWeightSpinBox"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

@@ -253,11 +253,11 @@ void mitk::ImageSource::PrepareOutputs()
   Superclass::PrepareOutputs();
 }
 
-void* mitk::ImageSource::GetData()
+/*void* mitk::ImageSource::GetData()
 {
     Update();
     return GetOutput()->GetData();
-}
+}*/
 
 vtkImageData* mitk::ImageSource::GetVtkImageData()
 {

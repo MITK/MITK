@@ -77,7 +77,7 @@ class MitkExt_EXPORT ApplyDiffImageOperation : public Operation
     double GetFactor() { return m_Factor; }
 
     Image* GetImage() { return m_Image; }
-    Image::ConstPointer GetDiffImage();
+    Image::Pointer GetDiffImage();
 
     bool IsImageStillValid() { return m_ImageStillValid; }
 

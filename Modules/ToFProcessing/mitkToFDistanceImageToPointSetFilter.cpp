@@ -28,6 +28,7 @@ mitk::ToFDistanceImageToPointSetFilter::ToFDistanceImageToPointSetFilter()
   m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
   m_CameraIntrinsics->SetPrincipalPoint(113.29063841714108,97.243216122015184);
   m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
+  m_ReconstructionMode = true;
 }
 
 mitk::ToFDistanceImageToPointSetFilter::~ToFDistanceImageToPointSetFilter()

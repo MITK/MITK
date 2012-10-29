@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 
 QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread():QThread(),
-  m_StatisticsImage(NULL), m_BinaryMask(NULL), m_PlanarFigureMask(NULL), m_TimeStep(0), 
+  m_StatisticsImage(NULL), m_BinaryMask(NULL), m_PlanarFigureMask(NULL), m_TimeStep(0),
   m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false)
 {
 }
@@ -111,15 +111,28 @@ void QmitkImageStatisticsCalculationThread::run()
   {
     statisticCalculationSuccessful = false;
   }
-  if(this->m_BinaryMask.IsNotNull())
+
+  // Bug 13416 : The ImageStatistics::SetImageMask() method can throw exceptions, i.e. when the dimensionality
+  // of the masked and input image differ, we need to catch them and mark the calculation as failed
+  // the same holds for the ::SetPlanarFigure()
+  try
   {
-    calculator->SetImageMask(m_BinaryMask);
-    calculator->SetMaskingModeToImage();
+    if(this->m_BinaryMask.IsNotNull())
+    {
+
+      calculator->SetImageMask(m_BinaryMask);
+      calculator->SetMaskingModeToImage();
+    }
+    if(this->m_PlanarFigureMask.IsNotNull())
+    {
+      calculator->SetPlanarFigure(m_PlanarFigureMask);
+      calculator->SetMaskingModeToPlanarFigure();
+    }
   }
-  if(this->m_PlanarFigureMask.IsNotNull())
+  catch( const itk::ExceptionObject& e)
   {
-    calculator->SetPlanarFigure(m_PlanarFigureMask);
-    calculator->SetMaskingModeToPlanarFigure();
+    MITK_ERROR << "ITK Exception:" << e.what();
+    statisticCalculationSuccessful = false;
   }
   bool statisticChanged = false;
 
@@ -144,12 +157,12 @@ void QmitkImageStatisticsCalculationThread::run()
 
   if(statisticCalculationSuccessful)
   {
-    this->m_StatisticsStruct = calculator->GetStatistics(m_TimeStep);  
+    this->m_StatisticsStruct = calculator->GetStatistics(m_TimeStep);
 
     if(this->m_TimeStepHistogram.IsNotNull())
     {
       this->m_TimeStepHistogram = NULL;
-    } 
+    }
     this->m_TimeStepHistogram = (HistogramType*) calculator->GetHistogram(m_TimeStep);
   }
 }

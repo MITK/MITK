@@ -62,7 +62,8 @@ GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
     m_DuplicateImage(true),
     m_RandomSeed(-1),
     m_LoadParameterFile(""),
-    m_LutPath("")
+    m_LutPath(""),
+    m_IsInValidState(true)
 {
 
 }
@@ -112,6 +113,14 @@ GibbsTrackingFilter< ItkQBallImageType >
 
     // instantiate all necessary components
     SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
+    // handle lookup table not found cases
+    if( !interpolator->IsInValidState() )
+    {
+      m_IsInValidState = false;
+      m_AbortTracking = true;
+      m_BuildFibers = false;
+      mitkThrow() << "Unable to load lookup tables.";
+    }
     ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength, m_ParticleGridCellCapacity);
     GibbsEnergyComputer* encomp = new GibbsEnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
 
@@ -232,11 +241,26 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     // load sphere interpolator to evaluate the ODFs
     SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
 
+    MITK_INFO << "GibbsTrackingFilter: 1";
+    // handle lookup table not found cases
+    if( !interpolator->IsInValidState() )
+    {
+      m_IsInValidState = false;
+      m_AbortTracking = true;
+      m_BuildFibers = false;
+      mitkThrow() << "Unable to load lookup tables.";
+    }
+    MITK_INFO << "GibbsTrackingFilter: 2";
+
     // initialize the actual tracking components (ParticleGrid, Metropolis Hastings Sampler and Energy Computer)
     ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength, m_ParticleGridCellCapacity);
 
+    MITK_INFO << "GibbsTrackingFilter: 3";
+
     GibbsEnergyComputer* encomp = new GibbsEnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
     encomp->SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
+
+    MITK_INFO << "GibbsTrackingFilter: 4";
 
     MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, encomp, randGen, m_CurvatureThreshold);
 

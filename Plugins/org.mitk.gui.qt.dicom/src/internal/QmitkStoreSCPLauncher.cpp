@@ -33,26 +33,23 @@ QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* build
 {
     connect( m_StoreSCP, SIGNAL(error(QProcess::ProcessError)),this, SLOT(OnProcessError(QProcess::ProcessError)));
     connect( m_StoreSCP, SIGNAL(stateChanged(QProcess::ProcessState)),this, SLOT(OnStateChanged(QProcess::ProcessState)));
-    //connect( m_StoreSCP, SIGNAL(readyReadStandardError()),this, SLOT(OnReadyProcessError()));
     connect( m_StoreSCP, SIGNAL(readyReadStandardOutput()),this, SLOT(OnReadyProcessOutput()));
     SetArgumentList(builder);
-    //m_StoreSCP->setStandardOutputFile("OutputLog.log");
-    //m_StoreSCP->setStandardErrorFile("ErrorLog.log");
 }
 
 QmitkStoreSCPLauncher::~QmitkStoreSCPLauncher()
 {
+    disconnect( m_StoreSCP, SIGNAL(error(QProcess::ProcessError)),this, SLOT(OnProcessError(QProcess::ProcessError)));
+    disconnect( m_StoreSCP, SIGNAL(stateChanged(QProcess::ProcessState)),this, SLOT(OnStateChanged(QProcess::ProcessState)));
+    disconnect( m_StoreSCP, SIGNAL(readyReadStandardOutput()),this, SLOT(OnReadyProcessOutput()));
     m_StoreSCP->close();
     m_StoreSCP->waitForFinished(1000);
-    DeleteTemporaryData();
     delete m_StoreSCP;
 }
 
 void QmitkStoreSCPLauncher::StartStoreSCP()
 {
     FindPathToStoreSCP();
-    MITK_INFO << m_PathToStoreSCP.toStdString();
-    MITK_INFO << m_ArgumentList[7].toStdString();
     m_StoreSCP->start(m_PathToStoreSCP,m_ArgumentList);
 }
 
@@ -188,24 +185,6 @@ void QmitkStoreSCPLauncher::SetArgumentList(QmitkStoreSCPLauncherBuilder* builde
 {
     m_ArgumentList << *builder->GetPort() << QString("-aet") <<*builder->GetAETitle() << *builder->GetTransferSyntax()
         << *builder->GetOtherNetworkOptions() << *builder->GetMode() << QString("-od") << *builder->GetOutputDirectory();
-}
-
-void QmitkStoreSCPLauncher::DeleteTemporaryData()
-{
-    MITK_INFO << "About to delete: " << m_ArgumentList[7].toStdString();
-    
-    /* 
-     * Dangerous code, see bug 13021
-     *
-
-     QDir dir(m_ArgumentList[7]);
-    QDirIterator it(dir);
-    while(it.hasNext())
-    {
-        it.next();
-        dir.remove(it.fileInfo().absoluteFilePath());
-    }
-    */
 }
 
 QString QmitkStoreSCPLauncher::ArgumentListToQString()

@@ -43,6 +43,9 @@ void QmitkStringPropertyEditor::PropertyRemoved()
 
 void QmitkStringPropertyEditor::onTextChanged(const QString& text)
 {
+  if( m_StringProperty == 0 )
+    return;
+
   BeginModifyProperty();  // deregister from events
   
   m_StringProperty->SetValue(text.toStdString());

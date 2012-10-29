@@ -14,9 +14,12 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkDIAppIVIMPerspective.cpp
   Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.cpp
   Perspectives/QmitkDIAppQuantificationPerspective.cpp
-  Perspectives/QmitkDIAppScreenshotsMoviesPerspective.cpp
   Perspectives/QmitkDIAppTBSSPerspective.cpp
-  Perspectives/QmitkDIAppVolumeVisualizationPerspective.cpp
+  Perspectives/QmitkDIAppUtilityPerspective.cpp
+  Perspectives/QmitkDIAppImageProcessingPerspective.cpp
+  Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
+  Perspectives/QmitkDIAppRegistrationPerspective.cpp
+  Perspectives/QmitkDIAppVisualizationPerspective.cpp
 )
 
 set(UI_FILES
@@ -35,9 +38,12 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
   src/internal/Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.h
   src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h
-  src/internal/Perspectives/QmitkDIAppScreenshotsMoviesPerspective.h
   src/internal/Perspectives/QmitkDIAppTBSSPerspective.h
-  src/internal/Perspectives/QmitkDIAppVolumeVisualizationPerspective.h
+  src/internal/Perspectives/QmitkDIAppUtilityPerspective.h
+  src/internal/Perspectives/QmitkDIAppImageProcessingPerspective.h
+  src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
+  src/internal/Perspectives/QmitkDIAppRegistrationPerspective.h
+  src/internal/Perspectives/QmitkDIAppVisualizationPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -59,9 +65,15 @@ set(CACHED_RESOURCE_FILES
   resources/perspectives/ivim.png
   resources/perspectives/preprocessingreconstruction.png
   resources/perspectives/quantification.png
-  resources/perspectives/screenshotsmovies.png
   resources/perspectives/tbss.png
-  resources/perspectives/volumevizualization.png
+  resources/perspectives/utilities.png
+  resources/perspectives/imageProcessing.png
+  resources/perspectives/registration.png
+  resources/perspectives/phantomData2.png
+  resources/perspectives/eye.png
+  resources/perspectives/registration.xpm
+  resources/perspectives/chart.png
+  resources/perspectives/preprocessing.png
 )
 
 set(QRC_FILES

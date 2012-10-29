@@ -19,27 +19,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void QmitkDIAppFiberTractographyPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
-  /////////////////////////////////////////////////////
-  // all di-app perspectives should have the following:
-  /////////////////////////////////////////////////////
-
   std::string editorArea = layout->GetEditorArea();
 
   layout->AddStandaloneView("org.mitk.views.datamanager",
     false, berry::IPageLayout::LEFT, 0.3f, editorArea);
 
   layout->AddStandaloneView("org.mitk.views.controlvisualizationpropertiesview",
-    false, berry::IPageLayout::BOTTOM, .2f, "org.mitk.views.datamanager");
+    false, berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.datamanager");
 
   berry::IFolderLayout::Pointer left =
-    layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
-    berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
+    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols2",
+    berry::IPageLayout::BOTTOM, 0.1f, "org.mitk.views.controlvisualizationpropertiesview");
 
-  layout->AddStandaloneView("org.mitk.views.imagenavigator",
-    false, berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols");
+  berry::IFolderLayout::Pointer bottomleft =
+    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols",
+    berry::IPageLayout::BOTTOM, 0.5f, "org.mitk.diffusionimaginginternal.leftcontrols2");
+
+  layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
+    berry::IPageLayout::BOTTOM, .6f, "org.mitk.diffusionimaginginternal.leftcontrols", false);
 
   /////////////////////////////////////////////
-  // here goes the perspective specific stuff
+  // add the views
   /////////////////////////////////////////////
 
   left->AddView("org.mitk.views.gibbstracking");
@@ -54,7 +54,11 @@ void QmitkDIAppFiberTractographyPerspective::CreateInitialLayout(berry::IPageLay
   lo = layout->GetViewLayout("org.mitk.views.streamlinetracking");
   lo->SetCloseable(false);
 
-  left->AddView("org.mitk.views.fiberprocessing");
-  lo = layout->GetViewLayout("org.mitk.views.fiberprocessing");
-  lo->SetCloseable(false);
+  bottomleft->AddView("org.mitk.views.fiberprocessing");
+  berry::IViewLayout::Pointer lo2 = layout->GetViewLayout("org.mitk.views.fiberprocessing");
+  lo2->SetCloseable(false);
+
+  bottomleft->AddView("org.mitk.views.segmentation");
+  lo2 = layout->GetViewLayout("org.mitk.views.segmentation");
+  lo2->SetCloseable(false);
 }

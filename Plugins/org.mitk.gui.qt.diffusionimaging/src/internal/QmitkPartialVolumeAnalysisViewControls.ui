@@ -33,7 +33,7 @@
     <number>3</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="m_InputData">
      <property name="title">
       <string>Data</string>
      </property>
@@ -67,14 +67,14 @@
       <item row="1" column="1">
        <widget class="QLabel" name="m_SelectedImageLabel">
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="m_SelectedMaskLabel">
         <property name="text">
-         <string>-</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -117,6 +117,9 @@
          </property>
          <item>
           <widget class="QFrame" name="m_PlanarFigureButtonsFrame">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
            </property>

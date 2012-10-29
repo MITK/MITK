@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageSource.h>
 #include "mitkImage.h"
 #include "mitkImageDataItem.h"
+#include "mitkImageWriteAccessor.h"
 
 namespace mitk
 {
@@ -65,11 +66,8 @@ public:
   typedef typename TOutputImage::RegionType       RegionType;
   typedef typename TOutputImage::PixelType        PixelType;
   
-  const mitk::Image * GetInput(void);
-  const mitk::Image * GetInput(unsigned int idx);
-
-  virtual void SetInput(const mitk::Image *input);
-  virtual void SetInput(unsigned int index, const mitk::Image * image);
+  virtual void SetInput(mitk::Image *input);
+  virtual void SetInput(unsigned int index, mitk::Image * image);
 
   virtual void UpdateOutputInformation();
 
@@ -81,6 +79,9 @@ public:
   itkBooleanMacro( CopyMemFlag );
 
 protected:
+  mitk::Image * GetInput(void);
+  mitk::Image * GetInput(unsigned int idx);
+
   ImageToItk(): m_CopyMemFlag(false), m_Channel(0)
   {
   }

@@ -114,17 +114,25 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
     if(m_ExternalModel->data(currentIndex,ctkDICOMModel::TypeRole)==static_cast<int>(ctkDICOMModel::SeriesType))
     {
         QString seriesUID = m_ExternalModel->data(currentIndex,ctkDICOMModel::UIDRole).toString();
-        QString seriesName = m_ExternalModel->data(currentIndex).toString();        
-        
+        QString seriesName = m_ExternalModel->data(currentIndex).toString();
+
         QModelIndex studyIndex = m_ExternalModel->parent(currentIndex);
         QString studyUID = m_ExternalModel->data(studyIndex,ctkDICOMModel::UIDRole).toString();
         QString studyName = m_ExternalModel->data(studyIndex).toString();
 
         QModelIndex patientIndex = m_ExternalModel->parent(studyIndex);
-        QString patientName = m_ExternalModel->data(patientIndex).toString();        
+        QString patientName = m_ExternalModel->data(patientIndex).toString();
 
-        QStringList eventProperties;
-        eventProperties << patientName << studyUID << studyName << seriesUID << seriesName << m_LastImportDirectory;
+        QStringList filesForSeries;
+        filesForSeries = m_ExternalDatabase->filesForSeries(seriesUID);
+
+        QHash<QString,QVariant> eventProperties;
+        eventProperties.insert("PatientName",patientName);
+        eventProperties.insert("StudyUID",studyUID);
+        eventProperties.insert("StudyName",studyName);
+        eventProperties.insert("SeriesUID",seriesUID);
+        eventProperties.insert("SeriesName",seriesName);
+        eventProperties.insert("FilesForSeries",filesForSeries);
         emit SignalDicomToDataManager(eventProperties);
     }
 }

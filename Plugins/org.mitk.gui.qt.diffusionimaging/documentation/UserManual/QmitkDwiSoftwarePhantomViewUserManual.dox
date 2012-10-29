@@ -1,0 +1,43 @@
+/**
+\page org_mitk_views_dwisoftwarephantomview DWI Software Phantoms View
+
+This view provides the user interface to generate artificial diffusion weighted images. This view is regarded as experimental and it has not been tested extensively!
+
+Available sections:
+  - \ref SwpUserManualInputData
+  - \ref SwpUserManualParameters
+  - \ref SwpUserManualOutputData
+
+\section SwpUserManualInputData Input Data
+
+The input of the algorithm consists of an arbitrary number of binary masks. For each mask, the according parameters of the diffusion tensor used to generate the artificial diffusion signal can be specified. If no mask is set, the whole image is filled with an isotropic default signal plus the specified noise. To generate for example a crossing situation one would use two masks with different directions of the respective diffusion tensor.
+
+\image html sw_phantom_rois.png Possible ROIs to generate a 90° crossing situation.
+\image html dwisoftwarephantomsview.png Parameters to generate a phantom image using the ROIs illustrated above while adding a small amount of noise. Note the perpendicular tensor directions for the two ROIs!
+\image html sw_phantom_crossing_qballs.png Q-Ball reconstruction of the signal generated with the configuration illustrated above.
+
+\section SwpUserManualParameters Input Parameters
+
+\li Image Name: Name of the resulting data node containing the generated phantom image.
+\li B-Value: B-Value of the resulting DWI
+\li #Gradient Directions: Number of gradient directions of the resulting DWI.
+\li SNR: Signal to noise ratio. For values > 99, no noise at all is added to the image. The noise values are sampled from a rician distribution.
+\li Grey Matter ADC: Define ADC for isotropic reagions (liquor, air, ...).
+\li Scale of the baseline image values: Usually there is no need to change the dafault value.
+\li Image Dimensions: Size of the resulting DWI (x,y,z)
+\li Image spacing: Spacing of the resulting DWI
+
+Parameters per mask image:
+
+\li FA of the tensor used to generate the artificial signal.
+\li ADC of the tensor used to generate the artificial signal.
+\li Direction of the tensors main eigenvector (x,y and z component).
+\li Weighting factor for the signal generated from this tensor.
+
+\section SwpUserManualOutputData Additional Output
+
+\li Visualize tensor directions.
+\li #Directions per Voxel: Image containing the number of directions per voxel as image value.
+\li Direction Images: One image for each signal region. Each voxel contains one direction vector as image value.
+
+*/

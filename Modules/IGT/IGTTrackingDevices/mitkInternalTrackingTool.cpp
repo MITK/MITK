@@ -34,6 +34,14 @@ m_ToolTipSet(false)
   m_Orientation[1] = 0.0f;
   m_Orientation[2] = 0.0f;
   m_Orientation[3] = 0.0f;
+  // this should not be necessary as the tools bring their own tooltip transformation
+  m_ToolTip[0] = 0.0f;
+  m_ToolTip[1] = 0.0f;
+  m_ToolTip[2] = 0.0f;
+  m_ToolTipRotation[0] = 0.0f;
+  m_ToolTipRotation[1] = 0.0f;
+  m_ToolTipRotation[2] = 0.0f;
+  m_ToolTipRotation[3] = 1.0f;
 }
 
 mitk::InternalTrackingTool::~InternalTrackingTool()

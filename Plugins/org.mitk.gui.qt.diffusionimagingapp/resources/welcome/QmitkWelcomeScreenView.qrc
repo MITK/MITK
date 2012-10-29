@@ -24,7 +24,13 @@
         <file>pics/07ivim.png</file>
         <file>pics/08avolumevisualization.png</file>
         <file>pics/08volumevisualization.png</file>
-        <file>pics/09ascreenshotsmovies.png</file>
-        <file>pics/09screenshotsmovies.png</file>
+        <file>pics/10asoftwarephantoms.png</file>
+        <file>pics/10softwarephantoms.png</file>
+        <file>pics/11asegmentation.png</file>
+        <file>pics/11segmentation.png</file>
+        <file>pics/12aregistration.png</file>
+        <file>pics/12registration.png</file>
+        <file>pics/13autilities.png</file>
+        <file>pics/13utilities.png</file>
     </qresource>
 </RCC>

@@ -384,6 +384,8 @@ void QmitkToFPointSetWidget::MeasurementPointSetChanged()
 
 void QmitkToFPointSetWidget::PointSetChanged()
 {
+  if (m_DistanceImage.IsNotNull())
+  {
   int imageSizeX = m_DistanceImage->GetDimensions()[0];
   int imageSizeY = m_DistanceImage->GetDimensions()[1];
   int pointSetValid = 1;
@@ -425,5 +427,6 @@ void QmitkToFPointSetWidget::PointSetChanged()
     // initialize 3D pointset empty
     mitk::PointSet::Pointer pointSet3D = mitk::PointSet::New();
     m_PointSet3DNode->SetData(pointSet3D);
+  }
   }
 }

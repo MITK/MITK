@@ -33,9 +33,9 @@ mitk::USImageVideoSource::USImageVideoSource()
   m_IsVideoReady = false;
   m_IsGreyscale  = false;
   this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
-  int  m_ResolutionOverrideWidth = 0;
-  int  m_ResolutionOverrideHeight = 0;
-  bool m_ResolutionOverride = false;
+  m_ResolutionOverrideWidth = 0;
+  m_ResolutionOverrideHeight = 0;
+  m_ResolutionOverride = false;
 }
 
 mitk::USImageVideoSource::~USImageVideoSource()
@@ -126,12 +126,12 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 
   // Convert to MITK-Image
   IplImage ipl_img = image;
+
   this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
   this->m_OpenCVToMitkFilter->Update();
 
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
   mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput(0));
-
   return result;
 }
 

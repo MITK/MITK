@@ -673,6 +673,10 @@ mitk::DataNode::Pointer QmitkMeasurementView::DetectTopMostVisibleImage()
       continue;
     if (node->IsVisible(NULL) == false)
       continue;
+    // we also do not want to assign planar figures to helper objects ( even if they are of type image )
+    if (node->GetProperty("helper object"))
+      continue;
+
     int layer = 0;
     node->GetIntProperty("layer", layer);
     if ( layer < maxLayer )

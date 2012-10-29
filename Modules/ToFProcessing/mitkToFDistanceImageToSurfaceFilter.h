@@ -77,9 +77,13 @@ namespace mitk
     */
     void SetTextureImageHeight(int height);
     /*!
-    \brief Set the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units (=true) or interpixeldistances and focal length in mm (=false)
+    \brief Sets the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units (=true) or interpixeldistances and focal length in mm (=false)
     */
     void SetReconstructionMode(bool withoutInterpixdist = true);
+    /*!
+    \brief Returns the reconstruction mode
+    */
+    bool GetReconstructionMode();
     /*!
     \brief Sets the input of this filter
     \param distanceImage input is the distance image of e.g. a ToF camera

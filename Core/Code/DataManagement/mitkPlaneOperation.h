@@ -35,13 +35,18 @@ class MITK_CORE_EXPORT PlaneOperation : public PointOperation
 {
 public:
   PlaneOperation( OperationType operationType, Point3D point, Vector3D normal );
+  PlaneOperation( OperationType operationType, Point3D point, Vector3D normal, Vector3D axisVec0 );
 
   virtual ~PlaneOperation();
 
   Vector3D GetNormal();
+  Vector3D GetAxisVec0();
+  bool IsAxisVec0Defined();
 
 private:
   Vector3D m_Normal;
+  Vector3D m_AxisVec0;
+  bool m_AxisVec0IsDefined;
 
 };
 

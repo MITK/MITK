@@ -818,6 +818,9 @@
       <transition NAME="Shift+press" NEXT_STATE_ID="1" EVENT_ID="3">
         <action ID="10" />
       </transition>
+      <transition NAME="Shift+pressRMB" NEXT_STATE_ID="1" EVENT_ID="2000">
+        <action ID="6000" />
+      </transition>
       <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="90" />
       </transition>
@@ -3600,7 +3603,9 @@
       <transition NAME="levelwindow" NEXT_STATE_ID="1" EVENT_ID="531">
         <action ID="1014" />
       </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" >
+        <action ID="43" />
+      </transition>
     </state>
   </stateMachine>
   <stateMachine NAME="LevelWindow">
@@ -3613,7 +3618,9 @@
       <transition NAME="levelwindow" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="1014" />
       </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" >
+        <action ID="43" />
+      </transition>
     </state>
   </stateMachine>
   <stateMachine NAME="PlanarFigureInteractor">

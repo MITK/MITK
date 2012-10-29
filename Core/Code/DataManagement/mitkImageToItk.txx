@@ -20,10 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToItk.h"
 #include "mitkBaseProcess.h"
 #include "itkImportMitkImageContainer.h"
+#include "mitkImageWriteAccessor.h"
+#include "mitkException.h"
 
 
 template <class TOutputImage>
-void mitk::ImageToItk<TOutputImage>::SetInput(const mitk::Image *input)
+void mitk::ImageToItk<TOutputImage>::SetInput(mitk::Image *input)
 {
   if(input == NULL)
     itkExceptionMacro( << "image is null" );
@@ -35,12 +37,11 @@ void mitk::ImageToItk<TOutputImage>::SetInput(const mitk::Image *input)
     itkExceptionMacro( << "image has wrong pixel type " );
   
   // Process object is not const-correct so the const_cast is required here
-  itk::ProcessObject::SetNthInput(0, 
-    const_cast< mitk::Image * >( input ) );
+  itk::ProcessObject::SetNthInput(0, input);
 }
 
 template<class TOutputImage>
-void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, const mitk::Image * input ) 
+void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, mitk::Image * input )
 {
   if( index+1 > this->GetNumberOfInputs() )
   {
@@ -57,27 +58,24 @@ void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, const mitk::I
     itkExceptionMacro( << "image has wrong pixel type " );
 
   // Process object is not const-correct so the const_cast is required here
-  itk::ProcessObject::SetNthInput(index, 
-    const_cast< mitk::Image *>( input ) );
+  itk::ProcessObject::SetNthInput(index,input);
 }
 
 template<class TOutputImage>
-const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(void) 
+mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
   {
     return 0;
   }
 
-  return static_cast< const mitk::Image * >
-    (itk::ProcessObject::GetInput(0) );
+  return (mitk::Image*) const_cast<itk::DataObject*>(itk::ProcessObject::GetInput(0));
 }
 
 template<class TOutputImage>
-const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(unsigned int idx)
+mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(unsigned int idx)
 {
-  return static_cast< mitk::Image * >
-    (itk::ProcessObject::GetInput(idx));
+  return itk::ProcessObject::GetInput(idx);
 }
 
 template<class TOutputImage>
@@ -85,7 +83,7 @@ template<class TOutputImage>
   ::GenerateData()
 {
   // Allocate output
-  mitk::Image::ConstPointer input = this->GetInput();
+  mitk::Image::Pointer input = this->GetInput();
   typename Superclass::OutputImageType::Pointer output = this->GetOutput();
   
   
@@ -94,10 +92,11 @@ template<class TOutputImage>
   {
     noBytes = noBytes * input->GetDimension(i);
   }
-  
+
+  mitk::ImageWriteAccessor* imageAccess = new mitk::ImageWriteAccessor(input);
+
   // hier wird momentan wohl nur der erste Channel verwendet??!!
-  m_ImageDataItem = const_cast<mitk::Image*>(input.GetPointer())->GetChannelData( m_Channel );
-  if(m_ImageDataItem.GetPointer() == NULL)
+  if(imageAccess->GetData() == NULL)
   {
     itkWarningMacro(<< "no image data to import in ITK image");
 
@@ -111,9 +110,10 @@ template<class TOutputImage>
     itkDebugMacro("copyMem ...");
 
     output->Allocate();
-    
-    memcpy( (PixelType *) output->GetBufferPointer(), m_ImageDataItem->GetData(), sizeof(PixelType)*noBytes);
-    
+
+    memcpy( (PixelType *) output->GetBufferPointer(), imageAccess->GetData(), sizeof(PixelType)*noBytes);
+
+    delete imageAccess;
   }
   else
   {
@@ -125,7 +125,8 @@ template<class TOutputImage>
     import->Initialize();
 
     itkDebugMacro( << "size of container = " << import->Size() );
-    import->SetImageDataItem(m_ImageDataItem);
+    //import->SetImageDataItem(m_ImageDataItem);
+    import->SetImageAccessor(imageAccess,sizeof(PixelType)*noBytes);
 
     output->SetPixelContainer(import);
     itkDebugMacro( << "size of container = " << import->Size() );
@@ -136,7 +137,7 @@ template<class TOutputImage>
   void mitk::ImageToItk<TOutputImage>
   ::UpdateOutputInformation()
 {
-  mitk::Image::ConstPointer input = this->GetInput();
+  mitk::Image::Pointer input = this->GetInput();
   if(input.IsNotNull() && (input->GetSource().IsNotNull()) && input->GetSource()->Updating())
   {
     typename Superclass::OutputImageType::Pointer output = this->GetOutput();

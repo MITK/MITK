@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkLevelWindowProperty.h>
 
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
+
 // ITK
 #include <itkMultiplyImageFilter.h>
 
@@ -190,6 +193,24 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
     resultNode->SetProperty("binary", mitk::BoolProperty::New(false) );
     resultNode->SetProperty("use color", mitk::BoolProperty::New(false) );
+
+    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+
+    mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
+
+    //resultNode->GetProperty(prop, "LookupTable");
+
+    vtkLookupTable *lookupTable = vtkLookupTable::New();
+    lookupTable->SetHueRange(1.0, 0.0);
+    lookupTable->SetSaturationRange(1.0, 1.0);
+    lookupTable->SetValueRange(1.0, 1.0);
+    lookupTable->SetTableRange(-1.0, 1.0);
+    lookupTable->Build();
+
+    lut->SetVtkLookupTable(lookupTable);
+
+    prop->SetLookupTable(lut);
+    resultNode->SetProperty("LookupTable",prop);
 
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
     mitk::LevelWindow levelwindow;

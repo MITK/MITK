@@ -146,7 +146,10 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     typedef itk::Image<pixeltype, dimension> ImageType;                                   \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                    \
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();                 \
-    imagetoitk->SetInput(mitkImage);                                                     \
+    const mitk::Image* constImage = mitkImage;                                           \
+    mitk::Image* nonConstImage = const_cast<mitk::Image*>(constImage);                   \
+    nonConstImage->Update();                                                             \
+    imagetoitk->SetInput(nonConstImage);                                                     \
     imagetoitk->Update();                                                               \
     itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
 }                                                              

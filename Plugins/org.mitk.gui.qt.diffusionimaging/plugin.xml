@@ -145,7 +145,7 @@
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.dwisoftwarephantomview"
-          name="DWI Software Phantoms"
+          name="ROI Based Phantoms"
           class="QmitkDwiSoftwarePhantomView"
           icon="resources/phantom.png" />
   </extension>

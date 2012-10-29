@@ -19,33 +19,54 @@
 
 =============================================================================*/
 
+#include "usTestModuleBService.h"
 
-#ifndef USTRACKEDSERVICELISTENER_H
-#define USTRACKEDSERVICELISTENER_H
+#include <usModuleImport.h>
+#include <usModuleActivator.h>
+#include <usModuleContext.h>
+#include <usConfig.h>
 
-#include "usServiceEvent.h"
+#include US_BASECLASS_HEADER
 
 US_BEGIN_NAMESPACE
 
-/**
- * This class is not intended to be used directly. It is exported to support
- * the US module system.
- */
-struct TrackedServiceListener // : public US_BASECLASS_NAME
+struct TestModuleB : public US_BASECLASS_NAME, public TestModuleBService
 {
-  virtual ~TrackedServiceListener() {}
 
-  /**
-   * Slot connected to service events for the
-   * <code>ServiceTracker</code> class. This method must NOT be
-   * synchronized to avoid deadlock potential.
-   *
-   * @param event <code>ServiceEvent</code> object from the framework.
-   */
-  virtual void ServiceChanged(const ServiceEvent event) = 0;
+  TestModuleB(ModuleContext* mc)
+  {
+    US_INFO << "Registering TestModuleBService";
+    mc->RegisterService<TestModuleBService>(this);
+  }
 
+};
+
+class TestModuleBActivator : public ModuleActivator
+{
+public:
+
+  TestModuleBActivator() : s(0) {}
+  ~TestModuleBActivator() { delete s; }
+
+  void Load(ModuleContext* context)
+  {
+    s = new TestModuleB(context);
+  }
+
+  void Unload(ModuleContext*)
+  {
+  }
+
+private:
+
+  TestModuleB* s;
 };
 
 US_END_NAMESPACE
 
-#endif // USTRACKEDSERVICELISTENER_H
+US_EXPORT_MODULE_ACTIVATOR(TestModuleB, US_PREPEND_NAMESPACE(TestModuleBActivator))
+
+
+US_IMPORT_MODULE(TestModuleImportedByB)
+
+US_LOAD_IMPORTED_MODULES(TestModuleB, TestModuleImportedByB)

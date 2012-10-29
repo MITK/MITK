@@ -108,8 +108,8 @@ int TestEvaluate()
     ldap = LDAPFilter( "  ( |(cn=Babs *)(sn=1) )" );
     props.clear();
     std::vector<Any> list;
-    list.push_back(Any(std::string("Babs Jensen")));
-    list.push_back(Any(std::string("1")));
+    list.push_back(std::string("Babs Jensen"));
+    list.push_back(std::string("1"));
     props["sn"] = list;
     US_TEST_OUTPUT(<< "Evaluating vector expr: " << ldap.ToString())
     eval = ldap.Match(props);

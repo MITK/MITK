@@ -97,6 +97,18 @@ struct ModuleActivator
 
 US_END_NAMESPACE
 
+#define US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(type)                                     \
+  struct ScopedPointer                                                                  \
+  {                                                                                     \
+    ScopedPointer(US_PREPEND_NAMESPACE(ModuleActivator)* activator = 0) : m_Activator(activator) {} \
+    ~ScopedPointer() { delete m_Activator; }                                            \
+    US_PREPEND_NAMESPACE(ModuleActivator)* m_Activator;                                 \
+  };                                                                                    \
+                                                                                        \
+  static ScopedPointer activatorPtr;                                                    \
+  if (activatorPtr.m_Activator == 0) activatorPtr.m_Activator = new type;               \
+  return activatorPtr.m_Activator;
+
 /**
  * \ingroup MicroServices
  *
@@ -112,35 +124,10 @@ US_END_NAMESPACE
  * Example:
  * \snippet uServices-activator/main.cpp 0
  */
-
-#define US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(type)                                     \
-  struct ScopedPointer                                                                  \
-  {                                                                                     \
-    ScopedPointer(US_PREPEND_NAMESPACE(ModuleActivator)* activator = 0) : m_Activator(activator) {} \
-    ~ScopedPointer() { delete m_Activator; }                                            \
-    US_PREPEND_NAMESPACE(ModuleActivator)* m_Activator;                                 \
-  };                                                                                    \
-                                                                                        \
-  static ScopedPointer activatorPtr;                                                    \
-  if (activatorPtr.m_Activator == 0) activatorPtr.m_Activator = new type;               \
-  return activatorPtr.m_Activator;
-
-#ifdef US_BUILD_SHARED_LIBS
-
-  #define US_EXPORT_MODULE_ACTIVATOR(_module_libname, _activator_type)                  \
-    extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_libname () \
-    {                                                                                   \
-      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(_activator_type)                            \
-    }
-
-#else
-
-  #define US_EXPORT_MODULE_ACTIVATOR(_module_libname, _activator_type)                  \
-    US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_libname () \
-    {                                                                                   \
-      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(_activator_type)                            \
-    }
-
-#endif
+#define US_EXPORT_MODULE_ACTIVATOR(_module_libname, _activator_type)                  \
+  extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_libname () \
+  {                                                                                   \
+    US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(_activator_type)                            \
+  }
 
 #endif /* USMODULEACTIVATOR_H_ */

@@ -73,6 +73,7 @@ set(_public_headers
   module/usModuleActivator.h
   module/usModuleContext.h
   module/usModuleEvent.h
+  module/usModuleImport.h
   module/usModuleInfo.h
   module/usModuleInitialization.h
   module/usModuleRegistry.h
@@ -107,11 +108,14 @@ if(NOT US_IS_EMBEDDED)
     link_directories(${US_LINK_DIRS})
   endif()
 
-  if(US_BUILD_SHARED_LIBS)
-    usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME} VERSION "0.9.0")
-  endif()
+  usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME} VERSION "0.9.0")
 
-  add_library(${PROJECT_NAME} ${_srcs} ${_public_headers} ${_private_headers})
+  add_library(${PROJECT_NAME} ${_srcs}
+              ${_public_headers} ${_private_headers} ${us_config_h_file})
+  if(NOT US_IS_EMBEDDED AND US_LINK_FLAGS)
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "${US_LINK_FLAGS}")
+  endif()
+  set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS US_FORCE_MODULE_INIT)
   set_property(TARGET ${PROJECT_NAME} PROPERTY FRAMEWORK 1)
   if(US_LINK_LIBRARIES)
     target_link_libraries(${PROJECT_NAME} ${US_LINK_LIBRARIES})
@@ -141,8 +145,8 @@ foreach(_header ${_public_headers} ${_private_headers})
 endforeach()
 
 if(NOT US_IS_EMBEDDED)
-  set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER ${US_PUBLIC_HEADERS} ${us_config_h_file})
-  set_property(TARGET ${PROJECT_NAME} PROPERTY PRIVATE_HEADER ${_private_headers})
+  set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER ${US_PUBLIC_HEADERS})
+  set_property(TARGET ${PROJECT_NAME} PROPERTY PRIVATE_HEADER ${_private_headers} ${us_config_h_file})
 else()
   set(US_PUBLIC_HEADERS ${US_PUBLIC_HEADERS} PARENT_SCOPE)
   set(US_PRIVATE_HEADERS ${US_PRIVATE_HEADERS} PARENT_SCOPE)

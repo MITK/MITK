@@ -19,33 +19,50 @@
 
 =============================================================================*/
 
+#ifndef USTESTUTILSHAREDLIBRARY_H
+#define USTESTUTILSHAREDLIBRARY_H
 
-#ifndef USTRACKEDSERVICELISTENER_H
-#define USTRACKEDSERVICELISTENER_H
+#include "usConfig.h"
 
-#include "usServiceEvent.h"
+#include <string>
 
 US_BEGIN_NAMESPACE
 
-/**
- * This class is not intended to be used directly. It is exported to support
- * the US module system.
- */
-struct TrackedServiceListener // : public US_BASECLASS_NAME
+class SharedLibraryHandle
 {
-  virtual ~TrackedServiceListener() {}
+public:
 
-  /**
-   * Slot connected to service events for the
-   * <code>ServiceTracker</code> class. This method must NOT be
-   * synchronized to avoid deadlock potential.
-   *
-   * @param event <code>ServiceEvent</code> object from the framework.
-   */
-  virtual void ServiceChanged(const ServiceEvent event) = 0;
+  SharedLibraryHandle();
 
+  SharedLibraryHandle(const std::string& name);
+
+  virtual ~SharedLibraryHandle();
+
+  void Load();
+
+  void Load(const std::string& name);
+
+  void Unload();
+
+  std::string GetAbsolutePath(const std::string& name);
+
+  std::string GetAbsolutePath();
+
+  static std::string GetLibraryPath();
+
+  static std::string Suffix();
+
+  static std::string Prefix();
+
+private:
+
+  SharedLibraryHandle(const SharedLibraryHandle&);
+  SharedLibraryHandle& operator = (const SharedLibraryHandle&);
+
+  std::string m_Name;
+  void* m_Handle;
 };
 
 US_END_NAMESPACE
 
-#endif // USTRACKEDSERVICELISTENER_H
+#endif // USTESTUTILSHAREDLIBRARY_H

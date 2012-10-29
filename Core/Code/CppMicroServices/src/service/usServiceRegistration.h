@@ -155,7 +155,7 @@ public:
   ServiceRegistration& operator=(const ServiceRegistration& registration);
 
 
-protected:
+private:
 
   friend class ServiceRegistry;
   friend class ServiceReferencePrivate;

@@ -20,32 +20,21 @@
 =============================================================================*/
 
 
-#ifndef USTRACKEDSERVICELISTENER_H
-#define USTRACKEDSERVICELISTENER_H
+#ifndef USTESTMODULEBSERVICE_H
+#define USTESTMODULEBSERVICE_H
 
-#include "usServiceEvent.h"
+#include <usConfig.h>
+#include <usServiceInterface.h>
 
 US_BEGIN_NAMESPACE
 
-/**
- * This class is not intended to be used directly. It is exported to support
- * the US module system.
- */
-struct TrackedServiceListener // : public US_BASECLASS_NAME
+struct TestModuleBService
 {
-  virtual ~TrackedServiceListener() {}
-
-  /**
-   * Slot connected to service events for the
-   * <code>ServiceTracker</code> class. This method must NOT be
-   * synchronized to avoid deadlock potential.
-   *
-   * @param event <code>ServiceEvent</code> object from the framework.
-   */
-  virtual void ServiceChanged(const ServiceEvent event) = 0;
-
+  virtual ~TestModuleBService() {}
 };
 
 US_END_NAMESPACE
 
-#endif // USTRACKEDSERVICELISTENER_H
+US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleBService), "org.cppmicroservices.TestModuleBService")
+
+#endif // USTESTMODULEASERVICE_H

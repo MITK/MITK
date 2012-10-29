@@ -19,33 +19,22 @@
 
 =============================================================================*/
 
+#include <usModuleActivator.h>
+#include <usModuleInitialization.h>
 
-#ifndef USTRACKEDSERVICELISTENER_H
-#define USTRACKEDSERVICELISTENER_H
+US_USE_NAMESPACE
 
-#include "usServiceEvent.h"
-
-US_BEGIN_NAMESPACE
-
-/**
- * This class is not intended to be used directly. It is exported to support
- * the US module system.
- */
-struct TrackedServiceListener // : public US_BASECLASS_NAME
+struct MyStaticModuleActivator : public ModuleActivator
 {
-  virtual ~TrackedServiceListener() {}
+  void Load(ModuleContext* /*context*/)
+  {
+    std::cout << "Hello from a static module." << std::endl;
+  }
 
-  /**
-   * Slot connected to service events for the
-   * <code>ServiceTracker</code> class. This method must NOT be
-   * synchronized to avoid deadlock potential.
-   *
-   * @param event <code>ServiceEvent</code> object from the framework.
-   */
-  virtual void ServiceChanged(const ServiceEvent event) = 0;
-
+  void Unload(ModuleContext* /*context*/) {}
 };
 
-US_END_NAMESPACE
+US_EXPORT_MODULE_ACTIVATOR(MyStaticModule, MyStaticModuleActivator)
 
-#endif // USTRACKEDSERVICELISTENER_H
+US_INITIALIZE_MODULE("My Static Module", "MyStaticModule", "", "1.0.0")
+

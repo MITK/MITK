@@ -125,6 +125,7 @@ void Module::Start()
       d->moduleActivator->Load(d->moduleContext);
     }
 
+    d->StartStaticModules();
     d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));
 //  }
 //  catch (...)
@@ -152,6 +153,9 @@ void Module::Stop()
   try
   {
     d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADING, this));
+
+    d->StopStaticModules();
+
     if (d->moduleActivator)
     {
       d->moduleActivator->Unload(d->moduleContext);

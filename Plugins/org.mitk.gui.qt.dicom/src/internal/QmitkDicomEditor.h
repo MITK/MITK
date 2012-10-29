@@ -118,7 +118,7 @@ protected:
 
     void SetDatabaseDirectory(const QString& databaseDirectory);
 
-    void QmitkDicomEditor::CreateTemporaryDirectory();
+    void CreateTemporaryDirectory();
 
     void StartDicomDirectoryListener();
 

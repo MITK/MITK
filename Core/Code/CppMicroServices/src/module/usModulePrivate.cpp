@@ -89,7 +89,7 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
     }
     catch (const std::exception& e)
     {
-      throw std::invalid_argument(std::string("US module does not specify a valid version identifier. Got exception: ") + e.what());
+      throw std::invalid_argument(std::string("CppMicroServices module does not specify a valid version identifier. Got exception: ") + e.what());
     }
   }
 

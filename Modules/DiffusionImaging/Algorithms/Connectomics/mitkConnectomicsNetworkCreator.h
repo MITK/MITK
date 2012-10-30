@@ -32,6 +32,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+  /**
+    * \brief Creates connectomics networks from fibers and parcellation
+    *
+    * This class needs a parcellation image and a fiber image to be set. Then you can create
+    * a connectomics network from the two, using different strategies.
+    */
+
   class MitkDiffusionImaging_EXPORT ConnectomicsNetworkCreator : public itk::Object
   {
   public:

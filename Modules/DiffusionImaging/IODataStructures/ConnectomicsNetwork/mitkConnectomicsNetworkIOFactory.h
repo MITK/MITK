@@ -26,10 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-//##Documentation
-//## @brief Create instances of ConnectomicsNetwork objects using an object factory.
-//##
-//## @ingroup IO
+ /**
+   * \brief Create instances of ConnectomicsNetwork objects using an object factory.
+   *
+   * \ingroup IO
+   */
 class MitkDiffusionImaging_EXPORT ConnectomicsNetworkIOFactory : public itk::ObjectFactoryBase
 {
 public:  

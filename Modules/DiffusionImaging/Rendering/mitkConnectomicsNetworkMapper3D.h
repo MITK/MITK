@@ -59,10 +59,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  //##Documentation
-  //## @brief Mapper for Networks
-  //## @ingroup Mapper
-//  template<class TPixelType>
+  /**
+    * \brief Mapper for Networks
+    * \ingroup Mapper
+    */
+
   class MitkDiffusionImaging_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper3D
   {
   public:

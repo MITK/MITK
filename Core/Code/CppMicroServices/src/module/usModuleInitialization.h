@@ -36,12 +36,18 @@
  * \brief Creates initialization code for a module.
  *
  * Each module which wants to register itself with the CppMicroServices library
- * has to put a call to this macro in one of its source files.
+ * has to put a call to this macro (or to #US_INITIALIZE_MODULE_WITH_CUSTOM_AUTOLOADDIR)
+ * in one of its source files.
  *
  * Example call for a module with file-name "libmylibname.so".
  * \code
  * US_INITIALIZE_MODULE("My Service Implementation", "mylibname", "", "1.0.0")
  * \endcode
+ *
+ * This will initialize the module for use with the CppMicroServices library, using a default
+ * auto-load directory named after the provided library name in \c _module_libname.
+ *
+ * \sa US_INITIALIZE_MODULE_WITH_CUSTOM_AUTOLOADDIR
  *
  * \remarks If you are using CMake, consider using the provided CMake macro
  * <code>usFunctionGenerateModuleInit()</code>.

@@ -37,6 +37,10 @@ set(_tests
   usStaticModuleTest
 )
 
+if(US_BUILD_SHARED_LIBS)
+  list(APPEND _tests usServiceListenerTest usModuleAutoLoadTest)
+endif()
+
 set(_additional_srcs
   usTestManager.cpp
   usTestUtilModuleListener.cpp

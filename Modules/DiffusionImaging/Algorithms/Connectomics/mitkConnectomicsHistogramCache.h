@@ -29,8 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  //##Documentation
-  //## @brief Provides a method to cache network histograms
+  /**
+    * @brief Provides a method to cache network histograms
+    */
 
   class ConnectomicsHistogramsContainer 
   {

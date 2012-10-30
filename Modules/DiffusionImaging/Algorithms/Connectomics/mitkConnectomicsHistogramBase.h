@@ -25,8 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  //##Documentation
-  //## @brief Superclass for histograms working with connectomic networks
+  /**
+    * \brief Superclass for histograms working with connectomic networks
+    */
 
   class ConnectomicsHistogramBase : public mitk::SimpleHistogram
   {

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 /**
-  \brief Serializes mitk::Surface for mitk::SceneIO
+  \brief Serializes mitk::ConnectomicsNetwork for mitk::SceneIO
 */
 class MitkDiffusionImaging_EXPORT ConnectomicsNetworkSerializer : public BaseDataSerializer
 {

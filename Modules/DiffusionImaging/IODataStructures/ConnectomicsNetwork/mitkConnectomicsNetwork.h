@@ -28,7 +28,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /**
-  * \brief Base Class for Connectomics Networks   */
+  * \brief Connectomics Network Class
+  *
+  * This class is designed to represent a connectomics network (brain network). It encapsulates a
+  * boost adjacency list and provides additional capabilities. The information contained in the nodes and edges is:
+  *
+  * Network Node:
+  * <ul>
+  *  <li> int ID - The id of the node
+  *  <li> string label - The label of the node, this can be any string, such as an anatomical label
+  *  <li> vector<float> coordinates - The coordinates the node should be displayed at
+  * </ul>
+  *
+  * Network Edge:
+  * <ul>
+  *  <li> int sourceId - The Id of the source node
+  *  <li> int targetId - The Id of the target node
+  *  <li> int weight - Weight of the edge as int (used for counting fibers)
+  *  <li> double edge_weight - Used for boost and algorithms, should be between 0 and 1
+  * </ul>
+  */
   class MitkDiffusionImaging_EXPORT ConnectomicsNetwork : public BaseData
   {
   public:

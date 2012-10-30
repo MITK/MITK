@@ -11,6 +11,7 @@ include(mitkFunctionCheckMitkCompatibility)
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
+include(mitkFunctionInstallAutoLoadModules)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)
@@ -141,3 +142,7 @@ if(MITK_USE_BLUEBERRY)
       "${MITK_PLUGIN_PROVISIONING_FILE}")
 
 endif(MITK_USE_BLUEBERRY)
+
+# Set properties on exported targets
+@MITK_EXPORTED_TARGET_PROPERTIES@
+

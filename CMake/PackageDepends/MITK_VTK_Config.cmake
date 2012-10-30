@@ -6,7 +6,8 @@ if(NOT MITK_VTK_Config_INCLUDED)
   endif()
 
   include(${VTK_USE_FILE})
-    list(APPEND ALL_INCLUDE_DIRECTORIES ${VTK_INCLUDE_DIRS})
+  list(APPEND ALL_INCLUDE_DIRECTORIES ${VTK_INCLUDE_DIRS})
+  list(APPEND ALL_LIBRARY_DIRS ${VTK_LIBRARY_DIRS})
   if(VTK_FOR_MITK_LIBRARIES)
     list(APPEND ALL_LIBRARIES ${VTK_FOR_MITK_LIBRARIES})
   else()
@@ -17,7 +18,6 @@ if(NOT MITK_VTK_Config_INCLUDED)
       vtkGraphics
       vtkCommon
       vtkFiltering
-      vtkftgl
       vtkGraphics
       vtkHybrid
       vtkImaging

@@ -58,7 +58,6 @@ set(VTK_FOR_MITK_LIBRARIES
     vtkGraphics
     vtkCommon
     vtkFiltering
-    vtkftgl
     vtkGraphics
     vtkHybrid
     vtkImaging

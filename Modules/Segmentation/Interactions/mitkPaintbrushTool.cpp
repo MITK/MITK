@@ -83,33 +83,32 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   if (!positionEvent) return;
 
   // Get Spacing of current Slice
-  mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing();
+  //mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing();
 
-  // Draw a contour in cross-shape according to selected brush size
-
-
+  //
+  // Draw a contour in Square according to selected brush size
+  //
+  int radius = (m_Size+1)/2;
+  Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+  contourInImageIndexCoordinates->Initialize();
 
 
   mitk::Point3D pIndex;
   pIndex[0] = 0;
   pIndex[1] = 0;
   pIndex[2] = 0;
-  Contour::Pointer contourInImageIndexCoordinates = Contour::New();
-  contourInImageIndexCoordinates->Initialize();
 
   mitk::Point3D p0,p1,p2,p3;
   p0 = p1 = p2 = p3 = pIndex;
 
-  p0[0] -= vSpacing[0]*0.5;
-  p0[1] -= vSpacing[1]*0.5;
-  p1[0] -= vSpacing[0]*0.5;
-  p1[1] += vSpacing[1]*0.5;
-  p2[0] += vSpacing[0]*0.5;
-  p2[1] += vSpacing[1]*0.5;
-  p3[0] += vSpacing[0]*0.5;
-  p3[1] -= vSpacing[1]*0.5;
-
-
+  p0[0] -=0.5 * m_Size;
+  p0[1] -=0.5 * m_Size;
+  p1[0] -=0.5 * m_Size;
+  p1[1] +=0.5 * m_Size;
+  p2[0] +=0.5 * m_Size;
+  p2[1] +=0.5 * m_Size;
+  p3[0] +=0.5 * m_Size;
+  p3[1] -=0.5 * m_Size;
 
   contourInImageIndexCoordinates->AddVertex( p0 );
   contourInImageIndexCoordinates->AddVertex( p1 );
@@ -118,93 +117,6 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 
   m_MasterContour = contourInImageIndexCoordinates;
 
-  MITK_INFO << "added Vertex: " << pIndex;
-
-  /*
-  //Cloning Working slice and set direction to identity
-  Image::Pointer temporarySlice = m_WorkingSlice->Clone();
-  temporarySlice->GetGeometry()->SetIdentity();
-
-  // Create clone of current Slice and draw the contour on.
-  // This is not really good approach
-  // We actually just need the spacing of the slice and a pixel-extends that can handle BrushSize
-  // also the whole ipPic stuff is deprecated
-  mitkIpPicDescriptor* stupidClone = mitkIpPicNew();
-  CastToIpPicDescriptor( temporarySlice->GetSliceData(), stupidClone );
-  unsigned int pixelWidth  = m_Size + 1;
-  unsigned int pixelHeight = m_Size + 1;
-  if ( stupidClone->n[0] < m_Size || stupidClone->n[1] < m_Size )
-  {
-    MITK_INFO << "Brush size is bigger than your working image. Reconsider this...\n"
-                "(Or tell your progammer until (s)he fixes this message.)" << std::endl;
-    //mitkIpPicFree( stupidClone );
-    return;
-  }
-
-  unsigned int lineLength( stupidClone->n[0] );
-  unsigned int oneContourOffset(0);
-  float circleCenterX = (float)m_Size / 2.0;
-  float circleCenterY = (float)m_Size / 2.0;
-  for (unsigned int x = 0; x <= pixelWidth; ++x)
-  {
-    for (unsigned int y = 0; y <= pixelHeight; ++y)
-    {
-      unsigned int offset = lineLength * y + x;
-      ipMITKSegmentationTYPE* current = (ipMITKSegmentationTYPE*)stupidClone->data + offset;
-
-      float pixelCenterX = x;
-      float pixelCenterY = y;
-
-      float xoff = pixelCenterX - circleCenterX;
-      float yoff = pixelCenterY - circleCenterY;
-
-      bool inside = xoff * xoff + yoff * yoff < (m_Size * m_Size) / 4.0; // no idea, if this would work for ellipses
-      if (inside)
-      {
-        *current = 1;
-        oneContourOffset = offset;
-      }
-      else
-      {
-        *current = 0;
-      }
-    }
-  }
-
-  int numberOfContourPoints( 0 );
-  int newBufferSize( 0 );
-  float* contourPoints = ipMITKSegmentationGetContour8N( stupidClone, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
-  if (!contourPoints)
-  {
-    //mitkIpPicFree( stupidClone );
-    return;
-  }
-
-  // copy point from float* to mitk::Contour
-  Contour::Pointer contourInImageIndexCoordinates = Contour::New();
-  contourInImageIndexCoordinates->Initialize();
-  Point3D newPoint;
-  //ipMITKSegmentationGetContour8N returns all points, which causes vtk warnings, since the first and the last points are coincident.
-  //leaving the last point out, the contour is still drawn correctly
-  for (int index = 0; index < numberOfContourPoints-1; ++index)
-  {
-    newPoint[0] = contourPoints[ 2 * index + 0 ] - circleCenterX; // master contour should be centered around (0,0)
-    newPoint[1] = contourPoints[ 2 * index + 1] - circleCenterY;
-    newPoint[2] = 0.0;
-    MITK_DEBUG << "Point [" << index << "] (" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
-
-    contourInImageIndexCoordinates->AddVertex( newPoint );
-  }
-
-  free(contourPoints);
-
-  m_MasterContour = contourInImageIndexCoordinates;
-
-  // The PicDescriptor is only REFERENCING(!) the data, the temporarySlice takes care of deleting the data also the descriptor is pointing on
-  // because they got allocated by the ImageDataItem, not the descriptor.
-  stupidClone->data = NULL;
-  //mitkIpPicFree( stupidClone );
-  */
 }
 
 

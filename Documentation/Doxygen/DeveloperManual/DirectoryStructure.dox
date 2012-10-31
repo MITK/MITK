@@ -7,19 +7,19 @@ To avoid clutter and ease the administration of the source code the MITK source 
 
 The top level directories are the following:
 
-\li DirectoryStructurePageApplications
-\li DirectoryStructurePageBlueBerry
-\li DirectoryStructurePageBuild
-\li DirectoryStructurePageCMake
-\li DirectoryStructurePageCMakeExternals
-\li DirectoryStructurePageConfig
-\li DirectoryStructurePageCore
-\li DirectoryStructurePageDocumentation
-\li DirectoryStructurePageExamples
-\li DirectoryStructurePageModules
-\li DirectoryStructurePagePlugins
-\li DirectoryStructurePageUtilities
-\li DirectoryStructurePageWrapping
+\li \ref DirectoryStructurePageApplications
+\li \ref DirectoryStructurePageBlueBerry
+\li \ref DirectoryStructurePageBuild
+\li \ref DirectoryStructurePageCMake
+\li \ref DirectoryStructurePageCMakeExternals
+\li \ref DirectoryStructurePageConfig
+\li \ref DirectoryStructurePageCore
+\li \ref DirectoryStructurePageDocumentation
+\li \ref DirectoryStructurePageExamples
+\li \ref DirectoryStructurePageModules
+\li \ref DirectoryStructurePagePlugins
+\li \ref DirectoryStructurePageUtilities
+\li \ref DirectoryStructurePageWrapping
 
 see the corresponding section for more information.
 
@@ -31,7 +31,7 @@ This directory contains the different applications. Each application has its own
 
 \subsection DirectoryStructurePageBlueBerry BlueBerry
 
-The BlueBerry directory contains all code related to the BlueBerry framework. This code can be used independently of MITK. Its documentation can be found @BLUEBERRY_DOXYGEN_LINK@ "here".
+The BlueBerry directory contains all code related to the BlueBerry framework. This code can be used independently of MITK.
 
 \subsection DirectoryStructurePageBuild Build
 
@@ -39,11 +39,11 @@ The Build directory contains tools for the generation of MITK Plugins, editing o
 
 \subsection DirectoryStructurePageCMake CMake
 
-The CMake directory contains CMake files, macros and templates for the configuration of MITK as a project.
+The %CMake directory contains %CMake files, macros and templates for the configuration of MITK as a project.
 
 \subsection DirectoryStructurePageCMakeExternals CMakeExternals
 
-This directory contains CMake files for the configuration of other projects used by MITK.
+This directory contains %CMake files for the configuration of other projects used by MITK.
 
 \subsection DirectoryStructurePageConfig Config
 

@@ -24,9 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandardFileLocations.h>
 #include <mitkFiberBuilder.h>
 #include <mitkMetropolisHastingsSampler.h>
-//#include <mitkEnergyComputer.h>
 #include <itkTensorImageToQBallImageFilter.h>
 #include <mitkGibbsEnergyComputer.h>
+#include <mitkRotationOperation.h>
+#include <mitkInteractionConst.h>
 
 // ITK
 #include <itkImageDuplicator.h>
@@ -102,11 +103,15 @@ void FibersFromPointsFilter::GenerateData()
             const mitk::Geometry2D* pfgeometry = figure->GetGeometry2D();
             const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(pfgeometry);
 
-            mitk::Point3D w;
+            mitk::Point3D w, wc;
             planeGeo->Map(p1, w);
+
+            wc = figure->GetWorldControlPoint(0);
 
             vtkIdType id = m_VtkPoints->InsertNextPoint(w.GetDataPointer());
             container->GetPointIds()->InsertNextId(id);
+
+            vnl_vector_fixed< float, 3 > n = planeGeo->GetNormalVnl();
 
             for (int k=1; k<bundle.size(); k++)
             {
@@ -127,14 +132,22 @@ void FibersFromPointsFilter::GenerateData()
                 newP[1] = m_2DPoints.at(j)[1];
                 newP = rot*newP;
 
+                mitk::Geometry2D* pfgeometry = const_cast<mitk::Geometry2D*>(figure->GetGeometry2D());
+                mitk::PlaneGeometry* planeGeo = dynamic_cast<mitk::PlaneGeometry*>(pfgeometry);
+                mitk::Vector3D perp = wc-planeGeo->ProjectPointOntoPlane(wc); perp.Normalize();
+                vnl_vector_fixed< float, 3 > n2 = planeGeo->GetNormalVnl();
+                wc = figure->GetWorldControlPoint(0);
+
+                // is flip needed?
+                if (dot_product(perp.GetVnlVector(),n2)>0)
+                    newP[0] *= -1;
+
                 p1[0] += newP[0]*r;
                 p1[1] += newP[1]*r;
 
-                const mitk::Geometry2D* pfgeometry = figure->GetGeometry2D();
-                const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(pfgeometry);
-
                 mitk::Point3D w;
                 planeGeo->Map(p1, w);
+
 
                 vtkIdType id = m_VtkPoints->InsertNextPoint(w.GetDataPointer());
                 container->GetPointIds()->InsertNextId(id);

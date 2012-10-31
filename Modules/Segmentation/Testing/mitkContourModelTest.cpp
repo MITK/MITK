@@ -195,7 +195,7 @@ static void TestIsclosed()
 
   contour->Close();
 
-  MITK_TEST_CONDITION(contour->IsClosed(), "close contour");
+  MITK_TEST_CONDITION(contour->IsClosed(), "closed contour");
 
   //no vertices should be added to a closed contour
   int oldNumberOfVertices = contour->GetNumberOfVertices();
@@ -207,7 +207,7 @@ static void TestIsclosed()
 
   int newNumberOfVertices = contour->GetNumberOfVertices();
 
-  MITK_TEST_CONDITION(oldNumberOfVertices == newNumberOfVertices, "no vertices added to closed contour");
+  MITK_TEST_CONDITION(oldNumberOfVertices != newNumberOfVertices, "vertices added to closed contour");
 }
 
 
@@ -259,14 +259,16 @@ static void TestSelectVertexAtWrongPosition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
+  MITK_TEST_CONDITION_REQUIRED(contour->GetSelectedVertex() == NULL, "slected vertex is NULL");
   mitk::Point3D p;
   p[0] = p[1] = p[2] = 0;
 
   contour->AddVertex(p);
 
-  p[0] = p[1] = p[2] = 2;
+  mitk::Point3D p2;
+  p2[0] = p2[1] = p2[2] = 2;
 
-  contour->SelectVertexAt(p, 0.1);
+  contour->SelectVertexAt(p2, 0.1);
 
   MITK_TEST_CONDITION(contour->GetSelectedVertex() == NULL, "Vertex was not selected");
 }

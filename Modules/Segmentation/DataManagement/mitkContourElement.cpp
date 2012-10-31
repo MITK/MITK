@@ -90,12 +90,7 @@ mitk::ContourElement::VertexType* mitk::ContourElement::GetVertexAt(const mitk::
 
   if(eps > 0)
   {
-    if(this->m_Vertices->size() == 1)
-    {
-      return this->m_Vertices->at(0);
-    }
-
-    if(this->m_Vertices->size() < 1000000)
+    if(true ) //currently no method with better performance is available this->m_Vertices->size() < 1000)
     {
       return BruteForceGetVertexAt(point, eps);
     }

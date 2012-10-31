@@ -78,7 +78,7 @@ void mitk::PaintbrushTool::SetSize(int value)
 mitk::Point2D mitk::PaintbrushTool::upperLeft(mitk::Point2D p)
 {
    p[0] -= 0.5;
-   p[1] -= 0.5;
+   p[1] += 0.5;
    return p;
 }
 
@@ -96,14 +96,12 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   //
   // Draw a contour in Square according to selected brush size
   //
-  int radius = (m_Size+1)/2;
+  int radius = (m_Size)/2;
   Contour::Pointer contourInImageIndexCoordinates = Contour::New();
   contourInImageIndexCoordinates->Initialize();
 
 
   // we will compute the control points for the upper left quarter part of a circle contour
-  // and determine the remaining points by mirroring
-  std::vector< mitk::Point2D > fullCycle;
   std::vector< mitk::Point2D > quarterCycleUpperRight;
   std::vector< mitk::Point2D > quarterCycleLowerRight;
   std::vector< mitk::Point2D > quarterCycleLowerLeft;
@@ -114,7 +112,11 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   bool curPointIsInside = true;
   curPoint[0] = 0;
   curPoint[1] = radius;
-  quarterCycleUpperRight.push_back(curPoint);
+  quarterCycleUpperRight.push_back( upperLeft(curPoint) );
+
+  // to estimate if a pixel is inside the circle, we need to compare against the 'outer radius'
+  // i.e. the distance from the midpoint [0,0] to the border of the pixel [0,radius]
+  const float outer_radius = static_cast<float>(radius) + 0.5;
 
   while (curPoint[1] >= 0)
   {
@@ -123,8 +125,8 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      {
         // increment posX and chec
         curPoint[0]++;
-        float len = sqrt(curPoint[0] * curPoint[0] + curPoint[1] + curPoint[1]);
-        if ( len > radius )
+        float len = sqrt(curPoint[0] * curPoint[0] + curPoint[1] * curPoint[1]);
+        if ( len > outer_radius )
         {
            // found first Pixel in this horizontal line, that is outside the circle
            curPointIsInside = false;
@@ -137,8 +139,8 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      {
         // increment posX and chec
         curPoint[1]--;
-        float len = sqrt(curPoint[0] * curPoint[0] + curPoint[1] + curPoint[1]);
-        if ( len <= radius )
+        float len = sqrt(curPoint[0] * curPoint[0] + curPoint[1] * curPoint[1]);
+        if ( len <= outer_radius )
         {
            // found first Pixel in this horizontal line, that is outside the circle
            curPointIsInside = true;
@@ -158,19 +160,25 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   {
      mitk::Point2D p;
      p = *it;
+
+     // the contour points in the lower right corner have same position but with negative y values
      p[1] *= -1;
      quarterCycleLowerRight.push_back(p);
 
+     // the contour points in the lower left corner have same position
+     // but with both x,y negative
      p[0] *= -1;
      quarterCycleLowerLeft.push_back(p);
 
+     // the contour points in the upper left corner have same position
+     // but with x negative
      p[1] *= -1;
      quarterCycleUpperLeft.push_back(p);
 
      it++;
   }
 
-  // now fill contour
+  // fill contour with poins in right ordering, starting with the upperRight block
   mitk::Point3D tempPoint;
   for (int i=0; i<quarterCycleUpperRight.size(); i++)
   {
@@ -179,7 +187,8 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      tempPoint[2] = 0;
      contourInImageIndexCoordinates->AddVertex( tempPoint  );
   }
-  for (int i=quarterCycleUpperRight.size()-1; i>=0; i++)
+  // the lower right has to be parsed in reverse order
+  for (int i=quarterCycleLowerRight.size()-1; i>=0; i--)
   {
      tempPoint[0] = quarterCycleLowerRight[i][0];
      tempPoint[1] = quarterCycleLowerRight[i][1];
@@ -193,39 +202,14 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      tempPoint[2] = 0;
      contourInImageIndexCoordinates->AddVertex( tempPoint );
   }
-  for (int i=quarterCycleUpperLeft.size()-1; i>=0; i++)
+  // the upper left also has to be parsed in reverse order
+  for (int i=quarterCycleUpperLeft.size()-1; i>=0; i--)
   {
      tempPoint[0] = quarterCycleUpperLeft[i][0];
      tempPoint[1] = quarterCycleUpperLeft[i][1];
      tempPoint[2] = 0;
      contourInImageIndexCoordinates->AddVertex( tempPoint );
   }
-
-
-/*
-  mitk::Point3D pIndex;
-  pIndex[0] = 0;
-  pIndex[1] = 0;
-  pIndex[2] = 0;
-
-  mitk::Point3D p0,p1,p2,p3;
-  p0 = p1 = p2 = p3 = pIndex;
-
-  p0[0] -=0.5 * m_Size;
-  p0[1] -=0.5 * m_Size;
-  p1[0] -=0.5 * m_Size;
-  p1[1] +=0.5 * m_Size;
-  p2[0] +=0.5 * m_Size;
-  p2[1] +=0.5 * m_Size;
-  p3[0] +=0.5 * m_Size;
-  p3[1] -=0.5 * m_Size;
-
-  contourInImageIndexCoordinates->AddVertex( p0 );
-  contourInImageIndexCoordinates->AddVertex( p1 );
-  contourInImageIndexCoordinates->AddVertex( p2 );
-  contourInImageIndexCoordinates->AddVertex( p3 );
-*/
-
 
   m_MasterContour = contourInImageIndexCoordinates;
 

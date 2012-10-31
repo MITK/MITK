@@ -389,6 +389,10 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
             }
             else
             {
+                vnl_vector<TO> coeffs(m_NumberCoefficients);
+                coeffs = ( (*m_CoeffReconstructionMatrix) * B );
+                coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+                coeffPixel = coeffs.data_block();
                 odf = ( (*m_ReconstructionMatrix) * B ).data_block();
             }
             odf = Normalize(odf, b0);

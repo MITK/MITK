@@ -115,7 +115,7 @@
          <string>Specify number of iterations for the tracking algorithm.</string>
         </property>
         <property name="maximum">
-         <number>10</number>
+         <number>9</number>
         </property>
         <property name="value">
          <number>6</number>

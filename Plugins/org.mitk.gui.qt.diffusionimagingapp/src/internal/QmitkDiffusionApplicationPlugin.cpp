@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,11 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Perspectives/QmitkDIAppDicomImportPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppFiberTractographyPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppIVIMPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppImageProcessingPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h"
-#include "src/internal/Perspectives/QmitkDIAppScreenshotsMoviesPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppTBSSPerspective.h"
-#include "src/internal/Perspectives/QmitkDIAppVolumeVisualizationPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppUtilityPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppRegistrationPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppVisualizationPerspective.h"
 
 #include <mitkVersion.h>
 #include <mitkLogMacros.h>
@@ -60,22 +63,25 @@ QmitkDiffusionApplicationPlugin* QmitkDiffusionApplicationPlugin::GetDefault()
 void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
 {
   berry::AbstractUICTKPlugin::start(context);
-  
+
   this->context = context;
-  
+
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppApplication, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppIntroPart, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppConnectomicsPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppDicomImportPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppImageProcessingPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppFiberTractographyPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppIVIMPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppPreprocessingReconstructionPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppQuantificationPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppScreenshotsMoviesPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppTBSSPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppVolumeVisualizationPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppUtilityPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppSyntheticDataGenerationPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppRegistrationPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppVisualizationPerspective, context)
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
   ctkConfigurationAdmin* configAdmin = 0;

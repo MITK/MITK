@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,8 +35,8 @@ void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry
     layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
     berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
 
-  layout->AddStandaloneView("org.mitk.views.imagenavigator",
-    false, berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols");
+  layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
+    berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols", false);
 
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
@@ -58,4 +58,7 @@ void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry
   lo = layout->GetViewLayout("org.mitk.views.odfdetails");
   lo->SetCloseable(false);
 
+  left->AddView("org.mitk.views.odfmaximaextraction");
+  layout->GetViewLayout("org.mitk.views.odfmaximaextraction");
+  lo->SetCloseable(false);
 }

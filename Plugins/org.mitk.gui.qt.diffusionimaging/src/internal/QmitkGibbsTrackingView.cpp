@@ -301,10 +301,6 @@ void QmitkGibbsTrackingView::SetIterations(int value)
         m_Controls->m_IterationsLabel->setText("Iterations: 5x10^8");
         m_Iterations = 500000000;
         break;
-    case 10:
-        m_Controls->m_IterationsLabel->setText("Iterations: 1x10^9");
-        m_Iterations = 1000000000;
-        break;
     }
 
 }

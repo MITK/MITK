@@ -130,11 +130,13 @@ void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::Scala
   if (expandRangesIfNecessary)
   {
     /* if caller is sure he wants exactly that level/window, we make sure the limits match */
-    if ( m_LowerWindowBound < m_RangeMin ) 
+    if (m_LowerWindowBound > m_UpperWindowBound)
+      std::swap(m_LowerWindowBound, m_UpperWindowBound);
+    if ( m_LowerWindowBound < m_RangeMin )
     {
       m_RangeMin = m_LowerWindowBound;
     }
-    
+
     if ( m_UpperWindowBound > m_RangeMax )
     {
       m_RangeMax = m_UpperWindowBound;
@@ -317,6 +319,14 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   if ( minValue == maxValue )
   {
     minValue = maxValue-1;
+  }
+  else
+  {
+      //Due to bug #8690 level window now is no longer of fixed range by default but the range adapts according to levelwindow interaction
+      //This is done because the range should be a little bit larger from the beginning so that the scale doesn't start to resize right from the beginning
+      double additionalRange = 0.15*(maxValue-minValue);
+      minValue -= additionalRange;
+      maxValue += additionalRange;
   }
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);

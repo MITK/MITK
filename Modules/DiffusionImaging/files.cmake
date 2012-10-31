@@ -113,6 +113,7 @@ set(CPP_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingManager.cpp
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.cpp
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
+  Algorithms/Connectomics/itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp
 
   # Tractography
   Tractography/GibbsTracking/mitkParticleGrid.cpp
@@ -204,7 +205,7 @@ set(H_FILES
   Algorithms/itkGaussianInterpolateImageFunction.h
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.h
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.h
-  Algorithms/itkDiffusionTensorPrincipleDirectionImageFilter.h
+  Algorithms/itkDiffusionTensorPrincipalDirectionImageFilter.h
   Algorithms/itkCartesianToPolarVectorImageFilter.h
   Algorithms/itkPolarToCartesianVectorImageFilter.h
   Algorithms/itkDistanceMapFilter.h
@@ -215,6 +216,11 @@ set(H_FILES
   Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
   Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
   Algorithms/itkMergeDiffusionImagesFilter.h
+  Algorithms/itkDwiPhantomGenerationFilter.h
+  Algorithms/itkFiniteDiffOdfMaximaExtractionFilter.h
+  Algorithms/itkFslPeakImageConverter.h
+  Algorithms/itkFslShCoefficientImageConverter.h
+  Algorithms/itkOdfMaximaExtractionFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h
@@ -229,6 +235,7 @@ set(H_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingManager.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionBase.h
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
+  Algorithms/Connectomics/itkConnectomicsNetworkToConnectivityMatrixImageFilter.h
 
 
 )

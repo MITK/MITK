@@ -137,62 +137,25 @@ void QmitkLineEditLevelWindowWidget::SetDataStorage( mitk::DataStorage* ds )
 //read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetLevelValue()
 {
-  validLevel();
+    double level = m_LevelInput->text().toDouble();
+    m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
+    m_Manager->SetLevelWindow(m_LevelWindow);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 //read the windowInput and change window and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetWindowValue()
 {
-  validWindow();
+  double window = m_WindowInput->text().toDouble();
+  m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), window);
+  m_Manager->SetLevelWindow(m_LevelWindow);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLineEditLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
 { 
   m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
   m_Contextmenu->getContextMenu();
-}
-
-void QmitkLineEditLevelWindowWidget::validLevel()
-{
-  double level =m_LevelInput->text().toDouble();
-  
-  if ( level + m_LevelWindow.GetWindow()/2 > m_LevelWindow.GetRangeMax())
-  {
-    level = m_LevelWindow.GetRangeMax() - m_LevelWindow.GetWindow()/2;
-  }
-  if (level - m_LevelWindow.GetWindow()/2 < m_LevelWindow.GetRangeMin())
-  {
-    level = m_LevelWindow.GetRangeMin() + m_LevelWindow.GetWindow()/2;
-  }
-  
-  std::stringstream ss;
-  ss << std::setprecision(2) << level;
-  QString qLevel(ss.str().c_str());
-
-  //qLevel.setNum(level);
-  m_LevelInput->setText(qLevel);
-  m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
-  m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkLineEditLevelWindowWidget::validWindow()
-{
-  double window = m_WindowInput->text().toDouble();
-  if ( m_LevelWindow.GetLevel() + window/2 > m_LevelWindow.GetRangeMax())
-  {
-    window = (m_LevelWindow.GetRangeMax() - m_LevelWindow.GetLevel())*2;
-  }
-  if (m_LevelWindow.GetLevel() - window/2 < m_LevelWindow.GetRangeMin())
-  {
-    window = (m_LevelWindow.GetLevel() - m_LevelWindow.GetRangeMin())*2;
-  }
-  QString qWindow;
-  qWindow.setNum(window);
-  m_WindowInput->setText(qWindow);
-  m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), window);
-  m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 mitk::LevelWindowManager* QmitkLineEditLevelWindowWidget::GetManager()

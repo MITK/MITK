@@ -26,6 +26,7 @@ set(_plugins
   org.blueberry.core.commands
   org.blueberry.ui
   org.blueberry.ui.qt
+  org.blueberry.ui.qt.log
   org.blueberry.ui.qt.help
   org.mitk.core.services
   org.mitk.gui.common
@@ -45,6 +46,8 @@ set(_plugins
   org.mitk.gui.qt.diffusionimaging
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
+  org.mitk.gui.qt.basicimageprocessing
+  org.mitk.gui.qt.registration
 )
 
 # Plug-ins listed below will not be

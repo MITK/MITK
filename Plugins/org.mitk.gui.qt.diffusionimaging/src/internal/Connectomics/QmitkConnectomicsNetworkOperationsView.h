@@ -14,32 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkBrainNetworkAnalysisView_h
-#define QmitkBrainNetworkAnalysisView_h
+#ifndef QmitkConnectomicsNetworkOperationsView_h
+#define QmitkConnectomicsNetworkOperationsView_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
 
-#include "ui_QmitkBrainNetworkAnalysisViewControls.h"
+#include "ui_QmitkConnectomicsNetworkOperationsViewControls.h"
 
-#include "mitkConnectomicsNetworkCreator.h"
 #include "mitkConnectomicsNetworkMapper3D.h"
-
-#include "mitkConnectomicsHistogramCache.h"
 
 // ####### ITK includes #######
 #include <itkImage.h>
 
 /*!
-\brief QmitkBrainNetworkAnalysisView 
+\brief QmitkConnectomicsNetworkOperationsView 
 
 This bundle provides GUI for the brain network analysis algorithms.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkBrainNetworkAnalysisView : public QmitkFunctionality
+class QmitkConnectomicsNetworkOperationsView : public QmitkFunctionality
 {  
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -49,8 +46,8 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkBrainNetworkAnalysisView();
-  virtual ~QmitkBrainNetworkAnalysisView();
+  QmitkConnectomicsNetworkOperationsView();
+  virtual ~QmitkConnectomicsNetworkOperationsView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -62,20 +59,14 @@ public:
     /// \brief Called when the user clicks the GUI button
     void OnConvertToRGBAImagePushButtonClicked();
 
-    /// \brief Align two images by copying the geometry
-    void OnNetworkifyPushButtonClicked();
-
-    /// \brief Create synthetic networks 
-    void OnSyntheticNetworkCreationPushButtonClicked();
-
-    /// \brief Adjust parameters depending on synthetic network type
-    void OnSyntheticNetworkComboBoxCurrentIndexChanged(int currentIndex);
-
     /// \brief Create modularization of network
     void OnModularizePushButtonClicked();
 
     /// \brief Prune network
     void OnPrunePushButtonClicked();
+
+    /// \brief Create 2D Connecivity Matrix image from network
+    void OnCreateConnectivityMatrixImagePushButtonClicked();
 
 protected:
 
@@ -94,16 +85,11 @@ protected:
   // ####### Variables #######
 
 
-  Ui::QmitkBrainNetworkAnalysisViewControls* m_Controls;
+  Ui::QmitkConnectomicsNetworkOperationsViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 
-  mitk::ConnectomicsNetworkCreator::Pointer m_ConnectomicsNetworkCreator;
-
   mitk::ConnectomicsNetworkMapper3D::Pointer m_NetworkMapper;
-
-  /// Cache for histograms
-  mitk::ConnectomicsHistogramCache histogramCache;
 
   // Demo/Developer mode toggle
   bool m_demomode;

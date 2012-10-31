@@ -36,14 +36,22 @@ void QmitkDIAppConnectomicsPerspective::CreateInitialLayout(berry::IPageLayout::
     layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
     berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
 
-  layout->AddStandaloneView("org.mitk.views.imagenavigator",
-    false, berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols");
+  layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
+    berry::IPageLayout::BOTTOM, .4f, "org.mbi.diffusionimaginginternal.leftcontrols", false);
 
   /////////////////////////////////////////////
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.brainnetworkanalysis");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.brainnetworkanalysis");
+  left->AddView("org.mitk.views.connectomicsstatistics");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.connectomicsstatistics");
+  lo->SetCloseable(false);
+  
+  left->AddView("org.mitk.views.connectomicsnetworkoperations");
+  lo = layout->GetViewLayout("org.mitk.views.connectomicsnetworkoperations");
+  lo->SetCloseable(false);
+  
+  left->AddView("org.mitk.views.connectomicsdata");
+  lo = layout->GetViewLayout("org.mitk.views.connectomicsdata");
   lo->SetCloseable(false);
 }

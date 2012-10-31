@@ -99,7 +99,7 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
         while ( it != end )
         {
           //add the current point to the temp contour
-          tempContour->AddVertex((*it)->Coordinates, (*it)->IsActive, currentTimestep);
+          tempContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, currentTimestep);
 
           //control points for interpolation
           InputType::VertexIterator Ci = it;

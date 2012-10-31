@@ -119,7 +119,7 @@ namespace itk
       //current position
       std::map< int, int >::iterator x;
       //std::map< int, int >::key_type keyOfX = static_cast<std::map< int, int >::key_type>(gradientMagnitude * 1000);
-      int keyOfX = static_cast<int >(gradientMagnitude * ShortestPathCostFunctionLiveWire::MAPSCALEFACTOR);
+      int keyOfX = static_cast<int >(gradientMagnitude /* ShortestPathCostFunctionLiveWire::MAPSCALEFACTOR*/);
       x = m_CostMap.find( keyOfX );
 
       std::map< int, int >::iterator left2;
@@ -379,27 +379,15 @@ namespace itk
     /*------------------------------------------------------------------------*/
 
 
-    /*+++++++++++++++++++++ intensity difference costs +++++++++++++++++++++++++++*/
-    double a,b,intensityDifferenceCost;    
-
-    a = this->m_Image->GetPixel(p1);
-
-    b = this->m_Image->GetPixel(p2);
-    intensityDifferenceCost = pow((b-a),2) / SHRT_MAX;
-
-
-    //intensityDifferenceCost = SigmoidFunction(intensityDifferenceCost,1.0,0.0,10,20);
-    /*------------------------------------------------------------------------*/
 
 
     /*+++++++++++++++++++++  local component costs +++++++++++++++++++++++++++*/
     /*weights*/
-    double w1 = 0.40;
+    double w1 = 0.43;
     double w2 = 0.43;
-    double w3 = 0.05;
-    double w4 = 0.12;
+    double w3 = 0.14;
 
-    double costs = w1 * laplacianCost + w2 * gradientCost /*+ w3 * intensityDifferenceCost*/ + w4 * gradientDirectionCost;
+    double costs = w1 * laplacianCost + w2 * gradientCost + w3 * gradientDirectionCost;
 
 
     //scale by euclidian distance
@@ -490,24 +478,24 @@ namespace itk
         CastFilterType::Pointer castFilter = CastFilterType::New();
         castFilter->SetInput(this->m_Image);
 
-        typedef itk::LaplacianImageFilter<FloatImageType, FloatImageType >  filterType;
-        filterType::Pointer laplacianFilter = filterType::New();
-        laplacianFilter->SetInput( castFilter->GetOutput() ); // NOTE: input image type must be double or float
-        laplacianFilter->Update();
+        //typedef itk::LaplacianImageFilter<FloatImageType, FloatImageType >  filterType;
+        //filterType::Pointer laplacianFilter = filterType::New();
+        //laplacianFilter->SetInput( castFilter->GetOutput() ); // NOTE: input image type must be double or float
+        //laplacianFilter->Update();
 
-        m_EdgeImage = laplacianFilter->GetOutput();
+        //m_EdgeImage = laplacianFilter->GetOutput();
 
         ////init canny edge detection
-        //typedef itk::CannyEdgeDetectionImageFilter<FloatImageType, FloatImageType> CannyEdgeDetectionImageFilterType;
-        //CannyEdgeDetectionImageFilterType::Pointer cannyEdgeDetectionfilter = CannyEdgeDetectionImageFilterType::New();
-        //cannyEdgeDetectionfilter->SetInput(castFilter->GetOutput());
-        //cannyEdgeDetectionfilter->SetUpperThreshold(30);
-        //cannyEdgeDetectionfilter->SetLowerThreshold(15);
-        //cannyEdgeDetectionfilter->SetVariance(statisticsImageFilter->GetSigma());
-        //cannyEdgeDetectionfilter->SetMaximumError(.01f);
+        typedef itk::CannyEdgeDetectionImageFilter<FloatImageType, FloatImageType> CannyEdgeDetectionImageFilterType;
+        CannyEdgeDetectionImageFilterType::Pointer cannyEdgeDetectionfilter = CannyEdgeDetectionImageFilterType::New();
+        cannyEdgeDetectionfilter->SetInput(castFilter->GetOutput());
+        cannyEdgeDetectionfilter->SetUpperThreshold(30);
+        cannyEdgeDetectionfilter->SetLowerThreshold(15);
+        cannyEdgeDetectionfilter->SetVariance(statisticsImageFilter->GetSigma());
+        cannyEdgeDetectionfilter->SetMaximumError(.01f);
 
-        //cannyEdgeDetectionfilter->Update();
-        //m_EdgeImage = cannyEdgeDetectionfilter->GetOutput();
+        cannyEdgeDetectionfilter->Update();
+        m_EdgeImage = cannyEdgeDetectionfilter->GetOutput();
 
       }//else no filter just approximate the gradient during cost estimation
 
@@ -545,7 +533,7 @@ namespace itk
   template<class TInputImageType>
   double ShortestPathCostFunctionLiveWire<TInputImageType>::Gaussian(double x, double xOfGaussian, double yOfGaussian)
   {
-    return yOfGaussian * exp( -0.5 * pow( ( abs(x - xOfGaussian) / (2.0 * ShortestPathCostFunctionLiveWire<TInputImageType>::MAPSCALEFACTOR) ), 2) );
+    return yOfGaussian * exp( -0.5 * pow( (x - xOfGaussian), 2) );
   }
 
 } // end namespace itk

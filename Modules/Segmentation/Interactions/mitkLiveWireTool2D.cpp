@@ -65,11 +65,11 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   // great magic numbers
   CONNECT_ACTION( AcINITNEWOBJECT, OnInitLiveWire );
   CONNECT_ACTION( AcADDPOINT, OnAddPoint );
-  CONNECT_ACTION( AcMOVE, OnMouseMoved );
+  CONNECT_ACTION( AcMOVE, OnMouseMoveNoDynamicCosts );
   CONNECT_ACTION( AcCHECKPOINT, OnCheckPoint );
   CONNECT_ACTION( AcFINISH, OnFinish );
   CONNECT_ACTION( AcDELETEPOINT, OnLastSegmentDelete );
-  CONNECT_ACTION( AcADDLINE, OnMouseMoveNoDynamicCosts );
+  CONNECT_ACTION( AcADDLINE, OnMouseMoved );
 }
 
 

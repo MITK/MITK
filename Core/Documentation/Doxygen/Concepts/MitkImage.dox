@@ -88,11 +88,11 @@ If only a pointer to image data is needed, following code example shows how to g
 
 try
 {
-  mitk::ImageReadAccessor readAccess(image, image->GetVolume(0));
-  const void* pointer = imageAccess.GetData();
+  mitk::ImageReadAccessor readAccess(image, image->GetVolumeData(0));
+  const void* cPointer = readAccess.GetData();
 
   mitk::ImageWriteAccessor writeAccess(image);
-  void* pointer = writeAccess.GetData();
+  void* vPointer = writeAccess.GetData();
 }
 catch(mitk::Exception& e)
 {
@@ -107,12 +107,12 @@ A more convenient way to access image data is provided by the classes mitk::Imag
 
 try
 {
-  itk::index<2> idx = {{ 12, 34 }};
+  itk::Index<2> idx = {{ 12, 34 }};
 
-  mitk::ImagePixelReadAccessor<short,2> readAcces(image, image->GetSlice(2));
+  mitk::ImagePixelReadAccessor<short,2> readAcces(image, image->GetSliceData(2));
   short value = readAccess.GetPixelByIndex(idx);
 
-  mitk::ImagePixelWriteAccessor<short,2> writeAccess(image, image->GetSlice(4));
+  mitk::ImagePixelWriteAccessor<short,2> writeAccess(image, image->GetSliceData(4));
   writeAccess.SetPixelByIndex(idx, 42);
 }
 catch(mitk::Exception& e)
@@ -130,7 +130,7 @@ The flag ExceptionIfLocked causes an exception if the requested image part is lo
 \verbatim
 try
 {
-  mitk::ImageReadAccessor imageAccess(image, image->GetSlice(2), mitk::ImageAccessorBase::ExceptionIfLocked);
+  mitk::ImageReadAccessor imageAccess(image, image->GetSliceData(2), mitk::ImageAccessorBase::ExceptionIfLocked);
   const void* pointer = imageAccess.GetData();
 }
 catch(mitk::MemoryIsLockedException& e) {

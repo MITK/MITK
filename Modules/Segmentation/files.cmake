@@ -23,6 +23,7 @@ Algorithms/mitkContourModelSource.cpp
 Algorithms/mitkContourModelToPointSetFilter.cpp
 Algorithms/mitkContourModelToSurfaceFilter.cpp
 Algorithms/mitkContourModelSubDivisionFilter.cpp
+Algorithms/mitkImageToContourModelFilter.cpp
 Controllers/mitkSegmentationInterpolationController.cpp
 Controllers/mitkSurfaceInterpolationController.cpp
 # DataManagement/mitkApplyDiffImageOperation.cpp
@@ -30,7 +31,7 @@ DataManagement/mitkContour.cpp
 DataManagement/mitkContourSet.cpp
 DataManagement/mitkExtrudedContour.cpp
 DataManagement/mitkContourModel.cpp
-DataManagement/mitkContourModelElement.cpp
+DataManagement/mitkContourElement.cpp
 Interactions/mitkAddContourTool.cpp
 Interactions/mitkAutoCropTool.cpp
 Interactions/mitkAutoSegmentationTool.cpp
@@ -55,6 +56,7 @@ Interactions/mitkSegmentationsProcessingTool.cpp
 Interactions/mitkSetRegionTool.cpp
 Interactions/mitkSegTool2D.cpp
 Interactions/mitkSubtractContourTool.cpp
+Interactions/mitkContourModelInteractor.cpp
 IO/mitkContourModelIOFactory.cpp
 IO/mitkContourModelReader.cpp
 IO/mitkContourModelWriter.cpp
@@ -65,4 +67,5 @@ Rendering/mitkContourSetVtkMapper3D.cpp
 Rendering/mitkContourVtkMapper3D.cpp
 Rendering/mitkContourModelMapper2D.cpp
 Rendering/mitkContourModelMapper3D.cpp
+Rendering/mitkContourModelGLMapper2D.cpp
 )

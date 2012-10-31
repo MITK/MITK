@@ -47,14 +47,14 @@ mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc
     this->GetVtkRenderWindow()->DoubleBufferOff( );
     this->SetInputFileNames(argc, argv);
     // prints the glinfo after creation of the vtkrenderwindow
-    this->printGLInfo();
+    this->PrintGLInfo();
 }
 
 mitkRenderingTestHelper::~mitkRenderingTestHelper()
 {
 }
 
-void mitkRenderingTestHelper::printGLInfo()
+void mitkRenderingTestHelper::PrintGLInfo()
 {
     GLint maxTextureSize;
     GLint maxTextureSize3D;

@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include <mitkContourModel.h>
+#include <mitkPlaneGeometry.h>
 
 mitk::ContourModel::ContourModel()
 {
@@ -49,25 +50,71 @@ void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, int timestep)
 
 
 
-void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isActive, int timestep)
+void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isControlPoint, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-      this->m_ContourSeries[timestep]->AddVertex(vertex, isActive);
-      this->InvokeEvent( ContourModelSizeChangeEvent() );
-      this->Modified();
+    this->m_ContourSeries[timestep]->AddVertex(vertex, isControlPoint);
+    this->InvokeEvent( ContourModelSizeChangeEvent() );
+    this->Modified();
   }
 }
 
 
 
-void mitk::ContourModel::InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isActive, int timestep)
+void mitk::ContourModel::AddVertex(VertexType &vertex, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    this->m_ContourSeries[timestep]->AddVertex(vertex);
+    this->InvokeEvent( ContourModelSizeChangeEvent() );
+    this->Modified();
+  }
+}
+
+
+
+void mitk::ContourModel::AddVertexAtFront(mitk::Point3D &vertex, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep) )
+  {
+    this->AddVertexAtFront(vertex, false, timestep);
+  }
+}
+
+
+
+void mitk::ContourModel::AddVertexAtFront(mitk::Point3D &vertex, bool isControlPoint, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    this->m_ContourSeries[timestep]->AddVertexAtFront(vertex, isControlPoint);
+    this->InvokeEvent( ContourModelSizeChangeEvent() );
+    this->Modified();
+  }
+}
+
+
+
+void mitk::ContourModel::AddVertexAtFront(VertexType &vertex, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    this->m_ContourSeries[timestep]->AddVertexAtFront(vertex);
+    this->InvokeEvent( ContourModelSizeChangeEvent() );
+    this->Modified();
+  }
+}
+
+
+
+void mitk::ContourModel::InsertVertexAtIndex(mitk::Point3D &vertex, int index, bool isControlPoint, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
     if(index > 0 && this->m_ContourSeries[timestep]->GetSize() > index)
     {
-      this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isActive, index);
+      this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isControlPoint, index);
       this->InvokeEvent( ContourModelSizeChangeEvent() );
       this->Modified();
     }
@@ -215,14 +262,32 @@ bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, int tim
 
 
 
+bool mitk::ContourModel::RemoveVertex(VertexType* vertex, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    if(this->m_ContourSeries[timestep]->RemoveVertex(vertex))
+    {
+      this->Modified();
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
+      return true;
+    }
+  }
+  return false;
+}
+
+
+
 bool mitk::ContourModel::RemoveVertexAt(int index, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-    this->m_ContourSeries[timestep]->RemoveVertexAt(index);
-    this->Modified();
-    this->InvokeEvent( ContourModelSizeChangeEvent() );
-    return true;
+    if(this->m_ContourSeries[timestep]->RemoveVertexAt(index))
+    {
+      this->Modified();
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
+      return true;
+    }
   }
   return false;
 }
@@ -233,10 +298,12 @@ bool mitk::ContourModel::RemoveVertexAt(mitk::Point3D &point, float eps, int tim
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-    return this->m_ContourSeries[timestep]->RemoveVertexAt(point, eps);
-    this->Modified();
-    this->InvokeEvent( ContourModelSizeChangeEvent() );
-    return true;
+    if(this->m_ContourSeries[timestep]->RemoveVertexAt(point, eps))
+    {
+      this->Modified();
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
+      return true;
+    }
   }
   return false;
 }
@@ -262,6 +329,7 @@ void mitk::ContourModel::ShiftContour(mitk::Vector3D &translate, int timestep)
     VertexIterator it = vList->begin();
     VertexIterator end = vList->end();
 
+    //shift all vertices
     while(it != end)
     {
       this->ShiftVertex((*it),translate);
@@ -284,6 +352,19 @@ void mitk::ContourModel::ShiftVertex(VertexType* vertex, mitk::Vector3D &vector)
 
 
 
+void mitk::ContourModel::Clear(int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    //clear data at timestep
+    this->m_ContourSeries[timestep]->Clear();
+    this->InitializeEmpty();
+    this->Modified();
+  }
+}
+
+
+
 void mitk::ContourModel::Expand( int timeSteps )
 {
   int oldSize = this->m_ContourSeries.size();
@@ -292,11 +373,12 @@ void mitk::ContourModel::Expand( int timeSteps )
   {
     Superclass::Expand(timeSteps);
 
+    //insert contours for each new timestep
     for( int i = oldSize; i < timeSteps; i++)
     {
-      m_ContourSeries.push_back(mitk::ContourModelElement::New());
+      m_ContourSeries.push_back(mitk::ContourElement::New());
     }
-    
+
     this->InvokeEvent( ContourModelExpandTimeBoundsEvent() );
   }
 }
@@ -371,7 +453,7 @@ void mitk::ContourModel::InitializeEmpty()
 {
   //clear data at timesteps
   this->m_ContourSeries.resize(0);
-  this->m_ContourSeries.push_back(mitk::ContourModelElement::New());
+  this->m_ContourSeries.push_back(mitk::ContourElement::New());
 
   //set number of timesteps to one
   this->InitializeTimeSlicedGeometry(1);
@@ -384,78 +466,87 @@ void mitk::ContourModel::InitializeEmpty()
 
 void mitk::ContourModel::UpdateOutputInformation()
 {
-  
+
   if ( this->GetSource() )
   {
     this->GetSource()->UpdateOutputInformation();
   }
 
+
+
   //update the bounds of the geometry according to the stored vertices
   float mitkBounds[6];
 
-  //if no controlPoints are available the boundingbox is 0 in all dimensions
-  if (this->GetNumberOfVertices() == 0)
+
+  //calculate the boundingbox at each timestep
+
+  typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
+  typedef BoundingBoxType::PointsContainer                      PointsContainer;
+
+  int timesteps = this->GetTimeSteps();
+
+  //iterate over the timesteps
+  for(int currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
   {
-    mitkBounds[0] = 0.0;
-    mitkBounds[1] = 0.0;
-    mitkBounds[2] = 0.0;
-    mitkBounds[3] = 0.0;
-    mitkBounds[4] = 0.0;
-    mitkBounds[5] = 0.0;
-  }
-  else
-  {
-    //calculate the boundingbox at each timestep
-
-    typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
-    typedef BoundingBoxType::PointsContainer                      PointsContainer;
-
-    int timesteps = this->GetTimeSteps();
-
-    //iterate over the timesteps
-    for(int currenTimeStep = 0; currenTimeStep < timesteps; currenTimeStep++)
+    if( dynamic_cast< mitk::PlaneGeometry* >(this->GetGeometry(currenTimeStep)) )
     {
-
-      BoundingBoxType::Pointer boundingBox = BoundingBoxType::New();
-
-      PointsContainer::Pointer points = PointsContainer::New();
-
-      VertexIterator it = this->IteratorBegin(currenTimeStep);
-      VertexIterator end = this->IteratorEnd(currenTimeStep);
-
-      //fill the boundingbox with the points
-      while(it != end)
-      {
-        Point3D currentP = (*it)->Coordinates;
-        BoundingBoxType::PointType p;
-        p.CastFrom(currentP);
-        points->InsertElement(points->Size(), p);
-
-        it++;
-      }
-
-      //construct the new boundingBox
-      boundingBox->SetPoints(points);
-      boundingBox->ComputeBoundingBox();
-      BoundingBoxType::BoundsArrayType tmp = boundingBox->GetBounds();
-      mitkBounds[0] = tmp[0];
-      mitkBounds[1] = tmp[1];
-      mitkBounds[2] = tmp[2];
-      mitkBounds[3] = tmp[3];
-      mitkBounds[4] = tmp[4];
-      mitkBounds[5] = tmp[5];
-
-      Geometry3D* geometry3d = this->GetGeometry(currenTimeStep);
-      geometry3d->SetBounds(mitkBounds);
+      //do not update bounds for 2D geometries, as they are unfortunately defined with min bounds 0!
+      return;
     }
+    else
+    {//we have a 3D geometry -> let's update bounds
+      //only update bounds if the contour was modified
+      if (this->GetMTime() > this->GetGeometry(currenTimeStep)->GetBoundingBox()->GetMTime())
+      {
+        mitkBounds[0] = 0.0;
+        mitkBounds[1] = 0.0;
+        mitkBounds[2] = 0.0;
+        mitkBounds[3] = 0.0;
+        mitkBounds[4] = 0.0;
+        mitkBounds[5] = 0.0;
 
-    GetTimeSlicedGeometry()->UpdateInformation();
+        BoundingBoxType::Pointer boundingBox = BoundingBoxType::New();
+
+        PointsContainer::Pointer points = PointsContainer::New();
+
+        VertexIterator it = this->IteratorBegin(currenTimeStep);
+        VertexIterator end = this->IteratorEnd(currenTimeStep);
+
+        //fill the boundingbox with the points
+        while(it != end)
+        {
+          Point3D currentP = (*it)->Coordinates;
+          BoundingBoxType::PointType p;
+          p.CastFrom(currentP);
+          points->InsertElement(points->Size(), p);
+
+          it++;
+        }
+
+        //construct the new boundingBox
+        boundingBox->SetPoints(points);
+        boundingBox->ComputeBoundingBox();
+        BoundingBoxType::BoundsArrayType tmp = boundingBox->GetBounds();
+        mitkBounds[0] = tmp[0];
+        mitkBounds[1] = tmp[1];
+        mitkBounds[2] = tmp[2];
+        mitkBounds[3] = tmp[3];
+        mitkBounds[4] = tmp[4];
+        mitkBounds[5] = tmp[5];
+
+        //set boundingBox at current timestep
+        Geometry3D* geometry3d = this->GetGeometry(currenTimeStep);
+        geometry3d->SetBounds(mitkBounds);
+      }
+    }
   }
+  GetTimeSlicedGeometry()->UpdateInformation();
 }
+
 
 
 
 void mitk::ContourModel::ExecuteOperation(mitk::Operation* operation)
 {
-
+  //not supported yet
 }

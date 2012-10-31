@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,6 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSliceNavigationController.h>
 #include <mitkNodePredicateDataType.h>
 
+// include gl to read out properties
+#include <vtkOpenGL.h>
+#include <vtkOpenGLExtensionManager.h>
+
 mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc, char* argv[])
 {
     // Global interaction must(!) be initialized
@@ -42,10 +46,28 @@ mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc
 
     this->GetVtkRenderWindow()->DoubleBufferOff( );
     this->SetInputFileNames(argc, argv);
+    // prints the glinfo after creation of the vtkrenderwindow
+    this->PrintGLInfo();
 }
 
 mitkRenderingTestHelper::~mitkRenderingTestHelper()
 {
+}
+
+void mitkRenderingTestHelper::PrintGLInfo()
+{
+    GLint maxTextureSize;
+    GLint maxTextureSize3D;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+    glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &maxTextureSize3D);
+
+    MITK_INFO << "glInfo: \n"
+              << "GLVendor: "<< glGetString(GL_VENDOR) << "\n"
+              << "GLRenderer: "<< glGetString(GL_RENDERER) << "\n"
+              << "GLVersion: "<< glGetString(GL_VERSION)   << "\n"
+              << "MaxTextureSize: "<< maxTextureSize << "\n"
+              << "Max3DTextureSize: " << maxTextureSize3D << "\n"
+              << "GLExtensions: "<< glGetString(GL_EXTENSIONS);
 }
 
 void mitkRenderingTestHelper::Render()
@@ -53,7 +75,7 @@ void mitkRenderingTestHelper::Render()
     //if the datastorage is initialized and at least 1 image is loaded render it
     if(m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1 )
     {
-      
+
       mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
 
       //use this to actually show the iamge in a renderwindow

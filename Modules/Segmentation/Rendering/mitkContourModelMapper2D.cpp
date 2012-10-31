@@ -257,7 +257,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
 
-        if ( currentControlPoint->IsActive )
+        if ( currentControlPoint->IsControlPoint )
         { 
           double coordinates[3];
           coordinates[0] = currentControlPoint->Coordinates[0];
@@ -269,7 +269,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
           {
             vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
-            sphere->SetRadius(1.5);
+            sphere->SetRadius(1.2);
             sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
             sphere->Update();
             appendPoly->AddInput(sphere->GetOutput());
@@ -282,7 +282,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
       }//end while (it!=end)
 
       //check if last control point is enabled to draw it
-      if ( (*current)->IsActive )
+      if ( (*current)->IsControlPoint )
       {
         double coordinates[3];
         coordinates[0] = (*current)->Coordinates[0];
@@ -294,7 +294,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
         {
           vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
-          sphere->SetRadius(1.5);
+          sphere->SetRadius(1.2);
           sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
           sphere->Update();
           appendPoly->AddInput(sphere->GetOutput());
@@ -389,8 +389,7 @@ void mitk::ContourModelMapper2D::ApplyContourProperties(mitk::BaseRenderer* rend
     localStorage->m_Actor->GetProperty()->SetLineWidth(lineWidth);
   }
 
-  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-        ("color", renderer));
+  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("color", renderer));
   if(colorprop)
   {
     //set the color of the contour
@@ -432,7 +431,7 @@ void mitk::ContourModelMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
   node->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
   node->AddProperty( "width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
   node->AddProperty( "use cutting plane", mitk::BoolProperty::New( true ), renderer, overwrite );
-  node->AddProperty( "subdivision curve", mitk::BoolProperty::New( true ), renderer, overwrite );
+  node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

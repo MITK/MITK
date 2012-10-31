@@ -199,13 +199,17 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
       mitk::ContourModel::VertexType* currentControlPoint = *current;
       mitk::ContourModel::VertexType* nextControlPoint = *next;
 
-      vtkIdType p1 = points->InsertNextPoint(currentControlPoint->Coordinates[0], currentControlPoint->Coordinates[1], currentControlPoint->Coordinates[2]);
-      vtkIdType p2 = points->InsertNextPoint(nextControlPoint->Coordinates[0], nextControlPoint->Coordinates[1], nextControlPoint->Coordinates[2]);
-      //add the line between both contorlPoints
-      lines->InsertNextCell(2);
-      lines->InsertCellPoint(p1);
-      lines->InsertCellPoint(p2);
-
+      if( currentControlPoint->Coordinates[0] != nextControlPoint->Coordinates[0] &&
+          currentControlPoint->Coordinates[1] != nextControlPoint->Coordinates[1] &&
+          currentControlPoint->Coordinates[2] != nextControlPoint->Coordinates[2])
+      {
+        vtkIdType p1 = points->InsertNextPoint(currentControlPoint->Coordinates[0], currentControlPoint->Coordinates[1], currentControlPoint->Coordinates[2]);
+        vtkIdType p2 = points->InsertNextPoint(nextControlPoint->Coordinates[0], nextControlPoint->Coordinates[1], nextControlPoint->Coordinates[2]);
+        //add the line between both contorlPoints
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
       current++; 
       next++;
     }
@@ -215,13 +219,18 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
       // If the contour is closed add a line from the last to the first control point
       mitk::ContourModel::VertexType* firstControlPoint = *(inputContour->IteratorBegin(timestep));
       mitk::ContourModel::VertexType* lastControlPoint = *(--(inputContour->IteratorEnd(timestep)));
-      vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);
-      vtkIdType p1 = points->InsertNextPoint(firstControlPoint->Coordinates[0], firstControlPoint->Coordinates[1], firstControlPoint->Coordinates[2]);
+      if( lastControlPoint->Coordinates[0] != firstControlPoint->Coordinates[0] &&
+          lastControlPoint->Coordinates[1] != firstControlPoint->Coordinates[1] &&
+          lastControlPoint->Coordinates[2] != firstControlPoint->Coordinates[2])
+      {
+        vtkIdType p2 = points->InsertNextPoint(lastControlPoint->Coordinates[0], lastControlPoint->Coordinates[1], lastControlPoint->Coordinates[2]);
+        vtkIdType p1 = points->InsertNextPoint(firstControlPoint->Coordinates[0], firstControlPoint->Coordinates[1], firstControlPoint->Coordinates[2]);
 
-      //add the line to the cellArray
-      lines->InsertNextCell(2);
-      lines->InsertCellPoint(p1);
-      lines->InsertCellPoint(p2);
+        //add the line to the cellArray
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+      }
     }
 
 

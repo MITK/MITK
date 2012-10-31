@@ -115,12 +115,14 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   // if Region of interest is set, crop image
   if (m_CropRegion.width > 0){
     buffer = image(m_CropRegion);
+    image.release();
     image = buffer;
   }
   // If this source is set to deliver greyscale images, convert it
   if (m_IsGreyscale)
   {
     cv::cvtColor(image, buffer, CV_RGB2GRAY, 1);
+    image.release();
     image = buffer;
   }
 
@@ -132,6 +134,11 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
   mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput(0));
+  
+  // Clean up
+  buffer.release();
+  image.release();
+
   return result;
 }
 

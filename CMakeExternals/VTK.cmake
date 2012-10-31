@@ -51,6 +51,7 @@ if(NOT DEFINED VTK_DIR)
 
   if(APPLE)
     set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK-5.10-Mac.cmake)
+  endif()
 
     ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
@@ -77,35 +78,6 @@ if(NOT DEFINED VTK_DIR)
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
-
-  else()
-
-    ExternalProject_Add(${proj}
-     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-     BINARY_DIR ${proj}-build
-     PREFIX ${proj}-cmake
-     URL ${VTK_URL}
-     URL_MD5 ${VTK_URL_MD5}
-     INSTALL_COMMAND ""
-     CMAKE_GENERATOR ${gen}
-     CMAKE_ARGS
-         ${ep_common_args}
-         -DVTK_WRAP_TCL:BOOL=OFF
-         -DVTK_WRAP_PYTHON:BOOL=OFF
-         -DVTK_WRAP_JAVA:BOOL=OFF
-         -DBUILD_SHARED_LIBS:BOOL=ON
-         -DVTK_USE_PARALLEL:BOOL=ON
-         -DVTK_USE_CHARTS:BOOL=OFF
-         -DVTK_USE_QTCHARTS:BOOL=ON
-         -DVTK_USE_GEOVIS:BOOL=OFF
-         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
-         -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
-         -DVTK_LEGACY_REMOVE:BOOL=ON
-         ${additional_cmake_args}
-      DEPENDS ${proj_DEPENDENCIES}
-    )
-
-  endif()
 
   set(VTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
 

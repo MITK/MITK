@@ -23,7 +23,6 @@ Algorithms/mitkContourModelSource.cpp
 Algorithms/mitkContourModelToPointSetFilter.cpp
 Algorithms/mitkContourModelToSurfaceFilter.cpp
 Algorithms/mitkContourModelSubDivisionFilter.cpp
-Algorithms/mitkImageToContourModelFilter.cpp
 Controllers/mitkSegmentationInterpolationController.cpp
 Controllers/mitkSurfaceInterpolationController.cpp
 # DataManagement/mitkApplyDiffImageOperation.cpp

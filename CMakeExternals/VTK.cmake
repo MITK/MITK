@@ -46,24 +46,21 @@ if(NOT DEFINED VTK_DIR)
      )
   endif()
 
-  option(MITK_USE_VTK_5_10_IN_SUPERBUILD "Use VTK 5.10 in MITK superbuild" OFF)
-  #use only VTK 5.8 in superbuild until all issues regarding VTK 5.10 are solved
+  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.10.0.tar.gz)
+  set(VTK_URL_MD5 a0363f78910f466ba8f1bd5ab5437cb9)
 
-  if(MITK_USE_VTK_5_10_IN_SUPERBUILD)
-    set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.10.0.tar.gz)
-    set(VTK_URL_MD5 a0363f78910f466ba8f1bd5ab5437cb9)
-  else()
-    set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.8.0.tar.gz)
-    set(VTK_URL_MD5 37b7297d02d647cc6ca95b38174cb41f)
+  if(APPLE)
+    set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK-5.10-Mac.cmake)
   endif()
 
-  ExternalProject_Add(${proj}
+    ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
     BINARY_DIR ${proj}-build
     PREFIX ${proj}-cmake
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
     INSTALL_COMMAND ""
+    PATCH_COMMAND ${VTK_PATCH_COMMAND}
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
@@ -81,6 +78,7 @@ if(NOT DEFINED VTK_DIR)
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
+
   set(VTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
 
 else()

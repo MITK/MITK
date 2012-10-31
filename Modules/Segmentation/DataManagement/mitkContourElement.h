@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef _MITK_CONTOURMODELELEMENT_H_
-#define _MITK_CONTOURMODELELEMENT_H_
+#ifndef _MITK_ContourElement_H_
+#define _MITK_ContourElement_H_
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
@@ -29,7 +29,7 @@ namespace mitk
 {
 
   /** \brief Represents a contour in 3D space.
-  A ContourModelElement is consisting of linked vertices implicitely defining the contour.
+  A ContourElement is consisting of linked vertices implicitely defining the contour.
   They are stored in a double ended queue making it possible to add vertices at front and
   end of the contour and to iterate in both directions.
   To mark a vertex as a special one it can be set as a control point.
@@ -37,12 +37,12 @@ namespace mitk
   \Note It is highly not recommend to use this class directly as no secure mechanism is used here.
   Use mitk::ContourModel instead providing some additional features.
   */
-  class Segmentation_EXPORT ContourModelElement : public itk::LightObject
+  class Segmentation_EXPORT ContourElement : public itk::LightObject
   {
 
   public:
 
-    mitkClassMacro(ContourModelElement, itk::LightObject);
+    mitkClassMacro(ContourElement, itk::LightObject);
 
     itkNewMacro(Self);
 
@@ -179,7 +179,7 @@ namespace mitk
     /** \brief Concatenate the contuor with a another contour.
     All vertices of the other contour will be add after last vertex.
     */
-    void Concatenate(mitk::ContourModelElement* other);
+    void Concatenate(mitk::ContourElement* other);
 
     /** \brief Remove the given vertex from the container if exists.
     \param vertex - the vertex to be removed.
@@ -216,9 +216,9 @@ namespace mitk
 
   protected:
 
-    ContourModelElement();
-    ContourModelElement(const mitk::ContourModelElement &other);
-    virtual ~ContourModelElement();
+    ContourElement();
+    ContourElement(const mitk::ContourElement &other);
+    virtual ~ContourElement();
 
     VertexListType* m_Vertices; //double ended queue with vertices
     bool m_IsClosed;

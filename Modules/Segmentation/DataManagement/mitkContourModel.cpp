@@ -376,7 +376,7 @@ void mitk::ContourModel::Expand( int timeSteps )
     //insert contours for each new timestep
     for( int i = oldSize; i < timeSteps; i++)
     {
-      m_ContourSeries.push_back(mitk::ContourModelElement::New());
+      m_ContourSeries.push_back(mitk::ContourElement::New());
     }
 
     this->InvokeEvent( ContourModelExpandTimeBoundsEvent() );
@@ -453,7 +453,7 @@ void mitk::ContourModel::InitializeEmpty()
 {
   //clear data at timesteps
   this->m_ContourSeries.resize(0);
-  this->m_ContourSeries.push_back(mitk::ContourModelElement::New());
+  this->m_ContourSeries.push_back(mitk::ContourElement::New());
 
   //set number of timesteps to one
   this->InitializeTimeSlicedGeometry(1);

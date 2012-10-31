@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkBaseData.h"
 
-#include <mitkContourModelElement.h>
+#include <mitkContourElement.h>
 
 
 namespace mitk 
@@ -28,13 +28,13 @@ namespace mitk
 
   /** 
   \brief ContourModel is a structure of linked vertices defining a contour in 3D space.
-  The vertices are stored in a mitk::ContourModelElement is stored for each timestep.
+  The vertices are stored in a mitk::ContourElement is stored for each timestep.
   The contour line segments are implicitly defined by the given linked vertices.
   By default two control points are are linked by a straight line.It is possible to add 
   vertices at front and end of the contour and to iterate in both directions.
 
   Points are specified containing coordinates and additional (data) information,
-  see mitk::ContourModelElement.
+  see mitk::ContourElement.
   For accessing a specific vertex either an index or a position in 3D Space can be used.
   The vertices are best accessed by using a VertexIterator.
   Interaction with the contour is thus available without any mitk interactor class using the
@@ -63,10 +63,10 @@ namespace mitk
 
 
     /*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
-    typedef mitk::ContourModelElement::VertexType VertexType;
-    typedef mitk::ContourModelElement::VertexListType VertexListType;
-    typedef mitk::ContourModelElement::ConstVertexIterator VertexIterator;
-    typedef std::vector< mitk::ContourModelElement::Pointer > ContourModelSeries;
+    typedef mitk::ContourElement::VertexType VertexType;
+    typedef mitk::ContourElement::VertexListType VertexListType;
+    typedef mitk::ContourElement::ConstVertexIterator VertexIterator;
+    typedef std::vector< mitk::ContourElement::Pointer > ContourModelSeries;
     /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
 

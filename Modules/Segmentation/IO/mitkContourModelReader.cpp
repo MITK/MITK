@@ -53,20 +53,20 @@ void mitk::ContourModelReader::GenerateData()
       TiXmlHandle docHandle( &doc );
 
       //handle geometry information
-      TiXmlElement* currentContourModelElement = docHandle.FirstChildElement("contourModel").FirstChildElement("head").FirstChildElement("geometryInformation").ToElement();
+      TiXmlElement* currentContourElement = docHandle.FirstChildElement("contourModel").FirstChildElement("head").FirstChildElement("geometryInformation").ToElement();
       
       
       /*++++ handle n contourModels within data tags ++++*/
       unsigned int contourCounter(0);
 
-      for( TiXmlElement* currentContourModelElement = docHandle.FirstChildElement("contourModel").FirstChildElement("data").ToElement();
-        currentContourModelElement != NULL; currentContourModelElement = currentContourModelElement->NextSiblingElement())
+      for( TiXmlElement* currentContourElement = docHandle.FirstChildElement("contourModel").FirstChildElement("data").ToElement();
+        currentContourElement != NULL; currentContourElement = currentContourElement->NextSiblingElement())
       {
         mitk::ContourModel::Pointer newContourModel = mitk::ContourModel::New();
-        if(currentContourModelElement->FirstChildElement("timestep") != NULL)
+        if(currentContourElement->FirstChildElement("timestep") != NULL)
         {
           /*++++ handle n timesteps within timestep tags ++++*/
-          for( TiXmlElement* currentTimeSeries = currentContourModelElement->FirstChildElement("timestep")->ToElement();
+          for( TiXmlElement* currentTimeSeries = currentContourElement->FirstChildElement("timestep")->ToElement();
             currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
           {
             unsigned int currentTimeStep(0);
@@ -90,7 +90,7 @@ void mitk::ContourModelReader::GenerateData()
         {
           //this should not happen
           MITK_WARN << "wrong file format!";
-          //newContourModel = this->ReadPoint(newContourModel, currentContourModelElement, 0);
+          //newContourModel = this->ReadPoint(newContourModel, currentContourElement, 0);
         }
         this->SetNthOutput( contourCounter, newContourModel );
         contourCounter++;

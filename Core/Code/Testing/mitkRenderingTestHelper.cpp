@@ -57,17 +57,15 @@ mitkRenderingTestHelper::~mitkRenderingTestHelper()
 void mitkRenderingTestHelper::PrintGLInfo()
 {
     GLint maxTextureSize;
-    GLint maxTextureSize3D;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-    glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &maxTextureSize3D);
 
-    MITK_INFO << "glInfo: \n"
-              << "GLVendor: "<< glGetString(GL_VENDOR) << "\n"
-              << "GLRenderer: "<< glGetString(GL_RENDERER) << "\n"
-              << "GLVersion: "<< glGetString(GL_VERSION)   << "\n"
-              << "MaxTextureSize: "<< maxTextureSize << "\n"
-              << "Max3DTextureSize: " << maxTextureSize3D << "\n"
-              << "GLExtensions: "<< glGetString(GL_EXTENSIONS);
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);;
+
+    MITK_INFO << "OpenGL Render Context Information: \n"
+              << "- GL_VENDOR: "<< glGetString(GL_VENDOR) << "\n"
+              << "- GL_RENDERER: "<< glGetString(GL_RENDERER) << "\n"
+              << "- GL_VERSION: "<< glGetString(GL_VERSION)   << "\n"
+              << "- GL_MAX_TEXTURE_SIZE: "<< maxTextureSize << "\n"
+              << "- GL_EXTENSIONS: "<< glGetString(GL_EXTENSIONS);
 }
 
 void mitkRenderingTestHelper::Render()

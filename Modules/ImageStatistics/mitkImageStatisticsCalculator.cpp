@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -66,10 +66,10 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_IgnorePixelValue(0.0),
   m_DoIgnorePixelValue(false),
   m_IgnorePixelValueChanged(false)
-{ 
+{
   m_EmptyHistogram = HistogramType::New();
   HistogramType::SizeType histogramSize;
-  histogramSize.Fill( 256 ); 
+  histogramSize.Fill( 256 );
   m_EmptyHistogram->Initialize( histogramSize );
 
   m_EmptyStatistics.Reset();
@@ -241,9 +241,16 @@ bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
 
 bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 {
-  if ( m_Image.IsNull() )
+
+  if (m_Image.IsNull() )
   {
-    itkExceptionMacro( << "Image not set!" );
+    //itkExceptionMacro( << "Image not set!" );
+    return false;
+  }
+
+  if (!m_Image->IsInitialized())
+  {
+    return false;
   }
 
   if ( m_Image->GetReferenceCount() == 1 )
@@ -346,7 +353,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   {
     if ( m_MaskingMode == MASKING_MODE_NONE && !m_DoIgnorePixelValue )
     {
-      AccessFixedDimensionByItk_2( 
+      AccessFixedDimensionByItk_2(
         m_InternalImage,
         InternalCalculateStatisticsUnmasked,
         3,
@@ -355,7 +362,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
     }
     else
     {
-      AccessFixedDimensionByItk_3( 
+      AccessFixedDimensionByItk_3(
         m_InternalImage,
         InternalCalculateStatisticsMasked,
         3,
@@ -368,7 +375,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   {
     if ( m_MaskingMode == MASKING_MODE_NONE && !m_DoIgnorePixelValue )
     {
-      AccessFixedDimensionByItk_2( 
+      AccessFixedDimensionByItk_2(
         m_InternalImage,
         InternalCalculateStatisticsUnmasked,
         2,
@@ -377,7 +384,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
     }
     else
     {
-      AccessFixedDimensionByItk_3( 
+      AccessFixedDimensionByItk_3(
         m_InternalImage,
         InternalCalculateStatisticsMasked,
         2,
@@ -605,7 +612,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
         throw std::runtime_error( "Planar-Figure not yet initialized!" );
       }
 
-      const PlaneGeometry *planarFigureGeometry = 
+      const PlaneGeometry *planarFigureGeometry =
         dynamic_cast< const PlaneGeometry * >( planarFigureGeometry2D );
       if ( planarFigureGeometry == NULL )
       {
@@ -638,7 +645,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
 
       // Compute mask from PlanarFigure
-      AccessFixedDimensionByItk_1( 
+      AccessFixedDimensionByItk_1(
         m_InternalImage,
         InternalCalculateMaskFromPlanarFigure,
         2, axis );
@@ -667,7 +674,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 }
 
 
-bool ImageStatisticsCalculator::GetPrincipalAxis( 
+bool ImageStatisticsCalculator::GetPrincipalAxis(
   const Geometry3D *geometry, Vector3D vector,
   unsigned int &axis )
 {
@@ -726,7 +733,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput( image );
-  unsigned long observerTag = statisticsFilter->AddObserver( 
+  unsigned long observerTag = statisticsFilter->AddObserver(
     itk::ProgressEvent(), progressListener );
 
   statisticsFilter->Update();
@@ -744,7 +751,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statistics.Mean = statisticsFilter->GetMean();
   statistics.Median = 0.0;
   statistics.Sigma = statisticsFilter->GetSigma();
-  statistics.RMS = sqrt( statistics.Mean * statistics.Mean 
+  statistics.RMS = sqrt( statistics.Mean * statistics.Mean
     + statistics.Sigma * statistics.Sigma );
 
   statisticsContainer->push_back( statistics );
@@ -883,7 +890,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   // Make sure that mask region is contained within image region
   if ( !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
   {
-    itkExceptionMacro( << "Mask region needs to be inside of image region! (Image region: " 
+    itkExceptionMacro( << "Mask region needs to be inside of image region! (Image region: "
       << image->GetLargestPossibleRegion() << "; Mask region: " << adaptedMaskImage->GetLargestPossibleRegion() << ")" );
   }
 
@@ -894,7 +901,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   bool maskSmallerImage = false;
   for ( unsigned int i = 0; i < ImageType::ImageDimension; ++i )
   {
-    if ( maskSize[i] < imageSize[i] ) 
+    if ( maskSize[i] < imageSize[i] )
     {
       maskSmallerImage = true;
     }
@@ -928,26 +935,26 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   labelStatisticsFilter->UseHistogramsOn();
   labelStatisticsFilter->SetHistogramParameters( 384, statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum() );
 
-  
+
   // Add progress listening
   typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;
   ITKCommandType::Pointer progressListener;
   progressListener = ITKCommandType::New();
   progressListener->SetCallbackFunction( this,
     &ImageStatisticsCalculator::MaskedStatisticsProgressUpdate );
-  unsigned long observerTag = labelStatisticsFilter->AddObserver( 
+  unsigned long observerTag = labelStatisticsFilter->AddObserver(
     itk::ProgressEvent(), progressListener );
 
 
   // Execute filter
   this->InvokeEvent( itk::StartEvent() );
 
-  
+
   // Make sure that only the mask region is considered (otherwise, if the mask region is smaller
   // than the image region, the Update() would result in an exception).
   labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
 
-  
+
   // Execute the filter
   labelStatisticsFilter->Update();
 
@@ -988,7 +995,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.Mean = labelStatisticsFilter->GetMean( *it );
       statistics.Median = labelStatisticsFilter->GetMedian( *it );
       statistics.Sigma = labelStatisticsFilter->GetSigma( *it );
-      statistics.RMS = sqrt( statistics.Mean * statistics.Mean 
+      statistics.RMS = sqrt( statistics.Mean * statistics.Mean
         + statistics.Sigma * statistics.Sigma );
       statisticsContainer->push_back( statistics );
     }
@@ -1057,7 +1064,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     // Convert 2D point back to the local index coordinates of the selected
     // image
     planarFigureGeometry2D->Map( it->Point, point3D );
-    
+
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil
     if ( !imageGeometry3D->IsInside( point3D ) )

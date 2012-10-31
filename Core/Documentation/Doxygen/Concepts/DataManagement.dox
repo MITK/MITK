@@ -1,6 +1,6 @@
 /**
 
-\page DataManagementPage The Data Management Concept
+\page DataManagementPage Data Management Concept
 
 As MITK is used to process large and diverse data the management thereof becomes an important issue.
 In order to abstract the management of data from the actual format of the data it is encapsulated.

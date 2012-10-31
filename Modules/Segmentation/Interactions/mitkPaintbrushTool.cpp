@@ -75,6 +75,14 @@ void mitk::PaintbrushTool::SetSize(int value)
   m_Size = value;
 }
 
+mitk::Point2D mitk::PaintbrushTool::upperLeft(mitk::Point2D p)
+{
+   p[0] -= 0.5;
+   p[1] -= 0.5;
+   return p;
+}
+
+
 void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 {
   //MITK_INFO<<"Update...";
@@ -93,6 +101,108 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   contourInImageIndexCoordinates->Initialize();
 
 
+  // we will compute the control points for the upper left quarter part of a circle contour
+  // and determine the remaining points by mirroring
+  std::vector< mitk::Point2D > fullCycle;
+  std::vector< mitk::Point2D > quarterCycleUpperRight;
+  std::vector< mitk::Point2D > quarterCycleLowerRight;
+  std::vector< mitk::Point2D > quarterCycleLowerLeft;
+  std::vector< mitk::Point2D > quarterCycleUpperLeft;
+
+
+  mitk::Point2D curPoint;
+  bool curPointIsInside = true;
+  curPoint[0] = 0;
+  curPoint[1] = radius;
+  quarterCycleUpperRight.push_back(curPoint);
+
+  while (curPoint[1] >= 0)
+  {
+     // Move right until pixel is outside circle
+     while( curPointIsInside )
+     {
+        // increment posX and chec
+        curPoint[0]++;
+        float len = sqrt(curPoint[0] * curPoint[0] + curPoint[1] + curPoint[1]);
+        if ( len > radius )
+        {
+           // found first Pixel in this horizontal line, that is outside the circle
+           curPointIsInside = false;
+        }
+     }
+     quarterCycleUpperRight.push_back( upperLeft(curPoint) );
+
+     // Move down until pixel is inside circle
+     while( !curPointIsInside )
+     {
+        // increment posX and chec
+        curPoint[1]--;
+        float len = sqrt(curPoint[0] * curPoint[0] + curPoint[1] + curPoint[1]);
+        if ( len <= radius )
+        {
+           // found first Pixel in this horizontal line, that is outside the circle
+           curPointIsInside = true;
+           quarterCycleUpperRight.push_back( upperLeft(curPoint) );
+        }
+
+        // Quarter cycle is full, when curPoint y position is 0
+        if (curPoint[1] <= 0)
+           break;
+     }
+
+   }
+
+  // QuarterCycle is full! Now copy quarter cycle to other quarters.
+  std::vector< mitk::Point2D >::const_iterator it = quarterCycleUpperRight.begin();
+  while( it != quarterCycleUpperRight.end() )
+  {
+     mitk::Point2D p;
+     p = *it;
+     p[1] *= -1;
+     quarterCycleLowerRight.push_back(p);
+
+     p[0] *= -1;
+     quarterCycleLowerLeft.push_back(p);
+
+     p[1] *= -1;
+     quarterCycleUpperLeft.push_back(p);
+
+     it++;
+  }
+
+  // now fill contour
+  mitk::Point3D tempPoint;
+  for (int i=0; i<quarterCycleUpperRight.size(); i++)
+  {
+     tempPoint[0] = quarterCycleUpperRight[i][0];
+     tempPoint[1] = quarterCycleUpperRight[i][1];
+     tempPoint[2] = 0;
+     contourInImageIndexCoordinates->AddVertex( tempPoint  );
+  }
+  for (int i=quarterCycleUpperRight.size()-1; i>=0; i++)
+  {
+     tempPoint[0] = quarterCycleLowerRight[i][0];
+     tempPoint[1] = quarterCycleLowerRight[i][1];
+     tempPoint[2] = 0;
+     contourInImageIndexCoordinates->AddVertex( tempPoint);
+  }
+  for (int i=0; i<quarterCycleLowerLeft.size(); i++)
+  {
+     tempPoint[0] = quarterCycleLowerLeft[i][0];
+     tempPoint[1] = quarterCycleLowerLeft[i][1];
+     tempPoint[2] = 0;
+     contourInImageIndexCoordinates->AddVertex( tempPoint );
+  }
+  for (int i=quarterCycleUpperLeft.size()-1; i>=0; i++)
+  {
+     tempPoint[0] = quarterCycleUpperLeft[i][0];
+     tempPoint[1] = quarterCycleUpperLeft[i][1];
+     tempPoint[2] = 0;
+     contourInImageIndexCoordinates->AddVertex( tempPoint );
+  }
+
+
+/*
   mitk::Point3D pIndex;
   pIndex[0] = 0;
   pIndex[1] = 0;
@@ -114,6 +224,8 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   contourInImageIndexCoordinates->AddVertex( p1 );
   contourInImageIndexCoordinates->AddVertex( p2 );
   contourInImageIndexCoordinates->AddVertex( p3 );
+*/
+
 
   m_MasterContour = contourInImageIndexCoordinates;
 

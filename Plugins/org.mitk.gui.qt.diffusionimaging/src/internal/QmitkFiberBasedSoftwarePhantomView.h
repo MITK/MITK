@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 #include "ui_QmitkFiberBasedSoftwarePhantomViewControls.h"
 #include <itkVectorImage.h>
 #include <itkVectorContainer.h>
@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 using namespace std;
 
-class QmitkFiberBasedSoftwarePhantomView : public QmitkFunctionality
+class QmitkFiberBasedSoftwarePhantomView : public QmitkAbstractView
 {
 
     // this is needed for all Qt objects that should have a Qt meta-object
@@ -56,14 +56,12 @@ public:
     virtual ~QmitkFiberBasedSoftwarePhantomView();
 
     virtual void CreateQtPartControl(QWidget *parent);
+    void SetFocus();
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
-
-    typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
-    typedef itk::Image<float, 3>          ItkFloatImgType;
-    typedef itk::Vector<double,3>         GradientType;
-    typedef vector<GradientType>     GradientListType;
+    typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
+    typedef itk::Image<float, 3>            ItkFloatImgType;
+    typedef itk::Vector<double,3>           GradientType;
+    typedef vector<GradientType>            GradientListType;
 
     template<int ndirs> vector<itk::Vector<double,3> > MakeGradientList() ;
 
@@ -77,17 +75,21 @@ protected slots:
 protected:
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( vector<mitk::DataNode*> nodes );
+    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&);
+
     GradientListType GenerateHalfShell(int NPoints);
 
     Ui::QmitkFiberBasedSoftwarePhantomViewControls* m_Controls;
-
-    QmitkStdMultiWidget* m_MultiWidget;
 
     void UpdateGui();
 
 private:
 
+    void EnableCrosshairNavigation();
+    void DisableCrosshairNavigation();
+    void NodeAdded( const mitk::DataNode* node );
+
+    mitk::Image::Pointer                            m_TissueMask;
     mitk::DataNode::Pointer                         m_SelectedImage;
     mitk::DataNode::Pointer                         m_SelectedBundle;
     vector< mitk::DataNode::Pointer >               m_SelectedBundles;

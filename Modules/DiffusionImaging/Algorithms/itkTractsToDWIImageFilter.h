@@ -61,13 +61,13 @@ public:
     itkSetMacro( MaxCrossingComplexity, int )
     itkSetMacro( MinCrossingAngle, double )
     itkSetMacro( BValue, float )
-    itkSetMacro( MaxFA, float )
+    itkSetMacro( KernelFA, float )
     itkSetMacro( SNR, double )
-    itkSetMacro( GreyMatterAdc, float )
     itkSetMacro( Spacing, mitk::Vector3D )
     itkSetMacro( Origin, mitk::Point3D )
     itkSetMacro( DirectionMatrix, MatrixType )
     itkSetMacro( ImageRegion, ImageRegion<3> )
+    itkSetMacro( TissueMask, ItkUcharImgType::Pointer )
 
     void GenerateData();
 
@@ -78,7 +78,7 @@ protected:
     itk::Point<float, 3> GetItkPoint(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
-    DoubleDwiType::PixelType SimulateMeasurement(ItkTensorType& tensor, double scaleSignal);
+    DoubleDwiType::PixelType SimulateMeasurement(ItkTensorType& tensor, double baseline);
     void AddNoise(DoubleDwiType::PixelType& pix);
     double GetTensorL2Norm(itk::DiffusionTensor3D<float>& T);
 
@@ -88,17 +88,17 @@ protected:
     ImageRegion<3>                      m_ImageRegion;
     float                               m_BValue;
     typename OutputImageType::Pointer   m_DiffusionImage;
+
+    float                               m_KernelFA;
     double                              m_NoiseVariance;
     double                              m_SNR;
-    float                               m_GreyMatterAdc;
-    double                              m_DefaultBaseline;
-    int                                 m_MaxDensity;
-    ItkFloatImgType::Pointer            m_TractDensityImage;
-    float                               m_MaxFA;
+    double                              m_WhiteMatterBaseline;
+    double                              m_CsfBaseline;
+    ItkUcharImgType::Pointer            m_TissueMask;
+
     int                                 m_MaxCrossingComplexity;
     double                              m_MinCrossingAngle;
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
-    double                              m_SignalScale;
     double                              m_MaxBaseline;
 
     GradientListType                    m_GradientList;

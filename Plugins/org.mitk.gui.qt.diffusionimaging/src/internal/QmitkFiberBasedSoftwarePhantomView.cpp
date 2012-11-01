@@ -38,6 +38,10 @@
 #include <itkFibersFromPointsFilter.h>
 #include <itkTractsToDWIImageFilter.h>
 #include <mitkTensorImage.h>
+#include <mitkILinkedRenderWindowPart.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkImageToItk.h>
+#include <mitkImageCast.h>
 
 #include <QMessageBox>
 
@@ -47,9 +51,8 @@
 const std::string QmitkFiberBasedSoftwarePhantomView::VIEW_ID = "org.mitk.views.FiberBasedSoftwarePhantomView";
 
 QmitkFiberBasedSoftwarePhantomView::QmitkFiberBasedSoftwarePhantomView()
-    : QmitkFunctionality()
+    : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_MultiWidget( NULL )
     , m_SelectedImage( NULL )
     , m_SelectedBundle( NULL )
 {
@@ -62,6 +65,19 @@ QmitkFiberBasedSoftwarePhantomView::~QmitkFiberBasedSoftwarePhantomView()
 
 }
 
+struct QmitkPlanarFigureData
+{
+  QmitkPlanarFigureData()
+    : m_Figure(0), m_EndPlacementObserverTag(0), m_SelectObserverTag(0), m_StartInteractionObserverTag(0), m_EndInteractionObserverTag(0)
+  {
+  }
+
+  mitk::PlanarFigure* m_Figure;
+  unsigned int m_EndPlacementObserverTag;
+  unsigned int m_SelectObserverTag;
+  unsigned int m_StartInteractionObserverTag;
+  unsigned int m_EndInteractionObserverTag;
+};
 
 void QmitkFiberBasedSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
 {
@@ -184,11 +200,12 @@ void QmitkFiberBasedSoftwarePhantomView::OnDrawCircle()
     node->SetName(name.toStdString());
     GetDataStorage()->Add(node, m_SelectedBundle);
 
+    this->DisableCrosshairNavigation();
+
     mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
     if(figureInteractor.IsNull())
         figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
     mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
-
 }
 
 void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
@@ -276,9 +293,14 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
     filter->SetSNR(m_Controls->m_NoiseLevel->value());
     filter->SetImageRegion(imageRegion);
     filter->SetSpacing(spacing);
-    filter->SetGreyMatterAdc(m_Controls->m_GmAdc->value());
     filter->SetFiberBundle(fiberBundle);
-    filter->SetMaxFA(m_Controls->m_MaxFaBox->value());
+    filter->SetKernelFA(m_Controls->m_MaxFaBox->value());
+    if (m_TissueMask.IsNotNull())
+    {
+        ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
+        mitk::CastToItkImage<ItkUcharImgType>(m_TissueMask, mask);
+        filter->SetTissueMask(mask);
+    }
     filter->Update();
 
     mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
@@ -321,30 +343,29 @@ void QmitkFiberBasedSoftwarePhantomView::UpdateGui()
     }
 }
 
-void QmitkFiberBasedSoftwarePhantomView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkFiberBasedSoftwarePhantomView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes )
 {
-    m_MultiWidget = &stdMultiWidget;
-}
-
-void QmitkFiberBasedSoftwarePhantomView::StdMultiWidgetNotAvailable()
-{
-    m_MultiWidget = NULL;
-}
-
-void QmitkFiberBasedSoftwarePhantomView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
-{
+    m_TissueMask = NULL;
     m_SelectedBundles.clear();
     m_SelectedBundle = NULL;
     m_SelectedImage = NULL;
+    m_Controls->m_TissueMaskLabel->setText("-");
 
     // iterate all selected objects, adjust warning visibility
-    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+    for( int i=0; i<nodes.size(); i++)
     {
-        mitk::DataNode::Pointer node = *it;
+        mitk::DataNode::Pointer node = nodes.at(i);
 
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
             m_SelectedImage = node;
+            bool isBinary = false;
+            node->GetPropertyValue<bool>("binary", isBinary);
+            if (isBinary)
+            {
+                m_TissueMask = dynamic_cast<mitk::Image*>(node->GetData());
+                m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
+            }
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {
@@ -353,4 +374,93 @@ void QmitkFiberBasedSoftwarePhantomView::OnSelectionChanged( std::vector<mitk::D
         }
     }
     UpdateGui();
+}
+
+
+void QmitkFiberBasedSoftwarePhantomView::EnableCrosshairNavigation()
+{
+    MITK_DEBUG << "EnableCrosshairNavigation";
+
+    // enable the crosshair navigation
+    if (mitk::ILinkedRenderWindowPart* linkedRenderWindow =
+            dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
+    {
+        MITK_DEBUG << "enabling linked navigation";
+        linkedRenderWindow->EnableLinkedNavigation(true);
+//        linkedRenderWindow->EnableSlicingPlanes(true);
+    }
+}
+
+void QmitkFiberBasedSoftwarePhantomView::DisableCrosshairNavigation()
+{
+    MITK_DEBUG << "DisableCrosshairNavigation";
+
+    // disable the crosshair navigation during the drawing
+    if (mitk::ILinkedRenderWindowPart* linkedRenderWindow =
+            dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
+    {
+        MITK_DEBUG << "disabling linked navigation";
+        linkedRenderWindow->EnableLinkedNavigation(false);
+//        linkedRenderWindow->EnableSlicingPlanes(false);
+    }
+}
+
+void QmitkFiberBasedSoftwarePhantomView::NodeAdded( const mitk::DataNode* node )
+{
+    // add observer for selection in renderwindow
+    mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+    bool isPositionMarker (false);
+    node->GetBoolProperty("isContourMarker", isPositionMarker);
+    if( figure && !isPositionMarker )
+    {
+        MITK_DEBUG << "figure added. will add interactor if needed.";
+        mitk::PlanarFigureInteractor::Pointer figureInteractor
+                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+
+        mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
+        if(figureInteractor.IsNull())
+        {
+            figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", nonConstNode);
+        }
+        else
+        {
+            // just to be sure that the interactor is not added twice
+            mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
+        }
+
+        MITK_DEBUG << "adding interactor to globalinteraction";
+        mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+
+        MITK_DEBUG << "will now add observers for planarfigure";
+        QmitkPlanarFigureData data;
+        data.m_Figure = figure;
+
+//        // add observer for event when figure has been placed
+        typedef itk::SimpleMemberCommand< QmitkFiberBasedSoftwarePhantomView > SimpleCommandType;
+//        SimpleCommandType::Pointer initializationCommand = SimpleCommandType::New();
+//        initializationCommand->SetCallbackFunction( this, &QmitkFiberBasedSoftwarePhantomView::PlanarFigureInitialized );
+//        data.m_EndPlacementObserverTag = figure->AddObserver( mitk::EndPlacementPlanarFigureEvent(), initializationCommand );
+
+//        // add observer for event when figure is picked (selected)
+//        typedef itk::MemberCommand< QmitkMeasurementView > MemberCommandType;
+//        MemberCommandType::Pointer selectCommand = MemberCommandType::New();
+//        selectCommand->SetCallbackFunction( this, &QmitkFiberBasedSoftwarePhantomView::PlanarFigureSelected );
+//        data.m_SelectObserverTag = figure->AddObserver( mitk::SelectPlanarFigureEvent(), selectCommand );
+
+        // add observer for event when interaction with figure starts
+        SimpleCommandType::Pointer startInteractionCommand = SimpleCommandType::New();
+        startInteractionCommand->SetCallbackFunction( this, &QmitkFiberBasedSoftwarePhantomView::DisableCrosshairNavigation);
+        data.m_StartInteractionObserverTag = figure->AddObserver( mitk::StartInteractionPlanarFigureEvent(), startInteractionCommand );
+
+        // add observer for event when interaction with figure starts
+        SimpleCommandType::Pointer endInteractionCommand = SimpleCommandType::New();
+        endInteractionCommand->SetCallbackFunction( this, &QmitkFiberBasedSoftwarePhantomView::EnableCrosshairNavigation);
+        data.m_EndInteractionObserverTag = figure->AddObserver( mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand );
+
+    }
+}
+
+void QmitkFiberBasedSoftwarePhantomView::SetFocus()
+{
+    m_Controls->m_FiberButton->setFocus();
 }

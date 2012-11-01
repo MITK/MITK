@@ -139,8 +139,9 @@ void FibersFromPointsFilter::GenerateData()
                 wc = figure->GetWorldControlPoint(0);
 
                 // is flip needed?
-                if (dot_product(perp.GetVnlVector(),n2)>0)
+                if (dot_product(perp.GetVnlVector(),n2)>0 && dot_product(n,n2)<=0.00001)
                     newP[0] *= -1;
+                n = n2;
 
                 p1[0] += newP[0]*r;
                 p1[1] += newP[1]*r;

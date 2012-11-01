@@ -204,7 +204,10 @@ SimpleHistogram* SimpleHistogramCache::operator[](BaseData::Pointer sp_BaseData)
         cache.push_front(e);
       }
       if( p_BaseData->GetMTime() > e->m_LastUpdateTime.GetMTime())
+      {
+        elementToUpdate = e;
         goto recomputeElement;
+      }
 
       //MITK_INFO << "using a cached histogram";
 

@@ -195,9 +195,9 @@ void QmitkUGVisualizationView::UpdateEnablement()
   m_Controls.m_TransferFunctionWidget->ShowColorFunction(m_ShowColorWidget);
   m_Controls.m_TransferFunctionWidget->ShowGradientOpacityFunction(m_ShowGradientOpacityWidget);
 
-  m_Controls.m_TransferFunctionGeneratorWidget->SetThresholdTabEnabled(m_VolumeMode);
-  m_Controls.m_TransferFunctionGeneratorWidget->SetBellTabEnabled(m_VolumeMode);
-  m_Controls.m_TransferFunctionWidget->SetScalarOpacityFunctionEnabled(m_VolumeMode);
+  m_Controls.m_TransferFunctionGeneratorWidget->SetThresholdTabEnabled(m_ScalarVisibilityWidget->isChecked());
+  m_Controls.m_TransferFunctionGeneratorWidget->SetBellTabEnabled(m_ScalarVisibilityWidget->isChecked());
+  m_Controls.m_TransferFunctionWidget->SetScalarOpacityFunctionEnabled(m_ScalarVisibilityWidget->isChecked());
   m_Controls.m_TransferFunctionWidget->SetGradientOpacityFunctionEnabled(m_VolumeMode);
 }
 

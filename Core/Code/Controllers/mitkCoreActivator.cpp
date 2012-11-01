@@ -47,6 +47,19 @@ std::string GetProgramPath()
   std::size_t index = std::string(path, GetModuleFileName(NULL, path, 512)).find_last_of('\\');
   return std::string(path, index);
 }
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+std::string GetProgramPath()
+{
+  char path[512];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) == 0)
+  {
+    std::size_t index = std::string(path).find_last_of('/');
+    return std::string(path, index);
+  }
+  return std::string();
+}
 #else
 #include <sys/types.h>
 #include <unistd.h>
@@ -62,6 +75,34 @@ std::string GetProgramPath()
   return std::string(proc, index);
 }
 #endif
+
+void AddMitkAutoLoadPaths(const std::string& programPath)
+{
+  mitk::ModuleSettings::AddAutoLoadPath(programPath);
+#ifdef __APPLE__
+  // Walk up three directories since that is where the .dylib files are located
+  // for build trees.
+  std::string additionalPath = programPath;
+  bool addPath = true;
+  for(int i = 0; i < 3; ++i)
+  {
+    std::size_t index = additionalPath.find_last_of('/');
+    if (index != std::string::npos)
+    {
+      additionalPath = additionalPath.substr(0, index);
+    }
+    else
+    {
+      addPath = false;
+      break;
+    }
+  }
+  if (addPath)
+  {
+    mitk::ModuleSettings::AddAutoLoadPath(additionalPath);
+  }
+#endif
+}
 
 /*
  * This is the module activator for the "Mitk" module. It registers core services
@@ -85,7 +126,7 @@ public:
     }
     else
     {
-      mitk::ModuleSettings::AddAutoLoadPath(GetProgramPath());
+      AddMitkAutoLoadPaths(programPath);
     }
 
     //m_RenderingManager = mitk::RenderingManager::New();

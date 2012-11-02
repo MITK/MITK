@@ -25,10 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIToFDeviceFactory.h"
 
 #include "mitkToFConfig.h"
-#include "mitkToFCameraPMDPlayerDeviceFactory.h"
-
 #include "mitkToFCameraPMDCamBoardDeviceFactory.h"
-//#include "mitkToFCameraPMDRawDataCamBoardDeviceFactory.h"
+#include "mitkToFCameraPMDRawDataCamBoardDeviceFactory.h"
+
+#include "mitkToFCameraPMDPlayerDeviceFactory.h"
 
 //Implementing a Device on start
 #include "mitkAbstractToFDeviceFactory.h"

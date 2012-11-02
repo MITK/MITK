@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDCamBoardController_h
 #define __mitkToFCameraPMDCamBoardController_h
 
-#include "mitkPMDCamCubeModuleExports.h"
+#include "mitkPMDCamBoardModuleExports.h"
 #include "mitkCommon.h"
 #include "mitkToFCameraPMDController.h"
 
@@ -31,7 +31,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_PMDCAMCUBEMODULE_EXPORT ToFCameraPMDCamBoardController : public mitk::ToFCameraPMDController
+  class MITK_PMDCAMBOARDMODULE_EXPORT ToFCameraPMDCamBoardController : public mitk::ToFCameraPMDController
   {
   public:
 
@@ -73,7 +73,7 @@ namespace mitk
     */
     unsigned int* GetRegionOfInterest();
     /*!
-    \brief sets the exposure mode of the CamCube
+    \brief sets the exposure mode of the CamBoard
     \param mode exposure mode. 0: normal mode (one exposure), 1: Suppression of motion blur (SMB), minimizes the time needed to capture
     a distance image from the camera which results in a reduced amount of motion artifact but may lead to increased noise.
     */

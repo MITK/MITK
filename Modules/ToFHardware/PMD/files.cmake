@@ -13,13 +13,6 @@ SET(CPP_FILES
  #and the PMDRawDataDevice depends on
    mitkThreadedToFRawDataReconstruction.cpp
 
-#-------------Cam Cube------------------------------------------
-
-
-
-#-------------Cam Board------------------------------------------
-
-
 
   ##The ToFCameraPMDMITKPlayerDevice is depricated
      #mitkToFCameraPMDMITKPlayerController.cpp
@@ -37,8 +30,8 @@ SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDCamCubeDeviceFactory.cpp
   mitkPMDCamCubeModuleActivator.cpp
 
-  #mitkToFCameraPMDRawDataCamCubeDevice.cpp
-  #mitkToFCameraPMDRawDataCamCubeDeviceFactory.cpp
+  mitkToFCameraPMDRawDataCamCubeDevice.cpp
+  mitkToFCameraPMDRawDataCamCubeDeviceFactory.cpp
 
 )
 IF(WIN32)
@@ -71,8 +64,8 @@ SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDCamBoardDeviceFactory.cpp
   mitkPMDCamBoardModuleActivator.cpp
 
-   #mitkToFCameraPMDRawDataCamBoardDevice.cpp
-   #mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
+   mitkToFCameraPMDRawDataCamBoardDevice.cpp
+   mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
 
 )
 ELSE()
@@ -103,7 +96,7 @@ ENDIF(MITK_USE_TOF_PMDCAMBOARD)
  ENDIF(MITK_USE_TOF_PMDO3)
 
 
-##------------------------------------------Stubs I do NOT want to use(if possible)---------------------------
+##------------------------------------------Stubs we do NOT want to use(if possible)---------------------------
 #IF(NOT MITK_USE_TOF_PMDCAMCUBE)
 #IF(NOT MITK_USE_TOF_PMDCAMBOARD)
 #IF(NOT MITK_USE_TOF_PMDO3)

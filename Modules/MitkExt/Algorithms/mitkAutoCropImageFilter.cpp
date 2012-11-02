@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometry3D.h"
 #include "mitkStatusBar.h"
 
+#include "mitkPlaneGeometry.h"
+
 #include <itkImageRegionConstIterator.h>
 #include <itkRegionOfInterestImageFilter.h>
 
@@ -144,24 +146,45 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
   if(dimension>3)
     memcpy(dimensions+3, input->GetDimensions()+3, (dimension-3)*sizeof(unsigned int));
+  
+  // create basic slicedGeometry that will be initialized below
   output->Initialize(mitk::PixelType( GetOutputPixelType() ), dimension, dimensions);
   delete [] dimensions;
 
-  
   //clone the IndexToWorldTransform from the input, otherwise we will overwrite it, when adjusting the origin of the output image!!
   itk::ScalableAffineTransform< mitk::ScalarType,3 >::Pointer cloneTransform = itk::ScalableAffineTransform< mitk::ScalarType,3 >::New();
   cloneTransform->Compose(input->GetGeometry()->GetIndexToWorldTransform());
   output->GetGeometry()->SetIndexToWorldTransform( cloneTransform.GetPointer() );
 
-  // Set the spacing
-  output->SetSpacing( input->GetSlicedGeometry()->GetSpacing() );
-
   // Position the output Image to match the corresponding region of the input image
   mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
+  mitk::SlicedGeometry3D::Pointer inputGeometry = input->GetSlicedGeometry();
   const mitk::SlicedData::IndexType& start = m_InputRequestedRegion.GetIndex();
   mitk::Point3D origin; vtk2itk(start, origin);
   input->GetSlicedGeometry()->IndexToWorld(origin, origin);
   slicedGeometry->SetOrigin(origin);
+
+  // get the PlaneGeometry for the first slice of the original image
+  mitk::PlaneGeometry::Pointer plane = dynamic_cast<mitk::PlaneGeometry*>( inputGeometry->GetGeometry2D( 0 )->Clone().GetPointer() );
+  assert( plane );
+  
+  // re-initialize the plane according to the new requirements:
+  // dimensions of the cropped image
+  // right- and down-vector as well as spacing do not change, so use the ones from
+  // input image
+  ScalarType dimX = output->GetDimensions()[0];
+  ScalarType dimY = output->GetDimensions()[1];
+  mitk::Vector3D right = plane->GetAxisVector(0);
+  mitk::Vector3D down = plane->GetAxisVector(1);
+  mitk::Vector3D spacing = plane->GetSpacing();
+  plane->InitializeStandardPlane( dimX, dimY, right, down, &spacing );
+  // set the new origin on the PlaneGeometry as well
+  plane->SetOrigin(origin);
+
+  // re-initialize the slicedGeometry with the correct planeGeometry
+  // in order to get a fully initialized SlicedGeometry3D
+  slicedGeometry->InitializeEvenlySpaced( plane, inputGeometry->GetSpacing()[2], output->GetSlicedGeometry()->GetSlices() );
+
 
   mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
   timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));

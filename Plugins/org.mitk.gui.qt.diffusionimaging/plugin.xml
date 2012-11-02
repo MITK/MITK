@@ -128,14 +128,14 @@
           class="QmitkConnectomicsNetworkOperationsView"
           icon="resources/connectomics/QmitkConnectomicsNetworkOperationsViewIcon_48.png" />
   </extension>
-  
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.connectomicsdata"
           name="Network Data"
           class="QmitkConnectomicsDataView"
           icon="resources/connectomics/QmitkConnectomicsDataViewIcon_48.png" />
   </extension>
-  
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.connectomicsstatistics"
           name="Network Statistics"
@@ -145,7 +145,7 @@
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.dwisoftwarephantomview"
-          name="DWI Software Phantoms"
+          name="ROI Based Phantoms"
           class="QmitkDwiSoftwarePhantomView"
           icon="resources/phantom.png" />
   </extension>
@@ -155,6 +155,13 @@
           name="Peak Extraction"
           class="QmitkOdfMaximaExtractionView"
           icon="resources/qball_peaks.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.FiberBasedSoftwarePhantomView"
+          name="Fiber Based Phantoms"
+          class="QmitkFiberBasedSoftwarePhantomView"
+          icon="resources/stochFB.png" />
   </extension>
 
 </plugin>

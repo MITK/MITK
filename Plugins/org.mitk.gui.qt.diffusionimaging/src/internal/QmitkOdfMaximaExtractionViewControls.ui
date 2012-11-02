@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>392</width>
-    <height>739</height>
+    <height>769</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -340,10 +340,10 @@
    <item row="14" column="0">
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
-      <string>Convert FSL Files</string>
+      <string>Import From Other Tools</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_7">
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QCommandLinkButton" name="m_ConvertShFromFsl">
         <property name="enabled">
          <bool>false</bool>
@@ -352,11 +352,11 @@
          <string>Generate Q-Ball image and MITK compatible SH coefficient from the FSL qboot SH output.</string>
         </property>
         <property name="text">
-         <string>Convert SH - Coefficients</string>
+         <string>Convert FSL SH - Coefficients</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QCommandLinkButton" name="m_ConvertFromFsl">
         <property name="enabled">
          <bool>false</bool>
@@ -365,7 +365,20 @@
          <string>Generate vector field and direction images from the FSL qboot peak extraction output.</string>
         </property>
         <property name="text">
-         <string>Convert Peak Image</string>
+         <string>Convert FSL Peaks</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCommandLinkButton" name="m_MrtrixPeaks">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Convert MRtrix Peaks</string>
         </property>
        </widget>
       </item>

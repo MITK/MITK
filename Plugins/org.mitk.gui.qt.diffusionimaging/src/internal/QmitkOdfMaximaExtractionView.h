@@ -78,6 +78,7 @@ public:
 
   void ConvertShCoeffsFromFsl();
   void ConvertPeaksFromFsl();
+  void ConvertPeaksFromMrtrix();
   void GenerateImage();
   void StartFiniteDiff();
   void StartTensor();

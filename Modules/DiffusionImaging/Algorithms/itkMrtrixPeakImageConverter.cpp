@@ -1,12 +1,12 @@
 
-#ifndef __itkFslPeakImageConverter_cpp
-#define __itkFslPeakImageConverter_cpp
+#ifndef __itkMrtrixPeakImageConverter_cpp
+#define __itkMrtrixPeakImageConverter_cpp
 
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "itkFslPeakImageConverter.h"
+#include "itkMrtrixPeakImageConverter.h"
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
@@ -22,24 +22,24 @@
 namespace itk {
 
 template< class PixelType >
-FslPeakImageConverter< PixelType >::FslPeakImageConverter():
+MrtrixPeakImageConverter< PixelType >::MrtrixPeakImageConverter():
     m_NormalizationMethod(NO_NORM)
 {
 
 }
 
 template< class PixelType >
-void FslPeakImageConverter< PixelType >
+void MrtrixPeakImageConverter< PixelType >
 ::GenerateData()
 {
     // output vector field
     vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints>    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-    Vector<float, 4> spacing4 = m_InputImages->GetElement(0)->GetSpacing();
-    Point<float, 4> origin4 = m_InputImages->GetElement(0)->GetOrigin();
-    Matrix<double, 4, 4> direction4 = m_InputImages->GetElement(0)->GetDirection();
-    ImageRegion<4> imageRegion4 = m_InputImages->GetElement(0)->GetLargestPossibleRegion();
+    Vector<float, 4> spacing4 = m_InputImage->GetSpacing();
+    Point<float, 4> origin4 = m_InputImage->GetOrigin();
+    Matrix<double, 4, 4> direction4 = m_InputImage->GetDirection();
+    ImageRegion<4> imageRegion4 = m_InputImage->GetLargestPossibleRegion();
 
     Vector<float, 3> spacing3;
     Point<float, 3> origin3;
@@ -64,13 +64,14 @@ void FslPeakImageConverter< PixelType >
     m_DirectionImageContainer = DirectionImageContainerType::New();
 
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
-    for (int i=0; i<m_InputImages->Size(); i++)
-    {
-        InputImageType::Pointer img = m_InputImages->GetElement(i);
-        int x = img->GetLargestPossibleRegion().GetSize(0);
-        int y = img->GetLargestPossibleRegion().GetSize(1);
-        int z = img->GetLargestPossibleRegion().GetSize(2);
 
+    int x = m_InputImage->GetLargestPossibleRegion().GetSize(0);
+    int y = m_InputImage->GetLargestPossibleRegion().GetSize(1);
+    int z = m_InputImage->GetLargestPossibleRegion().GetSize(2);
+    int numDirs = m_InputImage->GetLargestPossibleRegion().GetSize(3)/3;
+
+    for (int i=0; i<numDirs; i++)
+    {
         ItkDirectionImageType::Pointer directionImage = ItkDirectionImageType::New();
         directionImage->SetSpacing( spacing3 );
         directionImage->SetOrigin( origin3 );
@@ -92,8 +93,8 @@ void FslPeakImageConverter< PixelType >
                     vnl_vector<double> dirVec; dirVec.set_size(4);
                     for (int k=0; k<3; k++)
                     {
-                        index.SetElement(3,k);
-                        dirVec[k] = img->GetPixel(index);
+                        index.SetElement(3,k+i*3);
+                        dirVec[k] = m_InputImage->GetPixel(index);
                     }
                     dirVec[3] = 0;
 
@@ -104,7 +105,7 @@ void FslPeakImageConverter< PixelType >
                     center[2] = index[2];
                     center[3] = 0;
                     itk::Point<double, 4> worldCenter;
-                    img->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
+                    m_InputImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
 
                     switch (m_NormalizationMethod)
                     {
@@ -115,7 +116,7 @@ void FslPeakImageConverter< PixelType >
                         break;
                     }
                     dirVec.normalize();
-                    dirVec = img->GetDirection()*dirVec;
+                    dirVec = m_InputImage->GetDirection()*dirVec;
 
                     itk::Point<double> worldStart;
                     worldStart[0] = worldCenter[0]-dirVec[0]/2 * minSpacing;
@@ -133,7 +134,7 @@ void FslPeakImageConverter< PixelType >
 
                     // generate direction image
                     typename ItkDirectionImageType::IndexType index2;
-                    index2[0] = index[0]; index2[1] = index[1]; index2[2] = index[2];
+                    index2[0] = a; index2[1] = b; index2[2] = c;
 
 
                     Vector< PixelType, 3 > pixel;
@@ -142,7 +143,6 @@ void FslPeakImageConverter< PixelType >
                     pixel.SetElement(2, dirVec[2]);
                     directionImage->SetPixel(index2, pixel);
                 }
-
         m_DirectionImageContainer->InsertElement(m_DirectionImageContainer->Size(), directionImage);
     }
 
@@ -154,4 +154,4 @@ void FslPeakImageConverter< PixelType >
 
 }
 
-#endif // __itkFslPeakImageConverter_cpp
+#endif // __itkMrtrixPeakImageConverter_cpp

@@ -270,6 +270,14 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     node->SetName(m_Controls->m_ImageName->text().toStdString());
     GetDataStorage()->Add(node);
 
+    mitk::BaseData::Pointer basedata = node->GetData();
+    if (basedata.IsNotNull())
+    {
+        mitk::RenderingManager::GetInstance()->InitializeViews(
+                    basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+
     if (m_Controls->m_OutputNumDirectionsBox->isChecked())
     {
         ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();

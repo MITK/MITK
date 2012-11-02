@@ -896,29 +896,20 @@ void QmitkFiberProcessingView::OnDrawPolygon()
 
 }
 
-
 void QmitkFiberProcessingView::OnDrawCircle()
 {
-    //bool checked = m_Controls->m_CircleButton->isChecked();
-    //if(!this->AssertDrawingIsPossible(checked))
-    //  return;
-
     mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
 
     this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_EllipseCounter));
 
     this->GetDataStorage()->Modified();
-    MITK_DEBUG << "PlanarCircle created ...";
-
-    //call
 
     mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
     mitk::DataNode* node = 0;
     mitk::PlanarFigureInteractor::Pointer figureInteractor = 0;
     mitk::PlanarFigure* figureP = 0;
 
-    for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
-        ; it++)
+    for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End(); it++)
     {
         node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
         figureP = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
@@ -933,9 +924,6 @@ void QmitkFiberProcessingView::OnDrawCircle()
             mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
         }
     }
-
-
-
 }
 
 void QmitkFiberProcessingView::Activated()

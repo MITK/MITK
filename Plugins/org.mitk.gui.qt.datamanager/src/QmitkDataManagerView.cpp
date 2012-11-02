@@ -643,7 +643,7 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-  
+
   if (renderWindow == NULL)
     renderWindow = this->OpenRenderWindowPart(false);
 
@@ -802,10 +802,15 @@ QItemSelectionModel *QmitkDataManagerView::GetDataNodeSelectionModel() const
 void QmitkDataManagerView::GlobalReinit( bool )
 {
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-  
+
   if (renderWindow == NULL)
+  {
     renderWindow = this->OpenRenderWindowPart(false);
-  
+
+    if(renderWindow == NULL)
+      return;
+  }
+
   // get all nodes that have not set "includeInBoundingBox" to false
   mitk::NodePredicateNot::Pointer pred
     = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"

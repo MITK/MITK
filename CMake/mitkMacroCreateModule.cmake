@@ -24,15 +24,41 @@
 #! \param HEADERS_ONLY specify this if the modules just contains header files.
 ##################################################################
 macro(MITK_CREATE_MODULE MODULE_NAME_IN)
-  MACRO_PARSE_ARGUMENTS(MODULE
-                        "SUBPROJECTS;VERSION;INCLUDE_DIRS;INTERNAL_INCLUDE_DIRS;DEPENDS;DEPENDS_INTERNAL;PACKAGE_DEPENDS;TARGET_DEPENDS;EXPORT_DEFINE;ADDITIONAL_LIBS;GENERATED_CPP"
-                        "QT_MODULE;FORCE_STATIC;HEADERS_ONLY;GCC_DEFAULT_VISIBILITY;NO_INIT;WARNINGS_AS_ERRORS"
-                        ${ARGN})
+
+  set(_macro_params
+      SUBPROJECTS            # list of CDash labels
+      VERSION                # module version number, e.g. "1.2.0"
+      INCLUDE_DIRS           # exported include dirs (used in mitkMacroCreateModuleConf.cmake)
+      INTERNAL_INCLUDE_DIRS  # include dirs internal to this module
+      DEPENDS                # list of modules this module depends on
+      DEPENDS_INTERNAL       # list of modules this module internally depends on
+      PACKAGE_DEPENDS        # list of "packages this module depends on (e.g. Qt, VTK, etc.)
+      TARGET_DEPENDS         # list of CMake targets this module should depend on
+      EXPORT_DEFINE          # export macro name for public symbols of this module
+      AUTOLOAD_WITH          # a module target name identifying the module which will trigger the
+                             # automatic loading of this module
+      ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
+      GENERATED_CPP          # not used (?)
+     )
+     
+  set(_macro_options
+      QT_MODULE              # the module makes use of Qt features and needs moc and ui generated files
+      FORCE_STATIC           # force building this module as a static library
+      HEADERS_ONLY           # this module is a headers-only library
+      GCC_DEFAULT_VISIBILITY # do not use gcc visibility flags - all symbols will be exported
+      NO_INIT                # do not create CppMicroServices initialization code
+      WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
+     )
+
+  MACRO_PARSE_ARGUMENTS(MODULE "${_macro_params}" "${_macro_options}" ${ARGN})
                         
   set(MODULE_NAME ${MODULE_NAME_IN})
 
   if(MODULE_HEADERS_ONLY)
     set(MODULE_PROVIDES )
+    if(MODULE_AUTOLOAD_WITH)
+      message(SEND_ERROR "A headers only module cannot be auto-loaded")
+    endif()
   else()
     set(MODULE_PROVIDES ${MODULE_NAME})
     if(NOT MODULE_NO_INIT AND NOT MODULE_NAME STREQUAL "Mitk")
@@ -56,7 +82,17 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
     endforeach()
   endif()  
 
-    
+  # check and set-up auto-loading
+  if(MODULE_AUTOLOAD_WITH)
+    if(NOT TARGET "${MODULE_AUTOLOAD_WITH}")
+      message(SEND_ERROR "The module target \"${MODULE_AUTOLOAD_WITH}\" specified as the auto-loading module for \"${MODULE_NAME}\" does not exist")
+    endif()
+    # create a meta-target if it does not already exist
+    set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-universe")
+    if(NOT TARGET ${_module_autoload_meta_target})
+      add_custom_target(${_module_autoload_meta_target})
+    endif()
+  endif()
   
   # assume worst case
   set(MODULE_IS_ENABLED 0)
@@ -275,7 +311,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
                 link_directories(${ALL_LIBRARY_DIRS})
               endif(ALL_LIBRARY_DIRS)
               add_library(${MODULE_PROVIDES} ${_STATIC} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP} ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
-              target_link_libraries(${MODULE_PROVIDES} ${QT_LIBRARIES} ${ALL_LIBRARIES} QVTK)
+              target_link_libraries(${MODULE_PROVIDES} ${QT_LIBRARIES} ${ALL_LIBRARIES})
               if(MODULE_TARGET_DEPENDS)
                 add_dependencies(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})
               endif()
@@ -307,6 +343,44 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           endif(NOT _STATIC OR MINGW)
 
         endif(NOT MODULE_QT_MODULE OR MITK_USE_QT)
+        
+        if(NOT MODULE_HEADERS_ONLY)
+          # add the target name to a global property which is used in the top-level
+          # CMakeLists.txt file to export the target
+          set_property(GLOBAL APPEND PROPERTY MITK_MODULE_TARGETS ${MODULE_PROVIDES})
+          if(MODULE_AUTOLOAD_WITH)
+            # for auto-loaded modules, adapt the output directory
+            add_dependencies(${_module_autoload_meta_target} ${MODULE_PROVIDES})
+            if(WIN32)
+              set(_module_output_prop RUNTIME_OUTPUT_DIRECTORY)
+            else()
+              set(_module_output_prop LIBRARY_OUTPUT_DIRECTORY)
+            endif()
+            set(_module_output_dir ${CMAKE_${_module_output_prop}}/${MODULE_AUTOLOAD_WITH})
+            get_target_property(_module_is_imported ${MODULE_AUTOLOAD_WITH} IMPORTED)
+            if(NOT _module_is_imported)
+              # if the auto-loading module is not imported, get its location
+              # and put the auto-load module relative to it.
+              get_target_property(_module_output_dir ${MODULE_AUTOLOAD_WITH} ${_module_output_prop})
+              set_target_properties(${MODULE_PROVIDES} PROPERTIES
+                                    ${_module_output_prop} ${_module_output_dir}/${MODULE_AUTOLOAD_WITH})
+            else()
+              set_target_properties(${MODULE_PROVIDES} PROPERTIES
+                                    ${_module_output_prop} ${CMAKE_${_module_output_prop}}/${MODULE_AUTOLOAD_WITH})
+            endif()
+            set_target_properties(${MODULE_PROVIDES} PROPERTIES
+                                  MITK_AUTOLOAD_DIRECTORY ${MODULE_AUTOLOAD_WITH})
+            
+            # add the auto-load module name as a property
+            set_property(TARGET ${MODULE_AUTOLOAD_WITH} APPEND PROPERTY MITK_AUTOLOAD_TARGETS ${MODULE_PROVIDES})
+          else()
+            # Add meta dependencies (e.g. on auto-load modules from depending modules)
+            if(ALL_META_DEPENDENCIES)
+              add_dependencies(${MODULE_PROVIDES} ${ALL_META_DEPENDENCIES})
+            endif()
+          endif()
+        endif()
+        
       endif(MODULE_IS_ENABLED)
     endif(_MISSING_DEP)
   endif(NOT MODULE_IS_EXCLUDED)

@@ -315,6 +315,7 @@ include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
+include(mitkFunctionInstallAutoLoadModules)
 include(mitkFunctionCompileSnippets)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
@@ -836,20 +837,42 @@ include(mitkInstallRules)
 # Last configuration steps
 #-----------------------------------------------------------------------------
 
+# This is for installation support of external projects depending on
+# MITK plugins and modules. The export file should not be used for linking to MITK
+# libraries without using LINK_DIRECTORIES, since the exports are incomplete
+# yet (depending libraries are not exported).
+  
 set(MITK_EXPORTS_FILE "${MITK_BINARY_DIR}/MitkExports.cmake")
 file(REMOVE ${MITK_EXPORTS_FILE})
 
+set(targets_to_export)
+get_property(module_targets GLOBAL PROPERTY MITK_MODULE_TARGETS)
+if(module_targets)
+  list(APPEND targets_to_export ${module_targets})
+endif()
+
 if(MITK_USE_BLUEBERRY)
-  # This is for installation support of external projects depending on
-  # MITK plugins. The export file should not be used for linking to MITK
-  # libraries without using LINK_DIRECTORIES, since the exports are incomplete
-  # yet(depending libraries are not exported).
   if(MITK_PLUGIN_LIBRARIES)
-    export(TARGETS ${MITK_PLUGIN_LIBRARIES}
-           APPEND
-           FILE ${MITK_EXPORTS_FILE})
+    list(APPEND targets_to_export ${MITK_PLUGIN_LIBRARIES})
   endif()
 endif()
+
+export(TARGETS ${targets_to_export} APPEND
+       FILE ${MITK_EXPORTS_FILE})
+
+set(MITK_EXPORTED_TARGET_PROPERTIES )
+foreach(target_to_export ${targets_to_export})
+  get_target_property(autoload_targets ${target_to_export} MITK_AUTOLOAD_TARGETS)
+  if(autoload_targets)
+    set(MITK_EXPORTED_TARGET_PROPERTIES "${MITK_EXPORTED_TARGET_PROPERTIES}
+set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_TARGETS \"${autoload_targets}\")")
+  endif()
+  get_target_property(autoload_dir ${target_to_export} MITK_AUTOLOAD_DIRECTORY)
+  if(autoload_dir)
+    set(MITK_EXPORTED_TARGET_PROPERTIES "${MITK_EXPORTED_TARGET_PROPERTIES}
+set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_DIRECTORY \"${autoload_dir}\")")
+  endif()
+endforeach()
 
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in
                ${MITK_BINARY_DIR}/ToolExtensionITKFactory.cpp.in COPYONLY)

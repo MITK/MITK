@@ -8,6 +8,7 @@
 
 #cmakedefine US_BUILD_SHARED_LIBS
 #cmakedefine CppMicroServices_EXPORTS
+#cmakedefine US_ENABLE_AUTOLOADING_SUPPORT
 #cmakedefine US_ENABLE_THREADING_SUPPORT
 #cmakedefine US_ENABLE_SERVICE_FACTORY_SUPPORT
 #cmakedefine US_USE_CXX11
@@ -105,6 +106,10 @@
   #define US_PLATFORM_APPLE
 #endif
 
+#if defined(__linux__)
+  #define US_PLATFORM_LINUX
+#endif
+
 #if defined(_WIN32) || defined(_WIN64)
   #define US_PLATFORM_WINDOWS
 #else
@@ -151,7 +156,7 @@ US_END_NAMESPACE
 
   #define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
   
-  #ifdef US_PLATFORM_WINDOWS
+  #if defined(US_PLATFORM_WINDOWS) && (_MSC_VER < 1700)
     #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::hash<type>
   #else
     #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::hash<type>

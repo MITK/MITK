@@ -94,23 +94,29 @@ macro(_fixup_target)
     endif()
 
     if(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\") 
-      file(GLOB_RECURSE GLOBBED_BLUEBERRY_PLUGINS
-        # glob for all blueberry bundles of this application
-        \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/liborg*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+      # When installing multiple applications, this will find *all* already installed
+      # and pulled in libraries (except on MacOS). We don't care...
+      file(GLOB_RECURSE GLOBBED_PLUGINS
+        \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/lib*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
     endif()
-
+    
     file(GLOB_RECURSE GLOBBED_QT_PLUGINS
       # glob for Qt plugins
       \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
     
-    # use custom version of BundleUtilities
-    message(\"globbed plugins: \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS}\")
-    set(PLUGIN_DIRS)
-    set(PLUGINS ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS})
+    set(PLUGINS )
+    foreach(_plugin ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_PLUGINS})
+      get_filename_component(_plugin_realpath \${_plugin} REALPATH)
+      list(APPEND PLUGINS \${_plugin_realpath})
+    endforeach()
+    
     if(PLUGINS)
       list(REMOVE_DUPLICATES PLUGINS)
     endif(PLUGINS)
-    foreach(_plugin \${GLOBBED_BLUEBERRY_PLUGINS})
+    message(\"globbed plugins: \${PLUGINS}\")
+
+    set(PLUGIN_DIRS)
+    foreach(_plugin \${PLUGINS})
       get_filename_component(_pluginpath \${_plugin} PATH)
       list(APPEND PLUGIN_DIRS \${_pluginpath})
     endforeach(_plugin)

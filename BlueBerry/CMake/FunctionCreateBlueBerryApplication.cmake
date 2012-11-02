@@ -171,6 +171,14 @@ if(NOT _APP_NO_INSTALL)
 
   # This installs all third-party CTK plug-ins
   FunctionInstallThirdPartyCTKPlugins(${_APP_PLUGINS} EXCLUDE ${_APP_EXCLUDE_PLUGINS})
+  
+  if(COMMAND BlueBerryApplicationInstallHook)
+    set(_real_app_plugins ${_APP_PLUGINS})
+    if(_APP_EXCLUDE_PLUGINS)
+      list(REMOVE_ITEM _real_app_plugins ${_APP_EXCLUDE_PLUGINS})
+    endif()
+    BlueBerryApplicationInstallHook(APP_NAME ${_APP_NAME} PLUGINS ${_real_app_plugins})
+  endif()
 
   # Install the executable
   MITK_INSTALL_TARGETS(EXECUTABLES ${_APP_NAME} GLOB_PLUGINS )

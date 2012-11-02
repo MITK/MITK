@@ -237,6 +237,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
   //the image was modified within the pipeline, but not marked so
   image->Modified();
+  image->GetVtkImageData()->Modified();
 
   /*============= BEGIN undo feature block ========================*/
   //specify the undo operation with the edited slice

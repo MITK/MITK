@@ -85,14 +85,14 @@ void FibersFromPointsFilter::GenerateData()
         vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkPoints> m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-        vector< mitk::PlanarCircle::Pointer > bundle = m_Fiducials.at(i);
+        vector< mitk::PlanarEllipse::Pointer > bundle = m_Fiducials.at(i);
 
         GeneratePoints();
         for (int j=0; j<m_Density; j++)
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
 
-            mitk::PlanarCircle::Pointer figure = bundle.at(0);
+            mitk::PlanarEllipse::Pointer figure = bundle.at(0);
             mitk::Point2D p1 = figure->GetControlPoint(0);
             mitk::Point2D p2 = figure->GetControlPoint(1);
             mitk::Vector2D dir = p2-p1; dir.Normalize();
@@ -125,7 +125,7 @@ void FibersFromPointsFilter::GenerateData()
                 vnl_matrix_fixed<float, 2, 2> rot;
                 rot[0][0] = dir[0]*dir2[0] + dir[1]*dir2[1]; rot[1][1] = rot[0][0];
                 rot[1][0] = sin(acos(rot[0][0]));
-                rot[0][1] = -sin(rot[1][0]);
+                rot[0][1] = -rot[1][0];
 
                 vnl_vector_fixed< float, 2 > newP;
                 newP[0] = m_2DPoints.at(j)[0];

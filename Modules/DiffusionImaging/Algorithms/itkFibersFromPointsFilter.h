@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define itkFibersFromPointsFilter_h
 
 // MITK
-#include <mitkPlanarCircle.h>
+#include <mitkPlanarEllipse.h>
 #include <mitkFiberBundleX.h>
 
 // ITK
@@ -41,7 +41,7 @@ public:
     typedef ProcessObject Superclass;
     typedef SmartPointer< Self > Pointer;
     typedef SmartPointer< const Self > ConstPointer;
-    typedef vector< vector< mitk::PlanarCircle::Pointer > > FiducialListType;
+    typedef vector< vector< mitk::PlanarEllipse::Pointer > > FiducialListType;
     typedef mitk::FiberBundleX::Pointer FiberType;
     typedef vector< mitk::FiberBundleX::Pointer > FiberContainerType;
 

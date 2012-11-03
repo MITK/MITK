@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkVectorContainer.h>
 #include <itkOrientationDistributionFunction.h>
 #include <mitkFiberBundleX.h>
-#include <mitkPlanarCircle.h>
+#include <mitkPlanarEllipse.h>
 
 /*!
 \brief QmitkFiberBasedSoftwarePhantomView

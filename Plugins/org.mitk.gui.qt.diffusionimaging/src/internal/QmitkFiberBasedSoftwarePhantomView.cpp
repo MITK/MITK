@@ -191,7 +191,7 @@ void QmitkFiberBasedSoftwarePhantomView::OnDrawCircle()
         return;
     mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundle);
 
-    mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+    mitk::PlanarEllipse::Pointer figure = mitk::PlanarEllipse::New();
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( figure );
@@ -213,17 +213,17 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
     if (m_SelectedBundle.IsNull())
         return;
 
-    vector< vector< mitk::PlanarCircle::Pointer > > fiducials;
+    vector< vector< mitk::PlanarEllipse::Pointer > > fiducials;
     for (int i=0; i<m_SelectedBundles.size(); i++)
     {
         mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundles.at(i));
-        vector< mitk::PlanarCircle::Pointer > fib;
+        vector< mitk::PlanarEllipse::Pointer > fib;
         for( mitk::DataStorage::SetOfObjects::const_iterator it = children->begin(); it != children->end(); ++it )
         {
             mitk::DataNode::Pointer node = *it;
 
-            if ( node.IsNotNull() && dynamic_cast<mitk::PlanarCircle*>(node->GetData()) )
-                fib.push_back(dynamic_cast<mitk::PlanarCircle*>(node->GetData()));
+            if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
+                fib.push_back(dynamic_cast<mitk::PlanarEllipse*>(node->GetData()));
         }
         if (fib.size()>1)
             fiducials.push_back(fib);
@@ -264,8 +264,49 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
 
 void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
 {
+    itk::ImageRegion<3> imageRegion;
+    imageRegion.SetSize(0, m_Controls->m_SizeX->value());
+    imageRegion.SetSize(1, m_Controls->m_SizeY->value());
+    imageRegion.SetSize(2, m_Controls->m_SizeZ->value());
+    mitk::Vector3D spacing;
+    spacing[0] = m_Controls->m_SpacingX->value();
+    spacing[1] = m_Controls->m_SpacingY->value();
+    spacing[2] = m_Controls->m_SpacingZ->value();
+
+    mitk::Point3D                       origin; origin.Fill(0.0);
+    itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
+
     if (m_SelectedBundle.IsNull())
+    {
+        ItkUcharImgType::Pointer dummyImage = ItkUcharImgType::New();
+        dummyImage->SetSpacing( spacing );
+        dummyImage->SetOrigin( origin );
+        dummyImage->SetDirection( directionMatrix );
+        dummyImage->SetLargestPossibleRegion( imageRegion );
+        dummyImage->SetBufferedRegion( imageRegion );
+        dummyImage->SetRequestedRegion( imageRegion );
+        dummyImage->Allocate();
+        dummyImage->FillBuffer(1);
+
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk( dummyImage.GetPointer() );
+        image->SetVolume( dummyImage->GetBufferPointer() );
+
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData( image );
+        node->SetName("Dummy");
+        GetDataStorage()->Add(node);
+
+        mitk::BaseData::Pointer basedata = node->GetData();
+        if (basedata.IsNotNull())
+        {
+            mitk::RenderingManager::GetInstance()->InitializeViews(
+                        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
+
         return;
+    }
 
     mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundle->GetData());
     if (fiberBundle->GetNumFibers()<=0)
@@ -277,14 +318,6 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
     typedef itk::TractsToDWIImageFilter FilterType;
     FilterType::GradientListType gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
     double bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
-    itk::ImageRegion<3> imageRegion;
-    imageRegion.SetSize(0, m_Controls->m_SizeX->value());
-    imageRegion.SetSize(1, m_Controls->m_SizeY->value());
-    imageRegion.SetSize(2, m_Controls->m_SizeZ->value());
-    mitk::Vector3D spacing;
-    spacing[0] = m_Controls->m_SpacingX->value();
-    spacing[1] = m_Controls->m_SpacingY->value();
-    spacing[2] = m_Controls->m_SpacingZ->value();
 
     FilterType::Pointer filter = FilterType::New();
 
@@ -333,13 +366,11 @@ void QmitkFiberBasedSoftwarePhantomView::UpdateGui()
     {
         m_Controls->m_GenerateFibersButton->setEnabled(true);
         m_Controls->m_CircleButton->setEnabled(true);
-        m_Controls->m_GenerateImageButton->setEnabled(true);
     }
     else
     {
         m_Controls->m_GenerateFibersButton->setEnabled(false);
         m_Controls->m_CircleButton->setEnabled(false);
-        m_Controls->m_GenerateImageButton->setEnabled(false);
     }
 }
 

@@ -17,18 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlanarEllipse.h"
 #include "mitkGeometry2D.h"
-#include <itkEllipseSpatialObject.h>
 #include "mitkProperties.h"
 
 
 mitk::PlanarEllipse::PlanarEllipse()
-    : FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
-      FEATURE_ID_DIAMETER( this->AddFeature( "Diameter", "mm" ) ),
-      FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) ),
-      m_MinRadius(0),
+    : m_MinRadius(0),
       m_MaxRadius(100),
       m_MinMaxRadiusContraintsActive(false),
-      m_TreatAsCircle(true)
+      m_TreatAsCircle(true),
+      m_ShowFirstControlVector(true)
 {
     // Ellipse has three control points
     this->ResetNumberOfControlPoints( 3 );
@@ -166,8 +163,6 @@ mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int ind
 
 void mitk::PlanarEllipse::GeneratePolyLine()
 {
-    // TODO: start circle at specified boundary point...
-
     // clear the PolyLine-Contrainer, it will be reconstructed soon enough...
     this->ClearPolyLines();
 
@@ -178,21 +173,29 @@ void mitk::PlanarEllipse::GeneratePolyLine()
     Vector2D dir = centerPoint-boundaryPoint1; dir.Normalize();
     vnl_matrix_fixed<float, 2, 2> rot;
 
+    // differentiate between clockwise and counterclockwise rotation
+    int start = -32;
+    int end = 32;
     if (dir[1]<0)
+    {
         dir[0] = -dir[0];
-
+        start = 0;
+        end = 64;
+    }
+    // construct rotation matrix to align ellipse with control point vector
     rot[0][0] = dir[0];
     rot[1][1] = rot[0][0];
     rot[1][0] = sin(acos(rot[0][0]));
     rot[0][1] = -rot[1][0];
 
-    MITK_INFO << acos(rot[0][0])*180.0/vnl_math::pi;
-
     double radius1 = centerPoint.EuclideanDistanceTo( boundaryPoint1 );
     double radius2 = centerPoint.EuclideanDistanceTo( boundaryPoint2 );
 
+    if (m_ShowFirstControlVector) // draw line from center to first control point
+        AppendPointToPolyLine( 0, PolyLineElement( centerPoint, 0 ) );
+
     // Generate poly-line with 64 segments
-    for ( int t = 0; t < 64; ++t )
+    for ( int t = start; t <= end; ++t )
     {
         double alpha = (double) t * vnl_math::pi / 32.0;
 
@@ -219,16 +222,7 @@ void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, un
 
 void mitk::PlanarEllipse::EvaluateFeaturesInternal()
 {
-    // Calculate circle radius and area
-    const Point3D &p0 = this->GetWorldControlPoint( 0 );
-    const Point3D &p1 = this->GetWorldControlPoint( 1 );
 
-    double radius = p0.EuclideanDistanceTo( p1 );
-    double area = vnl_math::pi * radius * radius;
-
-    this->SetQuantity( FEATURE_ID_RADIUS, radius );
-    this->SetQuantity( FEATURE_ID_DIAMETER, 2*radius );
-    this->SetQuantity( FEATURE_ID_AREA, area );
 }
 
 

@@ -44,7 +44,6 @@ public:
    *
    * Must be implemented in sub-classes.
    */
-  //virtual void Initialize();
   virtual void PlaceFigure( const Point2D &point );
 
   bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = true );
@@ -94,6 +93,8 @@ public:
   {
       m_MinMaxRadiusContraintsActive = active;
   }
+
+  void SetShowFirstControlVector(bool show){ m_ShowFirstControlVector = show; }
   
 protected:
   PlanarEllipse();
@@ -113,17 +114,12 @@ protected:
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
-
-  // Feature identifiers
-  const unsigned int FEATURE_ID_RADIUS;
-  const unsigned int FEATURE_ID_DIAMETER;
-  const unsigned int FEATURE_ID_AREA;
-
   //Member variables:
   double m_MinRadius;
   double m_MaxRadius;
   bool m_MinMaxRadiusContraintsActive;
   bool m_TreatAsCircle;
+  bool m_ShowFirstControlVector;
 
 private:
 

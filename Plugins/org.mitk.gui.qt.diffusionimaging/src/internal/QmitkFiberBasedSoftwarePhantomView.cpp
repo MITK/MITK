@@ -180,7 +180,7 @@ void QmitkFiberBasedSoftwarePhantomView::OnAddBundle()
     mitk::FiberBundleX::Pointer bundle = mitk::FiberBundleX::New();
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( bundle );
-    QString name = QString("Bundle%1").arg(children->size());
+    QString name = QString("Bundle_%1").arg(children->size());
     node->SetName(name.toStdString());
     GetDataStorage()->Add(node, m_SelectedImage);
 }
@@ -196,8 +196,14 @@ void QmitkFiberBasedSoftwarePhantomView::OnDrawCircle()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( figure );
 
-    QString name = QString("Fiducial%1").arg(children->size());
+
+    QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+    for( int i=0; i<nodes.size(); i++)
+        nodes.at(i)->SetSelected(false);
+
+    QString name = QString("Fiducial_%1").arg(children->size());
     node->SetName(name.toStdString());
+    node->SetSelected(true);
     GetDataStorage()->Add(node, m_SelectedBundle);
 
     this->DisableCrosshairNavigation();

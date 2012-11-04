@@ -68,7 +68,7 @@ protected:
     FiberContainerType  m_FiberBundles;
     int                 m_Density;
 
-    vector< mitk::Point2D > m_2DPoints;
+    vector< mitk::Vector2D > m_2DPoints;
 };
 }
 

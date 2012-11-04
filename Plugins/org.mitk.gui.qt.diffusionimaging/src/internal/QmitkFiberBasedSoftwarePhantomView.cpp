@@ -182,6 +182,9 @@ void QmitkFiberBasedSoftwarePhantomView::OnAddBundle()
     node->SetData( bundle );
     QString name = QString("Bundle_%1").arg(children->size());
     node->SetName(name.toStdString());
+    m_SelectedBundle = node;
+    UpdateGui();
+
     GetDataStorage()->Add(node, m_SelectedImage);
 }
 
@@ -250,7 +253,7 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
     for (int i=0; i<fiberBundles.size(); i++)
     {
         m_SelectedBundles.at(i)->SetData( fiberBundles.at(i) );
-        m_SelectedBundles.at(i)->SetVisibility(false);
+//        m_SelectedBundles.at(i)->SetVisibility(false);
 
         newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>(fiberBundles.at(i).GetPointer()));
     }
@@ -261,10 +264,10 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
         return;
     }
 
-    mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
-    fbNode->SetData(newBundle);
-    fbNode->SetName("Synthetic_Bundle");
-    GetDataStorage()->Add(fbNode);
+//    mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
+//    fbNode->SetData(newBundle);
+//    fbNode->SetName("Synthetic_Bundle");
+//    GetDataStorage()->Add(fbNode);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -302,6 +305,7 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
         node->SetData( image );
         node->SetName("Dummy");
         GetDataStorage()->Add(node);
+        m_SelectedImage = node;
 
         mitk::BaseData::Pointer basedata = node->GetData();
         if (basedata.IsNotNull())
@@ -310,6 +314,7 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
                         basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
+        UpdateGui();
 
         return;
     }

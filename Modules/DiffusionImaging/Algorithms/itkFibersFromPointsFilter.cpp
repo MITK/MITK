@@ -61,7 +61,7 @@ void FibersFromPointsFilter::GeneratePoints()
 
     while (count < m_Density)
     {
-        mitk::Point2D p;
+        mitk::Vector2D p;
         p[0] = (float)(rand()%2001)/1000 - 1;
         p[1] = (float)(rand()%2001)/1000 - 1;
         if (sqrt(p[0]*p[0]+p[1]*p[1]) <= 1)
@@ -93,18 +93,52 @@ void FibersFromPointsFilter::GenerateData()
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
 
             mitk::PlanarEllipse::Pointer figure = bundle.at(0);
-            mitk::Point2D p1 = figure->GetControlPoint(0);
-            mitk::Point2D p2 = figure->GetControlPoint(1);
-            mitk::Vector2D dir = p2-p1; dir.Normalize();
-            float r = p1.EuclideanDistanceTo(p2);
-            p1[0] += m_2DPoints.at(j)[0]*r;
-            p1[1] += m_2DPoints.at(j)[1]*r;
+            mitk::Point2D p0 = figure->GetControlPoint(0);
+            mitk::Point2D p1 = figure->GetControlPoint(1);
+            mitk::Point2D p2 = figure->GetControlPoint(2);
+            mitk::Point2D p3 = figure->GetControlPoint(3);
+            float r1 = p0.EuclideanDistanceTo(p1);
+            float r2 = p0.EuclideanDistanceTo(p2);
+            mitk::Vector2D eDir = p1-p0; eDir.Normalize();
+            mitk::Vector2D tDir = p3-p0; tDir.Normalize();
+            MITK_INFO << tDir;
+
+            // apply twist
+            vnl_matrix_fixed<float, 2, 2> tRot;
+            tRot[0][0] = tDir[0];
+            tRot[1][1] = tRot[0][0];
+            tRot[1][0] = sin(acos(tRot[0][0]));
+            tRot[0][1] = -tRot[1][0];
+            if (tDir[1]<0)
+                tRot.inplace_transpose();
+            m_2DPoints[j].SetVnlVector(tRot*m_2DPoints[j].GetVnlVector());
+            MITK_INFO << tRot;
+
+            // apply new ellipse shape
+            vnl_vector_fixed< float, 2 > newP;
+            newP[0] = m_2DPoints.at(j)[0];
+            newP[1] = m_2DPoints.at(j)[1];
+            float alpha = acos(eDir[0]);
+            if (eDir[1]>0)
+                alpha = 2*M_PI-alpha;
+            vnl_matrix_fixed<float, 2, 2> eRot;
+            eRot[0][0] = cos(alpha);
+            eRot[1][1] = eRot[0][0];
+            eRot[1][0] = sin(alpha);
+            eRot[0][1] = -eRot[1][0];
+            newP = eRot*newP;
+            newP[0] *= r1;
+            newP[1] *= r2;
+            newP = eRot.transpose()*newP;
+
+            p0[0] += newP[0];
+            p0[1] += newP[1];
 
             const mitk::Geometry2D* pfgeometry = figure->GetGeometry2D();
             const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(pfgeometry);
 
             mitk::Point3D w, wc;
-            planeGeo->Map(p1, w);
+            planeGeo->Map(p0, w);
 
             wc = figure->GetWorldControlPoint(0);
 
@@ -116,21 +150,43 @@ void FibersFromPointsFilter::GenerateData()
             for (int k=1; k<bundle.size(); k++)
             {
                 figure = bundle.at(k);
-                p1 = figure->GetControlPoint(0);
-                p2 = figure->GetControlPoint(1);
-                r = p1.EuclideanDistanceTo(p2);
+                p0 = figure->GetControlPoint(0);
+                p1 = figure->GetControlPoint(1);
+                p2 = figure->GetControlPoint(2);
+                p3 = figure->GetControlPoint(3);
+                r1 = p0.EuclideanDistanceTo(p1);
+                r2 = p0.EuclideanDistanceTo(p2);
 
-                // rotate vector
-                mitk::Vector2D dir2 = p2-p1; dir2.Normalize();
-                vnl_matrix_fixed<float, 2, 2> rot;
-                rot[0][0] = dir[0]*dir2[0] + dir[1]*dir2[1]; rot[1][1] = rot[0][0];
-                rot[1][0] = sin(acos(rot[0][0]));
-                rot[0][1] = -rot[1][0];
+                mitk::Vector2D eDir2 = p1-p0; eDir2.Normalize();
+                mitk::Vector2D tDir2 = p3-p0; tDir2.Normalize();
+                mitk::Vector2D temp; temp.SetVnlVector(tRot.transpose() * tDir2.GetVnlVector());
+                MITK_INFO << tDir2 << " - " << temp;
 
-                vnl_vector_fixed< float, 2 > newP;
+                // apply twist
+                tRot[0][0] = tDir[0]*tDir2[0] + tDir[1]*tDir2[1];
+                tRot[1][1] = tRot[0][0];
+                tRot[1][0] = sin(acos(tRot[0][0]));
+                tRot[0][1] = -tRot[1][0];
+                if (temp[1]<0)
+                    tRot.inplace_transpose();
+                m_2DPoints[j].SetVnlVector(tRot*m_2DPoints[j].GetVnlVector());
+                tDir = tDir2;
+                MITK_INFO << tRot;
+
+                // apply new ellipse shape
                 newP[0] = m_2DPoints.at(j)[0];
                 newP[1] = m_2DPoints.at(j)[1];
-                newP = rot*newP;
+                alpha = acos(eDir2[0]);
+                if (eDir2[1]>0)
+                    alpha = 2*M_PI-alpha;
+                eRot[0][0] = cos(alpha);
+                eRot[1][1] = eRot[0][0];
+                eRot[1][0] = sin(alpha);
+                eRot[0][1] = -eRot[1][0];
+                newP = eRot*newP;
+                newP[0] *= r1;
+                newP[1] *= r2;
+                newP = eRot.transpose()*newP;
 
                 mitk::Geometry2D* pfgeometry = const_cast<mitk::Geometry2D*>(figure->GetGeometry2D());
                 mitk::PlaneGeometry* planeGeo = dynamic_cast<mitk::PlaneGeometry*>(pfgeometry);
@@ -143,11 +199,11 @@ void FibersFromPointsFilter::GenerateData()
                     newP[0] *= -1;
                 n = n2;
 
-                p1[0] += newP[0]*r;
-                p1[1] += newP[1]*r;
+                p0[0] += newP[0];
+                p0[1] += newP[1];
 
                 mitk::Point3D w;
-                planeGeo->Map(p1, w);
+                planeGeo->Map(p0, w);
 
 
                 vtkIdType id = m_VtkPoints->InsertNextPoint(w.GetDataPointer());

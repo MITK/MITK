@@ -51,14 +51,14 @@ public:
   /** \brief Ellipse has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {
-    return 3;
+    return 4;
   }
 
 
   /** \brief Ellipse has 3 control points per definition. */
   unsigned int GetMaximumNumberOfControlPoints() const
   {
-    return 3;
+    return 4;
   }
 
   /** \brief Sets the minimum radius
@@ -93,8 +93,6 @@ public:
   {
       m_MinMaxRadiusContraintsActive = active;
   }
-
-  void SetShowFirstControlVector(bool show){ m_ShowFirstControlVector = show; }
   
 protected:
   PlanarEllipse();
@@ -119,7 +117,6 @@ protected:
   double m_MaxRadius;
   bool m_MinMaxRadiusContraintsActive;
   bool m_TreatAsCircle;
-  bool m_ShowFirstControlVector;
 
 private:
 

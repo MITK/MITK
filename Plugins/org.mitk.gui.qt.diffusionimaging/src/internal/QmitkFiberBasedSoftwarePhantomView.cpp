@@ -92,7 +92,42 @@ void QmitkFiberBasedSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
         connect((QObject*) m_Controls->m_FiberButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnAddBundle()));
         connect((QObject*) m_Controls->m_CircleButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnDrawCircle()));
+        connect((QObject*) m_Controls->m_FiberDensityBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberDensityChanged(int)));
+        connect((QObject*) m_Controls->m_FiberSamplingBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberSamplingChanged(int)));
+        connect((QObject*) m_Controls->m_TensionBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnTensionChanged(double)));
+        connect((QObject*) m_Controls->m_ContinuityBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnContinuityChanged(double)));
+        connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
     }
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnFiberDensityChanged(int value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnFiberSamplingChanged(int value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnTensionChanged(double value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnContinuityChanged(double value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnBiasChanged(double value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
 }
 
 QmitkFiberBasedSoftwarePhantomView::GradientListType QmitkFiberBasedSoftwarePhantomView::GenerateHalfShell(int NPoints)
@@ -180,8 +215,12 @@ void QmitkFiberBasedSoftwarePhantomView::OnAddBundle()
     mitk::FiberBundleX::Pointer bundle = mitk::FiberBundleX::New();
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( bundle );
-    QString name = QString("Bundle%1").arg(children->size());
+    QString name = QString("Bundle_%1").arg(children->size());
     node->SetName(name.toStdString());
+    m_SelectedBundle = node;
+    m_SelectedBundles.push_back(node);
+    UpdateGui();
+
     GetDataStorage()->Add(node, m_SelectedImage);
 }
 
@@ -191,13 +230,19 @@ void QmitkFiberBasedSoftwarePhantomView::OnDrawCircle()
         return;
     mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundle);
 
-    mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+    mitk::PlanarEllipse::Pointer figure = mitk::PlanarEllipse::New();
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( figure );
 
-    QString name = QString("Fiducial%1").arg(children->size());
+
+    QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+    for( int i=0; i<nodes.size(); i++)
+        nodes.at(i)->SetSelected(false);
+
+    QString name = QString("Fiducial_%1").arg(children->size());
     node->SetName(name.toStdString());
+    node->SetSelected(true);
     GetDataStorage()->Add(node, m_SelectedBundle);
 
     this->DisableCrosshairNavigation();
@@ -210,26 +255,26 @@ void QmitkFiberBasedSoftwarePhantomView::OnDrawCircle()
 
 void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
 {
-    if (m_SelectedBundle.IsNull())
+    if (m_SelectedBundles.empty())
         return;
 
-    vector< vector< mitk::PlanarCircle::Pointer > > fiducials;
+    vector< vector< mitk::PlanarEllipse::Pointer > > fiducials;
     for (int i=0; i<m_SelectedBundles.size(); i++)
     {
         mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundles.at(i));
-        vector< mitk::PlanarCircle::Pointer > fib;
+        vector< mitk::PlanarEllipse::Pointer > fib;
         for( mitk::DataStorage::SetOfObjects::const_iterator it = children->begin(); it != children->end(); ++it )
         {
             mitk::DataNode::Pointer node = *it;
 
-            if ( node.IsNotNull() && dynamic_cast<mitk::PlanarCircle*>(node->GetData()) )
-                fib.push_back(dynamic_cast<mitk::PlanarCircle*>(node->GetData()));
+            if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
+                fib.push_back(dynamic_cast<mitk::PlanarEllipse*>(node->GetData()));
         }
         if (fib.size()>1)
             fiducials.push_back(fib);
         if (fib.size()<3)
         {
-            QMessageBox::information(0, "Fiber generation not possible:", "At least 3 fiducials per bundle needed!");
+//            QMessageBox::information(0, "Fiber generation not possible:", "At least 3 fiducials per bundle needed!");
             return;
         }
     }
@@ -237,6 +282,10 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
     itk::FibersFromPointsFilter::Pointer filter = itk::FibersFromPointsFilter::New();
     filter->SetFiducials(fiducials);
     filter->SetDensity(m_Controls->m_FiberDensityBox->value());
+    filter->SetTension(m_Controls->m_TensionBox->value());
+    filter->SetContinuity(m_Controls->m_ContinuityBox->value());
+    filter->SetBias(m_Controls->m_BiasBox->value());
+    filter->SetFiberSampling(m_Controls->m_FiberSamplingBox->value());
     filter->Update();
     vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
 
@@ -244,28 +293,71 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
     for (int i=0; i<fiberBundles.size(); i++)
     {
         m_SelectedBundles.at(i)->SetData( fiberBundles.at(i) );
-        m_SelectedBundles.at(i)->SetVisibility(false);
+//        m_SelectedBundles.at(i)->SetVisibility(false);
 
         newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>(fiberBundles.at(i).GetPointer()));
     }
 
     if (newBundle->GetNumFibers()<=0)
     {
-        QMessageBox::warning(0, "Error:", "Generated fiber bundle contains no fibers!");
+//        QMessageBox::warning(0, "Error:", "Generated fiber bundle contains no fibers!");
         return;
     }
 
-    mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
-    fbNode->SetData(newBundle);
-    fbNode->SetName("Synthetic_Bundle");
-    GetDataStorage()->Add(fbNode);
+//    mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
+//    fbNode->SetData(newBundle);
+//    fbNode->SetName("Synthetic_Bundle");
+//    GetDataStorage()->Add(fbNode);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
 {
+    itk::ImageRegion<3> imageRegion;
+    imageRegion.SetSize(0, m_Controls->m_SizeX->value());
+    imageRegion.SetSize(1, m_Controls->m_SizeY->value());
+    imageRegion.SetSize(2, m_Controls->m_SizeZ->value());
+    mitk::Vector3D spacing;
+    spacing[0] = m_Controls->m_SpacingX->value();
+    spacing[1] = m_Controls->m_SpacingY->value();
+    spacing[2] = m_Controls->m_SpacingZ->value();
+
+    mitk::Point3D                       origin; origin.Fill(0.0);
+    itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
+
     if (m_SelectedBundle.IsNull())
+    {
+        ItkUcharImgType::Pointer dummyImage = ItkUcharImgType::New();
+        dummyImage->SetSpacing( spacing );
+        dummyImage->SetOrigin( origin );
+        dummyImage->SetDirection( directionMatrix );
+        dummyImage->SetLargestPossibleRegion( imageRegion );
+        dummyImage->SetBufferedRegion( imageRegion );
+        dummyImage->SetRequestedRegion( imageRegion );
+        dummyImage->Allocate();
+        dummyImage->FillBuffer(1);
+
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk( dummyImage.GetPointer() );
+        image->SetVolume( dummyImage->GetBufferPointer() );
+
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData( image );
+        node->SetName("Dummy");
+        GetDataStorage()->Add(node);
+        m_SelectedImage = node;
+
+        mitk::BaseData::Pointer basedata = node->GetData();
+        if (basedata.IsNotNull())
+        {
+            mitk::RenderingManager::GetInstance()->InitializeViews(
+                        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
+        UpdateGui();
+
         return;
+    }
 
     mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundle->GetData());
     if (fiberBundle->GetNumFibers()<=0)
@@ -277,14 +369,6 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
     typedef itk::TractsToDWIImageFilter FilterType;
     FilterType::GradientListType gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
     double bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
-    itk::ImageRegion<3> imageRegion;
-    imageRegion.SetSize(0, m_Controls->m_SizeX->value());
-    imageRegion.SetSize(1, m_Controls->m_SizeY->value());
-    imageRegion.SetSize(2, m_Controls->m_SizeZ->value());
-    mitk::Vector3D spacing;
-    spacing[0] = m_Controls->m_SpacingX->value();
-    spacing[1] = m_Controls->m_SpacingY->value();
-    spacing[2] = m_Controls->m_SpacingZ->value();
 
     FilterType::Pointer filter = FilterType::New();
 
@@ -333,13 +417,11 @@ void QmitkFiberBasedSoftwarePhantomView::UpdateGui()
     {
         m_Controls->m_GenerateFibersButton->setEnabled(true);
         m_Controls->m_CircleButton->setEnabled(true);
-        m_Controls->m_GenerateImageButton->setEnabled(true);
     }
     else
     {
         m_Controls->m_GenerateFibersButton->setEnabled(false);
         m_Controls->m_CircleButton->setEnabled(false);
-        m_Controls->m_GenerateImageButton->setEnabled(false);
     }
 }
 
@@ -366,14 +448,33 @@ void QmitkFiberBasedSoftwarePhantomView::OnSelectionChanged( berry::IWorkbenchPa
                 m_TissueMask = dynamic_cast<mitk::Image*>(node->GetData());
                 m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
             }
+            break;
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {
             m_SelectedBundle = node;
             m_SelectedBundles.push_back(node);
         }
+        else if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
+        {
+            m_SelectedBundles.clear();
+            mitk::DataStorage::SetOfObjects::ConstPointer parents = GetDataStorage()->GetSources(node);
+            for( mitk::DataStorage::SetOfObjects::const_iterator it = parents->begin(); it != parents->end(); ++it )
+            {
+                mitk::DataNode::Pointer pNode = *it;
+                if ( pNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(pNode->GetData()) )
+                {
+                    m_SelectedBundle = pNode;
+                    m_SelectedBundles.push_back(pNode);
+                }
+            }
+            break;
+        }
     }
     UpdateGui();
+
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
 }
 
 
@@ -389,6 +490,9 @@ void QmitkFiberBasedSoftwarePhantomView::EnableCrosshairNavigation()
         linkedRenderWindow->EnableLinkedNavigation(true);
 //        linkedRenderWindow->EnableSlicingPlanes(true);
     }
+
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
 }
 
 void QmitkFiberBasedSoftwarePhantomView::DisableCrosshairNavigation()

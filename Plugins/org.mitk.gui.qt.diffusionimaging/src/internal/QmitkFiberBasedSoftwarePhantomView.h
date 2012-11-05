@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkVectorContainer.h>
 #include <itkOrientationDistributionFunction.h>
 #include <mitkFiberBundleX.h>
-#include <mitkPlanarCircle.h>
+#include <mitkPlanarEllipse.h>
 
 /*!
 \brief QmitkFiberBasedSoftwarePhantomView
@@ -71,6 +71,11 @@ protected slots:
     void OnAddBundle();
     void GenerateFibers();
     void GenerateImage();
+    void OnFiberDensityChanged(int value);
+    void OnFiberSamplingChanged(int value);
+    void OnTensionChanged(double value);
+    void OnContinuityChanged(double value);
+    void OnBiasChanged(double value);
 
 protected:
 

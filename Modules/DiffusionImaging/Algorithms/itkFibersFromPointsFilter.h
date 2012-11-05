@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define itkFibersFromPointsFilter_h
 
 // MITK
-#include <mitkPlanarCircle.h>
+#include <mitkPlanarEllipse.h>
 #include <mitkFiberBundleX.h>
 
 // ITK
@@ -41,7 +41,7 @@ public:
     typedef ProcessObject Superclass;
     typedef SmartPointer< Self > Pointer;
     typedef SmartPointer< const Self > ConstPointer;
-    typedef vector< vector< mitk::PlanarCircle::Pointer > > FiducialListType;
+    typedef vector< vector< mitk::PlanarEllipse::Pointer > > FiducialListType;
     typedef mitk::FiberBundleX::Pointer FiberType;
     typedef vector< mitk::FiberBundleX::Pointer > FiberContainerType;
 
@@ -57,6 +57,10 @@ public:
     void SetFiducials(FiducialListType fiducials){ m_Fiducials = fiducials; }
     FiberContainerType GetFiberBundles(){ return m_FiberBundles; }
     itkSetMacro(Density, int)
+    itkSetMacro(FiberSampling, int)
+    itkSetMacro(Tension, double)
+    itkSetMacro(Continuity, double)
+    itkSetMacro(Bias, double)
 
 protected:
 
@@ -67,8 +71,12 @@ protected:
     FiducialListType    m_Fiducials;
     FiberContainerType  m_FiberBundles;
     int                 m_Density;
+    int                 m_FiberSampling;
+    double              m_Tension;
+    double              m_Continuity;
+    double              m_Bias;
 
-    vector< mitk::Point2D > m_2DPoints;
+    vector< mitk::Vector2D > m_2DPoints;
 };
 }
 

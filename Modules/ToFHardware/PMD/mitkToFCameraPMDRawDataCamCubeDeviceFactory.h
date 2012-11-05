@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDRawDataCamCubeDeviceFactory_h
 #define __mitkToFCameraPMDRawDataCamCubeDeviceFactory_h
 
-#include "mitkPMDCamCubeModuleExports.h"
+#include "mitkPMDModuleExports.h"
 #include "mitkToFCameraPMDRawDataCamCubeDevice.h"
 #include "mitkAbstractToFDeviceFactory.h"
 
@@ -29,7 +29,7 @@ namespace mitk
   * This offers users the oppertunity to generate new Raw Player Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-class MITK_PMDCAMCUBEMODULE_EXPORT ToFCameraPMDRawDataCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITK_PMDMODULE_EXPORT ToFCameraPMDRawDataCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
 

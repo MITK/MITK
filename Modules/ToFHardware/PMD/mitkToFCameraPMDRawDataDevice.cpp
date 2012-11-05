@@ -15,8 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkToFCameraPMDRawDataDevice.h"
 #include "mitkRealTimeClock.h"
-#include "mitkToFCameraPMDCamBoardController.h"   //If you just use an other includ-to be exact the PMDCamCube one- thinga at least compile
-//#include "mitkToFCameraPMDCamCubeController.h"
+
+#ifdef MITK_USE_TOF_PMDCAMBOARD
+#include "mitkToFCameraPMDCamBoardController.h"
+#endif
+
+#ifdef MITK_USE_TOF_PMDCAMCUBE
+#include "mitkToFCameraPMDCamCubeController.h"
+#endif
+
+#ifdef MITK_USE_TOF_PMDO3
+#include "mitkToFCameraPMDO3Controller.h"
+#endif
+
 #include "itkMultiThreader.h"
 #include <itksys/SystemTools.hxx>
 

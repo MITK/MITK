@@ -21,6 +21,9 @@ IF(MITK_USE_PMD)
   SET(MITK_PMD_SDK_DIR ${MITK_PMD_SDK_DIR}/..)
   FIND_PATH(MITK_PMD_INCLUDE_DIR pmdsdk2.h ${MITK_PMD_SDK_DIR}/include DOC  "Include directory of PMD-SDK.")
 
+    Set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_PMD_SDK_DIR}/include)
+    Set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_PMD_LIB})
+
   #-----Creating the PMD-Module-----
   MITK_CREATE_MODULE(mitkPMDModule
     SUBPROJECTS MITK-ToF
@@ -39,7 +42,7 @@ ENDIF(MITK_USE_PMD)
 
 #---------------------------------------------------------------------------------------------------------
 IF(MITK_USE_TOF_PMDCAMCUBE)
-Message("PMDCamCube is activated")
+
   SET(MITK_TOF_PMD_CAMCUBE_SOURCE ${MITK_PMD_SDK_DIR}/plugins/camcube3.${_PLATFORM_STRING}.pap)
   SET(MITK_TOF_PMD_CAMCUBE_PROC ${MITK_PMD_SDK_DIR}/plugins/camcubeproc.${_PLATFORM_STRING}.ppp)
   SET(MITK_TOF_PMD_FILE_SOURCE ${MITK_PMD_SDK_DIR}/plugins/pmdfile.${_PLATFORM_STRING}.pcp)
@@ -57,12 +60,13 @@ Message("PMDCamCube is activated")
    MITK_INSTALL(FILES ${MITK_PMD_SDK_DIR}/plugins/pmdfile.W32.pcp  CONFIGURATIONS Release)
   ENDIF(WIN32)
 
+Message("PMDCamCube activated")
 ENDIF(MITK_USE_TOF_PMDCAMCUBE)
 
 
 #-------------------------------Begin CamBoard hardware-------------------------------------------
- IF(MITK_USE_TOF_PMDCAMBOARD)
-Message("PMDCamBoard is activated")
+IF(MITK_USE_TOF_PMDCAMBOARD)
+
    SET(MITK_TOF_PMD_CAMBOARD_SOURCE ${MITK_PMD_SDK_DIR}/plugins/camboard.${_PLATFORM_STRING}.pap)
    SET(MITK_TOF_PMD_CAMBOARD_PROC ${MITK_PMD_SDK_DIR}/plugins/camboardproc.${_PLATFORM_STRING}.ppp)
    SET(MITK_TOF_AVAILABLE_CAMERAS ${MITK_TOF_AVAILABLE_CAMERAS},PMD CamBoard,PMD CamBoardRaw)
@@ -78,7 +82,8 @@ Message("PMDCamBoard is activated")
 #   INSTALL(FILES ${MITK_PMD_SDK_DIR}/plugins/pmdfile.W32.pcp DESTINATION bin CONFIGURATIONS Release)
    ENDIF(WIN32)
 
- ENDIF(MITK_USE_TOF_PMDCAMBOARD)
+Message("PMDCamBoard activated")
+ENDIF(MITK_USE_TOF_PMDCAMBOARD)
 
 
 #----------------------------------------Begin PMD O3 hardware--------------------------------------------

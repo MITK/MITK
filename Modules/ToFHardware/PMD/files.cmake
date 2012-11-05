@@ -1,4 +1,4 @@
-
+IF(MITK_USE_PMD)
 SET(CPP_FILES
    mitkToFCameraPMDDevice.cpp
 
@@ -13,12 +13,14 @@ SET(CPP_FILES
  #and the PMDRawDataDevice depends on
    mitkThreadedToFRawDataReconstruction.cpp
 
+    mitkPMDModuleActivator.cpp
+
 
   ##The ToFCameraPMDMITKPlayerDevice is depricated
      #mitkToFCameraPMDMITKPlayerController.cpp
      #mitkToFCameraPMDMITKPlayerDevice.cpp
 )
-
+ENDIF(MITK_USE_PMD)
 
 ##---------------------------------------------------Use of CamCube--------------------------------------------
 IF(MITK_USE_TOF_PMDCAMCUBE)
@@ -28,7 +30,7 @@ SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDCamCubeController.cpp
   mitkToFCameraPMDCamCubeDevice.cpp
   mitkToFCameraPMDCamCubeDeviceFactory.cpp
-  mitkPMDCamCubeModuleActivator.cpp
+  #mitkPMDCamCubeModuleActivator.cpp
 
   mitkToFCameraPMDRawDataCamCubeDevice.cpp
   mitkToFCameraPMDRawDataCamCubeDeviceFactory.cpp
@@ -50,7 +52,6 @@ SET(CPP_FILES ${CPP_FILES}
   #mitkToFCameraPMDPlayerControllerStub.cpp
 )
 ENDIF(MITK_USE_TOF_PMDCAMCUBE)
-##---------------------------------------------------------------------------------------------------------
 
 
 
@@ -62,7 +63,6 @@ SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDCamBoardController.cpp
   mitkToFCameraPMDCamBoardDevice.cpp
   mitkToFCameraPMDCamBoardDeviceFactory.cpp
-  mitkPMDCamBoardModuleActivator.cpp
 
    mitkToFCameraPMDRawDataCamBoardDevice.cpp
    mitkToFCameraPMDRawDataCamBoardDeviceFactory.cpp
@@ -85,7 +85,6 @@ ENDIF(MITK_USE_TOF_PMDCAMBOARD)
    mitkToFCameraPMDO3Device.cpp
    mitkToFCameraPMDO3DeviceFactory.cpp
    mitkToFCameraPMDO3Controller.cpp
-   mitkPMDO3ModuleActivator.cpp
 
 
  )

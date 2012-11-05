@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDPlayerController_h
 #define __mitkToFCameraPMDPlayerController_h
 
-#include "mitkPMDCamCubeModuleExports.h"
+#include "mitkPMDModuleExports.h"
 #include "mitkToFCameraPMDController.h"
 
 #include "itkObject.h"
@@ -30,7 +30,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_PMDCAMCUBEMODULE_EXPORT ToFCameraPMDPlayerController : public ToFCameraPMDController
+  class MITK_PMDMODULE_EXPORT ToFCameraPMDPlayerController : public ToFCameraPMDController
   {
   public:
 

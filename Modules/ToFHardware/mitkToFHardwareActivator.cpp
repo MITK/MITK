@@ -55,16 +55,9 @@ public:
           //LoadLibrary(TEXT("MesaSR4000Module.dll"));
 
 
-     //If CamBoard is activated through CMake, please load the .dll by uncommenting the next line!
-          LoadLibrary(TEXT("mitkPMDCamBoardModule.dll"));
+     //If the PMD-Module is activated through CMake, please load the .dll by uncommenting the next line!
+          LoadLibrary(TEXT("mitkPMDModule.dll"));
 
-
-     //If CamCube is activated through CMake, please load the .dll by uncommenting the next line!
-          LoadLibrary(TEXT("mitkPMDCamCubeModule.dll"));
-
-
-     //If PMDO3D is activated through CMake, please load the .dll by uncommenting the next line!
-          LoadLibrary(TEXT("mitkPMDO3Module.dll"));
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

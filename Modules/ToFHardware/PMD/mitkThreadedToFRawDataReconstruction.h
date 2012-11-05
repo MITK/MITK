@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk includes
 #include "mitkImageSource.h"
-#include "mitkPMDCamCubeModuleExports.h"
+#include "mitkPMDModuleExports.h"
 
 // itk includes
 #include <itkBarrier.h>
@@ -42,7 +42,7 @@ namespace mitk
     itk::FastMutexLock::Pointer m_ThreadDataMutex; ///< mutex to control access to images
   };
 
-  class MITK_PMDCAMCUBEMODULE_EXPORT ThreadedToFRawDataReconstruction : public itk::ProcessObject
+  class MITK_PMDMODULE_EXPORT ThreadedToFRawDataReconstruction : public itk::ProcessObject
   {
    public:
 

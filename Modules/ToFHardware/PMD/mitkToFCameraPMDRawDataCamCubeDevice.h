@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDRawDataCamCubeDevice_h
 #define __mitkToFCameraPMDRawDataCamCubeDevice_h
 
-#include "mitkPMDCamCubeModuleExports.h"
+#include "mitkPMDModuleExports.h"
 #include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
 #include "mitkToFCameraPMDRawDataDevice.h"
@@ -29,7 +29,7 @@ namespace mitk
   *
   * @ingroup ToFHardwareMBI
   */
-  class MITK_PMDCAMCUBEMODULE_EXPORT ToFCameraPMDRawDataCamCubeDevice : public ToFCameraPMDRawDataDevice
+  class MITK_PMDMODULE_EXPORT ToFCameraPMDRawDataCamCubeDevice : public ToFCameraPMDRawDataDevice
   {
   public:
 

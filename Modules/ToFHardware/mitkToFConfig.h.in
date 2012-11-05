@@ -1,6 +1,6 @@
 /*
   mitToFConfig.h
-  this file is generated. Do not change!
+  the file mitToFConfig.h is generated. Do not change!
 */
 
 #define MITK_TOF_PMDCAMBOARD_SOURCE_PLUGIN "@MITK_TOF_PMD_CAMBOARD_SOURCE@"
@@ -13,4 +13,7 @@
 #define MITK_TOF_PLATFORM "@_PLATFORM_STRING@"
 #define MITK_TOF_DATA_DIR "@MITK_DATA_DIR@/ToF-Data"
 #define MITK_TOF_CAMERAS "@MITK_TOF_AVAILABLE_CAMERAS@"
+#cmakedefine MITK_USE_TOF_PMDCAMCUBE
+#cmakedefine MITK_USE_TOF_PMDCAMBOARD
+#cmakedefine MITK_USE_TOF_PMDO3
 #cmakedefine MITK_USE_TOF_KINECT

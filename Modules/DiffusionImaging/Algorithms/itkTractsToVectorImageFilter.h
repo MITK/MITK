@@ -65,7 +65,7 @@ public:
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)
     itkGetMacro( CrossingsImage, ItkUcharImgType::Pointer)
 
-    itkSetMacro( MaskImage, typename ItkUcharImgType::Pointer)
+    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
     itkSetMacro( FiberBundle, FiberBundleX::Pointer)
     itkGetMacro( OutputFiberBundle, FiberBundleX::Pointer)
     itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer)
@@ -77,7 +77,7 @@ protected:
 
     std::vector< DirectionType > Clustering(std::vector< DirectionType >& inDirs);
     std::vector< DirectionType > FastClustering(std::vector< DirectionType >& inDirs);
-    DirectionContainerType::Pointer MeanShiftClustering(typename DirectionContainerType::Pointer dirCont);
+    DirectionContainerType::Pointer MeanShiftClustering(DirectionContainerType::Pointer dirCont);
     vnl_vector_fixed<double, 3> ClusterStep(DirectionContainerType::Pointer dirCont, vnl_vector_fixed<double, 3> currentMean);
 
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
@@ -97,7 +97,7 @@ protected:
     ItkUcharImgType::Pointer            m_MaskImage;
     bool                                m_NormalizeVectors;
     mitk::Vector3D                      m_OutImageSpacing;
-    typename ContainerType::Pointer     m_DirectionsContainer;
+    ContainerType::Pointer              m_DirectionsContainer;
     bool                                m_UseWorkingCopy;
     bool                                m_UseTrilinearInterpolation;
     int                                 m_MaxNumDirections;
@@ -105,7 +105,7 @@ protected:
     int                                 m_FiberSampling;
 
     // output datastructures
-    typename ContainerType::Pointer         m_ClusteredDirectionsContainer; // contains direction vectors for each voxel
+    ContainerType::Pointer                  m_ClusteredDirectionsContainer; // contains direction vectors for each voxel
     ItkUcharImgType::Pointer                m_NumDirectionsImage; // shows number of fibers per voxel
     ItkUcharImgType::Pointer                m_CrossingsImage; // shows voxels containing more than one fiber
     DirectionImageContainerType::Pointer    m_DirectionImageContainer;

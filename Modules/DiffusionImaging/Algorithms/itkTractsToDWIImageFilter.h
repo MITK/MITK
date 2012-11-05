@@ -87,7 +87,7 @@ protected:
     itk::Matrix<double, 3, 3>           m_DirectionMatrix;
     ImageRegion<3>                      m_ImageRegion;
     float                               m_BValue;
-    typename OutputImageType::Pointer   m_DiffusionImage;
+    OutputImageType::Pointer            m_DiffusionImage;
 
     float                               m_KernelFA;
     double                              m_NoiseVariance;

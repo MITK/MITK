@@ -117,7 +117,7 @@ void TractsToVectorImageFilter::GenerateData()
         m_MaskImage->Allocate();
         m_MaskImage->FillBuffer(1);
     }
-    typename OutputImageType::RegionType::SizeType outImageSize = imageRegion.GetSize();
+    OutputImageType::RegionType::SizeType outImageSize = imageRegion.GetSize();
     m_OutImageSpacing = m_MaskImage->GetSpacing();
     m_ClusteredDirectionsContainer = ContainerType::New();
 

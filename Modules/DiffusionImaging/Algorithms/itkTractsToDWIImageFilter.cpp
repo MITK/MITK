@@ -52,7 +52,7 @@ double TractsToDWIImageFilter::GetTensorL2Norm(itk::DiffusionTensor3D<float>& T)
 
 TractsToDWIImageFilter::DoubleDwiType::PixelType TractsToDWIImageFilter::SimulateMeasurement(ItkTensorType& T, double baseline)
 {
-    typename DoubleDwiType::PixelType pix;
+    DoubleDwiType::PixelType pix;
     pix.SetSize(m_GradientList.size());
     pix.Fill(0);
 
@@ -127,7 +127,7 @@ void TractsToDWIImageFilter::GenerateData()
     m_DiffusionImage->SetRequestedRegion( m_ImageRegion );
     m_DiffusionImage->SetVectorLength( m_GradientList.size() );
     m_DiffusionImage->Allocate();
-    typename OutputImageType::PixelType pix;
+    OutputImageType::PixelType pix;
     pix.SetSize(m_GradientList.size());
     pix.Fill(0.0);
     m_DiffusionImage->FillBuffer(pix);

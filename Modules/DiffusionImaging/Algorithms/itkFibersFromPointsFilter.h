@@ -57,6 +57,10 @@ public:
     void SetFiducials(FiducialListType fiducials){ m_Fiducials = fiducials; }
     FiberContainerType GetFiberBundles(){ return m_FiberBundles; }
     itkSetMacro(Density, int)
+    itkSetMacro(FiberSampling, int)
+    itkSetMacro(Tension, double)
+    itkSetMacro(Continuity, double)
+    itkSetMacro(Bias, double)
 
 protected:
 
@@ -67,6 +71,10 @@ protected:
     FiducialListType    m_Fiducials;
     FiberContainerType  m_FiberBundles;
     int                 m_Density;
+    int                 m_FiberSampling;
+    double              m_Tension;
+    double              m_Continuity;
+    double              m_Bias;
 
     vector< mitk::Vector2D > m_2DPoints;
 };

@@ -44,6 +44,10 @@ namespace itk{
 
 FibersFromPointsFilter::FibersFromPointsFilter()
     : m_Density(1000)
+    , m_FiberSampling(5)
+    , m_Tension(0)
+    , m_Continuity(0)
+    , m_Bias(0)
 {
 
 }
@@ -56,6 +60,7 @@ FibersFromPointsFilter::~FibersFromPointsFilter()
 
 void FibersFromPointsFilter::GeneratePoints()
 {
+    srand(0);
     m_2DPoints.clear();
     int count = 0;
 
@@ -101,7 +106,6 @@ void FibersFromPointsFilter::GenerateData()
             float r2 = p0.EuclideanDistanceTo(p2);
             mitk::Vector2D eDir = p1-p0; eDir.Normalize();
             mitk::Vector2D tDir = p3-p0; tDir.Normalize();
-            MITK_INFO << tDir;
 
             // apply twist
             vnl_matrix_fixed<float, 2, 2> tRot;
@@ -112,7 +116,6 @@ void FibersFromPointsFilter::GenerateData()
             if (tDir[1]<0)
                 tRot.inplace_transpose();
             m_2DPoints[j].SetVnlVector(tRot*m_2DPoints[j].GetVnlVector());
-            MITK_INFO << tRot;
 
             // apply new ellipse shape
             vnl_vector_fixed< float, 2 > newP;
@@ -157,10 +160,9 @@ void FibersFromPointsFilter::GenerateData()
                 r1 = p0.EuclideanDistanceTo(p1);
                 r2 = p0.EuclideanDistanceTo(p2);
 
-                mitk::Vector2D eDir2 = p1-p0; eDir2.Normalize();
+                eDir = p1-p0; eDir.Normalize();
                 mitk::Vector2D tDir2 = p3-p0; tDir2.Normalize();
                 mitk::Vector2D temp; temp.SetVnlVector(tRot.transpose() * tDir2.GetVnlVector());
-                MITK_INFO << tDir2 << " - " << temp;
 
                 // apply twist
                 tRot[0][0] = tDir[0]*tDir2[0] + tDir[1]*tDir2[1];
@@ -171,13 +173,12 @@ void FibersFromPointsFilter::GenerateData()
                     tRot.inplace_transpose();
                 m_2DPoints[j].SetVnlVector(tRot*m_2DPoints[j].GetVnlVector());
                 tDir = tDir2;
-                MITK_INFO << tRot;
 
                 // apply new ellipse shape
                 newP[0] = m_2DPoints.at(j)[0];
                 newP[1] = m_2DPoints.at(j)[1];
-                alpha = acos(eDir2[0]);
-                if (eDir2[1]>0)
+                alpha = acos(eDir[0]);
+                if (eDir[1]>0)
                     alpha = 2*M_PI-alpha;
                 eRot[0][0] = cos(alpha);
                 eRot[1][1] = eRot[0][0];
@@ -217,7 +218,7 @@ void FibersFromPointsFilter::GenerateData()
         fiberPolyData->SetPoints(m_VtkPoints);
         fiberPolyData->SetLines(m_VtkCellArray);
         mitk::FiberBundleX::Pointer mitkFiberBundle = mitk::FiberBundleX::New(fiberPolyData);
-        mitkFiberBundle->DoFiberSmoothing(5);
+        mitkFiberBundle->DoFiberSmoothing(m_FiberSampling, m_Tension, m_Continuity, m_Bias);
         m_FiberBundles.push_back(mitkFiberBundle);
     }
 }

@@ -92,7 +92,42 @@ void QmitkFiberBasedSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
         connect((QObject*) m_Controls->m_FiberButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnAddBundle()));
         connect((QObject*) m_Controls->m_CircleButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnDrawCircle()));
+        connect((QObject*) m_Controls->m_FiberDensityBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberDensityChanged(int)));
+        connect((QObject*) m_Controls->m_FiberSamplingBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberSamplingChanged(int)));
+        connect((QObject*) m_Controls->m_TensionBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnTensionChanged(double)));
+        connect((QObject*) m_Controls->m_ContinuityBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnContinuityChanged(double)));
+        connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
     }
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnFiberDensityChanged(int value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnFiberSamplingChanged(int value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnTensionChanged(double value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnContinuityChanged(double value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnBiasChanged(double value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
 }
 
 QmitkFiberBasedSoftwarePhantomView::GradientListType QmitkFiberBasedSoftwarePhantomView::GenerateHalfShell(int NPoints)
@@ -183,6 +218,7 @@ void QmitkFiberBasedSoftwarePhantomView::OnAddBundle()
     QString name = QString("Bundle_%1").arg(children->size());
     node->SetName(name.toStdString());
     m_SelectedBundle = node;
+    m_SelectedBundles.push_back(node);
     UpdateGui();
 
     GetDataStorage()->Add(node, m_SelectedImage);
@@ -219,7 +255,7 @@ void QmitkFiberBasedSoftwarePhantomView::OnDrawCircle()
 
 void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
 {
-    if (m_SelectedBundle.IsNull())
+    if (m_SelectedBundles.empty())
         return;
 
     vector< vector< mitk::PlanarEllipse::Pointer > > fiducials;
@@ -238,7 +274,7 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
             fiducials.push_back(fib);
         if (fib.size()<3)
         {
-            QMessageBox::information(0, "Fiber generation not possible:", "At least 3 fiducials per bundle needed!");
+//            QMessageBox::information(0, "Fiber generation not possible:", "At least 3 fiducials per bundle needed!");
             return;
         }
     }
@@ -246,6 +282,10 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
     itk::FibersFromPointsFilter::Pointer filter = itk::FibersFromPointsFilter::New();
     filter->SetFiducials(fiducials);
     filter->SetDensity(m_Controls->m_FiberDensityBox->value());
+    filter->SetTension(m_Controls->m_TensionBox->value());
+    filter->SetContinuity(m_Controls->m_ContinuityBox->value());
+    filter->SetBias(m_Controls->m_BiasBox->value());
+    filter->SetFiberSampling(m_Controls->m_FiberSamplingBox->value());
     filter->Update();
     vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
 
@@ -260,7 +300,7 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
 
     if (newBundle->GetNumFibers()<=0)
     {
-        QMessageBox::warning(0, "Error:", "Generated fiber bundle contains no fibers!");
+//        QMessageBox::warning(0, "Error:", "Generated fiber bundle contains no fibers!");
         return;
     }
 
@@ -408,14 +448,33 @@ void QmitkFiberBasedSoftwarePhantomView::OnSelectionChanged( berry::IWorkbenchPa
                 m_TissueMask = dynamic_cast<mitk::Image*>(node->GetData());
                 m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
             }
+            break;
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {
             m_SelectedBundle = node;
             m_SelectedBundles.push_back(node);
         }
+        else if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
+        {
+            m_SelectedBundles.clear();
+            mitk::DataStorage::SetOfObjects::ConstPointer parents = GetDataStorage()->GetSources(node);
+            for( mitk::DataStorage::SetOfObjects::const_iterator it = parents->begin(); it != parents->end(); ++it )
+            {
+                mitk::DataNode::Pointer pNode = *it;
+                if ( pNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(pNode->GetData()) )
+                {
+                    m_SelectedBundle = pNode;
+                    m_SelectedBundles.push_back(pNode);
+                }
+            }
+            break;
+        }
     }
     UpdateGui();
+
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
 }
 
 
@@ -431,6 +490,9 @@ void QmitkFiberBasedSoftwarePhantomView::EnableCrosshairNavigation()
         linkedRenderWindow->EnableLinkedNavigation(true);
 //        linkedRenderWindow->EnableSlicingPlanes(true);
     }
+
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
 }
 
 void QmitkFiberBasedSoftwarePhantomView::DisableCrosshairNavigation()

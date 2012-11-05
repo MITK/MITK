@@ -71,6 +71,11 @@ protected slots:
     void OnAddBundle();
     void GenerateFibers();
     void GenerateImage();
+    void OnFiberDensityChanged(int value);
+    void OnFiberSamplingChanged(int value);
+    void OnTensionChanged(double value);
+    void OnContinuityChanged(double value);
+    void OnBiasChanged(double value);
 
 protected:
 

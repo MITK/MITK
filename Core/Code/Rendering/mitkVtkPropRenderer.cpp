@@ -328,12 +328,23 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   glPushMatrix();
   glLoadIdentity();  
 
+  // iViewport is (x,y,width,height)
+  // glOrtho expects (left,right,bottom,top,znear,zfar)
+
   // Set up the orthographic projection  
   glOrtho( 
       iViewport[0], iViewport[0]+iViewport[2],
       iViewport[1], iViewport[1]+iViewport[3],
       -1.0, 1.0
       );
+
+  // scale OpenGL contents to (VTK) viewport
+  float windowWidth = GetDisplayGeometry()->GetSizeInDisplayUnits()[0];
+  float windowHeight = GetDisplayGeometry()->GetSizeInDisplayUnits()[1];
+
+  glTranslatef(iViewport[0], iViewport[1], 0.0);
+  glScalef(iViewport[2]/windowWidth, iViewport[3]/windowHeight, 1.0);
+
   glMatrixMode( GL_MODELVIEW );  
   glPushMatrix();  
   glLoadIdentity();

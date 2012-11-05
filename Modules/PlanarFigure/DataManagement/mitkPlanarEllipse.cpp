@@ -56,7 +56,7 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
         PlanarFigure::SetControlPoint( 0, point, createIfDoesNotExist );
         PlanarFigure::SetControlPoint( 1, boundaryPoint1, createIfDoesNotExist );
         PlanarFigure::SetControlPoint( 2, boundaryPoint2, createIfDoesNotExist );
-        PlanarFigure::SetControlPoint( 3, boundaryPoint2, createIfDoesNotExist );
+        PlanarFigure::SetControlPoint( 3, boundaryPoint3, createIfDoesNotExist );
         return true;
     }
     else if (index < 3)

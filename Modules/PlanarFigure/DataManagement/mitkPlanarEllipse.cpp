@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,6 +57,7 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
         PlanarFigure::SetControlPoint( 1, boundaryPoint1, createIfDoesNotExist );
         PlanarFigure::SetControlPoint( 2, boundaryPoint2, createIfDoesNotExist );
         PlanarFigure::SetControlPoint( 3, boundaryPoint2, createIfDoesNotExist );
+        return true;
     }
     else if (index < 3)
     {
@@ -122,6 +123,7 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
 
             m_TreatAsCircle = false;
         }
+        return true;
     }
     else if (index == 3)
     {
@@ -132,7 +134,9 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
         Point2D newPoint = centerPoint + vec3*std::max(r1, r2);
         PlanarFigure::SetControlPoint( index, newPoint, createIfDoesNotExist );
         m_TreatAsCircle = false;
+        return true;
     }
+    return false;
 }
 
 void mitk::PlanarEllipse::PlaceFigure( const mitk::Point2D &point )

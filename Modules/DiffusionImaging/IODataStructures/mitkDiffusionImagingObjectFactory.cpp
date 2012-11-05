@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -59,9 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNrrdTbssRoiImageWriterFactory.h"
 #include "mitkNrrdTbssRoiImageWriter.h"
 
-
-#include "mitkPlanarCircleMapper3D.h"
-#include "mitkPlanarPolygonMapper3D.h"
+#include "mitkPlanarFigureMapper3D.h"
 
 #include "mitkConnectomicsNetwork.h"
 #include "mitkConnectomicsNetworkIOFactory.h"
@@ -95,7 +93,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdTbssImageIOFactory::RegisterOneFactory();
     mitk::NrrdTbssRoiImageIOFactory::RegisterOneFactory();
     mitk::FiberBundleXIOFactory::RegisterOneFactory(); //modernized
-	mitk::ConnectomicsNetworkIOFactory::RegisterOneFactory();
+    mitk::ConnectomicsNetworkIOFactory::RegisterOneFactory();
 
 
     mitk::NrrdDiffusionImageWriterFactory::RegisterOneFactory();
@@ -104,7 +102,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     mitk::NrrdTbssImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTbssRoiImageWriterFactory::RegisterOneFactory();
     mitk::FiberBundleXWriterFactory::RegisterOneFactory();//modernized
-	mitk::ConnectomicsNetworkWriterFactory::RegisterOneFactory();
+    mitk::ConnectomicsNetworkWriterFactory::RegisterOneFactory();
 
 
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
@@ -113,7 +111,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     m_FileWriters.push_back( NrrdTbssImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssRoiImageWriter::New().GetPointer() );
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
-	m_FileWriters.push_back( mitk::ConnectomicsNetworkWriter::New().GetPointer() );
+    m_FileWriters.push_back( mitk::ConnectomicsNetworkWriter::New().GetPointer() );
 
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
@@ -223,26 +221,40 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper->SetDataNode(node);
     }
 
+    classname =  "PlanarRectangle";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::PlanarFigureMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+
     classname =  "PlanarCircle";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::PlanarCircleMapper3D::New();
+      newMapper = mitk::PlanarFigureMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+
+    classname =  "PlanarEllipse";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::PlanarFigureMapper3D::New();
       newMapper->SetDataNode(node);
     }
 
     classname = "PlanarPolygon";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::PlanarPolygonMapper3D::New();
+      newMapper = mitk::PlanarFigureMapper3D::New();
       newMapper->SetDataNode(node);
     }
-	
-	classname = "ConnectomicsNetwork";
-    if (node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0) 
-	{
+
+    classname = "ConnectomicsNetwork";
+    if (node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
       newMapper = mitk::ConnectomicsNetworkMapper3D::New();
       newMapper->SetDataNode(node);
-	}
+    }
 
   }
 
@@ -299,18 +311,30 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 
+  classname = "PlanarRectangle";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::PlanarFigureMapper3D::SetDefaultProperties(node);
+  }
+
+  classname = "PlanarEllipse";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::PlanarFigureMapper3D::SetDefaultProperties(node);
+  }
+
   classname = "PlanarCircle";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-    mitk::PlanarCircleMapper3D::SetDefaultProperties(node);
+    mitk::PlanarFigureMapper3D::SetDefaultProperties(node);
   }
 
   classname = "PlanarPolygon";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-    mitk::PlanarPolygonMapper3D::SetDefaultProperties(node);
+    mitk::PlanarFigureMapper3D::SetDefaultProperties(node);
   }
-  
+
   classname = "ConnectomicsNetwork";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {

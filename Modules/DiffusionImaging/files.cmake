@@ -88,8 +88,7 @@ set(CPP_FILES
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   Rendering/mitkTbssImageMapper.cpp
-  Rendering/mitkPlanarCircleMapper3D.cpp
-  Rendering/mitkPlanarPolygonMapper3D.cpp
+  Rendering/mitkPlanarFigureMapper3D.cpp
   Rendering/mitkConnectomicsNetworkMapper3D.cpp
 
 # Interactions
@@ -138,9 +137,8 @@ set(H_FILES
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
-  Rendering/mitkPlanarCircleMapper3D.h
-  Rendering/mitkPlanarPolygonMapper3D.h
   Rendering/mitkConnectomicsNetworkMapper3D.h
+  Rendering/mitkPlanarFigureMapper3D.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h

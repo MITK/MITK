@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef PlanarPolygonMapper3D_H
-#define PlanarPolygonMapper3D_H
+#ifndef PlanarFigureMapper3D_H
+#define PlanarFigureMapper3D_H
 
 #include <mitkBaseData.h>
 #include <mitkVtkMapper3D.h>
-#include <mitkPlanarPolygon.h>
+#include <mitkPlanarFigure.h>
 
 #include <vtkPoints.h>
 #include <vtkPolygon.h>
@@ -34,17 +34,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   //##Documentation
-  //## @brief Mapper for FiberBundles
+  //## @brief 3D mapper for planar figures
   //## @ingroup Mapper
   //  template<class TPixelType>
-  class PlanarPolygonMapper3D : public VtkMapper3D
+  class PlanarFigureMapper3D : public VtkMapper3D
   {
   public:
 
-    mitkClassMacro(PlanarPolygonMapper3D, VtkMapper3D);
-    itkNewMacro(Self);
+    mitkClassMacro(PlanarFigureMapper3D, VtkMapper3D)
+    itkNewMacro(Self)
 
-    const mitk::PlanarPolygon* GetInput();
+    const mitk::PlanarFigure* GetInput();
 
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like depricated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
@@ -56,8 +56,8 @@ namespace mitk {
 
   protected:
 
-    PlanarPolygonMapper3D();
-    virtual ~PlanarPolygonMapper3D();
+    PlanarFigureMapper3D();
+    virtual ~PlanarFigureMapper3D();
 
     void UpdateVtkObjects();
 

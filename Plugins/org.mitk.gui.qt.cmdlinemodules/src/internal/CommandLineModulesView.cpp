@@ -228,7 +228,7 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   if (loadHomeDirCliModules)        builder.addHomeDir("cli-modules");
   if (loadCurrentDir)               builder.addCurrentDir();
   if (loadCurrentDirCliModules)     builder.addCurrentDir("cli-modules");
-  if (loadAutoLoadDir)              builder.addCtkModuleLoadPathDir();
+  if (loadAutoLoadDir)              builder.addCtkModuleLoadPath();
 
   // and then we ask the builder to set up the paths.
   QStringList defaultPaths = builder.getDirectoryList();

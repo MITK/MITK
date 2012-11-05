@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class vtkRenderWindow;
 class vtkRenderer;
 
-class mitkRenderingTestHelper
+class MITK_CORE_EXPORT mitkRenderingTestHelper
 {
 
 public:
@@ -55,13 +55,21 @@ public:
     **/
     void SetProperty(const char *propertyKey, mitk::BaseProperty *property);
 
-    /** @brief Set the view direction of the renderwindow (e.g. sagittal, coronal, transversal)
+    /** @brief Set the view direction of the renderwindow (e.g. sagittal, coronal, axial)
     **/
     void SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection);
+
+    /** @brief Reorient the slice (e.g. rotation and translation like the swivel mode).
+    **/
+    void ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation);
 
     /** @brief Render everything into an mitkRenderWindow. Call SetViewDirection() and SetProperty() before this method.
     **/
     void Render();
+
+    /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
+    **/
+    mitk::DataStorage::Pointer GetDataStorage();
 protected:
 
     /** @brief This method tries to load the given file into a member datastorage, in order to render it.

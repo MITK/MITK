@@ -6,3 +6,8 @@ set(MODULE_TESTS
   mitkPlanarFigureObjectFactoryTest.cpp
   mitkPlanarArrowTest.cpp
 )
+
+set(MODULE_CUSTOM_TESTS
+  mitkViewportRenderingTest.cpp
+)
+

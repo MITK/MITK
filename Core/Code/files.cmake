@@ -46,20 +46,20 @@ set(H_FILES
   Algorithms/mitkPPTupleRem.h
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
   Algorithms/mitkExtractSliceFilter.h
-  
+
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
   DataManagement/mitkITKImageImport.h
   DataManagement/mitkITKImageImport.txx
   DataManagement/mitkImageToItk.h
   DataManagement/mitkImageToItk.txx
-  
+
   Interfaces/mitkIDataNodeReader.h
-  
+
   IO/mitkPixelTypeTraits.h
-  
+
   Interactions/mitkEventMapperAddOn.h
-  
+
   Common/mitkExceptionMacro.h
   Common/mitkTestingMacros.h
 )
@@ -292,6 +292,7 @@ set(CPP_FILES
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkApplyLevelWindowToRGBFilter.cpp
+  Rendering/mitkRenderingTestHelper.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h

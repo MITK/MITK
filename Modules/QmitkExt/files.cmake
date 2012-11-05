@@ -1,6 +1,7 @@
 set(CPP_FILES
 
  QmitkApplicationBase/QmitkCommonFunctionality.cpp
+ QmitkApplicationBase/QmitkIOUtil.cpp
 
  #QmitkModels/QmitkDataStorageListModel.cpp
  #QmitkModels/QmitkPropertiesTableModel.cpp

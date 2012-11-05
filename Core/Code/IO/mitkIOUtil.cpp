@@ -314,5 +314,4 @@ bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
     }
     return true;
 }
-
 }

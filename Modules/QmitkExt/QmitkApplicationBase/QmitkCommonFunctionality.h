@@ -62,6 +62,7 @@ namespace mitk
 /**
  * This class provides some data handling methods, like loading data or adding different 
  * types to the data tree...
+ * \deprecatedSince{2012_12} CommonFunctionality is deprecated. Please use mitkIOUtil.h or QmitkIOUtil.h instead.
  */
 namespace CommonFunctionality
 {

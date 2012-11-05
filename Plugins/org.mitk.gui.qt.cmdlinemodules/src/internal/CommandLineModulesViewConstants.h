@@ -60,15 +60,34 @@ struct CommandLineModulesViewConstants
 
   /**
    * \brief The name of the preferences node containing a boolean describing whether
+   * we are loading modules from the "application directory/cli-modules".
+   */
+  static const std::string LOAD_FROM_APPLICATION_DIR_CLI_MODULES;
+
+
+  /**
+   * \brief The name of the preferences node containing a boolean describing whether
    * we are loading modules from the users home directory.
    */
   static const std::string LOAD_FROM_HOME_DIR;
 
   /**
    * \brief The name of the preferences node containing a boolean describing whether
+   * we are loading modules from the users "home directory/cli-modules".
+   */
+  static const std::string LOAD_FROM_HOME_DIR_CLI_MODULES;
+
+  /**
+   * \brief The name of the preferences node containing a boolean describing whether
    * we are loading modules from the applications current working directory.
    */
   static const std::string LOAD_FROM_CURRENT_DIR;
+
+  /**
+   * \brief The name of the preferences node containing a boolean describing whether
+   * we are loading modules from the applications "current working directory/cli-modules".
+   */
+  static const std::string LOAD_FROM_CURRENT_DIR_CLI_MODULES;
 
   /**
    * \brief The name of the preferences node containing a boolean describing whether

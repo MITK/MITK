@@ -44,20 +44,24 @@ public:
         std::string string(MITK_TOF_CAMERAS);
         //       string.replace(";"," ");
         std::cout << "cameras " << string << std::endl;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
-//.dll do not get updated(deleted) automatically. One has to either to delete them manualy or just call them if a device is activated
+//.dll do not get updated/deleted automatically. One has either to delete them manualy or just call them if a device is activated
 
-     //If Kinect is activated through CMake, please load the .dll by uncommenting the next line!
+//If Kinect is activated through CMake, please load the .dll by uncommenting the next line!
+#ifdef MITK_USE_TOF_KINECT
           LoadLibrary(TEXT("mitkKinectModule.dll"));
+#endif
 
+//If MesaSR4000Module is activated through CMake, please load the MesaSR4000Module.dll by uncommenting the next line
+#ifdef MITK_USE_TOF_MESASR4000
+          LoadLibrary(TEXT("MesaSR4000Module.dll"));
+#endif
 
-    //If MesaSR4000Module is activated through CMake, please load the MesaSR4000Module.dll by uncommenting the next line
-          //LoadLibrary(TEXT("MesaSR4000Module.dll"));
-
-
-     //If the PMD-Module is activated through CMake, please load the .dll by uncommenting the next line!
+//If the PMD-Module is activated through CMake, please load the .dll by uncommenting the next line!
+#if defined ( MITK_USE_TOF_PMDCAMBOARD ) || defined ( MITK_USE_TOF_PMDO3 ) || defined ( MITK_USE_TOF_PMDCAMCUBE )
           LoadLibrary(TEXT("mitkPMDModule.dll"));
-
+#endif
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

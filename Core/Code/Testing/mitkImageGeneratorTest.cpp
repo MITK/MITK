@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
 {
-    MITK_TEST_BEGIN("ToFImageWriter");
+    MITK_TEST_BEGIN("ImageGeneratorTest");
 
     //create some images with arbitrary parameters (corner cases)
     mitk::Image::Pointer image2Da = mitk::ImageGenerator::GenerateRandomImage<float>(120, 205, 0, 0, 0.1, 0.2, 0.3, 577, 23);

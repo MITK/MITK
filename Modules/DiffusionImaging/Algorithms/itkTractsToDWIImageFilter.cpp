@@ -163,16 +163,6 @@ void TractsToDWIImageFilter::GenerateData()
     }
     else
         MITK_INFO << "Using tissue mask";
-    itk::TractsToVectorImageFilter::Pointer crossingsFilter = itk::TractsToVectorImageFilter::New();
-    crossingsFilter->SetFiberBundle(fiberBundle);
-    crossingsFilter->SetAngularThreshold(m_MinCrossingAngle);
-    crossingsFilter->SetUseFastClustering(true);
-    crossingsFilter->SetFiberSampling(0);
-    crossingsFilter->SetNormalizeVectors(false);
-    crossingsFilter->SetMaxNumDirections(m_MaxCrossingComplexity);
-    crossingsFilter->SetMaskImage(m_TissueMask);
-    crossingsFilter->Update();
-    ItkUcharImgType::Pointer numDirImage = crossingsFilter->GetNumDirectionsImage();
 
     // adjust SNR
     if (m_SNR <= 0)
@@ -267,10 +257,21 @@ void TractsToDWIImageFilter::GenerateData()
     IteratorOutputType it (doubleDwi, m_ImageRegion);
     it.GoToBegin();
 
-    itk::StatisticsImageFilter< ItkUcharImgType >::Pointer statsFilter = itk::StatisticsImageFilter< ItkUcharImgType >::New();
-    statsFilter->SetInput(numDirImage);
-    statsFilter->Update();
-    unsigned char max = statsFilter->GetMaximum();
+//    itk::TractsToVectorImageFilter::Pointer crossingsFilter = itk::TractsToVectorImageFilter::New();
+//    crossingsFilter->SetFiberBundle(fiberBundle);
+//    crossingsFilter->SetAngularThreshold(m_MinCrossingAngle);
+//    crossingsFilter->SetUseFastClustering(true);
+//    crossingsFilter->SetFiberSampling(0);
+//    crossingsFilter->SetNormalizeVectors(false);
+//    crossingsFilter->SetMaxNumDirections(m_MaxCrossingComplexity);
+//    crossingsFilter->SetMaskImage(m_TissueMask);
+//    crossingsFilter->Update();
+//    ItkUcharImgType::Pointer numDirImage = crossingsFilter->GetNumDirectionsImage();
+
+//    itk::StatisticsImageFilter< ItkUcharImgType >::Pointer statsFilter = itk::StatisticsImageFilter< ItkUcharImgType >::New();
+//    statsFilter->SetInput(numDirImage);
+//    statsFilter->Update();
+//    unsigned char max = statsFilter->GetMaximum();
 
     DoubleDwiType::PixelType signal;
     signal.SetSize(m_GradientList.size());

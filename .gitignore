@@ -1,4 +1,54 @@
-*~
 CMakeLists.txt.user*
+.clang_complete
+
+########## IDE specific
+
+## Office
+~$*
+
+## vim
+Session.vim
+*.swp
+*.swo
+
+## Emacs
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
+.\#*
+
+# Org-mode
+.org-id-locations
+*_archive
+
+########## OS specific
+
+## Windows files to ignore
+# Windows image file caches
 Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+## OSX specific
 .DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+## Linux
+*~

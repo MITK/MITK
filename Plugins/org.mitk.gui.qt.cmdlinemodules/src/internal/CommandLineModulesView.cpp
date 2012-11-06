@@ -211,7 +211,7 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   m_DirectoryWatcher->setDebug(m_DebugOutput);
 
   bool loadApplicationDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, false);
-  bool loadApplicationDirCliModules = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR_CLI_MODULES, false);
+  bool loadApplicationDirCliModules = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR_CLI_MODULES, true);
   bool loadHomeDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR, false);
   bool loadHomeDirCliModules = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR_CLI_MODULES, false);
   bool loadCurrentDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR, false);

@@ -19,7 +19,8 @@ part of <a href="http://www.ucl.ac.uk/">University College London</a> (UCL) and 
 This view provides the facility to run third party command line programs, and load the data back
 into the <a href="qthelp://org.mitk.gui.qt.datamanager/bundle/index.html">DataManager</a> for
 immediate visualisation. All that is required is that the command line application can be called 
-with an argument of --xml and respond with a valid XML description of the necessary parameters. 
+with an argument of --xml and respond with a valid XML description of the necessary parameters,
+and currently, that if the program requires images, they must be NifTI images. 
 This view can then generate a Graphical User Interface (GUI) dynamically from the XML to enable the 
 user to interact with the command line application. This provides an easy to use, and potentially 
 very flexible way to integrate almost any third party, medical imaging, command line application. 
@@ -30,11 +31,11 @@ As a high level introduction, this view performs the following steps:
 the interface, and populates a searchable list of available programs.
 \li When a program is selected, the GUI is generated.
 \li The user can then set the necessary parameters and run the program.
-\li Multiple programs can be launched simultaneously, and where available on the host platform, 
+\li Multiple programs can be launched in succession and run simultaneously, and where available on the host platform, 
 the user can pause, resume or cancel running jobs and see console output for each job.
 
 As a consequence of the very flexible nature of this plugin, these instructions can only describe how to launch
-command line modules in a general sense. The examples shown have been constructed by downloading the latest version
+command line modules in a general sense. The examples shown have been constructed by downloading the latest version (subversion commit 329)
 of the NiftyReg package, available <a href="http://sourceforge.net/projects/niftyreg/">here</a>, and described further
 <a href="http://www.cmpbjournal.com/article/S0169-2607(09)00253-3/abstract">here</a>. NiftyReg provides valid XML descriptors
 to enable the integration of the NiftyReg affine (RegAladin) and and non-rigid (RegF3D) image registration algorithms, as well
@@ -57,23 +58,28 @@ command line application must exactly conform to <a href="http://www.slicer.org/
 this definition</a>. For "none", there will be no validation. For "weak"  validation, the application will report errors, 
 but try to carry on and load as many modules as possible. The XML validation errors are available as tool-tips on
 the tab widget when the module is launched. Many third party modules included with Slicer currently have
-incorrect XML, and so the "weak" or "none" mode may assist in loading them. By default the "strict" mode is chosen 
-so that only valid modules are loaded.
+incorrect XML (typically, mis-ordered XML tags), and so the "weak" or "none" mode may assist in loading them. 
+By default the "strict" mode is chosen so that only valid modules are loaded.
 \li max concurrent processes: Sets the maximum number of concurrent jobs that can be run via this interface. The default is 4.
 When the maximum number is reached, the green "Run" button is disabled until a job finishes.
 
-The next four preferences are to control where the view will search for valid command line programs. By default these are off
+The next 7 preferences are to control where the view will search for valid command line programs. By default these are off
 as the searching process can take a long time and slow down the startup time of the GUI. The options provided are:
 
-\li scan home directory: Scan the users home directory. Most useful on unix systems where users can install their own software.
-\li scan current directory: This is the current working directory. Most useful on unix systems where users launch the application from the console.
+\li scan home directory: Scan the users home directory. (See QDir::homePath().)
+\li scan home directory/cli-modules: Scans the sub-directory called cli-modules under the users home directory.
+\li scan current directory: Scan the current working directory. (See QDir::homePath().)
+\li scan current directory/cli-modules: Scans the sub-directory called cli-modules under the current working directory.
 \li scan installation directory: This is the directory where the actual application is stored.
-\li scan CTK_MODULE_LOAD_PATH: If the environment variable CTK_MODULE_LOAD_PATH points to a valid directory, this will also be scanned.
+\li scan installation directory/cli-modules: Scans the sub-directory called cli-modules under the application installation directory.
+\li scan CTK_MODULE_LOAD_PATH: Scans the directory or list of directories defined by the environment variable CTK_MODULE_LOAD_PATH.
+A list is colon separated on Linux/Mac, and semi-colon separated on Windows.
 
-In addition, for the first 3 of these options, the sub-directory "cli-modules" will also be scanned if it exists.
-In most cases, the user will leave these options unchecked, as the user can also specify custom directories, and 
-even cherry-pick specific command line programs to load. Figure 2 shows a selection box that enables the user to
-specify custom directories to scan, and Figure 3. shows a selection box that enables the user to select specific modules.
+In most cases, it is suggested that the user will leave these options unchecked, as the user can also 
+specify custom directories, and even cherry-pick specific command line programs to load. Figure 2 shows 
+a selection box that enables the user to specify custom directories to scan, and Figure 3. shows a selection 
+box that enables the user to select specific modules. Picking specific directories, and specific executables
+will most likely make the application quicker to launch.
 
 \image html CLIPreferencesAdditionalDirectories.png "Figure 2. The User can specify specific directories to scan".
 \image html CLIPreferencesAdditionalModules.png "Figure 3. The User can specify specific command line programs to load".

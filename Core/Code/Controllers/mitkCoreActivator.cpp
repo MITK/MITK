@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkPlanePositionManager.h"
 #include "mitkCoreDataNodeReader.h"
+#include "mitkStandardFileLocations.h"
 
 #include <mitkModuleActivator.h>
 #include <mitkModuleSettings.h>
@@ -56,7 +57,10 @@ std::string GetProgramPath()
   if (_NSGetExecutablePath(path, &size) == 0)
   {
     std::size_t index = std::string(path).find_last_of('/');
-    return std::string(path, index);
+    std::string strPath = std::string(path, index);
+    const char* execPath = strPath.c_str();
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(execPath,false);
+    return strPath;
   }
   return std::string();
 }

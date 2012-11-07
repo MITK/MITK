@@ -87,8 +87,8 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
 void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
 {
   //initialize configuration widget
-  m_NDIConfigWidget = m_Controls.m_NDIConfigWidget;
-  m_NDIConfigWidget->SetToolTypes(QStringList () << "Instrument" << "Fiducial" << "Skinmarker" << "Unknown" );
+  //m_NDIConfigWidget = m_Controls.m_NDIConfigWidget;
+  //m_NDIConfigWidget->SetToolTypes(QStringList () << "Instrument" << "Fiducial" << "Skinmarker" << "Unknown" );
 
   //initialize registration widget
   m_RegistrationWidget = m_Controls.m_RegistrationWidget;
@@ -123,12 +123,14 @@ void QmitkIGTTrackingLabView::CreateConnections()
   connect( m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnToolBoxCurrentChanged(int)) );
 
   //connect( m_NDIConfigWidget, SIGNAL(Connected()), m_RenderingTimerWidget, SLOT(EnableWidget()) );
-  connect( m_NDIConfigWidget, SIGNAL(Disconnected()), this, SLOT(OnTrackerDisconnected()) );
+  /*connect( m_NDIConfigWidget, SIGNAL(Disconnected()), this, SLOT(OnTrackerDisconnected()) );
   connect( m_NDIConfigWidget, SIGNAL(Connected()), this, SLOT(OnSetupNavigation()) );
   connect( m_NDIConfigWidget, SIGNAL(SignalToolNameChanged(int, QString)), this, SLOT(OnChangeToolName(int, QString)) );
   connect( m_NDIConfigWidget, SIGNAL(SignalLoadTool(int, mitk::DataNode::Pointer)), this, SLOT(OnToolLoaded(int, mitk::DataNode::Pointer)) );    
   connect( m_NDIConfigWidget, SIGNAL(ToolsAdded(QStringList)), this, SLOT(OnToolsAdded(QStringList)) );
-  connect( m_NDIConfigWidget, SIGNAL(RepresentationChanged( int ,mitk::Surface::Pointer )), this, SLOT(ChangeToolRepresentation( int, mitk::Surface::Pointer )));
+  connect( m_NDIConfigWidget, SIGNAL(RepresentationChanged( int ,mitk::Surface::Pointer )), this, SLOT(ChangeToolRepresentation( int, mitk::Surface::Pointer )));*/
+  connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), m_RenderingTimerWidget, SLOT(EnableWidget()) );
+  connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), this, SLOT(OnSetupNavigation()) );
 
   connect( m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
   connect( m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnRegisterFiducials()) );
@@ -201,6 +203,7 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
 
 void QmitkIGTTrackingLabView::OnSetupNavigation()
 {
+  MITK_INFO << "SetupNavigationCalled";
   if(m_Source.IsNotNull())
     if(m_Source->IsTracking())
       return;
@@ -238,46 +241,42 @@ void QmitkIGTTrackingLabView::SetupIGTPipeline()
   if(ds == NULL)
     throw std::invalid_argument("DataStorage is not available");
 
-  mitk::TrackingDevice::Pointer tracker = m_NDIConfigWidget->GetTracker(); // get current tracker from configuration widget
-  if(tracker.IsNull()) // check if tracker is valid
-    throw std::invalid_argument("tracking device is NULL!");
-
-  m_Source = mitk::TrackingDeviceSource::New(); // create new source for the IGT-Pipeline
-  m_Source->SetTrackingDevice(tracker); // set the found tracker from the configuration widget to the source
+  //Get selected source
+  m_Source = dynamic_cast<mitk::TrackingDeviceSource*>(m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource().GetPointer());
+  if (m_Source.IsNull()) {mitkThrow() << "Error: no tracking device";}
+  
 
   this->InitializeFilters(); // initialize all needed filters 
 
-  if(m_NDIConfigWidget->GetTracker()->GetType() == mitk::NDIAurora)
+
+  for (unsigned int i=0; i < m_Source->GetNumberOfOutputs(); ++i)
   {
-
-    for (unsigned int i=0; i < m_Source->GetNumberOfOutputs(); ++i)
-    {
-      m_FiducialRegistrationFilter->SetInput(i, m_Source->GetOutput(i)); // set input for registration filter
-      m_Visualizer->SetInput(i, m_FiducialRegistrationFilter->GetOutput(i)); // set input for visualization filter
-    }
-
-    for(unsigned int i= 0; i < m_Visualizer->GetNumberOfOutputs(); ++i)
-    {
-      const char* toolName = tracker->GetTool(i)->GetToolName();
-
-      mitk::DataNode::Pointer representation = this->CreateInstrumentVisualization(this->GetDefaultDataStorage(), toolName);
-      m_PSRecToolSelectionComboBox->addItem(QString(toolName));
-
-      m_PermanentRegistrationToolSelectionWidget->AddToolName(QString(toolName));
-      m_VirtualViewToolSelectionWidget->AddToolName(QString(toolName));
-
-      m_Visualizer->SetRepresentationObject(i, representation->GetData());
-
-    }
-
-    if(m_Source->GetTrackingDevice()->GetToolCount() > 0)
-      m_RenderingTimerWidget->setEnabled(true);
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
-    this->GlobalReinit();
+    m_FiducialRegistrationFilter->SetInput(i, m_Source->GetOutput(i)); // set input for registration filter
+    m_Visualizer->SetInput(i, m_FiducialRegistrationFilter->GetOutput(i)); // set input for visualization filter
   }
 
-  // this->CreateInstrumentVisualization(ds, tracker);//create for each single connected ND a corresponding 3D representation
+  for(unsigned int i= 0; i < m_Visualizer->GetNumberOfOutputs(); ++i)
+  {
+    const char* toolName = m_Source->GetOutput(i)->GetName();
+
+    mitk::DataNode::Pointer representation = this->CreateInstrumentVisualization(this->GetDefaultDataStorage(), toolName);
+    m_PSRecToolSelectionComboBox->addItem(QString(toolName));
+
+    m_PermanentRegistrationToolSelectionWidget->AddToolName(QString(toolName));
+    m_VirtualViewToolSelectionWidget->AddToolName(QString(toolName));
+
+    m_Visualizer->SetRepresentationObject(i, representation->GetData());
+
+  }
+
+  if(m_Source->GetTrackingDevice()->GetToolCount() > 0)
+    m_RenderingTimerWidget->setEnabled(true);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
+  this->GlobalReinit();
+
+
+ 
 }
 
 void QmitkIGTTrackingLabView::InitializeFilters()

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>364</width>
-    <height>375</height>
+    <height>1058</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,12 +26,175 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="page_6">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>345</width>
+        <height>322</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Configuration</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
-        <widget class="QmitkNDIConfigurationWidget" name="m_NDIConfigWidget" native="true"/>
+        <widget class="QmitkNavigationDataSourceSelectionWidget" name="m_TrackingDeviceSelectionWidget" native="true"/>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Selected Device</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Status:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="m_TrackingDeviceStatusLabel">
+              <property name="text">
+               <string>&lt;not available&gt;</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="m_StartStopTrackingButton">
+              <property name="text">
+               <string>Start Tracking</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Tool Selection</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Pointer:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>13</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="m_PointerNameLabel">
+              <property name="text">
+               <string>&lt;not selected&gt;</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="m_UseAsPointerButton">
+              <property name="text">
+               <string>Use selected tool</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Objectmarker:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>47</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="m_ObjectmarkerNameLabel">
+              <property name="text">
+               <string>&lt;not selected&gt;</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="m_UseAsObjectmarkerButton">
+              <property name="text">
+               <string>Use selected tool</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -40,8 +203,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>414</width>
-        <height>85</height>
+        <width>342</width>
+        <height>343</height>
        </rect>
       </property>
       <attribute name="label">
@@ -54,6 +217,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="m_PermanentRegistrationToolSelectionWidgetPage">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>342</width>
+        <height>343</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Permanent Registration</string>
       </attribute>
@@ -64,6 +235,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="m_PointSetRecordingPage">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>342</width>
+        <height>343</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>PointSet Recording</string>
       </attribute>
@@ -74,6 +253,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_5">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>342</width>
+        <height>343</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Virtual Camera</string>
       </attribute>
@@ -86,9 +273,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkToolTrackingStatusWidget" name="m_ToolStatusWidget" native="true">
-     <zorder>m_RenderingTimerWidget</zorder>
-    </widget>
+    <widget class="QmitkToolTrackingStatusWidget" name="m_ToolStatusWidget" native="true"/>
    </item>
    <item>
     <widget class="QmitkUpdateTimerWidget" name="m_RenderingTimerWidget" native="true"/>
@@ -120,12 +305,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QmitkNDIConfigurationWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkNDIConfigurationWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QmitkToolSelectionWidget</class>
    <extends>QWidget</extends>
    <header>QmitkToolSelectionWidget.h</header>
@@ -141,6 +320,12 @@
    <class>QmitkUpdateTimerWidget</class>
    <extends>QWidget</extends>
    <header>QmitkUpdateTimerWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkNavigationDataSourceSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkNavigationDataSourceSelectionWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

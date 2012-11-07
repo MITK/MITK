@@ -749,6 +749,9 @@ EXCLUDE_SYMLINKS       = NO
 # for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = moc_* \
+                         ui_* \
+                         qrc_* \
+                         wrap_* \
                          Register* \
                          */files.cmake \
                          */.git/* \

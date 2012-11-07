@@ -280,9 +280,9 @@ void mitk::ContourElement::Concatenate(mitk::ContourElement* other)
 
 bool mitk::ContourElement::RemoveVertex(mitk::ContourElement::VertexType* vertex)
 {
-  ConstVertexIterator it = this->m_Vertices->begin();
+  VertexIterator it = this->m_Vertices->begin();
 
-  ConstVertexIterator end = this->m_Vertices->end();
+  VertexIterator end = this->m_Vertices->end();
 
   //search for vertex and remove it if exists
   while(it != end)
@@ -321,9 +321,9 @@ bool mitk::ContourElement::RemoveVertexAt(mitk::Point3D &point, float eps)
   /* current version iterates over the whole deque - should be some kind of an octree with spatial query*/
 
   if(eps > 0){
-    ConstVertexIterator it = this->m_Vertices->begin();
+    VertexIterator it = this->m_Vertices->begin();
 
-    ConstVertexIterator end = this->m_Vertices->end();
+    VertexIterator end = this->m_Vertices->end();
 
     while(it != end)
     {

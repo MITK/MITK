@@ -73,7 +73,7 @@ namespace mitk
 
 /*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
     typedef ContourModelVertex VertexType;
-    typedef std::deque<typename VertexType*> VertexListType;
+    typedef std::deque<VertexType*> VertexListType;
     typedef VertexListType::iterator VertexIterator;
     typedef VertexListType::const_iterator ConstVertexIterator;
 /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/

@@ -209,7 +209,7 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timest
   }
   else
   {
-    throw std::exception("invalid timestep");// << timestep << "only " << this->GetTimeSteps() << " available.");
+    mitkThrow() << "No iterator at invalid timestep " << timestep << ". There are only " << this->GetTimeSteps() << " timesteps available.";
   }
 }
 
@@ -223,7 +223,7 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd( int timestep
   }
   else
   {
-    throw std::exception("invalid timestep");// + timestep + "only " + this->GetTimeSteps() + " available.");
+    mitkThrow() << "No iterator at invalid timestep " << timestep << ". There are only " << this->GetTimeSteps() << " timesteps available.";
   }
 }
 

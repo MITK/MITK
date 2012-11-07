@@ -205,7 +205,7 @@ namespace mitk
     void Concatenate(mitk::ContourModel* other, int timestep=0);
 
     /** \brief Returns a const VertexIterator at the start element of the contour.
-    \throws exception for invalid timesteps
+    @throw mitk::Exception if the timestep is invalid.
     */
     VertexIterator IteratorBegin( int timestep=0);
 
@@ -227,7 +227,7 @@ namespace mitk
     virtual void SetIsClosed(bool isClosed, int timestep=0);
 
     /** \brief Returns a const VertexIterator at the end element of the contour.
-    \throws exception for invalid timesteps
+    @throw mitk::Exception if the timestep is invalid.
     */
     VertexIterator IteratorEnd( int timestep=0);
 

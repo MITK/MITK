@@ -168,4 +168,9 @@ namespace mitk
     m_CameraActiveMutex->Unlock();
     return ok;
   }
+
+  bool ToFCameraDevice::IsCameraConnected()
+  {
+    return m_CameraConnected;
+  }
 }

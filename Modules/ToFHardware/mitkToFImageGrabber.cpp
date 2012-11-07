@@ -158,6 +158,10 @@ namespace mitk
   {
     return m_ToFCameraDevice->IsCameraActive();
   }
+  bool ToFImageGrabber::IsCameraConnected()
+  {
+    return m_ToFCameraDevice->IsCameraConnected();
+  }
 
   void ToFImageGrabber::SetCameraDevice(ToFCameraDevice* aToFCameraDevice)
   {

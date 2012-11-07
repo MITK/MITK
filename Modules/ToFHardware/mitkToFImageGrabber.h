@@ -66,6 +66,10 @@ namespace mitk
     */
     virtual bool IsCameraActive();
     /*!
+    \brief Returns true if the camera is connected
+    */
+    virtual bool IsCameraConnected();
+    /*!
     \brief Sets the ToF device, the image grabber is grabbing the images from
     \param aToFCameraDevice device internally used for grabbing the images from the camera
     */

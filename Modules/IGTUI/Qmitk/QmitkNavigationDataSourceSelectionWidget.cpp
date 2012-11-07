@@ -69,7 +69,7 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
         //reset everything
         m_CurrentSource = NULL;
         m_CurrentStorage = NULL;
-        emit NavigationDataSourceDeselected();
+        emit NavigationDataSourceSelected(m_CurrentSource);
         return;
       }
 

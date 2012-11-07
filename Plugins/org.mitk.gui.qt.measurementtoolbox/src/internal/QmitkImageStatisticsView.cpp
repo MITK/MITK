@@ -257,6 +257,7 @@ void QmitkImageStatisticsView::ReinitData()
   m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
   m_Controls->m_HistogramWidget->ClearItemModel();
   m_Controls->m_LineProfileWidget->ClearItemModel();
+  m_Controls->m_JSHistogram->clearHistogram();
 }
 
 void QmitkImageStatisticsView::OnThreadedStatisticsCalculationEnds()

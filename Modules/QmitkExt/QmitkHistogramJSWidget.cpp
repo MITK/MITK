@@ -1,3 +1,20 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+
 #include "QmitkHistogramJSWidget.h"
 
 QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
@@ -24,12 +41,6 @@ void QmitkHistogramJSWidget::addJSObject()
   page()->mainFrame()->addToJavaScriptWindowObject(QString("histogramData"), this);
 }
 
-// emits Data to the JavaScript
-void QmitkHistogramJSWidget::emitData()
-{
-  emit sendFrequency(m_Frequency);
-  emit sendMeasurement(m_Measurement);
-}
 
 // reloads WebView, everytime its size has been changed, so the size of the Histogram fits to the size of the widget
 void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
@@ -46,13 +57,14 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
   HistogramConstIteratorType endIt = m_Histogram->End();
   HistogramConstIteratorType it;
   unsigned int i = 0;
-  for (it = m_Histogram->Begin() ; it != m_Histogram->End(); it++, i++)
+  for (it = m_Histogram->Begin() ; it != m_Histogram->End(); ++it, ++i)
   {
-    double frequency = it.GetFrequency();
-    double measurement = it.GetMeasurementVector()[0];
+    QVariant frequency = it.GetFrequency();
+    QVariant measurement = it.GetMeasurementVector()[0];
     m_Frequency.insert(i, frequency);
     m_Measurement.insert(i, measurement);
   }
+
   this->reload();
 }
 
@@ -66,4 +78,14 @@ void QmitkHistogramJSWidget::clearHistogram()
 {
   this->clearData();
   this->reload();
+}
+
+QList<QVariant> QmitkHistogramJSWidget::getFrequency()
+{
+  return m_Frequency;
+}
+
+QList<QVariant> QmitkHistogramJSWidget::getMeasurement()
+{
+  return m_Measurement;
 }

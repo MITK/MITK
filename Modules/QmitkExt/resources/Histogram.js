@@ -20,57 +20,20 @@ var margin = {
     left : 50,
     right : -20,
     };
-var height = 0;//500 - margin.top - margin.bottom;
-var width = 0;
+var height = histogramData.height - margin.top - margin.bottom;
+var width = histogramData.width - margin.left - margin.right;
 var tension = 0.8;
-var connected = false;
 
-connectSlots();
+
 makeHistogram();
 
-function setFrequency(frequency) {
-    this.frequency = frequency;
-}
-
-function setMeasurement(measurement) {
-    this.measurement = measurement;
-}
-
-function setData()
-{
-    dataset = [frequency, measurement];
-}
-
-function connectSlots() {
-    if (!connected) {
-        connected = true;
-        try{
-            histogramData.sendFrequency.connect(setFrequency);
-            histogramData.sendMeasurement.connect(setMeasurement);
-            width = histogramData.width - margin.right - margin.left;
-            height = histogramData.height - margin.top - margin.left;
-            histogramData.emitData();
-        }
-        catch(e){
-            alert(e);
-        }
-    }
-}
-
 function makeHistogram() {
-    setData();
     var xScale = d3.scale.linear()
-                        .domain([d3.min(dataset, function(d) {
-                            return d[1];
-                        }), d3.max(dataset, function(d) {
-                            return d[1];
-                        })])
+                        .domain([d3.min(histogramData.measurement), d3.max(histogramData.measurement)])
                         .range([margin.left, width]);
 
     var yScale = d3.scale.linear()
-                        .domain([0, d3.max(dataset, function(d) {
-                            return d[0];
-                        })])
+                        .domain([0, d3.max(histogramData.frequency)])
                         .range([height, margin.top]);
 
     var xAxis = d3.svg.axis()
@@ -90,52 +53,52 @@ function makeHistogram() {
 
     var line = d3.svg.line()
                     .interpolate("cardinal")
-                    .x(function(d) {
-                        return xScale(d[1]);
+                    .x(function(d,i) {
+                        return xScale(histogramData.measurement[i]);
                     })
-                    .y(function(d) {
-                        return yScale(d[0]);
+                    .y(function(d,i) {
+                        return yScale(d);
                     })
                     .tension(tension);
 
     var area = d3.svg.area()
                     .interpolate("cardinal")
                     .tension(tension)
-                    .x(function(d) {
-                        return xScale(d[1]);
+                    .x(function(d,i) {
+                        return xScale(histogramData.measurement[i]);
                     })
                     .y0(height)
-                    .y1(function(d) {
-                        return yScale(d[0]);
+                    .y1(function(d,i) {
+                        return yScale(d);
                     });
 
     svg.append("path")
             .attr("class", "area")
             .attr("fill", "steelblue")
             .attr("opacity", 0.5)
-            .attr("d", area(dataset));
+            .attr("d", area(histogramData.frequency));
 
     svg.append("path")
             .attr("class", "line")
             .attr("fill", "none")
             .attr("stroke", "black")
             .attr("stroke-width", 1)
-            .attr("d", line(dataset));
+            .attr("d", line(histogramData.frequency));
 
     // var bar = svg.selectAll("rect")
                     // .data(dataset)
                     // .enter()
                     // .append("rect")
                     // .attr("class", "bar")
-                    // .attr("x", function(d, i) {
-                        // return xScale(i);
+                    // .attr("x", function(d,i) {
+                        // return xScale(histogramData.measurement[i]);
                     // })
-                    // .attr("y", function(d) {
-                        // return yScale(d);
+                    // .attr("y", function(d,i) {
+                        // return yScale(histogramData.frequency[i]);
                     // })
-                    // .attr("width", width / (dataset.length + 1))
-                    // .attr("height", function(d) {
-                        // return height - yScale(d);
+                    // .attr("width", 1)
+                    // .attr("height", function(d,i) {
+                        // return height - yScale(histogramData.frequency[i]);
                     // })
                     // .attr("fill", "grey")
                     // .attr("opacity", 0.5);

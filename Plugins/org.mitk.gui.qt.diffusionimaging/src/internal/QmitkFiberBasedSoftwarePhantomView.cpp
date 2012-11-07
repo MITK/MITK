@@ -42,6 +42,7 @@
 #include <mitkGlobalInteraction.h>
 #include <mitkImageToItk.h>
 #include <mitkImageCast.h>
+#include <mitkImageGenerator.h>
 
 #include <QMessageBox>
 
@@ -327,19 +328,13 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
 
     if (m_SelectedBundle.IsNull())
     {
-        ItkUcharImgType::Pointer dummyImage = ItkUcharImgType::New();
-        dummyImage->SetSpacing( spacing );
-        dummyImage->SetOrigin( origin );
-        dummyImage->SetDirection( directionMatrix );
-        dummyImage->SetLargestPossibleRegion( imageRegion );
-        dummyImage->SetBufferedRegion( imageRegion );
-        dummyImage->SetRequestedRegion( imageRegion );
-        dummyImage->Allocate();
-        dummyImage->FillBuffer(1);
-
-        mitk::Image::Pointer image = mitk::Image::New();
-        image->InitializeByItk( dummyImage.GetPointer() );
-        image->SetVolume( dummyImage->GetBufferPointer() );
+        mitk::Image::Pointer image = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(
+                    m_Controls->m_SizeX->value(),
+                    m_Controls->m_SizeY->value(),
+                    m_Controls->m_SizeZ->value(),
+                    m_Controls->m_SpacingX->value(),
+                    m_Controls->m_SpacingY->value(),
+                    m_Controls->m_SpacingZ->value());
 
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData( image );

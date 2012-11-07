@@ -64,12 +64,6 @@ public:
     m_ReadAccessor(iP, iDI, OptionFlags)
   {
 
-    // Check if PixelType is correct
-    if(m_ReadAccessor.m_Image->GetPixelType().GetTypeId() != typeid(TPixel))
-    {
-      mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
-    }
-
     // Check if Dimensions are correct
     if(ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem == NULL) {
       if(m_ReadAccessor.m_Image->GetDimension() != VDimension)
@@ -80,6 +74,13 @@ public:
         mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and ImageDataItem are not equal.";
     }
 
+    // Check if PixelType is correct
+    if(!(m_ReadAccessor.m_Image->GetPixelType() !=  mitk::MakePixelType< itk::Image<TPixel, VDimension> >()) )
+    {
+      mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
+    }
+
+
   }
 
   /** Destructor informs Image to unlock memory. */
@@ -88,21 +89,9 @@ public:
   }
 
   /** Returns a const reference to the pixel at given index. */
-  const TPixel & GetPixelByIndex(const itk::Index<VDimension> & idx) const
+  const TPixel & GetPixelByIndex(const IndexType & idx) const
   {
-    const unsigned int * imageDims = ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem->m_Dimensions;
-
-    unsigned int offset = 0;
-
-    switch(VDimension)
-    {
-      case 4:
-        offset += idx[3]*imageDims[0]*imageDims[1]*imageDims[2];
-      case 3:
-        offset += idx[2]*imageDims[0]*imageDims[1];
-      case 2:
-        offset += idx[0] + idx[1]*imageDims[0];
-    }
+    unsigned int offset = PixelAccessorType::GetOffset(idx);
 
     return *(((TPixel*)m_ReadAccessor.m_AddressBegin) + offset);
   }
@@ -110,22 +99,9 @@ public:
   /** Extends GetPixel by integrating index validation to prevent overflow.
     * \throws mitk::Exception in case of overflow
     */
-  const TPixel & GetPixelByIndexSafe(const itk::Index<VDimension>& idx) const
+  const TPixel & GetPixelByIndexSafe(const IndexType& idx) const
   {
-    const unsigned int * imageDims = ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem->m_Dimensions;
-
-    unsigned int offset = 0;
-
-    switch(VDimension)
-    {
-      case 4:
-        offset += idx[3]*imageDims[0]*imageDims[1]*imageDims[2];
-      case 3:
-        offset += idx[2]*imageDims[0]*imageDims[1];
-      case 2:
-        offset += idx[0] + idx[1]*imageDims[0];
-        break;
-    }
+    unsigned int offset = PixelAccessorType::GetOffset(idx);
 
     TPixel* targetAddress = ((TPixel*)m_ReadAccessor.m_AddressBegin) + offset;
 

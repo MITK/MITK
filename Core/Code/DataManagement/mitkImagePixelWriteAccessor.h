@@ -35,6 +35,8 @@ class ImagePixelWriteAccessor : public ImagePixelAccessor<TPixel, VDimension>
   friend class Image;
 
 public:
+    typedef ImagePixelAccessor<TPixel,VDimension> ImagePixelAccessorType;
+
   /** \brief Instantiates a mitk::ImageWriteAccessor (see its doxygen page for more details)
      *  \param Image::Pointer specifies the associated Image
      *  \param ImageDataItem* specifies the allocated image part
@@ -53,12 +55,6 @@ public:
     m_WriteAccessor(iP , iDI, OptionFlags)
   {
 
-    // Check if PixelType is correct
-    if(m_WriteAccessor.m_Image->GetPixelType().GetTypeId() != typeid(TPixel))
-    {
-      mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
-    }
-
     // Check if Dimensions are correct
     if(ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem == NULL) {
       if(m_WriteAccessor.m_Image->GetDimension() != VDimension)
@@ -68,6 +64,14 @@ public:
       if(ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem->GetDimension() != VDimension)
         mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and ImageDataItem are not equal.";
     }
+
+    // Check if PixelType is correct
+    if(!(m_WriteAccessor.m_Image->GetPixelType() ==  mitk::MakePixelType< itk::Image<TPixel, VDimension> >()) )
+    {
+      mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
+    }
+
+
 
   }
 
@@ -79,43 +83,19 @@ public:
     }
 
 
-
   /// Sets a pixel value at given index.
   void SetPixelByIndex(const itk::Index<VDimension>& idx, const TPixel & value)
   {
-    const unsigned int * imageDims = ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem->m_Dimensions;
-
-    unsigned int offset = 0;
-
-    switch(VDimension)
-    {
-      case 4:
-        offset += idx[3]*imageDims[0]*imageDims[1]*imageDims[2];
-      case 3:
-        offset += idx[2]*imageDims[0]*imageDims[1];
-      case 2:
-        offset += idx[0] + idx[1]*imageDims[0];
-    }
+    unsigned int offset = ImagePixelAccessor<TPixel,VDimension>::GetOffset(idx);
 
     *(((TPixel*)m_WriteAccessor.m_AddressBegin) + offset) = value;
   }
 
 
   /** Extends SetPixel by integrating index validation to prevent overflow. */
-  void SetPixelByIndexSafe(const itk::Index<VDimension>& idx, const TPixel & value) {
-    const unsigned int * imageDims = ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem->m_Dimensions;
-
-    unsigned int offset = 0;
-
-    switch(VDimension)
-    {
-      case 4:
-        offset += idx[3]*imageDims[0]*imageDims[1]*imageDims[2];
-      case 3:
-        offset += idx[2]*imageDims[0]*imageDims[1];
-      case 2:
-        offset += idx[0] + idx[1]*imageDims[0];
-    }
+  void SetPixelByIndexSafe(const itk::Index<VDimension>& idx, const TPixel & value)
+  {
+    unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
 
     TPixel* targetAddress = ((TPixel*)m_WriteAccessor.m_AddressBegin) + offset;
 
@@ -125,11 +105,48 @@ public:
     }
     else
     {
-      printf("image dimensions = %d, %d, %d\n", imageDims[0], imageDims[1], imageDims[2]);
-      printf("m_AddressBegin: %p, m_AddressEnd: %p, offset: %u\n", m_WriteAccessor.m_AddressBegin, m_WriteAccessor.m_AddressEnd, offset);
+      //printf("image dimensions = %d, %d, %d\n", imageDims[0], imageDims[1], imageDims[2]);
+      //printf("m_AddressBegin: %p, m_AddressEnd: %p, offset: %u\n", m_WriteAccessor.m_AddressBegin, m_WriteAccessor.m_AddressEnd, offset);
       mitkThrow() << "ImageAccessor Overflow: image access exceeds the requested image area at " << idx << ".";
     }
 
+  }
+
+
+  /** Returns a const reference to the pixel at given index. */
+  const TPixel & GetPixelByIndex(const itk::Index<VDimension>& idx) const
+  {
+    unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
+
+    return *(((TPixel*)m_WriteAccessor.m_AddressBegin) + offset);
+  }
+
+
+  /** Extends GetPixel by integrating index validation to prevent overflow.
+    * \throws mitk::Exception in case of overflow
+    */
+  const TPixel & GetPixelByIndexSafe(const itk::Index<VDimension>& idx) const
+  {
+    unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
+
+    TPixel* targetAddress = ((TPixel*)m_WriteAccessor.m_AddressBegin) + offset;
+
+    if(!(targetAddress >= m_WriteAccessor.m_AddressBegin && targetAddress < m_WriteAccessor.m_AddressEnd))
+    {
+      mitkThrow() << "ImageAccessor Overflow: image access exceeds the requested image area at " << idx << ".";
+    }
+
+    return *targetAddress;
+  }
+
+
+  /** Returns a const reference to the pixel at given world coordinate - works only with three-dimensional ImageAccessor */
+  const TPixel & GetPixelByWorldCoordinates(mitk::Point3D position)
+  {
+    Index3D itkIndex;
+    m_WriteAccessor.m_Image->GetGeometry()->WorldToIndex(position, itkIndex);
+
+    return GetPixelByIndex( itkIndex);
   }
 
   /** Returns a reference to the pixel at given world coordinate */
@@ -139,6 +156,7 @@ public:
   {
 
   }
+
 
 private:
 

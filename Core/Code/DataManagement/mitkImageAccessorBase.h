@@ -122,7 +122,6 @@ protected:
     */
   bool Overlap(const ImageAccessorBase* iAB);
 
-
   /** \brief Uses the WaitLock to wait for another ImageAccessor*/
   void WaitForReleaseOf(ImageAccessorWaitLock* wL);
 

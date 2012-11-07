@@ -59,9 +59,7 @@ namespace mitk {
   friend class ImageReadAccessor;
 
   template <class TPixel, unsigned int VDimension>
-  friend class ImagePixelReadAccessor;
-  template <class TPixel, unsigned int VDimension>
-  friend class ImagePixelWriteAccessor;
+  friend class ImagePixelAccessor;
 
   friend class Image;
 

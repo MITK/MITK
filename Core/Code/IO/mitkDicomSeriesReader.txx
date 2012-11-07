@@ -158,7 +158,11 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         Vector3D correctedImageSpacing = image->GetGeometry()->GetSpacing();
         std::swap( correctedImageSpacing[0], correctedImageSpacing[1] );
         image->GetGeometry()->SetSpacing( correctedImageSpacing );
+
+        // TODO check against actual tag values, NOT against some artificial GDCM version
 #endif
+        // TODO check generated spacing in all cases against what we know from tags!
+        // TODO mark iamge if spacing was determined from fallback/default values instead of documented tags
 
         MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", " 
                                           << image->GetGeometry()->GetSpacing()[1] << ", " 
@@ -456,6 +460,7 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
      For CT, HU -1000 might be meaningful, but a general solution seems not possible. Even for CT,
      -1000 would only look natural for many not all images.
   */
+  // TODO use (0028,0120) Pixel Padding Value if present
   resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::min() );
   
   // adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need

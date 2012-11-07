@@ -526,6 +526,7 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
     m_ShiftUp = signedDistance;
     
     m_ITKAssumedSliceSpacing = (origin2 - origin1).GetNorm();
+    // TODO how do we now this is assumed? document files/lines which make us believe so
     //double itkAssumedSliceSpacing = sqrt( m_ShiftUp * m_ShiftUp + m_ShiftNormal * m_ShiftNormal );
 
     MITK_DEBUG << "    shift normal: " << m_ShiftNormal;
@@ -660,6 +661,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     bool groupImagesWithGantryTilt,
     const gdcm::Scanner::MappingType& tagValueMappings_)
 {
+  // TODO specify more clearly how we know about ITK and what we expect here!
   // result.first = files that fit ITK's assumption
   // result.second = files that do not fit, should be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption() again
   SliceGroupingAnalysisResult result;
@@ -886,6 +888,9 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
 
   const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
     scanner.AddTag( tagPixelSpacing );
+  
+  const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // imager pixel spacing
+    scanner.AddTag( tagImagerPixelSpacing );
     
   const gdcm::Tag tagSliceThickness(0x0018, 0x0050); // slice thickness
     scanner.AddTag( tagSliceThickness );
@@ -935,6 +940,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   {
     try
     {
+    // TODO this must accept missing location and position information
     groupsOfSimilarImages[ groupIter->first ] = SortSeriesSlices( groupIter->second  ); // sort each slice group spatially
     } catch(...)
     {
@@ -950,6 +956,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   //            * check what images actually fulfill ITK's z-spacing assumption
   //            * separate all images that fail the test into new blocks, re-iterate analysis for these blocks
 
+  // TODO this must accept missing location and position information
   UidFileNamesMap mapOf3DPlusTBlocks; // final result of this function
   for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
   {
@@ -1115,9 +1122,13 @@ DicomSeriesReader::CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagVal
 std::string 
 DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& tagValueMap )
 {
+  // TODO make sure this accepts all missing information
+  // TODO add imager pixel spacing
+
   const gdcm::Tag tagSeriesInstanceUID(0x0020,0x000e); // Series Instance UID
   const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // image orientation
   const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
+  const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // imager pixel spacing
   const gdcm::Tag tagSliceThickness(0x0018, 0x0050); // slice thickness
   const gdcm::Tag tagNumberOfRows(0x0028, 0x0010); // number rows
   const gdcm::Tag tagNumberOfColumns(0x0028, 0x0011); // number cols
@@ -1209,6 +1220,17 @@ DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_u
 DicomSeriesReader::StringContainer 
 DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
 {
+  // TODO this must accept missing location and position information
+  /* we CAN expect a group of equal
+     - series instance uid
+     - image orientation
+     - pixel spacing
+     - imager pixel spacing
+     - slice thickness
+     - number of rows/columns
+
+     (each piece of information except the rows/columns might be missing)
+  */
   gdcm::Sorter sorter;
 
   sorter.SetSortFunction(DicomSeriesReader::GdcmSortFunction);
@@ -1227,119 +1249,154 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
 bool 
 DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
 {
-  // make sure we have Image Position and Orientation
-  if ( ! ( 
-      ds1.FindDataElement(gdcm::Tag(0x0020,0x0032)) &&
-      ds1.FindDataElement(gdcm::Tag(0x0020,0x0037)) &&
-      ds2.FindDataElement(gdcm::Tag(0x0020,0x0032)) &&
-      ds2.FindDataElement(gdcm::Tag(0x0020,0x0037)) 
-        )
-      )
-      {
-        MITK_WARN << "Dicom images are missing attributes for a meaningful sorting.";
-        throw std::logic_error("Dicom images are missing attributes for a meaningful sorting.");
-      }
-  
-  gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
-  gdcm::Attribute<0x0020,0x0037> image_orientation1; // Image Orientation (Patient)
+  // TODO make sure we don't die when imagepositionpatient is not present (SC etc.)
+  // TODO this must accept missing location and position information
+  /* we CAN expect a group of equal
+     - series instance uid
+     - image orientation
+     - pixel spacing
+     - imager pixel spacing
+     - slice thickness
+     - number of rows/columns
 
-  image_pos1.Set(ds1);
-  image_orientation1.Set(ds1);
-
-  gdcm::Attribute<0x0020,0x0032> image_pos2;
-  gdcm::Attribute<0x0020,0x0037> image_orientation2;
-
-  image_pos2.Set(ds2);
-  image_orientation2.Set(ds2);
-
-  /*
-     we tolerate very small differences in image orientation, since we got to know about
-     acquisitions where these values change across a single series (7th decimal digit)
-     (http://bugs.mitk.org/show_bug.cgi?id=12263)
-
-     still, we want to check if our assumption of 'almost equal' orientations is valid
+     (each piece of information except the rows/columns might be missing)
   */
-  for (unsigned int dim = 0; dim < 6; ++dim)
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+  const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
+
+  // see if we have Image Position and Orientation
+  if ( ds1.FindDataElement(tagImagePositionPatient) && ds1.FindDataElement(tagImageOrientation) &&
+       ds2.FindDataElement(tagImagePositionPatient) && ds2.FindDataElement(tagImageOrientation) )
   {
-    if ( fabs(image_orientation2[dim] - image_orientation1[dim]) > 0.0001 )
+    gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
+    gdcm::Attribute<0x0020,0x0037> image_orientation1; // Image Orientation (Patient)
+
+    image_pos1.Set(ds1);
+    image_orientation1.Set(ds1);
+
+    gdcm::Attribute<0x0020,0x0032> image_pos2;
+    gdcm::Attribute<0x0020,0x0037> image_orientation2;
+
+    image_pos2.Set(ds2);
+    image_orientation2.Set(ds2);
+
+    /*
+       we tolerate very small differences in image orientation, since we got to know about
+       acquisitions where these values change across a single series (7th decimal digit)
+       (http://bugs.mitk.org/show_bug.cgi?id=12263)
+
+       still, we want to check if our assumption of 'almost equal' orientations is valid
+     */
+    for (unsigned int dim = 0; dim < 6; ++dim)
     {
-      MITK_ERROR << "Dicom images have different orientations.";
-      throw std::logic_error("Dicom images have different orientations. Call GetSeries() first to separate images.");
-    }
-  }
-
-  double normal[3];
-
-  normal[0] = image_orientation1[1] * image_orientation1[5] - image_orientation1[2] * image_orientation1[4];
-  normal[1] = image_orientation1[2] * image_orientation1[3] - image_orientation1[0] * image_orientation1[5];
-  normal[2] = image_orientation1[0] * image_orientation1[4] - image_orientation1[1] * image_orientation1[3];
-
-  double
-      dist1 = 0.0,
-      dist2 = 0.0;
-
-  for (unsigned char i = 0u; i < 3u; ++i)
-  {
-    dist1 += normal[i] * image_pos1[i];
-    dist2 += normal[i] * image_pos2[i];
-  }
-
-  if ( fabs(dist1 - dist2) < mitk::eps)
-  {
-    gdcm::Attribute<0x0020,0x0012> acq_number1; // Acquisition number (may also be missing, so we check existence first)
-    gdcm::Attribute<0x0020,0x0012> acq_number2;
-
-    gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time (may be missing, so we check existence first)
-    gdcm::Attribute<0x0008,0x0032> acq_time2;
-
-    gdcm::Attribute<0x0018,0x1060> trg_time1; // Trigger time (may be missing, so we check existence first)
-    gdcm::Attribute<0x0018,0x1060> trg_time2;
-
-    if (ds1.FindDataElement(gdcm::Tag(0x0020,0x0012)) && ds2.FindDataElement(gdcm::Tag(0x0020,0x0012)))
-    {
-      acq_number1.Set(ds1);
-      acq_number2.Set(ds2);
-
-      if (acq_number1 == acq_number2)
+      if ( fabs(image_orientation2[dim] - image_orientation1[dim]) > 0.0001 )
       {
-        if (ds1.FindDataElement(gdcm::Tag(0x0008,0x0032)) && ds2.FindDataElement(gdcm::Tag(0x0008,0x0032)))
+        MITK_ERROR << "Dicom images have different orientations.";
+        throw std::logic_error("Dicom images have different orientations. Call GetSeries() first to separate images.");
+      }
+    }
+
+    double normal[3];
+
+    normal[0] = image_orientation1[1] * image_orientation1[5] - image_orientation1[2] * image_orientation1[4];
+    normal[1] = image_orientation1[2] * image_orientation1[3] - image_orientation1[0] * image_orientation1[5];
+    normal[2] = image_orientation1[0] * image_orientation1[4] - image_orientation1[1] * image_orientation1[3];
+
+    double
+      dist1 = 0.0,
+            dist2 = 0.0;
+
+    // TODO document this part, rename identifiers...
+    for (unsigned char i = 0u; i < 3u; ++i)
+    {
+      dist1 += normal[i] * image_pos1[i];
+      dist2 += normal[i] * image_pos2[i];
+    }
+
+    // if we can sort by just comparing the distance, we do exactly that
+    if ( fabs(dist1 - dist2) >= mitk::eps)
+    {
+      // default: compare position
+      return dist1 < dist2;
+    }
+    else // we need to check more properties to distinguish slices
+    {
+      // try to sort by Acquisition Number
+      const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
+      if (ds1.FindDataElement(tagAcquisitionNumber) && ds2.FindDataElement(tagAcquisitionNumber))
+      {
+        gdcm::Attribute<0x0020,0x0012> acquisition_number1; // Acquisition number
+        gdcm::Attribute<0x0020,0x0012> acquisition_number2;
+
+        acquisition_number1.Set(ds1);
+        acquisition_number2.Set(ds2);
+
+        if (acquisition_number1 != acquisition_number2)
         {
-          acq_time1.Set(ds1);
-          acq_time2.Set(ds2);
-
-          if (acq_time1 == acq_time2)
+          return acquisition_number1 < acquisition_number2;
+        }
+        else // neither position nor acquisition number are good for sorting, so check more
+        {
+          // try to sort by Acquisition Time
+          const gdcm::Tag tagAcquisitionTime(0x0008, 0x0032);
+          if (ds1.FindDataElement(tagAcquisitionTime) && ds2.FindDataElement(tagAcquisitionTime))
           {
-            if (ds1.FindDataElement(gdcm::Tag(0x0018,0x1060)) && ds2.FindDataElement(gdcm::Tag(0x0018,0x1060)))
+            gdcm::Attribute<0x0008,0x0032> acquisition_time1; // Acquisition time
+            gdcm::Attribute<0x0008,0x0032> acquisition_time2;
+
+            acquisition_time1.Set(ds1);
+            acquisition_time2.Set(ds2);
+
+            if (acquisition_time1 != acquisition_time2)
             {
-              trg_time1.Set(ds1);
-              trg_time2.Set(ds2);
-
-              return trg_time1 < trg_time2;
+              return acquisition_time1 < acquisition_time2;
             }
-          }
+            else // we gave up on image position, acquisition number and acquisition time now
+            {
+              // let's try trigger time
+              const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
+              if (ds1.FindDataElement(tagTriggerTime) && ds2.FindDataElement(tagTriggerTime))
+              {
+                gdcm::Attribute<0x0018,0x1060> trigger_time1; // Trigger time
+                gdcm::Attribute<0x0018,0x1060> trigger_time2;
 
-          return acq_time1 < acq_time2;
+                trigger_time1.Set(ds1);
+                trigger_time2.Set(ds2);
+
+                if (trigger_time1 != trigger_time2)
+                {
+                  return trigger_time1 < trigger_time2;
+                }
+                // ELSE!
+                // for this and many previous ifs we fall through if nothing lets us sort
+              } // .
+            }   // .
+          }     // .
         }
       }
-
-      return acq_number1 < acq_number2;
     }
-    else
-    {
-      // we need some reproducible sort criteria here
-      gdcm::Attribute<0x0008,0x0018> sop_uid1;   // SOP instance UID, mandatory
-      gdcm::Attribute<0x0008,0x0018> sop_uid2;
+  }             // .
 
-      sop_uid1.Set(ds1);
-      sop_uid2.Set(ds2);
+  // LAST RESORT: all valuable information for sorting is missing. 
+  // Sort by some meaningless but unique identifiers to satisfy the sort function
+  const gdcm::Tag tagSOPInstanceUID(0x0018, 0x1060);
+  if (ds1.FindDataElement(tagSOPInstanceUID) && ds2.FindDataElement(tagSOPInstanceUID))
+  {
+    MITK_WARN << "Dicom images are missing attributes for a meaningful sorting, falling back to SOP instance UID comparison.";
+    gdcm::Attribute<0x0008,0x0018> SOPInstanceUID1;   // SOP instance UID is mandatory and unique
+    gdcm::Attribute<0x0008,0x0018> SOPInstanceUID2;
 
-      return sop_uid1 < sop_uid2;
-    }
+    SOPInstanceUID1.Set(ds1);
+    SOPInstanceUID2.Set(ds2);
+
+    return SOPInstanceUID1 < SOPInstanceUID2;
   }
   else
   {
-    // default: compare position
-    return dist1 < dist2;
+    // no DICOM file should really come down here, this should only be reached with unskillful and unlucky manipulation of files
+    std::string error_message("Malformed DICOM images, which do not even contain a SOP Instance UID.");
+    MITK_ERROR << error_message;
+    throw std::logic_error( error_message );
   }
 }
   

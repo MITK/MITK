@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 
 
-#include <mitkContourModelSubdivisionFilter.h>
+#include <mitkContourModelSubDivisionFilter.h>
 
 namespace mitk {
 

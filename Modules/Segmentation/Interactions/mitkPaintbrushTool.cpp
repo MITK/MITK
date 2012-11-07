@@ -175,32 +175,72 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
    }
 
   // QuarterCycle is full! Now copy quarter cycle to other quarters.
-  std::vector< mitk::Point2D >::const_iterator it = quarterCycleUpperRight.begin();
-  while( it != quarterCycleUpperRight.end() )
+
+  if( !evenSize )
   {
-     mitk::Point2D p;
-     p = *it;
+    std::vector< mitk::Point2D >::const_iterator it = quarterCycleUpperRight.begin();
+    while( it != quarterCycleUpperRight.end() )
+    {
+      mitk::Point2D p;
+      p = *it;
 
-     // the contour points in the lower right corner have same position but with negative y values
-     p[1] *= -1;
-     quarterCycleLowerRight.push_back(p);
+      std::cout << p << std::endl;
 
-     // the contour points in the lower left corner have same position
-     // but with both x,y negative
-     p[0] *= -1;
-     quarterCycleLowerLeft.push_back(p);
+      // the contour points in the lower right corner have same position but with negative y values
+      p[1] *= -1;
+      quarterCycleLowerRight.push_back(p);
 
-     // the contour points in the upper left corner have same position
-     // but with x negative
-     p[1] *= -1;
-     quarterCycleUpperLeft.push_back(p);
+      // the contour points in the lower left corner have same position
+      // but with both x,y negative
+      p[0] *= -1;
+      quarterCycleLowerLeft.push_back(p);
 
-     it++;
+      // the contour points in the upper left corner have same position
+      // but with x negative
+      p[1] *= -1;
+      quarterCycleUpperLeft.push_back(p);
+
+      it++;
+    }
   }
+  else
+  {
+    std::vector< mitk::Point2D >::const_iterator it = quarterCycleUpperRight.begin();
+    while( it != quarterCycleUpperRight.end() )
+    {
+      mitk::Point2D p,q;
+      p = *it;
+
+      q = p;
+      // the contour points in the lower right corner have same position but with negative y values
+      q[1] *= -1;
+      // correct for moved offset if size even = the midpoint is not the midpoint of the current pixel
+      // but its upper rigt corner
+      q[1] += 1;
+      quarterCycleLowerRight.push_back(q);
+
+      q = p;
+      // the contour points in the lower left corner have same position
+      // but with both x,y negative
+      q[1] = -1.0f * q[1] + 1;
+      q[0] = -1.0f * q[0] + 1;
+      quarterCycleLowerLeft.push_back(q);
+
+      // the contour points in the upper left corner have same position
+      // but with x negative
+      q = p;
+      q[0] *= -1;
+      q[0] +=  1;
+      quarterCycleUpperLeft.push_back(q);
+
+      it++;
+    }
+  }
+  std::cout << "---" << std::endl;
 
   // fill contour with poins in right ordering, starting with the upperRight block
   mitk::Point3D tempPoint;
-  for (int i=0; i<quarterCycleUpperRight.size(); i++)
+  for (unsigned int i=0; i<quarterCycleUpperRight.size(); i++)
   {
      tempPoint[0] = quarterCycleUpperRight[i][0];
      tempPoint[1] = quarterCycleUpperRight[i][1];
@@ -215,7 +255,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      tempPoint[2] = 0;
      contourInImageIndexCoordinates->AddVertex( tempPoint);
   }
-  for (int i=0; i<quarterCycleLowerLeft.size(); i++)
+  for (unsigned int i=0; i<quarterCycleLowerLeft.size(); i++)
   {
      tempPoint[0] = quarterCycleLowerLeft[i][0];
      tempPoint[1] = quarterCycleLowerLeft[i][1];
@@ -284,8 +324,8 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   // round to nearest voxel center (abort if this hasn't changed)
   if ( m_Size % 2 == 0 ) // even
   {
-    indexCoordinates[0] = ROUND( indexCoordinates[0] /*+ 0.5*/) + 0.5;
-    indexCoordinates[1] = ROUND( indexCoordinates[1] /*+ 0.5*/ ) + 0.5;
+    indexCoordinates[0] = ROUND( indexCoordinates[0]);// /*+ 0.5*/) + 0.5;
+    indexCoordinates[1] = ROUND( indexCoordinates[1]);// /*+ 0.5*/ ) + 0.5;
   }
   else // odd
   {
@@ -369,7 +409,7 @@ bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent*
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
   */
-bool mitk::PaintbrushTool::OnInvertLogic(Action* itkNotUsed(action), const StateEvent* stateEvent)
+bool mitk::PaintbrushTool::OnInvertLogic(Action* itkNotUsed(action), const StateEvent* /*stateEvent*/)
 {
     // Inversion only for 0 and 1 as painting values
     if (m_PaintingPixelValue == 1)

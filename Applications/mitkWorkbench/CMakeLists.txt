@@ -33,6 +33,13 @@ FunctionCreateBlueBerryApplication(
   ${_app_options}
 )
 
+#Setting application icon for mac os x systems
+set_target_properties(mitkWorkbench PROPERTIES MACOSX_BUNDLE_ICON_FILE "icon.icns")
+
+if(APPLE)
+  install(FILES "icons/icon.icns" DESTINATION "mitkWorkbench.app/Contents/Resources")
+endif(APPLE)
+
 # Add a build time dependency to legacy BlueBerry bundles.
 if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(mitkWorkbench ${MITK_MODULES_ENABLED_PLUGINS})

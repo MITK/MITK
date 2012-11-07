@@ -432,8 +432,10 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      * BaseRenderer has been specified*/
     BaseRenderer *GetRenderer() const;
 
-    /** \brief Re-orients the slice stack to include the plane specified by
-     * the given point an normal vector. 
+    /** \brief Re-orients the slice stack. All slices will be oriented to the given normal vector.
+         The given point (world coordinates) defines the selected slice. 
+         Careful: The resulting axis vectors are not clearly defined this way. If you want to define them clearly, use 
+         ReorientSlices (const mitk::Point3D &point, const mitk::Vector3D &axisVec0, const mitk::Vector3D &axisVec1).         
      */
     void ReorientSlices( 
       const mitk::Point3D &point, const mitk::Vector3D &normal );

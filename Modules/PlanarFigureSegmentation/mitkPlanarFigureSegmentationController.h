@@ -80,6 +80,7 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
     */
     void AddPlanarFigure( PlanarFigure::Pointer planarFigure );
 
+    void RemovePlanarFigure( mitk::PlanarFigure::Pointer planarFigure );
 
     /**
     * \brief Performs the interpolation and returns the result

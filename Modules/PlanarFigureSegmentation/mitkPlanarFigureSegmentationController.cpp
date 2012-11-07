@@ -76,7 +76,6 @@ void mitk::PlanarFigureSegmentationController::AddPlanarFigure( mitk::PlanarFigu
     }
   }
 
-
   if ( newFigure )
   {
     m_PlanarFigureList.push_back( planarFigure );
@@ -88,7 +87,34 @@ void mitk::PlanarFigureSegmentationController::AddPlanarFigure( mitk::PlanarFigu
 
   m_NormalsFilter->SetInput( indexOfFigure, m_ReduceFilter->GetOutput( indexOfFigure ) );
   m_DistanceImageCreator->SetInput( indexOfFigure, m_NormalsFilter->GetOutput( indexOfFigure ) );
+}
 
+void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarFigure::Pointer planarFigure )
+{
+  if ( planarFigure.IsNull() )
+    return;
+
+  bool figureFound = false;
+  int indexOfFigure = -1;
+  for( int i=0; i<m_PlanarFigureList.size(); i++ )
+  {
+    if( m_PlanarFigureList.at(i) == planarFigure )
+    {
+      indexOfFigure = i;
+      figureFound = true;
+      break;
+    }
+  }
+
+  if ( !figureFound )
+    return;
+
+  if ( indexOfFigure == m_PlanarFigureList.size()-1 )
+  {
+    m_DistanceImageCreator->RemoveInputs( m_NormalsFilter->GetOutput( indexOfFigure ) );
+    m_NormalsFilter->RemoveInputs( m_ReduceFilter->GetOutput( indexOfFigure ) );
+    m_ReduceFilter->RemoveInputs( const_cast<mitk::Surface*>(m_ReduceFilter->GetInput(indexOfFigure)) );
+  }
 
 }
 

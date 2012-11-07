@@ -366,7 +366,7 @@ void QmitkToFUtilView::OnToFCameraStopped()
 {
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
   m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
-  m_Controls->tofMeasurementWidget->setEnabled(false);
+  //m_Controls->tofMeasurementWidget->setEnabled(false);
   m_Controls->SurfacePropertiesBox->setEnabled(false);
 
   this->m_Frametimer->stop();

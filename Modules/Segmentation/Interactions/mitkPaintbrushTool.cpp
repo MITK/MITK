@@ -97,8 +97,24 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   // Draw a contour in Square according to selected brush size
   //
   int radius = (m_Size)/2;
+  float fradius = static_cast<float>(m_Size) / 2.0f;
+
   Contour::Pointer contourInImageIndexCoordinates = Contour::New();
   contourInImageIndexCoordinates->Initialize();
+
+  // estimate center point of the brush ( relative to the pixel the mouse points on )
+  // -- left upper corner for even sizes,
+  // -- midpoint for uneven sizes
+  mitk::Point2D centerCorrection;
+  centerCorrection.Fill(0);
+
+  // even --> correction of [+0.5, +0.5]
+  bool evenSize = ((m_Size % 2) == 0);
+  if( evenSize )
+  {
+    centerCorrection[0] += 0.5;
+    centerCorrection[1] += 0.5;
+  }
 
 
   // we will compute the control points for the upper left quarter part of a circle contour
@@ -116,17 +132,20 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 
   // to estimate if a pixel is inside the circle, we need to compare against the 'outer radius'
   // i.e. the distance from the midpoint [0,0] to the border of the pixel [0,radius]
-  const float outer_radius = static_cast<float>(radius) + 0.5;
+  //const float outer_radius = static_cast<float>(radius) + 0.5;
 
-  while (curPoint[1] >= 0)
+  while (curPoint[1] > 0)
   {
      // Move right until pixel is outside circle
+     float curPointX_squared = 0.0f;
+     float curPointY_squared = (curPoint[1] - centerCorrection[1] ) * (curPoint[1] - centerCorrection[1] );
      while( curPointIsInside )
      {
         // increment posX and chec
         curPoint[0]++;
-        float len = sqrt(curPoint[0] * curPoint[0] + curPoint[1] * curPoint[1]);
-        if ( len > outer_radius )
+        curPointX_squared = (curPoint[0] - centerCorrection[0] ) * (curPoint[0] - centerCorrection[0] );
+        const float len = sqrt( curPointX_squared + curPointY_squared);
+        if ( len > fradius )
         {
            // found first Pixel in this horizontal line, that is outside the circle
            curPointIsInside = false;
@@ -139,8 +158,9 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      {
         // increment posX and chec
         curPoint[1]--;
-        float len = sqrt(curPoint[0] * curPoint[0] + curPoint[1] * curPoint[1]);
-        if ( len <= outer_radius )
+        curPointY_squared = (curPoint[1] - centerCorrection[1] ) * (curPoint[1] - centerCorrection[1] );
+        const float len = sqrt( curPointX_squared + curPointY_squared);
+        if ( len <= fradius )
         {
            // found first Pixel in this horizontal line, that is outside the circle
            curPointIsInside = true;

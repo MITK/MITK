@@ -96,11 +96,6 @@ void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
   m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
   m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
 
-  //initialize permanent registration widget
-  m_PermanentRegistrationToolSelectionWidget = m_Controls.m_PermanentRegistrationToolSelectionWidget;
-  m_PermanentRegistrationToolSelectionWidget->SetCheckboxtText("Use this tool for permanent registration");
-
-  
   //create widget for pointset recording
   m_Controls.m_PointSetRecordingLayout->addWidget(this->CreatePointSetRecordingWidget(parent));
 
@@ -132,16 +127,21 @@ void QmitkIGTTrackingLabView::CreateConnections()
   connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), m_RenderingTimerWidget, SLOT(EnableWidget()) );
   connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), this, SLOT(OnSetupNavigation()) );
 
+  connect( m_Controls.m_UseAsPointerButton, SIGNAL(clicked()), this, SLOT(OnInstrumentSelected()) );
+  connect( m_Controls.m_UseAsObjectmarkerButton, SIGNAL(clicked()), this, SLOT(OnObjectmarkerSelected()) );
+
+  
+  
+
   connect( m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
   connect( m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnRegisterFiducials()) );
 
   connect( m_RenderingTimerWidget, SIGNAL(Started()), this, SLOT(OnStartNavigation()) );
   connect( m_RenderingTimerWidget, SIGNAL(Stopped()), this, SLOT(OnStopNavigation()) );
 
-  connect( m_VirtualViewToolSelectionWidget, SIGNAL(SignalUseTool(int, bool)), this, SLOT(OnVirtualCamera(int, bool)));
+  //TODO
+  //connect( m_VirtualViewToolSelectionWidget, SIGNAL(SignalUseTool(int, bool)), this, SLOT(OnVirtualCamera(int, bool)));
   
-  connect( m_PermanentRegistrationToolSelectionWidget, SIGNAL(SignalUseTool(int, bool)), this, SLOT(OnPermanentRegistration(int, bool)) );
-
 }
 
 
@@ -173,7 +173,7 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     return;
   }
 
-  mitk::NavigationData::Pointer nd = m_Source->GetOutput(0);
+  mitk::NavigationData::Pointer nd = m_InstrumentNavigationData;
   
   if( nd.IsNull() || !nd->IsDataValid())
     QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
@@ -199,6 +199,51 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "Can not access Tracker Fiducials. Adding fiducial not possible!");
    
 
+}
+
+void QmitkIGTTrackingLabView::OnInstrumentSelected()
+{
+  if (m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource().IsNotNull())
+    {
+    m_InstrumentNavigationData = m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedToolID());
+    } 
+  else
+    {
+    m_Controls.m_PointerNameLabel->setText("<not available>");
+    return;
+    }
+  
+  if (m_InstrumentNavigationData.IsNotNull())
+    {
+    m_Controls.m_PointerNameLabel->setText(m_InstrumentNavigationData->GetName());
+    }
+  else
+    {
+    m_Controls.m_PointerNameLabel->setText("<not available>");
+    }
+}
+
+void QmitkIGTTrackingLabView::OnObjectmarkerSelected()
+{
+
+if (m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource().IsNotNull())
+    {
+    m_ObjectmarkerNavigationData = m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedToolID());
+    } 
+  else
+    {
+    m_Controls.m_ObjectmarkerNameLabel->setText("<not available>");
+    return;
+    }
+  
+  if (m_ObjectmarkerNavigationData.IsNotNull())
+    {
+    m_Controls.m_ObjectmarkerNameLabel->setText(m_ObjectmarkerNavigationData->GetName());
+    }
+  else
+    {
+    m_Controls.m_ObjectmarkerNameLabel->setText("<not available>");
+    }
 }
 
 void QmitkIGTTrackingLabView::OnSetupNavigation()
@@ -262,7 +307,6 @@ void QmitkIGTTrackingLabView::SetupIGTPipeline()
     mitk::DataNode::Pointer representation = this->CreateInstrumentVisualization(this->GetDefaultDataStorage(), toolName);
     m_PSRecToolSelectionComboBox->addItem(QString(toolName));
 
-    m_PermanentRegistrationToolSelectionWidget->AddToolName(QString(toolName));
     m_VirtualViewToolSelectionWidget->AddToolName(QString(toolName));
 
     m_Visualizer->SetRepresentationObject(i, representation->GetData());
@@ -503,7 +547,6 @@ void QmitkIGTTrackingLabView::OnToolLoaded(int index, mitk::DataNode::Pointer to
   m_PSRecToolSelectionComboBox->setItemText(index,toolNode->GetName().c_str());
 
   m_VirtualViewToolSelectionWidget->ChangeToolName(index, QString(toolNode->GetName().c_str()));
-  m_PermanentRegistrationToolSelectionWidget->ChangeToolName(index, QString(toolNode->GetName().c_str()));
 
   m_Visualizer->SetRepresentationObject(index, tempNode->GetData());
   m_Visualizer->Update();
@@ -584,12 +627,10 @@ void QmitkIGTTrackingLabView::RenderScene( )
         this->GetActiveStdMultiWidget()->MoveCrossToPosition(p);
       }
 
-      if(m_PermanentRegistrationToolSelectionWidget->IsSelectedToolActivated() && m_PermanentRegistrationToolSelectionWidget->GetCurrentSelectedIndex() >= 0 )
-      {
-        mitk::NavigationData::Pointer permRegTool = m_Source->GetOutput((unsigned int) m_PermanentRegistrationToolSelectionWidget->GetCurrentSelectedIndex());
+      mitk::NavigationData::Pointer permRegTool = this->m_ObjectmarkerNavigationData;
         
-        m_PermanentRegistrationFilter->SetSourceLandmarks(this->GetVirtualPointSetFromPosition(permRegTool));
-      }
+      m_PermanentRegistrationFilter->SetSourceLandmarks(this->GetVirtualPointSetFromPosition(permRegTool));
+      
 
       if(m_PointSetRecording && m_PSRecordingPointSet.IsNotNull())
       {
@@ -691,7 +732,6 @@ void QmitkIGTTrackingLabView::OnToolsAdded(QStringList toolsList)
     
     m_PSRecToolSelectionComboBox->addItem(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
     
-    m_PermanentRegistrationToolSelectionWidget->AddToolName(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
     m_VirtualViewToolSelectionWidget->AddToolName(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
 
     m_Visualizer->SetRepresentationObject(j, representation->GetData());

@@ -22,6 +22,12 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QToolBox" name="m_ToolBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>600</height>
+      </size>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -31,7 +37,7 @@
         <x>0</x>
         <y>0</y>
         <width>345</width>
-        <height>322</height>
+        <height>424</height>
        </rect>
       </property>
       <attribute name="label">
@@ -39,7 +45,14 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
-        <widget class="QmitkNavigationDataSourceSelectionWidget" name="m_TrackingDeviceSelectionWidget" native="true"/>
+        <widget class="QmitkNavigationDataSourceSelectionWidget" name="m_TrackingDeviceSelectionWidget" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>150</height>
+          </size>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QGroupBox" name="groupBox">
@@ -204,7 +217,7 @@
         <x>0</x>
         <y>0</y>
         <width>342</width>
-        <height>343</height>
+        <height>445</height>
        </rect>
       </property>
       <attribute name="label">
@@ -222,7 +235,7 @@
         <x>0</x>
         <y>0</y>
         <width>342</width>
-        <height>343</height>
+        <height>445</height>
        </rect>
       </property>
       <attribute name="label">
@@ -230,7 +243,69 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QmitkToolSelectionWidget" name="m_PermanentRegistrationToolSelectionWidget" native="true"/>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Current object marker:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="m_ObjectmarkerNameLabel2">
+           <property name="text">
+            <string>&lt;not available&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;Please fix object marker &lt;br&gt; on registered object.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_UsePermanentRegistrationToggle">
+         <property name="text">
+          <string>Activate permanent registration</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -240,7 +315,7 @@
         <x>0</x>
         <y>0</y>
         <width>342</width>
-        <height>343</height>
+        <height>445</height>
        </rect>
       </property>
       <attribute name="label">
@@ -258,7 +333,7 @@
         <x>0</x>
         <y>0</y>
         <width>342</width>
-        <height>343</height>
+        <height>445</height>
        </rect>
       </property>
       <attribute name="label">

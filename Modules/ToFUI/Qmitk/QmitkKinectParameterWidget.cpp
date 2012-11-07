@@ -73,17 +73,24 @@ void QmitkKinectParameterWidget::OnAcquisitionModeChanged()
   {
     // stop camera if active
     bool active = m_ToFImageGrabber->IsCameraActive();
-    if (active)
+    bool connected = m_ToFImageGrabber->IsCameraConnected();
+    if (connected)
     {
-      m_ToFImageGrabber->StopCamera();
+      if (active)
+      {
+        m_ToFImageGrabber->StopCamera();
+      }
       m_ToFImageGrabber->DisconnectCamera();
     }
     this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_RGB->isChecked());
     this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_IR->isChecked());
-    if (active)
+    if (connected)
     {
       m_ToFImageGrabber->ConnectCamera();
-      m_ToFImageGrabber->StartCamera();
+      if (active)
+      {
+        m_ToFImageGrabber->StartCamera();
+      }
     }
   }
 }

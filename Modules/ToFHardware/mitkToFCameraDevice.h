@@ -61,6 +61,10 @@ namespace mitk
     */
     virtual bool IsCameraActive();
     /*!
+    \brief returns true if the camera is connected
+    */
+    virtual bool IsCameraConnected();
+    /*!
     \brief updates the camera for image acquisition
     */
     virtual void UpdateCamera() = 0;

@@ -69,6 +69,7 @@ protected slots:
 
     void OnDrawCircle();
     void OnAddBundle();
+    void OnFlipButton();
     void GenerateFibers();
     void GenerateImage();
     void OnFiberDensityChanged(int value);
@@ -76,6 +77,7 @@ protected slots:
     void OnTensionChanged(double value);
     void OnContinuityChanged(double value);
     void OnBiasChanged(double value);
+    void JoinBundles();
 
 protected:
 
@@ -90,12 +92,36 @@ protected:
 
 private:
 
+    void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
     void EnableCrosshairNavigation();
     void DisableCrosshairNavigation();
     void NodeAdded( const mitk::DataNode* node );
+    void NodeRemoved(const mitk::DataNode* node);
 
-    mitk::Image::Pointer                            m_TissueMask;
-    mitk::DataNode::Pointer                         m_SelectedImage;
-    mitk::DataNode::Pointer                         m_SelectedBundle;
-    vector< mitk::DataNode::Pointer >               m_SelectedBundles;
+    struct QmitkPlanarFigureData
+    {
+        QmitkPlanarFigureData()
+            : m_Figure(0)
+            , m_EndPlacementObserverTag(0)
+            , m_SelectObserverTag(0)
+            , m_StartInteractionObserverTag(0)
+            , m_EndInteractionObserverTag(0)
+            , m_Flipped(0)
+        {
+        }
+
+        mitk::PlanarFigure* m_Figure;
+        unsigned int m_EndPlacementObserverTag;
+        unsigned int m_SelectObserverTag;
+        unsigned int m_StartInteractionObserverTag;
+        unsigned int m_EndInteractionObserverTag;
+        unsigned int m_Flipped;
+    };
+
+    std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;
+    mitk::Image::Pointer                                m_TissueMask;
+    mitk::DataNode::Pointer                             m_SelectedFiducial;
+    mitk::DataNode::Pointer                             m_SelectedImage;
+    mitk::DataNode::Pointer                             m_SelectedBundle;
+    vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
 };

@@ -43,6 +43,7 @@
 #include <mitkImageToItk.h>
 #include <mitkImageCast.h>
 #include <mitkImageGenerator.h>
+#include <mitkNodePredicateDataType.h>
 
 #include <QMessageBox>
 
@@ -66,20 +67,6 @@ QmitkFiberBasedSoftwarePhantomView::~QmitkFiberBasedSoftwarePhantomView()
 
 }
 
-struct QmitkPlanarFigureData
-{
-  QmitkPlanarFigureData()
-    : m_Figure(0), m_EndPlacementObserverTag(0), m_SelectObserverTag(0), m_StartInteractionObserverTag(0), m_EndInteractionObserverTag(0)
-  {
-  }
-
-  mitk::PlanarFigure* m_Figure;
-  unsigned int m_EndPlacementObserverTag;
-  unsigned int m_SelectObserverTag;
-  unsigned int m_StartInteractionObserverTag;
-  unsigned int m_EndInteractionObserverTag;
-};
-
 void QmitkFiberBasedSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
 {
     // build up qt view, unless already done
@@ -91,13 +78,14 @@ void QmitkFiberBasedSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
-        connect((QObject*) m_Controls->m_FiberButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnAddBundle()));
         connect((QObject*) m_Controls->m_CircleButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnDrawCircle()));
+        connect((QObject*) m_Controls->m_FlipButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnFlipButton()));
         connect((QObject*) m_Controls->m_FiberDensityBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberDensityChanged(int)));
         connect((QObject*) m_Controls->m_FiberSamplingBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberSamplingChanged(int)));
         connect((QObject*) m_Controls->m_TensionBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnTensionChanged(double)));
         connect((QObject*) m_Controls->m_ContinuityBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnContinuityChanged(double)));
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
+        connect((QObject*) m_Controls->m_JoinBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(JoinBundles()));
     }
 }
 
@@ -127,6 +115,23 @@ void QmitkFiberBasedSoftwarePhantomView::OnContinuityChanged(double value)
 
 void QmitkFiberBasedSoftwarePhantomView::OnBiasChanged(double value)
 {
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnFlipButton()
+{
+    if (m_SelectedFiducial.IsNull())
+        return;
+
+    std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it = m_DataNodeToPlanarFigureData.find(m_SelectedFiducial.GetPointer());
+    if( it != m_DataNodeToPlanarFigureData.end() )
+    {
+        QmitkPlanarFigureData& data = it->second;
+        data.m_Flipped += 1;
+        data.m_Flipped %= 2;
+    }
+
     if (m_Controls->m_RealTimeFibers->isChecked())
         GenerateFibers();
 }
@@ -228,7 +233,10 @@ void QmitkFiberBasedSoftwarePhantomView::OnAddBundle()
 void QmitkFiberBasedSoftwarePhantomView::OnDrawCircle()
 {
     if (m_SelectedBundle.IsNull())
+        OnAddBundle();
+    if (m_SelectedBundle.IsNull())
         return;
+
     mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundle);
 
     mitk::PlanarEllipse::Pointer figure = mitk::PlanarEllipse::New();
@@ -241,6 +249,8 @@ void QmitkFiberBasedSoftwarePhantomView::OnDrawCircle()
     for( int i=0; i<nodes.size(); i++)
         nodes.at(i)->SetSelected(false);
 
+    m_SelectedFiducial = node;
+
     QString name = QString("Fiducial_%1").arg(children->size());
     node->SetName(name.toStdString());
     node->SetSelected(true);
@@ -252,6 +262,8 @@ void QmitkFiberBasedSoftwarePhantomView::OnDrawCircle()
     if(figureInteractor.IsNull())
         figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
     mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+
+    UpdateGui();
 }
 
 void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
@@ -260,28 +272,42 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
         return;
 
     vector< vector< mitk::PlanarEllipse::Pointer > > fiducials;
+    vector< vector< unsigned int > > fliplist;
     for (int i=0; i<m_SelectedBundles.size(); i++)
     {
         mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundles.at(i));
         vector< mitk::PlanarEllipse::Pointer > fib;
+        vector< unsigned int > flip;
         for( mitk::DataStorage::SetOfObjects::const_iterator it = children->begin(); it != children->end(); ++it )
         {
             mitk::DataNode::Pointer node = *it;
 
             if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
+            {
                 fib.push_back(dynamic_cast<mitk::PlanarEllipse*>(node->GetData()));
+
+                std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it = m_DataNodeToPlanarFigureData.find(node.GetPointer());
+                if( it != m_DataNodeToPlanarFigureData.end() )
+                {
+                    QmitkPlanarFigureData& data = it->second;
+                    flip.push_back(data.m_Flipped);
+                }
+                else
+                    flip.push_back(0);
+            }
         }
         if (fib.size()>1)
-            fiducials.push_back(fib);
-        if (fib.size()<3)
         {
-//            QMessageBox::information(0, "Fiber generation not possible:", "At least 3 fiducials per bundle needed!");
-            return;
+            fiducials.push_back(fib);
+            fliplist.push_back(flip);
         }
+        if (fib.size()<3)
+            return;
     }
 
     itk::FibersFromPointsFilter::Pointer filter = itk::FibersFromPointsFilter::New();
     filter->SetFiducials(fiducials);
+    filter->SetFlipList(fliplist);
     filter->SetDensity(m_Controls->m_FiberDensityBox->value());
     filter->SetTension(m_Controls->m_TensionBox->value());
     filter->SetContinuity(m_Controls->m_ContinuityBox->value());
@@ -294,21 +320,12 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
     for (int i=0; i<fiberBundles.size(); i++)
     {
         m_SelectedBundles.at(i)->SetData( fiberBundles.at(i) );
-//        m_SelectedBundles.at(i)->SetVisibility(false);
-
         newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>(fiberBundles.at(i).GetPointer()));
     }
 
     if (newBundle->GetNumFibers()<=0)
-    {
-//        QMessageBox::warning(0, "Error:", "Generated fiber bundle contains no fibers!");
         return;
-    }
 
-//    mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
-//    fbNode->SetData(newBundle);
-//    fbNode->SetName("Synthetic_Bundle");
-//    GetDataStorage()->Add(fbNode);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -401,27 +418,58 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
     }
 }
 
+void QmitkFiberBasedSoftwarePhantomView::JoinBundles()
+{
+    if ( m_SelectedBundles.size()<2 ){
+        QMessageBox::information( NULL, "Warning", "Select at least two fiber bundles!");
+        MITK_WARN("QmitkFiberProcessingView") << "Select at least two fiber bundles!";
+        return;
+    }
+
+    std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
+    mitk::FiberBundleX::Pointer newBundle = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+    QString name("");
+    name += QString((*it)->GetName().c_str());
+    ++it;
+    for (it; it!=m_SelectedBundles.end(); ++it)
+    {
+        newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()));
+        name += "+"+QString((*it)->GetName().c_str());
+    }
+
+    mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
+    fbNode->SetData(newBundle);
+    fbNode->SetName(name.toStdString());
+    fbNode->SetVisibility(true);
+    GetDataStorage()->Add(fbNode);
+}
+
 void QmitkFiberBasedSoftwarePhantomView::UpdateGui()
 {
-    if (m_SelectedImage.IsNotNull())
-        m_Controls->m_FiberButton->setEnabled(true);
+    if (m_SelectedFiducial.IsNotNull())
+        m_Controls->m_FlipButton->setEnabled(true);
     else
-        m_Controls->m_FiberButton->setEnabled(false);
+        m_Controls->m_FlipButton->setEnabled(false);
+
+    if (m_SelectedImage.IsNotNull())
+        m_Controls->m_CircleButton->setEnabled(true);
+    else
+        m_Controls->m_CircleButton->setEnabled(false);
 
     if (m_SelectedBundle.IsNotNull())
-    {
         m_Controls->m_GenerateFibersButton->setEnabled(true);
-        m_Controls->m_CircleButton->setEnabled(true);
-    }
     else
-    {
         m_Controls->m_GenerateFibersButton->setEnabled(false);
-        m_Controls->m_CircleButton->setEnabled(false);
-    }
+
+    if (m_SelectedBundles.size()>1)
+        m_Controls->m_JoinBundlesButton->setEnabled(true);
+    else
+        m_Controls->m_JoinBundlesButton->setEnabled(false);
 }
 
 void QmitkFiberBasedSoftwarePhantomView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes )
 {
+    m_SelectedFiducial = NULL;
     m_TissueMask = NULL;
     m_SelectedBundles.clear();
     m_SelectedBundle = NULL;
@@ -452,6 +500,7 @@ void QmitkFiberBasedSoftwarePhantomView::OnSelectionChanged( berry::IWorkbenchPa
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
         {
+            m_SelectedFiducial = node;
             m_SelectedBundles.clear();
             mitk::DataStorage::SetOfObjects::ConstPointer parents = GetDataStorage()->GetSources(node);
             for( mitk::DataStorage::SetOfObjects::const_iterator it = parents->begin(); it != parents->end(); ++it )
@@ -483,7 +532,7 @@ void QmitkFiberBasedSoftwarePhantomView::EnableCrosshairNavigation()
     {
         MITK_DEBUG << "enabling linked navigation";
         linkedRenderWindow->EnableLinkedNavigation(true);
-//        linkedRenderWindow->EnableSlicingPlanes(true);
+        //        linkedRenderWindow->EnableSlicingPlanes(true);
     }
 
     if (m_Controls->m_RealTimeFibers->isChecked())
@@ -500,7 +549,31 @@ void QmitkFiberBasedSoftwarePhantomView::DisableCrosshairNavigation()
     {
         MITK_DEBUG << "disabling linked navigation";
         linkedRenderWindow->EnableLinkedNavigation(false);
-//        linkedRenderWindow->EnableSlicingPlanes(false);
+        //        linkedRenderWindow->EnableSlicingPlanes(false);
+    }
+}
+
+void QmitkFiberBasedSoftwarePhantomView::NodeRemoved(const mitk::DataNode* node)
+{
+    if (node == m_SelectedImage)
+        m_SelectedImage = NULL;
+    if (node == m_SelectedBundle)
+        m_SelectedBundle = NULL;
+
+    mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
+    std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it = m_DataNodeToPlanarFigureData.find(nonConstNode);
+
+    if( it != m_DataNodeToPlanarFigureData.end() )
+    {
+        QmitkPlanarFigureData& data = it->second;
+
+        // remove observers
+        data.m_Figure->RemoveObserver( data.m_EndPlacementObserverTag );
+        data.m_Figure->RemoveObserver( data.m_SelectObserverTag );
+        data.m_Figure->RemoveObserver( data.m_StartInteractionObserverTag );
+        data.m_Figure->RemoveObserver( data.m_EndInteractionObserverTag );
+
+        m_DataNodeToPlanarFigureData.erase( it );
     }
 }
 
@@ -534,17 +607,17 @@ void QmitkFiberBasedSoftwarePhantomView::NodeAdded( const mitk::DataNode* node )
         QmitkPlanarFigureData data;
         data.m_Figure = figure;
 
-//        // add observer for event when figure has been placed
+        //        // add observer for event when figure has been placed
         typedef itk::SimpleMemberCommand< QmitkFiberBasedSoftwarePhantomView > SimpleCommandType;
-//        SimpleCommandType::Pointer initializationCommand = SimpleCommandType::New();
-//        initializationCommand->SetCallbackFunction( this, &QmitkFiberBasedSoftwarePhantomView::PlanarFigureInitialized );
-//        data.m_EndPlacementObserverTag = figure->AddObserver( mitk::EndPlacementPlanarFigureEvent(), initializationCommand );
+        //        SimpleCommandType::Pointer initializationCommand = SimpleCommandType::New();
+        //        initializationCommand->SetCallbackFunction( this, &QmitkFiberBasedSoftwarePhantomView::PlanarFigureInitialized );
+        //        data.m_EndPlacementObserverTag = figure->AddObserver( mitk::EndPlacementPlanarFigureEvent(), initializationCommand );
 
-//        // add observer for event when figure is picked (selected)
-//        typedef itk::MemberCommand< QmitkMeasurementView > MemberCommandType;
-//        MemberCommandType::Pointer selectCommand = MemberCommandType::New();
-//        selectCommand->SetCallbackFunction( this, &QmitkFiberBasedSoftwarePhantomView::PlanarFigureSelected );
-//        data.m_SelectObserverTag = figure->AddObserver( mitk::SelectPlanarFigureEvent(), selectCommand );
+        // add observer for event when figure is picked (selected)
+        typedef itk::MemberCommand< QmitkFiberBasedSoftwarePhantomView > MemberCommandType;
+        MemberCommandType::Pointer selectCommand = MemberCommandType::New();
+        selectCommand->SetCallbackFunction( this, &QmitkFiberBasedSoftwarePhantomView::PlanarFigureSelected );
+        data.m_SelectObserverTag = figure->AddObserver( mitk::SelectPlanarFigureEvent(), selectCommand );
 
         // add observer for event when interaction with figure starts
         SimpleCommandType::Pointer startInteractionCommand = SimpleCommandType::New();
@@ -556,10 +629,32 @@ void QmitkFiberBasedSoftwarePhantomView::NodeAdded( const mitk::DataNode* node )
         endInteractionCommand->SetCallbackFunction( this, &QmitkFiberBasedSoftwarePhantomView::EnableCrosshairNavigation);
         data.m_EndInteractionObserverTag = figure->AddObserver( mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand );
 
+        m_DataNodeToPlanarFigureData[nonConstNode] = data;
     }
+}
+
+void QmitkFiberBasedSoftwarePhantomView::PlanarFigureSelected( itk::Object* object, const itk::EventObject& )
+{
+    mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPf = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
+
+    mitk::DataStorage::SetOfObjects::ConstPointer allPfs = this->GetDataStorage()->GetSubset( isPf );
+    for ( mitk::DataStorage::SetOfObjects::const_iterator it = allPfs->begin(); it!=allPfs->end(); ++it)
+    {
+        mitk::DataNode* node = *it;
+
+        if( node->GetData() == object )
+        {
+            node->SetSelected(true);
+            m_SelectedFiducial = node;
+        }
+        else
+            node->SetSelected(false);
+    }
+    UpdateGui();
+    this->RequestRenderWindowUpdate();
 }
 
 void QmitkFiberBasedSoftwarePhantomView::SetFocus()
 {
-    m_Controls->m_FiberButton->setFocus();
+    m_Controls->m_CircleButton->setFocus();
 }

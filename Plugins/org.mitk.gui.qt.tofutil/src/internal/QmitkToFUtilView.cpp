@@ -301,7 +301,7 @@ void QmitkToFUtilView::OnKinectAcquisitionModeChanged()
 {
   if (m_ToFCompositeFilter.IsNotNull()&&m_ToFImageGrabber.IsNotNull())
   {
-    if (m_SelectedCamera=="Microsoft Kinect")
+    if (m_SelectedCamera.contains("Kinect"))
     {
       if (m_ToFImageGrabber->GetBoolProperty("RGB"))
       {
@@ -335,7 +335,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
 
     std::string rgbFileName;
     m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
-    if ((m_SelectedCamera=="Microsoft Kinect")||(rgbFileName!=""))
+    if ((m_SelectedCamera.contains("Kinect"))||(rgbFileName!=""))
     {
       if (m_ToFImageGrabber->GetBoolProperty("RGB"))
       {
@@ -350,7 +350,9 @@ void QmitkToFUtilView::OnToFCameraStarted()
     {
       this->m_RGBImageNode = NULL;
       this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+      this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
       this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+      this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
     }
     this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
     this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
@@ -621,7 +623,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if (m_AmplitudeImageNode.IsNotNull())
   {
-    if ((m_SelectedCamera=="Microsoft Kinect")&&(m_ToFImageGrabber->GetBoolProperty("RGB")))
+    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("RGB")))
     {
       this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
     }
@@ -637,7 +639,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if (m_IntensityImageNode.IsNotNull())
   {
-    if (m_SelectedCamera=="Microsoft Kinect")
+    if (m_SelectedCamera.contains("Kinect"))
     {
       this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
     }
@@ -653,7 +655,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if ((m_RGBImageNode.IsNotNull()))
   {
-    if ((m_SelectedCamera=="Microsoft Kinect")&&(m_ToFImageGrabber->GetBoolProperty("IR")))
+    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("IR")))
     {
       this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
     }

@@ -98,8 +98,6 @@ void QmitkToFConnectionWidget2::OnSelectCamera()
 
   //getting the selectedCamera through a static Method used to transform the device->GetNameOfClass
   QString selectedCamera = QString::fromStdString(device->GetNameOfClass());
-  //Hide all ParameterWidgets
-  this->HideAllParameterWidgets();
 
   //reactivating the Widgets on slecting a device
   if (selectedCamera.contains("PMD")) //Check if selectedCamera string contains ".." for each device
@@ -148,6 +146,8 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
     //Getting the device- and the slectedCamera-variables using the ServiceListWidget as we did it in the CameraSelect-Method
     mitk::ToFCameraDevice* device = m_Controls->m_DeviceList->GetSelectedService<mitk::ToFCameraDevice>();
     QString selectedCamera = QString::fromStdString(device->GetNameOfClass());
+
+    emit ToFCameraSelected(selectedCamera);
 
     //Creating a new  inctace of m_ToFImageGrabber
     this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();

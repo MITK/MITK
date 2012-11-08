@@ -27,15 +27,26 @@ mitk::PointSet::PointSet()
 
 mitk::PointSet::PointSet(const PointSet &other): BaseData(other)
 {
+   // Copy overall geometry information 
+   this->SetGeometry(other.GetGeometry());   
+
+   // Copy geometry information of every single timestep
+   for (unsigned int t=0; t < other.GetTimeSteps(); t++)
+   {
+      this->SetClonedGeometry( other.GetGeometry(t) );
+   }
+
+   // Expand to desired amount of timesteps
    this->Expand(other.GetTimeSteps());
+
+   // Copy points
    for (unsigned int t=0; t < other.GetTimeSteps(); t++)
    {
       for (int i=0; i< other.GetSize(t); i++)
       {
          this->InsertPoint(i, other.GetPoint(i,t), t);
       }
-   }
-   this->SetGeometry(other.GetGeometry());   
+   }   
 }
 
 mitk::PointSet::~PointSet()

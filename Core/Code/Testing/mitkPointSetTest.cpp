@@ -599,7 +599,36 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   pointSet->ExecuteOperation(&op5);  
   mitkPointSetTestClass::TestPointContainerPointDataContainer(pointSet);
 
+  pointSet->Expand(3);
+  mitk::Point3D new0, new1, new2;
+  new0.Fill(0);
+  new1.Fill(1);
+  new2.Fill(2);
+  pointSet->InsertPoint(0,new0,1);
+  pointSet->InsertPoint(1,new1,1);
+  pointSet->InsertPoint(2,new2,1);
+  pointSet->InsertPoint(2,new0,2);
+  pointSet->InsertPoint(1,new1,2);
+  pointSet->InsertPoint(0,new2,2);
+
+
+  MITK_INFO << "... pointset ts: " << pointSet->GetTimeSteps();
   mitk::PointSet::Pointer clonePS = pointSet->Clone();
+  MITK_INFO << "... clone pointset ts: " << clonePS->GetTimeSteps();
+
+  for (int t=0; t< pointSet->GetTimeSteps(); t++)
+  {
+     MITK_INFO << "testing timestep: " << t;
+     for (int i=0; i<pointSet->GetSize(t); i++)
+     {
+        mitk::Point3D point = pointSet->GetPoint(i,t);
+        mitk::Point3D clonedPoint = clonePS->GetPoint(i,t);
+        MITK_INFO << point << " and " << clonedPoint;
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(point,clonedPoint), "Cloned PS and PS have same points");
+     }
+  }
+
+
   mitkPointSetTestClass::TestIsNotEmpty(clonePS);
   MITK_TEST_CONDITION_REQUIRED(clonePS->GetPointSetSeriesSize() == pointSet->GetPointSetSeriesSize(), "Testing cloned point set's size!");
   MITK_TEST_CONDITION_REQUIRED(clonePS.GetPointer() != pointSet.GetPointer(), "Testing that the clone is not the source PS!");

@@ -648,15 +648,36 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
 
-  std::string modality;
-  if ( node->GetStringProperty( "dicom.series.Modality", modality ) )
+  std::string photometricInterpretation; // DICOM tag telling us how pixel values should be displayed
+  if ( node->GetStringProperty( "dicom.pixel.PhotometricInterpretation", photometricInterpretation ) )
   {
     // modality provided by DICOM or other reader
-    if ( modality == "PT") // NOT a typo, PT is the abbreviation for PET used in DICOM
+    if ( photometricInterpretation.find("MONOCHROME1") != std::string::npos ) // meaning: display MINIMUM pixels as WHITE
     {
+      // generate LUT (white to black)
+      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+      vtkLookupTable* bwLut = mitkLut->GetVtkLookupTable();
+      bwLut->SetTableRange (0, 1); 
+      bwLut->SetSaturationRange (0, 0); 
+      bwLut->SetHueRange (0, 0); 
+      bwLut->SetValueRange (1, 0); 
+      bwLut->SetAlphaRange (1, 1); 
+      bwLut->SetRampToLinear();
+      bwLut->Build();
+      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+      mitkLutProp->SetLookupTable(mitkLut);
+      node->SetProperty( "LookupTable", mitkLutProp );
+
       node->SetProperty( "use color", mitk::BoolProperty::New( false ), renderer );
-      node->SetProperty( "opacity", mitk::FloatProperty::New( 0.5 ), renderer );
     }
+    else
+    if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK
+    {
+      // apply default LUT (black to white)
+      node->SetProperty( "use color", mitk::BoolProperty::New( true ), renderer );
+      node->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ), renderer );
+    }
+    // PALETTE interpretation should be handled ok by RGB loading
   }
 
   bool isBinaryImage(false);

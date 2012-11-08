@@ -147,6 +147,9 @@ const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsTo
     dictionary["0028|1050"] = "dicom.voilut.WindowCenter";
     dictionary["0028|1051"] = "dicom.voilut.WindowWidth";
     dictionary["0028|1055"] = "dicom.voilut.WindowCenterAndWidthExplanation";
+    
+    // Image Pixel module
+    dictionary["0028|0004"] = "dicom.pixel.PhotometricInterpretation";
 
     initialized = true;
   }

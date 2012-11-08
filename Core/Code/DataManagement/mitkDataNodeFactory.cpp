@@ -269,7 +269,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     const std::string &uid = n_it->first;
     DataNode::Pointer node = this->GetOutput(outputIndex);
 
-    MITK_INFO << "Reading series " << outputIndex << ": " << uid << std::endl;
+    MITK_INFO << "DataNodeFactory: Loading DICOM series " << outputIndex << ": " << uid << std::endl;
 
     if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node, true, true, true)) 
     {
@@ -291,7 +291,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     }
     else
     {
-      MITK_ERROR << "Skipping series " << outputIndex << " due to exception" << std::endl;
+      MITK_ERROR << "DataNodeFactory: Skipping series " << outputIndex << " due to some unspecified error..." << std::endl;
     }
 
     ProgressBar::GetInstance()->Progress();

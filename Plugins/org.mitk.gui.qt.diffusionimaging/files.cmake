@@ -127,6 +127,7 @@ set(CACHED_RESOURCE_FILES
   resources/qball.png
   resources/StreamlineTracking.png
   resources/dwi2.png
+  resources/refresh.xpm
 )
 
 set(QRC_FILES

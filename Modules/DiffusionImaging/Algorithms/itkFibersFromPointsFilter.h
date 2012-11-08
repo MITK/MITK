@@ -38,12 +38,13 @@ class FibersFromPointsFilter : public ProcessObject
 {
 public:
     typedef FibersFromPointsFilter Self;
-    typedef ProcessObject Superclass;
-    typedef SmartPointer< Self > Pointer;
-    typedef SmartPointer< const Self > ConstPointer;
-    typedef vector< vector< mitk::PlanarEllipse::Pointer > > FiducialListType;
-    typedef mitk::FiberBundleX::Pointer FiberType;
-    typedef vector< mitk::FiberBundleX::Pointer > FiberContainerType;
+    typedef ProcessObject                                       Superclass;
+    typedef SmartPointer< Self >                                Pointer;
+    typedef SmartPointer< const Self >                          ConstPointer;
+    typedef vector< vector< mitk::PlanarEllipse::Pointer > >    FiducialListType;
+    typedef vector< vector< unsigned int > >                    FlipListType;
+    typedef mitk::FiberBundleX::Pointer                         FiberType;
+    typedef vector< mitk::FiberBundleX::Pointer >               FiberContainerType;
 
     itkNewMacro(Self)
     itkTypeMacro( FibersFromPointsFilter, ProcessObject )
@@ -54,6 +55,7 @@ public:
         this->GenerateData();
     }
 
+    void SetFlipList(FlipListType fliplist){ m_FlipList = fliplist; }
     void SetFiducials(FiducialListType fiducials){ m_Fiducials = fiducials; }
     FiberContainerType GetFiberBundles(){ return m_FiberBundles; }
     itkSetMacro(Density, int)
@@ -68,6 +70,7 @@ protected:
     virtual ~FibersFromPointsFilter();
     void GeneratePoints();
 
+    FlipListType        m_FlipList;
     FiducialListType    m_Fiducials;
     FiberContainerType  m_FiberBundles;
     int                 m_Density;

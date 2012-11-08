@@ -92,6 +92,14 @@ void FibersFromPointsFilter::GenerateData()
 
         vector< mitk::PlanarEllipse::Pointer > bundle = m_Fiducials.at(i);
 
+        vector< unsigned int > fliplist;
+        if (i<m_FlipList.size())
+            fliplist = m_FlipList.at(i);
+        else
+            fliplist.resize(bundle.size(), 0);
+        if (fliplist.size()<bundle.size())
+            fliplist.resize(bundle.size(), 0);
+
         GeneratePoints();
         for (int j=0; j<m_Density; j++)
         {
@@ -197,6 +205,8 @@ void FibersFromPointsFilter::GenerateData()
 
                 // is flip needed?
                 if (dot_product(perp.GetVnlVector(),n2)>0 && dot_product(n,n2)<=0.00001)
+                    newP[0] *= -1;
+                if (fliplist.at(k)>0)
                     newP[0] *= -1;
                 n = n2;
 

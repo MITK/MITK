@@ -409,6 +409,7 @@ protected:
         \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
       */
       void AddFileToUnsortedBlock(const std::string& filename);
+      void AddFilesToUnsortedBlock(const StringContainer& filenames);
       
       /**
         \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.

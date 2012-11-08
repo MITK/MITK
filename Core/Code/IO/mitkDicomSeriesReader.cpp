@@ -64,6 +64,11 @@ void DicomSeriesReader::SliceGroupingAnalysisResult::AddFileToUnsortedBlock(cons
 {
   m_UnsortedFiles.push_back( filename );
 }
+      
+void DicomSeriesReader::SliceGroupingAnalysisResult::AddFilesToUnsortedBlock(const StringContainer& filenames)
+{
+  m_UnsortedFiles.insert( m_UnsortedFiles.end(), filenames.begin(), filenames.end() );
+}
 
 void DicomSeriesReader::SliceGroupingAnalysisResult::FlagGantryTilt()
 {
@@ -618,10 +623,15 @@ DicomSeriesReader::DICOMStringToPoint3D(const std::string& s, bool& successful)
     p[dim++]= atof(coordinate.c_str());
   }
 
-  if (dim != 3)
+  if (dim && dim != 3)
   {
     successful = false;
     MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0032). Found " << dim << " instead of 3 values.";
+  }
+  else if (dim == 0)
+  {
+    successful = false;
+    p.Fill(0.0); // assume default (0,0,0)
   }
 
   return p;
@@ -647,10 +657,21 @@ DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3
     }
   }
 
-  if (dim != 6)
+  if (dim && dim != 6)
   {
     successful = false;
     MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0037). Found " << dim << " instead of 6 values.";
+  }
+  else if (dim == 0)
+  {
+    // fill with defaults
+    right.Fill(0.0);
+    right[0] = 1.0;
+    
+    up.Fill(0.0);
+    up[1] = 1.0;
+
+    successful = false;
   }
 }
 
@@ -661,7 +682,9 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     bool groupImagesWithGantryTilt,
     const gdcm::Scanner::MappingType& tagValueMappings_)
 {
-  // TODO specify more clearly how we know about ITK and what we expect here!
+  // TODO we MUST notice here, what can or should be sorted by time,
+  //      because otherwise we'd group Secondary Capture images as 2D+t (all same position/orientation (=none), no acquisition times etc.)
+
   // result.first = files that fit ITK's assumption
   // result.second = files that do not fit, should be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption() again
   SliceGroupingAnalysisResult result;
@@ -694,6 +717,19 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     std::string thisOriginString;
     // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
     thisOriginString = ConstCharStarToString( tagValueMappings[fileIter->c_str()][tagImagePositionPatient] );
+
+    if (thisOriginString.empty())
+    {
+      // don't let such files be in a common group. Everything without position information will be loaded as a single slice:
+      // with standard DICOM files this can happen to: CR, DX, SC
+      MITK_DEBUG << "    ==> Sort away " << *fileIter << " for separate time step (no position information)"; // we already have one occupying this position
+      result.AddFileToSortedBlock( *fileIter );
+      StringContainer remainingFiles;
+      remainingFiles.insert( remainingFiles.end(), fileIter+1, files.end() );
+      result.AddFilesToUnsortedBlock( remainingFiles );
+      fileFitsIntoPattern = false;
+      break;
+    }
 
     bool ignoredConversionError(-42); // hard to get here, no graceful way to react
     thisOrigin = DICOMStringToPoint3D( thisOriginString, ignoredConversionError );
@@ -934,14 +970,13 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     groupsOfSimilarImages [ moreUniqueSeriesId ].push_back( fileIter->first );
   }
   
-  // PART II: sort slices spatially
+  // PART II: sort slices spatially (or at least consistently if this is NOT possible, see method)
 
   for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
   {
     try
     {
-    // TODO this must accept missing location and position information
-    groupsOfSimilarImages[ groupIter->first ] = SortSeriesSlices( groupIter->second  ); // sort each slice group spatially
+      groupsOfSimilarImages[ groupIter->first ] = SortSeriesSlices( groupIter->second  ); // sort each slice group spatially
     } catch(...)
     {
        MITK_ERROR << "Catched something.";
@@ -955,8 +990,8 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   //            * imitate itk::ImageSeriesReader: use the distance between the first two images as z-spacing
   //            * check what images actually fulfill ITK's z-spacing assumption
   //            * separate all images that fail the test into new blocks, re-iterate analysis for these blocks
+  //              * this includes images which DO NOT PROVIDE spatial information, i.e. all images w/o ImagePositionPatient will be loaded separately
 
-  // TODO this must accept missing location and position information
   UidFileNamesMap mapOf3DPlusTBlocks; // final result of this function
   for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
   {
@@ -1002,6 +1037,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     else
     {
       // sort 3D+t (as described in "PART IV")
+      // TODO this whole part must be tolerant to missing position information, too
       
       MITK_DEBUG << "================================================================================";
       MITK_DEBUG << "3D+t analysis:";
@@ -1113,7 +1149,8 @@ DicomSeriesReader::CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagVal
   }
   catch (std::exception& e)
   {
-    MITK_WARN << "Could not access tag " << tag << ": " << e.what();
+    // we are happy with even nothing, this will just group images of a series
+    //MITK_WARN << "Could not access tag " << tag << ": " << e.what();
   }
    
   return result;
@@ -1122,9 +1159,6 @@ DicomSeriesReader::CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagVal
 std::string 
 DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& tagValueMap )
 {
-  // TODO make sure this accepts all missing information
-  // TODO add imager pixel spacing
-
   const gdcm::Tag tagSeriesInstanceUID(0x0020,0x000e); // Series Instance UID
   const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // image orientation
   const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
@@ -1143,6 +1177,7 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfRows );
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfColumns );
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagPixelSpacing );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagImagerPixelSpacing );
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagSliceThickness );
   
   // be a bit tolerant for orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
@@ -1220,7 +1255,6 @@ DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_u
 DicomSeriesReader::StringContainer 
 DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
 {
-  // TODO this must accept missing location and position information
   /* we CAN expect a group of equal
      - series instance uid
      - image orientation
@@ -1230,6 +1264,10 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
      - number of rows/columns
 
      (each piece of information except the rows/columns might be missing)
+
+     sorting with GdcmSortFunction tries its best by sorting by spatial position
+     and more hints (acquisition number, acquisition time, trigger time) but will
+     always produce a sorting by falling back to SOP Instance UID.
   */
   gdcm::Sorter sorter;
 
@@ -1249,8 +1287,11 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
 bool 
 DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
 {
-  // TODO make sure we don't die when imagepositionpatient is not present (SC etc.)
-  // TODO this must accept missing location and position information
+  // This method MUST accept missing location and position information (and all else, too)
+  // because we cannot rely on anything
+  // (restriction on the sentence before: we have to provide consistent sorting, so we
+  // rely on the minimum information all DICOM files need to provide: SOP Instance UID)
+
   /* we CAN expect a group of equal
      - series instance uid
      - image orientation
@@ -1258,8 +1299,6 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
      - imager pixel spacing
      - slice thickness
      - number of rows/columns
-
-     (each piece of information except the rows/columns might be missing)
   */
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
   const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
@@ -1379,7 +1418,7 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
 
   // LAST RESORT: all valuable information for sorting is missing. 
   // Sort by some meaningless but unique identifiers to satisfy the sort function
-  const gdcm::Tag tagSOPInstanceUID(0x0018, 0x1060);
+  const gdcm::Tag tagSOPInstanceUID(0x0008, 0x0018);
   if (ds1.FindDataElement(tagSOPInstanceUID) && ds2.FindDataElement(tagSOPInstanceUID))
   {
     MITK_WARN << "Dicom images are missing attributes for a meaningful sorting, falling back to SOP instance UID comparison.";

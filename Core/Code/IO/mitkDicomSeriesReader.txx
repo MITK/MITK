@@ -203,6 +203,8 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     setlocale(LC_NUMERIC, previousCLocale);
     std::cin.imbue(previousCppLocale);
 
+    MITK_ERROR << "Caught exception in DicomSeriesReader::LoadDicom";
+
     throw e;
   }
 }
@@ -272,8 +274,8 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 void 
 DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdcm::Scanner& scanner)
 {
-  const gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
-  scanner.AddTag(ippTag);
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
+  scanner.AddTag(tagImagePositionPatient);
   
   const gdcm::Tag tagImageOrientation(0x0020,0x0037); //Image orientation
   scanner.AddTag(tagImageOrientation);
@@ -306,7 +308,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
   std::string firstPosition;
   unsigned int numberOfBlocks(0); // number of 3D image blocks
 
-  const gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
 
   // loop files to determine number of image blocks
   for (StringContainer::const_iterator fileIter = sorted_filenames.begin();
@@ -315,12 +317,15 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
   {
     gdcm::Scanner::TagToValue tagToValueMap = tagValueMappings.find( fileIter->c_str() )->second;
     
-    if(tagToValueMap.find(ippTag) == tagToValueMap.end())
+    if(tagToValueMap.find(tagImagePositionPatient) == tagToValueMap.end())
     {
-      continue;
+      // we expect to get images w/ missing position information ONLY as separated blocks.
+      assert( presortedFilenames.size() == 1 );
+      numberOfBlocks = 1;
+      break;
     }
     
-    std::string position = tagToValueMap.find(ippTag)->second;
+    std::string position = tagToValueMap.find(tagImagePositionPatient)->second;
     MITK_DEBUG << "  " << *fileIter << " at " << position;
     if (firstPosition.empty())
     {

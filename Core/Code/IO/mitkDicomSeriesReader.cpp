@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <gdcmStringFilter.h>
 #include <gdcmDirectory.h>
 #include <gdcmScanner.h>
+#include <gdcmUIDs.h>
 
 #include "mitkProperties.h"
 
@@ -35,13 +36,13 @@ namespace mitk
 typedef itk::GDCMSeriesFileNames DcmFileNamesGeneratorType;
 
 DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor()
-:m_HasGantryTilt(false)
+:m_HasGantryTiltCorrected(false)
 ,m_HasMultipleTimePoints(false)
 {
 }
 
 DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(const StringContainer& files)
-:m_HasGantryTilt(false)
+:m_HasGantryTiltCorrected(false)
 ,m_HasMultipleTimePoints(false)
 {
   m_Filenames = files;
@@ -78,10 +79,47 @@ std::string DicomSeriesReader::ImageBlockDescriptor::GetModality() const
   return m_Modality;
 }
 
-
-bool DicomSeriesReader::ImageBlockDescriptor::HasGantryTilt() const
+std::string DicomSeriesReader::ImageBlockDescriptor::GetSOPClassUIDAsString() const
 {
-  return m_HasGantryTilt;
+  gdcm::UIDs uidKnowledge;
+  uidKnowledge.SetFromUID( m_SOPClassUID.c_str() );
+  return uidKnowledge.GetName();
+}
+
+std::string DicomSeriesReader::ImageBlockDescriptor::GetSOPClassUID() const
+{
+  return m_SOPClassUID;
+}
+      
+std::string DicomSeriesReader::ImageBlockDescriptor::GetLoadability() const
+{
+  gdcm::UIDs uidKnowledge;
+  uidKnowledge.SetFromUID( m_SOPClassUID.c_str() );
+
+  gdcm::UIDs::TSType uid = uidKnowledge;
+    
+  switch (uid)
+  {
+    case gdcm::UIDs::CTImageStorage:
+    case gdcm::UIDs::MRImageStorage:
+    case gdcm::UIDs::PositronEmissionTomographyImageStorage:
+      return "ESTABLISHED";
+    case gdcm::UIDs::ComputedRadiographyImageStorage:
+    case gdcm::UIDs::DigitalXRayImageStorageForPresentation:
+    case gdcm::UIDs::DigitalXRayImageStorageForProcessing:
+    case gdcm::UIDs::SecondaryCaptureImageStorage:
+      return "IMPLEMENTED";
+    case gdcm::UIDs::NuclearMedicineImageStorage:
+      return "PARTLY_IMPLEMENTED";
+    default:
+      return "WITH_LUCK";
+  }
+}
+
+
+bool DicomSeriesReader::ImageBlockDescriptor::HasGantryTiltCorrected() const
+{
+  return m_HasGantryTiltCorrected;
 }
 
 /*
@@ -157,10 +195,15 @@ void DicomSeriesReader::ImageBlockDescriptor::SetModality(const std::string moda
   m_Modality = modality;
 }
 
-
-void DicomSeriesReader::ImageBlockDescriptor::SetHasGantryTilt(bool on)
+void DicomSeriesReader::ImageBlockDescriptor::SetSOPClassUID(const std::string sopClassUID)
 {
-  m_HasGantryTilt = on;
+  m_SOPClassUID = sopClassUID;
+}
+
+
+void DicomSeriesReader::ImageBlockDescriptor::SetHasGantryTiltCorrected(bool on)
+{
+  m_HasGantryTiltCorrected = on;
 }
       
 void DicomSeriesReader::ImageBlockDescriptor::SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing)
@@ -291,6 +334,10 @@ const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsTo
     
     // Image Pixel module
     dictionary["0028|0004"] = "dicom.pixel.PhotometricInterpretation";
+    
+    // Image Plane module
+    dictionary["0028|0030"] = "dicom.PixelSpacing";
+    dictionary["0018|1164"] = "dicom.ImagerPixelSpacing";
 
     initialized = true;
   }
@@ -1060,6 +1107,9 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
 
   // scan for relevant tags in dicom files
   gdcm::Scanner scanner;
+  const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP class UID
+    scanner.AddTag( tagSOPClassUID );
+
   const gdcm::Tag tagSeriesInstanceUID(0x0020,0x000e); // Series Instance UID
     scanner.AddTag( tagSeriesInstanceUID );
 
@@ -1174,7 +1224,8 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
 
       thisBlock.SetImageBlockUID( newGroupUID.str() );
       thisBlock.SetSeriesInstanceUID( "TODO" );
-      thisBlock.SetHasGantryTilt( analysisResult.ContainsGantryTilt() );
+      thisBlock.SetHasGantryTiltCorrected( analysisResult.ContainsGantryTilt() );
+      thisBlock.SetSOPClassUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagSOPClassUID ) ) );
       thisBlock.SetModality( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagModality ) ) );
       thisBlock.SetPixelSpacingInformation( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagPixelSpacing ) ),
                                             DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagImagerPixelSpacing ) ) );
@@ -1291,10 +1342,11 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   for ( FileNamesGrouping::const_iterator groupIter = groupsOf3DPlusTBlocks.begin(); groupIter != groupsOf3DPlusTBlocks.end(); ++groupIter )
   {
     ImageBlockDescriptor block = groupIter->second;
-    MITK_DEBUG << "  " << block.GetFilenames().size() << " '" << block.GetModality() << "' images in volume " << block.GetImageBlockUID();
-    MITK_DEBUG << "    (gantry tilt : " << (block.HasGantryTilt()?"yes":"no") << "; "
+    MITK_DEBUG << "  " << block.GetFilenames().size() << " '" << block.GetModality() << "' images (" << block.GetSOPClassUIDAsString() << ") in volume " << block.GetImageBlockUID();
+    MITK_DEBUG << "    (gantry tilt : " << (block.HasGantryTiltCorrected()?"yes":"no") << "; "
                        "pixel spacing : " << block.GetPixelSpacingType() << "; " 
-                       "3D+t: " << (block.HasMultipleTimePoints()?"yes":"no") << ")";
+                       "3D+t: " << (block.HasMultipleTimePoints()?"yes":"no") << "; "
+                       "loadability: " << block.GetLoadability() << ")";
     mapOf3DPlusTBlocks[ groupIter->first ] = groupIter->second.GetFilenames();
   }
   MITK_DEBUG << "================================================================================";
@@ -1626,14 +1678,14 @@ std::string DicomSeriesReader::GetConfigurationString()
   return configuration.str();
 }
 
-void DicomSeriesReader::CopyMetaDataToImageProperties(StringContainer filenames, const gdcm::Scanner::MappingType &tagValueMappings_, DcmIoType *io, Image *image)
+void DicomSeriesReader::CopyMetaDataToImageProperties(StringContainer filenames, const gdcm::Scanner::MappingType &tagValueMappings_, DcmIoType *io, const GantryTiltInformation& tiltInfo, Image *image)
 {
   std::list<StringContainer> imageBlock;
   imageBlock.push_back(filenames);
-  CopyMetaDataToImageProperties(imageBlock, tagValueMappings_, io, image);
+  CopyMetaDataToImageProperties(imageBlock, tagValueMappings_, io, tiltInfo, image);
 }
   
-void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_,  DcmIoType* io, Image* image)
+void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_,  DcmIoType* io, const GantryTiltInformation& tiltInfo, Image* image)
 {
   if (!io || !image) return;
 
@@ -1724,6 +1776,10 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
     }
     ++dictIter;
   }
+
+  // TODO get imageblockdescriptor here and add information as properties
+  image->SetProperty("dicomseriesreader.found_gantry_tilt", BoolProperty::New(tiltInfo.IsSheared()));
+  image->SetProperty("dicomseriesreader.found_correctable_gantry_tilt", BoolProperty::New(tiltInfo.IsRegularGantryTilt()));
 }
   
 

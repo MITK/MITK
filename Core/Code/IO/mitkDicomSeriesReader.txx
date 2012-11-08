@@ -34,15 +34,22 @@ namespace mitk
 template <typename PixelType>
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback)
 {
+  // TODO make callers happier by providing additional information in properties (such as meaning of spacing etc.)
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );
   std::locale l( "C" );
   std::cin.imbue(l);
-  
+
+  ImageBlockDescriptor imageBlockDescriptor;
+
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
   const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
-
+  const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP class UID
+  const gdcm::Tag tagModality(0x0008, 0x0060); // modality
+  const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
+  const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // imager pixel spacing
+ 
   try
   {
     mitk::Image::Pointer image = mitk::Image::New();
@@ -52,6 +59,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     /* special case for Philips 3D+t ultrasound images */ 
     if ( DicomSeriesReader::IsPhilips3DDicom(filenames.front().c_str())  )
     {
+      // TODO what about imageBlockDescriptor?
       ReadPhilips3DDicom(filenames.front().c_str(), image);
       initialize_node = true;
     }
@@ -67,6 +75,12 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       
       std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
+
+      imageBlockDescriptor.SetSeriesInstanceUID( "TODO" );
+      imageBlockDescriptor.SetSOPClassUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagSOPClassUID ) ) );
+      imageBlockDescriptor.SetModality( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagModality ) ) );
+      imageBlockDescriptor.SetPixelSpacingInformation( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagPixelSpacing ) ),
+                                                       ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagImagerPixelSpacing ) ) );
 
       GantryTiltInformation tiltInfo;
  
@@ -99,14 +113,20 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       {
         correctTilt = false; // we CANNOT do that
       }
+      
+      imageBlockDescriptor.SetHasGantryTiltCorrected( correctTilt );
 
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
         image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, command ); // load first 3D block
+        imageBlockDescriptor.AddFiles(imageBlocks.front()); // only the first part is loaded
+        imageBlockDescriptor.SetHasMultipleTimePoints( false );
         initialize_node = true;
       }
       else if (volume_count > 1)
       {
+        imageBlockDescriptor.AddFiles(filenames); // all is loaded
+        imageBlockDescriptor.SetHasMultipleTimePoints( true );
         // It is 3D+t! Read it and store into mitk image
         typedef itk::Image<PixelType, 4> ImageType;
         typedef itk::ImageSeriesReader<ImageType> ReaderType;
@@ -140,7 +160,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         gdcm::Scanner scanner;
         ScanForSliceInformation(filenames, scanner);
         
-        DicomSeriesReader::CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, image);
+        DicomSeriesReader::CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, tiltInfo, image);
 
         MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
                                             << image->GetDimension(1) << ", " 
@@ -207,7 +227,16 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
     throw e;
   }
-}
+
+  MITK_DEBUG << "--------------------------------------------------------------------------------";
+  MITK_DEBUG << "Series information after loading (UID " << imageBlockDescriptor.GetSeriesInstanceUID() << "):"
+             << "\n  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded"
+             << "\n  gantry tilt corrected: " << (imageBlockDescriptor.HasGantryTiltCorrected()?"yes":"no")
+             << "\n  pixel spacing type: " << imageBlockDescriptor.GetPixelSpacingType()
+             << "\n  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"yes":"no")
+             << "\n  loadability: " << imageBlockDescriptor.GetLoadability();
+  MITK_DEBUG << "--------------------------------------------------------------------------------";
+ }
 
 template <typename PixelType>
 Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, CallbackCommand* command )
@@ -245,7 +274,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   gdcm::Scanner scanner;
   ScanForSliceInformation(filenames, scanner);
   
-  DicomSeriesReader::CopyMetaDataToImageProperties( filenames, scanner.GetMappings(), io, image);
+  DicomSeriesReader::CopyMetaDataToImageProperties( filenames, scanner.GetMappings(), io, tiltInfo, image);
 
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
                                       << image->GetDimension(1) << ", " 
@@ -280,7 +309,6 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
   const gdcm::Tag tagImageOrientation(0x0020,0x0037); //Image orientation
   scanner.AddTag(tagImageOrientation);
 
-  // TODO what if tags don't exist?
   const gdcm::Tag tagSliceLocation(0x0020, 0x1041); // slice location
   scanner.AddTag( tagSliceLocation );
 
@@ -290,7 +318,19 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
   const gdcm::Tag tagSOPInstanceNumber(0x0008, 0x0018); // SOP instance number
   scanner.AddTag( tagSOPInstanceNumber );
 
-  scanner.Scan(filenames); // make available image position for each file
+  const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // Pixel Spacing
+  scanner.AddTag( tagPixelSpacing );
+  
+  const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // Imager Pixel Spacing
+  scanner.AddTag( tagImagerPixelSpacing );
+  
+  const gdcm::Tag tagModality(0x0008, 0x0060); // Modality
+  scanner.AddTag( tagModality );
+  
+  const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP Class UID
+  scanner.AddTag( tagSOPClassUID );
+ 
+  scanner.Scan(filenames); // make available image information for each file
 }
 
 std::list<DicomSeriesReader::StringContainer> 

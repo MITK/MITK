@@ -284,8 +284,13 @@ public:
       std::string GetSeriesInstanceUID() const;
       
       std::string GetModality() const;
+      
+      std::string GetSOPClassUIDAsString() const;
+      std::string GetSOPClassUID() const;
 
-      bool HasGantryTilt() const;
+      std::string GetLoadability() const;
+
+      bool HasGantryTiltCorrected() const;
       
       bool PixelSpacingRelatesToPatient() const;
       bool PixelSpacingRelatesToDetector() const;
@@ -304,8 +309,10 @@ public:
       void SetSeriesInstanceUID(const std::string uid);
       
       void SetModality(const std::string modality);
+      
+      void SetSOPClassUID(const std::string mediaStorageSOPClassUID);
 
-      void SetHasGantryTilt(bool);
+      void SetHasGantryTiltCorrected(bool);
       
       void SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
       
@@ -315,7 +322,8 @@ public:
       std::string m_ImageBlockUID;
       std::string m_SeriesInstanceUID;
       std::string m_Modality;
-      bool m_HasGantryTilt;
+      std::string m_SOPClassUID;
+      bool m_HasGantryTiltCorrected;
       std::string m_PixelSpacing;
       std::string m_ImagerPixelSpacing;
       bool m_HasMultipleTimePoints;
@@ -781,8 +789,8 @@ protected:
            and from the list of input files to the PropertyList of mitk::Image.
     \todo Tag copy must follow; image level will cause some additional files parsing, probably.
   */
-  static void CopyMetaDataToImageProperties( StringContainer filenames, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, Image* image);
-  static void CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, Image* image);
+  static void CopyMetaDataToImageProperties( StringContainer filenames, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const GantryTiltInformation& tiltInfo, Image* image);
+  static void CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const GantryTiltInformation& tiltInfo, Image* image);
   
   /**
     \brief Map between DICOM tags and MITK properties.

@@ -267,6 +267,62 @@ public:
   */
   typedef void (*UpdateCallBackMethod)(float);
 
+  class ImageBlockDescriptor
+  {
+    public:
+
+      ImageBlockDescriptor();
+      ImageBlockDescriptor(const StringContainer& files);
+
+      void AddFile(const std::string& file);
+      void AddFiles(const StringContainer& files);
+
+      StringContainer GetFilenames() const;
+
+      std::string GetImageBlockUID() const;
+      
+      std::string GetSeriesInstanceUID() const;
+      
+      std::string GetModality() const;
+
+      bool HasGantryTilt() const;
+      
+      bool PixelSpacingRelatesToPatient() const;
+      bool PixelSpacingRelatesToDetector() const;
+      bool PixelSpacingIsUnknown() const;
+
+      std::string GetPixelSpacingType() const;
+
+      bool HasMultipleTimePoints() const;
+
+    private:
+
+      friend class DicomSeriesReader;
+
+      void SetImageBlockUID(const std::string uid);
+      
+      void SetSeriesInstanceUID(const std::string uid);
+      
+      void SetModality(const std::string modality);
+
+      void SetHasGantryTilt(bool);
+      
+      void SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
+      
+      void SetHasMultipleTimePoints(bool);
+
+      StringContainer m_Filenames;
+      std::string m_ImageBlockUID;
+      std::string m_SeriesInstanceUID;
+      std::string m_Modality;
+      bool m_HasGantryTilt;
+      std::string m_PixelSpacing;
+      std::string m_ImagerPixelSpacing;
+      bool m_HasMultipleTimePoints;
+  };
+  
+  typedef std::map<std::string, ImageBlockDescriptor> FileNamesGrouping;
+
   /**
     \brief Provide combination of preprocessor defines that was active during compilation.
 

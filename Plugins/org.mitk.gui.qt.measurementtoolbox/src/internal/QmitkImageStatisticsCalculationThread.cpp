@@ -81,6 +81,11 @@ bool QmitkImageStatisticsCalculationThread::GetIgnoreZeroValueVoxel()
   return this->m_IgnoreZeros;
 }
 
+std::string QmitkImageStatisticsCalculationThread::GetLastErrorMessage()
+{
+  return m_message;
+}
+
 QmitkImageStatisticsCalculationThread::HistogramType::Pointer
 QmitkImageStatisticsCalculationThread::GetTimeStepHistogram()
 {
@@ -141,6 +146,11 @@ void QmitkImageStatisticsCalculationThread::run()
   try
   {
     statisticChanged = calculator->ComputeStatistics(m_TimeStep);
+  }
+  catch ( mitk::Exception& e)
+  {
+    m_message = e.GetDescription();
+    statisticCalculationSuccessful = false;
   }
   catch ( const std::runtime_error &e )
   {

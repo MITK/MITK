@@ -244,13 +244,12 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 
   if (m_Image.IsNull() )
   {
-    //itkExceptionMacro( << "Image not set!" );
-    return false;
+    mitkThrow() << "Image not set!";
   }
 
   if (!m_Image->IsInitialized())
   {
-    return false;
+    mitkThrow() << "Image not initialized!";
   }
 
   if ( m_Image->GetReferenceCount() == 1 )

@@ -1,6 +1,14 @@
 CMakeLists.txt.user*
 .clang_complete
 
+########## Git related
+
+# Patches and similar
+*.patch
+*.diff
+*.rej
+*.orig
+
 ########## IDE specific
 
 ## Office

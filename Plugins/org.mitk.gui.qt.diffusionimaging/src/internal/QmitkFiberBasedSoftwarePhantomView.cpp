@@ -76,10 +76,16 @@ void QmitkFiberBasedSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkFiberBasedSoftwarePhantomViewControls;
         m_Controls->setupUi( parent );
 
+        m_Controls->m_VarianceBox->setVisible(false);
+
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
         connect((QObject*) m_Controls->m_CircleButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnDrawCircle()));
         connect((QObject*) m_Controls->m_FlipButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnFlipButton()));
+
+        connect((QObject*) m_Controls->m_VarianceBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnVarianceChanged(double)));
+        connect((QObject*) m_Controls->m_DistributionBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnDistributionChanged(int)));
+
         connect((QObject*) m_Controls->m_FiberDensityBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberDensityChanged(int)));
         connect((QObject*) m_Controls->m_FiberSamplingBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberSamplingChanged(int)));
         connect((QObject*) m_Controls->m_TensionBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnTensionChanged(double)));
@@ -87,6 +93,23 @@ void QmitkFiberBasedSoftwarePhantomView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
         connect((QObject*) m_Controls->m_JoinBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(JoinBundles()));
     }
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnDistributionChanged(int value)
+{
+    if (value==1)
+        m_Controls->m_VarianceBox->setVisible(true);
+    else
+        m_Controls->m_VarianceBox->setVisible(false);
+
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberBasedSoftwarePhantomView::OnVarianceChanged(double value)
+{
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
 }
 
 void QmitkFiberBasedSoftwarePhantomView::OnFiberDensityChanged(int value)
@@ -308,6 +331,17 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateFibers()
     itk::FibersFromPointsFilter::Pointer filter = itk::FibersFromPointsFilter::New();
     filter->SetFiducials(fiducials);
     filter->SetFlipList(fliplist);
+
+    switch(m_Controls->m_DistributionBox->currentIndex()){
+    case 0:
+        filter->SetFiberDistribution(itk::FibersFromPointsFilter::DISTRIBUTE_UNIFORM);
+        break;
+    case 1:
+        filter->SetFiberDistribution(itk::FibersFromPointsFilter::DISTRIBUTE_GAUSSIAN);
+        filter->SetVariance(m_Controls->m_VarianceBox->value());
+        break;
+    }
+
     filter->SetDensity(m_Controls->m_FiberDensityBox->value());
     filter->SetTension(m_Controls->m_TensionBox->value());
     filter->SetContinuity(m_Controls->m_ContinuityBox->value());

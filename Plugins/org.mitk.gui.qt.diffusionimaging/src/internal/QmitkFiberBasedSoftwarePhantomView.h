@@ -78,6 +78,8 @@ protected slots:
     void OnContinuityChanged(double value);
     void OnBiasChanged(double value);
     void JoinBundles();
+    void OnVarianceChanged(double value);
+    void OnDistributionChanged(int value);
 
 protected:
 

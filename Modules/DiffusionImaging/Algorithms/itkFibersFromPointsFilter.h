@@ -37,6 +37,12 @@ namespace itk{
 class FibersFromPointsFilter : public ProcessObject
 {
 public:
+
+    enum FiberDistribution{
+        DISTRIBUTE_UNIFORM,
+        DISTRIBUTE_GAUSSIAN
+    };
+
     typedef FibersFromPointsFilter Self;
     typedef ProcessObject                                       Superclass;
     typedef SmartPointer< Self >                                Pointer;
@@ -63,6 +69,8 @@ public:
     itkSetMacro(Tension, double)
     itkSetMacro(Continuity, double)
     itkSetMacro(Bias, double)
+    itkSetMacro(FiberDistribution, FiberDistribution)
+    itkSetMacro(Variance, double)
 
 protected:
 
@@ -70,6 +78,7 @@ protected:
     virtual ~FibersFromPointsFilter();
     void GeneratePoints();
 
+    FiberDistribution   m_FiberDistribution;
     FlipListType        m_FlipList;
     FiducialListType    m_Fiducials;
     FiberContainerType  m_FiberBundles;
@@ -78,6 +87,7 @@ protected:
     double              m_Tension;
     double              m_Continuity;
     double              m_Bias;
+    double              m_Variance;
 
     vector< mitk::Vector2D > m_2DPoints;
 };

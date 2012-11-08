@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageDuplicator.h>
 #include <itkResampleImageFilter.h>
 #include <itkTimeProbe.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 // MISC
 #include <fstream>
@@ -48,6 +49,8 @@ FibersFromPointsFilter::FibersFromPointsFilter()
     , m_Tension(0)
     , m_Continuity(0)
     , m_Bias(0)
+    , m_FiberDistribution(DISTRIBUTE_UNIFORM)
+    , m_Variance(0.1)
 {
 
 }
@@ -60,15 +63,24 @@ FibersFromPointsFilter::~FibersFromPointsFilter()
 
 void FibersFromPointsFilter::GeneratePoints()
 {
-    srand(0);
+    Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
+    randGen->SetSeed((unsigned int)0);
     m_2DPoints.clear();
     int count = 0;
 
     while (count < m_Density)
     {
         mitk::Vector2D p;
-        p[0] = (float)(rand()%2001)/1000 - 1;
-        p[1] = (float)(rand()%2001)/1000 - 1;
+        switch (m_FiberDistribution) {
+            case DISTRIBUTE_GAUSSIAN:
+                p[0] = randGen->GetNormalVariate(0, m_Variance);
+                p[1] = randGen->GetNormalVariate(0, m_Variance);
+                break;
+            default:
+                p[0] = randGen->GetUniformVariate(-1, 1);
+                p[1] = randGen->GetUniformVariate(-1, 1);
+        }
+
         if (sqrt(p[0]*p[0]+p[1]*p[1]) <= 1)
         {
             m_2DPoints.push_back(p);

@@ -393,6 +393,14 @@ void QmitkImageStatisticsView::UpdateStatistics()
       // Compute statistics
       this->m_CalculationThread->start();
     }
+    catch ( const mitk::Exception& e)
+    {
+      std::stringstream message;
+      message << "<font color='red'>" << e.GetDescription() << "</font>";
+      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->show();
+      this->m_StatisticsUpdatePending = false;
+    }
     catch ( const std::runtime_error &e )
     {
       // In case of exception, print error message on GUI
@@ -487,9 +495,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
   else
   {
     m_Controls->m_SelectedMaskLabel->setText( "None" );
-    std::stringstream message;
-    message << "<font color='red'>Error calculating statistics!</font>";
-    m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+    m_Controls->m_ErrorMessageLabel->setText( m_CalculationThread->GetLastErrorMessage().c_str() );
     m_Controls->m_ErrorMessageLabel->show();
     // Clear statistics and histogram
     this->InvalidateStatisticsTableView();

@@ -85,8 +85,11 @@ public:
   /brief Method called once the thread is executed. */
   void run();
 
+  std::string GetLastErrorMessage();
+
 private:
   //member declaration
+
   mitk::Image::Pointer m_StatisticsImage;                         ///< member variable holds the input image for which the statistics need to be calculated.
   mitk::Image::Pointer m_BinaryMask;                              ///< member variable holds the binary mask image for segmentation image statistics calculation.
   mitk::PlanarFigure::Pointer m_PlanarFigureMask;                 ///< member variable holds the planar figure for segmentation image statistics calculation.
@@ -96,5 +99,6 @@ private:
   bool m_StatisticChanged;                                        ///< flag set if statistics have changed
   bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
   HistogramType::Pointer m_TimeStepHistogram;                     ///< member holds the histogram of the current time step.
+  std::string m_message;
 };
 #endif // QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED

@@ -57,6 +57,9 @@
      </item>
      <item>
       <widget class="QLabel" name="m_ErrorMessageLabel">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 0, 0);</string>
+       </property>
        <property name="text">
         <string>Error Message</string>
        </property>

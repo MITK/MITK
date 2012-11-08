@@ -434,13 +434,22 @@ int TestUnitilizedImage()
   /*****************************
   * loading uninitialized image to datastorage
   ******************************/
-  mitk::Image::Pointer image = mitk::Image::New();
-  mitk::DataNode::Pointer node = mitk::DataNode::New();
-  node->SetData(image);
+  std::cout << "Testing loading uninitialized image to datastorage:";
+  try{
+    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception)
+    mitk::Image::Pointer image = mitk::Image::New();
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(image);
 
-  mitk::ImageStatisticsCalculator::Pointer is = mitk::ImageStatisticsCalculator::New();
+    mitk::ImageStatisticsCalculator::Pointer is = mitk::ImageStatisticsCalculator::New();
+    is->ComputeStatistics();
+    MITK_TEST_FOR_EXCEPTION_END(mitk::Exception)
+  }
+  catch (mitk::Exception& e)
+  {
+    std::cout << "Success: Loading uninitialized image has thrown an exception." << std::endl;
+  }
 
-  MITK_TEST_CONDITION_REQUIRED( !is->ComputeStatistics(), "Try to compute statistics, even though the input image was not initialized." );
   return 0;
 }
 

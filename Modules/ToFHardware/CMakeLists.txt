@@ -1,25 +1,5 @@
 include(mitkToFHardware.cmake)
 
-#if(MITK_USE_TOF_PMDCAMCUBE)
-#  set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_PMD_SDK_DIR}/include)
-#  set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_PMD_LIB})
-#endif(MITK_USE_TOF_PMDCAMCUBE)
-
-#if(MITK_USE_TOF_O3)
-#  set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_PMD_SDK_DIR}/include)
-#  set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_PMD_LIB})
-#endif(MITK_USE_TOF_O3)
-
-#if(MITK_USE_TOF_PMDCAMBOARD)
-#  set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_PMD_SDK_DIR}/include)
-#  set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_PMD_LIB})
-#endif(MITK_USE_TOF_PMDCAMBOARD)
-
-#if(MITK_USE_TOF_MESASR4000)
-#  set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_MESA_SDK_DIR}/include)
-#  set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_MESA_LIB})
-#endif(MITK_USE_TOF_MESASR4000)
-
 MITK_CREATE_MODULE(mitkToFHardware
   SUBPROJECTS MITK-ToF
   INCLUDE_DIRS ${MITK_BIN_DIR}
@@ -33,16 +13,6 @@ add_subdirectory(Testing)
 add_subdirectory(Kinect)
 add_subdirectory(PMD)
 add_subdirectory(MesaSR4000)
-#add_subdirectory(PMDCamBoard)
-#add_subdirectory(PMD03D)
-#add_subdirectory()
-#add_subdirectory()
-
-
-#set(tofhardwaresubfolder_dirs
-#    Kinect
-#    Testing
-#)
 
 #foreach(tofhardwaresubfolder_dir ${tofhardwaresubfolder_dirs})
 #  add_subdirectory(${tofhardwaresubfolder_dirs})

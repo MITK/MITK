@@ -199,7 +199,7 @@ void QmitkToFPointSetWidget::CleanUpWidget()
   if (m_Controls->pointSetButton->isChecked())
   {
     m_Controls->pointSetButton->setChecked(false);
-    this->OnMeasurement();
+    this->OnPointSet();
   }
   // remove observer
   if (m_MeasurementPointSet2D.IsNotNull())

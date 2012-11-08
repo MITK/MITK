@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*
   * This is the module activator for the "ToFHardware" module. It registers services
   * like the IToFDeviceFactory.
-  */
+*/
 
 namespace mitk
 {

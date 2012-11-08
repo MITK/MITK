@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 //mitk headers
-#include <mitkToFImageGrabber.h>
+#include "mitkToFImageGrabber.h"
 
 /**
 * @brief Widget allowing to connect to different ToF / range cameras (located in module ToFProcessing)
@@ -39,6 +39,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget2 :public QWidget
   Q_OBJECT
 
   public:
+
 
     static const std::string VIEW_ID;
 

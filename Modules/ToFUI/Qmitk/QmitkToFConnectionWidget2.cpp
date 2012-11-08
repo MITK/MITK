@@ -56,6 +56,8 @@ void QmitkToFConnectionWidget2::CreateQtPartControl(QWidget *parent)   //Definit
     // create GUI widgets
     m_Controls = new Ui::QmitkToFConnectionWidgetControls2;
     m_Controls->setupUi(parent);
+    //and hide them on startup
+    this->HideAllParameterWidgets();
 
     // initzializing MitkServiceListWidget here
     std::string empty= "";
@@ -78,7 +80,7 @@ void QmitkToFConnectionWidget2::CreateConnections()
 
     /*Creating an other Datanode structur for Kinect is done here: As soon as a Kinect is connected, the KinectParameterWidget is enabled,
     which can be used to trigger the KinectAcqusitionModeChanged-Method, to create a working Data-Node-structure*/
-   connect( m_Controls->m_KinectParameterWidget, SIGNAL(AcquisitionModeChanged()), this, SIGNAL(KinectAcquisitionModeChanged()) );
+    connect( m_Controls->m_KinectParameterWidget, SIGNAL(AcquisitionModeChanged()), this, SIGNAL(KinectAcquisitionModeChanged()) );
 
   }
 }
@@ -102,14 +104,17 @@ void QmitkToFConnectionWidget2::OnSelectCamera()
   //reactivating the Widgets on slecting a device
   if (selectedCamera.contains("PMD")) //Check if selectedCamera string contains ".." for each device
   {
+    this->HideAllParameterWidgets();
     this->m_Controls->m_PMDParameterWidget->show(); //and activate the correct widget
   }
   else if (selectedCamera.contains("MESA"))
   {
+    this->HideAllParameterWidgets();
     this->m_Controls->m_MESAParameterWidget->show();
   }
   else if (selectedCamera.contains("Kinect"))
   {
+    this->HideAllParameterWidgets();
     this->m_Controls->m_KinectParameterWidget->show();
   }
   emit  (selectedCamera);
@@ -131,7 +136,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
   //After connecting a device
   if (m_Controls->m_ConnectCameraButton->text()=="Connect")
   {
-    //Disabling some GUI-Elements
+    //Reset the status of some GUI-Elements
     m_Controls->m_ConnectCameraButton->setEnabled(false); //ConnectCameraButton gets disabled, what leads to other changes later
     m_Controls->m_DeviceList->setEnabled(false);          //Deactivating the Instance of QmitkServiceListWidget
     //repaint the widget
@@ -140,7 +145,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
     QString tmpFileName("");
     QString fileFilter("");
 
-    //Getting the device- and the slectedCamera-Variables using the ServiceListWidget as we did it in the CameraSelect-Method
+    //Getting the device- and the slectedCamera-variables using the ServiceListWidget as we did it in the CameraSelect-Method
     mitk::ToFCameraDevice* device = m_Controls->m_DeviceList->GetSelectedService<mitk::ToFCameraDevice>();
     QString selectedCamera = QString::fromStdString(device->GetNameOfClass());
 
@@ -153,7 +158,7 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
     // Calling Alex FixForKinect, if the Kinect is selected
     if (selectedCamera.contains("Kinect") )
     {
-      MITK_INFO<< "Kinect connected";
+      MITK_INFO<< "Kinect is connected here";
       //If the particular property is selected, the suitable data-node will be generated
       this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());//--------------------------------------------------------
       this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());

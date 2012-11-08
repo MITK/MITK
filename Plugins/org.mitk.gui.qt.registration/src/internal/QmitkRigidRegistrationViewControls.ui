@@ -609,10 +609,10 @@
                           <string/>
                          </property>
                          <property name="minimum">
-                          <number>-256</number>
+                          <number>-10000</number>
                          </property>
                          <property name="maximum">
-                          <number>256</number>
+                          <number>10000</number>
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
@@ -622,10 +622,10 @@
                        <item>
                         <widget class="QSlider" name="m_YTransSlider">
                          <property name="minimum">
-                          <number>-256</number>
+                          <number>-10000</number>
                          </property>
                          <property name="maximum">
-                          <number>256</number>
+                          <number>10000</number>
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
@@ -635,10 +635,10 @@
                        <item>
                         <widget class="QSlider" name="m_ZTransSlider">
                          <property name="minimum">
-                          <number>-256</number>
+                          <number>-10000</number>
                          </property>
                          <property name="maximum">
-                          <number>256</number>
+                          <number>10000</number>
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
@@ -861,10 +861,10 @@
                           <string/>
                          </property>
                          <property name="minimum">
-                          <number>-20</number>
+                          <number>-180</number>
                          </property>
                          <property name="maximum">
-                          <number>20</number>
+                          <number>180</number>
                          </property>
                          <property name="singleStep">
                           <number>1</number>
@@ -886,10 +886,10 @@
                        <item>
                         <widget class="QSlider" name="m_YScaleSlider">
                          <property name="minimum">
-                          <number>-20</number>
+                          <number>-180</number>
                          </property>
                          <property name="maximum">
-                          <number>20</number>
+                          <number>180</number>
                          </property>
                          <property name="pageStep">
                           <number>1</number>
@@ -902,10 +902,10 @@
                        <item>
                         <widget class="QSlider" name="m_ZScaleSlider">
                          <property name="minimum">
-                          <number>-20</number>
+                          <number>-180</number>
                          </property>
                          <property name="maximum">
-                          <number>20</number>
+                          <number>180</number>
                          </property>
                          <property name="pageStep">
                           <number>1</number>

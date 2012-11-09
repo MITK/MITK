@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 template< class ScalarType >
-class MitkDiffusionImaging_EXPORT ScalarModel : public DiffusionSignalModel< ScalarType >
+class ScalarModel : public DiffusionSignalModel< ScalarType >
 {
 public:
 

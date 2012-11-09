@@ -123,7 +123,6 @@ set(CPP_FILES
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
-
 )
 
 set(H_FILES
@@ -239,7 +238,11 @@ set(H_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
   Algorithms/Connectomics/itkConnectomicsNetworkToConnectivityMatrixImageFilter.h
 
-
+  SignalModels/mitkDiffusionSignalModel.h
+  SignalModels/mitkTensorModel.h
+  SignalModels/mitkScalarModel.h
+  SignalModels/mitkDiffusionNoiseModel.h
+  SignalModels/mitkRicianNoiseModel.h
 )
 
 set( TOOL_FILES

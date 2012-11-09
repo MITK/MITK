@@ -20,13 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK
 #include <mitkFiberBundleX.h>
+#include <mitkDiffusionSignalModel.h>
+#include <mitkDiffusionNoiseModel.h>
 
 // ITK
 #include <itkImage.h>
 #include <itkVectorImage.h>
 #include <itkProcessObject.h>
 #include <itkImageSource.h>
-#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 typedef itk::VectorImage< short, 3 > DWIImageType;
 
@@ -46,28 +47,26 @@ public:
     typedef itk::DiffusionTensor3D< float >                 ItkTensorType;
     typedef itk::Image<ItkTensorType,3>                     ItkTensorImageType;
     typedef mitk::FiberBundleX::Pointer                     FiberBundleType;
-    typedef Vector<double,3>                                GradientType;
-    typedef std::vector<GradientType>                       GradientListType;
-    typedef itk::Matrix<double, 3, 3>                       MatrixType;
     typedef itk::VectorImage< double, 3 >                   DoubleDwiType;
+    typedef std::vector< DiffusionSignalModel<double>* >    DiffusionModelList;
+    typedef itk::Matrix<double, 3, 3>                       MatrixType;
+    typedef mitk::DiffusionNoiseModel<double>               NoiseModelType;
 
     itkNewMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
     itkSetMacro(FiberBundle, FiberBundleType)
-    void SetGradientList(GradientListType gradientList) {m_GradientList = gradientList; }
-
-    itkSetMacro( MaxCrossingComplexity, int )
-    itkSetMacro( MinCrossingAngle, double )
-    itkSetMacro( BValue, float )
-    itkSetMacro( KernelFA, float )
-    itkSetMacro( SNR, double )
+    itkSetMacro( FiberBaseline, double )
+    itkSetMacro( NonFiberBaseline, double )
     itkSetMacro( Spacing, mitk::Vector3D )
     itkSetMacro( Origin, mitk::Point3D )
     itkSetMacro( DirectionMatrix, MatrixType )
     itkSetMacro( ImageRegion, ImageRegion<3> )
     itkSetMacro( TissueMask, ItkUcharImgType::Pointer )
+    void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }
+    void SetFiberModels(DiffusionModelList modelList){ m_FiberModels = modelList; }
+    void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }
 
     void GenerateData();
 
@@ -78,31 +77,22 @@ protected:
     itk::Point<float, 3> GetItkPoint(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
-    DoubleDwiType::PixelType SimulateMeasurement(ItkTensorType& tensor, double baseline);
     void AddNoise(DoubleDwiType::PixelType& pix);
-    double GetTensorL2Norm(itk::DiffusionTensor3D<float>& T);
 
     mitk::Vector3D                      m_Spacing;
     mitk::Point3D                       m_Origin;
-    itk::Matrix<double, 3, 3>           m_DirectionMatrix;
+    MatrixType                          m_DirectionMatrix;
     ImageRegion<3>                      m_ImageRegion;
-    float                               m_BValue;
-    OutputImageType::Pointer            m_DiffusionImage;
 
-    float                               m_KernelFA;
-    double                              m_NoiseVariance;
-    double                              m_SNR;
-    double                              m_WhiteMatterBaseline;
-    double                              m_CsfBaseline;
+    double                              m_FiberBaseline;
+    double                              m_NonFiberBaseline;
     ItkUcharImgType::Pointer            m_TissueMask;
 
-    int                                 m_MaxCrossingComplexity;
-    double                              m_MinCrossingAngle;
-    Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
-    double                              m_MaxBaseline;
-
-    GradientListType                    m_GradientList;
     FiberBundleType                     m_FiberBundle;
+
+    DiffusionModelList                  m_FiberModels;
+    DiffusionModelList                  m_NonFiberModels;
+    NoiseModelType*                     m_NoiseModel;
 };
 }
 

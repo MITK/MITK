@@ -754,7 +754,7 @@ protected:
   template <typename PixelType>
   static 
   Image::Pointer 
-  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, CallbackCommand* command = NULL);
+  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command = NULL);
 
   /**
     \brief Sort files into time step blocks of a 3D+t image.
@@ -789,8 +789,8 @@ protected:
            and from the list of input files to the PropertyList of mitk::Image.
     \todo Tag copy must follow; image level will cause some additional files parsing, probably.
   */
-  static void CopyMetaDataToImageProperties( StringContainer filenames, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const GantryTiltInformation& tiltInfo, Image* image);
-  static void CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const GantryTiltInformation& tiltInfo, Image* image);
+  static void CopyMetaDataToImageProperties( StringContainer filenames, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image);
+  static void CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image);
   
   /**
     \brief Map between DICOM tags and MITK properties.

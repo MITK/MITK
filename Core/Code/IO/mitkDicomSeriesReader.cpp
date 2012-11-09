@@ -1678,14 +1678,14 @@ std::string DicomSeriesReader::GetConfigurationString()
   return configuration.str();
 }
 
-void DicomSeriesReader::CopyMetaDataToImageProperties(StringContainer filenames, const gdcm::Scanner::MappingType &tagValueMappings_, DcmIoType *io, const GantryTiltInformation& tiltInfo, Image *image)
+void DicomSeriesReader::CopyMetaDataToImageProperties(StringContainer filenames, const gdcm::Scanner::MappingType &tagValueMappings_, DcmIoType *io, const ImageBlockDescriptor& blockInfo, Image *image)
 {
   std::list<StringContainer> imageBlock;
   imageBlock.push_back(filenames);
-  CopyMetaDataToImageProperties(imageBlock, tagValueMappings_, io, tiltInfo, image);
+  CopyMetaDataToImageProperties(imageBlock, tagValueMappings_, io, blockInfo, image);
 }
   
-void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_,  DcmIoType* io, const GantryTiltInformation& tiltInfo, Image* image)
+void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_,  DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image)
 {
   if (!io || !image) return;
 
@@ -1777,9 +1777,12 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
     ++dictIter;
   }
 
-  // TODO get imageblockdescriptor here and add information as properties
-  image->SetProperty("dicomseriesreader.found_gantry_tilt", BoolProperty::New(tiltInfo.IsSheared()));
-  image->SetProperty("dicomseriesreader.found_correctable_gantry_tilt", BoolProperty::New(tiltInfo.IsRegularGantryTilt()));
+  // copy imageblockdescriptor as properties
+  image->SetProperty("dicomseriesreader.SOPClass", StringProperty::New(blockInfo.GetSOPClassUIDAsString()));
+  image->SetProperty("dicomseriesreader.Loadability", StringProperty::New(blockInfo.GetLoadability()));
+  image->SetProperty("dicomseriesreader.GantyTiltCorrected", BoolProperty::New(blockInfo.HasGantryTiltCorrected()));
+  image->SetProperty("dicomseriesreader.3D+t", BoolProperty::New(blockInfo.HasMultipleTimePoints()));
+  image->SetProperty("dicomseriesreader.PixelSpacingType", StringProperty::New(blockInfo.GetPixelSpacingType()));
 }
   
 

@@ -118,9 +118,15 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
-        image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, command ); // load first 3D block
+
+        DcmIoType::Pointer io;
+        image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, io, command ); // load first 3D block
+
         imageBlockDescriptor.AddFiles(imageBlocks.front()); // only the first part is loaded
         imageBlockDescriptor.SetHasMultipleTimePoints( false );
+
+        CopyMetaDataToImageProperties( imageBlocks.front(), scanner.GetMappings(), io, imageBlockDescriptor, image);
+
         initialize_node = true;
       }
       else if (volume_count > 1)
@@ -160,7 +166,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         gdcm::Scanner scanner;
         ScanForSliceInformation(filenames, scanner);
         
-        DicomSeriesReader::CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, tiltInfo, image);
+        CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, imageBlockDescriptor, image);
 
         MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
                                             << image->GetDimension(1) << ", " 
@@ -239,7 +245,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
  }
 
 template <typename PixelType>
-Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, CallbackCommand* command )
+Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command )
 {
   /******** Normal Case, 3D (also for GDCM < 2 usable) ***************/
   mitk::Image::Pointer image = mitk::Image::New();
@@ -247,7 +253,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   typedef itk::Image<PixelType, 3> ImageType;
   typedef itk::ImageSeriesReader<ImageType> ReaderType;
 
-  DcmIoType::Pointer io = DcmIoType::New();
+  io = DcmIoType::New();
   typename ReaderType::Pointer reader = ReaderType::New();
 
   reader->SetImageIO(io);
@@ -270,11 +276,6 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   
   image->InitializeByItk(readVolume.GetPointer());
   image->SetImportVolume(readVolume->GetBufferPointer());
-
-  gdcm::Scanner scanner;
-  ScanForSliceInformation(filenames, scanner);
-  
-  DicomSeriesReader::CopyMetaDataToImageProperties( filenames, scanner.GetMappings(), io, tiltInfo, image);
 
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
                                       << image->GetDimension(1) << ", " 

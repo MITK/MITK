@@ -29,6 +29,9 @@ class  MitkDiffusionImaging_EXPORT DiffusionNoiseModel
 {
 public:
 
+    DiffusionNoiseModel(){}
+    ~DiffusionNoiseModel(){}
+
     typedef itk::VariableLengthVector< ScalarType > PixelType;
 
     virtual void AddNoise(PixelType& pixel) = 0;

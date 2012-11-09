@@ -29,6 +29,9 @@ class  MitkDiffusionImaging_EXPORT DiffusionSignalModel
 {
 public:
 
+    DiffusionSignalModel(){}
+    ~DiffusionSignalModel(){}
+
     typedef itk::VariableLengthVector< ScalarType > PixelType;
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;

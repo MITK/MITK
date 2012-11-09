@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ namespace berry
 struct IConfigurationElement;
 
 /**
- * Interface for executable extension classes that require access to 
+ * Interface for executable extension classes that require access to
  * their configuration element, or implement an extension adapter.
  * <p>
  * Extension adapters are typically required in cases where the extension
@@ -41,20 +41,20 @@ struct IConfigurationElement;
  * <p>
  * Clients may implement this interface.
  * </p>
- * 
- * @see IConfigurationElement#createExecutableExtension 
+ *
+ * @see IConfigurationElement#createExecutableExtension
  * @since 3.0
  */
 struct IExecutableExtension {
   /**
    * This method is called by the implementation of the method
    * <code>IConfigurationElement.createExecutableExtension</code>
-   * on a newly constructed extension, passing it its relevant configuration 
-   * information. Most executable extensions only make use of the first 
+   * on a newly constructed extension, passing it its relevant configuration
+   * information. Most executable extensions only make use of the first
    * two call arguments.
    * <p>
-   * Regular executable extensions specify their Java implementation 
-   * class name as an attribute of the configuration element for the 
+   * Regular executable extensions specify their Java implementation
+   * class name as an attribute of the configuration element for the
    * extension. For example
    * <pre>
    *     &lt;action run="com.example.BaseAction"/&gt;
@@ -119,20 +119,20 @@ struct IExecutableExtension {
    * </ul>
    * </p>
    *
-   * @param config the configuration element used to trigger this execution. 
+   * @param config the configuration element used to trigger this execution.
    *    It can be queried by the executable extension for specific
    *    configuration properties
    * @param propertyName the name of an attribute of the configuration element
    *    used on the <code>createExecutableExtension(String)</code> call. This
    *    argument can be used in the cases where a single configuration element
    *    is used to define multiple executable extensions.
-   * @param data adapter data in the form of a <code>String</code>, 
+   * @param data adapter data in the form of a <code>String</code>,
    *    a <code>Hashtable</code>, or <code>null</code>.
    * @exception CoreException if error(s) detected during initialization processing
    * @see IConfigurationElement#createExecutableExtension
    */
   virtual void SetInitializationData(SmartPointer<IConfigurationElement> config, const std::string& propertyName, Object::Pointer data) = 0;
-  
+
   virtual ~IExecutableExtension() {};
 };
 

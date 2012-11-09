@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,7 +26,7 @@ namespace berry {
 
 ServiceRegistry::~ServiceRegistry()
 {
-  
+
 }
 
 void ServiceRegistry::RegisterService(const std::string& id, Service::Pointer service)
@@ -34,7 +34,7 @@ void ServiceRegistry::RegisterService(const std::string& id, Service::Pointer se
   Poco::Mutex::ScopedLock lock(m_Mutex);
   if (m_ServiceMap.find(id) != m_ServiceMap.end())
     throw Poco::ExistsException("The following service is already registered:", id);
-  
+
   m_ServiceMap[id] = service;
   //BERRY_INFO << "Service " << id << " registered\n";
 }

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -78,7 +78,7 @@ QStringList QmitkSegmentationView::GetDefaultOrganColorString()
 void QmitkSegmentationView::UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color color)
 {
   QString listElement( organname + QColor(color.GetRed() * 255 , color.GetGreen() * 255 , color.GetBlue() * 255).name() );
-  
+
   // remove previous definition if necessary
   int oldIndex = organColors.indexOf( QRegExp(QRegExp::escape(organname) + "#......", Qt::CaseInsensitive));
   if (oldIndex < 0 || organColors.at(oldIndex) != listElement )

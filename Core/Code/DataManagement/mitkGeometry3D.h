@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,32 +50,32 @@ typedef itk::AffineGeometryFrame<ScalarType, 3> AffineGeometryFrame3D;
 //##Documentation
 //## @brief Describes the geometry of a data object
 //##
-//## At least, it can return the bounding box of the data object. 
+//## At least, it can return the bounding box of the data object.
 //##
-//## The class holds 
-//## \li a bounding box which is axes-parallel in intrinsic coordinates 
-//## (often integer indices of pixels), to be accessed by 
+//## The class holds
+//## \li a bounding box which is axes-parallel in intrinsic coordinates
+//## (often integer indices of pixels), to be accessed by
 //## GetBoundingBox()
-//## \li a transform to convert intrinsic coordinates into a 
-//## world-coordinate system with coordinates in millimeters 
-//## and milliseconds (all are floating point values), to 
+//## \li a transform to convert intrinsic coordinates into a
+//## world-coordinate system with coordinates in millimeters
+//## and milliseconds (all are floating point values), to
 //## be accessed by GetIndexToWorldTransform()
-//## \li a life span, i.e. a bounding box in time in ms (with 
-//## start and end time), to be accessed by GetTimeBounds(). 
+//## \li a life span, i.e. a bounding box in time in ms (with
+//## start and end time), to be accessed by GetTimeBounds().
 //## The default is minus infinity to plus infinity.
 //##
-//## Geometry3D and its sub-classes allow converting between 
-//## intrinsic coordinates (called index or unit coordinates) 
-//## and world-coordinates (called world or mm coordinates), 
+//## Geometry3D and its sub-classes allow converting between
+//## intrinsic coordinates (called index or unit coordinates)
+//## and world-coordinates (called world or mm coordinates),
 //## e.g. WorldToIndex.
 //## In case you need integer index coordinates, provide an
-//## mitk::Index3D (or itk::Index) as target variable to 
+//## mitk::Index3D (or itk::Index) as target variable to
 //## WorldToIndex, otherwise you will get a continuous index
 //## (floating point values).
 //##
-//## An important sub-class is SlicedGeometry3D, which descibes 
+//## An important sub-class is SlicedGeometry3D, which descibes
 //## data objects consisting of slices, e.g., objects of type Image.
-//## Conversions between world coordinates (in mm) and unit coordinates 
+//## Conversions between world coordinates (in mm) and unit coordinates
 //## (e.g., pixels in the case of an Image) can be performed.
 //##
 //## For more information on related classes, see \ref Geometry.
@@ -84,13 +84,13 @@ typedef itk::AffineGeometryFrame<ScalarType, 3> AffineGeometryFrame3D;
 //## different definition of corners, see SetImageGeometry. This
 //## is usualy automatically called by Image.
 //##
-//## Geometry3D have to be initialized in the method GenerateOutputInformation() 
-//## of BaseProcess (or CopyInformation/ UpdateOutputInformation of BaseData, 
+//## Geometry3D have to be initialized in the method GenerateOutputInformation()
+//## of BaseProcess (or CopyInformation/ UpdateOutputInformation of BaseData,
 //## if possible, e.g., by analyzing pic tags in Image) subclasses. See also
 //## itk::ProcessObject::GenerateOutputInformation(),
 //## itk::DataObject::CopyInformation() and
 //## itk::DataObject::UpdateOutputInformation().
-//## 
+//##
 //## Rule: everything is in mm (ms) if not stated otherwise.
 //## @ingroup Geometry
 class MITK_CORE_EXPORT Geometry3D : public AffineGeometryFrame3D, public OperationActor
@@ -107,15 +107,15 @@ public:
   // a bit of a misuse, but we want only doxygen to see the following:
 #ifdef DOXYGEN_SKIP
   //##Documentation
-  //## @brief Get the transformation used to convert from index 
+  //## @brief Get the transformation used to convert from index
   //## to world coordinates
   itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
 #endif
-  //## @brief Set the transformation used to convert from index 
+  //## @brief Set the transformation used to convert from index
   //## to world coordinates
   virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
   //##Documentation
-  //## @brief Convenience method for setting the ITK transform 
+  //## @brief Convenience method for setting the ITK transform
   //## (m_IndexToWorldTransform) via an vtkMatrix4x4
   //## \sa SetIndexToWorldTransform
   virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
@@ -123,7 +123,7 @@ public:
 #ifdef DOXYGEN_SKIP
   //##Documentation
   //## @brief Get bounding box (in index/unit coordinates)
-  itkGetConstObjectMacro(BoundingBox, BoundingBoxType); 
+  itkGetConstObjectMacro(BoundingBox, BoundingBoxType);
   //##Documentation
   //## @brief Get bounding box (in index/unit coordinates) as a BoundsArrayType
   const BoundsArrayType GetBounds() const
@@ -134,7 +134,7 @@ public:
   //##Documentation
   //## \brief Set the bounding box (in index/unit coordinates)
   //##
-  //## Only possible via the BoundsArray to make clear that a 
+  //## Only possible via the BoundsArray to make clear that a
   //## copy of the bounding-box is stored, not a reference to it.
 virtual void SetBounds(const BoundsArrayType& bounds);
 #endif
@@ -154,7 +154,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##Documentation
   //## @brief Checks, if the given geometry can be converted to 2D without information loss
   //## e.g. when a 2D image is saved, the matrix is usually cropped to 2x2, and when you load it back to MITK
-  //## it will be filled with standard values. This function checks, if information would be lost during this 
+  //## it will be filled with standard values. This function checks, if information would be lost during this
   //## procedure
   virtual bool Is2DConvertable();
 
@@ -181,7 +181,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##Documentation
   //## @brief Get vector along bounding-box in the specified @a direction in mm
   //##
-  //## The length of the vector is the size of the bounding-box in the 
+  //## The length of the vector is the size of the bounding-box in the
   //## specified @a direction in mm
   //## \sa GetMatrixColumn
   Vector3D GetAxisVector(unsigned int direction) const
@@ -194,16 +194,16 @@ virtual void SetBounds(const BoundsArrayType& bounds);
 
   //##Documentation
   //## @brief Get the center of the bounding-box in mm
-  //## 
-  Point3D GetCenter() const 
-  {    
+  //##
+  Point3D GetCenter() const
+  {
     assert(m_BoundingBox.IsNotNull());
-    return m_IndexToWorldTransform->TransformPoint(m_BoundingBox->GetCenter());  
+    return m_IndexToWorldTransform->TransformPoint(m_BoundingBox->GetCenter());
   }
 
   //##Documentation
   //## @brief Get the squared length of the diagonal of the bounding-box in mm
-  //## 
+  //##
   double GetDiagonalLength2() const
   {
     Vector3D diagonalvector = GetCornerPoint()-GetCornerPoint(false, false, false);
@@ -212,14 +212,14 @@ virtual void SetBounds(const BoundsArrayType& bounds);
 
   //##Documentation
   //## @brief Get the length of the diagonal of the bounding-box in mm
-  //## 
+  //##
   double GetDiagonalLength() const
   {
     return sqrt(GetDiagonalLength2());
   }
 
   //##Documentation
-  //## @brief Get a VnlVector along bounding-box in the specified 
+  //## @brief Get a VnlVector along bounding-box in the specified
   //## @a direction, length is spacing
   //##
   //## \sa GetAxisVector
@@ -276,13 +276,13 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##Documentation
   //## @brief Compose new IndexToWorldTransform with a given transform.
   //##
-  //## This method composes m_IndexToWorldTransform with another transform, 
-  //## modifying self to be the composition of self and other. 
-  //## If the argument pre is true, then other is precomposed with self; 
-  //## that is, the resulting transformation consists of first applying 
-  //## other to the source, followed by self. If pre is false or omitted, 
-  //## then other is post-composed with self; that is the resulting 
-  //## transformation consists of first applying self to the source, 
+  //## This method composes m_IndexToWorldTransform with another transform,
+  //## modifying self to be the composition of self and other.
+  //## If the argument pre is true, then other is precomposed with self;
+  //## that is, the resulting transformation consists of first applying
+  //## other to the source, followed by self. If pre is false or omitted,
+  //## then other is post-composed with self; that is the resulting
+  //## transformation consists of first applying self to the source,
   //## followed by other.
   virtual void Compose( const AffineGeometryFrame3D::TransformType * other, bool pre = 0 );
 
@@ -309,7 +309,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   }
 
   //##Documentation
-  //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates 
+  //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates
   //## \warning If you need (discrete) integer index coordinates (e.g., for iterating easily over an image),
   //## use WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index).
   //## For further information about coordinates types, please see the Geometry documentation
@@ -321,27 +321,27 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   void IndexToWorld(const mitk::Point3D& pt_units, mitk::Point3D& pt_mm) const;
 
   //##Documentation
-  //## @brief Convert world coordinates (in mm) of a \em vector 
+  //## @brief Convert world coordinates (in mm) of a \em vector
   //## \a vec_mm to (continuous!) index coordinates.
   //## @deprecated First parameter (Point3D) is not used. If possible, please use void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const.
   //## For further information about coordinates types, please see the Geometry documentation
   void WorldToIndex(const mitk::Point3D& atPt3d_mm, const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
 
   //##Documentation
-  //## @brief Convert world coordinates (in mm) of a \em vector 
+  //## @brief Convert world coordinates (in mm) of a \em vector
   //## \a vec_mm to (continuous!) index coordinates.
   //## For further information about coordinates types, please see the Geometry documentation
   void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
 
   //##Documentation
-  //## @brief Convert (continuous or discrete) index coordinates of a \em vector 
+  //## @brief Convert (continuous or discrete) index coordinates of a \em vector
   //## \a vec_units to world coordinates (in mm)
   //## @deprecated First parameter (Point3D) is not used. If possible, please use void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const.
   //## For further information about coordinates types, please see the Geometry documentation
   void IndexToWorld(const mitk::Point3D& atPt3d_units, const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
 
   //##Documentation
-  //## @brief Convert (continuous or discrete) index coordinates of a \em vector 
+  //## @brief Convert (continuous or discrete) index coordinates of a \em vector
   //## \a vec_units to world coordinates (in mm)
   //## For further information about coordinates types, please see the Geometry documentation
   void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
@@ -369,20 +369,20 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   }
 
   //##Documentation
-  //## @brief Deprecated for use with ITK version 3.10 or newer. 
-  //## Convert world coordinates (in mm) of a \em point to 
+  //## @brief Deprecated for use with ITK version 3.10 or newer.
+  //## Convert world coordinates (in mm) of a \em point to
   //## ITK physical coordinates (in mm, but without a possible rotation)
   //##
   //## This method is useful if you have want to access an mitk::Image
-  //## via an itk::Image. ITK v3.8 and older did not support rotated (tilted) 
-  //## images, i.e., ITK images are always parallel to the coordinate axes. 
+  //## via an itk::Image. ITK v3.8 and older did not support rotated (tilted)
+  //## images, i.e., ITK images are always parallel to the coordinate axes.
   //## When accessing a (possibly rotated) mitk::Image via an itk::Image
-  //## the rotational part of the transformation in the Geometry3D is 
-  //## simply discarded; in other word: only the origin and spacing is 
+  //## the rotational part of the transformation in the Geometry3D is
+  //## simply discarded; in other word: only the origin and spacing is
   //## used by ITK, not the complete matrix available in MITK.
-  //## With WorldToItkPhysicalPoint you can convert an MITK world 
+  //## With WorldToItkPhysicalPoint you can convert an MITK world
   //## coordinate (including the rotation) into a coordinate that
-  //## can be used with the ITK image as a ITK physical coordinate 
+  //## can be used with the ITK image as a ITK physical coordinate
   //## (excluding the rotation).
   template<class TCoordRep>
   void WorldToItkPhysicalPoint(const mitk::Point3D& pt_mm,
@@ -392,8 +392,8 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   }
 
   //##Documentation
-  //## @brief Deprecated for use with ITK version 3.10 or newer. 
-  //## Convert ITK physical coordinates of a \em point (in mm, 
+  //## @brief Deprecated for use with ITK version 3.10 or newer.
+  //## Convert ITK physical coordinates of a \em point (in mm,
   //## but without a rotation) into MITK world coordinates (in mm)
   //##
   //## For more information, see WorldToItkPhysicalPoint.
@@ -421,7 +421,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //## The position of a voxel is defined by the position of its center.
   //## If we would use the origin (position of the (center of) the first
   //## voxel) as a corner and display this point, it would seem to be
-  //## \em not at the corner but a bit within the image. Even worse for 
+  //## \em not at the corner but a bit within the image. Even worse for
   //## the opposite corner of the image: here the corner would appear
   //## outside the image (by half of the voxel diameter). Thus, we have
   //## to correct for this and to be able to do that, we need to know
@@ -437,7 +437,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   }
 
   //##Documentation
-  //## @brief Test whether the point \a p (world coordinates in mm) is 
+  //## @brief Test whether the point \a p (world coordinates in mm) is
   //## inside the bounding box
   bool IsInside(const mitk::Point3D& p) const
   {
@@ -447,7 +447,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   }
 
   //##Documentation
-  //## @brief Test whether the point \a p ((continous!)index coordinates in units) is 
+  //## @brief Test whether the point \a p ((continous!)index coordinates in units) is
   //## inside the bounding box
   bool IsIndexInside(const mitk::Point3D& index) const
   {
@@ -475,7 +475,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
     }
     else
       inside = m_BoundingBox->IsInside(index);
-    
+
     return inside;
   }
 
@@ -518,35 +518,35 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   itkSetMacro(FrameOfReferenceID, unsigned int);
 
   //##Documentation
-  //## @brief Copy the ITK transform 
+  //## @brief Copy the ITK transform
   //## (m_IndexToWorldTransform) to the VTK transform
   //## \sa SetIndexToWorldTransform
   void TransferItkToVtkTransform();
 
   //##Documentation
-  //## @brief Copy the VTK transform 
+  //## @brief Copy the VTK transform
   //## to the ITK transform (m_IndexToWorldTransform)
   //## \sa SetIndexToWorldTransform
   void TransferVtkToItkTransform();
 
   //##Documentation
   //## @brief Get the parametric bounding-box
-  //## 
+  //##
   //## See AbstractTransformGeometry for an example usage of this.
   itkGetConstObjectMacro(ParametricBoundingBox, BoundingBox);
   //##Documentation
   //## @brief Get the parametric bounds
-  //## 
+  //##
   //## See AbstractTransformGeometry for an example usage of this.
   const BoundingBox::BoundsArrayType& GetParametricBounds() const
   {
     assert(m_ParametricBoundingBox.IsNotNull());
     return m_ParametricBoundingBox->GetBounds();
   }
- 
+
   //##Documentation
   //## @brief Get the parametric extent
-  //## 
+  //##
   //## See AbstractTransformGeometry for an example usage of this.
   mitk::ScalarType GetParametricExtent(int direction) const
   {
@@ -556,10 +556,10 @@ virtual void SetBounds(const BoundsArrayType& bounds);
     BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
     return bounds[direction*2+1]-bounds[direction*2];
   }
- 
+
   //##Documentation
   //## @brief Get the parametric extent in mm
-  //## 
+  //##
   //## See AbstractTransformGeometry for an example usage of this.
   virtual mitk::ScalarType GetParametricExtentInMM(int direction) const
   {
@@ -568,7 +568,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
 
   //##Documentation
   //## @brief Get the parametric transform
-  //## 
+  //##
   //## See AbstractTransformGeometry for an example usage of this.
   virtual const Transform3D* GetParametricTransform() const
   {
@@ -576,7 +576,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   }
 
   //##Documentation
-  //## @brief Calculates a bounding-box around the geometry relative 
+  //## @brief Calculates a bounding-box around the geometry relative
   //## to a coordinate system defined by a transform
   //##
   mitk::BoundingBox::Pointer CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform) const;
@@ -595,7 +595,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
 
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)
-  virtual void ExecuteOperation(Operation* operation); 
+  virtual void ExecuteOperation(Operation* operation);
 
 protected:
   Geometry3D();
@@ -617,7 +617,7 @@ protected:
 
   //##Documentation
   //## @brief Set the parametric bounds
-  //## 
+  //##
   //## Protected in this class, made public in some sub-classes, e.g.,
   //## ExternAbstractTransformGeometry.
   virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
@@ -632,11 +632,11 @@ protected:
   mutable mitk::TimeBounds m_TimeBounds;
 
   vtkMatrix4x4* m_VtkMatrix;
-  
+
   bool m_ImageGeometry;
 
   //##Documentation
-  //## @brief Spacing of the data. Only significant if the geometry describes 
+  //## @brief Spacing of the data. Only significant if the geometry describes
   //## an Image (m_ImageGeometry==true).
   mitk::Vector3D m_Spacing;
 

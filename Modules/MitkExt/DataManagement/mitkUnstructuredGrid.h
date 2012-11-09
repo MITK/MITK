@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,32 +34,32 @@ class MitkExt_EXPORT UnstructuredGrid : public BaseData
 
 public:
   // not yet the best choice of a region-type for surfaces, but it works for the time being
-  typedef itk::ImageRegion< 5 >  RegionType;  
-  
+  typedef itk::ImageRegion< 5 >  RegionType;
+
   mitkClassMacro(UnstructuredGrid, BaseData);
-  
+
   itkNewMacro(Self);
 
   mitkCloneMacro(UnstructuredGrid);
-  
+
   virtual void SetVtkUnstructuredGrid(vtkUnstructuredGrid* grid, unsigned int t = 0);
-  
+
   virtual vtkUnstructuredGrid* GetVtkUnstructuredGrid(unsigned int t = 0);
-  
+
   virtual void UpdateOutputInformation();
-  
+
   virtual void SetRequestedRegionToLargestPossibleRegion();
-  
+
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-  
+
   virtual bool VerifyRequestedRegion();
- 
+
   virtual void SetRequestedRegion(itk::DataObject *data);
 
   virtual void SetRequestedRegion(UnstructuredGrid::RegionType *region);
 
   virtual void CopyInformation(const itk::DataObject *data);
-  
+
   virtual void Update();
 
   // Initialize should not be called manually;
@@ -87,11 +87,11 @@ public:
 protected:
 
   typedef std::vector< vtkUnstructuredGrid* > VTKUnstructuredGridSeries;
- 
+
   UnstructuredGrid();
 
   UnstructuredGrid(const mitk::UnstructuredGrid & other);
-  
+
   virtual ~UnstructuredGrid();
 
   virtual void ClearData();
@@ -103,7 +103,7 @@ protected:
   mutable RegionType m_LargestPossibleRegion;
 
   RegionType m_RequestedRegion;
-  
+
   bool m_CalculateBoundingBox;
 };
 

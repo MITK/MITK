@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsSimulatedAnnealingPermutationBase.h"
 
-mitk::ConnectomicsSimulatedAnnealingPermutationBase::ConnectomicsSimulatedAnnealingPermutationBase() 
+mitk::ConnectomicsSimulatedAnnealingPermutationBase::ConnectomicsSimulatedAnnealingPermutationBase()
 : m_CostFunction( 0 )
 {
 }
@@ -25,7 +25,7 @@ mitk::ConnectomicsSimulatedAnnealingPermutationBase::~ConnectomicsSimulatedAnnea
 {
 }
 
-void mitk::ConnectomicsSimulatedAnnealingPermutationBase::SetCostFunction( 
+void mitk::ConnectomicsSimulatedAnnealingPermutationBase::SetCostFunction(
   mitk::ConnectomicsSimulatedAnnealingCostFunctionBase::Pointer costFunction )
 {
   m_CostFunction = costFunction;

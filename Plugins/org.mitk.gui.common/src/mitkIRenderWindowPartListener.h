@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,7 +46,7 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPartListener
    * \param renderWindowPart The newly activated IRenderWindowPart.
    */
   virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) = 0;
-  
+
   /**
    * Called when a IRenderWindowPart becomes invisible and if it was active before.
    *

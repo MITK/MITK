@@ -3,11 +3,11 @@
 #
 # Example:
 # mitkFunctionCheckMitkCompatibility(VERSIONS MITK_VERSION_PLUGIN_SYSTEM 1 REQUIRED)
-#   
+#
 function(mitkFunctionCheckMitkCompatibility)
 
   macro_parse_arguments(_COMPAT "VERSIONS" "REQUIRED" ${ARGN})
-  
+
   set(_is_version_name 1)
   foreach(_item ${_COMPAT_VERSIONS})
     if(_is_version_name)

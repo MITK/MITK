@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,14 +40,14 @@ mitk::VtkWidgetRendering::VtkWidgetRendering()
 {
   m_Renderer = vtkRenderer::New();
 }
- 
+
 
 mitk::VtkWidgetRendering::~VtkWidgetRendering()
 {
   if ( m_RenderWindow != NULL )
     if ( this->IsEnabled() )
       this->Disable();
-  
+
   if ( m_Renderer != NULL )
     m_Renderer->Delete();
 }
@@ -105,7 +105,7 @@ void mitk::VtkWidgetRendering::Enable()
       {
         layerController->InsertForegroundRenderer(m_Renderer,false);
       }
-      
+
       m_IsEnabled = true;
     }
   }
@@ -149,7 +149,7 @@ void mitk::VtkWidgetRendering::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::VtkWidgetRendering::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return false;    
+    return false;
 }
 
 bool mitk::VtkWidgetRendering::VerifyRequestedRegion()

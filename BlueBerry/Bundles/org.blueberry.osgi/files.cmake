@@ -53,7 +53,7 @@ set(SRC_CPP_FILES
   berryPlatformException.cpp
   berryPlugin.cpp
   berryStackTrace.cpp
-  
+
   # application
   application/berryIApplication.cpp
   application/berryStarter.cpp

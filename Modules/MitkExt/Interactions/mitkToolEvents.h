@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ namespace mitk {
   \brief Basic tool event without any parameters
          Can simply be inherited using the itkEventMacro, e.g.
 \code
-namespace mitk 
+namespace mitk
 {
 
 class MyTool : public Tool
@@ -61,7 +61,7 @@ itkEventMacro( ToolEvent, itk::ModifiedEvent );
 
   Can store one parameter for use within an observer. To derive your own special events, use the mitkToolEventMacro1Param macro.
 \code
-namespace mitk 
+namespace mitk
 {
 
 class MyTool : public Tool
@@ -86,56 +86,56 @@ class MyTool : public Tool
 */
 template <typename T>
 class ParameterToolEvent : public ToolEvent
-{ 
-  public: 
+{
+  public:
 
-    typedef ParameterToolEvent Self; 
-    typedef ToolEvent Superclass; 
+    typedef ParameterToolEvent Self;
+    typedef ToolEvent Superclass;
 
     ParameterToolEvent( const T parameter )
     : m_Parameter(parameter)
     {
-    } 
-
-    ParameterToolEvent(const Self& s) 
-    : ToolEvent(s), 
-      m_Parameter(s.m_Parameter) 
-    {
-    } 
-
-    virtual ~ParameterToolEvent() 
-    {
-    } 
-
-    virtual const char * GetEventName() const 
-    { 
-      return "ParameterToolEvent"; 
-    } 
-
-    virtual bool CheckEvent(const ::itk::EventObject* e) const 
-    { 
-      return dynamic_cast<const Self*>(e); 
-    } 
-
-    virtual ::itk::EventObject* MakeObject() const 
-    { 
-      return new Self( m_Parameter ); 
-    } 
-
-    const T GetParameter() const 
-    { 
-      return m_Parameter; 
     }
-    
+
+    ParameterToolEvent(const Self& s)
+    : ToolEvent(s),
+      m_Parameter(s.m_Parameter)
+    {
+    }
+
+    virtual ~ParameterToolEvent()
+    {
+    }
+
+    virtual const char * GetEventName() const
+    {
+      return "ParameterToolEvent";
+    }
+
+    virtual bool CheckEvent(const ::itk::EventObject* e) const
+    {
+      return dynamic_cast<const Self*>(e);
+    }
+
+    virtual ::itk::EventObject* MakeObject() const
+    {
+      return new Self( m_Parameter );
+    }
+
+    const T GetParameter() const
+    {
+      return m_Parameter;
+    }
+
   protected:
 
     const T m_Parameter;
-  
-  private: 
-    
+
+  private:
+
     ParameterToolEvent();
 
-    void operator=(const Self&); 
+    void operator=(const Self&);
 };
 
 /**
@@ -143,7 +143,7 @@ class ParameterToolEvent : public ToolEvent
 
   Can store one parameter for use within an observer. To derive your own special events, use the mitkToolEventMacro1Param macro.
 \code
-namespace mitk 
+namespace mitk
 {
 
 class MyTool : public Tool
@@ -168,64 +168,64 @@ class MyTool : public Tool
 */
 template <typename T, typename U>
 class TwoParameterToolEvent : public ToolEvent
-{ 
-  public: 
+{
+  public:
 
-    typedef TwoParameterToolEvent Self; 
-    typedef ToolEvent Superclass; 
+    typedef TwoParameterToolEvent Self;
+    typedef ToolEvent Superclass;
 
     TwoParameterToolEvent( const T parameter1, const U parameter2 )
     : m_Parameter1(parameter1),
       m_Parameter2(parameter2)
     {
-    } 
+    }
 
-    TwoParameterToolEvent(const Self& s) 
-    : ToolEvent(s), 
+    TwoParameterToolEvent(const Self& s)
+    : ToolEvent(s),
       m_Parameter1(s.m_Parameter1),
-      m_Parameter2(s.m_Parameter2) 
+      m_Parameter2(s.m_Parameter2)
     {
-    } 
-
-    virtual ~TwoParameterToolEvent() 
-    {
-    } 
-
-    virtual const char * GetEventName() const 
-    { 
-      return "TwoParameterToolEvent"; 
-    } 
-
-    virtual bool CheckEvent(const ::itk::EventObject* e) const 
-    { 
-      return dynamic_cast<const Self*>(e); 
-    } 
-
-    virtual ::itk::EventObject* MakeObject() const 
-    { 
-      return new Self( m_Parameter1, m_Parameter2 ); 
-    } 
-
-    const T GetParameter1() const 
-    { 
-      return m_Parameter1; 
     }
 
-    const T GetParameter2() const 
-    { 
-      return m_Parameter2; 
+    virtual ~TwoParameterToolEvent()
+    {
     }
-    
+
+    virtual const char * GetEventName() const
+    {
+      return "TwoParameterToolEvent";
+    }
+
+    virtual bool CheckEvent(const ::itk::EventObject* e) const
+    {
+      return dynamic_cast<const Self*>(e);
+    }
+
+    virtual ::itk::EventObject* MakeObject() const
+    {
+      return new Self( m_Parameter1, m_Parameter2 );
+    }
+
+    const T GetParameter1() const
+    {
+      return m_Parameter1;
+    }
+
+    const T GetParameter2() const
+    {
+      return m_Parameter2;
+    }
+
   protected:
 
     const T m_Parameter1;
     const U m_Parameter2;
-  
-  private: 
-    
+
+  private:
+
     TwoParameterToolEvent();
 
-    void operator=(const Self&); 
+    void operator=(const Self&);
 };
 
 typedef ParameterToolEvent<int>            IntegerToolEvent;

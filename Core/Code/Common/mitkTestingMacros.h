@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,16 +22,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestManager.h>
 
 namespace mitk {
-  /** \brief Indicate a failed test. */ 
+  /** \brief Indicate a failed test. */
   class TestFailedException : public std::exception {
     public:
       TestFailedException() {}
   };
 }
 
-/** 
- * 
- * \brief Output some text without generating a terminating newline. Include  
+/**
+ *
+ * \brief Output some text without generating a terminating newline. Include
  *
  * */
 #define MITK_TEST_OUTPUT_NO_ENDL(x) \
@@ -41,7 +41,7 @@ namespace mitk {
 #define MITK_TEST_OUTPUT(x) \
   MITK_TEST_OUTPUT_NO_ENDL(x << "\n")
 
-/** \brief Do some general test preparations. Must be called first in the 
+/** \brief Do some general test preparations. Must be called first in the
      main test function. */
 #define MITK_TEST_BEGIN(testName)      \
   std::string mitkTestName(#testName);   \
@@ -101,7 +101,7 @@ namespace mitk {
  * \brief Begin block which should be checked for exceptions
  *
  * This macro, together with MITK_TEST_FOR_EXCEPTION_END, can be used
- * to test whether a code block throws an expected exception. The test FAILS if the 
+ * to test whether a code block throws an expected exception. The test FAILS if the
  * exception is NOT thrown. A simple example:
  *
 
@@ -113,7 +113,7 @@ namespace mitk {
  MITK_TEST_FOR_EXCEPTION_END(itk::ImageFileReaderException)
 
  *
- */ 
+ */
 #define MITK_TEST_FOR_EXCEPTION_BEGIN(EXCEPTIONCLASS) \
   try {
 

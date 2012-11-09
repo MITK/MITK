@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //XML StateMachine
 const std::string STYLE = "STYLE";
 const std::string NAME = "NAME";
-const std::string ID = "ID";    
+const std::string ID = "ID";
 const std::string START_STATE = "START_STATE";
 const std::string NEXT_STATE_ID = "NEXT_STATE_ID";
 const std::string EVENT_ID = "EVENT_ID";
@@ -72,10 +72,10 @@ mitk::StateMachineFactory::~StateMachineFactory()
     m_AllStateMachineMap.erase(m_AllStateMachineMap.begin());
     delete temp;
   }
-  
+
   //should not be necessary due to SmartPointers
   m_StartStates.clear();
-  
+
   //delete WeakPointer
   if (m_AktTransition)
     delete m_AktTransition;
@@ -127,7 +127,7 @@ bool mitk::StateMachineFactory::LoadStandardBehavior()
 {
   std::string xmlFileName( mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions") );
 
-  if (!xmlFileName.empty()) 
+  if (!xmlFileName.empty())
     return this->LoadBehavior(xmlFileName);
   else
     return false;
@@ -135,8 +135,8 @@ bool mitk::StateMachineFactory::LoadStandardBehavior()
 
 
 /**
-* @brief Recursive method, that parses this brand of 
-* the stateMachine; if the history has the same 
+* @brief Recursive method, that parses this brand of
+* the stateMachine; if the history has the same
 * size at the end, then the StateMachine is correct
 **/
 bool mitk::StateMachineFactory::RParse(mitk::State::StateMap* states, mitk::State::StateMapIter thisState, HistorySet *history)
@@ -144,7 +144,7 @@ bool mitk::StateMachineFactory::RParse(mitk::State::StateMap* states, mitk::Stat
   history->insert((thisState->second)->GetId());//log our path  //or thisState->first. but this seems safer
   std::set<int> nextStatesSet = (thisState->second)->GetAllNextStates();
 
-  //remove loops in nextStatesSet; 
+  //remove loops in nextStatesSet;
   //nether do we have to go there, nor will it clear a deadlock
   std::set<int>::iterator position = nextStatesSet.find((thisState->second)->GetId());//look for the same state in nextStateSet
   if (position != nextStatesSet.end())
@@ -186,7 +186,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
   {
     //parse all the given states an check for deadlock or not connected states
     HistorySet *history = new HistorySet;
-    mitk::State::StateMapIter firstState = states->begin(); 
+    mitk::State::StateMapIter firstState = states->begin();
     //parse through all the given states, log the parsed elements in history
     bool ok = RParse( states, firstState, history);
 
@@ -217,7 +217,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
   return true;
 }
 
-void  mitk::StateMachineFactory::StartElement (const char* elementName, const char **atts) 
+void  mitk::StateMachineFactory::StartElement (const char* elementName, const char **atts)
 {
   //skip the state machine pattern because the name was not unique!
   if (m_SkipStateMachine)
@@ -226,8 +226,8 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
   std::string name(elementName);
 
   if ( name == STATE_MACHINE )
-  { 
-    std::string tempStateMachineName = ReadXMLStringAttribut( NAME, atts ); 
+  {
+    std::string tempStateMachineName = ReadXMLStringAttribut( NAME, atts );
     if (m_AllStateMachineMap.find(tempStateMachineName) != m_AllStateMachineMap.end())
     {
       //warning: Statemachine tempStateMachineName already exists!
@@ -236,70 +236,70 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
     }
     else //tempStateMachineName is unique, so add it
     {
-      m_AktStateMachineName = tempStateMachineName; 
+      m_AktStateMachineName = tempStateMachineName;
       m_AllStateMachineMap[ m_AktStateMachineName ] = new StateMachineMapType;
     }
-  } 
+  }
 
-  else if ( name == STATE )   
+  else if ( name == STATE )
   {
     std::string stateMachinName = ReadXMLStringAttribut( NAME, atts ) ;
     int id = ReadXMLIntegerAttribut( ID, atts );
 
     //create a new instance
     m_AktState = mitk::State::New(stateMachinName , id);
-    
+
     // store all states to be able to access a specific state (for persistence)
     StateMachineMapType* stateMachine = m_AllStateMachineMap[ m_AktStateMachineName ];
     (*stateMachine)[id] = m_AktState;
 
     std::pair<mitk::State::StateMapIter,bool> ok = m_AllStatesOfOneStateMachine.insert(mitk::State::StateMap::value_type(id , m_AktState));
 
-    if ( ok.second == false ) 
-    { 
+    if ( ok.second == false )
+    {
       MITK_INFO<<std::endl;
       MITK_INFO<<"Warning from StateMachineFactory: STATE_ID was not unique in pattern "<< m_AktStateMachineName<<"!"<<std::endl;
       return; //STATE_ID was not unique or something else didn't work in insert! EXITS the process
     }
     if ( ReadXMLBooleanAttribut( START_STATE, atts ) )
-      m_StartStates.insert(StartStateMap::value_type(m_AktStateMachineName, m_AktState));  
-  } 
+      m_StartStates.insert(StartStateMap::value_type(m_AktStateMachineName, m_AktState));
+  }
 
-  else if ( name == TRANSITION )   
+  else if ( name == TRANSITION )
   {
     std::string transitionName = ReadXMLStringAttribut( NAME, atts ) ;
     int nextStateId = ReadXMLIntegerAttribut( NEXT_STATE_ID, atts );
     int eventId = ReadXMLIntegerAttribut( EVENT_ID, atts );
     m_AktTransition = new Transition(transitionName, nextStateId, eventId);
     if ( m_AktState )
-      m_AktState->AddTransition( m_AktTransition );  
+      m_AktState->AddTransition( m_AktTransition );
   }
 
   else if ( name == ACTION )
   {
     int actionId = ReadXMLIntegerAttribut( ID, atts );
     m_AktAction = Action::New( actionId );
-    m_AktTransition->AddAction( m_AktAction );  
-  } 
+    m_AktTransition->AddAction( m_AktAction );
+  }
 
   else if ( name == BOOL_PARAMETER )
   {
     if ( !m_AktAction )
       return;
 
-    bool value = ReadXMLBooleanAttribut( VALUE, atts );    
-    std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), BoolProperty::New( value ) );  
-  }  
+    bool value = ReadXMLBooleanAttribut( VALUE, atts );
+    std::string name = ReadXMLStringAttribut( NAME, atts );
+    m_AktAction->AddProperty( name.c_str(), BoolProperty::New( value ) );
+  }
 
   else if ( name == INT_PARAMETER )
   {
     if ( !m_AktAction )
       return;
 
-    int value = ReadXMLIntegerAttribut( VALUE, atts );    
-    std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), IntProperty::New( value ) );  
+    int value = ReadXMLIntegerAttribut( VALUE, atts );
+    std::string name = ReadXMLStringAttribut( NAME, atts );
+    m_AktAction->AddProperty( name.c_str(), IntProperty::New( value ) );
   }
 
   else if ( name == FLOAT_PARAMETER )
@@ -307,9 +307,9 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
     if ( !m_AktAction )
       return;
 
-    float value = ReadXMLIntegerAttribut( VALUE, atts ); 
-    std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), FloatProperty::New( value ) );    
+    float value = ReadXMLIntegerAttribut( VALUE, atts );
+    std::string name = ReadXMLStringAttribut( NAME, atts );
+    m_AktAction->AddProperty( name.c_str(), FloatProperty::New( value ) );
   }
 
   else if ( name == DOUBLE_PARAMETER )
@@ -318,8 +318,8 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
       return;
 
     double value = ReadXMLDoubleAttribut( VALUE, atts );
-    std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), DoubleProperty::New( value ) );      
+    std::string name = ReadXMLStringAttribut( NAME, atts );
+    m_AktAction->AddProperty( name.c_str(), DoubleProperty::New( value ) );
   }
 
   else if ( name == STRING_PARAMETER )
@@ -328,12 +328,12 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
       return;
 
     std::string value = ReadXMLStringAttribut( VALUE, atts );
-    std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), StringProperty::New( value ) );        
+    std::string name = ReadXMLStringAttribut( NAME, atts );
+    m_AktAction->AddProperty( name.c_str(), StringProperty::New( value ) );
   }
 }
 
-void mitk::StateMachineFactory::EndElement (const char* elementName) 
+void mitk::StateMachineFactory::EndElement (const char* elementName)
 {
   //bool ok = true;
   std::string name(elementName);
@@ -353,16 +353,16 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
 
     /*ok =*/ ConnectStates(&m_AllStatesOfOneStateMachine);
     m_AllStatesOfOneStateMachine.clear();
-  } 
-  else if ( name == STATE_MACHINE ) 
+  }
+  else if ( name == STATE_MACHINE )
   {
     //doesn't have to be done
-  } 
-  else if ( name == TRANSITION ) 
+  }
+  else if ( name == TRANSITION )
   {
     m_AktTransition = NULL; //pointer stored in its state. memory will be freed in destructor of class state
-  } 
-  else if ( name == ACTION ) 
+  }
+  else if ( name == ACTION )
   {
     m_AktAction = NULL;
   }
@@ -376,13 +376,13 @@ std::string mitk::StateMachineFactory::ReadXMLStringAttribut( std::string name, 
 {
   if(atts)
   {
-    const char** attsIter = atts;  
+    const char** attsIter = atts;
 
-    while(*attsIter) 
-    {     
+    while(*attsIter)
+    {
       if ( name == *attsIter )
       {
-        attsIter++;      
+        attsIter++;
         return *attsIter;
       }
       attsIter++;
@@ -433,7 +433,7 @@ mitk::State* mitk::StateMachineFactory::GetState( const char * type, int StateId
 
   //get the state from its statemachine
   if ( sm != NULL )
-    return (*sm)[StateId].GetPointer();  
+    return (*sm)[StateId].GetPointer();
   else
     return NULL;
 }
@@ -452,7 +452,7 @@ bool mitk::StateMachineFactory::AddStateMachinePattern(const char * type, mitk::
   }
 
   //add the start state
-  m_StartStates.insert(StartStateMap::value_type(type, startState)); 
+  m_StartStates.insert(StartStateMap::value_type(type, startState));
 
   //add all states of the new pattern to hold their references
   m_AllStateMachineMap.insert(AllStateMachineMapType::value_type(type, allStatesOfStateMachine));

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,8 +41,8 @@ class DisplayGeometry;
  * Displays a 2D cut through a Surface object (vtkPolyData). This
  * is basically done in two steps:
  *
- * 1. Cut a slice out of a (input) vtkPolyData object. The slice may be a flat plane (PlaneGeometry) 
- *    or a curved plane (ThinPlateSplineCurvedGeometry). The actual cutting is done by a vtkCutter. 
+ * 1. Cut a slice out of a (input) vtkPolyData object. The slice may be a flat plane (PlaneGeometry)
+ *    or a curved plane (ThinPlateSplineCurvedGeometry). The actual cutting is done by a vtkCutter.
  *    The result of cutting is a (3D) vtkPolyData object, which contains only points and lines
  *    describing the cut.
  *
@@ -87,7 +87,7 @@ public:
   virtual void Paint(BaseRenderer* renderer);
 
   /**
-   * @brief The Surface to map can be explicitly set by this method. 
+   * @brief The Surface to map can be explicitly set by this method.
    *
    * If it is set, it is used instead of the data stored in the DataNode.
    * This enables to use the mapper also internally from other mappers.
@@ -110,10 +110,10 @@ public:
   /**
    * \brief Generate OpenGL primitives for the VTK contour held in contour.
    */
-  void PaintCells(BaseRenderer* renderer, vtkPolyData* contour, 
-                  const Geometry2D* worldGeometry, 
-                  const DisplayGeometry* displayGeometry, 
-                  vtkLinearTransform* vtktransform, 
+  void PaintCells(BaseRenderer* renderer, vtkPolyData* contour,
+                  const Geometry2D* worldGeometry,
+                  const DisplayGeometry* displayGeometry,
+                  vtkLinearTransform* vtktransform,
                   vtkLookupTable* lut = NULL,
                   vtkPolyData* original3DObject = NULL);
 
@@ -133,11 +133,11 @@ protected:
   Surface::ConstPointer m_Surface;
 
   vtkLookupTable* m_LUT;
-  
+
   int m_LineWidth;
 
   vtkPKdTree* m_PointLocator;
-  
+
   vtkStripper* m_Stripper;
 
   bool m_DrawNormals;

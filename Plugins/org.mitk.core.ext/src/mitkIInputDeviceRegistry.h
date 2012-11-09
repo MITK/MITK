@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIInputDeviceDescriptor.h"
 
-namespace mitk 
+namespace mitk
 {
   /**
    *
@@ -53,7 +53,7 @@ namespace mitk
      * Return an input device descriptor with the given extension id. If no input device exists,
      * with the id return <code>null</code>.
      *
-     * @param id 
+     * @param id
      *      the id to search for
      * @return the descriptor or <code>null</code>
      */

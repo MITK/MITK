@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,18 +47,18 @@ ImageToPathFilter<TInputImage,TOutputPath>
 ::~ImageToPathFilter()
 {
 }
-  
+
 
 /**
  *
  */
 template <class TInputImage, class TOutputPath>
-void 
+void
 ImageToPathFilter<TInputImage,TOutputPath>
 ::SetInput(const InputImageType *input)
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, 
+  this->ProcessObject::SetNthInput(0,
                                    const_cast< InputImageType * >( input ) );
 }
 
@@ -69,10 +69,10 @@ ImageToPathFilter<TInputImage,TOutputPath>
 template <class TInputImage, class TOutputPath>
 void
 ImageToPathFilter<TInputImage,TOutputPath>
-::SetInput( unsigned int index, const TInputImage * image ) 
+::SetInput( unsigned int index, const TInputImage * image )
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(index, 
+  this->ProcessObject::SetNthInput(index,
                                    const_cast< TInputImage *>( image ) );
 }
 
@@ -83,17 +83,17 @@ ImageToPathFilter<TInputImage,TOutputPath>
 template <class TInputImage, class TOutputPath>
 const typename ImageToPathFilter<TInputImage,TOutputPath>::InputImageType *
 ImageToPathFilter<TInputImage,TOutputPath>
-::GetInput(void) 
+::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
     {
     return 0;
     }
-  
+
   return static_cast<const TInputImage * >
     (this->ProcessObject::GetInput(0) );
 }
-  
+
 /**
  *
  */
@@ -108,7 +108,7 @@ ImageToPathFilter<TInputImage,TOutputPath>
 
 
 template<class TInputImage, class TOutputPath>
-void 
+void
 ImageToPathFilter<TInputImage,TOutputPath>
 ::PrintSelf(std::ostream& os, Indent indent) const
 {

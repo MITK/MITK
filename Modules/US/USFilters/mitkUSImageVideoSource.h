@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,14 +47,14 @@ namespace mitk {
     itkNewMacro(Self);
 
     /**
-    * \brief Opens a video file for streaming. If nothing goes wrong, the 
+    * \brief Opens a video file for streaming. If nothing goes wrong, the
     * VideoSource is ready to deliver images after calling this function.
     */
     void SetVideoFileInput(std::string path);
 
     /**
     * \brief Opens a video device for streaming. Takes the Device id. Try -1 for "grab the first you can get"
-    * which works quite well if only one device is available. If nothing goes wrong, the 
+    * which works quite well if only one device is available. If nothing goes wrong, the
     * VideoSource is ready to deliver images after calling this function.
     */
     void SetCameraInput(int deviceID);
@@ -86,7 +86,7 @@ namespace mitk {
 
     /**
     * \brief This is a workaround for a problem that happens with some video device drivers.
-    *  
+    *
     * If you encounter OpenCV Warnings that buffer sizes do not match while calling getNextFrame,
     * then do the following: Using the drivers control panel to force a certain resolution, then call
     * this method with the same Dimensions after opening the device.

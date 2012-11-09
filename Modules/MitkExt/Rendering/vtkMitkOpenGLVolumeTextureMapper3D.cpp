@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -54,16 +54,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "!!ARBfp1.0\n"
-  
-//# We need some temporary variables    
+
+//# We need some temporary variables
 "TEMP index, normal, finalColor;\n"
 "TEMP temp,temp1, temp2, temp3,temp4; \n"
 "TEMP sampleColor;\n"
 "TEMP ndotl, ndoth, ndotv; \n"
 "TEMP lightInfo, lightResult;\n"
-   
-//# We are going to use the first 
-//# texture coordinate    
+
+//# We are going to use the first
+//# texture coordinate
 "ATTRIB tex0 = fragment.texcoord[0];\n"
 
 //# This is the lighting information
@@ -74,16 +74,16 @@ const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "PARAM lightSpecColor = program.local[4]; \n"
 "PARAM viewVector     = program.local[5];\n"
 "PARAM constants      = program.local[6];\n"
-  
+
 //# This is our output color
 "OUTPUT out = result.color;\n"
 
 //# Look up the gradient direction
-//# in the third volume  
+//# in the third volume
 "TEX temp2, tex0, texture[0], 3D;\n"
 
 //# This normal is stored 0 to 1, change to -1 to 1
-//# by multiplying by 2.0 then adding -1.0.  
+//# by multiplying by 2.0 then adding -1.0.
 "MAD normal, temp2, constants.x, constants.y;\n"
 
 "DP3 temp4, normal, normal;\n"
@@ -105,7 +105,7 @@ const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "DP3 ndotl, normal, lightDirection;\n"
 
 //# Take the dot product of the halfway
-//# vector and the normal    
+//# vector and the normal
 "DP3 ndoth, normal, halfwayVector;\n"
 
 "DP3 ndotv, normal, viewVector;\n"
@@ -115,51 +115,51 @@ const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "CMP ndotl, ndotv, ndotl, temp3;\n"
 "MUL temp3, ndoth, constants.y; \n"
 "CMP ndoth, ndotv, ndoth, temp3;\n"
-   
-//# put the pieces together for a LIT operation    
+
+//# put the pieces together for a LIT operation
 "MOV lightInfo.x, ndotl.x; \n"
 "MOV lightInfo.y, ndoth.x; \n"
 "MOV lightInfo.w, coefficient.w; \n"
 
-//# compute the lighting  
+//# compute the lighting
 "LIT lightResult, lightInfo;\n"
 
 //# COLOR FIX
 "MUL lightResult, lightResult, 4.0;\n"
 
-//# This is the ambient contribution  
+//# This is the ambient contribution
 "MUL finalColor, coefficient.x, sampleColor;\n"
 
-//# This is the diffuse contribution  
+//# This is the diffuse contribution
 "MUL temp3, lightDiffColor, sampleColor;\n"
 "MUL temp3, temp3, lightResult.y;\n"
 "ADD finalColor, finalColor, temp3;\n"
 
-//# This is th specular contribution  
+//# This is th specular contribution
 "MUL temp3, lightSpecColor, lightResult.z; \n"
-  
+
 //# Add specular into result so far, and replace
-//# with the original alpha.  
+//# with the original alpha.
 "ADD out, finalColor, temp3;\n"
 "MOV out.w, temp2.w;\n"
-   
+
 "END\n";
 
 const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "!!ARBfp1.0\n"
-  
-//# This is the fragment program for one
-//# component data with shading  
 
-//# We need some temporary variables    
+//# This is the fragment program for one
+//# component data with shading
+
+//# We need some temporary variables
 "TEMP index, normal, finalColor;\n"
 "TEMP temp,temp1, temp2, temp3,temp4; \n"
 "TEMP sampleColor;\n"
 "TEMP ndotl, ndoth, ndotv; \n"
 "TEMP lightInfo, lightResult;\n"
-   
-//# We are going to use the first 
-//# texture coordinate    
+
+//# We are going to use the first
+//# texture coordinate
 "ATTRIB tex0 = fragment.texcoord[0];\n"
 
 //# This is the lighting information
@@ -170,19 +170,19 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "PARAM lightSpecColor = program.local[4]; \n"
 "PARAM viewVector     = program.local[5];\n"
 "PARAM constants      = program.local[6];\n"
-  
+
 //# This is our output color
 "OUTPUT out = result.color;\n"
 
 //# Look up the gradient direction
-//# in the third volume  
+//# in the third volume
 "TEX temp2, tex0, texture[0], 3D;\n"
 
 
 // Gradient Compution
 
 //# Look up the scalar value / gradient
-//# magnitude in the first volume  
+//# magnitude in the first volume
 //"TEX temp1, tex0, texture[0], 3D;\n"
 
               /*
@@ -215,22 +215,22 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 
 
                 */
-                
+
 //"MOV normal,{1,1,1};\n"
 
 "MOV index.x,temp2.a;\n"
 
 //# This normal is stored 0 to 1, change to -1 to 1
-//# by multiplying by 2.0 then adding -1.0.  
+//# by multiplying by 2.0 then adding -1.0.
 "MAD normal, temp2, constants.x, constants.y;\n"
 
 //# Swizzle this to use (a,r) as texture
-//# coordinates  
+//# coordinates
 //"SWZ index, temp1, a, r, 1, 1;\n"
 
-//# Use this coordinate to look up a 
+//# Use this coordinate to look up a
 //# final color in the third texture
-//# (this is a 2D texture)      
+//# (this is a 2D texture)
 
 "DP3 temp4, normal, normal;\n"
 
@@ -251,7 +251,7 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "DP3 ndotl, normal, lightDirection;\n"
 
 //# Take the dot product of the halfway
-//# vector and the normal    
+//# vector and the normal
 "DP3 ndoth, normal, halfwayVector;\n"
 
 "DP3 ndotv, normal, viewVector;\n"
@@ -261,34 +261,34 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "CMP ndotl, ndotv, ndotl, temp3;\n"
 "MUL temp3, ndoth, constants.y; \n"
 "CMP ndoth, ndotv, ndoth, temp3;\n"
-   
-//# put the pieces together for a LIT operation    
+
+//# put the pieces together for a LIT operation
 "MOV lightInfo.x, ndotl.x; \n"
 "MOV lightInfo.y, ndoth.x; \n"
 "MOV lightInfo.w, coefficient.w; \n"
 
-//# compute the lighting  
+//# compute the lighting
 "LIT lightResult, lightInfo;\n"
 
 //# COLOR FIX
 "MUL lightResult, lightResult, 4.0;\n"
 
-//# This is the ambient contribution  
+//# This is the ambient contribution
 "MUL finalColor, coefficient.x, sampleColor;\n"
 
-//# This is the diffuse contribution  
+//# This is the diffuse contribution
 "MUL temp3, lightDiffColor, sampleColor;\n"
 "MUL temp3, temp3, lightResult.y;\n"
 "ADD finalColor, finalColor, temp3;\n"
 
-//# This is th specular contribution  
+//# This is th specular contribution
 "MUL temp3, lightSpecColor, lightResult.z; \n"
-  
+
 //# Add specular into result so far, and replace
-//# with the original alpha.  
+//# with the original alpha.
 "ADD out, finalColor, temp3;\n"
 "MOV out.w, sampleColor.w;\n"
-   
+
 "END\n";
 
 
@@ -310,7 +310,7 @@ vtkMitkOpenGLVolumeTextureMapper3D::vtkMitkOpenGLVolumeTextureMapper3D()
   this->AlphaLookupIndex             =  0;
   this->RenderWindow                 = NULL;
   this->SupportsCompressedTexture    = false;
-  
+
   prgOneComponentShade = 0;
   prgRGBAShade = 0;
 }
@@ -318,20 +318,20 @@ vtkMitkOpenGLVolumeTextureMapper3D::vtkMitkOpenGLVolumeTextureMapper3D()
 vtkMitkOpenGLVolumeTextureMapper3D::~vtkMitkOpenGLVolumeTextureMapper3D()
 {
   //GPU_INFO << "~vtkMitkOpenGLVolumeTextureMapper3D";
-  if(prgOneComponentShade)  
+  if(prgOneComponentShade)
     vtkgl::DeleteProgramsARB( 1, &prgOneComponentShade );
 
-  if(prgRGBAShade)  
+  if(prgRGBAShade)
     vtkgl::DeleteProgramsARB( 1, &prgRGBAShade );
 }
 
-// Release the graphics resources used by this texture.  
-void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(vtkWindow 
+// Release the graphics resources used by this texture.
+void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(vtkWindow
                                                                 *renWin)
 {
   //GPU_INFO << "ReleaseGraphicsResources";
 
-  if (( this->Volume1Index || this->Volume2Index || 
+  if (( this->Volume1Index || this->Volume2Index ||
         this->Volume3Index || this->ColorLookupIndex) && renWin)
     {
     static_cast<vtkRenderWindow *>(renWin)->MakeCurrent();
@@ -341,7 +341,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(vtkWindow
     this->DeleteTextureIndex( &this->Volume2Index );
     this->DeleteTextureIndex( &this->Volume3Index );
     this->DeleteTextureIndex( &this->ColorLookupIndex );
-    this->DeleteTextureIndex( &this->AlphaLookupIndex );    
+    this->DeleteTextureIndex( &this->AlphaLookupIndex );
 #endif
     }
   this->Volume1Index     = 0;
@@ -356,24 +356,24 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(vtkWindow
 }
 
 void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol)
-{  
+{
   //GPU_INFO << "Render";
 
   ren->GetRenderWindow()->MakeCurrent();
-  
+
   if ( !this->Initialized )
     {
       //this->Initialize();
       this->Initialize(ren);
     }
-  
+
   if ( !this->RenderPossible )
     {
     vtkErrorMacro( "required extensions not supported" );
     return;
     }
 
-    
+
   vtkMatrix4x4       *matrix = vtkMatrix4x4::New();
   vtkPlaneCollection *clipPlanes;
   vtkPlane           *plane;
@@ -381,19 +381,19 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
   double             planeEquation[4];
 
 
-  // build transformation 
+  // build transformation
   vol->GetMatrix(matrix);
   matrix->Transpose();
 
-  glPushAttrib(GL_ENABLE_BIT   | 
+  glPushAttrib(GL_ENABLE_BIT   |
                GL_COLOR_BUFFER_BIT   |
                GL_STENCIL_BUFFER_BIT |
-               GL_DEPTH_BUFFER_BIT   | 
-               GL_POLYGON_BIT        | 
+               GL_DEPTH_BUFFER_BIT   |
+               GL_POLYGON_BIT        |
                GL_TEXTURE_BIT);
-  
+
   int i;
-  
+
   // Use the OpenGL clip planes
   clipPlanes = this->ClippingPlanes;
   if ( clipPlanes )
@@ -410,8 +410,8 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
 
       plane = static_cast<vtkPlane *>(clipPlanes->GetItemAsObject(i));
 
-      planeEquation[0] = plane->GetNormal()[0]; 
-      planeEquation[1] = plane->GetNormal()[1]; 
+      planeEquation[0] = plane->GetNormal()[0];
+      planeEquation[1] = plane->GetNormal()[1];
       planeEquation[2] = plane->GetNormal()[2];
       planeEquation[3] = -(planeEquation[0]*plane->GetOrigin()[0]+
                            planeEquation[1]*plane->GetOrigin()[1]+
@@ -421,8 +421,8 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
     }
 
 
-  
-  // insert model transformation 
+
+  // insert model transformation
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
   glMultMatrixd(matrix->Element[0]);
@@ -431,11 +431,11 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
 
   // Turn lighting off - the polygon textures already have illumination
   glDisable( GL_LIGHTING );
-  
+
   vtkGraphicErrorMacro(ren->GetRenderWindow(),"Before actual render method");
-  
+
   this->RenderFP(ren,vol);
-  
+
   // pop transformation matrix
   glMatrixMode( GL_MODELVIEW );
   glPopMatrix();
@@ -453,33 +453,33 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderFP(vtkRenderer *ren,
   glAlphaFunc (GL_GREATER, static_cast<GLclampf>(1.0/255.0));
   glEnable (GL_ALPHA_TEST);
   */
-  
+
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-  
-  int components = this->GetInput()->GetNumberOfScalarComponents();   
+
+  int components = this->GetInput()->GetNumberOfScalarComponents();
   switch ( components )
     {
     case 1:
       this->RenderOneIndependentShadeFP(ren,vol);
       break;
-      
+
     case 4:
       this->RenderRGBAShadeFP(ren,vol);
       break;
     }
-  
+
   vtkgl::ActiveTexture( vtkgl::TEXTURE2);
   glDisable( GL_TEXTURE_2D );
   glDisable( vtkgl::TEXTURE_3D );
-  
+
   vtkgl::ActiveTexture( vtkgl::TEXTURE1);
   glDisable( GL_TEXTURE_2D );
   glDisable( vtkgl::TEXTURE_3D );
-  
+
   vtkgl::ActiveTexture( vtkgl::TEXTURE0);
   glDisable( GL_TEXTURE_2D );
-  glDisable( vtkgl::TEXTURE_3D );  
+  glDisable( vtkgl::TEXTURE_3D );
 
   glDisable( GL_BLEND );
 }
@@ -501,7 +501,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::CreateTextureIndex( GLuint *index )
 {
   //GPU_INFO << "CreateTextureIndex";
 
-  GLuint tempIndex=0;    
+  GLuint tempIndex=0;
   glGenTextures(1, &tempIndex);
   *index = static_cast<long>(tempIndex);
 }
@@ -513,18 +513,18 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
   //GPU_INFO << "RenderPolygons";
 
   vtkRenderWindow *renWin = ren->GetRenderWindow();
-  
+
   if ( renWin->CheckAbortStatus() )
     {
     return;
     }
-  
+
   double bounds[27][6];
   float distance2[27];
-  
+
   int   numIterations;
   int i, j, k;
-  
+
   // No cropping case - render the whole thing
   if ( !this->Cropping )
     {
@@ -545,10 +545,10 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
     // Get the camera position
     double camPos[4];
     ren->GetActiveCamera()->GetPosition(camPos);
-    
+
     double volBounds[6];
     this->GetInput()->GetBounds(volBounds);
-    
+
     // Pass camera through inverse volume matrix
     // so that we are in the same coordinate system
     vtkMatrix4x4 *volMatrix = vtkMatrix4x4::New();
@@ -563,12 +563,12 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
       camPos[1] /= camPos[3];
       camPos[2] /= camPos[3];
       }
-    
+
     // These are the region limits for x (first four), y (next four) and
     // z (last four). The first region limit is the lower bound for
     // that axis, the next two are the region planes along that axis, and
     // the final one in the upper bound for that axis.
-    float limit[12];    
+    float limit[12];
     for ( i = 0; i < 3; i++ )
       {
       limit[i*4  ] = volBounds[i*2];
@@ -576,7 +576,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
       limit[i*4+2] = this->CroppingRegionPlanes[i*2+1];
       limit[i*4+3] = volBounds[i*2+1];
       }
-    
+
     // For each of the 27 possible regions, find out if it is enabled,
     // and if so, compute the bounds and the distance from the camera
     // to the center of the region.
@@ -585,7 +585,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
     for ( region = 0; region < 27; region++ )
       {
       int regionFlag = 1<<region;
-      
+
       if ( this->CroppingRegionFlags & regionFlag )
         {
         // what is the coordinate in the 3x3x3 grid
@@ -600,22 +600,22 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
           {
           bounds[numRegions][i*2  ] = limit[4*i+loc[i]];
           bounds[numRegions][i*2+1] = limit[4*i+loc[i]+1];
-          center[i] = 
-            (bounds[numRegions][i*2  ] + 
+          center[i] =
+            (bounds[numRegions][i*2  ] +
              bounds[numRegions][i*2+1])/2.0;
           }
-        
+
         // compute the distance squared to the center
-        distance2[numRegions] = 
+        distance2[numRegions] =
           (camPos[0]-center[0])*(camPos[0]-center[0]) +
           (camPos[1]-center[1])*(camPos[1]-center[1]) +
           (camPos[2]-center[2])*(camPos[2]-center[2]);
-        
+
         // we've added one region
         numRegions++;
         }
       }
-    
+
     // Do a quick bubble sort on distance
     for ( i = 1; i < numRegions; i++ )
       {
@@ -623,7 +623,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
         {
         float tmpBounds[6];
         float tmpDistance2;
-        
+
         for ( k = 0; k < 6; k++ )
           {
           tmpBounds[k] = bounds[j][k];
@@ -641,35 +641,35 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
           bounds[j-1][k] = tmpBounds[k];
           }
         distance2[j-1] = tmpDistance2;
-        
+
         }
       }
-    
+
     numIterations = numRegions;
     }
 
   // loop over all regions we need to render
-  for ( int loop = 0; 
+  for ( int loop = 0;
         loop < numIterations;
         loop++ )
     {
-    // Compute the set of polygons for this region 
+    // Compute the set of polygons for this region
     // according to the bounds
     this->ComputePolygons( ren, vol, bounds[loop] );
 
     // Loop over the polygons
     for ( i = 0; i < this->NumberOfPolygons; i++ )
       {
-      
+
       if ( renWin->CheckAbortStatus() )
         {
         return;
         }
-      
+
       float *ptr = this->PolygonBuffer + 36*i;
-      
+
       glBegin( GL_TRIANGLE_FAN );
-      
+
       for ( j = 0; j < 6; j++ )
         {
         if ( ptr[0] < 0.0 )
@@ -685,10 +685,10 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
             }
           }
         glVertex3fv( ptr+3 );
-        
+
         ptr += 6;
         }
-      glEnd();         
+      glEnd();
       }
     }
 }
@@ -696,7 +696,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
 // This method moves the scalars from the input volume into volume1 (and
 // possibly volume2) which are the 3D texture maps used for rendering.
 //
-// In the case where our volume is a power of two, the copy is done 
+// In the case where our volume is a power of two, the copy is done
 // directly. If we need to resample, then trilinear interpolation is used.
 //
 // A shift/scale is applied to the input scalar value to produce an 8 bit
@@ -705,7 +705,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
 // When the input data is one component, the scalar value is placed in the
 // second component of the two component volume1. The first component is
 // filled in later with the gradient magnitude.
-// 
+//
 // When the input data is two component non-independent, the first component
 // of the input data is placed in the first component of volume1, and the
 // second component of the input data is placed in the third component of
@@ -718,7 +718,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
 // of volume2. The first component of volume2 is later filled in with the
 // gradient magnitude.
 
-template <class T> 
+template <class T>
 class ScalarGradientCompute
 {
   T *dataPtr;
@@ -739,10 +739,10 @@ class ScalarGradientCompute
   int currentChunkEnd;
 
   int offZ;
-  
+
   float offset;
   float scale;
-  
+
   public:
 
   ScalarGradientCompute( T *_dataPtr,unsigned char *_tmpPtr,unsigned char *_tmpPtr2,int _sizeX,int _sizeY,int _sizeZ,int _fullX,int _fullY,int _fullZ,float _offset,float _scale)
@@ -763,7 +763,7 @@ class ScalarGradientCompute
     sizeXm1=sizeX-1;
     sizeYm1=sizeY-1;
     sizeZm1=sizeZ-1;
-    
+
     fullXY=fullX*fullY;
   }
 
@@ -771,11 +771,11 @@ class ScalarGradientCompute
   {
     return float(dataPtr[ x + y * sizeX + z * sizeXY ]);
   }
-  
+
   inline void fill(int x,int y,int z)
   {
     int doff = x + y * fullX + (z-offZ) * fullXY;
-    
+
     tmpPtr[doff*4+0]= 0;
     tmpPtr[doff*4+1]= 0;
     tmpPtr[doff*4+2]= 0;
@@ -783,20 +783,20 @@ class ScalarGradientCompute
           /*
     tmpPtr2[doff*3+0]= 0;
     tmpPtr2[doff*3+1]= 0;
-    tmpPtr2[doff*3+2]= 0;       
+    tmpPtr2[doff*3+2]= 0;
     */
   }
-  
+
   inline int clamp(int x)
   {
     if(x<0) x=0; else if(x>255) x=255;
     return x;
   }
-  
+
   inline void write(int x,int y,int z,float grayValue,float gx,float gy,float gz)
   {
-  
- /*       
+
+ /*
     gx /= aspect[0];
     gy /= aspect[1];
     gz /= aspect[2];
@@ -819,14 +819,14 @@ class ScalarGradientCompute
         gx *= fac;
         gy *= fac;
         gz *= fac;
-      } 
+      }
       else if( t > 255.0f)
       {
         float fac = 255.0f/t;
         gx *= fac;
         gy *= fac;
         gz *= fac;
-      } 
+      }
     }
     else
     {
@@ -836,24 +836,24 @@ class ScalarGradientCompute
     int nx = static_cast<int>(0.5f*gx+127.5f);
     int ny = static_cast<int>(0.5f*gy+127.5f);
     int nz = static_cast<int>(0.5f*gz+127.5f);
-    
+
     int doff = x + y * fullX + (z-offZ) * fullXY;
-    
+
     //tmpPtr[doff*2+0]= 0;
-       
+
     tmpPtr[doff*4+0]= clamp(nx);
     tmpPtr[doff*4+1]= clamp(ny);
-    tmpPtr[doff*4+2]= clamp(nz);       
+    tmpPtr[doff*4+2]= clamp(nz);
     tmpPtr[doff*4+3]= clamp(iGrayValue);
 
 /*
     if( z == fullZ/2 )
     if( y == fullY/2 )
       MITK_INFO << x << " " << y << " " << z << " : " << iGrayValue << " : " << iGradient;
-  */  
+  */
   }
-  
-  
+
+
   inline void compute(int x,int y,int z)
   {
     float grayValue = sample(x,y,z);
@@ -862,9 +862,9 @@ class ScalarGradientCompute
     gx = sample(x+1,y,z) - sample(x-1,y,z);
     gy = sample(x,y+1,z) - sample(x,y-1,z);
     gz = sample(x,y,z+1) - sample(x,y,z-1);
-    
+
     write( x, y, z, grayValue, gx, gy, gz );
- 
+
   }
 
   inline void computeClamp(int x,int y,int z)
@@ -875,32 +875,32 @@ class ScalarGradientCompute
     if(x==0)            gx = 2.0f * ( sample(x+1,y,z) - grayValue       );
     else if(x==sizeXm1) gx = 2.0f * ( grayValue       - sample(x-1,y,z) );
     else                gx =          sample(x+1,y,z) - sample(x-1,y,z);
-    
+
     if(y==0)            gy = 2.0f * ( sample(x,y+1,z) - grayValue       );
     else if(y==sizeYm1) gy = 2.0f * ( grayValue       - sample(x,y-1,z) );
     else                gy =          sample(x,y+1,z) - sample(x,y-1,z);
-    
+
     if(z==0)            gz = 2.0f * ( sample(x,y,z+1) - grayValue       );
     else if(z==sizeZm1) gz = 2.0f * ( grayValue       - sample(x,y,z-1) );
     else                gz =          sample(x,y,z+1) - sample(x,y,z-1);
-    
+
     write( x, y, z, grayValue, gx, gy, gz );
   }
 
   inline void compute1D(int y,int z)
   {
     int x;
-    
+
     x=0;
     computeClamp(x,y,z);
     x++;
-    
+
     while(x<sizeX-1)
     {
-      compute(x,y,z);     
+      compute(x,y,z);
       x++;
     }
-    
+
     if(x<sizeX)
     {
       computeClamp(x,y,z);
@@ -912,30 +912,30 @@ class ScalarGradientCompute
       fill(x,y,z);
       x++;
     }
-  }      
+  }
 
   inline void fill1D(int y,int z)
   {
     int x;
-    
+
     x=0;
     while(x<fullX)
     {
       fill(x,y,z);
       x++;
     }
-  }      
-        
+  }
+
 
   inline void computeClamp1D(int y,int z)
   {
     int x;
-    
+
     x=0;
-    
+
     while(x<sizeX)
     {
-      computeClamp(x,y,z);     
+      computeClamp(x,y,z);
       x++;
     }
 
@@ -944,8 +944,8 @@ class ScalarGradientCompute
       fill(x,y,z);
       x++;
     }
-  }      
-        
+  }
+
   inline void computeClamp2D(int z)
   {
     int y;
@@ -954,31 +954,31 @@ class ScalarGradientCompute
 
     while(y<sizeY)
     {
-      computeClamp1D(y,z);     
+      computeClamp1D(y,z);
       y++;
     }
-    
+
     while(y<fullY)
     {
       fill1D(y,z);
       y++;
-    }      
+    }
   }
-  
+
   inline void compute2D(int z)
   {
     int y;
 
     y=0;
-    computeClamp1D(y,z);     
+    computeClamp1D(y,z);
     y++;
-    
+
     while(y<sizeY-1)
     {
-      compute1D(y,z);     
+      compute1D(y,z);
       y++;
     }
-    
+
     if(y<sizeY)
     {
       computeClamp1D(y,z);
@@ -989,9 +989,9 @@ class ScalarGradientCompute
     {
       fill1D(y,z);
       y++;
-    }      
+    }
   }
-  
+
   inline void fill2D(int z)
   {
     int y;
@@ -1001,9 +1001,9 @@ class ScalarGradientCompute
     {
       fill1D(y,z);
       y++;
-    }      
+    }
   }
-  
+
   inline void fillSlices(int currentChunkStart,int currentChunkEnd)
   {
     offZ=currentChunkStart;
@@ -1023,7 +1023,7 @@ class ScalarGradientCompute
       else
         compute2D(z);
     }
-  }    
+  }
 };
 
 
@@ -1072,7 +1072,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   int sizeZ = inputDimensions[2];
 
   int chunkSize = 64;
-  
+
   if(fullZ < chunkSize) chunkSize=fullZ;
 
   int numChunks = ( fullZ + (chunkSize-1) ) / chunkSize;
@@ -1091,15 +1091,15 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
     while(currentChunk < numChunks)
     {
 //      MITK_INFO << "processing chunk " << currentChunk;
-      
+
       int currentChunkStart = currentChunk * chunkSize;
       int currentChunkEnd   = currentChunkStart + chunkSize - 1 ;
-      
+
       if( currentChunkEnd > (fullZ-1) )
         currentChunkEnd = (fullZ-1);
-      
+
       int currentChunkSize = currentChunkEnd - currentChunkStart + 1;
-    
+
       sgc.fillSlices( currentChunkStart , currentChunkEnd );
 
       glBindTexture(vtkgl::TEXTURE_3D, volume1);
@@ -1111,7 +1111,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
       currentChunk ++;
     }
   }
-  
+
   delete tmpPtr;
  // delete tmpPtr2;
 }
@@ -1137,7 +1137,7 @@ class RGBACompute
   int currentChunkEnd;
 
   int offZ;
-  
+
   public:
 
   RGBACompute( unsigned char *_dataPtr,unsigned char *_tmpPtr,unsigned char *_tmpPtr2,int _sizeX,int _sizeY,int _sizeZ,int _fullX,int _fullY,int _fullZ)
@@ -1156,7 +1156,7 @@ class RGBACompute
     sizeXm1=sizeX-1;
     sizeYm1=sizeY-1;
     sizeZm1=sizeZ-1;
-    
+
     fullXY=fullX*fullY;
   }
 
@@ -1164,11 +1164,11 @@ class RGBACompute
   {
     return dataPtr[ ( x + y * sizeX + z * sizeXY ) * 4 +3 ];
   }
-  
+
   inline void fill(int x,int y,int z)
   {
     int doff = x + y * fullX + (z-offZ) * fullXY;
-    
+
     tmpPtr[doff*4+0]= 0;
     tmpPtr[doff*4+1]= 0;
     tmpPtr[doff*4+2]= 0;
@@ -1176,19 +1176,19 @@ class RGBACompute
 
     tmpPtr2[doff*3+0]= 0;
     tmpPtr2[doff*3+1]= 0;
-    tmpPtr2[doff*3+2]= 0;       
+    tmpPtr2[doff*3+2]= 0;
   }
-  
+
   inline int clamp(int x)
   {
     if(x<0) x=0; else if(x>255) x=255;
     return x;
   }
-  
+
   inline void write(int x,int y,int z,int iGrayValue,int gx,int gy,int gz)
   {
-  
- /*       
+
+ /*
     gx /= aspect[0];
     gy /= aspect[1];
     gz /= aspect[2];
@@ -1196,30 +1196,30 @@ class RGBACompute
     int nx = static_cast<int>(0.5f*gx+127.5f);
     int ny = static_cast<int>(0.5f*gy+127.5f);
     int nz = static_cast<int>(0.5f*gz+127.5f);
-    
+
     int doff = x + y * fullX + (z-offZ) * fullXY;
-    
+
     //tmpPtr[doff*2+0]= 0;
-       
+
     tmpPtr[doff*4+0]= clamp(nx);
     tmpPtr[doff*4+1]= clamp(ny);
-    tmpPtr[doff*4+2]= clamp(nz);       
+    tmpPtr[doff*4+2]= clamp(nz);
     tmpPtr[doff*4+3]= clamp(iGrayValue);
 
     int soff = x + y * sizeX + z * sizeXY;
 
     tmpPtr2[doff*3+0]= dataPtr[soff*4+0];
     tmpPtr2[doff*3+1]= dataPtr[soff*4+1];
-    tmpPtr2[doff*3+2]= dataPtr[soff*4+2];       
+    tmpPtr2[doff*3+2]= dataPtr[soff*4+2];
 
 /*
     if( z == fullZ/2 )
     if( y == fullY/2 )
       MITK_INFO << x << " " << y << " " << z << " : " << iGrayValue << " : " << iGradient;
-  */  
+  */
   }
-  
-  
+
+
   inline void compute(int x,int y,int z)
   {
     int grayValue = sample(x,y,z);
@@ -1228,9 +1228,9 @@ class RGBACompute
     gx = sample(x+1,y,z) - sample(x-1,y,z);
     gy = sample(x,y+1,z) - sample(x,y-1,z);
     gz = sample(x,y,z+1) - sample(x,y,z-1);
-    
+
     write( x, y, z, grayValue, gx, gy, gz );
- 
+
   }
 
   inline void computeClamp(int x,int y,int z)
@@ -1241,30 +1241,30 @@ class RGBACompute
     if(x==0)            gx = 2 * ( sample(x+1,y,z) - grayValue       );
     else if(x==sizeXm1) gx = 2 * ( grayValue       - sample(x-1,y,z) );
     else                gx =       sample(x+1,y,z) - sample(x-1,y,z);
-    
+
     if(y==0)            gy = 2 * ( sample(x,y+1,z) - grayValue       );
     else if(y==sizeYm1) gy = 2 * ( grayValue       - sample(x,y-1,z) );
     else                gy =       sample(x,y+1,z) - sample(x,y-1,z);
-    
+
     if(z==0)            gz = 2 * ( sample(x,y,z+1) - grayValue       );
     else if(z==sizeZm1) gz = 2 * ( grayValue       - sample(x,y,z-1) );
     else                gz =       sample(x,y,z+1) - sample(x,y,z-1);
-    
+
     write( x, y, z, grayValue, gx, gy, gz );
   }
 
   inline void compute1D(int y,int z)
   {
     int x=0;
-    
+
     computeClamp(x,y,z);
     x++;
-    
+
     while(x<sizeX-1) {
-      compute(x,y,z);     
+      compute(x,y,z);
       x++;
     }
-    
+
     if(x<sizeX) {
       computeClamp(x,y,z);
       x++;
@@ -1274,25 +1274,25 @@ class RGBACompute
       fill(x,y,z);
       x++;
     }
-  }      
+  }
 
   inline void fill1D(int y,int z)
   {
     int x=0;
-    
+
     while(x<fullX) {
       fill(x,y,z);
       x++;
     }
-  }      
-        
+  }
+
 
   inline void computeClamp1D(int y,int z)
   {
     int x=0;
-    
+
     while(x<sizeX) {
-      computeClamp(x,y,z);     
+      computeClamp(x,y,z);
       x++;
     }
 
@@ -1300,35 +1300,35 @@ class RGBACompute
       fill(x,y,z);
       x++;
     }
-  }      
-        
+  }
+
   inline void computeClamp2D(int z)
   {
     int y=0;
 
     while(y<sizeY) {
-      computeClamp1D(y,z);     
+      computeClamp1D(y,z);
       y++;
     }
-    
+
     while(y<fullY) {
       fill1D(y,z);
       y++;
-    }      
+    }
   }
-  
+
   inline void compute2D(int z)
   {
     int y=0;
-    
-    computeClamp1D(y,z);     
+
+    computeClamp1D(y,z);
     y++;
-    
+
     while(y<sizeY-1) {
-      compute1D(y,z);     
+      compute1D(y,z);
       y++;
     }
-    
+
     if(y<sizeY) {
       computeClamp1D(y,z);
       y++;
@@ -1337,19 +1337,19 @@ class RGBACompute
     while(y<fullY) {
       fill1D(y,z);
       y++;
-    }      
+    }
   }
-  
+
   inline void fill2D(int z)
   {
     int y=0;
-    
+
     while(y<fullY) {
       fill1D(y,z);
       y++;
-    }      
+    }
   }
-  
+
   inline void fillSlices(int currentChunkStart,int currentChunkEnd)
   {
     offZ=currentChunkStart;
@@ -1361,7 +1361,7 @@ class RGBACompute
       else if(z>=sizeZ)      fill2D(z);
       else                   compute2D(z);
     }
-  }    
+  }
 };
 
 
@@ -1409,7 +1409,7 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
   int sizeZ = inputDimensions[2];
 
   int chunkSize = 64;
-  
+
   if(fullZ < chunkSize) chunkSize=fullZ;
 
   int numChunks = ( fullZ + (chunkSize-1) ) / chunkSize;
@@ -1428,27 +1428,27 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
     while(currentChunk < numChunks)
     {
 //      MITK_INFO << "processing chunk " << currentChunk;
-      
+
       int currentChunkStart = currentChunk * chunkSize;
       int currentChunkEnd   = currentChunkStart + chunkSize - 1 ;
-      
+
       if( currentChunkEnd > (fullZ-1) )
         currentChunkEnd = (fullZ-1);
-      
+
       int currentChunkSize = currentChunkEnd - currentChunkStart + 1;
-    
+
       sgc.fillSlices( currentChunkStart , currentChunkEnd );
 
       glBindTexture(vtkgl::TEXTURE_3D, volume1);
       vtkgl::TexSubImage3D(vtkgl::TEXTURE_3D,0,0,0,currentChunkStart,fullX,fullY,currentChunkSize,GL_RGBA,GL_UNSIGNED_BYTE,tmpPtr);
-                                                  
+
       glBindTexture(vtkgl::TEXTURE_3D, volume2);
       vtkgl::TexSubImage3D(vtkgl::TEXTURE_3D,0,0,0,currentChunkStart,fullX,fullY,currentChunkSize,GL_RGB,GL_UNSIGNED_BYTE,tmpPtr2);
-                                                    
+
       currentChunk ++;
     }
   }
-  
+
   delete tmpPtr;
   delete tmpPtr2;
 }
@@ -1466,7 +1466,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ComputeVolumeDimensions()
 
   int powerOfTwoDim[3];
 
-  if(this->SupportsNonPowerOfTwoTextures) 
+  if(this->SupportsNonPowerOfTwoTextures)
   {
     for ( int i = 0; i < 3; i++ )
       powerOfTwoDim[i]=(dim[i]+1)&~1;
@@ -1484,14 +1484,14 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ComputeVolumeDimensions()
 
     MITK_WARN << "using power-two textures (" << (1.0-double(dim[0]*dim[1]*dim[2])/double(powerOfTwoDim[0]*powerOfTwoDim[1]*powerOfTwoDim[2])) * 100.0 << "% memory wasted)";
   }
-  
+
   // Save the volume size
   this->VolumeDimensions[0] = powerOfTwoDim[0];
   this->VolumeDimensions[1] = powerOfTwoDim[1];
   this->VolumeDimensions[2] = powerOfTwoDim[2];
- 
+
   // What is the spacing?
-  double spacing[3]; 
+  double spacing[3];
   input->GetSpacing(spacing);
 
   // Compute the new spacing
@@ -1521,24 +1521,24 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol
     return true;
 
   ComputeVolumeDimensions();
-  
+
   int components = input->GetNumberOfScalarComponents();
 
   // Find the scalar range
   double scalarRange[2];
   input->GetPointData()->GetScalars()->GetRange(scalarRange, components-1);
- 
+
   // Is the difference between max and min less than 4096? If so, and if
   // the data is not of float or double type, use a simple offset mapping.
   // If the difference between max and min is 4096 or greater, or the data
   // is of type float or double, we must use an offset / scaling mapping.
-  // In this case, the array size will be 4096 - we need to figure out the 
+  // In this case, the array size will be 4096 - we need to figure out the
   // offset and scale factor.
   float offset;
   float scale;
- 
+
   int arraySizeNeeded;
- 
+
   int scalarType = input->GetScalarType();
 
   if ( scalarType == VTK_FLOAT || scalarType == VTK_DOUBLE || scalarRange[1] - scalarRange[0] > 255 )
@@ -1550,10 +1550,10 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol
   else
   {
     arraySizeNeeded = static_cast<int>(scalarRange[1] - scalarRange[0] + 1);
-    offset          = -scalarRange[0]; 
+    offset          = -scalarRange[0];
     scale           = 1.0;
   }
- 
+
   this->ColorTableSize   = arraySizeNeeded;
   this->ColorTableOffset = offset;
   this->ColorTableScale  = scale;
@@ -1569,14 +1569,14 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol
     //this->CreateTextureIndex(&this->Volume2Index);
 
     int dim[3]; this->GetVolumeDimensions(dim);
-    
+
     vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
 
     MITK_INFO << "allocating volume on gpu";
-    
+
     GLint gradientScalarTextureFormat = GL_RGBA8;
-    
-    if(this->UseCompressedTexture && SupportsCompressedTexture)   
+
+    if(this->UseCompressedTexture && SupportsCompressedTexture)
       gradientScalarTextureFormat = myGL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
     glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);
@@ -1627,7 +1627,7 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumesRGBA(vtkVolume *vtkNotUsed
   MITK_INFO << "updating rgba volume";
 
   ComputeVolumeDimensions();
-                                   
+
   // Allocating volume on gpu
   {
     // Deleting old textures
@@ -1639,18 +1639,18 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumesRGBA(vtkVolume *vtkNotUsed
     this->CreateTextureIndex(&this->Volume2Index);
 
     int dim[3]; this->GetVolumeDimensions(dim);
-    
+
     MITK_INFO << "allocating volume on gpu";
-    
+
     GLint gradientScalarTextureFormat = GL_RGBA8;
     GLint colorTextureFormat = GL_RGB8;
-    
-    if(this->UseCompressedTexture && SupportsCompressedTexture)   
+
+    if(this->UseCompressedTexture && SupportsCompressedTexture)
     {
       gradientScalarTextureFormat = myGL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
       colorTextureFormat = myGL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     }
-    
+
     vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
     glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);
     vtkgl::TexImage3D(vtkgl::TEXTURE_3D,0,gradientScalarTextureFormat,dim[0],dim[1],dim[2],0,GL_RGBA,GL_UNSIGNED_BYTE,0);
@@ -1674,7 +1674,7 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumesRGBA(vtkVolume *vtkNotUsed
 void vtkMitkOpenGLVolumeTextureMapper3D::Setup3DTextureParameters( bool linear )
 {
   //GPU_INFO << "Setup3DTextureParameters";
-  
+
   if( linear )
   {
     glTexParameterf( vtkgl::TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1691,7 +1691,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Setup3DTextureParameters( bool linear )
 }
 
 void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRenderer *vtkNotUsed(ren), vtkVolume *vol )
-{ 
+{
   // Update the volume containing the 2 byte scalar / gradient magnitude
   this->UpdateVolumes( vol );
 
@@ -1701,14 +1701,14 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
   {
     this->DeleteTextureIndex( &this->ColorLookupIndex );
     this->DeleteTextureIndex( &this->AlphaLookupIndex );
-    
+
     this->CreateTextureIndex( &this->ColorLookupIndex );
 
     vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
-    glBindTexture(GL_TEXTURE_2D, this->ColorLookupIndex);   
+    glBindTexture(GL_TEXTURE_2D, this->ColorLookupIndex);
 
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );    
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
@@ -1718,10 +1718,10 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
 
     if(this->UseCompressedTexture && SupportsCompressedTexture)
       colorLookupTextureFormat = myGL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-      
-    glTexImage2D( GL_TEXTURE_2D, 0,colorLookupTextureFormat, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, this->ColorLookup );    
+
+    glTexImage2D( GL_TEXTURE_2D, 0,colorLookupTextureFormat, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, this->ColorLookup );
   }
-  
+
 }
 
 
@@ -1732,10 +1732,10 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupRGBATextures(
   vtkVolume *vol )
 {
   MITK_INFO << "SetupFourDependentTextures";
-  
+
   this->UpdateVolumesRGBA(vol);
-  
-  
+
+
     /*
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glDisable( GL_TEXTURE_2D );
@@ -1750,12 +1750,12 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupRGBATextures(
   glEnable( vtkgl::TEXTURE_3D );
 
   // Update the volume containing the 3 byte scalars / gradient magnitude
-  if ( this->UpdateVolumes( vol ) || !this->Volume1Index || 
+  if ( this->UpdateVolumes( vol ) || !this->Volume1Index ||
        !this->Volume2Index || !this->Volume3Index )
-    {    
+    {
     int dim[3];
     this->GetVolumeDimensions(dim);
-    
+
     vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
     glBindTexture(vtkgl::TEXTURE_3D,0);
     this->DeleteTextureIndex(&this->Volume1Index);
@@ -1768,7 +1768,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupRGBATextures(
     glBindTexture(vtkgl::TEXTURE_3D,0);
     this->DeleteTextureIndex(&this->Volume2Index);
     this->CreateTextureIndex(&this->Volume2Index);
-    glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);   
+    glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);
     vtkgl::TexImage3D(vtkgl::TEXTURE_3D,0,this->InternalLA,dim[0],dim[1],
                       dim[2],0,GL_LUMINANCE_ALPHA,GL_UNSIGNED_BYTE,
                       this->Volume2);
@@ -1781,17 +1781,17 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupRGBATextures(
     vtkgl::TexImage3D(vtkgl::TEXTURE_3D,0,this->InternalRGB,dim[0],dim[1],
                       dim[2],0,GL_RGB,GL_UNSIGNED_BYTE,this->Volume3);
     }
-  
+
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);
   this->Setup3DTextureParameters( true );
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
-  glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);   
+  glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);
   this->Setup3DTextureParameters( true );
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
-  glBindTexture(vtkgl::TEXTURE_3D_EXT, this->Volume3Index);   
+  glBindTexture(vtkgl::TEXTURE_3D_EXT, this->Volume3Index);
   this->Setup3DTextureParameters( true );
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE3 );
@@ -1801,14 +1801,14 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupRGBATextures(
   // Update the dependent 2D table mapping scalar value and
   // gradient magnitude to opacity
   if ( this->UpdateColorLookup( vol ) || !this->AlphaLookupIndex )
-    {    
+    {
     this->DeleteTextureIndex(&this->ColorLookupIndex);
-    
+
     vtkgl::ActiveTexture( vtkgl::TEXTURE3 );
     glBindTexture(GL_TEXTURE_2D,0);
     this->DeleteTextureIndex(&this->AlphaLookupIndex);
     this->CreateTextureIndex(&this->AlphaLookupIndex);
-    glBindTexture(GL_TEXTURE_2D, this->AlphaLookupIndex);   
+    glBindTexture(GL_TEXTURE_2D, this->AlphaLookupIndex);
 
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
@@ -1818,12 +1818,12 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupRGBATextures(
     //MITK_INFO << "uploading transferfunction";
 
     glTexImage2D(GL_TEXTURE_2D,0,this->InternalAlpha, 256, 256, 0,
-                 GL_ALPHA, GL_UNSIGNED_BYTE, this->AlphaLookup );      
+                 GL_ALPHA, GL_UNSIGNED_BYTE, this->AlphaLookup );
     }
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE3 );
-  glBindTexture(GL_TEXTURE_2D, this->AlphaLookupIndex);   
-  
+  glBindTexture(GL_TEXTURE_2D, this->AlphaLookupIndex);
+
   */
 }
 
@@ -1838,7 +1838,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentShadeFP(
   glEnable( vtkgl::FRAGMENT_PROGRAM_ARB );
 
   vtkgl::BindProgramARB( vtkgl::FRAGMENT_PROGRAM_ARB, prgOneComponentShade );
-           
+
   this->SetupProgramLocalsForShadingFP( ren, vol );
 
   // Bind Textures
@@ -1846,7 +1846,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentShadeFP(
     vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
     glDisable( GL_TEXTURE_2D );
     glEnable( vtkgl::TEXTURE_3D );
-    glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);   
+    glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);
 
     vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
     glEnable( GL_TEXTURE_2D );
@@ -1856,11 +1856,11 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentShadeFP(
     vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
     glDisable( GL_TEXTURE_2D );
     glEnable( vtkgl::TEXTURE_3D );
-    glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);   
+    glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);
   }
-  
+
   int stages[4] = {1,1,1,0};
-  this->RenderPolygons( ren, vol, stages );  
+  this->RenderPolygons( ren, vol, stages );
 
   glDisable( vtkgl::FRAGMENT_PROGRAM_ARB );
 }
@@ -1876,22 +1876,22 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderRGBAShadeFP(
   vtkgl::BindProgramARB( vtkgl::FRAGMENT_PROGRAM_ARB, prgRGBAShade );
 
   this->SetupProgramLocalsForShadingFP( ren, vol );
-  
+
   // Bind Textures
   {
     vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
     glDisable( GL_TEXTURE_2D );
     glEnable( vtkgl::TEXTURE_3D );
-    glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);   
+    glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);
 
     vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
     glDisable( GL_TEXTURE_2D );
     glEnable( vtkgl::TEXTURE_3D );
-    glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);   
+    glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);
   }
 
   int stages[4] = {1,1,1,0};
-  this->RenderPolygons( ren, vol, stages );  
+  this->RenderPolygons( ren, vol, stages );
 
   glDisable( vtkgl::FRAGMENT_PROGRAM_ARB );
 }
@@ -1912,49 +1912,49 @@ void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
   float ambient = vol->GetProperty()->GetAmbient();
   float diffuse  = vol->GetProperty()->GetDiffuse();
   float specular = vol->GetProperty()->GetSpecular();
-  
+
   vtkTransform *volumeTransform = vtkTransform::New();
-  
+
   volumeTransform->SetMatrix( vol->GetMatrix() );
   volumeTransform->Inverse();
-  
+
   vtkLightCollection *lights = ren->GetLights();
   lights->InitTraversal();
-  
+
   vtkLight *light[2];
   light[0] = lights->GetNextItem();
   light[1] = lights->GetNextItem();
-  
+
   int lightIndex = 0;
-  
+
   double cameraPosition[3];
   double cameraFocalPoint[3];
-  
+
   ren->GetActiveCamera()->GetPosition( cameraPosition );
   ren->GetActiveCamera()->GetFocalPoint( cameraFocalPoint );
-  
+
   double viewDirection[3];
-  
+
   volumeTransform->TransformPoint( cameraPosition, cameraPosition );
   volumeTransform->TransformPoint( cameraFocalPoint, cameraFocalPoint );
-  
+
   viewDirection[0] = cameraFocalPoint[0] - cameraPosition[0];
   viewDirection[1] = cameraFocalPoint[1] - cameraPosition[1];
   viewDirection[2] = cameraFocalPoint[2] - cameraPosition[2];
-  
+
   vtkMath::Normalize( viewDirection );
-  
+
 
   ambientColor[0] = 0.0;
   ambientColor[1] = 0.0;
-  ambientColor[2] = 0.0;  
-  ambientColor[3] = 0.0;  
-  
+  ambientColor[2] = 0.0;
+  ambientColor[3] = 0.0;
+
   for ( lightIndex = 0; lightIndex < 2; lightIndex++ )
     {
     float dir[3] = {0,0,0};
     float half[3] = {0,0,0};
-    
+
     if ( light[lightIndex] == NULL ||
          light[lightIndex]->GetSwitch() == 0 )
       {
@@ -1972,9 +1972,9 @@ void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
       {
       float lightIntensity = light[lightIndex]->GetIntensity();
       double lightColor[3];
-      
+
       light[lightIndex]->GetDiffuseColor( lightColor );
-      
+
       double lightPosition[3];
       double lightFocalPoint[3];
       light[lightIndex]->GetTransformedPosition( lightPosition );
@@ -1982,18 +1982,18 @@ void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
 
       volumeTransform->TransformPoint( lightPosition, lightPosition );
       volumeTransform->TransformPoint( lightFocalPoint, lightFocalPoint );
-      
+
       dir[0] = lightPosition[0] - lightFocalPoint[0];
       dir[1] = lightPosition[1] - lightFocalPoint[1];
       dir[2] = lightPosition[2] - lightFocalPoint[2];
-      
+
       vtkMath::Normalize( dir );
-      
+
       lightDiffuseColor[lightIndex][0] = lightColor[0]*diffuse*lightIntensity;
       lightDiffuseColor[lightIndex][1] = lightColor[1]*diffuse*lightIntensity;
       lightDiffuseColor[lightIndex][2] = lightColor[2]*diffuse*lightIntensity;
       lightDiffuseColor[lightIndex][3] = 1.0;
-      
+
       lightSpecularColor[lightIndex][0]= lightColor[0]*specular*lightIntensity;
       lightSpecularColor[lightIndex][1]= lightColor[1]*specular*lightIntensity;
       lightSpecularColor[lightIndex][2]= lightColor[2]*specular*lightIntensity;
@@ -2002,27 +2002,27 @@ void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
       half[0] = dir[0] - viewDirection[0];
       half[1] = dir[1] - viewDirection[1];
       half[2] = dir[2] - viewDirection[2];
-      
+
       vtkMath::Normalize( half );
-      
+
       ambientColor[0] += ambient*lightColor[0];
       ambientColor[1] += ambient*lightColor[1];
-      ambientColor[2] += ambient*lightColor[2];      
+      ambientColor[2] += ambient*lightColor[2];
       }
 
     lightDirection[lightIndex][0] = (dir[0]+1.0)/2.0;
     lightDirection[lightIndex][1] = (dir[1]+1.0)/2.0;
     lightDirection[lightIndex][2] = (dir[2]+1.0)/2.0;
     lightDirection[lightIndex][3] = 0.0;
-    
+
     halfwayVector[lightIndex][0] = (half[0]+1.0)/2.0;
     halfwayVector[lightIndex][1] = (half[1]+1.0)/2.0;
     halfwayVector[lightIndex][2] = (half[2]+1.0)/2.0;
-    halfwayVector[lightIndex][3] = 0.0;    
+    halfwayVector[lightIndex][3] = 0.0;
     }
-  
+
   volumeTransform->Delete();
-  
+
 }
 
 void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
@@ -2041,49 +2041,49 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
   float diffuse       = vol->GetProperty()->GetDiffuse();
   float specular      = vol->GetProperty()->GetSpecular();
   float specularPower = vol->GetProperty()->GetSpecularPower();
-  
+
   vtkTransform *volumeTransform = vtkTransform::New();
-  
+
   volumeTransform->SetMatrix( vol->GetMatrix() );
   volumeTransform->Inverse();
-  
+
   vtkLightCollection *lights = ren->GetLights();
   lights->InitTraversal();
-  
+
   vtkLight *light[2];
   light[0] = lights->GetNextItem();
   light[1] = lights->GetNextItem();
-  
+
   int lightIndex = 0;
-  
+
   double cameraPosition[3];
   double cameraFocalPoint[3];
-  
+
   ren->GetActiveCamera()->GetPosition( cameraPosition );
   ren->GetActiveCamera()->GetFocalPoint( cameraFocalPoint );
-  
+
   volumeTransform->TransformPoint( cameraPosition, cameraPosition );
   volumeTransform->TransformPoint( cameraFocalPoint, cameraFocalPoint );
-  
+
   double viewDirection[4];
-  
+
   viewDirection[0] = cameraFocalPoint[0] - cameraPosition[0];
   viewDirection[1] = cameraFocalPoint[1] - cameraPosition[1];
   viewDirection[2] = cameraFocalPoint[2] - cameraPosition[2];
   viewDirection[3] = 0.0;
-  
+
   vtkMath::Normalize( viewDirection );
-  
+
   ambientColor[0] = 0.0;
   ambientColor[1] = 0.0;
-  ambientColor[2] = 0.0;  
-  ambientColor[3] = 0.0;  
-  
+  ambientColor[2] = 0.0;
+  ambientColor[3] = 0.0;
+
   for ( lightIndex = 0; lightIndex < 2; lightIndex++ )
     {
     float dir[3] = {0,0,0};
     float half[3] = {0,0,0};
-    
+
     if ( light[lightIndex] == NULL ||
          light[lightIndex]->GetSwitch() == 0 )
       {
@@ -2101,28 +2101,28 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
       {
       float lightIntensity = light[lightIndex]->GetIntensity();
       double lightColor[3];
-      
+
       light[lightIndex]->GetDiffuseColor( lightColor );
-      
+
       double lightPosition[3];
       double lightFocalPoint[3];
       light[lightIndex]->GetTransformedPosition( lightPosition );
       light[lightIndex]->GetTransformedFocalPoint( lightFocalPoint );
-      
+
       volumeTransform->TransformPoint( lightPosition, lightPosition );
       volumeTransform->TransformPoint( lightFocalPoint, lightFocalPoint );
-      
+
       dir[0] = lightPosition[0] - lightFocalPoint[0];
       dir[1] = lightPosition[1] - lightFocalPoint[1];
       dir[2] = lightPosition[2] - lightFocalPoint[2];
-      
+
       vtkMath::Normalize( dir );
-      
+
       lightDiffuseColor[lightIndex][0] = lightColor[0]*diffuse*lightIntensity;
       lightDiffuseColor[lightIndex][1] = lightColor[1]*diffuse*lightIntensity;
       lightDiffuseColor[lightIndex][2] = lightColor[2]*diffuse*lightIntensity;
       lightDiffuseColor[lightIndex][3] = 0.0;
-      
+
       lightSpecularColor[lightIndex][0]= lightColor[0]*specular*lightIntensity;
       lightSpecularColor[lightIndex][1]= lightColor[1]*specular*lightIntensity;
       lightSpecularColor[lightIndex][2]= lightColor[2]*specular*lightIntensity;
@@ -2131,34 +2131,34 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
       half[0] = dir[0] - viewDirection[0];
       half[1] = dir[1] - viewDirection[1];
       half[2] = dir[2] - viewDirection[2];
-      
+
       vtkMath::Normalize( half );
-      
+
       ambientColor[0] += ambient*lightColor[0];
       ambientColor[1] += ambient*lightColor[1];
-      ambientColor[2] += ambient*lightColor[2];      
+      ambientColor[2] += ambient*lightColor[2];
       }
 
     lightDirection[lightIndex][0] = dir[0];
     lightDirection[lightIndex][1] = dir[1];
     lightDirection[lightIndex][2] = dir[2];
     lightDirection[lightIndex][3] = 0.0;
-    
+
     halfwayVector[lightIndex][0] = half[0];
     halfwayVector[lightIndex][1] = half[1];
     halfwayVector[lightIndex][2] = half[2];
-    halfwayVector[lightIndex][3] = 0.0;    
+    halfwayVector[lightIndex][3] = 0.0;
     }
-  
+
   volumeTransform->Delete();
 
-  vtkgl::ProgramLocalParameter4fARB( vtkgl::FRAGMENT_PROGRAM_ARB, 0, 
+  vtkgl::ProgramLocalParameter4fARB( vtkgl::FRAGMENT_PROGRAM_ARB, 0,
               lightDirection[0][0],
               lightDirection[0][1],
               lightDirection[0][2],
               lightDirection[0][3] );
 
-  vtkgl::ProgramLocalParameter4fARB( vtkgl::FRAGMENT_PROGRAM_ARB, 1, 
+  vtkgl::ProgramLocalParameter4fARB( vtkgl::FRAGMENT_PROGRAM_ARB, 1,
               halfwayVector[0][0],
               halfwayVector[0][1],
               halfwayVector[0][2],
@@ -2198,23 +2198,23 @@ int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(  vtkRenderer *render
     //this->Initialize();
       this->Initialize(renderer);
     }
-  
+
   if ( !this->RenderPossible )
     {
     return 0;
     }
-  
+
   if ( !this->GetInput() )
     {
     return 0;
     }
-  
+
   if ( this->GetInput()->GetNumberOfScalarComponents() > 1 &&
        property->GetIndependentComponents() )
     {
     return 0;
     }
-  
+
   return 1;
 }
 
@@ -2226,7 +2226,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
  // vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
   //extensions->SetRenderWindow(NULL); // set render window to the current one.
   vtkOpenGLExtensionManager *extensions=static_cast<vtkOpenGLRenderWindow *>(renderer->GetRenderWindow())->GetExtensionManager();
-  
+
   int supports_texture3D=extensions->ExtensionSupported( "GL_VERSION_1_2" );
   if(supports_texture3D)
     {
@@ -2240,7 +2240,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
       extensions->LoadCorePromotedExtension("GL_EXT_texture3D");
       }
     }
-  
+
   int supports_multitexture=extensions->ExtensionSupported( "GL_VERSION_1_3" );
   if(supports_multitexture)
     {
@@ -2255,7 +2255,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
       extensions->LoadCorePromotedExtension("GL_ARB_multitexture");
       }
     }
-  
+
   this->SupportsCompressedTexture=extensions->ExtensionSupported("GL_VERSION_1_3")==1;
   if(!this->SupportsCompressedTexture)
     {
@@ -2267,27 +2267,27 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
       }
     }
   //GPU_INFO(this->SupportsCompressedTexture) << "supporting compressed textures";
-  
+
   this->SupportsNonPowerOfTwoTextures=
         extensions->ExtensionSupported("GL_VERSION_2_0")
         || extensions->ExtensionSupported("GL_ARB_texture_non_power_of_two");
 
   //GPU_INFO << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
-  
+
   int supports_GL_ARB_fragment_program   = extensions->ExtensionSupported( "GL_ARB_fragment_program" );
-  if(supports_GL_ARB_fragment_program)    
+  if(supports_GL_ARB_fragment_program)
     {
     extensions->LoadExtension( "GL_ARB_fragment_program" );
     }
 
   int supports_GL_ARB_vertex_program     = extensions->ExtensionSupported( "GL_ARB_vertex_program" );
-  if(supports_GL_ARB_vertex_program)    
+  if(supports_GL_ARB_vertex_program)
     {
     extensions->LoadExtension( "GL_ARB_vertex_program" );
     }
-  
+
   RenderPossible = 0;
-  
+
   if ( supports_texture3D          &&
        supports_multitexture       &&
        supports_GL_ARB_fragment_program   &&
@@ -2300,7 +2300,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
        vtkgl::BindProgramARB              &&
        vtkgl::ProgramStringARB            &&
        vtkgl::ProgramLocalParameter4fARB )
-    {    
+    {
     RenderPossible = 1;
     }
     else
@@ -2326,14 +2326,14 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
     vtkgl::GenProgramsARB( 1, &prgOneComponentShade );
     vtkgl::BindProgramARB( vtkgl::FRAGMENT_PROGRAM_ARB, prgOneComponentShade );
     vtkgl::ProgramStringARB( vtkgl::FRAGMENT_PROGRAM_ARB,
-          vtkgl::PROGRAM_FORMAT_ASCII_ARB, 
+          vtkgl::PROGRAM_FORMAT_ASCII_ARB,
           static_cast<GLsizei>(strlen(vtkMitkVolumeTextureMapper3D_OneComponentShadeFP)),
           vtkMitkVolumeTextureMapper3D_OneComponentShadeFP );
-          
+
    vtkgl::GenProgramsARB( 1, &prgRGBAShade );
    vtkgl::BindProgramARB( vtkgl::FRAGMENT_PROGRAM_ARB, prgRGBAShade );
    vtkgl::ProgramStringARB( vtkgl::FRAGMENT_PROGRAM_ARB,
-         vtkgl::PROGRAM_FORMAT_ASCII_ARB, 
+         vtkgl::PROGRAM_FORMAT_ASCII_ARB,
          static_cast<GLsizei>(strlen(vtkMitkVolumeTextureMapper3D_FourDependentShadeFP)),
          vtkMitkVolumeTextureMapper3D_FourDependentShadeFP );
   }
@@ -2344,27 +2344,27 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
 // Print the vtkMitkOpenGLVolumeTextureMapper3D
 void vtkMitkOpenGLVolumeTextureMapper3D::PrintSelf(ostream& os, vtkIndent indent)
 {
- 
+
  // vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
  // extensions->SetRenderWindow(NULL); // set render window to current render window
-  
+
   os << indent << "Initialized " << this->Initialized << endl;
   /* if ( this->Initialized )
     {
-    os << indent << "Supports GL_VERSION_1_2:" 
+    os << indent << "Supports GL_VERSION_1_2:"
        << extensions->ExtensionSupported( "GL_VERSION_1_2" ) << endl;
-    os << indent << "Supports GL_EXT_texture3D:" 
+    os << indent << "Supports GL_EXT_texture3D:"
        << extensions->ExtensionSupported( "GL_EXT_texture3D" ) << endl;
-     os << indent << "Supports GL_VERSION_1_3:" 
+     os << indent << "Supports GL_VERSION_1_3:"
        << extensions->ExtensionSupported( "GL_VERSION_1_3" ) << endl;
-    os << indent << "Supports GL_ARB_multitexture: " 
+    os << indent << "Supports GL_ARB_multitexture: "
        << extensions->ExtensionSupported( "GL_ARB_multitexture" ) << endl;
-    os << indent << "Supports GL_NV_texture_shader2: " 
+    os << indent << "Supports GL_NV_texture_shader2: "
        << extensions->ExtensionSupported( "GL_NV_texture_shader2" ) << endl;
-    os << indent << "Supports GL_NV_register_combiners2: " 
+    os << indent << "Supports GL_NV_register_combiners2: "
        << extensions->ExtensionSupported( "GL_NV_register_combiners2" )
        << endl;
-    os << indent << "Supports GL_ATI_fragment_shader: " 
+    os << indent << "Supports GL_ATI_fragment_shader: "
        << extensions->ExtensionSupported( "GL_ATI_fragment_shader" ) << endl;
     os << indent << "Supports GL_ARB_fragment_program: "
        << extensions->ExtensionSupported( "GL_ARB_fragment_program" ) << endl;
@@ -2380,12 +2380,12 @@ void vtkMitkOpenGLVolumeTextureMapper3D::PrintSelf(ostream& os, vtkIndent indent
     }
   extensions->Delete();
    */
-  
+
   if(this->RenderWindow!=0)
         {
           vtkOpenGLExtensionManager *extensions=
             static_cast<vtkOpenGLRenderWindow *>(this->RenderWindow)->GetExtensionManager();
-      
+
           if ( this->Initialized )
               {
                 os << indent << "Supports GL_VERSION_1_2:"
@@ -2417,7 +2417,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::PrintSelf(ostream& os, vtkIndent indent
                    << endl;
                 }
           }
-  
+
   this->Superclass::PrintSelf(os,indent);
 }
 

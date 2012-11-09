@@ -9,6 +9,6 @@ function(mitkFunctionCheckCxx0xHashString var_has_feature)
     "
     ${var_has_feature}
   )
-  
+
   set(${var_has_feature} "${${var_has_feature}}" PARENT_SCOPE)
 endfunction()

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,10 +26,10 @@ void
 mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
 {
   Q_UNUSED(context)
-  
+
   RegisterDiffusionImagingObjectFactory();
 
-  QmitkNodeDescriptorManager* manager = 
+  QmitkNodeDescriptorManager* manager =
     QmitkNodeDescriptorManager::GetInstance();
 
   mitk::NodePredicateDataType::Pointer isDiffusionImage = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -44,7 +44,7 @@ mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
 
   mitk::NodePredicateDataType::Pointer isFiberBundle = mitk::NodePredicateDataType::New("FiberBundle");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("FiberBundle"), QString(":/QmitkDiffusionImaging/FiberBundle.png"), isFiberBundle, manager));
-  
+
   mitk::NodePredicateDataType::Pointer isFiberBundleX = mitk::NodePredicateDataType::New("FiberBundleX");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("FiberBundleX"), QString(":/QmitkDiffusionImaging/FiberBundleX.png"), isFiberBundleX, manager));
 

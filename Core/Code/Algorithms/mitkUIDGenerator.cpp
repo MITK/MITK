@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -49,7 +49,7 @@ std::string UIDGenerator::GetUID()
   if (t)
   {
     s << t->tm_year + 1900;
-    
+
     if (t->tm_mon < 9) s << "0"; // add a 0 for months 1 to 9
     s << t->tm_mon + 1;
 
@@ -61,10 +61,10 @@ std::string UIDGenerator::GetUID()
 
     if (t->tm_min < 10) s << "0"; // add a 0 for minutes 1 to 9
     s << t->tm_min;
-    
+
     if (t->tm_sec < 10) s << "0"; // add a 0 for seconds 1 to 9
     s << t->tm_sec;
-    
+
     std::ostringstream rs;
     rs << (long int)( pow(10.0, double(m_LengthOfRandomPart)) / double(RAND_MAX) * double(rand()) );
 

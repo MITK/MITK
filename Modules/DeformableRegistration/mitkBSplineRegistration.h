@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,40 +37,40 @@ namespace mitk
   \author Thomas van Bruggen
   */
 
-  
+
   class MITK_DEFORMABLEREGISTRATION_EXPORT BSplineRegistration : public RegistrationBase
   {
 
   public:
-    
+
 
     mitkClassMacro(BSplineRegistration, RegistrationBase);
 
-    /*!  
-    * \brief Method for creation through the object factory. 
+    /*!
+    * \brief Method for creation through the object factory.
     */
     itkNewMacro(Self);
-   
 
-    /*!  
-    * \brief Sets the number of iterations which will be performed during the registration process. 
+
+    /*!
+    * \brief Sets the number of iterations which will be performed during the registration process.
     */
     void SetNumberOfIterations(int iterations);
-     
 
-    /*!  
-    * \brief Sets whether the result should be saved or not. 
+
+    /*!
+    * \brief Sets whether the result should be saved or not.
     */
     void SetSaveResult(bool saveResult);
 
-    /*!  
-    * \brief Sets the filename for the resulting deformed image. 
+    /*!
+    * \brief Sets the filename for the resulting deformed image.
     */
     void SetResultFileName(const char* resultName);
 
-   
-    /*!  
-    * \brief Starts the B-Spline registration. 
+
+    /*!
+    * \brief Starts the B-Spline registration.
     */
     virtual void GenerateData()
     {
@@ -108,30 +108,30 @@ namespace mitk
     itkSetMacro(DeformationFileName, std::string);
     itkSetMacro(Metric, int);
     itkSetMacro(MatchHistograms, bool);
-   
-    
-    
+
+
+
   protected:
 
-    /*!  
+    /*!
     * \brief Default constructor
-    */ 
+    */
     BSplineRegistration();
 
-    /*!  
+    /*!
     * \brief Default destructor
     */
     virtual ~BSplineRegistration();
 
-    /*!  
+    /*!
     * \brief Template class to perform the demons registration with any kind of image. Called by GenerateData().
-    */  
+    */
     template < typename TPixel, unsigned int VImageDimension >
       void GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1);
 
-    int m_Iterations;     
-    const char* m_ResultName;   
-    bool m_SaveResult;    
+    int m_Iterations;
+    const char* m_ResultName;
+    bool m_SaveResult;
 
     mitk::OptimizerParameters::Pointer m_OptimizerParameters;
     //mitk::MetricParameters::Pointer m_MetricParameters;

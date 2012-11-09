@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -48,7 +48,7 @@ class QmitkExt_EXPORT QmitkNewSegmentationDialog : public QDialog
   Q_OBJECT
 
   public:
-    
+
     QmitkNewSegmentationDialog(QWidget* parent = 0);
 
     virtual ~QmitkNewSegmentationDialog();
@@ -65,10 +65,10 @@ class QmitkExt_EXPORT QmitkNewSegmentationDialog : public QDialog
 
     void setPrompt( const QString& prompt );
     void setSegmentationName( const QString& name );
-  
+
   protected slots:
 
-    void onAcceptClicked(); 
+    void onAcceptClicked();
     void onNewOrganNameChanged(const QString&);
     void onColorBtnClicked();
     void onColorChange(const QString& completedWord);

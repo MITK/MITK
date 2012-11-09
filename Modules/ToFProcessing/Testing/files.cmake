@@ -4,7 +4,7 @@ set(MODULE_TESTS
   mitkToFCompositeFilterTest.cpp
   mitkToFProcessingCommonTest.cpp
 )
- 
+
 set(MODULE_CUSTOM_TESTS
   mitkToFImageDownsamplingFilterTest.cpp
 )

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -138,7 +138,7 @@ QmitkTbssSkeletonizationView::QmitkTbssSkeletonizationView()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
 {
-  
+
 }
 
 QmitkTbssSkeletonizationView::~QmitkTbssSkeletonizationView()
@@ -148,7 +148,7 @@ QmitkTbssSkeletonizationView::~QmitkTbssSkeletonizationView()
 void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
   //datamanager selection changed
-  if (!this->IsActivated())  
+  if (!this->IsActivated())
     return;
 }
 
@@ -161,7 +161,7 @@ void QmitkTbssSkeletonizationView::CreateQtPartControl( QWidget *parent )
   {
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkTbssSkeletonizationViewControls;
-    m_Controls->setupUi( parent ); 
+    m_Controls->setupUi( parent );
     this->CreateConnections();
   }
 
@@ -196,7 +196,7 @@ void QmitkTbssSkeletonizationView::Deactivated()
 void QmitkTbssSkeletonizationView::CreateConnections()
 {
   if ( m_Controls )
-  {    
+  {
     connect( (QObject*)(m_Controls->m_Skeletonize), SIGNAL(clicked()), this, SLOT(Skeletonize() ));
     connect( (QObject*)(m_Controls->m_Project), SIGNAL(clicked()), this, SLOT(Project() ));
   }

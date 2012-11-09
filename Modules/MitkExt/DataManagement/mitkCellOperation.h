@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,9 +40,9 @@ class MitkExt_EXPORT CellOperation : public Operation
   //## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
   //## cellId: Id of the cell and a vector if needed
     CellOperation(OperationType operationType, int cellId, Vector3D vector);
-    
+
     CellOperation(OperationType operationType, int cellId);
-  
+
     virtual ~CellOperation(){};
 
     int GetCellId() {return m_CellId;};

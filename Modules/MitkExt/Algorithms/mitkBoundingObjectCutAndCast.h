@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,9 +27,9 @@ namespace mitk {
 
 //##Documentation
 //## @brief Cuts an Boundingobject out of an mitk Image
-//## 
+//##
 //## Input Parameters are a mitk::BoundingObject and optionally an mitk::Image
-//## if no mitk::Image is provided, the resulting image will have m_InsideValue as pixelvalue on inside pixel, 
+//## if no mitk::Image is provided, the resulting image will have m_InsideValue as pixelvalue on inside pixel,
 //## otherwise it will have the pixelvalue of the input image.
 //## Pixel on the outside of the BoundingObject will have a pixelvalue of m_OutsideValue
 //## \todo What Image resolution/spacing should be used, if no input image is given?

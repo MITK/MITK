@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  struct ThreadDataStruct 
+  struct ThreadDataStruct
   {
     std::vector<std::vector<short> > m_InputData;
     std::vector<float*> m_OutputData;
@@ -44,7 +44,7 @@ namespace mitk
 
   class MITK_TOFHARDWARE_EXPORT ThreadedToFRawDataReconstruction : public itk::ProcessObject
   {
-   public: 
+   public:
 
     mitkClassMacro( ThreadedToFRawDataReconstruction ,  itk::ProcessObject );
     itkNewMacro( Self );
@@ -77,19 +77,19 @@ namespace mitk
     This method generates the two outputs of the ToFImageSource: The distance and the intensity image
     */
     virtual void GenerateData();
-    
+
     /*!
     \brief method configures the camera output and prepares the thread data struct for threaded data
           generation
     */
     virtual void BeforeThreadedGenerateData();
- 
+
     /*!
     \brief threader callback function for multi threaded data generation
     */
     static ITK_THREAD_RETURN_TYPE ThreadedGenerateDataCallbackFunction(void* data);
     /*!
-    \brief Method to reduce image size from original controller size to output size (200x200px) 
+    \brief Method to reduce image size from original controller size to output size (200x200px)
     and rotate the image. This is needed due to defect pixel rows at the rim of the chip
     */
     void ResizeOutputImage(float* in, float* out);
@@ -107,11 +107,11 @@ namespace mitk
     float* m_CISAmpl;               ///< holds the amplitude information from for one amplitude image slice
     float* m_CISInten;              ///< holds the intensity information from for one intensity image slice
     float* m_ThreadedCISDist;
-    float* m_ThreadedCISAmpl; 
+    float* m_ThreadedCISAmpl;
     float* m_ThreadedCISInten;
-    
+
     itk::MultiThreader::Pointer m_Threader;
-    ThreadDataStruct* m_ThreadData; 
+    ThreadDataStruct* m_ThreadData;
 
   };
 } //end mitk namespace

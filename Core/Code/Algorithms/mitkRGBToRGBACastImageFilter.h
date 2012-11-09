@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ template <class TPixel, unsigned int VImageDimension> class ITK_EXPORT Image;
 namespace mitk {
 
 //##Documentation
-//## @brief 
+//## @brief
 //## @ingroup Process
 class MITK_CORE_EXPORT RGBToRGBACastImageFilter : public ImageToImageFilter
 {
@@ -43,7 +43,7 @@ public:
 
   /** Static convenience method to check if the passed mitk::Image is
    * an RGB image in the sense of this converter filter.
-   * 
+   *
    * Returns falsefor RGBA and all other images.
    */
   static bool IsRGBImage( const mitk::Image *image );
@@ -68,14 +68,14 @@ protected:
   virtual void GenerateData();
 
   template < typename TPixel, unsigned int VImageDimension >
-  void InternalCast( itk::Image< TPixel, VImageDimension > *itkImage, 
+  void InternalCast( itk::Image< TPixel, VImageDimension > *itkImage,
     mitk::RGBToRGBACastImageFilter *addComponentFilter,
     typename TPixel::ComponentType defaultAlpha );
 
   mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
   mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
 
-  //##Description 
+  //##Description
   //## @brief Time when Header was last initialized
   itk::TimeStamp m_TimeOfHeaderInitialization;
 };

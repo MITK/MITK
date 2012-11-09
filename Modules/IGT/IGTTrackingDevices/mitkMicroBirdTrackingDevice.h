@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -63,8 +63,8 @@ namespace mitk {
     virtual bool CloseConnection();
 
     /**Documentation
-    * \brief Start the tracking. 
-    * 
+    * \brief Start the tracking.
+    *
     * A new thread is created, which reads the position and orientation information of each tool and stores them inside the tools.
     **/
     virtual bool StartTracking();
@@ -103,7 +103,7 @@ namespace mitk {
     **/
     ToolType* GetMicroBirdTool(unsigned int toolNumber);
 
-    virtual void InvalidateAll();         ///< invalidates all tools (on stoptracking, closeconnection)     
+    virtual void InvalidateAll();         ///< invalidates all tools (on stoptracking, closeconnection)
     bool SwitchTransmitter(bool switchOn);///< Switches the transmitter on resp. off
 
     /**Documentation
@@ -111,14 +111,14 @@ namespace mitk {
     *
     * This function should only be executed by a new thread (through StartTracking() and ThreadStartTracking())
     */
-    virtual void TrackTools();    
+    virtual void TrackTools();
 
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);  ///< Helper function, because the itk::MultiThreader can only start a new thread with a static member function
 
     itkSetStringMacro(ErrorMessage);
 
     itk::FastMutexLock::Pointer m_ToolsMutex;
-    ToolContainerType m_Tools;  
+    ToolContainerType m_Tools;
 
     std::string m_ErrorMessage;
 

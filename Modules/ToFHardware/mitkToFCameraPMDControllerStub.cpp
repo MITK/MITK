@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  ToFCameraPMDController::ToFCameraPMDController():m_PMDRes(0), m_PixelNumber(40000), m_NumberOfBytes(0), 
-    m_CaptureWidth(200), m_CaptureHeight(200), m_SourceDataSize(0), m_SourceDataStructSize(0), m_ConnectionCheck(false), 
+  ToFCameraPMDController::ToFCameraPMDController():m_PMDRes(0), m_PixelNumber(40000), m_NumberOfBytes(0),
+    m_CaptureWidth(200), m_CaptureHeight(200), m_SourceDataSize(0), m_SourceDataStructSize(0), m_ConnectionCheck(false),
     m_InputFileName("")
   {
     MITK_WARN("ToF") << "PMD devices currently not available";
@@ -32,7 +32,7 @@ namespace mitk
   {
     MITK_WARN("ToF") << "PMD devices currently not available";
     return true;
-  } 
+  }
 
   bool ToFCameraPMDController::ErrorText(int error)
   {

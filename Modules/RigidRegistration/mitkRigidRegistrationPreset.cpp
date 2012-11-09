@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -234,7 +234,7 @@ namespace mitk {
   //  itk::Array<double> transformValues = m_TransformValues[item];
   //  double transform = transformValues[0];
   //  xmlWriter.WriteProperty("TRANSFORM", transformValues[0]);
-  //  if (transform == mitk::TransformParameters::TRANSLATIONTRANSFORM || transform == mitk::TransformParameters::SCALETRANSFORM || 
+  //  if (transform == mitk::TransformParameters::TRANSLATIONTRANSFORM || transform == mitk::TransformParameters::SCALETRANSFORM ||
   //        transform == mitk::TransformParameters::SCALELOGARITHMICTRANSFORM || transform == mitk::TransformParameters::VERSORTRANSFORM ||
   //        transform == mitk::TransformParameters::RIGID2DTRANSFORM || transform == mitk::TransformParameters::EULER2DTRANSFORM)
   //  {
@@ -522,7 +522,7 @@ namespace mitk {
 
   itk::Array<double> RigidRegistrationPreset::loadTransformValues(itk::Array<double> transformValues, double transform, const char **atts)
   {
-    if (transform == mitk::TransformParameters::TRANSLATIONTRANSFORM || transform == mitk::TransformParameters::SCALETRANSFORM || 
+    if (transform == mitk::TransformParameters::TRANSLATIONTRANSFORM || transform == mitk::TransformParameters::SCALETRANSFORM ||
           transform == mitk::TransformParameters::SCALELOGARITHMICTRANSFORM || transform == mitk::TransformParameters::VERSORTRANSFORM ||
           transform == mitk::TransformParameters::RIGID2DTRANSFORM || transform == mitk::TransformParameters::EULER2DTRANSFORM)
     {

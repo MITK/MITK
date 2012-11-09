@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ int main(int argc, char** argv)
   mitk::TestDICOMLoading::StringContainer files;
 
   for (int arg = 1; arg < argc; ++arg) files.push_back( argv[arg] );
-  
+
   mitk::TestDICOMLoading::ImageList images = loader.LoadFiles(files);
 
   // combine individual dumps in a way that VerifyDICOMMitkImageDump is able to separate again.

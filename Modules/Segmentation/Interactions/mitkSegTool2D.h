@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,7 +51,7 @@ class BaseRenderer;
    - Projection of a 3D contour onto a 2D plane/slice
 
    SegTool2D tries to structure the interaction a bit. If you pass "PressMoveRelease" as the interaction type
-   of your derived tool, you might implement the methods OnMousePressed, OnMouseMoved, and OnMouseReleased. 
+   of your derived tool, you might implement the methods OnMousePressed, OnMouseMoved, and OnMouseReleased.
    Yes, your guess about when they are called is correct.
 
   \warning Only to be instantiated by mitk::ToolManager.
@@ -61,7 +61,7 @@ class BaseRenderer;
 class Segmentation_EXPORT SegTool2D : public Tool
 {
   public:
-    
+
     mitkClassMacro(SegTool2D, Tool);
 
     /**
@@ -115,7 +115,7 @@ class Segmentation_EXPORT SegTool2D : public Tool
     void WriteBackSegmentationResult (const PositionEvent*, Image*);
 
     /**
-      \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure. 
+      \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
     */
 

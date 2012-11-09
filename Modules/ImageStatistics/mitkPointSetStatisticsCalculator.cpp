@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -118,7 +118,7 @@ else //odd
 
 mitk::Point3D mitk::PointSetStatisticsCalculator::GetMean(std::vector<mitk::Point3D> list)
 {
-if (list.empty()) 
+if (list.empty())
   {
     mitk::Point3D emptyPoint;
     emptyPoint.Fill(0);
@@ -206,7 +206,7 @@ double mitk::PointSetStatisticsCalculator::GetPositionErrorMax()
 {
 return GetMax(GetErrorList(PointSetToVector(m_PointSet)));
 }
-  
+
 double mitk::PointSetStatisticsCalculator::GetPositionErrorMin()
 {
 return GetMin(GetErrorList(PointSetToVector(m_PointSet)));

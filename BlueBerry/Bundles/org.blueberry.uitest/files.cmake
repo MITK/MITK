@@ -1,7 +1,7 @@
 set(MOC_H_FILES
   src/internal/berryPluginActivator.h
   src/util/berryEmptyPerspective.h
-  
+
   src/berryUITestApplication.h
 )
 
@@ -11,9 +11,9 @@ set(CACHED_RESOURCE_FILES
 
 set(SRC_CPP_FILES
   berryUITestApplication.cpp
-  
+
   harness/berryUITestCase.cpp
-  
+
   util/berryEmptyPerspective.cpp
 )
 

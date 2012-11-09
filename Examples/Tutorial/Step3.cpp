@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
   // Part I: Basic initialization
   //*************************************************************************
 
-  // Create a DataStorage  
+  // Create a DataStorage
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
   //*************************************************************************
@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
   // *********************************************************
   // ******************* END OF NEW PART 2 *******************
   // *********************************************************
-  
+
   //*************************************************************************
   // Part VI: Qt-specific initialization
   //*************************************************************************

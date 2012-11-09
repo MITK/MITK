@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -61,16 +61,16 @@ namespace mitk
     /** Generate a synthetic cube (regular lattice) network */
     void GenerateSyntheticCubeNetwork( mitk::ConnectomicsNetwork::Pointer network, int cubeExtent, double distance );
 
-    /** Generate a highly heterogenic network 
-    * 
+    /** Generate a highly heterogenic network
+    *
     * This is achieved by generating a center vertex and vertices on
     * a sphere surface, which are all only connected to the center
     * vertex.                                                        */
-    void GenerateSyntheticCenterToSurfaceNetwork( 
+    void GenerateSyntheticCenterToSurfaceNetwork(
       mitk::ConnectomicsNetwork::Pointer network, int numberOfPoints, double radius );
 
     /** Generate a random network without specific characteristics
-    * 
+    *
     * This is achieved by generating vertices and then deciding whether to
     * specific vertices are connected by comparing a random number to the threshold */
     void GenerateSyntheticRandomNetwork(

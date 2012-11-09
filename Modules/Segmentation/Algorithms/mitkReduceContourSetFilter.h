@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -54,23 +54,23 @@ namespace mitk {
 
     class Segmentation_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
     {
-        
+
     public:
 
        enum Reduction_Type
         {
             NTH_POINT, DOUGLAS_PEUCKER
         };
-        
-        struct LineSegment 
+
+        struct LineSegment
         {
             unsigned int StartIndex;
             unsigned int EndIndex;
         };
-        
+
         mitkClassMacro(ReduceContourSetFilter,SurfaceToSurfaceFilter);
         itkNewMacro(Self);
-        
+
         itkSetMacro(MinSpacing, double);
         itkSetMacro(MaxSpacing, double);
         itkSetMacro(ReductionType, Reduction_Type);
@@ -78,7 +78,7 @@ namespace mitk {
         itkSetMacro(Tolerance, double);
 
         itkGetMacro(NumberOfPointsAfterReduction, unsigned int);
-        
+
         //Resets the filter, i.e. removes all inputs and outputs
         void Reset();
 
@@ -101,17 +101,17 @@ namespace mitk {
         virtual ~ReduceContourSetFilter();
         virtual void GenerateData();
         virtual void GenerateOutputInformation();
-        
+
     private:
         void ReduceNumberOfPointsByNthPoint (vtkIdType cellSize, vtkIdType* cell, vtkPoints* points, vtkPolygon* reducedPolygon, vtkPoints* reducedPoints);
-        
+
         void ReduceNumberOfPointsByDouglasPeucker (vtkIdType cellSize, vtkIdType* cell, vtkPoints* points, vtkPolygon* reducedPolygon, vtkPoints* reducedPoints);
-        
+
         bool CheckForIntersection (vtkIdType* currentCell, vtkIdType currentCellSize, vtkPoints* currentPoints, /*vtkIdType numberOfIntersections, vtkIdType* intersectionPoints,*/ unsigned int currentInputIndex);
-        
-        double m_MinSpacing; 
+
+        double m_MinSpacing;
         double m_MaxSpacing;
-       
+
         Reduction_Type m_ReductionType;
         unsigned int m_StepSize;
         double m_Tolerance;
@@ -121,8 +121,8 @@ namespace mitk {
         unsigned int m_ProgressStepSize;
 
         unsigned int m_NumberOfPointsAfterReduction;
-        
+
     };//class
-    
+
 }//namespace
 #endif

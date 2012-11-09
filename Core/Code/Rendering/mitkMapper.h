@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,7 +36,7 @@ namespace mitk {
   class BaseRenderer;
   class BaseData;
   class DataNode;
-  
+
 
   /** \brief Interface for accessing (templated) LocalStorageHandler instances.
    */
@@ -51,9 +51,9 @@ namespace mitk {
   //##Documentation
   //## @brief Base class of all mappers, 2D as well as 3D
   //##
-  //## Base class of all Mappers, 2D as well as 3D. 
+  //## Base class of all Mappers, 2D as well as 3D.
   //## Subclasses of mitk::Mapper control the creation of rendering primitives
-  //## that interface to the graphics library (e.g., OpenGL, vtk). 
+  //## that interface to the graphics library (e.g., OpenGL, vtk).
   //## @todo Should Mapper be a subclass of ImageSource?
   //## @ingroup Mapper
   class MITK_CORE_EXPORT Mapper : public itk::Object
@@ -68,7 +68,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Get the data to map
-    //## 
+    //##
     //## Returns the mitk::BaseData object associated with this mapper.
     //## @returns the mitk::BaseData associated with this mapper.
     BaseData* GetData() const;
@@ -107,7 +107,7 @@ namespace mitk {
     //## of BoolProperty). Return value is the visibility. Default is
     //## visible==true, i.e., true is returned even if the property (@a
     //## propertyKey) is not found.
-    //## 
+    //##
     //## Thus, the return value has a different meaning than in the
     //## GetVisibility method!
     //## @sa GetVisibility
@@ -118,28 +118,28 @@ namespace mitk {
     virtual void MitkRenderOverlay(BaseRenderer* renderer) = 0;
     virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer) = 0;
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer) = 0;
-    
+
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) = 0;
 
-    
-    
-    /** 
+
+
+    /**
     * \brief Returns whether this is an vtk-based mapper
     */
      virtual bool IsVtkBased() const = 0;
-    
-    
+
+
     /** \brief Returns true if this mapper owns the specified vtkProp for
      * the given BaseRenderer.
      *
      * Note: returns false by default; should be implemented for VTK-based
      * Mapper subclasses. */
     virtual bool HasVtkProp( const vtkProp* /*prop*/, BaseRenderer* /*renderer*/ )
-    { 
-      return false; 
+    {
+      return false;
     }
 
-    /** 
+    /**
     * \brief Release vtk-based graphics resources. Must be overwritten in
     * subclasses if vtkProps are used.
     */
@@ -150,15 +150,15 @@ namespace mitk {
     *
     * \param node The node for which the properties are set
     * \param overwrite overwrite existing properties (default: \a false)
-    * \param renderer defines which property list of node is used 
+    * \param renderer defines which property list of node is used
     * (default: \a NULL, i.e. default property list)
     */
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
     /** \brief Returns the current time step as calculated from the renderer */
-    int GetTimestep() const {return m_TimeStep;}; 
+    int GetTimestep() const {return m_TimeStep;};
 
-    
+
     /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
      * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
      * ProgressEvent on BaseRenderer. */
@@ -179,7 +179,7 @@ namespace mitk {
 
     //## Updates the time step, which is sometimes needed in subclasses
     virtual void CalculateTimeStep( BaseRenderer* renderer );
-    
+
     //## Reset the mapper (i.e., make sure that nothing is displayed) if no
     //## valid data is present.
     //##
@@ -209,26 +209,26 @@ namespace mitk {
     {
     };
 
-     
+
     /** \brief Templated class for management of LocalStorage implementations in Mappers.
      *
      * The LocalStorageHandler is responsible for providing a LocalStorage to a
      * concrete mitk::Mapper subclass. Each RenderWindow / mitk::BaseRenderer is
      * assigned its own LocalStorage instance so that all contained ressources
      * (actors, shaders, textures, ...) are provided individually per window.
-     * 
+     *
      */
     template<class L> class LocalStorageHandler : public mitk::BaseLocalStorageHandler
     {
       protected:
-    
+
         std::map<mitk::BaseRenderer *,L*> m_BaseRenderer2LS;
-      
+
       public:
 
         /** \brief deallocates a local storage for a specifc BaseRenderer (if the
          * BaseRenderer is itself deallocating it in its destructor, it has to set
-         * unregisterFromBaseRenderer=false) 
+         * unregisterFromBaseRenderer=false)
          */
         virtual void ClearLocalStorage(mitk::BaseRenderer *renderer,bool unregisterFromBaseRenderer=true )
         {
@@ -239,7 +239,7 @@ namespace mitk {
           m_BaseRenderer2LS.erase( renderer );
           delete l;
         }
-      
+
         /** \brief Retrieves a LocalStorage for a specific BaseRenderer.
          *
          * Should be used by mappers in GenerateData() and ApplyProperties()
@@ -256,7 +256,7 @@ namespace mitk {
           }
           return l;
         }
-        
+
         ~LocalStorageHandler()
         {
           typename std::map<mitk::BaseRenderer *,L*>::iterator it;
@@ -266,10 +266,10 @@ namespace mitk {
             (*it).first->UnregisterLocalStorageHandler(this);
             delete (*it).second;
           }
-          
+
           m_BaseRenderer2LS.clear();
         }
-             
+
     };
 
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,76 +31,76 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   }
   else {
   std::cout << "[PASSED]" << std::endl;
-  } 
+  }
   mitk::BoolProperty::Pointer boolProp = mitk::BoolProperty::New(false);
   mitk::BoolProperty::Pointer boolProp2 = mitk::BoolProperty::New(false);
   std::cout << "Testing BoolProperty ==: ";
   if (! (*boolProp2 == *boolProp) ) {
-    
+
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
-    } 
+    }
   std::cout << "[PASSED]" << std::endl;
-  unsigned long tBefore,tAfter; 
-  
+  unsigned long tBefore,tAfter;
+
   std::cout << "Testing SetProperty() with new key value: ";
   tBefore = propList->GetMTime();
-  propList->SetProperty("test",boolProp); 
+  propList->SetProperty("test",boolProp);
   tAfter = propList->GetMTime();
   if (! ( tAfter > tBefore) ) {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "[PASSED]" << std::endl;
-  
+
   std::cout << "Testing SetProperty() with changed property value: ";
   tBefore = propList->GetMTime();
-  propList->SetProperty("test",mitk::BoolProperty::New(true)); 
+  propList->SetProperty("test",mitk::BoolProperty::New(true));
   tAfter = propList->GetMTime();
   if (!  (tAfter > tBefore) ) {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "[PASSED]" << std::endl;
-  
+
   std::cout << "Testing SetProperty() with unchanged property value: ";
   tBefore = propList->GetMTime();
-  propList->SetProperty("test",mitk::BoolProperty::New(true)); 
+  propList->SetProperty("test",mitk::BoolProperty::New(true));
   tAfter = propList->GetMTime();
   if ( tBefore != tAfter ) {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "[PASSED]" << std::endl;
-  
+
   std::cout << "Testing MTime correctness when changing property value: ";
   boolProp = mitk::BoolProperty::New(true);
-  propList->ReplaceProperty("test",boolProp); 
+  propList->ReplaceProperty("test",boolProp);
   tBefore = propList->GetMTime();
   boolProp->SetValue(true);
   tAfter = propList->GetMTime();
   boolProp->SetValue(false);
   unsigned long tAfterAll = propList->GetMTime();
-  
+
   if (tBefore != tAfter || tAfterAll <= tAfter) {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "[PASSED]" << std::endl;
- 
+
   std::cout << "Testing MTime correctness when calling SetProperty twice: ";
   boolProp = mitk::BoolProperty::New(true);
-  propList->SetProperty("test",boolProp); 
+  propList->SetProperty("test",boolProp);
   tBefore = propList->GetMTime();
-  propList->SetProperty("test",boolProp); 
+  propList->SetProperty("test",boolProp);
   tAfter = propList->GetMTime();
-  
+
   if (tBefore != tAfter) {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "[PASSED]" << std::endl;
- 
+
 
   std::cout << "Testing if existing properties survive SetProperty: ";
   propList->SetProperty("test",boolProp);
@@ -127,13 +127,13 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
   std::cout << "[PASSED]" << std::endl;
-  
+
   //std::cout << "Testing output of PropertyList to file: ";
   //if ( TestXMLWriter() )
   //  std::cout << "[PASSED]" << std::endl;
   //else
   //  return EXIT_FAILURE;
-  
+
   std::cout << "Testing GetPropertyValue(bool): ";
   mitk::BoolProperty::Pointer gpvTest = mitk::BoolProperty::New(true);
   propList->SetProperty("gpvBool", gpvTest);
@@ -143,13 +143,13 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
     std::cout << "[PASSED]" << std::endl;
   else
   {
-    std::cout << "Oh, not goot:" 
+    std::cout << "Oh, not goot:"
                  "\nWe called propList->GetPropertyValue<bool>('gpvBool', b) and it returned " << getPropertyValueReturnValue <<
                  "\nThen we compared b [" << b << "] and gpvTest->GetValue() [" << gpvTest->GetValue() << "]" << std::endl;
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  
+
   std::cout << "Testing GetPropertyValue(float): ";
   mitk::FloatProperty::Pointer gpvTest2 = mitk::FloatProperty::New(3.1337);
   propList->SetProperty("gpvfloat", gpvTest2);
@@ -183,7 +183,7 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
 
-  {  
+  {
     std::cout << "Testing GetBoolProperty(): ";
     mitk::BoolProperty::Pointer prop = mitk::BoolProperty::New(true);
     propList->ReplaceProperty("test", prop);
@@ -196,7 +196,7 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
       return EXIT_FAILURE;
     }
   }
-  {  
+  {
     std::cout << "Testing GetIntProperty(): ";
     mitk::IntProperty::Pointer prop = mitk::IntProperty::New(31337);
     propList->ReplaceProperty("test", prop);
@@ -209,7 +209,7 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
       return EXIT_FAILURE;
     }
   }
-  {  
+  {
     std::cout << "Testing GetFloatProperty(): ";
     mitk::FloatProperty::Pointer prop = mitk::FloatProperty::New(31.337);
     propList->ReplaceProperty("test", prop);
@@ -221,8 +221,8 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
       std::cout << "[FAILED]" << std::endl;
       return EXIT_FAILURE;
     }
-  } 
-  {  
+  }
+  {
     std::cout << "Testing GetStringProperty(): ";
     mitk::StringProperty::Pointer prop = mitk::StringProperty::New("MITK");
     propList->ReplaceProperty("test", prop);
@@ -234,8 +234,8 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
       std::cout << "[FAILED]" << std::endl;
       return EXIT_FAILURE;
     }
-  } 
-  
+  }
+
   std::cout << "[TEST DONE]" << std::endl;
   return EXIT_SUCCESS;
 }

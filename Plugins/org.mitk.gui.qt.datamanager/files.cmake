@@ -13,8 +13,8 @@ set(INTERNAL_CPP_FILES
   QmitkPropertyTreeFilterProxyModel.cpp
   QmitkPropertyTreeModel.cpp
   QmitkPropertyTreeView.cpp
-  QmitkNodeTableViewKeyFilter.cpp 
-  QmitkInfoDialog.cpp 
+  QmitkNodeTableViewKeyFilter.cpp
+  QmitkInfoDialog.cpp
 )
 
 set(MOC_H_FILES

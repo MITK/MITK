@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -133,10 +133,10 @@ int QmitkTranslationTransformView::GetNumberOfTransformParameters()
     {
       m_Controls.m_ScalesTranslationTransformTranslationZ->show();
       m_Controls.textLabel4_4_2->show();
-      
+
       return 3;
     }
   }
-  else 
-    return 0; 
+  else
+    return 0;
 }

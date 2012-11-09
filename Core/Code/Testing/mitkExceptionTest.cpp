@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,25 +29,25 @@ class SpecializedTestException : public mitk::Exception
 
 class ExceptionTestClass : public itk::Object
 {
-public: 
+public:
   mitkClassMacro( ExceptionTestClass , itk::Object );
   itkNewMacro(Self);
 
-  void throwExceptionManually() 
+  void throwExceptionManually()
   //this method is ONLY to test the constructor and no code example
   //normally exceptions should only be thrown by using the exception macro!
   {
   throw mitk::Exception("test.cpp",155,"","");
   }
 
-  void throwSpecializedExceptionManually() 
+  void throwSpecializedExceptionManually()
   //this method is ONLY to test the constructor and no code example
   //normally exceptions should only be thrown by using the exception macro!
   {
   throw SpecializedTestException("test.cpp",155,"","");
   }
 
-  void throwExceptionManually(std::string message1, std::string message2) 
+  void throwExceptionManually(std::string message1, std::string message2)
   //this method is ONLY to test methods of mitk::Exception and no code example
   //normally exceptions should only be thrown by using the exception macro!
   {
@@ -84,7 +84,7 @@ public:
     {
     mitkReThrow(e) << messageReThrow;
     }
-  
+
   }
 
   static void TestExceptionConstructor()
@@ -111,12 +111,12 @@ public:
        {
        exceptionThrown = true;
        }
-    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing constructor specialized exception (deriving from mitkException)");  
+    MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing constructor specialized exception (deriving from mitkException)");
     }
 
   static void TestExceptionMessageStream()
     {
-    //##### this method is ONLY to test the streaming operators of the exceptions and 
+    //##### this method is ONLY to test the streaming operators of the exceptions and
     //##### NO code example. Please do not instantiate exceptions by yourself in normal code!
     //##### Normally exceptions should only be thrown by using the exception macro!
     mitk::Exception myException = mitk::Exception("testfile.cpp",111,"testmessage");
@@ -158,9 +158,9 @@ public:
 
     bool exceptionThrown = false;
     ExceptionTestClass::Pointer myExceptionTestObject = ExceptionTestClass::New();
-    
+
     //case 1: test throwing
-    
+
     try
      {
      myExceptionTestObject->throwExceptionWithThrowMacro();
@@ -173,9 +173,9 @@ public:
 
     //case 2: test message text
 
-    exceptionThrown = false;   
+    exceptionThrown = false;
     std::string messageText = "";
-    
+
     try
      {
      myExceptionTestObject->throwExceptionWithThrowMacro("test123");
@@ -184,13 +184,13 @@ public:
      {
      exceptionThrown = true;
      messageText = e.GetDescription();
-  
+
      }
     MITK_TEST_CONDITION_REQUIRED((exceptionThrown && (messageText=="test123")),"Testing message test of mitkThrow()");
 
     //case 3: specialized exception / command mitkThrow(mitk::Exception)
 
-    exceptionThrown = false;   
+    exceptionThrown = false;
     messageText = "";
 
     try
@@ -206,7 +206,7 @@ public:
 
     //case 4: specialized exception / command mitkThrow(mitk::SpecializedException)
 
-    exceptionThrown = false;   
+    exceptionThrown = false;
     messageText = "";
 
     try
@@ -219,7 +219,7 @@ public:
      messageText = e.GetDescription();
      }
     MITK_TEST_CONDITION_REQUIRED(exceptionThrown && messageText=="test123","Testing special exception with mitkThrow(mitk::SpecializedException)");
-    
+
     }
 
 static void TestRethrowInformation()
@@ -231,7 +231,7 @@ static void TestRethrowInformation()
     //case 1.1: method GetNumberOfRethrows()
     mitk::Exception e = mitk::Exception("test.cpp",155,"","");
     MITK_TEST_CONDITION_REQUIRED(e.GetNumberOfRethrows()==0,"Testing GetNumberOfRethrows() with empty rethrow information");
-    
+
     //case 1.2: GetRethrowData() with negative number
     {
     std::string file = "invalid";
@@ -274,7 +274,7 @@ static void TestRethrowInformation()
     e.GetRethrowData(0,file,line,message);
     MITK_TEST_CONDITION_REQUIRED(((file == "test2.cpp")&&(line==10)&&(message == "Rethrow one")),"Testing stored information of first rethrow.");
     }
-   
+
     {
     std::string file = "invalid";
     int line= -1;
@@ -291,9 +291,9 @@ static void TestRethrowMacro()
     bool exceptionThrown = false;
     std::string message = "";
     ExceptionTestClass::Pointer myExceptionTestObject = ExceptionTestClass::New();
-    
+
     //case 1: test throwing
-    
+
     try
      {
      myExceptionTestObject->reThrowExceptionWithReThrowMacro("Test original message.","Test rethrow message.");

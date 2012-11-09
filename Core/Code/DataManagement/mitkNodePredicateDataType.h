@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,9 +27,9 @@ namespace mitk {
   //##Documentation
   //## @brief Predicate that evaluates if the given DataNodes data object is of a specific data type
   //##
-  //## The data type must be specified in the constructor as a string. The string must equal the result 
+  //## The data type must be specified in the constructor as a string. The string must equal the result
   //## value of the requested data types GetNameOfClass() method.
-  //## 
+  //##
   //## @ingroup DataStorage
   class MITK_CORE_EXPORT NodePredicateDataType : public NodePredicateBase
   {
@@ -42,7 +42,7 @@ namespace mitk {
     virtual ~NodePredicateDataType();
 
     //##Documentation
-    //## @brief Checks, if the nodes data object is of a specific data type 
+    //## @brief Checks, if the nodes data object is of a specific data type
     virtual bool CheckNode(const mitk::DataNode* node) const;
 
   protected:
@@ -56,7 +56,7 @@ namespace mitk {
   /**
    * \brief Tests for type compatibility (dynamic_cast).
    *
-   * In contrast to NodePredicateDataType this class also accepts derived types. 
+   * In contrast to NodePredicateDataType this class also accepts derived types.
    * E.g. if you query for type BaseData, you will also get Image and Surface objects.
    *
    * The desired type is given as a template parameter, the constructor takes no other parameters.
@@ -68,7 +68,7 @@ namespace mitk {
     mitkClassMacro(TNodePredicateDataType, NodePredicateBase);
     itkFactorylessNewMacro(TNodePredicateDataType);
 
-    virtual ~TNodePredicateDataType() 
+    virtual ~TNodePredicateDataType()
     {
     }
 
@@ -81,7 +81,7 @@ namespace mitk {
   protected:
     //##Documentation
     //## @brief Protected constructor, use static instantiation functions instead
-    TNodePredicateDataType() 
+    TNodePredicateDataType()
     {
     }
   };

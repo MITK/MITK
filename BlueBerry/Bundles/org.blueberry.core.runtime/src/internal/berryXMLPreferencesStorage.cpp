@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -48,7 +48,7 @@ using Poco::Exception;
 #include <iostream>
 #include <fstream>
 
-namespace berry 
+namespace berry
 {
 
 
@@ -70,8 +70,8 @@ namespace berry
     {
       const std::string tempString = _File.path()+".backup";
       BERRY_INFO << exc.what();
-      BERRY_INFO << "Preferences could not be loaded."; 
-      BERRY_INFO << "Creating " << tempString; 
+      BERRY_INFO << "Preferences could not be loaded.";
+      BERRY_INFO << "Creating " << tempString;
       BERRY_INFO << "and resetting to default values.";
       _File.copyTo(tempString);
       this->m_Root = NULL;
@@ -91,13 +91,13 @@ namespace berry
     try
     {
       this->ToDOMTree(dynamic_cast<Preferences*>(this->m_Root.GetPointer()), 0);
-      // flush dom to file  
+      // flush dom to file
       Poco::XML::DOMWriter writer;
       //writer.setNewLine("\n");
       writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT);
       std::ofstream f;
       f.open (this->m_File.path().c_str());
-      
+
       // PRECISION setting
       // f.precision(10);
       writer.writeNode(f, m_Document);
@@ -132,7 +132,7 @@ namespace berry
     Poco::XML::NodeList* childNodes = elem->childNodes();
     Poco::XML::Node* currentNode = 0;
     Poco::XML::Element* prop = 0;
-    std::string key; 
+    std::string key;
     std::string value;
 
     for (unsigned int i = 0; i != childNodes->length(); ++i)
@@ -159,7 +159,7 @@ namespace berry
       parentDOMNode = m_Document;
     }
 
-    //# create DOMNode from Preferences    
+    //# create DOMNode from Preferences
     Element* newNode = m_Document->createElement("preferences");
     newNode->setAttribute("name", prefNode->Name());
 

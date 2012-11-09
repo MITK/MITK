@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -156,7 +156,7 @@ public slots:
 
   /// Invoked when the median action is invoked
   void OtsuFilter( bool checked = false );
-  
+
   /// When rows are inserted auto expand them
   void NodeTreeViewRowsInserted ( const QModelIndex & parent, int start, int end );
 
@@ -193,7 +193,7 @@ protected:
   ///
   QmitkDataStorageTreeModel* m_NodeTreeModel;
   ///
-  /// Holds the preferences for the datamanager. 
+  /// Holds the preferences for the datamanager.
   ///
   berry::IBerryPreferences::Pointer m_DataManagerPreferencesNode;
   ///
@@ -225,7 +225,7 @@ protected:
   QAction* m_TextureInterpolation;
   /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
-  
+
   /// Maps "Show in" actions to editor ids
   QSignalMapper* m_ShowInMapper;
 

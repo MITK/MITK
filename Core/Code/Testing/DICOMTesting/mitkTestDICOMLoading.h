@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
 
     TestDICOMLoading();
 
-    ImageList 
+    ImageList
     LoadFiles( const StringContainer& files );
 
     /**
@@ -42,7 +42,7 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
     */
     std::string
     DumpImageInformation( const Image* image );
-    
+
     /**
       \brief Compare two image information dumps.
       \return true, if dumps are sufficiently equal (see parameters)
@@ -64,26 +64,26 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
 
     KeyValueMap ParseDump( const std::string& dump );
 
-    bool CompareSpacedValueFields( const std::string& reference, 
+    bool CompareSpacedValueFields( const std::string& reference,
                                    const std::string& test,
                                    double eps = mitk::eps );
 
     /**
-       Compress whitespace in string 
+       Compress whitespace in string
        \param pString input string
        \param pFill replacement whitespace (only whitespace in string after reduction)
        \param pWhitespace characters handled as whitespace
      */
-    std::string reduce(const std::string& pString, 
-                       const std::string& pFill = " ", 
+    std::string reduce(const std::string& pString,
+                       const std::string& pFill = " ",
                        const std::string& pWhitespace = " \t");
 
-    /** 
+    /**
        Remove leading and trailing whitespace
        \param pString input string
        \param pWhitespace characters handled as whitespace
     */
-    std::string trim(const std::string& pString, 
+    std::string trim(const std::string& pString,
                      const std::string& pWhitespace = " \t");
 
     template<typename T>

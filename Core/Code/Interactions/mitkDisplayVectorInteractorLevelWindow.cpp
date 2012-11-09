@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,12 +35,12 @@ void mitk::DisplayVectorInteractorLevelWindow::ExecuteOperation(Operation* itkNo
 bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok=false;
-  
+
   const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
   if(posEvent==NULL) return false;
 
   int actionId = action->GetActionId();
-  
+
   switch(actionId)
   {
   case AcINITMOVE:
@@ -60,7 +60,7 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
 
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
-  
+
       mitk::DataStorage::Pointer storage =  m_Sender->GetDataStorage();
       mitk::DataNode::Pointer node = NULL;
 
@@ -72,7 +72,7 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
         bool propFound = allImageNodes->at( i )->GetBoolProperty( "imageForLevelWindow", isActiveImage );
 
         if ( propFound && isActiveImage )
-        { 
+        {
           node = allImageNodes->at( i );
           continue;
         }
@@ -109,7 +109,7 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
     {
       ok = true;
       this->InvokeEvent( EndInteractionEvent() );
-      
+
       break;
     }
   default:

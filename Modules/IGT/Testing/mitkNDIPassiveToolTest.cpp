@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
 * NDIPassiveTool has a protected constructor and a protected itkNewMacro
 * so that only it's friend class NDITrackingDevice is able to instantiate
-* tool objects. Therefore, we derive from NDIPassiveTool and add a 
+* tool objects. Therefore, we derive from NDIPassiveTool and add a
 * public itkNewMacro, so that we can instantiate and test the class
 */
 class NDIPassiveToolTestClass : public mitk::NDIPassiveTool
@@ -39,7 +39,7 @@ public:
   itkNewMacro(Self);
 
 protected:
-  NDIPassiveToolTestClass() : mitk::NDIPassiveTool()  
+  NDIPassiveToolTestClass() : mitk::NDIPassiveTool()
   {
   }
 };
@@ -52,7 +52,7 @@ int mitkNDIPassiveToolTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("NDIPassiveTool");
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::NDIPassiveTool::Pointer myNDIPassiveTool = NDIPassiveToolTestClass::New().GetPointer();
 
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
@@ -78,8 +78,8 @@ int mitkNDIPassiveToolTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION(myNDIPassiveTool->LoadSROMFile(name2) == false ,"Test LoadSROMFile() without file")
 
-  MITK_TEST_CONDITION(myNDIPassiveTool->GetSROMData()== temp, "Test GetSROMData() returns same after failed load") 
-  MITK_TEST_CONDITION(myNDIPassiveTool->GetSROMDataLength()== templen,"Test GetSROMDataLength() returns same after failed load") 
+  MITK_TEST_CONDITION(myNDIPassiveTool->GetSROMData()== temp, "Test GetSROMData() returns same after failed load")
+  MITK_TEST_CONDITION(myNDIPassiveTool->GetSROMDataLength()== templen,"Test GetSROMDataLength() returns same after failed load")
 
   // always end with this!
   MITK_TEST_END();

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 
-mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilter() : mitk::NavigationDataToNavigationDataFilter(), 
-m_ErrorMean(-1.0), m_ErrorStdDev(-1.0), m_ErrorRMS(-1.0), m_ErrorMin(-1.0), m_ErrorMax(-1.0), m_ErrorAbsMax(-1.0), 
+mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilter() : mitk::NavigationDataToNavigationDataFilter(),
+m_ErrorMean(-1.0), m_ErrorStdDev(-1.0), m_ErrorRMS(-1.0), m_ErrorMin(-1.0), m_ErrorMax(-1.0), m_ErrorAbsMax(-1.0),
 m_SourcePoints(), m_TargetPoints(), m_LandmarkTransformInitializer(NULL), m_LandmarkTransform(NULL),
 m_QuatLandmarkTransform(NULL), m_QuatTransform(NULL), m_Errors(), m_UseICPInitialization(false)
 {
@@ -35,7 +35,7 @@ m_QuatLandmarkTransform(NULL), m_QuatTransform(NULL), m_Errors(), m_UseICPInitia
   m_LandmarkTransformInitializer = TransformInitializerType::New();
   m_LandmarkTransformInitializer->SetTransform(m_LandmarkTransform);
 
-  //transform to rotate orientation 
+  //transform to rotate orientation
   m_QuatLandmarkTransform = QuaternionTransformType::New();
   m_QuatTransform = QuaternionTransformType::New();
 }
@@ -73,7 +73,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetSourceLandmarks(mitk::Point
   mitk::PointSet::PointType mitkSourcePoint;
   TransformInitializerType::LandmarkPointType lPoint;
 
-  for (mitk::PointSet::PointsContainer::ConstIterator it = mitkSourcePointSet->GetPointSet()->GetPoints()->Begin(); 
+  for (mitk::PointSet::PointsContainer::ConstIterator it = mitkSourcePointSet->GetPointSet()->GetPoints()->Begin();
     it != mitkSourcePointSet->GetPointSet()->GetPoints()->End(); ++it)
   {
     mitk::FillVector3D(lPoint, it->Value().GetElement(0), it->Value().GetElement(1), it->Value().GetElement(2));
@@ -94,7 +94,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetTargetLandmarks(mitk::Point
 {
   m_TargetPoints.clear();
   TransformInitializerType::LandmarkPointType lPoint;
-  for (mitk::PointSet::PointsContainer::ConstIterator it = mitkTargetPointSet->GetPointSet()->GetPoints()->Begin(); 
+  for (mitk::PointSet::PointsContainer::ConstIterator it = mitkTargetPointSet->GetPointSet()->GetPoints()->Begin();
     it != mitkTargetPointSet->GetPointSet()->GetPoints()->End(); ++it)
   {
     mitk::FillVector3D(lPoint, it->Value().GetElement(0), it->Value().GetElement(1), it->Value().GetElement(2));
@@ -147,7 +147,7 @@ mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetAbsMaxError() c
 }
 
 
-void mitk::NavigationDataLandmarkTransformFilter::AccumulateStatistics(std::vector<mitk::ScalarType>& vector) 
+void mitk::NavigationDataLandmarkTransformFilter::AccumulateStatistics(std::vector<mitk::ScalarType>& vector)
 {
   //mean, min, max
   m_ErrorMean = 0.0;
@@ -166,7 +166,7 @@ void mitk::NavigationDataLandmarkTransformFilter::AccumulateStatistics(std::vect
     if(fabs(vector[i]) > fabs(m_ErrorAbsMax)) // abs_max
       m_ErrorAbsMax = vector[i];
   }
-  m_ErrorMean /= vector.size(); 
+  m_ErrorMean /= vector.size();
   m_ErrorRMS = sqrt(m_ErrorRMS/vector.size());
 
   //standard deviation
@@ -270,7 +270,7 @@ void mitk::NavigationDataLandmarkTransformFilter::PrintSelf( std::ostream& os, i
     }
     os << "]\n";
   }
-  os << indent << "Landmarktransform initialized: " << this->IsInitialized() << "\n";  
+  os << indent << "Landmarktransform initialized: " << this->IsInitialized() << "\n";
   if (this->IsInitialized() == true)
     m_LandmarkTransform->Print(os, nextIndent);
   os << indent << "Registration error statistics:\n";
@@ -371,7 +371,7 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
   //------------------------------------------------------
   // Connect all the components required for Registration
   //------------------------------------------------------
-  MetricType::Pointer metric = MetricType::New();  
+  MetricType::Pointer metric = MetricType::New();
 
   registration->SetMetric( metric );
   registration->SetOptimizer( optimizer );
@@ -415,7 +415,7 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
       {
         minDistanceIterator = sourcesIt;
         minDistance = dist;
-      }      
+      }
     }
     if (minDistanceIterator == sources.end())
       return false;

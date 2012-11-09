@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -120,7 +120,7 @@ void QmitkBaseComponent::SetAvailability(bool available)
 
 /*************** ADD COMPONENT LISTENER ***************/
 void QmitkBaseComponent::AddComponentListener(QmitkBaseComponent* component)
-{  
+{
   if(component!=NULL)
   {
     m_AddedChildList.push_back(component);
@@ -129,18 +129,18 @@ void QmitkBaseComponent::AddComponentListener(QmitkBaseComponent* component)
 
 /************* REMOVE COMPONENT LISTENER **************/
 void QmitkBaseComponent::RemoveComponentListener(QmitkBaseComponent* component)
-{  
+{
   if(component!=NULL)
   {
-    std::vector<QmitkBaseComponent*>::iterator it = m_AddedChildList.begin();   
-    while (it != m_AddedChildList.end()) 
+    std::vector<QmitkBaseComponent*>::iterator it = m_AddedChildList.begin();
+    while (it != m_AddedChildList.end())
     {
-      if(*it == component) 
+      if(*it == component)
       {
         m_AddedChildList.erase(it);
         break;
       }
-      ++it; 
+      ++it;
     }
   }
 }

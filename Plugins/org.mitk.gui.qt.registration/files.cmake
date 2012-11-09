@@ -1,5 +1,5 @@
 set(SRC_CPP_FILES
-  
+
 )
 
 set(INTERNAL_CPP_FILES
@@ -14,7 +14,7 @@ set(INTERNAL_CPP_FILES
   QmitkRigidRegistrationView.cpp
   QmitkLoadPresetDialog.cpp
   QmitkRigidRegistrationSelectorView.cpp
-  
+
 )
 
 set(UI_FILES
@@ -63,7 +63,7 @@ set(QRC_FILES
   resources/QmitkRigidRegistrationView.qrc
 )
 
-set(CPP_FILES 
+set(CPP_FILES
 
 )
 

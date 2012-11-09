@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,7 +42,7 @@ mitk::ExtractDirectedPlaneImageFilter::ExtractDirectedPlaneImageFilter()
   MITK_WARN << "Class ExtractDirectedPlaneImageFilter is deprecated! Use ExtractSliceFilter instead.";
 
   m_Reslicer = vtkImageReslice::New();
-  
+
   m_TargetTimestep = 0;
   m_InPlaneResampleExtentByGeometry = true;
   m_ResliceInterpolationProperty = NULL;//VtkResliceInterpolationProperty::New(); //TODO initial with value
@@ -101,9 +101,9 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   }
 
   // check if there is something to display.
-  if ( ! input->IsVolumeSet( timestep ) ) 
+  if ( ! input->IsVolumeSet( timestep ) )
   {
-    itkWarningMacro(<<"No volume data existent at given timestep "<<timestep); 
+    itkWarningMacro(<<"No volume data existent at given timestep "<<timestep);
     return;
   }
 
@@ -145,7 +145,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   ScalarType mmPerPixel[2];
 
-  // Bounds information for reslicing (only required if reference geometry 
+  // Bounds information for reslicing (only required if reference geometry
   // is present)
   vtkFloatingPointType bounds[6];
   bool boundsInitialized = false;
@@ -207,8 +207,8 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     //heightInMM -= mmPerPixel[1];
 
     // Use inverse transform of the input geometry for reslicing the 3D image
-    m_Reslicer->SetResliceTransform( 
-      inputGeometry->GetVtkTransform()->GetLinearInverse() ); 
+    m_Reslicer->SetResliceTransform(
+      inputGeometry->GetVtkTransform()->GetLinearInverse() );
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
     m_Reslicer->SetBackgroundLevel( -32768 );
@@ -289,7 +289,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   m_Reslicer->SetInput( unitSpacingImageFilter->GetOutput() );
   unitSpacingImageFilter->Delete();
-  
+
   //m_Reslicer->SetInput( inputData );
 
   m_Reslicer->SetOutputDimensionality( 2 );
@@ -337,8 +337,8 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   }
 
   m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], 1.0 );
-  // xMax and yMax are meant exclusive until now, whereas 
-  // SetOutputExtent wants an inclusive bound. Thus, we need 
+  // xMax and yMax are meant exclusive until now, whereas
+  // SetOutputExtent wants an inclusive bound. Thus, we need
   // to subtract 1.
   m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, 0, 1 );
 
@@ -373,7 +373,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   //resultImage->SetPicVolume( pic );
 
   //mitkIpPicFree(pic);
-  
+
   /*unsigned int dimensions[2];
   dimensions[0] = (unsigned int)extent[0]; dimensions[1] = (unsigned int)extent[1];
   Vector3D spacingVector;
@@ -389,18 +389,18 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
 void mitk::ExtractDirectedPlaneImageFilter::GenerateOutputInformation()
 {
-  Superclass::GenerateOutputInformation(); 
+  Superclass::GenerateOutputInformation();
 }
 
 
 bool mitk::ExtractDirectedPlaneImageFilter
-::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
+::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
                 const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
-  // Clip the plane with the bounding geometry. To do so, the corner points 
-  // of the bounding box are transformed by the inverse transformation 
-  // matrix, and the transformed bounding box edges derived therefrom are 
-  // clipped with the plane z=0. The resulting min/max values are taken as 
+  // Clip the plane with the bounding geometry. To do so, the corner points
+  // of the bounding box are transformed by the inverse transformation
+  // matrix, and the transformed bounding box edges derived therefrom are
+  // clipped with the plane z=0. The resulting min/max values are taken as
   // bounds for the image reslicer.
   const BoundingBox *boundingBox = boundingGeometry->GetBoundingBox();
 

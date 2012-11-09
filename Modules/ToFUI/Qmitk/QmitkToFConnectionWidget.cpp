@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -131,7 +131,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
   bool playerMode = false;
 
   if (m_Controls->m_ConnectCameraButton->text()=="Connect")
-  {   
+  {
     this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
     //reset the status of the GUI buttons
     m_Controls->m_ConnectCameraButton->setEnabled(false);
@@ -303,8 +303,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
       this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
-      if ((selectedCamera == "PMD CamCube 2.0/3.0") || (selectedCamera == "PMD CamBoard") || 
-        (selectedCamera== "PMD O3D") || (selectedCamera== "PMD CamBoardRaw") || 
+      if ((selectedCamera == "PMD CamCube 2.0/3.0") || (selectedCamera == "PMD CamBoard") ||
+        (selectedCamera== "PMD O3D") || (selectedCamera== "PMD CamBoardRaw") ||
         (selectedCamera== "PMD CamCubeRaw 2.0/3.0"))
       {
         this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();

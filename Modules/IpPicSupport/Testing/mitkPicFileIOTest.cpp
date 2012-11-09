@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -80,7 +80,7 @@ mitk::Image::Pointer CreateTestImage(unsigned int which)
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* mitkImage, bool& identical ) 
+void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* mitkImage, bool& identical )
 {
   typename itk::Image< TPixel, VImageDimension >::Pointer itkImage2;
 
@@ -114,9 +114,9 @@ void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::
   // if we reach this point, all pixel are the same
   identical = true;
 }
- 
+
 int mitkPicFileIOTest(int, char*[])
-{ 
+{
   unsigned int numberFailed(0);
 
   for (unsigned int i = 0; i < numberOfTestImages; ++i)
@@ -129,7 +129,7 @@ int mitkPicFileIOTest(int, char*[])
       {
         mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
         imageWriter->SetInput(originalImage);
-        
+
         imageWriter->SetFileName("test_image");
         imageWriter->SetExtension(".pic");
         imageWriter->Write();
@@ -141,12 +141,12 @@ int mitkPicFileIOTest(int, char*[])
         ++numberFailed;
         continue;
       }
- 
+
     // load
       try
       {
         mitk::PicFileReader::Pointer imageReader = mitk::PicFileReader::New();
-        
+
         imageReader->SetFileName("test_image.pic");
         imageReader->Update();
 
@@ -166,11 +166,11 @@ int mitkPicFileIOTest(int, char*[])
         ++numberFailed;
         continue;
       }
-    
+
     std::remove( "test_image.pic" );
-  
+
     // compare
-  
+
     bool identical(false);
     AccessFixedDimensionByItk_2( secondImage.GetPointer(), ItkImageProcessing, 3, originalImage.GetPointer(), identical );
 

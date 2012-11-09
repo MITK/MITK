@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,9 +33,9 @@ namespace mitk {
   //##
   //## The StandaloneDataStorage provides data storage and management functionality.
   //## It handles a 'was created by' relation by associating each data object with a
-  //## set of source objects that were used to create the new object was created from. 
+  //## set of source objects that were used to create the new object was created from.
   //## Thus, nodes are stored in a noncyclical directed graph data structure.
-  //## It is derived from mitk::DataStorage and implements its interface, 
+  //## It is derived from mitk::DataStorage and implements its interface,
   //## including AddNodeEvent and RemoveNodeEvent.
   //## @ingroup StandaloneDataStorage
   class MITK_CORE_EXPORT StandaloneDataStorage : public mitk::DataStorage
@@ -89,7 +89,7 @@ namespace mitk {
     SetOfObjects::ConstPointer GetAll() const;
 
     /*ITK Mutex */
-    mutable itk::SimpleFastMutexLock m_Mutex; 
+    mutable itk::SimpleFastMutexLock m_Mutex;
 
   protected:
 

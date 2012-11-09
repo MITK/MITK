@@ -49,7 +49,7 @@ else()
     string(REPLACE "." "_" _plugin_target ${_plugin})
     list(APPEND _APP_PLUGINS ${_plugin_target})
   endforeach()
-  
+
   # get all plug-in dependencies
   ctkFunctionGetPluginDependencies(_plugin_deps PLUGINS ${_APP_PLUGINS} ALL)
   # add the dependencies to the list of application plug-ins
@@ -171,7 +171,7 @@ if(NOT _APP_NO_INSTALL)
 
   # This installs all third-party CTK plug-ins
   FunctionInstallThirdPartyCTKPlugins(${_APP_PLUGINS} EXCLUDE ${_APP_EXCLUDE_PLUGINS})
-  
+
   if(COMMAND BlueBerryApplicationInstallHook)
     set(_real_app_plugins ${_APP_PLUGINS})
     if(_APP_EXCLUDE_PLUGINS)

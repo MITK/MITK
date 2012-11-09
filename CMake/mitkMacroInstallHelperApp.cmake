@@ -12,16 +12,16 @@ macro(MITK_INSTALL_HELPER_APP)
   if(WIN32 AND NOT MINGW)
     set(intermediate_dir Release)
   endif()
-  
-  set(DIRS 
+
+  set(DIRS
     ${VTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
     ${ITK_LIBRARY_DIRS}/${intermediate_dir}
     ${QT_LIBRARY_DIR}
   ${QT_LIBRARY_DIR}/../bin
-    ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
+    ${MITK_BINARY_DIR}/bin/${intermediate_dir}
     ${_install_LIBRARY_DIRS}
     )
-    
+
   if(APPLE)
     list(APPEND DIRS "/usr/lib")
   endif(APPLE)
@@ -65,7 +65,7 @@ macro(MITK_INSTALL_HELPER_APP)
         install(CODE "file(RPATH_REMOVE
                            FILE \"\${CMAKE_INSTALL_PREFIX}/${_target_location}\")")
       endif()
-    endif() 
+    endif()
 
     foreach(_target_location ${_target_locations})
       if(NOT _qt_is_system_qt)
@@ -88,7 +88,7 @@ macro(MITK_INSTALL_HELPER_APP)
                     DESTINATION ${${_target_location}_qt_plugins_install_dir}
                     FILES_MATCHING REGEX "${CMAKE_SHARED_LIBRARY_SUFFIX}"
                    )
- 
+
           endif(WIN32)
         endif()
       endif()

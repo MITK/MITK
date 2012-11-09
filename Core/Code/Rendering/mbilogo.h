@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mbilogo_1804289383
 
 /**
-* This file includes a simple logo of the department 
+* This file includes a simple logo of the department
 * Medical and Biological Informatics at the DKFZ
 * into MITK
-* 
+*
 * NOTE: the logo is created by the QT qembed tool,
 * and thus it is upside down.
 */

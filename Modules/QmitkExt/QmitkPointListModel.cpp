@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -72,7 +72,7 @@ int QmitkPointListModel::GetTimeStep() const
 
 void QmitkPointListModel::ObserveNewPointSet( mitk::DataNode* pointSetNode )
 {
-  
+
   //remove old observers
   if (m_PointSetNode != NULL)
   {
@@ -113,7 +113,7 @@ void QmitkPointListModel::OnPointSetChanged( const itk::EventObject &  /*e*/ )
   QAbstractListModel::reset();
   emit SignalUpdateSelection();
 }
- 
+
 void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject &  /*e*/ )
 {
 //  m_PointSetNode = NULL;
@@ -145,7 +145,7 @@ int QmitkPointListModel::rowCount( const QModelIndex&  /*parent*/ ) const
 QVariant QmitkPointListModel::data(const QModelIndex& index, int role) const
 {
   mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
-  
+
   if ( pointSet.IsNull() )
   {
     return QVariant();
@@ -199,7 +199,7 @@ QVariant QmitkPointListModel::headerData(int section, Qt::Orientation orientatio
   }
 }
 
-bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk::PointSet::PointType& p, 
+bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk::PointSet::PointType& p,
                                                 mitk::PointSet::PointIdentifier& id) const
 {
   mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
@@ -210,20 +210,20 @@ bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk:
     return false;
 
   // get the nth. element, if it exists.
-  // we can not use the index directly, because PointSet uses a map container, 
+  // we can not use the index directly, because PointSet uses a map container,
   // where the index is not necessarily the same as the key.
   // Therefore we have to count the elements
   mitk::PointSet::PointsContainer::Iterator it = pointSet->GetPointSet(m_TimeStep)->GetPoints()->Begin();
   for (int i = 0; i < index.row(); ++i)
   {
     ++it;
-  
+
     if (it == pointSet->GetPointSet(m_TimeStep)->GetPoints()->End())
       return false;
 
   }
 
-  if (it != pointSet->GetPointSet(m_TimeStep)->GetPoints()->End()) // not at the end, 
+  if (it != pointSet->GetPointSet(m_TimeStep)->GetPoints()->End()) // not at the end,
   {
     p = it->Value();
     id = it->Index();
@@ -252,7 +252,7 @@ bool QmitkPointListModel::GetModelIndexForPointID(mitk::PointSet::PointIdentifie
       index = this->index(idx);
       return true;
     }
-    
+
     idx++;
   }
 
@@ -264,8 +264,8 @@ void QmitkPointListModel::MoveSelectedPointUp()
   mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
   if (pointSet.IsNull())
     return;
-  
-  mitk::PointSet::PointIdentifier selectedID;   
+
+  mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
   mitk::PointSet::PointType point = pointSet->GetPoint(selectedID, m_TimeStep);
   mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStep);
@@ -280,7 +280,7 @@ void QmitkPointListModel::MoveSelectedPointDown()
   if (pointSet.IsNull())
     return;
 
-  mitk::PointSet::PointIdentifier selectedID; 
+  mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
   mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStep);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
@@ -296,7 +296,7 @@ void QmitkPointListModel::RemoveSelectedPoint()
     return;
 
   //get corresponding interactor to PointSet
-  mitk::PointSetInteractor::Pointer interactor = dynamic_cast<mitk::PointSetInteractor*>(m_PointSetNode->GetInteractor());  
+  mitk::PointSetInteractor::Pointer interactor = dynamic_cast<mitk::PointSetInteractor*>(m_PointSetNode->GetInteractor());
   if (interactor.IsNull())
   {
     if (m_PointSetNode->GetInteractor()==NULL && m_PointSetNode != NULL) //no Interactor set to node

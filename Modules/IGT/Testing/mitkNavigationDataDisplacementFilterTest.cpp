@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,9 +30,9 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationDataDisplacementFilter")
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::NavigationDataDisplacementFilter::Pointer myFilter = mitk::NavigationDataDisplacementFilter::New();
-  
+
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
@@ -44,7 +44,7 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   mitk::NavigationData::OrientationType initialOri(0.0, 0.0, 0.0, 0.0);
   mitk::ScalarType initialError(0.0);
   bool initialValid(true);
-  
+
   mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
   nd1->SetPosition(initialPos);
   nd1->SetOrientation(initialOri);
@@ -55,7 +55,7 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(myFilter->GetInput() == nd1, "testing Set-/GetInput()");
 
   /* create filter parameter */
-  mitk::Vector3D offset; 
+  mitk::Vector3D offset;
   mitk::FillVector3D(offset, 1.0, 1.0, 1.0);
 
   myFilter->SetOffset(offset);
@@ -85,18 +85,18 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   myFilter->SetInput(0, nd1);
   myFilter->SetInput(1, nd2);
 
-  MITK_TEST_CONDITION(((myFilter->GetInput(0) == nd1) 
+  MITK_TEST_CONDITION(((myFilter->GetInput(0) == nd1)
                     && (myFilter->GetInput(1) == nd2)), "testing Set-/GetInput(index, data)");
-  
+
   output = myFilter->GetOutput(0);
   mitk::NavigationData* output2 = myFilter->GetOutput(1);
   output2->Update(); // execute filter pipeline. this should update both outputs!
-  MITK_TEST_CONDITION(((output != NULL) 
+  MITK_TEST_CONDITION(((output != NULL)
                     && (output2 != NULL)), "testing GetOutput(index)");
 
   MITK_TEST_CONDITION(output->GetPosition() == (initialPos + offset), "Testing offset calculation for output 0");
   MITK_TEST_CONDITION(output2->GetPosition() == (initialPos2 + offset), "Testing offset calculation for output 1");
-  
+
   MITK_TEST_CONDITION(output2->GetOrientation() == initialOri, "Testing if Orientation remains unchanged for output 1");
   MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if DataValid remains unchanged for output 1");
 
@@ -143,7 +143,7 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   p2->SetProperty("NavigationDataDisplacementFilter_Offset", mitk::Vector3DProperty::New(v));  // fill PropertyList with correct parameter
   myFilter->SetParameters(p2);
   MITK_TEST_CONDITION(myFilter->GetOffset() == v, "Offset updated correctly by SetParameters()?");
-  
+
   p2 = mitk::PropertyList::New();
   mitk::Vector3D v2;
   mitk::FillVector3D(v2, 0.0, 111.1, 0.0);

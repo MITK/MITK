@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,21 +40,21 @@ m_FixedNode(NULL), m_MovingNode(NULL)
   m_Controls.setupUi(parent);
 
   QObject::connect( (QObject*)(m_Controls.m_PrintDeformField),
-              SIGNAL(clicked()), 
+              SIGNAL(clicked()),
               (QObject*) this,
               SLOT(PrintDeformationField()) );
 
 
-  
+
 
   QObject::connect( (QObject*)(m_Controls.m_BrowseDeformationField),
-              SIGNAL(clicked()), 
+              SIGNAL(clicked()),
               (QObject*) this,
               SLOT(SelectDeformationField()) );
 
   connect( m_Controls.m_OptimizerSelector, SIGNAL(activated(int)), m_Controls.m_OptimizerWidgetStack, SLOT(setCurrentIndex(int)));
   connect( m_Controls.m_OptimizerSelector, SIGNAL(activated(int)), this, SLOT(OptimizerSelected(int)));
-  
+
 }
 
 QmitkBSplineRegistrationView::~QmitkBSplineRegistrationView()
@@ -82,12 +82,12 @@ void QmitkBSplineRegistrationView::HideAllOptimizerFrames()
 }
 
 void QmitkBSplineRegistrationView::SelectDeformationField()
-{ 
+{
   // SELECT FOLDER DIALOG
   QFileDialog* w = new QFileDialog( this, "Select Deformation Field" );
   w->setFileMode( QFileDialog::ExistingFiles );
   w->setFilter( "Images (*.mhd)" );
-  w->setDirectory("G:\\home\\vanbrugg\\testimages\\deformable"); 
+  w->setDirectory("G:\\home\\vanbrugg\\testimages\\deformable");
 
   // RETRIEVE SELECTION
   if ( w->exec() != QDialog::Accepted )
@@ -100,24 +100,24 @@ void QmitkBSplineRegistrationView::SelectDeformationField()
   QStringList::Iterator it = filenames.begin();
   if( it != filenames.end() ) {
     std::string filename = ( *it ).toStdString();
-    ++it;     
+    ++it;
     QString qStr = QString( filename.c_str() );
-    m_Controls.m_DeformationField->setText(qStr); 
+    m_Controls.m_DeformationField->setText(qStr);
   }
-   
+
 }
 
 
 
 void QmitkBSplineRegistrationView::PrintDeformationField()
-{               
- 
+{
+
   ImageReaderType::Pointer reader  = ImageReaderType::New();
   reader->SetFileName(  m_Controls.m_DeformationField->text().toStdString()  );
   reader->Update();
-      
+
   DeformationFieldType::Pointer deformationField = reader->GetOutput();
-     
+
 
   typedef itk::ImageRegionIterator<DeformationFieldType> IteratorType;
   IteratorType deformIter(deformationField, deformationField->GetRequestedRegion());
@@ -135,16 +135,16 @@ void QmitkBSplineRegistrationView::CalculateTransformation()
   {
     mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
-    
+
 
     mitk::BSplineRegistration::Pointer registration = mitk::BSplineRegistration::New();
-    
+
     registration->SetSaveResult(false);
     registration->SetReferenceImage(fimage);
     registration->SetInput(mimage);
-    
+
     // Read out optimizer parameters from the interface
-    setOptimizerParameters();    
+    setOptimizerParameters();
 
     registration->SetNumberOfGridPoints( m_Controls.m_NumberOfGridNodes->text().toInt() );
     registration->SetOptimizerParameters(m_OptimizerParameters);
@@ -168,7 +168,7 @@ void QmitkBSplineRegistrationView::CalculateTransformation()
     }
 
     mitk::Image::Pointer image = registration->GetOutput();
-   
+
     if (image.IsNotNull())
     {
       m_MovingNode->SetData(image);
@@ -180,7 +180,7 @@ void QmitkBSplineRegistrationView::CalculateTransformation()
     }
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  } 
+  }
 }
 
 void QmitkBSplineRegistrationView::setOptimizerParameters()

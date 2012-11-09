@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,22 +36,22 @@ namespace mitk
     mitkNewMacro2Param(Self, const char*, DataNode*);
 
     /**
-     * \brief check how good an event can be handled 
+     * \brief check how good an event can be handled
      */
-    //virtual float CanHandleEvent(StateEvent const* stateEvent) const; 
+    //virtual float CanHandleEvent(StateEvent const* stateEvent) const;
     //used from mitkInteractor
 
     /**
     *@brief Gets called when mitk::DataNode::SetData() is called
-    * 
-    * No need to use it here, because the pattern won't be complex 
+    *
+    * No need to use it here, because the pattern won't be complex
     * and we can take care of unexpected data change
     **/
     //virtual void DataChanged(){};
 
   protected:
     /**
-     * \brief Constructor 
+     * \brief Constructor
      */
     MoveSurfaceInteractor(const char * type, DataNode* dataNode);
 
@@ -67,7 +67,7 @@ namespace mitk
   };
 }
 
-/** 
+/**
 \example mitkMoveSurfaceInteractor.h
  * This is an example of how to implement a new Interactor.
  * See more details about this example in tutorial Step10.

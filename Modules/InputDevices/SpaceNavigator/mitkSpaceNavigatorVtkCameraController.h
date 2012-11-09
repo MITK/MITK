@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ namespace mitk {
 
   /**
   * The Space Navigator camera controller listens to events from a Space Navigator. <br>
-  * After receiving such events, it moves the camera of the 3D window accordingly. 
+  * After receiving such events, it moves the camera of the 3D window accordingly.
   *
   * @brief vtk-based camera controller
   * @ingroup NavigationControl
@@ -51,7 +51,7 @@ namespace mitk {
     */
     SpaceNavigatorVtkCameraController();
 
-    /**  
+    /**
     * Default Destructor
     */
     virtual ~SpaceNavigatorVtkCameraController();

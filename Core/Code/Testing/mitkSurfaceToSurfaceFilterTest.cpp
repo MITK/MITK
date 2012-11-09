@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,7 +40,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   vtkPolyData* polys = sphereSource->GetOutput();
   surface->SetVtkPolyData( polys );
   sphereSource->Delete();
-  
+
 
   mitk::SurfaceToSurfaceFilter::Pointer filter = mitk::SurfaceToSurfaceFilter::New();
   std::cout << "Testing mitk::SurfaceToSurfaceFilter::SetInput() and ::GetNumberOfInputs() : " ;
@@ -111,12 +111,12 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   if ( filter->GetNumberOfInputs() != 0 )
   {
     std::cout << "[FAILED] : existing input was not removed correctly." << std::endl;
-    return EXIT_FAILURE; 
+    return EXIT_FAILURE;
   }
   std::cout << "[SUCCESS] : existing input was removed correctly." << std::endl;
 
 
-  
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

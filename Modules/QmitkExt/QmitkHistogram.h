@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qglobal.h>
 #include <qcolor.h>
 
-#include <qwt_plot_item.h> 
+#include <qwt_plot_item.h>
 #include <qwt_interval_data.h>
 
-/** 
+/**
 \brief Used to create a histogram that can be shown in a Qwt Plot.
 See QmitkHistogramWidget for an example of its usage.
 */
@@ -46,7 +46,7 @@ public:
 
     virtual QwtDoubleRect boundingRect() const;
 
-    virtual void draw(QPainter *, const QwtScaleMap &xMap, 
+    virtual void draw(QPainter *, const QwtScaleMap &xMap,
         const QwtScaleMap &yMap, const QRect &) const;
 
     void setBaseline(double reference);

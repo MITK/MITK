@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,10 +38,10 @@ namespace mitk {
  */
 class MitkExt_EXPORT PadImageFilter : public ImageToImageFilter
 {
-public:    
+public:
   mitkClassMacro(PadImageFilter, ImageToImageFilter);
 
-  itkNewMacro(Self);  
+  itkNewMacro(Self);
 
   /** \brief Sets the intensity of the pixel to pad */
   itkSetMacro(PadConstant, int);
@@ -57,9 +57,9 @@ public:
 
 protected:
   PadImageFilter();
-  
+
   virtual ~PadImageFilter();
-  
+
   virtual void GenerateData();
 
 private:

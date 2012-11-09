@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -94,8 +94,8 @@ void mitk::ConnectomicsNetworkWriter::GenerateData()
         {
           // not localized as of yet TODO
           TiXmlElement* vertexXML = new TiXmlElement(mitk::ConnectomicsNetworkDefinitions::XML_VERTEX );
-          vertexXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_VERTEX_ID , vertexVector[ index ].id ); 
-          vertexXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_VERTEX_LABEL , vertexVector[ index ].label ); 
+          vertexXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_VERTEX_ID , vertexVector[ index ].id );
+          vertexXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_VERTEX_LABEL , vertexVector[ index ].label );
           vertexXML->SetDoubleAttribute( mitk::ConnectomicsNetworkDefinitions::XML_VERTEX_X , vertexVector[ index ].coordinates[0] );
           vertexXML->SetDoubleAttribute( mitk::ConnectomicsNetworkDefinitions::XML_VERTEX_Y , vertexVector[ index ].coordinates[1] );
           vertexXML->SetDoubleAttribute( mitk::ConnectomicsNetworkDefinitions::XML_VERTEX_Z , vertexVector[ index ].coordinates[2] );
@@ -110,10 +110,10 @@ void mitk::ConnectomicsNetworkWriter::GenerateData()
         for( int index = 0; index < edgeVector.size(); index++ )
         {
           TiXmlElement* edgeXML = new TiXmlElement(mitk::ConnectomicsNetworkDefinitions::XML_EDGE );
-          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_ID , index ); 
-          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_SOURCE_ID , edgeVector[ index ].second.sourceId ); 
-          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_TARGET_ID , edgeVector[ index ].second.targetId ); 
-          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_WEIGHT_ID , edgeVector[ index ].second.weight ); 
+          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_ID , index );
+          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_SOURCE_ID , edgeVector[ index ].second.sourceId );
+          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_TARGET_ID , edgeVector[ index ].second.targetId );
+          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_WEIGHT_ID , edgeVector[ index ].second.weight );
           edgesXML->LinkEndChild(edgeXML);
         }
       } // end edges section

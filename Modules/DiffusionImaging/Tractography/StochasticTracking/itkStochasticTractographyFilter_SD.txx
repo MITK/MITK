@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -2588,13 +2588,13 @@ StochasticTractographyFilter< TInputDWIImage, TInputMaskImage, TOutputConnectivi
   };
   TractOrientationContainerType::Pointer sdcontainerptr =
     TractOrientationContainerType::New();
-    
+
   for(unsigned int i = 0; i<totalsd; i++){
     TractOrientationContainerType::Element dir(
       sdarray[i][0], sdarray[i][1], sdarray[i][2]);
     sdcontainerptr->InsertElement(i, dir);
   }
- 
+
   this->SetSampleDirections( sdcontainerptr );
 }
 

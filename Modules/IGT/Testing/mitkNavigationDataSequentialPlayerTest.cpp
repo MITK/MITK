@@ -3,12 +3,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,7 +57,7 @@ mitk::NavigationDataSequentialPlayer::Pointer player(
 
 bool runLoop()
 {
- 
+
 
   bool success = true;
   mitk::NavigationData::Pointer nd0;
@@ -113,12 +113,12 @@ void TestStandardWorkflow()
   //test SetXMLString()
   player->SetXMLString(XML_STRING);
   MITK_TEST_CONDITION_REQUIRED(player->GetNumberOfSnapshots() == 3,"Testing method SetXMLString with 3 navigation datas.");
- 
+
   //rest repeat
   player->SetRepeat(true);
   MITK_TEST_CONDITION_REQUIRED(runLoop(),"Testing first run.");
   MITK_TEST_CONDITION_REQUIRED(runLoop(),"Testing second run."); //repeat is on should work a second time
-  
+
   // now test the go to snapshot function
   player->GoToSnapshot(3);
   mitk::NavigationData::Pointer nd1 = player->GetOutput(1);
@@ -171,9 +171,9 @@ void TestSetFileNameException()
 void TestGoToSnapshotException()
 {
  //testing GoToSnapShot for exception
-  mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer2 = mitk::NavigationDataSequentialPlayer::New(); 
+  mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer2 = mitk::NavigationDataSequentialPlayer::New();
   myTestPlayer2->SetXMLString(XML_STRING);
-  
+
   bool exceptionThrown2=false;
   try
   {
@@ -191,12 +191,12 @@ void TestSetXMLStringException()
   mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer3 = mitk::NavigationDataSequentialPlayer::New();
 
   bool exceptionThrown3=false;
-  
+
   //The string above XML_INVALID_TESTSTRING is a wrong string, some element were deleted in above
   try
   {
     myTestPlayer3->SetXMLString(XML_INVALID_TESTSTRING);
-  } 
+  }
   catch(mitk::IGTException)
   {
     exceptionThrown3=true;
@@ -204,9 +204,9 @@ void TestSetXMLStringException()
  MITK_TEST_CONDITION_REQUIRED(exceptionThrown3, "Testing SetXMLString method with an invalid XML string.");
 }
 
-  
 
-  
+
+
 /**Documentation
  *  test for the class "NavigationDataRecorder".
  */
@@ -218,6 +218,6 @@ int mitkNavigationDataSequentialPlayerTest(int /* argc */, char* /*argv*/[])
   TestSetFileNameException();
   TestSetXMLStringException();
   TestGoToSnapshotException();
- 
+
   MITK_TEST_END();
 }

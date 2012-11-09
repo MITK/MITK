@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <deque>
 
 
-namespace mitk 
+namespace mitk
 {
 
 class Geometry2D;
@@ -94,7 +94,7 @@ public:
    * Default is false. The "closed" boolean property must be set in sub-classes. */
   virtual bool IsClosed() const;
 
-  
+
   /** \brief True if the planar figure has been placed (and can be
    * displayed/interacted with). */
   virtual bool IsPlaced() const { return m_FigurePlaced; };
@@ -116,7 +116,7 @@ public:
   * \brief Adds / inserts new control-points
   *
   * This method adds a new control-point with the coordinates defined by point at the given index.
-  * If 'index' == -1 or index is greater than the number of control-points the new point is appended 
+  * If 'index' == -1 or index is greater than the number of control-points the new point is appended
   * to the back of the list of control points.
   * If a control-point already exists for 'index', an additional point is inserted at that position.
   * It is not possible to add more points if the maximum number of control-points (GetMaximumNumberOfControlPoints())
@@ -128,7 +128,7 @@ public:
 
   virtual bool SetCurrentControlPoint( const Point2D& point );
 
-   
+
   /** \brief Returns the current number of 2D control points defining this figure. */
   unsigned int GetNumberOfControlPoints() const;
 
@@ -152,7 +152,7 @@ public:
   /** \brief Selects currently active control points. */
   virtual bool SelectControlPoint( unsigned int index );
 
-  
+
   /** \brief Deselect control point; no control point active. */
   virtual void DeselectControlPoint();
 
@@ -179,14 +179,14 @@ public:
   /** \brief Returns the polyline that should be drawn the same size at every scale
    * (for text, angles, etc.). */
   const PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight );
- 
-  
+
+
   /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
   void SetPreviewControlPoint( const Point2D& point );
-  
+
   /** \brief Marks the PreviewControlPoint as invisible.*/
   void ResetPreviewContolPoint();
-  
+
   /** \brief Returns whether or not the PreviewControlPoint is visible.*/
   bool IsPreviewControlPointVisible();
 
@@ -194,7 +194,7 @@ public:
   Point2D GetPreviewControlPoint();
 
 
-  
+
   /** \brief Returns the number of features available for this PlanarFigure
    * (such as, radius, area, ...). */
   virtual unsigned int GetNumberOfFeatures() const;
@@ -212,7 +212,7 @@ public:
    * area, ... ) */
   double GetQuantity( unsigned int index ) const;
 
-  
+
   /** \brief Returns true if the feature with the specified index exists and
   * is active (an inactive feature may e.g. be the area of a non-closed
   * polygon. */
@@ -220,8 +220,8 @@ public:
 
   /** \brief Returns true if the feature with the specified index exists and is set visible */
   bool IsFeatureVisible( unsigned int index ) const;
-  
-  /** \brief Defines if the feature with the specified index will be shown as an 
+
+  /** \brief Defines if the feature with the specified index will be shown as an
   * overlay in the RenderWindow */
   void SetFeatureVisible( unsigned int index, bool visible );
 
@@ -244,7 +244,7 @@ public:
 
   /** \brief Intherited from parent */
   virtual void SetRequestedRegion(itk::DataObject *data);
- 
+
   /** \brief  Returns the current number of polylines  */
   virtual unsigned short GetPolyLinesSize();
 
@@ -267,7 +267,7 @@ public:
   /** \brief Removes last control point */
   virtual void RemoveLastControlPoint();
 
-  /** \brief Copies contents and state of a figre provided as parameter to the current object. 
+  /** \brief Copies contents and state of a figre provided as parameter to the current object.
              Requires a matching type of both figures. */
   void DeepCopy(Self::Pointer oldFigure);
 
@@ -357,7 +357,7 @@ protected:
   BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
 
   // this point is used to store the coordiantes an additional 'ControlPoint' that is rendered
-  // when the mouse cursor is above the figure (and not a control-point) and when the 
+  // when the mouse cursor is above the figure (and not a control-point) and when the
   // property 'planarfigure.isextendable' is set to true
   Point2D m_PreviewControlPoint;
   bool m_PreviewControlPointVisible;
@@ -368,7 +368,7 @@ private:
 
   struct Feature
   {
-    Feature( const char *name, const char *unit ) 
+    Feature( const char *name, const char *unit )
     : Name( name ), Unit( unit ), Quantity( 0.0 ), Active( true ), Visible( true )
     {
     };
@@ -395,7 +395,7 @@ private:
   unsigned long m_FeaturesMTime;
 
   // this pair is used to store the mmInDisplayUnits (m_DisplaySize.first) and the displayHeight (m_DisplaySize.second)
-  // that the helperPolyLines have been calculated for. 
+  // that the helperPolyLines have been calculated for.
   // It's used to determine whether or not GetHelperPolyLine() needs to recalculate the HelperPolyLines.
   std::pair<double, unsigned int> m_DisplaySize;
 

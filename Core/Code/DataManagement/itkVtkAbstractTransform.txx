@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,9 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk {
 
 template <class TScalarType>
-itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() : 
+itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() :
   Superclass(3, 0),
-  m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL), 
+  m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL),
   m_LastVtkAbstractTransformTimeStamp(0)
 {
 
@@ -73,7 +73,7 @@ void itk::VtkAbstractTransform<TScalarType>::SetVtkAbstractTransform(vtkAbstract
 template<class TScalarType>
 typename itk::VtkAbstractTransform<TScalarType>::OutputPointType
 itk::VtkAbstractTransform<TScalarType>::
-TransformPoint(const InputPointType &point) const 
+TransformPoint(const InputPointType &point) const
 {
   assert(m_VtkAbstractTransform!=NULL);
 
@@ -91,7 +91,7 @@ TransformPoint(const InputPointType &point) const
 template<class TScalarType>
 typename itk::VtkAbstractTransform<TScalarType>::OutputVectorType
 itk::VtkAbstractTransform<TScalarType>::
-TransformVector(const InputVectorType &vect) const 
+TransformVector(const InputVectorType &vect) const
 {
   assert(m_VtkAbstractTransform!=NULL);
 
@@ -110,7 +110,7 @@ TransformVector(const InputVectorType &vect) const
 template<class TScalarType>
 typename itk::VtkAbstractTransform<TScalarType>::OutputVnlVectorType
 itk::VtkAbstractTransform<TScalarType>::
-TransformVector(const InputVnlVectorType &vect) const 
+TransformVector(const InputVnlVectorType &vect) const
 {
   assert(m_VtkAbstractTransform!=NULL);
 
@@ -127,15 +127,15 @@ TransformVector(const InputVnlVectorType &vect) const
 template<class TScalarType>
 typename itk::VtkAbstractTransform<TScalarType>::OutputCovariantVectorType
 itk::VtkAbstractTransform<TScalarType>::
-TransformCovariantVector(const InputCovariantVectorType &/*vec*/) const 
+TransformCovariantVector(const InputCovariantVectorType &/*vec*/) const
 {
   itkExceptionMacro( << "implement before using!" );
   OutputCovariantVectorType  result;    // Converted vector
 
-//  for (unsigned int i = 0; i < NDimensions; i++) 
+//  for (unsigned int i = 0; i < NDimensions; i++)
 //    {
 //    result[i] = NumericTraits<ScalarType>::Zero;
-//    for (unsigned int j = 0; j < NDimensions; j++) 
+//    for (unsigned int j = 0; j < NDimensions; j++)
 //      {
 //      result[i] += m_Inverse[j][i]*vec[j]; // Inverse transposed
 //      }
@@ -147,7 +147,7 @@ TransformCovariantVector(const InputCovariantVectorType &/*vec*/) const
 template<class TScalarType>
 typename VtkAbstractTransform<TScalarType>::InputPointType
 itk::VtkAbstractTransform<TScalarType>::
-BackTransform(const OutputPointType &point) const 
+BackTransform(const OutputPointType &point) const
 {
   assert(m_VtkAbstractTransform!=NULL);
 
@@ -163,7 +163,7 @@ BackTransform(const OutputPointType &point) const
 template<class TScalarType>
 typename VtkAbstractTransform<TScalarType>::InputVectorType
 itk::VtkAbstractTransform<TScalarType>::
-BackTransform(const OutputVectorType &vect ) const 
+BackTransform(const OutputVectorType &vect ) const
 {
   assert(m_VtkAbstractTransform!=NULL);
 
@@ -180,7 +180,7 @@ BackTransform(const OutputVectorType &vect ) const
 template<class TScalarType>
 typename VtkAbstractTransform<TScalarType>::InputVnlVectorType
 itk::VtkAbstractTransform<TScalarType>::
-BackTransform(const OutputVnlVectorType &vect ) const 
+BackTransform(const OutputVnlVectorType &vect ) const
 {
   assert(m_InverseVtkAbstractTransform!=NULL);
 
@@ -197,13 +197,13 @@ BackTransform(const OutputVnlVectorType &vect ) const
 template<class TScalarType>
 typename VtkAbstractTransform<TScalarType>::InputCovariantVectorType
 itk::VtkAbstractTransform<TScalarType>::
-BackTransform(const OutputCovariantVectorType &vec) const 
+BackTransform(const OutputCovariantVectorType &vec) const
 {
   itkExceptionMacro( << "implement before using!" );
-//  for (unsigned int i = 0; i < NDimensions; i++) 
+//  for (unsigned int i = 0; i < NDimensions; i++)
 //    {
 //    result[i] = NumericTraits<ScalarType>::Zero;
-//    for (unsigned int j = 0; j < NDimensions; j++) 
+//    for (unsigned int j = 0; j < NDimensions; j++)
 //      {
 //      result[i] += m_Matrix[j][i]*vec[j]; // Direct matrix transposed
 //      }
@@ -212,7 +212,7 @@ BackTransform(const OutputCovariantVectorType &vec) const
 }
 
 template<class TScalarType>
-unsigned long 
+unsigned long
 itk::VtkAbstractTransform<TScalarType>::GetMTime() const
 {
   if((m_VtkAbstractTransform != NULL) && (m_LastVtkAbstractTransformTimeStamp < m_VtkAbstractTransform->GetMTime()))

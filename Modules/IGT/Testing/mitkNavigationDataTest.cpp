@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,20 +42,20 @@ class NavigationDataTestClass
       nd->SetPositionAccuracy(100.0);
       nd->SetOrientationAccuracy(10.0);
       return nd;
-    
+
       }
 
     static void TestInstatiation()
     {
     // Test instantiation of NavigationData
     mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
-    MITK_TEST_CONDITION(nd.IsNotNull(),"Test instatiation");  
+    MITK_TEST_CONDITION(nd.IsNotNull(),"Test instatiation");
     }
 
     static void TestGetterSetter()
     {
       mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
-    
+
       mitk::NavigationData::PositionType p;
       mitk::FillVector3D(p, 44.4, 55.5, 66.66);
       nd->SetPosition(p);
@@ -99,13 +99,13 @@ class NavigationDataTestClass
       MITK_TEST_CONDITION(mitk::Equal(result2(3, 3), 100.0)
                        && mitk::Equal(result2(4, 4), 100.0)
                        && mitk::Equal(result2(5, 5), 100.0), "SetOrientationAccuracy()");
-        
+
     }
     static void TestGraft()
     {
     //create test data
     mitk::NavigationData::Pointer nd = GetTestData();
-       
+
     mitk::NavigationData::Pointer graftedCopy = mitk::NavigationData::New();
     graftedCopy->Graft(nd);
 
@@ -117,7 +117,7 @@ class NavigationDataTestClass
                      && (nd->GetHasOrientation() == graftedCopy->GetHasOrientation())
                      && (nd->GetCovErrorMatrix() == graftedCopy->GetCovErrorMatrix())
                      && (std::string(nd->GetName()) == graftedCopy->GetName());
-    
+
 
     MITK_TEST_CONDITION(graftIsEqual, "Graft() produces equal NavigationData object");
     }
@@ -144,7 +144,7 @@ class NavigationDataTestClass
     {
 
     mitk::NavigationData::Pointer nd = GetTestData();
-    
+
 
     // Test CopyInformation
     bool success = false;
@@ -191,10 +191,10 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
   NavigationDataTestClass::TestPrintSelf();
   NavigationDataTestClass::TestWrongInputs();
 
- 
 
 
-  
+
+
 
 
   MITK_TEST_END();

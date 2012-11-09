@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ mitk::ImageSource::ImageSource()
   // Create the output. We use static_cast<> here because we know the default
   // output must be of type TOutputImage
   OutputImageType::Pointer output
-    = static_cast<OutputImageType*>(this->MakeOutput(0).GetPointer()); 
+    = static_cast<OutputImageType*>(this->MakeOutput(0).GetPointer());
   Superclass::SetNumberOfRequiredOutputs(1);
   Superclass::SetNthOutput(0, output.GetPointer());
 }
@@ -34,7 +34,7 @@ mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(unsigned int)
 {
   return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
 }
-  
+
 /**
  *
  */
@@ -44,12 +44,12 @@ mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput()
     {
     return 0;
     }
-  
+
   return static_cast<OutputImageType*>
                      (this->BaseProcess::GetOutput(0));
 }
 
-  
+
 /**
  *
  */
@@ -71,7 +71,7 @@ void mitk::ImageSource::SetOutput(OutputImageType *output)
 
 
 /**
- * 
+ *
  */
 void mitk::ImageSource::GraftOutput(OutputImageType *graft)
 {
@@ -80,7 +80,7 @@ void mitk::ImageSource::GraftOutput(OutputImageType *graft)
 
 
 /**
- * 
+ *
  */
 void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
 {
@@ -94,12 +94,12 @@ void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
       {
       // grab a handle to the bulk data of the specified data object
 //      output->SetPixelContainer( graft->GetPixelContainer() ); @FIXME!!!!
-      
+
       // copy the region ivars of the specified data object
       output->SetRequestedRegion( graft );//graft->GetRequestedRegion() );
 //      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); @FIXME!!!!
 //      output->SetBufferedRegion( graft->GetBufferedRegion() ); @FIXME!!!!
-      
+
       // copy the meta-information
       output->CopyInformation( graft );
       }
@@ -111,7 +111,7 @@ int mitk::ImageSource::SplitRequestedRegion(int i, int num, OutputImageRegionTyp
 {
   // Get the output pointer
   OutputImageType * outputPtr = this->GetOutput();
-  const SlicedData::SizeType& requestedRegionSize 
+  const SlicedData::SizeType& requestedRegionSize
     = outputPtr->GetRequestedRegion().GetSize();
 
   int splitAxis;
@@ -152,7 +152,7 @@ int mitk::ImageSource::SplitRequestedRegion(int i, int num, OutputImageRegionTyp
     // last thread needs to process the "rest" dimension being split
     splitSize[splitAxis] = splitSize[splitAxis] - i*valuesPerThread;
     }
-  
+
   // set the split region ivars
   splitRegion.SetIndex( splitIndex );
   splitRegion.SetSize( splitSize );
@@ -184,19 +184,19 @@ void mitk::ImageSource::GenerateData()
   // Call a method that can be overriden by a subclass to allocate
   // memory for the filter's outputs
   this->AllocateOutputs();
-  
+
   // Call a method that can be overridden by a subclass to perform
   // some calculations prior to splitting the main computations into
   // separate threads
   this->BeforeThreadedGenerateData();
-  
+
   // Set up the multithreaded processing
   ThreadStruct str;
   str.Filter = this;
-  
+
   this->GetMultiThreader()->SetNumberOfThreads(this->GetNumberOfThreads());
   this->GetMultiThreader()->SetSingleMethod(this->ThreaderCallback, &str);
-  
+
   // multithread the execution
   this->GetMultiThreader()->SingleMethodExecute();
 
@@ -216,7 +216,7 @@ void mitk::ImageSource::ThreadedGenerateData(const OutputImageRegionType&, int)
 
 // Callback routine used by the threading library. This routine just calls
 // the ThreadedGenerateData method after setting the correct region for this
-// thread. 
+// thread.
 
 ITK_THREAD_RETURN_TYPE mitk::ImageSource::ThreaderCallback( void *arg )
 {
@@ -241,10 +241,10 @@ ITK_THREAD_RETURN_TYPE mitk::ImageSource::ThreaderCallback( void *arg )
   // else
   //   {
   //   otherwise don't use this thread. Sometimes the threads dont
-  //   break up very well and it is just as efficient to leave a 
+  //   break up very well and it is just as efficient to leave a
   //   few threads idle.
   //   }
-  
+
   return ITK_THREAD_RETURN_VALUE;
 }
 

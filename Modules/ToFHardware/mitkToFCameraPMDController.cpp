@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,12 +23,12 @@ PMDDataDescription m_DataDescription; //TODO
 struct SourceDataStruct {
    PMDDataDescription dataDescription;
    char sourceData;
-}; 
+};
 
 namespace mitk
 {
-  ToFCameraPMDController::ToFCameraPMDController(): m_PMDRes(0), m_PixelNumber(40000), m_NumberOfBytes(0), 
-    m_CaptureWidth(200), m_CaptureHeight(200), m_SourceDataSize(0), m_SourceDataStructSize(0), m_ConnectionCheck(false), 
+  ToFCameraPMDController::ToFCameraPMDController(): m_PMDRes(0), m_PixelNumber(40000), m_NumberOfBytes(0),
+    m_CaptureWidth(200), m_CaptureHeight(200), m_SourceDataSize(0), m_SourceDataStructSize(0), m_ConnectionCheck(false),
     m_InputFileName("")
   {
   }
@@ -43,7 +43,7 @@ namespace mitk
     m_ConnectionCheck = ErrorText(m_PMDRes);
     m_PMDHandle = 0;
     return m_ConnectionCheck;
-  } 
+  }
 
   bool ToFCameraPMDController::ErrorText(int error)
   {
@@ -58,7 +58,7 @@ namespace mitk
 
   bool ToFCameraPMDController::UpdateCamera()
   {
-    m_PMDRes = pmdUpdate(m_PMDHandle);                
+    m_PMDRes = pmdUpdate(m_PMDHandle);
     return ErrorText(m_PMDRes);
   }
 

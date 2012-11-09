@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -67,7 +67,7 @@ mitk::Contour* mitk::FeedbackContourTool::GetFeedbackContour()
 
 void mitk::FeedbackContourTool::SetFeedbackContour(Contour& contour)
 {
-  // begin of temporary fix for 3m3 release  
+  // begin of temporary fix for 3m3 release
   this->Disable3dRendering();
   //end of temporary fix for 3m3 release
 
@@ -77,11 +77,11 @@ void mitk::FeedbackContourTool::SetFeedbackContour(Contour& contour)
 
 void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 {
-  // begin of temporary fix for 3m3 release  
+  // begin of temporary fix for 3m3 release
   this->Disable3dRendering();
   //end of temporary fix for 3m3 release
 
-  if ( m_FeedbackContourVisible == visible ) 
+  if ( m_FeedbackContourVisible == visible )
     return; // nothing changed
 
   if ( DataStorage* storage = m_ToolManager->GetDataStorage() )
@@ -103,7 +103,7 @@ mitk::Contour::Pointer mitk::FeedbackContourTool::ProjectContourTo2DSlice(Image*
 {
   return m_ContourUtils->ProjectContourTo2DSlice(slice, contourIn3D, correctionForIpSegmentation, constrainToInside);
 }
-    
+
 mitk::Contour::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation)
 {
   return m_ContourUtils->BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D, correctionForIpSegmentation);
@@ -127,5 +127,5 @@ void mitk::FeedbackContourTool::Disable3dRendering()
     {
       m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(false), mitk::BaseRenderer::GetInstance((*iter)));
     }
-  }  
+  }
 }

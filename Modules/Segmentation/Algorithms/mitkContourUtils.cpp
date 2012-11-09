@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // explicitly instantiate the 2D version of this method
 InstantiateAccessFunctionForFixedDimension(ItkCopyFilledContourToSlice, 2);
-    
+
 mitk::ContourUtils::ContourUtils()
 {
 }
@@ -42,7 +42,7 @@ mitk::Contour::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice,
 
   const Contour::PathType::VertexListType* pointsIn3D = contourIn3D->GetContourPath()->GetVertexList();
   const Geometry3D* sliceGeometry = slice->GetGeometry();
-  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn3D->begin(); 
+  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn3D->begin();
         iter != pointsIn3D->end();
         ++iter )
   {
@@ -51,7 +51,7 @@ mitk::Contour::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice,
     for (int i = 0; i < 3; ++i) currentPointIn3D[i] = currentPointIn3DITK[i];
 
     Point3D projectedPointIn2D;
-    projectedPointIn2D.Fill(0.0); 
+    projectedPointIn2D.Fill(0.0);
     sliceGeometry->WorldToIndex( currentPointIn3D, projectedPointIn2D );
     // MITK_INFO << "world point " << currentPointIn3D << " in index is " << projectedPointIn2D;
 
@@ -73,14 +73,14 @@ mitk::Contour::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const G
   Contour::Pointer worldContour = Contour::New();
 
   const Contour::PathType::VertexListType* pointsIn2D = contourIn2D->GetContourPath()->GetVertexList();
-  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin(); 
+  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin();
         iter != pointsIn2D->end();
         ++iter )
   {
     Contour::PathType::VertexType currentPointIn3DITK = *iter;
     Point3D currentPointIn2D;
     for (int i = 0; i < 3; ++i) currentPointIn2D[i] = currentPointIn3DITK[i];
-    
+
     Point3D worldPointIn3D;
     worldPointIn3D.Fill(0.0);
     sliceGeometry->IndexToWorld( currentPointIn2D, worldPointIn3D );
@@ -98,12 +98,12 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
 {
   // 1. Use ipSegmentation to draw a filled(!) contour into a new 8 bit 2D image, which will later be copied back to the slice.
   //    We don't work on the "real" working data, because ipSegmentation would restrict us to 8 bit images
-  
+
   // convert the projected contour into a ipSegmentation format
   mitkIpInt4_t* picContour = new mitkIpInt4_t[2 * projectedContour->GetNumberOfPoints()];
   const Contour::PathType::VertexListType* pointsIn2D = projectedContour->GetContourPath()->GetVertexList();
   unsigned int index(0);
-  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin(); 
+  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin();
         iter != pointsIn2D->end();
         ++iter, ++index )
   {
@@ -153,19 +153,19 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
 
   InputIteratorType inputIterator( filledContourSliceITK, filledContourSliceITK->GetLargestPossibleRegion() );
   OutputIteratorType outputIterator( originalSlice, originalSlice->GetLargestPossibleRegion() );
-  
+
   outputIterator.GoToBegin();
   inputIterator.GoToBegin();
-  
+
   while ( !outputIterator.IsAtEnd() )
   {
     if ( inputIterator.Get() != 0 )
     {
       outputIterator.Set( overwritevalue );
     }
- 
+
     ++outputIterator;
     ++inputIterator;
   }
-} 
+}
 

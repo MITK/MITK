@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPointData.h>
 #include <vtkObjectFactory.h>
 #include <vtkRendererCollection.h>
-   
+
 
 mitk::GradientBackground::GradientBackground()
 {
@@ -44,7 +44,7 @@ mitk::GradientBackground::GradientBackground()
   m_Lut = vtkLookupTable::New();
   m_Plane = vtkPolyData::New();
 
-  vtkPoints* points = vtkPoints::New( ); 
+  vtkPoints* points = vtkPoints::New( );
   points->InsertPoint(0,-10,0,0);
   points->InsertPoint(1,-10,1,0);
   points->InsertPoint(2,10,1,0);
@@ -57,7 +57,7 @@ mitk::GradientBackground::GradientBackground()
   cellArray->InsertCellPoint(2);
   cellArray->InsertCellPoint(3);
 
-  vtkUnsignedIntArray* data = vtkUnsignedIntArray::New();  
+  vtkUnsignedIntArray* data = vtkUnsignedIntArray::New();
   data->InsertTuple1(0,1);
   data->InsertTuple1(1,0);
   data->InsertTuple1(2,0);
@@ -78,7 +78,7 @@ mitk::GradientBackground::GradientBackground()
 
   m_Mapper->SetInput( m_Plane );
   m_Mapper->SetLookupTable( m_Lut );
-  
+
   //m_Mapper->ImmediateModeRenderingOn();
 
   m_Actor->SetMapper( m_Mapper );
@@ -95,19 +95,19 @@ mitk::GradientBackground::~GradientBackground()
   if ( m_RenderWindow != NULL )
     if ( this->IsEnabled() )
       this->Disable();
-  
+
   if ( m_Plane != NULL )
     m_Plane->Delete();
-  
+
   if( m_Lut != NULL )
     m_Lut->Delete();
 
   if ( m_Mapper != NULL )
     m_Mapper->Delete();
-  
+
   if ( m_Actor!=NULL )
     m_Actor->Delete();
-  
+
   if ( m_Renderer != NULL )
     m_Renderer->Delete();
 }
@@ -200,7 +200,7 @@ void mitk::GradientBackground::Disable()
   if ( this->IsEnabled() )
   {
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_Renderer);
-  } 
+  }
 }
 
 
@@ -224,7 +224,7 @@ void mitk::GradientBackground::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::GradientBackground::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return false;    
+    return false;
 }
 
 bool mitk::GradientBackground::VerifyRequestedRegion()

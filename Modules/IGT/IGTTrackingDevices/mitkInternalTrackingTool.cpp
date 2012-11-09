@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
-mitk::InternalTrackingTool::InternalTrackingTool() 
+mitk::InternalTrackingTool::InternalTrackingTool()
 : TrackingTool(),
-m_TrackingError(0.0f), 
-m_Enabled(true), 
+m_TrackingError(0.0f),
+m_Enabled(true),
 m_DataValid(false),
 m_ToolTipSet(false)
 {
@@ -53,8 +53,8 @@ void mitk::InternalTrackingTool::SetToolName(const char* _arg)
 {
   itkDebugMacro("setting  m_ToolName to " << _arg);
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-  if ( _arg && (_arg == this->m_ToolName) ) 
-  { 
+  if ( _arg && (_arg == this->m_ToolName) )
+  {
     return;
   }
   if (_arg)
@@ -65,8 +65,8 @@ void mitk::InternalTrackingTool::SetToolName(const char* _arg)
   {
     this->m_ToolName= "";
   }
-  this->Modified(); 
-} 
+  this->Modified();
+}
 
 
 void mitk::InternalTrackingTool::SetToolName( const std::string _arg )
@@ -99,7 +99,7 @@ void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
 void mitk::InternalTrackingTool::SetPosition(mitk::Point3D position)
 {
   itkDebugMacro("setting  m_Position to " << position);
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   m_Position = position;
   this->Modified();
 }
@@ -107,7 +107,7 @@ void mitk::InternalTrackingTool::SetPosition(mitk::Point3D position)
 
 void mitk::InternalTrackingTool::GetOrientation(mitk::Quaternion& orientation) const
 {
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   if (m_ToolTipSet)
     {
     //compute rotation of tooltip
@@ -131,7 +131,7 @@ if( (toolTipPosition[0] == 0) &&
     {
     m_ToolTipSet = false;
     }
-else 
+else
     {
     m_ToolTipSet = true;
     }
@@ -142,7 +142,7 @@ m_ToolTipRotation = orientation;
 void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation)
 {
   itkDebugMacro("setting  m_Orientation to " << orientation);
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   m_Orientation = orientation;
   this->Modified();
 }
@@ -151,9 +151,9 @@ void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation)
 void mitk::InternalTrackingTool::SetTrackingError(float error)
 {
   itkDebugMacro("setting  m_TrackingError  to " << error);
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   if (error == m_TrackingError)
-  { 
+  {
     return;
   }
   m_TrackingError = error;
@@ -163,7 +163,7 @@ void mitk::InternalTrackingTool::SetTrackingError(float error)
 
 float mitk::InternalTrackingTool::GetTrackingError() const
 {
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   float r = m_TrackingError;
   return r;
 }
@@ -171,19 +171,19 @@ float mitk::InternalTrackingTool::GetTrackingError() const
 
 bool mitk::InternalTrackingTool::Enable()
 {
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   if (m_Enabled == false)
   {
     this->m_Enabled = true;
     this->Modified();
-  }  
+  }
   return true;
 }
 
 
 bool mitk::InternalTrackingTool::Disable()
 {
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   if (m_Enabled == true)
   {
     this->m_Enabled = false;
@@ -195,40 +195,40 @@ bool mitk::InternalTrackingTool::Disable()
 
 bool mitk::InternalTrackingTool::IsEnabled() const
 {
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   return m_Enabled;
 }
 
 
 bool mitk::InternalTrackingTool::IsDataValid() const
 {
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   return m_DataValid;
 }
 
 
 void mitk::InternalTrackingTool::SetDataValid(bool _arg)
-{  
+{
   itkDebugMacro("setting m_DataValid to " << _arg);
   if (this->m_DataValid != _arg)
   {
-    MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+    MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
     this->m_DataValid = _arg;
     this->Modified();
-  }  
+  }
 }
 
 
 void mitk::InternalTrackingTool::SetErrorMessage(const char* _arg)
 {
   itkDebugMacro("setting  m_ErrorMessage  to " << _arg);
-  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
-  if ((_arg == NULL) || (_arg == this->m_ErrorMessage)) 
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
+  if ((_arg == NULL) || (_arg == this->m_ErrorMessage))
     return;
 
   if (_arg != NULL)
     this->m_ErrorMessage = _arg;
   else
     this->m_ErrorMessage = "";
-  this->Modified(); 
-} 
+  this->Modified();
+}

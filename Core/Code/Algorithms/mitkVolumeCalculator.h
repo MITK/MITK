@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,7 +44,7 @@ namespace mitk
     itkSetMacro(Threshold,int);
     itkGetMacro(Volume,float);
     itkGetMacro(VoxelCount,unsigned long int);
-   
+
     std::vector<float> GetVolumes();
     void ComputeVolume();
 
@@ -52,7 +52,7 @@ namespace mitk
     static float ComputeVolume(Vector3D spacing, unsigned int voxelCount);
 
   protected:
-    
+
     VolumeCalculator();
     virtual ~VolumeCalculator();
 

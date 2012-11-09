@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
 {
   int nextStateId = 10;
   int eventId = 100;
-  
+
   //Create Transition
   itk::WeakPointer<mitk::Transition> transition = new mitk::Transition("transitionname", nextStateId, eventId);
 
@@ -59,7 +59,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
-  
+
   ++count;
 
   //Create Action
@@ -76,7 +76,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   count = 1;
-  
+
   //check ActionIterators
   std::cout << "Check ActionIterators: ";
   mitk::Transition::ActionVectorIterator iter = transition->GetActionBeginIterator();

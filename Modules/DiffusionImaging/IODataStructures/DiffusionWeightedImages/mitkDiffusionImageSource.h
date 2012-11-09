@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,8 +35,8 @@ namespace mitk {
   class DiffusionImage<unsigned long>;*/
 
 //##Documentation
-//## @brief Superclass of all classes generating diffusion volumes (instances 
-//## of class DiffusionImage) as output. 
+//## @brief Superclass of all classes generating diffusion volumes (instances
+//## of class DiffusionImage) as output.
 //##
 //## @ingroup Process
 template<typename TPixelType>
@@ -44,7 +44,7 @@ class DiffusionImageSource : public ImageSource
 {
 public:
   mitkClassMacro(DiffusionImageSource, BaseProcess);
-  itkNewMacro(Self);  
+  itkNewMacro(Self);
 
   typedef DiffusionImage<TPixelType> OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;

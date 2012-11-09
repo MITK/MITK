@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-mitk::MouseModeSwitcher::MouseModeSwitcher( mitk::GlobalInteraction* gi ) 
+mitk::MouseModeSwitcher::MouseModeSwitcher( mitk::GlobalInteraction* gi )
 : m_GlobalInteraction( gi )
 , m_ActiveInteractionScheme( MITK )
 , m_ActiveMouseMode( MousePointer )
@@ -50,7 +50,7 @@ void mitk::MouseModeSwitcher::InitializeListeners()
   m_ListenersForMITK.push_back( listener );
 
 
-  mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New( 
+  mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New(
     "alternativeScroll", new mitk::DisplayInteractor() );
   listener = scrollInteractor;
   m_ListenersForPACS.push_back( listener );
@@ -59,12 +59,12 @@ void mitk::MouseModeSwitcher::InitializeListeners()
   listener = lwInteractor;
   m_ListenersForPACS.push_back( listener );
 
-  mitk::DisplayVectorInteractor::Pointer panInteractor = mitk::DisplayVectorInteractor::New( 
+  mitk::DisplayVectorInteractor::Pointer panInteractor = mitk::DisplayVectorInteractor::New(
     "alternativePan", new mitk::DisplayInteractor() );
   listener = panInteractor;
   m_ListenersForPACS.push_back( listener );
 
-  mitk::DisplayVectorInteractor::Pointer crtlZoomInteractor = mitk::DisplayVectorInteractor::New( 
+  mitk::DisplayVectorInteractor::Pointer crtlZoomInteractor = mitk::DisplayVectorInteractor::New(
     "alternativeZoom", new mitk::DisplayInteractor() );
   listener = crtlZoomInteractor;
   m_ListenersForPACS.push_back( listener );
@@ -129,7 +129,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
     {
       m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
-      mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New( 
+      mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New(
         "Scroll", new mitk::DisplayInteractor() );
       m_LeftMouseButtonHandler = scrollInteractor;
 
@@ -141,7 +141,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
     {
       m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
-      mitk::DisplayVectorInteractorLevelWindow::Pointer lwInteractor = mitk::DisplayVectorInteractorLevelWindow::New( 
+      mitk::DisplayVectorInteractorLevelWindow::Pointer lwInteractor = mitk::DisplayVectorInteractorLevelWindow::New(
         "LevelWindow" );
       m_LeftMouseButtonHandler = lwInteractor;
 
@@ -153,7 +153,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
     {
       m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
-      mitk::DisplayVectorInteractor::Pointer zoomInteractor = mitk::DisplayVectorInteractor::New( 
+      mitk::DisplayVectorInteractor::Pointer zoomInteractor = mitk::DisplayVectorInteractor::New(
         "Zoom", new mitk::DisplayInteractor() );
       m_LeftMouseButtonHandler = zoomInteractor;
 
@@ -165,7 +165,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode mode )
     {
       m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
 
-      mitk::DisplayVectorInteractor::Pointer panInteractor = mitk::DisplayVectorInteractor::New( 
+      mitk::DisplayVectorInteractor::Pointer panInteractor = mitk::DisplayVectorInteractor::New(
         "Pan", new mitk::DisplayInteractor() );
       m_LeftMouseButtonHandler = panInteractor;
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,30 +27,30 @@ namespace mitk
 
   The list of colors starts with a fully saturated, full valued red (Hue = 0 = 360).
   After that the sequence is generated like this:
-  
+
   - first cycle through fully saturated colors (increase hue by 60)
   - then cycle through colors with halfed saturation (increase hue by 60)
   - then cycle through colors with halfed value (increase hue by 60)
-  
+
   Finally repeat colors.
-  
+
 */
 class MitkExt_EXPORT ColorSequenceCycleH : public ColorSequence
 {
   public:
-    
+
     ColorSequenceCycleH();
-    
+
     virtual ~ColorSequenceCycleH();
 
-    /*!  
+    /*!
     \brief Return another color
-    */ 
-    virtual Color GetNextColor(); 
-  
-    /*!  
+    */
+    virtual Color GetNextColor();
+
+    /*!
     \brief Rewind to first color
-    */ 
+    */
     virtual void GoToBegin();
 
     /*!
@@ -74,11 +74,11 @@ class MitkExt_EXPORT ColorSequenceCycleH : public ColorSequence
     virtual void SetColorCycle( unsigned short cycle );
 
   protected:
-      
+
     float color_h; // current hue (0 .. 360)
     float color_s; // current saturation (0 .. 1)
     float color_v; // current value (0 .. 1)
-    
+
     unsigned short color_cycle;
 
 };

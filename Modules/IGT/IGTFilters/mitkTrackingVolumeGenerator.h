@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -70,13 +70,13 @@ class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
     */
     mitk::TrackingDeviceType GetTrackingDeviceType() const;
 
-    
+
     /**
     * \brief        Sets the tracking device data object which will be used to generate the volume. Each tracking device data object
     *               has an unambiguous assignment to a tracking volume. See file mitkTrackingTypes.h for a list of all availiable object.
     */
     void SetTrackingDeviceData(mitk::TrackingDeviceData deviceData);
-    
+
     /**
     * \return       Returns the current tracking device data of the generator. See file mitkTrackingTypes.h for the definition of tracking device data objects.
     */

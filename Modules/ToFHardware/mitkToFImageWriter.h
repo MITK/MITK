@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ namespace mitk
   */
   class MITK_TOFHARDWARE_EXPORT ToFImageWriter : public itk::Object
   {
-  public: 
+  public:
 
     ToFImageWriter();
 
@@ -105,7 +105,7 @@ namespace mitk
     \brief Checks file name if file extension exists. If not an error message is returned
     */
     void CheckForFileExtension(std::string& fileName);
-    
+
     // member variables
     std::string m_DistanceImageFileName; ///< file name for saving the distance image
     std::string m_AmplitudeImageFileName; ///< file name for saving the amplitude image

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -72,7 +72,7 @@ void SlicesRotator::OnSliceControllerAdded(SliceNavigationController* snc)
   snc->ConnectGeometrySendEvent(this); // connects creation of new world geometry to Self::SetGeometry
 }
 
-  
+
 void SlicesRotator::OnSliceControllerRemoved(SliceNavigationController* snc)
 {
   if (!snc) return;
@@ -80,7 +80,7 @@ void SlicesRotator::OnSliceControllerRemoved(SliceNavigationController* snc)
 }
 
 /// Is called whenever a SliceNavigationController invokes an event. Will update the list
-/// of SliceNavigationControllers that can handle rotation 
+/// of SliceNavigationControllers that can handle rotation
 void SlicesRotator::SetGeometry(const itk::EventObject& /*EventObject*/)
 {
   // there is no way to determine the sender?
@@ -89,7 +89,7 @@ void SlicesRotator::SetGeometry(const itk::EventObject& /*EventObject*/)
 }
 
 
-void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC, 
+void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
   SliceNavigationController *rotatedPlaneSNC,
   const Point3D &point, bool linked )
 {
@@ -115,7 +115,7 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
   const PlaneGeometry *rotatedPlane = rotatedPlaneSNC->GetCurrentPlaneGeometry();
   const PlaneGeometry *thirdPlane = thirdSNC->GetCurrentPlaneGeometry();
 
-  if ( (rotationPlane == NULL) || (rotatedPlane == NULL) 
+  if ( (rotationPlane == NULL) || (rotatedPlane == NULL)
     || (thirdPlane == NULL) )
   {
     return;
@@ -138,7 +138,7 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
     return;
   }
 
-  
+
   // All pre-requirements are met; execute the rotation
 
   Point3D referencePoint = intersection.Project( projectedPoint );
@@ -146,17 +146,17 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
 
   Vector3D toProjected = referencePoint - rotationCenter;
   Vector3D toCursor    = projectedPoint - rotationCenter;
- 
+
   // cross product: | A x B | = |A| * |B| * sin(angle)
   Vector3D axisOfRotation;
-  vnl_vector_fixed< ScalarType, 3 > vnlDirection = 
+  vnl_vector_fixed< ScalarType, 3 > vnlDirection =
     vnl_cross_3d( toCursor.GetVnlVector(), toProjected.GetVnlVector() );
   axisOfRotation.SetVnlVector( vnlDirection );
-  
+
   // scalar product: A * B = |A| * |B| * cos(angle)
   // tan = sin / cos
-  ScalarType angle = - atan2( 
-    (double)(axisOfRotation.GetNorm()), 
+  ScalarType angle = - atan2(
+    (double)(axisOfRotation.GetNorm()),
     (double)(toCursor * toProjected) );
   angle *= 180.0 / vnl_math::pi;
 
@@ -178,13 +178,13 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
     displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
 
     const Geometry3D *geometry3D = rotatedPlaneSNC->GetCreatedWorldGeometry();
-    const TimeSlicedGeometry *timeSlicedGeometry = 
+    const TimeSlicedGeometry *timeSlicedGeometry =
       dynamic_cast<const TimeSlicedGeometry*>( geometry3D );
     if ( !timeSlicedGeometry )
     {
       return;
     }
-    
+
     const_cast< TimeSlicedGeometry * >( timeSlicedGeometry )->ExecuteOperation( &op );
 
     displayGeometry->Map( rotationCenter, point2DWorld );
@@ -215,13 +215,13 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
       displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
 
       const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
-      const TimeSlicedGeometry *timeSlicedGeometry = 
+      const TimeSlicedGeometry *timeSlicedGeometry =
         dynamic_cast<const TimeSlicedGeometry*>( geometry3D );
       if ( !timeSlicedGeometry )
       {
         continue;
       }
-      
+
       const_cast< TimeSlicedGeometry * >( timeSlicedGeometry )->ExecuteOperation( &op );
 
       displayGeometry->Map( rotationCenter, point2DWorld );
@@ -233,12 +233,12 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
       displayGeometry->MoveBy( vector2DDisplayDiff );
 
       (*iter)->SendCreatedWorldGeometryUpdate();
-    } 
+    }
   }
 } // end RotateToPoint
 
 
-/// Updates the list of SliceNavigationControllers that can handle rotation 
+/// Updates the list of SliceNavigationControllers that can handle rotation
 void SlicesRotator::UpdateRotatableSNCs()
 {
   m_RotatableSNCs.clear();
@@ -252,7 +252,7 @@ void SlicesRotator::UpdateRotatableSNCs()
     const SlicedGeometry3D* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>( timeSlicedGeometry->GetGeometry3D(0) );
     if (!slicedGeometry) continue;
 
-    if (slicedGeometry->IsValidSlice(0))  
+    if (slicedGeometry->IsValidSlice(0))
     {
       // there were some lines of additional checks here in previous versions,
       // all of which would always evaluate to true, so the check was irrelevant.
@@ -292,7 +292,7 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
        - calculate the line intersection of this SliceNavigationController's plane with our rendering plane
        - if there is no interesection, ignore and continue
        - IF there is an intersection
-         - check the mouse cursor's distance from that line. 
+         - check the mouse cursor's distance from that line.
          0. if the line is NOT near the cursor, remember the plane as "one of the other planes" (which can be rotated in "locked" mode)
          1. on first line near the cursor,  just remember this intersection line as THE other plane that we want to rotate
          2. on every consecutive line near the cursor, check if the line is geometrically identical to the line that we want to rotate
@@ -301,7 +301,7 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
   */
   const DisplayPositionEvent* posEvent = dynamic_cast<const DisplayPositionEvent*>(e->GetEvent());
   if (!posEvent) return false;
-    
+
   BaseRenderer* clickedRenderer = e->GetEvent()->GetSender();
   const PlaneGeometry* ourViewportGeometry = dynamic_cast<const PlaneGeometry*>( clickedRenderer->GetCurrentWorldGeometry2D() );
   if (!ourViewportGeometry) return false;
@@ -311,7 +311,7 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
 
   MITK_DEBUG << "=============================================";
   MITK_DEBUG << "Renderer under cursor is " << clickedRenderer->GetName();
-  
+
   Point3D cursorPosition = posEvent->GetWorldPosition();
   const PlaneGeometry* geometryToBeRotated = NULL;  // this one is under the mouse cursor
   const PlaneGeometry* anyOtherGeometry = NULL;    // this is also visible (for calculation of intersection ONLY)
@@ -327,7 +327,7 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
     const PlaneGeometry* otherRenderersRenderPlane = (*iter)->GetCurrentPlaneGeometry();
     if (otherRenderersRenderPlane == NULL) continue; // ignore, we don't see a plane
     MITK_DEBUG << "  Checking plane of renderer " << (*iter)->GetRenderer()->GetName();
-  
+
     // check if there is an intersection
     Line3D intersectionLine; // between rendered/clicked geometry and the one being analyzed
     if (!ourViewportGeometry->IntersectionLine( otherRenderersRenderPlane, intersectionLine ))
@@ -344,7 +344,7 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
     if (distanceFromIntersectionLine > threshholdDistancePixels)
     {
       MITK_DEBUG << "    Plane is too far away --> remember as otherRenderersRenderPlane";
-      anyOtherGeometry = otherRenderersRenderPlane; // we just take the last one, so overwrite each iteration (we just need some crossing point) 
+      anyOtherGeometry = otherRenderersRenderPlane; // we just take the last one, so overwrite each iteration (we just need some crossing point)
                                                    // TODO what about multiple crossings? NOW we have undefined behavior / random crossing point is used
 
       if (m_LinkPlanes)
@@ -369,7 +369,7 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
         //                                                     if different, DON'T rotate
 
         if ( intersectionLine.IsParallel( intersectionLineWithGeometryToBeRotated )
-          && intersectionLine.Distance( intersectionLineWithGeometryToBeRotated.GetPoint1() ) < mitk::eps ) 
+          && intersectionLine.Distance( intersectionLineWithGeometryToBeRotated.GetPoint1() ) < mitk::eps )
         {
           MITK_DEBUG << "    This line is the same as intersectionLineWithGeometryToBeRotated which we already know";
           m_SNCsToBeRotated.push_back(*iter);
@@ -475,8 +475,8 @@ bool SlicesRotator::DoRotationStep(Action*, const StateEvent* e)
     //  - execute rotation
     //  - calculate new center of rotation on 2D display
     //  - move display IF the center of rotation has moved slightly before and after rotation
-    
-    // DM 2012-10: this must probably be due to rounding errors only, right? 
+
+    // DM 2012-10: this must probably be due to rounding errors only, right?
     //             We don't have documentation on if/why this code is needed
     BaseRenderer *renderer = (*iter)->GetRenderer();
     if ( !renderer ) continue;
@@ -500,7 +500,7 @@ bool SlicesRotator::DoRotationStep(Action*, const StateEvent* e)
     displayGeometry->MoveBy( vector2DDisplayDiff );
 
     (*iter)->SendCreatedWorldGeometryUpdate();
-  } 
+  }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -509,5 +509,5 @@ bool SlicesRotator::DoRotationStep(Action*, const StateEvent* e)
   return true;
 }
 
-} // namespace 
+} // namespace
 

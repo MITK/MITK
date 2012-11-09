@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  *  Test for the class "mitkPointSetFileWriter".
- *  
- *  argc and argv are the command line parameters which were passed to 
+ *
+ *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
@@ -35,13 +35,13 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("PointSetWriter")
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::PointSetWriter::Pointer myPointSetWriter = mitk::PointSetWriter::New();
-  
+
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myPointSetWriter.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(myPointSetWriter.IsNotNull(),"Testing instantiation")
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!
@@ -61,16 +61,16 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION_REQUIRED(pointSet.IsNotNull(),"PointSet creation")
 
-    try{  
+    try{
       // test for exception handling
       MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
       myPointSetWriter->SetInput(pointSet);
       myPointSetWriter->SetFileName("/usr/bin");
-      myPointSetWriter->Update(); 
+      myPointSetWriter->Update();
       MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
   }
   catch(...) {
-    //this means that a wrong exception (i.e. no itk:Exception) has been thrown 
+    //this means that a wrong exception (i.e. no itk:Exception) has been thrown
     std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
@@ -91,14 +91,14 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
   const char * pattern = myPointSetWriter->GetFilePattern();
   MITK_TEST_CONDITION_REQUIRED(std::string("pattern") == prefix, "Pattern set correctly?");
   */
-  
+
   MITK_TEST_OUTPUT( << "Check if input can be set correctly: ");
   myPointSetWriter->SetInput(pointSet);
   mitk::PointSet::Pointer pointSet2 = mitk::PointSet::New();
   pointSet2 = myPointSetWriter->GetInput();
 
-  MITK_TEST_CONDITION_REQUIRED( pointSet->GetSize() == pointSet2->GetSize(), "Pointsets have unequal size" ); 
-  
+  MITK_TEST_CONDITION_REQUIRED( pointSet->GetSize() == pointSet2->GetSize(), "Pointsets have unequal size" );
+
   for(int i=0; i<pointSet->GetSize(); i++)
   {
     mitk::Point3D p1 = pointSet->GetPoint(i);

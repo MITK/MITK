@@ -70,8 +70,8 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
 
   for ( ; iterator != end; ++iterator)
   {
-    labelToIndexMap.insert( 
-      std::pair< std::string, DescriptorType >( 
+    labelToIndexMap.insert(
+      std::pair< std::string, DescriptorType >(
       boostGraph[ *iterator ].label, *iterator )
       );
   }
@@ -102,7 +102,7 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
       DescriptorType toVertexDescriptor = labelToIndexMap.find( positionToLabelVector[ innerLoop ] )->second;
 
 
-      int weight( 0 ); 
+      int weight( 0 );
 
       if( boost::edge(toVertexDescriptor, fromVertexDescriptor, boostGraph ).second )
       {
@@ -114,17 +114,17 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
   }
 
 
-  OutputImageType::SpacingType spacing; 
-  spacing[0] = 1.0; 
+  OutputImageType::SpacingType spacing;
+  spacing[0] = 1.0;
   spacing[1] = 1.0;
-  OutputImageType::PointType origin; 
-  origin[0] = 0.0; 
+  OutputImageType::PointType origin;
+  origin[0] = 0.0;
   origin[1] = 0.0;
-  OutputImageType::IndexType index; 
-  index[0] = 0.0; 
+  OutputImageType::IndexType index;
+  index[0] = 0.0;
   index[1] = 0.0;
-  OutputImageType::SizeType size; 
-  size[0] = numberOfVertices; 
+  OutputImageType::SizeType size;
+  size[0] = numberOfVertices;
   size[1] = numberOfVertices;
   OutputImageType::RegionType region;
   region.SetIndex( index );
@@ -157,11 +157,11 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
     {
       if( connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ] )
       {
-        it_connect.Set( 1 ); 
+        it_connect.Set( 1 );
       }
       else
       {
-        it_connect.Set( 0 ); 
+        it_connect.Set( 0 );
       }
       ++it_connect;
       counter++;
@@ -172,8 +172,8 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
     // if desired rescale to the 0-255 range
     while( !it_connect.IsAtEnd() )
     {
-      it_connect.Set( ( unsigned short ) rescaleFactor * 
-        connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ] 
+      it_connect.Set( ( unsigned short ) rescaleFactor *
+        connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ]
       );
       ++it_connect;
       counter++;

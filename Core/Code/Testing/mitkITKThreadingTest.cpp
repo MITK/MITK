@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,18 +44,18 @@ ITK_THREAD_RETURN_TYPE ThreadedFunction(void* param)
   std::cout<<"Getting thread info data... ";
   itk::MultiThreader::ThreadInfoStruct* threadInfo = static_cast<itk::MultiThreader::ThreadInfoStruct*>(param);
 
-  if (!threadInfo) 
+  if (!threadInfo)
   {
     std::cout<<"[FAILED]"<<std::endl;
     exit(EXIT_FAILURE);
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  
+
   std::cout<<"Getting user data from thread... ";
   UserData* userData = static_cast<UserData*>(threadInfo->UserData);
 
-  if (!userData) 
+  if (!userData)
   {
     std::cout<<"[FAILED]"<<std::endl;
     exit(EXIT_FAILURE);
@@ -72,11 +72,11 @@ ITK_THREAD_RETURN_TYPE ThreadedFunction(void* param)
     userData->semaphore->Up(); // signal "work done"
   }
   std::cout<<"[PASSED]"<<std::endl;
-  
+
   std::cout<<"waiting for main thread's signal... "<<std::endl;;
   userData->mayIRun->Down(); // wait for signal
   std::cout<<"got main thread's signal... "<<std::endl;
- 
+
   // inc variable TOGETHER WITH main thread
   for (int i = 1; i <= 10000; ++i)
   {
@@ -84,7 +84,7 @@ ITK_THREAD_RETURN_TYPE ThreadedFunction(void* param)
     *(userData->intPointer) += 1;
     userData->mutex->Unlock();
   }
-  
+
   userData->semaphore->Up(); // signal "job done"
 
  return ITK_THREAD_RETURN_VALUE;
@@ -95,13 +95,13 @@ int mitkITKThreadingTest(int /*argc*/, char* /*argv*/[])
   itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
 
   int localInt(0); // this will be modified by both threads
-  
+
   itk::Semaphore::Pointer m_ResultAvailable = itk::Semaphore::New();
   m_ResultAvailable->Initialize(0); // no pieces left (thread has to create one)
-  
+
   itk::Semaphore::Pointer m_RunThreadRun = itk::Semaphore::New();
   m_RunThreadRun->Initialize(0); // no pieces left (thread has to create one)
-  
+
   itk::FastMutexLock::Pointer m_Mutex = itk::FastMutexLock::New();
 
   UserData userData;
@@ -109,7 +109,7 @@ int mitkITKThreadingTest(int /*argc*/, char* /*argv*/[])
   userData.mutex = m_Mutex.GetPointer();
   userData.semaphore = m_ResultAvailable.GetPointer();
   userData.mayIRun = m_RunThreadRun.GetPointer();
-  
+
   itk::ThreadFunctionType pointer = &ThreadedFunction;
   int thread_id = threader->SpawnThread( pointer, &userData );
 
@@ -139,7 +139,7 @@ int mitkITKThreadingTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"waiting for thread's signal"<<std::endl;;
   m_ResultAvailable->Down(); // wait for thread
   std::cout<<"got thread's signal"<<std::endl;;
-  
+
   std::cout<<"sharing a mutex protected variable among threads";
   if (localInt == 20000)
     std::cout<<"[PASSED]"<<std::endl;
@@ -153,7 +153,7 @@ int mitkITKThreadingTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"waiting for idling thread ";
   threader->TerminateThread( thread_id );
   std::cout<<"[PASSED]"<<std::endl;
-  
+
   std::cout<<"Whole test [PASSED]"<<std::endl;
 
   return EXIT_SUCCESS;

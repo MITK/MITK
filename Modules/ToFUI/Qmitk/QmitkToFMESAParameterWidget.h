@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -61,7 +61,7 @@ class mitkTOFUI_EXPORT QmitkToFMESAParameterWidget :public QWidget
     \brief sets the ToFImageGrabber which was configured after selecting a camera / player
     */
     void SetToFImageGrabber(mitk::ToFImageGrabber* aToFImageGrabber);
-  
+
     /*!
     \brief activate camera settings according to the parameters from GUI
     */
@@ -92,7 +92,7 @@ class mitkTOFUI_EXPORT QmitkToFMESAParameterWidget :public QWidget
     void ToFCameraSelected(int);
 
   protected slots:
-  
+
     /*!
     \brief slot updating the member m_IntegrationTime and the parameter "integration time" of the current ToFImageGrabber
     */

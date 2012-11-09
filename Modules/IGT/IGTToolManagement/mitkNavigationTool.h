@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,23 +53,23 @@ namespace mitk {
     //NavigationToolType:
     itkGetMacro(Type,NavigationToolType);
     itkSetMacro(Type,NavigationToolType);
-    
+
     //Identifier:
     itkGetMacro(Identifier,std::string);
     itkSetMacro(Identifier,std::string);
-    
+
     //Datatreenode:
     itkGetMacro(DataNode,mitk::DataNode::Pointer);
     itkSetMacro(DataNode,mitk::DataNode::Pointer);
-    
+
     //SpatialObject:
     itkGetMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
     itkSetMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
-    
+
     //TrackingTool:
     itkGetMacro(TrackingTool,mitk::TrackingTool::Pointer);
     itkSetMacro(TrackingTool,mitk::TrackingTool::Pointer);
-    
+
     //CalibrationFile:
     itkGetMacro(CalibrationFile,std::string);
     void SetCalibrationFile(const std::string filename);
@@ -79,7 +79,7 @@ namespace mitk {
     itkSetMacro(ToolTipPosition,mitk::Point3D);
     itkGetMacro(ToolTipOrientation,mitk::Quaternion);
     itkSetMacro(ToolTipOrientation,mitk::Quaternion);
-    
+
     //Tool Landmarks:
     /** @return Returns the tool registration landmarks which represent markers / special points on a
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.
@@ -90,15 +90,15 @@ namespace mitk {
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.
      */
     itkSetMacro(ToolRegistrationLandmarks,mitk::PointSet::Pointer);
-    /** @return Returns the tool calibration landmarks for calibration of the defined points in the 
+    /** @return Returns the tool calibration landmarks for calibration of the defined points in the
       *         tool coordinate system, e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
       */
     itkGetMacro(ToolCalibrationLandmarks,mitk::PointSet::Pointer);
-    /** @brief  Sets the tool calibration landmarks for calibration of defined points in the 
+    /** @brief  Sets the tool calibration landmarks for calibration of defined points in the
       *         tool coordinate system, e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
       */
     itkSetMacro(ToolCalibrationLandmarks,mitk::PointSet::Pointer);
-    
+
     //SerialNumber:
     itkGetMacro(SerialNumber,std::string);
     itkSetMacro(SerialNumber,std::string);
@@ -149,8 +149,8 @@ namespace mitk {
     mitk::TrackingDeviceType m_TrackingDeviceType;
     /** @brief Holds landmarks for tool registration. */
     mitk::PointSet::Pointer m_ToolRegistrationLandmarks;
-    /** @brief Holds landmarks for calibration of the defined points in the tool coordinate system, 
-      *        e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool. 
+    /** @brief Holds landmarks for calibration of the defined points in the tool coordinate system,
+      *        e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
       */
     mitk::PointSet::Pointer m_ToolCalibrationLandmarks;
     /** @brief Holds the position of the tool tip. */

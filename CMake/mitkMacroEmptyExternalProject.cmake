@@ -1,7 +1,7 @@
 
 #
 # Convenient macro allowing to define a "empty" project in case an external one is provided
-# using for example <proj>_DIR. 
+# using for example <proj>_DIR.
 # Doing so allows to keep the external project dependency system happy.
 #
 macro(mitkMacroEmptyExternalProject proj dependencies)
@@ -11,7 +11,7 @@ macro(mitkMacroEmptyExternalProject proj dependencies)
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""
-    DEPENDS 
+    DEPENDS
       ${dependencies}
     )
 endmacro()

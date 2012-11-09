@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,9 +40,9 @@ public:
     mitkWriterMacro
 
     itkNewMacro( Self )
-    
+
     typedef mitk::TbssImage InputType;
-    
+
     /**
      * Sets the filename of the file to write.
      * @param FileName the nameInputType of the file to write.
@@ -88,7 +88,7 @@ public:
      * Returns false if an error happened during writing
      */
     itkGetMacro( Success, bool )
-   
+
     /**
     * @return possible file extensions for the data type associated with the writer
     */
@@ -104,34 +104,34 @@ public:
     }
 
 
-    virtual void DoWrite(BaseData::Pointer data) { 
+    virtual void DoWrite(BaseData::Pointer data) {
       if (CanWriteBaseDataType(data)) {
         this->SetInput(dynamic_cast<mitk::TbssImage*>(data.GetPointer()));
-        this->Update(); 
+        this->Update();
       }
     }
 
 protected:
-        
+
     NrrdTbssImageWriter();
 
     virtual ~NrrdTbssImageWriter();
 
     virtual void GenerateData();
-    
+
     std::string m_FileName;
 
     std::string m_FilePrefix;
 
     std::string m_FilePattern;
-    
+
     bool m_Success;
 
 
     std::string RetrieveString(mitk::TbssImage::MetaDataFunction meta);
-            
-};    
-       
+
+};
+
 
 } // end of namespace mitk
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,7 +26,7 @@ QmitkColorPropertyView::QmitkColorPropertyView( const mitk::ColorProperty* prope
   setText("  "); // two spaces for some minimun height
   setMinimumSize(15,15);
   PropertyChanged();
-  
+
   m_WidgetPalette = QWidget::palette();
   QWidget::setPalette(m_WidgetPalette);
   QWidget::setAutoFillBackground(true);
@@ -35,7 +35,7 @@ QmitkColorPropertyView::QmitkColorPropertyView( const mitk::ColorProperty* prope
 QmitkColorPropertyView::~QmitkColorPropertyView()
 {
 }
-    
+
 //void QmitkColorPropertyView::unsetPalette()
 //{
 //  // just ignore calls... this widget is the only one to change its background color
@@ -78,7 +78,7 @@ void QmitkColorPropertyView::DisplayColor()
   //m_SelfCall = true;
   //QWidget::setPaletteBackgroundColor( color );
   //m_SelfCall = false;
-  
+
   m_WidgetPalette.setColor(QPalette::Background, color);
 }
 

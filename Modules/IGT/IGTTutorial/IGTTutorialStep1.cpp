@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,15 +40,15 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //filter which just displaces the positions with an offset. After that we use a recorder
   //to store this new positions and other information to disc in a XML file. After that we use
   //another source (NavigationDataPlayer) to replay the recorded data.
-  
+
 
   //*************************************************************************
   // Part I: Basic initialization of the source and tracking device
   //*************************************************************************
   //First of all create a tracking device object and two tools for this "device".
 
-  //Here we take the VirtualTrackingDevice. This is not a real tracking device it just delivers random 
-  //positions and orientations. You can use other/real tracking devices if you replace the following 
+  //Here we take the VirtualTrackingDevice. This is not a real tracking device it just delivers random
+  //positions and orientations. You can use other/real tracking devices if you replace the following
   //code with different tracking devices, e.g. mitk::NDITrackingDevice. The tools represent the
   //sensors of the tracking device. The TrackingDevice fills the tools with data.
   std::cout << "Generating TrackingDevice ..." << std::endl;
@@ -59,13 +59,13 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   //The tracking device object is used for the physical connection to the device. To use the
   //data inside of our tracking pipeline we need a source. This source encapsulate the tracking device
-  //and provides objects of the type mitk::NavigationData as output. The NavigationData objects stores 
-  //position, orientation, if the data is valid or not and special error informations in a covariance 
+  //and provides objects of the type mitk::NavigationData as output. The NavigationData objects stores
+  //position, orientation, if the data is valid or not and special error informations in a covariance
   //matrix.
   //
-  //Typically the start of our pipeline is a TrackingDeviceSource. To work correct we have to set a 
+  //Typically the start of our pipeline is a TrackingDeviceSource. To work correct we have to set a
   //TrackingDevice object. Attention you have to set the tools before you set the whole TrackingDevice
-  //object to the TrackingDeviceSource because the source need to know how many outputs should be 
+  //object to the TrackingDeviceSource because the source need to know how many outputs should be
   //generated.
 
   std::cout << "Generating Source ..." << std::endl;
@@ -75,7 +75,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   source->Connect();        //here we connect to the tracking system
                             //Note we do not call this on the TrackingDevice object
-  source->StartTracking();  //start the tracking 
+  source->StartTracking();  //start the tracking
                             //Now the source generates outputs.
 
 
@@ -83,9 +83,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   // Part II: Create a NavigationDataToNavigationDataFilter
   //*************************************************************************
 
-  //The next thing we do is using a NavigationDataToNavigationDataFilter. One of these filter is the 
-  //very simple NavigationDataDisplacementFilter. This filter just changes the positions of the input 
-  //NavigationData objects with an offset for each direction (X,Y,Z). The input of this filter is the 
+  //The next thing we do is using a NavigationDataToNavigationDataFilter. One of these filter is the
+  //very simple NavigationDataDisplacementFilter. This filter just changes the positions of the input
+  //NavigationData objects with an offset for each direction (X,Y,Z). The input of this filter is the
   //source and the output of this filter is the "displaced" input.
 
   std::cout << "Generating DisplacementFilter ..." << std::endl;
@@ -98,7 +98,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //now every output of the source object is connected to the displacer object
   for (unsigned int i = 0; i < source->GetNumberOfOutputs(); i++)
   {
-    displacer->SetInput(i, source->GetOutput(i));  //here we connect to the displacement filter 
+    displacer->SetInput(i, source->GetOutput(i));  //here we connect to the displacement filter
   }
 
 
@@ -129,8 +129,8 @@ int main(int  /*argc*/, char*  /*argv*/[])
     recorder->AddNavigationData(displacer->GetOutput(i));  // here we connect to the recorder
   }
 
-  recorder->StartRecording(); //after finishing the settings you can start the recording mechanism 
-                              //now every update of the recorder stores one line into the file for 
+  recorder->StartRecording(); //after finishing the settings you can start the recording mechanism
+                              //now every update of the recorder stores one line into the file for
                               //each added NavigationData
 
 
@@ -141,7 +141,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
     itksys::SystemTools::Delay(100);         //sleep a little
   }
   recorder->StopRecording(); //to get proper XML files you should stop recording
-                             //if your application crashes during recording no data 
+                             //if your application crashes during recording no data
                              //will be lost it is all stored to disc
 
 
@@ -149,9 +149,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   // Part IV: Play the data with the NavigationDataPlayer
   //*************************************************************************
 
-  //The recording is finished now so now we can play the data. The NavigationDataPlayer is similar 
-  //to the TrackingDevice source. It also derives from NavigationDataSource. So you can use a player 
-  //instead of a TrackingDeviceSource. The input of this player is the filename and the output are 
+  //The recording is finished now so now we can play the data. The NavigationDataPlayer is similar
+  //to the TrackingDevice source. It also derives from NavigationDataSource. So you can use a player
+  //instead of a TrackingDeviceSource. The input of this player is the filename and the output are
   //NavigationData object.
 
   filename << "-0.xml";
@@ -160,21 +160,21 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
   //this is first part of the file name the .xml extension and an counter is added automatically
-  player->SetFileName(filename.str()); 
+  player->SetFileName(filename.str());
   player->StartPlaying(); //this starts the player
-                          //From now on the player provides NavigationDatas in the order and 
+                          //From now on the player provides NavigationDatas in the order and
                           //correct time as they were recorded
-  
+
   //this connects the outputs of the player to the NavigationData objects
-  mitk::NavigationData::Pointer nd = player->GetOutput(0); 
-  mitk::NavigationData::Pointer nd2 = player->GetOutput(1); 
-  for (unsigned int x=0; x<100; x++) 
+  mitk::NavigationData::Pointer nd = player->GetOutput(0);
+  mitk::NavigationData::Pointer nd2 = player->GetOutput(1);
+  for (unsigned int x=0; x<100; x++)
   {
     if (nd.IsNotNull()) //check if the output is not null
     {
       //With this update the NavigationData object propagates through the pipeline to get a new value.
       //In this case we only have a source (NavigationDataPlayer).
-      nd->Update(); 
+      nd->Update();
 
       std::cout << x << ": 1:" << nd->GetPosition() << std::endl;
       std::cout << x << ": 2:" << nd2->GetPosition() << std::endl;

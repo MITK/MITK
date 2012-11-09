@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -326,8 +326,8 @@ void QmitkPointBasedRegistrationView::Activated()
   this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
   this->showRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
 
-  
-  
+
+
 }
 
 void QmitkPointBasedRegistrationView::Visible()
@@ -456,7 +456,7 @@ void QmitkPointBasedRegistrationView::Hidden()
 void QmitkPointBasedRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* node)
 {
   if(node == m_FixedNode || node == m_MovingNode)
-  {  
+  {
     m_Controls.m_StatusLabel->show();
     m_Controls.TextLabelFixed->hide();
     m_Controls.m_FixedLabel->hide();
@@ -472,7 +472,7 @@ void QmitkPointBasedRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNod
     m_Controls.label_2->hide();
     m_Controls.m_SwitchImages->hide();
     m_Controls.m_ShowRedGreenValues->setEnabled(false);
-  }    
+  }
 
 }
 
@@ -541,7 +541,7 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataNode::Pointer fixe
       m_FixedPointSetNode->SetVisibility(true);
       m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
       this->GetDataStorage()->Add(m_FixedPointSetNode, m_FixedNode);
-      
+
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
     if (m_FixedPointSetNode.IsNull())
@@ -557,7 +557,7 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataNode::Pointer fixe
       m_FixedPointSetNode->SetVisibility(true);
       m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
       this->GetDataStorage()->Add(m_FixedPointSetNode, m_FixedNode);
-      
+
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -671,13 +671,13 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataNode::Pointer mov
       m_Controls.m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);
       this->GetDataStorage()->Add(m_MovingPointSetNode, m_MovingNode);
 
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();      
-     
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
     }
-    
 
 
-   
+
+
   }
   else
   {
@@ -1175,9 +1175,9 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
   mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
   if (fimage.IsNotNull() && /*fimage->GetDimension() == 2 || */ fimage->GetDimension() == 3 && mimage.IsNotNull() && mimage->GetDimension() == 3)
   {
-    mitk::CastToItkImage(fimage, fixedImage);   
+    mitk::CastToItkImage(fimage, fixedImage);
     mitk::CastToItkImage(mimage, movingImage);
-    
+
     registration->SetFixedImage(fixedImage);
     registration->SetMovingImage(movingImage);
     unsigned int pointId;

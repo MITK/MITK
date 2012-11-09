@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -468,7 +468,7 @@ mitk::GPGPU::GPGPU()
 
   if(windowsContext==0)
     std::cout << "failed getting window device context\n";
-                 
+
   static PIXELFORMATDESCRIPTOR pfd =// pfd Tells Windows How We Want Things To Be
   {
     sizeof(PIXELFORMATDESCRIPTOR),  // Size Of This Pixel Format Descriptor
@@ -569,9 +569,9 @@ mitk::GPGPU::GPGPU()
 mitk::GPGPU::~GPGPU()
 {
 #ifdef _WIN32
-  
+
   wglDeleteContext( openGLContext );
-  
+
 #else
 
   if(openGLContext)
@@ -579,7 +579,7 @@ mitk::GPGPU::~GPGPU()
 
   if(X_display)
     XCloseDisplay(X_display);
-    
+
 #endif
 
 }

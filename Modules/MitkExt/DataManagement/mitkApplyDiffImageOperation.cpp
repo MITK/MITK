@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -62,6 +62,6 @@ mitk::Image::Pointer mitk::ApplyDiffImageOperation::GetDiffImage()
   // uncompress image to create a valid mitk::Image
   Image::Pointer image = zlibContainer->GetImage().GetPointer();
 
-  return image; 
+  return image;
 }
 

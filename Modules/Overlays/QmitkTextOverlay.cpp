@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -78,7 +78,7 @@ void QmitkTextOverlay::UpdateFontProperties( mitk::PropertyList::Pointer pl )
   QFont font = QFont();
 
   // get the desired color of the textOverlays
-  mitk::ColorProperty::Pointer colorProp = 
+  mitk::ColorProperty::Pointer colorProp =
     dynamic_cast<mitk::ColorProperty*>( propertyList->GetProperty( "overlay.color" ) );
 
   if ( colorProp.IsNull() )
@@ -98,18 +98,18 @@ void QmitkTextOverlay::UpdateFontProperties( mitk::PropertyList::Pointer pl )
   //if ( opacityProperty.IsNull() )
   //{
   //  m_Label->setWindowOpacity( 1 );
-  //} 
+  //}
   //else
   //{
   //  m_Label->setWindowOpacity( opacityProperty->GetValue() );
   //}
-  
+
    //set the desired font-size of the overlays
   int fontSize = 0;
   if ( !propertyList->GetIntProperty( "overlay.fontSize", fontSize ) )
   {
     fontSize = 9.5;
-  } 
+  }
   font.setPointSize( fontSize );
 
   bool useKerning = false;

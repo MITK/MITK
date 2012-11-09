@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ class Overlays_EXPORT QmitkScalarBar : public QWidget
     Q_OBJECT
   public:
 
-    enum alignment 
+    enum alignment
     {
       vertical = 0,
       horizontal = 1
@@ -58,16 +58,16 @@ class Overlays_EXPORT QmitkScalarBar : public QWidget
     unsigned int GetNumberOfSubdivisions();
 
   protected:
-   
+
     void paintEvent(QPaintEvent* event);
 
     void SetupGeometry( alignment align );
-   
+
     void CleanUpLines();
     //void moveEvent(QMoveEvent*);
 
     alignment m_Alignment;
-    
+
     double m_ScaleFactor;
 
     QLine* m_MainLine;

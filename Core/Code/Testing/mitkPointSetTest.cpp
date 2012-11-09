@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,13 +40,13 @@ static void TestGetSizeIsZero(mitk::PointSet *pointSet)
   MITK_TEST_CONDITION( pointSet->GetSize() == 0, "check if the PointSet size is 0 " )
 }
 
-static void TestIsEmpty(mitk::PointSet *pointSet) 
+static void TestIsEmpty(mitk::PointSet *pointSet)
 {
   MITK_TEST_CONDITION(pointSet->IsEmptyTimeStep(0), "check if the PointSet is empty" )
 }
 
-static void TestCreateOperationAndAddPoint(mitk::PointSet *pointSet) 
-{ 
+static void TestCreateOperationAndAddPoint(mitk::PointSet *pointSet)
+{
   int id = 0;
   mitk::Point3D point;
   point.Fill(1);
@@ -90,7 +90,7 @@ static void TestIsNotEmpty(mitk::PointSet *pointSet)
   //PointSet can not be empty!
   MITK_TEST_CONDITION( !pointSet->IsEmptyTimeStep(0), "check if the PointSet is not empty " )
 
-    /* 
+    /*
     std::cout << "check if the PointSet is not empty ";
     if (pointSet->IsEmpty(0))
     {
@@ -143,13 +143,13 @@ static void TestSwapPointPositionDownwards(mitk::PointSet *pointSet)
   //Check SwapPointPosition downwards
   mitk::Point3D point;
   mitk::Point3D tempPoint;
-  point = pointSet->GetPoint(0);  
+  point = pointSet->GetPoint(0);
   pointSet->SwapPointPosition(0, false);
   tempPoint = pointSet->GetPoint(1);
 
   MITK_TEST_CONDITION( point == tempPoint, "check SwapPointPosition down" )
 
-    /*  
+    /*
     if(point != tempPoint)
     {
     std::cout<<"[FAILED]"<<std::endl;
@@ -189,7 +189,7 @@ static void TestPointOperationOpMove(mitk::PointSet *pointSet)
   mitk::Point3D point1;
   mitk::Point3D tempPoint;
   point1.Fill(2);
-  
+
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVE, point1, id);
   pointSet->ExecuteOperation(doOp);
   tempPoint = pointSet->GetPoint(id);
@@ -254,7 +254,7 @@ static void TestPointOperationOpSelectPoint(mitk::PointSet *pointSet)
 
 static void TestGetNumberOfSelected(mitk::PointSet *pointSet)
 {
-  // check GetNumeberOfSelected 
+  // check GetNumeberOfSelected
   MITK_TEST_CONDITION(pointSet->GetNumberOfSelected() == 1 , "check GetNumeberOfSelected " )
     /*
     if(pointSet->GetNumberOfSelected() != 1)
@@ -268,7 +268,7 @@ static void TestGetNumberOfSelected(mitk::PointSet *pointSet)
 
 static void TestSearchSelectedPoint(mitk::PointSet *pointSet)
 {
-  // check SearchSelectedPoint 
+  // check SearchSelectedPoint
   MITK_TEST_CONDITION(pointSet->SearchSelectedPoint() == 4 , "check SearchSelectedPoint " )
 
     /*
@@ -312,7 +312,7 @@ static void TestOpDeselectPoint(mitk::PointSet *pointSet)
 
 static void TestOpMovePointUp(mitk::PointSet *pointSet)
 {
-  //check OpMOVEPOINTUP  ExecuteOperation  
+  //check OpMOVEPOINTUP  ExecuteOperation
   int id = 4;
   mitk::Point3D point4;
   mitk::Point3D point;
@@ -338,7 +338,7 @@ static void TestOpMovePointUp(mitk::PointSet *pointSet)
 
 static void TestOpMovePointDown(mitk::PointSet *pointSet)
 {
-  //check OpMOVEPOINTDown  ExecuteOperation  
+  //check OpMOVEPOINTDown  ExecuteOperation
 
   int id = 2;
   mitk::Point3D point;
@@ -419,7 +419,7 @@ static void TestGetPointIfExists(mitk::PointSet *pointSet)
     }
     std::cout<<"[PASSED]"<<std::endl;
     */
-} 
+}
 
 static void TestCreateHoleInThePointIDs(mitk::PointSet *pointSet)
 {
@@ -479,14 +479,14 @@ static void TestCreateHoleInThePointIDs(mitk::PointSet *pointSet)
 
 static void TestOpMovePointUpOnFirstPoint(mitk::PointSet *pointSet)
 {
-  //check OpMOVEPOINTUP  on first point ExecuteOperation  
+  //check OpMOVEPOINTUP  on first point ExecuteOperation
 
   mitk::PointSet::PointType p1 = pointSet->GetPoint(1);
   mitk::PointSet::PointType p2 = pointSet->GetPoint(2);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP, p1, 1);
   pointSet->ExecuteOperation(doOp);
   delete doOp;
-  
+
   mitk::PointSet::PointType newP1 = pointSet->GetPoint(1);
   mitk::PointSet::PointType newP2 = pointSet->GetPoint(2);
 
@@ -530,9 +530,9 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
     //Create PointSet
     mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
 
-  MITK_TEST_CONDITION_REQUIRED(pointSet.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(pointSet.IsNotNull(),"Testing instantiation")
 
-  mitkPointSetTestClass::TestGetITKPointSet(pointSet); 
+  mitkPointSetTestClass::TestGetITKPointSet(pointSet);
   mitkPointSetTestClass::TestGetSizeIsZero(pointSet);
   mitkPointSetTestClass::TestIsEmpty(pointSet);
   mitkPointSetTestClass::TestCreateOperationAndAddPoint(pointSet);
@@ -577,7 +577,7 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   pointSet->SwapPointPosition(3, true);
   pointSet->SwapPointPosition(2, false);
   mitkPointSetTestClass::TestPointContainerPointDataContainer(pointSet);
-  
+
   MITK_TEST_OUTPUT(<< "Test OpREMOVE");
   mitk::PointOperation op1(mitk::OpREMOVE, mitk::Point3D(), 2); // existing index
   pointSet->ExecuteOperation(&op1);
@@ -596,7 +596,7 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   mitk::PointOperation op4(mitk::OpINSERT, mitk::Point3D(), 38);  // non existing index
   pointSet->ExecuteOperation(&op4);
   mitk::PointOperation op5(mitk::OpINSERT, mitk::Point3D(), 17);  // existing index
-  pointSet->ExecuteOperation(&op5);  
+  pointSet->ExecuteOperation(&op5);
   mitkPointSetTestClass::TestPointContainerPointDataContainer(pointSet);
 
   pointSet->Expand(3);

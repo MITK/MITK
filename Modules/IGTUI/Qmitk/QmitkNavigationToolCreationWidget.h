@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkNavigationToolCreationWidget.h"
 
  /** Documentation:
-  *   \brief An object of this class offers an UI to create new NavigationTools 
+  *   \brief An object of this class offers an UI to create new NavigationTools
   *
   *      Be sure to call the Initialize-methode before you start the widget
   *      otherwise some errors might occure.
@@ -49,9 +49,9 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
       * @param supposedIdentifier This Identifier is supposed for the user. It is needed because every identifier in a navigation tool storage must be unique and we don't know the others.
       */
     void Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier);
-    
+
     /** @brief Sets the default tracking device type. You may also define if it is changeable or not.*/
-    void SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable = true); 
+    void SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable = true);
 
     /** @brief Sets the default data of all input fields. The default data is used from the default tool which is given as parameter. */
     void SetDefaultData(mitk::NavigationTool::Pointer DefaultTool);
@@ -59,9 +59,9 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     QmitkNavigationToolCreationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolCreationWidget();
 
-    /** @return Returns the created tool. Returns NULL if no tool was created yet. */   
+    /** @return Returns the created tool. Returns NULL if no tool was created yet. */
     mitk::NavigationTool::Pointer GetCreatedTool();
-    
+
 
   signals:
 
@@ -72,7 +72,7 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     void Canceled();
 
   protected slots:
-     
+
     void OnCancel();
     void OnFinished();
     void OnLoadSurface();
@@ -93,9 +93,9 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
 
     /** @brief this pointer holds the tool which is created */
     mitk::NavigationTool::Pointer m_CreatedTool;
-    
+
     //############## private help methods #######################
     void MessageBox(std::string s);
-    
+
 };
 #endif

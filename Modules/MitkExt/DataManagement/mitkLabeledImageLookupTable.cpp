@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,14 +32,14 @@ mitk::LabeledImageLookupTable::LabeledImageLookupTable()
     m_LookupTable = vtkLookupTable::New();
   }
   m_LookupTable->SetNumberOfTableValues(256);
-  
+
   // set the background to black and fully transparent
-  m_LookupTable->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 ); 
-  
-  // initialize the remaining 255 colors with random values and 
+  m_LookupTable->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 );
+
+  // initialize the remaining 255 colors with random values and
   // an alpha value of 1.0
   vtkFloatingPointType r, g, b;
-  
+
   //
   // Initialize the random number generator with an arbitrary seed.
   // This way, the generated colors are random, but always the same...
@@ -49,13 +49,13 @@ mitk::LabeledImageLookupTable::LabeledImageLookupTable()
     GenerateRandomColor(r, g, b);
     m_LookupTable->SetTableValue(index, r, g, b);
   }
-  
+
   // initialize the default level/window settings,
   // which can be accessed via GetLevelWindow();
   m_LevelWindow.SetRangeMinMax(0,255);
   m_LevelWindow.SetWindowBounds(0,255);
   m_LevelWindow.SetFixed(true);
-  
+
 }
 
 /**
@@ -63,7 +63,7 @@ mitk::LabeledImageLookupTable::LabeledImageLookupTable()
  */
 mitk::LabeledImageLookupTable::~LabeledImageLookupTable()
 {
-  
+
 }
 
 
@@ -71,7 +71,7 @@ mitk::LabeledImageLookupTable::~LabeledImageLookupTable()
  * Sets the color for a given label
  * @param label The pixel value used as a label in the image
  * @param r The red component of the rgba color value. Values sould be given in the range [0,1]
- * @param g The green component of the rgba color value. Values sould be given in the range [0,1] 
+ * @param g The green component of the rgba color value. Values sould be given in the range [0,1]
  * @param b The blue component of the rgba color value. Values sould be given in the range [0,1]
  * @param a The alpha component of the rgba color value. Values sould be given in the range [0,1]. Default is 1.
  */
@@ -81,7 +81,7 @@ void mitk::LabeledImageLookupTable::SetColorForLabel ( const mitk::LabeledImageL
   {
     itkWarningMacro("LookupTable is NULL, but it should have been initialized by the constructor");
     return;
-  }  
+  }
   m_LookupTable->SetTableValue(label, r, g, b, a);
 }
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -64,7 +64,7 @@ namespace mitk {
       *\brief These constants are used in conjunction with Microservices
       */
       static const std::string US_INTERFACE_NAME;     // Common Interface name of all US Devices. Used to refer to this device via Microservices
-      static const std::string US_PROPKEY_LABEL;      // Human readable text represntation of this device 
+      static const std::string US_PROPKEY_LABEL;      // Human readable text represntation of this device
       static const std::string US_PROPKEY_ISACTIVE;   // Whether this Device is active or not.
       static const std::string US_PROPKEY_CLASS;      // Class Name of this Object
 
@@ -119,7 +119,7 @@ namespace mitk {
       * \brief Removes a probe from the ist of currently added probes.
       */
       //virtual void removeProbe(mitk::USProbe::Pointer probe);
-    
+
       /**
       *  \brief Returns a vector containing all connected probes.
       */
@@ -135,7 +135,7 @@ namespace mitk {
       */
       USImage* GetOutput(unsigned int idx);
 
-      
+
       /**
       *\brief Graft the specified DataObject onto this ProcessObject's output.
       *
@@ -198,14 +198,14 @@ namespace mitk {
       * \brief Returns the currently active probe or null, if none is active
       */
       itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
-    
+
       std::string GetDeviceManufacturer();
       std::string GetDeviceModel();
       std::string GetDeviceComment();
 
     protected:
       mitk::USProbe::Pointer m_ActiveProbe;
-      std::vector<mitk::USProbe::Pointer> m_ConnectedProbes; 
+      std::vector<mitk::USProbe::Pointer> m_ConnectedProbes;
       bool m_IsActive;
 
 
@@ -227,29 +227,29 @@ namespace mitk {
       * \brief Is called during the disconnection process. Override this method in your subclass to handle the actual disconnection.
       *  Return true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
       */
-      virtual bool OnDisconnection() = 0;    
+      virtual bool OnDisconnection() = 0;
 
       /**
       * \brief Is called during the activation process. After this method is finished, the device should be generating images
       */
-      virtual bool OnActivation() = 0;    
+      virtual bool OnActivation() = 0;
 
 
       /**
       * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
       */
-      virtual void OnDeactivation() = 0;    
-      
+      virtual void OnDeactivation() = 0;
+
 
       /**
       * \brief This metadata set is privately used to imprint USImages with Metadata later.
       *        At instantiation time, it only contains Information about the Device,
-      *        At scan time, it integrates this data with the probe information and imprints it on 
+      *        At scan time, it integrates this data with the probe information and imprints it on
       *        the produced images. This field is intentionally hidden from outside interference.
       */
       mitk::USImageMetadata::Pointer m_Metadata;
 
-      
+
       /**
       * \brief Enforces minimal Metadata to be set.
       */
@@ -281,12 +281,12 @@ namespace mitk {
 
 
      private:
-       
+
       /**
       *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
       */
        mitk::ServiceRegistration m_ServiceRegistration;
-       
+
 
 
     };

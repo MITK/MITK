@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,7 +46,7 @@ void  mitk::VtkLayerController::AddInstance(vtkRenderWindow* renWin, vtkRenderer
   ControllerInstance->InsertSceneRenderer(mitkSceneRenderer);
 
   s_LayerControllerMap.insert(vtkLayerControllerMapType::value_type(renWin,ControllerInstance));
-}     
+}
 
 void  mitk::VtkLayerController::RemoveInstance(vtkRenderWindow* renWin)
 {
@@ -83,11 +83,11 @@ mitk::VtkLayerController::~VtkLayerController()
  */
 void mitk::VtkLayerController::InsertBackgroundRenderer(vtkRenderer* renderer, bool forceAbsoluteBackground)
 {
-  
+
   if(renderer == NULL)
     return;
-  
-  // Remove renderer if it already exists 
+
+  // Remove renderer if it already exists
   RemoveRenderer(renderer);
 
   if(forceAbsoluteBackground)
@@ -106,11 +106,11 @@ void mitk::VtkLayerController::InsertBackgroundRenderer(vtkRenderer* renderer, b
  */
 void mitk::VtkLayerController::InsertForegroundRenderer(vtkRenderer* renderer, bool forceAbsoluteForeground)
 {
-  
+
   if(renderer == NULL)
     return;
-  
-  // Remove renderer if it already exists 
+
+  // Remove renderer if it already exists
   RemoveRenderer(renderer);
 
   if(forceAbsoluteForeground)
@@ -142,10 +142,10 @@ vtkRenderer* mitk::VtkLayerController::GetSceneRenderer()
  */
 void mitk::VtkLayerController::InsertSceneRenderer(vtkRenderer* renderer)
 {
-  
+
   if(renderer == NULL)
     return;
-  
+
   // Remove renderer if it already exists
   RemoveRenderer(renderer);
 
@@ -222,7 +222,7 @@ void mitk::VtkLayerController::SetRenderWindow(vtkRenderWindow* renwin)
 }
 
 /**
-* Returns true if a renderer has been inserted 
+* Returns true if a renderer has been inserted
 */
 bool mitk::VtkLayerController::IsRendererInserted(vtkRenderer* renderer)
 {
@@ -255,7 +255,7 @@ bool mitk::VtkLayerController::IsRendererInserted(vtkRenderer* renderer)
     }
   }
   return false;
-  
+
 }
 /**
  * Internally used to sort all registered renderers and to connect the with the vtkRenderWindow.
@@ -284,7 +284,7 @@ void mitk::VtkLayerController::UpdateLayers()
     (*it)->SetRenderWindow(m_RenderWindow);
     (*it)->SetLayer(currentLayerNumber);
     m_RenderWindow->AddRenderer((*it));
-    
+
     if(traverseUpwards)
       currentLayerNumber++;
     else
@@ -292,11 +292,11 @@ void mitk::VtkLayerController::UpdateLayers()
   }
   // assign a layer number for the scene renderers
   for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); it++)
-  {   
+  {
     (*it)->SetRenderWindow(m_RenderWindow);
     (*it)->SetLayer(currentLayerNumber);
     m_RenderWindow->AddRenderer((*it));
-    
+
     if(traverseUpwards)
       currentLayerNumber++;
     else
@@ -308,7 +308,7 @@ void mitk::VtkLayerController::UpdateLayers()
     (*it)->SetRenderWindow(m_RenderWindow);
     (*it)->SetLayer(currentLayerNumber);
     m_RenderWindow->AddRenderer((*it));
-    
+
     if(traverseUpwards)
       currentLayerNumber++;
     else
@@ -325,13 +325,13 @@ unsigned int mitk::VtkLayerController::GetNumberOfRenderers()
 
 void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
 {
-  
+
   this->m_RenderWindow->SetErase(i);
 
   RendererVectorType::iterator it;
   for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); it++)
     (*it)->SetErase(i);
-  
+
   for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); it++)
    (*it)->SetErase(i);
 

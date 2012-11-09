@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,13 +51,13 @@ mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
 
 mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
 {
- // m_Prop3D->Delete();                                  
+ // m_Prop3D->Delete();
 }
 
 void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-  
+
   bool visible = IsVisible(renderer);
 
   if(visible==false)
@@ -71,7 +71,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   //
   mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
   vtkPolyData * polydata = input->GetVtkPolyData( this->GetTimestep() );
-  if(polydata == NULL) 
+  if(polydata == NULL)
   {
     ls->m_Actor->VisibilityOff();
     return;
@@ -114,18 +114,18 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       useCulling = p->GetValue();
     property->SetBackfaceCulling(useCulling);
   }
-  
+
   // Colors
   {
     double ambient [3] = { 0.5,0.5,0.0 };
     double diffuse [3] = { 0.5,0.5,0.0 };
     double specular[3] = { 1.0,1.0,1.0 };
-    
+
     float coeff_ambient = 0.5f;
     float coeff_diffuse = 0.5f;
     float coeff_specular= 0.5f;
     float power_specular=10.0f;
-  
+
     // Color
     {
       mitk::ColorProperty::Pointer p;
@@ -137,10 +137,10 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
         diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
         // Setting specular color to the same, make physically no real sense, however vtk rendering slows down, if these colors are different.
         specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
-      }          
+      }
     }
-    
-    // Ambient 
+
+    // Ambient
     {
       mitk::ColorProperty::Pointer p;
       node->GetProperty(p, "material.ambientColor", renderer);
@@ -148,10 +148,10 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       {
         mitk::Color c = p->GetColor();
         ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
-      }          
+      }
     }
-    
-    // Diffuse 
+
+    // Diffuse
     {
       mitk::ColorProperty::Pointer p;
       node->GetProperty(p, "material.diffuseColor", renderer);
@@ -159,10 +159,10 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       {
         mitk::Color c = p->GetColor();
         diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
-      }          
+      }
     }
-    
-    // Specular 
+
+    // Specular
     {
       mitk::ColorProperty::Pointer p;
       node->GetProperty(p, "material.specularColor", renderer);
@@ -170,36 +170,36 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       {
         mitk::Color c = p->GetColor();
         specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
-      }          
+      }
     }
 
     // Ambient coeff
     {
       node->GetFloatProperty("material.ambientCoefficient", coeff_ambient, renderer);
     }
-    
+
     // Diffuse coeff
     {
       node->GetFloatProperty("material.diffuseCoefficient", coeff_diffuse, renderer);
     }
-    
+
     // Specular coeff
     {
       node->GetFloatProperty("material.specularCoefficient", coeff_specular, renderer);
     }
-    
+
     // Specular power
     {
       node->GetFloatProperty("material.specularPower", power_specular, renderer);
     }
-    
-    property->SetAmbient( coeff_ambient );    
+
+    property->SetAmbient( coeff_ambient );
     property->SetDiffuse( coeff_diffuse );
     property->SetSpecular( coeff_specular );
     property->SetSpecularPower( power_specular );
 
-    property->SetAmbientColor( ambient );    
-    property->SetDiffuseColor( diffuse );    
+    property->SetAmbientColor( ambient );
+    property->SetDiffuseColor( diffuse );
     property->SetSpecularColor( specular );
   }
 
@@ -211,7 +211,7 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       if( node->GetOpacity(opacity,renderer) )
         property->SetOpacity( opacity );
     }
-     
+
     // Wireframe line width
     {
       float lineWidth = 1;
@@ -243,7 +243,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  // Applying shading properties    
+  // Applying shading properties
   {
     Superclass::ApplyProperties( ls->m_Actor, renderer ) ;
     // VTK Properties
@@ -269,7 +269,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
   {
     ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
   }
-  
+
   bool scalarVisibility = false;
   this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
   ls->m_VtkPolyDataMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
@@ -305,7 +305,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
 
   bool deprecatedUsePointData = false;
   this->GetDataNode()->GetBoolProperty("deprecated usePointDataForColouring", deprecatedUsePointData);
-                  
+
   if (deprecatedUseCellData)
   {
     ls->m_VtkPolyDataMapper->SetColorModeToDefault();
@@ -353,7 +353,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
 
   // Add clipping planes (if any)
   ls->m_ClippingPlaneCollection->RemoveAllItems();
-  
+
   PropertyList::PropertyMap::const_iterator it;
   for ( it = rendererProperties->begin(); it != rendererProperties->end(); ++it )
   {
@@ -373,8 +373,8 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
   {
     ls->m_VtkPolyDataMapper->RemoveAllClippingPlanes();
   }
-  
-  
+
+
 }
 
 vtkProp *mitk::SurfaceVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
@@ -439,7 +439,7 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::
   node->AddProperty( "opacity", mitk::FloatProperty::New(1.0), renderer, overwrite );
 
   mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(node,renderer,overwrite); // Shading
-  
+
   node->AddProperty( "scalar visibility", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "color mode", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "scalar mode", mitk::VtkScalarModeProperty::New(), renderer, overwrite );
@@ -455,7 +455,7 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::
 
   // Backface culling
   node->AddProperty( "Backface Culling", mitk::BoolProperty::New(false), renderer, overwrite );
-  
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
@@ -463,7 +463,7 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::
 void mitk::SurfaceVtkMapper3D::SetImmediateModeRenderingOn(int  /*on*/)
 {
 /*
-  if (m_VtkPolyDataMapper != NULL) 
+  if (m_VtkPolyDataMapper != NULL)
     m_VtkPolyDataMapper->SetImmediateModeRendering(on);
 */
 }

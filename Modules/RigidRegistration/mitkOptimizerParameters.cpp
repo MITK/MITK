@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,16 +20,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  OptimizerParameters::OptimizerParameters() : 
+  OptimizerParameters::OptimizerParameters() :
     m_Optimizer(EXHAUSTIVEOPTIMIZER),
     // for all Optimizer
     m_Dimension(2),
     m_Maximize(false),
-    
+
     // for itk::ExhaustiveOptimizer
     m_StepLengthExhaustive(1.0),
     m_NumberOfStepsExhaustive(10),
-    
+
     // for itk::GradientDescentOptimizer
     m_LearningRateGradientDescent(0.01),
     m_NumberOfIterationsGradientDescent(200),
@@ -110,7 +110,7 @@ namespace mitk {
   }
 
   /********************************** for itk::AmoebaOptimizer ****************************************/
-  
+
   void OptimizerParameters::SetSimplexDeltaAmoeba(itk::Array<double> simplexDelta)
   {
     m_SimplexDeltaAmoeba = simplexDelta;

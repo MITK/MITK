@@ -24,7 +24,7 @@ function(mitkFunctionInstallAutoLoadModules)
   if(NOT _INSTALL_DESTINATION)
     message(SEND_ERROR "DESTINATION argument is required")
   endif()
-  
+
   foreach(_install_plugin ${_INSTALL_PLUGINS})
     if(TARGET ${_install_plugin})
       get_target_property(_autoload_targets ${_install_plugin} MITK_AUTOLOAD_TARGETS)
@@ -34,9 +34,9 @@ function(mitkFunctionInstallAutoLoadModules)
           if(NOT _autoload_subdir)
             message(WARNING "Target ${_autoload_target} does not seem to be an auto-load module. Skipping installation.")
           else(NOT _${_autoload_target}_installed)
-          
+
             set(_module_install_dir ${_INSTALL_DESTINATION}/${_autoload_subdir})
-            
+
             get_target_property(_is_imported ${_autoload_target} IMPORTED)
             if(_is_imported)
               get_target_property(_target_loc_debug ${_autoload_target} IMPORTED_LOCATION_DEBUG)
@@ -58,7 +58,7 @@ function(mitkFunctionInstallAutoLoadModules)
               set(_target_loc_debug ${_target_loc_debug}/${CMAKE_SHARED_LIBRARY_PREFIX}${_autoload_target}${CMAKE_SHARED_LIBRARY_SUFFIX})
               set(_target_loc_release ${_target_loc_release}/${CMAKE_SHARED_LIBRARY_PREFIX}${_autoload_target}${CMAKE_SHARED_LIBRARY_SUFFIX})
             endif()
-            
+
             get_filename_component(_target_filename_debug "${_target_loc_debug}" NAME)
             get_filename_component(_target_filename_release "${_target_loc_release}" NAME)
             install(FILES ${_target_loc_debug}
@@ -67,7 +67,7 @@ function(mitkFunctionInstallAutoLoadModules)
             install(FILES ${_target_loc_release}
                     DESTINATION ${_module_install_dir}
                     CONFIGURATIONS Release)
-                    
+
             set(_${_autoload_target}_installed 1)
 
             if(UNIX AND NOT APPLE)
@@ -87,21 +87,21 @@ function(mitkFunctionInstallAutoLoadModules)
       message(WARNING "Ignoring unknown target \"${_install_target}\" for installation.")
     endif()
   endforeach()
-  
+
 endfunction()
 
 function(BlueBerryApplicationInstallHook)
 
   MACRO_PARSE_ARGUMENTS(_INSTALL "APP_NAME;PLUGINS" "" ${ARGN})
-  
+
   set(_destination bin)
   if(APPLE)
     set(_destination ${_INSTALL_APP_NAME}.app/Contents/MacOS)
   endif()
-  
+
   mitkFunctionInstallAutoLoadModules(
     PLUGINS ${_INSTALL_PLUGINS}
     DESTINATION ${_destination}
    )
-  
+
 endfunction()

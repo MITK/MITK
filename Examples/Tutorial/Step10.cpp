@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 
 //##Documentation
-//## @brief Load two or more surfaces (stl format, see e.g. Core/Code/Testing/data directory for binary.stl) and display it in a 3D view. 
-//## The MoveSurfaceInteractor explained in tutorial Step10.dox is used to move the surfaces in 3D by arrow keys in combination 
+//## @brief Load two or more surfaces (stl format, see e.g. Core/Code/Testing/data directory for binary.stl) and display it in a 3D view.
+//## The MoveSurfaceInteractor explained in tutorial Step10.dox is used to move the surfaces in 3D by arrow keys in combination
 //## with and without Shift key. Use two surfaces to see that the objects and not the camera are moving.
 int main(int argc, char* argv[])
 {
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   //*************************************************************************
 
   // Create a DataStorage
-  // The DataStorage manages all data objects. It is used by the 
+  // The DataStorage manages all data objects. It is used by the
   // rendering mechanism to render all data objects
   // We use the standard implementation mitk::StandaloneDataStorage.
 
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     // create interactor
     // use it with up, down (->z direction), left and right (x-direction) arrow keys. Also hold Shift to translate in y direction.
     // see state machine pattern SelectAndMoveObjectWithArrowKeys in file StateMachine.xml for definition of interaction or use the StatemachineEditor.
-    mitk::MoveSurfaceInteractor::Pointer surfaceInteractor = 
+    mitk::MoveSurfaceInteractor::Pointer surfaceInteractor =
       mitk::MoveSurfaceInteractor::New("SelectAndMoveObjectWithArrowKeys",node);
 
     //activate interactor at interaction controller:
@@ -107,9 +107,9 @@ int main(int argc, char* argv[])
 
     // Add the node to the DataStorage
     ds->Add(node);
-    
+
     //doesn't have to be done, but nicer! Is destroyed when leaving the sccope anyway
-    reader = NULL; 
+    reader = NULL;
     surfaceInteractor = NULL;
   }
 
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
 
   // Tell the RenderWindow which (part of) the datastorage to render
   renderWindow.GetRenderer()->SetDataStorage(ds);
-  
+
   // Use it as a 3D view
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
   else
     return QtTesting();
 
-  // cleanup: Remove References 
+  // cleanup: Remove References
   ds = NULL;
 }
 /**

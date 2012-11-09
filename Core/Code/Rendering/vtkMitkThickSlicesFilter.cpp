@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,12 +36,12 @@ vtkMitkThickSlicesFilter::vtkMitkThickSlicesFilter()
 {
   this->HandleBoundaries = 1;
   this->Dimensionality = 2;
-  
+
   this->m_CurrentMode = MIP;
-  
+
   // by default process active point scalars
   this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
-                               vtkDataSetAttributes::SCALARS);  
+                               vtkDataSetAttributes::SCALARS);
 }
 
 //----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ int vtkMitkThickSlicesFilter::RequestUpdateExtent(vtkInformation*,
 
   if (inUExt[4] < wholeExtent[4]) */inUExt[4] = wholeExtent[4];
   /*if (inUExt[5] > wholeExtent[5]) */inUExt[5] = wholeExtent[5];
-  
+
   // Store the update extent needed from the intput.
   inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), inUExt, 6);
 
@@ -167,10 +167,10 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
 
   if(_maxZ<_minZ)
     return;
-  
+
   double invNum = 1.0 / (_maxZ-_minZ+1) ;
 
-  
+
   switch(self->GetThickSliceMode())
   {
     default:
@@ -187,7 +187,7 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
             //useXMax = ((idxX + outExt[0]) >= wholeExtent[1]) ? 0 : inIncs[0];
 
             T mip = inPtr[_minZ*inIncs[2]];
-            
+
             for(int z = _minZ+1; z<= _maxZ;z++)
             {
               T value = inPtr[z*inIncs[2]];
@@ -205,7 +205,7 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
         }
       }
       break;
-      
+
     case vtkMitkThickSlicesFilter::SUM:
       {
         //MIP
@@ -219,7 +219,7 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
             //useXMax = ((idxX + outExt[0]) >= wholeExtent[1]) ? 0 : inIncs[0];
 
             double sum = 0;
-            
+
             for(int z = _minZ; z<= _maxZ;z++)
             {
               T value = inPtr[z*inIncs[2]];
@@ -286,7 +286,7 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
     }
     break;
   }
-  
+
 }
 
 int vtkMitkThickSlicesFilter::RequestData(

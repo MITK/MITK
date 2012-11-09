@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,9 +27,9 @@ namespace mitk {
 
 //##Documentation
 //## @brief Event that stores coordinates and the key which is pressed
-//## 
-//## Stores display position of the mouse. If requested, the correspondent 
-//## 3D world position in mm is calculated via picking (delegated to the 
+//##
+//## Stores display position of the mouse. If requested, the correspondent
+//## 3D world position in mm is calculated via picking (delegated to the
 //## BaseRenderer).
 //## @ingroup Interaction
 class MITK_CORE_EXPORT KeyEvent : public Event
@@ -70,7 +70,7 @@ class MITK_CORE_EXPORT KeyEvent : public Event
     std::string m_Text;
     mutable Point3D m_WorldPosition;
     mutable bool m_WorldPositionIsSet;
-    
+
 };
 
 } // namespace mitk

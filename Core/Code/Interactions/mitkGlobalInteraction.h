@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -56,13 +56,13 @@ namespace mitk {
   //## Through m_InteractorRelevanceMap stepping through interactors, that were not selected and could handle that event, can be done.
   //## Through m_ListenerRelevanceMap the listener which can handle the event best can be determined. In case of the INFORM_ONE notification policy
   //## the event is passed to just this listener
-  //## 
+  //##
   //## First the listeners are informed with the event.
   //## Then the selected or subselected interactors are asked if they can handle that event.
   //## They can handle it, if the mode of the interactor after HandleEvent(..) is still in SMSELECTED or SMSUBSELECTED.
   //## They can't handle it, if the mode changed to SMDESELECTED. Then the interactor is removed from the selected-list.
   //## In that case, all interactors are asked to calculate and return their area of Relevance.
-  //## An iterator is held on one interactor in the map. With the iterator, the map can be looped through so 
+  //## An iterator is held on one interactor in the map. With the iterator, the map can be looped through so
   //## so that several geometric objects, that lie on top of each other, can be selected.
   //## @ingroup Interaction
  class MITK_CORE_EXPORT GlobalInteraction : public StateMachine
@@ -90,7 +90,7 @@ namespace mitk {
       INFORM_MULTIPLE, /** For setting that all registered listeners are informed */
       INFORM_ONE /** For setting that just the listener that can handle the event best is informed */
     };
-    
+
     //##Documentation
     //## @brief add an Interactor to the list of all interactors that are asked for handling an event
     //##
@@ -161,13 +161,13 @@ namespace mitk {
     * @brief Return StateMachineFactory
     **/
     StateMachineFactory* GetStateMachineFactory();
-    
+
     /**
     * @brief Returns the StartState of the StateMachine with the name type;
     *
     * Asks member StateMachineFactory for the StartState.
     * Returns NULL if no entry with name type is found.
-    **/    
+    **/
     State* GetStartState(const char* type);
 
     //##Documentation
@@ -206,11 +206,11 @@ namespace mitk {
   protected:
     /**
     * @brief Default Constructor with type to load the StateMachinePattern of the StateMachine
-    * @param XMLbehaviorFile the file which contains the statemachine and event patterns 
+    * @param XMLbehaviorFile the file which contains the statemachine and event patterns
     * @param type the name of the statemachine pattern this class shall use
     **/
     GlobalInteraction();
-    
+
     /**
     * @brief Default destructor.
     **/
@@ -219,7 +219,7 @@ namespace mitk {
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
     /*
-    *@brief adds the given interactor to the list of selected interactors. 
+    *@brief adds the given interactor to the list of selected interactors.
     * This list is asked first to handle an event.
     */
     virtual bool AddToSelectedInteractors(Interactor* interactor);
@@ -272,7 +272,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief list of all interactors, that are in Mode SELECTED or SUBSELECTED
-    InteractorList m_SelectedList; 
+    InteractorList m_SelectedList;
 
     //##Documentation
     //## @brief map for sorting all interactors by the value returned from CanHandleEvent(..).
@@ -289,7 +289,7 @@ namespace mitk {
     //##Documentation
     //## @brief iterator on an entry in m_RelevanceMap for stepping through interactors
     InteractorMapIter m_CurrentInteractorIter;
-    
+
     //##Documentation
     //## @brief holds a list of BaseRenderer and one focused
     FocusManager::Pointer m_FocusManager;

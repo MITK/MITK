@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -103,10 +103,10 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
     MappingStrategy strategy = EndElementPositionAvoidingWhiteMatter;
     if ( singleTract && ( singleTract->Size() > 0 ) )
     {
-      AddConnectionToNetwork( 
-        ReturnAssociatedVertexPairForLabelPair( 
-        ReturnLabelForFiberTract( singleTract, strategy ) 
-        ) 
+      AddConnectionToNetwork(
+        ReturnAssociatedVertexPairForLabelPair(
+        ReturnLabelForFiberTract( singleTract, strategy )
+        )
         );
     }
   }
@@ -154,7 +154,7 @@ mitk::ConnectomicsNetworkCreator::VertexType mitk::ConnectomicsNetworkCreator::R
     VertexType newVertex = m_ConNetwork->AddVertex( idCounter );
     idCounter++;
     SupplyVertexWithInformation(label, newVertex);
-    m_LabelToVertexMap.insert( std::pair< ImageLabelType, VertexType >( label, newVertex ) );    
+    m_LabelToVertexMap.insert( std::pair< ImageLabelType, VertexType >( label, newVertex ) );
   }
 
   //return associated vertex
@@ -255,7 +255,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
       lastNode.coordinates.resize( 3 );
       for( unsigned int index = 0; index < lastNode.coordinates.size() ; index++ )
       {
-        lastNode.coordinates[ index ] = lastElementSegIndex[ index ] ; 
+        lastNode.coordinates[ index ] = lastElementSegIndex[ index ] ;
       }
 
       lastNode.label = LabelToString( lastLabel );
@@ -263,7 +263,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
       m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( lastLabel, lastNode ) );
     }
   }
-    
+
   return labelpair;
 }
 
@@ -408,7 +408,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
       lastNode.coordinates.resize( 3 );
       for( unsigned int index = 0; index < lastNode.coordinates.size() ; index++ )
       {
-        lastNode.coordinates[ index ] = lastElementSegIndex[ index ] ; 
+        lastNode.coordinates[ index ] = lastElementSegIndex[ index ] ;
       }
 
       lastNode.label = LabelToString( lastLabel );
@@ -478,7 +478,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
       lastNode.coordinates.resize( 3 );
       for( unsigned int index = 0; index < lastNode.coordinates.size() ; index++ )
       {
-        lastNode.coordinates[ index ] = lastElementSegIndex[ index ] ; 
+        lastNode.coordinates[ index ] = lastElementSegIndex[ index ] ;
       }
 
       lastNode.label = LabelToString( lastLabel );
@@ -537,10 +537,10 @@ bool mitk::ConnectomicsNetworkCreator::IsNonWhiteMatterLabel( int labelInQuestio
 {
   bool isWhite( false );
 
-  isWhite = ( 
-    ( labelInQuestion == freesurfer_Left_Cerebral_White_Matter )   || 
-    ( labelInQuestion == freesurfer_Left_Cerebellum_White_Matter ) || 
-    ( labelInQuestion == freesurfer_Right_Cerebral_White_Matter )  || 
+  isWhite = (
+    ( labelInQuestion == freesurfer_Left_Cerebral_White_Matter )   ||
+    ( labelInQuestion == freesurfer_Left_Cerebellum_White_Matter ) ||
+    ( labelInQuestion == freesurfer_Right_Cerebral_White_Matter )  ||
     ( labelInQuestion == freesurfer_Right_Cerebellum_White_Matter )||
     ( labelInQuestion == freesurfer_Left_Cerebellum_Cortex )       ||
     ( labelInQuestion == freesurfer_Right_Cerebellum_Cortex )      ||
@@ -559,10 +559,10 @@ bool mitk::ConnectomicsNetworkCreator::IsBackgroundLabel( int labelInQuestion )
   return isBackground;
 }
 
-void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter( 
-  std::vector<int> & indexVectorOfPointsToUse, 
-  TractType::Pointer singleTract, 
-  int & label, 
+void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
+  std::vector<int> & indexVectorOfPointsToUse,
+  TractType::Pointer singleTract,
+  int & label,
   mitk::Index3D & mitkIndex )
 {
   if( indexVectorOfPointsToUse.size() > singleTract->Size() )
@@ -645,7 +645,7 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
     {
       if( parameter > 1000 )
       {
-        MBI_WARN << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_DID_NOT_FIND_WHITE; 
+        MBI_WARN << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_DID_NOT_FIND_WHITE;
         break;
       }
 
@@ -676,7 +676,7 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
 
 }
 
-void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractFront, TractType::Pointer singleTract, 
+void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractFront, TractType::Pointer singleTract,
                                                                   int & label, mitk::Index3D & mitkIndex )
 {
   int retractionStartIndex( singleTract->Size() - 1 );
@@ -739,7 +739,7 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
 
       for( int index( 0 ); index < 3; index++ )
       {
-        tempIndex.SetElement( index, 
+        tempIndex.SetElement( index,
           currentPoint.GetElement( index ) + ( 1.0 + parameter ) / ( 1.0 + length ) * differenceVector[ index ] );
       }
 

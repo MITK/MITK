@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,14 +34,14 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
  : QWidget(parent, f)
 {
   m_Manager = mitk::LevelWindowManager::New();
-  
+
   itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
   command->SetCallbackFunction(this, &QmitkLineEditLevelWindowWidget::OnPropertyModified);
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   m_IsObserverTagSet = true;
 
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this); // true);
-  
+
   QVBoxLayout* layout = new QVBoxLayout( this );
   layout->setMargin(0);
   layout->setSpacing(0);
@@ -71,7 +71,7 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   //QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
   //QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(), numeric_limits<double>::max(), 2, this);
   //m_LevelInput->setValidator(validatorLevelInput);
-  
+
   this->hide();
 }
 
@@ -96,8 +96,8 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
     QString window;
     window.setNum((int)(m_LevelWindow.GetWindow()));
     m_WindowInput->setText(window);
-    m_LevelInput->setEnabled(!m_LevelWindow.IsFixed());  
-    m_WindowInput->setEnabled(!m_LevelWindow.IsFixed());  
+    m_LevelInput->setEnabled(!m_LevelWindow.IsFixed());
+    m_WindowInput->setEnabled(!m_LevelWindow.IsFixed());
     this->show();
   }
   catch(...)
@@ -153,7 +153,7 @@ void QmitkLineEditLevelWindowWidget::SetWindowValue()
 }
 
 void QmitkLineEditLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
-{ 
+{
   m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
   m_Contextmenu->getContextMenu();
 }

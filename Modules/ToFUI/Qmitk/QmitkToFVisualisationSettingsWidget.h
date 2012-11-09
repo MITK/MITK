@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -86,14 +86,14 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     int GetSelectedImageIndex();
 
   protected slots:
-  
+
     void OnSetXValueColor();
     /*!
     \brief Slot invoking a reset of the RangeSlider to the minimal and maximal values of the according image
     */
-    void OnResetSlider();  
+    void OnResetSlider();
     /*!
-    \brief Slot called when the range span has changed. 
+    \brief Slot called when the range span has changed.
     */
     void OnSpanChanged (int lower, int upper);
     /*!

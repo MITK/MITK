@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -63,34 +63,34 @@ EvaluationResult::EvaluationResult(int value)
   fValue= value;
 }
 
-EvaluationResult 
-EvaluationResult::And(EvaluationResult other) 
+EvaluationResult
+EvaluationResult::And(EvaluationResult other)
 {
   return AND[fValue][other.fValue];
 }
 
-EvaluationResult 
-EvaluationResult::Or(EvaluationResult other) 
+EvaluationResult
+EvaluationResult::Or(EvaluationResult other)
 {
   return OR[fValue][other.fValue];
 }
 
 
-EvaluationResult 
-EvaluationResult::Not() 
+EvaluationResult
+EvaluationResult::Not()
 {
   return NOT[fValue];
 }
 
-EvaluationResult 
-EvaluationResult::ValueOf(bool b) 
+EvaluationResult
+EvaluationResult::ValueOf(bool b)
 {
   return b ? TRUE_EVAL : FALSE_EVAL;
 }
 
 
 std::string
-EvaluationResult::ToString() 
+EvaluationResult::ToString()
 {
   switch (fValue) {
   case 0:

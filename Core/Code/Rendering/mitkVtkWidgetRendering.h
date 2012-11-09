@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,7 +26,7 @@ class vtkInteractorObserver;
 
 namespace mitk {
 
-class RenderWindow;  
+class RenderWindow;
 
 /**
  * \brief Mechanism for rendering a vtkWidget in the foreground of a RenderWindow.
@@ -45,11 +45,11 @@ class MITK_CORE_EXPORT VtkWidgetRendering : public BaseData
 public:
 
   mitkClassMacro( VtkWidgetRendering, BaseData );
-  
+
   itkNewMacro( Self );
 
- 
-  
+
+
   /**
    * Sets the renderwindow, in which the widget
    * will be shown. Make sure, you have called this function
@@ -68,31 +68,31 @@ public:
    * If you want to enable it, call the Enable() function.
    */
   virtual void Disable();
-  
+
   /**
    * Checks, if the widget is currently
    * enabled (visible)
    */
   virtual bool IsEnabled();
-   
+
   /**
    * Empty implementation, since the VtkWidgetRendering doesn't
    * support the requested region concept
    */
   virtual void SetRequestedRegionToLargestPossibleRegion();
-  
+
   /**
    * Empty implementation, since the VtkWidgetRendering doesn't
    * support the requested region concept
    */
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-  
+
   /**
    * Empty implementation, since the VtkWidgetRendering doesn't
    * support the requested region concept
    */
   virtual bool VerifyRequestedRegion();
-  
+
   /**
    * Empty implementation, since the VtkWidgetRendering doesn't
    * support the requested region concept

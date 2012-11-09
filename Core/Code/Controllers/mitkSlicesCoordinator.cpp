@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,7 +36,7 @@ SlicesCoordinator::~SlicesCoordinator()
 void SlicesCoordinator::AddSliceController(SliceNavigationController* snc)
 {
   if (!snc) return;
-    
+
   m_SliceNavigationControllers.push_back(snc);
 
   OnSliceControllerAdded(snc); // notify
@@ -86,7 +86,7 @@ void SlicesCoordinator::OnSliceControllerAdded(SliceNavigationController*)
 {
   // implement in subclasses
 }
-  
+
 void SlicesCoordinator::OnSliceControllerRemoved(SliceNavigationController*)
 {
   // implement in subclasses
@@ -98,5 +98,5 @@ bool SlicesCoordinator::ExecuteAction(Action* a, StateEvent const* e)
   return Superclass::ExecuteAction(a,e);
 }
 
-} // namespace 
+} // namespace
 

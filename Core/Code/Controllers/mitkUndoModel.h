@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,10 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class UndoStackItem; 
+class UndoStackItem;
 class OperationEvent;
 class OperationActor;
-  
+
 //##Documentation
 //## @brief superclass for all UndoModels
 //##
@@ -38,7 +38,7 @@ class MITK_CORE_EXPORT UndoModel : public itk::Object
 {
   public:
   mitkClassMacro(UndoModel, itk::Object);
-  
+
   // no New Macro because this is an abstract class!
 
   virtual bool SetOperationEvent(UndoStackItem* stackItem) = 0;
@@ -62,21 +62,21 @@ class MITK_CORE_EXPORT UndoModel : public itk::Object
   virtual bool RedoListEmpty() = 0;
 
   //##Documentation
-  //## @brief returns the ObjectEventId of the 
-  //## top Element in the OperationHistory of the selected 
+  //## @brief returns the ObjectEventId of the
+  //## top Element in the OperationHistory of the selected
   //## UndoModel
   virtual int GetLastObjectEventIdInList() = 0;
 
   //##Documentation
-  //## @brief returns the GroupEventId of the 
-  //## top Element in the OperationHistory of the selected 
+  //## @brief returns the GroupEventId of the
+  //## top Element in the OperationHistory of the selected
   //## UndoModel
   virtual int GetLastGroupEventIdInList() = 0;
 
   //##Documentation
   //## @brief returns the last specified OperationEvent in Undo-list
   //## corresponding to the given values; if nothing found, then returns NULL
-  //## 
+  //##
   //## needed to get the old Position of an Element for declaring an UndoOperation
   virtual OperationEvent* GetLastOfType(OperationActor* destination, OperationType opType) = 0;
 

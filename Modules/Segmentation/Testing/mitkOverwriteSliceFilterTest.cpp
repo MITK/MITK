@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -43,7 +43,7 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkOverwriteSliceFilterTest")
 
 
-    
+
 
     typedef itk::Image<unsigned short, 3> ImageType;
 
@@ -69,9 +69,9 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
     ImageIterator imageIterator( image, image->GetLargestPossibleRegion() );
     imageIterator.GoToBegin();
 
-    
+
     unsigned short pixelValue = 0;
-    
+
     //fill the image with distinct values
     while ( !imageIterator.IsAtEnd() )
     {
@@ -80,7 +80,7 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
       ++pixelValue;
     }
     /* end setup itk image */
-    
+
 
 
     mitk::Image::Pointer referenceImage;
@@ -89,19 +89,19 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
     CastToMitkImage(image, workingImage);
 
 
-    
+
   /* ============= setup plane ============*/
   int sliceindex = 55;//rand() % 32;
-  bool isFrontside = true; 
+  bool isFrontside = true;
   bool isRotated = false;
 
   mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
   plane->InitializeStandardPlane(workingImage->GetGeometry(), mitk::PlaneGeometry::Axial, sliceindex, isFrontside, isRotated);
   mitk::Point3D origin = plane->GetOrigin();
   mitk::Vector3D normal;
-  normal = plane->GetNormal();    
-  normal.Normalize();    
-  origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5    
+  normal = plane->GetNormal();
+  normal.Normalize();
+  origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
   plane->SetOrigin(origin);
 
 
@@ -137,7 +137,7 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
     for (int y = 0; y < VolumeSize; ++y){
       id[1] = y;
       for (int z = 0; z < VolumeSize; ++z){
-        id[2] = z;          
+        id[2] = z;
         areSame = referenceImage->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
         if(!areSame)
           goto stop;
@@ -171,7 +171,7 @@ stop:
   slicer2->SetVtkOutputRequest(true);
   slicer2->Modified();
   slicer2->Update();
-  
+
 
 
 
@@ -185,7 +185,7 @@ stop:
     for ( yy = 0; yy < VolumeSize; ++yy){
       id[1] = yy;
       for ( zz = 0; zz < VolumeSize; ++zz){
-        id[2] = zz;          
+        id[2] = zz;
         areSame = referenceImage->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
         if(!areSame)
           goto stop2;
@@ -193,7 +193,7 @@ stop:
     }
   }
 stop2:
-  //MITK_INFO << "index: [" << x << ", " << y << ", " << z << "]"; 
+  //MITK_INFO << "index: [" << x << ", " << y << ", " << z << "]";
   MITK_TEST_CONDITION(xx==idX && yy==idY && zz==sliceindex,"test overwrite modified slice");
 
 

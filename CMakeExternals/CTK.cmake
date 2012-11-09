@@ -14,12 +14,12 @@ if(MITK_USE_CTK)
   set(CTK_DEPENDS ${proj})
 
   if(NOT DEFINED CTK_DIR)
-    
+
     set(revision_tag f25f19e5)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
-    
+
     set(ctk_optional_cache_args )
     if(MITK_USE_Python)
       list(APPEND ctk_optional_cache_args
@@ -71,11 +71,11 @@ if(MITK_USE_CTK)
       DEPENDS ${proj_DEPENDENCIES}
      )
   set(CTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
-  
+
   else()
 
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
-    
+
   endif()
-  
+
 endif()

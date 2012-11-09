@@ -19,24 +19,24 @@ $(license)
   \ingroup ${plugin_target}_internal
 */
 class $(view-class-name) : public QmitkAbstractView
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
-  
-  public:  
+
+  public:
 
     static const std::string VIEW_ID;
 
     virtual void CreateQtPartControl(QWidget *parent);
 
   protected slots:
-  
+
     /// \brief Called when the user clicks the GUI button
     void DoImageProcessing();
 
   protected:
-  
+
     virtual void SetFocus();
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed

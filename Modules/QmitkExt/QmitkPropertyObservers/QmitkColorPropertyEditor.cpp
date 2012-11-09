@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,10 +30,10 @@ QmitkPopupColorChooser::QmitkPopupColorChooser(QWidget* parent, unsigned int ste
   my_parent(parent)
 {
   setSteps(steps);
-  
+
   setLineWidth(2);
   setMouseTracking ( TRUE );
-  
+
   //setMargin(0);
   //setAutoMask( FALSE );
   setFrameStyle ( QFrame::Panel | QFrame::Raised );
@@ -64,19 +64,19 @@ void QmitkPopupColorChooser::keyReleaseEvent(QKeyEvent*)
 }
 
 void QmitkPopupColorChooser::mouseMoveEvent (QMouseEvent* e)
-{  
+{
   double x(e->pos().x());
   double y(e->pos().y());
   x /= width();
-  
-  if ( x >= 0.0 ) 
+
+  if ( x >= 0.0 )
   {
     //x = (int)(x / (1.0/m_Steps)) * (1.0/m_Steps); // div stepsize * stepsize
     x = (int)(x * (float)(m_Steps-1)) / (float)(m_Steps-1); // same as above
     if (x > 1.0) x = 1.0;
     if (x < 0.0) x = 0.0;
   }
-  
+
   y /= height();
   if (y >= 1.0) y = 0.9;
   if (y < 0.0) y = 0.0;
@@ -143,7 +143,7 @@ void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point, const m
       QColor qcolor( (int)((*color)[0] * 255.0) , (int)((*color)[1] * 255.0) , (int)((*color)[2] * 255.0) );
       int h,s,v;
       qcolor.getHsv(&h, &s, &v);
-      
+
       if ( h == -1 ) // set by Qt if color is achromatic ( but this widget does not display grays )
         h = 10;  // red
 
@@ -155,7 +155,7 @@ void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point, const m
         s = 255;
         x = (int)(
            (
-             ((float)v / 255.0)      
+             ((float)v / 255.0)
             *
              ((float)m_Steps2)
             -
@@ -171,22 +171,22 @@ void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point, const m
         v = 255;
         x = (int)(
            (
-             (1.0 - ((float)s / 255.0))      
+             (1.0 - ((float)s / 255.0))
             *
              ((float)m_Steps2)
            )
           *
            cellwidth
           + cellwidth/2
-          
+
           + width() / 2
           );
       }
 
       y = (int)( (float)h/360.0 * (float)m_Steps * cellwidth );
-   
+
       m_OriginalColor.setHsv(h,s,v);
-      
+
       // move to color
       newPos.setX( point.x() - x );
       newPos.setY( point.y() - y );
@@ -201,7 +201,7 @@ void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point, const m
     }
     move ( m_popupParent->mapToGlobal( newPos ) );
   }
-  
+
   show();
   raise();
   grabMouse();
@@ -217,19 +217,19 @@ void QmitkPopupColorChooser::paintEvent(QPaintEvent*)
 void QmitkPopupColorChooser::drawGradient( QPainter* p)
 {
   p->setWindow( 0, 0, m_Steps-1, m_Steps );       // defines coordinate system
-  p->setPen( Qt::NoPen ); 
+  p->setPen( Qt::NoPen );
 
   QColor c;
   for ( unsigned int h = 0; h < m_Steps; ++h )
   {
     for ( unsigned int v = 1; v < m_Steps2; ++v )
-    {                
+    {
       c.setHsv( h*m_HStep, 255, v*m_VStep );             // rainbow effect
       p->setBrush( c );                  // solid fill with color c
       p->drawRect( v-1, h, m_Steps2, m_Steps );         // draw the rectangle
     }
     for ( unsigned int s = 0; s < m_Steps2; ++s )
-    {                
+    {
       c.setHsv( h*m_HStep, 255 - s*m_SStep, 255 );             // rainbow effect
       p->setBrush( c );                  // solid fill with color c
       p->drawRect( m_Steps2+s-1, h, m_Steps2, m_Steps );         // draw the rectangle
@@ -249,9 +249,9 @@ QmitkColorPropertyEditor::QmitkColorPropertyEditor( const mitk::ColorProperty* p
   // our popup belongs to the whole screen, so it could be drawn outside the toplevel window's borders
   int scr;
   if ( QApplication::desktop()->isVirtualDesktop() )
-    scr = QApplication::desktop()->screenNumber( parent->mapToGlobal( pos() ) ); 
+    scr = QApplication::desktop()->screenNumber( parent->mapToGlobal( pos() ) );
   else
-    scr = QApplication::desktop()->screenNumber( parent ); 
+    scr = QApplication::desktop()->screenNumber( parent );
 
   if ( colorChooserRefCount == 0 )
   {

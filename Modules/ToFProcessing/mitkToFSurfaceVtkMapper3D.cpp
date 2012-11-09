@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -82,7 +82,7 @@ void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
   //mitk::ToFSurface::Pointer input  = const_cast< mitk::ToFSurface* >( this->GetInput() );
   mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
   vtkPolyData * polydata = input->GetVtkPolyData( this->GetTimestep() );
-  if(polydata == NULL) 
+  if(polydata == NULL)
   {
     ls->m_Actor->VisibilityOff();
     return;
@@ -139,9 +139,9 @@ void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
     imageData->GetPointData()->SetScalars(scalars);
     scalars->Delete();
 
-    // create vtk texture 
-    vtkTexture *aTexture = vtkTexture::New(); 
-    aTexture->SetInput(imageData); 
+    // create vtk texture
+    vtkTexture *aTexture = vtkTexture::New();
+    aTexture->SetInput(imageData);
     aTexture->InterpolateOn();
     ls->m_Actor->SetTexture(aTexture);
     aTexture->Delete();
@@ -183,10 +183,10 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNod
         diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
         // Setting specular color to the same, make physically no real sense, however vtk rendering slows down, if these colors are different.
         specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
-      }          
+      }
     }
 
-    // Ambient 
+    // Ambient
     {
       mitk::ColorProperty::Pointer p;
       node->GetProperty(p, "material.ambientColor", renderer);
@@ -194,10 +194,10 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNod
       {
         mitk::Color c = p->GetColor();
         ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
-      }          
+      }
     }
 
-    // Diffuse 
+    // Diffuse
     {
       mitk::ColorProperty::Pointer p;
       node->GetProperty(p, "material.diffuseColor", renderer);
@@ -205,10 +205,10 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNod
       {
         mitk::Color c = p->GetColor();
         diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
-      }          
+      }
     }
 
-    // Specular 
+    // Specular
     {
       mitk::ColorProperty::Pointer p;
       node->GetProperty(p, "material.specularColor", renderer);
@@ -216,7 +216,7 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNod
       {
         mitk::Color c = p->GetColor();
         specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
-      }          
+      }
     }
 
     // Ambient coeff
@@ -239,13 +239,13 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNod
       node->GetFloatProperty("material.specularPower", power_specular, renderer);
     }
 
-    property->SetAmbient( coeff_ambient );    
+    property->SetAmbient( coeff_ambient );
     property->SetDiffuse( coeff_diffuse );
     property->SetSpecular( coeff_specular );
     property->SetSpecularPower( power_specular );
 
-    property->SetAmbientColor( ambient );    
-    property->SetDiffuseColor( diffuse );    
+    property->SetAmbientColor( ambient );
+    property->SetDiffuseColor( diffuse );
     property->SetSpecularColor( specular );
   }
 
@@ -289,7 +289,7 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  // Applying shading properties    
+  // Applying shading properties
   {
     Superclass::ApplyProperties( ls->m_Actor, renderer ) ;
     // VTK Properties
@@ -505,7 +505,7 @@ void mitk::ToFSurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
 void mitk::ToFSurfaceVtkMapper3D::SetImmediateModeRenderingOn(int  /*on*/)
 {
   /*
-  if (m_VtkPolyDataMapper != NULL) 
+  if (m_VtkPolyDataMapper != NULL)
   m_VtkPolyDataMapper->SetImmediateModeRendering(on);
   */
 }

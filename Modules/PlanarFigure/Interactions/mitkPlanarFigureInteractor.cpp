@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -136,7 +136,7 @@ bool mitk::PlanarFigureInteractor
   bool ok = false;
 
   // Check corresponding data; has to be sub-class of mitk::PlanarFigure
-  mitk::PlanarFigure *planarFigure = 
+  mitk::PlanarFigure *planarFigure =
     dynamic_cast< mitk::PlanarFigure * >( m_DataNode->GetData() );
 
   if ( planarFigure == NULL )
@@ -162,7 +162,7 @@ bool mitk::PlanarFigureInteractor
   mitk::Geometry2D *planarFigureGeometry =
     dynamic_cast< mitk::Geometry2D * >( planarFigure->GetGeometry( timeStep ) );
 
-  // Get the Geometry2D of the window the user interacts with (for 2D point 
+  // Get the Geometry2D of the window the user interacts with (for 2D point
   // projection)
   mitk::BaseRenderer *renderer = NULL;
   const Geometry2D *projectionPlane = NULL;
@@ -418,8 +418,8 @@ bool mitk::PlanarFigureInteractor
 
       // TODO: check segement of polyline we clicked in
       int nextIndex = -1;
-      
-      // We only need to check which position to insert the control point 
+
+      // We only need to check which position to insert the control point
       // when interacting with a PlanarPolygon. For all other types
       // new control points will always be appended
 
@@ -691,7 +691,7 @@ bool mitk::PlanarFigureInteractor
       {
         planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
       }
-  
+
       planarFigure->InvokeEvent( ContextMenuPlanarFigureEvent() );
       ok = true;
 
@@ -780,7 +780,7 @@ bool mitk::PlanarFigureInteractor::TransformPositionEventToPoint2D(
 {
   // Extract world position, and from this position on geometry, if
   // available
-  const mitk::PositionEvent *positionEvent = 
+  const mitk::PositionEvent *positionEvent =
     dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
   if ( positionEvent == NULL )
   {
@@ -828,7 +828,7 @@ bool mitk::PlanarFigureInteractor::TransformObjectToDisplay(
 
 bool mitk::PlanarFigureInteractor::IsPointNearLine(
   const mitk::Point2D& point,
-  const mitk::Point2D& startPoint, 
+  const mitk::Point2D& startPoint,
   const mitk::Point2D& endPoint,
   mitk::Point2D& projectedPoint
   ) const
@@ -848,7 +848,7 @@ bool mitk::PlanarFigureInteractor::IsPointNearLine(
   // - its distance to its projected point is small enough
   // - it is not further outside of the line than the defined tolerance
   if (((crossPoint.SquaredEuclideanDistanceTo(point) < 20.0) && (l1 > 0.0) && (l2 > 0.0))
-      || endPoint.SquaredEuclideanDistanceTo(point) < 20.0 
+      || endPoint.SquaredEuclideanDistanceTo(point) < 20.0
       || startPoint.SquaredEuclideanDistanceTo(point) < 20.0)
   {
     return true;
@@ -866,7 +866,7 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
   Point2D& pointProjectedOntoLine ) const
 {
   // Extract display position
-  const mitk::PositionEvent *positionEvent = 
+  const mitk::PositionEvent *positionEvent =
     dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
   if ( positionEvent == NULL )
   {
@@ -933,7 +933,7 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
   const DisplayGeometry *displayGeometry ) const
 {
   // Extract display position
-  const mitk::PositionEvent *positionEvent = 
+  const mitk::PositionEvent *positionEvent =
     dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
   if ( positionEvent == NULL )
   {
@@ -983,7 +983,7 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
 }
 
 
-void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities( 
+void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities(
   const PlanarFigure *planarFigure )
 {
   MITK_INFO << "PlanarFigure: " << planarFigure->GetNameOfClass();

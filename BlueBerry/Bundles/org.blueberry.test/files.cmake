@@ -1,6 +1,6 @@
 set(MOC_H_FILES
   src/internal/berryPluginActivator.h
-  
+
   src/berryCoreTestApplication.h
 )
 
@@ -11,9 +11,9 @@ set(CACHED_RESOURCE_FILES
 set(SRC_CPP_FILES
   berryCoreTestApplication.cpp
   berryBlueBerryTestDriver.cpp
-  
+
   harness/berryTestCase.cpp
-  
+
   util/berryCallHistory.cpp
 )
 

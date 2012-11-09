@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,15 +25,15 @@ void mitk::LevelWindow::EnsureConsistency()
 {
   // Check if total range is ok
   {
-    if ( m_RangeMin > m_RangeMax ) 
+    if ( m_RangeMin > m_RangeMax )
       std::swap(m_RangeMin,m_RangeMax);
-    if (m_RangeMin == m_RangeMax ) 
+    if (m_RangeMin == m_RangeMax )
       m_RangeMin = m_RangeMax - 1;
   }
-  
+
   // Check if current window is ok
-  { 
-    if ( m_LowerWindowBound > m_UpperWindowBound )   
+  {
+    if ( m_LowerWindowBound > m_UpperWindowBound )
       std::swap(m_LowerWindowBound,m_UpperWindowBound);
 
     if ( m_LowerWindowBound < m_RangeMin ) m_LowerWindowBound = m_RangeMin;
@@ -41,16 +41,16 @@ void mitk::LevelWindow::EnsureConsistency()
     if ( m_LowerWindowBound > m_RangeMax ) m_LowerWindowBound = m_RangeMax;
     if ( m_UpperWindowBound > m_RangeMax ) m_UpperWindowBound = m_RangeMax;
 
-    if (m_LowerWindowBound == m_UpperWindowBound )  
+    if (m_LowerWindowBound == m_UpperWindowBound )
     {
       if(m_LowerWindowBound == m_RangeMin )
         m_UpperWindowBound++;
-      else    
+      else
         m_LowerWindowBound--;
     }
   }
 }
- 
+
 mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
 : m_LowerWindowBound( level - window / 2.0 ), m_UpperWindowBound( level + window / 2.0 ),
   m_RangeMin( -2048.0 ), m_RangeMax( 4096.0 ),
@@ -160,11 +160,11 @@ void mitk::LevelWindow::SetDefaultBoundaries(mitk::ScalarType low, mitk::ScalarT
   m_DefaultLowerBound = low;
   m_DefaultUpperBound = up;
   // Check if default window is ok
-  { 
-    if ( m_DefaultLowerBound > m_DefaultUpperBound )   
+  {
+    if ( m_DefaultLowerBound > m_DefaultUpperBound )
       std::swap(m_DefaultLowerBound,m_DefaultUpperBound);
 
-    if (m_DefaultLowerBound == m_DefaultUpperBound )  
+    if (m_DefaultLowerBound == m_DefaultUpperBound )
         m_DefaultLowerBound--;
   }
   EnsureConsistency();
@@ -227,7 +227,7 @@ Next the level window is set relative to the inner range IR = lengthOf([min2ndVa
 For count(minValue) > 20% the smallest values are frequent and should be
 distinct from the min2ndValue and larger values (minValue may be std:min, may signify
 something special) hence the lower end of the level window is set to min2ndValue - 0.5 * IR
- 
+
 For count(minValue) <= 20% the smallest values are not so important and can
 blend with the next ones => min(level window) = min2ndValue
 
@@ -245,13 +245,13 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
 {
   if ( IsFixed() )
     return;
-  
+
   if ( image == NULL || !image->IsInitialized() ) return;
 
   const mitk::Image* wholeImage = image;
   ScalarType minValue = 0.0;
   ScalarType maxValue = 0.0;
-  ScalarType min2ndValue = 0.0; 
+  ScalarType min2ndValue = 0.0;
   ScalarType max2ndValue = 0.0;
   mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
   if ( guessByCentralSlice )
@@ -295,10 +295,10 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
         maxValue = maxValueTemp;
       ScalarType min2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(i);
       if (min2ndValue > min2ndValueTemp)
-        min2ndValue = min2ndValueTemp; 
+        min2ndValue = min2ndValueTemp;
       ScalarType max2ndValueTemp = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(i);
       if (max2ndValue > max2ndValueTemp)
-        max2ndValue = max2ndValueTemp; 
+        max2ndValue = max2ndValueTemp;
     }
   }
 
@@ -339,7 +339,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
     }
   }
  */
-   
+
   unsigned int numPixelsInDataset = image->GetDimensions()[0];
   for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
   unsigned int minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
@@ -365,7 +365,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   else
   {
     ScalarType innerRange = max2ndValue - min2ndValue;
-    
+
     if ( minCountFraction > 0.2 )  //// lots of min values -> make different from rest, but not miles away
     {
       ScalarType halfInnerRangeGapMinValue = min2ndValue - innerRange/2.0;
@@ -392,14 +392,14 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
 
 void mitk::LevelWindow::SetFixed( bool fixed )
 {
-  m_Fixed = fixed; 
+  m_Fixed = fixed;
 }
-  
+
 bool mitk::LevelWindow::GetFixed() const
 {
   return m_Fixed;
 }
-  
+
 bool mitk::LevelWindow::IsFixed() const
 {
   return m_Fixed;
@@ -407,8 +407,8 @@ bool mitk::LevelWindow::IsFixed() const
 
 bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 {
-  if ( m_RangeMin == levWin.GetRangeMin() && 
-    m_RangeMax == levWin.GetRangeMax() && 
+  if ( m_RangeMin == levWin.GetRangeMin() &&
+    m_RangeMax == levWin.GetRangeMax() &&
     m_LowerWindowBound == levWin.GetLowerWindowBound() && m_UpperWindowBound == levWin.GetUpperWindowBound() &&
     m_DefaultLowerBound == levWin.GetDefaultLowerBound() && m_DefaultUpperBound == levWin.GetDefaultUpperBound() && m_Fixed == levWin.IsFixed() ) {
 

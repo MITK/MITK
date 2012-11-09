@@ -2,20 +2,20 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef BERRY_INTERNALJOB_H 
-#define BERRY_INTERNALJOB_H 
+#ifndef BERRY_INTERNALJOB_H
+#define BERRY_INTERNALJOB_H
 
 #include <Poco/Thread.h>
 #include <Poco/Thread.h>
@@ -53,7 +53,7 @@ struct BERRY_JOBS InternalJob : public Object
   friend struct JobQueue;
   friend struct JobManager;
 
-  
+
   berryObjectMacro(InternalJob)
 
   bool operator==(const Object* otherJob) const;
@@ -95,7 +95,7 @@ struct BERRY_JOBS InternalJob : public Object
    */
   std::string GetName() const;
 
-  /* 
+  /*
    * @see Job#setRule(ISchedulingRule::Pointer)
    */
   void InternalSetRule(ISchedulingRule::Pointer rule);
@@ -118,7 +118,7 @@ struct BERRY_JOBS InternalJob : public Object
   /**
    * Returns whether this job was canceled when it was running.
    */
-  bool IsRunCanceled() const ; 
+  bool IsRunCanceled() const ;
 
   /**
    * Returns true if this job conflicts with the given job, and false otherwise.
@@ -158,7 +158,7 @@ struct BERRY_JOBS InternalJob : public Object
   /**
    * Sets whether this job was canceled when it was running
    */
-  void SetRunCanceled(bool value) ; 
+  void SetRunCanceled(bool value) ;
 
   void SetNext(InternalJob::Pointer entry);
 
@@ -240,7 +240,7 @@ protected:
    */
   virtual void Canceling();
 
-  /* 
+  /*
    *
    * @see Job#Done(IStatus:.Pointer)
    */
@@ -257,12 +257,12 @@ protected:
    */
   /// Object GetProperty(QualifiedName key) ;
 
-  /* 
+  /*
    * @see Job#GetResult
    */
   IStatus::Pointer GetResult() const ;
 
-  /* 
+  /*
    * @see Job#GetRule
    */
   ISchedulingRule::Pointer GetRule() const;
@@ -281,7 +281,7 @@ protected:
    */
   /// void Join() throws InterruptedException ;
 
-  /* 
+  /*
    * @see Job#RemoveJobListener(IJobChangeListener)
    */
   void RemoveJobChangeListener(IJobChangeListener::Pointer listener);
@@ -301,7 +301,7 @@ protected:
    */
   void SetPriority(int newPriority);
 
-  /* 
+  /*
    * @see Job#SetProgressGroup(IProgressMonitor::Pointer, int ticks)
    */
   void SetProgressGroup(IProgressMonitor::Pointer group, int ticks);

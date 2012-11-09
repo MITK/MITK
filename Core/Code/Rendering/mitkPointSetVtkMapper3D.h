@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,23 +37,23 @@ namespace mitk {
   /**
   * @brief Vtk-based mapper for PointSet
   *
-  * Due to the need of different colors for selected 
-  * and unselected points and the facts, that we also have a contour and 
-  * labels for the points, the vtk structure is build up the following way: 
+  * Due to the need of different colors for selected
+  * and unselected points and the facts, that we also have a contour and
+  * labels for the points, the vtk structure is build up the following way:
   *
-  * We have two AppendPolyData, one selected, and one unselected and one 
-  * for a contour between the points. Each one is connected to an own 
-  * PolyDaraMapper and an Actor. The different color for the unselected and 
+  * We have two AppendPolyData, one selected, and one unselected and one
+  * for a contour between the points. Each one is connected to an own
+  * PolyDaraMapper and an Actor. The different color for the unselected and
   * selected state and for the contour is read from properties.
   *
-  * "unselectedcolor", "selectedcolor" and "contourcolor" are the strings, 
-  * that are looked for. Pointlabels are added besides the selected or the 
+  * "unselectedcolor", "selectedcolor" and "contourcolor" are the strings,
+  * that are looked for. Pointlabels are added besides the selected or the
   * deselected points.
   *
-  * Then the three Actors are combined inside a vtkPropAssembly and this 
-  * object is returned in GetProp() and so hooked up into the rendering 
-  * pipeline. 
-  
+  * Then the three Actors are combined inside a vtkPropAssembly and this
+  * object is returned in GetProp() and so hooked up into the rendering
+  * pipeline.
+
   * Properties that can be set for point sets and influence the PointSetVTKMapper3D are:
   *
 
@@ -74,18 +74,18 @@ namespace mitk {
   *   - \b "contoursize": (FloatProperty::New(0.5), renderer, overwrite )
   *   - \b "close contour": (BoolProperty::New(false), renderer, overwrite )
   *   - \b "show points": (BoolProperty::New(true), renderer, overwrite )
-  *   - \b "updateDataOnRender": (BoolProperty::New(true), renderer, overwrite ) 
+  *   - \b "updateDataOnRender": (BoolProperty::New(true), renderer, overwrite )
 
 
 
   *Other properties looked for are:
   *
   *   - \b "show contour": if set to on, lines between the points are shown
-  *   - \b "close contour": if set to on, the open strip is closed (first point 
+  *   - \b "close contour": if set to on, the open strip is closed (first point
   *       connected with last point)
   *   - \b "pointsize": size of the points mapped
   *   - \b "label": text of the Points to show besides points
-  *   - \b "contoursize": size of the contour drawn between the points 
+  *   - \b "contoursize": size of the contour drawn between the points
   *       (if not set, the pointsize is taken)
   *
   * @ingroup Mapper
@@ -99,7 +99,7 @@ namespace mitk {
 
     virtual const mitk::PointSet* GetInput();
 
-    //overwritten from VtkMapper3D to be able to return a 
+    //overwritten from VtkMapper3D to be able to return a
     //m_PointsAssembly which is much faster than a vtkAssembly
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
     virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer);

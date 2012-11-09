@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageData.h>
 #include <vtkCubeSource.h>
 
-mitk::ExtrudedContour::ExtrudedContour() 
+mitk::ExtrudedContour::ExtrudedContour()
   : m_Contour(NULL), m_ClippingGeometry(NULL), m_AutomaticVectorGeneration(false)
 {
   GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
@@ -73,7 +73,7 @@ mitk::ExtrudedContour::ExtrudedContour()
   m_ClipPolyDataFilter->InsideOutOn();
 
   m_Polygon = vtkPolygon::New();
-  
+
   m_ProjectionPlane = mitk::PlaneGeometry::New();
 }
 
@@ -115,7 +115,7 @@ bool mitk::ExtrudedContour::IsInside(const Point3D& worldPoint) const
   if ( x[0] >= this->m_ProjectedContourBounds[0] && x[0] <= this->m_ProjectedContourBounds[1] &&
     x[1] >= this->m_ProjectedContourBounds[2] && x[1] <= this->m_ProjectedContourBounds[3] &&
     this->m_Polygon->PointInPolygon(x, m_Polygon->Points->GetNumberOfPoints(),
-    ((vtkDoubleArray *)this->m_Polygon->Points->GetData())->GetPointer(0), 
+    ((vtkDoubleArray *)this->m_Polygon->Points->GetData())->GetPointer(0),
     (double*)const_cast<mitk::ExtrudedContour*>(this)->m_ProjectedContourBounds, polygonNormal) == 1 )
     return true;
   else
@@ -261,7 +261,7 @@ void mitk::ExtrudedContour::BuildGeometry()
     // calculate a legal m_RightVector
     if( mitk::Equal( m_Vector[1], 0.0f ) == false )
     {
-      FillVector3D( m_RightVector, 1.0f, -m_Vector[0]/m_Vector[1], 0.0f ); 
+      FillVector3D( m_RightVector, 1.0f, -m_Vector[0]/m_Vector[1], 0.0f );
       m_RightVector.Normalize();
     }
     else
@@ -269,18 +269,18 @@ void mitk::ExtrudedContour::BuildGeometry()
       FillVector3D( m_RightVector, 0.0f, 1.0f, 0.0f );
     }
   }
- 
+
   // calculate down-vector
   VnlVector rightDV = m_RightVector.Get_vnl_vector(); rightDV.normalize(); vnl2vtk(rightDV, m_Right);
   VnlVector downDV  = vnl_cross_3d( m_Vector.Get_vnl_vector(), rightDV ); downDV.normalize();  vnl2vtk(downDV,  m_Down);
-  
+
   // Part II: calculate plane as base for extrusion, project the contour
   // on this plane and store as polygon for IsInside test and BoundingBox calculation
 
   // initialize m_ProjectionPlane, yet with origin at 0
   m_ProjectionPlane->InitializeStandardPlane(rightDV, downDV);
 
-  // create vtkPolygon from contour and simultaneously determine 2D bounds of 
+  // create vtkPolygon from contour and simultaneously determine 2D bounds of
   // contour projected on m_ProjectionPlane
   //mitk::Contour::PointsContainerIterator pointsIt = m_Contour->GetPoints()->Begin();
   m_Polygon->Points->Reset();
@@ -317,7 +317,7 @@ void mitk::ExtrudedContour::BuildGeometry()
   this->m_Polygon->GetBounds(m_ProjectedContourBounds);
   //m_ProjectedContourBounds[4]=-1.0; m_ProjectedContourBounds[5]=1.0;
 
-  // calculate origin (except translation along the normal) and bounds 
+  // calculate origin (except translation along the normal) and bounds
   // of m_ProjectionPlane:
   //  origin is composed of the minimum x-/y-coordinates of the polygon,
   //  bounds from the extent of the polygon, both after projecting on the plane

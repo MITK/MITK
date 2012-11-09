@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFConfig.h>
 
 /**Documentation
- *  test for the class "ToFCameraPMDMITKPlayerController". 
+ *  test for the class "ToFCameraPMDMITKPlayerController".
  */
 int mitkToFCameraPMDMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
 {
@@ -36,7 +36,7 @@ int mitkToFCameraPMDMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
   //MITK_TEST_CONDITION_REQUIRED(!testObject->CloseCameraConnection(),"Testing closing of connection");
 
   //test valid data behavior
-  //CAVE: The following test cases are valid once rawData recording is fixed. Currently the 
+  //CAVE: The following test cases are valid once rawData recording is fixed. Currently the
   //      functionality is not working therefor the test cases are excluded!!
 
   //std::string filePath = MITK_TOF_DATA_DIR;

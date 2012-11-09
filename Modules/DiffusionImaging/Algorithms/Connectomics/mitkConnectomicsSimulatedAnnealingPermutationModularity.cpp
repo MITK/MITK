@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,7 +30,7 @@ mitk::ConnectomicsSimulatedAnnealingPermutationModularity::~ConnectomicsSimulate
 {
 }
 
-void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::SetNetwork( 
+void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::SetNetwork(
   mitk::ConnectomicsNetwork::Pointer theNetwork )
 {
   m_Network = theNetwork;
@@ -76,7 +76,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::Permutate( doubl
     }
   }
 
-  // do moduleMaxNumber module permutations 
+  // do moduleMaxNumber module permutations
   for(int loop( 0 ); loop < moduleMaxNumber; loop++)
   {
     permutateMappingModuleChange( &currentSolution, temperature, m_Network );
@@ -125,7 +125,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::permutateMapping
     return;
   }
 
-  const std::vector< VertexDescriptorType > allNodesVector 
+  const std::vector< VertexDescriptorType > allNodesVector
     = network->GetVectorOfAllVertexDescriptors();
 
   ToModuleMapType::iterator iter = vertexToModuleMap->find( allNodesVector[ randomNode ] );
@@ -179,8 +179,8 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::permutateMapping
     //eliminate the empty module
     removeModule( vertexToModuleMap, randomModuleB );
 
-  } 
-  else 
+  }
+  else
   {
     //split module
     splitModule( vertexToModuleMap, currentTemperature, network, randomModuleA );
@@ -211,7 +211,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::joinTwoModules(
 void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::splitModule(
   ToModuleMapType *vertexToModuleMap, double currentTemperature, mitk::ConnectomicsNetwork::Pointer network, int moduleToSplit )
 {
-  
+
   if( m_Depth == 0 )
   {
     // do nothing
@@ -238,7 +238,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::splitModule(
   // The submap
   ToModuleMapType vertexToModuleSubMap;
 
-  // copy vertices 
+  // copy vertices
   VertexToVertexMapType::iterator iter = graphToSubgraphVertexMap.begin();
   VertexToVertexMapType::iterator end =  graphToSubgraphVertexMap.end();
 
@@ -293,11 +293,11 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::splitModule(
 }
 
 void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::extractModuleSubgraph(
-  ToModuleMapType *vertexToModuleMap, 
-  mitk::ConnectomicsNetwork::Pointer network, 
-  int moduleToSplit, 
-  mitk::ConnectomicsNetwork::Pointer subNetwork, 
-  VertexToVertexMapType* graphToSubgraphVertexMap, 
+  ToModuleMapType *vertexToModuleMap,
+  mitk::ConnectomicsNetwork::Pointer network,
+  int moduleToSplit,
+  mitk::ConnectomicsNetwork::Pointer subNetwork,
+  VertexToVertexMapType* graphToSubgraphVertexMap,
   VertexToVertexMapType* subgraphToGraphVertexMap )
 {
   const std::vector< VertexDescriptorType > allNodesVector = network->GetVectorOfAllVertexDescriptors();
@@ -331,12 +331,12 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::extractModuleSub
 
   while( iter != end )
   {
-    const std::vector< VertexDescriptorType > adjacentNodexVector 
+    const std::vector< VertexDescriptorType > adjacentNodexVector
       = network->GetVectorOfAdjacentNodes( iter->first );
 
     for( int adjacentNodeNumber( 0 ); adjacentNodeNumber < adjacentNodexVector.size() ; adjacentNodeNumber++)
     {
-      // if the adjacent vertex is part of the subgraph, 
+      // if the adjacent vertex is part of the subgraph,
       // add edge, if it does not exist yet, else do nothing
 
       VertexDescriptorType adjacentVertex = adjacentNodexVector[ adjacentNodeNumber ];
@@ -396,7 +396,7 @@ int mitk::ConnectomicsSimulatedAnnealingPermutationModularity::getNumberOfVertic
 }
 
 void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::removeModule(
-  ToModuleMapType *vertexToModuleMap, int module ) 
+  ToModuleMapType *vertexToModuleMap, int module )
 {
   int lastModuleNumber = getNumberOfModules( vertexToModuleMap ) - 1;
   if( module == lastModuleNumber )
@@ -455,7 +455,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::randomlyAssignNo
     nodeList[ nodeIndex ] = rng.lrand32( numberOfIntendedModules - 1 );
 
     histogram[ nodeList[ nodeIndex ] ]++;
-    
+
   }
 
   // make sure no module contains no node, if one does assign it one of a random module
@@ -488,7 +488,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::SetMapping( ToMo
   m_BestSolution = mapping;
 }
 
-mitk::ConnectomicsSimulatedAnnealingPermutationModularity::ToModuleMapType 
+mitk::ConnectomicsSimulatedAnnealingPermutationModularity::ToModuleMapType
 mitk::ConnectomicsSimulatedAnnealingPermutationModularity::GetMapping()
 {
   return m_BestSolution;
@@ -496,7 +496,7 @@ mitk::ConnectomicsSimulatedAnnealingPermutationModularity::GetMapping()
 
 double mitk::ConnectomicsSimulatedAnnealingPermutationModularity::Evaluate( ToModuleMapType* mapping ) const
 {
-  mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity* costMapping = 
+  mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity* costMapping =
     dynamic_cast<mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity*>( m_CostFunction.GetPointer() );
   if( costMapping )
   {
@@ -533,12 +533,12 @@ bool mitk::ConnectomicsSimulatedAnnealingPermutationModularity::AcceptChange( do
 }
 
 
-void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::SetDepth( int depth ) 
+void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::SetDepth( int depth )
 {
   m_Depth = depth;
 }
 
-void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::SetStepSize( double size ) 
+void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::SetStepSize( double size )
 {
   m_StepSize = size;
 }

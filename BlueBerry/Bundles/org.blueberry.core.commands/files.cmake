@@ -27,7 +27,7 @@ set(SRC_CPP_FILES
   berryParameterType.cpp
   berryParameterTypeEvent.cpp
   berryState.cpp
-  
+
   util/berryCommandTracing.cpp
 )
 

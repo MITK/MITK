@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -54,9 +54,9 @@ namespace mitk {
 
     typedef float InternalPixelType;
     typedef typename itk::Image< InternalPixelType, VImageDimension > InternalImageType;
-    typedef typename itk::CastImageFilter< FixedImageType, 
+    typedef typename itk::CastImageFilter< FixedImageType,
                                 InternalImageType > FixedImageCasterType;
-    typedef typename itk::CastImageFilter< MovingImageType, 
+    typedef typename itk::CastImageFilter< MovingImageType,
                                 InternalImageType > MovingImageCasterType;
     typedef typename itk::HistogramMatchingImageFilter<
                                     InternalImageType,

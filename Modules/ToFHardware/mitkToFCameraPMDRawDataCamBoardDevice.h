@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ namespace mitk
   */
   class MITK_TOFHARDWARE_EXPORT ToFCameraPMDRawDataCamBoardDevice : public ToFCameraPMDRawDataDevice
   {
-  public: 
+  public:
 
     mitkClassMacro( ToFCameraPMDRawDataCamBoardDevice , ToFCameraPMDRawDataDevice );
 
@@ -41,7 +41,7 @@ namespace mitk
     */
     virtual void SetProperty( const char *propertyKey, BaseProperty* propertyValue );
     /*!
-    \brief Transforms the sourceData into an array with four tuples holding the channels for 
+    \brief Transforms the sourceData into an array with four tuples holding the channels for
            raw data reconstruction.
     */
     virtual void GetChannelSourceData(short* sourceData, vtkShortArray* vtkChannelArray );
@@ -58,7 +58,7 @@ namespace mitk
     */
     void GetAmplitudes(float* amplitudeArray, int& imageSequence);
     /*!
-    \brief Returns distance data 
+    \brief Returns distance data
     */
     void GetDistances(float* distanceArray, int& imageSequence);
     /*!

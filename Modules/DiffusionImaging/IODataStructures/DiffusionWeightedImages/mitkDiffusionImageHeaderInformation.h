@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "itkObjectFactory.h"
 
-namespace mitk 
+namespace mitk
 {
 
   enum DiffusionHeaderGroup{
@@ -46,7 +46,7 @@ namespace mitk
     //  float yOrigin, float zOrigin, float sliceThickness, float sliceSpacing,
     //  int nSliceInVolume, float xRow, float yRow, float zRow, float xCol,
     //  float yCol, float zCol, float xSlice, float ySlice, float zSlice,
-    //  float bValue, vnl_vector_fixed<double, 3>  DiffusionVector, 
+    //  float bValue, vnl_vector_fixed<double, 3>  DiffusionVector,
     //  std::string vendor, bool mosaic, DiffusionHeaderGroup headerGroup = DHG_NotYetGrouped):
     //  nRows(nRows), nCols(nCols),xRes(xRes),
     //  yRes(yRes),xOrigin(xOrigin),yOrigin(yOrigin),zOrigin(zOrigin),
@@ -71,13 +71,13 @@ namespace mitk
     int nSliceInVolume;
     float xRow;
     float yRow;
-    float zRow; 
-    float xCol; 
-    float yCol; 
-    float zCol; 
-    float xSlice; 
-    float ySlice; 
-    float zSlice; 
+    float zRow;
+    float xCol;
+    float yCol;
+    float zCol;
+    float xSlice;
+    float ySlice;
+    float zSlice;
     float bValue;
     vnl_vector_fixed<double, 3> DiffusionVector;
     std::string vendor;

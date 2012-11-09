@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,10 +29,10 @@ namespace mitk {
 
     /**Documentation
     * \brief TODO
-    *  
+    *
     * \ingroup US
     */
-    
+
   class MitkUS_EXPORT USDeviceService : public itk::Object
     {
     public:
@@ -41,7 +41,7 @@ namespace mitk {
 
 
 
-    
+
       //## getter and setter ##
 
       /**
@@ -54,7 +54,7 @@ namespace mitk {
       void DeactivateDevice (int index);
 
       std::vector<mitk::USDevice::Pointer> GetActiveDevices();
-     
+
 
     protected:
       USDeviceService();
@@ -67,11 +67,11 @@ namespace mitk {
       //std::vector<mitk::USDevice::Pointer> m_AllDevices;
 
 
-      
 
 
 
-    
+
+
 
     };
 } // namespace mitk

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  *  Test for class mitk::VtkWidgetRendering (for rendering vtkWidgets on the
  *  screen)
- *  
- *  argc and argv are the command line parameters which were passed to 
+ *
+ *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
@@ -38,7 +38,7 @@ int mitkVtkWidgetRenderingTest(int /* argc */, char* /*argv*/[])
 
   // Test: instantiation
   mitk::VtkWidgetRendering::Pointer widgetRendering = mitk::VtkWidgetRendering::New();
-  MITK_TEST_CONDITION_REQUIRED(widgetRendering.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(widgetRendering.IsNotNull(),"Testing instantiation")
 
   // Test: Create and set vtkRenderWindow
   vtkRenderWindow *renderWindow = vtkRenderWindow::New();
@@ -50,7 +50,7 @@ int mitkVtkWidgetRenderingTest(int /* argc */, char* /*argv*/[])
 
   // Test: Try to enable before widget has been set (should stay disabled)
   widgetRendering->Enable();
-  MITK_TEST_CONDITION(!widgetRendering->IsEnabled(), 
+  MITK_TEST_CONDITION(!widgetRendering->IsEnabled(),
     "Trying to enable widget rendering before setting widget")
   widgetRendering->Disable();
 
@@ -80,11 +80,11 @@ int mitkVtkWidgetRenderingTest(int /* argc */, char* /*argv*/[])
   // Clean up
   scalarBarWidget->Delete();
   renderWindow->Delete();
-  
+
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!
-  
+
   // always end with this!
   MITK_TEST_END()
 }

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,7 +41,7 @@ mitk::GlobalInteraction::~GlobalInteraction()
 {
   //s_GlobalInteraction doesn't have to be set = NULL;
 
-  
+
 
   // StateMachineFactory and EventMapper have to be deleted explicitly, as they inherit from Vtk
   if (this->IsInitialized())
@@ -168,7 +168,7 @@ bool mitk::GlobalInteraction::RemoveInteractor(mitk::Interactor* interactor)
   position = m_InteractorList.erase(position);
 
   //check if the interactor is also held in SelectedList
-  this->RemoveFromSelectedInteractors(interactor);  
+  this->RemoveFromSelectedInteractors(interactor);
 
   //check if in RelevanceMap
   for (InteractorMapIter it = m_InteractorRelevanceMap.begin(); it != m_InteractorRelevanceMap.end(); it++)
@@ -278,7 +278,7 @@ bool mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* state
   {
     handled = (*m_CurrentInteractorIter).second->HandleEvent(stateEvent);
 
-    if (!handled) 
+    if (!handled)
       m_CurrentInteractorIter++;
   }
 
@@ -387,7 +387,7 @@ mitk::State* mitk::GlobalInteraction::GetStartState(const char* type)
 {
   if ( this->IsInitialized() )
     return m_StateMachineFactory->GetStartState(type);
-  
+
   MITK_FATAL << "Fatal Error in mitkGlobalInteraction.cpp: GlobalInteraction not initialized!\n";
   return NULL;
 }
@@ -441,13 +441,13 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, cons
   if (m_StateMachineFactory)
     m_StateMachineFactory->Delete();
   m_StateMachineFactory = StateMachineFactory::New();
-  
-  //if EventMapper was initialized before, delete it and initialize once more 
+
+  //if EventMapper was initialized before, delete it and initialize once more
   // to create new event descriptions and not to add them
   if (m_EventMapper)
     m_EventMapper->Delete();
   m_EventMapper = EventMapper::New();
-  
+
 
   bool success = true;
 
@@ -470,7 +470,7 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, cons
     success &= m_EventMapper->LoadBehaviorString(XMLBehaviorInput);
   }
 
-  if(!success) 
+  if(!success)
   {
     MITK_FATAL << "Error initializing global interaction!\n";
     return false;
@@ -495,7 +495,7 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, cons
   //add the start state pointer for the first time step to the list
   m_CurrentStateVector.push_back(startState);
   m_IsInitialized = true;
-  return true;  
+  return true;
 }
 
 void mitk::GlobalInteraction::SetEventNotificationPolicy(EVENT_NOTIFICATION_POLICY policy)

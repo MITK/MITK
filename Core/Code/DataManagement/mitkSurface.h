@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,7 +34,7 @@ namespace mitk {
 
   public:
     // not yet the best chioce of a region-type for surfaces, but it works for the time being
-    typedef itk::ImageRegion< 5 >  RegionType;  
+    typedef itk::ImageRegion< 5 >  RegionType;
 
     mitkClassMacro(Surface, BaseData);
     itkNewMacro(Self);

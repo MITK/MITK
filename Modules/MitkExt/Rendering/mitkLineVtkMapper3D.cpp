@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -85,7 +85,7 @@ void mitk::LineVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer
   else
     close = dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("close contour").GetPointer())->GetValue();
 
-  if (close) 
+  if (close)
   {
     int cell[2] = {j-1,0};
     polys->InsertNextCell(2,cell);
@@ -102,7 +102,7 @@ void mitk::LineVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer
   m_tubefilter->Update();;
 
   m_vtkPointList->AddInput(m_tubefilter->GetOutput());
-  
+
 
   // check for color prop and use it for rendering if it exists
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};
@@ -120,7 +120,7 @@ void mitk::LineVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer
     if (dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label").GetPointer()) == NULL)
     {
     }
-    else 
+    else
     {
       const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label").GetPointer())->GetValue();
       char buffer[20];

@@ -141,7 +141,7 @@ QListWidgetItem* QmitkServiceListWidget::AddServiceToList(mitk::ServiceReference
   //TODO allow more complex formatting
   if (m_NamingProperty.empty())
     caption = m_Interface;
-  else 
+  else
   {
     mitk::Any prop = serviceRef.GetProperty(m_NamingProperty);
     if (prop.Empty())

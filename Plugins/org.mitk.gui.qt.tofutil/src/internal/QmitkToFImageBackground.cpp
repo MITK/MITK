@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -55,11 +55,11 @@ QmitkToFImageBackground::~QmitkToFImageBackground()
 void QmitkToFImageBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
 {
   RemoveRenderWindow(renderWindow);
-  
+
   vtkRenderer*    videoRenderer   = vtkRenderer::New();
   vtkImageActor*  videoActor      = vtkImageActor::New();
   vtkImageImport* videoImport     = vtkImageImport::New();
-  
+
   videoImport->SetDataScalarTypeToUnsignedChar();
   videoImport->SetNumberOfScalarComponents(3);
 
@@ -67,15 +67,15 @@ void QmitkToFImageBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
     m_VideoSource->FetchFrame();
 
   videoImport->SetWholeExtent(0,m_VideoSource->GetImageWidth()-1,0,m_VideoSource->GetImageHeight()-1,0,1-1);
-  videoImport->SetDataExtentToWholeExtent();  
-  
+  videoImport->SetDataExtentToWholeExtent();
+
   mitk::VideoBackgroundVectorInfo v;
   v.renWin        = renderWindow;
   v.videoRenderer = videoRenderer;
   v.videoActor    = videoActor;
   v.videoImport   = videoImport;
-  
-  m_renderWindowVectorInfo.push_back(v); 
+
+  m_renderWindowVectorInfo.push_back(v);
 
   Modified();
 }
@@ -83,11 +83,11 @@ void QmitkToFImageBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
 void QmitkToFImageBackground::AddRenderWindow(vtkRenderWindow* renderWindow, int width, int height )
 {
   RemoveRenderWindow(renderWindow);
-  
+
   vtkRenderer*    videoRenderer   = vtkRenderer::New();
   vtkImageActor*  videoActor      = vtkImageActor::New();
   vtkImageImport* videoImport     = vtkImageImport::New();
-  
+
   videoImport->SetDataScalarTypeToUnsignedChar();
   videoImport->SetNumberOfScalarComponents(3);
 
@@ -95,18 +95,18 @@ void QmitkToFImageBackground::AddRenderWindow(vtkRenderWindow* renderWindow, int
 //    m_VideoSource->FetchFrame();
 
   videoImport->SetWholeExtent(0,width-1,0,height-1,0,1-1);
-  videoImport->SetDataExtentToWholeExtent();  
-  
+  videoImport->SetDataExtentToWholeExtent();
+
   mitk::ToFImageBackgroundVectorInfo v;
   v.renWin        = renderWindow;
   v.videoRenderer = videoRenderer;
   v.videoActor    = videoActor;
   v.videoImport   = videoImport;
-  
-  m_renderWindowVectorInfo.push_back(v); 
+
+  m_renderWindowVectorInfo.push_back(v);
 
   //Modified();
-  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
     (*it).videoActor->SetInput((*it).videoImport->GetOutput());
@@ -118,12 +118,12 @@ void QmitkToFImageBackground::AddRenderWindow(vtkRenderWindow* renderWindow, int
 
     if(!mitk::VtkLayerController::GetInstance((*it).renWin)->IsRendererInserted((*it).videoRenderer))
       mitk::VtkLayerController::GetInstance((*it).renWin)->InsertBackgroundRenderer((*it).videoRenderer,true);
-  } 
+  }
 }
 
 void QmitkToFImageBackground::RemoveRenderWindow(vtkRenderWindow* renderWindow )
 {
-  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
     if((*it).renWin == renderWindow)
@@ -143,7 +143,7 @@ void QmitkToFImageBackground::RemoveRenderWindow(vtkRenderWindow* renderWindow )
 
 bool QmitkToFImageBackground::IsRenderWindowIncluded(vtkRenderWindow* renderWindow )
 {
-  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
     if((*it).renWin == renderWindow)
@@ -159,9 +159,9 @@ bool QmitkToFImageBackground::IsRenderWindowIncluded(vtkRenderWindow* renderWind
  /*
 void QmitkToFImageBackground::Enable()
 {
-  UpdateVideo();  
+  UpdateVideo();
   Modified();
-  
+
   m_QTimer->start(m_TimerDelay);
 }
 */
@@ -174,7 +174,7 @@ void QmitkToFImageBackground::Disable()
 {
   if ( this->IsEnabled() )
   {
-    /*for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+    /*for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
       it != m_renderWindowVectorInfo.end(); it++)
     {
       mitk::VtkLayerController::GetInstance((*it).renWin)->RemoveRenderer((*it).videoRenderer);
@@ -193,19 +193,19 @@ bool QmitkToFImageBackground::IsEnabled()
   if (m_QTimer->isActive())
       return true;
   else
-      return false;    
+      return false;
 }
 */
 /*
 void QmitkToFImageBackground::UpdateVideo()
-{  
+{
   unsigned char *src = 0;
   src = m_VideoSource->GetVideoTexture();
   if(src)
-  { 
+  {
     if(m_renderWindowVectorInfo.size()>0)
     {
-      for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+      for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
         it != m_renderWindowVectorInfo.end(); it++)
       {
         (*it).videoImport->SetImportVoidPointer(src);
@@ -219,12 +219,12 @@ void QmitkToFImageBackground::UpdateVideo()
 }
 */
 void QmitkToFImageBackground::UpdateBackground(unsigned char *src)
-{  
+{
   if(src)
-  { 
+  {
     if(m_renderWindowVectorInfo.size()>0)
     {
-      for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+      for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
         it != m_renderWindowVectorInfo.end(); it++)
       {
         (*it).videoImport->SetImportVoidPointer(src);
@@ -239,7 +239,7 @@ void QmitkToFImageBackground::UpdateBackground(unsigned char *src)
 
 void QmitkToFImageBackground::Modified()
 { // ensures registration of video backrounds in each renderwindow
-  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
     (*it).videoActor->SetInput((*it).videoImport->GetOutput());
@@ -251,5 +251,5 @@ void QmitkToFImageBackground::Modified()
 
     if(!mitk::VtkLayerController::GetInstance((*it).renWin)->IsRendererInserted((*it).videoRenderer))
       mitk::VtkLayerController::GetInstance((*it).renWin)->InsertBackgroundRenderer((*it).videoRenderer,true);
-  } 
+  }
 }

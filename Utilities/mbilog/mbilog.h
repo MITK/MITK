@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,12 +38,12 @@ namespace mbilog {
    *         backend is used.
    */
   void MBILOG_DLL_API RegisterBackend(BackendBase* backend);
-  
+
   /** \brief Unregisters a backend.
    */
   void MBILOG_DLL_API UnregisterBackend(BackendBase* backend);
-  
-  /** \brief Distributes the given message to all registered backends. Should only be called by objects 
+
+  /** \brief Distributes the given message to all registered backends. Should only be called by objects
     *        of the class pseudo stream.
     */
   void MBILOG_DLL_API DistributeToBackends(LogMessage &l);
@@ -152,7 +152,7 @@ namespace mbilog {
       }
   };
 
-  /** 
+  /**
    * \brief An object of this class simulates a std::cout stream but does nothing. This class is for dummy objects, bit shift
    *        operators are availiable but doing nothing. Should only be used by the macros defined in the file mbilog.h
    * \ingroup mbilog

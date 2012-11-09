@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tchar.h>    // auto Unicode/Ansi support
 #include <queue>    // for HID write method
 #include <list>      // for state recording
- 
+
 #ifndef QWORD
  typedef unsigned __int64 QWORD;
 #endif
@@ -130,7 +130,7 @@ class wiimote : public wiimote_state
       IN_BUTTONS_ACCEL_IR_EXT   = 0x37, // reports IR BASIC data (no dot sizes)
       IN_BUTTONS_BALANCE_BOARD = 0x32, // must use this for the balance board
       };
-    // string versions 
+    // string versions
     static const TCHAR* ReportTypeName [];
 
 
@@ -161,7 +161,7 @@ class wiimote : public wiimote_state
     QWORD UniqueID;       // constructed from device-specific calibration info.
                  //  Note this is not guaranteed to be truly unique
                  //  as several devices may contain the same calibration
-                 //  vluaes - but unique amongst a small number of 
+                 //  vluaes - but unique amongst a small number of
                  //  devices.
 #ifdef ID2_FROM_DEVICEPATH
     QWORD UniqueID2;     // (low-reliabilty, left for reference)
@@ -229,7 +229,7 @@ class wiimote : public wiimote_state
     //           acceleration data will cause frequent updates anyway as it
     //           jitters even when the wiimote is stationary)
     void SetReportType       (input_report type, bool continuous = false);
-    
+
     // toggle the MotionPlus extension.  Call MotionPlusDetected() first to
     //  see if it's attached.  Unlike normal extensions, the MotionPlus does
     //  not report itself as one until enabled.  Once done, it then replaces
@@ -238,7 +238,7 @@ class wiimote : public wiimote_state
     //  be read simultaneously).
     bool EnableMotionPlus  ();
     bool DisableMotionPlus ();
-  
+
     // this is used to remove unwanted 'at rest' offsets, currently only from
     //  the Balance Board.  make sure there is no weight on the board before
     //  calling this. it reads the current sensor values and then removes them
@@ -290,7 +290,7 @@ class wiimote : public wiimote_state
                         DWORD         length,
                         speaker_freq   freq,
                         wiimote_sample &out);
-    
+
     // state recording - records state snapshots to a 'state_history' supplied
     //            by the caller.  states are timestamped and only added
     //            to the list when the specified state changes.
@@ -412,9 +412,9 @@ class wiimote : public wiimote_state
                       //  but required for some BT stacks (eg. MS')
     // HidD_SetOutputReport is only supported from XP onwards, so detect &
     //  load it dynamically:
-    static HMODULE   HidDLL;  
+    static HMODULE   HidDLL;
     static hidwrite_ptr _HidD_SetOutputReport;
-    
+
     volatile bool   bStatusReceived;    // for output method detection
     volatile bool   bConnectInProgress;  // don't handle extensions until complete
     volatile bool   bInitInProgress;    // stop regular requests until complete
@@ -427,12 +427,12 @@ volatile int   MotionPlusDetectCount;      // waiting for the result
     volatile bool   bCalibrateAtRest;    // as soon as the first sensor values                         //  come in after a Connect() call.
     static unsigned   _TotalCreated;
     static unsigned   _TotalConnected;
-    input_report   ReportType;        // type of data the wiimote delivers  
+    input_report   ReportType;        // type of data the wiimote delivers
     // read buffer
     BYTE       ReadBuff  [REPORT_LENGTH];
     // for polling: state is updated on a thread internally, and made only
     //  made public via RefreshState()
-    CRITICAL_SECTION StateLock;  
+    CRITICAL_SECTION StateLock;
     wiimote_state   Internal;
     state_change_flags InternalChanged;   // state changes since last RefreshState()
     // periodic status report requests (for battery level and connection loss
@@ -459,7 +459,7 @@ volatile int   MotionPlusDetectCount;      // waiting for the result
       // Note: MAX_QUEUE_ENTRIES _must_ be a power-of-2, as it
       //  uses index wraparound optimisations.
       static const unsigned MAX_QUEUE_ENTRIES = 1<<7;
-    
+
       inline bool IsEmpty() const { return (ReadIndex == WriteIndex); }
 
       bool Allocate  ()  { // allocate memory (only when needed)
@@ -473,14 +473,14 @@ volatile int   MotionPlusDetectCount;      // waiting for the result
                 delete[] Queue; Queue = NULL;
                 ReadIndex = WriteIndex = 0;
                 }
-                
+
       struct queue_entry
         {
         queue_entry() { memset(Report, 0, sizeof(Report)); }
-        
+
         BYTE Report [REPORT_LENGTH];
         } *Queue;
-      
+
       unsigned ReadIndex, WriteIndex;
       } HID;
 #endif

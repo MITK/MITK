@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -67,7 +67,7 @@ class mitkDataNodeSegmentationTestClass { public:
 static void TestDataSetting(mitk::DataNode::Pointer dataNode)
 {
 
-  mitk::BaseData::Pointer baseData; 
+  mitk::BaseData::Pointer baseData;
 
   //NULL pointer Test
   dataNode->SetData(baseData);
@@ -102,7 +102,7 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a ContourSetMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-  
+
   //3D Mappers
   mapper = mitk::ContourSetVtkMapper3D::New();
   dataNode->SetMapper(1,mapper);
@@ -123,7 +123,7 @@ static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
   mitk::Interactor::Pointer interactor;
 
   MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a NULL pointer was set correctly (Interactor)" )
-  
+
   interactor = mitk::ContourInteractor::New("AffineInteractions click to select", dataNode);
   MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a ContourInteractor was set correctly" )
 
@@ -141,24 +141,24 @@ int mitkDataNodeSegmentationTest(int /* argc */, char* /*argv*/[])
   // Global interaction must(!) be initialized
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::DataNode::Pointer myDataNode = mitk::DataNode::New();
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myDataNode.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(myDataNode.IsNotNull(),"Testing instantiation")
 
   //test setData() Method
   mitkDataNodeSegmentationTestClass::TestDataSetting(myDataNode);
   mitkDataNodeSegmentationTestClass::TestMapperSetting(myDataNode);
-  
+
   //note, that no data is set to the dataNode
   mitkDataNodeSegmentationTestClass::TestInteractorSetting(myDataNode);
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!
-  
+
   // always end with this!
   MITK_TEST_END()
 }

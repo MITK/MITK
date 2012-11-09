@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,20 +30,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-void BoundingObjectCutter::SetBoundingObject( const mitk::BoundingObject* boundingObject ) 
+void BoundingObjectCutter::SetBoundingObject( const mitk::BoundingObject* boundingObject )
 {
   m_BoundingObject = const_cast<mitk::BoundingObject*>(boundingObject);
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(1, 
+  this->ProcessObject::SetNthInput(1,
     const_cast< mitk::BoundingObject * >( boundingObject ) );
 }
 
-const mitk::BoundingObject* BoundingObjectCutter::GetBoundingObject() const 
+const mitk::BoundingObject* BoundingObjectCutter::GetBoundingObject() const
 {
   return m_BoundingObject.GetPointer();
 }
 
-BoundingObjectCutter::BoundingObjectCutter() 
+BoundingObjectCutter::BoundingObjectCutter()
   : m_BoundingObject(NULL), m_InsideValue(1), m_OutsideValue(0), m_AutoOutsideValue(false),
     m_UseInsideValue(false), m_OutsidePixelCount(0), m_InsidePixelCount(0), m_UseWholeInputRegion(false)
 {
@@ -67,9 +67,9 @@ void BoundingObjectCutter::GenerateInputRequestedRegion()
   mitk::Image* output = this->GetOutput();
   if((output->IsInitialized()==false) || (m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
-  // we have already calculated the spatial part of the 
-  // input-requested-region in m_InputRequestedRegion in 
-  // GenerateOutputInformation (which is called before 
+  // we have already calculated the spatial part of the
+  // input-requested-region in m_InputRequestedRegion in
+  // GenerateOutputInformation (which is called before
   // GenerateInputRequestedRegion).
   GenerateTimeInInputRegion(output, const_cast< mitk::Image * > ( this->GetInput() ));
   GenerateTimeInInputRegion(output, m_BoundingObject.GetPointer());
@@ -86,24 +86,24 @@ void BoundingObjectCutter::GenerateOutputInformation()
   itkDebugMacro(<<"GenerateOutputInformation()");
 
   if(input.IsNull())
-    return;  
+    return;
 
   if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
 
-  mitk::Geometry3D* boGeometry =  m_BoundingObject->GetGeometry(); 
+  mitk::Geometry3D* boGeometry =  m_BoundingObject->GetGeometry();
   mitk::Geometry3D* inputImageGeometry = input->GetSlicedGeometry();
-  // calculate bounding box of bounding-object relative to the geometry 
+  // calculate bounding box of bounding-object relative to the geometry
   // of the input image. The result is in pixel coordinates of the input
   // image (because the m_IndexToWorldTransform includes the spacing).
   mitk::BoundingBox::Pointer boBoxRelativeToImage = boGeometry->CalculateBoundingBoxRelativeToTransform( inputImageGeometry->GetIndexToWorldTransform() );
 
-  // PART I: initialize input requested region. We do this already here (and not 
-  // later when GenerateInputRequestedRegion() is called), because we 
+  // PART I: initialize input requested region. We do this already here (and not
+  // later when GenerateInputRequestedRegion() is called), because we
   // also need the information to setup the output.
 
   // pre-initialize input-requested-region to largest-possible-region
-  // and correct time-region; spatial part will be cropped by 
+  // and correct time-region; spatial part will be cropped by
   // bounding-box of bounding-object below
   m_InputRequestedRegion = input->GetLargestPossibleRegion();
 
@@ -121,7 +121,7 @@ void BoundingObjectCutter::GenerateOutputInformation()
   size[2] = (mitk::SlicedData::SizeType::SizeValueType)(max[2]+0.5)-index[2];
 
   mitk::SlicedData::RegionType boRegion(index, size);
-  
+
   if(m_UseWholeInputRegion == false)
   {
     // crop input-requested-region with region of bounding-object
@@ -141,7 +141,7 @@ void BoundingObjectCutter::GenerateOutputInformation()
   input->SetRequestedRegion(&m_InputRequestedRegion);
 
   // PART II: initialize output image
-  
+
   unsigned int dimension = input->GetDimension();
   unsigned int *dimensions = new unsigned int [dimension];
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
@@ -153,12 +153,12 @@ void BoundingObjectCutter::GenerateOutputInformation()
   // now we have everything to initialize the transform of the output
   mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
 
-  // set the transform: use the transform of the input; 
+  // set the transform: use the transform of the input;
   // the origin will be replaced afterwards
   AffineTransform3D::Pointer indexToWorldTransform = AffineTransform3D::New();
   indexToWorldTransform->SetParameters(input->GetSlicedGeometry()->GetIndexToWorldTransform()->GetParameters());
   slicedGeometry->SetIndexToWorldTransform(indexToWorldTransform);
-  
+
   // Position the output Image to match the corresponding region of the input image
   const mitk::SlicedData::IndexType& start = m_InputRequestedRegion.GetIndex();
   mitk::Point3D origin; vtk2itk(start, origin);
@@ -183,7 +183,7 @@ void BoundingObjectCutter::GenerateData()
   mitk::Image::Pointer output = this->GetOutput();
 
   if(input.IsNull())
-    return;  
+    return;
 
   if((output->IsInitialized()==false) || (m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;

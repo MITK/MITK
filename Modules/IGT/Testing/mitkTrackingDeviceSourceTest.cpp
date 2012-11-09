@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,9 +28,9 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("TrackingDeviceSource");
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::TrackingDeviceSource::Pointer mySource = mitk::TrackingDeviceSource::New();
-  
+
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
@@ -41,10 +41,10 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(mySource->GetNumberOfOutputs() == 0, "Testing GetNumberOfOutputs with NULL td");
   MITK_TEST_FOR_EXCEPTION(std::invalid_argument, mySource->Connect());
   MITK_TEST_FOR_EXCEPTION(std::invalid_argument, mySource->StartTracking());
-  
+
   mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New();
   tracker->SetRefreshRate(10);
-  
+
 
   mySource->SetTrackingDevice(tracker);
   MITK_TEST_CONDITION(mySource->GetTrackingDevice() == tracker.GetPointer(), "Testing Set/GetTrackingDevice(tracker)");
@@ -64,7 +64,7 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   mySource->Disconnect();
   MITK_TEST_CONDITION(mySource->IsConnected() == false, "Testing Disconnect()/IsConnected()");
   MITK_TEST_CONDITION(tracker->GetState() == mitk::TrackingDevice::Setup, "Testing Disconnect()/IsConnected() 2");
-  
+
   mySource->Connect();
   mySource->StartTracking();
   MITK_TEST_CONDITION(mySource->IsConnected() == true, "Testing StartTracking()/IsConnected()");
@@ -83,7 +83,7 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
 
   //test getOutputIndex()
   MITK_TEST_CONDITION(mySource->GetOutputIndex(nd0->GetName())==0,"Testing GetOutputIndex()");
-  
+
   //test GraftNthOutput()
   mitk::NavigationData::Pointer ndCopy = mitk::NavigationData::New();
   mySource->GraftNthOutput(1,nd0);
@@ -111,7 +111,7 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
 
   mySource->StopTracking();
   mySource->Disconnect();
-  
+
   tracker = mitk::VirtualTrackingDevice::New();
   mySource->SetTrackingDevice(tracker);
   MITK_TEST_CONDITION(watch->GetReferenceCount() == 0, "Testing if reference to previous tracker object is released");

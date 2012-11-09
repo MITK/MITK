@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,24 +39,24 @@ public:
 
   int GetNumberOfIterations();
   Ui::QmitkBSplineRegistrationViewControls m_Controls;
-  
+
   void SetFixedNode( mitk::DataNode * fixedNode );
   void SetMovingNode( mitk::DataNode * movingNode );
 
-  
 
-  
+
+
 public slots:
   void CalculateTransformation();
 
 
 protected slots:
  /*!
-   * Prints the values of the deformationfield 
+   * Prints the values of the deformationfield
    */
   void PrintDeformationField();
 
- 
+
 
   /*!
    * Select a deformation field
@@ -68,12 +68,12 @@ protected slots:
 
 
 protected:
-  
+
   mitk::DataNode* m_FixedNode;
   mitk::DataNode* m_MovingNode;
   mitk::OptimizerParameters::Pointer m_OptimizerParameters;
 
- 
+
   void setOptimizerParameters();
 };
 

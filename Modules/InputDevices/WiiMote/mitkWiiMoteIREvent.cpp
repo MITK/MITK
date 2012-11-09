@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::WiiMoteIREvent::WiiMoteIREvent(
   mitk::Vector2D inputData
 , double recordTime
-, int sliceNavigationValue ) 
+, int sliceNavigationValue )
 : Event(NULL, mitk::Type_WiiMoteInput, mitk::BS_NoButton, mitk::BS_NoButton, Key_none)
 {
  this->m_MovementVector = inputData;
@@ -26,7 +26,7 @@ mitk::WiiMoteIREvent::WiiMoteIREvent(
  this->m_SliceNavigationValue = sliceNavigationValue;
 }
 
-mitk::WiiMoteIREvent::~WiiMoteIREvent() 
+mitk::WiiMoteIREvent::~WiiMoteIREvent()
 {
 }
 
@@ -46,18 +46,18 @@ int mitk::WiiMoteIREvent::GetSliceNavigationValue() const
 }
 
 const char* mitk::WiiMoteIREvent::GetEventName() const
-{ 
-  return "WiiMoteIREvent"; 
-} 
+{
+  return "WiiMoteIREvent";
+}
 
 bool mitk::WiiMoteIREvent::CheckEvent(const itk::EventObject *e) const
-{ 
-  return dynamic_cast<const Self*>(e); 
-} 
+{
+  return dynamic_cast<const Self*>(e);
+}
 
 itk::EventObject* mitk::WiiMoteIREvent::MakeObject() const
-{ 
+{
   return new Self( this->GetMovementVector()
       , this->GetRecordTime()
-      , this->GetSliceNavigationValue() ); 
-} 
+      , this->GetSliceNavigationValue() );
+}

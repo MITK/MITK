@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -91,7 +91,7 @@ mitk::Geometry3D::Pointer mitk::ConnectomicsSyntheticNetworkGenerator::GenerateD
   spacing[2] = one;
   geometry->SetSpacing(spacing);
 
-  // transform 
+  // transform
   vtkMatrix4x4* transformMatrix = vtkMatrix4x4::New();
   transformMatrix->SetElement(0,0,one);
   transformMatrix->SetElement(1,0,zero);
@@ -114,7 +114,7 @@ mitk::Geometry3D::Pointer mitk::ConnectomicsSyntheticNetworkGenerator::GenerateD
   return geometry;
 }
 
-void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCubeNetwork( 
+void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCubeNetwork(
   mitk::ConnectomicsNetwork::Pointer network, int cubeExtent, double distance )
 {
   // map for storing the conversion from indices to vertex descriptor
@@ -154,7 +154,7 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCubeNetwork(
     }
   }
 
-  int edgeID(0), edgeSourceID(0), edgeTargetID(0); 
+  int edgeID(0), edgeSourceID(0), edgeTargetID(0);
   // uniform weight of one
   int edgeWeight(1);
 
@@ -207,7 +207,7 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCubeNetwork(
   m_LastGenerationWasSuccess = true;
 }
 
-void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCenterToSurfaceNetwork( 
+void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCenterToSurfaceNetwork(
   mitk::ConnectomicsNetwork::Pointer network, int numberOfPoints, double radius )
 {
   //the random number generators
@@ -327,7 +327,7 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticRandomNetwork
     idToVertexMap.insert( std::pair< int, mitk::ConnectomicsNetwork::VertexDescriptorType >( loopID, newVertex) );
   }
 
-  int edgeID(0); 
+  int edgeID(0);
   // uniform weight of one
   int edgeWeight(1);
 
@@ -336,15 +336,15 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticRandomNetwork
 
   for( int loopID( 0 ); loopID < numberOfPoints; loopID++  )
   {
-    // to avoid creating an edge twice (this being an undirected graph) we only 
+    // to avoid creating an edge twice (this being an undirected graph) we only
     // potentially generate edges with all nodes with a bigger ID
     for( int innerLoopID( loopID ); innerLoopID < numberOfPoints; innerLoopID++  )
     {
       if( rng.drand64( 0.0 , 1.0) > threshold)
       {
         // do nothing
-      } 
-      else 
+      }
+      else
       {
         source = idToVertexMap.find( loopID )->second;
         target = idToVertexMap.find( innerLoopID )->second;

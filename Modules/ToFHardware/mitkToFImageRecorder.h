@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,7 +41,7 @@ namespace mitk
   */
   class MITK_TOFHARDWARE_EXPORT ToFImageRecorder : public itk::Object
   {
-  public: 
+  public:
 
     ToFImageRecorder();
 
@@ -167,7 +167,7 @@ namespace mitk
     int m_ThreadID; ///< ID of the thread recording the data
     itk::FastMutexLock::Pointer m_AbortMutex; ///< mutex for thread-safe data access of abort flag
     bool m_Abort; ///< flag controlling the abort mechanism of the recording procedure. For thread-safety only use in combination with m_AbortMutex
-    
+
   private:
 
   };

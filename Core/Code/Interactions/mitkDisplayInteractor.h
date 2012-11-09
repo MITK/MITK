@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,7 +41,7 @@ namespace mitk {
     */
     DisplayInteractor(mitk::BaseRenderer *ren = 0);
 
-    /*! 
+    /*!
     \brief implementation of ExecuteOperation from mitk::OperationActor interface
     this method triggers the zooming and panning stuff in the appropriate renderer
     */
@@ -56,6 +56,6 @@ namespace mitk {
 
   };
 
-} // end of namespace mitk 
+} // end of namespace mitk
 
 #endif //_MITK_DISPLAY_INTERACTOR_H_

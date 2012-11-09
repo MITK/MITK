@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ namespace mitk {
   *        to the harddisc.
   *
   * \ingroup IGT
-  */  
+  */
   class MitkIGT_EXPORT NavigationToolStorageSerializer : public itk::Object
   {
   public:
@@ -46,7 +46,7 @@ namespace mitk {
      *                             if the temp directory is not accessible.
      */
     bool Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage);
-    
+
     /**
      * @brief This method is decrepated. Exceptions are used for error handling now!
      * @return Returns always an empty string since error handling was converted to exception handling.

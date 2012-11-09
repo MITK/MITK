@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,7 +46,7 @@ mitk::IInputDevice::Pointer mitk::InputDeviceDescriptor::CreateInputDevice()
   return this->m_InputDevice;
 }
 
-std::string mitk::InputDeviceDescriptor::GetID() const 
+std::string mitk::InputDeviceDescriptor::GetID() const
 {
   std::string idOfExtensionPoint;
   this->m_InputDeviceExtensionPoint->GetAttribute(mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_ID,idOfExtensionPoint);
@@ -55,7 +55,7 @@ std::string mitk::InputDeviceDescriptor::GetID() const
 
 std::string mitk::InputDeviceDescriptor::GetDescription() const
 {
-  std::vector<berry::IConfigurationElement::Pointer> 
+  std::vector<berry::IConfigurationElement::Pointer>
     descriptions(this->m_InputDeviceExtensionPoint->GetChildren(mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_DESCRIPTION));
 
   if(!descriptions.empty())

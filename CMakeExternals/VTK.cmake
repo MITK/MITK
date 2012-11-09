@@ -35,7 +35,7 @@ if(NOT DEFINED VTK_DIR)
          -DVTK_WINDOWS_PYTHON_DEBUGGABLE:BOOL=OFF
         )
   endif()
-  
+
   if(MITK_USE_QT)
     list(APPEND additional_cmake_args
         -DDESIRED_QT_VERSION:STRING=4
@@ -67,7 +67,7 @@ if(NOT DEFINED VTK_DIR)
         -DVTK_WRAP_TCL:BOOL=OFF
         -DVTK_WRAP_PYTHON:BOOL=OFF
         -DVTK_WRAP_JAVA:BOOL=OFF
-        -DBUILD_SHARED_LIBS:BOOL=ON 
+        -DBUILD_SHARED_LIBS:BOOL=ON
         -DVTK_USE_PARALLEL:BOOL=ON
         -DVTK_USE_CHARTS:BOOL=OFF
         -DVTK_USE_QTCHARTS:BOOL=ON
@@ -84,5 +84,5 @@ if(NOT DEFINED VTK_DIR)
 else()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
-  
+
 endif()

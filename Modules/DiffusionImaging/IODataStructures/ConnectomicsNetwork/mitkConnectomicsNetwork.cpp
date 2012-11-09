@@ -3,12 +3,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,13 +30,13 @@ mitk::ConnectomicsNetwork::~ConnectomicsNetwork()
 
 /* Wrapper methods */
 
-bool mitk::ConnectomicsNetwork::EdgeExists( 
+bool mitk::ConnectomicsNetwork::EdgeExists(
   mitk::ConnectomicsNetwork::VertexDescriptorType vertexA, mitk::ConnectomicsNetwork::VertexDescriptorType vertexB ) const
 {
   return boost::edge(vertexA, vertexB, m_Network ).second;
 }
 
-void mitk::ConnectomicsNetwork::IncreaseEdgeWeight( 
+void mitk::ConnectomicsNetwork::IncreaseEdgeWeight(
   mitk::ConnectomicsNetwork::VertexDescriptorType vertexA, mitk::ConnectomicsNetwork::VertexDescriptorType vertexB )
 {
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].weight++;
@@ -44,17 +44,17 @@ void mitk::ConnectomicsNetwork::IncreaseEdgeWeight(
   SetIsModified( true );
 }
 
-void mitk::ConnectomicsNetwork::AddEdge( 
-                                        mitk::ConnectomicsNetwork::VertexDescriptorType vertexA, 
+void mitk::ConnectomicsNetwork::AddEdge(
+                                        mitk::ConnectomicsNetwork::VertexDescriptorType vertexA,
                                         mitk::ConnectomicsNetwork::VertexDescriptorType vertexB
                                         )
 {
   AddEdge(vertexA, vertexB, m_Network[ vertexA ].id, m_Network[ vertexB ].id );
 }
 
-void mitk::ConnectomicsNetwork::AddEdge( 
-                                        mitk::ConnectomicsNetwork::VertexDescriptorType vertexA, 
-                                        mitk::ConnectomicsNetwork::VertexDescriptorType vertexB, 
+void mitk::ConnectomicsNetwork::AddEdge(
+                                        mitk::ConnectomicsNetwork::VertexDescriptorType vertexA,
+                                        mitk::ConnectomicsNetwork::VertexDescriptorType vertexB,
                                         int sourceID, int targetID, int weight )
 {
   boost::add_edge( vertexA, vertexB, m_Network );
@@ -76,7 +76,7 @@ mitk::ConnectomicsNetwork::VertexDescriptorType mitk::ConnectomicsNetwork::AddVe
   return vertex;
 }
 
-void mitk::ConnectomicsNetwork::SetLabel( 
+void mitk::ConnectomicsNetwork::SetLabel(
   mitk::ConnectomicsNetwork::VertexDescriptorType vertex, std::string inLabel )
 {
   m_Network[vertex].label = inLabel;
@@ -84,7 +84,7 @@ void mitk::ConnectomicsNetwork::SetLabel(
   SetIsModified( true );
 }
 
-void mitk::ConnectomicsNetwork::SetCoordinates( 
+void mitk::ConnectomicsNetwork::SetCoordinates(
   mitk::ConnectomicsNetwork::VertexDescriptorType vertex, std::vector< float > inCoordinates )
 {
   m_Network[vertex].coordinates = inCoordinates;
@@ -123,7 +123,7 @@ void mitk::ConnectomicsNetwork::SetRequestedRegion( itk::DataObject *data )
 
 
 
-std::vector< mitk::ConnectomicsNetwork::NetworkNode > 
+std::vector< mitk::ConnectomicsNetwork::NetworkNode >
 mitk::ConnectomicsNetwork::GetVectorOfAllNodes() const
 {
   boost::graph_traits<NetworkType>::vertex_iterator iterator, end;
@@ -146,7 +146,7 @@ mitk::ConnectomicsNetwork::GetVectorOfAllNodes() const
   return vectorOfNodes;
 }
 
-std::vector< mitk::ConnectomicsNetwork::VertexDescriptorType > 
+std::vector< mitk::ConnectomicsNetwork::VertexDescriptorType >
 mitk::ConnectomicsNetwork::GetVectorOfAllVertexDescriptors() const
 {
   boost::graph_traits<NetworkType>::vertex_iterator iterator, end;
@@ -164,9 +164,9 @@ mitk::ConnectomicsNetwork::GetVectorOfAllVertexDescriptors() const
   return vectorOfDescriptors;
 }
 
-std::vector< std::pair< 
-std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode > 
-, mitk::ConnectomicsNetwork::NetworkEdge > > 
+std::vector< std::pair<
+std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode >
+, mitk::ConnectomicsNetwork::NetworkEdge > >
 mitk::ConnectomicsNetwork::GetVectorOfAllEdges() const
 {
   boost::graph_traits<NetworkType>::edge_iterator iterator, end;
@@ -174,11 +174,11 @@ mitk::ConnectomicsNetwork::GetVectorOfAllEdges() const
   // sets iterator to start end end to end
   boost::tie(iterator, end) = boost::edges( m_Network );
 
-  std::vector< 
-    std::pair< 
-    std::pair< NetworkNode, NetworkNode > 
-    , NetworkEdge 
-    > 
+  std::vector<
+    std::pair<
+    std::pair< NetworkNode, NetworkNode >
+    , NetworkEdge
+    >
   > vectorOfEdges;
 
   for ( ; iterator != end; ++iterator)
@@ -238,7 +238,7 @@ int mitk::ConnectomicsNetwork::GetNumberOfSelfLoops()
 {
   int noOfSelfLoops( 0 );
 
-  std::vector< std::pair< std::pair< NetworkNode, NetworkNode > , NetworkEdge > > 
+  std::vector< std::pair< std::pair< NetworkNode, NetworkNode > , NetworkEdge > >
     edgeVector =  GetVectorOfAllEdges();
 
   for( int index = 0; index < edgeVector.size() ; index++ )
@@ -254,11 +254,11 @@ int mitk::ConnectomicsNetwork::GetNumberOfSelfLoops()
 
     // if the coordinates are the same
     if(
-      sourceX > ( targetX - 0.01 ) && 
+      sourceX > ( targetX - 0.01 ) &&
       sourceX < ( targetX + 0.01 ) &&
-      sourceY > ( targetY - 0.01 ) && 
+      sourceY > ( targetY - 0.01 ) &&
       sourceY < ( targetY + 0.01 ) &&
-      sourceZ > ( targetZ - 0.01 ) && 
+      sourceZ > ( targetZ - 0.01 ) &&
       sourceZ < ( targetZ + 0.01 )
       )
     {
@@ -305,7 +305,7 @@ std::vector< int > mitk::ConnectomicsNetwork::GetDegreeOfNodes( ) const
   return vectorOfDegree;
 }
 
-std::vector< mitk::ConnectomicsNetwork::VertexDescriptorType > 
+std::vector< mitk::ConnectomicsNetwork::VertexDescriptorType >
 mitk::ConnectomicsNetwork::GetVectorOfAdjacentNodes( mitk::ConnectomicsNetwork::VertexDescriptorType vertex ) const
 {
   std::vector< mitk::ConnectomicsNetwork::VertexDescriptorType > vectorOfAdjacentNodes;
@@ -350,10 +350,10 @@ std::vector< double > mitk::ConnectomicsNetwork::GetLocalClusteringCoefficients(
   std::pair<vertexIter, vertexIter> vertexPair;
 
   //for every vertex calculate the clustering coefficient
-  for (vertexPair = vertices(m_Network); vertexPair.first != vertexPair.second; ++vertexPair.first) 
+  for (vertexPair = vertices(m_Network); vertexPair.first != vertexPair.second; ++vertexPair.first)
   {
-    vectorOfClusteringCoefficients[ m_Network[ *vertexPair.first ].id ] = 
-      boost::clustering_coefficient(m_Network,*vertexPair.first) ;        
+    vectorOfClusteringCoefficients[ m_Network[ *vertexPair.first ].id ] =
+      boost::clustering_coefficient(m_Network,*vertexPair.first) ;
   }
 
   return vectorOfClusteringCoefficients;
@@ -414,8 +414,8 @@ double mitk::ConnectomicsNetwork::GetGlobalClusteringCoefficient( )
   // k is the degree
   for( int degree( 0 ); degree < degreeDistribution.size(); ++degree )
   {
-    globalClusteringCoefficient += 
-      degreeDistribution[ degree ] / ( (double) normalizationParameter) 
+    globalClusteringCoefficient +=
+      degreeDistribution[ degree ] / ( (double) normalizationParameter)
       * vectorOfClusteringCoefficientsByDegree[ degree ];
   }
 

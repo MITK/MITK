@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,7 +47,7 @@ DataStorage* mitk::NonBlockingAlgorithm::GetDataStorage()
 
 
 void NonBlockingAlgorithm::Initialize(const NonBlockingAlgorithm* itkNotUsed(other))
-{ 
+{
   // define one input, one output basedata object
 
   // some basedata input - image, surface, whatever
@@ -86,7 +86,7 @@ void NonBlockingAlgorithm::UnDefineTriggerParameter(const char* parameter)
   if ( iter != m_TriggerPropertyConnections.end() )
   {
     BaseProperty* value = m_Parameters->GetProperty( parameter );
-    
+
     MITK_ERROR(!value) << "NonBlockingAlgorithm::UnDefineTriggerProperty() in bad state." << std::endl; ;
 
     value->RemoveObserver( m_TriggerPropertyConnections[parameter] );
@@ -95,10 +95,10 @@ void NonBlockingAlgorithm::UnDefineTriggerParameter(const char* parameter)
 }
 
 
-void NonBlockingAlgorithm::Reset() 
-{ 
-  Initialize(); 
-} 
+void NonBlockingAlgorithm::Reset()
+{
+  Initialize();
+}
 
 
 void NonBlockingAlgorithm::StartBlockingAlgorithm()
@@ -129,7 +129,7 @@ void NonBlockingAlgorithm::StartAlgorithm()
 void NonBlockingAlgorithm::StopAlgorithm()
 {
   if (m_ThreadID == -1) return; // thread not running
- 
+
   m_MultiThreader->TerminateThread( m_ThreadID ); // waits for the thread to terminate on its own
 }
 
@@ -139,13 +139,13 @@ ITK_THREAD_RETURN_TYPE NonBlockingAlgorithm::StaticNonBlockingAlgorithmThread(vo
 {
   // itk::MultiThreader provides an itk::MultiThreader::ThreadInfoStruct as parameter
   itk::MultiThreader::ThreadInfoStruct* itkmttis = static_cast<itk::MultiThreader::ThreadInfoStruct*>(param);
-  
+
   // we need the UserData part of that structure
   ThreadParameters* flsp = static_cast<ThreadParameters*>(itkmttis->UserData);
 
   NonBlockingAlgorithm::Pointer algorithm = flsp->m_Algorithm;
   // this UserData tells us, which BubbleTool's method to call
-  if (!algorithm) 
+  if (!algorithm)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
@@ -171,7 +171,7 @@ ITK_THREAD_RETURN_TYPE NonBlockingAlgorithm::StaticNonBlockingAlgorithmThread(vo
       CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
       //algorithm->ThreadedUpdateFailed();
     }
-    
+
     algorithm->m_ParameterListMutex->Lock();
   }
   algorithm->m_ParameterListMutex->Unlock();
@@ -189,7 +189,7 @@ bool NonBlockingAlgorithm::ReadyToRun()
 {
   return true; // default is always ready
 }
-    
+
 bool NonBlockingAlgorithm::ThreadedUpdateFunction()
 {
   return true;
@@ -199,13 +199,13 @@ bool NonBlockingAlgorithm::ThreadedUpdateFunction()
 void NonBlockingAlgorithm::ThreadedUpdateSuccessful(const itk::EventObject&)
 {
   ThreadedUpdateSuccessful();
-  
+
   m_ParameterListMutex->Lock();
   m_ThreadID = -1; // tested before starting
   m_ParameterListMutex->Unlock();
   m_ThreadParameters.m_Algorithm = NULL;
 }
-    
+
 void NonBlockingAlgorithm::ThreadedUpdateSuccessful()
 {
   // notify observers that a result is ready
@@ -216,13 +216,13 @@ void NonBlockingAlgorithm::ThreadedUpdateSuccessful()
 void NonBlockingAlgorithm::ThreadedUpdateFailed(const itk::EventObject&)
 {
   ThreadedUpdateFailed();
-  
+
   m_ParameterListMutex->Lock();
   m_ThreadID = -1; // tested before starting
   m_ParameterListMutex->Unlock();
   m_ThreadParameters.m_Algorithm = NULL; //delete
 }
- 
+
 void NonBlockingAlgorithm::ThreadedUpdateFailed()
 {
   // notify observers that something went wrong

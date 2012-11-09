@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,12 +29,12 @@ m_Width (3.0)
   Superclass::InitializeTimeSlicedGeometry();
 }
 
-mitk::Contour::Contour( const Contour & other ): BaseData(other), 
+mitk::Contour::Contour( const Contour & other ): BaseData(other),
 m_ContourPath(other.m_ContourPath),
-m_CurrentWindow(other.m_CurrentWindow), 
-m_BoundingBox(other.m_BoundingBox), 
-m_Vertices(other.m_Vertices), 
-m_Closed(other.m_Closed), 
+m_CurrentWindow(other.m_CurrentWindow),
+m_BoundingBox(other.m_BoundingBox),
+m_Vertices(other.m_Vertices),
+m_Closed(other.m_Closed),
 m_Selected(other.m_Selected),
 m_Width(other.m_Width)
 {
@@ -150,7 +150,7 @@ void mitk::Contour::PrintSelf( std::ostream& os, itk::Indent indent) const
   os << indent << "Number of verticies:  " << GetNumberOfPoints() << std::endl;
 
   mitk::Contour::PointsContainerIterator pointsIt = m_Vertices->Begin(), end = m_Vertices->End();
-  
+
   os << indent << "Verticies:  " << std::endl;
 
   int i = 0;

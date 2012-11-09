@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,11 +33,11 @@ namespace itk
  * In the context of image registration, the image to be used are reference will
  * be the fixed image. The BSpline grid will use the fixed image as a base for
  * computing the grid spacing, orientation and origin, among other things.
- * 
- * 
+ *
+ *
  * \ingroup Transforms
  */
-template < class TTransform, class TImage > 
+template < class TTransform, class TImage >
 class ITK_EXPORT BSplineDeformableTransformInitializer : public Object
 {
 public:
@@ -46,7 +46,7 @@ public:
   typedef Object                                    Superclass;
   typedef SmartPointer<Self>                        Pointer;
   typedef SmartPointer<const Self>                  ConstPointer;
-    
+
   /** New macro for creation of through a Smart Pointer. */
   itkNewMacro( Self );
 
@@ -63,14 +63,14 @@ public:
 
 
   /** Dimension of parameters. */
-  itkStaticConstMacro(SpaceDimension, unsigned int, 
+  itkStaticConstMacro(SpaceDimension, unsigned int,
                       TransformType::InputSpaceDimension);
 
   /** Image Types to use in the initialization of the transform */
   typedef   TImage                             ImageType;
   typedef   typename ImageType::ConstPointer   ImagePointer;
 
-  
+
   /** Set the transform to be initialized */
   itkSetObjectMacro( Transform,   TransformType   );
 

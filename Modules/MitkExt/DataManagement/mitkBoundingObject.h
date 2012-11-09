@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,7 +32,7 @@ namespace mitk {
 class MitkExt_EXPORT BoundingObject : public mitk::Surface     //BaseData
 {
 public:
-  mitkClassMacro(BoundingObject, mitk::Surface);  
+  mitkClassMacro(BoundingObject, mitk::Surface);
 
   virtual bool IsInside(const mitk::Point3D& p) const=0;
 
@@ -44,8 +44,8 @@ public:
   //##Documentation
   //## @brief Sets the Geometry3D of the bounding object to fit the given
   //## geometry.
-  //## 
-  //## The fit is done once, so if the given geometry changes it will 
+  //##
+  //## The fit is done once, so if the given geometry changes it will
   //## \em not effect the bounding object.
   virtual void FitGeometry(Geometry3D* aGeometry3D);
 protected:
@@ -55,9 +55,9 @@ protected:
   bool WriteXMLData( XMLWriter& xmlWriter );
 
   //##Documentation
-  //## \brief If \a true, the Boundingobject describes a positive volume, 
+  //## \brief If \a true, the Boundingobject describes a positive volume,
   //## if \a false a negative volume.
-  //## 
+  //##
   bool m_Positive;
 };
 

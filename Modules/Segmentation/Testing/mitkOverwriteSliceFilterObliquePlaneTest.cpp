@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -43,16 +43,16 @@ static void OverwriteObliquePlaneTest(mitk::Image* workingImage, mitk::Image* re
 
     /* ============= setup plane ============*/
   int sliceindex = (int)(VolumeSize/2);//rand() % 32;
-  bool isFrontside = true; 
+  bool isFrontside = true;
   bool isRotated = false;
 
   mitk::PlaneGeometry::Pointer obliquePlane = mitk::PlaneGeometry::New();
   obliquePlane->InitializeStandardPlane(workingImage->GetGeometry(), mitk::PlaneGeometry::Axial, sliceindex, isFrontside, isRotated);
   mitk::Point3D origin = obliquePlane->GetOrigin();
   mitk::Vector3D normal;
-  normal = obliquePlane->GetNormal();    
-  normal.Normalize();    
-  origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5    
+  normal = obliquePlane->GetNormal();
+  normal.Normalize();
+  origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
   obliquePlane->SetOrigin(origin);
 
   mitk::Vector3D rotationVector = obliquePlane->GetAxisVector(0);
@@ -101,7 +101,7 @@ static void OverwriteObliquePlaneTest(mitk::Image* workingImage, mitk::Image* re
     for (int y = 0; y < VolumeSize; ++y){
       id[1] = y;
       for (int z = 0; z < VolumeSize; ++z){
-        id[2] = z;          
+        id[2] = z;
         areSame = refImg->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
         if(!areSame)
           goto stop;
@@ -152,7 +152,7 @@ stop:
     for (int y = 0; y < VolumeSize; ++y){
       id[1] = y;
       for (int z = 0; z < VolumeSize; ++z){
-        id[2] = z;          
+        id[2] = z;
         areSame = refImg->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
         if(!areSame)
           goto stop2;
@@ -173,7 +173,7 @@ stop2:
   double val = 33.0;
 
   slice->SetScalarComponentFromDouble(idX,idY,idZ,component,val);
-  
+
   mitk::Vector3D indx;
   indx[0] = idX; indx[1] = idY; indx[2] = idZ;
   sliceInMitk->GetGeometry()->IndexToWorld(indx, indx);
@@ -189,7 +189,7 @@ stop2:
   overwriter3->SetVtkOutputRequest(true);
   overwriter3->Modified();
   overwriter3->Update();
-  
+
 
 
 
@@ -203,7 +203,7 @@ stop2:
     for ( y = 0; y < VolumeSize; ++y){
       id[1] = y;
       for ( z = 0; z < VolumeSize; ++z){
-        id[2] = z;          
+        id[2] = z;
         areSame = refImg->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
         if(!areSame)
           goto stop3;
@@ -211,7 +211,7 @@ stop2:
     }
   }
 stop3:
-  //MITK_INFO << "index: [" << x << ", " << y << ", " << z << "]"; 
+  //MITK_INFO << "index: [" << x << ", " << y << ", " << z << "]";
   //MITK_INFO << indx;
   MITK_TEST_CONDITION(x==idX && y==z,"overwrited the right index [oblique]");
 }
@@ -226,7 +226,7 @@ int mitkOverwriteSliceFilterObliquePlaneTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkOverwriteSliceFilterObliquePlaneTest")
 
 
-    
+
 
     typedef itk::Image<unsigned short, 3> ImageType;
 
@@ -252,9 +252,9 @@ int mitkOverwriteSliceFilterObliquePlaneTest(int argc, char* argv[])
     ImageIterator imageIterator( image, image->GetLargestPossibleRegion() );
     imageIterator.GoToBegin();
 
-    
+
     unsigned short pixelValue = 0;
-    
+
     //fill the image with distinct values
     while ( !imageIterator.IsAtEnd() )
     {
@@ -263,7 +263,7 @@ int mitkOverwriteSliceFilterObliquePlaneTest(int argc, char* argv[])
       ++pixelValue;
     }
     /* end setup itk image */
-    
+
 
 
     mitk::Image::Pointer refImage;

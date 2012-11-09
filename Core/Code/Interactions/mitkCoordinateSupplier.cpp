@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,9 +44,9 @@ mitk::CoordinateSupplier::~CoordinateSupplier()
 bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
     bool ok = false;
-  
+
     const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-    
+
     PointOperation* doOp=NULL;
     if(posEvent!=NULL)
     {
@@ -117,8 +117,8 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         {
           if (m_Destination == NULL)
             return false;
-          /*finishes a Movement from the coordinate supplier: 
-          gets the lastpoint from the undolist and writes an undo-operation so 
+          /*finishes a Movement from the coordinate supplier:
+          gets the lastpoint from the undolist and writes an undo-operation so
           that the movement of the coordinatesupplier is undoable.*/
           mitk::Point3D movePoint = posEvent->GetWorldPosition();
           mitk::Point3D oldMovePoint; oldMovePoint.Fill(0);

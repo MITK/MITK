@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,7 +50,7 @@ public:
   void SetPredicate(mitk::NodePredicateBase* pred);
   mitk::NodePredicateBase* GetPredicate() const;
 
-  std::vector<mitk::DataNode*> GetDataNodes() const; 
+  std::vector<mitk::DataNode*> GetDataNodes() const;
 
   mitk::DataNode::Pointer getNode(const QModelIndex &index) const;
 
@@ -72,13 +72,13 @@ public:
   virtual void NodeRemoved(const mitk::DataNode* node);
 
   ///
-  /// \brief Called when a itk::Object that is hold as a member variable was 
+  /// \brief Called when a itk::Object that is hold as a member variable was
   /// modified in order to react to it.
   ///
   virtual void OnModified(const itk::Object *caller, const itk::EventObject &event);
 
   ///
-  /// \brief Called when a itk::Object that is hold as a member variable is about to be 
+  /// \brief Called when a itk::Object that is hold as a member variable is about to be
   /// deleted in order to react to it.
   ///
   virtual void OnDelete(const itk::Object *caller, const itk::EventObject &event);
@@ -118,7 +118,7 @@ protected:
 
   ///
   /// Saves if this model is currently working on events to prevent endless event loops.
-  /// 
+  ///
   bool m_BlockEvents;
 };
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,7 +32,7 @@ class Image;
   \sa FeedbackContourTool
   \sa ExtractImageFilter
   \sa OverwriteSliceImageFilter
-  
+
   \ingroup Interaction
   \ingroup ToolManagerEtAl
 
@@ -41,7 +41,7 @@ class Image;
   the (filled) contour as a binary image.
 
   The painting "color" is defined by m_PaintingPixelValue, which is set in the constructor
-  (by sub-classes) or during some event (e.g. in OnInvertLogic - when CTRL is pressed). 
+  (by sub-classes) or during some event (e.g. in OnInvertLogic - when CTRL is pressed).
 
   \warning Only to be instantiated by mitk::ToolManager.
 
@@ -50,17 +50,17 @@ class Image;
 class Segmentation_EXPORT ContourTool : public FeedbackContourTool
 {
   public:
-    
+
     mitkClassMacro(ContourTool, FeedbackContourTool);
 
   protected:
-   
+
     ContourTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~ContourTool();
 
     virtual void Activated();
     virtual void Deactivated();
-    
+
     virtual bool OnMousePressed (Action*, const StateEvent*);
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,9 +53,9 @@ mitk::ManufacturerLogo::ManufacturerLogo()
   m_Mapper            = vtkImageMapper::New();
   m_PngReader         = vtkPNGReader::New();
   m_VtkImageImport    = vtkImageImport::New();
-  
+
   m_LogoPosition  = mitk::ManufacturerLogo::LowerRight;
- 
+
   m_IsEnabled                  = false;
   m_ForceShowMBIDepartmentLogo = false;
 
@@ -71,13 +71,13 @@ mitk::ManufacturerLogo::~ManufacturerLogo()
   if ( m_RenderWindow != NULL )
     if ( this->IsEnabled() )
       this->Disable();
-  
+
   if ( m_Mapper != NULL )
     m_Mapper->Delete();
-  
+
   if ( m_Actor!=NULL )
     m_Actor->Delete();
-  
+
   if ( m_Renderer != NULL )
     m_Renderer->Delete();
 
@@ -129,7 +129,7 @@ vtkImageActor* mitk::ManufacturerLogo::GetActor()
 }
 
 /**
- * Returns the mapper associated with the 
+ * Returns the mapper associated with the
  * logo.
  */
 vtkImageMapper* mitk::ManufacturerLogo::GetMapper()
@@ -172,7 +172,7 @@ void mitk::ManufacturerLogo::Enable()
 
       // flip mbi logo around y axis and change color order
       m_ImageData = new char[mbiLogo_Height*mbiLogo_Width*mbiLogo_NumberOfScalars];
-      
+
       unsigned int column, row;
       char * dest   = m_ImageData;
       char * source = (char*) &mbiLogo_Data[0];;
@@ -189,25 +189,25 @@ void mitk::ManufacturerLogo::Enable()
             *dest++ = g;
             *dest++ = b;
             *dest++ = a;
-          }        
+          }
 
       m_VtkImageImport->SetImportVoidPointer(m_ImageData);
       m_VtkImageImport->Modified();
       m_VtkImageImport->Update();
-      
+
       m_Actor->SetInput(m_VtkImageImport->GetOutput());
     }
 
     m_Actor->SetOpacity(m_Opacity);
-    
+
     m_Renderer->AddActor( m_Actor );
     m_Renderer->InteractiveOff();
-    
+
     SetupCamera();
     SetupPosition();
-    
+
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_Renderer,false);
-    
+
     m_IsEnabled = true;
   }
 }
@@ -223,7 +223,7 @@ void mitk::ManufacturerLogo::SetupCamera()
 
   if ( !image )
     return;
-  
+
   double spacing[3];
   double origin[3];
   int   dimensions[3];
@@ -261,7 +261,7 @@ void mitk::ManufacturerLogo::SetupCamera()
 
 void mitk::ManufacturerLogo::SetupPosition()
 { // Position and Scale of the logo
-  
+
   double newPos[4];
   int dimensions[3];
   vtkImageData * image = m_Actor->GetInput();
@@ -272,7 +272,7 @@ void mitk::ManufacturerLogo::SetupPosition()
   double normY = dimensions[1] / max;
 
   double buffer = 0; // buffer to the boarder of the renderwindow
- 
+
   switch(m_LogoPosition)
   {
     case mitk::ManufacturerLogo::LowerLeft:
@@ -317,7 +317,7 @@ void mitk::ManufacturerLogo::SetupPosition()
       break;
     }
   }
-    
+
   m_Renderer->SetViewport(newPos);
 }
 
@@ -365,7 +365,7 @@ void mitk::ManufacturerLogo::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::ManufacturerLogo::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return false;    
+    return false;
 }
 
 bool mitk::ManufacturerLogo::VerifyRequestedRegion()

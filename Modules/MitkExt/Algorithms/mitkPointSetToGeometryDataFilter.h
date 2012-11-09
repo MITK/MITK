@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,16 +35,16 @@ public:
    * Standard mitk class macro
    */
   mitkClassMacro( PointSetToGeometryDataFilter, GeometryDataSource );
-  
+
   itkNewMacro( Self );
-  
+
   /**
    * Common typdedefs for the input type and corresponding pointers
    */
   typedef mitk::PointSet InputType;
   typedef InputType::Pointer InputTypePointer;
   typedef InputType::ConstPointer InputTypeConstPointer;
-  
+
   /**
    * Set and Get input methods.
    */
@@ -52,22 +52,22 @@ public:
   virtual void SetInput( const unsigned int& idx, const InputType* input );
   virtual InputType* GetInput();
   virtual InputType* GetInput(const unsigned int& idx);
-  
+
 protected:
-  
+
   /**
    * Protected constructor. Use ::New instead()
    */
   PointSetToGeometryDataFilter();
-  
+
   /**
    * Protected destructor. Instances are destroyed when reference count is zero
    */
   virtual ~PointSetToGeometryDataFilter();
-  
-  
-};  
-    
+
+
+};
+
 } //end of namespace mitk
 
 

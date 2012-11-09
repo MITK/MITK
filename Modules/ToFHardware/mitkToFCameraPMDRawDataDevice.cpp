@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   ToFCameraPMDRawDataDevice::ToFCameraPMDRawDataDevice() :
-  m_SourceDataBuffer(NULL), m_SourceDataArray(NULL), m_ShortSourceData(NULL), 
+  m_SourceDataBuffer(NULL), m_SourceDataArray(NULL), m_ShortSourceData(NULL),
   m_OriginControllerWidth(0), m_OriginControllerHeight(0)
   {
     m_RawDataSource = ThreadedToFRawDataReconstruction::New();
@@ -78,7 +78,7 @@ namespace mitk
     {
       // get the first image
       this->m_Controller->UpdateCamera();
-      
+
       this->m_ImageMutex->Lock();
       this->m_Controller->GetSourceData(this->m_SourceDataBuffer[this->m_FreePos]);
       this->m_FreePos = (this->m_FreePos+1) % this->m_BufferSize;
@@ -169,16 +169,16 @@ namespace mitk
 
         if(!toFCameraDevice->m_RawDataSource->GetInit())
         {
-          toFCameraDevice->m_RawDataSource->Initialize(toFCameraDevice->m_OriginControllerWidth, 
-            toFCameraDevice->m_OriginControllerHeight, 
-            toFCameraDevice->m_Controller->GetModulationFrequency(), 
+          toFCameraDevice->m_RawDataSource->Initialize(toFCameraDevice->m_OriginControllerWidth,
+            toFCameraDevice->m_OriginControllerHeight,
+            toFCameraDevice->m_Controller->GetModulationFrequency(),
             toFCameraDevice->GetChannelSize());
         }
         toFCameraDevice->m_RawDataSource->SetChannelData(channelData);
         toFCameraDevice->m_RawDataSource->Update();
         toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataArray);
-        toFCameraDevice->m_RawDataSource->GetAllData(toFCameraDevice->m_DistanceArray, 
+        toFCameraDevice->m_RawDataSource->GetAllData(toFCameraDevice->m_DistanceArray,
           toFCameraDevice->m_AmplitudeArray, toFCameraDevice->m_IntensityArray);
         toFCameraDevice->m_ImageMutex->Unlock();
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

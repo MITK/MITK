@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,9 +68,9 @@ QmitkPythonScriptEditor::QmitkPythonScriptEditor(QWidget *parent)
   m_TextEditor = new QTextEdit(parent);
   m_TextEditor->setObjectName(QString::fromUtf8("m_TextEditor"));
   m_TextEditor->viewport()->setAcceptDrops(true);
-  
+
   QmitkPythonScriptEditorHighlighter *highlighter = new QmitkPythonScriptEditorHighlighter(m_TextEditor->document());
-  
+
   gridLayout->addWidget(m_TextEditor, 0, 0, 1, 3);
 
   buttonLoadScript = new QPushButton(parent);

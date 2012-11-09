@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
 
   //CONFERENCE EVENT
   mitk::BaseRenderer *br = const_cast<mitk::BaseRenderer*>(mitk::BaseRenderer::GetByName( std::string(sender) ));
-  
+
   mitk::Point3D p3d;
   p3d[0] = (mitk::ScalarType) w1;
   p3d[1] = (mitk::ScalarType) w2;
@@ -46,9 +46,9 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
 
 
   mitk::PositionEvent *pe = new mitk::PositionEvent(br,Etype,Estate,Ebuttonstate,Ekey,p2d,p3d);
-  
+
   // MOUSE Overlay
-  mitk::Point2D  p2d_mm, pos_unit;     
+  mitk::Point2D  p2d_mm, pos_unit;
   //Map world to 2d mm
   if (br->GetDisplayGeometry()->Map( p3d, p2d_mm ) )
   {
@@ -61,12 +61,12 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
 
 
   //MITK_INFO<<"mitkEventMapper::MapEvent(): "<<br->GetSizeX()<<" * "<<p1<<" =X (("<<p2d[0]<<"))   UND "<<br->GetSizeY()<<" * "<< p2 <<" =Y (("<<p2d[1]<<"))"<<std::endl;
-  
+
   //ONlY 3D Widget
   if( br->GetMapperID() == 2 )
   {
     mitk::CameraController* cc = br->GetCameraController();
-    
+
     //Qt Event IDs
     if (Etype == 6)
     {
@@ -77,10 +77,10 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
     else
     {
       //Umrechnung fuer VTKCameraControler
-      p2d[1] = (mitk::ScalarType) (br->GetSizeY() - p2) * br->GetSizeY(); 
+      p2d[1] = (mitk::ScalarType) (br->GetSizeY() - p2) * br->GetSizeY();
       mitk::PositionEvent *peVTK = new mitk::PositionEvent(br,Etype,Estate,Ebuttonstate,Ekey,p2d,p3d);
       // END
-      
+
       //PRESS
       if(Etype == 2)
       {
@@ -98,7 +98,7 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
       }
     }
   }
-  
+
   bool ok = EventMapper::MapEvent( pe, mitk::GlobalInteraction::GetInstance(), mitkEventID );
 
   return ok;
@@ -110,14 +110,14 @@ mitk::ConferenceEventMapper::MapEvent(const char* sender, float w1, float w2, fl
 
   //CONFERENCE EVENT
   mitk::BaseRenderer *br = const_cast<mitk::BaseRenderer*>(mitk::BaseRenderer::GetByName( std::string(sender) ));
-  
+
   mitk::Point3D p3d;
   p3d[0] = (mitk::ScalarType) w1;
   p3d[1] = (mitk::ScalarType) w2;
   p3d[2] = (mitk::ScalarType) w3;
 
   // MOUSE Overlay
-  mitk::Point2D  p2d_mm, pos_unit;     
+  mitk::Point2D  p2d_mm, pos_unit;
   //Map world to 2d mm
   if (br->GetDisplayGeometry()->Map( p3d, p2d_mm ) )
   {

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-/** 
+/**
  * \brief Widget for displaying image histograms based on the vtkQtChart
  * framework
  */
@@ -65,11 +65,11 @@ public:
 
   /** \brief Set histogram to be displayed directly. */
   void SetHistogram(const HistogramType* histogram);
-  
+
   /** \brief Set image from which to calculate the histogram. */
   void SetImage(const mitk::Image* image);
 
-  /** \brief Set binary image mask determining the voxels to include in 
+  /** \brief Set binary image mask determining the voxels to include in
    * histogram calculation. */
   void SetImageMask(const mitk::Image* imageMask);
 
@@ -82,7 +82,7 @@ public:
 
   /** \brief Set/Get operation mode for Histogram */
   void SetHistogramMode(unsigned int histogramMode);
-  
+
   /** \brief Set/Get operation mode for Histogram */
   unsigned int GetHistogramMode();
 

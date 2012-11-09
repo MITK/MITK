@@ -32,7 +32,7 @@ QmitkStoreSCPLauncherBuilder::~QmitkStoreSCPLauncherBuilder()
     delete m_AETitle;
     delete m_TransferSyntax;
     delete m_OtherNetworkOptions;
-    delete m_Mode;   
+    delete m_Mode;
     delete m_OutputDirectory;
 }
 

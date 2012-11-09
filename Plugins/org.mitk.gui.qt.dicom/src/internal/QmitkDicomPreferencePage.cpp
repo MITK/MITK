@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIBerryPreferences.h>
 #include <berryPlatform.h>
 
-QmitkDicomPreferencePage::QmitkDicomPreferencePage() 
+QmitkDicomPreferencePage::QmitkDicomPreferencePage()
 : m_MainControl(0)
 {
 
@@ -38,8 +38,8 @@ void QmitkDicomPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDicomPreferencePage::CreateQtControl(QWidget* parent)
 {
-    berry::IPreferencesService::Pointer prefService= 
-        berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);    
+    berry::IPreferencesService::Pointer prefService=
+        berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
     m_DicomPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDicomEditor::EDITOR_ID).Cast<berry::IBerryPreferences>();;
     assert( m_DicomPreferencesNode );
@@ -78,7 +78,7 @@ void QmitkDicomPreferencePage::CreateQtControl(QWidget* parent)
 
     formLayout->setWidget(3, QFormLayout::FieldRole, frame);
 
-            
+
 
 }
 

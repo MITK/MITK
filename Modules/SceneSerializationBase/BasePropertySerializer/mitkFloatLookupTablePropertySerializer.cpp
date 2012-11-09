@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ namespace mitk
 class SceneSerializationBase_EXPORT FloatLookupTablePropertySerializer : public BasePropertySerializer
 {
   public:
-    
+
     mitkClassMacro( FloatLookupTablePropertySerializer, BasePropertySerializer );
     itkNewMacro(Self);
 
@@ -39,7 +39,7 @@ class SceneSerializationBase_EXPORT FloatLookupTablePropertySerializer : public 
       if (prop == NULL)
         return NULL;
       FloatLookupTable lut = prop->GetValue();
-      //if (lut.IsNull()) 
+      //if (lut.IsNull())
       //  return NULL; // really?
       const FloatLookupTable::LookupTableType& map = lut.GetLookupTable();
 
@@ -56,7 +56,7 @@ class SceneSerializationBase_EXPORT FloatLookupTablePropertySerializer : public 
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
     {
-      if (!element) 
+      if (!element)
         return NULL;
 
       FloatLookupTable lut;
@@ -70,7 +70,7 @@ class SceneSerializationBase_EXPORT FloatLookupTablePropertySerializer : public 
         float tempVal = -1.0;
         if (child->QueryFloatAttribute("value", &tempVal) == TIXML_WRONG_TYPE)
           return NULL; // TODO: can we do a better error handling?
-        FloatLookupTable::ValueType val = static_cast<FloatLookupTable::ValueType>(tempVal);        
+        FloatLookupTable::ValueType val = static_cast<FloatLookupTable::ValueType>(tempVal);
         lut.SetTableValue(id, val);
       }
       return FloatLookupTableProperty::New(lut).GetPointer();

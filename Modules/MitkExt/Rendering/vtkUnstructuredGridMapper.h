@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ class vtkPolyDataMapper;
 class vtkGeometryFilter;
 class vtkUnstructuredGrid;
 
-class MitkExt_EXPORT vtkUnstructuredGridMapper : public vtkMapper 
+class MitkExt_EXPORT vtkUnstructuredGridMapper : public vtkMapper
 {
 public:
   static vtkUnstructuredGridMapper *New();
@@ -53,16 +53,16 @@ public:
   // Set the Input of this mapper.
   void SetInput(vtkUnstructuredGrid *input);
   vtkUnstructuredGrid *GetInput();
-  
+
   void SetBoundingObject(mitk::BoundingObject* bo);
-  
+
 protected:
   vtkUnstructuredGridMapper();
   ~vtkUnstructuredGridMapper();
 
   vtkGeometryFilter *GeometryExtractor;
   vtkPolyDataMapper *PolyDataMapper;
-  
+
   mitk::BoundingObject::Pointer m_BoundingObject;
 
   virtual void ReportReferences(vtkGarbageCollector*);

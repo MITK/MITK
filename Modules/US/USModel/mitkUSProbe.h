@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ namespace mitk {
     /**Documentation
     * \brief Right now, the US Probe is only a fancy name for a string. Later, it could handle probe specific parameters
     *  like the current frequency etc. It is able to compare itself to other probes for device managment though.
-    *  
+    *
     * \ingroup US
     */
     //Be sure to check the isEqualTo() method if you expand this class to see if it needs work!
@@ -44,7 +44,7 @@ namespace mitk {
       */
       bool IsEqualToProbe(mitk::USProbe::Pointer probe);
 
-    
+
       //## getter and setter ##
 
       itkGetMacro(Name, std::string);
@@ -56,7 +56,7 @@ namespace mitk {
 
       std::string m_Name;
 
-    
+
 
     };
 } // namespace mitk

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,8 +21,8 @@ CMesaDevice* m_MESAHandle=0;
 
 namespace mitk
 {
-  ToFCameraMESAController::ToFCameraMESAController(): m_MESARes(0), m_PixelNumber(40000), m_NumberOfBytes(0), 
-    m_CaptureWidth(0), m_CaptureHeight(0), m_NumImg(0), m_MaxRangeFactor(0.0), m_ConnectionCheck(false), 
+  ToFCameraMESAController::ToFCameraMESAController(): m_MESARes(0), m_PixelNumber(40000), m_NumberOfBytes(0),
+    m_CaptureWidth(0), m_CaptureHeight(0), m_NumImg(0), m_MaxRangeFactor(0.0), m_ConnectionCheck(false),
     m_InputFileName("")
   {
   }
@@ -37,7 +37,7 @@ namespace mitk
     m_ConnectionCheck = ErrorText(m_MESARes);
     m_MESAHandle = 0;
     return m_ConnectionCheck;
-  } 
+  }
 
   bool ToFCameraMESAController::ErrorText(int error)
   {

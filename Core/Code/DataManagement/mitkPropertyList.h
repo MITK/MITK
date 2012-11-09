@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 #include <string>
-#include <map> 
+#include <map>
 
 namespace mitk {
 
@@ -34,17 +34,17 @@ class XMLWriter;
 /**
  * @brief Key-value list holding instances of BaseProperty
  *
- * This list is meant to hold an arbitrary list of "properties", 
+ * This list is meant to hold an arbitrary list of "properties",
  * which should describe the object associated with this list.
  *
- * Usually you will use PropertyList as part of a DataNode 
+ * Usually you will use PropertyList as part of a DataNode
  * object - in this context the properties describe the data object
  * held by the DataNode (e.g. whether the object is rendered at
  * all, which color is used for rendering, what name should be
  * displayed for the object, etc.)
  *
  * The values in the list are not fixed, you may introduce any kind
- * of property that seems useful - all you have to do is inherit 
+ * of property that seems useful - all you have to do is inherit
  * from BaseProperty.
  *
  * The list is organized as a key-value pairs, i.e.
@@ -58,7 +58,7 @@ class XMLWriter;
  * quite different semantics. Normally SetProperty is what you want - this
  * method will try to change the value of an existing property and will
  * not allow you to replace e.g. a ColorProperty with an IntProperty.
- * 
+ *
  * @ingroup DataManagement
  */
 class MITK_CORE_EXPORT PropertyList : public itk::Object
@@ -68,8 +68,8 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
 
     mitkClassMacro(PropertyList, itk::Object);
 
-    /** 
-     * Method for creation through the object factory. 
+    /**
+     * Method for creation through the object factory.
      */
     itkNewMacro(Self);
 
@@ -81,14 +81,14 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
     typedef std::pair< std::string, BaseProperty::Pointer> PropertyMapElementType;
 
     /**
-     * @brief Get a property by its name. 
+     * @brief Get a property by its name.
      */
     mitk::BaseProperty* GetProperty(const std::string& propertyKey) const;
 
     /**
      * @brief Set a property in the list/map by value.
-     * 
-     * The actual OBJECT holding the value of the property is not replaced, but its value 
+     *
+     * The actual OBJECT holding the value of the property is not replaced, but its value
      * is modified to match that of @a property. To really replace the object holding the
      * property - which would make sense if you want to change the type (bool, string) of the property
      * - call ReplaceProperty.
@@ -107,11 +107,11 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
 
     /**
      * @brief Set a property object in the list/map by reference.
-     */ 
+     */
     void ConcatenatePropertyList(PropertyList *pList, bool replace = false);
 
     //##Documentation
-    //## @brief Convenience access method for GenericProperty<T> properties 
+    //## @brief Convenience access method for GenericProperty<T> properties
     //## (T being the type of the second parameter)
     //## @return @a true property was found
     template <typename T>
@@ -128,17 +128,17 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
 
     /**
     * @brief Convenience method to access the value of a BoolProperty
-    */    
+    */
     bool GetBoolProperty(const char* propertyKey, bool& boolValue) const;
-    
+
     /**
     * @brief Convenience method to set the value of a BoolProperty
     */
     void SetBoolProperty( const char* propertyKey, bool boolValue);
-    
+
     /**
     * @brief Convenience method to access the value of an IntProperty
-    */   
+    */
     bool GetIntProperty(const char* propertyKey, int &intValue) const;
 
     /**
@@ -148,7 +148,7 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
 
     /**
     * @brief Convenience method to access the value of a FloatProperty
-    */   
+    */
     bool GetFloatProperty(const char* propertyKey, float &floatValue) const;
 
     /**
@@ -158,7 +158,7 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
 
     /**
     * @brief Convenience method to access the value of a StringProperty
-    */   
+    */
     bool GetStringProperty(const char* propertyKey, std::string& stringValue) const;
 
     /**
@@ -167,7 +167,7 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
     void SetStringProperty( const char* propertyKey, const char* stringValue);
 
     /**
-     * @brief Get the timestamp of the last change of the map or the last change of one of 
+     * @brief Get the timestamp of the last change of the map or the last change of one of
      * the properties store in the list (whichever is later).
      */
     virtual unsigned long GetMTime() const;

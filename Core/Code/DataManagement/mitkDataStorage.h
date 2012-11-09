@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -193,7 +193,7 @@ namespace mitk {
     const DataNode::GroupTagList GetGroupTags() const;
 
     /*ITK Mutex */
-    mutable itk::SimpleFastMutexLock m_MutexOne; 
+    mutable itk::SimpleFastMutexLock m_MutexOne;
 
     /* Public Events */
     typedef Message1<const mitk::DataNode*> DataStorageEvent;
@@ -206,7 +206,7 @@ namespace mitk {
     //## Note: AddEvents are _not_ emitted if a node is added to DataStorage by adding it to the the underlying DataTree!
 
     // member variable is not needed to be locked in multi threaded scenarios since the DataStorageEvent is a typedef for
-    // a Message1 object which is thread safe 
+    // a Message1 object which is thread safe
     DataStorageEvent AddNodeEvent;
 
     //##Documentation
@@ -218,7 +218,7 @@ namespace mitk {
     //## Note: RemoveEvents are also emitted if a node was removed from the DataStorage by deleting it from the underlying DataTree
 
     // member variable is not needed to be locked in multi threaded scenarios since the DataStorageEvent is a typedef for
-    // a Message1 object which is thread safe 
+    // a Message1 object which is thread safe
     DataStorageEvent RemoveNodeEvent;
 
     //##Documentation
@@ -231,7 +231,7 @@ namespace mitk {
     //## to the listeners of this event.
 
     // member variable is not needed to be locked in multi threaded scenarios since the DataStorageEvent is a typedef for
-    // a Message1 object which is thread safe 
+    // a Message1 object which is thread safe
     DataStorageEvent ChangedNodeEvent;
 
     //##Documentation
@@ -244,7 +244,7 @@ namespace mitk {
     //## to the listeners of this event.
 
     // member variable is not needed to be locked in multi threaded scenarios since the DataStorageEvent is a typedef for
-    // a Message1 object which is thread safe 
+    // a Message1 object which is thread safe
     DataStorageEvent DeleteNodeEvent;
 
     //##Documentation

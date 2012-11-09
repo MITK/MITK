@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMultiStepper.h"
 #include "mitkStepper.h"
 
-mitk::MultiStepper::MultiStepper() 
+mitk::MultiStepper::MultiStepper()
 {
 }
 
@@ -38,22 +38,22 @@ void mitk::MultiStepper::RemoveStepper(Stepper::Pointer stepper, unsigned int /*
 /*void mitk::MultiStepper::Next() {
   for (StepperSet::iterator it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
     (*it)->Next();
-  } 
+  }
 }
 void mitk::MultiStepper::Previous() {
   for (StepperSet::iterator it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
     (*it)->Previous();
-  } 
+  }
 }
 void mitk::MultiStepper::First() {
   for (StepperSet::iterator it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
     (*it)->First();
-  } 
+  }
 }
 void mitk::MultiStepper::Last() {
   for (StepperSet::iterator it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
     (*it)->Last();
-  } 
+  }
 }*/
 
 void mitk::MultiStepper::SetPos(unsigned int pos) {
@@ -67,9 +67,9 @@ void mitk::MultiStepper::SetPos(unsigned int pos) {
 };
 
 void mitk::MultiStepper::SetSteps(unsigned int /*steps*/) {
-  assert(false); 
+  assert(false);
 };
- 
+
 void mitk::MultiStepper::UpdateStepCount() {
   m_Steps=0;
   m_LargestRangeStepper = NULL;
@@ -79,5 +79,5 @@ void mitk::MultiStepper::UpdateStepCount() {
        m_Steps = count;
        m_LargestRangeStepper = *it;
     }
-  } 
+  }
 }

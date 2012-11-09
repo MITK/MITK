@@ -28,12 +28,12 @@ class MinimalApplication : public QObject, public berry::IApplication
 {
   Q_OBJECT
   Q_INTERFACES(berry::IApplication)
-  
+
 public:
-  
+
   MinimalApplication();
   ~MinimalApplication();
-  
+
   int Start();
   void Stop();
 

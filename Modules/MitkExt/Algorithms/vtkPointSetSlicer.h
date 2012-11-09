@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,7 +40,7 @@ class MitkExt_EXPORT vtkPointSetSlicer : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkPointSetSlicer,vtkPolyDataAlgorithm);
-  
+
   void PrintSelf(std::ostream& os, vtkIndent indent);
 
   // Description:
@@ -67,13 +67,13 @@ public:
   vtkBooleanMacro(GenerateCutScalars,int);
 
   // Description:
-  // Specify a spatial locator for merging points. By default, 
+  // Specify a spatial locator for merging points. By default,
   // an instance of vtkMergePoints is used.
   void SetLocator(vtkPointLocator *locator);
   vtkGetObjectMacro(Locator,vtkPointLocator);
 
   // Description:
-  // Create default locator. Used to create one when none is specified. The 
+  // Create default locator. Used to create one when none is specified. The
   // locator is used to merge coincident points.
   void CreateDefaultLocator();
 
@@ -84,33 +84,33 @@ protected:
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int FillInputPortInformation(int port, vtkInformation *info);
-  
+
   void UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *output);
-  
+
   void ContourUnstructuredGridCell(vtkCell* cell,
       vtkDataArray* cellScalars, vtkPointLocator* locator,
       vtkCellArray* verts, vtkCellArray* lines,
       vtkCellArray* polys, vtkPointData* inPd,
       vtkPointData* outPd, vtkCellData* inCd,
       vtkIdType cellId, vtkCellData* outCd);
-  
+
   vtkPlane *SlicePlane;
   vtkCutter *Cutter;
 
   vtkPointLocator *Locator;
   int GenerateCutScalars;
-  
+
 private:
   vtkPointSetSlicer(const vtkPointSetSlicer&);  // Not implemented.
   void operator=(const vtkPointSetSlicer&);  // Not implemented.
-  
+
   static int edges[12][2];
-  
+
   typedef int EDGE_LIST;
   typedef struct {
     EDGE_LIST edges[8];
   } POLY_CASES;
-  
+
   static POLY_CASES polyCases[256];
 };
 

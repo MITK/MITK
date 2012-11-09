@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -129,7 +129,7 @@ void mitk::DataNodeFactory::GenerateData()
     std::string testfilename = m_FileName + ".gz";
 
     std::ifstream exists(testfilename.c_str());
-    if (exists.good()) 
+    if (exists.good())
     {
       m_FileName += ".gz";
     }
@@ -137,7 +137,7 @@ void mitk::DataNodeFactory::GenerateData()
     {
       testfilename = m_FileName + ".GZ";
       std::ifstream exists(testfilename.c_str());
-      if (exists.good()) 
+      if (exists.good())
       {
         m_FileName += ".GZ";
       }
@@ -202,7 +202,7 @@ void mitk::DataNodeFactory::ResizeOutputs( const unsigned int& num )
 bool mitk::DataNodeFactory::FileNameEndsWith( const std::string& name )
 {
   if (m_FileName.size() < name.size()) return false;
-  
+
   return m_FileName.substr(m_FileName.size() - name.size()) == name;
 }
 
@@ -225,7 +225,7 @@ std::string mitk::DataNodeFactory::GetDirectory()
 {
   if ( !m_FileName.empty() )   return itksys::SystemTools::GetFilenamePath( m_FileName );
   if ( !m_FilePrefix.empty() ) return itksys::SystemTools::GetFilenamePath( m_FilePrefix );
-  
+
   return std::string();
 }
 
@@ -253,7 +253,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     return;
 
   }
-      
+
   DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), true, this->m_SeriesRestrictions); // true = group gantry tilt images
   const unsigned int size = names_map.size();
 
@@ -271,7 +271,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 
     MITK_INFO << "Reading series " << outputIndex << ": " << uid << std::endl;
 
-    if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node, true, true, true)) 
+    if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node, true, true, true))
     {
       std::string nodeName(uid);
       std::string studyDescription;
@@ -474,7 +474,7 @@ void mitk::DataNodeFactory::SetDefaultCommonProperties(mitk::DataNode::Pointer &
       node->SetProperty( "name", nameProp );
     }
   }
-  
+
   // visibility
   if(!node->GetProperty("visible"))
     node->SetVisibility(true);

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -49,8 +49,8 @@ int mitkDICOMTestingSanityTest(int argc, char** const argv)
 
   // compare with expected number of images from commandline
   mitk::TestDICOMLoading::ImageList images = loader.LoadFiles(files);
-  MITK_TEST_CONDITION_REQUIRED( images.size() == numberOfExpectedImages, "Loading " << files.size() 
-                                                                      << " files from commandline results in " << numberOfExpectedImages 
+  MITK_TEST_CONDITION_REQUIRED( images.size() == numberOfExpectedImages, "Loading " << files.size()
+                                                                      << " files from commandline results in " << numberOfExpectedImages
                                                                       << " images (see test invocation)" )
 
   // check dump equality (dumping image information must always equal itself)

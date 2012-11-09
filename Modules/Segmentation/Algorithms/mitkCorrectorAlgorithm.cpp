@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ mitk::CorrectorAlgorithm::~CorrectorAlgorithm()
 {
 }
 
-    
+
 void mitk::CorrectorAlgorithm::GenerateData()
 {
   Image::Pointer inputImage = const_cast<Image*>(ImageToImageFilter::GetInput(0));
@@ -104,7 +104,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
 //    itkExceptionMacro("Original image does not have a 'Time sliced geometry'! Cannot copy.");
 //  }
 }
-    
+
 void mitk::CorrectorAlgorithm::TobiasHeimannCorrectionAlgorithm(mitkIpPicDescriptor* pic)
 {
 /*!
@@ -114,7 +114,7 @@ TobiasHeimannCorrectionAlgorithm will be called, when the user has finished draw
 
 There should be different results, depending on the line's properties:
 
-1. Without any prior segmentation, the start point and the end point of the drawn line will be 
+1. Without any prior segmentation, the start point and the end point of the drawn line will be
 connected to a contour and the area enclosed by the contour will be marked as segmentation.
 
 2. When the whole line is inside a segmentation, start and end point will be connected to
@@ -129,7 +129,7 @@ either fully inside or fully outside a segmentation. When it is inside a segment
 enclosed area will be subtracted from the segmentation. When the segment is outside a
 segmentation, its enclosed area it will be added to the segmentation.
 
-The algorithm is described in full length in Tobias Heimann's diploma thesis 
+The algorithm is described in full length in Tobias Heimann's diploma thesis
 (MBI Technical Report 145, p. 37 - 40).
 */
 
@@ -139,40 +139,40 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
 
   std::vector<TSegData> segData;
   segData.reserve( 16 );
-    
+
   Contour* contour3D = const_cast<Contour*>(m_Contour.GetPointer());
   ContourUtils::Pointer contourUtils = ContourUtils::New();
-  Contour::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice( m_WorkingImage, contour3D, true, false ); 
-      
-  if (projectedContour.IsNull()) 
+  Contour::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice( m_WorkingImage, contour3D, true, false );
+
+  if (projectedContour.IsNull())
   {
     delete[] _ofsArray;
     return;
   }
 
-  if (projectedContour->GetNumberOfPoints() < 2) 
+  if (projectedContour->GetNumberOfPoints() < 2)
   {
     delete[] _ofsArray;
     return;
   }
-  
+
   // convert the projected contour into a ipSegmentation format
   mitkIpInt4_t* _points = new mitkIpInt4_t[2 * projectedContour->GetNumberOfPoints()];
   const Contour::PathType::VertexListType* pointsIn2D = projectedContour->GetContourPath()->GetVertexList();
   unsigned int index(0);
-  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin(); 
+  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin();
         iter != pointsIn2D->end();
         ++iter, ++index )
   {
     _points[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] + 0.5 );
     _points[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] + 0.5 );
   }
- 
+
   // store ofsets of the drawn line in array
   int _ofsNum = 0;
   unsigned int num = projectedContour->GetNumberOfPoints();
   int lastOfs = -1;
-  for (unsigned int i=0; i<num-1; i++) 
+  for (unsigned int i=0; i<num-1; i++)
   {
     float x = _points [2*i] + 0.5;
     float y = _points [2*i+1] + 0.5;
@@ -181,7 +181,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     float length = sqrt( difX*difX + difY*difY );
     float dx = difX / length;
     float dy = difY / length;
-    for (int p=0; ((float)p)<length; p++) 
+    for (int p=0; ((float)p)<length; p++)
     {
       // if ofs is out of bounds, very nasty things will happen, so better check coordinates:
       if (x<0) x=0.5;
@@ -192,7 +192,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
       int ofs = (int)(x) + pic->n[0]*((int)(y));
       x += dx;
       y += dy;
-      if (ofs != lastOfs) 
+      if (ofs != lastOfs)
       {
         _ofsArray[_ofsNum++] = ofs;
         lastOfs = ofs;
@@ -217,17 +217,17 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   int modifyStart, modifyEnd;  // start of first and end of last segment
   bool nextSegment;
   segData.clear();
-  do 
+  do
   {
     nextSegment = false;
     while (ofsP<_ofsNum && *(picdata + _ofsArray[ofsP])==state) ofsP++;
-    if (ofsP<_ofsNum) 
+    if (ofsP<_ofsNum)
     {
       int lineStart = ofsP-1;
       if (numSegments==0) modifyStart = ofsP;
       state = *(picdata + _ofsArray[ofsP]);
       while (ofsP<_ofsNum && *(picdata + _ofsArray[ofsP])==state) ofsP++;
-      if (ofsP<_ofsNum) 
+      if (ofsP<_ofsNum)
       {
         int lineEnd = ofsP;
         modifyEnd = lineEnd;
@@ -243,27 +243,27 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     }
   } while (nextSegment);
 
-  for (int segNr=0; segNr < numSegments; segNr++) 
+  for (int segNr=0; segNr < numSegments; segNr++)
   {
     // draw line if modified:
-    if ( segData[segNr].modified ) 
+    if ( segData[segNr].modified )
     {
-      for (int i=segData[segNr].lineStart+1; i<segData[segNr].lineEnd; i++) 
+      for (int i=segData[segNr].lineStart+1; i<segData[segNr].lineEnd; i++)
       {
         *(picdata + _ofsArray[i]) = 1;
       }
     }
   }
 
-  if (numSegments == 0) 
+  if (numSegments == 0)
   {
-    if (num <= 1) 
+    if (num <= 1)
     { // only a single pixel. _ofsArray[_ofsNum-1] in else statement would crash, so don't do anything
       // no movement: delete operation
 
-      // This behaviour would probably confuse users when they use the correction 
+      // This behaviour would probably confuse users when they use the correction
       // tool to change a segmentation and it deletes much more than selected
-     
+
       // if (state == 1)  ipMITKSegmentationReplaceRegion4N( pic, _ofsArray[0], 0 );
     }
     else if ( *(picdata + _ofsArray[_ofsNum-1]) == *(picdata + _ofsArray[0]))
@@ -271,7 +271,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
       // start point and end point both inside or both outside any segmentation
       // normal paint operation
       mitkIpInt4_t* p = new mitkIpInt4_t[2 * num];
-      for (unsigned int i = 0; i < num; i++) 
+      for (unsigned int i = 0; i < num; i++)
       {
         p[2 * i] = (mitkIpInt4_t) _points [2 * i];
         p[2 * i + 1] = (mitkIpInt4_t) _points [2 * i + 1];
@@ -293,11 +293,11 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     if ( ((ipMITKSegmentationTYPE*) pic->data)[oneContourOffset]> 0) break;
 
   float* contourPoints = ipMITKSegmentationGetContour8N( pic, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
-  
-  if (contourPoints) 
+
+  if (contourPoints)
   {
-    
-    // copy point from float* to mitk::Contour 
+
+    // copy point from float* to mitk::Contour
     Contour::Pointer contourInImageIndexCoordinates = Contour::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
@@ -311,11 +311,11 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     }
 
     free(contourPoints);
-    
+
     ContourUtils::Pointer contourUtils = ContourUtils::New();
     contourUtils->FillContourInSlice( contourInImageIndexCoordinates, m_WorkingImage );
   }
-  
+
   delete[] _ofsArray;
   delete[] _points;
 }
@@ -329,14 +329,14 @@ bool mitk::CorrectorAlgorithm::modifySegment( int lineStart, int lineEnd, ipMITK
 
   // offsets for pixels right, top-right, top, top-left left, bottom-left, bottom, bottom-right
   int nbDelta8[8];
-  nbDelta8[0] = 1;   nbDelta8[1] = nbDelta4[1]+1; nbDelta8[2] = nbDelta4[1];  nbDelta8[3] = nbDelta4[1]-1; 
-  nbDelta8[4] = -1;  nbDelta8[5] = nbDelta4[3]-1; nbDelta8[6] = nbDelta4[3];  nbDelta8[7] = nbDelta4[3]+1; 
-  
+  nbDelta8[0] = 1;   nbDelta8[1] = nbDelta4[1]+1; nbDelta8[2] = nbDelta4[1];  nbDelta8[3] = nbDelta4[1]-1;
+  nbDelta8[4] = -1;  nbDelta8[5] = nbDelta4[3]-1; nbDelta8[6] = nbDelta4[3];  nbDelta8[7] = nbDelta4[3]+1;
+
   ipMITKSegmentationTYPE* picdata = static_cast<ipMITKSegmentationTYPE*>(pic->data);
 
   ipMITKSegmentationTYPE saveStart = *(picdata + _ofsArray[lineStart]);
   ipMITKSegmentationTYPE saveEnd = *(picdata + _ofsArray[lineEnd]);
-  ipMITKSegmentationTYPE newState = ((!state)&1) + 2; // probably equal to: ipMITKSegmentationTYPE newState = 3 - state; 
+  ipMITKSegmentationTYPE newState = ((!state)&1) + 2; // probably equal to: ipMITKSegmentationTYPE newState = 3 - state;
 
   // make two copies of pic:
   mitkIpPicDescriptor *seg1 = mitkIpPicClone( pic );
@@ -373,10 +373,10 @@ bool mitk::CorrectorAlgorithm::modifySegment( int lineStart, int lineEnd, ipMITK
           }
           else {
             int tnb = 0;
-            while (   tnb < 4 
-                   && ((nbOfs + nbDelta4[tnb]) >= 0) &&  ((nbOfs + nbDelta4[tnb]) < maxOfs) 
+            while (   tnb < 4
+                   && ((nbOfs + nbDelta4[tnb]) >= 0) &&  ((nbOfs + nbDelta4[tnb]) < maxOfs)
                    && *(((ipMITKSegmentationTYPE*)seg1->data) + nbOfs + nbDelta4[tnb]) != newState
-                  ) 
+                  )
                   tnb++;
 
             if (tnb < 4 && ((nbOfs + nbDelta4[tnb]) >= 0) &&  ((nbOfs + nbDelta4[tnb]) < maxOfs) ) {
@@ -429,7 +429,7 @@ bool mitk::CorrectorAlgorithm::modifySegment( int lineStart, int lineEnd, ipMITK
   ipMITKSegmentationTYPE *current, *segSrc;
   if (sizeRegion1 < sizeRegion2) {
     segSrc = (ipMITKSegmentationTYPE*)seg1->data;
-    sizeDif = sizeRegion2 - sizeRegion1;    
+    sizeDif = sizeRegion2 - sizeRegion1;
   }
   else {
     segSrc = (ipMITKSegmentationTYPE*)seg2->data;
@@ -454,7 +454,7 @@ bool mitk::CorrectorAlgorithm::modifySegment( int lineStart, int lineEnd, ipMITK
   // restore end points:
   *(picdata + _ofsArray[lineStart]) = saveStart;
   *(picdata + _ofsArray[lineEnd]) = saveEnd;
-  
+
   mitkIpPicFree( seg1 );
   mitkIpPicFree( seg2 );
 
@@ -485,7 +485,7 @@ void mitk::CorrectorAlgorithm::ItkCalculateDifferenceImage( itk::Image<TPixel, V
 
   typename ModifiedImageType::Pointer modifiedImage;
   CastToItkImage( modifiedMITKImage, modifiedImage );
-  
+
   // create new image as a copy of the input
   // this new image is the output of this filter class
   typename DiffImageType::Pointer diffImage;
@@ -502,13 +502,13 @@ void mitk::CorrectorAlgorithm::ItkCalculateDifferenceImage( itk::Image<TPixel, V
   modifiedIterator.GoToBegin();
   originalIterator.GoToBegin();
   diffIterator.GoToBegin();
- 
+
   while ( !diffIterator.IsAtEnd() )
   {
-    short signed int difference = static_cast<short signed int>( static_cast<signed int>(modifiedIterator.Get()) - 
+    short signed int difference = static_cast<short signed int>( static_cast<signed int>(modifiedIterator.Get()) -
                                                           static_cast<signed int>(originalIterator.Get())); // not good for bigger values ?!
     diffIterator.Set( difference );
-    
+
     ++modifiedIterator;
     ++originalIterator;
     ++diffIterator;

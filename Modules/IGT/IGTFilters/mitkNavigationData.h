@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,9 +28,9 @@ namespace mitk {
     * \brief Navigation Data
     *
     * This class represents the data object that is passed through the MITK-IGT navigation filter
-    * pipeline. It encapsulates position and orientation of a tracked tool/sensor. Additionally, 
+    * pipeline. It encapsulates position and orientation of a tracked tool/sensor. Additionally,
     * it contains a data structure that contains error/plausibility information
-    * 
+    *
     * \ingroup IGT
     */
   class MitkIGT_EXPORT NavigationData : public itk::DataObject
@@ -122,15 +122,15 @@ namespace mitk {
       */
       itkGetStringMacro(Name);
 
-      /** 
-      * \brief Graft the data and information from one NavigationData to another. 
-      * 
+      /**
+      * \brief Graft the data and information from one NavigationData to another.
+      *
       * Copies the content of data into this object.
       * This is a convenience method to setup a second NavigationData object with all the meta
       * information of another NavigationData object.
       * Note that this method is different than just using two
       * SmartPointers to the same NavigationData object since separate DataObjects are
-      * still maintained. 
+      * still maintained.
       */
       virtual void Graft(const DataObject *data);
 

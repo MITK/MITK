@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,7 +57,7 @@ namespace itk
   * generate requested region
   */
  template <class TInputImage, class TOutputImage>
-  void 
+  void
     TotalVariationSingleIterationImageFilter<TInputImage, TOutputImage>
     ::GenerateInputRequestedRegion() throw (InvalidRequestedRegionError)
   {
@@ -65,7 +65,7 @@ namespace itk
     Superclass::GenerateInputRequestedRegion();
 
     // get pointers to the input and output
-    typename Superclass::InputImagePointer inputPtr = 
+    typename Superclass::InputImagePointer inputPtr =
       const_cast< TInputImage * >( this->GetInput() );
     typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
 
@@ -156,18 +156,18 @@ namespace itk
     {
 
       // iterators over output, input, original and local variation image
-      ImageRegionIterator<OutputImageType> output_image_it = 
+      ImageRegionIterator<OutputImageType> output_image_it =
         ImageRegionIterator<OutputImageType>(output, *fit);
-      ImageRegionConstIterator<InputImageType> input_image_it = 
+      ImageRegionConstIterator<InputImageType> input_image_it =
         ImageRegionConstIterator<InputImageType>(input, *fit);
-      ImageRegionConstIterator<InputImageType> orig_image_it = 
+      ImageRegionConstIterator<InputImageType> orig_image_it =
         ImageRegionConstIterator<InputImageType>(m_OriginalImage, *fit);
-      ImageRegionConstIterator<LocalVariationImageType> loc_var_image_it = 
+      ImageRegionConstIterator<LocalVariationImageType> loc_var_image_it =
         ImageRegionConstIterator<LocalVariationImageType>(
         m_LocalVariation, *fit);
 
       // neighborhood in input image
-      ConstShapedNeighborhoodIterator<InputImageType> 
+      ConstShapedNeighborhoodIterator<InputImageType>
         input_image_neighbors_it(size, input, *fit);
       typename ConstShapedNeighborhoodIterator<InputImageType>::
         OffsetType offset;
@@ -184,7 +184,7 @@ namespace itk
       input_image_neighbors_it.GoToBegin();
 
       // neighborhood in local variation image
-      ConstShapedNeighborhoodIterator<LocalVariationImageType> 
+      ConstShapedNeighborhoodIterator<LocalVariationImageType>
         loc_var_image_neighbors_it(size, m_LocalVariation, *lv_fit);
       loc_var_image_neighbors_it.OverrideBoundaryCondition(&lv_nbc);
       loc_var_image_neighbors_it.ClearActiveList();
@@ -212,20 +212,20 @@ namespace itk
         double wsum = 0;
         typename ConstShapedNeighborhoodIterator<LocalVariationImageType>::
           ConstIterator loc_var_neighbors_it;
-        for (loc_var_neighbors_it = loc_var_image_neighbors_it.Begin(); 
-          ! loc_var_neighbors_it.IsAtEnd(); 
+        for (loc_var_neighbors_it = loc_var_image_neighbors_it.Begin();
+          ! loc_var_neighbors_it.IsAtEnd();
           loc_var_neighbors_it++)
-        { 
-          // w_alphabeta(u) = 
+        {
+          // w_alphabeta(u) =
           //   1 / ||nabla_alpha(u)||_a + 1 / ||nabla_beta(u)||_a
-          ws[count] = 
+          ws[count] =
             locvar_alpha_inv + (1.0/(double)loc_var_neighbors_it.Get());
           wsum += ws[count++];
         }
 
         // h_alphaalpha * u_alpha^zero
-        typename OutputImageType::PixelType res = 
-          static_cast<typename OutputImageType::PixelType>( 
+        typename OutputImageType::PixelType res =
+          static_cast<typename OutputImageType::PixelType>(
           ((typename OutputImageType::PixelType)
           orig_image_it.Get()) * (m_Lambda / (m_Lambda+wsum)));
 
@@ -233,10 +233,10 @@ namespace itk
         count = 0;
         typename ConstShapedNeighborhoodIterator<InputImageType>::
           ConstIterator input_neighbors_it;
-        for (input_neighbors_it = input_image_neighbors_it.Begin(); 
-          ! input_neighbors_it.IsAtEnd(); 
+        for (input_neighbors_it = input_image_neighbors_it.Begin();
+          ! input_neighbors_it.IsAtEnd();
           input_neighbors_it++)
-        { 
+        {
           res += input_neighbors_it.Get() * (ws[count++] / (m_Lambda+wsum));
         }
 
@@ -284,7 +284,7 @@ namespace itk
   void
     TotalVariationSingleIterationImageFilter<TInputImage, TOutput>
     ::PrintSelf(
-    std::ostream& os, 
+    std::ostream& os,
     Indent indent) const
   {
     Superclass::PrintSelf( os, indent );

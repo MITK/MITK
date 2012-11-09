@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ mitk::SeedsImageLookupTableSource::SeedsImageLookupTableSource() : mitk::LookupT
   m_Mode = DefaultLUT;
   m_LookupTable = NULL;
 
-  this->Modified();    
+  this->Modified();
 }
 
 
@@ -74,7 +74,7 @@ vtkLookupTable* mitk::SeedsImageLookupTableSource::BuildForceLookupTable()
   int i;
   for ( i = 0; i < 128; i++ )
   {
-    vtkLookupTable->SetTableValue ( i, 
+    vtkLookupTable->SetTableValue ( i,
       0.0, 0.0, 1.0, 0.2 + fabs(128.0 - i) / 256.0 );
   }
 

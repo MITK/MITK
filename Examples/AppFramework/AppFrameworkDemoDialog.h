@@ -30,7 +30,7 @@ class AppFrameworkDemoDialog;
 class AppFrameworkDemoDialog : public QDialog
 {
   Q_OBJECT
-  
+
 public:
   explicit AppFrameworkDemoDialog(QWidget *parent = 0);
   ~AppFrameworkDemoDialog();
@@ -43,7 +43,7 @@ private:
   Q_SLOT void dialogCanceled();
 
   Q_SLOT void selectionChanged(int row);
-  
+
 private:
 
   Ui::AppFrameworkDemoDialog *ui;

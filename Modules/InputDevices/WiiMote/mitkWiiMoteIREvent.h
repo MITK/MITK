@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,20 +26,20 @@ namespace mitk
 {
   /**
   * This event type is used for IR events triggered by the <br>
-  * the Wiimote driver. 
+  * the Wiimote driver.
   */
   class mitkWiiMote_EXPORT WiiMoteIREvent : public Event, itk::EventObject
   {
 
   public:
 
-    typedef WiiMoteIREvent Self; 
-    typedef itk::EventObject Superclass; 
+    typedef WiiMoteIREvent Self;
+    typedef itk::EventObject Superclass;
 
     /**
     * Initializes a Wiimote Event, that stores additional information. <br>
     * Such as a vector and the time of the recording <br>
-    * 
+    *
     * @param inputData
     *          the movement of the IR sensor computed in a vector
     * @param recordTime
@@ -48,7 +48,7 @@ namespace mitk
     WiiMoteIREvent( mitk::Vector2D inputData
       , double recordTime
       , int sliceNavigationValue);
-    
+
     ~WiiMoteIREvent();
 
     /**
@@ -60,9 +60,9 @@ namespace mitk
     int GetSliceNavigationValue() const;
 
     //itk::EventObject implementation
-    const char * GetEventName() const; 
-    bool CheckEvent(const ::itk::EventObject* e) const; 
-    ::itk::EventObject* MakeObject() const; 
+    const char * GetEventName() const;
+    bool CheckEvent(const ::itk::EventObject* e) const;
+    ::itk::EventObject* MakeObject() const;
 
   private:
 

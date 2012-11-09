@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -85,15 +85,15 @@ mitk::WiiMoteInteractor::~WiiMoteInteractor()
 
 bool mitk::WiiMoteInteractor::OnWiiMoteResetButton(Action* action, const mitk::StateEvent* stateEvent)
 {
-  // resets the geometry, so that the 
-  // object will be returned to its 
+  // resets the geometry, so that the
+  // object will be returned to its
   // initial state
   try
   {
-    mitk::Surface* surface 
+    mitk::Surface* surface
       = dynamic_cast<mitk::Surface*>(m_DataNode->GetData());
-    mitk::Geometry3D::Pointer temp 
-      = dynamic_cast<mitk::Geometry3D*>(m_OriginalGeometry->Clone().GetPointer()); 
+    mitk::Geometry3D::Pointer temp
+      = dynamic_cast<mitk::Geometry3D*>(m_OriginalGeometry->Clone().GetPointer());
     surface->SetGeometry(temp);
 
     if(surface == NULL)
@@ -113,7 +113,7 @@ bool mitk::WiiMoteInteractor::OnWiiMoteResetButton(Action* action, const mitk::S
   //reset the camera, so that the objects shown in the scene can be seen.
   const mitk::BaseRenderer* br = mitk::GlobalInteraction::GetInstance()->GetFocus();
 
-  const mitk::VtkPropRenderer* glRenderer 
+  const mitk::VtkPropRenderer* glRenderer
     = dynamic_cast<const mitk::VtkPropRenderer*>(br);
   if (glRenderer)
   {
@@ -137,10 +137,10 @@ bool mitk::WiiMoteInteractor::OnWiiMoteResetButton(Action* action, const mitk::S
 
 bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEvent* stateEvent)
 {
-  const mitk::WiiMoteAllDataEvent* wiiMoteEvent; 
+  const mitk::WiiMoteAllDataEvent* wiiMoteEvent;
   try
   {
-    wiiMoteEvent = 
+    wiiMoteEvent =
       dynamic_cast<const mitk::WiiMoteAllDataEvent*>(stateEvent->GetEvent());
   }
   catch(...)
@@ -164,7 +164,7 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   m_OrientationY = wiiMoteEvent->GetOrientationY();
   m_OrientationZ = wiiMoteEvent->GetOrientationZ();
 
-  // substracts the proportionate force 
+  // substracts the proportionate force
   // applied by gravity depending on the
   // orientation
 
@@ -266,7 +266,7 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   {
     m_zAngle = 0;
   }
- 
+
   // -------------------- rotation and translation --------------------
 
   bool result = false;
@@ -310,7 +310,7 @@ mitk::Geometry3D* mitk::WiiMoteInteractor::TransformCurrentDataInGeometry3D()
   return geometry;
 }
 
-vnl_matrix_fixed<double, 4, 4> mitk::WiiMoteInteractor::ComputeCurrentCameraPosition( vtkCamera* vtkCamera )                                                          
+vnl_matrix_fixed<double, 4, 4> mitk::WiiMoteInteractor::ComputeCurrentCameraPosition( vtkCamera* vtkCamera )
 {
   vnl_matrix_fixed<double, 4, 4> cameraMat;
 
@@ -318,26 +318,26 @@ vnl_matrix_fixed<double, 4, 4> mitk::WiiMoteInteractor::ComputeCurrentCameraPosi
   mitk::Vector3D camPosition;
   double camPositionTemp[3];
   vtkCamera->GetPosition(camPositionTemp);
-  camPosition[0] = camPositionTemp[0]; 
-  camPosition[1] = camPositionTemp[1]; 
-  camPosition[2] = camPositionTemp[2]; 
+  camPosition[0] = camPositionTemp[0];
+  camPosition[1] = camPositionTemp[1];
+  camPosition[2] = camPositionTemp[2];
 
   //then the upvector of the camera
   mitk::Vector3D upCamVector;
   double upCamTemp[3];
   vtkCamera->GetViewUp(upCamTemp);
-  upCamVector[0] = upCamTemp[0]; 
-  upCamVector[1] = upCamTemp[1]; 
-  upCamVector[2] = upCamTemp[2]; 
+  upCamVector[0] = upCamTemp[0];
+  upCamVector[1] = upCamTemp[1];
+  upCamVector[2] = upCamTemp[2];
   upCamVector.Normalize();
 
   //then the vector to which the camera is heading at (focalpoint)
   mitk::Vector3D focalPoint;
   double focalPointTemp[3];
   vtkCamera->GetFocalPoint(focalPointTemp);
-  focalPoint[0] = focalPointTemp[0]; 
-  focalPoint[1] = focalPointTemp[1]; 
-  focalPoint[2] = focalPointTemp[2]; 
+  focalPoint[0] = focalPointTemp[0];
+  focalPoint[1] = focalPointTemp[1];
+  focalPoint[2] = focalPointTemp[2];
   mitk::Vector3D focalVector;
   focalVector = focalPoint - camPosition;
   focalVector.Normalize();
@@ -399,11 +399,11 @@ bool mitk::WiiMoteInteractor::DynamicRotationAndTranslation(Geometry3D* geometry
   //  , m_zAngle);
 
 
-  vnl_quaternion<double> q( 
-    vtkMath::RadiansFromDegrees( m_xAngle ), 
-    vtkMath::RadiansFromDegrees( m_yAngle ), 
+  vnl_quaternion<double> q(
+    vtkMath::RadiansFromDegrees( m_xAngle ),
+    vtkMath::RadiansFromDegrees( m_yAngle ),
     vtkMath::RadiansFromDegrees( m_zAngle ) );
- 
+
   //q = Rz * Ry * Rx;
   //q.normalize();
 
@@ -433,19 +433,19 @@ bool mitk::WiiMoteInteractor::DynamicRotationAndTranslation(Geometry3D* geometry
     // relative to the camera view
 
     // get renderer
-    const RenderingManager::RenderWindowVector& renderWindows 
+    const RenderingManager::RenderWindowVector& renderWindows
       = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
     for ( RenderingManager::RenderWindowVector::const_iterator iter = renderWindows.begin();
-      iter != renderWindows.end(); 
+      iter != renderWindows.end();
       ++iter )
     {
       if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard3D )
       {
         m_BaseRenderer = mitk::BaseRenderer::GetInstance((*iter));
       }
-    }  
+    }
 
-    vtkCamera* camera 
+    vtkCamera* camera
       = m_BaseRenderer->GetVtkRenderer()->GetActiveCamera();
 
     //vtkMatrix4x4* cameraMat = vtkMatrix4x4::New();
@@ -464,7 +464,7 @@ bool mitk::WiiMoteInteractor::DynamicRotationAndTranslation(Geometry3D* geometry
 
     objectToCameraMat = vnl_inverse(cameraMat) * objectMat;
 
-    newObjectMat = vnl_inverse(objectToCameraMat) 
+    newObjectMat = vnl_inverse(objectToCameraMat)
       * deltaTransformMat
       * objectToCameraMat
       * vnl_inverse(objectMat);
@@ -518,13 +518,13 @@ bool mitk::WiiMoteInteractor::DynamicRotationAndTranslation(Geometry3D* geometry
 
 bool mitk::WiiMoteInteractor::FixedRotationAndTranslation(const mitk::WiiMoteAllDataEvent* wiiMoteEvent)
 {
-  
+
   Geometry3D* geometry = this->TransformCurrentDataInGeometry3D();
 
   m_OrientationX = wiiMoteEvent->GetOrientationX();
   m_OrientationY = wiiMoteEvent->GetOrientationY();
   m_OrientationZ = wiiMoteEvent->GetOrientationZ();
-  
+
   ScalarType pitchSpeed = wiiMoteEvent->GetPitchSpeed();
   ScalarType rollSpeed = wiiMoteEvent->GetRollSpeed();
   ScalarType yawSpeed = wiiMoteEvent->GetYawSpeed();
@@ -541,28 +541,28 @@ bool mitk::WiiMoteInteractor::FixedRotationAndTranslation(const mitk::WiiMoteAll
 
   m_yAngle += (rollSpeed / 1500);
 
-  // angle z 
+  // angle z
   if(std::abs(yawSpeed) < 200)
     yawSpeed = 0;
 
   m_zAngle += (yawSpeed / 1500);
 
-  if(  std::abs(pitchSpeed) > 200 
-    || std::abs(rollSpeed) > 200 
+  if(  std::abs(pitchSpeed) > 200
+    || std::abs(rollSpeed) > 200
     || std::abs(yawSpeed) > 200)
   {
     m_InRotation = true;
     //// depending on a combination of the
     //// orientation the angleX wil be altered
     //// because the range from roll is limited
-    //// range: -90° to 90° by the wiimote 
+    //// range: -90° to 90° by the wiimote
     //if(wiiMoteEvent->GetOrientationZ() < 0)
     //{
-    //  // value is positive 
+    //  // value is positive
     //  if(wiiMoteEvent->GetOrientationX() > 0)
     //  {
-    //    // the degree measured decreases after it reaches 
-    //    // in the "real" world the 90 degree angle 
+    //    // the degree measured decreases after it reaches
+    //    // in the "real" world the 90 degree angle
     //    // (rotation to the right side)
     //    // therefore it needs to artificially increased
 
@@ -576,9 +576,9 @@ bool mitk::WiiMoteInteractor::FixedRotationAndTranslation(const mitk::WiiMoteAll
     //  else if(wiiMoteEvent->GetOrientationX() < 0)
     //  {
     //    // the degree measured increases after it reaches
-    //    // in the "real" world -90 degree 
+    //    // in the "real" world -90 degree
     //    // (rotation to the left side)
-    //    // therefore it needs to be artificially decreased 
+    //    // therefore it needs to be artificially decreased
     //    // (example -90 -> -70, but -110 is needed)
 
     //    // measured value increases -> computated angle decreases
@@ -649,7 +649,7 @@ bool mitk::WiiMoteInteractor::FixedRotationAndTranslation(const mitk::WiiMoteAll
     float pitch = wiiMoteEvent->GetPitch();
     float roll = wiiMoteEvent->GetRoll();
 
-    // substracts the proportionate force 
+    // substracts the proportionate force
     // applied by gravity depending on the
     // orientation
 
@@ -683,7 +683,7 @@ bool mitk::WiiMoteInteractor::FixedRotationAndTranslation(const mitk::WiiMoteAll
       zValue = 0;
 
     // simple integration over time
-    // resulting in velocity  
+    // resulting in velocity
     switch(m_TranslationMode)
     {
     case 1:

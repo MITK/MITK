@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,7 +40,7 @@ class BaseData;
 //## DataObject. This is also true for subclasses of mitk::BaseProcess. But
 //## many of the subclasses of mitk::BaseProcess define additional access
 //## functions to the generated output that guarantee an up-to-date result, see
-//## for example mitk::ImageSource. 
+//## for example mitk::ImageSource.
 //## @ingroup Process
 class MITK_CORE_EXPORT BaseProcess : public itk::ProcessObject
 {
@@ -74,19 +74,19 @@ protected:
 
   //##Documentation
   //## @brief Protected methods for setting outputs.
-  //## 
-  //## Subclasses make use of them for getting output. 
-  //## These are only overwritten because of itk::DataObject::ConnectSource being 
-  //## private and non-virtual: the important stuff is done in 
+  //##
+  //## Subclasses make use of them for getting output.
+  //## These are only overwritten because of itk::DataObject::ConnectSource being
+  //## private and non-virtual: the important stuff is done in
   //## mitk::BaseData::ConnectSource.
   virtual void SetNthOutput(unsigned int num, itk::DataObject *output);
 
   //##Documentation
   //## @brief Protected methods for setting outputs.
-  //## 
-  //## Subclasses make use of them for getting output. 
-  //## These are only overwritten because of itk::DataObject::ConnectSource being 
-  //## private and non-virtual: the important stuff is done in 
+  //##
+  //## Subclasses make use of them for getting output.
+  //## These are only overwritten because of itk::DataObject::ConnectSource being
+  //## private and non-virtual: the important stuff is done in
   //## mitk::BaseData::ConnectSource.
   virtual void AddOutput(itk::DataObject *output);
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,12 +35,12 @@ const char* SINGLEPOINTWITHOUTSHIFTCLICKNAME = "singlepointinteractorwithoutshif
 /**
 *@brief method to send specified events to EventMapper
 **/
-class mitkPointSetInteractorTestClass { 
+class mitkPointSetInteractorTestClass {
 public:
 
   void TestPointSetInteractor(const char* name, mitk::DataNode* node, mitk::BaseRenderer* sender, int numberOfPointsAllowed)
-  {  
-    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New(name, node, numberOfPointsAllowed); 
+  {
+    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New(name, node, numberOfPointsAllowed);
     MITK_TEST_CONDITION_REQUIRED(interactor.IsNotNull(),"Testing to initialize PointSetInteractor")
       std::cout<<"The pattern of the interactor is called: "<<interactor->GetType()<<std::endl;
     MITK_TEST_CONDITION_REQUIRED(interactor->GetType() == name,"testing pattern name of interactor");
@@ -56,7 +56,7 @@ public:
     mitk::Point2D pos2D;
     pos3D[0]= 10.0;  pos3D[1]= 20.0;  pos3D[2]= 30.0;
     pos2D[0]= 100;  pos2D[0]= 200;
-    
+
     this->SendPositionEvent(sender, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_ShiftButton, mitk::Key_none, pos2D, pos3D);
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==0,"Checking unconnected interactor.");
 
@@ -77,7 +77,7 @@ public:
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetSelectInfo(0) == false,"Testing deselection of a point.");
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetNumberOfSelected() == 0,"No selected points.");
 
-    //trying to delete a deselected point so going from state 2 over 30 to 1 
+    //trying to delete a deselected point so going from state 2 over 30 to 1
     mitk::Event* delEvent = new mitk::Event(sender, mitk::Type_KeyPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_Delete);
     mitk::GlobalInteraction::GetInstance()->GetEventMapper()->MapEvent(delEvent);
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==1,"Checking that no unselected point can be deleted.");
@@ -217,8 +217,8 @@ public:
   }
 
   void TestOnlyMovePointSetInteractor(const char* name, mitk::DataNode* node, mitk::BaseRenderer* sender, int numberOfPointsAllowed)
-  {  
-    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New(name, node, numberOfPointsAllowed); 
+  {
+    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New(name, node, numberOfPointsAllowed);
     MITK_TEST_CONDITION_REQUIRED(interactor.IsNotNull(),"Testing to initialize PointSetInteractor")
       std::cout<<"The pattern of the interactor is called: "<<interactor->GetType()<<std::endl;
     MITK_TEST_CONDITION_REQUIRED(interactor->GetType() == name,"testing pattern name of interactor");
@@ -251,7 +251,7 @@ public:
     mitk::PointOperation* doOp = new mitk::PointOperation( mitk::OpINSERT, timestep, pos3D, index);
     newPointSet->ExecuteOperation(doOp);
     //undo is enabled on default, so no need to delete doOp
-    
+
     pos3D[0]= 100.0;  pos3D[1]= 200.0;  pos3D[2]= 300.0;
     pos2D[0]= 100;  pos2D[0]= 200;
     index = 1;
@@ -304,14 +304,14 @@ public:
     this->SendPositionEvent(sender, mitk::Type_MouseButtonRelease, mitk::BS_LeftButton, mitk::BS_LeftButton, mitk::Key_none, pos2D, pos3D);
 
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPoint(0) == pos3D,"Testing movement of point.");
-    
+
     mitk::GlobalInteraction::GetInstance()->RemoveInteractor(interactor);
   }
 
-  
+
   void TestSeedPointSetInteractor(const char* name, mitk::DataNode* node, mitk::BaseRenderer* sender)
-  {  
-    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New(name, node); 
+  {
+    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New(name, node);
     MITK_TEST_CONDITION_REQUIRED(interactor.IsNotNull(),"Testing to initialize PointSetInteractor")
       std::cout<<"The pattern of the interactor is called: "<<interactor->GetType()<<std::endl;
     MITK_TEST_CONDITION_REQUIRED(interactor->GetType() == name,"testing pattern name of interactor");
@@ -327,7 +327,7 @@ public:
     mitk::Point2D pos2D;
     pos3D[0]= 10.0;  pos3D[1]= 20.0;  pos3D[2]= 30.0;
     pos2D[0]= 10;  pos2D[0]= 20;
-    
+
     this->SendPositionEvent(sender, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_ShiftButton, mitk::Key_none, pos2D, pos3D);
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==0,"Checking unconnected interactor.");
 
@@ -348,7 +348,7 @@ public:
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetSelectInfo(0) == false,"Testing deselection of a point.");
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetNumberOfSelected() == 0,"No selected points.");
 
-    //trying to delete a deselected point so going from state 10 over 15 to 10 
+    //trying to delete a deselected point so going from state 10 over 15 to 10
     mitk::Event* delEvent = new mitk::Event(sender, mitk::Type_KeyPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_Delete);
     mitk::GlobalInteraction::GetInstance()->GetEventMapper()->MapEvent(delEvent);
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==1,"Checking that no unselected point can be deleted.");
@@ -364,7 +364,7 @@ public:
     mitk::GlobalInteraction::GetInstance()->GetEventMapper()->MapEvent(delEvent);
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==0,"Checking if the selected point could be delected.");
 
-    //adding two points and checking that only the last one remains in point set 
+    //adding two points and checking that only the last one remains in point set
     pos3D[0]= 11.0;  pos3D[1]= 22.0;  pos3D[2]= 33.0;
     pos2D[0]= 11;  pos2D[0]= 22;
     this->SendPositionEvent(sender, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_ShiftButton, mitk::Key_none, pos2D, pos3D);
@@ -421,16 +421,16 @@ public:
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPoint(0) == pos3D,"Testing movement of point.");
 
     //not deleting the points and end of test
-    
+
     //removing interactor from GlobalInteraction
     mitk::GlobalInteraction::GetInstance()->RemoveInteractor(interactor);
     delete delEvent;
   }
 
-  
+
   void TestSinglePointSetInteractorWithoutShiftClick(const char* name, mitk::DataNode* node, mitk::BaseRenderer* sender)
-  {  
-    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New(name, node); 
+  {
+    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New(name, node);
     MITK_TEST_CONDITION_REQUIRED(interactor.IsNotNull(),"Testing to initialize PointSetInteractor")
       std::cout<<"The pattern of the interactor is called: "<<interactor->GetType()<<std::endl;
     MITK_TEST_CONDITION_REQUIRED(interactor->GetType() == name,"testing pattern name of interactor");
@@ -446,7 +446,7 @@ public:
     mitk::Point2D pos2D;
     pos3D[0]= 10.0;  pos3D[1]= 20.0;  pos3D[2]= 30.0;
     pos2D[0]= 10;  pos2D[0]= 20;
-    
+
     this->SendPositionEvent(sender, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_NoButton, mitk::Key_none, pos2D, pos3D);
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==0,"Checking unconnected interactor.");
 
@@ -460,12 +460,12 @@ public:
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPoint(0) == pos3D,"Testing right addition of point.");
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetSelectInfo(0) ,"Testing if point is selected.");
 
-    //trying to delete point 
+    //trying to delete point
     mitk::Event* delEvent = new mitk::Event(sender, mitk::Type_KeyPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_Delete);
     mitk::GlobalInteraction::GetInstance()->GetEventMapper()->MapEvent(delEvent);
     MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==0,"Checking deleting point.");
 
-    //adding two points and checking that only the last one remains in point set 
+    //adding two points and checking that only the last one remains in point set
     pos3D[0]= 11.0;  pos3D[1]= 22.0;  pos3D[2]= 33.0;
     pos2D[0]= 11;  pos2D[0]= 22;
     this->SendPositionEvent(sender, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_NoButton, mitk::Key_none, pos2D, pos3D);
@@ -535,7 +535,7 @@ int mitkPointSetInteractorTest(int /*argc*/, char* /*argv*/[])
 
   //we need a baserenderer (VtkPropRenderer) to be able to let PointSetInteractor::CanHandleEvent() proccess
   //and for this we need a RenderWindow and a RenderingManager
-  
+
   mitk::RenderingManager::Pointer myRenderingManager = mitk::RenderingManager::New();
   myRenderingManager->SetGlobalInteraction(mitk::GlobalInteraction::GetInstance());
   vtkRenderWindow* vtkRenWin = vtkRenderWindow::New();
@@ -545,16 +545,16 @@ int mitkPointSetInteractorTest(int /*argc*/, char* /*argv*/[])
   //hook everything up into a dataNode. (node doesn't here have to be in DataStorage)
   node->SetData(pointSet);
 
-  //pointset should be empty  
+  //pointset should be empty
   MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==0,"Checking if pointset is empty.");
 
   //instance of testclass
   mitkPointSetInteractorTestClass* test = new mitkPointSetInteractorTestClass();
-  
+
   //test setup regular pointsetinteractor
   MITK_TEST_OUTPUT(<<"--------Testing "<<POINTSETINTERACTORNAME<<" with max 3 points--------");
   test->TestPointSetInteractor(POINTSETINTERACTORNAME, node, sender, 3);
-  
+
   pointSet = mitk::PointSet::New();
   node = mitk::DataNode::New();
   node->SetData(pointSet);
@@ -581,7 +581,7 @@ int mitkPointSetInteractorTest(int /*argc*/, char* /*argv*/[])
   pointSet = mitk::PointSet::New();
   node = mitk::DataNode::New();
   node->SetData(pointSet);
-  
+
   MITK_TEST_OUTPUT(<<"--------Testing "<<SINGLEPOINTWITHOUTSHIFTCLICKNAME<<" with one point --------");
   test->TestSinglePointSetInteractorWithoutShiftClick(SINGLEPOINTWITHOUTSHIFTCLICKNAME, node, sender);
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,11 +39,11 @@ int mitkContourTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(points.IsNotNull(), "Testing GetPoints()");
 
   contour->Initialize();
-  MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfPoints() == 0, "Testing Initialize()!"); 
+  MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfPoints() == 0, "Testing Initialize()!");
 
   contour->SetPoints(points);
   MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfPoints() == 3, "Testimg SetPoints()!");
-  
+
   mitk::Contour::PathPointer path =  contour->GetContourPath();
   MITK_TEST_CONDITION_REQUIRED(path.IsNotNull(), "Testing GetContourPath()!");
 

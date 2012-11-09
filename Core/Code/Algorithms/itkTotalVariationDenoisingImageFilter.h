@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ namespace itk
  * \sa Neighborhood
  * \sa NeighborhoodOperator
  * \sa NeighborhoodIterator
- * 
+ *
  * \ingroup IntensityImageFilters
  */
 template <class TInputImage, class TOutputImage>
@@ -62,7 +62,7 @@ public:
 
   /** Run-time type information (and related methods). */
   itkTypeMacro(TotalVariationDenoisingImageFilter, ImageToImageFilter);
-  
+
   /** Image typedef support. */
   typedef typename InputImageType::PixelType InputPixelType;
   typedef typename OutputImageType::PixelType OutputPixelType;
@@ -98,7 +98,7 @@ private:
   TotalVariationDenoisingImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 };
-  
+
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION

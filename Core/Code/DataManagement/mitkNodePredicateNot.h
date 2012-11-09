@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ namespace mitk {
   //## Changed: NodePredicateNot now derives from NodePredicateCompositeBase though it really holds
   //## only one subpredicate at any time. But logically any Predicate that has one or more subpredicate
   //## is a CompositePredicate.
-  //## 
+  //##
   //## @ingroup DataStorage
   class MITK_CORE_EXPORT NodePredicateNot : public mitk::NodePredicateCompositeBase
   {

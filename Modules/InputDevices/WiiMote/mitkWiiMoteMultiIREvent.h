@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,8 +28,8 @@ namespace mitk
   {
   public:
 
-    typedef WiiMoteMultiIREvent Self; 
-    typedef itk::EventObject Superclass; 
+    typedef WiiMoteMultiIREvent Self;
+    typedef itk::EventObject Superclass;
 
     WiiMoteMultiIREvent(mitk::Point3D Coordinate3D);
     ~WiiMoteMultiIREvent();
@@ -37,9 +37,9 @@ namespace mitk
     mitk::Point3D Get3DCoordinate() const;
 
     //itk::EventObject implementation
-    const char * GetEventName() const; 
-    bool CheckEvent(const ::itk::EventObject* e) const; 
-    ::itk::EventObject* MakeObject() const; 
+    const char * GetEventName() const;
+    bool CheckEvent(const ::itk::EventObject* e) const;
+    ::itk::EventObject* MakeObject() const;
 
   protected:
 

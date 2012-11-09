@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -291,7 +291,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     d->m_RenderWindows.insert("sagittal", d->m_StdMultiWidget->GetRenderWindow2());
     d->m_RenderWindows.insert("coronal", d->m_StdMultiWidget->GetRenderWindow3());
     d->m_RenderWindows.insert("3d", d->m_StdMultiWidget->GetRenderWindow4());
-    
+
     d->m_MouseModeToolbar->setMouseModeSwitcher( d->m_StdMultiWidget->GetMouseModeSwitcher() );
     connect( d->m_MouseModeToolbar, SIGNAL( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ),
       d->m_StdMultiWidget, SLOT( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ) );
@@ -374,7 +374,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     if (logoFound) break;
     currentNode = currentNode->Parent().GetPointer();
   }
- 
+
   // preferences for gradient background
   float color = 255.0;
   QString firstColorName = QString::fromStdString (prefs->GetByteArray("first background color", ""));

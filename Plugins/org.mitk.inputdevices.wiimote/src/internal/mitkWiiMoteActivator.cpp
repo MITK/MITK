@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,14 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseRenderer.h>
 #include <mitkIDataStorageService.h>
 
-mitk::WiiMoteActivator::WiiMoteActivator() 
+mitk::WiiMoteActivator::WiiMoteActivator()
 : m_IsRegistered(false)
 , m_Controller(mitk::WiiMoteVtkCameraController::New())
 , m_Interactor(NULL)
 , m_Node(NULL)
 {
  m_PrefService = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);  
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 }
 
 mitk::WiiMoteActivator::~WiiMoteActivator()
@@ -43,7 +43,7 @@ bool mitk::WiiMoteActivator::RegisterInputDevice()
   if(!this->m_IsRegistered)
   {
     mitk::WiiMoteAddOn::GetInstance()->ActivateWiiMotes();
-   
+
     mitk::EventMapper* eventMapper(mitk::GlobalInteraction::GetInstance()->GetEventMapper());
     if (eventMapper != NULL)
     {
@@ -58,7 +58,7 @@ bool mitk::WiiMoteActivator::RegisterInputDevice()
   }
 
   // get the current preferences
-  m_WiiMotePreferencesNode = 
+  m_WiiMotePreferencesNode =
     m_PrefService->GetSystemPreferences()->Node(CoreExtConstants::INPUTDEVICE_PREFERENCES);
 
   // modus change between Surface Interaction and VR Headtracking
@@ -118,7 +118,7 @@ bool mitk::WiiMoteActivator::UnRegisterInputDevice()
 
 mitk::DataStorage::Pointer mitk::WiiMoteActivator::GetDataStorage()
 {
-  mitk::IDataStorageService::Pointer service = 
+  mitk::IDataStorageService::Pointer service =
     berry::Platform::GetServiceRegistry().
     GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
 
@@ -136,7 +136,7 @@ void mitk::WiiMoteActivator::AddSurfaceInteractor()
 
     // model was designed by Patrick Grubb
     std::string fileName = MITK_ROOT;
-    fileName += "Modules/InputDevices/WiiMote/WiiMoteModel.obj"; 
+    fileName += "Modules/InputDevices/WiiMote/WiiMoteModel.obj";
 
     try
     {
@@ -175,7 +175,7 @@ void mitk::WiiMoteActivator::RemoveSurfaceInteractor()
       this->GetDataStorage()->Remove(m_Node);
     }
 
-    if(m_Interactor.IsNotNull() 
+    if(m_Interactor.IsNotNull()
       && mitk::GlobalInteraction::GetInstance()->InteractorRegistered(m_Interactor))
     {
       mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_Interactor);

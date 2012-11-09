@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,23 +24,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkNavigationDataLandmarkTransformFilterTestClass
   {
   public:
-  
+
   static void TestInstantiation()
     {
-    // let's create an object of our class  
+    // let's create an object of our class
     mitk::NavigationDataLandmarkTransformFilter::Pointer myFilter = mitk::NavigationDataLandmarkTransformFilter::New();
-  
+
     // first test: did this work?
     // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
     // it makes no sense to continue without an object.
     MITK_TEST_CONDITION_REQUIRED(myFilter.IsNotNull(),"Testing instantiation");
     }
- 
+
   static void TestFilter()
     {
-    // let's create an object of our class  
+    // let's create an object of our class
     mitk::NavigationDataLandmarkTransformFilter::Pointer myFilter = mitk::NavigationDataLandmarkTransformFilter::New();
-    
+
     // first test: did this work?
     // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
     // it makes no sense to continue without an object.
@@ -55,14 +55,14 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     mitk::FillVector3D(tPoint1, 2.1, 2.1, 2.1);
     mitk::FillVector3D(tPoint2, 3.2, 3.2, 3.2);
     mitk::FillVector3D(tPoint3, 4.3, 4.3, 4.3);
-    
+
     mitk::PointSet::Pointer sourcePoints = mitk::PointSet::New();
     mitk::PointSet::Pointer targetPoints = mitk::PointSet::New();
-      
+
     sourcePoints->SetPoint(0,sPoint1);
     sourcePoints->SetPoint(1,sPoint2);
     sourcePoints->SetPoint(2,sPoint3);
-   
+
     targetPoints->SetPoint(0,tPoint1);
     targetPoints->SetPoint(1,tPoint2);
     targetPoints->SetPoint(2,tPoint3);
@@ -102,13 +102,13 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() after setting source points and before setting target points");
 
     mitk::PointSet::Pointer zeroTargetPoints = mitk::PointSet::New();
-    
+
     MITK_TEST_FOR_EXCEPTION(itk::ExceptionObject, myFilter->SetTargetLandmarks(zeroTargetPoints));
     MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() after setting target pointset with insufficient points");
 
     myFilter->SetTargetLandmarks(targetPoints);
     MITK_TEST_CONDITION(myFilter->IsInitialized() == true, "Testing IsInitialized() after setting source& target points");
-    
+
     //------------------------landmark transform should be initialized at this point------------------------
     output1->Update();
     MITK_TEST_CONDITION_REQUIRED(
@@ -122,7 +122,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
 
     mitk::NavigationData* output2 = myFilter->GetOutput(1);
     MITK_TEST_CONDITION_REQUIRED(output2 != NULL, "Testing GetOutput() ND2");
-    
+
     //------------------------update output1 but check result2------------------------
     output1->Update();
     MITK_TEST_CONDITION_REQUIRED(
@@ -145,7 +145,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       mitk::Equal(output2->GetPosition(),  resultPos2),
       "Testing ND2 position correctly transformed after updating value");
 
-    
+
     //------------------------change target PointSet------------------------
     mitk::FillVector3D(tPoint1, 3.1, 3.1, 3.1);
     mitk::FillVector3D(tPoint2, 4.2, 4.2, 4.2);
@@ -157,11 +157,11 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     targetPoints->SetPoint(0,tPoint1);
     targetPoints->SetPoint(1,tPoint2);
     targetPoints->SetPoint(2,tPoint3);
-    
+
     myFilter->SetTargetLandmarks(targetPoints);
 
     output1->Update();
-    
+
     MITK_TEST_CONDITION(
       mitk::Equal(output1->GetPosition(),  resultPos1),
       "Testing ND1 position correctly transformed after targetPointSet changed");
@@ -211,7 +211,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       sourcePoints->SetPoint(4, s1);
       sourcePoints->SetPoint(5, s2);
       sourcePoints->SetPoint(6, s5);
-      
+
       mitk::PointSet::Pointer targetPoints = mitk::PointSet::New();
       mitk::Point3D t1, t2, t3, t4, t5, t6;
       mitk::FillVector3D(t1, 2.1, 2.1, 102.1);  // ==> targets have offset [1, 1, 101]
@@ -223,7 +223,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       targetPoints->SetPoint(1, t1);
       targetPoints->SetPoint(2, t2);
       targetPoints->SetPoint(3, t3);
-      targetPoints->SetPoint(4, t4);  
+      targetPoints->SetPoint(4, t4);
       targetPoints->SetPoint(5, t5);
       targetPoints->SetPoint(6, t6);
 
@@ -295,11 +295,11 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     //set initial orientation (x y z r)
     mitk::NavigationData::OrientationType initialQuat(0.0, 0.0, 0.0, 1.0);
     mitk::NavigationData::OrientationType resultQuat(0.0, 0.0, -0.7071, -0.7071);
-    
+
     //set position
     mitk::FillVector3D(initialPos1, 2.2, 2.2, 2.2);
     mitk::FillVector3D(resultPos1, -2.2, 2.2, 2.2);
-    
+
     nd1->SetOrientation(initialQuat);
     nd1->SetPosition(initialPos1);
 
@@ -307,15 +307,15 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
 
     output1 = myFilter->GetOutput(0);
     output1->Update();
-    
-    MITK_TEST_CONDITION( 
+
+    MITK_TEST_CONDITION(
       mitk::Equal(output1->GetPosition(), resultPos1),
       "Testing ND1 position correctly transformed ");
 
-    MITK_TEST_CONDITION( 
+    MITK_TEST_CONDITION(
       mitk::Equal(output1->GetOrientation(), resultQuat),
       "Testing ND1 orientation correctly transformed ");
-    
+
     //------------------------test FRE calculation------------------------
     mitk::PointSet::Pointer refSet = mitk::PointSet::New();
     mitk::PointSet::Pointer movSet = mitk::PointSet::New();
@@ -359,7 +359,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     mitk::NavigationDataLandmarkTransformFilter::Pointer myFREFilter = mitk::NavigationDataLandmarkTransformFilter::New();
     myFREFilter->SetSourceLandmarks(refSet);
     myFREFilter->SetTargetLandmarks(movSet);
-    
+
     //very simple test case, everything is the same (min = max = mean = RMS = abs max error)
     //but still ok to see if the methods work without a crash
     MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetFRE() == (float) sqrt(3.0),"Testing mean error calculation");
@@ -369,7 +369,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetFREStdDev() == (float) 0.0,"Testing SD calculation");
     MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetAbsMaxError() == (float) sqrt(3.0),"Testing abs max error calculation");
     MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetErrorVector().size() == 8,"Testing method GetErrorVector");
-    
+
     //todo: extend by a more complex test case with different values?
     }
 
@@ -450,7 +450,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     //Point 2
     refPoint[0]=0; refPoint[1]=0; refPoint[2]=3; refSet->SetPoint(2, refPoint);
     movPoint[0]=1; movPoint[1]=1; movPoint[2]=2; movSet->SetPoint(2, movPoint);
-    
+
     myFilter->SetUseICPInitialization(true);
 
     bool exceptionThrown = false;
@@ -475,7 +475,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
 int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationDataLandmarkTransformFilter")
-  
+
   mitkNavigationDataLandmarkTransformFilterTestClass::TestInstantiation();
   mitkNavigationDataLandmarkTransformFilterTestClass::TestFilter();
   mitkNavigationDataLandmarkTransformFilterTestClass::TestPrintSelfMethod();

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,8 +20,8 @@ QmitkSliderNavigatorWidget::QmitkSliderNavigatorWidget(QWidget* parent, Qt::Wind
  : QWidget(parent, f)
 {
   this->setupUi(this);
-  
-  // this avoids trying to use m_Stepper until it is set to something != NULL 
+
+  // this avoids trying to use m_Stepper until it is set to something != NULL
   // (additionally to the avoiding recursions during refetching)
   m_InRefetch = true;
 
@@ -41,7 +41,7 @@ void QmitkSliderNavigatorWidget::Refetch()
   if ( !m_InRefetch )
   {
     m_InRefetch = true;
-    
+
     m_Slider->setMinimum( 0 );
     m_Slider->setMaximum( m_Stepper->GetSteps() - 1 );
     if (m_InverseDirection)
@@ -52,7 +52,7 @@ void QmitkSliderNavigatorWidget::Refetch()
     {
       m_Slider->setValue( m_Stepper->GetPos() );
     }
-    
+
     m_SpinBox->setMinimum( 0 );
     m_SpinBox->setMaximum( m_Stepper->GetSteps() - 1 );
     if (m_InverseDirection)
@@ -69,11 +69,11 @@ void QmitkSliderNavigatorWidget::Refetch()
       // Show slider with labels according to below settings
       m_SliderLabelLeft->setHidden( false );
       m_SliderLabelRight->setHidden( false );
-    
+
       if ( m_Stepper->HasValidRange() )
       {
         this->SetLabelValuesValid( true, true );
-        this->SetLabelValues( 
+        this->SetLabelValues(
           m_Stepper->GetRangeMin(),
           m_Stepper->GetRangeMax() );
       }
@@ -93,10 +93,10 @@ void QmitkSliderNavigatorWidget::Refetch()
       m_SliderLabelLeft->setHidden( true );
       m_SliderLabelRight->setHidden( true );
     }
-  
+
     // Update GUI according to above settings
     this->SetLabels();
-    
+
     m_InRefetch=false;
   }
 }
@@ -105,8 +105,8 @@ void QmitkSliderNavigatorWidget::Refetch()
 void QmitkSliderNavigatorWidget::SetStepper( mitk::Stepper * stepper)
 {
   m_Stepper = stepper;
-  
-  // this avoids trying to use m_Stepper until it is set to something != NULL 
+
+  // this avoids trying to use m_Stepper until it is set to something != NULL
   // (additionally to the avoiding recursions during refetching)
   m_InRefetch = (stepper==NULL);
 }
@@ -203,12 +203,12 @@ QString QmitkSliderNavigatorWidget::GetMaxValueLabel()
 
 void QmitkSliderNavigatorWidget::SetLabels()
 {
-  QString minText = "<p align='center'><font size='2'>" 
+  QString minText = "<p align='center'><font size='2'>"
     + this->GetMinValueLabel();
 
-  QString maxText = "<p align='center'><font size='2'>" 
+  QString maxText = "<p align='center'><font size='2'>"
     + this->GetMaxValueLabel();
-  
+
   if ( m_HasLabelUnit )
   {
     minText += "&nbsp;" + this->GetLabelUnit();
@@ -255,7 +255,7 @@ int QmitkSliderNavigatorWidget::GetPos()
 
 void QmitkSliderNavigatorWidget::SetPos(int val)
 {
-  if (!m_InRefetch)    
+  if (!m_InRefetch)
   {
     m_Stepper->SetPos( val );
   }

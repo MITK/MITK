@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ namespace mitk {
 
 class DataNode;
 
-//## @brief base-class for factories of certain mitk objects. 
+//## @brief base-class for factories of certain mitk objects.
 //## @ingroup Algorithms
 //## This interface can be implemented by factories which add new mapper classes or extend the
 //## data tree deserialization mechanism.
@@ -51,7 +51,7 @@ class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::Object
     virtual const char* GetSaveFileExtensions() = 0;
     virtual MultimapType GetSaveFileExtensionsMap() = 0;
     virtual const char* GetITKSourceVersion() const
-    { 
+    {
       return ITK_SOURCE_VERSION;
     }
     virtual const char* GetDescription() const
@@ -63,7 +63,7 @@ class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::Object
     }
 
   protected:
-  
+
     /**
      * @brief create a string from a map that contains the file extensions
      * @param fileExtensionsMap input map with the file extensions, e.g. ("*.dcm", "DICOM files")("*.dc3", "DICOM files")

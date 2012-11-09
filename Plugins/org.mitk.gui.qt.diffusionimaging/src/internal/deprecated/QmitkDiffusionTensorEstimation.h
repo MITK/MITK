@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,52 +27,52 @@ typedef short DiffusionPixelType;
 
 
 /*!
-\brief QmitkDiffusionTensorEstimation 
+\brief QmitkDiffusionTensorEstimation
 
-One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 
-and CreateAction(..) from QmitkFunctionality. 
+One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..)
+and CreateAction(..) from QmitkFunctionality.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
 class QmitkDiffusionTensorEstimation : public QmitkFunctionality
-{  
+{
   Q_OBJECT
 
-public:  
-  /*!  
-  \brief default constructor  
-  */  
+public:
+  /*!
+  \brief default constructor
+  */
   QmitkDiffusionTensorEstimation(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
-  /*!  
-  \brief default destructor  
-  */  
+  /*!
+  \brief default destructor
+  */
   virtual ~QmitkDiffusionTensorEstimation();
 
-  /*!  
-  \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
-  */  
+  /*!
+  \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
+  */
   virtual QWidget * CreateControlWidget(QWidget *parent);
 
-  /*!  
-  \brief method for creating the applications main widget  
-  */  
+  /*!
+  \brief method for creating the applications main widget
+  */
   virtual QWidget * CreateMainWidget(QWidget * parent);
 
-  /*!  
-  \brief method for creating the connections of main and control widget  
-  */  
+  /*!
+  \brief method for creating the connections of main and control widget
+  */
   virtual void CreateConnections();
 
-  /*!  
-  \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
-  */  
+  /*!
+  \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget
+  */
   virtual QAction * CreateAction(QActionGroup *parent);
 
   virtual void Activated();
 
-  protected slots:  
+  protected slots:
     void TreeChanged();
 
     void TensorVolumesSaveButton();
@@ -129,22 +129,22 @@ public:
 
     void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
-protected:  
-  /*!  
-  * default main widget containing 4 windows showing 3   
-  * orthogonal slices of the volume and a 3d render window  
-  */  
+protected:
+  /*!
+  * default main widget containing 4 windows showing 3
+  * orthogonal slices of the volume and a 3d render window
+  */
   QmitkStdMultiWidget * m_MultiWidget;
 
-  /*!  
-  * controls containing sliders for scrolling through the slices  
-  */  
+  /*!
+  * controls containing sliders for scrolling through the slices
+  */
   QmitkDiffusionTensorEstimationControls * m_Controls;
 
   mitk::DataTreeFilter::Pointer m_DiffusionVolumesDataTreeFilter;
-  
+
   mitk::DataTreeFilter::Pointer m_TensorVolumesDataTreeFilter;
-  
+
   mitk::DataTreeFilter::Pointer m_QballVolumesDataTreeFilter;
 
   mitk::DataTreeFilter::Pointer m_DirectionVolumesDataTreeFilter;
@@ -152,11 +152,11 @@ protected:
   bool m_FilterInitialized;
 
   static const int odfsize;
-  
+
   static const int nrconvkernels;
 
   template<int L>
-  void ReconstructAnalytically(mitk::DiffusionVolumes<DiffusionPixelType>* vols, 
+  void ReconstructAnalytically(mitk::DiffusionVolumes<DiffusionPixelType>* vols,
     float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes);
 
 };

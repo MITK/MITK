@@ -19,7 +19,7 @@ find_program(GIT_EXECUTABLE ${git_candidates}
     "C:/Program Files (x86)/Git/bin"
   DOC "git command line client")
 mark_as_advanced(GIT_EXECUTABLE)
- 
+
 if(GIT_EXECUTABLE)
 
   macro(GIT_IS_REPO dir result_var)
@@ -34,7 +34,7 @@ if(GIT_EXECUTABLE)
       set(${result_var} 0)
     endif()
   endmacro()
-  
+
   macro(GIT_WC_INFO dir prefix)
     execute_process(COMMAND ${GIT_EXECUTABLE} rev-list -n 1 HEAD
        WORKING_DIRECTORY ${dir}
@@ -72,7 +72,7 @@ if(GIT_EXECUTABLE)
       string(REGEX REPLACE "^(.*\n)?Last Changed Date: ([^\n]+).*"
         "\\2" ${prefix}_WC_LAST_CHANGED_DATE "${${prefix}_WC_INFO}")
     endif()
-    
+
   endmacro()
 endif()
 

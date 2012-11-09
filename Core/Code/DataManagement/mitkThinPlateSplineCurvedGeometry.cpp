@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -71,7 +71,7 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
   projectedTargetLandmarks = m_LandmarkProjector->GetProjectedLandmarks();
 
   mitk::PointSet::DataType::PointsContainer::ConstIterator targetIt, projectedIt;
-  
+
   targetIt    = finalTargetLandmarks->Begin();
   projectedIt = projectedTargetLandmarks->Begin();
 
@@ -81,7 +81,7 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
   vtkIdType id;
   int size=finalTargetLandmarks->Size();
   for(id=0; id < size; ++id, ++targetIt, ++projectedIt)
-  { 
+  {
     const mitk::PointSet::PointType& target = targetIt->Value();
     m_VtkTargetLandmarks->InsertPoint(id, target[0], target[1], target[2]);
     const mitk::PointSet::PointType& projected = projectedIt->Value();

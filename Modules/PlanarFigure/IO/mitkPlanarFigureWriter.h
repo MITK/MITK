@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ namespace mitk
 {
 
   /**
-  * @brief XML-based writer for mitk::PlanarFigures 
+  * @brief XML-based writer for mitk::PlanarFigures
   *
   * XML-based writer for mitk::PlanarFigures.
   * @ingroup Process
@@ -99,7 +99,7 @@ namespace mitk
 
     /**
     * @param num the index of the desired output object.
-    * @returns the n'th input object of the filter. 
+    * @returns the n'th input object of the filter.
     */
     PlanarFigure* GetInput( const unsigned int& num );
 
@@ -115,7 +115,7 @@ namespace mitk
     virtual std::string GetFileExtension();
 
     /**
-    * @brief Check if the Writer can write the Content of the 
+    * @brief Check if the Writer can write the Content of the
     */
     virtual bool CanWriteDataType( DataNode* );
 
@@ -151,7 +151,7 @@ namespace mitk
 
 
     /**
-    @brief CAUTION: It's up to the user to call this function to release the 
+    @brief CAUTION: It's up to the user to call this function to release the
     memory buffer after use in case the file writer has written to its memory array.
     See mitkFileWriter base class. */
     virtual void         ReleaseMemory();

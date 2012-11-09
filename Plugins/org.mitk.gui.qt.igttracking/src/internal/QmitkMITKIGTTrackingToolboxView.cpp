@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -446,7 +446,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
       //ask the user if he wants to save the detected tools
       QMessageBox msgBox;
       switch(m_toolStorage->GetToolCount())
-        { 
+        {
         case 1:
           msgBox.setText("Found one tool!");
           break;
@@ -457,7 +457,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
       msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
       msgBox.setDefaultButton(QMessageBox::No);
       int ret = msgBox.exec();
-      
+
       if (ret == 16384) //yes
         {
         //ask the user for a filename

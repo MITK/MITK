@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,25 +28,25 @@ Widget for setting up and controlling an update timer in an IGT-Pipeline.
 
 */
 class MitkIGTUI_EXPORT QmitkUpdateTimerWidget : public QWidget
-{  
+{
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
-public: 
+public:
 
 
   enum WidgetButtons {
-      
+
       StartButton,
       StopButton
   };
 
-  /*!  
-  \brief default constructor  
-  */ 
+  /*!
+  \brief default constructor
+  */
   QmitkUpdateTimerWidget( QWidget* parent );
 
-  /*!  
-  \brief default destructor  
-  */ 
+  /*!
+  \brief default destructor
+  */
   virtual ~QmitkUpdateTimerWidget();
 
   /*!
@@ -122,7 +122,7 @@ protected:
   void CreateConnections();
   void CreateQtPartControl( QWidget *parent );
   Ui::QmitkUpdateTimerWidgetControls* m_Controls;  ///< gui widgets
-  
+
 
 private:
   /*!

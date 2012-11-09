@@ -5,7 +5,7 @@ if(BUILD_TESTING)
   set(proj PT) # Means ProjectTemplate (use a short name due to Windows limitations)
   set(MITK-ProjectTemplate_SOURCE_DIR "${MITK_BINARY_DIR}/${proj}")
   set(MITK-ProjectTemplate_BINARY_DIR "${MITK_BINARY_DIR}/${proj}-bin")
-  
+
   add_test(NAME mitkProjectTemplateRmSrcTest
            COMMAND ${CMAKE_COMMAND} -E remove_directory "${MITK-ProjectTemplate_SOURCE_DIR}"
           )
@@ -31,7 +31,7 @@ if(BUILD_TESTING)
   set_tests_properties(mitkProjectTemplateCloneTest PROPERTIES
                        DEPENDS mitkProjectTemplateRmSrcTest
                        LABELS "MITK;BlueBerry")
-                         
+
   if(CMAKE_CONFIGURATION_TYPES)
     foreach(config ${CMAKE_CONFIGURATION_TYPES})
       add_test(NAME mitkProjectTemplateConfigureTest-${config} CONFIGURATIONS ${config}
@@ -46,7 +46,7 @@ if(BUILD_TESTING)
       set_tests_properties(mitkProjectTemplateConfigureTest-${config} PROPERTIES
                            DEPENDS "mitkProjectTemplateCloneTest;mitkProjectTemplateMakeBinTest"
                            LABELS "MITK;BlueBerry")
-                           
+
       add_test(NAME mitkProjectTemplateBuildTest-${config} CONFIGURATIONS ${config}
                COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${config})
       set_tests_properties(mitkProjectTemplateBuildTest-${config} PROPERTIES
@@ -65,7 +65,7 @@ if(BUILD_TESTING)
     set_tests_properties(mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
                          DEPENDS "mitkProjectTemplateCloneTest;mitkProjectTemplateMakeBinTest"
                          LABELS "MITK;BlueBerry")
-                         
+
     add_test(NAME mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE}
              COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR} --config ${CMAKE_BUILD_TYPE})
     set_tests_properties(mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE} PROPERTIES
@@ -78,16 +78,16 @@ if(BUILD_TESTING)
     # Only test packaging if build type is "Release" on Windows
     set(package_test_configurations CONFIGURATIONS Release)
   endif()
-  
+
   if(NOT MITK_FAST_TESTING)
-  
+
     if(WIN32)
       # Only test packaging if build type is "Release" on Windows
       add_test(NAME mitkProjectTemplatePackageTest CONFIGURATIONS Release
                COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config Release --target package)
       set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
                            DEPENDS mitkProjectTemplateBuildTest-Release
-                           TIMEOUT 6000 
+                           TIMEOUT 6000
                            LABELS "MITK;BlueBerry")
     elseif(CMAKE_BUILD_TYPE)
       add_test(NAME mitkProjectTemplatePackageTest
@@ -96,8 +96,8 @@ if(BUILD_TESTING)
                            DEPENDS mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE}
                            TIMEOUT 6000
                            LABELS "MITK;BlueBerry")
-    endif() 
-    
+    endif()
+
   endif()
-  
+
 endif()

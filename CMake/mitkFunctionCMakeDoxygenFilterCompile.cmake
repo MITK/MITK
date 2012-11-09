@@ -62,7 +62,7 @@ function(mitkFunctionCMakeDoxygenFilterCompile)
   else()
     set(copy_file "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CMakeDoxygenFilter${CMAKE_EXECUTABLE_SUFFIX}")
   endif()
-  
+
   set(compile_defs "")
   if(FILTER_NAMESPACE)
     set(compile_defs "${compile_defs} -DUSE_NAMESPACE=${FILTER_NAMESPACE}")
@@ -70,18 +70,18 @@ function(mitkFunctionCMakeDoxygenFilterCompile)
 
   set(cmake_doxygen_filter_src "${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp")
 
-  try_compile(result_var 
+  try_compile(result_var
               "${CMAKE_CURRENT_BINARY_DIR}"
               "${cmake_doxygen_filter_src}"
               COMPILE_DEFINITIONS ${compile_defs}
               OUTPUT_VARIABLE compile_output
               COPY_FILE ${copy_file}
              )
-             
+
   if(NOT result_var)
     message(FATAL_ERROR "error: Faild to compile ${cmake_doxygen_filter_src} (result: ${result_var})\n${compile_output}")
   endif()
-  
+
   set(CMakeDoxygenFilter_EXECUTABLE "${copy_file}" PARENT_SCOPE)
-  
+
 endfunction()

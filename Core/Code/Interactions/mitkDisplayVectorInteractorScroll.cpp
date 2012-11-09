@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
   const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
 
   int actionId = action->GetActionId();
-  
+
   switch(actionId)
   {
   case AcSELECTALL:   // modifier key for uncoupled panning is being pressed
@@ -122,11 +122,11 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
         }
 
         delta /= m_IndexToSliceModifier;
-  
+
         if ( m_InvertScrollingDirection )
           delta *= -1;
 
-        int newPos = sliceNaviController->GetSlice()->GetPos() + delta; 
+        int newPos = sliceNaviController->GetSlice()->GetPos() + delta;
 
         // if auto repeat is on, start at first slice if you reach the last slice and vice versa
         int maxSlices = sliceNaviController->GetSlice()->GetSteps();
@@ -157,14 +157,14 @@ bool mitk::DisplayVectorInteractorScroll::ExecuteAction(Action* action, mitk::St
 
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
-      
+
       ok = true;
       break;
     }
   case AcFINISHMOVE:
     {
       this->InvokeEvent( EndScrollInteractionEvent() );
-      
+
       ok = true;
       break;
     }

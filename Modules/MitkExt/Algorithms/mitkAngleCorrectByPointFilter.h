@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 //##Documentation
-//## @brief 
+//## @brief
 //## @ingroup Process
 class MitkExt_EXPORT AngleCorrectByPointFilter : public ImageToImageFilter
 {
@@ -34,7 +34,7 @@ public:
   mitkClassMacro(AngleCorrectByPointFilter, ImageToImageFilter);
 
   itkNewMacro(Self);
-  
+
   itkSetMacro(Center, Point3D);
   itkGetConstReferenceMacro(Center, Point3D);
 
@@ -46,10 +46,10 @@ public:
 
 protected:
 
-  //##Description 
+  //##Description
   //## @brief Time when Header was last initialized
   itk::TimeStamp m_TimeOfHeaderInitialization;
- 
+
 protected:
   AngleCorrectByPointFilter();
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,7 +53,7 @@ public:
 
     //right now, list of devices should be empty
     MITK_TEST_CONDITION_REQUIRED(device->GetConnectedProbes().size() == 0, "Newly created device should have no probes connected");
-    
+
     // Connect Probe A
     device->AddProbe(probeA);
     MITK_TEST_CONDITION_REQUIRED(device->GetConnectedProbes().size() == 1, "Device should add one new probe");
@@ -89,7 +89,7 @@ public:
     // We after activation, we expect the device to activate probeA, which is the first-connected identical version.
     device->ActivateProbe(identicalProbe);
     MITK_TEST_CONDITION_REQUIRED(device->GetActiveProbe() == probeA, "probe A should be active");
-   
+
     // And we deactivate it again...
     device->DeactivateProbe();
     MITK_TEST_CONDITION_REQUIRED(device->GetActiveProbe().IsNull(), "After deactivation, no probe should be active");

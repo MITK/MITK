@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -64,7 +64,7 @@ protected:
     *
     * if no n is set, then the number of points is unlimited*
     */
-  SurfaceDeformationInteractor3D(const char *type, 
+  SurfaceDeformationInteractor3D(const char *type,
     DataNode *dataNode, int n = -1);
 
   /**
@@ -72,7 +72,7 @@ protected:
     **/
   virtual ~SurfaceDeformationInteractor3D();
 
-  virtual bool ExecuteAction( Action* action, 
+  virtual bool ExecuteAction( Action* action,
     mitk::StateEvent const* stateEvent );
 
   enum
@@ -80,7 +80,7 @@ protected:
     COLORIZATION_GAUSS,
     COLORIZATION_CONSTANT
   };
-  
+
   bool ColorizeSurface( vtkPolyData *polyData, const Point3D &pickedPoint,
     int mode, double scalar = 0.0 );
 
@@ -101,7 +101,7 @@ private:
   Point3D m_SurfaceColorizationCenter;
 
   Vector3D m_ObjectNormal;
-  
+
   Geometry3D::Pointer m_Geometry;
 
   Surface *m_Surface;

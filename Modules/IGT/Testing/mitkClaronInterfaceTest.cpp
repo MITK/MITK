@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,21 +21,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 
 /**
- * This function is testing the Class ClaronInterface. For tests with this class, which connects directly to the device via firewire 
- * by using the MTC-library we would need the MicronTracker hardware, so only instantiation is tested yet (2009, January, 23rd). 
- * As soon as there is a working concept to test the tracking classes which are very close to the hardware on all systems more 
+ * This function is testing the Class ClaronInterface. For tests with this class, which connects directly to the device via firewire
+ * by using the MTC-library we would need the MicronTracker hardware, so only instantiation is tested yet (2009, January, 23rd).
+ * As soon as there is a working concept to test the tracking classes which are very close to the hardware on all systems more
  * tests are needed here.
  */
 int mitkClaronInterfaceTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("ClaronInterface")
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::ClaronInterface::Pointer myClaronInterface = mitk::ClaronInterface::New();
   myClaronInterface->Initialize("Test","Test");
-  
+
   // first test: did this work?
-  MITK_TEST_CONDITION_REQUIRED((myClaronInterface.IsNotNull()),"Testing instantiation:") 
+  MITK_TEST_CONDITION_REQUIRED((myClaronInterface.IsNotNull()),"Testing instantiation:")
 
   // if the Microntracker is not installed we could also test the returnValues of the stubs
   if (!myClaronInterface->IsMicronTrackerInstalled())
@@ -60,7 +60,7 @@ int mitkClaronInterfaceTest(int /* argc */, char* /*argv*/[])
       }
     MITK_TEST_CONDITION_REQUIRED(success,"Testing stub of GrabFrame() ");
     }
-  
+
   // always end with this!
   MITK_TEST_END()
 }

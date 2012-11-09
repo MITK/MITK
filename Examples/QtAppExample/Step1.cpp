@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
   //*************************************************************************
 
   // Create a DataStorage
-  // The DataStorage manages all data objects. It is used by the 
+  // The DataStorage manages all data objects. It is used by the
   // rendering mechanism to render all data objects
   // We use the standard implementation mitk::StandaloneDataStorage.
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
   //*************************************************************************
   renderWindow.show();
   renderWindow.resize( 256, 256 );
-  
+
   qtapplication.exec();
 
   // cleanup: Remove References to DataStorage. This will delete the object

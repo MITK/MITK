@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ROUND_P(x) ((x)>=0?(int)((x)+0.5):(int)((x)-0.5))
 
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
-    const mitk::PlaneGeometry* geometry, 
+    const mitk::PlaneGeometry* geometry,
     mitk::Image::Pointer image):
   m_PlaneGeometry(NULL),
   m_Geometry3D(NULL),
@@ -30,7 +30,7 @@ mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
   for(int i = 0; i < 3; i++)
   {
     m_MinMaxOutput.push_back(
-        OutputType( std::numeric_limits<int>::max() , 
+        OutputType( std::numeric_limits<int>::max() ,
                     std::numeric_limits<int>::min() ));
   }
 
@@ -62,9 +62,9 @@ mitk::ClippedSurfaceBoundsCalculator::~ClippedSurfaceBoundsCalculator()
 {
 }
 
-void 
+void
 mitk::ClippedSurfaceBoundsCalculator::SetInput(
-    const mitk::PlaneGeometry* geometry, 
+    const mitk::PlaneGeometry* geometry,
     mitk::Image* image)
 {
   if(geometry && image)
@@ -88,19 +88,19 @@ mitk::ClippedSurfaceBoundsCalculator::SetInput(
   }
 }
 
-mitk::ClippedSurfaceBoundsCalculator::OutputType 
+mitk::ClippedSurfaceBoundsCalculator::OutputType
 mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionX()
 {
   return this->m_MinMaxOutput[0];
 }
 
-mitk::ClippedSurfaceBoundsCalculator::OutputType 
+mitk::ClippedSurfaceBoundsCalculator::OutputType
 mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionY()
 {
   return this->m_MinMaxOutput[1];
 }
 
-mitk::ClippedSurfaceBoundsCalculator::OutputType 
+mitk::ClippedSurfaceBoundsCalculator::OutputType
 mitk::ClippedSurfaceBoundsCalculator::GetMinMaxSpatialDirectionZ()
 {
   return this->m_MinMaxOutput[2];
@@ -145,7 +145,7 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
   yDirection = m_Image->GetGeometry()->GetAxisVector(0);
   zDirection = m_Image->GetGeometry()->GetAxisVector(2);
 
-  /* 
+  /*
    *  For the calculation of the intersection points we need as corner points the center-based image coordinates.
    * With the method GetCornerPoint() of the class Geometry3D we only get the corner-based coordinates.
    * Therefore we need to calculate the center-based corner points here. For that we add/substract the corner-
@@ -245,7 +245,7 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
     intersectionWorldPoint.Fill(std::numeric_limits<int>::min());
 
     // Get intersection point of line and plane geometry
-    geometry->IntersectionPoint(line, intersectionWorldPoint);  
+    geometry->IntersectionPoint(line, intersectionWorldPoint);
 
     double t = -1.0;
 
@@ -265,7 +265,7 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
 
     mitk::Point3D intersectionIndexPoint;
     //Get index point
-    m_Image->GetGeometry()->WorldToIndex(intersectionWorldPoint, intersectionIndexPoint);    
+    m_Image->GetGeometry()->WorldToIndex(intersectionWorldPoint, intersectionIndexPoint);
 
     if ( doesLineIntersectWithPlane && -mitk::sqrteps <= t && t <= 1.0 + mitk::sqrteps )
     {
@@ -273,14 +273,14 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
       {
         // minimum
         //If new point value is lower than old
-        if( this->m_MinMaxOutput[dim].first > ROUND_P(intersectionIndexPoint[dim]) )    
+        if( this->m_MinMaxOutput[dim].first > ROUND_P(intersectionIndexPoint[dim]) )
         {
             this->m_MinMaxOutput[dim].first = ROUND_P(intersectionIndexPoint[dim]);     //set new value
         }
 
         // maximum
         //If new point value is higher than old
-        if( this->m_MinMaxOutput[dim].second < ROUND_P(intersectionIndexPoint[dim]) ) 
+        if( this->m_MinMaxOutput[dim].second < ROUND_P(intersectionIndexPoint[dim]) )
         {
             this->m_MinMaxOutput[dim].second = ROUND_P(intersectionIndexPoint[dim]);     //set new value
         }

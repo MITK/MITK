@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ public:
   typedef mitk::Image                    InputImageType;
   typedef InputImageType::Pointer        InputImagePointer;
   typedef InputImageType::ConstPointer   InputImageConstPointer;
-  typedef SlicedData::RegionType         InputImageRegionType; 
+  typedef SlicedData::RegionType         InputImageRegionType;
 
   /** Set/Get the image input of this process object.  */
   virtual void SetInput( const InputImageType *image);
@@ -58,7 +58,7 @@ protected:
   * filters is that the input requested region can be set to match the
   * output requested region.  If a filter requires more input (for instance
   * a filter that uses neighborhoods needs more input than output to avoid
-  * introducing artificial boundary conditions) or less input (for instance 
+  * introducing artificial boundary conditions) or less input (for instance
   * a magnify filter) will have to override this method.  In doing so, it
   * should call its superclass' implementation as its first step. Note that
   * this imaging filters operate differently than the classes to this

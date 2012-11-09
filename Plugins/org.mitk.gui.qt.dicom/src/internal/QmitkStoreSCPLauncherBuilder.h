@@ -45,7 +45,7 @@ private:
     QString* m_AETitle;
     QString* m_TransferSyntax;
     QString* m_OtherNetworkOptions;
-    QString* m_Mode;   
+    QString* m_Mode;
     QString* m_OutputDirectory;
 };
-#endif 
+#endif

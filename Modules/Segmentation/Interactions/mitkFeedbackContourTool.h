@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,7 +40,7 @@ namespace mitk
   \ingroup Interaction
   \ingroup ToolManagerEtAl
 
-  Implements helper methods, that might be of use to all kind of 2D segmentation tools that use a contour for user feedback. 
+  Implements helper methods, that might be of use to all kind of 2D segmentation tools that use a contour for user feedback.
    - Providing a feedback contour that might be added or removed from the visible scene (SetFeedbackContourVisible).
    - Filling of a contour into a 2D slice
 
@@ -53,7 +53,7 @@ namespace mitk
 class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
 {
   public:
-    
+
     mitkClassMacro(FeedbackContourTool, SegTool2D);
 
   protected:
@@ -81,7 +81,7 @@ class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
 
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
-      
+
       \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
     Contour::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);

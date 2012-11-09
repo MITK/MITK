@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,14 +39,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  
+
   BSplineRegistration::BSplineRegistration():
-    m_Iterations(50),    
-    m_ResultName("deformedImage.mhd"),   
+    m_Iterations(50),
+    m_ResultName("deformedImage.mhd"),
     m_SaveResult(true),
     m_SaveDeformationField(false),
     m_UpdateInputImage(false),
-    m_MatchHistograms(true),    
+    m_MatchHistograms(true),
     m_Metric(0)
   {
     m_Observer = mitk::RigidRegistrationObserver::New();
@@ -59,7 +59,7 @@ namespace mitk {
   void BSplineRegistration::SetNumberOfIterations(int iterations)
   {
     m_Iterations = iterations;
-  }  
+  }
 
   void BSplineRegistration::SetSaveResult(bool saveResult)
   {
@@ -72,16 +72,16 @@ namespace mitk {
   }
 
 
-  
+
 
   template < typename TPixel, unsigned int VImageDimension >
     void BSplineRegistration::GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1)
   {
     std::cout << "start bspline registration" << std::endl;
-    
+
     // Typedefs
     typedef typename itk::Image< TPixel, VImageDimension >  InternalImageType;
-       
+
     typedef typename itk::Vector< float, VImageDimension >    VectorPixelType;
     typedef typename itk::Image<  VectorPixelType, VImageDimension > DeformationFieldType;
 
@@ -94,7 +94,7 @@ namespace mitk {
 
 
 
-    
+
     //typedef itk::LBFGSOptimizer                             OptimizerType;
     typedef itk::SingleValuedNonLinearOptimizer             OptimizerType;
     //typedef itk::SingleValuedCostFunction                   MetricType;
@@ -116,7 +116,7 @@ namespace mitk {
                                 InternalImageType >           RegistrationType;
 
     typedef typename itk::WarpImageFilter<
-                            InternalImageType, 
+                            InternalImageType,
                             InternalImageType,
                             DeformationFieldType  >         WarperType;
 
@@ -124,19 +124,19 @@ namespace mitk {
 
     typedef typename TransformType::OriginType                       OriginType;
 
-    typedef itk::ResampleImageFilter< 
-                                InternalImageType, 
+    typedef itk::ResampleImageFilter<
+                                InternalImageType,
                                 InternalImageType >            ResampleFilterType;
 
     typedef itk::Image< TPixel, VImageDimension >           OutputImageType;
-  
+
 
     // Sample new image with the same image type as the fixed image
-    typedef itk::CastImageFilter< 
+    typedef itk::CastImageFilter<
                                 InternalImageType,
                                 InternalImageType >            CastFilterType;
-                    
-    
+
+
     typedef itk::Vector< float, VImageDimension >           VectorType;
     typedef itk::Image< VectorType, VImageDimension >       DeformationFieldType;
 
@@ -144,14 +144,14 @@ namespace mitk {
     typedef itk::BSplineDeformableTransformInitializer <
                                 TransformType,
                                 InternalImageType >            InitializerType;
-    
+
 
     typename InterpolatorType::Pointer   interpolator  = InterpolatorType::New();
-    typename RegistrationType::Pointer   registration  = RegistrationType::New();   
+    typename RegistrationType::Pointer   registration  = RegistrationType::New();
     typename InitializerType::Pointer    initializer   = InitializerType::New();
     typename TransformType::Pointer      transform     = TransformType::New();
-    
-    
+
+
     if(m_Metric==0 || m_Metric==1)
     {
       typename MetricType::Pointer metric = MetricType::New();
@@ -160,17 +160,17 @@ namespace mitk {
       registration->SetMetric(          metric       );
     }
     else{
-      typename MetricTypeMS::Pointer metric = MetricTypeMS::New();  
+      typename MetricTypeMS::Pointer metric = MetricTypeMS::New();
       registration->SetMetric(          metric       );
     }
-     
+
     typename OptimizerFactory::Pointer optFac = OptimizerFactory::New();
     optFac->SetOptimizerParameters(m_OptimizerParameters);
     optFac->SetNumberOfTransformParameters(transform->GetNumberOfParameters());
-    OptimizerType::Pointer optimizer = optFac->GetOptimizer();    
+    OptimizerType::Pointer optimizer = optFac->GetOptimizer();
 
     optimizer->AddObserver(itk::AnyEvent(), m_Observer);
-    
+
     //typedef mitk::MetricFactory <TPixel, VImageDimension> MetricFactoryType;
     //typename MetricFactoryType::Pointer metricFac = MetricFactoryType::New();
     //metricFac->SetMetricParameters(m_MetricParameters);
@@ -178,29 +178,29 @@ namespace mitk {
 
 
     typename InternalImageType::Pointer fixedImage = InternalImageType::New();
-    mitk::CastToItkImage(m_ReferenceImage, fixedImage);    
+    mitk::CastToItkImage(m_ReferenceImage, fixedImage);
     typename InternalImageType::Pointer movingImage = itkImage1;
     typename InternalImageType::RegionType fixedRegion = fixedImage->GetBufferedRegion();
     typename InternalImageType::RegionType movingRegion = movingImage->GetBufferedRegion();
 
-    
+
     if(m_MatchHistograms)
     {
-      typedef itk::RescaleIntensityImageFilter<InternalImageType,InternalImageType> FilterType;   
+      typedef itk::RescaleIntensityImageFilter<InternalImageType,InternalImageType> FilterType;
       typedef itk::HistogramMatchingImageFilter<InternalImageType,InternalImageType> HEFilterType;
 
-      typename FilterType::Pointer inputRescaleFilter = FilterType::New();  
-      typename FilterType::Pointer referenceRescaleFilter = FilterType::New();  
+      typename FilterType::Pointer inputRescaleFilter = FilterType::New();
+      typename FilterType::Pointer referenceRescaleFilter = FilterType::New();
 
       referenceRescaleFilter->SetInput(fixedImage);
       inputRescaleFilter->SetInput(movingImage);
 
       TPixel desiredMinimum =  0;
       TPixel desiredMaximum =  255;
-      
+
       referenceRescaleFilter->SetOutputMinimum( desiredMinimum );
       referenceRescaleFilter->SetOutputMaximum( desiredMaximum );
-      referenceRescaleFilter->UpdateLargestPossibleRegion();  
+      referenceRescaleFilter->UpdateLargestPossibleRegion();
       inputRescaleFilter->SetOutputMinimum( desiredMinimum );
       inputRescaleFilter->SetOutputMaximum( desiredMaximum );
       inputRescaleFilter->UpdateLargestPossibleRegion();
@@ -225,9 +225,9 @@ namespace mitk {
 
     //
     registration->SetOptimizer(       optimizer     );
-    registration->SetInterpolator(    interpolator  );  
+    registration->SetInterpolator(    interpolator  );
     registration->SetFixedImage(      fixedImage    );
-    registration->SetMovingImage(     movingImage   );    
+    registration->SetMovingImage(     movingImage   );
     registration->SetFixedImageRegion(fixedRegion   );
 
     initializer->SetTransform(transform);
@@ -235,10 +235,10 @@ namespace mitk {
     initializer->SetNumberOfGridNodesInsideTheImage( m_NumberOfGridPoints );
     initializer->InitializeTransform();
 
-    registration->SetTransform( transform );    
+    registration->SetTransform( transform );
 
     const unsigned int numberOfParameters = transform->GetNumberOfParameters();
-    
+
     typename itk::BSplineDeformableTransform<
                                 double,
                                 VImageDimension,
@@ -251,28 +251,28 @@ namespace mitk {
     // We now pass the parameters of the current transform as the initial
     // parameters to be used when the registration process starts.
     registration->SetInitialTransformParameters( transform->GetParameters() );
-    
+
     std::cout << "Intial Parameters = " << std::endl;
     std::cout << transform->GetParameters() << std::endl;
- 
+
 
     std::cout << std::endl << "Starting Registration" << std::endl;
 
-    try 
-    { 
-      double tstart(clock());     
-      registration->StartRegistration();    
+    try
+    {
+      double tstart(clock());
+      registration->StartRegistration();
       double time = clock() - tstart;
       time = time / CLOCKS_PER_SEC;
       MITK_INFO << "Registration time: " << time;
-    } 
-    catch( itk::ExceptionObject & err ) 
-    { 
-      std::cerr << "ExceptionObject caught !" << std::endl; 
-      std::cerr << err << std::endl;       
-    } 
-    
-    typename OptimizerType::ParametersType finalParameters = 
+    }
+    catch( itk::ExceptionObject & err )
+    {
+      std::cerr << "ExceptionObject caught !" << std::endl;
+      std::cerr << err << std::endl;
+    }
+
+    typename OptimizerType::ParametersType finalParameters =
                       registration->GetLastTransformParameters();
 
     std::cout << "Last Transform Parameters" << std::endl;
@@ -295,11 +295,11 @@ namespace mitk {
 
 
     // Generate deformation field
-    typename DeformationFieldType::Pointer field = DeformationFieldType::New();    
+    typename DeformationFieldType::Pointer field = DeformationFieldType::New();
     field->SetRegions( movingRegion );
     field->SetOrigin( movingImage->GetOrigin() );
     field->SetSpacing( movingImage->GetSpacing() );
-    field->SetDirection( movingImage->GetDirection() );   
+    field->SetDirection( movingImage->GetDirection() );
     field->Allocate();
 
 
@@ -325,7 +325,7 @@ namespace mitk {
 
 
     // Use the deformation field to warp the moving image
-    typename WarperType::Pointer warper = WarperType::New();    
+    typename WarperType::Pointer warper = WarperType::New();
     warper->SetInput( movingImage );
     warper->SetInterpolator( interpolator );
     warper->SetOutputSpacing( movingImage->GetSpacing() );
@@ -334,23 +334,23 @@ namespace mitk {
     warper->SetDeformationField( field );
     warper->Update();
 
-    typename InternalImageType::Pointer result = warper->GetOutput();    
+    typename InternalImageType::Pointer result = warper->GetOutput();
 
     if(m_UpdateInputImage)
-    {   
+    {
       Image::Pointer outputImage = this->GetOutput();
       mitk::CastToMitkImage( result, outputImage );
     }
 
 
-    // Save the deformationfield resulting from the registration    
+    // Save the deformationfield resulting from the registration
     if(m_SaveDeformationField)
-    {      
+    {
       typedef itk::ImageFileWriter< DeformationFieldType >  FieldWriterType;
       typename FieldWriterType::Pointer fieldWriter = FieldWriterType::New();
 
       fieldWriter->SetInput( field );
-      
+
       fieldWriter->SetFileName( m_DeformationFileName );
       try
       {

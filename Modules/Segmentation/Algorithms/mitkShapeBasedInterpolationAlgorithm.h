@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ namespace mitk
 /**
  * \brief Shape-based binary image interpolation.
  *
- * This class uses legacy code from ipSegmentation to implement 
+ * This class uses legacy code from ipSegmentation to implement
  * the shape-based interpolation algorithm described in
  *
  * G.T. Herman, J. Zheng, C.A. Bucholtz: "Shape-based interpolation"
@@ -39,7 +39,7 @@ namespace mitk
 class Segmentation_EXPORT ShapeBasedInterpolationAlgorithm : public SegmentationInterpolationAlgorithm
 {
   public:
-    
+
     mitkClassMacro(ShapeBasedInterpolationAlgorithm, SegmentationInterpolationAlgorithm);
     itkNewMacro(ShapeBasedInterpolationAlgorithm);
 

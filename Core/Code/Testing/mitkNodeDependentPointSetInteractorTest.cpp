@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -49,11 +49,11 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(ds.IsNotNull(),"Instantiating DataStorage");
 
   //read two images and store to datastorage
-  //these two images are used as node the interactors depend on. If the visibility property of one node if false, the 
+  //these two images are used as node the interactors depend on. If the visibility property of one node if false, the
   //associated interactor may not change the data
-  mitk::DataNode::Pointer node1, node2;      
+  mitk::DataNode::Pointer node1, node2;
   mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-  
+
   MITK_TEST_CONDITION_REQUIRED(argc >= 3, "Test if a files to load has been specified");
 
 
@@ -88,7 +88,7 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   mitk::DataNode::Pointer pointSetNode1 = mitk::DataNode::New();
   pointSetNode1->AddProperty( "unselectedcolor", mitk::ColorProperty::New(0.0f, 1.0f, 0.0f));
   pointSetNode1->SetData(pointSet1);
-  mitk::NodeDepententPointSetInteractor::Pointer interactor1 = mitk::NodeDepententPointSetInteractor::New("pointsetinteractor", pointSetNode1, node1); 
+  mitk::NodeDepententPointSetInteractor::Pointer interactor1 = mitk::NodeDepententPointSetInteractor::New("pointsetinteractor", pointSetNode1, node1);
   MITK_TEST_CONDITION_REQUIRED(interactor1.IsNotNull(),"Instanciating NodeDependentPointSetInteractor");
   // Add the node to the tree
   ds->Add(pointSetNode1);
@@ -98,11 +98,11 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   mitk::DataNode::Pointer pointSetNode2 = mitk::DataNode::New();
   pointSetNode2->AddProperty( "unselectedcolor", mitk::ColorProperty::New(0.0f, 0.0f, 1.0f));
   pointSetNode2->SetData(pointSet2);
-  mitk::NodeDepententPointSetInteractor::Pointer interactor2 = mitk::NodeDepententPointSetInteractor::New("pointsetinteractor", pointSetNode2, node2); 
+  mitk::NodeDepententPointSetInteractor::Pointer interactor2 = mitk::NodeDepententPointSetInteractor::New("pointsetinteractor", pointSetNode2, node2);
   MITK_TEST_CONDITION_REQUIRED(interactor2.IsNotNull(),"Instanciating NodeDependentPointSetInteractor");
   // Add the node to the tree
   ds->Add(pointSetNode2);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(interactor2);  
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(interactor2);
 
   //check for the two pointsets
   mitk::NodePredicateDataType::Pointer predicatePS(mitk::NodePredicateDataType::New("PointSet"));
@@ -125,13 +125,13 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
 
   //set properties for renderWindow 1 and 2
   //1:
-  node1->SetBoolProperty("visible", true, renderer1); 
-  node2->SetBoolProperty("visible", false, renderer1); 
+  node1->SetBoolProperty("visible", true, renderer1);
+  node2->SetBoolProperty("visible", false, renderer1);
   //2:
-  node1->SetBoolProperty("visible", false, renderer2); 
-  node2->SetBoolProperty("visible", true, renderer2); 
+  node1->SetBoolProperty("visible", false, renderer2);
+  node2->SetBoolProperty("visible", true, renderer2);
 
-  
+
   //***************************************************
   //now start to test if only an event send from renderwindow 1 can interact with interactor 1 and vice versa
 
@@ -163,7 +163,7 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   SendPositionEvent(renderer2, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_ShiftButton, mitk::Key_none, pos2D, pos3D);
   MITK_TEST_CONDITION_REQUIRED(pointSet1->GetPointSet()->GetNumberOfPoints()==1,"7 Checking untouched state of pointset 1");
   MITK_TEST_CONDITION_REQUIRED(pointSet2->GetPointSet()->GetNumberOfPoints()==3,"8 Checking addition of point to pointset 2");
-  
+
   //add to pointset 1
   SendPositionEvent(renderer1, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_ShiftButton, mitk::Key_none, pos2D, pos3D);
   MITK_TEST_CONDITION_REQUIRED(pointSet1->GetPointSet()->GetNumberOfPoints()==2,"9 Checking addition of point to pointset 1");
@@ -172,7 +172,7 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   //trying to delete points
   mitk::Event* delEvent1 = new mitk::Event(renderer1, mitk::Type_KeyPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_Delete);
   mitk::Event* delEvent2 = new mitk::Event(renderer2, mitk::Type_KeyPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_Delete);
-  
+
   mitk::GlobalInteraction::GetInstance()->GetEventMapper()->MapEvent(delEvent2);
   MITK_TEST_CONDITION_REQUIRED(pointSet1->GetPointSet()->GetNumberOfPoints()==2,"11 Checking untouched state of pointset 1");
   MITK_TEST_CONDITION_REQUIRED(pointSet2->GetPointSet()->GetNumberOfPoints()==2,"12 Checking detected point in pointset 2");
@@ -180,7 +180,7 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   mitk::GlobalInteraction::GetInstance()->GetEventMapper()->MapEvent(delEvent1);
   MITK_TEST_CONDITION_REQUIRED(pointSet1->GetPointSet()->GetNumberOfPoints()==1,"11 Checking deleted point in pointset 1");
   MITK_TEST_CONDITION_REQUIRED(pointSet2->GetPointSet()->GetNumberOfPoints()==2,"12 Checking untouched state of pointset 2");
-  
+
   mitk::GlobalInteraction::GetInstance()->GetEventMapper()->MapEvent(delEvent2);
   MITK_TEST_CONDITION_REQUIRED(pointSet1->GetPointSet()->GetNumberOfPoints()==1,"13 Checking untouched state of pointset 1");
   MITK_TEST_CONDITION_REQUIRED(pointSet2->GetPointSet()->GetNumberOfPoints()==1,"14 Checking detected point in pointset 2");
@@ -189,7 +189,7 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(interactor2);
   delete delEvent1;
   delete delEvent2;
-  
+
   myRenderingManager->RemoveRenderWindow(vtkRenWin1);
   myRenderingManager->RemoveRenderWindow(vtkRenWin2);
   vtkRenWin1->Delete();

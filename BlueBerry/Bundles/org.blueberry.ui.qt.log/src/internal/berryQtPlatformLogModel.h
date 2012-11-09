@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -80,20 +80,20 @@ private:
     mbilog::LogMessage message;
     clock_t time;
     int threadid;
-    
+
     ExtendedLogMessage(const ExtendedLogMessage &src):message(src.message),time(src.time),threadid(src.threadid)
     {
     }
-    
+
     ExtendedLogMessage(const mbilog::LogMessage &msg):message(msg),time(std::clock()),threadid(0)
     {
     }
-    
+
     ExtendedLogMessage operator = (const ExtendedLogMessage& src)
     {
       return ExtendedLogMessage(src);
     }
-    
+
     QVariant getLevel() const
     {
     switch(this->message.level)
@@ -149,22 +149,22 @@ private:
     out << this->message.lineNumber;
     return QVariant(QString(out.str().c_str()));
     }
-  
+
     /** This method is implemented in the cpp file to save includes. */
     QVariant getTime() const;
-    
+
   };
 
-  
+
 
   typedef MessageDelegate1<QtPlatformLogModel, const PlatformEvent&> PlatformEventDelegate;
 
-  
-    
+
+
   class QtLogBackend : public mbilog::BackendBase
   {
     public:
-    
+
       QtLogBackend(QtPlatformLogModel *_myModel)
       {
         myModel=_myModel;
@@ -172,33 +172,33 @@ private:
         mbilog::RegisterBackend(this);
         BERRY_INFO << "BlueBerry mbilog backend registered";
       }
-      
+
       ~QtLogBackend()
       {
         mbilog::UnregisterBackend(this);
       }
-      
+
       void ProcessMessage(const mbilog::LogMessage &l )
       {
         if(!deactivated)
           myModel->addLogEntry(l);
       }
-      
+
       void Deactivate()
       {
         deactivated=true;
-      }                             
-      
+      }
+
     private:
-    
+
       QtPlatformLogModel *myModel;
       bool deactivated;
-      
+
   } *myBackend;
 
   std::vector<ExtendedLogMessage> m_Entries;
   std::list<ExtendedLogMessage> *m_Active,*m_Pending;
-  
+
   static const QString Error;
   static const QString Warn;
   static const QString Fatal;
@@ -206,13 +206,13 @@ private:
   static const QString Debug;
 
   QMutex m_Mutex;
-  
+
   signals:
-  
+
     void signalFlushLogEntries();
 
   protected slots:
-  
+
     void slotFlushLogEntries();
 };
 

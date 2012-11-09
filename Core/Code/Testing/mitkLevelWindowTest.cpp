@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,7 +41,7 @@ int mitkLevelWindowTest(int, char* [])
   std::cout << "Testing mitk::LevelWindow constructor with Level and Window ";
   mitk::LevelWindow* levWin = new mitk::LevelWindow(256, 500);
   std::cout<<"[PASSED]"<<std::endl;
-  
+
   std::cout << "Testing mitk::LevelWindow GetDefaultWindow ";
   mitk::ScalarType defaultWindow = levWin->GetDefaultWindow();
   if (!(defaultWindow == 500))
@@ -93,7 +93,7 @@ int mitkLevelWindowTest(int, char* [])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
-  
+
   std::cout << "Testing mitk::LevelWindow GetWindow : GetDefaultWindow ";
   if (!(defaultWindow == window))
   {
@@ -363,7 +363,7 @@ int mitkLevelWindowTest(int, char* [])
 
   // minmax > maxrange, minmax < minrange, min<maxrange & max >maxrange, min < minrange & max > minrange
   // max < minrange & min > minrange, min > maxrange & max < maxrange, min < minrange & max > maxrange
-  // min > maxrange & max < minrange 
+  // min > maxrange & max < minrange
   std::cout << "Testing mitk::LevelWindow max > min > maxrange autoexpand = FALSE";
   levWin->SetWindowBounds(11000, 12000, false);
   if (!((levWin->GetLowerWindowBound() == 9999) && (levWin->GetUpperWindowBound() == 10000)))
@@ -849,7 +849,7 @@ int mitkLevelWindowTest(int, char* [])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
-  
+
   std::cout << "Testing mitk::LevelWindow destructor ";
   delete levWin;
   delete lw;
@@ -942,7 +942,7 @@ int mitkLevelWindowTest(int, char* [])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
-  
+
   std::cout << "Testing range adaption of mitk::LevelWindow::SetLevelWindow()";
   levelWindow.SetLevelWindow(50,140,true); // ture == force
   if ( levelWindow.GetUpperWindowBound() != 120.0 ||
@@ -952,7 +952,7 @@ int mitkLevelWindowTest(int, char* [])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
- 
+
 
   std::cout<<"[PASSED]"<<std::endl;
   std::cout<<"[TEST DONE]"<<std::endl;

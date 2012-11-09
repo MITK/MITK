@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,7 +51,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     static const std::string VIEW_ID;
 
     QmitkMITKIGTTrackingToolboxView();
-    
+
     QmitkMITKIGTTrackingToolboxView(const QmitkMITKIGTTrackingToolboxView& other)
     {
       Q_UNUSED(other)
@@ -62,7 +62,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     virtual void CreateQtPartControl(QWidget *parent);
 
     virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    
+
     virtual void StdMultiWidgetNotAvailable();
 
   protected slots:
@@ -84,17 +84,17 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     void OnStopTracking();
 
     /** @brief This slot is called if the user want's to choose a file name for logging. A new windows to navigate through the file system and choose
-               a file opens.*/ 
+               a file opens.*/
     void OnChooseFileClicked();
 
     /** @brief This slot starts logging. Logging is only possible if a device is tracking. If not the logging mechanism start when the start tracking
                is called.*/
     void StartLogging();
-    
+
     /** @brief This slot stops logging. If logging is not running it does nothing.*/
     void StopLogging();
 
-    /** @brief This slot enables / disables UI elements depending on the tracking device after a device is changed.*/ 
+    /** @brief This slot enables / disables UI elements depending on the tracking device after a device is changed.*/
     void OnTrackingDeviceChanged();
 
     /** @brief This slot selects the Tracking Volume appropriate for a given model */
@@ -103,8 +103,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** @brief Shows or hides the tracking volume according to the checkboxe's state */
     void OnShowTrackingVolumeChanged();
 
-    /** @brief This slot auto detects tools of a NDI Aurora tracking device. If tools where found they will be stored internally as a tool storage. 
-        The user is also asked if he wants to save this tool storage to load it later. Only call it if a Aurora device was configured because other 
+    /** @brief This slot auto detects tools of a NDI Aurora tracking device. If tools where found they will be stored internally as a tool storage.
+        The user is also asked if he wants to save this tool storage to load it later. Only call it if a Aurora device was configured because other
         devices don't support auto detection.*/
     void OnAutoDetectTools();
 

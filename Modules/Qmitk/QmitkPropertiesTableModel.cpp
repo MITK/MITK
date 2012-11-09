@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -77,7 +77,7 @@ QVariant QmitkPropertiesTableModel::headerData(int section, Qt::Orientation orie
     return QVariant();
 
   if (orientation == Qt::Horizontal) {
-    switch (section) 
+    switch (section)
     {
     case PROPERTY_NAME_COLUMN:
       return tr("Name");
@@ -113,7 +113,7 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
   {
     mitk::BaseProperty* baseProp = m_SelectedProperties[index.row()].second;
 
-    if (const mitk::ColorProperty* colorProp 
+    if (const mitk::ColorProperty* colorProp
       = dynamic_cast<const mitk::ColorProperty*>(baseProp))
     {
       mitk::Color col = colorProp->GetColor();
@@ -206,7 +206,7 @@ void QmitkPropertiesTableModel::SetPropertyList( mitk::PropertyList* _PropertyLi
         (mitk::MessageDelegate1<QmitkPropertiesTableModel
         , const itk::Object*>( this, &QmitkPropertiesTableModel::PropertyListDelete ));
     }
-  
+
     // set new list
     m_PropertyList = _PropertyList;
 
@@ -269,7 +269,7 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
     {
       mitk::BaseProperty* baseProp = m_SelectedProperties[index.row()].second;
 
-      if (mitk::ColorProperty* colorProp 
+      if (mitk::ColorProperty* colorProp
         = dynamic_cast<mitk::ColorProperty*>(baseProp))
       {
         QColor qcolor = value.value<QColor>();
@@ -348,7 +348,7 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
       }
     }
 
-    // property was changed by us, now we can accept property changes triggered by someone else 
+    // property was changed by us, now we can accept property changes triggered by someone else
     m_BlockEvents = false;
     emit dataChanged(index, index);
     return true;
@@ -367,7 +367,7 @@ void QmitkPropertiesTableModel::sort( int column, Qt::SortOrder order /*= Qt::As
   {
     m_SortDescending = sortDescending;
 
-    PropertyDataSetCompareFunction::CompareCriteria _CompareCriteria 
+    PropertyDataSetCompareFunction::CompareCriteria _CompareCriteria
       = PropertyDataSetCompareFunction::CompareByName;
 
     PropertyDataSetCompareFunction::CompareOperator _CompareOperator
@@ -448,7 +448,7 @@ void QmitkPropertiesTableModel::Reset()
   {
     this->RemoveSelectedProperty(m_SelectedProperties.size()-1);
   }
-  
+
   std::vector<PropertyDataSet> allPredicates;
   if(m_PropertyList.IsNotNull())
   {
@@ -458,7 +458,7 @@ void QmitkPropertiesTableModel::Reset()
       ; it++)
     {
       allPredicates.push_back(*it); //% TODO
-    }      
+    }
   }
   // make a subselection if a keyword is specified
   if(!m_FilterKeyWord.empty())

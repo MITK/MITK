@@ -60,7 +60,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         m_Controls->setupUi( parent );
         m_Controls->cancelButton->setVisible(false);
         m_Controls->viewExternalDataButton->setVisible(true);
-        // 
+        //
         m_Controls->ExternalDataTreeView->setSortingEnabled(true);
         m_Controls->ExternalDataTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
         m_Controls->ExternalDataTreeView->setModel(m_ExternalModel);

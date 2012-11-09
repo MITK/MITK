@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,13 +31,13 @@ namespace mitk
  /**Documentation
  * \brief This class records NavigationData objects.
  *
- * The output of this class is formated as a XML document. 
+ * The output of this class is formated as a XML document.
  *
- * Internal this class uses streams for recording NavigationData objects. Therefore different types of output are possible 
- * and can be set with the SetOutputMode() method. The default output is directed to the console. If you want to save into a  
- * file you have to set a file name and the path. The recording is started with the call of the method StartRecording(). Now 
+ * Internal this class uses streams for recording NavigationData objects. Therefore different types of output are possible
+ * and can be set with the SetOutputMode() method. The default output is directed to the console. If you want to save into a
+ * file you have to set a file name and the path. The recording is started with the call of the method StartRecording(). Now
  * every Update() stores the current state of the added NavigationDatas. With StopRecording() the stream is stopped. With
- * another call of StartRecording() the output is written to a new file with incremented filename counter. 
+ * another call of StartRecording() the output is written to a new file with incremented filename counter.
  *
  * \warning At the moment there is no check if the file is already existing and this class will override existing files.
  * \ingroup IGT
@@ -52,7 +52,7 @@ public:
 
     /**Documentation
     * \brief Determines where the output is directed to
-    * 
+    *
     * Console:    std::cout
     * NormalFile: std::ofstream
     * ZipFile:    Not supported yet -> std::cout
@@ -66,7 +66,7 @@ public:
 
     /**Documentation
     * \brief Determines the output format
-    * 
+    *
     * xml:  XML format, also default, can be read by NavigationDataPlayer
     * csv:  use to export in excel, matlab, etc.
     */
@@ -84,7 +84,7 @@ public:
     * \warning do not use "." in file names at the end
     */
     itkSetStringMacro(FileName);
-    
+
     /**
     * \brief Returns the file name of the recording file (in OutputMode NormalFile and ZipFile)
     */
@@ -133,10 +133,10 @@ public:
     /**
      * Documentation
      * \brief Starts the recording with the presetted OutputMode.
-     *        This method calls StartRecording(std::ostream*). 
-     *        Does nothing if the recorder is already recording and 
+     *        This method calls StartRecording(std::ostream*).
+     *        Does nothing if the recorder is already recording and
      *        the method StartRecording is called again.
-     * @throw mitk::IGTException Throws an exception if no file name or file path is set. 
+     * @throw mitk::IGTException Throws an exception if no file name or file path is set.
      */
     void StartRecording();
 
@@ -181,7 +181,7 @@ protected:
     virtual void GenerateData();
 
     NavigationDataRecorder();
-    
+
     virtual ~NavigationDataRecorder();
 
     std::string m_FileName; ///< stores the file name and path

@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,14 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include "Poco/Mutex.h"
 
-namespace berry 
+namespace berry
 {
   class AbstractPreferencesStorage;
   ///
   /// Implementation of the OSGI Preferences Interface.
   /// Wraps a DOMNode.
-  ///  
-  class BERRY_RUNTIME Preferences: public IBerryPreferences 
+  ///
+  class BERRY_RUNTIME Preferences: public IBerryPreferences
   {
 
   public:
@@ -41,12 +41,12 @@ namespace berry
     ///
     berryObjectMacro(berry::Preferences)
     ///
-    /// Maps a string key to a string value 
-    ///    
+    /// Maps a string key to a string value
+    ///
     typedef std::map<std::string, std::string> PropertyMap;
     ///
     /// The list of Child nodes
-    ///    
+    ///
     typedef std::vector<Preferences::Pointer> ChildrenList;
 
     ///
@@ -57,7 +57,7 @@ namespace berry
     /// \param _FileName the absolute path to the file in which this preferences tree will be saved to
     /// \param _Parent the parent node or 0 if this is the root
     /// \param _Root the root of this preference tree
-    ///    
+    ///
     Preferences(const PropertyMap& _Properties
       , const std::string& _Name
       , Preferences* _Parent
@@ -65,28 +65,28 @@ namespace berry
 
     ///
     /// Nothing to do here
-    ///    
+    ///
     virtual ~Preferences();
-    
+
     ///
     /// Prints out the absolute path of the preference node.
-    ///    
+    ///
     std::string ToString() const;
     ///
     /// Returns if this node and his silblings have to be rewritten persistently
-    ///    
-    bool IsDirty() const; 
+    ///
+    bool IsDirty() const;
     ///
     /// Returns if this node is removed
-    ///    
-    bool IsRemoved() const; 
+    ///
+    bool IsRemoved() const;
     ///
     /// Returns if this node has property with a specific key
-    ///    
-    bool Has(std::string key) const;    
+    ///
+    bool Has(std::string key) const;
     ///
     /// Returns true if the absolute paths are the same
-    ///    
+    ///
     bool Equals(const Preferences* rhs) const;
     ///
     /// Returns all Properties as map.
@@ -95,7 +95,7 @@ namespace berry
     ///
     /// Returns a reference to the children list in order to add or remove nodes.
     /// *ATTENTION*: Should only be used
-    /// when constructing the preferences tree from a persistent location. Normally, one would 
+    /// when constructing the preferences tree from a persistent location. Normally, one would
     /// only use the IPreferences methods
     ///
     ChildrenList GetChildren() const;
@@ -104,137 +104,137 @@ namespace berry
 
     ///
     /// \see IPreferences::AbsolutePath()
-    ///    
+    ///
     virtual std::string AbsolutePath() const;
 
     ///
     /// \see IPreferences::ChildrenNames()
-    ///    
+    ///
     virtual std::vector<std::string> ChildrenNames() const throw(Poco::Exception, BackingStoreException);
 
     ///
     /// \see IPreferences::ChildrenNames()
-    ///    
+    ///
     virtual AbstractPreferencesStorage* GetStorage() const;
 
     ///
     /// \see IPreferences::Clear()
-    ///    
+    ///
     virtual void Clear() throw(Poco::Exception, BackingStoreException);
 
     ///
     /// \see IPreferences::Flush()
-    ///    
+    ///
     virtual void Flush() throw(Poco::Exception, BackingStoreException);
 
     ///
     /// \see IPreferences::Get()
-    ///    
+    ///
     virtual std::string Get(std::string key, std::string def) const;
 
     ///
     /// \see IPreferences::GetBool()
-    ///    
+    ///
     virtual bool GetBool(std::string key, bool def) const;
 
     ///
     /// \see IPreferences::GetByteArray()
-    ///    
+    ///
     virtual std::string GetByteArray(std::string key, std::string def) const;
 
     ///
     /// \see IPreferences::GetDouble()
-    ///    
+    ///
     virtual double GetDouble(std::string key, double def) const;
 
     ///
     /// \see IPreferences::GetFloat()
-    ///    
+    ///
     virtual float GetFloat(std::string key, float def) const;
 
     ///
     /// \see IPreferences::GetInt()
-    ///    
+    ///
     virtual int GetInt(std::string key, int def) const;
 
     ///
     /// \see IPreferences::GetLong()
-    ///    
+    ///
     virtual long GetLong(std::string key, long def) const;
 
     ///
     /// \see IPreferences::Keys()
-    ///    
+    ///
     std::vector<std::string> Keys() const throw(Poco::Exception, BackingStoreException);
 
     ///
     /// \see IPreferences::Name()
-    ///    
+    ///
     virtual std::string Name() const;
 
     ///
     /// \see IPreferences::Node()
-    ///    
+    ///
     virtual IPreferences::Pointer Node(std::string pathName);
 
     ///
     /// \see IPreferences::NodeExists()
-    ///    
+    ///
     virtual bool NodeExists(std::string pathName) const throw(Poco::Exception, BackingStoreException);
 
     ///
     /// \see IPreferences::Parent()
-    ///    
+    ///
     virtual IPreferences::Pointer Parent() const;
 
     ///
     /// \see IPreferences::Put()
-    ///    
+    ///
     virtual void Put(std::string key, std::string value);
 
     ///
     /// \see IPreferences::PutByteArray()
-    ///    
+    ///
     virtual void PutByteArray(std::string key, std::string value);
 
     ///
     /// \see IPreferences::PutBool()
-    ///    
+    ///
     virtual void PutBool(std::string key, bool value);
 
     ///
     /// \see IPreferences::PutDouble()
-    ///    
+    ///
     virtual void PutDouble(std::string key, double value);
 
     ///
     /// \see IPreferences::Sync()
-    ///    
+    ///
     virtual void PutFloat(std::string key, float value);
 
     ///
     /// \see IPreferences::PutInt()
-    ///    
+    ///
     virtual void PutInt(std::string key, int value);
 
     ///
     /// \see IPreferences::PutLong()
-    ///    
+    ///
     virtual void PutLong(std::string key, long value);
 
     ///
     /// \see IPreferences::Remove()
-    ///    
+    ///
     virtual void Remove(std::string key);
 
     ///
     /// \see IPreferences::RemoveNode()
-    ///    
+    ///
     virtual void RemoveNode() throw(Poco::Exception, BackingStoreException);
 
     ///
     /// \see IPreferences::Sync()
-    ///    
+    ///
     virtual void Sync() throw(Poco::Exception, BackingStoreException);
 
     //# End of IPreferences methods
@@ -274,36 +274,36 @@ namespace berry
   protected:
     ///
     /// Holds all Key/Value Pairs.
-    ///    
+    ///
     std::map<std::string, std::string> m_Properties;
     ///
-    /// Holds all child nodes (explicit ownership). 
-    ///    
+    /// Holds all child nodes (explicit ownership).
+    ///
     std::vector<Preferences::Pointer> m_Children;
     ///
     /// Saves the absolute path of this node (calculated in the constructor)
-    ///    
+    ///
     std::string m_Path;
     ///
     /// Saves the name of this node (set when read from backend)
-    ///    
+    ///
     std::string m_Name;
     ///
-    /// Saves the parent of this node 
-    ///    
+    /// Saves the parent of this node
+    ///
     Preferences* m_Parent;
     ///
     /// Saves the root of this tree
-    ///    
+    ///
     Preferences* m_Root;
     ///
     /// Saves if something changed on this branch.
     /// Meaning that you would have to rewrite it.
-    ///    
+    ///
     bool m_Dirty;
     ///
     /// Saves if this Node is removed (will not be saved to the backend).
-    ///    
+    ///
     bool m_Removed;
     ///
     /// A storage to call the flush method.
@@ -317,9 +317,9 @@ namespace berry
 
 }
 
-namespace Base64 
+namespace Base64
 {
-  /// 
+  ///
   /// Encode string to base64 (needed for writing byte arrays)
   ///
   std::string encode(const std::string &sString);
@@ -330,12 +330,12 @@ namespace Base64
 };
 
 ///
-/// Uses Preferences::ToString to print node information 
+/// Uses Preferences::ToString to print node information
 ///
 std::ostream& operator<<(std::ostream& os,const berry::Preferences& m);
 
 ///
-/// Uses Preferences::ToString to print node information 
+/// Uses Preferences::ToString to print node information
 ///
 std::ostream& operator<<(std::ostream& os,const berry::Preferences* m);
 

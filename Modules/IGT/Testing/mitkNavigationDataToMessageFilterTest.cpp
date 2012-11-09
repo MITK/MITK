@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ class MessageReceiverClass
       m_ReceivedData.resize(numberOfNavigationDatas);
       for (unsigned int i = 0; i < numberOfNavigationDatas; ++i)
         m_ReceivedData[i] = mitk::NavigationData::New();
-      
+
       m_MessagesReceived = 0;
     }
 
@@ -42,7 +42,7 @@ class MessageReceiverClass
       m_ReceivedData[index]->SetPosition(v);
       ++m_MessagesReceived;
     }
-    
+
     void OnOrientationChanged(mitk::NavigationData::OrientationType v, unsigned int index)
     {
       m_ReceivedData[index]->SetOrientation(v);
@@ -54,7 +54,7 @@ class MessageReceiverClass
       m_ReceivedData[index]->SetCovErrorMatrix(v);
       ++m_MessagesReceived;
     }
-    
+
     void OnTimeStampChanged(mitk::NavigationData::TimeStampType v, unsigned int index)
     {
       m_ReceivedData[index]->SetTimeStamp(v);
@@ -78,8 +78,8 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationDataToMessageFilter");
   /* first tests with one input */
-  { 
-    // let's create an object of our class  
+  {
+    // let's create an object of our class
     mitk::NavigationDataToMessageFilter::Pointer myFilter = mitk::NavigationDataToMessageFilter::New();
 
     // first test: did this work?
@@ -129,7 +129,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION( answers.m_ReceivedData[0]->IsDataValid() == nd1->IsDataValid(), "Testing PositionChanged message");
     MITK_TEST_CONDITION( answers.m_MessagesReceived == 6, "only necessary messages send?");  // only datavalid message re-send
 
-    /* changing two input parameters */  
+    /* changing two input parameters */
     mitk::FillVector3D(initialPos, 11.0, 21.0, 31.0);
     nd1->SetPosition(initialPos); // change only one parameter
     nd1->SetTimeStamp(55.55); // change only one parameter
@@ -170,7 +170,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     nd1->SetPositionAccuracy(22.222);
     nd1->SetTimeStamp(222.2);
     nd1->SetDataValid(true);
-  
+
     myFilter->SetInput(0, nd0);
     myFilter->SetInput(1, nd1);
     MITK_TEST_CONDITION(myFilter->GetInput(0) == nd0, "testing Set-/GetInput(0)");

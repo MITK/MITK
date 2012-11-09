@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,7 +34,7 @@ namespace mitk
   */
   class MITK_TOFHARDWARE_EXPORT ToFCameraMESAController : public itk::Object
   {
-  public: 
+  public:
 
     mitkClassMacro( ToFCameraMESAController , itk::Object );
 
@@ -73,8 +73,8 @@ namespace mitk
     */
     virtual int GetModulationFrequency() = 0;
     /*!
-    \brief Sets the modulation frequency of the ToF device. 
-    The method automatically calculates a valid value from the given frequency to 
+    \brief Sets the modulation frequency of the ToF device.
+    The method automatically calculates a valid value from the given frequency to
     make sure that only valid frequencies are used.
     \param modulationFrequency modulation frequency
     \return frequency set after validation step
@@ -86,8 +86,8 @@ namespace mitk
     */
     virtual int GetIntegrationTime() = 0;
     /*!
-    \brief Sets the integration time of the ToF device. 
-    The method automatically calculates a valid value from the given integration time to 
+    \brief Sets the integration time of the ToF device.
+    The method automatically calculates a valid value from the given integration time to
     make sure that only valid times are used.
     \param integrationTime integration time
     \return integration time set after validation step

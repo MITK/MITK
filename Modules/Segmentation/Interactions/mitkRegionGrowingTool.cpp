@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -105,7 +105,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
   //ToolLogger::SetVerboseness(3);
 
   MITK_DEBUG << "OnMousePressed" << std::endl;
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 ) 
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
   {
     MITK_DEBUG << "OnMousePressed: FeedbackContourTool says ok" << std::endl;
 
@@ -113,7 +113,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
     if (positionEvent)
     {
       MITK_DEBUG << "OnMousePressed: got positionEvent" << std::endl;
-      
+
       m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
       m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
 
@@ -153,7 +153,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
 
           mitkIpPicDescriptor* workingPicSlice = mitkIpPicNew();
           CastToIpPicDescriptor(temporarySlice, workingPicSlice);
-         
+
           int initialWorkingOffset = projectedPointInWorkingSlice2D[1] * workingPicSlice->n[0] + projectedPointInWorkingSlice2D[0];
 
           if ( initialWorkingOffset < static_cast<int>( workingPicSlice->n[0] * workingPicSlice->n[1] ) &&
@@ -166,9 +166,9 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
             if ( m_LastWorkingSeed >= static_cast<int>( workingPicSlice->n[0] * workingPicSlice->n[1] ) ||
                  m_LastWorkingSeed < 0 )
             {
-              inside = false; 
+              inside = false;
             }
-              
+
             if ( m_ReferenceSlice.IsNotNull() )
             {
               MITK_DEBUG << "OnMousePressed: got reference slice" << std::endl;
@@ -191,7 +191,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
       }
     }
   }
-  
+
   MITK_DEBUG << "end OnMousePressed" << std::endl;
   return true;
 }
@@ -200,7 +200,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
  3.1 Create a skeletonization of the segmentation and try to find a nice cut
    3.1.1 Call a ipSegmentation algorithm to create a nice cut
    3.1.2 Set the result of this algorithm as the feedback contour
-*/ 
+*/
 bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ), const StateEvent* stateEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
@@ -214,9 +214,9 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
   {
     tCutResult cutContour = ipMITKSegmentationGetCutPoints( workingPicSlice, segmentationHistory, initialWorkingOffset ); // tCutResult is a ipSegmentation type
     mitkIpPicFree( segmentationHistory );
-    if (cutContour.cutIt) 
+    if (cutContour.cutIt)
     {
-      // 3.1.2 copy point from float* to mitk::Contour 
+      // 3.1.2 copy point from float* to mitk::Contour
       Contour::Pointer contourInImageIndexCoordinates = Contour::New();
       contourInImageIndexCoordinates->Initialize();
       Point3D newPoint;
@@ -283,7 +283,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
     //m_ScreenYPositionAtStart = static_cast<int>(positionEvent->GetDisplayPosition()[1]);
     m_LastScreenPosition = ApplicationCursor::GetInstance()->GetCursorPosition();
     m_ScreenYDifference = 0;
-   
+
     m_SeedPointMemoryOffset = projectedPointIn2D[1] * m_OriginalPicSlice->n[0] + projectedPointIn2D[0];
     m_LastWorkingSeed = m_SeedPointMemoryOffset; // remember for skeletonization
 
@@ -312,7 +312,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
         // display the contour
         FeedbackContourTool::SetFeedbackContourVisible(true);
         mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-        
+
         m_FillFeedbackContour = true;
       }
     }
@@ -332,10 +332,10 @@ bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* sta
 {
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
   {
-    if ( m_ReferenceSlice.IsNotNull() && m_OriginalPicSlice ) 
+    if ( m_ReferenceSlice.IsNotNull() && m_OriginalPicSlice )
     {
       const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-      if (positionEvent) 
+      if (positionEvent)
       {
         ApplicationCursor* cursor = ApplicationCursor::GetInstance();
         if (!cursor) return false;
@@ -344,7 +344,7 @@ bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* sta
 
         m_LowerThreshold = std::max<mitk::ScalarType>(0.0, m_InitialLowerThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
         m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
-        
+
         // 2. Perform region growing again and show the result
         mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
         ipMITKSegmentationFree( result );
@@ -396,7 +396,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
             }
           }
         }
-        
+
         FeedbackContourTool::SetFeedbackContourVisible(false);
         mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
       }
@@ -404,9 +404,9 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
   }
 
   m_ReferenceSlice = NULL; // don't leak
-  m_WorkingSlice = NULL;  
+  m_WorkingSlice = NULL;
   m_OriginalPicSlice = NULL;
-    
+
   return true;
 }
 
@@ -440,7 +440,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
     Contour::Pointer dummyContour = Contour::New();
     dummyContour->Initialize();
     FeedbackContourTool::SetFeedbackContour( *dummyContour );
-    
+
     if (regionGrowerResult) ipMITKSegmentationFree(regionGrowerResult);
     return NULL;
   }
@@ -485,22 +485,22 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
       oneContourOffset =    m_SeedPointMemoryOffset % smoothedRegionGrowerResult->n[0]  // x of seed point
                           + rowLength*(smoothedRegionGrowerResult->n[1]-1);              // y of last row
 
-      while (    oneContourOffset >=0 
+      while (    oneContourOffset >=0
               && (*(static_cast<ipMITKSegmentationTYPE*>(smoothedRegionGrowerResult->data) + oneContourOffset) == 0) )
       {
         oneContourOffset -= rowLength; // if pixel at data+oneContourOffset is 0, then move up one row
       }
-      
+
       if ( oneContourOffset < 0 )
       {
         break; // just use the last contour we found
       }
-    
+
       free(contourPoints); // release contour memory
       contourPoints = ipMITKSegmentationGetContour8N( smoothedRegionGrowerResult, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
     }
 
-    // copy point from float* to mitk::Contour 
+    // copy point from float* to mitk::Contour
     Contour::Pointer contourInImageIndexCoordinates = Contour::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
@@ -521,7 +521,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
   }
 
   // 5. Result HAS TO BE freed by caller, contains the binary region growing result
-  return smoothedRegionGrowerResult; 
+  return smoothedRegionGrowerResult;
 }
 
 /**
@@ -530,7 +530,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
   \param sourceImage The original binary image.
   \param dest The smoothed image (will be written without bounds checking).
   \param contourOfs One offset of the contour. Is updated if a pixel is changed (which might change the contour).
-  \param maskOffsets Memory offsets that describe the smoothing mask. 
+  \param maskOffsets Memory offsets that describe the smoothing mask.
   \param maskSize Entries of the mask.
   \param startOffset First pixel that should be smoothed using this mask.
   \param endOffset Last pixel that should be smoothed using this mask.
@@ -544,20 +544,20 @@ void mitk::RegionGrowingTool::SmoothIPPicBinaryImageHelperForRows( mitkIpPicDesc
   int ofs = startOffset;
   int minority = (maskSize - 1) / 2;
 
-  for (current = ((ipMITKSegmentationTYPE*)dest->data) + startOffset; current<end; current++) 
+  for (current = ((ipMITKSegmentationTYPE*)dest->data) + startOffset; current<end; current++)
   {
     mitkIpInt1_t sum( 0 );
-    for (int i = 0; i < maskSize; ++i) 
+    for (int i = 0; i < maskSize; ++i)
     {
       sum += *(source+maskOffsets[i]);
     }
 
-    if (sum > minority) 
+    if (sum > minority)
     {
       *current = 1;
       contourOfs = ofs;
     }
-    else 
+    else
     {
       *current = 0;
     }
@@ -577,34 +577,34 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::SmoothIPPicBinaryImage( mitkIpPicD
   // Original code from /trunk/mbi-qm/Qmitk/Qmitk2DSegTools/RegionGrowerTool.cpp (first version by T. Boettger?). Reformatted and documented and restructured.
   #define MSK_SIZE5x5 21
   #define MSK_SIZE3x3 5
-  #define MSK_SIZE3x1 3 
-  
+  #define MSK_SIZE3x1 3
+
   // mask is an array of coordinates that form a rastered circle like this
   //
-  //            OOO  
-  //           OOOOO 
-  //           OOOOO 
-  //           OOOOO 
-  //            OOO  
+  //            OOO
+  //           OOOOO
+  //           OOOOO
+  //           OOOOO
+  //            OOO
   //
   //
-  int mask5x5[MSK_SIZE5x5][2] 
+  int mask5x5[MSK_SIZE5x5][2]
   = {
-  /******/ {-1,-2}, {0,-2}, {1,-2}, /*****/ 
+  /******/ {-1,-2}, {0,-2}, {1,-2}, /*****/
   {-2,-1}, {-1,-1}, {0,-1}, {1,-1}, {2,-1},
   {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0},
   {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1},
-  /******/ {-1, 2}, {0, 2}, {1, 2}  /*****/ 
+  /******/ {-1, 2}, {0, 2}, {1, 2}  /*****/
   };
 
-  int mask3x3[MSK_SIZE3x3][2] 
+  int mask3x3[MSK_SIZE3x3][2]
   = {
-  /******/ {0,-1}, /*****/ 
+  /******/ {0,-1}, /*****/
   {-1, 0}, {0, 0}, {1, 0},
-  /******/ {0, 1} /*****/ 
+  /******/ {0, 1} /*****/
   };
 
-  int mask3x1[MSK_SIZE3x1][2] 
+  int mask3x1[MSK_SIZE3x1][2]
   = {
   {-1, 0}, {0, 0}, {1, 0}
   };
@@ -616,25 +616,25 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::SmoothIPPicBinaryImage( mitkIpPicD
   // This is determining a majority. If there is no clear majority, then the central pixel itself "decides".
   int maskOffset5x5[MSK_SIZE5x5];
   int line = image->n[0];
-  for (int i=0; i<MSK_SIZE5x5; i++) 
+  for (int i=0; i<MSK_SIZE5x5; i++)
   {
     maskOffset5x5[i] = mask5x5[i][0] + line * mask5x5[i][1]; // calculate memory offsets from the x,y mask elements
   }
 
   int maskOffset3x3[MSK_SIZE3x3];
-  for (int i=0; i<MSK_SIZE3x3; i++) 
+  for (int i=0; i<MSK_SIZE3x3; i++)
   {
     maskOffset3x3[i] = mask3x3[i][0] + line * mask3x3[i][1]; // calculate memory offsets from the x,y mask elements
   }
 
   int maskOffset3x1[MSK_SIZE3x1];
-  for (int i=0; i<MSK_SIZE3x1; i++) 
+  for (int i=0; i<MSK_SIZE3x1; i++)
   {
     maskOffset3x1[i] = mask3x1[i][0] + line * mask3x1[i][1]; // calculate memory offsets from the x,y mask elements
   }
 
 
-  if (!dest) 
+  if (!dest)
   {
     // create pic if necessary
     dest = ipMITKSegmentationNew( image );
@@ -650,7 +650,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::SmoothIPPicBinaryImage( mitkIpPicD
   if ( image->n[1] > 10) SmoothIPPicBinaryImageHelperForRows( image, dest, contourOfs, maskOffset3x1, MSK_SIZE3x1, dest->n[0]*dest->n[1] -spareOut1Rows, dest->n[0]*dest->n[1] - 1 );
 
   // correction for first pixel (sorry for the ugliness)
-  if ( *((ipMITKSegmentationTYPE*)(dest->data)+1) == 1 ) 
+  if ( *((ipMITKSegmentationTYPE*)(dest->data)+1) == 1 )
   {
     *((ipMITKSegmentationTYPE*)(dest->data)+0) = 1;
   }
@@ -658,12 +658,12 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::SmoothIPPicBinaryImage( mitkIpPicD
   if (dest->n[0] * dest->n[1] > 2)
   {
     // correction for last pixel
-    if ( *((ipMITKSegmentationTYPE*)(dest->data)+dest->n[0]*dest->n[1]-2) == 1 ) 
+    if ( *((ipMITKSegmentationTYPE*)(dest->data)+dest->n[0]*dest->n[1]-2) == 1 )
     {
       *((ipMITKSegmentationTYPE*)(dest->data)+dest->n[0]*dest->n[1]-1) = 1;
     }
   }
-  
+
   return dest;
 }
 

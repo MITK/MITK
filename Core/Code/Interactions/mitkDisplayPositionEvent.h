@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ namespace mitk {
 
 /**
  * \brief Event that stores coordinates
- * 
+ *
  * Stores display position of the mouse.
  *
  * If requested, the correspondent 3D world position in mm is calculated via
@@ -41,7 +41,7 @@ class MITK_CORE_EXPORT DisplayPositionEvent : public Event
 {
 public:
   /** \brief Constructor with all necessary arguments.
-   * 
+   *
    * \param sender is the renderer that caused that event
    * \param type, button, buttonState, key: information from the Event
    * \param displPosition is the 2D Position of the mouse

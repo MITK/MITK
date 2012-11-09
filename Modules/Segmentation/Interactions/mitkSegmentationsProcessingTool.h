@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,24 +33,24 @@ namespace mitk
 class Segmentation_EXPORT SegmentationsProcessingTool : public Tool
 {
   public:
-    
+
     mitkClassMacro(SegmentationsProcessingTool, Tool);
 
   protected:
 
     SegmentationsProcessingTool(); // purposely hidden
     virtual ~SegmentationsProcessingTool();
-    
+
     virtual const char* GetGroup() const;
 
     /**
      \brief Called when the tool gets activated
-     
+
      Will just call ProcessAllObjects and then deactivate this tool again.
     */
     virtual void Activated();
     virtual void Deactivated();
-   
+
     /**
      \brief Loop over all working data items
 
@@ -88,7 +88,7 @@ class Segmentation_EXPORT SegmentationsProcessingTool : public Tool
     virtual void SendErrorMessageIfAny();
 
     /**
-      \brief Describes the error (if one occurred during processing). 
+      \brief Describes the error (if one occurred during processing).
      */
     virtual std::string GetErrorMessage();
 

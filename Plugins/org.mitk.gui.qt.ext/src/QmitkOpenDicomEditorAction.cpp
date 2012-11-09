@@ -65,7 +65,7 @@ void QmitkOpenDicomEditorAction::init(berry::IWorkbenchWindow::Pointer window)
   berry::IPreferencesService::Pointer prefService
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-  
+
   m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
@@ -85,9 +85,9 @@ void QmitkOpenDicomEditorAction::Run()
     //mitk::DataStorage::Pointer dataStorage;
     //QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
     //berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
-   
 
-   
+
+
     //if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
     //{
     //    editorInput = new mitk::DataStorageEditorInput();

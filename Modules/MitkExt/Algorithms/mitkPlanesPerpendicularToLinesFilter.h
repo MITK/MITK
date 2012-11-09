@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 //##Documentation
-//## @brief Create Planes perpendicular to lines contained in a Mesh. The planes data is generated as one SlicedGeometry3D data. 
+//## @brief Create Planes perpendicular to lines contained in a Mesh. The planes data is generated as one SlicedGeometry3D data.
 //## To create the planes as input a
 //## mitk::mesh (for example a pointSet) and as geometry hint a geometry (for example from the original image) must be given.
 //##
@@ -65,7 +65,7 @@ public:
   //## @brief Set plane to be used as an example of the planes to move
   //## along the lines in the input mesh.
   //##
-  //## The size and spacing are copied from the plane. The in-plane 
+  //## The size and spacing are copied from the plane. The in-plane
   //## orientation (right-vector) of the created planes are set as
   //## parallel as possible to the orientation (right-vector) of the
   //## the plane set using this method.
@@ -91,7 +91,7 @@ public:
   //## @brief Set an explicit frame of the created sliced geometry
   //##
   //## Set an explicit framegeometry for the created sliced geometry. This framegeometry is
-  //## used as geometry for all created planes. 
+  //## used as geometry for all created planes.
   //## Uses the IndexToWorldTransform and bounding box of the
   //## provided geometry.
   //## \sa CalculateFrameGeometry
@@ -112,7 +112,7 @@ protected:
   //## @brief Plane to be used as an example of the planes to move
   //## along the lines in the input mesh.
   //##
-  //## The size and spacing are copied from the m_Plane. The in-plane 
+  //## The size and spacing are copied from the m_Plane. The in-plane
   //## orientation (right-vector) of the created planes are set as
   //## parallel as possible to the orientation (right-vector) of m_Plane.
   //## \sa SetPlane

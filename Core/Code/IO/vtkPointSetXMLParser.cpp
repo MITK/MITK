@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -90,7 +90,7 @@ void mitk::vtkPointSetXMLParser::StartElement ( const char *name, const char ** 
         m_CurYString.clear();
         m_CurZString.clear();
     }
-    
+
     //
     // the current element is pushed on to the stack
     // to be able to detect some errors in the xml file
@@ -104,9 +104,9 @@ void mitk::vtkPointSetXMLParser::StartElement ( const char *name, const char ** 
 void mitk::vtkPointSetXMLParser::EndElement ( const char *name )
 {
     std::string currentElement = name;
-    
+
     //
-    // make sure, that the current end element matches with the 
+    // make sure, that the current end element matches with the
     // last start tag
     //
     if ( m_ParseStack.top() != currentElement )
@@ -153,10 +153,10 @@ void mitk::vtkPointSetXMLParser::CharacterDataHandler ( const char *inData, int 
     std::string currentElement = m_ParseStack.top();
     if ( currentElement == mitk::PointSetWriter::XML_ID )
     {
-        m_CurId.append( inData, inLength );        
+        m_CurId.append( inData, inLength );
     }
     else if ( currentElement == mitk::PointSetWriter::XML_X )
-    { 
+    {
         m_CurXString.append(inData, inLength);
     }
     else if ( currentElement == mitk::PointSetWriter::XML_Y )

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,11 +27,11 @@ namespace mitk {
 
     //##Documentation
     //## @brief Predicate that evaluates if the given node is a direct or indirect source node of a specific node
-    //## 
-    //## @warning This class seems to be obsolete since mitk::DataStorage::GetDerivations(). 
+    //##
+    //## @warning This class seems to be obsolete since mitk::DataStorage::GetDerivations().
     //##          Since there is no real use case up until now, NodePredicateSource is NOT WORKING YET.
     //##          If you need it working, inform us.
-    //## 
+    //##
     //## @ingroup DataStorage
     class MITK_CORE_EXPORT NodePredicateFirstLevel : public NodePredicateBase
     {

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ ClippingProperty::ClippingProperty()
 }
 
 
-ClippingProperty::ClippingProperty( 
+ClippingProperty::ClippingProperty(
   const Point3D &origin, const Vector3D &normal )
 : m_ClippingEnabled( true ),
   m_Origin( origin ),
@@ -85,7 +85,7 @@ void ClippingProperty::SetNormal( const Vector3D &normal )
 
 
 bool ClippingProperty::IsEqual( const BaseProperty &property ) const
-{  
+{
   return ((this->m_ClippingEnabled == static_cast<const Self&>(property).m_ClippingEnabled) &&
           (this->m_Origin == static_cast<const Self&>(property).m_Origin ) &&
           (this->m_Normal == static_cast<const Self&>(property).m_Normal ) );
@@ -100,12 +100,12 @@ bool ClippingProperty::Assign( const BaseProperty &property )
 }
 
 
-std::string ClippingProperty::GetValueAsString() const 
+std::string ClippingProperty::GetValueAsString() const
 {
   std::stringstream myStr;
 
   myStr << this->GetClippingEnabled() << this->GetOrigin() << this->GetNormal();
-  return myStr.str(); 
+  return myStr.str();
 }
 } // namespace
 

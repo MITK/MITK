@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,9 +31,9 @@ namespace mitk
 /**
  * @brief reads xml representations of mitk::PlanarFigure from a file
  *
- * Reader for xml files containing one or multiple xml represenations of 
+ * Reader for xml files containing one or multiple xml represenations of
  * mitk::PlanarFigure. If multiple mitk::PlanarFigure are stored in one file,
- * these are assigned to multiple outputs of the filter. 
+ * these are assigned to multiple outputs of the filter.
  * @ingroup IO
 */
 class PlanarFigure_EXPORT PlanarFigureReader: public PlanarFigureSource, public FileReader
@@ -75,17 +75,17 @@ public:
      * @warning multiple load not (yet) supported
      */
     itkGetStringMacro( FilePattern );
-    
+
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
-    
+
     /**
      * @returns whether the last read attempt was successful or not.
      */
     itkGetConstMacro(Success, bool);
 
     /**
-    * Allocates a new dummy output object and returns it. 
-    * GenerateData() will overwrite the outputs with specific types, 
+    * Allocates a new dummy output object and returns it.
+    * GenerateData() will overwrite the outputs with specific types,
     * @param idx the index of the output for which an object should be created
     * @returns the dummy object
     */
@@ -104,23 +104,23 @@ protected:
      * Virtual destructor
      */
     virtual ~PlanarFigureReader();
-    
+
     /**
      * Actually reads the point sets from the given file
      */
     virtual void GenerateData();
-    
+
     /**
      * Does nothing in the current implementation
      */
     virtual void GenerateOutputInformation();
-    
+
     /**
      * Resizes the output-objects according to the given number.
      * @param num the new number of output objects.
      */
     virtual void ResizeOutputs( const unsigned int& num );
-    
+
     /**
      * Checks if the given file has appropriate
      * read access.
@@ -156,8 +156,8 @@ protected:
 
     std::string m_FileName;
     std::string m_FilePrefix;
-    std::string m_FilePattern;  
-    bool m_Success;  
-};   
+    std::string m_FilePattern;
+    bool m_Success;
+};
 }
 #endif

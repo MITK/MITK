@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,21 +34,21 @@ public:
   mitkClassMacro(MovieGenerator, itk::LightObject);
 
   // delivers Win32 or Linux-versions of MovieGenerator
-  static Pointer New(void);    
+  static Pointer New(void);
 
   //!  stepper  used to  control  movie  generation
   virtual void SetStepper( Stepper *stepper ) { m_stepper = stepper; }
 
-  //!  renderer to record    
+  //!  renderer to record
   virtual void SetRenderer(  BaseRenderer *renderer ) { m_renderer  =  renderer;  }
 
-  //!  filename under which movie is  saved    
+  //!  filename under which movie is  saved
   virtual void SetFileName(  const  char *fileName ) { strcpy( m_fileName, fileName  ); }
 
-  //!  uses given stepper and filename  to create a movie from the active OpenGL context    
+  //!  uses given stepper and filename  to create a movie from the active OpenGL context
   virtual bool WriteMovie();
-  
-  //!  alternative way, which does not use a stepper; 
+
+  //!  alternative way, which does not use a stepper;
   //   it adds a single frame to a movie each time the function is called
   //   Initialization is done with first function call; Renderer and Filename have to be set up properly before.
   virtual bool WriteCurrentFrameToMovie();

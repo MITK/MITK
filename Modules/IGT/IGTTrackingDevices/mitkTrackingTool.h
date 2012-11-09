@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,13 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVector.h>
 #include <itkFastMutexLock.h>
 
-namespace mitk 
+namespace mitk
 {
   /**Documentation
   * \brief Interface for all Tracking Tools
   *
   * Abstract class that defines the methods that are common for all tracking tools.
-  * 
+  *
   * \ingroup IGT
   */
   class MitkIGT_EXPORT TrackingTool : public itk::Object
@@ -46,12 +46,12 @@ namespace mitk
     virtual bool IsEnabled() const = 0;              ///< returns whether the tool is enabled or disabled
     virtual bool IsDataValid() const = 0;            ///< returns true if the current position data is valid (no error during tracking, tracking error below threshold, ...)
     virtual float GetTrackingError() const = 0;      ///< returns one value that corresponds to the overall tracking error.
-    virtual const char* GetToolName() const;         ///< every tool has a name that can be used to identify it.     
+    virtual const char* GetToolName() const;         ///< every tool has a name that can be used to identify it.
     virtual const char* GetErrorMessage() const;     ///< if the data is not valid, ErrorMessage should contain a string explaining why it is invalid (the Set-method should be implemented in subclasses, it should not be accessible by the user)
   protected:
     TrackingTool();
     virtual ~TrackingTool();
-    std::string m_ToolName;                          ///< every tool has a name that can be used to identify it. 
+    std::string m_ToolName;                          ///< every tool has a name that can be used to identify it.
     std::string m_ErrorMessage;                      ///< if a tool is invalid, this member should contain a human readable explanation of why it is invalid
     itk::FastMutexLock::Pointer m_MyMutex;           ///< mutex to control concurrent access to the tool
   };

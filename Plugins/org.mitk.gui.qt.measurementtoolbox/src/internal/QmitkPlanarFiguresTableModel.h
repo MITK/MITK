@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /// Forward declarations.
 
-/// 
+///
 /// \class QmitkPlanarFiguresTableModel
 ///
 /// \brief A table model for a set of DataNodes defined by a predicate.
@@ -33,14 +33,14 @@ class QmitkPlanarFiguresTableModel : public QmitkDataStorageTableModel
   Q_OBJECT
 
     //#Ctors/Dtor
-public:    
+public:
   ///
   /// Constructs a new QmitkPlanarFiguresTableModel and sets a predicate that defines
   /// this list.
   /// \see setPredicate()
   ///
   QmitkPlanarFiguresTableModel(mitk::DataStorage::Pointer _DataStorage, mitk::NodePredicateBase* _Predicate = 0
-    , QObject* parent = 0 ); 
+    , QObject* parent = 0 );
 
   ///
   /// Standard dtor. Delete predicate, disconnect from DataStorage.
@@ -51,7 +51,7 @@ public:
 public:
   ///
   /// Overridden from QAbstractTableModel. Returns the header data at section
-  /// for given orientation and role. 
+  /// for given orientation and role.
   ///
   QVariant headerData(int section, Qt::Orientation orientation,
     int role) const;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -62,7 +62,7 @@ mitk::ContourSetVtkMapper3D::~ContourSetVtkMapper3D()
 
   if( m_ContourSet )
     m_ContourSet->Delete();;
-  
+
   if( m_Actor )
     m_Actor->Delete();;
 }
@@ -80,7 +80,7 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
     return;
   }
   m_Actor->VisibilityOn();
-  
+
   mitk::ContourSet::Pointer input  = const_cast<mitk::ContourSet*>(this->GetInput());
 
   if ( renderer->GetDisplayGeometryUpdateTime() > this->GetInput()->GetMTime() )
@@ -93,7 +93,7 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
     mitk::ContourSet::Pointer input =  const_cast<mitk::ContourSet*>(this->GetInput());
     mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
     mitk::ContourSet::ContourIterator contourIt = contourVec.begin();
-    
+
     vtkIdType firstPointIndex= 0, lastPointIndex=0;
 
     vtkIdType ptIndex = 0;
@@ -114,7 +114,7 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
       while ( pointsIt != contourPoints->End() )
       {
         if (counter %2 == 0)
-        {        
+        {
           Contour::BoundingBoxType::PointType point;
           point = pointsIt.Value();
           points->InsertPoint(ptIndex, point[0],point[1],point[2]);
@@ -152,7 +152,7 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }
-  
+
   SetVtkMapperImmediateModeRendering(m_VtkPolyDataMapper);
 }
 

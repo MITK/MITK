@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,7 +68,7 @@ void mitk::ExtractSliceFilter::GenerateInputRequestedRegion(){
   //is set to the largest possible region in the image.
   //This is needed because an oblique plane has a larger extent then the image
   //and the in pipeline it is checked via PropagateResquestedRegion(). But the
-  //extent of the slice is actually fitting because it is oblique within the image. 
+  //extent of the slice is actually fitting because it is oblique within the image.
   ImageToImageFilter::InputImagePointer input =  const_cast< ImageToImageFilter::InputImageType* > ( this->GetInput() );
   input->SetRequestedRegionToLargestPossibleRegion();
 }
@@ -114,9 +114,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
   }
 
   // check if there is something to display.
-  if ( ! input->IsVolumeSet( m_TimeStep ) ) 
+  if ( ! input->IsVolumeSet( m_TimeStep ) )
   {
-    itkWarningMacro(<<"No volume data existent at given timestep "<< m_TimeStep ); 
+    itkWarningMacro(<<"No volume data existent at given timestep "<< m_TimeStep );
     return;
   }
 
@@ -192,7 +192,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
     //set the tranform for reslicing.
     // Use inverse transform of the input geometry for reslicing the 3D image.
-    // This is needed if the image volume already transformed 
+    // This is needed if the image volume already transformed
     if(m_ResliceTransform.IsNotNull())
       m_Reslicer->SetResliceTransform(m_ResliceTransform->GetVtkTransform()->GetLinearInverse());
 
@@ -201,7 +201,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     // else the background of the image turns out gray
     m_Reslicer->SetBackgroundLevel( -32768 );
 
-  }  
+  }
   else{
     //Code for curved planes, mostly taken 1:1 from imageVtkMapper2D and not tested yet.
     // Do we have an AbstractTransformGeometry?
@@ -249,7 +249,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       // Set background level to BLACK instead of translucent, to avoid
       // boundary artifacts (see Geometry2DDataVtkMapper3D)
       m_Reslicer->SetBackgroundLevel( -1023 );
-    } 
+    }
     else
     {
       itkExceptionMacro("mitk::ExtractSliceFilter: No fitting geometry for reslice axis!");
@@ -414,7 +414,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     /*At this point we have to adjust the geometry because the origin isn't correct.
     The wrong origin is related to the rotation of the current world geometry plane.
     This causes errors on transfering world to index coordinates. We just shift the
-    origin in each direction about the amount of the expanding (needed while rotating 
+    origin in each direction about the amount of the expanding (needed while rotating
     the plane).
     */
     Vector3D axis0 = originalGeometry->GetAxisVector(0);
@@ -455,34 +455,34 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(vtkFloatingPointType bounds
   if(!m_WorldGeometry || !this->GetInput())
     return false;
 
-  return this->GetClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), dynamic_cast< const PlaneGeometry * >( m_WorldGeometry ), bounds); 
+  return this->GetClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), dynamic_cast< const PlaneGeometry * >( m_WorldGeometry ), bounds);
 
 }
 
 
-bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const Geometry3D *boundingGeometry, 
+bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
                                                      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
-  bool b =  this->CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds); 
+  bool b =  this->CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds);
 
   return b;
 }
 
 
 bool mitk::ExtractSliceFilter
-::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
+::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
                               const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
-  // Clip the plane with the bounding geometry. To do so, the corner points 
-  // of the bounding box are transformed by the inverse transformation 
-  // matrix, and the transformed bounding box edges derived therefrom are 
-  // clipped with the plane z=0. The resulting min/max values are taken as 
+  // Clip the plane with the bounding geometry. To do so, the corner points
+  // of the bounding box are transformed by the inverse transformation
+  // matrix, and the transformed bounding box edges derived therefrom are
+  // clipped with the plane z=0. The resulting min/max values are taken as
   // bounds for the image reslicer.
   const BoundingBox *boundingBox = boundingGeometry->GetBoundingBox();
 
   BoundingBox::PointType bbMin = boundingBox->GetMinimum();
   BoundingBox::PointType bbMax = boundingBox->GetMaximum();
-  
+
   vtkPoints *points = vtkPoints::New();
   if(boundingGeometry->GetImageGeometry())
   {

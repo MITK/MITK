@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryJobQueue.h"
 
 // changed Java JobQueue implementation ..
-// if only one element is in the queue than  InternalJob->next and InternalJob->previous pointer are pointing to 0 and not to the Element itself 
-// I think its better .. will see 
+// if only one element is in the queue than  InternalJob->next and InternalJob->previous pointer are pointing to 0 and not to the Element itself
+// I think its better .. will see
 namespace berry
 {
 
@@ -90,12 +90,12 @@ void JobQueue::Clear()
 
 }
 
-// notice: important that the first element in the queue is internally set as a dummy element 
+// notice: important that the first element in the queue is internally set as a dummy element
 InternalJob::Pointer JobQueue::Dequeue()
 {
 
   InternalJob::Pointer ptr_dummyPrevious = dummy->Previous();
-  // sets previous pointer to 0 if there is only 1 Element in the queue 
+  // sets previous pointer to 0 if there is only 1 Element in the queue
   if (ptr_dummyPrevious == dummy)
   {
     dummy->previous = 0;

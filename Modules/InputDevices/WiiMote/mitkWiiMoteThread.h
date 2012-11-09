@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -52,20 +52,20 @@ namespace mitk
 
     /**
     * Allows to set report types, detects extensions and responds to connect/disconnect <br>
-    * events of extension, such as MotionPlus. 
+    * events of extension, such as MotionPlus.
     *
     * NOTE: don't access the public state from the 'remote' object here, as it will
     *       be out-of-date (it's only updated via RefreshState() calls, and these
     *       are reserved for the main application so it can be sure the values
     *       stay consistent between calls).  Instead query 'new_state' only.
     *
-    * @param remote 
+    * @param remote
     *          the old state of the connected Wii remote
     * @param changed
     *          the state change of the Wii remote
     * @param newState
     *          the new state, after the change is applied (i.e. new extension connected)
-    *           
+    *
     */
     static void OnStateChange(wiimote &remote, state_change_flags  changed, const wiimote_state &newState);
 
@@ -91,12 +91,12 @@ namespace mitk
     void StopWiiMote();
 
     /**
-    * Reconnects the Wiimote in case the connection is lost. 
+    * Reconnects the Wiimote in case the connection is lost.
     */
     void ReconnectWiiMote();
 
     /**
-    * Detects all available Wiimotes. 
+    * Detects all available Wiimotes.
     *
     * TODO: more detailed regarding the mode and led lighting
     */
@@ -109,8 +109,8 @@ namespace mitk
 
     /**
     * Reads incoming data from the IR camera. After processing the data <br>
-    * (e.g. computations, assigning commands...) fires Wiimote events accordingly. 
-    * 
+    * (e.g. computations, assigning commands...) fires Wiimote events accordingly.
+    *
     */
     void WiiMoteIRInput();
 
@@ -136,7 +136,7 @@ namespace mitk
 
     /**
     * Reads incoming data from the IR camera. Afterwards the raw x and y coordinates <br>
-    * are stored in an event and fired as an event. 
+    * are stored in an event and fired as an event.
     *
     */
     void WiiMoteCalibrationInput();
@@ -156,15 +156,15 @@ namespace mitk
     void MultiWiiMoteUpdate();
 
     /**
-    * Processes the different IR inputs from multiple wiimotes. 
+    * Processes the different IR inputs from multiple wiimotes.
     */
     void MultiWiiMoteIRInput();
 
     /**
     * Sets the modus for the first connected Wiimote depending <br>
     * on the given parameter.
-    * 
-    * @param activated 
+    *
+    * @param activated
     *             true, the Surface Interaction modus will be activated
     *             false, the Surface Interaction modus will be deactivated
     */
@@ -175,7 +175,7 @@ namespace mitk
 
   protected:
 
-  private: 
+  private:
 
     // threading
     int m_ThreadID;

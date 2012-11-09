@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ namespace berry {
 
 /**
  * \ingroup org_blueberry_ui_internal
- * 
+ *
  * Template implementation of a registry reader that creates objects
  * representing registry contents. Typically, an extension
  * contains one element, but this reader handles multiple
@@ -39,14 +39,14 @@ namespace berry {
  * done by default.
  */
 class RegistryReader {
-  
+
     // for dynamic UI - remove this cache to avoid inconsistency
     //protected static Hashtable extensionPoints = new Hashtable();
     /**
      * The constructor.
      */
 protected:
-  
+
   RegistryReader();
   virtual ~RegistryReader();
 
@@ -73,9 +73,9 @@ protected:
      */
     static void LogUnknownElement(IConfigurationElement::Pointer element);
 
-    
+
 public:
-  
+
     /**
      * Apply a reproducable order to the list of extensions
      * provided, such that the order will not change as
@@ -85,14 +85,14 @@ public:
      */
     static const std::vector<const IExtension*> OrderExtensions(const std::vector<const IExtension*>& extensions);
 
-    
+
 protected:
-  
+
     /**
      * Implement this method to read element's attributes.
      * If children should also be read, then implementor
      * is responsible for calling <code>readElementChildren</code>.
-     * Implementor is also responsible for logging missing 
+     * Implementor is also responsible for logging missing
      * attributes.
      *
      * @return true if element was recognized, false if not.
@@ -120,34 +120,34 @@ protected:
      */
     virtual void ReadExtension(const IExtension* extension);
 
-    
+
 public:
-  
+
     /**
      *  Start the registry reading process using the
      * supplied plugin ID and extension point.
-     * 
+     *
      * @param registry the registry to read from
      * @param pluginId the plugin id of the extenion point
      * @param extensionPoint the extension point id
      */
     virtual void ReadRegistry(const std::string& pluginId,
             const std::string& extensionPoint);
-    
+
     /**
      * Utility for extracting the description child of an element.
-     * 
+     *
      * @param configElement the element
      * @return the description
      * @since 3.1
      */
     static std::string GetDescription(IConfigurationElement::Pointer configElement);
-    
+
     /**
    * Utility for extracting the value of a class attribute or a nested class
    * element that follows the pattern set forth by
    * {@link org.blueberry.core.runtime.IExecutableExtension}.
-   * 
+   *
    * @param configElement
    *            the element
    * @param classAttributeName

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,7 +35,7 @@ ColorSequenceCycleH::~ColorSequenceCycleH()
 Color ColorSequenceCycleH::GetNextColor()
 {
   color_h += 60.0;
-  if ( color_h < 0.0 ) color_h = 0.0; 
+  if ( color_h < 0.0 ) color_h = 0.0;
 
   if (color_h >= 360.0)
   {
@@ -86,10 +86,10 @@ Color ColorSequenceCycleH::GetNextColor()
   // convert to rgb
   float r, g, b;
   ColorConversions::Hsv2Rgb(color_h, color_s, color_v, r, g, b);
-  
+
   Color returnColor;
   returnColor.Set(r, g, b);
-  
+
   return returnColor;
 }
 

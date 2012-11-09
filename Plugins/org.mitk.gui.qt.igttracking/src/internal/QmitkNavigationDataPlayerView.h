@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 /*!
-\brief QmitkNavigationDataPlayerView 
+\brief QmitkNavigationDataPlayerView
 
 \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
@@ -46,12 +46,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 \ingroup Functionalities
 */
 class QmitkNavigationDataPlayerView : public QmitkFunctionality
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-public:  
+public:
 
   static const std::string VIEW_ID;
 
@@ -70,53 +70,53 @@ public:
   */
   virtual void CreateConnections();
 
-  
+
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
 
 
   protected slots:
-  
-    /*!  
+
+    /*!
     \brief Creates DataNodes for all available playback objects
-    */ 
+    */
     void OnCreatePlaybackVisualization();
-    /*!  
+    /*!
     \brief Assigns position changings from the player widget to the visualization objects
-    */ 
+    */
     void OnPerformPlaybackVisualization();
-    /*!  
-    \brief Reinits this player. Cleans all timers and trajectory data 
-    */ 
+    /*!
+    \brief Reinits this player. Cleans all timers and trajectory data
+    */
     void OnReinit();
-    /*!  
+    /*!
     \brief Shows trajectory of tool with index
     */
     void OnShowTrajectory(int index);
-    /*!  
+    /*!
     \brief Cleans trajectory data before playing is started
     */
     void OnPlayingStarted();
-    /*!  
+    /*!
     \brief Enables or disables trajectory visualization with splines
     */
     void OnEnableSplineTrajectoryMapper(bool enable);
-    
+
 
 protected:
 
-  enum TrajectoryStyle { 
+  enum TrajectoryStyle {
     Points = 1,
-    Splines = 2    
+    Splines = 2
   };
 
   void CreateBundleWidgets(QWidget* parent);
-  
+
    /**
     \brief Refreshes the visualization of the playback object DataNodes.
     */
   void RenderScene();
-  
+
   /**
     \brief Creates representation DataNode with given name and color
   */
@@ -140,14 +140,14 @@ protected:
   */
   mitk::DataNode::Pointer CreateTrajectory( mitk::PointSet::Pointer points, const std::string& name, const mitk::Color color );
 
-  
+
 
 
   Ui::QmitkNavigationDataPlayerViewControls* m_Controls;
-  
+
   QmitkStdMultiWidget* m_MultiWidget;
   QmitkIGTPlayerWidget* m_PlayerWidget; ///< this bundle's playback widget
-   
+
   mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< this filter visualizes the navigation data
 
   std::vector<mitk::DataNode::Pointer> m_RepresentationObjects; ///< vector for current visualization objects
@@ -155,14 +155,14 @@ protected:
   mitk::DataNode::Pointer m_Trajectory; ///< main trajectory visualization DataNode
   mitk::PointSet::Pointer m_TrajectoryPointSet; ///< PointSet with all points for trajectory
   int m_TrajectoryIndex;  ///< trajectory tool index
-  
+
   bool m_ReloadData;  ///< flag needed for refresh of visualization if needed
   bool m_ShowTrajectory;  ///< flag needed for trajectory visualization
 
   mitk::SplineVtkMapper3D::Pointer m_SplineMapper; ///< spline trajectory mapper
   mitk::PointSetVtkMapper3D::Pointer m_PointSetMapper; ///< standard trajectroy mapper
 
- 
+
 
 
 private:

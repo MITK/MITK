@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ QmitkDelKeyFilter::QmitkDelKeyFilter( QObject* _DataManagerView )
 
 bool QmitkDelKeyFilter::eventFilter( QObject *obj, QEvent *event )
 {
-  if (event->type() == QEvent::KeyPress) 
+  if (event->type() == QEvent::KeyPress)
   {
     QmitkDataManagerView* _DataManagerView = qobject_cast<QmitkDataManagerView*>(this->parent());
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);

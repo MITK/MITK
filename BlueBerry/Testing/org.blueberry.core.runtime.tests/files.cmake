@@ -11,12 +11,12 @@ set(SRC_CPP_FILES
   berryCoreRuntimeTestSuite.cpp
   berryPreferencesServiceTest.cpp
   berryPreferencesTest.cpp
-  
+
   berryPluginActivator.cpp
 )
 
 set(INTERNAL_CPP_FILES
-  
+
 )
 
 set(CPP_FILES )

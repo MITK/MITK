@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ class vtkActor2D;
 class vtkVideoSizeCallback;
 
 
-namespace mitk 
+namespace mitk
 {
 
   struct ToFImageBackgroundVectorInfo
@@ -73,7 +73,7 @@ protected:
 
   typedef std::vector<mitk::ToFImageBackgroundVectorInfo> RenderWindowVectorInfoType;
   RenderWindowVectorInfoType      m_renderWindowVectorInfo;
- 
+
 };
 
 #endif

@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,7 +50,7 @@ IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
     PartPane::Pointer part = draggedObject.Cast<PartPane>();
     if (part->GetContainer().Cast<PartStack>()->GetAppearance() == PresentationFactoryUtil::ROLE_EDITOR)
       return IDropTarget::Pointer(0);
-    
+
     // Views that haven't been shown yet have no 'control' which causes
     // 'GetWorkbenchWindow' to return 'null' so check explicitly
     if (part->GetPage() != perspHelper->page)
@@ -68,7 +68,7 @@ IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
     PartStack::Pointer stack = draggedObject.Cast<PartStack>();
     if (stack->GetAppearance() == PresentationFactoryUtil::ROLE_EDITOR)
       return IDropTarget::Pointer(0);
-    
+
     if (stack->GetWorkbenchWindow() != perspHelper->page->GetWorkbenchWindow())
       return IDropTarget::Pointer(0);
 

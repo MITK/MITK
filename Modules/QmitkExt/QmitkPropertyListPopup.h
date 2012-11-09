@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QmitkMaterialEditor;
 
-/*! 
+/*!
   \class QmitkPropertyListPopUp
 
   @ingroup Widgets
@@ -49,11 +49,11 @@ class QmitkExt_EXPORT QmitkPropertyListPopup : public QObject
   Q_OBJECT
 
   public:
-    
+
     QmitkPropertyListPopup( mitk::PropertyList*, QObject* parent = 0, bool disableBoolProperties = false, bool fillMenuImmediatelty = true, const char* name = 0 );
-    
+
     virtual ~QmitkPropertyListPopup();
-    
+
     //!mm
     //void popup( const QPoint& pos, int indexAtPoint = -1 );
     void popup( const QPoint& pos, QAction* action = 0 );
@@ -92,14 +92,14 @@ class QmitkExt_EXPORT QmitkPropertyListPopup : public QObject
 
     mitk::PropertyList::Pointer m_PropertyList;
     std::vector<mitk::BoolProperty::Pointer> m_BoolProperties;
-    
+
     //!mm,update: QPopupMenu is deprecated, use QtMenu in Qt4
     //Q3PopupMenu* m_PopupMenu;
     QMenu* m_InfoPopup;
     //!
 
   //  QmitkMaterialEditor* m_MaterialEditor;
-    
+
     //!mm
     //int m_NameMenuID;
     //int m_VisibleMenuID;

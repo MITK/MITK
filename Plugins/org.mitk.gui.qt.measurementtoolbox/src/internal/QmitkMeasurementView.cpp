@@ -407,7 +407,7 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer par
 
   MEASUREMENT_DEBUG << "refreshing selection and detailed text";
   d->m_CurrentSelection = nodes;
-  this->UpdateMeasurementText();   
+  this->UpdateMeasurementText();
 
   for( int i=d->m_CurrentSelection.size()-1; i>= 0; --i)
   {
@@ -614,7 +614,7 @@ void QmitkMeasurementView::UpdateMeasurementText()
     }
 
     if (j != d->m_CurrentSelection.size())
-      infoText.append("<br />");    
+      infoText.append("<br />");
   }
 
   d->m_SelectedPlanarFiguresText->setHtml(infoText);

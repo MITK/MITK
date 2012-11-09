@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,14 +28,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #else
   #include <sys/sysinfo.h>
   #include <unistd.h>
-#endif 
+#endif
 
 
-/** 
+/**
  * Returns the memory usage of the current process in bytes.
- * On linux, this refers to the virtual memory allocated by 
+ * On linux, this refers to the virtual memory allocated by
  * the process (the VIRT column in top).
- * On windows, this refery to the size in bytes of the working 
+ * On windows, this refery to the size in bytes of the working
  * set pages (the "Speicherauslastung" column in the task manager).
  */
 size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
@@ -65,7 +65,7 @@ size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
     return (size_t) size * getpagesize();
   else
     return 0;
-#endif 
+#endif
   return 0;
 }
 
@@ -94,12 +94,12 @@ size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
     return info.totalram * info.mem_unit;
   else
     return 0;
-#endif 
+#endif
 }
 
-#ifndef _MSC_VER 
+#ifndef _MSC_VER
 #ifndef __APPLE__
-int mitk::MemoryUtilities::ReadStatmFromProcFS( int* size, int* res, int* shared, int* text, int* sharedLibs, int* stack, int* dirtyPages ) 
+int mitk::MemoryUtilities::ReadStatmFromProcFS( int* size, int* res, int* shared, int* text, int* sharedLibs, int* stack, int* dirtyPages )
 {
   int ret = 0;
   FILE* f;
@@ -113,7 +113,7 @@ int mitk::MemoryUtilities::ReadStatmFromProcFS( int* size, int* res, int* shared
   }
   return ret;
 }
-#endif 
+#endif
 #endif
 
 

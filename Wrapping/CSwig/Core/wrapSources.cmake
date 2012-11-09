@@ -35,7 +35,7 @@ set(WRAP_SOURCES_TEST
   wrap_mitkSurfaceToSurfaceFilter
   wrap_mitkUIDGenerator
   wrap_mitkVolumeCalculator
-  
+
   #Controllers:
   wrap_mitkBaseController
   wrap_mitkCallbackFromGUIThread
@@ -63,7 +63,7 @@ set(WRAP_SOURCES_TEST
   wrap_mitkVerboseLimitedLinearUndo
   wrap_mitkVtkInteractorCameraController
   wrap_mitkVtkLayerController
-  
+
   #DataManagement:
   #wrap_itkVtkAbstractTransform //Template: can be wrapped; TODO: instantiate the needed templates
   wrap_mitkAbstractTransformGeometry
@@ -145,7 +145,7 @@ set(WRAP_SOURCES_TEST
   wrap_mitkVtkVolumeRenderingProperty
   #wrap_mitkWeakPointer //Template: can be wrapped; TODO: instantiate the needed templates
   wrap_mitkWeakPointerProperty
-  
+
   #Interactions:
   wrap_mitkAction
   wrap_mitkAffineInteractor
@@ -171,7 +171,7 @@ set(WRAP_SOURCES_TEST
   wrap_mitkStateMachineFactory
   wrap_mitkTransition
   wrap_mitkWheelEvent
-  
+
   #IO:
   wrap_mitkBaseDataIOFactory
   wrap_mitkDicomSeriesReader
@@ -213,7 +213,7 @@ set(WRAP_SOURCES_TEST
   wrap_mitkVtkSurfaceIOFactory
   wrap_mitkVtkSurfaceReader
   wrap_vtkPointSetXMLParser
-  
+
   #Rendering:
   #wrap_mitkBaseRenderer //leads to a crash of cswig; after bug fixed in cswig -> circular import error
   wrap_mitkVtkMapper2D
@@ -239,7 +239,7 @@ set(WRAP_SOURCES_TEST
   wrap_vtkMitkRenderProp
   wrap_vtkMitkThickSlicesFilter
   wrap_mitkManufacturerLogo
-  
+
   wrap_mitkCommonSuperclasses
   wrap_mitkImageCaster
   #wrap_qmitkFunctionality

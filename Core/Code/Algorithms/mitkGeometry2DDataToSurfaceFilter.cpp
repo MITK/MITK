@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -49,7 +49,7 @@ mitk::Geometry2DDataToSurfaceFilter::Geometry2DDataToSurfaceFilter()
 
   m_CubeSource = vtkCubeSource::New();
   m_PolyDataTransformer = vtkTransformPolyDataFilter::New();
-  
+
   m_Plane = vtkPlane::New();
   m_PlaneCutter = vtkCutter::New();
   m_PlaneStripper = vtkStripper::New();
@@ -73,7 +73,7 @@ mitk::Geometry2DDataToSurfaceFilter::~Geometry2DDataToSurfaceFilter()
 
   m_CubeSource->Delete();
   m_PolyDataTransformer->Delete();
-  
+
   m_Plane->Delete();
   m_PlaneCutter->Delete();
   m_PlaneStripper->Delete();
@@ -105,19 +105,19 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
   Point3D right, bottom;
 
   vtkPolyData *planeSurface = NULL;
-  
-    
+
+
   // Does the Geometry2DData contain a PlaneGeometry?
   if ( dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() ) != NULL )
   {
-    mitk::PlaneGeometry *planeGeometry = 
+    mitk::PlaneGeometry *planeGeometry =
       dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() );
 
     if ( m_PlaceByGeometry )
     {
       // Let the output use the input geometry to appropriately transform the
       // coordinate system.
-      mitk::AffineGeometryFrame3D::TransformType *affineTransform = 
+      mitk::AffineGeometryFrame3D::TransformType *affineTransform =
         planeGeometry->GetIndexToWorldTransform();
 
       mitk::TimeSlicedGeometry *timeGeometry = output->GetTimeSlicedGeometry();
@@ -130,7 +130,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     if ( !m_UseBoundingBox)
     {
       // We do not have a bounding box, so no clipping is required.
-      
+
       if ( m_PlaceByGeometry )
       {
         // Derive coordinate axes and origin from input geometry extent
@@ -145,7 +145,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
         right = planeGeometry->GetCornerPoint( false, true );
         bottom = planeGeometry->GetCornerPoint( true, false );
       }
-      
+
       // Since the plane is planar, there is no need to subdivide the grid
       // (cf. AbstractTransformGeometry case)
       m_PlaneSource->SetXResolution( 1 );
@@ -202,7 +202,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       // Transform the cube accordingly (s.a.)
       m_PolyDataTransformer->SetInput( m_CubeSource->GetOutput() );
       m_PolyDataTransformer->SetTransform( m_Transform );
-      
+
       // Initialize the plane to clip the cube with, as lying on the z-plane
       m_Plane->SetOrigin( 0.0, 0.0, 0.0 );
       m_Plane->SetNormal( 0.0, 0.0, 1.0 );
@@ -225,12 +225,12 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 
       m_PlaneTriangler->SetInput( m_PlanePolyData );
 
-      
+
       // Get bounds of the resulting surface and use it to generate the texture
       // mapping information
       m_PlaneTriangler->Update();
       m_PlaneTriangler->GetOutput()->ComputeBounds();
-      vtkFloatingPointType *surfaceBounds = 
+      vtkFloatingPointType *surfaceBounds =
         m_PlaneTriangler->GetOutput()->GetBounds();
 
       origin[0] = surfaceBounds[0];
@@ -252,12 +252,12 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       m_TextureMapToPlane->SetOrigin( origin[0], origin[1], origin[2] );
       m_TextureMapToPlane->SetPoint1( right[0], right[1], right[2] );
       m_TextureMapToPlane->SetPoint2( bottom[0], bottom[1], bottom[2] );
-      
+
       // Need to call update so that output data and bounds are immediately
       // available
       m_TextureMapToPlane->Update();
 
-      
+
       // Return the output of this generation process
       planeSurface = dynamic_cast< vtkPolyData * >(
         m_TextureMapToPlane->GetOutput()
@@ -287,7 +287,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     // grid needs to have a certain resolution so that the deformation has the
     // desired effect).
     if ( m_UseGeometryParametricBounds )
-    { 
+    {
       m_PlaneSource->SetXResolution(
         (int)abstractGeometry->GetParametricExtent(0)
       );
@@ -304,7 +304,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     {
       // Let the output use the input geometry to appropriately transform the
       // coordinate system.
-      mitk::AffineGeometryFrame3D::TransformType *affineTransform = 
+      mitk::AffineGeometryFrame3D::TransformType *affineTransform =
         abstractGeometry->GetIndexToWorldTransform();
 
       mitk::TimeSlicedGeometry *timeGeometry = output->GetTimeSlicedGeometry();
@@ -365,7 +365,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
   }
 
   m_NormalsUpdater->SetInput( planeSurface );
-  m_NormalsUpdater->AutoOrientNormalsOn(); // that's the trick! Brings consistency between 
+  m_NormalsUpdater->AutoOrientNormalsOn(); // that's the trick! Brings consistency between
                                           //  normals direction and front/back faces direction (see bug 1440)
   m_NormalsUpdater->ComputePointNormalsOn();
   m_NormalsUpdater->Update();
@@ -406,18 +406,18 @@ mitk::Geometry2DDataToSurfaceFilter
 }
 
 
-void 
+void
 mitk::Geometry2DDataToSurfaceFilter
 ::SetInput(const mitk::Geometry2DData *input)
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput( 0, 
+  this->ProcessObject::SetNthInput( 0,
   const_cast< mitk::Geometry2DData * >( input )
   );
 }
 
 
-void 
+void
 mitk::Geometry2DDataToSurfaceFilter
 ::SetInput(unsigned int index, const mitk::Geometry2DData *input)
 {
@@ -426,7 +426,7 @@ mitk::Geometry2DDataToSurfaceFilter
     this->SetNumberOfRequiredInputs( index + 1 );
   }
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(index, 
+  this->ProcessObject::SetNthInput(index,
     const_cast< mitk::Geometry2DData *>( input )
   );
 }

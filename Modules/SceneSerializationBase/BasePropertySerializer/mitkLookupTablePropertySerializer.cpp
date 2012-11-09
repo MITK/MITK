@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ namespace mitk
 class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BasePropertySerializer
 {
   public:
-    
+
     mitkClassMacro( LookupTablePropertySerializer, BasePropertySerializer );
     itkNewMacro(Self);
 
@@ -57,7 +57,7 @@ class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BaseP
         element->LinkEndChild( child );
           child->SetDoubleAttribute("min", range[0]);
           child->SetDoubleAttribute("max", range[1]);
-        
+
         range = lut->GetValueRange();
                       child = new TiXmlElement("ValueRange");
         element->LinkEndChild( child );
@@ -113,7 +113,7 @@ class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BaseP
 
       int numberOfColors;
       int scale;
-      int ramp; // hope the int values don't change betw. vtk versions... 
+      int ramp; // hope the int values don't change betw. vtk versions...
       if ( element->QueryIntAttribute( "NumberOfColors", &numberOfColors ) == TIXML_SUCCESS )
       {
         lut->SetNumberOfTableValues( numberOfColors );
@@ -134,13 +134,13 @@ class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BaseP
         return NULL;
 
       TiXmlElement* child = element->FirstChildElement("HueRange");
-      if (child) 
+      if (child)
       {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) 
-          return NULL; 
+        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS )
+          return NULL;
         range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) 
-          return NULL; 
+        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS )
+          return NULL;
         range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
         lut->SetHueRange( range );
       }
@@ -176,9 +176,9 @@ class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BaseP
         if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return NULL; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
         lut->SetTableRange( range );
       }
-                     
+
       child = element->FirstChildElement("Table");
-      if (child) 
+      if (child)
       {
         unsigned int index(0);
         for( TiXmlElement* grandChild = child->FirstChildElement("RgbaColor"); grandChild; grandChild = grandChild->NextSiblingElement("RgbaColor"))
@@ -196,7 +196,7 @@ class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BaseP
       LookupTable::Pointer mitkLut = LookupTable::New();
       mitkLut->SetVtkLookupTable( lut );
 
-      lut->Delete(); 
+      lut->Delete();
 
       return LookupTableProperty::New(mitkLut).GetPointer();
     }

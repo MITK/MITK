@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ namespace mitk
 {
   /**
   * @brief Writer class for ToF nrrd images
-  * 
+  *
   * This writer class allows streaming of ToF data into a nrrd file. This class uses the itkNrrdImageIO class
   * Writer can simultaneously save "distance", "intensity" and "amplitude" image.
   * Images can be written as 3D volume (ToFImageType::ToFImageType3D) or temporal image stack (ToFImageType::ToFImageType2DPlusT)
@@ -34,7 +34,7 @@ namespace mitk
   */
   class MITK_TOFHARDWARE_EXPORT ToFNrrdImageWriter : public ToFImageWriter
   {
-  public: 
+  public:
     mitkClassMacro( ToFNrrdImageWriter , ToFImageWriter );
     itkNewMacro( Self );
 

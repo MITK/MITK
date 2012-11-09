@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeDescriptor.h"
 
-/// 
+///
 /// \class QmitkNodeDescriptorManager
 /// \brief QmitkNodeDescriptorManager manages a set of QmitkNodeDescriptors
 ///
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QMITK_EXPORT QmitkNodeDescriptorManager : public QObject
 {
   Q_OBJECT
-public:  
+public:
   ///
   /// \return the solely instance of QmitkNodeDescriptorManager
   ///
@@ -46,7 +46,7 @@ public:
   /// - A QmitkNodeDescriptor for the class of "PointSet" DataNodes
   ///
   virtual void Initialize();
-  
+
   ///
   /// Adds a new descriptor to the manager. The manager takes the ownership.
   ///
@@ -83,7 +83,7 @@ public:
   /// Returns a list of all actions that are associated with the given node.
   /// If there are more than one Descriptors for this node all actions
   /// will be merged together.
-  /// E.g. all actions from the "unknown" DataNodes will be added to 
+  /// E.g. all actions from the "unknown" DataNodes will be added to
   /// this list. Generic Actions like Save, Load, etc. are stored there.
   ///
   QList<QAction*> GetActions(const mitk::DataNode* _Node) const;

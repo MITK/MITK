@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,7 +34,7 @@ struct QmitkEditPointDialogData
 QmitkEditPointDialog::QmitkEditPointDialog( QWidget * parent, Qt::WindowFlags f)
 : QDialog(parent, f)
 , d(new QmitkEditPointDialogData)
-{  
+{
   this->setWindowTitle("Edit Point Dialog");
   d->m_PointSet = 0;
   d->m_Timestep = 0;
@@ -44,11 +44,11 @@ QmitkEditPointDialog::QmitkEditPointDialog( QWidget * parent, Qt::WindowFlags f)
   QPushButton* _OKButton = new QPushButton("OK");
   connect( _OKButton, SIGNAL(clicked(bool)), this, SLOT(OnOkButtonClicked(bool)) );
 
-  QGridLayout* layout = new QGridLayout;  
+  QGridLayout* layout = new QGridLayout;
   layout->addWidget(new QLabel("X: "), 0,0,1,1);
-  layout->addWidget(d->m_XCoord, 0,1,1,1);  
+  layout->addWidget(d->m_XCoord, 0,1,1,1);
   layout->addWidget(new QLabel("Y: "), 1,0,1,1);
-  layout->addWidget(d->m_YCoord, 1,1,1,1);  
+  layout->addWidget(d->m_YCoord, 1,1,1,1);
   layout->addWidget(new QLabel("Z: "), 2,0,1,1);
   layout->addWidget(d->m_ZCoord, 2,1,1,1);
   layout->addWidget(_OKButton, 3,0,2,1);
@@ -75,7 +75,7 @@ void QmitkEditPointDialog::SetPoint( mitk::PointSet* _PointSet, mitk::PointSet::
 
 
 void QmitkEditPointDialog::OnOkButtonClicked( bool /*triggered*/ )
-{  
+{
   if(d->m_PointSet == 0)
   {
     MITK_WARN << "Pointset is 0.";

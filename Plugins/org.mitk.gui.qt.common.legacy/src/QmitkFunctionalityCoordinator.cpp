@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -58,7 +58,7 @@ QmitkFunctionalityCoordinator::~QmitkFunctionalityCoordinator()
 berry::IPartListener::Events::Types QmitkFunctionalityCoordinator::GetPartEventTypes() const
 {
   return berry::IPartListener::Events::ACTIVATED | berry::IPartListener::Events::DEACTIVATED
-    | berry::IPartListener::Events::CLOSED | berry::IPartListener::Events::HIDDEN 
+    | berry::IPartListener::Events::CLOSED | berry::IPartListener::Events::HIDDEN
     | berry::IPartListener::Events::VISIBLE | berry::IPartListener::Events::OPENED;
 }
 
@@ -69,7 +69,7 @@ void QmitkFunctionalityCoordinator::PartActivated( berry::IWorkbenchPartReferenc
 }
 
 void QmitkFunctionalityCoordinator::PartDeactivated( berry::IWorkbenchPartReference::Pointer /*partRef*/ )
-{    
+{
   // nothing to do here: see PartActivated()
 }
 
@@ -118,7 +118,7 @@ void QmitkFunctionalityCoordinator::PartClosed( berry::IWorkbenchPartReference::
     {
       // deactivate on close ( the standalone functionality may still be activated  )
       this->DeactivateStandaloneFunctionality(partRef.GetPointer(), 0);
-      
+
       // and set pointer to 0
       if(m_StandaloneFuntionality == partRef.GetPointer())
         m_StandaloneFuntionality = 0;
@@ -133,7 +133,7 @@ void QmitkFunctionalityCoordinator::PartClosed( berry::IWorkbenchPartReference::
 }
 
 void QmitkFunctionalityCoordinator::PartHidden( berry::IWorkbenchPartReference::Pointer partRef )
-{    
+{
   // Check for QmitkFunctionality
   QmitkFunctionality::Pointer _QmitkFunctionality = partRef->GetPart(false).Cast<QmitkFunctionality>();
   if(_QmitkFunctionality != 0)

@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,12 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "Poco/File.h"
 
-namespace berry 
+namespace berry
 {
 
   ///
   /// Interface to flush Preferences.
-  ///  
+  ///
   class BERRY_RUNTIME AbstractPreferencesStorage : public Object
   {
 

@@ -4,10 +4,10 @@ set(CPP_FILES
   mitkOptimizerFactory.cpp
   mitkOptimizerParameters.cpp
   mitkRigidRegistrationObserver.cpp
-  mitkRigidRegistrationPreset.cpp  
+  mitkRigidRegistrationPreset.cpp
   mitkTransformParameters.cpp
   mitkPyramidalRegistrationMethod.cpp
 )
 
-MITK_MULTIPLEX_PICTYPE( mitkImageRegistrationMethod-TYPE.cpp ) 
-MITK_MULTIPLEX_PICTYPE( mitkPyramidalRegistrationMethod-TYPE.cpp ) 
+MITK_MULTIPLEX_PICTYPE( mitkImageRegistrationMethod-TYPE.cpp )
+MITK_MULTIPLEX_PICTYPE( mitkPyramidalRegistrationMethod-TYPE.cpp )

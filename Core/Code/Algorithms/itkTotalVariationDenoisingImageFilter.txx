@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -74,20 +74,20 @@ namespace itk
       filter->SetNumberOfThreads(this->GetNumberOfThreads());
       filter->UpdateLargestPossibleRegion();
       image = filter->GetOutput();
-      std::cout << "Iteration " << i+1 << "/" << 
+      std::cout << "Iteration " << i+1 << "/" <<
         m_NumberIterations << std::endl;
     }
-    
+
     typename OutputImageType::Pointer output = this->GetOutput();
     output->SetSpacing(image->GetSpacing());
     typename OutputImageType::RegionType largestPossibleRegion;
-    largestPossibleRegion.SetSize( 
+    largestPossibleRegion.SetSize(
       image->GetLargestPossibleRegion().GetSize() );
-    largestPossibleRegion.SetIndex( 
+    largestPossibleRegion.SetIndex(
       image->GetLargestPossibleRegion().GetIndex() );
-    output->SetLargestPossibleRegion( 
+    output->SetLargestPossibleRegion(
       image->GetLargestPossibleRegion() );
-    output->SetBufferedRegion( 
+    output->SetBufferedRegion(
       image->GetLargestPossibleRegion() );
     output->Allocate();
 
@@ -115,7 +115,7 @@ namespace itk
   void
     TotalVariationDenoisingImageFilter<TInputImage, TOutput>
     ::PrintSelf(
-    std::ostream& os, 
+    std::ostream& os,
     Indent indent) const
   {
     Superclass::PrintSelf( os, indent );

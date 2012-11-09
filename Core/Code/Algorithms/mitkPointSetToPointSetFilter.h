@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,37 +44,37 @@ namespace mitk
     typedef InputType::ConstPointer InputTypeConstPointer;
 
     /**
-    * Sets the input of this process object 
+    * Sets the input of this process object
     * @param input the input
     */
     virtual void SetInput( const InputType* input );
 
     /**
-    * Sets the input n'th of this process object 
+    * Sets the input n'th of this process object
     * @param idx the number associated with the given input
     */
     virtual void SetInput( const unsigned int& idx, const InputType* input );
 
     /**
-    * @returns the input tree of the process object  
+    * @returns the input tree of the process object
     */
     const InputType * GetInput( void );
 
     /**
     * @param idx the index of the input to return
-    * @returns the input object with the given index  
+    * @returns the input object with the given index
     */
     const InputType * GetInput( const unsigned int& idx );
 
   protected:
 
     /**
-    * A default constructor  
+    * A default constructor
     */
     PointSetToPointSetFilter();
 
     /**
-    * The destructor  
+    * The destructor
     */
     virtual ~PointSetToPointSetFilter();
 

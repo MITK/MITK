@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkNavigationToolManagementWidgetControls.h"
 
  /** Documentation:
-  *   \brief An object of this class offers an UI to manage NavigationTools and 
-  *       NavigationToolStorages. This means a user may create, save and load 
+  *   \brief An object of this class offers an UI to manage NavigationTools and
+  *       NavigationToolStorages. This means a user may create, save and load
   *       single NavigationTools and/or NavigationToolStorages with this widget.
   *
   *      Be sure to call the Initialize-methode before you start the widget
@@ -74,7 +74,7 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
     virtual void CreateConnections();
 
     virtual void CreateQtPartControl(QWidget *parent);
-    
+
     Ui::QmitkNavigationToolManagementWidgetControls* m_Controls;
 
     /** @brief holds the DataStorage */
@@ -82,7 +82,7 @@ class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
 
     /** @brief holds the NavigationToolStorage we are working with. */
     mitk::NavigationToolStorage::Pointer m_NavigationToolStorage;
-    
+
     /** @brief shows if we are in edit mode, if not we create new navigation tool objects. */
     bool m_edit;
 

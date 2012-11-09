@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -62,7 +62,7 @@ berry::PreferencesService::PreferencesService(string _PreferencesDir)
 
   Poco::File f;
 
-  while(dirIt.path().getFileName() != "") 
+  while(dirIt.path().getFileName() != "")
   {
     f = dirIt.path();
 
@@ -89,7 +89,7 @@ berry::PreferencesService::~PreferencesService()
 berry::IPreferences::Pointer berry::PreferencesService::GetSystemPreferences()
 {
   Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
-  // sys prefs are indicated by an empty user string 
+  // sys prefs are indicated by an empty user string
   return this->GetUserPreferences("");
 }
 
@@ -97,9 +97,9 @@ berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences( std:
 {
   Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
   IPreferences::Pointer userPrefs(0);
-  
+
   map<string, AbstractPreferencesStorage::Pointer>::iterator it
-    = m_PreferencesStorages.find(name); 
+    = m_PreferencesStorages.find(name);
 
   // does not exist or is not loaded yet
   if(it == m_PreferencesStorages.end() || it->second.IsNull())
@@ -108,7 +108,7 @@ berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences( std:
 
     if(name.empty())
       path = path +  Poco::Path::separator() + GetDefaultPreferencesFileName();
-    // 
+    //
     else
       path = path +  Poco::Path::separator() + name + GetDefaultPreferencesFileName();
 
@@ -138,7 +138,7 @@ std::vector<std::string> berry::PreferencesService::GetUsers() const
 void berry::PreferencesService::ImportPreferences( Poco::File f, std::string name )
 {
   map<string, AbstractPreferencesStorage::Pointer>::iterator it
-    = m_PreferencesStorages.find(name); 
+    = m_PreferencesStorages.find(name);
 
   if(it == m_PreferencesStorages.end() || it->second == 0)
   {
@@ -180,7 +180,7 @@ void berry::PreferencesService::ImportNode( IPreferences::Pointer nodeToImport
                                             , IPreferences::Pointer rootOfOldPrefs )
 {
   //# overwrite properties
-  IPreferences::Pointer oldNode 
+  IPreferences::Pointer oldNode
     = rootOfOldPrefs->Node(nodeToImport->AbsolutePath()); // get corresponding node in "old" tree
 
   std::vector<std::string> keys = nodeToImport->Keys(); // get all keys for properties
@@ -189,7 +189,7 @@ void berry::PreferencesService::ImportNode( IPreferences::Pointer nodeToImport
   {
     oldNode->Put((*it), nodeToImport->Get((*it), ""));// set property in old node to the value of the imported.
                                                 // properties not existing in imported are left untouched
-     
+
   }
 
   // do it for all children
@@ -205,7 +205,7 @@ void berry::PreferencesService::ImportNode( IPreferences::Pointer nodeToImport
 void berry::PreferencesService::ExportPreferences( Poco::File f, std::string name )
 {
   map<string, AbstractPreferencesStorage::Pointer>::iterator it
-    = m_PreferencesStorages.find(name); 
+    = m_PreferencesStorages.find(name);
 
   if(it->second == 0)
   {

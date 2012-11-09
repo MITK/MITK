@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,11 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::BaseProperty* mitk::PropertyList::GetProperty(const std::string& propertyKey) const
 {
     PropertyMap::const_iterator it;
-    
+
     it=m_Properties.find( propertyKey );
     if(it!=m_Properties.end())
       return it->second;
-    else 
+    else
         return NULL;
 }
 
@@ -37,14 +37,14 @@ mitk::BaseProperty* mitk::PropertyList::GetProperty(const std::string& propertyK
 void mitk::PropertyList::SetProperty(const std::string& propertyKey, BaseProperty* property)
 {
   if (!property) return;
-  //make sure that BaseProperty*, which may have just been created and never been 
+  //make sure that BaseProperty*, which may have just been created and never been
   //assigned to a SmartPointer, is registered/unregistered properly. If we do not
   //do that, it will a) not deleted in case it is identical to the old one or
   //b) possibly deleted when temporarily added to a smartpointer somewhere below.
   BaseProperty::Pointer tmpSmartPointerToProperty = property;
 
   PropertyMap::iterator it( m_Properties.find( propertyKey ) );
-  
+
   // Is a property with key @a propertyKey contained in the list?
   if( it != m_Properties.end() )
   {
@@ -86,7 +86,7 @@ void mitk::PropertyList::ReplaceProperty(const std::string& propertyKey, BasePro
   if (!property) return;
 
   PropertyMap::iterator it( m_Properties.find( propertyKey ) );
-  
+
   // Is a property with key @a propertyKey contained in the list?
   if( it != m_Properties.end() )
   {
@@ -134,14 +134,14 @@ unsigned long mitk::PropertyList::GetMTime() const
       break;
     }
   }
-    
+
   return Superclass::GetMTime();
 }
 
 
 bool mitk::PropertyList::DeleteProperty(const std::string& propertyKey)
 {
-  PropertyMap::iterator it;  
+  PropertyMap::iterator it;
   it=m_Properties.find( propertyKey );
 
   if(it!=m_Properties.end())

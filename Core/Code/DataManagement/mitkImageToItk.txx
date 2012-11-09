@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,11 +31,11 @@ void mitk::ImageToItk<TOutputImage>::SetInput(mitk::Image *input)
     itkExceptionMacro( << "image is null" );
   if(input->GetDimension()!=TOutputImage::GetImageDimension())
     itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
-  
-  
+
+
   if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>()))
     itkExceptionMacro( << "image has wrong pixel type " );
-  
+
   // Process object is not const-correct so the const_cast is required here
   itk::ProcessObject::SetNthInput(0, input);
 }
@@ -52,8 +52,8 @@ void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, mitk::Image *
     itkExceptionMacro( << "image is null" );
   if(input->GetDimension()!=TOutputImage::GetImageDimension())
     itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
-  
-  
+
+
   if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>() ))
     itkExceptionMacro( << "image has wrong pixel type " );
 
@@ -85,8 +85,8 @@ template<class TOutputImage>
   // Allocate output
   mitk::Image::Pointer input = this->GetInput();
   typename Superclass::OutputImageType::Pointer output = this->GetOutput();
-  
-  
+
+
   unsigned long noBytes = input->GetDimension(0);
   for (unsigned int i=1; i<TOutputImage::GetImageDimension(); ++i)
   {
@@ -104,7 +104,7 @@ template<class TOutputImage>
     output->SetBufferedRegion(bufferedRegion);
     return;
   }
-  
+
   if (m_CopyMemFlag)
   {
     itkDebugMacro("copyMem ...");
@@ -166,14 +166,14 @@ template<class TOutputImage>
   SizeType  size;
   const unsigned int itkDimMin3 = (TOutputImage::ImageDimension > 3 ? TOutputImage::ImageDimension : 3);
   const unsigned int itkDimMax3 = (TOutputImage::ImageDimension < 3 ? TOutputImage::ImageDimension : 3);
-  typename Superclass::OutputImageType::PointType::ValueType origin[ itkDimMin3 ];   
+  typename Superclass::OutputImageType::PointType::ValueType origin[ itkDimMin3 ];
   typename Superclass::OutputImageType::SpacingType::ComponentType spacing[ itkDimMin3 ];
   typename Superclass::OutputImageType::DirectionType direction;
 
   // copy as much information as possible into size and spacing
   unsigned int i;
   for ( i=0; i < itkDimMax3; ++i)
-  {             
+  {
      size[i]    = input->GetDimension(i);
      spacing[i] = input->GetGeometry()->GetSpacing()[i];
   }
@@ -184,17 +184,17 @@ template<class TOutputImage>
      spacing[i] = 1.0;
   }
 
-  // build region from size  
+  // build region from size
   IndexType start;
   start.Fill( 0 );
   RegionType region;
   region.SetIndex( start );
   region.SetSize(  size  );
-  
+
   // copy as much information as possible into origin
   const mitk::Point3D& mitkorigin = input->GetGeometry()->GetOrigin();
   itk2vtk(mitkorigin, origin);
-  
+
   // copy as much information as possible into direction
   direction.SetIdentity();
   unsigned int j;
@@ -206,9 +206,9 @@ template<class TOutputImage>
   /// If the MITK image contains any other rotation, the ITK image will have no rotation at all.
   /// Spacing is of course conserved in both cases.
 
-   
+
   // the following loop devides by spacing now to normalize columns.
-  // counterpart of InitializeByItk in mitkImage.h line 372 of revision 15092. 
+  // counterpart of InitializeByItk in mitkImage.h line 372 of revision 15092.
 
   // Check if information is lost
   if (  TOutputImage::ImageDimension <= 2)
@@ -226,7 +226,7 @@ template<class TOutputImage>
      }
      else
      {
-        // The 2D MITK image can be converted to an 2D ITK image without information loss!     
+        // The 2D MITK image can be converted to an 2D ITK image without information loss!
         for ( i=0; i < itkDimMax3; ++i)
            for( j=0; j < itkDimMax3; ++j )
               direction[i][j] = matrix[i][j]/spacing[j];
@@ -239,7 +239,7 @@ template<class TOutputImage>
         for( j=0; j < itkDimMax3; ++j )
            direction[i][j] = matrix[i][j]/spacing[j];
   }
-  
+
   // set information into output image
   output->SetRegions( region );
   output->SetOrigin( origin );

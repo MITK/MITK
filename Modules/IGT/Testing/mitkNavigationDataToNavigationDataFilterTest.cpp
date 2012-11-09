@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,9 +36,9 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
 {
   MITK_TEST_BEGIN("NavigationDataToNavigationDataFilter")
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::NavigationDataToNavigationDataFilter::Pointer myFilter = NavigationDataToNavigationDataFilterTestClass::New().GetPointer(); // create testing subclass, but treat it like the real NavigationDataToNavigationDataFilter
-  
+
   MITK_TEST_CONDITION_REQUIRED(myFilter.IsNotNull(),"Testing instantiation");
 
   /* create helper objects: navigation data with position as origin, zero quaternion, zero error and data valid */
@@ -46,7 +46,7 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   mitk::FillVector3D(initialPos, 1.0, 2.0, 3.0);
   mitk::NavigationData::OrientationType initialOri(0.1, 0.2, 0.3, 0.4);
   mitk::ScalarType initialError(22.22);
-  bool initialValid(true);  
+  bool initialValid(true);
   mitk::NavigationData::Pointer nd0 = mitk::NavigationData::New();
   nd0->SetPosition(initialPos);
   nd0->SetOrientation(initialOri);

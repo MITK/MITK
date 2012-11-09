@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -48,13 +48,13 @@ double mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity::CalculateModu
   sumOfDegreesInModule.resize( numberOfModules, 0 );
   // get vector of all vertex descriptors in the network
 
-  const std::vector< VertexDescriptorType > allNodesVector 
+  const std::vector< VertexDescriptorType > allNodesVector
     = network->GetVectorOfAllVertexDescriptors();
 
   for( int nodeNumber( 0 ); nodeNumber < allNodesVector.size() ; nodeNumber++)
   {
     int correspondingModule = vertexToModuleMap->find( allNodesVector[ nodeNumber ] )->second;
-    const std::vector< VertexDescriptorType > adjacentNodexVector 
+    const std::vector< VertexDescriptorType > adjacentNodexVector
       = network->GetVectorOfAdjacentNodes( allNodesVector[ nodeNumber ] );
     numberOfLinksInNetwork += adjacentNodexVector.size();
     sumOfDegreesInModule[ correspondingModule ] += adjacentNodexVector.size();
@@ -97,8 +97,8 @@ double mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity::CalculateModu
   {
     modularity += (((double) numberOfLinksInModule[ moduleID ]) / ((double) numberOfLinksInNetwork)) -
       (
-      (((double) sumOfDegreesInModule[ moduleID ]) / ((double) 2 * numberOfLinksInNetwork) ) * 
-      (((double) sumOfDegreesInModule[ moduleID ]) / ((double) 2 * numberOfLinksInNetwork) ) 
+      (((double) sumOfDegreesInModule[ moduleID ]) / ((double) 2 * numberOfLinksInNetwork) ) *
+      (((double) sumOfDegreesInModule[ moduleID ]) / ((double) 2 * numberOfLinksInNetwork) )
       );
   }
 

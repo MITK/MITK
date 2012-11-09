@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,7 +57,7 @@ mitk::SurfaceGLMapper2D::SurfaceGLMapper2D()
   m_FrontSideColor[1] = 1.0;
   m_FrontSideColor[2] = 0.0;
   m_FrontSideColor[3] = 1.0;
-  
+
   // default for normals on back side = red
   m_BackSideColor[0] = 1.0;
   m_BackSideColor[1] = 0.0;
@@ -199,9 +199,9 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     Point3D point;
     Vector3D normal;
 
-    //Check if Lookup-Table is already given, else use standard one. 
+    //Check if Lookup-Table is already given, else use standard one.
     vtkFloatingPointType* scalarLimits = m_LUT->GetTableRange();
-    vtkFloatingPointType scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1]; 
+    vtkFloatingPointType scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1];
 
     vtkLookupTable *lut;// = vtkLookupTable::New();
 
@@ -211,7 +211,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     {
       lut = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
 
-      if (dynamic_cast<FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != NULL)        
+      if (dynamic_cast<FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != NULL)
         scalarsMin = dynamic_cast<FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
       if (dynamic_cast<FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
         scalarsMax = dynamic_cast<FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
@@ -224,9 +224,9 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
         lut->Build();
       }
     }
-    else 
-    { 
-      lut = m_LUT; 
+    else
+    {
+      lut = m_LUT;
     }
 
     vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(timestep);
@@ -269,7 +269,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     //normally, we would need to transform the surface and cut the transformed surface with the cutter.
     //This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
-    //@todo It probably does not work for scaling operations yet:scaling operations have to be 
+    //@todo It probably does not work for scaling operations yet:scaling operations have to be
     //dealed with after the cut is performed by scaling the contour.
     vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
     inversetransform->TransformPoint(vp, vp);
@@ -298,11 +298,11 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   }
 }
 
-void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour, 
-                                       const Geometry2D* worldGeometry, 
-                                       const DisplayGeometry* displayGeometry, 
-                                       vtkLinearTransform * vtktransform, 
-                                       vtkLookupTable *lut, 
+void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour,
+                                       const Geometry2D* worldGeometry,
+                                       const DisplayGeometry* displayGeometry,
+                                       vtkLinearTransform * vtktransform,
+                                       vtkLookupTable *lut,
                                        vtkPolyData* original3DObject)
 {
   // deprecated settings
@@ -362,7 +362,7 @@ void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyDa
     vlines->GetNextCell(cellSize, cell);
 
     vpoints->GetPoint(cell[0], vp);
-    //take transformation via vtktransform into account    
+    //take transformation via vtktransform into account
     vtktransform->TransformPoint(vp, vp);
     vtk2itk(vp, p);
 
@@ -378,7 +378,7 @@ void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyDa
       vpoints->GetPoint(cell[j], vp);
       Point3D originalPoint;
       vtk2itk(vp, originalPoint);
-      //take transformation via vtktransform into account    
+      //take transformation via vtktransform into account
       vtktransform->TransformPoint(vp, vp);
       vtk2itk(vp, p);
 
@@ -406,11 +406,11 @@ void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyDa
         glColor3f(color[0],color[1],color[2]);
         glVertex2f(p2d[0], p2d[1]);
       }
-      else 
+      else
       {
         glVertex2f(last[0], last[1]);
         glVertex2f(p2d[0], p2d[1]);
-        
+
         // draw normals ?
         if (m_DrawNormals && original3DObject)
         {
@@ -441,25 +441,25 @@ void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyDa
 
               // calculate a point (point from the cut 3D object) + (normal vector of closest point)
               Point3D tip3D = p + normalITK;
-       
+
               // map this point into our 2D coordinate system
               Point2D tip2D;
               worldGeometry->Map(tip3D, tip2D);
-      
+
               displayGeometry->WorldToDisplay(tip2D, tip2D);
 
               // calculate 2D vector from point to point+normal, normalize it to standard length
               Vector2D tipVectorGLFront = tip2D - p2d;
               tipVectorGLFront.Normalize();
               tipVectorGLFront *= m_FrontNormalLengthInPixels;
-              
+
               Vector2D tipVectorGLBack = p2d - tip2D;
               tipVectorGLBack.Normalize();
               tipVectorGLBack *= m_BackNormalLengthInPixels;
 
               Point2D tipPoint2D = p2d + tipVectorGLFront;
               Point2D backTipPoint2D = p2d + tipVectorGLBack;
-              
+
               // draw normalized mapped normal vector
               glColor4f(m_BackSideColor[0], m_BackSideColor[1], m_BackSideColor[2], m_BackSideColor[3]); // red backside
               glVertex2f(p2d[0], p2d[1]);
@@ -499,11 +499,11 @@ void mitk::SurfaceGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   Superclass::ApplyProperties(renderer);
 
   GetDataNode()->GetBoolProperty("draw normals 2D", m_DrawNormals, renderer);
-   
+
   // check for color and opacity properties, use it for rendering if they exists
-  GetColor(m_LineColor, renderer /*, "color" */); 
+  GetColor(m_LineColor, renderer /*, "color" */);
   GetOpacity(m_LineColor[3], renderer /*, "color" */);
-  
+
   bool invertNormals(false);
   if (DataNode* node = GetDataNode())
   {
@@ -517,7 +517,7 @@ void mitk::SurfaceGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
     GetColor(m_BackSideColor, renderer, "back color");
     GetOpacity(m_BackSideColor[3], renderer);
-    
+
     if (DataNode* node = GetDataNode())
     {
       node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
@@ -531,7 +531,7 @@ void mitk::SurfaceGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
     GetColor(m_BackSideColor, renderer, "front color");
     GetOpacity(m_BackSideColor[3], renderer);
-    
+
     if (DataNode* node = GetDataNode())
     {
       node->GetFloatProperty( "back normal lenth (px)", m_FrontNormalLengthInPixels, renderer );

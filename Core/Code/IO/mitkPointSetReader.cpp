@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -69,8 +69,8 @@ void mitk::PointSetReader::GenerateData()
 
             newPointSet = this->ReadPoint(newPointSet, currentTimeSeries, currentTimeStep);
           }
-        } 
-        else 
+        }
+        else
         {
           newPointSet = this->ReadPoint(newPointSet, currentPointSetElement, 0);
         }
@@ -90,8 +90,8 @@ void mitk::PointSetReader::GenerateData()
     m_Success = true;
 }
 
-mitk::PointSet::Pointer mitk::PointSetReader::ReadPoint(mitk::PointSet::Pointer newPointSet, 
-        TiXmlElement* currentTimeSeries, unsigned int currentTimeStep) 
+mitk::PointSet::Pointer mitk::PointSetReader::ReadPoint(mitk::PointSet::Pointer newPointSet,
+        TiXmlElement* currentTimeSeries, unsigned int currentTimeStep)
 {
   if(currentTimeSeries->FirstChildElement("point") != NULL)
   {
@@ -140,7 +140,7 @@ int mitk::PointSetReader::CanReadFile ( const char *name )
     return isGood;
 }
 
-bool mitk::PointSetReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+bool mitk::PointSetReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
 {
   // First check the extension
   if(  filename == "" )
@@ -190,5 +190,5 @@ void mitk::PointSetReader::ResizeOutputs( const unsigned int& num )
 
 bool mitk::PointSetReader::GetSuccess() const
 {
-    return m_Success;  
+    return m_Success;
 }

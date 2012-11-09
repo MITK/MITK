@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -66,7 +66,7 @@ public:
 
   mitk::DataStorage* GetDataStorage();
   void SetDataStorage(mitk::DataStorage& storage);
- 
+
   /// initialization with a data storage object
   void Initialize(mitk::DataStorage*);
 
@@ -89,7 +89,7 @@ public:
 
   /**
   * \brief How the list contents is determined.
-  * 
+  *
   * See also documentation of DisplayMode.
   *
   * \sa DisplayMode
@@ -110,7 +110,7 @@ protected slots:
 protected:
 
   mitk::DataStorage::SetOfObjects::ConstPointer GetAllPossibleReferenceImages();
-  
+
   mitk::NodePredicateBase::ConstPointer GetAllPossibleReferenceImagesPredicate();
 
   mitk::ToolManager::Pointer m_ToolManager;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 std::vector<std::string> LoadDumps(const std::string& fileName)
 {
   std::vector<std::string> separatedDumps;
-  
+
   std::ifstream fileStream( fileName.c_str() );
 
   std::string buffer;
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 
   mitk::TestDICOMLoading loader;
   mitk::TestDICOMLoading::StringContainer files;
-    
+
   // TODO load reference dumps
 
   // load from argv[1]
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
   std::vector<std::string> expectedDumps = LoadDumps(argv[1]);
 
   for (int arg = 2; arg < argc; ++arg) files.push_back( argv[arg] );
-  
+
   mitk::TestDICOMLoading::ImageList images = loader.LoadFiles(files);
 
   unsigned int imageCounter(0);

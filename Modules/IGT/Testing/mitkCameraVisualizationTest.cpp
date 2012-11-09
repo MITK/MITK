@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,12 +32,12 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("CameraVisualization")
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::CameraVisualization::Pointer myFilter = mitk::CameraVisualization::New();
 
   // Global interaction must(!) be initialized if used
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
-  
+
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
@@ -45,7 +45,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   /* create helper objects: navigation data with position as origin, zero quaternion, zero error and data valid */
   srand(time(NULL));
-  // generate a random position for the navigation data 
+  // generate a random position for the navigation data
   mitk::NavigationData::PositionType position;
   position[0] = rand()%1000;
   position[1] = rand()%1000;
@@ -72,7 +72,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
   {
     valid=true;
   }
-  
+
   // set parameters of navigation data
   mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
   nd1->SetPosition(position);
@@ -94,7 +94,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   // set renderer
   myFilter->SetRenderer(renderer);
-  
+
   //Update filter
   myFilter->Update();
 

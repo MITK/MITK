@@ -75,11 +75,11 @@ void UltrasoundSupport::DisplayImage()
 {
  // m_Device->UpdateOutputData(0);
  // mitk::USImage::Pointer image = m_Device->GetOutput();
-  
+
   m_Device->UpdateOutputData(0);
   m_Node->SetData(m_Device->GetOutput());
   this->RequestRenderWindowUpdate();
-  
+
   m_FrameCounter ++;
   if (m_FrameCounter == 10)
   {

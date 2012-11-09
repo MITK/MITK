@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -56,10 +56,10 @@ void mitk::PlaneFit::GenerateOutputInformation()
   if ( update )
   {
     mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
-  
-    m_TimeSlicedGeometry->InitializeEvenlyTimed( 
+
+    m_TimeSlicedGeometry->InitializeEvenlyTimed(
       planeGeometry, m_PointSet->GetPointSetSeriesSize() );
-  
+
     unsigned int t;
     for ( t = 0;
           (t < m_PointSet->GetPointSetSeriesSize())
@@ -68,7 +68,7 @@ void mitk::PlaneFit::GenerateOutputInformation()
     {
       m_TimeSlicedGeometry->SetGeometry3D( m_Planes[t], (int) t );
     }
-  
+
     output->SetGeometry( m_TimeSlicedGeometry );
   }
 }
@@ -93,7 +93,7 @@ void mitk::PlaneFit::GenerateData()
 void mitk::PlaneFit::SetInput( const mitk::PointSet* pointSet )
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, 
+  this->ProcessObject::SetNthInput(0,
     const_cast< mitk::PointSet * >( pointSet ) );
 
   m_PointSet = pointSet;
@@ -122,17 +122,17 @@ const mitk::PointSet* mitk::PlaneFit::GetInput()
 
 
 void mitk::PlaneFit::CalculateCentroid( int t )
-{  
+{
   if ( m_PointSet == NULL ) return;
 
   int ps_total = m_PointSet->GetSize( t );
-  
+
   m_Centroids[t][0] = m_Centroids[t][1] = m_Centroids[t][2] = 0.0;
 
   for (int i=0; i<ps_total; i++)
   {
     mitk::Point3D p3d = m_PointSet->GetPoint(i,t);
-    m_Centroids[t][0] += p3d[0]; 
+    m_Centroids[t][0] += p3d[0];
     m_Centroids[t][1] += p3d[1];
     m_Centroids[t][2] += p3d[2];
   }
@@ -160,7 +160,7 @@ void mitk::PlaneFit::ProcessPointSet( int t )
     dataM[i][2] = p3d[2] - m_Centroids[t][2];
   }
   // process the SVD (singular value decomposition) from ITK
-  // the vector will be orderd   descending 
+  // the vector will be orderd   descending
   vnl_svd<mitk::ScalarType> svd(dataM, 0.0);
 
   // calculate the SVD of A

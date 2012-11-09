@@ -18,7 +18,7 @@
 #!               the extracted information.
 #!
 function(mitkFunctionGetVersion source_dir prefix)
-  
+
   if(NOT prefix)
     message(FATAL_ERROR "prefix argument not specified")
   endif()
@@ -31,12 +31,12 @@ function(mitkFunctionGetVersion source_dir prefix)
 
   find_package(Git)
   if(GIT_FOUND)
-  
+
     GIT_IS_REPO(${source_dir} _is_git_repo)
     if(_is_git_repo)
       set(_wc_type "git")
       GIT_WC_INFO(${source_dir} ${prefix})
-      
+
       set(_wc_id ${${prefix}_WC_REVISION_HASH})
 
       string(REPLACE " " ";" hash_name ${${prefix}_WC_REVISION_NAME})
@@ -66,7 +66,7 @@ function(mitkFunctionGetVersion source_dir prefix)
     endif()
 
   endif()
-  
+
   set(${prefix}_WC_TYPE ${_wc_type} PARENT_SCOPE)
   set(${prefix}_REVISION_ID ${_wc_id} PARENT_SCOPE)
   set(_shortid ${_wc_id})

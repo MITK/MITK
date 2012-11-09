@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,10 +35,10 @@ namespace itk {
 
   //#define QBALL_RECON_PI       M_PI
 
-  template< class TOdfPixelType, 
+  template< class TOdfPixelType,
   class TGfaPixelType,
     int NrOdfDirections>
-    DiffusionQballGeneralizedFaImageFilter< TOdfPixelType, 
+    DiffusionQballGeneralizedFaImageFilter< TOdfPixelType,
     TGfaPixelType, NrOdfDirections>
     ::DiffusionQballGeneralizedFaImageFilter() :
         m_ComputationMethod(GFA_STANDARD)
@@ -48,24 +48,24 @@ namespace itk {
     this->SetNumberOfRequiredInputs( 1 );
   }
 
-  template< class TOdfPixelType, 
+  template< class TOdfPixelType,
   class TGfaPixelType,
     int NrOdfDirections>
-    void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType, 
+    void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType,
     TGfaPixelType, NrOdfDirections>
     ::BeforeThreadedGenerateData()
   {
   }
 
-  template< class TOdfPixelType, 
+  template< class TOdfPixelType,
   class TGfaPixelType,
     int NrOdfDirections>
-    void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType, 
+    void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType,
     TGfaPixelType, NrOdfDirections>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-    int ) 
+    int )
   {
-    typename OutputImageType::Pointer outputImage = 
+    typename OutputImageType::Pointer outputImage =
       static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
@@ -75,7 +75,7 @@ namespace itk {
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
     typedef typename InputImageType::PixelType         OdfVectorType;
     typename InputImageType::Pointer inputImagePointer = NULL;
-    inputImagePointer = static_cast< InputImageType * >( 
+    inputImagePointer = static_cast< InputImageType * >(
       this->ProcessObject::GetInput(0) );
 
     InputIteratorType git(inputImagePointer, outputRegionForThread );
@@ -134,19 +134,19 @@ namespace itk {
           odf = odf.MinMaxNormalize();
           outval = odf.GetGeneralizedFractionalAnisotropy();
           break;
-        }  
+        }
       case GFA_NORMALIZED_ENTROPY:
         {
           OdfType odf = b.GetDataPointer();
           outval = odf.GetNormalizedEntropy();
           break;
-        }  
+        }
       case GFA_NEMATIC_ORDER_PARAMETER:
         {
           OdfType odf = b.GetDataPointer();
           outval = odf.GetNematicOrderParameter();
           break;
-        }  
+        }
       case GFA_QUANTILE_LOW:
         {
           vnl_vector_fixed<TOdfPixelType,NrOdfDirections> sorted;
@@ -183,23 +183,23 @@ namespace itk {
           OdfType odf = b.GetDataPointer();
           outval = odf.GetStdDevByMaxValue();
           break;
-        } 
+        }
       case GFA_PRINCIPLE_CURVATURE:
         {
           OdfType odf = b.GetDataPointer();
           outval = odf.GetPrincipleCurvature(m_Param1, m_Param2, 0);
           break;
-        } 
+        }
       case GFA_GENERALIZED_GFA:
         {
           OdfType odf = b.GetDataPointer();
           outval = odf.GetGeneralizedGFA(m_Param1, m_Param2);
           break;
-        } 
+        }
       }
-      
+
       oit.Set( outval );
-      
+
       ++oit;
       ++git; // Gradient  image iterator
     }
@@ -207,10 +207,10 @@ namespace itk {
     std::cout << "One Thread finished calculation" << std::endl;
   }
 
-  template< class TOdfPixelType, 
+  template< class TOdfPixelType,
   class TGfaPixelType,
     int NrOdfDirections>
-    void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType, 
+    void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType,
     TGfaPixelType, NrOdfDirections>
     ::PrintSelf(std::ostream& os, Indent indent) const
   {

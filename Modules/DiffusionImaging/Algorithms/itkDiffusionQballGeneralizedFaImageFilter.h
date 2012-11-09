@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,11 +35,11 @@ namespace itk{
 /** \class DiffusionQballGeneralizedFaImageFilter
  */
 
-template< class TOdfPixelType, 
+template< class TOdfPixelType,
           class TGfaPixelType,
           int NrOdfDirections>
 class DiffusionQballGeneralizedFaImageFilter :
-  public ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >, 
+  public ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >,
                               Image< TGfaPixelType, 3 > >
 {
 
@@ -66,17 +66,17 @@ public:
   typedef DiffusionQballGeneralizedFaImageFilter Self;
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
-  typedef ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >, 
+  typedef ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >,
     Image< TGfaPixelType, 3 > >
                           Superclass;
-  
+
    /** Method for creation through the object factory. */
-  itkNewMacro(Self);  
+  itkNewMacro(Self);
 
   /** Runtime information support. */
-  itkTypeMacro(DiffusionQballGeneralizedFaImageFilter, 
+  itkTypeMacro(DiffusionQballGeneralizedFaImageFilter,
                                                    ImageToImageFilter);
- 
+
   typedef TOdfPixelType                 OdfComponentType;
 
   typedef TGfaPixelType                  DirectionPixelType;
@@ -91,7 +91,7 @@ public:
   itkStaticConstMacro(NOdfDirections,int,NrOdfDirections);
 
   void SetOdfImage( const InputImageType *image );
-  
+
   itkGetMacro(ComputationMethod, GfaComputationMethod);
   itkSetMacro(ComputationMethod, GfaComputationMethod);
 
@@ -105,9 +105,9 @@ protected:
   DiffusionQballGeneralizedFaImageFilter();
   ~DiffusionQballGeneralizedFaImageFilter() {};
   void PrintSelf(std::ostream& os, Indent indent) const;
-  
+
   void BeforeThreadedGenerateData();
-  void ThreadedGenerateData( const 
+  void ThreadedGenerateData( const
       OutputImageRegionType &outputRegionForThread, int);
 
   GfaComputationMethod m_ComputationMethod;

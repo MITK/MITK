@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace itk
-{ 
+{
 
   // Constructor
   template<class TInputImageType>
@@ -38,9 +38,9 @@ namespace itk
     // Very simple Metric:
     // The squared difference of both values is defined as cost
 
-    double a,b,c;    
+    double a,b,c;
     ConstIteratorType it( this->m_Image, this->m_Image->GetRequestedRegion());
-    
+
     it.SetIndex(p1);
     a = it.Get();
     it.SetIndex(p2);
@@ -63,7 +63,7 @@ namespace itk
     }
 
 
-    return c; 
+    return c;
   }
 
 

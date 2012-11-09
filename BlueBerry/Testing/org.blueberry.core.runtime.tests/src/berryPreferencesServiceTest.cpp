@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,7 +53,7 @@ namespace berry
   void PreferencesServiceTest::TestAll()
   {
     try
-    {    
+    {
       IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
       assert(prefService.IsNotNull());
 
@@ -80,7 +80,7 @@ namespace berry
       }
       assert(userListContainsTestUser);
 
-      IBerryPreferencesService::Pointer berryPrefService = prefService.Cast<IBerryPreferencesService>();    
+      IBerryPreferencesService::Pointer berryPrefService = prefService.Cast<IBerryPreferencesService>();
       // optional test for IBerryPreferencesService
       if(berryPrefService.IsNotNull())
       {
@@ -116,7 +116,7 @@ namespace berry
         berryPrefService->ImportPreferences(testUserPrefsExportFile, "testUser");
         // "testNumber" preference should now again be overwritten with its old value 2
         assert(testUserPrefs->GetInt("testNumber", 4) == 2);
-        
+
         // delete files again
         sysPrefsExportFile.remove();
         testUserPrefsExportFile.remove();

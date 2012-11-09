@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -49,7 +49,7 @@ struct BERRY_COMMANDS IExecutionListener : public virtual Object {
     Message2<const std::string&, const ExecutionException*> postExecuteFailure;
     Message2<const std::string&, Object::Pointer> postExecuteSuccess;
     Message2<const std::string&, const SmartPointer<const ExecutionEvent> > preExecute;
-  
+
   virtual ~Events();
 
     virtual void AddListener(IExecutionListener::Pointer listener);
@@ -62,7 +62,7 @@ struct BERRY_COMMANDS IExecutionListener : public virtual Object {
     typedef MessageDelegate2<IExecutionListener, const std::string&, Object::Pointer> PostExecuteSuccessDelegate;
     typedef MessageDelegate2<IExecutionListener, const std::string&, const SmartPointer<const ExecutionEvent> > PreExecuteDelegate;
   };
-  
+
   virtual ~IExecutionListener();
 
   /**

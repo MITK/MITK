@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -54,7 +54,7 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 
     std::string filepath = ""; // Full path to file (wil be resolved later)
   std::string filename = this->m_Data.VolumeModelLocation; // Name of the file or possibly a magic String, e.g. "cube"
-  
+
   // See if filename matches a magic string.
   if (filename.compare("cube") == 0){
             vtkSmartPointer<vtkCubeSource> cubeSource = vtkSmartPointer<vtkCubeSource>::New();
@@ -67,17 +67,17 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 
             output->SetVtkPolyData(cubeSource->GetOutput()); //set the vtkCubeSource as polyData of the surface
             return;
-  } 
+  }
   if (filename.compare("") == 0) // empty String means no model, return empty output
   {
       output->SetVtkPolyData(vtkPolyData::New()); //initialize with empty poly data (otherwise old surfaces may be returned) => so an empty surface is returned
       return;
   }
-  
+
   // from here on, we assume that filename contains an actual filename and not a magic string
 
   filepath = mitk::StandardFileLocations::GetInstance()->FindFile(filename.c_str());
-  
+
     if (filepath.empty())
     {
         MITK_ERROR << ("Volume Generator could not find the specified file " + filename);

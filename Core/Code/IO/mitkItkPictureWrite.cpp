@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkRGBAPixel.h>
 
-template < typename TPixel, unsigned int VImageDimension > 
+template < typename TPixel, unsigned int VImageDimension >
 void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName)
 {
   typedef itk::Image< TPixel, VImageDimension > TImageType;
@@ -102,62 +102,62 @@ InstantiateAccessFunctionForFixedPixelType( _mitkItkPictureWriteComposite, MITK_
 // template <> void _mitkItkImageWrite<itk::RGBPixel<unsigned char>, 2>(itkImageRGBUC2* itkImage, const std::string& fileName)
 // {
 //   typedef itkImageRGBUC2 TImageType;
-// 
+//
 //   itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
 //   writer->SetInput( itkImage );
 //   writer->SetFileName( fileName.c_str() );
 //   writer->Update();
 // };
-// 
+//
 // typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
 // template <> void _mitkItkImageWrite<itk::RGBPixel<unsigned char>, 3>(itkImageRGBUC3* itkImage, const std::string& fileName)
 // {
 //   typedef itkImageRGBUC3 TImageType;
-// 
+//
 //   itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
 //   writer->SetInput( itkImage );
 //   writer->SetFileName( fileName.c_str() );
 //   writer->Update();
 // };
-// 
+//
 // typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
 // template <> void _mitkItkImageWrite<itk::DiffusionTensor3D<float>, 3>(itkImageDTIF3* itkImage, const std::string& fileName)
 // {
 //   typedef itkImageDTIF3 TImageType;
-// 
+//
 //   itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
 //   writer->SetInput( itkImage );
 //   writer->SetFileName( fileName.c_str() );
 //   writer->Update();
 // };
-// 
+//
 // typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
 // template <> void _mitkItkImageWrite<itk::DiffusionTensor3D<double>, 3>(itkImageDTID3* itkImage, const std::string& fileName)
 // {
 //   typedef itkImageDTID3 TImageType;
-// 
+//
 //   itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
 //   writer->SetInput( itkImage );
 //   writer->SetFileName( fileName.c_str() );
 //   writer->Update();
 // };
-// 
+//
 // typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;
 // template <> void _mitkItkImageWrite<itk::DiffusionTensor3D<float>, 2>(itkImageDTIF2* itkImage, const std::string& fileName)
 // {
 //   typedef itkImageDTIF2 TImageType;
-// 
+//
 //   itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
 //   writer->SetInput( itkImage );
 //   writer->SetFileName( fileName.c_str() );
 //   writer->Update();
 // };
-// 
+//
 // typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
 // template <> void _mitkItkImageWrite<itk::DiffusionTensor3D<double>, 2>(itkImageDTID2* itkImage, const std::string& fileName)
 // {
 //   typedef itkImageDTID2 TImageType;
-// 
+//
 //   itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
 //   writer->SetInput( itkImage );
 //   writer->SetFileName( fileName.c_str() );

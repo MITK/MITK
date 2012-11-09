@@ -21,10 +21,10 @@ if(NOT _SCHEMA_WORKING_DIR)
   set(_SCHEMA_WORKING_DIR ${CMAKE_CURRENT_BINARY_DIR})
 endif(NOT _SCHEMA_WORKING_DIR)
 
-configure_file("${BLUEBERRY_SOURCE_DIR}/Build/ConvertSchemaToHTML/buildExtPointDoc.xml.in" 
+configure_file("${BLUEBERRY_SOURCE_DIR}/Build/ConvertSchemaToHTML/buildExtPointDoc.xml.in"
   "${_SCHEMA_WORKING_DIR}/buildExtPointDoc.xml" @ONLY)
-  
-add_custom_target(${_SCHEMA_TARGET_NAME} 
+
+add_custom_target(${_SCHEMA_TARGET_NAME}
                   ant -f ${_SCHEMA_WORKING_DIR}/buildExtPointDoc.xml
                   DEPENDS ${_SCHEMA_DEPENDS}
                   WORKING_DIRECTORY ${_SCHEMA_WORKING_DIR}

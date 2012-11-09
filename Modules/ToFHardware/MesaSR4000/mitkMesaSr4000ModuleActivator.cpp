@@ -58,12 +58,11 @@ public:
 
     ~MesaSr4000ModuleActivator()
     {
-        //todo iterieren über liste m_Factories und löschen
         if(m_Factories.size() > 0)
         {
             for(std::list< IToFDeviceFactory* >::iterator it = m_Factories.begin(); it != m_Factories.end(); ++it)
             {
-                delete (*it); //todo wie genau löschen?
+                delete (*it);
             }
         }
     }

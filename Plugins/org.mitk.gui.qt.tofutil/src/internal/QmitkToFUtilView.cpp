@@ -80,8 +80,8 @@ QmitkToFUtilView::QmitkToFUtilView()
 //Destructor, specifically calling OnToFCameraStopped() and OnToFCammeraDiconnected()
 QmitkToFUtilView::~QmitkToFUtilView()
 {
-        OnToFCameraStopped();
-        OnToFCameraDisconnected();
+  OnToFCameraStopped();
+  OnToFCameraDisconnected();
 }
 
 //Createing the PartControl Signal-Slot principal
@@ -107,11 +107,6 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStopped()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
-
-  ////m_ConnectCameraDev does not exist anymore, neither does m_DeviceServiceListWidget->uncommenting both actions
-    //connect( (QObject*)(m_Controls->m_ConnectCameraDev), SIGNAL(clicked()), this, SLOT(OnToFCameraConnected()) );
-    //std::string empty= "";
-    //m_Controls->m_DeviceServiceListWidget->Initialize<mitk::ToFCameraDevice>("ToFDeviceName", empty);
   }
 }
 
@@ -169,7 +164,6 @@ void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Point
 
 void QmitkToFUtilView::Deactivated()
 {
-
 }
 
 void QmitkToFUtilView::Visible()
@@ -179,7 +173,7 @@ void QmitkToFUtilView::Visible()
 //Reset of the ToFUtilView
 void QmitkToFUtilView::Hidden()
 {
-    ResetGUIToDefault();
+  ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::OnToFCameraConnected()
@@ -199,7 +193,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
   m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
   m_Controls->m_ToFRecorderWidget->setEnabled(true);
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
-    m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true); //todo ist das richtig?
+  m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
 
   // initialize measurement widget
   m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());
@@ -207,48 +201,48 @@ void QmitkToFUtilView::OnToFCameraConnected()
   //TODO
   this->m_RealTimeClock = mitk::RealTimeClock::New();
   this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
-/*
+  /*//As it seems, this part of the Code doing nothing but producing an error message
   try
   {
-    this->m_VideoSource = mitk::OpenCVVideoSource::New();
+  this->m_VideoSource = mitk::OpenCVVideoSource::New();
 
-    this->m_VideoSource->SetVideoCameraInput(0, false);
-    this->m_VideoSource->StartCapturing();
-    if(!this->m_VideoSource->IsCapturingEnabled())
-    {
-      MITK_INFO << "unable to initialize video grabbing/playback";
-      this->m_VideoEnabled = false;
-      m_Controls->m_VideoTextureCheckBox->setEnabled(false);
-    }
-    else
-    {
-      this->m_VideoEnabled = true;
-      m_Controls->m_VideoTextureCheckBox->setEnabled(true);
-    }
+  this->m_VideoSource->SetVideoCameraInput(0, false);
+  this->m_VideoSource->StartCapturing();
+  if(!this->m_VideoSource->IsCapturingEnabled())
+  {
+  MITK_INFO << "unable to initialize video grabbing/playback";
+  this->m_VideoEnabled = false;
+  m_Controls->m_VideoTextureCheckBox->setEnabled(false);
+  }
+  else
+  {
+  this->m_VideoEnabled = true;
+  m_Controls->m_VideoTextureCheckBox->setEnabled(true);
+  }
 
-    if (this->m_VideoEnabled)
-    {
+  if (this->m_VideoEnabled)
+  {
 
-      this->m_VideoSource->FetchFrame();
-      this->m_VideoCaptureHeight = this->m_VideoSource->GetImageHeight();
-      this->m_VideoCaptureWidth = this->m_VideoSource->GetImageWidth();
-      this->m_VideoTexture = this->m_VideoSource->GetVideoTexture();
+  this->m_VideoSource->FetchFrame();
+  this->m_VideoCaptureHeight = this->m_VideoSource->GetImageHeight();
+  this->m_VideoCaptureWidth = this->m_VideoSource->GetImageWidth();
+  this->m_VideoTexture = this->m_VideoSource->GetVideoTexture();
 
-      this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_VideoCaptureWidth);
-      this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_VideoCaptureHeight);
+  this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_VideoCaptureWidth);
+  this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_VideoCaptureHeight);
 
 
-      this->m_ToFSurfaceVtkMapper3D->SetTextureWidth(this->m_VideoCaptureWidth);
-      this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
-    }
+  this->m_ToFSurfaceVtkMapper3D->SetTextureWidth(this->m_VideoCaptureWidth);
+  this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
+  }
   }
   catch (std::logic_error& e)
   {
-    QMessageBox::warning(NULL, "Warning", QString(e.what()));
-    MITK_ERROR << e.what();
-    return;
+  QMessageBox::warning(NULL, "Warning", QString(e.what()));
+  MITK_ERROR << e.what();
+  return;
   }
-*/
+  */
   this->RequestRenderWindowUpdate();
 }
 

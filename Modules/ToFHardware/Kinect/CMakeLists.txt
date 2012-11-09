@@ -16,6 +16,7 @@ MITK_CREATE_MODULE(mitkKinectModule
   DEPENDS mitkToFHardware
   EXPORT_DEFINE MITK_KINECTMODULE_EXPORT
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
+  AUTOLOAD_WITH mitkToFHardware
 )
   Message("Kinect Module generated")
 

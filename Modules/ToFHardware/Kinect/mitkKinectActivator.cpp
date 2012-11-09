@@ -46,7 +46,7 @@ public:
         ServiceProperties kinectFactoryProps;
         kinectFactoryProps["ToFFactoryName"] =kinectFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(kinectFactory, kinectFactoryProps);
-        kinectFactory->ConnectToFDevice();    //aufrufen der ConnectToFDevice-Methode der kinectFactory
+        kinectFactory->ConnectToFDevice();
 
         m_Factories.push_back( kinectFactory );
     }
@@ -57,12 +57,11 @@ public:
 
     ~KinectActivator()
     {
-        //todo iterieren über liste m_Factories und löschen
         if(m_Factories.size() > 0)
         {
             for(std::list< IToFDeviceFactory* >::iterator it = m_Factories.begin(); it != m_Factories.end(); ++it)
             {
-                delete (*it); //todo wie genau löschen?
+                delete (*it);
             }
         }
     }

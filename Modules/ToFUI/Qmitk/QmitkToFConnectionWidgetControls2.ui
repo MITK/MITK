@@ -67,8 +67,8 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QmitkServiceListWidget" name="m_DeviceList" native="true"/>
+   <item row="5" column="0">
+    <widget class="QmitkKinectParameterWidget" name="m_KinectParameterWidget" native="true"/>
    </item>
    <item row="3" column="0">
     <widget class="QmitkToFPMDParameterWidget" name="m_PMDParameterWidget" native="true"/>
@@ -76,8 +76,21 @@
    <item row="4" column="0">
     <widget class="QmitkToFMESAParameterWidget" name="m_MESAParameterWidget" native="true"/>
    </item>
-   <item row="5" column="0">
-    <widget class="QmitkKinectParameterWidget" name="m_KinectParameterWidget" native="true"/>
+   <item row="1" column="0">
+    <widget class="QmitkServiceListWidget" name="m_DeviceList" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

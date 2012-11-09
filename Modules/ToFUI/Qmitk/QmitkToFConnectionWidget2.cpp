@@ -99,20 +99,18 @@ void QmitkToFConnectionWidget2::OnSelectCamera()
   //getting the selectedCamera through a static Method used to transform the device->GetNameOfClass
   QString selectedCamera = QString::fromStdString(device->GetNameOfClass());
 
+  this->HideAllParameterWidgets();
   //reactivating the Widgets on slecting a device
   if (selectedCamera.contains("PMD")) //Check if selectedCamera string contains ".." for each device
   {
-    this->HideAllParameterWidgets();
     this->m_Controls->m_PMDParameterWidget->show(); //and activate the correct widget
   }
   else if (selectedCamera.contains("MESA"))
   {
-    this->HideAllParameterWidgets();
     this->m_Controls->m_MESAParameterWidget->show();
   }
   else if (selectedCamera.contains("Kinect"))
   {
-    this->HideAllParameterWidgets();
     this->m_Controls->m_KinectParameterWidget->show();
   }
   emit  (selectedCamera);
@@ -321,6 +319,10 @@ void QmitkToFConnectionWidget2::OnConnectCamera()
       else if (selectedCamera.contains("Kinect"))
       {
         this->m_Controls->m_KinectParameterWidget->ActivateAllParameters();
+      }
+      else
+      {
+        this->HideAllParameterWidgets();
       }
       // send connect signal to the caller functionality
       emit ToFCameraConnected();

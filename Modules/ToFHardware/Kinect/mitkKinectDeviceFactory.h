@@ -43,13 +43,12 @@ namespace mitk
     {
       return std::string("Kinect Factory");
     }
-    //--------------------------Renaming the Device should be implemted in this method. it should be called by tge ToFAbstractDeviceFactory later on!
+    //Interating the Device name on calling the Factory
     std::string GetCurrentDeviceName()
     {
       std::stringstream name;
       name << "Kinect Device " << m_DeviceNumber++;
       return name.str();
-      //return std::string("Kinect Device")+m_DeviceNumber;
     }
 
   private:
@@ -62,7 +61,7 @@ namespace mitk
       KinectDevice::Pointer device = KinectDevice::New();
       return device.GetPointer();
     }
-    //------------This member variable should be set here and is used to produce kinect1,kinect2, kinect m_DeviceNumber
+    //Member variable as variable for our DeviceNumber
     int m_DeviceNumber;
   };
 }

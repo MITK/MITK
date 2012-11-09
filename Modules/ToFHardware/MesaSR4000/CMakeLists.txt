@@ -24,6 +24,7 @@ MITK_CREATE_MODULE(mitkMesaSR4000Module
   DEPENDS mitkToFHardware
   EXPORT_DEFINE MITK_MESASR4000MODULE_EXPORT
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
+  AUTOLOAD_WITH mitkToFHardware
 )
   Message("MesaSR4000 Module erfolgreich erstellt")
   add_subdirectory(Testing)

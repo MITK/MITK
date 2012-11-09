@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -284,9 +284,9 @@ namespace itk{
     typedef itk::Image<itk::Vector<double, 3>, 3> InitialFitImageType;
 
     /** set method to add gradient directions and its corresponding
-   * image. The image here is a VectorImage. The user is expected to pass the 
-   * gradient directions in a container. The ith element of the container 
-   * corresponds to the gradient direction of the ith component image the 
+   * image. The image here is a VectorImage. The user is expected to pass the
+   * gradient directions in a container. The ith element of the container
+   * corresponds to the gradient direction of the ith component image the
    * VectorImage.  For the baseline image, a vector of all zeros
    * should be set.*/
     void SetGradientDirections( GradientDirectionContainerType * );

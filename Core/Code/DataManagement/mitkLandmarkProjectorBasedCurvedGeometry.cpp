@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLandmarkProjectorBasedCurvedGeometry.h"
 #include <vtkAbstractTransform.h>
 
-mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry() 
+mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry()
   : m_LandmarkProjector(NULL), m_InterpolatingAbstractTransform(NULL)
 {
 }
@@ -51,7 +51,7 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::Land
         itkWarningMacro(<<"m_InterpolatingAbstractTransform not set.");
       }
       m_LandmarkProjector->SetInterpolatingAbstractTransform(GetInterpolatingAbstractTransform());
-      
+
       SetVtkAbstractTransform(m_LandmarkProjector->GetCompleteAbstractTransform());
     }
     Modified();

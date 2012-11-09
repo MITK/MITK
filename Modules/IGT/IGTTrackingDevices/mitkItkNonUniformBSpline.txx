@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ This file is based heavily on a corresponding ITK filter.
 #pragma warning ( disable : 4786 )
 #endif
 
-#include "itkNonUniformBSpline.h" 
+#include "itkNonUniformBSpline.h"
 
 #include "vnl/vnl_vector.h"
 #include "vnl/vnl_matrix.h"
@@ -41,34 +41,34 @@ This file is based heavily on a corresponding ITK filter.
 
 // #define DEBUG_SPLINE
 
-namespace itk  
-{ 
+namespace itk
+{
 
 /** Constructor */
 template< unsigned int TDimension >
-NonUniformBSpline< TDimension > 
-::NonUniformBSpline()  
-{ 
+NonUniformBSpline< TDimension >
+::NonUniformBSpline()
+{
   // Cubic bspline => 4th order
   m_SplineOrder = 3;
   m_SpatialDimension = TDimension;
-} 
- 
+}
+
 /** Destructor */
 template< unsigned int TDimension >
-NonUniformBSpline< TDimension >  
+NonUniformBSpline< TDimension >
 ::~NonUniformBSpline()
-{ 
-}  
+{
+}
 
-/** Print the object */ 
+/** Print the object */
 template< unsigned int TDimension >
-void  
-NonUniformBSpline< TDimension >  
-::PrintSelf( std::ostream& os, Indent indent ) const 
-{ 
-  Superclass::PrintSelf( os, indent ); 
-  os << indent << "NonUniformBSpline(" << this << ")" << std::endl; 
+void
+NonUniformBSpline< TDimension >
+::PrintSelf( std::ostream& os, Indent indent ) const
+{
+  Superclass::PrintSelf( os, indent );
+  os << indent << "NonUniformBSpline(" << this << ")" << std::endl;
 
   os << indent << "Chord lengths : " << std::endl;
   for (ChordLengthListType::const_iterator iter = m_CumulativeChordLength.begin();
@@ -91,17 +91,17 @@ NonUniformBSpline< TDimension >
     {
     os << indent << indent << *cpiter << std::endl;
     }
-} 
+}
 
 
 /** Set the list of points composing the tube */
 template< unsigned int TDimension >
-void  
-NonUniformBSpline< TDimension >  
-::SetPoints( PointListType & points )  
+void
+NonUniformBSpline< TDimension >
+::SetPoints( PointListType & points )
 {
   m_Points.clear();
-         
+
   typename PointListType::iterator it,end;
   it = points.begin();
   end = points.end();
@@ -110,21 +110,21 @@ NonUniformBSpline< TDimension >
     m_Points.push_back(*it);
     it++;
     }
-      
+
   this->Modified();
 }
 
 /** Set the list of points composing the tube */
 template< unsigned int TDimension >
-void  
-NonUniformBSpline< TDimension >  
-::SetKnots( KnotListType & knots )  
+void
+NonUniformBSpline< TDimension >
+::SetKnots( KnotListType & knots )
 {
   m_Knots.clear();
-  
+
   int len = knots.size();
   double max_knot = knots[len - 1];
-         
+
   typename KnotListType::iterator it;
   typename KnotListType::iterator end;
 
@@ -136,13 +136,13 @@ NonUniformBSpline< TDimension >
     m_Knots.push_back(*it/max_knot);
     it++;
     }
-      
+
   this->Modified();
 }
 
 template< unsigned int TDimension >
-double  
-NonUniformBSpline< TDimension > 
+double
+NonUniformBSpline< TDimension >
 ::NonUniformBSplineFunctionRecursive(unsigned int order, unsigned int i, double t) const
 {
   if (order == 1)
@@ -181,8 +181,8 @@ NonUniformBSpline< TDimension >
 }
 
 template< unsigned int TDimension >
-void  
-NonUniformBSpline< TDimension > 
+void
+NonUniformBSpline< TDimension >
 ::ComputeChordLengths()
 {
   m_ChordLength.clear();
@@ -238,8 +238,8 @@ NonUniformBSpline< TDimension >
 }
 
 template< unsigned int TDimension >
-void  
-NonUniformBSpline< TDimension > 
+void
+NonUniformBSpline< TDimension >
 ::SetControlPoints( ControlPointListType& ctrlpts )
 {
   m_ControlPoints.clear();
@@ -247,8 +247,8 @@ NonUniformBSpline< TDimension >
        iter != ctrlpts.end();
        iter++)
     {
-    m_ControlPoints.push_back(*iter);   
-    } 
+    m_ControlPoints.push_back(*iter);
+    }
   this->Modified();
 }
 
@@ -282,17 +282,17 @@ NonUniformBSpline< TDimension >::GetPoints() const
 
 template< unsigned int TDimension >
 void
-NonUniformBSpline< TDimension >::ComputeControlPoints() 
+NonUniformBSpline< TDimension >::ComputeControlPoints()
 {
   unsigned int dim = m_Points[0].GetPointDimension();
 
 #ifdef DEBUG_SPLINE
   std::cout << "Points have dimension : " << dim  << std::endl;
-#endif  
+#endif
 
   //
   // +1 in cols for radius
-  // 
+  //
   vnl_matrix<double> data_matrix(m_Points.size(), dim);
 
   //
@@ -428,10 +428,10 @@ NonUniformBSpline< TDimension >
   std::cout << "Result : " << result << std::endl;
   std::cout << "Sum : " << sum << std::endl;
 #endif
-  
+
   return sum;
 }
 
-} // end namespace itk 
+} // end namespace itk
 
 #endif

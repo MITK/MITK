@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -89,7 +89,7 @@ protected slots:
   void OnRenderWindow4Clicked();
   void OnTakeHighResolutionScreenshot(); ///< takes screenshot of the 3D window in 4x resolution of the render window
   void OnTakeScreenshot(); ///< takes screenshot of the selected render window
- 
+
 protected:
 
   Ui::QmitkSimpleExampleViewControls* m_Controls;

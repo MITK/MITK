@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,13 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkSmartPointer.h"
 
 
-mitk::Surface::Surface() : 
+mitk::Surface::Surface() :
 m_CalculateBoundingBox( false )
 {
   this->InitializeEmpty();
 }
 
-mitk::Surface::Surface(const mitk::Surface& other) : BaseData(other), 
+mitk::Surface::Surface(const mitk::Surface& other) : BaseData(other),
 m_LargestPossibleRegion(other.m_LargestPossibleRegion),
 m_RequestedRegion(other.m_RequestedRegion),
 m_CalculateBoundingBox(other.m_CalculateBoundingBox)
@@ -90,8 +90,8 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
     m_PolyDataSeries[ t ]->Delete();
   }
   m_PolyDataSeries[ t ] = polydata;
-  // call m_VtkPolyData->Register(NULL) to tell 
-  // the reference counting that we want to keep a 
+  // call m_VtkPolyData->Register(NULL) to tell
+  // the reference counting that we want to keep a
   // reference on the object
   if(m_PolyDataSeries[ t ] != NULL)
   {
@@ -107,8 +107,8 @@ bool mitk::Surface::IsEmptyTimeStep(unsigned int t) const
   if(!IsInitialized())
     return false;
   vtkPolyData* polydata = const_cast<Surface*>(this)->GetVtkPolyData(t);
-  return 
-    (polydata == NULL) || 
+  return
+    (polydata == NULL) ||
     (
     (polydata->GetNumberOfVerts()  <= 0) &&
     (polydata->GetNumberOfPolys()  <= 0) &&
@@ -209,7 +209,7 @@ bool mitk::Surface::RequestedRegionIsOutsideOfTheBufferedRegion()
 
 bool mitk::Surface::VerifyRequestedRegion()
 {
-  if( (m_RequestedRegion.GetIndex(3)>=0) && 
+  if( (m_RequestedRegion.GetIndex(3)>=0) &&
     (m_RequestedRegion.GetIndex(3)+m_RequestedRegion.GetSize(3)<=m_PolyDataSeries.size()) )
     return true;
 
@@ -279,7 +279,7 @@ void mitk::Surface::Update()
 }
 
 void mitk::Surface::Expand( unsigned int timeSteps )
-{  
+{
   // check if the vector is long enough to contain the new element
   // at the given position. If not, expand it with sufficient zero-filled elements.
   if ( timeSteps > m_PolyDataSeries.size() )
@@ -296,7 +296,7 @@ void mitk::Surface::ExecuteOperation(Operation *operation)
   switch ( operation->GetOperationType() )
   {
   case OpSURFACECHANGED:
-  
+
     mitk::SurfaceOperation* surfOp = dynamic_cast<mitk::SurfaceOperation*>(operation);
     if( ! surfOp ) break;
 
@@ -323,7 +323,7 @@ unsigned int mitk::Surface::GetSizeOfPolyDataSeries() const
 void mitk::Surface::Graft( const DataObject* data )
 {
   const Self* surface;
-  try 
+  try
   {
     surface = dynamic_cast<const Self*>( data );
   }
@@ -332,7 +332,7 @@ void mitk::Surface::Graft( const DataObject* data )
     itkExceptionMacro( << "mitk::Surface::Graft cannot cast "
       << typeid(data).name() << " to "
       << typeid(const Self *).name() );
-    return;    
+    return;
   }
 
   if(!surface)
@@ -374,7 +374,7 @@ void mitk::Surface::PrintSelf( std::ostream& os, itk::Indent indent ) const
       os << indent << "VTKPolyData : \n";
       pd->Print(os);
     }
-    else 
+    else
       os << indent << "\nEmpty PolyData at time step " << count << ".\n";
 
     count++;

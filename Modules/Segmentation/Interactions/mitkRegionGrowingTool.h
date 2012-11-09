@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ namespace mitk
   to initialize a region growing algorithm (in the affected 2D slice).
 
   By moving the mouse up and down while the button is still pressed, the user can change the parameters
-  of the region growing algorithm (selecting more or less of an object). 
+  of the region growing algorithm (selecting more or less of an object).
   The current result of region growing will always be shown as a contour to the user.
 
   After releasing the button, the current result of the region growing algorithm will be written to the
@@ -55,7 +55,7 @@ namespace mitk
 class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
 {
   public:
-    
+
     mitkClassMacro(RegionGrowingTool, FeedbackContourTool);
     itkNewMacro(RegionGrowingTool);
 
@@ -63,13 +63,13 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
     virtual const char* GetName() const;
 
   protected:
-    
+
     RegionGrowingTool(); // purposely hidden
     virtual ~RegionGrowingTool();
 
     virtual void Activated();
     virtual void Deactivated();
-    
+
     virtual bool OnMousePressed (Action*, const StateEvent*);
     virtual bool OnMousePressedInside (Action*, const StateEvent*, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset);
     virtual bool OnMousePressedOutside (Action*, const StateEvent*);
@@ -93,14 +93,14 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
 
     mitkIpPicDescriptor* SmoothIPPicBinaryImage( mitkIpPicDescriptor* image, int &contourOfs, mitkIpPicDescriptor* dest = NULL );
     void SmoothIPPicBinaryImageHelperForRows( mitkIpPicDescriptor* source, mitkIpPicDescriptor* dest, int &contourOfs, int* maskOffsets, int maskSize, int startOffset, int endOffset );
-    
+
     mitkIpPicDescriptor* m_OriginalPicSlice;
     int m_SeedPointMemoryOffset;
 
     ScalarType m_VisibleWindow;
     ScalarType m_DefaultWindow;
     ScalarType m_MouseDistanceScaleFactor;
-    
+
     int m_PaintingPixelValue;
     int m_LastWorkingSeed;
 

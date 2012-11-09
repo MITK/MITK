@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,19 +22,19 @@ namespace mitk
 class SceneReaderV1 : public SceneReader
 {
   public:
-    
+
     mitkClassMacro( SceneReaderV1, SceneReader);
     itkNewMacro( Self );
-      
+
     virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage );
-  
+
   protected:
 
     /**
       \brief tries to create one DataNode from a given XML <node> element
     */
-    DataNode::Pointer LoadBaseDataFromDataTag( TiXmlElement* dataElement, 
-                                                   const std::string& workingDirectory, 
+    DataNode::Pointer LoadBaseDataFromDataTag( TiXmlElement* dataElement,
+                                                   const std::string& workingDirectory,
                                                    bool& error );
 
     /**

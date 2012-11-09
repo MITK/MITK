@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataTransformFilter.h"
 
 
-mitk::NavigationDataTransformFilter::NavigationDataTransformFilter() 
+mitk::NavigationDataTransformFilter::NavigationDataTransformFilter()
 : mitk::NavigationDataToNavigationDataFilter()
 {
   m_Transform = NULL;
 
-  //transform to rotate orientation 
+  //transform to rotate orientation
   m_QuatOrgRigidTransform = itk::QuaternionRigidTransform<double>::New();
   m_QuatTmpTransform = itk::QuaternionRigidTransform<double>::New();
 }
@@ -35,7 +35,7 @@ mitk::NavigationDataTransformFilter::~NavigationDataTransformFilter()
 
 void mitk::NavigationDataTransformFilter::SetRigid3DTransform( TransformType::Pointer transform )
 {
-  m_Transform = transform; 
+  m_Transform = transform;
   this->Modified();
 }
 
@@ -46,7 +46,7 @@ void mitk::NavigationDataTransformFilter::GenerateData()
   if(m_Transform.IsNull())
   {
     itkExceptionMacro("Invalid parameter: Transform was not set!  Use SetRigid3DTransform() before updating the filter.");
-    return;  
+    return;
   }
   else
   {
@@ -75,7 +75,7 @@ void mitk::NavigationDataTransformFilter::GenerateData()
       itkPointIn[2] = tempCoordinateIn[2];
 
       //do the transform
-      itkPointOut = m_Transform->TransformPoint( itkPointIn );  
+      itkPointOut = m_Transform->TransformPoint( itkPointIn );
 
       tempCoordinateOut[0] = itkPointOut[0];
       tempCoordinateOut[1] = itkPointOut[1];
@@ -100,7 +100,7 @@ void mitk::NavigationDataTransformFilter::GenerateData()
 
       vnl_quaternion<double> vnlQuatOut = m_QuatTmpTransform->GetRotation();
       NavigationData::OrientationType quatOut(vnlQuatOut[0], vnlQuatOut[1], vnlQuatOut[2], vnlQuatOut[3]);
-      
+
       output->SetOrientation(quatOut);
 
 

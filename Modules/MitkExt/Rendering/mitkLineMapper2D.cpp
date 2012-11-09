@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,11 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLinearTransform.h>
 #include "mitkPointSet.h"
 #include "mitkGL.h"
-  
+
 mitk::LineMapper2D::LineMapper2D()
 : mitk::PointSetGLMapper2D()
 {
- 
+
 }
 
 mitk::LineMapper2D::~LineMapper2D()
@@ -42,12 +42,12 @@ const mitk::PointSet *mitk::LineMapper2D::GetInput(void)
 
 void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
-  if(IsVisible(renderer)==false) 
+  if(IsVisible(renderer)==false)
     return;
 
   bool updateNeccesary = true;//!!!! @TODO !??!!
 
-  if (updateNeccesary) 
+  if (updateNeccesary)
   {
     mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
@@ -68,7 +68,7 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
     //bool list for the selection of the points
     PointSet::DataType::PointDataContainerIterator selIt, selItNext;
     selIt=input->GetPointSet()->GetPointData()->Begin();
-    
+
     int j=0;
     while(it!=end)
     {
@@ -77,7 +77,7 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
       itk2vtk(it->Value(), vtkp);
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);
-      
+
       //next point n+1
       it++;
       itk2vtk(it->Value(), vtkp);
@@ -93,7 +93,7 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
          (diffq.GetSquaredNorm()<4.0))
       {
         Point2D p2d, q2d, tmp;
-        
+
         displayGeometry->Map(projected_p, p2d);
         displayGeometry->WorldToDisplay(p2d, p2d);
         displayGeometry->Map(projected_q, q2d);

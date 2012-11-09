@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryFileEditorInput.h"
 #include <berryIViewPart.h>
 
-const std::string QmitkPythonCommandHistory::VIEW_ID = "org.mitk.views.pythoncommandhistory"; 
+const std::string QmitkPythonCommandHistory::VIEW_ID = "org.mitk.views.pythoncommandhistory";
 
 QmitkPythonCommandHistory::QmitkPythonCommandHistory()
 : QmitkFunctionality()
@@ -57,7 +57,7 @@ QmitkPythonCommandHistory::~QmitkPythonCommandHistory()
 void QmitkPythonCommandHistory::CreateQtPartControl( QWidget *parent )
 {
   QGridLayout *gridLayout;
-  
+
 
   if (parent->objectName().isEmpty())
     parent->setObjectName(QString::fromUtf8("parent"));
@@ -103,7 +103,7 @@ void QmitkPythonCommandHistory::AddCommand(const QString& command)
   for(int i = 0; i < m_commandHistory.size(); i++)
   {
     if( m_commandHistory[i].value(0).compare("") != 0 )
-      m_treeWidget->addTopLevelItem(new QTreeWidgetItem(m_commandHistory[i])); 
+      m_treeWidget->addTopLevelItem(new QTreeWidgetItem(m_commandHistory[i]));
   }
 }
 
@@ -114,7 +114,7 @@ void QmitkPythonCommandHistory::SetCommandHistory(std::vector<QStringList> histo
   for(int i = 0; i < m_commandHistory.size(); i++)
   {
     if( m_commandHistory[i].value(0).compare("") != 0 )
-      m_treeWidget->addTopLevelItem(new QTreeWidgetItem(m_commandHistory[i])); 
+      m_treeWidget->addTopLevelItem(new QTreeWidgetItem(m_commandHistory[i]));
   }
 }
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -1913,7 +1913,7 @@ vtkMitkOpenGLGPUVolumeRayCastMapper::vtkMitkOpenGLGPUVolumeRayCastMapper()
 
   this->ActualSampleDistance=1.0;
   this->LastProgressEventTime=0.0; // date in seconds
-  
+
   this->PreserveOrientation=true;
 }
 
@@ -2117,7 +2117,7 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::LoadExtensions(
     this->LoadExtensionsSucceeded=0;
     return;
     }
-  
+
   // Create an extension manager
   vtkOpenGLExtensionManager *extensions=vtkOpenGLExtensionManager::New();
   extensions->SetRenderWindow(window);
@@ -2488,7 +2488,7 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::CreateOpenGLObjects()
   vtkgl::GenFramebuffersEXT(1, &frameBufferObject); // color
   vtkgl::GenRenderbuffersEXT(1, &depthRenderBufferObject); // depth
   glGenTextures(vtkMitkOpenGLGPUVolumeRayCastMapperNumberOfTextureObjects,textureObjects);
-                                           
+
   // Color buffers
   GLint value;
   glGetIntegerv(vtkgl::FRAMEBUFFER_BINDING_EXT,&value);
@@ -2846,15 +2846,15 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
   ren->GetTiledSize(&size[0],&size[1]);
 
   int sizeChanged=this->LastSize[0]!=size[0] || this->LastSize[1]!=size[1];
-  
+
   GLenum errorCode=glGetError();
-    
+
   // Need allocation?
   if(sizeChanged)
     {
     int i=0;
     GLenum errorCode=glGetError();
-    
+
     while(i <this->NumberOfFrameBuffers && errorCode==GL_NO_ERROR)
       {
       glBindTexture(GL_TEXTURE_2D,static_cast<GLuint>(this->TextureObjects[vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront+i]));
@@ -2975,7 +2975,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
          static_cast<GLuint>(this->MaxValueFrameBuffer);
        glDeleteTextures(1,&maxValueFrameBuffer);
        this->MaxValueFrameBuffer=0;
-       
+
        m_BindMax = false;
 
        GLuint maxValueFrameBuffer2=
@@ -3030,7 +3030,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
       }
 
     }
-  
+
   PrintError("AllocateFrameBuffers");
   return result;
 }
@@ -3581,14 +3581,14 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::ClipBoundingBox(vtkRenderer *ren,
   direction[2] = focalPoint[2] - camPos[2];
 
   vtkMath::Normalize(direction);
-  
+
   // The range (near/far) must also be transformed
   // into the local coordinate system.
   camWorldDirection[0] = camFocalWorldPoint[0] - camWorldPos[0];
   camWorldDirection[1] = camFocalWorldPoint[1] - camWorldPos[1];
   camWorldDirection[2] = camFocalWorldPoint[2] - camWorldPos[2];
   vtkMath::Normalize(camWorldDirection);
-  
+
   double camNearWorldPoint[4];
   double camFarWorldPoint[4];
   double camNearPoint[4];
@@ -3626,7 +3626,7 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::ClipBoundingBox(vtkRenderer *ren,
   double dist = range[1] - range[0];
   range[0] += dist / (2<<16);
   range[1] -= dist / (2<<16);
-  
+
   if(this->NearPlane==0)
     {
     this->NearPlane= vtkPlane::New();
@@ -3642,7 +3642,7 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::ClipBoundingBox(vtkRenderer *ren,
     vtkPlane *plane;
     while ( (plane = this->ClippingPlanes->GetNextItem()) )
       {
-      // Planes are in world coordinates, we need to 
+      // Planes are in world coordinates, we need to
       // convert them in local coordinates
       double planeOrigin[4], planeNormal[4], planeP1[4];
       plane->GetOrigin(planeOrigin);
@@ -3879,7 +3879,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::RenderClippedBoundingBox(
 }
 
 void vtkMitkOpenGLGPUVolumeRayCastMapper::CopyFBOToTexture()
-{  
+{
   // in OpenGL copy texture to texture does not exist but
   // framebuffer to texture exists (and our FB is an FBO).
   // we have to copy and not just to switch color textures because the
@@ -4268,16 +4268,16 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::PreRender(vtkRenderer *ren,
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
-  
+
   // See if the volume transform is orientation-preserving
   vtkMatrix4x4 *m=vol->GetMatrix();
   double det=vtkMath::Determinant3x3(
     m->GetElement(0,0),m->GetElement(0,1),m->GetElement(0,2),
     m->GetElement(1,0),m->GetElement(1,1),m->GetElement(1,2),
     m->GetElement(2,0),m->GetElement(2,1),m->GetElement(2,2));
-  
+
   this->PreserveOrientation=det>0;
-  
+
   // If we have clipping planes, render the back faces of the clipped
   // bounding box of the whole dataset to set the zbuffer.
   if(this->ClippingPlanes && this->ClippingPlanes->GetNumberOfItems()!=0)
@@ -5123,7 +5123,7 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::RenderBlock(vtkRenderer *ren,
     this->RenderWholeVolume(ren,vol);
     }
   else
-    { 
+    {
     this->ClipCroppingRegionPlanes();
     this->RenderRegions(ren,vol);
     }
@@ -5273,7 +5273,7 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::GPURender(vtkRenderer *ren,
     this->RenderBlock(ren,vol,0);
     this->PostRender(ren,numberOfScalarComponents);
     }
-  
+
   // Let's just make sure no OpenGL errors occurred during this render
   this->PrintError("End GPU Render");
 

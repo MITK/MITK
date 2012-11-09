@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,10 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkHistogram.h>
 
-/** 
+/**
  \brief Shows a histogram in a Qwt_Plot and a report (selectable) in a QTextEdit
  Makes the data Values from a itk::histogram suitable for a Qwt_Plot.
- Offers zoom possibility. 
+ Offers zoom possibility.
  A marker can be set and shows the frequency at his position.
  */
 class QmitkExt_EXPORT QmitkHistogramWidget: public QDialog

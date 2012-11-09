@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,14 +44,14 @@ void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
 
   m_DataManagerPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataManagerView::VIEW_ID);
 
-  m_MainControl = new QWidget(parent); 
+  m_MainControl = new QWidget(parent);
   m_EnableSingleEditing = new QCheckBox;
   m_PlaceNewNodesOnTop = new QCheckBox;
   m_ShowHelperObjects = new QCheckBox;
   m_ShowNodesContainingNoData = new QCheckBox;
   m_UseSurfaceDecimation = new QCheckBox;
 
-  QFormLayout *formLayout = new QFormLayout; 
+  QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("&Single click property editing:", m_EnableSingleEditing);
   formLayout->addRow("&Place new nodes on top:", m_PlaceNewNodesOnTop);
   formLayout->addRow("&Show helper objects:", m_ShowHelperObjects);
@@ -68,7 +68,7 @@ QWidget* QmitkDataManagerPreferencePage::GetQtControl() const
 }
 
 bool QmitkDataManagerPreferencePage::PerformOk()
-{  
+{
   m_DataManagerPreferencesNode->PutBool("Single click property editing"
                                         , m_EnableSingleEditing->isChecked());
   m_DataManagerPreferencesNode->PutBool("Place new nodes on top"
@@ -88,7 +88,7 @@ void QmitkDataManagerPreferencePage::PerformCancel()
 }
 
 void QmitkDataManagerPreferencePage::Update()
-{  
+{
   m_EnableSingleEditing->setChecked(m_DataManagerPreferencesNode->GetBool("Single click property editing", true));
   m_PlaceNewNodesOnTop->setChecked(m_DataManagerPreferencesNode->GetBool("Place new nodes on top", true));
   m_ShowHelperObjects->setChecked(m_DataManagerPreferencesNode->GetBool("Show helper objects", false));

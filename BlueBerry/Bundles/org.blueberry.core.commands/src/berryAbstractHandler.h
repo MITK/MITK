@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,28 +32,28 @@ namespace berry {
  * changes. Subclasses can also override {@link AbstractHandler#isEnabled()} and
  * {@link AbstractHandler#isHandled()}.
  * </p>
- * 
+ *
  * @since 3.1
  */
 class BERRY_COMMANDS AbstractHandler : public IHandler { // ,public EventManager {
 
 public:
   berryObjectMacro(AbstractHandler)
-  
+
 private:
-  
+
   /**
    * Track this base class enabled state.
-   * 
+   *
    * @since 3.4
    */
   bool baseEnabled;
 
-  
+
 public:
-  
+
   AbstractHandler();
-  
+
   /**
    * @see IHandler#addHandlerListener(IHandlerListener)
    */
@@ -64,19 +64,19 @@ public:
   /**
    * The default implementation does nothing. Subclasses who attach listeners
    * to other objects are encouraged to detach them in this method.
-   * 
+   *
    * @see org.blueberry.core.commands.IHandler#dispose()
    */
   ~AbstractHandler() {
     // Do nothing.
   }
-  
+
   /**
    * Whether this handler is capable of executing at this time. Subclasses may
    * override this method. If clients override this method they should also
    * consider overriding {@link #setEnabled(Object)} so they can be notified
    * about framework execution contexts.
-   * 
+   *
    * @return <code>true</code>
    * @see #setEnabled(Object)
    * @see #setBaseEnabled(boolean)
@@ -86,11 +86,11 @@ public:
   /**
    * Whether this handler is capable of handling delegated responsibilities at
    * this time. Subclasses may override this method.
-   * 
+   *
    * @return <code>true</code>
    */
   bool IsHandled();
-  
+
   /**
    * @see IHandler#removeHandlerListener(IHandlerListener)
    */
@@ -98,9 +98,9 @@ public:
 //    removeListenerObject(handlerListener);
 //  }
 
-  
+
 protected:
-  
+
   /**
    * Fires an event to all registered listeners describing changes to this
    * instance.
@@ -112,7 +112,7 @@ protected:
    * overriding this behaviour. If this method is overridden, then the first
    * line of the method should be "<code>super.fireHandlerChanged(handlerEvent);</code>".
    * </p>
-   * 
+   *
    * @param handlerEvent
    *            the event describing changes to this instance. Must not be
    *            <code>null</code>.
@@ -129,14 +129,14 @@ protected:
 //    }
 //  }
 
-  
+
 
   /**
    * Allow the default {@link #isEnabled()} to answer our enabled state. It
    * will fire a HandlerEvent if necessary. If clients use this method they
    * should also consider overriding {@link #setEnabled(Object)} so they can
    * be notified about framework execution contexts.
-   * 
+   *
    * @param state
    *            the enabled state
    * @since 3.4
@@ -156,7 +156,7 @@ protected:
    * overriding this behaviour. If this method is overridden, then the return
    * value should include "<code>super.hasListeners() ||</code>".
    * </p>
-   * 
+   *
    * @return true iff there is one or more IHandlerListeners attached to this
    *         AbstractHandler
    */
@@ -164,7 +164,7 @@ protected:
 //    return isListenerAttached();
 //  }
 
-  
+
 };
 
 }

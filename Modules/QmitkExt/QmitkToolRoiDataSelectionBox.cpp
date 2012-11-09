@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,7 +53,7 @@ QmitkToolRoiDataSelectionBox::~QmitkToolRoiDataSelectionBox()
   delete m_segmentationComboBox;
   delete m_boundingObjectWidget;
 
-  m_ToolManager->GetDataStorage()->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkToolRoiDataSelectionBox , const mitk::DataNode*>( this, &QmitkToolRoiDataSelectionBox::DataStorageChanged ) );  
+  m_ToolManager->GetDataStorage()->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkToolRoiDataSelectionBox , const mitk::DataNode*>( this, &QmitkToolRoiDataSelectionBox::DataStorageChanged ) );
 }
 
 void QmitkToolRoiDataSelectionBox::SetDataStorage(mitk::DataStorage &storage)
@@ -95,7 +95,7 @@ void QmitkToolRoiDataSelectionBox::OnToolManagerRoiDataModified()
 
 void QmitkToolRoiDataSelectionBox::DataStorageChanged(const mitk::DataNode* node )
 {
-  if (m_SelfCall) 
+  if (m_SelfCall)
     return;
 
   if ( this->GetDataStorage()->GetAll()->size() == 1 )

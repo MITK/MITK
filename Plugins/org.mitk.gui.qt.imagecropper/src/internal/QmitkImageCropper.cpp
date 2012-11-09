@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -211,7 +211,7 @@ void QmitkImageCropper::CreateNewBoundingObject()
         m_Controls->m_CropButton->setEnabled(true);
       }
     }
-    else 
+    else
       QMessageBox::information(NULL, "Image cropping functionality", "Load an image first!");
   }
 }
@@ -316,7 +316,7 @@ void QmitkImageCropper::CropImage()
     //       recognized by MITK.
     mitk::OperationEvent* operationEvent = new mitk::OperationEvent( m_Interface, doOp, undoOp, "Crop image");
     mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( operationEvent ); // tell the undo controller about the action
-    
+
     ExecuteOperation(doOp); // execute action
   }
 

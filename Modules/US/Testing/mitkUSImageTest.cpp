@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -52,7 +52,7 @@ public:
     MITK_TEST_CONDITION_REQUIRED(meta1->GetProbeName().compare(meta2->GetProbeName()) == 0, "Comparing Metadata after write & read: Probe Name");
     MITK_TEST_CONDITION_REQUIRED(meta1->GetProbeFrequency().compare(meta2->GetProbeFrequency()) == 0, "Comparing Metadata after write & read: Frequency");
     MITK_TEST_CONDITION_REQUIRED(meta1->GetZoom().compare(meta2->GetZoom()) == 0, "Comparing Metadata after write & read: Zoom Factor");
-    
+
   }
 
 };

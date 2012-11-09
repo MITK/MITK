@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -131,7 +131,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   world2vtk->Delete();
 
     // vtk works in axis align coords
-  // thus the normal also must be axis align, since 
+  // thus the normal also must be axis align, since
   // we do not allow arbitrary cutting through volume
   //
   // vnormal should already be axis align, but in order
@@ -179,7 +179,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   m_Plane->SetNormal( vnormal );
 
   vtkPolyData* cuttedPlane;
-  if(!( (dims[0] == 1 && vnormal[0] != 0) || 
+  if(!( (dims[0] == 1 && vnormal[0] != 0) ||
         (dims[1] == 1 && vnormal[1] != 0) ||
         (dims[2] == 1 && vnormal[2] != 0) ))
   {
@@ -191,7 +191,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   }
   else
   {
-    // cutting of a 2D-Volume does not work, 
+    // cutting of a 2D-Volume does not work,
     // so we have to build up our own polydata object
     cuttedPlane = vtkPolyData::New();
     vtkPoints* points = vtkPoints::New();
@@ -359,7 +359,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     double myscale[3];
     trafo->GetScale(myscale);
     trafo->Scale(1/myscale[0],1/myscale[1],1/myscale[2]);
-    
+
     this->PaintCells( glyphGenerator->GetOutput(), renderer->GetCurrentWorldGeometry2D(), renderer->GetDisplayGeometry(), trafo, renderer, NULL/*vtkLut*/, color, lwidth, spacing );
 
     vectorMagnitudes->Delete();
@@ -395,10 +395,10 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
   vtkIdList* idList;
   vtkCell* cell;
 
-  vtkFloatingPointType offset[3]; 
-  for (unsigned int i = 0; i < 3; ++i) 
+  vtkFloatingPointType offset[3];
+  for (unsigned int i = 0; i < 3; ++i)
   {
-    offset[i] = 0; 
+    offset[i] = 0;
   }
 
   vtkIdType numCells = glyphs->GetNumberOfCells();
@@ -428,7 +428,7 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
     {
       glLineWidth(lwidth);
       glBegin ( GL_LINE_LOOP );
-      
+
       for ( int pointNr = 0; pointNr < numPoints ;++pointNr )
       {
         points->GetPoint( idList->GetId( pointNr ), vp );

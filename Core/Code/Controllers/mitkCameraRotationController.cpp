@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -65,16 +65,16 @@ void mitk::CameraRotationController::AcquireCamera()
   BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(m_RenderWindow);
 
   const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer * >( renderer );
-  if (propRenderer) 
-  { 
+  if (propRenderer)
+  {
     // get vtk renderer
     vtkRenderer* vtkrenderer = propRenderer->GetVtkRenderer();
-    if (vtkrenderer) 
-    { 
+    if (vtkrenderer)
+    {
       // get vtk camera
       vtkCamera* vtkcam = vtkrenderer->GetActiveCamera();
-      if (vtkcam) 
-      { 
+      if (vtkcam)
+      {
         // vtk smart pointer handling
         if (!m_Camera)
         {

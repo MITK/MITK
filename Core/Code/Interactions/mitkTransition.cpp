@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ mitk::Transition::~Transition()
   m_Actions.clear();
 }
 
-void mitk::Transition::AddAction( Action* action ) 
+void mitk::Transition::AddAction( Action* action )
 {
   m_Actions.push_back( action );
 }
@@ -49,12 +49,12 @@ int mitk::Transition::GetNextStateId() const
   return m_NextStateId;
 }
 
-int mitk::Transition::GetEventId() const 
+int mitk::Transition::GetEventId() const
 {
   return m_EventId;
 }
 
-unsigned int mitk::Transition::GetActionCount() const 
+unsigned int mitk::Transition::GetActionCount() const
 {
   return static_cast<unsigned int>(m_Actions.size());
 }

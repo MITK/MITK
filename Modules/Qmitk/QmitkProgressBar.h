@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,7 +40,7 @@ public:
   //##@brief Constructor;
   //## holds param instance internally and connects this to the mitkProgressBar
   QmitkProgressBar(QWidget * parent = 0, const char * name = 0);
-  
+
   //##Documentation
   //##@brief Destructor
   virtual ~QmitkProgressBar();
@@ -52,14 +52,14 @@ public:
   //##Documentation
   //## @brief Adds steps to totalSteps.
   virtual void AddStepsToDo(unsigned int steps);
-  
+
   //##Documentation
   //## @brief Sets the current amount of progress to current progress + steps.
   //## @param: steps the number of steps done since last Progress(int steps) call.
   virtual void Progress(unsigned int steps);
 
 signals:
-  
+
   void SignalAddStepsToDo(unsigned int steps);
   void SignalProgress(unsigned int steps);
   void SignalSetPercentageVisible(bool visible);
@@ -69,15 +69,15 @@ protected slots:
   virtual void SlotAddStepsToDo(unsigned int steps);
   virtual void SlotProgress(unsigned int steps);
   virtual void SlotSetPercentageVisible(bool visible);
-    
+
 private:
 
   //##Documentation
   //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
   void Reset();
-  
+
   unsigned int m_TotalSteps;
-  
+
   unsigned int m_Progress;
 
 };

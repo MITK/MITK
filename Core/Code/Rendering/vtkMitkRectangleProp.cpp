@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,17 +37,17 @@ double *vtkMitkRectangleProp::GetBounds()
 int vtkMitkRectangleProp::RenderOverlay(vtkViewport* /*viewport*/)
 {
   m_RenderWindow->MakeCurrent();
-  
+
   Enable2DOpenGL();
 
   //make it nicer
   glEnable(GL_LINE_SMOOTH);
   glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
-  
+
   //size and position
   int * i = m_RenderWindow->GetSize();
   GLfloat bbox[8] = {0.f , 0.f, (float)i[0], 0.f, (float)i[0], (float)i[1], 0.f, (float)i[1]};
-    
+
   //render rectangle
   glLineWidth(5.0f);
   glBegin(GL_LINE_LOOP);
@@ -91,38 +91,38 @@ int vtkMitkRectangleProp::RenderOpaqueGeometry(vtkViewport* /*viewport*/)
 
 void vtkMitkRectangleProp::Enable2DOpenGL()
 {
-  GLint iViewport[4];  
-   
-  // Get a copy of the viewport  
-  glGetIntegerv( GL_VIEWPORT, iViewport );  
-   
-  // Save a copy of the projection matrix so that we can restore it  
-  // when it's time to do 3D rendering again.  
-  glMatrixMode( GL_PROJECTION );  
-  glPushMatrix();  
-  glLoadIdentity();  
-   
-  // Set up the orthographic projection  
-  glOrtho( iViewport[0], iViewport[0]+iViewport[2],  
-  iViewport[1]+iViewport[3], iViewport[1], -1, 1 );  
-  glMatrixMode( GL_MODELVIEW );  
-  glPushMatrix();  
-  glLoadIdentity();  
-   
-  // Make sure depth testing and lighting are disabled for 2D rendering until  
-  // we are finished rendering in 2D  
+  GLint iViewport[4];
+
+  // Get a copy of the viewport
+  glGetIntegerv( GL_VIEWPORT, iViewport );
+
+  // Save a copy of the projection matrix so that we can restore it
+  // when it's time to do 3D rendering again.
+  glMatrixMode( GL_PROJECTION );
+  glPushMatrix();
+  glLoadIdentity();
+
+  // Set up the orthographic projection
+  glOrtho( iViewport[0], iViewport[0]+iViewport[2],
+  iViewport[1]+iViewport[3], iViewport[1], -1, 1 );
+  glMatrixMode( GL_MODELVIEW );
+  glPushMatrix();
+  glLoadIdentity();
+
+  // Make sure depth testing and lighting are disabled for 2D rendering until
+  // we are finished rendering in 2D
   glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_TEXTURE_2D);
-  glDisable( GL_DEPTH_TEST );  
+  glDisable( GL_DEPTH_TEST );
   glDisable( GL_LIGHTING   );
   glDisable( GL_TEXTURE_2D );
 }
 
 void vtkMitkRectangleProp::Disable2DOpenGL()
 {
-  glPopAttrib();  
-  glMatrixMode( GL_PROJECTION );  
-  glPopMatrix();  
-  glMatrixMode( GL_MODELVIEW );  
-  glPopMatrix(); 
+  glPopAttrib();
+  glMatrixMode( GL_PROJECTION );
+  glPopMatrix();
+  glMatrixMode( GL_MODELVIEW );
+  glPopMatrix();
 }
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -81,8 +81,8 @@ bool CompareImageMetaData( mitk::Image::Pointer image, mitk::Image::Pointer refe
 
 /**
 *  test for "ImageWriter".
-*  
-*  argc and argv are the command line parameters which were passed to 
+*
+*  argc and argv are the command line parameters which were passed to
 *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
 *  tests, argv is either empty for the simple tests or contains the filename
 *  of a test image for the image tests (see CMakeLists.txt).
@@ -92,19 +92,19 @@ int mitkImageWriterTest(int  argc , char* argv[])
   // always start with this!
   MITK_TEST_BEGIN("ImageWriter")
 
-    // let's create an object of our class  
+    // let's create an object of our class
     mitk::ImageWriter::Pointer myImageWriter = mitk::ImageWriter::New();
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myImageWriter.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(myImageWriter.IsNotNull(),"Testing instantiation")
 
     // write your own tests here and use the macros from mitkTestingMacros.h !!!
     // do not write to std::cout and do not return from this function yourself!
 
     // load image
-    
+
   MITK_TEST_CONDITION_REQUIRED(argc != 0, "File to load has been specified");
 
 
@@ -117,7 +117,7 @@ int mitkImageWriterTest(int  argc , char* argv[])
     factory->SetFileName( argv[1] );
     factory->Update();
     MITK_TEST_CONDITION_REQUIRED(factory->GetNumberOfOutputs() > 0, "file loaded");
-    
+
     mitk::DataNode::Pointer node = factory->GetOutput( 0 );
     image = dynamic_cast<mitk::Image*>(node->GetData());
     if(image.IsNull())
@@ -125,7 +125,7 @@ int mitkImageWriterTest(int  argc , char* argv[])
       std::cout<<"file "<< argv[1]<< "is not an image - test will not be applied."<<std::endl;
       std::cout<<"[TEST DONE]"<<std::endl;
       return EXIT_SUCCESS;
-    }  
+    }
   }
   catch (itk::ExceptionObject & ex)
   {
@@ -144,7 +144,7 @@ int mitkImageWriterTest(int  argc , char* argv[])
 #endif
 
 
-  
+
 
   std::string filename = filename_stream.str();
 
@@ -241,11 +241,11 @@ int mitkImageWriterTest(int  argc , char* argv[])
     MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
     myImageWriter->SetInput(image);
     myImageWriter->SetFileName("/usr/bin");
-    myImageWriter->Update(); 
+    myImageWriter->Update();
     MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
   }
   catch(...) {
-    //this means that a wrong exception (i.e. no itk:Exception) has been thrown 
+    //this means that a wrong exception (i.e. no itk:Exception) has been thrown
     MITK_TEST_FAILED_MSG(<< "Wrong exception (i.e. no itk:Exception) caught during write");
   }
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ namespace mitk {
   //##
   //## Classes that inherit this interface can be used as predicates in the GetSubset() method
   //## of mitk::DataStorage. By combining different predicate objects, the user can form complex
-  //## queries like "give me all nodes that either contain a surface object or a binary segmentation 
+  //## queries like "give me all nodes that either contain a surface object or a binary segmentation
   //## and that are tagged as Organtype == 'Liver'".
   //## @warning NodePredicates are now derived from itk::Object and make thus use of the smart pointer concept.
   //##          As a result predicates should only store raw pointers because for one thing they are not owners

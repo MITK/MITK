@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Poco/Path.h"
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
-    
+
 bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage )
 {
   assert(storage);
@@ -38,7 +38,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     ++listSize;
   }
 
-  ProgressBar::GetInstance()->AddStepsToDo( listSize ); 
+  ProgressBar::GetInstance()->AddStepsToDo( listSize );
 
   // iterate all nodes
   // first level nodes should be <node> elements
@@ -98,7 +98,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     }
 
 
-    //   5. if there are <properties> nodes, 
+    //   5. if there are <properties> nodes,
     //        - instantiate the appropriate PropertyListDeSerializer
     //        - use them to construct PropertyList objects
     //        - add these properties to the node (if necessary, use renderwindow name)
@@ -112,7 +112,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     ProgressBar::GetInstance()->Progress();
 
   } // end for all <node>
-    
+
   // remove all unknown parent UIDs
   for (NodesAndParentsMapType::iterator nodesIter = m_Nodes.begin();
        nodesIter != m_Nodes.end();
@@ -157,7 +157,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
           break;
         }
       }
-      
+
       if (addNow)
       {
         DataStorage::SetOfObjects::Pointer parents = DataStorage::SetOfObjects::New();
@@ -167,7 +167,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
         {
           parents->push_back( m_NodeForID[ *parentsIter ] );
         }
-   
+
         // if all parents are found in datastorage (or are unknown), add node to DataStorage
         storage->Add( nodesIter->first, parents );
 
@@ -197,14 +197,14 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlEleme
 {
   DataNode::Pointer node;
 
-  if (dataElement) 
+  if (dataElement)
   {
     const char* filename( dataElement->Attribute("file") );
     if ( filename )
     {
       DataNodeFactory::Pointer factory = DataNodeFactory::New();
       factory->SetFileName( workingDirectory + Poco::Path::separator() + filename );
-      
+
       try
       {
         factory->Update();
@@ -243,7 +243,7 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
   {
     const char* propertiesfilea( properties->Attribute("file") );
     std::string propertiesfile( propertiesfilea ? propertiesfilea : "" );
-    
+
     const char* renderwindowa( properties->Attribute("renderwindow") );
     std::string renderwindow( renderwindowa ? renderwindowa : "" );
 
@@ -251,12 +251,12 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
     if (renderer || renderwindow.empty())
     {
       PropertyList::Pointer propertyList = node->GetPropertyList(renderer); // DataNode implementation always returns a propertylist
-      // clear all properties from node that might be set by DataNodeFactory during loading 
+      // clear all properties from node that might be set by DataNodeFactory during loading
       propertyList->Clear();
 
       // use deserializer to construct new properties
       PropertyListDeserializer::Pointer deserializer = PropertyListDeserializer::New();
-      
+
       deserializer->SetFilename(workingDirectory + Poco::Path::separator() + propertiesfile);
       bool success = deserializer->Deserialize();
       error |= !success;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -84,24 +84,24 @@ void mitk::ExtractImageFilter::GenerateData()
   switch ( m_SliceDimension )
   {
     default:
-    case 2: 
+    case 2:
       orientation = PlaneGeometry::Axial;
       break;
-    case 1: 
+    case 1:
       orientation = PlaneGeometry::Frontal;
       break;
-    case 0: 
+    case 0:
       orientation = PlaneGeometry::Sagittal;
       break;
    }
- 
+
   PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
   planeGeometry->InitializeStandardPlane( inputImageGeometry, orientation, (ScalarType)m_SliceIndex, true, false );
   Image::Pointer resultImage = ImageToImageFilter::GetOutput();
   planeGeometry->ChangeImageGeometryConsideringOriginOffset(true);
   resultImage->SetGeometry( planeGeometry );
 }
-    
+
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage )
 {
@@ -110,14 +110,14 @@ void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimen
   typedef itk::Image< TPixel, VImageDimension-1 > ImageType2D;
 
   typename ImageType3D::RegionType inSliceRegion = itkImage->GetLargestPossibleRegion();
-  
+
   inSliceRegion.SetSize( m_SliceDimension, 0 );
 
   typedef itk::ExtractImageFilter<ImageType3D, ImageType2D> ExtractImageFilterType;
 
   typename ExtractImageFilterType::Pointer sliceExtractor = ExtractImageFilterType::New();
   sliceExtractor->SetInput( itkImage );
-    
+
   inSliceRegion.SetIndex( m_SliceDimension, m_SliceIndex );
 
   sliceExtractor->SetExtractionRegion( inSliceRegion );
@@ -145,7 +145,7 @@ void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimen
  * function should never request an input region that is outside the the
  * input largest possible region (i.e. implementations of this method should
  * crop the input requested region at the boundaries of the input largest
- * possible region). 
+ * possible region).
  */
 void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
 {
@@ -210,17 +210,17 @@ void mitk::ExtractImageFilter::GenerateOutputInformation()
   switch ( sliceDimension )
   {
     default:
-    case 2: 
+    case 2:
       // orientation = PlaneGeometry::Axial;
       tmpDimensions[0] = input->GetDimension(0);
       tmpDimensions[1] = input->GetDimension(1);
       break;
-    case 1: 
+    case 1:
       // orientation = PlaneGeometry::Frontal;
       tmpDimensions[0] = input->GetDimension(0);
       tmpDimensions[1] = input->GetDimension(2);
       break;
-    case 0: 
+    case 0:
       // orientation = PlaneGeometry::Sagittal;
       tmpDimensions[0] = input->GetDimension(1);
       tmpDimensions[1] = input->GetDimension(2);

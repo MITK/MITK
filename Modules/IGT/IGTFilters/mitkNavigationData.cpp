@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationData.h"
 
 
-mitk::NavigationData::NavigationData() : itk::DataObject(), 
+mitk::NavigationData::NavigationData() : itk::DataObject(),
 m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
 m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_TimeStamp(0.0),
 m_Name()
@@ -114,7 +114,7 @@ void mitk::NavigationData::CopyInformation( const DataObject* data )
 void mitk::NavigationData::SetPositionAccuracy(mitk::ScalarType error)
 {
   for ( int i = 0; i < 3; i++ )
-    for ( int j = 0; j < 3; j++ ) 
+    for ( int j = 0; j < 3; j++ )
     {
       m_CovErrorMatrix[ i ][ j ] = 0;
       // assume independence of position and orientation

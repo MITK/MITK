@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,7 +57,7 @@ void mitk::NavigationDataRecorder::GenerateData()
 void mitk::NavigationDataRecorder::AddNavigationData( const NavigationData* nd )
 {
   // Process object is not const-correct so the const_cast is required here
-  this->SetNthInput(m_NumberOfInputs, 
+  this->SetNthInput(m_NumberOfInputs,
     const_cast< mitk::NavigationData * >( nd ) );
 
   m_NumberOfInputs++;
@@ -83,7 +83,7 @@ void mitk::NavigationDataRecorder::Update()
     mitk::NavigationData::TimeStampType sysTimestamp = 0.0; // timestamp for system time
     sysTimestamp = m_SystemTimeClock->GetCurrentStamp();
 
-    // cast system time double value to stringstream to avoid low precision rounding 
+    // cast system time double value to stringstream to avoid low precision rounding
     std::ostringstream strs;
     strs.precision(15); // rounding precision for system time double value
     strs << sysTimestamp;
@@ -92,7 +92,7 @@ void mitk::NavigationDataRecorder::Update()
     //if csv-mode: write csv header and timestamp at beginning
     if (m_OutputFormat == mitk::NavigationDataRecorder::csv)
       {
-      //write header only when it's the first line 
+      //write header only when it's the first line
       if (m_firstLine)
         {
         m_firstLine = false;
@@ -108,9 +108,9 @@ void mitk::NavigationDataRecorder::Update()
         *m_Stream << "\n";
         }
       //write timestamp (always)
-      *m_Stream << timestamp;  
+      *m_Stream << timestamp;
       }
-    
+
     //write tool data for every tool
     for (unsigned int index = 0; index < inputs.size(); index++)
     {
@@ -121,8 +121,8 @@ void mitk::NavigationDataRecorder::Update()
       mitk::NavigationData::OrientationType orientation(0.0, 0.0, 0.0, 0.0);
       mitk::NavigationData::CovarianceMatrixType matrix;
 
-      bool hasPosition = true;    
-      bool hasOrientation = true; 
+      bool hasPosition = true;
+      bool hasOrientation = true;
       bool dataValid = false;
 
       position.Fill(0.0);
@@ -131,7 +131,7 @@ void mitk::NavigationDataRecorder::Update()
       position = nd->GetPosition();
       orientation = nd->GetOrientation();
       matrix = nd->GetCovErrorMatrix();
-      
+
       hasPosition = nd->GetHasPosition();
       hasOrientation = nd->GetHasOrientation();
       dataValid = nd->IsDataValid();
@@ -141,7 +141,7 @@ void mitk::NavigationDataRecorder::Update()
 
       //a timestamp is never < 0! this case happens only if you are using the timestamp of the nd object instead of getting a new one
       if (timestamp >= 0)
-      { 
+      {
         if (this->m_OutputFormat == mitk::NavigationDataRecorder::xml)
           {
           TiXmlElement* elem = new TiXmlElement("NavigationData");
@@ -204,7 +204,7 @@ void mitk::NavigationDataRecorder::Update()
           }
       }
     }
-    if (this->m_OutputFormat == mitk::NavigationDataRecorder::csv) 
+    if (this->m_OutputFormat == mitk::NavigationDataRecorder::csv)
     {
       *m_Stream << "\n";
     }
@@ -243,15 +243,15 @@ void mitk::NavigationDataRecorder::StartRecording()
   if(!m_Recording)
   {
     if (m_Stream == NULL)
-    { 
+    {
       std::stringstream ss;
       std::ostream* stream;
-      
+
       //An existing extension will be cut and replaced with .xml
       std::string tmpPath = itksys::SystemTools::GetFilenamePath(m_FileName);
       m_FileName = itksys::SystemTools::GetFilenameWithoutExtension(m_FileName);
       std::string extension = ".xml";
-      if (m_OutputFormat == mitk::NavigationDataRecorder::csv) 
+      if (m_OutputFormat == mitk::NavigationDataRecorder::csv)
         extension = ".csv";
 
       ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << extension;
@@ -285,12 +285,12 @@ void mitk::NavigationDataRecorder::StartRecording()
             stream = new std::ofstream(ss.str().c_str());
           }
           break;
-        
+
         case ZipFile:
           stream = &std::cout;
           MITK_WARN << "Sorry no ZipFile support yet";
           break;
-        
+
         default:
           stream = &std::cout;
           break;
@@ -301,12 +301,12 @@ void mitk::NavigationDataRecorder::StartRecording()
       m_RecordCounter = 0;
       StartRecording(stream);
     }
-  } 
+  }
 else if (m_Recording)
   {
   MITK_WARN << "Already recording please stop before start new recording session";
   return;
-  } 
+  }
 }
 
 void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
@@ -323,7 +323,7 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
   //TODO store date and GMT time
   //cheking if the stream is good
   if (m_Stream->good())
-  { 
+  {
     if (m_OutputFormat == mitk::NavigationDataRecorder::xml)
       {
       *m_Stream << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << std::endl;
@@ -332,8 +332,8 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
       *m_Stream << "    " << "<Data ToolCount=\"" << (m_NumberOfInputs) << "\" version=\"1.0\">" << std::endl;
       }
     m_Recording = true;
-  } 
-  else 
+  }
+  else
   {
    m_Recording = false;
    mitkThrowException(mitk::IGTException)<<"The stream is not good";
@@ -344,11 +344,11 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
 void mitk::NavigationDataRecorder::StopRecording()
 {
   if (!m_Recording)
-  { 
+  {
     std::cout << "You have to start a recording first" << std::endl;
     return;
   }
- 
+
   if ((m_Stream) && (m_OutputFormat == mitk::NavigationDataRecorder::xml))
   {
     *m_Stream << "</Data>" << std::endl;
@@ -362,5 +362,5 @@ void mitk::NavigationDataRecorder::StopRecording()
     m_StreamMustBeDeleted = false;
     delete m_Stream;
     }
-  m_Stream = NULL;   
+  m_Stream = NULL;
 }

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -92,7 +92,7 @@ namespace mitk
     /**
     * \brief TestConnection() tries to connect to a NDI tracking device on the current port/device and returns which device it has found
     *
-    * TestConnection() tries to connect to a NDI tracking device on the current port/device. 
+    * TestConnection() tries to connect to a NDI tracking device on the current port/device.
     * \return It returns the type of the device that
     * answers at the port/device or mitk::TrackingSystemNotSpecified if no NDI tracking device is available at that port
     */
@@ -197,12 +197,12 @@ namespace mitk
 
 
     /**
-    * \brief Get number of supported tracking volumes, a vector containing the supported volumes and 
-    * a vector containing the signed dimensions in mm. For each volume 10 boundaries are stored in the order of 
+    * \brief Get number of supported tracking volumes, a vector containing the supported volumes and
+    * a vector containing the signed dimensions in mm. For each volume 10 boundaries are stored in the order of
     * the supported volumes (see AURORA API GUIDE: SFLIST p.54).
     **/
     virtual bool GetSupportedVolumes(unsigned int* numberOfVolumes, NDITrackingVolumeContainerType* volumes, TrackingVolumeDimensionType* volumesDimensions);
-    
+
     /**
     * \brief Sets the desired tracking volume. Returns true if the volume type could be set. Usage: ndiTracker->SetVolume(mitk::Dome);
     **/
@@ -220,13 +220,13 @@ namespace mitk
     /* Methods for NDIProtocol friend class */
     virtual void InvalidateAll();             ///< invalidate all tools
     NDIPassiveTool* GetInternalTool(std::string portHandle); ///< returns the tool object that has been assigned the port handle or NULL if no tool can be found
-    
+
     /**
     * \brief free all port handles that need to be freed
     *
     * This method retrieves a list of all port handles that need to be freed (e.g. tool got disconnected)
     * and frees the handles at the tracking device and it removes the tools from the internal tool list
-    * \warning This method can remove TrackingTools from the tool list! After calling this method, GetTool(i) could return 
+    * \warning This method can remove TrackingTools from the tool list! After calling this method, GetTool(i) could return
     *          a different tool, because tool indices could have changed.
     * \return returns NDIOKAY if everything was sucessfull, returns an error code otherwise
     */
@@ -277,7 +277,7 @@ public://TODO
   protected:
     NDITrackingDevice();          ///< Constructor
     virtual ~NDITrackingDevice(); ///< Destructor
-   
+
     std::string m_DeviceName;///< Device Name
     PortNumber m_PortNumber; ///< COM Port Number
     BaudRate m_BaudRate;     ///< COM Port Baud Rate

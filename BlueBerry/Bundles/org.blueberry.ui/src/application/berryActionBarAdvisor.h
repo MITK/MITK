@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,15 +41,15 @@ namespace berry
  * to configure a window's action bars</li>
  * </ul>
  * </p>
- * 
+ *
  * @see WorkbenchWindowAdvisor#createActionBarAdvisor(IActionBarConfigurer)
- * 
+ *
  * @since 3.1
  */
 class BERRY_UI ActionBarAdvisor : public Object {
-  
+
 public:
-  
+
   berryObjectMacro(ActionBarAdvisor);
 
     /**
@@ -80,22 +80,22 @@ public:
      */
     public: static const int FILL_STATUS_LINE;
 
-    
+
     private: IActionBarConfigurer::Pointer actionBarConfigurer;
-    
+
     //private: Map actions = new HashMap();
-    
+
     /**
      * Creates a new action bar advisor to configure a workbench
      * window's action bars via the given action bar configurer.
-     * 
+     *
      * @param configurer the action bar configurer
      */
     public: ActionBarAdvisor(IActionBarConfigurer::Pointer configurer);
-    
+
     /**
      * Returns the action bar configurer.
-     * 
+     *
      * @return the action bar configurer
      */
     protected: virtual IActionBarConfigurer::Pointer GetActionBarConfigurer();
@@ -125,15 +125,15 @@ public:
      * This method is called just after {@link WorkbenchWindowAdvisor#preWindowOpen()}.
      * Clients must not call this method directly (although super calls are okay).
      * The default implementation calls <code>makeActions</code> if
-     * <code>FILL_PROXY</code> is specified, then calls <code>fillMenuBar</code>, 
+     * <code>FILL_PROXY</code> is specified, then calls <code>fillMenuBar</code>,
      * <code>fillCoolBar</code>, and <code>fillStatusLine</code>
      * if the corresponding flags are specified.
      * </p>
-     * <p> 
+     * <p>
      * Subclasses may override, but it is recommended that they override the
      * methods mentioned above instead.
      * </p>
-     * 
+     *
      * @param flags bit mask composed from the constants
      * {@link #FILL_MENU_BAR FILL_MENU_BAR},
      * {@link #FILL_COOL_BAR FILL_COOL_BAR},
@@ -141,29 +141,29 @@ public:
      * and {@link #FILL_PROXY FILL_PROXY}
      */
     public: virtual void FillActionBars(int flags);
-        
+
     /**
      * Instantiates the actions used in the fill methods.
      * Use {@link #register(IAction)} to register the action with the key binding service
      * and add it to the list of actions to be disposed when the window is closed.
-     * 
+     *
      * @param window the window containing the action bars
      */
     protected: virtual void MakeActions(IWorkbenchWindow::Pointer window);
 
     /**
-     * Registers the given action with the key binding service 
+     * Registers the given action with the key binding service
      * (by calling {@link IActionBarConfigurer#registerGlobalAction(IAction)}),
      * and adds it to the list of actions to be disposed when the window is closed.
      * <p>
      * In order to participate in key bindings, the action must have an action
      * definition id (aka command id), and a corresponding command extension.
      * See the <code>org.blueberry.ui.commands</code> extension point documentation
-     * for more details. 
+     * for more details.
      * </p>
-     * 
+     *
      * @param action the action to register, this cannot be <code>null</code>
-     * 
+     *
      * @see IAction#setActionDefinitionId(String)
      * @see #disposeAction(IAction)
      */
@@ -174,10 +174,10 @@ public:
 //        getActionBarConfigurer().registerGlobalAction(action);
 //        actions.put(id, action);
 //    }
-    
+
     /**
      * Returns the action with the given id, or <code>null</code> if not found.
-     * 
+     *
      * @param id the action id
      * @return the action with the given id, or <code>null</code> if not found
      * @see IAction#getId()
@@ -185,46 +185,46 @@ public:
 //    protected: virtual IAction GetAction(const std::string& id) {
 //        return (IAction) actions.get(id);
 //    }
-    
+
     /**
      * Fills the menu bar with the main menus for the window.
      * <p>
      * The default implementation does nothing.
      * Subclasses may override.
      * </p>
-     * 
+     *
      * @param menuBar the menu manager for the menu bar
      */
     protected: virtual void FillMenuBar(void* menuBar);
-    
+
     /**
      * Fills the cool bar with the main toolbars for the window.
      * <p>
      * The default implementation does nothing.
      * Subclasses may override.
      * </p>
-     * 
+     *
      * @param coolBar the cool bar manager
      */
 //    protected: virtual void FillCoolBar(ICoolBarManager coolBar) {
 //        // do nothing
 //    }
-    
+
     /**
-     * Fills the status line with the main status line contributions 
+     * Fills the status line with the main status line contributions
      * for the window.
      * <p>
      * The default implementation does nothing.
      * Subclasses may override.
      * </p>
-     * 
+     *
      * @param statusLine the status line manager
      */
 //    protected: virtual void FillStatusLine(IStatusLineManager statusLine) {
 //        // do nothing
-//    }    
+//    }
 
-  
+
   /**
    * Saves arbitrary application-specific state information
      * for this action bar advisor.
@@ -232,13 +232,13 @@ public:
      * The default implementation simply returns an OK status.
      * Subclasses may extend or override.
      * </p>
-   * 
+   *
    * @param memento the memento in which to save the advisor's state
    * @return a status object indicating whether the save was successful
    * @since 3.1
    */
   public: virtual bool SaveState(IMemento::Pointer memento);
-  
+
   /**
    * Restores arbitrary application-specific state information
      * for this action bar advisor.
@@ -246,7 +246,7 @@ public:
      * The default implementation simply returns an OK status.
      * Subclasses may extend or override.
      * </p>
-   * 
+   *
      * @param memento the memento from which to restore the advisor's state
    * @return a status object indicating whether the restore was successful
    * @since 3.1

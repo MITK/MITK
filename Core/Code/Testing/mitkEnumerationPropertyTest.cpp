@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,10 +39,10 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
     std::cout << "[PASSED]" << std::endl;
   }
 
-  
-  
-  
-  
+
+
+
+
   std::cout << "Testing mitk::EnumerationProperty::Size(): " ;
   if ( enumerationProperty->Size() != 3 )
   {
@@ -65,10 +65,10 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
     std::cout << "[PASSED]" << std::endl;
   }
 
-  
-  
-  
-  
+
+
+
+
   std::cout << "Testing mitk::EnumerationProperty::SetValue(id): ";
   if ( ! enumerationProperty->SetValue( 2 ) )
   {
@@ -87,10 +87,10 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   }
   std::cout << "[PASSED]" << std::endl;
 
-  
-  
-  
-  
+
+
+
+
   std::cout << "Testing mitk::EnumerationProperty::SetValue(name): ";
   if ( ! enumerationProperty->SetValue( "third" ) )
   {
@@ -109,10 +109,10 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   }
   std::cout << "[PASSED]" << std::endl;
 
-  
-  
-  
-  
+
+
+
+
   std::cout << "Testing mitk::EnumerationProperty::SetValue(invalid id): ";
   if ( enumerationProperty->SetValue( 100 ) )
   {
@@ -130,10 +130,10 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   std::cout << "[PASSED]" << std::endl;
 
 
-  
-  
-  
-  
+
+
+
+
   std::cout << "Testing mitk::VtkInterpolationType::SetInterpolationToPhong(): ";
   mitk::VtkInterpolationProperty::Pointer vtkInterpolationProperty(mitk::VtkInterpolationProperty::New());;
   vtkInterpolationProperty->SetInterpolationToPhong();
@@ -154,10 +154,10 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   }
   std::cout << "[PASSED]" << std::endl;
 
-  
-  
-  
-  
+
+
+
+
   std::cout << "Testing mitk::VtkRepresentationType::SetRepresentationToWireframe(): ";
   mitk::VtkRepresentationProperty::Pointer vtkRepresentationProperty(mitk::VtkRepresentationProperty::New());
   vtkRepresentationProperty->SetRepresentationToWireframe();

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,18 +45,18 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, Qt
   m_Bottom = false;
   m_CtrlPressed = false;
   m_MouseDown = false;
-  
+
   m_Font.setPointSize( 6 );
-  
+
   m_MoveHeight = height() - 25;
   m_ScaleVisible = true;
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this); //, true);
 
   //setBackgroundMode( Qt::NoBackground );
-  
+
   this->hide();
   update();
- 
+
 }
 
 QmitkSliderLevelWindowWidget::~QmitkSliderLevelWindowWidget()
@@ -259,7 +259,7 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 /**
 *
 */
-void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) 
+void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
 {
   if(!mouseEvent)
     return;
@@ -267,7 +267,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
     return;
   if (!m_MouseDown)
   {
-    if ( mouseEvent->pos().y() >= 0 
+    if ( mouseEvent->pos().y() >= 0
       && mouseEvent->pos().y() <= (m_Rect.topLeft().y() + 3) )
     {
       setCursor(Qt::SizeVerCursor);
@@ -295,7 +295,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
 
     float fact = (float) m_MoveHeight / m_LevelWindow.GetRange();
 
-    if ( m_Leftbutton ) 
+    if ( m_Leftbutton )
     {
       if (m_Resize && !m_CtrlPressed)
       {
@@ -314,7 +314,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
           value = 0;
 
         m_LevelWindow.SetLevelWindow( m_LevelWindow.GetLevel(), value );
-      } 
+      }
       else if(m_Resize && m_CtrlPressed)
       {
         if (!m_Bottom)
@@ -325,7 +325,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
 
           if (diff == 0) return;
           float value;
-          
+
           value = m_LevelWindow.GetWindow() - ( ( diff ) );
 
           if ( value < 0 )
@@ -336,7 +336,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
           oldWindow = m_LevelWindow.GetWindow();
           oldLevel = m_LevelWindow.GetLevel();
           newLevel = oldLevel + (value - oldWindow)/2;
-          if (!((newLevel + value/2) > m_LevelWindow.GetRangeMax())) 
+          if (!((newLevel + value/2) > m_LevelWindow.GetRangeMax()))
             m_LevelWindow.SetLevelWindow( newLevel, value );
         }
         else
@@ -347,7 +347,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
 
           if (diff == 0) return;
           float value;
-          
+
           value = m_LevelWindow.GetWindow() + ( ( diff ) );
 
           if ( value < 0 )
@@ -358,7 +358,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
           oldWindow = m_LevelWindow.GetWindow();
           oldLevel = m_LevelWindow.GetLevel();
           newLevel = oldLevel - (value - oldWindow)/2;
-          if (!((newLevel - value/2) < m_LevelWindow.GetRangeMin())) 
+          if (!((newLevel - value/2) < m_LevelWindow.GetRangeMin()))
             m_LevelWindow.SetLevelWindow( newLevel, value );
         }
       }
@@ -439,7 +439,7 @@ void QmitkSliderLevelWindowWidget::resizeEvent ( QResizeEvent * event ) {
 /**
 *
 */
-void QmitkSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* ) 
+void QmitkSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* )
 {
   if ( m_LevelWindow.IsFixed() )
     return;
@@ -481,12 +481,12 @@ void QmitkSliderLevelWindowWidget::update() {
     m_Rect.setRect( 2, (int) (m_MoveHeight - (m_LevelWindow.GetUpperWindowBound() - m_LevelWindow.GetRangeMin()) * fact) , rectWidth, (int) rectHeight );
   else
     m_Rect.setRect( 2, (int) (m_MoveHeight - (m_LevelWindow.GetUpperWindowBound() - m_LevelWindow.GetRangeMin()) * fact), rectWidth, (int) rectHeight );
-  
+
   QWidget::repaint();
 }
 
 void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
-{ 
+{
   m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
   QMenu *contextMenu = new QMenu( this );
   Q_CHECK_PTR( contextMenu );

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,22 +30,22 @@ class mitkNavigationToolStorageTestClass
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
     MITK_TEST_CONDITION_REQUIRED(myStorage.IsNotNull(),"Testing instantiation with constructor 1.")
 
-    mitk::DataStorage::Pointer myDataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());    
+    mitk::DataStorage::Pointer myDataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
     mitk::NavigationToolStorage::Pointer myStorage2 = mitk::NavigationToolStorage::New(myDataStorage);
     MITK_TEST_CONDITION_REQUIRED(myStorage2.IsNotNull(),"Testing instantiation with constructor 2.")
-    
+
     }
-  
+
     static void TestAddAndDelete()
     {
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-    
+
     //first tool
     mitk::NavigationTool::Pointer myTool1 = mitk::NavigationTool::New();
     myTool1->SetIdentifier("001");
     MITK_TEST_CONDITION_REQUIRED(myStorage->AddTool(myTool1),"Testing: Add 1st tool.");
     MITK_TEST_CONDITION_REQUIRED(myStorage->GetToolCount()==1,"Testing: Is first tool in storage?");
-    
+
     //second tool
     mitk::NavigationTool::Pointer myTool2 = mitk::NavigationTool::New();
     myTool2->SetIdentifier("002");
@@ -62,7 +62,7 @@ class mitkNavigationToolStorageTestClass
     myStorage->DeleteTool(1);
     MITK_TEST_CONDITION_REQUIRED(myStorage->GetToolCount()==1,"Testing: Delete 2nd tool.");
 
-    //delete first tool 
+    //delete first tool
     myStorage->DeleteTool(0);
     MITK_TEST_CONDITION_REQUIRED(myStorage->GetToolCount()==0,"Testing: Delete 1st tool.");
 
@@ -104,7 +104,7 @@ class mitkNavigationToolStorageTestClass
     MITK_TEST_CONDITION_REQUIRED(!myStorage->isEmpty(),"Testing: method isEmpty() with non empty storage.");
     MITK_TEST_CONDITION_REQUIRED(myStorage->DeleteAllTools(),"Testing: Delete method.");
     MITK_TEST_CONDITION_REQUIRED(myStorage->isEmpty(),"Testing: method isEmpty() with empty storage.");
-     
+
     MITK_TEST_CONDITION_REQUIRED(myStorage->GetToolCount()==0,"Testing: Delete 100 tools at once.");
     }
 
@@ -112,7 +112,7 @@ class mitkNavigationToolStorageTestClass
     {
     //let's create an object of our class
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-    
+
     //let's add two different tools
     //first tool
     mitk::NavigationTool::Pointer myTool1 = mitk::NavigationTool::New();
@@ -122,13 +122,13 @@ class mitkNavigationToolStorageTestClass
     toolNode->SetName("Tool1");
     myTool1->SetDataNode(toolNode);
     myStorage->AddTool(myTool1);
-        
+
     //second tool
     mitk::NavigationTool::Pointer myTool2 = mitk::NavigationTool::New();
     myTool2->SetSerialNumber("0816");
     myTool2->SetIdentifier("002");
     myStorage->AddTool(myTool2);
-    
+
     //let's try to get the first tool in different ways.
     mitk::NavigationTool::Pointer myToolGet = myStorage->GetTool(0);
     MITK_TEST_CONDITION_REQUIRED(myToolGet==myTool1,"Testing GetTool() by number.");
@@ -144,9 +144,9 @@ class mitkNavigationToolStorageTestClass
 
     static void TestStorageHandling()
     {
-    mitk::DataStorage::Pointer myDataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());   
+    mitk::DataStorage::Pointer myDataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New(myDataStorage);
-    
+
     //define first tool
     mitk::NavigationTool::Pointer myTool1 = mitk::NavigationTool::New();
     myTool1->SetIdentifier("001");
@@ -173,7 +173,7 @@ class mitkNavigationToolStorageTestClass
     MITK_TEST_CONDITION_REQUIRED(myStorage->DeleteTool(0),"Deleting tool 1.");
     MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==NULL,"Testing: Was data node 1 deleted?");
     MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool2")==node2,"Testing: Is data node 2 still in data storage?");
-       
+
     }
   };
 

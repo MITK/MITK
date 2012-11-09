@@ -34,29 +34,29 @@ See LICENSE.txt or http://www.mitk.org for details.
   \ingroup ${plugin_target}_internal
 */
 class UltrasoundSupport : public QmitkAbstractView
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
-  
-  public:  
-    
+
+  public:
+
     virtual void SetFocus();
 
     static const std::string VIEW_ID;
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-   signals: 
+   signals:
 
   public slots:
     /*
     * \brief This is called when the newDeviceWidget is closed
     */
     void OnNewDeviceWidgetDone();
-     
+
   protected slots:
-  
+
     void OnClickedAddNewDevice();
 
     void OnClickedViewDevice();

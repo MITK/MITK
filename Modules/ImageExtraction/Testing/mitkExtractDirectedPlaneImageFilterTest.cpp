@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -69,7 +69,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //
 //    vtkSmartPointer<vtkImageMapper3D> imageMapper = vtkSmartPointer<vtkImageMapper3D>::New();
 //    imageMapper->SetInput(colorImage);
-//    
+//
 //
 //    vtkSmartPointer<vtkActor> imageActor = vtkSmartPointer<vtkActor>::New();
 //    imageActor->SetMapper(imageMapper);
@@ -215,7 +215,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //
 //  static mitk::Geometry2D::Pointer TestSagital()
 //  {
-//    
+//
 //    return NULL;
 //  }
 //
@@ -264,8 +264,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //
 //**
 // *  Tests for the class "mitkExtractDirectedPlaneImageFilter".
-// *  
-// *  argc and argv are the command line parameters which were passed to 
+// *
+// *  argc and argv are the command line parameters which were passed to
 // *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
 // *  tests, argv is either empty for the simple tests or contains the filename
 // *  of a test image for the image tests (see CMakeLists.txt).
@@ -277,7 +277,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //
 //
 //    mitk::ExtractDirectedPlaneImageFilter::Pointer extractor = mitk::ExtractDirectedPlaneImageFilter::New();
-//  MITK_TEST_CONDITION_REQUIRED(extractor.IsNotNull(),"Testing instantiation") 
+//  MITK_TEST_CONDITION_REQUIRED(extractor.IsNotNull(),"Testing instantiation")
 //
 //
 //    std::vector<ExtractionTesting::Testcase> allTests = ExtractionTesting::InitializeTestCases();
@@ -288,7 +288,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //
 //    ExtractionTesting::DoTesting(testCase);
 //
-//    MITK_TEST_CONDITION(testCase.success, "Testcase #'" << testCase.number << " " << testCase.name); 
+//    MITK_TEST_CONDITION(testCase.success, "Testcase #'" << testCase.number << " " << testCase.name);
 //  }
 //
 //  // always end with this!

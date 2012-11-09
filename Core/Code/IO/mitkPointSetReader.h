@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,10 +30,10 @@ namespace mitk
 /**
  * @brief reads xml representations of mitk::PointSets from a file
  *
- * Reader for xml files containing one or multiple xml represenations of 
+ * Reader for xml files containing one or multiple xml represenations of
  * mitk::PointSets. If multiple mitk::PointSets are stored in one file,
  * these are assigned to multiple outputs of the filter. The number of point
- * sets which have be read can be retrieven by a call to GetNumberOfOutputs() 
+ * sets which have be read can be retrieven by a call to GetNumberOfOutputs()
  * after the pipeline update().
  * The reader is able to read the old 3D Pointsets without the "specification" and "timeseries" tags and the new 4D Pointsets.
  * @note loading point sets from multiple files according to a given file pattern
@@ -80,14 +80,14 @@ public:
      * @warning multiple load not (yet) supported
      */
     itkGetStringMacro( FilePattern );
-    
+
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
-    
+
     /**
      * @returns whether the last read attempt was successful or not.
      */
     bool GetSuccess() const;
-    
+
 protected:
 
     /**
@@ -99,26 +99,26 @@ protected:
      * Virtual destructor
      */
     virtual ~PointSetReader();
-    
+
     /**
      * Actually reads the point sets from the given file
      */
     virtual void GenerateData();
-    
-    virtual mitk::PointSet::Pointer ReadPoint(mitk::PointSet::Pointer newPointSet, 
+
+    virtual mitk::PointSet::Pointer ReadPoint(mitk::PointSet::Pointer newPointSet,
       TiXmlElement* currentTimeSeries, unsigned int currentTimeStep);
 
     /**
      * Does nothing in the current implementation
      */
     virtual void GenerateOutputInformation();
-    
+
     /**
      * Resizes the output-objects according to the given number.
      * @param num the new number of output objects.
      */
     virtual void ResizeOutputs( const unsigned int& num );
-    
+
     /**
      * Checks if the given file has appropriate
      * read access.
@@ -126,18 +126,18 @@ protected:
      *          or false otherwise.
      */
     virtual int CanReadFile (const char *name);
-    
-    
+
+
     std::string m_FileName;
-    
+
     std::string m_FilePrefix;
-    
-    std::string m_FilePattern;  
-    
+
+    std::string m_FilePattern;
+
     bool m_Success;
-    
+
 };
-    
+
 }
 
 

@@ -3,12 +3,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,7 +32,7 @@ mitk::ConnectomicsBetweennessHistogram::~ConnectomicsBetweennessHistogram()
 {
 }
 
-void mitk::ConnectomicsBetweennessHistogram::SetBetweennessCalculationMode( 
+void mitk::ConnectomicsBetweennessHistogram::SetBetweennessCalculationMode(
   const mitk::ConnectomicsBetweennessHistogram::BetweennessCalculationMode & mode )
 {
   m_Mode = mode;
@@ -68,19 +68,19 @@ void mitk::ConnectomicsBetweennessHistogram::ComputeFromConnectomicsNetwork( Con
   ConvertCentralityMapToHistogram();
 }
 
-void mitk::ConnectomicsBetweennessHistogram::CalculateUnweightedUndirectedBetweennessCentrality( 
+void mitk::ConnectomicsBetweennessHistogram::CalculateUnweightedUndirectedBetweennessCentrality(
   NetworkType* boostGraph, IteratorType vertex_iterator_begin, IteratorType vertex_iterator_end )
 {
-  boost::brandes_betweenness_centrality( 
+  boost::brandes_betweenness_centrality(
     *boostGraph,
-    boost::centrality_map( 
-    boost::make_iterator_property_map( m_CentralityMap.begin(), boost::get( &mitk::ConnectomicsNetwork::NetworkNode::id, *boostGraph ), double() ) 
-    ).vertex_index_map( boost::get( &mitk::ConnectomicsNetwork::NetworkNode::id, *boostGraph ) ) 
+    boost::centrality_map(
+    boost::make_iterator_property_map( m_CentralityMap.begin(), boost::get( &mitk::ConnectomicsNetwork::NetworkNode::id, *boostGraph ), double() )
+    ).vertex_index_map( boost::get( &mitk::ConnectomicsNetwork::NetworkNode::id, *boostGraph ) )
     );
 
 }
 
-void mitk::ConnectomicsBetweennessHistogram::CalculateWeightedUndirectedBetweennessCentrality( 
+void mitk::ConnectomicsBetweennessHistogram::CalculateWeightedUndirectedBetweennessCentrality(
   NetworkType* boostGraph, IteratorType vertex_iterator_begin, IteratorType vertex_iterator_end )
 {
   MBI_WARN << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_UNIMPLEMENTED_FEATURE;
@@ -108,7 +108,7 @@ void mitk::ConnectomicsBetweennessHistogram::ConvertCentralityMapToHistogram()
   int maximumInt( 0 );
   try
   {
-    maximumInt = Double2Int::convert( maximumFloat ); 
+    maximumInt = Double2Int::convert( maximumFloat );
   }
   catch ( boost::numeric::positive_overflow const& )
   {
@@ -120,7 +120,7 @@ void mitk::ConnectomicsBetweennessHistogram::ConvertCentralityMapToHistogram()
   for ( int index( 0 ); index < m_CentralityMap.size(); index++ )
   {
     int value( 0 );
-    value = Double2Int::convert( ( m_CentralityMap[index ] + 0.5 ) ); 
+    value = Double2Int::convert( ( m_CentralityMap[index ] + 0.5 ) );
     m_HistogramVector[ value ]++;
   }
 

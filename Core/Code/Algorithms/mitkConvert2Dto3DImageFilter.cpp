@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,7 +30,7 @@ mitk::Convert2Dto3DImageFilter::~Convert2Dto3DImageFilter()
 void mitk::Convert2Dto3DImageFilter::GenerateData()
 {
    mitk::Image::ConstPointer inputImage = this->GetInput();
-   mitk::Image::Pointer resultImage = this->GetOutput(); 
+   mitk::Image::Pointer resultImage = this->GetOutput();
 
   AccessFixedDimensionByItk_1(inputImage,ItkConvert2DTo3D, 2, resultImage);
 
@@ -43,7 +43,7 @@ void mitk::Convert2Dto3DImageFilter::ItkConvert2DTo3D( itk::Image<TPixel,VImageD
    typedef itk::Image<TPixel,3> itkImageType3D;
    typedef typename itkImageType3D::SizeType::SizeValueType sizeValType;
 
-   // Create a new ITK image   
+   // Create a new ITK image
    typename itkImageType3D::Pointer outputImage = itkImageType3D::New();
    typename itkImageType3D::RegionType myRegion;
    typename itkImageType3D::SizeType mySize;
@@ -77,8 +77,8 @@ void mitk::Convert2Dto3DImageFilter::ItkConvert2DTo3D( itk::Image<TPixel,VImageD
          index3D[0] = x;
          index3D[1] = y;
          index3D[2] = 0;
-         
-         outputImage->SetPixel(index3D, 
+
+         outputImage->SetPixel(index3D,
             itkImage->GetPixel(index2D));
       }
    }

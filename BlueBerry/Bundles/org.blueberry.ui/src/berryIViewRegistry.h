@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ namespace berry {
 
 /**
  * \ingroup org_blueberry_ui
- * 
+ *
  * The view registry maintains a list of views explicitly registered
  * against the view extension point.
  * <p>
@@ -55,7 +55,7 @@ struct BERRY_UI IViewRegistry
    * @return the descriptor or <code>null</code>
    */
   virtual IViewDescriptor::Pointer Find(const std::string& id) const = 0;
-  
+
   /**
    * Returns an array of view categories.
    *

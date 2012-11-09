@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,19 +38,19 @@ QmitkBooleanOperationsView::~QmitkBooleanOperationsView()
 void QmitkBooleanOperationsView::CreateQtPartControl(QWidget *parent)
 {
   mitk::DataStorage::Pointer dataStorage = GetDefaultDataStorage();
-  
+
   mitk::NodePredicateAnd::Pointer segmentationPredicate = mitk::NodePredicateAnd::New(
     mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)),
     mitk::NodePredicateNot::New(
       mitk::NodePredicateProperty::New("helper object")));
-  
+
   m_Parent = parent;
 
   m_Controls.setupUi(parent);
 
   m_Controls.cmbSegmentationImage1->SetDataStorage(dataStorage);
   m_Controls.cmbSegmentationImage1->SetPredicate(segmentationPredicate);
-  
+
   m_Controls.cmbSegmentationImage2->SetPredicate(segmentationPredicate);
   m_Controls.cmbSegmentationImage2->SetDataStorage(dataStorage);
 
@@ -100,7 +100,7 @@ mitk::Image::Pointer QmitkBooleanOperationsView::To3D(const mitk::Image::Pointer
 
     imageTimeSelector->SetInput(image);
     imageTimeSelector->SetTimeNr(static_cast<int>(GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime()->GetPos()));
-    
+
     imageTimeSelector->UpdateLargestPossibleRegion();
 
     return imageTimeSelector->GetOutput();

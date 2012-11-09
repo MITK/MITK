@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -258,11 +258,11 @@ public:
   /**
   * \brief Setter / Getter for internal DataStorage
   *
-  * Sets / returns the mitk::DataStorage that is used internally. This instance holds all mitk::DataNodes that are 
-  * rendered by the registered BaseRenderers. 
+  * Sets / returns the mitk::DataStorage that is used internally. This instance holds all mitk::DataNodes that are
+  * rendered by the registered BaseRenderers.
   *
   * If this DataStorage is changed at runtime by calling SetDataStorage(),
-  * all currently registered BaseRenderers are automatically given the correct instance. 
+  * all currently registered BaseRenderers are automatically given the correct instance.
   * When a new BaseRenderer is added, it is automatically initialized with the currently active DataStorage.
   */
   void SetDataStorage( mitk::DataStorage* storage );
@@ -270,17 +270,17 @@ public:
   /**
   * \brief Setter / Getter for internal DataStorage
   *
-  * Sets / returns the mitk::DataStorage that is used internally. This instance holds all mitk::DataNodes that are 
-  * rendered by the registered BaseRenderers. 
+  * Sets / returns the mitk::DataStorage that is used internally. This instance holds all mitk::DataNodes that are
+  * rendered by the registered BaseRenderers.
   *
   * If this DataStorage is changed at runtime by calling SetDataStorage(),
-  * all currently registered BaseRenderers are automatically given the correct instance. 
+  * all currently registered BaseRenderers are automatically given the correct instance.
   * When a new BaseRenderer is added, it is automatically initialized with the currently active DataStorage.
   */
   mitk::DataStorage* GetDataStorage();
 
 
-  /** 
+  /**
   * \brief Setter / Getter for internal GloabInteraction
   *
   * Sets / returns the instance of mitk::GlobalInteraction that is internally held.
@@ -289,7 +289,7 @@ public:
   */
   void SetGlobalInteraction( mitk::GlobalInteraction* globalInteraction );
 
-  /** 
+  /**
   * \brief Setter / Getter for internal GloabInteraction
   *
   * Sets / returns the instance of mitk::GlobalInteraction that is internally held.

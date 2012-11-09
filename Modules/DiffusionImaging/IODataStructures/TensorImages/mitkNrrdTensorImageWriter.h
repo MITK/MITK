@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,9 +38,9 @@ public:
     mitkWriterMacro;
 
     itkNewMacro( Self );
-    
+
     typedef mitk::TensorImage InputType;
-    
+
     /**
      * Sets the filename of the file to write.
      * @param FileName the name of the file to write.
@@ -87,7 +87,7 @@ public:
      * Returns false if an error happened during writing
      */
     itkGetMacro( Success, bool );
-   
+
     /**
     * @return possible file extensions for the data type associated with the writer
     */
@@ -97,32 +97,32 @@ public:
     virtual const char * GetDefaultFilename() { return "Tensors.dti"; }
     virtual const char * GetFileDialogPattern() { return "Tensor Images (*.dti *.hdti)"; }
     virtual const char * GetDefaultExtension() { return ".dti"; }
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::TensorImage*>(data.GetPointer()) != NULL); };  
-    virtual void DoWrite(BaseData::Pointer data) { 
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::TensorImage*>(data.GetPointer()) != NULL); };
+    virtual void DoWrite(BaseData::Pointer data) {
       if (CanWriteBaseDataType(data)) {
-        this->SetInput(dynamic_cast<mitk::TensorImage*>(data.GetPointer())); 
-        this->Update(); 
+        this->SetInput(dynamic_cast<mitk::TensorImage*>(data.GetPointer()));
+        this->Update();
       }
     };
 
 protected:
-        
+
     NrrdTensorImageWriter();
 
     virtual ~NrrdTensorImageWriter();
 
     virtual void GenerateData();
-    
+
     std::string m_FileName;
 
     std::string m_FilePrefix;
 
     std::string m_FilePattern;
-    
+
     bool m_Success;
-            
-};    
-       
+
+};
+
 
 } // end of namespace mitk
 

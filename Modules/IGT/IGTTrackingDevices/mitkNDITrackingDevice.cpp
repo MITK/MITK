@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,7 +32,7 @@ mitk::NDITrackingDevice::NDITrackingDevice() :
 TrackingDevice(),m_DeviceName(""), m_PortNumber(mitk::SerialCommunication::COM5), m_BaudRate(mitk::SerialCommunication::BaudRate9600),
 m_DataBits(mitk::SerialCommunication::DataBits8), m_Parity(mitk::SerialCommunication::None), m_StopBits(mitk::SerialCommunication::StopBits1),
 m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff), m_NDITrackingVolume(Standard),
-m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_ToolsMutex(NULL), 
+m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_ToolsMutex(NULL),
 m_SerialCommunication(NULL), m_SerialCommunicationMutex(NULL), m_DeviceProtocol(NULL),
 m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(NULL), m_MarkerPoints()
 {
@@ -277,8 +277,8 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveByte(char* answer)
 
   std::string m;
 
-  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex  
-  
+  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
+
   long returnvalue = m_SerialCommunication->Receive(m, 1);
 
   if ((returnvalue == 0) ||(m.size() != 1))
@@ -296,7 +296,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveLine(std::string* answer)
 
   std::string m;
 
-  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex  
+  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
 
   do
   {
@@ -356,7 +356,7 @@ const std::string mitk::NDITrackingDevice::CalcCRC(const std::string* input)
 
 bool mitk::NDITrackingDevice::OpenConnection()
 {
-  
+
   //this->m_ModeMutex->Lock();
   if (this->GetState() != Setup)
   {
@@ -503,7 +503,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   * POLARIS: initialize the tools that were added manually
   **/
   {
-    
+
     MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
     std::string portHandle;
     Tool6DContainerType::iterator endIt = m_6DTools.end();
@@ -515,7 +515,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
       {
         (*it)->SetPortHandle(portHandle.c_str());
         /* now write the SROM file of the tool to the tracking system using PVWR */
-		if (this->m_Data.Line == NDIPolaris)
+    if (this->m_Data.Line == NDIPolaris)
         {
           returnvalue = m_DeviceProtocol->PVWR(&portHandle, (*it)->GetSROMData(), (*it)->GetSROMDataLength());
           if (returnvalue != NDIOKAY)
@@ -541,7 +541,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
           }
         }
       }
-    }  
+    }
   } // end of toolsmutexlockholder scope
 
   /* check for wired tools and add them too */
@@ -675,7 +675,7 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
   //  return mitk::TrackingSystemNotSpecified;
   //}
 
-  
+
     mitk::TrackingDeviceType deviceType;
     returnvalue = m_DeviceProtocol->VER(deviceType);
     if ((returnvalue != NDIOKAY) || (deviceType == mitk::TrackingSystemNotSpecified))
@@ -797,8 +797,8 @@ void mitk::NDITrackingDevice::TrackTools()
   returnvalue = m_DeviceProtocol->TSTOP();
   if (returnvalue != NDIOKAY)
   {
-    /* insert error handling/notification here */ 
-    ; // how can this thread tell the application, that an error has occurred? 
+    /* insert error handling/notification here */
+    ; // how can this thread tell the application, that an error has occurred?
   }
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread and transfer control back to main thread by releasing trackingFinishedLockHolder
 }
@@ -1105,7 +1105,7 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
 {
   /* First, check for disconnected tools and remove them */
   this->FreePortHandles();
-  
+
   /* check for new tools, add and initialize them */
   NDIErrorCode returnvalue;
   std::string portHandle;
@@ -1119,7 +1119,7 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
 
   /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
-  
+
   /* we need to remember the ports which are occupied to be able to readout the serial numbers of the connected tools later */
   std::vector<int> occupiedPorts = std::vector<int>();
   int numberOfToolsAtStart = this->GetToolCount(); //also remember the number of tools at start to identify the automatically detected tools later
@@ -1129,7 +1129,7 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
     ph = portHandle.substr(i, 2);
     if (this->GetInternalTool(ph) != NULL) // if we already have a tool with this handle
       continue;                            // then skip the initialization
-    
+
     //instantiate an object for each tool that is connected
     mitk::NDIPassiveTool::Pointer newTool = mitk::NDIPassiveTool::New();
     newTool->SetPortHandle(ph.c_str());
@@ -1156,13 +1156,13 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
         return false;
       }
     }
-    //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool() 
+    //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool()
     if (this->InternalAddTool(newTool) == false)
       this->SetErrorMessage("Error while adding new tool");
     else occupiedPorts.push_back(i);
   }
-  
-  
+
+
   // after initialization readout serial numbers of automatically detected tools
   for (unsigned int i = 0; i < occupiedPorts.size(); i++)
     {
@@ -1256,7 +1256,7 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
     this->SetErrorMessage("Could not receive tracking volume information of tracking system!");
     return false;
   }
-  
+
   /*info contains the following:
   <HEX:number of volumes> (+n times:) <HEX:shape type> <shape parameters D1-D10> <HEX:reserved / number of wavelength supported> <metal resistant / supported wavelength>
   */
@@ -1264,13 +1264,13 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
 
   for (unsigned int i=0; i<(*numberOfVolumes); i++)
   {
-    //e.g. for cube:  "9-025000+025000-025000+025000-055000-005000+000000+000000+000000+00000011" 
+    //e.g. for cube:  "9-025000+025000-025000+025000-055000-005000+000000+000000+000000+00000011"
     //for dome:       "A+005000+048000+005000+066000+000000+000000+000000+000000+000000+00000011"
 
     std::string::size_type offset, end;
-    offset = (i*73)+1; 
+    offset = (i*73)+1;
     end = 73+(i*73);
-    std::string currentVolume = info.substr(offset, end);//i=0: from 1 to 73 characters; i=1: from 75 to 148 char; 
+    std::string currentVolume = info.substr(offset, end);//i=0: from 1 to 73 characters; i=1: from 75 to 148 char;
     // if i>0 then we have a return statement <LF> infront
     if (i>0)
       currentVolume = currentVolume.substr(1, currentVolume.size());
@@ -1305,7 +1305,7 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
       volumesDimensions->push_back(dimension);
     }
   }
-    
+
   return true;
 }
 

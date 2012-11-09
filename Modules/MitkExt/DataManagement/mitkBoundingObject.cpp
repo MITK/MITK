@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,15 +23,15 @@ mitk::BoundingObject::BoundingObject()
 {
 //  Initialize(1);
 
-  /* bounding box around the unscaled bounding object */ 
+  /* bounding box around the unscaled bounding object */
   ScalarType bounds[6]={-1,1,-1,1,-1,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
   GetGeometry()->SetBounds(bounds);
   GetTimeSlicedGeometry()->UpdateInformation();
 }
 
-mitk::BoundingObject::~BoundingObject() 
+mitk::BoundingObject::~BoundingObject()
 {
-} 
+}
 
 mitk::ScalarType mitk::BoundingObject::GetVolume()
 {
@@ -41,7 +41,7 @@ mitk::ScalarType mitk::BoundingObject::GetVolume()
 void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
 {
 
-  // Adjusted this function to fix 
+  // Adjusted this function to fix
   // BUG 6951 - Image Cropper - Bounding Box is strange
   // Still, the behavior of the BoundingObject is really strange.
   // One would think that writing "setGeometry(aGeometry3D)" here would do the job.
@@ -57,7 +57,7 @@ void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
 
   GetGeometry()->SetIdentity();
   GetGeometry()->Compose(aGeometry3D->GetIndexToWorldTransform());
-    
+
   GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
 
   mitk::Vector3D size;

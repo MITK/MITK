@@ -20,13 +20,13 @@ macro(MACRO_TEST_PLUGIN)
     string(REPLACE "_" "." BUNDLE-SYMBOLICNAME ${PROJECT_NAME})
   endif()
   add_test(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} ${_cla_switch}BlueBerry.application=coretestapplication ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
-  
+
   set(_labels ${ARGN})
   if(NOT _labels)
     set(_labels BlueBerry)
   endif()
   set_property(TEST ${BUNDLE-SYMBOLICNAME} PROPERTY LABELS ${_labels})
-  
+
 endmacro(MACRO_TEST_PLUGIN)
 
 # Variables:
@@ -48,21 +48,21 @@ macro(MACRO_TEST_UIPLUGIN)
   if(NOT BUNDLE-SYMBOLICNAME)
     string(REPLACE "_" "." BUNDLE-SYMBOLICNAME ${PROJECT_NAME})
   endif()
-  
+
   if(BLUEBERRY_ENABLE_GUI_TESTING)
     if(BLUEBERRY_TEST_APP_ID)
       set(_app_id_arg "${_cla_switch}BlueBerry.testapplication=${BLUEBERRY_TEST_APP_ID}")
     else()
       set(_app_id_arg )
     endif()
-        
+
     add_test(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_UI_TEST_APP} ${_cla_switch}BlueBerry.application=uitestapplication ${_app_id_arg} ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
-    
+
     set(_labels ${ARGN})
     if(NOT _labels)
       set(_labels BlueBerry)
     endif()
     set_property(TEST ${BUNDLE-SYMBOLICNAME} PROPERTY LABELS ${_labels})
   endif()
-  
+
 endmacro(MACRO_TEST_UIPLUGIN)

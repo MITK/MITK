@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -70,12 +70,12 @@ namespace mitk {
     * @brief Default Constructor
     **/
     DisplayVectorInteractorScroll(const char * type, mitk::OperationActor* destination=NULL);
-    
+
     /**
     * @brief Default Destructor
     **/
     virtual ~DisplayVectorInteractorScroll();
-    
+
     /**
     * @brief Method derived from StateMachine to implement the own actions
     **/
@@ -92,9 +92,9 @@ namespace mitk {
     /**
     * \brief Modifier that defines how many slices are scrolled per pixel that the mouse has moved
     *
-    * This modifier defines how many slices the scene is scrolled per pixel that the mouse cursor has moved. 
-    * By default the modifier is 4. This means that when the user moves the cursor by 4 pixels in Y-direction 
-    * the scene is scrolled by one slice. If the user has moved the the cursor by 20 pixels, the scene is 
+    * This modifier defines how many slices the scene is scrolled per pixel that the mouse cursor has moved.
+    * By default the modifier is 4. This means that when the user moves the cursor by 4 pixels in Y-direction
+    * the scene is scrolled by one slice. If the user has moved the the cursor by 20 pixels, the scene is
     * scrolled by 5 slices.
     *
     * If the cursor has moved less than m_IndexToSliceModifier pixels the scene is scrolled by one slice.

@@ -13,11 +13,11 @@ macro(MITK_INSTALL_TARGETS)
   if(WIN32 AND NOT MINGW)
     set(intermediate_dir Release)
   endif()
-  
-  set(DIRS 
+
+  set(DIRS
     ${MITK_VTK_LIBRARY_DIRS}/${intermediate_dir}
     ${MITK_ITK_LIBRARY_DIRS}/${intermediate_dir}
-    ${QT_LIBRARY_DIR} 
+    ${QT_LIBRARY_DIR}
     ${QT_LIBRARY_DIR}/../bin
     ${MITK_BINARY_DIR}/bin/${intermediate_dir}
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${intermediate_dir}
@@ -26,7 +26,7 @@ macro(MITK_INSTALL_TARGETS)
   foreach(_lib_dir ${_install_LIBRARY_DIRS})
     list(APPEND DIRS ${_lib_dir}/${intermediate_dir})
   endforeach()
-  
+
   if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
     list(APPEND DIRS ${Boost_LIBRARY_DIRS})
   endif()
@@ -85,7 +85,7 @@ macro(MITK_INSTALL_TARGETS)
       set(${_target_locations}_qt_plugins_install_dir bin)
       set(_qt_conf_install_dirs bin)
       install(TARGETS ${_target} RUNTIME DESTINATION bin)
-    endif() 
+    endif()
 
     foreach(_target_location ${_target_locations})
       if(NOT _qt_is_system_qt)
@@ -109,7 +109,7 @@ macro(MITK_INSTALL_TARGETS)
                     DESTINATION ${${_target_location}_qt_plugins_install_dir}
                     FILES_MATCHING REGEX "${CMAKE_SHARED_LIBRARY_SUFFIX}"
                    )
- 
+
           endif(WIN32)
 
         endif()
@@ -126,7 +126,7 @@ macro(MITK_INSTALL_TARGETS)
       if(APPLE)
         set(_qt_conf_plugin_install_prefix ./MacOS)
       endif()
-      
+
       foreach(_qt_conf_install_dir ${_qt_conf_install_dirs})
         install(CODE "file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${_qt_conf_install_dir}/qt.conf\" \"
 [Paths]

@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,38 +39,38 @@ class ExtensionPointService : public QObject, public IExtensionPointService
 {
   Q_OBJECT
   Q_INTERFACES(berry::IExtensionPointService)
-  
+
 public:
 
   berryObjectMacro(ExtensionPointService);
-  
+
   bool IsA(const std::type_info& type);
   const std::type_info& GetType() const;
-  
+
   ExtensionPointService(BundleLoader* loader);
-  
+
   void AddContribution(std::istream& istr, const std::string& contributor);
-  
+
   const std::vector<IConfigurationElement::Pointer> GetConfigurationElementsFor(const std::string& extensionPointId) const;
-  
+
   const IExtension* GetExtension(const std::string& extensionPointId, const std::string& extensionId) const;
-  
+
   const IExtensionPoint* GetExtensionPoint(const std::string& id) const;
-  
+
   const std::vector<const IExtension*> GetExtensions(const std::string& contributor) const;
   const std::vector<const IExtensionPoint*> GetExtensionPoints() const;
   const std::vector<const IExtensionPoint*> GetExtensionPoints(const std::string& contributor) const;
-  
+
   bool HasContributionFrom(const std::string& name) const;
-  
+
 private:
   typedef std::map<std::string, ExtensionPoint::Pointer > ExtensionPointMap;
-  
+
   std::set<std::string> m_Contributors;
-  
+
   BundleLoader* m_BundleLoader;
   ExtensionPointMap m_ExtensionPointMap;
-  
+
   Poco::XML::DOMParser m_DOMParser;
   Poco::XML::InputSource m_XMLInputSource;
 

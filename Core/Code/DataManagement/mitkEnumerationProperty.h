@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,12 +37,12 @@ namespace mitk
  * enumeration values before you may use the Get/SetValue methods.
  *
  * To use the class enumeration property you have 2 choices:
- * 
- * 1. Directly use the class and add your possible enumeration values via 
+ *
+ * 1. Directly use the class and add your possible enumeration values via
  *    AddEnum(name, id). NOte that the ids do not have to be in any order, they
  *    just have to be unique. The current value is set via SetValue(...) and
  *    retrieved via GetValueAsId() or GetValueAsString().
- * 2. Create a subclass, which adds the possible enumeration values in its 
+ * 2. Create a subclass, which adds the possible enumeration values in its
  *    constructor and maybe adds some additional convenience functions to
  *    set/get the value. NOte that you should override AddEnum(...) as protected
  *    so that the user may not add additional invalid enumeration values.
@@ -55,7 +55,7 @@ class MITK_CORE_EXPORT EnumerationProperty : public BaseProperty
 public:
 
   mitkClassMacro( EnumerationProperty, BaseProperty );
-  
+
   itkNewMacro(EnumerationProperty);
 
   /**
@@ -70,7 +70,7 @@ public:
   typedef std::map<IdType, std::string> EnumIdsContainerType;
 
   /**
-   * Type used to store a mapping from enumeration string/description to 
+   * Type used to store a mapping from enumeration string/description to
    * enumeration id
    */
   typedef std::map<std::string, IdType> EnumStringsContainerType;
@@ -96,7 +96,7 @@ public:
   /**
    * Sets the current value of the enumeration
    * @param name the string representation of the enumeration value to set
-   * @returns true if the value was successfully set (i.e. it was valid), or 
+   * @returns true if the value was successfully set (i.e. it was valid), or
    * false, if the name provided is incalid.
    */
   virtual bool SetValue( const std::string& name );
@@ -104,7 +104,7 @@ public:
   /**
    * Sets the current value of the enumeration
    * @param id the integer representation of the enumeration value to set
-   * @returns true if the value was successfully set (i.e. it was valid), or 
+   * @returns true if the value was successfully set (i.e. it was valid), or
    * false, if the id provided is invalid.
    */
   virtual bool SetValue( const IdType& id );
@@ -116,7 +116,7 @@ public:
   virtual IdType GetValueAsId() const;
 
   /**
-   * Returns the string representation of the current enumeration value. If it 
+   * Returns the string representation of the current enumeration value. If it
    * was not yet set, the return value is unspecified
    */
   virtual std::string GetValueAsString() const;
@@ -127,7 +127,7 @@ public:
   virtual void Clear();
 
   /**
-   * Determines the number of enumeration values which have been added via 
+   * Determines the number of enumeration values which have been added via
    * AddEnum(...).
    * @returns the number of enumeration values associated with this Enumeration
    * Property
@@ -182,14 +182,14 @@ public:
 
   const EnumIdsContainerType& GetEnumIds() const;
   const EnumStringsContainerType& GetEnumStrings() const;
-  
+
   EnumIdsContainerType& GetEnumIds();
   EnumStringsContainerType& GetEnumStrings();
 
   using BaseProperty::operator=;
-  
+
 protected:
-  
+
   /**
    * Default constructor. The current value of the enumeration is undefined.
    */

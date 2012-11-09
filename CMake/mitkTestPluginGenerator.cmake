@@ -1,16 +1,16 @@
 if(BUILD_TESTING)
- 
+
   set(proj GP) # Means GenerateProject (use a short name due to Windows limitations)
   set(test_project_out_dir "${MITK_BINARY_DIR}")
   set(test_project_source_dir "${MITK_BINARY_DIR}/${proj}")
   set(test_project_binary_dir "${MITK_BINARY_DIR}/${proj}-bin")
-  
+
   add_test(NAME mitkPluginGeneratorCleanTest
            COMMAND ${CMAKE_COMMAND} -E remove_directory "${test_project_source_dir}"
           )
   set_tests_properties(mitkPluginGeneratorCleanTest PROPERTIES
                        LABELS "MITK;BlueBerry")
-  
+
   add_test(NAME mitkPluginGeneratorCleanTest2
            COMMAND ${CMAKE_COMMAND} -E remove_directory "${test_project_binary_dir}"
           )
@@ -23,7 +23,7 @@ if(BUILD_TESTING)
   set_tests_properties(mitkPluginGeneratorCleanTest3 PROPERTIES
                        DEPENDS mitkPluginGeneratorCleanTest2
                        LABELS "MITK;BlueBerry")
-  
+
   add_test(NAME mitkPluginGeneratorCreateTest
            COMMAND ${exec_target} --project-name "${proj}" --project-app-name "TestApp"
                                   -ps org.test.plugin -pn "Test Plugin" -vn "Test View"
@@ -32,7 +32,7 @@ if(BUILD_TESTING)
   set_tests_properties(mitkPluginGeneratorCreateTest PROPERTIES
                        DEPENDS "${exec_target};mitkPluginGeneratorCleanTest;mitkPluginGeneratorCleanTest3"
                        LABELS "MITK;BlueBerry")
-                         
+
   if(CMAKE_CONFIGURATION_TYPES)
     foreach(config ${CMAKE_CONFIGURATION_TYPES})
       add_test(NAME mitkPluginGeneratorConfigureTest-${config} CONFIGURATIONS ${config}
@@ -43,7 +43,7 @@ if(BUILD_TESTING)
       set_tests_properties(mitkPluginGeneratorConfigureTest-${config} PROPERTIES
                            DEPENDS mitkPluginGeneratorCreateTest
                            LABELS "MITK;BlueBerry")
-                           
+
       add_test(NAME mitkPluginGeneratorBuildTest-${config} CONFIGURATIONS ${config}
                COMMAND ${CMAKE_COMMAND} --build ${test_project_binary_dir} --config ${config})
       set_tests_properties(mitkPluginGeneratorBuildTest-${config} PROPERTIES
@@ -60,7 +60,7 @@ if(BUILD_TESTING)
     set_tests_properties(mitkPluginGeneratorConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
                          DEPENDS mitkPluginGeneratorCreateTest
                          LABELS "MITK;BlueBerry")
-  
+
     add_test(NAME mitkPluginGeneratorBuildTest-${CMAKE_BUILD_TYPE}
              COMMAND ${CMAKE_COMMAND} --build ${test_project_binary_dir} --config ${CMAKE_BUILD_TYPE})
     set_tests_properties(mitkPluginGeneratorBuildTest-${CMAKE_BUILD_TYPE} PROPERTIES
@@ -73,7 +73,7 @@ if(BUILD_TESTING)
     # Only test packaging if build type is "Release" on Windows
     set(package_test_configurations CONFIGURATIONS Release)
   endif()
-  
+
   if(NOT MITK_FAST_TESTING)
 
     if(WIN32)
@@ -94,6 +94,6 @@ if(BUILD_TESTING)
     endif()
 
   endif()
-  
+
 endif()
 

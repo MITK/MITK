@@ -3,7 +3,7 @@ set(CPP_FILES
   mitkToFDistanceImageToPointSetFilter.cpp
   mitkToFDistanceImageToSurfaceFilter.cpp
   mitkToFImageDownsamplingFilter.cpp
-  mitkToFProcessingCommon.cpp  
+  mitkToFProcessingCommon.cpp
   mitkToFSurfaceVtkMapper3D.cpp
   mitkToFTestingCommon.cpp
 )

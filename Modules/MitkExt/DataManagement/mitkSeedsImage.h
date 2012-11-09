@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,19 +33,19 @@ namespace mitk
 //##Documentation
 //## @brief SeedsImage class for storing seeds-images
 //##
-//## Handles operations for drawing seeds. 
+//## Handles operations for drawing seeds.
 //## @ingroup Data
 class MitkExt_EXPORT SeedsImage : public Image
 {
 
 public:
-  
+
   mitkClassMacro(SeedsImage, Image);
   itkNewMacro(Self);
 
   itkGetMacro(LastPoint, mitk::Point3D);
 
-  void Initialize(); 
+  void Initialize();
 
   /// handles operations
   virtual void ExecuteOperation(Operation* operation);

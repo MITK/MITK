@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QObject>
 
-namespace berry 
+namespace berry
 {
   /**
   * Implementation of the IPreferencesService Interface
@@ -78,7 +78,7 @@ namespace berry
     * \see IPreferencesService::GetUsers()
     */
     virtual std::vector<std::string> GetUsers() const;
-    
+
 
     ///
     /// \see IPreferencesService::ImportPreferences()
@@ -111,7 +111,7 @@ namespace berry
     /// A mutex to avoid concurrency crashes. Mutable because we need to use Mutex::lock() in const functions
     ///
     mutable Poco::Mutex m_Mutex;
-    
+
   };
 }  // namespace berry
 

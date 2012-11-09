@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *          a fully configurated tracking device is availiabe the object emits a
   *          signal "TrackingDeviceConfigurationFinished()". You can then get the
   *          tracking device by calling the method GetTrackingDevice().
-  *          
+  *
   *          Once the tracking device is configurated there are two ways to reset
   *          the UI to allow the user for configuring a new device. The method Reset()
   *          can be called and there is also a button "reset" which can be pressed by
@@ -52,12 +52,12 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
     QmitkTrackingDeviceConfigurationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkTrackingDeviceConfigurationWidget();
-    
+
     /* @return Returns the current configurated tracking device. If the user didn't finished the
      *         configuration process NULL is returned.
-     */ 
+     */
     mitk::TrackingDevice::Pointer GetTrackingDevice();
-    
+
     enum Style
       {
       SIMPLE,
@@ -94,7 +94,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
       */
     void EnableAdvancedUserControl(bool enable);
 
-    
+
   signals:
 
     /* @brief This signal is sent if the user has finished the configuration of the tracking device.
@@ -103,7 +103,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      */
     void TrackingDeviceConfigurationFinished();
 
-    /* @brief This signal is sent if the UI was reseted and the user is required to configurate 
+    /* @brief This signal is sent if the UI was reseted and the user is required to configurate
      *        a new tracking device.
      */
     void TrackingDeviceConfigurationReseted();
@@ -112,7 +112,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     void TrackingDeviceSelectionChanged();
 
   protected:
-    
+
     /// \brief Creation of the connections
     virtual void CreateConnections();
 
@@ -125,13 +125,13 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     mitk::TrackingDevice::Pointer m_TrackingDevice;
 
     std::string m_MTCalibrationFile;
-    
+
     bool m_TrackingDeviceConfigurated;
 
     bool m_AdvancedUserControl;
 
     // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
-    typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;  
+    typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;
 
     //######################### internal help methods #######################################
     void ResetOutput();
@@ -142,7 +142,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
       * @return  Returns the type of the device if one was found. Returns TrackingSystemNotSpecified if none was found.
       */
     mitk::TrackingDeviceType ScanPort(QString port);
-    
+
 
   protected slots:
     /* @brief This method is called when the user changes the selection of the trackingdevice (m_trackingDeviceChooser).
@@ -171,13 +171,13 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      */
     virtual mitk::TrackingDevice::Pointer ConfigureNDI5DTrackingDevice();
 
-    /* @return Returns a configured NDI 6D tracking device. 
+    /* @return Returns a configured NDI 6D tracking device.
      *         The type (which means Aurora/Polaris) will not be set in the returnvalue. You have to this later.
      */
     mitk::TrackingDevice::Pointer ConfigureNDI6DTrackingDevice();
 
 
-    /* @brief Scans the serial ports automatically for a connected tracking device. If the method finds a device 
+    /* @brief Scans the serial ports automatically for a connected tracking device. If the method finds a device
      *        it selects the right type and sets the corresponding port in the widget.
      */
     void AutoScanPorts();

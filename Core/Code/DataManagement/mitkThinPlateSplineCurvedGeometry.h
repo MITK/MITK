@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,20 +27,20 @@ namespace mitk {
 
 //##Documentation
 //## @brief Thin-plate-spline-based landmark-based curved geometry
-//## 
+//##
 //## @ingroup Geometry
 class MITK_CORE_EXPORT ThinPlateSplineCurvedGeometry : public LandmarkProjectorBasedCurvedGeometry
 {
 public:
   mitkClassMacro(ThinPlateSplineCurvedGeometry, LandmarkProjectorBasedCurvedGeometry);
-  
+
   itkNewMacro(Self);
-  
+
   virtual void ComputeGeometry();
 
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 
-  vtkThinPlateSplineTransform* GetThinPlateSplineTransform() const  
+  vtkThinPlateSplineTransform* GetThinPlateSplineTransform() const
   {
     return m_ThinPlateSplineTransform;
   }
@@ -55,7 +55,7 @@ protected:
   ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other );
 
   virtual ~ThinPlateSplineCurvedGeometry();
-  
+
   vtkThinPlateSplineTransform* m_ThinPlateSplineTransform;
 
   vtkPoints* m_VtkTargetLandmarks;

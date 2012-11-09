@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ class QmitkStdMultiWidget;
 /*!
 * \brief GUI widget for handling mitk::PointSet
 *
-* Displays all the points in a mitk::PointSet graphically. 
+* Displays all the points in a mitk::PointSet graphically.
 * Reacts automatically to changes in the PointSet's selection status.
 * Updates PointSet's selection status when this list's selection changes.
 *
@@ -56,9 +56,9 @@ public:
   /**
   * \brief If Multiwidget is set, the crosshair is automatically centering to the selected point
   * As an alternative, if you dont have a multiwidget, you can call SetSnc1, SetSnc2, SetSnc3 to set the
-  * SliceNavigationControllers directly to enable the focussing feature. 
+  * SliceNavigationControllers directly to enable the focussing feature.
   */
-  void SetMultiWidget( QmitkStdMultiWidget* multiWidget ); 
+  void SetMultiWidget( QmitkStdMultiWidget* multiWidget );
 
   QmitkStdMultiWidget* GetMultiWidget() const;  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
 

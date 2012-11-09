@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -227,7 +227,7 @@ void mitk::ToFCompositeFilter::ProcessCVBilateralFilter(IplImage* inputIplImage,
   cvSmooth(inputIplImage, outputIplImage, CV_BILATERAL, diameter, 0, sigmaColor, sigmaSpace);
 }
 
-void mitk::ToFCompositeFilter::ProcessCVMedianFilter(IplImage* inputIplImage, IplImage* outputIplImage, int radius) 
+void mitk::ToFCompositeFilter::ProcessCVMedianFilter(IplImage* inputIplImage, IplImage* outputIplImage, int radius)
 {
   cvSmooth(inputIplImage, outputIplImage, CV_MEDIAN, radius, 0, 0, 0);
 }
@@ -276,13 +276,13 @@ void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplIm
     currentBufferSize = this->m_DataBufferCurrentIndex + 1;
   }
 
-  for(int j=0; j<imageSize; j++) 
+  for(int j=0; j<imageSize; j++)
   {
     this->m_DataBuffer[this->m_DataBufferCurrentIndex][j] = data[j];
   }
 
   float tmpValue = 0.0f;
-  for(int i=0; i<imageSize; i++) 
+  for(int i=0; i<imageSize; i++)
   {
     if (m_ApplyAverageFilter)
     {

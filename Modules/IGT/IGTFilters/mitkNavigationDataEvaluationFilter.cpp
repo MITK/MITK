@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -55,12 +55,12 @@ void mitk::NavigationDataEvaluationFilter::GenerateData()
         m_LoggedPositions[i].push_back(input->GetPosition());
         m_LoggedQuaternions[i].push_back(input->GetOrientation());
         }
-      else 
+      else
         {
         m_InavildSamples[i]++;
         }
     }
-  
+
 }
 void mitk::NavigationDataEvaluationFilter::CreateMembersForAllInputs()
 {
@@ -80,7 +80,7 @@ void mitk::NavigationDataEvaluationFilter::CreateMembersForAllInputs()
     m_InavildSamples.insert(newElement);
     }
 
-  
+
 }
 
 void mitk::NavigationDataEvaluationFilter::ResetStatistic()
@@ -142,7 +142,7 @@ return returnValue;
 }
 
 mitk::Vector3D mitk::NavigationDataEvaluationFilter::GetEulerAnglesMean(int input)
-{ 
+{
 mitk::PointSetStatisticsCalculator::Pointer myCalculator = mitk::PointSetStatisticsCalculator::New(VectorToPointSet(QuaternionsToEulerAngles(m_LoggedQuaternions[input])));
 mitk::Vector3D returnValue;
 returnValue[0] = myCalculator->GetPositionMean()[0];
@@ -201,7 +201,7 @@ double mitk::NavigationDataEvaluationFilter::GetPositionErrorMax(int input)
 mitk::PointSetStatisticsCalculator::Pointer myCalculator = mitk::PointSetStatisticsCalculator::New(VectorToPointSet(m_LoggedPositions[input]));
 return myCalculator->GetPositionErrorMax();
 }
-  
+
 double mitk::NavigationDataEvaluationFilter::GetPositionErrorMin(int input)
 {
 mitk::PointSetStatisticsCalculator::Pointer myCalculator = mitk::PointSetStatisticsCalculator::New(VectorToPointSet(m_LoggedPositions[input]));
@@ -246,20 +246,20 @@ return mean;
 mitk::PointSet::Pointer mitk::NavigationDataEvaluationFilter::VectorToPointSet(std::vector<mitk::Point3D> pSet)
 {
   mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
-  for (int i=0; i<pSet.size(); i++) returnValue->InsertPoint(i,pSet.at(i)); 
+  for (int i=0; i<pSet.size(); i++) returnValue->InsertPoint(i,pSet.at(i));
   return returnValue;
 }
 
 mitk::PointSet::Pointer mitk::NavigationDataEvaluationFilter::VectorToPointSet(std::vector<mitk::Vector3D> pSet)
 {
   mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
-  for (int i=0; i<pSet.size(); i++) 
+  for (int i=0; i<pSet.size(); i++)
     {
     mitk::Point3D thisPoint;
     thisPoint[0] = pSet.at(i)[0];
     thisPoint[1] = pSet.at(i)[1];
     thisPoint[2] = pSet.at(i)[2];
-    returnValue->InsertPoint(i,thisPoint); 
+    returnValue->InsertPoint(i,thisPoint);
     }
   return returnValue;
 }
@@ -267,7 +267,7 @@ mitk::PointSet::Pointer mitk::NavigationDataEvaluationFilter::VectorToPointSet(s
 std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToEulerAngles(std::vector<mitk::Quaternion> quaterions)
 {
   std::vector<mitk::Vector3D> returnValue = std::vector<mitk::Vector3D>();
-  for (int i=0; i<quaterions.size(); i++) 
+  for (int i=0; i<quaterions.size(); i++)
     {
     mitk::Vector3D eulerAngles;
     mitk::Quaternion currentQuaternion = quaterions.at(i);
@@ -304,7 +304,7 @@ mitk::Point3D  mitk::NavigationDataEvaluationFilter::GetLoggedPosition(int i, in
   return returnValue;
 }
 
-    
+
 mitk::Quaternion  mitk::NavigationDataEvaluationFilter::GetLoggedOrientation(int i, int input)
 {
   mitk::Quaternion returnValue;

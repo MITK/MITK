@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,8 +50,8 @@ namespace mitk
 {
 
   ThreadedToFRawDataReconstruction::ThreadedToFRawDataReconstruction(): m_Threader(0),
-    m_CISDist(0), m_CISAmpl(0), m_CISInten(0), 
-    m_ThreadedCISDist(0), m_ThreadedCISAmpl(0), m_ThreadedCISInten(0), 
+    m_CISDist(0), m_CISAmpl(0), m_CISInten(0),
+    m_ThreadedCISDist(0), m_ThreadedCISAmpl(0), m_ThreadedCISInten(0),
     m_Init(0), m_Width(0), m_Height(0), m_SourceDataSize(0), m_ImageSize(0), m_SourceData(0)
   {
     m_ThreadData = new ThreadDataStruct;
@@ -88,7 +88,7 @@ namespace mitk
 
   }
 
-void ThreadedToFRawDataReconstruction::Initialize(int width, int height, int modulationFrequency, 
+void ThreadedToFRawDataReconstruction::Initialize(int width, int height, int modulationFrequency,
                                                   int sourceDataSize )
 {
   m_Width = width;
@@ -120,7 +120,7 @@ void ThreadedToFRawDataReconstruction::Initialize(int width, int height, int mod
 }
 
 void ThreadedToFRawDataReconstruction::SetChannelData(vtkShortArray* sourceData)
-{ 
+{
   m_SourceData->DeepCopy(sourceData);
 }
 
@@ -130,13 +130,13 @@ void ThreadedToFRawDataReconstruction::GetDistances(float* dist)
 }
 
 void ThreadedToFRawDataReconstruction::GetAmplitudes(float* ampl)
-{  
+{
   memcpy(ampl, m_CISAmpl, m_ImageSize*sizeof(float));
 }
 
 void ThreadedToFRawDataReconstruction::GetIntensities(float* inten)
 {
-  memcpy(inten, m_CISInten, m_ImageSize*sizeof(float));  
+  memcpy(inten, m_CISInten, m_ImageSize*sizeof(float));
 }
 
 void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, float* inten)
@@ -163,7 +163,7 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
     int quadChannelSize = channelSize * 0.25;
 
     std::vector<short> quad = std::vector<short>(quadChannelSize);
-    
+
     // clean the thread data array
     m_ThreadData->m_InputData.erase(m_ThreadData->m_InputData.begin(),m_ThreadData->m_InputData.end());
 
@@ -200,7 +200,7 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
     if ( m_ThreadData->m_Barrier.IsNull())
     {
       m_ThreadData->m_Barrier = itk::Barrier::New();
-      m_ThreadData->m_Barrier->Initialize(maxThreadNr);     // 
+      m_ThreadData->m_Barrier->Initialize(maxThreadNr);     //
     }
     m_ThreadData->m_DataSize = quadChannelSize;
     m_ThreadData->m_LineWidth = lineWidth;
@@ -286,11 +286,11 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
     int datasize = doubleLwidth*frameheight << 2;
 
 
-    do 
+    do
     {
       index += doubleLwidth;
       x++;
-      do 
+      do
       {
         index -= 8;
         A1 = htons(quad1.at(index));
@@ -302,8 +302,8 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
         A7 = htons(quad3.at(index+1));
         A8 = htons(quad4.at(index+1));
 
-        phi  = atan2((A3 - A1),(A2 - A4)) + pi; 
-        phi2 = atan2((A7 - A5),(A6 - A8)); 
+        phi  = atan2((A3 - A1),(A2 - A4)) + pi;
+        phi2 = atan2((A7 - A5),(A6 - A8));
         if(phi2<0) phi2 +=twoPi;
 
         A3m1 = A3*A3 - 2*A3*A1 + A1*A1;
@@ -311,7 +311,7 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
         A7m5 = A7*A7 - 2*A7*A5 + A5*A5;
         A8m6 = A8*A8 - 2*A8*A6 + A6*A6;
         threadData->m_ImageDataMutex->Lock();
-        threadData->m_OutputData.at(0)[index2] = (phi+phi2)*intermed2;                        //(((phi*intermed1) + (phi2*intermed1))/2)*1000;  //   
+        threadData->m_OutputData.at(0)[index2] = (phi+phi2)*intermed2;                        //(((phi*intermed1) + (phi2*intermed1))/2)*1000;  //
         threadData->m_OutputData.at(1)[index2] = (sqrt(A3m1 + A4m2)+sqrt(A7m5 + A8m6))*0.5;   //(sqrt(A3m1 + A4m2)/2) + (sqrt(A7m5 + A8m6)/2);
         threadData->m_OutputData.at(2)[index2] = (A1+A2+A3+A4+A5+A6+A7+A8)*0.125;
         threadData->m_ImageDataMutex->Unlock();

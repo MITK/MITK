@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -76,7 +76,7 @@ void QmitkToFVisualisationSettingsWidget::CreateConnections()
     m_Controls->m_RangeSlider->setMinimum(-2048);
     m_Controls->m_RangeSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
     m_Controls->m_RangeSlider->setStyle(sliderStyle);
-  
+
     m_Controls->m_ColorTransferFunctionCanvas->SetQLineEdits(m_Controls->m_XEditColor, 0);
     m_Controls->m_ColorTransferFunctionCanvas->SetTitle(""/*"Value -> Grayscale/Color"*/);
   }
@@ -102,29 +102,29 @@ void QmitkToFVisualisationSettingsWidget::OnRangeSliderMinChanged()
   m_Controls->m_ColorTransferFunctionCanvas->update();
 }
 
-void QmitkToFVisualisationSettingsWidget::OnSpanChanged(int /*lower*/, int /*upper*/) 
+void QmitkToFVisualisationSettingsWidget::OnSpanChanged(int /*lower*/, int /*upper*/)
 {
   UpdateRanges();
   m_Controls->m_ColorTransferFunctionCanvas->update();
 }
 
-void QmitkToFVisualisationSettingsWidget::OnResetSlider() 
+void QmitkToFVisualisationSettingsWidget::OnResetSlider()
 {
   m_Controls->m_RangeSlider->setUpperValue(m_RangeSliderMax);
   m_Controls->m_RangeSlider->setLowerValue(m_RangeSliderMin);
-  
+
   UpdateRanges();
   m_Controls->m_ColorTransferFunctionCanvas->update();
 }
 
-void QmitkToFVisualisationSettingsWidget::UpdateRanges() 
+void QmitkToFVisualisationSettingsWidget::UpdateRanges()
 {
   int lower =  m_Controls->m_RangeSlider->lowerValue();
   int upper =  m_Controls->m_RangeSlider->upperValue();
 
   m_Controls->m_ColorTransferFunctionCanvas->SetMin(lower);
   m_Controls->m_ColorTransferFunctionCanvas->SetMax(upper);
-} 
+}
 
 void QmitkToFVisualisationSettingsWidget::Initialize(mitk::DataNode* distanceImageNode, mitk::DataNode* amplitudeImageNode, mitk::DataNode* intensityImageNode)
 {
@@ -192,7 +192,7 @@ void QmitkToFVisualisationSettingsWidget::OnTransferFunctionTypeSelected(int ind
   {
     this->m_Widget3TransferFunctionType = index;
   }
-  else 
+  else
   {
     return;
   }
@@ -232,7 +232,7 @@ void QmitkToFVisualisationSettingsWidget::OnWidgetSelected(int index)
   else if (currentWidgetIndex == 3)
   {
   }
-  else 
+  else
   {
     return;
   }
@@ -254,7 +254,7 @@ void QmitkToFVisualisationSettingsWidget::ResetTransferFunction(vtkColorTransfer
   if (type == 0)
   {
     colorTransferFunction->AddRGBPoint(min, 0, 0, 0);
-    colorTransferFunction->AddRGBPoint(max, 1, 1, 1);  
+    colorTransferFunction->AddRGBPoint(max, 1, 1, 1);
   }
   else
   {
@@ -264,8 +264,8 @@ void QmitkToFVisualisationSettingsWidget::ResetTransferFunction(vtkColorTransfer
       colorTransferFunction->AddRGBPoint(min-0.01, 0, 0, 0);
     }
     colorTransferFunction->AddRGBPoint(min, 1, 0, 0);
-    colorTransferFunction->AddRGBPoint(min+(max-min)/2, 1, 1, 0);  
-    colorTransferFunction->AddRGBPoint(max, 0, 0, 1);  
+    colorTransferFunction->AddRGBPoint(min+(max-min)/2, 1, 1, 0);
+    colorTransferFunction->AddRGBPoint(max, 0, 0, 1);
   }
   colorTransferFunction->SetColorSpaceToHSV();
 }
@@ -353,17 +353,17 @@ void QmitkToFVisualisationSettingsWidget::OnTransferFunctionReset()
 }
 
 vtkColorTransferFunction* QmitkToFVisualisationSettingsWidget::GetWidget1ColorTransferFunction()
-{  
+{
   return this->m_Widget1ColorTransferFunction;
 }
 
 vtkColorTransferFunction* QmitkToFVisualisationSettingsWidget::GetWidget2ColorTransferFunction()
-{  
+{
   return this->m_Widget2ColorTransferFunction;
 }
 
 vtkColorTransferFunction* QmitkToFVisualisationSettingsWidget::GetWidget3ColorTransferFunction()
-{  
+{
   return this->m_Widget3ColorTransferFunction;
 }
 

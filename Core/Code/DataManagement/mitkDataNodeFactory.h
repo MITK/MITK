@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,14 +29,14 @@ namespace mitk
 {
 /**
 * @brief Factory, which creates instances of mitk::DataNodes filled with
-*        data read from a given file 
+*        data read from a given file
 *
 * This class reads files, creates an appropriate mitk::BaseData and adds the
 * BaseData to a mitk::DataNode. This filter may produce one or more outputs
-* (i.e. mitk::DataNodes). The number of generated nodes can be retrieved by a 
+* (i.e. mitk::DataNodes). The number of generated nodes can be retrieved by a
 * call of GetNumberOfOutputs().
 *
-* If you want to add a new file type, you have to register the factory 
+* If you want to add a new file type, you have to register the factory
 * of the file reader in the class mitk::BaseDataIOFactory.
 * @ingroup IO
 */
@@ -96,7 +96,7 @@ public:
   {m_SeriesRestrictions.push_back(tag);}
 
   static bool m_TextureInterpolationActive;
-  
+
 protected:
 
   /**
@@ -112,7 +112,7 @@ protected:
   bool m_Serie;
 
   /**
-  * Determines of which file type a given file is and calls the 
+  * Determines of which file type a given file is and calls the
   * appropriate reader function.
   */
   virtual void GenerateData();
@@ -127,7 +127,7 @@ protected:
 
   /**
   * Checks if the file name m_FileName ends with the given name.
-  * Currently, this check is done by a dumb search for name in 
+  * Currently, this check is done by a dumb search for name in
   * the filename.
   * @param name the extension of the file
   * @returns true, if the filename contains name.
@@ -136,7 +136,7 @@ protected:
 
   /**
   * Checks if the file pattern m_FilePattern ends with the given name.
-  * Currently, this check is done by a dumb search for name in 
+  * Currently, this check is done by a dumb search for name in
   * the filename.
   * @param name the extension of the file
   * @returns true, if the filepattern contains name.
@@ -154,7 +154,7 @@ protected:
   virtual std::string GetBaseFilePrefix();
 
   /**
-  * @returns the directory of the file name m_FileName. 
+  * @returns the directory of the file name m_FileName.
   */
   virtual std::string GetDirectory();
 

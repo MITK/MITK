@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // pleae see qmitkmitralvalvesegmentation4dtee bundle
 
 
-namespace itk 
+namespace itk
 {
 
    template <class TInputImageType, class TOutputImageType>
@@ -53,7 +53,7 @@ namespace itk
       public ImageToImageFilter<TInputImageType, TOutputImageType>
    {
    public:
-      //Standard Typedefs    
+      //Standard Typedefs
       typedef ShortestPathImageFilter                             Self;
       typedef ImageToImageFilter<TInputImageType,TOutputImageType> Superclass;
       typedef SmartPointer<Self>                                   Pointer;
@@ -90,7 +90,7 @@ namespace itk
       void PrintSelf( std::ostream& os, Indent indent ) const;
 
       // Compare function for A_STAR
-      struct CompareNodeStar 
+      struct CompareNodeStar
       {
          bool operator()(ShortestPathNode *a, ShortestPathNode *b)
          {
@@ -109,7 +109,7 @@ namespace itk
 
 
       // \brief Set FullNeighborsMode. false = no diagonal neighbors, in 2D this means N4 Neigborhood. true = would be N8 in 2D
-      itkSetMacro (FullNeighborsMode, bool); 
+      itkSetMacro (FullNeighborsMode, bool);
       itkGetMacro (FullNeighborsMode, bool);
 
       // \brief (default=true), Produce output image, which shows the shortest path. But you can also get the shortest Path directly as vector with the function GetVectorPath
@@ -136,10 +136,10 @@ namespace itk
 
       // \brief returns the vector order image. It shows in which order the pixels were checked. good for debugging. Be sure to have m_StoreVectorOrder=true
       OutputImagePointer GetVectorOrderImage();
-      
+
       // \brief returns the distance image. It shows the distances from the startpoint to all other pixels. Be sure to have m_CalcAllDistances=true
       OutputImagePointer GetDistanceImage();
-      
+
       // \brief cleans up the filter
       void CleanUp();
 
@@ -162,9 +162,9 @@ namespace itk
       void operator=(const Self&);      // intentionally not implemented
       const static int BACKGROUND = 0;
       const static int FOREGROUND = 255;
-      bool m_FullNeighborsMode;      
+      bool m_FullNeighborsMode;
 
-      bool m_MakeOutputImage;   
+      bool m_MakeOutputImage;
       bool m_StoreVectorOrder; // Store an Vector of Order, so you can call getVectorOrderImage after update
       bool m_CalcAllDistances; // Calculate all Distances, so you can call getDistanceImage after update (warning algo will take a long time)
 
@@ -172,7 +172,7 @@ namespace itk
 
       bool m_ActivateTimeOut; // if true, then i search max. 30 secs. then abort
       CostFunctionTypePointer m_CostFunction;
-      IndexType m_StartIndex, m_EndIndex; 
+      IndexType m_StartIndex, m_EndIndex;
       std::vector< itk::Index<3> > m_VectorPath;
       std::vector< std::vector< itk::Index<3> > > m_MultipleVectorPaths;
 
@@ -195,7 +195,7 @@ namespace itk
       // \brief gets the estimate costs from pixel a to target.
       double getEstimatedCostsToTarget(const IndexType & a);
 
-      typename InputImageType::Pointer m_magnitudeImage;       
+      typename InputImageType::Pointer m_magnitudeImage;
 
       // \brief Convert a indexnumber of a node in m_Nodes to image coordinates
       typename TInputImageType::IndexType NodeToCoord(NodeNumType);

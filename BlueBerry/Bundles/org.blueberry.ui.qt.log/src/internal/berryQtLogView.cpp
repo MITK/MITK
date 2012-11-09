@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,33 +46,33 @@ QtLogView::QtLogView(QWidget *parent)
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
         .Cast<berry::IBerryPreferences>();
-  
-  
+
+
   prefs->PutBool("ShowAdvancedFields", false);
   prefs->PutBool("ShowCategory", true);
   bool showAdvancedFields = false;
-     
+
 
   ui.setupUi(this);
-  
+
   model = QtLogPlugin::GetInstance()->GetLogModel();
   model->SetShowAdvancedFiels( showAdvancedFields );
-  
+
   filterModel = new QSortFilterProxyModel(this);
   filterModel->setSourceModel(model);
   filterModel->setFilterKeyColumn(-1);
 
   ui.tableView->setModel(filterModel);
- 
+
   ui.tableView->verticalHeader()->setVisible(false);
   ui.tableView->horizontalHeader()->setStretchLastSection(true);
-             
+
   connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
   connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
   connect( ui.SaveToClipboard, SIGNAL( clicked()),this, SLOT(on_SaveToClipboard_clicked()));
-  
+
   ui.ShowAdvancedFields->setChecked( showAdvancedFields );
-           
+
 }
 
 QtLogView::~QtLogView()
@@ -108,12 +108,12 @@ void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int e
 void QtLogView::showEvent( QShowEvent * event )
 {
   ui.tableView->resizeColumnsToContents();
-  ui.tableView->resizeRowsToContents();  
+  ui.tableView->resizeRowsToContents();
 }
 
 void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
 {
-  QtLogPlugin::GetInstance()->GetLogModel()->SetShowAdvancedFiels( checked );  
+  QtLogPlugin::GetInstance()->GetLogModel()->SetShowAdvancedFiels( checked );
   ui.tableView->resizeColumnsToContents();
 
   berry::IPreferencesService::Pointer prefService
@@ -122,14 +122,14 @@ void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
         .Cast<berry::IBerryPreferences>();
-  
+
   prefs->PutBool("ShowAdvancedFields", checked);
   prefs->Flush();
 }
 
 void QtLogView::on_ShowCategory_clicked( bool checked )
 {
-  QtLogPlugin::GetInstance()->GetLogModel()->SetShowCategory( checked );  
+  QtLogPlugin::GetInstance()->GetLogModel()->SetShowCategory( checked );
   ui.tableView->resizeColumnsToContents();
 
   berry::IPreferencesService::Pointer prefService
@@ -138,7 +138,7 @@ void QtLogView::on_ShowCategory_clicked( bool checked )
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
         .Cast<berry::IBerryPreferences>();
-  
+
   prefs->PutBool("ShowCategory", checked);
   prefs->Flush();
 }

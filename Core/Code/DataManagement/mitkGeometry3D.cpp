@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,7 +39,7 @@ mitk::Geometry3D::Geometry3D()
   m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
   Initialize();
 }
-mitk::Geometry3D::Geometry3D(const Geometry3D& other) : Superclass(), mitk::OperationActor(), m_ParametricBoundingBox(other.m_ParametricBoundingBox),m_TimeBounds(other.m_TimeBounds), 
+mitk::Geometry3D::Geometry3D(const Geometry3D& other) : Superclass(), mitk::OperationActor(), m_ParametricBoundingBox(other.m_ParametricBoundingBox),m_TimeBounds(other.m_TimeBounds),
   m_ImageGeometry(other.m_ImageGeometry), m_Valid(other.m_Valid), m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_RotationQuaternion( other.m_RotationQuaternion ) , m_Origin(other.m_Origin)
 {
   // AffineGeometryFrame
@@ -391,7 +391,7 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
   const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
   if(inverse.GetVnlMatrix().has_nans())
   {
-    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl 
+    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
       << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
       << inverse );
   }
@@ -425,7 +425,7 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &/*at*/, const mitk::Ve
   //const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
   //if(inverse.GetVnlMatrix().has_nans())
   //{
-  //  itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl 
+  //  itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
   //    << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
   //    << inverse );
   //}
@@ -459,7 +459,7 @@ void mitk::Geometry3D::BackTransform(const mitk::Vector3D& in, mitk::Vector3D& o
   const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
   if(inverse.GetVnlMatrix().has_nans())
   {
-    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl 
+    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
       << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
       << inverse );
   }
@@ -555,7 +555,7 @@ void mitk::Geometry3D::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
   Compose(itkTransform, pre);
 }
 
-const std::string mitk::Geometry3D::GetTransformAsString( TransformType* transformType ) 
+const std::string mitk::Geometry3D::GetTransformAsString( TransformType* transformType )
 {
   std::ostringstream out;
 
@@ -590,7 +590,7 @@ void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
     unsigned int i, j;
     os << std::endl;
     os << indent << "Matrix: " << std::endl;
-    for (i = 0; i < 3; i++) 
+    for (i = 0; i < 3; i++)
     {
       os << indent.GetNextIndent();
       for (j = 0; j < 3; j++)
@@ -605,7 +605,7 @@ void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
     os << indent << "Translation: " << m_IndexToWorldTransform->GetTranslation() << std::endl;
 
     os << indent << "Inverse: " << std::endl;
-    for (i = 0; i < 3; i++) 
+    for (i = 0; i < 3; i++)
     {
       os << indent.GetNextIndent();
       for (j = 0; j < 3; j++)
@@ -617,7 +617,7 @@ void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
 
     // from itk::ScalableAffineTransform
     os << indent << "Scale : ";
-    for (i = 0; i < 3; i++) 
+    for (i = 0; i < 3; i++)
     {
       os << m_IndexToWorldTransform->GetScale()[i] << " ";
     }
@@ -661,7 +661,7 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const
   case 5: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[5]); break;
   case 6: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[4]); break;
   case 7: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[5]); break;
-  default: 
+  default:
     {
       itkExceptionMacro(<<"A cube only has 8 corners. These are labeled 0-7.");
       return NULL;
@@ -711,21 +711,21 @@ mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnIma
   if(m_ImageGeometry == isAnImageGeometry)
     return;
 
-  const BoundingBox::BoundsArrayType& boundsarray = 
+  const BoundingBox::BoundsArrayType& boundsarray =
     this->GetBoundingBox()->GetBounds();
 
-  Point3D  originIndex; 
+  Point3D  originIndex;
   FillVector3D(originIndex,  boundsarray[0], boundsarray[2], boundsarray[4]);
 
   if(isAnImageGeometry == true)
     FillVector3D( originIndex,
-      originIndex[0] + 0.5, 
-      originIndex[1] + 0.5, 
+      originIndex[0] + 0.5,
+      originIndex[1] + 0.5,
       originIndex[2] + 0.5 );
   else
     FillVector3D( originIndex,
-      originIndex[0] - 0.5, 
-      originIndex[1] - 0.5, 
+      originIndex[0] - 0.5,
+      originIndex[1] - 0.5,
       originIndex[2] - 0.5 );
 
   Point3D originWorld;
@@ -733,8 +733,8 @@ mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnIma
   originWorld = GetIndexToWorldTransform()
     ->TransformPoint( originIndex );
   // instead could as well call  IndexToWorld(originIndex,originWorld);
-  
-  SetOrigin(originWorld); 
+
+  SetOrigin(originWorld);
 
   this->SetImageGeometry(isAnImageGeometry);
 }
@@ -759,13 +759,13 @@ bool mitk::Geometry3D::Is2DConvertable()
       col0.Set_vnl_vector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
       col1.Set_vnl_vector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
       col2.Set_vnl_vector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
-      
+
       if ((col0[2] != 0) || (col1[2] != 0) || (col2[0] != 0) || (col2[1] != 0) || (col2[2] != 1))
       {
          isConvertableWithoutLoss = false;
          break;
       }
    } while (0);
-   
+
    return isConvertableWithoutLoss;
 }

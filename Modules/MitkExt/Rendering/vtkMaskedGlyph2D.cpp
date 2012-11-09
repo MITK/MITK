@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -70,25 +70,25 @@ void vtkMaskedGlyph2D::Execute()
     {
     this->Superclass::SetInput(this->MaskPoints->GetInput());
     }
-  
+
   this->Superclass::Execute();
 }
 
 void vtkMaskedGlyph2D::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  //os << indent << "InputScalarsSelection: " 
+  //os << indent << "InputScalarsSelection: "
   //   << (this->InputScalarsSelection ? this->InputScalarsSelection : "(none)")
   //   << endl;
 
-  //os << indent << "InputVectorsSelection: " 
+  //os << indent << "InputVectorsSelection: "
   //   << (this->InputVectorsSelection ? this->InputVectorsSelection : "(none)")
   //   << endl;
 
-  //os << indent << "InputNormalsSelection: " 
+  //os << indent << "InputNormalsSelection: "
   //   << (this->InputNormalsSelection ? this->InputNormalsSelection : "(none)")
   //   << endl;
-  
+
   os << indent << "MaximumNumberOfPoints: " << this->GetMaximumNumberOfPoints()
      << endl;
 

@@ -1,7 +1,7 @@
 macro(MITK_GENERATE_TOOLS_LIBRARY)
-  
+
   set(libraryname ${ARGV0})
-  
+
   set(reallycreatelibrary TRUE)
 
   if(${ARGC} EQUAL 2) # this won't work without the ${}, don't understand the cmake documentation
@@ -13,7 +13,7 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
 
 
 
-  # GUI-less tools 
+  # GUI-less tools
   if(TOOL_FILES)
 
     # TODO these will also get Qmitk includes! Should not be
@@ -40,8 +40,8 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
 
     # give them Qmitk headers
     include_directories(${QMITK_INCLUDE_DIRS})
-    
-    foreach( TOOL_GUI_FILE ${TOOL_QT4GUI_FILES})  
+
+    foreach( TOOL_GUI_FILE ${TOOL_QT4GUI_FILES})
 
       # construct tool name from file name
       string(REGEX REPLACE "^Qmitk(.+)GUI\\.c(pp|xx)$" "\\1" TOOL_NAME ${TOOL_GUI_FILE})
@@ -51,12 +51,12 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
       # source file names for this tool
       set( TOOL_GUI_CPPS ${TOOL_GUI_FILE} ${TOOL_GUI_CPPS} )
       set( TOOL_GUI_MOC_H ${TOOL_GUI_HEADER} ${TOOL_GUI_MOC_H} )
-    endforeach( TOOL_GUI_FILE ${TOOL_QT4GUI_FILES})  
+    endforeach( TOOL_GUI_FILE ${TOOL_QT4GUI_FILES})
 
     qt_wrap_cpp(${libraryname} TOOL_GUI_CPPS ${TOOL_GUI_MOC_H})
   endif(TOOL_QT4GUI_FILES)
 
-  
+
 
   # care for additional files (should be used only with MITK external extensions)
   if(TOOL_ADDITIONAL_CPPS)
@@ -77,7 +77,7 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
       # also mark this file for compilation
       set( TOOL_CPPS ${PROJECT_BINARY_DIR}/mitkToolExtensionITKFactoryLoader.cpp ${TOOL_CPPS} )
       message(STATUS "Creating itkLoad for external library " ${libraryname})
-    
+
     message(STATUS "Adding library " ${libraryname})
 
     # a library to wrap up everything
@@ -86,7 +86,7 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
 
     link_directories(${MITK_LINK_DIRECTORIES})
     add_library(${libraryname} SHARED ${TOOL_CPPS} ${TOOL_GUI_CPPS})
-    
+
     target_link_libraries(${libraryname} ${QMITK_LIBRARIES})
     endif(libraryname AND reallycreatelibrary)
   endif(TOOL_FILES OR TOOL_QT4GUI_FILES)

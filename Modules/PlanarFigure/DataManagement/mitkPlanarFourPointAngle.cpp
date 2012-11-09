@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,8 +37,8 @@ void mitk::PlanarFourPointAngle::GeneratePolyLine()
 {
   this->ClearPolyLines();
   // TODO: start line at specified start point...
-  // Generate poly-line 
-  
+  // Generate poly-line
+
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
     int index = i/2;
@@ -51,7 +51,7 @@ void mitk::PlanarFourPointAngle::GenerateHelperPolyLine(double /*mmPerDisplayUni
   // Generate helper-poly-line for an four point angle
   // Need to discuss a sensible implementation
 }
-  
+
 void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
 {
   if ( this->GetNumberOfControlPoints() < 4 )

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -78,8 +78,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkVersorRigid3DTransformOptimizerView.h"
 
 QmitkRigidRegistrationSelectorView::QmitkRigidRegistrationSelectorView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
-m_FixedNode(NULL), m_FixedMaskNode(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedDimension(0), m_MovingDimension(0), 
-m_StopOptimization(false), m_GeometryItkPhysicalToWorldTransform(NULL), m_GeometryWorldToItkPhysicalTransform(NULL), 
+m_FixedNode(NULL), m_FixedMaskNode(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedDimension(0), m_MovingDimension(0),
+m_StopOptimization(false), m_GeometryItkPhysicalToWorldTransform(NULL), m_GeometryWorldToItkPhysicalTransform(NULL),
 m_MovingGeometry(NULL), m_ImageGeometry(NULL)
 {
   m_Controls.setupUi(parent);
@@ -88,7 +88,7 @@ m_MovingGeometry(NULL), m_ImageGeometry(NULL)
   this->AddTransform(new QmitkScaleTransformView(this, f));
   this->AddTransform(new QmitkScaleLogarithmicTransformView(this, f));
   this->AddTransform(new QmitkAffineTransformView(this, f));
-  this->AddTransform(new QmitkFixedCenterOfRotationAffineTransformView(this, f));  
+  this->AddTransform(new QmitkFixedCenterOfRotationAffineTransformView(this, f));
   this->AddTransform(new QmitkEuler3DTransformView(this, f));
   this->AddTransform(new QmitkCenteredEuler3DTransformView(this, f));
   this->AddTransform(new QmitkQuaternionRigidTransformView(this, f));
@@ -151,7 +151,7 @@ m_MovingGeometry(NULL), m_ImageGeometry(NULL)
   this->TransformSelected(m_Controls.m_TransformBox->currentIndex());
   this->MetricSelected(m_Controls.m_MetricBox->currentIndex());
   this->OptimizerSelected(m_Controls.m_OptimizerBox->currentIndex());
-  
+
 
   //// create connections
   connect( m_Controls.m_TransformGroup, SIGNAL(clicked(bool)), m_Controls.m_TransformFrame, SLOT(setVisible(bool)));
@@ -277,12 +277,12 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
     std::vector<std::string> presets;
     // init registration method
-    mitk::ImageRegistrationMethod::Pointer registration = mitk::ImageRegistrationMethod::New(); 
+    mitk::ImageRegistrationMethod::Pointer registration = mitk::ImageRegistrationMethod::New();
 
     registration->SetObserver(m_Observer);
     registration->SetInterpolator(m_Controls.m_InterpolatorBox->currentIndex());
     registration->SetReferenceImage(fimage);
-    registration->SetInput(mimage);    
+    registration->SetInput(mimage);
     if (mmimage.IsNotNull())
     {
       registration->SetMovingMask(mmimage);
@@ -291,15 +291,15 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     {
       registration->SetFixedMask(fmimage);
     }
-    
+
     dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->SetFixedImage(dynamic_cast<mitk::Image*>(m_FixedNode->GetData()));
     dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->SetMovingImage(dynamic_cast<mitk::Image*>(m_MovingNode->GetData()));
     registration->SetOptimizerScales(dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->GetScales());
     registration->SetTransform(dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->GetTransform());
-    
+
     dynamic_cast<QmitkRigidRegistrationMetricsGUIBase*>(m_Controls.m_MetricWidgetStack->currentWidget())->SetMovingImage(dynamic_cast<mitk::Image*>(m_MovingNode->GetData()));
     registration->SetMetric(dynamic_cast<QmitkRigidRegistrationMetricsGUIBase*>(m_Controls.m_MetricWidgetStack->currentWidget())->GetMetric());
-    
+
     registration->SetOptimizer(dynamic_cast<QmitkRigidRegistrationOptimizerGUIBase*>(m_Controls.m_OptimizerWidgetStack->currentWidget())->GetOptimizer());
 
     double time(0.0);
@@ -325,7 +325,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
     m_Observer->RemoveObserver(observer);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }  
+  }
 }
 
 void QmitkRigidRegistrationSelectorView::SetFixedNode( mitk::DataNode * fixedNode )
@@ -409,9 +409,9 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
     m_MovingGeometry->Compose(m_ImageGeometry->GetIndexToWorldTransform(), 1);
 
     // in the end, go back to world space
-    m_MovingGeometry->Compose(m_GeometryItkPhysicalToWorldTransform, 0);  
+    m_MovingGeometry->Compose(m_GeometryItkPhysicalToWorldTransform, 0);
 
-#else     
+#else
     m_MovingGeometry->Compose(m_ImageGeometry->GetIndexToWorldTransform(), 1);
 #endif
 
@@ -423,7 +423,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
     std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>::iterator iter;
     std::map<mitk::DataNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>::iterator iter2;
     mitk::DataNode::Pointer childNode;
-    for( iter = m_ChildNodes.begin(); iter != m_ChildNodes.end(); iter++ ) 
+    for( iter = m_ChildNodes.begin(); iter != m_ChildNodes.end(); iter++ )
     {
       childNode = (*iter).first;
       if (childNode.IsNotNull())
@@ -451,9 +451,9 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
         childGeometry->Compose(childImageGeometry->GetIndexToWorldTransform(), 1);
 
         // in the end, go back to world space
-        childGeometry->Compose(m_GeometryItkPhysicalToWorldTransform, 0);  
+        childGeometry->Compose(m_GeometryItkPhysicalToWorldTransform, 0);
 
-#else     
+#else
         childGeometry->Compose(childImageGeometry->GetIndexToWorldTransform(), 1);
 #endif
       }
@@ -517,10 +517,10 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationParameter()
 {
   std::map<std::string, itk::Array<double> > existingPresets;
   existingPresets = m_Preset->getTransformValuesPresets();
-  
+
   std::map<std::string, itk::Array<double> >::iterator iter;
   std::list<std::string> presets;
-  for( iter = existingPresets.begin(); iter != existingPresets.end(); iter++ ) 
+  for( iter = existingPresets.begin(); iter != existingPresets.end(); iter++ )
   {
     presets.push_back( (*iter).first );
   }
@@ -542,7 +542,7 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
 {
   itk::Array<double> transformValues;
   transformValues = m_Preset->getTransformValues(presetName);
-  
+
   m_Controls.m_TransformGroup->setChecked(true);
   m_Controls.m_TransformFrame->setVisible(true);
   m_Controls.m_TransformBox->setCurrentIndex((int)transformValues[0]);
@@ -557,9 +557,9 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
   }
   dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->SetTransformParameters(transformValuesForGUI);
 
-  itk::Array<double> metricValues;  
+  itk::Array<double> metricValues;
   metricValues = m_Preset->getMetricValues(presetName);
-  
+
   m_Controls.m_MetricGroup->setChecked(true);
   m_Controls.m_MetricFrame->setVisible(true);
   m_Controls.m_MetricBox->setCurrentIndex((int)metricValues[0]);
@@ -576,7 +576,7 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
 
   itk::Array<double> optimizerValues;
   optimizerValues = m_Preset->getOptimizerValues(presetName);
-   
+
   m_Controls.m_OptimizerGroup->setChecked(true);
   m_Controls.m_OptimizerFrame->setVisible(true);
   m_Controls.m_OptimizerBox->setCurrentIndex((int)optimizerValues[0]);
@@ -593,7 +593,7 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
 
   itk::Array<double> interpolatorValues;
   interpolatorValues = m_Preset->getInterpolatorValues(presetName);
-  
+
   m_Controls.m_InterpolatorGroup->setChecked(true);
   m_Controls.m_InterpolatorFrame->setVisible(true);
   m_Controls.m_InterpolatorBox->setCurrentIndex((int)interpolatorValues[0]);
@@ -608,14 +608,14 @@ void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
 void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter()
 {
   bool ok;
-  QString text = QInputDialog::getText(this, 
+  QString text = QInputDialog::getText(this,
     "Save Parameter Preset", "Enter name for preset:", QLineEdit::Normal,
     QString::null, &ok );
   if ( ok )
   {
     std::map<std::string, itk::Array<double> > existingPresets;
     existingPresets = m_Preset->getTransformValuesPresets();
-    
+
     std::map<std::string, itk::Array<double> >::iterator iter = existingPresets.find(std::string((const char*)text.toLatin1()));
     if (iter != existingPresets.end())
     {
@@ -643,7 +643,7 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter()
 
     std::map<std::string, itk::Array<double> > transformMap;
     transformMap = m_Preset->getTransformValuesPresets();
-    
+
     transformMap[std::string((const char*)text.toLatin1())] = transformValues;
 
     itk::Array<double> metricValues;
@@ -658,7 +658,7 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter()
 
     std::map<std::string, itk::Array<double> > metricMap;
     metricMap = m_Preset->getMetricValuesPresets();
-    
+
     metricMap[std::string((const char*)text.toLatin1())] = metricValues;
 
     itk::Array<double> optimizerValues;
@@ -673,7 +673,7 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter()
 
     std::map<std::string, itk::Array<double> > optimizerMap;
     optimizerMap = m_Preset->getOptimizerValuesPresets();
-    
+
     optimizerMap[std::string((const char*)text.toLatin1())] = optimizerValues;
 
     itk::Array<double> interpolatorValues;
@@ -683,13 +683,13 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter()
 
     std::map<std::string, itk::Array<double> > interpolatorMap;
     interpolatorMap = m_Preset->getInterpolatorValuesPresets();
-    
+
     interpolatorMap[std::string((const char*)text.toLatin1())] = interpolatorValues;
 
     m_Preset->newPresets(transformMap, metricMap, optimizerMap, interpolatorMap);
-    
+
   }
-  else 
+  else
   {
     // user pressed Cancel
   }

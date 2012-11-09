@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ ImportMitkImageContainer<TElementIdentifier , TElement>
 
 }
 
-  
+
 template <typename TElementIdentifier, typename TElement>
 ImportMitkImageContainer< TElementIdentifier , TElement >
 ::~ImportMitkImageContainer()
@@ -46,7 +46,7 @@ ImportMitkImageContainer< TElementIdentifier , TElement >
 ::SetImageDataItem(mitk::ImageDataItem* imageDataItem)
 {
   m_ImageDataItem = imageDataItem;
-  
+
   this->SetImportPointer( (TElement*) m_ImageDataItem->GetData(), m_ImageDataItem->GetSize()/sizeof(Element), false);
 
   this->Modified();

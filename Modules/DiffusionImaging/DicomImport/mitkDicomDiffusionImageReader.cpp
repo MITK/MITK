@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -99,7 +99,7 @@ void DicomDiffusionImageReader<TPixelType, TDimension>
   output->SetBufferedRegion( requestedRegion );
   output->Allocate();
 
-  itk::ProgressReporter progress(this, 0, 
+  itk::ProgressReporter progress(this, 0,
                             m_Headers.size(),
                             m_Headers.size());
 
@@ -109,7 +109,7 @@ void DicomDiffusionImageReader<TPixelType, TDimension>
 
   for (int i = 0; i < numberOfVolumes; i ++)
     {
-    
+
     MITK_INFO << "Loading volume " << i+1 << "/" << numberOfVolumes;
     typename ReaderType::Pointer reader = ReaderType::New();
     reader->SetFileNames(m_Headers[i]->m_DicomFilenames);

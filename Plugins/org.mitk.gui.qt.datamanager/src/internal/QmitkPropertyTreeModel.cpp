@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -98,7 +98,7 @@ QVariant QmitkPropertyTreeModel::data(const QModelIndex &index, int role) const
   if (index.column() == 1 && static_cast<QmitkPropertyTreeItem *>(index.internalPointer())->GetData(index.column()).isValid())
   {
     mitk::BaseProperty *property = reinterpret_cast<mitk::BaseProperty *>(static_cast<QmitkPropertyTreeItem *>(index.internalPointer())->GetData(index.column()).value<void *>());
-    
+
     if (mitk::ColorProperty *colorProperty = dynamic_cast<mitk::ColorProperty *>(property))
     {
       if (role == Qt::DisplayRole || role == Qt::EditRole)
@@ -209,7 +209,7 @@ QModelIndex QmitkPropertyTreeModel::parent(const QModelIndex &child) const
 
   return createIndex(parentItem->GetRow(), 0, parentItem);
 }
- 
+
 int QmitkPropertyTreeModel::rowCount(const QModelIndex &parent) const
 {
   if (parent.column() > 0)
@@ -227,7 +227,7 @@ bool QmitkPropertyTreeModel::setData(const QModelIndex &index, const QVariant &v
     if (index.column() == 1)
     {
       mitk::BaseProperty *property = reinterpret_cast<mitk::BaseProperty *>(static_cast<QmitkPropertyTreeItem *>(index.internalPointer())->GetData(index.column()).value<void *>());
-    
+
       if (mitk::ColorProperty *colorProperty = dynamic_cast<mitk::ColorProperty *>(property))
       {
         QColor qtColor = value.value<QColor>();

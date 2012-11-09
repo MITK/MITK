@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QToolButton>
 
 QmitkCorrespondingPointSetsWidget::QmitkCorrespondingPointSetsWidget(QWidget *parent):
-  QWidget(parent), 
+  QWidget(parent),
   m_CorrespondingPointSetsView(NULL)
 {
   // create new QTableView
@@ -53,7 +53,7 @@ void QmitkCorrespondingPointSetsWidget::SetupUi()
 
     QStatusBar* statusBar = new QStatusBar(this);
     statusBar->setMaximumHeight(25);
-    
+
     m_CreatePointSetBtn = new QToolButton();
     m_CreatePointSetBtn->setAutoRaise(true);
     m_CreatePointSetBtn->setIcon(QIcon(":/qmitk/btnAddPointSet.png"));

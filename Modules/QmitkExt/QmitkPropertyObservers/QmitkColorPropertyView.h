@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,10 +27,10 @@ class QmitkExt_EXPORT QmitkColorPropertyView : public QLabel, public mitk::Prope
   Q_OBJECT
 
   public:
-    
+
     QmitkColorPropertyView( const mitk::ColorProperty*, QWidget* parent );
     virtual ~QmitkColorPropertyView();
-      
+
     //virtual void unsetPalette();
     //virtual void setPalette( const QPalette & );
     //virtual void setBackgroundMode( QWidget::BackgroundMode );
@@ -43,11 +43,11 @@ class QmitkExt_EXPORT QmitkColorPropertyView : public QLabel, public mitk::Prope
     void DisplayColor();
 
     const mitk::ColorProperty* m_ColorProperty;
-    
+
     QPalette m_WidgetPalette;
 
   private:
-    
+
     //bool m_SelfCall;
 };
 

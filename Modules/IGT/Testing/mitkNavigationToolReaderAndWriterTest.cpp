@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkNavigationToolReaderAndWriterTestClass
   {
   private:
-    
+
     static mitk::Surface::Pointer testSurface;
 
   public:
@@ -62,7 +62,7 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     mitk::DataNode::Pointer myNode = mitk::DataNode::New();
     myNode->SetName("ClaronTool");
-      
+
     //load an stl File
     mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
     try
@@ -82,9 +82,9 @@ class mitkNavigationToolReaderAndWriterTestClass
     else
       {
       testSurface = stlReader->GetOutput();
-      myNode->SetData(testSurface);    
+      myNode->SetData(testSurface);
       }
-    
+
     myNavigationTool->SetDataNode(myNode);
     myNavigationTool->SetIdentifier("ClaronTool#1");
     myNavigationTool->SetSerialNumber("0815");
@@ -117,7 +117,7 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     std::ifstream TestFile(readTool->GetCalibrationFile().c_str());
     MITK_TEST_CONDITION_REQUIRED(TestFile,"Testing If Calibration File Exists");
- 
+
     }
 
     static void TestWrite2()
@@ -125,10 +125,10 @@ class mitkNavigationToolReaderAndWriterTestClass
     //testcase with second test tool: an aurora tool
     //create a NavigationTool which we can write on the harddisc
     mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
-   
+
     mitk::DataNode::Pointer myNode = mitk::DataNode::New();
     myNode->SetName("AuroraTool");
-      
+
     //load an stl File
     mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
     try
@@ -148,9 +148,9 @@ class mitkNavigationToolReaderAndWriterTestClass
     else
       {
       testSurface = stlReader->GetOutput();
-      myNode->SetData(testSurface);    
+      myNode->SetData(testSurface);
       }
-    
+
     myNavigationTool->SetDataNode(myNode);
     myNavigationTool->SetIdentifier("AuroraTool#1");
     myNavigationTool->SetSerialNumber("0816");
@@ -183,7 +183,7 @@ class mitkNavigationToolReaderAndWriterTestClass
     MITK_TEST_CONDITION_REQUIRED(readTool->GetSerialNumber()=="0816","Testing Serial Number");
 
     MITK_TEST_CONDITION_REQUIRED(readTool->GetCalibrationFile()=="none","Testing Calibration File");
-    
+
     }
 
     static void CleanUp()
@@ -212,11 +212,11 @@ class mitkNavigationToolReaderAndWriterTestClass
     //now create a writer and write it to the harddisc
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
     std::string filename = "NH:/sfdsfsdsf.&%%%";
-    
+
     MITK_TEST_OUTPUT(<<"---- Testing write invalid file ----");
     bool test = myWriter->DoWrite(filename,myNavigationTool);
     MITK_TEST_CONDITION_REQUIRED(!test,"testing write");
-    MITK_TEST_CONDITION_REQUIRED(myWriter->GetErrorMessage() == "Could not open a zip file for writing: 'NH:/sfdsfsdsf.&%%%'","testing error message"); 
+    MITK_TEST_CONDITION_REQUIRED(myWriter->GetErrorMessage() == "Could not open a zip file for writing: 'NH:/sfdsfsdsf.&%%%'","testing error message");
     }
 
   };

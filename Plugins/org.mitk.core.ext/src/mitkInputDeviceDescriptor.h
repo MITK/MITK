@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,8 +40,8 @@ namespace mitk
     /**
     * Initialize the Input Device Descriptor with the given extension point.
     *
-    * @param inputDeviceExtensionPoint 
-    *				element, that refers to a extension point (type, id, name, class)
+    * @param inputDeviceExtensionPoint
+    *        element, that refers to a extension point (type, id, name, class)
     */
     InputDeviceDescriptor(berry::IConfigurationElement::Pointer inputDeviceExtensionPoint);
 
@@ -61,12 +61,12 @@ namespace mitk
     std::string GetDescription() const;
 
     /**
-    * @see mitk::IInputDeviceDescriptor::GetID() 
+    * @see mitk::IInputDeviceDescriptor::GetID()
     */
     std::string GetID() const;
 
     /**
-    * @see mitk::IInputDeviceDescriptor::GetName() 
+    * @see mitk::IInputDeviceDescriptor::GetName()
     */
     std::string GetName() const;
 
@@ -79,7 +79,7 @@ namespace mitk
 
     // IConfigurationElements are used to access xml files (here: plugin.xml)
     berry::IConfigurationElement::Pointer m_InputDeviceExtensionPoint;
-    mitk::IInputDevice::Pointer m_InputDevice;   
+    mitk::IInputDevice::Pointer m_InputDevice;
 
   }; // end class
 } // end namespace

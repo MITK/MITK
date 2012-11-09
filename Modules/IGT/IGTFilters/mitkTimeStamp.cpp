@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -43,7 +43,7 @@ mitk::TimeStamp* mitk::TimeStamp::GetInstance()
     s_Instance = ts;
     return s_Instance;
   }
-  else  
+  else
     return s_Instance;
 }
 
@@ -59,17 +59,17 @@ void mitk::TimeStamp::Start(itk::Object::Pointer device)
     {
       m_ReferenceTime = GetCurrentStamp();
       m_Time = 0.0;
-    } 
+    }
     m_DeviceMap.insert( std::pair<itk::Object::Pointer, double>(device, this->GetElapsed()) );
   }
   else
   {
-    itkGenericOutputMacro("Trying to use mitk::TimeStamp::Start() " 
+    itkGenericOutputMacro("Trying to use mitk::TimeStamp::Start() "
         << "without an available singleton instance. Either no instance has "
         << "been created (use TimeStamp::CreateInstance) or it has already "
         << "been destroyed.");
   }
-}             
+}
 
 void mitk::TimeStamp::Stop(itk::Object::Pointer device)
 {
@@ -80,7 +80,7 @@ void mitk::TimeStamp::Stop(itk::Object::Pointer device)
     {
       m_DeviceMap.erase( m_MapIterator );
     }
-    
+
     if (m_DeviceMap.empty())
     {
       m_ReferenceTime = NULL;
@@ -89,10 +89,10 @@ void mitk::TimeStamp::Stop(itk::Object::Pointer device)
   }
   else
   {
-    itkGenericOutputMacro("Trying to use mitk::TimeStamp::Stop() " 
+    itkGenericOutputMacro("Trying to use mitk::TimeStamp::Stop() "
         << "without an available singleton instance. Either no instance has "
         << "been created (use TimeStamp::CreateInstance) or it has already "
-        << "been destroyed.");    
+        << "been destroyed.");
   }
 }
 
@@ -143,7 +143,7 @@ double mitk::TimeStamp::GetOffset(itk::Object::Pointer Device)
   {
     return m_MapIterator->second;
   }
-  else 
+  else
   {
     return -1.0;
   }

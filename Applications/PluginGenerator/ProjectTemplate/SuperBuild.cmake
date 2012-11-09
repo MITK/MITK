@@ -1,6 +1,6 @@
 
 #-----------------------------------------------------------------------------
-# ExternalProjects 
+# ExternalProjects
 #-----------------------------------------------------------------------------
 
 set(external_projects
@@ -52,7 +52,7 @@ else()
   set(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLINUX_EXTRA")
 endif()
 
-set(ep_common_args 
+set(ep_common_args
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
   -DBUILD_SHARED_LIBS:BOOL=${ep_build_shared_libs}
@@ -77,7 +77,7 @@ set(my_cmake_boolean_args
   BUILD_TESTING
   ${MY_PROJECT_NAME}_BUILD_ALL_PLUGINS
   )
-    
+
 #-----------------------------------------------------------------------------
 # Create the final variable containing superbuild boolean args
 #-----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ ExternalProject_Add(${proj}
   DEPENDS
     # Mandatory dependencies
     ${MITK_DEPENDS}
-    # Optional dependencies 
+    # Optional dependencies
 )
 
 #-----------------------------------------------------------------------------

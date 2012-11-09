@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,14 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <limits>
 
-mitk::GeometryClipImageFilter::GeometryClipImageFilter() 
-  : m_ClippingGeometry(NULL), 
-    m_ClipPartAboveGeometry(true), 
-    m_OutsideValue(0), 
-    m_AutoOutsideValue(false), 
+mitk::GeometryClipImageFilter::GeometryClipImageFilter()
+  : m_ClippingGeometry(NULL),
+    m_ClipPartAboveGeometry(true),
+    m_OutsideValue(0),
+    m_AutoOutsideValue(false),
     m_LabelBothSides(false),
     m_AutoOrientLabels(false),
-    m_AboveGeometryLabel(1), 
+    m_AboveGeometryLabel(1),
     m_BelowGeometryLabel(2)
 {
   this->SetNumberOfInputs(2);
@@ -61,7 +61,7 @@ void mitk::GeometryClipImageFilter::SetClippingGeometry(const mitk::Geometry3D* 
   }
 }
 
-const mitk::Geometry3D* mitk::GeometryClipImageFilter::GetClippingGeometry() const 
+const mitk::Geometry3D* mitk::GeometryClipImageFilter::GetClippingGeometry() const
 {
   return m_ClippingGeometry;
 }
@@ -105,7 +105,7 @@ void mitk::GeometryClipImageFilter::GenerateOutputInformation()
 
   output->SetGeometry(static_cast<mitk::Geometry3D*>(input->GetGeometry()->Clone().GetPointer()));
 
-  output->SetPropertyList(input->GetPropertyList()->Clone());    
+  output->SetPropertyList(input->GetPropertyList()->Clone());
 
   m_TimeOfHeaderInitialization.Modified();
 }

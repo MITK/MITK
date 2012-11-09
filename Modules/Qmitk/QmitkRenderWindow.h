@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,7 +41,7 @@ public:
 
   QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL, mitk::RenderingManager* renderingManager = NULL);
   virtual ~QmitkRenderWindow();
- 
+
   /**
    * \brief Whether Qt events should be passed to parent (default: true)
    *
@@ -62,25 +62,25 @@ public:
 
   // Set Layout Index to define the Layout Type
   void SetLayoutIndex( unsigned int layoutIndex );
-    
+
   // Get Layout Index to define the Layout Type
   unsigned int GetLayoutIndex();
 
   //MenuWidget need to update the Layout Design List when Layout had changed
   void LayoutDesignListChanged( int layoutDesignIndex );
-  
-  
+
+
   void HideRenderWindowMenu( );
 
   //Activate or Deactivate MenuWidget.
   void ActivateMenuWidget( bool state, QmitkStdMultiWidget* stdMultiWidget = 0);
-  
+
   bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }
 
   // Get it from the QVTKWidget parent
   virtual vtkRenderWindow* GetVtkRenderWindow()
-  {  return GetRenderWindow();} 
+  {  return GetRenderWindow();}
 
   virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor()
   {  return NULL;}
@@ -123,10 +123,10 @@ protected:
     void AdjustRenderWindowMenuVisibility( const QPoint& pos );
 
 signals:
-  
+
   void ResetView();
   // \brief int parameters are enum from QmitkStdMultiWidget
-  void ChangeCrosshairRotationMode(int); 
+  void ChangeCrosshairRotationMode(int);
 
   void SignalLayoutDesignChanged( int layoutDesignIndex );
 
@@ -137,7 +137,7 @@ signals:
   /// \brief Emits a signal to say that this window has had the following nodes dropped on it.
   void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode*> nodes);
 
-protected slots:  
+protected slots:
 
   void OnChangeLayoutDesign(int layoutDesignIndex);
 
@@ -146,15 +146,15 @@ protected slots:
   void DeferredHideMenu();
 
 private:
-  
+
   bool                           m_ResendQtEvents;
 
   QmitkRenderWindowMenu*         m_MenuWidget;
 
   bool                           m_MenuWidgetActivated;
-  
+
   unsigned int                   m_LayoutIndex;
-  
+
 };
 
 #endif

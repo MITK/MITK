@@ -9,7 +9,7 @@ set(INTERNAL_CPP_FILES
 
 set(MOC_H_FILES
   src/QmitkStdMultiWidgetEditor.h
-  
+
   src/internal/org_mitk_gui_qt_stdmultiwidgeteditor_Activator.h
   src/internal/QmitkStdMultiWidgetEditorPreferencePage.h
 )

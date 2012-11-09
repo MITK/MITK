@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -212,7 +212,7 @@ void mitk::DataStorage::AddListeners( const mitk::DataNode* _Node )
   mitk::DataNode* NonConstNode = const_cast<mitk::DataNode*>(_Node);
   if(_Node && m_NodeModifiedObserverTags
     .find(NonConstNode) == m_NodeModifiedObserverTags.end())
-  {    
+  {
     itk::MemberCommand<mitk::DataStorage>::Pointer nodeModifiedCommand =
       itk::MemberCommand<mitk::DataStorage>::New();
     nodeModifiedCommand->SetCallbackFunction(this

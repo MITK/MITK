@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,10 +39,10 @@ namespace mitk {
   class MITK_CORE_EXPORT DisplayCoordinateOperation : public Operation
   {
   public:
-    DisplayCoordinateOperation(mitk::OperationType operationType, 
+    DisplayCoordinateOperation(mitk::OperationType operationType,
       mitk::BaseRenderer* renderer,
-      const mitk::Point2D& startDisplayCoordinate, 
-      const mitk::Point2D& lastDisplayCoordinate, 
+      const mitk::Point2D& startDisplayCoordinate,
+      const mitk::Point2D& lastDisplayCoordinate,
       const mitk::Point2D& currentDisplayCoordinate
       );
 

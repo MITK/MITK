@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -48,7 +48,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
   case AcDONOTHING:
     ok = true;
     break;
-  case AcCHECKELEMENT: 
+  case AcCHECKELEMENT:
     /*
     * picking: Answer the question if the given position within stateEvent is close enough to select an object
     * send yes if close enough and no if not picked
@@ -71,9 +71,9 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
       else
         newStateEvent.reset(new mitk::StateEvent(EIDNO, stateEvent->GetEvent()));
 
-      /* write new state (selected/not selected) to the property */      
+      /* write new state (selected/not selected) to the property */
       this->HandleEvent( newStateEvent.get() );
-    
+
     ok = true;
     break;
     }
@@ -81,14 +81,14 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
     // select the data
     {
       mitk::BoolProperty::Pointer selected = dynamic_cast<mitk::BoolProperty*>(m_DataNode->GetProperty("selected"));
-      if ( selected.IsNull() ) 
+      if ( selected.IsNull() )
       {
         selected = mitk::BoolProperty::New();
         m_DataNode->GetPropertyList()->SetProperty("selected", selected);
       }
 
       mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
-      if ( color.IsNull() ) 
+      if ( color.IsNull() )
       {
         color = mitk::ColorProperty::New();
         m_DataNode->GetPropertyList()->SetProperty("color", color);
@@ -107,14 +107,14 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
     //deselect the data
     {
       mitk::BoolProperty::Pointer selected = dynamic_cast<mitk::BoolProperty*>(m_DataNode->GetProperty("selected"));
-      if ( selected.IsNull() ) 
+      if ( selected.IsNull() )
       {
         selected = mitk::BoolProperty::New();
         m_DataNode->GetPropertyList()->SetProperty("selected", selected);
       }
 
       mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
-      if ( color.IsNull() ) 
+      if ( color.IsNull() )
       {
         color = mitk::ColorProperty::New();
         m_DataNode->GetPropertyList()->SetProperty("color", color);
@@ -157,7 +157,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
 
       // indicate modification of data tree node
       m_DataNode->Modified();
-      
+
       //update rendering
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -172,7 +172,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
   return ok;
 }
 
-/** 
+/**
 \example mitkMoveSurfaceInteractor.cpp
  * This is an example of how to implement a new Interactor.
  * See more details about this example in tutorial Step10.

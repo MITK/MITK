@@ -40,8 +40,8 @@ double vtkThickPlane::EvaluateFunction(double x[3])
 double vtkThickPlane::EvaluateFunction(double x,double y,double z)
 {
   // PointPlaneDistance = Distance - Normal*Point
-  double ppd = Distance - ( this->Normal[0]*x + 
-    this->Normal[1]*y + 
+  double ppd = Distance - ( this->Normal[0]*x +
+    this->Normal[1]*y +
     this->Normal[2]*z );
 
   if( abs(ppd) <= Thickness )
@@ -52,7 +52,7 @@ double vtkThickPlane::EvaluateFunction(double x,double y,double z)
 
   if( ppd >= 0 )
     return ppd - Thickness;
-  
+
   return abs(ppd + Thickness);
 }
 
@@ -100,7 +100,7 @@ void vtkThickPlane::SetNormal (double _arg1, double _arg2, double _arg3)
 void vtkThickPlane::SetNormal (double _arg[3])
 {
   this->SetNormal (_arg[0], _arg[1], _arg[2]);
-} 
+}
 
 void vtkThickPlane::SetOrigin (double _arg1, double _arg2, double _arg3)
 {
@@ -117,7 +117,7 @@ void vtkThickPlane::SetOrigin (double _arg1, double _arg2, double _arg3)
 void vtkThickPlane::SetOrigin (double _arg[3])
 {
   this->SetOrigin (_arg[0], _arg[1], _arg[2]);
-} 
+}
 
 void vtkThickPlane::SetThickness (double _arg)
 {
@@ -130,10 +130,10 @@ void vtkThickPlane::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Normal: (" << this->Normal[0] << ", " 
+  os << indent << "Normal: (" << this->Normal[0] << ", "
     << this->Normal[1] << ", " << this->Normal[2] << ")\n";
 
-  os << indent << "Origin: (" << this->Origin[0] << ", " 
+  os << indent << "Origin: (" << this->Origin[0] << ", "
     << this->Origin[1] << ", " << this->Origin[2] << ")\n";
 
   os << indent << "Thickness: " << this->Thickness << "\n";

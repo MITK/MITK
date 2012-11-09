@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationTool.h"
 #include "Poco/File.h"
 
-mitk::NavigationTool::NavigationTool() : m_Type(mitk::NavigationTool::Unknown), 
+mitk::NavigationTool::NavigationTool() : m_Type(mitk::NavigationTool::Unknown),
                                          m_Identifier("None"),
                                          m_TrackingDeviceType(mitk::TrackingSystemNotSpecified),
                                          m_CalibrationFile("none"),
@@ -30,10 +30,10 @@ mitk::NavigationTool::NavigationTool() : m_Type(mitk::NavigationTool::Unknown),
     m_ToolTipPosition[1] = 0;
     m_ToolTipPosition[2] = 0;
   }
- 
+
 mitk::NavigationTool::~NavigationTool()
   {
-  
+
   }
 
 void mitk::NavigationTool::SetCalibrationFile(const std::string filename)
@@ -46,7 +46,7 @@ void mitk::NavigationTool::SetCalibrationFile(const std::string filename)
   else
     {
     Poco::File myFile(filename);
-    if (myFile.exists()) 
+    if (myFile.exists())
       m_CalibrationFile = filename;
     else
       m_CalibrationFile = "none";

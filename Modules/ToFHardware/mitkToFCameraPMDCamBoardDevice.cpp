@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,7 +30,7 @@ namespace mitk
   ToFCameraPMDCamBoardDevice::~ToFCameraPMDCamBoardDevice()
   {
   }
-  
+
   void ToFCameraPMDCamBoardDevice::SetRegionOfInterest(unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height)
   {
     if (m_Controller.IsNotNull())
@@ -82,7 +82,7 @@ namespace mitk
     {
       // 1) copy the image buffer
       // 2) convert the distance values from m to mm
-     
+
       // check for empty buffer
       if (this->m_ImageSequence < 0)
       {

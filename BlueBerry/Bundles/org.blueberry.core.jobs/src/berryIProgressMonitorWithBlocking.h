@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -65,7 +65,7 @@ struct BERRY_JOBS IProgressMonitorWithBlocking: public IProgressMonitor
    * information is not available.
    * @see #clearBlocked()
    */
-   virtual void SetBlocked(IStatus::Pointer reason)= 0;  
+   virtual void SetBlocked(IStatus::Pointer reason)= 0;
 
   /**
    * Clears the blocked state of the running operation. If a running
@@ -75,7 +75,7 @@ struct BERRY_JOBS IProgressMonitorWithBlocking: public IProgressMonitor
    * @see #setBlocked(IStatus)
    */
    virtual void  ClearBlocked() = 0;
-  
+
 
 };
 

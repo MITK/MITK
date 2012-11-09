@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef WIN32
   #include <ulimit.h>
   #include <errno.h>
-#endif 
+#endif
 
 class SceneIOTestClass
 {
@@ -85,7 +85,7 @@ static mitk::Surface::Pointer LoadSurface(const std::string& filename)
 
 static mitk::PointSet::Pointer CreatePointSet()
 {
-  
+
   mitk::PointSet::Pointer ps = mitk::PointSet::New();
   mitk::PointSet::PointType p;
   mitk::FillVector3D(p, 1.0, -2.0, 33.0);
@@ -122,13 +122,13 @@ static void FillStorage(mitk::DataStorage* storage, std::string imageName, std::
   imagechildnode->SetName( "Pic3D again" );
   storage->Add( imagechildnode, imagenode );
 
-  
+
   mitk::Surface::Pointer surface = LoadSurface(surfaceName );
   MITK_TEST_CONDITION_REQUIRED(surface.IsNotNull(),"Loading test surface binary.stl");
-  
+
   surface->SetProperty("surface type", mitk::StringProperty::New("test surface") );
   surface->SetProperty("greetings", mitk::StringProperty::New("to dad") );
-  
+
   mitk::DataNode::Pointer surfacenode = mitk::DataNode::New();
   surfacenode->SetData( surface );
   surfacenode->SetName( "binary" );
@@ -208,7 +208,7 @@ static void VerifyStorage(mitk::DataStorage* storage)
 
 }
 }; // end test helper class
-  
+
 int mitkSceneIOTest(int, char* argv[])
 {
   MITK_TEST_BEGIN("SceneIO")
@@ -227,11 +227,11 @@ int mitkSceneIOTest(int, char* argv[])
         continue;
       #endif
     }
-  
+
     // create a data storage and fill it with some test data
     mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
-    MITK_TEST_CONDITION_REQUIRED(sceneIO.IsNotNull(),"SceneIO instantiation") 
-    
+    MITK_TEST_CONDITION_REQUIRED(sceneIO.IsNotNull(),"SceneIO instantiation")
+
     mitk::DataStorage::Pointer storage = mitk::StandaloneDataStorage::New().GetPointer();
     MITK_TEST_CONDITION_REQUIRED(storage.IsNotNull(),"StandaloneDataStorage instantiation");
 
@@ -332,11 +332,11 @@ int mitkSceneIOTest(int, char* argv[])
 
     // check if data storage content has been restored correctly
     SceneIOTestClass::VerifyStorage(storage);
-  
+
   }
   // if no sub-test failed remove the scene file, otherwise it is kept for debugging purposes
   if ( mitk::TestManager::GetInstance()->NumberOfFailedTests() == 0 )
-  {    
+  {
     Poco::File pocoSceneFile( sceneFileName );
     MITK_TEST_CONDITION_REQUIRED( pocoSceneFile.exists(), "Checking if scene file still exists before cleaning up." )
     pocoSceneFile.remove();

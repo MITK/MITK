@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
   // overwrite the settings in MapConfiguration
   Poco::Path basePath(argv[0]);
   basePath.setFileName("");
-  
+
   Poco::Path provFile(basePath);
   provFile.setFileName("mitkDiffusion.provisioning");
 
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
   {
     diffConfig->setString(berry::Platform::ARG_STORAGE_DIR, storageDir.toStdString());
   }
- 
+
   diffConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());
   diffConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.diffusionimagingapp");
 

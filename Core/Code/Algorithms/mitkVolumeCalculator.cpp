@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -15,11 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkVolumeCalculator.h"
-#include "mitkImageAccessByItk.h" 
-#include <itkImageRegionConstIterator.h> 
+#include "mitkImageAccessByItk.h"
+#include <itkImageRegionConstIterator.h>
 
 #include "mitkImageStatisticsHolder.h"
-  
+
 template < typename TPixel, unsigned int VImageDimension >
 void mitk::VolumeCalculator::InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage)
 {
@@ -33,19 +33,19 @@ void mitk::VolumeCalculator::InternalCompute(itk::Image< TPixel, VImageDimension
       count++;
     }
   }
-  if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 3) 
+  if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 3)
   {
     m_Volume = count / 1000.0 * itkImage->GetSpacing()[0] * itkImage->GetSpacing()[1] * itkImage->GetSpacing()[2];
-  } 
-  else if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 2) 
+  }
+  else if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 2)
   {
     m_Volume = count / 100.0 * itkImage->GetSpacing()[0] * itkImage->GetSpacing()[1];
   }
   m_VoxelCount = count;
 }
 
-mitk::VolumeCalculator::VolumeCalculator() 
-: m_Image(NULL), 
+mitk::VolumeCalculator::VolumeCalculator()
+: m_Image(NULL),
   m_Threshold(0),
   m_Volume(0)
 {
@@ -55,8 +55,8 @@ mitk::VolumeCalculator::VolumeCalculator()
 mitk::VolumeCalculator::~VolumeCalculator()
 {
 }
-    
-std::vector<float> mitk::VolumeCalculator::GetVolumes() 
+
+std::vector<float> mitk::VolumeCalculator::GetVolumes()
 {
   return m_Volumes;
 }
@@ -64,11 +64,11 @@ std::vector<float> mitk::VolumeCalculator::GetVolumes()
 void mitk::VolumeCalculator::ComputeVolume()
 {
   const_cast<Image*>(m_Image.GetPointer())->SetRequestedRegionToLargestPossibleRegion();
-  if (m_Image->GetDimension() == 4) 
+  if (m_Image->GetDimension() == 4)
   {
     m_TimeSelector->SetInput(m_Image);
     m_Volumes.resize(m_Image->GetDimension(3));
-    for (unsigned int timeStep = 0; timeStep<m_Image->GetDimension(3); ++timeStep) 
+    for (unsigned int timeStep = 0; timeStep<m_Image->GetDimension(3); ++timeStep)
     {
       m_TimeSelector->SetTimeNr(timeStep);
       m_TimeSelector->Update();
@@ -76,12 +76,12 @@ void mitk::VolumeCalculator::ComputeVolume()
       m_Volumes[timeStep] = m_Volume;
     }
   }
-  else if (m_Image->GetDimension() == 3) 
+  else if (m_Image->GetDimension() == 3)
   {
     const_cast<Image*>(m_Image.GetPointer())->Update();
     AccessFixedDimensionByItk(m_Image,InternalCompute,3);
-  } 
-  else if (m_Image->GetDimension() == 2) 
+  }
+  else if (m_Image->GetDimension() == 2)
   {
     const_cast<Image*>(m_Image.GetPointer())->Update();
     AccessFixedDimensionByItk(m_Image,InternalCompute,2);
@@ -107,7 +107,7 @@ void mitk::VolumeCalculator::ComputeVolumeFromImageStatistics()
     Vector3D spacing = m_Image->GetSlicedGeometry()->GetSpacing();
     m_Volume = m_Image->GetStatistics()->GetCountOfMaxValuedVoxels() / 1000.0 * spacing[0] * spacing[1] * spacing[2];
   }
-  else if (dim == 2) 
+  else if (dim == 2)
   {
     Vector3D spacing = m_Image->GetGeometry()->GetSpacing();
     m_Volume = m_Image->GetStatistics()->GetCountOfMaxValuedVoxels() / 100.0 * spacing[0] * spacing[1];

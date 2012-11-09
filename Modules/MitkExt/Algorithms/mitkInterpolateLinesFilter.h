@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,12 +35,12 @@ namespace mitk {
 //##Documentation
 //## @brief Interpolate additional points on lines
 //##
-//## If a Geometry2D is set (by SetGeometryForInterpolation), 
-//## we do an interpolation in the 2D-space of the Geometry2D: 
-//## Map two neighboring original points on 
-//## the Geometry2D, resulting in two 2D-points, interpolate 
-//## in 2D between them, and map them back via the 
-//## Geometry2D in the 3D-world. 
+//## If a Geometry2D is set (by SetGeometryForInterpolation),
+//## we do an interpolation in the 2D-space of the Geometry2D:
+//## Map two neighboring original points on
+//## the Geometry2D, resulting in two 2D-points, interpolate
+//## in 2D between them, and map them back via the
+//## Geometry2D in the 3D-world.
 //## @ingroup Process
 class MitkExt_EXPORT InterpolateLinesFilter : public SurfaceSource
 {
@@ -70,9 +70,9 @@ public:
   //##
   //## If this is set (not NULL), we do an interpolation in the
   //## 2D-space of the Geometry2D: Map two neighboring original
-  //## points on the Geometry2D, resulting in two 2D-points, 
-  //## interpolate in 2D between them, and map them back via the 
-  //## Geometry2D in the 3D-world. 
+  //## points on the Geometry2D, resulting in two 2D-points,
+  //## interpolate in 2D between them, and map them back via the
+  //## Geometry2D in the 3D-world.
   itkGetConstObjectMacro(GeometryForInterpolation, mitk::Geometry2D);
   itkSetObjectMacro(GeometryForInterpolation, mitk::Geometry2D);
 

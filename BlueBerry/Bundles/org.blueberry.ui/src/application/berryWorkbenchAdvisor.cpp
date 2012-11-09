@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -86,10 +86,10 @@ bool WorkbenchAdvisor::OpenWindows()
 {
   //   final Display display = PlatformUI.getWorkbench().getDisplay();
   //   final boolean result [] = new boolean[1];
-  //   
-  //   // spawn another init thread.  For API compatibility We guarantee this method is called from 
+  //
+  //   // spawn another init thread.  For API compatibility We guarantee this method is called from
   //   // the UI thread but it could take enough time to disrupt progress reporting.
-  //   // spawn a new thread to do the grunt work of this initialization and spin the event loop 
+  //   // spawn a new thread to do the grunt work of this initialization and spin the event loop
   //   // ourselves just like it's done in Workbench.
   //   final boolean[] initDone = new boolean[]{false};
   //   final Throwable [] error = new Throwable[1];
@@ -99,16 +99,16 @@ bool WorkbenchAdvisor::OpenWindows()
   //      */
   //       void run() {
   //       try {
-  //         //declare us to be a startup thread so that our syncs will be executed 
+  //         //declare us to be a startup thread so that our syncs will be executed
   //         UISynchronizer.startupThread.set(Boolean.TRUE);
   //         final IWorkbenchConfigurer [] myConfigurer = new IWorkbenchConfigurer[1];
   //         StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  // 
+  //
   //             void runWithException() throws Throwable {
   //             myConfigurer[0] = getWorkbenchConfigurer();
-  //             
+  //
   //           }});
-  //         
+  //
   //         IStatus status = myConfigurer[0].restoreState();
   //         if (!status.isOK()) {
   //           if (status.getCode() == IWorkbenchConfigurer.RESTORE_CODE_EXIT) {
@@ -136,21 +136,21 @@ bool WorkbenchAdvisor::OpenWindows()
   //           break;
   //         display.sleep();
   //       }
-  //       
+  //
   //     }
-  //     
+  //
   //     // can only be a runtime or error
   //     if (error[0] instanceof Error)
   //       throw (Error)error[0];
   //     else if (error[0] instanceof RuntimeException)
   //       throw (RuntimeException)error[0];
-  //   
+  //
   //     return result[0];
-  
+
   IWorkbenchConfigurer::Pointer myConfigurer = this->GetWorkbenchConfigurer();
-   
+
   bool status = myConfigurer->RestoreState();
-  if (!status) 
+  if (!status)
   {
     myConfigurer->OpenFirstTimeWindow();
   }

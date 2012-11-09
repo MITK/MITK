@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -105,14 +105,14 @@ namespace itk
 
     void PrintSelf (std::ostream& os, Indent indent) const
     {
-      Superclass::PrintSelf (os, indent);      
+      Superclass::PrintSelf (os, indent);
     }
 
     void BeforeThreadedGenerateData( void );
 
-    void ThreadedGenerateData( const 
+    void ThreadedGenerateData( const
       OutputImageRegionType &outputRegionForThread, int);
-  
+
     //void GenerateData();
 
 
@@ -129,7 +129,7 @@ namespace itk
     OutputScalarType                     m_Min;
     OutputScalarType                     m_Max;
 
-  };    
+  };
 
 
 } // end of namespace

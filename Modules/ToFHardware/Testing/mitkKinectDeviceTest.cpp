@@ -39,7 +39,7 @@ int mitkKinectDeviceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_OUTPUT(<<"Testing StopCamera()");
   testObject->StopCamera();
   MITK_TEST_CONDITION_REQUIRED(testObject->DisconnectCamera(),"Testing DisconnectCamera()");
-  
+
   MITK_TEST_END();
 
 }

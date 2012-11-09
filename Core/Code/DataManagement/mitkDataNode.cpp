@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::Mapper* mitk::DataNode::GetMapper(MapperSlotId id) const
 {
-  if( (id >= m_Mappers.size()) || (m_Mappers[id].IsNull()) ) 
+  if( (id >= m_Mappers.size()) || (m_Mappers[id].IsNull()) )
   {
     if(id >= m_Mappers.capacity())
     {
@@ -110,7 +110,7 @@ mitk::DataNode::~DataNode()
 
   if ( interactor )
   {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( interactor );  
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( interactor );
   }
   m_Mappers.clear();
   m_Data = NULL;
@@ -134,7 +134,7 @@ mitk::DataNode& mitk::DataNode::operator=(mitk::BaseData* right)
 MBI_STD::istream& mitk::operator>>( MBI_STD::istream& i, mitk::DataNode::Pointer& dtn )
 #endif
 #if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
-MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataNode::Pointer& dtn ) 
+MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataNode::Pointer& dtn )
 #endif
 {
   dtn = mitk::DataNode::New();
@@ -236,7 +236,7 @@ mitk::BaseProperty* mitk::DataNode::GetProperty(const char *propertyKey, const m
     else //didn't find the property list of the given renderer
     {
       //return the renderer unspecific property if there is one
-      return m_PropertyList->GetProperty(propertyKey); 
+      return m_PropertyList->GetProperty(propertyKey);
     }
   }
   else //no specific renderer given; use the renderer independent one
@@ -246,11 +246,11 @@ mitk::BaseProperty* mitk::DataNode::GetProperty(const char *propertyKey, const m
     if(property.IsNotNull())
       return property;
   }
-  
+
   //only to satisfy compiler!
   return NULL;
 }
-  
+
 mitk::DataNode::GroupTagList mitk::DataNode::GetGroupTags() const
 {
   GroupTagList groups;
@@ -306,8 +306,8 @@ bool mitk::DataNode::GetStringProperty(const char* propertyKey, std::string& str
   if(stringProp.IsNull())
   {
     return false;
-  } 
-  else 
+  }
+  else
   {
     //memcpy((void*)string, stringProp->GetValue(), strlen(stringProp->GetValue()) + 1 ); // looks dangerous
     string = stringProp->GetValue();
@@ -408,22 +408,22 @@ void mitk::DataNode::SetStringProperty( const char* propertyKey, const char* str
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
 }
 
-void mitk::DataNode::SetProperty(const char *propertyKey, 
-                                     BaseProperty* propertyValue, 
+void mitk::DataNode::SetProperty(const char *propertyKey,
+                                     BaseProperty* propertyValue,
                                      const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, propertyValue);
 }
 
-void mitk::DataNode::ReplaceProperty(const char *propertyKey, 
-                                         BaseProperty* propertyValue, 
+void mitk::DataNode::ReplaceProperty(const char *propertyKey,
+                                         BaseProperty* propertyValue,
                                          const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->ReplaceProperty(propertyKey, propertyValue);
 }
 
-void mitk::DataNode::AddProperty(const char *propertyKey, 
-                                     BaseProperty* propertyValue, 
+void mitk::DataNode::AddProperty(const char *propertyKey,
+                                     BaseProperty* propertyValue,
                                      const mitk::BaseRenderer* renderer,
                                      bool overwrite)
 {
@@ -466,14 +466,14 @@ void mitk::DataNode::SetSelected(bool selected, mitk::BaseRenderer* renderer)
 {
   mitk::BoolProperty::Pointer selectedProperty = dynamic_cast<mitk::BoolProperty*>(GetProperty("selected"));
 
-  if ( selectedProperty.IsNull() ) 
+  if ( selectedProperty.IsNull() )
   {
     selectedProperty = mitk::BoolProperty::New();
     selectedProperty->SetValue(false);
-    SetProperty("selected", selectedProperty, renderer);  
+    SetProperty("selected", selectedProperty, renderer);
   }
 
-  if( selectedProperty->GetValue() != selected ) 
+  if( selectedProperty->GetValue() != selected )
   {
     selectedProperty->SetValue(selected);
     itk::ModifiedEvent event;
@@ -483,25 +483,25 @@ void mitk::DataNode::SetSelected(bool selected, mitk::BaseRenderer* renderer)
 
 /*
 class SelectedEvent : public itk::ModifiedEvent
-{ 
-public: 
-  typedef SelectedEvent Self; 
-  typedef itk::ModifiedEvent Superclass; 
+{
+public:
+  typedef SelectedEvent Self;
+  typedef itk::ModifiedEvent Superclass;
 
   SelectedEvent(DataNode* dataNode)
     { m_DataNode = dataNode; };
-  DataNode* GetDataNode() 
+  DataNode* GetDataNode()
     { return m_DataNode; };
-  virtual const char * GetEventName() const 
-    { return "SelectedEvent"; } 
-  virtual bool CheckEvent(const ::itk::EventObject* e) const 
-    { return dynamic_cast<const Self*>(e); } 
-  virtual ::itk::EventObject* MakeObject() const 
-    { return new Self(m_DataNode); } 
-private: 
+  virtual const char * GetEventName() const
+    { return "SelectedEvent"; }
+  virtual bool CheckEvent(const ::itk::EventObject* e) const
+    { return dynamic_cast<const Self*>(e); }
+  virtual ::itk::EventObject* MakeObject() const
+    { return new Self(m_DataNode); }
+private:
   DataNode* m_DataNode;
   SelectedEvent(const Self& event)
-    { m_DataNode = event.m_DataNode; }; 
+    { m_DataNode = event.m_DataNode; };
   void operator=(const Self& event)
   { m_DataNode = event.m_DataNode; }
 };
@@ -521,7 +521,7 @@ void mitk::DataNode::SetInteractorEnabled( const bool& enabled )
 {
   if ( m_Interactor.IsNull() )
   {
-    itkWarningMacro("Interactor is NULL. Couldn't enable or disable interaction.");  
+    itkWarningMacro("Interactor is NULL. Couldn't enable or disable interaction.");
     return;
   }
   if ( enabled )

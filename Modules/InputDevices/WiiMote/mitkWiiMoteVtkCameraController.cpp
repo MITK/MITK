@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,7 +40,7 @@ const double YMAX = 768;
 
 const int UPDATEFREQUENCY = 5;
 
-mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController() 
+mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController()
 : CameraController("WiiMoteHeadtracking")
 , m_ClippingRangeIsSet(false)
 , m_SensitivityXMIN (XMAX)
@@ -87,7 +87,7 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
 
   vtkCamera* vtkCam = (vtkCamera*)vtkRenderer->GetActiveCamera();
 
-  //TODO check the range 
+  //TODO check the range
   if(!m_ClippingRangeIsSet)
     vtkCam->SetClippingRange(0.1, 1000);
 
@@ -122,7 +122,7 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
     movementVector[1] *= CALIBRATIONFACTORY;
   }
   else
-  { 
+  {
     movementVector[0] *= m_SensitivityX;
     movementVector[1] *= m_SensitivityY;
   }
@@ -135,7 +135,7 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
 
   MITK_INFO << "Elevation angle: " << m_CurrentElevationAngle;
 
-  // avoids flipping of the surface 
+  // avoids flipping of the surface
   // through the elevation function
   if(m_CurrentElevationAngle < 70
     && m_CurrentElevationAngle > -70)
@@ -167,27 +167,27 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   {
     m_CurrentAzimuthAngle = -70;
   }
- 
+
 
   ////compute the global space coordinates from the relative mouse coordinate
   ////first we need the position of the camera
   //mitk::Vector3D camPosition;
   //double camPositionTemp[3];
   //vtkCam->GetPosition(camPositionTemp);
-  //camPosition[0] = camPositionTemp[0]; camPosition[1] = camPositionTemp[1]; camPosition[2] = camPositionTemp[2]; 
+  //camPosition[0] = camPositionTemp[0]; camPosition[1] = camPositionTemp[1]; camPosition[2] = camPositionTemp[2];
 
   ////then the upvector of the camera
   //mitk::Vector3D upCamVector;
   //double upCamTemp[3];
   //vtkCam->GetViewUp(upCamTemp);
-  //upCamVector[0] = upCamTemp[0]; upCamVector[1] = upCamTemp[1]; upCamVector[2] = upCamTemp[2]; 
+  //upCamVector[0] = upCamTemp[0]; upCamVector[1] = upCamTemp[1]; upCamVector[2] = upCamTemp[2];
   //upCamVector.Normalize();
 
   ////then the vector to which the camera is heading at (focalpoint)
   //mitk::Vector3D focalPoint;
   //double focalPointTemp[3];
   //vtkCam->GetFocalPoint(focalPointTemp);
-  //focalPoint[0] = focalPointTemp[0]; focalPoint[1] = focalPointTemp[1]; focalPoint[2] = focalPointTemp[2]; 
+  //focalPoint[0] = focalPointTemp[0]; focalPoint[1] = focalPointTemp[1]; focalPoint[2] = focalPointTemp[2];
   //mitk::Vector3D focalVector;
   //focalVector = focalPoint - camPosition;
   //focalVector.Normalize();
@@ -199,7 +199,7 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
 
   ////now we have the current orientation so we can adapt it according to the current information, which we got from the Wiimote
 
-  ////new position of the camera: 
+  ////new position of the camera:
   ////left/right = camPosition + crossVector * movementVector[0];
   //mitk::Vector3D vectorX = crossVector * -movementVector[0]; //changes the magnitude, not the direction
   //double nextCamPosition[3];
@@ -221,28 +221,28 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
 
   ////set the next position
   //double nextPosition[3];
-  //nextPosition[0] = nextCamPosition[0]; nextPosition[1] = nextCamPosition[1]; nextPosition[2] = nextCamPosition[2]; 
+  //nextPosition[0] = nextCamPosition[0]; nextPosition[1] = nextCamPosition[1]; nextPosition[2] = nextCamPosition[2];
   //vtkCam->SetPosition(nextPosition);
 
   ////adapt the focal point the same way
   //double currentFocalPoint[3], nextFocalPoint[3];
   //vtkCam->GetFocalPoint(currentFocalPoint);
-  //nextFocalPoint[0] = currentFocalPoint[0] + vectorX[0] + vectorY[0] + vectorZ[0]; 
-  //nextFocalPoint[1] = currentFocalPoint[1] + vectorX[1] + vectorY[1] + vectorZ[1]; ; 
-  //nextFocalPoint[2] = currentFocalPoint[2] + vectorX[2] + vectorY[2] + vectorZ[2]; 
+  //nextFocalPoint[0] = currentFocalPoint[0] + vectorX[0] + vectorY[0] + vectorZ[0];
+  //nextFocalPoint[1] = currentFocalPoint[1] + vectorX[1] + vectorY[1] + vectorZ[1]; ;
+  //nextFocalPoint[2] = currentFocalPoint[2] + vectorX[2] + vectorY[2] + vectorZ[2];
   //vtkCam->SetFocalPoint(nextFocalPoint);
 
-  //Reset the camera clipping range based on the bounds of the visible actors. 
+  //Reset the camera clipping range based on the bounds of the visible actors.
   //This ensures that no props are cut off
   vtkRenderer->ResetCameraClippingRange();
 
   // ------------ axial scrolling -----------------------
 
   // get renderer
-  const RenderingManager::RenderWindowVector& renderWindows 
+  const RenderingManager::RenderWindowVector& renderWindows
     = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
   for ( RenderingManager::RenderWindowVector::const_iterator iter = renderWindows.begin();
-    iter != renderWindows.end(); 
+    iter != renderWindows.end();
     ++iter )
   {
     if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard2D )
@@ -253,7 +253,7 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
         m_AxialBR = mitk::BaseRenderer::GetInstance((*iter));
       }
     }
-  }  
+  }
 
   SlicedGeometry3D* slicedWorldGeometry
     = dynamic_cast<SlicedGeometry3D*>
@@ -338,14 +338,14 @@ bool mitk::WiiMoteVtkCameraController::ResetView(mitk::Action *a, const mitk::St
 
 bool mitk::WiiMoteVtkCameraController::InitCalibration(mitk::Action *a, const mitk::StateEvent *e)
 {
-  // to initialize the values with its counterpart 
+  // to initialize the values with its counterpart
   // is essential. The reason is that through calibration
   // the values will increase or decrease depending on
   // semantics:
   // the max will try to reach the XMAX (from XMIN)
   // the min will try to reach the XMIN (from XMAX)
   // i.e. in the calibration process they move
-  // into their opposite direction to create an 
+  // into their opposite direction to create an
   // intervall that defines the boundaries
   m_SensitivityX = 0;
   m_SensitivityXMAX = XMIN;
@@ -407,9 +407,9 @@ bool mitk::WiiMoteVtkCameraController::FinishCalibration(mitk::Action *a, const 
 {
   // checks if one of the properties was not set at all during the calibration
   // should that happen, the computation will not be executed
-  if( m_SensitivityXMAX != XMIN 
-    && m_SensitivityXMIN != XMAX 
-    && m_SensitivityYMAX != YMIN 
+  if( m_SensitivityXMAX != XMIN
+    && m_SensitivityXMIN != XMAX
+    && m_SensitivityYMAX != YMIN
     && m_SensitivityYMIN != YMAX )
   {
     // computation of the sensitivity out of the calibration data
@@ -424,7 +424,7 @@ bool mitk::WiiMoteVtkCameraController::FinishCalibration(mitk::Action *a, const 
 
   if(!m_Calibrated)
   {
-    MITK_INFO << "Calibration was unsuccesful - " 
+    MITK_INFO << "Calibration was unsuccesful - "
       << "please repeat the process and move in all directions!";
   }
   else

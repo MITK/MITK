@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-/** 
+/**
  * \brief Widget for displaying intensity profiles of images along a given
  * path
  */
@@ -70,7 +70,7 @@ public:
 
   /** \brief Set/Get mode which path to use */
   void SetPathMode(unsigned int pathMode);
-  
+
   /** \brief Set/Get mode which path to use */
   unsigned int GetPathMode();
 

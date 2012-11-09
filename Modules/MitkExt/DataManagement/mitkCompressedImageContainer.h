@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,7 +40,7 @@ namespace mitk
 class MitkExt_EXPORT CompressedImageContainer : public itk::Object
 {
   public:
-    
+
     mitkClassMacro(CompressedImageContainer, Object);
     itkNewMacro(CompressedImageContainer);
 
@@ -76,7 +76,7 @@ class MitkExt_EXPORT CompressedImageContainer : public itk::Object
     unsigned int m_NumberOfTimeSteps;
 
     /// one for each timestep. first = pointer to compressed data; second = size of buffer in bytes
-    std::vector< std::pair<unsigned char*, unsigned long> > m_ByteBuffers; 
+    std::vector< std::pair<unsigned char*, unsigned long> > m_ByteBuffers;
 
     Geometry3D::Pointer m_ImageGeometry;
 };

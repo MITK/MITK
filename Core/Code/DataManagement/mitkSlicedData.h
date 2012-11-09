@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ class SlicedGeometry3D;
 //## Super class of data objects consisting of slices, e.g., images or a stack
 //## of contours. (GetGeometry will return a Geometry3D containing Geometry2D
 //## objects).
-//## 
+//##
 //## SlicedData-objects have geometries of type SlicedGeometry3D or sub-classes.
 //## @ingroup Data
 class MITK_CORE_EXPORT SlicedData : public BaseData
@@ -95,8 +95,8 @@ public:
 
   //##Documentation
   //## @brief Verify that the RequestedRegion is within the
-  //## LargestPossibleRegion.  
-  //## 
+  //## LargestPossibleRegion.
+  //##
   //## Verify that the RequestedRegion is within the LargestPossibleRegion.
   //## If the RequestedRegion is not within the LargestPossibleRegion,
   //## then the filter cannot possibly satisfy the request. This method
@@ -120,7 +120,7 @@ public:
   //## implemented in the concrete subclasses of DataObject.
   virtual void SetRequestedRegion(SlicedData::RegionType *region);
 
-  const RegionType& GetLargestPossibleRegion() const 
+  const RegionType& GetLargestPossibleRegion() const
   {
     return m_LargestPossibleRegion;
   }
@@ -147,46 +147,46 @@ public:
   }
 
   ////##Documentation
-  ////## @brief Return the Geometry2D of the slice (@a s, @a t). 
-  ////## 
+  ////## @brief Return the Geometry2D of the slice (@a s, @a t).
+  ////##
   ////## The method does not simply call GetGeometry()->GetGeometry2D(). Before doing this, it
   ////## makes sure that the Geometry2D is up-to-date before returning it (by
   ////## setting the update extent appropriately and calling
   ////## UpdateOutputInformation).
-  ////## 
+  ////##
   ////## @warning GetGeometry2D not yet completely implemented.
   ////## @todo Appropriate setting of the update extent is missing.
   //virtual const mitk::Geometry2D* GetGeometry2D(int s, int t=0) const;
 
   //##Documentation
   //## @brief Convenience access method for the geometry, which is of type SlicedGeometry3D (or a sub-class of it).
-  //## 
-  //## @em No update will be called. Normally used in GenerateOutputInformation of 
+  //##
+  //## @em No update will be called. Normally used in GenerateOutputInformation of
   //## subclasses of BaseProcess.
   SlicedGeometry3D* GetSlicedGeometry(unsigned int t=0) const;
 
   //##Documentation
   //## @brief Convenience access method for the geometry, which is of type SlicedGeometry3D (or a sub-class of it).
-  //## 
+  //##
   //## The method does not simply return the value of the m_Geometry3D member.
-  //## Before doing this, it makes sure that the Geometry3D is up-to-date before 
+  //## Before doing this, it makes sure that the Geometry3D is up-to-date before
   //## returning it (by setting the update extent appropriately and calling
   //## UpdateOutputInformation).
-  //## 
-  //## @warning GetGeometry not yet completely implemented. 
+  //##
+  //## @warning GetGeometry not yet completely implemented.
   //## @todo Appropriate setting of the update extent is missing.
   const SlicedGeometry3D* GetUpdatedSlicedGeometry(unsigned int t=0);
 
   //##Documentation
   //## @brief Set the Geometry3D of the data, which will be referenced (not copied!). It
   //## has to be a sub-class of SlicedGeometry3D.
-  //## 
-  //## @warning This method will normally be called internally by the sub-class of SlicedData 
+  //##
+  //## @warning This method will normally be called internally by the sub-class of SlicedData
   //## during initialization.
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
   //##Documentation
-  //## @brief Convenience method for setting the origin of 
+  //## @brief Convenience method for setting the origin of
   //## the SlicedGeometry3D instances of all time steps
   //##
   //## In case the SlicedGeometry3D is evenly spaced,
@@ -195,12 +195,12 @@ public:
   virtual void SetOrigin(const Point3D& origin);
 
   //##Documentation
-  //## @brief Convenience method for setting the spacing of 
+  //## @brief Convenience method for setting the spacing of
   //## the SlicedGeometry3D instances of all time steps
   virtual void SetSpacing(const float aSpacing[3]);
 
   //##Documentation
-  //## @brief Convenience method for setting the spacing of 
+  //## @brief Convenience method for setting the spacing of
   //## the SlicedGeometry3D instances of all time steps
   virtual void SetSpacing(mitk::Vector3D aSpacing);
 

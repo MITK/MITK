@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkPolyDataNormals.h>
 
-namespace mitk 
+namespace mitk
 {
 
 ShowSegmentationAsSurface::ShowSegmentationAsSurface()
@@ -78,27 +78,27 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
 {
   Image::Pointer image;
   GetPointerParameter("Input", image);
- 
+
   bool smooth(true);
   GetParameter("Smooth", smooth);
-  
+
   bool applyMedian(true);
   GetParameter("Apply median", applyMedian);
-  
+
   bool decimateMesh(true);
   GetParameter("Decimate mesh", decimateMesh);
 
   unsigned int medianKernelSize(3);
   GetParameter("Median kernel size", medianKernelSize);
-  
+
   float gaussianSD(1.5);
   GetParameter("Gaussian SD", gaussianSD );
-  
+
   float reductionRate(0.8);
   GetParameter("Decimation rate", reductionRate );
 
-  MITK_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD 
-                                         << " median " << applyMedian << " median kernel " << medianKernelSize 
+  MITK_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD
+                                         << " median " << applyMedian << " median kernel " << medianKernelSize
                                          << " mesh reduction " << decimateMesh << " reductionRate " << reductionRate;
 
   ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = ManualSegmentationToSurfaceFilter::New();
@@ -109,7 +109,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   if (smooth)
   {
     surfaceFilter->InterpolationOn();
-    surfaceFilter->SetGaussianStandardDeviation( gaussianSD ); 
+    surfaceFilter->SetGaussianStandardDeviation( gaussianSD );
     //surfaceFilter->SetGaussianStandardDeviation( 3 );
     //surfaceFilter->SetUseGaussianImageSmooth(true);
   }
@@ -123,7 +123,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   //fix to avoid vtk warnings see bug #5390
   if ( image->GetDimension() > 3 )
     decimateMesh = false;
-  
+
   if (decimateMesh)
   {
     surfaceFilter->SetDecimate( ImageToSurfaceFilter::QuadricDecimation );
@@ -183,22 +183,22 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
       if (np)
         np->SetRepresentationToWireframe();
     }
-  
+
     m_Node->SetProperty("opacity", FloatProperty::New(0.3) );
     m_Node->SetProperty("line width", IntProperty::New(1) );
     m_Node->SetProperty("scalar visibility", BoolProperty::New(false) );
-    
+
     std::string uid = m_UIDGeneratorSurfaces.GetUID();
     m_Node->SetProperty( "FILENAME", StringProperty::New( uid + ".vtk" ) ); // undocumented feature of Image::WriteXMLData
     std::string groupNodesName ("surface");
-    
+
     DataNode* groupNode = GetGroupNode();
     if (groupNode)
     {
       groupNode->GetName( groupNodesName );
     }
     m_Node->SetProperty( "name", StringProperty::New(groupNodesName) );
-   
+
     // synchronize this object's color with the parent's color
     //surfaceNode->SetProperty( "color", parentNode->GetProperty( "color" ) );
     //surfaceNode->SetProperty( "visible", parentNode->GetProperty( "visible" ) );
@@ -218,30 +218,30 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
         m_Node->ReplaceProperty("color", colorProp);
       else
         m_Node->SetProperty("color", ColorProperty::New(1.0, 1.0, 0.0));
-  
+
       bool showResult(true);
       GetParameter("Show result", showResult );
 
       bool syncVisibility(false);
       GetParameter("Sync visibility", syncVisibility );
-  
+
       Image::Pointer image;
       GetPointerParameter("Input", image);
 
       BaseProperty* organTypeProp = image->GetProperty("organ type");
       if (organTypeProp)
         m_Surface->SetProperty("organ type", organTypeProp);
- 
+
       BaseProperty* visibleProp = groupNode->GetProperty("visible");
       if (visibleProp && syncVisibility)
         m_Node->ReplaceProperty("visible", visibleProp);
       else
         m_Node->SetProperty("visible", BoolProperty::New(showResult));
      }
-    
+
     InsertBelowGroupNode(m_Node);
   }
-    
+
   Superclass::ThreadedUpdateSuccessful();
 }
 

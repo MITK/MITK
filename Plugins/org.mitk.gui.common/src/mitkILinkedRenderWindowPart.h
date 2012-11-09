@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,7 +44,7 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
    *         <code>NULL</code> otherwise.
    */
   virtual mitk::SlicesRotator* GetSlicesRotator() const = 0;
-  
+
   /**
    * Get the mitk::SlicesSwiveller.
    *
@@ -60,7 +60,7 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
    *        <code>false</code> otherwise.
    */
   virtual void EnableSlicingPlanes(bool enable) = 0;
-  
+
   /**
    * Get the enabled status of the slicing planes.
    *
@@ -77,7 +77,7 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
    *        is disabled.
    */
   virtual void EnableLinkedNavigation(bool enable) = 0;
-  
+
   /**
    * Get the enabled status of linked navigation.
    *

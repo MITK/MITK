@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -61,7 +61,7 @@ QmitkAdaptiveRegionGrowingWidget::~QmitkAdaptiveRegionGrowingWidget()
     {
         this->DeactivateSeedPointMode();
         dynamic_cast<mitk::PointSet*>(node->GetData())->RemoveObserver(m_PointSetAddObserverTag);
-    }    
+    }
 
     this->RemoveHelperNodes();
 
@@ -173,7 +173,7 @@ void QmitkAdaptiveRegionGrowingWidget::SetSeedPointToggled(bool toggled)
       return;
     }
 
-   
+
     if (toggled == true) // button is down
     {
       this->ActivateSeedPointMode();  //add pointSet Interactor if there is none
@@ -300,7 +300,7 @@ void QmitkAdaptiveRegionGrowingWidget::OnPointAdded()
 
 void QmitkAdaptiveRegionGrowingWidget::RunSegmentation()
 {
-  
+
   if (m_InputImageNode.IsNull())
   {
     QMessageBox::information( NULL, "Adaptive Region Growing functionality", "Please specify the image in Datamanager!");
@@ -311,7 +311,7 @@ void QmitkAdaptiveRegionGrowingWidget::RunSegmentation()
   if (m_Controls.m_pbDefineSeedPoint->isChecked())
     m_Controls.m_pbDefineSeedPoint->toggle();
 
- 
+
   mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
 
   if (node.IsNull())
@@ -589,7 +589,7 @@ void QmitkAdaptiveRegionGrowingWidget::IncreaseSlider()
   {
     int newValue = this->m_Controls.m_Slider->value() + 1;
     this->ChangeLevelWindow(newValue);
-    this->m_Controls.m_Slider->setValue(newValue);    
+    this->m_Controls.m_Slider->setValue(newValue);
   }
 }
 
@@ -755,9 +755,9 @@ void QmitkAdaptiveRegionGrowingWidget::UpdateVolumeRenderingThreshold(int thValu
   mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
 
   mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-      
+
   if (m_UpdateSuggestedThreshold)
-  { 
+  {
     m_SuggestedThValue = thValue;
     m_UpdateSuggestedThreshold = false;
   }
@@ -780,8 +780,8 @@ void QmitkAdaptiveRegionGrowingWidget::UpdateVolumeRenderingThreshold(int thValu
     vtkColorTransferFunction *ctf = tf->GetColorTransferFunction();
     ctf->RemoveAllPoints();
     //ctf->AddRGBPoint(-1000, 0.0, 0.0, 0.0);
-    ctf->AddRGBPoint(m_SuggestedThValue+1, 203/a, 104/a, 102/a);       
-    ctf->AddRGBPoint(m_SuggestedThValue, 255/a, 0/a, 0/a);    
+    ctf->AddRGBPoint(m_SuggestedThValue+1, 203/a, 104/a, 102/a);
+    ctf->AddRGBPoint(m_SuggestedThValue, 255/a, 0/a, 0/a);
     ctf->ClampingOn();
     ctf->Modified();
   }

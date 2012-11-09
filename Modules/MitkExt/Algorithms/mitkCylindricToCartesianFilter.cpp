@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -73,11 +73,11 @@ void _transform(mitkIpPicDescriptor *pic, mitkIpPicDescriptor *dest, float _outs
 
       for(z=0;z<nz_size;++z,dp+=-nxy_size-x_start)
         for(x=0;x<x_start;++x,++dp)
-          *dp=outsideValue;    
+          *dp=outsideValue;
       dp+=nxy_size*nz_size; dp+=x_end;
       for(z=0;z<nz_size;++z,dp+=-nxy_size-x_start)
         for(x=x_end;x<nx_size;++x,++dp)
-          *dp=outsideValue;        
+          *dp=outsideValue;
       dp+=nxy_size*nz_size; dp-=x_end;
 
       fr+=x_start;
@@ -191,11 +191,11 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
 
   int x,y,xy0,xy0_orig, oxy_size, new_zsize;
   oxy_size=orig_xsize*orig_ysize;
-  xy0=(int)(((double)new_xsize)/2+0.5); 
-  xy0_orig=(int)(((double)orig_xsize)/2+0.5); 
+  xy0=(int)(((double)new_xsize)/2+0.5);
+  xy0_orig=(int)(((double)orig_xsize)/2+0.5);
 
   new_zsize=(int)(orig_ysize/scale);
-  // \bug y compared to x 
+  // \bug y compared to x
   for(y=0;y<new_xsize;++y)
   {
     rt_xzero=rtp; *rtp=0;
@@ -258,7 +258,7 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
   int z;
   float z_step=orig_ysize/(orig_ysize*((float)new_xsize)/orig_xsize);
   for(z=0;z<new_zsize;++z,++fzp,++ztp)
-  {    
+  {
     *fzp=z*z_step;
     *ztp=(unsigned int)*fzp;
     *fzp-=*ztp;
@@ -296,7 +296,7 @@ void mitk::CylindricToCartesianFilter::buildConeCutOffShortCut(int orig_xsize, i
       cco=(mitkIpInt2_t)(a*(orig_xsize-(*rt+*fr))+b);
     if(cco<0)
       cco=0;
-    if(cco>=nz_size) 
+    if(cco>=nz_size)
       cco=nz_size;
     *ccop=cco;
   }
@@ -326,7 +326,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   for(i=3;i<input->GetDimension();++i)
     tmpDimensions[i]=input->GetDimension(i);
 
-  output->Initialize(input->GetPixelType(), 
+  output->Initialize(input->GetPixelType(),
     input->GetDimension(),
     tmpDimensions,
     input->GetNumberOfChannels());
@@ -436,7 +436,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
       if(input->GetDimension(2)>1)
       {
         mitkIpPicTypeMultiplex9(_transform, timeSelectorPic , pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
-        //  mitkIpPicPut("1trf.pic",pic_transformed);  
+        //  mitkIpPicPut("1trf.pic",pic_transformed);
       }
       else
       {
@@ -451,7 +451,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
       output->SetVolume(pic_transformed->data, t, n);
     }
   }
-  //mitkIpPicPut("outzzzzzzzz.pic",pic_transformed);  
+  //mitkIpPicPut("outzzzzzzzz.pic",pic_transformed);
   mitkIpPicFree(pic_transformed);
 
   m_TimeOfHeaderInitialization.Modified();

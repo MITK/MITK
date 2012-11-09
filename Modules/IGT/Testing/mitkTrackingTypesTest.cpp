@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
 * ClaronTool has a protected constructor and a protected itkNewMacro
 * so that only it's friend class ClaronTrackingDevice is able to instantiate
-* tool objects. Therefore, we derive from ClaronTool and add a 
+* tool objects. Therefore, we derive from ClaronTool and add a
 * public itkNewMacro, so that we can instantiate and test the class
 */
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,21 +28,21 @@ namespace mitk {
 
   This class registers itself as an ITK observer to a BaseProperty and gets
   informed of changes to the property. Whenever such a change occurrs, the virtual
-  method PropertyChanged() or PropertyRemoved() is called. This way, derived 
-  classes can implement behaviour for more specific properties (e.g. ColorProperty) 
+  method PropertyChanged() or PropertyRemoved() is called. This way, derived
+  classes can implement behaviour for more specific properties (e.g. ColorProperty)
   without the need to reimplement the Subject-Observer handling.
 
 */
 
 class BaseProperty;
 
-class MitkExt_EXPORT PropertyObserver 
+class MitkExt_EXPORT PropertyObserver
 {
   public:
 
     PropertyObserver();
     virtual ~PropertyObserver();
-    
+
     virtual void PropertyChanged() = 0;
     virtual void PropertyRemoved() = 0;
 
@@ -56,7 +56,7 @@ class MitkExt_EXPORT PropertyObserver
 
     bool m_SelfCall;
 };
-  
+
 class MitkExt_EXPORT PropertyView : public PropertyObserver
 {
   public:
@@ -83,10 +83,10 @@ class MitkExt_EXPORT PropertyEditor : public PropertyObserver
     void OnDelete(const itk::EventObject& e);
 
   protected:
-    
+
     mitk::BaseProperty* m_Property;
 };
-  
+
 }
 
 #endif

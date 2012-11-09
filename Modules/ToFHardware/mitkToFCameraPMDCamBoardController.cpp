@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_matrix.h"
 
 //Plugin defines for CamBoard
-#define SOURCE_PARAM "" 
+#define SOURCE_PARAM ""
 #define PROC_PARAM ""
 
 extern PMDHandle m_PMDHandle; //TODO
@@ -30,11 +30,11 @@ extern PMDDataDescription m_DataDescription; //TODO
 struct SourceDataStruct {
   PMDDataDescription dataDescription;
   char sourceData;
-}; 
+};
 
 namespace mitk
 {
-  ToFCameraPMDCamBoardController::ToFCameraPMDCamBoardController(): m_InternalCaptureWidth(0), 
+  ToFCameraPMDCamBoardController::ToFCameraPMDCamBoardController(): m_InternalCaptureWidth(0),
     m_InternalCaptureHeight(0), m_InternalPixelNumber(0)
   {
     m_SourcePlugin = MITK_TOF_PMDCAMBOARD_SOURCE_PLUGIN;
@@ -60,7 +60,7 @@ namespace mitk
       // get image properties from camera
       this->UpdateCamera();
       this->m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &m_DataDescription);
-      ErrorText(m_PMDRes); 
+      ErrorText(m_PMDRes);
       this->m_InternalCaptureWidth = m_DataDescription.img.numColumns;
       this->m_CaptureWidth = 200;
       this->m_InternalCaptureHeight = m_DataDescription.img.numRows;

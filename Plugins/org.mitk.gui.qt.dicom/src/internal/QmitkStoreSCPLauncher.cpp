@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QCoreApplication>
 #include "org_mitk_gui_qt_dicom_config.h"
 
-QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder) 
+QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder)
 : m_StoreSCP(new QProcess())
 {
     connect( m_StoreSCP, SIGNAL(error(QProcess::ProcessError)),this, SLOT(OnProcessError(QProcess::ProcessError)));

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,19 +32,19 @@ namespace mitk {
   *
   * This class provides a timestamp in milliseconds.
   * It is a Singleton class, that internally uses a mitkRealTimeClock() for
-  * time-acquisition. 
+  * time-acquisition.
   *
   * First you have to call Start() in order to set the reference-time to the current time.
   * If the user has not created and set his own "RealTimeClock", initialize() will be called and a
   * default mitkRealTimeClock() is created.
   * In addition the TimeStamp() saves a pointer to the device calling and the respective offset-time.
-  * The first device will have an offset of 0, the following's offset will be the time elapsed since the 
+  * The first device will have an offset of 0, the following's offset will be the time elapsed since the
   * starting of the first device. This offset can be prompted by calling GetOffset();
   *
-  * You can always get the time elapsed since calling Start() with GetElapsed(). It returns the 
+  * You can always get the time elapsed since calling Start() with GetElapsed(). It returns the
   * time spent in milliseconds as a double.
   *
-  * When the TimeStamp is no longer used, you can call Stop(). This erases the pointer to the device 
+  * When the TimeStamp is no longer used, you can call Stop(). This erases the pointer to the device
   * and the offset. When all devices have "stopped tracking" the reference-time and the current-time are reset to 0.
   *
   * \ingroup IGT
@@ -52,9 +52,9 @@ namespace mitk {
   class MitkIGT_EXPORT TimeStamp : public itk::Object
   {
   public:
-    
+
     mitkClassMacro(TimeStamp, itk::Object);
-    
+
    /**
     * \brief creates a new instance of mitkTimeStamp
     *
@@ -78,7 +78,7 @@ namespace mitk {
     *
     * Each device is to call this method when it starts tracking.
     * The current time is saved as a reference-value (m_Time = 0).
-    * Internally the device (pointer) and its offset are saved in a map, so that 
+    * Internally the device (pointer) and its offset are saved in a map, so that
     * no device can call this method twice.
     * If the user has not set its own RealTimeClock, a default one is created dependant on the OS
     * in use.
@@ -100,8 +100,8 @@ namespace mitk {
     * \brief returns the time elapsed since calling Start() for the first time in milliseconds
     *
     * GetElapsed() returns the time elapsed since Start() has been called first, no matter
-    * which itk::Object did the call. 
-    * This method-call can be used if you want to need to have several processes you want to 
+    * which itk::Object did the call.
+    * This method-call can be used if you want to need to have several processes you want to
     * monitor and need timestamps in the same space of time, e.g. when using two tracking-devices
     * on the same experiment.
     */
@@ -110,20 +110,20 @@ namespace mitk {
     /**
     * \brief returns the time elapsed since 'device' called Start() in milliseconds
     *
-    * GetElapsed(itk::Object device) returns the time elapsed since the given itk::Object called 
-    * Start(). 
-    * This overloaded method should be used when you only have one independent process to keep 
+    * GetElapsed(itk::Object device) returns the time elapsed since the given itk::Object called
+    * Start().
+    * This overloaded method should be used when you only have one independent process to keep
     * track of, e.g. when you want to measure how long it takes to execute a piece of code.
     */
     double GetElapsed(itk::Object::Pointer device);
 
 
     /**
-    * \brief returns the offset of this device's starting-time to the 
+    * \brief returns the offset of this device's starting-time to the
     *  reference-time in ms
     *
     * Device 'A' is the first device to call Start(). Device 'B' calls Start()
-    * some time later. This time-difference is the offset, that each device has realtive to the 
+    * some time later. This time-difference is the offset, that each device has realtive to the
     * device that started the time-acquisition.
     * Each device's offset is stored in a map with a pointer to the device.
     *
@@ -145,11 +145,11 @@ namespace mitk {
     *
     * Right now, none of these RealTimeClocks have been implemented!!
     *
-    * Notice: The mitk-implementation of an os-dependant RealTimeClock is used 
+    * Notice: The mitk-implementation of an os-dependant RealTimeClock is used
     * by default.
     */
     void SetRealTimeClock(mitk::RealTimeClock::Pointer Clock);
- 
+
     /**
     * \brief creates a new RealTimeClock
     *
@@ -183,7 +183,7 @@ namespace mitk {
     /* map, in which pointer to all devices calling Start(), are saved */
     std::map<itk::Object::Pointer, double> m_DeviceMap;
 
-    std::map<itk::Object::Pointer, double>::iterator m_MapIterator;    
+    std::map<itk::Object::Pointer, double>::iterator m_MapIterator;
   };
 } // namespace mitk
 

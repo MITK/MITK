@@ -27,13 +27,13 @@ namespace mitk
 {
   /**
   * @brief Interface to the Kinect camera
-  * 
+  *
   *
   * @ingroup ToFHardware
   */
   class MITK_TOFHARDWARE_EXPORT KinectController : public itk::Object
   {
-  public: 
+  public:
 
     mitkClassMacro( KinectController , itk::Object );
 

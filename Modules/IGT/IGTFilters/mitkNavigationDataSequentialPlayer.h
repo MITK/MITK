@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,7 +46,7 @@ namespace mitk
     void SetFileName(const std::string& _FileName);
 
     /**
-    * \brief returns the file name and path 
+    * \brief returns the file name and path
     */
     itkGetStringMacro(FileName);
 
@@ -65,7 +65,7 @@ namespace mitk
      * @brief Set to true if the data player should repeat the outputs.
      */
     itkSetMacro(Repeat, bool);
-    
+
     /**
      * @return Returns if the data player should repeat the outputs.
      */

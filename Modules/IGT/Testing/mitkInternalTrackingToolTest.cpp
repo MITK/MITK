@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
 * NDIPassiveTool has a protected constructor and a protected itkNewMacro
 * so that only it's friend class NDITrackingDevice is able to instantiate
-* tool objects. Therefore, we derive from NDIPassiveTool and add a 
+* tool objects. Therefore, we derive from NDIPassiveTool and add a
 * public itkNewMacro, so that we can instantiate and test the class
 */
 class InternalTrackingToolTestClass : public mitk::InternalTrackingTool
@@ -36,7 +36,7 @@ public:
   */
   itkNewMacro(Self);
 protected:
-  InternalTrackingToolTestClass() : mitk::InternalTrackingTool()  
+  InternalTrackingToolTestClass() : mitk::InternalTrackingTool()
   {
   }
 
@@ -45,9 +45,9 @@ public: //these static methods are only to structure the test
 
 static void TestBasicFunctionality()
   {
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New().GetPointer();
-  
+
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
@@ -115,15 +115,15 @@ static void TestTooltipFunctionality()
                        (positionOutput[0] == 6)),
                        "Testing tooltip definition."
                      );
-  
+
 
   }
 };
 
 /**
  *  Simple example for a test for the class "InternalTrackingTool".
- *  
- *  argc and argv are the command line parameters which were passed to 
+ *
+ *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
@@ -135,8 +135,8 @@ int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
 
   InternalTrackingToolTestClass::TestBasicFunctionality();
   InternalTrackingToolTestClass::TestTooltipFunctionality();
-  
-  
+
+
   // always end with this!
   MITK_TEST_END();
 }

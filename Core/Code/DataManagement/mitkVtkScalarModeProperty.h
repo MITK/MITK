@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,10 +28,10 @@ namespace mitk
 #endif
 
 /**
- * Encapsulates the enumeration vtkInterpolation. Valid values are 
+ * Encapsulates the enumeration vtkInterpolation. Valid values are
  * (VTK constant/Id/string representation):
- * \li VTK_SCALAR_MODE_DEFAULT/0/Default, 
- * \li VTK_SCALAR_MODE_USE_POINT_DATA/1/PointData, 
+ * \li VTK_SCALAR_MODE_DEFAULT/0/Default,
+ * \li VTK_SCALAR_MODE_USE_POINT_DATA/1/PointData,
  * \li VTK_SCALAR_MODE_USE_CELL_DATA/2/CellData
  * \li VTK_SCALAR_MODE_USE_POINT_FIELD_DATA/3/PointFieldData
  * \li VTK_SCALAR_MODE_USE_CELL_FIELD_DATA/4/CellFieldData
@@ -41,11 +41,11 @@ class MITK_CORE_EXPORT VtkScalarModeProperty : public EnumerationProperty
 public:
 
   mitkClassMacro( VtkScalarModeProperty, EnumerationProperty );
-  
+
   itkNewMacro(VtkScalarModeProperty);
-  
+
   mitkNewMacro1Param(VtkScalarModeProperty, const IdType&);
-  
+
   mitkNewMacro1Param(VtkScalarModeProperty, const std::string&);
 
   /**
@@ -65,21 +65,21 @@ public:
   virtual void SetScalarModeToCellFieldData();
 
   using BaseProperty::operator=;
-  
+
 protected:
-  
+
   /**
    * Constructor. Sets the representation to a default value of surface(2)
    */
   VtkScalarModeProperty( );
-  
+
   /**
    * \brief Sets the scalar mode to the given value. If it is not
    * valid, the scalar mode is set to default (0).
    * @param value the integer representation of the scalar mode
    */
   VtkScalarModeProperty( const IdType& value );
-  
+
   /**
    * \brief Sets the scalar mode to the given value. If it is not
    * valid, the representation is set to default (0).
@@ -94,7 +94,7 @@ protected:
   virtual bool AddEnum( const std::string& name, const IdType& id );
 
   /**
-   * Adds the enumeration types as defined by vtk to the list of known 
+   * Adds the enumeration types as defined by vtk to the list of known
    * enumeration values.
    */
   virtual void AddInterpolationTypes();

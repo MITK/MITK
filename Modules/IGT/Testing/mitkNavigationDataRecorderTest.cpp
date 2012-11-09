@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -285,7 +285,7 @@ class mitkNavigationDataRecorderTestClass
     std::string filenameCSV = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"Recordertest-0.csv";
     Poco::File myFileXML(filenameXML);
     Poco::File myFileCSV(filenameCSV);
-    
+
     try
     {
     if (myFileXML.exists())
@@ -307,10 +307,10 @@ class mitkNavigationDataRecorderTestClass
     }
 
     }
-  
+
   static void TestStartRecordingExceptions()
      {
-     //Testing Start Recording for exceptions if recording has already started 
+     //Testing Start Recording for exceptions if recording has already started
      mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
      std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"Recordertest.xml";
      recorder->SetFileName(filename.c_str());
@@ -322,7 +322,7 @@ class mitkNavigationDataRecorderTestClass
      recorder->StartRecording();
      recorder->StopRecording();
      MITK_TEST_OUTPUT(<<"Tested double call of StartRecording(). Application should not crash.");
-    
+
      //Testing exceptions for method StartRecording() when no file is set.
      mitk::NavigationDataRecorder::Pointer recorder1 = mitk::NavigationDataRecorder::New();
      std::string filename1 = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"Recordertest.xml";
@@ -349,7 +349,7 @@ class mitkNavigationDataRecorderTestClass
      recorder2->StartRecording(&stream);
      recorder2->StopRecording();
      MITK_TEST_OUTPUT(<<"Tested double call of StartRecording(stream). Application should not crash.");
-    
+
      //Testing exceptions if the stream is not good
      mitk::NavigationDataRecorder::Pointer recorder3 = mitk::NavigationDataRecorder::New();
      std::ofstream stream3; //making an invalid stream
@@ -385,7 +385,7 @@ int mitkNavigationDataRecorderTest(int /* argc */, char* /*argv*/[])
   mitkNavigationDataRecorderTestClass::TestRecordingInvalidData();
   mitkNavigationDataRecorderTestClass::TestStartRecordingExceptions();
 
-  
+
   //Test fails under linux, perhaps reading permission problems, deactivated it temporary
   //mitkNavigationDataRecorderTestClass::TestLoadingRecordedXMLFile();
 

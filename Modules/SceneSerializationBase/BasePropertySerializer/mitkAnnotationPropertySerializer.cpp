@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ namespace mitk
 class SceneSerializationBase_EXPORT AnnotationPropertySerializer : public BasePropertySerializer
 {
   public:
-    
+
     mitkClassMacro( AnnotationPropertySerializer, BasePropertySerializer );
     itkNewMacro(Self);
 
@@ -53,11 +53,11 @@ class SceneSerializationBase_EXPORT AnnotationPropertySerializer : public BasePr
       if (!element) return NULL;
       const char* label( element->Attribute("label") );
       Point3D p;
-      if ( element->QueryFloatAttribute( "x", &p[0] ) != TIXML_SUCCESS ) 
+      if ( element->QueryFloatAttribute( "x", &p[0] ) != TIXML_SUCCESS )
         return NULL;
-      if ( element->QueryFloatAttribute( "y", &p[1] ) != TIXML_SUCCESS ) 
+      if ( element->QueryFloatAttribute( "y", &p[1] ) != TIXML_SUCCESS )
         return NULL;
-      if ( element->QueryFloatAttribute( "z", &p[2] ) != TIXML_SUCCESS ) 
+      if ( element->QueryFloatAttribute( "z", &p[2] ) != TIXML_SUCCESS )
         return NULL;
       return AnnotationProperty::New(label, p).GetPointer();
     }

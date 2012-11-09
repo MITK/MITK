@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,10 +44,10 @@ const char* PixelTypeToString()
 
 
 //##Documentation
-//## @brief Class for defining the data type of pixels 
+//## @brief Class for defining the data type of pixels
 //##
 //## To obtain additional type information not provided by this class
-//## itk::ImageIOBase can be used by passing the return value of 
+//## itk::ImageIOBase can be used by passing the return value of
 //## PixelType::GetItkTypeId() to itk::ImageIOBase::SetPixelTypeInfo
 //## and using the itk::ImageIOBase methods GetComponentType,
 //## GetComponentTypeAsString, GetPixelType, GetPixelTypeAsString.
@@ -131,9 +131,9 @@ public:
   */
   inline size_t GetNumberOfComponents() const
   {
-    return m_NumberOfComponents;    
+    return m_NumberOfComponents;
   }
-  
+
   /** \brief Get the number of bits per components
   * \sa GetBitsPerComponent
   */
@@ -141,7 +141,7 @@ public:
   {
     return m_BytesPerComponent * 8;
   }
-  
+
   bool operator==(const PixelType& rhs) const;
   bool operator!=(const PixelType& rhs) const;
 
@@ -198,7 +198,7 @@ private:
   std::string m_ComponentTypeName;
 
   std::string m_PixelTypeName;
-  
+
   std::size_t m_NumberOfComponents;
 
   std::size_t m_BytesPerComponent;

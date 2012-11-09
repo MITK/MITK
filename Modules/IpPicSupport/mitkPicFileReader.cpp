@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPicHelper.h"
 #include <itkImageFileReader.h>
 
-extern "C" 
+extern "C"
 {
   mitkIpPicDescriptor * MITKipPicGet( char *infile_name, mitkIpPicDescriptor *pic );
   mitkIpPicDescriptor * MITKipPicGetTags( char *infile_name, mitkIpPicDescriptor *pic );
@@ -119,7 +119,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
         {
             sprintf(fullName, m_FilePattern.c_str(), m_FilePrefix.c_str(), m_StartFileIndex+numberOfImages);
             FILE * f=fopen(fullName,"r");
-            if(f==NULL) 
+            if(f==NULL)
             {
                 //already found an image?
                 if(numberOfImages>0)
@@ -132,7 +132,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
                 fclose(f);
                 //only open the header of the first file found,
                 //@warning what to do when images do not have the same size??
-                if(header==NULL) 
+                if(header==NULL)
                 {
                     header=mitkIpPicGetHeader(fullName, NULL);
                     header=MITKipPicGetTags(fullName, header);
@@ -155,7 +155,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
 
         //@FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
         if(numberOfImages>1)
-        {  
+        {
             printf("\n numberofimages %d > 1\n",numberOfImages);
             header->dim=3;
             header->n[2]=numberOfImages;
@@ -280,7 +280,7 @@ void mitk::PicFileReader::GenerateData()
         int zDim=(output->GetDimension()>2?output->GetDimensions()[2]:1);
         printf("\n zdim is %u \n",zDim);
 
-        for (position = 0; position < zDim; ++position) 
+        for (position = 0; position < zDim; ++position)
         {
             char fullName[1024];
 
@@ -289,12 +289,12 @@ void mitk::PicFileReader::GenerateData()
             pic=MITKipPicGet(fullName, pic);
             if(pic==NULL)
             {
-                itkDebugMacro("Pic file '" << fullName << "' does not exist."); 
+                itkDebugMacro("Pic file '" << fullName << "' does not exist.");
             }
             /* FIXME else
             if(output->SetPicSlice(pic, position)==false)
             {
-                itkDebugMacro("Image '" << fullName << "' could not be added to Image."); 
+                itkDebugMacro("Image '" << fullName << "' could not be added to Image.");
             }*/
        }
        if(pic!=NULL)
@@ -307,7 +307,7 @@ void mitk::PicFileReader::EnlargeOutputRequestedRegion(itk::DataObject *output)
   output->SetRequestedRegionToLargestPossibleRegion();
 }
 
-bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
 {
   // First check the extension
   if(  filename == "" )

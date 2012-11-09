@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,9 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 #ifdef _WIN64  //Defined for applications for Win64.
-typedef long mtHandle; 
-#else 
-typedef int mtHandle; 
+typedef long mtHandle;
+#else
+typedef int mtHandle;
 #endif
 
 namespace mitk
@@ -41,13 +41,13 @@ namespace mitk
   *   \brief An object of this class represents the interface to the MicronTracker. The methods of this class
   *          are calling the c-functions which are provided by the MTC-library. If the MicronTracker is not in
   *          use, which means the CMake-variable "MITK_USE_MICRON_TRACKER" is set to OFF, this class is replaced
-  *          by a stub class called "ClaronInterfaceStub". 
+  *          by a stub class called "ClaronInterfaceStub".
   *   \ingroup IGT
   */
   class MitkIGT_EXPORT ClaronInterface : public itk::Object
   {
   public:
-    
+
     mitkClassMacro(ClaronInterface,itk::Object);
     itkNewMacro(Self);
     /**
@@ -58,7 +58,7 @@ namespace mitk
     void Initialize(std::string calibrationDir, std::string toolFilesDir);
 
     /**
-    * \brief Opens the connection to the device and makes it ready to track tools. 
+    * \brief Opens the connection to the device and makes it ready to track tools.
     * \return Returns true if there is a connection to the device and the device is ready to track tools, false if not.
     */
     bool StartTracking();
@@ -109,10 +109,10 @@ namespace mitk
     * \return Returns wether the tracking device is tracking or not.
     */
     bool IsTracking();
-    
+
     /**
     * \return   Returns wether the MicronTracker is installed (means wether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set ON),
-    *           so returns true in this case. This is because the class mitkClaronInterfaceStub, in which the same Method returns false 
+    *           so returns true in this case. This is because the class mitkClaronInterfaceStub, in which the same Method returns false
     *            is used otherways.
     */
     bool IsMicronTrackerInstalled();

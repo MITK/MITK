@@ -81,7 +81,7 @@ QmitkDicomEditor::~QmitkDicomEditor()
 }
 
 void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
-{   
+{
     m_Controls.setupUi( parent );
     m_Controls.LocalStorageButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/drive-harddisk_32.png"));
     m_Controls.FolderButton->setIcon(QIcon(":/org.mitk.gui.qt.dicom/folder_32.png"));

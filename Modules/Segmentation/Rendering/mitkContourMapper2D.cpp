@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,7 +41,7 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
   ////  @FIXME: Logik fuer update
   bool updateNeccesary=true;
 
-  if (updateNeccesary) 
+  if (updateNeccesary)
     {
     mitk::Contour::Pointer input =  const_cast<mitk::Contour*>(this->GetInput());
 
@@ -69,7 +69,7 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
       {
       glBegin (GL_LINE_LOOP);
       }
-    else 
+    else
       {
       glBegin (GL_LINE_STRIP);
       }

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,11 +53,11 @@ public:
 
   /** The type of input image.   */
   typedef TInputImage InputImageType;
-  
+
   /** Dimension of the input and output images. */
   itkStaticConstMacro (ImageDimension, unsigned int,
                        TInputImage::ImageDimension);
-  
+
   /** The type of output image.   */
   typedef TOutputImage OutputImageType;
 
@@ -69,7 +69,7 @@ public:
 
   /** Run-time type information (and related methods) */
   itkTypeMacro(IntelligentBinaryClosingFilter, ImageToImageFilter);
-  
+
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
@@ -78,10 +78,10 @@ public:
 
   /** Overloaded to link the input to this filter with the input of the
       mini-pipeline */
-  void SetInput(const InputImageType *input) 
+  void SetInput(const InputImageType *input)
   {
     // processObject is not const-correct so a const_cast is needed here
-    this->ProcessObject::SetNthInput(0, 
+    this->ProcessObject::SetNthInput(0,
                                      const_cast<InputImageType *>( input ) );
     m_DilateImageFilter->SetInput( const_cast<InputImageType *>( input ) );
   }
@@ -111,7 +111,7 @@ protected:
 
 
 private:
- 
+
   typedef typename InputImageType::PixelType                  InputPixelType;
   typedef BinaryBallStructuringElement
     <InputPixelType, ImageDimension >                         StructuringElementType;
@@ -130,7 +130,7 @@ private:
   typedef ImageRegionIterator<InputImageType>        InputIteratorType;
   typedef ImageRegionConstIterator<InputImageType>   ConstInputIteratorType;
   typedef ImageRegionIterator<OutputImageType>       OutputIteratorType;
- 
+
   typename BinaryErodeImageFilterType::Pointer        m_ErodeImageFilter;
   typename BinaryDilateImageFilterType::Pointer       m_DilateImageFilter;
   typename SubtractImageFilterType::Pointer           m_SubtractImageFilter;

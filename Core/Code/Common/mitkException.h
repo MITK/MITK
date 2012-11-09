@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,33 +44,33 @@ namespace mitk {
   *          You can then throw your specialized exceptions by using the macro
   *
   *                 mitkThrowException(MyException) << "optional exception message";
-  */  
-  class MITK_CORE_EXPORT Exception : public itk::ExceptionObject 
+  */
+  class MITK_CORE_EXPORT Exception : public itk::ExceptionObject
   {
-  
+
   public:
     Exception(const char *file, unsigned int lineNumber=0,
                   const char *desc="None", const char *loc="Unknown") :
     itk::ExceptionObject(file,lineNumber,desc,loc){}
-    
+
     virtual ~Exception() throw() {}
 
     itkTypeMacro(ClassName, SuperClassName);
-    
+
     /** \brief Adds rethrow data to this exception. */
     void AddRethrowData(const char *file, unsigned int lineNumber, const char *message);
-    
+
     /** \return Returns how often the exception was rethrown. */
     int GetNumberOfRethrows();
-    
-    /** @return Returns the rethrow data of the specified rethrow number. Returns empty data, if the rethrowNumber doesn't exist. 
+
+    /** @return Returns the rethrow data of the specified rethrow number. Returns empty data, if the rethrowNumber doesn't exist.
       * @param rethrowNumber The internal number of the rethrow.
       * @param file (returnvalue) This varaiable will be filled with the file of the specified rethrow.
       * @param file (returnvalue) This varaiable will be filled with the line of the specified rethrow.
       * @param file (returnvalue) This varaiable will be filled with the message of the specified rethrow.
-      */ 
+      */
     void GetRethrowData(int rethrowNumber, std::string &file, int &line, std::string &message);
-    
+
     /** \brief Definition of the bit shift operator for this class.*/
     template <class T> inline Exception& operator<<(const T& data)
     {
@@ -98,16 +98,16 @@ namespace mitk {
       return *this;
     }
   protected:
-  
+
   struct ReThrowData
     {
     std::string RethrowClassname;
     unsigned int RethrowLine;
     std::string RethrowMessage;
     };
-   
+
    std::vector<ReThrowData> m_RethrowData;
-   
+
   };
 } // namespace mitk
 #endif

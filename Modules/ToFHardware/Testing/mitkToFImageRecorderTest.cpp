@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -176,7 +176,7 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   mitk::PicFileReader::Pointer picFileReader = mitk::PicFileReader::New();
   mitk::Image::Pointer originalImage = NULL;
   mitk::Image::Pointer recordedImage = NULL;
-  
+
   MITK_TEST_OUTPUT(<< "Read original distance image using PicFileReader");
   picFileReader->SetFileName(distanceFileName);
   picFileReader->Update();

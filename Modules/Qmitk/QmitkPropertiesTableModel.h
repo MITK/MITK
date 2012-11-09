@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //# Forward declarations
 
-/// 
+///
 /// \class QmitkPropertiesTableModel
 /// \brief A table model for showing and editing mitk::Properties.
 ///
@@ -51,7 +51,7 @@ public:
   typedef std::pair<std::string, mitk::BaseProperty::Pointer> PropertyDataSet;
 
   ///
-  /// Constructs a new QmitkDataStorageTableModel 
+  /// Constructs a new QmitkDataStorageTableModel
   /// and sets the DataNode for this TableModel.
   QmitkPropertiesTableModel(QObject* parent = 0, mitk::PropertyList::Pointer _PropertyList=0);
 
@@ -64,7 +64,7 @@ public:
   ///
   /// Returns the property list of this table model.
   ///
-  mitk::PropertyList::Pointer GetPropertyList() const; 
+  mitk::PropertyList::Pointer GetPropertyList() const;
 
   ///
   /// Overwritten from QAbstractTableModel. Returns the flags what can be done with the items (view, edit, ...)
@@ -131,7 +131,7 @@ protected:
   /// \struct PropertyDataSetCompareFunction
   /// \brief A struct that inherits from std::binary_function. You can use it in std::sort algorithm for sorting the property list elements.
   ///
-  struct PropertyDataSetCompareFunction 
+  struct PropertyDataSetCompareFunction
     : public std::binary_function<PropertyDataSet, PropertyDataSet, bool>
   {
     ///
@@ -184,11 +184,11 @@ protected:
 //# PROTECTED GETTER
 protected:
   ///
-  /// \brief Searches for the specified property and returns the row of the element in this QTableModel. 
+  /// \brief Searches for the specified property and returns the row of the element in this QTableModel.
   /// If any errors occur, the function returns -1.
   ///
   int FindProperty(const mitk::BaseProperty* _Property) const;
-  
+
 //# PROTECTED SETTER
 protected:
   ///
@@ -205,7 +205,7 @@ protected:
   void RemoveSelectedProperty(unsigned int _Index);
   ///
   /// Reset is called when a new filter keyword is set or a new
-  /// PropertyList is set. First of all, all priorly selected 
+  /// PropertyList is set. First of all, all priorly selected
   /// properties are removed. Then all properties to be
   /// selected (specified by the keyword) are added to the selection.
   ///
@@ -213,12 +213,12 @@ protected:
 
 //# PROTECTED MEMBERS
 protected:
-  /// 
+  ///
   /// Holds the pointer to the properties list. Dont use smart pointers here. Instead: Listen
   /// to the delete event.
   mitk::WeakPointer<mitk::PropertyList> m_PropertyList;
 
-  /// 
+  ///
   /// Store the properties in a vector so that they may be sorted
   std::vector<PropertyDataSet > m_SelectedProperties;
 

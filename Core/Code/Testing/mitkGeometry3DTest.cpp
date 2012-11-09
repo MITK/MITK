@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -81,7 +81,7 @@ int testIndexAndWorldConsistency(mitk::Geometry3D* geometry3d)
   MITK_TEST_OUTPUT( << " Testing WorldToIndex(origin, mitk::Point3D)==(0,0,0)");
   mitk::Point3D globalOrigin;
   mitk::FillVector3D(globalOrigin, 0,0,0);
-  
+
   mitk::Point3D originContinuousIndex;
   geometry3d->WorldToIndex(origin, originContinuousIndex);
   MITK_TEST_CONDITION_REQUIRED(originContinuousIndex == globalOrigin, "");
@@ -100,7 +100,7 @@ int testIndexAndWorldConsistency(mitk::Geometry3D* geometry3d)
   geometry3d->WorldToIndex(originOffCenter, itkindex);
   MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
 
-  MITK_TEST_OUTPUT( << " Testing WorldToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)");  
+  MITK_TEST_OUTPUT( << " Testing WorldToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)");
   originOffCenter = origin+halfSpacingStep;
   originOffCenter -= 0.0001;
   geometry3d->WorldToIndex( originOffCenter, itkindex);
@@ -159,7 +159,7 @@ int testIndexAndWorldConsistencyForVectors(mitk::Geometry3D* geometry3d)
   MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndexDeprecated[1] == pIndex[1],"");
   MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndexDeprecated[2] == pIndex[2],"");
 
-  
+
   geometry3d->IndexToWorld(xAxisContinuousIndex,xAxisContinuousIndex);
   geometry3d->IndexToWorld(xAxisContinuousIndexDeprecated,xAxisContinuousIndexDeprecated);
   geometry3d->IndexToWorld(pIndex,p);
@@ -216,7 +216,7 @@ int testItkImageIsCenterBased()
   itkintimage->TransformPhysicalPointToIndex(originOffCenter, itkindex);
   MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
 
-  MITK_TEST_OUTPUT( << " Testing itk::Image::TransformPhysicalPointToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)");  
+  MITK_TEST_OUTPUT( << " Testing itk::Image::TransformPhysicalPointToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)");
   originOffCenter = origin+halfSpacingStep;
   originOffCenter -= 0.0001;
   itkintimage->TransformPhysicalPointToIndex( originOffCenter, itkindex);
@@ -236,10 +236,10 @@ int testItkImageIsCenterBased()
 
 int testGeometry3D(bool imageGeometry)
 {
-  // Build up a new image Geometry    
+  // Build up a new image Geometry
   mitk::Geometry3D::Pointer geometry3d = mitk::Geometry3D::New();
   float bounds[ ] = {-10.0, 17.0, -12.0, 188.0, 13.0, 211.0};
-    
+
   MITK_TEST_OUTPUT( << "Initializing");
   geometry3d->Initialize();
 
@@ -248,7 +248,7 @@ int testGeometry3D(bool imageGeometry)
 
   MITK_TEST_OUTPUT(<< "Setting bounds by SetFloatBounds(): " << bounds);
   geometry3d->SetFloatBounds(bounds);
- 
+
   MITK_TEST_OUTPUT( << "Testing AxisVectors");
   if(testGetAxisVectorVariants(geometry3d) == false)
     return EXIT_FAILURE;
@@ -264,10 +264,10 @@ int testGeometry3D(bool imageGeometry)
   transform = mitk::AffineTransform3D::New();
   transform->SetMatrix(matrix);
 
-  MITK_TEST_OUTPUT( << "Testing a SetIndexToWorldTransform"); 
+  MITK_TEST_OUTPUT( << "Testing a SetIndexToWorldTransform");
   geometry3d->SetIndexToWorldTransform(transform);
 
-  MITK_TEST_OUTPUT( << "Testing correctness of value returned by GetSpacing"); 
+  MITK_TEST_OUTPUT( << "Testing correctness of value returned by GetSpacing");
   const mitk::Vector3D& spacing1 = geometry3d->GetSpacing();
   mitk::Vector3D expectedSpacing;
   expectedSpacing.Fill(1.0);
@@ -278,10 +278,10 @@ int testGeometry3D(bool imageGeometry)
       return EXIT_FAILURE;
   }
 
-  MITK_TEST_OUTPUT( << "Testing a Compose(transform)");   
+  MITK_TEST_OUTPUT( << "Testing a Compose(transform)");
   geometry3d->Compose(transform);
 
-  MITK_TEST_OUTPUT( << "Testing correctness of value returned by GetSpacing");   
+  MITK_TEST_OUTPUT( << "Testing correctness of value returned by GetSpacing");
   const mitk::Vector3D& spacing2 = geometry3d->GetSpacing();
   expectedSpacing[1] = 4;
   if( mitk::Equal(spacing2, expectedSpacing) == false )
@@ -290,7 +290,7 @@ int testGeometry3D(bool imageGeometry)
       return EXIT_FAILURE;
   }
 
-  MITK_TEST_OUTPUT( << "Testing correctness of SetSpacing");   
+  MITK_TEST_OUTPUT( << "Testing correctness of SetSpacing");
   mitk::Vector3D newspacing;
   mitk::FillVector3D(newspacing, 1.5, 2.5, 3.5);
   geometry3d->SetSpacing(newspacing);
@@ -305,7 +305,7 @@ int testGeometry3D(bool imageGeometry)
   testIndexAndWorldConsistency(geometry3d);
   testIndexAndWorldConsistencyForVectors(geometry3d);
 
-  MITK_TEST_OUTPUT( << "Testing a rotation of the geometry");   
+  MITK_TEST_OUTPUT( << "Testing a rotation of the geometry");
   double angle = 35.0;
   mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 1, 0, 0 );
   mitk::Point3D center = geometry3d->GetCenter();
@@ -315,7 +315,7 @@ int testGeometry3D(bool imageGeometry)
   MITK_TEST_OUTPUT( << "Testing mitk::GetRotation() and success of rotation");
   mitk::Matrix3D rotation;
   mitk::GetRotation(geometry3d, rotation);
-  mitk::Vector3D voxelStep=rotation*newspacing;  
+  mitk::Vector3D voxelStep=rotation*newspacing;
   mitk::Vector3D voxelStepIndex;
   geometry3d->WorldToIndex(voxelStep, voxelStepIndex);
   mitk::Vector3D expectedVoxelStepIndex;
@@ -357,12 +357,12 @@ int testGeometryAfterCasting()
    mySize[1] = 2;
    mySize[2] = 555.5;
    myRegion.SetSize( mySize);
-   myRegion.SetIndex( myIndex ); 
+   myRegion.SetIndex( myIndex );
    image3DItk->SetSpacing(mySpacing);
    image3DItk->SetRegions( myRegion);
    image3DItk->Allocate();
    image3DItk->FillBuffer(0);
-   
+
    myDirection.SetIdentity();
    rotMatrixX.SetIdentity();
    rotMatrixY.SetIdentity();
@@ -386,7 +386,7 @@ int testGeometryAfterCasting()
          rotMatrixY[0][0] = cos( rotY );
          rotMatrixY[0][2] = sin( rotY );
          rotMatrixY[2][0] = -sin( rotY );
-         rotMatrixY[2][2] = cos( rotY ); 
+         rotMatrixY[2][2] = cos( rotY );
 
          for (double rotZ=0; rotZ < (itk::Math::pi*2); rotZ+=0.5 )
          {
@@ -394,14 +394,14 @@ int testGeometryAfterCasting()
             rotMatrixZ[0][0] = cos( rotZ );
             rotMatrixZ[0][1] = -sin( rotZ );
             rotMatrixZ[1][0] = sin( rotZ );
-            rotMatrixZ[1][1] = cos( rotZ );    
-            
+            rotMatrixZ[1][1] = cos( rotZ );
+
             // Multiply matrizes
             myDirection = myDirection * rotMatrixX * rotMatrixY * rotMatrixZ;
             image3DItk->SetDirection(myDirection);
             mitk::CastToMitkImage(image3DItk, mitkImage);
             const mitk::AffineTransform3D::MatrixType& matrix = mitkImage->GetGeometry()->GetIndexToWorldTransform()->GetMatrix();
-            
+
             for (int row=0; row<3; row++)
             {
                for (int col=0; col<3; col++)
@@ -409,7 +409,7 @@ int testGeometryAfterCasting()
                   double mitkValue = matrix[row][col] / mitkImage->GetGeometry()->GetSpacing()[col];
                   double itkValue  = myDirection[row][col];
                   double diff = mitkValue - itkValue;
-                  // if you decrease this value, you can see that there might be QUITE high inaccuracy!!! 
+                  // if you decrease this value, you can see that there might be QUITE high inaccuracy!!!
                   if (diff > eps) // need to check, how exact it SHOULD be .. since it is NOT EXACT!
                   {
                      std::cout << "Had a difference of : " << diff;
@@ -421,12 +421,12 @@ int testGeometryAfterCasting()
                      return false;
                   }
                }
-            } 
+            }
          }
       }
    }
 
-   
+
 
    // Create 2D ITK Image from Scratch, cast to 2D MITK image, compare Geometries
    Image2DType::Pointer image2DItk = Image2DType::New();
@@ -442,7 +442,7 @@ int testGeometryAfterCasting()
    mySize2D[0] = 10;
    mySize2D[1] = 2;
    myRegion2D.SetSize( mySize2D);
-   myRegion2D.SetIndex( myIndex2D ); 
+   myRegion2D.SetIndex( myIndex2D );
    image2DItk->SetSpacing(mySpacing2D);
    image2DItk->SetRegions( myRegion2D);
    image2DItk->Allocate();
@@ -493,7 +493,7 @@ int testGeometryAfterCasting()
             {
                double itkValue  = myDirection2D[row][col];
                double diff = mitkValue - itkValue;
-               // if you decrease this value, you can see that there might be QUITE high inaccuracy!!! 
+               // if you decrease this value, you can see that there might be QUITE high inaccuracy!!!
                if (diff > eps) // need to check, how exact it SHOULD be .. since it is NOT EXACT!
                {
                   std::cout << "Had a difference of : " << diff;
@@ -504,16 +504,16 @@ int testGeometryAfterCasting()
                   MITK_TEST_CONDITION_REQUIRED(false == true, "");
                   return false;
                }
-            }           
+            }
          }
-      }                     
-   }        
+      }
+   }
 
 
 
 
 
-   // THIS WAS TESTED: 
+   // THIS WAS TESTED:
    // 2D ITK -> 2D MITK,
    // 3D ITK -> 3D MITK,
 

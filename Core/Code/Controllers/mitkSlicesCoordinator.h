@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,20 +30,20 @@ class StateEvent;
 #pragma GCC visibility push(default)
 itkEventMacro( SliceRotationEvent, itk::AnyEvent);
 #pragma GCC visibility pop
- 
+
 /**
  * \brief Coordinates a list of SliceNavigationControllers.
  *
  * Each SliceNavigationController can select one slice from a
- * TimeSlicedGeometry. This class (SlicesCoordinator) coordinates several 
- * SliceNavigationControllers to facilitate e.g. rotation of slices. A new 
+ * TimeSlicedGeometry. This class (SlicesCoordinator) coordinates several
+ * SliceNavigationControllers to facilitate e.g. rotation of slices. A new
  * class is needed, because for rotation one has to know an axis of rotation.
  * Such an axis is most easily determined from the "other slices", which are
  * not known by a SliceNavigationController.
 
  * This class registers itself as a listener to GlobalInteraction and holds a
  * list of SliceNavigationControllers. Any functionality, such as slice
- * rotation, is done in subclasses. This separation is done for the case that 
+ * rotation, is done in subclasses. This separation is done for the case that
  * some other multi-slice coordination should be implemented.
  */
 class MITK_CORE_EXPORT SlicesCoordinator : public StateMachine
@@ -51,10 +51,10 @@ class MITK_CORE_EXPORT SlicesCoordinator : public StateMachine
 public:
 
   typedef std::vector<SliceNavigationController*> SNCVector;
-  
+
   mitkClassMacro(SlicesCoordinator, StateMachine);
-  mitkNewMacro1Param(Self, const char*);   
-  
+  mitkNewMacro1Param(Self, const char*);
+
 
   /** Add to list of managed slices. Check if CreatedWorldGeometry of SNC is
    * managable (i.e. there is basically only one planegeometry) */
@@ -84,7 +84,7 @@ public:
 protected:
   /** \brief Default Constructor */
   SlicesCoordinator(const char* machine);
-  
+
   /** clear list of controllers */
   virtual ~SlicesCoordinator();
 
@@ -111,8 +111,8 @@ protected:
 
 };
 
-} // namespace 
+} // namespace
 
-#endif 
+#endif
 
 

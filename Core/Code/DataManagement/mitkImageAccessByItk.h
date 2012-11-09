@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifndef MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED
 #define MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED
- 
+
 #include <itkCastImageFilter.h>
 #include <mitkImageToItk.h>
 
@@ -117,7 +117,7 @@ public:
     imagetoitk->SetInput(nonConstImage);                                               \
     imagetoitk->Update();                                                              \
     itkImageTypeFunction(imagetoitk->GetOutput(), MITK_PP_TUPLE_REM(MITK_PP_SEQ_HEAD(args))MITK_PP_SEQ_TAIL(args)); \
-  } else                                                                               
+  } else
 
 #define _accessByItkArgs_n(itkImageTypeFunction, type, args)                           \
   (itkImageTypeFunction, MITK_PP_TUPLE_REM(2) type, args)
@@ -140,11 +140,11 @@ public:
 
 /**
  * \brief Access a MITK image by an ITK image
- * 
+ *
  * Define a templated function or method (\a itkImageTypeFunction)
  * within which the mitk-image (\a mitkImage) is accessed:
  * \code
- *   template < typename TPixel, unsigned int VImageDimension > 
+ *   template < typename TPixel, unsigned int VImageDimension >
  *   void ExampleFunction( itk::Image<TPixel, VImageDimension>* itkImage );
  * \endcode
  *

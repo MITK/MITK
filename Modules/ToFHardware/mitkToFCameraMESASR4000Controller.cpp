@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -99,7 +99,7 @@ namespace mitk
 
       this->m_MESARes = SR_GetRows(m_MESAHandle);
       this->m_CaptureHeight = this->m_MESARes;
-      this->m_MESARes = SR_GetCols(m_MESAHandle); 
+      this->m_MESARes = SR_GetCols(m_MESAHandle);
       this->m_CaptureWidth = this->m_MESARes;
       this->m_PixelNumber = this->m_CaptureWidth*this->m_CaptureHeight;
       this->m_NumberOfBytes = this->m_PixelNumber * sizeof(float);

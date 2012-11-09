@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,7 +44,7 @@ mitk::RenderWindowFrame::~RenderWindowFrame()
   if ( m_RenderWindow != NULL )
     if ( this->IsEnabled() )
       this->Disable();
-  
+
   if ( m_RectangleRenderer != NULL )
     m_RectangleRenderer->Delete();
 
@@ -113,9 +113,9 @@ void mitk::RenderWindowFrame::Enable(float col1, float col2, float col3)
     m_RectangleRenderer->EraseOff();
 
     m_RectangleRenderer->SetInteractive(0);
-    
+
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_RectangleRenderer,true);
-    
+
     m_IsEnabled = true;
   }
 }
@@ -127,7 +127,7 @@ bool mitk::RenderWindowFrame::IsEnabled()
 {
   return  m_IsEnabled;
 }
- 
+
 void mitk::RenderWindowFrame::SetRequestedRegionToLargestPossibleRegion()
 {
     //nothing to do
@@ -135,7 +135,7 @@ void mitk::RenderWindowFrame::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::RenderWindowFrame::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return false;    
+    return false;
 }
 
 bool mitk::RenderWindowFrame::VerifyRequestedRegion()

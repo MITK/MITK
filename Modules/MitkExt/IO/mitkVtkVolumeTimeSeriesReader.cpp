@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,12 +47,12 @@ void mitk::VtkVolumeTimeSeriesReader::GenerateData()
     else
     {
       itkWarningMacro(<< "vtkPolyDataReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
-      output->SetVtkPolyData( vtkPolyData::New(), i ); 
+      output->SetVtkPolyData( vtkPolyData::New(), i );
     }
   }
 }
 
-bool mitk::VtkVolumeTimeSeriesReader::CanReadFile(const std::string /*filename*/, const std::string filePrefix, const std::string filePattern) 
+bool mitk::VtkVolumeTimeSeriesReader::CanReadFile(const std::string /*filename*/, const std::string filePrefix, const std::string filePattern)
 {
   if( filePattern != "" && filePrefix != "" )
     return false;

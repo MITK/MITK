@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,10 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include "mitkModuleContext.h"
 
-const std::string mitk::USDevice::US_INTERFACE_NAME = "org.mitk.services.UltrasoundDevice";     
-const std::string mitk::USDevice::US_PROPKEY_LABEL = US_INTERFACE_NAME + ".label";      
-const std::string mitk::USDevice::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";  
-const std::string mitk::USDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";  
+const std::string mitk::USDevice::US_INTERFACE_NAME = "org.mitk.services.UltrasoundDevice";
+const std::string mitk::USDevice::US_PROPKEY_LABEL = US_INTERFACE_NAME + ".label";
+const std::string mitk::USDevice::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
+const std::string mitk::USDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
 
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::ImageSource()
@@ -36,7 +36,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::Im
   m_Metadata->SetDeviceManufacturer(manufacturer);
   m_Metadata->SetDeviceModel(model);
   m_IsActive = false;
-  
+
   //set number of outputs
   this->SetNumberOfOutputs(1);
 
@@ -113,9 +113,9 @@ bool mitk::USDevice::Connect()
   m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
 
   // This makes sure that the SmartPointer to this device does not invalidate while the device is connected
-  this->Register(); 
+  this->Register();
 
-  return true; 
+  return true;
 }
 
 bool mitk::USDevice::Disconnect()
@@ -131,7 +131,7 @@ bool mitk::USDevice::Disconnect()
   // Unregister
   m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
-  
+
   // Undo the manual registration done in Connect(). Pointer will invalidte, if no one holds a reference to this object anymore.
   this->UnRegister();
   return true;
@@ -169,7 +169,7 @@ void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
 
 
 void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
-  // currently, we may just add the probe. This behaviour should be changed, should more complicated SDK applications emerge 
+  // currently, we may just add the probe. This behaviour should be changed, should more complicated SDK applications emerge
   AddProbe(probe);
   int index = -1;
   for(int i = 0; i < m_ConnectedProbes.size(); i++)

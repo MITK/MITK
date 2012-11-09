@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,8 +51,8 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
 
   // Here is the part where a graph is given and converted to points and connections between points...
   std::vector< mitk::ConnectomicsNetwork::NetworkNode > vectorOfNodes = this->GetInput()->GetVectorOfAllNodes();
-  std::vector< std::pair< 
-    std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode > 
+  std::vector< std::pair<
+    std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode >
     , mitk::ConnectomicsNetwork::NetworkEdge > >  vectorOfEdges = this->GetInput()->GetVectorOfAllEdges();
 
   mitk::Point3D tempWorldPoint, tempCNFGeometryPoint;
@@ -60,7 +60,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
   //////////////////////Create Spheres/////////////////////////
   for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
   {
-    vtkSmartPointer<vtkSphereSource> sphereSource = 
+    vtkSmartPointer<vtkSphereSource> sphereSource =
       vtkSmartPointer<vtkSphereSource>::New();
 
     for(unsigned int dimension = 0; dimension < 3; dimension++)
@@ -73,11 +73,11 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
     sphereSource->SetCenter( tempWorldPoint[0] , tempWorldPoint[1], tempWorldPoint[2] );
     sphereSource->SetRadius(1.0);
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper = 
+    vtkSmartPointer<vtkPolyDataMapper> mapper =
       vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInput(sphereSource->GetOutput());
 
-    vtkSmartPointer<vtkActor> actor = 
+    vtkSmartPointer<vtkActor> actor =
       vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
 
@@ -89,7 +89,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
   for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
   {
 
-    vtkSmartPointer<vtkLineSource> lineSource = 
+    vtkSmartPointer<vtkLineSource> lineSource =
       vtkSmartPointer<vtkLineSource>::New();
 
     for(unsigned int dimension = 0; dimension < 3; dimension++)
@@ -116,11 +116,11 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
     double radiusFactor = 1.0 + ((double) vectorOfEdges[i].second.weight) / 10.0 ;
     tubes->SetRadius( std::log10( radiusFactor ) );
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper2 = 
+    vtkSmartPointer<vtkPolyDataMapper> mapper2 =
       vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper2->SetInput( tubes->GetOutput() );
 
-    vtkSmartPointer<vtkActor> actor = 
+    vtkSmartPointer<vtkActor> actor =
       vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper2);
 
@@ -137,7 +137,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
 
   //this->UpdateVtkObjects();
 
-  
+
 }
 
 const mitk::ConnectomicsNetwork* mitk::ConnectomicsNetworkMapper3D::GetInput()
@@ -177,5 +177,5 @@ vtkProp* mitk::ConnectomicsNetworkMapper3D::GetVtkProp(mitk::BaseRenderer *rende
 {
 
   return m_NetworkAssembly;
-  
+
 }

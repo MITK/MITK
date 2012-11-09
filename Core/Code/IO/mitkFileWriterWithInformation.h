@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 /**
  * \brief Interface for FileWriters with extra information.
- * Should be merged into FileWriter. 
+ * Should be merged into FileWriter.
 */
 class MITK_CORE_EXPORT FileWriterWithInformation : public FileWriter {
   public:
@@ -32,7 +32,7 @@ class MITK_CORE_EXPORT FileWriterWithInformation : public FileWriter {
     virtual const char *GetDefaultFilename() = 0;
     virtual const char *GetFileDialogPattern() = 0;
     virtual const char *GetDefaultExtension() = 0;
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data) = 0;  
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) = 0;
     virtual void DoWrite(BaseData::Pointer data) = 0;
 };
 }

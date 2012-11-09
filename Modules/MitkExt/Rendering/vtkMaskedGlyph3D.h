@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,8 +28,8 @@ class vtkMaskPoints;
  * This class masked points of the input data set and glyphs
  * only the selected poitns. Points may be selected either by
  * random or by ratio.
- * Additionally, this class allows to set the InputScalars, 
- * InputVectors and InputNormals by their field name in the 
+ * Additionally, this class allows to set the InputScalars,
+ * InputVectors and InputNormals by their field name in the
  * input dataset.
  */
 class MitkExt_EXPORT vtkMaskedGlyph3D : public vtkGlyph3D
@@ -53,7 +53,7 @@ public:
    * Set the input to this filter.
    */
   virtual void SetInput(vtkDataSet *input);
-  
+
   /**
    * Set/get whether to mask points
    */
@@ -78,7 +78,7 @@ protected:
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;
   int UseMaskPoints;
-  
+
 private:
   vtkMaskedGlyph3D(const vtkMaskedGlyph3D&);  // Not implemented.
   void operator=(const vtkMaskedGlyph3D&);  // Not implemented.

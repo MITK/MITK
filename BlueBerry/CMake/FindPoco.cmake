@@ -8,7 +8,7 @@
 
 # ----------------------------------------------------------------------------
 # If you have installed Poco in a non-standard location.
-# Then you have three options. 
+# Then you have three options.
 # In the following comments, it is assumed that <Your Path>
 # points to the root directory of the include directory of Poco. e.g
 # If you have put poco in C:\development\Poco then <Your Path> is
@@ -94,7 +94,7 @@ if(NOT Poco_INCLUDE_DIR)
 
   # Look for standard unix include paths
   find_path(Poco_INCLUDE_DIR Poco/Poco.h DOC "The ${POCO_INCLUDE_PATH_DESCRIPTION}")
-  
+
 endif(NOT Poco_INCLUDE_DIR)
 
 # Assume we didn't find it.

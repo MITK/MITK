@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -76,7 +76,7 @@ static void TestComplexCase()
     myNavigationDataEvaluationFilter->SetInput(testData);
     testData->SetDataValid(true);
     mitk::Point3D testPoint;
-    
+
     //1st point
     mitk::FillVector3D(testPoint,0,1,0);
     testData->SetPosition(testPoint);
@@ -121,7 +121,7 @@ static void TestComplexCase()
     mitk::FillVector3D(testPoint,3.1,3,1);
     testData->SetPosition(testPoint);
     myNavigationDataEvaluationFilter->Update();
-    
+
     MITK_TEST_CONDITION_REQUIRED(myNavigationDataEvaluationFilter->GetNumberOfAnalysedNavigationData(0)==9,".. Testing GetNumberOfAnalysedNavigationData");
     MITK_TEST_CONDITION_REQUIRED(myNavigationDataEvaluationFilter->GetNumberOfInvalidSamples(0)==0,".. Testing GetNumberOfInvalidSamples");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myNavigationDataEvaluationFilter->GetPercentageOfInvalidSamples(0),0),".. Testing GetPercentageOfInvalidSamples");
@@ -138,7 +138,7 @@ static void TestComplexCase()
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myNavigationDataEvaluationFilter->GetQuaternionStandardDeviation(0)[0],0),".. Testing GetQuaternionStandardDeviation");
     myNavigationDataEvaluationFilter->ResetStatistic();
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myNavigationDataEvaluationFilter->GetNumberOfAnalysedNavigationData(0),0),".. Testing ResetStatistic");
-    
+
     }
 };
 
@@ -149,7 +149,7 @@ int mitkNavigationDataEvaluationFilterTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("NavigationDataEvaluationFilter")
-  
+
   NavigationDataEvaluationFilterTestClass::TestInstantiation();
   NavigationDataEvaluationFilterTestClass::TestSimpleCase();
   NavigationDataEvaluationFilterTestClass::TestComplexCase();

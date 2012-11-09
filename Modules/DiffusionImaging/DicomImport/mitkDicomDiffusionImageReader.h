@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ public:
   typedef itk::VectorImage< TPixelType, TDimension >   OutputImageType;
   typedef itk::Image<TPixelType, TDimension >         InputImageType;
   typedef itk::ImageSource< OutputImageType > ImageSourceType;
-  
+
   mitkClassMacro( DicomDiffusionImageReader, ImageSourceType );
   itkNewMacro(Self);
 
@@ -75,10 +75,10 @@ public:
    * cannot read a portion of an image), so the ImageSeriesReader must
    * enlarge the RequestedRegion to the size of the image on disk. */
   virtual void EnlargeOutputRequestedRegion(itk::DataObject *output);
-  
+
 protected:
   void PrintSelf(std::ostream& os, itk::Indent indent) const;
-  
+
   /** Does the real work. */
   virtual void GenerateData();
 

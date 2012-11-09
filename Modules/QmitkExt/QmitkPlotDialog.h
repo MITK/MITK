@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkPlotWidget.h>
 #include "mitkCommon.h"
 
-/** 
+/**
 * Provides a GUI interface for plotting curves using QmitkPlotWidget.
 * Designed for qwt version 5.1.1.
 * To plot data do the following:
@@ -44,14 +44,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 *    the QwtPlot instance using the method GetQwtPlot().
 * @see QwtPlot, @see QmitkPlotWidget
 */
-class QmitkExt_EXPORT QmitkPlotDialog: public QDialog 
+class QmitkExt_EXPORT QmitkPlotDialog: public QDialog
 {
 
 public:
   /**
   * Standard qt constructor
   */
-  QmitkPlotDialog(const char* title, QWidget* parent = 0, const char* name = 0);    
+  QmitkPlotDialog(const char* title, QWidget* parent = 0, const char* name = 0);
 
   /**
   * Virtual destructor
@@ -62,13 +62,13 @@ public:
   * Returns the instance of the QmitkPlotWidget. This may be used
   * to modify any detail of the appearance of the plot.
   */
-  QmitkPlotWidget* GetPlot();    
+  QmitkPlotWidget* GetPlot();
 
   /**
   * Returns the instance of the plot-widget. This may be used
   * to modify any detail of the appearance of the plot.
   */
-  QwtPlot* GetQwtPlot();    
+  QwtPlot* GetQwtPlot();
 
 protected:
 
@@ -77,5 +77,5 @@ protected:
   QPushButton* m_CloseDialogButton;
 };
 
-#endif 
+#endif
 

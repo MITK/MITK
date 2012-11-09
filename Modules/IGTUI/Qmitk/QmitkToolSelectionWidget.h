@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,24 +26,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*!
 \brief QmitkToolSelectionWidget
 
-Widget for tool selection in an IGT Plugin. Provides a combobx which can be filled with the tool names ( SetToolNames() or AddToolName() ) of a tracking source and a checkbox 
+Widget for tool selection in an IGT Plugin. Provides a combobx which can be filled with the tool names ( SetToolNames() or AddToolName() ) of a tracking source and a checkbox
 whose text can be set with AddCheckBoxText(). Toggeling of the checkbox should be used to activate or inactivate a specific action for the selected tool in the IGT Plugin.
 
 */
 class MitkIGTUI_EXPORT QmitkToolSelectionWidget : public QWidget
-{  
+{
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
-public: 
+public:
 
 
-  /*!  
-  \brief default constructor  
-  */ 
+  /*!
+  \brief default constructor
+  */
   QmitkToolSelectionWidget( QWidget* parent );
 
-  /*!  
-  \brief default destructor  
-  */ 
+  /*!
+  \brief default destructor
+  */
   virtual ~QmitkToolSelectionWidget();
 
   /*!
@@ -61,7 +61,7 @@ public:
   */
   void AddToolName( const QString& toolName);
 
- 
+
   /*!
   \brief This method changes the tool name in the combobox at the given position.
   */
@@ -86,9 +86,9 @@ public:
   \brief This method sets the text of the use tool checkbox.
   */
   void SetCheckboxtText( const QString& text);
-  
+
   /*!
-  \brief This method returns whether the use tool checkbox is checked or not. 
+  \brief This method returns whether the use tool checkbox is checked or not.
   */
   bool IsSelectedToolActivated();
 
@@ -115,7 +115,7 @@ public slots:
 
     protected slots:
       /*!
-  \brief Slot which emits the SingalUseTool() after providing it with the tool id. 
+  \brief Slot which emits the SingalUseTool() after providing it with the tool id.
   */
       void CheckBoxToggled(bool checked);
 

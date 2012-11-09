@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
-  * @brief Interface for all representations of PMD ToF devices. 
-  * ToFCameraPMDDevice internally holds an instance of ToFCameraPMDController and starts a thread 
+  * @brief Interface for all representations of PMD ToF devices.
+  * ToFCameraPMDDevice internally holds an instance of ToFCameraPMDController and starts a thread
   * that continuously grabs images from the controller. A buffer structure buffers the last acquired images
   * to provide the image data loss-less.
   *
@@ -33,7 +33,7 @@ namespace mitk
   */
   class MITK_TOFHARDWARE_EXPORT ToFCameraPMDRawDataDevice : public ToFCameraDevice
   {
-  public: 
+  public:
 
     mitkClassMacro( ToFCameraPMDRawDataDevice , ToFCameraDevice );
 
@@ -50,7 +50,7 @@ namespace mitk
     */
     virtual bool DisconnectCamera();
     /*!
-    \brief starts the continuous updating of the camera. 
+    \brief starts the continuous updating of the camera.
     A separate thread updates the source data, the main thread processes the source data and creates images and coordinates
     */
     virtual void StartCamera();
@@ -109,7 +109,7 @@ namespace mitk
     */
     ToFCameraPMDController::Pointer GetController();
 
-    virtual void GetChannelSourceData(short* /*sourceData*/, vtkShortArray* /*vtkChannelArray*/ ){}; 
+    virtual void GetChannelSourceData(short* /*sourceData*/, vtkShortArray* /*vtkChannelArray*/ ){};
 
     /*!
     \brief set a BaseProperty

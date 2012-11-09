@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkCompressedImageContainerTestClass
 {
   public:
-  
+
 static void Test( mitk::CompressedImageContainer* container, mitk::Image* image, unsigned int& numberFailed )
 {
   container->SetImage( image ); // compress
@@ -50,7 +50,7 @@ static void Test( mitk::CompressedImageContainer* container, mitk::Image* image,
   {
     ++numberFailed;
     std::cerr << "  (EE) Pixel type wrong after uncompression:" << std::endl;
-    
+
     mitk::PixelType m_PixelType = image->GetPixelType();
     std::cout << "Original pixel type:" << std::endl;
     std::cout << " PixelType: " << m_PixelType.GetTypeId().name() << std::endl;
@@ -78,7 +78,7 @@ static void Test( mitk::CompressedImageContainer* container, mitk::Image* image,
   }
 
   unsigned int numberOfTimeSteps(1);
-  if (image->GetDimension() > 3) 
+  if (image->GetDimension() > 3)
   {
     numberOfTimeSteps = image->GetDimension(3);
   }
@@ -104,7 +104,7 @@ static void Test( mitk::CompressedImageContainer* container, mitk::Image* image,
       break; // break "for timeStep"
     }
   }
- 
+
 }
 
 };
@@ -114,14 +114,14 @@ int mitkCompressedImageContainerTest(int argc, char* argv[])
 {
   // one big variable to tell if anything went wrong
     unsigned int numberFailed(0);
- 
+
   // need one parameter (image filename)
     if(argc==0)
     {
       std::cerr<<"No file specified [FAILED]"<<std::endl;
       return EXIT_FAILURE;
     }
- 
+
   // load the image
 
     mitk::Image::Pointer image = NULL;
@@ -171,12 +171,12 @@ int mitkCompressedImageContainerTest(int argc, char* argv[])
 
   // some real work
     mitkCompressedImageContainerTestClass::Test( container, image, numberFailed );
-  
+
     std::cout << "Testing destruction" << std::endl;
 
   // freeing
     container = NULL;
-      
+
     std::cout << "  (II) Freeing works." << std::endl;
 
     if (numberFailed > 0)

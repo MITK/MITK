@@ -35,7 +35,7 @@ void @VIEW_CLASS@::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::@VIEW_CONTROLS_CLASS@;
     m_Controls->setupUi( parent );
- 
+
     connect( m_Controls->btnPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
   }
 }
@@ -54,14 +54,14 @@ void @VIEW_CLASS@::StdMultiWidgetNotAvailable()
 
 
 void @VIEW_CLASS@::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
-{ 
+{
   // iterate all selected objects, adjust warning visibility
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
        it != nodes.end();
        ++it )
   {
     mitk::DataNode::Pointer node = *it;
-  
+
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       m_Controls->lblWarning->setVisible( false );

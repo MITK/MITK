@@ -40,7 +40,7 @@ set(CPP_FILES
   IGTToolManagement/mitkNavigationTool.cpp
   IGTToolManagement/mitkNavigationToolReader.cpp
   IGTToolManagement/mitkNavigationToolWriter.cpp
-  
+
   IGTExceptionHandling/mitkIGTException.cpp
   IGTExceptionHandling/mitkIGTHardwareException.cpp
   IGTExceptionHandling/mitkIGTIOException.cpp

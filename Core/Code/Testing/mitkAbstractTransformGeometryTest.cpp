@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,7 +51,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char* /*argv*/ [])
   abstractgeometry->SetPlane(xyPlane);
 
   std::cout << "Testing whether the bounds of xyPlane and the parametric bounds of AbstractTransformGeometry are equal: ";
-  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(xyPlane->GetBoundingBox())->GetMinimum())==false) || 
+  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(xyPlane->GetBoundingBox())->GetMinimum())==false) ||
      (mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMaximum(), const_cast<mitk::BoundingBox*>(xyPlane->GetBoundingBox())->GetMaximum())==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -60,7 +60,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char* /*argv*/ [])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing whether the parametic bounds of AbstractTransformGeometry and the bounds of the plane accessed from there are equal: ";
-  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum())==false) || 
+  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum())==false) ||
      (mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMaximum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMaximum())==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -72,7 +72,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char* /*argv*/ [])
   height = 300;
   bounds[3] = height;
   abstractgeometry->SetParametricBounds(bounds);
-  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum())==false) || 
+  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum())==false) ||
      (mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMaximum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMaximum())==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -103,7 +103,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char* /*argv*/ [])
   abstractgeometry->SetVtkAbstractTransform(sphericalTransform);
 
   std::cout << "Testing whether the bounds of sphereParameterPlane and the parametric bounds of AbstractTransformGeometry are equal: ";
-  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(sphereParameterPlane->GetBoundingBox())->GetMinimum())==false) || 
+  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(sphereParameterPlane->GetBoundingBox())->GetMinimum())==false) ||
      (mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMaximum(), const_cast<mitk::BoundingBox*>(sphereParameterPlane->GetBoundingBox())->GetMaximum())==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -112,7 +112,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char* /*argv*/ [])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing whether the parametic bounds of AbstractTransformGeometry and the bounds of the plane accessed from there are equal: ";
-  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum())==false) || 
+  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum())==false) ||
      (mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMaximum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMaximum())==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -159,7 +159,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char* /*argv*/ [])
   height = 300;
   bounds[3] = height;
   abstractgeometry->SetParametricBounds(bounds);
-  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum())==false) || 
+  if((mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum())==false) ||
      (mitk::Equal(const_cast<mitk::BoundingBox*>(abstractgeometry->GetParametricBoundingBox())->GetMaximum(), const_cast<mitk::BoundingBox*>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMaximum())==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -189,8 +189,8 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char* /*argv*/ [])
   //std::cout<<"[PASSED]"<<std::endl;
 
   //std::cout << "Testing whether the first geometry in the SlicedGeometry3D is identical to planegeometry3 by axis comparison: "<<std::endl;
-  //if((mitk::Equal(accessedplanegeometry3->GetAxisVector(0), planegeometry3->GetAxisVector(0))==false) || 
-  //   (mitk::Equal(accessedplanegeometry3->GetAxisVector(1), planegeometry3->GetAxisVector(1))==false) || 
+  //if((mitk::Equal(accessedplanegeometry3->GetAxisVector(0), planegeometry3->GetAxisVector(0))==false) ||
+  //   (mitk::Equal(accessedplanegeometry3->GetAxisVector(1), planegeometry3->GetAxisVector(1))==false) ||
   //   (mitk::Equal(accessedplanegeometry3->GetAxisVector(2), planegeometry3->GetAxisVector(2))==false))
   //{
   //  std::cout<<"[FAILED]"<<std::endl;

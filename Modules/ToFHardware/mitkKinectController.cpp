@@ -78,7 +78,7 @@ KinectController::~KinectController()
     delete d;
   }
 
-  bool KinectController::OpenCameraConnection() 
+  bool KinectController::OpenCameraConnection()
   {
     if (!d->m_ConnectionCheck)
     {

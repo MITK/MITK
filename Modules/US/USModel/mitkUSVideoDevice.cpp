@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,7 +47,7 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetad
 
 mitk::USVideoDevice::~USVideoDevice()
 {
- 
+
 }
 
 void mitk::USVideoDevice::Init()
@@ -93,7 +93,7 @@ bool mitk::USVideoDevice::OnActivation()
   MITK_INFO << "Activated UsVideoDevice!";
   this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
   return true;
-}  
+}
 
 
 void mitk::USVideoDevice::OnDeactivation()
@@ -105,7 +105,7 @@ void mitk::USVideoDevice::GenerateData()
 {
   mitk::USImage::Pointer result;
   result = m_Image;
-  
+
   // Set Metadata
   result->SetMetadata(this->m_Metadata);
   //Apply Transformation

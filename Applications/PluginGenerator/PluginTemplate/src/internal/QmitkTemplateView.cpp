@@ -27,7 +27,7 @@ void $(view-class-name)::CreateQtPartControl( QWidget *parent )
 
 void $(view-class-name)::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )
-{ 
+{
   // iterate all selected objects, adjust warning visibility
   foreach( mitk::DataNode::Pointer node, nodes )
   {

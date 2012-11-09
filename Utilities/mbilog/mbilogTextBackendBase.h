@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,14 +25,14 @@ namespace mbilog{
 
   /** Documentation
    *  \brief This class is an abstract superclass for logging text backends. It adds string formatting methods
-   *         to the backend interface BackendBase. Accordingly backends that inherit from this class can be 
+   *         to the backend interface BackendBase. Accordingly backends that inherit from this class can be
    *         registered in the mbi logging mechanism.
    *
    *  \ingroup mbilog
    */
   class MBILOG_DLL_API TextBackendBase : public BackendBase
   {
-  public: 
+  public:
 
     virtual ~TextBackendBase();
 

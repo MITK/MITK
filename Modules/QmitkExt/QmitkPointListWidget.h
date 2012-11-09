@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -88,11 +88,11 @@ public:
     void OnNodeDeleted( const itk::EventObject & e );
 
     /** @brief Unselects the edit button if it is selected. */
-    void UnselectEditButton(); 
+    void UnselectEditButton();
 
 public slots:
     void DeactivateInteractor(bool deactivate);
-    void EnableEditButton(bool enabled); 
+    void EnableEditButton(bool enabled);
 
 signals:
     /** @brief signal to inform about the state of the EditPointSetButton, whether an interactor for setting points is active or not */

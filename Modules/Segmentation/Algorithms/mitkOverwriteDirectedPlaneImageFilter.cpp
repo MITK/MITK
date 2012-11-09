@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -74,8 +74,8 @@ void mitk::OverwriteDirectedPlaneImageFilter::GenerateData()
     }
 
     m_ImageGeometry3D = input3D->GetGeometry();
-    /* 
-    if ( m_SliceDifferenceImage.IsNull() || 
+    /*
+    if ( m_SliceDifferenceImage.IsNull() ||
     m_SliceDifferenceImage->GetDimension(0) != m_SliceImage->GetDimension(0) ||
     m_SliceDifferenceImage->GetDimension(1) != m_SliceImage->GetDimension(1) )
     {
@@ -153,7 +153,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
         }
 
 
-        ++sliceIterator; 
+        ++sliceIterator;
     }
 }
 
@@ -164,7 +164,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 
 //if ( columns == extent[0] )
 //{
-////If we are at the end of a row, then we have to go to the beginning of the next row 
+////If we are at the end of a row, then we have to go to the beginning of the next row
 //currentImagePointIn3D = origin;
 //currentImagePointIn3D += spacing[1]*bottom*currentPointIn2D[1];
 //columns = 0;
@@ -174,7 +174,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //{
 //if ( columns != 0 )
 //{
-//currentImagePointIn3D += spacing[0]*right; 
+//currentImagePointIn3D += spacing[0]*right;
 //}
 //m_ImageGeometry3D->WorldToIndex(currentImagePointIn3D, outputIndex);
 //}
@@ -232,7 +232,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //    imagetoitk->SetInput(mitkImage);                                                     \
 //    imagetoitk->Update();                                                               \
 //    itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
-//}                                                              
+//}
 //
 //#define myMITKOverwriteDirectedPlaneImageFilterAccessAllTypesByItk(mitkImage, itkImageTypeFunction,       dimension, itkimage2)    \
 //{                                                                                                                           \
@@ -246,7 +246,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //    myMITKOverwriteDirectedPlaneImageFilterAccessByItk(mitkImage, itkImageTypeFunction, unsigned char,  dimension, itkimage2)       \
 //}*/
 //
-//    
+//
 //template<typename TPixel, unsigned int VImageDimension>
 //void mitk::OverwriteDirectedPlaneImageFilter::ItkImageSwitch( itk::Image<TPixel,VImageDimension>* itkImage )
 //{
@@ -267,7 +267,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //  //typedef itk::ImageRegionIterator< DiffImageType >     DiffSliceIteratorType;
 //
 //  InputSliceIteratorType inputIterator( inputImage, inputImage->GetLargestPossibleRegion() );
-//  
+//
 //  //typename DiffImageType::Pointer diffImage;
 //  //CastToItkImage( m_SliceDifferenceImage, diffImage );
 //  //DiffSliceIteratorType diffIterator( diffImage, diffImage->GetLargestPossibleRegion() );
@@ -295,7 +295,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //
 //  Point3D currentPointIn2D, worldPointIn3D;
 //  TPixel2 outputPixel = 0;
-//  
+//
 //  int debugCounter( 0 );
 //
 //  std::ofstream geometryFile;
@@ -350,7 +350,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //
 ////if ( columns == extent[0] )
 ////{
-//////If we are at the end of a row, then we have to go to the beginning of the next row 
+//////If we are at the end of a row, then we have to go to the beginning of the next row
 ////currentImagePointIn3D = origin;
 ////currentImagePointIn3D += spacing[1]*bottom*currentPointIn2D[1];
 //columns = 0;
@@ -360,7 +360,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 ////{
 ////if ( columns != 0 )
 ////{
-////currentImagePointIn3D += spacing[0]*right; 
+////currentImagePointIn3D += spacing[0]*right;
 ////}
 ////m_ImageGeometry3D->WorldToIndex(currentImagePointIn3D, outputIndex);
 ////}
@@ -408,7 +408,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 ////    worldPointIn3D[ 2 ] += offsetWorld[2];
 ////*/
 //    // Output index
-//   
+//
 //
 ////For the purpose of debug
 ////if( debugCounter%100 == 0)
@@ -423,9 +423,9 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //
 //    // Set difference image
 //    //diffIterator.Set( static_cast<short signed int>(inputIterator.Get() - outputPixel ) ); // oh oh, not good for bigger values
-//    ++inputIterator; 
+//    ++inputIterator;
 ////++debugCounter;
-//    //++diffIterator; 
+//    //++diffIterator;
 //  }
 //  /*overriderFile.close();
 //  overriderFileIndex.close();*/
@@ -437,7 +437,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //  sliceInVolumeRegion = outputImage->GetLargestPossibleRegion();
 //  sliceInVolumeRegion.SetSize( m_SliceDimension, 1 );             // just one slice
 //  sliceInVolumeRegion.SetIndex( m_SliceDimension, m_SliceIndex ); // exactly this slice, please
-//  
+//
 //  OutputSliceIteratorType outputIterator( outputImage, sliceInVolumeRegion );
 //  outputIterator.SetFirstDirection(m_Dimension0);
 //  outputIterator.SetSecondDirection(m_Dimension1);
@@ -452,9 +452,9 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //      {
 //        diffIterator.Set( static_cast<short signed int>(inputIterator.Get() - outputIterator.Get()) ); // oh oh, not good for bigger values
 //        outputIterator.Set( (TPixel2) inputIterator.Get() );
-//        ++outputIterator; 
-//        ++inputIterator; 
-//        ++diffIterator; 
+//        ++outputIterator;
+//        ++inputIterator;
+//        ++diffIterator;
 //      }
 //      outputIterator.NextLine();
 //    }
@@ -488,4 +488,4 @@ s << " " << sliceIndex << " " << timeStep << ")";
 return s.str();
 }
 */
-    
+

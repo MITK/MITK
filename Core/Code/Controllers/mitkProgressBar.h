@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 
 
-namespace mitk 
+namespace mitk
 {
 
   class ProgressBarImplementation;
@@ -38,9 +38,9 @@ namespace mitk
 
   public:
     itkTypeMacro(ProgressBar, itk::Object);
-  
+
     //##Documentation
-    //## @brief static method to get the GUI dependent ProgressBar-instance 
+    //## @brief static method to get the GUI dependent ProgressBar-instance
     //## so the methods for steps to do and progress can be called
     //## No reference counting, cause of decentral static use!
     static ProgressBar* GetInstance();
@@ -55,7 +55,7 @@ namespace mitk
     //##Documentation
     //## @brief Adds steps to totalSteps.
     void AddStepsToDo(unsigned int steps);
-  
+
     //##Documentation
     //## @brief Sets the current amount of progress to current progress + steps.
     //## @param: steps the number of steps done since last Progress(int steps) call.
@@ -64,16 +64,16 @@ namespace mitk
     //##Documentation
     //## @brief Sets whether the current progress value is displayed.
     void SetPercentageVisible (bool visible);
-    
+
   protected:
 
     typedef std::vector< ProgressBarImplementation* > ProgressBarImplementationsList;
     typedef ProgressBarImplementationsList::iterator ProgressBarImplementationsListIterator;
-  
+
     ProgressBar();
-  
+
     virtual ~ProgressBar();
-  
+
     ProgressBarImplementationsList m_Implementations;
 
     static ProgressBar* m_Instance;

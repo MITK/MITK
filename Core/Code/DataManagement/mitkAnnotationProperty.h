@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,17 +38,17 @@ class MITK_CORE_EXPORT AnnotationProperty : public BaseProperty
 public:
   mitkClassMacro(AnnotationProperty, BaseProperty);
   typedef std::string ValueType;
-  
+
   itkNewMacro( AnnotationProperty );
-  mitkNewMacro2Param( AnnotationProperty, 
+  mitkNewMacro2Param( AnnotationProperty,
     const char *, const Point3D & );
-  mitkNewMacro2Param( AnnotationProperty, 
+  mitkNewMacro2Param( AnnotationProperty,
     const std::string &, const Point3D & );
   mitkNewMacro4Param( AnnotationProperty,
     const char *, ScalarType, ScalarType, ScalarType );
   mitkNewMacro4Param( AnnotationProperty,
     const std::string &, ScalarType, ScalarType, ScalarType );
-  
+
   itkGetStringMacro( Label );
   itkSetStringMacro( Label );
 
@@ -63,7 +63,7 @@ protected:
 
   std::string m_Label;
   Point3D m_Position;
-  
+
   AnnotationProperty();
   AnnotationProperty( const char *label, const Point3D &position );
   AnnotationProperty( const std::string &label, const Point3D &position );

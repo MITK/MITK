@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPicFileWriter.h"
 #include "mitkPicFileReader.h"
 
-extern "C" 
+extern "C"
 {
 size_t _mitkIpPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);
 }
@@ -65,7 +65,7 @@ void mitk::PicFileWriter::GenerateData()
 
   mitkIpPicDescriptor * picImage = mitkIpPicNew();
   picImage = CastToIpPicDescriptor(input, picImage);
-  
+
   SlicedGeometry3D* slicedGeometry = input->GetSlicedGeometry();
   if (slicedGeometry != NULL)
   {
@@ -200,7 +200,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
       char buff[1024];
 
       sprintf( buff, "%s.gz", outfile_name );
-      outfile = (FILE*) mitkIpPicFOpen( buff, "wb" ); // cast to prevent warning. 
+      outfile = (FILE*) mitkIpPicFOpen( buff, "wb" ); // cast to prevent warning.
     }
     else
     */
@@ -256,9 +256,9 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
     size_t bytes_written = 0;
     size_t block_nr = 0;
     mitkIpUInt1_t* data = (mitkIpUInt1_t*) pic->data;
-      
+
     assert( data != NULL );
-      
+
     if( pic->type == mitkIpPicNonUniform )
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
@@ -271,7 +271,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
         bytes_written += mitkIpPicFWriteLE( data + ( block_nr * block_size ), 1, block_size, outfile );
       bytes_written += mitkIpPicFWriteLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, outfile );
     }
-        
+
     if ( bytes_written != number_of_bytes )
     {
       fprintf( stderr, "Error while writing (ferror indicates %u), only %u bytes were written! Eof indicator is %u.\n", ferror(outfile), ( (unsigned int) ( bytes_written ) ), feof(outfile) );
@@ -279,14 +279,14 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
       return( -1 );
     }
   }
-  
+
   if( outfile != stdout )
   {
     // Removed due to linker problems when compiling
     // an mitk chili plugin using msvc: there appear
     // unresolved external symbol errors to function
     // _ipPicGetWriteCompression()
-    /*    
+    /*
     if( mitkIpPicGetWriteCompression() )
       mitkIpPicFClose( outfile );
     else

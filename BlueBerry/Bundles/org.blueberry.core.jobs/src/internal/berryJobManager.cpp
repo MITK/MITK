@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-/** 
+/**
  *  test class implementing ISchedulingRule to validate client defined rules
  */
 struct NullRule: public ISchedulingRule
@@ -46,18 +46,18 @@ bool NullRule::Contains(ISchedulingRule::Pointer dummyRule) const
 {
   return dummyRule == this;
 }
-    
+
 
 JobManager::JobManager() :
   sptr_testRule(new NullRule()),m_active(true), m_Pool(new WorkerPool(this)), m_sptr_progressProvider(0),
-      m_JobQueueSleeping(true), m_JobQueueWaiting(false),m_suspended(false), m_waitQueueCounter(0) 
-       
+      m_JobQueueSleeping(true), m_JobQueueWaiting(false),m_suspended(false), m_waitQueueCounter(0)
+
 {
   m_JobListeners.global.SetExceptionHandler(MessageExceptionHandler<
       JobListeners> (&m_JobListeners, &JobListeners::HandleException));
 }
 
-// DEBUG VARIABLES 
+// DEBUG VARIABLES
 
 
 const std::string& JobManager::PI_JOBS()
@@ -195,7 +195,7 @@ bool JobManager::IsSuspended()
 
 }
 //
-//    /* 
+//    /*
 //   * @see IJobManager#join(String, IProgressMonitor)
 //   */
 //void
@@ -287,16 +287,16 @@ void JobManager::ReportBlocked(IProgressMonitor::Pointer sptr_monitor, InternalJ
 
   if ( sptr_monitor.Cast<IProgressMonitorWithBlocking>() == 0 )
       return ;
-  
-  if (sptr_blockingJob == 0 || sptr_blockingJob->IsSystem()) 
+
+  if (sptr_blockingJob == 0 || sptr_blockingJob->IsSystem())
     {
    Status::Pointer sptr_reason( new Status(IStatus::INFO_TYPE, JobManager::PI_JOBS(), 1, "the user operation is waiting for  background work to complete" ) );
 
-    } 
-  else 
+    }
+  else
     {
    std::stringstream msg ;
-   msg << "the user operation is waiting for : " << sptr_blockingJob->GetName() << " to complete. " ;    
+   msg << "the user operation is waiting for : " << sptr_blockingJob->GetName() << " to complete. " ;
    JobStatus::Pointer sptr_reason(new JobStatus(IStatus::INFO_TYPE, sptr_blockingJob.Cast<Job>(), msg.str() ));
     }
     //  ((IProgressmonitorWithBlocking) sptr_monitor)->SetBlocked(sptr_reason);
@@ -305,7 +305,7 @@ void JobManager::ReportBlocked(IProgressMonitor::Pointer sptr_monitor, InternalJ
 
 void JobManager::ReportUnblocked(IProgressMonitor::Pointer sptr_monitor) const {
   if ( IProgressMonitorWithBlocking::Pointer sptr_monitorWithBlocking = sptr_monitor.Cast<IProgressMonitorWithBlocking>() )
-     sptr_monitorWithBlocking->ClearBlocked(); 
+     sptr_monitorWithBlocking->ClearBlocked();
   }
 
 
@@ -395,7 +395,7 @@ void JobManager::AddJobChangeListener(IJobChangeListener::Pointer listener)
   m_JobListeners.Add(listener);
 }
 
-//void 
+//void
 //JobManager
 //::BeginRule(ISchedulingRule rule, IProgressMonitor monitor) {
 //    validateRule(rule);
@@ -601,7 +601,7 @@ void JobManager::DoShutdown()
       }
       if (DEBUG_SHUTDOWN)
       {
-        //  JobManager.debug("Shutdown - job wait cycle #" + (waitAttempts + 1)); 
+        //  JobManager.debug("Shutdown - job wait cycle #" + (waitAttempts + 1));
         std::vector<InternalJob::Pointer> vec_StillRunning;
         {
           Poco::ScopedLock<Poco::Mutex> LockMe(m_mutex);
@@ -693,8 +693,8 @@ Job::Pointer JobManager::NextJob()
   }
 }
 
-//TODO Job families 
-//void 
+//TODO Job families
+//void
 //JobManager
 //::Select(List members, Object family, InternalJob firstJob, int stateMask) {
 //    if (firstJob == null)
@@ -732,7 +732,7 @@ Job::Pointer JobManager::NextJob()
 //    return members;
 //  }
 
-// dummy validateRule implemenation 
+// dummy validateRule implemenation
 void JobManager::ValidateRule(ISchedulingRule::Pointer sptr_rule)
 {
   //null rule always valid
@@ -756,7 +756,7 @@ bool JobManager::Cancel(InternalJob::Pointer sptr_job)
   bool runCanceling = false;
   {
     Poco::ScopedLock<Poco::Mutex> mangerMutex (m_mutex);
-    
+
     switch (sptr_job->GetState())
     {
       case Job::NONE :
@@ -766,10 +766,10 @@ bool JobManager::Cancel(InternalJob::Pointer sptr_job)
       if (sptr_job->InternalGetState() == Job::RUNNING)
       {
       sptr_progressMonitor = sptr_job->GetProgressMonitor();
-      runCanceling = sptr_job->IsRunCanceled(); 
+      runCanceling = sptr_job->IsRunCanceled();
       if(runCanceling)
-          sptr_job->SetRunCanceled(true); 
-      break ; 
+          sptr_job->SetRunCanceled(true);
+      break ;
       }
       //signal that the job should be canceled before it gets a chance to run
       sptr_job->SetAboutToRunCanceled(true);
@@ -786,7 +786,7 @@ bool JobManager::Cancel(InternalJob::Pointer sptr_job)
        if (!sptr_progressMonitor->IsCanceled())
           sptr_progressMonitor->SetCanceled(true);
        sptr_job->Canceling();
-        
+
       }
     return false;
   }
@@ -807,7 +807,7 @@ IProgressMonitor::Pointer JobManager::CreateMonitor(
     NullProgressMonitor::Pointer sptr_defaultMonitor(new NullProgressMonitor());
       return sptr_defaultMonitor;
    }
-    return sptr_monitor ; 
+    return sptr_monitor ;
 }
 
 
@@ -815,7 +815,7 @@ IProgressMonitor::Pointer JobManager::CreateMonitor(InternalJob::Pointer sptr_jo
 {
  {
      Poco::ScopedLock<Poco::Mutex> managerLock(m_mutex);
-  
+
     //group must be set before the job is scheduled
     //this includes the ABOUT_TO_SCHEDULE state, during which it is still
     //valid to set the progress monitor

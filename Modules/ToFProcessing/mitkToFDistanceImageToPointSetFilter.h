@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraIntrinsics.h>
 #include "mitkImage.h"
 #include "mitkPointSet.h"
-#include <mitkPointSetSource.h> 
+#include <mitkPointSetSource.h>
 #include "mitkImageSource.h"
 #include <mitkToFProcessingCommon.h>
 #include "mitkToFProcessingExports.h"
@@ -35,7 +35,7 @@ namespace mitk
   * If a subset of indizes of the image is defined via SetSubset(), the output PointSet will only contain the cartesian coordinates
   * of the corresponding 3D points.
   *
-  * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera 
+  * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera
   * coordinate system (world coordinates) is at the pinhole
   * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png
   * The definition of the image plane and its coordinate systems (pixel and mm) is depicted in the following image
@@ -75,7 +75,7 @@ namespace mitk
     \brief Returns the input of this filter
     */
      Image* GetInput();
-   
+
     /*!
     \brief Returns the input with id idx of this filter
     */
@@ -124,7 +124,7 @@ namespace mitk
     * \brief Create an output for each input
     *
     * This Method sets the number of outputs to the number of inputs
-    * and creates missing outputs objects. 
+    * and creates missing outputs objects.
     * \warning any additional outputs that exist before the method is called are deleted
     */
     void CreateOutputsForAllInputs();

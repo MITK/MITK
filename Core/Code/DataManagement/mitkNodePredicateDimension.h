@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,8 +24,8 @@ namespace mitk {
  class BaseData;
 
   //##Documentation
-  //## @brief Predicate that evaluates if the given DataNodes data object 
-  //## has the specified dimension, for datasets where dimension is 
+  //## @brief Predicate that evaluates if the given DataNodes data object
+  //## has the specified dimension, for datasets where dimension is
   //## applicable.
   //##
   //## Evaluates to "false" for unsupported datasets.

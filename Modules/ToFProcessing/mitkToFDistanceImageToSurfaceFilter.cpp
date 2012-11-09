@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -169,7 +169,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
       else
       {
         isPointValid[pointCount] = true;
-      
+
         points->InsertPoint(pixelID, cartesianCoordinates.GetDataPointer());
 
         if((i >= 1) && (j >= 1))
@@ -194,14 +194,14 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
         }
 
         if (scalarFloatData)
-        {          
+        {
           scalarArray->InsertTuple1(pixelID, scalarFloatData[pixel[0]+pixel[1]*xDimension]);
           //scalarArray->InsertTuple1(pixelID, scalarFloatData[pixelID]);
         }
         if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
         {
 
-          float xNorm = (((float)pixel[0])/xDimension)*textureScaleCorrection1 + textureScaleCorrection2 ; // correct video texture scale 640 * 480!! 
+          float xNorm = (((float)pixel[0])/xDimension)*textureScaleCorrection1 + textureScaleCorrection2 ; // correct video texture scale 640 * 480!!
           float yNorm = 1.0 - ((float)pixel[1])/yDimension; //flip y-axis
           textureCoords->InsertTuple2(pixelID, xNorm, yNorm);
         }

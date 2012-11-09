@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -73,7 +73,7 @@ class mitkNavigationDataPlayerTestClass
 
     player = mitk::NavigationDataPlayer::New();
     player->SetFileName( file );
- 
+
     std::vector<double> times, refTimes;
     refTimes.resize(5);
     refTimes[0] = 3.9;
@@ -260,7 +260,7 @@ class mitkNavigationDataPlayerTestClass
     player->StopPlaying();
     MITK_TEST_OUTPUT(<<"#0: Tested stream not set. Application should not crash.");
     }
-   
+
     MITK_TEST_CONDITION_REQUIRED(InvalidStreamException0, "Testing Invalid Stream method if exception (stream not set) was thrown.");
 
     //case 1: non-existing file
@@ -280,7 +280,7 @@ class mitkNavigationDataPlayerTestClass
     }
 
     MITK_TEST_CONDITION_REQUIRED(InvalidStreamException1, "Testing Invalid Stream method if exception (non-existing file) was thrown.");
-     
+
     //case 2: wrong file format
     player = mitk::NavigationDataPlayer::New();
     bool InvalidStreamException2 = false;
@@ -350,14 +350,14 @@ class mitkNavigationDataPlayerTestClass
     }
 
     MITK_TEST_CONDITION_REQUIRED(InvalidStreamException5, "Testing Invalid Stream method if exception (null stream) was thrown.");
-     
+
     //case 6: empty stream, exception is thrown in setstream
     player = mitk::NavigationDataPlayer::New();
     bool InvalidStreamException6=false;
     std::ifstream* myEmptyStream;
     try
     {
-    myEmptyStream = new std::ifstream(""); 
+    myEmptyStream = new std::ifstream("");
     player->SetStream( myEmptyStream );
     }
     catch(mitk::IGTException)
@@ -373,7 +373,7 @@ class mitkNavigationDataPlayerTestClass
     //case 7: wrong stream
     player = mitk::NavigationDataPlayer::New();
     file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
-    
+
     bool InvalidStreamException7=false;
     std::ifstream* myWrongStream;
     myWrongStream = new std::ifstream(file.c_str());
@@ -383,13 +383,13 @@ class mitkNavigationDataPlayerTestClass
     }
     catch(mitk::IGTIOException)
     {
-    InvalidStreamException7=true;   
+    InvalidStreamException7=true;
     MITK_TEST_OUTPUT(<<"#7: Tested wrong stream. Application should not crash.");
     }
-    
+
     MITK_TEST_CONDITION_REQUIRED(InvalidStreamException7, "Testing Invalid Stream method if exception (wrong stream) was thrown.");
 
-    
+
 
     //case 8: invalid
     player = mitk::NavigationDataPlayer::New();
@@ -411,13 +411,13 @@ class mitkNavigationDataPlayerTestClass
     delete myEmptyStream;
     delete myWrongStream;
     }
-  
+
   static void TestSetStreamExceptions()
     {
     mitk::NavigationDataPlayer::Pointer myTestPlayer = mitk::NavigationDataPlayer::New();
     std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData.xml", "Modules/IGT/Testing/Data");
     myTestPlayer->SetFileName( file );
-    
+
 
     bool exceptionThrown=false;
 
@@ -435,7 +435,7 @@ class mitkNavigationDataPlayerTestClass
     MITK_TEST_CONDITION_REQUIRED(exceptionThrown, "Testing SetStream method in exception was thrown.");
 
   }
-    
+
  static void TestStartPlayingExceptions()
     {
       MITK_INFO <<"In the following, exceptions are tested. Errors will occur and are expected.";
@@ -447,7 +447,7 @@ class mitkNavigationDataPlayerTestClass
       try
        {
        myTestPlayer1->StartPlaying();
-       
+
        }
        catch(mitk::IGTException)
        {
@@ -464,7 +464,7 @@ class mitkNavigationDataPlayerTestClass
       bool exceptionThrown2 = false;
       try{
       myTestPlayer2->StartPlaying();
-      } 
+      }
       catch(mitk::IGTIOException)
       {
       exceptionThrown2 = true;
@@ -473,7 +473,7 @@ class mitkNavigationDataPlayerTestClass
       }
       MITK_TEST_CONDITION_REQUIRED(exceptionThrown2, "Testing StartPlaying method if exception is thrown when file does not exist.");
 
-  
+
       //Case3 Testing if wrong file format
       mitk::NavigationDataPlayer::Pointer myTestPlayer3 = mitk::NavigationDataPlayer::New();
       std::string file3 = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
@@ -481,7 +481,7 @@ class mitkNavigationDataPlayerTestClass
       bool exceptionThrown3 = false;
       try{
       myTestPlayer3->StartPlaying();
-      } 
+      }
       catch(mitk::IGTIOException)
       {
       exceptionThrown3 = true;
@@ -498,7 +498,7 @@ class mitkNavigationDataPlayerTestClass
       bool exceptionThrown4 = false;
       try{
       myTestPlayer4->StartPlaying();
-      } 
+      }
       catch(mitk::IGTIOException)
       {
       exceptionThrown4 = true;
@@ -513,7 +513,7 @@ class mitkNavigationDataPlayerTestClass
       bool exceptionThrown5 = false;
       try{
       myTestPlayer5->StartPlaying();
-      } 
+      }
       catch(mitk::IGTIOException)
       {
       exceptionThrown5 = true;

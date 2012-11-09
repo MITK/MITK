@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,12 +40,12 @@ m_width(0),
 m_height(0),
 m_initialized(false),
 m_FrameRate(20)
-{ 
+{
   m_fileName[0]  =  0;
 }
 
 
-mitk::MovieGenerator::Pointer mitk::MovieGenerator::New() 
+mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
 {
   Pointer smartPtr;
   MovieGenerator *rawPtr = ::itk::ObjectFactory<MovieGenerator>::Create();
@@ -68,7 +68,7 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
 
 
 bool mitk::MovieGenerator::WriteMovie()
-{  
+{
   bool ok = false;
   if (m_stepper)
   {
@@ -77,7 +77,7 @@ bool mitk::MovieGenerator::WriteMovie()
     RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
 
     ok = InitGenerator();
-    if (!ok) 
+    if (!ok)
     {
       TerminateGenerator();
       return false;
@@ -106,28 +106,28 @@ bool mitk::MovieGenerator::WriteMovie()
 }
 
 bool mitk::MovieGenerator::WriteCurrentFrameToMovie()
-{  
-  if (m_renderer) 
+{
+  if (m_renderer)
   {
     m_renderer->GetRenderWindow()->MakeCurrent();
-    
+
     if(!m_initialized)
     {
       RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
       m_initialized = InitGenerator();
     }
-    if (!m_initialized) 
+    if (!m_initialized)
     {
       TerminateGenerator();
       return false;
     }
     int imgSize = 3 * m_width * m_height;
     GLbyte *data = new GLbyte[imgSize];
-    
+
     RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
     glReadPixels( 5, 5, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void*)data );
-    AddFrame( data );    
-    delete[] data;  
+    AddFrame( data );
+    delete[] data;
   }
   return true;
 }

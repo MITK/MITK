@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,8 +41,8 @@ int main(int argc, char **argv) {
   }
   if (!fileName) { exit(0);}
 
-  UserInterface ui; 
-  mitk::SliceNavigationController::Pointer &sliceCtrl = ui.mainWid->sliceCtrl;    
+  UserInterface ui;
+  mitk::SliceNavigationController::Pointer &sliceCtrl = ui.mainWid->sliceCtrl;
   sliceCtrl = mitk::SliceNavigationController::New("navigation");
   ui.mainWid->InitRenderer();
   ui.mainWid->GetRenderer()->SetMapperID(1);
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
   factory->SetFileName( fileName );
   factory->Update();
   if (factory->GetNumberOfOutputs() > 1) {
-    fl_alert("WARNING: More than one image in file. Only showing first one."); 
+    fl_alert("WARNING: More than one image in file. Only showing first one.");
   }
   mitk::DataTreePreOrderIterator it(tree);
   mitk::DataNode::Pointer node = factory->GetOutput( 0 );
@@ -75,10 +75,10 @@ int main(int argc, char **argv) {
   sliceCtrl->SetInputWorldGeometry(geometry.GetPointer());
   //tell the navigator in which direction it shall slice the data
   sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Axial);
-  //Connect one or more BaseRenderer to this navigator, i.e.: events sent 
-  //by the navigator when stepping through the slices (e.g. by 
-  //sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer 
-  //(in this example only slice-changes, see also ConnectGeometryTimeEvent 
+  //Connect one or more BaseRenderer to this navigator, i.e.: events sent
+  //by the navigator when stepping through the slices (e.g. by
+  //sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer
+  //(in this example only slice-changes, see also ConnectGeometryTimeEvent
   //and ConnectGeometryEvents.)
   sliceCtrl->ConnectGeometrySliceEvent(ui.mainWid->GetRenderer());
   //create a world geometry and send the information to the connected renderer(s)
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
   sliceCtrl->GetSlice()->SetPos(3);
 
   ui.sliceSlider->bounds(0,sliceCtrl->GetSlice()->GetSteps()-1);
-  ui.sliceSlider->precision(0); 
+  ui.sliceSlider->precision(0);
   ui.mainWid->RequestUpdate();
   ui.mainWin->show(argc, argv);
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,13 +27,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  *  Simple example for a test for the (non-existent) class "NavigationDataToPointSetFilter".
- *  
- *  argc and argv are the command line parameters which were passed to 
+ *
+ *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
  */
-class mitkNavigationDataToPointSetFilterTestClass { 
+class mitkNavigationDataToPointSetFilterTestClass {
 
 public:
 
@@ -97,7 +97,7 @@ static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
     //pointSet0->GetPoint(0)[0] == 1.0  && pointSet0->GetPoint(0)[1] == 2.0  && pointSet0->GetPoint(0)[2] == 3.0 &&
     //                  pointSet1->GetPoint(0)[0] == 4.0  && pointSet1->GetPoint(0)[1] == 5.0  && pointSet1->GetPoint(0)[2] == 6.0 &&
     //                  pointSet2->GetPoint(0)[0] == 7.0  && pointSet2->GetPoint(0)[1] == 8.0  && pointSet2->GetPoint(0)[2] == 9.0 &&
-    //                  pointSet3->GetPoint(0)[0] == 10.0 && pointSet3->GetPoint(0)[1] == 11.0 && pointSet3->GetPoint(0)[2] == 12.0 
+    //                  pointSet3->GetPoint(0)[0] == 10.0 && pointSet3->GetPoint(0)[1] == 11.0 && pointSet3->GetPoint(0)[2] == 12.0
     //, "Testing the conversion of navigation data object to PointSets in Mode 3D" );
 
 }
@@ -143,7 +143,7 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 1.0 && pointSet->GetPoint(0,0)[1] == 2.0 && pointSet->GetPoint(0,0)[2] == 3.0 &&
-    pointSet->GetPoint(1,0)[0] == 4.0 && pointSet->GetPoint(1,0)[1] == 5.0 && pointSet->GetPoint(1,0)[2] == 6.0 
+    pointSet->GetPoint(1,0)[0] == 4.0 && pointSet->GetPoint(1,0)[1] == 5.0 && pointSet->GetPoint(1,0)[2] == 6.0
     , "Testing the conversion of navigation data object to one point set in Mode 4D in first timestep" );
 
   myNavigationDataToPointSetFilter->SetInput(0, nd3);
@@ -181,7 +181,7 @@ static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavig
   MITK_TEST_CONDITION(mitk::Equal(myNavigationDataToPointSetFilter->GetNumberForMean(), numberForMean), "Testing get/set for numberForMean");
 
   mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
-  
+
   std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2Tools.xml", "Modules/IGT/Testing/Data");
 
   player->SetFileName( file );
@@ -214,7 +214,7 @@ int mitkNavigationDataToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("NavigationDataToPointSetFilter");
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::NavigationDataToPointSetFilter::Pointer myNavigationDataToPointSetFilter = mitk::NavigationDataToPointSetFilter::New();
 
   // first test: did this work?

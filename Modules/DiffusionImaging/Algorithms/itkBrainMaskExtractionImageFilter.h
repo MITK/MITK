@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ namespace itk{
 
 template< class TOutputImagePixelType >
 class BrainMaskExtractionImageFilter :
-  public ImageToImageFilter< Image< unsigned short, 3 >, 
+  public ImageToImageFilter< Image< unsigned short, 3 >,
                              Image< TOutputImagePixelType, 3 > >
 {
 
@@ -36,24 +36,24 @@ public:
   typedef BrainMaskExtractionImageFilter Self;
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
-  typedef ImageToImageFilter< Image< unsigned short, 3 >, 
+  typedef ImageToImageFilter< Image< unsigned short, 3 >,
                              Image< TOutputImagePixelType, 3 >  >
                           Superclass;
-  
+
    /** Method for creation through the object factory. */
-  itkNewMacro(Self);  
+  itkNewMacro(Self);
 
   /** Runtime information support. */
-  itkTypeMacro(BrainMaskExtractionImageFilter, 
+  itkTypeMacro(BrainMaskExtractionImageFilter,
                                                    ImageToImageFilter);
- 
+
   typedef unsigned short                           InputPixelType;
 
   typedef TOutputImagePixelType                    OutputPixelType;
 
   typedef typename Superclass::InputImageType      InputImageType;
   typedef typename Superclass::OutputImageType     OutputImageType;
-  
+
   typedef typename Superclass::OutputImageRegionType
                                                    OutputImageRegionType;
 

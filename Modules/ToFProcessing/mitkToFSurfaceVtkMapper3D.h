@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,7 +45,7 @@ namespace mitk {
 
   /**
   * @brief Vtk-based mapper for Surface
-  * 
+  *
 
   * Properties that can be set for surfaces and influence the surfaceVTKMapper3D are:
   *
@@ -62,7 +62,7 @@ namespace mitk {
   *   - \b "material.representation": (VtkRepresentationProperty*) Representation
   *   - \b "material.wireframeLineWidth": (FloatProperty) Width in pixels of the lines drawn.
   *   - \b "scalar visibility": (BoolProperty) If the scarlars of the surface are visible
-  
+
   * Properties to look for are:
   *
   *   - \b "scalar visibility": if set to on, scalars assigned to the data are shown
@@ -122,7 +122,7 @@ protected:
   virtual ~ToFSurfaceVtkMapper3D();
 
   virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-  
+
   virtual void ResetMapper( mitk::BaseRenderer* renderer );
 
   /** Checks whether the specified property is a ClippingProperty and if yes,
@@ -141,9 +141,9 @@ protected:
   int m_TextureHeight; // height of the texture/video image
 
   vtkScalarsToColors* m_VtkScalarsToColors; // vtk color transfer funtion
-  
+
 public:
-    
+
   class LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
     public:
@@ -152,7 +152,7 @@ public:
       vtkPolyDataMapper *m_VtkPolyDataMapper;
       vtkPolyDataNormals *m_VtkPolyDataNormals;
       vtkPlaneCollection *m_ClippingPlaneCollection;
-      
+
       itk::TimeStamp m_ShaderTimestampUpdate;
 
       LocalStorage()
@@ -164,18 +164,18 @@ public:
 
         m_Actor->SetMapper(m_VtkPolyDataMapper);
       }
-      
+
       ~LocalStorage()
       {
         m_VtkPolyDataMapper->Delete();
         m_VtkPolyDataNormals->Delete();
-        m_Actor->Delete();                                  
+        m_Actor->Delete();
         m_ClippingPlaneCollection->Delete();
       }
-  };  
-    
-  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;  
-  
+  };
+
+  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+
   static void ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer);
   static void SetDefaultPropertiesForVtkProperty(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite);
 };

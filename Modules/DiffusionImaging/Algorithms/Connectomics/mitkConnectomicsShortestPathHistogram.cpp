@@ -3,12 +3,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -92,7 +92,7 @@ void mitk::ConnectomicsShortestPathHistogram::CalculateWeightedUndirectedShortes
 void mitk::ConnectomicsShortestPathHistogram::ConvertDistanceMapToHistogram()
 {
   // get the longest path between any two nodes in the network
-  // we assume that no nodes are farther apart than there are nodes, 
+  // we assume that no nodes are farther apart than there are nodes,
   // this is to filter unconnected nodes
   int longestPath( 0 );
   int numberOfNodes( m_DistanceMatrix.size() );
@@ -155,7 +155,7 @@ void mitk::ConnectomicsShortestPathHistogram::ConvertDistanceMapToHistogram()
 double mitk::ConnectomicsShortestPathHistogram::GetEfficiency()
 {
   if( !this->m_Valid )
-  { 
+  {
     MBI_INFO << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_CAN_NOT_COMPUTE_EFFICIENCY << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_NETWORK_NOT_VALID;
     return 0.0;
   }

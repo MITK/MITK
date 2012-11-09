@@ -10,7 +10,7 @@ set(SRC_CPP_FILES
   berryQtPreferences.cpp
   berryQtSelectionProvider.cpp
   berryQtViewPart.cpp
-  
+
   # application
   application/berryQtWorkbenchAdvisor.cpp
 )
@@ -23,7 +23,7 @@ set(INTERNAL_CPP_FILES
   defaultpresentation/berryNativeTabItem.cpp
   defaultpresentation/berryQCTabBar.cpp
   defaultpresentation/berryQtWorkbenchPresentationFactory.cpp
-  
+
   util/berryAbstractTabFolder.cpp
   util/berryAbstractTabItem.cpp
   util/berryIPresentablePartList.cpp
@@ -35,7 +35,7 @@ set(INTERNAL_CPP_FILES
   util/berryTabDragHandler.cpp
   util/berryTabFolderEvent.cpp
   util/berryTabOrder.cpp
-  
+
   berryQtDisplay.cpp
   berryQtDnDTweaklet.cpp
   berryQtFileImageDescriptor.cpp
@@ -66,12 +66,12 @@ set(INTERNAL_CPP_FILES
 set(MOC_H_FILES
   src/berryQCHPluginListener.h
   src/berryQtSelectionProvider.h
-  
+
   src/internal/defaultpresentation/berryNativeTabFolder.h
   src/internal/defaultpresentation/berryNativeTabItem.h
   src/internal/defaultpresentation/berryQCTabBar.h
   src/internal/defaultpresentation/berryQtWorkbenchPresentationFactory.h
-  
+
   src/internal/berryQtDisplay.h
   src/internal/berryQtDnDTweaklet.h
   src/internal/berryQtGlobalEventFilter.h

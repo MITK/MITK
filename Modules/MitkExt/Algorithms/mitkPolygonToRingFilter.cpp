@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -79,7 +79,7 @@ void mitk::PolygonToRingFilter::GenerateData()
     Mesh::ConstCellIterator cellIt, cellEnd;
     cellEnd = input->GetMesh( t )->GetCells()->End();
     for ( cellIt = input->GetMesh( t )->GetCells()->Begin();
-          cellIt != cellEnd; 
+          cellIt != cellEnd;
           ++cellIt )
     {
       m_PointList.clear();
@@ -97,7 +97,7 @@ void mitk::PolygonToRingFilter::GenerateData()
 
     output->SetVtkPolyData( polyData, t );
     polyData->Delete();
-  
+
   }
 
 }
@@ -108,7 +108,7 @@ void mitk::PolygonToRingFilter::GenerateData()
 //idmax: Id des Strahls des aktuellen Sterns (sc), der am besten zum ersten Strahl vom letzten Stern (sl) passt.
 //last_p: Mittelpunkt des letzten Sterns
 //cur_p: Mittelpunkt des aktuellen Sterns
-void mitk::PolygonToRingFilter::DrawCyl(vtkPoints *vPoints, vtkCellArray *polys, 
+void mitk::PolygonToRingFilter::DrawCyl(vtkPoints *vPoints, vtkCellArray *polys,
                                         VectorListType &sl, VectorListType &sc, int idmax, Point3D & last_p, Point3D & cur_p)
 {
   unsigned int i;
@@ -196,7 +196,7 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
     a=last_v; b=next_v; a.Normalize(); b.Normalize(); axis=a+b; axis.Normalize();
 
     //neuen Stern sc (SternCurrent) bauen und dabei Start für neuen Stern suchen
-    double max=0; int idmax=0; Vector3D sl0=*(sl->begin()); 
+    double max=0; int idmax=0; Vector3D sl0=*(sl->begin());
     m = vnl_quaternion<mitk::ScalarType>(axis.Get_vnl_vector(),2*vnl_math::pi/(double)m_RingResolution).rotation_matrix_transpose();
     for(i=0;i<m_RingResolution;++i)
     {
@@ -238,9 +238,9 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   DrawCyl(vPoints, polys, *sl, sfirst, idmax, last_p, cur_p);
 }
 
-void 
+void
 mitk::PolygonToRingFilter
-::BuildPointAndVectorList( mitk::Mesh::CellType& cell, 
+::BuildPointAndVectorList( mitk::Mesh::CellType& cell,
   PointListType& ptList, VectorListType& vecList, int timeStep )
 {
   // This method constructs a spline from the given point list and retrieves
@@ -289,7 +289,7 @@ mitk::PolygonToRingFilter
       pit = cell.PointIdsBegin();
     }
 
-    t += inputPoint.EuclideanDistanceTo( 
+    t += inputPoint.EuclideanDistanceTo(
       this->GetInput()->GetPoint( *pit, timeStep ) );
   }
 
@@ -336,6 +336,6 @@ const mitk::Mesh *mitk::PolygonToRingFilter::GetInput(void)
 void mitk::PolygonToRingFilter::SetInput(const mitk::Mesh *input)
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, 
+  this->ProcessObject::SetNthInput(0,
     const_cast< mitk::Mesh * >( input ) );
 }

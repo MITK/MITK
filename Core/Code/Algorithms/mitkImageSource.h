@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,7 +26,7 @@ namespace mitk {
 
 //##Documentation
 //## @brief Superclass of all classes generating Images (instances of class
-//## Image) as output. 
+//## Image) as output.
 //##
 //## In itk and vtk the generated result of a ProcessObject is only guaranteed
 //## to be up-to-date, when Update() of the ProcessObject or the generated
@@ -41,12 +41,12 @@ class MITK_CORE_EXPORT ImageSource : public BaseProcess
 {
 public:
   mitkClassMacro(ImageSource,BaseProcess);
-  
+
   /** @brief Smart Pointer type to a DataObject. */
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   /** @brief Method for creation through the object factory. */
-  itkNewMacro(Self);  
+  itkNewMacro(Self);
 
   /** @brief Some convenient typedefs. */
   typedef mitk::Image OutputImageType;
@@ -56,8 +56,8 @@ public:
   /** @brief Get the image output of this process object.  */
   OutputImageType * GetOutput(void);
   OutputImageType * GetOutput(unsigned int idx);
-  
-  /** @brief Set the image output of this process object. 
+
+  /** @brief Set the image output of this process object.
    *
    * This call is slated
    * to be removed from ITK. You should GraftOutput() and possible
@@ -79,7 +79,7 @@ public:
    * \code
    *    // setup the mini-pipeline to process the input to this filter
    *    firstFilterInMiniPipeline->SetInput( this->GetInput() );
-   
+
    *    // setup the mini-pipeline to calculate the correct regions
    *    // and write to the appropriate bulk data block
    *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput() );
@@ -103,7 +103,7 @@ public:
   virtual void GraftOutput(OutputImageType *output);
 
   /** @brief Graft the specified data object onto this ProcessObject's idx'th
-   * output. 
+   * output.
    *
    * This is the similar to GraftOutput method except is
    * allows you specify which output is affected. The specified index
@@ -113,7 +113,7 @@ public:
   virtual void GraftNthOutput(unsigned int idx, OutputImageType *output);
 
   /** @brief Make a DataObject of the correct type to used as the specified
-   * output. 
+   * output.
    *
    * Every ProcessObject subclass must be able to create a
    * DataObject that can be used as a specified output. This method
@@ -135,9 +135,9 @@ public:
 protected:
   ImageSource();
   virtual ~ImageSource() {}
-  
+
   /** @brief A version of GenerateData() specific for image processing
-   * filters. 
+   * filters.
    *
    * This implementation will split the processing across
    * multiple threads. The buffer is allocated by this method. Then
@@ -184,7 +184,7 @@ protected:
                             int threadId );
 
 
-  /** @brief This method is intentionally left blank. 
+  /** @brief This method is intentionally left blank.
    *
    * ImageSource's need not
    * Initialize their containers. The Image::Allocate() method (called
@@ -194,14 +194,14 @@ protected:
   virtual void PrepareOutputs();
 
   /** @brief The GenerateData method normally allocates the buffers for all of the
-   * outputs of a filter. 
+   * outputs of a filter.
    *
    * Some filters may want to override this default
    * behavior. For example, a filter may have multiple outputs with
    * varying resolution. Or a filter may want to process data in place by
    * grafting its input to its output.*/
   virtual void AllocateOutputs();
-  
+
   /** @brief If an imaging filter needs to perform processing after the buffer
    * has been allocated but before threads are spawned, the filter can
    * can provide an implementation for BeforeThreadedGenerateData().
@@ -214,7 +214,7 @@ protected:
    * Note that this flow of control is only available if a filter provides
    * a ThreadedGenerateData() method and NOT a GenerateData() method. */
   virtual void BeforeThreadedGenerateData() {};
-  
+
   /** @brief If an imaging filter needs to perform processing after all
    * processing threads have completed, the filter can can provide an
    * implementation for AfterThreadedGenerateData().
@@ -228,9 +228,9 @@ protected:
    * Note that this flow of control is only available if a filter provides
    * a ThreadedGenerateData() method and NOT a GenerateData() method. */
   virtual void AfterThreadedGenerateData() {};
-  
+
   /** @brief Split the output's RequestedRegion into "num" pieces, returning
-   * region "i" as "splitRegion". 
+   * region "i" as "splitRegion".
    *
    * This method is called "num" times. The
    * regions must not overlap. The method returns the number of pieces that
@@ -239,7 +239,7 @@ protected:
   virtual
   int SplitRequestedRegion(int i, int num, OutputImageRegionType& splitRegion);
 
-  /** @brief Static function used as a "callback" by the MultiThreader. 
+  /** @brief Static function used as a "callback" by the MultiThreader.
    *
    * The threading library will call this routine for each thread, which will delegate the
    * control to ThreadedGenerateData(). */
@@ -250,7 +250,7 @@ protected:
   {
    Pointer Filter;
   };
-  
+
 private:
   void operator=(const Self&); //purposely not implemented
 };

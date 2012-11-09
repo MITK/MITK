@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,24 +53,24 @@ class MITK_EXPORT GenericProperty : public BaseProperty
 
     mitkClassMacro(GenericProperty, BaseProperty);
     mitkNewMacro1Param(GenericProperty<T>, T);
-    
+
     typedef T ValueType;
 
     itkSetMacro(Value,T);
     itkGetConstMacro(Value,T);
-    
-    virtual std::string GetValueAsString() const 
+
+    virtual std::string GetValueAsString() const
     {
       std::stringstream myStr;
       myStr << GetValue() ;
-      return myStr.str(); 
+      return myStr.str();
     }
 
     using BaseProperty::operator=;
 
   protected:
     GenericProperty() {}
-    GenericProperty(T x) 
+    GenericProperty(T x)
        : m_Value(x) {}
     T m_Value;
 
@@ -99,7 +99,7 @@ class MITK_EXPORT GenericProperty : public BaseProperty
 } // namespace mitk
 
 /**
- * Generates a specialized subclass of mitk::GenericProperty. 
+ * Generates a specialized subclass of mitk::GenericProperty.
  * This way, GetNameOfClass() returns the value provided by PropertyName.
  * Please see mitkProperties.h for examples.
  * @param PropertyName the name of the subclass of GenericProperty

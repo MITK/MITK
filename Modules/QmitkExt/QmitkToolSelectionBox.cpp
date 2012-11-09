@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -279,7 +279,7 @@ void QmitkToolSelectionBox::OnToolManagerReferenceDataModified()
 void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 {
   if (m_SelfCall) return;
-  
+
   MITK_DEBUG << "OnToolManagerWorkingDataModified()";
 
   SetGUIEnabledAccordingToToolManagerState();
@@ -296,7 +296,7 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   //MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
 
   bool enabled = true;
-  
+
   switch ( m_EnabledMode )
   {
     default:
@@ -417,7 +417,7 @@ void QmitkToolSelectionBox::RecreateButtons()
   {
     SortPairType thisPair = toolPositions.top();
     MITK_DEBUG << "Position " << thisPair.first << " : " << thisPair.second->GetName();
-    
+
     allTools.push_back( thisPair.second );
     toolPositions.pop();
   }

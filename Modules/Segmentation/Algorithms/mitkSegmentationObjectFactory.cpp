@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,25 +28,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourVtkMapper3D.h"
 
 
-mitk::SegmentationObjectFactory::SegmentationObjectFactory() 
+mitk::SegmentationObjectFactory::SegmentationObjectFactory()
 :CoreObjectFactoryBase()
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "SegmentationObjectFactory c'tor" << std::endl;
-    
+
     //CreateFileExtensionsMap();
-    
+
     alreadyDone = true;
   }
 }
 
-mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id) 
+mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
 {
   mitk::Mapper::Pointer newMapper=NULL;
   mitk::BaseData *data = node->GetData();
-  
+
   if ( id == mitk::BaseRenderer::Standard2D )
   {
     if((dynamic_cast<Contour*>(data)!=NULL))
@@ -78,26 +78,26 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
 
 void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  
+
   if(node==NULL)
     return;
-  
+
   mitk::DataNode::Pointer nodePointer = node;
-  
+
 //  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 //  if(image.IsNotNull() && image->IsInitialized())
 //  {
 //    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
 //  }
-//  
+//
 //  if (dynamic_cast<mitk::UnstructuredGrid*>(node->GetData()))
 //  {
 //    mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(node);
 //  }
-  
+
 }
 
-const char* mitk::SegmentationObjectFactory::GetFileExtensions() 
+const char* mitk::SegmentationObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
@@ -125,14 +125,14 @@ const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
   return fileExtension.c_str();
 }
 
-void mitk::SegmentationObjectFactory::RegisterIOFactories() 
+void mitk::SegmentationObjectFactory::RegisterIOFactories()
 {
 }
 
-void RegisterSegmentationObjectFactory() 
+void RegisterSegmentationObjectFactory()
 {
   static bool oneSegmentationObjectFactoryRegistered = false;
-  if ( ! oneSegmentationObjectFactoryRegistered ) 
+  if ( ! oneSegmentationObjectFactoryRegistered )
   {
     MITK_DEBUG << "Registering SegmentationObjectFactory..." << std::endl;
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::SegmentationObjectFactory::New());

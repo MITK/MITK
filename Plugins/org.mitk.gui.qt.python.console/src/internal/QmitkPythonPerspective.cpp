@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ void QmitkPythonPerspective::CreateInitialLayout(berry::IPageLayout::Pointer lay
 {
   std::string editorArea = layout->GetEditorArea();
 
-  layout->AddView("org.mitk.views.datamanager", 
+  layout->AddView("org.mitk.views.datamanager",
     berry::IPageLayout::LEFT, 0.3f, editorArea);
   layout->AddView("org.mitk.views.pythoncommandhistory",
     berry::IPageLayout::TOP, 0.3f, "org.mitk.views.datamanager");

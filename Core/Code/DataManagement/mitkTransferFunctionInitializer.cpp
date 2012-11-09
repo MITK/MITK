@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -132,15 +132,15 @@ void TransferFunctionInitializer::InitTransferFunctionMode()
 
 void TransferFunctionInitializer::SetCtDefaultMode()
 {
-  // grayvalue->opacity 
+  // grayvalue->opacity
   m_transferFunction->GetScalarOpacityFunction()->AddPoint(132.108911,0.000000);
   m_transferFunction->GetScalarOpacityFunction()->AddPoint(197.063492,0.041333);
   m_transferFunction->GetScalarOpacityFunction()->AddPoint(1087.917989,0.700000);
 
-  // gradient at grayvalue->opacity 
+  // gradient at grayvalue->opacity
   m_transferFunction->GetGradientOpacityFunction()->AddPoint(560.695000,1.000000);
 
-  // grayvalue->color 
+  // grayvalue->color
   m_transferFunction->GetColorTransferFunction()->AddRGBPoint(176.881890,0.650980,0.000000,0.000000);
   m_transferFunction->GetColorTransferFunction()->AddRGBPoint(239.427822,0.933333,0.000000,0.000000);
   m_transferFunction->GetColorTransferFunction()->AddRGBPoint(301.973753,1.000000,0.800000,0.062745);
@@ -168,18 +168,18 @@ void TransferFunctionInitializer::SetCtBlackWhiteMode()
 
 void TransferFunctionInitializer::SetCtThoraxLargeMode()
 {
-  // grayvalue->opacity 
-  
+  // grayvalue->opacity
+
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(76.721239,0.000000);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(139.524336,0.000000);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(274.458333,0.228650);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(638.420139,0.721763);
-  
 
-  // gradient at grayvalue->opacity 
+
+  // gradient at grayvalue->opacity
     m_transferFunction->GetGradientOpacityFunction()->AddPoint(560.695000,1.000000);
-  
-  // grayvalue->color 
+
+  // grayvalue->color
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 85.382743,0.478431,0.000000,0.000000);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 198.201327,0.933333,0.000000,0.000000);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 254.610619,1.000000,0.800000,0.062745);
@@ -189,17 +189,17 @@ void TransferFunctionInitializer::SetCtThoraxLargeMode()
 
 void TransferFunctionInitializer::SetCtThoraxSmallMode()
 {
-  // grayvalue->opacity 
+  // grayvalue->opacity
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(147.216912,0.000000);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(274.458333,0.228650);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(430.330882,0.675532);
-  
 
-  // gradient at grayvalue->opacity 
+
+  // gradient at grayvalue->opacity
     m_transferFunction->GetGradientOpacityFunction()->AddPoint(560.695000,1.000000);
-  
 
-  // grayvalue->color 
+
+  // grayvalue->color
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 129.607774,0.478431,0.000000,0.000000);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 213.812721,0.933333,0.000000,0.000000);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 348.540636,1.000000,0.800000,0.062745);
@@ -209,16 +209,16 @@ void TransferFunctionInitializer::SetCtThoraxSmallMode()
 
 void TransferFunctionInitializer::SetCtBoneMode()
 {
-  // grayvalue->opacity 
+  // grayvalue->opacity
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(126.413793,0.000000);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(178.312160,0.014663);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(247.509982,0.000000);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(1013.010889,1.000000);
-  
-  // gradient at grayvalue->opacity 
+
+  // gradient at grayvalue->opacity
     m_transferFunction->GetGradientOpacityFunction()->AddPoint(485.377495,1.000000);
-  
-  // grayvalue->color 
+
+  // grayvalue->color
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 312.382940,1.000000,0.564706,0.274510);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 455.103448,1.000000,0.945098,0.768627);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 623.773140,1.000000,0.800000,0.333333);
@@ -226,22 +226,22 @@ void TransferFunctionInitializer::SetCtBoneMode()
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 930.838475,1.000000,1.000000,1.000000);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint(1073.558984,1.000000,0.839216,0.423529);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint(1220.604356,1.000000,0.772549,0.490196);
-  
+
 }
 
 void TransferFunctionInitializer::SetCtBoneGradientMode()
 {
-  // grayvalue->opacity 
+  // grayvalue->opacity
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(126.413793,0.000000);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(186.961887,0.146628);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(247.509982,0.000000);
     m_transferFunction->GetScalarOpacityFunction()->AddPoint(1013.010889,1.000000);
-  
-  // gradient at grayvalue->opacity 
+
+  // gradient at grayvalue->opacity
     m_transferFunction->GetGradientOpacityFunction()->AddPoint(22.617060,0.000000);
     m_transferFunction->GetGradientOpacityFunction()->AddPoint(65.865699,1.000000);
-  
-  // grayvalue->color 
+
+  // grayvalue->color
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 312.382940,1.000000,0.564706,0.274510);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 455.103448,1.000000,0.945098,0.768627);
     m_transferFunction->GetColorTransferFunction()->AddRGBPoint( 623.773140,1.000000,0.800000,0.333333);

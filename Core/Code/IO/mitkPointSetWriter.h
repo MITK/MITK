@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,10 +26,10 @@ namespace mitk
 {
 
 /**
- * @brief XML-based writer for mitk::PointSets 
+ * @brief XML-based writer for mitk::PointSets
  *
  * XML-based writer for mitk::PointSets. Multiple PointSets can be written in
- * a single XML file by simply setting multiple inputs to the filter. 
+ * a single XML file by simply setting multiple inputs to the filter.
  * Writing of multiple XML files according to a given filename pattern is not
  * yet supported.
  * @ingroup PSIO
@@ -101,11 +101,11 @@ public:
 
     /**
      * @param num the index of the desired output object.
-     * @returns the n'th input object of the filter. 
+     * @returns the n'th input object of the filter.
      */
     PointSet* GetInput( const unsigned int& num );
 
-  
+
     /**
     * @brief Return the possible file extensions for the data type associated with the writer
     */
@@ -117,7 +117,7 @@ public:
     virtual std::string GetFileExtension();
 
     /**
-    * @brief Check if the Writer can write the Content of the 
+    * @brief Check if the Writer can write the Content of the
     */
     virtual bool CanWriteDataType( DataNode* );
 
@@ -135,7 +135,7 @@ public:
      * @returns whether the last write attempt was successful or not.
      */
     bool GetSuccess() const;
-    
+
 protected:
 
     /**
@@ -162,7 +162,7 @@ protected:
      */
     virtual void ResizeInputs( const unsigned int& num );
 
-    
+
     /**
      * Converts an arbitrary type to a string. The type has to
      * support the << operator. This works fine at least for integral
@@ -172,9 +172,9 @@ protected:
      */
     template < typename T>
     std::string ConvertToString( T value );
-    
+
     /**
-     * Writes an XML representation of the given point set to 
+     * Writes an XML representation of the given point set to
      * an outstream. The XML-Header an root node is not included!
      * @param pointSet the point set to be converted to xml
      * @param out the stream to write to.
@@ -186,7 +186,7 @@ protected:
      * @param file the stream in which the header is written.
      */
     void WriteXMLHeader( std::ofstream &file );
-    
+
     /** Write a start element tag */
     void WriteStartElement( const char *const tag, std::ofstream &file );
 
@@ -224,35 +224,35 @@ protected:
     unsigned int m_IndentDepth;
 
     unsigned int m_Indent;
-    
+
     bool m_Success;
-    
-    
-    
+
+
+
 public:
 
     static const char* XML_POINT_SET;
-    
+
     static const char* XML_TIME_SERIES;
 
     static const char* XML_TIME_SERIES_ID;
 
     static const char* XML_POINT_SET_FILE;
-    
+
     static const char* XML_FILE_VERSION;
-    
+
     static const char* XML_POINT;
-    
+
     static const char* XML_SPEC;
 
     static const char* XML_ID;
-    
+
     static const char* XML_X;
-    
+
     static const char* XML_Y;
-    
+
     static const char* XML_Z;
-    
+
     static const char* VERSION_STRING;
 
 };

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -62,7 +62,7 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
   vtkLinearTransform* transform = this->GetDataNode()->GetVtkTransform();
   if ( transform == NULL )
   {
-    itkWarningMacro("transfrom is NULL");  
+    itkWarningMacro("transfrom is NULL");
   }
 
   //
@@ -70,13 +70,13 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
   //
   mitk::Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
   if ( worldGeometry.IsNull() )
-  {  
+  {
     itkWarningMacro("worldGeometry is NULL!");
     return;
   }
   PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*> ( worldGeometry.GetPointer() );
   if ( worldPlaneGeometry.IsNull() )
-  {  
+  {
     itkWarningMacro("worldPlaneGeometry is NULL!");
     return;
   }
@@ -94,12 +94,12 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
   vtkCellArray *vlines  = spline3D->GetLines();
   if (vpoints == NULL)
   {
-    itkWarningMacro("points are NULL!"); 
+    itkWarningMacro("points are NULL!");
     return;
   }
   if (vlines == NULL)
   {
-    itkWarningMacro("lines are NULL!"); 
+    itkWarningMacro("lines are NULL!");
     return;
   }
 
@@ -115,20 +115,20 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
     bool previousPointOnPlane = false;
     bool currentPointOnPlane = false;
     vtkIdType* cell ( NULL );
-    vtkIdType cellSize ( 0 ); 
+    vtkIdType cellSize ( 0 );
     vlines->GetNextCell ( cellSize, cell );
     for ( int j = 0 ; j < cellSize; ++j )
     {
       vpoints->GetPoint ( cell[j], currentPoint3DVtk );
-      
+
       // take transformation via vtktransform into account
       transform->TransformPoint ( currentPoint3DVtk, currentPoint3DVtk );
       vtk2itk ( currentPoint3DVtk, currentPoint3D );
 
-      // check if the point has a distance to the plane 
+      // check if the point has a distance to the plane
       // which is smaller than m_MaxProjectionDistance
       currentPointDistance = worldPlaneGeometry->DistanceFromPlane ( currentPoint3D );
-      
+
       if ( currentPointDistance < m_MaxProjectionDistance )
       {
         currentPointOnPlane = true;
@@ -162,7 +162,7 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
       }
       previousPointOnPlane = currentPointOnPlane;
     }
-    // the last point of the spline segment is on the plane, thus we have to 
+    // the last point of the spline segment is on the plane, thus we have to
     // close the GL_LINE
     if ( previousPointOnPlane == true )
     {

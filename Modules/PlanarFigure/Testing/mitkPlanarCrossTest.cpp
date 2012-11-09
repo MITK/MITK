@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -93,7 +93,7 @@ static void TestPlanarCrossPlacement( mitk::PlanarCross::Pointer planarCross )
 
   mitk::PlanarFigure::PolyLineType::const_iterator iter0 = polyLine0.begin();
   mitk::PlanarFigure::PolyLineType::const_iterator iter1 = polyLine1.begin();
-  
+
   // Get polylines and check if the generated coordinates are OK
   const mitk::Point2D& pp0 = iter0->Point;
   iter0++;
@@ -107,7 +107,7 @@ static void TestPlanarCrossPlacement( mitk::PlanarCross::Pointer planarCross )
   MITK_TEST_CONDITION( ((pp2 == p2) && (pp3 == p3))
     || ((pp2 == p3) && (pp3 == p2)), "Correct polyline 2" );
 
-  
+
   // Test for number of measurement features
   planarCross->EvaluateFeatures();
   MITK_TEST_CONDITION( planarCross->GetNumberOfFeatures() == 2, "Number of measurement features" );
@@ -185,7 +185,7 @@ static void TestPlanarCrossPlacementConstrained(mitk::PlanarCross::Pointer plana
 
   // Test if constraint has been applied correctly
   mitk::Point2D cp0 = planarCross->GetControlPoint( 0 );
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
        (fabs(cp0[0]) < mitk::eps)
     && (fabs(cp0[1] - 20.0) < mitk::eps), "Point1 placed and constrained correctly" );
 
@@ -197,7 +197,7 @@ static void TestPlanarCrossPlacementConstrained(mitk::PlanarCross::Pointer plana
 
   // Test if constraint has been applied correctly
   mitk::Point2D cp1 = planarCross->GetControlPoint( 1 );
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
     (fabs(cp1[0] - 80.0) < mitk::eps)
     && (fabs(cp1[1] - 100.0) < mitk::eps), "Point2 placed and constrained correctly" );
 
@@ -209,7 +209,7 @@ static void TestPlanarCrossPlacementConstrained(mitk::PlanarCross::Pointer plana
 
   // Test if constraint has been applied correctly (100.0, 100.0) must be projected to (90.0, 90.0)
   mitk::Point2D cp2 = planarCross->GetControlPoint( 2 );
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
     (fabs(cp2[0] - 90.0) < mitk::eps)
     && (fabs(cp2[1] - 90.0) < mitk::eps), "Point3 placed and constrained correctly" );
 
@@ -219,7 +219,7 @@ static void TestPlanarCrossPlacementConstrained(mitk::PlanarCross::Pointer plana
 
   // Test if point is still at this position (no constrained should be applied)
   cp2 = planarCross->GetControlPoint( 2 );
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
     (fabs(cp2[0] - 40.0) < mitk::eps)
     && (fabs(cp2[1] - 20.0) < mitk::eps), "Point3 moved correctly" );
 
@@ -231,7 +231,7 @@ static void TestPlanarCrossPlacementConstrained(mitk::PlanarCross::Pointer plana
 
   // Test if constraint has been applied correctly (20.0, 60.0) must be projected to (10.0, 50.0)
   mitk::Point2D cp3 = planarCross->GetControlPoint( 3 );
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
     (fabs(cp3[0] - 10.0) < mitk::eps)
     && (fabs(cp3[1] - 50.0) < mitk::eps), "Point4 placed and constrained correctly" );
 
@@ -242,7 +242,7 @@ static void TestPlanarCrossPlacementConstrained(mitk::PlanarCross::Pointer plana
 
   // Test if constrained point is on the projected intersection point of both lines (20.0/40.0)
   cp3 = planarCross->GetControlPoint( 3 );
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
     (fabs(cp3[0] - 20.0) < mitk::eps)
     && (fabs(cp3[1] - 40.0) < mitk::eps), "Point4 placed and constrained correctly" );
 }
@@ -269,7 +269,7 @@ static void TestPlanarCrossEdit(mitk::PlanarCross::Pointer planarCross)
   MITK_TEST_CONDITION( planarCross->GetNumberOfControlPoints() == 2, "Two control points are left" );
 
   // Check if correct control points have been left
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
        (planarCross->GetControlPoint( 0 ).EuclideanDistanceTo( p1 ) < mitk::eps)
     && (planarCross->GetControlPoint( 1 ).EuclideanDistanceTo( p0 ) < mitk::eps),
     "Reset to expected control points (p1, p0)" );
@@ -289,7 +289,7 @@ static void TestPlanarCrossEdit(mitk::PlanarCross::Pointer planarCross)
   MITK_TEST_CONDITION( planarCross->GetNumberOfControlPoints() == 2, "Two control points are left" );
 
   // Check if correct control points have been left
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
     (planarCross->GetControlPoint( 0 ).EuclideanDistanceTo( p0 ) < mitk::eps)
     && (planarCross->GetControlPoint( 1 ).EuclideanDistanceTo( p1 ) < mitk::eps),
     "Reset to expected control points (p0, p1)" );
@@ -309,7 +309,7 @@ static void TestPlanarCrossEdit(mitk::PlanarCross::Pointer planarCross)
   MITK_TEST_CONDITION( planarCross->GetNumberOfControlPoints() == 2, "Two control points are left" );
 
   // Check if correct control points have been left
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
     (planarCross->GetControlPoint( 0 ).EuclideanDistanceTo( p3 ) < mitk::eps)
     && (planarCross->GetControlPoint( 1 ).EuclideanDistanceTo( p2 ) < mitk::eps),
     "Reset to expected control points (p3, p2)" );
@@ -329,7 +329,7 @@ static void TestPlanarCrossEdit(mitk::PlanarCross::Pointer planarCross)
   MITK_TEST_CONDITION( planarCross->GetNumberOfControlPoints() == 2, "Two control points are left" );
 
   // Check if correct control points have been left
-  MITK_TEST_CONDITION( 
+  MITK_TEST_CONDITION(
     (planarCross->GetControlPoint( 0 ).EuclideanDistanceTo( p2 ) < mitk::eps)
     && (planarCross->GetControlPoint( 1 ).EuclideanDistanceTo( p3 ) < mitk::eps),
     "Reset to expected control points (p2, p3)" );

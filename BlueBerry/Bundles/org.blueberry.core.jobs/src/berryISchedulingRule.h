@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,21 +25,21 @@ namespace berry
 
 /**
  * Scheduling rules are used by jobs to indicate when they need exclusive access
- * to a resource.  
- * @todo 
+ * to a resource.
+ * @todo
  * Scheduling rules can also be applied synchronously to a thread
- * using <tt>IJobManager.beginRule(ISchedulingRule)</tt> and 
- * <tt>IJobManager.endRule(ISchedulingRule)</tt>. 
- * 
- * The job manager guarantees that 
- * no two jobs with conflicting scheduling rules will run concurrently. 
- * @todo 
- * Multiple rules can be applied to a given thread only if the outer rule explicitly 
- * allows the nesting as specified by the <code>contains</code> method.  
- * 
+ * using <tt>IJobManager.beginRule(ISchedulingRule)</tt> and
+ * <tt>IJobManager.endRule(ISchedulingRule)</tt>.
+ *
+ * The job manager guarantees that
+ * no two jobs with conflicting scheduling rules will run concurrently.
+ * @todo
+ * Multiple rules can be applied to a given thread only if the outer rule explicitly
+ * allows the nesting as specified by the <code>contains</code> method.
+ *
  * <p>
  * Clients may implement this interface.
- * 
+ *
  * @see Job#GetRule()
  * @see Job#SetRule(ISchedulingRule)
  * @see Job#Schedule(long)
@@ -59,7 +59,7 @@ struct BERRY_JOBS ISchedulingRule: public Object
    * Implementations of this method must obey the rules of a partial order relation
    * on the set of all scheduling rules.  In particular, implementations must be reflexive
    * (a.contains(a) is always true), antisymmetric (a.contains(b) and b.contains(a) iff
-   * equals(b), 
+   * equals(b),
    * and transitive (if a.contains(b) and b.contains(c), then a.contains(c)).  Implementations
    * of this method must return <code>false</code> when compared to a rule they
    * know nothing about.

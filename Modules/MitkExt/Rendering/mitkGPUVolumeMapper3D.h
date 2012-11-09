@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -63,7 +63,7 @@ public:
   itkNewMacro(Self);
 
   virtual const mitk::Image* GetInput();
-  
+
   virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
@@ -76,7 +76,7 @@ public:
   bool IsMIPEnabled( BaseRenderer *renderer = NULL );
   bool IsGPUEnabled( BaseRenderer *renderer = NULL );
   bool IsRAYEnabled( BaseRenderer *renderer = NULL );
-  
+
   virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
 
 protected:
@@ -114,7 +114,7 @@ protected:
   void UpdateTransferFunctions( mitk::BaseRenderer *renderer );
 
   vtkSmartPointer<vtkVolume> m_VolumeNULL;
-  
+
   bool m_commonInitialized;
   vtkSmartPointer<vtkImageChangeInformation> m_UnitSpacingImageFilter;
   vtkSmartPointer<vtkPiecewiseFunction> m_DefaultOpacityTransferFunction;
@@ -123,7 +123,7 @@ protected:
   vtkSmartPointer<vtkPiecewiseFunction> m_BinaryOpacityTransferFunction;
   vtkSmartPointer<vtkPiecewiseFunction> m_BinaryGradientTransferFunction;
   vtkSmartPointer<vtkColorTransferFunction> m_BinaryColorTransferFunction;
-  
+
   class LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
     public:
@@ -153,7 +153,7 @@ protected:
     LocalStorage()
     {
       m_cpuInitialized = false;
-      
+
       m_gpuInitialized = false;
       m_gpuSupported = true;    // assume initially gpu slicing is supported
 
@@ -163,7 +163,7 @@ protected:
       m_raySupported = true;    // assume initially gpu raycasting is supported
 #endif
     }
-    
+
     ~LocalStorage()
     {
       if(m_cpuInitialized)
@@ -188,7 +188,7 @@ protected:
 
     }
   };
-    
+
   mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
 };
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,18 +28,18 @@ class QmitkStdMultiWidget;
 /**
 * \brief ComponentClass to find an adequate threshold for a selected image
 * \ingroup QmitkFunctionalityComponent
-* 
+*
 * This class inherits from
 * - \ref QmitkFunctionalityComponentContainer
 
-* 
+*
 * \section QmitkThresholdComponent Overview
-* 
-* The ThresholdComponent is a class to easy find an adequate threshold. On two ways the user can insert 
-* a possible threshold: as a number in a textfield or by moving a scrollbar. The selected threshold will 
+*
+* The ThresholdComponent is a class to easy find an adequate threshold. On two ways the user can insert
+* a possible threshold: as a number in a textfield or by moving a scrollbar. The selected threshold will
 * be shown on the image as an new binary layer that contains those areas above the theshold.
 * Like all other componentes the QmitkThresholdComponent inherits from QmitkFunctionalityComponentContainer.
-* 
+*
 */
 
 
@@ -79,7 +79,7 @@ public:
 
   /** \brief Method to get the DataStorage*/
   virtual mitk::DataStorage::Pointer GetDataStorage();
-  
+
     /** \brief Method to return the ComboBox that includes all GUI-elements instead of the outermost checkable CheckBox and that can be set visible or not*/
   virtual QGroupBox * GetContentContainer();
 
@@ -97,24 +97,24 @@ virtual QGroupBox* GetImageContent();
   ///** \brief Method to set m_Activated to false */
   virtual void Deactivated();
 
-public slots:  
+public slots:
   /***************      OHTER METHODS     ***************/
 
   virtual void DataStorageChanged(mitk::DataStorage::Pointer ds);
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
-	void ImageSelected(const mitk::DataNode* item);
+  void ImageSelected(const mitk::DataNode* item);
 
-  /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
+  /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */
   void ShowThreshold(bool show = true);
 
-  /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
+  /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */
   void ShowThresholdFinderContent(bool show = true);
 
-  /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
+  /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */
   void ShowImageContent(bool show = true);
 
-  /** \brief Slot method that will be called if the Thresholdslider was moved to update the shown image and the ThresholdLineEdit. */ 
+  /** \brief Slot method that will be called if the Thresholdslider was moved to update the shown image and the ThresholdLineEdit. */
   void ThresholdSliderChanged(int moved = 0);
 
   /** \brief Slot method that will be called if the ThresholdLineEdit was changed to update the shown image and the ThresholdSlider. */
@@ -174,7 +174,7 @@ private:
   bool m_ThresholdNodeExisting;
 
     /*!
-  * Segmentation made with thresholdSegmentation 
+  * Segmentation made with thresholdSegmentation
   */
   mitk::Image::Pointer m_ThresholdSegmentationImage;
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -63,7 +63,7 @@ public:
     void SetOutput( OutputType* output );
 
     /**
-     * Replacement of the SetOutput method. I think it is not yet correcly 
+     * Replacement of the SetOutput method. I think it is not yet correcly
      * implemented, so you should better not use it.
      * @todo provide a more usefule implementation
      * @param output the intended output of the lookup table source.

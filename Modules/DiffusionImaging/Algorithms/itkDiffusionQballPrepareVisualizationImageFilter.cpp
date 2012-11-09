@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,16 +50,16 @@ namespace itk {
     this->SetNumberOfRequiredInputs( 1 );
   }
 
-  template< class TOdfPixelType, 
+  template< class TOdfPixelType,
     int NrOdfDirections>
-    void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType, 
+    void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType,
     NrOdfDirections>
     ::BeforeThreadedGenerateData()
   {
     if( m_NormalizationMethod == PV_GLOBAL_MAX )
     {
       typename InputImageType::Pointer inputImagePointer = NULL;
-      inputImagePointer = static_cast< InputImageType * >( 
+      inputImagePointer = static_cast< InputImageType * >(
         this->ProcessObject::GetInput(0) );
 
       typename GfaFilterType::Pointer filter = GfaFilterType::New();
@@ -68,7 +68,7 @@ namespace itk {
       filter->SetComputationMethod(GfaFilterType::GFA_MAX_ODF_VALUE);
       filter->Update();
 
-      typedef typename itk::MinimumMaximumImageCalculator< typename GfaFilterType::OutputImageType > 
+      typedef typename itk::MinimumMaximumImageCalculator< typename GfaFilterType::OutputImageType >
         MaxFilterType;
       typename MaxFilterType::Pointer maxFilter = MaxFilterType::New();
       maxFilter->SetImage(filter->GetOutput());
@@ -80,7 +80,7 @@ namespace itk {
     //if(m_DoScaleGfa)
     {
       typename InputImageType::Pointer inputImagePointer = NULL;
-      inputImagePointer = static_cast< InputImageType * >( 
+      inputImagePointer = static_cast< InputImageType * >(
         this->ProcessObject::GetInput(0) );
 
       typename GfaFilterType::Pointer filter = GfaFilterType::New();
@@ -94,14 +94,14 @@ namespace itk {
     }
   }
 
-  template< class TOdfPixelType, 
+  template< class TOdfPixelType,
     int NrOdfDirections>
-    void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType, 
+    void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType,
     NrOdfDirections>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-    int ) 
+    int )
   {
-    typename OutputImageType::Pointer outputImage = 
+    typename OutputImageType::Pointer outputImage =
       static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();
@@ -110,19 +110,19 @@ namespace itk {
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
     typedef typename InputImageType::PixelType         OdfVectorType;
     typename InputImageType::Pointer inputImagePointer = NULL;
-    inputImagePointer = static_cast< InputImageType * >( 
+    inputImagePointer = static_cast< InputImageType * >(
       this->ProcessObject::GetInput(0) );
     InputIteratorType git(inputImagePointer, outputRegionForThread );
     git.GoToBegin();
 
     typedef ImageRegionConstIterator< GfaImageType > GfaIteratorType;
     GfaIteratorType gfaIt(m_GfaImage, outputRegionForThread);
-    
+
     while( !git.IsAtEnd() )
     {
       OdfVectorType b = git.Get();
       OdfType odf = b.GetDataPointer();
- 
+
       switch( m_NormalizationMethod )
       {
       case PV_NONE:
@@ -154,7 +154,7 @@ namespace itk {
           break;
         }
       }
-        
+
       if(m_DoScaleGfa)
       {
         odf *= gfaIt.Get();
@@ -170,14 +170,14 @@ namespace itk {
     std::cout << "One Thread finished extraction" << std::endl;
   }
 
-  template< class TOdfPixelType, 
+  template< class TOdfPixelType,
     int NrOdfDirections>
-    void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType, 
+    void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType,
     NrOdfDirections>
     ::PrintSelf(std::ostream& os, Indent indent) const
   {
     Superclass::PrintSelf(os,indent);
-    os << indent << "m_Threshold: " << 
+    os << indent << "m_Threshold: " <<
       m_Threshold << std::endl;
   }
 

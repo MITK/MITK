@@ -19,7 +19,7 @@ set(UI_FILES
 set(MOC_H_FILES
   src/QmitkExtFileSaveProjectAction.h
   src/QmitkExtWorkbenchWindowAdvisor.h
-  
+
   src/internal/QmitkAppInstancesPreferencePage.h
   src/internal/QmitkCommonExtPlugin.h
   src/internal/QmitkExtWorkbenchWindowAdvisorHack.h

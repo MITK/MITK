@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -43,7 +43,7 @@ using namespace std;
 
 QmitkOtsuAction::QmitkOtsuAction()
 : m_OtsuSegmentationDialog(NULL)
-{ 
+{
 }
 
 QmitkOtsuAction::~QmitkOtsuAction()
@@ -56,7 +56,7 @@ void QmitkOtsuAction::Run(const QList<DataNode::Pointer> &selectedNodes)
   //this->m_selectedNodes = selectedNodes;
 
   m_OtsuSegmentationDialog = new QDialog(QApplication::activeWindow(),Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-  
+
 
   QVBoxLayout *layout = new QVBoxLayout;
   layout->setContentsMargins(0, 0, 0, 0);
@@ -123,16 +123,16 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
 
   int numberOfThresholds = this->m_OtsuSpinBox->value() - 1;
   int proceed;
-  
+
   QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
-  if (numberOfThresholds >= 5) 
+  if (numberOfThresholds >= 5)
   {
     proceed = messageBox->exec();
     if (proceed != QMessageBox::Ok) return;
   }
 
   mitk::Image::Pointer mitkImage = 0;
-  
+
   mitkImage = dynamic_cast<mitk::Image*>( this->m_DataNode->GetData() );
 
   try

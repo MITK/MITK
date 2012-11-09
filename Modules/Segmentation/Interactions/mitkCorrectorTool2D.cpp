@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -79,7 +79,7 @@ bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* st
   Contour* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Initialize();
   contour->AddVertex( positionEvent->GetWorldPosition() );
-  
+
   FeedbackContourTool::SetFeedbackContourVisible(true);
 
   return true;
@@ -105,13 +105,13 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
 {
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
-  
+
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-  
+
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
@@ -133,7 +133,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
   CorrectorAlgorithm::Pointer algorithm = CorrectorAlgorithm::New();
   algorithm->SetInput( m_WorkingSlice );
   algorithm->SetContour( FeedbackContourTool::GetFeedbackContour() );
-  try 
+  try
   {
       algorithm->UpdateLargestPossibleRegion();
   }
@@ -150,4 +150,4 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
 
   return true;
 }
-    
+

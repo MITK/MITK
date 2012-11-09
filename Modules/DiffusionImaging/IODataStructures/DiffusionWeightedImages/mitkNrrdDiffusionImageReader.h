@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  /** \brief 
+  /** \brief
   */
 
   template < class TPixelType >
@@ -41,7 +41,7 @@ namespace mitk
     typedef DiffusionImageSource<TPixelType> DiffVolSourceType;
     typedef vnl_vector_fixed< double, 3 >      GradientDirectionType;
     typedef vnl_matrix_fixed< double, 3, 3 >      MeasurementFrameType;
-    typedef itk::VectorContainer< unsigned int, 
+    typedef itk::VectorContainer< unsigned int,
       GradientDirectionType >                  GradientDirectionContainerType;
 
     mitkClassMacro( NrrdDiffusionImageReader, DiffVolSourceType );

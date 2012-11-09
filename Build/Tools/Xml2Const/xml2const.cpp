@@ -17,8 +17,8 @@ int main(int argc, char** argv) {
   infile.seekg (0, std::ios::end);
   int length = infile.tellg();
   infile.seekg (0, std::ios::beg);
-  
-  
+
+
 
   if (argc == 5 && strcmp(argv[4],"-b") == 0) {
     // convert in binary mode, create stringstream
@@ -29,9 +29,9 @@ int main(int argc, char** argv) {
     while (infile.good()) {
       char c;
       infile.get(c);
-      outfile << "\\x"; 
+      outfile << "\\x";
       outfile.width(2);
-      unsigned int d = (unsigned char)c; 
+      unsigned int d = (unsigned char)c;
       outfile << d;
       if (++nOutputChars > 26) {
         nOutputChars = 0;
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
       std::getline(infile,buffer);
       std::string::iterator it;
       for (it=buffer.begin() ; it < buffer.end() ; it++) {
-        char c = *it;    
+        char c = *it;
         if ( c == '"' || c == '\\' ) {
           outfile << '\\';
         }

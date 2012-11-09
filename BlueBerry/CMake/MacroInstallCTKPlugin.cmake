@@ -20,7 +20,7 @@ macro(MACRO_INSTALL_CTK_PLUGIN)
   else()
     set(_INSTALL_DESTINATION "${_INSTALL_DESTINATION}/")
   endif()
-  
+
   foreach(_install_target ${_INSTALL_TARGETS})
     if(TARGET ${_install_target})
       get_target_property(_is_imported ${_install_target} IMPORTED)
@@ -56,5 +56,5 @@ macro(MACRO_INSTALL_CTK_PLUGIN)
       message(WARNING "Ignoring unknown plug-in target \"${_install_target}\" for installation.")
     endif()
   endforeach()
-  
+
 endmacro()

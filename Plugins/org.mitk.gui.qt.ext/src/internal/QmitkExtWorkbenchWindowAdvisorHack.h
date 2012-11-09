@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,7 +35,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     void onClosePerspective();
     void onNewWindow();
     void onIntro();
-    
+
     /**
      * @brief This slot is called if the user klicks the menu item "help->context help" or presses F1.
      * The help page is shown in a workbench editor.
@@ -43,7 +43,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     void onHelp();
 
     void onHelpOpenHelpPerspective();
-    
+
     /**
      * @brief This slot is called if the user clicks in help menu the about button
      */

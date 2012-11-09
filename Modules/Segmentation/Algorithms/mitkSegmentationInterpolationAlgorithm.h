@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ namespace mitk
  *   - slice index of the requested slice (guaranteed to be between upper and lower index)
  *   - image data of the original patient image that is being segmented (optional, may not be present)
  *   - time step of the requested slice (needed to read out original image data)
- *   
+ *
  *   Concrete algorithms can use e.g. itk::ImageSliceConstIteratorWithIndex to
  *   inspect the original patient image at appropriate positions - if they
  *   want to take image data into account.
@@ -51,7 +51,7 @@ namespace mitk
 class Segmentation_EXPORT SegmentationInterpolationAlgorithm : public itk::Object
 {
   public:
-    
+
     mitkClassMacro(SegmentationInterpolationAlgorithm, itk::Object);
 
     virtual Image::Pointer Interpolate(Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,

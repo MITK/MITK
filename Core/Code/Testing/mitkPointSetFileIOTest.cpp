@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -98,14 +98,14 @@ public:
 
       mitk::PointSetWriter::Pointer pointSetWriter = mitk::PointSetWriter::New();
       pointSetWriter->SetFileName("test_pointset_new.mps");
-      
+
       for (unsigned int i = 0; i < numberOfPointSets; i++)
       {
         pointSetWriter->SetInput(i, CreateTestPointSet());
       }
 
       pointSetWriter->Write();
-    } 
+    }
     catch (std::exception& /*e*/)
     {
       return false;
@@ -153,7 +153,7 @@ int mitkPointSetFileIOTest(int, char*[])
 
   // load - compare
   test->PointSetLoadAndCompareTest(numberOfPointSets);
-  
+
   //Delete correctly
   delete test;
 

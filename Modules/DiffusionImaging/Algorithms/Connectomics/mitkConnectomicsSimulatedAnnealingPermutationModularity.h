@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -59,7 +59,7 @@ namespace mitk
 
     // Set the mapping
     void SetMapping( ToModuleMapType mapping );
-    
+
     // Get the mapping
     ToModuleMapType GetMapping();
 
@@ -68,7 +68,7 @@ namespace mitk
 
     // Set stepSize
     void SetStepSize( double size );
-    
+
   protected:
 
     //////////////////// Functions ///////////////////////
@@ -76,14 +76,14 @@ namespace mitk
     ~ConnectomicsSimulatedAnnealingPermutationModularity();
 
     // This function moves one single node from a module to another
-        void permutateMappingSingleNodeShift( 
-      ToModuleMapType *vertexToModuleMap, 
+        void permutateMappingSingleNodeShift(
+      ToModuleMapType *vertexToModuleMap,
       mitk::ConnectomicsNetwork::Pointer network );
 
         // This function splits and joins modules
-    void permutateMappingModuleChange( 
-      ToModuleMapType *vertexToModuleMap, 
-      double currentTemperature, 
+    void permutateMappingModuleChange(
+      ToModuleMapType *vertexToModuleMap,
+      double currentTemperature,
       mitk::ConnectomicsNetwork::Pointer network );
 
     // join the two given modules to a single one
@@ -93,19 +93,19 @@ namespace mitk
     // first randomly assigns nodes and then starts another simulated annealing
     // on the sub network, as long as depthOfModuleChange > 0
     void splitModule(
-      ToModuleMapType *vertexToModuleMap, 
-      double currentTemperature, 
-      mitk::ConnectomicsNetwork::Pointer network, 
+      ToModuleMapType *vertexToModuleMap,
+      double currentTemperature,
+      mitk::ConnectomicsNetwork::Pointer network,
       int moduleToSplit );
 
     // Extract the subgraph of a network containing all nodes
     // of a given module and the egdes between them
     void extractModuleSubgraph(
-      ToModuleMapType *vertexToModuleMap, 
-      mitk::ConnectomicsNetwork::Pointer network, 
-      int moduleToSplit, 
-      mitk::ConnectomicsNetwork::Pointer subNetwork, 
-      VertexToVertexMapType* graphToSubgraphVertexMap, 
+      ToModuleMapType *vertexToModuleMap,
+      mitk::ConnectomicsNetwork::Pointer network,
+      int moduleToSplit,
+      mitk::ConnectomicsNetwork::Pointer subNetwork,
+      VertexToVertexMapType* graphToSubgraphVertexMap,
       VertexToVertexMapType* subgraphToGraphVertexMap );
 
     // Remove empty modules by moving all nodes of the highest module to the given module

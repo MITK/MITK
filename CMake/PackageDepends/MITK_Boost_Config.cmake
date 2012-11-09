@@ -3,7 +3,7 @@ if(MITK_USE_Boost)
   if(NOT MITK_USE_SYSTEM_Boost)
     set(Boost_NO_SYSTEM_PATHS 1)
   endif()
-  
+
   set(Boost_USE_MULTITHREADED 1)
   set(Boost_USE_STATIC_LIBS 0)
   set(Boost_USE_STATIC_RUNTIME 0)

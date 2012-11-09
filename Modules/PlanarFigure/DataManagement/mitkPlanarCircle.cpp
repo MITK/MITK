@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -113,7 +113,7 @@ mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int inde
 void mitk::PlanarCircle::GeneratePolyLine()
 {
   // TODO: start circle at specified boundary point...
-  
+
   // clear the PolyLine-Contrainer, it will be reconstructed soon enough...
   this->ClearPolyLines();
 
@@ -132,7 +132,7 @@ void mitk::PlanarCircle::GeneratePolyLine()
     polyLinePoint[0] = centerPoint[0] + radius * cos( alpha );
     polyLinePoint[1] = centerPoint[1] + radius * sin( alpha );
 
-    // ... and append it to the PolyLine. 
+    // ... and append it to the PolyLine.
     // No extending supported here, so we can set the index of the PolyLineElement to '0'
     AppendPointToPolyLine( 0, PolyLineElement( polyLinePoint, 0 ) );
   }

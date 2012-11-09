@@ -9,7 +9,7 @@
 # ${${KITNAME}_TESTIMAGES} : list of images passed as parameter for the IMAGE_TESTS
 # ${${KITNAME}_CUSTOM_TESTS} : filenames of custom tests which are just added to the TestDriver. Execution
 #                              of these has to be specified manually with the ADD_TEST CMake command.
-# 
+#
 macro(MITK_CREATE_DEFAULT_TESTS)
   # add tests which need a GUI if it is not disabled
   if(NOT MITK_GUI_TESTS_DISABLED)
@@ -19,15 +19,15 @@ macro(MITK_CREATE_DEFAULT_TESTS)
 
   #
   # Create the TestDriver binary which contains all the tests.
-  #  
-  create_test_sourcelist(MITKTEST_SOURCE ${KITNAME}TestDriver.cpp 
+  #
+  create_test_sourcelist(MITKTEST_SOURCE ${KITNAME}TestDriver.cpp
     ${${KITNAME}_TESTS} ${${KITNAME}_IMAGE_TESTS} ${${KITNAME}_CUSTOM_TESTS}
   )
   add_executable(${KITNAME}TestDriver ${MITKTEST_SOURCE})
   set_property(TARGET ${KITNAME}TestDriver PROPERTY LABELS ${PROJECT_NAME})
   target_link_libraries(${KITNAME}TestDriver ${${KITNAME}_CORE_LIBRARIES} ${${KITNAME}_LIBRARIES} ${LIBRARIES_FOR_${KITNAME}_CORE})
   #
-  # Now tell CMake which tests should be run. This is done automatically 
+  # Now tell CMake which tests should be run. This is done automatically
   # for all tests in ${KITNAME}_TESTS and ${KITNAME}_IMAGE_TESTS. The IMAGE_TESTS
   # are run for each image in the TESTIMAGES list.
   #

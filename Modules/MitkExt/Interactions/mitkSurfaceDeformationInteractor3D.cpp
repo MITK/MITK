@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -76,7 +76,7 @@ float mitk::SurfaceDeformationInteractor3D
 ::CanHandleEvent(StateEvent const* stateEvent) const
 {
   float returnValue = 0.5;
-  
+
 
   // If it is a key event that can be handled in the current state,
   // then return 0.5
@@ -116,7 +116,7 @@ float mitk::SurfaceDeformationInteractor3D
 
   //if ( curveModel != NULL )
   //{
-  //  // Get the Geometry2D of the window the user interacts with (for 2D point 
+  //  // Get the Geometry2D of the window the user interacts with (for 2D point
   //  // projection)
   //  mitk::BaseRenderer *renderer = stateEvent->GetEvent()->GetSender();
   //  const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
@@ -166,8 +166,8 @@ bool mitk::SurfaceDeformationInteractor3D
   }
 
   // Check if we have a DisplayPositionEvent
-  const mitk::DisplayPositionEvent *dpe = 
-    dynamic_cast< const mitk::DisplayPositionEvent * >( stateEvent->GetEvent() );     
+  const mitk::DisplayPositionEvent *dpe =
+    dynamic_cast< const mitk::DisplayPositionEvent * >( stateEvent->GetEvent() );
   if ( dpe != NULL )
   {
     m_PickedSurfaceNode = dpe->GetPickedObjectNode();
@@ -245,7 +245,7 @@ bool mitk::SurfaceDeformationInteractor3D
       {
         // Yes: object will be selected
         newStateEvent = new mitk::StateEvent( EIDYES );
-      
+
         // Disable VTK interactor until MITK interaction has been completed
         if ( renderWindowInteractor != NULL )
         {
@@ -297,7 +297,7 @@ bool mitk::SurfaceDeformationInteractor3D
       this->ColorizeSurface( m_PolyData,
         m_SurfaceColorizationCenter, COLORIZATION_GAUSS );
 
-      ok = true;  
+      ok = true;
       break;
     }
 
@@ -399,8 +399,8 @@ bool mitk::SurfaceDeformationInteractor3D
   case AcMODIFY:
     {
       // Check if we have an mitk::WheelEvent
-      const mitk::WheelEvent *we = 
-        dynamic_cast< const mitk::WheelEvent * >( stateEvent->GetEvent() );     
+      const mitk::WheelEvent *we =
+        dynamic_cast< const mitk::WheelEvent * >( stateEvent->GetEvent() );
       if ( we == NULL )
       {
         ok = true;
@@ -421,7 +421,7 @@ bool mitk::SurfaceDeformationInteractor3D
       this->ColorizeSurface( m_PolyData,
         m_SurfaceColorizationCenter, COLORIZATION_GAUSS );
 
-      
+
       mitk::RenderingManager::GetInstance()->RequestUpdateAll(
         mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
       ok = true;
@@ -437,7 +437,7 @@ bool mitk::SurfaceDeformationInteractor3D
 }
 
 
-bool mitk::SurfaceDeformationInteractor3D::ColorizeSurface( vtkPolyData *polyData, 
+bool mitk::SurfaceDeformationInteractor3D::ColorizeSurface( vtkPolyData *polyData,
   const Point3D &pickedPoint, int mode, double scalar )
 {
   if ( polyData == NULL )

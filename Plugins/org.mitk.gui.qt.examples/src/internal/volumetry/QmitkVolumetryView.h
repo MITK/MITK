@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,7 +51,7 @@ class QmitkVolumetryView : public QmitkFunctionality
     throw std::runtime_error("Copy constructor not implemented");
   }
 
-  
+
   virtual ~QmitkVolumetryView();
 
   virtual void CreateQtPartControl(QWidget *parent);
@@ -90,9 +90,9 @@ protected slots:
   void OnTimeSeriesButtonClicked();
 
   void OnThresholdSliderChanged( int value );
-  
+
   void OnSaveCsvButtonClicked();
- 
+
   void OnImageSelected(const mitk::DataNode* item);
 
 
@@ -104,7 +104,7 @@ protected:
   QmitkStdMultiWidget* m_MultiWidget;
 
   /// store weak pointer of the DataNode
-  mitk::WeakPointer<mitk::DataNode> m_SelectedDataNode; 
+  mitk::WeakPointer<mitk::DataNode> m_SelectedDataNode;
 
 
   mitk::DataNode::Pointer m_OverlayNode;

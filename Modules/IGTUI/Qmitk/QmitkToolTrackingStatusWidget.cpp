@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,16 +20,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-QmitkToolTrackingStatusWidget::QmitkToolTrackingStatusWidget(QWidget* parent)  
+QmitkToolTrackingStatusWidget::QmitkToolTrackingStatusWidget(QWidget* parent)
 : QWidget(parent), m_Controls(NULL), m_StatusLabels (NULL), m_NavigationDatas(NULL)
 {
   m_ShowPositions = false;
   m_ShowQuaternions = false;
   m_Alignment = Qt::AlignHCenter;
   m_Style = QmitkToolTrackingStatusWidget::VerticalUpperStyle;
-  
+
   CreateQtPartControl( this );
- 
+
 }
 
 
@@ -95,7 +95,7 @@ void QmitkToolTrackingStatusWidget::CreateConnections()
 
 
 void QmitkToolTrackingStatusWidget::SetNavigationDatas(std::vector<mitk::NavigationData::Pointer>* navDatas)
-{  
+{
   m_NavigationDatas = navDatas;
 }
 
@@ -113,14 +113,14 @@ void QmitkToolTrackingStatusWidget::Refresh(int posPrecision, int quatPrecision)
 {
 
   if(m_NavigationDatas == NULL || m_NavigationDatas->size() <= 0)
-    { 
+    {
     RemoveGuiLabels();
     AddEmptyLabel();
     return;
     }
 
 
-  mitk::NavigationData* navData; 
+  mitk::NavigationData* navData;
 
   for(unsigned int i = 0; i < m_NavigationDatas->size(); i++)
   {
@@ -139,22 +139,22 @@ void QmitkToolTrackingStatusWidget::Refresh(int posPrecision, int quatPrecision)
       quat = " / [qx:" + QString::number(quaternion.x(),'f',quatPrecision) + ";qy:" + QString::number(quaternion.y(),'f',quatPrecision) + ";qz:" + QString::number(quaternion.z(),'f',quatPrecision) + ";qr:" + QString::number(quaternion.r()) + "]";
       }
 
-    
+
      if(!(m_StatusLabels->at(i)->text() == name+pos+quat))
         m_StatusLabels->at(i)->setText(name+pos+quat);
-     
+
       if(navData->IsDataValid())
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #8bff8b }");
       else
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #ff7878 }");
-      
+
   }
 }
 
 
 void QmitkToolTrackingStatusWidget::ShowStatusLabels()
 {
-  RemoveGuiLabels(); 
+  RemoveGuiLabels();
 
   if(m_NavigationDatas == NULL || m_NavigationDatas->size() <= 0)
     {
@@ -174,7 +174,7 @@ void QmitkToolTrackingStatusWidget::ShowStatusLabels()
     navData = m_NavigationDatas->at(i).GetPointer();
 
     QString name(navData->GetName());
-   
+
     label = new QLabel(name, this);
     label->setObjectName(name);
     label->setAlignment(m_Alignment | Qt::AlignVCenter);
@@ -183,7 +183,7 @@ void QmitkToolTrackingStatusWidget::ShowStatusLabels()
     m_StatusLabels->append(label);
     if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(m_StatusLabels->at(i));
     else m_Controls->m_GridLayout->addWidget(m_StatusLabels->at(i),0,i);
-    
+
   }
 }
 
@@ -195,7 +195,7 @@ void QmitkToolTrackingStatusWidget::PreShowTools(mitk::NavigationToolStorage::Po
   for(unsigned int i = 0; i < toolStorage->GetToolCount(); i++)
     {
     QString name(toolStorage->GetTool(i)->GetToolName().c_str());
-   
+
     label = new QLabel(name, this);
     label->setObjectName(name);
     label->setAlignment(m_Alignment | Qt::AlignVCenter);
@@ -203,7 +203,7 @@ void QmitkToolTrackingStatusWidget::PreShowTools(mitk::NavigationToolStorage::Po
     label->setStyleSheet("QLabel{background-color: #dddddd }");
     if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(label);
     else m_Controls->m_GridLayout->addWidget(label);
-    
+
     }
 
   }
@@ -212,7 +212,7 @@ void QmitkToolTrackingStatusWidget::PreShowTools(mitk::NavigationToolStorage::Po
 void QmitkToolTrackingStatusWidget::RemoveStatusLabels()
 {
   //remove GUI elements
-  RemoveGuiLabels();  
+  RemoveGuiLabels();
 
   //clear members
   if(m_StatusLabels != NULL && m_StatusLabels->size() > 0)

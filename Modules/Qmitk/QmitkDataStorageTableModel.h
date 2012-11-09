@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /// Forward declarations.
 
-/// 
+///
 /// \class QmitkDataStorageTableModel
 ///
 /// \brief A table model for a set of DataNodes defined by a predicate.
@@ -41,14 +41,14 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
   Q_OBJECT
 
   //#Ctors/Dtor
-  public:    
+  public:
     ///
     /// Constructs a new QmitkDataStorageTableModel and sets a predicate that defines
     /// this list.
     /// \see setPredicate()
     ///
     QmitkDataStorageTableModel(mitk::DataStorage::Pointer _DataStorage, mitk::NodePredicateBase* _Predicate = 0
-      , QObject* parent = 0 ); 
+      , QObject* parent = 0 );
 
     ///
     /// Standard dtor. Delete predicate, disconnect from DataStorage.
@@ -59,11 +59,11 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
   public:
     ///
     /// Get the DataStorage.
-    /// 
+    ///
     const mitk::DataStorage::Pointer GetDataStorage() const;
     ///
     /// Get the predicate.
-    /// 
+    ///
     mitk::NodePredicateBase::Pointer GetPredicate() const;
     ///
     /// Get node at a specific model index. Another way to implement this, is
@@ -73,7 +73,7 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     mitk::DataNode::Pointer GetNode(const QModelIndex &index) const;
     ///
     /// Overridden from QAbstractTableModel. Returns the header data at section
-    /// for given orientation and role. 
+    /// for given orientation and role.
     ///
     virtual QVariant headerData(int section, Qt::Orientation orientation,
       int role) const;
@@ -106,7 +106,7 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     ///
     void SetPredicate(mitk::NodePredicateBase* _Predicate);
     ///
-    /// Adds a node to this model. 
+    /// Adds a node to this model.
     /// There are two constraints for nodes in this model:
     /// 1. If a predicate is set (not null) the node will be checked against it.
     /// 2. The node has to have a data object (no one wants to see empty nodes).
@@ -144,7 +144,7 @@ protected:
   /// \struct DataNodeCompareFunction
   /// \brief A struct that inherits from std::binary_function. You can use it in std::sort algorithm for sorting the node list elements.
   ///
-  struct DataNodeCompareFunction 
+  struct DataNodeCompareFunction
     : public std::binary_function<mitk::DataNode::Pointer, mitk::DataNode::Pointer, bool>
   {
     ///
@@ -215,7 +215,7 @@ protected:
     std::map<mitk::BaseProperty*, unsigned long> m_VisiblePropertyModifiedObserverTags;
     ///
     /// Saves if this model is currently working on events to prevent endless event loops.
-    /// 
+    ///
     bool m_BlockEvents;
     ///
     /// \brief The property is true when the property list is sorted in descending order.

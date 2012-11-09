@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,9 +33,9 @@ void mitk::TestDICOMLoading::SetDefaultLocale()
 
     // set to "C"
     setlocale(LC_NUMERIC, "C");
-  
+
     m_PreviousCppLocale = std::cin.getloc();
-    
+
     std::locale l( "C" );
     std::cin.imbue(l);
     std::cout.imbue(l);
@@ -47,10 +47,10 @@ void mitk::TestDICOMLoading::ResetUserLocale()
   if (m_PreviousCLocale)
   {
     setlocale(LC_NUMERIC, m_PreviousCLocale);
-  
+
     std::cin.imbue(m_PreviousCppLocale);
     std::cout.imbue(m_PreviousCppLocale);
-    
+
     m_PreviousCLocale = NULL;
   }
 }
@@ -65,7 +65,7 @@ mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const Strin
   {
     MITK_DEBUG << "File " << *iter;
   }
-   
+
   ImageList result;
 
   DicomSeriesReader::UidFileNamesMap seriesInFiles = DicomSeriesReader::GetSeries( files, true );
@@ -82,7 +82,7 @@ mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const Strin
     if (node.IsNotNull())
     {
       Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-    
+
       result.push_back( image );
     }
     else
@@ -210,14 +210,14 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
 
     }
   }
-  
+
   ResetUserLocale();
 
   return result.str();
 }
 
-std::string 
-mitk::TestDICOMLoading::trim(const std::string& pString, 
+std::string
+mitk::TestDICOMLoading::trim(const std::string& pString,
                              const std::string& pWhitespace)
 {
   const size_t beginStr = pString.find_first_not_of(pWhitespace);
@@ -233,8 +233,8 @@ mitk::TestDICOMLoading::trim(const std::string& pString,
   return pString.substr(beginStr, range);
 }
 
-std::string 
-mitk::TestDICOMLoading::reduce(const std::string& pString, 
+std::string
+mitk::TestDICOMLoading::reduce(const std::string& pString,
                                const std::string& pFill,
                                const std::string& pWhitespace)
 {
@@ -260,7 +260,7 @@ mitk::TestDICOMLoading::reduce(const std::string& pString,
 
 
 bool
-mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference, 
+mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference,
                                                   const std::string& test,
                                                   double /*eps*/ )
 {
@@ -272,7 +272,7 @@ mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference,
 
   std::string refToken;
   std::string testToken;
-  while ( std::getline( referenceStream,  refToken, ' ' ) && 
+  while ( std::getline( referenceStream,  refToken, ' ' ) &&
           std::getline (     testStream, testToken, ' ' ) )
   {
     float refNumber;
@@ -321,20 +321,20 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
   bool testResult(true);
 
   // verify all expected values
-  for (KeyValueMap::const_iterator refIter = reference.begin(); 
-       refIter != reference.end(); 
+  for (KeyValueMap::const_iterator refIter = reference.begin();
+       refIter != reference.end();
        ++refIter)
   {
     const std::string& refKey = refIter->first;
     const std::string& refValue = refIter->second;
-    
+
     if ( test.find(refKey) != test.end() )
     {
       const std::string& testValue = test[refKey];
 
       bool thisTestResult = CompareSpacedValueFields( refValue, testValue );
       testResult &= thisTestResult;
-      
+
       MITK_DEBUG << refKey << ": '" << refValue << "' == '" << testValue << "' ? " << (thisTestResult?"YES":"NO");
     }
     else
@@ -346,8 +346,8 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
   }
 
   // now check test dump does not contain any additional keys
-  for (KeyValueMap::const_iterator testIter = test.begin(); 
-       testIter != test.end(); 
+  for (KeyValueMap::const_iterator testIter = test.begin();
+       testIter != test.end();
        ++testIter)
   {
     const std::string& key = testIter->first;
@@ -386,7 +386,7 @@ mitk::TestDICOMLoading::ParseDump( const std::string& dump )
 
     std::string::size_type keyPosition = line.find_first_not_of( ' ' );
     std::string::size_type colonPosition = line.find( ':' );
-    
+
     std::string key = line.substr(keyPosition, colonPosition - keyPosition);
     std::string::size_type firstSpacePosition = key.find_first_of(" ");
     if (firstSpacePosition != std::string::npos)
@@ -421,7 +421,7 @@ mitk::TestDICOMLoading::ParseDump( const std::string& dump )
     surroundingKeys.push(key); // this is the new embracing key
 
     std::string value = line.substr(colonPosition+1);
-    
+
     MITK_DEBUG << "  Key: '" << key << "' value '" << value << "'" ;
 
     parsedResult[key] = value; // store parsing result

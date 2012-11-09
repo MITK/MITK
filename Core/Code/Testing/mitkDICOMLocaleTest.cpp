@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*
  This test is meant to reproduce the following error:
- 
+
  - The machine or current user has a German locale.
  - This esp. means that stream IO expects the decimal separator as a comma: ","
  - DICOM files use a point "." as the decimal separator to be locale independent
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <list>
 #include <locale>
 #include <locale.h>
-  
+
 bool mitkDICOMLocaleTestChangeLocale(const std::string& locale)
 {
   try
@@ -67,15 +67,15 @@ void mitkDICOMLocaleTestWithReferenceImage(std::string filename)
   if(image.IsNull())
   {
     MITK_TEST_FAILED_MSG(<< "File "<< filename << " is not an image - test will not be applied." );
-  
+
     return;
-  }  
+  }
 
   // note importance of minor differences in spacings:
   // DICOM has order y-spacing, x-spacing, while in MITK we assume x-spacing, y-spacing (both meant for 0 and 1 index in array)
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592), "correct x spacing? found " 
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592), "correct x spacing? found "
                                << image->GetGeometry()->GetSpacing()[0]);
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3411592), "correct y spacing? found " 
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3411592), "correct y spacing? found "
                                << image->GetGeometry()->GetSpacing()[1]);
 }
 
@@ -84,7 +84,7 @@ int mitkDICOMLocaleTest(int argc, char* argv[])
   MITK_TEST_BEGIN("DICOMLocaleTest");
 
   MITK_TEST_CONDITION_REQUIRED(argc >= 2, "File to load has been specified on commandline");
-  
+
   MITK_TEST_OUTPUT(<< "Configuration: \n" << mitk::DicomSeriesReader::GetConfigurationString() );
 
   std::string filename = argv[1];
@@ -125,7 +125,7 @@ int mitkDICOMLocaleTest(int argc, char* argv[])
     MITK_TEST_OUTPUT(<< "Warning: No German locale was found on the system.");
   }
   //MITK_TEST_CONDITION_REQUIRED( numberOfTestedGermanLocales > 0, "Verify that at least one German locale has been tested.");
- 
+
   MITK_TEST_END();
 }
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -74,9 +74,9 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
         {
           // nothing to do, factor remains 1.0
         }
-        
+
         renderer->GetDisplayGeometry()->ZoomWithFixedWorldCoordinates(factor, dcOperation->GetStartDisplayCoordinate(), dcOperation->GetStartCoordinateInMM());
-        
+
         renderer->GetRenderingManager()->RequestUpdate(renderer->GetRenderWindow());
         //ok = true;
       }

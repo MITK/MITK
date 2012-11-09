@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "PlanarFigureExports.h"
 
 
-namespace mitk 
+namespace mitk
 {
 
 class Geometry2D;
@@ -35,7 +35,7 @@ class Geometry2D;
  * lying on a plane. The two control points of the first line are freely placable within
  * the bounds of the underlying 2D geometry, while the two control points of the second line
  * are ensured to meet the following constraints:
- * 
+ *
  * 1.) The lines must be orthogonal to each other
  * 2.) The second line must lie within the 2D area defined by the first line
  * 3.) The two lines must intersect (at least with their boundaries)
@@ -46,7 +46,7 @@ class Geometry2D;
  *
  * When modifying one of the lines by interactively moving its control points, the respective
  * other line is deleted and the user is prompted to draw it again.
- * 
+ *
  * The class provide a special mode for drawing single lines (SingleLineModeOn/Off); in this
  * case, interaction stops after the first line has been placed.
  *
@@ -73,7 +73,7 @@ public:
   * orthogonal cross. */
   itkBooleanMacro( SingleLineMode ); // No need to reimplement; calls SetSingleLineMode()
 
- 
+
   /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {

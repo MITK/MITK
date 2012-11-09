@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInteractionConst.h>
 #include <mitkVector.h>
 
-#include <ctime> 
+#include <ctime>
 #include <cstdlib>
 #include <math.h>
 
@@ -99,14 +99,14 @@ public:
   {
     TestPlane = planeGeometry;
     TestName = testname;
-    
+
     float centerCoordValue = TestvolumeSize / 2.0;
     float center[3] = {centerCoordValue, centerCoordValue, centerCoordValue};
     mitk::Point3D centerIndex(center);
 
     double radius = TestvolumeSize / 4.0;
     if(TestPlane->Distance(centerIndex) >= radius ) return;//outside sphere
-    
+
 
 
     //feed ExtractSliceFilter
@@ -128,7 +128,7 @@ public:
     else if(TestvolumeSize == 256.0){devArea = Testfailure_Deviation_Volume_256; devDiameter = Testfailure_Deviation_Diameter_256;}
     else if (TestvolumeSize == 512.0){devArea = Testfailure_Deviation_Volume_512; devDiameter = Testfailure_Deviation_Diameter_512;}
     else{devArea = Testfailure_Deviation_Volume_128; devDiameter = Testfailure_Deviation_Diameter_128;}
-  
+
 
     std::string areatestName = TestName.append(" area");
     std::string diametertestName = TestName.append(" testing diameter");
@@ -136,24 +136,24 @@ public:
     //TODO think about the deviation, 1% makes no sense at all
     MITK_TEST_CONDITION(std::abs(100 - testResults.percentageAreaCalcToPixel) < 1, areatestName );
     MITK_TEST_CONDITION(std::abs(100 - testResults.percentageRadiusToPixel) < 1, diametertestName );
-  
+
   #ifdef EXTRACTOR_DEBUG
     MITK_INFO << TestName << " >>> " << "planeDistanceToSphereCenter: " << testResults.planeDistanceToSphereCenter;
     MITK_INFO << "area in pixels: " << testResults.areaInPixel << " <-> area in mm: " << testResults.areaCalculated << " = " << testResults.percentageAreaCalcToPixel << "%";
-    
+
     MITK_INFO << "calculated diameter: " << testResults.diameterCalculated << " <-> diameter in mm: " << testResults.diameterInMM << " <-> diameter in pixel: " << testResults.diameterInPixel << " = " << testResults.percentageRadiusToPixel << "%";
-  #endif 
+  #endif
   }
 
 
   /*
-   * get the radius of the slice of a sphere based on pixel distance from edge to edge of the circle. 
+   * get the radius of the slice of a sphere based on pixel distance from edge to edge of the circle.
    */
   template<typename TPixel, unsigned int VImageDimension>
   static void TestSphereRadiusByItk (itk::Image<TPixel, VImageDimension>* inputImage)
   {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
-    
+
 
     //set the index to the middle of the image's edge at x and y axis
     typename InputImageType::IndexType currentIndexX;
@@ -229,7 +229,7 @@ public:
 
       //found both marks?
       if(indicesX.size() == 2 && indicesY.size() == 2) break;
-      
+
       //the new 'last' values
       lastValueX = inputImage->GetPixel(currentIndexX);
       lastValueY = inputImage->GetPixel(currentIndexY);
@@ -242,7 +242,7 @@ public:
      *When we have the center, the diameter of the circle will be checked to the reference value(math!).
      */
 
-    //each distance from the first mark of each direction to the center of the straight line between the marks 
+    //each distance from the first mark of each direction to the center of the straight line between the marks
     double distanceToCenterX = std::abs(indicesX[0][1] - indicesX[1][1]) / 2.0;
     double distanceToCenterY = std::abs(indicesY[0][0] - indicesY[1][0]) / 2.0;
 
@@ -270,19 +270,19 @@ public:
       currentIndex[1] += 1;
 
       if( inputImage->GetPixel(currentIndex) != lastValueX)
-      { 
+      {
         typename InputImageType::IndexType markIndex;
         markIndex[0] = currentIndex[0];
-        markIndex[1] = currentIndex[1] - 1; 
-        
-        diameterIndices.push_back(markIndex); 
+        markIndex[1] = currentIndex[1] - 1;
+
+        diameterIndices.push_back(markIndex);
         break;
       }
 
       sumpixels++;
       lastValueX = inputImage->GetPixel(currentIndex);
     }
-    
+
     currentIndex[1] -= sumpixels; //move back to center to go in the other direction
     lastValueX = inputImage->GetPixel(currentIndex);
 
@@ -292,20 +292,20 @@ public:
       currentIndex[1] -= 1;
 
       if( inputImage->GetPixel(currentIndex) != lastValueX)
-        { 
+        {
         typename InputImageType::IndexType markIndex;
         markIndex[0] = currentIndex[0];
-        markIndex[1] = currentIndex[1];//outside sphere because we want to calculate the distance from edge to edge 
-        
-        diameterIndices.push_back(markIndex); 
+        markIndex[1] = currentIndex[1];//outside sphere because we want to calculate the distance from edge to edge
+
+        diameterIndices.push_back(markIndex);
         break;
       }
-      
+
       sumpixels++;
       lastValueX = inputImage->GetPixel(currentIndex);
     }
 
-    
+
 
     /*
     *Now sumpixels should be the apromximate diameter of the circle. This is checked with the calculated diameter from the plane transformation(math).
@@ -313,7 +313,7 @@ public:
     mitk::Point3D volumeCenter;
     volumeCenter[0] = volumeCenter[1] = volumeCenter[2] = TestvolumeSize / 2.0;
 
-    
+
     double planeDistanceToSphereCenter = TestPlane->Distance(volumeCenter);
 
 
@@ -323,8 +323,8 @@ public:
     double diameter = 2.0 * std::sqrt(std::pow(sphereRadius, 2) - std::pow( planeDistanceToSphereCenter  , 2));
 
     double percentageRadiusToPixel = 100 /  diameter  * sumpixels;
-    
-    
+
+
 
     /*
      *calculate the radius in mm by the both marks of the center line by using the world coordinates
@@ -333,7 +333,7 @@ public:
     mitk::Vector3D diameterPointRight, diameterPointLeft;
 
     diameterPointRight[2] = diameterPointLeft[2] = 0.0;
-    
+
     diameterPointLeft[0] = diameterIndices[0][0];
     diameterPointLeft[1] = diameterIndices[0][1];
 
@@ -377,11 +377,11 @@ public:
       if(inputImage->GetPixel(imageIterator.GetIndex()) == pixelValueSet) sumPixelsInArea++;
       ++imageIterator;
     }
-    
+
     mitk::Point3D volumeCenter;
     volumeCenter[0] = volumeCenter[1] = volumeCenter[2] = TestvolumeSize / 2.0;
 
-    
+
     double planeDistanceToSphereCenter = TestPlane->Distance(volumeCenter);
 
     double sphereRadius = TestvolumeSize/4.0;
@@ -390,7 +390,7 @@ public:
     double radius = std::sqrt(std::pow(sphereRadius, 2) - std::pow( planeDistanceToSphereCenter  , 2));
 
     double areaInMM = 3.14159265358979 * std::pow(radius, 2);
-    
+
 
     testResults.areaCalculated = areaInMM;
     testResults.areaInPixel = sumPixelsInArea;
@@ -399,7 +399,7 @@ public:
 
 
 
-  /* 
+  /*
    * random a voxel. define plane through this voxel. reslice at the plane. compare the pixel vaues of the voxel
    * in the volume with the pixel value in the resliced image.
    * there are some indice shifting problems which causes the test to fail for oblique planes. seems like the chosen
@@ -433,9 +433,9 @@ public:
     ImageIterator imageIterator( image, image->GetLargestPossibleRegion() );
     imageIterator.GoToBegin();
 
-    
+
     unsigned short pixelValue = 0;
-    
+
     //fill the image with distinct values
     while ( !imageIterator.IsAtEnd() )
     {
@@ -446,10 +446,10 @@ public:
     /* end setup itk image */
 
 
-    
+
     mitk::Image::Pointer imageInMitk;
     CastToMitkImage(image, imageInMitk);
-    
+
 
 
     /*mitk::ImageWriter::Pointer writer = mitk::ImageWriter::New();
@@ -470,10 +470,10 @@ public:
 
     //set the seed of the rand function
     srand((unsigned)time(0));
-    
+
     /* setup a random orthogonal plane */
     int sliceindex = 17;//rand() % 32;
-    bool isFrontside = true; 
+    bool isFrontside = true;
     bool isRotated = false;
 
 
@@ -484,23 +484,23 @@ public:
     }
 
 
-    
+
     mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
 
-     
+
     plane->InitializeStandardPlane(imageInMitk->GetGeometry(), orientation, sliceindex, isFrontside, isRotated);
-    
+
     mitk::Point3D origin = plane->GetOrigin();
     mitk::Vector3D normal;
     normal = plane->GetNormal();
-    
+
 
     normal.Normalize();
-    
+
     origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
-    
+
     plane->SetOrigin(origin);
-    
+
     //we dont need this any more, because we are only testing orthogonal planes
     /*mitk::Vector3D rotationVector;
     rotationVector[0] = randFloat();
@@ -533,7 +533,7 @@ public:
 
     unsigned char n1 = 7;// rand() % 32;
     unsigned char n2 = 13;// rand() % 32;
-    
+
 
     mitk::Point3D testPoint3DInWorld;
     testPoint3DInWorld = planeOrigin + (axis0 * n1) + (axis1 * n2);
@@ -543,7 +543,7 @@ public:
     imageInMitk->GetGeometry()->WorldToIndex(testPoint3DInWorld, testPoint3DInIndex);
 
     mitk::Index3D testPoint2DInIndex;
-    
+
     /* end define a point in the 3D volume.*/
 
 
@@ -551,26 +551,26 @@ public:
     mitk::ExtractSliceFilter::Pointer slicer = mitk::ExtractSliceFilter::New();
     slicer->SetInput(imageInMitk);
     slicer->SetWorldGeometry(plane);
-    
+
     slicer->Update();
 
     mitk::Image::Pointer slice = slicer->GetOutput();
 
     // Get TestPoiont3D as Index in Slice
     slice->GetGeometry()->WorldToIndex(testPoint3DInWorld,testPoint2DInIndex);
-    
+
 
     mitk::Point3D p, sliceIndexToWorld, imageIndexToWorld;
     p[0] = testPoint2DInIndex[0];
     p[1] = testPoint2DInIndex[1];
     p[2] = testPoint2DInIndex[2];
     slice->GetGeometry()->IndexToWorld(p, sliceIndexToWorld);
-    
+
     p[0] = testPoint3DInIndex[0];
     p[1] = testPoint3DInIndex[1];
     p[2] = testPoint3DInIndex[2];
     imageInMitk->GetGeometry()->IndexToWorld(p, imageIndexToWorld);
-    
+
 
 
     //compare the pixelvalues of the defined point in the 3D volume with the value of the resliced image
@@ -592,14 +592,14 @@ public:
     double valueVTKinImage = imageInVtk->GetScalarComponentAsDouble(testPoint3DInIndex[0], testPoint3DInIndex[1], testPoint3DInIndex[2], 0);
 
 
-    /* Test that everything is working equally if vtkoutput is used instead of the default output 
+    /* Test that everything is working equally if vtkoutput is used instead of the default output
      * from mitk ImageToImageFilter
      */
     mitk::ExtractSliceFilter::Pointer slicerWithVtkOutput = mitk::ExtractSliceFilter::New();
     slicerWithVtkOutput->SetInput(imageInMitk);
     slicerWithVtkOutput->SetWorldGeometry(plane);
     slicerWithVtkOutput->SetVtkOutputRequest(true);
-    
+
     slicerWithVtkOutput->Update();
     vtkSmartPointer<vtkImageData> vtkImageByVtkOutput = vtkSmartPointer<vtkImageData>::New();
     vtkImageByVtkOutput = slicerWithVtkOutput->GetVtkOutput();
@@ -620,7 +620,7 @@ public:
     MITK_INFO << "\n" << "testPoint3D InWorld" << testPoint3DInWorld << " is " << testPoint2DInIndex << " in 2D";
     MITK_INFO << "\n" << "randoms: " << ((int)n1) << ", " << ((int)n2);
     MITK_INFO << "\n" << "point is inside plane: " << plane->IsInside(testPoint3DInWorld) << " and volume: " << imageInMitk->GetGeometry()->IsInside(testPoint3DInWorld);
-    
+
     MITK_INFO << "\n" << "volume idx: " << testPoint3DInIndex << " = " << valueAt3DVolume ;
     MITK_INFO << "\n" << "volume world: " << testPoint3DInWorld << " = " << valueAt3DVolumeByWorld ;
     MITK_INFO << "\n" << "slice idx: " << testPoint2DInIndex << " = " << valueAtSlice ;
@@ -644,13 +644,13 @@ public:
     Image2DType::Pointer img  = Image2DType::New();
     CastToItkImage(slice, img);
     typedef itk::ImageRegionConstIterator< Image2DType > Iterator2D;
-    
+
     Iterator2D iter(img, img->GetLargestPossibleRegion());
     iter.GoToBegin();
     while( !iter.IsAtEnd() ){
-    
+
       if(img->GetPixel(iter.GetIndex()) == valueAt3DVolume) MITK_INFO << "\n" << valueAt3DVolume << " MATCHED itk " << iter.GetIndex();
-      
+
       ++iter;
     }
 #endif //EXTRACTOR_DEBUG
@@ -669,7 +669,7 @@ public:
 
   #ifdef CREATE_VOLUME
 
-    
+
     //do sphere creation
     ItkVolumeGeneration();
 
@@ -678,7 +678,7 @@ public:
       mitk::ImageWriter::Pointer writer = mitk::ImageWriter::New();
       writer->SetInput(TestVolume);
 
-      
+
       std::string file;
 
       std::ostringstream filename;
@@ -687,7 +687,7 @@ public:
       filename << ".nrrd";
 
       file = filename.str();
-       
+
       writer->SetFileName(file);
       writer->Update();
     #endif//SAVE_VOLUME
@@ -696,14 +696,14 @@ public:
 
 
   #ifndef CREATE_VOLUME //read from file
-    
+
     mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
 
     std::string filename = locator->FindFile("sphere_512.nrrd.mhd", "Modules/ImageExtraction/Testing/Data");
 
     mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
     reader->SetFileName(filename);
-  
+
     reader->Update();
     TestVolume = reader->GetOutput();
 
@@ -715,7 +715,7 @@ public:
   #endif
   }
 
-  
+
   //the test result of the sphere reslice
   struct SliceProperties{
     double planeDistanceToSphereCenter;
@@ -740,9 +740,9 @@ public:
 
 
 private:
-  
+
   /*
-   * Generate a sphere with a radius of TestvolumeSize / 4.0 
+   * Generate a sphere with a radius of TestvolumeSize / 4.0
    */
   static void ItkVolumeGeneration ()
   {
@@ -768,7 +768,7 @@ private:
 
     sphereImage->FillBuffer(0);
 
-    
+
     mitk::Vector3D center;
     center[0] = center[1] = center[2] = TestvolumeSize / 2.0;
 
@@ -779,13 +779,13 @@ private:
 
     double distanceToCenter = 0.0;
 
-    
+
     ImageIterator imageIterator( sphereImage, sphereImage->GetLargestPossibleRegion() );
     imageIterator.GoToBegin();
 
-    
+
     mitk::Vector3D currentVoxelInIndex;
-    
+
     while ( !imageIterator.IsAtEnd() )
     {
       currentVoxelInIndex[0] = imageIterator.GetIndex()[0];
@@ -807,7 +807,7 @@ private:
   }
 
 
-  
+
 
 
   /* calculate the devation of the voxel object to the mathematical sphere object.
@@ -833,7 +833,7 @@ private:
     double diameter  = TestvolumeSize / 2.0;
     double volumeCalculated = (1.0 / 6.0) * 3.14159265358979 * std::pow(diameter, 3);
 
-    
+
     double volumeDeviation = std::abs( 100 - (100 / volumeCalculated * volumeInPixel) );
 
 
@@ -847,8 +847,8 @@ private:
       if(inputImage->GetPixel(index) == pixelValueSet) sumpixels++;
       index[2] += 1;
     }
-    
-    
+
+
     double diameterDeviation = std::abs( 100 - (100 / diameter * sumpixels) );
   #ifdef DEBUG
     MITK_INFO << "volume deviation: " << volumeDeviation << " diameter deviation:" << diameterDeviation;
@@ -890,7 +890,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
   //initialize sphere test volume
   mitkExtractSliceFilterTestClass::InitializeTestVolume();
-  
+
 
   mitk::Vector3D spacing = mitkExtractSliceFilterTestClass::TestVolume->GetGeometry()->GetSpacing();
 
@@ -1016,18 +1016,18 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
   #ifdef SHOW_SLICE_IN_RENDER_WINDOW
     /*================ #BEGIN vtk render code ================*/
-    
+
     //set reslicer for renderwindow
     mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
 
     std::string filename =  "C:\\home\\Pics\\Pic3D.nrrd";
     reader->SetFileName(filename);
-    
+
     reader->Update();
 
     mitk::Image::Pointer pic = reader->GetOutput();
     vtkSmartPointer<vtkImageReslice> slicer = vtkSmartPointer<vtkImageReslice>::New();
-    
+
     slicer->SetInput(pic->GetVtkImageData());
 
 
@@ -1038,12 +1038,12 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
                mitk::Point3D origin2 = obliquePl->GetOrigin();
     mitk::Vector3D n;
     n = obliquePl->GetNormal();
-    
+
 
     n.Normalize();
-    
+
                 origin2 += n * 0.5;//pixelspacing is 1, so half the spacing is 0.5
-    
+
                 obliquePl->SetOrigin(origin2);
 
     mitk::Vector3D rotation;
@@ -1057,7 +1057,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
     mitk::RotationOperation* operation = new mitk::RotationOperation(mitk::OpROTATE, obliquePl->GetCenter(), rotationVector, degree);
     obliquePl->ExecuteOperation(operation);
     delete operation;
-    
+
 
     double origin[3];
     origin[0] = obliquePl->GetOrigin()[0];
@@ -1065,7 +1065,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
     origin[2] = obliquePl->GetOrigin()[2];
     slicer->SetResliceAxesOrigin(origin);
 
-    
+
     mitk::Vector3D right, bottom, normal;
     right  = obliquePl->GetAxisVector( 0 );
     bottom = obliquePl->GetAxisVector( 1 );
@@ -1074,7 +1074,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
     right.Normalize();
     bottom.Normalize();
     normal.Normalize();
-    
+
     double cosines[9];
 
     mitk::vnl2vtk(right.GetVnlVector(), cosines);//x
@@ -1103,7 +1103,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
     vtkSmartPointer<vtkPolyDataMapper> imageMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     imageMapper->SetInputConnection(vtkPlane->GetOutputPort());
 
-    
+
     vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
 
     //built a default lookuptable
@@ -1121,7 +1121,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
 
     texture->SetInput(slicer->GetOutput());
-    
+
     texture->SetLookupTable(lookupTable);
 
     texture->SetMapColorScalarsThroughLookupTable(true);
@@ -1129,7 +1129,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
     vtkSmartPointer<vtkActor> imageActor = vtkSmartPointer<vtkActor>::New();
     imageActor->SetMapper(imageMapper);
     imageActor->SetTexture(texture);
-    
+
 
     // Setup renderers
     vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();

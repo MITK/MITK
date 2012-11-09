@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,20 +42,20 @@ void mitk::LimitedLinearUndo::ClearList(UndoContainer* list)
 
 bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem* stackItem)
 {
-  OperationEvent* operationEvent = dynamic_cast<OperationEvent*>(stackItem); 
+  OperationEvent* operationEvent = dynamic_cast<OperationEvent*>(stackItem);
   if (!operationEvent) return false;
-  
+
   // clear the redolist, if a new operation is saved
   if (!m_RedoList.empty())
   {
     this->ClearList(&m_RedoList);
     InvokeEvent( RedoEmptyEvent() );
   }
-    
+
   m_UndoList.push_back(operationEvent);
-  
+
   InvokeEvent( UndoNotEmptyEvent() );
-  
+
   return true;
 }
 
@@ -67,7 +67,7 @@ bool mitk::LimitedLinearUndo::Undo(bool fine)
     return Undo();
   }
   else
-  { 
+  {
     // undo one group event ID
     int oeid = FirstObjectEventIdOfCurrentGroup(m_UndoList); // get the Object Event ID of the first item with a differnt Group ID (as seen from the end of stack)
     return Undo(oeid);
@@ -89,17 +89,17 @@ bool mitk::LimitedLinearUndo::Undo(int oeid)
   do
   {
     m_UndoList.back()->ReverseAndExecute();
-    
+
     m_RedoList.push_back(m_UndoList.back());  // move to redo stack
     m_UndoList.pop_back();
     InvokeEvent( RedoNotEmptyEvent() );
 
-    if (m_UndoList.empty()) 
+    if (m_UndoList.empty())
     {
       InvokeEvent( UndoEmptyEvent() );
       return false;
     }
-  } 
+  }
   while ( m_UndoList.back()->GetObjectEventId() >= oeid );
 
   //Update. Check Rendering Mechanism where to request updates
@@ -127,19 +127,19 @@ bool mitk::LimitedLinearUndo::Redo(int oeid)
   do
   {
     m_RedoList.back()->ReverseAndExecute();
-      
+
     m_UndoList.push_back(m_RedoList.back());
     m_RedoList.pop_back();
     InvokeEvent( UndoNotEmptyEvent() );
 
-    if (m_RedoList.empty()) 
+    if (m_RedoList.empty())
     {
       InvokeEvent( RedoEmptyEvent() );
       break;
     }
-  } 
+  }
   while ( m_RedoList.back()->GetObjectEventId() <= oeid );
-  
+
   //Update. This should belong into the ExecuteOperation() of OperationActors, but it seems not to be used everywhere
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   return true;
@@ -186,7 +186,7 @@ mitk::OperationEvent* mitk::LimitedLinearUndo::GetLastOfType(OperationActor* des
     if (   opEvent->GetOperation() != NULL
         && opEvent->GetOperation()->GetOperationType() == opType
         && opEvent->IsValid()
-        && opEvent->GetDestination() == destination ) 
+        && opEvent->GetDestination() == destination )
       return opEvent;
   }
 

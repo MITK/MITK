@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNDIToolDelegate.h"
 
 /* VIEW MANAGEMENT */
-QmitkNDIConfigurationWidget::QmitkNDIConfigurationWidget(QWidget* parent)  
+QmitkNDIConfigurationWidget::QmitkNDIConfigurationWidget(QWidget* parent)
 : QWidget(parent), m_Controls(NULL), m_Tracker(NULL), m_Source(NULL),
 m_Delegate(NULL), m_SROMCellDefaultText("<click to load SROM file>"), m_RepresentatonCellDefaultText("<click to select representation>")
 {
@@ -82,10 +82,10 @@ void QmitkNDIConfigurationWidget::CreateConnections()
   connect(m_Controls->m_DisoverDevicesBtn, SIGNAL(clicked()), this, SLOT(OnDiscoverDevices()));
   connect(m_Controls->m_ToolTable->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(UpdateTrackerFromToolTable(const QModelIndex &, const QModelIndex &)));
   connect(m_Controls->m_DisoverDevicesBtnInfo, SIGNAL(clicked()), this, SLOT(OnDisoverDevicesBtnInfo()));
-  
+
   connect(m_Controls->m_SaveToolPushButton, SIGNAL(clicked()), this, SLOT(OnSaveTool()) );
   connect(m_Controls->m_LoadToolPushButton, SIGNAL(clicked()), this, SLOT(OnLoadTool()) );
-  
+
  }
 
 
@@ -116,9 +116,9 @@ void QmitkNDIConfigurationWidget::OnConnect()
 
     this->UpdateWidgets();
     this->UpdateToolTable();
-    
+
     connect(m_Controls->m_ToolTable, SIGNAL(cellChanged(int,int)), this, SLOT(OnTableCellChanged(int,int)));
-    
+
     emit ToolsAdded(this->GetToolNamesList());
     emit Connected();
   }
@@ -137,12 +137,12 @@ void QmitkNDIConfigurationWidget::OnDisconnect()
     return;
   m_Tracker->CloseConnection();
   m_Tracker = NULL;
-  
+
   disconnect(m_Controls->m_ToolTable, SIGNAL(cellChanged(int,int)), this, SLOT(OnTableCellChanged(int,int)));
   m_Controls->m_ToolSelectionComboBox->clear();
-  
+
   this->UpdateToolTable();
-  this->UpdateWidgets();  
+  this->UpdateWidgets();
   emit ToolsAdded(this->GetToolNamesList());
   emit Disconnected();
 
@@ -183,8 +183,8 @@ void QmitkNDIConfigurationWidget::UpdateWidgets()
     disconnect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnConnect()));
     connect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnDisconnect()));
     m_Controls->m_DiscoverToolsBtn->setEnabled(true);
-    m_Controls->m_AddToolBtn->setEnabled(true);    
-  }  
+    m_Controls->m_AddToolBtn->setEnabled(true);
+  }
 }
 
 
@@ -292,13 +292,13 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
   //disconnect(m_Controls->m_ToolTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(OnTableItemChanged(QTableWidgetItem*))); // stop listening to table changes
   disconnect(m_Controls->m_ToolTable->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(UpdateTrackerFromToolTable(const QModelIndex &, const QModelIndex &)));
   disconnect(m_Controls->m_ToolTable, SIGNAL( clicked ( const QModelIndex & )), this, SLOT ( OnTableItemClicked( const QModelIndex & )));
-  
+
   m_Controls->m_ToolTable->clearContents();
   m_Controls->m_ToolTable->setRowCount(0);
   if (m_Tracker.IsNull() || (m_Controls == NULL))
     return;
-    
-  m_Controls->m_ToolSelectionComboBox->clear();  
+
+  m_Controls->m_ToolSelectionComboBox->clear();
 
   m_Controls->m_ToolTable->setRowCount(m_Tracker->GetToolCount());
   for (unsigned int i = 0; i < m_Tracker->GetToolCount(); ++i)
@@ -309,11 +309,11 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
       m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::IndexCol, new QTableWidgetItem("INVALID"));                   // Index
       continue;
     }
-    
+
     m_Controls->m_ToolSelectionComboBox->addItem(m_Tracker->GetTool(i)->GetToolName());
-        
+
     m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::IndexCol, new QTableWidgetItem(QString::number(i)));            // Index
-    m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::NameCol, new QTableWidgetItem(t->GetToolName()));               // Name    
+    m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::NameCol, new QTableWidgetItem(t->GetToolName()));               // Name
     if (dynamic_cast<mitk::NDIPassiveTool*>(t)->GetSROMDataLength() > 0)
       m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::SROMCol, new QTableWidgetItem("SROM file loaded"));           // SROM file
     else
@@ -327,7 +327,7 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
 
     m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::RepCol, new QTableWidgetItem(m_RepresentatonCellDefaultText));       // Representation
 
-         
+
     /* set read-only/editable flags */
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::IndexCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                        // Index
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::NodeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Name
@@ -335,14 +335,14 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::TypeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Type
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::StatusCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                       // Status
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::NodeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Node
-  
+
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::RepCol)->setFlags(Qt::NoItemFlags);  // Representation surface file
   }
   m_Controls->m_ToolTable->resizeColumnsToContents();
   //connect(m_Controls->m_ToolTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(OnTableItemChanged(QTableWidgetItem*))); // listen to table changes again
   connect(m_Controls->m_ToolTable->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(UpdateTrackerFromToolTable(const QModelIndex &, const QModelIndex &)));
   connect(m_Controls->m_ToolTable, SIGNAL( clicked ( const QModelIndex & )), this, SLOT ( OnTableItemClicked( const QModelIndex & )));
-  
+
 }
 
 
@@ -389,7 +389,7 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
     {
       tmpComPort.remove(0,4); // remove "\\.\" for nice ui visualisation
     }
-    result += tmpComPort + ": ";   
+    result += tmpComPort + ": ";
 
     switch (it.value())
     {
@@ -423,7 +423,7 @@ void QmitkNDIConfigurationWidget::ScanPortsForNDITrackingDevices( PortDeviceMap&
   // Iterative scanning:
   for (PortDeviceMap::iterator it = portsAndDevices.begin(); it != portsAndDevices.end(); ++it)
     it.value() = this->ScanPort(it.key());
-  
+
   // \Todo: use parallel scanning
   //QtConcurrent::blockingMap( portsAndDevices.begin(), portsAndDevices.end(), ScanPort );
   //MITK_INFO << portsAndDevices;
@@ -485,7 +485,7 @@ void QmitkNDIConfigurationWidget::SetTagProperty( mitk::BaseProperty::Pointer pr
 void QmitkNDIConfigurationWidget::OnTableItemClicked(const QModelIndex & topLeft )
 {
   QString filename;
-  QTableWidgetItem* filenameItem; 
+  QTableWidgetItem* filenameItem;
 
   switch (topLeft.column())
   {
@@ -499,13 +499,13 @@ void QmitkNDIConfigurationWidget::OnTableItemClicked(const QModelIndex & topLeft
     if(QFileInfo(filename).exists())
     {
       mitk::Surface::Pointer surface = this->LoadSurfaceFromSTLFile(filename);
-      
+
       if(surface.IsNotNull())
         emit RepresentationChanged( topLeft.row(), surface);
     }
     break;
    default:
-    break;  
+    break;
   }
 }
 
@@ -622,7 +622,7 @@ QList<unsigned int> QmitkNDIConfigurationWidget::GetToolsByToolType( QString too
 
 mitk::DataNode* QmitkNDIConfigurationWidget::GetNode( unsigned int index ) const
 {
-  
+
   if (m_Controls == NULL)
     return NULL;
   QAbstractItemModel* model = m_Controls->m_ToolTable->model();
@@ -645,15 +645,15 @@ void QmitkNDIConfigurationWidget::ShowToolRepresentationColumn()
   int cols = m_Controls->m_ToolTable->columnCount();
 
   //checking if representation column is inserted at right index
-  if(cols != QmitkNDIToolDelegate::RepCol) 
+  if(cols != QmitkNDIToolDelegate::RepCol)
   {
     //throw std::exception("Representation Column is not inserted at it's designated index!");
     return;
   }
-  
+
 
   m_Controls->m_ToolTable->insertColumn(cols); // insert new column at end of table
-  
+
 
   m_Controls->m_ToolTable->setHorizontalHeaderItem(QmitkNDIToolDelegate::RepCol, new QTableWidgetItem(QString("Representation"))); // inser column header for new colum
   //m_Controls->m_ToolTable->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
@@ -661,12 +661,12 @@ void QmitkNDIConfigurationWidget::ShowToolRepresentationColumn()
   int rows = m_Controls->m_ToolTable->rowCount();
 
  // make all representation colum items not editable
-  for(int i=0; i < rows; ++i) 
+  for(int i=0; i < rows; ++i)
   {
     m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::RepCol, new QTableWidgetItem("<click to select representation>"));       // Representation
     m_Controls->m_ToolTable->item(i,QmitkNDIToolDelegate::RepCol)->setFlags(Qt::NoItemFlags);
    }
-   
+
    //connect(m_Controls->m_ToolTable, SIGNAL( clicked ( const QModelIndex & )), this, SLOT ( OnTableItemClicked( const QModelIndex & )));
 
 }
@@ -682,26 +682,26 @@ void QmitkNDIConfigurationWidget::OnDisoverDevicesBtnInfo()
 
 void QmitkNDIConfigurationWidget::OnTableCellChanged(int row, int column)
 {
-  
+
   if(m_Tracker.IsNull())
-    return;  
-  
+    return;
+
   QString toolName;
-  
+
   switch (column)
   {
   case QmitkNDIToolDelegate::NameCol:
     toolName = m_Controls->m_ToolTable->item(row,column)->text();
     m_Controls->m_ToolSelectionComboBox->setItemText(row, toolName);
-        
+
     emit SignalToolNameChanged(row, toolName);
-        
+
   break;
-  
+
   default:
-  break;   
-  } 
-  
+  break;
+  }
+
 }
 
 
@@ -712,21 +712,21 @@ void QmitkNDIConfigurationWidget::OnSaveTool()
 
   int currId = m_Controls->m_ToolSelectionComboBox->currentIndex();
   QString filename = QFileDialog::getSaveFileName(NULL, "Save NDI-Tool", QString(QString(m_Tracker->GetTool(currId)->GetToolName())),"NDI Tracking Tool file(*.ntf)");
-  
+
   mitk::TrackingTool* selectedTool = m_Tracker->GetTool(currId);
-  
+
   if(filename.isEmpty())
     return;
 
   mitk::NavigationTool::Pointer navTool = mitk::NavigationTool::New();
-  
-   
+
+
   mitk::NavigationToolWriter::Pointer toolWriter = mitk::NavigationToolWriter::New();
   try {
     toolWriter->DoWrite(filename.toStdString(), this->GenerateNavigationTool(selectedTool));
   }
   catch( ... )
-  {    
+  {
     QMessageBox::warning(NULL, "Saving Tool Error", QString("An error occured! Could not save tool!\n\n"));
     MBI_ERROR<<"Could not save tool surface!";
     MBI_ERROR<< toolWriter->GetErrorMessage();
@@ -735,7 +735,7 @@ void QmitkNDIConfigurationWidget::OnSaveTool()
 
     if(maybeCorruptFile.exists())
       maybeCorruptFile.remove();
-  } 
+  }
 
   emit SignalSavedTool(currId, filename);
 }
@@ -745,14 +745,14 @@ void QmitkNDIConfigurationWidget::OnLoadTool()
 {
   if(m_Tracker.IsNull() || m_Tracker->GetToolCount() <= 0)
     return;
-  
+
   QString filename = QFileDialog::getOpenFileName(NULL, "Load NDI-Tools", QDir::currentPath(),"NDI Tracking Tool file(*.ntf)");
   int currId = m_Controls->m_ToolSelectionComboBox->currentIndex();
-  
+
   if(filename.isEmpty())
     return;
-  
-  mitk::DataNode::Pointer toolNode;  
+
+  mitk::DataNode::Pointer toolNode;
   mitk::NavigationToolReader::Pointer toolReader = mitk::NavigationToolReader::New();
   mitk::NavigationTool::Pointer navTool;
 
@@ -760,23 +760,23 @@ void QmitkNDIConfigurationWidget::OnLoadTool()
     navTool = toolReader->DoRead(filename.toStdString());
   }
   catch( ... )
-  {    
+  {
     QMessageBox::warning(NULL, "Loading Tool Error", QString("An error occured! Could not load tool!\n\n"));
     MBI_ERROR<<"Could not load tool surface!";
     MBI_ERROR<< toolReader->GetErrorMessage();
-  } 
+  }
 
   int currSelectedToolID = m_Controls->m_ToolSelectionComboBox->currentIndex();
-  
+
   // name
   m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::NameCol)->setText(navTool->GetToolName().c_str());
   dynamic_cast<mitk::NDIPassiveTool*>(m_Tracker->GetTool(currSelectedToolID))->SetToolName(navTool->GetToolName().c_str()); // also setting name to tool directly
-  
+
   //calibration file (.srom) filename
   m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::SROMCol)->setText(navTool->GetCalibrationFile().c_str());
-  
-  //type 
-  if(navTool->GetType() == mitk::NavigationTool::Instrument) 
+
+  //type
+  if(navTool->GetType() == mitk::NavigationTool::Instrument)
     m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::TypeCol)->setText("Instrument");
   else if(navTool->GetType() == mitk::NavigationTool::Fiducial)
     m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::TypeCol)->setText("Fiducial");
@@ -785,10 +785,10 @@ void QmitkNDIConfigurationWidget::OnLoadTool()
   else
     m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::TypeCol)->setText("Unknown");
 
-  
+
   //representation
   m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::SROMCol)->setText(m_RepresentatonCellDefaultText);
-  
+
   emit SignalLoadTool(currId, navTool->GetDataNode());
 }
 
@@ -805,7 +805,7 @@ mitk::NavigationTool::Pointer QmitkNDIConfigurationWidget::GenerateNavigationToo
 
   QString sromFileName = m_Controls->m_ToolTable->item(currSelectedToolID, QmitkNDIToolDelegate::SROMCol)->text();
   QString surfaceFileName = m_Controls->m_ToolTable->item(currSelectedToolID, QmitkNDIToolDelegate::RepCol)->text();
-  
+
   //calibration file (.srom) filename
   QFile sromFile(sromFileName);
   if(sromFile.exists())
@@ -816,9 +816,9 @@ mitk::NavigationTool::Pointer QmitkNDIConfigurationWidget::GenerateNavigationToo
 
   // name and surface as dataNode
   mitk::DataNode::Pointer node = mitk::DataNode::New();
-  
+
   mitk::Surface::Pointer toolSurface;
-  
+
   try{
    toolSurface = this->LoadSurfaceFromSTLFile(surfaceFileName);
   }
@@ -831,12 +831,12 @@ mitk::NavigationTool::Pointer QmitkNDIConfigurationWidget::GenerateNavigationToo
 
   if(toolSurface.IsNotNull())
   {
-    node->SetData(toolSurface); 
+    node->SetData(toolSurface);
     node->SetName(tool->GetToolName());
   }
-  
+
   navTool->SetDataNode(node);
-  
+
   // type
   mitk::NavigationTool::NavigationToolType type;
   QString currentToolType = m_Controls->m_ToolTable->item(currSelectedToolID,QmitkNDIToolDelegate::TypeCol)->text();
@@ -859,12 +859,12 @@ mitk::NavigationTool::Pointer QmitkNDIConfigurationWidget::GenerateNavigationToo
 mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QString surfaceFilename)
 {
   mitk::Surface::Pointer toolSurface;
-  
+
   QFile surfaceFile(surfaceFilename);
   if(surfaceFile.exists())
   {
     mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-    
+
     try{
       stlReader->SetFileName(surfaceFilename.toStdString().c_str());
       stlReader->Update();//load surface
@@ -877,7 +877,7 @@ mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QStri
       throw e;
     }
   }
-  
+
   return toolSurface;
 }
 

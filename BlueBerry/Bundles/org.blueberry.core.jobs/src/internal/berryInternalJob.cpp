@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,13 +41,13 @@ InternalJob::InternalJob(std::string name) :
 
 JobManager* const InternalJob::ptr_manager = JobManager::GetInstance();
 
-// time_variables definitions 
-// implemented as TimeDiff, if needed can be used to create a Poco::Timestamp with the given value 
+// time_variables definitions
+// implemented as TimeDiff, if needed can be used to create a Poco::Timestamp with the given value
 
 const Poco::Timestamp::TimeDiff InternalJob::T_INFINITE = std::numeric_limits<Poco::Timestamp::TimeVal>::max();
 
-// indicates if a job has a scheduling time 
-// implemented as TimeDiff, if needed can be used to create a Poco::Timestamp with the given value 
+// indicates if a job has a scheduling time
+// implemented as TimeDiff, if needed can be used to create a Poco::Timestamp with the given value
 const Poco::Timestamp::TimeDiff InternalJob::T_NONE = -1;
 
 
@@ -110,7 +110,7 @@ void InternalJob::InternalSetRule(ISchedulingRule::Pointer rule)
 }
 
 
-//TODO InternalSetState 
+//TODO InternalSetState
 void InternalJob::InternalSetState(int i)
 {
   flags = (flags & ~M_STATE) | i;
@@ -123,7 +123,7 @@ bool InternalJob::IsAboutToRunCanceled() const
 }
 
 
-bool InternalJob::IsRunCanceled() const 
+bool InternalJob::IsRunCanceled() const
 {
   return (flags & M_RUN_CANCELED) != 0;
 }
@@ -170,7 +170,7 @@ void InternalJob::SetAboutToRunCanceled(bool value) throw (JobRuntimeException)
       & ~M_ABOUT_TO_RUN_CANCELED;
 }
 
-void InternalJob::SetRunCanceled(bool value) 
+void InternalJob::SetRunCanceled(bool value)
 {
   flags = value ? flags | M_RUN_CANCELED : flags & ~M_RUN_CANCELED;
 }
@@ -194,7 +194,7 @@ void InternalJob::SetProgressMonitor(IProgressMonitor::Pointer monitor)
 }
 
 
-void InternalJob::SetResult(IStatus::Pointer result) 
+void InternalJob::SetResult(IStatus::Pointer result)
 {
   m_result = result;
 }
@@ -215,7 +215,7 @@ std::string InternalJob::ToString()
 {
   std::stringstream ss;
   ss << GetName() << "(" << jobNumber << ")";
-  return ss.str(); 
+  return ss.str();
 }
 
 void InternalJob::SetWaitQueueStamp(Poco::Timestamp waitQueueStamp)
@@ -266,7 +266,7 @@ int InternalJob::GetPriority() const
 }
 
 
-//TODO QualifiedName GetProperty 
+//TODO QualifiedName GetProperty
 //Object::Pointer
 //InternalJob
 //::GetProperty(QualifiedName key) {
@@ -277,7 +277,7 @@ int InternalJob::GetPriority() const
 //  }
 
 
-IStatus::Pointer InternalJob::GetResult() const 
+IStatus::Pointer InternalJob::GetResult() const
 {
   return m_result;
 }
@@ -326,7 +326,7 @@ bool InternalJob::IsUser() const
 }
 
 
-//void 
+//void
 //InternalJob
 //::Join() throws InterruptedException {
 //    manager.join(this);
@@ -376,7 +376,7 @@ void InternalJob::SetProgressGroup(IProgressMonitor::Pointer group, int ticks)
 }
 
 
-//TODO QualifiedName SetProperty 
+//TODO QualifiedName SetProperty
 //void
 //InternalJob
 //::SetProperty(QualifiedName key, Object value) {

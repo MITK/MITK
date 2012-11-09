@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -109,7 +109,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
   // @FIXME: Logik fuer update
   bool updateNeccesary=true;
 
-  if (updateNeccesary) 
+  if (updateNeccesary)
   {
     // ok, das ist aus GenerateData kopiert
     mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
@@ -142,12 +142,12 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 
     mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timeStep );
 
-    if ( itkPointSet.GetPointer() == NULL) 
+    if ( itkPointSet.GetPointer() == NULL)
     {
       return;
     }
 
-    
+
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
 
     assert(displayGeometry.IsNotNull());
@@ -158,7 +158,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
 
     //List of the Points
-    PointSet::DataType::PointsContainerConstIterator it, end;      
+    PointSet::DataType::PointsContainerConstIterator it, end;
     it = itkPointSet->GetPoints()->Begin();
     end = itkPointSet->GetPoints()->End();
 
@@ -170,13 +170,13 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 
     int counter = 0;
 
-    //for writing text 
+    //for writing text
     int j = 0;
 
     //for switching back to old color after using selected color
     float recallColor[4];
     glGetFloatv(GL_CURRENT_COLOR,recallColor);
-    
+
     //get the properties for coloring the points
     float unselectedColor[4] = {1.0, 1.0, 0.0, 1.0};//yellow
     //check if there is an unselected property
@@ -241,8 +241,8 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
       m_Point2DSize = dynamic_cast<mitk::IntProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("point 2D size"))->GetValue();
     }
 
-    Point3D p;                      // currently visited point 
-    Point3D lastP;                  // last visited point 
+    Point3D p;                      // currently visited point
+    Point3D lastP;                  // last visited point
     Vector3D vec;                   // p - lastP
     Vector3D lastVec;               // lastP - point before lastP
     vec.Fill(0);
@@ -294,18 +294,18 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 
       bool isRendererSlice = scalardiff < 0.00001; //cause roundoff error
       if(this->GetDataNode()->GetBoolProperty("inputdevice",isInputDevice) && isInputDevice && !isRendererSlice )
-      { 
+      {
         displayGeometry->Map(projected_p, pt2d);
         displayGeometry->WorldToDisplay(pt2d, pt2d);
 
         //Point size depending of distance to slice
         /*float p_size = (1/scalardiff)*10*m_Point2DSize;
-        if(p_size < m_Point2DSize * 0.6 ) 
+        if(p_size < m_Point2DSize * 0.6 )
           p_size = m_Point2DSize * 0.6 ;
         else if ( p_size > m_Point2DSize )
           p_size = m_Point2DSize;*/
         float p_size = (1/scalardiff)*100.0;
-        if(p_size < 6.0 ) 
+        if(p_size < 6.0 )
           p_size = 6.0 ;
         else if ( p_size > 10.0 )
           p_size = 10.0;
@@ -359,10 +359,10 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
             OpenGLrenderer->WriteSimpleText(l, pt2d[0] + text2dDistance, pt2d[1] + text2dDistance,0.0,1.0,0.0);
           }
         }
-        
+
         if((m_ShowPoints) && (scalardiff<4.0))
         {
-          //check if the point is to be marked as selected 
+          //check if the point is to be marked as selected
           if(selIt != selEnd || pointDataBroken)
           {
             bool addAsSelected = false;
@@ -370,7 +370,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
               addAsSelected = false;
             else if (selIt->Value().selected)
               addAsSelected = true;
-            else 
+            else
               addAsSelected = false;
 
             if (addAsSelected)
@@ -510,8 +510,8 @@ void mitk::PointSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::
   node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite ); //width of the cross marking a point
   node->AddProperty( "point 2D size", mitk::IntProperty::New(8), renderer, overwrite ); // length of the cross marking a point // length of an edge of the box marking a point
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite ); // contour of the line between points
-  node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite ); 
-  node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite ); //show or hide points 
+  node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite ); //show or hide points
   node->AddProperty( "show distances", mitk::BoolProperty::New(false), renderer, overwrite ); //show or hide distance measure (not always available)
   node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite ); //set the number of decimal digits to be shown
   node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite ); //show or hide angle measurement (not always available)

@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,21 +42,21 @@ struct IJobManager;
  * jobs start with a state value of <code>NONE</code>.  When a job is scheduled
  * to be run, it moves into the <code>WAITING</code> state.  When a job starts
  * running, it moves into the <code>RUNNING</code> state.  When execution finishes
- * (either normally or through cancellation), the state changes back to 
- * <code>NONE</code>.  
+ * (either normally or through cancellation), the state changes back to
+ * <code>NONE</code>.
  * </p><p>
  * A job can also be in the <code>SLEEPING</code> state.  This happens if a user
  * calls Job.sleep() on a waiting job, or if a job is scheduled to run after a specified
- * delay.  Only jobs in the <code>WAITING</code> state can be put to sleep.  
+ * delay.  Only jobs in the <code>WAITING</code> state can be put to sleep.
  * Sleeping jobs can be woken at any time using Job.wakeUp(), which will put the
  * job back into the <code>WAITING</code> state.
  * </p><p>
  * Jobs can be assigned a priority that is used as a hint about how the job should
  * be scheduled.  There is no guarantee that jobs of one priority will be run before
  * all jobs of lower priority.  The documentation of the various priority constants provide
- * more detail about what each priority means.  By default, jobs start in the 
+ * more detail about what each priority means.  By default, jobs start in the
  * <code>LONG</code> priority class.
- * 
+ *
  * @see IJobManager
  *
  */
@@ -251,7 +251,7 @@ public:
    *     or <code>null</code> if this job has no such property
    * @see #SetProperty(QualifiedName, Object)
    */
-  //TODO QualifiedName GetPropertys 
+  //TODO QualifiedName GetPropertys
   ///Object GetProperty(QualifiedName key) const ;
 
   /**
@@ -361,7 +361,7 @@ public:
    * @see ILock
    *  @see IJobManager#Suspend()
    */
-  //TODO Error Join  Problem InterruptedException 
+  //TODO Error Join  Problem InterruptedException
   /// void Join() ;
 
   /**

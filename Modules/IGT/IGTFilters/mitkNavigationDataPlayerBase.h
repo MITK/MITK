@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,7 +42,7 @@ namespace mitk{
     */
     virtual void UpdateOutputInformation();
 
-    /** @return Returns an error message if there was one (e.g. if the stream is invalid). 
+    /** @return Returns an error message if there was one (e.g. if the stream is invalid).
      *          Returns an empty string if there was no error in the current stream.
      */
     itkGetStringMacro(ErrorMessage);
@@ -52,7 +52,7 @@ namespace mitk{
 
    /**
     * \brief This method checks if player arrived at end of file.
-    * 
+    *
     *\warning This method is not tested yet. It is not save to use!
     */
     bool IsAtEnd();
@@ -64,14 +64,14 @@ namespace mitk{
 
 
     /**
-    * \brief Creates NavigationData from XML element and returns it 
+    * \brief Creates NavigationData from XML element and returns it
     * @throw mitk::Exception Throws an exception if elem is NULL.
     */
     mitk::NavigationData::Pointer ReadNavigationData(TiXmlElement* elem);
 
     bool m_StreamValid;                       ///< stores if the input stream is valid or not
     std::string m_ErrorMessage;               ///< stores the error message if the stream is invalid
-  
+
   };
 } // namespace mitk
 

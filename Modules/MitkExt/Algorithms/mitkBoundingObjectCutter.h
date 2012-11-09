@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,9 +30,9 @@ namespace mitk {
 
 //##Documentation
 //## @brief Cuts an Boundingobject out of an mitk Image
-//## 
+//##
 //## Input Parameters are a mitk::BoundingObject and optionally an mitk::Image
-//## if no mitk::Image is provided, the resulting image will have m_InsideValue as pixelvalue on inside pixel, 
+//## if no mitk::Image is provided, the resulting image will have m_InsideValue as pixelvalue on inside pixel,
 //## otherwise it will have the pixelvalue of the input image.
 //## Pixel on the outside of the BoundingObject will have a pixelvalue of m_OutsideValue
 //## \todo What Image resolution/spacing should be used, if no input image is given?
@@ -45,18 +45,18 @@ public:
 
   void SetBoundingObject( const mitk::BoundingObject* boundingObject );
   const mitk::BoundingObject* GetBoundingObject() const;
-  //##Description 
+  //##Description
   //## @brief Set for inside pixels, used when m_UseInsideValue is @a true
   itkSetMacro(InsideValue,  ScalarType);
   itkGetMacro(InsideValue,  ScalarType);
-  //##Description 
+  //##Description
   //## @brief Set value for outside pixels, used when m_AutoOutsideValue is \a false
   itkSetMacro(OutsideValue, ScalarType);
   itkGetMacro(OutsideValue, ScalarType);
   itkSetMacro(UseInsideValue, bool);
   itkGetMacro(UseInsideValue, bool);
   itkBooleanMacro(UseInsideValue);
-  //##Description 
+  //##Description
   //## @brief If set to \a true the minimum of the ouput pixel type is
   //## used as outside value.
   itkSetMacro(AutoOutsideValue, bool);
@@ -79,30 +79,30 @@ protected:
   virtual void GenerateOutputInformation();
   virtual void GenerateData();
 
-  template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel > 
+  template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel >
     friend void CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep=0, TOutputPixel* dummy=NULL );
-  template < typename TPixel, unsigned int VImageDimension > 
+  template < typename TPixel, unsigned int VImageDimension >
     friend void CutImage( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep );
   virtual void ComputeData(mitk::Image* input3D, int boTimeStep);
 
-  //##Description 
+  //##Description
   //## @brief BoundingObject that will be cut
-  mitk::BoundingObject::Pointer m_BoundingObject; 
-  //##Description 
+  mitk::BoundingObject::Pointer m_BoundingObject;
+  //##Description
   //## @brief Value for inside pixels, used when m_UseInsideValue is @a true
   //##
   //## \sa m_UseInsideValue
   ScalarType m_InsideValue;
-  //##Description 
+  //##Description
   //## @brief Value for outside pixels (default: 0)
   //##
   //## Used only if m_AutoOutsideValue is \a false.
   ScalarType m_OutsideValue;
-  //##Description 
+  //##Description
   //## @brief If \a true the minimum of the ouput pixel type is
   //## used as outside value (default: \a false)
   bool m_AutoOutsideValue;
-  //##Description 
+  //##Description
   //## @brief Use m_InsideValue for inside pixels (default: \a false)
   //##
   //## If @a true, pixels that are inside m_BoundingObject
@@ -114,11 +114,11 @@ protected:
   unsigned int m_OutsidePixelCount;
   unsigned int m_InsidePixelCount;
 
-  //##Description 
+  //##Description
   //## @brief Region of input needed for cutting
   mitk::SlicedData::RegionType m_InputRequestedRegion;
 
-  //##Description 
+  //##Description
   //## @brief Time when Header was last initialized
   itk::TimeStamp m_TimeOfHeaderInitialization;
 

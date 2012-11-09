@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,8 +35,8 @@ class TestOperation : public Operation
 public:
   TestOperation(OperationType operationType)
     : Operation(operationType)
-  { 
-    g_GlobalCounter++; 
+  {
+    g_GlobalCounter++;
   };
 
   virtual ~TestOperation()
@@ -51,17 +51,17 @@ public:
 *  @brief Test of the LimitedLinearUndo object
 *
 *  This test was motivated by bug 3248 which had to check memory leakage
-*  while using mitkOperations within the UndoMechanism. 
-*  OperationObjects are added to the UndoController and stored within 
-*  two lists (m_UndoList and m_RedoList) inside LimitedLinearUndo and 
-*  derived from this VerboseLimitedLinearUndo. When using Undo during 
-*  runtime operations are moved from UndoList to RedoList. In case of 
+*  while using mitkOperations within the UndoMechanism.
+*  OperationObjects are added to the UndoController and stored within
+*  two lists (m_UndoList and m_RedoList) inside LimitedLinearUndo and
+*  derived from this VerboseLimitedLinearUndo. When using Undo during
+*  runtime operations are moved from UndoList to RedoList. In case of
 *  a new interaction, causing new operations to be stored in the UndoList
-*  the RedoList needs to be cleared. For this, the operations and all 
-*  connected objects need to be deleted and memory to be freed. 
+*  the RedoList needs to be cleared. For this, the operations and all
+*  connected objects need to be deleted and memory to be freed.
 *  And this what this test checks!
-*  
-*  argc and argv are the command line parameters which were passed to 
+*
+*  argc and argv are the command line parameters which were passed to
 *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
 *  tests, argv is either empty for the simple tests or contains the filename
 *  of a test image for the image tests (see CMakeLists.txt).
@@ -92,7 +92,7 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4,"checking initialization of mitkOperation");
 
   //undo one operation; 1 operationEvent element in undo list, 1 in Redo list
-  myUndoController->Undo(); 
+  myUndoController->Undo();
 
   //sending two new OperationEvents: RedoList should be deleted and memory of operations freed
   for (int i = 0; i<2; i++)
@@ -105,12 +105,12 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char* /*argv*/[])
     mitk::OperationEvent::IncCurrObjectEventId();
     mitk::UndoStackItem::ExecuteIncrement();
   }
-  
+
   //2 operations should have been deleted, 4 should have been added
   MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 6,"checking adding of operations");
-  
+
   //two operations to RedoList
-  myUndoController->Undo(); 
+  myUndoController->Undo();
   myUndoController->ClearRedoList();
 
   //one operationEvent containing 2 operations should have been deleted

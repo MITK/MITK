@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ namespace mitk {
 
     public:
       typedef std::set<std::string> PropertyNameSet;
-            
+
 //      typedef PropertyNameSetterator PropertyNameIterator;
       const PropertyNameSet& GetDefaultPropertyNames();
       BaseProperty::Pointer CreateDefaultProperty(std::string name);
@@ -40,7 +40,7 @@ namespace mitk {
       typedef std::map< std::string, std::pair<float,float> > PropertyLimitsMap;
       PropertyLimitsMap m_PropertyLimits;
   }      ;
-}  
+}
 
 
 #endif /* MITKPROPERTYMANAGER_H_HEADER_INCLUDED */

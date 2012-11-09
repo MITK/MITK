@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -237,7 +237,7 @@ void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
-  
+
   // If the renderWindow is not valid, we do not want to inadvertantly create
   // an entry in the m_RenderWindowList map. It is possible if the user is
   // regularly calling AddRenderer and RemoveRenderer for a rendering update
@@ -787,7 +787,7 @@ RenderingManager
   RenderWindowList &renderWindowList = renman->m_RenderWindowList;
 
   RendererIntMap &nextLODMap = renman->m_NextLODMap;
-  
+
   if ( renderWindow )
   {
     BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );

@@ -457,7 +457,7 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
     bool threeModuleModularity( std::abs(0.4753 - costFunction->CalculateModularity( network, &threeModuleSolution )) < eps);
     MITK_TEST_CONDITION_REQUIRED( threeModuleModularity, "Expected three module modularity")
 
-    bool correctNumberOfModules( permutation->getNumberOfModules( &threeModuleSolution ) == 3 ); 
+    bool correctNumberOfModules( permutation->getNumberOfModules( &threeModuleSolution ) == 3 );
     MITK_TEST_CONDITION_REQUIRED( correctNumberOfModules, "Expected number of modules")
 
     bool correctNumberOfVertices( permutation->getNumberOfVerticesInModule( &threeModuleSolution, 0 ) == 5

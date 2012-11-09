@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -546,7 +546,7 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
   // and create a profile for every subject
     int size = m_Projections->GetVectorLength();
     for(int s=0; s<size; s++)
-    {      
+    {
       // Iterate trough the roi
       std::vector<double> profile;
       RoiType::iterator it;
@@ -711,7 +711,7 @@ void QmitkTbssRoiAnalysisWidget::DrawProfiles(std::string preprocessed)
 
 
   QwtLegend *legend = new QwtLegend;
-  this->SetLegend(legend, QwtPlot::RightLegend, 0.5); 
+  this->SetLegend(legend, QwtPlot::RightLegend, 0.5);
 
 
   std::cout << m_Measure << std::endl;

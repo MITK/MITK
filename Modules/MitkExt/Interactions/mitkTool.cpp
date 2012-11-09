@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,14 +37,14 @@ mitk::Tool::Tool(const char* type)
 
   m_PredicateSegmentation(NodePredicateProperty::New("segmentation", BoolProperty::New(true))),
   m_PredicateNotSegmentation( NodePredicateNot::New(m_PredicateSegmentation) ),
-  
+
   m_PredicateHelper(NodePredicateProperty::New("helper object", BoolProperty::New(true))),
   m_PredicateNotHelper( NodePredicateNot::New(m_PredicateHelper) ),
-  
+
   m_PredicateImageColorful( NodePredicateAnd::New(m_PredicateNotBinary, m_PredicateNotSegmentation) ),
 
   m_PredicateImageColorfulNotHelper( NodePredicateAnd::New(m_PredicateImageColorful, m_PredicateNotHelper) ),
-  
+
   m_PredicateReference( NodePredicateAnd::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) ),
 
   // for working image
@@ -55,7 +55,7 @@ mitk::Tool::Tool(const char* type)
 mitk::Tool::~Tool()
 {
 }
-    
+
 const char* mitk::Tool::GetGroup() const
 {
   return "default";
@@ -74,7 +74,7 @@ void mitk::Tool::Deactivated()
 {
   StateMachine::ResetStatemachineToStartState(); // forget about the past
 }
-    
+
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix)
 {
   itk::Object::Pointer object;
@@ -120,7 +120,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
   // actually create a new empty segmentation
   PixelType pixelType(mitk::MakeScalarPixelType<DefaultSegmentationDataType>() );
   Image::Pointer segmentation = Image::New();
- 
+
   if (original->GetDimension() == 2)
   {
     const unsigned int dimensions[] = { original->GetDimension(0), original->GetDimension(1), 1 };
@@ -132,7 +132,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
   }
 
   unsigned int byteSize = sizeof(DefaultSegmentationDataType);
-  for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim) 
+  for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim)
   {
     byteSize *= segmentation->GetDimension(dim);
   }
@@ -175,7 +175,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const 
   segmentationNode->SetProperty( "reslice interpolation", VtkResliceInterpolationProperty::New() ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)
   // For MITK-3M3 release, the volume of all segmentations should be shown
   segmentationNode->SetProperty( "showVolume", BoolProperty::New( true ) );
-  
+
   return segmentationNode;
 }
 

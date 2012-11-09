@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,7 +42,7 @@ const std::string QmitkConnectomicsStatisticsView::VIEW_ID = "org.mitk.views.con
 QmitkConnectomicsStatisticsView::QmitkConnectomicsStatisticsView()
 : QmitkFunctionality()
 , m_Controls( 0 )
-, m_MultiWidget( NULL )  
+, m_MultiWidget( NULL )
 , m_currentIndex( 0 )
 {
 }
@@ -130,7 +130,7 @@ void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::Data
   {
     mitk::DataNode::Pointer node = *it;
     currentFormatUnknown = true;
-  
+
     if( node.IsNotNull()  )
     { // network section
       mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( node->GetData() );

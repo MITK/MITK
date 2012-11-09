@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ QmitkOverlay::QmitkOverlay( const char* id )
 
 QmitkOverlay::~QmitkOverlay()
 {
-  if ( m_Widget && !m_WidgetIsCustom ) 
+  if ( m_Widget && !m_WidgetIsCustom )
   {
     m_Widget->deleteLater();
     m_Widget = NULL;
@@ -67,7 +67,7 @@ QWidget* QmitkOverlay::GetWidget()
 
 void QmitkOverlay::AddDropShadow( QWidget* widget )
 {
-  if (m_Widget) 
+  if (m_Widget)
   {
     QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect(widget);
     effect->setOffset( QPointF( 1.0, 1.0 ) );

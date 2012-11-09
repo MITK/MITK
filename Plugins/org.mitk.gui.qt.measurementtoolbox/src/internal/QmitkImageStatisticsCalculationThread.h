@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,43 +45,43 @@ public:
 
   typedef itk::Statistics::Histogram<double> HistogramType;
 
-  /*! 
+  /*!
   /brief standard constructor. */
   QmitkImageStatisticsCalculationThread();
-  /*! 
+  /*!
   /brief standard destructor. */
   ~QmitkImageStatisticsCalculationThread();
-  /*! 
+  /*!
   /brief Initializes the object with necessary data. */
   void Initialize( mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig );
-  /*! 
+  /*!
   /brief returns the calculated image statistics. */
   mitk::ImageStatisticsCalculator::Statistics GetStatisticsData();
-  /*! 
+  /*!
   /brief */
   mitk::Image::Pointer GetStatisticsImage();
-  /*! 
+  /*!
   /brief Set the time step of the image you want to process. */
   void SetTimeStep( int times );
-  /*! 
+  /*!
   /brief Get the time step of the image you want to process. */
   int GetTimeStep();
-  /*! 
+  /*!
   /brief Set flag to ignore zero valued voxels */
   void SetIgnoreZeroValueVoxel( bool _arg );
-  /*! 
+  /*!
   /brief Get status of zero value voxel ignoring. */
   bool GetIgnoreZeroValueVoxel();
-  /*! 
+  /*!
   /brief Returns the histogram of the currently selected time step. */
   HistogramType::Pointer GetTimeStepHistogram();
-  /*! 
+  /*!
   /brief Returns a flag indicating if the statistics have changed during calculation */
   bool GetStatisticsChangedFlag();
-  /*! 
+  /*!
   /brief Returns a flag the indicates if the statistics are updated successfully */
   bool GetStatisticsUpdateSuccessFlag();
-  /*! 
+  /*!
   /brief Method called once the thread is executed. */
   void run();
 

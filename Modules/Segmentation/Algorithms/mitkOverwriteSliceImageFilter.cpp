@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -90,7 +90,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
    itkExceptionMacro("Slice and image dimensions differ or slice index is too large. Sorry, cannot work like this.");
    return;
   }
-  
+
   if ( input->GetDimension() == 4 )
   {
     ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
@@ -99,8 +99,8 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     timeSelector->UpdateLargestPossibleRegion();
     input3D = timeSelector->GetOutput();
   }
- 
-  if ( m_SliceDifferenceImage.IsNull() || 
+
+  if ( m_SliceDifferenceImage.IsNull() ||
        m_SliceDifferenceImage->GetDimension(0) != m_SliceImage->GetDimension(0) ||
        m_SliceDifferenceImage->GetDimension(1) != m_SliceImage->GetDimension(1) )
   {
@@ -152,7 +152,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     imagetoitk->SetInput(nonConstImage);                                                     \
     imagetoitk->Update();                                                               \
     itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
-}                                                              
+}
 
 #define myMITKOverwriteSliceImageFilterAccessAllTypesByItk(mitkImage, itkImageTypeFunction,       dimension, itkimage2)    \
 {                                                                                                                           \
@@ -166,7 +166,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     myMITKOverwriteSliceImageFilterAccessByItk(mitkImage, itkImageTypeFunction, unsigned char,  dimension, itkimage2)       \
 }
 
-    
+
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::OverwriteSliceImageFilter::ItkImageSwitch( itk::Image<TPixel,VImageDimension>* itkImage )
 {
@@ -191,13 +191,13 @@ void mitk::OverwriteSliceImageFilter::ItkImageProcessing( itk::Image<TPixel1,VIm
   sliceInVolumeRegion = outputImage->GetLargestPossibleRegion();
   sliceInVolumeRegion.SetSize( m_SliceDimension, 1 );             // just one slice
   sliceInVolumeRegion.SetIndex( m_SliceDimension, m_SliceIndex ); // exactly this slice, please
-  
+
   OutputSliceIteratorType outputIterator( outputImage, sliceInVolumeRegion );
   outputIterator.SetFirstDirection(m_Dimension0);
   outputIterator.SetSecondDirection(m_Dimension1);
 
   InputSliceIteratorType inputIterator( inputImage, inputImage->GetLargestPossibleRegion() );
-  
+
   typename DiffImageType::Pointer diffImage;
   CastToItkImage( m_SliceDifferenceImage, diffImage );
   DiffSliceIteratorType diffIterator( diffImage, diffImage->GetLargestPossibleRegion() );
@@ -214,9 +214,9 @@ void mitk::OverwriteSliceImageFilter::ItkImageProcessing( itk::Image<TPixel1,VIm
       {
         diffIterator.Set( static_cast<short signed int>(inputIterator.Get() - outputIterator.Get()) ); // oh oh, not good for bigger values
         outputIterator.Set( (TPixel2) inputIterator.Get() );
-        ++outputIterator; 
-        ++inputIterator; 
-        ++diffIterator; 
+        ++outputIterator;
+        ++inputIterator;
+        ++diffIterator;
       }
       outputIterator.NextLine();
     }
@@ -227,7 +227,7 @@ void mitk::OverwriteSliceImageFilter::ItkImageProcessing( itk::Image<TPixel1,VIm
 std::string mitk::OverwriteSliceImageFilter::EventDescription( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep )
 {
   std::stringstream s;
-  
+
   s << "Changed slice (";
 
   switch (sliceDimension)

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,9 +27,9 @@ SegmentationSink::SegmentationSink()
 SegmentationSink::~SegmentationSink()
 {
 }
-    
-void SegmentationSink::Initialize(const NonBlockingAlgorithm* other) 
-{ 
+
+void SegmentationSink::Initialize(const NonBlockingAlgorithm* other)
+{
   Superclass::Initialize(other);
   // sinks should be called explicitly from the tool, because otherwise the order of setting "Input" and "Group node" would matter
   UnDefineTriggerParameter("Input");
@@ -58,7 +58,7 @@ bool SegmentationSink::ReadyToRun()
 
   return image.IsNotNull() && groupNode.IsNotNull();
 }
-   
+
 bool SegmentationSink::ThreadedUpdateFunction()
 {
   return true;
@@ -75,7 +75,7 @@ void SegmentationSink::InsertBelowGroupNode(mitk::DataNode* node)
       node->GetData()->DisconnectPipeline();
     m_DataStorage->Add( node, groupNode );
   }
-    
+
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -86,7 +86,7 @@ DataNode* SegmentationSink::GetGroupNode()
 
   return groupNode.GetPointer();
 }
-    
+
 DataNode* SegmentationSink::LookForPointerTargetBelowGroupNode(const char* name)
 {
   DataNode::Pointer groupNode;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,7 +30,7 @@ namespace mitk
 #endif
 
 /**
- * Encapsulates the enumeration for reslice interpolation. Valid values are 
+ * Encapsulates the enumeration for reslice interpolation. Valid values are
  * (VTK constant/Id/string representation):
  * VTK_RESLICE_NEAREST, VTK_RESLICE_LINEAR, VTK_RESLICE_CUBIC
  * Default is VTK_RESLICE_NEAREST
@@ -42,9 +42,9 @@ public:
   mitkClassMacro( VtkResliceInterpolationProperty, EnumerationProperty );
 
   itkNewMacro(VtkResliceInterpolationProperty);
-  
+
   mitkNewMacro1Param(VtkResliceInterpolationProperty, const IdType&);
-  
+
   mitkNewMacro1Param(VtkResliceInterpolationProperty, const std::string&);
 
   /**
@@ -56,30 +56,30 @@ public:
    * Sets the interpolation type to VTK_RESLICE_NEAREST.
    */
   virtual void SetInterpolationToNearest();
-  
+
   /**
    * Sets the interpolation type to VTK_RESLICE_LINEAR.
    */
   virtual void SetInterpolationToLinear();
-  
+
   /**
    * Sets the interpolation type to VTK_RESLICE_CUBIC.
    */
   virtual void SetInterpolationToCubic();
 
   using BaseProperty::operator=;
-  
+
 protected:
-  
+
   /** Sets reslice interpolation mode to default (VTK_RESLICE_NEAREST).
    */
   VtkResliceInterpolationProperty( );
-  
+
   /**
    * Constructor. Sets reslice interpolation to the given value.
    */
   VtkResliceInterpolationProperty( const IdType& value );
-  
+
   /**
    * Constructor. Sets reslice interpolation to the given value.
    */
@@ -92,7 +92,7 @@ protected:
   virtual bool AddEnum( const std::string& name, const IdType& id );
 
   /**
-   * Adds the enumeration types as defined by vtk to the list of known 
+   * Adds the enumeration types as defined by vtk to the list of known
    * enumeration values.
    */
   virtual void AddInterpolationTypes();

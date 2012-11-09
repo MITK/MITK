@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 
-namespace mitk 
+namespace mitk
 {
 
 class mitkMessageTestTestClass
@@ -231,7 +231,7 @@ class Law
    mitkNewMessageMacro(AnalysisStarted);
    mitkNewMessage1Macro(AnalysisStopped, bool);
    mitkNewMessage1Macro(LawDiscovered, const Law&);
-   //mitkNewMessageWithReturnMacro(PatentFiled, bool); 
+   //mitkNewMessageWithReturnMacro(PatentFiled, bool);
 
    public:
 
@@ -268,7 +268,7 @@ class Law
 
    public:
 
-     Observer(NewtonMachine* machine) : 
+     Observer(NewtonMachine* machine) :
       m_Machine(machine), m_MachineStarted(false), m_MachineStopped(false),
       m_Error(false), m_Law("NONE")
      {
@@ -387,13 +387,13 @@ int mitkMessageTest(int /* argc */, char* /*argv*/[])
   newtonMachine.StartAnalysis();
   MITK_TEST_CONDITION(observer1.m_MachineStarted == true, "Message from Message Macro send to receiver 1");
   MITK_TEST_CONDITION(observer2.m_MachineStarted == true, "Message from Message Macro send to receiver 2");
-  
-  MITK_TEST_CONDITION(observer1.m_Law.GetDescription() == std::string("Unit tests are mandatory!"), 
+
+  MITK_TEST_CONDITION(observer1.m_Law.GetDescription() == std::string("Unit tests are mandatory!"),
     "Message1 from Message Macro send to receiver 1");
-  MITK_TEST_CONDITION(observer2.m_Law.GetDescription() == std::string("Unit tests are mandatory!"), 
+  MITK_TEST_CONDITION(observer2.m_Law.GetDescription() == std::string("Unit tests are mandatory!"),
     "Message1 from Message Macro send to receiver 2");
 
-  
+
   // This will send one event to registered observers
   newtonMachine.StopAnalysis();
   MITK_TEST_CONDITION(observer1.m_MachineStopped == true, "Message1 from Message Macro send to receiver 1");
@@ -405,11 +405,11 @@ int mitkMessageTest(int /* argc */, char* /*argv*/[])
   /* Message with return type tests are work in progess... */
   //bool patentSuccessful = newtonMachine.PatentLaw();   // what with return types from multiple observers?
 
-  //MITK_TEST_CONDITION((observer1.m_PatentReviewed == true) && (patentSuccessful == false), 
+  //MITK_TEST_CONDITION((observer1.m_PatentReviewed == true) && (patentSuccessful == false),
   //  "Message with return type from Message Macro send to receiver 1");
   //
-  //MITK_TEST_CONDITION((observer2.m_PatentReviewed == true) && (patentSuccessful == false), 
+  //MITK_TEST_CONDITION((observer2.m_PatentReviewed == true) && (patentSuccessful == false),
   //  "Message with return type from Message Macro send to receiver 2");
-  
+
   MITK_TEST_END();
 }

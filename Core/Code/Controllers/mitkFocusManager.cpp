@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,11 +30,11 @@ mitk::FocusManager::~FocusManager()
 
 bool mitk::FocusManager::AddElement(FocusElement* element)
 {
-  // Try find  
+  // Try find
   mitk::FocusManager::FocusListIterator position = std::find(m_FocusList.begin(),m_FocusList.end(),element);
   if (position != m_FocusList.end())
     return false;
-  
+
   m_FocusList.push_back(element);
   if (m_FocElement.GetPointer() == NULL)
     m_FocElement = element;
@@ -43,7 +43,7 @@ bool mitk::FocusManager::AddElement(FocusElement* element)
 
 bool mitk::FocusManager::RemoveElement(FocusElement* element)
 {
-  // Try find  
+  // Try find
   mitk::FocusManager::FocusListIterator position = std::find(m_FocusList.begin(),m_FocusList.end(),element);
   if (position == m_FocusList.end())
     return false;
@@ -67,7 +67,7 @@ bool mitk::FocusManager::RemoveElement(FocusElement* element)
   return true;
 }
 
-mitk::FocusManager::FocusElement* mitk::FocusManager::GetFocused() const 
+mitk::FocusManager::FocusElement* mitk::FocusManager::GetFocused() const
 {
   return m_FocElement.GetPointer();
 }
@@ -132,9 +132,9 @@ bool mitk::FocusManager::GoToNext()
 }
 
 //##Documentation
-//## returns an iterator, that points to the 
+//## returns an iterator, that points to the
 //## beginning of the list
-mitk::FocusManager::FocusListIterator mitk::FocusManager::GetIter() 
+mitk::FocusManager::FocusListIterator mitk::FocusManager::GetIter()
 {
   return m_FocusList.begin();
 }

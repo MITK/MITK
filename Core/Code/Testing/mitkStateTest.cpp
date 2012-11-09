@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,10 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 int mitkStateTest(int /*argc*/, char* /*argv*/[])
 {
   int stateId = 10;
-  
+
   //Create State
   mitk::State::Pointer state = mitk::State::New("state", stateId);
-  
+
   //check reference count
   MITK_TEST_CONDITION_REQUIRED(state->GetReferenceCount() == 1,"Testing ReferenceCount of State");
 
@@ -57,7 +57,7 @@ int mitkStateTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(state->GetTransition(count+1) == firstTransition ,"Getting first transition");
   MITK_TEST_CONDITION_REQUIRED(state->GetReferenceCount() == 1,"Testing ReferenceCount still one");
   ++count;
-  
+
   mitk::Transition* secondTransition = new mitk::Transition(secondTName, count, count+1);
   MITK_TEST_CONDITION_REQUIRED(state->AddTransition( secondTransition ),"Adding second transition");
   MITK_TEST_CONDITION_REQUIRED(state->IsValidEvent(count+1),"Check if the second EventId is valid");
@@ -66,19 +66,19 @@ int mitkStateTest(int /*argc*/, char* /*argv*/[])
 
   ++count;
   MITK_TEST_CONDITION_REQUIRED( ! state->IsValidEvent(count+1),"Check if a non existent EventId is valid");
-  
+
   //deleting state and checking if transitions are deleted
   state = NULL;
-  MITK_TEST_CONDITION_REQUIRED(state.IsNull(),"Testing setting state to null and deleting it with it"); 
+  MITK_TEST_CONDITION_REQUIRED(state.IsNull(),"Testing setting state to null and deleting it with it");
 
-    
+
   std::cout << "Check state with cyclic definition: StateA->TransitionA->StateA: \n";
   stateId = 20;
   const char* name = "StateA";
   state = mitk::State::New(name, stateId);
   MITK_TEST_CONDITION_REQUIRED(state->GetId()==stateId,"Testing GetID ");
-  MITK_TEST_CONDITION_REQUIRED(state->GetName()==name,"Testing GetID "); 
-  MITK_TEST_CONDITION_REQUIRED(state->GetReferenceCount() == 1,"Testing ReferenceCount of State"); 
+  MITK_TEST_CONDITION_REQUIRED(state->GetName()==name,"Testing GetID ");
+  MITK_TEST_CONDITION_REQUIRED(state->GetReferenceCount() == 1,"Testing ReferenceCount of State");
   std::cout << "Add next state to transition: ";
   count = 0;
   //creating first transition
@@ -89,12 +89,12 @@ int mitkStateTest(int /*argc*/, char* /*argv*/[])
   //creating second transition
   secondTransition = new mitk::Transition(secondTName, stateId, count+2);
   secondTransition ->SetNextState(state);
-  state->AddTransition(secondTransition); 
+  state->AddTransition(secondTransition);
   MITK_TEST_CONDITION_REQUIRED(state->GetReferenceCount() == 1,"Testing ReferenceCount still one");
-  
+
   //destroying it again.
   state = NULL;
-  MITK_TEST_CONDITION_REQUIRED(state.IsNull(),"Testing setting state to null and deleting it with it"); 
+  MITK_TEST_CONDITION_REQUIRED(state.IsNull(),"Testing setting state to null and deleting it with it");
 
   //doesn't have to be done because the memory is freed in ~State destructor
   //delete firstTransition;

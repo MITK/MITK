@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -95,7 +95,7 @@ void PropertyView::OnDelete(const itk::EventObject& /*e*/)
     m_Property = NULL;
   }
 }
-    
+
 //---- PropertyEditor -------------------------------------------------------------
 
 PropertyEditor::PropertyEditor( mitk::BaseProperty* property )
@@ -138,7 +138,7 @@ void PropertyEditor::OnModified(const itk::EventObject& /*e*/)
 void PropertyEditor::OnDelete(const itk::EventObject& /*e*/)
 {
   if (m_SelfCall) return; // does this make any sense?
-  
+
   PropertyRemoved();
   if (m_Property)
   {

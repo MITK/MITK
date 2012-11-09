@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -169,7 +169,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   cout << "Computing sum of all RGBA values..\n";
   long int sum_now = 0;
-  for(int i=0;i<size[0]*size[1];i++) 
+  for(int i=0;i<size[0]*size[1];i++)
     sum_now += vtkImage->GetValue(i);
   std::cout << "Sum of all RGBA values: " << sum_now << "\n";
   std::cout << "Sum should be: " << sum_orig_Pic3D_pic_gz << "\n";
@@ -182,7 +182,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   //if(argv_str.size() - ((int) argv_str.find("Pic3D.pic.gz")) == 12)
   //{
-  //  std::cout << "Input image is Pic3D.pic.gz\n";    
+  //  std::cout << "Input image is Pic3D.pic.gz\n";
   //  std::cout << "Sum should be: " << sum_orig_Pic3D_pic_gz << "\n";
   //  if(sum_orig_Pic3D_pic_gz!=sum_now)
   //  {
@@ -206,7 +206,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   vtkImage->Delete();
   ds = NULL;
-  
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

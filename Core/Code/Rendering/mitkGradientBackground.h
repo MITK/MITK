@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,13 +30,13 @@ class vtkRenderWindow;
 
 namespace mitk {
 
-class RenderWindow;  
+class RenderWindow;
 /**
  * Displays a color gradient in the background
  * of a vtkRenderWindow.
  * The gradient ist faked by displaying a non-interactable
  * smoothly shaded plane in a separate layer behind the
- * scene. After setting the renderwindow, the gradient may be 
+ * scene. After setting the renderwindow, the gradient may be
  * activated by calling Enable()
  */
 class MITK_CORE_EXPORT GradientBackground : public BaseData
@@ -44,7 +44,7 @@ class MITK_CORE_EXPORT GradientBackground : public BaseData
 public:
 
   mitkClassMacro( GradientBackground, BaseData );
-  
+
   itkNewMacro( Self );
 
   /**
@@ -97,37 +97,37 @@ public:
    * If you want to enable it, call the Enable() function.
    */
   virtual void Disable();
-  
+
   /**
    * Checks, if the gradient background is currently
    * enabled (visible)
    */
   virtual bool IsEnabled();
-  
+
   /**
    * Empty implementation, since the GradientBackground doesn't
    * support the requested region concept
    */
   virtual void SetRequestedRegionToLargestPossibleRegion();
-  
+
   /**
    * Empty implementation, since the GradientBackground doesn't
    * support the requested region concept
    */
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-  
+
   /**
    * Empty implementation, since the GradientBackground doesn't
    * support the requested region concept
    */
   virtual bool VerifyRequestedRegion();
-  
+
   /**
    * Empty implementation, since the GradientBackground doesn't
    * support the requested region concept
    */
   virtual void SetRequestedRegion(itk::DataObject*);
-  
+
 protected:
 
   /**

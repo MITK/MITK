@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,23 +44,23 @@ public:
 };
 
 class MITK_CORE_EXPORT OperationEndEvent : public itk::EndEvent
-{ 
-public: 
-  typedef OperationEndEvent Self; 
-  typedef itk::EndEvent Superclass; 
-  OperationEndEvent(Operation* operation = NULL) : 
-    m_Operation(operation) {} 
-  virtual ~OperationEndEvent() {} 
-  virtual const char * GetEventName() const { return "OperationEndEvent"; } 
-  virtual bool CheckEvent(const ::itk::EventObject* e) const 
-    { return dynamic_cast<const Self*>(e); } 
-  virtual ::itk::EventObject* MakeObject() const 
-    { return new Self(m_Operation); } 
+{
+public:
+  typedef OperationEndEvent Self;
+  typedef itk::EndEvent Superclass;
+  OperationEndEvent(Operation* operation = NULL) :
+    m_Operation(operation) {}
+  virtual ~OperationEndEvent() {}
+  virtual const char * GetEventName() const { return "OperationEndEvent"; }
+  virtual bool CheckEvent(const ::itk::EventObject* e) const
+    { return dynamic_cast<const Self*>(e); }
+  virtual ::itk::EventObject* MakeObject() const
+    { return new Self(m_Operation); }
   Operation* GetOperation() const { return m_Operation; }
-private: 
+private:
   Operation* m_Operation;
-  OperationEndEvent(const Self&); 
-  void operator=(const Self&); 
+  OperationEndEvent(const Self&);
+  void operator=(const Self&);
 };
 
 }//namespace mitk

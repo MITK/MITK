@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,13 +26,13 @@ namespace mitk
 
   enum OdfScaleBy
   {
-    ODFSB_NONE, 
-    ODFSB_GFA, 
+    ODFSB_NONE,
+    ODFSB_GFA,
     ODFSB_PC
   };
 
 /**
- * Encapsulates the enumeration for ODF normalization. Valid values are 
+ * Encapsulates the enumeration for ODF normalization. Valid values are
  *     ODFSB_NONE, ODFSB_GFA, ODFSB_PC
  * Default is ODFSB_NONE
  */
@@ -42,11 +42,11 @@ public:
 
   mitkClassMacro( OdfScaleByProperty, EnumerationProperty );
   itkNewMacro(OdfScaleByProperty);
-  
+
   mitkNewMacro1Param(OdfScaleByProperty, const IdType&);
-  
+
   mitkNewMacro1Param(OdfScaleByProperty, const std::string&);
-  
+
   /**
    * Returns the current interpolation value as defined by VTK constants.
    */
@@ -55,18 +55,18 @@ public:
   virtual void SetScaleByNothing();
   virtual void SetScaleByGFA();
   virtual void SetScaleByPrincipalCurvature();
-  
+
 protected:
-  
+
   /** Sets reslice interpolation mode to default (ODFSB_NONE).
    */
   OdfScaleByProperty( );
-  
+
   /**
    * Constructor. Sets reslice interpolation to the given value.
    */
   OdfScaleByProperty( const IdType& value );
-  
+
   /**
    * Constructor. Sets reslice interpolation to the given value.
    */
@@ -79,7 +79,7 @@ protected:
   virtual bool AddEnum( const std::string& name, const IdType& id );
 
   /**
-   * Adds the enumeration types as defined by vtk to the list of known 
+   * Adds the enumeration types as defined by vtk to the list of known
    * enumeration values.
    */
   virtual void AddInterpolationTypes();

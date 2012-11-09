@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,14 +51,14 @@ std::string mitk::CreateSurfaceTool::GetErrorMessage()
 {
   return "No surfaces created for these segmentations:";
 }
-    
+
 bool mitk::CreateSurfaceTool::ProcessOneWorkingData( DataNode* node )
 {
   if (node)
   {
     Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
     if (image.IsNull()) return false;
-      
+
     try
     {
       mitk::ShowSegmentationAsSurface::Pointer surfaceFilter = mitk::ShowSegmentationAsSurface::New();
@@ -77,7 +77,7 @@ bool mitk::CreateSurfaceTool::ProcessOneWorkingData( DataNode* node )
       surfaceFilter->SetParameter("Show result", true );
       surfaceFilter->SetParameter("Sync visibility", false );
       surfaceFilter->SetDataStorage( *m_ToolManager->GetDataStorage() );
-      
+
       ProgressBar::GetInstance()->AddStepsToDo(1);
       StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
       surfaceFilter->StartAlgorithm();

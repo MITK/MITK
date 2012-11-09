@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include "mitkException.h"
 
-/** The exception macro is used to throw an exception 
- *  (i.e., usually a condition that results in program failure). 
+/** The exception macro is used to throw an exception
+ *  (i.e., usually a condition that results in program failure).
  *
  *  Example usage looks like:
  *  mitkThrow() << "this is error info";
@@ -50,14 +50,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkReThrow(mitkexception) \
     mitkexception.AddRethrowData(__FILE__,__LINE__,"Rethrow by mitkReThrow macro.");\
     throw mitkexception
- 
-/** The specialized exception macro is used to throw exceptions 
-  * in cases of specialized errors. This means the second parameter must be a class which 
+
+/** The specialized exception macro is used to throw exceptions
+  * in cases of specialized errors. This means the second parameter must be a class which
   * inherits from mitk::Exception. An object of this exception is thrown when using the macro.
   * Thus, more differentiated excaptions can be thrown, when needed.
   *
   * Example usage:
-  * mitkSpecializedExceptionMacro(mitk::MySpecializedException) << "this is error info"; 
+  * mitkSpecializedExceptionMacro(mitk::MySpecializedException) << "this is error info";
   */
 #define mitkThrowException(classname) throw classname(__FILE__,__LINE__,"",ITK_LOCATION)
 

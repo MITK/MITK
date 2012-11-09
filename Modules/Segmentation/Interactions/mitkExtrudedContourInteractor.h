@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,7 +45,7 @@ namespace mitk {
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
     /**
-    * entry method for any interaction. Method is called if user 
+    * entry method for any interaction. Method is called if user
     * presses the left mouse button down.
     */
     virtual void Press (mitk::Point3D& op);

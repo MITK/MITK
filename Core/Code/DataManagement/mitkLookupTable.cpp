@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,14 +32,14 @@ mitk::LookupTable::~LookupTable()
 {
   if ( m_LookupTable )
   {
-    m_LookupTable->Delete();   
+    m_LookupTable->Delete();
     m_LookupTable = NULL;
   }
 }
 
 void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
 {
-  
+
   if(m_LookupTable == lut)
   {
     return;
@@ -53,11 +53,11 @@ void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
 
   if(lut)
   {
-    lut->Register(NULL);    
+    lut->Register(NULL);
   }
 
   m_LookupTable = lut;
-  this->Modified();  
+  this->Modified();
 
 }
 
@@ -116,12 +116,12 @@ mitk::LookupTable::RawLookupTableType * mitk::LookupTable::GetRawLookupTable() c
 */
 bool mitk::LookupTable::operator==( const mitk::LookupTable& other ) const
 {
-  if ( m_LookupTable == other.GetVtkLookupTable()) 
+  if ( m_LookupTable == other.GetVtkLookupTable())
     return true;
   vtkLookupTable* olut = other.GetVtkLookupTable();
   if (olut == NULL)
     return false;
-  
+
   bool equal = (m_LookupTable->GetNumberOfColors() == olut->GetNumberOfColors())
             && (m_LookupTable->GetTableRange()[0] == olut->GetTableRange()[0])
             && (m_LookupTable->GetTableRange()[1] == olut->GetTableRange()[1])

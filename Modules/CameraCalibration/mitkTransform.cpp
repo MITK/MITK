@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -261,7 +261,7 @@ namespace mitk
     return s.str();
   }
 
-  void Transform::Copy( const mitk::Transform* transform ) 
+  void Transform::Copy( const mitk::Transform* transform )
   {
     m_NavData->Graft(transform->GetNavigationData());
     m_Type = transform->GetType();
@@ -555,7 +555,7 @@ namespace mitk
       return;
 
     m_NavData->SetDataValid( valid );
-    this->Modified();    
+    this->Modified();
   }
 
   std::string mitk::Transform::ToString() const

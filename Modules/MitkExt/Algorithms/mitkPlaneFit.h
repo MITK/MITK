@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,37 +26,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  //!  
+  //!
   //  kind regards to dr. math!
   // function [x0, a, d, normd] = lsplane(X)
   // ---------------------------------------------------------------------
   // LSPLANE.M   Least-squares plane (orthogonal distance
   //             regression).
   //
-  // Version 1.0    
-  // Last amended   I M Smith 27 May 2002. 
+  // Version 1.0
+  // Last amended   I M Smith 27 May 2002.
   // Created        I M Smith 08 Mar 2002
   // ---------------------------------------------------------------------
-  // Input    
-  // X        Array [x y z] where x = vector of x-coordinates, 
-  //          y = vector of y-coordinates and z = vector of 
-  //          z-coordinates. 
-  //          Dimension: m x 3. 
-  // 
-  // Output   
+  // Input
+  // X        Array [x y z] where x = vector of x-coordinates,
+  //          y = vector of y-coordinates and z = vector of
+  //          z-coordinates.
+  //          Dimension: m x 3.
+  //
+  // Output
   // x0       Centroid of the data = point on the best-fit plane.
-  //          Dimension: 3 x 1. 
-  // 
-  // a        Direction cosines of the normal to the best-fit 
-  //          plane. 
   //          Dimension: 3 x 1.
-  // 
-  // <Optional... 
-  // d        Residuals. 
-  //          Dimension: m x 1. 
-  // 
-  // normd    Norm of residual errors. 
-  //          Dimension: 1 x 1. 
+  //
+  // a        Direction cosines of the normal to the best-fit
+  //          plane.
+  //          Dimension: 3 x 1.
+  //
+  // <Optional...
+  // d        Residuals.
+  //          Dimension: m x 1.
+  //
+  // normd    Norm of residual errors.
+  //          Dimension: 1 x 1.
   // ...>
   //
   // [x0, a <, d, normd >] = lsplane(X)
@@ -129,15 +129,15 @@ namespace mitk {
 
       /*!keeps a copy of the pointset.*/
       const mitk::PointSet* m_PointSet;
-      
+
       /* output object - a time sliced geometry.*/
       mitk::TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
 
       std::vector< mitk::PlaneGeometry::Pointer > m_Planes;
-      
+
       /*! the calculatet center point of all points in the point set.*/
       std::vector< mitk::Point3D > m_Centroids;
-      
+
       /* the normal vector to descrie a plane gemoetry.*/
       std::vector< mitk::Vector3D > m_PlaneVectors;
   };

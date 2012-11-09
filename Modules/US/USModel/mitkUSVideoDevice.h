@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -63,7 +63,7 @@ namespace mitk {
 
       static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
 
-      
+
 
       /**
       * \brief Creates a new device that will deliver USImages taken from a video device.
@@ -94,7 +94,7 @@ namespace mitk {
       void Init();
 
       /**
-      * \brief Is called during the connection process. 
+      * \brief Is called during the connection process.
       *  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
       */
       virtual bool OnConnection();
@@ -103,18 +103,18 @@ namespace mitk {
       * \brief Is called during the disconnection process.
       *  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
       */
-      virtual bool OnDisconnection();    
+      virtual bool OnDisconnection();
 
       /**
       * \brief Is called during the activation process. After this method is finsihed, the device should be generating images
       */
-      virtual bool OnActivation();    
+      virtual bool OnActivation();
 
 
       /**
       * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
       */
-      virtual void OnDeactivation();  
+      virtual void OnDeactivation();
 
       /**
       * \brief The image source that we use to aquire data

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,7 +23,7 @@ class mitkToolManagerTestClass { public:
 
 static void TestToolManagerWithOutTools(mitk::ToolManager::Pointer toolManager)
 {
-  MITK_TEST_CONDITION( toolManager->GetTools().size() == 0, "Get empty tool list" )   
+  MITK_TEST_CONDITION( toolManager->GetTools().size() == 0, "Get empty tool list" )
   MITK_TEST_CONDITION( toolManager->GetToolById(0) == NULL, "Get empty tool by id" )
 }
 
@@ -47,7 +47,7 @@ static void TestSetterMethods(mitk::ToolManager::Pointer toolManager)
   MITK_TEST_CONDITION( toolManager->GetReferenceData().size() == 1, "Get reference data size (1)" )
   MITK_TEST_CONDITION( toolManager->GetReferenceData(0) == nodeEmpty, "Check if it is the right reference data" )
   MITK_TEST_CONDITION( toolManager->GetReferenceData()[0] == nodeEmpty, "Check if it is the right reference data vector" )
-  
+
   mitk::DataNode::Pointer nodeEmpty2 = mitk::DataNode::New();
   toolManager->SetWorkingData(nodeEmpty2);
   MITK_TEST_CONDITION( toolManager->GetWorkingData().size() == 1, "Get working data size (1)" )
@@ -72,7 +72,7 @@ int mitkToolManagerTest(int /* argc */, char* /*argv*/[])
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(toolManager.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(toolManager.IsNotNull(),"Testing instantiation")
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!
@@ -80,10 +80,10 @@ int mitkToolManagerTest(int /* argc */, char* /*argv*/[])
 
   //now we add one tool
   toolManager = mitk::ToolManager::New(dataStorage.GetPointer());
- 
+
   //start test with tool
   mitkToolManagerTestClass::TestToolManagerWithTools(toolManager);
-  
+
   //now the setter methods
   mitkToolManagerTestClass::TestSetterMethods(toolManager);
 

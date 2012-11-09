@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -91,11 +91,11 @@ namespace mitk {
 
     //##Documentation
     //## loads an XML-File containing events and adds definition to internal mapping list
-    //## 
+    //##
     //## Several files can be loaded. Event descriptions have to be unique or a warning will be displayed.
-    //## If the same file is loaded twice, 
+    //## If the same file is loaded twice,
     //## it will only be parsed the first time.
-    //## If a file A, then a file B and then file A is to be loaded, warnings 
+    //## If a file A, then a file B and then file A is to be loaded, warnings
     //## will be displayed when loading file A the second time.
     bool LoadBehavior(std::string fileName);
 
@@ -124,12 +124,12 @@ namespace mitk {
     friend class mitk::GlobalInteraction;
 
     /**
-    * @brief adds a new EventMapper addon 
+    * @brief adds a new EventMapper addon
     */
     void AddEventMapperAddOn(mitk::EventMapperAddOn* newAddOn);
 
     /**
-    * @brief removes an EventMapper addon 
+    * @brief removes an EventMapper addon
     */
     void RemoveEventMapperAddOn(mitk::EventMapperAddOn* unusedAddOn);
 

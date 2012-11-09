@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -117,7 +117,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateOutputInformation()
     output->Initialize( refPtype, *input->GetTimeSlicedGeometry() );
   }
 
-  output->SetPropertyList(input->GetPropertyList()->Clone());    
+  output->SetPropertyList(input->GetPropertyList()->Clone());
 
   m_TimeOfHeaderInitialization.Modified();
 }
@@ -181,7 +181,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
     else
     {
       // Otherwise, write warning and graft input to output
-      
+
       // ...TBD...
     }
 
@@ -192,8 +192,8 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
 
 
 template < typename TPixel, unsigned int VImageDimension >
-void mitk::RGBToRGBACastImageFilter::InternalCast( 
-  itk::Image< TPixel, VImageDimension > *inputItkImage, 
+void mitk::RGBToRGBACastImageFilter::InternalCast(
+  itk::Image< TPixel, VImageDimension > *inputItkImage,
   mitk::RGBToRGBACastImageFilter *addComponentFilter,
   typename TPixel::ComponentType defaultAlpha )
 {
@@ -205,20 +205,20 @@ void mitk::RGBToRGBACastImageFilter::InternalCast(
   typedef itk::ImageRegionConstIterator< InputImageType > InputImageIteratorType;
   typedef itk::ImageRegionIteratorWithIndex< OutputImageType > OutputImageIteratorType;
 
-  typename mitk::ImageToItk< OutputImageType >::Pointer outputimagetoitk = 
+  typename mitk::ImageToItk< OutputImageType >::Pointer outputimagetoitk =
     mitk::ImageToItk< OutputImageType >::New();
   outputimagetoitk->SetInput(addComponentFilter->m_OutputTimeSelector->GetOutput());
   outputimagetoitk->Update();
   typename OutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
 
   // create the iterators
-  typename InputImageType::RegionType inputRegionOfInterest = 
+  typename InputImageType::RegionType inputRegionOfInterest =
     inputItkImage->GetLargestPossibleRegion();
   InputImageIteratorType  inputIt( inputItkImage, inputRegionOfInterest );
   OutputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
 
   for ( inputIt.GoToBegin(), outputIt.GoToBegin();
-        !inputIt.IsAtEnd(); 
+        !inputIt.IsAtEnd();
         ++inputIt, ++outputIt )
   {
     typename InputPixelType::Iterator pixelInputIt = inputIt.Get().Begin();

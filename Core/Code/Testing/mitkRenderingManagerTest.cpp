@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,8 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  *  Simple example for a test for the class "RenderingManager".
- *  
- *  argc and argv are the command line parameters which were passed to 
+ *
+ *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
@@ -48,7 +48,7 @@ static void TestPropertyList(mitk::RenderingManager::Pointer renderingManager)
 {
 
   mitk::PropertyList::Pointer propertyList =  renderingManager->GetPropertyList();
-   
+
   MITK_TEST_CONDITION(renderingManager->GetPropertyList().IsNotNull(), "Testing if the constructor set the propertylist" )
 
   //check if the default properties are set
@@ -57,7 +57,7 @@ static void TestPropertyList(mitk::RenderingManager::Pointer renderingManager)
   mitk::BoolProperty* prop = dynamic_cast<mitk::BoolProperty*>( renderingManager->GetProperty("booltest") );
 
   MITK_TEST_CONDITION(prop->GetValue(), "Testing if getting the bool property" )
-  
+
   MITK_TEST_CONDITION(propertyList == renderingManager->GetPropertyList(), "Testing if the propertylist has changed during the last tests" )
 }
 
@@ -68,7 +68,7 @@ static void TestSurfaceLoading( mitk::RenderingManager::Pointer renderingManager
 
   double planeBounds[] = { -1.0, 1.0, -1.0, 1.0, 0.0, 0.0 };
   double cubeBounds[] = { -0.5, 0.5, -0.5, 0.5, -0.5, 0.5 };
-  plane->SetBounds( planeBounds ); 
+  plane->SetBounds( planeBounds );
   plane->SetCenter( 0.0, 0.0, 0.0 );
 
   vtkPolyData* polys = plane->GetOutput();
@@ -93,7 +93,7 @@ static void TestSurfaceLoading( mitk::RenderingManager::Pointer renderingManager
 
   // create and render three dimensional surface
   vtkCubeSource* cube = vtkCubeSource::New();
-  cube->SetBounds( cubeBounds ); 
+  cube->SetBounds( cubeBounds );
   cube->SetCenter( 0.0, 0.0, 0.0 );
 
   vtkPolyData* polyCube = cube->GetOutput();
@@ -177,16 +177,16 @@ int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
 
   mitk::RenderingManager::Pointer myRenderingManager = mitk::RenderingManager::New();
 
-  MITK_TEST_CONDITION_REQUIRED(myRenderingManager.IsNotNull(),"Testing instantiation of second 'local' instance") 
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager.IsNotNull(),"Testing instantiation of second 'local' instance")
 
-  MITK_TEST_CONDITION_REQUIRED(myRenderingManager != globalRenderingManager ,"Testing whether global instance equals new local instance (must not be!)") 
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager != globalRenderingManager ,"Testing whether global instance equals new local instance (must not be!)")
 
 
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   mitk::StandaloneDataStorage::Pointer ds2 = mitk::StandaloneDataStorage::New();
   mitk::GlobalInteraction::Pointer gi = mitk::GlobalInteraction::New();
   gi->Initialize("global");
-  
+
   myRenderingManager->SetDataStorage(ds);
   myRenderingManager->SetGlobalInteraction(gi);
 
@@ -196,12 +196,12 @@ int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
   mitk::BaseRenderer::AddInstance(vtkRenWin,br);
   myRenderingManager->AddRenderWindow(vtkRenWin);
 
-  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetDataStorage() == ds, "Testing the setter and getter for internal DataStorage") 
-  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetGlobalInteraction() ==gi, "Testing the setter and getter for internal GlobalInteraction") 
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetDataStorage() == ds, "Testing the setter and getter for internal DataStorage")
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetGlobalInteraction() ==gi, "Testing the setter and getter for internal GlobalInteraction")
 
-  MITK_TEST_CONDITION_REQUIRED(br->GetDataStorage() == ds,"Testing if internal DataStorage has been set correctly for registered BaseRenderer") 
+  MITK_TEST_CONDITION_REQUIRED(br->GetDataStorage() == ds,"Testing if internal DataStorage has been set correctly for registered BaseRenderer")
   myRenderingManager->SetDataStorage(ds2);
-  MITK_TEST_CONDITION_REQUIRED(br->GetDataStorage() == ds2,"Testing if change of internal DataStorage has been forwarded correctly to registered BaseRenderer") 
+  MITK_TEST_CONDITION_REQUIRED(br->GetDataStorage() == ds2,"Testing if change of internal DataStorage has been forwarded correctly to registered BaseRenderer")
 
   mitkRenderingManagerTestClass::TestPropertyList(myRenderingManager);
 
@@ -215,7 +215,7 @@ int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
 
   //Delete vtk variable correctly
   vtkRenWin->Delete();
-    
+
   // always end with this!
   MITK_TEST_END()
 }

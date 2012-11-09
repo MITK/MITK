@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -103,8 +103,8 @@ namespace mitk
 
     /** @brief Sets the directory where the calibration file of the MicronTracker can be found. */
     itkSetMacro(CalibrationDir,std::string);
-	
-	/** @brief Gets the current calibration directory. */
+
+  /** @brief Gets the current calibration directory. */
     itkGetMacro(CalibrationDir,std::string);
 
   protected:

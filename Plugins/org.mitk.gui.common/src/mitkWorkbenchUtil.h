@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,7 +35,7 @@ namespace mitk {
  * @brief Utility class for loading data, opening editors and other tasks in a MITK Workbench.
  *
  * @note Infering the content type is not yet supported (ignore the comments about it
- *       in the method documentation). 
+ *       in the method documentation).
  */
 struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
 {

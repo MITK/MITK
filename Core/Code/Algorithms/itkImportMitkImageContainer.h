@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ namespace itk
  * TElement =
  *    The element type stored in the container.
  */
-  
+
 template <typename TElementIdentifier, typename TElement>
 class ImportMitkImageContainer:  public ImportImageContainer<TElementIdentifier, TElement>
 {
@@ -47,14 +47,14 @@ public:
   typedef Object                    Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
-    
+
   /** Save the template parameters. */
   typedef TElementIdentifier  ElementIdentifier;
   typedef TElement            Element;
-    
+
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
-  
+
   /** Standard part of every itk Object. */
   itkTypeMacro(ImportMitkImageContainer, ImportImageContainer);
 

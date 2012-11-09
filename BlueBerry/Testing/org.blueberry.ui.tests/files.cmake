@@ -1,7 +1,7 @@
 set(MOC_H_FILES
   src/berryPluginActivator.h
   src/berryUiTestSuite.h
-  
+
   src/api/berryMockViewPart.h
   src/api/berrySaveableMockViewPart.h
 )
@@ -26,11 +26,11 @@ set(SRC_CPP_FILES
   api/berrySaveableMockViewPart.cpp
   api/berryUiApiTestSuite.cpp
   api/berryXMLMementoTest.cpp
-  
+
 )
 
 set(INTERNAL_CPP_FILES
-  
+
 )
 
 set(CPP_FILES )

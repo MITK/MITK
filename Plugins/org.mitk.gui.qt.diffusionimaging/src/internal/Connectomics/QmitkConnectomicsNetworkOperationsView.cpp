@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,7 +46,7 @@ const std::string QmitkConnectomicsNetworkOperationsView::VIEW_ID = "org.mitk.vi
 QmitkConnectomicsNetworkOperationsView::QmitkConnectomicsNetworkOperationsView()
 : QmitkFunctionality()
 , m_Controls( 0 )
-, m_MultiWidget( NULL )  
+, m_MultiWidget( NULL )
 , m_demomode( false )
 , m_currentIndex( 0 )
 {
@@ -129,7 +129,7 @@ void QmitkConnectomicsNetworkOperationsView::OnSelectionChanged( std::vector<mit
   {
     mitk::DataNode::Pointer node = *it;
     currentFormatUnknown = true;
-  
+
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       currentFormatUnknown = false;
@@ -275,7 +275,7 @@ void QmitkConnectomicsNetworkOperationsView::TurnIntoRGBA( itk::Image<TPixel, VI
   int gapCounter = 0; //this variable will be used to count the empty labels
 
   //stores how much has to be subtracted from the image to remove gaps
-  std::vector< TPixel > subtractionStorage; 
+  std::vector< TPixel > subtractionStorage;
   subtractionStorage.resize( range + 1, 0 );
 
   for( int index = 0; index <= range; index++ )
@@ -336,7 +336,7 @@ void QmitkConnectomicsNetworkOperationsView::TurnIntoRGBA( itk::Image<TPixel, VI
     it_rgbaImage.Value() = lookupTable[ int ( it_inputImage.Value() ) - offset ];
   }
 
-  mitk::Image::Pointer mitkRGBAImage = mitk::ImportItkImage( rgbaImage ); 
+  mitk::Image::Pointer mitkRGBAImage = mitk::ImportItkImage( rgbaImage );
 
   mitk::DataNode::Pointer rgbaImageNode = mitk::DataNode::New();
   rgbaImageNode->SetData(mitkRGBAImage);
@@ -353,7 +353,7 @@ void QmitkConnectomicsNetworkOperationsView::OnModularizePushButtonClicked()
     QMessageBox::information( NULL, "Modularization calculation", "Please select exactly one network.");
     return;
   }
-  
+
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
     it != nodes.end();
     ++it )

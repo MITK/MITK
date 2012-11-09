@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,9 +26,9 @@ namespace mitk {
   //##Documentation
   //## @brief Base class for all predicates that can have child predicates (e.g. AND/OR)
   //##
-  //## This class provides methods to add and remove child predicates. It is used for 
+  //## This class provides methods to add and remove child predicates. It is used for
   //## predicates that are compositions of other predicates like AND and OR.
-  //## 
+  //##
   //## @ingroup DataStorage
   class MITK_CORE_EXPORT NodePredicateCompositeBase : public NodePredicateBase
   {

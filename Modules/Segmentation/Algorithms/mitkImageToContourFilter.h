@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,10 +34,10 @@ namespace mitk {
 
 /**
   \brief A filter that can extract contours out of a 2D binary image
-  
+
   This class takes an 2D mitk::Image as input and extracts all contours which are drawn it. The contour
   extraction is done by using the itk::ContourExtractor2DImageFilter.
-  
+
   The output is a mitk::Surface.
 
   $Author: fetzer$
@@ -50,12 +50,12 @@ class Segmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
    itkNewMacro(Self);
 
     /**
-      \brief Set macro for the geometry of the slice. If it is not set explicitly the geometry will be taken from the slice 
-      
-      \a Parameter The slice`s geometry 
+      \brief Set macro for the geometry of the slice. If it is not set explicitly the geometry will be taken from the slice
+
+      \a Parameter The slice`s geometry
     */
    itkSetMacro(SliceGeometry, Geometry3D*);
-   
+
    //typedef unsigned int VDimension;
    typedef itk::PolyLineParametricPath<2> PolyLineParametricPath2D;
    typedef PolyLineParametricPath2D::VertexListType ContourPath;
@@ -73,13 +73,13 @@ class Segmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
      \a Parameter The stepsize for progressing
    */
    void SetProgressStepSize(unsigned int stepSize);
-   
+
  protected:
    ImageToContourFilter();
    virtual ~ImageToContourFilter();
    virtual void GenerateData();
    virtual void GenerateOutputInformation();
-   
+
  private:
    const Geometry3D* m_SliceGeometry;
    bool m_UseProgressBar;

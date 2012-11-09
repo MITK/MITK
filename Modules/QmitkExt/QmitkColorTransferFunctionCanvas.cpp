@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,7 +45,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
 
   if( ! this->isEnabled() )
     return;
- 
+
   if (m_ColorTransferFunction)
   {
     for (int x = contentsRect.x(); x < contentsRect.x() + contentsRect.width(); x++)
@@ -59,7 +59,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
       painter.drawLine(x, 1, x, contentsRect.height());
     }
   }
- 
+
  //paint title
   if (m_Title.size()>0)
   {
@@ -68,32 +68,32 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
     painter.setPen(Qt::white);
     painter.drawText(QPoint(10,20),m_Title);
   }
-  
+
   //paint min and max
   QString qs_min = QString::number( m_Min );
   QString qs_max = QString::number( m_Max );
-  
+
   QRect qr_min = painter.fontMetrics().boundingRect( qs_min );
   QRect qr_max = painter.fontMetrics().boundingRect( qs_max );
-  
+
   int y,x;
-    
-  y=this->contentsRect().height()-qr_min.height()+5; 
-  x=10; 
-  
+
+  y=this->contentsRect().height()-qr_min.height()+5;
+  x=10;
+
   painter.setPen(Qt::black);
   painter.drawText(QPoint(x+1,y+1),qs_min);
   painter.setPen(Qt::white);
   painter.drawText(QPoint(x  ,y  ),qs_min);
 
-  y=this->contentsRect().height()-qr_max.height()+5; 
-  x=this->contentsRect().width()-qr_max.width()-6; 
+  y=this->contentsRect().height()-qr_max.height()+5;
+  x=this->contentsRect().width()-qr_max.width()-6;
 
   painter.setPen(Qt::black);
   painter.drawText(QPoint(x,y+1),qs_max);
   painter.setPen(Qt::white);
   painter.drawText(QPoint(x,y  ),qs_max);
-  
+
   if (m_ColorTransferFunction)
   {
     // now paint the handles
@@ -118,7 +118,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
           //m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
         }
       }
-      
+
     }
   }
 }

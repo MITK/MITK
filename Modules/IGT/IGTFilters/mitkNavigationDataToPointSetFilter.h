@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,21 +28,21 @@ namespace mitk {
   *
   * \brief This filter creates mitk::PointSet objects from mitk::NavigaitionData objects
   *
-  * This filter has two modes that can be set with SetOperationMode(). 
+  * This filter has two modes that can be set with SetOperationMode().
   * - Mode3D:   every input NavigationData is processed into one output pointset.  For each call to Update() a point with the ND position will be added to the PointSet
   * - Mode4D:   one output pointset is generated that contains one point for each input NavigationData. Each call to Update() adds a new timestep to the PointSet that contains new positions for the points.
   *
   * \ingroup IGT
-  * 
+  *
   */
   class MitkIGT_EXPORT NavigationDataToPointSetFilter : public PointSetSource
   {
   public:
     mitkClassMacro(NavigationDataToPointSetFilter, PointSetSource);
     itkNewMacro(Self);
-    
+
     /**Documentation
-    * \brief There are two different operation modes. 
+    * \brief There are two different operation modes.
     *
     * - Mode3D:   every input NavigationData is processed into one output pointset that contains a point with the ND position for each Update()
     * - Mode3DMean:   a defined number of input NavigationData is used to generate a mean position and processed into one output pointset that contains a point with the ND position for each Update()
@@ -84,7 +84,7 @@ namespace mitk {
     * \brief Sets one input NavigationData
     */
     virtual void SetInput(const mitk::NavigationData *NavigationData);
-   
+
     /**
     * \brief Sets the input NavigationData at a specific index
     */
@@ -117,7 +117,7 @@ namespace mitk {
     */
     itkGetConstMacro(OperationMode, OperationMode);
 
-    
+
     void GenerateOutputInformation() {}; ///< empty implementation to prevent calling of the superclass method that would try to copy information from the input NavigationData to the output PointSet, which makes no sense!
 
   protected:

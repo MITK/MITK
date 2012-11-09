@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ namespace mitk {
   *        and NavigationToolStorageDeserializer.
   *
   * \ingroup IGT
-  */  
+  */
   class MitkIGT_EXPORT NavigationToolStorage : public itk::Object
   {
   public:
@@ -49,7 +49,7 @@ namespace mitk {
     itkNewMacro(Self);
     /** @brief Constructs a NavigationToolStorage with reference to a DataStorage. The Data Nodes of tools are added and removed automatically to this data storage. */
     mitkNewMacro1Param(Self,mitk::DataStorage::Pointer);
-    
+
 
     /**
     *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
@@ -76,21 +76,21 @@ namespace mitk {
 
 
     /**
-     * @brief  Adds a tool to the storage. Be sure that the tool has a unique 
+     * @brief  Adds a tool to the storage. Be sure that the tool has a unique
      *         identifier which is not already part of this storage.
      * @return Returns true if the tool was added to the storage, false if not
      *         (false can be returned if the identifier already exists in this storage
      *         for example).
      */
     bool AddTool(mitk::NavigationTool::Pointer tool);
-    
+
     /**
      * @return Returns the tracking tool at the position "number"
      *         in the storage. Returns NULL if there is no
      *         tracking tool at this position.
      */
     mitk::NavigationTool::Pointer GetTool(int number);
-    
+
     /**
      * @return Returns the tracking tool with the given identifier.
      *         Returns NULL if there is no
@@ -104,7 +104,7 @@ namespace mitk {
      *         tracking tool with this name in the storage.
      */
     mitk::NavigationTool::Pointer GetToolByName(std::string name);
-    
+
 
     /**
      * @brief Deletes a tool from the collection.
@@ -131,12 +131,12 @@ namespace mitk {
      *         Returns NULL if none is set.
      */
     itkGetMacro(DataStorage,mitk::DataStorage::Pointer);
-    
+
   protected:
     NavigationToolStorage();
     NavigationToolStorage(mitk::DataStorage::Pointer);
     ~NavigationToolStorage();
-    
+
     std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
     mitk::DataStorage::Pointer m_DataStorage;
 

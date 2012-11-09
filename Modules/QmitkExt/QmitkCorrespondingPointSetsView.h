@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,7 +30,7 @@ class QmitkStdMultiWidget;
 /*!
 * \brief GUI widget for handling mitk::PointSet
 *
-* Displays all the points in a mitk::PointSet graphically. 
+* Displays all the points in a mitk::PointSet graphically.
 * Reacts automatically to changes in the PointSet's selection status.
 * Updates PointSet's selection status when this list's selection changes.
 *
@@ -73,13 +73,13 @@ signals:
   void SignalAddPointsModeChanged(bool);
 
 public slots:
-    
+
   void AddPointSet();
 
   void RemoveSelectedPoint();
 
   void MoveSelectedPointDown();
-  
+
   void MoveSelectedPointUp();
 
   void AddPointsMode(bool checked);

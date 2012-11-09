@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 //#include <mitkVector.h>
 
-namespace mitk 
+namespace mitk
 {
 
   /**Documentation
@@ -78,7 +78,7 @@ namespace mitk
     };
 
     /**Documentation
-    * \brief identifier for tracking device. The way it is currently used 
+    * \brief identifier for tracking device. The way it is currently used
   * represents a product line rather than an actal type. Refactoring is a future option.
     */
     enum TrackingDeviceType
@@ -93,7 +93,7 @@ namespace mitk
       TrackingSystemInvalid      ///< entry for invalid state (mainly for testing)
     };
 
-  
+
 
     /**Documentation
     * \brief Error codes of NDI tracking devices
@@ -111,7 +111,7 @@ namespace mitk
   * Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
     * a tracking device itself (as 3d-Object) is represented by an instance of the class mitk::TrackingVolume
     * as defined by NDI API SFLIST (Aurora and Polaris API guide)
-  * 
+  *
     */
     enum NDITrackingVolume
     {
@@ -133,8 +133,8 @@ namespace mitk
       TrackingDeviceType Line;
     std::string Model;
     std::string VolumeModelLocation;
-    };  
-    
+    };
+
 
   /**
   * Here all supported devices are defined. Dont forget to introduce new Devices into the TrackingDeviceList Array at the bottom!
@@ -162,15 +162,15 @@ namespace mitk
   DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataInvalid};
 
   /**
-  * /brief Returns all devices compatibel to the given Line of Devices 
+  * /brief Returns all devices compatibel to the given Line of Devices
   */
   static std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType Type){
     std::vector<TrackingDeviceData> Result;
     int size = (sizeof (TrackingDeviceList) / sizeof*(TrackingDeviceList));
     for(int i=0; i < size; i++)
-    {      
+    {
       if(TrackingDeviceList[i].Line == Type ) Result.push_back(TrackingDeviceList[i]);
-    } 
+    }
     return Result;
   }
 
@@ -179,7 +179,7 @@ namespace mitk
   * with the old way to manage Devices
   */
   static TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType Type){
-    
+
     return GetDeviceDataForLine(Type).front();
   }
 
@@ -187,12 +187,12 @@ namespace mitk
   * /brief Returns the device Data set matching the model name or the invalid device, if none was found
   */
   static TrackingDeviceData GetDeviceDataByName(std::string modelName){
-  
+
     int size = (sizeof (TrackingDeviceList) / sizeof*(TrackingDeviceList));
     for(int i=0; i < size; i++)
-    {      
+    {
       if(TrackingDeviceList[i].Model == modelName) return TrackingDeviceList[i];
-    } 
+    }
     return DeviceDataInvalid;
   }
 

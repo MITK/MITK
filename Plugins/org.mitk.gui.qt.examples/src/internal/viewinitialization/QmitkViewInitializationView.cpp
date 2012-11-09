@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -94,19 +94,19 @@ void QmitkViewInitializationView::OnApply()
   mitk::SliceNavigationController::ViewDirection viewDirection( mitk::SliceNavigationController::Axial );
   if( m_Controls->rbAxial->isChecked() )
     viewDirection = mitk::SliceNavigationController::Axial;
-    
+
   else if( m_Controls->rbFrontal->isChecked())
     viewDirection = mitk::SliceNavigationController::Frontal;
-    
+
   else if( m_Controls->rbSagittal->isChecked() )
     viewDirection = mitk::SliceNavigationController::Sagittal;
-  
+
   vtkRenderWindow* renderwindow = this->GetSelectedRenderWindow();
   if(renderwindow != NULL)
   {
-    mitk::BaseRenderer::GetInstance(renderwindow)->GetSliceNavigationController()->Update(viewDirection, 
-      m_Controls->cbTop->isChecked(), 
-      m_Controls->cbFrontSide->isChecked(), 
+    mitk::BaseRenderer::GetInstance(renderwindow)->GetSliceNavigationController()->Update(viewDirection,
+      m_Controls->cbTop->isChecked(),
+      m_Controls->cbFrontSide->isChecked(),
       m_Controls->cbRotated->isChecked()
       );
     mitk::BaseRenderer::GetInstance(renderwindow)->GetDisplayGeometry()->Fit();
@@ -127,8 +127,8 @@ vtkRenderWindow* QmitkViewInitializationView::GetSelectedRenderWindow()
   int itemNumber = 0;
 
   mitk::BaseRenderer::BaseRendererMapType::iterator mapit;
-  for(mapit = mitk::BaseRenderer::baseRendererMap.begin(); 
-    mapit != mitk::BaseRenderer::baseRendererMap.end(); 
+  for(mapit = mitk::BaseRenderer::baseRendererMap.begin();
+    mapit != mitk::BaseRenderer::baseRendererMap.end();
     mapit++, itemNumber++)
   {
     if(itemNumber==selectedItem)
@@ -143,7 +143,7 @@ vtkRenderWindow* QmitkViewInitializationView::GetSelectedRenderWindow()
 
 void QmitkViewInitializationView::InitRenderWindowSelector()
 {
-  itk::SimpleMemberCommand<QmitkViewInitializationView>::Pointer updateRendererListCommand = 
+  itk::SimpleMemberCommand<QmitkViewInitializationView>::Pointer updateRendererListCommand =
     itk::SimpleMemberCommand<QmitkViewInitializationView>::New();
   updateRendererListCommand->SetCallbackFunction( this, &QmitkViewInitializationView::UpdateRendererList );
 
@@ -160,7 +160,7 @@ void QmitkViewInitializationView::UpdateRendererList()
   mitk::FocusManager* fm = mitk::GlobalInteraction::GetInstance()->GetFocusManager();
 
   mitk::BaseRenderer::ConstPointer br = fm->GetFocused();
-  
+
   if (br.IsNotNull())
   {
     focusedRenderWindow = br->GetRenderWindow();
@@ -171,7 +171,7 @@ void QmitkViewInitializationView::UpdateRendererList()
   m_Controls->m_lbRenderWindows->clear();
 
 
-  for(mitk::BaseRenderer::BaseRendererMapType::iterator mapit = mitk::BaseRenderer::baseRendererMap.begin(); 
+  for(mitk::BaseRenderer::BaseRendererMapType::iterator mapit = mitk::BaseRenderer::baseRendererMap.begin();
     mapit != mitk::BaseRenderer::baseRendererMap.end(); mapit++, itemNumber++)
   {
     if( (*mapit).second->GetName())

@@ -9,7 +9,7 @@ if(NOT DCMTK_DIR)
 endif(NOT DCMTK_DIR)
 
 find_package(DCMTK)
-    
+
 if(NOT DCMTK_FOUND)
   message(SEND_ERROR "DCMTK development files not found.\n Please check variables (e.g. DCMTK_DIR) for include directories and libraries.\nYou may set environment variable DCMTK_DIR before pressing 'configure'")
 endif(NOT DCMTK_FOUND)
@@ -27,7 +27,7 @@ file(READ ${DCMTK_config_INCLUDE_DIR}/osconfig.h _osconfig_h)
   # message(STATUS "Found DCMTK newer that 3.5.4 ...")
   set(MITK_USE_DCMTK_NEWER_THAN_3_5_4 TRUE)
   # assume the new oflog library is located next to the others
-  # this can be removed if FindDCMTK is adapted for 3.5.5 
+  # this can be removed if FindDCMTK is adapted for 3.5.5
   # treat Debug and Release separately
   get_filename_component(_DCMTK_lib_dir_release ${DCMTK_ofstd_LIBRARY_RELEASE} PATH)
   get_filename_component(_DCMTK_lib_dir_debug ${DCMTK_ofstd_LIBRARY_DEBUG} PATH)

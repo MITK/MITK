@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,7 +36,7 @@ namespace mitk {
        std::cout << "RigidRegistrationParameters.xml is empty or does not exist. There are no presets to select." << std::endl;
        return;
     }
-    
+
     m_UseMask = false;
     m_BlurMovingImage = true;
     m_BlurFixedImage = true;
@@ -45,7 +45,7 @@ namespace mitk {
 
   PyramidalRegistrationMethod::~PyramidalRegistrationMethod()
   {
- 
+
   }
 
   void PyramidalRegistrationMethod::GenerateData()
@@ -85,34 +85,34 @@ namespace mitk {
     }
     transformParameters = mitk::TransformParameters::New();
     transformParameters->SetTransform(transformValues[0]);
-   
+
     if(transformParameters->GetInitialParameters().size())
     {
-      transformParameters->SetInitialParameters(initialParameters); 
+      transformParameters->SetInitialParameters(initialParameters);
     }
-    
-    // Set scales. Every type of transform has a different number of scales!!! 
+
+    // Set scales. Every type of transform has a different number of scales!!!
     // TODO: Finish for al types of transform (or find a better solution)
     itk::Array<double> scales;
     if(transformValues[0] == mitk::TransformParameters::AFFINETRANSFORM) scales.SetSize(12);
     if(transformValues[0] == mitk::TransformParameters::TRANSLATIONTRANSFORM) scales.SetSize(3);
-    
+
     for(unsigned int i = 0; i < scales.size(); i++)
     {
-      scales[i] = transformValues[i+2];        
+      scales[i] = transformValues[i+2];
     }
-    transformParameters->SetScales(scales);      
+    transformParameters->SetScales(scales);
     transformParameters->SetTransformInitializerOn(false);
-    
-    // Use Scales      
+
+    // Use Scales
     if(transformValues[1] == 1)
     {
-      transformParameters->SetUseOptimizerScales(true);              
-    } 
+      transformParameters->SetUseOptimizerScales(true);
+    }
 
-    return transformParameters; 
+    return transformParameters;
   }
-  
+
   mitk::MetricParameters::Pointer PyramidalRegistrationMethod::ParseMetricParameters(itk::Array<double> metricValues)
   {
     mitk::MetricParameters::Pointer metricParameters = mitk::MetricParameters::New();
@@ -122,9 +122,9 @@ namespace mitk {
 
     // Some things have to be checked for every metric individually
     if(metricValues[0] == mitk::MetricParameters::MUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC)
-    {       
+    {
       metricParameters->SetNumberOfHistogramBinsMutualInformationHistogram(metricValues[2]);
-    }   
+    }
 
     if(metricValues[0] == mitk::MetricParameters::MATTESMUTUALINFORMATIONIMAGETOIMAGEMETRIC)
     {
@@ -143,7 +143,7 @@ namespace mitk {
     optimizerParameters->SetMaximize(optimizerValues[1]); //should be when used with maximize mutual information for example
 
     if(optimizerValues[0] == mitk::OptimizerParameters::GRADIENTDESCENTOPTIMIZER)
-    {        
+    {
       optimizerParameters->SetLearningRateGradientDescent(optimizerValues[2]);
       optimizerParameters->SetNumberOfIterationsGradientDescent(optimizerValues[3]);
     }
@@ -155,10 +155,10 @@ namespace mitk {
       optimizerParameters->SetMinimumStepLengthRegularStepGradientDescent(optimizerValues[3]);
       optimizerParameters->SetMaximumStepLengthRegularStepGradientDescent(optimizerValues[4]);
       optimizerParameters->SetRelaxationFactorRegularStepGradientDescent(optimizerValues[5]);
-      optimizerParameters->SetNumberOfIterationsRegularStepGradientDescent(optimizerValues[6]);       
-    }  
+      optimizerParameters->SetNumberOfIterationsRegularStepGradientDescent(optimizerValues[6]);
+    }
 
-    return optimizerParameters;    
+    return optimizerParameters;
   }
 
   void PyramidalRegistrationMethod::SetMovingMask(Image::Pointer movingMask)
@@ -174,6 +174,6 @@ namespace mitk {
     SetNthInput(4, m_FixedMask);
     Modified();
   }
- 
+
 
 } // end namespace

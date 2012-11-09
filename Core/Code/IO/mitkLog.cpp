@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,7 +44,7 @@ void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage& l )
   #else
     FormatSmart( l );
   #endif
-  
+
   if(logFile)
   {
     #ifdef _WIN32
@@ -119,9 +119,9 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
 
     logFileName = file;
     logFile = new std::ofstream( );
-    
+
     logFile->open( file,  std::ios_base::out | std::ios_base::app );
-    
+
     if(logFile->good())
     {
       logMutex.Unlock();
@@ -160,11 +160,11 @@ void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc,char **arg
       }
 
       mitk::LoggingBackend::SetLogFile(argv[r+1]);
-     
+
       for(r+=2;r<argc;r++)
         argv[r-2]=argv[r];
-        
-      argc-=2;     
+
+      argc-=2;
       return;
     }
   }

@@ -53,7 +53,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
 
   # Compute the plugin dependencies
   ctkFunctionGetTargetLibraries(_PLUGIN_target_libraries)
-  
+
 
   #------------------------------------------------------------#
   #------------------ Qt Help support -------------------------#
@@ -95,7 +95,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
       set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} ${_PLUGIN_DOXYGEN_TAGFILES}")
     endif()
     #message("PLUGIN_DOXYGEN_TAGFILES: ${PLUGIN_DOXYGEN_TAGFILES}")
-      
+
     if(_PLUGIN_NO_QHP_TRANSFORM)
       set(_use_qhp_xsl 0)
     else()
@@ -126,7 +126,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
   if(mbilog_FOUND)
     target_link_libraries(${PLUGIN_TARGET} mbilog)
   endif()
-  
+
   include_directories(${Poco_INCLUDE_DIRS})
   include_directories(${BlueBerry_BINARY_DIR})
 
@@ -135,7 +135,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     optimized PocoUtil debug PocoUtild
     optimized PocoXML debug PocoXMLd
   )
-  
+
   # Set compiler flags
   get_target_property(_plugin_compile_flags ${PLUGIN_TARGET} COMPILE_FLAGS)
   if(NOT _plugin_compile_flags)
@@ -164,7 +164,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     GEN_QRC ${MY_QRC_SRCS}
   )
 
-  
+
   #------------------------------------------------------------#
   #------------------ Installer support -----------------------#
   if(NOT _PLUGIN_TEST_PLUGIN)

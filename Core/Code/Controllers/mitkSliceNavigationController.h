@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,24 +57,24 @@ class BaseRenderer;
 /**
  * \brief Controls the selection of the slice the associated BaseRenderer
  * will display
- * 
+ *
  * A SliceNavigationController takes a Geometry3D as input world geometry
  * (TODO what are the exact requirements?) and generates a TimeSlicedGeometry
  * as output. The TimeSlicedGeometry holds a number of SlicedGeometry3Ds and
- * these in turn hold a series of Geometry2Ds. One of these Geometry2Ds is 
+ * these in turn hold a series of Geometry2Ds. One of these Geometry2Ds is
  * selected as world geometry for the BaseRenderers associated to 2D views.
- *  
+ *
  * The SliceNavigationController holds has Steppers (one for the slice, a
- * second for the time step), which control the selection of a single 
+ * second for the time step), which control the selection of a single
  * Geometry2D from the TimeSlicedGeometry. SliceNavigationController generates
- * ITK events to tell observers, like a BaseRenderer,  when the selected slice 
+ * ITK events to tell observers, like a BaseRenderer,  when the selected slice
  * or timestep changes.
- * 
+ *
  * SliceNavigationControllers are registered as listeners to GlobalInteraction
- * by the QmitkStdMultiWidget. In ExecuteAction, the controllers react to 
- * PositionEvents by setting the steppers to the slice which is nearest to the 
+ * by the QmitkStdMultiWidget. In ExecuteAction, the controllers react to
+ * PositionEvents by setting the steppers to the slice which is nearest to the
  * point of the PositionEvent.
- *  
+ *
  * Example:
  * \code
  * // Initialization
@@ -87,9 +87,9 @@ class BaseRenderer;
  * // Tell the navigator in which direction it shall slice the data
  * sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Axial);
  *
- * // Connect one or more BaseRenderer to this navigator, i.e.: events sent 
- * // by the navigator when stepping through the slices (e.g. by 
- * // sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer 
+ * // Connect one or more BaseRenderer to this navigator, i.e.: events sent
+ * // by the navigator when stepping through the slices (e.g. by
+ * // sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer
  * // (in this example only slice-changes, see also ConnectGeometryTimeEvent
  * // and ConnectGeometryEvents.)
  * sliceCtrl->ConnectGeometrySliceEvent(renderer.GetPointer());
@@ -104,21 +104,21 @@ class BaseRenderer;
  *
  * \code
  * // Create the visible navigator (a slider with a spin-box)
- * QmitkSliderNavigator* navigator = 
+ * QmitkSliderNavigator* navigator =
  *   new QmitkSliderNavigator(parent, "slidernavigator");
  *
  * // Connect the navigator to the slice-stepper of the
  * // SliceNavigationController. For initialization (position, mininal and
  * // maximal values) the values of the SliceNavigationController are used.
- * // Thus, accessing methods of a navigator is normally not necessary, since 
+ * // Thus, accessing methods of a navigator is normally not necessary, since
  * // everything can be set via the (Qt-independent) SliceNavigationController.
  * // The QmitkStepperAdapter converts the Qt-signals to Qt-independent
  * // itk-events.
  * new QmitkStepperAdapter(navigator, sliceCtrl->GetSlice(), "navigatoradaptor");
  * \endcode
- * 
- * If you do not want that all renderwindows are updated when a new slice is 
- * selected, you can use a specific RenderingManager, which updates only those 
+ *
+ * If you do not want that all renderwindows are updated when a new slice is
+ * selected, you can use a specific RenderingManager, which updates only those
  * renderwindows that should be updated. This is sometimes useful when a 3D view
  * does not need to be updated when the slices in some 2D views are changed.
  * QmitkSliderNavigator (for Qt):
@@ -133,10 +133,10 @@ class BaseRenderer;
  *
  * // tell the SliceNavigationController of renderwindow1 and renderwindow2
  * // to use the specific RenderingManager instead of the global one
- * renderwindow1->GetSliceNavigationController()->SetRenderingManager(myManager); 
- * renderwindow2->GetSliceNavigationController()->SetRenderingManager(myManager); 
+ * renderwindow1->GetSliceNavigationController()->SetRenderingManager(myManager);
+ * renderwindow2->GetSliceNavigationController()->SetRenderingManager(myManager);
  * \endcode
- * 
+ *
  * \todo implement for non-evenly-timed geometry!
  * \ingroup NavigationControl
  */
@@ -146,9 +146,9 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     mitkClassMacro(SliceNavigationController,BaseController);
     itkNewMacro(Self);
     mitkNewMacro1Param(Self, const char *);
-  
+
     /**
-     * \brief Possible view directions, \a Original will uses 
+     * \brief Possible view directions, \a Original will uses
      * the Geometry2D instances in a SlicedGeometry3D provided
      * as input world geometry (by SetInputWorldGeometry).
      */
@@ -181,7 +181,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
 
     /**
      * \brief Set the desired view directions
-     * 
+     *
      * \sa ViewDirection
      * \sa Update(ViewDirection viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
@@ -194,7 +194,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      *
      * This is used to re-initialize the view direction of the SNC to the
      * default value with SetViewDirectionToDefault()
-     * 
+     *
      * \sa ViewDirection
      * \sa Update(ViewDirection viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
@@ -205,16 +205,16 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     virtual void SetViewDirectionToDefault();
 
     /**
-     * \brief Do the actual creation and send it to the connected 
+     * \brief Do the actual creation and send it to the connected
      * observers (renderers)
-     * 
+     *
      */
     virtual void Update();
 
     /**
      * \brief Extended version of Update, additionally allowing to
      * specify the direction/orientation of the created geometry.
-     * 
+     *
      */
     virtual void Update(ViewDirection viewDirection, bool top = true,
       bool frontside = true, bool rotated = false);
@@ -222,14 +222,14 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     /**
      * \brief Send the created geometry to the connected
      * observers (renderers)
-     * 
+     *
      * Called by Update().
      */
     virtual void SendCreatedWorldGeometry();
-   
+
     /**
      * \brief Tell observers to re-read the currently selected 2D geometry
-     * 
+     *
      * Called by mitk::SlicesRotator during rotation.
      */
     virtual void SendCreatedWorldGeometryUpdate();
@@ -237,7 +237,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     /**
      * \brief Send the currently selected slice to the connected
      * observers (renderers)
-     * 
+     *
      * Called by Update().
      */
     virtual void SendSlice();
@@ -245,14 +245,14 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     /**
      * \brief Send the currently selected time to the connected
      * observers (renderers)
-     * 
+     *
      * Called by Update().
      */
     virtual void SendTime();
 
     /**
      * \brief Set the RenderingManager to be used
-     * 
+     *
      * If \a NULL, the default RenderingManager will be used.
      */
     itkSetObjectMacro(RenderingManager, RenderingManager);
@@ -262,81 +262,81 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     itkEventMacro( UpdateEvent, itk::AnyEvent );
     #pragma GCC visibility pop
 
-    class MITK_CORE_EXPORT TimeSlicedGeometryEvent : public itk::AnyEvent 
-    { 
-      public: 
-        typedef TimeSlicedGeometryEvent Self; 
-        typedef itk::AnyEvent Superclass; 
+    class MITK_CORE_EXPORT TimeSlicedGeometryEvent : public itk::AnyEvent
+    {
+      public:
+        typedef TimeSlicedGeometryEvent Self;
+        typedef itk::AnyEvent Superclass;
 
         TimeSlicedGeometryEvent(
-          TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos) 
-          : m_TimeSlicedGeometry(aTimeSlicedGeometry), m_Pos(aPos) 
-          {} 
+          TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos)
+          : m_TimeSlicedGeometry(aTimeSlicedGeometry), m_Pos(aPos)
+          {}
 
-        virtual ~TimeSlicedGeometryEvent() 
-          {} 
+        virtual ~TimeSlicedGeometryEvent()
+          {}
 
-        virtual const char * GetEventName() const 
-          { return "TimeSlicedGeometryEvent"; } 
+        virtual const char * GetEventName() const
+          { return "TimeSlicedGeometryEvent"; }
 
-        virtual bool CheckEvent(const ::itk::EventObject* e) const 
-          { return dynamic_cast<const Self*>(e); } 
+        virtual bool CheckEvent(const ::itk::EventObject* e) const
+          { return dynamic_cast<const Self*>(e); }
 
-        virtual ::itk::EventObject* MakeObject() const 
-          { return new Self(m_TimeSlicedGeometry, m_Pos); } 
+        virtual ::itk::EventObject* MakeObject() const
+          { return new Self(m_TimeSlicedGeometry, m_Pos); }
 
-        TimeSlicedGeometry* GetTimeSlicedGeometry() const 
+        TimeSlicedGeometry* GetTimeSlicedGeometry() const
           { return m_TimeSlicedGeometry; }
 
-        unsigned int GetPos() const 
+        unsigned int GetPos() const
           { return m_Pos; }
 
-      private: 
+      private:
         TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
         unsigned int m_Pos;
-        // TimeSlicedGeometryEvent(const Self&); 
+        // TimeSlicedGeometryEvent(const Self&);
         void operator=(const Self&); //just hide
     };
-  
-    mitkTimeSlicedGeometryEventMacro( 
+
+    mitkTimeSlicedGeometryEventMacro(
       GeometrySendEvent,TimeSlicedGeometryEvent );
-    mitkTimeSlicedGeometryEventMacro( 
+    mitkTimeSlicedGeometryEventMacro(
       GeometryUpdateEvent, TimeSlicedGeometryEvent );
-    mitkTimeSlicedGeometryEventMacro( 
+    mitkTimeSlicedGeometryEventMacro(
       GeometryTimeEvent, TimeSlicedGeometryEvent );
-    mitkTimeSlicedGeometryEventMacro( 
+    mitkTimeSlicedGeometryEventMacro(
       GeometrySliceEvent, TimeSlicedGeometryEvent );
-  
-    template <typename T> 
+
+    template <typename T>
     void ConnectGeometrySendEvent(T* receiver)
     {
       typedef typename itk::ReceptorMemberCommand<T>::Pointer
         ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = 
+      ReceptorMemberCommandPointer eventReceptorCommand =
         itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometry);
       unsigned long tag = AddObserver(GeometrySendEvent(NULL,0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
-    
-    template <typename T> 
+
+    template <typename T>
     void ConnectGeometryUpdateEvent(T* receiver)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer 
+      typedef typename itk::ReceptorMemberCommand<T>::Pointer
         ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = 
+      ReceptorMemberCommandPointer eventReceptorCommand =
         itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::UpdateGeometry);
       unsigned long tag = AddObserver(GeometryUpdateEvent(NULL,0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
-  
-    template <typename T> 
+
+    template <typename T>
     void ConnectGeometrySliceEvent(T* receiver, bool connectSendEvent=true)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer 
+      typedef typename itk::ReceptorMemberCommand<T>::Pointer
         ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = 
+      ReceptorMemberCommandPointer eventReceptorCommand =
         itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
       unsigned long tag = AddObserver(GeometrySliceEvent(NULL,0), eventReceptorCommand);
@@ -348,9 +348,9 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     template <typename T>
     void ConnectGeometryTimeEvent(T* receiver, bool connectSendEvent=true)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer 
+      typedef typename itk::ReceptorMemberCommand<T>::Pointer
         ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = 
+      ReceptorMemberCommandPointer eventReceptorCommand =
         itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
       unsigned long tag = AddObserver(GeometryTimeEvent(NULL,0), eventReceptorCommand);
@@ -385,20 +385,20 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     Message<> crosshairPositionEvent;
 
     /**
-     * \brief To connect multiple SliceNavigationController, we can 
+     * \brief To connect multiple SliceNavigationController, we can
      * act as an observer ourselves: implemented interface
      * \warning not implemented
      */
     virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
 
     /**
-     * \brief To connect multiple SliceNavigationController, we can 
+     * \brief To connect multiple SliceNavigationController, we can
      * act as an observer ourselves: implemented interface
      */
     virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);
 
     /**
-     * \brief To connect multiple SliceNavigationController, we can 
+     * \brief To connect multiple SliceNavigationController, we can
      * act as an observer ourselves: implemented interface
      */
     virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
@@ -415,7 +415,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     /** \brief Returns the Geometry3D of the currently selected time step. */
     const mitk::Geometry3D *GetCurrentGeometry3D();
 
-    
+
     /** \brief Returns the currently selected Plane in the current
      * Geometry3D (if existent).
      */
@@ -433,20 +433,20 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     BaseRenderer *GetRenderer() const;
 
     /** \brief Re-orients the slice stack to include the plane specified by
-     * the given point an normal vector. 
+     * the given point an normal vector.
      */
-    void ReorientSlices( 
+    void ReorientSlices(
       const mitk::Point3D &point, const mitk::Vector3D &normal );
 
 
     /** \brief Re-orients the slice stack to include the plane specified by
     * the given point an normal vector and rotates to fit the given axis vector
     */
-    void ReorientSlices( 
+    void ReorientSlices(
        const mitk::Point3D &point, const mitk::Vector3D &normal, const mitk::Vector3D &axisVec0 );
 
 
-    virtual bool ExecuteAction( 
+    virtual bool ExecuteAction(
       Action* action, mitk::StateEvent const* stateEvent);
 
     void ExecuteOperation(Operation* operation);
@@ -459,18 +459,18 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     itkSetMacro(SliceLocked, bool);
     itkGetMacro(SliceLocked, bool);
     itkBooleanMacro(SliceLocked);
-    
+
     /**
      * \brief Feature option to lock slice rotation.
      *
-     * This option flag disables separately the rotation of a slice which is 
+     * This option flag disables separately the rotation of a slice which is
      * implemented in mitkSliceRotator.
      */
     itkSetMacro(SliceRotationLocked, bool);
     itkGetMacro(SliceRotationLocked, bool);
     itkBooleanMacro(SliceRotationLocked);
 
-    /** 
+    /**
      * \brief Adjusts the numerical range of the slice stepper according to
      * the current geometry orientation of this SNC's SlicedGeometry.
      */
@@ -501,7 +501,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
           stream<<(((T*) pic->data)[p[0]*3 + 1 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
           stream<<(((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
         }
-        
+
         s = stream.str();
       }
       else

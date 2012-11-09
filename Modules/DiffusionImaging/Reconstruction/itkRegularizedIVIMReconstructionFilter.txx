@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -61,10 +61,10 @@ namespace itk
       filter->SetNumberOfThreads(this->GetNumberOfThreads());
       filter->UpdateLargestPossibleRegion();
       image = filter->GetOutput();
-      std::cout << "Iteration " << i+1 << "/" << 
+      std::cout << "Iteration " << i+1 << "/" <<
         m_NumberIterations << std::endl;
     }
-    
+
     typename OutputImageType::Pointer output = this->GetOutput();
     output->SetOrigin( image->GetOrigin() );     // Set the image origin
     output->SetDirection( image->GetDirection() );  // Set the image direction
@@ -97,7 +97,7 @@ namespace itk
   void
   RegularizedIVIMReconstructionFilter<TInputPixel, TOutputPixel, TRefPixelType>
     ::PrintSelf(
-    std::ostream& os, 
+    std::ostream& os,
     Indent indent) const
   {
     Superclass::PrintSelf( os, indent );

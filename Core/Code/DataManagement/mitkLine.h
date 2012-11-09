@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -41,9 +41,9 @@ public:
 
   //##Documentation
   //## @brief Define line by point and direction
-  //## 
+  //##
   //## Length of direction defines the the length of the line
-  Line( const itk::Point<TCoordRep,NPointDimension>& point, const itk::Vector<TCoordRep,NPointDimension>& direction ) 
+  Line( const itk::Point<TCoordRep,NPointDimension>& point, const itk::Vector<TCoordRep,NPointDimension>& direction )
   {
     this->m_Point = point;
     this->m_Direction = direction;
@@ -51,7 +51,7 @@ public:
 
   //##Documentation
   //## @brief Get start point of the line
-  const itk::Point<TCoordRep,NPointDimension>& GetPoint() const 
+  const itk::Point<TCoordRep,NPointDimension>& GetPoint() const
   {
     return m_Point;
   }
@@ -67,14 +67,14 @@ public:
   //## @brief Get point on the line with parameter @a t
   //##
   //## @return m_Point+t*m_Direction
-  const itk::Point<TCoordRep,NPointDimension> GetPoint(TCoordRep t) const 
+  const itk::Point<TCoordRep,NPointDimension> GetPoint(TCoordRep t) const
   {
     return m_Point+m_Direction*t;
   }
 
   //##Documentation
   //## @brief Set/change start point of the line
-  void SetPoint( const itk::Point<TCoordRep,NPointDimension>& point1 ) 
+  void SetPoint( const itk::Point<TCoordRep,NPointDimension>& point1 )
   {
     itk::Vector<TCoordRep,NPointDimension> point2;
     point2 = m_Point + m_Direction;
@@ -85,7 +85,7 @@ public:
 
   //##Documentation
   //## @brief Get the direction vector of the line
-  const itk::Vector<TCoordRep,NPointDimension>& GetDirection() const 
+  const itk::Vector<TCoordRep,NPointDimension>& GetDirection() const
   {
     return m_Direction;
   }
@@ -99,19 +99,19 @@ public:
 
   //##Documentation
   //## @brief Set the direction vector of the line
-  void SetDirection( const itk::Vector<TCoordRep,NPointDimension>& direction ) 
+  void SetDirection( const itk::Vector<TCoordRep,NPointDimension>& direction )
   {
     m_Direction = direction;
   }
 
   //##Documentation
   //## @brief Define line by point and direction
-  //## 
+  //##
   //## Length of direction defines the the length of the line
   void Set( const itk::Point<TCoordRep,NPointDimension>& point, const itk::Vector<TCoordRep,NPointDimension>& direction ) {
 
     this->m_Point = point;
-    this->m_Direction = direction;    
+    this->m_Direction = direction;
   }
 
   //##Documentation
@@ -136,21 +136,21 @@ public:
 
   //##Documentation
   //## @brief Get start point of the line
-  const itk::Point<TCoordRep,NPointDimension>& GetPoint1() const 
+  const itk::Point<TCoordRep,NPointDimension>& GetPoint1() const
   {
     return m_Point;
   }
 
   //##Documentation
   //## @brief Set/change end point of the line
-  void SetPoint2( const itk::Point<TCoordRep,NPointDimension>& point2 ) 
+  void SetPoint2( const itk::Point<TCoordRep,NPointDimension>& point2 )
   {
     m_Direction = point2 - m_Point;
   }
 
   //##Documentation
   //## @brief Get end point of the line
-  itk::Point<TCoordRep,NPointDimension> GetPoint2() const 
+  itk::Point<TCoordRep,NPointDimension> GetPoint2() const
   {
     itk::Point<TCoordRep,NPointDimension> point2;
     point2 = m_Point+m_Direction;
@@ -160,9 +160,9 @@ public:
   //##Documentation
   //## @brief Transform the line with a Transform
   void Transform(itk::Transform<TCoordRep, NPointDimension, NPointDimension>& transform)
-  {  
+  {
     m_Direction = transform.TransformVector(m_Direction);
-    m_Point = transform.TransformPoint(m_Point);  
+    m_Point = transform.TransformPoint(m_Point);
   }
 
   //##Documentation
@@ -180,7 +180,7 @@ public:
 
   //##Documentation
   //## @brief Distance of a point from the line
-  double Distance( const itk::Point<TCoordRep,NPointDimension>& point ) const 
+  double Distance( const itk::Point<TCoordRep,NPointDimension>& point ) const
   {
     itk::Vector<TCoordRep,NPointDimension> diff;
     diff =  Project(point)-point;
@@ -191,13 +191,13 @@ public:
   //## @brief Project a point on the line
   itk::Point<TCoordRep,NPointDimension> Project( const itk::Point<TCoordRep,NPointDimension>& point ) const
   {
-    if(m_Direction.GetNorm()==0) 
+    if(m_Direction.GetNorm()==0)
       return this->m_Point;
 
     itk::Vector<TCoordRep,NPointDimension> diff;
     diff = point-this->m_Point;
 
-    itk::Vector<TCoordRep,NPointDimension> normalizedDirection = m_Direction; 
+    itk::Vector<TCoordRep,NPointDimension> normalizedDirection = m_Direction;
     normalizedDirection.Normalize();
 
     normalizedDirection *= dot_product(diff.Get_vnl_vector(), normalizedDirection.Get_vnl_vector());
@@ -207,20 +207,20 @@ public:
 
   //##Documentation
   //## @brief Test if a point is part of the line
-  //## 
+  //##
   //## Length of the direction vector defines the length of the line
-  bool IsPartOfStraightLine( const itk::Point<TCoordRep,NPointDimension>& point ) const 
+  bool IsPartOfStraightLine( const itk::Point<TCoordRep,NPointDimension>& point ) const
   {
-    if( Distance( point ) > eps ) 
+    if( Distance( point ) > eps )
       return false;
 
     itk::Vector<TCoordRep,NPointDimension> diff;
     diff = point - this->m_Point;
 
-    if( diff*m_Direction < 0 ) 
+    if( diff*m_Direction < 0 )
       return false;
 
-    if( diff.GetSquaredNorm() <= m_Direction.GetSquaredNorm() ) 
+    if( diff.GetSquaredNorm() <= m_Direction.GetSquaredNorm() )
       return true;
 
     return false;
@@ -238,7 +238,7 @@ public:
 
   //##Documentation
   //## @brief Test if a lines is parallel to this line
-  bool IsParallel( const Line<TCoordRep,NPointDimension>& line) const 
+  bool IsParallel( const Line<TCoordRep,NPointDimension>& line) const
   {
     vnl_vector<TCoordRep> normal;
 
@@ -262,7 +262,7 @@ public:
   //##
   //## Start point and direction and length of direction vector must be
   //## equal for identical lines.
-  bool operator==( const Line<TCoordRep,NPointDimension>& line ) const 
+  bool operator==( const Line<TCoordRep,NPointDimension>& line ) const
   {
     itk::Vector<TCoordRep,NPointDimension> diff;
     diff = GetPoint1()-line.GetPoint1();
@@ -276,7 +276,7 @@ public:
 
   //##Documentation
   //## @brief Set the line by another line
-  inline const Line<TCoordRep,NPointDimension>& operator=( const Line<TCoordRep,NPointDimension>& line ) 
+  inline const Line<TCoordRep,NPointDimension>& operator=( const Line<TCoordRep,NPointDimension>& line )
   {
     m_Point = line.GetPoint();
     m_Direction = line.GetDirection();
@@ -287,7 +287,7 @@ public:
   //## @brief Test if two lines are not identical
   //##
   //## \sa operator==
-  bool operator!=( const Line<TCoordRep,NPointDimension>& line ) const 
+  bool operator!=( const Line<TCoordRep,NPointDimension>& line ) const
   {
     return !((*this)==line);
   }
@@ -295,16 +295,16 @@ public:
   //##Documentation
   //## @brief Calculates the intersection points of a straight line in 2D
   //## with a rectangle
-  //## 
+  //##
   //## @param x1,y1,x2,y2   rectangle
   //## @param p,d           straight line: p point on it, d direction of line
   //## @param s1            first intersection point (valid only if s_num>0)
   //## @param s2            second intersection point (valid only if s_num==2)
   //## @return              number of intersection points (0<=s_num<=2)
-  static int RectangleLineIntersection( 
-    TCoordRep x1, TCoordRep y1, 
-    TCoordRep x2, TCoordRep y2, 
-    itk::Point< TCoordRep, 2 > p, itk::Vector< TCoordRep, 2 > d, 
+  static int RectangleLineIntersection(
+    TCoordRep x1, TCoordRep y1,
+    TCoordRep x2, TCoordRep y2,
+    itk::Point< TCoordRep, 2 > p, itk::Vector< TCoordRep, 2 > d,
     itk::Point< TCoordRep, 2 > &s1, itk::Point< TCoordRep, 2 > &s2 )
   {
     int s_num;
@@ -316,25 +316,25 @@ public:
     {
       t=(x1-p[0])/d[0];
       itk::Point<TCoordRep,2> l=p+d*t;
-      if((l[1]>=y1) && (l[1]<y2)) 
+      if((l[1]>=y1) && (l[1]<y2))
       { // yes, intersection point within the bounds of the border-line
         if(s_num) s2=l; else s1=l; ++s_num;
       }
     }
 
-    if(fabs(d[0])>eps) 
+    if(fabs(d[0])>eps)
     {
       t=(x2-p[0])/d[0];
       itk::Point<TCoordRep,2> l=p+d*t;
 
-      if((l[1]>=y1) && (l[1]<y2)) 
+      if((l[1]>=y1) && (l[1]<y2))
       { // yes, intersection point within the bounds of the border-line
         if(s_num) s2=l; else s1=l; ++s_num;
       }
     }
 
     /*test if intersecting with the vertical axis*/
-    if(fabs(d[1])>eps)  
+    if(fabs(d[1])>eps)
     {
       t=(y1-p[1])/d[1];
       itk::Point<TCoordRep,2> l=p+d*t;
@@ -345,7 +345,7 @@ public:
       }
     }
 
-    if(fabs(d[1])>eps) 
+    if(fabs(d[1])>eps)
     {
       t=(y2-p[1])/d[1];
       itk::Point<TCoordRep,2> l=p+d*t;
@@ -361,7 +361,7 @@ public:
   /**
    * \brief Calculates the intersection points of a straight line in 3D with
    * a box.
-   *  
+   *
    * \param x1,y1,z1  first corner of the box
    * \param x2,y2,z2  second corner of the box
    * \param p,d       straight line: p point on it, d direction of line
@@ -372,7 +372,7 @@ public:
   static int BoxLineIntersection(
     TCoordRep x1, TCoordRep y1, TCoordRep z1,
     TCoordRep x2, TCoordRep y2, TCoordRep z2,
-    itk::Point< TCoordRep, 3 > p, itk::Vector< TCoordRep, 3 > d, 
+    itk::Point< TCoordRep, 3 > p, itk::Vector< TCoordRep, 3 > d,
     itk::Point< TCoordRep, 3 > &s1, itk::Point< TCoordRep, 3 > &s2 )
   {
     int num = 0;

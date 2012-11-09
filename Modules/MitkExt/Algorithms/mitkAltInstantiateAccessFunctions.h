@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifndef MITKALTINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED
 #define MITKALTINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED
- 
+
 #include <itkCastImageFilter.h>
 #include <mitkImageToItk.h>
 
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## @ingroup Adaptor
 #define AltInstantiateAccessFunction(itkImgFunc)                       \
   AltInstantiateAccessFunctionForFixedDimension(itkImgFunc, 2)         \
-  AltInstantiateAccessFunctionForFixedDimension(itkImgFunc, 3)         
+  AltInstantiateAccessFunctionForFixedDimension(itkImgFunc, 3)
 
 //##Documentation
 //## @brief Instantiate access function with one additional parammeter
@@ -49,7 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## @ingroup Adaptor
 #define AltInstantiateAccessFunction_1(itkImgFunc, param1Type)                       \
   AltInstantiateAccessFunctionForFixedDimension_1(itkImgFunc, 2, param1Type)         \
-  AltInstantiateAccessFunctionForFixedDimension_1(itkImgFunc, 3, param1Type)         
+  AltInstantiateAccessFunctionForFixedDimension_1(itkImgFunc, 3, param1Type)
 
 //##Documentation
 //## @brief Instantiate access function with two additional parammeters
@@ -63,7 +63,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## @ingroup Adaptor
 #define AltInstantiateAccessFunction_2(itkImgFunc, param1Type, param2Type)                \
   AltInstantiateAccessFunctionForFixedDimension_2(itkImgFunc, 2, param1Type, param2Type)  \
-  AltInstantiateAccessFunctionForFixedDimension_2(itkImgFunc, 3, param1Type, param2Type)         
+  AltInstantiateAccessFunctionForFixedDimension_2(itkImgFunc, 3, param1Type, param2Type)
 
 //##Documentation
 //## @brief Instantiate access function without additional parammeters
@@ -83,7 +83,7 @@ template void itkImgFunc(itk::Image<unsigned int, dimension>*);            \
 template void itkImgFunc(itk::Image<short, dimension>*);                   \
 template void itkImgFunc(itk::Image<unsigned short, dimension>*);          \
 template void itkImgFunc(itk::Image<char, dimension>*);                    \
-template void itkImgFunc(itk::Image<unsigned char, dimension>*);           
+template void itkImgFunc(itk::Image<unsigned char, dimension>*);
 
 //##Documentation
 //## @brief Instantiate access function with one additional parammeter
@@ -103,7 +103,7 @@ template void itkImgFunc(itk::Image<unsigned int, dimension>*, param1Type);     
 template void itkImgFunc(itk::Image<short, dimension>*, param1Type);                   \
 template void itkImgFunc(itk::Image<unsigned short, dimension>*, param1Type);          \
 template void itkImgFunc(itk::Image<char, dimension>*, param1Type);                    \
-template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type);           
+template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type);
 
 //##Documentation
 //## @brief Instantiate access function with two additional parammeters
@@ -123,7 +123,7 @@ template void itkImgFunc(itk::Image<unsigned int, dimension>*, param1Type, param
 template void itkImgFunc(itk::Image<short, dimension>*, param1Type, param2Type);                   \
 template void itkImgFunc(itk::Image<unsigned short, dimension>*, param1Type, param2Type);          \
 template void itkImgFunc(itk::Image<char, dimension>*, param1Type, param2Type);                    \
-template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, param2Type);           
+template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, param2Type);
 
 //##Documentation
 //## @brief Instantiate access function without additional parammeters
@@ -137,7 +137,7 @@ template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, para
 //## @ingroup Adaptor
 #define AltInstantiateAccessFunctionForFixedPixelType(itkImgFunc, pixelType)                          \
 template void itkImgFunc(itk::Image<pixelType, 2>*);                                               \
-template void itkImgFunc(itk::Image<pixelType, 3>*);                   
+template void itkImgFunc(itk::Image<pixelType, 3>*);
 
 //##Documentation
 //## @brief Instantiate access function with one additional parammeter
@@ -151,7 +151,7 @@ template void itkImgFunc(itk::Image<pixelType, 3>*);
 //## @ingroup Adaptor
 #define AltInstantiateAccessFunctionForFixedPixelType_1(itkImgFunc, pixelType, param1Type)            \
 template void itkImgFunc(itk::Image<pixelType, 2>*, param1Type);                                   \
-template void itkImgFunc(itk::Image<pixelType, 3>*, param1Type);                   
+template void itkImgFunc(itk::Image<pixelType, 3>*, param1Type);
 
 //##Documentation
 //## @brief Instantiate access function with two additional parammeters
@@ -165,7 +165,7 @@ template void itkImgFunc(itk::Image<pixelType, 3>*, param1Type);
 //## @ingroup Adaptor
 #define AltInstantiateAccessFunctionForFixedPixelType_2(itkImgFunc, pixelType, param1Type, param2Type)\
 template void itkImgFunc(itk::Image<pixelType, 2>*, param1Type, param2Type);                       \
-template void itkImgFunc(itk::Image<pixelType, 3>*, param1Type, param2Type);                   
+template void itkImgFunc(itk::Image<pixelType, 3>*, param1Type, param2Type);
 
 #endif DOXYGEN_SKIP
 

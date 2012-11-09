@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ class QmitkLevelWindowWidgetContextMenu;
   \brief Provides a widget with a slider to change the level and window value of the current image.
 
   This documentation actually refers to the QmitkLevelWindowWidget and is only put in this class due to technical issues (should be moved later).
-  
+
   The QmitkLevelWindowWidget is a kind of container for a
   QmitkSliderLevelWindowWidget (this is the cyan bar above the text input
   fields) and a QmitkLineEditLevelWindowWidget (with two text input fields). It holds a reference to a
@@ -45,11 +45,11 @@ class QmitkLevelWindowWidgetContextMenu;
   The image which is affected by changes can also be changed by QmitkLevelWindowWidgetContextMenu, the context menu
   for QmitkSliderLevelWindowWidget and QmitkLineEditLevelWindowWidget. There you have the possibility to set
   a certain image or always the topmost image in the data tree (layer property) to be affected by changes.
-  
+
   The internal mitk::LevelWindow variable contains a range that is valid for
   a given image. It should not be possible to move the level/window
-  parameters outside this range. The range can be changed and reset to its default values 
-  by QmitkLevelWindowWidgetContextMenu, the context menu for QmitkSliderLevelWindowWidget and 
+  parameters outside this range. The range can be changed and reset to its default values
+  by QmitkLevelWindowWidgetContextMenu, the context menu for QmitkSliderLevelWindowWidget and
   QmitkLineEditLevelWindowWidget.
 
   Now for the behaviour of the text inputs: The upper one contains the
@@ -61,8 +61,8 @@ class QmitkLevelWindowWidgetContextMenu;
   The window is changed by moving the mouse on the upper or lower bound of the bar until the cursor becomes an vertical double-arrowed symbol.
   Then you can change the windowsize by clicking the left mouse button and move the mouse upwards or downwards.
   The bar becomes greater upwards as well as downwards. If you want to change the size of the window in only one
-  direction you have to press the CTRL-key while doing the same as mentioned above. 
-  This information is also presented by a tooltip text when moving the mouse on the upper or lower bound of the bar. 
+  direction you have to press the CTRL-key while doing the same as mentioned above.
+  This information is also presented by a tooltip text when moving the mouse on the upper or lower bound of the bar.
 
   */
 
@@ -129,7 +129,7 @@ protected:
   QRect m_UpperBound;
   unsigned long m_ObserverTag;
   bool m_IsObserverTagSet;
-  
+
   QFont m_Font;
 
   /*!
@@ -137,7 +137,7 @@ protected:
   */
   QmitkLevelWindowWidgetContextMenu* m_Contextmenu;
 
-  /*! 
+  /*!
   * repaint the slider and the scale
   */
   void paintEvent( QPaintEvent* e );
@@ -163,7 +163,7 @@ protected:
   void mousePressEvent( QMouseEvent* mouseEvent );
 
   /*!
-  *  sets the variable m_MouseDown to false 
+  *  sets the variable m_MouseDown to false
   */
   void mouseReleaseEvent( QMouseEvent* mouseEvent );
 

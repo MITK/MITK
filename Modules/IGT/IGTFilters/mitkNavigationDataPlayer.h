@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,9 +33,9 @@ namespace mitk {
   /**Documentation
   * \brief This class is used to play recorded (see mitkNavigationDataRecorder class) files.
   *
-  * If you want to play a file you have to set an input stream. This can be an own one (use StartPlaying(std::istream*)) 
-  * or a preset (use StartPlaying()). The presets are NormalFile and ZipFile and can be set with the method 
-  * SetPlayerMode(PlayerMode). The presets need a FileName. Therefore the FileName must be set before the preset. 
+  * If you want to play a file you have to set an input stream. This can be an own one (use StartPlaying(std::istream*))
+  * or a preset (use StartPlaying()). The presets are NormalFile and ZipFile and can be set with the method
+  * SetPlayerMode(PlayerMode). The presets need a FileName. Therefore the FileName must be set before the preset.
   * For pausing the player call Pause(). A call of Resume() will continue the playing.
   *
   *
@@ -57,20 +57,20 @@ namespace mitk {
     */
     itkGetStringMacro(FileName);
 
-    
+
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update
     */
     virtual void UpdateOutputInformation();
 
     /**
-     * \brief This method starts the player. 
+     * \brief This method starts the player.
      *
      * Before the stream has to be set. Either with a PlayingMode (SetStream(PlayerMode)) and FileName. Or
      * with an own inputstream (SetStream(istream*)).
      *
      * @throw mitk::IGTIOException Throws an exception if the file cannot be opened.
-     * @throw mitk::IGTIOException Throws an exception if there is no valid filename. 
+     * @throw mitk::IGTIOException Throws an exception if there is no valid filename.
      * @throw mitk::IGTIOException Throws an exception if the file is damaged.
      * @throw mitk::IGTException Throws an exception if there is no stream (i.e stream=NULL).
      */
@@ -91,14 +91,14 @@ namespace mitk {
     void Pause();
 
     /**
-     * \brief This method resumes the player when it was paused. 
+     * \brief This method resumes the player when it was paused.
      */
     void Resume();
 
 
     /**
      * \brief This method checks if player arrived at end of file.
-     * 
+     *
      */
     bool IsAtEnd();
 
@@ -137,12 +137,12 @@ namespace mitk {
     typedef mitk::NavigationData::TimeStampType TimeStampType;
 
     /**
-     * \brief filter execute method 
+     * \brief filter execute method
      */
     virtual void GenerateData();
 
     /**
-     * \brief Creates a stream out of the filename given by the variable m_FileName. 
+     * \brief Creates a stream out of the filename given by the variable m_FileName.
      * The stream is then set to m_Stream.
      *
      * @throw mitk::IGTIOException Throws an exception if file does not exist
@@ -177,7 +177,7 @@ namespace mitk {
     mitk::NavigationData::Pointer ReadVersion1();
 
     /**
-     * \brief This method initializes the player with first data  
+     * \brief This method initializes the player with first data
      */
     void InitPlayer();
 
@@ -210,7 +210,7 @@ namespace mitk {
     TiXmlNode * m_currentNode;
 
     bool m_StreamEnd; ///< stores if the input stream arrived at end
-    
+
     /**
      * @brief This is a helping method which gives an error message and throws an exception with the given message.
      *        It can be used if a stream is found to be invalid.
@@ -218,7 +218,7 @@ namespace mitk {
      * @throw mitk::IGTIOException Always throws an exception.
      */
     void StreamInvalid(std::string message);  ///< help method which sets the stream invalid and displays an error
-   
+
   };
 } // namespace mitk
 

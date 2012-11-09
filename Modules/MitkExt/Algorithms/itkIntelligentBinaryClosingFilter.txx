@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-template< class TInputImage, class TOutputImage > 
+template< class TInputImage, class TOutputImage >
 IntelligentBinaryClosingFilter<TInputImage, TOutputImage> ::IntelligentBinaryClosingFilter()
 {
   m_ErodeImageFilter = BinaryErodeImageFilterType::New();
@@ -52,9 +52,9 @@ void IntelligentBinaryClosingFilter<TInputImage, TOutputImage>::GenerateData()
   StructuringElementType seClosing;
   unsigned long radius[ImageDimension];
   const typename InputImageType::SpacingType spacing = input->GetSpacing();
-  for (unsigned int d=0; d<ImageDimension; d++) 
+  for (unsigned int d=0; d<ImageDimension; d++)
   { // closing works in voxel coordinates, so use spacing (and add 0.5 for correct rounding - cast just truncates)
-    radius[d] = (unsigned long)(m_ClosingRadius / spacing[d] + 0.5); 
+    radius[d] = (unsigned long)(m_ClosingRadius / spacing[d] + 0.5);
   }
   MITK_INFO << "    Closing kernel size = [" << radius[0] << ", " << radius[1] << ", " << radius[2] << "]" << std::endl;
   seClosing.SetRadius( radius );
@@ -85,21 +85,21 @@ void IntelligentBinaryClosingFilter<TInputImage, TOutputImage>::GenerateData()
 
   // dilate all components to detect border voxels
   m_BorderDetectionDilateFilter->SetInput( m_RelabelComponentImageFilter->GetOutput() );
-  m_BorderDetectionDilateFilter->SetKernel( seBorder ); 
+  m_BorderDetectionDilateFilter->SetKernel( seBorder );
   m_BorderDetectionDilateFilter->Update();
 
   // count volumes and border voxels for all components
-  OutputIteratorType itComp( m_RelabelComponentImageFilter->GetOutput(), 
+  OutputIteratorType itComp( m_RelabelComponentImageFilter->GetOutput(),
                              m_RelabelComponentImageFilter->GetOutput()->GetLargestPossibleRegion() );
-  OutputIteratorType itBorder( m_BorderDetectionDilateFilter->GetOutput(), 
+  OutputIteratorType itBorder( m_BorderDetectionDilateFilter->GetOutput(),
                               m_BorderDetectionDilateFilter->GetOutput()->GetLargestPossibleRegion() );
   ConstInputIteratorType itIn( input, input->GetLargestPossibleRegion() );
-  
+
   std::vector<unsigned int> volume( m_RelabelComponentImageFilter->GetNumberOfObjects()+1, 0 );
   std::vector<unsigned int> border( m_RelabelComponentImageFilter->GetNumberOfObjects()+1, 0 );
   std::vector<unsigned int> adjacent( m_RelabelComponentImageFilter->GetNumberOfObjects()+1, 0 );
   typename OutputImageType::ValueType borderId, compId;
-  for (itComp.GoToBegin(), itBorder.GoToBegin(), itIn.GoToBegin(); !itComp.IsAtEnd(); ++itComp, ++itBorder, ++itIn ) 
+  for (itComp.GoToBegin(), itBorder.GoToBegin(), itIn.GoToBegin(); !itComp.IsAtEnd(); ++itComp, ++itBorder, ++itIn )
   {
     borderId = itBorder.Get();
     if (borderId != 0) {
@@ -124,7 +124,7 @@ void IntelligentBinaryClosingFilter<TInputImage, TOutputImage>::GenerateData()
 
   // fill output
   OutputIteratorType itOut( output, output->GetLargestPossibleRegion() );
-  for (itOut.GoToBegin(), itIn.GoToBegin(), itComp.GoToBegin(); !itOut.IsAtEnd(); ++itOut, ++itIn, ++itComp ) 
+  for (itOut.GoToBegin(), itIn.GoToBegin(), itComp.GoToBegin(); !itOut.IsAtEnd(); ++itOut, ++itIn, ++itComp )
   {
     if (itIn.Get() != 0) {
       itOut.Set( 1 );

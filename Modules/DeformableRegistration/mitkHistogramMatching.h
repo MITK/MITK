@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,28 +40,28 @@ namespace mitk
   public:
     mitkClassMacro(HistogramMatching, RegistrationBase);
 
-    /*!  
-    * \brief Method for creation through the object factory. 
+    /*!
+    * \brief Method for creation through the object factory.
     */
     itkNewMacro(Self);
 
-    /*!  
-    * \brief Sets the number of match points for the histogram generation. 
+    /*!
+    * \brief Sets the number of match points for the histogram generation.
     */
     void SetNumberOfMatchPoints(int matchPoints);
 
-    /*!  
-    * \brief Sets the number of histogram levels for the histogram generation. 
+    /*!
+    * \brief Sets the number of histogram levels for the histogram generation.
     */
     void SetNumberOfHistogramLevels(int histogrammLevels);
 
-    /*!  
-    * \brief Sets whether a threshold at mean intensity should be used for the histogram generation. 
+    /*!
+    * \brief Sets whether a threshold at mean intensity should be used for the histogram generation.
     */
     void SetThresholdAtMeanIntensity(bool on);
 
-    /*!  
-    * \brief Starts the histogram matching. 
+    /*!
+    * \brief Starts the histogram matching.
     */
     virtual void GenerateData()
     {
@@ -73,19 +73,19 @@ namespace mitk
 
   protected:
 
-    /*!  
+    /*!
     * \brief Default constructor
-    */  
+    */
     HistogramMatching();
 
-    /*!  
+    /*!
     * \brief Default destructor
-    */  
+    */
     virtual ~HistogramMatching();
 
-    /*!  
+    /*!
     * \brief Template class to perform the histogram matching with any kind of image. Called by GenerateData().
-    */  
+    */
     template < typename TPixel, unsigned int VImageDimension >
       void GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1);
 

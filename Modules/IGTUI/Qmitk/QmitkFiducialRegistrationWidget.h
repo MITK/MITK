@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,17 +24,17 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \brief IGT Fiducial Registration Widget
  *
  * Widget used to set fiducial landmarks in the image and to confirm the corresponding landmarks on the world object (patient/phantom).
- * 
- * SetImageFiducialsNode(), SetTrackerFiducialsNode() and SetMultiWidget() must be called, otherwise QmitkPointListWidget can not work. 
- * 
- * 
+ *
+ * SetImageFiducialsNode(), SetTrackerFiducialsNode() and SetMultiWidget() must be called, otherwise QmitkPointListWidget can not work.
+ *
+ *
  *
  * \sa IGT
 */
 class MitkIGTUI_EXPORT QmitkFiducialRegistrationWidget : public QWidget
-{  
+{
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
-public: 
+public:
 
   QmitkFiducialRegistrationWidget(QWidget* parent);
   virtual ~QmitkFiducialRegistrationWidget();
@@ -59,7 +59,7 @@ public:
   void SetMultiWidget(QmitkStdMultiWidget* multiWidget); ///< Set the default stdMultiWidget (needed for the PointListwidget)
 
   void SetImageFiducialsNode(mitk::DataNode::Pointer imageFiducialsNode); ///< specify data tree node for the image fiducials
-  void SetTrackerFiducialsNode(mitk::DataNode::Pointer trackerFiducialsNode); ///< specify data tree node for the tracker fiducials  
+  void SetTrackerFiducialsNode(mitk::DataNode::Pointer trackerFiducialsNode); ///< specify data tree node for the tracker fiducials
   mitk::DataNode::Pointer GetImageFiducialsNode(); ///< returns data tree node for the image fiducials
   mitk::DataNode::Pointer GetTrackerFiducialsNode(); ///< returns data tree node for the tracker fiducials
 
@@ -72,7 +72,7 @@ public:
   void HideImageFiducialButton(bool on); ///< show or hide  "Add image fiducial" button in the UI
   void HideTrackingFiducialButton(bool on); ///< show or hide  "Add tracking fiducial" button in the UI
   void AdjustButtonSpacing(); ///< Rearrange spacing when buttons are turned on or off
-  
+
   signals:
     void AddedTrackingFiducial();      ///< signal if a world instrument position was added to a tracking space fiducial
     void AddedImageFiducial();      ///< signal if an image position was added to a image space fiducial
@@ -88,11 +88,11 @@ protected:
   void CreateQtPartControl(QWidget *parent);
 
   void CreateConnections();
-  
+
   Ui::QmitkFiducialRegistrationWidget* m_Controls;  ///< gui widget
   QmitkStdMultiWidget* m_MultiWidget;
   mitk::DataNode::Pointer m_ImageFiducialsNode;
   mitk::DataNode::Pointer m_TrackerFiducialsNode;
- 
+
 };
 #endif // _QmitkFiducialRegistrationWidget_H_INCLUDED

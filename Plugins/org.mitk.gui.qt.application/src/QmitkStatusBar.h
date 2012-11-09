@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,24 +38,24 @@ class MITK_QT_APP QmitkStatusBar : public mitk::StatusBarImplementation
 public:
 
     mitkClassMacro(QmitkStatusBar, mitk::StatusBarImplementation);
- 
+
     //##Documentation
     //##@brief Constructor;
     //## holds param instance internaly and connects this to the mitkStatusBar
     QmitkStatusBar(QStatusBar* instance);
-    
+
     //##Documentation
     //##@brief Destructor
     virtual ~QmitkStatusBar();
-    
-   
+
+
     //##Documentation
     //## @brief Send a string to the applications StatusBar (QStatusBar).
     virtual void DisplayText(const char* t);
     virtual void DisplayText(const char* t, int ms);
-        
+
     //##Documentation
-    //## @brief Send a string as an error message to StatusBar. 
+    //## @brief Send a string as an error message to StatusBar.
     //## The implementation calls DisplayText()
     virtual void DisplayErrorText(const char *t) { this->DisplayText(t); };
     virtual void DisplayWarningText(const char *t) { this->DisplayText(t); };
@@ -69,11 +69,11 @@ public:
     virtual void Clear();
 
     //##Documentation
-    //## @brief Set the QSizeGrip of the window 
-    //## (the triangle in the lower right Windowcorner for changing the size) 
-    //## to enabled or disabled 
+    //## @brief Set the QSizeGrip of the window
+    //## (the triangle in the lower right Windowcorner for changing the size)
+    //## to enabled or disabled
     virtual void SetSizeGripEnabled(bool enable);
-    
+
 private:
     //static Pointer m_Instance;
     QStatusBar* m_StatusBar;

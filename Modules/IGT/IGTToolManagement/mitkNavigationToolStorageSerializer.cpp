@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,7 +36,7 @@ mitk::NavigationToolStorageSerializer::NavigationToolStorageSerializer()
   //create temp directory
   mitk::UIDGenerator myUIDGen = mitk::UIDGenerator("",16);
   m_tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "tempNavigationToolSerializer_" + myUIDGen.GetUID();
-  Poco::File myFile(m_tempDirectory);  
+  Poco::File myFile(m_tempDirectory);
   myFile.createDirectory();
 }
 
@@ -59,9 +59,9 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
   //save every tool to temp directory
   mitk::NavigationToolWriter::Pointer myToolWriter = mitk::NavigationToolWriter::New();
   for(int i=0; i<storage->GetToolCount();i++)
-  {   
+  {
     std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
-    if (!myToolWriter->DoWrite(fileName,storage->GetTool(i))) 
+    if (!myToolWriter->DoWrite(fileName,storage->GetTool(i)))
       {
         mitkThrowException(mitk::IGTIOException) << "Could not write tool to tempory directory: " << filename;
       }
@@ -88,7 +88,7 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
   }
  zipper.close();
  file.close();
-  
+
  return true;
  }
 

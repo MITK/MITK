@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,23 +34,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
-  
+
   enum PFCompositionOperation {
     PFCOMPOSITION_AND_OPERATION,
     PFCOMPOSITION_OR_OPERATION,
     PFCOMPOSITION_NOT_OPERATION,
   };
-  
 
 
-  
+
+
   class MitkDiffusionImaging_EXPORT PlanarFigureComposite : public PlanarFigure
   {
-    
+
     typedef itk::VectorContainer<unsigned int, PlanarFigure::Pointer> CompositionContainer;
     typedef itk::VectorContainer<unsigned int, mitk::DataNode::Pointer> DataNodeContainer;
-    
-  
+
+
   public:
     mitkClassMacro(PlanarFigureComposite, PlanarFigure);
     itkNewMacro( Self );
@@ -67,14 +67,14 @@ namespace mitk {
       return 0;
     }
     // /////////////////////////
-  
-    
-    
+
+
+
     int getNumberOfChildren();
     mitk::PlanarFigure::Pointer getChildAt(int);
     void addPlanarFigure(PlanarFigure::Pointer);
-    
-    
+
+
     mitk::DataNode::Pointer getDataNodeAt(int);
     void addDataNode(mitk::DataNode::Pointer);
     void replaceDataNodeAt(int, mitk::DataNode::Pointer);
@@ -82,42 +82,42 @@ namespace mitk {
     // set if this compsition is AND, OR, NOT
     void setOperationType(PFCompositionOperation);
     PFCompositionOperation getOperationType();
-    
+
     void setDisplayName(std::string);
     std::string getDisplayName();
-    
+
   protected:
     PlanarFigureComposite();
     virtual ~PlanarFigureComposite();
-    
-    
-    
+
+
+
     // ///MUST HAVE IMPLEMENTATION//////
     /** \brief Generates the poly-line representation of the planar figure. */
     virtual void GeneratePolyLine();
-    
+
     /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
     virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight);
-    
+
     /** \brief Calculates feature quantities of the planar figure. */
     virtual void EvaluateFeaturesInternal();
-    
+
     virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
     // ////////////////////
-        
 
-    
-    
+
+
+
   private:
     //this vector takes planarfigures and planarfigureComosite types
     CompositionContainer::Pointer m_PFVector;
     PFCompositionOperation m_compOperation;
-    
+
     DataNodeContainer::Pointer m_DNVector;
     std::string m_name;
-    
-    
-    
+
+
+
   };
 
 }

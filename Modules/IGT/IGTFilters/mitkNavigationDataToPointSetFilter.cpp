@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -151,7 +151,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
   std::vector<mitk::NavigationData::TimeStampType> vectorOldTime(this->GetNumberOfOutputs());
 
   //use first Output to get the size of the pointsets. All output pointssets have to have the same size!
-  mitk::PointSet::PointIdentifier newPointId = this->GetOutput(0)->GetSize(); 
+  mitk::PointSet::PointIdentifier newPointId = this->GetOutput(0)->GetSize();
 
   bool numberForMean_is_reached = false;
   while (!numberForMean_is_reached)
@@ -186,8 +186,8 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
             mitk::Vector3D vec;
             vec.SetVnlVector(pos.GetVnlVector());
             mitk::PointSet::PointType oPoint = output->GetPoint(newPointId);
-            oPoint += vec;//summ up 
-            output->SetPoint(newPointId, oPoint); 
+            oPoint += vec;//summ up
+            output->SetPoint(newPointId, oPoint);
 
             //store in counterVec to know how many have been added (and not skipped because of invalid data)
             counterVec[i]++;
@@ -212,7 +212,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
     mitk::PointSet::PointType oPoint = output->GetPoint(newPointId);
     for (unsigned int index = 0; index < oPoint.Size(); index++)
       oPoint[index] = oPoint[index] / counterVec[i];
-    output->SetPoint(newPointId, oPoint); 
+    output->SetPoint(newPointId, oPoint);
     MBI_INFO << "For output # " << i << ", " << counterVec[i] << " tracked positions used for averaging";
   }
 }
@@ -227,7 +227,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode4D()
     assert(nd);
     mitk::NavigationData::PositionType point = nd->GetPosition();  //get the position
     output->SetPoint( index, point, m_CurrentTimeStep); //store it in the pointset always at the current time step
-  }   
+  }
   if (m_CurrentTimeStep == m_RingBufferSize - 1) // update ring buffer index
     m_CurrentTimeStep = 0;
   else

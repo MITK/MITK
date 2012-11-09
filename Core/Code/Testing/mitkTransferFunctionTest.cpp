@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
 *  Unit test for class mitk::TransferFunction.
-*  
-*  argc and argv are the command line parameters which were passed to 
+*
+*  argc and argv are the command line parameters which were passed to
 *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
 *  tests, argv is either empty for the simple tests or contains the filename
 *  of a test image for the image tests (see CMakeLists.txt).
@@ -34,7 +34,7 @@ int mitkTransferFunctionTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("TransferFunction");
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::TransferFunction::Pointer myTransferFunction = mitk::TransferFunction::New();
 
   // first test: did this work?
@@ -100,7 +100,7 @@ int mitkTransferFunctionTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(
     myTransferFunction->GetColorTransferFunction()->GetSize() == 5,
     "Adding new point/value to color transfer function via MITK interface" );
-  
+
 
   /*************************************************************************/
   // Retrieve two points from scalar opacity transfer function
@@ -139,7 +139,7 @@ int mitkTransferFunctionTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(
     myTransferFunction->RemoveScalarOpacityPoint( 3.0 ) == 1,
     "Removing point from scalar opacity transfer function (should return point index)" );
-  
+
   // Remove point from scalar opacity transfer function (should return new
   // number of points)
   MITK_TEST_CONDITION_REQUIRED(
@@ -236,7 +236,7 @@ int mitkTransferFunctionTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(
     transferInit->GetTransferFunction() == myTransferFunction,
     "Testing if Set Transferfunction sets the correct one" );
-  
+
   const int size = 8;
   int arPointNumbers[size][3] = {{3,1,6},
                               {2,1,2},
@@ -259,17 +259,17 @@ int mitkTransferFunctionTest(int /* argc */, char* /*argv*/[])
   for(int i =0; i<size; i++)
   {
   transferInit->SetTransferFunctionMode(i);
-  
+
   std::cout << "Punkte: " << myTransferFunction->GetScalarOpacityFunction()->GetSize() << std::endl;
   MITK_TEST_CONDITION_REQUIRED(
     myTransferFunction->GetScalarOpacityFunction()->GetSize() == arPointNumbers[i][0],
-    "Testing if in " << names[i] << " the Scalar Opacity Function is set" );  
+    "Testing if in " << names[i] << " the Scalar Opacity Function is set" );
   MITK_TEST_CONDITION_REQUIRED(
     myTransferFunction->GetGradientOpacityFunction()->GetSize() == arPointNumbers[i][1],
     "Testing if in " << names[i] << " the Gradient Opacity Function is set" );
   MITK_TEST_CONDITION_REQUIRED(
       myTransferFunction->GetColorTransferFunction()->GetSize() == arPointNumbers[i][2],
-    "Testing if in " << names[i] << " the Color Transfer Function is set" );   
+    "Testing if in " << names[i] << " the Color Transfer Function is set" );
   }
   // always end with this!
   MITK_TEST_END()

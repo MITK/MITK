@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,7 +26,7 @@ namespace mitk
     m_NumOfFrames(0), m_DistanceImageSelected(true), m_AmplitudeImageSelected(true),
     m_IntensityImageSelected(true), m_RGBImageSelected(true), m_ToFCaptureWidth(200),m_ToFCaptureHeight(200),
     m_RGBCaptureWidth(200),m_RGBCaptureHeight(200),
-    m_ToFPixelNumber(0), m_ToFImageSizeInBytes(0), 
+    m_ToFPixelNumber(0), m_ToFImageSizeInBytes(0),
     m_RGBPixelNumber(0), m_RGBImageSizeInBytes(0),
     m_ToFImageType(ToFImageWriter::ToFImageType3D)
   {

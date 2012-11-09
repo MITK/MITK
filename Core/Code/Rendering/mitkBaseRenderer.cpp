@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -65,7 +65,7 @@ mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::baseRendererMap;
 
 mitk::BaseRenderer* mitk::BaseRenderer::GetInstance(vtkRenderWindow * renWin)
 {
-   for(BaseRendererMapType::iterator mapit = baseRendererMap.begin(); 
+   for(BaseRendererMapType::iterator mapit = baseRendererMap.begin();
       mapit != baseRendererMap.end(); mapit++)
   {
     if( (*mapit).first == renWin)
@@ -97,7 +97,7 @@ void mitk::BaseRenderer::RemoveInstance(vtkRenderWindow* renWin)
 
 mitk::BaseRenderer* mitk::BaseRenderer::GetByName( const std::string& name )
 {
-  for(BaseRendererMapType::iterator mapit = baseRendererMap.begin(); 
+  for(BaseRendererMapType::iterator mapit = baseRendererMap.begin();
     mapit != baseRendererMap.end(); mapit++)
   {
     if( (*mapit).second->m_Name == name)
@@ -109,7 +109,7 @@ mitk::BaseRenderer* mitk::BaseRenderer::GetByName( const std::string& name )
 
 vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName( const std::string& name )
 {
-  for(BaseRendererMapType::iterator mapit = baseRendererMap.begin(); 
+  for(BaseRendererMapType::iterator mapit = baseRendererMap.begin();
   mapit != baseRendererMap.end(); mapit++)
   {
     if( (*mapit).second->m_Name == name)
@@ -211,12 +211,12 @@ m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
   m_VtkRenderer = vtkRenderer::New();
 
   if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == NULL)
-  {  
+  {
     mitk::VtkLayerController::AddInstance(m_RenderWindow,m_VtkRenderer);
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);
   }
   else
-    mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);  
+    mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);
 }
 
 
@@ -230,14 +230,14 @@ mitk::BaseRenderer::~BaseRenderer()
 
   if(m_CameraController.IsNotNull())
     m_CameraController->SetRenderer(NULL);
-  
+
   m_RenderingManager->GetGlobalInteraction()->RemoveFocusElement(this);
 
   mitk::VtkLayerController::RemoveInstance(m_RenderWindow);
 
   RemoveAllLocalStorages();
-    
-  
+
+
   m_DataStorage = NULL;
 
   if(m_RenderWindow!=NULL)
@@ -250,17 +250,17 @@ mitk::BaseRenderer::~BaseRenderer()
 void mitk::BaseRenderer::RemoveAllLocalStorages()
 {
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
-  
+
   std::list<mitk::BaseLocalStorageHandler*>::iterator it;
   for ( it=m_RegisteredLocalStorageHandlers.begin() ; it != m_RegisteredLocalStorageHandlers.end(); it++ )
     (*it)->ClearLocalStorage(this,false);
-  m_RegisteredLocalStorageHandlers.clear();  
+  m_RegisteredLocalStorageHandlers.clear();
 }
 
 void mitk::BaseRenderer::RegisterLocalStorageHandler( mitk::BaseLocalStorageHandler *lsh )
 {
   m_RegisteredLocalStorageHandlers.push_back(lsh);
-  
+
 }
 
 void mitk::BaseRenderer::UnregisterLocalStorageHandler( mitk::BaseLocalStorageHandler *lsh )
@@ -310,9 +310,9 @@ void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
   {
     m_RenderWindow->Register(NULL);
   }
-  
+
   RemoveAllLocalStorages();
-  
+
   if(m_CameraController.IsNotNull())
   {
     m_CameraController->SetRenderer(this);
@@ -410,7 +410,7 @@ void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
   {
     if(geometry->GetBoundingBox()->GetDiagonalLength2() == 0)
       return;
-    
+
     m_WorldGeometry = geometry;
     m_TimeSlicedWorldGeometry=dynamic_cast<TimeSlicedGeometry*>(geometry);
     SlicedGeometry3D* slicedWorldGeometry;
@@ -500,7 +500,7 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::Geometry3D* geometry)
     m_EmptyWorldGeometry = true;
     return;
   }
-  BoundingBox::Pointer boundingBox = 
+  BoundingBox::Pointer boundingBox =
     m_CurrentWorldGeometry->CalculateBoundingBoxRelativeToTransform(NULL);
   const BoundingBox::BoundsArrayType& worldBounds = boundingBox->GetBounds();
   m_Bounds[0] = worldBounds[0];
@@ -537,7 +537,7 @@ void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject & geometryUpdateE
     if (slicedWorldGeometry)
     {
       Geometry2D* geometry2D = slicedWorldGeometry->GetGeometry2D(m_Slice);
-    
+
       SetCurrentWorldGeometry2D(geometry2D); // calls Modified()
     }
   }
@@ -572,7 +572,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   //set the Focus on the renderer
   /*bool success =*/ m_RenderingManager->GetGlobalInteraction()->SetFocus(this);
   /*
-  if (! success) 
+  if (! success)
     mitk::StatusBar::GetInstance()->DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");
   */
 
@@ -739,7 +739,7 @@ mitk::RenderingManager* mitk::BaseRenderer::GetRenderingManager() const
 
 
 /*!
-Sets the new Navigation controller 
+Sets the new Navigation controller
 */
 void mitk::BaseRenderer::SetSliceNavigationController(mitk::SliceNavigationController *SlicenavigationController)
 {
@@ -748,24 +748,24 @@ void mitk::BaseRenderer::SetSliceNavigationController(mitk::SliceNavigationContr
 
   //disconnect old from globalinteraction
   m_RenderingManager->GetGlobalInteraction()->RemoveListener(SlicenavigationController);
-  
+
   //copy worldgeometry
   SlicenavigationController->SetInputWorldGeometry( SlicenavigationController->GetCreatedWorldGeometry() );
   SlicenavigationController->Update();
 
-    
-  //set new 
+
+  //set new
   m_SliceNavigationController = SlicenavigationController;
   m_SliceNavigationController->SetRenderer( this );
 
   if (m_SliceNavigationController.IsNotNull())
-  {  
+  {
     m_SliceNavigationController->ConnectGeometrySliceEvent( this );
     m_SliceNavigationController->ConnectGeometryUpdateEvent( this );
     m_SliceNavigationController->ConnectGeometryTimeEvent( this, false );
   }
 
- 
+
 }
 
 

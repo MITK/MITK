@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -99,7 +99,7 @@ void mitk::SphereLandmarkProjector::ProjectLandmarks(
       v[0]=point[0]-center[0];
       v[1]=point[1]-center[1];
       v[2]=point[2]-center[2];
-      if (v.GetNorm() < radius) radius = v.GetNorm();      
+      if (v.GetNorm() < radius) radius = v.GetNorm();
     }
     break;
   case 1/*MAX*/:
@@ -111,7 +111,7 @@ void mitk::SphereLandmarkProjector::ProjectLandmarks(
       v[0]=point[0]-center[0];
       v[1]=point[1]-center[1];
       v[2]=point[2]-center[2];
-      if (v.GetNorm() > radius) radius = v.GetNorm();      
+      if (v.GetNorm() > radius) radius = v.GetNorm();
     }
     break;
   case 2/*AVERAGE*/:
@@ -143,7 +143,7 @@ void mitk::SphereLandmarkProjector::ProjectLandmarks(
   m_WritableFinalTargetLandmarks->Reserve(size);
   m_ProjectedLandmarks->Reserve(size);
   for(id=0, pointiterator=start;id<size;++id, ++pointiterator)
-  { 
+  {
     point = pointiterator->Value();
 
     mitk::Vector3D v;

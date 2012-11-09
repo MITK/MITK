@@ -1,5 +1,5 @@
 set(SRC_CPP_FILES
-  
+
 )
 
 set(INTERNAL_CPP_FILES
@@ -7,19 +7,19 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
-  
+
 )
 
 set(MOC_H_FILES
-  
+
 )
 
 set(RESOURCE_FILES
-  
+
 )
 
 set(RES_FILES
-  
+
 )
 
 set(CPP_FILES manifest.cpp)

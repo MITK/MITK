@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -89,7 +89,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
 }//Generate Data
 
 
-void mitk::ExtractDirectedPlaneImageFilterNew::GenerateOutputInformation () 
+void mitk::ExtractDirectedPlaneImageFilterNew::GenerateOutputInformation ()
 {
     Superclass::GenerateOutputInformation();
 }
@@ -193,7 +193,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     itk::MatrixOffsetTransformBase<mitk::ScalarType,3,3>::MatrixType tempTransform = newSliceGeometryTest->GetIndexToWorldTransform()->GetMatrix();
     //Workaround end
 
-    /* 
+    /*
     * Now we iterate over the recently created slice.
     * For each slice - pixel we check whether there is an according
     * pixel in the input - image which can be set in the slice.
@@ -257,7 +257,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
 
 //if ( columns == (extentInPixel[0]) )
 //{
-//If we are at the end of a row, then we have to go to the beginning of the next row 
+//If we are at the end of a row, then we have to go to the beginning of the next row
 //currentImagePointIn3D = origin;
 //currentImagePointIn3D += newPixelSpacing[1]*bottom*index[1];
 //columns = 0;
@@ -268,7 +268,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
 ////
 //if ( columns != 0 )
 //{
-//currentImagePointIn3D += newPixelSpacing[0]*right; 
+//currentImagePointIn3D += newPixelSpacing[0]*right;
 //}
 //m_ImageGeometry->WorldToIndex(currentImagePointIn3D, inputIndex);
 //}

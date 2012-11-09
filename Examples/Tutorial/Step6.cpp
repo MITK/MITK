@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //##Documentation
 //## @brief Start region-grower at interactively added points
-Step6::Step6(int argc, char* argv[], QWidget *parent) 
+Step6::Step6(int argc, char* argv[], QWidget *parent)
 : QWidget(parent)
 {
   // load data as in the previous steps; a reference to the first loaded

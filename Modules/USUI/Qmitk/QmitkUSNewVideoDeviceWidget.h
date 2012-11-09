@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,7 +50,7 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     virtual void CreateQtPartControl(QWidget *parent);
     /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
-  
+
   signals:
 
     void Finished();
@@ -68,7 +68,7 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     void CreateNewDevice();
 
   protected slots:
-  
+
     /*
     \brief Called, when the the user clicks the "Done" button (Labeled either "Add Device" or "Edit Device", depending on the situation.
     */
@@ -77,15 +77,15 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     /*
     \brief Called, when the button "Cancel" was clicked
     */
-    void OnClickedCancel();   
+    void OnClickedCancel();
 
     /*
     \brief Called, when the Use selects one of the Radiobuttons
     */
-    void OnDeviceTypeSelection();   
+    void OnDeviceTypeSelection();
 
 
-    
+
 
 
   protected:
@@ -115,7 +115,7 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     *  if the "CreateNewDevice slot was called.
     */
     mitk::USVideoDevice::Pointer m_TargetDevice;
-     
+
 
 };
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  *  Test for the class "mitkPointSetReader".
- *  
- *  argc and argv are the command line parameters which were passed to 
+ *
+ *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test data set for the tests (see CMakeLists.txt).
@@ -30,17 +30,17 @@ int mitkPointSetReaderTest(int argc , char* argv[])
 {
   // always start with this!
   MITK_TEST_BEGIN("PointSetReader")
-  MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing invocation") 
+  MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing invocation")
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::PointSetReader::Pointer myPointSetReader = mitk::PointSetReader::New();
-  MITK_TEST_CONDITION_REQUIRED(myPointSetReader.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(myPointSetReader.IsNotNull(),"Testing instantiation")
 
   // testing set / get name with invalid data
   std::string testName = "test1";
   myPointSetReader->SetFileName( testName );
   MITK_TEST_CONDITION_REQUIRED( myPointSetReader->GetFileName()== testName, "Testing set / get file name methods!");
-  
+
   // testing file reading with invalid data
   MITK_TEST_CONDITION_REQUIRED( !myPointSetReader->CanReadFile(testName,"",""), "Testing CanReadFile() method with invalid input file name!");
   myPointSetReader->Update();
@@ -52,7 +52,7 @@ int mitkPointSetReaderTest(int argc , char* argv[])
   myPointSetReader->Modified();
   myPointSetReader->Update();
   MITK_TEST_CONDITION_REQUIRED( myPointSetReader->GetSuccess(), "Testing GetSuccess() with valid input file name!");
-  
+
   // evaluate if the read point set is correct
   mitk::PointSet::Pointer resultPS = myPointSetReader->GetOutput();
   MITK_TEST_CONDITION_REQUIRED( resultPS.IsNotNull(), "Testing output generation!");

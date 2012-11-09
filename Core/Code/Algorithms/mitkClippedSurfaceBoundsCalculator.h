@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * form of a pair (minimum,maximum) slice index.
  *
  * Such calculations are useful if you want to display information about the
- * currently visible slice (overlays, statistics, ...) and you don't want to 
+ * currently visible slice (overlays, statistics, ...) and you don't want to
  * depend on any prior information about hat the renderwindow is currently showing.
  *
  * \warning The interface attempts to look like an ITK filter but it is far from being one.
@@ -46,7 +46,7 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
 
   public:
 
-    ClippedSurfaceBoundsCalculator(const mitk::PlaneGeometry* geometry = NULL, 
+    ClippedSurfaceBoundsCalculator(const mitk::PlaneGeometry* geometry = NULL,
                                    mitk::Image::Pointer image = NULL);
     ClippedSurfaceBoundsCalculator(const mitk::Geometry3D* geometry,
                                    mitk::Image::Pointer image);
@@ -63,7 +63,7 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
        1. construct a bounding box of the image. This is the box that connect the outer voxel centers(!).
        2. check the edges of this box.
        3. intersect each edge with the plane geometry
-          - if the intersection point is within the image box, 
+          - if the intersection point is within the image box,
             we update the visible/cut slice indices for all dimensions.
           - else we ignore the cut
     */
@@ -78,12 +78,12 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
       \brief What X coordinates (slice indices) are cut/visible in given plane.
     */
     OutputType GetMinMaxSpatialDirectionX();
-    
+
     /**
       \brief What Y coordinates (slice indices) are cut/visible in given plane.
     */
     OutputType GetMinMaxSpatialDirectionY();
-    
+
     /**
       \brief What Z coordinates (slice indices) are cut/visible in given plane.
     */

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -93,7 +93,7 @@ namespace mitk {
     }
 
     bool HasVtkProp( const vtkProp* prop, BaseRenderer* renderer )
-    { 
+    {
       return m_OdfMapper->HasVtkProp(prop, renderer);
     }
 
@@ -115,7 +115,7 @@ namespace mitk {
       node->AddProperty( "opaclevelwindow", prop );
     }
 
-    bool IsLODEnabled( BaseRenderer * renderer ) const 
+    bool IsLODEnabled( BaseRenderer * renderer ) const
     {
       return m_ImgMapper->IsLODEnabled(renderer) || m_OdfMapper->IsLODEnabled(renderer);
     }

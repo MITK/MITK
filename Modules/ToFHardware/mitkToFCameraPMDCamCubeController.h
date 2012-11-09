@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,13 +27,13 @@ namespace mitk
 {
   /**
   * @brief Interface to the Time-of-Flight (ToF) camera PMD CamCube
-  * 
+  *
   *
   * @ingroup ToFHardware
   */
   class MITK_TOFHARDWARE_EXPORT ToFCameraPMDCamCubeController : public mitk::ToFCameraPMDController
   {
-  public: 
+  public:
 
     mitkClassMacro( ToFCameraPMDCamCubeController , mitk::ToFCameraPMDController );
 
@@ -66,7 +66,7 @@ namespace mitk
     bool SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height );
     /*!
     \brief Setting the region of interest, the camera is configured to only output a certain area of the image.
-    \param roi region of interest. roi[0]: x value of left upper corner, roi[1]: y value of left upper corner, roi[2]: width, roi[3]: height 
+    \param roi region of interest. roi[0]: x value of left upper corner, roi[1]: y value of left upper corner, roi[2]: width, roi[3]: height
     \return returns whether set operation was successful (true) or not (false)
     */
     bool SetRegionOfInterest( unsigned int roi[4] );
@@ -77,7 +77,7 @@ namespace mitk
     unsigned int* GetRegionOfInterest();
     /*!
     \brief sets the exposure mode of the CamCube
-    \param mode exposure mode. 0: normal mode (one exposure), 1: Suppression of motion blur (SMB), minimizes the time needed to capture 
+    \param mode exposure mode. 0: normal mode (one exposure), 1: Suppression of motion blur (SMB), minimizes the time needed to capture
     a distance image from the camera which results in a reduced amount of motion artifact but may lead to increased noise.
     \return returns whether set operation was successful (true) or not (false)
     */

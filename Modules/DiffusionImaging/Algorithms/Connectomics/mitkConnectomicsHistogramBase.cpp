@@ -4,12 +4,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,32 +35,32 @@ mitk::ConnectomicsHistogramBase::~ConnectomicsHistogramBase()
 }
 
 
-double mitk::ConnectomicsHistogramBase::GetYMin() const 
+double mitk::ConnectomicsHistogramBase::GetYMin() const
 {
   return m_BaselineValue;
 }
 
-double mitk::ConnectomicsHistogramBase::GetYMax() const 
+double mitk::ConnectomicsHistogramBase::GetYMax() const
 {
   return m_TopValue;
 }
 
-double mitk::ConnectomicsHistogramBase::GetMin() const 
+double mitk::ConnectomicsHistogramBase::GetMin() const
 {
   return this->GetXMin();
 }
 
-double mitk::ConnectomicsHistogramBase::GetMax() const 
+double mitk::ConnectomicsHistogramBase::GetMax() const
 {
   return this->GetXMax();
 }
 
-double mitk::ConnectomicsHistogramBase::GetXMin() const 
+double mitk::ConnectomicsHistogramBase::GetXMin() const
 {
   return m_StartValue;
 }
 
-double mitk::ConnectomicsHistogramBase::GetXMax() const 
+double mitk::ConnectomicsHistogramBase::GetXMax() const
 {
   return ( m_StartValue + this->GetRange() );
 }
@@ -108,7 +108,7 @@ void mitk::ConnectomicsHistogramBase::ComputeFromBaseData( BaseData* source )
 
   mitk::ConnectomicsNetwork* networkSource = dynamic_cast<mitk::ConnectomicsNetwork*>(source);
 
-  if (networkSource==NULL) 
+  if (networkSource==NULL)
   { // base data but no network
     return;
   }
@@ -159,7 +159,7 @@ float mitk::ConnectomicsHistogramBase::GetRelativeBin( double start, double end 
     }
     else
     {
-      MBI_WARN << mitk::ConnectomicsConstantsManager::CONNECTOMICS_ERROR_BEYOND_SCOPE << 
+      MBI_WARN << mitk::ConnectomicsConstantsManager::CONNECTOMICS_ERROR_BEYOND_SCOPE <<
         index << " on vector sized: " <<  m_HistogramVector.size();
     }
   }
@@ -170,8 +170,8 @@ float mitk::ConnectomicsHistogramBase::GetRelativeBin( double start, double end 
 
     try
     {
-      indexStart = Double2Int::convert( start ); 
-      indexEnd   = Double2Int::convert( end   ); 
+      indexStart = Double2Int::convert( start );
+      indexEnd   = Double2Int::convert( end   );
     }
     catch ( boost::numeric::positive_overflow const& )
     {

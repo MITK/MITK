@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,13 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace std;
 
-namespace berry 
+namespace berry
 {
 
   Preferences::Preferences(const PropertyMap& _Properties
     , const std::string& _Name
     , Preferences* _Parent
-    , AbstractPreferencesStorage* _Storage) 
+    , AbstractPreferencesStorage* _Storage)
       : m_Properties(_Properties)
       , m_Name(_Name)
       , m_Parent(_Parent)
@@ -47,7 +47,7 @@ namespace berry
       m_Path = "/";
       m_Root = this;
     }
-    
+
   }
 
   bool Preferences::Has( string key ) const
@@ -63,7 +63,7 @@ namespace berry
     bool dirty = m_Dirty;
     for (ChildrenList::const_iterator it = m_Children.begin()
       ; it != m_Children.end(); ++it)
-    {      
+    {
       // break condition: if one node is dirty the whole tree is dirty
       if(dirty)
         break;
@@ -136,7 +136,7 @@ namespace berry
     this->SetDirty(true);
   }
 
-  void Preferences::Flush() throw(Poco::Exception, BackingStoreException)  
+  void Preferences::Flush() throw(Poco::Exception, BackingStoreException)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     // ensure that this is the parent
@@ -146,35 +146,35 @@ namespace berry
     this->SetDirty(false);
   }
 
-  string Preferences::Get(string key, string def) const 
+  string Preferences::Get(string key, string def) const
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
     return this->Has(key)? m_Properties.find(key)->second: def;
   }
 
-  bool Preferences::GetBool(string key, bool def) const 
+  bool Preferences::GetBool(string key, bool def) const
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
     return this->Has(key)? (m_Properties.find(key)->second == "true"? true: false): def;
   }
 
-  string Preferences::GetByteArray(string key, string def) const 
+  string Preferences::GetByteArray(string key, string def) const
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
     return this->Has(key)? Base64::decode(m_Properties.find(key)->second): def;
   }
 
-  double Preferences::GetDouble(string key, double def) const 
+  double Preferences::GetDouble(string key, double def) const
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
     return this->Has(key)? atof(m_Properties.find(key)->second.c_str()): def;
   }
 
-  float Preferences::GetFloat(string key, float def) const 
+  float Preferences::GetFloat(string key, float def) const
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -188,7 +188,7 @@ namespace berry
     return this->Has(key)? atoi(m_Properties.find(key)->second.c_str()): def;
   }
 
-  long Preferences::GetLong(string key, long def) const 
+  long Preferences::GetLong(string key, long def) const
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -209,13 +209,13 @@ namespace berry
     return keys;
   }
 
-  string Preferences::Name() const 
+  string Preferences::Name() const
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     return m_Name;
   }
 
-  IPreferences::Pointer Preferences::Node(string pathName)  
+  IPreferences::Pointer Preferences::Node(string pathName)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -258,7 +258,7 @@ namespace berry
           node = IPreferences::Pointer((*it).GetPointer());
           break;
         }
-   
+
       }
 
       // node not found create new one
@@ -269,7 +269,7 @@ namespace berry
         node = newNode.GetPointer();
         // this branch is dirty now -> prefs must be rewritten persistently
         this->SetDirty(true);
-      
+
       }
 
       // call Node() again if there are any names left on the path
@@ -320,7 +320,7 @@ namespace berry
           // call recursively if more names on the path exist
           if(pos != string::npos)
             nodeExists = (*it)->NodeExists(pathName);
-          else 
+          else
             nodeExists = true;
           break;
         }
@@ -330,7 +330,7 @@ namespace berry
     return nodeExists;
   }
 
-  void Preferences::Put(string key, string value) 
+  void Preferences::Put(string key, string value)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -339,14 +339,14 @@ namespace berry
     this->SetDirty(true);
   }
 
-  void Preferences::PutByteArray(string key, string value) 
+  void Preferences::PutByteArray(string key, string value)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
     this->Put(key, Base64::encode(value));
   }
 
-  void Preferences::PutBool(string key, bool value)  
+  void Preferences::PutBool(string key, bool value)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -367,7 +367,7 @@ namespace berry
     this->Put(key, Preferences::ToString(value));
   }
 
-  void Preferences::PutInt(string key, int value)   
+  void Preferences::PutInt(string key, int value)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -381,7 +381,7 @@ namespace berry
     this->Put(key, Preferences::ToString(value));
   }
 
-  void Preferences::Remove(string key)  
+  void Preferences::Remove(string key)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -399,7 +399,7 @@ namespace berry
       Preferences::Pointer(this)));
   }
 
-  void Preferences::Sync() throw(Poco::Exception, BackingStoreException) 
+  void Preferences::Sync() throw(Poco::Exception, BackingStoreException)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -409,7 +409,7 @@ namespace berry
   void Preferences::AssertValid() const
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
-    if(m_Removed) 
+    if(m_Removed)
     {
       ostringstream s;
       std::locale C("C");
@@ -419,9 +419,9 @@ namespace berry
     }
   }
 
-  void Preferences::AssertPath(string pathName) 
+  void Preferences::AssertPath(string pathName)
   {
-    if(pathName.find("//") != string::npos) 
+    if(pathName.find("//") != string::npos)
     {
       ostringstream s;
       std::locale C("C");
@@ -456,7 +456,7 @@ namespace berry
 /*
     for (ChildrenList::iterator it = m_Children.begin()
     ; it != m_Children.end(); ++it)
-    {      
+    {
       (*it)->SetDirty(_Dirty);
     }
 */
@@ -470,7 +470,7 @@ namespace berry
 
     for (ChildrenList::iterator it = m_Children.begin()
       ; it != m_Children.end(); ++it)
-    {      
+    {
       (*it)->SetRemoved(_Removed);
     }
 
@@ -492,9 +492,9 @@ namespace berry
   Preferences::~Preferences()
   {
   }
-} 
+}
 
-namespace Base64 
+namespace Base64
 {
   string encode(const string &sString)
   {
@@ -547,9 +547,9 @@ namespace Base64
   {
     static const string::size_type np = string::npos;
 
-    static const string::size_type DecodeTable[] = 
+    static const string::size_type DecodeTable[] =
     {
-      // 0   1   2   3   4   5   6   7   8   9 
+      // 0   1   2   3   4   5   6   7   8   9
       np, np, np, np, np, np, np, np, np, np,  //   0 -   9
       np, np, np, np, np, np, np, np, np, np,  //  10 -  19
       np, np, np, np, np, np, np, np, np, np,  //  20 -  29

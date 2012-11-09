@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,19 +24,19 @@ QmitkLevelWindowPresetDefinitionDialog::QmitkLevelWindowPresetDefinitionDialog(Q
  : QDialog(parent, f), m_TableModel(0), m_SortModel(this)
 {
   this->setupUi(this);
-  
+
   QObject::connect(addButton, SIGNAL(clicked()), this, SLOT(addPreset()));
   QObject::connect(removeButton, SIGNAL(clicked()), this, SLOT(removePreset()));
   QObject::connect(changeButton, SIGNAL(clicked()), this, SLOT(changePreset()));
-  
+
   QObject::connect(presetView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortPresets(int)));
-  
+
   presetView->verticalHeader()->setVisible(false);
   presetView->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
   //presetView->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
   //presetView->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
   //presetView->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
-  
+
   presetView->setModel(&m_SortModel);
 }
 
@@ -48,7 +48,7 @@ QmitkLevelWindowPresetDefinitionDialog::~QmitkLevelWindowPresetDefinitionDialog(
 void QmitkLevelWindowPresetDefinitionDialog::sortPresets(int index)
 {
   static Qt::SortOrder order[3] = {Qt::AscendingOrder};
-  
+
   presetView->sortByColumn(index, order[index]);
   if (order[index] == Qt::AscendingOrder) order[index] = Qt::DescendingOrder;
   else order[index] = Qt::AscendingOrder;
@@ -57,14 +57,14 @@ void QmitkLevelWindowPresetDefinitionDialog::sortPresets(int index)
 void QmitkLevelWindowPresetDefinitionDialog::resizeEvent(QResizeEvent* event)
 {
   QDialog::resizeEvent(event);
-  
+
   this->resizeColumns();
 }
 
 void QmitkLevelWindowPresetDefinitionDialog::showEvent(QShowEvent* event)
 {
   this->resizeColumns();
-  
+
   QDialog::showEvent(event);
 }
 
@@ -72,7 +72,7 @@ void QmitkLevelWindowPresetDefinitionDialog::resizeColumns()
 {
   int width = presetView->viewport()->size().width() - presetView->columnWidth(1) - presetView->columnWidth(2);
   if (width < 50) width = 50;
-    
+
   presetView->setColumnWidth(0, width);
 }
 
@@ -92,7 +92,7 @@ void QmitkLevelWindowPresetDefinitionDialog::addPreset()
     "You have to enter a Presetname." );
   }
   else
-  {  
+  {
     m_TableModel->addPreset(name, levelSpinBox->value(), windowSpinBox->value());
   }
 }
@@ -102,7 +102,7 @@ void QmitkLevelWindowPresetDefinitionDialog::removePreset()
 {
   QModelIndex index(presetView->selectionModel()->currentIndex());
   if (!index.isValid()) return;
-  
+
   m_TableModel->removePreset(index);
 }
 
@@ -118,7 +118,7 @@ void QmitkLevelWindowPresetDefinitionDialog::changePreset()
       "Presetname has to be set.\n"
       "You have to enter a Presetname." );
     }
-    else if (m_TableModel->contains(name) 
+    else if (m_TableModel->contains(name)
         && (m_TableModel->getPreset(presetView->selectionModel()->currentIndex()).name
             != name))
     {
@@ -128,7 +128,7 @@ void QmitkLevelWindowPresetDefinitionDialog::changePreset()
     }
     else
     {
-      m_TableModel->changePreset(presetView->selectionModel()->currentIndex().row(), 
+      m_TableModel->changePreset(presetView->selectionModel()->currentIndex().row(),
                                  name, levelSpinBox->value(), windowSpinBox->value());
     }
   }
@@ -139,16 +139,16 @@ void QmitkLevelWindowPresetDefinitionDialog::setPresets(std::map<std::string, do
 {
   levelSpinBox->setValue(initLevel.toInt());
   windowSpinBox->setValue(initWindow.toInt());
-  
+
   delete m_TableModel;
   m_TableModel = new PresetTableModel(level, window, this);
-  
+
   m_SortModel.setSourceModel(m_TableModel);
-  
+
   QObject::connect(presetView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(ListViewSelectionChanged(const QItemSelection&, const QItemSelection&)));
 
   this->sortPresets(0);
-  
+
   presetView->resizeColumnsToContents();
 }
 
@@ -198,7 +198,7 @@ PresetTableModel::PresetTableModel(std::map<std::string, double>& levels,
     m_Entries.push_back(Entry(iter->first, iter->second, windows[iter->first]));
   }
 }
-    
+
 void
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::getLevels(std::map<std::string, double>& levels)
@@ -218,7 +218,7 @@ PresetTableModel::getWindows(std::map<std::string, double>& windows)
     windows[iter->name] = iter->window;
   }
 }
-  
+
 void
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::addPreset(std::string& name, double level, double window)
@@ -240,16 +240,16 @@ PresetTableModel::contains(std::string& name)
   {
     if (iter->name == name) return true;
   }
-  
+
   return false;
 }
 
 void
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::removePreset(const QModelIndex& index)
-{  
+{
   int row = index.row();
-  
+
   this->beginRemoveRows(QModelIndex(), row, row);
 
   m_Entries.erase(m_Entries.begin()+row);
@@ -260,11 +260,11 @@ PresetTableModel::removePreset(const QModelIndex& index)
 void
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::changePreset(int row, std::string& name, double level, double window)
-{  
+{
   m_Entries[row].name = name;
   m_Entries[row].level = level;
   m_Entries[row].window = window;
-  
+
   this->dataChanged(index(row, 0), index(row, 2));
 }
 
@@ -274,27 +274,27 @@ QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::getPreset(const QModelIndex& index) const
 {
   int row = index.row();
-  
+
   if (row < 0 || (unsigned int)row >= m_Entries.size()) return Entry("", 0, 0);
-  
+
   return m_Entries[row];
 }
 
-int 
+int
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::rowCount(const QModelIndex&) const
 {
   return (int) m_Entries.size();
 }
-  
-int 
+
+int
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::columnCount(const QModelIndex&) const
 {
   return 3;
 }
-  
-QVariant 
+
+QVariant
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::data(const QModelIndex& index, int role) const
 {
@@ -314,8 +314,8 @@ PresetTableModel::data(const QModelIndex& index, int role) const
 
   return QVariant();
 }
-  
-QVariant 
+
+QVariant
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {

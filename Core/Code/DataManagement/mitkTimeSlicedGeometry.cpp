@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -108,8 +108,8 @@ mitk::Geometry3D* mitk::TimeSlicedGeometry::GetGeometry3D(int t) const
   if(IsValidTime(t))
   {
     geometry3d = m_Geometry3Ds[t];
-    //if (a) we don't have a Geometry3D stored for the requested time, 
-    //(b) m_EvenlyTimed is activated and (c) the first geometry (t=0) 
+    //if (a) we don't have a Geometry3D stored for the requested time,
+    //(b) m_EvenlyTimed is activated and (c) the first geometry (t=0)
     //is set, then we clone the geometry and set the m_TimeBounds accordingly.
     if((m_EvenlyTimed) && (geometry3d.IsNull()))
     {
@@ -159,7 +159,7 @@ int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
     if(m_TimeBounds[0] == m_TimeBounds[1])
       return 0;
     if((m_TimeBounds[0]>ScalarTypeNumericTraits::NonpositiveMin()) && (m_TimeBounds[1]<ScalarTypeNumericTraits::max()))
-    {   
+    {
       return (int) ceil(((time_in_ms - m_TimeBounds[0])/(m_TimeBounds[1]-m_TimeBounds[0])*m_TimeSteps)-0.5);
     }
     return 0;
@@ -187,7 +187,7 @@ mitk::ScalarType mitk::TimeSlicedGeometry::TimeStepToMS(int timestep) const
   {
     if ( timestep == 0 )
       return m_TimeBounds[0];
-    else 
+    else
     {
       assert( ! (m_TimeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin() && m_TimeBounds[1] == ScalarTypeNumericTraits::max() ) );
       return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBounds[1]-m_TimeBounds[0])+m_TimeBounds[0];
@@ -271,7 +271,7 @@ void mitk::TimeSlicedGeometry::ExpandToNumberOfTimeSteps( unsigned int timeSteps
   {
     Geometry3D* g3d = m_Geometry3Ds[0];
     const TimeBounds & timeBounds = g3d->GetTimeBounds();
-    if( (timeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin()) || 
+    if( (timeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin()) ||
         (timeBounds[1]==ScalarTypeNumericTraits::max())
       )
     {

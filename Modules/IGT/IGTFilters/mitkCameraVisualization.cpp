@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -79,7 +79,7 @@ void mitk::CameraVisualization::GenerateData()
   quatTransform->SetRotation(doubleQuaternion);
   quatTransform->Modified();
 
-  /* because of an itk bug, the transform can not be calculated with float datatype. 
+  /* because of an itk bug, the transform can not be calculated with float datatype.
   To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float */
   static AffineTransform3D::MatrixType m;
   mitk::TransferMatrix(quatTransform->GetMatrix(), m);

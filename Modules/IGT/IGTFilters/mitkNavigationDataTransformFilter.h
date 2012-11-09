@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /**Documentation
-  * \brief NavigationDataTransformFilter applies an user-defined rigid transformation on navigation data objects. 
+  * \brief NavigationDataTransformFilter applies an user-defined rigid transformation on navigation data objects.
   * Input navigation data are mapped 1:1 on output navigation data.  To run the filter SetRigid3DTransform(TransformType::Pointer transform) has to be called first.
   *
   * \ingroup IGT
@@ -42,7 +42,7 @@ namespace mitk {
     mitkClassMacro(NavigationDataTransformFilter, NavigationDataToNavigationDataFilter);
     itkNewMacro(Self);
 
-    /**Documentation 
+    /**Documentation
     *\brief Set the rigid transform used to transform the input navigation data.
     *
     */
@@ -61,7 +61,7 @@ namespace mitk {
     /**Documentation
     * \brief filter execute method
     *
-    * transforms navigation data   
+    * transforms navigation data
     */
     virtual void GenerateData();
 

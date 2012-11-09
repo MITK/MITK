@@ -1,12 +1,12 @@
 #
 # MITK_MULTIPLEX_PICTYPE: generate separated source files for different
-# data types to reduce memory consumption of compiler during template 
+# data types to reduce memory consumption of compiler during template
 # instantiation
 #
 # Param "file" should be named like mitkMyAlgo-TYPE.cpp
 # in the file, every occurence of @TYPE@ is replaced by the
-# datatype. For each datatype, a new file mitkMyAlgo-datatype.cpp 
-# is generated and added to CPP_FILES_GENERATED. 
+# datatype. For each datatype, a new file mitkMyAlgo-datatype.cpp
+# is generated and added to CPP_FILES_GENERATED.
 #
 macro(MITK_MULTIPLEX_PICTYPE file)
   string(REPLACE "," ";" TYPES "${MITK_ACCESSBYITK_PIXEL_TYPES}")

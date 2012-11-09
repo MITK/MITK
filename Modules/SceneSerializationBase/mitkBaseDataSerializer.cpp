@@ -42,13 +42,13 @@ std::string mitk::BaseDataSerializer::GetUniqueFilenameInWorkingDirectory()
 {
   // tmpname
   static unsigned long count = 0;
-	unsigned long n = count++;
+  unsigned long n = count++;
   std::ostringstream name;
   for (int i = 0; i < 6; ++i)
-	{
-		name << char('a' + (n % 26));
-		n /= 26;
-	}
+  {
+    name << char('a' + (n % 26));
+    n /= 26;
+  }
   std::string myname;
   myname.append(name.str());
   return myname;

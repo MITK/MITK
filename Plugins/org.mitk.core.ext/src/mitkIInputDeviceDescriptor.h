@@ -83,7 +83,7 @@ namespace mitk
     * Equals this class with the given parameter.
     *
     * @param object 
-    *			the object for the equation
+    *      the object for the equation
     * @return true, if the objects are equal :: false, if they differ in any way
     */
     virtual bool operator==(const Object* object) const = 0;

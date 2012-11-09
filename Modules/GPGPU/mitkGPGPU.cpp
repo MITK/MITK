@@ -33,8 +33,8 @@ static GLint convertTextureFormatToInternalFormatGL(mitk::GPGPU::TextureFormat f
   {
     case mitk::GPGPU::FLOAT32_LUMINANCE:       return GL_LUMINANCE_FLOAT32_ATI;
     case mitk::GPGPU::FLOAT32_LUMINANCE_ALPHA: return GL_LUMINANCE_ALPHA_FLOAT32_ATI;
-	  case mitk::GPGPU::FLOAT32_RGBA:            return GL_RGBA32F_ARB;
-	  case mitk::GPGPU::UINT8_RGBA:              return GL_RGBA8;
+    case mitk::GPGPU::FLOAT32_RGBA:            return GL_RGBA32F_ARB;
+    case mitk::GPGPU::UINT8_RGBA:              return GL_RGBA8;
   }
   return 0;
 }
@@ -46,7 +46,7 @@ static GLint convertTextureFormatToFormatGL(mitk::GPGPU::TextureFormat format)
     case mitk::GPGPU::FLOAT32_LUMINANCE:       return GL_LUMINANCE;
     case mitk::GPGPU::FLOAT32_LUMINANCE_ALPHA: return GL_LUMINANCE_ALPHA;
     case mitk::GPGPU::FLOAT32_RGBA:            return GL_RGBA;
-	  case mitk::GPGPU::UINT8_RGBA:              return GL_RGBA;
+    case mitk::GPGPU::UINT8_RGBA:              return GL_RGBA;
   }
   return 0;
 }
@@ -58,7 +58,7 @@ static GLint convertTextureFormatToTypeGL(mitk::GPGPU::TextureFormat format)
     case mitk::GPGPU::FLOAT32_LUMINANCE:       return GL_FLOAT;
     case mitk::GPGPU::FLOAT32_LUMINANCE_ALPHA: return GL_FLOAT;
     case mitk::GPGPU::FLOAT32_RGBA:            return GL_FLOAT;
-	  case mitk::GPGPU::UINT8_RGBA:              return GL_UNSIGNED_BYTE;
+    case mitk::GPGPU::UINT8_RGBA:              return GL_UNSIGNED_BYTE;
   }
   return 0;
 }
@@ -95,25 +95,25 @@ mitk::GPGPU::Texture::Texture(mitk::GPGPU::TextureFormat format,int width,int he
     glTexImage2D(GL_TEXTURE_2D,0,convertTextureFormatToInternalFormatGL(myFormat),width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,0);
 //    glGenerateMipmap(GL_TEXTURE_2D);
 
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
 
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 
 
   }
   else
   {
     glTexImage3D(GL_TEXTURE_3D,0,convertTextureFormatToInternalFormatGL(myFormat),width,height,depth,0,GL_RGBA,GL_UNSIGNED_BYTE,0);
-//	glGenerateMipmap(GL_TEXTURE_3D);
+//  glGenerateMipmap(GL_TEXTURE_3D);
 
-	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
 
-	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 
   }
 
@@ -168,24 +168,24 @@ void mitk::GPGPU::Texture::ActivateAsDestination()
   int error = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
   switch(error)
   {
- 	  case GL_FRAMEBUFFER_COMPLETE_EXT:
-	    break;
-	  case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-		   GPGPU_ERROR << "Incomplete attachment\n";break;
-	  case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-	    GPGPU_ERROR << "Missing attachment\n";break;
-	  case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-	    GPGPU_ERROR << "Incomplete dimensions\n";break;
-	  case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-	    GPGPU_ERROR << "Incomplete formats\n";break;
-	  case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-	    GPGPU_ERROR << "Incomplete draw buffer\n";break;
-	  case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-	    GPGPU_ERROR << "Incomplete read buffer\n";break;
-	  case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-	    GPGPU_ERROR << "Framebufferobjects unsupported\n";break;
-	  default:
-	    GPGPU_ERROR << "unknown framebuffer status\n";break;
+     case GL_FRAMEBUFFER_COMPLETE_EXT:
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+       GPGPU_ERROR << "Incomplete attachment\n";break;
+    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+      GPGPU_ERROR << "Missing attachment\n";break;
+    case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+      GPGPU_ERROR << "Incomplete dimensions\n";break;
+    case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+      GPGPU_ERROR << "Incomplete formats\n";break;
+    case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+      GPGPU_ERROR << "Incomplete draw buffer\n";break;
+    case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+      GPGPU_ERROR << "Incomplete read buffer\n";break;
+    case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+      GPGPU_ERROR << "Framebufferobjects unsupported\n";break;
+    default:
+      GPGPU_ERROR << "unknown framebuffer status\n";break;
   }
 
   glViewport(0,0,myWidth,myHeight);
@@ -219,8 +219,8 @@ void mitk::GPGPU::Texture::Download(TextureFormat inputformat,void *dst)
 
   if(glTarget==GL_TEXTURE_2D)
   {
-	  glGetTexImage( GL_TEXTURE_2D,0,convertTextureFormatToFormatGL(inputformat),convertTextureFormatToTypeGL(inputformat),dst);
-	  GPGPU_CHECKGLERR << "texture download to cpu";
+    glGetTexImage( GL_TEXTURE_2D,0,convertTextureFormatToFormatGL(inputformat),convertTextureFormatToTypeGL(inputformat),dst);
+    GPGPU_CHECKGLERR << "texture download to cpu";
   }
   else
   {
@@ -399,18 +399,18 @@ void mitk::GPGPU::Shader::SetUniform(char *name,float i0,float i1,float i2,float
 #ifdef _WIN32
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch(msg)
-	{
-	  case WM_CLOSE:
-		  DestroyWindow(hwnd);
-		  break;
-	  case WM_DESTROY:
-		  PostQuitMessage(0);
-		  break;
-	  default:
-		  return DefWindowProc(hwnd, msg, wParam, lParam);
-	}
-	return 0;
+  switch(msg)
+  {
+    case WM_CLOSE:
+      DestroyWindow(hwnd);
+      break;
+    case WM_DESTROY:
+      PostQuitMessage(0);
+      break;
+    default:
+      return DefWindowProc(hwnd, msg, wParam, lParam);
+  }
+  return 0;
 }
 #endif
 
@@ -419,78 +419,78 @@ mitk::GPGPU::GPGPU()
 
 #ifdef _WIN32
                /*
-	WNDCLASSEX wcx;
+  WNDCLASSEX wcx;
 
-	// Fill in the window class structure with parameters
-	// that describe the main window.
+  // Fill in the window class structure with parameters
+  // that describe the main window.
 
-	wcx.cbSize = sizeof(wcx);          // size of structure
-	wcx.style = CS_HREDRAW |
-		CS_VREDRAW;                    // redraw if size changes
-	wcx.lpfnWndProc = MainWndProc;     // points to window procedure
-	wcx.cbClsExtra = 0;                // no extra class memory
-	wcx.cbWndExtra = 0;                // no extra window memory
-	wcx.hInstance = GetModuleHandle(NULL);         // handle to inst ance
-	wcx.hIcon = LoadIcon(NULL,
-		IDI_APPLICATION);              // predefined app. icon
-	wcx.hCursor = LoadCursor(NULL,
-		IDC_ARROW);                    // predefined arrow
-	wcx.hbrBackground = NULL;                  // white background brush
-	wcx.lpszMenuName = (LPCSTR) "MainMenu";    // name of menu resource
-	wcx.lpszClassName = (LPCSTR) "MainWClass";  // name of window class
-	wcx.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+  wcx.cbSize = sizeof(wcx);          // size of structure
+  wcx.style = CS_HREDRAW |
+    CS_VREDRAW;                    // redraw if size changes
+  wcx.lpfnWndProc = MainWndProc;     // points to window procedure
+  wcx.cbClsExtra = 0;                // no extra class memory
+  wcx.cbWndExtra = 0;                // no extra window memory
+  wcx.hInstance = GetModuleHandle(NULL);         // handle to inst ance
+  wcx.hIcon = LoadIcon(NULL,
+    IDI_APPLICATION);              // predefined app. icon
+  wcx.hCursor = LoadCursor(NULL,
+    IDC_ARROW);                    // predefined arrow
+  wcx.hbrBackground = NULL;                  // white background brush
+  wcx.lpszMenuName = (LPCSTR) "MainMenu";    // name of menu resource
+  wcx.lpszClassName = (LPCSTR) "MainWClass";  // name of window class
+  wcx.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 
-	// Register the window class.
+  // Register the window class.
 
-	if(!RegisterClassEx(&wcx))
-		std::cout << "failed registering window class\n";
+  if(!RegisterClassEx(&wcx))
+    std::cout << "failed registering window class\n";
 
-	HWND desktopWindow=CreateWindowEx(
-		WS_EX_CLIENTEDGE,
-		(LPCSTR)"MainWClass",
-		(LPCSTR)"Anatomy of a Window",
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
-		NULL,
-		NULL,
-		GetModuleHandle(NULL),
-		NULL);
-	windowHandle = desktopWindow;
+  HWND desktopWindow=CreateWindowEx(
+    WS_EX_CLIENTEDGE,
+    (LPCSTR)"MainWClass",
+    (LPCSTR)"Anatomy of a Window",
+    WS_OVERLAPPEDWINDOW,
+    CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
+    NULL,
+    NULL,
+    GetModuleHandle(NULL),
+    NULL);
+  windowHandle = desktopWindow;
   ShowWindow(desktopWindow, SW_RESTORE);
 
   if(desktopWindow==0)
-	  std::cout << "failed creating window\n";
+    std::cout << "failed creating window\n";
                  */
 
-	HWND desktopWindow=QApplication::topLevelWidgets().at(0)->winId();
+  HWND desktopWindow=QApplication::topLevelWidgets().at(0)->winId();
 
   windowsContext = GetDC(desktopWindow);
 
   if(windowsContext==0)
-	  std::cout << "failed getting window device context\n";
+    std::cout << "failed getting window device context\n";
                  
-	static PIXELFORMATDESCRIPTOR pfd =// pfd Tells Windows How We Want Things To Be
-	{
-		sizeof(PIXELFORMATDESCRIPTOR),	// Size Of This Pixel Format Descriptor
-		1,								              // Version Number
-		PFD_DRAW_TO_WINDOW |						// Format Must Support Window
-		PFD_SUPPORT_OPENGL |						// Format Must Support OpenGL
-		PFD_DOUBLEBUFFER |
-		PFD_SWAP_EXCHANGE ,					    // Must Support Double Buffering
-		PFD_TYPE_RGBA,							    // Request An RGBA Format
-		24,								              // Select Our Color Depth
-		0, 0, 0, 0, 0, 0,						    // Color Bits Ignored  if(openGLContext==0)
-		0,								              // No Alpha Buffer
-		0,								              // Shift Bit Ignored
-		0,								              // No Accumulation Buffer
-		0, 0, 0, 0,							        // Accumulation Bits Ignored
-		0,								              // 16Bit Z-Buffer (Depth Buffer)
-		0,								              // No Stencil Buffer
-		0,								              // No Auxiliary Buffer
-		PFD_MAIN_PLANE,							    // Main Drawing Layer
-		0,								              // Reserved
-		0, 0, 0								          // Layer Masks Ignored
-	};
+  static PIXELFORMATDESCRIPTOR pfd =// pfd Tells Windows How We Want Things To Be
+  {
+    sizeof(PIXELFORMATDESCRIPTOR),  // Size Of This Pixel Format Descriptor
+    1,                              // Version Number
+    PFD_DRAW_TO_WINDOW |            // Format Must Support Window
+    PFD_SUPPORT_OPENGL |            // Format Must Support OpenGL
+    PFD_DOUBLEBUFFER |
+    PFD_SWAP_EXCHANGE ,              // Must Support Double Buffering
+    PFD_TYPE_RGBA,                  // Request An RGBA Format
+    24,                              // Select Our Color Depth
+    0, 0, 0, 0, 0, 0,                // Color Bits Ignored  if(openGLContext==0)
+    0,                              // No Alpha Buffer
+    0,                              // Shift Bit Ignored
+    0,                              // No Accumulation Buffer
+    0, 0, 0, 0,                      // Accumulation Bits Ignored
+    0,                              // 16Bit Z-Buffer (Depth Buffer)
+    0,                              // No Stencil Buffer
+    0,                              // No Auxiliary Buffer
+    PFD_MAIN_PLANE,                  // Main Drawing Layer
+    0,                              // Reserved
+    0, 0, 0                          // Layer Masks Ignored
+  };
 
 
   // Sonstiges einstellen
@@ -503,7 +503,7 @@ mitk::GPGPU::GPGPU()
   int errw=GetLastError();
 
   if(openGLContext==0)
-	  std::cout << "failed creating openGL context "<<errw<<"\n";
+    std::cout << "failed creating openGL context "<<errw<<"\n";
 
 #else
 
@@ -555,11 +555,11 @@ mitk::GPGPU::GPGPU()
   GPGPU_CHECKGLERR << "intializing projection&modelview matrix";
 
   glDisable(GL_CULL_FACE);
-	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Black Background
-	glClearDepth(1.0f);									// Depth Buffer Setup
-  glDisable(GL_DEPTH_TEST);							// Enables Depth Testing
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
+  glShadeModel(GL_SMOOTH);              // Enable Smooth Shading
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);        // Black Background
+  glClearDepth(1.0f);                  // Depth Buffer Setup
+  glDisable(GL_DEPTH_TEST);              // Enables Depth Testing
+  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Really Nice Perspective Calculations
   glHint(GL_TEXTURE_COMPRESSION_HINT, GL_NICEST);
   glDepthMask(false);
 

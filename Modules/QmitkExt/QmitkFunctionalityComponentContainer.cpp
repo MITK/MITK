@@ -410,13 +410,13 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
       visibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget();
       idVisibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->indexOf(visibleWidget);
       new QVBoxLayout(visibleWidget);
-	  // QT3: new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
+    // QT3: new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
     }
 
     QLayout* layout;
     if(m_FunctionalityComponentContainerGUI->m_WidgetStack->layout() == 0)
     {
-		layout = new QVBoxLayout( (QWidget*)(m_FunctionalityComponentContainerGUI->m_WidgetStack));
+    layout = new QVBoxLayout( (QWidget*)(m_FunctionalityComponentContainerGUI->m_WidgetStack));
     }
     else 
     {

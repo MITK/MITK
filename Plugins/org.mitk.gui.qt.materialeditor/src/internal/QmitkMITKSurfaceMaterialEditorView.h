@@ -120,7 +120,7 @@ private:
   void shaderEnumChange(const itk::Object *caller, const itk::EventObject &event);
 
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-	berry::ISelectionListener::Pointer m_SelectionListener;
+  berry::ISelectionListener::Pointer m_SelectionListener;
 };
 
 

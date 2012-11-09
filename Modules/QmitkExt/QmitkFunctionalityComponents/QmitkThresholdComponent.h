@@ -103,7 +103,7 @@ public slots:
   virtual void DataStorageChanged(mitk::DataStorage::Pointer ds);
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
-	void ImageSelected(const mitk::DataNode* item);
+  void ImageSelected(const mitk::DataNode* item);
 
   /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
   void ShowThreshold(bool show = true);

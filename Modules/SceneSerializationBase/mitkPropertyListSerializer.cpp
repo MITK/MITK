@@ -45,13 +45,13 @@ std::string mitk::PropertyListSerializer::Serialize()
 
   // tmpname
   static unsigned long count = 1;
-	unsigned long n = count++;
+  unsigned long n = count++;
   std::ostringstream name;
   for (int i = 0; i < 6; ++i)
-	{
-		name << char('a' + (n % 26));
-		n /= 26;
-	}
+  {
+    name << char('a' + (n % 26));
+    n /= 26;
+  }
   std::string filename;
   filename.append(name.str());
 

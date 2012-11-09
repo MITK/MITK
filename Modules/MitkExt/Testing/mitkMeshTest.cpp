@@ -50,7 +50,7 @@ int mitkMeshTest(int /*argc*/, char* /*argv*/[])
   mitk::Point3D point;
   point.Fill(1);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpINSERT, point, position);
-	mesh->ExecuteOperation(doOp);
+  mesh->ExecuteOperation(doOp);
 
   //now check new condition!
   if ( (mesh->GetSize()!=1) ||

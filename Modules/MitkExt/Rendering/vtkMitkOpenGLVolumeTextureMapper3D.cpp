@@ -54,16 +54,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "!!ARBfp1.0\n"
-	
-//# We need some temporary variables		
+  
+//# We need some temporary variables    
 "TEMP index, normal, finalColor;\n"
 "TEMP temp,temp1, temp2, temp3,temp4; \n"
 "TEMP sampleColor;\n"
 "TEMP ndotl, ndoth, ndotv; \n"
 "TEMP lightInfo, lightResult;\n"
-	 
+   
 //# We are going to use the first 
-//# texture coordinate		
+//# texture coordinate    
 "ATTRIB tex0 = fragment.texcoord[0];\n"
 
 //# This is the lighting information
@@ -74,16 +74,16 @@ const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "PARAM lightSpecColor = program.local[4]; \n"
 "PARAM viewVector     = program.local[5];\n"
 "PARAM constants      = program.local[6];\n"
-	
+  
 //# This is our output color
 "OUTPUT out = result.color;\n"
 
 //# Look up the gradient direction
-//# in the third volume	
+//# in the third volume  
 "TEX temp2, tex0, texture[0], 3D;\n"
 
 //# This normal is stored 0 to 1, change to -1 to 1
-//# by multiplying by 2.0 then adding -1.0.	
+//# by multiplying by 2.0 then adding -1.0.  
 "MAD normal, temp2, constants.x, constants.y;\n"
 
 "DP3 temp4, normal, normal;\n"
@@ -105,7 +105,7 @@ const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "DP3 ndotl, normal, lightDirection;\n"
 
 //# Take the dot product of the halfway
-//# vector and the normal		
+//# vector and the normal    
 "DP3 ndoth, normal, halfwayVector;\n"
 
 "DP3 ndotv, normal, viewVector;\n"
@@ -115,51 +115,51 @@ const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "CMP ndotl, ndotv, ndotl, temp3;\n"
 "MUL temp3, ndoth, constants.y; \n"
 "CMP ndoth, ndotv, ndoth, temp3;\n"
-	 
-//# put the pieces together for a LIT operation		
+   
+//# put the pieces together for a LIT operation    
 "MOV lightInfo.x, ndotl.x; \n"
 "MOV lightInfo.y, ndoth.x; \n"
 "MOV lightInfo.w, coefficient.w; \n"
 
-//# compute the lighting	
+//# compute the lighting  
 "LIT lightResult, lightInfo;\n"
 
 //# COLOR FIX
 "MUL lightResult, lightResult, 4.0;\n"
 
-//# This is the ambient contribution	
+//# This is the ambient contribution  
 "MUL finalColor, coefficient.x, sampleColor;\n"
 
-//# This is the diffuse contribution	
+//# This is the diffuse contribution  
 "MUL temp3, lightDiffColor, sampleColor;\n"
 "MUL temp3, temp3, lightResult.y;\n"
 "ADD finalColor, finalColor, temp3;\n"
 
-//# This is th specular contribution	
+//# This is th specular contribution  
 "MUL temp3, lightSpecColor, lightResult.z; \n"
-	
+  
 //# Add specular into result so far, and replace
-//# with the original alpha.	
+//# with the original alpha.  
 "ADD out, finalColor, temp3;\n"
 "MOV out.w, temp2.w;\n"
-	 
+   
 "END\n";
 
 const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "!!ARBfp1.0\n"
-	
+  
 //# This is the fragment program for one
-//# component data with shading	
+//# component data with shading  
 
-//# We need some temporary variables		
+//# We need some temporary variables    
 "TEMP index, normal, finalColor;\n"
 "TEMP temp,temp1, temp2, temp3,temp4; \n"
 "TEMP sampleColor;\n"
 "TEMP ndotl, ndoth, ndotv; \n"
 "TEMP lightInfo, lightResult;\n"
-	 
+   
 //# We are going to use the first 
-//# texture coordinate		
+//# texture coordinate    
 "ATTRIB tex0 = fragment.texcoord[0];\n"
 
 //# This is the lighting information
@@ -170,19 +170,19 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "PARAM lightSpecColor = program.local[4]; \n"
 "PARAM viewVector     = program.local[5];\n"
 "PARAM constants      = program.local[6];\n"
-	
+  
 //# This is our output color
 "OUTPUT out = result.color;\n"
 
 //# Look up the gradient direction
-//# in the third volume	
+//# in the third volume  
 "TEX temp2, tex0, texture[0], 3D;\n"
 
 
 // Gradient Compution
 
 //# Look up the scalar value / gradient
-//# magnitude in the first volume	
+//# magnitude in the first volume  
 //"TEX temp1, tex0, texture[0], 3D;\n"
 
               /*
@@ -221,16 +221,16 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "MOV index.x,temp2.a;\n"
 
 //# This normal is stored 0 to 1, change to -1 to 1
-//# by multiplying by 2.0 then adding -1.0.	
+//# by multiplying by 2.0 then adding -1.0.  
 "MAD normal, temp2, constants.x, constants.y;\n"
 
 //# Swizzle this to use (a,r) as texture
-//# coordinates	
+//# coordinates  
 //"SWZ index, temp1, a, r, 1, 1;\n"
 
 //# Use this coordinate to look up a 
 //# final color in the third texture
-//# (this is a 2D texture)			
+//# (this is a 2D texture)      
 
 "DP3 temp4, normal, normal;\n"
 
@@ -251,7 +251,7 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "DP3 ndotl, normal, lightDirection;\n"
 
 //# Take the dot product of the halfway
-//# vector and the normal		
+//# vector and the normal    
 "DP3 ndoth, normal, halfwayVector;\n"
 
 "DP3 ndotv, normal, viewVector;\n"
@@ -261,34 +261,34 @@ const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "CMP ndotl, ndotv, ndotl, temp3;\n"
 "MUL temp3, ndoth, constants.y; \n"
 "CMP ndoth, ndotv, ndoth, temp3;\n"
-	 
-//# put the pieces together for a LIT operation		
+   
+//# put the pieces together for a LIT operation    
 "MOV lightInfo.x, ndotl.x; \n"
 "MOV lightInfo.y, ndoth.x; \n"
 "MOV lightInfo.w, coefficient.w; \n"
 
-//# compute the lighting	
+//# compute the lighting  
 "LIT lightResult, lightInfo;\n"
 
 //# COLOR FIX
 "MUL lightResult, lightResult, 4.0;\n"
 
-//# This is the ambient contribution	
+//# This is the ambient contribution  
 "MUL finalColor, coefficient.x, sampleColor;\n"
 
-//# This is the diffuse contribution	
+//# This is the diffuse contribution  
 "MUL temp3, lightDiffColor, sampleColor;\n"
 "MUL temp3, temp3, lightResult.y;\n"
 "ADD finalColor, finalColor, temp3;\n"
 
-//# This is th specular contribution	
+//# This is th specular contribution  
 "MUL temp3, lightSpecColor, lightResult.z; \n"
-	
+  
 //# Add specular into result so far, and replace
-//# with the original alpha.	
+//# with the original alpha.  
 "ADD out, finalColor, temp3;\n"
 "MOV out.w, sampleColor.w;\n"
-	 
+   
 "END\n";
 
 
@@ -363,8 +363,8 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
   
   if ( !this->Initialized )
     {
-			//this->Initialize();
-			this->Initialize(ren);
+      //this->Initialize();
+      this->Initialize(ren);
     }
   
   if ( !this->RenderPossible )
@@ -2196,8 +2196,8 @@ int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(  vtkRenderer *render
   if ( !this->Initialized )
     {
     //this->Initialize();
-			this->Initialize(renderer);
-		}
+      this->Initialize(renderer);
+    }
   
   if ( !this->RenderPossible )
     {
@@ -2225,7 +2225,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
   this->Initialized = 1;
  // vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
   //extensions->SetRenderWindow(NULL); // set render window to the current one.
-	vtkOpenGLExtensionManager *extensions=static_cast<vtkOpenGLRenderWindow *>(renderer->GetRenderWindow())->GetExtensionManager();
+  vtkOpenGLExtensionManager *extensions=static_cast<vtkOpenGLRenderWindow *>(renderer->GetRenderWindow())->GetExtensionManager();
   
   int supports_texture3D=extensions->ExtensionSupported( "GL_VERSION_1_2" );
   if(supports_texture3D)
@@ -2379,44 +2379,44 @@ void vtkMitkOpenGLVolumeTextureMapper3D::PrintSelf(ostream& os, vtkIndent indent
        << endl;
     }
   extensions->Delete();
-	 */
-	
-	if(this->RenderWindow!=0)
-		    {
-			    vtkOpenGLExtensionManager *extensions=
-			      static_cast<vtkOpenGLRenderWindow *>(this->RenderWindow)->GetExtensionManager();
-			
-			    if ( this->Initialized )
-				      {
-					      os << indent << "Supports GL_VERSION_1_2:"
-					         << extensions->ExtensionSupported( "GL_VERSION_1_2" ) << endl;
-					      os << indent << "Supports GL_EXT_texture3D:"
-					         << extensions->ExtensionSupported( "GL_EXT_texture3D" ) << endl;
-					      os << indent << "Supports GL_VERSION_1_3:"
-					         << extensions->ExtensionSupported( "GL_VERSION_1_3" ) << endl;
-					      os << indent << "Supports GL_ARB_multitexture: "
-					         << extensions->ExtensionSupported( "GL_ARB_multitexture" ) << endl;
-					      os << indent << "Supports GL_NV_texture_shader2: "
-					         << extensions->ExtensionSupported( "GL_NV_texture_shader2" ) << endl;
-					      os << indent << "Supports GL_NV_register_combiners2: "
-					         << extensions->ExtensionSupported( "GL_NV_register_combiners2" )
-					         << endl;
-					      os << indent << "Supports GL_ATI_fragment_shader: "
-					         << extensions->ExtensionSupported( "GL_ATI_fragment_shader" ) << endl;
-					      os << indent << "Supports GL_ARB_fragment_program: "
-					         << extensions->ExtensionSupported( "GL_ARB_fragment_program" )
-					         << endl;
-					      os << indent << "Supports GL_ARB_texture_compression: "
-					         << extensions->ExtensionSupported( "GL_ARB_texture_compression" )
-					         << endl;
-					      os << indent << "Supports GL_VERSION_2_0:"
-					         << extensions->ExtensionSupported( "GL_VERSION_2_0" )
-					         << endl;
-					      os << indent << "Supports GL_ARB_texture_non_power_of_two:"
-					         << extensions->ExtensionSupported( "GL_ARB_texture_non_power_of_two" )
-					         << endl;
-					      }
-			    }
+   */
+  
+  if(this->RenderWindow!=0)
+        {
+          vtkOpenGLExtensionManager *extensions=
+            static_cast<vtkOpenGLRenderWindow *>(this->RenderWindow)->GetExtensionManager();
+      
+          if ( this->Initialized )
+              {
+                os << indent << "Supports GL_VERSION_1_2:"
+                   << extensions->ExtensionSupported( "GL_VERSION_1_2" ) << endl;
+                os << indent << "Supports GL_EXT_texture3D:"
+                   << extensions->ExtensionSupported( "GL_EXT_texture3D" ) << endl;
+                os << indent << "Supports GL_VERSION_1_3:"
+                   << extensions->ExtensionSupported( "GL_VERSION_1_3" ) << endl;
+                os << indent << "Supports GL_ARB_multitexture: "
+                   << extensions->ExtensionSupported( "GL_ARB_multitexture" ) << endl;
+                os << indent << "Supports GL_NV_texture_shader2: "
+                   << extensions->ExtensionSupported( "GL_NV_texture_shader2" ) << endl;
+                os << indent << "Supports GL_NV_register_combiners2: "
+                   << extensions->ExtensionSupported( "GL_NV_register_combiners2" )
+                   << endl;
+                os << indent << "Supports GL_ATI_fragment_shader: "
+                   << extensions->ExtensionSupported( "GL_ATI_fragment_shader" ) << endl;
+                os << indent << "Supports GL_ARB_fragment_program: "
+                   << extensions->ExtensionSupported( "GL_ARB_fragment_program" )
+                   << endl;
+                os << indent << "Supports GL_ARB_texture_compression: "
+                   << extensions->ExtensionSupported( "GL_ARB_texture_compression" )
+                   << endl;
+                os << indent << "Supports GL_VERSION_2_0:"
+                   << extensions->ExtensionSupported( "GL_VERSION_2_0" )
+                   << endl;
+                os << indent << "Supports GL_ARB_texture_non_power_of_two:"
+                   << extensions->ExtensionSupported( "GL_ARB_texture_non_power_of_two" )
+                   << endl;
+                }
+          }
   
   this->Superclass::PrintSelf(os,indent);
 }

@@ -52,7 +52,7 @@ public:
   // more than one independent component, or if the hardware does
   // not support the required extensions
   // int IsRenderSupported(vtkVolumeProperty *);
-	int IsRenderSupported(vtkRenderer *ren,vtkVolumeProperty *);
+  int IsRenderSupported(vtkRenderer *ren,vtkVolumeProperty *);
   
 //BTX
 
@@ -108,8 +108,8 @@ protected:
   bool SupportsCompressedTexture;
   
   //void Initialize();
-	void Initialize(vtkRenderer *r);
-	
+  void Initialize(vtkRenderer *r);
+  
   virtual void RenderFP(vtkRenderer *ren, vtkVolume *vol);
 
   void SetupOneIndependentTextures( vtkRenderer *ren, vtkVolume *vol );

@@ -48,19 +48,19 @@ namespace mitk
   bool ToFCameraMESAController::GetAmplitudes(float* amplitudeArray)
   {
     MITK_WARN("ToF") << "Error: MESA camera currently not available"; 
-	  return true;
+    return true;
   }
 
   bool ToFCameraMESAController::GetIntensities(float* intensityArray)
   {
     MITK_WARN("ToF") << "Error: MESA camera currently not available"; 
-	  return true;
+    return true;
   }
 
   bool ToFCameraMESAController::GetDistances(float* distanceArray)
   {
     MITK_WARN("ToF") << "Error: MESA camera currently not available"; 
-	  return true;
+    return true;
   }
 
   void ToFCameraMESAController::SetInputFileName(std::string inputFileName)

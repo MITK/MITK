@@ -47,12 +47,12 @@ class QmitkSimpleMeasurement : public QmitkFunctionality
 
   public:
 
-	QmitkSimpleMeasurement() {}
-	QmitkSimpleMeasurement(const QmitkSimpleMeasurement& other)
-	{
-		Q_UNUSED(other)
-		throw std::runtime_error("Copy constructor not implemented");
-	}
+  QmitkSimpleMeasurement() {}
+  QmitkSimpleMeasurement(const QmitkSimpleMeasurement& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
     virtual ~QmitkSimpleMeasurement();
     virtual void Activated();
     virtual void Deactivated();

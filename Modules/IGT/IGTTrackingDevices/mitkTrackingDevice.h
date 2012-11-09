@@ -107,20 +107,20 @@ namespace mitk {
       /**
        * \brief Deprecated! Use the more specific getDeviceData instead. return device type identifier
        */
-	  TrackingDeviceType GetType() const;
+    TrackingDeviceType GetType() const;
        /**
        * \brief Deprecated! Use the more specific setDeviceData instead. set device type
        */
-	  void SetType(TrackingDeviceType type);
+    void SetType(TrackingDeviceType type);
 
-	   /**
+     /**
        * \brief return device data
-	   */
-	  TrackingDeviceData GetData() const;
+     */
+    TrackingDeviceData GetData() const;
        /**
        * \brief set device type
        */
-	  void SetData(TrackingDeviceData data);
+    void SetData(TrackingDeviceData data);
 
     protected:
       /**
@@ -136,7 +136,7 @@ namespace mitk {
       TrackingDevice();
       virtual ~TrackingDevice();
 
-	  TrackingDeviceData m_Data; ///< current device Data 
+    TrackingDeviceData m_Data; ///< current device Data 
       TrackingDeviceState m_State; ///< current object state (Setup, Ready or Tracking)
       bool m_StopTracking;       ///< signal stop to tracking thread
       itk::FastMutexLock::Pointer m_StopTrackingMutex; ///< mutex to control access to m_StopTracking

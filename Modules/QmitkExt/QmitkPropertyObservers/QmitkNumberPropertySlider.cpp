@@ -203,7 +203,7 @@ void QmitkNumberPropertySlider::onValueChanged(int value)
     
   switch (m_DataType)
   {
-	/*
+  /*
     case DT_SHORT:
       {
         m_ShortProperty->SetValue(ROUND_SHORT(newValue));
@@ -249,14 +249,14 @@ void QmitkNumberPropertySlider::DisplayNumber()
   m_SelfChangeLock = true;
   switch (m_DataType)
   {
-	/*
+  /*
     case DT_SHORT:
       {
         short s = m_ShortProperty->GetValue();
         QSlider::setValue( s );
         break;
       }
-	*/
+  */
     case DT_INT:
       {
         int i = m_IntProperty->GetValue();

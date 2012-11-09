@@ -27,22 +27,22 @@ namespace itk
 template < class TInputImage, class TOutputImage >
 class DistanceMapFilter : public ImageToImageFilter<TInputImage, TOutputImage>
 {
-	/*!
-	\brief itkDistanceMapFilter 
-	
-	\brief Creates a distance map from a FA skeleton image.
-	
-	\sa itkImageToImageFilter
-	
-	
-	\verbatim
-	Last contributor: $Author: vanbrugg $
-	\endverbatim
-	*/
+  /*!
+  \brief itkDistanceMapFilter 
+  
+  \brief Creates a distance map from a FA skeleton image.
+  
+  \sa itkImageToImageFilter
+  
+  
+  \verbatim
+  Last contributor: $Author: vanbrugg $
+  \endverbatim
+  */
 
 public:
 
-	/** Typedef for input ImageType. */
+  /** Typedef for input ImageType. */
   typedef TInputImage  InputImageType;
 
   /** Typedef for input imageType Pointer. */
@@ -56,7 +56,7 @@ public:
 
 public:
 
-	/** */
+  /** */
   typedef DistanceMapFilter Self;
   
   /** Superclass */
@@ -68,17 +68,17 @@ public:
   /** Smart Pointer */
   typedef SmartPointer<const Self> ConstPointer;
 
-	/** */
+  /** */
   itkNewMacro( Self);
 
-	/** Generate Data. The image will be divided into a number of pieces, a number of threads 
+  /** Generate Data. The image will be divided into a number of pieces, a number of threads 
   will be spawned and Threaded GenerateData() will be called in each thread. */
   virtual void GenerateData();
 
  
 protected:
 
-	/** Constructor */
+  /** Constructor */
   DistanceMapFilter();
   
   /** Destructor */
@@ -87,8 +87,8 @@ protected:
   
   
 protected:
- 	
-  	
+   
+    
   
 };
 

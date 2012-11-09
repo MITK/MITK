@@ -63,9 +63,9 @@ class GPGPU_DLL_API GPGPU
         void ActivateAsDestination();
         void Upload(mitk::GPGPU::TextureFormat inputformat,const void *src);
         void Download(mitk::GPGPU::TextureFormat inputformat,void *dst);
-		int GetWidth();
-		int GetHeigth();
-		int GetDepth();
+    int GetWidth();
+    int GetHeigth();
+    int GetDepth();
 
       private:
 

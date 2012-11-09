@@ -257,7 +257,7 @@ VolumeVisualizationImagePreprocessor::Gaussian(CTImage::Pointer src)
 {
   VVP_INFO << "Gaussian...";
 
-  typedef itk::DiscreteGaussianImageFilter< CTImage, CTImage>					GaussianFilterType;
+  typedef itk::DiscreteGaussianImageFilter< CTImage, CTImage>          GaussianFilterType;
 
   GaussianFilterType::Pointer gaussianFilter = GaussianFilterType::New();
   gaussianFilter->SetInput( src );

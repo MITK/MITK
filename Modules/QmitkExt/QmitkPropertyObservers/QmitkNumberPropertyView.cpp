@@ -148,7 +148,7 @@ void QmitkNumberPropertyView::DisplayNumber()
   
   switch (m_DataType)
   {
-	/*
+  /*
     case DT_SHORT:
       {
         short s = m_ShortProperty->GetValue();

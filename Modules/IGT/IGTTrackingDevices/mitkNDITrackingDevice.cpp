@@ -515,7 +515,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
       {
         (*it)->SetPortHandle(portHandle.c_str());
         /* now write the SROM file of the tool to the tracking system using PVWR */
-		if (this->m_Data.Line == NDIPolaris)
+    if (this->m_Data.Line == NDIPolaris)
         {
           returnvalue = m_DeviceProtocol->PVWR(&portHandle, (*it)->GetSROMData(), (*it)->GetSROMDataLength());
           if (returnvalue != NDIOKAY)

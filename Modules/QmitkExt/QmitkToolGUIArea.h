@@ -35,7 +35,7 @@ class QmitkExt_EXPORT QmitkToolGUIArea : public QWidget
 
   public:
     
-	QmitkToolGUIArea( QWidget* parent = 0, Qt::WFlags f = 0 );
+  QmitkToolGUIArea( QWidget* parent = 0, Qt::WFlags f = 0 );
   virtual ~QmitkToolGUIArea();
 
   signals:

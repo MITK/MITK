@@ -124,16 +124,16 @@ void BoundingObjectCutter::GenerateOutputInformation()
   
   if(m_UseWholeInputRegion == false)
   {
-	  // crop input-requested-region with region of bounding-object
-	  if(m_InputRequestedRegion.Crop(boRegion)==false)
-	  {
-		// crop not possible => do nothing: set time size to 0.
-		size.Fill(0);
-		m_InputRequestedRegion.SetSize(size);
-		boRegion.SetSize(size);
-		m_BoundingObject->SetRequestedRegion(&boRegion);
-		return;
-	  }
+    // crop input-requested-region with region of bounding-object
+    if(m_InputRequestedRegion.Crop(boRegion)==false)
+    {
+    // crop not possible => do nothing: set time size to 0.
+    size.Fill(0);
+    m_InputRequestedRegion.SetSize(size);
+    boRegion.SetSize(size);
+    m_BoundingObject->SetRequestedRegion(&boRegion);
+    return;
+    }
   }
 
   // set input-requested-region, because we access it later in

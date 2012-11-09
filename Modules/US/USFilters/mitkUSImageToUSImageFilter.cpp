@@ -29,11 +29,11 @@ mitk::USImageToUSImageFilter::~USImageToUSImageFilter()
 }
 
       // ---- OVERRIDDEN INHERITED METHODS ---- //
-void 	mitk::USImageToUSImageFilter::SetInput (const mitk::USImage * image){
+void   mitk::USImageToUSImageFilter::SetInput (const mitk::USImage * image){
   mitk::ImageToImageFilter::SetInput(image);
 }
 
-void 	mitk::USImageToUSImageFilter::SetInput (unsigned int index, const mitk::USImage * image){
+void   mitk::USImageToUSImageFilter::SetInput (unsigned int index, const mitk::USImage * image){
   mitk::ImageToImageFilter::SetInput(index, image);
 }
 

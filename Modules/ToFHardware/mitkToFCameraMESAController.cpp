@@ -75,7 +75,7 @@ namespace mitk
         amplitudeArray[i] = value2;
       }
     }
-	  return true;
+    return true;
   }
 
   bool ToFCameraMESAController::GetIntensities(float* intensityArray)
@@ -86,7 +86,7 @@ namespace mitk
     {
       intensityArray[i] = data[i];
     }
-	  return true;
+    return true;
   }
 
   bool ToFCameraMESAController::GetDistances(float* distanceArray)
@@ -113,7 +113,7 @@ namespace mitk
       }
     }
 
-	  return true;
+    return true;
   }
 
   void ToFCameraMESAController::SetInputFileName(std::string inputFileName)

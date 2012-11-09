@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSpaceNavigatorVtkCameraController.h>
 
 namespace mitk
-{	
+{  
   /**
   * Documentation in the interface.
   * 

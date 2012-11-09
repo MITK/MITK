@@ -45,10 +45,10 @@ class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
 
     QmitkMITKIGTNavigationToolManagerView();
     QmitkMITKIGTNavigationToolManagerView(const QmitkMITKIGTNavigationToolManagerView& other)
-  	{
-    	Q_UNUSED(other)
-    	throw std::runtime_error("Copy constructor not implemented");
-  	}
+    {
+      Q_UNUSED(other)
+      throw std::runtime_error("Copy constructor not implemented");
+    }
     virtual ~QmitkMITKIGTNavigationToolManagerView();
 
     virtual void CreateQtPartControl(QWidget *parent);

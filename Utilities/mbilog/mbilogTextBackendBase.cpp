@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static bool g_init=false;
 
 mbilog::TextBackendBase::~TextBackendBase()
-	{}
+  {}
 
 #ifdef USE_WIN32COLOREDCONSOLE
 

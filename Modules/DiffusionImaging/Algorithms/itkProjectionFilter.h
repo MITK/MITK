@@ -26,15 +26,15 @@ namespace itk
 {
 class ProjectionFilter : public Object
 {
-	/*!
-	\brief itkProjectionFilter 
-	
-	\brief Performs the Projection Step of the TBSS algorithm from Smith et al. 2006.
-	
-	
-	*/
+  /*!
+  \brief itkProjectionFilter 
+  
+  \brief Performs the Projection Step of the TBSS algorithm from Smith et al. 2006.
+  
+  
+  */
 
-public:	
+public:  
 
   typedef itk::Image<float, 3> RealImageType;
 
@@ -52,7 +52,7 @@ public:
 
 public:
 
-	/** */
+  /** */
   typedef ProjectionFilter Self;
   
   /** Superclass */
@@ -64,10 +64,10 @@ public:
   /** Smart Pointer */
   typedef SmartPointer<const Self> ConstPointer;
 
-	/** */
+  /** */
   itkNewMacro( Self);
 
-	/** Generate Data. The image will be divided into a number of pieces, a number of threads 
+  /** Generate Data. The image will be divided into a number of pieces, a number of threads 
   will be spawned and Threaded GenerateData() will be called in each thread. */
   void Project();
 
@@ -89,7 +89,7 @@ public:
  
 protected:
 
-	/** Constructor */
+  /** Constructor */
   ProjectionFilter();
   
   /** Destructor */
@@ -116,8 +116,8 @@ protected:
   }
   
 protected:
- 	
-  	
+   
+    
   
 };
 

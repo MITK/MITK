@@ -41,7 +41,7 @@ namespace mitk
     * Initialize the Input Device Descriptor with the given extension point.
     *
     * @param inputDeviceExtensionPoint 
-    *				element, that refers to a extension point (type, id, name, class)
+    *        element, that refers to a extension point (type, id, name, class)
     */
     InputDeviceDescriptor(berry::IConfigurationElement::Pointer inputDeviceExtensionPoint);
 

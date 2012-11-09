@@ -126,7 +126,7 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
       }
     }
 
-	//# no errors -> save all values and flush to file
+  //# no errors -> save all values and flush to file
     for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
       ; it != m_HotkeyEditors.end(); ++it)
       _DataManagerHotkeysPreferencesNode->Put(it->first.toStdString()

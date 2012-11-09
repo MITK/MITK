@@ -395,7 +395,7 @@ void QmitkIGTTrackingLabView::OnTrackerDisconnected()
 
 
 mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateInstrumentVisualization(mitk::DataStorage* ds, const char* toolName)
-{	  
+{    
     //const char* toolName = tracker->GetTool(i)->GetToolName();
     mitk::DataNode::Pointer toolRepresentationNode;
     toolRepresentationNode = ds->GetNamedNode(toolName); // check if node with same name already exists

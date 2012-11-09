@@ -27,19 +27,19 @@ namespace itk
 template < class TInputImage, class TOutputImage >
 class SkeletonizationFilter : public ImageToImageFilter<TInputImage, TOutputImage>
 {
-	/*!
-	\brief itkSkeletonizationFilter
-	
-	\brief Skeletonization algorithm from TBSS (Smith et al. 2006)
-	
-	\sa itkImageToImageFilter
-	
-	
-	*/
+  /*!
+  \brief itkSkeletonizationFilter
+  
+  \brief Skeletonization algorithm from TBSS (Smith et al. 2006)
+  
+  \sa itkImageToImageFilter
+  
+  
+  */
 
 public:
 
-	/** Typedef for input ImageType. */
+  /** Typedef for input ImageType. */
   typedef TInputImage  InputImageType;
 
   typedef itk::CovariantVector<int,3> VectorType;
@@ -53,7 +53,7 @@ public:
   typedef itk::VectorImage<int, 3> GradientImageType;
 
 
-	/** */
+  /** */
   typedef SkeletonizationFilter Self;
   
   /** Superclass */
@@ -65,10 +65,10 @@ public:
   /** Smart Pointer */
   typedef SmartPointer<const Self> ConstPointer;
 
-	/** */
+  /** */
   itkNewMacro( Self);
 
-	/** Generate Data. The image will be divided into a number of pieces, a number of threads 
+  /** Generate Data. The image will be divided into a number of pieces, a number of threads 
   will be spawned and Threaded GenerateData() will be called in each thread. */
   virtual void GenerateData();
 
@@ -85,7 +85,7 @@ public:
 
 protected:
 
-	/** Constructor */
+  /** Constructor */
   SkeletonizationFilter();
   
   /** Destructor */
@@ -105,8 +105,8 @@ protected:
   
   
 protected:
- 	
-  	
+   
+    
   
 };
 

@@ -44,6 +44,9 @@
 #include <mitkImageCast.h>
 #include <mitkImageGenerator.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkTensorModel.h>
+#include <mitkScalarModel.h>
+#include <mitkRicianNoiseModel.h>
 
 #include <QMessageBox>
 
@@ -412,19 +415,45 @@ void QmitkFiberBasedSoftwarePhantomView::GenerateImage()
         return;
     }
 
-    typedef itk::TractsToDWIImageFilter FilterType;
-    FilterType::GradientListType gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
+    DiffusionSignalModel<double>::GradientListType gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
     double bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
 
-    FilterType::Pointer filter = FilterType::New();
+    // signal models
+    mitk::TensorModel<double> fiberModel;
+    fiberModel.SetGradientList(gradientList);
+    fiberModel.SetBvalue(bVal);
+    fiberModel.SetKernelFA(m_Controls->m_MaxFaBox->value());
+    mitk::ScalarModel<double> nonFiberModel;
+    nonFiberModel.SetGradientList(gradientList);
+    nonFiberModel.SetBvalue(bVal);
+    std::vector< mitk::DiffusionSignalModel<double>* > modelList;
 
-    filter->SetGradientList(gradientList);
-    filter->SetBValue(bVal);
-    filter->SetSNR(m_Controls->m_NoiseLevel->value());
+    // noise model
+    double snr = m_Controls->m_NoiseLevel->value();
+    double noiseVariance = 0;
+    if (snr <= 0)
+        snr = 0.0001;
+    if (snr<=99)
+    {
+        noiseVariance = 1/snr;
+        noiseVariance *= noiseVariance;
+    }
+    mitk::RicianNoiseModel<double> noiseModel;
+    noiseModel.SetScaleFactor(200);
+    noiseModel.SetNoiseVariance(noiseVariance);
+
+    itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();
     filter->SetImageRegion(imageRegion);
     filter->SetSpacing(spacing);
     filter->SetFiberBundle(fiberBundle);
-    filter->SetKernelFA(m_Controls->m_MaxFaBox->value());
+    filter->SetFiberBaseline(200);
+    filter->SetNonFiberBaseline(1000);
+    modelList.push_back(&fiberModel);
+    filter->SetFiberModels(modelList);
+    modelList.clear();
+    modelList.push_back(&nonFiberModel);
+    filter->SetNonFiberModels(modelList);
+    filter->SetNoiseModel(&noiseModel);
     if (m_TissueMask.IsNotNull())
     {
         ItkUcharImgType::Pointer mask = ItkUcharImgType::New();

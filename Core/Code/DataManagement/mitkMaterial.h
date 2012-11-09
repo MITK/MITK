@@ -323,9 +323,6 @@ public:
      * given material.
      * @param property the materials which should be copied in the
      *        current materials
-     * @param copyDataNode If set to true, the data tree node and renderer
-     *        associated with the material property are also copied. Otherwise
-     *        these member variables will be left untouched
      */
     virtual void Initialize( const Material& property );
 

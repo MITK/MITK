@@ -68,13 +68,13 @@ namespace mitk
 
     /*!
     \brief sets the input of this filter
-    \param distanceImage input is the distance image of e.g. a ToF camera
+    \param input is the distance image of e.g. a ToF camera
     */
     virtual void SetInput( Image* input);
     /*!
     \brief sets the input of this filter at idx
     \param idx number of the current input
-    \param distanceImage input is the distance image of e.g. a ToF camera
+    \param input is the distance image of e.g. a ToF camera
     */
     virtual void SetInput(unsigned int idx,  Image* input);
     /*!

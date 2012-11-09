@@ -282,7 +282,7 @@ public:
  * For more information, see #AccessByItk.
  *
  * \param pixelTypeSeq A sequence of pixel types, like (short)(char)(int).
- * \param dimension A sequence of dimensions, like (2)(3).
+ * \param dimSeq A sequence of dimensions, like (2)(3).
  * \param mitkImage The MITK input image.
  * \param itkImageTypeFunction The templated access-function to be called.
  *
@@ -464,7 +464,7 @@ public:
  * For usage, see AccessFixedTypeByItk.
  *
  * \param pixelTypeSeq A sequence of pixel types, like (short)(char)(int).
- * \param dimension A sequence of dimensions, like (2)(3).
+ * \param dimSeq A sequence of dimensions, like (2)(3).
  * \param va_tuple A variable length tuple containing the arguments to be passed
  *        to the access function itkImageTypeFunction, e.g. ("first", 2, THIRD).
  * \param mitkImage The MITK input image.

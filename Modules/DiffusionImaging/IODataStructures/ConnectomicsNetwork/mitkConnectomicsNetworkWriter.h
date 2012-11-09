@@ -67,7 +67,7 @@ namespace mitk
 
     /**
     * Sets the filename of the file to write.
-    * @param FileName the name of the file to write.
+    * @param _arg the name of the file to write.
     */
     itkSetStringMacro( FileName );
 

@@ -109,7 +109,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \sa InstantiateAccessFunctionForFixedType
  *
  * \param itkImgFunc The custom part of the name of the macro to be called.
- * \param dimSeq a sequence of dimensions, like (2)(3).
+ * \param dim a sequence of dimensions, like (2)(3).
  *
  * \ingroup Adaptor
  */

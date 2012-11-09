@@ -58,7 +58,7 @@ protected:
   /** \brief Method for threaded execution of the filter.
    * \param *inData: The input.
    * \param *outData: The output of the filter.
-   * \param extent[6]: Specefies the region of the image to be updated inside this thread.
+   * \param extent: Array[6] specifies the region of the image to be updated inside this thread.
    * It is a six-component array of the form (xmin, xmax, ymin, ymax, zmin, zmax).
    * \param id: The thread id.
    */

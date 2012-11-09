@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -16,6 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraDevice.h"
 #include <itksys/SystemTools.hxx>
 
+//Microservices
+#include <usGetModuleContext.h>
+#include "mitkModuleContext.h"
 
 namespace mitk
 {
@@ -87,8 +90,8 @@ namespace mitk
     if(stringProp.IsNull())
     {
       return false;
-    } 
-    else 
+    }
+    else
     {
       string = stringProp->GetValue();
       return true;
@@ -167,6 +170,15 @@ namespace mitk
     bool ok = m_CameraActive;
     m_CameraActiveMutex->Unlock();
     return ok;
+}
+  bool ToFCameraDevice::ConnectCamera()
+  {
+      // Prepare connection, fail if this fails.
+      if (! this->OnConnectCamera()) return false;
+
+      // Get Context and Module
+      mitk::ModuleContext* context = GetModuleContext();
+      return true;
   }
 
   bool ToFCameraDevice::IsCameraConnected()

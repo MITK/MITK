@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,22 +24,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include "mitkToFConfig.h"
-#include "mitkToFCameraPMDCamCubeDevice.h"
-#include "mitkToFCameraPMDRawDataCamCubeDevice.h"
-#include "mitkToFCameraPMDCamBoardDevice.h"
-#include "mitkToFCameraPMDRawDataCamBoardDevice.h"
-#include "mitkToFCameraPMDO3Device.h"
-#include "mitkToFCameraPMDPlayerDevice.h"
-#include "mitkToFCameraPMDMITKPlayerDevice.h"
+//#include "mitkToFCameraPMDCamCubeDevice.h"
+//#include "mitkToFCameraPMDRawDataCamCubeDevice.h"
+//#include "mitkToFCameraPMDCamBoardDevice.h"
+//#include "mitkToFCameraPMDRawDataCamBoardDevice.h"
+//#include "mitkToFCameraPMDO3Device.h"
+//#include "mitkToFCameraPMDPlayerDevice.h"
+//#include "mitkToFCameraPMDMITKPlayerDevice.h"
 #include "mitkToFCameraMITKPlayerDevice.h"
-#include "mitkToFCameraMESASR4000Device.h"
-#include "mitkKinectDevice.h"
+//#include "mitkToFCameraMESASR4000Device.h"
+//#include "mitkKinectDevice.h"
 
 //itk headers
 #include <itksys/SystemTools.hxx>
 
 const std::string QmitkToFConnectionWidget::VIEW_ID = "org.mitk.views.qmitktofconnectionwidget";
-
+//Konstruktor des QmitkToFConnectionWidgets
 QmitkToFConnectionWidget::QmitkToFConnectionWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 {
   this->m_IntegrationTime = 0;
@@ -48,22 +48,22 @@ QmitkToFConnectionWidget::QmitkToFConnectionWidget(QWidget* parent, Qt::WindowFl
   m_Controls = NULL;
   CreateQtPartControl(this);
 }
-
+//Destruktor of QmitkToFConnectionWidget ->"Q...." for a Qt created Method,in MITK-TOF ->"..mitkToF..."
 QmitkToFConnectionWidget::~QmitkToFConnectionWidget()
 {
 }
 
-void QmitkToFConnectionWidget::CreateQtPartControl(QWidget *parent)
+void QmitkToFConnectionWidget::CreateQtPartControl(QWidget *parent)   //Definition of CreateQtPartControll-Methode in QmitkToFConnectionWidget; Input= Pointer
 {
-  if (!m_Controls)
+  if (!m_Controls)  //Define if not alreaddy exists
   {
     // create GUI widgets
     m_Controls = new Ui::QmitkToFConnectionWidgetControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
     // set available cameras to combo box
-    QString string(MITK_TOF_CAMERAS);
-    string.replace(";"," ");
+    QString string(MITK_TOF_CAMERAS);                           // Initializin a QString "string"(same behaviour), der die Namen der Kameras beinhaltet
+    string.replace(";"," ");                                    // erstezen von ";" durch ","
     QStringList list = string.split(",");
     m_Controls->m_SelectCameraCombobox->addItems(list);
 
@@ -131,8 +131,9 @@ void QmitkToFConnectionWidget::OnConnectCamera()
   bool playerMode = false;
 
   if (m_Controls->m_ConnectCameraButton->text()=="Connect")
-  {   
+  {
     this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
+
     //reset the status of the GUI buttons
     m_Controls->m_ConnectCameraButton->setEnabled(false);
     m_Controls->m_SelectCameraCombobox->setEnabled(false);
@@ -144,47 +145,50 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
     //select the camera to connect with
     QString selectedCamera = m_Controls->m_SelectCameraCombobox->currentText();
+
+
     if (selectedCamera == "PMD CamCube 2.0/3.0")
     { //PMD CamCube
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDCamCubeDevice::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDCamCubeDevice::New());
     }
     else if (selectedCamera == "PMD CamCubeRaw 2.0/3.0")
     { //PMD CamCube
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDRawDataCamCubeDevice::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDRawDataCamCubeDevice::New());
     }
     else if (selectedCamera == "PMD CamBoard")
     { //PMD CamBoard
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDCamBoardDevice::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDCamBoardDevice::New());
     }
     else if (selectedCamera == "PMD CamBoardRaw")
     { //PMD CamBoard
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDRawDataCamBoardDevice::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDRawDataCamBoardDevice::New());
     }
     else if (selectedCamera == "PMD O3D")
     {//PMD O3
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDO3Device::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDO3Device::New());
     }
     else if (selectedCamera == "MESA Swissranger 4000")
     {//MESA SR4000
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraMESASR4000Device::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraMESASR4000Device::New());
     }
     else if (selectedCamera == "Microsoft Kinect")
     {//KINECT
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::KinectDevice::New());
-      this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::KinectDevice::New());
+      this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB()); //Todo Justin: In Widget2 packen
       this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::KinectDevice::New());
     }
     else if (selectedCamera == "PMD Player")
     {//PMD player
       playerMode = true;
       fileFilter.append("PMD Files (*.pmd)");
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDPlayerDevice::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDPlayerDevice::New());
     }
     else if (selectedCamera == "PMD Raw Data Player")
     {//PMD MITK player
       playerMode = true;
       fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
-      this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDRawDataDevice::New());
+      //this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraPMDRawDataDevice::New());
     }
     else if (selectedCamera == "MITK Player")
     {//MITK player
@@ -192,6 +196,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
       this->m_ToFImageGrabber->SetCameraDevice(mitk::ToFCameraMITKPlayerDevice::New());
     }
+
 
     // if a player was selected ...
     if (playerMode)
@@ -303,8 +308,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
       this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
-      if ((selectedCamera == "PMD CamCube 2.0/3.0") || (selectedCamera == "PMD CamBoard") || 
-        (selectedCamera== "PMD O3D") || (selectedCamera== "PMD CamBoardRaw") || 
+      if (/*(selectedCamera == "PMD CamCube 2.0/3.0") ||*/ (selectedCamera == "PMD CamBoard") ||
+        (selectedCamera== "PMD O3D") || (selectedCamera== "PMD CamBoardRaw") ||
         (selectedCamera== "PMD CamCubeRaw 2.0/3.0"))
       {
         this->m_Controls->m_PMDParameterWidget->ActivateAllParameters();

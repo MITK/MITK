@@ -84,29 +84,32 @@ protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
-  void UpdateOdf();
+  void UpdateOdf(); ///< called if slice position or datamanager selection has changed
 
-  Ui::QmitkODFDetailsViewControls* m_Controls;
+  Ui::QmitkODFDetailsViewControls*  m_Controls;
+  QmitkStdMultiWidget*              m_MultiWidget;
 
-  QmitkStdMultiWidget* m_MultiWidget;
+  /** observer flags */
   int m_SliceObserverTag1;
   int m_SliceObserverTag2;
   int m_SliceObserverTag3;
   int m_PropertyObserverTag;
 
-  vtkPolyData* m_TemplateOdf;
-  vtkSmartPointer<vtkTransform> m_OdfTransform;
-  vtkSmartPointer<vtkDoubleArray> m_OdfVals;
-  vtkSmartPointer<vtkOdfSource> m_OdfSource;
+  /** ODF related variables like mesh structure, values etc. */
+  vtkPolyData*                      m_TemplateOdf;  ///< spherical base mesh
+  vtkSmartPointer<vtkTransform>     m_OdfTransform;
+  vtkSmartPointer<vtkDoubleArray>   m_OdfVals;
+  vtkSmartPointer<vtkOdfSource>     m_OdfSource;
 
-  vtkActor* m_VtkActor;
-  vtkPolyDataMapper* m_VtkMapper;
-  vtkRenderer* m_Renderer;
-  vtkRenderWindow* m_VtkRenderWindow;
-  vtkRenderWindowInteractor* m_RenderWindowInteractor;
-  vtkCamera* m_Camera;
-  std::vector<double> m_Values;
-  int m_OdfNormalization;
+  int                               m_OdfNormalization; ///< normalization method defined in the visualization view
+
+  /** rendering of the ODF */
+  vtkActor*                     m_VtkActor;
+  vtkPolyDataMapper*            m_VtkMapper;
+  vtkRenderer*                  m_Renderer;
+  vtkRenderWindow*              m_VtkRenderWindow;
+  vtkRenderWindowInteractor*    m_RenderWindowInteractor;
+  vtkCamera*                    m_Camera;
 
   mitk::DataNode::Pointer m_ImageNode;
 };

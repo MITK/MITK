@@ -70,6 +70,8 @@ protected slots:
     void GenerateFibers();  ///< generate fibers from the selected ROIs
     void GenerateImage();   ///< generate artificial image from the selected fiber bundle
     void JoinBundles();     ///< merges selcted fiber bundles into one
+
+    /** update fibers if any parameter changes */
     void OnFiberDensityChanged(int value);
     void OnFiberSamplingChanged(int value);
     void OnTensionChanged(double value);
@@ -88,15 +90,13 @@ protected:
     Ui::QmitkFiberfoxViewControls* m_Controls;
 
     void UpdateGui();   ///< enable/disbale buttons etc. according to current datamanager selection
-
-private:
-
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
-    void EnableCrosshairNavigation();
-    void DisableCrosshairNavigation();
-    void NodeAdded( const mitk::DataNode* node );
-    void NodeRemoved(const mitk::DataNode* node);
+    void EnableCrosshairNavigation();   ///< enable crosshair navigation if planar figure interaction ends
+    void DisableCrosshairNavigation();  ///< disable crosshair navigation if planar figure interaction starts
+    void NodeAdded( const mitk::DataNode* node );   ///< add observers
+    void NodeRemoved(const mitk::DataNode* node);   ///< remove observers
 
+    /** structure to keep track of planar figures and observers */
     struct QmitkPlanarFigureData
     {
         QmitkPlanarFigureData()
@@ -108,7 +108,6 @@ private:
             , m_Flipped(0)
         {
         }
-
         mitk::PlanarFigure* m_Figure;
         unsigned int m_EndPlacementObserverTag;
         unsigned int m_SelectObserverTag;
@@ -117,9 +116,9 @@ private:
         unsigned int m_Flipped;
     };
 
-    std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;
-    mitk::Image::Pointer                                m_TissueMask;
-    mitk::DataNode::Pointer                             m_SelectedFiducial;
+    std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
+    mitk::Image::Pointer                                m_TissueMask;                   ///< mask defining which regions of the image should contain signal and which are containing only noise
+    mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
     mitk::DataNode::Pointer                             m_SelectedImage;
     mitk::DataNode::Pointer                             m_SelectedBundle;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;

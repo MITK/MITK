@@ -55,31 +55,18 @@ public:
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
 
-  typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
-  typedef itk::Image<short, 3>          ItkShortImgType;
-  typedef itk::Image<float, 3>          ItkFloatImgType;
-  typedef itk::Image<itk::Vector<float, QBALL_ODFSIZE>, 3>  ItkQBallImgType;
-  typedef itk::Image< itk::DiffusionTensor3D< float >, 3 >  ItkTensorImage;
-
-  typedef itk::Image<itk::Vector<float,3>, 3>     OutputImageType;
-  typedef std::vector< OutputImageType::Pointer > OutputImageContainerType;
-
-  typedef vnl_vector_fixed< double, 3 >  DirectionType;
-  typedef itk::VectorContainer< int, DirectionType > DirectionContainerType;
-  typedef itk::VectorContainer< int, DirectionContainerType::Pointer > ContainerType;
-  typedef itk::Image< itk::Vector< float, QBALL_ODFSIZE >, 3 > ItkQballImageType;
-
-  typedef itk::Image< itk::Vector< float, 3>, 3 > ItkDirectionImage3DType;
-  typedef itk::VectorContainer< int, ItkDirectionImage3DType::Pointer > ItkDirectionImageContainerType;
+  typedef itk::Image<unsigned char, 3>                                  ItkUcharImgType;
+  typedef itk::Image< itk::DiffusionTensor3D< float >, 3 >              ItkTensorImage;
+  typedef itk::Image< itk::Vector< float, 3>, 3 >                       ItkDirectionImage3DType;    ///< contains a 3D vector in each voxel
 
   protected slots:
 
-  void ConvertShCoeffsFromFsl();
-  void ConvertPeaksFromFsl();
-  void ConvertPeaksFromMrtrix();
-  void GenerateImage();
-  void StartFiniteDiff();
-  void StartTensor();
+  void ConvertShCoeffsFromFsl();    ///< convert fsl spherical harmonic coefficients to the according mitk datatype
+  void ConvertPeaksFromFsl();       ///< convert fsl peaks to the according mitk datatype
+  void ConvertPeaksFromMrtrix();    ///< convert mrtrix peaks to the according mitk datatype
+  void GenerateImage();             ///< semicontinuous ODF maxima extraction
+  void StartFiniteDiff();           ///< ODF maxima extraction using finite differences on the densely sampled sphere
+  void StartTensor();               ///< extract principal eigenvectors from tensor image
 
 protected:
 
@@ -87,17 +74,16 @@ protected:
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
   Ui::QmitkOdfMaximaExtractionViewControls* m_Controls;
-
   QmitkStdMultiWidget* m_MultiWidget;
 
-  std::vector< mitk::DataNode::Pointer > m_BinaryImageNodes;
+  std::vector< mitk::DataNode::Pointer > m_BinaryImageNodes;    ///< mask images
   std::vector< mitk::DataNode::Pointer > m_ImageNodes;
   std::vector< mitk::DataNode::Pointer > m_TensorImageNodes;
 
-  void UpdateGui();
-  void GenerateDataFromDwi();
+  void UpdateGui();             ///< update button activity etc. dpending on current datamanager selection
+  void GenerateDataFromDwi();   ///< semicontinuous ODF maxima extraction
   template<int shOrder> void TemplatedConvertShCoeffsFromFsl(mitk::Image* mitkImg);
-  template<int shOrder> void StartMaximaExtraction();
+  template<int shOrder> void StartMaximaExtraction();   ///< ODF maxima extraction using finite differences on the densely sampled sphere
 
 private:
 

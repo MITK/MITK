@@ -71,7 +71,6 @@ public:
   // input
   itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
   itkSetMacro( NormalizationMethod, NormalizationMethods)
-  itkSetMacro( UseAdaptiveStepWidth, bool)
   itkSetMacro( DiffusionGradients, DirectionContainerType::Pointer)
   itkSetMacro( DiffusionImage, DiffusionImageType::Pointer)
   itkSetMacro( ShCoeffImage, CoefficientImageType::Pointer)
@@ -91,50 +90,51 @@ protected:
   OdfMaximaExtractionFilter();
   ~OdfMaximaExtractionFilter(){}
 
-  // CSA Qball reconstruction (SH order 4)
+  /** CSA Qball reconstruction (SH order 4) **/
   bool ReconstructQballImage();
 
-  // calculate roots of cubic equation ax³ + bx² + cx + d = 0 using cardanos method
+  /** calculate roots of cubic equation ax³ + bx² + cx + d = 0 using cardanos method **/
   std::vector<double> SolveCubic(const double& a, const double& b, const double& c, const double& d);
 
-  // derivatives of SH representation of the ODF
+  /** derivatives of SH representation of the ODF **/
   double ODF_dtheta2(const double& sn, const double& cs, const double& A, const double& B, const double& C, const double& D, const double& E, const double& F, const double& G, const double& H);
+
+  /** derivatives of SH representation of the ODF **/
   double ODF_dphi2(const double& sn, const double& cs, const double& A, const double& B, const double& C, const double& D, const double& E, const double& F, const double& G, const double& H);
+
+  /** derivatives of SH representation of the ODF **/
   double ODF_dtheta(const double& sn, const double& cs, const double& A, const double& B, const double& C, const double& D, const double& E, const double& F, const double& G, const double& H);
 
-  // calculate all directions fullfilling the maximum consitions
+  /** calculate all directions fullfilling the maximum consitions **/
   void FindCandidatePeaks(const CoefficientPixelType& SHcoeff);
 
-  // cluster the peaks detected by FindCandidatePeaks and retain maximum m_MaxNumPeaks
+  /** cluster the peaks detected by FindCandidatePeaks and retain maximum m_MaxNumPeaks **/
   std::vector< Vector3D > ClusterPeaks(const CoefficientPixelType& shCoeff);
 
-  // TODO
   void Cart2Sph(const std::vector< Vector3D >& dir,  vnl_matrix<double>& sphCoords);
   vnl_matrix<double> CalcShBasis(vnl_matrix<double>& sphCoords, const int& shOrder);
 
   // diffusion weighted image (mandatory input)
-  DirectionContainerType::Pointer           m_DiffusionGradients;
-  DiffusionImageType::Pointer               m_DiffusionImage;
-  float                                     m_Bvalue;
+  DirectionContainerType::Pointer           m_DiffusionGradients;   ///< input for qball reconstruction
+  DiffusionImageType::Pointer               m_DiffusionImage;       ///< input for qball reconstruction
+  float                                     m_Bvalue;               ///< input for qball reconstruction
 
   // binary mask image (optional input)
-  ItkUcharImgType::Pointer                  m_MaskImage;
+  ItkUcharImgType::Pointer                  m_MaskImage;            ///< only voxels inside the binary mask are processed
 
   // input parameters
-  NormalizationMethods                      m_NormalizationMethod;
-  bool                                      m_UseAdaptiveStepWidth;
-  bool                                      m_ScaleByGfa;
-  double                                    m_PeakThreshold;
-  unsigned int                              m_MaxNumPeaks;
+  NormalizationMethods                      m_NormalizationMethod;  ///< normalization for peaks
+  double                                    m_PeakThreshold;        ///< threshold on peak length relative to the largest peak in the current voxel
+  unsigned int                              m_MaxNumPeaks;          ///< if more peaks are found, only the largest are kept
 
   // intermediate results
-  CoefficientImageType::Pointer                 m_ShCoeffImage;
-  std::vector< vnl_vector_fixed< double, 2 > >  m_CandidatePeaks;
+  CoefficientImageType::Pointer                 m_ShCoeffImage;     ///< conatins spherical harmonic coefficients
+  std::vector< vnl_vector_fixed< double, 2 > >  m_CandidatePeaks;   ///< container for candidate peaks (all extrema, also minima)
 
   // output data
-  mitk::FiberBundleX::Pointer               m_OutputFiberBundle;
-  ItkUcharImgType::Pointer                  m_NumDirectionsImage;
-  ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;
+  mitk::FiberBundleX::Pointer               m_OutputFiberBundle;        ///< vector field (peak sizes rescaled for visualization purposes)
+  ItkUcharImgType::Pointer                  m_NumDirectionsImage;       ///< number of peaks per voxel
+  ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;  ///< output peaks
 
 private:
 

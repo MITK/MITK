@@ -52,9 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkStreamlineTrackingFilter.h>
 
 /*!
-\brief QmitkFiberProcessingView
-
-\warning  View to process fiber bundles. Supplies methods to extract fibers from the bundle, join and subtract bundles, generate images from the selected bundle and much more.
+\brief View to process fiber bundles. Supplies methods to extract fibers from the bundle, join and subtract bundles, generate images from the selected bundle and much more.
 
 \sa QmitkFunctionality
 \ingroup Functionalities

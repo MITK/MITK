@@ -26,6 +26,9 @@ using namespace std;
 namespace mitk
 {
 
+/**
+* \brief Samples new tract from surrounding fiber segments.   */
+
 class MitkDiffusionImaging_EXPORT SimpSamp
 {
 

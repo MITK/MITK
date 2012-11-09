@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk{
 
+/**
+* \brief Generates image where the pixel values are set according to the number of fibers ending in the voxel.   */
+
 template< class OutputImageType >
 class TractsToFiberEndingsImageFilter : public ImageSource< OutputImageType >
 {
@@ -65,11 +68,11 @@ protected:
   TractsToFiberEndingsImageFilter();
   virtual ~TractsToFiberEndingsImageFilter();
 
-  mitk::FiberBundleX::Pointer m_FiberBundle;
-  float m_UpsamplingFactor;
-  bool m_InvertImage;
-  bool m_UseImageGeometry;
-  bool m_BinaryOutput;
+  mitk::FiberBundleX::Pointer       m_FiberBundle;          ///< input fiber bundle
+  float                             m_UpsamplingFactor;     ///< use higher resolution for ouput image
+  bool                              m_InvertImage;          ///< voxelvalue = 1-voxelvalue
+  bool                              m_UseImageGeometry;     ///< output image is given other geometry than fiberbundle (input image geometry)
+  bool                              m_BinaryOutput;
   typename OutputImageType::Pointer m_InputImage;
 };
 

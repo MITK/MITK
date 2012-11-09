@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,10 +51,10 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
   typedef typename InputPixelType::ValueType      InputValueType;
 
   /** Run-time type information (and related methods).   */
-  itkTypeMacro( QBallToRgbImageFilter, ImageToImageFilter );
+  itkTypeMacro( QBallToRgbImageFilter, ImageToImageFilter )
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkNewMacro(Self)
 
   /** Print internal ivars */
   void PrintSelf(std::ostream& os, Indent indent) const
@@ -68,8 +68,8 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
 #endif
 
 protected:
-  QBallToRgbImageFilter() {};
-  virtual ~QBallToRgbImageFilter() {};
+  QBallToRgbImageFilter(){}
+  virtual ~QBallToRgbImageFilter(){}
 
   void GenerateData()
   {

@@ -53,9 +53,7 @@ private:
 };
 
 /*!
-  \brief QmitkGibbsTrackingView
-
-  \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
+  \brief View for global fiber tracking (Gibbs tracking)
 
   \sa QmitkFunctionality
   \ingroup Functionalities

@@ -28,8 +28,7 @@ namespace itk{
 
   template< class OutputImageType >
   TractsToRgbaImageFilter< OutputImageType >::TractsToRgbaImageFilter()
-    : m_InvertImage(false)
-    , m_UpsamplingFactor(1)
+    : m_UpsamplingFactor(1)
     , m_InputImage(NULL)
     , m_UseImageGeometry(false)
   {

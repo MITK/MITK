@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk{
 
+/**
+* \brief Generates RGBA image from the input fibers where color values are set according to the local fiber directions.   */
+
 template< class OutputImageType >
 class TractsToRgbaImageFilter : public ImageSource< OutputImageType >
 {
@@ -44,10 +47,6 @@ public:
   itkSetMacro( UpsamplingFactor, float)
   itkGetMacro( UpsamplingFactor, float)
 
-  /** Invert Image **/
-  itkSetMacro( InvertImage, bool)
-  itkGetMacro( InvertImage, bool)
-
   itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer)
   itkSetMacro( InputImage, typename InputImageType::Pointer)
 
@@ -65,11 +64,10 @@ protected:
   TractsToRgbaImageFilter();
   virtual ~TractsToRgbaImageFilter();
 
-  mitk::FiberBundleX::Pointer m_FiberBundle;
-  float m_UpsamplingFactor;
-  bool m_InvertImage;
-  bool m_UseImageGeometry;
-  typename InputImageType::Pointer m_InputImage;
+  mitk::FiberBundleX::Pointer       m_FiberBundle;      ///< input fiber bundle
+  float                             m_UpsamplingFactor; ///< use higher resolution for ouput image
+  bool                              m_UseImageGeometry; ///< output image is given other geometry than fiberbundle (input image geometry)
+  typename InputImageType::Pointer  m_InputImage;
 };
 
 }

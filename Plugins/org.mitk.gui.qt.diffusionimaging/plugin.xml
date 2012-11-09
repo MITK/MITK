@@ -158,9 +158,9 @@
   </extension>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.FiberBasedSoftwarePhantomView"
+    <view id="org.mitk.views.fiberfoxview"
           name="Fiberfox"
-          class="QmitkFiberBasedSoftwarePhantomView"
+          class="QmitkFiberfoxView"
           icon="resources/stochFB.png" />
   </extension>
 

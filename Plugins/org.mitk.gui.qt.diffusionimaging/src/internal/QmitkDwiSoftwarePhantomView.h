@@ -27,9 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkOrientationDistributionFunction.h>
 
 /*!
-\brief QmitkDwiSoftwarePhantomView
-
-\warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
+\brief View for diffusion software phantom generation using binary ROIs.
 
 \sa QmitkFunctionality
 \ingroup Functionalities

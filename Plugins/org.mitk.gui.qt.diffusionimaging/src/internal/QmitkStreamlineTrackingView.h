@@ -29,10 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 /*!
-\brief QmitkStreamlineTrackingView
-
-\warning  Implements standard streamline tracking as proposed by Mori et al. 1999 "Three-Dimensional Tracking of Axonal Projections in the Brain by Magnetic Resonance Imaging"
-
+\brief View for deterministic streamline fiber tracking.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */

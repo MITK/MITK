@@ -33,6 +33,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+/**
+* \brief Generates ne proposals of particle configurations.   */
+
 class MitkDiffusionImaging_EXPORT MetropolisHastingsSampler
 {
 public:

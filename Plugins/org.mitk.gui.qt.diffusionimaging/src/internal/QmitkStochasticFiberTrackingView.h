@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,10 +44,7 @@ typedef itk::DTITubeSpatialObjectPoint<3>  DTITubePointType;
 typedef itk::SceneSpatialObject<3>        SceneSpatialObjectType;
 
 /*!
-\brief QmitkFiberTrackingView
-
-\warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
-
+\brief View for probabilistic streamline fiber tracking
 \sa QmitkFunctionality
 \ingroup Functionalities
 */

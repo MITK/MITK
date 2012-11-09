@@ -34,7 +34,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <mitkFiberBundleX.h>
 
 namespace itk{
-/** \class DiffusionTensorPrincipalDirectionImageFilter
+/** \brief Extracts principal eigenvectors of the input tensors
  */
 
 template< class TTensorPixelType, class TPDPixelType=float>
@@ -85,10 +85,10 @@ public:
 
 private:
 
-    bool                                m_NormalizeVectors;
-    mitk::FiberBundleX::Pointer         m_OutputFiberBundle;
-    ItkUcharImgType::Pointer            m_NumDirectionsImage;
-    ItkUcharImgType::Pointer            m_MaskImage;
+    bool                                m_NormalizeVectors;     ///< Normalizes the output vector to length 1
+    mitk::FiberBundleX::Pointer         m_OutputFiberBundle;    ///< Vector field representation of the output vectors
+    ItkUcharImgType::Pointer            m_NumDirectionsImage;   ///< Image containing the number of fiber directions per voxel
+    ItkUcharImgType::Pointer            m_MaskImage;            ///< Extraction is only performed inside of the binary mask
     float                               m_MaxEigenvalue;
 };
 

@@ -35,8 +35,8 @@ class FslPeakImageConverter : public ProcessObject
 public:
 
   enum NormalizationMethods {
-    NO_NORM,
-    SINGLE_VEC_NORM
+    NO_NORM,            ///< don't normalize peaks
+    SINGLE_VEC_NORM     ///< normalize peaks to length 1
   };
 
   typedef FslPeakImageConverter Self;
@@ -69,10 +69,10 @@ protected:
   FslPeakImageConverter();
   ~FslPeakImageConverter(){}
 
-  NormalizationMethods                  m_NormalizationMethod;
-  mitk::FiberBundleX::Pointer           m_OutputFiberBundle;
+  NormalizationMethods                  m_NormalizationMethod;  ///< vector normalization
+  mitk::FiberBundleX::Pointer           m_OutputFiberBundle;    ///< output vector field
   InputType::Pointer                    m_InputImages;
-  DirectionImageContainerType::Pointer  m_DirectionImageContainer;
+  DirectionImageContainerType::Pointer  m_DirectionImageContainer;  ///< container for output peaks
 
 private:
 

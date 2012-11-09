@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef itkFibersFromPointsFilter_h
-#define itkFibersFromPointsFilter_h
+#ifndef itkFibersFromPlanarFiguresFilter_h
+#define itkFibersFromPlanarFiguresFilter_h
 
 // MITK
 #include <mitkPlanarEllipse.h>
@@ -34,7 +34,10 @@ using namespace std;
 
 namespace itk{
 
-class FibersFromPointsFilter : public ProcessObject
+/**
+* \brief Generates artificial fibers distributed in and interpolated between the input planar figures.   */
+
+class FibersFromPlanarFiguresFilter : public ProcessObject
 {
 public:
 
@@ -43,7 +46,7 @@ public:
         DISTRIBUTE_GAUSSIAN
     };
 
-    typedef FibersFromPointsFilter Self;
+    typedef FibersFromPlanarFiguresFilter Self;
     typedef ProcessObject                                       Superclass;
     typedef SmartPointer< Self >                                Pointer;
     typedef SmartPointer< const Self >                          ConstPointer;
@@ -53,7 +56,7 @@ public:
     typedef vector< mitk::FiberBundleX::Pointer >               FiberContainerType;
 
     itkNewMacro(Self)
-    itkTypeMacro( FibersFromPointsFilter, ProcessObject )
+    itkTypeMacro( FibersFromPlanarFiguresFilter, ProcessObject )
 
     void GenerateData();
 
@@ -74,27 +77,26 @@ public:
 
 protected:
 
-    FibersFromPointsFilter();
-    virtual ~FibersFromPointsFilter();
+    FibersFromPlanarFiguresFilter();
+    virtual ~FibersFromPlanarFiguresFilter();
     void GeneratePoints();
 
-    FiberDistribution   m_FiberDistribution;
-    FlipListType        m_FlipList;
-    FiducialListType    m_Fiducials;
-    FiberContainerType  m_FiberBundles;
-    int                 m_Density;
-    int                 m_FiberSampling;
-    double              m_Tension;
-    double              m_Continuity;
-    double              m_Bias;
-    double              m_Variance;
-
-    vector< mitk::Vector2D > m_2DPoints;
+    FiberDistribution   m_FiberDistribution;    ///< flag to switch between uniform and gaussian distribution of the fiber waypoints inside of the fiducials
+    FlipListType        m_FlipList;             ///< contains flags indicating a flip of the 2D fiber x-coordinates (needed to resolve some unwanted fiber twisting)
+    FiducialListType    m_Fiducials;            ///< container of the planar ellipses used as fiducials for the fiber generation process
+    FiberContainerType  m_FiberBundles;         ///< container for the output fiber bundles
+    int                 m_Density;              ///< number of fibers per bundle
+    int                 m_FiberSampling;        ///< sampling points of the fibers per cm
+    double              m_Tension;              ///< tension parameter of the Kochanek-Bartels splines
+    double              m_Continuity;           ///< continuity parameter of the Kochanek-Bartels splines
+    double              m_Bias;                 ///< bias parameter of the Kochanek-Bartels splines
+    double              m_Variance;             ///< variance of the gaussian waypoint distribution
+    vector< mitk::Vector2D > m_2DPoints;        ///< container for the 2D fiber waypoints
 };
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkFibersFromPointsFilter.cpp"
+#include "itkFibersFromPlanarFiguresFilter.cpp"
 #endif
 
 #endif

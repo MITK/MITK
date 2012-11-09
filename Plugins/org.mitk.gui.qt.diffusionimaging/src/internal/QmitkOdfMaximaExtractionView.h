@@ -27,9 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkOrientationDistributionFunction.h>
 
 /*!
-\brief QmitkOdfMaximaExtractionView
-
-\warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
+\brief View providing several methods to extract peaks from the spherical harmonic representation of ODFs or from tensors
 
 \sa QmitkFunctionality
 \ingroup Functionalities

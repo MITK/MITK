@@ -619,7 +619,6 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
         break;
     }
 
-    filter->SetUseAdaptiveStepWidth(true);
     filter->GenerateData();
 
     ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();

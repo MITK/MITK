@@ -40,6 +40,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace itk
 {
 
+/**
+* \brief Merges diffusion weighted images, e.g. to generate one multishell volume from several single shell volumes.   */
+
 template <class TScalarType>
 class MergeDiffusionImagesFilter
         : public ImageSource<itk::VectorImage<TScalarType,3> >
@@ -82,12 +85,12 @@ protected:
 
     void GenerateData();
 
-    DwiImageContainerType       m_ImageVolumes;
-    GradientListContainerType   m_GradientLists;
-    std::vector< double >       m_BValues;
-    int                         m_NumGradients;
-    GradientListType::Pointer   m_OutputGradients;
-    double                      m_BValue;
+    DwiImageContainerType       m_ImageVolumes;     ///< contains input images
+    GradientListContainerType   m_GradientLists;    ///< contains gradients of all input images
+    std::vector< double >       m_BValues;          ///< contains b-values of all input images
+    int                         m_NumGradients;     ///< number of gradients in the output image
+    GradientListType::Pointer   m_OutputGradients;  ///< container for output gradients
+    double                      m_BValue;           ///< main output b-value
 };
 
 

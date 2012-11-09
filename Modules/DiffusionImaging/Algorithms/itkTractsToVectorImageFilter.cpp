@@ -30,7 +30,6 @@ TractsToVectorImageFilter::TractsToVectorImageFilter():
     m_Epsilon(0.999),
     m_UseWorkingCopy(true),
     m_MaxNumDirections(3),
-    m_UseFastClustering(true),
     m_FiberSampling(5),
     m_UseTrilinearInterpolation(true),
     m_Thres(0.5)
@@ -62,19 +61,6 @@ itk::Point<float, 3> TractsToVectorImageFilter::GetItkPoint(double point[3])
     itkPoint[2] = point[2];
     return itkPoint;
 }
-
-
-
-float TractsToVectorImageFilter::GaussWeighting(float distance)
-{
-    float weight = distance;
-    //    float weight = m_GaussFac1*exp(distance*distance*m_GaussFac2);
-    //    MITK_INFO << distance << " -> " << weight;
-    if (weight<=0.5)
-        return 0.0;
-    return weight;
-}
-
 
 void TractsToVectorImageFilter::GenerateData()
 {
@@ -161,11 +147,6 @@ void TractsToVectorImageFilter::GenerateData()
     int numFibers = m_FiberBundle->GetNumFibers();
     itk::TimeProbe clock;
     m_DirectionsContainer = ContainerType::New();
-
-    // normal distribution parameters
-    float sigma = 0.1;
-    m_GaussFac1 = 1/(4*sigma*sqrt(2*M_PI));
-    m_GaussFac2 = -0.5/(sigma*sigma);
 
     MITK_INFO << "Generating fODFs (trilinear interpolation)";
     boost::progress_display disp(numFibers);
@@ -512,12 +493,7 @@ void TractsToVectorImageFilter::GenerateData()
                 directions.push_back(dirCont->ElementAt(i));
 
         if (!directions.empty())
-        {
-            if (m_UseFastClustering)
-                directions = FastClustering(directions);
-            else
-                directions = Clustering(directions);
-        }
+            directions = FastClustering(directions);
 
         std::sort( directions.begin(), directions.end(), CompareVectorLengths );
 

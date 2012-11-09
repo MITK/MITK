@@ -219,7 +219,7 @@ set(H_FILES
   Algorithms/itkFslPeakImageConverter.h
   Algorithms/itkFslShCoefficientImageConverter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
-  Algorithms/itkFibersFromPointsFilter.h
+  Algorithms/itkFibersFromPlanarFiguresFilter.h
   Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToVectorImageFilter.h
 

@@ -22,6 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+/**
+  * \brief Generates  diffusion measurement employing a second rank tensor model: e^(-bg^TDg)
+  *
+  */
+
 template< class ScalarType >
 class TensorModel : public DiffusionSignalModel< ScalarType >
 {
@@ -34,7 +39,9 @@ public:
     typedef itk::DiffusionTensor3D< float >                             ItkTensorType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType   GradientType;
 
+    /** Actual signal generation **/
     PixelType SimulateMeasurement();
+
     void SetKernelDirection(vnl_vector_fixed<double, 3> kernelDirection){ m_KernelDirection = kernelDirection; }
     void SetKernelTensor(ItkTensorType& tensor);
     void SetKernelFA(float FA);
@@ -43,13 +50,13 @@ public:
 
 protected:
 
+    /** Calculates tensor matrix from FA and ADC **/
     void UpdateKernelTensor();
-
-    vnl_vector_fixed<double, 3>     m_KernelDirection;
-    vnl_matrix_fixed<double, 3, 3>  m_KernelTensorMatrix;
-    float                           m_KernelFA;
-    float                           m_KernelADC;
-    float                           m_BValue;
+    vnl_vector_fixed<double, 3>     m_KernelDirection;      ///< Direction of the kernel tensors principal eigenvector
+    vnl_matrix_fixed<double, 3, 3>  m_KernelTensorMatrix;   ///< 3x3 matrix containing the kernel tensor values
+    float                           m_KernelFA;             ///< FA of the kernel tensor
+    float                           m_KernelADC;            ///< ADC of the kernel tensor
+    float                           m_BValue;               ///< b-value used to generate the artificial signal
 };
 
 }

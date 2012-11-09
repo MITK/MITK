@@ -21,6 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+/**
+  * \brief Generates direction independent diffusion measurement employing a scalar diffusion constant D: e^(-bD)
+  *
+  */
+
 template< class ScalarType >
 class ScalarModel : public DiffusionSignalModel< ScalarType >
 {
@@ -32,14 +37,17 @@ public:
     typedef typename DiffusionSignalModel< ScalarType >::PixelType      PixelType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType   GradientType;
 
+
+    /** Actual signal generation **/
     PixelType SimulateMeasurement();
+
     void SetDiffusivity(float D) { m_Diffusivity = D; }
     void SetBvalue(float bValue) { m_BValue = bValue; }
 
 protected:
 
-    float                           m_Diffusivity;
-    float                           m_BValue;
+    float                           m_Diffusivity;  ///< Scalar diffusion constant
+    float                           m_BValue;       ///< b-value used to generate the artificial signal
 };
 
 }

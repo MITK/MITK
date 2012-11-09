@@ -26,7 +26,6 @@ namespace itk {
 template< class TOdfPixelType >
 OdfMaximaExtractionFilter< TOdfPixelType >::OdfMaximaExtractionFilter():
     m_NormalizationMethod(MAX_VEC_NORM),
-    m_UseAdaptiveStepWidth(true),
     m_PeakThreshold(0.2),
     m_MaxNumPeaks(10),
     m_ShCoeffImage(NULL),

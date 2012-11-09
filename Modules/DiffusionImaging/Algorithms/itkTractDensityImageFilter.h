@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk{
 
+/**
+* \brief Generates tract density images from input fiberbundles (Calamante 2010).   */
+
 template< class OutputImageType >
 class TractDensityImageFilter : public ImageSource< OutputImageType >
 {
@@ -72,12 +75,12 @@ protected:
   virtual ~TractDensityImageFilter();
 
   typename OutputImageType::Pointer m_InputImage;
-  mitk::FiberBundleX::Pointer m_FiberBundle;
-  float m_UpsamplingFactor;
-  bool m_InvertImage;
-  bool m_BinaryOutput;
-  bool m_UseImageGeometry;
-  bool m_OutputAbsoluteValues;
+  mitk::FiberBundleX::Pointer       m_FiberBundle;          ///< input fiber bundle
+  float                             m_UpsamplingFactor;     ///< use higher resolution for ouput image
+  bool                              m_InvertImage;          ///< voxelvalue = 1-voxelvalue
+  bool                              m_BinaryOutput;         ///< generate binary fiber envelope
+  bool                              m_UseImageGeometry;     ///< output image is given other geometry than fiberbundle
+  bool                              m_OutputAbsoluteValues; ///< do not normalize image values to 0-1
 };
 
 }

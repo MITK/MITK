@@ -34,8 +34,9 @@ This file is based heavily on a corresponding ITK filter.
 #include <vtkPolyLine.h>
 
 namespace itk{
-  /** \class StreamlineTrackingFilter
- */
+
+/**
+* \brief Performes deterministic streamline tracking on the input tensor image.   */
 
   template< class TTensorPixelType, class TPDPixelType=double>
   class StreamlineTrackingFilter :

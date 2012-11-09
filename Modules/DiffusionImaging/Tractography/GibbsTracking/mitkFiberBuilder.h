@@ -35,6 +35,9 @@ using namespace std;
 namespace mitk
 {
 
+/**
+* \brief Gnerates actual fiber structure (vtkPolyData) from the particle grid content.   */
+
 class MitkDiffusionImaging_EXPORT FiberBuilder
 {
 public:

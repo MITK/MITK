@@ -60,7 +60,7 @@ QmitkFiberProcessingView::QmitkFiberProcessingView()
     : QmitkFunctionality()
     , m_Controls( 0 )
     , m_MultiWidget( NULL )
-    , m_EllipseCounter(0)
+    , m_CircleCounter(0)
     , m_PolygonCounter(0)
     , m_UpsamplingFactor(5)
 {
@@ -100,7 +100,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->m_Extract3dButton, SIGNAL(clicked()), this, SLOT(Extract3d()));
         connect( m_Controls->m_ProcessFiberBundleButton, SIGNAL(clicked()), this, SLOT(ProcessSelectedBundles()) );
         connect( m_Controls->m_ResampleFibersButton, SIGNAL(clicked()), this, SLOT(ResampleSelectedBundles()) );
-        connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoFaColorCoding()));
+        connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoImageColorCoding()));
         connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
         connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
         connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
@@ -752,7 +752,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_PruneFibersButton->setEnabled(false);
         m_Controls->m_CurvatureThresholdButton->setEnabled(false);
 
-        if (m_Surfaces.size()>0)
+        if (m_SelectedSurfaces.size()>0)
             m_Controls->m_MirrorFibersButton->setEnabled(true);
         else
             m_Controls->m_MirrorFibersButton->setEnabled(false);
@@ -768,7 +768,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_CurvatureThresholdButton->setEnabled(true);
         m_Controls->m_MirrorFibersButton->setEnabled(true);
 
-        if (m_Surfaces.size()>0)
+        if (m_SelectedSurfaces.size()>0)
             m_Controls->m_Extract3dButton->setEnabled(true);
 
         // one bundle and one planar figure needed to extract fibers
@@ -829,7 +829,7 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
     //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
     m_SelectedFB.clear();
     m_SelectedPF.clear();
-    m_Surfaces.clear();
+    m_SelectedSurfaces.clear();
     m_SelectedImage = NULL;
 
     m_Controls->m_FibLabel->setText("<font color='red'>mandatory</font>");
@@ -853,7 +853,7 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
         else if (dynamic_cast<mitk::Surface*>(node->GetData()))
         {
             m_Controls->m_PfLabel->setText(node->GetName().c_str());
-            m_Surfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
+            m_SelectedSurfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
         }
     }
     UpdateGui();
@@ -900,7 +900,7 @@ void QmitkFiberProcessingView::OnDrawCircle()
 {
     mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
 
-    this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_EllipseCounter));
+    this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_CircleCounter));
 
     this->GetDataStorage()->Modified();
 
@@ -1710,11 +1710,11 @@ void QmitkFiberProcessingView::MirrorFibers()
     if (m_SelectedFB.size()>0)
         GenerateStats();
 
-    if (m_Surfaces.size()>0)
+    if (m_SelectedSurfaces.size()>0)
     {
-        for (int i=0; i<m_Surfaces.size(); i++)
+        for (int i=0; i<m_SelectedSurfaces.size(); i++)
         {
-            mitk::Surface::Pointer surf = m_Surfaces.at(i);
+            mitk::Surface::Pointer surf = m_SelectedSurfaces.at(i);
             vtkSmartPointer<vtkPolyData> poly = surf->GetVtkPolyData();
             vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
 
@@ -1732,7 +1732,7 @@ void QmitkFiberProcessingView::MirrorFibers()
     RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkFiberProcessingView::DoFaColorCoding()
+void QmitkFiberProcessingView::DoImageColorCoding()
 {
     if (m_SelectedImage.IsNull())
         return;

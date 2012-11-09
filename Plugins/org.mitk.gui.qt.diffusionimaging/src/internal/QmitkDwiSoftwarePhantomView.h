@@ -15,28 +15,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
-
-#include <berryISelectionListener.h>
-#include <berryIStructuredSelection.h>
-
 #include <QmitkFunctionality.h>
 #include "ui_QmitkDwiSoftwarePhantomViewControls.h"
-#include <itkVectorImage.h>
-#include <itkVectorContainer.h>
-#include <itkOrientationDistributionFunction.h>
 
 /*!
-\brief QmitkDwiSoftwarePhantomView
-
-\warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
+\brief View for diffusion software phantom generation using binary ROIs.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-
-// Forward Qt class declarations
-
 
 class QmitkDwiSoftwarePhantomView : public QmitkFunctionality
 {
@@ -62,37 +49,40 @@ public:
   typedef itk::Vector<double,3>         GradientType;
   typedef std::vector<GradientType>     GradientListType;
 
-  template<int ndirs> std::vector<itk::Vector<double,3> > MakeGradientList() ;
 
   protected slots:
 
-  void GeneratePhantom();
-  void OnSimulateBaselineToggle(int state);
+  void GeneratePhantom();                   ///< Start image generation
+  void OnSimulateBaselineToggle(int state); ///< change from SNR to noise variance and vice versa
 
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+
+  /** Generate gradient directions distributed on half sphere (suboptimal distribution but arbitrary number of gradients) **/
   GradientListType GenerateHalfShell(int NPoints);
 
-  Ui::QmitkDwiSoftwarePhantomViewControls* m_Controls;
+  /** Generate gradient directions (n-fold icosaedron tesselation) **/
+  template<int ndirs> std::vector<itk::Vector<double,3> > MakeGradientList();
 
+  /** Update button activity etc. depending on current datamanager selection **/
+  void UpdateGui();
+
+  Ui::QmitkDwiSoftwarePhantomViewControls* m_Controls;
   QmitkStdMultiWidget* m_MultiWidget;
 
-  std::vector< mitk::DataNode::Pointer >    m_SignalRegionNodes;
-  std::vector< ItkUcharImgType::Pointer >   m_SignalRegions;
+  std::vector< mitk::DataNode::Pointer >    m_SignalRegionNodes;    ///< contains binary signal region nodes
+  std::vector< ItkUcharImgType::Pointer >   m_SignalRegions;        ///< contains binary signal region images
 
-  std::vector< QLabel* >    m_Labels;
+  /** List of gui elements generated dynamically depending on the number of selected signal regions **/
+  std::vector< QLabel* >            m_Labels;
   std::vector< QDoubleSpinBox* >    m_SpinFa;
   std::vector< QDoubleSpinBox* >    m_SpinAdc;
   std::vector< QDoubleSpinBox* >    m_SpinX;
   std::vector< QDoubleSpinBox* >    m_SpinY;
   std::vector< QDoubleSpinBox* >    m_SpinZ;
   std::vector< QDoubleSpinBox* >    m_SpinWeight;
-
-  void UpdateGui();
-
-private:
 
  };
 

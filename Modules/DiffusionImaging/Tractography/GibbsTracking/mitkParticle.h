@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+/**
+* \brief A particle is the basic element of the Gibbs fiber tractography method.   */
+
 class MitkDiffusionImaging_EXPORT Particle
 {
 public:

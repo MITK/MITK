@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
+/**
+* \brief Calculates internal and external energy of the new particle configuration proposal.   */
+
 class MitkDiffusionImaging_EXPORT EnergyComputer
 {
 

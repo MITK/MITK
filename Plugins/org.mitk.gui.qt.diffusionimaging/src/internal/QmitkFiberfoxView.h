@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIStructuredSelection.h>
 
 #include <QmitkAbstractView.h>
-#include "ui_QmitkFiberBasedSoftwarePhantomViewControls.h"
+#include "ui_QmitkFiberfoxViewControls.h"
 #include <itkVectorImage.h>
 #include <itkVectorContainer.h>
 #include <itkOrientationDistributionFunction.h>
@@ -29,9 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPlanarEllipse.h>
 
 /*!
-\brief QmitkFiberBasedSoftwarePhantomView
-
-\warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
+\brief View for fiber based diffusion software phantoms (Fiberfox).
 
 \sa QmitkFunctionality
 \ingroup Functionalities
@@ -41,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 using namespace std;
 
-class QmitkFiberBasedSoftwarePhantomView : public QmitkAbstractView
+class QmitkFiberfoxView : public QmitkAbstractView
 {
 
     // this is needed for all Qt objects that should have a Qt meta-object
@@ -52,14 +50,13 @@ public:
 
     static const string VIEW_ID;
 
-    QmitkFiberBasedSoftwarePhantomView();
-    virtual ~QmitkFiberBasedSoftwarePhantomView();
+    QmitkFiberfoxView();
+    virtual ~QmitkFiberfoxView();
 
     virtual void CreateQtPartControl(QWidget *parent);
     void SetFocus();
 
     typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
-    typedef itk::Image<float, 3>            ItkFloatImgType;
     typedef itk::Vector<double,3>           GradientType;
     typedef vector<GradientType>            GradientListType;
 
@@ -67,17 +64,19 @@ public:
 
 protected slots:
 
-    void OnDrawCircle();
-    void OnAddBundle();
-    void OnFlipButton();
-    void GenerateFibers();
-    void GenerateImage();
+    void OnDrawROI();       ///< adds new ROI, handles interactors etc.
+    void OnAddBundle();     ///< adds new fiber bundle to datastorage
+    void OnFlipButton();    ///< negate one coordinate of the fiber waypoints in the selcted planar figure. needed in case of unresolvable twists
+    void GenerateFibers();  ///< generate fibers from the selected ROIs
+    void GenerateImage();   ///< generate artificial image from the selected fiber bundle
+    void JoinBundles();     ///< merges selcted fiber bundles into one
+
+    /** update fibers if any parameter changes */
     void OnFiberDensityChanged(int value);
     void OnFiberSamplingChanged(int value);
     void OnTensionChanged(double value);
     void OnContinuityChanged(double value);
     void OnBiasChanged(double value);
-    void JoinBundles();
     void OnVarianceChanged(double value);
     void OnDistributionChanged(int value);
 
@@ -86,20 +85,18 @@ protected:
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&);
 
-    GradientListType GenerateHalfShell(int NPoints);
+    GradientListType GenerateHalfShell(int NPoints);    ///< generate vectors distributed over the halfsphere
 
-    Ui::QmitkFiberBasedSoftwarePhantomViewControls* m_Controls;
+    Ui::QmitkFiberfoxViewControls* m_Controls;
 
-    void UpdateGui();
-
-private:
-
+    void UpdateGui();   ///< enable/disbale buttons etc. according to current datamanager selection
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
-    void EnableCrosshairNavigation();
-    void DisableCrosshairNavigation();
-    void NodeAdded( const mitk::DataNode* node );
-    void NodeRemoved(const mitk::DataNode* node);
+    void EnableCrosshairNavigation();   ///< enable crosshair navigation if planar figure interaction ends
+    void DisableCrosshairNavigation();  ///< disable crosshair navigation if planar figure interaction starts
+    void NodeAdded( const mitk::DataNode* node );   ///< add observers
+    void NodeRemoved(const mitk::DataNode* node);   ///< remove observers
 
+    /** structure to keep track of planar figures and observers */
     struct QmitkPlanarFigureData
     {
         QmitkPlanarFigureData()
@@ -111,7 +108,6 @@ private:
             , m_Flipped(0)
         {
         }
-
         mitk::PlanarFigure* m_Figure;
         unsigned int m_EndPlacementObserverTag;
         unsigned int m_SelectObserverTag;
@@ -120,9 +116,9 @@ private:
         unsigned int m_Flipped;
     };
 
-    std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;
-    mitk::Image::Pointer                                m_TissueMask;
-    mitk::DataNode::Pointer                             m_SelectedFiducial;
+    std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
+    mitk::Image::Pointer                                m_TissueMask;                   ///< mask defining which regions of the image should contain signal and which are containing only noise
+    mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
     mitk::DataNode::Pointer                             m_SelectedImage;
     mitk::DataNode::Pointer                             m_SelectedBundle;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;

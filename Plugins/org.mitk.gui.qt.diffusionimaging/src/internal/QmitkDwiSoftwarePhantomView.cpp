@@ -15,24 +15,14 @@
 
  =========================================================================*/
 
-//misc
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-// Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-
 // Qmitk
 #include "QmitkDwiSoftwarePhantomView.h"
 
 // MITK
-#include <mitkImage.h>
 #include <mitkDiffusionImage.h>
 #include <mitkImageToItk.h>
-#include <itkDwiPhantomGenerationFilter.h>
 #include <mitkImageCast.h>
-#include <mitkProperties.h>
+#include <itkDwiPhantomGenerationFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>

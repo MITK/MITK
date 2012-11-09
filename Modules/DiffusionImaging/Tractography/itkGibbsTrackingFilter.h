@@ -34,6 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk{
 
+/**
+* \brief Performes global fiber tractography on the input Q-Ball or tensor image (Gibbs tracking, Reisert 2010).   */
+
 template< class ItkQBallImageType >
 class GibbsTrackingFilter : public ProcessObject
 {

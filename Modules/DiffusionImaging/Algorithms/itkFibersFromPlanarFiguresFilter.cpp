@@ -13,7 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include "itkFibersFromPointsFilter.h"
+#include "itkFibersFromPlanarFiguresFilter.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -43,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk{
 
-FibersFromPointsFilter::FibersFromPointsFilter()
+FibersFromPlanarFiguresFilter::FibersFromPlanarFiguresFilter()
     : m_Density(1000)
     , m_FiberSampling(5)
     , m_Tension(0)
@@ -55,13 +55,13 @@ FibersFromPointsFilter::FibersFromPointsFilter()
 
 }
 
-FibersFromPointsFilter::~FibersFromPointsFilter()
+FibersFromPlanarFiguresFilter::~FibersFromPlanarFiguresFilter()
 {
 
 }
 
 
-void FibersFromPointsFilter::GeneratePoints()
+void FibersFromPlanarFiguresFilter::GeneratePoints()
 {
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
     randGen->SetSeed((unsigned int)0);
@@ -90,7 +90,7 @@ void FibersFromPointsFilter::GeneratePoints()
 }
 
 // perform global tracking
-void FibersFromPointsFilter::GenerateData()
+void FibersFromPlanarFiguresFilter::GenerateData()
 {
     // check if enough fiducials are available
     for (int i=0; i<m_Fiducials.size(); i++)

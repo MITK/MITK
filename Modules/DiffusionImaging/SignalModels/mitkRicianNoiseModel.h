@@ -22,6 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+/**
+  * \brief Implementation of noise following a rician distribution
+  *
+  */
+
 template< class ScalarType >
 class RicianNoiseModel : public DiffusionNoiseModel< ScalarType >
 {
@@ -32,6 +37,7 @@ public:
 
     typedef typename DiffusionNoiseModel< ScalarType >::PixelType      PixelType;
 
+    /** Adds rician noise to the input pixel **/
     void AddNoise(PixelType& pixel);
 
 protected:

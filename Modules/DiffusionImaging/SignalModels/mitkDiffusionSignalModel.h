@@ -24,6 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+/**
+  * \brief Abstract class for diffusion signal models
+  *
+  */
+
 template< class ScalarType >
 class DiffusionSignalModel
 {
@@ -36,6 +41,7 @@ public:
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
 
+    /** Realizes actual signal generation. Has to be implemented in subclass. **/
     virtual PixelType SimulateMeasurement() = 0;
     void SetFiberDirection(vnl_vector_fixed<double, 3> fiberDirection){ m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { m_GradientList = gradientList; }
@@ -43,8 +49,8 @@ public:
 
 protected:
 
-    vnl_vector_fixed<double, 3>     m_FiberDirection;
-    GradientListType                m_GradientList;
+    vnl_vector_fixed<double, 3>     m_FiberDirection;   ///< Needed to generate anisotropc signal to determin direction of anisotropy
+    GradientListType                m_GradientList;     ///< Diffusion gradient direction container
 
 };
 

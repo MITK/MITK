@@ -34,7 +34,7 @@ class DiffusionSignalModel
 {
 public:
 
-    DiffusionSignalModel(){}
+    DiffusionSignalModel() : m_SignalScale(200){}
     ~DiffusionSignalModel(){}
 
     typedef itk::VariableLengthVector< ScalarType > PixelType;
@@ -45,13 +45,16 @@ public:
     virtual PixelType SimulateMeasurement() = 0;
     void SetFiberDirection(GradientType fiberDirection){ m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { m_GradientList = gradientList; }
+    void SetSignalScale(ScalarType signalScale) { m_SignalScale = signalScale; }
+
+    ScalarType GetSignalScale() { return m_SignalScale; }
     int GetNumGradients(){ return m_GradientList.size(); }
 
 protected:
 
     GradientType        m_FiberDirection;   ///< Needed to generate anisotropc signal to determin direction of anisotropy
     GradientListType    m_GradientList;     ///< Diffusion gradient direction container
-
+    ScalarType          m_SignalScale;      ///< Scaling factor for signal value
 };
 
 }

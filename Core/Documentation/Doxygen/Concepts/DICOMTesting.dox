@@ -126,6 +126,15 @@ From test set \b TinyCTAbdomen (see description.txt in this directory for detail
  - tilted_gantry : slice origins do not align along first slice normal (happens with tilted gantries)
  - interleaved : two volumes of slices with origins along the same line. The volumes' slices interleave in their border region. This test is meant to correctly sort apart the two blocks instead of generating many two-slices groups in the interleaved region.
 
+ TODO:
+ - sc_image
+ - cr_image_no_spacing
+ - cr_image_pixelspacing
+ - cr_image_imagerpixelspacing
+ - cr_image_calibratedspacing
+ - dx_image
+ - multiframe
+
 From test set \b TiltHead (see description.txt in this directory for details on test images):
  
  - head_ct_tilt : load a series with gantry tilt and check its orientation

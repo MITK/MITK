@@ -113,14 +113,17 @@ DicomSeriesReader::ReaderImplementationLevel DicomSeriesReader::ImageBlockDescri
     case gdcm::UIDs::CTImageStorage:
     case gdcm::UIDs::MRImageStorage:
     case gdcm::UIDs::PositronEmissionTomographyImageStorage:
-      return ReaderImplementationLevel_Supported;
-    case gdcm::UIDs::NuclearMedicineImageStorage:
-      return ReaderImplementationLevel_PartlySupported;
     case gdcm::UIDs::ComputedRadiographyImageStorage:
     case gdcm::UIDs::DigitalXRayImageStorageForPresentation:
     case gdcm::UIDs::DigitalXRayImageStorageForProcessing:
+      return ReaderImplementationLevel_Supported;
+
+    case gdcm::UIDs::NuclearMedicineImageStorage:
+      return ReaderImplementationLevel_PartlySupported;
+
     case gdcm::UIDs::SecondaryCaptureImageStorage:
       return ReaderImplementationLevel_Implemented;
+
     default:
       return ReaderImplementationLevel_Unsupported;
   }

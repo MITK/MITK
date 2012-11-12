@@ -57,6 +57,7 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
     virtual ~PlanarFigureSegmentationController();
 
     typedef std::vector<PlanarFigure::Pointer> PlanarFigureListType;
+    typedef std::vector<Surface::Pointer> SurfaceListType;
 
     /**
     * \brief Setter for the reference image.
@@ -116,9 +117,11 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
 
     PlanarFigureSegmentationController();
 
+    void InitializeFilters();
+
 
     PlanarFigureListType m_PlanarFigureList;
-
+    SurfaceListType m_SurfaceList;
 
     /**
     * \brief Filter to reduce the number of control points.

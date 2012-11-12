@@ -42,8 +42,8 @@ class FibersFromPlanarFiguresFilter : public ProcessObject
 public:
 
     enum FiberDistribution{
-        DISTRIBUTE_UNIFORM,
-        DISTRIBUTE_GAUSSIAN
+        DISTRIBUTE_UNIFORM, // distribute fibers uniformly in the ROIs
+        DISTRIBUTE_GAUSSIAN // distribute fibers using a 2D gaussian
     };
 
     typedef FibersFromPlanarFiguresFilter Self;
@@ -64,16 +64,19 @@ public:
         this->GenerateData();
     }
 
-    void SetFlipList(FlipListType fliplist){ m_FlipList = fliplist; }
-    void SetFiducials(FiducialListType fiducials){ m_Fiducials = fiducials; }
+    // input
+    void SetFlipList(FlipListType fliplist){ m_FlipList = fliplist; }           ///< contains flags indicating a flip of the 2D fiber x-coordinates (needed to resolve some unwanted fiber twisting)
+    void SetFiducials(FiducialListType fiducials){ m_Fiducials = fiducials; }   ///< container of the planar ellipses used as fiducials for the fiber generation process
+    itkSetMacro(Density, int)                                                   ///< number of fibers per bundle
+    itkSetMacro(FiberSampling, int)                                             ///< sampling points of the fibers per cm
+    itkSetMacro(Tension, double)                                                ///< tension parameter of the Kochanek-Bartels splines
+    itkSetMacro(Continuity, double)                                             ///< continuity parameter of the Kochanek-Bartels splines
+    itkSetMacro(Bias, double)                                                   ///< bias parameter of the Kochanek-Bartels splines
+    itkSetMacro(FiberDistribution, FiberDistribution)                           ///< flag to switch between uniform and gaussian distribution of the fiber waypoints inside of the fiducials
+    itkSetMacro(Variance, double)                                               ///< variance of the gaussian waypoint distribution
+
+    // output
     FiberContainerType GetFiberBundles(){ return m_FiberBundles; }
-    itkSetMacro(Density, int)
-    itkSetMacro(FiberSampling, int)
-    itkSetMacro(Tension, double)
-    itkSetMacro(Continuity, double)
-    itkSetMacro(Bias, double)
-    itkSetMacro(FiberDistribution, FiberDistribution)
-    itkSetMacro(Variance, double)
 
 protected:
 

@@ -42,28 +42,18 @@ public:
   itkNewMacro(Self)
   itkTypeMacro( TractDensityImageFilter, ImageSource )
 
-  /** Upsampling factor **/
-  itkSetMacro( UpsamplingFactor, float)
-  itkGetMacro( UpsamplingFactor, float)
-
-  /** Invert Image **/
-  itkSetMacro( InvertImage, bool)
-  itkGetMacro( InvertImage, bool)
-
-  /** Binary Output **/
-  itkSetMacro( BinaryOutput, bool)
-  itkGetMacro( BinaryOutput, bool)
-
-  /** Output absolute values of #fibers per voxel **/
-  itkSetMacro( OutputAbsoluteValues, bool)
-  itkGetMacro( OutputAbsoluteValues, bool)
-
-  /** Use input image geometry to initialize output image **/
-  itkSetMacro( UseImageGeometry, bool)
-  itkGetMacro( UseImageGeometry, bool)
-
-  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer)
-  itkSetMacro( InputImage, typename OutputImageType::Pointer)
+  itkSetMacro( UpsamplingFactor, float)                         ///< use higher resolution for ouput image
+  itkGetMacro( UpsamplingFactor, float)                         ///< use higher resolution for ouput image
+  itkSetMacro( InvertImage, bool)                               ///< voxelvalue = 1-voxelvalue
+  itkGetMacro( InvertImage, bool)                               ///< voxelvalue = 1-voxelvalue
+  itkSetMacro( BinaryOutput, bool)                              ///< generate binary fiber envelope
+  itkGetMacro( BinaryOutput, bool)                              ///< generate binary fiber envelope
+  itkSetMacro( OutputAbsoluteValues, bool)                      ///< output absolute values of the number of fibers per voxel
+  itkGetMacro( OutputAbsoluteValues, bool)                      ///< output absolute values of the number of fibers per voxel
+  itkSetMacro( UseImageGeometry, bool)                          ///< use input image geometry to initialize output image
+  itkGetMacro( UseImageGeometry, bool)                          ///< use input image geometry to initialize output image
+  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer)        ///< input fiber bundle
+  itkSetMacro( InputImage, typename OutputImageType::Pointer)   ///< use input image geometry to initialize output image
 
   void GenerateData();
 
@@ -74,12 +64,12 @@ protected:
   TractDensityImageFilter();
   virtual ~TractDensityImageFilter();
 
-  typename OutputImageType::Pointer m_InputImage;
+  typename OutputImageType::Pointer m_InputImage;           ///< use input image geometry to initialize output image
   mitk::FiberBundleX::Pointer       m_FiberBundle;          ///< input fiber bundle
   float                             m_UpsamplingFactor;     ///< use higher resolution for ouput image
   bool                              m_InvertImage;          ///< voxelvalue = 1-voxelvalue
   bool                              m_BinaryOutput;         ///< generate binary fiber envelope
-  bool                              m_UseImageGeometry;     ///< output image is given other geometry than fiberbundle
+  bool                              m_UseImageGeometry;     ///< use input image geometry to initialize output image
   bool                              m_OutputAbsoluteValues; ///< do not normalize image values to 0-1
 };
 

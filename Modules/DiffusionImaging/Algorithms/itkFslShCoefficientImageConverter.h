@@ -50,9 +50,12 @@ public:
   /** Runtime information support. */
   itkTypeMacro(FslShCoefficientImageConverter, ProcessObject)
 
-  itkSetMacro( InputImage, InputImageType::Pointer)
-  itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)
-  itkGetMacro( QballImage, typename QballImageType::Pointer)
+  // input
+  itkSetMacro( InputImage, InputImageType::Pointer) ///< sh coefficient image in FSL file format
+
+  // output
+  itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)    ///< mitk style image containing the SH coefficients
+  itkGetMacro( QballImage, typename QballImageType::Pointer)                ///< mitk Q-Ball image generated from the coefficients
 
   void GenerateData();
 

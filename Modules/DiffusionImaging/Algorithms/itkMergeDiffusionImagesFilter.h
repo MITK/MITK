@@ -57,10 +57,10 @@ public:
     typedef SmartPointer<const Self> ConstPointer;
 
     /** Method for creation through the object factory. */
-   itkNewMacro(Self);
+   itkNewMacro(Self)
 
    /** Runtime information support. */
-   itkTypeMacro(MergeDiffusionImagesFilter, ImageSource);
+   itkTypeMacro(MergeDiffusionImagesFilter, ImageSource)
 
     typedef itk::VectorImage<TScalarType,3>                  DwiImageType;
     typedef typename DwiImageType::PixelType                DwiPixelType;
@@ -71,12 +71,14 @@ public:
     typedef itk::VectorContainer< unsigned int, GradientType >  GradientListType;
     typedef typename std::vector< GradientListType::Pointer >   GradientListContainerType;
 
-    void SetImageVolumes(DwiImageContainerType cont);
-    void SetGradientLists(GradientListContainerType cont);
-    void SetBValues(std::vector< double > bvals);
+   // input
+    void SetImageVolumes(DwiImageContainerType cont);       ///< input DWI image volume container
+    void SetGradientLists(GradientListContainerType cont);  ///< gradients of all input images
+    void SetBValues(std::vector< double > bvals);           ///< b-values of all input images
 
-    GradientListType::Pointer GetOutputGradients();
-    double GetB_Value();
+    // output
+    GradientListType::Pointer GetOutputGradients();         ///< gradient list of the merged output image
+    double GetB_Value();                                    ///< main b-value of the merged output image
 
 protected:
 

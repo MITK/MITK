@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkGDCMSeriesFileNames.h>
 
+#include <gdcmSorter.h>
+#include <gdcmRAWCodec.h>
 #include <gdcmAttribute.h>
 #include <gdcmPixmapReader.h>
 #include <gdcmStringFilter.h>

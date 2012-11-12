@@ -40,11 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 #include <gdcmDataSet.h>
-#include <gdcmRAWCodec.h>
-#include <gdcmSorter.h>
 #include <gdcmScanner.h>
-#include <gdcmPixmapReader.h>
-#include <gdcmStringFilter.h>
 
 namespace mitk
 {

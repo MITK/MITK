@@ -71,16 +71,16 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
   dir = argv[1];
 
   //check if DICOMTags have been set as property for mitk::Image
-  mitk::DicomSeriesReader::UidFileNamesMap seriesInFiles = mitk::DicomSeriesReader::GetSeries( dir, true );
+  mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( dir, true );
   std::list<mitk::Image::Pointer> images;
   std::map<mitk::Image::Pointer, mitk::DicomSeriesReader::StringContainer> fileMap;
 
   // TODO sort series UIDs, implementation of map iterator might differ on different platforms (or verify this is a standard topic??)
-  for (mitk::DicomSeriesReader::UidFileNamesMap::const_iterator seriesIter = seriesInFiles.begin();
+  for (mitk::DicomSeriesReader::FileNamesGrouping::const_iterator seriesIter = seriesInFiles.begin();
        seriesIter != seriesInFiles.end();
        ++seriesIter)
   {
-    mitk::DicomSeriesReader::StringContainer files = seriesIter->second;
+    mitk::DicomSeriesReader::StringContainer files = seriesIter->second.GetFilenames();
 
     mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries( files );
     MITK_TEST_CONDITION_REQUIRED(node.IsNotNull(),"Testing node")

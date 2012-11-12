@@ -68,14 +68,14 @@ mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const Strin
    
   ImageList result;
 
-  DicomSeriesReader::UidFileNamesMap seriesInFiles = DicomSeriesReader::GetSeries( files, true );
+  DicomSeriesReader::FileNamesGrouping seriesInFiles = DicomSeriesReader::GetSeries( files, true );
 
   // TODO sort series UIDs, implementation of map iterator might differ on different platforms (or verify this is a standard topic??)
-  for (DicomSeriesReader::UidFileNamesMap::const_iterator seriesIter = seriesInFiles.begin();
+  for (DicomSeriesReader::FileNamesGrouping::const_iterator seriesIter = seriesInFiles.begin();
        seriesIter != seriesInFiles.end();
        ++seriesIter)
   {
-    StringContainer files = seriesIter->second;
+    StringContainer files = seriesIter->second.GetFilenames();
 
     DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files );
 

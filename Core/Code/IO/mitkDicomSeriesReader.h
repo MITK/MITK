@@ -122,7 +122,7 @@ namespace mitk
 
  // only a directory is known at this point: /home/who/dicom
 
- DicomSeriesReader::UidFileNamesMap allImageBlocks = DicomSeriesReader::GetSeries("/home/who/dicom/");
+ DicomSeriesReader::FileNamesGrouping allImageBlocks = DicomSeriesReader::GetSeries("/home/who/dicom/");
 
  // file now divided into groups of identical image size, orientation, spacing, etc.
  // each of these lists should be loadable as an mitk::Image.
@@ -372,7 +372,7 @@ public:
    
    Find all series (and sub-series -- see details) in a particular directory.
   */
-  static UidFileNamesMap GetSeries(const std::string &dir, 
+  static FileNamesGrouping GetSeries(const std::string &dir, 
                                    bool groupImagesWithGantryTilt,
                                    const StringContainer &restrictions = StringContainer());
 
@@ -412,7 +412,7 @@ public:
    \warning Adding restrictions is not yet implemented!
    */
   static
-  UidFileNamesMap 
+  FileNamesGrouping 
   GetSeries(const StringContainer& files, 
             bool sortTo3DPlust, 
             bool groupImagesWithGantryTilt,
@@ -424,7 +424,7 @@ public:
     Use GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions) instead.
   */
   static
-  UidFileNamesMap 
+  FileNamesGrouping 
   GetSeries(const StringContainer& files, 
             bool groupImagesWithGantryTilt,
             const StringContainer &restrictions = StringContainer());

@@ -1152,13 +1152,13 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   return result;
 }
 
-DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::FileNamesGrouping 
 DicomSeriesReader::GetSeries(const StringContainer& files, bool groupImagesWithGantryTilt, const StringContainer &restrictions)
 {
   return GetSeries(files, true, groupImagesWithGantryTilt, restrictions);
 }
   
-DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::FileNamesGrouping 
 DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, bool groupImagesWithGantryTilt, const StringContainer& /*restrictions*/)
 {
   /**
@@ -1170,8 +1170,6 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
         - 0028,0030 pixel spacing (x,y)
         - 0018,0050 slice thickness
   */
-
-  UidFileNamesMap groupsOfSimilarImages; // preliminary result, refined into the final result mapOf3DPlusTBlocks
 
   // use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
 
@@ -1227,8 +1225,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   if ( !scanner.Scan( files ) )
   {
     MITK_ERROR << "gdcm::Scanner failed when scanning " << files.size() << " input files.";
-    return groupsOfSimilarImages;
-    //return result; // TODO
+    return result;
   }
 
   // assign files IDs that will separate them for loading into image blocks
@@ -1307,7 +1304,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
       std::string firstFileInBlock = thisBlock.GetFilenames().front();
 
       thisBlock.SetImageBlockUID( newGroupUID.str() );
-      thisBlock.SetSeriesInstanceUID( "TODO" );
+      thisBlock.SetSeriesInstanceUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagSeriesInstanceUID ) ) );
       thisBlock.SetHasGantryTiltCorrected( analysisResult.ContainsGantryTilt() );
       thisBlock.SetSOPClassUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagSOPClassUID ) ) );
       thisBlock.SetNumberOfFrames( ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagNumberOfFrames ) ) );
@@ -1421,25 +1418,23 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     }
   }
 
-  UidFileNamesMap mapOf3DPlusTBlocks; // final result of this function
   MITK_DEBUG << "================================================================================";
   MITK_DEBUG << "Summary: ";
   for ( FileNamesGrouping::const_iterator groupIter = groupsOf3DPlusTBlocks.begin(); groupIter != groupsOf3DPlusTBlocks.end(); ++groupIter )
   {
     ImageBlockDescriptor block = groupIter->second;
     MITK_DEBUG << "  " << block.GetFilenames().size() << " '" << block.GetModality() << "' images (" << block.GetSOPClassUIDAsString() << ") in volume " << block.GetImageBlockUID();
-    MITK_DEBUG << "    (gantry tilt : " << (block.HasGantryTiltCorrected()?"yes":"no") << "; "
+    MITK_DEBUG << "    (gantry tilt : " << (block.HasGantryTiltCorrected()?"Yes":"No") << "; "
                        "pixel spacing : " << PixelSpacingInterpretationToString( block.GetPixelSpacingType() ) << "; " 
-                       "3D+t: " << (block.HasMultipleTimePoints()?"yes":"no") << "; "
+                       "3D+t: " << (block.HasMultipleTimePoints()?"Yes":"No") << "; "
                        "reader support: " << ReaderImplementationLevelToString( block.GetReaderImplementationLevel() );
-    mapOf3DPlusTBlocks[ groupIter->first ] = groupIter->second.GetFilenames();
   }
   MITK_DEBUG << "================================================================================";
 
-  return mapOf3DPlusTBlocks;
+  return groupsOf3DPlusTBlocks;
 }
 
-DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::FileNamesGrouping 
 DicomSeriesReader::GetSeries(const std::string &dir, bool groupImagesWithGantryTilt, const StringContainer &restrictions)
 {
   gdcm::Directory directoryLister;
@@ -1546,16 +1541,16 @@ DicomSeriesReader::IDifyTagValue(const std::string& value)
 DicomSeriesReader::StringContainer 
 DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, bool groupImagesWithGantryTilt, const StringContainer &restrictions)
 {
-  UidFileNamesMap allSeries = GetSeries(dir, groupImagesWithGantryTilt, restrictions);
+  FileNamesGrouping allSeries = GetSeries(dir, groupImagesWithGantryTilt, restrictions);
   StringContainer resultingFileList;
 
-  for ( UidFileNamesMap::const_iterator idIter = allSeries.begin(); 
+  for ( FileNamesGrouping::const_iterator idIter = allSeries.begin(); 
         idIter != allSeries.end(); 
         ++idIter )
   {
     if ( idIter->first.find( series_uid ) == 0 ) // this ID starts with given series_uid
     {
-      resultingFileList.insert( resultingFileList.end(), idIter->second.begin(), idIter->second.end() ); // append
+      return idIter->second.GetFilenames();
     }
   }
 

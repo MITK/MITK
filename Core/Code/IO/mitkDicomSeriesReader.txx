@@ -126,6 +126,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         imageBlockDescriptor.AddFiles(imageBlocks.front()); // only the first part is loaded
         imageBlockDescriptor.SetHasMultipleTimePoints( false );
 
+        FixSpacingInformation( image, imageBlockDescriptor );
         CopyMetaDataToImageProperties( imageBlocks.front(), scanner.GetMappings(), io, imageBlockDescriptor, image);
 
         initialize_node = true;
@@ -161,12 +162,12 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
         }
 
-        image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
-        image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
-
         gdcm::Scanner scanner;
         ScanForSliceInformation(filenames, scanner);
         
+        image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
+        image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
+        FixSpacingInformation( image, imageBlockDescriptor );
         CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, imageBlockDescriptor, image);
 
         MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
@@ -223,6 +224,15 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       setlocale(LC_NUMERIC, previousCLocale);
       std::cin.imbue(previousCppLocale);
     }
+
+    MITK_INFO << "--------------------------------------------------------------------------------";
+    MITK_INFO << "DICOM files loaded (from series UID " << imageBlockDescriptor.GetSeriesInstanceUID() << "):";
+    MITK_INFO << "  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
+    MITK_INFO << "  loadability: " << imageBlockDescriptor.GetLoadability();
+    MITK_INFO << "  pixel spacing type: " << imageBlockDescriptor.GetPixelSpacingType() << " " << image->GetGeometry()->GetSpacing()[0] << "/" << image->GetGeometry()->GetSpacing()[0];
+    MITK_INFO << "  gantry tilt corrected: " << (imageBlockDescriptor.HasGantryTiltCorrected()?"yes":"no");
+    MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"yes":"no");
+    MITK_INFO << "--------------------------------------------------------------------------------";
   }
   catch (std::exception& e)
   {
@@ -234,16 +244,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
     throw e;
   }
-
-  MITK_INFO << "--------------------------------------------------------------------------------";
-  MITK_INFO << "DICOM files loaded (from series UID " << imageBlockDescriptor.GetSeriesInstanceUID() << "):";
-  MITK_INFO << "  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
-  MITK_INFO << "  loadability: " << imageBlockDescriptor.GetLoadability();
-  MITK_INFO << "  pixel spacing type: " << imageBlockDescriptor.GetPixelSpacingType();
-  MITK_INFO << "  gantry tilt corrected: " << (imageBlockDescriptor.HasGantryTiltCorrected()?"yes":"no");
-  MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"yes":"no");
-  MITK_INFO << "--------------------------------------------------------------------------------";
- }
+}
 
 template <typename PixelType>
 Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command )

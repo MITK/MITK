@@ -297,6 +297,7 @@ public:
       bool PixelSpacingIsUnknown() const;
 
       std::string GetPixelSpacingType() const;
+      void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
 
       bool HasMultipleTimePoints() const;
 
@@ -626,6 +627,10 @@ protected:
   static
   std::string
   ConstCharStarToString(const char* s);
+  
+  static
+  bool
+  DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY);
 
   /**
     \brief Convert DICOM string describing a point to Point3D.
@@ -732,6 +737,8 @@ protected:
 
     UpdateCallBackMethod m_Callback;
   };
+
+  static void FixSpacingInformation( Image* image, const ImageBlockDescriptor& imageBlockDescriptor );
 
   /**
    \brief Scan for slice image information

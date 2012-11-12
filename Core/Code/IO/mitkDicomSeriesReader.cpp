@@ -175,6 +175,26 @@ bool DicomSeriesReader::ImageBlockDescriptor::PixelSpacingIsUnknown() const
   return GetPixelSpacingType() == "UNKNOWN";
 }
 
+void DicomSeriesReader::ImageBlockDescriptor::SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing)
+{
+  m_PixelSpacing = pixelSpacing;
+  m_ImagerPixelSpacing = imagerPixelSpacing;
+}
+
+void DicomSeriesReader::ImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const
+{
+  // preference for "in patient" pixel spacing
+  if ( !DICOMStringToSpacing( m_PixelSpacing, spacingX, spacingY ) )
+  {
+    // fallback to "on detector" spacing
+    if ( !DICOMStringToSpacing( m_ImagerPixelSpacing, spacingX, spacingY ) )
+    {
+      // last resort: invent something
+      spacingX = spacingY = 1.0;
+    }
+  }
+}
+
 bool DicomSeriesReader::ImageBlockDescriptor::HasMultipleTimePoints() const
 {
   return m_HasMultipleTimePoints;
@@ -206,12 +226,6 @@ void DicomSeriesReader::ImageBlockDescriptor::SetHasGantryTiltCorrected(bool on)
   m_HasGantryTiltCorrected = on;
 }
       
-void DicomSeriesReader::ImageBlockDescriptor::SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing)
-{
-  m_PixelSpacing = pixelSpacing;
-  m_ImagerPixelSpacing = imagerPixelSpacing;
-}
-
 void DicomSeriesReader::ImageBlockDescriptor::SetHasMultipleTimePoints(bool on)
 {
   m_HasMultipleTimePoints = on;
@@ -799,7 +813,29 @@ DicomSeriesReader::ConstCharStarToString(const char* s)
 {
   return s ?  std::string(s) : std::string();
 }
-  
+
+bool
+DicomSeriesReader::DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY)
+{
+  bool successful = false;
+
+  std::istringstream spacingReader(s);
+  std::string spacing;
+  if ( std::getline( spacingReader, spacing, '\\' ) )
+  {
+    spacingY = atof( spacing.c_str() );
+
+    if ( std::getline( spacingReader, spacing, '\\' ) )
+    {
+      spacingX = atof( spacing.c_str() );
+
+      successful = true;
+    }
+  }
+
+  return successful;
+}
+   
 Point3D
 DicomSeriesReader::DICOMStringToPoint3D(const std::string& s, bool& successful)
 {
@@ -1785,6 +1821,25 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
   image->SetProperty("dicomseriesreader.PixelSpacingType", StringProperty::New(blockInfo.GetPixelSpacingType()));
 }
   
+void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBlockDescriptor& imageBlockDescriptor )
+{
+  // spacing provided by ITK/GDCM
+  Vector3D imageSpacing = image->GetGeometry()->GetSpacing();
+  ScalarType imageSpacingX = imageSpacing[0];
+  ScalarType imageSpacingY = imageSpacing[1];
+ 
+  // spacing as desired by MITK (preference for "in patient", else "on detector", or "1.0/1.0")
+  ScalarType desiredSpacingX = imageSpacingX;
+  ScalarType desiredSpacingY = imageSpacingY;
+  imageBlockDescriptor.GetDesiredMITKImagePixelSpacing( desiredSpacingX, desiredSpacingY );
+
+  MITK_DEBUG << "Loaded spacing: " << imageSpacingX << "/" << imageSpacingY;
+  MITK_DEBUG << "Corrected spacing: " << desiredSpacingX << "/" << desiredSpacingY;
+  
+  imageSpacing[0] = desiredSpacingX;
+  imageSpacing[1] = desiredSpacingY;
+  image->GetGeometry()->SetSpacing( imageSpacing );
+}
 
 } // end namespace mitk
 

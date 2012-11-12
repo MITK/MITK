@@ -97,10 +97,10 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     //Looking for Input and Defining reaction
     connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
 
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(KinectAcquisitionModeChanged()), this, SLOT(OnKinectAcquisitionModeChanged()) ); // Todo in Widget2
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget2), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(KinectAcquisitionModeChanged()), this, SLOT(OnKinectAcquisitionModeChanged()) ); // Todo in Widget2
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
@@ -187,13 +187,13 @@ void QmitkToFUtilView::OnToFCameraConnected()
   this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
   this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 
-  this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget2->GetToFImageGrabber();
+  this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();
 
   this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
   m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
   m_Controls->m_ToFRecorderWidget->setEnabled(true);
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
-  m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
+  m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
 
   // initialize measurement widget
   m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());
@@ -412,7 +412,7 @@ void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
   else
   {
     this->m_Controls->m_SurfaceCheckBox->setEnabled(true);
-    this->m_Controls->m_TextureCheckBox->setEnabled(true); // TODO enable when bug 8106 is solved
+    this->m_Controls->m_TextureCheckBox->setEnabled(true);
     this->m_Controls->m_VideoTextureCheckBox->setEnabled(true);
   }
 }

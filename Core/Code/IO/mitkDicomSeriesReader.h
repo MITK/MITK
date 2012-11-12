@@ -56,17 +56,22 @@ namespace mitk
    - \ref DicomSeriesReader_sorting2
    - \ref DicomSeriesReader_sorting3
    - \ref DicomSeriesReader_sorting4
+ - \ref DicomSeriesReader_gantrytilt
+ - \ref DicomSeriesReader_pixelspacing
+ - \ref DicomSeriesReader_nextworkitems
+ - \ref DicomSeriesReader_whynotinitk
  - \ref DicomSeriesReader_tests
 
  \section DicomSeriesReader_purpose Purpose
 
  DicomSeriesReader serves as a central class for loading DICOM images as mitk::Image.
+
  As the term "DICOM image" covers a huge variety of possible modalities and 
  implementations, and since MITK assumes that 3D images are made up of continuous blocks
  of slices without any gaps or changes in orientation, the loading mechanism must
  implement a number of decisions and compromises.
 
- <b>The main intention of this implementation is not efficiency but correcness of generated slice positions!</b>
+ <b>The main intention of this implementation is not efficiency but correctness of generated slice positions and pixel spacings!</b>
 
  \section DicomSeriesReader_limitations Assumptions and limitations
 
@@ -75,10 +80,15 @@ namespace mitk
  because of the associated complexity of DicomSeriesReader.
 
  \b Assumptions
-  - expected to work for SOP Classes CT Image Storage and MR Image Storage (NOT for the "Enhanced" variants containing multi-frame images)
+  - expected to work with certain SOP Classes (mostly CT Image Storage and MR Image Storage)
+    - see ImageBlockDescriptor.GetReaderImplementationLevel() method for the details
   - special treatment for a certain type of Philips 3D ultrasound (recogized by tag 3001,0010 set to "Philips3D")
   - loader will always attempt to read multiple single slices as a single 3D image volume (i.e. mitk::Image)
     - slices will be grouped by basic properties such as orientation, rows, columns, spacing and grouped into as large blocks as possible
+  - images which do NOT report a position or orientation in space (Image Position Patient, Image Orientation) will be assigned defaults
+    - image position (0,0,0)
+    - image orientation (1,0,0), (0,1,0)
+    - such images will always be grouped separately since spatial grouping / sorting makes no sense for them
   
  \b Options
   - images that cover the same piece of space (i.e. position, orientation, and dimensions are equal)
@@ -87,10 +97,6 @@ namespace mitk
  \b Limitations
   - the 3D+t assumption only works if all time-steps have an equal number of slices and if all
     have the Acquisition Time attribute set to meaningful values
-  - Images from tilted CT gantries CAN ONLY be loaded as a series of single-slice images, since
-    mitk::Image or the accompanying mapper are not (yet?) capable of representing such geometries
-  - Secondary Capture images are expected to have the (0018,2010) tag describing the pixel spacing.
-    If only the (0028,0030) tag is set, the spacing will be misinterpreted as (1,1)
 
  \section DicomSeriesReader_usage Usage
 
@@ -103,14 +109,18 @@ namespace mitk
   1. <b>Group the files into spatial blocks</b> by calling GetSeries(). 
      This method will sort all passed files into meaningful blocks that
      could fit into an mitk::Image. Sorting for 3D+t loading is optional but default.
-     The \b return value of this function is a list of identifiers similar to
-     DICOM UIDs, each associated to a sorted list of file names.
+     The \b return value of this function is a list of descriptors, which
+     describe a grouped list of files with its most basic properties:
+     - SOP Class (CT Image Storage, Secondary Capture Image Storage, etc.)
+     - Modality
+     - What type of pixel spacing can be read from the provided DICOM tags
+     - How well DicomSeriesReader is prepared to load this type of data
 
   2. <b>Load a sorted set of files</b> by calling LoadDicomSeries().
      This method expects go receive the sorting output of GetSeries().
-     The method will then invoke ITK methods to actually load the
-     files into memory and put them into mitk::Images. Again, loading
-     as 3D+t is optional.
+     The method will then invoke ITK methods configured with GDCM-IO 
+     classes to actually load the files into memory and put them into 
+     mitk::Images. Again, loading as 3D+t is optional.
  
   Example:
 
@@ -141,12 +151,14 @@ namespace mitk
  A first pass separates slices that cannot possibly be loaded together because of restrictions of mitk::Image.
  After this steps, each block contains only slices that match in all of the following DICOM tags:
 
+   - (0020,000e) Series Instance UID
    - (0020,0037) Image Orientation
    - (0028,0030) Pixel Spacing
+   - (0018,1164) Imager Pixel Spacing
    - (0018,0050) Slice Thickness
    - (0028,0010) Number Of Rows
    - (0028,0011) Number Of Columns
-   - (0020,000e) Series Instance UID : could be argued about, might be dropped in the future (optionally)
+   - (0028,0008) Number Of Frames
  
  \subsection DicomSeriesReader_sorting2 Step 2: Sort slices spatially
 
@@ -232,6 +244,29 @@ Stacked slices:
 
   \image tilt-correction.jpg
  
+ \section DicomSeriesReader_pixelspacing Handling of pixel spacing
+
+ The reader implementes what is described in DICOM Part 3, chapter 10.7: Both tags
+  - (0028,0030) Pixel Spacing and
+  - (0018,1164) Imager Pixel Spacing
+
+ are evaluated and the pixel spacing is set to the spacing within the patient when tags allow that. 
+ The result of pixel spacing interpretation can be read from a property "dicomseriesreader.PixelSpacingInterpretation", 
+ which refers to one of the enumerated values of type PixelSpacingInterpretation;
+ 
+ \section DicomSeriesReader_supportedmodalities Limitations for specific modalities
+
+  - <b>Enhanced Computed Tomography / Magnetic Resonance Images</b> are currently NOT supported at all, because we lack general support for multi-frame images.
+  - <b>Nuclear Medicine Images</b> are not supported fully supported, only the single-frame variants are loaded properly.
+
+ \section DicomSeriesReader_nextworkitems Possible enhancements
+
+  This is a short list of ideas for enhancement:
+   - Class has historically grown and should be reviewed again. There is probably too many duplicated scanning code
+   - Multi-frame images don't mix well with the curent assumption of "one file - one slice", which is assumed by our code
+     - It should be checked how well GDCM and ITK support these files (some load, some don't)
+   - Specializations such as the Philips 3D code should be handled in a more generic way. The current handling of Philips 3D images is not nice at all
+ 
  \section DicomSeriesReader_whynotinitk Why is this not in ITK?
  
   Some of this code would probably be better located in ITK. It is just a matter of resources that this is not the
@@ -258,60 +293,97 @@ public:
   */
   typedef void (*UpdateCallBackMethod)(float);
 
+  /**
+    \brief Describes how well the reader is tested for a certain file type.
+
+    Applications should not rely on the outcome for images which are reported
+    ReaderImplementationLevel_Implemented or ReaderImplementationLevel_Unsupported.
+
+    Errors to load images which are reported as ReaderImplementationLevel_Supported
+    are considered bugs. For ReaderImplementationLevel_PartlySupported please check the appropriate paragraph in \ref DicomSeriesReader_supportedmodalities
+  */
   typedef enum
   {
-    ReaderImplementationLevel_Supported,       // loader code and tests are established
-    ReaderImplementationLevel_PartlySupported, // loader code and tests are establised for specific parts of a SOP Class
-    ReaderImplementationLevel_Implemented,     // loader code is implemented but not accompanied by tests
-    ReaderImplementationLevel_Unsupported,     // loader code is not working with this SOP Class
+    ReaderImplementationLevel_Supported,       /// loader code and tests are established
+    ReaderImplementationLevel_PartlySupported, /// loader code and tests are establised for specific parts of a SOP Class
+    ReaderImplementationLevel_Implemented,     /// loader code is implemented but not accompanied by tests
+    ReaderImplementationLevel_Unsupported,     /// loader code is not working with this SOP Class
   } ReaderImplementationLevel;
 
+  /**
+    \brief How the mitk::Image spacing should be interpreted.
+
+    Compare DICOM PS 3.3 10.7 (Basic Pixel Spacing Calibration Macro).
+  */
   typedef enum
   {
-    PixelSpacingInterpretation_SpacingInPatient,
-    PixelSpacingInterpretation_SpacingAtDetector,
-    PixelSpacingInterpretation_SpacingUnknown
+    PixelSpacingInterpretation_SpacingInPatient,  /// distances are mm within a patient
+    PixelSpacingInterpretation_SpacingAtDetector, /// distances are mm at detector surface
+    PixelSpacingInterpretation_SpacingUnknown     /// NO spacing information is present, we use (1,1) as default
   } PixelSpacingInterpretation;
 
+  /**
+    \brief Return type of GetSeries, describes a logical group of files.
 
+    Files grouped into a single 3D or 3D+t block are described by an instance
+    of this class. Relevant descriptive properties can be used to provide
+    the application user with meaningful choices.
+  */
   class ImageBlockDescriptor
   {
     public:
 
+      /// List of files in this group
+      StringContainer GetFilenames() const;
+
+      /// A unique ID describing this bloc (enhanced Series Instance UID).
+      std::string GetImageBlockUID() const;
+     
+      /// The Series Instance UID.
+      std::string GetSeriesInstanceUID() const;
+      
+      /// Series Modality (CT, MR, etc.)
+      std::string GetModality() const;
+      
+      /// SOP Class UID as readable string (Computed Tomography Image Storage, Secondary Capture Image Storage, etc.)
+      std::string GetSOPClassUIDAsString() const;
+      
+      /// SOP Class UID as DICOM UID
+      std::string GetSOPClassUID() const;
+
+      /// Confidence of the reader that this block can be read successfully.
+      ReaderImplementationLevel GetReaderImplementationLevel() const;
+
+      /// Whether or not the block contains a gantry tilt which will be "corrected" during loading
+      bool HasGantryTiltCorrected() const;
+      
+      /// Whether or not mitk::Image spacing relates to the patient
+      bool PixelSpacingRelatesToPatient() const;
+      /// Whether or not mitk::Image spacing relates to the detector surface
+      bool PixelSpacingRelatesToDetector() const;
+      /// Whether or not mitk::Image spacing is of unknown origin
+      bool PixelSpacingIsUnknown() const;
+
+      /// How the mitk::Image spacing can meaningfully be interpreted. 
+      PixelSpacingInterpretation GetPixelSpacingType() const;
+
+      /// 3D+t or not
+      bool HasMultipleTimePoints() const;
+
+      /// Multi-frame image(s) or not
+      bool IsMultiFrameImage() const;
+
       ImageBlockDescriptor();
+
+    private:
+
+      friend class DicomSeriesReader;
+
       ImageBlockDescriptor(const StringContainer& files);
 
       void AddFile(const std::string& file);
       void AddFiles(const StringContainer& files);
 
-      StringContainer GetFilenames() const;
-
-      std::string GetImageBlockUID() const;
-      
-      std::string GetSeriesInstanceUID() const;
-      
-      std::string GetModality() const;
-      
-      std::string GetSOPClassUIDAsString() const;
-      std::string GetSOPClassUID() const;
-
-      ReaderImplementationLevel GetReaderImplementationLevel() const;
-
-      bool HasGantryTiltCorrected() const;
-      
-      bool PixelSpacingRelatesToPatient() const;
-      bool PixelSpacingRelatesToDetector() const;
-      bool PixelSpacingIsUnknown() const;
-
-      PixelSpacingInterpretation GetPixelSpacingType() const;
-      void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
-
-      bool HasMultipleTimePoints() const;
-      bool IsMultiFrameImage() const;
-
-    private:
-
-      friend class DicomSeriesReader;
 
       void SetImageBlockUID(const std::string& uid);
       
@@ -328,6 +400,8 @@ public:
       void SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
       
       void SetHasMultipleTimePoints(bool);
+
+      void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
 
       StringContainer m_Filenames;
       std::string m_ImageBlockUID;
@@ -638,7 +712,10 @@ protected:
   static
   std::string
   ConstCharStarToString(const char* s);
-  
+ 
+  /**
+    \brief Safely convert a string into pixel spacing x and y.
+  */
   static
   bool
   DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY);

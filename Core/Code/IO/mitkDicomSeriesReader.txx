@@ -50,6 +50,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   const gdcm::Tag tagModality(0x0008, 0x0060); // modality
   const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
   const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // imager pixel spacing
+  const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
  
   try
   {
@@ -80,6 +81,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       imageBlockDescriptor.SetSeriesInstanceUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagSeriesInstanceUID ) ) );
       imageBlockDescriptor.SetSOPClassUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagSOPClassUID ) ) );
       imageBlockDescriptor.SetModality( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagModality ) ) );
+      imageBlockDescriptor.SetNumberOfFrames( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagNumberOfFrames ) ) );
       imageBlockDescriptor.SetPixelSpacingInformation( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagPixelSpacing ) ),
                                                        ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagImagerPixelSpacing ) ) );
 
@@ -336,6 +338,9 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
   
   const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP Class UID
   scanner.AddTag( tagSOPClassUID );
+  
+  const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
+    scanner.AddTag( tagNumberOfFrames );
  
   scanner.Scan(filenames); // make available image information for each file
 }

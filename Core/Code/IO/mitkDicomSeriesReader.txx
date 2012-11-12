@@ -228,7 +228,8 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     MITK_INFO << "--------------------------------------------------------------------------------";
     MITK_INFO << "DICOM files loaded (from series UID " << imageBlockDescriptor.GetSeriesInstanceUID() << "):";
     MITK_INFO << "  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
-    MITK_INFO << "  loadability: " << imageBlockDescriptor.GetLoadability();
+    MITK_INFO << "  multi-frame: " << (imageBlockDescriptor.IsMultiFrameImage()?"yes":"no");
+    MITK_INFO << "  loadability: " << LoadabilityToString(imageBlockDescriptor.GetLoadability());
     MITK_INFO << "  pixel spacing type: " << imageBlockDescriptor.GetPixelSpacingType() << " " << image->GetGeometry()->GetSpacing()[0] << "/" << image->GetGeometry()->GetSpacing()[0];
     MITK_INFO << "  gantry tilt corrected: " << (imageBlockDescriptor.HasGantryTiltCorrected()?"yes":"no");
     MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"yes":"no");

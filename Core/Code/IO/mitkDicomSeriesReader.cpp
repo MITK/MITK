@@ -38,12 +38,14 @@ typedef itk::GDCMSeriesFileNames DcmFileNamesGeneratorType;
 DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor()
 :m_HasGantryTiltCorrected(false)
 ,m_HasMultipleTimePoints(false)
+,m_IsMultiFrameImage(false)
 {
 }
 
 DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(const StringContainer& files)
 :m_HasGantryTiltCorrected(false)
 ,m_HasMultipleTimePoints(false)
+,m_IsMultiFrameImage(false)
 {
   m_Filenames = files;
 }
@@ -90,9 +92,17 @@ std::string DicomSeriesReader::ImageBlockDescriptor::GetSOPClassUID() const
 {
   return m_SOPClassUID;
 }
-      
-std::string DicomSeriesReader::ImageBlockDescriptor::GetLoadability() const
+
+bool DicomSeriesReader::ImageBlockDescriptor::IsMultiFrameImage() const
 {
+  return m_IsMultiFrameImage;
+}
+
+DicomSeriesReader::Loadability DicomSeriesReader::ImageBlockDescriptor::GetLoadability() const
+{
+  if ( this->IsMultiFrameImage() )
+    return Loadability_Unsupported;
+
   gdcm::UIDs uidKnowledge;
   uidKnowledge.SetFromUID( m_SOPClassUID.c_str() );
 
@@ -103,17 +113,29 @@ std::string DicomSeriesReader::ImageBlockDescriptor::GetLoadability() const
     case gdcm::UIDs::CTImageStorage:
     case gdcm::UIDs::MRImageStorage:
     case gdcm::UIDs::PositronEmissionTomographyImageStorage:
-      return "ESTABLISHED";
+      return Loadability_Supported;
+    case gdcm::UIDs::NuclearMedicineImageStorage:
+      return Loadability_PartlySupported;
     case gdcm::UIDs::ComputedRadiographyImageStorage:
     case gdcm::UIDs::DigitalXRayImageStorageForPresentation:
     case gdcm::UIDs::DigitalXRayImageStorageForProcessing:
     case gdcm::UIDs::SecondaryCaptureImageStorage:
-      return "IMPLEMENTED";
-    case gdcm::UIDs::NuclearMedicineImageStorage:
-      return "PARTLY_IMPLEMENTED";
+      return Loadability_Implemented;
     default:
-      return "WITH_LUCK";
+      return Loadability_Unsupported;
   }
+}
+  
+std::string DicomSeriesReader::LoadabilityToString( const Loadability& enumValue )
+{
+  switch (enumValue)
+  {
+    case Loadability_Supported: return "Supported";
+    case Loadability_PartlySupported: return "PartlySupported";
+    case Loadability_Implemented: return "Implemented";
+    case Loadability_Unsupported: return "Unsupported";
+    default: return "<unknown value of enum Loadability>";
+  };
 }
 
 
@@ -200,22 +222,27 @@ bool DicomSeriesReader::ImageBlockDescriptor::HasMultipleTimePoints() const
   return m_HasMultipleTimePoints;
 }
 
-void DicomSeriesReader::ImageBlockDescriptor::SetImageBlockUID(const std::string uid)
+void DicomSeriesReader::ImageBlockDescriptor::SetImageBlockUID(const std::string& uid)
 {
   m_ImageBlockUID = uid;
 }
 
-void DicomSeriesReader::ImageBlockDescriptor::SetSeriesInstanceUID(const std::string uid)
+void DicomSeriesReader::ImageBlockDescriptor::SetSeriesInstanceUID(const std::string& uid)
 {
   m_SeriesInstanceUID = uid;
 }
 
-void DicomSeriesReader::ImageBlockDescriptor::SetModality(const std::string modality)
+void DicomSeriesReader::ImageBlockDescriptor::SetModality(const std::string& modality)
 {
   m_Modality = modality;
 }
+      
+void DicomSeriesReader::ImageBlockDescriptor::SetNumberOfFrames(const std::string& numberOfFrames)
+{
+  m_IsMultiFrameImage = !numberOfFrames.empty();
+}
 
-void DicomSeriesReader::ImageBlockDescriptor::SetSOPClassUID(const std::string sopClassUID)
+void DicomSeriesReader::ImageBlockDescriptor::SetSOPClassUID(const std::string& sopClassUID)
 {
   m_SOPClassUID = sopClassUID;
 }
@@ -1173,6 +1200,9 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   const gdcm::Tag tagModality(0x0008, 0x0060); // modality
     scanner.AddTag( tagModality );
   
+  const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
+    scanner.AddTag( tagNumberOfFrames );
+  
   // additional tags read in this scan to allow later analysis
   // THESE tag are not used for initial separating of files
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
@@ -1195,9 +1225,16 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
        fileIter != scanner.End();
        ++fileIter)
   {
-    //MITK_DEBUG << "Scan file " << fileIter->first << std::endl;
     if ( std::string(fileIter->first).empty() ) continue; // TODO understand why Scanner has empty string entries
     if ( std::string(fileIter->first) == std::string("DICOMDIR") ) continue;
+
+    /* sort out multi-frame
+    if ( scanner.GetValue( fileIter->first , tagNumberOfFrames ) )
+    {
+      MITK_INFO << "Ignoring " << fileIter->first << " because we cannot handle multi-frame images.";
+      continue;
+    }
+    */
 
     // we const_cast here, because I could not use a map.at() function in CreateMoreUniqueSeriesIdentifier.
     // doing the same thing with find would make the code less readable. Since we forget the Scanner results
@@ -1262,6 +1299,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
       thisBlock.SetSeriesInstanceUID( "TODO" );
       thisBlock.SetHasGantryTiltCorrected( analysisResult.ContainsGantryTilt() );
       thisBlock.SetSOPClassUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagSOPClassUID ) ) );
+      thisBlock.SetNumberOfFrames( ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagNumberOfFrames ) ) );
       thisBlock.SetModality( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagModality ) ) );
       thisBlock.SetPixelSpacingInformation( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagPixelSpacing ) ),
                                             DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagImagerPixelSpacing ) ) );
@@ -1382,7 +1420,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     MITK_DEBUG << "    (gantry tilt : " << (block.HasGantryTiltCorrected()?"yes":"no") << "; "
                        "pixel spacing : " << block.GetPixelSpacingType() << "; " 
                        "3D+t: " << (block.HasMultipleTimePoints()?"yes":"no") << "; "
-                       "loadability: " << block.GetLoadability() << ")";
+                       "loadability: " << LoadabilityToString( block.GetLoadability() ) << ")";
     mapOf3DPlusTBlocks[ groupIter->first ] = groupIter->second.GetFilenames();
   }
   MITK_DEBUG << "================================================================================";
@@ -1425,6 +1463,7 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
   const gdcm::Tag tagSliceThickness(0x0018, 0x0050); // slice thickness
   const gdcm::Tag tagNumberOfRows(0x0028, 0x0010); // number rows
   const gdcm::Tag tagNumberOfColumns(0x0028, 0x0011); // number cols
+  const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
 
   const char* tagSeriesInstanceUid = tagValueMap[tagSeriesInstanceUID];
   if (!tagSeriesInstanceUid)
@@ -1438,6 +1477,7 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagPixelSpacing );
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagImagerPixelSpacing );
   constructedID += CreateSeriesIdentifierPart( tagValueMap, tagSliceThickness );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfFrames );
   
   // be a bit tolerant for orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
   // NOT constructedID += CreateSeriesIdentifierPart( tagValueMap, tagImageOrientation );
@@ -1815,7 +1855,7 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
 
   // copy imageblockdescriptor as properties
   image->SetProperty("dicomseriesreader.SOPClass", StringProperty::New(blockInfo.GetSOPClassUIDAsString()));
-  image->SetProperty("dicomseriesreader.Loadability", StringProperty::New(blockInfo.GetLoadability()));
+  image->SetProperty("dicomseriesreader.LoadabilityString", StringProperty::New(LoadabilityToString( blockInfo.GetLoadability() )));
   image->SetProperty("dicomseriesreader.GantyTiltCorrected", BoolProperty::New(blockInfo.HasGantryTiltCorrected()));
   image->SetProperty("dicomseriesreader.3D+t", BoolProperty::New(blockInfo.HasMultipleTimePoints()));
   image->SetProperty("dicomseriesreader.PixelSpacingType", StringProperty::New(blockInfo.GetPixelSpacingType()));

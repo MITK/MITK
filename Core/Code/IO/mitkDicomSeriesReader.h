@@ -267,6 +267,14 @@ public:
   */
   typedef void (*UpdateCallBackMethod)(float);
 
+  typedef enum
+  {
+    Loadability_Supported,       // loader code and tests are established
+    Loadability_PartlySupported, // loader code and tests are establised for specific parts of a SOP Class
+    Loadability_Implemented,     // loader code is implemented but not accompanied by tests
+    Loadability_Unsupported,     // loader code is not working with this SOP Class
+  } Loadability;
+
   class ImageBlockDescriptor
   {
     public:
@@ -288,7 +296,7 @@ public:
       std::string GetSOPClassUIDAsString() const;
       std::string GetSOPClassUID() const;
 
-      std::string GetLoadability() const;
+      Loadability GetLoadability() const;
 
       bool HasGantryTiltCorrected() const;
       
@@ -300,18 +308,21 @@ public:
       void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
 
       bool HasMultipleTimePoints() const;
+      bool IsMultiFrameImage() const;
 
     private:
 
       friend class DicomSeriesReader;
 
-      void SetImageBlockUID(const std::string uid);
+      void SetImageBlockUID(const std::string& uid);
       
-      void SetSeriesInstanceUID(const std::string uid);
+      void SetSeriesInstanceUID(const std::string& uid);
       
-      void SetModality(const std::string modality);
+      void SetModality(const std::string& modality);
       
-      void SetSOPClassUID(const std::string mediaStorageSOPClassUID);
+      void SetNumberOfFrames(const std::string& );
+      
+      void SetSOPClassUID(const std::string& mediaStorageSOPClassUID);
 
       void SetHasGantryTiltCorrected(bool);
       
@@ -328,6 +339,7 @@ public:
       std::string m_PixelSpacing;
       std::string m_ImagerPixelSpacing;
       bool m_HasMultipleTimePoints;
+      bool m_IsMultiFrameImage;
   };
   
   typedef std::map<std::string, ImageBlockDescriptor> FileNamesGrouping;
@@ -688,6 +700,9 @@ public:
    \brief Checks if a specific file is a Philips3D ultrasound DICOM file.
   */
   static bool IsPhilips3DDicom(const std::string &filename);
+  
+  static std::string LoadabilityToString( const Loadability& enumValue );
+
 protected:
 
   /**

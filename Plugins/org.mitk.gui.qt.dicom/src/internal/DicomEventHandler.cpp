@@ -45,22 +45,20 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
     QString seriesName = ctkEvent.getProperty("SeriesName").toString();
     QString path = ctkEvent.getProperty("Path").toString(); 
 
-    std::list<std::string> qualifiedUIDs;
     mitk::DicomSeriesReader::StringContainer seriesToLoad;
     std::size_t found;
 
-    mitk::DicomSeriesReader::UidFileNamesMap dicomSeriesMap = mitk::DicomSeriesReader::GetSeries(path.toStdString(),false);
-    mitk::DicomSeriesReader::UidFileNamesMap::const_iterator qualifiedSeriesInstanceUIDIterator;
+    mitk::DicomSeriesReader::FileNamesGrouping dicomSeriesMap = mitk::DicomSeriesReader::GetSeries(path.toStdString(),false);
+    mitk::DicomSeriesReader::FileNamesGrouping::const_iterator qualifiedSeriesInstanceUIDIterator;
 
     for(qualifiedSeriesInstanceUIDIterator = dicomSeriesMap.begin();
         qualifiedSeriesInstanceUIDIterator != dicomSeriesMap.end();
         ++qualifiedSeriesInstanceUIDIterator)
     {
-        found = qualifiedSeriesInstanceUIDIterator->first.find(seriesUID.toStdString());
-        if(found!= qualifiedSeriesInstanceUIDIterator->first.npos)
+        found = qualifiedSeriesInstanceUIDIterator->second.GetSeriesInstanceUID().find(seriesUID.toStdString());
+        if(found != std::string::npos)
         {
-            qualifiedUIDs.push_back(qualifiedSeriesInstanceUIDIterator->first); 
-            seriesToLoad = qualifiedSeriesInstanceUIDIterator->second;
+            seriesToLoad = qualifiedSeriesInstanceUIDIterator->second.GetFilenames();
         }
     }
 

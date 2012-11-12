@@ -46,6 +46,7 @@
 #include <mitkNodePredicateDataType.h>
 #include <mitkTensorModel.h>
 #include <mitkBallModel.h>
+#include <mitkStickModel.h>
 #include <mitkRicianNoiseModel.h>
 
 #include <QMessageBox>
@@ -419,13 +420,20 @@ void QmitkFiberfoxView::GenerateImage()
     double bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
 
     // signal models
-    mitk::TensorModel<double> fiberModel;
-    fiberModel.SetGradientList(gradientList);
-    fiberModel.SetBvalue(bVal);
-    fiberModel.SetKernelFA(m_Controls->m_MaxFaBox->value());
-    mitk::BallModel<double> nonFiberModel;
-    nonFiberModel.SetGradientList(gradientList);
-    nonFiberModel.SetBvalue(bVal);
+    mitk::TensorModel<double> extraAxonal;
+    extraAxonal.SetGradientList(gradientList);
+    extraAxonal.SetBvalue(bVal);
+    extraAxonal.SetKernelFA(m_Controls->m_MaxFaBox->value());
+    extraAxonal.SetSignalScale(200);
+    mitk::StickModel<double> intraAxonal;
+    intraAxonal.SetGradientList(gradientList);
+    intraAxonal.SetDiffusivity(m_Controls->m_MaxFaBox->value());
+    intraAxonal.SetSignalScale(200);
+
+    mitk::BallModel<double> freeDiffusion;
+    freeDiffusion.SetGradientList(gradientList);
+    freeDiffusion.SetBvalue(bVal);
+    freeDiffusion.SetSignalScale(1000);
     std::vector< mitk::DiffusionSignalModel<double>* > modelList;
 
     // noise model
@@ -446,12 +454,11 @@ void QmitkFiberfoxView::GenerateImage()
     filter->SetImageRegion(imageRegion);
     filter->SetSpacing(spacing);
     filter->SetFiberBundle(fiberBundle);
-    filter->SetFiberBaseline(200);
-    filter->SetNonFiberBaseline(1000);
-    modelList.push_back(&fiberModel);
+    modelList.push_back(&extraAxonal);
+    modelList.push_back(&intraAxonal);
     filter->SetFiberModels(modelList);
     modelList.clear();
-    modelList.push_back(&nonFiberModel);
+    modelList.push_back(&freeDiffusion);
     filter->SetNonFiberModels(modelList);
     filter->SetNoiseModel(&noiseModel);
     if (m_TissueMask.IsNotNull())

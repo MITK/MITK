@@ -23,8 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 namespace itk
 {
 TractsToDWIImageFilter::TractsToDWIImageFilter()
-    : m_FiberBaseline(200)
-    , m_NonFiberBaseline(1000)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -81,21 +79,25 @@ void TractsToDWIImageFilter::GenerateData()
     this->SetNthOutput(0, outImage);
 
     // generate working double image because we work with small values (will be scaled later)
-    DoubleDwiType::Pointer doubleDwi = DoubleDwiType::New();
-    doubleDwi->SetSpacing( m_Spacing );
-    doubleDwi->SetOrigin( m_Origin );
-    doubleDwi->SetDirection( m_DirectionMatrix );
-    doubleDwi->SetLargestPossibleRegion( m_ImageRegion );
-    doubleDwi->SetBufferedRegion( m_ImageRegion );
-    doubleDwi->SetRequestedRegion( m_ImageRegion );
-    doubleDwi->SetVectorLength( m_FiberModels[0]->GetNumGradients() );
-    doubleDwi->Allocate();
-    DoubleDwiType::PixelType pix;
-    pix.SetSize(m_FiberModels[0]->GetNumGradients());
-    pix.Fill(0.0);
-    doubleDwi->FillBuffer(pix);
+    std::vector< DoubleDwiType::Pointer > compartments;
+    for (int i=0; i<m_FiberModels.size()+m_NonFiberModels.size(); i++)
+    {
+        DoubleDwiType::Pointer doubleDwi = DoubleDwiType::New();
+        doubleDwi->SetSpacing( m_Spacing );
+        doubleDwi->SetOrigin( m_Origin );
+        doubleDwi->SetDirection( m_DirectionMatrix );
+        doubleDwi->SetLargestPossibleRegion( m_ImageRegion );
+        doubleDwi->SetBufferedRegion( m_ImageRegion );
+        doubleDwi->SetRequestedRegion( m_ImageRegion );
+        doubleDwi->SetVectorLength( m_FiberModels[0]->GetNumGradients() );
+        doubleDwi->Allocate();
+        DoubleDwiType::PixelType pix;
+        pix.SetSize(m_FiberModels[0]->GetNumGradients());
+        pix.Fill(0.0);
+        doubleDwi->FillBuffer(pix);
+        compartments.push_back(doubleDwi);
+    }
 
-    // search crossing regions
     if (m_TissueMask.IsNull())
     {
         m_TissueMask = ItkUcharImgType::New();
@@ -116,7 +118,7 @@ void TractsToDWIImageFilter::GenerateData()
     vLines->InitTraversal();
 
     MITK_INFO << "Generating signal of " << m_FiberModels.size() << " fiber compartments";
-    double maxBaseline = 0;
+    double maxFiberDensity = 0;
     boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
@@ -145,48 +147,81 @@ void TractsToDWIImageFilter::GenerateData()
             if (!m_ImageRegion.IsInside(index))
                 continue;
 
-            pix = doubleDwi->GetPixel(index);
             for (int k=0; k<m_FiberModels.size(); k++)
             {
+                DoubleDwiType::Pointer doubleDwi = compartments.at(k);
                 m_FiberModels[k]->SetFiberDirection(dir);
-                doubleDwi->SetPixel(index, pix + m_FiberModels[k]->SimulateMeasurement());
+                doubleDwi->SetPixel(index, doubleDwi->GetPixel(index) + m_FiberModels[k]->SimulateMeasurement());
+
+                DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
+                if (pix[0]>maxFiberDensity)
+                    maxFiberDensity = pix[0];
             }
-            pix = doubleDwi->GetPixel(index);
-            if (pix[0]>maxBaseline)
-                maxBaseline = pix[0];
         }
     }
 
-    MITK_INFO << "Adding signal of " << m_NonFiberModels.size() << " non-fiber compartments and noise";
-    typedef ImageRegionIterator<DoubleDwiType>      IteratorOutputType;
-    IteratorOutputType it (doubleDwi, m_ImageRegion);
-    it.GoToBegin();
+    MITK_INFO << "Generating signal of " << m_NonFiberModels.size() << " non-fiber compartments";
+    boost::progress_display disp2(m_ImageRegion.GetNumberOfPixels());
+    for (int k=0; k<m_NonFiberModels.size(); k++)
+    {
+        ++disp2;
+        DoubleDwiType::Pointer doubleDwi = compartments.at(k+m_FiberModels.size());
+        typedef ImageRegionIterator<DoubleDwiType>      IteratorType;
+        IteratorType it (doubleDwi, m_ImageRegion);
+        it.GoToBegin();
 
+        while(!it.IsAtEnd())
+        {
+            DoubleDwiType::IndexType index = it.GetIndex();
+            doubleDwi->SetPixel(index, doubleDwi->GetPixel(index) + m_NonFiberModels[k]->SimulateMeasurement());
+            ++it;
+        }
+    }
+
+    MITK_INFO << "Summing signals and adding noise";
+    typedef ImageRegionIterator<DWIImageType>      IteratorOutputType;
+    IteratorOutputType it (outImage, m_ImageRegion);
+    it.GoToBegin();
     DoubleDwiType::PixelType signal;
     signal.SetSize(m_FiberModels[0]->GetNumGradients());
+
+    boost::progress_display disp3(m_ImageRegion.GetNumberOfPixels());
     while(!it.IsAtEnd())
     {
-        DoubleDwiType::IndexType index = it.GetIndex();
+        ++disp3;
+        DWIImageType::IndexType index = it.GetIndex();
         signal.Fill(0.0);
 
         if (m_TissueMask->GetPixel(index)>0)
         {
-            pix = it.Get();
-            double w = pix[0]/maxBaseline;        // anisotropic volume fraction
-            if (pix[0]>0)
-                pix /= pix[0];                      // normalize signal
+            // compartment weights are calculated according to fiber density
+            double w = compartments.at(0)->GetPixel(index)[0]/maxFiberDensity;
 
-            // add non-fiber compartments
-            for (int k=0; k<m_NonFiberModels.size(); k++)
-                signal += m_NonFiberModels[k]->SimulateMeasurement();
-            if (signal[0]>0)
-                signal /= signal[0];
-            signal *= (1-w)*m_NonFiberBaseline;
-            signal += w*m_FiberBaseline*pix;
+            // add fiber signal
+            for (int i=0; i<m_FiberModels.size(); i++)
+            {
+                DoubleDwiType::Pointer doubleDwi = compartments.at(i);
+                DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
+                if (pix[0]>0)
+                    pix /= pix[0];
+                pix *= m_FiberModels.at(i)->GetSignalScale()*w/m_FiberModels.size();
+                signal += pix;
+            }
+
+            // add on-fiber signal
+            for (int i=0; i<m_NonFiberModels.size(); i++)
+            {
+                DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
+                DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
+                if (pix[0]>0)
+                    pix /= pix[0];
+                pix *= m_NonFiberModels.at(i)->GetSignalScale()*(1-w)/m_NonFiberModels.size();
+                signal += pix;
+            }
         }
 
-        m_NoiseModel->AddNoise(signal);                               // add rician noise
-        outImage->SetPixel(index, signal);
+        m_NoiseModel->AddNoise(signal); // add noise
+        it.Set(signal);
         ++it;
     }
 }

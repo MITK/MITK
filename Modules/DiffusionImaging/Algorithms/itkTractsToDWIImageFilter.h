@@ -57,8 +57,6 @@ public:
 
     // input
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
-    itkSetMacro( FiberBaseline, double )                ///< baseline signal of fiber compartments
-    itkSetMacro( NonFiberBaseline, double )             ///< baseline signal of non-fiber compartments
     itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
     itkSetMacro( Origin, mitk::Point3D )                ///< output image origin
     itkSetMacro( DirectionMatrix, MatrixType )          ///< output image rotation
@@ -83,8 +81,6 @@ protected:
     mitk::Point3D                       m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size
-    double                              m_FiberBaseline;        ///< baseline signal of fiber compartments
-    double                              m_NonFiberBaseline;     ///< baseline signal of non-fiber compartments
     ItkUcharImgType::Pointer            m_TissueMask;           ///< voxels outside of this binary mask contain only noise (are treated as air)
     FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments

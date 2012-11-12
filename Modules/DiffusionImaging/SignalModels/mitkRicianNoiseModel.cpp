@@ -37,6 +37,6 @@ void RicianNoiseModel< ScalarType >::AddNoise(PixelType& pixel)
     for( unsigned int i=0; i<pixel.Size(); i++)
     {
         double signal = pixel[i];
-        pixel[i] = sqrt(pow(signal + this->m_ScaleFactor*m_RandGen->GetNormalVariate(0.0, this->m_NoiseVariance), 2) +  this->m_ScaleFactor*pow(m_RandGen->GetNormalVariate(0.0, this->m_NoiseVariance),2));
+        pixel[i] = sqrt(pow(signal + this->m_ScaleFactor*m_RandGen->GetNormalVariate(0.0, this->m_NoiseVariance), 2) +  pow(this->m_ScaleFactor*m_RandGen->GetNormalVariate(0.0, this->m_NoiseVariance),2));
     }
 }

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_quaternion.h>
 
 template< class ScalarType >
-ScalarModel< ScalarType >::ScalarModel()
+StickModel< ScalarType >::StickModel()
     : m_Diffusivity(0.001)
     , m_BValue(1000)
 {
@@ -25,13 +25,13 @@ ScalarModel< ScalarType >::ScalarModel()
 }
 
 template< class ScalarType >
-ScalarModel< ScalarType >::~ScalarModel()
+StickModel< ScalarType >::~StickModel()
 {
 
 }
 
 template< class ScalarType >
-typename ScalarModel< ScalarType >::PixelType ScalarModel< ScalarType >::SimulateMeasurement()
+typename StickModel< ScalarType >::PixelType StickModel< ScalarType >::SimulateMeasurement()
 {
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());
@@ -40,7 +40,10 @@ typename ScalarModel< ScalarType >::PixelType ScalarModel< ScalarType >::Simulat
     {
         GradientType g = this->m_GradientList[i];
         if (g.GetNorm()>0.0001)
-            signal[i] = exp( -m_BValue * m_Diffusivity );
+        {
+            double dot = m_FiberDirection*g;
+            signal[i] = exp( -m_BValue*m_Diffusivity*dot*dot );
+        }
         else
             signal[i] = 1;
     }

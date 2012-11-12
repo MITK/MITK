@@ -45,7 +45,7 @@
 #include <mitkImageGenerator.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkTensorModel.h>
-#include <mitkScalarModel.h>
+#include <mitkBallModel.h>
 #include <mitkRicianNoiseModel.h>
 
 #include <QMessageBox>
@@ -423,7 +423,7 @@ void QmitkFiberfoxView::GenerateImage()
     fiberModel.SetGradientList(gradientList);
     fiberModel.SetBvalue(bVal);
     fiberModel.SetKernelFA(m_Controls->m_MaxFaBox->value());
-    mitk::ScalarModel<double> nonFiberModel;
+    mitk::BallModel<double> nonFiberModel;
     nonFiberModel.SetGradientList(gradientList);
     nonFiberModel.SetBvalue(bVal);
     std::vector< mitk::DiffusionSignalModel<double>* > modelList;

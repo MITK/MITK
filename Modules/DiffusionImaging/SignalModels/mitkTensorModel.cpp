@@ -74,9 +74,9 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
     PixelType signal; signal.SetSize(this->m_GradientList.size()); signal.Fill(0.0);
 
     ItkTensorType tensor; tensor.Fill(0.0);
-    this->m_FiberDirection.normalize();
-    vnl_vector_fixed<double, 3> axis = vnl_cross_3d(m_KernelDirection, this->m_FiberDirection); axis.normalize();
-    vnl_quaternion<double> rotation(axis, acos(dot_product(m_KernelDirection, this->m_FiberDirection)));
+    this->m_FiberDirection.Normalize();
+    vnl_vector_fixed<double, 3> axis = itk::CrossProduct(m_KernelDirection, this->m_FiberDirection).GetVnlVector(); axis.normalize();
+    vnl_quaternion<double> rotation(axis, acos(m_KernelDirection*this->m_FiberDirection));
     rotation.normalize();
     vnl_matrix_fixed<double, 3, 3> matrix = rotation.rotation_matrix_transpose();
 

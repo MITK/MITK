@@ -240,7 +240,8 @@ set(H_FILES
 
   SignalModels/mitkDiffusionSignalModel.h
   SignalModels/mitkTensorModel.h
-  SignalModels/mitkScalarModel.h
+  SignalModels/mitkBallModel.h
+  SignalModels/mitkStickModel.h
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
 )

@@ -131,13 +131,13 @@ void TractsToDWIImageFilter::GenerateData()
         {
             double* temp = fiberPolyData->GetPoint(points[j]);
             itk::Point<float, 3> vertex = GetItkPoint(temp);
-            vnl_vector<double> v = GetVnlVector(temp);
+            itk::Vector<double> v = GetItkVector(temp);
 
-            vnl_vector<double> dir(3);
+            itk::Vector<double, 3> dir(3);
             if (j<numPoints-1)
-                dir = GetVnlVector(fiberPolyData->GetPoint(points[j+1]))-v;
+                dir = GetItkVector(fiberPolyData->GetPoint(points[j+1]))-v;
             else
-                dir = v-GetVnlVector(fiberPolyData->GetPoint(points[j-1]));
+                dir = v-GetItkVector(fiberPolyData->GetPoint(points[j-1]));
 
             itk::Index<3> index;
             outImage->TransformPhysicalPointToIndex(vertex, index);
@@ -198,6 +198,15 @@ itk::Point<float, 3> TractsToDWIImageFilter::GetItkPoint(double point[3])
     itkPoint[1] = point[1];
     itkPoint[2] = point[2];
     return itkPoint;
+}
+
+itk::Vector<double, 3> TractsToDWIImageFilter::GetItkVector(double point[3])
+{
+    itk::Vector<double, 3> itkVector;
+    itkVector[0] = point[0];
+    itkVector[1] = point[1];
+    itkVector[2] = point[2];
+    return itkVector;
 }
 
 vnl_vector_fixed<double, 3> TractsToDWIImageFilter::GetVnlVector(double point[3])

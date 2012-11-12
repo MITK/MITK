@@ -42,7 +42,7 @@ public:
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
 
-    void SetKernelDirection(vnl_vector_fixed<double, 3> kernelDirection){ m_KernelDirection = kernelDirection; }
+    void SetKernelDirection(GradientType kernelDirection){ m_KernelDirection = kernelDirection; }
     void SetKernelTensor(ItkTensorType& tensor);
     void SetKernelFA(float FA);
     void SetKernelADC(float ADC);
@@ -52,7 +52,7 @@ protected:
 
     /** Calculates tensor matrix from FA and ADC **/
     void UpdateKernelTensor();
-    vnl_vector_fixed<double, 3>     m_KernelDirection;      ///< Direction of the kernel tensors principal eigenvector
+    GradientType                    m_KernelDirection;      ///< Direction of the kernel tensors principal eigenvector
     vnl_matrix_fixed<double, 3, 3>  m_KernelTensorMatrix;   ///< 3x3 matrix containing the kernel tensor values
     float                           m_KernelFA;             ///< FA of the kernel tensor
     float                           m_KernelADC;            ///< ADC of the kernel tensor

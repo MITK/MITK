@@ -46,29 +46,18 @@ public:
     itkNewMacro(Self)
     itkTypeMacro( TractsToVectorImageFilter, ImageSource )
 
-    /** cluster directions that are closer together than the specified threshold **/
-    itkSetMacro( AngularThreshold, float)
-    itkGetMacro( AngularThreshold, float)
-
-    /** Sampling points per voxel **/
-    itkSetMacro( FiberSampling, int)
-    itkGetMacro( FiberSampling, int)
-
-    /** Normalize vectors to length 1 **/
-    itkSetMacro( NormalizeVectors, bool)
-    itkGetMacro( NormalizeVectors, bool)
-
-    /** Do not modify input fiber bundle. Use a copy. **/
-    itkSetMacro( UseWorkingCopy, bool)
-    itkGetMacro( UseWorkingCopy, bool)
-
-    /** If more directions are extracted, only the largest are kept. **/
-    itkSetMacro( MaxNumDirections, int)
-    itkGetMacro( MaxNumDirections, int)
-
-    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)   ///< only process voxels inside mask
-    itkSetMacro( FiberBundle, FiberBundleX::Pointer)    ///< input fiber bundle
-
+    itkSetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
+    itkGetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
+    itkSetMacro( FiberSampling, int)                                    ///< Sampling points per voxel
+    itkGetMacro( FiberSampling, int)                                    ///< Sampling points per voxel
+    itkSetMacro( NormalizeVectors, bool)                                ///< Normalize vectors to length 1
+    itkGetMacro( NormalizeVectors, bool)                                ///< Normalize vectors to length 1
+    itkSetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
+    itkGetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
+    itkSetMacro( MaxNumDirections, int)                                 ///< If more directions are extracted, only the largest are kept.
+    itkGetMacro( MaxNumDirections, int)                                 ///< If more directions are extracted, only the largest are kept.
+    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)                   ///< only process voxels inside mask
+    itkSetMacro( FiberBundle, FiberBundleX::Pointer)                    ///< input fiber bundle
     itkGetMacro( ClusteredDirectionsContainer, ContainerType::Pointer)  ///< output directions
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)          ///< nimber of directions per voxel
     itkGetMacro( CrossingsImage, ItkUcharImgType::Pointer)              ///< mask voxels containing crossings

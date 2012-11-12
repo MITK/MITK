@@ -74,18 +74,18 @@ Image< Vector< PixelType, 3 >, 3 > >
     typedef VectorContainer< unsigned int, ItkDirectionImage::Pointer >   ItkDirectionImageContainer;
 
     // input
-    itkSetMacro( MaxNumPeaks, unsigned int)
-    itkSetMacro( PeakThreshold, double)
-    itkSetMacro( AbsolutePeakThreshold, double)
-    itkSetMacro( ClusteringThreshold, double)
-    itkSetMacro( AngularThreshold, double)
-    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
-    itkSetMacro( NormalizationMethod, NormalizationMethods)
+    itkSetMacro( MaxNumPeaks, unsigned int)                 ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
+    itkSetMacro( PeakThreshold, double)                     ///< threshold on the peak length relative to the largest peak inside the current voxel
+    itkSetMacro( AbsolutePeakThreshold, double)             ///< hard threshold on the peak length of all local maxima
+    itkSetMacro( ClusteringThreshold, double)               ///< directions closer together than the specified angular threshold will be clustered (in rad)
+    itkSetMacro( AngularThreshold, double)                  ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
+    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)       ///< only voxels inside the binary mask are processed
+    itkSetMacro( NormalizationMethod, NormalizationMethods) ///< normalization method of ODF peaks
 
     // output
-    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)
-    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)
-    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)
+    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                ///< vector field (peak sizes rescaled for visualization purposes)
+    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)  ///< container for output peaks
+    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                  ///< number of peaks per voxel
 
     protected:
     FiniteDiffOdfMaximaExtractionFilter();
@@ -109,7 +109,7 @@ Image< Vector< PixelType, 3 >, 3 > >
 
     private:
 
-    NormalizationMethods                        m_NormalizationMethod;  ///< used vector normalization
+    NormalizationMethods                        m_NormalizationMethod;  ///< normalization method of ODF peaks
     unsigned int                                m_MaxNumPeaks;          ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
     double                                      m_PeakThreshold;        ///< threshold on the peak length relative to the largest peak inside the current voxel
     double                                      m_AbsolutePeakThreshold;///< hard threshold on the peak length of all local maxima
@@ -118,10 +118,10 @@ Image< Vector< PixelType, 3 >, 3 > >
     double                                      m_AngularThreshold;     ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
     const int                                   m_NumCoeffs;            ///< number of spherical harmonics coefficients
 
-    mitk::FiberBundleX::Pointer               m_OutputFiberBundle;
-    ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;
-    ItkUcharImgType::Pointer                  m_NumDirectionsImage;
-    ItkUcharImgType::Pointer                  m_MaskImage;
+    mitk::FiberBundleX::Pointer               m_OutputFiberBundle;      ///< vector field (peak sizes rescaled for visualization purposes)
+    ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;///< container for output peaks
+    ItkUcharImgType::Pointer                  m_NumDirectionsImage;     ///< number of peaks per voxel
+    ItkUcharImgType::Pointer                  m_MaskImage;              ///< only voxels inside the binary mask are processed
 };
 
 }

@@ -36,9 +36,9 @@ class OdfMaximaExtractionFilter : public ProcessObject
 public:
 
   enum NormalizationMethods {
-    NO_NORM,
-    SINGLE_VEC_NORM,
-    MAX_VEC_NORM
+    NO_NORM,            ///< don't normalize peaks
+    SINGLE_VEC_NORM,    ///< normalize peaks to length 1
+    MAX_VEC_NORM        ///< largest peak is normalized to length 1, other peaks relative to it
   };
 
   typedef OdfMaximaExtractionFilter Self;
@@ -64,25 +64,19 @@ public:
   typedef itk::VectorContainer< unsigned int, ItkDirectionImage::Pointer >                          ItkDirectionImageContainer;
 
   // output
-  itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)
-  itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)
-  itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)
+  itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                  ///< vector field (peak sizes rescaled for visualization purposes)
+  itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                    ///< number of peaks per voxel
+  itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)    ///< container for output peaks
 
   // input
-  itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
-  itkSetMacro( NormalizationMethod, NormalizationMethods)
-  itkSetMacro( DiffusionGradients, DirectionContainerType::Pointer)
-  itkSetMacro( DiffusionImage, DiffusionImageType::Pointer)
-  itkSetMacro( ShCoeffImage, CoefficientImageType::Pointer)
-
-  itkSetMacro( MaxNumPeaks, unsigned int)
-  itkGetMacro( MaxNumPeaks, unsigned int)
-
-  itkSetMacro( PeakThreshold, double)
-  itkGetMacro( PeakThreshold, double)
-
-  itkSetMacro( Bvalue, float)
-  itkGetMacro( Bvalue, float)
+  itkSetMacro( MaskImage, ItkUcharImgType::Pointer)                 ///< only voxels inside the binary mask are processed
+  itkSetMacro( NormalizationMethod, NormalizationMethods)           ///< normalization method of ODF peaks
+  itkSetMacro( DiffusionGradients, DirectionContainerType::Pointer) ///< input for qball reconstruction
+  itkSetMacro( DiffusionImage, DiffusionImageType::Pointer)         ///< input for qball reconstruction
+  itkSetMacro( Bvalue, float)                                       ///< input for qball reconstruction
+  itkSetMacro( ShCoeffImage, CoefficientImageType::Pointer)         ///< conatins spherical harmonic coefficients
+  itkSetMacro( MaxNumPeaks, unsigned int)                           ///< if more peaks are found, only the largest are kept
+  itkSetMacro( PeakThreshold, double)                               ///< threshold on peak length relative to the largest peak in the current voxel
 
   void GenerateData();
 

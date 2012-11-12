@@ -65,21 +65,21 @@ public:
     void SetTensorDirection(std::vector< vnl_vector_fixed<double, 3> > directionList){m_TensorDirection = directionList;}
 
     // input parameters
-    itkSetMacro( BValue, float )
-    itkSetMacro( SignalScale, float )
-    itkSetMacro( NoiseVariance, double )
-    itkSetMacro( GreyMatterAdc, float )
-    itkSetMacro( Spacing, mitk::Vector3D )
-    itkSetMacro( Origin, mitk::Point3D )
-    itkSetMacro( DirectionMatrix, MatrixType )
-    itkSetMacro( ImageRegion, ImageRegion<3> )
-    itkSetMacro( SimulateBaseline, bool )
+    itkSetMacro( BValue, float )                ///< signal parameter
+    itkSetMacro( SignalScale, float )           ///< scaling factor for signal
+    itkSetMacro( NoiseVariance, double )        ///< variance of rician noise
+    itkSetMacro( GreyMatterAdc, float )         ///< ADC of isotropic diffusion tensor
+    itkSetMacro( Spacing, mitk::Vector3D )      ///< parameter of output image
+    itkSetMacro( Origin, mitk::Point3D )        ///< parameter of output image
+    itkSetMacro( DirectionMatrix, MatrixType )  ///< parameter of output image
+    itkSetMacro( ImageRegion, ImageRegion<3> )  ///< parameter of output image
+    itkSetMacro( SimulateBaseline, bool )       ///< generate baseline image values as the l2 norm of the corresponding tensor used for the diffusion signal generation
 
     // output
-    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)
-    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)
-    itkGetMacro( SNRImage, ItkFloatImgType::Pointer)
-    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)
+    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)  ///< contains one vectorimage for each input ROI
+    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                  ///< contains number of directions per voxel
+    itkGetMacro( SNRImage, ItkFloatImgType::Pointer)                            ///< contains local SNR values
+    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                ///< output vector field
 
     protected:
     DwiPhantomGenerationFilter();

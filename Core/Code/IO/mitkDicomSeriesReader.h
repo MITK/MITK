@@ -258,11 +258,6 @@ public:
   typedef std::vector<std::string> StringContainer;
 
   /** 
-    \brief For grouped lists of filenames, assigned an ID each.
-  */
-  typedef std::map<std::string, StringContainer> UidFileNamesMap;
-
-  /** 
     \brief Interface for the progress callback.
   */
   typedef void (*UpdateCallBackMethod)(float);

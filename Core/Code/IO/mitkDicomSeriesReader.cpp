@@ -98,10 +98,10 @@ bool DicomSeriesReader::ImageBlockDescriptor::IsMultiFrameImage() const
   return m_IsMultiFrameImage;
 }
 
-DicomSeriesReader::Loadability DicomSeriesReader::ImageBlockDescriptor::GetLoadability() const
+DicomSeriesReader::ReaderImplementationLevel DicomSeriesReader::ImageBlockDescriptor::GetReaderImplementationLevel() const
 {
   if ( this->IsMultiFrameImage() )
-    return Loadability_Unsupported;
+    return ReaderImplementationLevel_Unsupported;
 
   gdcm::UIDs uidKnowledge;
   uidKnowledge.SetFromUID( m_SOPClassUID.c_str() );
@@ -113,28 +113,28 @@ DicomSeriesReader::Loadability DicomSeriesReader::ImageBlockDescriptor::GetLoada
     case gdcm::UIDs::CTImageStorage:
     case gdcm::UIDs::MRImageStorage:
     case gdcm::UIDs::PositronEmissionTomographyImageStorage:
-      return Loadability_Supported;
+      return ReaderImplementationLevel_Supported;
     case gdcm::UIDs::NuclearMedicineImageStorage:
-      return Loadability_PartlySupported;
+      return ReaderImplementationLevel_PartlySupported;
     case gdcm::UIDs::ComputedRadiographyImageStorage:
     case gdcm::UIDs::DigitalXRayImageStorageForPresentation:
     case gdcm::UIDs::DigitalXRayImageStorageForProcessing:
     case gdcm::UIDs::SecondaryCaptureImageStorage:
-      return Loadability_Implemented;
+      return ReaderImplementationLevel_Implemented;
     default:
-      return Loadability_Unsupported;
+      return ReaderImplementationLevel_Unsupported;
   }
 }
   
-std::string DicomSeriesReader::LoadabilityToString( const Loadability& enumValue )
+std::string DicomSeriesReader::ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue )
 {
   switch (enumValue)
   {
-    case Loadability_Supported: return "Supported";
-    case Loadability_PartlySupported: return "PartlySupported";
-    case Loadability_Implemented: return "Implemented";
-    case Loadability_Unsupported: return "Unsupported";
-    default: return "<unknown value of enum Loadability>";
+    case ReaderImplementationLevel_Supported: return "Supported";
+    case ReaderImplementationLevel_PartlySupported: return "PartlySupported";
+    case ReaderImplementationLevel_Implemented: return "Implemented";
+    case ReaderImplementationLevel_Unsupported: return "Unsupported";
+    default: return "<unknown value of enum ReaderImplementationLevel>";
   };
 }
 
@@ -1420,7 +1420,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     MITK_DEBUG << "    (gantry tilt : " << (block.HasGantryTiltCorrected()?"yes":"no") << "; "
                        "pixel spacing : " << block.GetPixelSpacingType() << "; " 
                        "3D+t: " << (block.HasMultipleTimePoints()?"yes":"no") << "; "
-                       "loadability: " << LoadabilityToString( block.GetLoadability() ) << ")";
+                       "reader support: " << ReaderImplementationLevelToString( block.GetReaderImplementationLevel() );
     mapOf3DPlusTBlocks[ groupIter->first ] = groupIter->second.GetFilenames();
   }
   MITK_DEBUG << "================================================================================";
@@ -1855,7 +1855,7 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
 
   // copy imageblockdescriptor as properties
   image->SetProperty("dicomseriesreader.SOPClass", StringProperty::New(blockInfo.GetSOPClassUIDAsString()));
-  image->SetProperty("dicomseriesreader.LoadabilityString", StringProperty::New(LoadabilityToString( blockInfo.GetLoadability() )));
+  image->SetProperty("dicomseriesreader.ReaderImplementationLevelString", StringProperty::New(ReaderImplementationLevelToString( blockInfo.GetReaderImplementationLevel() )));
   image->SetProperty("dicomseriesreader.GantyTiltCorrected", BoolProperty::New(blockInfo.HasGantryTiltCorrected()));
   image->SetProperty("dicomseriesreader.3D+t", BoolProperty::New(blockInfo.HasMultipleTimePoints()));
   image->SetProperty("dicomseriesreader.PixelSpacingType", StringProperty::New(blockInfo.GetPixelSpacingType()));

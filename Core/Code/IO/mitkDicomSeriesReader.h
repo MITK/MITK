@@ -269,11 +269,11 @@ public:
 
   typedef enum
   {
-    Loadability_Supported,       // loader code and tests are established
-    Loadability_PartlySupported, // loader code and tests are establised for specific parts of a SOP Class
-    Loadability_Implemented,     // loader code is implemented but not accompanied by tests
-    Loadability_Unsupported,     // loader code is not working with this SOP Class
-  } Loadability;
+    ReaderImplementationLevel_Supported,       // loader code and tests are established
+    ReaderImplementationLevel_PartlySupported, // loader code and tests are establised for specific parts of a SOP Class
+    ReaderImplementationLevel_Implemented,     // loader code is implemented but not accompanied by tests
+    ReaderImplementationLevel_Unsupported,     // loader code is not working with this SOP Class
+  } ReaderImplementationLevel;
 
   class ImageBlockDescriptor
   {
@@ -296,7 +296,7 @@ public:
       std::string GetSOPClassUIDAsString() const;
       std::string GetSOPClassUID() const;
 
-      Loadability GetLoadability() const;
+      ReaderImplementationLevel GetReaderImplementationLevel() const;
 
       bool HasGantryTiltCorrected() const;
       
@@ -701,7 +701,7 @@ public:
   */
   static bool IsPhilips3DDicom(const std::string &filename);
   
-  static std::string LoadabilityToString( const Loadability& enumValue );
+  static std::string ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue );
 
 protected:
 

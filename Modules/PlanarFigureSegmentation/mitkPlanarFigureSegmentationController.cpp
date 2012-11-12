@@ -41,13 +41,7 @@ mitk::PlanarFigureSegmentationController::PlanarFigureSegmentationController()
 , m_ReferenceImage( NULL )
 , m_SegmentationAsImage( NULL )
 {
-
-  m_ReduceFilter = mitk::ReduceContourSetFilter::New();
-  m_ReduceFilter->SetReductionType(ReduceContourSetFilter::NTH_POINT);
-  m_ReduceFilter->SetStepSize( 10 );
-  m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
-  m_DistanceImageCreator = mitk::CreateDistanceImageFromSurfaceFilter::New();
-
+  InitializeFilters();
 }
 
 mitk::PlanarFigureSegmentationController::~PlanarFigureSegmentationController()
@@ -76,13 +70,21 @@ void mitk::PlanarFigureSegmentationController::AddPlanarFigure( mitk::PlanarFigu
     }
   }
 
+  mitk::Surface::Pointer figureAsSurface = NULL;
+
   if ( newFigure )
   {
     m_PlanarFigureList.push_back( planarFigure );
+    figureAsSurface = this->CreateSurfaceFromPlanarFigure( planarFigure );
+    m_SurfaceList.push_back( figureAsSurface );
     indexOfFigure = m_PlanarFigureList.size() -1 ;
   }
+  else
+  {
+    figureAsSurface = this->CreateSurfaceFromPlanarFigure( planarFigure );
+    m_SurfaceList.at(indexOfFigure) = figureAsSurface;
+  }
 
-  mitk::Surface::Pointer figureAsSurface = this->CreateSurfaceFromPlanarFigure( planarFigure );
   m_ReduceFilter->SetInput( indexOfFigure, figureAsSurface );
 
   m_NormalsFilter->SetInput( indexOfFigure, m_ReduceFilter->GetOutput( indexOfFigure ) );
@@ -111,17 +113,64 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
 
   if ( indexOfFigure == m_PlanarFigureList.size()-1 )
   {
+    // Ff the removed figure was the last one in the list, we can simply
+    // remove the last input from each filter.
     m_DistanceImageCreator->RemoveInputs( m_NormalsFilter->GetOutput( indexOfFigure ) );
     m_NormalsFilter->RemoveInputs( m_ReduceFilter->GetOutput( indexOfFigure ) );
     m_ReduceFilter->RemoveInputs( const_cast<mitk::Surface*>(m_ReduceFilter->GetInput(indexOfFigure)) );
+
+//      PlanarFigureListType::iterator whereIter = m_PlanarFigureList.begin();
+//      whereIter += indexOfFigure;
+//      m_PlanarFigureList.erase( whereIter );
+//  
+//      SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
+//      surfaceIter += indexOfFigure;
+//      m_SurfaceList.erase( surfaceIter );
+  }
+  else
+  {
+    // this is not very nice! If the figure that has been removed is NOT the last
+    // one in the list we have to create new filters and add all remaining 
+    // inputs again.
+    // 
+    // Has to be done as the filters do not work when removing an input 
+    // other than the last one.
+    
+    // create new filters
+    InitializeFilters();
+
+    // and add all existing surfaces
+    SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
+    for ( surfaceIter = m_SurfaceList.begin(); surfaceIter!=m_SurfaceList.end(); surfaceIter++ )
+    {
+      m_ReduceFilter->SetInput( indexOfFigure, (*surfaceIter) );
+      m_NormalsFilter->SetInput( indexOfFigure, m_ReduceFilter->GetOutput( indexOfFigure ) );
+      m_DistanceImageCreator->SetInput( indexOfFigure, m_NormalsFilter->GetOutput( indexOfFigure ) );
+    }
   }
 
+  PlanarFigureListType::iterator whereIter = m_PlanarFigureList.begin();
+  whereIter += indexOfFigure;
+  m_PlanarFigureList.erase( whereIter );
+
+  SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
+  surfaceIter += indexOfFigure;
+  m_SurfaceList.erase( surfaceIter );
 }
 
 
 mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationResult()
 {
   m_SegmentationAsImage = NULL;
+
+  if ( m_PlanarFigureList.size() == 0 )
+  {
+    m_SegmentationAsImage = mitk::Image::New();
+    //m_SegmentationAsImage->Initialize(m_ReferenceImage);
+    m_SegmentationAsImage->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *m_ReferenceImage->GetTimeSlicedGeometry());
+
+    return m_SegmentationAsImage;
+  }
 
   m_ReduceFilter->Update();
   m_NormalsFilter->Update();
@@ -219,5 +268,14 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
 mitk::PlanarFigureSegmentationController::PlanarFigureListType mitk::PlanarFigureSegmentationController::GetAllPlanarFigures()
 {
   return m_PlanarFigureList;
+}
+
+void mitk::PlanarFigureSegmentationController::InitializeFilters()
+{
+  m_ReduceFilter = mitk::ReduceContourSetFilter::New();
+  m_ReduceFilter->SetReductionType(ReduceContourSetFilter::NTH_POINT);
+  m_ReduceFilter->SetStepSize( 10 );
+  m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
+  m_DistanceImageCreator = mitk::CreateDistanceImageFromSurfaceFilter::New();
 }
 

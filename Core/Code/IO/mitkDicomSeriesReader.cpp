@@ -137,6 +137,17 @@ std::string DicomSeriesReader::ReaderImplementationLevelToString( const ReaderIm
     default: return "<unknown value of enum ReaderImplementationLevel>";
   };
 }
+  
+std::string DicomSeriesReader::PixelSpacingInterpretationToString( const PixelSpacingInterpretation& enumValue )
+{
+  switch (enumValue)
+  {
+    case PixelSpacingInterpretation_SpacingInPatient: return "In Patient";
+    case PixelSpacingInterpretation_SpacingAtDetector: return "At Detector";
+    case PixelSpacingInterpretation_SpacingUnknown: return "Unknown spacing";
+    default: return "<unknown value of enum PixelSpacingInterpretation>";
+  };
+}
 
 
 bool DicomSeriesReader::ImageBlockDescriptor::HasGantryTiltCorrected() const
@@ -152,49 +163,49 @@ bool DicomSeriesReader::ImageBlockDescriptor::HasGantryTiltCorrected() const
         1               1             0       --> detector surface spacing CORRECTED for geometrical magnifications: spacing as in patient
         1               1             1       --> detector surface spacing NOT corrected for geometrical magnifications: spacing as at detector
 */
-std::string DicomSeriesReader::ImageBlockDescriptor::GetPixelSpacingType() const
+DicomSeriesReader::PixelSpacingInterpretation DicomSeriesReader::ImageBlockDescriptor::GetPixelSpacingType() const
 {
   if (m_PixelSpacing.empty())
   {
     if (m_ImagerPixelSpacing.empty())
     {
-      return "UNKNOWN";
+      return PixelSpacingInterpretation_SpacingUnknown;
     }
     else
     {
-      return "AT_DETECTOR";
+      return PixelSpacingInterpretation_SpacingAtDetector;
     }
   }
   else // Pixel Spacing defined
   {
     if (m_ImagerPixelSpacing.empty())
     {
-      return "IN_PATIENT";
+      return PixelSpacingInterpretation_SpacingInPatient;
     }
     else if (m_PixelSpacing != m_ImagerPixelSpacing)
     {
-      return "IN_PATIENT";
+      return PixelSpacingInterpretation_SpacingInPatient;
     }
     else
     {
-      return "AT_DETECTOR";
+      return PixelSpacingInterpretation_SpacingAtDetector;
     }
   }
 }
 
 bool DicomSeriesReader::ImageBlockDescriptor::PixelSpacingRelatesToPatient() const
 {
-  return  GetPixelSpacingType() == "IN_PATIENT";
+  return  GetPixelSpacingType() == PixelSpacingInterpretation_SpacingInPatient;
 }
 
 bool DicomSeriesReader::ImageBlockDescriptor::PixelSpacingRelatesToDetector() const
 {
-  return  GetPixelSpacingType() == "AT_DETECTOR";
+  return  GetPixelSpacingType() == PixelSpacingInterpretation_SpacingAtDetector;
 }
 
 bool DicomSeriesReader::ImageBlockDescriptor::PixelSpacingIsUnknown() const
 {
-  return GetPixelSpacingType() == "UNKNOWN";
+  return GetPixelSpacingType() == PixelSpacingInterpretation_SpacingUnknown;
 }
 
 void DicomSeriesReader::ImageBlockDescriptor::SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing)
@@ -1418,7 +1429,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     ImageBlockDescriptor block = groupIter->second;
     MITK_DEBUG << "  " << block.GetFilenames().size() << " '" << block.GetModality() << "' images (" << block.GetSOPClassUIDAsString() << ") in volume " << block.GetImageBlockUID();
     MITK_DEBUG << "    (gantry tilt : " << (block.HasGantryTiltCorrected()?"yes":"no") << "; "
-                       "pixel spacing : " << block.GetPixelSpacingType() << "; " 
+                       "pixel spacing : " << PixelSpacingInterpretationToString( block.GetPixelSpacingType() ) << "; " 
                        "3D+t: " << (block.HasMultipleTimePoints()?"yes":"no") << "; "
                        "reader support: " << ReaderImplementationLevelToString( block.GetReaderImplementationLevel() );
     mapOf3DPlusTBlocks[ groupIter->first ] = groupIter->second.GetFilenames();
@@ -1858,7 +1869,7 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
   image->SetProperty("dicomseriesreader.ReaderImplementationLevelString", StringProperty::New(ReaderImplementationLevelToString( blockInfo.GetReaderImplementationLevel() )));
   image->SetProperty("dicomseriesreader.GantyTiltCorrected", BoolProperty::New(blockInfo.HasGantryTiltCorrected()));
   image->SetProperty("dicomseriesreader.3D+t", BoolProperty::New(blockInfo.HasMultipleTimePoints()));
-  image->SetProperty("dicomseriesreader.PixelSpacingType", StringProperty::New(blockInfo.GetPixelSpacingType()));
+  image->SetProperty("dicomseriesreader.PixelSpacingType", StringProperty::New(PixelSpacingInterpretationToString( blockInfo.GetPixelSpacingType() )));
 }
   
 void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBlockDescriptor& imageBlockDescriptor )

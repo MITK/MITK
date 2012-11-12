@@ -275,6 +275,14 @@ public:
     ReaderImplementationLevel_Unsupported,     // loader code is not working with this SOP Class
   } ReaderImplementationLevel;
 
+  typedef enum
+  {
+    PixelSpacingInterpretation_SpacingInPatient,
+    PixelSpacingInterpretation_SpacingAtDetector,
+    PixelSpacingInterpretation_SpacingUnknown
+  } PixelSpacingInterpretation;
+
+
   class ImageBlockDescriptor
   {
     public:
@@ -304,7 +312,7 @@ public:
       bool PixelSpacingRelatesToDetector() const;
       bool PixelSpacingIsUnknown() const;
 
-      std::string GetPixelSpacingType() const;
+      PixelSpacingInterpretation GetPixelSpacingType() const;
       void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
 
       bool HasMultipleTimePoints() const;
@@ -702,6 +710,7 @@ public:
   static bool IsPhilips3DDicom(const std::string &filename);
   
   static std::string ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue );
+  static std::string PixelSpacingInterpretationToString( const PixelSpacingInterpretation& enumValue );
 
 protected:
 

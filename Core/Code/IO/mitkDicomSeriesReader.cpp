@@ -1867,9 +1867,12 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
   // copy imageblockdescriptor as properties
   image->SetProperty("dicomseriesreader.SOPClass", StringProperty::New(blockInfo.GetSOPClassUIDAsString()));
   image->SetProperty("dicomseriesreader.ReaderImplementationLevelString", StringProperty::New(ReaderImplementationLevelToString( blockInfo.GetReaderImplementationLevel() )));
+  image->SetProperty("dicomseriesreader.ReaderImplementationLevel", GenericProperty<ReaderImplementationLevel>::New( blockInfo.GetReaderImplementationLevel() ));
+  image->SetProperty("dicomseriesreader.PixelSpacingInterpretationString", StringProperty::New(PixelSpacingInterpretationToString( blockInfo.GetPixelSpacingType() )));
+  image->SetProperty("dicomseriesreader.PixelSpacingInterpretation", GenericProperty<PixelSpacingInterpretation>::New(blockInfo.GetPixelSpacingType()));
+  image->SetProperty("dicomseriesreader.MultiFrameImage", BoolProperty::New(blockInfo.IsMultiFrameImage()));
   image->SetProperty("dicomseriesreader.GantyTiltCorrected", BoolProperty::New(blockInfo.HasGantryTiltCorrected()));
   image->SetProperty("dicomseriesreader.3D+t", BoolProperty::New(blockInfo.HasMultipleTimePoints()));
-  image->SetProperty("dicomseriesreader.PixelSpacingType", StringProperty::New(PixelSpacingInterpretationToString( blockInfo.GetPixelSpacingType() )));
 }
   
 void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBlockDescriptor& imageBlockDescriptor )

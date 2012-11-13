@@ -3,4 +3,6 @@ set(CPP_FILES
   mitkOclResourceServiceImpl_Private.cpp
   mitkOclImageFormats.cpp
   mitkOpenCLActivator.cpp
+  mitkOclBaseData.cpp
+  mitkOclImage.cpp
 )

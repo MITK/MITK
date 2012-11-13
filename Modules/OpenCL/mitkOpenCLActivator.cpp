@@ -26,6 +26,12 @@ void OpenCLActivator::Load(mitk::ModuleContext *context)
   m_InternalResourceReference = m_ResourceService.get();
 }
 
+void OpenCLActivator::Unload(mitk::ModuleContext *)
+{
+  m_InternalResourceReference = NULL;
+  m_ResourceService.release();
+}
+
 OclResourceService* OpenCLActivator::GetResourceServiceRef()
 {
   return m_InternalResourceReference;

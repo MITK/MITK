@@ -48,7 +48,7 @@ public:
   void Load(mitk::ModuleContext *context);
 
   /** @brief Unload module context */
-  void Unload(mitk::ModuleContext* ){ }
+  void Unload(mitk::ModuleContext* );
 
   static OclResourceService* GetResourceServiceRef();
 

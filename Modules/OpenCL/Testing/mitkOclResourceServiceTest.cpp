@@ -44,6 +44,7 @@ int mitkOclResourceServiceTest( int /*argc*/, char** /*argv[]*/ )
   MITK_TEST_CONDITION_REQUIRED( resources != NULL, "Resource service available." );
 
   cl_context first = resources->GetContext();
+  MITK_TEST_CONDITION_REQUIRED(first != NULL, "Got not-null OpenCL context.");
 
   OclResourceService* resources_2 = GetModuleContext()->GetService<OclResourceService>(ref);
   MITK_TEST_CONDITION_REQUIRED( resources == resources_2, "Same resource reference the second time." );

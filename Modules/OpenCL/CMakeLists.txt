@@ -8,9 +8,13 @@ if(MITK_USE_OpenCL)
   endif(APPLE)
 
   # create the module
+  # forcing autoloading with Mitk to provide the OclResourceService
   MITK_CREATE_MODULE(MitkOcl
     INCLUDE_DIRS ${OpenCL_INCLUDE_DIR} ${MITK_BIN_DIR}
     DEPENDS Mitk
     PACKAGE_DEPENDS OpenCL
+    AUTOLOAD_WITH Mitk
     ADDITIONAL_LIBS "${OpenCL_LIBRARY}")
+
+  add_subdirectory(Testing)
 endif(MITK_USE_OpenCL)

@@ -244,7 +244,7 @@ Stacked slices:
 
   \image tilt-correction.jpg
  
- \section DicomSeriesReader_whatweknowaboutitk The ITK loader, what we know about it
+ \section DicomSeriesReader_whatweknowaboutitk The actual image loading process
 
  When calling LoadDicomSeries(), this method "mainly" uses an instance of itk::ImageSeriesReader, 
  configured with an itk::GDCMImageIO object. Because DicomSeriesReader works around some of the 
@@ -258,6 +258,16 @@ Stacked slices:
       - the origins are read from appropriate tags, nothing special about that
       - the spacing is read by gdcm::ImageReader, gdcm::ImageHelper::GetSpacingValue() from a tag determined by gdcm::ImageHelper::GetSpacingTagFromMediaStorage(), which basically determines ONE appropriate pixel spacing tag for each media storage type (ct image, mr image, secondary capture image, etc.)
         - this is fine for modalities such as CT/MR where the "Pixel Spacing" tag is mandatory, but for other modalities such as CR or Secondary Capture, the tag "Imager Pixel Spacing" is taken, which is no only optional but also has a more complicated relation with the "Pixel Spacing" tag. For this reason we check/modify the pixel spacing reported by itk::ImageSeriesReader after loading the image (see \ref DicomSeriesReader_pixelspacing)
+
+ AFTER loading, DicomSeriesReader marks some of its findings as mitk::Properties to the loaded Image and DataNode:
+  - <b>dicomseriesreader.SOPClass</b> : DICOM SOP Class as readable string (instead of a UID)
+  - <b>dicomseriesreader.ReaderImplementationLevelString</b> : Confidence /Support level of the reader for this image as readable string
+  - <b>dicomseriesreader.ReaderImplementationLevel</b> : Confidence /Support level of the reader for this image as enum value of type ReaderImplementationLevel
+  - <b>dicomseriesreader.PixelSpacingInterpretationString</b> : Appropriate interpreteation of pixel spacing for this Image as readable string
+  - <b>dicomseriesreader.PixelSpacingInterpretation</b> : Appropriate interpreteation of pixel spacing for this Image as enum value of type PixelSpacingInterpretation
+  - <b>dicomseriesreader.MultiFrameImage</b> : bool flag to mark multi-frame images
+  - <b>dicomseriesreader.GantyTiltCorrected</b> : bool flag to mark images where a gantry tilt was corrected to fit slices into an mitk::Image
+  - <b>dicomseriesreader.3D+t</b> : bool flag to mark images with a time dimension (multiple 3D blocks of the same size at the same position in space)
 
  \section DicomSeriesReader_pixelspacing Handling of pixel spacing
 

@@ -172,7 +172,7 @@ namespace mitk
 
  Since inter-slice distance is not recorded in DICOM tags, we must ensure that blocks are made up of
  slices that have equal distances between neighboring slices. This is especially necessary because itk::ImageSeriesReader
- is later used for the actual loading, and this class expects (and does nocht verify) equal inter-slice distance.
+ is later used for the actual loading, and this class expects (and does nocht verify) equal inter-slice distance (see \ref DicomSeriesReader_whatweknowaboutitk).
 
  To achieve such grouping, the inter-slice distance is calculated from the first two different slice positions of a block. 
  Following slices are added to a block as long as they can be added by adding the calculated inter-slice distance to the
@@ -244,9 +244,24 @@ Stacked slices:
 
   \image tilt-correction.jpg
  
+ \section DicomSeriesReader_whatweknowaboutitk The ITK loader, what we know about it
+
+ When calling LoadDicomSeries(), this method "mainly" uses an instance of itk::ImageSeriesReader, 
+ configured with an itk::GDCMImageIO object. Because DicomSeriesReader works around some of the 
+ behaviors of these classes, the following is a list of features that we find in the code and need to work with:
+
+  - itk::ImageSeriesReader::GenerateOutputInformation() does the z-spacing handling
+    - spacing is directly determined by comparing (euclidean distance) the origins of the first two slices of a series
+      - this is GOOD because there is no reliable z-spacing information in DICOM images
+      - this is bad because it does not work with gantry tilt, in which case the slice distance is SMALLER than the distance between two origins (see section on tilt)
+  - origin and spacing are calculated by GDCMImageIO and re-used in itk::ImageSeriesReader
+      - the origins are read from appropriate tags, nothing special about that
+      - the spacing is read by gdcm::ImageReader, gdcm::ImageHelper::GetSpacingValue() from a tag determined by gdcm::ImageHelper::GetSpacingTagFromMediaStorage(), which basically determines ONE appropriate pixel spacing tag for each media storage type (ct image, mr image, secondary capture image, etc.)
+        - this is fine for modalities such as CT/MR where the "Pixel Spacing" tag is mandatory, but for other modalities such as CR or Secondary Capture, the tag "Imager Pixel Spacing" is taken, which is no only optional but also has a more complicated relation with the "Pixel Spacing" tag. For this reason we check/modify the pixel spacing reported by itk::ImageSeriesReader after loading the image (see \ref DicomSeriesReader_pixelspacing)
+
  \section DicomSeriesReader_pixelspacing Handling of pixel spacing
 
- The reader implementes what is described in DICOM Part 3, chapter 10.7: Both tags
+ The reader implementes what is described in DICOM Part 3, chapter 10.7 (Basic Pixel Spacing Calibration Macro): Both tags
   - (0028,0030) Pixel Spacing and
   - (0018,1164) Imager Pixel Spacing
 

@@ -11,7 +11,7 @@ mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_NoFiles mitkDICOMTestingSanit
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_CTImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-ct.dcm)
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_MRImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-mr.dcm)
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_SCImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc.dcm)
-mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_DefectImage mitkDICOMTestingSanityTest 0 ${MITK_DATA_DIR}/spacing-ok-sc-no2032.dcm)
+mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_NoImagePositionPatient mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc-no2032.dcm)
 
 #see bug 8108
 if(NOT APPLE)
@@ -21,6 +21,7 @@ set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen)
 set(MR_HEART_DIR ${MITK_DATA_DIR}/3D+t-Heart)
 set(CT_TILT_HEAD_DIR ${MITK_DATA_DIR}/TiltHead)
 set(CT_TILT_DIR ${MITK_DATA_DIR}/TiltedData)
+set(SOP_CLASSES_DIR ${MITK_DATA_DIR}/DICOMReader)
 
 
 # these variables could be passed as parameters to a generic test creation function
@@ -46,7 +47,7 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
     set(expecteddump "${CURRENT_DATASET_DIR}/${TESTS_DIR}/${input}/${EXPECTED_DUMP}")
     set(testname "DICOM_Load_${input}")
 
-    message(STATUS "DICOM loading test case '${input}'")
+    #message(STATUS "DICOM loading test case '${input}'")
     expectFileExists(${inputfilelist})
     expectFileExists(${expecteddump})
 
@@ -75,6 +76,8 @@ AddDicomTestsFromDataRepository(${CT_ABDOMEN_DIR} ${TESTS_DIR} ${INPUT_LISTNAME}
 AddDicomTestsFromDataRepository(${CT_TILT_HEAD_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 AddDicomTestsFromDataRepository(${CT_TILT_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 AddDicomTestsFromDataRepository(${MR_HEART_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
+
+AddDicomTestsFromDataRepository(${SOP_CLASSES_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 
 
 endif() # apple

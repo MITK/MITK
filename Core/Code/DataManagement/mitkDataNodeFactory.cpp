@@ -253,25 +253,35 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     return;
 
   }
-
-  DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), true, this->m_SeriesRestrictions); // true = group gantry tilt images
-  const unsigned int size = names_map.size();
+      
+  DicomSeriesReader::FileNamesGrouping imageBlocks = DicomSeriesReader::GetSeries(this->GetDirectory(), true, this->m_SeriesRestrictions); // true = group gantry tilt images
+  const unsigned int size = imageBlocks.size();
 
   this->ResizeOutputs(size);
   ProgressBar::GetInstance()->AddStepsToDo(size);
   ProgressBar::GetInstance()->Progress();
 
   unsigned int outputIndex = 0u;
-  const DicomSeriesReader::UidFileNamesMap::const_iterator n_end = names_map.end();
+  const DicomSeriesReader::FileNamesGrouping::const_iterator n_end = imageBlocks.end();
 
-  for (DicomSeriesReader::UidFileNamesMap::const_iterator n_it = names_map.begin(); n_it != n_end; ++n_it)
+  for (DicomSeriesReader::FileNamesGrouping::const_iterator n_it = imageBlocks.begin(); n_it != n_end; ++n_it)
   {
     const std::string &uid = n_it->first;
     DataNode::Pointer node = this->GetOutput(outputIndex);
 
-    MITK_INFO << "Reading series " << outputIndex << ": " << uid << std::endl;
+    const DicomSeriesReader::ImageBlockDescriptor& imageBlockDescriptor( n_it->second );
+    
+    MITK_INFO << "--------------------------------------------------------------------------------";
+    MITK_INFO << "DataNodeFactory: Loading DICOM series " << outputIndex << ": Series UID " << imageBlockDescriptor.GetSeriesInstanceUID() << std::endl;
+    MITK_INFO << "  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
+    MITK_INFO << "  multi-frame: " << (imageBlockDescriptor.IsMultiFrameImage()?"Yes":"No");
+    MITK_INFO << "  reader support: " << DicomSeriesReader::ReaderImplementationLevelToString(imageBlockDescriptor.GetReaderImplementationLevel());
+    MITK_INFO << "  pixel spacing type: " << DicomSeriesReader::PixelSpacingInterpretationToString( imageBlockDescriptor.GetPixelSpacingType() );
+    MITK_INFO << "  gantry tilt corrected: " << (imageBlockDescriptor.HasGantryTiltCorrected()?"Yes":"No");
+    MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"Yes":"No");
+    MITK_INFO << "--------------------------------------------------------------------------------";
 
-    if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node, true, true, true))
+    if (DicomSeriesReader::LoadDicomSeries(n_it->second.GetFilenames(), *node, true, true, true)) 
     {
       std::string nodeName(uid);
       std::string studyDescription;
@@ -291,7 +301,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     }
     else
     {
-      MITK_ERROR << "Skipping series " << outputIndex << " due to exception" << std::endl;
+      MITK_ERROR << "DataNodeFactory: Skipping series " << outputIndex << " due to some unspecified error..." << std::endl;
     }
 
     ProgressBar::GetInstance()->Progress();

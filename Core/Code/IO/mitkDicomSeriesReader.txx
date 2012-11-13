@@ -34,14 +34,23 @@ namespace mitk
 template <typename PixelType>
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback)
 {
+  // TODO make callers happier by providing additional information in properties (such as meaning of spacing etc.)
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );
   std::locale l( "C" );
   std::cin.imbue(l);
 
+  ImageBlockDescriptor imageBlockDescriptor;
+
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
   const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
+  const gdcm::Tag tagSeriesInstanceUID(0x0020, 0x000e); // Series Instance UID
+  const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP class UID
+  const gdcm::Tag tagModality(0x0008, 0x0060); // modality
+  const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
+  const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // imager pixel spacing
+  const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
 
   try
   {
@@ -52,6 +61,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     /* special case for Philips 3D+t ultrasound images */
     if ( DicomSeriesReader::IsPhilips3DDicom(filenames.front().c_str())  )
     {
+      // TODO what about imageBlockDescriptor?
       ReadPhilips3DDicom(filenames.front().c_str(), image);
       initialize_node = true;
     }
@@ -67,6 +77,13 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
       std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
+
+      imageBlockDescriptor.SetSeriesInstanceUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagSeriesInstanceUID ) ) );
+      imageBlockDescriptor.SetSOPClassUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagSOPClassUID ) ) );
+      imageBlockDescriptor.SetModality( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagModality ) ) );
+      imageBlockDescriptor.SetNumberOfFrames( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagNumberOfFrames ) ) );
+      imageBlockDescriptor.SetPixelSpacingInformation( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagPixelSpacing ) ),
+                                                       ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagImagerPixelSpacing ) ) );
 
       GantryTiltInformation tiltInfo;
 
@@ -100,13 +117,26 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         correctTilt = false; // we CANNOT do that
       }
 
+      imageBlockDescriptor.SetHasGantryTiltCorrected( correctTilt );
+
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
-        image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, command ); // load first 3D block
+
+        DcmIoType::Pointer io;
+        image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, io, command ); // load first 3D block
+
+        imageBlockDescriptor.AddFiles(imageBlocks.front()); // only the first part is loaded
+        imageBlockDescriptor.SetHasMultipleTimePoints( false );
+
+        FixSpacingInformation( image, imageBlockDescriptor );
+        CopyMetaDataToImageProperties( imageBlocks.front(), scanner.GetMappings(), io, imageBlockDescriptor, image);
+
         initialize_node = true;
       }
       else if (volume_count > 1)
       {
+        imageBlockDescriptor.AddFiles(filenames); // all is loaded
+        imageBlockDescriptor.SetHasMultipleTimePoints( true );
         // It is 3D+t! Read it and store into mitk image
         typedef itk::Image<PixelType, 4> ImageType;
         typedef itk::ImageSeriesReader<ImageType> ReaderType;
@@ -134,13 +164,13 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
         }
 
-        image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
-        image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
-
         gdcm::Scanner scanner;
         ScanForSliceInformation(filenames, scanner);
 
-        DicomSeriesReader::CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, image);
+        image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
+        image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
+        FixSpacingInformation( image, imageBlockDescriptor );
+        CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, imageBlockDescriptor, image);
 
         MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
                                             << image->GetDimension(1) << ", "
@@ -158,7 +188,11 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         Vector3D correctedImageSpacing = image->GetGeometry()->GetSpacing();
         std::swap( correctedImageSpacing[0], correctedImageSpacing[1] );
         image->GetGeometry()->SetSpacing( correctedImageSpacing );
+
+        // TODO check against actual tag values, NOT against some artificial GDCM version
 #endif
+        // TODO check generated spacing in all cases against what we know from tags!
+        // TODO mark iamge if spacing was determined from fallback/default values instead of documented tags
 
         MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
                                           << image->GetGeometry()->GetSpacing()[1] << ", "
@@ -192,6 +226,16 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       setlocale(LC_NUMERIC, previousCLocale);
       std::cin.imbue(previousCppLocale);
     }
+
+    MITK_INFO << "--------------------------------------------------------------------------------";
+    MITK_INFO << "DICOM files loaded (from series UID " << imageBlockDescriptor.GetSeriesInstanceUID() << "):";
+    MITK_INFO << "  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
+    MITK_INFO << "  multi-frame: " << (imageBlockDescriptor.IsMultiFrameImage()?"Yes":"No");
+    MITK_INFO << "  reader support: " << ReaderImplementationLevelToString(imageBlockDescriptor.GetReaderImplementationLevel());
+    MITK_INFO << "  pixel spacing type: " << PixelSpacingInterpretationToString( imageBlockDescriptor.GetPixelSpacingType() ) << " " << image->GetGeometry()->GetSpacing()[0] << "/" << image->GetGeometry()->GetSpacing()[0];
+    MITK_INFO << "  gantry tilt corrected: " << (imageBlockDescriptor.HasGantryTiltCorrected()?"Yes":"No");
+    MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"Yes":"No");
+    MITK_INFO << "--------------------------------------------------------------------------------";
   }
   catch (std::exception& e)
   {
@@ -199,12 +243,14 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     setlocale(LC_NUMERIC, previousCLocale);
     std::cin.imbue(previousCppLocale);
 
+    MITK_ERROR << "Caught exception in DicomSeriesReader::LoadDicom";
+
     throw e;
   }
 }
 
 template <typename PixelType>
-Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, CallbackCommand* command )
+Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command )
 {
   /******** Normal Case, 3D (also for GDCM < 2 usable) ***************/
   mitk::Image::Pointer image = mitk::Image::New();
@@ -212,7 +258,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   typedef itk::Image<PixelType, 3> ImageType;
   typedef itk::ImageSeriesReader<ImageType> ReaderType;
 
-  DcmIoType::Pointer io = DcmIoType::New();
+  io = DcmIoType::New();
   typename ReaderType::Pointer reader = ReaderType::New();
 
   reader->SetImageIO(io);
@@ -235,11 +281,6 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 
   image->InitializeByItk(readVolume.GetPointer());
   image->SetImportVolume(readVolume->GetBufferPointer());
-
-  gdcm::Scanner scanner;
-  ScanForSliceInformation(filenames, scanner);
-
-  DicomSeriesReader::CopyMetaDataToImageProperties( filenames, scanner.GetMappings(), io, image);
 
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
                                       << image->GetDimension(1) << ", "
@@ -268,13 +309,15 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 void
 DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdcm::Scanner& scanner)
 {
-  const gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
-  scanner.AddTag(ippTag);
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
+  scanner.AddTag(tagImagePositionPatient);
+
+  const gdcm::Tag tagSeriesInstanceUID(0x0020, 0x000e); // Series Instance UID
+  scanner.AddTag(tagSeriesInstanceUID);
 
   const gdcm::Tag tagImageOrientation(0x0020,0x0037); //Image orientation
   scanner.AddTag(tagImageOrientation);
 
-  // TODO what if tags don't exist?
   const gdcm::Tag tagSliceLocation(0x0020, 0x1041); // slice location
   scanner.AddTag( tagSliceLocation );
 
@@ -284,7 +327,22 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
   const gdcm::Tag tagSOPInstanceNumber(0x0008, 0x0018); // SOP instance number
   scanner.AddTag( tagSOPInstanceNumber );
 
-  scanner.Scan(filenames); // make available image position for each file
+  const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // Pixel Spacing
+  scanner.AddTag( tagPixelSpacing );
+
+  const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // Imager Pixel Spacing
+  scanner.AddTag( tagImagerPixelSpacing );
+
+  const gdcm::Tag tagModality(0x0008, 0x0060); // Modality
+  scanner.AddTag( tagModality );
+
+  const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP Class UID
+  scanner.AddTag( tagSOPClassUID );
+
+  const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
+    scanner.AddTag( tagNumberOfFrames );
+
+  scanner.Scan(filenames); // make available image information for each file
 }
 
 std::list<DicomSeriesReader::StringContainer>
@@ -302,7 +360,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
   std::string firstPosition;
   unsigned int numberOfBlocks(0); // number of 3D image blocks
 
-  const gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
 
   // loop files to determine number of image blocks
   for (StringContainer::const_iterator fileIter = sorted_filenames.begin();
@@ -311,12 +369,15 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
   {
     gdcm::Scanner::TagToValue tagToValueMap = tagValueMappings.find( fileIter->c_str() )->second;
 
-    if(tagToValueMap.find(ippTag) == tagToValueMap.end())
+    if(tagToValueMap.find(tagImagePositionPatient) == tagToValueMap.end())
     {
-      continue;
+      // we expect to get images w/ missing position information ONLY as separated blocks.
+      assert( presortedFilenames.size() == 1 );
+      numberOfBlocks = 1;
+      break;
     }
 
-    std::string position = tagToValueMap.find(ippTag)->second;
+    std::string position = tagToValueMap.find(tagImagePositionPatient)->second;
     MITK_DEBUG << "  " << *fileIter << " at " << position;
     if (firstPosition.empty())
     {
@@ -456,6 +517,7 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
      For CT, HU -1000 might be meaningful, but a general solution seems not possible. Even for CT,
      -1000 would only look natural for many not all images.
   */
+  // TODO use (0028,0120) Pixel Padding Value if present
   resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::min() );
 
   // adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need

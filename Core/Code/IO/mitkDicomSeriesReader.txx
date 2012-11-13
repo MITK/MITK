@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,14 +51,14 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
   const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // imager pixel spacing
   const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
- 
+
   try
   {
     mitk::Image::Pointer image = mitk::Image::New();
     CallbackCommand *command = callback ? new CallbackCommand(callback) : 0;
     bool initialize_node = false;
 
-    /* special case for Philips 3D+t ultrasound images */ 
+    /* special case for Philips 3D+t ultrasound images */
     if ( DicomSeriesReader::IsPhilips3DDicom(filenames.front().c_str())  )
     {
       // TODO what about imageBlockDescriptor?
@@ -71,10 +71,10 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       bool canLoadAs4D(true);
       gdcm::Scanner scanner;
       ScanForSliceInformation(filenames, scanner);
-   
+
       // need non-const access for map
       gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(scanner.GetMappings());
-      
+
       std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
 
@@ -86,25 +86,25 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
                                                        ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagImagerPixelSpacing ) ) );
 
       GantryTiltInformation tiltInfo;
- 
+
       // check possibility of a single slice with many timesteps. In this case, don't check for tilt, no second slice possible
       if ( !imageBlocks.empty() && imageBlocks.front().size() > 1 && correctTilt)
       {
         // check tiltedness here, potentially fixup ITK's loading result by shifting slice contents
         // check first and last position slice from tags, make some calculations to detect tilt
 
-        std::string firstFilename(imageBlocks.front().front()); 
+        std::string firstFilename(imageBlocks.front().front());
         // calculate from first and last slice to minimize rounding errors
         std::string secondFilename(imageBlocks.front().back());
 
         std::string imagePosition1(    ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImagePositionPatient ] ) );
         std::string imageOrientation( ConstCharStarToString( tagValueMappings[ firstFilename.c_str() ][ tagImageOrientation ] ) );
         std::string imagePosition2(    ConstCharStarToString( tagValueMappings[secondFilename.c_str() ][ tagImagePositionPatient ] ) );
-      
+
         bool ignoredConversionError(-42); // hard to get here, no graceful way to react
         Point3D origin1( DICOMStringToPoint3D( imagePosition1, ignoredConversionError ) );
         Point3D origin2( DICOMStringToPoint3D( imagePosition2, ignoredConversionError ) );
-      
+
         Vector3D right; right.Fill(0.0);
         Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
         DICOMStringToOrientationVectors( imageOrientation, right, up, ignoredConversionError );
@@ -116,7 +116,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       {
         correctTilt = false; // we CANNOT do that
       }
-      
+
       imageBlockDescriptor.SetHasGantryTiltCorrected( correctTilt );
 
       if (volume_count == 1 || !canLoadAs4D || !load4D)
@@ -166,15 +166,15 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
         gdcm::Scanner scanner;
         ScanForSliceInformation(filenames, scanner);
-        
+
         image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
         image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
         FixSpacingInformation( image, imageBlockDescriptor );
         CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, imageBlockDescriptor, image);
 
-        MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
-                                            << image->GetDimension(1) << ", " 
-                                            << image->GetDimension(2) << ", " 
+        MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
+                                            << image->GetDimension(1) << ", "
+                                            << image->GetDimension(2) << ", "
                                             << image->GetDimension(3) << "]";
 
 #if (GDCM_MAJOR_VERSION == 2) && (GDCM_MINOR_VERSION < 1) && (GDCM_BUILD_VERSION < 15)
@@ -194,8 +194,8 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         // TODO check generated spacing in all cases against what we know from tags!
         // TODO mark iamge if spacing was determined from fallback/default values instead of documented tags
 
-        MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", " 
-                                          << image->GetGeometry()->GetSpacing()[1] << ", " 
+        MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
+                                          << image->GetGeometry()->GetSpacing()[1] << ", "
                                           << image->GetGeometry()->GetSpacing()[2] << "]";
 
         for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
@@ -203,7 +203,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           reader->SetFileNames(*df_it);
           reader->Update();
           readVolume = reader->GetOutput();
-          
+
           if (correctTilt)
           {
             readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
@@ -211,10 +211,10 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
           image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
         }
-        
+
         initialize_node = true;
       }
-   
+
     }
 
     if (initialize_node)
@@ -278,12 +278,12 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   {
     readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
   }
-  
+
   image->InitializeByItk(readVolume.GetPointer());
   image->SetImportVolume(readVolume->GetBufferPointer());
 
-  MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
-                                      << image->GetDimension(1) << ", " 
+  MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
+                                      << image->GetDimension(1) << ", "
                                       << image->GetDimension(2) << "]";
 
 #if (GDCM_MAJOR_VERSION == 2) && (GDCM_MINOR_VERSION < 1) && (GDCM_BUILD_VERSION < 15)
@@ -299,22 +299,22 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
     image->GetGeometry()->SetSpacing( correctedImageSpacing );
 #endif
 
-  MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", " 
-                                    << image->GetGeometry()->GetSpacing()[1] << ", " 
+  MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
+                                    << image->GetGeometry()->GetSpacing()[1] << ", "
                                     << image->GetGeometry()->GetSpacing()[2] << "]";
 
   return image;
 }
 
-void 
+void
 DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdcm::Scanner& scanner)
 {
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
   scanner.AddTag(tagImagePositionPatient);
-  
+
   const gdcm::Tag tagSeriesInstanceUID(0x0020, 0x000e); // Series Instance UID
   scanner.AddTag(tagSeriesInstanceUID);
-  
+
   const gdcm::Tag tagImageOrientation(0x0020,0x0037); //Image orientation
   scanner.AddTag(tagImageOrientation);
 
@@ -329,34 +329,34 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
 
   const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // Pixel Spacing
   scanner.AddTag( tagPixelSpacing );
-  
+
   const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // Imager Pixel Spacing
   scanner.AddTag( tagImagerPixelSpacing );
-  
+
   const gdcm::Tag tagModality(0x0008, 0x0060); // Modality
   scanner.AddTag( tagModality );
-  
+
   const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP Class UID
   scanner.AddTag( tagSOPClassUID );
-  
+
   const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
     scanner.AddTag( tagNumberOfFrames );
- 
+
   scanner.Scan(filenames); // make available image information for each file
 }
 
-std::list<DicomSeriesReader::StringContainer> 
-DicomSeriesReader::SortIntoBlocksFor3DplusT( 
-    const StringContainer& presortedFilenames, 
+std::list<DicomSeriesReader::StringContainer>
+DicomSeriesReader::SortIntoBlocksFor3DplusT(
+    const StringContainer& presortedFilenames,
     const gdcm::Scanner::MappingType& tagValueMappings,
-    bool /*sort*/, 
+    bool /*sort*/,
     bool& canLoadAs4D )
 {
   std::list<StringContainer> imageBlocks;
 
   // ignore sort request, because most likely re-sorting is now needed due to changes in GetSeries(bug #8022)
   StringContainer sorted_filenames = DicomSeriesReader::SortSeriesSlices(presortedFilenames);
- 
+
   std::string firstPosition;
   unsigned int numberOfBlocks(0); // number of 3D image blocks
 
@@ -368,7 +368,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
        ++fileIter)
   {
     gdcm::Scanner::TagToValue tagToValueMap = tagValueMappings.find( fileIter->c_str() )->second;
-    
+
     if(tagToValueMap.find(tagImagePositionPatient) == tagToValueMap.end())
     {
       // we expect to get images w/ missing position information ONLY as separated blocks.
@@ -376,7 +376,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
       numberOfBlocks = 1;
       break;
     }
-    
+
     std::string position = tagToValueMap.find(tagImagePositionPatient)->second;
     MITK_DEBUG << "  " << *fileIter << " at " << position;
     if (firstPosition.empty())
@@ -419,8 +419,8 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
     }
 
     imageBlocks.push_back(filesOfCurrentBlock);
-    
-    if (block == 0) 
+
+    if (block == 0)
     {
       numberOfExpectedSlices = filesOfCurrentBlock.size();
     }
@@ -472,18 +472,18 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
         - the shift in Y direction that is added with each additional slice is the most important information
         - the Y-shift is calculated in mm world coordinates
       - we apply a shearing transformation to the ITK-read image volume
-        - to do this locally, 
+        - to do this locally,
           - we transform the image volume back to origin and "normal" orientation by applying the inverse of its transform
             (this brings us into the image's "index coordinate" system)
           - we apply a shear with the Y-shift factor put into a unit transform at row 1, col 2
           - we transform the image volume back to its actual position (from index to world coordinates)
       - we lastly apply modify the image spacing in z direction by replacing this number with the correctly calulcated inter-slice distance
   */
-  
+
   ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];
   // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
   transformShear->Shear( 1, 2, factor );
- 
+
   typename TransformType::Pointer imageIndexToWorld = TransformType::New();
   imageIndexToWorld->SetOffset( input->GetOrigin().GetVectorFromOrigin() );
 
@@ -498,15 +498,15 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   indexToWorldMatrix *= scale;
 
   imageIndexToWorld->SetMatrix( indexToWorldMatrix );
-  
+
   typename TransformType::Pointer imageWorldToIndex = TransformType::New();
   imageIndexToWorld->GetInverse( imageWorldToIndex );
-  
+
   typename TransformType::Pointer gantryTiltCorrection = TransformType::New();
   gantryTiltCorrection->Compose( imageWorldToIndex );
   gantryTiltCorrection->Compose( transformShear );
   gantryTiltCorrection->Compose( imageIndexToWorld );
-  
+
   resampler->SetTransform( gantryTiltCorrection );
 
   typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
@@ -519,7 +519,7 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   */
   // TODO use (0028,0120) Pixel Padding Value if present
   resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::min() );
-  
+
   // adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
 
   resampler->SetOutputParametersFromImage( input ); // we basically need the same image again, just sheared
@@ -544,12 +544,12 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
 
     typename ImageType::PointType shiftedOrigin;
     shiftedOrigin = input->GetOrigin();
-   
+
     // add some pixels to make everything fit
     shiftedOrigin[0] -= yDirection[0] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
     shiftedOrigin[1] -= yDirection[1] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
     shiftedOrigin[2] -= yDirection[2] * (tiltInfo.GetTiltCorrectedAdditionalSize() + 1.0 * input->GetSpacing()[1]);
-    
+
     resampler->SetOutputOrigin( shiftedOrigin );
   }
 

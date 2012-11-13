@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-/** 
+/**
  \brief Loading DICOM images as MITK images.
 
  - \ref DicomSeriesReader_purpose
@@ -66,7 +66,7 @@ namespace mitk
 
  DicomSeriesReader serves as a central class for loading DICOM images as mitk::Image.
 
- As the term "DICOM image" covers a huge variety of possible modalities and 
+ As the term "DICOM image" covers a huge variety of possible modalities and
  implementations, and since MITK assumes that 3D images are made up of continuous blocks
  of slices without any gaps or changes in orientation, the loading mechanism must
  implement a number of decisions and compromises.
@@ -89,7 +89,7 @@ namespace mitk
     - image position (0,0,0)
     - image orientation (1,0,0), (0,1,0)
     - such images will always be grouped separately since spatial grouping / sorting makes no sense for them
-  
+
  \b Options
   - images that cover the same piece of space (i.e. position, orientation, and dimensions are equal)
     can be interpreted as time-steps of the same image, i.e. a series will be loaded as 3D+t
@@ -106,7 +106,7 @@ namespace mitk
 
  Loading is then done in two steps:
 
-  1. <b>Group the files into spatial blocks</b> by calling GetSeries(). 
+  1. <b>Group the files into spatial blocks</b> by calling GetSeries().
      This method will sort all passed files into meaningful blocks that
      could fit into an mitk::Image. Sorting for 3D+t loading is optional but default.
      The \b return value of this function is a list of descriptors, which
@@ -118,10 +118,10 @@ namespace mitk
 
   2. <b>Load a sorted set of files</b> by calling LoadDicomSeries().
      This method expects go receive the sorting output of GetSeries().
-     The method will then invoke ITK methods configured with GDCM-IO 
-     classes to actually load the files into memory and put them into 
+     The method will then invoke ITK methods configured with GDCM-IO
+     classes to actually load the files into memory and put them into
      mitk::Images. Again, loading as 3D+t is optional.
- 
+
   Example:
 
 \code
@@ -145,7 +145,7 @@ namespace mitk
 
  The general sorting mechanism (implemented in GetSeries) groups and sorts a set of DICOM files, each assumed to contain a single CT/MR slice.
  In the following we refer to those file groups as "blocks", since this is what they are meant to become when loaded into an mitk::Image.
- 
+
  \subsection DicomSeriesReader_sorting1 Step 1: Avoiding pure non-sense
 
  A first pass separates slices that cannot possibly be loaded together because of restrictions of mitk::Image.
@@ -159,7 +159,7 @@ namespace mitk
    - (0028,0010) Number Of Rows
    - (0028,0011) Number Of Columns
    - (0028,0008) Number Of Frames
- 
+
  \subsection DicomSeriesReader_sorting2 Step 2: Sort slices spatially
 
  Before slices are further analyzed, they are sorted spatially. As implemented by GdcmSortFunction(),
@@ -174,20 +174,20 @@ namespace mitk
  slices that have equal distances between neighboring slices. This is especially necessary because itk::ImageSeriesReader
  is later used for the actual loading, and this class expects (and does nocht verify) equal inter-slice distance (see \ref DicomSeriesReader_whatweknowaboutitk).
 
- To achieve such grouping, the inter-slice distance is calculated from the first two different slice positions of a block. 
+ To achieve such grouping, the inter-slice distance is calculated from the first two different slice positions of a block.
  Following slices are added to a block as long as they can be added by adding the calculated inter-slice distance to the
  last slice of the block. Slices that do not fit into the expected distance pattern, are set aside for further analysis.
  This grouping is done until each file has been assigned to a group.
 
- Slices that share a position in space are also sorted into separate blocks during this step. 
- So the result of this step is a set of blocks that contain only slices with equal z spacing 
+ Slices that share a position in space are also sorted into separate blocks during this step.
+ So the result of this step is a set of blocks that contain only slices with equal z spacing
  and uniqe slices at each position.
 
  \subsection DicomSeriesReader_sorting4 Step 4 (optional): group 3D blocks as 3D+t when possible
 
  This last step depends on an option of GetSeries(). When requested, image blocks from the previous step are merged again
  whenever two blocks occupy the same portion of space (i.e. same origin, number of slices and z-spacing).
- 
+
  \section DicomSeriesReader_gantrytilt Handling of gantry tilt
 
  When CT gantry tilt is used, the gantry plane (= X-Ray source and detector ring) and the vertical plane do not align
@@ -201,7 +201,7 @@ namespace mitk
 \verbatim
 
   without tilt       with tilt
-  
+
     ||||||             //////
     ||||||            //////
 --  |||||| --------- ////// -------- table orientation
@@ -228,7 +228,7 @@ Stacked slices:
   - the plane shift that is ignored by ITK's reader is recreated by applying a shearing transformation using itk::ResampleFilter.
   - the spacing is corrected (it is calculated by ITK's reader from the distance between two origins, which is NOT the slice distance in this special case)
 
- Both errors are introduced in 
+ Both errors are introduced in
  itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
 
  For the correction, we examine two consecutive slices of a series, both described as a pair (origin/orientation):
@@ -240,14 +240,14 @@ Stacked slices:
  The geometry of image stacks with tilted geometries is illustrated below:
   - green: the DICOM images as described by their tags: origin as a point with the line indicating the orientation
   - red: the output of ITK ImageSeriesReader: wrong, larger spacing, no tilt
-  - blue: how much a shear must correct 
+  - blue: how much a shear must correct
 
   \image tilt-correction.jpg
- 
+
  \section DicomSeriesReader_whatweknowaboutitk The actual image loading process
 
- When calling LoadDicomSeries(), this method "mainly" uses an instance of itk::ImageSeriesReader, 
- configured with an itk::GDCMImageIO object. Because DicomSeriesReader works around some of the 
+ When calling LoadDicomSeries(), this method "mainly" uses an instance of itk::ImageSeriesReader,
+ configured with an itk::GDCMImageIO object. Because DicomSeriesReader works around some of the
  behaviors of these classes, the following is a list of features that we find in the code and need to work with:
 
   - itk::ImageSeriesReader::GenerateOutputInformation() does the z-spacing handling
@@ -275,10 +275,10 @@ Stacked slices:
   - (0028,0030) Pixel Spacing and
   - (0018,1164) Imager Pixel Spacing
 
- are evaluated and the pixel spacing is set to the spacing within the patient when tags allow that. 
- The result of pixel spacing interpretation can be read from a property "dicomseriesreader.PixelSpacingInterpretation", 
+ are evaluated and the pixel spacing is set to the spacing within the patient when tags allow that.
+ The result of pixel spacing interpretation can be read from a property "dicomseriesreader.PixelSpacingInterpretation",
  which refers to one of the enumerated values of type PixelSpacingInterpretation;
- 
+
  \section DicomSeriesReader_supportedmodalities Limitations for specific modalities
 
   - <b>Enhanced Computed Tomography / Magnetic Resonance Images</b> are currently NOT supported at all, because we lack general support for multi-frame images.
@@ -291,13 +291,13 @@ Stacked slices:
    - Multi-frame images don't mix well with the curent assumption of "one file - one slice", which is assumed by our code
      - It should be checked how well GDCM and ITK support these files (some load, some don't)
    - Specializations such as the Philips 3D code should be handled in a more generic way. The current handling of Philips 3D images is not nice at all
- 
+
  \section DicomSeriesReader_whynotinitk Why is this not in ITK?
- 
+
   Some of this code would probably be better located in ITK. It is just a matter of resources that this is not the
   case yet. Any attempts into this direction are welcome and can be supported. At least the gantry tilt correction
   should be a simple addition to itk::ImageSeriesReader.
- 
+
  \section DicomSeriesReader_tests Tests regarding DICOM loading
 
  A number of tests have been implemented to check our assumptions regarding DICOM loading. Please see \ref DICOMTesting
@@ -308,12 +308,12 @@ class MITK_CORE_EXPORT DicomSeriesReader
 {
 public:
 
-  /** 
+  /**
     \brief Lists of filenames.
   */
   typedef std::vector<std::string> StringContainer;
 
-  /** 
+  /**
     \brief Interface for the progress callback.
   */
   typedef void (*UpdateCallBackMethod)(float);
@@ -363,16 +363,16 @@ public:
 
       /// A unique ID describing this bloc (enhanced Series Instance UID).
       std::string GetImageBlockUID() const;
-     
+
       /// The Series Instance UID.
       std::string GetSeriesInstanceUID() const;
-      
+
       /// Series Modality (CT, MR, etc.)
       std::string GetModality() const;
-      
+
       /// SOP Class UID as readable string (Computed Tomography Image Storage, Secondary Capture Image Storage, etc.)
       std::string GetSOPClassUIDAsString() const;
-      
+
       /// SOP Class UID as DICOM UID
       std::string GetSOPClassUID() const;
 
@@ -381,7 +381,7 @@ public:
 
       /// Whether or not the block contains a gantry tilt which will be "corrected" during loading
       bool HasGantryTiltCorrected() const;
-      
+
       /// Whether or not mitk::Image spacing relates to the patient
       bool PixelSpacingRelatesToPatient() const;
       /// Whether or not mitk::Image spacing relates to the detector surface
@@ -389,7 +389,7 @@ public:
       /// Whether or not mitk::Image spacing is of unknown origin
       bool PixelSpacingIsUnknown() const;
 
-      /// How the mitk::Image spacing can meaningfully be interpreted. 
+      /// How the mitk::Image spacing can meaningfully be interpreted.
       PixelSpacingInterpretation GetPixelSpacingType() const;
 
       /// 3D+t or not
@@ -411,19 +411,19 @@ public:
 
 
       void SetImageBlockUID(const std::string& uid);
-      
+
       void SetSeriesInstanceUID(const std::string& uid);
-      
+
       void SetModality(const std::string& modality);
-      
+
       void SetNumberOfFrames(const std::string& );
-      
+
       void SetSOPClassUID(const std::string& mediaStorageSOPClassUID);
 
       void SetHasGantryTiltCorrected(bool);
-      
+
       void SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
-      
+
       void SetHasMultipleTimePoints(bool);
 
       void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
@@ -439,7 +439,7 @@ public:
       bool m_HasMultipleTimePoints;
       bool m_IsMultiFrameImage;
   };
-  
+
   typedef std::map<std::string, ImageBlockDescriptor> FileNamesGrouping;
 
   /**
@@ -453,16 +453,16 @@ public:
   /**
    \brief Checks if a specific file contains DICOM data.
   */
-  static 
-  bool 
+  static
+  bool
   IsDicom(const std::string &filename);
 
   /**
    \brief see other GetSeries().
-   
+
    Find all series (and sub-series -- see details) in a particular directory.
   */
-  static FileNamesGrouping GetSeries(const std::string &dir, 
+  static FileNamesGrouping GetSeries(const std::string &dir,
                                    bool groupImagesWithGantryTilt,
                                    const StringContainer &restrictions = StringContainer());
 
@@ -472,9 +472,9 @@ public:
    \warning Untested, could or could not work.
 
    This differs only by having an additional restriction to a single known DICOM series.
-   Internally, it uses the other GetSeries() method. 
+   Internally, it uses the other GetSeries() method.
   */
-  static StringContainer GetSeries(const std::string &dir, 
+  static StringContainer GetSeries(const std::string &dir,
                                    const std::string &series_uid,
                                    bool groupImagesWithGantryTilt,
                                    const StringContainer &restrictions = StringContainer());
@@ -484,38 +484,38 @@ public:
 
    Parse a list of files for images of DICOM series.
    For each series, an enumeration of the files contained in it is created.
-  
+
    \return The resulting maps UID-like keys (based on Series Instance UID and slice properties) to sorted lists of file names.
-  
+
    SeriesInstanceUID will be enhanced to be unique for each set of file names
    that is later loadable as a single mitk::Image. This implies that
    Image orientation, slice thickness, pixel spacing, rows, and columns
    must be the same for each file (i.e. the image slice contained in the file).
-  
+
    If this separation logic requires that a SeriesInstanceUID must be made more specialized,
    it will follow the same logic as itk::GDCMSeriesFileNames to enhance the UID with
    more digits and dots.
-   
+
    Optionally, more tags can be used to separate files into different logical series by setting
    the restrictions parameter.
 
    \warning Adding restrictions is not yet implemented!
    */
   static
-  FileNamesGrouping 
-  GetSeries(const StringContainer& files, 
-            bool sortTo3DPlust, 
+  FileNamesGrouping
+  GetSeries(const StringContainer& files,
+            bool sortTo3DPlust,
             bool groupImagesWithGantryTilt,
             const StringContainer &restrictions = StringContainer());
-  
+
   /**
     \brief See other GetSeries().
 
     Use GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions) instead.
   */
   static
-  FileNamesGrouping 
-  GetSeries(const StringContainer& files, 
+  FileNamesGrouping
+  GetSeries(const StringContainer& files,
             bool groupImagesWithGantryTilt,
             const StringContainer &restrictions = StringContainer());
 
@@ -527,19 +527,19 @@ public:
    \param sort Whether files should be sorted spatially (true) or not (false - maybe useful if presorted)
    \param load4D Whether to load the files as 3D+t (if possible)
   */
-  static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames, 
-                                           bool sort = true, 
-                                           bool load4D = true, 
+  static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames,
+                                           bool sort = true,
+                                           bool load4D = true,
                                            bool correctGantryTilt = true,
                                            UpdateCallBackMethod callback = 0);
 
   /**
     \brief See LoadDicomSeries! Just a slightly different interface.
   */
-  static bool LoadDicomSeries(const StringContainer &filenames, 
-                              DataNode &node, 
-                              bool sort = true, 
-                              bool load4D = true, 
+  static bool LoadDicomSeries(const StringContainer &filenames,
+                              DataNode &node,
+                              bool sort = true,
+                              bool load4D = true,
                               bool correctGantryTilt = true,
                               UpdateCallBackMethod callback = 0);
 
@@ -552,7 +552,7 @@ protected:
     which takes as input a number of images, which are all equally oriented and spatially sorted along their normal direction.
 
     The result contains of two blocks: a first one is the grouping result, all of those images can be loaded
-    into one image block because they have an equal origin-to-origin distance without any gaps in-between. 
+    into one image block because they have an equal origin-to-origin distance without any gaps in-between.
   */
   class SliceGroupingAnalysisResult
   {
@@ -564,12 +564,12 @@ protected:
         \brief Grouping result, all same origin-to-origin distance w/o gaps.
       */
       StringContainer GetBlockFilenames();
-      
+
       /**
         \brief Remaining files, which could not be grouped.
       */
       StringContainer GetUnsortedFilenames();
-  
+
       /**
         \brief Wheter or not the grouped result contain a gantry tilt.
       */
@@ -579,13 +579,13 @@ protected:
         \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
       */
       void AddFileToSortedBlock(const std::string& filename);
-     
+
       /**
         \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
       */
       void AddFileToUnsortedBlock(const std::string& filename);
       void AddFilesToUnsortedBlock(const StringContainer& filenames);
-      
+
       /**
         \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
         \todo Could make sense to enhance this with an instance of GantryTiltInformation to store the whole result!
@@ -598,7 +598,7 @@ protected:
       void UndoPrematureGrouping();
 
     protected:
-      
+
       StringContainer m_GroupedFiles;
       StringContainer m_UnsortedFiles;
 
@@ -645,9 +645,9 @@ protected:
         \param up right/up describe the orientatation of borth slices
         \param numberOfSlicesApart how many slices are the given origins apart (1 for neighboring slices)
       */
-      GantryTiltInformation( const Point3D& origin1, 
+      GantryTiltInformation( const Point3D& origin1,
                              const Point3D& origin2,
-                             const Vector3D& right, 
+                             const Vector3D& right,
                              const Vector3D& up,
                              unsigned int numberOfSlicesApart);
 
@@ -697,7 +697,7 @@ protected:
       /**
         \brief Projection of point p onto line through lineOrigin in direction of lineDirection.
       */
-      Point3D projectPointOnLine( Point3Dd p, Point3Dd lineOrigin, Vector3Dd lineDirection ); 
+      Point3D projectPointOnLine( Point3Dd p, Point3Dd lineOrigin, Vector3Dd lineDirection );
 
       double m_ShiftUp;
       double m_ShiftRight;
@@ -710,7 +710,7 @@ protected:
     \brief for internal sorting.
   */
   typedef std::pair<StringContainer, StringContainer> TwoStringContainers;
- 
+
   /**
     \brief Maps DICOM tags to MITK properties.
   */
@@ -718,26 +718,26 @@ protected:
 
   /**
     \brief Ensure an equal z-spacing for a group of files.
-    
+
     Takes as input a number of images, which are all equally oriented and spatially sorted along their normal direction.
 
     Internally used by GetSeries. Returns two lists: the first one contins slices of equal inter-slice spacing.
     The second list contains remaining files, which need to be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption again.
-    
+
     Relevant code that is matched here is in
     itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
   */
   static
   SliceGroupingAnalysisResult
   AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, bool groupsOfSimilarImages, const gdcm::Scanner::MappingType& tagValueMappings_);
-  
+
   /**
     \brief Safely convert const char* to std::string.
   */
   static
   std::string
   ConstCharStarToString(const char* s);
- 
+
   /**
     \brief Safely convert a string into pixel spacing x and y.
   */
@@ -778,21 +778,21 @@ protected:
 
   /**
     \brief Sort a set of file names in an order that is meaningful for loading them into an mitk::Image.
-   
-    \warning This method assumes that input files are similar in basic properties such as 
-             slice thicknes, image orientation, pixel spacing, rows, columns. 
+
+    \warning This method assumes that input files are similar in basic properties such as
+             slice thicknes, image orientation, pixel spacing, rows, columns.
              It should always be ok to put the result of a call to GetSeries(..) into this method.
-   
+
     Sorting order is determined by
-   
+
      1. image position along its normal (distance from world origin)
      2. acquisition time
-   
+
     If P<n> denotes a position and T<n> denotes a time step, this method will order slices from three timesteps like this:
 \verbatim
   P1T1 P1T2 P1T3 P2T1 P2T2 P2T3 P3T1 P3T2 P3T3
 \endverbatim
-   
+
    */
   static StringContainer SortSeriesSlices(const StringContainer &unsortedFilenames);
 
@@ -801,7 +801,7 @@ public:
    \brief Checks if a specific file is a Philips3D ultrasound DICOM file.
   */
   static bool IsPhilips3DDicom(const std::string &filename);
-  
+
   static std::string ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue );
   static std::string PixelSpacingInterpretationToString( const PixelSpacingInterpretation& enumValue );
 
@@ -811,17 +811,17 @@ protected:
    \brief Read a Philips3D ultrasound DICOM file and put into an mitk::Image.
   */
   static bool ReadPhilips3DDicom(const std::string &filename, mitk::Image::Pointer output_image);
-     
+
   /**
     \brief Construct a UID that takes into account sorting criteria from GetSeries().
   */
   static std::string CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& tagValueMap );
-  
+
   /**
     \brief Helper for CreateMoreUniqueSeriesIdentifier
   */
   static std::string CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagValueMap, const gdcm::Tag& tag );
-  
+
   /**
     \brief Helper for CreateMoreUniqueSeriesIdentifier
   */
@@ -866,8 +866,8 @@ protected:
    \brief Performs actual loading of a series and creates an image having the specified pixel type.
   */
   template <typename PixelType>
-  static 
-  void 
+  static
+  void
   LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback);
 
   /**
@@ -876,8 +876,8 @@ protected:
     \param command can be used for progress reporting
   */
   template <typename PixelType>
-  static 
-  Image::Pointer 
+  static
+  Image::Pointer
   LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command = NULL);
 
   /**
@@ -893,8 +893,8 @@ protected:
 
     \todo We can probably remove this method if we somehow transfer 3D+t information from GetSeries to LoadDicomSeries.
   */
-  static 
-  std::list<StringContainer> 
+  static
+  std::list<StringContainer>
   SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, const gdcm::Scanner::MappingType& tagValueMappings_, bool sort, bool& canLoadAs4D);
 
   /**
@@ -903,8 +903,8 @@ protected:
    Sorts by image position along image normal (distance from world origin).
    In cases of conflict, acquisition time is used as a secondary sort criterium.
   */
-  static 
-  bool 
+  static
+  bool
   GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2);
 
 
@@ -915,7 +915,7 @@ protected:
   */
   static void CopyMetaDataToImageProperties( StringContainer filenames, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image);
   static void CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image);
-  
+
   /**
     \brief Map between DICOM tags and MITK properties.
 

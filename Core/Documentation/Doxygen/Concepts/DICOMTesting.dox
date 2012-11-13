@@ -125,15 +125,12 @@ From test set \b TinyCTAbdomen (see description.txt in this directory for detail
  - single_negative_spacing : from reported bug related to single MR images with misleading spacing information
  - tilted_gantry : slice origins do not align along first slice normal (happens with tilted gantries)
  - interleaved : two volumes of slices with origins along the same line. The volumes' slices interleave in their border region. This test is meant to correctly sort apart the two blocks instead of generating many two-slices groups in the interleaved region.
-
- TODO:
- - sc_image
- - cr_image_no_spacing
- - cr_image_pixelspacing
- - cr_image_imagerpixelspacing
- - cr_image_calibratedspacing
- - dx_image
- - multiframe
+ - CR-MONO1-10-chest-spacing-none : CR image without spacing information - (1.0, 1.0) should be assumed
+ - CR-MONO1-10-chest-spacing-pixelspacing : CR image with only "Pixel Spacing" tag - this should be used as spacing
+ - CR-MONO1-10-chest-spacing-imagerpixelspacing : CR image with only "Imager Pixel Spacing" tag - this should be used as spacing
+ - CR-MONO1-10-chest-spacing-calibrated : CR image with BOTH "Imager Pixel Spacing" and "Pixel Spacing" defined - "Pixel Spacing" should be used
+ - OT-MONO2-8-colon : Secondary Capture image with gray value pixels - should be loaded
+ - OT-PAL-8-face : Secondary Capture image with PALETTE pixel values - can be loaded, but display is not correct yet
 
 From test set \b TiltHead (see description.txt in this directory for details on test images):
  

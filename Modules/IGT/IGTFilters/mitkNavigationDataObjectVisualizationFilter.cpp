@@ -28,6 +28,7 @@ m_RepresentationList(), m_TransformPosition(), m_TransformOrientation()
 mitk::NavigationDataObjectVisualizationFilter::~NavigationDataObjectVisualizationFilter()
 {
   m_RepresentationList.clear();
+  m_OffsetList.clear();
 }
 
 
@@ -47,6 +48,14 @@ const mitk::BaseData* mitk::NavigationDataObjectVisualizationFilter::GetRepresen
   return NULL;
 }
 
+mitk::AffineTransform3D::Pointer mitk::NavigationDataObjectVisualizationFilter::GetOffset(int index)
+{
+  OffsetPointerMap::const_iterator iter = m_OffsetList.find(index);
+  if (iter != m_OffsetList.end())
+    return iter->second;
+  return NULL;
+}
+
 
 void mitk::NavigationDataObjectVisualizationFilter::SetRepresentationObject(unsigned int idx, BaseData* data)
 {
@@ -62,6 +71,11 @@ void mitk::NavigationDataObjectVisualizationFilter::SetRepresentationObject(unsi
   //std::pair<RepresentationPointerMap::iterator, bool> returnEl; //pair for returning the result
   //returnEl = m_RepresentationList.insert( RepresentationPointerMap::value_type(nd, data) ); //insert the given elements
   //return returnEl.second; // return if insert was successful
+}
+
+void mitk::NavigationDataObjectVisualizationFilter::SetOffset(int index, mitk::AffineTransform3D::Pointer offset)
+{
+m_OffsetList[index] = offset;
 }
 
 
@@ -101,6 +115,9 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
       return;
     }
 
+    //check for offset
+    mitk::AffineTransform3D::Pointer offset = this->GetOffset(index);
+
     //store the current scaling to set it after transformation
     mitk::Vector3D spacing = data->GetGeometry()->GetSpacing();
     //clear spacing of data to be able to set it again afterwards
@@ -109,7 +126,6 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
 
     /*now bring quaternion to affineTransform by using vnl_Quaternion*/
     affineTransform->SetIdentity();
-
 
     if (this->GetTransformOrientation(index) == true)
     {
@@ -137,8 +153,22 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
       affineTransform->SetOffset(pos);
     }
     affineTransform->Modified();
+
+
     //set the transform to data
-    data->GetGeometry()->SetIndexToWorldTransform(affineTransform);
+    if(offset.IsNotNull()) //first use offset if there is one.
+      {
+      mitk::AffineTransform3D::Pointer overallTransform = mitk::AffineTransform3D::New();
+      overallTransform->SetIdentity();
+      overallTransform->Compose(offset);
+      overallTransform->Compose(affineTransform);
+      data->GetGeometry()->SetIndexToWorldTransform(overallTransform);
+      }
+    else
+      {
+      data->GetGeometry()->SetIndexToWorldTransform(affineTransform);
+      }
+
     //set the original spacing to keep scaling of the geometrical object
     data->GetGeometry()->SetSpacing(spacing);
     data->GetGeometry()->TransferItkToVtkTransform(); // update VTK Transform for rendering too

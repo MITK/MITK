@@ -83,10 +83,12 @@ void QmitkRegionGrowingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       m_Controls->lblWarning->setVisible( false );
+      m_Controls->m_AdaptiveRGWidget->EnableControls(true);
       m_Controls->m_AdaptiveRGWidget->SetInputImageNode(node);
       return;
     }
   }
 
   m_Controls->lblWarning->setVisible( true );
+  m_Controls->m_AdaptiveRGWidget->EnableControls(false);
 }

@@ -117,6 +117,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="_2">
      <item>
       <widget class="QPushButton" name="m_pbDefineSeedPoint">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="minimumSize">
         <size>
          <width>32</width>
@@ -180,6 +183,9 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QCheckBox" name="m_cbVolumeRendering">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -208,6 +214,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QPushButton" name="m_DecreaseTH">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -234,6 +243,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QPushButton" name="m_IncreaseTH">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -267,6 +279,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QLabel" name="m_SliderValueLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>0</string>
        </property>
@@ -295,6 +310,9 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QPushButton" name="m_pbConfirmSegementation">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="font">
       <font/>
      </property>

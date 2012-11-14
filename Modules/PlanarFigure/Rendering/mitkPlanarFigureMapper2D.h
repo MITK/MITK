@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,10 +32,10 @@ class Contour;
 
 /**
 * \brief OpenGL-based mapper to render display sub-class instances of mitk::PlanarFigure
-* 
+*
 * The appearance of planar figures can be configured through  properties. If no properties are specified,
 * default values will be used. There are four elements a planar figure consists of:
-* 
+*
 * <ol>
 * <li>"line": the main line segments of the planar figure (note: text is drawn in the same style)
 * <li>"helperline": additional line segments of planar figures, such as arrow tips, arches of angles, etc.
@@ -43,9 +43,9 @@ class Contour;
 * <li>"marker": the markers (control points) of a planar figure
 * <li>"markerline": the lines by which markers (control points) are surrounded
 * </ol>
-* 
+*
 * In the following, all appearance-related planar figure properties are listed:
-* 
+*
 * <ol>
 * <li>General properties for the planar figure
 *   <ul>
@@ -109,7 +109,7 @@ class Contour;
 class PlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper2D
 {
 public:
-    
+
   mitkClassMacro(PlanarFigureMapper2D, Mapper2D);
 
   itkNewMacro(Self);
@@ -123,7 +123,7 @@ public:
 
 
 protected:
-  
+
   enum PlanarFigureDisplayMode
   {
     PF_DEFAULT = 0,
@@ -158,34 +158,34 @@ protected:
 
   void PaintPolyLine( mitk::PlanarFigure::PolyLineType vertices,
     bool closed,
-    float* color, 
-    float opacity, 
-    float lineWidth, 
+    float* color,
+    float opacity,
+    float lineWidth,
     Point2D& firstPoint,
-    const Geometry2D* planarFigureGeometry2D, 
-    const Geometry2D* rendererGeometry2D, 
+    const Geometry2D* planarFigureGeometry2D,
+    const Geometry2D* rendererGeometry2D,
     const DisplayGeometry* displayGeometry);
 
-  void DrawMainLines( mitk::PlanarFigure* figure, 
-    float* color, 
-    float opacity, 
+  void DrawMainLines( mitk::PlanarFigure* figure,
+    float* color,
+    float opacity,
     bool drawShadow,
-    float lineWidth, 
+    float lineWidth,
     float shadowWidthFactor,
     Point2D& firstPoint,
-    const Geometry2D* planarFigureGeometry2D, 
-    const Geometry2D* rendererGeometry2D, 
+    const Geometry2D* planarFigureGeometry2D,
+    const Geometry2D* rendererGeometry2D,
     const DisplayGeometry* displayGeometry) ;
 
   void DrawHelperLines( mitk::PlanarFigure* figure,
-    float* color, 
-    float opacity, 
+    float* color,
+    float opacity,
     bool drawShadow,
-    float lineWidth, 
+    float lineWidth,
     float shadowWidthFactor,
     Point2D& firstPoint,
-    const Geometry2D* planarFigureGeometry2D, 
-    const Geometry2D* rendererGeometry2D, 
+    const Geometry2D* planarFigureGeometry2D,
+    const Geometry2D* rendererGeometry2D,
     const DisplayGeometry* displayGeometry) ;
 
   void InitializeDefaultPlanarFigureProperties();
@@ -214,6 +214,7 @@ private:
   bool m_DrawShadow;
   bool m_DrawControlPoints;
   bool m_DrawName;
+  bool m_DrawDashed;
 
   // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;

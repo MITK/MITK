@@ -281,58 +281,91 @@ int testReorientPlanes ()
    slicedgeometry2->SetSliceNavigationController(sliceCtrl2);
 
 
+   // Whats current geometry?
+   MITK_INFO << "center: " << sliceCtrl1->GetCurrentPlaneGeometry()->GetCenter();
+   MITK_INFO << "normal: " << sliceCtrl1->GetCurrentPlaneGeometry()->GetNormal();
+   MITK_INFO << "origin: " << sliceCtrl1->GetCurrentPlaneGeometry()->GetOrigin();
+   MITK_INFO << "axis0 : " << sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(0);
+   MITK_INFO << "aixs1 : " << sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(1);
 
-   // Now reorient slices
-   mitk::Point3D newCenter;
+   //
+   // Now reorient slices (ONE POINT, ONE NORMAL)
+   mitk::Point3D oldCenter, oldOrigin;
+   mitk::Vector3D oldAxis0, oldAxis1;
+   oldCenter = sliceCtrl1->GetCurrentPlaneGeometry()->GetCenter();
+   oldOrigin = sliceCtrl1->GetCurrentPlaneGeometry()->GetOrigin();
+   oldAxis0 = sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(0);
+   oldAxis1 = sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(1);
+
+   mitk::Point3D orientCenter;
+   mitk::Vector3D orientNormal;
+   orientCenter = oldCenter;
+   mitk::FillVector3D(orientNormal, 0.3, 0.1, 0.8);
+   orientNormal.Normalize();
+   sliceCtrl1->ReorientSlices(orientCenter,orientNormal);
+
+   mitk::Point3D newCenter, newOrigin;
+   mitk::Vector3D newNormal;
    newCenter = sliceCtrl1->GetCurrentPlaneGeometry()->GetCenter();
-   mitk::Vector3D newNormal, newAxis, curNormal, curAxis;
-   mitk::FillVector3D(newNormal, 0.0, 0.0, 1.0);
-   mitk::FillVector3D(newAxis, 1.0, 0.0, 0.0);
+   newOrigin = sliceCtrl1->GetCurrentPlaneGeometry()->GetOrigin();
+   newNormal = sliceCtrl1->GetCurrentPlaneGeometry()->GetNormal();
+   newNormal.Normalize();
 
-   sliceCtrl1->ReorientSlices(newCenter,newNormal, newAxis);
-
-
-   curNormal = sliceCtrl1->GetCurrentPlaneGeometry()->GetNormal();
-   curAxis = sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(0);
-   curNormal.Normalize();
-   curAxis.Normalize();
-   MITK_INFO << curNormal;
-   MITK_INFO << curAxis;
+   itk::Index<3> orientCenterIdx;
+   itk::Index<3> newCenterIdx;
+   sliceCtrl1->GetCurrentGeometry3D()->WorldToIndex(orientCenter, orientCenterIdx);
+   sliceCtrl1->GetCurrentGeometry3D()->WorldToIndex(newCenter, newCenterIdx);
 
    if (
-      ( !mitk::Equal(curNormal, newNormal) )  ||
-      ( !mitk::Equal(curAxis, newAxis) )
+      (newCenterIdx != orientCenterIdx)  ||
+      ( !mitk::Equal(orientNormal, newNormal) )
       )
    {
-      MITK_INFO << "Reorient Planes not working as it should";
-      return EXIT_FAILURE;
-   }
-
-   // Now again with different values
-   mitk::FillVector3D(newNormal, 1.0, 0.0, 0.0);
-   mitk::FillVector3D(newAxis, 0.0, 0.0, 1.0);
-   sliceCtrl1->ReorientSlices(newCenter,newNormal, newAxis);
-
-   curNormal = sliceCtrl1->GetCurrentPlaneGeometry()->GetNormal();
-   curAxis = sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(0);
-   curNormal.Normalize();
-   curAxis.Normalize();
-   MITK_INFO << curNormal;
-   MITK_INFO << curAxis;
-
-
-   if (
-      ( !mitk::Equal(curNormal, newNormal) )  ||
-      ( !mitk::Equal(curAxis, newAxis) )
-      )
-   {
-      MITK_INFO << "Reorient Planes not working as it should";
+      MITK_INFO << "Reorient Planes (1 point, 1 vector) not working as it should";
+      MITK_INFO << "orientCenterIdx: " << orientCenterIdx;
+      MITK_INFO << "newCenterIdx: " << newCenterIdx;
+      MITK_INFO << "orientNormal: " << orientNormal;
+      MITK_INFO << "newNormal: " << newNormal;
       return EXIT_FAILURE;
    }
 
 
+   //
+   // Now reorient slices (center, vec0, vec1 )
+   mitk::Vector3D orientAxis0, orientAxis1, newAxis0, newAxis1;
+   mitk::FillVector3D(orientAxis0, 1.0, 0.0, 0.0);
+   mitk::FillVector3D(orientAxis1, 0.0, 1.0, 0.0);
 
+   orientAxis0.Normalize();
+   orientAxis1.Normalize();
 
+   sliceCtrl1->ReorientSlices(orientCenter,orientAxis0, orientAxis1);
+
+   newAxis0 = sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(0);
+   newAxis1 = sliceCtrl1->GetCurrentPlaneGeometry()->GetAxisVector(1);
+   newCenter = sliceCtrl1->GetCurrentPlaneGeometry()->GetCenter();
+
+   newAxis0.Normalize();
+   newAxis1.Normalize();
+
+   sliceCtrl1->GetCurrentGeometry3D()->WorldToIndex(orientCenter, orientCenterIdx);
+   sliceCtrl1->GetCurrentGeometry3D()->WorldToIndex(newCenter, newCenterIdx);
+
+   if (
+       (newCenterIdx != orientCenterIdx) ||
+      ( !mitk::Equal(orientAxis0, newAxis0) )  ||
+      ( !mitk::Equal(orientAxis1, newAxis1) )
+      )
+   {
+      MITK_INFO << "Reorient Planes (point, vec, vec) not working as it should";
+      MITK_INFO << "orientCenterIdx: " << orientCenterIdx;
+      MITK_INFO << "newCenterIdx: " << newCenterIdx;
+      MITK_INFO << "orientAxis0: " << orientAxis0;
+      MITK_INFO << "newAxis0: " << newAxis0;
+      MITK_INFO << "orientAxis1: " << orientAxis1;
+      MITK_INFO << "newAxis1: " << newAxis1;
+      return EXIT_FAILURE;
+   }
 
    return EXIT_SUCCESS;
 }

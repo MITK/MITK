@@ -93,6 +93,8 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
   SliceNavigationController *rotatedPlaneSNC,
   const Point3D &point, bool linked )
 {
+  MITK_WARN << "Deprecated function! Use SliceNavigationController::ReorientSlices() instead";
+
   SliceNavigationController *thirdSNC = NULL;
 
   SNCVector::iterator iter;

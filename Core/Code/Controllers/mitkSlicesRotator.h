@@ -114,9 +114,9 @@ class MITK_CORE_EXPORT SlicesRotator : public SlicesCoordinator
     virtual void SetGeometry(const itk::EventObject& EventObject);
 
     /**
-      \brief NOT USED by anything open-source.
+      \brief NOT USED by anything open-source. Deprecated. Highly obfuscated code. Use SliceNavigationController::ReorientSlices() instead!
+      #Deprecated
 
-      \TODO check if this is actually still needed, with SliceNavigationController::ReorientSlices() now being implemented this could be obsolete!?
      */
     virtual void RotateToPoint( SliceNavigationController *rotationPlaneSNC,
                                 SliceNavigationController *rotatedPlaneSNC,

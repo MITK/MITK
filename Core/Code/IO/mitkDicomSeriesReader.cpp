@@ -1460,7 +1460,7 @@ DicomSeriesReader::CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagVal
   {
     result = IDifyTagValue( tagValueMap[ tag ] ? tagValueMap[ tag ] : std::string("") );
   }
-  catch (std::exception& e)
+  catch (std::exception&)
   {
     // we are happy with even nothing, this will just group images of a series
     //MITK_WARN << "Could not access tag " << tag << ": " << e.what();

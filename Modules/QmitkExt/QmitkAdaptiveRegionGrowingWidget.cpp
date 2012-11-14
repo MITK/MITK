@@ -364,7 +364,7 @@ void QmitkAdaptiveRegionGrowingWidget::RunSegmentation()
           return;
       }
   }
-
+  EnableControls(true); // Segmentation ran successfully, so enable all controls.
   node->SetVisibility(true);
 }
 
@@ -719,11 +719,38 @@ void QmitkAdaptiveRegionGrowingWidget::EnableControls(bool enable)
 
   this->m_Controls.m_RSliderLabelLower->setEnabled(enable);
   this->m_Controls.m_RGSliderLaberUpper->setEnabled(enable);
-  this->m_Controls.m_pbRunSegmentation->setEnabled(enable);
-  this->m_Controls.m_DecreaseTH->setEnabled(enable);
-  this->m_Controls.m_IncreaseTH->setEnabled(enable);
-  this->m_Controls.m_Slider->setEnabled(enable);
-  this->m_Controls.m_pbConfirmSegementation->setEnabled(enable);
+
+  this->m_Controls.m_pbDefineSeedPoint->setEnabled(enable);
+
+  // Check if seed point is already set, if not leave RunSegmentation disabled
+  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
+  if (node.IsNull()) {
+    this->m_Controls.m_pbRunSegmentation->setEnabled(false);
+  }
+  else
+  {
+    this->m_Controls.m_pbRunSegmentation->setEnabled(enable);
+  }
+
+  // Check if a segmentation exists, if not leave segmentation dependent disabled.
+  node = m_DataStorage->GetNamedNode(m_NAMEFORLABLEDSEGMENTATIONIMAGE);
+  if (node.IsNull()) {
+      this->m_Controls.m_DecreaseTH->setEnabled(false);
+      this->m_Controls.m_IncreaseTH->setEnabled(false);
+      this->m_Controls.m_Slider->setEnabled(false);
+      this->m_Controls.m_SliderValueLabel->setEnabled(false);
+      this->m_Controls.m_pbConfirmSegementation->setEnabled(false);
+  }
+  else
+  {
+      this->m_Controls.m_DecreaseTH->setEnabled(enable);
+      this->m_Controls.m_IncreaseTH->setEnabled(enable);
+      this->m_Controls.m_Slider->setEnabled(enable);
+      this->m_Controls.m_SliderValueLabel->setEnabled(enable);
+      this->m_Controls.m_pbConfirmSegementation->setEnabled(enable);
+  }
+
+  this->m_Controls.m_cbVolumeRendering->setEnabled(enable);
 }
 
 void QmitkAdaptiveRegionGrowingWidget::EnableVolumeRendering(bool enable)

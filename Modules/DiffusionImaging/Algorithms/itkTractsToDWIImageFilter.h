@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkVectorImage.h>
 #include <itkImageSource.h>
+#include <itkFFTRealToComplexConjugateImageFilter.h>
+#include <itkFFTComplexConjugateToRealImageFilter.h>
 
 typedef itk::VectorImage< short, 3 > DWIImageType;
 
@@ -49,6 +51,8 @@ public:
     typedef std::vector< DiffusionSignalModel<double>* >    DiffusionModelList;
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
     typedef mitk::DiffusionNoiseModel<double>               NoiseModelType;
+    typedef itk::Image< double, 2 >                         SliceType;
+    typedef itk::FFTRealToComplexConjugateImageFilter< double, 2 >::OutputImageType ComplexSliceType;
 
     itkNewMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
@@ -74,6 +78,8 @@ protected:
     itk::Vector<double, 3> GetItkVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
+    std::vector< DoubleDwiType::Pointer > AddKspaceArtifacts(std::vector< DoubleDwiType::Pointer >& images);
+    ComplexSliceType::Pointer CropSlice(ComplexSliceType::Pointer image, int x, int y);
 
     mitk::Vector3D                      m_Spacing;              ///< output image spacing
     mitk::Point3D                       m_Origin;               ///< output image origin
@@ -84,6 +90,7 @@ protected:
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
+    unsigned int                        m_Undersampling;        ///< undersampling of k-space (introduces gibbs ringing artifacts)
 };
 }
 

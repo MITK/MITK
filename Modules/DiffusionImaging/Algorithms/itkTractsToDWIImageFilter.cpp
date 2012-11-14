@@ -21,13 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
-#include <itkTractDensityImageFilter.h>
-#include <itkStatisticsImageFilter.h>
-#include <itkTractsToVectorImageFilter.h>
+#include <vnl/algo/vnl_fft_2d.h>
+#include <vcl_complex.h>
 
 namespace itk
 {
 TractsToDWIImageFilter::TractsToDWIImageFilter()
+    : m_Undersampling(11)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -39,6 +39,109 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
 TractsToDWIImageFilter::~TractsToDWIImageFilter()
 {
 
+}
+
+std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFilter::AddKspaceArtifacts( std::vector< DoubleDwiType::Pointer >& images )
+{
+    // create slice object
+    SliceType::Pointer slice = SliceType::New();
+    ImageRegion<2> region;
+    region.SetSize(0, images[0]->GetLargestPossibleRegion().GetSize(0));
+    region.SetSize(1, images[0]->GetLargestPossibleRegion().GetSize(1));
+    slice->SetLargestPossibleRegion( region );
+    slice->SetBufferedRegion( region );
+    slice->SetRequestedRegion( region );
+    slice->Allocate();
+
+    std::vector< DoubleDwiType::Pointer > outImages;
+    for (int i=0; i<images.size(); i++)
+    {
+        DoubleDwiType::Pointer image = images.at(i);
+        DoubleDwiType::Pointer newImage = DoubleDwiType::New();
+        newImage->SetSpacing( m_Spacing );
+        newImage->SetOrigin( m_Origin );
+        newImage->SetDirection( m_DirectionMatrix );
+        newImage->SetLargestPossibleRegion( m_ImageRegion );
+        newImage->SetBufferedRegion( m_ImageRegion );
+        newImage->SetRequestedRegion( m_ImageRegion );
+        newImage->SetVectorLength( image->GetVectorLength() );
+        newImage->Allocate();
+
+        for (int g=0; g<image->GetVectorLength(); g++)
+            for (int z=0; z<image->GetLargestPossibleRegion().GetSize(2); z++)
+            {
+                // extract slice from channel g
+                for (int y=0; y<image->GetLargestPossibleRegion().GetSize(1); y++)
+                    for (int x=0; x<image->GetLargestPossibleRegion().GetSize(0); x++)
+                    {
+                        SliceType::IndexType index2D;
+                        index2D[0]=x; index2D[1]=y;
+                        DoubleDwiType::IndexType index3D;
+                        index3D[0]=x; index3D[1]=y; index3D[2]=z;
+
+                        SliceType::PixelType pix2D = image->GetPixel(index3D)[g];
+                        slice->SetPixel(index2D, pix2D);
+                    }
+                // fourier transform slice
+                itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
+                fft->SetInput(slice);
+                fft->Update();
+                ComplexSliceType::Pointer fSlice = fft->GetOutput();
+
+                // crop transformed slice
+                fSlice = CropSlice(fSlice, m_ImageRegion.GetSize()[0]*(m_Undersampling-1)/2, m_ImageRegion.GetSize()[1]*(m_Undersampling-1)/2);
+
+                // inverse fourier transform slice
+                itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::Pointer ifft = itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::New();
+                ifft->SetInput(fSlice);
+                ifft->Update();
+                SliceType::Pointer newSlice = ifft->GetOutput();
+
+                // put slice back into channel g
+                for (int y=0; y<m_ImageRegion.GetSize(1); y++)
+                    for (int x=0; x<m_ImageRegion.GetSize(0); x++)
+                    {
+                        DoubleDwiType::IndexType index3D;
+                        index3D[0]=x; index3D[1]=y; index3D[2]=z;
+                        DoubleDwiType::PixelType pix3D = newImage->GetPixel(index3D);
+
+                        SliceType::IndexType index2D;
+                        index2D[0]=x; index2D[1]=y;
+                        pix3D[g] = newSlice->GetPixel(index2D);
+
+                        newImage->SetPixel(index3D, pix3D);
+                    }
+            }
+        outImages.push_back(newImage);
+    }
+    return outImages;
+}
+
+TractsToDWIImageFilter::ComplexSliceType::Pointer TractsToDWIImageFilter::CropSlice(ComplexSliceType::Pointer image, int x, int y)
+{
+    ImageRegion<2> region = image->GetLargestPossibleRegion();
+    ImageRegion<2> newRegion;
+    newRegion.SetSize(0, region.GetSize(0)-2*x);
+    newRegion.SetSize(1, region.GetSize(1)-2*y);
+
+    ComplexSliceType::Pointer newImage = ComplexSliceType::New();
+    newImage->SetLargestPossibleRegion( newRegion );
+    newImage->SetBufferedRegion( newRegion );
+    newImage->SetRequestedRegion( newRegion );
+    newImage->Allocate();
+    newImage->FillBuffer(0);
+
+    ImageRegionIterator<ComplexSliceType> it(image, region);
+    while(!it.IsAtEnd())
+    {
+        ComplexSliceType::IndexType index = it.GetIndex();
+        index[0] -= x; index[1] -= y;
+        if (newRegion.IsInside(index))
+            newImage->SetPixel(index, image->GetPixel(it.GetIndex()));
+
+        ++it;
+    }
+    return newImage;
 }
 
 void TractsToDWIImageFilter::GenerateData()
@@ -64,6 +167,9 @@ void TractsToDWIImageFilter::GenerateData()
     else
         minSpacing = m_Spacing[2];
 
+    if (m_Undersampling%2!=1)
+        m_Undersampling += 1;
+
     FiberBundleType fiberBundle = m_FiberBundle->GetDeepCopy();
     fiberBundle->DoFiberSmoothing(ceil(10.0*2.0/minSpacing));
 
@@ -87,13 +193,23 @@ void TractsToDWIImageFilter::GenerateData()
     std::vector< DoubleDwiType::Pointer > compartments;
     for (int i=0; i<m_FiberModels.size()+m_NonFiberModels.size(); i++)
     {
+        ImageRegion<3> upsampledRegion;
+        upsampledRegion.SetSize(0, m_ImageRegion.GetSize(0)*m_Undersampling);
+        upsampledRegion.SetSize(1, m_ImageRegion.GetSize(1)*m_Undersampling);
+        upsampledRegion.SetSize(2, m_ImageRegion.GetSize(2));
+
+        mitk::Vector3D spacing;
+        spacing[0] = m_Spacing[0]/m_Undersampling;
+        spacing[1] = m_Spacing[1]/m_Undersampling;
+        spacing[2] = m_Spacing[2];
+
         DoubleDwiType::Pointer doubleDwi = DoubleDwiType::New();
-        doubleDwi->SetSpacing( m_Spacing );
+        doubleDwi->SetSpacing( spacing );
         doubleDwi->SetOrigin( m_Origin );
         doubleDwi->SetDirection( m_DirectionMatrix );
-        doubleDwi->SetLargestPossibleRegion( m_ImageRegion );
-        doubleDwi->SetBufferedRegion( m_ImageRegion );
-        doubleDwi->SetRequestedRegion( m_ImageRegion );
+        doubleDwi->SetLargestPossibleRegion( upsampledRegion );
+        doubleDwi->SetBufferedRegion( upsampledRegion );
+        doubleDwi->SetRequestedRegion( upsampledRegion );
         doubleDwi->SetVectorLength( m_FiberModels[0]->GetNumGradients() );
         doubleDwi->Allocate();
         DoubleDwiType::PixelType pix;
@@ -167,26 +283,24 @@ void TractsToDWIImageFilter::GenerateData()
 
     MITK_INFO << "Generating signal of " << m_NonFiberModels.size() << " non-fiber compartments";
     boost::progress_display disp2(m_ImageRegion.GetNumberOfPixels());
-    for (int k=0; k<m_NonFiberModels.size(); k++)
+    for (int i=0; i<m_NonFiberModels.size(); i++)
     {
         ++disp2;
-        DoubleDwiType::Pointer doubleDwi = compartments.at(k+m_FiberModels.size());
-        typedef ImageRegionIterator<DoubleDwiType>      IteratorType;
-        IteratorType it (doubleDwi, m_ImageRegion);
-        it.GoToBegin();
-
+        DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
+        ImageRegionIterator<DoubleDwiType> it(doubleDwi, m_ImageRegion);
         while(!it.IsAtEnd())
         {
             DoubleDwiType::IndexType index = it.GetIndex();
-            doubleDwi->SetPixel(index, doubleDwi->GetPixel(index) + m_NonFiberModels[k]->SimulateMeasurement());
+            doubleDwi->SetPixel(index, doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement());
             ++it;
         }
     }
 
+    MITK_INFO << "Adding k-space artifacts";
+    compartments = AddKspaceArtifacts(compartments);
+
     MITK_INFO << "Summing signals and adding noise";
-    typedef ImageRegionIterator<DWIImageType>      IteratorOutputType;
-    IteratorOutputType it (outImage, m_ImageRegion);
-    it.GoToBegin();
+    ImageRegionIterator<DWIImageType> it (outImage, m_ImageRegion);
     DoubleDwiType::PixelType signal;
     signal.SetSize(m_FiberModels[0]->GetNumGradients());
 

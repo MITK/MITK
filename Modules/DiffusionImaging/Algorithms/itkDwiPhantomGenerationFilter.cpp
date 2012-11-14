@@ -119,7 +119,7 @@ void DwiPhantomGenerationFilter< TOutputScalarType >::AddNoise(typename OutputIm
     for( unsigned int i=0; i<m_GradientList.size(); i++)
     {
         float signal = pix[i];
-        float val = sqrt(pow(signal + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseVariance),2));
+        float val = sqrt(pow(signal + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance), 2) +  pow(m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance),2));
         pix[i] += val;
     }
 }

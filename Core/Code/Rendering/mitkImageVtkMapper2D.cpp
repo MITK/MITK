@@ -177,6 +177,10 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // and the geometry of the image that is to be rendered.
   if ( !RenderingGeometryIntersectsImage( worldGeometry, input->GetSlicedGeometry() ) )
   {
+    // set image to NULL, to clear the texture in 3D, because
+    // the latest image is used there if the plane is out of the geometry
+    // see bug-13275
+    localStorage->m_ReslicedImage = NULL;
     localStorage->m_Mapper->SetInput( localStorage->m_EmptyPolyData );
     return;
   }
@@ -701,11 +705,11 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       // generate LUT (white to black)
       mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
       vtkLookupTable* bwLut = mitkLut->GetVtkLookupTable();
-      bwLut->SetTableRange (0, 1); 
-      bwLut->SetSaturationRange (0, 0); 
-      bwLut->SetHueRange (0, 0); 
-      bwLut->SetValueRange (1, 0); 
-      bwLut->SetAlphaRange (1, 1); 
+      bwLut->SetTableRange (0, 1);
+      bwLut->SetSaturationRange (0, 0);
+      bwLut->SetHueRange (0, 0);
+      bwLut->SetValueRange (1, 0);
+      bwLut->SetAlphaRange (1, 1);
       bwLut->SetRampToLinear();
       bwLut->Build();
       mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -55,18 +55,18 @@ bool operator==(const mitk::Geometry3D & left, const mitk::Geometry3D & right)
   const mitk::Geometry3D::TransformType::OffsetType & rightoffset = right.GetIndexToWorldTransform()->GetOffset();
   for(i=0;i<3;++i)
     if(mitk::Equal(leftoffset[i],rightoffset[i])==false) return false;
-  
+
   return true;
 }
 
-int compareGeometry(const mitk::Geometry3D & geometry, 
-                 const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& numSlices, 
-                 const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::ScalarType& thicknessInMM, 
+int compareGeometry(const mitk::Geometry3D & geometry,
+                 const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& numSlices,
+                 const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::ScalarType& thicknessInMM,
                  const mitk::Point3D& cornerpoint0, const mitk::Vector3D& right, const mitk::Vector3D& bottom, const mitk::Vector3D& normal)
 {
   std::cout << "Testing width, height and thickness (in units): ";
-  if((mitk::Equal(geometry.GetExtent(0),width)==false) || 
-     (mitk::Equal(geometry.GetExtent(1),height)==false) || 
+  if((mitk::Equal(geometry.GetExtent(0),width)==false) ||
+     (mitk::Equal(geometry.GetExtent(1),height)==false) ||
      (mitk::Equal(geometry.GetExtent(2),numSlices)==false)
     )
   {
@@ -76,8 +76,8 @@ int compareGeometry(const mitk::Geometry3D & geometry,
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm): ";
-  if((mitk::Equal(geometry.GetExtentInMM(0),widthInMM)==false) || 
-     (mitk::Equal(geometry.GetExtentInMM(1),heightInMM)==false) || 
+  if((mitk::Equal(geometry.GetExtentInMM(0),widthInMM)==false) ||
+     (mitk::Equal(geometry.GetExtentInMM(1),heightInMM)==false) ||
      (mitk::Equal(geometry.GetExtentInMM(2),thicknessInMM)==false)
     )
   {
@@ -123,9 +123,9 @@ int compareGeometry(const mitk::Geometry3D & geometry,
   return EXIT_SUCCESS;
 }
 
-int testGeometry(const mitk::Geometry3D * geometry, 
+int testGeometry(const mitk::Geometry3D * geometry,
                  const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& numSlices,
-                 const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::ScalarType& thicknessInMM, 
+                 const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::ScalarType& thicknessInMM,
                  const mitk::Point3D& cornerpoint0, const mitk::Vector3D& right, const mitk::Vector3D& bottom, const mitk::Vector3D& normal)
 {
   int result=EXIT_FAILURE;
@@ -317,8 +317,8 @@ int testReorientPlanes ()
    sliceCtrl1->GetCurrentGeometry3D()->WorldToIndex(newCenter, newCenterIdx);
 
    if (
-      (newCenterIdx != orientCenterIdx)  || 
-      ( !mitk::Equal(orientNormal, newNormal) ) 
+      (newCenterIdx != orientCenterIdx)  ||
+      ( !mitk::Equal(orientNormal, newNormal) )
       )
    {
       MITK_INFO << "Reorient Planes (1 point, 1 vector) not working as it should";
@@ -334,7 +334,7 @@ int testReorientPlanes ()
    // Now reorient slices (center, vec0, vec1 )
    mitk::Vector3D orientAxis0, orientAxis1, newAxis0, newAxis1;
    mitk::FillVector3D(orientAxis0, 1.0, 0.0, 0.0);
-   mitk::FillVector3D(orientAxis1, 0.0, 1.0, 0.0);   
+   mitk::FillVector3D(orientAxis1, 0.0, 1.0, 0.0);
 
    orientAxis0.Normalize();
    orientAxis1.Normalize();
@@ -352,9 +352,9 @@ int testReorientPlanes ()
    sliceCtrl1->GetCurrentGeometry3D()->WorldToIndex(newCenter, newCenterIdx);
 
    if (
-       (newCenterIdx != orientCenterIdx) || 
+       (newCenterIdx != orientCenterIdx) ||
       ( !mitk::Equal(orientAxis0, newAxis0) )  ||
-      ( !mitk::Equal(orientAxis1, newAxis1) ) 
+      ( !mitk::Equal(orientAxis1, newAxis1) )
       )
    {
       MITK_INFO << "Reorient Planes (point, vec, vec) not working as it should";
@@ -491,7 +491,7 @@ int mitkSliceNavigationControllerTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Creating and initializing a PlaneGeometry: ";
   mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
- 
+
   mitk::Point3D origin;
   mitk::Vector3D right, bottom, normal;
   mitk::ScalarType width, height;
@@ -557,7 +557,7 @@ int mitkSliceNavigationControllerTest(int /*argc*/, char* /*argv*/[])
   matrix = vnlmatrix;
   transform->SetMatrix(matrix);
   transform->SetOffset(cornerpoint0.GetVectorFromOrigin());
-  
+
   right.Set_vnl_vector( rotation.rotation_matrix_transpose()*right.Get_vnl_vector() );
   bottom.Set_vnl_vector(rotation.rotation_matrix_transpose()*bottom.Get_vnl_vector());
   normal.Set_vnl_vector(rotation.rotation_matrix_transpose()*normal.Get_vnl_vector());

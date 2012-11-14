@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -82,13 +82,13 @@ mitk::Geometry2D *
 mitk::SlicedGeometry3D::GetGeometry2D( int s ) const
 {
   mitk::Geometry2D::Pointer geometry2D = NULL;
-  
+
   if ( this->IsValidSlice(s) )
   {
     geometry2D = m_Geometry2Ds[s];
 
     // If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored
-    // for the requested slice, and (c) the first slice (s=0) 
+    // for the requested slice, and (c) the first slice (s=0)
     // is a PlaneGeometry instance, then we calculate the geometry of the
     // requested as the plane of the first slice shifted by m_Spacing[2]*s
     // in the direction of m_DirectionVector.
@@ -158,7 +158,7 @@ mitk::SlicedGeometry3D::InitializeSlicedGeometry( unsigned int slices )
 
   Geometry2D::Pointer gnull = NULL;
   m_Geometry2Ds.assign( m_Slices, gnull );
- 
+
   Vector3D spacing;
   spacing.Fill( 1.0 );
   this->SetSpacing( spacing );
@@ -167,7 +167,7 @@ mitk::SlicedGeometry3D::InitializeSlicedGeometry( unsigned int slices )
 }
 
 
-void 
+void
 mitk::SlicedGeometry3D::InitializeEvenlySpaced(
   mitk::Geometry2D* geometry2D, unsigned int slices, bool flipped )
 {
@@ -268,7 +268,7 @@ mitk::SlicedGeometry3D::InitializePlanes(
   bool top, bool frontside, bool rotated )
 {
   m_ReferenceGeometry = const_cast< Geometry3D * >( geometry3D );
-  
+
   PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
   planeGeometry->InitializeStandardPlane(
     geometry3D, top, planeorientation, frontside, rotated );
@@ -315,7 +315,7 @@ mitk::SlicedGeometry3D::InitializePlanes(
   }
 
   bool flipped = (top == false);
-  
+
   if ( frontside == false )
   {
     flipped = !flipped;
@@ -340,7 +340,7 @@ mitk::SlicedGeometry3D
   }
 
   // Get first plane of plane stack
-  PlaneGeometry *firstPlane = 
+  PlaneGeometry *firstPlane =
     dynamic_cast< PlaneGeometry * >( m_Geometry2Ds[0].GetPointer() );
 
   // If plane stack is empty, exit
@@ -367,7 +367,7 @@ mitk::SlicedGeometry3D
 
   Superclass::SetSpacing( spacing );
 
-  
+
   // Now we need to calculate the number of slices in the plane's normal
   // direction, so that the entire volume is covered. This is done by first
   // calculating the dot product between the volume diagonal (the maximum
@@ -393,7 +393,7 @@ mitk::SlicedGeometry3D
   // difference between this distance and half of the new extent.
   double centerOfRotationDistance =
     firstPlane->SignedDistanceFromPlane( center );
-    
+
   if ( centerOfRotationDistance > 0 )
   {
     firstPlane->SetOrigin( firstPlane->GetOrigin()
@@ -424,7 +424,7 @@ mitk::SlicedGeometry3D
   firstPlane->SetOrigin(
     firstPlane->GetOrigin() + normal * alignmentValue * spacing[2] );
 
-  
+
   // Finally, we can clear the previous geometry stack and initialize it with
   // our re-initialized "first plane".
   m_Geometry2Ds.assign( m_Slices, Geometry2D::Pointer( NULL ) );
@@ -472,12 +472,12 @@ double mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D spacing, c
   return ( sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] ) / scaling );
 }
 
-mitk::Vector3D 
+mitk::Vector3D
 mitk::SlicedGeometry3D::AdjustNormal( const mitk::Vector3D &normal ) const
 {
   Geometry3D::TransformType::Pointer inverse = Geometry3D::TransformType::New();
   m_ReferenceGeometry->GetIndexToWorldTransform()->GetInverse( inverse );
-  
+
   Vector3D transformedNormal = inverse->TransformVector( normal );
 
   transformedNormal.Normalize();
@@ -491,7 +491,7 @@ mitk::SlicedGeometry3D::SetImageGeometry( const bool isAnImageGeometry )
   Superclass::SetImageGeometry( isAnImageGeometry );
 
   mitk::Geometry3D* geometry;
-  
+
   unsigned int s;
   for ( s = 0; s < m_Slices; ++s )
   {
@@ -507,7 +507,7 @@ void
 mitk::SlicedGeometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
 {
   mitk::Geometry3D* geometry;
-  
+
   unsigned int s;
   for ( s = 0; s < m_Slices; ++s )
   {
@@ -517,7 +517,7 @@ mitk::SlicedGeometry3D::ChangeImageGeometryConsideringOriginOffset( const bool i
       geometry->ChangeImageGeometryConsideringOriginOffset( isAnImageGeometry );
     }
   }
-  
+
   Superclass::ChangeImageGeometryConsideringOriginOffset( isAnImageGeometry );
 }
 
@@ -641,7 +641,7 @@ mitk::SlicedGeometry3D::SetEvenlySpaced(bool on)
 
 void
 mitk::SlicedGeometry3D
-::SetDirectionVector( const mitk::Vector3D& directionVector ) 
+::SetDirectionVector( const mitk::Vector3D& directionVector )
 {
    Vector3D newDir = directionVector;
    newDir.Normalize();
@@ -708,7 +708,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
   {
   case OpNOTHING:
     break;
-  
+
   case OpROTATE:
     if ( m_EvenlySpaced )
     {
@@ -717,14 +717,14 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       {
         // Clear all generated geometries and then rotate only the first slice.
         // The other slices will be re-generated on demand
-        
+
         // Save first slice
         Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
 
         RotationOperation *rotOp = dynamic_cast< RotationOperation * >( operation );
 
         // Generate a RotationOperation using the dataset center instead of
-        // the supplied rotation center. This is necessary so that the rotated 
+        // the supplied rotation center. This is necessary so that the rotated
         // zero-plane does not shift away. The supplied center is instead used
         // to adjust the slice stack afterwards.
         Point3D center = m_ReferenceGeometry->GetCenter();
@@ -740,7 +740,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         geometry2D->ExecuteOperation( &centeredRotation );
 
         // Clear the slice stack and adjust it according to the center of
-        // the dataset and the supplied rotation center (see documentation of 
+        // the dataset and the supplied rotation center (see documentation of
         // ReinitializePlanes)
         this->ReinitializePlanes( center, rotOp->GetCenterOfRotation() );
 
@@ -757,7 +757,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       }
       else
       {
-        // we also have to consider the case, that there is no reference geometry available.      
+        // we also have to consider the case, that there is no reference geometry available.
         if ( m_Geometry2Ds.size() > 0 )
         {
            // Reach through to all slices in my container
@@ -767,7 +767,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
            {
               (*iter)->ExecuteOperation(operation);
            }
-      
+
           // rotate overall geometry
           RotationOperation *rotOp = dynamic_cast< RotationOperation * >( operation );
           Geometry3D::ExecuteOperation( rotOp);
@@ -795,9 +795,9 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
 
       // Get first slice
       Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
-      PlaneGeometry *planeGeometry = dynamic_cast< PlaneGeometry * >( 
+      PlaneGeometry *planeGeometry = dynamic_cast< PlaneGeometry * >(
         geometry2D.GetPointer() );
-     
+
       // Need a PlaneGeometry, a PlaneOperation and a reference frame to
       // carry out the re-orientation. If not all avaialble, stop here
       if ( !m_ReferenceGeometry || !planeGeometry || !planeOp )
@@ -805,7 +805,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          break;
       }
 
-      // General Behavior:         
+      // General Behavior:
       // Clear all generated geometries and then rotate only the first slice.
       // The other slices will be re-generated on demand
 
@@ -831,12 +831,11 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       newNormal.Normalize();
       float rotationAngle = angle(currentNormal.Get_vnl_vector(),newNormal.Get_vnl_vector());
 
-      //MITK_INFO << rotationAngle;
       rotationAngle *= 180.0 / vnl_math::pi; // from rad to deg
       Vector3D rotationAxis = itk::CrossProduct( currentNormal, newNormal );
       if (abs(rotationAngle-180) < mitk::eps )
       {
-         // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0). 
+         // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0).
          // Rotation Axis should be ANY vector that is 90° to current Normal
          mitk::Vector3D helpNormal;
          helpNormal = currentNormal;
@@ -855,26 +854,26 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          );
 
       // Rotate first slice
-      //MITK_INFO << "geometry2DMatrix before OP: " << geometry2D->GetMatrixColumn(0); 
-      //MITK_INFO << "opCenter: " << center << " opRotAxis: " << rotationAxis << "opRotAngle: " << rotationAngle;
       geometry2D->ExecuteOperation( &centeredRotation );
-      //MITK_INFO << "geometry2DMatrix after OP: " << geometry2D->GetMatrixColumn(0);
 
-      // Clear the slice stack and adjust it according to the center of
-      // rotation and plane position (see documentation of ReinitializePlanes)
-      this->ReinitializePlanes( center, planeOp->GetPoint() );
-      //MITK_INFO << "geometry2DMatrix after initPlanes: " << geometry2D->GetMatrixColumn(0);
-
-      if ( m_SliceNavigationController )
+      // Reinitialize planes and select slice, if my rotations are all done.
+      if (!planeOp->AreAxisDefined())
       {
-         m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
-         m_SliceNavigationController->AdjustSliceStepperRange();
+         // Clear the slice stack and adjust it according to the center of
+         // rotation and plane position (see documentation of ReinitializePlanes)
+         this->ReinitializePlanes( center, planeOp->GetPoint() );
+
+         if ( m_SliceNavigationController )
+         {
+            m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
+            m_SliceNavigationController->AdjustSliceStepperRange();
+         }
       }
 
       // Also apply rotation on the slicedGeometry - Geometry3D (Bounding geometry)
       Geometry3D::ExecuteOperation( &centeredRotation );
 
-      // 
+      //
       // 2nd step. If axis vectors were defined, rotate the plane around its normal to fit these
       //
 
@@ -882,7 +881,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       {
          mitk::Vector3D vecAxixNew = planeOp->GetAxisVec0();
          vecAxixNew.Normalize();
-         mitk::Vector3D VecAxisCurr = geometry2D->GetAxisVector(0);           
+         mitk::Vector3D VecAxisCurr = geometry2D->GetAxisVector(0);
          VecAxisCurr.Normalize();
 
          float rotationAngle = angle(VecAxisCurr.Get_vnl_vector(),vecAxixNew.Get_vnl_vector());
@@ -895,13 +894,13 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          rotationAxis = itk::CrossProduct( VecAxisCurr, vecAxixNew  );
          if (abs(rotationAngle-180) < mitk::eps )
          {
-            // current axisVec and desired axisVec are not linear independent!!(e.g 1,0,0 and -1,0,0). 
+            // current axisVec and desired axisVec are not linear independent!!(e.g 1,0,0 and -1,0,0).
             // Rotation Axis can be just plane Normal. (have to rotate by 180°)
             rotationAxis = newNormal;
          }
 
          // Perfom Rotation
-         mitk::RotationOperation op(mitk::OpROTATE, center, rotationAxis, rotationAngle);   
+         mitk::RotationOperation op(mitk::OpROTATE, center, rotationAxis, rotationAngle);
          geometry2D->ExecuteOperation( &op );
 
          // Apply changes on first slice to whole slice stack
@@ -948,7 +947,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // The other slices will be re-generated on demand
 
         // Rotate first slice
-        geometry2D->ExecuteOperation( restorePlaneOp ); 
+        geometry2D->ExecuteOperation( restorePlaneOp );
 
         m_DirectionVector = restorePlaneOp->GetDirectionVector();
 

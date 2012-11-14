@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,10 +47,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-SliceNavigationController::SliceNavigationController( const char *type ) 
+SliceNavigationController::SliceNavigationController( const char *type )
 : BaseController( type ),
   m_InputWorldGeometry( NULL ),
-  m_CreatedWorldGeometry( NULL ), 
+  m_CreatedWorldGeometry( NULL ),
   m_ViewDirection( Axial ),
   m_DefaultViewDirection( Axial ),
   m_RenderingManager( NULL ),
@@ -77,7 +77,7 @@ SliceNavigationController::SliceNavigationController( const char *type )
 
   m_Slice->AddObserver( itk::ModifiedEvent(), sliceStepperChangedCommand );
   m_Time->AddObserver( itk::ModifiedEvent(), timeStepperChangedCommand );
-  
+
   m_Slice->SetUnitName( "mm" );
   m_Time->SetUnitName( "ms" );
 
@@ -149,7 +149,7 @@ void SliceNavigationController::Update()
       this->Update( m_ViewDirection );
     }
   }
-} 
+}
 
 void
 SliceNavigationController::Update(
@@ -160,8 +160,8 @@ SliceNavigationController::Update(
     dynamic_cast< const TimeSlicedGeometry * >(
       m_InputWorldGeometry.GetPointer() );
 
-  if( m_BlockUpdate || 
-      m_InputWorldGeometry.IsNull() || 
+  if( m_BlockUpdate ||
+      m_InputWorldGeometry.IsNull() ||
       ( (worldTimeSlicedGeometry != NULL) && (worldTimeSlicedGeometry->GetTimeSteps() == 0) )
     )
   {
@@ -186,7 +186,7 @@ SliceNavigationController::Update(
 
     // initialize the viewplane
     SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
-    
+
     m_CreatedWorldGeometry = NULL;
     switch ( viewDirection )
     {
@@ -248,7 +248,7 @@ SliceNavigationController::Update(
 
     m_Slice->SetPos( 0 );
     m_Slice->SetSteps( (int)slicedWorldGeometry->GetSlices() );
-  
+
     if ( m_CreatedWorldGeometry.IsNull() )
     {
       // initialize TimeSlicedGeometry
@@ -412,7 +412,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
       mitk::Geometry2D *plane = slicedWorldGeometry->GetGeometry2D( 0 );
 
       const Vector3D &direction = slicedWorldGeometry->GetDirectionVector();
-      
+
       Point3D projectedPoint;
       plane->Project( point, projectedPoint );
 
@@ -456,7 +456,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
 
 
 void
-SliceNavigationController::ReorientSlices( const Point3D &point, 
+SliceNavigationController::ReorientSlices( const Point3D &point,
   const Vector3D &normal )
 {
   PlaneOperation op( OpORIENT, point, normal );
@@ -502,13 +502,13 @@ SliceNavigationController::GetCurrentGeometry3D()
 const mitk::PlaneGeometry *
 SliceNavigationController::GetCurrentPlaneGeometry()
 {
-  const mitk::SlicedGeometry3D *slicedGeometry = 
+  const mitk::SlicedGeometry3D *slicedGeometry =
     dynamic_cast< const mitk::SlicedGeometry3D * >
       ( this->GetCurrentGeometry3D() );
 
   if ( slicedGeometry )
   {
-    const mitk::PlaneGeometry *planeGeometry = 
+    const mitk::PlaneGeometry *planeGeometry =
       dynamic_cast< mitk::PlaneGeometry * >
         ( slicedGeometry->GetGeometry2D(this->GetSlice()->GetPos()) );
     return planeGeometry;
@@ -520,7 +520,7 @@ SliceNavigationController::GetCurrentPlaneGeometry()
 }
 
 
-void 
+void
 SliceNavigationController::SetRenderer( BaseRenderer *renderer )
 {
   m_Renderer = renderer;
@@ -537,7 +537,7 @@ SliceNavigationController::GetRenderer() const
 void
 SliceNavigationController::AdjustSliceStepperRange()
 {
-  const mitk::SlicedGeometry3D *slicedGeometry = 
+  const mitk::SlicedGeometry3D *slicedGeometry =
     dynamic_cast< const mitk::SlicedGeometry3D * >
       ( this->GetCurrentGeometry3D() );
 
@@ -576,7 +576,7 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
   {
     return;
   }
-  
+
   switch ( operation->GetOperationType() )
   {
     case OpMOVE: // should be a point operation
@@ -650,14 +650,14 @@ SliceNavigationController
             if(baseRenderer == m_Renderer)
             {
               {
-                std::string statusText;     
+                std::string statusText;
                 TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
 
                 mitk::DataStorage::SetOfObjects::ConstPointer nodes = baseRenderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
                 mitk::Point3D worldposition = posEvent->GetWorldPosition();
                 int  maxlayer = -32768;
                 mitk::Image::Pointer image3D;
-                // find image with largest layer, that is the image shown on top in the render window 
+                // find image with largest layer, that is the image shown on top in the render window
                 for (unsigned int x = 0; x < nodes->size(); x++)
                 {
                   //Just consider image data that is no helper object. E.g. do not consider nodes created for the slice interpolation
@@ -682,7 +682,7 @@ SliceNavigationController
                 std::stringstream stream;
                 stream.imbue(std::locale::classic());
 
-                // get the position and gray value from the image and build up status bar text                
+                // get the position and gray value from the image and build up status bar text
                 if(image3D.IsNotNull())
                 {
                   Index3D p;
@@ -705,9 +705,9 @@ SliceNavigationController
                   stream << "No image information at this position!";
                 }
 
-                statusText = stream.str(); 
+                statusText = stream.str();
                 mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-             
+
               }
 
             }
@@ -720,7 +720,7 @@ SliceNavigationController
       break;
     }
     return ok;
-  } 
+  }
 
   const DisplayPositionEvent *displPosEvent =
     dynamic_cast< const DisplayPositionEvent * >( stateEvent->GetEvent() );

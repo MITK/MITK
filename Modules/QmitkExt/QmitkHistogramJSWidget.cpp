@@ -39,6 +39,7 @@ QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
 void QmitkHistogramJSWidget::addJSObject()
 {
   page()->mainFrame()->addToJavaScriptWindowObject(QString("histogramData"), this);
+  this->clearData();
 }
 
 
@@ -51,11 +52,13 @@ void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
 
 void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
 {
-  this->clearData();
+  //this->clearData();
   m_Histogram = histogram;
   HistogramConstIteratorType startIt = m_Histogram->End();
   HistogramConstIteratorType endIt = m_Histogram->End();
   HistogramConstIteratorType it;
+  m_Frequency.clear();
+  m_Measurement.clear();
   unsigned int i = 0;
   for (it = m_Histogram->Begin() ; it != m_Histogram->End(); ++it, ++i)
   {
@@ -65,19 +68,21 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
     m_Measurement.insert(i, measurement);
   }
 
-  this->reload();
+  this->DataChanged();
 }
 
 void QmitkHistogramJSWidget::clearData()
 {
   m_Frequency.clear();
   m_Measurement.clear();
+  m_Frequency.insert(0,0);
+  m_Measurement.insert(0,0);
 }
 
 void QmitkHistogramJSWidget::clearHistogram()
 {
   this->clearData();
-  this->reload();
+  this->DataChanged();
 }
 
 QList<QVariant> QmitkHistogramJSWidget::getFrequency()

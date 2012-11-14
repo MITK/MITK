@@ -57,6 +57,14 @@ cl_context OclResourceServiceImpl::GetContext() const
 
 cl_command_queue OclResourceServiceImpl::GetCommandQueue() const
 {
+  // check if queue valid
+  cl_int clErr = clGetCommandQueueInfo( m_CommandQueue, CL_QUEUE_CONTEXT, NULL, NULL, NULL );
+  if( clErr != CL_SUCCESS )
+  {
+    MITK_WARN << "Have no valid command queue. Query returned : " << GetOclErrorString( clErr );
+    return NULL;
+  }
+
   return this->m_CommandQueue;
 }
 

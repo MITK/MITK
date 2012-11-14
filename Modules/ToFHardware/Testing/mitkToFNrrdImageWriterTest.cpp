@@ -39,9 +39,9 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
   unsigned int pixelNumber = dimX*dimY;
   unsigned int numOfFrames = 23; //or numberOfSlices
   ////create 3 images filled with random values
-  mitk::Image::Pointer distanceImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 1.0f, 1.0f);
-  mitk::Image::Pointer amplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 0.0f, 2000.0f);
-  mitk::Image::Pointer intensityImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,0, 0.0f, 100000.0f);
+  mitk::Image::Pointer distanceImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,1.0, 1.0f, 1.0f);
+  mitk::Image::Pointer amplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,1.0, 1.0f, 2000.0f);
+  mitk::Image::Pointer intensityImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,1.0, 1.0f, 100000.0f);
 
   //SET NEEDED PARAMETER
   //file names on the disc

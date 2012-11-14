@@ -831,7 +831,6 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       newNormal.Normalize();
       float rotationAngle = angle(currentNormal.Get_vnl_vector(),newNormal.Get_vnl_vector());
 
-      //MITK_INFO << rotationAngle;
       rotationAngle *= 180.0 / vnl_math::pi; // from rad to deg
       Vector3D rotationAxis = itk::CrossProduct( currentNormal, newNormal );
       if (abs(rotationAngle-180) < mitk::eps )
@@ -855,20 +854,20 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          );
 
       // Rotate first slice
-      //MITK_INFO << "geometry2DMatrix before OP: " << geometry2D->GetMatrixColumn(0);
-      //MITK_INFO << "opCenter: " << center << " opRotAxis: " << rotationAxis << "opRotAngle: " << rotationAngle;
       geometry2D->ExecuteOperation( &centeredRotation );
-      //MITK_INFO << "geometry2DMatrix after OP: " << geometry2D->GetMatrixColumn(0);
 
-      // Clear the slice stack and adjust it according to the center of
-      // rotation and plane position (see documentation of ReinitializePlanes)
-      this->ReinitializePlanes( center, planeOp->GetPoint() );
-      //MITK_INFO << "geometry2DMatrix after initPlanes: " << geometry2D->GetMatrixColumn(0);
-
-      if ( m_SliceNavigationController )
+      // Reinitialize planes and select slice, if my rotations are all done.
+      if (!planeOp->AreAxisDefined())
       {
-         m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
-         m_SliceNavigationController->AdjustSliceStepperRange();
+         // Clear the slice stack and adjust it according to the center of
+         // rotation and plane position (see documentation of ReinitializePlanes)
+         this->ReinitializePlanes( center, planeOp->GetPoint() );
+
+         if ( m_SliceNavigationController )
+         {
+            m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
+            m_SliceNavigationController->AdjustSliceStepperRange();
+         }
       }
 
       // Also apply rotation on the slicedGeometry - Geometry3D (Bounding geometry)

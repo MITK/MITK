@@ -354,7 +354,7 @@ public:
     of this class. Relevant descriptive properties can be used to provide
     the application user with meaningful choices.
   */
-  class ImageBlockDescriptor
+  class MITK_CORE_EXPORT ImageBlockDescriptor
   {
     public:
 

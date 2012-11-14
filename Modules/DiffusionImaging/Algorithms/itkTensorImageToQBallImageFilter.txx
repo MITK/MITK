@@ -126,6 +126,6 @@ namespace itk
     {
       this->UpdateProgress (1.0);
     }
-    //MITK_INFO << "one thread finished Q-Ball estimation";
+    MITK_INFO << "one thread finished Q-Ball estimation";
   }
 } // end of namespace

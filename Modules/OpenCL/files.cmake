@@ -5,4 +5,7 @@ set(CPP_FILES
   mitkOpenCLActivator.cpp
   mitkOclBaseData.cpp
   mitkOclImage.cpp
+  mitkOclFilter.cpp
+  mitkOclImageFilter.cpp
+  mitkOclImageToImageFilter.cpp
 )

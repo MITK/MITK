@@ -599,18 +599,23 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   pointSet->ExecuteOperation(&op5);
   mitkPointSetTestClass::TestPointContainerPointDataContainer(pointSet);
 
+
+
+  pointSet = mitk::PointSet::New();
   pointSet->Expand(3);
   mitk::Point3D new0, new1, new2;
   new0.Fill(0);
   new1.Fill(1);
   new2.Fill(2);
-  pointSet->InsertPoint(0,new0,1);
+  pointSet->InsertPoint(0,new0,0);
+  pointSet->InsertPoint(1,new1,0);
+  pointSet->InsertPoint(2,new2,0);
+  pointSet->InsertPoint(2,new0,1);
   pointSet->InsertPoint(1,new1,1);
-  pointSet->InsertPoint(2,new2,1);
-  pointSet->InsertPoint(2,new0,2);
-  pointSet->InsertPoint(1,new1,2);
-  pointSet->InsertPoint(0,new2,2);
-
+  pointSet->InsertPoint(0,new2,1);
+  pointSet->InsertPoint(0,new0,2);
+  pointSet->InsertPoint(2,new1,2);
+  pointSet->InsertPoint(1,new2,2);
 
   MITK_INFO << "... pointset ts: " << pointSet->GetTimeSteps();
   mitk::PointSet::Pointer clonePS = pointSet->Clone();

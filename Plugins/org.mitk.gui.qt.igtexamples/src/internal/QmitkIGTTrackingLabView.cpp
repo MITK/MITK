@@ -77,9 +77,7 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
 
-  m_ToolBox = new QToolBox(parent);
-  m_Controls.m_VBoxLayout->addWidget(m_ToolBox);
-
+  m_ToolBox = m_Controls.m_ToolBox;
 
   this->CreateBundleWidgets( parent );
   this->CreateConnections();
@@ -88,46 +86,30 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
 
 void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
 {
-    // configuration widget
-  m_NDIConfigWidget = new QmitkNDIConfigurationWidget(parent);
-  m_NDIConfigWidget->SetToolTypes(QStringList () << "Instrument" << "Fiducial" << "Skinmarker" << "Unknown" );
+  //initialize configuration widget
+  //m_NDIConfigWidget = m_Controls.m_NDIConfigWidget;
+  //m_NDIConfigWidget->SetToolTypes(QStringList () << "Instrument" << "Fiducial" << "Skinmarker" << "Unknown" );
 
-  m_ToolBox->addItem(m_NDIConfigWidget, "Configuration");
-
-
-  // registration widget
-  m_RegistrationWidget = new QmitkFiducialRegistrationWidget(parent);
+  //initialize registration widget
+  m_RegistrationWidget = m_Controls.m_RegistrationWidget;
   m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
   m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
   m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
 
-  m_ToolBox->addItem(m_RegistrationWidget, "Initial Registration");
+  //create widget for pointset recording
+  m_Controls.m_PointSetRecordingLayout->addWidget(this->CreatePointSetRecordingWidget(parent));
 
-  // permanent registration widget
-  m_PermanentRegistrationToolSelectionWidget = new QmitkToolSelectionWidget(parent);
-  m_PermanentRegistrationToolSelectionWidget->SetCheckboxtText("Use this tool for permanent registration");
-
-  m_ToolBox->addItem(m_PermanentRegistrationToolSelectionWidget, "Permanent Registration");
-
-  // pointset recording
-  m_ToolBox->addItem(this->CreatePointSetRecordingWidget(parent), "PointSet Recording");
-
-  // virtual view
-  m_VirtualViewToolSelectionWidget = new QmitkToolSelectionWidget(parent);
+  //initialize virtual view tab
+  m_VirtualViewToolSelectionWidget = m_Controls.m_VirtualViewToolSelectionWidget;
   m_VirtualViewToolSelectionWidget->SetCheckboxtText("Enable Virtual Camera");
 
-  m_ToolBox->addItem(m_VirtualViewToolSelectionWidget, "Virtual Camera");
+  //initialize tracking status widget
+  m_ToolStatusWidget = m_Controls.m_ToolStatusWidget;
 
-  // tracking status
-  m_ToolStatusWidget = new QmitkToolTrackingStatusWidget( parent );
-  m_Controls.m_VBoxLayout->addWidget(m_ToolStatusWidget);
-
-  // update timer
-  m_RenderingTimerWidget = new QmitkUpdateTimerWidget( parent );
+  //initialize update timer
+  m_RenderingTimerWidget = m_Controls.m_RenderingTimerWidget;
   m_RenderingTimerWidget->SetPurposeLabelText(QString("Navigation"));
   m_RenderingTimerWidget->SetTimerInterval( 50 );  // set rendering timer at 20Hz (updating every 50msec)
-
-  m_Controls.m_VBoxLayout->addWidget(m_RenderingTimerWidget);
 }
 
 
@@ -136,12 +118,20 @@ void QmitkIGTTrackingLabView::CreateConnections()
   connect( m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnToolBoxCurrentChanged(int)) );
 
   //connect( m_NDIConfigWidget, SIGNAL(Connected()), m_RenderingTimerWidget, SLOT(EnableWidget()) );
-  connect( m_NDIConfigWidget, SIGNAL(Disconnected()), this, SLOT(OnTrackerDisconnected()) );
+  /*connect( m_NDIConfigWidget, SIGNAL(Disconnected()), this, SLOT(OnTrackerDisconnected()) );
   connect( m_NDIConfigWidget, SIGNAL(Connected()), this, SLOT(OnSetupNavigation()) );
   connect( m_NDIConfigWidget, SIGNAL(SignalToolNameChanged(int, QString)), this, SLOT(OnChangeToolName(int, QString)) );
   connect( m_NDIConfigWidget, SIGNAL(SignalLoadTool(int, mitk::DataNode::Pointer)), this, SLOT(OnToolLoaded(int, mitk::DataNode::Pointer)) );
   connect( m_NDIConfigWidget, SIGNAL(ToolsAdded(QStringList)), this, SLOT(OnToolsAdded(QStringList)) );
-  connect( m_NDIConfigWidget, SIGNAL(RepresentationChanged( int ,mitk::Surface::Pointer )), this, SLOT(ChangeToolRepresentation( int, mitk::Surface::Pointer )));
+  connect( m_NDIConfigWidget, SIGNAL(RepresentationChanged( int ,mitk::Surface::Pointer )), this, SLOT(ChangeToolRepresentation( int, mitk::Surface::Pointer )));*/
+  connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), m_RenderingTimerWidget, SLOT(EnableWidget()) );
+  connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), this, SLOT(OnSetupNavigation()) );
+
+  connect( m_Controls.m_UseAsPointerButton, SIGNAL(clicked()), this, SLOT(OnInstrumentSelected()) );
+  connect( m_Controls.m_UseAsObjectmarkerButton, SIGNAL(clicked()), this, SLOT(OnObjectmarkerSelected()) );
+
+
+
 
   connect( m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
   connect( m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnRegisterFiducials()) );
@@ -149,9 +139,8 @@ void QmitkIGTTrackingLabView::CreateConnections()
   connect( m_RenderingTimerWidget, SIGNAL(Started()), this, SLOT(OnStartNavigation()) );
   connect( m_RenderingTimerWidget, SIGNAL(Stopped()), this, SLOT(OnStopNavigation()) );
 
-  connect( m_VirtualViewToolSelectionWidget, SIGNAL(SignalUseTool(int, bool)), this, SLOT(OnVirtualCamera(int, bool)));
-
-  connect( m_PermanentRegistrationToolSelectionWidget, SIGNAL(SignalUseTool(int, bool)), this, SLOT(OnPermanentRegistration(int, bool)) );
+  //TODO
+  //connect( m_VirtualViewToolSelectionWidget, SIGNAL(SignalUseTool(int, bool)), this, SLOT(OnVirtualCamera(int, bool)));
 
 }
 
@@ -184,7 +173,7 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     return;
   }
 
-  mitk::NavigationData::Pointer nd = m_Source->GetOutput(0);
+  mitk::NavigationData::Pointer nd = m_InstrumentNavigationData;
 
   if( nd.IsNull() || !nd->IsDataValid())
     QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
@@ -212,8 +201,54 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
 
 }
 
+void QmitkIGTTrackingLabView::OnInstrumentSelected()
+{
+  if (m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource().IsNotNull())
+    {
+    m_InstrumentNavigationData = m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedToolID());
+    }
+  else
+    {
+    m_Controls.m_PointerNameLabel->setText("<not available>");
+    return;
+    }
+
+  if (m_InstrumentNavigationData.IsNotNull())
+    {
+    m_Controls.m_PointerNameLabel->setText(m_InstrumentNavigationData->GetName());
+    }
+  else
+    {
+    m_Controls.m_PointerNameLabel->setText("<not available>");
+    }
+}
+
+void QmitkIGTTrackingLabView::OnObjectmarkerSelected()
+{
+
+if (m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource().IsNotNull())
+    {
+    m_ObjectmarkerNavigationData = m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedToolID());
+    }
+  else
+    {
+    m_Controls.m_ObjectmarkerNameLabel->setText("<not available>");
+    return;
+    }
+
+  if (m_ObjectmarkerNavigationData.IsNotNull())
+    {
+    m_Controls.m_ObjectmarkerNameLabel->setText(m_ObjectmarkerNavigationData->GetName());
+    }
+  else
+    {
+    m_Controls.m_ObjectmarkerNameLabel->setText("<not available>");
+    }
+}
+
 void QmitkIGTTrackingLabView::OnSetupNavigation()
 {
+  MITK_INFO << "SetupNavigationCalled";
   if(m_Source.IsNotNull())
     if(m_Source->IsTracking())
       return;
@@ -251,46 +286,41 @@ void QmitkIGTTrackingLabView::SetupIGTPipeline()
   if(ds == NULL)
     throw std::invalid_argument("DataStorage is not available");
 
-  mitk::TrackingDevice::Pointer tracker = m_NDIConfigWidget->GetTracker(); // get current tracker from configuration widget
-  if(tracker.IsNull()) // check if tracker is valid
-    throw std::invalid_argument("tracking device is NULL!");
+  //Get selected source
+  m_Source = dynamic_cast<mitk::TrackingDeviceSource*>(m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationDataSource().GetPointer());
+  if (m_Source.IsNull()) {mitkThrow() << "Error: no tracking device";}
 
-  m_Source = mitk::TrackingDeviceSource::New(); // create new source for the IGT-Pipeline
-  m_Source->SetTrackingDevice(tracker); // set the found tracker from the configuration widget to the source
 
   this->InitializeFilters(); // initialize all needed filters
 
-  if(m_NDIConfigWidget->GetTracker()->GetType() == mitk::NDIAurora)
+
+  for (unsigned int i=0; i < m_Source->GetNumberOfOutputs(); ++i)
   {
-
-    for (unsigned int i=0; i < m_Source->GetNumberOfOutputs(); ++i)
-    {
-      m_FiducialRegistrationFilter->SetInput(i, m_Source->GetOutput(i)); // set input for registration filter
-      m_Visualizer->SetInput(i, m_FiducialRegistrationFilter->GetOutput(i)); // set input for visualization filter
-    }
-
-    for(unsigned int i= 0; i < m_Visualizer->GetNumberOfOutputs(); ++i)
-    {
-      const char* toolName = tracker->GetTool(i)->GetToolName();
-
-      mitk::DataNode::Pointer representation = this->CreateInstrumentVisualization(this->GetDefaultDataStorage(), toolName);
-      m_PSRecToolSelectionComboBox->addItem(QString(toolName));
-
-      m_PermanentRegistrationToolSelectionWidget->AddToolName(QString(toolName));
-      m_VirtualViewToolSelectionWidget->AddToolName(QString(toolName));
-
-      m_Visualizer->SetRepresentationObject(i, representation->GetData());
-
-    }
-
-    if(m_Source->GetTrackingDevice()->GetToolCount() > 0)
-      m_RenderingTimerWidget->setEnabled(true);
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
-    this->GlobalReinit();
+    m_FiducialRegistrationFilter->SetInput(i, m_Source->GetOutput(i)); // set input for registration filter
+    m_Visualizer->SetInput(i, m_FiducialRegistrationFilter->GetOutput(i)); // set input for visualization filter
   }
 
-  // this->CreateInstrumentVisualization(ds, tracker);//create for each single connected ND a corresponding 3D representation
+  for(unsigned int i= 0; i < m_Visualizer->GetNumberOfOutputs(); ++i)
+  {
+    const char* toolName = m_Source->GetOutput(i)->GetName();
+
+    mitk::DataNode::Pointer representation = this->CreateInstrumentVisualization(this->GetDefaultDataStorage(), toolName);
+    m_PSRecToolSelectionComboBox->addItem(QString(toolName));
+
+    m_VirtualViewToolSelectionWidget->AddToolName(QString(toolName));
+
+    m_Visualizer->SetRepresentationObject(i, representation->GetData());
+
+  }
+
+  if(m_Source->GetTrackingDevice()->GetToolCount() > 0)
+    m_RenderingTimerWidget->setEnabled(true);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_ALL);
+  this->GlobalReinit();
+
+
+
 }
 
 void QmitkIGTTrackingLabView::InitializeFilters()
@@ -517,7 +547,6 @@ void QmitkIGTTrackingLabView::OnToolLoaded(int index, mitk::DataNode::Pointer to
   m_PSRecToolSelectionComboBox->setItemText(index,toolNode->GetName().c_str());
 
   m_VirtualViewToolSelectionWidget->ChangeToolName(index, QString(toolNode->GetName().c_str()));
-  m_PermanentRegistrationToolSelectionWidget->ChangeToolName(index, QString(toolNode->GetName().c_str()));
 
   m_Visualizer->SetRepresentationObject(index, tempNode->GetData());
   m_Visualizer->Update();
@@ -598,12 +627,10 @@ void QmitkIGTTrackingLabView::RenderScene( )
         this->GetActiveStdMultiWidget()->MoveCrossToPosition(p);
       }
 
-      if(m_PermanentRegistrationToolSelectionWidget->IsSelectedToolActivated() && m_PermanentRegistrationToolSelectionWidget->GetCurrentSelectedIndex() >= 0 )
-      {
-        mitk::NavigationData::Pointer permRegTool = m_Source->GetOutput((unsigned int) m_PermanentRegistrationToolSelectionWidget->GetCurrentSelectedIndex());
+      mitk::NavigationData::Pointer permRegTool = this->m_ObjectmarkerNavigationData;
 
-        m_PermanentRegistrationFilter->SetSourceLandmarks(this->GetVirtualPointSetFromPosition(permRegTool));
-      }
+      m_PermanentRegistrationFilter->SetSourceLandmarks(this->GetVirtualPointSetFromPosition(permRegTool));
+
 
       if(m_PointSetRecording && m_PSRecordingPointSet.IsNotNull())
       {
@@ -705,7 +732,6 @@ void QmitkIGTTrackingLabView::OnToolsAdded(QStringList toolsList)
 
     m_PSRecToolSelectionComboBox->addItem(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
 
-    m_PermanentRegistrationToolSelectionWidget->AddToolName(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
     m_VirtualViewToolSelectionWidget->AddToolName(QString(m_Source->GetTrackingDevice()->GetTool(j)->GetToolName()));
 
     m_Visualizer->SetRepresentationObject(j, representation->GetData());

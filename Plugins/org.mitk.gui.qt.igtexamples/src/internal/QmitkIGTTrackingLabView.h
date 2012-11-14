@@ -143,6 +143,11 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     */
     void OnPermanentRegistration(int toolID, bool on);
 
+    void OnInstrumentSelected();
+
+    void OnObjectmarkerSelected();
+
+
 
   protected:
 
@@ -255,6 +260,9 @@ private:
   mitk::NavigationData::OrientationType m_PermanentRegistrationInitialOrientation;
 
   mitk::PointSet::Pointer m_PermanentRegistrationSourcePoints;
+
+  mitk::NavigationData::Pointer m_InstrumentNavigationData;
+  mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;
 
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.

@@ -34,7 +34,6 @@ namespace mitk
 template <typename PixelType>
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback)
 {
-  // TODO make callers happier by providing additional information in properties (such as meaning of spacing etc.)
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );
@@ -176,23 +175,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
                                             << image->GetDimension(1) << ", "
                                             << image->GetDimension(2) << ", "
                                             << image->GetDimension(3) << "]";
-
-#if (GDCM_MAJOR_VERSION == 2) && (GDCM_MINOR_VERSION < 1) && (GDCM_BUILD_VERSION < 15)
-        // workaround for a GDCM 2 bug until version 2.0.15:
-        // GDCM read spacing vector wrongly. Instead of "row spacing, column spacing", it misinterprets the DICOM tag as "column spacing, row spacing".
-        // this is undone here, until we use a GDCM that has this issue fixed.
-        // From the commit comments, GDCM 2.0.15 fixed the spacing interpretation with bug 2901181
-        // http://sourceforge.net/tracker/index.php?func=detail&aid=2901181&group_id=137895&atid=739587
-
-
-        Vector3D correctedImageSpacing = image->GetGeometry()->GetSpacing();
-        std::swap( correctedImageSpacing[0], correctedImageSpacing[1] );
-        image->GetGeometry()->SetSpacing( correctedImageSpacing );
-
-        // TODO check against actual tag values, NOT against some artificial GDCM version
-#endif
-        // TODO check generated spacing in all cases against what we know from tags!
-        // TODO mark iamge if spacing was determined from fallback/default values instead of documented tags
 
         MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
                                           << image->GetGeometry()->GetSpacing()[1] << ", "

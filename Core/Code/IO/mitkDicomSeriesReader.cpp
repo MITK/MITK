@@ -784,7 +784,7 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
     m_ShiftUp = signedDistance;
 
     m_ITKAssumedSliceSpacing = (origin2 - origin1).GetNorm();
-    // TODO how do we now this is assumed? document files/lines which make us believe so
+    // How do we now this is assumed? See header documentation for ITK code references
     //double itkAssumedSliceSpacing = sqrt( m_ShiftUp * m_ShiftUp + m_ShiftNormal * m_ShiftNormal );
 
     MITK_DEBUG << "    shift normal: " << m_ShiftNormal;
@@ -957,9 +957,6 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     bool groupImagesWithGantryTilt,
     const gdcm::Scanner::MappingType& tagValueMappings_)
 {
-  // TODO we MUST notice here, what can or should be sorted by time,
-  //      because otherwise we'd group Secondary Capture images as 2D+t (all same position/orientation (=none), no acquisition times etc.)
-
   // result.first = files that fit ITK's assumption
   // result.second = files that do not fit, should be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption() again
   SliceGroupingAnalysisResult result;
@@ -1062,7 +1059,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
               double angle = atof(tiltStr.c_str());
 
               MITK_DEBUG << "Comparing recorded tilt angle " << angle << " against calculated value " << tiltInfo.GetTiltAngleInDegrees();
-              // TODO we probably want the signs correct, too
+              // TODO we probably want the signs correct, too (that depends: this is just a rough check, nothing serious)
               if ( fabs(angle) - tiltInfo.GetTiltAngleInDegrees() > 0.25)
               {
                 result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
@@ -1227,7 +1224,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
     scanner.AddTag( tagImagePositionPatient );
 
-  // TODO add further restrictions from arguments
+  // TODO add further restrictions from arguments (when anybody asks for it)
 
   FileNamesGrouping result;
 
@@ -1269,7 +1266,6 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   {
     try
     {
-      // TODO probably the right position to return analysis findings
       result[ groupIter->first ] = ImageBlockDescriptor( SortSeriesSlices( groupIter->second.GetFilenames() ) ); // sort each slice group spatially
     } catch(...)
     {
@@ -1343,13 +1339,11 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     if ( !sortTo3DPlust )
     {
       // copy 3D blocks to output
-      // TODO avoid collisions (or prove impossibility)
       groupsOf3DPlusTBlocks.insert( groupsOf3DBlocks.begin(), groupsOf3DBlocks.end() );
     }
     else
     {
       // sort 3D+t (as described in "PART IV")
-      // TODO this whole part must be tolerant to missing position information, too
 
       MITK_DEBUG << "================================================================================";
       MITK_DEBUG << "3D+t analysis:";
@@ -1658,9 +1652,9 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
 
     double
       dist1 = 0.0,
-            dist2 = 0.0;
+      dist2 = 0.0;
 
-    // TODO document this part, rename identifiers...
+    // this computes the distance from world origin (0,0,0) ALONG THE NORMAL of the image planes
     for (unsigned char i = 0u; i < 3u; ++i)
     {
       dist1 += normal[i] * image_pos1[i];

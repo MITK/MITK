@@ -43,6 +43,11 @@ DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor()
 ,m_IsMultiFrameImage(false)
 {
 }
+      
+DicomSeriesReader::ImageBlockDescriptor::~ImageBlockDescriptor()
+{
+  // nothing
+}
 
 DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(const StringContainer& files)
 :m_HasGantryTiltCorrected(false)

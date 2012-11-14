@@ -399,6 +399,7 @@ public:
       bool IsMultiFrameImage() const;
 
       ImageBlockDescriptor();
+      ~ImageBlockDescriptor();
 
     private:
 

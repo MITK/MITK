@@ -43,7 +43,7 @@ DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor()
 ,m_IsMultiFrameImage(false)
 {
 }
-      
+
 DicomSeriesReader::ImageBlockDescriptor::~ImageBlockDescriptor()
 {
   // nothing

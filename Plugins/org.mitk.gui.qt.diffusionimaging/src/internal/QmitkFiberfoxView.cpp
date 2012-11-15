@@ -423,16 +423,19 @@ void QmitkFiberfoxView::GenerateImage()
     extraAxonal.SetGradientList(gradientList);
     extraAxonal.SetBvalue(bVal);
     extraAxonal.SetKernelFA(m_Controls->m_MaxFaBox->value());
-    extraAxonal.SetSignalScale(200);
+    extraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
+    extraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
     mitk::StickModel<double> intraAxonal;
     intraAxonal.SetGradientList(gradientList);
     intraAxonal.SetDiffusivity(m_Controls->m_MaxFaBox->value());
-    intraAxonal.SetSignalScale(200);
+    intraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
+    intraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
 
     mitk::BallModel<double> freeDiffusion;
     freeDiffusion.SetGradientList(gradientList);
     freeDiffusion.SetBvalue(bVal);
-    freeDiffusion.SetSignalScale(1000);
+    freeDiffusion.SetSignalScale(m_Controls->m_NonFiberS0Box->value());
+    freeDiffusion.SetRelaxationT2(m_Controls->m_NonFiberRelaxationT2Box->value());
     std::vector< mitk::DiffusionSignalModel<double>* > modelList;
 
     // noise model
@@ -460,6 +463,7 @@ void QmitkFiberfoxView::GenerateImage()
     modelList.push_back(&freeDiffusion);
     filter->SetNonFiberModels(modelList);
     filter->SetNoiseModel(&noiseModel);
+    filter->SetAddT2Smearing(m_Controls->m_AddT2Smearing->isChecked());
     if (m_TissueMask.IsNotNull())
     {
         ItkUcharImgType::Pointer mask = ItkUcharImgType::New();

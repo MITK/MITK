@@ -58,6 +58,9 @@ public:
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
+    itkSetMacro( AddGibbsRinging, bool )                ///< add Gibbs ringing artifact
+    itkSetMacro( AddT2Smearing, bool )                  ///< add T2 induced k-space smearing artifact
+    itkSetMacro( ReadoutPulseLength, unsigned int )
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
     itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
     itkSetMacro( Origin, mitk::Point3D )                ///< output image origin
@@ -79,7 +82,9 @@ protected:
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
     std::vector< DoubleDwiType::Pointer > AddKspaceArtifacts(std::vector< DoubleDwiType::Pointer >& images);
-    ComplexSliceType::Pointer CropSlice(ComplexSliceType::Pointer image, int x, int y);
+    ComplexSliceType::Pointer CropSlice(ComplexSliceType::Pointer image, int x, int y); ///< crop k space to introduce gibbs ringing
+    void AddT2Smearing(ComplexSliceType::Pointer slice, double T2);
+    void CorrectSlice(ComplexSliceType::Pointer slice);
 
     mitk::Vector3D                      m_Spacing;              ///< output image spacing
     mitk::Point3D                       m_Origin;               ///< output image origin
@@ -91,6 +96,9 @@ protected:
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
     unsigned int                        m_Undersampling;        ///< undersampling of k-space (introduces gibbs ringing artifacts)
+    unsigned int                        m_ReadoutPulseLength;
+    bool                                m_AddT2Smearing;        ///< add T2 smearing artifact or not
+    bool                                m_AddGibbsRinging;      ///< add Gibbs ringing artifact or not
 };
 }
 

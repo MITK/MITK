@@ -701,11 +701,11 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       // generate LUT (white to black)
       mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
       vtkLookupTable* bwLut = mitkLut->GetVtkLookupTable();
-      bwLut->SetTableRange (0, 1); 
-      bwLut->SetSaturationRange (0, 0); 
-      bwLut->SetHueRange (0, 0); 
-      bwLut->SetValueRange (1, 0); 
-      bwLut->SetAlphaRange (1, 1); 
+      bwLut->SetTableRange (0, 1);
+      bwLut->SetSaturationRange (0, 0);
+      bwLut->SetHueRange (0, 0);
+      bwLut->SetValueRange (1, 0);
+      bwLut->SetAlphaRange (1, 1);
       bwLut->SetRampToLinear();
       bwLut->Build();
       mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();

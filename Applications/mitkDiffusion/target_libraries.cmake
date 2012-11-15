@@ -18,4 +18,6 @@ set(target_libraries
   org_mitk_gui_qt_imagenavigator
   org_mitk_gui_qt_moviemaker
   org_mitk_gui_qt_measurementtoolbox
+  org_mitk_gui_qt_basicimageprocessing
+  org_mitk_gui_qt_registration
 )

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   QWebView(parent)
 {
-
   connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJSObject()));
   QUrl myUrl = QUrl("qrc:/qmitk/Histogram.html");
   setUrl(myUrl);
@@ -47,7 +46,7 @@ void QmitkHistogramJSWidget::addJSObject()
 void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
 {
   QWebView::resizeEvent(resizeEvent);
-  this->reload();
+  this->sizeChanged();
 }
 
 void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
@@ -75,8 +74,6 @@ void QmitkHistogramJSWidget::clearData()
 {
   m_Frequency.clear();
   m_Measurement.clear();
-  m_Frequency.insert(0,0);
-  m_Measurement.insert(0,0);
 }
 
 void QmitkHistogramJSWidget::clearHistogram()

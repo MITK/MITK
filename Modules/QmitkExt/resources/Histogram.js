@@ -16,14 +16,16 @@ var dataset;
 
 var margin = {
     top : 30,
-    bottom : 0,
+    bottom : 50,
     left : 50,
-    right : -20,
+    right : 20,
     };
 var height = histogramData.height - margin.top - margin.bottom;
 var width = histogramData.width - margin.left - margin.right;
 var tension = 0.8;
 var connected = false;
+var dur = 1000;
+
    /*  var line = d3.svg.line()
                     .interpolate("cardinal")
                     .x(function(d,i) {
@@ -46,36 +48,35 @@ var connected = false;
                     }); */
 
 if (!connected)
-    {
-        connected = true;
-        histogramData.DataChanged.connect(changeHistogram);
-        //makeHistogram();
-    }
+{
+    connected = true;
+    histogramData.DataChanged.connect(changeHistogram);
+    histogramData.sizeChanged.connect(changeSize);
+}
 
 
 
-    var xScale = d3.scale.linear()
-                        .domain([d3.min(histogramData.measurement), d3.max(histogramData.measurement)])
-                        .range([margin.left, width]);
+var xScale = d3.scale.linear()
+                .domain([d3.min(histogramData.measurement), d3.max(histogramData.measurement)])
+                .range([margin.left, width]);
 
-    var yScale = d3.scale.linear()
-                        .domain([0, d3.max(histogramData.frequency)])
-                        .range([height, margin.top]);
+var yScale = d3.scale.linear()
+                .domain([0, d3.max(histogramData.frequency)])
+                .range([height, margin.top]);
 
-    var xAxis = d3.svg.axis()
-                    .scale(xScale)
-                    .orient("bottom");
+var xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom");
 
-    var yAxis = d3.svg.axis()
-                    .scale(yScale)
-                    .orient("left");
+var yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
 
-    var svg = d3.select("body")
-                .append("svg")
-                .attr("class", "svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.bottom + margin.top)
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var svg = d3.select("body")
+            .append("svg")
+            .attr("class", "svg")
+            .attr("width", width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom);
 
     // svg.append("path")
             // .attr("class", "area")
@@ -108,41 +109,67 @@ if (!connected)
                     // .attr("fill", "grey")
                     // .attr("opacity", 0.5);
 
-    svg.append("g")
-            .attr("class", "axis")
-            .attr("transform", "translate(" + 0 + "," + height + ")")
-            .call(xAxis);
+svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + 0 + "," + height + ")")
+    .call(xAxis);
 
-    svg.append("g")
-            .attr("class", "axis")
-            .attr("transform", "translate(" + margin.left + "," + 0 + ")")
-            .call(yAxis);
+svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + margin.left + "," + 0 + ")")
+    .call(yAxis);
 
-
-function changeHistogram ()
+function changeSize ()
 {
-    var bar = svg.selectAll("rect")
-                .data(data);
+    height = histogramData.height - margin.top - margin.bottom;
+    width = histogramData.width - margin.left - margin.right;
+    svg = d3.select("body")
+            .append("svg")
+            .attr("class", "svg")
+            .attr("width", width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom);
+    changeHistogram();
+}
 
-    bar.data(histogramData.frequency).enter().append("rect")
+function changeHistogram()
+{
+    xScale = d3.scale.linear()
+                .domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)])
+                .range([margin.left,width]);
+
+    yScale = d3.scale.linear()
+                .domain([0,d3.max(histogramData.frequency)])
+                .range([height,margin.bottom]);
+
+    xAxis = d3.svg.axis()
+                .scale(xScale)
+                .ticks(5)
+                .orient("bottom");
+
+    yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+
+    var bar = svg.selectAll("rect").data(histogramData.frequency);
+
+    bar.enter().append("rect")
         .attr("class", "bar")
         .attr("x", function(d,i) {
             return xScale(histogramData.measurement[i]);
         })
         .attr("y", height)
         .attr("height", 0)
-        .attr("width", 1)
-        .attr("fill", "grey")
-        .transition()
+        .attr("width", (width/(histogramData.frequency.length + 1)))
+        .transition().duration(dur)
         .attr("height", function(d) {
             return (height-yScale(d));
         })
-        .attr("width", 1)
+        .attr("width", (width/(histogramData.frequency.length + 1)))
         .attr("y", function(d) {
-            return yScale(d);
-        });
+           return yScale(d);
+       });
 
-    bar.transition()
+    bar.transition().duration(dur)
         .attr("x", function(d,i) {
             return xScale(histogramData.measurement[i]);
         })
@@ -152,12 +179,24 @@ function changeHistogram ()
         .attr("height", function(d) {
             return (height-yScale(d));
         })
-        .attr("width", 1)
-        .attr("fill", "grey");
+        .attr("width", (width/(histogramData.frequency.length + 1)))
 
-    bar.exit().transition()
+    bar.exit().transition().duration(dur)
         .attr("y", height)
         .attr("height", 0)
         .remove();
+
+    svg.selectAll("g").transition().duration(dur).attr("opacity", 0).remove();
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + 0 + "," + height + ")")
+        .transition().duration(dur)
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + margin.left + "," + 0 + ")")
+        .transition()
+        .call(yAxis);
 }
 

@@ -59,9 +59,7 @@ private slots:
 
 signals:
   void DataChanged();
-
-public slots:
-
+  void sizeChanged();
 };
 
 #endif // QMITKHISTOGRAMJSWIDGET_H

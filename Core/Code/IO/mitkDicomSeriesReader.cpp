@@ -433,7 +433,7 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
 {
   if( filenames.empty() )
   {
-    MITK_WARN << "Calling LoadDicomSeries with empty filename string container. Probably invalid application logic.";
+    MITK_DEBUG << "Calling LoadDicomSeries with empty filename string container. Probably invalid application logic.";
     node.SetData(NULL);
     return true; // this is not actually an error but the result is very simple
   }
@@ -994,13 +994,27 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     {
       // don't let such files be in a common group. Everything without position information will be loaded as a single slice:
       // with standard DICOM files this can happen to: CR, DX, SC
-      MITK_DEBUG << "    ==> Sort away " << *fileIter << " for separate time step (no position information)"; // we already have one occupying this position
-      result.AddFileToSortedBlock( *fileIter );
-      StringContainer remainingFiles;
-      remainingFiles.insert( remainingFiles.end(), fileIter+1, files.end() );
-      result.AddFilesToUnsortedBlock( remainingFiles );
-      fileFitsIntoPattern = false;
-      break;
+      MITK_DEBUG << "    ==> Sort away " << *fileIter << " for later analysis (no position information)"; // we already have one occupying this position
+
+      if ( result.GetBlockFilenames().empty() ) // nothing WITH position information yet
+      {
+        // ==> this is a group of its own, stop processing, come back later
+        result.AddFileToSortedBlock( *fileIter );
+
+        StringContainer remainingFiles;
+        remainingFiles.insert( remainingFiles.end(), fileIter+1, files.end() );
+        result.AddFilesToUnsortedBlock( remainingFiles );
+
+        fileFitsIntoPattern = false;
+        break; // no files anymore
+      }
+      else
+      {
+        // ==> this does not match, consider later
+        result.AddFileToUnsortedBlock( *fileIter );
+        fileFitsIntoPattern = false;
+        continue; // next file
+      }
     }
 
     bool ignoredConversionError(-42); // hard to get here, no graceful way to react
@@ -1321,11 +1335,18 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
 
       groupsOf3DBlocks[ newGroupUID.str() ] = thisBlock;
 
-      MITK_DEBUG << "Result: sorted 3D group " << newGroupUID.str() << " with " << groupsOf3DBlocks[ newGroupUID.str() ].GetFilenames().size() << " files";
+      //MITK_DEBUG << "Result: sorted 3D group " << newGroupUID.str() << " with " << groupsOf3DBlocks[ newGroupUID.str() ].GetFilenames().size() << " files";
+      MITK_DEBUG << "Result: sorted 3D group with " << groupsOf3DBlocks[ newGroupUID.str() ].GetFilenames().size() << " files";
+      StringContainer debugOutputFiles = analysisResult.GetBlockFilenames();
+      for (StringContainer::const_iterator siter = debugOutputFiles.begin(); siter != debugOutputFiles.end(); ++siter)
+        MITK_DEBUG << "  IN  " << *siter;
 
       ++subgroup;
 
       filesStillToAnalyze = analysisResult.GetUnsortedFilenames(); // remember what needs further analysis
+      for (StringContainer::const_iterator siter = filesStillToAnalyze.begin(); siter != filesStillToAnalyze.end(); ++siter)
+        MITK_DEBUG << " OUT  " << *siter;
+
     }
 
     // end of grouping, now post-process groups
@@ -1431,7 +1452,10 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     MITK_DEBUG << "    (gantry tilt : " << (block.HasGantryTiltCorrected()?"Yes":"No") << "; "
                        "pixel spacing : " << PixelSpacingInterpretationToString( block.GetPixelSpacingType() ) << "; "
                        "3D+t: " << (block.HasMultipleTimePoints()?"Yes":"No") << "; "
-                       "reader support: " << ReaderImplementationLevelToString( block.GetReaderImplementationLevel() );
+                       "reader support: " << ReaderImplementationLevelToString( block.GetReaderImplementationLevel() ) << ")";
+    StringContainer debugOutputFiles = block.GetFilenames();
+    for (StringContainer::const_iterator siter = debugOutputFiles.begin(); siter != debugOutputFiles.end(); ++siter)
+      MITK_DEBUG << "  F " << *siter;
   }
   MITK_DEBUG << "================================================================================";
 
@@ -1730,7 +1754,7 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
   const gdcm::Tag tagSOPInstanceUID(0x0008, 0x0018);
   if (ds1.FindDataElement(tagSOPInstanceUID) && ds2.FindDataElement(tagSOPInstanceUID))
   {
-    MITK_WARN << "Dicom images are missing attributes for a meaningful sorting, falling back to SOP instance UID comparison.";
+    MITK_DEBUG << "Dicom images are missing attributes for a meaningful sorting, falling back to SOP instance UID comparison.";
     gdcm::Attribute<0x0008,0x0018> SOPInstanceUID1;   // SOP instance UID is mandatory and unique
     gdcm::Attribute<0x0008,0x0018> SOPInstanceUID2;
 

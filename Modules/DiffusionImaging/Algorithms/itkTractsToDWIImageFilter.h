@@ -58,6 +58,7 @@ public:
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
+    itkSetMacro( KspaceCropping, double )               ///< k-space cropping factor
     itkSetMacro( OuputKspaceImage, bool )               ///< output image of the k-space instead of the dwi (inverse fourier transformed k-space)
     itkSetMacro( AddGibbsRinging, bool )                ///< add Gibbs ringing artifact
     itkSetMacro( AddT2Smearing, bool )                  ///< add T2 induced k-space smearing artifact
@@ -87,7 +88,7 @@ protected:
     std::vector< DoubleDwiType::Pointer > AddKspaceArtifacts(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Crop k space to simulate undersampling. Introduces artificial Gibbs ringing artifacts. */
-    ComplexSliceType::Pointer CropSlice(ComplexSliceType::Pointer image, int x, int y);
+    ComplexSliceType::Pointer CropSlice(ComplexSliceType::Pointer image);
 
     /** Simulate T2 signal decay during k-space readout. Adds smearing artifact. */
     void AddT2Smearing(ComplexSliceType::Pointer slice, double T2);
@@ -104,7 +105,7 @@ protected:
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
-    unsigned int                        m_Undersampling;        ///< undersampling of k-space (introduces gibbs ringing artifacts)
+    double                              m_KspaceCropping;       ///< cropping of k-space (introduces gibbs ringing artifacts)
     unsigned int                        m_ReadoutPulseLength;   ///< time needed to read one k-space row. parameter for artificial smearing artifacts.
     bool                                m_AddT2Smearing;        ///< add T2 smearing artifact or not
     bool                                m_AddGibbsRinging;      ///< add Gibbs ringing artifact or not

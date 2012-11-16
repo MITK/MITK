@@ -353,15 +353,12 @@ void QmitkFiberfoxView::GenerateFibers()
     filter->Update();
     vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
 
-    mitk::FiberBundleX::Pointer newBundle = mitk::FiberBundleX::New();
     for (int i=0; i<fiberBundles.size(); i++)
     {
         m_SelectedBundles.at(i)->SetData( fiberBundles.at(i) );
-        newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>(fiberBundles.at(i).GetPointer()));
+        if (fiberBundles.at(i)->GetNumFibers()>50000)
+            m_SelectedBundles.at(i)->SetVisibility(false);
     }
-
-    if (newBundle->GetNumFibers()<=0)
-        return;
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -369,9 +366,9 @@ void QmitkFiberfoxView::GenerateFibers()
 void QmitkFiberfoxView::GenerateImage()
 {
     itk::ImageRegion<3> imageRegion;
-    imageRegion.SetSize(0, m_Controls->m_SizeX->value());
-    imageRegion.SetSize(1, m_Controls->m_SizeY->value());
-    imageRegion.SetSize(2, m_Controls->m_SizeZ->value());
+    imageRegion.SetSize(0, m_Controls->m_SizeX->currentText().toInt());
+    imageRegion.SetSize(1, m_Controls->m_SizeY->currentText().toInt());
+    imageRegion.SetSize(2, m_Controls->m_SizeZ->currentText().toInt());
     mitk::Vector3D spacing;
     spacing[0] = m_Controls->m_SpacingX->value();
     spacing[1] = m_Controls->m_SpacingY->value();
@@ -383,9 +380,9 @@ void QmitkFiberfoxView::GenerateImage()
     if (m_SelectedBundle.IsNull())
     {
         mitk::Image::Pointer image = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(
-                    m_Controls->m_SizeX->value(),
-                    m_Controls->m_SizeY->value(),
-                    m_Controls->m_SizeZ->value(),
+                    m_Controls->m_SizeX->currentText().toInt(),
+                    m_Controls->m_SizeY->currentText().toInt(),
+                    m_Controls->m_SizeZ->currentText().toInt(),
                     m_Controls->m_SpacingX->value(),
                     m_Controls->m_SpacingY->value(),
                     m_Controls->m_SpacingZ->value());
@@ -465,6 +462,9 @@ void QmitkFiberfoxView::GenerateImage()
     filter->SetNoiseModel(&noiseModel);
     filter->SetAddT2Smearing(m_Controls->m_AddT2Smearing->isChecked());
     filter->SetOuputKspaceImage(m_Controls->m_KspaceImageBox->isChecked());
+    filter->SetAddGibbsRinging(m_Controls->m_AddGibbsRinging->isChecked());
+    filter->SetKspaceCropping((double)m_Controls->m_KspaceCroppingBox->value()/100.0);
+
     if (m_TissueMask.IsNotNull())
     {
         ItkUcharImgType::Pointer mask = ItkUcharImgType::New();

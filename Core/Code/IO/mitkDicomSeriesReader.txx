@@ -268,19 +268,6 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
                                       << image->GetDimension(1) << ", "
                                       << image->GetDimension(2) << "]";
 
-#if (GDCM_MAJOR_VERSION == 2) && (GDCM_MINOR_VERSION < 1) && (GDCM_BUILD_VERSION < 15)
-    // workaround for a GDCM 2 bug until version 2.0.15:
-    // GDCM read spacing vector wrongly. Instead of "row spacing, column spacing", it misinterprets the DICOM tag as "column spacing, row spacing".
-    // this is undone here, until we use a GDCM that has this issue fixed.
-    // From the commit comments, GDCM 2.0.15 fixed the spacing interpretation with bug 2901181
-    // http://sourceforge.net/tracker/index.php?func=detail&aid=2901181&group_id=137895&atid=739587
-
-
-    Vector3D correctedImageSpacing = image->GetGeometry()->GetSpacing();
-    std::swap( correctedImageSpacing[0], correctedImageSpacing[1] );
-    image->GetGeometry()->SetSpacing( correctedImageSpacing );
-#endif
-
   MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
                                     << image->GetGeometry()->GetSpacing()[1] << ", "
                                     << image->GetGeometry()->GetSpacing()[2] << "]";

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <math.h>
 
 // offset which moves the planarfigures on top of the other content
-// the crosshair is rendered into the z = 1 layer. 
+// the crosshair is rendered into the z = 1 layer.
 static const float PLANAR_OFFSET = 0.5f;
 
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
@@ -44,7 +44,7 @@ mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 
 void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-  if ( !this->IsVisible( renderer ) ) 
+  if ( !this->IsVisible( renderer ) )
   {
     return;
   }
@@ -60,7 +60,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 
   // Get 2D geometry frame of PlanarFigure
-  mitk::Geometry2D *planarFigureGeometry2D = 
+  mitk::Geometry2D *planarFigureGeometry2D =
     dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
   if ( planarFigureGeometry2D == NULL )
   {
@@ -74,16 +74,16 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // If the PlanarFigure geometry is a plane geometry, check if current
   // world plane is parallel to and within the planar figure geometry bounds
   // (otherwise, display nothing)
-  mitk::PlaneGeometry *planarFigurePlaneGeometry = 
+  mitk::PlaneGeometry *planarFigurePlaneGeometry =
     dynamic_cast< PlaneGeometry * >( planarFigureGeometry2D );
-  const mitk::PlaneGeometry *rendererPlaneGeometry = 
+  const mitk::PlaneGeometry *rendererPlaneGeometry =
     dynamic_cast< const PlaneGeometry * >( rendererGeometry2D );
 
   if ( (planarFigurePlaneGeometry != NULL) && (rendererPlaneGeometry != NULL) )
   {
     double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
     if ( !planarFigurePlaneGeometry->IsParallel( rendererPlaneGeometry )
-      || !(planarFigurePlaneGeometry->DistanceFromPlane( 
+      || !(planarFigurePlaneGeometry->DistanceFromPlane(
       rendererPlaneGeometry ) < planeThickness / 3.0) )
     {
       // Planes are not parallel or renderer plane is not within PlanarFigure
@@ -110,7 +110,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   glEnable( GL_LINE_SMOOTH );
   glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
   glEnable(GL_DEPTH_TEST);
-  
+
   // Get properties from node (if present)
   const mitk::DataNode* node=this->GetDataNode();
   this->InitializePlanarFigurePropertiesFromDataNode( node );
@@ -187,7 +187,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
         m_LineColor[lineDisplayMode][1],
         m_LineColor[lineDisplayMode][2],
         globalOpacity );
-    
+
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;
     }
@@ -202,10 +202,10 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
     bool firstActiveFeature = true;
     for ( unsigned int i = 0; i < planarFigure->GetNumberOfFeatures(); ++i )
-    {     
+    {
       if( planarFigure->IsFeatureActive(i) && planarFigure->IsFeatureVisible( i ) )
       {
-        if ( ! firstActiveFeature ) 
+        if ( ! firstActiveFeature )
         {
           quantityString << " x ";
         }
@@ -218,7 +218,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if ( openGLrenderer )
     {
-      openGLrenderer->WriteSimpleText( quantityString.str().c_str(), 
+      openGLrenderer->WriteSimpleText( quantityString.str().c_str(),
         firstPoint[0] + 6.0, firstPoint[1] + 4.0 + annotationOffset,
         0,
         0,
@@ -277,7 +277,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       if ( m_DrawOutline )
       {
         // draw outlines for markers as well
-        // linewidth for the contour is only half, as full width looks 
+        // linewidth for the contour is only half, as full width looks
         // much too thick!
         this->DrawMarker( planarFigure->GetControlPoint( i ),
           m_OutlineColor[lineDisplayMode],
@@ -286,8 +286,8 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
           m_MarkerOpacity[pointDisplayMode],
           m_OutlineWidth/2,
           m_ControlPointShape,
-          planarFigureGeometry2D, 
-          rendererGeometry2D, 
+          planarFigureGeometry2D,
+          rendererGeometry2D,
           displayGeometry );
       }
 
@@ -298,8 +298,8 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
         m_MarkerOpacity[pointDisplayMode],
         m_LineWidth,
         m_ControlPointShape,
-        planarFigureGeometry2D, 
-        rendererGeometry2D, 
+        planarFigureGeometry2D,
+        rendererGeometry2D,
         displayGeometry );
     }
 
@@ -312,9 +312,9 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
         m_MarkerOpacity[PF_HOVER],
         m_LineWidth,
         m_ControlPointShape,
-        planarFigureGeometry2D, 
-        rendererGeometry2D, 
-        displayGeometry 
+        planarFigureGeometry2D,
+        rendererGeometry2D,
+        displayGeometry
         );
     }
   }
@@ -324,14 +324,14 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 
 void mitk::PlanarFigureMapper2D::PaintPolyLine(
-  mitk::PlanarFigure::PolyLineType vertices,  
+  mitk::PlanarFigure::PolyLineType vertices,
   bool closed,
-  float* color, 
-  float opacity, 
-  float lineWidth, 
-  Point2D& firstPoint, 
-  const Geometry2D* planarFigureGeometry2D, 
-  const Geometry2D* rendererGeometry2D, 
+  float* color,
+  float opacity,
+  float lineWidth,
+  Point2D& firstPoint,
+  const Geometry2D* planarFigureGeometry2D,
+  const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
   glColor4f( color[0], color[1], color[2], opacity );
@@ -341,7 +341,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   {
     glBegin( GL_LINE_LOOP );
   }
-  else 
+  else
   {
     glBegin( GL_LINE_STRIP );
   }
@@ -363,18 +363,25 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
 }
 
 
-void mitk::PlanarFigureMapper2D::DrawMainLines( 
-  mitk::PlanarFigure* figure, 
-  float* color, 
-  float opacity, 
+void mitk::PlanarFigureMapper2D::DrawMainLines(
+  mitk::PlanarFigure* figure,
+  float* color,
+  float opacity,
   bool drawShadow,
-  float lineWidth, 
+  float lineWidth,
   float shadowWidthFactor,
   Point2D& firstPoint,
-  const Geometry2D* planarFigureGeometry2D, 
-  const Geometry2D* rendererGeometry2D, 
+  const Geometry2D* planarFigureGeometry2D,
+  const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
+
+  if ( m_DrawDashed )
+  {
+    glLineStipple(2, 0x00FF);
+    glEnable(GL_LINE_STIPPLE);
+  }
+
   for ( unsigned short loop = 0; loop < figure->GetPolyLinesSize(); ++loop )
   {
     PlanarFigure::PolyLineType polyline = figure->GetPolyLine(loop);
@@ -391,31 +398,37 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
       if( opacity > 0.2f )
         shadowOpacity = opacity - 0.2f;
 
-      this->PaintPolyLine( polyline, 
-        figure->IsClosed(),    
+      this->PaintPolyLine( polyline,
+        figure->IsClosed(),
         shadow, shadowOpacity, lineWidth*shadowWidthFactor, firstPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
       delete shadow;
     }
 
-    this->PaintPolyLine( polyline, 
-      figure->IsClosed(),    
+    this->PaintPolyLine( polyline,
+      figure->IsClosed(),
       color, opacity, lineWidth, firstPoint,
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
+
+  if ( m_DrawDashed )
+  {
+    glDisable(GL_LINE_STIPPLE);
+  }
+
 }
 
 void mitk::PlanarFigureMapper2D::DrawHelperLines(
   mitk::PlanarFigure* figure,
-  float* color, 
-  float opacity, 
+  float* color,
+  float opacity,
   bool drawShadow,
   float lineWidth,
   float shadowWidthFactor,
   Point2D& firstPoint,
-  const Geometry2D* planarFigureGeometry2D, 
-  const Geometry2D* rendererGeometry2D, 
+  const Geometry2D* planarFigureGeometry2D,
+  const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
   // Draw helper objects
@@ -514,7 +527,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
     glDisable( GL_LINE_SMOOTH );
 
     glRectf(
-      displayPoint[0] - 4, displayPoint[1] - 4, 
+      displayPoint[0] - 4, displayPoint[1] - 4,
       displayPoint[0] + 4, displayPoint[1] + 4 );
 
     // Paint outline
@@ -566,6 +579,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   m_DrawShadow = false;
   m_DrawControlPoints = false;
   m_DrawName = true;
+  m_DrawDashed = true;
 
   m_ShadowWidthFactor = 1.2;
   m_LineWidth = 1.0;
@@ -628,12 +642,15 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetBoolProperty( "planarfigure.drawcontrolpoints", m_DrawControlPoints );
   node->GetBoolProperty( "planarfigure.drawname", m_DrawName );
 
+  node->GetBoolProperty( "planarfigure.drawdashed", m_DrawDashed );
+
+
   node->GetFloatProperty( "planarfigure.line.width", m_LineWidth );
   node->GetFloatProperty( "planarfigure.shadow.widthmodifier", m_ShadowWidthFactor );
   node->GetFloatProperty( "planarfigure.outline.width", m_OutlineWidth );
   node->GetFloatProperty( "planarfigure.helperline.width", m_HelperlineWidth );
 
-  PlanarFigureControlPointStyleProperty::Pointer styleProperty = 
+  PlanarFigureControlPointStyleProperty::Pointer styleProperty =
     dynamic_cast< PlanarFigureControlPointStyleProperty* >( node->GetProperty( "planarfigure.controlpointshape" ) );
   if ( styleProperty.IsNotNull() )
   {
@@ -713,6 +730,8 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
   node->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawcontrolpoints", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawname", mitk::BoolProperty::New(true) );
+  node->AddProperty( "planarfigure.drawdashed", mitk::BoolProperty::New(false) );
+
 
   node->AddProperty("planarfigure.line.width", mitk::FloatProperty::New(2.0) );
   node->AddProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );

@@ -464,6 +464,7 @@ void QmitkFiberfoxView::GenerateImage()
     filter->SetNonFiberModels(modelList);
     filter->SetNoiseModel(&noiseModel);
     filter->SetAddT2Smearing(m_Controls->m_AddT2Smearing->isChecked());
+    filter->SetOuputKspaceImage(m_Controls->m_KspaceImageBox->isChecked());
     if (m_TissueMask.IsNotNull())
     {
         ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
@@ -590,8 +591,8 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     }
     UpdateGui();
 
-    if (m_Controls->m_RealTimeFibers->isChecked())
-        GenerateFibers();
+//    if (m_Controls->m_RealTimeFibers->isChecked())
+//        GenerateFibers();
 }
 
 

@@ -30,6 +30,7 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     , m_ReadoutPulseLength(1)
     , m_AddT2Smearing(false)
     , m_AddGibbsRinging(false)
+    , m_OuputKspaceImage(false)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -97,21 +98,24 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                 fft->SetInput(slice);
                 fft->Update();
                 ComplexSliceType::Pointer fSlice = fft->GetOutput();
-                CorrectSlice(fSlice);
+                fSlice = RearrangeSlice(fSlice);
 
                 // add artifacts
 //                if (m_AddGibbsRinging)
 //                    fSlice = CropSlice(fSlice, m_ImageRegion.GetSize()[0]*(m_Undersampling-1)/2, m_ImageRegion.GetSize()[1]*(m_Undersampling-1)/2);
-//                if (m_AddT2Smearing)
-//                    AddT2Smearing(fSlice, signalModel->GetRelaxationT2());
+                if (m_AddT2Smearing)
+                    AddT2Smearing(fSlice, signalModel->GetRelaxationT2());
 
-                CorrectSlice(fSlice);
-
-                // inverse fourier transform slice
-                itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::Pointer ifft = itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::New();
-                ifft->SetInput(fSlice);
-                ifft->Update();
-                SliceType::Pointer newSlice = ifft->GetOutput();
+                SliceType::Pointer newSlice;
+                if (!m_OuputKspaceImage)
+                {
+                    fSlice = RearrangeSlice(fSlice);
+                    // inverse fourier transform slice
+                    itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::Pointer ifft = itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::New();
+                    ifft->SetInput(fSlice);
+                    ifft->Update();
+                    newSlice = ifft->GetOutput();
+                }
 
                 // put slice back into channel g
                 for (int y=0; y<m_ImageRegion.GetSize(1); y++)
@@ -123,9 +127,11 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
 
                         SliceType::IndexType index2D;
                         index2D[0]=x; index2D[1]=y;
-                        //                        pix3D[g] = slice->GetPixel(index2D);
-                        pix3D[g] = newSlice->GetPixel(index2D);
-                        //                        pix3D[g] = sqrt(fSlice->GetPixel(index2D).real()*fSlice->GetPixel(index2D).real()+fSlice->GetPixel(index2D).imag()*fSlice->GetPixel(index2D).imag());
+
+                        if (m_OuputKspaceImage)
+                            pix3D[g] = sqrt(fSlice->GetPixel(index2D).real()*fSlice->GetPixel(index2D).real()+fSlice->GetPixel(index2D).imag()*fSlice->GetPixel(index2D).imag());
+                        else
+                            pix3D[g] = newSlice->GetPixel(index2D);
 
                         newImage->SetPixel(index3D, pix3D);
                     }
@@ -135,77 +141,39 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
     return outImages;
 }
 
-void TractsToDWIImageFilter::CorrectSlice(ComplexSliceType::Pointer slice)
+TractsToDWIImageFilter::ComplexSliceType::Pointer TractsToDWIImageFilter::RearrangeSlice(ComplexSliceType::Pointer slice)
 {
     ImageRegion<2> region = slice->GetLargestPossibleRegion();
+    ComplexSliceType::Pointer rearrangedSlice = ComplexSliceType::New();
+    rearrangedSlice->SetLargestPossibleRegion( region );
+    rearrangedSlice->SetBufferedRegion( region );
+    rearrangedSlice->SetRequestedRegion( region );
+    rearrangedSlice->Allocate();
 
-    vnl_matrix< vcl_complex< double > > quad1;
-    quad1.set_size(region.GetSize(0)/2, region.GetSize(1)/2);
-    vnl_matrix< vcl_complex< double > > quad2;
-    quad2.set_size(region.GetSize(0)/2, region.GetSize(1)/2);
-    vnl_matrix< vcl_complex< double > > quad3;
-    quad3.set_size(region.GetSize(0)/2, region.GetSize(1)/2);
-    vnl_matrix< vcl_complex< double > > quad4;
-    quad4.set_size(region.GetSize(0)/2, region.GetSize(1)/2);
+    int xHalf = region.GetSize(0)/2;
+    int yHalf = region.GetSize(1)/2;
 
     for (int y=0; y<region.GetSize(1); y++)
         for (int x=0; x<region.GetSize(0); x++)
         {
-            SliceType::IndexType index2D;
-            index2D[0]=x; index2D[1]=y;
-            vcl_complex< double > pix = slice->GetPixel(index2D);
+            SliceType::IndexType idx;
+            idx[0]=x; idx[1]=y;
+            vcl_complex< double > pix = slice->GetPixel(idx);
 
-            if (x<region.GetSize(0)/2)
-            {
-                if (y<region.GetSize(1)/2)
-                    quad1[x][y]=pix;
-                else
-                    quad3[x][y-region.GetSize(1)/2]=pix;
-            }
+            if( idx[0] <  xHalf )
+                idx[0] = idx[0] + xHalf;
             else
-            {
-                if (y<region.GetSize(1)/2)
-                    quad2[x-region.GetSize(0)/2][y]=pix;
-                else
-                    quad4[x-region.GetSize(0)/2][y-region.GetSize(1)/2]=pix;
-            }
-        }
-    quad1.fliplr(); quad1.flipud();
-    quad2.fliplr(); quad2.flipud();
-    quad3.fliplr(); quad3.flipud();
-    quad4.fliplr(); quad4.flipud();
+                idx[0] = idx[0] - xHalf;
 
-    for (int y=0; y<quad1.cols(); y++)
-        for (int x=0; x<quad1.rows(); x++)
-        {
-            SliceType::IndexType index2D;
-            index2D[0]=x; index2D[1]=y;
-            slice->SetPixel(index2D, quad1[x][y]);
+            if( idx[1] <  yHalf )
+                idx[1] = idx[1] + yHalf;
+            else
+                idx[1] = idx[1] - yHalf;
+
+            rearrangedSlice->SetPixel(idx, pix);
         }
 
-    for (int y=0; y<quad2.cols(); y++)
-        for (int x=0; x<quad2.rows(); x++)
-        {
-            SliceType::IndexType index2D;
-            index2D[0]=x+region.GetSize(0)/2; index2D[1]=y;
-            slice->SetPixel(index2D, quad2[x][y]);
-        }
-
-    for (int y=0; y<quad3.cols(); y++)
-        for (int x=0; x<quad3.rows(); x++)
-        {
-            SliceType::IndexType index2D;
-            index2D[0]=x; index2D[1]=y+region.GetSize(1)/2;
-            slice->SetPixel(index2D, quad3[x][y]);
-        }
-
-    for (int y=0; y<quad4.cols(); y++)
-        for (int x=0; x<quad4.rows(); x++)
-        {
-            SliceType::IndexType index2D;
-            index2D[0]=x+region.GetSize(0)/2; index2D[1]=y+region.GetSize(1)/2;
-            slice->SetPixel(index2D, quad4[x][y]);
-        }
+    return rearrangedSlice;
 }
 
 void TractsToDWIImageFilter::AddT2Smearing(ComplexSliceType::Pointer slice, double T2)
@@ -214,13 +182,20 @@ void TractsToDWIImageFilter::AddT2Smearing(ComplexSliceType::Pointer slice, doub
     for (int y=0; y<region.GetSize(1)/2; y++)
         for (int x=0; x<region.GetSize(0); x++)
         {
-            SliceType::IndexType index2D;
-            index2D[0]=x; index2D[1]=y;
-            vcl_complex< double > pix = slice->GetPixel(index2D);
+            SliceType::IndexType idx;
+            idx[0]=x; idx[1]=y;
+            vcl_complex< double > pix = slice->GetPixel(idx);
 
             double t = m_ReadoutPulseLength*(y+(double)x/region.GetSize(0));
             pix.real(pix.real()*exp(-t/T2));
-            slice->SetPixel(index2D, pix);
+            pix.imag(pix.imag()*exp(-t/T2));
+            slice->SetPixel(idx, pix);
+
+            idx[0]=region.GetSize(0)-1-x; idx[1]=region.GetSize(1)-1-y;
+            pix = slice->GetPixel(idx);
+            pix.real(pix.real()*exp(-t/T2));
+            pix.imag(pix.imag()*exp(-t/T2));
+            slice->SetPixel(idx, pix);
         }
 }
 
@@ -403,9 +378,9 @@ void TractsToDWIImageFilter::GenerateData()
         }
     }
 
-    if (m_AddT2Smearing || m_AddGibbsRinging)
+    if (m_AddT2Smearing || m_AddGibbsRinging || m_OuputKspaceImage)
     {
-        MITK_INFO << "Adding k-space artifacts";
+        MITK_INFO << "Generating k-space";
         compartments = AddKspaceArtifacts(compartments);
     }
 

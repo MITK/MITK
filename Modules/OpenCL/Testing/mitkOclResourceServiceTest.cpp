@@ -35,7 +35,7 @@ using namespace mitk;
   */
 int mitkOclResourceServiceTest( int /*argc*/, char** /*argv[]*/ )
 {
-  MITK_TEST_BEGIN("mitkOclContextManagerTest");
+  MITK_TEST_BEGIN("mitkOclResourceServiceTest");
 
   ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   MITK_TEST_CONDITION_REQUIRED( ref != NULL, "Resource service available." );
@@ -98,7 +98,7 @@ int mitkOclResourceServiceTest( int /*argc*/, char** /*argv[]*/ )
 
   err = clBuildProgram(notComp_testProgram, 0, NULL, NULL, NULL, NULL);
   MITK_TEST_CONDITION_REQUIRED( err == CL_BUILD_PROGRAM_FAILURE, "Test program 2 failed to build.");
-  std::cout << " --> The (expected) OpenCL Build Error was : " << GetOclErrorString(err);
+  std::cout << " --> The (expected) OpenCL Build Error occured : ";// << GetOclErrorString(err);
 
   resources->InsertProgram( notComp_testProgram, "test_program_failed", true);
   MITK_TEST_CONDITION( resources->GetProgram("test_program_failed") == notComp_testProgram, "Program correctly stored by ResourceService");

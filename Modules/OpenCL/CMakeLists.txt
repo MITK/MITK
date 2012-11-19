@@ -13,7 +13,6 @@ if(MITK_USE_OpenCL)
     INCLUDE_DIRS ${OpenCL_INCLUDE_DIR} ${MITK_BIN_DIR}
     DEPENDS Mitk
     PACKAGE_DEPENDS OpenCL
-    AUTOLOAD_WITH Mitk
     ADDITIONAL_LIBS "${OpenCL_LIBRARY}")
 
   add_subdirectory(Testing)

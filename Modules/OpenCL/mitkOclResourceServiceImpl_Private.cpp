@@ -16,6 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclResourceServiceImpl_p.h"
 
+OclResourceService::~OclResourceService()
+{
+
+}
+
 OclResourceServiceImpl::OclResourceServiceImpl()
   : m_Context(NULL), m_Devices(NULL), m_ProgramStorage()
 {

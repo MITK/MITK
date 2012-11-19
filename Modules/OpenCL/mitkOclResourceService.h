@@ -76,7 +76,7 @@ public:
    */
   virtual unsigned int GetMaximumImageSize( unsigned int , cl_mem_object_type) = 0;
 
-  virtual ~OclResourceService() { }
+  virtual ~OclResourceService() = 0;
 
 };
 

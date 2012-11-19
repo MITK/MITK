@@ -15,9 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkKinectController.h"
 
-#ifdef MITK_USE_TOF_KINECT
 #include <XnCppWrapper.h>
-#endif
 
 namespace mitk
 {
@@ -28,12 +26,12 @@ public:
   ~KinectControllerPrivate();
 
   bool ErrorText(unsigned int error);
-#ifdef MITK_USE_TOF_KINECT
+//OpenNI related stuff
   xn::Context m_Context; ///< OpenNI context
   xn::DepthGenerator m_DepthGenerator; ///< Depth generator to access depth image of kinect
   xn::ImageGenerator m_ImageGenerator; ///< Image generator to access RGB image of kinect
   xn::IRGenerator m_IRGenerator; ///< IR generator to access IR image of kinect
-#endif
+
 
   bool m_ConnectionCheck; ///< check if camera is connected or not
 

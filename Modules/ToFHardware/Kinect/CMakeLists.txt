@@ -1,7 +1,7 @@
 IF(MITK_ENABLE_TOF_HARDWARE)
 #Begin Kinect hardware
 OPTION(MITK_USE_TOF_KINECT "Enable support for Kinect camera" OFF)
-# only if Kinect is enabled
+
 IF(MITK_USE_TOF_KINECT)
   FIND_LIBRARY(MITK_KINECT_LIB libOpenNI DOC "Kinect access library.")
   FIND_PATH(MITK_KINECT_INCLUDE_DIR XnCppWrapper.h DOC  "Include directory of Kinect camera.")
@@ -18,9 +18,9 @@ MITK_CREATE_MODULE(mitkKinectModule
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
   AUTOLOAD_WITH mitkToFHardware
 )
-  Message("Kinect Module generated")
-
+Message("Kinect Module generated")
 add_subdirectory(Testing)
+
 ENDIF(MITK_USE_TOF_KINECT)
 #End Kinect Hardware
 ENDIF(MITK_ENABLE_TOF_HARDWARE)

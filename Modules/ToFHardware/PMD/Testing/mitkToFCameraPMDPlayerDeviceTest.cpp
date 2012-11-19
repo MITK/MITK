@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFCameraPMDPlayerDevice.h>
 
 #include <mitkToFConfig.h>
+#include <mitkToFPMDConfig.h>
 
 /**Documentation
  *  test for the class "ToFCameraPMDPlayerDevice".

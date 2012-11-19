@@ -1,7 +1,7 @@
 #option MITK_USE_TOF_HARDWARE
 IF(MITK_ENABLE_TOF_HARDWARE)
 
-###-------------------------------Begin CamCube hardware-------------------------------------------
+###-------------------------------Begin PMD Module-------------------------------------------
 OPTION(MITK_USE_TOF_PMDCAMCUBE "Enable support for Cam Cube camera" OFF)
 OPTION(MITK_USE_TOF_PMDCAMBOARD "Enable support for PMD camboard" OFF)
 IF(WIN32)
@@ -13,7 +13,7 @@ IF(MITK_USE_TOF_PMDO3 OR MITK_USE_TOF_PMDCAMCUBE OR MITK_USE_TOF_PMDCAMBOARD)
   SET(MITK_USE_PMD ON)
 ENDIF(MITK_USE_TOF_PMDO3 OR MITK_USE_TOF_PMDCAMCUBE OR MITK_USE_TOF_PMDCAMBOARD)
 
-#---------------------------------------------Creating Basics----------------------------------------
+#---------------------------------------------Creating Basics for all PMD devices----------------------------------------
 IF(MITK_USE_PMD)
   #-----Setting generall Path-----
   FIND_LIBRARY(MITK_PMD_LIB pmdaccess2 DOC "PMD access library.")
@@ -34,23 +34,17 @@ IF(MITK_USE_PMD)
     ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
     AUTOLOAD_WITH mitkToFHardware
   )
-    Message("PMD Module generated")
-
-  #-----Creating Testing-subdirectory------
+  Message("PMD Module generated")
   add_subdirectory(Testing)
 ENDIF(MITK_USE_PMD)
 
-
-#---------------------------------------------------------------------------------------------------------
+#Only for CamCube
 IF(MITK_USE_TOF_PMDCAMCUBE)
 
   SET(MITK_TOF_PMD_CAMCUBE_SOURCE ${MITK_PMD_SDK_DIR}/plugins/camcube3.${_PLATFORM_STRING}.pap)
   SET(MITK_TOF_PMD_CAMCUBE_PROC ${MITK_PMD_SDK_DIR}/plugins/camcubeproc.${_PLATFORM_STRING}.ppp)
   SET(MITK_TOF_PMD_FILE_SOURCE ${MITK_PMD_SDK_DIR}/plugins/pmdfile.${_PLATFORM_STRING}.pcp)
   SET(MITK_TOF_AVAILABLE_CAMERAS ${MITK_TOF_AVAILABLE_CAMERAS},PMD CamCube 2.0/3.0,PMD CamCubeRaw 2.0/3.0,PMD Player,PMD Raw Data Player)
-
-  #set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_PMD_SDK_DIR}/include)
-  #set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_PMD_LIB})
 
   IF(WIN32)
    MITK_INSTALL(FILES ${MITK_PMD_SDK_DIR}/bin/pmdaccess2.dll  CONFIGURATIONS Release)
@@ -63,7 +57,6 @@ IF(MITK_USE_TOF_PMDCAMCUBE)
 
 Message("PMDCamCube activated")
 ENDIF(MITK_USE_TOF_PMDCAMCUBE)
-
 
 #-------------------------------Begin CamBoard hardware-------------------------------------------
 IF(MITK_USE_TOF_PMDCAMBOARD)
@@ -82,16 +75,13 @@ IF(MITK_USE_TOF_PMDCAMBOARD)
 #   INSTALL(FILES ${MITK_PMD_SDK_DIR}/plugins/camboardproc.W64.ppp DESTINATION bin CONFIGURATIONS Release)
 #   INSTALL(FILES ${MITK_PMD_SDK_DIR}/plugins/pmdfile.W32.pcp DESTINATION bin CONFIGURATIONS Release)
    ENDIF(WIN32)
-
 Message("PMDCamBoard activated")
 ENDIF(MITK_USE_TOF_PMDCAMBOARD)
 
-
 #----------------------------------------Begin PMD O3 hardware--------------------------------------------
- IF(WIN32)
-
+IF(WIN32)
 # only if PMD O3 is enabled
- IF(MITK_USE_TOF_PMDO3)
+IF(MITK_USE_TOF_PMDO3)
 Message("PMDO3 is activated")
    SET(MITK_TOF_PMD_O3D_SOURCE ${MITK_PMD_SDK_DIR}/plugins/o3d.${_PLATFORM_STRING}.pcp)
    SET(MITK_TOF_PMD_O3D_PROC ${MITK_PMD_SDK_DIR}/plugins/o3d.${_PLATFORM_STRING}.pcp)
@@ -105,5 +95,9 @@ Message("PMDO3 is activated")
  ENDIF(MITK_USE_TOF_PMDO3)
  ENDIF(WIN32)
 
+ #Generate the mitkToFPMDConfig.h file which is used internally
+CONFIGURE_FILE(mitkToFPMDConfig.h.in ${PROJECT_BINARY_DIR}/Modules/ToFHardware/PMD/mitkToFPMDConfig.h @ONLY)
+Message("mitkToFPMDConfig.h generated in")
+Message(${PROJECT_BINARY_DIR})
+
 ENDIF(MITK_ENABLE_TOF_HARDWARE)
-CONFIGURE_FILE(../mitkToFConfig.h.in ${PROJECT_BINARY_DIR}/mitkToFConfig.h @ONLY)

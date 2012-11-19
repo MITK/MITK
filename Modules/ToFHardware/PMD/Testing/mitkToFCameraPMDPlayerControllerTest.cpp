@@ -13,11 +13,11 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details
 
 ===================================================================*/
-#include "mitkToFConfig.h"
 #include <mitkTestingMacros.h>
 #include <mitkToFCameraPMDPlayerController.h>
 #include <mitkToFCameraPMDPlayerDevice.h>
 
+#include "mitkToFPMDConfig.h"
 #include <mitkToFConfig.h>
 
 /**Documentation

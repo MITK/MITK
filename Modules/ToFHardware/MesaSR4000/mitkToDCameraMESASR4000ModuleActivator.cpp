@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class MesaSr4000ModuleActivator : public mitk::ModuleActivator {
+class MESASR4000ModuleActivator : public mitk::ModuleActivator {
 public:
 
     void Load(mitk::ModuleContext* context)
@@ -56,7 +56,7 @@ public:
     {
     }
 
-    ~MesaSr4000ModuleActivator()
+    ~MESASR4000ModuleActivator()
     {
         if(m_Factories.size() > 0)
         {
@@ -73,5 +73,5 @@ private:
 
 };
 }
-US_EXPORT_MODULE_ACTIVATOR(mitkMESASR4000Module, mitk::MESASR4000Activator)
+US_EXPORT_MODULE_ACTIVATOR(mitkMESASR4000Module, mitk::MESASR4000ModuleActivator)
 #endif

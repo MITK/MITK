@@ -54,15 +54,16 @@ int mitkOclBinaryThresholdImageFilterTest( int /*argc*/, char**/* argv[]*/ )
   MITK_TEST_CONDITION_REQUIRED( inputImage.IsNotNull(), "Input (random) mitk::Image object instantiated.");
 
   // FIXME: could also be random values
-  short upperThr = 220;
-  short lowerThr = 100;
+  int upperThr = 255;
+  int lowerThr = 60;
 
-  short outsideVal = 0;
-  short insideVal = 200;
+  int outsideVal = 0;
+  int insideVal = 100;
 
   mitk::OclBinaryThresholdImageFilter* oclFilter = new mitk::OclBinaryThresholdImageFilter;
   MITK_TEST_CONDITION_REQUIRED( oclFilter != NULL, "Filter was created. ");
 
+  oclFilter->SetInput( inputImage );
   oclFilter->SetUpperThreshold( upperThr );
   oclFilter->SetLowerThreshold( lowerThr );
   oclFilter->SetOutsideValue( outsideVal );
@@ -103,8 +104,8 @@ int mitkOclBinaryThresholdImageFilterTest( int /*argc*/, char**/* argv[]*/ )
   stats->SetInput( subFilt->GetOutput() );
   stats->Update();
 
-  MITK_TEST_CONDITION( stats->GetMaximum() == 0, "The images do not differ.");
-  MITK_TEST_CONDITION( stats->GetMinimum() == 0, "The images really do not differ.")
+  MITK_TEST_CONDITION( stats->GetMaximum() == 0, "Maximal value in the difference image is 0.");
+  MITK_TEST_CONDITION( stats->GetMinimum() == 0, "Minimal value in the difference image is 0.")
 
   MITK_TEST_END();
 }

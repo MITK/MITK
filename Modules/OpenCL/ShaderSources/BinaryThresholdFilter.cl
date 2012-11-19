@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 __kernel void ckBinaryThreshold(
   __read_only image3d_t dSource, // input image
-  __global short* dDest, // output buffer
+  __global uchar* dDest, // output buffer
   int lowerT, int upperT, int outsideVal, int insideVal // parameters
 )
 {
@@ -41,13 +41,13 @@ __kernel void ckBinaryThreshold(
     // get input value
     int4 pixelValue = read_imagei( dSource, defaultSampler, (int4) (globalPosX, globalPosY, globalPosZ, 0 ));
 
-    // check for threshold
-    if ( ( pixelValue.x >= lowerT ) && ( pixelValue.x <= upperT ) )
+    if( (pixelValue.x >= lowerT) && (pixelValue.x <= upperT ) )
+    {
       result = insideVal;
+    }
 
-    // convert and store the result
-    short shResult = (short) result;
-    dDest[ globalPosZ * uiWidth * uiHeight + globalPosY * uiWidth + globalPosX ] = shResult;
+    // store the result
+    dDest[ globalPosZ * uiWidth * uiHeight + globalPosY * uiWidth + globalPosX ] = result;
   }
 
 }

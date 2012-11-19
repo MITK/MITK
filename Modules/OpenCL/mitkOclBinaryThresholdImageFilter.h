@@ -94,12 +94,12 @@ protected:
 
   mitk::PixelType GetOutputType()
   {
-    return mitk::MakeScalarPixelType<short>();
+    return mitk::MakeScalarPixelType<unsigned char>();
   }
 
   int GetBytesPerElem()
   {
-    return sizeof(short);
+    return sizeof(unsigned char);
   }
 
 private:

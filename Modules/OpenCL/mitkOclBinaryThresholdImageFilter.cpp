@@ -23,10 +23,10 @@ mitk::OclBinaryThresholdImageFilter::OclBinaryThresholdImageFilter()
   this->SetSourceFile( path.c_str() );
   this->m_FilterID = "BinaryThreshold";
 
-  this->m_lowerThr = 0;
-  this->m_upperThr = 300;
+  this->m_lowerThr = 10;
+  this->m_upperThr = 200;
 
-  this->m_insideVal = 1;
+  this->m_insideVal = 100;
   this->m_outsideVal = 0;
 }
 
@@ -57,25 +57,28 @@ void mitk::OclBinaryThresholdImageFilter::Execute()
 {
   cl_int clErr = 0;
 
-  if ( this->InitExec( this->m_ckBinaryThreshold ) )
+  try
   {
-    // set kernel arguments
-    clErr =  clSetKernelArg( this->m_ckBinaryThreshold, 3, sizeof(cl_int), &(this->m_lowerThr) );
-    clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 4, sizeof(cl_int), &(this->m_upperThr) );
-    clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 5, sizeof(cl_int), &(this->m_outsideVal) );
-    clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 6, sizeof(cl_int), &(this->m_insideVal) );
-    CHECK_OCL_ERR( clErr );
-
-    // execute the filter on a 3D NDRange
-    this->ExecuteKernel( m_ckBinaryThreshold, 3);
-
-    // signalize the GPU-side data changed
-    m_output->Modified( GPU_DATA );
+    this->InitExec( this->m_ckBinaryThreshold );
   }
-  else
+  catch( const mitk::Exception& e)
   {
-    MITK_ERROR << "Execution failed!!!";
+    MITK_ERROR << "Catched exception while initializing filter: " << e.what();
+    return;
   }
+
+  // set kernel arguments
+  clErr =  clSetKernelArg( this->m_ckBinaryThreshold, 2, sizeof(cl_int), &(this->m_lowerThr) );
+  clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 3, sizeof(cl_int), &(this->m_upperThr) );
+  clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 4, sizeof(cl_int), &(this->m_outsideVal) );
+  clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 5, sizeof(cl_int), &(this->m_insideVal) );
+  CHECK_OCL_ERR( clErr );
+
+  // execute the filter on a 3D NDRange
+  this->ExecuteKernel( m_ckBinaryThreshold, 3);
+
+  // signalize the GPU-side data changed
+  m_output->Modified( GPU_DATA );
 
 }
 

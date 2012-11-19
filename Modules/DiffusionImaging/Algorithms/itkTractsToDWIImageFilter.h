@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleX.h>
 #include <mitkDiffusionSignalModel.h>
 #include <mitkDiffusionNoiseModel.h>
+#include <mitkKspaceArtifact.h>
+#include <mitkGibbsRingingArtifact.h>
+#include <mitkT2SmearingArtifact.h>
 
 // ITK
 #include <itkImage.h>
@@ -48,7 +51,8 @@ public:
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
     typedef mitk::FiberBundleX::Pointer                     FiberBundleType;
     typedef itk::VectorImage< double, 3 >                   DoubleDwiType;
-    typedef std::vector< DiffusionSignalModel<double>* >    DiffusionModelList;
+    typedef std::vector< mitk::KspaceArtifact<double>* >    KspaceArtifactList;
+    typedef std::vector< mitk::DiffusionSignalModel<double>* >    DiffusionModelList;
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
     typedef mitk::DiffusionNoiseModel<double>               NoiseModelType;
     typedef itk::Image< double, 2 >                         SliceType;
@@ -58,11 +62,7 @@ public:
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
-    itkSetMacro( KspaceCropping, double )               ///< k-space cropping factor
     itkSetMacro( OuputKspaceImage, bool )               ///< output image of the k-space instead of the dwi (inverse fourier transformed k-space)
-    itkSetMacro( AddGibbsRinging, bool )                ///< add Gibbs ringing artifact
-    itkSetMacro( AddT2Smearing, bool )                  ///< add T2 induced k-space smearing artifact
-    itkSetMacro( ReadoutPulseLength, unsigned int )     ///< time needed to read one k-space row. parameter for artificial smearing artifacts.
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
     itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
     itkSetMacro( Origin, mitk::Point3D )                ///< output image origin
@@ -72,6 +72,7 @@ public:
     void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }            ///< generates the noise added to the image values
     void SetFiberModels(DiffusionModelList modelList){ m_FiberModels = modelList; }         ///< generate signal of fiber compartments
     void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }   ///< generate signal of non-fiber compartments
+    void SetKspaceArtifacts(KspaceArtifactList artifactList){ m_KspaceArtifacts = artifactList; }
 
     void GenerateData();
 
@@ -87,12 +88,6 @@ protected:
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using FFT and add k-space artifacts. */
     std::vector< DoubleDwiType::Pointer > AddKspaceArtifacts(std::vector< DoubleDwiType::Pointer >& images);
 
-    /** Crop k space to simulate undersampling. Introduces artificial Gibbs ringing artifacts. */
-    ComplexSliceType::Pointer CropSlice(ComplexSliceType::Pointer image);
-
-    /** Simulate T2 signal decay during k-space readout. Adds smearing artifact. */
-    void AddT2Smearing(ComplexSliceType::Pointer slice, double T2);
-
     /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
     TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
@@ -104,11 +99,8 @@ protected:
     FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
+    KspaceArtifactList                  m_KspaceArtifacts;
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
-    double                              m_KspaceCropping;       ///< cropping of k-space (introduces gibbs ringing artifacts)
-    unsigned int                        m_ReadoutPulseLength;   ///< time needed to read one k-space row. parameter for artificial smearing artifacts.
-    bool                                m_AddT2Smearing;        ///< add T2 smearing artifact or not
-    bool                                m_AddGibbsRinging;      ///< add Gibbs ringing artifact or not
     bool                                m_OuputKspaceImage;
 };
 }

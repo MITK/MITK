@@ -244,6 +244,9 @@ set(H_FILES
   SignalModels/mitkStickModel.h
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
+  SignalModels/mitkKspaceArtifact.h
+  SignalModels/mitkGibbsRingingArtifact.h
+  SignalModels/mitkT2SmearingArtifact.h
 )
 
 set( TOOL_FILES

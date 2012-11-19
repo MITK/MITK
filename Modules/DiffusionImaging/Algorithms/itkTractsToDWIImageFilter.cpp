@@ -26,11 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 TractsToDWIImageFilter::TractsToDWIImageFilter()
-    : m_KspaceCropping(0.1)
-    , m_ReadoutPulseLength(1)
-    , m_AddT2Smearing(false)
-    , m_AddGibbsRinging(false)
-    , m_OuputKspaceImage(false)
+    : m_OuputKspaceImage(false)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -101,10 +97,11 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                 fSlice = RearrangeSlice(fSlice);
 
                 // add artifacts
-                if (m_AddGibbsRinging)
-                    fSlice = CropSlice(fSlice);
-                if (m_AddT2Smearing)
-                    AddT2Smearing(fSlice, signalModel->GetRelaxationT2());
+                for (int a=0; a<m_KspaceArtifacts.size(); a++)
+                {
+                    m_KspaceArtifacts.at(a)->SetRelaxationT2(signalModel->GetRelaxationT2());
+                    m_KspaceArtifacts.at(a)->AddArtifact(fSlice);
+                }
 
                 SliceType::Pointer newSlice;
                 if (!m_OuputKspaceImage)
@@ -176,76 +173,6 @@ TractsToDWIImageFilter::ComplexSliceType::Pointer TractsToDWIImageFilter::Rearra
     return rearrangedSlice;
 }
 
-void TractsToDWIImageFilter::AddT2Smearing(ComplexSliceType::Pointer slice, double T2)
-{
-    ImageRegion<2> region = slice->GetLargestPossibleRegion();
-    for (int y=0; y<region.GetSize(1)/2; y++)
-        for (int x=0; x<region.GetSize(0); x++)
-        {
-            SliceType::IndexType idx;
-            idx[0]=x; idx[1]=y;
-            vcl_complex< double > pix = slice->GetPixel(idx);
-
-            double t = m_ReadoutPulseLength*(y+(double)x/region.GetSize(0));
-            pix.real(pix.real()*exp(-t/T2));
-            pix.imag(pix.imag()*exp(-t/T2));
-            slice->SetPixel(idx, pix);
-
-            idx[0]=region.GetSize(0)-1-x; idx[1]=region.GetSize(1)-1-y;
-            pix = slice->GetPixel(idx);
-            pix.real(pix.real()*exp(-t/T2));
-            pix.imag(pix.imag()*exp(-t/T2));
-            slice->SetPixel(idx, pix);
-        }
-}
-
-TractsToDWIImageFilter::ComplexSliceType::Pointer TractsToDWIImageFilter::CropSlice(ComplexSliceType::Pointer image)
-{
-    ImageRegion<2> region = image->GetLargestPossibleRegion();
-    ImageRegionIterator<ComplexSliceType> it(image, region);
-    int x = std::ceil((double)region.GetSize()[0]*m_KspaceCropping);
-    int y = std::ceil((double)region.GetSize()[1]*m_KspaceCropping);
-    while(!it.IsAtEnd())
-    {
-        ComplexSliceType::IndexType idx = it.GetIndex();
-        if (idx[0]<x)
-            it.Set(vcl_complex<double>(0,0));
-        if (idx[0]>region.GetSize()[0]-x)
-            it.Set(0);
-        if (idx[1]>region.GetSize()[1]-y)
-            it.Set(0);
-        if (idx[1]<y)
-            it.Set(0);
-        ++it;
-    }
-
-//    ImageRegion<2> newRegion;
-//    newRegion.SetSize(0, x);
-//    newRegion.SetSize(1, y);
-
-//    ComplexSliceType::Pointer newImage = ComplexSliceType::New();
-//    newImage->SetLargestPossibleRegion( newRegion );
-//    newImage->SetBufferedRegion( newRegion );
-//    newImage->SetRequestedRegion( newRegion );
-//    newImage->Allocate();
-//    newImage->FillBuffer(0);
-
-//    ImageRegionIterator<ComplexSliceType> it(newImage, newRegion);
-//    while(!it.IsAtEnd())
-//    {
-//        ComplexSliceType::IndexType idx1 = it.GetIndex();
-//        ComplexSliceType::IndexType idx2;
-
-//        idx2[0] = region.GetSize(0)/2+idx1[0]-x/2;
-//        idx2[1] = region.GetSize(1)/2+idx1[1]-y/2;
-
-//        it.Set(image->GetPixel(idx2));
-
-//        ++it;
-//    }
-    return image;
-}
-
 void TractsToDWIImageFilter::GenerateData()
 {
     if (m_FiberBundle.IsNull())
@@ -287,9 +214,6 @@ void TractsToDWIImageFilter::GenerateData()
     temp.Fill(0.0);
     outImage->FillBuffer(temp);
     this->SetNthOutput(0, outImage);
-
-    if (m_KspaceCropping>1)
-        m_KspaceCropping = 1;
 
     // generate working double images because we work with small values (will be scaled later)
     std::vector< DoubleDwiType::Pointer > compartments;
@@ -388,7 +312,7 @@ void TractsToDWIImageFilter::GenerateData()
         }
     }
 
-    if (m_AddT2Smearing || m_AddGibbsRinging || m_OuputKspaceImage)
+    if (!m_KspaceArtifacts.empty() || m_OuputKspaceImage)
     {
         MITK_INFO << "Generating k-space";
         compartments = AddKspaceArtifacts(compartments);

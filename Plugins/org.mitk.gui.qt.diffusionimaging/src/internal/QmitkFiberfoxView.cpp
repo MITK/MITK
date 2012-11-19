@@ -47,6 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBallModel.h>
 #include <mitkStickModel.h>
 #include <mitkRicianNoiseModel.h>
+#include <mitkGibbsRingingArtifact.h>
+#include <mitkT2SmearingArtifact.h>
 
 #include <QMessageBox>
 
@@ -422,18 +424,19 @@ void QmitkFiberfoxView::GenerateImage()
     extraAxonal.SetKernelFA(m_Controls->m_MaxFaBox->value());
     extraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
     extraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
-    mitk::StickModel<double> intraAxonal;
-    intraAxonal.SetGradientList(gradientList);
-    intraAxonal.SetDiffusivity(m_Controls->m_MaxFaBox->value());
-    intraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
-    intraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
+//    mitk::StickModel<double> intraAxonal;
+//    intraAxonal.SetGradientList(gradientList);
+//    intraAxonal.SetDiffusivity(m_Controls->m_MaxFaBox->value());
+//    intraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
+//    intraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
 
     mitk::BallModel<double> freeDiffusion;
     freeDiffusion.SetGradientList(gradientList);
     freeDiffusion.SetBvalue(bVal);
     freeDiffusion.SetSignalScale(m_Controls->m_NonFiberS0Box->value());
     freeDiffusion.SetRelaxationT2(m_Controls->m_NonFiberRelaxationT2Box->value());
-    std::vector< mitk::DiffusionSignalModel<double>* > modelList;
+    itk::TractsToDWIImageFilter::DiffusionModelList modelList;
+    itk::TractsToDWIImageFilter::KspaceArtifactList artifactList;
 
     // noise model
     double snr = m_Controls->m_NoiseLevel->value();
@@ -449,21 +452,35 @@ void QmitkFiberfoxView::GenerateImage()
     noiseModel.SetScaleFactor(200);
     noiseModel.SetNoiseVariance(noiseVariance);
 
+    // artifact models
+
+    mitk::T2SmearingArtifact<double> t2Model;
+    if (m_Controls->m_AddT2Smearing->isChecked())
+    {
+        t2Model.SetReadoutPulseLength(1);
+        artifactList.push_back(&t2Model);
+    }
+
+    mitk::GibbsRingingArtifact<double> gibbsModel;
+    if (m_Controls->m_AddGibbsRinging->isChecked())
+    {
+        gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceCroppingBox->value()/100.0);
+        artifactList.push_back(&gibbsModel);
+    }
+
     itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();
     filter->SetImageRegion(imageRegion);
     filter->SetSpacing(spacing);
     filter->SetFiberBundle(fiberBundle);
     modelList.push_back(&extraAxonal);
-    modelList.push_back(&intraAxonal);
+//    modelList.push_back(&intraAxonal);
     filter->SetFiberModels(modelList);
     modelList.clear();
     modelList.push_back(&freeDiffusion);
     filter->SetNonFiberModels(modelList);
     filter->SetNoiseModel(&noiseModel);
-    filter->SetAddT2Smearing(m_Controls->m_AddT2Smearing->isChecked());
+    filter->SetKspaceArtifacts(artifactList);
     filter->SetOuputKspaceImage(m_Controls->m_KspaceImageBox->isChecked());
-    filter->SetAddGibbsRinging(m_Controls->m_AddGibbsRinging->isChecked());
-    filter->SetKspaceCropping((double)m_Controls->m_KspaceCroppingBox->value()/100.0);
 
     if (m_TissueMask.IsNotNull())
     {

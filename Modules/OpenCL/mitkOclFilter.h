@@ -99,8 +99,9 @@ protected:
   std::string m_FilterID;
 
   /** @brief Set the working size for the following OpenCL kernel call */
-  void SetWorkingSize( unsigned int locx, unsigned int locy,
-                       unsigned int dimx, unsigned int dimy);
+  void SetWorkingSize(unsigned int locx, unsigned int dimx,
+                      unsigned int locy, unsigned int dimy,
+                      unsigned int locz = 1, unsigned int dimz = 1);
 
   /** @brief The local work size fo the filter */
   size_t m_localWorkSize[3];

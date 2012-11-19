@@ -240,7 +240,7 @@ void* mitk::OclImage::TransferDataToCPU(cl_command_queue gpuComQueue)
   }
 
   // check buffersize/image size
-  unsigned char* data = new unsigned char[m_bufferSize * m_BpE];
+  char* data = new char[m_bufferSize * m_BpE];
 
   // debug info
   oclPrintMemObjectInfo( m_gpuImage );
@@ -249,7 +249,8 @@ void* mitk::OclImage::TransferDataToCPU(cl_command_queue gpuComQueue)
   CHECK_OCL_ERR(clErr);
 
   clFlush( gpuComQueue );
-  // m_Image->SetImportVolume((void*) data, 0, 0, mitk::Image::ReferenceMemory);
+  // the cpu data is same as gpu
+  this->m_gpuModified = false;
 
   return (void*) data;
 
@@ -266,7 +267,7 @@ cl_image_format mitk::OclImage::ConvertPixelTypeToOCLFormat()
   switch ( this->m_BpE )
   {
   case 1:
-    texFormat.image_channel_data_type = CL_UNORM_INT8;
+    texFormat.image_channel_data_type = CL_UNSIGNED_INT8;
     MITK_INFO<< "PixelType: UCHAR => CLFormat: [CL_UNORM_INT8, CL_R]";
     break;
   case 2:

@@ -64,6 +64,8 @@ mitk::Image::Pointer mitk::OclImageToImageFilter::GetOutput()
 
     const mitk::SlicedGeometry3D::Pointer p_slg = m_input->GetMITKImage()->GetSlicedGeometry();
 
+    MITK_INFO << " Creating new MITK Image. ";
+
     m_output->GetMITKImage()->Initialize( this->GetOutputType(), dimension, dimensions);
     m_output->GetMITKImage()->SetSpacing( p_slg->GetSpacing());
     m_output->GetMITKImage()->SetGeometry( m_input->GetMITKImage()->GetGeometry() );
@@ -90,6 +92,8 @@ mitk::PixelType mitk::OclImageToImageFilter::GetOutputType()
   {
   case CL_UNORM_INT8:
     return mitk::MakeScalarPixelType<unsigned char>();
+  case CL_UNSIGNED_INT8:
+    return mitk::MakeScalarPixelType<unsigned char>();
   case CL_UNORM_INT16:
     return mitk::MakeScalarPixelType<short>();
   default:
@@ -106,13 +110,16 @@ bool mitk::OclImageToImageFilter::InitExec(cl_kernel ckKernel)
 {
   cl_int clErr = 0;
 
+  if( m_input.IsNull() )
+    mitkThrow() << "Input image is null.";
+
   // get image size once
   const unsigned int uiImageWidth  = m_input->GetDimension(0);
   const unsigned int uiImageHeight = m_input->GetDimension(1);
   const unsigned int uiImageDepth  = m_input->GetDimension(2);
 
   // compute work sizes
-  this->SetWorkingSize( 8, 8, uiImageWidth, uiImageHeight );
+  this->SetWorkingSize( 8, uiImageWidth, 8, uiImageHeight , 8, uiImageDepth );
 
   cl_mem clBuffIn = m_input->GetGPUImage(this->m_commandQue);
   cl_mem clBuffOut = m_output->GetGPUBuffer();
@@ -139,6 +146,9 @@ bool mitk::OclImageToImageFilter::InitExec(cl_kernel ckKernel)
   clErr  = clSetKernelArg(ckKernel, 0, sizeof(cl_mem), &clBuffIn);
   clErr |= clSetKernelArg(ckKernel, 1, sizeof(cl_mem), &clBuffOut);
   CHECK_OCL_ERR( clErr );
+
+  if( clErr != CL_SUCCESS )
+    mitkThrow() << "OpenCL Part initialization failed with " << GetOclErrorString(clErr);
 
   return( clErr == CL_SUCCESS );
 }

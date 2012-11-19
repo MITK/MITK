@@ -37,7 +37,7 @@ mitk::OclFilter::OclFilter()
     m_commandQue(NULL),
     m_FilterID("mitkOclFilter")
 {
-  this->SetSourcePath("/Modules/OpenCL/gpuSourceCode");
+  this->SetSourcePath("Modules/OpenCL/ShaderSources");
   m_clCompilerFlags = "";
 }
 
@@ -48,7 +48,7 @@ mitk::OclFilter::OclFilter(const char *_filename)
   m_clProgram = NULL;
   m_clCompilerFlags = "";
   this->SetSourceFile( _filename);
-  this->SetSourcePath("/Modules/OpenCL/gpuSourceCode");
+  this->SetSourcePath("/Modules/OpenCL/ShaderSources");
 }
 
 mitk::OclFilter::~OclFilter()
@@ -85,8 +85,6 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
 
 bool mitk::OclFilter::Initialize()
 {
-  cl_device_id clDevice = OpenCLActivator::GetResourceServiceRef()->GetCurrentDevice();
-
   m_commandQue = OpenCLActivator::GetResourceServiceRef()->GetCommandQueue();
 
   cl_int clErr = 0;

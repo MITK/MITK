@@ -1,0 +1,94 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#include "mitkOclBinaryThresholdImageFilter.h"
+
+mitk::OclBinaryThresholdImageFilter::OclBinaryThresholdImageFilter()
+: m_ckBinaryThreshold( NULL )
+{
+  std::string path = "BinaryThresholdFilter.cl";
+  this->SetSourceFile( path.c_str() );
+  this->m_FilterID = "BinaryThreshold";
+
+  this->m_lowerThr = 0;
+  this->m_upperThr = 300;
+
+  this->m_insideVal = 1;
+  this->m_outsideVal = 0;
+}
+
+mitk::OclBinaryThresholdImageFilter::~OclBinaryThresholdImageFilter()
+{
+  if ( this->m_ckBinaryThreshold )
+  {
+    clReleaseKernel( m_ckBinaryThreshold );
+  }
+}
+
+void mitk::OclBinaryThresholdImageFilter::Update()
+{
+  //Check if context & program available
+  if (!this->Initialize())
+  {
+    // clean-up also the resources
+    OpenCLActivator::GetResourceServiceRef()->InvalidateStorage();
+    mitkThrow() <<"Filter is not initialized. Cannot update.";
+  }
+  else{
+    // Execute
+    this->Execute();
+  }
+}
+
+void mitk::OclBinaryThresholdImageFilter::Execute()
+{
+  cl_int clErr = 0;
+
+  if ( this->InitExec( this->m_ckBinaryThreshold ) )
+  {
+    // set kernel arguments
+    clErr =  clSetKernelArg( this->m_ckBinaryThreshold, 3, sizeof(cl_int), &(this->m_lowerThr) );
+    clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 4, sizeof(cl_int), &(this->m_upperThr) );
+    clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 5, sizeof(cl_int), &(this->m_outsideVal) );
+    clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 6, sizeof(cl_int), &(this->m_insideVal) );
+    CHECK_OCL_ERR( clErr );
+
+    // execute the filter on a 3D NDRange
+    this->ExecuteKernel( m_ckBinaryThreshold, 3);
+
+    // signalize the GPU-side data changed
+    m_output->Modified( GPU_DATA );
+  }
+  else
+  {
+    MITK_ERROR << "Execution failed!!!";
+  }
+
+}
+
+bool mitk::OclBinaryThresholdImageFilter::Initialize()
+{
+  bool buildErr = true;
+  cl_int clErr = 0;
+
+  if ( OclFilter::Initialize() )
+  {
+    this->m_ckBinaryThreshold = clCreateKernel( this->m_clProgram, "ckBinaryThreshold", &clErr);
+    buildErr |= CHECK_OCL_ERR( clErr );
+  }
+
+  return (Superclass::IsInitialized() && buildErr );
+}

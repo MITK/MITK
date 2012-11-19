@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 /**
-  This function is testing the class mitk::OclContextManager.
+  This function is testing the mitk::OclImage class.
   */
 int mitkOclImageTest( int /*argc*/, char* /*argv*/[] )
 {

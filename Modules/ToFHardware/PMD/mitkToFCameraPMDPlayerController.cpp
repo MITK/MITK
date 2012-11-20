@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkToFCameraPMDPlayerController.h"
 #include <mitkToFConfig.h>
+#include <mitkToFPMDConfig.h>
 #include <pmdsdk2.h>
 
 //Plugin defines for Camcube 2.0

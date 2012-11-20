@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraPMDO3Controller.h"
 #include <pmdsdk2.h>
 #include "mitkToFConfig.h"
+#include "mitkToFPMDConfig.h"
 
 // IP Adress of the Camera, change here if needed
 #define CAMERA_ADDR "192.168.0.69"

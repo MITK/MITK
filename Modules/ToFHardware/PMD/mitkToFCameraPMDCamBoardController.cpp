@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraPMDCamBoardController.h"
 #include "mitkToFConfig.h"
 #include <pmdsdk2.h>
+#include "mitkToFPMDConfig.h"
 
 // vnl includes
 #include "vnl/vnl_matrix.h"

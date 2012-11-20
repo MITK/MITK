@@ -1,5 +1,9 @@
 IF(MITK_USE_PMD)
 SET(CPP_FILES
+
+   mitkToFCameraPMDPlayerController.cpp
+   mitkToFCameraPMDPlayerDevice.cpp
+   mitkToFCameraPMDPlayerDeviceFactory.cpp
    mitkToFCameraPMDDevice.cpp
  #the PMDRawDataCamCubeDeviceFactory need the
    mitkToFCameraPMDRawDataDevice.cpp

@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkModuleActivator.h>
 #include "mitkIToFDeviceFactory.h"
 #include "mitkToFConfig.h"
+#include "mitkToFPMDConfig.h"
 
 
 //The follwing heades only get implemented if the respective Devices are activated through Cmake

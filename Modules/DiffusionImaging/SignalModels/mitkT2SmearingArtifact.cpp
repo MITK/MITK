@@ -30,7 +30,7 @@ template< class ScalarType >
 void T2SmearingArtifact< ScalarType >::AddArtifact(typename ComplexSliceType::Pointer slice)
 {
     itk::ImageRegion<2> region = slice->GetLargestPossibleRegion();
-    for (int y=0; y<region.GetSize(1)/2; y++)
+    for (int y=0; y<region.GetSize(1); y++)
         for (int x=0; x<region.GetSize(0); x++)
         {
             typename ComplexSliceType::IndexType idx;
@@ -42,10 +42,10 @@ void T2SmearingArtifact< ScalarType >::AddArtifact(typename ComplexSliceType::Po
             pix.imag(pix.imag()*exp(-t/this->m_T2));
             slice->SetPixel(idx, pix);
 
-            idx[0]=region.GetSize(0)-1-x; idx[1]=region.GetSize(1)-1-y;
-            pix = slice->GetPixel(idx);
-            pix.real(pix.real()*exp(-t/this->m_T2));
-            pix.imag(pix.imag()*exp(-t/this->m_T2));
-            slice->SetPixel(idx, pix);
+//            idx[0]=region.GetSize(0)-1-x; idx[1]=region.GetSize(1)-1-y;
+//            pix = slice->GetPixel(idx);
+//            pix.real(pix.real()*exp(-t/this->m_T2));
+//            pix.imag(pix.imag()*exp(-t/this->m_T2));
+//            slice->SetPixel(idx, pix);
         }
 }

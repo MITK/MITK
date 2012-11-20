@@ -39,7 +39,7 @@ public:
     typedef typename KspaceArtifact< ScalarType >::ComplexSliceType ComplexSliceType;
 
     /** Attenuate signal according to given T2 time. **/
-    void AddArtifact(typename ComplexSliceType::Pointer slice);
+    typename ComplexSliceType::Pointer AddArtifact(typename ComplexSliceType::Pointer slice);
 
     void SetReadoutPulseLength(double t){ m_ReadoutPulseLength=t; }
 

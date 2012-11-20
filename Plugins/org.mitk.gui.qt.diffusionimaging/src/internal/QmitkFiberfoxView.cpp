@@ -453,19 +453,18 @@ void QmitkFiberfoxView::GenerateImage()
     noiseModel.SetNoiseVariance(noiseVariance);
 
     // artifact models
+    mitk::GibbsRingingArtifact<double> gibbsModel;
+    if (m_Controls->m_AddGibbsRinging->isChecked())
+    {
+        gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceCroppingBox->value());
+        artifactList.push_back(&gibbsModel);
+    }
 
     mitk::T2SmearingArtifact<double> t2Model;
     if (m_Controls->m_AddT2Smearing->isChecked())
     {
         t2Model.SetReadoutPulseLength(1);
         artifactList.push_back(&t2Model);
-    }
-
-    mitk::GibbsRingingArtifact<double> gibbsModel;
-    if (m_Controls->m_AddGibbsRinging->isChecked())
-    {
-        gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceCroppingBox->value()/100.0);
-        artifactList.push_back(&gibbsModel);
     }
 
     itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();

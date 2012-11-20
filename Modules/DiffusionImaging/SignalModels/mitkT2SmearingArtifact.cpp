@@ -27,7 +27,7 @@ T2SmearingArtifact< ScalarType >::~T2SmearingArtifact()
 }
 
 template< class ScalarType >
-void T2SmearingArtifact< ScalarType >::AddArtifact(typename ComplexSliceType::Pointer slice)
+typename T2SmearingArtifact< ScalarType >::ComplexSliceType::Pointer T2SmearingArtifact< ScalarType >::AddArtifact(typename ComplexSliceType::Pointer slice)
 {
     itk::ImageRegion<2> region = slice->GetLargestPossibleRegion();
     for (int y=0; y<region.GetSize(1); y++)
@@ -48,4 +48,5 @@ void T2SmearingArtifact< ScalarType >::AddArtifact(typename ComplexSliceType::Po
 //            pix.imag(pix.imag()*exp(-t/this->m_T2));
 //            slice->SetPixel(idx, pix);
         }
+    return slice;
 }

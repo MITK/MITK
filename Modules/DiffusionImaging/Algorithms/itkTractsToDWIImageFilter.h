@@ -102,6 +102,7 @@ protected:
     KspaceArtifactList                  m_KspaceArtifacts;
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
     bool                                m_OuputKspaceImage;
+    bool                                m_CircleDummy;
 };
 }
 

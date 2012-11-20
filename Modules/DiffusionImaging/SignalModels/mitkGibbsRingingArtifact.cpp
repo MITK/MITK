@@ -30,38 +30,33 @@ GibbsRingingArtifact< ScalarType >::~GibbsRingingArtifact()
 }
 
 template< class ScalarType >
-void GibbsRingingArtifact< ScalarType >::AddArtifact(typename ComplexSliceType::Pointer slice)
+typename GibbsRingingArtifact< ScalarType >::ComplexSliceType::Pointer GibbsRingingArtifact< ScalarType >::AddArtifact(typename ComplexSliceType::Pointer slice)
 {
     itk::ImageRegion<2> region = slice->GetLargestPossibleRegion();
-    itk::ImageRegionIterator<ComplexSliceType> it(slice, region);
 
-//    double x = (double)region.GetSize()[0]/2;
-//    double y = (double)region.GetSize()[1]/2;
+    int x = region.GetSize()[0]/m_KspaceCropping;
+    int y = region.GetSize()[1]/m_KspaceCropping;
 
-//    double radius = std::max(x,y);
-//    radius *= (1-m_KspaceCropping);
+    typename ComplexSliceType::Pointer newSlice = ComplexSliceType::New();
+    itk::ImageRegion<2> newRegion;
+    newRegion.SetSize(0, x);
+    newRegion.SetSize(1, y);
 
-//    if (region.GetSize()[0]%2 == 0)
-//        x -= 0.5;
-//    if (region.GetSize()[1]%2 == 0)
-//        y -= 0.5;
+    newSlice->SetLargestPossibleRegion( newRegion );
+    newSlice->SetBufferedRegion( newRegion );
+    newSlice->SetRequestedRegion( newRegion );
+    newSlice->Allocate();
 
-    int x = std::ceil((double)region.GetSize()[0]*m_KspaceCropping);
-    int y = std::ceil((double)region.GetSize()[1]*m_KspaceCropping);
+    itk::ImageRegionIterator<ComplexSliceType> it(newSlice, newRegion);
     while(!it.IsAtEnd())
     {
-        typename ComplexSliceType::IndexType idx = it.GetIndex();
-//        double dist = sqrt((idx[0]-x)*(idx[0]-x)+(idx[1]-y)*(idx[1]-y));
-//        if (dist>radius)
-//            it.Set(0);
-        if (idx[0]<x)
-            it.Set(vcl_complex<double>(0,0));
-        if (idx[0]>region.GetSize()[0]-x)
-            it.Set(0);
-        if (idx[1]>region.GetSize()[1]-y)
-            it.Set(0);
-        if (idx[1]<y)
-            it.Set(0);
+        typename ComplexSliceType::IndexType idx;
+        idx[0] = region.GetSize()[0]/2-x/2+it.GetIndex()[0];
+        idx[1] = region.GetSize()[1]/2-y/2+it.GetIndex()[1];
+
+        it.Set(slice->GetPixel(idx));
+
         ++it;
     }
+    return newSlice;
 }

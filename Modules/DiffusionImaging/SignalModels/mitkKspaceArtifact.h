@@ -39,7 +39,7 @@ public:
     typedef typename itk::FFTRealToComplexConjugateImageFilter< ScalarType, 2 >::OutputImageType ComplexSliceType;
 
     /** Adds artifact according to model to the input slice. Has to be implemented in subclass. **/
-    virtual void AddArtifact(typename ComplexSliceType::Pointer slice) = 0;
+    virtual typename ComplexSliceType::Pointer AddArtifact(typename ComplexSliceType::Pointer slice) = 0;
 
     void SetRelaxationT2(unsigned int T2){ m_T2=T2; }
 

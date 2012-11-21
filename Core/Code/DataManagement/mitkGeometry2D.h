@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,26 +26,26 @@ namespace mitk {
 /**
  * \brief Describes the geometry of a two-dimensional object
  *
- * Describes a two-dimensional manifold, i.e., to put it simply, 
- * an object that can be described using a 2D coordinate-system. 
+ * Describes a two-dimensional manifold, i.e., to put it simply,
+ * an object that can be described using a 2D coordinate-system.
  *
- * Geometry2D can map points between 3D world coordinates 
+ * Geometry2D can map points between 3D world coordinates
  * (in mm) and the described 2D coordinate-system (in mm) by first projecting
  * the 3D point onto the 2D manifold and then calculating the 2D-coordinates
- * (in mm). These 2D-mm-coordinates can be further converted into 
+ * (in mm). These 2D-mm-coordinates can be further converted into
  * 2D-unit-coordinates (e.g., pixels), giving a parameter representation of
  * the object with parameter values inside a rectangle
  * (e.g., [0,0]..[width, height]), which is the bounding box (bounding range
  * in z-direction always [0]..[1]).
  *
- * A Geometry2D describes the 2D representation within a 3D object and is 
+ * A Geometry2D describes the 2D representation within a 3D object and is
  * therefore itself a Geometry3D (derived from Geometry3D). For example,
- * a single CT-image (slice) is 2D in the sense that you can access the 
- * pixels using 2D-coordinates, but is also 3D, as the pixels are really 
+ * a single CT-image (slice) is 2D in the sense that you can access the
+ * pixels using 2D-coordinates, but is also 3D, as the pixels are really
  * voxels, thus have an extension (thickness) in the 3rd dimension.
- * 
- * Most often, instances of Geometry2D will be used to descibe a plane, 
- * which is represented by the sub-class PlaneGeometry, but curved 
+ *
+ * Most often, instances of Geometry2D will be used to descibe a plane,
+ * which is represented by the sub-class PlaneGeometry, but curved
  * surfaces are also possible.
  *
  * Optionally, a reference Geometry3D can be specified, which usually would
@@ -53,7 +53,7 @@ namespace mitk {
  * used for calculating the intersection of inclined / rotated planes
  * (represented as Geometry2D) with the bounding box of the associated
  * Geometry3D.
- * 
+ *
  * \warning The Geometry2Ds are not necessarily up-to-date and not even
  * initialized. As described in the previous paragraph, one of the
  * Generate-/Copy-/UpdateOutputInformation methods have to initialize it.
@@ -61,7 +61,7 @@ namespace mitk {
  * up-to-date before returning it (by setting the update extent appropriately
  * and calling UpdateOutputInformation).
  *
- * Rule: everything is in mm (or ms for temporal information) if not 
+ * Rule: everything is in mm (or ms for temporal information) if not
  * stated otherwise.
  * \ingroup Geometry
  */
@@ -74,21 +74,21 @@ public:
   /**
    * \brief Project a 3D point given in mm (\a pt3d_mm) onto the 2D
    * geometry. The result is a 2D point in mm (\a pt2d_mm).
-   * 
+   *
    * The result is a 2D point in mm (\a pt2d_mm) relative to the upper-left
    * corner of the geometry. To convert this point into units (e.g., pixels
    * in case of an image), use WorldToIndex.
    * \return true projection was possible
    * \sa Project(const mitk::Point3D &pt3d_mm, mitk::Point3D
-   * &projectedPt3d_mm) 
+   * &projectedPt3d_mm)
    */
   virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
 
   /**
    * \brief Converts a 2D point given in mm (\a pt2d_mm) relative to the
    * upper-left corner of the geometry into the corresponding
-   * world-coordinate (a 3D point in mm, \a pt3d_mm). 
-   * 
+   * world-coordinate (a 3D point in mm, \a pt3d_mm).
+   *
    * To convert a 2D point given in units (e.g., pixels in case of an
    * image) into a 2D point given in mm (as required by this method), use
    * IndexToWorld.
@@ -120,7 +120,7 @@ public:
   virtual void IndexToWorld(
     const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units,
     mitk::Vector2D &vec_mm) const;
-  
+
   /**
    * \brief Convert a 2D vector given in mm into a 2D point vector in mm
    * (e.g., pixels in case of an image)
@@ -130,7 +130,7 @@ public:
    * information for general transforms.
    */
   virtual void WorldToIndex(
-    const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, 
+    const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm,
     mitk::Vector2D &vec_units) const;
 
   /**
@@ -146,7 +146,7 @@ public:
   /**
    * \brief Project a 3D point given in mm (\a pt3d_mm) onto the 2D
    * geometry. The result is a 3D point in mm (\a projectedPt3d_mm).
-   * 
+   *
    * \return true projection was possible
    */
   virtual bool Project(const mitk::Point3D &pt3d_mm,
@@ -155,38 +155,48 @@ public:
   /**
    * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D
    * geometry. The result is a 2D vector in mm (\a vec2d_mm).
-   * 
+   *
    * The result is a 2D vector in mm (\a vec2d_mm) relative to the
    * upper-left
    * corner of the geometry. To convert this point into units (e.g., pixels
    * in case of an image), use WorldToIndex.
    * \return true projection was possible
    * \sa Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D
-   * &projectedVec3d_mm) 
+   * &projectedVec3d_mm)
    */
-  virtual bool Map(const mitk::Point3D & atPt3d_mm, 
+  virtual bool Map(const mitk::Point3D & atPt3d_mm,
     const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
 
   /**
    * \brief Converts a 2D vector given in mm (\a vec2d_mm) relative to the
    * upper-left corner of the geometry into the corresponding
-   * world-coordinate (a 3D vector in mm, \a vec3d_mm). 
-   * 
+   * world-coordinate (a 3D vector in mm, \a vec3d_mm).
+   *
    * To convert a 2D vector given in units (e.g., pixels in case of an
    * image) into a 2D vector given in mm (as required by this method), use
    * IndexToWorld.
    */
-  virtual void Map(const mitk::Point2D & atPt2d_mm, 
+  virtual void Map(const mitk::Point2D & atPt2d_mm,
     const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
   /**
    * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D
    * geometry. The result is a 3D vector in mm (\a projectedVec3d_mm).
-   * 
+   *
+   * DEPRECATED. Use Project(vector,vector) instead
+   *
    * \return true projection was possible
    */
-  virtual bool Project(const mitk::Point3D & atPt3d_mm, 
+  virtual bool Project(const mitk::Point3D & atPt3d_mm,
     const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
+
+  /**
+  * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D
+  * geometry. The result is a 3D vector in mm (\a projectedVec3d_mm).
+  *
+  * \return true projection was possible
+  */
+  virtual bool Project( const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
   /**
    * \brief Distance of the point from the geometry
@@ -238,20 +248,20 @@ protected:
   Geometry2D();
 
   Geometry2D(const Geometry2D& other);
-  
+
   virtual ~Geometry2D();
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
   /**
    * \brief factor to convert x-coordinates from mm to units and vice versa
-   * 
+   *
    */
   mutable mitk::ScalarType m_ScaleFactorMMPerUnitX;
 
   /**
    * \brief factor to convert y-coordinates from mm to units and vice versa
-   * 
+   *
    */
   mutable mitk::ScalarType m_ScaleFactorMMPerUnitY;
 

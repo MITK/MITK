@@ -386,13 +386,19 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
 
     std::string filename;
+    std::string optionDirectory;
+    std::string separator;
     try
     {
         //create filename
+        separator = Poco::Path::separator();
+        optionDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory();
         filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage";
     }
     catch (std::exception& e) {
         MITK_ERROR << "File access Exception: " << e.what();
+        MITK_INFO << "separator: " << separator;
+        MITK_INFO << "optionDirectory: " << optionDirectory;
         MITK_TEST_FAILED_MSG(<<"Could not create filename for Exceptiontest");
     }
 

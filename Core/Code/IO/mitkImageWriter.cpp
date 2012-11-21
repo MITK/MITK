@@ -105,7 +105,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
 
   // Set the necessary information for imageIO
   imageIO->SetNumberOfDimensions(dimension);
-  imageIO->SetPixelTypeInfo( pixelType.GetTypeId() );
+  imageIO->SetPixelTypeInfo<std::type_info>( &pixelType.GetTypeId() );
   // Set also the PixelTypeIO information since it is available after
   // the changes in PixelType for Bug #12838
   imageIO->SetPixelType( pixelType.GetPixelTypeId() );

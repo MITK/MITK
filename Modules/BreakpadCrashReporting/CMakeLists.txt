@@ -1,4 +1,4 @@
-OPTION(MITK_USE_BREAKPAD_CRASH_REPORTING "Enable support for Google Breakpad Crash Reporting" ON)
+OPTION(MITK_USE_BREAKPAD_CRASH_REPORTING "Enable support for Google Breakpad Crash Reporting" OFF)
 
 
 if(MITK_USE_BREAKPAD_CRASH_REPORTING)

@@ -364,7 +364,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
     }
     for(i=0;i<dim;++i){
       //index[i]=itk::Math::RoundHalfIntegerUp<typename IndexType::IndexValueType >( pt_units[i] );
-      index[i]=itk::Math::RoundHalfIntegerUp( pt_units[i] );
+      index[i]=itk::Math::RoundHalfIntegerUp<IndexType::IndexValueType>( pt_units[i] );
     }
   }
 
@@ -457,9 +457,9 @@ virtual void SetBounds(const BoundsArrayType& bounds);
     if (m_ImageGeometry)
     {
       mitk::Point3D discretIndex;
-      discretIndex[0]=itk::Math::RoundHalfIntegerUp( index[0] );
-      discretIndex[1]=itk::Math::RoundHalfIntegerUp( index[1] );
-      discretIndex[2]=itk::Math::RoundHalfIntegerUp( index[2] );
+      discretIndex[0]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[0] );
+      discretIndex[1]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[1] );
+      discretIndex[2]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[2] );
 
       inside = m_BoundingBox->IsInside(discretIndex);
       //we have to check if the index is at the upper border of each dimension,

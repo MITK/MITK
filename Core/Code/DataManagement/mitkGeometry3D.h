@@ -187,7 +187,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   Vector3D GetAxisVector(unsigned int direction) const
   {
     Vector3D frontToBack;
-    frontToBack.Set_vnl_vector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction));
+    frontToBack.SetVnlVector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction));
     frontToBack *= GetExtent(direction);
     return frontToBack;
   }
@@ -305,7 +305,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //## \sa GetOrigin
   VnlVector GetOriginVnl() const
   {
-    return const_cast<Self*>(this)->m_Origin.Get_vnl_vector();
+    return const_cast<Self*>(this)->m_Origin.GetVnlVector();
   }
 
   //##Documentation

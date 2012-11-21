@@ -590,7 +590,7 @@ mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
 
     planeGeometry->SetReferenceGeometry( m_ReferenceGeometry );
     planeGeometry->InitializeStandardPlane(
-      rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &m_Spacing );
+      rightDV.GetVnlVector(), bottomDV.GetVnlVector(), &m_Spacing );
     planeGeometry->SetOrigin(origin);
     planeGeometry->SetBounds(bounds);
 

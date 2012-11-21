@@ -229,7 +229,7 @@ int testReorientPlanes ()
    mitk::Vector3D spacing;
    normal.Normalize(); normal *= thicknessInMM;
    mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
-   planegeometry->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector(), &spacing);
+   planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector(), &spacing);
    planegeometry->SetOrigin(origin);
 
    //Create SlicedGeometry3D out of planeGeometry
@@ -393,7 +393,7 @@ int testRestorePlanePostionOperation ()
     mitk::Vector3D spacing;
     normal.Normalize(); normal *= thicknessInMM;
     mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
-    planegeometry->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector(), &spacing);
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector(), &spacing);
     planegeometry->SetOrigin(origin);
 
     //Create SlicedGeometry3D out of planeGeometry
@@ -498,7 +498,7 @@ int mitkSliceNavigationControllerTest(int /*argc*/, char* /*argv*/[])
   mitk::Vector3D spacing;
   normal.Normalize(); normal *= thicknessInMM;
   mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
-  planegeometry->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector(), &spacing);
+  planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector(), &spacing);
   planegeometry->SetOrigin(origin);
   std::cout<<"[PASSED]"<<std::endl;
 
@@ -547,9 +547,9 @@ int mitkSliceNavigationControllerTest(int /*argc*/, char* /*argv*/[])
   transform->SetMatrix(matrix);
   transform->SetOffset(cornerpoint0.GetVectorFromOrigin());
 
-  right.Set_vnl_vector( rotation.rotation_matrix_transpose()*right.Get_vnl_vector() );
-  bottom.Set_vnl_vector(rotation.rotation_matrix_transpose()*bottom.Get_vnl_vector());
-  normal.Set_vnl_vector(rotation.rotation_matrix_transpose()*normal.Get_vnl_vector());
+  right.SetVnlVector( rotation.rotation_matrix_transpose()*right.GetVnlVector() );
+  bottom.SetVnlVector(rotation.rotation_matrix_transpose()*bottom.GetVnlVector());
+  normal.SetVnlVector(rotation.rotation_matrix_transpose()*normal.GetVnlVector());
   geometry->SetIndexToWorldTransform(transform);
   std::cout<<"[PASSED]"<<std::endl;
 

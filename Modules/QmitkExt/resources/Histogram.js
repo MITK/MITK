@@ -25,6 +25,7 @@ var width = histogramData.width - margin.left - margin.right;
 var tension = 0.8;
 var connected = false;
 var dur = 1000;
+var useLinePlot = false;
 
    /*  var line = d3.svg.line()
                     .interpolate("cardinal")
@@ -50,19 +51,19 @@ var dur = 1000;
 if (!connected)
 {
     connected = true;
-    histogramData.DataChanged.connect(changeHistogram);
+    histogramData.DataChanged.connect(linePlot);
     histogramData.sizeChanged.connect(changeSize);
 }
 
 
 
 var xScale = d3.scale.linear()
-                .domain([d3.min(histogramData.measurement), d3.max(histogramData.measurement)])
-                .range([margin.left, width]);
+                .domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)])
+                .range([margin.left,width]);
 
 var yScale = d3.scale.linear()
-                .domain([0, d3.max(histogramData.frequency)])
-                .range([height, margin.top]);
+                .domain([0,d3.max(histogramData.frequency)])
+                .range([height,margin.top]);
 
 var xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -139,7 +140,7 @@ function changeHistogram()
 
     yScale = d3.scale.linear()
                 .domain([0,d3.max(histogramData.frequency)])
-                .range([height,margin.bottom]);
+                .range([height,margin.top]);
 
     xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -162,12 +163,12 @@ function changeHistogram()
         .attr("width", (width/(histogramData.frequency.length + 1)))
         .transition().duration(dur)
         .attr("height", function(d) {
-            return (height-yScale(d));
+            return (height - yScale(d));
         })
         .attr("width", (width/(histogramData.frequency.length + 1)))
         .attr("y", function(d) {
-           return yScale(d);
-       });
+            return yScale(d);
+        });
 
     bar.transition().duration(dur)
         .attr("x", function(d,i) {
@@ -177,7 +178,7 @@ function changeHistogram()
             return yScale(d);
         })
         .attr("height", function(d) {
-            return (height-yScale(d));
+            return (height - yScale(d));
         })
         .attr("width", (width/(histogramData.frequency.length + 1)))
 
@@ -186,17 +187,94 @@ function changeHistogram()
         .attr("height", 0)
         .remove();
 
-    svg.selectAll("g").transition().duration(dur).attr("opacity", 0).remove();
+    svg.selectAll("g")
+        .transition()
+        .duration(dur)
+        .attr("opacity", 0)
+        .remove();
+
     svg.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(" + 0 + "," + height + ")")
         .transition().duration(dur)
+        .attr("opacity", 100)
         .call(xAxis);
 
     svg.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(" + margin.left + "," + 0 + ")")
-        .transition()
+        .transition().duration(dur)
+        .attr("opacity", 100)
         .call(yAxis);
 }
 
+function linePlot()
+{
+    xScale = d3.scale.linear()
+                .domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)])
+                .range([margin.left,width]);
+
+    yScale = d3.scale.linear()
+                .domain([0,d3.max(histogramData.frequency)])
+                .range([height,margin.top]);
+
+    xAxis = d3.svg.axis()
+                .scale(xScale)
+                .ticks(5)
+                .orient("bottom");
+
+    yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+
+    var line = d3.svg.line()
+            .interpolate("linear")
+            .x(function(d,i) {
+                return xScale(histogramData.measurement[i]);
+            })
+            .y(function(d) {
+                return yScale(d);
+            });
+
+    var linenull = d3.svg.line()
+            .interpolate("linear")
+            .x(function(d,i) {
+                return xScale(i);
+            })
+            .y(function(d) {
+                return yScale(0);
+            });
+
+    svg.selectAll("path")
+        .data([histogramData.frequency])
+        .enter()
+        .append("path")
+        .attr("class", "line")
+        .attr("d", linenull);
+
+    svg.selectAll("path")
+        .data([histogramData.frequency])
+        .transition()
+        .duration(dur)
+        .attr("d", line);
+
+    svg.selectAll("g")
+        .transition()
+        .duration(dur)
+        .attr("opacity", 0)
+        .remove();
+
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + 0 + "," + height + ")")
+        .transition().duration(dur)
+        .attr("opacity", 100)
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + margin.left + "," + 0 + ")")
+        .transition().duration(dur)
+        .attr("opacity", 100)
+        .call(yAxis);
+}

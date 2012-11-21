@@ -56,6 +56,7 @@ private:
 
 private slots:
   void addJSObject();
+  void resetData(bool ok);
 
 signals:
   void DataChanged();

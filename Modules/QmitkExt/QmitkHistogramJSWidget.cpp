@@ -21,6 +21,7 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   QWebView(parent)
 {
   connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJSObject()));
+  connect(this, SIGNAL(loadFinished()), this, SLOT(resetData()));
   QUrl myUrl = QUrl("qrc:/qmitk/Histogram.html");
   setUrl(myUrl);
 
@@ -38,7 +39,6 @@ QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
 void QmitkHistogramJSWidget::addJSObject()
 {
   page()->mainFrame()->addToJavaScriptWindowObject(QString("histogramData"), this);
-  this->clearData();
 }
 
 
@@ -46,12 +46,11 @@ void QmitkHistogramJSWidget::addJSObject()
 void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
 {
   QWebView::resizeEvent(resizeEvent);
-  this->sizeChanged();
+  this->reload();
 }
 
 void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
 {
-  //this->clearData();
   m_Histogram = histogram;
   HistogramConstIteratorType startIt = m_Histogram->End();
   HistogramConstIteratorType endIt = m_Histogram->End();
@@ -90,4 +89,9 @@ QList<QVariant> QmitkHistogramJSWidget::getFrequency()
 QList<QVariant> QmitkHistogramJSWidget::getMeasurement()
 {
   return m_Measurement;
+}
+
+void QmitkHistogramJSWidget::resetData(bool ok)
+{
+  this->DataChanged();
 }

@@ -127,9 +127,6 @@ private:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
-  template<class InputImageType>
-  void CastToFloat(InputImageType* image, typename mitk::Image::Pointer outImage);
-
   void UpdateIteraionsGUI(unsigned long iterations);    ///< update iterations label text
 
   Ui::QmitkGibbsTrackingViewControls* m_Controls;

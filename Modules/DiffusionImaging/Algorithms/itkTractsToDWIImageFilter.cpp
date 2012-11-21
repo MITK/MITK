@@ -282,7 +282,7 @@ void TractsToDWIImageFilter::GenerateData()
                 double d1 = index[0]-t+0.5;
                 t = region.GetSize(1)/2;
                 double d2 = index[1]-t+0.5;
-                if (sqrt(d1*d1+d2*d2)<region.GetSize(0)/5)
+                if (sqrt(d1*d1+d2*d2)<20*undersampling)
                     it.Set(pix);
                 ++it;
             }

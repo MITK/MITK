@@ -497,6 +497,8 @@ void QmitkFiberfoxView::GenerateImage()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );
     node->SetName(m_Controls->m_ImageName->text().toStdString());
+    if (m_Controls->m_KspaceImageBox->isChecked())
+        node->SetBoolProperty("use-color", false);
     GetDataStorage()->Add(node, m_SelectedBundle);
 
     mitk::BaseData::Pointer basedata = node->GetData();

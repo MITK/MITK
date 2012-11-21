@@ -28,7 +28,7 @@ namespace itk
 {
 TractsToDWIImageFilter::TractsToDWIImageFilter()
     : m_OuputKspaceImage(false)
-    , m_CircleDummy(false)
+    , m_CircleDummy(true)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -69,6 +69,18 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
         newImage->SetVectorLength( image->GetVectorLength() );
         newImage->Allocate();
 
+        m_UpsImage = ItkFloatImgType::New();
+        m_UpsImage->SetSpacing( m_Spacing/dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(0))->GetKspaceCropping() );
+        m_UpsImage->SetOrigin( m_Origin );
+        m_UpsImage->SetDirection( m_DirectionMatrix );
+        ImageRegion<3> region2 = m_ImageRegion;
+        region2.SetSize(0, m_ImageRegion.GetSize()[0]*dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(0))->GetKspaceCropping());
+        region2.SetSize(1, m_ImageRegion.GetSize()[1]*dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(0))->GetKspaceCropping());
+        m_UpsImage->SetLargestPossibleRegion( region2 );
+        m_UpsImage->SetBufferedRegion( region2 );
+        m_UpsImage->SetRequestedRegion( region2 );
+        m_UpsImage->Allocate();
+
         DiffusionSignalModel<double>* signalModel;
         if (i<m_FiberModels.size())
             signalModel = m_FiberModels.at(i);
@@ -91,8 +103,25 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                         SliceType::PixelType pix2D = image->GetPixel(index3D)[g];
                         slice->SetPixel(index2D, pix2D);
                     }
+
+                if (g==0 && i==0)
+                for (int y=0; y<image->GetLargestPossibleRegion().GetSize(1); y++)
+                    for (int x=0; x<image->GetLargestPossibleRegion().GetSize(0); x++)
+                    {
+                        DoubleDwiType::IndexType index3D;
+                        index3D[0]=x; index3D[1]=y; index3D[2]=z;
+                        ItkFloatImgType::PixelType pix3D = m_UpsImage->GetPixel(index3D);
+
+                        SliceType::IndexType index2D;
+                        index2D[0]=x; index2D[1]=y;
+                        pix3D =  slice->GetPixel(index2D);
+
+                        m_UpsImage->SetPixel(index3D, pix3D);
+                    }
+
                 // fourier transform slice
                 itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
+
                 fft->SetInput(slice);
                 fft->Update();
                 ComplexSliceType::Pointer fSlice = fft->GetOutput();

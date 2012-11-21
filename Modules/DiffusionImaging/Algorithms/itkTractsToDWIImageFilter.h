@@ -48,6 +48,7 @@ public:
     typedef SmartPointer< Self >        Pointer;
     typedef SmartPointer< const Self >  ConstPointer;
 
+    typedef itk::Image<float, 3>                            ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
     typedef mitk::FiberBundleX::Pointer                     FiberBundleType;
     typedef itk::VectorImage< double, 3 >                   DoubleDwiType;
@@ -75,6 +76,8 @@ public:
     void SetKspaceArtifacts(KspaceArtifactList artifactList){ m_KspaceArtifacts = artifactList; }
 
     void GenerateData();
+
+    ItkFloatImgType::Pointer m_UpsImage;
 
 protected:
 

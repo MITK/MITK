@@ -460,10 +460,8 @@ namespace mitk
     mitk::Image::Pointer CaculateAngularErrorImage(
         mitk::Image::Pointer comp1, mitk::Image::Pointer comp2, mitk::Image::Pointer probImg) const;
 
-    template < typename TPixel, unsigned int VImageDimension >
-        void InternalGenerateRGB(
-            const itk::Image< TPixel, VImageDimension > *image,
-            HelperStructRGBChannels *rgb, mitk::Image::Pointer retval ) const;
+    template < unsigned int VImageDimension >
+    void InternalGenerateRGB( HelperStructRGBChannels *rgb, mitk::Image::Pointer retval ) const;
 
     template < typename TPixel, unsigned int VImageDimension >
         void InternalGenerateProbabilityImage(

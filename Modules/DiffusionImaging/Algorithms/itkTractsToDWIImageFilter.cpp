@@ -104,21 +104,6 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                         slice->SetPixel(index2D, pix2D);
                     }
 
-                if (g==0 && i==0)
-                for (int y=0; y<image->GetLargestPossibleRegion().GetSize(1); y++)
-                    for (int x=0; x<image->GetLargestPossibleRegion().GetSize(0); x++)
-                    {
-                        DoubleDwiType::IndexType index3D;
-                        index3D[0]=x; index3D[1]=y; index3D[2]=z;
-                        ItkFloatImgType::PixelType pix3D = m_UpsImage->GetPixel(index3D);
-
-                        SliceType::IndexType index2D;
-                        index2D[0]=x; index2D[1]=y;
-                        pix3D =  slice->GetPixel(index2D);
-
-                        m_UpsImage->SetPixel(index3D, pix3D);
-                    }
-
                 // fourier transform slice
                 itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
 
@@ -126,6 +111,21 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                 fft->Update();
                 ComplexSliceType::Pointer fSlice = fft->GetOutput();
                 fSlice = RearrangeSlice(fSlice);
+
+                if (g==0 && i==0)
+                for (int y=0; y<image->GetLargestPossibleRegion().GetSize(1); y++)
+                    for (int x=0; x<image->GetLargestPossibleRegion().GetSize(1); x++)
+                    {
+                        DoubleDwiType::IndexType index3D;
+                        index3D[0]=x; index3D[1]=y; index3D[2]=z;
+                        ItkFloatImgType::PixelType pix3D = m_UpsImage->GetPixel(index3D);
+
+                        SliceType::IndexType index2D;
+                        index2D[0]=x; index2D[1]=y;
+                        pix3D = sqrt(fSlice->GetPixel(index2D).real()*fSlice->GetPixel(index2D).real()+fSlice->GetPixel(index2D).imag()*fSlice->GetPixel(index2D).imag());
+
+                        m_UpsImage->SetPixel(index3D, pix3D);
+                    }
 
                 // add artifacts
                 for (int a=0; a<m_KspaceArtifacts.size(); a++)

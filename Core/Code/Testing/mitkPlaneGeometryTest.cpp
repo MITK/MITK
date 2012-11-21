@@ -319,7 +319,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   mitk::FillVector3D(normal,         0,          0, thicknessInMM);
 
   std::cout << "Testing InitializeStandardPlane(rightVector, downVector, spacing = NULL): "<<std::endl;
-  planegeometry->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector());
+  planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
 
   std::cout << "Testing width, height and thickness (in units): ";
   if((mitk::Equal(planegeometry->GetExtent(0),width)==false) ||
@@ -358,7 +358,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   thicknessInMM = 1.5;
   normal.Normalize(); normal *= thicknessInMM;
   mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
-  planegeometry->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector(), &spacing);
+  planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector(), &spacing);
 
   std::cout << "Testing width, height and thickness (in units): ";
   if((mitk::Equal(planegeometry->GetExtent(0),width)==false) ||
@@ -447,9 +447,9 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   transform->SetMatrix(matrix);
   transform->SetOffset(planegeometry->GetIndexToWorldTransform()->GetOffset());
 
-  right.Set_vnl_vector( rotation.rotation_matrix_transpose()*right.Get_vnl_vector() );
-  bottom.Set_vnl_vector(rotation.rotation_matrix_transpose()*bottom.Get_vnl_vector());
-  normal.Set_vnl_vector(rotation.rotation_matrix_transpose()*normal.Get_vnl_vector());
+  right.SetVnlVector( rotation.rotation_matrix_transpose()*right.GetVnlVector() );
+  bottom.SetVnlVector(rotation.rotation_matrix_transpose()*bottom.GetVnlVector());
+  normal.SetVnlVector(rotation.rotation_matrix_transpose()*normal.GetVnlVector());
   planegeometry->SetIndexToWorldTransform(transform);
 
   //The origin changed,because m_Origin=m_IndexToWorldTransform->GetOffset()+GetAxisVector(2)*0.5

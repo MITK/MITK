@@ -387,8 +387,8 @@ void
 PlaneGeometry::InitializeStandardPlane( const Vector3D &rightVector,
   const Vector3D &downVector, const Vector3D *spacing )
 {
-  InitializeStandardPlane( rightVector.Get_vnl_vector(),
-    downVector.Get_vnl_vector(), spacing );
+  InitializeStandardPlane( rightVector.GetVnlVector(),
+    downVector.GetVnlVector(), spacing );
 }
 
 
@@ -410,7 +410,7 @@ PlaneGeometry::InitializeStandardPlane( mitk::ScalarType width,
 {
   InitializeStandardPlane(
     width, height,
-    rightVector.Get_vnl_vector(), downVector.Get_vnl_vector(),
+    rightVector.GetVnlVector(), downVector.GetVnlVector(),
     spacing );
 }
 
@@ -466,7 +466,7 @@ PlaneGeometry::InitializePlane( const Point3D &origin,
   {
     FillVector3D( rightVectorVnl, 0.0f, 1.0f, 0.0f );
   }
-  downVectorVnl = vnl_cross_3d( normal.Get_vnl_vector(), rightVectorVnl );
+  downVectorVnl = vnl_cross_3d( normal.GetVnlVector(), rightVectorVnl );
   downVectorVnl.normalize();
 
   InitializeStandardPlane( rightVectorVnl, downVectorVnl );
@@ -498,7 +498,7 @@ Vector3D
 PlaneGeometry::GetNormal() const
 {
   Vector3D frontToBack;
-  frontToBack.Set_vnl_vector( m_IndexToWorldTransform
+  frontToBack.SetVnlVector( m_IndexToWorldTransform
     ->GetMatrix().GetVnlMatrix().get_column(2) );
 
   return frontToBack;
@@ -564,7 +564,7 @@ PlaneGeometry::IntersectionLine(
   double c2 = ( d2 - d1 * N1dN2 ) / determinant;
 
   Vector3D p = normal * c1 + planeNormal * c2;
-  crossline.GetPoint().Get_vnl_vector() = p.Get_vnl_vector();
+  crossline.GetPoint().GetVnlVector() = p.GetVnlVector();
 
   return true;
 }
@@ -600,7 +600,7 @@ double PlaneGeometry::Angle( const PlaneGeometry *plane ) const
 double PlaneGeometry::Angle( const Line3D &line ) const
 {
   return vnl_math::pi_over_2
-    - angle( line.GetDirection().Get_vnl_vector(), GetMatrixColumn(2) );
+    - angle( line.GetDirection().GetVnlVector(), GetMatrixColumn(2) );
 }
 
 

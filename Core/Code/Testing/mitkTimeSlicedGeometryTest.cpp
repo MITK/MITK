@@ -178,7 +178,7 @@ int mitkTimeSlicedGeometryTest(int /*argc*/, char* /*argv*/[])
   timeBounds1[1] = 2.4;
 
   std::cout << "Initializing a PlaneGeometry by InitializeStandardPlane(rightVector, downVector, spacing = NULL): "<<std::endl;
-  planegeometry->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector());
+  planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Setting TimeBounds of PlaneGeometry by SetTimeBounds(): "<<std::endl;

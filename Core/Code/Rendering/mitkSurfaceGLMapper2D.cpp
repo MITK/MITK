@@ -264,8 +264,8 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     vtkFloatingPointType vp[3], vnormal[3];
 
-    vnl2vtk(point.Get_vnl_vector(), vp);
-    vnl2vtk(normal.Get_vnl_vector(), vnormal);
+    vnl2vtk(point.GetVnlVector(), vp);
+    vnl2vtk(normal.GetVnlVector(), vnormal);
 
     //normally, we would need to transform the surface and cut the transformed surface with the cutter.
     //This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.

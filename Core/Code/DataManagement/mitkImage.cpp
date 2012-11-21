@@ -837,7 +837,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D
     bounds[0] = 0.0;      bounds[2] = 0.0;      bounds[4] = 0.0;
 this->m_ImageDescriptor->Initialize( this->m_Dimensions, this->m_Dimension );
     slicedGeometry->SetBounds(bounds);
-    slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.Get_vnl_vector().data_block());
+    slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.GetVnlVector().data_block());
 
     GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
   }

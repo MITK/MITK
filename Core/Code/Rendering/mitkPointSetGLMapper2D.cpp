@@ -475,7 +475,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
            {
               std::stringstream buffer;
               //buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << "�";
-              buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << (char)176;
+              buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << (char)176;
 
               Vector2D vec2d = pt2d-lastPt2d;
               vec2d.Normalize();

@@ -122,7 +122,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
     imageIO->SetOrigin(i,origin[i]);
 
     mitk::Vector3D direction;
-    direction.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
+    direction.SetVnlVector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
     vnl_vector< double > axisDirection(dimension);
     for(unsigned int j=0; j<dimension; j++)
     {

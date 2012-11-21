@@ -465,18 +465,6 @@ void QmitkGibbsTrackingView::SetMask()
     }
 }
 
-// cast image to float
-template<class InputImageType>
-void QmitkGibbsTrackingView::CastToFloat(InputImageType* image, mitk::Image::Pointer outImage)
-{
-    typedef itk::CastImageFilter<InputImageType, ItkFloatImageType> ItkCastFilter;
-    typename ItkCastFilter::Pointer itkCaster = ItkCastFilter::New();
-    itkCaster->SetInput(image);
-    itkCaster->Update();
-    outImage->InitializeByItk(itkCaster->GetOutput());
-    outImage->SetVolume(itkCaster->GetOutput()->GetBufferPointer());
-}
-
 // check for mask and qbi and start tracking thread
 void QmitkGibbsTrackingView::StartGibbsTracking()
 {
@@ -485,6 +473,7 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
         MITK_WARN("QmitkGibbsTrackingView")<<"Thread already running!";
         return;
     }
+    m_GlobalTracker = NULL;
 
     if (m_ImageNode.IsNull())
     {

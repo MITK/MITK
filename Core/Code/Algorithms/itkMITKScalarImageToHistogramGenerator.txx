@@ -35,7 +35,7 @@ MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
 {
   m_ImageToListAdaptor = AdaptorType::New();
   m_HistogramGenerator = GeneratorType::New();
-  m_HistogramGenerator->SetListSample( m_ImageToListAdaptor );
+  m_HistogramGenerator->SetInput( m_ImageToListAdaptor );
 }
 
 
@@ -76,7 +76,7 @@ MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
 {
   typename HistogramType::SizeType size;
   size.Fill( numberOfBins );
-  m_HistogramGenerator->SetNumberOfBins( size );
+  m_HistogramGenerator->SetHistogramSize( size );
 }
 
 

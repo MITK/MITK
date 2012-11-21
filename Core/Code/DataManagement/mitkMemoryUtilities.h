@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_MEMORY_UTILITIES_H_
 
 #include <itkMacro.h>
-#include <itkExceptionObject.h>
 #include <MitkExports.h>
 
 namespace mitk

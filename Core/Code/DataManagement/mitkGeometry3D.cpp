@@ -208,7 +208,7 @@ void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
   }
 }
 
-mitk::AffineGeometryFrame3D::Pointer mitk::Geometry3D::Clone() const
+itk::LightObject::Pointer mitk::Geometry3D::InternalClone() const
 {
   Self::Pointer newGeometry = new Self(*this);
   newGeometry->UnRegister();

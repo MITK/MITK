@@ -254,7 +254,7 @@ void mitk::AbstractTransformGeometry::SetOversampling(float oversampling)
   SetParametricBounds(bounds);
 }
 
-mitk::AffineGeometryFrame3D::Pointer mitk::AbstractTransformGeometry::Clone() const
+itk::LightObject::Pointer mitk::AbstractTransformGeometry::InternalClone() const
 {
   Self::Pointer newGeometry = new AbstractTransformGeometry(*this);
   newGeometry->UnRegister();

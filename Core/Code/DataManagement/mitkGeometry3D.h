@@ -591,7 +591,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##  newGeometry->UnRegister();
   //##  return newGeometry.GetPointer();
   //## \endcode
-  virtual AffineGeometryFrame3D::Pointer Clone() const;
+  virtual itk::LightObject::Pointer InternalClone() const;
 
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)

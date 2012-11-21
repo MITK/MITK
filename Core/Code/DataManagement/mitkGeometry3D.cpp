@@ -664,7 +664,6 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const
   default:
     {
       itkExceptionMacro(<<"A cube only has 8 corners. These are labeled 0-7.");
-      return NULL;
     }
   }
   if(m_ImageGeometry)

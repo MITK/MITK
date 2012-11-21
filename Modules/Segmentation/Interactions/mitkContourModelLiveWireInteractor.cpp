@@ -123,6 +123,8 @@ bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const 
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
 
+  if(contour->GetSelectedVertex()){
+
   mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
   newContour->Expand(contour->GetTimeSteps());
   newContour->Concatenate( m_ContourLeft, timestep );
@@ -150,6 +152,7 @@ bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const 
   assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
 
+  }
   return true;
 }
 
@@ -211,7 +214,7 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   newContour->Concatenate( m_ContourRight, timestep );
 
   newContour->SetIsClosed(contour->IsClosed(timestep), timestep);
-
+  newContour->Deselect();//just to make sure
   m_DataNode->SetData(newContour);
 
   this->m_lastMousePosition = positionEvent->GetWorldPosition();

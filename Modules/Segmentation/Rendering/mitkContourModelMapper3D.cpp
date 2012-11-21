@@ -37,7 +37,7 @@ const mitk::ContourModel* mitk::ContourModelMapper3D::GetInput( void )
 
 
 vtkProp* mitk::ContourModelMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
-{  
+{
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
@@ -114,7 +114,7 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
     localStorage->m_TubeFilter->SetRadius(lineWidth);
   }else
   {
-    localStorage->m_TubeFilter->SetRadius(0.2);
+    localStorage->m_TubeFilter->SetRadius(0.5);
   }
   localStorage->m_TubeFilter->CappingOn();
   localStorage->m_TubeFilter->SetNumberOfSides(10);
@@ -210,7 +210,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
       }
-      current++; 
+      current++;
       next++;
     }
 
@@ -285,7 +285,7 @@ mitk::ContourModelMapper3D::LocalStorage::LocalStorage()
 void mitk::ContourModelMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
-  node->AddProperty( "3D contour width", mitk::FloatProperty::New( 0.2 ), renderer, overwrite );
+  node->AddProperty( "3D contour width", mitk::FloatProperty::New( 0.5 ), renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -48,7 +48,11 @@ mitk::ContourModelLiveWireInteractor::~ContourModelLiveWireInteractor()
 bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
+  if (!positionEvent) {
+    this->HandleEvent( new mitk::StateEvent(EIDNO, stateEvent->GetEvent()) );
+    return false;
+  }
+
 
 
   mitk::StateEvent* newStateEvent = NULL;
@@ -61,7 +65,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
 
   contour->Deselect();
 
-  /* 
+  /*
   * Check distance to any vertex.
   * Transition YES if click close to a vertex
   */

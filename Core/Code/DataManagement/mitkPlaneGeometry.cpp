@@ -686,8 +686,8 @@ PlaneGeometry::ProjectPointOntoPlane( const Point3D& pt ) const
 }
 
 
-AffineGeometryFrame3D::Pointer
-PlaneGeometry::Clone() const
+itk::LightObject::Pointer
+PlaneGeometry::InternalClone() const
 {
   Self::Pointer newGeometry = new PlaneGeometry(*this);
   newGeometry->UnRegister();

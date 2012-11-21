@@ -38,7 +38,7 @@ public:
 
   virtual void ComputeGeometry();
 
-  virtual AffineGeometryFrame3D::Pointer Clone() const;
+  virtual itk::LightObject::Pointer InternalClone() const;
 
   vtkThinPlateSplineTransform* GetThinPlateSplineTransform() const
   {

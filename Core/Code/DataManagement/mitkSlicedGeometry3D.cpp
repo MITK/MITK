@@ -670,8 +670,8 @@ mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
 }
 
 
-mitk::AffineGeometryFrame3D::Pointer
-mitk::SlicedGeometry3D::Clone() const
+itk::LightObject::Pointer
+mitk::SlicedGeometry3D::InternalClone() const
 {
   Self::Pointer newGeometry = new SlicedGeometry3D(*this);
   newGeometry->UnRegister();

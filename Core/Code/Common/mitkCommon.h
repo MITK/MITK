@@ -99,11 +99,11 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
 /** Creates a Clone() method for "Classname". Returns a smartPtr of a clone of the
 calling object*/
 #define mitkCloneMacro(classname) \
-  virtual Pointer Clone() const \
+  virtual itk::LightObject::Pointer InternalClone() const \
 { \
   Pointer smartPtr = new classname(*this); \
   smartPtr->UnRegister(); \
-  return smartPtr;  \
+  return smartPtr.GetPointer();  \
 }
 
 /** cross-platform deprecation macro

@@ -382,7 +382,7 @@ void mitk::TimeSlicedGeometry::CopyTimes(const mitk::TimeSlicedGeometry* timesli
   UpdateInformation();
 }
 
-mitk::AffineGeometryFrame3D::Pointer mitk::TimeSlicedGeometry::Clone() const
+itk::LightObject::Pointer mitk::TimeSlicedGeometry::InternalClone() const
 {
   Self::Pointer newGeometry = new TimeSlicedGeometry(*this);
   newGeometry->UnRegister();

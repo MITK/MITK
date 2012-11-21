@@ -151,7 +151,7 @@ public:
 
   //##Documentation
   //## @brief duplicates the geometry
-  virtual AffineGeometryFrame3D::Pointer Clone() const;
+  virtual itk::LightObject::Pointer InternalClone() const;
   TimeSlicedGeometry::Pointer CloneCopy() const;
   virtual void ExecuteOperation(Operation* operation);
 protected:

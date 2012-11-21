@@ -154,7 +154,7 @@ public:
   //## \sa CalculateFrameGeometry
   virtual void SetFrameGeometry(const mitk::Geometry3D* frameGeometry);
 
-  virtual AffineGeometryFrame3D::Pointer Clone() const;
+  virtual itk::LightObject::Pointer InternalClone() const;
 protected:
   AbstractTransformGeometry();
   AbstractTransformGeometry(const AbstractTransformGeometry& other);

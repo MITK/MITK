@@ -18,6 +18,7 @@ endif()
 
 # Set-up the build system to use the Qmitk module
 MITK_USE_MODULE(Qmitk)
+MITK_USE_MODULE(BreakpadCrashReporting)
 include_directories(${ALL_INCLUDE_DIRECTORIES})
 link_directories(${ALL_LIBRARY_DIRS})
 

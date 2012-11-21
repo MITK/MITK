@@ -8,8 +8,7 @@
 #!
 function(mitkAddCustomModuleTest test_name test_function)
 
-  if (BUILD_TESTING AND MODULE_IS_ENABLED)
-    add_test(${test_name} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${test_function} ${ARGN})
+  if (BUILD_TESTING AND MODULE_IS_ENABLED AND NOT MODULE_IS_EXCLUDED)
     set_property(TEST ${test_name} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
   endif()
 

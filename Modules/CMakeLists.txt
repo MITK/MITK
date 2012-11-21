@@ -31,8 +31,9 @@ set(module_dirs
     ToFProcessing
     ToFUI
     US
-    ClippingTools  
+    ClippingTools
     USUI
+    BreakpadCrashReporting
     DicomUI
 )
 
@@ -48,10 +49,10 @@ if(MITK_PRIVATE_MODULES)
     string(FIND ${subdir} "." _result)
     if(_result EQUAL -1)
       if(EXISTS ${MITK_PRIVATE_MODULES}/${subdir}/CMakeLists.txt)
-        message(STATUS "Found private module ${subdir}")    
+        message(STATUS "Found private module ${subdir}")
         add_subdirectory(${MITK_PRIVATE_MODULES}/${subdir} private_modules/${subdir})
     endif()
     endif()
-  endforeach()     
+  endforeach()
 endif(MITK_PRIVATE_MODULES)
 

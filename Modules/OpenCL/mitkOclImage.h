@@ -25,12 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include <MitkOclExports.h>
 
-#ifdef __APPLE__
-#include <OpenCL/cl.h>
-#else
-#include <CL/cl.h>
-#endif
-
 #include "mitkOclBaseData.h"
 #include "mitkOclImageFormats.h"
 

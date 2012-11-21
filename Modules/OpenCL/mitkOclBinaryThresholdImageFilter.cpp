@@ -23,11 +23,11 @@ mitk::OclBinaryThresholdImageFilter::OclBinaryThresholdImageFilter()
   this->SetSourceFile( path.c_str() );
   this->m_FilterID = "BinaryThreshold";
 
-  this->m_lowerThr = 10;
-  this->m_upperThr = 200;
+  this->m_LowerThreshold = 10;
+  this->m_UpperThreshold = 200;
 
-  this->m_insideVal = 100;
-  this->m_outsideVal = 0;
+  this->m_InsideValue = 100;
+  this->m_OutsideValue = 0;
 }
 
 mitk::OclBinaryThresholdImageFilter::~OclBinaryThresholdImageFilter()
@@ -68,10 +68,10 @@ void mitk::OclBinaryThresholdImageFilter::Execute()
   }
 
   // set kernel arguments
-  clErr =  clSetKernelArg( this->m_ckBinaryThreshold, 2, sizeof(cl_int), &(this->m_lowerThr) );
-  clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 3, sizeof(cl_int), &(this->m_upperThr) );
-  clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 4, sizeof(cl_int), &(this->m_outsideVal) );
-  clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 5, sizeof(cl_int), &(this->m_insideVal) );
+  clErr =  clSetKernelArg( this->m_ckBinaryThreshold, 2, sizeof(cl_int), &(this->m_LowerThreshold) );
+  clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 3, sizeof(cl_int), &(this->m_UpperThreshold) );
+  clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 4, sizeof(cl_int), &(this->m_OutsideValue) );
+  clErr |= clSetKernelArg( this->m_ckBinaryThreshold, 5, sizeof(cl_int), &(this->m_InsideValue) );
   CHECK_OCL_ERR( clErr );
 
   // execute the filter on a 3D NDRange
@@ -89,7 +89,7 @@ bool mitk::OclBinaryThresholdImageFilter::Initialize()
 
   if ( OclFilter::Initialize() )
   {
-    this->m_ckBinaryThreshold = clCreateKernel( this->m_clProgram, "ckBinaryThreshold", &clErr);
+    this->m_ckBinaryThreshold = clCreateKernel( this->m_ClProgram, "ckBinaryThreshold", &clErr);
     buildErr |= CHECK_OCL_ERR( clErr );
   }
 

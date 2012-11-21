@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-
 #ifndef _MITKOCLBINARYTHRESHOLDIMAGEFILTER_H_
 #define _MITKOCLBINARYTHRESHOLDIMAGEFILTER_H_
 
@@ -27,12 +25,11 @@ class OclImageToImageFilter;
 
 /** Documentation
   *
-  * \brief The OclBinaryThresholdImageFilter computes an binary segmentation based on given
-  threshold values
+  * \brief The OclBinaryThresholdImageFilter computes a binary segmentation based on given
+  threshold values.
 
   *
-  * The filter requires two threshold values ( the upper and the lower threshold ) and two values ( inside and outside ). The resulting
-  voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
+  * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
   */
 class MitkOcl_EXPORT OclBinaryThresholdImageFilter : public OclImageToImageFilter
 {
@@ -42,8 +39,6 @@ public:
   /** Update the filter */
   void Update();
 
-  int GetBytesPerElement();
-
   /** Constructor */
   OclBinaryThresholdImageFilter();
 
@@ -51,39 +46,36 @@ public:
   virtual ~OclBinaryThresholdImageFilter();
 
   /** Set the lower threshold
-
     @param thr Threshold value
     */
-  void SetLowerThreshold( int thr )
+  void SetLowerThreshold( int lowerThreshold )
   {
-    this->m_lowerThr = thr;
+    this->m_LowerThreshold = lowerThreshold;
   }
 
   /** Set the upper threshold
-
     @param thr Threshold value
     */
-  void SetUpperThreshold( int thr )
+  void SetUpperThreshold( int upperThreshold )
   {
-    this->m_upperThr = thr;
+    this->m_UpperThreshold = upperThreshold;
   }
 
   /** Set the outside value
 
     @param val The outside value
     */
-  void SetOutsideValue( int val)
+  void SetOutsideValue( int outsideValue )
   {
-    this->m_outsideVal = val;
+    this->m_OutsideValue = outsideValue;
   }
 
   /** Set the inside value
-
     @param val The inside value
     */
-  void SetInsideValue( int val)
+  void SetInsideValue( int insideValue )
   {
-    this->m_insideVal = val;
+    this->m_InsideValue = insideValue;
   }
 
 protected:
@@ -106,13 +98,13 @@ private:
   /** The OpenCL kernel for the filter */
   cl_kernel m_ckBinaryThreshold;
 
-  int m_lowerThr;
+  int m_LowerThreshold;
 
-  int m_upperThr;
+  int m_UpperThreshold;
 
-  int m_insideVal;
+  int m_InsideValue;
 
-  int m_outsideVal;
+  int m_OutsideValue;
 };
 }
 

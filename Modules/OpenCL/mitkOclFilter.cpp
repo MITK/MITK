@@ -14,49 +14,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+//Ocl
 #include "mitkOclFilter.h"
-
-#include "mitkLogMacros.h"
 #include "mitkOclUtils.h"
-
-#include "mitkDataNodeFactory.h"
-#include "mitkStandardFileLocations.h"
-
-#include "mitkConfig.h"
-
 #include "mitkOpenCLActivator.h"
 
+//Mitk
+#include <mitkLogMacros.h>
+#include <mitkDataNodeFactory.h>
+#include <mitkStandardFileLocations.h>
+#include <mitkConfig.h>
 
 mitk::OclFilter::OclFilter()
-  : m_clFile(),
-    m_clSourcePath(NULL),
-    m_clCompilerFlags(NULL),
-    m_clProgram(NULL),
-    m_preambel(" "),
+  : m_ClFile(),
+    m_ClSourcePath(NULL),
+    m_ClCompilerFlags(NULL),
+    m_ClProgram(NULL),
+    m_Preambel(" "),
     m_Initialized(false),
-    m_commandQue(NULL),
+    m_CommandQue(NULL),
     m_FilterID("mitkOclFilter")
 {
   this->SetSourcePath("Modules/OpenCL/ShaderSources");
-  m_clCompilerFlags = "";
+  m_ClCompilerFlags = "";
 }
 
-mitk::OclFilter::OclFilter(const char *_filename)
-  : m_FilterID(_filename)
+mitk::OclFilter::OclFilter(const char* filename)
+  : m_FilterID(filename)
 {
-  m_commandQue = NULL;
-  m_clProgram = NULL;
-  m_clCompilerFlags = "";
-  this->SetSourceFile( _filename);
+  m_CommandQue = NULL;
+  m_ClProgram = NULL;
+  m_ClCompilerFlags = "";
+  this->SetSourceFile(filename);
   this->SetSourcePath("/Modules/OpenCL/ShaderSources");
 }
 
 mitk::OclFilter::~OclFilter()
 {
-  MITK_INFO << "OclFilter Destructor \n";
+  MITK_DEBUG << "OclFilter Destructor";
 
   // release program
-  if (m_clProgram)
+  if (m_ClProgram)
   {
     cl_int clErr = 0;
 
@@ -64,7 +62,7 @@ mitk::OclFilter::~OclFilter()
     OpenCLActivator::GetResourceServiceRef()->RemoveProgram(m_FilterID);
 
     // release program
-    clErr = clReleaseProgram(this->m_clProgram);
+    clErr = clReleaseProgram(this->m_ClProgram);
     CHECK_OCL_ERR(clErr);
   }
 
@@ -74,8 +72,8 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
 {
   cl_int clErr = 0;
 
-  clErr = clEnqueueNDRangeKernel( this->m_commandQue, kernel, workSizeDim,
-                                  NULL, this->m_globalWorkSize, m_localWorkSize, 0, NULL, NULL);
+  clErr = clEnqueueNDRangeKernel( this->m_CommandQue, kernel, workSizeDim,
+                                  NULL, this->m_GlobalWorkSize, m_LocalWorkSize, 0, NULL, NULL);
 
   CHECK_OCL_ERR( clErr );
 
@@ -85,50 +83,50 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
 
 bool mitk::OclFilter::Initialize()
 {
-  m_commandQue = OpenCLActivator::GetResourceServiceRef()->GetCommandQueue();
+  m_CommandQue = OpenCLActivator::GetResourceServiceRef()->GetCommandQueue();
 
   cl_int clErr = 0;
   m_Initialized = CHECK_OCL_ERR(clErr);
 
-  if ((m_clSource==NULL) && (m_clFile.empty()))
+  if ((m_ClSource==NULL) && (m_ClFile.empty()))
   {
     MITK_ERROR<<"No OpenCL Source FILE specified";
     return false;
   }
 
-  if (m_clProgram == NULL)
+  if (m_ClProgram == NULL)
   {
     try
     {
-      this->m_clProgram = OpenCLActivator::GetResourceServiceRef()->GetProgram( this->m_FilterID );
+      this->m_ClProgram = OpenCLActivator::GetResourceServiceRef()->GetProgram( this->m_FilterID );
     }
     catch(const mitk::Exception& e)
     {
       MITK_INFO << "Program not stored in resource manager, compiling.";
-      this->CompileSource("\n");
+      this->CompileSource();
     }
   }
 
   return m_Initialized;
 }
 
-void mitk::OclFilter::SetSourceFile(const char *_filename)
+void mitk::OclFilter::SetSourceFile(const char* filename)
 {
-  MITK_INFO("ocl.filter") << "Setting source [" << _filename <<" ]";
+  MITK_DEBUG("ocl.filter") << "Setting source [" <<  filename <<" ]";
 
   std::string clsourceDir = MITK_ROOT;
-  clsourceDir  += m_clSourcePath;
+  clsourceDir  += m_ClSourcePath;
 
   mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( clsourceDir.c_str(), true);
   // search for file
-  clsourceDir = mitk::StandardFileLocations::GetInstance()->FindFile( _filename);
+  clsourceDir = mitk::StandardFileLocations::GetInstance()->FindFile(  filename);
 
-  m_clFile = clsourceDir;
+  m_ClFile = clsourceDir;
 }
 
-void mitk::OclFilter::CompileSource(const char *preambel)
+void mitk::OclFilter::CompileSource()
 {
-  if (m_clFile.empty() && m_clSource == NULL)
+  if (m_ClFile.empty() && m_ClSource == NULL)
   {
     MITK_ERROR("ocl.filter") << "No shader source file was set";
     return;
@@ -142,40 +140,40 @@ void mitk::OclFilter::CompileSource(const char *preambel)
   cl_context gpuContext = OpenCLActivator::GetResourceServiceRef()->GetContext();
 
   // load the program source from file
-  m_clSource = oclLoadProgramSource( m_clFile.c_str(), this->m_preambel, &szKernelLength);
+  m_ClSource = oclLoadProgramSource( m_ClFile.c_str(), this->m_Preambel, &szKernelLength);
 
-  if (m_clSource != NULL)
+  if (m_ClSource != NULL)
   {
-    m_clProgram = clCreateProgramWithSource(gpuContext, 1, (const char**)&m_clSource, &szKernelLength, &clErr);
+    m_ClProgram = clCreateProgramWithSource(gpuContext, 1, (const char**)&m_ClSource, &szKernelLength, &clErr);
     CHECK_OCL_ERR(clErr);
 
     // build the source code
-    MITK_INFO << "Building Program Source\n";
+    MITK_DEBUG << "Building Program Source";
     std::string compilerOptions = "";
 
-    compilerOptions.append(m_clCompilerFlags);
+    compilerOptions.append(m_ClCompilerFlags);
     // activate the include compiler flag
     compilerOptions.append(" -I");
     // set the path of the current gpu source dir as opencl
     // include folder
     compilerOptions.append(MITK_ROOT);
-    compilerOptions.append(m_clSourcePath);
+    compilerOptions.append(m_ClSourcePath);
 
-    clErr = clBuildProgram(m_clProgram, 0, NULL, compilerOptions.c_str(), NULL, NULL);
+    clErr = clBuildProgram(m_ClProgram, 0, NULL, compilerOptions.c_str(), NULL, NULL);
     CHECK_OCL_ERR(clErr);
 
     // if OpenCL Source build failed
     if (clErr != CL_SUCCESS)
     {
       MITK_ERROR("ocl.filter") << "Failed to build source";
-      oclLogBuildInfo(m_clProgram,  OpenCLActivator::GetResourceServiceRef()->GetCurrentDevice() );
-      oclLogBinary(m_clProgram,  OpenCLActivator::GetResourceServiceRef()->GetCurrentDevice() );
+      oclLogBuildInfo(m_ClProgram,  OpenCLActivator::GetResourceServiceRef()->GetCurrentDevice() );
+      oclLogBinary(m_ClProgram,  OpenCLActivator::GetResourceServiceRef()->GetCurrentDevice() );
       m_Initialized = false;
 
     }
 
     // store the succesfully build program into the program storage provided by the resource service
-    OpenCLActivator::GetResourceServiceRef()->InsertProgram(m_clProgram, m_FilterID, true);
+    OpenCLActivator::GetResourceServiceRef()->InsertProgram(m_ClProgram, m_FilterID, true);
   }
   else
   {
@@ -188,32 +186,32 @@ void mitk::OclFilter::CompileSource(const char *preambel)
 void mitk::OclFilter::SetWorkingSize(unsigned int locx, unsigned int dimx, unsigned int locy, unsigned int dimy, unsigned int locz, unsigned int dimz)
 {
   // set the local work size
-  this->m_localWorkSize[0] = locx;
-  this->m_localWorkSize[1] = locy;
-  this->m_localWorkSize[2] = locz;
+  this->m_LocalWorkSize[0] = locx;
+  this->m_LocalWorkSize[1] = locy;
+  this->m_LocalWorkSize[2] = locz;
 
   // estimate the global work size
-  this->m_globalWorkSize[0] = iDivUp( dimx, this->m_localWorkSize[0]) *this->m_localWorkSize[0];
-  this->m_globalWorkSize[1] = iDivUp( dimy, this->m_localWorkSize[1]) * this->m_localWorkSize[1];
+  this->m_GlobalWorkSize[0] = iDivUp( dimx, this->m_LocalWorkSize[0]) *this->m_LocalWorkSize[0];
+  this->m_GlobalWorkSize[1] = iDivUp( dimy, this->m_LocalWorkSize[1]) * this->m_LocalWorkSize[1];
   if( dimz <= 1 )
-    this->m_globalWorkSize[2] = 1;
+    this->m_GlobalWorkSize[2] = 1;
   else
-    this->m_globalWorkSize[2] = iDivUp( dimz, this->m_localWorkSize[2]) * this->m_localWorkSize[2];
+    this->m_GlobalWorkSize[2] = iDivUp( dimz, this->m_LocalWorkSize[2]) * this->m_LocalWorkSize[2];
 }
 
-void mitk::OclFilter::SetSourcePreambel(const char* _preambel)
+void mitk::OclFilter::SetSourcePreambel(const char* preambel)
 {
-  this->m_preambel = _preambel;
+  this->m_Preambel = preambel;
 }
 
-void mitk::OclFilter::SetSourcePath(const char * _path)
+void mitk::OclFilter::SetSourcePath(const char* path)
 {
-  m_clSourcePath = _path;
+  m_ClSourcePath = path;
 }
 
-void mitk::OclFilter::SetCompilerFlags(const char * _flags)
+void mitk::OclFilter::SetCompilerFlags(const char* flags)
 {
-  m_clCompilerFlags = _flags;
+  m_ClCompilerFlags = flags;
 }
 
 

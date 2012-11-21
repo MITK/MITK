@@ -14,20 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkOclBaseData.h"
+#ifndef MITKOPENCL_H_HEADER_INCLUDED
+#define MITKOPENCL_H_HEADER_INCLUDED
 
-mitk::OclBaseData::OclBaseData()
-: m_BufferSize ( NULL ), m_GPUBuffer( NULL ), m_CPUBuffer( NULL )
-{
-}
+#if defined (__APPLE__) || defined(MACOSX)
+#include <OpenCL/cl.h>
+#else
+#include <CL/cl.h>
+#endif
 
-mitk::OclBaseData::~OclBaseData()
-{
-  if (m_GPUBuffer) clReleaseMemObject( m_GPUBuffer );
-  if (m_CPUBuffer) free( m_CPUBuffer );
-}
-
-cl_mem mitk::OclBaseData::GetGPUBuffer()
-{
-  return this->m_GPUBuffer;
-}
+#endif /* MITKOPENCL_H_HEADER_INCLUDED */

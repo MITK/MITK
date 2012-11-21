@@ -17,11 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkOclUtils_h
 #define __mitkOclUtils_h
 
-#if defined (__APPLE__) || defined(MACOSX)
-#include <OpenCL/cl.h>
-#else
-#include <CL/cl.h>
-#endif
+#include "mitkOpenCL.h"
 
 #include <string>
 #include <MitkOclExports.h>

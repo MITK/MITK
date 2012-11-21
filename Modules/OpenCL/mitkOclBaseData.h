@@ -20,11 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkOclExports.h"
 #include "mitkOclUtils.h"
 
-#ifdef __APPLE__
-#include <OpenCL/cl.h>
-#else
-#include <CL/cl.h>
-#endif
+#include "mitkOpenCL.h"
 
 #include <mitkCommon.h>
 #include <itkObjectFactory.h>
@@ -37,13 +33,16 @@ namespace mitk
   {
   public:
     mitkClassMacro(OclBaseData, itk::Object);
-    itkNewMacro(Self);
 
-    /*!  \brief Copies the RAM-stored data to GPU-MEM */
-    virtual int TransferDataToGPU(cl_command_queue);
+    /*!  \brief Copies the RAM-stored data to GPU-MEM.
+     * This method has to be implemented for each data type.
+     */
+    virtual int TransferDataToGPU(cl_command_queue) = 0;
 
-    /*! \brief Copies the in GPU-MEM stored data to RAM */
-    virtual void* TransferDataToCPU(cl_command_queue);
+    /*! \brief Copies the in GPU-MEM stored data to RAM
+     * This method has to be implemented for each data type.
+     */
+    virtual void* TransferDataToCPU(cl_command_queue) = 0;
 
     /** \brief Set the modified flag for one of the GPU buffer */
     void GPUModified();

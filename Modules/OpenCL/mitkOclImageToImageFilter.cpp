@@ -57,7 +57,7 @@ mitk::Image::Pointer mitk::OclImageToImageFilter::GetOutput()
 {
   if (m_output->IsModified(GPU_DATA))
   {
-    void* pData = m_output->TransferDataToCPU(m_commandQue);
+    void* pData = m_output->TransferDataToCPU(m_CommandQue);
 
     const unsigned int dimension = m_input->GetDimension();
     unsigned int* dimensions = m_input->GetDimensions();
@@ -121,17 +121,17 @@ bool mitk::OclImageToImageFilter::InitExec(cl_kernel ckKernel)
   // compute work sizes
   this->SetWorkingSize( 8, uiImageWidth, 8, uiImageHeight , 8, uiImageDepth );
 
-  cl_mem clBuffIn = m_input->GetGPUImage(this->m_commandQue);
+  cl_mem clBuffIn = m_input->GetGPUImage(this->m_CommandQue);
   cl_mem clBuffOut = m_output->GetGPUBuffer();
 
   if (!clBuffIn)
   {
-    if ( m_input->TransferDataToGPU(m_commandQue) != CL_SUCCESS )
+    if ( m_input->TransferDataToGPU(m_CommandQue) != CL_SUCCESS )
     {
       mitkThrow()<< "Could not create / initialize gpu image.";
     }
 
-    clBuffIn = m_input->GetGPUImage(m_commandQue);
+    clBuffIn = m_input->GetGPUImage(m_CommandQue);
   }
 
   // output image not initialized

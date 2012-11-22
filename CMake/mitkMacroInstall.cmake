@@ -100,9 +100,12 @@ macro(_fixup_target)
         \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/lib*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
     endif()
 
-    file(GLOB_RECURSE GLOBBED_QT_PLUGINS
-      # glob for Qt plugins
-      \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+    set(_qt_plugin_glob_expressions \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+    if(CMAKE_SHARED_MODULE_SUFFIX AND NOT CMAKE_SHARED_MODULE_SUFFIX STREQUAL CMAKE_SHARED_LIBRARY_SUFFIX)
+      list(APPEND _qt_plugin_glob_expressions \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_MODULE_SUFFIX}\")
+    endif()
+
+    file(GLOB_RECURSE GLOBBED_QT_PLUGINS ${_qt_plugin_glob_expressions})
 
     set(PLUGINS )
     foreach(_plugin ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_PLUGINS})

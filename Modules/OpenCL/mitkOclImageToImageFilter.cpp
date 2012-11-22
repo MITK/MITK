@@ -21,71 +21,65 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::OclImageToImageFilter::OclImageToImageFilter()
 {
-  m_output = mitk::OclImage::New();
+  m_Output = mitk::OclImage::New();
 }
 
 
 mitk::OclImageToImageFilter::~OclImageToImageFilter()
 {
-
 }
 
 mitk::OclImage::Pointer mitk::OclImageToImageFilter::GetGPUOutput()
 {
   // initialize some variables
-  m_output->SetPixelType(m_input->GetPixelType());
+  m_Output->SetPixelType(m_Input->GetPixelType());
 
   // create new image, for passing the essential information to the output
-  m_output->InitializeMITKImage();
+  m_Output->InitializeMITKImage();
 
-  const unsigned int dimension = m_input->GetDimension();
-  unsigned int* dimensions = m_input->GetDimensions();
+  const unsigned int dimension = m_Input->GetDimension();
+  unsigned int* dimensions = m_Input->GetDimensions();
 
-  m_output->SetDimensions( dimensions );
-  m_output->SetDimension( (unsigned short)dimension );
+  m_Output->SetDimensions( dimensions );
+  m_Output->SetDimension( (unsigned short)dimension );
 
-  m_output->GetMITKImage()->Initialize( this->GetOutputType(), dimension, dimensions);
-  const mitk::SlicedGeometry3D::Pointer p_slg = m_input->GetMITKImage()->GetSlicedGeometry(0);
-  m_output->GetMITKImage()->SetSpacing( p_slg->GetSpacing() );
-  m_output->GetMITKImage()->SetGeometry( m_input->GetMITKImage()->GetGeometry() );
+  m_Output->GetMITKImage()->Initialize( this->GetOutputType(), dimension, dimensions);
+  const mitk::SlicedGeometry3D::Pointer p_slg = m_Input->GetMITKImage()->GetSlicedGeometry(0);
+  m_Output->GetMITKImage()->SetSpacing( p_slg->GetSpacing() );
+  m_Output->GetMITKImage()->SetGeometry( m_Input->GetMITKImage()->GetGeometry() );
 
-  return this->m_output;
+  return this->m_Output;
 
 }
 
 mitk::Image::Pointer mitk::OclImageToImageFilter::GetOutput()
 {
-  if (m_output->IsModified(GPU_DATA))
+  if (m_Output->IsModified(GPU_DATA))
   {
-    void* pData = m_output->TransferDataToCPU(m_CommandQue);
+    void* pData = m_Output->TransferDataToCPU(m_CommandQue);
 
-    const unsigned int dimension = m_input->GetDimension();
-    unsigned int* dimensions = m_input->GetDimensions();
+    const unsigned int dimension = m_Input->GetDimension();
+    unsigned int* dimensions = m_Input->GetDimensions();
 
-    const mitk::SlicedGeometry3D::Pointer p_slg = m_input->GetMITKImage()->GetSlicedGeometry();
+    const mitk::SlicedGeometry3D::Pointer p_slg = m_Input->GetMITKImage()->GetSlicedGeometry();
 
-    MITK_INFO << " Creating new MITK Image. ";
+    MITK_DEBUG << "Creating new MITK Image.";
 
-    m_output->GetMITKImage()->Initialize( this->GetOutputType(), dimension, dimensions);
-    m_output->GetMITKImage()->SetSpacing( p_slg->GetSpacing());
-    m_output->GetMITKImage()->SetGeometry( m_input->GetMITKImage()->GetGeometry() );
-    m_output->GetMITKImage()->SetImportVolume( pData, 0, 0, mitk::Image::ReferenceMemory);
+    m_Output->GetMITKImage()->Initialize( this->GetOutputType(), dimension, dimensions);
+    m_Output->GetMITKImage()->SetSpacing( p_slg->GetSpacing());
+    m_Output->GetMITKImage()->SetGeometry( m_Input->GetMITKImage()->GetGeometry() );
+    m_Output->GetMITKImage()->SetImportVolume( pData, 0, 0, mitk::Image::ReferenceMemory);
   }
 
-  MITK_INFO<< "Image Initialized.";
+  MITK_DEBUG << "Image Initialized.";
 
-  return m_output->GetMITKImage();
-}
-
-void mitk::OclImageToImageFilter::Update()
-{
-
+  return m_Output->GetMITKImage();
 }
 
 mitk::PixelType mitk::OclImageToImageFilter::GetOutputType()
 {
   // get the current image format from the input image
-  const cl_image_format* currentImFormat = this->m_input->GetPixelType();
+  const cl_image_format* currentImFormat = this->m_Input->GetPixelType();
 
   // return the value according to the current channel type
   switch( currentImFormat->image_channel_data_type )
@@ -103,43 +97,43 @@ mitk::PixelType mitk::OclImageToImageFilter::GetOutputType()
 
 int mitk::OclImageToImageFilter::GetBytesPerElem()
 {
-  return (this->m_currentType + 1);
+  return (this->m_CurrentType + 1);
 }
 
 bool mitk::OclImageToImageFilter::InitExec(cl_kernel ckKernel)
 {
   cl_int clErr = 0;
 
-  if( m_input.IsNull() )
+  if( m_Input.IsNull() )
     mitkThrow() << "Input image is null.";
 
   // get image size once
-  const unsigned int uiImageWidth  = m_input->GetDimension(0);
-  const unsigned int uiImageHeight = m_input->GetDimension(1);
-  const unsigned int uiImageDepth  = m_input->GetDimension(2);
+  const unsigned int uiImageWidth  = m_Input->GetDimension(0);
+  const unsigned int uiImageHeight = m_Input->GetDimension(1);
+  const unsigned int uiImageDepth  = m_Input->GetDimension(2);
 
   // compute work sizes
   this->SetWorkingSize( 8, uiImageWidth, 8, uiImageHeight , 8, uiImageDepth );
 
-  cl_mem clBuffIn = m_input->GetGPUImage(this->m_CommandQue);
-  cl_mem clBuffOut = m_output->GetGPUBuffer();
+  cl_mem clBuffIn = m_Input->GetGPUImage(this->m_CommandQue);
+  cl_mem clBuffOut = m_Output->GetGPUBuffer();
 
   if (!clBuffIn)
   {
-    if ( m_input->TransferDataToGPU(m_CommandQue) != CL_SUCCESS )
+    if ( m_Input->TransferDataToGPU(m_CommandQue) != CL_SUCCESS )
     {
       mitkThrow()<< "Could not create / initialize gpu image.";
     }
 
-    clBuffIn = m_input->GetGPUImage(m_CommandQue);
+    clBuffIn = m_Input->GetGPUImage(m_CommandQue);
   }
 
   // output image not initialized
   if (!clBuffOut)
   {
     //TODO bpp, or SetImageWidth/Height/...
-    MITK_INFO << "Create GPU Image call " << uiImageWidth<< "x"<<uiImageHeight<< "x"<<uiImageDepth;
-    clBuffOut = m_output->CreateGPUImage(uiImageWidth, uiImageHeight, uiImageDepth, this->m_currentType + 1);
+    MITK_DEBUG << "Create GPU Image call " << uiImageWidth<< "x"<<uiImageHeight<< "x"<<uiImageDepth;
+    clBuffOut = m_Output->CreateGPUImage(uiImageWidth, uiImageHeight, uiImageDepth, this->m_CurrentType + 1);
   }
 
   clErr = 0;

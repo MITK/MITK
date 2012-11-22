@@ -16,35 +16,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclImageFilter.h"
 #include "mitkOclFilter.h"
-
 #include "mitkOclImage.h"
 
 mitk::OclImageFilter::OclImageFilter()
 {
   // set the filter type to default value = SHORT
-  this->m_currentType = FILTER_SHORT;
+  this->m_CurrentType = FILTER_SHORT;
 }
 
 mitk::OclImageFilter::~OclImageFilter()
 {
-
 }
 
-void mitk::OclImageFilter::SetInput(mitk::OclImage::Pointer _im)
+void mitk::OclImageFilter::SetInput(mitk::OclImage::Pointer image)
 {
-  m_input = _im;
+  m_Input = image;
 }
 
-void mitk::OclImageFilter::SetInput(mitk::Image::Pointer _im)
+void mitk::OclImageFilter::SetInput(mitk::Image::Pointer image)
 {
-  m_input = mitk::OclImage::New();
-  m_input->InitializeByMitkImage(_im);
+  m_Input = mitk::OclImage::New();
+  m_Input->InitializeByMitkImage(image);
 
   // update current size
-  MITK_INFO << "Current Type was: " << this->m_currentType;
-  this->m_currentType = m_input->GetBytesPerPixel() - 1;
-
-  MITK_INFO << "Current Type is: " << this->m_currentType;
-
+  MITK_DEBUG << "Current Type was: " << this->m_CurrentType;
+  this->m_CurrentType = m_Input->GetBytesPerPixel() - 1;
+  MITK_DEBUG << "Current Type is: " << this->m_CurrentType;
 }
 

@@ -19,11 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usServiceInterface.h>
 
-#if defined (__APPLE__) || defined(MACOSX)
-#include <OpenCL/cl.h>
-#else
-#include <CL/cl.h>
-#endif
+#include <mitkOpenCL.h>
 
 /**
  * @brief Declaration of the OpenCL Resources micro-service
@@ -45,29 +41,32 @@ public:
   virtual cl_device_id GetCurrentDevice() const = 0;
 
   /** @brief Checks if an OpenCL image format passed in is supported on current device */
-  virtual bool GetIsFormatSupported( cl_image_format* ) = 0;
+  virtual bool GetIsFormatSupported( cl_image_format* format ) = 0;
 
   /** @brief Puts the OpenCL Context info in std::cout */
   virtual void PrintContextInfo() = 0;
 
   /** @brief Insert program into the internal program storage
    *
-   * @param program an cl_program object
-   * @param string text identifier of the inserted program. Used for getting the program
+   * @param program A cl_program object.
+   * @param string Text identifier of the inserted program. Used for getting the program.
+   * @param todo: what is the flag?
   */
-  virtual void InsertProgram(cl_program, std::string, bool) = 0;
+  virtual void InsertProgram(cl_program program, std::string string, bool flag) = 0;
 
   /** @brief Get the cl_program by name
-   *
+   * @param name Text identifier of the program.
    * @throws an mitk::Exception in case the program cannot be found
    */
-  virtual cl_program GetProgram(const std::string&) const = 0;
+  virtual cl_program GetProgram(const std::string& name) const = 0;
 
   /** @brief Remove all invalid (=do not compile) programs from the internal storage */
   virtual void InvalidateStorage() = 0;
 
-  /** @brief Remove given program from storage */
-  virtual void RemoveProgram(const std::string&) = 0;
+  /** @brief Remove given program from storage
+   * @param name Text identifier of the program.
+   */
+  virtual void RemoveProgram(const std::string& name) = 0;
 
   /** @brief Get the maximum size of an image
    *

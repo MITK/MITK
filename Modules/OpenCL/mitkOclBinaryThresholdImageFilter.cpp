@@ -78,7 +78,7 @@ void mitk::OclBinaryThresholdImageFilter::Execute()
   this->ExecuteKernel( m_ckBinaryThreshold, 3);
 
   // signalize the GPU-side data changed
-  m_output->Modified( GPU_DATA );
+  m_Output->Modified( GPU_DATA );
 
 }
 

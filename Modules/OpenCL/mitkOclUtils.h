@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkOclExports.h>
 
 #define CHECK_OCL_ERR(_er) oclCheckError(_er, __FILE__, __LINE__);
-#define EPS 0.000001f
+
+//todo improve docu!
 
 MitkOcl_EXPORT unsigned int iDivUp(unsigned int dividend, unsigned int divisor);
 

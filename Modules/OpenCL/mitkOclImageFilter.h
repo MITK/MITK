@@ -28,38 +28,38 @@ namespace mitk
 class OclFilter;
 class OclImageFilter;
 
-/**
-    * \brief The OclImageFilter is the topmost class for all filter which takes an image as input
+   /**
+    * \brief The OclImageFilter is the topmost class for all filter which take images as input.
     *
-    * The input image can be intialized by an oclImage or an mitk::Image.
+    * The input image can be intialized via an oclImage or an mitk::Image.
     * This makes it possible to create a filter pipeline of GPU-based filters
-    * and to bind this part into the CPU (ITK) filter pipeline
+    * and to bind this part into the CPU (ITK) filter pipeline.
     */
 class MitkOcl_EXPORT OclImageFilter: public OclFilter
 {
 public:
   /**
-     \brief Set the input image ( oclImage )
-    */
-  void SetInput(mitk::OclImage::Pointer );
+   * @brief SetInput SetInput Set the input image (as mitk::OclImage).
+   * @param image The image in mitk::OclImage.
+   */
+  void SetInput(mitk::OclImage::Pointer image);
 
   /**
-      \brief Set the input image ( mitkImage )
-      */
-  void SetInput(mitk::Image::Pointer);
-
-  virtual ~OclImageFilter();
+   * @brief SetInput Set the input image (as mitk::Image).
+   * @param image The image in mitk::Image.
+   */
+  void SetInput(mitk::Image::Pointer image);
 
 protected:
   OclImageFilter();
 
+  virtual ~OclImageFilter();
+
   /** The input image */
-  mitk::OclImage::Pointer m_input;
+  mitk::OclImage::Pointer m_Input;
 
   /*! Current (last used) image pixel type */
-  short m_currentType;
-
-
+  short m_CurrentType;
 };
 }
 #endif // __mitkOclImageFilter_h

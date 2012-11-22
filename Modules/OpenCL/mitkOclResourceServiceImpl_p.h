@@ -19,16 +19,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <map>
 
-
+//Micro Services
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usServiceProperties.h>
 
+//ocl
 #include "mitkOclResourceService.h"
-
 #include "mitkOclUtils.h"
 #include "mitkOclImageFormats.h"
+
+//todo add docu!
 
 class OclResourceServiceImpl
     : public US_BASECLASS_NAME, public OclResourceService
@@ -70,7 +72,7 @@ private:
   cl_device_id* m_Devices;
 
   /** Class for handling (un)supported GPU image formats **/
-  mitk::OclImageFormats* m_ImageFormats;
+  mitk::OclImageFormats::Pointer m_ImageFormats;
 
   /** The command queue*/
   cl_command_queue m_CommandQueue;

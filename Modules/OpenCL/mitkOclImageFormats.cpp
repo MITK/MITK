@@ -16,10 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclImageFormats.h"
 
-mitk::OclImageFormats::OclImageFormats( cl_context ctxt)
+mitk::OclImageFormats::OclImageFormats()
     :m_Image2DSupport( NULL ), m_Image3DSupport( NULL ),
-    m_gpuContext(ctxt)
+    m_GpuContext( NULL )
 {
+    //todo: what happens here?
     const unsigned int matrixSize = MAX_FORMATS * MAX_DATA_TYPES;
 
     this->m_Image2DSupport = new unsigned char[matrixSize];
@@ -30,45 +31,43 @@ mitk::OclImageFormats::OclImageFormats( cl_context ctxt)
         this->m_Image2DSupport[i] = 0;
         this->m_Image3DSupport[i] = 0;
     }
-
-    this->CollectAvailableFormats();
-
 }
 
 mitk::OclImageFormats::~OclImageFormats()
 {
-
 }
 
 void mitk::OclImageFormats::PrintSelf()
 {
-    std::cout << "Values: Read-Write(1) ReadOnly(2) , WriteOnly(4) \n";
-    std::cout << "ROWS: [CL_A, CL_R, CL_RA, CL_RG, CL_RGB, CL_RGBA, CL_ARGB, CL_BGRA, CL_LUM, CL_INT]" << std::endl;
+    std::stringstream outputstream;
+    outputstream << "Values: Read-Write(1) ReadOnly(2) , WriteOnly(4) \n";
+    outputstream << "ROWS: [CL_A, CL_R, CL_RA, CL_RG, CL_RGB, CL_RGBA, CL_ARGB, CL_BGRA, CL_LUM, CL_INT] \n";
 
     const unsigned int matrixSize = MAX_FORMATS * MAX_DATA_TYPES;
 
     for( unsigned int i = 0; i<matrixSize; i++ )
     {
-        std::cout << (int) this->m_Image2DSupport[i] << ", \t";
+        outputstream << (int) this->m_Image2DSupport[i] << ", \t";
         if( (i+1) % MAX_DATA_TYPES == 0 )
-            std::cout << " \n";
+            outputstream << " \n";
     }
-    std::cout << "========================== \n";
+    outputstream << "========================== \n";
 
     for( unsigned int i = 0; i<matrixSize; i++ )
     {
-        std::cout << (int) this->m_Image3DSupport[i] << ", \t";
+        outputstream << (int) this->m_Image3DSupport[i] << ", \t";
         if( (i+1) % MAX_DATA_TYPES == 0 )
-            std::cout << " \n";
+            outputstream << " \n";
     }
-
+    MITK_INFO << outputstream.str();
 }
 
-unsigned int mitk::OclImageFormats::GetOffset(cl_image_format fmt)
+unsigned int mitk::OclImageFormats::GetOffset(cl_image_format format)
 {
+    //todo: what happens here?
     unsigned int offset = 0;
 
-    switch( fmt.image_channel_order )
+    switch( format.image_channel_order )
     {
     case CL_A:
         break;
@@ -101,7 +100,7 @@ unsigned int mitk::OclImageFormats::GetOffset(cl_image_format fmt)
         break;
     }
 
-    switch ( fmt.image_channel_data_type )
+    switch ( format.image_channel_data_type )
     {
     case CL_SNORM_INT8:
         break;
@@ -143,53 +142,59 @@ unsigned int mitk::OclImageFormats::GetOffset(cl_image_format fmt)
     return offset;
 }
 
-bool mitk::OclImageFormats::IsFormatSupported(cl_image_format *fmt)
+bool mitk::OclImageFormats::IsFormatSupported(cl_image_format* format)
 {
     bool retVal = false;
 
     // FIXME needs finer subdivision...
-    if ( this->m_Image2DSupport[ GetOffset(*fmt)] > 4 )
+    //todo: Comment above???
+    if ( this->m_Image2DSupport[ GetOffset(*format)] > 4 )
         retVal = true;
 
     return retVal;
 }
 
-bool mitk::OclImageFormats::GetNearestSupported(cl_image_format *in, cl_image_format *out)
+bool mitk::OclImageFormats::GetNearestSupported(cl_image_format *inputformat, cl_image_format *outputformat)
 {
-    bool retVal = false;
+    bool returnValue = false;
 
     // init output format
-    out->image_channel_data_type = in->image_channel_data_type;
-    out->image_channel_order = in->image_channel_order;
+    outputformat->image_channel_data_type = inputformat->image_channel_data_type;
+    outputformat->image_channel_order = inputformat->image_channel_order;
 
     // the input format is supported, just copy the information into out
-    if( this->IsFormatSupported(in) )
+    if( this->IsFormatSupported(inputformat) )
     {
-        retVal = true;
+        returnValue = true;
     }
     else
     {
         // get the 'nearest' format
         // try RGBA first
+        //todo: It seems like ONLY RGBA is considered to be near?!? Either code or docu should be adapted.
         cl_image_format test;
         test.image_channel_order = CL_RGBA;
-        test.image_channel_data_type = in->image_channel_data_type;
+        test.image_channel_data_type = inputformat->image_channel_data_type;
 
         if(this->IsFormatSupported( &test) )
         {
-            out->image_channel_order = CL_RGBA;
+            outputformat->image_channel_order = CL_RGBA;
         }
-
     }
+    return returnValue;
+}
 
-    return retVal;
-
+void mitk::OclImageFormats::SetGPUContext(cl_context context)
+{
+    this->m_GpuContext = context;
+    //collect available formats can now be called
+    this->CollectAvailableFormats();
 }
 
 void mitk::OclImageFormats::SortFormats(cl_image_format *formats, cl_uint count, int val, int dims)
 {
+    //todo what happens here?
     unsigned char *target = this->m_Image2DSupport;
-
     if (dims == 3)
     {
         target = this->m_Image3DSupport;
@@ -204,6 +209,11 @@ void mitk::OclImageFormats::SortFormats(cl_image_format *formats, cl_uint count,
 
 void mitk::OclImageFormats::CollectAvailableFormats()
 {
+    if( this->m_GpuContext == NULL)
+    {
+        mitkThrow() << "No GPU context was set! Use SetGPUContext() before calling this method!";
+    }
+    //todo what happens here?
     const unsigned int entries = 100;
     cl_image_format* formats = new cl_image_format[entries];
 
@@ -211,21 +221,21 @@ void mitk::OclImageFormats::CollectAvailableFormats()
     cl_int clErr = 0;
 
     // GET formats for R/W, 2D
-    clErr = clGetSupportedImageFormats( m_gpuContext, CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D, entries, formats, &written);
+    clErr = clGetSupportedImageFormats( m_GpuContext, CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE2D, entries, formats, &written);
     CHECK_OCL_ERR( clErr );
 
     this->SortFormats( formats, written, 1 );
 
     // GET formats for R/-, 2D
     written = 0;
-    clErr = clGetSupportedImageFormats( m_gpuContext, CL_MEM_READ_ONLY, CL_MEM_OBJECT_IMAGE2D, entries, formats, &written);
+    clErr = clGetSupportedImageFormats( m_GpuContext, CL_MEM_READ_ONLY, CL_MEM_OBJECT_IMAGE2D, entries, formats, &written);
     CHECK_OCL_ERR( clErr );
 
     this->SortFormats( formats, written, 2 );
 
     // GET formats for -/W, 2D
     written = 0;
-    clErr = clGetSupportedImageFormats( m_gpuContext, CL_MEM_WRITE_ONLY, CL_MEM_OBJECT_IMAGE2D, entries, formats, &written);
+    clErr = clGetSupportedImageFormats( m_GpuContext, CL_MEM_WRITE_ONLY, CL_MEM_OBJECT_IMAGE2D, entries, formats, &written);
     CHECK_OCL_ERR( clErr );
 
     this->SortFormats( formats, written, 4 );
@@ -234,23 +244,22 @@ void mitk::OclImageFormats::CollectAvailableFormats()
 
     // GET formats for R/W, 3D
     written = 0;
-    clErr = clGetSupportedImageFormats( m_gpuContext, CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE3D, entries, formats, &written);
+    clErr = clGetSupportedImageFormats( m_GpuContext, CL_MEM_READ_WRITE, CL_MEM_OBJECT_IMAGE3D, entries, formats, &written);
     CHECK_OCL_ERR( clErr );
 
     this->SortFormats( formats, written, 1, 3 );
 
     // GET formats for R/-, 3D
     written = 0;
-    clErr = clGetSupportedImageFormats( m_gpuContext, CL_MEM_READ_ONLY, CL_MEM_OBJECT_IMAGE3D, entries, formats, &written);
+    clErr = clGetSupportedImageFormats( m_GpuContext, CL_MEM_READ_ONLY, CL_MEM_OBJECT_IMAGE3D, entries, formats, &written);
     CHECK_OCL_ERR( clErr );
 
     this->SortFormats( formats, written, 2, 3 );
 
     // GET formats for -/W, 3D
     written = 0;
-    clErr = clGetSupportedImageFormats( m_gpuContext, CL_MEM_WRITE_ONLY, CL_MEM_OBJECT_IMAGE3D, entries, formats, &written);
+    clErr = clGetSupportedImageFormats( m_GpuContext, CL_MEM_WRITE_ONLY, CL_MEM_OBJECT_IMAGE3D, entries, formats, &written);
     CHECK_OCL_ERR( clErr );
 
     this->SortFormats( formats, written, 4, 3 );
-
 }

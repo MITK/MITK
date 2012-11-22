@@ -244,10 +244,11 @@ void OclResourceServiceImpl::CreateContext()
     this->PrintContextInfo( );
 
     // collect available image formats for current context
-    this->m_ImageFormats = new mitk::OclImageFormats( m_Context );
+    this->m_ImageFormats = mitk::OclImageFormats::New();
+    this->m_ImageFormats->SetGPUContext(m_Context);
   }
   catch( std::exception& e)
   {
-    MITK_ERROR("OpenCL.ResourceService") << "Exception while creating context: \n" << e.what() << std::endl;
+    MITK_ERROR("OpenCL.ResourceService") << "Exception while creating context: \n" << e.what();
   }
 }

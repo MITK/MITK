@@ -33,7 +33,7 @@ namespace itk
 {
 TractsToDWIImageFilter::TractsToDWIImageFilter()
     : m_OuputKspaceImage(false)
-    , m_CircleDummy(true)
+    , m_CircleDummy(false)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -65,24 +65,12 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
     for (int i=0; i<m_KspaceArtifacts.size(); i++)
         if ( dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i)) )
             undersampling = dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i))->GetKspaceCropping();
-
     if (undersampling<=1)
         undersampling = 1;
 
-    m_UpsImage = ItkFloatImgType::New();
-    m_UpsImage->SetSpacing( m_Spacing/undersampling );
-    m_UpsImage->SetOrigin( m_Origin );
-    m_UpsImage->SetDirection( m_DirectionMatrix );
-    ImageRegion<3> region2 = m_ImageRegion;
-    region2.SetSize(0, m_ImageRegion.GetSize()[0]*undersampling);
-    region2.SetSize(1, m_ImageRegion.GetSize()[1]*undersampling);
-    m_UpsImage->SetLargestPossibleRegion( region2 );
-    m_UpsImage->SetBufferedRegion( region2 );
-    m_UpsImage->SetRequestedRegion( region2 );
-    m_UpsImage->Allocate();
     itk::ResampleImageFilter<SliceType, SliceType>::SizeType upsSize;
-    upsSize[0] = region2.GetSize()[0];
-    upsSize[1] = region2.GetSize()[1];
+    upsSize[0] = m_ImageRegion.GetSize()[0]*undersampling;
+    upsSize[1] = m_ImageRegion.GetSize()[1]*undersampling;
     mitk::Vector2D upsSpacing;
     upsSpacing[0] = m_Spacing[0]/undersampling;
     upsSpacing[1] = m_Spacing[1]/undersampling;
@@ -127,16 +115,23 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                         slice->SetPixel(index2D, pix2D);
                     }
 
+                // upsample slice to simulate high resolution k-space
+                SliceType::Pointer reslice;
+                if (undersampling>1)
+                {
 //                itk::BSplineInterpolateImageFunction<SliceType,SliceType::PixelType>::Pointer interpolator = itk::BSplineInterpolateImageFunction<SliceType,SliceType::PixelType>::New();
 //                itk::NearestNeighborInterpolateImageFunction<SliceType,SliceType::PixelType>::Pointer interpolator = itk::NearestNeighborInterpolateImageFunction<SliceType,SliceType::PixelType>::New();
-                itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
+                    itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
 //                resampler->SetInterpolator(interpolator);
-                resampler->SetInput(slice);
-                resampler->SetOutputParametersFromImage(slice);
-                resampler->SetSize(upsSize);
-                resampler->SetOutputSpacing(upsSpacing);
-                resampler->Update();
-                SliceType::Pointer reslice = resampler->GetOutput();
+                    resampler->SetInput(slice);
+                    resampler->SetOutputParametersFromImage(slice);
+                    resampler->SetSize(upsSize);
+                    resampler->SetOutputSpacing(upsSpacing);
+                    resampler->Update();
+                    reslice = resampler->GetOutput();
+                }
+                else
+                    reslice = slice;
 
                 // fourier transform slice
                 itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
@@ -144,21 +139,6 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                 fft->Update();
                 ComplexSliceType::Pointer fSlice = fft->GetOutput();
                 fSlice = RearrangeSlice(fSlice);
-
-                if (g==0 && i==0)
-                    for (int y=0; y<upsSize[1]; y++)
-                    for (int x=0; x<upsSize[0]; x++)
-                    {
-                        DoubleDwiType::IndexType index3D;
-                        index3D[0]=x; index3D[1]=y; index3D[2]=z;
-                        ItkFloatImgType::PixelType pix3D = m_UpsImage->GetPixel(index3D);
-
-                        SliceType::IndexType index2D;
-                        index2D[0]=x; index2D[1]=y;
-//                        pix3D = sqrt(fSlice->GetPixel(index2D).real()*fSlice->GetPixel(index2D).real()+fSlice->GetPixel(index2D).imag()*fSlice->GetPixel(index2D).imag());
-                        pix3D = reslice->GetPixel(index2D);
-                        m_UpsImage->SetPixel(index3D, pix3D);
-                    }
 
                 // add artifacts
                 for (int a=0; a<m_KspaceArtifacts.size(); a++)
@@ -261,7 +241,7 @@ void TractsToDWIImageFilter::GenerateData()
         minSpacing = m_Spacing[2];
 
     FiberBundleType fiberBundle = m_FiberBundle->GetDeepCopy();
-    fiberBundle->DoFiberSmoothing(ceil(10.0*2.0/minSpacing));
+    fiberBundle->DoFiberSmoothing(ceil(10.0*4.0/minSpacing));
 
     // initialize output dwi image
     OutputImageType::Pointer outImage = OutputImageType::New();
@@ -478,7 +458,7 @@ void TractsToDWIImageFilter::GenerateData()
             double s = 1;
             if (!m_OuputKspaceImage)
                 s = m_NonFiberModels.at(i)->GetSignalScale();
-            signal += compartments.at(i)->GetPixel(index)*s;
+            signal += compartments.at(m_FiberModels.size()+i)->GetPixel(index)*s;
         }
 
         if (!m_OuputKspaceImage)

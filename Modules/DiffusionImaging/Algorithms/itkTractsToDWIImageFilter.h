@@ -77,8 +77,6 @@ public:
 
     void GenerateData();
 
-    ItkFloatImgType::Pointer m_UpsImage;
-
 protected:
 
     TractsToDWIImageFilter();

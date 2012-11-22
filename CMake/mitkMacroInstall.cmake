@@ -53,8 +53,14 @@ macro(_fixup_target)
         get_filename_component(_item_path \"\${full_path}\" PATH)
       endif()
 
-      if(_item_path STREQUAL \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/plugins\"
-         OR (_item_path MATCHES \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/\" AND _item_name MATCHES \"liborg\") # this is for legacy BlueBerry bundle support
+      if(_bundle_dest_dir)
+        set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/plugins\")
+      else()
+        set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/bin/plugins\")
+      endif()
+
+      if(_item_path STREQUAL _plugins_path
+         OR (_item_path MATCHES \"\${_plugins_path}/\" AND _item_name MATCHES \"liborg\") # this is for legacy BlueBerry bundle support
         )
         # Only fix plugins
         message(\"override: \${item}\")

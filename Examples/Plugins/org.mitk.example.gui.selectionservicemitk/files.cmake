@@ -2,8 +2,8 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  selectionservicemitkActivator.cpp
-  SelectionServiceMITK.cpp
+  org_mitk_example_gui_selectionservicemitk_Activator.cpp
+  SelectionServiceMitk.cpp
   ExtendedPerspective.cpp
   ListenerViewMitk.cpp
   SelectionViewMitk.cpp
@@ -15,8 +15,8 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/selectionservicemitkActivator.h
-  src/internal/SelectionServiceMITK.h
+  src/internal/org_mitk_example_gui_selectionservicemitk_Activator.h
+  src/internal/SelectionServiceMitk.h
   src/internal/ExtendedPerspective.h
   src/internal/ListenerViewMitk.h
   src/internal/SelectionViewMitk.h

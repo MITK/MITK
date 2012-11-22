@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QObject>
 #include <QScopedPointer>
 
-class SelectionServiceQTWorkbenchAdvisor;
+class SelectionServiceQtWorkbenchAdvisor;
 
  /** Documentation:
   *   \ingroup org_mitk_example_gui_selectionserviceqt
@@ -33,22 +33,22 @@ class SelectionServiceQTWorkbenchAdvisor;
   *   "Selection service QT". It creates a perspective with two views
   *   that demonstrate the Qt-based selection service.
   */
-class SelectionServiceQT : public QObject, public berry::IApplication
+class SelectionServiceQt : public QObject, public berry::IApplication
 {
   Q_OBJECT
   Q_INTERFACES(berry::IApplication)
 
 public:
 
-  SelectionServiceQT();
-  ~SelectionServiceQT();
+  SelectionServiceQt();
+  ~SelectionServiceQt();
 
   int Start();
   void Stop();
 
 private:
 
-  QScopedPointer<SelectionServiceQTWorkbenchAdvisor> wbAdvisor;
+  QScopedPointer<SelectionServiceQtWorkbenchAdvisor> wbAdvisor;
 };
 
 #endif /*SELECTIONSERVICEQT_H_*/

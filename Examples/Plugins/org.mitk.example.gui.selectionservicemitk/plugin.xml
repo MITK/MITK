@@ -3,7 +3,7 @@
 <plugin>
   <extension point="org.blueberry.osgi.applications">
     <application id="org.mitk.example.selectionservicemitk">
-      <run class="SelectionServiceMITK"/>
+      <run class="SelectionServiceMitk"/>
     </application>
   </extension>
 

@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "SelectionServiceQT.h"
+#include "SelectionServiceMitk.h"
 
 // berry Includes
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
-class SelectionServiceQTWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
+class SelectionServiceMITKWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {
 
 public:
@@ -48,20 +48,20 @@ private:
 
 };
 
-const std::string SelectionServiceQTWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
+const std::string SelectionServiceMITKWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
 
-SelectionServiceQT::SelectionServiceQT()
+SelectionServiceMITK::SelectionServiceMITK()
 {
 }
 
-SelectionServiceQT::~SelectionServiceQT()
+SelectionServiceMITK::~SelectionServiceMITK()
 {
 }
 
-int SelectionServiceQT::Start()
+int SelectionServiceMITK::Start()
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
-  wbAdvisor.reset(new SelectionServiceQTWorkbenchAdvisor);
+  wbAdvisor.reset(new SelectionServiceMITKWorkbenchAdvisor);
 
   int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
 
@@ -70,7 +70,7 @@ int SelectionServiceQT::Start()
               ? EXIT_RESTART : EXIT_OK;
 }
 
-void SelectionServiceQT::Stop()
+void SelectionServiceMITK::Stop()
 {
 
 }

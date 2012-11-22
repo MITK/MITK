@@ -2,7 +2,7 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  multipleperspectivesActivator.cpp
+  org_mitk_example_gui_multipleperspectives_Activator.cpp
   MultiplePerspectives.cpp
   MinimalPerspective.cpp
   ExtendedPerspective.cpp
@@ -16,7 +16,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/multipleperspectivesActivator.h
+  src/internal/org_mitk_example_gui_multipleperspectives_Activator.h
   src/internal/MultiplePerspectives.h
   src/internal/MinimalPerspective.h
   src/internal/ExtendedPerspective.h

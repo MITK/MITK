@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "multipleperspectivesActivator.h"
+#include "org_mitk_example_gui_multipleperspectives_Activator.h"
 
 #include "MultiplePerspectives.h"
 #include "MinimalPerspective.h"
@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 
 
-void multipleperspectivesActivator::start(ctkPluginContext* context)
+void org_mitk_example_gui_multipleperspectives_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(MultiplePerspectives, context)
     BERRY_REGISTER_EXTENSION_CLASS(MinimalPerspective, context)
@@ -35,12 +35,9 @@ void multipleperspectivesActivator::start(ctkPluginContext* context)
     BERRY_REGISTER_EXTENSION_CLASS(EmptyView2, context)
 }
 
-void multipleperspectivesActivator::stop(ctkPluginContext* context)
+void org_mitk_example_gui_multipleperspectives_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
 
-
-Q_EXPORT_PLUGIN2(org_mitk_example_gui_multipleperspectives, multipleperspectivesActivator)
-
-
+Q_EXPORT_PLUGIN2(org_mitk_example_gui_multipleperspectives, org_mitk_example_gui_multipleperspectives_Activator)

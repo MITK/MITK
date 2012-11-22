@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MULTIPLEPERSPECTIVESACTIVATOR_H
-#define MULTIPLEPERSPECTIVESACTIVATOR_H
+#ifndef org_mitk_example_gui_selectionserviceqt_Activator_H
+#define org_mitk_example_gui_selectionserviceqt_Activator_H
 
 #include <ctkPluginActivator.h>
 
-class multipleperspectivesActivator :
+class org_mitk_example_gui_selectionserviceqt_Activator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
@@ -33,4 +33,4 @@ public:
 
 };
 
-#endif // org_mitk_example_gui_multipleperspectives_Activator_H
+#endif // org_mitk_example_gui_selectionserviceqt_Activator_H

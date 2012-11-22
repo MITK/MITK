@@ -15,9 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "selectionserviceqtActivator.h"
+#include "org_mitk_example_gui_selectionserviceqt_Activator.h"
 
-#include "SelectionServiceQT.h"
+#include "SelectionServiceQt.h"
 #include "ExtendedPerspective.h"
 #include "ListenerView.h"
 #include "SelectionView.h"
@@ -25,20 +25,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 
 
-void selectionserviceqtActivator::start(ctkPluginContext* context)
+void org_mitk_example_gui_selectionserviceqt_Activator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(SelectionServiceQT, context)
+  BERRY_REGISTER_EXTENSION_CLASS(SelectionServiceQt, context)
     BERRY_REGISTER_EXTENSION_CLASS(ExtendedPerspective, context)
     BERRY_REGISTER_EXTENSION_CLASS(ListenerView, context)
     BERRY_REGISTER_EXTENSION_CLASS(SelectionView, context)
 }
 
-void selectionserviceqtActivator::stop(ctkPluginContext* context)
+void org_mitk_example_gui_selectionserviceqt_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
 
 
-Q_EXPORT_PLUGIN2(org_mitk_example_gui_selectionserviceqt, selectionserviceqtActivator)
-
-
+Q_EXPORT_PLUGIN2(org_mitk_example_gui_selectionserviceqt, org_mitk_example_gui_selectionserviceqt_Activator)

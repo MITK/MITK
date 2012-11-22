@@ -53,6 +53,7 @@ private:
   HistogramType::ConstPointer m_Histogram;
 
   void clearData();
+  void testData();
 
 private slots:
   void addJSObject();

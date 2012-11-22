@@ -14,6 +14,8 @@ var frequency = new Array();
 var measurement = new Array();
 var dataset;
 
+var data = [8,6,4,2,0,9,7,5,3,1];
+
 var margin = {
     top : 30,
     bottom : 50,
@@ -79,6 +81,7 @@ var svg = d3.select("body")
             .attr("width", width + margin.right + margin.left)
             .attr("height", height + margin.top + margin.bottom);
 
+
     // svg.append("path")
             // .attr("class", "area")
             // .attr("fill", "steelblue")
@@ -132,7 +135,7 @@ function changeSize ()
     changeHistogram();
 }
 
-function changeHistogram()
+function barChart()
 {
     xScale = d3.scale.linear()
                 .domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)])
@@ -239,24 +242,29 @@ function linePlot()
     var linenull = d3.svg.line()
             .interpolate("linear")
             .x(function(d,i) {
-                return xScale(i);
+                return xScale(histogramData.measurement[i]);
             })
             .y(function(d) {
                 return yScale(0);
             });
 
-    svg.selectAll("path")
-        .data([histogramData.frequency])
-        .enter()
+    var graph = svg.selectAll("path.line").data([histogramData.frequency]);
+
+
+    graph.enter()
         .append("path")
         .attr("class", "line")
-        .attr("d", linenull);
-
-    svg.selectAll("path")
-        .data([histogramData.frequency])
+        .attr("d", linenull)
         .transition()
         .duration(dur)
         .attr("d", line);
+
+
+    graph.transition()
+        .duration(dur)
+        .attr("d", line);
+
+    graph.exit().transition().duration(dur).attr("d", linenull);
 
     svg.selectAll("g")
         .transition()
@@ -277,4 +285,109 @@ function linePlot()
         .transition().duration(dur)
         .attr("opacity", 100)
         .call(yAxis);
+}
+
+function Test()
+{
+    xScale = d3.scale.linear()
+                .domain([0,data.length])
+                .range([margin.left,width]);
+
+    yScale = d3.scale.linear()
+                .domain([0,d3.max(data)])
+                .range([height,margin.bottom]);
+
+    xAxis = d3.svg.axis()
+                    .scale(xScale)
+                    .orient("bottom");
+
+    yAxis = d3.svg.axis()
+                   .scale(yScale)
+                   .orient("left");
+
+    var bar = svg.selectAll("rect").data(data);
+
+    bar.enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d,i) {
+            return xScale(i);
+        })
+        .attr("y", height)
+        .attr("height", 0)
+        .attr("width", width/(data.length + 1))
+        .transition()
+        .attr("height", function(d) {
+            return (height-yScale(d));
+        })
+        .attr("width", width/(data.length + 1))
+        .attr("y", function(d) {
+            return yScale(d);
+        });
+
+    bar.transition()
+        .attr("x", function(d,i) {
+            return xScale(i);
+        })
+        .attr("y", function(d) {
+            return yScale(d);
+        })
+        .attr("height", function(d) {
+            return (height-yScale(d));
+        })
+        .attr("width", width/(data.length + 1));
+
+    bar.exit().transition()
+        .attr("y", height)
+        .attr("height", 0)
+        .remove();
+
+    var line = d3.svg.line()
+            .interpolate("linear")
+            .x(function(d,i) {
+                return xScale(i);
+            })
+            .y(function(d) {
+                return yScale(d);
+            });
+
+    var linenull = d3.svg.line()
+            .interpolate("linear")
+            .x(function(d,i) {
+                return xScale(i);
+            })
+            .y(function(d) {
+                return yScale(0);
+            });
+
+    var graph = svg.selectAll("path.line").data([data]);
+
+    graph.enter()
+        .append("path")
+        .attr("class", "line")
+        .attr("d", linenull)
+        .transition()
+        .duration(dur)
+        .attr("d", line);
+
+
+    graph.transition()
+        .duration(dur)
+        .attr("d", line);
+
+    graph.exit().transition().duration(dur).attr("d", linenull);
+
+    svg.selectAll("g").transition().attr("opacity", 0).remove();
+
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + 0 + "," + height + ")")
+        .transition()
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + margin.left + "," + 0 + ")")
+        .transition()
+        .call(yAxis);
+
 }

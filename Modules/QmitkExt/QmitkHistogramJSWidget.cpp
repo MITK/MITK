@@ -95,3 +95,13 @@ void QmitkHistogramJSWidget::resetData(bool ok)
 {
   this->DataChanged();
 }
+
+void QmitkHistogramJSWidget::testData()
+{
+  this->clearData();
+  for (unsigned int i = 0; i<10; i++)
+  {
+    m_Frequency.insert(i,10);
+    m_Measurement.insert(i,i);
+  }
+}

@@ -29,31 +29,11 @@ var connected = false;
 var dur = 1000;
 var useLinePlot = false;
 
-   /*  var line = d3.svg.line()
-                    .interpolate("cardinal")
-                    .x(function(d,i) {
-                        return xScale(histogramData.measurement[i]);
-                    })
-                    .y(function(d,i) {
-                        return yScale(d);
-                    })
-                    .tension(tension);
-
-    var area = d3.svg.area()
-                    .interpolate("cardinal")
-                    .tension(tension)
-                    .x(function(d,i) {
-                        return xScale(histogramData.measurement[i]);
-                    })
-                    .y0(height)
-                    .y1(function(d,i) {
-                        return yScale(d);
-                    }); */
 
 if (!connected)
 {
     connected = true;
-    histogramData.DataChanged.connect(linePlot);
+    histogramData.DataChanged.connect(updateHistogram);
     histogramData.sizeChanged.connect(changeSize);
 }
 
@@ -81,38 +61,6 @@ var svg = d3.select("body")
             .attr("width", width + margin.right + margin.left)
             .attr("height", height + margin.top + margin.bottom);
 
-
-    // svg.append("path")
-            // .attr("class", "area")
-            // .attr("fill", "steelblue")
-            // .attr("opacity", 0.5)
-            // .attr("d", area(histogramData.frequency));
-
-    // svg.append("path")
-            // .attr("class", "line")
-            // .attr("fill", "none")
-            // .attr("stroke", "black")
-            // .attr("stroke-width", 1)
-            // .attr("d", line(histogramData.frequency));
-
-    // var bar = svg.selectAll("rect")
-                    // .data(histogramData.frequency)
-                    // .enter()
-                    // .append("rect")
-                    // .attr("class", "bar")
-                    // .attr("x", function(d,i) {
-                        // return xScale(histogramData.measurement[i]);
-                    // })
-                    // .attr("y", function(d,i) {
-                        // return yScale(d);
-                    // })
-                    // .attr("width", 1)
-                    // .attr("height", function(d) {
-                        // return height - yScale(d);
-                    // })
-                    // .attr("fill", "grey")
-                    // .attr("opacity", 0.5);
-
 svg.append("g")
     .attr("class", "axis")
     .attr("transform", "translate(" + 0 + "," + height + ")")
@@ -135,6 +83,24 @@ function changeSize ()
     changeHistogram();
 }
 
+function updateHistogram()
+{
+    if (!useLinePlot)
+    {
+        barChart();
+    }
+    else if (useLinePlot)
+    {
+        linePlot()
+    }
+}
+
+function changeHistogram()
+{
+    useLinePlot = !useLinePlot;
+    updateHistogram();
+}
+
 function barChart()
 {
     xScale = d3.scale.linear()
@@ -154,10 +120,23 @@ function barChart()
                 .scale(yScale)
                 .orient("left");
 
+    var linenull = d3.svg.line()
+            .interpolate("linear")
+            .x(function(d,i) {
+                return xScale(histogramData.measurement[i]);
+            })
+            .y(function(d) {
+                return yScale(0);
+            });
+
+    svg.selectAll("path.line").transition().duration(dur).attr("d", linenull(histogramData.frequency)).remove();
+
     var bar = svg.selectAll("rect").data(histogramData.frequency);
 
     bar.enter().append("rect")
         .attr("class", "bar")
+        .on("mouseover", function (d) {d3.select(this).style('fill', "red");})
+        .on("mouseout", function (d) {d3.select(this).style("fill", "steelblue");})
         .attr("x", function(d,i) {
             return xScale(histogramData.measurement[i]);
         })
@@ -229,6 +208,13 @@ function linePlot()
     yAxis = d3.svg.axis()
                 .scale(yScale)
                 .orient("left");
+
+    svg.selectAll("rect")
+        .transition()
+        .duration(dur)
+        .attr("height", 0)
+        .attr("fill", "black")
+        .remove();
 
     var line = d3.svg.line()
             .interpolate("linear")

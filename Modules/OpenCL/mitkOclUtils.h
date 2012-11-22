@@ -24,8 +24,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #define CHECK_OCL_ERR(_er) oclCheckError(_er, __FILE__, __LINE__);
 
-//todo improve docu!
+/**
+ @brief Method to estimate an integer quotient C from given dividend and divisor higher or equal to
+        the corresponding floating quotient
 
+  If the divisor is a factor of the dividend, the dividend/divisor is an integer value and is returned. If not,
+  the nearest higher integer is returned. So it holds for the return value C that C * divisor is equal or greater then
+  the dividend. In OpenCL context useful for estimating the local/global working dimension of a NDRange so that all
+  image data is covered by the parallelisation scheme.
+ */
 MitkOcl_EXPORT unsigned int iDivUp(unsigned int dividend, unsigned int divisor);
 
 /*! \brief Loads a program source code from a text-file to a string,
@@ -37,11 +44,22 @@ MitkOcl_EXPORT unsigned int iDivUp(unsigned int dividend, unsigned int divisor);
 */
 MitkOcl_EXPORT char* oclLoadProgramSource( const char* ,const char* ,size_t* );
 
-MitkOcl_EXPORT std::string GetOclErrorString( int _clErr );
+/**
+ @brief Returns the name of an OpenCL Error as a string
 
+ Most of the OpenCL Methods ( cl<NAME> ) return an integer error code. This method translates the
+ error value given as parameter to the corresponding error name. For example the value -30 will be translated
+ to CL_INVALID_VALUE
+ */
+MitkOcl_EXPORT std::string GetOclErrorAsString( int _clErr );
+
+/**
+ @brief Checks whether the given value corresponds to an OpenCL Error value and prints this message out as MITK_ERROR if yes
+ */
 MitkOcl_EXPORT void GetOclError(int _clErr);
 
-/*! \brief Returns a platform ID of an OpenCL-capable GPU, or throws an exception
+/**
+ @brief Returns a platform ID of an OpenCL-capable GPU, or throws an exception
 */
 MitkOcl_EXPORT cl_int oclGetPlatformID(cl_platform_id* selectedPlatform);
 
@@ -79,6 +97,9 @@ MitkOcl_EXPORT void oclLogBuildInfo(cl_program clProg, cl_device_id clDev);
   */
 MitkOcl_EXPORT void GetSupportedImageFormats(cl_context _context, cl_mem_object_type _type);
 
-MitkOcl_EXPORT std::string imageType( const unsigned int _in);
+/**
+ @brief Translates the internal image type identifier to a human readable description string
+*/
+MitkOcl_EXPORT std::string GetImageTypeAsString( const unsigned int _in);
 
 #endif //mitkOclUtils_h

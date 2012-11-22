@@ -262,7 +262,7 @@ void oclPrintDeviceInfo(cl_device_id device)
 
 }
 
-std::string GetOclErrorString( int _clErr )
+std::string GetOclErrorAsString( int _clErr )
 {
   std::string returnString("CL_SUCCESS\n");
 
@@ -415,7 +415,7 @@ void GetOclError(int _clErr)
   if(_clErr == CL_SUCCESS )
     MITK_WARN << "Called GetOclErr() with no error value: [CL_SUCCESS]";
   else
-    MITK_ERROR << GetOclErrorString(_clErr);
+    MITK_ERROR << GetOclErrorAsString(_clErr);
 }
 
 bool oclCheckError(int _err, const char* filepath, int lineno)
@@ -448,7 +448,7 @@ void GetSupportedImageFormats(cl_context _context, cl_mem_object_type _type)
 
   for (unsigned int i=0; i<_written; i++)
   {
-    MITK_INFO<< "ChannelType: " << imageType(formats[i].image_channel_data_type) << "| ChannelOrder: "<< imageType(formats[i].image_channel_order) <<"\n";
+    MITK_INFO<< "ChannelType: " << GetImageTypeAsString(formats[i].image_channel_data_type) << "| ChannelOrder: "<< GetImageTypeAsString(formats[i].image_channel_order) <<"\n";
   }
 
   _written = 0;
@@ -461,7 +461,7 @@ void GetSupportedImageFormats(cl_context _context, cl_mem_object_type _type)
 
   for (unsigned int i=0; i<_written; i++)
   {
-    MITK_INFO<< "ChannelType: " << imageType(formats[i].image_channel_data_type) << "| ChannelOrder: "<< imageType(formats[i].image_channel_order) <<"\n";
+    MITK_INFO<< "ChannelType: " << GetImageTypeAsString(formats[i].image_channel_data_type) << "| ChannelOrder: "<< GetImageTypeAsString(formats[i].image_channel_order) <<"\n";
   }
 
   _written = 0;
@@ -474,11 +474,11 @@ void GetSupportedImageFormats(cl_context _context, cl_mem_object_type _type)
 
   for (unsigned int i=0; i<_written; i++)
   {
-    MITK_INFO<< "ChannelType: " << imageType(formats[i].image_channel_data_type) << "| ChannelOrder: "<< imageType(formats[i].image_channel_order) <<"\n";
+    MITK_INFO<< "ChannelType: " << GetImageTypeAsString(formats[i].image_channel_data_type) << "| ChannelOrder: "<< GetImageTypeAsString(formats[i].image_channel_order) <<"\n";
   }
 }
 
-std::string imageType( const unsigned int _in)
+std::string GetImageTypeAsString( const unsigned int _in)
 {
   switch(_in)
   {

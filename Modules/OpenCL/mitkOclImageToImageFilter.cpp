@@ -142,7 +142,7 @@ bool mitk::OclImageToImageFilter::InitExec(cl_kernel ckKernel)
   CHECK_OCL_ERR( clErr );
 
   if( clErr != CL_SUCCESS )
-    mitkThrow() << "OpenCL Part initialization failed with " << GetOclErrorString(clErr);
+    mitkThrow() << "OpenCL Part initialization failed with " << GetOclErrorAsString(clErr);
 
   return( clErr == CL_SUCCESS );
 }

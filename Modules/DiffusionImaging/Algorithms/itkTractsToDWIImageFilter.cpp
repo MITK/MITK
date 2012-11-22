@@ -53,10 +53,8 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
     // create slice object
     SliceType::Pointer slice = SliceType::New();
     ImageRegion<2> region;
-    region.SetSize(0, images[0]->GetLargestPossibleRegion().GetSize(0));
-    region.SetSize(1, images[0]->GetLargestPossibleRegion().GetSize(1));
-    mitk::Vector2D sliceSpacing; sliceSpacing[0]=m_Spacing[0]; sliceSpacing[1]=m_Spacing[1];
-    slice->SetSpacing(sliceSpacing);
+    region.SetSize(0, m_ImageRegion.GetSize()[0]);
+    region.SetSize(1, m_ImageRegion.GetSize()[0]);
     slice->SetLargestPossibleRegion( region );
     slice->SetBufferedRegion( region );
     slice->SetRequestedRegion( region );
@@ -70,13 +68,11 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
         undersampling = 1;
 
     itk::ResampleImageFilter<SliceType, SliceType>::SizeType upsSize;
-    upsSize[0] = m_ImageRegion.GetSize()[0]*undersampling;
-    upsSize[1] = m_ImageRegion.GetSize()[1]*undersampling;
+    upsSize[0] = region.GetSize()[0]*undersampling;
+    upsSize[1] = region.GetSize()[1]*undersampling;
     mitk::Vector2D upsSpacing;
-    upsSpacing[0] = m_Spacing[0]/undersampling;
-    upsSpacing[1] = m_Spacing[1]/undersampling;
-
-    MITK_INFO << "New Size: " << upsSize;
+    upsSpacing[0] = slice->GetSpacing()[0]/undersampling;
+    upsSpacing[1] = slice->GetSpacing()[1]/undersampling;
 
     boost::progress_display disp(images.size()*images[0]->GetVectorLength()*images[0]->GetLargestPossibleRegion().GetSize(2));
     std::vector< DoubleDwiType::Pointer > outImages;
@@ -233,6 +229,27 @@ void TractsToDWIImageFilter::GenerateData()
     if (numFibers<=0)
         itkExceptionMacro("Input fiber bundle contains no fibers!");
 
+    if (m_TissueMask.IsNull())
+    {
+        m_TissueMask = ItkUcharImgType::New();
+        m_TissueMask->SetSpacing( m_Spacing );
+        m_TissueMask->SetOrigin( m_Origin );
+        m_TissueMask->SetDirection( m_DirectionMatrix );
+        m_TissueMask->SetLargestPossibleRegion( m_ImageRegion );
+        m_TissueMask->SetBufferedRegion( m_ImageRegion );
+        m_TissueMask->SetRequestedRegion( m_ImageRegion );
+        m_TissueMask->Allocate();
+        m_TissueMask->FillBuffer(1);
+    }
+    else
+    {
+        m_Spacing = m_TissueMask->GetSpacing();
+        m_Origin = m_TissueMask->GetOrigin();
+        m_DirectionMatrix = m_TissueMask->GetDirection();
+        m_ImageRegion = m_TissueMask->GetLargestPossibleRegion();
+        MITK_INFO << "Using tissue mask";
+    }
+
     float minSpacing = 1;
     if(m_Spacing[0]<m_Spacing[1] && m_Spacing[0]<m_Spacing[2])
         minSpacing = m_Spacing[0];
@@ -287,21 +304,6 @@ void TractsToDWIImageFilter::GenerateData()
         doubleDwi->FillBuffer(pix);
         compartments.push_back(doubleDwi);
     }
-
-    if (m_TissueMask.IsNull())
-    {
-        m_TissueMask = ItkUcharImgType::New();
-        m_TissueMask->SetSpacing( m_Spacing );
-        m_TissueMask->SetOrigin( m_Origin );
-        m_TissueMask->SetDirection( m_DirectionMatrix );
-        m_TissueMask->SetLargestPossibleRegion( m_ImageRegion );
-        m_TissueMask->SetBufferedRegion( m_ImageRegion );
-        m_TissueMask->SetRequestedRegion( m_ImageRegion );
-        m_TissueMask->Allocate();
-        m_TissueMask->FillBuffer(1);
-    }
-    else
-        MITK_INFO << "Using tissue mask";
 
     if (m_CircleDummy)
     {

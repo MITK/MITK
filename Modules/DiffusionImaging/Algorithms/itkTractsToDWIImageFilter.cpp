@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkNearestNeighborInterpolateImageFunction.h>
 #include <itkBSplineInterpolateImageFunction.h>
 
+#include <itkImageFileWriter.h>
+
 namespace itk
 {
 TractsToDWIImageFilter::TractsToDWIImageFilter()
@@ -52,6 +54,8 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
     ImageRegion<2> region;
     region.SetSize(0, images[0]->GetLargestPossibleRegion().GetSize(0));
     region.SetSize(1, images[0]->GetLargestPossibleRegion().GetSize(1));
+    mitk::Vector2D sliceSpacing; sliceSpacing[0]=m_Spacing[0]; sliceSpacing[1]=m_Spacing[1];
+    slice->SetSpacing(sliceSpacing);
     slice->SetLargestPossibleRegion( region );
     slice->SetBufferedRegion( region );
     slice->SetRequestedRegion( region );
@@ -122,43 +126,17 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                         SliceType::PixelType pix2D = image->GetPixel(index3D)[g];
                         slice->SetPixel(index2D, pix2D);
                     }
+
 //                itk::BSplineInterpolateImageFunction<SliceType,SliceType::PixelType>::Pointer interpolator = itk::BSplineInterpolateImageFunction<SliceType,SliceType::PixelType>::New();
 //                itk::NearestNeighborInterpolateImageFunction<SliceType,SliceType::PixelType>::Pointer interpolator = itk::NearestNeighborInterpolateImageFunction<SliceType,SliceType::PixelType>::New();
-//                itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
+                itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
 //                resampler->SetInterpolator(interpolator);
-//                resampler->SetSize(upsSize);
-//                resampler->SetInput(slice);
-//                resampler->SetOutputSpacing(upsSpacing);
-//                resampler->Update();
-//                SliceType::Pointer reslice = resampler->GetOutput();
-                SliceType::Pointer reslice = SliceType::New();
-                ImageRegion<2> upsRegion;
-                upsRegion.SetSize(0, upsSize[0]);
-                upsRegion.SetSize(1, upsSize[1]);
-                reslice->SetLargestPossibleRegion( upsRegion );
-                reslice->SetBufferedRegion( upsRegion );
-                reslice->SetRequestedRegion( upsRegion );
-                reslice->Allocate();
-
-                itk::ImageRegionIterator<SliceType> it(slice, region);
-                while(!it.IsAtEnd())
-                {
-                    SliceType::IndexType idx = it.GetIndex();
-                    SliceType::PixelType pix = it.Get();
-
-                    for (int ux=0; ux<undersampling; ux++)
-                        for (int uy=0; uy<undersampling; uy++)
-                        {
-                            SliceType::IndexType upsIdx = idx;
-                            upsIdx[0] *= undersampling;
-                            upsIdx[1] *= undersampling;
-                            upsIdx[0] += ux;
-                            upsIdx[1] += uy;
-                            reslice->SetPixel(upsIdx, pix);
-                        }
-
-                    ++it;
-                }
+                resampler->SetInput(slice);
+                resampler->SetOutputParametersFromImage(slice);
+                resampler->SetSize(upsSize);
+                resampler->SetOutputSpacing(upsSpacing);
+                resampler->Update();
+                SliceType::Pointer reslice = resampler->GetOutput();
 
                 // fourier transform slice
                 itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();

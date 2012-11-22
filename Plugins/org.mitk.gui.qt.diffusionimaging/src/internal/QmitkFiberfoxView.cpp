@@ -502,16 +502,16 @@ void QmitkFiberfoxView::GenerateImage()
     GetDataStorage()->Add(node, m_SelectedBundle);
 
     /////
-//    if (filter->m_UpsImage.IsNotNull())
-//    {
-//        mitk::Image::Pointer image2 = mitk::Image::New();
-//        image2->InitializeByItk( filter->m_UpsImage.GetPointer() );
-//        image2->SetVolume( filter->m_UpsImage->GetBufferPointer() );
-//        mitk::DataNode::Pointer node2 = mitk::DataNode::New();
-//        node2->SetData( image2 );
-//        node2->SetName("UPS");
-//        GetDataStorage()->Add(node2, m_SelectedBundle);
-//    }
+    if (filter->m_UpsImage.IsNotNull())
+    {
+        mitk::Image::Pointer image2 = mitk::Image::New();
+        image2->InitializeByItk( filter->m_UpsImage.GetPointer() );
+        image2->SetVolume( filter->m_UpsImage->GetBufferPointer() );
+        mitk::DataNode::Pointer node2 = mitk::DataNode::New();
+        node2->SetData( image2 );
+        node2->SetName("UPS");
+        GetDataStorage()->Add(node2, m_SelectedBundle);
+    }
     /////
 
     mitk::BaseData::Pointer basedata = node->GetData();

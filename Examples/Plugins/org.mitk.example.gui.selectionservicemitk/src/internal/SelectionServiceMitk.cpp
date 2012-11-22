@@ -50,15 +50,15 @@ private:
 
 const std::string SelectionServiceMITKWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
 
-SelectionServiceMITK::SelectionServiceMITK()
+SelectionServiceMitk::SelectionServiceMitk()
 {
 }
 
-SelectionServiceMITK::~SelectionServiceMITK()
+SelectionServiceMitk::~SelectionServiceMitk()
 {
 }
 
-int SelectionServiceMITK::Start()
+int SelectionServiceMitk::Start()
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
   wbAdvisor.reset(new SelectionServiceMITKWorkbenchAdvisor);
@@ -70,7 +70,7 @@ int SelectionServiceMITK::Start()
               ? EXIT_RESTART : EXIT_OK;
 }
 
-void SelectionServiceMITK::Stop()
+void SelectionServiceMitk::Stop()
 {
 
 }

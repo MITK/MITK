@@ -33,15 +33,15 @@ class SelectionServiceMITKWorkbenchAdvisor;
  * "Selection service MITK". It creates a perspective with two views
  * that demonstrate the MitkDataNode-based selection service.
  */
-class SelectionServiceMITK : public QObject, public berry::IApplication
+class SelectionServiceMitk : public QObject, public berry::IApplication
 {
   Q_OBJECT
   Q_INTERFACES(berry::IApplication)
 
 public:
 
-  SelectionServiceMITK();
-  ~SelectionServiceMITK();
+  SelectionServiceMitk();
+  ~SelectionServiceMitk();
 
   int Start();
   void Stop();

@@ -63,6 +63,7 @@ public:
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
+    itkSetMacro( VolumeAccuracy, unsigned int )         ///< determines fiber sampling density and thereby the accuracy of the fiber volume fraction
     itkSetMacro( OuputKspaceImage, bool )               ///< output image of the k-space instead of the dwi (inverse fourier transformed k-space)
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
     itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
@@ -104,6 +105,7 @@ protected:
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
     bool                                m_OuputKspaceImage;
     bool                                m_CircleDummy;
+    unsigned int                        m_VolumeAccuracy;
 };
 }
 

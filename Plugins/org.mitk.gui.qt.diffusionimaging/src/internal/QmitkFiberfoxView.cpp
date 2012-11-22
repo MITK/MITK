@@ -480,7 +480,7 @@ void QmitkFiberfoxView::GenerateImage()
     filter->SetNoiseModel(&noiseModel);
     filter->SetKspaceArtifacts(artifactList);
     filter->SetOuputKspaceImage(m_Controls->m_KspaceImageBox->isChecked());
-
+    filter->SetVolumeAccuracy(m_Controls->m_VolumeAccuracyBox->value());
     if (m_TissueMask.IsNotNull())
     {
         ItkUcharImgType::Pointer mask = ItkUcharImgType::New();

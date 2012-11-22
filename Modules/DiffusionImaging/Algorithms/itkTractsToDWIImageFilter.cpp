@@ -34,6 +34,7 @@ namespace itk
 TractsToDWIImageFilter::TractsToDWIImageFilter()
     : m_OuputKspaceImage(false)
     , m_CircleDummy(false)
+    , m_VolumeAccuracy(1)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -240,8 +241,16 @@ void TractsToDWIImageFilter::GenerateData()
     else
         minSpacing = m_Spacing[2];
 
-    FiberBundleType fiberBundle = m_FiberBundle->GetDeepCopy();
-    fiberBundle->DoFiberSmoothing(ceil(10.0*4.0/minSpacing));
+    FiberBundleType fiberBundle = m_FiberBundle;
+//    int sampling = ceil(10.0*2.0/minSpacing);
+//    if (sampling>fiberBundle->GetFiberSampling())
+//        fiberBundle->DoFiberSmoothing(sampling);
+
+    if (m_FiberBundle->GetFiberSampling()<=0 || 10/m_FiberBundle->GetFiberSampling()>minSpacing*0.5/m_VolumeAccuracy)
+    {
+        fiberBundle = m_FiberBundle->GetDeepCopy();
+        fiberBundle->ResampleFibers(minSpacing*0.5/m_VolumeAccuracy);
+    }
 
     // initialize output dwi image
     OutputImageType::Pointer outImage = OutputImageType::New();
@@ -349,22 +358,65 @@ void TractsToDWIImageFilter::GenerateData()
                 else
                     dir = v-GetItkVector(fiberPolyData->GetPoint(points[j-1]));
 
-                itk::Index<3> index;
-                compartments.at(0)->TransformPhysicalPointToIndex(vertex, index);
+                itk::Index<3> idx;
+                itk::ContinuousIndex<float, 3> contIndex;
+                outImage->TransformPhysicalPointToIndex(vertex, idx);
+                outImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
 
-                if (!compartments.at(0)->GetLargestPossibleRegion().IsInside(index))
-                    continue;
-
-                for (int k=0; k<m_FiberModels.size(); k++)
+                double frac_x = contIndex[0] - idx[0];
+                double frac_y = contIndex[1] - idx[1];
+                double frac_z = contIndex[2] - idx[2];
+                if (frac_x<0)
                 {
-                    DoubleDwiType::Pointer doubleDwi = compartments.at(k);
-                    m_FiberModels[k]->SetFiberDirection(dir);
-                    doubleDwi->SetPixel(index, doubleDwi->GetPixel(index) + m_FiberModels[k]->SimulateMeasurement());
-
-                    DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
-                    if (pix[0]>maxFiberDensity)
-                        maxFiberDensity = pix[0];
+                    idx[0] -= 1;
+                    frac_x += 1;
                 }
+                if (frac_y<0)
+                {
+                    idx[1] -= 1;
+                    frac_y += 1;
+                }
+                if (frac_z<0)
+                {
+                    idx[2] -= 1;
+                    frac_z += 1;
+                }
+
+                itk::Index<3> newIdx;
+                for (int x=0; x<2; x++)
+                {
+                    frac_x = 1-frac_x;
+                    for (int y=0; y<2; y++)
+                    {
+                        frac_y = 1-frac_y;
+                        for (int z=0; z<2; z++)
+                        {
+                            frac_z = 1-frac_z;
+
+                            newIdx[0] = idx[0]+x;
+                            newIdx[1] = idx[1]+y;
+                            newIdx[2] = idx[2]+z;
+
+                            double frac = frac_x*frac_y*frac_z;
+
+                            if (!outImage->GetLargestPossibleRegion().IsInside(newIdx) || m_TissueMask->GetPixel(newIdx)<=0)
+                                continue;
+
+                            for (int k=0; k<m_FiberModels.size(); k++)
+                            {
+                                DoubleDwiType::Pointer doubleDwi = compartments.at(k);
+                                m_FiberModels[k]->SetFiberDirection(dir);
+                                doubleDwi->SetPixel(newIdx, doubleDwi->GetPixel(newIdx) + frac*m_FiberModels[k]->SimulateMeasurement());
+
+                                DoubleDwiType::PixelType pix = doubleDwi->GetPixel(newIdx);
+                                if (pix[0]>maxFiberDensity)
+                                    maxFiberDensity = pix[0];
+                            }
+                        }
+                    }
+
+                }
+
             }
         }
 
@@ -378,8 +430,8 @@ void TractsToDWIImageFilter::GenerateData()
             {
                 ++disp2;
                 DoubleDwiType::IndexType index = it.GetIndex();
-                //            if (m_TissueMask->GetPixel(index)>0)
-                doubleDwi->SetPixel(index, doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement());
+                if (m_TissueMask->GetPixel(index)>0)
+                    doubleDwi->SetPixel(index, doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement());
                 ++it;
             }
         }
@@ -392,7 +444,7 @@ void TractsToDWIImageFilter::GenerateData()
             ++disp3;
             DoubleDwiType::IndexType index = it3.GetIndex();
 
-            //        if (m_TissueMask->GetPixel(index)>0)
+            if (m_TissueMask->GetPixel(index)>0)
             {
                 // compartment weights are calculated according to fiber density
                 double w = compartments.at(0)->GetPixel(index)[0]/maxFiberDensity;

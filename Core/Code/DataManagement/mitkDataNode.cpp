@@ -83,7 +83,8 @@ void mitk::DataNode::SetInteractor(mitk::Interactor* interactor)
 {
   m_Interactor = interactor;
   if(m_Interactor.IsNotNull())
-  m_Interactor->SetDataNode(this);
+    m_Interactor->SetDataNode(this);
+  Modified();
 }
 
 mitk::DataNode::DataNode() : m_Data(NULL), m_PropertyListModifiedObserverTag(0)

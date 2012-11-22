@@ -203,7 +203,9 @@ set(CPP_FILES
   DataManagement/mitkMaterial.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
+  Interactions/mitkBindDispatcherInteractor.cpp
   Interactions/mitkCoordinateSupplier.cpp
+  Interactions/mitkDispatcher.cpp
   Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkDisplayPositionEvent.cpp

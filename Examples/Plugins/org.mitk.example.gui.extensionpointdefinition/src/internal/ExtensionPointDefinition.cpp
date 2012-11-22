@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
-class MinimalWorkbenchAdvisor : public berry::WorkbenchAdvisor
+class MinimalWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {
 
 public:

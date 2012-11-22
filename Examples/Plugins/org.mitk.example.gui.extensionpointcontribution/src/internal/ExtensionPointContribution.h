@@ -28,7 +28,7 @@ public:
   ExtensionPointContribution();
   ~ExtensionPointContribution();
 
-  void ChangeExtensionLabelText(QString s);
+  void ChangeExtensionLabelText(const QString& s);
 
 };
 

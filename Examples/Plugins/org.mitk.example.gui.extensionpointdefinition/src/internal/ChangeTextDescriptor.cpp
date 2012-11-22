@@ -38,30 +38,30 @@ IChangeText::Pointer ChangeTextDescriptor::CreateChangeText()
   return this->m_ChangeText;
 }
 
-std::string ChangeTextDescriptor::GetID() const
+QString ChangeTextDescriptor::GetID() const
 {
   std::string idOfExtensionPoint;
   this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID,idOfExtensionPoint);
-  return idOfExtensionPoint;
+  return QString::fromStdString(idOfExtensionPoint);
 }
 
-std::string ChangeTextDescriptor::GetDescription() const
+QString ChangeTextDescriptor::GetDescription() const
 {
   std::vector<berry::IConfigurationElement::Pointer>
     descriptions(this->m_ChangeTextExtensionPoint->GetChildren(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_DESCRIPTION));
 
   if(!descriptions.empty())
   {
-    return descriptions[0]->GetValue();
+    return QString::fromStdString(descriptions[0]->GetValue());
   }
-  return "";
+  return QString();
 }
 
-std::string ChangeTextDescriptor::GetName() const
+QString ChangeTextDescriptor::GetName() const
 {
   std::string name;
   this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME,name);
-  return name;
+  return QString::fromStdString(name);
 }
 
 bool ChangeTextDescriptor::operator==(const Object* object) const

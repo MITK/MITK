@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIConfigurationElement.h>
 #include <berryObject.h>
 
-#include <string>
-
 #include "IChangeText.h"
 
 class ChangeTextDescriptor : public berry::Object
@@ -56,21 +54,21 @@ public:
    *
    * @return the description
    */
-  std::string GetDescription() const;
+  QString GetDescription() const;
 
   /**
    * Returns the id of this "ChangeText".
    *
    * @return the id
    */
-  std::string GetID() const;
+  QString GetID() const;
 
   /**
    * Returns the name of this "ChangeText".
    *
    * @return the name
    */
-  std::string GetName() const;
+  QString GetName() const;
 
   /**
    * Equals this class with the given parameter.

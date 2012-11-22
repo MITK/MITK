@@ -41,7 +41,7 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  virtual void ChangeExtensionLabelText(QString s);
+  virtual void ChangeExtensionLabelText(const QString& s);
 
 protected:
 

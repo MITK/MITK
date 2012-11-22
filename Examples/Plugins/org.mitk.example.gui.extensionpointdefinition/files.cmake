@@ -1,4 +1,5 @@
 set(SRC_CPP_FILES
+  IChangeText.cpp
 )
 
 set(INTERNAL_CPP_FILES

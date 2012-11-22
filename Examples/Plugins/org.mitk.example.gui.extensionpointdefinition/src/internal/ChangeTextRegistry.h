@@ -17,10 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef CHANGETEXTREGISTRY_H_
 #define CHANGETEXTREGISTRY_H_
 
-#include <Poco/HashMap.h>
-#include <string>
-#include <vector>
-
 #include <berryObject.h>
 
 #include "ChangeTextDescriptor.h"
@@ -29,9 +25,6 @@ class ChangeTextRegistry : public berry::Object
 {
 
 public:
-
-  // easier maintenance
-  typedef ChangeTextDescriptor::Pointer ChangeTextDescriptorPtr;
 
   ChangeTextRegistry();
   ~ChangeTextRegistry();
@@ -44,18 +37,18 @@ public:
    *           the id to search for
    * @return the descriptor or <code>null</code>
    */
-  ChangeTextDescriptorPtr Find(const std::string& id) const;
+  ChangeTextDescriptor::Pointer Find(const QString& id) const;
 
   /**
    * Return a list of "change texts" defined in the registry.
    *
    * @return the change texts.
    */
-  std::vector<ChangeTextDescriptorPtr> GetChangeTexts() const;
+  QList<ChangeTextDescriptor::Pointer> GetChangeTexts() const;
 
 private:
 
-  Poco::HashMap<std::string, ChangeTextDescriptorPtr> m_ListRegisteredTexts;
+  QHash<QString, ChangeTextDescriptor::Pointer> m_ListRegisteredTexts;
 
 };
 

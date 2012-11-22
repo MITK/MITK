@@ -44,7 +44,7 @@ void MinimalView::SetFocus ()
 {
 }
 
-void MinimalView::ChangeExtensionLabelText(QString s)
+void MinimalView::ChangeExtensionLabelText(const QString& s)
 {
   m_Controls.extensionLabel->setText(s);
 }

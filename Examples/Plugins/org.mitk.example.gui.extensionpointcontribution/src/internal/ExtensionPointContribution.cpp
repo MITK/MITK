@@ -27,7 +27,7 @@ ExtensionPointContribution::~ExtensionPointContribution()
 {
 }
 
-void ExtensionPointContribution::ChangeExtensionLabelText(QString /*s*/)
+void ExtensionPointContribution::ChangeExtensionLabelText(const QString& /*s*/)
 {
   QMessageBox::critical(0, "Error", "Provided by extension!");
 }

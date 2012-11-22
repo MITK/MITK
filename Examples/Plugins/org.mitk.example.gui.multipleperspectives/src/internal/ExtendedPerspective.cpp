@@ -32,6 +32,6 @@ void ExtendedPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout
   layout->SetEditorAreaVisible(false);
 
   // add emptyviews to perspective
-  layout->AddView("org.mitk.views.emptyview1", berry::IPageLayout::LEFT,0.3f, editorAreaId);
-  layout->AddView("org.mitk.views.emptyview2", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
+  layout->AddView("org.mitk.views.emptyview1", berry::IPageLayout::LEFT, 1.0f, editorAreaId);
+  layout->AddView("org.mitk.views.emptyview2", berry::IPageLayout::RIGHT, 0.3f, "org.mitk.views.emptyview1");
 }

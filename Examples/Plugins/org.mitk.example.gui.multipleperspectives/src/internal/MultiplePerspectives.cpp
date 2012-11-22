@@ -35,6 +35,9 @@ public:
     configurer->SetInitialSize(berry::Point(600,400));
     //! [initial window size]
 
+    // Set an individual title
+    configurer->SetTitle("Multiple Perspectives");
+
     //! [Visibility of perspective bar]
     // Enable or disable the perspective bar
     configurer->SetShowPerspectiveBar(true);

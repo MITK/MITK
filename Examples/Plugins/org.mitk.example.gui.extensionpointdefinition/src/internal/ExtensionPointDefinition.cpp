@@ -32,6 +32,8 @@ public:
   {
     // Set an individual initial size
     configurer->SetInitialSize(berry::Point(600,400));
+    // Set an individual title
+    configurer->SetTitle("Extension Points");
     // Enable or disable the perspective bar
     configurer->SetShowPerspectiveBar(false);
 

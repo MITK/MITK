@@ -32,9 +32,10 @@ public:
   {
     // Set an individual initial size
     configurer->SetInitialSize(berry::Point(600,400));
+    // Set an individual title
+    configurer->SetTitle("Minimal Application");
     // Enable or disable the perspective bar
     configurer->SetShowPerspectiveBar(false);
-    //configurer->SetTitle("TEST TEST TEST!");
 
     wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
     return wwAdvisor.data();

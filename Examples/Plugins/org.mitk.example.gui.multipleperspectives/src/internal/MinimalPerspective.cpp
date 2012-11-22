@@ -35,10 +35,10 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 
   // create folder with alignment "left"
   berry::IFolderLayout::Pointer left =
-    layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.3f, editorAreaId);
+    layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.5f, editorAreaId);
 
   // add emptyview1 to the folder
   left->AddView("org.mitk.views.emptyview1");
-  // add emptyview2 to the layout (not the folder) with alignment "right"
-  layout->AddView("org.mitk.views.emptyview2", berry::IPageLayout::RIGHT,0.3f, editorAreaId);
+  // add emptyview2 to the folder
+  left->AddView("org.mitk.views.emptyview2");
 }

@@ -5,7 +5,7 @@
   <extension point="org.blueberry.ui.views">
     <view
       id="org.mitk.views.listenerviewmitk"
-      name="Selection Listener Example"
+      name="Selection Listener"
       icon="resources/selectionListenerIcon.png"
       class="ListenerViewMitk">
     </view>
@@ -14,7 +14,7 @@
   <extension point="org.blueberry.ui.views">
     <view
       id="org.mitk.views.selectionviewmitk"
-      name="Selection Provider Example"
+      name="Selection Provider"
       icon="resources/selectionProviderIcon.png"
       class="SelectionViewMitk">
     </view>

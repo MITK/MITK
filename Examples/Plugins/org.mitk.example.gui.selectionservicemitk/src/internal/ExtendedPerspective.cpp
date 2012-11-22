@@ -31,7 +31,7 @@ void ExtendedPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout
   layout->SetEditorAreaVisible(false);
 
   // add the selection view (for providing selection events for the listener view) to the perspective
-  layout->AddView("org.mitk.views.selectionviewmitk", berry::IPageLayout::LEFT,0.3f, editorAreaId);
+  layout->AddView("org.mitk.views.selectionviewmitk", berry::IPageLayout::LEFT,1.0f, editorAreaId);
   // add the listener view (listening for selection events of the selection view) to the perspective
-  layout->AddView("org.mitk.views.listenerviewmitk", berry::IPageLayout::RIGHT,0.4f, editorAreaId);
+  layout->AddView("org.mitk.views.listenerviewmitk", berry::IPageLayout::RIGHT,0.5f, "org.mitk.views.selectionviewmitk");
 }

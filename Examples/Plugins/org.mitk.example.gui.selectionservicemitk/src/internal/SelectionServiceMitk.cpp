@@ -32,6 +32,8 @@ public:
   {
     // Set an individual initial size
     configurer->SetInitialSize(berry::Point(600,400));
+    // Set the window title
+    configurer->SetTitle("MITK Selection Service");
 
     wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
     return wwAdvisor.data();

@@ -40,6 +40,9 @@ class SelectionServiceMITK : public QObject, public berry::IApplication
 
 public:
 
+  SelectionServiceMITK();
+  ~SelectionServiceMITK();
+
   int Start();
   void Stop();
 

@@ -40,6 +40,9 @@ class SelectionServiceQt : public QObject, public berry::IApplication
 
 public:
 
+  SelectionServiceQt();
+  ~SelectionServiceQt();
+
   int Start();
   void Stop();
 

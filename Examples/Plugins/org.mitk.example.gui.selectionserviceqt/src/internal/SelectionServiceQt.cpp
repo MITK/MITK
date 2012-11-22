@@ -50,6 +50,14 @@ private:
 
 const std::string SelectionServiceQtWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
 
+SelectionServiceQt::SelectionServiceQt()
+{
+}
+
+SelectionServiceQt::~SelectionServiceQt()
+{
+}
+
 int SelectionServiceQt::Start()
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();

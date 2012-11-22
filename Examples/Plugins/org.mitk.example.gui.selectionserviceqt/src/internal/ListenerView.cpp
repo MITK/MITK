@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview";
 
 ListenerView::ListenerView()
-  : m_Parent(0)
-  , m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))
+  : m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))
+  , m_Parent(0)
 {
 }
 
@@ -77,7 +77,7 @@ void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
   if (sourcepart != this &&
       selection.Cast<const berry::IStructuredSelection>())
   {
-    berry::IStructuredSelection::Pointer currentSelection = selection.Cast<const berry::IStructuredSelection>();
+    berry::IStructuredSelection::ConstPointer currentSelection = selection.Cast<const berry::IStructuredSelection>();
     // iterate over the selections (for the BlueBerry example this is always 1
     for (berry::IStructuredSelection::iterator itr = currentSelection->Begin();
          itr != currentSelection->End(); ++itr)

@@ -18,24 +18,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SELECTIONVIEW_H_
 #define SELECTIONVIEW_H_
 
-// berry Includes
+// berry includes
 #include <berryQtViewPart.h>
 #include <berryQtSelectionProvider.h>
 
-// ui Includes
+// ui includes
 #include "ui_SelectionViewControls.h"
 
- /** Documentation:
-  *   \ingroup org_mitk_example_gui_selectionserviceqt
-  *
-  *   \brief This BlueBerry view is part of the BlueBerry example
-  *   "Selection service QT". It creates a QListWidget that provides
-  *   the selection events for the selection listener. The selection
-  *   provider is Qt-based.
-  */
+/**
+ * \ingroup org_mitk_example_gui_selectionserviceqt
+ *
+ * \brief This BlueBerry view is part of the BlueBerry example
+ * "Selection service QT". It creates a QListWidget that provides
+ * the selection events for the selection listener. The selection
+ * provider is Qt-based.
+ */
 class SelectionView : public berry::QtViewPart
 {
-
   Q_OBJECT
 
 public:
@@ -49,13 +48,13 @@ public:
 
   SelectionView();
 
-  virtual ~SelectionView();
-
-  virtual void CreateQtPartControl(QWidget *parent);
-
 protected:
 
+  void CreateQtPartControl(QWidget *parent);
+
   void SetFocus();
+
+private:
 
   Ui::SelectionViewControls m_Controls;
 

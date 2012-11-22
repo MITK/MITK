@@ -16,12 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ExtendedPerspective.h"
 
-// berry Includes
+// berry includes
 #include "berryIViewLayout.h"
-
-ExtendedPerspective::ExtendedPerspective()
-{
-}
 
 void ExtendedPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {

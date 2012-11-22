@@ -26,7 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  * \brief A view class suited for the DicomPerspective within the custom viewer plug-in.
  *
- * This view class contributes dicom import functionality to the DicomPerspective. The view controls are provided within CreatePartControl() by the QmitkDicomExternalDataWidget class. A DicomView instance is part of the DicomPerspective for Dicom import functionality.
+ * This view class contributes dicom import functionality to the DicomPerspective.
+ * The view controls are provided within CreatePartControl() by the QmitkDicomExternalDataWidget
+ * class. A DicomView instance is part of the DicomPerspective for Dicom import functionality.
  */
 // //! [DicomViewDecl]
 class DicomView : public QmitkAbstractView
@@ -37,29 +39,33 @@ class DicomView : public QmitkAbstractView
 public:
 
   /**
-   *  String based view identifier.
+   * String based view identifier.
    */
   static const std::string VIEW_ID;
 
   /**
-   *  Standard constructor.
+   * Standard constructor.
    */
   DicomView();
 
   /**
-   *  Standard destructor.
+   * Standard destructor.
    */
   virtual ~DicomView();
 
   /**
-   *  Creates the view control widgets provided by the QmitkDicomExternalDataWidget class. Widgets associated with unused functionality are being removed and DICOM import and data storage transfer funcionality being connected to the appropriate slots.
+   * Creates the view control widgets provided by the QmitkDicomExternalDataWidget class.
+   * Widgets associated with unused functionality are being removed and DICOM import and data
+   * storage transfer funcionality being connected to the appropriate slots.
    */
   virtual void CreateQtPartControl(QWidget *parent);
 
-protected slots:
+protected Q_SLOTS:
 
   /**
-   *  Loads the DICOM series specified by the given string parameter and adds the resulting data node to the data storage. Subsequently switches to the ViewerPerspective for further data examination.
+   * Loads the DICOM series specified by the given string parameter and adds the resulting data
+   * node to the data storage. Subsequently switches to the ViewerPerspective for further
+   * data examination.
    */
   void AddDataNodeFromDICOM(const QStringList& Properties);
 

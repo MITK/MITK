@@ -27,7 +27,11 @@ class AbstractRenderWindowViewPrivate;
 /**
  * \brief A view class suited for the ViewerPerspective within the custom viewer plug-in.
  *
- * This view class contributes data node rendering functionality to the ViewerPerspective. Being a subclass of QmitkAbstractView, this class yields access to the data storage and thus is interconnected with the mitk::QmitkDataManagerView present in the same perspective. As a subclass of mitk::IRenderWindowPart, this class provides an instance of QmitkRenderWindow. A SimpleRenderWindowView instance is part of the ViewerPerspective for data visualization.
+ * This view class contributes data node rendering functionality to the ViewerPerspective.
+ * Being a subclass of QmitkAbstractView, this class yields access to the data storage and
+ * thus is interconnected with the mitk::QmitkDataManagerView present in the same perspective.
+ * As a subclass of mitk::IRenderWindowPart, this class provides an instance of QmitkRenderWindow.
+ * A SimpleRenderWindowView instance is part of the ViewerPerspective for data visualization.
  */
 // //! [SimpleRenderWindowViewDeclaration]
 class SimpleRenderWindowView : public QmitkAbstractView, public mitk::IRenderWindowPart

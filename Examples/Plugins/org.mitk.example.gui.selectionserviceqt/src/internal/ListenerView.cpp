@@ -16,12 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ListenerView.h"
 
-// berry Includes
+// berry includes
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryQModelIndexObject.h>
 
-// qt Includes
+// Qt includes
 #include <QString>
 #include <QModelIndex>
 #include <QVariant>
@@ -36,7 +36,7 @@ ListenerView::ListenerView()
 
 ListenerView::~ListenerView()
 {
-  // destroy selection service
+  // remove selection service
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   s->RemoveSelectionListener(m_SelectionListener);
 }
@@ -60,7 +60,7 @@ void ListenerView::ToggleRadioMethod(QString selectStr)
   else if (selectStr == "Selection 2") m_Controls.radioButton_2->toggle();
 }
 
-void ListenerView::SetFocus ()
+void ListenerView::SetFocus()
 {
 }
 
@@ -77,10 +77,10 @@ void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
   if (sourcepart != this &&
       selection.Cast<const berry::IStructuredSelection>())
   {
-    m_CurrentSelection = selection.Cast<const berry::IStructuredSelection>();
+    berry::IStructuredSelection::Pointer currentSelection = selection.Cast<const berry::IStructuredSelection>();
     // iterate over the selections (for the BlueBerry example this is always 1
-    for (berry::IStructuredSelection::iterator itr = m_CurrentSelection->Begin();
-      itr != m_CurrentSelection->End(); ++itr)
+    for (berry::IStructuredSelection::iterator itr = currentSelection->Begin();
+         itr != currentSelection->End(); ++itr)
     {
       if (berry::QModelIndexObject::Pointer object = itr->Cast<berry::QModelIndexObject>())
       {

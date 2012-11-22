@@ -22,11 +22,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkFileOpenAction.h>
 
 /**
-* \brief A WorkbenchWindowAdvisor class for the custom viewer plug-in.
-*
-* This class suits the custom viewer plug-in. Menu bar, tool bar and status bar are made invisible, and the window title for the custom viewer is being set. The workbench window is being customized, i.e. a perspectives tab-bar is arranged according to the PageComposite. The PageComposite is then laid out according to perspective related contents by the WindowConfigurer.
-* @see{ CustomViewerWorkbenchWindowAdvisor::PreWindowOpen(), CustomViewerWorkbenchWindowAdvisor::CreateWindowContents() }
-*/
+ * \brief A WorkbenchWindowAdvisor class for the custom viewer plug-in.
+ *
+ * This class suits the custom viewer plug-in. Menu bar, tool bar and status bar are made invisible,
+ * and the window title for the custom viewer is being set. The workbench window is being customized,
+ * i.e. a perspectives tab-bar is arranged according to the PageComposite. The PageComposite is then
+ * laid out according to perspective related contents by the WindowConfigurer.
+ *
+ * @see{ CustomViewerWorkbenchWindowAdvisor::PreWindowOpen(), CustomViewerWorkbenchWindowAdvisor::CreateWindowContents() }
+ */
 // //! [CustomViewerWorkbenchWindowAdvisorClassDeclaration]
 class CustomViewerWorkbenchWindowAdvisor : public QObject, public berry::WorkbenchWindowAdvisor
 // //! [CustomViewerWorkbenchWindowAdvisorClassDeclaration]
@@ -35,34 +39,33 @@ class CustomViewerWorkbenchWindowAdvisor : public QObject, public berry::Workben
 
 public:
 
-    /**
-    * Standard constructor.
-    */
-    CustomViewerWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer);
+  /**
+   * Standard constructor.
+   */
+  CustomViewerWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-    /**
-    * Standard destructor.
-    */
-    ~CustomViewerWorkbenchWindowAdvisor();
+  /**
+   * Standard destructor.
+   */
+  ~CustomViewerWorkbenchWindowAdvisor();
 
-    /**
-    * Customizes the workbench window, i.e. arrange a perspectives tab-bar according to the PageComposite. The PageComposite is given to the WindowConfigurer for perspective related layout.
-    */
-    void CreateWindowContents(berry::Shell::Pointer shell);
+  /**
+   * Customizes the workbench window, i.e. arrange a perspectives tab-bar according to the
+   * PageComposite. The PageComposite is given to the WindowConfigurer for perspective related layout.
+   */
+  void CreateWindowContents(berry::Shell::Pointer shell);
 
-    /**
-    * For arbitrary actions after the window has been created but not yet opened.
-    */
-    void PostWindowCreate();
+  /**
+   * For arbitrary actions after the window has been created but not yet opened.
+   */
+  void PostWindowCreate();
 
-    /**
-    * Menu bar, tool bar and status bar are made invisible, and the window title is being set.
-    */
-    void PreWindowOpen();
+  /**
+   * Menu bar, tool bar and status bar are made invisible, and the window title is being set.
+   */
+  void PreWindowOpen();
 
-private:
-
-private slots:
+private Q_SLOTS:
 
   /**
   * Allows for runtime stylesheet update.

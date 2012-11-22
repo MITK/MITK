@@ -34,5 +34,3 @@ void org_mitk_example_gui_minimalapplication_Activator::stop(ctkPluginContext* c
 }
 
 Q_EXPORT_PLUGIN2(org_mitk_example_gui_minimalapplication, org_mitk_example_gui_minimalapplication_Activator)
-
-

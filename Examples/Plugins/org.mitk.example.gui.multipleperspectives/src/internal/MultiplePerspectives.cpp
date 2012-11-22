@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MultiplePerspectives.h"
 
-// berry Includes
+// berry includes
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 

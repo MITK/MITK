@@ -35,6 +35,7 @@ DicomView::DicomView()
 DicomView::~DicomView()
 {
 }
+
 // //! [DicomViewCreatePartControl]
 void DicomView::CreateQtPartControl(QWidget *parent)
 {
@@ -54,6 +55,7 @@ void DicomView::CreateQtPartControl(QWidget *parent)
   m_Parent->setEnabled(true);
 }
 // //! [DicomViewCreatePartControl]
+
 // //! [DicomViewCreateAddDataNodeInformation]
 void DicomView::AddDataNodeFromDICOM(const QStringList& Properties)
 {

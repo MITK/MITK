@@ -17,31 +17,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SELECTIONSERVICEQT_H_
 #define SELECTIONSERVICEQT_H_
 
-// berry Includes
+// berry includes
 #include <berryIApplication.h>
 
-// qt Includes
+// Qt includes
 #include <QObject>
 #include <QScopedPointer>
 
 class SelectionServiceQtWorkbenchAdvisor;
 
- /** Documentation:
-  *   \ingroup org_mitk_example_gui_selectionserviceqt
-  *
-  *   \brief This BlueBerry plugin is part of the BlueBerry example
-  *   "Selection service QT". It creates a perspective with two views
-  *   that demonstrate the Qt-based selection service.
-  */
+/**
+ * \ingroup org_mitk_example_gui_selectionserviceqt
+ *
+ * \brief This BlueBerry plugin is part of the BlueBerry example
+ * "Selection service QT". It creates a perspective with two views
+ * that demonstrate the Qt-based selection service.
+ */
 class SelectionServiceQt : public QObject, public berry::IApplication
 {
   Q_OBJECT
   Q_INTERFACES(berry::IApplication)
 
 public:
-
-  SelectionServiceQt();
-  ~SelectionServiceQt();
 
   int Start();
   void Stop();

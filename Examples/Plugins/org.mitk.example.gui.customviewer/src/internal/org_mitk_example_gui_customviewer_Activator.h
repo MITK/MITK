@@ -19,7 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define org_mitk_example_gui_customviewer_Activator_H
 
 #include <ctkPluginActivator.h>
+
 class ctkPluginContext;
+
 // //! [PluginActivatorHeader]
 class org_mitk_example_gui_customviewer_Activator : public QObject, public ctkPluginActivator
 {

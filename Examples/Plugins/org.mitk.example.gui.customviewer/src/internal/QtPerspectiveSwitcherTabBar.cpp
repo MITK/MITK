@@ -1,6 +1,6 @@
 /*===================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPerspectiveDescriptor.h>
 
 /**
- *  \brief A Listener class for perspective changes. Neccessary for consistent tab activation in QtPerspectiveSwitcherTabBar instances.
+ * \brief A Listener class for perspective changes. Neccessary for consistent tab activation
+ * in QtPerspectiveSwitcherTabBar instances.
  */
 // //! [SwitchPerspectiveListener]
 struct QtPerspectiveSwitcherTabBarListener : public berry::IPerspectiveListener

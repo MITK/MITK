@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MinimalPerspective.h"
 
-// berry Includes
+// berry includes
 #include "berryIViewLayout.h"
 
 MinimalPerspective::MinimalPerspective()

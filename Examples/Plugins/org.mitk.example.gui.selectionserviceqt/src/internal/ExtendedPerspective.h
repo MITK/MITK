@@ -18,12 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef EXTENDEDPERSPECTIVE_H_
 #define EXTENDEDPERSPECTIVE_H_
 
-// berry Includes
+// berry includes
 #include <berryIPerspectiveFactory.h>
 
-// qt Includes
+// Qt includes
 #include <QObject>
-
 
 class ExtendedPerspective : public QObject, public berry::IPerspectiveFactory
 {
@@ -31,8 +30,6 @@ class ExtendedPerspective : public QObject, public berry::IPerspectiveFactory
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
-
-  ExtendedPerspective();
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 

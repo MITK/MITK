@@ -17,10 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryQtWorkbenchAdvisor.h>
 
 /**
-* \brief A WorkbenchAdvisor class for the custom viewer plug-in.
-*
-* This WorkbenchAdvisor class for the custom viewer plug-in adds and sets a Qt-Stylesheet file to the berry::QtStyleManager during the initialization phase for customization purpose.
-*/
+ * \brief A WorkbenchAdvisor class for the custom viewer plug-in.
+ *
+ * This WorkbenchAdvisor class for the custom viewer plug-in adds and sets a Qt-Stylesheet
+ * file to the berry::QtStyleManager during the initialization phase for customization purpose.
+ */
 
 // //! [WorkbenchAdvisorDecl]
 class CustomViewerWorkbenchAdvisor : public berry::QtWorkbenchAdvisor

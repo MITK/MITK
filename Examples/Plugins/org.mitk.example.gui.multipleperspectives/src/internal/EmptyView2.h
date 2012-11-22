@@ -18,12 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef EMPTYVIEW2_H_
 #define EMPTYVIEW2_H_
 
-// berry Includes
+// berry includes
 #include <berryQtViewPart.h>
 
-// ui Includes
+// ui includes
 #include "ui_EmptyView2Controls.h"
-
 
 class EmptyView2 : public berry::QtViewPart
 {
@@ -40,12 +39,11 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-private:
-
-
 protected:
 
   void SetFocus();
+
+private:
 
   Ui::EmptyView2Controls m_Controls;
 

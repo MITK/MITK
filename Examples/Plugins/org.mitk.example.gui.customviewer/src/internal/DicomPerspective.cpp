@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 DicomPerspective::DicomPerspective()
 {
 }
+
 // //! [DicomPerspCreateLayout]
 void DicomPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {

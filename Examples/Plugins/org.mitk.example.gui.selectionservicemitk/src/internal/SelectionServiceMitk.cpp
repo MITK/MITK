@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SelectionServiceMitk.h"
 
-// berry Includes
+// berry includes
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
@@ -49,14 +49,6 @@ private:
 };
 
 const std::string SelectionServiceMITKWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
-
-SelectionServiceMITK::SelectionServiceMITK()
-{
-}
-
-SelectionServiceMITK::~SelectionServiceMITK()
-{
-}
 
 int SelectionServiceMITK::Start()
 {

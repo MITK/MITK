@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MINIMALVIEW_H_
 #define MINIMALVIEW_H_
 
-/// Berry
+// Berry
 #include <berryQtViewPart.h>
 
 #include <QString>
@@ -43,12 +43,11 @@ public:
 
   virtual void ChangeExtensionLabelText(QString s);
 
-private:
-
-
 protected:
 
   void SetFocus();
+
+private:
 
   Ui::MinimalViewControls m_Controls;
 

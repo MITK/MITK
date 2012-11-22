@@ -19,24 +19,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <string>
 
-  /**
-  * The ExtensionPointDefinitionConstants contains a list of unique ids in the
-  * following form: <br>
-  * "org.mitk.mybundle.mytype.propername" <br>
-  *
-  * This ids have the purpose of connecting the plugin.xml of each bundle to the
-  * appropriate classes.
-  *
-  * Additionally it includes names of tags, which are used in XML files <br>
-  * regarding the BlueBerry example.
-  */
-  struct ExtensionPointDefinitionConstants
-  {
-    static const std::string CHANGETEXT_EXTENSION_NAME;
-    static const std::string CHANGETEXT_XMLATTRIBUTE_CLASS;
-    static const std::string CHANGETEXT_XMLATTRIBUTE_DESCRIPTION;
-    static const std::string CHANGETEXT_XMLATTRIBUTE_NAME;
-    static const std::string CHANGETEXT_XMLATTRIBUTE_ID;
-  };
+/**
+ * The ExtensionPointDefinitionConstants contains a list of unique ids in the
+ * following form: <br>
+ * "org.mitk.mybundle.mytype.propername" <br>
+ *
+ * This ids have the purpose of connecting the plugin.xml of each bundle to the
+ * appropriate classes.
+ *
+ * Additionally it includes names of tags, which are used in XML files <br>
+ * regarding the BlueBerry example.
+ */
+struct ExtensionPointDefinitionConstants
+{
+  static const std::string CHANGETEXT_EXTENSION_NAME;
+  static const std::string CHANGETEXT_XMLATTRIBUTE_CLASS;
+  static const std::string CHANGETEXT_XMLATTRIBUTE_DESCRIPTION;
+  static const std::string CHANGETEXT_XMLATTRIBUTE_NAME;
+  static const std::string CHANGETEXT_XMLATTRIBUTE_ID;
+};
 
 #endif /*EXTENSIONPOINTDEFINITIONCONSTANTS_H_*/

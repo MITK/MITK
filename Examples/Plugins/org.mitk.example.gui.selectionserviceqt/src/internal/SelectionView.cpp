@@ -18,11 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string SelectionView::VIEW_ID = "org.mitk.views.selectionview";
 
-SelectionView::SelectionView() : m_Parent(0)
-{
-}
-
-SelectionView::~SelectionView()
+SelectionView::SelectionView()
+  : m_Parent(0)
 {
 }
 

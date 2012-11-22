@@ -24,13 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 
-
 void org_mitk_example_gui_selectionserviceqt_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(SelectionServiceQt, context)
-    BERRY_REGISTER_EXTENSION_CLASS(ExtendedPerspective, context)
-    BERRY_REGISTER_EXTENSION_CLASS(ListenerView, context)
-    BERRY_REGISTER_EXTENSION_CLASS(SelectionView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(ExtendedPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(ListenerView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(SelectionView, context)
 }
 
 void org_mitk_example_gui_selectionserviceqt_Activator::stop(ctkPluginContext* context)

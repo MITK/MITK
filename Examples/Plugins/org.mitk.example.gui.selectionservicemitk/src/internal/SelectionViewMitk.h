@@ -18,23 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SELECTIONVIEWMITK_H_
 #define SELECTIONVIEWMITK_H_
 
-// qmitk Includes
+// QMitk includes
 #include <QmitkAbstractView.h>
 
-// ui Includes
+// ui includes
 #include "ui_SelectionViewMitkControls.h"
 
- /** Documentation:
-  *   \ingroup org_mitk_example_gui_selectionservicemitk
-  *
-  *   \brief This BlueBerry view is part of the BlueBerry example
-  *   "Selection service MITK". It creates a QListWidget that provides
-  *   the selection events for the selection listener. The selection
-  *   provider is MITK-based.
-  */
+/**
+ * \ingroup org_mitk_example_gui_selectionservicemitk
+ *
+ * \brief This BlueBerry view is part of the BlueBerry example
+ * "Selection service MITK". It creates a QListWidget that provides
+ * the selection events for the selection listener. The selection
+ * provider is MITK-based.
+ */
 class SelectionViewMitk : public QmitkAbstractView
 {
-
   Q_OBJECT
 
 public:
@@ -43,21 +42,20 @@ public:
 
   SelectionViewMitk();
 
-  virtual ~SelectionViewMitk();
+protected:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  void SetFocus();
+
 private:
+
   //! [MITK Selection Provider method]
   /** @brief Reimplementation of method from QmitkAbstractView that returns the data node
   *   selection model for the selection listener.
   */
   QItemSelectionModel* GetDataNodeSelectionModel() const;
   //! [MITK Selection Provider method]
-
-protected:
-
-  void SetFocus();
 
   Ui::SelectionViewMitkControls m_Controls;
 

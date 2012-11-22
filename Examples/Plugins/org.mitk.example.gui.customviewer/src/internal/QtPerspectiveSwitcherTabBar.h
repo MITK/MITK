@@ -1,6 +1,6 @@
 /*===================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
@@ -25,9 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 /**
- *  \brief A QTabBar providing perspective bar functionality in BlueBerry applications.
+ * \brief A QTabBar providing perspective bar functionality in BlueBerry applications.
  *
- *  This subclass of QTabBar acts as a perspective bar in BlueBerry applications. Providing perspective switching functionality in a tab-bar like outfit, this class serves as an alternative to the ToolBar based berry::QtPerspectiveSwitcher class.
+ * This subclass of QTabBar acts as a perspective bar in BlueBerry applications. Providing
+ * perspective switching functionality in a tab-bar like outfit, this class serves as an
+ * alternative to the ToolBar based berry::QtPerspectiveSwitcher class.
  */
 // //! [PerspectiveSwitcherDeclaration]
 class QtPerspectiveSwitcherTabBar : public QTabBar
@@ -38,22 +40,21 @@ class QtPerspectiveSwitcherTabBar : public QTabBar
 public:
 
   /**
-   *  Constructor.
+   * Constructor.
    */
   QtPerspectiveSwitcherTabBar(berry::IWorkbenchWindow::Pointer window);
 
   /**
-   *  Standard destructor.
+   * Standard destructor.
    */
   ~QtPerspectiveSwitcherTabBar();
 
-private slots:
+private Q_SLOTS:
 
   /**
-   *  Implements perspective switching.
+   * Implements perspective switching.
    */
   void SwitchPerspective();
-
 
 private:
 
@@ -63,12 +64,12 @@ private:
   QHash<QString, QAction*> perspIdToActionMap;
 
   /**
-   *  Neccessary to prevent initial tab switching.
+   * Neccessary to prevent initial tab switching.
    */
   bool tabChanged;
 
   /**
-   *  Listener for perspective changes. Neccessary for consistent tab activation.
+   * Listener for perspective changes. Neccessary for consistent tab activation.
    */
   friend struct QtPerspectiveSwitcherTabBarListener;
 };

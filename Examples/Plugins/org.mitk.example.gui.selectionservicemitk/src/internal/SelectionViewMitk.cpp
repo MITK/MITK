@@ -26,10 +26,6 @@ SelectionViewMitk::SelectionViewMitk() : m_Parent(0)
 {
 }
 
-SelectionViewMitk::~SelectionViewMitk()
-{
-}
-
 void SelectionViewMitk::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets

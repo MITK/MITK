@@ -42,5 +42,3 @@ ChangeTextRegistry* org_mitk_example_gui_extensionpointdefinition_Activator::get
 }
 
 Q_EXPORT_PLUGIN2(org_mitk_example_gui_extensionpointdefinition, org_mitk_example_gui_extensionpointdefinition_Activator)
-
-

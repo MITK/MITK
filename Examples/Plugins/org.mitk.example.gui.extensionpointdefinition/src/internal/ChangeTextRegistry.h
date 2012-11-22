@@ -26,37 +26,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ChangeTextDescriptor.h"
 
 class ChangeTextRegistry : public berry::Object
-  {
-  public:
+{
 
-    // easier maintenance
-    typedef ChangeTextDescriptor::Pointer ChangeTextDescriptorPtr;
+public:
 
-    ChangeTextRegistry();
-    ~ChangeTextRegistry();
+  // easier maintenance
+  typedef ChangeTextDescriptor::Pointer ChangeTextDescriptorPtr;
 
-        /**
-        * Return an "change text" descriptor with the given extension id. If no "change text" exists,
-        * with the id return <code>null</code>.
-        *
-        * @param id
-        *           the id to search for
-        * @return the descriptor or <code>null</code>
-        */
-    ChangeTextDescriptorPtr Find(const std::string& id) const;
+  ChangeTextRegistry();
+  ~ChangeTextRegistry();
 
-        /**
-        * Return a list of "change texts" defined in the registry.
-        *
-        * @return the change texts.
-        */
-    std::vector<ChangeTextDescriptorPtr> GetChangeTexts() const;
+  /**
+   * Return an "change text" descriptor with the given extension id. If no "change text" exists,
+   * with the id return <code>null</code>.
+   *
+   * @param id
+   *           the id to search for
+   * @return the descriptor or <code>null</code>
+   */
+  ChangeTextDescriptorPtr Find(const std::string& id) const;
 
-  protected:
+  /**
+   * Return a list of "change texts" defined in the registry.
+   *
+   * @return the change texts.
+   */
+  std::vector<ChangeTextDescriptorPtr> GetChangeTexts() const;
 
-  private:
-    Poco::HashMap<std::string, ChangeTextDescriptorPtr> m_ListRegisteredTexts;
+private:
 
-  };
+  Poco::HashMap<std::string, ChangeTextDescriptorPtr> m_ListRegisteredTexts;
+
+};
 
 #endif /*CHANGETEXTREGISTRY_H_*/

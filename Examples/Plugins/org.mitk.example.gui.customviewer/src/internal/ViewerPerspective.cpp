@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ViewerPerspective::ViewerPerspective()
 {
 }
+
 // //! [AddView1]
 void ViewerPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {

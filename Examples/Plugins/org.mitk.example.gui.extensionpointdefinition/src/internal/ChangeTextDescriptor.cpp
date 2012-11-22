@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 ChangeTextDescriptor::ChangeTextDescriptor(berry::IConfigurationElement::Pointer changeTextExtensionPoint)
-: m_ChangeTextExtensionPoint(changeTextExtensionPoint)
+  : m_ChangeTextExtensionPoint(changeTextExtensionPoint)
 {
 }
 

@@ -16,16 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ListenerViewMitk.h"
 
-// mitk Includes
+// Mitk includes
 #include "mitkDataNodeObject.h"
 
 const std::string ListenerViewMitk::VIEW_ID = "org.mitk.views.listenerviewmitk";
 
 ListenerViewMitk::ListenerViewMitk() : m_Parent(0)
-{
-}
-
-ListenerViewMitk::~ListenerViewMitk()
 {
 }
 
@@ -45,7 +41,7 @@ void ListenerViewMitk::ToggleRadioMethod(QString selectStr)
   else if (selectStr == "DataNode 2") m_Controls.radioButton_2->toggle();
 }
 
-void ListenerViewMitk::SetFocus ()
+void ListenerViewMitk::SetFocus()
 {
 }
 

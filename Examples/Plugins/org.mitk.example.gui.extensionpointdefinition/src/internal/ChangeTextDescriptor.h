@@ -24,68 +24,69 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "IChangeText.h"
 
-  class ChangeTextDescriptor : public berry::Object
-  {
+class ChangeTextDescriptor : public berry::Object
+{
 
-  public:
+public:
 
-    berryObjectMacro(ChangeTextDescriptor)
-    /**
-    * Initialize the "ChangeText" Descriptor with the given extension point.
-    *
-    * @param changeTextExtensionPoint
-    *           element, that refers to a extension point (type, id, name, class)
-    */
-    ChangeTextDescriptor(berry::IConfigurationElement::Pointer changeTextExtensionPoint);
+  berryObjectMacro(ChangeTextDescriptor)
 
-    /**
-    * Default destructor
-    */
-    ~ChangeTextDescriptor();
+  /**
+   * Initialize the "ChangeText" Descriptor with the given extension point.
+   *
+   * @param changeTextExtensionPoint
+   *           element, that refers to a extension point (type, id, name, class)
+   */
+  ChangeTextDescriptor(berry::IConfigurationElement::Pointer changeTextExtensionPoint);
 
-    /**
-    * Creates an instance of "ChangeText" defined in the descriptor.
-    *
-    * @return change text
-    */
-    IChangeText::Pointer CreateChangeText();
+  /**
+   * Default destructor
+   */
+  ~ChangeTextDescriptor();
 
-    /**
-    * Returns the description of this "ChangeText".
-    *
-    * @return the description
-    */
-    std::string GetDescription() const;
+  /**
+   * Creates an instance of "ChangeText" defined in the descriptor.
+   *
+   * @return change text
+   */
+  IChangeText::Pointer CreateChangeText();
 
-    /**
-    * Returns the id of this "ChangeText".
-    *
-    * @return the id
-    */
-    std::string GetID() const;
+  /**
+   * Returns the description of this "ChangeText".
+   *
+   * @return the description
+   */
+  std::string GetDescription() const;
 
-    /**
-    * Returns the name of this "ChangeText".
-    *
-    * @return the name
-    */
-    std::string GetName() const;
+  /**
+   * Returns the id of this "ChangeText".
+   *
+   * @return the id
+   */
+  std::string GetID() const;
 
-    /**
-    * Equals this class with the given parameter.
-    *
-    * @param object
-    *           the object for the equation
-    * @return true, if the objects are equal :: false, if they differ in any way
-    */
-    bool operator==(const Object* object) const;
+  /**
+   * Returns the name of this "ChangeText".
+   *
+   * @return the name
+   */
+  std::string GetName() const;
 
-  private:
+  /**
+   * Equals this class with the given parameter.
+   *
+   * @param object
+   *           the object for the equation
+   * @return true, if the objects are equal :: false, if they differ in any way
+   */
+  bool operator==(const Object* object) const;
 
-    // IConfigurationElements are used to access xml files (here: plugin.xml)
-    berry::IConfigurationElement::Pointer m_ChangeTextExtensionPoint;
-    IChangeText::Pointer m_ChangeText;
+private:
 
-  };
+  // IConfigurationElements are used to access xml files (here: plugin.xml)
+  berry::IConfigurationElement::Pointer m_ChangeTextExtensionPoint;
+  IChangeText::Pointer m_ChangeText;
+
+};
 
 #endif /*CHANGETEXTDESCRIPTOR_H_*/

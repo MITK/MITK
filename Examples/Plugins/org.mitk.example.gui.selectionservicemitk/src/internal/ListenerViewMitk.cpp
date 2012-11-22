@@ -50,7 +50,7 @@ void ListenerViewMitk::SetFocus ()
 }
 
 //! [MITK Selection Listener method implementation]
-void ListenerViewMitk::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
+void ListenerViewMitk::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer> &nodes)
 {
   //any nodes there?
   if (!nodes.empty())

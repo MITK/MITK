@@ -6,7 +6,7 @@ set(INTERNAL_CPP_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/ExtensionPointContribution.h
+
 )
 
 set(CACHED_RESOURCE_FILES

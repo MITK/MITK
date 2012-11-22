@@ -14,7 +14,6 @@ set(INTERNAL_CPP_FILES
 set(MOC_H_FILES
   src/internal/org_mitk_example_gui_customviewer_Activator.h
   src/internal/CustomViewer.h
-  src/internal/CustomViewerWorkbenchAdvisor.h
   src/internal/ViewerPerspective.h
   src/internal/DicomPerspective.h
   src/internal/CustomViewerWorkbenchWindowAdvisor.h

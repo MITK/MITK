@@ -47,7 +47,4 @@ void MinimalView::SetFocus ()
 void MinimalView::ChangeExtensionLabelText(QString s)
 {
   m_Controls.extensionLabel->setText(s);
-
-  ChangeTextRegistry* registry = org_mitk_example_gui_extensionpointdefinition_Activator::getChangeTextRegistry();
-  QMessageBox::critical(0, "Error", "Test");
 }

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -59,6 +59,15 @@ public:
 
     m_CoreDataNodeReader = mitk::CoreDataNodeReader::New();
     context->RegisterService<mitk::IDataNodeReader>(m_CoreDataNodeReader);
+
+    /*
+    There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.
+    This code is left here as a reminder, just in case we might need to do that some time.
+
+    vtkNeverTranslucentTextureFactory* textureFactory = vtkNeverTranslucentTextureFactory::New();
+    vtkObjectFactory::RegisterFactory( textureFactory );
+    textureFactory->Delete();
+    */
   }
 
   void Unload(mitk::ModuleContext* )

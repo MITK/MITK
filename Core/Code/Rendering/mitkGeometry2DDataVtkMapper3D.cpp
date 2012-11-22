@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkWeakPointerProperty.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateOr.h"
+#include "vtkNeverTranslucentTexture.h"
 
 #include <vtkAssembly.h>
 #include <vtkDataSetMapper.h>
@@ -34,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataMapper.h>
 #include <vtkProp3DCollection.h>
 #include <vtkProperty.h>
-#include <vtkTexture.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTubeFilter.h>
 
@@ -481,7 +481,7 @@ namespace mitk
               //Enable rendering without copying the image.
               dataSetMapper->ImmediateModeRenderingOn();
 
-              texture = vtkTexture::New();
+              texture = vtkNeverTranslucentTexture::New();
               texture->RepeatOff();
 
               imageActor = vtkActor::New();

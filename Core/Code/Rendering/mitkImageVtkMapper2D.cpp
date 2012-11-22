@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageVtkMapper2D.h"
 #include "vtkMitkThickSlicesFilter.h"
 #include "vtkMitkLevelWindowFilter.h"
+#include "vtkNeverTranslucentTexture.h"
 
 //VTK
 #include <vtkProperty.h>
@@ -48,7 +49,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageChangeInformation.h>
 #include <vtkPlaneSource.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkTexture.h>
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
 #include <vtkColorTransferFunction.h>
@@ -107,7 +107,7 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 }
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
-{  
+{
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
@@ -367,7 +367,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
 
   if(thickSlicesMode > 0)
-  {  
+  {
     double dataZSpacing = 1.0;
 
     Vector3D normInIndex, normal;
@@ -421,7 +421,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
 
 
-  // Bounds information for reslicing (only reuqired if reference geometry 
+  // Bounds information for reslicing (only reuqired if reference geometry
   // is present)
   //this used for generating a vtkPLaneSource with the right size
   vtkFloatingPointType sliceBounds[6];
@@ -495,17 +495,17 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
       }
     }
   }
-  
+
   if (!(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
   {
     MITK_ERROR << "2D Reindering Error: Unknown number of components!!! Please report to rendering task force or check your data!";
   }
-  
+
   //TODO MapColorScalarsThroughLookupTableOn testen Markus!!! Auf Bildern mit Verschiedenen Komponenten muss die LuT Funkionieren!
-  
+
   this->ApplyLookuptable(renderer, textureClippingBounds);
-  
-    
+
+
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
@@ -685,9 +685,9 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
   // ... set outside pixels to alpha=0
   //pass the LuT to the RBG filter
   // TODO check whether setting LUT on BOTH texture and our filter is useful
-  
+
   //localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_Texture->GetLookupTable());
-  
+
   localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_LookupTable);
   //localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
   // TODO check opacity handling
@@ -698,7 +698,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
   //connect the texture with the output of the RGB filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
   // TODO use filter thing to create RGBA texture
-  
+
  // localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
 }
 
@@ -891,7 +891,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
         {
           float smallestPixelValueInSeries = atof( sSmallestPixelValueInSeries.c_str() );
           float largestPixelValueInSeries = atof( sLargestPixelValueInSeries.c_str() );
-          contrast.SetRangeMinMax( smallestPixelValueInSeries-1, largestPixelValueInSeries+1 ); // why not a little buffer? 
+          contrast.SetRangeMinMax( smallestPixelValueInSeries-1, largestPixelValueInSeries+1 ); // why not a little buffer?
           // might remedy some l/w widget challenges
         }
         else
@@ -956,19 +956,19 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
-  while (y <= yMax) 
-  { 
+  while (y <= yMax)
+  {
     currentPixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer(x, y, 0));
 
     //if the current pixel value is set to something
-    if ((currentPixel) && (*currentPixel != 0)) 
+    if ((currentPixel) && (*currentPixel != 0))
     {
       //check in which direction a line is necessary
       //a line is added if the neighbor of the current pixel has the value 0
       //and if the pixel is located at the edge of the image
 
       //if   vvvvv  not the first line vvvvv
-      if (y > yMin && *(currentPixel-line) == 0) 
+      if (y > yMin && *(currentPixel-line) == 0)
       { //x direction - bottom edge of the pixel
         //add the 2 points
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
@@ -980,7 +980,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  not the last line vvvvv
-      if (y < yMax && *(currentPixel+line) == 0) 
+      if (y < yMax && *(currentPixel+line) == 0)
       { //x direction - top edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -990,7 +990,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  not the first pixel vvvvv
-      if ( (x > xMin || y > yMin) && *(currentPixel-1) == 0) 
+      if ( (x > xMin || y > yMin) && *(currentPixel-1) == 0)
       { //y direction - left edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -1000,7 +1000,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  not the last pixel vvvvv
-      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) == 0) 
+      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) == 0)
       { //y direction - right edge of the pixel
         vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -1012,7 +1012,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       /*  now consider pixels at the edge of the image  */
 
       //if   vvvvv  left edge of image vvvvv
-      if (x == xMin) 
+      if (x == xMin)
       { //draw left edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -1022,7 +1022,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  right edge of image vvvvv
-      if (x == xMax) 
+      if (x == xMax)
       { //draw right edge of the pixel
         vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -1032,7 +1032,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
     //if   vvvvv  bottom edge of image vvvvv
-      if (y == yMin) 
+      if (y == yMin)
       { //draw bottom edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
@@ -1042,7 +1042,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
     //if   vvvvv  top edge of image vvvvv
-      if (y == yMax) 
+      if (y == yMax)
     { //draw top edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -1054,7 +1054,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
 
     x++;
 
-    if (x > xMax) 
+    if (x > xMax)
     { //reached end of line
       x = xMin;
       y++;
@@ -1088,7 +1088,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 {
   //Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
-  m_Texture = vtkSmartPointer<vtkTexture>::New();
+  m_Texture = vtkSmartPointer<vtkNeverTranslucentTexture>::New().GetPointer();
   m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
@@ -1115,7 +1115,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 
   //set the mapper for the actor
   m_Actor->SetMapper(m_Mapper);
-  
+
   //level window filter
   m_LevelWindowFilter = new vtkMitkLevelWindowFilter();
 }

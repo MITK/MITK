@@ -1,8 +1,8 @@
 /**
-  \defgroup org_mitk_example_gui_selectionservicemitk org.mitk.example.gui.selectionservicemitk
+  \defgroup org_mitk_example_gui_selectionservicemitk_views org.mitk.example.gui.selectionservicemitk.views
   \ingroup MITKExamplePlugins
 
-  \brief An example application plug-in with a minimal selection service based on MITK elements.
+  \brief Contributes Views for the BlueBerry example \ref BlueBerryExampleSelectionServiceMitk.
 */
 
 /**

@@ -1,6 +1,6 @@
 /**
 
-\page org_mitk_example_gui_customviewer Custom Viewer Example Documentation
+\page BlueBerryExampleCustomViewer A highly customized viewer
 
 This documentation is structured as follows:
 
@@ -31,7 +31,7 @@ The custom viewer itself consists of two perspectives, i.e. a viewer perspective
 
 \image html DicomPerspective.png "Dicom perspective of the Custom Viewer."
 
-Proceed to the previous page \ref org_mitk_example_gui_customviewer. Or proceed to the next page \ref ViewerPluginCreation.
+Go to the previous page \ref BlueBerryExampleCustomViewer. Or proceed to the next page \ref ViewerPluginCreation.
 
 \page ViewerPluginCreation Creating the CustomViewer plugin
 
@@ -85,7 +85,7 @@ When we start the BlueBerryExampleLauncher (either directly or via the provided 
 
 \image html MinimalApplicationWindow.png "Our first application window showing one single perspective"
 
-Proceed to the previous page \ref Introduction. Or proceed to the next page \ref MainWindowLayout.
+Go to the previous page \ref Introduction. Or proceed to the next page \ref MainWindowLayout.
 
 \page MainWindowLayout Main Window Layout: ViewerPerspective and DicomPerspective
 
@@ -153,7 +153,7 @@ The OpenFile-Button and the QtPerspectiveSwitcherTabBar will be laid out togethe
 
 \image html BulkApplicationWindow.png "Our bulk application showing two empty perspectives managed with a tab-bar based perspectives bar"
 
-Proceed to the previous page \ref ViewerPluginCreation. Or proceed to the next page \ref AddFunctionality.
+Go to the previous page \ref ViewerPluginCreation. Or proceed to the next page \ref AddFunctionality.
 
 \page AddFunctionality Adding functionality: Data Manager, Render Window, File Opening and DICOM Import
 
@@ -248,7 +248,7 @@ Before we can examine the loaded data, we have to manually invoke a reinit on it
 \image html OpenFileDialog.png "The open file dialog"
 \image html FileOpened.png "Opened file shown in the render window view"
 
-Proceed to the previous page \ref MainWindowLayout. Or proceed to the next page \ref GUICustomization.
+Go to the previous page \ref MainWindowLayout. Or proceed to the next page \ref GUICustomization.
 
 \page GUICustomization Customizing the Main Window using Qt-Stylesheets
 
@@ -265,13 +265,15 @@ For GUI customization, we will modify the Qt-Stylesheets files already used by b
 
 \snippet CustomViewerWorkbenchAdvisor.cpp WorkbenchAdvisorInit
 
-The style manager is taken from the application's plugin context via service reference. Invoking the berry::IQtStyleManager::AddStyle() and berry::IQtStyleManager::SetStyle() methods, the workbench will now use the announced qss-File to style our Workbench Window.
+The style manager is taken from the application's plugin context via service reference. Invoking the berry::IQtStyleManager::AddStyle() and berry::IQtStyleManager::SetStyle() methods, the workbench will now use the announced qss-File to style our Workbench Window. In a production system, the stylesheets are usually compiled into the plug-in or application using the Qt resource system.
+However, during developement of the stylesheets it is often more convenient to reference them using a hard-coded path to the local file system (see live update functionality below).
 
 Before we start customization we will first provide some customization convenience. We add an UpdateStyle()-slot to our CustomViewerWorkbenchWindowAdvisor where we explicitly reset the css-File to the style manager:
 
 \snippet CustomViewerWorkbenchWindowAdvisor.cpp WorkbenchWindowAdvisorUpdateStyle
 
-By integrating an update style button to the Application's main window and connecting this button with the previously defined slot, we can now button-push-update the style on runtime.
+By integrating an update style button to the Application's main window and connecting this button with the previously defined slot, we can now button-push-update the style on runtime. This will of course
+only work for stylesheets which are referenced from the local file system.
 
 \image html StyledMainWindow0.png "The unstyled Main Window"
 

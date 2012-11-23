@@ -198,6 +198,7 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "endBlueBerry=\endif" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
+                         "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
                          "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" "
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).

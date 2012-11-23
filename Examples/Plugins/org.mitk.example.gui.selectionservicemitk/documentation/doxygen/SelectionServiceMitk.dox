@@ -1,8 +1,8 @@
 /**
 
-\page org_mitk_example_gui_selectionserviceqt Blueberry Examples - Selection service MITK
+\page BlueBerryExampleSelectionServiceMitk MITK DataNode Selections
 
-  \brief An example application plug-in with a minimal selection service based on MITK elements.
+  \brief An example application plug-in with a minimal selection service based on mitk::DataNode objects.
 
   \image html SelectionServiceMITK.png
 
@@ -11,9 +11,9 @@
   selection of QListWidgetItems of the SelectionView with the radio buttons from the ListenerView and the
   funtionality is the same.
 
-  This time the SelectionView does not inherit from QtViewPart but from QmitkAbstractView. QmitkAbstractView provides
-  a method called GetDataNodeSelection with which the selection model of the QListWidget can be returned. No additional
-  selection provider needs to be registered.
+  This time the SelectionView does not inherit from berry::QtViewPart but from QmitkAbstractView. QmitkAbstractView provides
+  a virtual method called GetDataNodeSelectionModel() with which the
+  selection model of the QListWidget can be returned. No selection provider needs to be registered explicitly with the workbench.
 
   In the SelectionViewMitk.h the method from QmitkAbstractView ist declared:
   \snippet SelectionViewMitk.h MITK Selection Provider method
@@ -32,11 +32,11 @@
   \snippet ListenerViewMitk.cpp MITK Selection Listener method implementation
 
   View complete source files:
-  \li SelectionViewMitk.cpp
-  \li SelectionViewMitk.h
-  \li ListenerViewMitk.cpp
-  \li ListenerViewMitk.h
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionservicemitk.views/src/internal/SelectionViewMitk.cpp,SelectionViewMitk.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionservicemitk.views/src/internal/SelectionViewMitk.h,SelectionViewMitk.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionservicemitk.views/src/internal/ListenerViewMitk.cpp,ListenerViewMitk.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionservicemitk.views/src/internal/ListenerViewMitk.h,ListenerViewMitk.h}
 
-\ref IntroductionSelectionService "[Selection Service Introduction]" \ref org_mitk_example_gui_selectionservicemitk "[Second example: MITK Data node selections]" \ref ExamplePage "[Main BlueBerry example page]"
+[\ref BlueBerrySelectionServiceIntro] [Previous: \ref BlueBerryExampleSelectionServiceQt] [\ref BlueBerryExamples]
 
 */

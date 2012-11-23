@@ -1,17 +1,17 @@
 /**
 
-\page org_mitk_example_gui_minimalapplication Blueberry Examples - Minimal application
+\page BlueBerryExampleMinimalApplication A minimal BlueBerry application
 
   \image html MinimalApplication.png
 
   The first example creates a minimal application with an empty perspective.
 
   View complete source files:
-  \li MinimalApplication.cpp
-  \li MinimalApplication.h
-  \li MinimalPerspective.cpp
-  \li MinimalPerspective.h
+  \li \github{Examples/Plugins/org.mitk.example.gui.minimalapplication/src/internal/MinimalApplication.cpp,MinimalApplication.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.minimalapplication/src/internal/MinimalApplication.h,MinimalApplication.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.minimalapplication/src/internal/MinimalPerspective.cpp,MinimalPerspective.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.minimalapplication/src/internal/MinimalPerspective.h,MinimalPerspective.h}
 
-\ref IntroductionBlueBerry "[BlueBerry Introduction]" \ref org_mitk_example_gui_multipleperspectives "[Second example: Multiple perspectives and views]" \ref ExamplePage "[Main BlueBerry example page]"
+[\ref BlueBerryIntro] [Next: \ref BlueBerryExampleMultiplePerspectives]
 
 */

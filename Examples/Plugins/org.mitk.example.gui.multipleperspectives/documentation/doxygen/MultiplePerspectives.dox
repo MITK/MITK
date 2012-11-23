@@ -1,6 +1,6 @@
 /**
 
-\page org_mitk_example_gui_multipleperspectives Blueberry Examples - Multiple perspectives and views
+\page BlueBerryExampleMultiplePerspectives Multiple perspectives and views
 
   \image html MultiplePerspectives.png
 
@@ -20,17 +20,17 @@
 
   The icons of the perspectives are definded by the extension declaration in the plugin.xml
   of the example and lie in the resources directory of the plug-in:
-  \include plugin.xml
+  \include org.mitk.example.gui.multipleperspectives/plugin.xml
 
 
   View complete source files:
-  \li MultiplePerspectives.cpp
-  \li MultiplePerspectives.h
-  \li MinimalPerspective.cpp
-  \li MinimalPerspective.h
-  \li ExtendedPerspective.cpp
-  \li ExtendedPerspective.h
+  \li \github{Examples/Plugins/org.mitk.example.gui.multipleperspectives/src/internal/MultiplePerspectives.cpp,MultiplePerspectives.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.multipleperspectives/src/internal/MultiplePerspectives.h,MultiplePerspectives.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.multipleperspectives/src/internal/MinimalPerspective.cpp,MinimalPerspective.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.multipleperspectives/src/internal/MinimalPerspective.h,MinimalPerspective.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.multipleperspectives/src/internal/ExtendedPerspective.cpp,ExtendedPerspective.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.multipleperspectives/src/internal/ExtendedPerspective.h,ExtendedPerspective.h}
 
-\ref IntroductionBlueBerry "[BlueBerry Introduction]" \ref org_mitk_example_gui_minimalapplication "[First example: Minimal application]" \ref ExamplePage "[Main BlueBerry example page]"
+\ref [\ref BlueBerryIntro] [Previous: \ref BlueBerryExampleMinimalApplication] [Next: \ref BlueBerrySelectionServiceIntro]
 
 */

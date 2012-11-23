@@ -1,8 +1,8 @@
 /**
 
-\page org_mitk_example_gui_selectionservicemitk Blueberry Examples - Selection service QT
+\page BlueBerryExampleSelectionServiceQt Qt Model/View selections
 
-  \brief An example application plug-in with a minimal selection service based on QT elements.
+  \brief An example application plug-in with a minimal selection service based on Qt selection models.
 
   \image html SelectionServiceQT.png
 
@@ -15,8 +15,8 @@
 
   For additional informations on the selection service concept see http://www.mitk.org/wiki/Article_Using_the_Selection_Service
 
-  The QtSelectionProvider implements the interface ISelectionProvider. Due to the model/view concept in Qt, the workbench
-  provides the QtSelectionProvider class for Qt viewers which must be provided with a QItemSelectionModel.
+  The berry::QtSelectionProvider class implements the interface berry::ISelectionProvider. Due to the model/view concept in Qt, the workbench
+  provides the berry::QtSelectionProvider class for Qt viewers which must be provided with a QItemSelectionModel.
 
   In the SelectionView.h we declare a pointer that holds the selection provider...
   \snippet SelectionView.h Qt Selection Provider
@@ -37,11 +37,11 @@
 
 
   View complete source files:
-  \li SelectionView.cpp
-  \li SelectionView.h
-  \li ListenerView.cpp
-  \li ListenerView.h
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/SelectionView.cpp,SelectionView.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/SelectionView.h,SelectionView.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/ListenerView.cpp,ListenerView.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/ListenerView.h,ListenerView.h}
 
-\ref IntroductionSelectionService "[Selection Service Introduction]" \ref org_mitk_example_gui_selectionserviceqt "[First example: Qt-based selections]" \ref ExamplePage "[Main BlueBerry example page]"
+[\ref BlueBerrySelectionServiceIntro] [Next: \ref BlueBerryExampleSelectionServiceMitk]
 
 */

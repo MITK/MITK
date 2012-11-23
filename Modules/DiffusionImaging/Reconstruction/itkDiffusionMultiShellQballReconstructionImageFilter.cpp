@@ -17,22 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __itkDiffusionMultiShellQballReconstructionImageFilter_cpp
 
 #include <itkDiffusionMultiShellQballReconstructionImageFilter.h>
-#include <itkImageRegionConstIterator.h>
-#include <itkImageRegionConstIteratorWithIndex.h>
-#include <itkImageRegionIterator.h>
-#include <itkArray.h>
-#include <vnl/vnl_vector.h>
-
-#include <boost/version.hpp>
-#include <stdio.h>
-#include <locale>
-#include <strstream>
-#include "mitkDiffusionFunctionCollection.h"
-#include "itkPointShell.h"
-#include <memory>
-
-#include <fstream>
-
+#include <mitkDiffusionFunctionCollection.h>
+#include <itkPointShell.h>
+#include <itkTimeProbe.h>
 
 namespace itk {
 
@@ -345,7 +332,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   }
   if(m_BValueMap.find(0) == m_BValueMap.end())
   {
-    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : GradientIndxMap with no b-Zero indecies found: check input image");
+    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : GradientIndxMap with no b-Zero indecies found: check input BValueMap");
   }
 
 
@@ -559,6 +546,7 @@ template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int NumberOfThreads)
 {
+
   itk::TimeProbe clock;
   clock.Start();
   switch(m_ReconstructionType)
@@ -644,10 +632,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       // approximate ODF coeffs
       vnl_vector<double>  coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
-      coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+      coeffs[0] = 1.0/(2.0*sqrt(M_PI));
 
       odf = element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
-      odf *= (QBALL_ANAL_RECON_PI*4/NODF);
+      odf *= (M_PI*4/NODF);
     }
     // set ODF to ODF-Image
     oit.Set( odf );
@@ -659,14 +647,29 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   MITK_INFO << "One Thread finished reconstruction";
 }
 
+//#include "itkLevenbergMarquardtOptimizer.h"
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread)
 {
 
+ /* itk::LevenbergMarquardtOptimizer::Pointer optimizer = itk::LevenbergMarquardtOptimizer::New();
+  optimizer->SetUseCostFunctionGradient(false);
 
-  //  vnl_levenberg_marquardt LMOptimizer = new vnl_levenberg_marquardt();
+  // Scale the translation components of the Transform in the Optimizer
+  itk::LevenbergMarquardtOptimizer::ScalesType scales(transform->GetNumberOfParameters());
+  scales.Fill(0.01);
+  unsigned long numberOfIterations = 80000;
+  double gradientTolerance = 1e-10; // convergence criterion
+  double valueTolerance = 1e-10; // convergence criterion
+  double epsilonFunction = 1e-10; // convergence criterion
+  optimizer->SetScales( scales );
+  optimizer->SetNumberOfIterations( numberOfIterations );
+  optimizer->SetValueTolerance( valueTolerance );
+  optimizer->SetGradientTolerance( gradientTolerance );
+  optimizer->SetEpsilonFunction( epsilonFunction );*/
+
 
 }
 
@@ -890,13 +893,13 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
 
       // the first coeff is a fix value
-      coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+      coeffs[0] = 1.0/(2.0*sqrt(M_PI));
 
       coeffPixel = element_cast<double, TO>(coeffs).data_block();
 
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
-      odf *= ((QBALL_ANAL_RECON_PI*4)/NODF);
+      odf *= ((M_PI*4)/NODF);
     }
 
     // set ODF to ODF-Image
@@ -961,7 +964,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 
   int numberOfGradientDirections = refVector.size();
 
-  if( numberOfGradientDirections < (((L+1)*(L+2))/2) || numberOfGradientDirections < 6  )
+  if( numberOfGradientDirections <= (((L+1)*(L+2))/2) || numberOfGradientDirections < 6  )
   {
     itkExceptionMacro( << "At least (L+1)(L+2)/2 gradient directions for each shell are required; current : " << numberOfGradientDirections );
   }
@@ -1002,13 +1005,13 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   MatrixDoublePtr inverse(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   (*inverse) = pseudo_inv->inverse();
 
-  const double factor = (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
+  const double factor = (1.0/(16.0*M_PI*M_PI));
   MatrixDoublePtr SignalReonstructionMatrix (new vnl_matrix<double>((*inverse) * (SHBasisMatrix->transpose())));
   m_CoeffReconstructionMatrix = new vnl_matrix<double>(( factor * ((*FRTMatrix) * ((*SHEigenvalues) * (*SignalReonstructionMatrix))) ));
 
 
   // SH Basis for ODF-reconstruction
-  vnl_matrix_fixed<double, 3, NOdfDirections>* U = itk::PointShell<NOdfDirections, vnl_matrix_fixed<double, 3, NOdfDirections> >::DistributePointShell();
+  vnl_matrix_fixed<double, 3, NOdfDirections>* U = PointShell<NOdfDirections, vnl_matrix_fixed<double, 3, NOdfDirections> >::DistributePointShell();
   for(int i=0; i<NOdfDirections; i++)
   {
     double x = (*U)(0,i);

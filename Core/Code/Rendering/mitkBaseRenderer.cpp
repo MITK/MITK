@@ -38,16 +38,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkLayerController.h"
 
-// Events
+// Events // TODO: INTERACTION_LEGACY
 #include "mitkEventMapper.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkPositionEvent.h"
 #include "mitkDisplayPositionEvent.h"
-
 #include "mitkProperties.h"
 #include "mitkWeakPointerProperty.h"
-
 #include "mitkInteractionConst.h"
+
 
 // VTK
 #include <vtkLinearTransform.h>
@@ -162,7 +161,10 @@ m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
   //instances.insert( this );
 
   //adding this BaseRenderer to the List of all BaseRenderer
+  // TODO: INTERACTION_LEGACY
   m_RenderingManager->GetGlobalInteraction()->AddFocusElement(this);
+
+  m_BindDispatcherInteractor = mitk::BindDispatcherInteractor::New();
 
   WeakPointerProperty::Pointer rendererProp = WeakPointerProperty::New((itk::Object*)this);
 
@@ -263,6 +265,11 @@ void mitk::BaseRenderer::RegisterLocalStorageHandler( mitk::BaseLocalStorageHand
 
 }
 
+const mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher()
+{
+  return m_BindDispatcherInteractor->GetDispatcher();
+}
+
 void mitk::BaseRenderer::UnregisterLocalStorageHandler( mitk::BaseLocalStorageHandler *lsh )
 {
   m_RegisteredLocalStorageHandlers.remove(lsh);
@@ -274,6 +281,7 @@ void mitk::BaseRenderer::SetDataStorage(DataStorage* storage)
   if ( storage != NULL )
   {
     m_DataStorage = storage;
+    m_BindDispatcherInteractor->SetDataStorage(m_DataStorage);
     this->Modified();
   }
 }

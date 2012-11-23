@@ -38,7 +38,9 @@ namespace mitk
     itkNewMacro(Self);
 
     void SetDataStorage(DataStorage::Pointer dataStorage);
+
     void SetDispatcher(Dispatcher::Pointer dispatcher);
+    Dispatcher::Pointer GetDispatcher();
 
   protected:
     BindDispatcherInteractor();

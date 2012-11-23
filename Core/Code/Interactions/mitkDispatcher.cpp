@@ -39,11 +39,14 @@ void mitk::Dispatcher::SetEventInteractor(const DataNode* dataNode)
     }
     it++;
   }
-
+  MITK_INFO << "SetEventInteractor called";
   mitk::EventInteractor::Pointer eventInteractor = dynamic_cast<mitk::EventInteractor*>(dataNode->GetInteractor());
   if (eventInteractor.IsNotNull())
   {
     m_Interactors.push_back(eventInteractor);
+    MITK_INFO << "EventInteractor accepted";
+  } else {
+    MITK_INFO << "SetEventInteractor canceled";
   }
 }
 
@@ -70,7 +73,7 @@ bool mitk::Dispatcher::ProcessEvent(mitk::Event event)
 {
   mitk::Event p = event;
   m_Interactors.sort();
-  //p = NULL;
+
   return false;
 }
 

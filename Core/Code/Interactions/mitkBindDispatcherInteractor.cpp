@@ -20,6 +20,7 @@
 mitk::BindDispatcherInteractor::BindDispatcherInteractor()
 {
   m_DataStorage = NULL;
+  m_Dispatcher = mitk::Dispatcher::New();
 }
 
 void mitk::BindDispatcherInteractor::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
@@ -39,14 +40,11 @@ void mitk::BindDispatcherInteractor::SetDataStorage(mitk::DataStorage::Pointer d
   }
 }
 
-void mitk::BindDispatcherInteractor::SetDispatcher(mitk::Dispatcher::Pointer dispatcher)
-{
-  m_Dispatcher = dispatcher;
-}
 
 mitk::BindDispatcherInteractor::~BindDispatcherInteractor()
 {
-  // TODO Auto-generated destructor stub
+  m_DataStorage = NULL;
+  m_Dispatcher = NULL;
 }
 
 void mitk::BindDispatcherInteractor::RegisterInteractor(const mitk::DataNode* dataNode)
@@ -75,6 +73,18 @@ void mitk::BindDispatcherInteractor::UnRegisterInteractor(const DataNode* dataNo
      m_Dispatcher->RemoveEventInteractor(dataNode);
    }
 }
+
+mitk::Dispatcher::Pointer mitk::BindDispatcherInteractor::GetDispatcher()
+{
+  return m_Dispatcher;
+}
+
+void mitk::BindDispatcherInteractor::SetDispatcher(Dispatcher::Pointer dispatcher)
+{
+  m_Dispatcher = dispatcher;
+}
+
+
 
 void mitk::BindDispatcherInteractor::UnRegisterDataStorageEvents()
 {

@@ -29,6 +29,9 @@ mitk::DataNode::Pointer mitk::EventInteractor::GetDataNode()
 void mitk::EventInteractor::SetDataNode(DataNode::Pointer dataNode)
 {
   m_DataNode = dataNode;
+  if (m_DataNode.IsNotNull()) {
+    m_DataNode->SetInteractor(dynamic_cast <mitk::Interactor*>(this));
+  }
 }
 
 int mitk::EventInteractor::GetLayer()

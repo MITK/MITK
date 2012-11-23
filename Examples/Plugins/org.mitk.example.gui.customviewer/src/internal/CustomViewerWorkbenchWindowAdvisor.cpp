@@ -140,7 +140,7 @@ void CustomViewerWorkbenchWindowAdvisor::UpdateStyle()
   berry::IQtStyleManager* styleManager = pluginContext->getService<berry::IQtStyleManager>(serviceReference);
   Q_ASSERT(styleManager);
 
-  styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss");
+  styleManager->SetStyle("/home/me/customstyle.qss");
 }
 // //! [WorkbenchWindowAdvisorUpdateStyle]
 // //! [WorkbenchWindowAdvisorOpenFile]

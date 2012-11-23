@@ -47,8 +47,10 @@ void CustomViewerWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Point
   Q_ASSERT(styleManager);
 
   QString styleName = "CustomStyle";
-  styleManager->AddStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss", styleName);
-  styleManager->SetStyle("D:/Plattformprojekt/MITK/Examples/Plugins/org.mitk.example.gui.customviewer/resources/customstyle.qss");
+  styleManager->AddStyle(":/customstyle.qss", styleName);
+  styleManager->SetStyle(":/customstyle.qss");
+  //styleManager->AddStyle("/home/me/customstyle.qss", styleName);
+  //styleManager->SetStyle("/home/me/customstyle.qss");
 }
 // //! [WorkbenchAdvisorInit]
 std::string CustomViewerWorkbenchAdvisor::GetInitialWindowPerspectiveId()

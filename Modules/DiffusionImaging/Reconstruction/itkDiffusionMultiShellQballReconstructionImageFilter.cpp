@@ -570,12 +570,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread)
 {
   // Get output image pointer
-  typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(ProcessObject::GetOutput(0));
+  typename OdfImageType::Pointer outputImage = static_cast< OdfImageType * >(ProcessObject::GetOutput(0));
   // Get input gradient image pointer
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
 
   // ImageRegionIterator for the output image
-  ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
+  ImageRegionIterator< OdfImageType > oit(outputImage, outputRegionForThread);
   oit.GoToBegin();
 
   // ImageRegionIterator for the BZero (output) image
@@ -680,11 +680,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
   // Input Gradient Image and Output ODF Image
   typedef typename GradientImagesType::PixelType         GradientVectorType;
-  typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(ProcessObject::GetOutput(0));
+  typename OdfImageType::Pointer outputImage = static_cast< OdfImageType * >(ProcessObject::GetOutput(0));
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
 
   // Define Image iterators
-  ImageRegionIterator< OutputImageType > odfOutputImageIterator(outputImage, outputRegionForThread);
+  ImageRegionIterator< OdfImageType > odfOutputImageIterator(outputImage, outputRegionForThread);
   ImageRegionConstIterator< GradientImagesType > gradientInputImageIterator(gradientImagePointer, outputRegionForThread );
   ImageRegionIterator< BZeroImageType > bzeroIterator(m_BZeroImage, outputRegionForThread);
   ImageRegionIterator< CoefficientImageType > coefficientImageIterator(m_CoefficientImage, outputRegionForThread);

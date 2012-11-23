@@ -17,15 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkDiffusionMultiShellQballReconstructionImageFilter_h_
 #define __itkDiffusionMultiShellQballReconstructionImageFilter_h_
 
-#include "itkImageToImageFilter.h"
-#include "vnl/vnl_vector_fixed.h"
-#include "vnl/vnl_matrix.h"
-#include "vnl/algo/vnl_svd.h"
-#include "itkVectorContainer.h"
-#include "itkVectorImage.h"
-#include <iomanip>
-
-
+#include <itkImageToImageFilter.h>
 
 namespace itk{
 /** \class DiffusionMultiShellQballReconstructionImageFilter
@@ -42,21 +34,19 @@ public:
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< Image< TReferenceImagePixelType, 3>, Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > > Superclass;
+
     typedef TReferenceImagePixelType                  ReferencePixelType;
     typedef TGradientImagePixelType                   GradientPixelType;
+
     typedef Vector< TOdfPixelType, NrOdfDirections >  OdfPixelType;
     typedef typename Superclass::InputImageType       ReferenceImageType;
     typedef Image< OdfPixelType, 3 >                  OdfImageType;
-    typedef OdfImageType                              OutputImageType;
     typedef TOdfPixelType                             BZeroPixelType;
     typedef Image< BZeroPixelType, 3 >                BZeroImageType;
     typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
     /** Typedef defining one (of the many) gradient images.  */
     typedef Image< GradientPixelType, 3 >            GradientImageType;
-    /** An alternative typedef defining one (of the many) gradient images.
-   * It will be assumed that the vectorImage has the same dimension as the
-   * Reference image and a vector length parameter of \c n (number of
-   * gradient directions)*/
+    /**  */
     typedef VectorImage< GradientPixelType, 3 >       GradientImagesType;
     /** Holds the ODF reconstruction matrix */
     typedef vnl_matrix< TOdfPixelType >*              OdfReconstructionMatrixType;

@@ -21,8 +21,10 @@
 #include "itkObjectFactory.h"
 #include "mitkEvent.h"
 #include "mitkCommon.h"
-#include "mitkInteractor.h" // TODO: Change to EventHandler, when done.
+#include "mitkDataNode.h"
+#include "mitkEventInteractor.h"
 #include <MitkExports.h>
+#include <list>
 
 
 namespace mitk
@@ -35,13 +37,15 @@ namespace mitk
     itkNewMacro(Self);
 
     bool ProcessEvent(mitk::Event event);
+    void SetEventInteractor(const DataNode* dataNode);
+    void RemoveEventInteractor(const DataNode* dataNode);
 
   protected:
     Dispatcher();
     virtual ~Dispatcher();
 
   private:
-    std::list<Interactor::Pointer> m_EventHandler; // TODO: Change to EventHandler Type, when done.
+    std::list<EventInteractor::Pointer> m_Interactors;
   };
 
 } /* namespace mitk */

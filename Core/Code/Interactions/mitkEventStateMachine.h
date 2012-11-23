@@ -14,12 +14,13 @@
 
  ===================================================================*/
 
-#ifndef MITKEVENTHANDLER_H_
-#define MITKEVENTHANDLER_H_
+#ifndef MITKEVENTSTATEMACHINE_H_
+#define MITKEVENTSTATEMACHINE_H_
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
+#include "mitkEventHandler.h"
 #include <MitkExports.h>
 
 
@@ -40,4 +41,4 @@ namespace mitk
   };
 
 } /* namespace mitk */
-#endif /* MITKEVENTHANDLER_H_ */
+#endif /* MITKEVENTSTATEMACHINE_H_ */

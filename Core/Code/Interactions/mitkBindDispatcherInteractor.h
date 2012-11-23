@@ -23,6 +23,7 @@
 
 #include "mitkDataStorage.h"
 #include "mitkDataNode.h"
+#include "mitkDispatcher.h"
 
 #include <MitkExports.h>
 
@@ -33,12 +34,11 @@ namespace mitk
   {
 
   public:
-    mitkClassMacro(BindDispatcherInteractor, itk::Object)
-    ;itkNewMacro(Self)
-    ;
+    mitkClassMacro(BindDispatcherInteractor, itk::Object);
+    itkNewMacro(Self);
 
-    void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
-    void SetDispatcher(mitk::Dispatcher::Pointer dispatcher);
+    void SetDataStorage(DataStorage::Pointer dataStorage);
+    void SetDispatcher(Dispatcher::Pointer dispatcher);
 
   protected:
     BindDispatcherInteractor();
@@ -46,13 +46,13 @@ namespace mitk
 
   private:
 
-    void RegisterInteractor(mitk::DataNode::Pointer  dataNode);
-    void UnRegisterInteractor(mitk::DataNode::Pointer  dataNode);
+    void RegisterInteractor(const DataNode*  dataNode);
+    void UnRegisterInteractor(const DataNode*  dataNode);
     void RegisterDataStorageEvents();
     void UnRegisterDataStorageEvents();
 
-    mitk::Dispatcher::Pointer m_Dispatcher;
-    mitk::DataStorage::Pointer m_DataStorage;
+    Dispatcher::Pointer m_Dispatcher;
+    DataStorage::Pointer m_DataStorage;
   };
 
 } /* namespace mitk */

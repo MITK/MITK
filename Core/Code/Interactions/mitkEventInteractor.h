@@ -14,30 +14,41 @@
 
  ===================================================================*/
 
-#ifndef MITKEVENTHANDLER_H_
-#define MITKEVENTHANDLER_H_
+#ifndef MITKEVENTINTERACTOR_H_
+#define MITKEVENTINTERACTOR_H_
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
 #include <MitkExports.h>
+#include "mitkDataNode.h"
+#include "mitkEventStateMachine.h"
 
 
 namespace mitk
 {
 
-  class MITK_CORE_EXPORT EventStateMachine : public EventHandler {
+  class MITK_CORE_EXPORT EventInteractor : public EventStateMachine {
 
   public:
-    mitkClassMacro(EventStateMachine, EventHandler);
+    mitkClassMacro(EventInteractor, EventStateMachine);
     itkNewMacro(Self);
 
+   bool operator<(const EventInteractor::Pointer eventInteractor);
+
+   void SetDataNode(DataNode::Pointer);
+
+   DataNode::Pointer GetDataNode();
+   int GetLayer();
+
   protected:
-    EventStateMachine();
-    virtual ~EventStateMachine();
+    EventInteractor();
+    virtual ~EventInteractor();
 
 
+  private:
+    DataNode::Pointer m_DataNode;
   };
 
 } /* namespace mitk */
-#endif /* MITKEVENTHANDLER_H_ */
+#endif /* MITKEVENTINTERACTOR_H_ */

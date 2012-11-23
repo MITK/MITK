@@ -214,7 +214,10 @@ set(CPP_FILES
   Interactions/mitkDisplayVectorInteractorScroll.cpp
   Interactions/mitkEvent.cpp
   Interactions/mitkEventDescription.cpp
+  Interactions/mitkEventHandler.cpp
+  Interactions/mitkEventInteractor.cpp
   Interactions/mitkEventMapper.cpp
+  Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
   Interactions/mitkInteractor.cpp
   Interactions/mitkMouseModeSwitcher.cpp

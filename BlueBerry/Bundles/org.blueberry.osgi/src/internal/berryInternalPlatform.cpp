@@ -220,7 +220,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       }
       catch (const ctkPluginException& e)
       {
-        BERRY_ERROR << "Failed to install: " << pluginUrl.toString().toStdString() << ",\n" << e.what();
+        QString errorMsg;
+        QDebug dbg(&errorMsg);
+        dbg << e.printStackTrace();
+        BERRY_ERROR << qPrintable(errorMsg);
       }
     }
   }

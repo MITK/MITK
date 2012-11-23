@@ -109,7 +109,8 @@ float mitk::PlanarFigureInteractor
       dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
 
     double planeThickness = planarFigureGeometry2D->GetExtentInMM( 2 );
-    if ( planarFigureGeometry2D->Distance( worldPoint3D ) > planeThickness )
+    if ( planarFigure->IsPlaced()
+      && planarFigureGeometry2D->Distance( worldPoint3D ) > planeThickness )
     {
       // don't react, when interaction is too far away
       return 0.0;

@@ -34,27 +34,24 @@ public:
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< Image< TReferenceImagePixelType, 3>, Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > > Superclass;
+    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
     typedef TReferenceImagePixelType                  ReferencePixelType;
-    typedef TGradientImagePixelType                   GradientPixelType;
 
-    typedef Vector< TOdfPixelType, NrOdfDirections >  OdfPixelType;
-    typedef typename Superclass::InputImageType       ReferenceImageType;
-    typedef Image< OdfPixelType, 3 >                  OdfImageType;
-    typedef TOdfPixelType                             BZeroPixelType;
-    typedef Image< BZeroPixelType, 3 >                BZeroImageType;
-    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
-    /** Typedef defining one (of the many) gradient images.  */
-    typedef Image< GradientPixelType, 3 >            GradientImageType;
-    /**  */
+    // GradientPixelType & GradientImagesType (container)
+    typedef TGradientImagePixelType                   GradientPixelType;
     typedef VectorImage< GradientPixelType, 3 >       GradientImagesType;
-    /** Holds the ODF reconstruction matrix */
-    typedef vnl_matrix< TOdfPixelType >*              OdfReconstructionMatrixType;
-    typedef vnl_matrix< double > *                    CoefficientMatrixType;
-    /** Holds each magnetic field gradient used to acquire one DWImage */
-    typedef vnl_vector_fixed< double, 3 >             GradientDirectionType;
+
+    // ODF PixelType & ODF ImageType
+    typedef Vector< TOdfPixelType, NrOdfDirections >  OdfPixelType;
+    typedef Image< OdfPixelType, 3 >                  OdfImageType;
+
+    // BzeroImageType
+    typedef Image< TOdfPixelType, 3 >                 BZeroImageType;
+
+
     /** Container to hold gradient directions of the 'n' DW measurements */
-    typedef VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
+    typedef VectorContainer< unsigned int, vnl_vector_fixed< double, 3 > > GradientDirectionContainerType;
 
     typedef Image< Vector< TOdfPixelType, (NOrderL*NOrderL + NOrderL + 2)/2 + NOrderL >, 3 > CoefficientImageType;
 
@@ -66,44 +63,16 @@ public:
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
-
     /** Runtime information support. */
     itkTypeMacro(DiffusionMultiShellQballReconstructionImageFilter, ImageToImageFilter);
 
-    /** set method to add gradient directions and its corresponding
-   * image. The image here is a VectorImage. The user is expected to pass the
-   * gradient directions in a container. The ith element of the container
-   * corresponds to the gradient direction of the ith component image the
-   * VectorImage.  For the baseline image, a vector of all zeros
-   * should be set.*/
-    void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image , float bvalue);//, std::vector<bool> listOfUserSelctedBValues );
-
-
     /** Get reference image */
-    virtual ReferenceImageType * GetReferenceImage()
-    { return ( static_cast< ReferenceImageType *>(this->ProcessObject::GetInput(0)) ); }
+    virtual typename Superclass::InputImageType * GetInputImage()
+    { return ( static_cast< typename Superclass::InputImageType *>(this->ProcessObject::GetInput(0)) ); }
 
-    /** Return the gradient direction. idx is 0 based */
-    virtual GradientDirectionType GetGradientDirection( unsigned int idx) const
-    {
-        if( idx >= m_GradientDirectionContainer->Size() )
-        {
-            itkExceptionMacro( << "Gradient direction " << idx << "does not exist" );
-        }
-        return m_GradientDirectionContainer->ElementAt( idx+1 );
-    }
 
-    void Normalize(OdfPixelType & odf );
-
-    void S_S0Normalization( vnl_vector<double> & vec, double b0  = 0 );
-
-    void DoubleLogarithm(vnl_vector<double> & vec);
-
-    void Projection1(vnl_vector<double> & vec, double delta = 0.01);
-    double CalculateThreashold(const double value, const double delta);
-
-    void Projection2( vnl_vector<double> & E1, vnl_vector<double> & E2, vnl_vector<double> & E3, double delta = 0.01);
-    void Projection3( vnl_vector<double> & A, vnl_vector<double> & alpha, vnl_vector<double> & beta, double delta = 0.01);
+    void SetGradientImage( GradientDirectionContainerType *, const GradientImagesType *image , float bvalue);//, std::vector<bool> listOfUserSelctedBValues );
+    void SetBValueMap(BValueMap map){this->m_BValueMap = map;}
 
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this
@@ -111,41 +80,19 @@ public:
     itkSetMacro( Threshold, ReferencePixelType );
     itkGetMacro( Threshold, ReferencePixelType );
 
-    itkGetMacro( BZeroImage, typename BZeroImageType::Pointer);
-    //itkGetMacro( ODFSumImage, typename BlaImage::Pointer);
-
     itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer );
+    itkGetMacro( BZeroImage, typename BZeroImageType::Pointer);
 
     itkSetMacro( Lambda, double );
     itkGetMacro( Lambda, double );
-
-    itkGetConstReferenceMacro( BValue, TOdfPixelType);
-
-    void SetBValueMap(BValueMap map){this->m_BValueMap = map;}
-
 
 protected:
     DiffusionMultiShellQballReconstructionImageFilter();
     ~DiffusionMultiShellQballReconstructionImageFilter() { };
     void PrintSelf(std::ostream& os, Indent indent) const;
-
-    void ComputeReconstructionMatrix(IndiciesVector const & refVector);
-    void ComputeODFSHBasis();
-    bool CheckDuplicateDiffusionGradients();
-    bool CheckForDifferingShellDirections();
-    IndiciesVector GetAllDirections();
-
-    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, int Lorder , vnl_matrix<double>* LaplaciaBaltramiOutput =0 , vnl_vector<int>* SHOrderAssociation =0 , vnl_matrix<double> * SHEigenvalues =0);
-    //void ComputeFunkRadonTransformationMatrix(vnl_vector<int>* SHOrderAssociationReference, vnl_matrix<double>* FRTMatrixOutput );
-    //bool CheckHemisphericalArrangementOfGradientDirections();
-
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
 
-    void StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread);
-    void AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread);
-    void NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread);
-    void GenerateAveragedBZeroImage(const OutputImageRegionType& outputRegionForThread);
 
 private:
 
@@ -156,22 +103,37 @@ private:
         Mode_Standard1Shell
     };
 
+    void ComputeReconstructionMatrix(IndiciesVector const & refVector);
+    void ComputeODFSHBasis();
+    bool CheckDuplicateDiffusionGradients();
+    bool CheckForDifferingShellDirections();
+    IndiciesVector GetAllDirections();
+    void ComputeSphericalHarmonicsBasis(vnl_matrix<double>* QBallReference, vnl_matrix<double>* SHBasisOutput, int Lorder , vnl_matrix<double>* LaplaciaBaltramiOutput =0 , vnl_vector<int>* SHOrderAssociation =0 , vnl_matrix<double> * SHEigenvalues =0);
+    void Normalize(OdfPixelType & odf );
+    void S_S0Normalization( vnl_vector<double> & vec, double b0  = 0 );
+    void DoubleLogarithm(vnl_vector<double> & vec);
+    double CalculateThreashold(const double value, const double delta);
+    void Projection1(vnl_vector<double> & vec, double delta = 0.01);
+    void Projection2( vnl_vector<double> & E1, vnl_vector<double> & E2, vnl_vector<double> & E3, double delta = 0.01);
+    void Projection3( vnl_vector<double> & A, vnl_vector<double> & alpha, vnl_vector<double> & beta, double delta = 0.01);
+    void StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread);
+    void AnalyticalThreeShellReconstruction(const OutputImageRegionType& outputRegionForThread);
+    void NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread);
+    void GenerateAveragedBZeroImage(const OutputImageRegionType& outputRegionForThread);
+    void ComputeSphericalFromCartesian(vnl_matrix<double> * Q, const IndiciesVector & refShell);
 
     // Interpolation
     bool m_Interpolation_Flag;
-    CoefficientMatrixType m_Interpolation_SHT1_inv;
-    CoefficientMatrixType m_Interpolation_SHT2_inv;
-    CoefficientMatrixType m_Interpolation_SHT3_inv;
-    CoefficientMatrixType m_TARGET_SH_shell1;
-    CoefficientMatrixType m_TARGET_SH_shell2;
-    CoefficientMatrixType m_TARGET_SH_shell3;
+    vnl_matrix< double > * m_Interpolation_SHT1_inv;
+    vnl_matrix< double > * m_Interpolation_SHT2_inv;
+    vnl_matrix< double > * m_Interpolation_SHT3_inv;
+    vnl_matrix< double > * m_TARGET_SH_shell1;
+    vnl_matrix< double > * m_TARGET_SH_shell2;
+    vnl_matrix< double > * m_TARGET_SH_shell3;
     int m_MaxDirections;
 
-    //CoefficientMatrixType m_ReconstructionMatrix;
-    CoefficientMatrixType m_CoeffReconstructionMatrix;
-    CoefficientMatrixType m_ODFSphericalHarmonicBasisMatrix;
-    //CoefficientMatrixType m_SignalReonstructionMatrix;
-    //CoefficientMatrixType m_SHBasisMatrix;
+    vnl_matrix< double > * m_CoeffReconstructionMatrix;
+    vnl_matrix< double > * m_ODFSphericalHarmonicBasisMatrix;
 
     /** container to hold gradient directions */
     GradientDirectionContainerType::Pointer m_GradientDirectionContainer;
@@ -185,12 +147,11 @@ private:
     /** Threshold on the reference image data */
     ReferencePixelType m_Threshold;
 
-    /** LeBihan's b-value for normalizing tensors */
-    float m_BValue;
-
     typename BZeroImageType::Pointer m_BZeroImage;
 
     typename CoefficientImageType::Pointer m_CoefficientImage;
+
+    float m_BValue;
 
     BValueMap m_BValueMap;
 
@@ -225,7 +186,7 @@ private:
       return result ;
     }
 
-    void ComputeSphericalFromCartesian(vnl_matrix<double> * Q, const IndiciesVector & refShell);
+
 
 
 };

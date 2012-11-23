@@ -49,6 +49,73 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 }
 
 
+template< class T, class TG, class TO, int L, int NODF>
+void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
+::SetGradientImage( GradientDirectionContainerType *gradientDirection
+                    , const GradientImagesType *gradientImage
+                    , float bvalue)
+{
+  m_BValue = bvalue;
+  m_GradientDirectionContainer = gradientDirection;
+  m_NumberOfBaselineImages = 0;
+
+
+  if(m_BValueMap.size() == 0){
+    itkWarningMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : no GradientIndexMapAvalible");
+
+    GradientDirectionContainerType::ConstIterator gdcit;
+    for( gdcit = m_GradientDirectionContainer->Begin(); gdcit != m_GradientDirectionContainer->End(); ++gdcit)
+    {
+      double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
+      m_BValueMap[bValueKey].push_back(gdcit.Index());
+    }
+
+  }
+  if(m_BValueMap.find(0) == m_BValueMap.end())
+  {
+    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : GradientIndxMap with no b-Zero indecies found: check input BValueMap");
+  }
+
+
+  m_NumberOfBaselineImages = m_BValueMap[0].size();
+  m_NumberOfGradientDirections = gradientDirection->Size() - m_NumberOfBaselineImages;
+  // ensure that the gradient image we received has as many components as
+  // the number of gradient directions
+  if( gradientImage->GetVectorLength() != m_NumberOfBaselineImages + m_NumberOfGradientDirections )
+  {
+    itkExceptionMacro( << m_NumberOfGradientDirections << " gradients + " << m_NumberOfBaselineImages
+                       << "baselines = " << m_NumberOfGradientDirections + m_NumberOfBaselineImages
+                       << " directions specified but image has " << gradientImage->GetVectorLength()
+                       << " components.");
+  }
+
+
+  ProcessObject::SetNthInput( 0, const_cast< GradientImagesType* >(gradientImage) );
+
+  std::string gradientImageClassName(ProcessObject::GetInput(0)->GetNameOfClass());
+  if ( strcmp(gradientImageClassName.c_str(),"VectorImage") != 0 )
+    itkExceptionMacro( << "There is only one Gradient image. I expect that to be a VectorImage. But its of type: " << gradientImageClassName );
+
+
+  m_BZeroImage = BZeroImageType::New();
+  typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
+  m_BZeroImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
+  m_BZeroImage->SetOrigin( img->GetOrigin() );     // Set the image origin
+  m_BZeroImage->SetDirection( img->GetDirection() );  // Set the image direction
+  m_BZeroImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
+  m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
+  m_BZeroImage->Allocate();
+
+  m_CoefficientImage = CoefficientImageType::New();
+  m_CoefficientImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
+  m_CoefficientImage->SetOrigin( img->GetOrigin() );     // Set the image origin
+  m_CoefficientImage->SetDirection( img->GetDirection() );  // Set the image direction
+  m_CoefficientImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
+  m_CoefficientImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
+  m_CoefficientImage->Allocate();
+
+}
+
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
 ::Normalize( OdfPixelType  & out)
@@ -308,72 +375,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   }
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::SetGradientImage( GradientDirectionContainerType *gradientDirection
-                    , const GradientImagesType *gradientImage
-                    , float bvalue)
-{
-  m_BValue = bvalue;
-  m_GradientDirectionContainer = gradientDirection;
-  m_NumberOfBaselineImages = 0;
 
-
-  if(m_BValueMap.size() == 0){
-    itkWarningMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : no GradientIndexMapAvalible");
-
-    GradientDirectionContainerType::ConstIterator gdcit;
-    for( gdcit = m_GradientDirectionContainer->Begin(); gdcit != m_GradientDirectionContainer->End(); ++gdcit)
-    {
-      double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
-      m_BValueMap[bValueKey].push_back(gdcit.Index());
-    }
-
-  }
-  if(m_BValueMap.find(0) == m_BValueMap.end())
-  {
-    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : GradientIndxMap with no b-Zero indecies found: check input BValueMap");
-  }
-
-
-  m_NumberOfBaselineImages = m_BValueMap[0].size();
-  m_NumberOfGradientDirections = gradientDirection->Size() - m_NumberOfBaselineImages;
-  // ensure that the gradient image we received has as many components as
-  // the number of gradient directions
-  if( gradientImage->GetVectorLength() != m_NumberOfBaselineImages + m_NumberOfGradientDirections )
-  {
-    itkExceptionMacro( << m_NumberOfGradientDirections << " gradients + " << m_NumberOfBaselineImages
-                       << "baselines = " << m_NumberOfGradientDirections + m_NumberOfBaselineImages
-                       << " directions specified but image has " << gradientImage->GetVectorLength()
-                       << " components.");
-  }
-
-
-  ProcessObject::SetNthInput( 0, const_cast< GradientImagesType* >(gradientImage) );
-
-  std::string gradientImageClassName(ProcessObject::GetInput(0)->GetNameOfClass());
-  if ( strcmp(gradientImageClassName.c_str(),"VectorImage") != 0 )
-    itkExceptionMacro( << "There is only one Gradient image. I expect that to be a VectorImage. But its of type: " << gradientImageClassName );
-
-
-  m_BZeroImage = BZeroImageType::New();
-  typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
-  m_BZeroImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
-  m_BZeroImage->SetOrigin( img->GetOrigin() );     // Set the image origin
-  m_BZeroImage->SetDirection( img->GetDirection() );  // Set the image direction
-  m_BZeroImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
-  m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
-  m_BZeroImage->Allocate();
-
-  m_CoefficientImage = CoefficientImageType::New();
-  m_CoefficientImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
-  m_CoefficientImage->SetOrigin( img->GetOrigin() );     // Set the image origin
-  m_CoefficientImage->SetDirection( img->GetDirection() );  // Set the image direction
-  m_CoefficientImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
-  m_CoefficientImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
-  m_CoefficientImage->Allocate();
-
-}
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>

@@ -14,24 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef ICHANGETEXT_H_
-#define ICHANGETEXT_H_
+#ifndef CHANGETEXTTOUPPERCASE_H
+#define CHANGETEXTTOUPPERCASE_H
 
-#include <berryObject.h>
+#include <IChangeText.h>
 
-#include "org_mitk_example_gui_extensionpointdefinition_Export.h"
-
-struct org_mitk_example_gui_extensionpointdefinition_EXPORT IChangeText
-    : public virtual berry::Object
+class ChangeTextToUpperCase : public QObject, public IChangeText
 {
-  berryInterfaceMacro(IChangeText, ::)
+  Q_OBJECT
+  Q_INTERFACES(IChangeText)
 
-  virtual ~IChangeText();
+public:
 
-  virtual QString ChangeText(const QString& s) = 0;
-
+  QString ChangeText(const QString &s);
 };
 
-Q_DECLARE_INTERFACE(IChangeText, "org.mitk.example.IChangeText")
-
-#endif /*ICHANGETEXT_H_*/
+#endif // CHANGETEXTTOUPPERCASE_H

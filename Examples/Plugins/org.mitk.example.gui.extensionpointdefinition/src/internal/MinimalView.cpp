@@ -18,15 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "org_mitk_example_gui_extensionpointdefinition_Activator.h"
 
-#include <QMessageBox>
+#include <QPushButton>
 
 const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview";
 
 MinimalView::MinimalView() : m_Parent(0)
-{
-}
-
-MinimalView::~MinimalView()
 {
 }
 
@@ -36,15 +32,34 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
   m_Controls.setupUi(parent);
 
-  m_Parent->setEnabled(true);
+  QVBoxLayout* layout = new QVBoxLayout(m_Controls.m_ButtonContainer);
+  QList<ChangeTextDescriptor::Pointer> changeTexts = m_Registry.GetChangeTexts();
+  foreach(const ChangeTextDescriptor::Pointer& changeText, changeTexts)
+  {
+    // Create a push button for each "changetext" descriptor
+    QPushButton* button = new QPushButton(changeText->GetName(), m_Controls.m_ButtonContainer);
+    button->setToolTip(changeText->GetDescription());
+    button->setObjectName(changeText->GetID());
+    layout->addWidget(button);
 
+    connect(button, SIGNAL(clicked()), &m_SignalMapper, SLOT(map()));
+    m_SignalMapper.setMapping(button, changeText->GetID());
+  }
+  layout->addStretch();
+
+  connect(&m_SignalMapper, SIGNAL(mapped(QString)), this, SLOT(ChangeText(QString)));
 }
 
 void MinimalView::SetFocus ()
 {
+  m_Controls.m_InputText->setFocus();
 }
 
-void MinimalView::ChangeExtensionLabelText(const QString& s)
+void MinimalView::ChangeText(const QString& id)
 {
-  m_Controls.extensionLabel->setText(s);
+  ChangeTextDescriptor::Pointer changeTextDescr = m_Registry.Find(id);
+
+  // lazily create an instance of IChangeText (the descriptor will cache it)
+  IChangeText::Pointer changeText = changeTextDescr->CreateChangeText();
+  m_Controls.m_OutputText->setText(changeText->ChangeText(m_Controls.m_InputText->text()));
 }

@@ -85,6 +85,10 @@ private:
   berry::IConfigurationElement::Pointer m_ChangeTextExtensionPoint;
   IChangeText::Pointer m_ChangeText;
 
+  QString m_Id;
+  QString m_Name;
+  QString m_Description;
+
 };
 
 #endif /*CHANGETEXTDESCRIPTOR_H_*/

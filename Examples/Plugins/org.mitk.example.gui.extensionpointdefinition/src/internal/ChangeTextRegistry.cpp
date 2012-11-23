@@ -25,7 +25,7 @@ ChangeTextRegistry::ChangeTextRegistry()
   //initialize the registry by copying all available extension points into a local variable
   berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
   std::vector<berry::IConfigurationElement::Pointer> allExtensionsChangeTexts
-    = extensionPointService->GetConfigurationElementsFor(ExtensionPointDefinitionConstants::CHANGETEXT_EXTENSION_NAME);
+    = extensionPointService->GetConfigurationElementsFor(ExtensionPointDefinitionConstants::CHANGETEXT_XP_NAME);
 
   for(std::vector<berry::IConfigurationElement::Pointer>::const_iterator it = allExtensionsChangeTexts.begin();
     it != allExtensionsChangeTexts.end();++it)
@@ -38,7 +38,7 @@ ChangeTextRegistry::ChangeTextRegistry()
     }
     else
     {
-      throw ctkRuntimeException("The ChangeText ID: "+temp->GetID()+" is already registered.");
+      BERRY_WARN << "The ChangeText ID: " << qPrintable(temp->GetID()) << " is already registered.";
     }
   }
 }

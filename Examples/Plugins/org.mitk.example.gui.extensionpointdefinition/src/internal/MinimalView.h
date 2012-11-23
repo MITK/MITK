@@ -18,17 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MINIMALVIEW_H_
 #define MINIMALVIEW_H_
 
-// Berry
 #include <berryQtViewPart.h>
 
-#include <QString>
+#include "ChangeTextRegistry.h"
 
 #include "ui_MinimalViewControls.h"
+
+#include <QSignalMapper>
 
 
 class MinimalView : public berry::QtViewPart
 {
-
   Q_OBJECT
 
 public:
@@ -37,22 +37,24 @@ public:
 
   MinimalView();
 
-  virtual ~MinimalView();
-
-  virtual void CreateQtPartControl(QWidget *parent);
-
-  virtual void ChangeExtensionLabelText(const QString& s);
-
 protected:
 
+  void CreateQtPartControl(QWidget *parent);
+
   void SetFocus();
+
+private Q_SLOTS:
+
+  void ChangeText(const QString& id);
 
 private:
 
   Ui::MinimalViewControls m_Controls;
 
   QWidget* m_Parent;
+  QSignalMapper m_SignalMapper;
 
+  ChangeTextRegistry m_Registry;
 };
 
 #endif /*MINIMALVIEW_H_*/

@@ -2,11 +2,15 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  ExtensionPointContribution.cpp
+  ChangeTextToLowerCase.cpp
+  ChangeTextToUpperCase.cpp
+  org_mitk_example_gui_extensionpointcontribution_Activator.cpp
 )
 
 set(MOC_H_FILES
-
+  src/internal/ChangeTextToLowerCase.h
+  src/internal/ChangeTextToUpperCase.h
+  src/internal/org_mitk_example_gui_extensionpointcontribution_Activator.h
 )
 
 set(CACHED_RESOURCE_FILES

@@ -14,21 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "ExtensionPointContribution.h"
 
-// Qt includes
-#include <QMessageBox>
+#ifndef org_mitk_example_gui_extensionpointcontribution_Activator_H
+#define org_mitk_example_gui_extensionpointcontribution_Activator_H
 
-ExtensionPointContribution::ExtensionPointContribution()
+#include <ctkPluginActivator.h>
+
+class org_mitk_example_gui_extensionpointcontribution_Activator :
+  public QObject, public ctkPluginActivator
 {
-}
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
 
-ExtensionPointContribution::~ExtensionPointContribution()
-{
-}
+public:
 
-void ExtensionPointContribution::ChangeExtensionLabelText(const QString& /*s*/)
-{
-  QMessageBox::critical(0, "Error", "Provided by extension!");
-}
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
+};
+
+#endif // org_mitk_example_gui_extensionpointcontribution_Activator_H

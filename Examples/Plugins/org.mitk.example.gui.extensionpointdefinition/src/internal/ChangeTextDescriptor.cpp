@@ -17,10 +17,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ChangeTextDescriptor.h"
 #include "ExtensionPointDefinitionConstants.h"
 
+#include "berryPlatformException.h"
 
 ChangeTextDescriptor::ChangeTextDescriptor(berry::IConfigurationElement::Pointer changeTextExtensionPoint)
   : m_ChangeTextExtensionPoint(changeTextExtensionPoint)
 {
+  std::string id;
+  std::string name;
+
+  // Check if the "id" and "name" attributes are available
+  if (!this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID, id) ||
+      !this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME, name))
+  {
+    throw berry::CoreException("Invalid changetext configuration element (missing id or name) from: " +
+                               m_ChangeTextExtensionPoint->GetContributor());
+  }
+
+  this->m_Id = QString::fromStdString(id);
+  this->m_Name = QString::fromStdString(name);
+
+  // Get the optional "description" child element
+  std::vector<berry::IConfigurationElement::Pointer> descriptions(
+        this->m_ChangeTextExtensionPoint->GetChildren(ExtensionPointDefinitionConstants::CHANGETEXT_CHILD_DESCRIPTION));
+
+  if(!descriptions.empty())
+  {
+    this->m_Description = QString::fromStdString(descriptions[0]->GetValue());
+  }
 }
 
 ChangeTextDescriptor::~ChangeTextDescriptor()
@@ -40,28 +63,17 @@ IChangeText::Pointer ChangeTextDescriptor::CreateChangeText()
 
 QString ChangeTextDescriptor::GetID() const
 {
-  std::string idOfExtensionPoint;
-  this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID,idOfExtensionPoint);
-  return QString::fromStdString(idOfExtensionPoint);
+  return this->m_Id;
 }
 
 QString ChangeTextDescriptor::GetDescription() const
 {
-  std::vector<berry::IConfigurationElement::Pointer>
-    descriptions(this->m_ChangeTextExtensionPoint->GetChildren(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_DESCRIPTION));
-
-  if(!descriptions.empty())
-  {
-    return QString::fromStdString(descriptions[0]->GetValue());
-  }
-  return QString();
+  return this->m_Description;
 }
 
 QString ChangeTextDescriptor::GetName() const
 {
-  std::string name;
-  this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME,name);
-  return QString::fromStdString(name);
+  return this->m_Name;
 }
 
 bool ChangeTextDescriptor::operator==(const Object* object) const
@@ -72,4 +84,3 @@ bool ChangeTextDescriptor::operator==(const Object* object) const
   }
   return false;
 }
-

@@ -10,14 +10,9 @@
    </annotation>
 
    <element name="extension">
-      <annotation>
-         <appinfo>
-            <meta.element />
-         </appinfo>
-      </annotation>
       <complexType>
          <sequence>
-            <element ref="labelextension" minOccurs="0" maxOccurs="1"/>
+            <element ref="changetext" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -46,12 +41,7 @@
       </complexType>
    </element>
 
-   <element name="labelextension">
-      <annotation>
-         <appinfo>
-            <meta.element />
-         </appinfo>
-      </annotation>
+   <element name="changetext">
       <complexType>
          <sequence>
             <element ref="description" minOccurs="0" maxOccurs="1"/>
@@ -59,14 +49,14 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  the identifier of the input device
+                  the identifier of the text changer
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="name" type="string">
+         <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  an optional name of the input device
+                  the name of the text changer
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -79,9 +69,6 @@
                   a fully qualified name of the class that implements
 &lt;samp&gt;IChangeText&lt;/samp&gt;.
                </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn="IChangeText"/>
-               </appinfo>
             </annotation>
          </attribute>
       </complexType>

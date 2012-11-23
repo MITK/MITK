@@ -32,9 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 struct ExtensionPointDefinitionConstants
 {
-  static const std::string CHANGETEXT_EXTENSION_NAME;
+  static const std::string CHANGETEXT_XP_NAME;
+  static const std::string CHANGETEXT_CHILD_DESCRIPTION;
   static const std::string CHANGETEXT_XMLATTRIBUTE_CLASS;
-  static const std::string CHANGETEXT_XMLATTRIBUTE_DESCRIPTION;
   static const std::string CHANGETEXT_XMLATTRIBUTE_NAME;
   static const std::string CHANGETEXT_XMLATTRIBUTE_ID;
 };

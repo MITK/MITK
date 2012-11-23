@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
+
   <extension point="org.mitk.example.extensionpointdefinition.changetext">
-    <labelextension id="org.mitk.example.extensionpointdefinition.example1" name="Example1" class="ExtensionPointContribution">
-        <description>Example extension for the Plugin org.mitk.example.extensionpointdefinition </description>
-    </labelextension>
+
+    <changetext id="org.mitk.example.extensionpointdefinition.tolower"
+                name="Lower case"
+                class="ChangeTextToLowerCase">
+      <description>Change the input string to lower case.</description>
+    </changetext>
+
+    <changetext id="org.mitk.example.extensionpointdefinition.toupper"
+                name="Upper case"
+                class="ChangeTextToUpperCase">
+      <description>Change the input string to upper case.</description>
+    </changetext>
+
   </extension>
+
 </plugin>

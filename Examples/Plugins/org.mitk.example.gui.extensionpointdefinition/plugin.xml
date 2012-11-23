@@ -18,7 +18,7 @@
   <extension point="org.blueberry.ui.views">
     <view
       id="org.mitk.views.minimalview"
-      name="Minimal View"
+      name="Text Changers"
       class="MinimalView">
     </view>
   </extension>

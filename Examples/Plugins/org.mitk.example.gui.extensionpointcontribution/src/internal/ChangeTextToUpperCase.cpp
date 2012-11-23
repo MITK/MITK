@@ -14,22 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef EXTENSIONPOINTCONTRIBUTION_H_
-#define EXTENSIONPOINTCONTRIBUTION_H_
+#include "ChangeTextToUpperCase.h"
 
-// Qt includes
-#include "IChangeText.h"
-
-class ExtensionPointContribution : public IChangeText
+QString ChangeTextToUpperCase::ChangeText(const QString &s)
 {
-
-public:
-
-  ExtensionPointContribution();
-  ~ExtensionPointContribution();
-
-  void ChangeExtensionLabelText(const QString& s);
-
-};
-
-#endif /*EXTENSIONPOINTCONTRIBUTION_H_*/
+  return s.toUpper();
+}

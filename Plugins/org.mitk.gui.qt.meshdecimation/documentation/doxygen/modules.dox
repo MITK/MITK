@@ -1,8 +1,17 @@
 /**
-  \defgroup org_mbi_gui_qt_meshdecimation org.mbi.gui.qt.meshdecimation Plugin
-  \ingroup MBIPlugins
+  \defgroup org_mitk_gui_qt_meshdecimation org.mitk.gui.qt.meshdecimation
+  \ingroup MITKPlugins
 
   \brief The plugin is a user friendly tool to decimate a mesh.
-  
+
   It has no public API and uses VTK filters internally to decimate MITK Surfaces. Please refer to the user manual for usage information.
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_meshdecimation_internal Internal
+  \ingroup org_mitk_gui_qt_meshdecimation
+
+  \brief This subcategory includes the internal classes of the org_mitk_gui_qt_meshdecimation plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
 */

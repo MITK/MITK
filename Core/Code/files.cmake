@@ -220,6 +220,9 @@ set(CPP_FILES
   Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
   Interactions/mitkInteractor.cpp
+  Interactions/mitkInteractionEvent.cpp
+  Interactions/mitkInteractionPositionEvent.cpp
+  Interactions/mitkMousePressEvent.cpp
   Interactions/mitkMouseModeSwitcher.cpp
   Interactions/mitkMouseMovePointSetInteractor.cpp
   Interactions/mitkMoveSurfaceInteractor.cpp

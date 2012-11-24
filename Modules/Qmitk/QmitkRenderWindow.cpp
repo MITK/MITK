@@ -77,6 +77,7 @@ void QmitkRenderWindow::LayoutDesignListChanged( int layoutDesignIndex )
 
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 {
+//  m_Renderer->GetDispatcher()->ProcessEvent()
   mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
   this->mousePressMitkEvent(&myevent);
 

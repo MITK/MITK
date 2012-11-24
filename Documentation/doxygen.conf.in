@@ -734,6 +734,7 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ann/ \
                          @MITK_BINARY_DIR@/PT/ \
                          @MITK_BINARY_DIR@/GP/ \
                          @MITK_BINARY_DIR@/Core/Code/CppMicroServices/ \
+                         @MITK_BINARY_DIR@/BlueBerry/ \
                          @MITK_DOXYGEN_ADDITIONAL_EXCLUDE_DIRS@
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -778,6 +779,7 @@ EXCLUDE_SYMBOLS        =
 
 EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Examples/Tutorial/ \
+                        @MITK_SOURCE_DIR@/Examples/Plugins/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
                          @MITK_SOURCE_DIR@/Core/Code/ \
                          @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/Documentation/Snippets/ \

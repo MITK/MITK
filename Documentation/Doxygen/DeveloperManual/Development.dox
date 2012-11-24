@@ -29,6 +29,10 @@ Some abstract concepts of MITK are described in \ref Concepts
 \li \subpage DocumentationGuide
 \li \subpage StyleGuideAndNotesPage
 
+\section DevelopmentGettingToKnowBlueberry Getting To Know BlueBerry
+
+\li \subpage ExamplePage
+
 \section DevelopmentFurtherInfo Further Information
 
 This section lists some ressources you might want to look at if you could not find what you need in

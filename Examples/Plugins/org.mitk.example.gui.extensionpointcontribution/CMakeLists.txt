@@ -1,0 +1,6 @@
+project(org_mitk_example_gui_extensionpointcontribution)
+
+MACRO_CREATE_MITK_CTK_PLUGIN(
+  EXPORT_DIRECTIVE org_mitk_example_gui_extensionpointcontribution_EXPORT
+  EXPORTED_INCLUDE_SUFFIXES src
+  )

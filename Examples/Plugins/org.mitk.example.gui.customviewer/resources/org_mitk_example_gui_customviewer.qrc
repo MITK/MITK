@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>customstyle.qss</file>
+     <file>customstyle-activetab.qss</file>
+     <file>customstyle-tab.qss</file>
+ </qresource>
+ </RCC>

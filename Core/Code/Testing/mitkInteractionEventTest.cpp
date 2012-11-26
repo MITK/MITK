@@ -48,9 +48,9 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
   mitk::MousePressEvent::Pointer me4 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
 
   MITK_TEST_CONDITION_REQUIRED(
-      me1->isEqual(me2.GetPointer()) ||
-      me1->isEqual(me3.GetPointer())||
-      !(me1->isEqual(me3.GetPointer())) ||
+      me1->isEqual(me2.GetPointer()) &&
+      me1->isEqual(me3.GetPointer()) &&
+      (me1->isEqual(me3.GetPointer())) &&
       !(me3->isEqual(me4.GetPointer()))
       , "Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MousePressEvent");
 

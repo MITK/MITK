@@ -19,9 +19,13 @@
 
 mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, unsigned int buttonStates,
     unsigned int modifiers, unsigned int eventButton) :
-    InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MousePressEvent")
+    InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MousePressEvent"),m_EventButton(eventButton)
 {
-  m_EventButton = eventButton;
+}
+
+unsigned int mitk::MousePressEvent::GetEventButton()
+{
+  return m_EventButton;
 }
 
 mitk::MousePressEvent::~MousePressEvent()
@@ -29,7 +33,27 @@ mitk::MousePressEvent::~MousePressEvent()
 
 }
 
-bool mitk::MousePressEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent) {
-  return (interactionEvent==interactionEvent);
+bool mitk::MousePressEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
+{
+  mitk::MousePressEvent* mpe = dynamic_cast< mitk::MousePressEvent* >(interactionEvent.GetPointer());
+  if (mpe == NULL)
+  {
+    return false;
+  }
+
+  if (this->GetEventButton() != mpe->GetEventButton())
+  {
+    return false;
+  }
+  if (this->GetModifiers() != mpe->GetModifiers())
+  {
+    return false;
+  }
+  if (this->GetButtonStates() != mpe->GetButtonStates())
+  {
+    return false;
+  }
+  return true;
+
 }
 

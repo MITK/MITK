@@ -40,6 +40,9 @@ namespace mitk
     void SetEventInteractor(const DataNode* dataNode);
     void RemoveEventInteractor(const DataNode* dataNode);
 
+    size_t GetNumberOfInteractors(); // DEBUG TESTING
+
+
   protected:
     Dispatcher();
     virtual ~Dispatcher();

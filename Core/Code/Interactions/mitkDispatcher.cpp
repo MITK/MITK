@@ -18,8 +18,6 @@
 
 mitk::Dispatcher::Dispatcher()
 {
-  // TODO Auto-generated constructor stub
-
 }
 
 /*
@@ -40,8 +38,8 @@ void mitk::Dispatcher::SetEventInteractor(const DataNode* dataNode)
     it++;
   }
   MITK_INFO << "SetEventInteractor called";
-  mitk::EventInteractor::Pointer eventInteractor = dynamic_cast<mitk::EventInteractor*>(dataNode->GetInteractor());
-  if (eventInteractor.IsNotNull())
+  mitk::EventInteractor::Pointer eventInteractor = <mitk::EventInteractor::Pointer>(dataNode->GetInteractor());
+  if (eventInteractor!=NULL)
   {
     m_Interactors.push_back(eventInteractor);
     MITK_INFO << "EventInteractor accepted";
@@ -62,6 +60,11 @@ void mitk::Dispatcher::RemoveEventInteractor(const DataNode* dataNode)
     }
     it++;
   }
+}
+
+size_t mitk::Dispatcher::GetNumberOfInteractors()
+{
+  return m_Interactors.size();
 }
 
 mitk::Dispatcher::~Dispatcher()

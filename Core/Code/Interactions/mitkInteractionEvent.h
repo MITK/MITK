@@ -32,10 +32,14 @@ namespace mitk
 
   public:
     void SetSender(BaseRenderer* sender);
-    BaseRenderer* GetSender();
+    const BaseRenderer* GetSender();
 
+    /**
+     * Implementation of equality for each event class
+     */
     virtual bool isEqual(InteractionEvent::Pointer) =0;
-    std::string GetEventClass ();
+    const std::string* GetEventClass ();
+
 
   protected:
     InteractionEvent(BaseRenderer*, std::string);

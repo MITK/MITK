@@ -30,6 +30,10 @@ namespace mitk
   class MITK_CORE_EXPORT InteractionPositionEvent : public InteractionEvent {
 
   public:
+    const Point2D* GetMousePosition();
+    const Point3D* GetWorldPosition();
+    unsigned int GetModifiers();
+    unsigned int GetButtonStates();
 
   protected:
     InteractionPositionEvent(BaseRenderer*, Point2D, unsigned int, unsigned int, std::string);

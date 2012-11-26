@@ -38,7 +38,7 @@ void mitk::Dispatcher::SetEventInteractor(const DataNode* dataNode)
     it++;
   }
   MITK_INFO << "SetEventInteractor called";
-  mitk::EventInteractor::Pointer eventInteractor = <mitk::EventInteractor::Pointer>(dataNode->GetInteractor());
+  mitk::EventInteractor* eventInteractor = dynamic_cast<mitk::EventInteractor*>(dataNode->GetInteractor());
   if (eventInteractor!=NULL)
   {
     m_Interactors.push_back(eventInteractor);

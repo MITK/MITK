@@ -65,6 +65,9 @@ public:
     QmitkToFUtilView();
     ~QmitkToFUtilView();
 
+    //TODO bitte loeschen, wenn besserer weg gefunden
+    void HackForPlayer();
+
     virtual void CreateQtPartControl(QWidget *parent);
     /// \brief Called when the functionality is activated.
     virtual void Activated();

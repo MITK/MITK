@@ -35,11 +35,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 {
-
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
   public:
+
 
     static const std::string VIEW_ID;
 
@@ -55,7 +55,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     \brief returns the ToFImageGrabber which was configured after selecting a camera / player
     \return ToFImageGrabber currently used by the widget
     */
-    mitk::ToFImageGrabber* GetToFImageGrabber();
+    mitk::ToFImageGrabber::Pointer GetToFImageGrabber();
 
   signals:
 
@@ -69,7 +69,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
      */
     void ToFCameraDisconnected();
     /*!
-    \brief signal that is emitted when a ToF camera is selected in the combo box
+    \brief signal that is emitted when a ToF camera is selected
     */
     void ToFCameraSelected(const QString selectedText);
 
@@ -88,11 +88,11 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     /*!
     \brief slot updating the GUI elements after the selection of the camera combo box has changed
     */
-    void OnSelectCamera(const QString selectedCamera);
+    void OnSelectCamera();
 
   protected:
 
-    Ui::QmitkToFConnectionWidgetControls* m_Controls; ///< member holding the UI elements of this widget
+    Ui::QmitkToFConnectionWidgetControls2* m_Controls; ///< member holding the UI elements of this widget
 
     mitk::ToFImageGrabber::Pointer m_ToFImageGrabber; ///< member holding the current ToFImageGrabber
 
@@ -101,7 +101,6 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 
   private:
 
-    void ShowParameterWidget();
     void HideAllParameterWidgets();
 };
 

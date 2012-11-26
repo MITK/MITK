@@ -83,22 +83,39 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
         m_Controls->m_VarianceBox->setVisible(false);
         m_Controls->m_GeometryMessage->setVisible(false);
+        m_Controls->m_T2bluringParamFrame->setVisible(false);
+        m_Controls->m_KspaceParamFrame->setVisible(false);
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
         connect((QObject*) m_Controls->m_CircleButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnDrawROI()));
         connect((QObject*) m_Controls->m_FlipButton, SIGNAL(clicked()), (QObject*) this, SLOT(OnFlipButton()));
-
         connect((QObject*) m_Controls->m_VarianceBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnVarianceChanged(double)));
         connect((QObject*) m_Controls->m_DistributionBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnDistributionChanged(int)));
-
         connect((QObject*) m_Controls->m_FiberDensityBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberDensityChanged(int)));
         connect((QObject*) m_Controls->m_FiberSamplingBox, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(OnFiberSamplingChanged(int)));
         connect((QObject*) m_Controls->m_TensionBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnTensionChanged(double)));
         connect((QObject*) m_Controls->m_ContinuityBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnContinuityChanged(double)));
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
-        connect((QObject*) m_Controls->m_JoinBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(JoinBundles()));
+        connect((QObject*) m_Controls->m_AddT2Smearing, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddT2Smearing(int)));
+        connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGibbsRinging(int)));
     }
+}
+
+void QmitkFiberfoxView::OnAddT2Smearing(int value)
+{
+    if (value>0)
+        m_Controls->m_T2bluringParamFrame->setVisible(true);
+    else
+        m_Controls->m_T2bluringParamFrame->setVisible(false);
+}
+
+void QmitkFiberfoxView::OnAddGibbsRinging(int value)
+{
+    if (value>0)
+        m_Controls->m_KspaceParamFrame->setVisible(true);
+    else
+        m_Controls->m_KspaceParamFrame->setVisible(false);
 }
 
 void QmitkFiberfoxView::OnDistributionChanged(int value)
@@ -457,7 +474,7 @@ void QmitkFiberfoxView::GenerateImage()
     mitk::GibbsRingingArtifact<double> gibbsModel;
     if (m_Controls->m_AddGibbsRinging->isChecked())
     {
-        gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceCroppingBox->value());
+        gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceUndersamplingBox->currentText().toInt());
         artifactList.push_back(&gibbsModel);
     }
 
@@ -545,14 +562,26 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_FlipButton->setEnabled(false);
 
     if (m_SelectedImage.IsNotNull())
+    {
         m_Controls->m_CircleButton->setEnabled(true);
+        m_Controls->m_FiberGenMessage->setVisible(false);
+    }
     else
+    {
         m_Controls->m_CircleButton->setEnabled(false);
+        m_Controls->m_FiberGenMessage->setVisible(true);
+    }
 
     if (m_SelectedBundle.IsNotNull())
+    {
         m_Controls->m_GenerateFibersButton->setEnabled(true);
+        m_Controls->m_FiberBundleLabel->setText(m_SelectedBundle->GetName().c_str());
+    }
     else
+    {
         m_Controls->m_GenerateFibersButton->setEnabled(false);
+        m_Controls->m_FiberBundleLabel->setText("<font color='red'>mandatory</font>");
+    }
 
     if (m_SelectedBundles.size()>1)
         m_Controls->m_JoinBundlesButton->setEnabled(true);
@@ -567,7 +596,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedBundles.clear();
     m_SelectedBundle = NULL;
     m_SelectedImage = NULL;
-    m_Controls->m_TissueMaskLabel->setText("-");
+    m_Controls->m_TissueMaskLabel->setText("<font color='grey'>optional</font>");
     m_Controls->m_GeometryMessage->setVisible(false);
     m_Controls->m_GeometryFrame->setEnabled(true);
 

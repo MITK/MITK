@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -605,7 +605,7 @@
           <item row="2" column="0">
            <widget class="QCheckBox" name="m_AddT2Smearing">
             <property name="text">
-             <string>Add T2 smearing</string>
+             <string>Add T2 Blurring</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -1403,6 +1403,8 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>m_RealTimeFibers</tabstop>
   <tabstop>m_CircleButton</tabstop>
   <tabstop>m_FlipButton</tabstop>
   <tabstop>m_FiberDensityBox</tabstop>
@@ -1412,16 +1414,29 @@
   <tabstop>m_BiasBox</tabstop>
   <tabstop>m_DistributionBox</tabstop>
   <tabstop>m_VarianceBox</tabstop>
-  <tabstop>m_TensorsToDWIBValueEdit</tabstop>
-  <tabstop>m_MaxFaBox</tabstop>
+  <tabstop>m_GenerateFibersButton</tabstop>
+  <tabstop>m_JoinBundlesButton</tabstop>
+  <tabstop>m_ImageName</tabstop>
+  <tabstop>m_GenerateImageButton</tabstop>
+  <tabstop>m_KspaceImageBox</tabstop>
   <tabstop>m_SizeX</tabstop>
   <tabstop>m_SizeY</tabstop>
   <tabstop>m_SizeZ</tabstop>
   <tabstop>m_SpacingX</tabstop>
   <tabstop>m_SpacingY</tabstop>
   <tabstop>m_SpacingZ</tabstop>
+  <tabstop>m_NumGradientsBox</tabstop>
+  <tabstop>m_TensorsToDWIBValueEdit</tabstop>
+  <tabstop>m_MaxFaBox</tabstop>
+  <tabstop>m_FiberS0Box</tabstop>
+  <tabstop>m_NonFiberS0Box</tabstop>
+  <tabstop>m_VolumeAccuracyBox</tabstop>
+  <tabstop>m_NoiseLevel</tabstop>
   <tabstop>m_AddT2Smearing</tabstop>
+  <tabstop>m_FiberRelaxationT2Box</tabstop>
+  <tabstop>m_NonFiberRelaxationT2Box</tabstop>
   <tabstop>m_AddGibbsRinging</tabstop>
+  <tabstop>m_KspaceUndersamplingBox</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>

@@ -259,10 +259,6 @@ void TractsToDWIImageFilter::GenerateData()
         minSpacing = m_Spacing[2];
 
     FiberBundleType fiberBundle = m_FiberBundle;
-//    int sampling = ceil(10.0*2.0/minSpacing);
-//    if (sampling>fiberBundle->GetFiberSampling())
-//        fiberBundle->DoFiberSmoothing(sampling);
-
     if (m_FiberBundle->GetFiberSampling()<=0 || 10/m_FiberBundle->GetFiberSampling()>minSpacing*0.5/m_VolumeAccuracy)
     {
         fiberBundle = m_FiberBundle->GetDeepCopy();
@@ -477,7 +473,8 @@ void TractsToDWIImageFilter::GenerateData()
         }
     }
 
-    double maxValue = 1;
+    double maxValue = 0;
+    double usedS = 1;
     if (!m_KspaceArtifacts.empty() || m_OuputKspaceImage)
     {
         if (!m_KspaceArtifacts.empty())
@@ -490,15 +487,26 @@ void TractsToDWIImageFilter::GenerateData()
         {
             DoubleDwiType::Pointer doubleDwi = compartments.at(i);
             ImageRegionIterator<DoubleDwiType> it(doubleDwi, doubleDwi->GetLargestPossibleRegion());
+            double s = 1;
+            if (i<m_FiberModels.size())
+                s = m_FiberModels.at(i)->GetSignalScale();
+            else
+                s = m_NonFiberModels.at(i-m_FiberModels.size())->GetSignalScale();
             while(!it.IsAtEnd())
             {
                 DoubleDwiType::PixelType pix = it.Get();
-                if (fabs(pix[0])>maxValue)
-                    maxValue = fabs(pix[0]);
+                if (pix[0]*s>maxValue)
+                {
+                    maxValue = pix[0]*s;
+                    usedS = s;
+                }
                 ++it;
             }
         }
     }
+    else
+        maxValue = 1;
+    maxValue /= usedS;
 
     MITK_INFO << "Summing compartments and adding noise";
     ImageRegionIterator<DWIImageType> it4 (outImage, m_ImageRegion);

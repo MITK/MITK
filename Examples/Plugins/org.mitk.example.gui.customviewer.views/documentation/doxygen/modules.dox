@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_example_gui_customviewer_views org.mitk.example.gui.customviewer.views
+  \ingroup MITKExamplePlugins
+
+  \brief Contributes BlueBerry Views for the code example \ref BlueBerryExampleCustomViewer.
+
+*/
+
+/**
+  \defgroup org_mitk_example_gui_customviewer_views_internal Internal
+  \ingroup org_mitk_example_gui_customviewer_views
+
+  \brief This subcategory includes the internal classes of the org.mitk.example.gui.customviewer.views plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

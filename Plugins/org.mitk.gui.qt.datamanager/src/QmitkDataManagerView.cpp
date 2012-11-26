@@ -807,6 +807,9 @@ void QmitkDataManagerView::GlobalReinit( bool )
   if (renderWindow == NULL)
     renderWindow = this->OpenRenderWindowPart(false);
 
+  // no render window available
+  if (renderWindow == NULL) return;
+
   // get all nodes that have not set "includeInBoundingBox" to false
   mitk::NodePredicateNot::Pointer pred
     = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"

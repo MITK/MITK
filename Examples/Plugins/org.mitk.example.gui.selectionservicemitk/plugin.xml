@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension point="org.blueberry.osgi.applications">
+    <application id="org.mitk.example.selectionservicemitk">
+      <run class="SelectionServiceMitk"/>
+    </application>
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective
+      id="org.mitk.example.extendedperspective"
+      name="Extended Perspective"
+      icon="resources/perspectiveIcon1.png"
+      class="ExtendedPerspective">
+    </perspective>
+  </extension>
+
+</plugin>

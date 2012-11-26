@@ -27,10 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*!
   \brief QmitkMeshDecimationView
 
-  \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
+  \sa QmitkAbstractView
+  \ingroup org_mitk_gui_qt_meshdecimation_internal
 */
 class QmitkMeshDecimationView : public QmitkAbstractView
 {

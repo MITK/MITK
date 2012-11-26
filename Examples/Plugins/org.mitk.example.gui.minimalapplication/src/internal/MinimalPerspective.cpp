@@ -16,10 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MinimalPerspective.h"
 
+// Berry
+#include "berryIViewLayout.h"
+
 MinimalPerspective::MinimalPerspective()
 {
 }
 
-void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/)
+void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
+  // Hides the editor area.
+  layout->SetEditorAreaVisible(false);
 }

@@ -1,0 +1,314 @@
+/**
+
+\page BlueBerryExampleCustomViewer A highly customized viewer
+
+This documentation is structured as follows:
+
+-# \subpage Introduction
+-# \subpage ViewerPluginCreation
+-# \subpage MainWindowLayout
+-# \subpage AddFunctionality
+-# \subpage GUICustomization
+
+\page Introduction Introduction
+
+The Custom Viewer Example is a BlueBerry example plugin, developed to demonstrate customization capabilities provided by the BlueBerry application framework. The example plugin implements a GUI customized viewer application. The developed viewer incorporates simple viewer functionality embedded in a customized graphical user interface.
+
+Spoken in BlueBerry terms, the following features are provided:
+
+<UL>
+<LI> Hidden Menu-, Tool- and Statusbars </LI>
+<LI> Hidden Editor Area </LI>
+<LI> Fixed perspectives </LI>
+<LI> Customized main window contents </LI>
+<LI> Customized perspectives bar based on QTabBar </LI>
+<LI> GUI Customization using Qt-Stylesheets </LI>
+</UL>
+
+The custom viewer itself consists of two perspectives, i.e. a viewer perspective and a DICOM perspective. As part of the viewer perspective, an instance of QmitkDataManagerView allows for data selection. Visualization of the selected data is then provided by a simple render window view. According data can either be directly loaded from file or be imported as DICOM data. DICOM import functionality is accessible from the DICOM perspective incorporating the QmitkDicomExternalDataWidget. The GUI-appearance is customized using Qt-Stylesheets in order to give the application a non-native look and feel. This is further emphasized by a Tab-Widget-like presentation of the perspectives using a modified perspective bar based on a QTabBar. In addition to an absence of menu-, tool- and status-bars, simplicity is accentuated by a proper view and perspective design, i.e. the editor area being invisible and views being fixated. The following images depict the viewer- and DICOM-perspectives of the custom viewer.
+
+\image html ViewerPerspective.png "Viewer perspective of the Custom Viewer."
+
+\image html DicomPerspective.png "Dicom perspective of the Custom Viewer."
+
+Go to the previous page \ref BlueBerryExampleCustomViewer. Or proceed to the next page \ref ViewerPluginCreation.
+
+\page ViewerPluginCreation Creating the CustomViewer plugin
+
+As we want to develop our Custom Viewer as part of BlueBerry to demonstrate the customization capabilities of the application framework, we have to integrate the components of our example application as BlueBerry plugins in order to make the application framework's functionalities available to our application. For example plugin startup with BlueBerry, a convenience application called BlueBerryExampleLauncher is already provided in the Examples/BlueBerryExampleLauncher directory of MITK. This application acts as a BlueBerry loading mechanism for any example application provided.
+
+To make an example application startable by the BlueBerry example launcher, we have to provide a folder inside Examples/Plugins containing all files making up the application plugin itself. Additionally, we have to add entries to the PluginList.cmake in the Examples/Plugins directory for plugin registration and create a new file in the Examples/BlueBerryExampleLauncher/Configurations folder containing the plugin itself as well as any further required plugin.
+
+The resulting plugin folder for our custom viewer application consists of several subfolders and files:
+
+\image html CustomViewerDirectory.png "The directory structure for the CustomViewer plugin."
+
+We can see a documentation and resources folder, a source folder containing all source files, some cmake-related files and a plugin.xml file for the BlueBerry related plugin extension and extension-point declarations.
+
+Next, we add some source code to our plugin folder. First, we need a class for our CustomViewer application itself which we derive from the berry:IApplication application class:
+
+\dontinclude CustomViewer.h
+\skip class CustomViewer : public QObject
+\until void Stop();
+
+In short, this class acts as an entry point for the BlueBerry application runtime. It defines what the application does when it is started (Start()-Method) and before it is ended (Stop()-Method). Our Start()-Method creates a BlueBerry display for GUI-rendering and a WorkbenchAdvisor for workbench control. Then the BlueBerry workbench is created and run given the created display and WorkbenchAdvisor:
+
+\snippet MinimalApplicationSnippet.cpp MinimalApplicationClass_StartMethod
+
+The Stop()-method does not need to be further defined. In addition, a default perspective identifier is given to define an initial perspective to be shown by the WorkbenchWindow.
+
+Later, we well need a proper WorkbenchAdvisor class derived from berry::WorkbenchAdvisor. In it, we will create a WorkbenchWindowAdvisor, which on his part is used to control the WorkbenchWindow's GUI creation. For now, we simply use the berry::WorkbenchWindowAdvisor, which creates the GUI in a default way. As the development of our custom viewer advances, we will want to take part in the GUI creation ourselves, so we will need to customize our own WorkbenchWindowAdvisor accordingly.
+
+Now we create a class named ViewerPerspective which is derived from berry::IPerspectiveFactory:
+
+\snippet ViewerPerspective.h ViewerPerspectiveClassDeclaration
+
+It acts as an initial perspective to be displayed as part of our bulk application plugin. For now, the perspective will remain empty and can, alongside the definition of further perspectives, be provided with views later by overwriting the CreateInitialLayout()-Method.
+
+Finally, we need a ctkPluginActivator derived class which is used to customize the starting and stopping of our plugin:
+
+\snippet org_mitk_example_gui_customviewer_Activator.h PluginActivatorHeader
+
+During plugin-start, we register our plugin classes given the ctkPluginContext by overwriting the start()-Method.
+
+\dontinclude org_mitk_example_gui_customviewer_Activator.cpp
+\skip ::start
+\until ViewerPerspective
+\skip PluginContext
+\until }
+
+In order to connect our application and its perspectives to the BlueBerry components we have to declare the according extension-point-contributions inside the plugin.xml file. As can be seen in the image below, our application and its perspectives contribute to the org.blueberry.osgi.applications and org.blueberry.ui.perspectives extension points respectively.
+
+\image html plugin_xml_0.png "Extension point contributions of our initial custom viewer application"
+
+When we start the BlueBerryExampleLauncher (either directly or via the provided batch files), we can now choose our bulk application (among others present), and a window is presented showing our empty initial perspective.
+
+\image html MinimalApplicationWindow.png "Our first application window showing one single perspective"
+
+Go to the previous page \ref Introduction. Or proceed to the next page \ref MainWindowLayout.
+
+\page MainWindowLayout Main Window Layout: ViewerPerspective and DicomPerspective
+
+Now that we have created a bulk plugin for our custom viewer, we intend to customize the way how the main window of our Blueberry application is laid out. We want:
+<UL>
+<LI> No visible menu-, tool- and status-bars </LI>
+<LI> Two perspectives: a viewer perspective and a DICOM perspective </LI>
+<LI> A tab-bar like perspective bar that allows for perspective switching </LI>
+<LI> An open file button for perspective-independent file opening </LI>
+</UL>
+
+Customizing the main window contents requires creating a custom WorkbenchWindowAdvisor derived from berry::WorkbenchWindowAdvisor hence this class controls the WorkbenchWindow layout:
+
+\snippet CustomViewerWorkbenchWindowAdvisor.h CustomViewerWorkbenchWindowAdvisorClassDeclaration
+
+As we mentioned in \ref ViewerPluginCreation, it is the WorkbenchAdvisor class that creates the WorkbenchWindowAdvisor. Hence, we now create our own version of a WorkbenchAdvisor:
+
+\snippet CustomViewerWorkbenchAdvisor.h WorkbenchAdvisorDecl
+
+Here, we overwrite the CreateWorkbenchWindowAdvisor()-method:
+
+\snippet CustomViewerWorkbenchAdvisor.cpp WorkbenchAdvisorCreateWindowAdvisor
+
+First, to prevent the WorkbenchWindow from rendering any menu-, tool- and status-bars, we overwrite the PreWindowOpen()-Method of the WorkbenchWindowAdvisor and access the WorkbenchWindowConfigurer helper class instance. Additionally, we set an appropriate title for our application window:
+
+\snippet CustomViewerWorkbenchWindowAdvisor.cpp CustomViewerWorkbenchWindowAdvisorPreWindowOpen
+
+Then we forge bulk versions of our viewer and dicom perspectives. We already created a bulk version of the viewer perspective earlier (see \ref ViewerPluginCreation). Accordingly, we create our DicomPerspective by defining the perspective class, contributing to the perspectives-extension point, registering the perspective in the plugin activator and adding to the cmake files.
+
+For the tab-bar like perspective bar we define a QtPerspectiveSwitcherTabBar derived from QTabBar:
+
+\snippet QtPerspectiveSwitcherTabBar.h PerspectiveSwitcherDeclaration
+
+The perspective switching functionality is implemented by a SwitchPerspective function, a signal-slot-connection that reacts on tab changes and a perspective listener that on perspective activation consistently switches to the according tab. Within the SwitchPerspective function, we show the perspective according to the current index indicating the currently active tab:
+
+\snippet QtPerspectiveSwitcherTabBar.cpp PerspectiveSwitcherSwitchPerspective
+
+Here, we have to ignore the first tab change event that can be fired during tab bar configuration. At that time, the perspective layout generally is not yet finished, which subsequently leads to an error. The SwitchPerspective slot is being connected to the tab-change-event during construction. The perspective listener is implemented as a helper friend struct derived from berry::IPerspectiveListener:
+
+\snippet QtPerspectiveSwitcherTabBar.cpp SwitchPerspectiveListener
+
+In the PerspectiveActivated-Method, we activate the tab according to the activated perspective's ID:
+
+\snippet QtPerspectiveSwitcherTabBar.cpp SwitchPerspectiveListenerPerspectiveActivated
+
+Now, our tab-bar like perspective bar is ready for use in the customized window layout.
+
+The open file functionality will later be implemented as an OpenFile-slot to the WorkbenchWindowAdvisor. Refer to \ref AddFunctionality for details. As such, it can be connected to a perspective-independent push button that will be part of to the application's window contents, together with an instance of the QtPerspectiveSwitcherTabBar.
+
+The customization of the window contents takes place within the CreateWindowContents method. That means, we can overwrite the superclass' CreateWindowContents method and lay out every widget of the main window individually. Given the method's berry::Shell parameter, we can extract the application's main window as QMainWindow using the berry::Shell::GetControl()-method:
+
+\snippet CustomViewerWorkbenchWindowAdvisor.cpp WorkbenchWindowAdvisorCreateWindowContentsHead
+
+Usually, as in the superclass' CreateWindowContents method, the shell ist given to the WindowConfigurer where the Page Composite, i.e. the part holding the perspective's view contents, is added as a single QControlWidget to an HBoxLayout.
+
+For our purposes, we want to place the QtPerspectiveSwitcherTabBar and the View-Button alongside the Page Composite. We can achieve that by creating the Page Composite within the CreateWindowContents method, lay it out in the MainWindow together with the other widgets, and give it to the WorkbenchWindowConfigurer for the view control layout process, which will then take place wrapped within our own PageComposite widget:
+
+\dontinclude CustomViewerWorkbenchWindowAdvisor.cpp
+\skip mainWindow->setCentralWidget(CentralWidget);
+\until PerspectivesLayer->addWidget(OpenFileButton);
+\skip for correct initial layout
+\until this->GetWindowConfigurer
+
+The OpenFile-Button and the QtPerspectiveSwitcherTabBar will be laid out together in a HBoxLayout called PerspectivesLayer. The PerspectivesLayer will be vertically arranged with the PageComposite widget in a VBoxLayout called CentralWidgetLayout. This CentralWidgetLayout will be assigned a QWidget being set the CentralWidget of our MainWindow. Caveat: we need to call the activate- and update-Methods of our CentralWidgetLayout; otherweise the widgets will not be laid out properly. See Bug-1654 for further details. See our bulk custom viewer application depicted below.
+
+\image html BulkApplicationWindow.png "Our bulk application showing two empty perspectives managed with a tab-bar based perspectives bar"
+
+Go to the previous page \ref ViewerPluginCreation. Or proceed to the next page \ref AddFunctionality.
+
+\page AddFunctionality Adding functionality: Data Manager, Render Window, File Opening and DICOM Import
+
+Up to now, we have developed a bulk custom viewer application, i.e. a runnable BlueBerry application showing an open file button and two perspectives switched by a custom tab-bar like perspectives bar. Now, we will add the desired functionality for our custom viewer. We want to integrate:
+
+<UL>
+<LI> A Data Manager, managing Data Nodes related to loaded or DICOM-imported images </LI>
+<LI> A Render Window to visualize the Data Nodes </LI>
+<LI> File Opening functionality connected to the Open-File-Button </LI>
+<LI> DICOM Import functionality </LI>
+</UL>
+
+Except for the File Opening functionality, which is already GUI-represented, we need to integrate proper views to our perspectives in order to make the according functionality accessible. Concerning the design of our example application, two options appear straight-forward:
+
+<OL>
+<LI> Integrate the view-class source-code to the main-application-plugin (the custom viewer plugin) </LI>
+<LI> Create a proper plugin for the views </LI>
+</OL>
+
+Taking into account the plugin dependencies, it can be revealed that the first solution is not an option. Without going into detail, that solution would result in a cyclic dependency scenario, so an adequate plugin activation order would not be achievable at runtime. So we will create a proper plugin for the views we intend to use. This is straightforward as shown in \ref ViewerPluginCreation.
+
+For Data Manager functionality we will make use of the QmitkDataManagerView which - being a berry::IVewPart - can externally be integrated to our viewer perspective. The only thing we have to do is add the QMitkDataManagerView to the viewer perspective's CreateInitialLayout()-method:
+
+\dontinclude ViewerPerspective.cpp
+\skip ::CreateInitialLayout
+\until org.mitk.views.datamanager
+
+For the rendering functionality we have to create a proper view class. We derive that view class called SimpleRenderWindowView from QmitkAbstractView (for direct DataStorage access) and from mitk::IRenderWindowPart:
+
+\snippet SimpleRenderWindowView.h SimpleRenderWindowViewDeclaration
+
+Concrete implementations can for example be adapted from QmitkAbstractRenderEditor. The AbstractRenderWindowViewPrivate helper class is modified with regard to the views-Plugin-Activator:
+
+\snippet SimpleRenderWindowView.cpp SimpleRenderWindowViewHelper
+
+In CreateQtPartControl() we can now lay out the view controls. For that, we create a QmitkRenderWindow whose Renderer is subsequently be given the DataStorage:
+
+\snippet SimpleRenderWindowView.cpp SimpleRenderWindowViewCreatePartControl
+
+Finally we add the SimpleRenderWindowView in ViewerPerspective::CreateInitialLayout():
+
+\snippet ViewerPerspective.cpp AddView1
+
+For the DICOM import functionality we derive the DicomView class from QmitkAbstractView:
+
+\snippet DicomView.h DicomViewDecl
+
+In CreateQtPartControl(), we add a QmitkDicomExternalDataWidget to our view controls (this time e.g. via ui-File):
+
+\snippet DicomView.cpp DicomViewCreatePartControl
+
+The QmitkDicomExternalDataWidget yields a tree view for DICOM data, as well as a signal for Dicom transfer to the data manager and a slot for DICOM import to the tree view. With the Dicom transfer signal a string containing information about the DICOM series currently selected in the tree view is piggybacked. We use this information in an AddDataNodeFromDICOM slot defined in the DicomView class following the example of the DicomEventHandler class:
+
+\snippet DicomView.cpp DicomViewCreateAddDataNodeInformation
+
+The file path and seriesUID information are used to load the selected DICOM series into a mitk::DataNode:
+
+\snippet DicomView.cpp DicomViewCreateAddDataNodeLoadSeries
+
+which can then be added to the DataStorage:
+
+\snippet DicomView.cpp DicomViewCreateAddDataNode
+
+After that, we activate the viewer perspective to examine the data in the rendering window view.
+
+\snippet DicomView.cpp DicomViewCreateAddDataNodeActivatePersp
+
+Having a look back to the QmitkDicomExternalDataWidget, while there is already a view button present that triggers Dicom transfer signal emission, we still have to bind DICOM import functionality to a proper import button. We will do this once again in the CreateQtPartControl method (refer to the above snippet). After setting up the view controls containing the QmitkDicomExternalDataWidget and an import button, we render the unused widgets invisible. After connecting the Dicom transfer signal to the AddDataNodeFromDICOM slot and our import button to the DICOM import slot of the QmitkDicomExternalDataWidget, the DicomView is ready for use. Finally, the DicomView is added inside the DicomPerspective::CreateInitialLayout() method:
+
+\snippet DicomPerspective.cpp DicomPerspCreateLayout
+
+The following images show the Dicom import functionality.
+
+\image html dicomImportFiles.png "The DICOM file import dialog"
+\image html dataTree.png "Imported DICOM data shown in the tree view"
+\image html DICOMimported.png "Imported DICOM data presented in the render window view"
+
+Now we implement the file open slot already defined earlier (see \ref MainWindowLayout). While it appears that we could simply assign a QmitkFileOpenAction to a QToolButton, this is not possible due to the fact, that by default, the WorkbenchUtil::LoadFiles() method invoked by the QmitkFileOpenAction awaits an editor to be present in the current application. To prevent the method from throwing an exception, we made a workaround by giving the LoadFiles() method an additional parameter that determines whether an editor is to be opened or not:
+
+\snippet mitkWorkbenchUtil.cpp UtilLoadFiles
+
+Hence, we have to invoke that method manually, e.g. inside an OpenFile-slot implemented inside the WorkbenchWindowAdvisor:
+
+\snippet CustomViewerWorkbenchWindowAdvisor.cpp WorkbenchWindowAdvisorOpenFile
+
+In it, a dialog is opened that asks for the user for a number of files to open. If any files are given, these are being loaded by the WorkbenchUtil::LoadFiles method. Finally, the viewer perspective is activated:
+
+\snippet CustomViewerWorkbenchWindowAdvisor.cpp WorkbenchWindowAdvisorOpenFilePerspActive
+
+Before we can examine the loaded data, we have to manually invoke a reinit on it. The render window concept in mitk is actually undergoing some work, where this inconvenience will also be adressed. The images below show the resulting file opening functionality.
+
+\image html OpenFileDialog.png "The open file dialog"
+\image html FileOpened.png "Opened file shown in the render window view"
+
+Go to the previous page \ref MainWindowLayout. Or proceed to the next page \ref GUICustomization.
+
+\page GUICustomization Customizing the Main Window using Qt-Stylesheets
+
+In a final step, we want to further customize the appearance of our mainWindow to give it an distinct non-native look and feel. We want to achieve this by pursuing the following aims:
+
+<UL>
+<LI> Change the background and widget colors </LI>
+<LI> Change the tab-widget and ToolButton style, also with respect to mouse-over-button (hovering) effects </LI>
+<LI> Completing the non-native tab-widget like impression of the perspectives by gluing tab-bar and perspective's PageComposite together </LI>
+<LI> DICOM Import functionality </LI>
+</UL>
+
+For GUI customization, we will modify the Qt-Stylesheets files already used by blueberry applications. Within the Qt-Stylesheet-Files, all widgets can globally and locally be adressed inside the main window for style changes. We have to adress the berry::IQtStyleManager to tell the BlueBerry workbench to use a specific Qt-Stylesheet. This is done inside the WorkbenchAdvisor in the CustomViewerWorkbenchAdvisor::Initialize() method:
+
+\snippet CustomViewerWorkbenchAdvisor.cpp WorkbenchAdvisorInit
+
+The style manager is taken from the application's plugin context via service reference. Invoking the berry::IQtStyleManager::AddStyle() and berry::IQtStyleManager::SetStyle() methods, the workbench will now use the announced qss-File to style our Workbench Window. In a production system, the stylesheets are usually compiled into the plug-in or application using the Qt resource system.
+However, during developement of the stylesheets it is often more convenient to reference them using a hard-coded path to the local file system (see live update functionality below).
+
+Before we start customization we will first provide some customization convenience. We add an UpdateStyle()-slot to our CustomViewerWorkbenchWindowAdvisor where we explicitly reset the css-File to the style manager:
+
+\snippet CustomViewerWorkbenchWindowAdvisor.cpp WorkbenchWindowAdvisorUpdateStyle
+
+By integrating an update style button to the Application's main window and connecting this button with the previously defined slot, we can now button-push-update the style on runtime. This will of course
+only work for stylesheets which are referenced from the local file system.
+
+\image html StyledMainWindow0.png "The unstyled Main Window"
+
+First we might want to change the background color style by setting the background color of the QWidget#CentralWidget to a linear gradient from light to dark blue:
+
+\snippet customstyleSnippet.qss CentralWidgetColor
+
+Then, we give the page composite control widget a slight grey border (except for the upper border where no border should be visible) and the same background color as the activated tab widget:
+
+\snippet customstyleSnippet.qss PageComposite
+
+The image below depicts the style changes.
+
+\image html StyledMainWindow2.png "Background-color changed Central and Composite Control Widgets"
+
+Concerning the tab-widget style, four states have to be customized: QtPerspectiveSwitcherTabBar::tab (the tab in general), QtPerspectiveSwitcherTabBar::tab:selected (when tab is selected), QtPerspectiveSwitcherTabBar::tab:selected:hover (when tab is selected and the mouse is hovering above), QtPerspectiveSwitcherTabBar::tab:!selected:hover (respectively).
+
+All tabs are given round corners using border-top-left- and border-top-right-radius definitions. Additionally, all tabs is provided a gap to its neighbor defining a positive margin right. Selected tabs appear bigger by defining a negative upper margin, and they have no lower frame in the unselected state so a tab-widget appearance is provided. Finally, they have a brighter background color also used by the QWidget#ClientComposite. Hovering tabs are colored yellow and have a visible lower border:
+
+\snippet customstyleSnippet.qss Tabs
+
+Finally, we customize the Push- and Tool-Buttons in a similar way:
+
+\snippet customstyleSnippet.qss Buttons
+
+The resulting style-customized main window is shown below (the style update button removed).
+
+\image html StyledMainWindow_final1.png "The final version of our Custom Viewer (viewer perspective)."
+\image html StyledMainWindow_final2.png "The final version of our Custom Viewer (DICOM perspective)."
+
+Proceed to the previous page \ref AddFunctionality.
+*/
+
+The custom viewer plugin implements simple viewer functionality presented in a customized look and feel. It was developed to demonstrate extensibility and customizability of the blueberry application framework.
+
+  As an example for the GUI customization capabilities provided by the BlueBerry application framework, the custom viewer plugin was developed. It features simple viewer functionality presented in a customized look and feel. The custom viewer consists of two perspectives, i.e. a viewer perspective and a DICOM perspective. As part of the viewer perspective, an instance of QmitkDataManagerView allows for data selection. Visualization of the selected data is then performed by a simple render window view. According data can either be directly loaded from file or be imported as DICOM data. DICOM import functionality is accessible from the DICOM perspective incorporating the QmitkDicomExternalDataWidget. The customization of Qt Stylesheets is used to give the application a non-native look and feel. This is further emphasized by a Tab-Widget-like unification of the perspectives with the according perspective bar. In addition to an absence of menu-, tool- and status-bars, simplicity is accentuated by a proper view and perspective design, i.e. the editor area being invisible and views being fixated.
+
+  TODO: //-for plugin folder creation, do we use the plugin generator?

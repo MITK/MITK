@@ -56,7 +56,7 @@ endif()
 
 if(MITK_USE_BLUEBERRY)
   list(APPEND _example_dirs
-    AppFramework
+    BlueBerryExampleLauncher
   )
 endif()
 

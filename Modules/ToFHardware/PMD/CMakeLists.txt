@@ -3,9 +3,20 @@ IF(MITK_ENABLE_TOF_HARDWARE)
 
 #Begin PMD Module
 OPTION(MITK_USE_TOF_PMDCAMCUBE "Enable support for Cam Cube camera" OFF)
-OPTION(MITK_USE_TOF_PMDCAMBOARD "Enable support for PMD camboard" OFF)
+
 IF(WIN32)
-OPTION(MITK_USE_TOF_PMDO3 "Enable support for PMD camboard" OFF)
+  IF(_PLATFORM_STRING MATCHES "W32")
+    OPTION(MITK_USE_TOF_PMDCAMBOARD "Enable support for PMD camboard" OFF)
+  ENDIF(_PLATFORM_STRING MATCHES "W32")
+
+ElSE(WIN32)
+    OPTION(MITK_USE_TOF_PMDCAMBOARD "Enable support for PMD camboard" OFF)
+ENDIF(WIN32)
+
+IF(WIN32)
+  IF(_PLATFORM_STRING MATCHES "W32")
+      OPTION(MITK_USE_TOF_PMDO3 "Enable support for PMD camboard" OFF)
+  ENDIF(_PLATFORM_STRING MATCHES "W32")
 ENDIF(WIN32)
 
 SET(MITK_USE_PMD OFF)
@@ -98,9 +109,6 @@ Message("PMDO3 is activated")
 
 
  #Generate the mitkToFPMDConfig.h file which is used internally
-
- Message("CamCube:" ${MITK_USE_TOF_PMDCAMCUBE})
- Message("CamBoard:" ${MITK_USE_TOF_PMDCAMBOARD})
 CONFIGURE_FILE(mitkToFPMDConfig.h.in ${PROJECT_BINARY_DIR}/mitkToFPMDConfig.h @ONLY)
 
 ENDIF(MITK_ENABLE_TOF_HARDWARE)

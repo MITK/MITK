@@ -55,7 +55,7 @@ macro(_fixup_target)
 
       set(_bundle_dest_dir \"${_bundle_dest_dir}\")
       if(_bundle_dest_dir)
-        set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/plugins\")
+        set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/\${_bundle_dest_dir}/plugins\")
       else()
         set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/bin/plugins\")
       endif()

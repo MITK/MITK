@@ -53,6 +53,7 @@ macro(_fixup_target)
         get_filename_component(_item_path \"\${full_path}\" PATH)
       endif()
 
+      set(_bundle_dest_dir \"${_bundle_dest_dir}\")
       if(_bundle_dest_dir)
         set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/plugins\")
       else()

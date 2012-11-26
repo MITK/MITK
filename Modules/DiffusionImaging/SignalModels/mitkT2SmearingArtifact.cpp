@@ -35,18 +35,11 @@ typename T2SmearingArtifact< ScalarType >::ComplexSliceType::Pointer T2SmearingA
         {
             typename ComplexSliceType::IndexType idx;
             idx[0]=x; idx[1]=y;
-            vcl_complex< double > pix = slice->GetPixel(idx);
+            std::complex< double > pix = slice->GetPixel(idx);
 
             double t = m_ReadoutPulseLength*(y+(double)x/region.GetSize(0));
-            pix.real(pix.real()*exp(-t/this->m_T2));
-            pix.imag(pix.imag()*exp(-t/this->m_T2));
-            slice->SetPixel(idx, pix);
-
-//            idx[0]=region.GetSize(0)-1-x; idx[1]=region.GetSize(1)-1-y;
-//            pix = slice->GetPixel(idx);
-//            pix.real(pix.real()*exp(-t/this->m_T2));
-//            pix.imag(pix.imag()*exp(-t/this->m_T2));
-//            slice->SetPixel(idx, pix);
+            std::complex< double > newPix(pix.real()*exp(-t/this->m_T2), pix.imag()*exp(-t/this->m_T2));
+            slice->SetPixel(idx, newPix);
         }
     return slice;
 }

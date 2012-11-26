@@ -238,6 +238,8 @@ namespace mitk {
     ///
     void GetVtkOpenGlMatrix(vtkMatrix4x4* matrix) const;
 
+    mitk::Point3D TransformPoint(mitk::Point3D point) const;
+
     ///
     /// create xml representation
     ///

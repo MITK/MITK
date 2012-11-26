@@ -20,11 +20,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleX.h>
 #include <mitkDiffusionSignalModel.h>
 #include <mitkDiffusionNoiseModel.h>
+#include <mitkKspaceArtifact.h>
+#include <mitkGibbsRingingArtifact.h>
+#include <mitkT2SmearingArtifact.h>
 
 // ITK
 #include <itkImage.h>
 #include <itkVectorImage.h>
 #include <itkImageSource.h>
+#include <itkFFTRealToComplexConjugateImageFilter.h>
+#include <itkFFTComplexConjugateToRealImageFilter.h>
 
 typedef itk::VectorImage< short, 3 > DWIImageType;
 
@@ -43,17 +48,23 @@ public:
     typedef SmartPointer< Self >        Pointer;
     typedef SmartPointer< const Self >  ConstPointer;
 
+    typedef itk::Image<float, 3>                            ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
     typedef mitk::FiberBundleX::Pointer                     FiberBundleType;
     typedef itk::VectorImage< double, 3 >                   DoubleDwiType;
-    typedef std::vector< DiffusionSignalModel<double>* >    DiffusionModelList;
+    typedef std::vector< mitk::KspaceArtifact<double>* >    KspaceArtifactList;
+    typedef std::vector< mitk::DiffusionSignalModel<double>* >    DiffusionModelList;
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
     typedef mitk::DiffusionNoiseModel<double>               NoiseModelType;
+    typedef itk::Image< double, 2 >                         SliceType;
+    typedef itk::FFTRealToComplexConjugateImageFilter< double, 2 >::OutputImageType ComplexSliceType;
 
     itkNewMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
+    itkSetMacro( VolumeAccuracy, unsigned int )         ///< determines fiber sampling density and thereby the accuracy of the fiber volume fraction
+    itkSetMacro( OuputKspaceImage, bool )               ///< output image of the k-space instead of the dwi (inverse fourier transformed k-space)
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
     itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
     itkSetMacro( Origin, mitk::Point3D )                ///< output image origin
@@ -63,6 +74,7 @@ public:
     void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }            ///< generates the noise added to the image values
     void SetFiberModels(DiffusionModelList modelList){ m_FiberModels = modelList; }         ///< generate signal of fiber compartments
     void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }   ///< generate signal of non-fiber compartments
+    void SetKspaceArtifacts(KspaceArtifactList artifactList){ m_KspaceArtifacts = artifactList; }
 
     void GenerateData();
 
@@ -75,6 +87,12 @@ protected:
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
 
+    /** Transform generated image compartment by compartment, channel by channel and slice by slice using FFT and add k-space artifacts. */
+    std::vector< DoubleDwiType::Pointer > AddKspaceArtifacts(std::vector< DoubleDwiType::Pointer >& images);
+
+    /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
+    TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
+
     mitk::Vector3D                      m_Spacing;              ///< output image spacing
     mitk::Point3D                       m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
@@ -83,7 +101,11 @@ protected:
     FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
+    KspaceArtifactList                  m_KspaceArtifacts;
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
+    bool                                m_OuputKspaceImage;
+    bool                                m_CircleDummy;
+    unsigned int                        m_VolumeAccuracy;
 };
 }
 

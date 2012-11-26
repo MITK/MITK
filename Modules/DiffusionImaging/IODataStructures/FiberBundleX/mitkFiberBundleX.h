@@ -93,6 +93,7 @@ namespace mitk {
     QStringList GetAvailableColorCodings();
     char* GetCurrentColorCoding();
     itkGetMacro( NumFibers, int)
+    itkGetMacro( FiberSampling, int)
     itkGetMacro( MinFiberLength, float )
     itkGetMacro( MaxFiberLength, float )
     itkGetMacro( MeanFiberLength, float )
@@ -135,12 +136,12 @@ namespace mitk {
     int   m_NumFibers;
 
     std::vector< float > m_FiberLengths;
-    float m_MinFiberLength;
-    float m_MaxFiberLength;
-    float m_MeanFiberLength;
-    float m_MedianFiberLength;
-    float m_LengthStDev;
-
+    float   m_MinFiberLength;
+    float   m_MaxFiberLength;
+    float   m_MeanFiberLength;
+    float   m_MedianFiberLength;
+    float   m_LengthStDev;
+    int     m_FiberSampling;
 
     std::vector<int> m_PointsRoi; // this global variable needs to be refactored
 

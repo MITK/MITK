@@ -51,6 +51,7 @@ using namespace std;
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_CurrentColorCoding(NULL)
     , m_NumFibers(0)
+    , m_FiberSampling(0)
 {
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != NULL)
@@ -1365,6 +1366,7 @@ void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm, double tension, doubl
     m_FiberPolyData->SetLines(vtkSmoothCells);
     UpdateColorCoding();
     UpdateFiberGeometry();
+    m_FiberSampling = pointsPerCm;
 }
 
 void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm)
@@ -1375,6 +1377,9 @@ void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm)
 // Resample fiber to get equidistant points
 void mitk::FiberBundleX::ResampleFibers(float pointDistance)
 {
+    if (pointDistance<=0.00001)
+        return;
+
     vtkSmartPointer<vtkPolyData> newPoly = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> newCellArray = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints>    newPoints = vtkSmartPointer<vtkPoints>::New();
@@ -1454,6 +1459,7 @@ void mitk::FiberBundleX::ResampleFibers(float pointDistance)
     m_FiberPolyData = newPoly;
     UpdateFiberGeometry();
     UpdateColorCoding();
+    m_FiberSampling = 10/pointDistance;
 }
 
 // reapply selected colorcoding in case polydata structure has changed

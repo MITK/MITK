@@ -78,6 +78,8 @@ protected slots:
     void OnBiasChanged(double value);
     void OnVarianceChanged(double value);
     void OnDistributionChanged(int value);
+    void OnAddT2Smearing(int value);
+    void OnAddGibbsRinging(int value);
 
 protected:
 

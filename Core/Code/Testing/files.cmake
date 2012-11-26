@@ -19,6 +19,7 @@ set(MODULE_TESTS
   #mitkImageToItkTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
+  mitkInteractionEventTest.cpp
   mitkITKThreadingTest.cpp
   # mitkLevelWindowManagerTest.cpp
   mitkLevelWindowTest.cpp

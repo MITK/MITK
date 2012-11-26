@@ -19,14 +19,17 @@
 #include "mitkInteractionConst.h"
 #include "mitkTestingMacros.h"
 
-
 int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
 {
+  /*
+   * Create different Events, fill them with data.
+   * And check if isEqual method is implemented properly.
+   */
+
+
   MITK_TEST_BEGIN("InteractionEvent")
 
-
-  vtkRenderWindow  * renWin = vtkRenderWindow::New();
-  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New( "ContourRenderer",renWin, mitk::RenderingManager::GetInstance() );
+  mitk::VtkPropRenderer::Pointer renderer = NULL;
 
   unsigned int buttonStates = mitk::BS_LeftButton || mitk::BS_RightButton;
   unsigned int eventButton = mitk::BS_LeftButton;
@@ -36,26 +39,20 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
   point[0] = 17;
   point[1] = 170;
 
-  mitk::MousePressEvent me1 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
-  mitk::MousePressEvent me2 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
+  mitk::MousePressEvent::Pointer me1 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
+  mitk::MousePressEvent::Pointer me2 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
   point[0] = 178;
   point[1] = 170;
-  mitk::MousePressEvent me3 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
+  mitk::MousePressEvent::Pointer me3 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
   modifiers = mitk::BS_ControlButton;
-  mitk::MousePressEvent me4 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
+  mitk::MousePressEvent::Pointer me4 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
 
-
-  //check Get...
   MITK_TEST_CONDITION_REQUIRED(
-      event->GetSender() == renderer ||
-      event->GetType() == 0 ||
-      event->GetButton() == 1 ||
-      event->GetButtonState() == 2 ||
-      event->GetKey() == 3
-      , "Checking Get methods of mitk::Event");
-
-  renWin->Delete();
-  delete event;
+      me1->isEqual(me2.GetPointer()) ||
+      me1->isEqual(me3.GetPointer())||
+      !(me1->isEqual(me3.GetPointer())) ||
+      !(me3->isEqual(me4.GetPointer()))
+      , "Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MousePressEvent");
 
   // always end with this!
   MITK_TEST_END()

@@ -30,11 +30,10 @@ namespace mitk
   class MITK_CORE_EXPORT InteractionPositionEvent : public InteractionEvent {
 
   public:
-    mitkClassMacro(InteractionPositionEvent,InteractionEvent);
-    mitkNewMacro5Param(Self, BaseRenderer*, Point2D, unsigned int, unsigned int, std::string);
 
   protected:
     InteractionPositionEvent(BaseRenderer*, Point2D, unsigned int, unsigned int, std::string);
+    virtual bool isEqual(InteractionEvent::Pointer) = 0;
     virtual ~InteractionPositionEvent();
 
   private:

@@ -29,7 +29,7 @@ mitk::MousePressEvent::~MousePressEvent()
 
 }
 
-bool mitk::MousePressEvent::isEqual(mitk::InteractionEvent* interactionEvent) {
+bool mitk::MousePressEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent) {
   return (interactionEvent==interactionEvent);
 }
 

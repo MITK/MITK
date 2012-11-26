@@ -31,12 +31,10 @@ namespace mitk
   class MITK_CORE_EXPORT InteractionEvent : public itk::Object {
 
   public:
-    mitkClassMacro(InteractionEvent, itk::Object);
-    mitkNewMacro2Param(Self,BaseRenderer*, std::string);
     void SetSender(BaseRenderer* sender);
     BaseRenderer* GetSender();
 
-    virtual bool isEqual(InteractionEvent*);
+    virtual bool isEqual(InteractionEvent::Pointer) =0;
     std::string GetEventClass ();
 
   protected:

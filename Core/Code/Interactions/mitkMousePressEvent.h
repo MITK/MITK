@@ -35,7 +35,7 @@ namespace mitk
     mitkClassMacro(MousePressEvent,InteractionPositionEvent);
     mitkNewMacro5Param(Self, BaseRenderer*, Point2D , unsigned int , unsigned int, unsigned int);
 
-    bool isEqual(InteractionEvent*);
+    virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:
     MousePressEvent(BaseRenderer*, Point2D, unsigned int buttonStates, unsigned int modifiers, unsigned int eventButton);

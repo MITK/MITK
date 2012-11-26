@@ -50,6 +50,5 @@ bool mitk::EventInteractor::operator <(const EventInteractor::Pointer eventInter
 
 mitk::EventInteractor::~EventInteractor()
 {
-  // TODO Auto-generated destructor stub
 }
 

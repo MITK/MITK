@@ -82,6 +82,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->setupUi( parent );
 
         m_Controls->m_VarianceBox->setVisible(false);
+        m_Controls->m_GeometryMessage->setVisible(false);
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
@@ -567,6 +568,8 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedBundle = NULL;
     m_SelectedImage = NULL;
     m_Controls->m_TissueMaskLabel->setText("-");
+    m_Controls->m_GeometryMessage->setVisible(false);
+    m_Controls->m_GeometryFrame->setEnabled(true);
 
     // iterate all selected objects, adjust warning visibility
     for( int i=0; i<nodes.size(); i++)
@@ -582,6 +585,8 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
             {
                 m_TissueMask = dynamic_cast<mitk::Image*>(node->GetData());
                 m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
+                m_Controls->m_GeometryMessage->setVisible(true);
+                m_Controls->m_GeometryFrame->setEnabled(false);
             }
             break;
         }

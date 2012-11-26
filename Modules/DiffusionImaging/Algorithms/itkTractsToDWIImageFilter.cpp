@@ -311,7 +311,7 @@ void TractsToDWIImageFilter::GenerateData()
         {
             DoubleDwiType::PixelType pix;
             pix.SetSize(m_FiberModels[0]->GetNumGradients());
-            pix.Fill(2);
+            pix.Fill(1);
 
             DoubleDwiType::Pointer doubleDwi = compartments.at(i);
             ImageRegion<3> region = doubleDwi->GetLargestPossibleRegion();
@@ -440,7 +440,7 @@ void TractsToDWIImageFilter::GenerateData()
 
         MITK_INFO << "Adjusting compartment signal intensities according to volume fraction";
         ImageRegionIterator<DoubleDwiType> it3(compartments.at(0), compartments.at(0)->GetLargestPossibleRegion());
-        boost::progress_display disp3(compartments.at(0)->GetLargestPossibleRegion().GetNumberOfPixels());
+        boost::progress_display disp3(m_ImageRegion.GetNumberOfPixels());
         while(!it3.IsAtEnd())
         {
             ++disp3;
@@ -475,9 +475,9 @@ void TractsToDWIImageFilter::GenerateData()
             }
             ++it3;
         }
-
     }
 
+    double maxValue = 1;
     if (!m_KspaceArtifacts.empty() || m_OuputKspaceImage)
     {
         if (!m_KspaceArtifacts.empty())
@@ -485,6 +485,19 @@ void TractsToDWIImageFilter::GenerateData()
         else
             MITK_INFO << "Generating k-space image";
         compartments = AddKspaceArtifacts(compartments);
+
+        for (int i=0; i<compartments.size(); i++)
+        {
+            DoubleDwiType::Pointer doubleDwi = compartments.at(i);
+            ImageRegionIterator<DoubleDwiType> it(doubleDwi, doubleDwi->GetLargestPossibleRegion());
+            while(!it.IsAtEnd())
+            {
+                DoubleDwiType::PixelType pix = it.Get();
+                if (fabs(pix[0])>maxValue)
+                    maxValue = fabs(pix[0]);
+                ++it;
+            }
+        }
     }
 
     MITK_INFO << "Summing compartments and adding noise";
@@ -502,7 +515,7 @@ void TractsToDWIImageFilter::GenerateData()
         {
             double s = 1;
             if (!m_OuputKspaceImage)
-                s = m_FiberModels.at(i)->GetSignalScale();
+                s = m_FiberModels.at(i)->GetSignalScale()/maxValue;
             signal += compartments.at(i)->GetPixel(index)*s;
         }
 
@@ -511,7 +524,7 @@ void TractsToDWIImageFilter::GenerateData()
         {
             double s = 1;
             if (!m_OuputKspaceImage)
-                s = m_NonFiberModels.at(i)->GetSignalScale();
+                s = m_NonFiberModels.at(i)->GetSignalScale()/maxValue;
             signal += compartments.at(m_FiberModels.size()+i)->GetPixel(index)*s;
         }
 

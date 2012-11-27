@@ -17,9 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __itkDiffusionMultiShellQballReconstructionImageFilter_cpp
 
 #include <itkDiffusionMultiShellQballReconstructionImageFilter.h>
-#include <mitkDiffusionFunctionCollection.h>
-#include <itkPointShell.h>
+
 #include <itkTimeProbe.h>
+#include <itkPointShell.h>
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace itk {
 
@@ -421,29 +422,31 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       if(m_Interpolation_Flag)
       {
-        int interp_SHOrder_shell1 = 6;
-        while( ((interp_SHOrder_shell1+1)*(interp_SHOrder_shell1+2)/2) > size_shell1 && interp_SHOrder_shell1 > L )
+        int interp_SHOrder_shell1 = 10;
+        while( ((interp_SHOrder_shell1+1)*(interp_SHOrder_shell1+2)/2) > size_shell1  )
           interp_SHOrder_shell1 -= 2 ;
 
         const int number_coeffs_shell1 = (int)(interp_SHOrder_shell1*interp_SHOrder_shell1 + interp_SHOrder_shell1 + 2.0)/2.0 + interp_SHOrder_shell1;
 
-        int interp_SHOrder_shell2 = 6;
-        while( ((interp_SHOrder_shell2+1)*(interp_SHOrder_shell2+2)/2) > size_shell2 && interp_SHOrder_shell2 > L )
+        int interp_SHOrder_shell2 = 10;
+        while( ((interp_SHOrder_shell2+1)*(interp_SHOrder_shell2+2)/2) > size_shell2  )
           interp_SHOrder_shell2 -= 2 ;
 
         const int number_coeffs_shell2 = (int)(interp_SHOrder_shell2*interp_SHOrder_shell2 + interp_SHOrder_shell2 + 2.0)/2.0 + interp_SHOrder_shell2;
 
-        int interp_SHOrder_shell3 = 6;
-        while( ((interp_SHOrder_shell3+1)*(interp_SHOrder_shell3+2)/2) > size_shell3 && interp_SHOrder_shell3 > L )
+        int interp_SHOrder_shell3 = 10;
+        while( ((interp_SHOrder_shell3+1)*(interp_SHOrder_shell3+2)/2) > size_shell3  )
           interp_SHOrder_shell3 -= 2 ;
 
         const int number_coeffs_shell3 = (int)(interp_SHOrder_shell3*interp_SHOrder_shell3 + interp_SHOrder_shell3 + 2.0)/2.0 + interp_SHOrder_shell3;
 
 
-        MITK_INFO << "Debug Information: Multishell Reconstruction filter - Interpolation";
-        MITK_INFO << "Shell 1 - SHOrder: " << interp_SHOrder_shell1 << " Number of Coeffs: " << number_coeffs_shell1;
-        MITK_INFO << "Shell 2 - SHOrder: " << interp_SHOrder_shell2 << " Number of Coeffs: " << number_coeffs_shell2;
-        MITK_INFO << "Shell 3 - SHOrder: " << interp_SHOrder_shell3 << " Number of Coeffs: " << number_coeffs_shell3;
+        MITK_INFO << "Debug Information: Multishell Reconstruction filter";
+        MITK_INFO << "Wanted SH-Level: " << L;
+        MITK_INFO << "Interpolation";
+        MITK_INFO << "Shell 1 - SHOrder: " << interp_SHOrder_shell1 << " Number Directions " << size_shell1 << " Number of Coeffs: " << number_coeffs_shell1;
+        MITK_INFO << "Shell 2 - SHOrder: " << interp_SHOrder_shell2 << " Number Directions " << size_shell2 << " Number of Coeffs: " << number_coeffs_shell2;
+        MITK_INFO << "Shell 3 - SHOrder: " << interp_SHOrder_shell3 << " Number Directions " << size_shell3 << " Number of Coeffs: " << number_coeffs_shell3;
 
         // Create direction container for all directions (no duplicates, different directions from all shells)
         IndiciesVector  all_directions_container = GetAllDirections();
@@ -451,8 +454,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         m_MaxDirections = all_directions_container.size();
 
         // create target SH-Basis
+        // initialize empty target matrix and set the wanted directions
         vnl_matrix<double> * Q = new vnl_matrix<double>(3, m_MaxDirections);
         ComputeSphericalFromCartesian(Q, all_directions_container);
+        // initialize a SH Basis, neede to interpolate from oldDirs -> newDirs
         m_TARGET_SH_shell1 = new vnl_matrix<double>(m_MaxDirections, number_coeffs_shell1);
         ComputeSphericalHarmonicsBasis(Q, m_TARGET_SH_shell1, interp_SHOrder_shell1);
         delete Q;
@@ -468,23 +473,28 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         m_TARGET_SH_shell3 = new vnl_matrix<double>(m_MaxDirections, number_coeffs_shell3);
         ComputeSphericalHarmonicsBasis(Q, m_TARGET_SH_shell3, interp_SHOrder_shell3);
         delete Q;
-
-
-
         // end creat target SH-Basis
+
+
+
 
         // create measured-SHBasis
         // Shell 1
         vnl_matrix<double> * tempSHBasis;
         vnl_matrix_inverse<double> * temp;
 
+        // initialize empty matrix and set the measured directions of shell1
         Q = new vnl_matrix<double>(3, shell1.size());
         ComputeSphericalFromCartesian(Q, shell1);
-
+        // initialize a SH Basis, need to get the coeffs from measuredShell
         tempSHBasis = new vnl_matrix<double>(shell1.size(), number_coeffs_shell1);
         ComputeSphericalHarmonicsBasis(Q, tempSHBasis, interp_SHOrder_shell1);
-        temp = new vnl_matrix_inverse<double>((*tempSHBasis));
+        // inversion of the SH=Basis
+        // c_s1 = B^-1 * shell1
+        // interp_Values = targetSHBasis * c_s1
 
+        // Values = m_TARGET_SH_shell1 * Interpolation_SHT1_inv * DataShell1;
+        temp = new vnl_matrix_inverse<double>((*tempSHBasis));
         m_Interpolation_SHT1_inv = new vnl_matrix<double>(temp->inverse());
 
         delete Q;

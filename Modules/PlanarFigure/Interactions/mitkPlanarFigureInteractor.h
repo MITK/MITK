@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -87,7 +87,7 @@ protected:
     *
     * if no n is set, then the number of points is unlimited*
     */
-  PlanarFigureInteractor(const char *type, 
+  PlanarFigureInteractor(const char *type,
     DataNode *dataNode, int n = -1);
 
   /**
@@ -95,13 +95,13 @@ protected:
     **/
   virtual ~PlanarFigureInteractor();
 
-  virtual bool ExecuteAction( Action *action, 
+  virtual bool ExecuteAction( Action *action,
     mitk::StateEvent const *stateEvent );
 
   /**
     \brief Used when clicking to determine if a point is too close to the previous point.
     */
-  bool IsMousePositionAcceptableAsNewControlPoint( const PositionEvent*, const PlanarFigure* );
+  bool IsMousePositionAcceptableAsNewControlPoint( mitk::StateEvent const *, const PlanarFigure* );
 
   bool TransformPositionEventToPoint2D( const StateEvent *stateEvent,
     Point2D &point2D,
@@ -140,7 +140,7 @@ protected:
     const DisplayGeometry *displayGeometry ) const;
 
   void LogPrintPlanarFigureQuantities( const PlanarFigure *planarFigure );
- 
+
 private:
 
   /** \brief to store the value of precision to pick a point */

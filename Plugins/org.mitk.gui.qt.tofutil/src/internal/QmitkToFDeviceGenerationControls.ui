@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkToFDeviceGenerationControls</class>
+ <widget class="QWidget" name="QmitkToFDeviceGenerationControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>466</width>
+    <height>452</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="m_DeviceFactoryLabel">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Available Device Factories</string>
+     </property>
+     <property name="margin">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkServiceListWidget" name="m_DeviceFactoryServiceListWidget" native="true">
+     <zorder>m_DeviceFactoryLabel</zorder>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="m_CreatedDevicesLabel">
+     <property name="text">
+      <string>Created Devices</string>
+     </property>
+     <property name="margin">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkServiceListWidget" name="m_ConnectedDeviceServiceListWidget" native="true">
+     <zorder>m_CreatedDevicesLabel</zorder>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="m_CreateDevice">
+     <property name="text">
+      <string>Create Device from selected Factory</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkServiceListWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkServiceListWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

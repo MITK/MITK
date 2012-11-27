@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiThreader.h"
 #include <itksys/SystemTools.hxx>
 
+
+
+
 namespace mitk
 {
   ToFCameraMITKPlayerDevice::ToFCameraMITKPlayerDevice() :
@@ -34,7 +37,7 @@ namespace mitk
     CleanUpDataBuffers();
   }
 
-  bool ToFCameraMITKPlayerDevice::ConnectCamera()
+  bool ToFCameraMITKPlayerDevice::OnConnectCamera()
   {
     bool ok = m_Controller->OpenCameraConnection();
     if (ok)

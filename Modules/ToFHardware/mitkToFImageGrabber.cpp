@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkToFImageGrabber.h"
-#include "mitkToFCameraPMDCamCubeDevice.h"
+//#include "mitkToFCameraPMDCamCubeDevice.h"
 
 #include "itkCommand.h"
 
@@ -134,7 +134,7 @@ namespace mitk
       this->m_SourceDataSize = m_ToFCameraDevice->GetSourceDataSize();
       this->AllocateImageArrays();
     }
-    return ok;
+    return true;
   }
 
   bool ToFImageGrabber::DisconnectCamera()

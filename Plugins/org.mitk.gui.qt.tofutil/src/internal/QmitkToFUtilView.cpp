@@ -28,6 +28,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QString>
 
+//QT headers
+#include <qmessagebox.h>
+#include <qfiledialog.h>
+#include <qcombobox.h>
+
 // MITK
 #include <mitkBaseRenderer.h>
 #include <mitkGlobalInteraction.h>
@@ -35,6 +40,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFDistanceImageToPointSetFilter.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
+
+#include <mitkToFDeviceFactoryManager.h>
+#include <mitkToFCameraDevice.h>
+
+//itk headers
+#include <itksys/SystemTools.hxx>
 
 // VTK
 #include <vtkCamera.h>
@@ -44,6 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 
+//Constructor
 QmitkToFUtilView::QmitkToFUtilView()
 : QmitkAbstractView()
 , m_Controls(NULL), m_MultiWidget( NULL )
@@ -65,17 +77,14 @@ QmitkToFUtilView::QmitkToFUtilView()
   this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 }
 
+//Destructor, specifically calling OnToFCameraStopped() and OnToFCammeraDiconnected()
 QmitkToFUtilView::~QmitkToFUtilView()
 {
-        OnToFCameraStopped();
-        OnToFCameraDisconnected();
+  OnToFCameraStopped();
+  OnToFCameraDisconnected();
 }
 
-void QmitkToFUtilView::SetFocus()
-{
-  m_Controls->m_ToFConnectionWidget->setFocus();
-}
-
+//Createing the PartControl Signal-Slot principal
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
@@ -85,11 +94,13 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkToFUtilViewControls;
     m_Controls->setupUi( parent );
 
+    //Looking for Input and Defining reaction
     connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
+
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(KinectAcquisitionModeChanged()), this, SLOT(OnKinectAcquisitionModeChanged()) ); // Todo in Widget2
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(KinectAcquisitionModeChanged()), this, SLOT(OnKinectAcquisitionModeChanged()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
@@ -99,6 +110,13 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
   }
 }
 
+//SetFocus-Method -> actually seting Focus to the Recorder
+void QmitkToFUtilView::SetFocus()
+{
+  m_Controls->m_ToFRecorderWidget->setFocus();
+}
+
+//Activated-Method->Generating RenderWindow
 void QmitkToFUtilView::Activated()
 {
   //get the current RenderWindowPart or open a new one if there is none
@@ -138,6 +156,7 @@ void QmitkToFUtilView::Activated()
   }
 }
 
+//ZomnnieView-Method -> Resetting GUI to default. Why not just QmitkToFUtilView()?!
 void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer /*zombieView*/)
 {
   ResetGUIToDefault();
@@ -145,21 +164,21 @@ void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Point
 
 void QmitkToFUtilView::Deactivated()
 {
-
 }
 
 void QmitkToFUtilView::Visible()
 {
 }
 
+//Reset of the ToFUtilView
 void QmitkToFUtilView::Hidden()
 {
-
-    ResetGUIToDefault();
+  ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::OnToFCameraConnected()
 {
+  MITK_INFO <<"OnToFCameraConnected";
   this->m_SurfaceDisplayCount = 0;
   this->m_2DDisplayCount = 0;
 
@@ -174,6 +193,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
   m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
   m_Controls->m_ToFRecorderWidget->setEnabled(true);
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
+  m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
 
   // initialize measurement widget
   m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());
@@ -181,48 +201,48 @@ void QmitkToFUtilView::OnToFCameraConnected()
   //TODO
   this->m_RealTimeClock = mitk::RealTimeClock::New();
   this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
-/*
+  /*//As it seems, this part of the Code doing nothing but producing an error message
   try
   {
-    this->m_VideoSource = mitk::OpenCVVideoSource::New();
+  this->m_VideoSource = mitk::OpenCVVideoSource::New();
 
-    this->m_VideoSource->SetVideoCameraInput(0, false);
-    this->m_VideoSource->StartCapturing();
-    if(!this->m_VideoSource->IsCapturingEnabled())
-    {
-      MITK_INFO << "unable to initialize video grabbing/playback";
-      this->m_VideoEnabled = false;
-      m_Controls->m_VideoTextureCheckBox->setEnabled(false);
-    }
-    else
-    {
-      this->m_VideoEnabled = true;
-      m_Controls->m_VideoTextureCheckBox->setEnabled(true);
-    }
+  this->m_VideoSource->SetVideoCameraInput(0, false);
+  this->m_VideoSource->StartCapturing();
+  if(!this->m_VideoSource->IsCapturingEnabled())
+  {
+  MITK_INFO << "unable to initialize video grabbing/playback";
+  this->m_VideoEnabled = false;
+  m_Controls->m_VideoTextureCheckBox->setEnabled(false);
+  }
+  else
+  {
+  this->m_VideoEnabled = true;
+  m_Controls->m_VideoTextureCheckBox->setEnabled(true);
+  }
 
-    if (this->m_VideoEnabled)
-    {
+  if (this->m_VideoEnabled)
+  {
 
-      this->m_VideoSource->FetchFrame();
-      this->m_VideoCaptureHeight = this->m_VideoSource->GetImageHeight();
-      this->m_VideoCaptureWidth = this->m_VideoSource->GetImageWidth();
-      this->m_VideoTexture = this->m_VideoSource->GetVideoTexture();
+  this->m_VideoSource->FetchFrame();
+  this->m_VideoCaptureHeight = this->m_VideoSource->GetImageHeight();
+  this->m_VideoCaptureWidth = this->m_VideoSource->GetImageWidth();
+  this->m_VideoTexture = this->m_VideoSource->GetVideoTexture();
 
-      this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_VideoCaptureWidth);
-      this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_VideoCaptureHeight);
+  this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_VideoCaptureWidth);
+  this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_VideoCaptureHeight);
 
 
-      this->m_ToFSurfaceVtkMapper3D->SetTextureWidth(this->m_VideoCaptureWidth);
-      this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
-    }
+  this->m_ToFSurfaceVtkMapper3D->SetTextureWidth(this->m_VideoCaptureWidth);
+  this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
+  }
   }
   catch (std::logic_error& e)
   {
-    QMessageBox::warning(NULL, "Warning", QString(e.what()));
-    MITK_ERROR << e.what();
-    return;
+  QMessageBox::warning(NULL, "Warning", QString(e.what()));
+  MITK_ERROR << e.what();
+  return;
   }
-*/
+  */
   this->RequestRenderWindowUpdate();
 }
 
@@ -275,7 +295,7 @@ void QmitkToFUtilView::OnKinectAcquisitionModeChanged()
 {
   if (m_ToFCompositeFilter.IsNotNull()&&m_ToFImageGrabber.IsNotNull())
   {
-    if (m_SelectedCamera=="Microsoft Kinect")
+    if (m_SelectedCamera.contains("Kinect"))
     {
       if (m_ToFImageGrabber->GetBoolProperty("RGB"))
       {
@@ -309,7 +329,9 @@ void QmitkToFUtilView::OnToFCameraStarted()
 
     std::string rgbFileName;
     m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
-    if ((m_SelectedCamera=="Microsoft Kinect") || rgbFileName!="")
+
+    if ((m_SelectedCamera.contains("Kinect"))||(rgbFileName!=""))
+
     {
       if (rgbFileName!="" || m_ToFImageGrabber->GetBoolProperty("RGB") )
       {
@@ -324,7 +346,9 @@ void QmitkToFUtilView::OnToFCameraStarted()
     {
       this->m_RGBImageNode = NULL;
       this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+      this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
       this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+      this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
     }
     this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
     this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
@@ -375,7 +399,7 @@ void QmitkToFUtilView::OnToFCameraStopped()
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
   m_SelectedCamera = selected;
-  if ((selected=="PMD CamBoard")||(selected=="PMD O3D"))
+  if ((selected.contains("CamBoard"))||(selected.contains("O3D")))
   {
     MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
     this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
@@ -388,7 +412,7 @@ void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
   else
   {
     this->m_Controls->m_SurfaceCheckBox->setEnabled(true);
-    this->m_Controls->m_TextureCheckBox->setEnabled(true); // TODO enable when bug 8106 is solved
+    this->m_Controls->m_TextureCheckBox->setEnabled(true);
     this->m_Controls->m_VideoTextureCheckBox->setEnabled(true);
   }
 }
@@ -595,7 +619,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if (m_AmplitudeImageNode.IsNotNull())
   {
-    if ((m_SelectedCamera=="Microsoft Kinect")&&(m_ToFImageGrabber->GetBoolProperty("RGB")))
+    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("RGB")))
     {
       this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
     }
@@ -611,7 +635,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if (m_IntensityImageNode.IsNotNull())
   {
-    if (m_SelectedCamera=="Microsoft Kinect")
+    if (m_SelectedCamera.contains("Kinect"))
     {
       this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
     }
@@ -627,7 +651,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if ((m_RGBImageNode.IsNotNull()))
   {
-    if ((m_SelectedCamera=="Microsoft Kinect")&&(m_ToFImageGrabber->GetBoolProperty("IR")))
+    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("IR")))
     {
       this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
     }

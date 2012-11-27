@@ -308,7 +308,7 @@ namespace mitk
     }
     else
     {
-      MITK_ERROR << "Error opening ToF data file " << outfileName;
+      MITK_ERROR << "Error opening ToF data file 2" << outfileName;
     }
   }
 

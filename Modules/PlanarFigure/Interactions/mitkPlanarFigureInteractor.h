@@ -101,7 +101,7 @@ protected:
   /**
     \brief Used when clicking to determine if a point is too close to the previous point.
     */
-  bool IsMousePositionAcceptableAsNewControlPoint( const PositionEvent*, const PlanarFigure* );
+  bool IsMousePositionAcceptableAsNewControlPoint( mitk::StateEvent const *, const PlanarFigure* );
 
   bool TransformPositionEventToPoint2D( const StateEvent *stateEvent,
     Point2D &point2D,

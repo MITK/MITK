@@ -383,7 +383,7 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
-      m_LastPointWasValid = IsMousePositionAcceptableAsNewControlPoint( positionEvent, planarFigure );
+      m_LastPointWasValid = IsMousePositionAcceptableAsNewControlPoint( stateEvent, planarFigure );
       if (m_LastPointWasValid)
       {
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
@@ -979,12 +979,12 @@ void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities(
 
 bool
 mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
-    const PositionEvent* positionEvent,
+    mitk::StateEvent const * stateEvent,
     const PlanarFigure* planarFigure )
 {
-  assert(positionEvent && planarFigure);
+  assert(stateEvent && planarFigure);
 
-  BaseRenderer* renderer = positionEvent->GetSender();
+  BaseRenderer* renderer = stateEvent->GetEvent()->GetSender();
 
   assert(renderer);
 
@@ -992,31 +992,57 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
   int timeStep( renderer->GetTimeStep( planarFigure ) );
 
   // Get current display position of the mouse
-  Point2D currentDisplayPosition = positionEvent->GetDisplayPosition();
+  //Point2D currentDisplayPosition = positionEvent->GetDisplayPosition();
 
   // Check if a previous point has been set
   bool tooClose = false;
+
+  const Geometry2D *renderingPlane = renderer->GetCurrentWorldGeometry2D();
+
+  mitk::Geometry2D *planarFigureGeometry =
+    dynamic_cast< mitk::Geometry2D * >( planarFigure->GetGeometry( timeStep ) );
+
+  Point2D point2D, correctedPoint;
+  // Get the point2D from the positionEvent
+  if ( !this->TransformPositionEventToPoint2D( stateEvent, point2D,
+    planarFigureGeometry ) )
+  {
+    return false;
+  }
+
+  // apply the controlPoint constraints of the planarFigure to get the
+  // coordinates that would actually be used.
+  correctedPoint = const_cast<PlanarFigure*>( planarFigure )->ApplyControlPointConstraints( 0, point2D );
+
+  // map the 2D coordinates of the new point to world-coordinates
+  // and transform those to display-coordinates
+  mitk::Point3D newPoint3D;
+  planarFigureGeometry->Map( correctedPoint, newPoint3D );
+  mitk::Point2D newDisplayPosition;
+  renderingPlane->Map( newPoint3D, newDisplayPosition );
+  renderer->GetDisplayGeometry()->WorldToDisplay( newDisplayPosition, newDisplayPosition );
+
 
   for( int i=0; i < (int)planarFigure->GetNumberOfControlPoints(); i++ )
   {
     if ( i != planarFigure->GetSelectedControlPoint() )
     {
       // Try to convert previous point to current display coordinates
-      mitk::Geometry2D *planarFigureGeometry =
-        dynamic_cast< mitk::Geometry2D * >( planarFigure->GetGeometry( timeStep ) );
-
-      const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
-
       mitk::Point3D previousPoint3D;
+      // map the 2D coordinates of the control-point to world-coordinates
       planarFigureGeometry->Map( planarFigure->GetControlPoint( i ), previousPoint3D );
+
       if ( renderer->GetDisplayGeometry()->Distance( previousPoint3D ) < 0.1 ) // ugly, but assert makes this work
       {
         mitk::Point2D previousDisplayPosition;
-        projectionPlane->Map( previousPoint3D, previousDisplayPosition );
+        // transform the world-coordinates into display-coordinates
+        renderingPlane->Map( previousPoint3D, previousDisplayPosition );
         renderer->GetDisplayGeometry()->WorldToDisplay( previousDisplayPosition, previousDisplayPosition );
 
-        double a = currentDisplayPosition[0] - previousDisplayPosition[0];
-        double b = currentDisplayPosition[1] - previousDisplayPosition[1];
+        //Calculate the distance. We use display-coordinates here to make
+        // the check independent of the zoom-level of the rendering scene.
+        double a = newDisplayPosition[0] - previousDisplayPosition[0];
+        double b = newDisplayPosition[1] - previousDisplayPosition[1];
 
         // If point is to close, do not set a new point
         tooClose = (a * a + b * b < m_MinimumPointDistance );

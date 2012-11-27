@@ -271,6 +271,14 @@ public:
              Requires a matching type of both figures. */
   void DeepCopy(Self::Pointer oldFigure);
 
+  /** \brief Allow sub-classes to apply constraints on control points.
+  *
+  * Sub-classes can define spatial constraints to certain control points by
+  * overwriting this method and returning a constrained point. By default,
+  * the points are constrained by the image bounds. */
+  virtual Point2D ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point );
+
+
 
 protected:
   PlanarFigure();
@@ -278,13 +286,6 @@ protected:
 
   /** \brief Set the initial number of control points of the planar figure */
   void ResetNumberOfControlPoints( int numberOfControlPoints );
-
-  /** \brief Allow sub-classes to apply constraints on control points.
-  *
-  * Sub-classes can define spatial constraints to certain control points by
-  * overwriting this method and returning a constrained point. By default,
-  * the points are constrained by the image bounds. */
-  virtual Point2D ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point );
 
   /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
    * of a planar figure object and returns integer ID for the feature element.

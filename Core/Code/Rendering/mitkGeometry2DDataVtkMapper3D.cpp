@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkWeakPointerProperty.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateOr.h"
+#include "vtkNeverTranslucentTexture.h"
 
 #include <vtkAssembly.h>
 #include <vtkDataSetMapper.h>
@@ -34,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataMapper.h>
 #include <vtkProp3DCollection.h>
 #include <vtkProperty.h>
-#include <vtkTexture.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTubeFilter.h>
 
@@ -99,7 +99,7 @@ namespace mitk
 
     m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
     m_BackgroundActor->GetProperty()->SetColor( 0.0, 0.0, 0.0 );
-    m_BackgroundActor->GetProperty()->SetOpacity( 1.0 );
+    m_BackgroundActor->GetProperty()->SetOpacity( 0.0 );
     m_BackgroundActor->SetMapper( m_BackgroundMapper );
 
     vtkProperty * backfaceProperty = m_BackgroundActor->MakeProperty();
@@ -481,12 +481,14 @@ namespace mitk
               //Enable rendering without copying the image.
               dataSetMapper->ImmediateModeRenderingOn();
 
-              texture = vtkTexture::New();
+              texture = vtkNeverTranslucentTexture::New();
               texture->RepeatOff();
 
               imageActor = vtkActor::New();
               imageActor->SetMapper( dataSetMapper );
               imageActor->SetTexture( texture );
+              imageActor->GetProperty()->SetOpacity(0.999); // HACK! otherwise VTK wouldn't recognize this as translucent surface (if LUT values map to alpha < 255
+              // improvement: apply "opacity" property onle HERE and also in 2D image mapper. DO NOT change LUT to achieve translucent images (see method ChangeOpacity in image mapper 2D)
 
               // Make imageActor the sole owner of the mapper and texture
               // objects

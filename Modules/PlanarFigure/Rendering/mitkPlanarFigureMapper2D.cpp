@@ -378,7 +378,7 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
 
   if ( m_DrawDashed )
   {
-    glLineStipple(2, 0x00FF);
+    glLineStipple(1, 0x00FF);
     glEnable(GL_LINE_STIPPLE);
   }
 

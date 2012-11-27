@@ -100,6 +100,8 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
         connect((QObject*) m_Controls->m_AddT2Smearing, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddT2Smearing(int)));
         connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGibbsRinging(int)));
+        connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
+        connect((QObject*) m_Controls->m_TransformBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(TransformBundles()));
     }
 }
 
@@ -529,6 +531,49 @@ void QmitkFiberfoxView::GenerateImage()
     }
 }
 
+void QmitkFiberfoxView::TransformBundles()
+{
+    if ( m_SelectedBundles.size()<1 ){
+        QMessageBox::information( NULL, "Warning", "Select at least one fiber bundle!");
+        MITK_WARN("QmitkFiberProcessingView") << "Select at least one fiber bundle!";
+        return;
+    }
+
+    std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
+    for (it; it!=m_SelectedBundles.end(); ++it)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+        fib->RotateAroundAxis(m_Controls->m_XrotBox->value(), m_Controls->m_YrotBox->value(), m_Controls->m_ZrotBox->value());
+        fib->TranslateFibers(m_Controls->m_XtransBox->value(), m_Controls->m_YtransBox->value(), m_Controls->m_ZtransBox->value());
+    }
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkFiberfoxView::CopyBundles()
+{
+    if ( m_SelectedBundles.size()<1 ){
+        QMessageBox::information( NULL, "Warning", "Select at least one fiber bundle!");
+        MITK_WARN("QmitkFiberProcessingView") << "Select at least one fiber bundle!";
+        return;
+    }
+
+    std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
+    for (it; it!=m_SelectedBundles.end(); ++it)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+        mitk::FiberBundleX::Pointer newBundle = fib->GetDeepCopy();
+        QString name((*it)->GetName().c_str());
+        name += "_copy";
+
+        mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
+        fbNode->SetData(newBundle);
+        fbNode->SetName(name.toStdString());
+        fbNode->SetVisibility(true);
+        GetDataStorage()->Add(fbNode);
+    }
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void QmitkFiberfoxView::JoinBundles()
 {
     if ( m_SelectedBundles.size()<2 ){
@@ -553,6 +598,7 @@ void QmitkFiberfoxView::JoinBundles()
     fbNode->SetName(name.toStdString());
     fbNode->SetVisibility(true);
     GetDataStorage()->Add(fbNode);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberfoxView::UpdateGui()
@@ -575,11 +621,15 @@ void QmitkFiberfoxView::UpdateGui()
 
     if (m_SelectedBundle.IsNotNull())
     {
+        m_Controls->m_TransformBundlesButton->setEnabled(true);
+        m_Controls->m_CopyBundlesButton->setEnabled(true);
         m_Controls->m_GenerateFibersButton->setEnabled(true);
         m_Controls->m_FiberBundleLabel->setText(m_SelectedBundle->GetName().c_str());
     }
     else
     {
+        m_Controls->m_TransformBundlesButton->setEnabled(false);
+        m_Controls->m_CopyBundlesButton->setEnabled(false);
         m_Controls->m_GenerateFibersButton->setEnabled(false);
         m_Controls->m_FiberBundleLabel->setText("<font color='red'>mandatory</font>");
     }
@@ -621,8 +671,19 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {
-            m_SelectedBundle = node;
-            m_SelectedBundles.push_back(node);
+            if (m_Controls->m_RealTimeFibers->isChecked() && node!=m_SelectedBundle)
+            {
+                m_SelectedBundle = node;
+                m_SelectedBundles.push_back(node);
+                mitk::FiberBundleX::Pointer newFib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+                if (newFib->GetNumFibers()!=m_Controls->m_FiberDensityBox->value())
+                    GenerateFibers();
+            }
+            else
+            {
+                m_SelectedBundle = node;
+                m_SelectedBundles.push_back(node);
+            }
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
         {
@@ -641,9 +702,6 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         }
     }
     UpdateGui();
-
-//    if (m_Controls->m_RealTimeFibers->isChecked())
-//        GenerateFibers();
 }
 
 

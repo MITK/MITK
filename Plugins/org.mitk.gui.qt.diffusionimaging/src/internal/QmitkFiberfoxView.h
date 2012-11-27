@@ -69,6 +69,8 @@ protected slots:
     void GenerateFibers();  ///< generate fibers from the selected ROIs
     void GenerateImage();   ///< generate artificial image from the selected fiber bundle
     void JoinBundles();     ///< merges selcted fiber bundles into one
+    void CopyBundles();      ///< add copy of the selected bundle to the datamanager
+    void TransformBundles(); ///< rotate and shift selected bundles
 
     /** update fibers if any parameter changes */
     void OnFiberDensityChanged(int value);

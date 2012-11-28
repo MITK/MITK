@@ -201,6 +201,7 @@ mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm,
    return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
+
 bool
 mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm,
   const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const

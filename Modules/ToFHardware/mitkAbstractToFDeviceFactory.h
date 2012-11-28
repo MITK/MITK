@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceRegistration.h>
-#include <usGetModuleContext.h>
-#include "mitkModuleContext.h"
 
 namespace mitk
 {
@@ -35,29 +33,9 @@ namespace mitk
 struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFactory {
    public:
 
-   ToFCameraDevice::Pointer ConnectToFDevice()
-   {
-      ToFCameraDevice::Pointer device = createToFCameraDevice();
-      m_Devices.push_back(device);
+   ToFCameraDevice::Pointer ConnectToFDevice();
 
-     ModuleContext* context = GetModuleContext();
-     ServiceProperties deviceProps;
-//-------------Take a look at this part to change the name given to a device
-     deviceProps["ToFDeviceName"] = GetCurrentDeviceName();
-     m_DeviceRegistrations.insert(std::make_pair(device.GetPointer(), context->RegisterService<ToFCameraDevice>(device.GetPointer(),deviceProps)));
-     return device;
-   }
-
-   void DisconnectToFDevice(const ToFCameraDevice::Pointer& device)
-   {
-      std::map<ToFCameraDevice*,ServiceRegistration>::iterator i = m_DeviceRegistrations.find(device.GetPointer());
-      if (i == m_DeviceRegistrations.end()) return;
-
-      i->second.Unregister();
-      m_DeviceRegistrations.erase(i);
-
-      m_Devices.erase(std::remove(m_Devices.begin(), m_Devices.end(), device), m_Devices.end());
-   }
+   void DisconnectToFDevice(const ToFCameraDevice::Pointer& device);
 
 private:
 

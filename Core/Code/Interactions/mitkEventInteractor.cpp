@@ -31,11 +31,13 @@ mitk::DataNode::Pointer mitk::EventInteractor::GetDataNode()
 
 void mitk::EventInteractor::SetDataNode(DataNode::Pointer dataNode)
 {
+  mitk::DataNode::Pointer tmpDN = m_DataNode;
   m_DataNode = dataNode;
-  if (m_DataNode.IsNotNull()) {
-    m_DataNode->SetDataInteractor(this);
+  if (dataNode.IsNotNull()) {
+    dataNode->SetDataInteractor(this);
+  } else if (tmpDN.IsNotNull()){ // if EventInteractors' DataNode is set to null, the "old" DataNode has to be notified (else the Dispatcher won't be notified either)
+    tmpDN->SetDataInteractor(NULL);
   }
-
 }
 
 int mitk::EventInteractor::GetLayer()

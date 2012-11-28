@@ -45,6 +45,7 @@ int mitkDispatcherTest(int /*argc*/, char* /*argv*/[])
   mitk::EventInteractor::Pointer ei = mitk::EventInteractor::New();
   mitk::EventInteractor::Pointer ei2 = mitk::EventInteractor::New();
 
+
   MITK_TEST_CONDITION_REQUIRED(
       renderer->GetDispatcher()->GetNumberOfInteractors() == 0
       , "01 Check Existence of Dispatcher." );
@@ -95,15 +96,21 @@ int mitkDispatcherTest(int /*argc*/, char* /*argv*/[])
       num == 2
       , "06 Number of registered Interactors " << num << " , expected 2" );
 
-  // Here ei1 and ei2 point to the same dn2; dn2 now only points to ei2, so ei1 is abandoned,
+  // Here ei and ei2 point to the same dn2; dn2 now only points to ei2, so ei is abandoned,
   // therefore ei1 is expected to be removed
 
   ei2->SetDataNode(dn2);
-
   num = renderer->GetDispatcher()->GetNumberOfInteractors();
   MITK_TEST_CONDITION_REQUIRED(
       num == 1
       , "07 Number of registered Interactors " << num << " , expected 1" );
+
+  // Setting DataNode in Interactor to NULL, should remove Interactor from Dispatcher
+  ei2->SetDataNode(NULL);
+  num = renderer->GetDispatcher()->GetNumberOfInteractors();
+  MITK_TEST_CONDITION_REQUIRED(
+      num == 0
+      , "08 Number of registered Interactors " << num << " , expected 0" );
 
   renWin->Delete();
   // always end with this!

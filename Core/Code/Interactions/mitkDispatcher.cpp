@@ -82,13 +82,14 @@ void mitk::Dispatcher::RemoveAbandonedInteractors()
   for (ListInteractor::iterator it = m_Interactors.begin(); it != m_Interactors.end();)
   {
     mitk::DataNode::Pointer dn = (*it)->GetDataNode();
-    if (dn.IsNull())
+    if (dn.IsNull()) {
       it = m_Interactors.erase(it);
-
+    } else {
     mitk::EventInteractor* interactor = dn->GetDataInteractor();
     if (!(interactor == (*it).GetPointer()))
       it = m_Interactors.erase(it);
     else
       ++it;
+    }
   }
 }

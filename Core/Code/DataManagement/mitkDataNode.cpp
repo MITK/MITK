@@ -549,8 +549,6 @@ bool mitk::DataNode::IsInteractorEnabled() const
 void mitk::DataNode::SetDataInteractor(EventInteractor::Pointer interactor)
 {
   m_DataInteractor = interactor;
-//  if(m_DataInteractor.IsNotNull())
-//    m_DataInteractor->SetDataNode(this);
   Modified();
 }
 

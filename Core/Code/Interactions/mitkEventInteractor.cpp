@@ -15,6 +15,9 @@
  ===================================================================*/
 
 #include "mitkEventInteractor.h"
+#include "mitkInteractor.h"
+
+#include "mitkDataNode.h"
 
 mitk::EventInteractor::EventInteractor()
 {
@@ -30,8 +33,9 @@ void mitk::EventInteractor::SetDataNode(DataNode::Pointer dataNode)
 {
   m_DataNode = dataNode;
   if (m_DataNode.IsNotNull()) {
-    m_DataNode->SetInteractor(dynamic_cast <mitk::Interactor*>(this));
+    m_DataNode->SetDataInteractor(this);
   }
+
 }
 
 int mitk::EventInteractor::GetLayer()
@@ -46,6 +50,12 @@ int mitk::EventInteractor::GetLayer()
 bool mitk::EventInteractor::operator <(const EventInteractor::Pointer eventInteractor)
 {
   return (GetLayer() < eventInteractor->GetLayer());
+}
+
+void mitk::EventInteractor::dummy()
+{
+  int h=0;
+  h++;
 }
 
 mitk::EventInteractor::~EventInteractor()

@@ -49,6 +49,7 @@ namespace mitk
 
   private:
     std::list<EventInteractor::Pointer> m_Interactors;
+    void RemoveAbandonedInteractors();
   };
 
 } /* namespace mitk */

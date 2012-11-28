@@ -16,6 +16,8 @@
 
 #include "mitkDispatcher.h"
 
+typedef std::list<mitk::EventInteractor::Pointer> ListInteractor;
+
 mitk::Dispatcher::Dispatcher()
 {
 }
@@ -27,38 +29,30 @@ mitk::Dispatcher::Dispatcher()
  */
 void mitk::Dispatcher::SetEventInteractor(const DataNode* dataNode)
 {
-  std::list<mitk::EventInteractor::Pointer>::iterator it = m_Interactors.begin();
-  while (it != m_Interactors.end())
-  {
-    if (it->GetPointer()->GetDataNode() == dataNode)
-    {
-      m_Interactors.remove(*it);
-      break;
-    }
-    it++;
-  }
-  MITK_INFO << "SetEventInteractor called";
-  mitk::EventInteractor* eventInteractor = dynamic_cast<mitk::EventInteractor*>(dataNode->GetInteractor());
-  if (eventInteractor!=NULL)
+  RemoveEventInteractor(dataNode);
+  RemoveAbandonedInteractors();
+  mitk::EventInteractor* eventInteractor = dynamic_cast<mitk::EventInteractor*>(dataNode->GetDataInteractor());
+  if (eventInteractor != NULL)
   {
     m_Interactors.push_back(eventInteractor);
-    MITK_INFO << "EventInteractor accepted";
-  } else {
-    MITK_INFO << "SetEventInteractor canceled";
   }
 }
 
+/*
+ * Remove all Interactors related to this Node, to prevent double entries and dead references.
+ */
 void mitk::Dispatcher::RemoveEventInteractor(const DataNode* dataNode)
 {
-  std::list<mitk::EventInteractor::Pointer>::iterator it = m_Interactors.begin();
-  while (it != m_Interactors.end())
+  for (ListInteractor::iterator it = m_Interactors.begin(); it != m_Interactors.end();)
   {
-    if (it->GetPointer()->GetDataNode() == dataNode)
+    if ((*it)->GetDataNode() == dataNode)
     {
-      m_Interactors.remove(*it);
-      break;
+      it = m_Interactors.erase(it);
     }
-    it++;
+    else
+    {
+      ++it;
+    }
   }
 }
 
@@ -76,7 +70,25 @@ bool mitk::Dispatcher::ProcessEvent(mitk::Event event)
 {
   mitk::Event p = event;
   m_Interactors.sort();
-
-  return false;
+  return false; // TODO: dummy implementation
 }
 
+/**
+ * Checks if DataNodes associated with Interactors point back to them.
+ * If not remove the Interactor. (This can happen when s.o. tries to set DataNodes to multiple Interactors)
+ */
+void mitk::Dispatcher::RemoveAbandonedInteractors()
+{
+  for (ListInteractor::iterator it = m_Interactors.begin(); it != m_Interactors.end();)
+  {
+    mitk::DataNode::Pointer dn = (*it)->GetDataNode();
+    if (dn.IsNull())
+      it = m_Interactors.erase(it);
+
+    mitk::EventInteractor* interactor = dn->GetDataInteractor();
+    if (!(interactor == (*it).GetPointer()))
+      it = m_Interactors.erase(it);
+    else
+      ++it;
+  }
+}

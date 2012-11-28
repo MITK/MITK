@@ -19,7 +19,6 @@
 
 mitk::BindDispatcherInteractor::BindDispatcherInteractor()
 {
-  m_DataStorage = NULL;
   m_Dispatcher = mitk::Dispatcher::New();
 }
 
@@ -43,8 +42,6 @@ void mitk::BindDispatcherInteractor::SetDataStorage(mitk::DataStorage::Pointer d
 
 mitk::BindDispatcherInteractor::~BindDispatcherInteractor()
 {
-  m_DataStorage = NULL;
-  m_Dispatcher = NULL;
 }
 
 void mitk::BindDispatcherInteractor::RegisterInteractor(const mitk::DataNode* dataNode)

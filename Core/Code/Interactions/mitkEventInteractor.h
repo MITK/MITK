@@ -18,16 +18,17 @@
 #define MITKEVENTINTERACTOR_H_
 
 #include "itkObject.h"
+#include "itkSmartPointer.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
 #include <MitkExports.h>
-#include "mitkDataNode.h"
 #include "mitkEventStateMachine.h"
 
 
 namespace mitk
 {
-
+  class DataNode;
+  typedef itk::SmartPointer<DataNode> SNode;
   class MITK_CORE_EXPORT EventInteractor : public EventStateMachine {
 
   public:
@@ -36,10 +37,12 @@ namespace mitk
 
    bool operator<(const EventInteractor::Pointer eventInteractor);
 
-   void SetDataNode(DataNode::Pointer);
+   void SetDataNode(SNode);
 
-   DataNode::Pointer GetDataNode();
+   SNode GetDataNode();
    int GetLayer();
+
+   virtual void dummy(); // for dynamic casts ?
 
   protected:
     EventInteractor();
@@ -47,7 +50,7 @@ namespace mitk
 
 
   private:
-    DataNode::Pointer m_DataNode;
+    SNode m_DataNode;
   };
 
 } /* namespace mitk */

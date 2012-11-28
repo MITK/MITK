@@ -17,12 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkIToFDeviceFactory_h
 
 #include "mitkToFCameraDevice.h"
+#include "mitkToFHardwareExports.h"
 //for microservices
 #include <usServiceInterface.h>
 
 namespace mitk
 {
-  struct IToFDeviceFactory {
+  struct MITK_TOFHARDWARE_EXPORT IToFDeviceFactory {
 
     virtual ~IToFDeviceFactory(); // leer in mitkIToFDeviceFactory.cpp implementieren
 

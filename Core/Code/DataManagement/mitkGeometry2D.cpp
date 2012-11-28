@@ -172,6 +172,34 @@ mitk::Geometry2D::Project(
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
+bool
+mitk::Geometry2D::Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
+{
+   assert(m_BoundingBox.IsNotNull());
+
+   Vector3D vec3d_units;
+   BackTransform(vec3d_mm, vec3d_units);
+   vec3d_units[2] = 0;
+   projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
+   return true;
+}
+
+bool
+mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm,
+                          const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
+{
+   MITK_WARN << "Deprecated function! Call Project(vec3D,vec3D) instead.";
+   assert(m_BoundingBox.IsNotNull());
+
+   Vector3D vec3d_units;
+   BackTransform(atPt3d_mm, vec3d_mm, vec3d_units);
+   vec3d_units[2] = 0;
+   projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
+
+   Point3D pt3d_units;
+   BackTransform(atPt3d_mm, pt3d_units);
+   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
+}
 
 bool
 mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm,
@@ -193,23 +221,6 @@ mitk::Geometry2D::Map(const mitk::Point2D &/*atPt2d_mm*/,
 {
   //@todo implement parallel to the other Map method!
   assert(false);
-}
-
-
-bool
-mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm,
-  const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
-{
-  assert(m_BoundingBox.IsNotNull());
-
-  Vector3D vec3d_units;
-  BackTransform(atPt3d_mm, vec3d_mm, vec3d_units);
-  vec3d_units[2] = 0;
-  projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
-
-  Point3D pt3d_units;
-  BackTransform(atPt3d_mm, pt3d_units);
-  return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
 

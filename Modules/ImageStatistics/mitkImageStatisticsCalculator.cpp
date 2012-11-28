@@ -927,12 +927,13 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   statisticsFilter->Update();
 
+  int numberOfBins = ( m_DoIgnorePixelValue && (m_MaskingMode == MASKING_MODE_NONE) ) ? 768 : 384;
   typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
   labelStatisticsFilter = LabelStatisticsFilterType::New();
   labelStatisticsFilter->SetInput( adaptedImage );
   labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
   labelStatisticsFilter->UseHistogramsOn();
-  labelStatisticsFilter->SetHistogramParameters( 384, statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum() );
+  labelStatisticsFilter->SetHistogramParameters( numberOfBins, statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum() );
 
 
   // Add progress listening

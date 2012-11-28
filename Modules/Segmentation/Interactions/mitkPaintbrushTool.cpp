@@ -183,8 +183,6 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
       mitk::Point2D p;
       p = *it;
 
-      std::cout << p << std::endl;
-
       // the contour points in the lower right corner have same position but with negative y values
       p[1] *= -1;
       quarterCycleLowerRight.push_back(p);
@@ -235,7 +233,6 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
       it++;
     }
   }
-  std::cout << "---" << std::endl;
 
   // fill contour with poins in right ordering, starting with the upperRight block
   mitk::Point3D tempPoint;

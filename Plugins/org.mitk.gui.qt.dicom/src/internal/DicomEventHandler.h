@@ -58,7 +58,7 @@ public:
         /**
         * \brief Called when ctkEvent with EVENT_TOPIC "org/mitk/gui/qt/dicom/DELETED" is thrown.
         *
-        * Not yet implemented.
+        * \note Not yet implemented.
         */
         void OnSignalRemoveSeriesFromStorage(const ctkEvent& ctkEvent);
 };

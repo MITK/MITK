@@ -8,6 +8,7 @@ The modules are shared libraries that provide functionality that can be used by 
 \section MITKModuleManualsListPageModuleManualList List of Module Manuals
 
   \li \subpage IGTGeneralModulePage
+  \li \subpage MitkOpenCL_Overview
 
 \section MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules
 

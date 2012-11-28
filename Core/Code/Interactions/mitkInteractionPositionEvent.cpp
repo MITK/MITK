@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, unsigned int buttonStates, unsigned int modifiers, std::string eventClass)
+mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, mitk::EButtonStates buttonStates, mitk::EButtonStates modifiers, std::string eventClass)
 : InteractionEvent(baseRenderer, eventClass),
   m_MousePosition(mousePosition),
   m_ButtonStates(buttonStates),
@@ -40,12 +40,12 @@ const mitk::Point3D* mitk::InteractionPositionEvent::GetWorldPosition()
   return &m_WorldPosition;
 }
 
-unsigned int mitk::InteractionPositionEvent::GetModifiers()
+mitk::EButtonStates mitk::InteractionPositionEvent::GetModifiers()
 {
   return m_Modifiers;
 }
 
-unsigned int mitk::InteractionPositionEvent::GetButtonStates()
+mitk::EButtonStates mitk::InteractionPositionEvent::GetButtonStates()
 {
   return m_ButtonStates;
 }

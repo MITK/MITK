@@ -14,40 +14,37 @@
 
  ===================================================================*/
 
-#ifndef MITKINTERACTIONPOSITIONEVENT_H_
-#define MITKINTERACTIONPOSITIONEVENT_H_
-
+#ifndef MITKMOUSEMOVEEVENT_H_
+#define MITKMOUSEMOVEEVENT_H_
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
-#include "mitkInteractionEvent.h"
 #include "mitkInteractionEventConst.h"
+#include "mitkInteractionPositionEvent.h"
+#include "mitkBaseRenderer.h"
+#include "mitkInteractionEvent.h"
+
 #include <MitkExports.h>
-#include <string>
 
 namespace mitk
 {
 
-  class MITK_CORE_EXPORT InteractionPositionEvent : public InteractionEvent {
+  class MITK_CORE_EXPORT MouseMoveEvent : public InteractionPositionEvent {
 
   public:
-    const Point2D* GetMousePosition();
-    const Point3D* GetWorldPosition();
-    EButtonStates GetModifiers();
-    EButtonStates GetButtonStates();
+    mitkClassMacro(MouseMoveEvent,InteractionPositionEvent);
+    mitkNewMacro4Param(Self, BaseRenderer*, Point2D , EButtonStates , EButtonStates);
+
+
+
+    virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:
-    InteractionPositionEvent(BaseRenderer*, Point2D, EButtonStates, EButtonStates, std::string);
-    virtual bool isEqual(InteractionEvent::Pointer) = 0;
-    virtual ~InteractionPositionEvent();
+    MouseMoveEvent(BaseRenderer*, Point2D, EButtonStates buttonStates, EButtonStates modifiers);
+    virtual ~MouseMoveEvent();
 
   private:
-    Point2D m_MousePosition;
-    Point3D m_WorldPosition;
-    EButtonStates m_ButtonStates;
-    EButtonStates m_Modifiers;
   };
-
 } /* namespace mitk */
 
-#endif /* MITKINTERACTIONPOSITIONEVENT_H_ */
+#endif /* MITKMOUSEMOVEEVENT_H_ */

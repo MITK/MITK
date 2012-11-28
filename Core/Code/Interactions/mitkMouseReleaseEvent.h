@@ -14,14 +14,14 @@
 
  ===================================================================*/
 
-#ifndef MITKMOUSEPRESSEVENT_H_
-#define MITKMOUSEPRESSEVENT_H_
+#ifndef MITKMOUSERELEASEEVENT_H_
+#define MITKMOUSERELEASEEVENT_H_
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
-#include "mitkInteractionEventConst.h"
 #include "mitkInteractionPositionEvent.h"
+#include "mitkInteractionEventConst.h"
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEvent.h"
 
@@ -30,11 +30,11 @@
 namespace mitk
 {
 
-  class MITK_CORE_EXPORT MousePressEvent : public InteractionPositionEvent {
+  class MITK_CORE_EXPORT MouseReleaseEvent : public InteractionPositionEvent {
 
   public:
-    mitkClassMacro(MousePressEvent,InteractionPositionEvent);
-    mitkNewMacro5Param(Self, BaseRenderer*, Point2D , EButtonStates , EButtonStates, EButtonStates);
+    mitkClassMacro(MouseReleaseEvent,InteractionPositionEvent);
+    mitkNewMacro5Param(Self, BaseRenderer*, Point2D ,EButtonStates , EButtonStates, EButtonStates);
 
 
     EButtonStates GetEventButton();
@@ -43,12 +43,12 @@ namespace mitk
     virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:
-    MousePressEvent(BaseRenderer*, Point2D, EButtonStates buttonStates, EButtonStates modifiers, EButtonStates eventButton);
-    virtual ~MousePressEvent();
+    MouseReleaseEvent(BaseRenderer*, Point2D, EButtonStates buttonStates, EButtonStates modifiers, EButtonStates eventButton);
+    virtual ~MouseReleaseEvent();
 
   private:
     EButtonStates m_EventButton;
   };
 } /* namespace mitk */
 
-#endif /* MITKMOUSEPRESSEVENT_H_ */
+#endif /* MITKMOUSERELEASEEVENT_H_ */

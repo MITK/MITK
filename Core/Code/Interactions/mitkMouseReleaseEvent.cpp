@@ -15,27 +15,28 @@
  ===================================================================*/
 
 #include "mitkException.h"
-#include "mitkMousePressEvent.h"
+#include "mitkMouseReleaseEvent.h"
 
-mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, mitk::EButtonStates buttonStates,
+mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, mitk::EButtonStates buttonStates,
     mitk::EButtonStates modifiers, mitk::EButtonStates eventButton) :
-    InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MousePressEvent"),m_EventButton(eventButton)
+    InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MouseReleaseEvent"),m_EventButton(eventButton)
 {
 }
 
-mitk::EButtonStates mitk::MousePressEvent::GetEventButton()
+
+mitk::EButtonStates mitk::MouseReleaseEvent::GetEventButton()
 {
   return m_EventButton;
 }
 
-mitk::MousePressEvent::~MousePressEvent()
+mitk::MouseReleaseEvent::~MouseReleaseEvent()
 {
 
 }
 
-bool mitk::MousePressEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MouseReleaseEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
 {
-  mitk::MousePressEvent* mpe = dynamic_cast< mitk::MousePressEvent* >(interactionEvent.GetPointer());
+  mitk::MouseReleaseEvent* mpe = dynamic_cast< mitk::MouseReleaseEvent* >(interactionEvent.GetPointer());
   if (mpe == NULL)
   {
     return false;

@@ -223,6 +223,8 @@ set(CPP_FILES
   Interactions/mitkInteractionEvent.cpp
   Interactions/mitkInteractionPositionEvent.cpp
   Interactions/mitkMousePressEvent.cpp
+  Interactions/mitkMouseMoveEvent.cpp
+  Interactions/mitkMouseReleaseEvent.cpp
   Interactions/mitkMouseModeSwitcher.cpp
   Interactions/mitkMouseMovePointSetInteractor.cpp
   Interactions/mitkMoveSurfaceInteractor.cpp

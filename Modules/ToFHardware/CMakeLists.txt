@@ -18,7 +18,7 @@ ENDIF(WIN32)
 
 #option MITK_USE_TOF_HARDWARE
 
-CONFIGURE_FILE(mitkToFConfig.h.in ${PROJECT_BINARY_DIR}/mitkToFConfig.h @ONLY)
+
 
 MITK_CREATE_MODULE(mitkToFHardware
   SUBPROJECTS MITK-ToF
@@ -35,6 +35,8 @@ add_subdirectory(PMD)
 add_subdirectory(MesaSR4000)
 
 ENDIF(MITK_ENABLE_TOF_HARDWARE)
+
+CONFIGURE_FILE(mitkToFConfig.h.in ${PROJECT_BINARY_DIR}/mitkToFConfig.h @ONLY)
 
 #foreach(tofhardwaresubfolder_dir ${tofhardwaresubfolder_dirs})
 #  add_subdirectory(${tofhardwaresubfolder_dirs})

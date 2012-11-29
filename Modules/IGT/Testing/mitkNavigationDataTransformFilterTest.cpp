@@ -109,7 +109,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   myFilter2->SetInput(nd1);
 
-  itk::Matrix<mitk::ScalarType,3,3> rotMatrix;
+  mitk::NavigationDataTransformFilter::TransformType::MatrixType rotMatrix;
   rotMatrix[0][0] = 0;
   rotMatrix[0][1] = 1;
   rotMatrix[0][2] = 0;

@@ -50,6 +50,8 @@ var yAxis = d3.svg.axis()
   .scale(yScale)
   .orient("left");
 
+var zoomer = d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom)
+
 var svg = d3.select("body")
   .append("svg")
   .attr("class", "svg")
@@ -57,7 +59,7 @@ var svg = d3.select("body")
   .attr("height", height + margin.top + margin.bottom)
  .append("g")
   .attr("transform", "translate (" + margin.left + "," + margin.top + ")")
-  .call(d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom));
+  .call(zoomer);
 
 var vis = svg.append("svg")
   .attr("width", width)
@@ -277,10 +279,31 @@ function barWidth()
 
 function zoom()
 {
-  svg.select(".x.axis").call(xAxis);
-  svg.select(".y.axis").call(yAxis);
-  vis.selectAll(".bar").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-  vis.selectAll("path.line").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+ /* if (d3.event.scale != 1){
+    var t = d3.event.translate;
+    t[0] = Math.min(0, t[0]);
+    t[1] = Math.min(0, t[1]);
+    d3.event.translate = t;
+    svg.select(".x.axis").call(xAxis);
+    svg.select(".y.axis").call(yAxis);
+    vis.selectAll(".bar").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    vis.selectAll("path.line").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  }
+  else {
+    d3.event.translate = [0,0];
+
+    xScale.domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)]);
+    yScale.domain([0,d3.max(histogramData.frequency)]);*/
+  if (d3.event.scale == 1)
+  {
+    zoom.translate([0,0]);
+    //d3.event.translate = [0,0];
+  }
+    svg.select(".x.axis").call(xAxis);
+    svg.select(".y.axis").call(yAxis);
+    vis.selectAll(".bar").attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")");
+    vis.selectAll("path.line").attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")");
+
 }
 
 svg.append("rect")

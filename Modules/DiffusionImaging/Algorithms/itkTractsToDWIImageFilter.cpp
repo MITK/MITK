@@ -54,7 +54,7 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
     SliceType::Pointer slice = SliceType::New();
     ImageRegion<2> region;
     region.SetSize(0, m_ImageRegion.GetSize()[0]);
-    region.SetSize(1, m_ImageRegion.GetSize()[0]);
+    region.SetSize(1, m_ImageRegion.GetSize()[1]);
     slice->SetLargestPossibleRegion( region );
     slice->SetBufferedRegion( region );
     slice->SetRequestedRegion( region );
@@ -229,40 +229,13 @@ void TractsToDWIImageFilter::GenerateData()
     if (numFibers<=0)
         itkExceptionMacro("Input fiber bundle contains no fibers!");
 
-    if (m_TissueMask.IsNull())
-    {
-        m_TissueMask = ItkUcharImgType::New();
-        m_TissueMask->SetSpacing( m_Spacing );
-        m_TissueMask->SetOrigin( m_Origin );
-        m_TissueMask->SetDirection( m_DirectionMatrix );
-        m_TissueMask->SetLargestPossibleRegion( m_ImageRegion );
-        m_TissueMask->SetBufferedRegion( m_ImageRegion );
-        m_TissueMask->SetRequestedRegion( m_ImageRegion );
-        m_TissueMask->Allocate();
-        m_TissueMask->FillBuffer(1);
-    }
-    else
+    if (m_TissueMask.IsNotNull())
     {
         m_Spacing = m_TissueMask->GetSpacing();
         m_Origin = m_TissueMask->GetOrigin();
         m_DirectionMatrix = m_TissueMask->GetDirection();
         m_ImageRegion = m_TissueMask->GetLargestPossibleRegion();
         MITK_INFO << "Using tissue mask";
-    }
-
-    float minSpacing = 1;
-    if(m_Spacing[0]<m_Spacing[1] && m_Spacing[0]<m_Spacing[2])
-        minSpacing = m_Spacing[0];
-    else if (m_Spacing[1] < m_Spacing[2])
-        minSpacing = m_Spacing[1];
-    else
-        minSpacing = m_Spacing[2];
-
-    FiberBundleType fiberBundle = m_FiberBundle;
-    if (m_FiberBundle->GetFiberSampling()<=0 || 10/m_FiberBundle->GetFiberSampling()>minSpacing*0.5/m_VolumeAccuracy)
-    {
-        fiberBundle = m_FiberBundle->GetDeepCopy();
-        fiberBundle->ResampleFibers(minSpacing*0.5/m_VolumeAccuracy);
     }
 
     // initialize output dwi image
@@ -280,6 +253,51 @@ void TractsToDWIImageFilter::GenerateData()
     temp.Fill(0.0);
     outImage->FillBuffer(temp);
     this->SetNthOutput(0, outImage);
+
+    int x=2; int y=2;
+    while (x<m_ImageRegion.GetSize()[0])
+        x *= 2;
+    while (y<m_ImageRegion.GetSize()[1])
+        y *= 2;
+
+    if (x!=m_ImageRegion.GetSize()[0])
+    {
+        MITK_INFO << "Adjusting image width: " << m_ImageRegion.GetSize()[0] << " --> " << x;
+        m_ImageRegion.SetSize(0, x);
+    }
+    if (y!=m_ImageRegion.GetSize()[1])
+    {
+        MITK_INFO << "Adjusting image height: " << m_ImageRegion.GetSize()[1] << " --> " << y;
+        m_ImageRegion.SetSize(1, y);
+    }
+
+    if (m_TissueMask.IsNull())
+    {
+        m_TissueMask = ItkUcharImgType::New();
+        m_TissueMask->SetSpacing( m_Spacing );
+        m_TissueMask->SetOrigin( m_Origin );
+        m_TissueMask->SetDirection( m_DirectionMatrix );
+        m_TissueMask->SetLargestPossibleRegion( m_ImageRegion );
+        m_TissueMask->SetBufferedRegion( m_ImageRegion );
+        m_TissueMask->SetRequestedRegion( m_ImageRegion );
+        m_TissueMask->Allocate();
+        m_TissueMask->FillBuffer(1);
+    }
+
+    float minSpacing = 1;
+    if(m_Spacing[0]<m_Spacing[1] && m_Spacing[0]<m_Spacing[2])
+        minSpacing = m_Spacing[0];
+    else if (m_Spacing[1] < m_Spacing[2])
+        minSpacing = m_Spacing[1];
+    else
+        minSpacing = m_Spacing[2];
+
+    FiberBundleType fiberBundle = m_FiberBundle;
+    if (m_FiberBundle->GetFiberSampling()<=0 || 10/m_FiberBundle->GetFiberSampling()>minSpacing*0.5/m_VolumeAccuracy)
+    {
+        fiberBundle = m_FiberBundle->GetDeepCopy();
+        fiberBundle->ResampleFibers(minSpacing*0.5/m_VolumeAccuracy);
+    }
 
     // generate working double images because we work with small values (will be scaled later)
     std::vector< DoubleDwiType::Pointer > compartments;
@@ -358,8 +376,8 @@ void TractsToDWIImageFilter::GenerateData()
 
                 itk::Index<3> idx;
                 itk::ContinuousIndex<float, 3> contIndex;
-                outImage->TransformPhysicalPointToIndex(vertex, idx);
-                outImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
+                m_TissueMask->TransformPhysicalPointToIndex(vertex, idx);
+                m_TissueMask->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
 
                 double frac_x = contIndex[0] - idx[0];
                 double frac_y = contIndex[1] - idx[1];
@@ -397,7 +415,7 @@ void TractsToDWIImageFilter::GenerateData()
 
                             double frac = frac_x*frac_y*frac_z;
 
-                            if (!outImage->GetLargestPossibleRegion().IsInside(newIdx) || m_TissueMask->GetPixel(newIdx)<=0)
+                            if (!m_TissueMask->GetLargestPossibleRegion().IsInside(newIdx) || m_TissueMask->GetPixel(newIdx)<=0)
                                 continue;
 
                             for (int k=0; k<m_FiberModels.size(); k++)
@@ -509,9 +527,9 @@ void TractsToDWIImageFilter::GenerateData()
     maxValue /= usedS;
 
     MITK_INFO << "Summing compartments and adding noise";
-    ImageRegionIterator<DWIImageType> it4 (outImage, m_ImageRegion);
+    ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
-    boost::progress_display disp4(m_ImageRegion.GetNumberOfPixels());
+    boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
     while(!it4.IsAtEnd())
     {
         ++disp4;

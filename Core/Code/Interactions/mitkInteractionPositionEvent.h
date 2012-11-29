@@ -33,19 +33,19 @@ namespace mitk
   public:
     const Point2D* GetMousePosition();
     const Point3D* GetWorldPosition();
-    EButtonStates GetModifiers();
-    EButtonStates GetButtonStates();
+    EModifiers GetModifiers();
+    EButtons GetButtonStates();
 
   protected:
-    InteractionPositionEvent(BaseRenderer*, Point2D, EButtonStates, EButtonStates, std::string);
+    InteractionPositionEvent(BaseRenderer*, Point2D, EButtons, EModifiers, std::string);
     virtual bool isEqual(InteractionEvent::Pointer) = 0;
     virtual ~InteractionPositionEvent();
 
   private:
     Point2D m_MousePosition;
     Point3D m_WorldPosition;
-    EButtonStates m_ButtonStates;
-    EButtonStates m_Modifiers;
+    EButtons m_ButtonStates;
+    EModifiers m_Modifiers;
   };
 
 } /* namespace mitk */

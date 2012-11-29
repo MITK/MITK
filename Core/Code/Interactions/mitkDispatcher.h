@@ -29,14 +29,14 @@
 
 namespace mitk
 {
-
+  class InteractionEvent;
   class MITK_CORE_EXPORT Dispatcher : public itk::Object {
 
   public:
     mitkClassMacro(Dispatcher, itk::Object);
     itkNewMacro(Self);
 
-    bool ProcessEvent(mitk::Event event);
+    bool ProcessEvent(mitk::InteractionEvent* event);
     void SetEventInteractor(const DataNode* dataNode);
     void RemoveEventInteractor(const DataNode* dataNode);
 

@@ -26,31 +26,48 @@ namespace mitk
 
 //##ButtonState
 // Mouse/keyboard state values
-  enum EButtonStates
+  enum EButtons
   {
-    BS_NoButton = 0x0000,
-    BS_LeftButton = 0x0001,
-    BS_RightButton = 0x0002,
-    BS_MidButton = 0x0004,
-    BS_MouseButtonMask = 0x0007,
-    BS_ShiftButton = 0x0100,
-    BS_ControlButton = 0x0200,
-    BS_AltButton = 0x0400,
-    BS_MetaButton = 0x0800,
-    BS_KeyButtonMask = 0x0f00,
-    BS_Keypad = 0x4000
+    BN_NoButton = 0x0000,
+    BN_LeftButton = 0x0001,
+    BN_RightButton = 0x0002,
+    BN_MidButton = 0x0004,
   };
 
+  enum EModifiers {
+    MOD_NoModifiers = 0x0000,
+    MOD_ShiftButton = 0x0100,
+    MOD_ControlButton = 0x0200,
+    MOD_AltButton = 0x0400
+  };
+
+
   /*
-   * Allow bitwise OR operation on enum.
+   * Allow bitwise OR operation on enums.
    */
-  inline EButtonStates operator|(EButtonStates a, EButtonStates b)
+  inline EButtons operator|(EButtons a, EButtons b)
   {
-    return static_cast<EButtonStates>(static_cast<int>(a) | static_cast<int>(b));
+    return static_cast<EButtons>(static_cast<int>(a) | static_cast<int>(b));
   }
 
-//##Key
-  enum EKeys
+  inline EButtons operator|=(EButtons a, EButtons b)
+    {
+      return static_cast<EButtons>(static_cast<int>(a) | static_cast<int>(b));
+    }
+
+  inline EModifiers operator|(EModifiers a, EModifiers b)
+  {
+    return static_cast<EModifiers>(static_cast<int>(a) | static_cast<int>(b));
+  }
+
+  inline EModifiers operator|=(EModifiers a, EModifiers b)
+  {
+    return static_cast<EModifiers>(static_cast<int>(a) | static_cast<int>(b));
+  }
+
+/*
+  //##Key
+  enum EEKeys
   {
     Key_Escape = 0x1000,           // misc keys
     Key_Tab = 0x1001,
@@ -298,6 +315,7 @@ namespace mitk
     Key_unknown = 0xffff,
     Key_none = 0xffff     //= Key_unknown
   };
-
+*/
 }     //namespace mitk
+
 #endif //ifndef MITKINTERACTEVENTCONST_H

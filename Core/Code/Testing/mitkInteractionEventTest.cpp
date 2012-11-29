@@ -33,9 +33,9 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
 
   mitk::VtkPropRenderer::Pointer renderer = NULL;
 
-  mitk::EButtonStates buttonStates =  mitk::BS_LeftButton | mitk::BS_RightButton;
-  mitk::EButtonStates eventButton = mitk::BS_LeftButton;
-  mitk::EButtonStates modifiers = mitk::BS_ControlButton | mitk::BS_AltButton;
+  mitk::EButtons buttonStates =  mitk::BN_LeftButton | mitk::BN_RightButton;
+  mitk::EButtons eventButton = mitk::BN_LeftButton;
+  mitk::EModifiers modifiers = mitk::MOD_ControlButton | mitk::MOD_AltButton;
 
   mitk::Point2D point;
   point[0] = 17;
@@ -47,7 +47,7 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
   point[0] = 178;
   point[1] = 170;
   mitk::MousePressEvent::Pointer me3 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
-  modifiers = mitk::BS_ControlButton;
+  modifiers = mitk::MOD_ControlButton;
   mitk::MousePressEvent::Pointer me4 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
 
 
@@ -64,7 +64,7 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
   point[0] = 178;
   point[1] = 170;
   mitk::MouseReleaseEvent::Pointer mr3 = mitk::MouseReleaseEvent::New(renderer,point, buttonStates, modifiers, eventButton);
-  eventButton = mitk::BS_RightButton;
+  eventButton = mitk::BN_RightButton;
   mitk::MouseReleaseEvent::Pointer mr4 = mitk::MouseReleaseEvent::New(renderer,point, buttonStates, modifiers, eventButton);
 
 
@@ -81,7 +81,7 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
     point[0] = 178;
   point[1] = 170;
   mitk::MouseMoveEvent::Pointer mm3 = mitk::MouseMoveEvent::New(renderer,point, buttonStates, modifiers);
-  modifiers = mitk::BS_LeftButton;
+  modifiers = mitk::MOD_AltButton;
   mitk::MouseMoveEvent::Pointer mm4 = mitk::MouseMoveEvent::New(renderer,point, buttonStates, modifiers);
 
 

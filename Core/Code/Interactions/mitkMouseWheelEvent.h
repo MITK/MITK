@@ -14,8 +14,9 @@
 
  ===================================================================*/
 
-#ifndef MITKMOUSEMOVEEVENT_H_
-#define MITKMOUSEMOVEEVENT_H_
+#ifndef MITKMOUSEWHEELEVENT_H_
+#define MITKMOUSEWHEELEVENT_H_
+
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
@@ -26,25 +27,30 @@
 
 #include <MitkExports.h>
 
+/**
+ * Note: A Click with the MiddleButton is to be handled with MousePressEvents
+ */
+
+
 namespace mitk
 {
-
-  class MITK_CORE_EXPORT MouseMoveEvent : public InteractionPositionEvent {
+  class MITK_CORE_EXPORT MouseWheelEvent : public InteractionPositionEvent {
 
   public:
-    mitkClassMacro(MouseMoveEvent,InteractionPositionEvent);
-    mitkNewMacro4Param(Self, BaseRenderer*, Point2D , EButtons , EModifiers);
+    mitkClassMacro(MouseWheelEvent,InteractionPositionEvent);
+    mitkNewMacro5Param(Self, BaseRenderer*, Point2D , EButtons , EModifiers, int);
 
-
+    int GetWheelDelta();
 
     virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:
-    MouseMoveEvent(BaseRenderer*, Point2D, EButtons buttonStates, EModifiers modifiers);
-    virtual ~MouseMoveEvent();
+    MouseWheelEvent(BaseRenderer*, Point2D, EButtons buttonStates, EModifiers modifiers, int  wheelDelta);
+    virtual ~MouseWheelEvent();
 
   private:
+    int m_WheelDelta;
   };
 } /* namespace mitk */
 
-#endif /* MITKMOUSEMOVEEVENT_H_ */
+#endif /* MITKMOUSEPRESSEVENT_H_ */

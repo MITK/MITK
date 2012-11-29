@@ -15,6 +15,7 @@
  ===================================================================*/
 
 #include "mitkDispatcher.h"
+#include "mitkInteractionEvent.h"
 
 typedef std::list<mitk::EventInteractor::Pointer> ListInteractor;
 
@@ -66,9 +67,9 @@ mitk::Dispatcher::~Dispatcher()
   // TODO Auto-generated destructor stub
 }
 
-bool mitk::Dispatcher::ProcessEvent(mitk::Event event)
+bool mitk::Dispatcher::ProcessEvent(mitk::InteractionEvent* event)
 {
-  mitk::Event p = event;
+  mitk::InteractionEvent::Pointer p = event;
   m_Interactors.sort();
   return false; // TODO: dummy implementation
 }

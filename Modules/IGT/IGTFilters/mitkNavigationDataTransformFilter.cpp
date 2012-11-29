@@ -89,10 +89,7 @@ void mitk::NavigationDataTransformFilter::GenerateData()
       NavigationData::OrientationType  quatIn = input->GetOrientation();
       vnl_quaternion<double> const vnlQuatIn(quatIn.x(), quatIn.y(), quatIn.z(), quatIn.r());
 
-      itk::Matrix<float,3,3> rotMatrix = m_Transform->GetMatrix();
-      itk::Matrix<double,3,3> rotMatrixD;
-
-      mitk::TransferMatrix(rotMatrix,rotMatrixD);
+      TransformType::MatrixType rotMatrixD = m_Transform->GetMatrix();
 
       m_QuatOrgRigidTransform->SetRotationMatrix(rotMatrixD);
       m_QuatTmpTransform->SetRotation(vnlQuatIn);

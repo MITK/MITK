@@ -37,7 +37,7 @@ namespace mitk {
 
   public:
 
-    typedef itk::Rigid3DTransform< float > TransformType;
+    typedef itk::Rigid3DTransform< double > TransformType;
 
     mitkClassMacro(NavigationDataTransformFilter, NavigationDataToNavigationDataFilter);
     itkNewMacro(Self);

@@ -322,19 +322,6 @@
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QPushButton" name="m_resetButton">
-         <property name="geometry">
-          <rect>
-           <x>280</x>
-           <y>10</y>
-           <width>75</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Reset view</string>
-         </property>
-        </widget>
        </widget>
       </item>
       <item row="1" column="0">

@@ -14,12 +14,10 @@ var frequency = new Array();
 var measurement = new Array();
 var dataset;
 
-var data = [8,6,4,2,0,9,7,5,3,1];
-
 var margin = {
-    top : 30,
+    top : 0,
     bottom : 50,
-    left : 50,
+    left : 45,
     right : 20,
     };
 var height = histogramData.height - margin.top - margin.bottom;
@@ -29,19 +27,16 @@ var connected = false;
 var dur = 1000;
 var useLinePlot = false;
 
-
+// connecting signal from qt side with JavaScript method
 if (!connected)
 {
     connected = true;
     histogramData.DataChanged.connect(updateHistogram);
-    histogramData.sizeChanged.connect(changeSize);
 }
-
-
 
 var xScale = d3.scale.linear()
                 .domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)])
-                .range([margin.left,width]);
+                .range([0,width]);
 
 var yScale = d3.scale.linear()
                 .domain([0,d3.max(histogramData.frequency)])
@@ -59,53 +54,42 @@ var svg = d3.select("body")
             .append("svg")
             .attr("class", "svg")
             .attr("width", width + margin.right + margin.left)
-            .attr("height", height + margin.top + margin.bottom);
+            .attr("height", height + margin.top + margin.bottom)
+         .append("g")
+            .attr("transform", "translate (" + margin.left + "," + margin.top + ")")
+            .call(d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom));
 
-svg.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(" + 0 + "," + height + ")")
-    .call(xAxis);
+var vis = svg.append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-svg.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(" + margin.left + "," + 0 + ")")
-    .call(yAxis);
+svg.append("rect")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .attr("opacity", 0);
 
-function changeSize ()
-{
-    height = histogramData.height - margin.top - margin.bottom;
-    width = histogramData.width - margin.left - margin.right;
-    svg = d3.select("body")
-            .append("svg")
-            .attr("class", "svg")
-            .attr("width", width + margin.right + margin.left)
-            .attr("height", height + margin.top + margin.bottom);
-    changeHistogram();
-}
+updateHistogram();
 
+// method to update and choose histogram
 function updateHistogram()
 {
-    if (!useLinePlot)
+    if (!histogramData.useLineGraph)
     {
         barChart();
     }
-    else if (useLinePlot)
+    else if (histogramData.useLineGraph)
     {
         linePlot()
     }
 }
 
-function changeHistogram()
-{
-    useLinePlot = !useLinePlot;
-    updateHistogram();
-}
-
+// method to display histogram as barchart
 function barChart()
 {
+// match scale to current data
     xScale = d3.scale.linear()
                 .domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)])
-                .range([margin.left,width]);
+                .range([0,width]);
 
     yScale = d3.scale.linear()
                 .domain([0,d3.max(histogramData.frequency)])
@@ -120,6 +104,8 @@ function barChart()
                 .scale(yScale)
                 .orient("left");
 
+    svg.call(d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom));
+
     var linenull = d3.svg.line()
             .interpolate("linear")
             .x(function(d,i) {
@@ -129,9 +115,10 @@ function barChart()
                 return yScale(0);
             });
 
-    svg.selectAll("path.line").transition().duration(dur).attr("d", linenull(histogramData.frequency)).remove();
+// element to animate transition from linegraph to barchart
+    vis.selectAll("path.line").transition().duration(dur).attr("d", linenull(histogramData.frequency)).remove();
 
-    var bar = svg.selectAll("rect").data(histogramData.frequency);
+    var bar = vis.selectAll("rect.bar").data(histogramData.frequency);
 
     bar.enter().append("rect")
         .attr("class", "bar")
@@ -143,7 +130,7 @@ function barChart()
         .attr("y", height)
         .attr("height", 0)
         .attr("width", (width/(histogramData.frequency.length + 1)))
-        .transition().duration(dur)
+        .transition().delay(dur).duration(dur*1.5)
         .attr("height", function(d) {
             return (height - yScale(d));
         })
@@ -152,7 +139,7 @@ function barChart()
             return yScale(d);
         });
 
-    bar.transition().duration(dur)
+    bar.transition().delay(dur).duration(dur*1.5)
         .attr("x", function(d,i) {
             return xScale(histogramData.measurement[i]);
         })
@@ -164,7 +151,7 @@ function barChart()
         })
         .attr("width", (width/(histogramData.frequency.length + 1)))
 
-    bar.exit().transition().duration(dur)
+    bar.exit().transition().delay(dur).duration(dur*1.5)
         .attr("y", height)
         .attr("height", 0)
         .remove();
@@ -176,25 +163,26 @@ function barChart()
         .remove();
 
     svg.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(" + 0 + "," + height + ")")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
         .transition().duration(dur)
         .attr("opacity", 100)
         .call(xAxis);
 
     svg.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(" + margin.left + "," + 0 + ")")
+        .attr("class", "y axis")
         .transition().duration(dur)
         .attr("opacity", 100)
         .call(yAxis);
 }
 
+// method to display histogram as linegraph
 function linePlot()
 {
+// match scale to current data
     xScale = d3.scale.linear()
                 .domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)])
-                .range([margin.left,width]);
+                .range([0,width]);
 
     yScale = d3.scale.linear()
                 .domain([0,d3.max(histogramData.frequency)])
@@ -209,7 +197,10 @@ function linePlot()
                 .scale(yScale)
                 .orient("left");
 
-    svg.selectAll("rect")
+    svg.call(d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom));
+
+// element to animate transition from barchart to linegraph
+    vis.selectAll("rect.bar")
         .transition()
         .duration(dur)
         .attr("height", 0)
@@ -217,24 +208,26 @@ function linePlot()
         .remove();
 
     var line = d3.svg.line()
-            .interpolate("linear")
+            .interpolate("cardinal")
             .x(function(d,i) {
                 return xScale(histogramData.measurement[i]);
             })
             .y(function(d) {
                 return yScale(d);
-            });
+            })
+            .tension(0.8);
 
     var linenull = d3.svg.line()
-            .interpolate("linear")
+            .interpolate("cardinal")
             .x(function(d,i) {
                 return xScale(histogramData.measurement[i]);
             })
             .y(function(d) {
                 return yScale(0);
-            });
+            })
+            .tension(0.8);
 
-    var graph = svg.selectAll("path.line").data([histogramData.frequency]);
+    var graph = vis.selectAll("path.line").data([histogramData.frequency]);
 
 
     graph.enter()
@@ -259,121 +252,40 @@ function linePlot()
         .remove();
 
     svg.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(" + 0 + "," + height + ")")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
         .transition().duration(dur)
         .attr("opacity", 100)
         .call(xAxis);
 
     svg.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(" + margin.left + "," + 0 + ")")
+        .attr("class", "y axis")
         .transition().duration(dur)
         .attr("opacity", 100)
         .call(yAxis);
+
 }
 
-function Test()
+// method to ensure barwidth is not smaller than 1px
+function barWidth()
 {
-    xScale = d3.scale.linear()
-                .domain([0,data.length])
-                .range([margin.left,width]);
-
-    yScale = d3.scale.linear()
-                .domain([0,d3.max(data)])
-                .range([height,margin.bottom]);
-
-    xAxis = d3.svg.axis()
-                    .scale(xScale)
-                    .orient("bottom");
-
-    yAxis = d3.svg.axis()
-                   .scale(yScale)
-                   .orient("left");
-
-    var bar = svg.selectAll("rect").data(data);
-
-    bar.enter().append("rect")
-        .attr("class", "bar")
-        .attr("x", function(d,i) {
-            return xScale(i);
-        })
-        .attr("y", height)
-        .attr("height", 0)
-        .attr("width", width/(data.length + 1))
-        .transition()
-        .attr("height", function(d) {
-            return (height-yScale(d));
-        })
-        .attr("width", width/(data.length + 1))
-        .attr("y", function(d) {
-            return yScale(d);
-        });
-
-    bar.transition()
-        .attr("x", function(d,i) {
-            return xScale(i);
-        })
-        .attr("y", function(d) {
-            return yScale(d);
-        })
-        .attr("height", function(d) {
-            return (height-yScale(d));
-        })
-        .attr("width", width/(data.length + 1));
-
-    bar.exit().transition()
-        .attr("y", height)
-        .attr("height", 0)
-        .remove();
-
-    var line = d3.svg.line()
-            .interpolate("linear")
-            .x(function(d,i) {
-                return xScale(i);
-            })
-            .y(function(d) {
-                return yScale(d);
-            });
-
-    var linenull = d3.svg.line()
-            .interpolate("linear")
-            .x(function(d,i) {
-                return xScale(i);
-            })
-            .y(function(d) {
-                return yScale(0);
-            });
-
-    var graph = svg.selectAll("path.line").data([data]);
-
-    graph.enter()
-        .append("path")
-        .attr("class", "line")
-        .attr("d", linenull)
-        .transition()
-        .duration(dur)
-        .attr("d", line);
-
-
-    graph.transition()
-        .duration(dur)
-        .attr("d", line);
-
-    graph.exit().transition().duration(dur).attr("d", linenull);
-
-    svg.selectAll("g").transition().attr("opacity", 0).remove();
-
-    svg.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(" + 0 + "," + height + ")")
-        .transition()
-        .call(xAxis);
-
-    svg.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(" + margin.left + "," + 0 + ")")
-        .transition()
-        .call(yAxis);
-
+    var barWidth = width/data.length - 1;
+    if (barWidth < 1)
+    {
+        barWidth = 1;
+    }
+    return barWidth;
 }
+
+function zoom()
+{
+  svg.select(".x.axis").call(xAxis);
+  svg.select(".y.axis").call(yAxis);
+  vis.selectAll(".bar").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  vis.selectAll("path.line").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
+
+svg.append("rect")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .attr("opacity", 0);

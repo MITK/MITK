@@ -20,8 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   QWebView(parent)
 {
+  // set histogram to barchart in first instance
+  m_UseLineGraph = false;
+
+  // prepare html for use
   connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJSObject()));
-  connect(this, SIGNAL(loadFinished()), this, SLOT(resetData()));
   QUrl myUrl = QUrl("qrc:/qmitk/Histogram.html");
   setUrl(myUrl);
 
@@ -49,21 +52,25 @@ void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
   this->reload();
 }
 
+// method to expose data to JavaScript by using properties
 void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
 {
   m_Histogram = histogram;
   HistogramConstIteratorType startIt = m_Histogram->End();
   HistogramConstIteratorType endIt = m_Histogram->End();
   HistogramConstIteratorType it;
-  m_Frequency.clear();
-  m_Measurement.clear();
+  clearData();
   unsigned int i = 0;
   for (it = m_Histogram->Begin() ; it != m_Histogram->End(); ++it, ++i)
   {
-    QVariant frequency = it.GetFrequency();
-    QVariant measurement = it.GetMeasurementVector()[0];
-    m_Frequency.insert(i, frequency);
-    m_Measurement.insert(i, measurement);
+    // filter frequencies of 0 to guarantee a better view while using a mask
+    if (it.GetFrequency() != 0)
+    {
+      QVariant frequency = it.GetFrequency();
+      QVariant measurement = it.GetMeasurementVector()[0];
+      m_Frequency.insert(i, frequency);
+      m_Measurement.insert(i, measurement);
+    }
   }
 
   this->DataChanged();
@@ -91,17 +98,25 @@ QList<QVariant> QmitkHistogramJSWidget::getMeasurement()
   return m_Measurement;
 }
 
-void QmitkHistogramJSWidget::resetData(bool ok)
+bool QmitkHistogramJSWidget::getUseLineGraph()
 {
+  return m_UseLineGraph;
+}
+
+// slots for radio- and pushbuttons
+void QmitkHistogramJSWidget::histogramToBarChart()
+{
+  m_UseLineGraph = false;
   this->DataChanged();
 }
 
-void QmitkHistogramJSWidget::testData()
+void QmitkHistogramJSWidget::histogramToLineGraph()
 {
-  this->clearData();
-  for (unsigned int i = 0; i<10; i++)
-  {
-    m_Frequency.insert(i,10);
-    m_Measurement.insert(i,i);
-  }
+  m_UseLineGraph = true;
+  this->DataChanged();
+}
+
+void QmitkHistogramJSWidget::resetView()
+{
+  this->reload();
 }

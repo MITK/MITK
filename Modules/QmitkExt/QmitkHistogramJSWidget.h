@@ -30,10 +30,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
 {
   Q_OBJECT
+
+// Properties which can be used in JavaScript
   Q_PROPERTY(QList<QVariant> measurement
              READ getMeasurement)
   Q_PROPERTY(QList<QVariant> frequency
              READ getFrequency)
+  Q_PROPERTY(bool useLineGraph
+             READ getUseLineGraph)
 
 public:
   typedef mitk::Image::HistogramType HistogramType;
@@ -46,22 +50,26 @@ public:
   void clearHistogram();
   QList<QVariant> getMeasurement();
   QList<QVariant> getFrequency();
+  bool getUseLineGraph();
 
 private:
   QList<QVariant> m_Frequency;
   QList<QVariant> m_Measurement;
+  bool m_UseLineGraph;
   HistogramType::ConstPointer m_Histogram;
 
   void clearData();
-  void testData();
 
 private slots:
   void addJSObject();
-  void resetData(bool ok);
+
+public slots:
+  void histogramToBarChart();
+  void histogramToLineGraph();
+  void resetView();
 
 signals:
   void DataChanged();
-  void sizeChanged();
 };
 
 #endif // QMITKHISTOGRAMJSWIDGET_H

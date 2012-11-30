@@ -27,26 +27,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::OclFilter::OclFilter()
   : m_ClFile(),
-    m_ClSourcePath(NULL),
-    m_ClCompilerFlags(NULL),
+    m_ClSource(NULL),
+    m_ClCompilerFlags(""),
     m_ClProgram(NULL),
-    m_Preambel(" "),
-    m_Initialized(false),
     m_CommandQue(NULL),
-    m_FilterID("mitkOclFilter")
+    m_FilterID("mitkOclFilter"),
+    m_Preambel(" "),
+    m_Initialized(false)
 {
-  this->SetSourcePath("Modules/OpenCL/ShaderSources");
-  m_ClCompilerFlags = "";
+  m_ClSourcePath = MITK_ROOT;
+  m_ClSourcePath += "Modules/OpenCL/ShaderSources";
 }
 
 mitk::OclFilter::OclFilter(const char* filename)
-  : m_FilterID(filename)
+  : m_ClFile(),
+    m_ClSource(NULL),
+    m_ClCompilerFlags(""),
+    m_ClProgram(NULL),
+    m_CommandQue(NULL),
+    m_FilterID(filename),
+    m_Preambel(" "),
+    m_Initialized(false)
 {
-  m_CommandQue = NULL;
-  m_ClProgram = NULL;
-  m_ClCompilerFlags = "";
-  this->SetSourceFile(filename);
-  this->SetSourcePath("/Modules/OpenCL/ShaderSources");
+  m_ClSourcePath = MITK_ROOT;
+  m_ClSourcePath += "Modules/OpenCL/ShaderSources";
 }
 
 mitk::OclFilter::~OclFilter()
@@ -114,14 +118,9 @@ void mitk::OclFilter::SetSourceFile(const char* filename)
 {
   MITK_DEBUG("ocl.filter") << "Setting source [" <<  filename <<" ]";
 
-  std::string clsourceDir = MITK_ROOT;
-  clsourceDir  += m_ClSourcePath;
-
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( clsourceDir.c_str(), true);
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_ClSourcePath.c_str(), true);
   // search for file
-  clsourceDir = mitk::StandardFileLocations::GetInstance()->FindFile(  filename);
-
-  m_ClFile = clsourceDir;
+  m_ClFile = mitk::StandardFileLocations::GetInstance()->FindFile(  filename);
 }
 
 void mitk::OclFilter::CompileSource()
@@ -156,8 +155,8 @@ void mitk::OclFilter::CompileSource()
     compilerOptions.append(" -I");
     // set the path of the current gpu source dir as opencl
     // include folder
-    compilerOptions.append(MITK_ROOT);
-    compilerOptions.append(m_ClSourcePath);
+    compilerOptions.append(m_ClSourcePath.c_str());
+    MITK_DEBUG("ocl.filter") << "cl compiler flags: " << compilerOptions.c_str();
 
     clErr = clBuildProgram(m_ClProgram, 0, NULL, compilerOptions.c_str(), NULL, NULL);
     CHECK_OCL_ERR(clErr);
@@ -169,7 +168,6 @@ void mitk::OclFilter::CompileSource()
       oclLogBuildInfo(m_ClProgram,  OpenCLActivator::GetResourceServiceRef()->GetCurrentDevice() );
       oclLogBinary(m_ClProgram,  OpenCLActivator::GetResourceServiceRef()->GetCurrentDevice() );
       m_Initialized = false;
-
     }
 
     // store the succesfully build program into the program storage provided by the resource service

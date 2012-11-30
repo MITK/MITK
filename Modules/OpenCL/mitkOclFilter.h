@@ -42,7 +42,10 @@ public:
   void SetSourceFile(const char* filename);
 
   /**
-    * @brief Set the folder of the OpenCL files
+    * @brief Set the folder of the directory that contains
+    *        the OpenCL source files. This location will also be used
+    *        as an include folder for the OpenCL compiler and all headers placed
+    *        there can be loaded by the compiler.
     *
     *  @param path to the modulefolder that contains the gpuSource
     */
@@ -77,9 +80,6 @@ protected:
   /** @brief The source code to be compiled for the GPU */
   const char* m_ClSource;
 
-  /** @brief The path of the module folder in wich the gpu sourcefiles are stored */
-  const char* m_ClSourcePath;
-
   /** @brief String that contains the compiler flags */
   const char* m_ClCompilerFlags;
 
@@ -92,16 +92,25 @@ protected:
   /** @brief Unique ID of the filter, needs to be specified in the constructor of the derived class */
   std::string m_FilterID;
 
-  /** @brief Set the working size for the following OpenCL kernel call */
-  void SetWorkingSize(unsigned int locx, unsigned int dimx,
-                      unsigned int locy, unsigned int dimy,
-                      unsigned int locz = 1, unsigned int dimz = 1);
+  /*! @brief source preambel for e.g. #define commands to be inserted into the OpenCL source */
+  const char* m_Preambel;
+
+  /** @brief  status of the filter */
+  bool m_Initialized;
+
+  /** @brief The path of the module folder in wich the gpu sourcefiles are stored */
+  std::string m_ClSourcePath;
 
   /** @brief The local work size fo the filter */
   size_t m_LocalWorkSize[3];
 
   /** @brief The global work size of the filter */
   size_t m_GlobalWorkSize[3];
+
+  /** @brief Set the working size for the following OpenCL kernel call */
+  void SetWorkingSize(unsigned int locx, unsigned int dimx,
+                      unsigned int locy, unsigned int dimy,
+                      unsigned int locz = 1, unsigned int dimz = 1);
 
   /** @brief Execute the given kernel on the OpenCL Index-Space defined by the local and global work sizes
       */
@@ -131,11 +140,6 @@ protected:
       */
   void SetSourcePreambel(const char* preambel);
 
-  /*! @brief source preambel for e.g. #define commands to be inserted into the OpenCL source */
-  const char* m_Preambel;
-
-  /** @brief  status of the filter */
-  bool m_Initialized;
 
 };
 }

@@ -43,7 +43,9 @@ public:
 
   /**
     * @brief Set the folder of the directory that contains
-    *        the OpenCL source files
+    *        the OpenCL source files. This location will also be used
+    *        as an include folder for the OpenCL compiler and all headers placed
+    *        there can be loaded by the compiler.
     *
     *  @param path to the modulefolder that contains the gpuSource
     */

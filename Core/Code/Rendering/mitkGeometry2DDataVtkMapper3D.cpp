@@ -513,6 +513,11 @@ namespace mitk
               dataSetMapper->SetInput( surface->GetVtkPolyData() );
             }
 
+            //Check if the m_ReslicedImage is NULL.
+            //This is the case when no image geometry is met by
+            //the reslicer. In that case, the texture has to be
+            //empty (black) and we don't have to do anything.
+            //See fixed bug #13275
             if(localStorage->m_ReslicedImage != NULL)
             {
               bool binaryOutline = node->IsOn( "outline binary", renderer );

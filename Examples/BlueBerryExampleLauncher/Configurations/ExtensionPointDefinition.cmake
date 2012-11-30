@@ -4,7 +4,7 @@ set(REQUIRED_PLUGINS
 )
 
 set(DESCRIPTION
-"This BlueBerry example consists of two plugins that demonstrate the use of the extension point concept. The first plugin defines an extension point and holds the GUI. The user can insert a text in a text field. The second plugin contributes an extension in the form of two classes that can change a given text to upper or lower case.
+"This BlueBerry example consists of two plugins that demonstrate the use of the extension point concept. The first plugin defines an extension point and holds the GUI. The user can insert a text in a text field. The second plugin contributes an extension in the form of two classes that can change the user text to upper or lower case.
 
 <p>
 The following features are demonstrated:

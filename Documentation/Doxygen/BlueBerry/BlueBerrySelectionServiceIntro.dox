@@ -35,6 +35,6 @@ The following two examples describe different ways of implementing and using the
 
 Knowing and using the existing selection mechanisms gives your plug-ins a clean design, smoothly integrates them into the workbench and opens them for future extensions.
 
-[\ref ExamplePage]
+[\ref BlueBerrySelectionServiceIntro] [Next: \ref BlueBerryExampleSelectionServiceQt] [\ref BlueBerryExamples]
 
 */

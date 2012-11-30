@@ -6,7 +6,7 @@
 
   \image html SelectionServiceQT.png
 
-  In this examples the selection service is used to connect the selection of the radio buttons from one
+  In this example the selection service is used to connect the selection of the radio buttons from one
   view with the selection of the list of the other view. The SelectionView holds a QListWidget that provides
   the user selection (qt selection provider) for the selection listener (ListenerView). The radio buttons of
   the listener view are changed according to the selection in the QListWidget. Vice versa the radio buttons
@@ -42,6 +42,6 @@
   \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/ListenerView.cpp,ListenerView.cpp}
   \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/ListenerView.h,ListenerView.h}
 
-[\ref BlueBerrySelectionServiceIntro] [Next: \ref BlueBerryExampleSelectionServiceMitk]
+[\ref BlueBerrySelectionServiceIntro] [Next: \ref BlueBerryExampleSelectionServiceMitk] [\ref BlueBerryExamples]
 
 */

@@ -145,10 +145,14 @@ namespace mitk {
       vtkSmartPointer<vtkPropAssembly> m_Actors;
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
-      /** \brief Current slice of a 2D render window. */
+      /** \brief Current slice of a 2D render window.*/
       vtkSmartPointer<vtkImageData> m_ReslicedImage;
       /** \brief Empty vtkPolyData that is set when rendering geometry does not
       *   intersect the image geometry.
+      *   \warning This member variable is set to NULL,
+      *   if no image geometry is inside the plane geometry
+      *   of the respective render window. Any user of this
+      *   slice has to check whether it is set to NULL!
       */
       vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
       /** \brief Plane on which the slice is rendered as texture. */

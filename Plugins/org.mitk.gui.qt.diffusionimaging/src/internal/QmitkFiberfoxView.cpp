@@ -500,7 +500,6 @@ void QmitkFiberfoxView::GenerateImage()
     filter->SetNonFiberModels(modelList);
     filter->SetNoiseModel(&noiseModel);
     filter->SetKspaceArtifacts(artifactList);
-    filter->SetOuputKspaceImage(m_Controls->m_KspaceImageBox->isChecked());
     filter->SetVolumeAccuracy(m_Controls->m_VolumeAccuracyBox->value());
     if (m_TissueMask.IsNotNull())
     {
@@ -518,9 +517,21 @@ void QmitkFiberfoxView::GenerateImage()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );
     node->SetName(m_Controls->m_ImageName->text().toStdString());
-    if (m_Controls->m_KspaceImageBox->isChecked())
-        node->SetBoolProperty("use-color", false);
     GetDataStorage()->Add(node, m_SelectedBundle);
+
+    if (m_Controls->m_KspaceImageBox->isChecked())
+    {
+        itk::Image<double, 3>::Pointer kspace = filter->GetKspaceImage();
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk(kspace.GetPointer());
+        image->SetVolume(kspace->GetBufferPointer());
+
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData( image );
+        node->SetName("k-space");
+        node->SetBoolProperty("use color", false);
+        GetDataStorage()->Add(node, m_SelectedBundle);
+    }
 
     mitk::BaseData::Pointer basedata = node->GetData();
     if (basedata.IsNotNull())

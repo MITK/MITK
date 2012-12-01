@@ -95,9 +95,11 @@ protected:
     TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
     mitk::Vector3D                      m_Spacing;              ///< output image spacing
+    mitk::Vector3D                      m_UpsampledSpacing;
     mitk::Point3D                       m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size
+    ImageRegion<3>                      m_UpsampledImageRegion;
     ItkUcharImgType::Pointer            m_TissueMask;           ///< voxels outside of this binary mask contain only noise (are treated as air)
     FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
@@ -107,6 +109,7 @@ protected:
     bool                                m_CircleDummy;
     unsigned int                        m_VolumeAccuracy;
     ItkDoubleImgType::Pointer           m_KspaceImage;
+    unsigned int                        m_Upsampling;
 };
 }
 

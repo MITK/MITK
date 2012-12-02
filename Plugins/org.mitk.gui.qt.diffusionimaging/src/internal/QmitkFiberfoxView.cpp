@@ -428,13 +428,6 @@ void QmitkFiberfoxView::GenerateImage()
         return;
     }
 
-    mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundle->GetData());
-    if (fiberBundle->GetNumFibers()<=0)
-    {
-        QMessageBox::information(0, "Image generation not possible:", "Generated fiber bundle contains no fibers!");
-        return;
-    }
-
     DiffusionSignalModel<double>::GradientListType gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
     double bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
 
@@ -445,11 +438,11 @@ void QmitkFiberfoxView::GenerateImage()
     extraAxonal.SetKernelFA(m_Controls->m_MaxFaBox->value());
     extraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
     extraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
-//    mitk::StickModel<double> intraAxonal;
-//    intraAxonal.SetGradientList(gradientList);
-//    intraAxonal.SetDiffusivity(m_Controls->m_MaxFaBox->value());
-//    intraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
-//    intraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
+    //    mitk::StickModel<double> intraAxonal;
+    //    intraAxonal.SetGradientList(gradientList);
+    //    intraAxonal.SetDiffusivity(m_Controls->m_MaxFaBox->value());
+    //    intraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
+    //    intraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
 
     mitk::BallModel<double> freeDiffusion;
     freeDiffusion.SetGradientList(gradientList);
@@ -488,57 +481,65 @@ void QmitkFiberfoxView::GenerateImage()
         artifactList.push_back(&t2Model);
     }
 
-    itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();
-    filter->SetImageRegion(imageRegion);
-    filter->SetSpacing(spacing);
-    filter->SetFiberBundle(fiberBundle);
-    modelList.push_back(&extraAxonal);
-//    modelList.push_back(&intraAxonal);
-    filter->SetFiberModels(modelList);
-    modelList.clear();
-    modelList.push_back(&freeDiffusion);
-    filter->SetNonFiberModels(modelList);
-    filter->SetNoiseModel(&noiseModel);
-    filter->SetKspaceArtifacts(artifactList);
-    filter->SetVolumeAccuracy(m_Controls->m_VolumeAccuracyBox->value());
-    if (m_TissueMask.IsNotNull())
+
+    for (int i=0; i<m_SelectedBundles.size(); i++)
     {
-        ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
-        mitk::CastToItkImage<ItkUcharImgType>(m_TissueMask, mask);
-        filter->SetTissueMask(mask);
-    }
-    filter->Update();
+        mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());
+        if (fiberBundle->GetNumFibers()<=0)
+            continue;
 
-    mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-    image->SetVectorImage( filter->GetOutput() );
-    image->SetB_Value(bVal);
-    image->SetDirections(gradientList);
-    image->InitializeFromVectorImage();
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData( image );
-    node->SetName(m_Controls->m_ImageName->text().toStdString());
-    GetDataStorage()->Add(node, m_SelectedBundle);
+        itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();
+        filter->SetImageRegion(imageRegion);
+        filter->SetSpacing(spacing);
+        filter->SetFiberBundle(fiberBundle);
+        modelList.push_back(&extraAxonal);
+        //    modelList.push_back(&intraAxonal);
+        filter->SetFiberModels(modelList);
+        modelList.clear();
+        modelList.push_back(&freeDiffusion);
+        filter->SetNonFiberModels(modelList);
+        filter->SetNoiseModel(&noiseModel);
+        filter->SetKspaceArtifacts(artifactList);
+        filter->SetVolumeAccuracy(m_Controls->m_VolumeAccuracyBox->value());
+        if (m_TissueMask.IsNotNull())
+        {
+            ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
+            mitk::CastToItkImage<ItkUcharImgType>(m_TissueMask, mask);
+            filter->SetTissueMask(mask);
+        }
+        filter->Update();
 
-    if (m_Controls->m_KspaceImageBox->isChecked())
-    {
-        itk::Image<double, 3>::Pointer kspace = filter->GetKspaceImage();
-        mitk::Image::Pointer image = mitk::Image::New();
-        image->InitializeByItk(kspace.GetPointer());
-        image->SetVolume(kspace->GetBufferPointer());
-
+        mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
+        image->SetVectorImage( filter->GetOutput() );
+        image->SetB_Value(bVal);
+        image->SetDirections(gradientList);
+        image->InitializeFromVectorImage();
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData( image );
-        node->SetName("k-space");
-        node->SetBoolProperty("use color", false);
+        node->SetName(m_Controls->m_ImageName->text().toStdString());
         GetDataStorage()->Add(node, m_SelectedBundle);
-    }
 
-    mitk::BaseData::Pointer basedata = node->GetData();
-    if (basedata.IsNotNull())
-    {
-        mitk::RenderingManager::GetInstance()->InitializeViews(
-                    basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        if (m_Controls->m_KspaceImageBox->isChecked())
+        {
+            itk::Image<double, 3>::Pointer kspace = filter->GetKspaceImage();
+            mitk::Image::Pointer image = mitk::Image::New();
+            image->InitializeByItk(kspace.GetPointer());
+            image->SetVolume(kspace->GetBufferPointer());
+
+            mitk::DataNode::Pointer node = mitk::DataNode::New();
+            node->SetData( image );
+            node->SetName("k-space");
+            node->SetBoolProperty("use color", false);
+            GetDataStorage()->Add(node, m_SelectedBundle);
+        }
+
+        mitk::BaseData::Pointer basedata = node->GetData();
+        if (basedata.IsNotNull())
+        {
+            mitk::RenderingManager::GetInstance()->InitializeViews(
+                        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
     }
 }
 

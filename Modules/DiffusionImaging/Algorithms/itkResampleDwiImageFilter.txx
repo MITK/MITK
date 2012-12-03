@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageRegion.h>
 #include <itkResampleImageFilter.h>
 #include <itkBSplineInterpolateImageFunction.h>
+#include <itkNearestNeighborInterpolateImageFunction.h>
 
 namespace itk
 {
@@ -76,8 +77,12 @@ ResampleDwiImageFilter<TScalarType>
     outImage->SetVectorLength( this->GetInput()->GetVectorLength() );
     outImage->Allocate();
 
+    typename itk::NearestNeighborInterpolateImageFunction<DwiChannelType>::Pointer interp = itk::NearestNeighborInterpolateImageFunction<DwiChannelType>::New();
+//    typename itk::BSplineInterpolateImageFunction<DwiChannelType>::Pointer interp = itk::BSplineInterpolateImageFunction<DwiChannelType>::New();
+
     typename itk::ResampleImageFilter<DwiChannelType, DwiChannelType>::Pointer resampler = itk::ResampleImageFilter<DwiChannelType, DwiChannelType>::New();
     resampler->SetOutputParametersFromImage(outImage);
+    resampler->SetInterpolator(interp);
 
     for (int i=0; i<this->GetInput()->GetVectorLength(); i++)
     {

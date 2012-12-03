@@ -206,6 +206,13 @@ void TractsToDWIImageFilter::GenerateData()
     if (m_NonFiberModels.empty())
         itkExceptionMacro("No diffusion model for non-fiber compartments defined!");
 
+    // determine k-space undersampling
+    for (int i=0; i<m_KspaceArtifacts.size(); i++)
+        if ( dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i)) )
+            m_Upsampling = dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i))->GetKspaceCropping();
+    if (m_Upsampling<=1)
+        m_Upsampling = 1;
+
     if (m_TissueMask.IsNotNull())
     {
         // use input tissue mask
@@ -213,31 +220,24 @@ void TractsToDWIImageFilter::GenerateData()
         m_Origin = m_TissueMask->GetOrigin();
         m_DirectionMatrix = m_TissueMask->GetDirection();
         m_ImageRegion = m_TissueMask->GetLargestPossibleRegion();
+
+        if (m_Upsampling>1)
+        {
+            ImageRegion<3> region = m_ImageRegion;
+            region.SetSize(0, m_ImageRegion.GetSize(0)*m_Upsampling);
+            region.SetSize(1, m_ImageRegion.GetSize(1)*m_Upsampling);
+            mitk::Vector3D spacing = m_Spacing;
+            spacing[0] /= m_Upsampling;
+            spacing[1] /= m_Upsampling;
+            itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer resampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
+            resampler->SetInput(m_TissueMask);
+            resampler->SetOutputParametersFromImage(m_TissueMask);
+            resampler->SetSize(region.GetSize());
+            resampler->SetOutputSpacing(spacing);
+            resampler->Update();
+            m_TissueMask = resampler->GetOutput();
+        }
         MITK_INFO << "Using tissue mask";
-    }
-    itk::Vector< double, 3 > samplingFactor; samplingFactor.Fill(1);
-
-    // is input slize size a power of two?
-    int x=2; int y=2;
-    while (x<m_ImageRegion.GetSize()[0])
-        x *= 2;
-    while (y<m_ImageRegion.GetSize()[1])
-        y *= 2;
-
-    // if not, adjust size and dimension (needed for FFT); will be resampled later
-    if (x!=m_ImageRegion.GetSize()[0])
-    {
-        MITK_INFO << "Adjusting image width: " << m_ImageRegion.GetSize(0) << " --> " << x;
-        m_Spacing[0] = m_Spacing[0]*(double)m_ImageRegion.GetSize(0)/x;
-        samplingFactor[0] = (double)m_ImageRegion.GetSize(0)/x;
-        m_ImageRegion.SetSize(0, x);
-    }
-    if (y!=m_ImageRegion.GetSize()[1])
-    {
-        MITK_INFO << "Adjusting image height: " << m_ImageRegion.GetSize(1) << " --> " << y;
-        m_Spacing[1] = m_Spacing[1]*(double)m_ImageRegion.GetSize(1)/y;
-        samplingFactor[1] = (double)m_ImageRegion.GetSize(1)/y;
-        m_ImageRegion.SetSize(1, y);
     }
 
     // initialize output dwi image
@@ -255,6 +255,25 @@ void TractsToDWIImageFilter::GenerateData()
     temp.Fill(0.0);
     outImage->FillBuffer(temp);
 
+    // is input slize size a power of two?
+    int x=2; int y=2;
+    while (x<m_ImageRegion.GetSize(0))
+        x *= 2;
+    while (y<m_ImageRegion.GetSize(1))
+        y *= 2;
+
+    // if not, adjust size and dimension (needed for FFT); zero-padding
+    if (x!=m_ImageRegion.GetSize(0))
+    {
+        MITK_INFO << "Adjusting image width: " << m_ImageRegion.GetSize(0) << " --> " << x;
+        m_ImageRegion.SetSize(0, x);
+    }
+    if (y!=m_ImageRegion.GetSize(1))
+    {
+        MITK_INFO << "Adjusting image height: " << m_ImageRegion.GetSize(1) << " --> " << y;
+        m_ImageRegion.SetSize(1, y);
+    }
+
     // initialize k-space image
     m_KspaceImage = ItkDoubleImgType::New();
     m_KspaceImage->SetSpacing( m_Spacing );
@@ -265,13 +284,6 @@ void TractsToDWIImageFilter::GenerateData()
     m_KspaceImage->SetRequestedRegion( m_ImageRegion );
     m_KspaceImage->Allocate();
     m_KspaceImage->FillBuffer(0);
-
-    // determine k-space undersampling
-    for (int i=0; i<m_KspaceArtifacts.size(); i++)
-        if ( dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i)) )
-            m_Upsampling = dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i))->GetKspaceCropping();
-    if (m_Upsampling<=1)
-        m_Upsampling = 1;
 
     // apply undersampling to image parameters
     m_UpsampledSpacing = m_Spacing;
@@ -293,18 +305,6 @@ void TractsToDWIImageFilter::GenerateData()
         m_TissueMask->SetRequestedRegion( m_UpsampledImageRegion );
         m_TissueMask->Allocate();
         m_TissueMask->FillBuffer(1);
-    }
-    else
-    {
-        itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer resampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
-//        itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType,ItkUcharImgType::PixelType>::Pointer interpolator = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType,ItkUcharImgType::PixelType>::New();
-//        resampler->SetInterpolator(interpolator);
-        resampler->SetInput(m_TissueMask);
-        resampler->SetOutputParametersFromImage(m_TissueMask);
-        resampler->SetSize(m_UpsampledImageRegion.GetSize());
-        resampler->SetOutputSpacing(m_UpsampledSpacing);
-        resampler->Update();
-        m_TissueMask = resampler->GetOutput();
     }
 
     // resample fiber bundle for sufficient voxel coverage
@@ -461,7 +461,7 @@ void TractsToDWIImageFilter::GenerateData()
         }
 
         MITK_INFO << "Generating signal of " << m_NonFiberModels.size() << " non-fiber compartments";
-        boost::progress_display disp2(m_NonFiberModels.size()*m_TissueMask->GetLargestPossibleRegion().GetNumberOfPixels());
+        boost::progress_display disp2(m_NonFiberModels.size()*compartments.at(0)->GetLargestPossibleRegion().GetNumberOfPixels());
         for (int i=0; i<m_NonFiberModels.size(); i++)
         {
             DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
@@ -470,7 +470,7 @@ void TractsToDWIImageFilter::GenerateData()
             {
                 ++disp2;
                 DoubleDwiType::IndexType index = it.GetIndex();
-                if (m_TissueMask->GetPixel(index)>0)
+                if (m_TissueMask->GetLargestPossibleRegion().IsInside(index) && m_TissueMask->GetPixel(index)>0)
                     doubleDwi->SetPixel(index, doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement());
                 ++it;
             }
@@ -583,12 +583,6 @@ void TractsToDWIImageFilter::GenerateData()
         ++it4;
     }
 
-    MITK_INFO << "Resampling output to requested size.";
-    itk::ResampleDwiImageFilter< short >::Pointer resampler = itk::ResampleDwiImageFilter< short >::New();
-    resampler->SetSamplingFactor(samplingFactor);
-    resampler->SetInput(outImage);
-    resampler->Update();
-    outImage = resampler->GetOutput();
     this->SetNthOutput(0, outImage);
 }
 

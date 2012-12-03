@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKMOVESURFACEINTERACTOR_H_HEADER_INCLUDED
 
 #include <mitkInteractor.h>
+#include <mitkColorProperty.h>
 
 namespace mitk
 {
@@ -64,6 +65,8 @@ namespace mitk
     * @brief Convert the given Actions to Operations and send to data and UndoController
     **/
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
+
+    mitk::ColorProperty::Pointer m_NodeColor;
   };
 }
 

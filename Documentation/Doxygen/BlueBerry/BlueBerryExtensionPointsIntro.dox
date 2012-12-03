@@ -26,8 +26,8 @@ A plugin can therefore be arbitrary extended.
 
 The two following example plugins describe the usage of the BlueBerry Extension Points. One example defines an extension point and the other example extends the created extension point.
 
-\li \ref org_mitk_example_gui_selectionservicemitk
-\li \ref org_mitk_example_gui_selectionserviceqt
+\li \ref org_mitk_example_gui_extensionpointdefinition
+\li \ref org_mitk_example_gui_extensionpointcontribution
 
 [\ref BlueBerryExampleExtensionPoint] [Next: \ref ExtensionPointDefinition] [\ref BlueBerryExamples]
 

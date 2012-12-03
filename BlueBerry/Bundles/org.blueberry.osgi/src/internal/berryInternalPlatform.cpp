@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -108,9 +108,9 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     this->init(argc, argv);
   }
   catch (const Poco::Util::UnknownOptionException& e)
-  { 
+  {
     BERRY_WARN << e.displayText();
-  } 
+  }
   this->loadConfiguration();
   if (config)
   {
@@ -152,7 +152,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   BERRY_INFO(m_ConsoleLog) << "Framework storage dir: " << m_UserPath.toString();
 
   Poco::File userFile(m_UserPath);
-  
+
   try
   {
     userFile.createDirectories();
@@ -169,6 +169,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   // Initialize the CTK Plugin Framework
   ctkProperties fwProps;
   fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE, QString::fromStdString(userFile.path()));
+
+#if defined(Q_CC_GNU) && ((__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ < 5)))
+  fwProps.insert(ctkPluginConstants::FRAMEWORK_PLUGIN_LOAD_HINTS, QVariant::fromValue<QLibrary::LoadHints>(QLibrary::ExportExternalSymbolsHint));
+#endif
   if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN))
   {
     fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN, ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
@@ -291,7 +295,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
         BERRY_WARN(m_ConsoleLog) << *pluginBaseDir << " is not a direcotry or does not exist. SKIPPED.\n";
         continue;
       }
-    
+
       std::vector<std::string> pluginList;
       pluginDir.list(pluginList);
 

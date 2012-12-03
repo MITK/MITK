@@ -2,20 +2,20 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __vtkMitkApplyLevelWindowToRGBFilter_h
-#define __vtkMitkApplyLevelWindowToRGBFilter_h
+#ifndef __vtkMitkLevelWindowFilter_h
+#define __vtkMitkLevelWindowFilter_h
 
 class vtkScalarsToColors;
 #include <vtkImageData.h>
@@ -34,9 +34,10 @@ class vtkScalarsToColors;
 *
 * \ingroup Renderer
 */
-class MITK_CORE_EXPORT vtkMitkApplyLevelWindowToRGBFilter : public vtkImageToImageFilter
+class MITK_CORE_EXPORT vtkMitkLevelWindowFilter : public vtkImageToImageFilter
 {
 public:
+  virtual unsigned long int GetMTime();
   /** \brief Get the lookup table for the RGB level window */
   vtkScalarsToColors* GetLookupTable();
   /** \brief Set the lookup table for the RGB level window */
@@ -50,10 +51,12 @@ public:
   void SetMaxOpacity(double maxOpacity);
   inline double GetMaxOpacity() const;
 
+  void SetClippingBounds(vtkFloatingPointType*);
+
   /** Default constructor. */
-  vtkMitkApplyLevelWindowToRGBFilter();
+  vtkMitkLevelWindowFilter();
   /** Default deconstructor. */
-  ~vtkMitkApplyLevelWindowToRGBFilter();
+  ~vtkMitkLevelWindowFilter();
 protected:
   /** \brief Method for threaded execution of the filter.
    * \param *inData: The input.
@@ -76,5 +79,7 @@ private:
   double m_MinOqacity;
   /** m_MinOqacity contains the upper bound for the alpha level window.*/
   double m_MaxOpacity;
+
+  vtkFloatingPointType m_ClippingBounds[4];
 };
 #endif

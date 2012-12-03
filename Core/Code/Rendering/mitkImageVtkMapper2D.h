@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,11 +40,12 @@ class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
 class vtkMitkApplyLevelWindowToRGBFilter;
+class vtkMitkLevelWindowFilter;
 
 namespace mitk {
 
   /** \brief Mapper to resample and display 2D slices of a 3D image.
- * 
+ *
  * The following image gives a brief overview of the mapping and the involved parts.
  *
  * \image html imageVtkMapper2Darchitecture.png
@@ -81,7 +82,7 @@ namespace mitk {
  *   - \b "bounding box": (BoolProperty) Is the Bounding Box of the image shown or not
  *   - \b "layer": (IntProperty) Layer of the image
  *   - \b "volume annotation color": (ColorProperty) color of the volume annotation, TODO has to be reimplemented
- *   - \b "volume annotation unit": (StringProperty) annotation unit as string (does not implicit convert the unit!) 
+ *   - \b "volume annotation unit": (StringProperty) annotation unit as string (does not implicit convert the unit!)
           unit is ml or cm3, TODO has to be reimplemented
 
  * The default properties are:
@@ -141,7 +142,7 @@ namespace mitk {
     public:
       /** \brief Actor of a 2D render window. */
       vtkSmartPointer<vtkActor> m_Actor;
-      
+
       vtkSmartPointer<vtkPropAssembly> m_Actors;
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
@@ -158,14 +159,14 @@ namespace mitk {
       /** \brief The lookuptable for colors and level window */
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
       /** \brief The actual reslicer (one per renderer) */
-    mitk::ExtractSliceFilter::Pointer m_Reslicer;  
+    mitk::ExtractSliceFilter::Pointer m_Reslicer;
     /** \brief Filter for thick slices */
     vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
       /** \brief PolyData object containg all lines/points needed for outlining the contour.
           This container is used to save a computed contour for the next rendering execution.
           For instance, if you zoom or pann, there is no need to recompute the contour. */
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
-    
+
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
@@ -174,7 +175,7 @@ namespace mitk {
       mitk::ScalarType* m_mmPerPixel;
 
       /** \brief This filter is used to apply the level window to RBG(A) images. */
-      vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
+      vtkMitkLevelWindowFilter* m_LevelWindowFilter;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
@@ -242,18 +243,23 @@ namespace mitk {
     */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
 
+    /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds() */
+    bool LineIntersectZero( vtkPoints *points, int p1, int p2,
+                            vtkFloatingPointType *bounds );
+
+    /** \brief Calculate the bounding box of the resliced image. This is necessary for
+        arbitrarily rotated planes in an image volume. A rotated plane (e.g. in swivel mode)
+        will have a new bounding box, which needs to be calculated. */
+    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
+                                      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
 
     /** \brief This method uses the vtkCamera clipping range and the layer property
     * to calcualte the depth of the object (e.g. image or contour). The depth is used
     * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 
-    /** \brief This method applies a level window on RBG(A) images.
-    * It should only be called for internally for RGB(A) images. */
-    void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
-
     /** \brief This method applies (or modifies) the lookuptable for all types of images. */
-    void ApplyLookuptable( mitk::BaseRenderer* renderer );
+    void ApplyLookuptable( mitk::BaseRenderer* renderer, vtkFloatingPointType* bounds );
 
     /** \brief This method applies a color transfer function, if no LookuptableProperty is set.
     Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
@@ -265,12 +271,12 @@ namespace mitk {
 
     /** \brief Set the opacity of the actor. */
     void ApplyOpacity( mitk::BaseRenderer* renderer );
-    
+
     /**
-    * \brief Calculates whether the given rendering geometry intersects the 
+    * \brief Calculates whether the given rendering geometry intersects the
     * given SlicedGeometry3D.
-    * 
-    * This method checks if the given Geometry2D intersects the given 
+    *
+    * This method checks if the given Geometry2D intersects the given
     * SlicedGeometry3D. It calculates the distance of the Geometry2D to all
     * 8 cornerpoints of the SlicedGeometry3D. If all distances have the same
     * sign (all positive or all negative) there is no intersection.

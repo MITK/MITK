@@ -46,23 +46,23 @@ set(H_FILES
   Algorithms/mitkPPTupleRem.h
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
   Algorithms/mitkExtractSliceFilter.h
-  Algorithms/mitkConvert2Dto3DImageFilter.h 
+  Algorithms/mitkConvert2Dto3DImageFilter.h
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
   DataManagement/mitkITKImageImport.h
   DataManagement/mitkITKImageImport.txx
   DataManagement/mitkImageToItk.h
   DataManagement/mitkImageToItk.txx
-  
+
   Interfaces/mitkIDataNodeReader.h
 
   IO/mitkPixelTypeTraits.h
-  
+
   Interactions/mitkEventMapperAddOn.h
-  
+
   Common/mitkExceptionMacro.h
   Common/mitkTestingMacros.h
-   
+
 )
 
 set(CPP_FILES
@@ -295,12 +295,14 @@ set(CPP_FILES
   Rendering/mitkShaderRepository.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
-  Rendering/vtkMitkApplyLevelWindowToRGBFilter.cpp
+  Rendering/vtkMitkLevelWindowFilter.cpp
+  Rendering/vtkNeverTranslucentTexture.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h
   Common/mitkCoreObjectFactoryBase.cpp
   Common/mitkCoreObjectFactory.cpp
+
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})

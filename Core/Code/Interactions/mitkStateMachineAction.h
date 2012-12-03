@@ -38,7 +38,7 @@ namespace mitk
     /**
      * @brief Returns the String-Id of this action.
      **/
-    std::string GetActionId() const;
+    std::string GetActionName() const;
 
   protected:
 
@@ -46,9 +46,9 @@ namespace mitk
     ~StateMachineAction();
   private:
     /**
-     * @brief The Id of this action.
+     * @brief The Id-Name of this action.
      **/
-    std::string m_ActionId;
+    std::string m_ActionName;
 
   };
 

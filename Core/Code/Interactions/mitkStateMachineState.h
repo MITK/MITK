@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include <string>
-#include <map>
-#include <set>
 #include <itkObject.h>
 #include <itkWeakPointer.h>
 #include <itkObjectFactory.h>

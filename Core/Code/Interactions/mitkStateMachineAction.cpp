@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkStateMachineAction.h"
 
-mitk::StateMachineAction::StateMachineAction(std::string actionId) : m_ActionId(actionId)
+mitk::StateMachineAction::StateMachineAction(std::string actionName) : m_ActionName(actionName)
 {
 }
 
-std::string mitk::StateMachineAction::GetActionId() const
+std::string mitk::StateMachineAction::GetActionName() const
 {
-  return m_ActionId;
+  return m_ActionName;
 }
 
 mitk::StateMachineAction::~StateMachineAction()

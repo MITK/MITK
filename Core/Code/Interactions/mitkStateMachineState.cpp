@@ -30,7 +30,7 @@ bool mitk::StateMachineState::AddTransition(StateMachineTransition::Pointer tran
 {
   for (TransitionVector::iterator it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
   {
-    if (transition == *it)
+    if (transition.GetPointer() == (*it).GetPointer())
       return false;
   }
   m_Transitions.push_back(transition);
@@ -39,11 +39,11 @@ bool mitk::StateMachineState::AddTransition(StateMachineTransition::Pointer tran
 
 mitk::StateMachineTransition::Pointer mitk::StateMachineState::GetTransition(std::string eventClass, std::string eventVariant)
 {
-  mitk::StateMachineTransition::Pointer t = mitk::StateMachineTransition::New(NULL, eventClass, eventVariant);
+  mitk::StateMachineTransition::Pointer t = mitk::StateMachineTransition::New("", eventClass, eventVariant);
   for (TransitionVector::iterator it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
   {
-    if (t == *it)
-      return t;
+    if (t->isEqual(*it))
+      return *it;
   }
   return NULL;
 }
@@ -61,15 +61,21 @@ bool mitk::StateMachineState::ConnectTransitions(StateMap *allStates)
 {
   for (TransitionVector::iterator transIt = m_Transitions.begin(); transIt != m_Transitions.end(); ++transIt)
   {
+    bool found = false;
     for (StateMap::iterator stateIt = allStates->begin(); stateIt != allStates->end(); ++stateIt)
     {
       if ((*stateIt)->GetName() == (*transIt)->GetNextStateName())
       {
         (*transIt)->SetNextState(*stateIt);
+        found = true;
         break;
       }
     }
-    return false; // only reached if no state matching the string is found
+    if (!found)
+    {
+      MITK_WARN<< "Target State not found in StateMachine.";
+      return false; // only reached if no state matching the string is found
+    }
   }
   return true;
 }

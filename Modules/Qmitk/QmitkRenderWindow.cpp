@@ -28,6 +28,7 @@
 #include "mitkMousePressEvent.h"
 #include "mitkMouseMoveEvent.h"
 #include "mitkMouseReleaseEvent.h"
+#include "mitkInteractionKeyEvent.h"
 #include "mitkMouseWheelEvent.h"
 
 #include "QmitkRenderWindowMenu.h"
@@ -78,8 +79,8 @@ void QmitkRenderWindow::LayoutDesignListChanged(int layoutDesignIndex)
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 {
 
-  mitk::MousePressEvent::Pointer mPressEvent = mitk::MousePressEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me), GetModifiers(me),
-      GetEventButton(me));
+  mitk::MousePressEvent::Pointer mPressEvent = mitk::MousePressEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
+      GetModifiers(me), GetEventButton(me));
 
   if (!m_Renderer->GetDispatcher()->ProcessEvent(dynamic_cast<mitk::InteractionEvent*>(mPressEvent.GetPointer())))
   { // TODO: INTERACTION_LEGACY
@@ -112,7 +113,8 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
   this->AdjustRenderWindowMenuVisibility(me->pos());
 
-  mitk::MouseMoveEvent::Pointer mMoveEvent = mitk::MouseMoveEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me), GetModifiers(me));
+  mitk::MouseMoveEvent::Pointer mMoveEvent = mitk::MouseMoveEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
+      GetModifiers(me));
 
   if (!m_Renderer->GetDispatcher()->ProcessEvent(dynamic_cast<mitk::InteractionEvent*>(mMoveEvent.GetPointer())))
   { // TODO: INTERACTION_LEGACY
@@ -129,8 +131,8 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
-  mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, GetMousePosition(we), GetButtonState(we), GetModifiers(we),
-      GetDelta(we));
+  mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, GetMousePosition(we), GetButtonState(we),
+      GetModifiers(we), GetDelta(we));
 
   if (!m_Renderer->GetDispatcher()->ProcessEvent(dynamic_cast<mitk::InteractionEvent*>(mWheelEvent.GetPointer())))
   { // TODO: INTERACTION_LEGACY
@@ -145,6 +147,10 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 
 void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 {
+  mitk::EModifiers modifiers = GetModifiers(ke);
+  char key = GetKeyLetter(ke);
+  mitk::InteractionKeyEvent::Pointer keyEvent = mitk::InteractionKeyEvent::New(m_Renderer, key, modifiers);
+
   QPoint cp = mapFromGlobal(QCursor::pos());
   mitk::KeyEvent mke(QmitkEventAdapter::AdaptKeyEvent(m_Renderer, ke, cp));
   this->keyPressMitkEvent(&mke);
@@ -388,6 +394,31 @@ mitk::EModifiers QmitkRenderWindow::GetModifiers(QWheelEvent* we)
     modifiers = modifiers | mitk::MOD_ShiftButton;
 
   return modifiers;
+}
+
+mitk::EModifiers QmitkRenderWindow::GetModifiers(QKeyEvent* ke)
+{
+  mitk::EModifiers modifiers = mitk::MOD_NoModifiers;
+
+  if (ke->modifiers() && Qt::ShiftModifier)
+    modifiers |= mitk::MOD_ShiftButton;
+  if (ke->modifiers() && Qt::CTRL)
+    modifiers |= mitk::MOD_ControlButton;
+  if (ke->modifiers() && Qt::ALT)
+    modifiers |= mitk::MOD_AltButton;
+
+  return modifiers;
+}
+
+char QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
+{
+  // Converting Qt Key Event to ascii element.
+  // extract only standard letter keys, drop modifier keys
+  char ckey = 0;
+  int tkey = ke->key();
+  if (tkey < 128)// else only a modifier-key is pressed
+  ckey = tkey;
+  return ckey;
 }
 
 int QmitkRenderWindow::GetDelta(QWheelEvent* we)

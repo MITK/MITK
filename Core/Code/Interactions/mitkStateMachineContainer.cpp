@@ -18,6 +18,7 @@
 #include <vtkXMLDataElement.h>
 #include <mitkStandardFileLocations.h>
 #include <vtkObjectFactory.h>
+#include <algorithm>
 
 /**
  * @brief This class builds up all the necessary structures for a statemachine.
@@ -42,7 +43,8 @@ namespace mitk
   vtkStandardNewMacro(StateMachineContainer);
 }
 
-mitk::StateMachineContainer::StateMachineContainer()
+mitk::StateMachineContainer::StateMachineContainer() :
+    m_StartStateFound(false), m_errors(false)
 {
 }
 
@@ -60,8 +62,7 @@ bool mitk::StateMachineContainer::LoadBehavior(std::string fileName)
 
   this->SetFileName(fileName.c_str());
 
-  return this->Parse();
-  return true;
+  return this->Parse() && !m_errors;
 }
 
 mitk::StateMachineState::Pointer mitk::StateMachineContainer::GetStartState()
@@ -72,9 +73,14 @@ mitk::StateMachineState::Pointer mitk::StateMachineContainer::GetStartState()
 /**
  * @brief sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
  **/
-bool mitk::StateMachineContainer::ConnectStates()
+void mitk::StateMachineContainer::ConnectStates()
 {
-  return false;
+
+  for (StateMachineCollectionType::iterator it = m_States.begin(); it != m_States.end(); ++it)
+  {
+    if ((*it)->ConnectTransitions(&m_States) == false)
+      m_errors = true;
+  }
 }
 
 void mitk::StateMachineContainer::StartElement(const char* elementName, const char **atts)
@@ -96,6 +102,10 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
     std::string stateName = ReadXMLStringAttribut(NAME, atts);
     bool isStartState = ReadXMLBooleanAttribut(STARTSTATE, atts);
 
+    if (isStartState)
+    {
+      m_StartStateFound = true;
+    }
     m_CurrState = mitk::StateMachineState::New(stateName);
 
     if (isStartState)
@@ -118,7 +128,7 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
 
   else if (name == ACTION)
   {
-    std::string actionName = ReadXMLStringAttribut(ACTION, atts);
+    std::string actionName = ReadXMLStringAttribut(NAME, atts);
     mitk::StateMachineAction::Pointer action = mitk::StateMachineAction::New(actionName);
     if (m_CurrTransition)
       m_CurrTransition->AddAction(action);
@@ -134,7 +144,7 @@ void mitk::StateMachineContainer::EndElement(const char* elementName)
 
   if (name == STATE_MACHINE)
   {
-    //
+    ConnectStates();
   }
   else if (name == TRANSITION)
   {
@@ -175,7 +185,7 @@ std::string mitk::StateMachineContainer::ReadXMLStringAttribut(std::string name,
 bool mitk::StateMachineContainer::ReadXMLBooleanAttribut(std::string name, const char** atts)
 {
   std::string s = ReadXMLStringAttribut(name, atts);
-
+  std::transform(s.begin(), s.end(), s.begin(), ::toupper);
   if (s == "TRUE")
     return true;
   else

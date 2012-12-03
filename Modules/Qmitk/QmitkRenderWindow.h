@@ -162,6 +162,8 @@ private:
   mitk::EModifiers GetModifiers(QMouseEvent* me);
   mitk::EButtons GetButtonState(QWheelEvent* we);
   mitk::EModifiers GetModifiers(QWheelEvent* we);
+  mitk::EModifiers GetModifiers(QKeyEvent* ke);
+  char GetKeyLetter(QKeyEvent* ke);
   int GetDelta(QWheelEvent* we);
 
   bool m_ResendQtEvents;

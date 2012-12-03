@@ -101,13 +101,17 @@ namespace mitk {
     /**
     * @brief Sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
     **/
-    bool ConnectStates();
+    void ConnectStates();
+
+
 
     StateMachineState::Pointer m_StartState;
     StateMachineState::Pointer m_CurrState;
     StateMachineTransition::Pointer m_CurrTransition;
 
     StateMachineCollectionType m_States;
+    bool m_StartStateFound;
+    bool m_errors; // use member, because of inheritance from vtkXMLParser we can't return a success value for parsing the file.
 
   };
 

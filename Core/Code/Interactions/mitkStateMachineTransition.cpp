@@ -23,7 +23,7 @@ mitk::StateMachineTransition::StateMachineTransition(std::string nextStateName, 
 {
 }
 
-bool mitk::StateMachineTransition::operator ==(const StateMachineTransition::Pointer transition)
+bool mitk::StateMachineTransition::isEqual (StateMachineTransition::Pointer transition)
 {
   return (this->m_EventClass==transition->m_EventClass && this->m_EventVariant==transition->m_EventVariant);
 }

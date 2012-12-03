@@ -47,7 +47,7 @@ namespace mitk
     std::string GetNextStateName() const;
 
 
-    bool operator==(const StateMachineTransition::Pointer transition);
+    bool isEqual(StateMachineTransition::Pointer transition);
     /**
      * @brief Get an iterator on the first action in list.
      **/

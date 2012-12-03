@@ -1,0 +1,34 @@
+/**
+
+\page BlueBerryExampleExtensionPoint Extension Points
+
+\brief A minimal applictaion that definines an extension point and collects extensions.
+
+-# \subpage IntroductionExtensionPoints "Introduction"
+-# \subpage ExtensionPointDefinition "Extension Point Definition"
+-# \subpage ExtensionContribution "Extension Contribution"
+
+\page IntroductionExtensionPoints Introduction: Extension Point/Extension Concept
+
+The BlueBerry application framework provides the concept of extension points and extensions. The main goal is to allow the extension of functionality of a plugin (based on the contract defined by the extension point) by several other plugins. Both the extension point and the extension are defined in the according plugin.xml.
+
+\image html ExtensionPoints.png "Extension Point concept"
+
+\section SimpleExample Why Extension Points?
+In the following simple example we have a plugin 'a' and 'b' with two classes 'A' and 'B' in these plugins.
+
+\image html ExtensionPointEx.png "Simple Example"
+
+Plugin 'a' uses the extension point mechanism and creates an extension point that can be extended by other plugins. Now if class 'A' reaches a part that can be extended it asks 'a' if another plugin is registered. If that's the case the functionality of the plugin 'b' that is defined in class 'B' is executed.
+A plugin can therefore be arbitrary extended.
+
+\section Examples Examples
+
+The two following example plugins describe the usage of the BlueBerry Extension Points. One example defines an extension point and the other example extends the created extension point.
+
+\li \ref org_mitk_example_gui_extensionpointdefinition
+\li \ref org_mitk_example_gui_extensionpointcontribution
+
+[\ref BlueBerryExampleExtensionPoint] [Next: \ref ExtensionPointDefinition] [\ref BlueBerryExamples]
+
+*/

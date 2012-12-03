@@ -33,6 +33,7 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
 
   QVBoxLayout* layout = new QVBoxLayout(m_Controls.m_ButtonContainer);
+  //! [Collect extensions through registry]
   QList<ChangeTextDescriptor::Pointer> changeTexts = m_Registry.GetChangeTexts();
   foreach(const ChangeTextDescriptor::Pointer& changeText, changeTexts)
   {
@@ -48,6 +49,7 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   layout->addStretch();
 
   connect(&m_SignalMapper, SIGNAL(mapped(QString)), this, SLOT(ChangeText(QString)));
+  //! [Collect extensions through registry]
 }
 
 void MinimalView::SetFocus ()
@@ -55,6 +57,7 @@ void MinimalView::SetFocus ()
   m_Controls.m_InputText->setFocus();
 }
 
+//! [Use extended functionality to alter input text]
 void MinimalView::ChangeText(const QString& id)
 {
   ChangeTextDescriptor::Pointer changeTextDescr = m_Registry.Find(id);
@@ -63,3 +66,4 @@ void MinimalView::ChangeText(const QString& id)
   IChangeText::Pointer changeText = changeTextDescr->CreateChangeText();
   m_Controls.m_OutputText->setText(changeText->ChangeText(m_Controls.m_InputText->text()));
 }
+//! [Use extended functionality to alter input text]

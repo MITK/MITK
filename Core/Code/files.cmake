@@ -222,6 +222,7 @@ set(CPP_FILES
   Interactions/mitkInteractor.cpp
   Interactions/mitkInteractionEvent.cpp
   Interactions/mitkInteractionPositionEvent.cpp
+  Interactions/mitkInteractionKeyEvent.cpp
   Interactions/mitkMousePressEvent.cpp
   Interactions/mitkMouseMoveEvent.cpp
   Interactions/mitkMouseReleaseEvent.cpp
@@ -233,7 +234,11 @@ set(CPP_FILES
   Interactions/mitkPointSetInteractor.cpp
   Interactions/mitkPositionEvent.cpp
   Interactions/mitkPositionTracker.cpp
+  Interactions/mitkStateMachineAction.cpp
+  Interactions/mitkStateMachineState.cpp
+  Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkState.cpp
+  Interactions/mitkStateMachineContainer.cpp
   Interactions/mitkStateEvent.cpp
   Interactions/mitkStateMachine.cpp
   Interactions/mitkStateMachineFactory.cpp

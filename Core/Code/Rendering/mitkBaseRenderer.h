@@ -445,6 +445,11 @@ namespace mitk
      */
     virtual mitk::RenderingManager* GetRenderingManager() const;
 
+    /**
+     * \brief Provides world coordinates for a given mouse position.
+     */
+    virtual Point3D GetWorldPosition(Point2D mousePosition) const;
+
   protected:
 
     virtual ~BaseRenderer();
@@ -496,6 +501,7 @@ namespace mitk
     //##Documentation
     //## @brief Sets m_CurrentWorldGeometry
     virtual void SetCurrentWorldGeometry(Geometry3D* geometry);
+
 
   private:
     //##Documentation

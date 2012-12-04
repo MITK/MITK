@@ -32,7 +32,7 @@ int mitkStateMachineContainerTest(int /*argc*/, char* /*argv*/[])
 mitk  ::StateMachineContainer* smc = mitk::StateMachineContainer::New();
 
   MITK_TEST_CONDITION_REQUIRED(
-      smc->LoadBehavior("/home.local/webechr.local/EclipseTest/MITK/Core/Code/Testing/StatemachineTest.xml") == true
+      smc->LoadBehavior("/home.local/webechr.local/EclipseTest/test/StatemachineTest.xml") == true
        , "01 Check if file can be loaded" );
 
   std::string sname = smc->GetStartState()->GetName();

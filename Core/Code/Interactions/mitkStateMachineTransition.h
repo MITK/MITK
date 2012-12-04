@@ -45,9 +45,9 @@ namespace mitk
     void AddAction(StateMachineAction::Pointer action);
     SpStateMachineState GetNextState();
     std::string GetNextStateName() const;
+    bool operator==(const StateMachineTransition& transition);
 
 
-    bool isEqual(StateMachineTransition::Pointer transition);
     /**
      * @brief Get an iterator on the first action in list.
      **/

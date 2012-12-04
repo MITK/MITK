@@ -101,7 +101,7 @@ public:
   virtual void SetInteractor(Interactor* interactor);
 
   virtual void SetDataInteractor(EventInteractor::Pointer interactor);
-  virtual EventInteractor* GetDataInteractor() const;
+  virtual EventInteractor::Pointer GetDataInteractor() const;
 
   mitk::DataNode& operator=(const DataNode& right);
 

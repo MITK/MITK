@@ -14,8 +14,8 @@
 
  ===================================================================*/
 
-#ifndef MITKBINDDISPATCHERINTERACTOR_H_
-#define MITKBINDDISPATCHERINTERACTOR_H_
+#ifndef mitkBindDispatcherInteractor_h
+#define mitkBindDispatcherInteractor_h
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
@@ -27,6 +27,12 @@
 
 #include <MitkExports.h>
 
+/**
+ * This Class is used to connect a DataStorage with the Dispatcher.
+ * This is done by registering for DataStorage Events and sending the Events to the registered Dispatcher.
+ * When an Interactor is registered with a DataNode the Dispatcher will be notified.
+ */
+
 namespace mitk
 {
 
@@ -37,9 +43,19 @@ namespace mitk
     mitkClassMacro(BindDispatcherInteractor, itk::Object);
     itkNewMacro(Self);
 
+    /**
+     * Sets the DataStorage to which Events the class subscribes.
+     */
     void SetDataStorage(DataStorage::Pointer dataStorage);
 
+    /**
+     * Sets Dispatcher which will be notified.
+     */
     void SetDispatcher(Dispatcher::Pointer dispatcher);
+
+    /**
+     * Return current Dispatcher.
+     */
     Dispatcher::Pointer GetDispatcher();
 
   protected:
@@ -58,4 +74,4 @@ namespace mitk
   };
 
 } /* namespace mitk */
-#endif /* MITKBINDDISPATCHERINTERACTOR_H_ */
+#endif /* mitkBindDispatcherInteractor_h */

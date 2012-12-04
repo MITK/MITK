@@ -17,12 +17,12 @@
 #include "mitkInteractionKeyEvent.h"
 
 mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer* baseRenderer, char key,
-    mitk::EModifiers modifiers = MOD_NoModifiers) :
+    mitk::ModifierKeys modifiers = ControlKey) :
     InteractionEvent(baseRenderer, "MouseWheelEvent"), m_Key(key),m_Modifiers(modifiers)
 {
 }
 
-mitk::EModifiers mitk::InteractionKeyEvent::GetModifiers()
+mitk::ModifierKeys mitk::InteractionKeyEvent::GetModifiers()
 {
   return m_Modifiers;
 }

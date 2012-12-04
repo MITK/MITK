@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkException.h"
 #include "mitkInteractionEvent.h"
 
-mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer, std::string classEvent) :
+mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer, std::string eventClass) :
   m_Sender(baseRenderer),
-  m_EventClass(classEvent)
+  m_EventClass(eventClass)
 {
 }
 
@@ -33,11 +33,16 @@ const mitk::BaseRenderer* mitk::InteractionEvent::GetSender()
   return m_Sender;
 }
 
+bool mitk::InteractionEvent::isEqual(InteractionEvent::Pointer)
+{
+  return true;
+}
+
 mitk::InteractionEvent::~InteractionEvent()
 {
 }
 
-const std::string* mitk::InteractionEvent::GetEventClass()
+std::string mitk::InteractionEvent::GetEventClass()
 {
-  return &m_EventClass;
+  return m_EventClass;
 }

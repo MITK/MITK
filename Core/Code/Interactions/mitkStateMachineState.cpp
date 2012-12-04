@@ -42,7 +42,7 @@ mitk::StateMachineTransition::Pointer mitk::StateMachineState::GetTransition(std
   mitk::StateMachineTransition::Pointer t = mitk::StateMachineTransition::New("", eventClass, eventVariant);
   for (TransitionVector::iterator it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
   {
-    if (t->isEqual(*it))
+    if (*t == **it)
       return *it;
   }
   return NULL;

@@ -28,21 +28,19 @@
 namespace mitk
 {
   class DataNode;
-  typedef itk::SmartPointer<DataNode> SNode;
   class MITK_CORE_EXPORT EventInteractor : public EventStateMachine {
 
   public:
+  typedef itk::SmartPointer<DataNode> NodeType;
     mitkClassMacro(EventInteractor, EventStateMachine);
     itkNewMacro(Self);
 
    bool operator<(const EventInteractor::Pointer eventInteractor);
 
-   void SetDataNode(SNode);
+   void SetDataNode(NodeType);
 
-   SNode GetDataNode();
+   NodeType GetDataNode();
    int GetLayer();
-
-   virtual void dummy(); // for dynamic casts ?
 
   protected:
     EventInteractor();
@@ -50,7 +48,7 @@ namespace mitk
 
 
   private:
-    SNode m_DataNode;
+    NodeType m_DataNode;
   };
 
 } /* namespace mitk */

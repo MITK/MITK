@@ -38,19 +38,19 @@ namespace mitk
 
   public:
     mitkClassMacro(InteractionKeyEvent,InteractionEvent);
-    mitkNewMacro3Param(Self, BaseRenderer*, char , EModifiers);
+    mitkNewMacro3Param(Self, BaseRenderer*, char , ModifierKeys);
 
     virtual bool isEqual(InteractionEvent::Pointer);
-    EModifiers GetModifiers();
+    ModifierKeys GetModifiers();
     char GetKey();
 
   protected:
-    InteractionKeyEvent(BaseRenderer*, char key, EModifiers modifiers);
+    InteractionKeyEvent(BaseRenderer*, char key, ModifierKeys modifiers);
     virtual ~InteractionKeyEvent();
 
   private:
     char m_Key;
-    EModifiers m_Modifiers;
+    ModifierKeys m_Modifiers;
   };
 } /* namespace mitk */
 

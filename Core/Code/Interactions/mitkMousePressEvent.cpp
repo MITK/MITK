@@ -17,13 +17,13 @@
 #include "mitkException.h"
 #include "mitkMousePressEvent.h"
 
-mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, mitk::EButtons buttonStates = BN_NoButton,
-    mitk::EModifiers modifiers = MOD_NoModifiers, mitk::EButtons eventButton = BN_NoButton) :
+mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, mitk::MouseButtons buttonStates = NoButton,
+    mitk::ModifierKeys modifiers = NoKey, mitk::MouseButtons eventButton = NoButton) :
     InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MousePressEvent"),m_EventButton(eventButton)
 {
 }
 
-mitk::EButtons mitk::MousePressEvent::GetEventButton()
+mitk::MouseButtons mitk::MousePressEvent::GetEventButton()
 {
   return m_EventButton;
 }

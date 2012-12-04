@@ -23,9 +23,9 @@ mitk::StateMachineTransition::StateMachineTransition(std::string nextStateName, 
 {
 }
 
-bool mitk::StateMachineTransition::isEqual (StateMachineTransition::Pointer transition)
+bool mitk::StateMachineTransition::operator ==(const StateMachineTransition& transition)
 {
-  return (this->m_EventClass==transition->m_EventClass && this->m_EventVariant==transition->m_EventVariant);
+  return (this->m_EventClass==transition.m_EventClass && this->m_EventVariant==transition.m_EventVariant);
 }
 
 mitk::StateMachineTransition::~StateMachineTransition()

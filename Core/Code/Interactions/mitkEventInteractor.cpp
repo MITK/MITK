@@ -33,9 +33,12 @@ void mitk::EventInteractor::SetDataNode(DataNode::Pointer dataNode)
 {
   mitk::DataNode::Pointer tmpDN = m_DataNode;
   m_DataNode = dataNode;
-  if (dataNode.IsNotNull()) {
+  if (dataNode.IsNotNull())
+  {
     dataNode->SetDataInteractor(this);
-  } else if (tmpDN.IsNotNull()){ // if EventInteractors' DataNode is set to null, the "old" DataNode has to be notified (else the Dispatcher won't be notified either)
+  }
+  else if (tmpDN.IsNotNull())
+  { // if EventInteractors' DataNode is set to null, the "old" DataNode has to be notified (else the Dispatcher won't be notified either)
     tmpDN->SetDataInteractor(NULL);
   }
 }
@@ -43,8 +46,9 @@ void mitk::EventInteractor::SetDataNode(DataNode::Pointer dataNode)
 int mitk::EventInteractor::GetLayer()
 {
   int layer = -1;
-  if (m_DataNode.IsNotNull()) {
-    m_DataNode->GetIntProperty("layer",layer);
+  if (m_DataNode.IsNotNull())
+  {
+    m_DataNode->GetIntProperty("layer", layer);
   }
   return layer;
 }
@@ -54,13 +58,11 @@ bool mitk::EventInteractor::operator <(const EventInteractor::Pointer eventInter
   return (GetLayer() < eventInteractor->GetLayer());
 }
 
-void mitk::EventInteractor::dummy()
-{
-  int h=0;
-  h++;
-}
-
 mitk::EventInteractor::~EventInteractor()
 {
+  if (m_DataNode.IsNotNull())
+  {
+    m_DataNode->SetInteractor(NULL);
+    m_DataNode = NULL;
+  }
 }
-

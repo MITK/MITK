@@ -552,7 +552,7 @@ void mitk::DataNode::SetDataInteractor(EventInteractor::Pointer interactor)
   Modified();
 }
 
-mitk::EventInteractor* mitk::DataNode::GetDataInteractor() const
+mitk::EventInteractor::Pointer mitk::DataNode::GetDataInteractor() const
 {
   return m_DataInteractor;
 }

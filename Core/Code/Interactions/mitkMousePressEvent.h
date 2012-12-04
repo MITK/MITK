@@ -34,20 +34,18 @@ namespace mitk
 
   public:
     mitkClassMacro(MousePressEvent,InteractionPositionEvent);
-    mitkNewMacro5Param(Self, BaseRenderer*, Point2D , EButtons , EModifiers, EButtons);
+    mitkNewMacro5Param(Self, BaseRenderer*, Point2D , MouseButtons , ModifierKeys, MouseButtons);
 
-
-    EButtons GetEventButton();
-
+    MouseButtons GetEventButton();
 
     virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:
-    MousePressEvent(BaseRenderer*, Point2D, EButtons buttonStates, EModifiers modifiers, EButtons eventButton);
+    MousePressEvent(BaseRenderer*, Point2D, MouseButtons buttonStates, ModifierKeys modifiers, MouseButtons eventButton);
     virtual ~MousePressEvent();
 
   private:
-    EButtons m_EventButton;
+    MouseButtons m_EventButton;
   };
 } /* namespace mitk */
 

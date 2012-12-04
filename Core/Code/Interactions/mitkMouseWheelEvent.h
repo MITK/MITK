@@ -38,14 +38,14 @@ namespace mitk
 
   public:
     mitkClassMacro(MouseWheelEvent,InteractionPositionEvent);
-    mitkNewMacro5Param(Self, BaseRenderer*, Point2D , EButtons , EModifiers, int);
+    mitkNewMacro5Param(Self, BaseRenderer*, Point2D , MouseButtons , ModifierKeys, int);
 
     int GetWheelDelta();
 
     virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:
-    MouseWheelEvent(BaseRenderer*, Point2D, EButtons buttonStates, EModifiers modifiers, int  wheelDelta);
+    MouseWheelEvent(BaseRenderer*, Point2D, MouseButtons buttonStates, ModifierKeys modifiers, int  wheelDelta);
     virtual ~MouseWheelEvent();
 
   private:

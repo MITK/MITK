@@ -28,23 +28,25 @@
 namespace mitk
 {
 
-  class MITK_CORE_EXPORT InteractionEvent : public itk::Object {
+  class MITK_CORE_EXPORT InteractionEvent: public itk::Object
+  {
+
 
   public:
+    mitkClassMacro(InteractionEvent,itk::Object);
+    mitkNewMacro2Param(Self,BaseRenderer*, std::string);
     void SetSender(BaseRenderer* sender);
     const BaseRenderer* GetSender();
 
     /**
      * Implementation of equality for each event class
      */
-    virtual bool isEqual(InteractionEvent::Pointer) =0;
-    const std::string* GetEventClass ();
-
+    virtual bool isEqual(InteractionEvent::Pointer);
+    std::string GetEventClass();
 
   protected:
     InteractionEvent(BaseRenderer*, std::string);
     virtual ~InteractionEvent();
-
 
   private:
     BaseRenderer* m_Sender;

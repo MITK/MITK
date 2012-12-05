@@ -18,14 +18,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandaloneDataStorage.h"
 #include <mitkTestingMacros.h>
 
-int mitkLevelWindowManagerTest(int, char* [])
+class mitkLevelWindowManagerTestClass
 {
-  MITK_TEST_BEGIN("mitkLevelWindowManager");
+public:
 
+  static void TestInstantiation()
+  {
   mitk::LevelWindowManager::Pointer manager;
   manager = mitk::LevelWindowManager::New();
-  MITK_TEST_CONDITION(manager.IsNotNull(),"Testing mitk::LevelWindowManager::New()");
+  MITK_TEST_CONDITION_REQUIRED(manager.IsNotNull(),"Testing mitk::LevelWindowManager::New()");
+  }
 
+  static void TestSetGetDataStorage()
+  {
+  mitk::LevelWindowManager::Pointer manager;
+  manager = mitk::LevelWindowManager::New();
   MITK_TEST_OUTPUT(<< "Creating DataStorage: ");
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
@@ -39,11 +46,19 @@ int mitkLevelWindowManagerTest(int, char* [])
     success = false;
     MITK_ERROR << "Exception: " << e.what();
     }
-  MITK_TEST_CONDITION(success,"Testing mitk::LevelWindowManager SetDataStorage ");
+  MITK_TEST_CONDITION_REQUIRED(success,"Testing mitk::LevelWindowManager SetDataStorage() ");
+  MITK_TEST_CONDITION_REQUIRED(ds == manager->GetDataStorage(),"Testing mitk::LevelWindowManager GetDataStorage ");
 
-  MITK_TEST_CONDITION(ds == manager->GetDataStorage(),"Testing mitk::LevelWindowManager GetDataStorage ");
+  }
 
+  static void TestMethodsWithInvalidParameters()
+  {
+  mitk::LevelWindowManager::Pointer manager;
+  manager = mitk::LevelWindowManager::New();
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  manager->SetDataStorage(ds);
 
+  /* commented out because of bug 13894
   success = false;
   try
     {
@@ -54,11 +69,11 @@ int mitkLevelWindowManagerTest(int, char* [])
     {
     success = true;
     }
-
   MITK_TEST_CONDITION(success,"Testing mitk::LevelWindowManager SetLevelWindowProperty with invalid parameter");
+  */
 
 
-/*
+  /* TODO: convert the rest of this test to MITK testing macros when bug 13894 is fixed
   std::cout << "Testing mitk::LevelWindowManager GetLevelWindowProperty ";
   if (levelWindowProperty != manager->GetLevelWindowProperty())
   {
@@ -103,7 +118,18 @@ int mitkLevelWindowManagerTest(int, char* [])
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
+  }
   */
+  }
+
+};
+
+int mitkLevelWindowManagerTest(int, char* [])
+{
+  MITK_TEST_BEGIN("mitkLevelWindowManager");
+  mitkLevelWindowManagerTestClass::TestInstantiation();
+  mitkLevelWindowManagerTestClass::TestSetGetDataStorage();
+  mitkLevelWindowManagerTestClass::TestMethodsWithInvalidParameters();
 
   MITK_TEST_END();
 }

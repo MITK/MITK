@@ -465,7 +465,6 @@ int testRestorePlanePostionOperation ()
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(slicedgeometry2->GetDirectionVector(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetDirectionVector()),"Testing for directionvector");
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(slicedgeometry2->GetSlices(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetSlices()),"Testing for numslices");
         MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(slicedgeometry2->GetIndexToWorldTransform()->GetMatrix(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");
-        return EXIT_FAILURE;
     }
     catch(...)
     {

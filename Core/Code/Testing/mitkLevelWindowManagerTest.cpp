@@ -16,40 +16,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLevelWindowManager.h"
 #include "mitkStandaloneDataStorage.h"
+#include <mitkTestingMacros.h>
 
 int mitkLevelWindowManagerTest(int, char* [])
 {
+  MITK_TEST_BEGIN("mitkLevelWindowManager");
+
   mitk::LevelWindowManager::Pointer manager;
-  std::cout << "Testing mitk::LevelWindowManager::New(): ";
   manager = mitk::LevelWindowManager::New();
-  if (manager.IsNull())
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION(manager.IsNotNull(),"Testing mitk::LevelWindowManager::New()");
 
-  std::cout << "Creating DataStorage: ";
+  MITK_TEST_OUTPUT(<< "Creating DataStorage: ");
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing mitk::LevelWindowManager SetDataStorage ";
-  manager->SetDataStorage(ds);
-  std::cout<<"[PASSED]"<<std::endl;
+  bool success = true;
+  try
+    {
+    manager->SetDataStorage(ds);
+    }
+  catch(std::exception e)
+    {
+    success = false;
+    MITK_ERROR << "Exception: " << e.what();
+    }
+  MITK_TEST_CONDITION(success,"Testing mitk::LevelWindowManager SetDataStorage ");
 
-  std::cout << "Testing mitk::LevelWindowManager GetDataStorage ";
-  if (ds != manager->GetDataStorage())
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION(ds == manager->GetDataStorage(),"Testing mitk::LevelWindowManager GetDataStorage ");
 
-  std::cout << "Testing mitk::LevelWindowManager SetLevelWindowProperty ";
-  mitk::LevelWindowProperty::Pointer levelWindowProperty = mitk::LevelWindowProperty::New();
 
-  manager->SetLevelWindowProperty(levelWindowProperty);
-  std::cout<<"[PASSED]"<<std::endl;
+  success = false;
+  try
+    {
+    mitk::LevelWindowProperty::Pointer levelWindowProperty = mitk::LevelWindowProperty::New();
+    manager->SetLevelWindowProperty(levelWindowProperty);
+    }
+  catch(mitk::Exception e)
+    {
+    success = true;
+    }
+
+  MITK_TEST_CONDITION(success,"Testing mitk::LevelWindowManager SetLevelWindowProperty with invalid parameter");
+
+
+/*
   std::cout << "Testing mitk::LevelWindowManager GetLevelWindowProperty ";
   if (levelWindowProperty != manager->GetLevelWindowProperty())
   {
@@ -94,4 +103,7 @@ int mitkLevelWindowManagerTest(int, char* [])
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
+  */
+
+  MITK_TEST_END();
 }

@@ -30,8 +30,8 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
   itk::Vector<float,3> itkVector_3;
   for (int i=0; i<3; i++)
   {
-    itkVector_2[i] = itkVector_1[i] - sqrt(mitk::eps/3);
-    itkVector_3[i] = itkVector_1[i] - sqrt(mitk::eps/3.1);
+    itkVector_2[i] = itkVector_1[i] - mitk::eps*1.1;
+    itkVector_3[i] = itkVector_1[i] - mitk::eps*0.9;
   }
 
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(itkVector_1,itkVector_1), "Test vector equality using the same vector with mitk::eps");
@@ -58,7 +58,7 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
   {
     mitk_vnl_vector_1.put(i,itkVector_1[i]);
     mitk_vnl_vector_2.put(i,itkVector_2[i]);
-    mitk_vnl_vector_3.put(i,itkVector_3[i]);
+    mitk_vnl_vector_3.put(i,itkVector_1[i]);
   }
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(mitk_vnl_vector_1,mitk_vnl_vector_1), "Test mitk vnl vector equality using the same mitk vnl vector with mitk::eps");
   MITK_TEST_CONDITION_REQUIRED(!mitk::Equal(mitk_vnl_vector_1,mitk_vnl_vector_2), "Test mitk vnl vector equality using different mitk vnl vectors with an element-wise difference greater than mitk::eps");

@@ -50,9 +50,12 @@ class SceneReaderV1 : public SceneReader
     bool DecorateBaseDataWithProperties(BaseData::Pointer data, TiXmlElement* baseDataNodeElem, const std::string& workingDir);
 
     typedef std::map<DataNode::Pointer, std::list<std::string> >   NodesAndParentsMapType;
+    typedef std::pair<DataNode::Pointer, std::list<std::string> >   NodesAndParentsPair;
+    typedef std::map<int, NodesAndParentsPair >   LayerPropertyMapType;
     typedef std::map<std::string, DataNode*> IDToNodeMappingType;
     typedef std::map<DataNode*, std::string> NodeToIDMappingType;
 
+    LayerPropertyMapType    m_OrderedNodePairs;
     NodesAndParentsMapType  m_Nodes;
     IDToNodeMappingType     m_NodeForID;
     NodeToIDMappingType     m_IDForNode;

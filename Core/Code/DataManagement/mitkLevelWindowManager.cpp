@@ -191,7 +191,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   mitk::DataNode* n = m_DataStorage->GetNode(p);
   if (n == NULL)
   {
-    mitkThrow() << "No Image in DataStorage that belongs to LevelWindow property";// << m_LevelWindowProperty->GetValueAsString();
+    mitkThrow() << "No Image in DataStorage that belongs to LevelWindow property" << m_LevelWindowProperty;
   }
 
   m_CurrentImage = dynamic_cast<mitk::Image*>(n->GetData());

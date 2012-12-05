@@ -56,6 +56,7 @@ void mitk::ContourModelReader::GenerateData()
       TiXmlElement* currentContourElement = docHandle.FirstChildElement("contourModel").FirstChildElement("head").FirstChildElement("geometryInformation").ToElement();
 
 
+
       /*++++ handle n contourModels within data tags ++++*/
       unsigned int contourCounter(0);
 

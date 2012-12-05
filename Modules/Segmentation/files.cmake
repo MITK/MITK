@@ -23,6 +23,9 @@ Algorithms/mitkContourModelSource.cpp
 Algorithms/mitkContourModelToPointSetFilter.cpp
 Algorithms/mitkContourModelToSurfaceFilter.cpp
 Algorithms/mitkContourModelSubDivisionFilter.cpp
+Algorithms/mitkImageToContourModelFilter.cpp
+Algorithms/mitkImageToLiveWireContourFilter.cpp
+Algorithms/mitkImageLiveWireContourModelFilter.cpp
 Controllers/mitkSegmentationInterpolationController.cpp
 Controllers/mitkSurfaceInterpolationController.cpp
 # DataManagement/mitkApplyDiffImageOperation.cpp
@@ -56,6 +59,8 @@ Interactions/mitkSetRegionTool.cpp
 Interactions/mitkSegTool2D.cpp
 Interactions/mitkSubtractContourTool.cpp
 Interactions/mitkContourModelInteractor.cpp
+Interactions/mitkContourModelLiveWireInteractor.cpp
+Interactions/mitkLiveWireTool2D.cpp
 IO/mitkContourModelIOFactory.cpp
 IO/mitkContourModelReader.cpp
 IO/mitkContourModelWriter.cpp

@@ -3948,6 +3948,43 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="LiveWireTool">
+   <state NAME="Start" ID="1" START_STATE="TRUE">
+    <transition NAME="initLiveWire" NEXT_STATE_ID="2" EVENT_ID="8"> <!-- left mbtn DC = 8 -->
+     <action ID="5" /> <!-- AcINITNEWOBJECT = 5 -->
+    </transition>
+   </state>
+   <state NAME="Active" ID="2" >
+    <transition NAME="addPoint" NEXT_STATE_ID="2" EVENT_ID="1"> <!-- left mbtn = 1 -->
+     <action ID="10" /> <!-- AcADDPOINT = 10 -->
+    </transition>
+    <transition NAME="mouseMove" NEXT_STATE_ID="2" EVENT_ID="520"> <!-- MouseMove = 520 -->
+     <action ID="92" /> <!-- AcMOVE = 92 -->
+    </transition>
+    <transition NAME="Delete" NEXT_STATE_ID="2" EVENT_ID="12"> <!-- Delete = 12 -->
+     <action ID="120"/> <!-- AcDELETEPOINT = 120 -->
+    </transition>
+    <transition NAME="doubleClick" NEXT_STATE_ID="20" EVENT_ID="8"> <!-- left mbtn DC = 8 -->
+     <!-- transition to checkState -->
+     <action ID="21"/> <!-- AcCHECKPOINT = 21 -->
+    </transition>
+    <transition NAME="ctrlMove" NEXT_STATE_ID="2" EVENT_ID="529"> <!-- Ctrl+MouseMove = 529 -->
+     <!-- transition to checkState -->
+     <action ID="12"/> <!-- AcADDLINE = 12 -->
+    </transition>
+    <transition NAME="ctrlAddPoint" NEXT_STATE_ID="2" EVENT_ID="5"> <!-- left mbtn + ctrl = 5 -->
+     <action ID="10" /> <!-- AcADDPOINT = 10 -->
+    </transition>
+   </state>
+   <state NAME="Guard_lastPointClicked" ID="20" ><!-- check doubleClick on last point -->
+    <transition NAME="yes" NEXT_STATE_ID="1" EVENT_ID="1004"> <!-- EIDYES = 1004 -->
+     <action ID="44" /> <!-- AcFINISH = 44 -->
+    </transition>
+    <transition NAME="no" NEXT_STATE_ID="2" EVENT_ID="1003"> <!-- EIDNO = 1003 -->
+     <action ID="10" /> <!-- AcADDPOINT = 10 -->
+    </transition>
+   </state>
+  </stateMachine>
   <stateMachine NAME="ContourModelInteractor">
    <state NAME="Start" ID="1" START_STATE="TRUE">
     <transition NAME="checkPointClick" NEXT_STATE_ID="10" EVENT_ID="1"> <!-- left mbtn = 1 -->

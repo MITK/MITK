@@ -91,7 +91,6 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
     std::string classname("ContourModel");
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      //has to be the 3D mapper, is set to 2D just for testing
       newMapper = mitk::ContourModelMapper3D::New();
       newMapper->SetDataNode(node);
     }

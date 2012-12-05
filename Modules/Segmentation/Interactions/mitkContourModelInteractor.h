@@ -60,6 +60,7 @@ class Segmentation_EXPORT ContourModelInteractor : public Interactor
 
   protected:
 
+
     ContourModelInteractor(DataNode* dataNode); // purposely hidden
     virtual ~ContourModelInteractor();
 

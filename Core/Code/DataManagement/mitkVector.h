@@ -360,32 +360,41 @@ inline bool MatrixEqualElementWise(const itk::Matrix<TCoordRep, NRows, NCols>& m
 }
 
 template <typename TCoordRep, unsigned int NPointDimension>
-inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2)
+inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps)
 {
   typename itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
-  return diff.GetSquaredNorm() < mitk::eps;
+  for (unsigned int i=0; i<NPointDimension; i++)
+      if (diff[i]>eps || diff[i]<-eps)
+      return false;
+  return true;
 }
 
 template <typename TCoordRep, unsigned int NPointDimension>
-  inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& vector1, const itk::Point<TCoordRep, NPointDimension>& vector2)
+  inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& vector1, const itk::Point<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps)
 {
   typename itk::Point<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
-  return diff.GetSquaredNorm() < mitk::eps;
+  for (unsigned int i=0; i<NPointDimension; i++)
+    if (diff[i]>eps || diff[i]<-eps)
+      return false;
+  return true;
 }
 
-inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2)
+inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2, ScalarType eps=mitk::eps)
 {
   mitk::VnlVector diff = vector1-vector2;
-  return diff.squared_magnitude() < mitk::eps;
+  for (unsigned int i=0; i<diff.size(); i++)
+    if (diff[i]>eps || diff[i]<-eps)
+      return false;
+  return true;
 }
 
-inline bool Equal(double scalar1, double scalar2)
+inline bool Equal(double scalar1, double scalar2, ScalarType eps=mitk::eps)
 {
-  return fabs(scalar1-scalar2) < mitk::eps;
+  return fabs(scalar1-scalar2) < eps;
 }
 
 template <typename TCoordRep, unsigned int NPointDimension>
-  inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> & vector1, const vnl_vector_fixed<TCoordRep, NPointDimension>& vector2)
+  inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> & vector1, const vnl_vector_fixed<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps)
 {
   vnl_vector_fixed<TCoordRep, NPointDimension> diff = vector1-vector2;
   return diff.squared_magnitude() < mitk::eps;

@@ -59,6 +59,12 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     LiveWireTool2D();
     virtual ~LiveWireTool2D();
 
+    /**
+    * \brief Calculates how good the data, this statemachine handles, is hit by the event.
+    *
+    */
+    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+
     virtual void Activated();
     virtual void Deactivated();
 

@@ -82,6 +82,41 @@ mitk::LiveWireTool2D::~LiveWireTool2D()
 
 
 
+float mitk::LiveWireTool2D::CanHandleEvent( StateEvent const *stateEvent) const
+{
+  mitk::PositionEvent const  *positionEvent =
+  dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+
+  //Key event handling:
+  if (positionEvent == NULL)
+  {
+    //check for delete and escape event
+    if(stateEvent->GetId() == 12 || stateEvent->GetId() == 14)
+    {
+      return 1.0;
+    }
+    //check, if the current state has a transition waiting for that key event.
+    else if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+    {
+      return 0.5;
+    }
+    else
+    {
+      return 0.0;
+    }
+  }
+  else
+  {
+    if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D )
+      return 0.0; // we don't want anything but 2D
+
+    return 1.0;
+  }
+
+}
+
+
+
 
 const char** mitk::LiveWireTool2D::GetXPM() const
 {

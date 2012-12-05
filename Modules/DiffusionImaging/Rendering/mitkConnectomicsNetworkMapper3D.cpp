@@ -16,6 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsNetworkMapper3D.h"
 
+#include <vtkMutableUndirectedGraph.h>
+#include "vtkGraphLayout.h"
+#include <vtkPoints.h>
+#include "vtkGraphToPolyData.h"
+#include <vtkPassThroughLayoutStrategy.h>
+#include "vtkGlyph3D.h"
+#include "vtkGlyphSource2D.h"
+
 mitk::ConnectomicsNetworkMapper3D::ConnectomicsNetworkMapper3D()
 {
   //TODO: implement
@@ -55,89 +63,163 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
     std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode >
     , mitk::ConnectomicsNetwork::NetworkEdge > >  vectorOfEdges = this->GetInput()->GetVectorOfAllEdges();
 
-  mitk::Point3D tempWorldPoint, tempCNFGeometryPoint;
-
-  //////////////////////Create Spheres/////////////////////////
-  for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
+  // Decide on the style of rendering due to property
+  if( false )
   {
-    vtkSmartPointer<vtkSphereSource> sphereSource =
-      vtkSmartPointer<vtkSphereSource>::New();
+    mitk::Point3D tempWorldPoint, tempCNFGeometryPoint;
 
-    for(unsigned int dimension = 0; dimension < 3; dimension++)
+    //////////////////////Create Spheres/////////////////////////
+    for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
     {
-      tempCNFGeometryPoint.SetElement( dimension , vectorOfNodes[i].coordinates[dimension] );
+      vtkSmartPointer<vtkSphereSource> sphereSource =
+        vtkSmartPointer<vtkSphereSource>::New();
+
+      for(unsigned int dimension = 0; dimension < 3; dimension++)
+      {
+        tempCNFGeometryPoint.SetElement( dimension , vectorOfNodes[i].coordinates[dimension] );
+      }
+
+      this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+
+      sphereSource->SetCenter( tempWorldPoint[0] , tempWorldPoint[1], tempWorldPoint[2] );
+      sphereSource->SetRadius(1.0);
+
+      vtkSmartPointer<vtkPolyDataMapper> mapper =
+        vtkSmartPointer<vtkPolyDataMapper>::New();
+      mapper->SetInput(sphereSource->GetOutput());
+
+      vtkSmartPointer<vtkActor> actor =
+        vtkSmartPointer<vtkActor>::New();
+      actor->SetMapper(mapper);
+
+      m_NetworkAssembly->AddPart(actor);
     }
 
-    this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+    //////////////////////Create Tubes/////////////////////////
 
-    sphereSource->SetCenter( tempWorldPoint[0] , tempWorldPoint[1], tempWorldPoint[2] );
-    sphereSource->SetRadius(1.0);
+    for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
+    {
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper =
-      vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInput(sphereSource->GetOutput());
+      vtkSmartPointer<vtkLineSource> lineSource =
+        vtkSmartPointer<vtkLineSource>::New();
 
-    vtkSmartPointer<vtkActor> actor =
-      vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
+      for(unsigned int dimension = 0; dimension < 3; dimension++)
+      {
+        tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.first.coordinates[dimension];
+      }
 
-    m_NetworkAssembly->AddPart(actor);
+      this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+
+      lineSource->SetPoint1(tempWorldPoint[0], tempWorldPoint[1],tempWorldPoint[2]  );
+
+      for(unsigned int dimension = 0; dimension < 3; dimension++)
+      {
+        tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.second.coordinates[dimension];
+      }
+
+      this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+
+      lineSource->SetPoint2(tempWorldPoint[0], tempWorldPoint[1], tempWorldPoint[2] );
+
+      vtkSmartPointer<vtkTubeFilter> tubes = vtkSmartPointer<vtkTubeFilter>::New();
+      tubes->SetInput( lineSource->GetOutput() );
+      tubes->SetNumberOfSides( 12 );
+      double radiusFactor = 1.0 + ((double) vectorOfEdges[i].second.weight) / 10.0 ;
+      tubes->SetRadius( std::log10( radiusFactor ) );
+
+      vtkSmartPointer<vtkPolyDataMapper> mapper2 =
+        vtkSmartPointer<vtkPolyDataMapper>::New();
+      mapper2->SetInput( tubes->GetOutput() );
+
+      vtkSmartPointer<vtkActor> actor =
+        vtkSmartPointer<vtkActor>::New();
+      actor->SetMapper(mapper2);
+
+      double maxWeight = (double) this->GetInput()->GetMaximumWeight();
+      double colourFactor = vectorOfEdges[i].second.weight / maxWeight;
+      actor->GetProperty()->SetColor( colourFactor, colourFactor, colourFactor);
+
+
+      m_NetworkAssembly->AddPart(actor);
+
+    }
   }
-
-  //////////////////////Create Tubes/////////////////////////
-
-  for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
+  else
   {
+    vtkSmartPointer<vtkMutableUndirectedGraph> graph =
+      vtkSmartPointer<vtkMutableUndirectedGraph>::New();
 
-    vtkSmartPointer<vtkLineSource> lineSource =
-      vtkSmartPointer<vtkLineSource>::New();
+    std::vector< vtkIdType > networkToVTKvector;
+    networkToVTKvector.resize(vectorOfNodes.size());
 
-    for(unsigned int dimension = 0; dimension < 3; dimension++)
+    for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
     {
-      tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.first.coordinates[dimension];
+      networkToVTKvector[vectorOfNodes[i].id] = graph->AddVertex();
     }
 
-    this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
-
-    lineSource->SetPoint1(tempWorldPoint[0], tempWorldPoint[1],tempWorldPoint[2]  );
-
-    for(unsigned int dimension = 0; dimension < 3; dimension++)
+    for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
     {
-      tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.second.coordinates[dimension];
+      graph->AddEdge(networkToVTKvector[vectorOfEdges[i].first.first.id], networkToVTKvector[vectorOfEdges[i].first.second.id]);
     }
 
-    this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+    vtkSmartPointer<vtkPoints> points =
+      vtkSmartPointer<vtkPoints>::New();
+    for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
+    {
+      double x = vectorOfNodes[i].coordinates[0];
+      double y = vectorOfNodes[i].coordinates[1];
+      double z = vectorOfNodes[i].coordinates[2];
+      points->InsertNextPoint( x, y, z);
+    }
 
-    lineSource->SetPoint2(tempWorldPoint[0], tempWorldPoint[1], tempWorldPoint[2] );
+    graph->SetPoints(points);
 
-    vtkSmartPointer<vtkTubeFilter> tubes = vtkSmartPointer<vtkTubeFilter>::New();
-    tubes->SetInput( lineSource->GetOutput() );
-    tubes->SetNumberOfSides( 12 );
-    double radiusFactor = 1.0 + ((double) vectorOfEdges[i].second.weight) / 10.0 ;
-    tubes->SetRadius( std::log10( radiusFactor ) );
+    vtkGraphLayout* layout = vtkGraphLayout::New();
+    layout->SetInput(graph);
+    layout->SetLayoutStrategy(vtkPassThroughLayoutStrategy::New());
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper2 =
-      vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper2->SetInput( tubes->GetOutput() );
+    vtkGraphToPolyData* graphToPoly = vtkGraphToPolyData::New();
+    graphToPoly->SetInputConnection(layout->GetOutputPort());
 
-    vtkSmartPointer<vtkActor> actor =
-      vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper2);
+    // Create the standard VTK polydata mapper and actor
+    // for the connections (edges) in the tree.
+    vtkPolyDataMapper* edgeMapper = vtkPolyDataMapper::New();
+    edgeMapper->SetInputConnection(graphToPoly->GetOutputPort());
+    vtkActor* edgeActor = vtkActor::New();
+    edgeActor->SetMapper(edgeMapper);
+    edgeActor->GetProperty()->SetColor(0.0, 0.5, 1.0);
 
-    double maxWeight = (double) this->GetInput()->GetMaximumWeight();
-    double colourFactor = vectorOfEdges[i].second.weight / maxWeight;
-    actor->GetProperty()->SetColor( colourFactor, colourFactor, colourFactor);
+    // Glyph the points of the tree polydata to create
+    // VTK_VERTEX cells at each vertex in the tree.
+    vtkGlyph3D* vertGlyph = vtkGlyph3D::New();
+    vertGlyph->SetInputConnection(0, graphToPoly->GetOutputPort());
+    vtkGlyphSource2D* glyphSource = vtkGlyphSource2D::New();
+    glyphSource->SetGlyphTypeToVertex();
+    vertGlyph->SetInputConnection(1, glyphSource->GetOutputPort());
 
+    // Create a mapper for the vertices, and tell the mapper
+    // to use the specified color array.
+    vtkPolyDataMapper* vertMapper = vtkPolyDataMapper::New();
+    vertMapper->SetInputConnection(vertGlyph->GetOutputPort());
+    /*if (colorArray)
+    {
+    vertMapper->SetScalarModeToUsePointFieldData();
+    vertMapper->SelectColorArray(colorArray);
+    vertMapper->SetScalarRange(colorRange);
+    }*/
 
-    m_NetworkAssembly->AddPart(actor);
+    // Create an actor for the vertices.  Move the actor forward
+    // in the z direction so it is drawn on top of the edge actor.
+    vtkActor* vertActor = vtkActor::New();
+    vertActor->SetMapper(vertMapper);
+    vertActor->GetProperty()->SetPointSize(5);
+    vertActor->SetPosition(0, 0, 0.001);
 
+    m_NetworkAssembly->AddPart(edgeActor);
+    m_NetworkAssembly->AddPart(vertActor);
   }
 
   (static_cast<mitk::ConnectomicsNetwork * > ( GetData() ) )->SetIsModified( false );
-
-  //this->UpdateVtkObjects();
-
-
 }
 
 const mitk::ConnectomicsNetwork* mitk::ConnectomicsNetworkMapper3D::GetInput()

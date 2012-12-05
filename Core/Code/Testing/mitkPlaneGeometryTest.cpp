@@ -46,7 +46,7 @@ int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarT
   std::cout << "Testing mapping Map(pt3d_mm, pt2d_mm) and compare with expected: ";
   mitk::Point2D testpt2d_mm;
   planegeometry->Map(pt3d_mm, testpt2d_mm);
-  if(mitk::Equal(pt2d_mm, testpt2d_mm) == false)
+  if(mitk::Equal(pt2d_mm, testpt2d_mm, 2*mitk::eps) == false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

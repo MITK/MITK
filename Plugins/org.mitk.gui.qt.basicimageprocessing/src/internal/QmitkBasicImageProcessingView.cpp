@@ -76,6 +76,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Resampling
 #include <itkResampleImageFilter.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkCastImageFilter.h>
 
 // Image Arithmetics
 #include <itkAddImageFilter.h>
@@ -118,6 +119,7 @@ typedef itk::SobelEdgeDetectionImageFilter< FloatImageType, FloatImageType >    
 
 typedef itk::ResampleImageFilter< ImageType, ImageType >                                ResampleImageFilterType;
 typedef itk::ResampleImageFilter< ImageType, ImageType >                                ResampleImageFilterType2;
+typedef itk::CastImageFilter< ImageType, FloatImageType >                               ImagePTypeToFloatPTypeCasterType;
 
 typedef itk::AddImageFilter< ImageType, ImageType, ImageType >                          AddFilterType;
 typedef itk::SubtractImageFilter< ImageType, ImageType, ImageType >                     SubtractFilterType;
@@ -721,8 +723,13 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   case LAPLACIAN:
     {
-      FloatImageType::Pointer fImage = FloatImageType::New();
-      CastToItkImage( newImage, fImage );
+      // the laplace filter requires a float type image as input, we need to cast the itkImage
+      // to correct type
+      ImagePTypeToFloatPTypeCasterType::Pointer caster = ImagePTypeToFloatPTypeCasterType::New();
+      caster->SetInput( itkImage );
+      caster->Update();
+      FloatImageType::Pointer fImage = caster->GetOutput();
+
       LaplacianFilterType::Pointer laplacianFilter = LaplacianFilterType::New();
       laplacianFilter->SetInput( fImage );
       laplacianFilter->UpdateLargestPossibleRegion();
@@ -734,8 +741,13 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   case SOBEL:
     {
-      FloatImageType::Pointer fImage = FloatImageType::New();
-      CastToItkImage( newImage, fImage );
+      // the sobel filter requires a float type image as input, we need to cast the itkImage
+      // to correct type
+      ImagePTypeToFloatPTypeCasterType::Pointer caster = ImagePTypeToFloatPTypeCasterType::New();
+      caster->SetInput( itkImage );
+      caster->Update();
+      FloatImageType::Pointer fImage = caster->GetOutput();
+
       SobelFilterType::Pointer sobelFilter = SobelFilterType::New();
       sobelFilter->SetInput( fImage );
       sobelFilter->UpdateLargestPossibleRegion();

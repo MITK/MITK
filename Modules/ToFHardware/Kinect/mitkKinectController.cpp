@@ -125,12 +125,12 @@ KinectController::~KinectController()
         if (d->m_UseIR)
         {
           d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_IRGenerator));
-          if (!d->m_ConnectionCheck) return false;
+          //if (!d->m_ConnectionCheck) return false;
         }
         else
         {
           d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_ImageGenerator));
-          if (!d->m_ConnectionCheck) return false;
+          //if (!d->m_ConnectionCheck) return false;
         }
       }
       else
@@ -142,7 +142,7 @@ KinectController::~KinectController()
         if ( d->m_IRGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
         {
           d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_DepthGenerator));
-          if (!d->m_ConnectionCheck) return false;
+          //if (!d->m_ConnectionCheck) return false;
         }
         else
         {

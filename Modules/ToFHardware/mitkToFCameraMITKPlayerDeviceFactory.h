@@ -36,7 +36,7 @@ public:
 
   ToFCameraMITKPlayerDeviceFactory()
   {
-   m_DeviceNumber = 0;
+   m_DeviceNumber = 1;
   }
 
      /*!
@@ -50,8 +50,15 @@ public:
     std::string GetCurrentDeviceName()
     {
       std::stringstream name;
-      name << "MITK Player Device " << m_DeviceNumber++;
-      MITK_INFO << name.str();          // Can be deleted later on! Just gave feedback, while ServiceListWidget has not been initialized
+      if(m_DeviceNumber>1)
+      {
+        name << "MITK Player "<< m_DeviceNumber;
+      }
+      else
+      {
+        name << "MITK Player";
+      }
+      m_DeviceNumber++;
       return name.str();
     }
 

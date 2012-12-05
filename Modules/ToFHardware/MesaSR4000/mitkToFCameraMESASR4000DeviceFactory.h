@@ -29,38 +29,46 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-class MITK_MESASR4000MODULE_EXPORT ToFCameraMESASR4000DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+  class MITK_MESASR4000MODULE_EXPORT ToFCameraMESASR4000DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
-public:
+  public:
     ToFCameraMESASR4000DeviceFactory()
     {
-      this->m_DeviceNumber = 0;
+      this->m_DeviceNumber = 1;
     }
-   /*!
-   \brief Defining the Factorie´s Name, here for the MESASR4000DeviceFactory
-   */
-   std::string GetFactoryName()
-   {
-       return std::string("MESA SR4000 Factory");
-   }
-       std::string GetCurrentDeviceName()
+    /*!
+    \brief Defining the Factorie´s Name, here for the MESASR4000DeviceFactory
+    */
+    std::string GetFactoryName()
+    {
+      return std::string("MESA SR4000 Factory");
+    }
+    std::string GetCurrentDeviceName()
     {
       std::stringstream name;
-      name << "Mesa SR4000 Device " << m_DeviceNumber++;
+      if(m_DeviceNumber>1)
+      {
+        name << "MESA SR4000 "<< m_DeviceNumber;
+      }
+      else
+      {
+        name << "MESA SR4000";
+      }
+      m_DeviceNumber++;
       return name.str();
     }
 
-private:
-     /*!
-   \brief Create an instance of a ToFPMDRawDataDevice.
-   */
-   ToFCameraDevice::Pointer createToFCameraDevice()
-   {
-     ToFCameraMESASR4000Device::Pointer device = ToFCameraMESASR4000Device::New();
+  private:
+    /*!
+    \brief Create an instance of a ToFPMDRawDataDevice.
+    */
+    ToFCameraDevice::Pointer createToFCameraDevice()
+    {
+      ToFCameraMESASR4000Device::Pointer device = ToFCameraMESASR4000Device::New();
 
-     return device.GetPointer();
-   }
+      return device.GetPointer();
+    }
     int m_DeviceNumber;
-};
+  };
 }
 #endif

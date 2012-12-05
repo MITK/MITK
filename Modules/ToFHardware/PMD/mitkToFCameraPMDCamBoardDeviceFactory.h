@@ -34,7 +34,7 @@ class MITK_PMDMODULE_EXPORT ToFCameraPMDCamBoardDeviceFactory : public itk::Ligh
 public:
   ToFCameraPMDCamBoardDeviceFactory()
   {
-    this->m_DeviceNumber=0;
+    this->m_DeviceNumber=1;
   }
   /*!
    \brief Defining the Factorie´s Name, here for the ToFPMDCamBoard.
@@ -47,8 +47,16 @@ public:
     std::string GetCurrentDeviceName()
     {
      std::stringstream name;
-      name << "PMD CamBoard Device " << m_DeviceNumber++;
-      return name.str();
+     if(m_DeviceNumber>1)
+     {
+       name << "PMD CamBoard "<< m_DeviceNumber;
+     }
+     else
+     {
+       name << "PMD CamBoard";
+     }
+     m_DeviceNumber++;
+     return name.str();
     }
 
 private:

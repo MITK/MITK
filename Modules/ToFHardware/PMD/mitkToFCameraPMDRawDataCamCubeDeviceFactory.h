@@ -35,7 +35,7 @@ public:
 
   ToFCameraPMDRawDataCamCubeDeviceFactory()
   {
-    this->m_DeviceNumber = 0;
+    this->m_DeviceNumber = 1;
   }
   /*!
    \brief Defining the Factorie´s Name, here for the RawDataDeviceFactory.
@@ -47,7 +47,15 @@ public:
    std::string GetCurrentDeviceName()
    {
      std::stringstream name;
-     name << "PMD Raw Data CamCube Device "<< m_DeviceNumber++;
+     if(m_DeviceNumber>1)
+     {
+       name << "PMD Raw Data CamCube 2.0/3.0 "<< m_DeviceNumber;
+     }
+     else
+     {
+       name << "PMD Raw Data CamCube 2.0/3.0";
+     }
+     m_DeviceNumber++;
      return name.str();
    }
 

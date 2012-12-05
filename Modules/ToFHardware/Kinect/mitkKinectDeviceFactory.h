@@ -34,7 +34,7 @@ namespace mitk
 
     KinectDeviceFactory()
     {
-      this->m_DeviceNumber = 0;
+      this->m_DeviceNumber = 1;
     }
     /*!
     \brief Defining the Factorie´s Name, here for the Kinect.
@@ -47,7 +47,15 @@ namespace mitk
     std::string GetCurrentDeviceName()
     {
       std::stringstream name;
-      name << "Kinect Device " << m_DeviceNumber++;
+      if (m_DeviceNumber>1)
+      {
+        name << "Kinect " << m_DeviceNumber;
+      }
+      else
+      {
+        name << "Kinect ";
+      }
+      m_DeviceNumber++;
       return name.str();
     }
 

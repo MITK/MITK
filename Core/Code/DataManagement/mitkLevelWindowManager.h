@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowProperty.h"
 #include "mitkBaseProperty.h"
 #include <map>
+#include <utility>
 
 namespace mitk
 {
@@ -101,7 +102,8 @@ namespace mitk
 
     DataStorage::Pointer         m_DataStorage;
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image
-    typedef std::map<unsigned long, BaseProperty::Pointer> ObserverToPropertyMap;
+    typedef std::pair<unsigned long, DataNode::Pointer> PropDataPair;
+    typedef std::map<PropDataPair, BaseProperty::Pointer> ObserverToPropertyMap;
     ObserverToPropertyMap        m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataNode큦 BaseProperty
     ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer ID큦 to every layer property of DataNode큦 BaseProperty
     bool                         m_AutoTopMost;
@@ -113,4 +115,3 @@ namespace mitk
   };
 }
 #endif
-

@@ -303,6 +303,13 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
 }
 
 
+int mitk::LevelWindowManager::GetNumberOfObservers()
+{
+if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != this->GetRelevantNodes()->size()))
+  {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
+return m_PropObserverToNode.size();
+}
+
 mitk::DataStorage* mitk::LevelWindowManager::GetDataStorage()
 {
   return m_DataStorage.GetPointer();

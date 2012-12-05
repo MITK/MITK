@@ -91,6 +91,16 @@ namespace mitk
     Image* GetCurrentImage(); ///< return the currently active image
 
     /**
+     * @return Returns the current number of observers which are registered in this object.
+     * @throw mitk::Exception Throws an exception if the number of observers differs from
+     *                        the number of relevant objects
+     *                        which means that something is wrong.
+     *
+     */
+    int GetNumberOfObservers();
+
+
+    /**
     *  returns all nodes in the DataStorage that have the following properties:
     *  "visible" == true, "binary" == false, "levelwindow", and DataType == Image
     */

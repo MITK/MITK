@@ -469,7 +469,7 @@ int testRestorePlanePostionOperation ()
     {
         MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(planeRotated->GetIndexToWorldTransform()->GetMatrix(), planeRestored->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");
         MITK_INFO<<"Rotated: \n"<<planeRotated->GetIndexToWorldTransform()->GetMatrix()<<" Restored: \n"<<planeRestored->GetIndexToWorldTransform()->GetMatrix();
-        MITK_TEST_CONDITION(mitk::Equal(planeRotated->GetOrigin(), planeRestored->GetOrigin()),"Testing for origin");
+        MITK_TEST_CONDITION(mitk::Equal(planeRotated->GetOrigin(), planeRestored->GetOrigin(),2*mitk::eps),"Testing for origin");
         MITK_INFO<<"Rotated: \n"<<planeRotated->GetOrigin()<<" Restored: \n"<<planeRestored->GetOrigin();
         MITK_TEST_CONDITION(mitk::Equal(planeRotated->GetSpacing(), planeRestored->GetSpacing()),"Testing for spacing");
         MITK_INFO<<"Rotated: \n"<<planeRotated->GetSpacing()<<" Restored: \n"<<planeRestored->GetSpacing();

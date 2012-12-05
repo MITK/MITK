@@ -41,7 +41,6 @@ namespace itk
     ::ShortestPathCostFunctionLiveWire()
   {
     m_UseRepulsivePoint = false;
-    m_UseApproximateGradient = false;
     m_GradientMax = 0.0;
     m_Initialized = false;
     m_UseCostMap = false;
@@ -87,44 +86,10 @@ namespace itk
 
     /* ++++++++++++++++++++ GradientMagnitude costs ++++++++++++++++++++++++++*/
 
-    if( m_UseApproximateGradient)
-    {
-      //approximate gradient magnitude
+    gradientMagnitude = this->m_GradientMagnImage->GetPixel(p2);
+    gradientX = m_GradientImage->GetPixel(p2)[0];
+    gradientY = m_GradientImage->GetPixel(p2)[1];
 
-      // dI(x,y)/dx
-      IndexType x1;
-      x1[0] = (p2[0] == xMAX) ? (p2[0]) :( p2[0] +1);//check for pixels at the edge of the image => x==xMAX
-      x1[1] = p2[1];
-
-      IndexType x2;
-      x2[0] = (p2[0] == 0) ? (0) :( p2[0] -1);//x==0
-      x2[1] = p2[1];
-
-      gradientX = (this->m_Image->GetPixel(x1) - this->m_Image->GetPixel(x2)) / 2;
-
-
-      // dI(x,y)/dy
-      IndexType y1;
-      y1[0] = p2[0];
-      y1[1] = (p2[1] == yMAX) ? (p2[1]) :( p2[1] +1);//y==yMAX
-
-      IndexType y2;
-      y2[0] = p2[0];
-      y2[1] = (p2[1] == 0) ? (0) :( p2[1] -1);//y==0
-
-      gradientY = (this->m_Image->GetPixel(y1) - this->m_Image->GetPixel(y2)) / 2;
-
-
-      // sqrt (x^2 + y^2)
-      gradientMagnitude = sqrt( ( pow( gradientX, 2) + pow( gradientY, 2) ) );
-
-    }
-    else
-    {
-      gradientMagnitude = this->m_GradientMagnImage->GetPixel(p2);
-      gradientX = m_GradientImage->GetPixel(p2)[0];
-      gradientY = m_GradientImage->GetPixel(p2)[1];
-    }
 
 
     if(m_UseCostMap && !m_CostMap.empty())
@@ -246,69 +211,16 @@ namespace itk
     double laplacianCost;
     Superclass::PixelType laplaceImageValue;
 
-    if(!m_UseApproximateGradient)
+
+    laplaceImageValue = m_EdgeImage->GetPixel(p2);
+
+    if(laplaceImageValue < 0 || laplaceImageValue > 0)
     {
-      //laplacianCost = this->m_ZeroCrossingsImage->GetPixel(p2);
-
-      laplaceImageValue = m_EdgeImage->GetPixel(p2);
-
-      if(laplaceImageValue < 0 || laplaceImageValue > 0)
-      {
-        laplacianCost = 1.0;
-      }
-      else
-      {
-        laplacianCost = 0.0;
-      }
+      laplacianCost = 1.0;
     }
     else
     {
-      //compute pointwise with laplacian kernel
-      // 0  1  0
-      // 1 -4  1
-      // 0  1  0
-
-      Superclass::PixelType up, down, left, right;
-      IndexType currentIndex;
-
-      // up
-      currentIndex[0] = p2[0];
-      currentIndex[1] = (p2[1] == yMAX) ? (p2[1]) :( p2[1] +1);//y==yMAX ?
-
-      up = this->m_Image->GetPixel(currentIndex);
-
-
-      // down
-      currentIndex[0] = p2[0];
-      currentIndex[1] = (p2[1] == 0) ? (0) :( p2[1] -1);//y==0 ?
-
-      down = this->m_Image->GetPixel(currentIndex);
-
-
-      // left
-      currentIndex[0] = (p2[0] == 0) ? (0) :( p2[0] -1);//x==0 ?
-      currentIndex[1] = p2[1];
-
-      left = this->m_Image->GetPixel(currentIndex);
-
-
-      // right
-      currentIndex[0] = (p2[0] == xMAX) ? (p2[0]) :( p2[0] +1);//x==xMAX ?
-      currentIndex[1] = p2[1];
-
-      right = this->m_Image->GetPixel(currentIndex);
-
-      //convolution
-      laplaceImageValue = -4.0 * this->m_Image->GetPixel(p2) + up + down + right + left;
-
-      if(laplaceImageValue < 0 || laplaceImageValue > 0)
-      {
-        laplacianCost = 1.0;
-      }
-      else
-      {
-        laplacianCost = 0.0;
-      }
+      laplacianCost = 0.0;
     }
 
     /* -----------------------------------------------------------------------------*/
@@ -341,48 +253,13 @@ namespace itk
     // gradient vector at p1
     double nGradientAtP2[2];
 
-    if(m_UseApproximateGradient)
-    {
-      // dI(x,y)/dx
-      IndexType x1;
-      x1[0] = (p2[0] == xMAX) ? (p1[0]) :( p2[0] +1);//check for pixels at the edge of the image => x==xMAX
-      x1[1] = p2[1];
 
-      IndexType x2;
-      x2[0] = (p2[0] == 0) ? (0) :( p2[0] -1);//x==0
-      x2[1] = p2[1];
-      gradientX = (this->m_Image->GetPixel(x1) - this->m_Image->GetPixel(x2)) / 2;
+    nGradientAtP2[0] = m_GradientImage->GetPixel(p2)[0];
+    nGradientAtP2[1] = m_GradientImage->GetPixel(p2)[1];
 
-      // dI(x,y)/dy
-      IndexType y1;
-      y1[0] = p2[0];
-      y1[1] = (p2[1] == yMAX) ? (p2[1]) :( p2[1] +1);//y==yMAX
+    nGradientAtP2[0] /= m_GradientMagnImage->GetPixel(p2);
+    nGradientAtP2[1] /= m_GradientMagnImage->GetPixel(p2);
 
-      IndexType y2;
-      y2[0] = p2[0];
-      y2[1] = (p2[1] == 0) ? (0) :( p2[1] -1);//y==0
-      gradientY = (this->m_Image->GetPixel(y1) - this->m_Image->GetPixel(y2)) / 2;
-
-      nGradientAtP2[0] = gradientX;
-      nGradientAtP2[1] = gradientY;
-
-      gradientMagnitude = sqrt( nGradientAtP2[0] * nGradientAtP2[0] + nGradientAtP2[1] * nGradientAtP2[1]);
-
-      //gradient direction unit vector of p2
-      nGradientAtP2[0] /= gradientMagnitude;
-      nGradientAtP2[1] /= gradientMagnitude;
-      //--------
-
-    }
-    else
-    {
-      nGradientAtP2[0] = m_GradientImage->GetPixel(p2)[0];
-      nGradientAtP2[1] = m_GradientImage->GetPixel(p2)[1];
-
-      nGradientAtP2[0] /= m_GradientMagnImage->GetPixel(p2);
-      nGradientAtP2[1] /= m_GradientMagnImage->GetPixel(p2);
-
-    }
 
     double scalarProduct = (nGradientAtP1[0] * nGradientAtP2[0]) + (nGradientAtP1[1] * nGradientAtP2[1]);
     if( abs(scalarProduct) >= 1.0)
@@ -399,15 +276,25 @@ namespace itk
 
     /*+++++++++++++++++++++  local component costs +++++++++++++++++++++++++++*/
     /*weights*/
-    double w1 = 0.43;
-    double w2 = 0.43;
-    double w3 = 0.14;
+    double w1;
+    double w2;
+    double w3;
+    double costs = 0.0;
 
-    double costs = w1 * laplacianCost + w2 * gradientCost + w3 * gradientDirectionCost;
+    if (this->m_UseCostMap){
+      w1 = 0.43;
+      w2= 0.43;
+      w3 = 0.14;
+    }else{
+      w1 = 0.10;
+      w2= 0.85;
+      w3 = 0.05;
+    }
+    costs = w1 * laplacianCost + w2 * gradientCost + w3 * gradientDirectionCost;
 
 
-    //scale by euclidian distance
-    double costScale;
+      //scale by euclidian distance
+      double costScale;
     if( p1[0] == p2[0] || p1[1] == p2[1])
     {
       //horizontal or vertical neighbor
@@ -442,83 +329,80 @@ namespace itk
     if(!m_Initialized)
     {
 
-      if( !m_UseApproximateGradient)
-      {
-        // init gradient magnitude image
-        typedef  itk::GradientMagnitudeImageFilter< typename TInputImageType, typename TInputImageType> GradientMagnitudeFilterType;
-        typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
-        gradientFilter->SetInput(this->m_Image);
-        //gradientFilter->SetNumberOfThreads(4);
-        //gradientFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
 
-        gradientFilter->Update();
-        m_GradientMagnImage = gradientFilter->GetOutput();
-
-        typedef itk::StatisticsImageFilter<TInputImageType> StatisticsImageFilterType;
-        StatisticsImageFilterType::Pointer statisticsImageFilter = StatisticsImageFilterType::New();
-        statisticsImageFilter->SetInput(this->m_GradientMagnImage);
-        statisticsImageFilter->Update();
-
-        m_GradientMax = statisticsImageFilter->GetMaximum();
+      typedef itk::CastImageFilter< TInputImageType, FloatImageType > CastFilterType;
+      typename CastFilterType::Pointer castFilter = CastFilterType::New();
+      castFilter->SetInput(this->m_Image);
 
 
+      // init gradient magnitude image
+      typedef  itk::GradientMagnitudeImageFilter< FloatImageType, FloatImageType> GradientMagnitudeFilterType;
+      typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
+      gradientFilter->SetInput(castFilter->GetOutput());
+      //gradientFilter->SetNumberOfThreads(4);
+      //gradientFilter->GetOutput()->SetRequestedRegion(m_RequestedRegion);
 
-        //Filter class is instantiated
-        /*typedef itk::GradientRecursiveGaussianImageFilter<TInputImageType, VectorOutputImageType> GradientFilterType;*/
+      gradientFilter->Update();
+      m_GradientMagnImage = gradientFilter->GetOutput();
 
-        typedef itk::GradientImageFilter< TInputImageType >  GradientFilterType;
+      typedef itk::StatisticsImageFilter<FloatImageType> StatisticsImageFilterType;
+      typename StatisticsImageFilterType::Pointer statisticsImageFilter = StatisticsImageFilterType::New();
+      statisticsImageFilter->SetInput(this->m_GradientMagnImage);
+      statisticsImageFilter->Update();
 
-        GradientFilterType::Pointer filter = GradientFilterType::New();
-        //sigma is specified in millimeters
-        //filter->SetSigma( 1.5 );
-        filter->SetInput(this->m_Image);
-        filter->Update();
-
-        m_GradientImage = filter->GetOutput();
-
-
-        // init zero crossings
-        //typedef  itk::ZeroCrossingImageFilter< TInputImageType, UnsignedCharImageType  > ZeroCrossingImageFilterType;
-        //ZeroCrossingImageFilterType::Pointer zeroCrossingImageFilter = ZeroCrossingImageFilterType::New();
-        //zeroCrossingImageFilter->SetInput(this->m_Image);
-        //zeroCrossingImageFilter->SetBackgroundValue(1);
-        //zeroCrossingImageFilter->SetForegroundValue(0);
-        //zeroCrossingImageFilter->SetNumberOfThreads(4);
-        //zeroCrossingImageFilter->Update();
-
-        //m_ZeroCrossingsImage = zeroCrossingImageFilter->GetOutput();
-
-
-        //cast image to float to apply canny edge dection filter
-        typedef itk::CastImageFilter< TInputImageType, FloatImageType > CastFilterType;
-        CastFilterType::Pointer castFilter = CastFilterType::New();
-        castFilter->SetInput(this->m_Image);
-
-        //typedef itk::LaplacianImageFilter<FloatImageType, FloatImageType >  filterType;
-        //filterType::Pointer laplacianFilter = filterType::New();
-        //laplacianFilter->SetInput( castFilter->GetOutput() ); // NOTE: input image type must be double or float
-        //laplacianFilter->Update();
-
-        //m_EdgeImage = laplacianFilter->GetOutput();
-
-        ////init canny edge detection
-        typedef itk::CannyEdgeDetectionImageFilter<FloatImageType, FloatImageType> CannyEdgeDetectionImageFilterType;
-        CannyEdgeDetectionImageFilterType::Pointer cannyEdgeDetectionfilter = CannyEdgeDetectionImageFilterType::New();
-        cannyEdgeDetectionfilter->SetInput(castFilter->GetOutput());
-        cannyEdgeDetectionfilter->SetUpperThreshold(30);
-        cannyEdgeDetectionfilter->SetLowerThreshold(15);
-        cannyEdgeDetectionfilter->SetVariance(statisticsImageFilter->GetSigma());
-        cannyEdgeDetectionfilter->SetMaximumError(.01f);
-
-        cannyEdgeDetectionfilter->Update();
-        m_EdgeImage = cannyEdgeDetectionfilter->GetOutput();
-
-      }//else no filter just approximate the gradient during cost estimation
+      m_GradientMax = statisticsImageFilter->GetMaximum();
 
 
 
+      //Filter class is instantiated
+      /*typedef itk::GradientRecursiveGaussianImageFilter<TInputImageType, VectorOutputImageType> GradientFilterType;*/
+
+      typedef itk::GradientImageFilter< FloatImageType >  GradientFilterType;
+
+      typename GradientFilterType::Pointer filter = GradientFilterType::New();
+      //sigma is specified in millimeters
+      //filter->SetSigma( 1.5 );
+      filter->SetInput(castFilter->GetOutput());
+      filter->Update();
+
+      m_GradientImage = filter->GetOutput();
 
 
+      // init zero crossings
+      //typedef  itk::ZeroCrossingImageFilter< TInputImageType, UnsignedCharImageType  > ZeroCrossingImageFilterType;
+      //ZeroCrossingImageFilterType::Pointer zeroCrossingImageFilter = ZeroCrossingImageFilterType::New();
+      //zeroCrossingImageFilter->SetInput(this->m_Image);
+      //zeroCrossingImageFilter->SetBackgroundValue(1);
+      //zeroCrossingImageFilter->SetForegroundValue(0);
+      //zeroCrossingImageFilter->SetNumberOfThreads(4);
+      //zeroCrossingImageFilter->Update();
+
+      //m_EdgeImage = zeroCrossingImageFilter->GetOutput();
+
+
+      //cast image to float to apply canny edge dection filter
+      /*typedef itk::CastImageFilter< TInputImageType, FloatImageType > CastFilterType;
+      CastFilterType::Pointer castFilter = CastFilterType::New();
+      castFilter->SetInput(this->m_Image);*/
+
+      //typedef itk::LaplacianImageFilter<FloatImageType, FloatImageType >  filterType;
+      //filterType::Pointer laplacianFilter = filterType::New();
+      //laplacianFilter->SetInput( castFilter->GetOutput() ); // NOTE: input image type must be double or float
+      //laplacianFilter->Update();
+
+      //m_EdgeImage = laplacianFilter->GetOutput();
+
+      //init canny edge detection
+      typedef itk::CannyEdgeDetectionImageFilter<FloatImageType, FloatImageType> CannyEdgeDetectionImageFilterType;
+      typename CannyEdgeDetectionImageFilterType::Pointer cannyEdgeDetectionfilter = CannyEdgeDetectionImageFilterType::New();
+      cannyEdgeDetectionfilter->SetInput(castFilter->GetOutput());
+      cannyEdgeDetectionfilter->SetUpperThreshold(30);
+      cannyEdgeDetectionfilter->SetLowerThreshold(15);
+      cannyEdgeDetectionfilter->SetVariance(4);
+      cannyEdgeDetectionfilter->SetMaximumError(.01f);
+
+      cannyEdgeDetectionfilter->Update();
+      m_EdgeImage = cannyEdgeDetectionfilter->GetOutput();
 
 
       // set minCosts

@@ -154,7 +154,7 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   //inputImage->SetRequestedRegion(region);
 
   typedef itk::CastImageFilter< InputImageType, FloatImageType > CastFilterType;
-  CastFilterType::Pointer castFilter = CastFilterType::New();
+  typename CastFilterType::Pointer castFilter = CastFilterType::New();
   castFilter->SetInput(inputImage);
   castFilter->Update();
   /* extracts features from image and calculates costs */

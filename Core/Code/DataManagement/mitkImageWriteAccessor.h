@@ -131,8 +131,8 @@ private:
 
           // Prevent deadlock
           itk::ThreadProcessIDType id = mitk::CurrentThreadHandle();
-          if(id == w->m_Thread) {
-            mitkThrow() << "This image part is already in use and cannot be requested from this thread, since we would end in a deadlock!";
+          if(mitk::CompareThreadHandles(id,w->m_Thread)) {
+            mitkThrow() << "Prohibited image access: the requested image part is already in use and cannot be requested recursively!";
           }
 
           // save overlapping Waitlock

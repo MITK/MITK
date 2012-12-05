@@ -115,11 +115,12 @@ private:
           // Throw an exception or wait for the WriteAccessor w until it is released and start again with the request afterwards.
           if(!(m_Options & ExceptionIfLocked))
           {
-            // Deadlock prevention
+            // Prevent deadlock
             itk::ThreadProcessIDType id = mitk::CurrentThreadHandle();
-            if(id == w->m_Thread) {
-              mitkThrow() << "This image part is already in use and cannot be requested from this thread, since we would end in a deadlock!";
+            if(mitk::CompareThreadHandles(id,w->m_Thread)) {
+              mitkThrow() << "Prohibited image access: the requested image part is already in use and cannot be requested recursively!";
             }
+
 
             // WAIT
             w->Increment();

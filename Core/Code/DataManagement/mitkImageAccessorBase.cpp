@@ -17,9 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessorBase.h"
 #include "mitkImage.h"
 
-itk::ThreadProcessIDType mitk::CurrentThreadHandle() {
+itk::ThreadProcessIDType mitk::CurrentThreadHandle()
+{
   #ifdef ITK_USE_SPROC
-    return reinterpret_cast<itk::ThreadProcessIDType>(GetCurrentThreadId());
+    return GetCurrentThread();
   #endif
 
   #ifdef ITK_USE_PTHREADS
@@ -27,7 +28,22 @@ itk::ThreadProcessIDType mitk::CurrentThreadHandle() {
   #endif
 
   #ifdef ITK_USE_WIN32_THREADS
-    return reinterpret_cast<itk::ThreadProcessIDType>(GetCurrentThreadId());
+    return GetCurrentThread();
+  #endif
+}
+
+bool mitk::CompareThreadHandles(itk::ThreadProcessIDType handle1, itk::ThreadProcessIDType handle2)
+{
+  #ifdef ITK_USE_SPROC
+    return GetThreadId(handle1) == GetThreadId(handle2);
+  #endif
+
+  #ifdef ITK_USE_WIN32_THREADS
+    return GetThreadId(handle1) == GetThreadId(handle2);
+  #endif
+
+  #ifdef ITK_USE_PTHREADS
+    return handle1 == handle2;
   #endif
 }
 

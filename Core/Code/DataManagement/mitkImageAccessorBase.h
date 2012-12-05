@@ -45,6 +45,7 @@ struct ImageAccessorWaitLock {
 };
 
 itk::ThreadProcessIDType MITK_CORE_EXPORT CurrentThreadHandle();
+bool MITK_CORE_EXPORT CompareThreadHandles(itk::ThreadProcessIDType, itk::ThreadProcessIDType);
 
 
 class MITK_CORE_EXPORT ImageAccessorBase {

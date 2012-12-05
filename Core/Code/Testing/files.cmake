@@ -20,7 +20,7 @@ set(MODULE_TESTS
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
   mitkITKThreadingTest.cpp
-  # mitkLevelWindowManagerTest.cpp
+  mitkLevelWindowManagerTest.cpp
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp

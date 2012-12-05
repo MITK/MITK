@@ -63,8 +63,9 @@ namespace mitk
     void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
     /**
-    * Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
-    */
+     * @brief Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
+     * @throw mitk::Exception Throws an exception if the there is no image in the data storage which belongs to this property.
+     */
     void SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty);
 
     /// sets new Level/Window values and informs all listeners about changes
@@ -89,6 +90,16 @@ namespace mitk
     void OnPropertyModified(const itk::EventObject& e);
 
     Image* GetCurrentImage(); ///< return the currently active image
+
+    /**
+     * @return Returns the current number of observers which are registered in this object.
+     * @throw mitk::Exception Throws an exception if the number of observers differs from
+     *                        the number of relevant objects
+     *                        which means that something is wrong.
+     *
+     */
+    int GetNumberOfObservers();
+
 
     /**
     *  returns all nodes in the DataStorage that have the following properties:

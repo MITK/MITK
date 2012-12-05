@@ -195,7 +195,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   mitk::DataNode* n = m_DataStorage->GetNode(p);
   if (n == NULL)
   {
-    itkExceptionMacro("No Image in DataStorage that belongs to LevelWindow property " << m_LevelWindowProperty);
+    mitkThrow() << "No Image in DataStorage that belongs to LevelWindow property" << m_LevelWindowProperty;
   }
 
   m_CurrentImage = dynamic_cast<mitk::Image*>(n->GetData());
@@ -313,6 +313,13 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
    }
 }
 
+
+int mitk::LevelWindowManager::GetNumberOfObservers()
+{
+if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != this->GetRelevantNodes()->size()))
+  {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
+return m_PropObserverToNode.size();
+}
 
 mitk::DataStorage* mitk::LevelWindowManager::GetDataStorage()
 {

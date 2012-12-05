@@ -469,6 +469,9 @@ namespace mitk
 
           if ( planeRenderer.IsNotNull() )
           {
+            // perform update of imagemapper if needed (maybe the respective 2D renderwindow is not rendered/update before)
+            imageMapper->Update(planeRenderer);
+
             // If it has not been initialized already in a previous pass,
             // generate an actor and a texture object to
             // render the image associated with the ImageVtkMapper2D.

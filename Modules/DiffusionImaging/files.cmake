@@ -137,6 +137,7 @@ set(H_FILES
   Rendering/mitkFiberBundleXMapper2D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
   Rendering/mitkConnectomicsNetworkMapper3D.h
+  Rendering/mitkConnectomicsRenderingProperties.h
   Rendering/mitkPlanarFigureMapper3D.h
 
   # Reconstruction

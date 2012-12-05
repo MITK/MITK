@@ -3964,6 +3964,9 @@
     <transition NAME="Delete" NEXT_STATE_ID="2" EVENT_ID="12"> <!-- Delete = 12 -->
      <action ID="120"/> <!-- AcDELETEPOINT = 120 -->
     </transition>
+    <transition NAME="Esc" NEXT_STATE_ID="2" EVENT_ID="14"> <!-- Esc = 14 -->
+     <action ID="120"/> <!-- AcDELETEPOINT = 120 -->
+    </transition>
     <transition NAME="doubleClick" NEXT_STATE_ID="20" EVENT_ID="8"> <!-- left mbtn DC = 8 -->
      <!-- transition to checkState -->
      <action ID="21"/> <!-- AcCHECKPOINT = 21 -->

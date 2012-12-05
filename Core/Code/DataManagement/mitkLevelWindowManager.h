@@ -62,8 +62,9 @@ namespace mitk
     void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
     /**
-    * Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
-    */
+     * @brief Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
+     * @throw mitk::Exception Throws an exception if the there is no image in the data storage which belongs to this property.
+     */
     void SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty);
 
     /// sets new Level/Window values and informs all listeners about changes

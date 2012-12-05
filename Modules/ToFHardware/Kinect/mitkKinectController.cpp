@@ -81,35 +81,42 @@ KinectController::~KinectController()
     if (!d->m_ConnectionCheck)
     {
       // Initialize the OpenNI status
-      d->m_ConnectionCheck = !d->ErrorText(d->m_Context.Init());
+      d->m_ConnectionCheck = d->ErrorText(d->m_Context.Init());
+      if (!d->m_ConnectionCheck) return false;
       // Create a depth generator and set its resolution
       XnMapOutputMode DepthMode;
-      d->m_ConnectionCheck = !d->ErrorText(d->m_DepthGenerator.Create(d->m_Context));
+      d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.Create(d->m_Context));
+      if (!d->m_ConnectionCheck) return false;
       d->m_DepthGenerator.GetMapOutputMode(DepthMode);
       DepthMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
       DepthMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
-      d->m_ConnectionCheck = !d->ErrorText(d->m_DepthGenerator.SetMapOutputMode(DepthMode));
+      d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.SetMapOutputMode(DepthMode));
+      if (!d->m_ConnectionCheck) return false;
 
       if (d->m_UseIR)
       {
         // Create the IR generator and set its resolution
-        d->m_ConnectionCheck = !d->ErrorText(d->m_IRGenerator.Create(d->m_Context));
+        d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.Create(d->m_Context));
+        if (!d->m_ConnectionCheck) return false;
         XnMapOutputMode IRMode;
         d->m_IRGenerator.GetMapOutputMode(IRMode);
         IRMode.nXRes = XN_VGA_X_RES;
         IRMode.nYRes = XN_VGA_Y_RES;
         IRMode.nFPS = 30;
-        d->m_ConnectionCheck = !d->ErrorText(d->m_IRGenerator.SetMapOutputMode(IRMode));
+        d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.SetMapOutputMode(IRMode));
+        if (!d->m_ConnectionCheck) return false;
       }
       else
       {
         // Create an image generator and set its resolution
         XnMapOutputMode ImageMode;
-        d->m_ConnectionCheck = !d->ErrorText(d->m_ImageGenerator.Create(d->m_Context));
+        d->m_ConnectionCheck = d->ErrorText(d->m_ImageGenerator.Create(d->m_Context));
+        if (!d->m_ConnectionCheck) return false;
         d->m_ImageGenerator.GetMapOutputMode(ImageMode);
         ImageMode.nXRes = xn::Resolution((XnResolution)XN_RES_VGA).GetXResolution();
         ImageMode.nYRes = xn::Resolution((XnResolution)XN_RES_VGA).GetYResolution();
-        d->m_ConnectionCheck = !d->ErrorText(d->m_ImageGenerator.SetMapOutputMode(ImageMode));
+        d->m_ConnectionCheck = d->ErrorText(d->m_ImageGenerator.SetMapOutputMode(ImageMode));
+        if (!d->m_ConnectionCheck) return false;
       }
 
       // Camera registration
@@ -117,11 +124,13 @@ KinectController::~KinectController()
       {
         if (d->m_UseIR)
         {
-          d->m_ConnectionCheck = !d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_IRGenerator));
+          d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_IRGenerator));
+          if (!d->m_ConnectionCheck) return false;
         }
         else
         {
-          d->m_ConnectionCheck = !d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_ImageGenerator));
+          d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_ImageGenerator));
+          if (!d->m_ConnectionCheck) return false;
         }
       }
       else
@@ -132,7 +141,8 @@ KinectController::~KinectController()
       {
         if ( d->m_IRGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
         {
-          d->m_ConnectionCheck = !d->ErrorText(d->m_IRGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_DepthGenerator));
+          d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_DepthGenerator));
+          if (!d->m_ConnectionCheck) return false;
         }
         else
         {
@@ -142,9 +152,11 @@ KinectController::~KinectController()
 
       // Mirror data
       d->m_ConnectionCheck = d->ErrorText(d->m_Context.SetGlobalMirror(!d->m_Context.GetGlobalMirror()));
+      if (!d->m_ConnectionCheck) return false;
 
       // Start data generation
       d->m_ConnectionCheck = d->ErrorText(d->m_Context.StartGeneratingAll());
+      if (!d->m_ConnectionCheck) return false;
 
 //      // Update the connected flag
 //      d->m_ConnectionCheck = true;

@@ -46,6 +46,8 @@ class ImagePixelReadAccessor : public ImagePixelAccessor<TPixel, VDimension>
   friend class Image;
 
 public:
+   typedef ImagePixelAccessor<TPixel,VDimension> ImagePixelAccessorType;
+
   /** \brief Instantiates a mitk::ImageReadAccessor (see its doxygen page for more details)
      *  \param Image::Pointer specifies the associated Image
      *  \param ImageDataItem* specifies the allocated image part

@@ -3,6 +3,10 @@
 
 This page is intended to give a comprehensive guide to setting up your own MITK based project. It will use the application framework provided by MITK and is probably the preferred way for most users.
 
+The first part of this document is a tutorial aimed at newcomers to MITK and possibly CMake and tries to give as much help as possible on setting up your own project. If you are looking for more technical information about customizing MITK, the structure of the superbuild or packaging you might want to read the \ref HowToNewProjectAdvancedInformation.
+
+If you have set up your MITK project already and want to start developing you could take a look at \ref TutorialPage.
+
 \section HowToNewProjectGettingStarted Getting Started
 
 To bootstrap your project MITK offers two convenient options:
@@ -84,5 +88,74 @@ Due to the sheer number of MITK plugins not every plugin is activated by default
 </ol>
 
 \note If you want to use an application provided by MITK (e.g. MITK Workbench) you have to tick the appropriate checkbox as well (in this case MITK_BUILD_APP_mitkWorkbench ) and build MITK. Do note, that this application will be located in the bin directory of the "D:\AwesomeProject-superbuild\MITK-superbuild\MITK-build\" folder.
+
+
+\section HowToNewProjectAdvancedInformation Information for avanced users
+
+\subsection HowToNewProjectCustomizingMITK Customizing MITK
+
+The CMake scripts from the Plugin Generator of the project template provide some handy options which allow you to customize the MITK build used in your project. You can either inject an already build MITK to be used by your project or configure some MITK options directly in your project's superbuild configuration if MITK is going to be build inside your project.
+
+\subsubsection HowToNewProjectCustomizingMITKInjectMITK  Inject a MITK build
+
+By setting the \b EXTERNAL_MITK_DIR \b variable in your project's superbuild CMake configuration to a MITK build directory (containing the MITKConfig.cmake) you can skip the MITK build process.
+
+If MITK is the only external project in your project, you might want to disable the superbuild of your project completely (set <your-proj-name>_USE_SUPERBUILD to OFF or edit your CMakeLists.txt file to set it to OFF by default) and set the \b MITK_DIR \b CMake variable to your MITK build directory.
+
+\subsubsection HowToNewProjectCustomizingMITKConfigure Configure the MITK superbuild
+
+If MITK is being build inside your project's superbuild process, you can enable the use of certain third-party libraries inside of MITK. The following variables control the MITK configuration:
+
+<ul>
+ <li> \b MITK_USE_BLUEBERRY Enable the use of the BlueBerry application framework
+ <li> \b MITK_USE_Boost Download and use Boost in MITK
+ <li> \b MITK_USE_CTK Download, compile, and use CTK in MITK
+ <li> \b MITK_USE_DCMTK Download, compile, and use DCMTK in MITK
+ <li> \b MITK_USE_OpenCV Download, compile, and use OpenCV in MITK
+ <li> \b MITK_USE_Python Download and compile 1CableSwig and enable Python wrapping in ITK, VTK, OpenCV, and MITK
+ <li> \b MITK_USE_QT Use the Qt framework in MITK
+</ul>
+
+You can also inject already build third-party libraries from inside your project's superbuild in the MITK superbuild by using any of the following CMake variables:
+
+<ul>
+ <li> \b MITK_CTK_DIR Reuse a CTK build directory in MITK.
+ <li> \b MITK_CableSwig_DIR Reuse a 1CableSwig build directory in MITK.
+ <li> \b MITK_DCMTK_DIR Reuse a DCMKT build directory in MITK.
+ <li> \b MITK_GDCM_DIR Reuse a GDCM build directory in MITK.
+ <li> \b MITK_ITK_DIR Reuse a ITK build directory in MITK.
+ <li> \b MITK_OpenCV_DIR Reuse a OpenCV build directory in MITK.
+ <li> \b MITK_VTK_DIR Reuse a VTK build directory in MITK.
+</ul>
+
+If the corresponding \b MITK_USE_<proj> \b  option is set to on, the MITK superbuild will use the provided build directory instead of building the project itself.
+
+You can also control the source code location for MITK in your project's superbuild configuration by using the following CMake variables:
+
+<ul>
+ <li> \b MITK_SOURCE_DIR The path to the MITK source directory. If the value for this variable is non-empty, the variables below are ignored.
+ <li> \b MITK_GIT_REPOSITORY The Git repository containing the MITK source code.
+ <li> \b MITK_GIT_TAG The hash id, tag or branch name used for a checkout from MITK_GIT_REPOSITORY.
+</ul>
+
+\subsubsection HowToNewProjectProjectStructure Project Structure
+
+If you are using the superbuild feature of the generated project (the default), you might want to familiarise yourself with the layout of your build tree. The top-level build directory which you specified in CMake when configuring your project will contain all the required dependencies.
+
+Suppose we call our project MyProject and the build directory is C:\MyProject-superbuild. Then the layout looks something like this:
+
+MyProjectLayout.png The top-level directory contains the source code and the build directories from the dependencies of your project. In the current case, the only dependency of MyProject is MITK, which in turn has downloaded and built its own dependencies (CTK, DCMTK, ITK, etc.). The "real" build tree for your project is located in MyProject-superbuild/MyProject-build, so point the CMake-GUI to this build directory if you want to change the set of enabled plug-ins for example.
+
+Further, you should open the MyProject.sln solution file (for Visual Studio) or execute "make" in the MyProject-superbuild/MyProject-build/ directory. Only for the very first time or if you want to update and newly build the project's dependencies should you use the project files in the MyProject-superbuild directory directly.
+
+The same applies for the MyProject-superbuild/MITK-superbuild directory. This directory contains the MITK superbuild, nested inside your project's superbuild. If you want to change CMake options for MITK, use the MyProject-superbuild/MITK-superbuild/MITK-build build directory.
+
+\image html HowToNewProject-MyProjectLayout.png "Layout of MyProject"
+
+\subsubsection HowToNewProjectPackaging Packaging
+
+The project template and the generated projects by the Plugin Generator come with full packaging support. You can create deployable packages of your project for all supported operating systems my building the PACKAGE target. On Linux, this will create a tarball, on MacOS a .dmg file, and on Windows a zipball and an NSIS installer (if NSIS is installed and found).
+
+You can read more about deployment \ref DeploymentPage "here".
 
 */

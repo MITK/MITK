@@ -303,7 +303,7 @@ mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference,
     }
     else
     {
-      MITK_INFO << "Token '" << refToken << "'" << " handled as string";
+      MITK_DEBUG << "Token '" << refToken << "'" << " handled as string";
       result &= refToken == testToken;
     }
   }

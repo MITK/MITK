@@ -1,10 +1,23 @@
 /**
 
 \page TutorialPage The MITK Tutorial
- 
-This tutorial gives an introduction to MITK. 
-We will start with the first steps of just compiling what you get after downloading MITK, continue to show how to
-display and do basic interaction with images, and finally show how to build an application module (functionality).
+
+If you have set up and compiled MITK already and want to know more about developing with MITK you might want to read the \ref TutorialSection. If you want help setting up MITK and creating your own project using MITK you should take a look at \ref HowToNewProject.
+
+\section TutorialFirstSteps First steps in MITK
+
+If you are absolutely new to MITK you might want to read up on setting up MITK to use in your development. The following pages will help you in this task.
+
+<ul>
+ <li> \subpage HowToNewProject "A comprehensive guide to setting up your own MITK project"
+ <li> \ref BuildInstructionsPage "Building MITK"
+</ul>
+
+\section TutorialSection Tutorial chapters
+
+This tutorial will give you an introduction to developing with MITK.
+We will start with configuring MITK to compile the tutorial, continue to show how to
+display and do basic interaction with images, and finally show how to build a plug-in and add new interactions.
 
 The source code of the examples can be found in mitk/QApplications/Tutorial/ \n
 Two data files are used to execute the example code.
@@ -15,8 +28,6 @@ This file contains an image and is located in bin/CMakeExternals/Source/MITK-Dat
 \li lungs.vtk \n
 This file contains a surface and is located in src/MITK/Modules/MitkExt/Testing/Data/lungs.vtk.
 
-\section TutorialSection Tutorial chapters
-
 \li \subpage Step00Page "Step 0: Getting started"
 \li \subpage Step01Page "Step 1: Displaying an image"
 \li \subpage Step02Page "Step 2: Load one or more data sets"
@@ -26,7 +37,7 @@ This file contains a surface and is located in src/MITK/Modules/MitkExt/Testing/
 \li \subpage Step06Page "Step 6: Use an interactive region-grower"
 \li \subpage Step07Page "Step 7: Convert result of region growing into a surface"
 \li \subpage Step08Page "Step 8: Use QmitkStdMultiWidget as widget"
-\li \subpage Step09Page "Step 9: A functionality"
+\li \subpage Step09Page "Step 9: A plug-in"
 \li \subpage Step10Page "Step 10: A new Interaction"
 
 Enjoy MITK!

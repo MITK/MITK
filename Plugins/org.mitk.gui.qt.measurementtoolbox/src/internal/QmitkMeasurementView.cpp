@@ -328,12 +328,6 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
   if( it != d->m_DataNodeToPlanarFigureData.end() )
   {
     QmitkPlanarFigureData& data = it->second;
-
-    MEASUREMENT_DEBUG << "removing figure interactor to globalinteraction";
-    mitk::Interactor::Pointer oldInteractor = node->GetInteractor();
-//    if(oldInteractor.IsNotNull())
-//      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(oldInteractor);
-
     // remove observers
     data.m_Figure->RemoveObserver( data.m_EndPlacementObserverTag );
     data.m_Figure->RemoveObserver( data.m_SelectObserverTag );
@@ -344,6 +338,24 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
     d->m_DataNodeToPlanarFigureData.erase( it );
   }
 
+  mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
+
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes =
+   GetDataStorage()->GetDerivations(node,isPlanarFigure);
+
+  for (unsigned int x = 0; x < nodes->size(); x++)
+  {
+    mitk::PlanarFigure* planarFigure  = dynamic_cast<mitk::PlanarFigure*>  (nodes->at(x)->GetData());
+    if (planarFigure != NULL) {
+      bool isFigureFinished = false;
+      bool isPlaced = false;
+      isFigureFinished = planarFigure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
+      if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
+        GetDataStorage()->Remove(nodes->at(x));
+        d->m_UnintializedPlanarFigure = false; // we deleted a node with ongoing interaction, to the state of the toolbox is reset too.
+      }
+    }
+  }
   this->CheckForTopMostVisibleImage(nonConstNode);
 }
 

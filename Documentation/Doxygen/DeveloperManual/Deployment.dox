@@ -18,7 +18,7 @@
 You can create a tarball (.tar.gz) of your MITK application which includes all necessary non-system libraries by following these steps:
 
 <ul>
-  <li> Set the CMake Variable CMAKE_BUILD_TYPE to either "Debug" or "Release". Any other type (or leaving the variable empty) will not work.
+  <li> Set the %CMake Variable CMAKE_BUILD_TYPE to either "Debug" or "Release". Any other type (or leaving the variable empty) will not work.
   <li> If you are using third-pary libraries not shipped with MITK, you might need to add the paths to the third-party libs to your LD_LIBRARY_PATH environment variable (not necessary if you use RPATH in your shared libraries).
   <li> Type "make package" in your build-tree. This will create a tarball in your build-tree directory.
 </ul>
@@ -41,6 +41,6 @@ On some systems, it might still be necessary to install the Microsoft Visual C++
 
 You can create a drag'n drop disk image (.dmg) file for MacOS. The procedure is pretty much the same as for Linux.
 
-Note that on MacOS, libraries in system locations as pointed out in the Linux section \b and \b libraries located in /System/Library will not be copied. If you want to distribute any libraries from these locations, you have to install them somewhere else prior to configuring your MITK build.
+\note On MacOS, libraries in system locations as pointed out in the Linux section \b and libraries located in /System/Library will not be copied. If you want to distribute any libraries from these locations, you have to install them somewhere else prior to configuring your MITK build.
 
 */

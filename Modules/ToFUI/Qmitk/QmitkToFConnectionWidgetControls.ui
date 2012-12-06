@@ -20,32 +20,29 @@
    <string>QmitkToFConnection</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>ToF camera connection</string>
-     </property>
-    </widget>
+   <item row="3" column="0">
+    <widget class="QmitkToFMESAParameterWidget" name="m_MESAParameterWidget" native="true"/>
    </item>
    <item row="1" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QmitkServiceListWidget" name="m_DeviceList" native="true">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>16777215</height>
+         <height>100</height>
         </size>
        </property>
       </widget>
@@ -61,13 +58,13 @@
        <property name="minimumSize">
         <size>
          <width>200</width>
-         <height>50</height>
+         <height>80</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>16777215</height>
+         <height>80</height>
         </size>
        </property>
        <property name="font">
@@ -99,11 +96,20 @@
      </item>
     </layout>
    </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>ToF camera connection</string>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="0">
     <widget class="QmitkToFPMDParameterWidget" name="m_PMDParameterWidget" native="true"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QmitkToFMESAParameterWidget" name="m_MESAParameterWidget" native="true"/>
    </item>
    <item row="4" column="0">
     <widget class="QmitkKinectParameterWidget" name="m_KinectParameterWidget" native="true"/>

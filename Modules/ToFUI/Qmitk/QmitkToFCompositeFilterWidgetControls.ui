@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>611</width>
-    <height>199</height>
+    <width>479</width>
+    <height>207</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -33,115 +33,130 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QCheckBox" name="m_ThresholdFilterCheckBox">
-     <property name="text">
-      <string>Threshold Filter</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QCheckBox" name="m_ThresholdFilterCheckBox">
+       <property name="text">
+        <string>Threshold Filter</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_ThresholdFilterMinValueSpinBox">
+       <property name="maximum">
+        <number>7000</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="margin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QxtSpanSlider" name="m_ThresholdFilterRangeSlider">
+          <property name="toolTip">
+           <string>modify actual seen window by dragging left and right slider. </string>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_ThresholdFilterRangeSliderReset">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>48</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Resets range to histogram minimum and maximum.</string>
+          </property>
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_ThresholdFilterMaxValueSpinBox">
+       <property name="maximum">
+        <number>7000</number>
+       </property>
+       <property name="value">
+        <number>7000</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="1" column="1">
-    <widget class="QSpinBox" name="m_ThresholdFilterMinValueSpinBox">
-     <property name="maximum">
-      <number>7000</number>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" colspan="4">
-    <widget class="QFrame" name="frame">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="margin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QxtSpanSlider" name="m_ThresholdFilterRangeSlider">
-        <property name="toolTip">
-         <string>modify actual seen window by dragging left and right slider. </string>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="m_ThresholdFilterRangeSliderReset">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>48</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Resets range to histogram minimum and maximum.</string>
-        </property>
-        <property name="text">
-         <string>Reset</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="6">
-    <widget class="QSpinBox" name="m_ThresholdFilterMaxValueSpinBox">
-     <property name="maximum">
-      <number>7000</number>
-     </property>
-     <property name="value">
-      <number>7000</number>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QCheckBox" name="maskSegmentationCheckBox">
-     <property name="text">
-      <string>Mask segmentation</string>
-     </property>
-    </widget>
+   <item row="2" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QCheckBox" name="maskSegmentationCheckBox">
+       <property name="text">
+        <string>Mask segmentation</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QmitkDataStorageComboBox" name="maskImageComboBox"/>
+     </item>
+    </layout>
    </item>
    <item row="3" column="0">
-    <widget class="QCheckBox" name="m_TemporalMedianFilterCheckBox">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Median Filter (t)</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1" colspan="2">
-    <widget class="QCheckBox" name="m_AverageFilterCheckBox">
-     <property name="text">
-      <string>Average Filter </string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="6">
-    <widget class="QSpinBox" name="m_TemporalMedianFilterNumOfFramesSpinBox">
-     <property name="maximum">
-      <number>100</number>
-     </property>
-     <property name="value">
-      <number>10</number>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QCheckBox" name="m_TemporalMedianFilterCheckBox">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Median Filter (t)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="m_AverageFilterCheckBox">
+       <property name="text">
+        <string>Average Filter </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_TemporalMedianFilterNumOfFramesSpinBox">
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item row="4" column="0">
     <widget class="QCheckBox" name="m_MedianFilterCheckBox">
@@ -154,52 +169,53 @@
     </widget>
    </item>
    <item row="5" column="0">
-    <widget class="QCheckBox" name="m_BilateralFilterCheckBox">
-     <property name="text">
-      <string>Bilateral Filter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Domain σ: </string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="QDoubleSpinBox" name="m_BilateralFilterDomainSigmaSpinBox">
-     <property name="value">
-      <double>2.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="3">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Range σ:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="4">
-    <widget class="QDoubleSpinBox" name="m_BilateralFilterRangeSigmaSpinBox">
-     <property name="value">
-      <double>60.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="5">
-    <widget class="QLabel" name="label_12">
-     <property name="text">
-      <string>Kernel Radius:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="6">
-    <widget class="QSpinBox" name="m_BilateralFilterKernelRadiusSpinBox"/>
-   </item>
-   <item row="2" column="2" colspan="5">
-    <widget class="QmitkDataStorageComboBox" name="maskImageComboBox"/>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="m_BilateralFilterCheckBox">
+       <property name="text">
+        <string>Bilateral Filter</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>σ_d: </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="m_BilateralFilterDomainSigmaSpinBox">
+       <property name="value">
+        <double>2.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>σ_r:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="m_BilateralFilterRangeSigmaSpinBox">
+       <property name="value">
+        <double>60.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_12">
+       <property name="text">
+        <string>radius:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_BilateralFilterKernelRadiusSpinBox"/>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

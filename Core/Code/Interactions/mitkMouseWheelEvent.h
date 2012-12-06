@@ -40,8 +40,7 @@ namespace mitk
     mitkClassMacro(MouseWheelEvent,InteractionPositionEvent);
     mitkNewMacro5Param(Self, BaseRenderer*, Point2D , MouseButtons , ModifierKeys, int);
 
-    int GetWheelDelta();
-
+    int GetWheelDelta() const;
     virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:

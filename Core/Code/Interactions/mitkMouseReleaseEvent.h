@@ -36,8 +36,7 @@ namespace mitk
     mitkClassMacro(MouseReleaseEvent,InteractionPositionEvent);
     mitkNewMacro5Param(Self, BaseRenderer*, Point2D ,MouseButtons , ModifierKeys, MouseButtons);
 
-    MouseButtons GetEventButton();
-
+    MouseButtons GetEventButton() const;
     virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:

@@ -16,18 +16,17 @@
 
 #include "mitkInteractionKeyEvent.h"
 
-mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer* baseRenderer, char key,
-    mitk::ModifierKeys modifiers = ControlKey) :
-    InteractionEvent(baseRenderer, "MouseWheelEvent"), m_Key(key),m_Modifiers(modifiers)
+mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer* baseRenderer, char key, mitk::ModifierKeys modifiers = ControlKey) :
+    InteractionEvent(baseRenderer, "MouseWheelEvent"), m_Key(key), m_Modifiers(modifiers)
 {
 }
 
-mitk::ModifierKeys mitk::InteractionKeyEvent::GetModifiers()
+mitk::ModifierKeys mitk::InteractionKeyEvent::GetModifiers() const
 {
   return m_Modifiers;
 }
 
-char mitk::InteractionKeyEvent::GetKey()
+char mitk::InteractionKeyEvent::GetKey() const
 {
   return m_Key;
 }
@@ -38,19 +37,11 @@ mitk::InteractionKeyEvent::~InteractionKeyEvent()
 
 bool mitk::InteractionKeyEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
 {
-  mitk::InteractionKeyEvent* mpe = dynamic_cast< mitk::InteractionKeyEvent* >(interactionEvent.GetPointer());
-  if (mpe == NULL)
+  mitk::InteractionKeyEvent* keyEvent = dynamic_cast<mitk::InteractionKeyEvent*>(interactionEvent.GetPointer());
+  if (keyEvent == NULL)
   {
     return false;
   }
-  if (this->GetModifiers() != mpe->GetModifiers())
-  {
-    return false;
-  }
-  if (this->GetKey() != mpe->GetKey())
-  {
-    return false;
-  }
-  return true;
+  return (this->GetModifiers() == keyEvent->GetModifiers() && this->GetKey() == keyEvent->GetKey());
 }
 

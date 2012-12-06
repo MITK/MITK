@@ -22,11 +22,11 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
     mitk::MouseButtons buttonStates,
     mitk::ModifierKeys modifiers,
     std::string eventClass) :
-    InteractionEvent(baseRenderer, eventClass), m_MousePosition(mousePosition), m_ButtonStates(buttonStates), m_Modifiers(modifiers)
+    InteractionEvent(baseRenderer, eventClass), m_PointerPosition(mousePosition), m_ButtonStates(buttonStates), m_Modifiers(modifiers)
 {
   if (GetSender() != NULL)
   {
-    m_WorldPosition = GetSender()->GetWorldPosition(m_MousePosition);
+    m_WorldPosition = GetSender()->Map2DRendererPositionTo3DWorldPosition(m_PointerPosition);
   }
   else
   {
@@ -38,22 +38,22 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
 
 }
 
-const mitk::Point2D* mitk::InteractionPositionEvent::GetMousePosition()
+mitk::Point2D mitk::InteractionPositionEvent::GetPointerPositionOnScreen()
 {
-  return &m_MousePosition;
+  return m_PointerPosition;
 }
 
-const mitk::Point3D* mitk::InteractionPositionEvent::GetWorldPosition()
+mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld()
 {
-  return &m_WorldPosition;
+  return m_WorldPosition;
 }
 
-mitk::ModifierKeys mitk::InteractionPositionEvent::GetModifiers()
+mitk::ModifierKeys mitk::InteractionPositionEvent::GetModifiers() const
 {
   return m_Modifiers;
 }
 
-mitk::MouseButtons mitk::InteractionPositionEvent::GetButtonStates()
+mitk::MouseButtons mitk::InteractionPositionEvent::GetButtonStates() const
 {
   return m_ButtonStates;
 }

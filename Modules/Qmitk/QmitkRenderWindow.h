@@ -157,12 +157,12 @@ private:
 
   mitk::Point2D GetMousePosition(QMouseEvent* me);
   mitk::Point2D GetMousePosition(QWheelEvent* we);
-  mitk::EButtons GetEventButton(QMouseEvent* me);
-  mitk::EButtons GetButtonState(QMouseEvent* me);
-  mitk::EModifiers GetModifiers(QMouseEvent* me);
-  mitk::EButtons GetButtonState(QWheelEvent* we);
-  mitk::EModifiers GetModifiers(QWheelEvent* we);
-  mitk::EModifiers GetModifiers(QKeyEvent* ke);
+  mitk::MouseButtons GetEventButton(QMouseEvent* me);
+  mitk::MouseButtons GetButtonState(QMouseEvent* me);
+  mitk::ModifierKeys GetModifiers(QMouseEvent* me);
+  mitk::MouseButtons GetButtonState(QWheelEvent* we);
+  mitk::ModifierKeys GetModifiers(QWheelEvent* we);
+  mitk::ModifierKeys GetModifiers(QKeyEvent* ke);
   char GetKeyLetter(QKeyEvent* ke);
   int GetDelta(QWheelEvent* we);
 

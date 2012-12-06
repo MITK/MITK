@@ -1,25 +1,24 @@
 /*===================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+ The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
+ Copyright (c) German Cancer Research Center,
+ Division of Medical and Biological Informatics.
+ All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+ This software is distributed WITHOUT ANY WARRANTY; without
+ even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.
 
-See LICENSE.txt or http://www.mitk.org for details.
+ See LICENSE.txt or http://www.mitk.org for details.
 
-===================================================================*/
+ ===================================================================*/
 
 #include "mitkException.h"
 #include "mitkInteractionEvent.h"
 
 mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer, std::string eventClass) :
-  m_Sender(baseRenderer),
-  m_EventClass(eventClass)
+    m_Sender(baseRenderer), m_EventClass(eventClass)
 {
 }
 
@@ -35,7 +34,7 @@ const mitk::BaseRenderer* mitk::InteractionEvent::GetSender()
 
 bool mitk::InteractionEvent::isEqual(InteractionEvent::Pointer)
 {
-  return true;
+  return false;
 }
 
 mitk::InteractionEvent::~InteractionEvent()

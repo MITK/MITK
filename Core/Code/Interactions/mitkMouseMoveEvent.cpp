@@ -17,34 +17,23 @@
 #include "mitkException.h"
 #include "mitkMouseMoveEvent.h"
 
-mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, mitk::MouseButtons buttonStates = NoButton,
-    mitk::ModifierKeys modifiers = NoKey) :
+mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, mitk::MouseButtons buttonStates =
+    NoButton, mitk::ModifierKeys modifiers = NoKey) :
     InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MouseMoveEvent")
 {
 }
 
 mitk::MouseMoveEvent::~MouseMoveEvent()
 {
-
 }
 
 bool mitk::MouseMoveEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
 {
-  mitk::MouseMoveEvent* mpe = dynamic_cast< mitk::MouseMoveEvent* >(interactionEvent.GetPointer());
+  mitk::MouseMoveEvent* mpe = dynamic_cast<mitk::MouseMoveEvent*>(interactionEvent.GetPointer());
   if (mpe == NULL)
   {
     return false;
   }
-
-  if (this->GetModifiers() != mpe->GetModifiers())
-  {
-    return false;
-  }
-  if (this->GetButtonStates() != mpe->GetButtonStates())
-  {
-    return false;
-  }
-  return true;
-
+  return (this->GetModifiers() == mpe->GetModifiers() && this->GetButtonStates() == mpe->GetButtonStates());
 }
 

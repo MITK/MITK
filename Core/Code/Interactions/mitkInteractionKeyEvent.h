@@ -41,8 +41,8 @@ namespace mitk
     mitkNewMacro3Param(Self, BaseRenderer*, char , ModifierKeys);
 
     virtual bool isEqual(InteractionEvent::Pointer);
-    ModifierKeys GetModifiers();
-    char GetKey();
+    ModifierKeys GetModifiers() const;
+    char GetKey() const;
 
   protected:
     InteractionKeyEvent(BaseRenderer*, char key, ModifierKeys modifiers);

@@ -448,7 +448,7 @@ namespace mitk
     /**
      * \brief Provides world coordinates for a given mouse position.
      */
-    virtual Point3D GetWorldPosition(Point2D mousePosition) const;
+    virtual Point3D Map2DRendererPositionTo3DWorldPosition(Point2D mousePosition) const;
 
   protected:
 

@@ -89,7 +89,7 @@ public:
   }
 
   /** Returns a const reference to the pixel at given index. */
-  const TPixel & GetPixelByIndex(const IndexType & idx) const
+  const TPixel & GetPixelByIndex(const itk::Index<VDimension>& idx) const
   {
      unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
 
@@ -99,7 +99,7 @@ public:
   /** Extends GetPixel by integrating index validation to prevent overflow.
     * \throws mitk::Exception in case of overflow
     */
-  const TPixel & GetPixelByIndexSafe(const IndexType& idx) const
+  const TPixel & GetPixelByIndexSafe(const itk::Index<VDimension>& idx) const
   {
     unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
 

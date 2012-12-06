@@ -235,7 +235,30 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
 {
   // Initialize enumeration properties
 
+  mitk::EnumerationProperty::Pointer connectomicsRenderingSchemeProperty =
+    mitk::EnumerationProperty::New( );
+  connectomicsRenderingSchemeProperty->AddEnum( connectomicsRenderingMITKScheme, 0 );
+  connectomicsRenderingSchemeProperty->AddEnum( connectomicsRenderingVTKScheme, 1 );
+  connectomicsRenderingSchemeProperty->SetValue( 0 );
 
+  mitk::EnumerationProperty::Pointer connectomicsRenderingEdgeFilteringProperty =
+    mitk::EnumerationProperty::New( );
+  connectomicsRenderingEdgeFilteringProperty->AddEnum( connectomicsRenderingEdgeNoFilter, 0 );
+  connectomicsRenderingEdgeFilteringProperty->AddEnum( connectomicsRenderingEdgeShortestPathFilter, 1 );
+  connectomicsRenderingEdgeFilteringProperty->AddEnum( connectomicsRenderingEdgeThresholdFilter, 2 );
+  connectomicsRenderingEdgeFilteringProperty->SetValue( 0 );
+
+  mitk::EnumerationProperty::Pointer connectomicsRenderingNodeFilteringProperty =
+    mitk::EnumerationProperty::New( );
+  connectomicsRenderingNodeFilteringProperty->AddEnum( connectomicsRenderingNodeNoFilter, 0 );
+  connectomicsRenderingNodeFilteringProperty->AddEnum( connectomicsRenderingNodeThresholdingFilter, 1 );
+  connectomicsRenderingNodeFilteringProperty->SetValue( 0 );
+
+  mitk::EnumerationProperty::Pointer connectomicsRenderingNodeColoringSchemeProperty =
+    mitk::EnumerationProperty::New( );
+  connectomicsRenderingNodeColoringSchemeProperty->AddEnum( connectomicsRenderingNodeColoringGradientScheme, 0 );
+  connectomicsRenderingNodeColoringSchemeProperty->AddEnum( connectomicsRenderingNodeColoringShortestPathScheme, 1 );
+  connectomicsRenderingNodeColoringSchemeProperty->SetValue( 0 );
 
   // set the properties
   node->AddProperty( connectomicsRenderingSchemePropertyName.c_str(),

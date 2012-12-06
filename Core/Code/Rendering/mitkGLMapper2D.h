@@ -28,13 +28,6 @@ namespace mitk {
 //## @brief Base class of all OpenGL-based 2D-Mappers
 //##
 //## Those must implement the abstract method Paint(BaseRenderer).
-//##
-//## <b>Notice on coordinates:</b>
-//## 
-//## When mappers draw objects using glVertex(..) etc., they are expected
-//## to produce a scene within the rect (0,0) to (window pixel width, window pixel height),
-//## EVEN if the glViewport would define a different range. Details in \ref QVTKRendering_OpenGLMappers.
-//## 
 //## @ingroup Mapper
 class MITK_CORE_EXPORT GLMapper2D : public Mapper2D
 {

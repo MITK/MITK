@@ -12,9 +12,7 @@ set(proj_DEPENDENCIES)
 set(MITK-Data_DEPENDS ${proj})
 
 if(BUILD_TESTING)
-
-  set(revision_tag d8921ed0)
-
+  set(revision_tag 692e6ef8)
   #if(${proj}_REVISION_TAG)
   #  set(revision_tag ${${proj}_REVISION_TAG})
   #endif()

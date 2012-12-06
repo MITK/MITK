@@ -115,4 +115,4 @@ usFunctionGenerateModuleInit(testdriver_init_file
                              EXECUTABLE
                             )
 
-set(TEST_CPP_FILES ${testdriver_init_file} mitkRenderingTestHelper.cpp)
+set(TEST_CPP_FILES ${testdriver_init_file})

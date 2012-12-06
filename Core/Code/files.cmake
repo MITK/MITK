@@ -47,6 +47,7 @@ set(H_FILES
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
   Algorithms/mitkExtractSliceFilter.h
   Algorithms/mitkConvert2Dto3DImageFilter.h
+
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
   DataManagement/mitkITKImageImport.h
@@ -297,6 +298,7 @@ set(CPP_FILES
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkLevelWindowFilter.cpp
   Rendering/vtkNeverTranslucentTexture.cpp
+  Rendering/mitkRenderingTestHelper.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h

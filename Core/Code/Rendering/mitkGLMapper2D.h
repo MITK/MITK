@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,6 +28,13 @@ namespace mitk {
 //## @brief Base class of all OpenGL-based 2D-Mappers
 //##
 //## Those must implement the abstract method Paint(BaseRenderer).
+//##
+//## <b>Notice on coordinates:</b>
+//##
+//## When mappers draw objects using glVertex(..) etc., they are expected
+//## to produce a scene within the rect (0,0) to (window pixel width, window pixel height),
+//## EVEN if the glViewport would define a different range. Details in \ref QVTKRendering_OpenGLMappers.
+//##
 //## @ingroup Mapper
 class MITK_CORE_EXPORT GLMapper2D : public Mapper2D
 {
@@ -44,17 +51,17 @@ class MITK_CORE_EXPORT GLMapper2D : public Mapper2D
     void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
     void MitkRenderOverlay(mitk::BaseRenderer* renderer);
     void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
-  
-  /** 
+
+  /**
    * \brief Returns whether this is an vtk-based mapper
    */
   virtual bool IsVtkBased() const { return false; }
-  
 
-  
+
+
   protected:
     GLMapper2D();
-    virtual ~GLMapper2D();    
+    virtual ~GLMapper2D();
 };
 
 } // namespace mitk

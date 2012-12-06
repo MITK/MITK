@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGlobalInteraction.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkTestingMacros.h>
 
 mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc, char* argv[])
 {
@@ -53,13 +54,7 @@ void mitkRenderingTestHelper::Render()
     //if the datastorage is initialized and at least 1 image is loaded render it
     if(m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1 )
     {
-      
       mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
-
-      //use this to actually show the iamge in a renderwindow
-//        this->GetVtkRenderWindow()->Render();
-//        this->GetVtkRenderWindow()->GetInteractor()->Start();
-
     }
     else
     {
@@ -86,7 +81,7 @@ void mitkRenderingTestHelper::SetInputFileNames(int argc, char* argv[])
         }
         else
         {
-            break;
+            break; // so -T and -V MUST be the last parameters...
         }
     }
 }
@@ -139,6 +134,10 @@ void mitkRenderingTestHelper::SaveAsPNG(std::string fileName)
 
 void mitkRenderingTestHelper::AddToStorage(const std::string &filename)
 {
+  std::ifstream ifile(filename.c_str()); // test file existence to avoid confusing test output AFTER reading a missing file
+  MITK_TEST_CONDITION_REQUIRED(ifile, "Input file exists: " << filename);
+
+  MITK_INFO << "Loading " << filename;
     mitk::DataNodeFactory::Pointer reader = mitk::DataNodeFactory::New();
     try
     {
@@ -159,6 +158,5 @@ void mitkRenderingTestHelper::AddToStorage(const std::string &filename)
     }
 
     mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
-
 }
 

@@ -652,6 +652,9 @@ bool mitk::PlanarFigureInteractor
       }
       else
       {
+        // we're not hovering above a control point -> deselect!
+        planarFigure->DeselectControlPoint();
+
         this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
 
         // Return false so that other (PlanarFigure) Interactors may react on this

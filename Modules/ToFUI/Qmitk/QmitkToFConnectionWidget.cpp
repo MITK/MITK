@@ -148,7 +148,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
     emit ToFCameraSelected(selectedCamera);
 
-    //Creating a new  inctace of m_ToFImageGrabber
+    //Creating a new  instance of m_ToFImageGrabber
+    this->m_ToFImageGrabber = NULL;
     this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
 
     //Feeding it with the Info from ServiceListWidget
@@ -251,7 +252,6 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           std::string rgbImageFileName = dir + "/" + baseFilenamePrefix + "_RGBImage" + extension;
 
 
-//--------------------------------------------ASK THOMAS about this Part------------------------------------------------
           if (!itksys::SystemTools::FileExists(distanceImageFileName.c_str(), true))
           {
             this->m_ToFImageGrabber->SetStringProperty("DistanceImageFileName", "");
@@ -334,6 +334,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       QMessageBox::critical( this, "Error", "Connection failed. Check if you have installed the latest driver for your system." );
       m_Controls->m_ConnectCameraButton->setChecked(false);
       m_Controls->m_ConnectCameraButton->setEnabled(true);
+      m_Controls->m_ConnectCameraButton->setText("Connect");
       m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
       this->OnSelectCamera();
       return;

@@ -34,7 +34,7 @@ class MITK_PMDMODULE_EXPORT ToFCameraPMDCamCubeDeviceFactory : public itk::Light
 public:
   ToFCameraPMDCamCubeDeviceFactory()
   {
-    this->m_DeviceNumber=0;
+    this->m_DeviceNumber=1;
   }
    /*!
    \brief Defining the Factorie´s Name, here for the ToFPMDCamCube.
@@ -47,7 +47,15 @@ public:
    std::string GetCurrentDeviceName()
    {
      std::stringstream name;
-     name << "PMD CamCube 2.0/3.0 Device "<< m_DeviceNumber++;
+     if(m_DeviceNumber>1)
+     {
+       name << "PMD CamCube 2.0/3.0 "<< m_DeviceNumber;
+     }
+     else
+     {
+       name << "PMD CamCube 2.0/3.0 ";
+     }
+     m_DeviceNumber++;
      return name.str();
    }
 

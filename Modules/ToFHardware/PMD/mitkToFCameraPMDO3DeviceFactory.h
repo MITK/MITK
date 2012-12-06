@@ -34,7 +34,7 @@ class MITK_PMDMODULE_EXPORT ToFCameraPMDO3DeviceFactory : public itk::LightObjec
 public:
     ToFCameraPMDO3DeviceFactory()
     {
-      this->m_DeviceNumber =0;
+      this->m_DeviceNumber =1;
     }
 
    /*!
@@ -47,7 +47,15 @@ public:
    std::string GetCurrentDeviceName()
    {
      std::stringstream name;
-     name<<"PMD O3D Device "<< m_DeviceNumber++;
+     if(m_DeviceNumber>1)
+     {
+       name << "PMD O3 "<< m_DeviceNumber;
+     }
+     else
+     {
+       name << "PMD O3";
+     }
+     m_DeviceNumber++;
      return name.str();
    }
 

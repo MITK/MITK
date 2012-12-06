@@ -142,8 +142,14 @@ void QmitkToFUtilView::Activated()
 
     this->UseToFVisibilitySettings(true);
 
-    m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
-    m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
+    if (this->m_ToFCompositeFilter)
+    {
+      m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
+    }
+    if (this->GetDataStorage())
+    {
+      m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
+    }
 
     if (this->m_ToFImageGrabber.IsNull())
     {
@@ -182,18 +188,30 @@ void QmitkToFUtilView::OnToFCameraConnected()
   this->m_SurfaceDisplayCount = 0;
   this->m_2DDisplayCount = 0;
 
-  this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
-  this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
-  this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
-  this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
-
   this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();
 
+  // initialize surface generation
+  this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
+  this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
+
+  // initialize ToFImageRecorder and ToFRecorderWidget
+  this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
   this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
   m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
   m_Controls->m_ToFRecorderWidget->setEnabled(true);
   m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+
+  // initialize ToFCompositeFilterWidget
+  this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
+  if (this->m_ToFCompositeFilter)
+  {
+    m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
+  }
+  if (this->GetDataStorage())
+  {
+    m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
+  }
 
   // initialize measurement widget
   m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());

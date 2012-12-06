@@ -134,7 +134,7 @@ namespace mitk
       this->m_SourceDataSize = m_ToFCameraDevice->GetSourceDataSize();
       this->AllocateImageArrays();
     }
-    return true;
+    return ok;
   }
 
   bool ToFImageGrabber::DisconnectCamera()

@@ -353,6 +353,7 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
       if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
         GetDataStorage()->Remove(nodes->at(x));
         d->m_UnintializedPlanarFigure = false; // we deleted a node with ongoing interaction, to the state of the toolbox is reset too.
+        PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
       }
     }
   }

@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkGlyph3D.h"
 #include "vtkGlyphSource2D.h"
 
+#include "mitkConnectomicsRenderingProperties.h"
+
 mitk::ConnectomicsNetworkMapper3D::ConnectomicsNetworkMapper3D()
 {
   //TODO: implement
@@ -231,10 +233,62 @@ const mitk::ConnectomicsNetwork* mitk::ConnectomicsNetworkMapper3D::GetInput()
 
 void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer , bool overwrite)
 {
-  //TODO: implement
+  // Initialize enumeration properties
 
 
-  // hand it to the superclass for base default properties
+
+  // set the properties
+  node->AddProperty( connectomicsRenderingSchemePropertyName.c_str(),
+    connectomicsRenderingSchemeProperty, renderer, overwrite );
+
+  node->AddProperty( connectomicsRenderingEdgeFilteringPropertyName.c_str(),
+    connectomicsRenderingEdgeFilteringProperty, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingEdgeThresholdFilterParameterName.c_str(),
+    connectomicsRenderingEdgeThresholdFilterParameterDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingEdgeThresholdFilterThresholdName.c_str(),
+    connectomicsRenderingEdgeThresholdFilterThresholdDefault, renderer, overwrite );
+
+  node->AddProperty( connectomicsRenderingNodeFilteringPropertyName.c_str(),
+    connectomicsRenderingNodeFilteringProperty, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingNodeThresholdFilterParameterName.c_str(),
+    connectomicsRenderingNodeThresholdFilterParameterDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingNodeThresholdFilterThresholdName.c_str(),
+    connectomicsRenderingNodeThresholdFilterThresholdDefault, renderer, overwrite );
+
+  node->AddProperty( connectomicsRenderingNodeColoringSchemeName.c_str(),
+    connectomicsRenderingNodeColoringSchemeProperty, renderer, overwrite );
+
+  node->AddProperty( connectomicsRenderingNodeGradientStartColorName.c_str(),
+    connectomicsRenderingNodeGradientStartColorDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingNodeGradientEndColorName.c_str(),
+    connectomicsRenderingNodeGradientEndColorDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingNodeGradientColorParameterName.c_str(),
+    connectomicsRenderingNodeGradientColorParameterDefault, renderer, overwrite );
+
+  node->AddProperty( connectomicsRenderingNodeRadiusStartName.c_str(),
+    connectomicsRenderingNodeRadiusStartDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingNodeRadiusEndName.c_str(),
+    connectomicsRenderingNodeRadiusEndDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingNodeRadiusParameterName.c_str(),
+    connectomicsRenderingNodeRadiusParameterDefault, renderer, overwrite );
+
+  node->AddProperty( connectomicsRenderingNodeChosenNodeName.c_str(),
+    connectomicsRenderingNodeChosenNodeDefault, renderer, overwrite );
+
+  node->AddProperty( connectomicsRenderingEdgeGradientStartColorName.c_str(),
+    connectomicsRenderingEdgeGradientStartColorDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingEdgeGradientEndColorName.c_str(),
+    connectomicsRenderingEdgeGradientEndColorDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingEdgeGradientColorParameterName.c_str(),
+    connectomicsRenderingEdgeGradientColorParameterDefault, renderer, overwrite );
+
+  node->AddProperty( connectomicsRenderingEdgeRadiusStartName.c_str(),
+    connectomicsRenderingEdgeRadiusStartDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingEdgeRadiusEndName.c_str(),
+    connectomicsRenderingEdgeRadiusEndDefault, renderer, overwrite );
+  node->AddProperty( connectomicsRenderingEdgeRadiusParameterName.c_str(),
+    connectomicsRenderingEdgeRadiusParameterDefault, renderer, overwrite );
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

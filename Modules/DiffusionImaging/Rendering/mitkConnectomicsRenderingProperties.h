@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ConnectomicsRenderingProperties_H_HEADER_INCLUDED
 
 #include <string.h>
+#include "mitkproperties.h"
+#include "mitkStringProperty.h"
+#include "mitkEnumerationProperty.h"
 
 namespace mitk {
 
@@ -36,7 +39,7 @@ namespace mitk {
    * Currently there are two possible rendering schemes in MITK.
    * <ol>
    *  <li> The VTK Graph Layout
-   *  <li> The MITK Connectomics Visualisation
+   *  <li> The MITK Connectomics Visualisation - Default
    * </ol>
    *
    * The VTK Graph Layout is faster than the MITK Connectomics Visualisation, but provides less features
@@ -56,7 +59,11 @@ namespace mitk {
 
    // Default values
 
-   const std::string connectomicsRenderingSchemePropertyDefault = connectomicsRenderingMITKScheme;
+   mitk::EnumerationProperty::Pointer connectomicsRenderingSchemeProperty =
+     mitk::EnumerationProperty::New( );
+   connectomicsRenderingSchemeProperty.AddEnum( connectomicsRenderingMITKScheme, 0 );
+   connectomicsRenderingSchemeProperty.AddEnum( connectomicsRenderingVTKScheme, 1 );
+   connectomicsRenderingSchemeProperty.SetValue( 0 );
 
    // All options below are only for the MITK Connectomics Visualisation scheme
 
@@ -70,13 +77,13 @@ namespace mitk {
     *
     * Currently there these options:
     * <ol>
-    *  <li> No Edge Filtering
+    *  <li> No Edge Filtering - Default
     *  <li> Shortest Path to Node
     *  <li> Thresholding
     * </ol>
     *
     */
-    const std::string connectomicsRenderingSchemePropertyName = "Connectomics.Rendering.Edges.Filtering";
+    const std::string connectomicsRenderingEdgeFilteringPropertyName = "Connectomics.Rendering.Edges.Filtering";
 
    /**
     * \brief Do not filter edges
@@ -91,7 +98,7 @@ namespace mitk {
    /**
     * \brief Show only edges above a certain parameter threshold
     */
-   const std::string connectomicsRenderingEdgeThresholdFilter = "MITK Connectomics Visualisation";
+   const std::string connectomicsRenderingEdgeThresholdFilter = "Thresholding";
 
    /**
     * \brief Parameter to be thresholded
@@ -109,12 +116,12 @@ namespace mitk {
     *
     * Currently there these options:
     * <ol>
-    *  <li> No Node Filtering
+    *  <li> No Node Filtering - Default
     *  <li> Thresholding
     * </ol>
     *
     */
-    const std::string connectomicsRenderingSchemePropertyName = "Connectomics.Rendering.Nodes.Filtering";
+    const std::string connectomicsRenderingNodeFilteringPropertyName = "Connectomics.Rendering.Nodes.Filtering";
 
    /**
     * \brief Do not filter nodes
@@ -136,6 +143,30 @@ namespace mitk {
     */
    const std::string connectomicsRenderingNodeThresholdFilterThresholdName = "Connectomics.Rendering.Nodes.Filtering.Threshold";
 
+   // Default values
+   mitk::EnumerationProperty::Pointer connectomicsRenderingEdgeFilteringProperty =
+     mitk::EnumerationProperty::New( );
+   connectomicsRenderingEdgeFilteringProperty.AddEnum( connectomicsRenderingEdgeNoFilter, 0 );
+   connectomicsRenderingEdgeFilteringProperty.AddEnum( connectomicsRenderingEdgeShortestPathFilter, 1 );
+   connectomicsRenderingEdgeFilteringProperty.AddEnum( connectomicsRenderingEdgeThresholdFilter, 2 );
+   connectomicsRenderingEdgeFilteringProperty.SetValue( 0 );
+
+   const mitk::StringProperty::Pointer connectomicsRenderingEdgeThresholdFilterParameterDefault =
+     mitk::StringProperty::New( "" );
+   const  mitk::FloatProperty::Pointer connectomicsRenderingEdgeThresholdFilterThresholdDefault =
+     mitk::FloatProperty::New( 1.0 );
+
+   mitk::EnumerationProperty::Pointer connectomicsRenderingNodeFilteringProperty =
+     mitk::EnumerationProperty::New( );
+   connectomicsRenderingNodeFilteringProperty.AddEnum( connectomicsRenderingNodeNoFilter, 0 );
+   connectomicsRenderingNodeFilteringProperty.AddEnum( connectomicsRenderingNodeThresholdingFilter, 1 );
+   connectomicsRenderingNodeFilteringProperty.SetValue( 0 );
+
+   const mitk::StringProperty::Pointer connectomicsRenderingNodeThresholdFilterParameterDefault =
+     mitk::StringProperty::New( "" );
+   const  mitk::FloatProperty::Pointer connectomicsRenderingNodeThresholdFilterThresholdDefault =
+     mitk::FloatProperty::New( 1.0 );
+
    ////////////////////////////////////////
    // Node Options
    ////////////////////////////////////////
@@ -146,7 +177,7 @@ namespace mitk {
     *
     * Currently there these options:
     * <ol>
-    *  <li> Color Gradient
+    *  <li> Color Gradient - Default
     *  <li> Shortest Path Steps
     * </ol>
     *
@@ -214,6 +245,30 @@ namespace mitk {
     */
    const std::string connectomicsRenderingNodeRadiusParameterName = "Connectomics.Rendering.Nodes.Radius.Parameter";
 
+   // Default values
+   mitk::EnumerationProperty::Pointer connectomicsRenderingNodeColoringSchemeProperty =
+     mitk::EnumerationProperty::New( );
+   connectomicsRenderingNodeColoringSchemeProperty.AddEnum( connectomicsRenderingNodeColoringGradientScheme, 0 );
+   connectomicsRenderingNodeColoringSchemeProperty.AddEnum( connectomicsRenderingNodeColoringShortestPathScheme, 1 );
+   connectomicsRenderingNodeColoringSchemeProperty.SetValue( 0 );
+
+   const mitk::StringProperty::Pointer connectomicsRenderingNodeChosenNodeDefault =
+     mitk::StringProperty::New("");
+
+   const mitk::ColorProperty::Pointer connectomicsRenderingNodeGradientStartColorDefault =
+     mitk::ColorProperty::New(0.0f, 0.0f, 1.0f);
+   const mitk::ColorProperty::Pointer connectomicsRenderingNodeGradientEndColorDefault =
+     mitk::ColorProperty::New(0.0f, 1.0f, 0.0f);
+   const mitk::StringProperty::Pointer connectomicsRenderingNodeGradientColorParameterDefault =
+     mitk::StringProperty::New("");
+
+   const  mitk::FloatProperty::Pointer connectomicsRenderingNodeRadiusStartDefault =
+     mitk::FloatProperty::New( 1.0 );
+   const  mitk::FloatProperty::Pointer connectomicsRenderingNodeRadiusEndDefault =
+     mitk::FloatProperty::New( 1.0 );
+   const mitk::StringProperty::Pointer connectomicsRenderingNodeRadiusParameterDefault =
+     mitk::StringProperty::New("");
+
    ////////////////////////////////////////
    // Edge Options
    ////////////////////////////////////////
@@ -262,6 +317,21 @@ namespace mitk {
     * This parameter will be used to select the radius of the edge.
     */
    const std::string connectomicsRenderingEdgeRadiusParameterName = "Connectomics.Rendering.Edges.Radius.Parameter";
+
+   // Default values
+   const mitk::ColorProperty::Pointer connectomicsRenderingEdgeGradientStartColorDefault =
+     mitk::ColorProperty::New(1.0f, 0.0f, 0.5f);
+   const mitk::ColorProperty::Pointer connectomicsRenderingEdgeGradientEndColorDefault =
+     mitk::ColorProperty::New(0.0f, 1.0f, 0.5f);
+   const mitk::StringProperty::Pointer connectomicsRenderingEdgeGradientColorParameterDefault =
+     mitk::StringProperty::New("");
+
+   const  mitk::FloatProperty::Pointer connectomicsRenderingEdgeRadiusStartDefault =
+     mitk::FloatProperty::New( 0.2 );
+   const  mitk::FloatProperty::Pointer connectomicsRenderingEdgeRadiusEndDefault =
+     mitk::FloatProperty::New( 0.8 );
+   const mitk::StringProperty::Pointer connectomicsRenderingEdgeRadiusParameterDefault =
+     mitk::StringProperty::New("");
 
 } // namespace mitk
 

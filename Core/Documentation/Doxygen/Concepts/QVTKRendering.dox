@@ -80,4 +80,12 @@ to add additional Interactors/Listeners.
 
 \note Dynamic casts of a mitk::BaseRenderer class to an OpenGLRenderer (or now, to an VtkPropRenderer) should be avoided. The "MITK Scene" vtkRenderer and the vtkRenderWindow as well, are therefore now included in the mitk::BaseRenderer.
 
+\section QVTKRendering_OpenGLMappers Expectations on OpenGL mappers
+
+With the base class mitk::GLMapper2D, MITK supports legacy mappers, which use OpenGL instead of VTK for drawing.
+
+When such mappers draw objects using glVertex(..) etc., they are expected to produce coordinates for a scene within the rect (0,0) to (window pixel width, window pixel height).
+This is even true if the glViewport would define a different range. Such things should only be done via the vtkRenderer::SetViewport() method,
+which in turn defines a viewport for OpenGL. mitk::VtkPropRenderer::Enable2DOpenGL() will imitate VTK's behavior to scale the rendering scene into the defined viewport. In the result, individual mappers should NOT care for the viewport but only for the render window dimensions.
+
 */

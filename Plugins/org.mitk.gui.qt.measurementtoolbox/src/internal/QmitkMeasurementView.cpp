@@ -412,7 +412,7 @@ void QmitkMeasurementView::SetFocus()
   d->m_SelectedImageLabel->setFocus();
 }
 
-void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
                                               const QList<mitk::DataNode::Pointer> &nodes)
 {
   MEASUREMENT_DEBUG << "Determine the top most visible image";
@@ -428,8 +428,7 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer par
   {
     mitk::DataNode* node = d->m_CurrentSelection.at(i);
 
-    mitk::PlanarFigure* _PlanarFigure =
-        _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
+    mitk::PlanarFigure* _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
 
     // the last selected planar figure
     if( _PlanarFigure )
@@ -558,7 +557,7 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(
   this->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
 
   // set all others in selection as deselected
-  for( size_t i=0; i<d->m_CurrentSelection.size(); ++i)
+  for( int i=0; i<d->m_CurrentSelection.size(); ++i)
     d->m_CurrentSelection.at(i)->SetSelected(false);
   d->m_CurrentSelection.clear();
   d->m_CurrentSelection.push_back( newNode );
@@ -575,13 +574,13 @@ void QmitkMeasurementView::UpdateMeasurementText()
 
   QString infoText;
   QString plainInfoText;
-  unsigned int j = 1;
+  int j = 1;
   mitk::PlanarFigure* _PlanarFigure = 0;
   mitk::PlanarAngle* planarAngle = 0;
   mitk::PlanarFourPointAngle* planarFourPointAngle = 0;
   mitk::DataNode::Pointer node = 0;
 
-  for (unsigned int i=0; i<d->m_CurrentSelection.size(); ++i, ++j)
+  for (int i=0; i<d->m_CurrentSelection.size(); ++i, ++j)
   {
     plainInfoText.clear();
     node = d->m_CurrentSelection.at(i);

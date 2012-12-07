@@ -38,6 +38,8 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     : m_CircleDummy(false)
     , m_VolumeAccuracy(1)
     , m_Upsampling(1)
+    , m_NumberOfRepetitions(1)
+    , m_EnforcePureFiberVoxels(true)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -229,8 +231,14 @@ void TractsToDWIImageFilter::GenerateData()
             mitk::Vector3D spacing = m_Spacing;
             spacing[0] /= m_Upsampling;
             spacing[1] /= m_Upsampling;
+            itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::New();
+            rescaler->SetInput(0,m_TissueMask);
+            rescaler->SetOutputMaximum(100);
+            rescaler->SetOutputMinimum(0);
+            rescaler->Update();
+
             itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer resampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
-            resampler->SetInput(m_TissueMask);
+            resampler->SetInput(rescaler->GetOutput());
             resampler->SetOutputParametersFromImage(m_TissueMask);
             resampler->SetSize(region.GetSize());
             resampler->SetOutputSpacing(spacing);
@@ -488,6 +496,8 @@ void TractsToDWIImageFilter::GenerateData()
             {
                 // compartment weights are calculated according to fiber density
                 double w = compartments.at(0)->GetPixel(index)[0]/maxFiberDensity;
+                if (m_EnforcePureFiberVoxels && w>0)
+                    w = 1;
 
                 // adjust fiber signal
                 for (int i=0; i<m_FiberModels.size(); i++)
@@ -510,6 +520,7 @@ void TractsToDWIImageFilter::GenerateData()
                     pix *= (1-w)/m_NonFiberModels.size();
                     doubleDwi->SetPixel(index, pix);
                 }
+
             }
             ++it3;
         }
@@ -571,7 +582,14 @@ void TractsToDWIImageFilter::GenerateData()
             signal += compartments.at(m_FiberModels.size()+i)->GetPixel(index)*s;
         }
 
-        m_NoiseModel->AddNoise(signal);
+        DoubleDwiType::PixelType accu = signal; accu.Fill(0.0);
+        for (int i=0; i<m_NumberOfRepetitions; i++)
+        {
+            DoubleDwiType::PixelType temp = signal;
+            m_NoiseModel->AddNoise(temp);
+            accu += temp;
+        }
+        signal = accu/m_NumberOfRepetitions;
         for (int i=0; i<signal.Size(); i++)
         {
             if (signal[i]>0)

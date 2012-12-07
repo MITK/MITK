@@ -147,10 +147,7 @@ void mitk::PlanarEllipse::PlaceFigure( const mitk::Point2D &point )
 
 mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
-    if ( this->GetGeometry2D() ==  NULL )
-    {
-        return point;
-    }
+    return point;
 
     Point2D indexPoint;
     this->GetGeometry2D()->WorldToIndex( point, indexPoint );

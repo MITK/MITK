@@ -69,7 +69,9 @@ public:
     itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
     itkSetMacro( Origin, mitk::Point3D )                ///< output image origin
     itkSetMacro( DirectionMatrix, MatrixType )          ///< output image rotation
+    itkSetMacro( EnforcePureFiberVoxels, bool )         ///< treat all voxels containing at least one fiber as fiber-only (actually disable non-fiber compartments for this voxel).
     itkSetMacro( ImageRegion, ImageRegion<3> )          ///< output image size
+    itkSetMacro( NumberOfRepetitions, unsigned int )    ///< number of acquisition repetitions to reduce noise (default is no additional repetition)
     itkSetMacro( TissueMask, ItkUcharImgType::Pointer ) ///< voxels outside of this binary mask contain only noise (are treated as air)
     itkGetMacro( KspaceImage, ItkDoubleImgType::Pointer )
     void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }            ///< generates the noise added to the image values
@@ -110,6 +112,8 @@ protected:
     unsigned int                        m_VolumeAccuracy;
     ItkDoubleImgType::Pointer           m_KspaceImage;
     unsigned int                        m_Upsampling;
+    unsigned int                        m_NumberOfRepetitions;
+    bool                                m_EnforcePureFiberVoxels;
 };
 }
 

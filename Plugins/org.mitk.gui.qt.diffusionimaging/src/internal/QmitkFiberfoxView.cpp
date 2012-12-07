@@ -100,9 +100,16 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
         connect((QObject*) m_Controls->m_AddT2Smearing, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddT2Smearing(int)));
         connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGibbsRinging(int)));
+        connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
         connect((QObject*) m_Controls->m_TransformBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(TransformBundles()));
     }
+}
+
+void QmitkFiberfoxView::OnConstantRadius(int value)
+{
+    if (value>0 && m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
 }
 
 void QmitkFiberfoxView::OnAddT2Smearing(int value)
@@ -315,6 +322,15 @@ void QmitkFiberfoxView::OnDrawROI()
     UpdateGui();
 }
 
+bool CompareLayer(mitk::DataNode::Pointer i,mitk::DataNode::Pointer j)
+{
+    int li = -1;
+    i->GetPropertyValue("layer", li);
+    int lj = -1;
+    j->GetPropertyValue("layer", lj);
+    return li<lj;
+}
+
 void QmitkFiberfoxView::GenerateFibers()
 {
     if (m_SelectedBundles.empty())
@@ -325,15 +341,38 @@ void QmitkFiberfoxView::GenerateFibers()
     for (int i=0; i<m_SelectedBundles.size(); i++)
     {
         mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundles.at(i));
+        std::vector< mitk::DataNode::Pointer > childVector;
+        for( mitk::DataStorage::SetOfObjects::const_iterator it = children->begin(); it != children->end(); ++it )
+            childVector.push_back(*it);
+        sort(childVector.begin(), childVector.end(), CompareLayer);
+
         vector< mitk::PlanarEllipse::Pointer > fib;
         vector< unsigned int > flip;
-        for( mitk::DataStorage::SetOfObjects::const_iterator it = children->begin(); it != children->end(); ++it )
+        float radius = 1;
+        int count = 0;
+        for( std::vector< mitk::DataNode::Pointer >::const_iterator it = childVector.begin(); it != childVector.end(); ++it )
         {
             mitk::DataNode::Pointer node = *it;
 
             if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
             {
-                fib.push_back(dynamic_cast<mitk::PlanarEllipse*>(node->GetData()));
+                mitk::PlanarEllipse* ellipse = dynamic_cast<mitk::PlanarEllipse*>(node->GetData());
+                if (m_Controls->m_ConstantRadiusBox->isChecked())
+                {
+                    ellipse->SetTreatAsCircle(true);
+                    mitk::Point2D c = ellipse->GetControlPoint(0);
+                    mitk::Point2D p = ellipse->GetControlPoint(1);
+                    mitk::Vector2D v = p-c;
+                    if (count==0)
+                        radius = v.GetVnlVector().magnitude();
+                    else
+                    {
+                        v.Normalize();
+                        v *= radius;
+                        ellipse->SetControlPoint(1, c+v);
+                    }
+                }
+                fib.push_back(ellipse);
 
                 std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it = m_DataNodeToPlanarFigureData.find(node.GetPointer());
                 if( it != m_DataNodeToPlanarFigureData.end() )
@@ -344,12 +383,14 @@ void QmitkFiberfoxView::GenerateFibers()
                 else
                     flip.push_back(0);
             }
+            count++;
         }
         if (fib.size()>1)
         {
             fiducials.push_back(fib);
             fliplist.push_back(flip);
         }
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         if (fib.size()<3)
             return;
     }
@@ -501,6 +542,8 @@ void QmitkFiberfoxView::GenerateImage()
         filter->SetNoiseModel(&noiseModel);
         filter->SetKspaceArtifacts(artifactList);
         filter->SetVolumeAccuracy(m_Controls->m_VolumeAccuracyBox->value());
+        filter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
+        filter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
         if (m_TissueMask.IsNotNull())
         {
             ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
@@ -625,7 +668,7 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_CircleButton->setEnabled(true);
         m_Controls->m_FiberGenMessage->setVisible(false);
     }
-    else
+    else if (m_SelectedBundle.IsNull())
     {
         m_Controls->m_CircleButton->setEnabled(false);
         m_Controls->m_FiberGenMessage->setVisible(true);

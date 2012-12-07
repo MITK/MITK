@@ -7,7 +7,7 @@ The MITK build system (which is based on CMake) supports a "superbuild" process,
 all required third-party libraries (except Qt) automatically. These instructions will show you how to use the MITK superbuild.
 
 \note This page explains explicitly how to build MITK itself. If you want to create your own project based on MITK, the process
-described below is completely automated. Please see <a href="http://www.mitk.org/wiki/SetupAMitkBasedProject">Setup a MITK-based project</a>
+described below is completely automated. Please see \ref HowToNewProject.
 
 For more advanced users, the last sections explain how to inject custom build libraries into the superbuild process.
 
@@ -17,12 +17,12 @@ You need:
   -# Git from http://git-scm.com (there are also numerous third-party graphical clients available). We recomment using
      Git, but see below for a way how to get the current source code without using it.
   -# <a href="http://www.cmake.org">CMake</a> (version 2.8.4 or higher)
-  -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications 
+  -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications
   (version 4.6 or above is recommended, we cannot guarantee compatibility with lower versions)
   -# If you are using <b>Mac OS X</b> you need an Xcode installation as this provides the neccessary compilers and SDKs
 
 \attention For Mac OS X it is strongly recommended to use CMake version 2.8.8 or higher
-  
+
 \section BuildInstructions_Qt A note about Qt
 
 Nokia provides several binary packages for Qt. You must make sure that the package you download matches
@@ -33,7 +33,7 @@ use the 32bit Qt libraries. You have two options for a 64bit Qt-based applicatio
   -# Download an inofficial 64bit installer, for example <a href="http://code.google.com/p/qt-msvc-installer/">here</a>. Note
      that we cannot offer support for problems with MITK due to the usage of this kind of installers.
   -# Compile Qt yourself. This is shortly described below.
-  
+
 To compile Qt on Windows using Visual Studio, follow the steps below:
 
   -# Download the Qt sources and unpack them, e.g. to C:/qt-everywhere-opensource-src-4.7.4
@@ -50,7 +50,7 @@ nmake
 nmake install
 \endverbatim
      After "nmake install" completed successfully, you may delete your Qt source directory.
-  
+
 \section BuildInstructions_Get_Source Get a source tree
 
 Since MITK is under active development we recommend to use git to get
@@ -104,8 +104,8 @@ CMake will present you a couple of options, these are the most important ones:
  - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
  - <tt><b>MITK_USE_QT</b></tt> Build MITK code which depends on Qt
  - <tt><b>QT_QMAKE_EXECUTABLE</b></tt> The path to the qmake executable of your Qt installation
- 
-If you are satisfied with the configuration of your MITK superbuild, generate the project files with 
+
+If you are satisfied with the configuration of your MITK superbuild, generate the project files with
 CMake by pressing "Generate".
 
 <b>Linux</b> and <b>Mac OS X</b> users usually just enter "make" (optionally supplying the number threads to be used for
@@ -152,7 +152,7 @@ to be able to start and debug MITK applications from inside Visual Studio.
 \section BuildInstructions_Documentation Documentation
 
 If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool installed, you get a new project
-(Visual Studio) or "make" target named "doc". You can build this to generate the HTML documentation of MITK in 
+(Visual Studio) or "make" target named "doc". You can build this to generate the HTML documentation of MITK in
 the Documentation/Doxygen directory of your MITK-build binary tree or in the <tt>MITK_DOXYGEN_OUTPUT_DIR</tt> CMake variable
 (if specified).
 
@@ -188,7 +188,7 @@ in ccmake may depend on specific MITK_USE_* options set to ON. You may also use 
  - <tt><b>EXTERNAL_ITK_DIR</b></tt> Set this variable to your ITK binary tree (the directory containing the ITKConfig.cmake file)
  - <tt><b>EXTERNAL_OpenCV_DIR</b></tt> Set this variable to your OpenCV binary tree (the directory containing the OpenCVConfig.cmake file)
  - <tt><b>EXTERNAL_VTK_DIR</b></tt> Set this variable to your VTK binary tree (the directory containing the VTKConfig.cmake file)
- 
+
 To set CMake options before the first configure step is invoked, supply them on the command line, i.e.
 
 \code

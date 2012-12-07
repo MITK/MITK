@@ -17,8 +17,11 @@
 #include "mitkException.h"
 #include "mitkMouseReleaseEvent.h"
 
-mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, mitk::MouseButtons buttonStates =
-    NoButton, mitk::ModifierKeys modifiers = NoKey, mitk::MouseButtons eventButton = NoButton) :
+mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer = NULL,
+    mitk::Point2D mousePosition = NULL,
+    mitk::MouseButtons buttonStates = NoButton,
+    mitk::ModifierKeys modifiers = NoKey,
+    mitk::MouseButtons eventButton = NoButton) :
     InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MouseReleaseEvent"), m_EventButton(eventButton)
 {
 }
@@ -28,6 +31,10 @@ mitk::MouseButtons mitk::MouseReleaseEvent::GetEventButton() const
   return m_EventButton;
 }
 
+void mitk::MouseReleaseEvent::SetEventButton(MouseButtons buttons)
+{
+  m_EventButton = buttons;
+}
 
 mitk::MouseReleaseEvent::~MouseReleaseEvent()
 {

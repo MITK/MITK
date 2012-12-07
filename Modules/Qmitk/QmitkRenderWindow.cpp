@@ -351,15 +351,15 @@ mitk::MouseButtons QmitkRenderWindow::GetButtonState(QMouseEvent* me)
 
   if (me->buttons() == Qt::LeftButton)
   {
-    buttonState |= mitk::RightMouseButton;
+    buttonState = buttonState | mitk::RightMouseButton;
   }
   if (me->buttons() == Qt::RightButton)
   {
-    buttonState |= mitk::LeftMouseButton;
+    buttonState = buttonState | mitk::LeftMouseButton;
   }
   if (me->buttons() == Qt::MiddleButton)
   {
-    buttonState |= mitk::MiddleMouseButton;
+    buttonState = buttonState | mitk::MiddleMouseButton;
   }
 
   return buttonState;
@@ -371,15 +371,15 @@ mitk::ModifierKeys QmitkRenderWindow::GetModifiers(QMouseEvent* me)
 
   if (me->modifiers() == Qt::ALT)
   {
-    modifiers |= mitk::AltKey;
+    modifiers = modifiers | mitk::AltKey;
   }
   if (me->modifiers() == Qt::CTRL)
   {
-    modifiers |= mitk::ControlKey;
+    modifiers = modifiers | mitk::ControlKey;
   }
   if (me->modifiers() == Qt::SHIFT)
   {
-    modifiers |= mitk::ShiftKey;
+    modifiers = modifiers | mitk::ShiftKey;
   }
 
   return modifiers;
@@ -391,15 +391,15 @@ mitk::MouseButtons QmitkRenderWindow::GetButtonState(QWheelEvent* we)
 
   if (we->buttons() == Qt::LeftButton)
   {
-    buttonState |= mitk::RightMouseButton;
+    buttonState = buttonState | mitk::RightMouseButton;
   }
   if (we->buttons() == Qt::RightButton)
   {
-    buttonState |= mitk::LeftMouseButton;
+    buttonState = buttonState | mitk::LeftMouseButton;
   }
   if (we->buttons() == Qt::MiddleButton)
   {
-    buttonState |= mitk::MiddleMouseButton;
+    buttonState = buttonState | mitk::MiddleMouseButton;
   }
 
   return buttonState;
@@ -430,11 +430,11 @@ mitk::ModifierKeys QmitkRenderWindow::GetModifiers(QKeyEvent* ke)
   mitk::ModifierKeys modifiers = mitk::NoKey;
 
   if (ke->modifiers() && Qt::ShiftModifier)
-    modifiers |= mitk::ShiftKey;
+    modifiers = modifiers | mitk::ShiftKey;
   if (ke->modifiers() && Qt::CTRL)
-    modifiers |= mitk::ControlKey;
+    modifiers = modifiers | mitk::ControlKey;
   if (ke->modifiers() && Qt::ALT)
-    modifiers |= mitk::AltKey;
+    modifiers = modifiers | mitk::AltKey;
 
   return modifiers;
 }

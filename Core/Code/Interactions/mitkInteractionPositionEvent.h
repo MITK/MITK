@@ -35,6 +35,8 @@ namespace mitk
     Point3D GetPositionInWorld();
     ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
+    void SetModifiers(ModifierKeys modifiers);
+    void SetButtonStates(MouseButtons buttons);
 
   protected:
     InteractionPositionEvent(BaseRenderer*, Point2D, MouseButtons, ModifierKeys, std::string);

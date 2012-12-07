@@ -29,7 +29,7 @@
 //std::string mitk::StateMachineFactory::s_LastLoadedBehavior;
 //XML StateMachine Tags
 const std::string NAME = "name";
-const std::string STATE_MACHINE = "statemachine";
+const std::string CONFIG = "statemachine";
 const std::string STATE = "state";
 const std::string TRANSITION = "transition";
 const std::string EVENTCLASS = "event_class";
@@ -93,7 +93,7 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
 
   std::string name(elementName);
 
-  if (name == STATE_MACHINE)
+  if (name == CONFIG)
   {
     //
   }
@@ -142,7 +142,7 @@ void mitk::StateMachineContainer::EndElement(const char* elementName)
 {
   std::string name(elementName);
 
-  if (name == STATE_MACHINE)
+  if (name == CONFIG)
   {
     ConnectStates();
   }

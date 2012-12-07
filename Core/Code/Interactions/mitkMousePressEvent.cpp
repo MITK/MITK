@@ -17,7 +17,7 @@
 #include "mitkException.h"
 #include "mitkMousePressEvent.h"
 
-mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition, mitk::MouseButtons buttonStates =
+mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer = NULL, mitk::Point2D mousePosition = NULL, mitk::MouseButtons buttonStates =
     NoButton, mitk::ModifierKeys modifiers = NoKey, mitk::MouseButtons eventButton = NoButton) :
     InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MousePressEvent"), m_EventButton(eventButton)
 {
@@ -26,6 +26,11 @@ mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer, mitk::P
 mitk::MouseButtons mitk::MousePressEvent::GetEventButton() const
 {
   return m_EventButton;
+}
+
+void mitk::MousePressEvent::SetEventButton(MouseButtons buttons)
+{
+  m_EventButton = buttons;
 }
 
 mitk::MousePressEvent::~MousePressEvent()
@@ -39,7 +44,6 @@ bool mitk::MousePressEvent::isEqual(mitk::InteractionEvent::Pointer interactionE
   {
     return false;
   }
-
   return (this->GetEventButton() == mpe->GetEventButton() && this->GetModifiers() == mpe->GetModifiers()
       && this->GetButtonStates() == mpe->GetButtonStates());
 }

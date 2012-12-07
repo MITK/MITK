@@ -33,7 +33,7 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
     m_WorldPosition[0] = 0;
     m_WorldPosition[1] = 0;
     m_WorldPosition[2] = 0;
-    MITK_WARN<< "Renderer not initialized. WorldCoordinates bogus!";
+    //MITK_WARN<< "Renderer not initialized. WorldCoordinates bogus!";
   }
 
 }
@@ -61,6 +61,16 @@ mitk::MouseButtons mitk::InteractionPositionEvent::GetButtonStates() const
 bool mitk::InteractionPositionEvent::isEqual(InteractionEvent::Pointer)
 {
   return true;
+}
+
+void mitk::InteractionPositionEvent::SetModifiers(ModifierKeys modifiers)
+{
+  m_Modifiers = modifiers;
+}
+
+void mitk::InteractionPositionEvent::SetButtonStates(MouseButtons buttons)
+{
+  m_ButtonStates = buttons;
 }
 
 mitk::InteractionPositionEvent::~InteractionPositionEvent()

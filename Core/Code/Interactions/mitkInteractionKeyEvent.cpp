@@ -17,7 +17,7 @@
 #include "mitkInteractionKeyEvent.h"
 
 mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer* baseRenderer, char key, mitk::ModifierKeys modifiers = ControlKey) :
-    InteractionEvent(baseRenderer, "MouseWheelEvent"), m_Key(key), m_Modifiers(modifiers)
+    InteractionEvent(baseRenderer, "KeyEvent"), m_Key(key), m_Modifiers(modifiers)
 {
 }
 

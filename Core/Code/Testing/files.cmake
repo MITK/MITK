@@ -40,6 +40,7 @@ set(MODULE_TESTS
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
+  mitkStateMachineConfigTest.cpp
   mitkStateMachineContainerTest.cpp
   mitkStateTest.cpp
   mitkSurfaceTest.cpp

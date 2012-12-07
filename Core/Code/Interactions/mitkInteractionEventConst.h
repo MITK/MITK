@@ -49,7 +49,7 @@ namespace mitk
   {
     return static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
   }
-
+  // TODO: FixME not working!
   inline MouseButtons operator|=(MouseButtons a, MouseButtons b)
   {
     return static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
@@ -60,10 +60,33 @@ namespace mitk
     return static_cast<ModifierKeys>(static_cast<int>(a) | static_cast<int>(b));
   }
 
+// TODO: FixME not working!
   inline ModifierKeys operator|=(ModifierKeys a, ModifierKeys b)
   {
     return static_cast<ModifierKeys>(static_cast<int>(a) | static_cast<int>(b));
   }
+
+  // XML
+
+  // XML Tags
+  const std::string CONFIG = "config";
+  const std::string PARAM = "param";
+  const std::string INPUT = "input";
+  const std::string ATTRIBUTE = "attribute";
+
+  // XML Param
+  const std::string NAME = "name";
+  const std::string VALUE = "value";
+  const std::string EVENTVARIANT = "event_variant";
+  const std::string EVENTCLASS = "event_class";
+
+  // Event Description
+  const std::string MODIFIERS = "Modifiers";
+  const std::string EVENTBUTTON = "EventButton";
+  const std::string BUTTONSTATE = "ButtonState";
+  const std::string KEY = "Key";
+  const std::string WHEELDELTA = "WheelDelta";
+
 
 }     //namespace mitk
 #endif //ifndef MITKINTERACTEVENTCONST_H

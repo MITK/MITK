@@ -16,8 +16,11 @@
 
 #include "mitkMouseWheelEvent.h"
 
-mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer, Point2D mousePosition, MouseButtons buttonStates =
-    NoButton, ModifierKeys modifiers = NoKey, int wheelDelta = 0) :
+mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer = NULL,
+    Point2D mousePosition = NULL,
+    MouseButtons buttonStates = NoButton,
+    ModifierKeys modifiers = NoKey,
+    int wheelDelta = 0) :
     InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MouseWheelEvent"), m_WheelDelta(wheelDelta)
 {
 }
@@ -25,6 +28,11 @@ mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer, Point2D mouse
 int mitk::MouseWheelEvent::GetWheelDelta() const
 {
   return m_WheelDelta;
+}
+
+void mitk::MouseWheelEvent::SetWheelDelta(int delta)
+{
+  m_WheelDelta = delta;
 }
 
 mitk::MouseWheelEvent::~MouseWheelEvent()
@@ -39,7 +47,6 @@ bool mitk::MouseWheelEvent::isEqual(mitk::InteractionEvent::Pointer interactionE
     return false;
   }
   return ((this->GetWheelDelta() * mwe->GetWheelDelta() > 0) // Consider WheelEvents to be equal if the scrolling is done in the same direction.
-  && this->GetModifiers() == mwe->GetModifiers()
-  && this->GetButtonStates() == mwe->GetButtonStates());
+  && this->GetModifiers() == mwe->GetModifiers() && this->GetButtonStates() == mwe->GetButtonStates());
 }
 

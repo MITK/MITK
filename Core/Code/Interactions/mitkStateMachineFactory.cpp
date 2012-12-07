@@ -40,7 +40,7 @@ const std::string EVENT_ID = "EVENT_ID";
 const std::string SIDE_EFFECT_ID = "SIDE_EFFECT_ID";
 const std::string ISTRUE = "TRUE";
 const std::string ISFALSE = "FALSE";
-const std::string STATE_MACHINE = "stateMachine";
+const std::string CONFIG = "stateMachine";
 const std::string STATE = "state";
 const std::string TRANSITION = "transition";
 const std::string STATE_MACHINE_NAME = "stateMachine";
@@ -225,7 +225,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
 
   std::string name(elementName);
 
-  if ( name == STATE_MACHINE )
+  if ( name == CONFIG )
   {
     std::string tempStateMachineName = ReadXMLStringAttribut( NAME, atts );
     if (m_AllStateMachineMap.find(tempStateMachineName) != m_AllStateMachineMap.end())
@@ -339,7 +339,7 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
   std::string name(elementName);
 
   //skip the state machine pattern because the name was not unique!
-  if (m_SkipStateMachine && (name != STATE_MACHINE) )
+  if (m_SkipStateMachine && (name != CONFIG) )
     return;
 
 
@@ -354,7 +354,7 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
     /*ok =*/ ConnectStates(&m_AllStatesOfOneStateMachine);
     m_AllStatesOfOneStateMachine.clear();
   }
-  else if ( name == STATE_MACHINE )
+  else if ( name == CONFIG )
   {
     //doesn't have to be done
   }

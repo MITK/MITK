@@ -92,8 +92,27 @@ namespace mitk {
 
     vtkPropAssembly *m_NetworkAssembly;
 
+    /**
+    * \brief Returns true if the properties have changed since the last data generation
+    */
+    bool PropertiesChanged();
 
-
+    // Property storing members
+    std::string m_ChosenRenderingScheme;
+    std::string m_ChosenEdgeFilter;
+    double m_EdgeThreshold;
+    std::string m_ChosenNodeFilter;
+    double m_NodeThreshold;
+    std::string m_ChosenNodeColoringScheme;
+    mitk::Color m_NodeColorStart;
+    mitk::Color m_NodeColorEnd;
+    double m_NodeRadiusStart;
+    double m_NodeRadiusEnd;
+    std::string m_ChosenNodeLabel;
+    mitk::Color m_EdgeColorStart;
+    mitk::Color m_EdgeColorEnd;
+    double m_EdgeRadiusStart;
+    double m_EdgeRadiusEnd;
 
 
   };

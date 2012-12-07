@@ -32,27 +32,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ConnectomicsNetworkMapper3D::ConnectomicsNetworkMapper3D()
 {
-  //TODO: implement
   m_NetworkAssembly = vtkPropAssembly::New();
 
 }
 
 mitk::ConnectomicsNetworkMapper3D:: ~ConnectomicsNetworkMapper3D()
 {
-  //TODO: implement
   m_NetworkAssembly->Delete();
 
 }
 
 void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
-  //TODO: implement
-
   if( this->GetInput() == NULL )
   {
     return;
   }
-  if( this->GetInput()->GetIsModified( ) )
+
+  bool propertiesHaveChanged = this->PropertiesChanged();
+
+  if( this->GetInput()->GetIsModified( ) || propertiesHaveChanged )
   {
     GenerateData();
   }
@@ -70,7 +69,8 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
     , mitk::ConnectomicsNetwork::NetworkEdge > >  vectorOfEdges = this->GetInput()->GetVectorOfAllEdges();
 
   // Decide on the style of rendering due to property
-  if( false )
+
+  if( m_ChosenRenderingScheme == connectomicsRenderingMITKScheme )
   {
     mitk::Point3D tempWorldPoint, tempCNFGeometryPoint;
 
@@ -150,7 +150,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
 
     }
   }
-  else
+  else if( m_ChosenRenderingScheme == connectomicsRenderingVTKScheme )
   {
     vtkSmartPointer<vtkMutableUndirectedGraph> graph =
       vtkSmartPointer<vtkMutableUndirectedGraph>::New();
@@ -233,7 +233,6 @@ const mitk::ConnectomicsNetwork* mitk::ConnectomicsNetworkMapper3D::GetInput()
 
   return static_cast<const mitk::ConnectomicsNetwork * > ( GetData() );
 }
-
 
 void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer , bool overwrite)
 {
@@ -324,5 +323,83 @@ vtkProp* mitk::ConnectomicsNetworkMapper3D::GetVtkProp(mitk::BaseRenderer *rende
 {
 
   return m_NetworkAssembly;
+
+}
+
+bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
+{
+  mitk::ConnectomicsRenderingSchemeProperty * renderingScheme =
+    static_cast< mitk::ConnectomicsRenderingSchemeProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingSchemePropertyName.c_str() ) );
+  mitk::ConnectomicsRenderingEdgeFilteringProperty * edgeFilter =
+    static_cast< mitk::ConnectomicsRenderingEdgeFilteringProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingEdgeFilteringPropertyName.c_str() ) );
+  mitk::FloatProperty * edgeThreshold = static_cast< mitk::FloatProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingEdgeThresholdFilterThresholdName.c_str() ) );
+  mitk::ConnectomicsRenderingNodeFilteringProperty * nodeFilter =
+    static_cast< mitk::ConnectomicsRenderingNodeFilteringProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeFilteringPropertyName.c_str() ) );
+  mitk::FloatProperty * nodeThreshold = static_cast< mitk::FloatProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeThresholdFilterThresholdName.c_str() ) );
+  mitk::ConnectomicsRenderingNodeColoringSchemeProperty * nodeColoringScheme =
+    static_cast< mitk::ConnectomicsRenderingNodeColoringSchemeProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeColoringSchemeName.c_str() ) );
+  mitk::ColorProperty * nodeColorStart = static_cast< mitk::ColorProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeGradientStartColorName.c_str() ) );
+  mitk::ColorProperty * nodeColorEnd = static_cast< mitk::ColorProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeGradientEndColorName.c_str() ) );
+  mitk::FloatProperty * nodeRadiusStart = static_cast< mitk::FloatProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeRadiusStartName.c_str() ) );
+  mitk::FloatProperty * nodeRadiusEnd = static_cast< mitk::FloatProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeRadiusEndName.c_str() ) );
+  mitk::StringProperty * chosenNode = static_cast< mitk::StringProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeChosenNodeName.c_str() ) );
+  mitk::ColorProperty * edgeColorStart = static_cast< mitk::ColorProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingEdgeGradientStartColorName.c_str() ) );
+  mitk::ColorProperty * edgeColorEnd  = static_cast< mitk::ColorProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingEdgeGradientEndColorName.c_str() ) );
+  mitk::FloatProperty * edgeRadiusStart = static_cast< mitk::FloatProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingEdgeRadiusStartName.c_str() ) );
+  mitk::FloatProperty * edgeRadiusEnd = static_cast< mitk::FloatProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingEdgeRadiusEndName.c_str() ) );
+
+  if(
+    m_ChosenRenderingScheme != renderingScheme->GetValueAsString() ||
+    m_ChosenEdgeFilter != edgeFilter->GetValueAsString() ||
+    m_EdgeThreshold != edgeThreshold->GetValue() ||
+    m_ChosenNodeFilter != nodeFilter->GetValueAsString() ||
+    m_NodeThreshold != nodeThreshold->GetValue() ||
+    m_ChosenNodeColoringScheme != nodeColoringScheme->GetValueAsString() ||
+    m_NodeColorStart != nodeColorStart->GetValue() ||
+    m_NodeColorEnd != nodeColorEnd->GetValue() ||
+    m_NodeRadiusStart != nodeRadiusStart->GetValue() ||
+    m_NodeRadiusEnd != nodeRadiusEnd->GetValue() ||
+    m_ChosenNodeLabel != chosenNode->GetValueAsString() ||
+    m_EdgeColorStart != edgeColorStart->GetValue() ||
+    m_EdgeColorEnd != edgeColorEnd->GetValue() ||
+    m_EdgeRadiusStart != edgeRadiusStart->GetValue() ||
+    m_EdgeRadiusEnd != edgeRadiusEnd->GetValue()
+    )
+  {
+    m_ChosenRenderingScheme = renderingScheme->GetValueAsString();
+    m_ChosenEdgeFilter = edgeFilter->GetValueAsString();
+    m_EdgeThreshold = edgeThreshold->GetValue();
+    m_ChosenNodeFilter = nodeFilter->GetValueAsString();
+    m_NodeThreshold = nodeThreshold->GetValue();
+    m_ChosenNodeColoringScheme = nodeColoringScheme->GetValueAsString();
+    m_NodeColorStart = nodeColorStart->GetValue();
+    m_NodeColorEnd = nodeColorEnd->GetValue();
+    m_NodeRadiusStart = nodeRadiusStart->GetValue();
+    m_NodeRadiusEnd = nodeRadiusEnd->GetValue();
+    m_ChosenNodeLabel = chosenNode->GetValueAsString();
+    m_EdgeColorStart = edgeColorStart->GetValue();
+    m_EdgeColorEnd = edgeColorEnd->GetValue();
+    m_EdgeRadiusStart = edgeRadiusStart->GetValue();
+    m_EdgeRadiusEnd = edgeRadiusEnd->GetValue();
+
+    return true;
+  }
+
+  return false;
 
 }

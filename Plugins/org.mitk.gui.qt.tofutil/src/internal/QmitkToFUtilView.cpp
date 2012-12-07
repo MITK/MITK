@@ -43,6 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkToFDeviceFactoryManager.h>
 #include <mitkToFCameraDevice.h>
+#include <mitkCameraIntrinsicsProperty.h>
 
 //itk headers
 #include <itksys/SystemTools.hxx>
@@ -68,6 +69,7 @@ QmitkToFUtilView::QmitkToFUtilView()
 , m_2DTimeBefore(0.0)
 , m_2DTimeAfter(0.0)
 , m_VideoEnabled(false)
+, m_CameraIntrinsics(NULL)
 {
   this->m_Frametimer = new QTimer(this);
 
@@ -333,6 +335,15 @@ void QmitkToFUtilView::OnToFCameraStarted()
 {
   if (m_ToFImageGrabber.IsNotNull())
   {
+    // initialize camera intrinsics
+    if (this->m_ToFImageGrabber->GetProperty("CameraIntrinsics"))
+    {
+      m_CameraIntrinsics = dynamic_cast<mitk::CameraIntrinsicsProperty*>(this->m_ToFImageGrabber->GetProperty("CameraIntrinsics"))->GetValue();
+    }
+    else
+    {
+      m_CameraIntrinsics = NULL;
+    }
     // initial update of image grabber
     this->m_ToFImageGrabber->Update();
 
@@ -371,6 +382,10 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
     this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
 
+    if (m_CameraIntrinsics.IsNotNull())
+    {
+      this->m_ToFDistanceImageToSurfaceFilter->SetCameraIntrinsics(m_CameraIntrinsics);
+    }
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
@@ -382,7 +397,11 @@ void QmitkToFUtilView::OnToFCameraStarted()
     m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
     // initialize visualization widget
     m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
-    // set distance image to measurement widget
+    // initialize measurement widget
+    if (m_CameraIntrinsics.IsNotNull())
+    {
+      m_Controls->tofMeasurementWidget->SetCameraIntrinsics(m_CameraIntrinsics);
+    }
     m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
 
     this->m_Frametimer->start(0);

@@ -35,6 +35,7 @@ class QTimer;
 #include <mitkToFSurfaceVtkMapper3D.h>
 #include <mitkToFImageRecorder.h>
 #include <mitkToFCompositeFilter.h>
+#include <mitkCameraIntrinsics.h>
 
 /*!
   \brief QmitkToFUtilView
@@ -156,6 +157,7 @@ protected:
     mitk::ToFDistanceImageToSurfaceFilter::Pointer m_ToFDistanceImageToSurfaceFilter; ///< Filter for calculating a surface representation from a given distance image
     mitk::ToFCompositeFilter::Pointer m_ToFCompositeFilter; ///< Filter combining several processing steps (thresholding, Median filtering, Bilateral filtering)
 
+    mitk::CameraIntrinsics::Pointer m_CameraIntrinsics;
     int m_SurfaceDisplayCount; ///< member used to determine whether surface is initialized or not
     int m_2DDisplayCount; ///< member used to determine whether frame rate output should be shown
     // members for calculating the frame rate

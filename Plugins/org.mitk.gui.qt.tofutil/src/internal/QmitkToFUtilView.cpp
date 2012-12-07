@@ -105,7 +105,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
         connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
         connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStopped()), this, SLOT(OnToFCameraStarted()) );
         connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
-        connect( (QObject*)(m_Controls->m_VideoTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
+        connect( (QObject*)(m_Controls->m_KinectTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
     }
 }
 
@@ -183,7 +183,7 @@ void QmitkToFUtilView::Hidden()
 
 void QmitkToFUtilView::OnToFCameraConnected()
 {
-    MITK_INFO <<"OnToFCameraConnected";
+    MITK_DEBUG <<"OnToFCameraConnected";
     this->m_SurfaceDisplayCount = 0;
     this->m_2DDisplayCount = 0;
 
@@ -215,51 +215,9 @@ void QmitkToFUtilView::OnToFCameraConnected()
     // initialize measurement widget
     m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
 
-    //TODO
     this->m_RealTimeClock = mitk::RealTimeClock::New();
     this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
-    /*//As it seems, this part of the Code doing nothing but producing an error message
-  try
-  {
-  this->m_VideoSource = mitk::OpenCVVideoSource::New();
 
-  this->m_VideoSource->SetVideoCameraInput(0, false);
-  this->m_VideoSource->StartCapturing();
-  if(!this->m_VideoSource->IsCapturingEnabled())
-  {
-  MITK_INFO << "unable to initialize video grabbing/playback";
-  this->m_VideoEnabled = false;
-  m_Controls->m_VideoTextureCheckBox->setEnabled(false);
-  }
-  else
-  {
-  this->m_VideoEnabled = true;
-  m_Controls->m_VideoTextureCheckBox->setEnabled(true);
-  }
-
-  if (this->m_VideoEnabled)
-  {
-
-  this->m_VideoSource->FetchFrame();
-  this->m_VideoCaptureHeight = this->m_VideoSource->GetImageHeight();
-  this->m_VideoCaptureWidth = this->m_VideoSource->GetImageWidth();
-  this->m_VideoTexture = this->m_VideoSource->GetVideoTexture();
-
-  this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_VideoCaptureWidth);
-  this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_VideoCaptureHeight);
-
-
-  this->m_ToFSurfaceVtkMapper3D->SetTextureWidth(this->m_VideoCaptureWidth);
-  this->m_ToFSurfaceVtkMapper3D->SetTextureHeight(this->m_VideoCaptureHeight);
-  }
-  }
-  catch (std::logic_error& e)
-  {
-  QMessageBox::warning(NULL, "Warning", QString(e.what()));
-  MITK_ERROR << e.what();
-  return;
-  }
-  */
     this->RequestRenderWindowUpdate();
 }
 
@@ -286,7 +244,7 @@ void QmitkToFUtilView::ResetGUIToDefault()
         this->UseToFVisibilitySettings(false);
 
         //global reinit
-        this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(/*this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll())*/);
+        this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
         this->RequestRenderWindowUpdate();
     }
 }
@@ -300,12 +258,6 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
     m_Controls->SurfacePropertiesBox->setEnabled(false);
     //clean up measurement widget
     m_Controls->tofMeasurementWidget->CleanUpWidget();
-
-    if(this->m_VideoSource)
-    {
-        this->m_VideoSource->StopCapturing();
-        this->m_VideoSource = NULL;
-    }
 }
 
 void QmitkToFUtilView::OnKinectAcquisitionModeChanged()
@@ -396,7 +348,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
         {
             OnTextureCheckBoxChecked(true);
         }
-        if (m_Controls->m_VideoTextureCheckBox->isChecked())
+        if (m_Controls->m_KinectTextureCheckBox->isChecked())
         {
             OnVideoTextureCheckBoxChecked(true);
         }
@@ -422,16 +374,16 @@ void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
         MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
         this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
         this->m_Controls->m_TextureCheckBox->setEnabled(false);
-        this->m_Controls->m_VideoTextureCheckBox->setEnabled(false);
+        this->m_Controls->m_KinectTextureCheckBox->setEnabled(false);
         this->m_Controls->m_SurfaceCheckBox->setChecked(false);
         this->m_Controls->m_TextureCheckBox->setChecked(false);
-        this->m_Controls->m_VideoTextureCheckBox->setChecked(false);
+        this->m_Controls->m_KinectTextureCheckBox->setChecked(false);
     }
     else
     {
         this->m_Controls->m_SurfaceCheckBox->setEnabled(true);
         this->m_Controls->m_TextureCheckBox->setEnabled(true);
-        this->m_Controls->m_VideoTextureCheckBox->setEnabled(true);
+        this->m_Controls->m_KinectTextureCheckBox->setEnabled(true);
     }
 }
 
@@ -441,14 +393,18 @@ void QmitkToFUtilView::OnUpdateCamera()
     {
         // update surface
         m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
-        //      m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(3);
         this->m_Surface->Update();
 
-        vtkColorTransferFunction* colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction();
-
-        //    this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
-
-
+        if(m_Controls->m_KinectTextureCheckBox->isChecked())
+        {
+            this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(NULL);
+            this->m_ToFSurfaceVtkMapper3D->SetTexture((this->m_ToFImageGrabber->GetOutput(3)->GetVtkImageData()));
+        }
+        else
+        {
+            this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
+            this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
+        }
         if (this->m_SurfaceDisplayCount<2)
         {
             this->m_SurfaceNode->SetData(this->m_Surface);
@@ -485,70 +441,6 @@ void QmitkToFUtilView::OnUpdateCamera()
     }
 }
 
-void QmitkToFUtilView::ProcessVideoTransform()
-{
-    IplImage *src, *dst;
-    src = cvCreateImageHeader(cvSize(this->m_VideoCaptureWidth, this->m_VideoCaptureHeight), IPL_DEPTH_8U, 3);
-    src->imageData = (char*)this->m_VideoTexture;
-
-    CvPoint2D32f srcTri[3], dstTri[3];
-    CvMat* rot_mat = cvCreateMat(2,3,CV_32FC1);
-    CvMat* warp_mat = cvCreateMat(2,3,CV_32FC1);
-    dst = cvCloneImage(src);
-    dst->origin = src->origin;
-    cvZero( dst );
-
-    int xOffset = 0;//m_Controls->m_XOffsetSpinBox->value();
-    int yOffset = 0;//m_Controls->m_YOffsetSpinBox->value();
-    int zoom = 0;//m_Controls->m_ZoomSpinBox->value();
-
-    // Compute warp matrix
-    srcTri[0].x = 0 + zoom;
-    srcTri[0].y = 0 + zoom;
-    srcTri[1].x = src->width - 1 - zoom;
-    srcTri[1].y = 0 + zoom;
-    srcTri[2].x = 0 + zoom;
-    srcTri[2].y = src->height - 1 - zoom;
-
-    dstTri[0].x = 0;
-    dstTri[0].y = 0;
-    dstTri[1].x = src->width - 1;
-    dstTri[1].y = 0;
-    dstTri[2].x = 0;
-    dstTri[2].y = src->height - 1;
-
-    cvGetAffineTransform( srcTri, dstTri, warp_mat );
-    cvWarpAffine( src, dst, warp_mat );
-    cvCopy ( dst, src );
-
-
-    // Compute warp matrix
-    srcTri[0].x = 0;
-    srcTri[0].y = 0;
-    srcTri[1].x = src->width - 1;
-    srcTri[1].y = 0;
-    srcTri[2].x = 0;
-    srcTri[2].y = src->height - 1;
-
-    dstTri[0].x = srcTri[0].x + xOffset;
-    dstTri[0].y = srcTri[0].y + yOffset;
-    dstTri[1].x = srcTri[1].x + xOffset;
-    dstTri[1].y = srcTri[1].y + yOffset;
-    dstTri[2].x = srcTri[2].x + xOffset;
-    dstTri[2].y = srcTri[2].y + yOffset;
-
-    cvGetAffineTransform( srcTri, dstTri, warp_mat );
-    cvWarpAffine( src, dst, warp_mat );
-    cvCopy ( dst, src );
-
-    src->imageData = NULL;
-    cvReleaseImage( &src );
-    cvReleaseImage( &dst );
-    cvReleaseMat( &rot_mat );
-    cvReleaseMat( &warp_mat );
-
-}
-
 void QmitkToFUtilView::OnTextureCheckBoxChecked(bool checked)
 {
     if(m_SurfaceNode.IsNotNull())
@@ -568,11 +460,8 @@ void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
 {
     if (checked)
     {
-        //      this->m_ToFSurfaceVtkMapper3D->SetTexture(this->m_VideoTexture);
-        this->m_ToFSurfaceVtkMapper3D->SetTexture((this->m_ToFImageGrabber->GetOutput(3)->GetVtkImageData()));
-        this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(640);
-        this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(480);
-        //        this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
+        this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(0));
+        this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(1));
     }
     else
     {
@@ -597,7 +486,7 @@ void QmitkToFUtilView::OnChangeCoronalWindowOutput(int index)
         if(this->m_RGBImageNode.IsNotNull())
             this->m_RGBImageNode->SetVisibility(false);
     }
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    this->RequestRenderWindowUpdate();
     this->OnToFCameraStarted();
 }
 

@@ -117,34 +117,7 @@ void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
 
     if (this->m_Texture)
     {
-        // create a vtk image as basic for texture
-        //    vtkImageData* imageData = vtkImageData::New();
-        //    int width = this->m_TextureWidth;
-        //    int height = this->m_TextureHeight;
-        //    imageData->SetDimensions(width, height, 1);
-        //    imageData->SetScalarTypeToUnsignedChar();
-        //    imageData->SetNumberOfScalarComponents(3); // RGB
-        //    imageData->SetSpacing(0.0, 0.0, 0.0);
-        //    imageData->SetOrigin(width/2, height/2, 0.0);
-        //    imageData->AllocateScalars(); // allocate storage for image data
-        //    imageData->SetScalarType( VTK_UNSIGNED_CHAR );
-
-        //    // create a vtk array to hold the input unsigned char* texture (e.g. from the video camera)
-        //    vtkDataArray *scalars;
-        //    scalars = vtkUnsignedCharArray::New();
-        //    scalars->SetNumberOfComponents(3);
-        //    scalars->SetVoidArray(this->GetTexture(), width*height*3, 1);
-
-        //    // prepare the image data from vtk array
-        //    imageData->GetPointData()->SetScalars(scalars);
-        //    scalars->Delete();
-
-        //    // create vtk texture
-        //    vtkTexture *aTexture = vtkTexture::New();
-        //    aTexture->SetInput(imageData);
-        //    aTexture->InterpolateOn();
         ls->m_Actor->SetTexture(this->m_Texture);
-        //    aTexture->Delete();
     }
     else
     {

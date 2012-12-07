@@ -164,13 +164,6 @@ protected:
     double m_2DTimeBefore; ///< holds the time stamp at the beginning of the display framerate measurement
     double m_2DTimeAfter; ///< holds the time stamp at the end of the display framerate measurement
 
-    // members used for displaying an external video source
-    mitk::OpenCVVideoSource::Pointer m_VideoSource; ///< OpenCV video source to connect a video device
-    unsigned char* m_VideoTexture; ///< texture used to show video image
-    int m_VideoCaptureWidth; ///< width of the video image
-    int m_VideoCaptureHeight; ///< height of the video image
-    bool m_VideoEnabled; ///< flag indicating whether video grabbing is enabled. Set via the RGB texture checkbox
-
 private:
 
     /*!

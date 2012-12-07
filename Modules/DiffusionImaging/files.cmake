@@ -89,11 +89,17 @@ set(CPP_FILES
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   Rendering/mitkTbssImageMapper.cpp
   Rendering/mitkPlanarFigureMapper3D.cpp
+
+  # Rendering Connectomics
   Rendering/mitkConnectomicsNetworkMapper3D.cpp
   Rendering/mitkConnectomicsRenderingSchemeProperty.cpp
   Rendering/mitkConnectomicsRenderingEdgeFilteringProperty.cpp
   Rendering/mitkConnectomicsRenderingNodeFilteringProperty.cpp
   Rendering/mitkConnectomicsRenderingNodeColoringSchemeProperty.cpp
+  Rendering/mitkConnectomicsRenderingEdgeColorParameterProperty.cpp
+  Rendering/mitkConnectomicsRenderingEdgeRadiusParameterProperty.cpp
+  Rendering/mitkConnectomicsRenderingNodeColorParameterProperty.cpp
+  Rendering/mitkConnectomicsRenderingNodeRadiusParameterProperty.cpp
 
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
@@ -140,13 +146,19 @@ set(H_FILES
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
+  Rendering/mitkPlanarFigureMapper3D.h
+
+  # Rendering Connectomics
   Rendering/mitkConnectomicsNetworkMapper3D.h
   Rendering/mitkConnectomicsRenderingProperties.h
   Rendering/mitkConnectomicsRenderingSchemeProperty.h
   Rendering/mitkConnectomicsRenderingEdgeFilteringProperty.h
   Rendering/mitkConnectomicsRenderingNodeFilteringProperty.h
   Rendering/mitkConnectomicsRenderingNodeColoringSchemeProperty.h
-  Rendering/mitkPlanarFigureMapper3D.h
+  Rendering/mitkConnectomicsRenderingEdgeColorParameterProperty.h
+  Rendering/mitkConnectomicsRenderingEdgeRadiusParameterProperty.h
+  Rendering/mitkConnectomicsRenderingNodeColorParameterProperty.h
+  Rendering/mitkConnectomicsRenderingNodeRadiusParameterProperty.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h

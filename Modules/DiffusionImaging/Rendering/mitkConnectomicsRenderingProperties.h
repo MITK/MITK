@@ -225,6 +225,13 @@ namespace mitk {
     */
    const std::string connectomicsRenderingNodeRadiusParameterName = "Connectomics.Rendering.Nodes.Radius.Parameter";
 
+   /**
+    * \brief Constant
+    *
+    * The node property will be constant.
+    */
+   const std::string connectomicsRenderingNodeParameterConstant = "Constant";
+
    // Default values
    const mitk::StringProperty::Pointer connectomicsRenderingNodeChosenNodeDefault =
      mitk::StringProperty::New("");
@@ -233,15 +240,11 @@ namespace mitk {
      mitk::ColorProperty::New(0.0f, 0.0f, 1.0f);
    const mitk::ColorProperty::Pointer connectomicsRenderingNodeGradientEndColorDefault =
      mitk::ColorProperty::New(0.0f, 1.0f, 0.0f);
-   const mitk::StringProperty::Pointer connectomicsRenderingNodeGradientColorParameterDefault =
-     mitk::StringProperty::New("");
 
    const  mitk::FloatProperty::Pointer connectomicsRenderingNodeRadiusStartDefault =
      mitk::FloatProperty::New( 1.0 );
    const  mitk::FloatProperty::Pointer connectomicsRenderingNodeRadiusEndDefault =
      mitk::FloatProperty::New( 1.0 );
-   const mitk::StringProperty::Pointer connectomicsRenderingNodeRadiusParameterDefault =
-     mitk::StringProperty::New("");
 
    ////////////////////////////////////////
    // Edge Options
@@ -292,20 +295,23 @@ namespace mitk {
     */
    const std::string connectomicsRenderingEdgeRadiusParameterName = "Connectomics.Rendering.Edges.Radius.Parameter";
 
+    /**
+    * \brief Constant
+    *
+    * The edge property will be constant.
+    */
+   const std::string connectomicsRenderingEdgeParameterConstant = "Constant";
+
    // Default values
    const mitk::ColorProperty::Pointer connectomicsRenderingEdgeGradientStartColorDefault =
      mitk::ColorProperty::New(0.8f, 0.0f, 0.6f);
    const mitk::ColorProperty::Pointer connectomicsRenderingEdgeGradientEndColorDefault =
      mitk::ColorProperty::New(0.0f, 0.8f, 0.2f);
-   const mitk::StringProperty::Pointer connectomicsRenderingEdgeGradientColorParameterDefault =
-     mitk::StringProperty::New("");
 
    const  mitk::FloatProperty::Pointer connectomicsRenderingEdgeRadiusStartDefault =
      mitk::FloatProperty::New( 0.1 );
    const  mitk::FloatProperty::Pointer connectomicsRenderingEdgeRadiusEndDefault =
      mitk::FloatProperty::New( 0.4 );
-   const mitk::StringProperty::Pointer connectomicsRenderingEdgeRadiusParameterDefault =
-     mitk::StringProperty::New("");
 
 } // namespace mitk
 

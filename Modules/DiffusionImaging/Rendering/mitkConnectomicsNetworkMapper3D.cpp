@@ -29,6 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingEdgeFilteringProperty.h"
 #include "mitkConnectomicsRenderingNodeFilteringProperty.h"
 #include "mitkConnectomicsRenderingNodeColoringSchemeProperty.h"
+#include "mitkConnectomicsRenderingNodeColorParameterProperty.h"
+#include "mitkConnectomicsRenderingNodeRadiusParameterProperty.h"
+#include "mitkConnectomicsRenderingEdgeColorParameterProperty.h"
+#include "mitkConnectomicsRenderingEdgeRadiusParameterProperty.h"
 
 mitk::ConnectomicsNetworkMapper3D::ConnectomicsNetworkMapper3D()
 {
@@ -307,6 +311,15 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
   mitk::ConnectomicsRenderingNodeColoringSchemeProperty::Pointer connectomicsRenderingNodeColoringScheme =
      mitk::ConnectomicsRenderingNodeColoringSchemeProperty::New();
 
+   mitk::ConnectomicsRenderingNodeColorParameterProperty::Pointer  connectomicsRenderingNodeGradientColorParameter =
+    mitk::ConnectomicsRenderingNodeColorParameterProperty::New();
+  mitk::ConnectomicsRenderingNodeRadiusParameterProperty::Pointer connectomicsRenderingNodeRadiusParameter =
+    mitk::ConnectomicsRenderingNodeRadiusParameterProperty::New();
+  mitk::ConnectomicsRenderingEdgeColorParameterProperty::Pointer connectomicsRenderingEdgeGradientColorParameter =
+    mitk::ConnectomicsRenderingEdgeColorParameterProperty::New();
+  mitk::ConnectomicsRenderingEdgeRadiusParameterProperty::Pointer connectomicsRenderingEdgeRadiusParameter =
+    mitk::ConnectomicsRenderingEdgeRadiusParameterProperty::New();
+
   // set the properties
   node->AddProperty( connectomicsRenderingSchemePropertyName.c_str(),
     connectomicsRenderingScheme, renderer, overwrite );
@@ -333,14 +346,14 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
   node->AddProperty( connectomicsRenderingNodeGradientEndColorName.c_str(),
     connectomicsRenderingNodeGradientEndColorDefault, renderer, overwrite );
   node->AddProperty( connectomicsRenderingNodeGradientColorParameterName.c_str(),
-    connectomicsRenderingNodeGradientColorParameterDefault, renderer, overwrite );
+    connectomicsRenderingNodeGradientColorParameter, renderer, overwrite );
 
   node->AddProperty( connectomicsRenderingNodeRadiusStartName.c_str(),
     connectomicsRenderingNodeRadiusStartDefault, renderer, overwrite );
   node->AddProperty( connectomicsRenderingNodeRadiusEndName.c_str(),
     connectomicsRenderingNodeRadiusEndDefault, renderer, overwrite );
   node->AddProperty( connectomicsRenderingNodeRadiusParameterName.c_str(),
-    connectomicsRenderingNodeRadiusParameterDefault, renderer, overwrite );
+    connectomicsRenderingNodeRadiusParameter, renderer, overwrite );
 
   node->AddProperty( connectomicsRenderingNodeChosenNodeName.c_str(),
     connectomicsRenderingNodeChosenNodeDefault, renderer, overwrite );
@@ -350,14 +363,14 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
   node->AddProperty( connectomicsRenderingEdgeGradientEndColorName.c_str(),
     connectomicsRenderingEdgeGradientEndColorDefault, renderer, overwrite );
   node->AddProperty( connectomicsRenderingEdgeGradientColorParameterName.c_str(),
-    connectomicsRenderingEdgeGradientColorParameterDefault, renderer, overwrite );
+    connectomicsRenderingEdgeGradientColorParameter, renderer, overwrite );
 
   node->AddProperty( connectomicsRenderingEdgeRadiusStartName.c_str(),
     connectomicsRenderingEdgeRadiusStartDefault, renderer, overwrite );
   node->AddProperty( connectomicsRenderingEdgeRadiusEndName.c_str(),
     connectomicsRenderingEdgeRadiusEndDefault, renderer, overwrite );
   node->AddProperty( connectomicsRenderingEdgeRadiusParameterName.c_str(),
-    connectomicsRenderingEdgeRadiusParameterDefault, renderer, overwrite );
+    connectomicsRenderingEdgeRadiusParameter, renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
@@ -422,6 +435,18 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
     this->GetDataNode()->GetProperty( connectomicsRenderingEdgeRadiusStartName.c_str() ) );
   mitk::FloatProperty * edgeRadiusEnd = static_cast< mitk::FloatProperty * > (
     this->GetDataNode()->GetProperty( connectomicsRenderingEdgeRadiusEndName.c_str() ) );
+  mitk::ConnectomicsRenderingNodeColorParameterProperty *  nodeColorParameter =
+    static_cast< mitk::ConnectomicsRenderingNodeColorParameterProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeGradientColorParameterName.c_str() ) );
+  mitk::ConnectomicsRenderingNodeRadiusParameterProperty * nodeRadiusParameter =
+    static_cast< mitk::ConnectomicsRenderingNodeRadiusParameterProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeRadiusParameterName.c_str() ) );
+  mitk::ConnectomicsRenderingEdgeColorParameterProperty * edgeColorParameter =
+    static_cast< mitk::ConnectomicsRenderingEdgeColorParameterProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingEdgeGradientColorParameterName.c_str() ) );
+  mitk::ConnectomicsRenderingEdgeRadiusParameterProperty * edgeRadiusParameter =
+    static_cast< mitk::ConnectomicsRenderingEdgeRadiusParameterProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingEdgeRadiusParameterName.c_str() ) );
 
   if(
     m_ChosenRenderingScheme != renderingScheme->GetValueAsString() ||
@@ -438,7 +463,11 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
     m_EdgeColorStart != edgeColorStart->GetValue() ||
     m_EdgeColorEnd != edgeColorEnd->GetValue() ||
     m_EdgeRadiusStart != edgeRadiusStart->GetValue() ||
-    m_EdgeRadiusEnd != edgeRadiusEnd->GetValue()
+    m_EdgeRadiusEnd != edgeRadiusEnd->GetValue() ||
+    m_NodeColorParameter != nodeColorParameter->GetValueAsString() ||
+    m_NodeRadiusParameter != nodeRadiusParameter->GetValueAsString() ||
+    m_EdgeColorParameter != edgeColorParameter->GetValueAsString() ||
+    m_EdgeRadiusParameter != edgeRadiusParameter->GetValueAsString()
     )
   {
     m_ChosenRenderingScheme = renderingScheme->GetValueAsString();
@@ -456,6 +485,10 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
     m_EdgeColorEnd = edgeColorEnd->GetValue();
     m_EdgeRadiusStart = edgeRadiusStart->GetValue();
     m_EdgeRadiusEnd = edgeRadiusEnd->GetValue();
+    m_NodeColorParameter = nodeColorParameter->GetValueAsString();
+    m_NodeRadiusParameter = nodeRadiusParameter->GetValueAsString();
+    m_EdgeColorParameter = edgeColorParameter->GetValueAsString();
+    m_EdgeRadiusParameter = edgeRadiusParameter->GetValueAsString();
 
     return true;
   }

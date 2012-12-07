@@ -294,16 +294,16 @@ namespace mitk {
 
    // Default values
    const mitk::ColorProperty::Pointer connectomicsRenderingEdgeGradientStartColorDefault =
-     mitk::ColorProperty::New(1.0f, 0.0f, 0.5f);
+     mitk::ColorProperty::New(0.8f, 0.0f, 0.6f);
    const mitk::ColorProperty::Pointer connectomicsRenderingEdgeGradientEndColorDefault =
-     mitk::ColorProperty::New(0.0f, 1.0f, 0.5f);
+     mitk::ColorProperty::New(0.0f, 0.8f, 0.2f);
    const mitk::StringProperty::Pointer connectomicsRenderingEdgeGradientColorParameterDefault =
      mitk::StringProperty::New("");
 
    const  mitk::FloatProperty::Pointer connectomicsRenderingEdgeRadiusStartDefault =
-     mitk::FloatProperty::New( 0.2 );
+     mitk::FloatProperty::New( 0.1 );
    const  mitk::FloatProperty::Pointer connectomicsRenderingEdgeRadiusEndDefault =
-     mitk::FloatProperty::New( 0.8 );
+     mitk::FloatProperty::New( 0.4 );
    const mitk::StringProperty::Pointer connectomicsRenderingEdgeRadiusParameterDefault =
      mitk::StringProperty::New("");
 

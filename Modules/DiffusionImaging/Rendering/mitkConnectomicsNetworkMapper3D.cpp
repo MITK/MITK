@@ -103,6 +103,8 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
 
     //////////////////////Create Tubes/////////////////////////
 
+    double maxWeight = (double) this->GetInput()->GetMaximumWeight();
+
     for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
     {
 
@@ -130,8 +132,16 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
       vtkSmartPointer<vtkTubeFilter> tubes = vtkSmartPointer<vtkTubeFilter>::New();
       tubes->SetInput( lineSource->GetOutput() );
       tubes->SetNumberOfSides( 12 );
-      double radiusFactor = 1.0 + ((double) vectorOfEdges[i].second.weight) / 10.0 ;
-      tubes->SetRadius( std::log10( radiusFactor ) );
+
+      // determine radius
+      double radiusFactor = vectorOfEdges[i].second.weight / maxWeight;
+
+      double radius = m_EdgeRadiusStart + ( m_EdgeRadiusEnd - m_EdgeRadiusStart) * radiusFactor;
+      tubes->SetRadius( radius );
+
+      // originally we used a logarithmic scaling,
+      // double radiusFactor = 1.0 + ((double) vectorOfEdges[i].second.weight) / 10.0 ;
+      // tubes->SetRadius( std::log10( radiusFactor ) );
 
       vtkSmartPointer<vtkPolyDataMapper> mapper2 =
         vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -141,10 +151,21 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
         vtkSmartPointer<vtkActor>::New();
       actor->SetMapper(mapper2);
 
-      double maxWeight = (double) this->GetInput()->GetMaximumWeight();
-      double colourFactor = vectorOfEdges[i].second.weight / maxWeight;
-      actor->GetProperty()->SetColor( colourFactor, colourFactor, colourFactor);
+      // determine color
+      double colorFactor = vectorOfEdges[i].second.weight / maxWeight;
 
+      double redStart = m_EdgeColorStart.GetElement( 0 );
+      double greenStart = m_EdgeColorStart.GetElement( 1 );
+      double blueStart = m_EdgeColorStart.GetElement( 2 );
+      double redEnd = m_EdgeColorEnd.GetElement( 0 );
+      double greenEnd = m_EdgeColorEnd.GetElement( 1 );
+      double blueEnd = m_EdgeColorEnd.GetElement( 2 );
+
+      double red = redStart + ( redEnd - redStart ) * colorFactor;
+      double green = greenStart + ( greenEnd - greenStart ) * colorFactor;
+      double blue = blueStart + ( blueEnd - blueStart ) * colorFactor;
+
+      actor->GetProperty()->SetColor( red, green, blue);
 
       m_NetworkAssembly->AddPart(actor);
 

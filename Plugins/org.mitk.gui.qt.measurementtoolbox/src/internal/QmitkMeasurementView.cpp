@@ -325,6 +325,9 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
   std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it =
       d->m_DataNodeToPlanarFigureData.find(nonConstNode);
 
+  bool isFigureFinished = false;
+  bool isPlaced = false;
+
   if( it != d->m_DataNodeToPlanarFigureData.end() )
   {
     QmitkPlanarFigureData& data = it->second;
@@ -336,6 +339,11 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
 
     MEASUREMENT_DEBUG << "removing from the list of tracked planar figures";
     d->m_DataNodeToPlanarFigureData.erase( it );
+
+    isFigureFinished = data.m_Figure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
+    if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
+      PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
+    }
   }
 
   mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
@@ -347,8 +355,7 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
   {
     mitk::PlanarFigure* planarFigure  = dynamic_cast<mitk::PlanarFigure*>  (nodes->at(x)->GetData());
     if (planarFigure != NULL) {
-      bool isFigureFinished = false;
-      bool isPlaced = false;
+
       isFigureFinished = planarFigure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
       if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
         GetDataStorage()->Remove(nodes->at(x));

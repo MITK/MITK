@@ -36,9 +36,11 @@ mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
-  m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
-  m_CameraIntrinsics->SetPrincipalPoint(113.29063841714108,97.243216122015184);
-  m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
+//  m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
+//  m_CameraIntrinsics->SetFocalLength(5.9421434211923247e+02,5.9104053696870778e+02);
+//  m_CameraIntrinsics->SetPrincipalPoint(3.3930780975300314e+02,2.4273913761751615e+02);
+//  m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
+  m_CameraIntrinsics->FromXMLFile("/media/hdd/thomasHdd/CalibrationFIles/ROS_RGB_calib.xml");
   m_ReconstructionMode = true;
 }
 
@@ -106,13 +108,13 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
   textureCoords->SetNumberOfComponents(2);
 
-  float textureScaleCorrection1 = 0.0;
-  float textureScaleCorrection2 = 0.0;
-  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-  {
-    textureScaleCorrection1 = float(this->m_TextureImageHeight) / float(this->m_TextureImageWidth);
-    textureScaleCorrection2 = ((float(this->m_TextureImageWidth) - float(this->m_TextureImageHeight))/2) / float(this->m_TextureImageWidth);
-  }
+//  float textureScaleCorrection1 = 0.0;
+//  float textureScaleCorrection2 = 0.0;
+//  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
+//  {
+//    textureScaleCorrection1 = float(this->m_TextureImageHeight) / float(this->m_TextureImageWidth);
+//    textureScaleCorrection2 = ((float(this->m_TextureImageWidth) - float(this->m_TextureImageHeight))/2) / float(this->m_TextureImageWidth);
+//  }
 
   float* scalarFloatData = NULL;
 
@@ -169,7 +171,6 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
       else
       {
         isPointValid[pointCount] = true;
-
         points->InsertPoint(pixelID, cartesianCoordinates.GetDataPointer());
 
         if((i >= 1) && (j >= 1))
@@ -201,8 +202,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
         if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
         {
 
-          float xNorm = (((float)pixel[0])/xDimension)*textureScaleCorrection1 + textureScaleCorrection2 ; // correct video texture scale 640 * 480!!
-          float yNorm = 1.0 - ((float)pixel[1])/yDimension; //flip y-axis
+          float xNorm = (((float)pixel[0])/xDimension)/**textureScaleCorrection1 + textureScaleCorrection2 */; // correct video texture scale 640 * 480!!
+          float yNorm = ((float)pixel[1])/yDimension; //don't flip. we don't need to flip.
           textureCoords->InsertTuple2(pixelID, xNorm, yNorm);
         }
       }

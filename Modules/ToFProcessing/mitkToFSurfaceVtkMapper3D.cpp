@@ -76,17 +76,17 @@ void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
     return;
   }
 
-  //
-  // set the input-object at time t for the mapper
-  //
-  //mitk::ToFSurface::Pointer input  = const_cast< mitk::ToFSurface* >( this->GetInput() );
-  mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
-  vtkPolyData * polydata = input->GetVtkPolyData( this->GetTimestep() );
-  if(polydata == NULL)
-  {
-    ls->m_Actor->VisibilityOff();
-    return;
-  }
+    //
+    // set the input-object at time t for the mapper
+    //
+    //mitk::ToFSurface::Pointer input  = const_cast< mitk::ToFSurface* >( this->GetInput() );
+    mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
+    vtkPolyData * polydata = input->GetVtkPolyData( this->GetTimestep() );
+    if(polydata == NULL)
+    {
+        ls->m_Actor->VisibilityOff();
+        return;
+    }
 
   if ( m_GenerateNormals )
   {
@@ -115,42 +115,42 @@ void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
     ls->m_VtkPolyDataMapper->SetLookupTable(this->m_VtkScalarsToColors);
   }
 
-  if (this->m_Texture)
-  {
-    // create a vtk image as basic for texture
-    vtkImageData* imageData = vtkImageData::New();
-    int width = this->m_TextureWidth;
-    int height = this->m_TextureHeight;
-    imageData->SetDimensions(width, height, 1);
-    imageData->SetScalarTypeToUnsignedChar();
-    imageData->SetNumberOfScalarComponents(3); // RGB
-    imageData->SetSpacing(0.0, 0.0, 0.0);
-    imageData->SetOrigin(width/2, height/2, 0.0);
-    imageData->AllocateScalars(); // allocate storage for image data
-    imageData->SetScalarType( VTK_UNSIGNED_CHAR );
+    if (this->m_Texture)
+    {
+        // create a vtk image as basic for texture
+        //    vtkImageData* imageData = vtkImageData::New();
+        //    int width = this->m_TextureWidth;
+        //    int height = this->m_TextureHeight;
+        //    imageData->SetDimensions(width, height, 1);
+        //    imageData->SetScalarTypeToUnsignedChar();
+        //    imageData->SetNumberOfScalarComponents(3); // RGB
+        //    imageData->SetSpacing(0.0, 0.0, 0.0);
+        //    imageData->SetOrigin(width/2, height/2, 0.0);
+        //    imageData->AllocateScalars(); // allocate storage for image data
+        //    imageData->SetScalarType( VTK_UNSIGNED_CHAR );
 
-    // create a vtk array to hold the input unsigned char* texture (e.g. from the video camera)
-    vtkDataArray *scalars;
-    scalars = vtkUnsignedCharArray::New();
-    scalars->SetNumberOfComponents(3);
-    scalars->SetVoidArray(this->GetTexture(), width*height*3, 1);
+        //    // create a vtk array to hold the input unsigned char* texture (e.g. from the video camera)
+        //    vtkDataArray *scalars;
+        //    scalars = vtkUnsignedCharArray::New();
+        //    scalars->SetNumberOfComponents(3);
+        //    scalars->SetVoidArray(this->GetTexture(), width*height*3, 1);
 
-    // prepare the image data from vtk array
-    imageData->GetPointData()->SetScalars(scalars);
-    scalars->Delete();
+        //    // prepare the image data from vtk array
+        //    imageData->GetPointData()->SetScalars(scalars);
+        //    scalars->Delete();
 
-    // create vtk texture
-    vtkTexture *aTexture = vtkTexture::New();
-    aTexture->SetInput(imageData);
-    aTexture->InterpolateOn();
-    ls->m_Actor->SetTexture(aTexture);
-    aTexture->Delete();
-  }
-  else
-  {
-    // remove the texture
-    ls->m_Actor->SetTexture(0);
-  }
+        //    // create vtk texture
+        //    vtkTexture *aTexture = vtkTexture::New();
+        //    aTexture->SetInput(imageData);
+        //    aTexture->InterpolateOn();
+        ls->m_Actor->SetTexture(this->m_Texture);
+        //    aTexture->Delete();
+    }
+    else
+    {
+        // remove the texture
+        ls->m_Actor->SetTexture(0);
+    }
 }
 
 void mitk::ToFSurfaceVtkMapper3D::ResetMapper( BaseRenderer* renderer )
@@ -161,126 +161,126 @@ void mitk::ToFSurfaceVtkMapper3D::ResetMapper( BaseRenderer* renderer )
 
 void mitk::ToFSurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer)
 {
-  // Colors
-  {
-    double ambient [3] = { 0.5,0.5,0.0 };
-    double diffuse [3] = { 0.5,0.5,0.0 };
-    double specular[3] = { 1.0,1.0,1.0 };
-
-    float coeff_ambient = 0.5f;
-    float coeff_diffuse = 0.5f;
-    float coeff_specular= 0.5f;
-    float power_specular=10.0f;
-
-    // Color
+    // Colors
     {
-      mitk::ColorProperty::Pointer p;
-      node->GetProperty(p, "color", renderer);
-      if(p.IsNotNull())
-      {
-        mitk::Color c = p->GetColor();
-        ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
-        diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
-        // Setting specular color to the same, make physically no real sense, however vtk rendering slows down, if these colors are different.
-        specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
-      }
+        double ambient [3] = { 0.5,0.5,0.0 };
+        double diffuse [3] = { 0.5,0.5,0.0 };
+        double specular[3] = { 1.0,1.0,1.0 };
+
+        float coeff_ambient = 0.5f;
+        float coeff_diffuse = 0.5f;
+        float coeff_specular= 0.5f;
+        float power_specular=10.0f;
+
+        // Color
+        {
+            mitk::ColorProperty::Pointer p;
+            node->GetProperty(p, "color", renderer);
+            if(p.IsNotNull())
+            {
+                mitk::Color c = p->GetColor();
+                ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
+                diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
+                // Setting specular color to the same, make physically no real sense, however vtk rendering slows down, if these colors are different.
+                specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
+            }
+        }
+
+        // Ambient
+        {
+            mitk::ColorProperty::Pointer p;
+            node->GetProperty(p, "material.ambientColor", renderer);
+            if(p.IsNotNull())
+            {
+                mitk::Color c = p->GetColor();
+                ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
+            }
+        }
+
+        // Diffuse
+        {
+            mitk::ColorProperty::Pointer p;
+            node->GetProperty(p, "material.diffuseColor", renderer);
+            if(p.IsNotNull())
+            {
+                mitk::Color c = p->GetColor();
+                diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
+            }
+        }
+
+        // Specular
+        {
+            mitk::ColorProperty::Pointer p;
+            node->GetProperty(p, "material.specularColor", renderer);
+            if(p.IsNotNull())
+            {
+                mitk::Color c = p->GetColor();
+                specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
+            }
+        }
+
+        // Ambient coeff
+        {
+            node->GetFloatProperty("material.ambientCoefficient", coeff_ambient, renderer);
+        }
+
+        // Diffuse coeff
+        {
+            node->GetFloatProperty("material.diffuseCoefficient", coeff_diffuse, renderer);
+        }
+
+        // Specular coeff
+        {
+            node->GetFloatProperty("material.specularCoefficient", coeff_specular, renderer);
+        }
+
+        // Specular power
+        {
+            node->GetFloatProperty("material.specularPower", power_specular, renderer);
+        }
+
+        property->SetAmbient( coeff_ambient );
+        property->SetDiffuse( coeff_diffuse );
+        property->SetSpecular( coeff_specular );
+        property->SetSpecularPower( power_specular );
+
+        property->SetAmbientColor( ambient );
+        property->SetDiffuseColor( diffuse );
+        property->SetSpecularColor( specular );
     }
 
-    // Ambient
+    // Render mode
     {
-      mitk::ColorProperty::Pointer p;
-      node->GetProperty(p, "material.ambientColor", renderer);
-      if(p.IsNotNull())
-      {
-        mitk::Color c = p->GetColor();
-        ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
-      }
+        // Opacity
+        {
+            float opacity = 1.0f;
+            if( node->GetOpacity(opacity,renderer) )
+                property->SetOpacity( opacity );
+        }
+
+        // Wireframe line width
+        {
+            float lineWidth = 1;
+            node->GetFloatProperty("material.wireframeLineWidth", lineWidth, renderer);
+            property->SetLineWidth( lineWidth );
+        }
+
+        // Representation
+        {
+            mitk::VtkRepresentationProperty::Pointer p;
+            node->GetProperty(p, "material.representation", renderer);
+            if(p.IsNotNull())
+                property->SetRepresentation( p->GetVtkRepresentation() );
+        }
+
+        // Interpolation
+        {
+            mitk::VtkInterpolationProperty::Pointer p;
+            node->GetProperty(p, "material.interpolation", renderer);
+            if(p.IsNotNull())
+                property->SetInterpolation( p->GetVtkInterpolation() );
+        }
     }
-
-    // Diffuse
-    {
-      mitk::ColorProperty::Pointer p;
-      node->GetProperty(p, "material.diffuseColor", renderer);
-      if(p.IsNotNull())
-      {
-        mitk::Color c = p->GetColor();
-        diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
-      }
-    }
-
-    // Specular
-    {
-      mitk::ColorProperty::Pointer p;
-      node->GetProperty(p, "material.specularColor", renderer);
-      if(p.IsNotNull())
-      {
-        mitk::Color c = p->GetColor();
-        specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
-      }
-    }
-
-    // Ambient coeff
-    {
-      node->GetFloatProperty("material.ambientCoefficient", coeff_ambient, renderer);
-    }
-
-    // Diffuse coeff
-    {
-      node->GetFloatProperty("material.diffuseCoefficient", coeff_diffuse, renderer);
-    }
-
-    // Specular coeff
-    {
-      node->GetFloatProperty("material.specularCoefficient", coeff_specular, renderer);
-    }
-
-    // Specular power
-    {
-      node->GetFloatProperty("material.specularPower", power_specular, renderer);
-    }
-
-    property->SetAmbient( coeff_ambient );
-    property->SetDiffuse( coeff_diffuse );
-    property->SetSpecular( coeff_specular );
-    property->SetSpecularPower( power_specular );
-
-    property->SetAmbientColor( ambient );
-    property->SetDiffuseColor( diffuse );
-    property->SetSpecularColor( specular );
-  }
-
-  // Render mode
-  {
-    // Opacity
-    {
-      float opacity = 1.0f;
-      if( node->GetOpacity(opacity,renderer) )
-        property->SetOpacity( opacity );
-    }
-
-    // Wireframe line width
-    {
-      float lineWidth = 1;
-      node->GetFloatProperty("material.wireframeLineWidth", lineWidth, renderer);
-      property->SetLineWidth( lineWidth );
-    }
-
-    // Representation
-    {
-      mitk::VtkRepresentationProperty::Pointer p;
-      node->GetProperty(p, "material.representation", renderer);
-      if(p.IsNotNull())
-        property->SetRepresentation( p->GetVtkRepresentation() );
-    }
-
-    // Interpolation
-    {
-      mitk::VtkInterpolationProperty::Pointer p;
-      node->GetProperty(p, "material.interpolation", renderer);
-      if(p.IsNotNull())
-        property->SetInterpolation( p->GetVtkInterpolation() );
-    }
-  }
 }
 
 
@@ -305,16 +305,16 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
     ls->m_VtkPolyDataMapper->SetLookupTable(lookupTableProp->GetLookupTable()->GetVtkLookupTable());
   }
 
-  mitk::LevelWindow levelWindow;
-  if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer, "levelWindow"))
-  {
-    ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
-  }
-  else
-    if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
+    mitk::LevelWindow levelWindow;
+    if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer, "levelWindow"))
     {
-      ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
+        ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
     }
+    else
+        if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
+        {
+            ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
+        }
 
     bool scalarVisibility = false;
     this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
@@ -510,12 +510,14 @@ void mitk::ToFSurfaceVtkMapper3D::SetImmediateModeRenderingOn(int  /*on*/)
   */
 }
 
-void mitk::ToFSurfaceVtkMapper3D::SetTexture(unsigned char* texture)
+void mitk::ToFSurfaceVtkMapper3D::SetTexture(vtkImageData *img)
 {
-  this->m_Texture = texture;
+    this->m_Texture = vtkSmartPointer<vtkTexture>::New();
+    this->m_Texture->SetInput(img);
+    //    MITK_INFO << "Neuer Code";
 }
 
-unsigned char* mitk::ToFSurfaceVtkMapper3D::GetTexture()
+vtkSmartPointer<vtkTexture> mitk::ToFSurfaceVtkMapper3D::GetTexture()
 {
   return this->m_Texture;
 }

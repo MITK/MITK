@@ -214,7 +214,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
   }
 
   // initialize measurement widget
-  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());
+  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
 
   //TODO
   this->m_RealTimeClock = mitk::RealTimeClock::New();
@@ -318,6 +318,7 @@ void QmitkToFUtilView::OnKinectAcquisitionModeChanged()
       if (m_ToFImageGrabber->GetBoolProperty("RGB"))
       {
         this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(3,this->m_ToFImageGrabber->GetOutput(3));
       }
       else if (m_ToFImageGrabber->GetBoolProperty("IR"))
       {
@@ -447,11 +448,15 @@ void QmitkToFUtilView::OnUpdateCamera()
   {
     // update surface
     m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
+//      m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(3);
     this->m_Surface->Update();
+              this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(640);
+              this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(480);
 
     vtkColorTransferFunction* colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction();
 
-    this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
+//    this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(colorTransferFunction);
+            this->m_ToFSurfaceVtkMapper3D->SetTexture((this->m_ToFImageGrabber->GetOutput(3)->GetVtkImageData()));
 
     if (this->m_SurfaceDisplayCount<2)
     {
@@ -574,7 +579,8 @@ void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
   {
     if (this->m_VideoEnabled)
     {
-      this->m_ToFSurfaceVtkMapper3D->SetTexture(this->m_VideoTexture);
+//      this->m_ToFSurfaceVtkMapper3D->SetTexture(this->m_VideoTexture);
+        this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
     }
     else
     {

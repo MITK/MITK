@@ -26,6 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGlobalInteraction.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkNodePredicateDataType.h>
+
+// include gl to read out properties
+#include <vtkOpenGL.h>
+#include <vtkOpenGLExtensionManager.h>
+
 #include <mitkTestingMacros.h>
 
 mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc, char* argv[])
@@ -43,10 +48,26 @@ mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc
 
     this->GetVtkRenderWindow()->DoubleBufferOff( );
     this->SetInputFileNames(argc, argv);
+    // prints the glinfo after creation of the vtkrenderwindow
+    this->PrintGLInfo();
 }
 
 mitkRenderingTestHelper::~mitkRenderingTestHelper()
 {
+}
+
+void mitkRenderingTestHelper::PrintGLInfo()
+{
+    GLint maxTextureSize;
+
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);;
+
+    MITK_INFO << "OpenGL Render Context Information: \n"
+              << "- GL_VENDOR: "<< glGetString(GL_VENDOR) << "\n"
+              << "- GL_RENDERER: "<< glGetString(GL_RENDERER) << "\n"
+              << "- GL_VERSION: "<< glGetString(GL_VERSION)   << "\n"
+              << "- GL_MAX_TEXTURE_SIZE: "<< maxTextureSize << "\n"
+              << "- GL_EXTENSIONS: "<< glGetString(GL_EXTENSIONS);
 }
 
 void mitkRenderingTestHelper::Render()
@@ -54,7 +75,13 @@ void mitkRenderingTestHelper::Render()
     //if the datastorage is initialized and at least 1 image is loaded render it
     if(m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1 )
     {
+
       mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
+
+      //use this to actually show the iamge in a renderwindow
+        this->GetVtkRenderWindow()->Render();
+//        this->GetVtkRenderWindow()->GetInteractor()->Start();
+
     }
     else
     {
@@ -134,10 +161,11 @@ void mitkRenderingTestHelper::SaveAsPNG(std::string fileName)
 
 void mitkRenderingTestHelper::AddToStorage(const std::string &filename)
 {
-  std::ifstream ifile(filename.c_str()); // test file existence to avoid confusing test output AFTER reading a missing file
-  MITK_TEST_CONDITION_REQUIRED(ifile, "Input file exists: " << filename);
+    std::ifstream ifile(filename.c_str()); // test file existence to avoid confusing test output AFTER reading a missing file
+    MITK_TEST_CONDITION_REQUIRED(ifile, "Input file exists: " << filename);
 
-  MITK_INFO << "Loading " << filename;
+    MITK_INFO << "Loading " << filename;
+
     mitk::DataNodeFactory::Pointer reader = mitk::DataNodeFactory::New();
     try
     {
@@ -158,5 +186,6 @@ void mitkRenderingTestHelper::AddToStorage(const std::string &filename)
     }
 
     mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
+
 }
 

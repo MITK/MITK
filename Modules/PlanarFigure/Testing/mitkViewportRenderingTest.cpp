@@ -33,6 +33,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 // stdlib
 #include <stdlib.h>
 
+std::string gen_random_filename() {
+  const int len = 8;
+  std::string result;
+  result.insert(0,len,'x');
+  static const char alphanum[] =
+    "0123456789"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz";
+
+  for (int i = 0; i < len; ++i) {
+    result[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+  }
+
+  return result;
+}
+
 int mitkViewportRenderingTest(int argc, char* argv[]) {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
@@ -128,10 +144,11 @@ int mitkViewportRenderingTest(int argc, char* argv[]) {
   renderingHelper.Render();
 
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = false;
+  bool generateReferenceScreenshot = true;
   if(generateReferenceScreenshot)
   {
-    renderingHelper.SaveAsPNG("/tmp/viewportrendering.png");
+    std::string tmpFilename = std::string("/tmp/viewportrendering_") + gen_random_filename() + ".png";
+    renderingHelper.SaveAsPNG( tmpFilename );
   }
 
   //### Usage of vtkRegressionTestImage:

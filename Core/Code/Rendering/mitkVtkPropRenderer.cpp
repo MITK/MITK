@@ -338,12 +338,20 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
       -1.0, 1.0
       );
 
-  // scale OpenGL contents to (VTK) viewport
-  float windowWidth = GetDisplayGeometry()->GetSizeInDisplayUnits()[0];
-  float windowHeight = GetDisplayGeometry()->GetSizeInDisplayUnits()[1];
+  const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
 
-  glScalef(iViewport[2]/windowWidth, iViewport[3]/windowHeight, 1.0);
+  float windowWidth = displayGeometry->GetSizeInDisplayUnits()[0];
+  float windowHeight = displayGeometry->GetSizeInDisplayUnits()[1];
 
+  float viewportHeight = iViewport[3]; // seemingly right
+
+  float translateX = (iViewport[2] - iViewport[3]) / 2.0 - (windowWidth - windowHeight)/2.0;
+  float zoom = viewportHeight / windowHeight;
+
+  glTranslatef( translateX, 0, 0.0);
+  glScalef( zoom, zoom, 1.0 );
+
+  /* ende maleike */
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
   glLoadIdentity();

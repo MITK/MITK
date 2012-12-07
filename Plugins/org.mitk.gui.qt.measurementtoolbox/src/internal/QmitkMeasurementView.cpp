@@ -723,7 +723,7 @@ void QmitkMeasurementView::EnableCrosshairNavigation()
       dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
   {
     MEASUREMENT_DEBUG << "enabling linked navigation";
-    //linkedRenderWindow->EnableLinkedNavigation(true);
+    linkedRenderWindow->EnableLinkedNavigation(true);
     linkedRenderWindow->EnableSlicingPlanes(true);
   }
 }
@@ -737,7 +737,7 @@ void QmitkMeasurementView::DisableCrosshairNavigation()
       dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
   {
     MEASUREMENT_DEBUG << "disabling linked navigation";
-    //linkedRenderWindow->EnableLinkedNavigation(false);
+    linkedRenderWindow->EnableLinkedNavigation(false);
     linkedRenderWindow->EnableSlicingPlanes(false);
   }
 }

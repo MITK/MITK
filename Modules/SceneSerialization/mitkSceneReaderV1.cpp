@@ -84,7 +84,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       error = true;
     }
 
-    //   5. if there are <properties> nodes,
+    //   3. if there are <properties> nodes,
     //        - instantiate the appropriate PropertyListDeSerializer
     //        - use them to construct PropertyList objects
     //        - add these properties to the node (if necessary, use renderwindow name)
@@ -96,19 +96,17 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     }
 
     // remember node for later adding to DataStorage
-    //m_Nodes.insert( std::make_pair( node, std::list<std::string>() ) );
     int layer;
     node->GetIntProperty("layer", layer);
     m_OrderedNodePairs.insert( std::make_pair( layer, std::make_pair( node, std::list<std::string>() ) ) );
 
-    //   3. if there are <source> elements, remember parent objects
+    //   4. if there are <source> elements, remember parent objects
     for( TiXmlElement* source = element->FirstChildElement("source"); source != NULL; source = source->NextSiblingElement("source") )
     {
       const char* sourceUID = source->Attribute("UID");
       if (sourceUID)
       {
         m_OrderedNodePairs[layer].second.push_back( std::string(sourceUID) );
-        //m_Nodes[node].push_back( std::string(sourceUID) );
       }
     }
 
@@ -117,9 +115,6 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   } // end for all <node>
 
   // remove all unknown parent UIDs
-  /*for (NodesAndParentsMapType::iterator nodesIter = m_Nodes.begin();
-       nodesIter != m_Nodes.end();
-       ++nodesIter)*/
   for (LayerPropertyMapType::iterator nodesIter = m_OrderedNodePairs.begin();
        nodesIter != m_OrderedNodePairs.end();
        ++nodesIter)
@@ -177,7 +172,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
         // if all parents are found in datastorage (or are unknown), add node to DataStorage
         storage->Add( nodesIter->second.first, parents );
 
-        // remove this node from m_Nodes
+        // remove this node from m_OrderedNodePairs
         m_OrderedNodePairs.erase( nodesIter );
 
         // break this for loop because iterators are probably invalid
@@ -186,7 +181,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     }
   }
 
-  // All nodes that are still in m_Nodes at this point are not part of a proper directed graph structure. We'll add such nodes without any parent information.
+  // All nodes that are still in m_OrderedNodePairs at this point are not part of a proper directed graph structure. We'll add such nodes without any parent information.
   for (LayerPropertyMapType::iterator nodesIter = m_OrderedNodePairs.begin();
        nodesIter != m_OrderedNodePairs.end();
        ++nodesIter)

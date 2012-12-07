@@ -74,6 +74,24 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
   {
     mitk::Point3D tempWorldPoint, tempCNFGeometryPoint;
 
+    //////////////////////Prepare coloring and radius////////////
+
+    std::vector< double > vectorOfNodeRadiusParameterValues;
+    vectorOfNodeRadiusParameterValues.resize( vectorOfNodes.size() );
+    double maxNodeRadiusParameterValue( FillNodeParameterVector( &vectorOfNodeRadiusParameterValues, m_NodeRadiusParameter ) );
+
+    std::vector< double > vectorOfNodeColorParameterValues;
+    vectorOfNodeColorParameterValues.resize( vectorOfNodes.size() );
+    double maxNodeColorParameterValue( FillNodeParameterVector( &vectorOfNodeColorParameterValues, m_NodeColorParameter ) );
+
+    std::vector< double > vectorOfEdgeRadiusParameterValues;
+    vectorOfEdgeRadiusParameterValues.resize( vectorOfEdges.size() );
+    double maxEdgeRadiusParameterValue( FillEdgeParameterVector( &vectorOfEdgeRadiusParameterValues, m_EdgeRadiusParameter ) );
+
+    std::vector< double > vectorOfEdgeColorParameterValues;
+    vectorOfEdgeColorParameterValues.resize( vectorOfEdges.size() );
+    double maxEdgeColorParameterValue( FillEdgeParameterVector( &vectorOfEdgeColorParameterValues, m_EdgeColorParameter ) );
+
     //////////////////////Create Spheres/////////////////////////
     for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
     {
@@ -88,7 +106,12 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
       this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
 
       sphereSource->SetCenter( tempWorldPoint[0] , tempWorldPoint[1], tempWorldPoint[2] );
-      sphereSource->SetRadius(1.0);
+
+      // determine radius
+      double radiusFactor = vectorOfNodeRadiusParameterValues[i] / maxNodeRadiusParameterValue;
+
+      double radius = m_NodeRadiusStart + ( m_NodeRadiusEnd - m_NodeRadiusStart) * radiusFactor;
+      sphereSource->SetRadius( radius );
 
       vtkSmartPointer<vtkPolyDataMapper> mapper =
         vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -97,6 +120,22 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
       vtkSmartPointer<vtkActor> actor =
         vtkSmartPointer<vtkActor>::New();
       actor->SetMapper(mapper);
+
+      // determine color
+      double colorFactor = vectorOfNodeColorParameterValues[i] / maxNodeColorParameterValue;
+
+      double redStart = m_NodeColorStart.GetElement( 0 );
+      double greenStart = m_NodeColorStart.GetElement( 1 );
+      double blueStart = m_NodeColorStart.GetElement( 2 );
+      double redEnd = m_NodeColorEnd.GetElement( 0 );
+      double greenEnd = m_NodeColorEnd.GetElement( 1 );
+      double blueEnd = m_NodeColorEnd.GetElement( 2 );
+
+      double red = redStart + ( redEnd - redStart ) * colorFactor;
+      double green = greenStart + ( greenEnd - greenStart ) * colorFactor;
+      double blue = blueStart + ( blueEnd - blueStart ) * colorFactor;
+
+      actor->GetProperty()->SetColor( red, green, blue);
 
       m_NetworkAssembly->AddPart(actor);
     }
@@ -134,7 +173,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
       tubes->SetNumberOfSides( 12 );
 
       // determine radius
-      double radiusFactor = vectorOfEdges[i].second.weight / maxWeight;
+      double radiusFactor = vectorOfEdgeRadiusParameterValues[i] / maxEdgeRadiusParameterValue;
 
       double radius = m_EdgeRadiusStart + ( m_EdgeRadiusEnd - m_EdgeRadiusStart) * radiusFactor;
       tubes->SetRadius( radius );
@@ -152,7 +191,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
       actor->SetMapper(mapper2);
 
       // determine color
-      double colorFactor = vectorOfEdges[i].second.weight / maxWeight;
+      double colorFactor = vectorOfEdgeColorParameterValues[i] / maxEdgeColorParameterValue;
 
       double redStart = m_EdgeColorStart.GetElement( 0 );
       double greenStart = m_EdgeColorStart.GetElement( 1 );
@@ -423,4 +462,14 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
 
   return false;
 
+}
+
+double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< double > * parameterVector, std::string parameterName )
+{
+  return 1.0;
+}
+
+double mitk::ConnectomicsNetworkMapper3D::FillEdgeParameterVector( std::vector< double > * parameterVector, std::string parameterName )
+{
+  return 1.0;
 }

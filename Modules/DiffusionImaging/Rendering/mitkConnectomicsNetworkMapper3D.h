@@ -97,6 +97,10 @@ namespace mitk {
     */
     bool PropertiesChanged();
 
+    // Create vectors for customizing color and radius and return maximum
+    double FillNodeParameterVector( std::vector< double > * parameterVector, std::string parameterName );
+    double FillEdgeParameterVector( std::vector< double > * parameterVector, std::string parameterName );
+
     // Property storing members
     std::string m_ChosenRenderingScheme;
     std::string m_ChosenEdgeFilter;
@@ -113,7 +117,10 @@ namespace mitk {
     mitk::Color m_EdgeColorEnd;
     double m_EdgeRadiusStart;
     double m_EdgeRadiusEnd;
-
+    std::string m_NodeRadiusParameter;
+    std::string m_NodeColorParameter;
+    std::string m_EdgeRadiusParameter;
+    std::string m_EdgeColorParameter;
 
   };
 

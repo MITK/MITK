@@ -90,6 +90,10 @@ set(CPP_FILES
   Rendering/mitkTbssImageMapper.cpp
   Rendering/mitkPlanarFigureMapper3D.cpp
   Rendering/mitkConnectomicsNetworkMapper3D.cpp
+  Rendering/mitkConnectomicsRenderingSchemeProperty.cpp
+  Rendering/mitkConnectomicsRenderingEdgeFilteringProperty.cpp
+  Rendering/mitkConnectomicsRenderingNodeFilteringProperty.cpp
+  Rendering/mitkConnectomicsRenderingNodeColoringSchemeProperty.cpp
 
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
@@ -138,6 +142,10 @@ set(H_FILES
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
   Rendering/mitkConnectomicsNetworkMapper3D.h
   Rendering/mitkConnectomicsRenderingProperties.h
+  Rendering/mitkConnectomicsRenderingSchemeProperty.h
+  Rendering/mitkConnectomicsRenderingEdgeFilteringProperty.h
+  Rendering/mitkConnectomicsRenderingNodeFilteringProperty.h
+  Rendering/mitkConnectomicsRenderingNodeColoringSchemeProperty.h
   Rendering/mitkPlanarFigureMapper3D.h
 
   # Reconstruction

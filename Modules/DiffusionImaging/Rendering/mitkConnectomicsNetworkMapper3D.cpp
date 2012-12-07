@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkGlyphSource2D.h"
 
 #include "mitkConnectomicsRenderingProperties.h"
+#include "mitkConnectomicsRenderingSchemeProperty.h"
+#include "mitkConnectomicsRenderingEdgeFilteringProperty.h"
+#include "mitkConnectomicsRenderingNodeFilteringProperty.h"
+#include "mitkConnectomicsRenderingNodeColoringSchemeProperty.h"
 
 mitk::ConnectomicsNetworkMapper3D::ConnectomicsNetworkMapper3D()
 {
@@ -235,51 +239,35 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
 {
   // Initialize enumeration properties
 
-  mitk::EnumerationProperty::Pointer connectomicsRenderingSchemeProperty =
-    mitk::EnumerationProperty::New( );
-  connectomicsRenderingSchemeProperty->AddEnum( connectomicsRenderingMITKScheme, 0 );
-  connectomicsRenderingSchemeProperty->AddEnum( connectomicsRenderingVTKScheme, 1 );
-  connectomicsRenderingSchemeProperty->SetValue( 0 );
-
-  mitk::EnumerationProperty::Pointer connectomicsRenderingEdgeFilteringProperty =
-    mitk::EnumerationProperty::New( );
-  connectomicsRenderingEdgeFilteringProperty->AddEnum( connectomicsRenderingEdgeNoFilter, 0 );
-  connectomicsRenderingEdgeFilteringProperty->AddEnum( connectomicsRenderingEdgeShortestPathFilter, 1 );
-  connectomicsRenderingEdgeFilteringProperty->AddEnum( connectomicsRenderingEdgeThresholdFilter, 2 );
-  connectomicsRenderingEdgeFilteringProperty->SetValue( 0 );
-
-  mitk::EnumerationProperty::Pointer connectomicsRenderingNodeFilteringProperty =
-    mitk::EnumerationProperty::New( );
-  connectomicsRenderingNodeFilteringProperty->AddEnum( connectomicsRenderingNodeNoFilter, 0 );
-  connectomicsRenderingNodeFilteringProperty->AddEnum( connectomicsRenderingNodeThresholdingFilter, 1 );
-  connectomicsRenderingNodeFilteringProperty->SetValue( 0 );
-
-  mitk::EnumerationProperty::Pointer connectomicsRenderingNodeColoringSchemeProperty =
-    mitk::EnumerationProperty::New( );
-  connectomicsRenderingNodeColoringSchemeProperty->AddEnum( connectomicsRenderingNodeColoringGradientScheme, 0 );
-  connectomicsRenderingNodeColoringSchemeProperty->AddEnum( connectomicsRenderingNodeColoringShortestPathScheme, 1 );
-  connectomicsRenderingNodeColoringSchemeProperty->SetValue( 0 );
+  mitk::ConnectomicsRenderingSchemeProperty::Pointer connectomicsRenderingScheme =
+    mitk::ConnectomicsRenderingSchemeProperty::New();
+  mitk::ConnectomicsRenderingEdgeFilteringProperty::Pointer connectomicsRenderingEdgeFiltering =
+    mitk::ConnectomicsRenderingEdgeFilteringProperty::New();
+  mitk::ConnectomicsRenderingNodeFilteringProperty::Pointer connectomicsRenderingNodeFiltering =
+     mitk::ConnectomicsRenderingNodeFilteringProperty::New();
+  mitk::ConnectomicsRenderingNodeColoringSchemeProperty::Pointer connectomicsRenderingNodeColoringScheme =
+     mitk::ConnectomicsRenderingNodeColoringSchemeProperty::New();
 
   // set the properties
   node->AddProperty( connectomicsRenderingSchemePropertyName.c_str(),
-    connectomicsRenderingSchemeProperty, renderer, overwrite );
+    connectomicsRenderingScheme, renderer, overwrite );
 
   node->AddProperty( connectomicsRenderingEdgeFilteringPropertyName.c_str(),
-    connectomicsRenderingEdgeFilteringProperty, renderer, overwrite );
+    connectomicsRenderingEdgeFiltering, renderer, overwrite );
   node->AddProperty( connectomicsRenderingEdgeThresholdFilterParameterName.c_str(),
     connectomicsRenderingEdgeThresholdFilterParameterDefault, renderer, overwrite );
   node->AddProperty( connectomicsRenderingEdgeThresholdFilterThresholdName.c_str(),
     connectomicsRenderingEdgeThresholdFilterThresholdDefault, renderer, overwrite );
 
   node->AddProperty( connectomicsRenderingNodeFilteringPropertyName.c_str(),
-    connectomicsRenderingNodeFilteringProperty, renderer, overwrite );
+    connectomicsRenderingNodeFiltering, renderer, overwrite );
   node->AddProperty( connectomicsRenderingNodeThresholdFilterParameterName.c_str(),
     connectomicsRenderingNodeThresholdFilterParameterDefault, renderer, overwrite );
   node->AddProperty( connectomicsRenderingNodeThresholdFilterThresholdName.c_str(),
     connectomicsRenderingNodeThresholdFilterThresholdDefault, renderer, overwrite );
 
   node->AddProperty( connectomicsRenderingNodeColoringSchemeName.c_str(),
-    connectomicsRenderingNodeColoringSchemeProperty, renderer, overwrite );
+    connectomicsRenderingNodeColoringScheme, renderer, overwrite );
 
   node->AddProperty( connectomicsRenderingNodeGradientStartColorName.c_str(),
     connectomicsRenderingNodeGradientStartColorDefault, renderer, overwrite );

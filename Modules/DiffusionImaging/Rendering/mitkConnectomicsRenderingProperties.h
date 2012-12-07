@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkproperties.h"
 #include "mitkStringProperty.h"
 #include "mitkEnumerationProperty.h"
+#include "mitkColorProperty.h"
 
 namespace mitk {
 

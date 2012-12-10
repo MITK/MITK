@@ -447,8 +447,9 @@ namespace mitk
         }
         else
         {
+          mitk::Image::Pointer extensionImage = m_OutputTimeSelector->GetOutput()->Clone();
           AccessByItk_3(
-            m_OutputTimeSelector->GetOutput(),
+            extensionImage,
             _InternalComputeClippedImage,
             this,
             inputSurface->GetVtkPolyData( t ),

@@ -125,5 +125,6 @@ protected:
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
     mitk::DataNode::Pointer                             m_SelectedImage;
     mitk::DataNode::Pointer                             m_SelectedBundle;
+    mitk::DataNode::Pointer                             m_SelectedDWI;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
 };

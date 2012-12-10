@@ -469,8 +469,27 @@ void QmitkFiberfoxView::GenerateImage()
         return;
     }
 
-    DiffusionSignalModel<double>::GradientListType gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
-    double bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
+    DiffusionSignalModel<double>::GradientListType gradientList;
+    double bVal = 1000;
+    if (m_SelectedDWI.IsNull())
+    {
+        gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
+        bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
+    }
+    else
+    {
+        mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
+        bVal = dwi->GetB_Value();
+        mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = dwi->GetDirectionsWithMeasurementFrame();
+        for (int i=0; i<dirs->Size(); i++)
+        {
+            DiffusionSignalModel<double>::GradientType g;
+            g[0] = dirs->at(i)[0];
+            g[1] = dirs->at(i)[1];
+            g[2] = dirs->at(i)[2];
+            gradientList.push_back(g);
+        }
+    }
 
     // signal models
     mitk::TensorModel<double> extraAxonal;
@@ -702,6 +721,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedBundles.clear();
     m_SelectedBundle = NULL;
     m_SelectedImage = NULL;
+    m_SelectedDWI = NULL;
     m_Controls->m_TissueMaskLabel->setText("<font color='grey'>optional</font>");
     m_Controls->m_GeometryMessage->setVisible(false);
     m_Controls->m_GeometryFrame->setEnabled(true);
@@ -711,7 +731,11 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     {
         mitk::DataNode::Pointer node = nodes.at(i);
 
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+        if ( node.IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()) )
+        {
+            m_SelectedDWI = node;
+        }
+        else if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
             m_SelectedImage = node;
             bool isBinary = false;

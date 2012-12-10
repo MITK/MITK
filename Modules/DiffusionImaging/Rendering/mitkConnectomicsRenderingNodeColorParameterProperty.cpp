@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingProperties.h"
 
 #define NODE_COLOR_CONSTANT 0
+#define NODE_COLOR_DEGREE 1
+#define NODE_COLOR_BETWEENNESS 2
+#define NODE_COLOR_CLUSTERING 3
 
 mitk::ConnectomicsRenderingNodeColorParameterProperty::ConnectomicsRenderingNodeColorParameterProperty( )
 {
@@ -57,6 +60,9 @@ mitk::ConnectomicsRenderingNodeColorParameterProperty::ConnectomicsRenderingNode
 void mitk::ConnectomicsRenderingNodeColorParameterProperty::AddRenderingNodeColorParameters()
 {
   AddEnum( connectomicsRenderingNodeParameterConstant , NODE_COLOR_CONSTANT );
+  AddEnum( connectomicsRenderingNodeParameterDegree , NODE_COLOR_DEGREE );
+  AddEnum( connectomicsRenderingNodeParameterBetweenness , NODE_COLOR_BETWEENNESS );
+  AddEnum( connectomicsRenderingNodeParameterClustering , NODE_COLOR_CLUSTERING );
 }
 
 

@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingEdgeColorParameterProperty.h"
 #include "mitkConnectomicsRenderingEdgeRadiusParameterProperty.h"
 
+#include <algorithm>
+
 mitk::ConnectomicsNetworkMapper3D::ConnectomicsNetworkMapper3D()
 {
   m_NetworkAssembly = vtkPropAssembly::New();
@@ -499,7 +501,60 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
 
 double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< double > * parameterVector, std::string parameterName )
 {
-  return 1.0;
+  int end( parameterVector->size() );
+
+  // constant parameter - uniform style
+  if( parameterName == connectomicsRenderingNodeParameterConstant )
+  {
+    for(int index(0); index < end; index++)
+    {
+      parameterVector->at( index ) = 1.0;
+    }
+    return 1.0;
+  }
+
+  double maximum( 0.0 );
+
+  // using the degree as parameter
+  if( parameterName == connectomicsRenderingNodeParameterDegree )
+  {
+    std::vector< int > vectorOfDegree = this->GetInput()->GetDegreeOfNodes();
+    for(int index(0); index < end; index++)
+    {
+      parameterVector->at( index ) = vectorOfDegree[ index ];
+    }
+
+    maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
+  }
+
+  // using betweenness centrality as parameter
+  if( parameterName == connectomicsRenderingNodeParameterBetweenness )
+  {
+    for(int index(0); index < end; index++)
+    {
+      parameterVector->at( index ) = 1.0; // dummy implementation for now
+    }
+    maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
+  }
+
+  // using clustering coefficient as parameter
+  if( parameterName == connectomicsRenderingNodeParameterClustering )
+  {
+    const std::vector< double > vectorOfClustering = this->GetInput()->GetLocalClusteringCoefficients();
+    for(int index(0); index < end; index++)
+    {
+      parameterVector->at( index ) = vectorOfClustering[index];
+    }
+    maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
+  }
+
+  // if the maximum is nearly zero
+  if( std::abs( maximum ) < mitk::eps )
+  {
+    maximum = 1.0;
+  }
+
+  return maximum;
 }
 
 double mitk::ConnectomicsNetworkMapper3D::FillEdgeParameterVector( std::vector< double > * parameterVector, std::string parameterName )

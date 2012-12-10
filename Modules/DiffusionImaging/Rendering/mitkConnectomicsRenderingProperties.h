@@ -225,6 +225,22 @@ namespace mitk {
     */
    const std::string connectomicsRenderingNodeRadiusParameterName = "Connectomics.Rendering.Nodes.Radius.Parameter";
 
+   // Possible parameters
+   /**
+    * \brief Using the node degree as parameter
+    */
+   const std::string connectomicsRenderingNodeParameterDegree = "Degree";
+
+   /**
+    * \brief Using the node betweenness as parameter
+    */
+   const std::string connectomicsRenderingNodeParameterBetweenness = "Betweenness centrality";
+
+   /**
+    * \brief Using the node clustering coefficient as parameter
+    */
+   const std::string connectomicsRenderingNodeParameterClustering = "Clustering coefficient";
+
    /**
     * \brief Constant
     *

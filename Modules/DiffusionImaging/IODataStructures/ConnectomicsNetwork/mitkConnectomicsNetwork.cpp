@@ -339,7 +339,7 @@ int mitk::ConnectomicsNetwork::GetMaximumDegree() const
   return maximumDegree;
 }
 
-std::vector< double > mitk::ConnectomicsNetwork::GetLocalClusteringCoefficients( )
+std::vector< double > mitk::ConnectomicsNetwork::GetLocalClusteringCoefficients( ) const
 {
   std::vector< double > vectorOfClusteringCoefficients;
 

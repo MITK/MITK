@@ -156,7 +156,7 @@ namespace mitk {
     int GetMaximumDegree() const;
 
     /** Get a vector in the format vector[ vertexID ] = clustering coefficient */
-    std::vector< double > GetLocalClusteringCoefficients( );
+    std::vector< double > GetLocalClusteringCoefficients( ) const;
 
     /** Get a vector in the format vector[ degree ] = average clustering coefficient */
     std::vector< double > GetClusteringCoefficientsByDegree( );

@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingProperties.h"
 
 #define NODE_RADIUS_CONSTANT 0
+#define NODE_RADIUS_DEGREE 1
+#define NODE_RADIUS_BETWEENNESS 2
+#define NODE_RADIUS_CLUSTERING 3
 
 mitk::ConnectomicsRenderingNodeRadiusParameterProperty::ConnectomicsRenderingNodeRadiusParameterProperty( )
 {
@@ -57,6 +60,9 @@ mitk::ConnectomicsRenderingNodeRadiusParameterProperty::ConnectomicsRenderingNod
 void mitk::ConnectomicsRenderingNodeRadiusParameterProperty::AddRenderingNodeRadiusParameters()
 {
   AddEnum( connectomicsRenderingNodeParameterConstant, NODE_RADIUS_CONSTANT );
+  AddEnum( connectomicsRenderingNodeParameterDegree , NODE_RADIUS_DEGREE );
+  AddEnum( connectomicsRenderingNodeParameterBetweenness , NODE_RADIUS_BETWEENNESS );
+  AddEnum( connectomicsRenderingNodeParameterClustering , NODE_RADIUS_CLUSTERING );
 }
 
 

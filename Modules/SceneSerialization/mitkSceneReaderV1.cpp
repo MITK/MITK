@@ -32,26 +32,33 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   // TODO prepare to detect errors (such as cycles) from wrongly written or edited xml files
 
   //Get number of elements to initialze progress bar
+  //   1. if there is a <data type="..." file="..."> element,
+    //        - construct a name for the appropriate serializer
+    //        - try to instantiate this serializer via itk object factory
+    //        - if serializer could be created, use it to read the file into a BaseData object
+    //        - if successful, call the new node's SetData(..)
+
+    // create a node for the tag "data" and test if node was created
+  typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
+  DataNodeVector DataNodes;
   unsigned int listSize = 0;
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
   {
     ++listSize;
+    DataNodes.push_back( LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error ) );
   }
+
+  OrderedLayers orderedLayers;
+  this->GetLayerOrder(document, workingDirectory, DataNodes, orderedLayers);
 
   ProgressBar::GetInstance()->AddStepsToDo( listSize );
 
   // iterate all nodes
   // first level nodes should be <node> elements
-  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
+  DataNodeVector::iterator nit = DataNodes.begin();
+  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
   {
-    //   1. if there is a <data type="..." file="..."> element,
-    //        - construct a name for the appropriate serializer
-    //        - try to instantiate this serializer via itk object factory
-    //        - if serializer could be created, use it to read the file into a BaseData object
-    //        - if successful, call the new node's SetData(..)
-    DataNode::Pointer node = LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error );
-
-    // create a node for the tag "data" and test if node was created
+    mitk::DataNode::Pointer node = *nit;
     // in case dataXmlElement is valid test whether it containts the "properties" child tag
     // and process further if and only if yes
     TiXmlElement *dataXmlElement = element->FirstChildElement("data");
@@ -96,8 +103,13 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     }
 
     // remember node for later adding to DataStorage
+
+    //node->GetIntProperty("layer", layer);
+
     int layer;
-    node->GetIntProperty("layer", layer);
+    OrderedLayers::iterator it = orderedLayers.find(uid);
+    layer = (*it).second;
+
     m_OrderedNodePairs.insert( std::make_pair( layer, std::make_pair( node, std::list<std::string>() ) ) );
 
     //   4. if there are <source> elements, remember parent objects
@@ -192,6 +204,36 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   }
 
   return !error;
+}
+
+void mitk::SceneReaderV1::GetLayerOrder(TiXmlDocument& document, const std::string& workingDirectory, std::vector<mitk::DataNode::Pointer> DataNodes, OrderedLayers& order)
+{
+  typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
+  DataNodeVector::iterator nit = DataNodes.begin();
+  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
+  {
+    bool error(false);
+    DataNode::Pointer node = *nit;
+    DecorateNodeWithProperties(node, element, workingDirectory);
+
+    int layer;
+    node->GetIntProperty("layer", layer);
+    std::string uid = element->Attribute("UID");
+    this->m_UnorderedLayers.insert( std::make_pair( layer, uid ) );
+  }
+
+  int lastLayer = itk::NumericTraits<int>::min();
+  UnorderedLayers::iterator it;
+  for (it = m_UnorderedLayers.begin(); it != m_UnorderedLayers.end(); it++)
+  {
+    int currentLayer = (*it).first;
+    if (currentLayer == lastLayer)
+    {
+      ++currentLayer;
+    }
+    order.insert( std::make_pair( (*it).second, currentLayer ) );
+    lastLayer = currentLayer;
+  }
 }
 
 mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlElement* dataElement, const std::string& workingDirectory, bool& error )

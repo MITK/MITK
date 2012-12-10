@@ -62,7 +62,7 @@ QmitkToFUtilView::QmitkToFUtilView()
     , m_MitkDistanceImage(NULL), m_MitkAmplitudeImage(NULL), m_MitkIntensityImage(NULL), m_Surface(NULL)
     , m_DistanceImageNode(NULL), m_AmplitudeImageNode(NULL), m_IntensityImageNode(NULL), m_RGBImageNode(NULL), m_SurfaceNode(NULL)
     , m_ToFImageRecorder(NULL), m_ToFImageGrabber(NULL), m_ToFDistanceImageToSurfaceFilter(NULL), m_ToFCompositeFilter(NULL)
-    , m_SurfaceDisplayCount(0), m_2DDisplayCount(0)
+    , m_2DDisplayCount(0)
     , m_RealTimeClock(NULL)
     , m_StepsForFramerate(100)
     , m_2DTimeBefore(0.0)
@@ -104,8 +104,10 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
         connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
         connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
         connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStopped()), this, SLOT(OnToFCameraStarted()) );
+        connect( (QObject*)(m_Controls->m_SurfaceCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnSurfaceCheckboxChecked(bool)) );
         connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
-        connect( (QObject*)(m_Controls->m_KinectTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnVideoTextureCheckBoxChecked(bool)) );
+        connect( (QObject*)(m_Controls->m_KinectTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnKinectRGBTextureCheckBoxChecked(bool)) );
+
     }
 }
 
@@ -130,12 +132,12 @@ void QmitkToFUtilView::Activated()
         {
             linkedRenderWindowPart->EnableSlicingPlanes(false);
         }
-        GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
-        GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOn();
-        GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
-        GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOn();
-        GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
-        GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
+        GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+        GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOn();
+        GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+        GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOn();
+        GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+        GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
 
         this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
 
@@ -184,7 +186,6 @@ void QmitkToFUtilView::Hidden()
 void QmitkToFUtilView::OnToFCameraConnected()
 {
     MITK_DEBUG <<"OnToFCameraConnected";
-    this->m_SurfaceDisplayCount = 0;
     this->m_2DDisplayCount = 0;
 
     this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();
@@ -234,12 +235,12 @@ void QmitkToFUtilView::ResetGUIToDefault()
         {
             linkedRenderWindowPart->EnableSlicingPlanes(true);
         }
-        GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
-        GetRenderWindowPart()->GetRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOff();
-        GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
-        GetRenderWindowPart()->GetRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
-        GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
-        GetRenderWindowPart()->GetRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
+        GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+        GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOff();
+        GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+        GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
+        GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
+        GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
 
         this->UseToFVisibilitySettings(false);
 
@@ -350,7 +351,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
         }
         if (m_Controls->m_KinectTextureCheckBox->isChecked())
         {
-            OnVideoTextureCheckBoxChecked(true);
+            OnKinectRGBTextureCheckBoxChecked(true);
         }
     }
     m_Controls->m_TextureCheckBox->setEnabled(true);
@@ -387,6 +388,28 @@ void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
     }
 }
 
+void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
+{
+    if(checked)
+    {
+        //initialize the surface once
+        MITK_INFO << "OnSurfaceCheckboxChecked true";
+        this->m_SurfaceNode->SetData(this->m_Surface);
+        this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, m_ToFSurfaceVtkMapper3D);
+
+        this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
+                    this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
+
+        mitk::Point3D surfaceCenter= this->m_Surface->GetGeometry()->GetCenter();
+        vtkCamera* camera3d = GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
+        camera3d->SetPosition(0,0,-1000);
+        camera3d->SetViewUp(0,-1,0);
+        camera3d->SetFocalPoint(0,0,surfaceCenter[2]);
+        camera3d->SetViewAngle(40);
+        camera3d->SetClippingRange(1, 10000);
+    }
+}
+
 void QmitkToFUtilView::OnUpdateCamera()
 {
     if (m_Controls->m_SurfaceCheckBox->isChecked())
@@ -405,24 +428,6 @@ void QmitkToFUtilView::OnUpdateCamera()
             this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
             this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
         }
-        if (this->m_SurfaceDisplayCount<2)
-        {
-            this->m_SurfaceNode->SetData(this->m_Surface);
-            this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, m_ToFSurfaceVtkMapper3D);
-
-            this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
-                        this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
-
-            mitk::Point3D surfaceCenter= this->m_Surface->GetGeometry()->GetCenter();
-            vtkCamera* camera3d = GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
-            camera3d->SetPosition(0,0,-50);
-            camera3d->SetViewUp(0,-1,0);
-            camera3d->SetFocalPoint(0,0,surfaceCenter[2]);
-            camera3d->SetViewAngle(40);
-            camera3d->SetClippingRange(1, 10000);
-        }
-        this->m_SurfaceDisplayCount++;
-
     }
     else
     {
@@ -456,16 +461,15 @@ void QmitkToFUtilView::OnTextureCheckBoxChecked(bool checked)
     }
 }
 
-void QmitkToFUtilView::OnVideoTextureCheckBoxChecked(bool checked)
+void QmitkToFUtilView::OnKinectRGBTextureCheckBoxChecked(bool checked)
 {
+    if((m_SelectedCamera.contains("Kinect")) && (m_ToFImageGrabber->GetBoolProperty("RGB")))
+    {
     if (checked)
     {
         this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(0));
         this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(1));
     }
-    else
-    {
-        this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
     }
 }
 
@@ -515,9 +519,9 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     if (m_DistanceImageNode.IsNotNull())
     {
         this->m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-        this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow() ) );
-        this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("coronal")->GetRenderWindow() ) );
-        this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
+        this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
+        this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
+        this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
         this->m_DistanceImageNode->SetBoolProperty("use color",!useToF);
         this->m_DistanceImageNode->GetPropertyList()->DeleteProperty("LookupTable");
     }
@@ -531,9 +535,9 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
         {
             this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
         }
-        this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow() ) );
-        this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("coronal")->GetRenderWindow() ) );
-        this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
+        this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
+        this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
+        this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
         this->m_AmplitudeImageNode->SetBoolProperty("use color",!useToF);
         this->m_AmplitudeImageNode->GetPropertyList()->DeleteProperty("LookupTable");
     }
@@ -546,9 +550,9 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
         else
         {
             this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-            this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow() ) );
-            this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow() ) );
-            this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
+            this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
+            this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
+            this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
             this->m_IntensityImageNode->SetBoolProperty("use color",!useToF);
             this->m_IntensityImageNode->GetPropertyList()->DeleteProperty("LookupTable");
         }
@@ -562,9 +566,9 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
         else
         {
             this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-            this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow() ) );
-            this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow() ) );
-            this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
+            this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
+            this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
+            this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
         }
     }
     // initialize images
@@ -581,7 +585,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
             i.next();
             this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(i.value()->GetRenderWindow()) );
         }
-        this->m_SurfaceNode->SetVisibility( true, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow() ) );
+        this->m_SurfaceNode->SetVisibility( true, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
     }
     //disable/enable gradient background
     this->GetRenderWindowPart()->EnableDecorations(!useToF, QStringList(QString("background")));

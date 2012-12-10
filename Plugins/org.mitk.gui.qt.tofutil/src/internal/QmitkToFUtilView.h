@@ -65,9 +65,6 @@ public:
     QmitkToFUtilView();
     ~QmitkToFUtilView();
 
-    //TODO bitte loeschen, wenn besserer weg gefunden
-    void HackForPlayer();
-
     virtual void CreateQtPartControl(QWidget *parent);
     /// \brief Called when the functionality is activated.
     virtual void Activated();
@@ -79,6 +76,7 @@ public:
     virtual void Hidden();
 
     void SetFocus();
+
 
 protected slots:
 
@@ -109,11 +107,17 @@ protected slots:
     /*!
     \brief Slot invoked when the texture checkbox is checked. Enables the scalar visibility of the surface
     */
+    /**
+     * @brief OnSurfaceCheckboxChecked Slot beeing called, if the "surface"-checkbox is clicked. This method initializes the surface once, if it is necessary.
+     * @param checked Is it checked or not?
+     */
+    void OnSurfaceCheckboxChecked(bool checked);
+
     void OnTextureCheckBoxChecked(bool checked);
     /*!
     \brief Slot invoked when the video texture checkbox is checked. Enables the texture of the surface
     */
-    void OnVideoTextureCheckBoxChecked(bool checked);
+    void OnKinectRGBTextureCheckBoxChecked(bool checked);
     /*!
     \brief Slot invoked when user alters the coronal window input from RGB to Intensity or vice versa.
     */
@@ -156,7 +160,6 @@ protected:
     mitk::ToFDistanceImageToSurfaceFilter::Pointer m_ToFDistanceImageToSurfaceFilter; ///< Filter for calculating a surface representation from a given distance image
     mitk::ToFCompositeFilter::Pointer m_ToFCompositeFilter; ///< Filter combining several processing steps (thresholding, Median filtering, Bilateral filtering)
 
-    int m_SurfaceDisplayCount; ///< member used to determine whether surface is initialized or not
     int m_2DDisplayCount; ///< member used to determine whether frame rate output should be shown
     // members for calculating the frame rate
     mitk::RealTimeClock::Pointer m_RealTimeClock; ///< real time clock used to calculate the display framerate

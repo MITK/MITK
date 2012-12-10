@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingProperties.h"
 
 #define EDGE_RADIUS_CONSTANT 0
+#define EDGE_RADIUS_WEIGHT 1
 
 mitk::ConnectomicsRenderingEdgeRadiusParameterProperty::ConnectomicsRenderingEdgeRadiusParameterProperty( )
 {
@@ -57,6 +58,7 @@ mitk::ConnectomicsRenderingEdgeRadiusParameterProperty::ConnectomicsRenderingEdg
 void mitk::ConnectomicsRenderingEdgeRadiusParameterProperty::AddRenderingEdgeRadiusParameters()
 {
   AddEnum( connectomicsRenderingEdgeParameterConstant , EDGE_RADIUS_CONSTANT );
+  AddEnum( connectomicsRenderingEdgeParameterWeight , EDGE_RADIUS_WEIGHT );
 }
 
 

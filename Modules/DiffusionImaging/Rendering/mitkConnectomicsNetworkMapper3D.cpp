@@ -560,5 +560,40 @@ double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< 
 
 double mitk::ConnectomicsNetworkMapper3D::FillEdgeParameterVector( std::vector< double > * parameterVector, std::string parameterName )
 {
-  return 1.0;
+    int end( parameterVector->size() );
+
+  // constant parameter - uniform style
+  if( parameterName == connectomicsRenderingEdgeParameterConstant )
+  {
+    for(int index(0); index < end; index++)
+    {
+      parameterVector->at( index ) = 1.0;
+    }
+    return 1.0;
+  }
+
+  double maximum( 0.0 );
+
+  // using the weight as parameter
+  if( parameterName == connectomicsRenderingEdgeParameterWeight )
+  {
+    std::vector< std::pair<
+      std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode >
+      , mitk::ConnectomicsNetwork::NetworkEdge > >  vectorOfEdges = this->GetInput()->GetVectorOfAllEdges();
+
+    for(int index(0); index < end; index++)
+    {
+      parameterVector->at( index ) = vectorOfEdges[ index ].second.weight;
+    }
+
+    maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
+  }
+
+  // if the maximum is nearly zero
+  if( std::abs( maximum ) < mitk::eps )
+  {
+    maximum = 1.0;
+  }
+
+  return maximum;
 }

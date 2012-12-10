@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingProperties.h"
 
 #define EDGE_COLOR_CONSTANT 0
+#define EDGE_COLOR_WEIGHT 1
 
 mitk::ConnectomicsRenderingEdgeColorParameterProperty::ConnectomicsRenderingEdgeColorParameterProperty( )
 {
@@ -57,6 +58,7 @@ mitk::ConnectomicsRenderingEdgeColorParameterProperty::ConnectomicsRenderingEdge
 void mitk::ConnectomicsRenderingEdgeColorParameterProperty::AddRenderingEdgeColorParameters()
 {
   AddEnum( connectomicsRenderingEdgeParameterConstant , EDGE_COLOR_CONSTANT );
+  AddEnum( connectomicsRenderingEdgeParameterWeight , EDGE_COLOR_WEIGHT );
 }
 
 

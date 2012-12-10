@@ -311,6 +311,12 @@ namespace mitk {
     */
    const std::string connectomicsRenderingEdgeRadiusParameterName = "Connectomics.Rendering.Edges.Radius.Parameter";
 
+   // Possible parameters
+   /**
+    * \brief Using the weight as parameter
+    */
+   const std::string connectomicsRenderingEdgeParameterWeight = "Weight";
+
     /**
     * \brief Constant
     *

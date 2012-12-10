@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsNetwork.h"
 #include <boost/graph/clustering_coefficient.hpp>
+#include <boost/graph/betweenness_centrality.hpp>
 
 /* Constructor and Destructor */
 mitk::ConnectomicsNetwork::ConnectomicsNetwork()
@@ -584,4 +585,21 @@ void mitk::ConnectomicsNetwork::PruneEdgesBelowWeight( int targetWeight )
   // this will remove any nodes which, after deleting edges are now
   // unconnected, also this calls UpdateIDs()
   PruneUnconnectedSingleNodes();
+}
+
+std::vector< double > mitk::ConnectomicsNetwork::GetBetweennessVector() const
+{
+  std::vector< double > betweennessVector;
+
+  betweennessVector.clear();
+  betweennessVector.resize( this->GetNumberOfVertices() );
+
+  boost::brandes_betweenness_centrality(
+    m_Network,
+    boost::centrality_map(
+    boost::make_iterator_property_map( betweennessVector.begin(), boost::get( &NetworkNode::id, m_Network ), double() )
+    ).vertex_index_map( boost::get( &NetworkNode::id, m_Network ) )
+    );
+
+  return betweennessVector;
 }

@@ -164,6 +164,9 @@ namespace mitk {
     /** Get the global clustering coefficient */
     double GetGlobalClusteringCoefficient( );
 
+    /** Get the betweenness centrality for each vertex in form of a vector of length (number vertices)*/
+    std::vector< double > GetBetweennessVector() const;
+
     /** Access boost graph directly */
     NetworkType* GetBoostGraph();
 

@@ -530,9 +530,10 @@ double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< 
   // using betweenness centrality as parameter
   if( parameterName == connectomicsRenderingNodeParameterBetweenness )
   {
+    std::vector< double > vectorOfBetweenness = this->GetInput()->GetBetweennessVector();
     for(int index(0); index < end; index++)
     {
-      parameterVector->at( index ) = 1.0; // dummy implementation for now
+      parameterVector->at( index ) = vectorOfBetweenness[index];
     }
     maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
   }

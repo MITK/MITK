@@ -361,7 +361,6 @@ void QmitkToFUtilView::OnToFCameraStopped()
 {
     m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
     m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
-    //m_Controls->tofMeasurementWidget->setEnabled(false);
     m_Controls->SurfacePropertiesBox->setEnabled(false);
 
     this->m_Frametimer->stop();
@@ -393,15 +392,19 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     if(checked)
     {
         //initialize the surface once
-        MITK_INFO << "OnSurfaceCheckboxChecked true";
+        MITK_DEBUG << "OnSurfaceCheckboxChecked true";
         this->m_SurfaceNode->SetData(this->m_Surface);
         this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, m_ToFSurfaceVtkMapper3D);
 
+        //we need to initialize (reinit) the surface, to make it fit into the renderwindow
         this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
                     this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
 
+        //the default camera position is rather unfortunate,
+        //that's why we set our own position according to the surface center
         mitk::Point3D surfaceCenter= this->m_Surface->GetGeometry()->GetCenter();
         vtkCamera* camera3d = GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
+        //1m distance to camera should be a nice default value for most cameras
         camera3d->SetPosition(0,0,-1000);
         camera3d->SetViewUp(0,-1,0);
         camera3d->SetFocalPoint(0,0,surfaceCenter[2]);
@@ -412,23 +415,31 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
 
 void QmitkToFUtilView::OnUpdateCamera()
 {
+    //##### Code for surface #####
     if (m_Controls->m_SurfaceCheckBox->isChecked())
     {
         // update surface
         m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
-        this->m_Surface->Update();
 
-        if(m_Controls->m_KinectTextureCheckBox->isChecked())
+        //if the user wants to see the texture, it has to be updated for every frame
+        if(m_Controls->m_KinectTextureCheckBox->isChecked() && (m_SelectedCamera.contains("Kinect")) && (m_ToFImageGrabber->GetBoolProperty("RGB")))
         {
+            //remove the vtkScalarsToColors object, if there was one.
             this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(NULL);
+            //set RGB-iamge as texture
             this->m_ToFSurfaceVtkMapper3D->SetTexture((this->m_ToFImageGrabber->GetOutput(3)->GetVtkImageData()));
         }
         else
         {
+            //we have to delete the texture, if there was one.
             this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
+            //get the colortransferfunction from the visualization widget
             this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
         }
+        //update pipeline
+        this->m_Surface->Update();
     }
+    //##### End code for surface #####
     else
     {
         // update pipeline
@@ -465,11 +476,12 @@ void QmitkToFUtilView::OnKinectRGBTextureCheckBoxChecked(bool checked)
 {
     if((m_SelectedCamera.contains("Kinect")) && (m_ToFImageGrabber->GetBoolProperty("RGB")))
     {
-    if (checked)
-    {
-        this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(0));
-        this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(1));
-    }
+        if (checked)
+        {
+            //define the dimensions of the texture
+            this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(0));
+            this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(1));
+        }
     }
 }
 

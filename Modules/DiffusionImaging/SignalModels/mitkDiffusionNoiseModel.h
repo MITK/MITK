@@ -42,12 +42,10 @@ public:
     /** Adds noise according to model to the input pixel. Has to be implemented in subclass. **/
     virtual void AddNoise(PixelType& pixel) = 0;
 
-    void SetScaleFactor(ScalarType scale){ m_ScaleFactor = scale; }
     void SetNoiseVariance(double var){ m_NoiseVariance = var; }
 
 protected:
 
-    ScalarType  m_ScaleFactor;      ///< scaling factor for generated noise values
     double      m_NoiseVariance;    ///< variance of underlying distribution
 };
 

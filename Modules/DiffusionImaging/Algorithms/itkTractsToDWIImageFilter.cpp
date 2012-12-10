@@ -557,6 +557,7 @@ void TractsToDWIImageFilter::GenerateData()
         }
     }
     maxValue /= usedS;
+    maxValue = m_Upsampling*m_Upsampling;
 
     MITK_INFO << "Summing compartments and adding noise";
     ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());

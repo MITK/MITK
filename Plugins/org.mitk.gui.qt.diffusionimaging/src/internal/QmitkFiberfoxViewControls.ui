@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>493</width>
-    <height>886</height>
+    <height>909</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1135,6 +1135,25 @@
              <property name="margin">
               <number>0</number>
              </property>
+             <item row="1" column="3">
+              <widget class="QDoubleSpinBox" name="m_SpacingZ">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>50.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>2.500000000000000</double>
+               </property>
+              </widget>
+             </item>
              <item row="1" column="2">
               <widget class="QDoubleSpinBox" name="m_SpacingY">
                <property name="decimals">
@@ -1165,25 +1184,6 @@
               <widget class="QLabel" name="label">
                <property name="text">
                 <string>Image Dimensions:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QDoubleSpinBox" name="m_SpacingZ">
-               <property name="decimals">
-                <number>3</number>
-               </property>
-               <property name="minimum">
-                <double>0.100000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>50.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-               <property name="value">
-                <double>2.500000000000000</double>
                </property>
               </widget>
              </item>
@@ -1479,7 +1479,7 @@
               </widget>
              </item>
              <item row="3" column="1">
-              <widget class="QSpinBox" name="m_TensorsToDWIBValueEdit">
+              <widget class="QSpinBox" name="m_BvalueBox">
                <property name="minimum">
                 <number>0</number>
                </property>
@@ -1683,6 +1683,16 @@
             </property>
            </widget>
           </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="m_DiffusionPropsMessage">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>Using  gradients of selected DWI!</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1728,7 +1738,7 @@
   <tabstop>m_SpacingY</tabstop>
   <tabstop>m_SpacingZ</tabstop>
   <tabstop>m_NumGradientsBox</tabstop>
-  <tabstop>m_TensorsToDWIBValueEdit</tabstop>
+  <tabstop>m_BvalueBox</tabstop>
   <tabstop>m_MaxFaBox</tabstop>
   <tabstop>m_FiberS0Box</tabstop>
   <tabstop>m_NonFiberS0Box</tabstop>

@@ -83,6 +83,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
         m_Controls->m_VarianceBox->setVisible(false);
         m_Controls->m_GeometryMessage->setVisible(false);
+        m_Controls->m_DiffusionPropsMessage->setVisible(false);
         m_Controls->m_T2bluringParamFrame->setVisible(false);
         m_Controls->m_KspaceParamFrame->setVisible(false);
 
@@ -474,7 +475,7 @@ void QmitkFiberfoxView::GenerateImage()
     if (m_SelectedDWI.IsNull())
     {
         gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
-        bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
+        bVal = m_Controls->m_BvalueBox->value();
     }
     else
     {
@@ -519,11 +520,10 @@ void QmitkFiberfoxView::GenerateImage()
         snr = 0.0001;
     if (snr<=99)
     {
-        noiseVariance = 1/snr;
+        noiseVariance = (double)m_Controls->m_FiberS0Box->value()/snr;
         noiseVariance *= noiseVariance;
     }
     mitk::RicianNoiseModel<double> noiseModel;
-    noiseModel.SetScaleFactor(m_Controls->m_FiberS0Box->value());
     noiseModel.SetNoiseVariance(noiseVariance);
 
     // artifact models
@@ -691,6 +691,19 @@ void QmitkFiberfoxView::UpdateGui()
     {
         m_Controls->m_CircleButton->setEnabled(false);
         m_Controls->m_FiberGenMessage->setVisible(true);
+    }
+
+    if (m_SelectedDWI.IsNotNull())
+    {
+        m_Controls->m_DiffusionPropsMessage->setVisible(true);
+        m_Controls->m_BvalueBox->setEnabled(false);
+        m_Controls->m_NumGradientsBox->setEnabled(false);
+    }
+    else
+    {
+        m_Controls->m_DiffusionPropsMessage->setVisible(false);
+        m_Controls->m_BvalueBox->setEnabled(true);
+        m_Controls->m_NumGradientsBox->setEnabled(true);
     }
 
     if (m_SelectedBundle.IsNotNull())

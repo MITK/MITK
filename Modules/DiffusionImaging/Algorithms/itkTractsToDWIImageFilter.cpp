@@ -527,39 +527,14 @@ void TractsToDWIImageFilter::GenerateData()
     }
 
     // do k-space stuff
-    double maxValue = 0;
-    double usedS = 1;
     if (!m_KspaceArtifacts.empty())
         MITK_INFO << "Generating k-space artifacts";
     else
         MITK_INFO << "Generating k-space image";
     compartments = AddKspaceArtifacts(compartments);
 
-    // we are now working with the low resolution images again!!!
-    for (int i=0; i<compartments.size(); i++)
-    {
-        DoubleDwiType::Pointer doubleDwi = compartments.at(i);
-        ImageRegionIterator<DoubleDwiType> it(doubleDwi, doubleDwi->GetLargestPossibleRegion());
-        double s = 1;
-        if (i<m_FiberModels.size())
-            s = m_FiberModels.at(i)->GetSignalScale();
-        else
-            s = m_NonFiberModels.at(i-m_FiberModels.size())->GetSignalScale();
-        while(!it.IsAtEnd())
-        {
-            DoubleDwiType::PixelType pix = it.Get();
-            if (pix[0]*s>maxValue)
-            {
-                maxValue = pix[0]*s;
-                usedS = s;
-            }
-            ++it;
-        }
-    }
-    maxValue /= usedS;
-    maxValue = m_Upsampling*m_Upsampling;
-
     MITK_INFO << "Summing compartments and adding noise";
+    double correction = m_Upsampling*m_Upsampling;
     ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
     boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
@@ -572,14 +547,14 @@ void TractsToDWIImageFilter::GenerateData()
         // adjust fiber signal
         for (int i=0; i<m_FiberModels.size(); i++)
         {
-            double s = m_FiberModels.at(i)->GetSignalScale()/maxValue;
+            double s = m_FiberModels.at(i)->GetSignalScale()/correction;
             signal += compartments.at(i)->GetPixel(index)*s;
         }
 
         // adjust non-fiber signal
         for (int i=0; i<m_NonFiberModels.size(); i++)
         {
-            double s = m_NonFiberModels.at(i)->GetSignalScale()/maxValue;
+            double s = m_NonFiberModels.at(i)->GetSignalScale()/correction;
             signal += compartments.at(m_FiberModels.size()+i)->GetPixel(index)*s;
         }
 

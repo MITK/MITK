@@ -95,7 +95,6 @@ set(CPP_FILES
   Rendering/mitkConnectomicsRenderingSchemeProperty.cpp
   Rendering/mitkConnectomicsRenderingEdgeFilteringProperty.cpp
   Rendering/mitkConnectomicsRenderingNodeFilteringProperty.cpp
-  Rendering/mitkConnectomicsRenderingNodeColoringSchemeProperty.cpp
   Rendering/mitkConnectomicsRenderingEdgeColorParameterProperty.cpp
   Rendering/mitkConnectomicsRenderingEdgeRadiusParameterProperty.cpp
   Rendering/mitkConnectomicsRenderingNodeColorParameterProperty.cpp
@@ -154,7 +153,6 @@ set(H_FILES
   Rendering/mitkConnectomicsRenderingSchemeProperty.h
   Rendering/mitkConnectomicsRenderingEdgeFilteringProperty.h
   Rendering/mitkConnectomicsRenderingNodeFilteringProperty.h
-  Rendering/mitkConnectomicsRenderingNodeColoringSchemeProperty.h
   Rendering/mitkConnectomicsRenderingEdgeColorParameterProperty.h
   Rendering/mitkConnectomicsRenderingEdgeRadiusParameterProperty.h
   Rendering/mitkConnectomicsRenderingNodeColorParameterProperty.h

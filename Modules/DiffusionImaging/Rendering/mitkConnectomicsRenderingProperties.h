@@ -151,36 +151,6 @@ namespace mitk {
    // Node Options
    ////////////////////////////////////////
 
-   /** \brief Node coloring option
-    *
-    * This option controls the coloring of nodes.
-    *
-    * Currently there these options:
-    * <ol>
-    *  <li> Color Gradient - Default
-    *  <li> Shortest Path Steps
-    * </ol>
-    *
-    */
-    const std::string connectomicsRenderingNodeColoringSchemeName = "Connectomics.Rendering.Nodes.ColorScheme";
-
-   /**
-    * \brief Color node using a color gradient
-    */
-   const std::string connectomicsRenderingNodeColoringGradientScheme = "Color Gradient";
-
-   /**
-    * \brief Color nodes by shortest path length to a chosen node
-    */
-   const std::string connectomicsRenderingNodeColoringShortestPathScheme = "Shortest Path Steps";
-
-   /**
-    * \brief The chosen node label
-    *
-    * This node will be used for any visualisation requiring a specific node
-    */
-   const std::string connectomicsRenderingNodeChosenNodeName = "Connectomics.Rendering.Nodes.ChosenNode";
-
    // Color gradient
     /**
     * \brief Start Color
@@ -202,6 +172,13 @@ namespace mitk {
     * This parameter will be used to select the color of the node.
     */
    const std::string connectomicsRenderingNodeGradientColorParameterName = "Connectomics.Rendering.Nodes.Gradient.Parameter";
+
+   /**
+    * \brief The chosen node label
+    *
+    * This node will be used for any visualisation requiring a specific node
+    */
+   const std::string connectomicsRenderingNodeChosenNodeName = "Connectomics.Rendering.Nodes.ChosenNode";
 
   // Radius
     /**
@@ -240,6 +217,11 @@ namespace mitk {
     * \brief Using the node clustering coefficient as parameter
     */
    const std::string connectomicsRenderingNodeParameterClustering = "Clustering coefficient";
+
+   /**
+    * \brief Color nodes by shortest path length to a chosen node
+    */
+   const std::string connectomicsRenderingNodeParameterColoringShortestPath = "Shortest Path Steps";
 
    /**
     * \brief Constant

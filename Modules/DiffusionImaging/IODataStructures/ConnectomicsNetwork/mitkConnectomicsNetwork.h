@@ -167,6 +167,12 @@ namespace mitk {
     /** Get the betweenness centrality for each vertex in form of a vector of length (number vertices)*/
     std::vector< double > GetBetweennessVector() const;
 
+    /** Check whether a vertex with the specified label exists*/
+    bool CheckForLabel( std::string targetLabel ) const;
+
+    /** Get the shortest distance from a specified vertex to all other vertices in form of a vector of length (number vertices)*/
+    std::vector< double > GetShortestDistanceVectorFromLabel( std::string targetLabel ) const;
+
     /** Access boost graph directly */
     NetworkType* GetBoostGraph();
 

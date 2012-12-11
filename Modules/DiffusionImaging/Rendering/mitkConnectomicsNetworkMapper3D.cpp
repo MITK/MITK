@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingSchemeProperty.h"
 #include "mitkConnectomicsRenderingEdgeFilteringProperty.h"
 #include "mitkConnectomicsRenderingNodeFilteringProperty.h"
-#include "mitkConnectomicsRenderingNodeColoringSchemeProperty.h"
 #include "mitkConnectomicsRenderingNodeColorParameterProperty.h"
 #include "mitkConnectomicsRenderingNodeRadiusParameterProperty.h"
 #include "mitkConnectomicsRenderingEdgeColorParameterProperty.h"
@@ -310,8 +309,6 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
     mitk::ConnectomicsRenderingEdgeFilteringProperty::New();
   mitk::ConnectomicsRenderingNodeFilteringProperty::Pointer connectomicsRenderingNodeFiltering =
      mitk::ConnectomicsRenderingNodeFilteringProperty::New();
-  mitk::ConnectomicsRenderingNodeColoringSchemeProperty::Pointer connectomicsRenderingNodeColoringScheme =
-     mitk::ConnectomicsRenderingNodeColoringSchemeProperty::New();
 
    mitk::ConnectomicsRenderingNodeColorParameterProperty::Pointer  connectomicsRenderingNodeGradientColorParameter =
     mitk::ConnectomicsRenderingNodeColorParameterProperty::New();
@@ -339,9 +336,6 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
     connectomicsRenderingNodeThresholdFilterParameterDefault, renderer, overwrite );
   node->AddProperty( connectomicsRenderingNodeThresholdFilterThresholdName.c_str(),
     connectomicsRenderingNodeThresholdFilterThresholdDefault, renderer, overwrite );
-
-  node->AddProperty( connectomicsRenderingNodeColoringSchemeName.c_str(),
-    connectomicsRenderingNodeColoringScheme, renderer, overwrite );
 
   node->AddProperty( connectomicsRenderingNodeGradientStartColorName.c_str(),
     connectomicsRenderingNodeGradientStartColorDefault, renderer, overwrite );
@@ -416,9 +410,6 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
     this->GetDataNode()->GetProperty( connectomicsRenderingNodeFilteringPropertyName.c_str() ) );
   mitk::FloatProperty * nodeThreshold = static_cast< mitk::FloatProperty * > (
     this->GetDataNode()->GetProperty( connectomicsRenderingNodeThresholdFilterThresholdName.c_str() ) );
-  mitk::ConnectomicsRenderingNodeColoringSchemeProperty * nodeColoringScheme =
-    static_cast< mitk::ConnectomicsRenderingNodeColoringSchemeProperty * > (
-    this->GetDataNode()->GetProperty( connectomicsRenderingNodeColoringSchemeName.c_str() ) );
   mitk::ColorProperty * nodeColorStart = static_cast< mitk::ColorProperty * > (
     this->GetDataNode()->GetProperty( connectomicsRenderingNodeGradientStartColorName.c_str() ) );
   mitk::ColorProperty * nodeColorEnd = static_cast< mitk::ColorProperty * > (
@@ -456,7 +447,6 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
     m_EdgeThreshold != edgeThreshold->GetValue() ||
     m_ChosenNodeFilter != nodeFilter->GetValueAsString() ||
     m_NodeThreshold != nodeThreshold->GetValue() ||
-    m_ChosenNodeColoringScheme != nodeColoringScheme->GetValueAsString() ||
     m_NodeColorStart != nodeColorStart->GetValue() ||
     m_NodeColorEnd != nodeColorEnd->GetValue() ||
     m_NodeRadiusStart != nodeRadiusStart->GetValue() ||
@@ -477,7 +467,6 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
     m_EdgeThreshold = edgeThreshold->GetValue();
     m_ChosenNodeFilter = nodeFilter->GetValueAsString();
     m_NodeThreshold = nodeThreshold->GetValue();
-    m_ChosenNodeColoringScheme = nodeColoringScheme->GetValueAsString();
     m_NodeColorStart = nodeColorStart->GetValue();
     m_NodeColorEnd = nodeColorEnd->GetValue();
     m_NodeRadiusStart = nodeRadiusStart->GetValue();
@@ -547,6 +536,30 @@ double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< 
       parameterVector->at( index ) = vectorOfClustering[index];
     }
     maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
+  }
+
+  // using distance to a specific node as parameter
+  if( parameterName == connectomicsRenderingNodeParameterColoringShortestPath )
+  {
+    bool labelNotFound( this->GetInput()->CheckForLabel( m_ChosenNodeLabel ) );
+    // check whether the chosen node is valid
+    if( labelNotFound )
+    {
+      MITK_WARN << "Node chosen for rendering is not valid.";
+      for(int index(0); index < end; index++)
+      {
+        parameterVector->at( index ) = 1.0;
+      }
+      return 1.0;
+    }
+    else
+    {
+      for(int index(0); index < end; index++)
+      {
+        parameterVector->at( index ) = 1.0;
+      }
+      return 1.0;
+    }
   }
 
   // if the maximum is nearly zero

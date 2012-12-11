@@ -107,7 +107,6 @@ namespace mitk {
     double m_EdgeThreshold;
     std::string m_ChosenNodeFilter;
     double m_NodeThreshold;
-    std::string m_ChosenNodeColoringScheme;
     mitk::Color m_NodeColorStart;
     mitk::Color m_NodeColorEnd;
     double m_NodeRadiusStart;

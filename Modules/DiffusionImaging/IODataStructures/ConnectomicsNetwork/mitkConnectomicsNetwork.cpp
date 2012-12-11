@@ -603,3 +603,48 @@ std::vector< double > mitk::ConnectomicsNetwork::GetBetweennessVector() const
 
   return betweennessVector;
 }
+
+std::vector< double > mitk::ConnectomicsNetwork::GetShortestDistanceVectorFromLabel( std::string targetLabel ) const
+{
+  std::vector< VertexDescriptorType > predecessorMap( boost::num_vertices( m_Network ) );
+  int numberOfNodes( boost::num_vertices( m_Network ) );
+
+  std::vector< double > distanceMatrix;
+  distanceMatrix.resize( numberOfNodes );
+
+  boost::graph_traits<NetworkType>::vertex_iterator iterator, end;
+  boost::tie(iterator, end) = boost::vertices( m_Network );
+
+  while( (iterator != end) && (m_Network[ *iterator ].label != targetLabel) )
+  {
+    ++iterator;
+  }
+
+  if( iterator == end )
+  {
+    MITK_WARN << "Label not found";
+    return distanceMatrix;
+  }
+
+  boost::dijkstra_shortest_paths(m_Network, *iterator, boost::predecessor_map(&predecessorMap[ 0 ]).distance_map(&distanceMatrix[ 0 ]).weight_map( boost::get( &NetworkEdge::edge_weight ,m_Network ) ) ) ;
+
+  return distanceMatrix;
+}
+
+bool mitk::ConnectomicsNetwork::CheckForLabel( std::string targetLabel ) const
+{
+  boost::graph_traits<NetworkType>::vertex_iterator iterator, end;
+  boost::tie(iterator, end) = boost::vertices( m_Network );
+
+  while( (iterator != end) && (m_Network[ *iterator ].label != targetLabel) )
+  {
+    ++iterator;
+  }
+
+  if( iterator == end )
+  {
+    return false;
+  }
+
+  return true;
+}

@@ -50,9 +50,16 @@ void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
   // specifies it's actual bounds. This behavior needs to be analyzed and maybe changed.
   // Check also BUG 11406
 
-  if (aGeometry3D->GetImageGeometry())
+  if(aGeometry3D->GetImageGeometry())
   {
-    aGeometry3D->ChangeImageGeometryConsideringOriginOffset(false);
+    if(dynamic_cast<mitk::TimeSlicedGeometry*>(aGeometry3D))
+    {
+      aGeometry3D->ChangeImageGeometryConsideringOriginOffset(true);
+    }
+    else
+    {
+      aGeometry3D->ChangeImageGeometryConsideringOriginOffset(false);
+    }
   }
 
   GetGeometry()->SetIdentity();
@@ -62,7 +69,10 @@ void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
 
   mitk::Vector3D size;
   for(unsigned int i=0; i < 3; ++i)
-    size[i] = (aGeometry3D->GetExtentInMM(i)/2.0) -1;
+  {
+    size[i] = (aGeometry3D->GetExtentInMM(i)/2.0);
+  }
   GetGeometry()->SetSpacing( size );
   GetTimeSlicedGeometry()->UpdateInformation();
 }
+

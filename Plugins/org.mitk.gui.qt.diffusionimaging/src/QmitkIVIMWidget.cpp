@@ -89,6 +89,8 @@ std::vector<double> QmitkIVIMWidget::vec(vnl_vector<double> vector)
 void QmitkIVIMWidget::SetParameters( IVIMFilterType::IVIMSnapshot snap )
 {
   this->Clear();
+  if (snap.bvalues.empty())
+      return;
 
   QString s("f=%1, D=%2, D*=%3");
   s = s.arg(snap.currentF,4);

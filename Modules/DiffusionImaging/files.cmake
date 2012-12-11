@@ -99,6 +99,8 @@ set(CPP_FILES
   Rendering/mitkConnectomicsRenderingEdgeRadiusParameterProperty.cpp
   Rendering/mitkConnectomicsRenderingNodeColorParameterProperty.cpp
   Rendering/mitkConnectomicsRenderingNodeRadiusParameterProperty.cpp
+  Rendering/mitkConnectomicsRenderingNodeThresholdParameterProperty.cpp
+  Rendering/mitkConnectomicsRenderingEdgeThresholdParameterProperty.cpp
 
 # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
@@ -157,6 +159,8 @@ set(H_FILES
   Rendering/mitkConnectomicsRenderingEdgeRadiusParameterProperty.h
   Rendering/mitkConnectomicsRenderingNodeColorParameterProperty.h
   Rendering/mitkConnectomicsRenderingNodeRadiusParameterProperty.h
+  Rendering/mitkConnectomicsRenderingNodeThresholdParameterProperty.h
+  Rendering/mitkConnectomicsRenderingEdgeThresholdParameterProperty.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h

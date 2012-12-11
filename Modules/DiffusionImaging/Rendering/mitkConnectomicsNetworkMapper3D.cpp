@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingNodeRadiusParameterProperty.h"
 #include "mitkConnectomicsRenderingEdgeColorParameterProperty.h"
 #include "mitkConnectomicsRenderingEdgeRadiusParameterProperty.h"
+#include "mitkConnectomicsRenderingNodeThresholdParameterProperty.h"
+#include "mitkConnectomicsRenderingEdgeThresholdParameterProperty.h"
 
 #include <algorithm>
 
@@ -319,6 +321,11 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
   mitk::ConnectomicsRenderingEdgeRadiusParameterProperty::Pointer connectomicsRenderingEdgeRadiusParameter =
     mitk::ConnectomicsRenderingEdgeRadiusParameterProperty::New();
 
+  mitk::ConnectomicsRenderingNodeThresholdParameterProperty::Pointer connectomicsRenderingNodeThresholdParameter =
+    mitk::ConnectomicsRenderingNodeThresholdParameterProperty::New();
+  mitk::ConnectomicsRenderingEdgeThresholdParameterProperty::Pointer connectomicsRenderingEdgeThresholdParameter =
+    mitk::ConnectomicsRenderingEdgeThresholdParameterProperty::New();
+
   // set the properties
   node->AddProperty( connectomicsRenderingSchemePropertyName.c_str(),
     connectomicsRenderingScheme, renderer, overwrite );
@@ -326,14 +333,14 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
   node->AddProperty( connectomicsRenderingEdgeFilteringPropertyName.c_str(),
     connectomicsRenderingEdgeFiltering, renderer, overwrite );
   node->AddProperty( connectomicsRenderingEdgeThresholdFilterParameterName.c_str(),
-    connectomicsRenderingEdgeThresholdFilterParameterDefault, renderer, overwrite );
+    connectomicsRenderingEdgeThresholdParameter, renderer, overwrite );
   node->AddProperty( connectomicsRenderingEdgeThresholdFilterThresholdName.c_str(),
     connectomicsRenderingEdgeThresholdFilterThresholdDefault, renderer, overwrite );
 
   node->AddProperty( connectomicsRenderingNodeFilteringPropertyName.c_str(),
     connectomicsRenderingNodeFiltering, renderer, overwrite );
   node->AddProperty( connectomicsRenderingNodeThresholdFilterParameterName.c_str(),
-    connectomicsRenderingNodeThresholdFilterParameterDefault, renderer, overwrite );
+    connectomicsRenderingNodeThresholdParameter, renderer, overwrite );
   node->AddProperty( connectomicsRenderingNodeThresholdFilterThresholdName.c_str(),
     connectomicsRenderingNodeThresholdFilterThresholdDefault, renderer, overwrite );
 

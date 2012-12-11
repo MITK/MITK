@@ -500,8 +500,17 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
             roisize = 5;
 
         mitk::Point3D pos = m_MultiWidget->GetCrossPosition();
+
         VecImgType::IndexType crosspos;
         diffusionImg->GetTimeSlicedGeometry()->WorldToIndex(pos, crosspos);
+        if (!vecimg->GetLargestPossibleRegion().IsInside(crosspos))
+        {
+            m_Controls->m_Warning->setText(QString("Crosshair position not inside of selected diffusion weighted image. Reinit needed!"));
+            m_Controls->m_Warning->setVisible(true);
+            return;
+        }
+        else
+            m_Controls->m_Warning->setVisible(false);
 
         VecImgType::IndexType index;
         index[0] = crosspos[0] - roisize; index[0] = index[0] < 0 ? 0 : index[0];

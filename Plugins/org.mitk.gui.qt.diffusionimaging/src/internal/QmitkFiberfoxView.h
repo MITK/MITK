@@ -69,6 +69,8 @@ protected slots:
     void GenerateFibers();  ///< generate fibers from the selected ROIs
     void GenerateImage();   ///< generate artificial image from the selected fiber bundle
     void JoinBundles();     ///< merges selcted fiber bundles into one
+    void CopyBundles();      ///< add copy of the selected bundle to the datamanager
+    void TransformBundles(); ///< rotate and shift selected bundles
 
     /** update fibers if any parameter changes */
     void OnFiberDensityChanged(int value);
@@ -80,6 +82,7 @@ protected slots:
     void OnDistributionChanged(int value);
     void OnAddT2Smearing(int value);
     void OnAddGibbsRinging(int value);
+    void OnConstantRadius(int value);
 
 protected:
 
@@ -122,5 +125,6 @@ protected:
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
     mitk::DataNode::Pointer                             m_SelectedImage;
     mitk::DataNode::Pointer                             m_SelectedBundle;
+    mitk::DataNode::Pointer                             m_SelectedDWI;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
 };

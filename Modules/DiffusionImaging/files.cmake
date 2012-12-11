@@ -222,6 +222,7 @@ set(H_FILES
   Algorithms/itkFibersFromPlanarFiguresFilter.h
   Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToVectorImageFilter.h
+  Algorithms/itkResampleDwiImageFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h

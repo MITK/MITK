@@ -48,6 +48,7 @@ public:
     typedef SmartPointer< Self >        Pointer;
     typedef SmartPointer< const Self >  ConstPointer;
 
+    typedef itk::Image<double, 3>                           ItkDoubleImgType;
     typedef itk::Image<float, 3>                            ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
     typedef mitk::FiberBundleX::Pointer                     FiberBundleType;
@@ -64,13 +65,15 @@ public:
 
     // input
     itkSetMacro( VolumeAccuracy, unsigned int )         ///< determines fiber sampling density and thereby the accuracy of the fiber volume fraction
-    itkSetMacro( OuputKspaceImage, bool )               ///< output image of the k-space instead of the dwi (inverse fourier transformed k-space)
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
     itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
     itkSetMacro( Origin, mitk::Point3D )                ///< output image origin
     itkSetMacro( DirectionMatrix, MatrixType )          ///< output image rotation
+    itkSetMacro( EnforcePureFiberVoxels, bool )         ///< treat all voxels containing at least one fiber as fiber-only (actually disable non-fiber compartments for this voxel).
     itkSetMacro( ImageRegion, ImageRegion<3> )          ///< output image size
+    itkSetMacro( NumberOfRepetitions, unsigned int )    ///< number of acquisition repetitions to reduce noise (default is no additional repetition)
     itkSetMacro( TissueMask, ItkUcharImgType::Pointer ) ///< voxels outside of this binary mask contain only noise (are treated as air)
+    itkGetMacro( KspaceImage, ItkDoubleImgType::Pointer )
     void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }            ///< generates the noise added to the image values
     void SetFiberModels(DiffusionModelList modelList){ m_FiberModels = modelList; }         ///< generate signal of fiber compartments
     void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }   ///< generate signal of non-fiber compartments
@@ -94,18 +97,23 @@ protected:
     TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
     mitk::Vector3D                      m_Spacing;              ///< output image spacing
+    mitk::Vector3D                      m_UpsampledSpacing;
     mitk::Point3D                       m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size
+    ImageRegion<3>                      m_UpsampledImageRegion;
     ItkUcharImgType::Pointer            m_TissueMask;           ///< voxels outside of this binary mask contain only noise (are treated as air)
     FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
     KspaceArtifactList                  m_KspaceArtifacts;
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
-    bool                                m_OuputKspaceImage;
     bool                                m_CircleDummy;
     unsigned int                        m_VolumeAccuracy;
+    ItkDoubleImgType::Pointer           m_KspaceImage;
+    unsigned int                        m_Upsampling;
+    unsigned int                        m_NumberOfRepetitions;
+    bool                                m_EnforcePureFiberVoxels;
 };
 }
 

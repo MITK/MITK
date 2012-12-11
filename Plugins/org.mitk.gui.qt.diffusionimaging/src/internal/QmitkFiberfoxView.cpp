@@ -83,6 +83,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
         m_Controls->m_VarianceBox->setVisible(false);
         m_Controls->m_GeometryMessage->setVisible(false);
+        m_Controls->m_DiffusionPropsMessage->setVisible(false);
         m_Controls->m_T2bluringParamFrame->setVisible(false);
         m_Controls->m_KspaceParamFrame->setVisible(false);
 
@@ -100,7 +101,16 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
         connect((QObject*) m_Controls->m_AddT2Smearing, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddT2Smearing(int)));
         connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGibbsRinging(int)));
+        connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
+        connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
+        connect((QObject*) m_Controls->m_TransformBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(TransformBundles()));
     }
+}
+
+void QmitkFiberfoxView::OnConstantRadius(int value)
+{
+    if (value>0 && m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
 }
 
 void QmitkFiberfoxView::OnAddT2Smearing(int value)
@@ -313,6 +323,15 @@ void QmitkFiberfoxView::OnDrawROI()
     UpdateGui();
 }
 
+bool CompareLayer(mitk::DataNode::Pointer i,mitk::DataNode::Pointer j)
+{
+    int li = -1;
+    i->GetPropertyValue("layer", li);
+    int lj = -1;
+    j->GetPropertyValue("layer", lj);
+    return li<lj;
+}
+
 void QmitkFiberfoxView::GenerateFibers()
 {
     if (m_SelectedBundles.empty())
@@ -323,15 +342,38 @@ void QmitkFiberfoxView::GenerateFibers()
     for (int i=0; i<m_SelectedBundles.size(); i++)
     {
         mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundles.at(i));
+        std::vector< mitk::DataNode::Pointer > childVector;
+        for( mitk::DataStorage::SetOfObjects::const_iterator it = children->begin(); it != children->end(); ++it )
+            childVector.push_back(*it);
+        sort(childVector.begin(), childVector.end(), CompareLayer);
+
         vector< mitk::PlanarEllipse::Pointer > fib;
         vector< unsigned int > flip;
-        for( mitk::DataStorage::SetOfObjects::const_iterator it = children->begin(); it != children->end(); ++it )
+        float radius = 1;
+        int count = 0;
+        for( std::vector< mitk::DataNode::Pointer >::const_iterator it = childVector.begin(); it != childVector.end(); ++it )
         {
             mitk::DataNode::Pointer node = *it;
 
             if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
             {
-                fib.push_back(dynamic_cast<mitk::PlanarEllipse*>(node->GetData()));
+                mitk::PlanarEllipse* ellipse = dynamic_cast<mitk::PlanarEllipse*>(node->GetData());
+                if (m_Controls->m_ConstantRadiusBox->isChecked())
+                {
+                    ellipse->SetTreatAsCircle(true);
+                    mitk::Point2D c = ellipse->GetControlPoint(0);
+                    mitk::Point2D p = ellipse->GetControlPoint(1);
+                    mitk::Vector2D v = p-c;
+                    if (count==0)
+                        radius = v.GetVnlVector().magnitude();
+                    else
+                    {
+                        v.Normalize();
+                        v *= radius;
+                        ellipse->SetControlPoint(1, c+v);
+                    }
+                }
+                fib.push_back(ellipse);
 
                 std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it = m_DataNodeToPlanarFigureData.find(node.GetPointer());
                 if( it != m_DataNodeToPlanarFigureData.end() )
@@ -342,12 +384,14 @@ void QmitkFiberfoxView::GenerateFibers()
                 else
                     flip.push_back(0);
             }
+            count++;
         }
         if (fib.size()>1)
         {
             fiducials.push_back(fib);
             fliplist.push_back(flip);
         }
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         if (fib.size()<3)
             return;
     }
@@ -426,15 +470,27 @@ void QmitkFiberfoxView::GenerateImage()
         return;
     }
 
-    mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundle->GetData());
-    if (fiberBundle->GetNumFibers()<=0)
+    DiffusionSignalModel<double>::GradientListType gradientList;
+    double bVal = 1000;
+    if (m_SelectedDWI.IsNull())
     {
-        QMessageBox::information(0, "Image generation not possible:", "Generated fiber bundle contains no fibers!");
-        return;
+        gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
+        bVal = m_Controls->m_BvalueBox->value();
     }
-
-    DiffusionSignalModel<double>::GradientListType gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
-    double bVal = m_Controls->m_TensorsToDWIBValueEdit->value();
+    else
+    {
+        mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
+        bVal = dwi->GetB_Value();
+        mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = dwi->GetDirectionsWithMeasurementFrame();
+        for (int i=0; i<dirs->Size(); i++)
+        {
+            DiffusionSignalModel<double>::GradientType g;
+            g[0] = dirs->at(i)[0];
+            g[1] = dirs->at(i)[1];
+            g[2] = dirs->at(i)[2];
+            gradientList.push_back(g);
+        }
+    }
 
     // signal models
     mitk::TensorModel<double> extraAxonal;
@@ -443,11 +499,11 @@ void QmitkFiberfoxView::GenerateImage()
     extraAxonal.SetKernelFA(m_Controls->m_MaxFaBox->value());
     extraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
     extraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
-//    mitk::StickModel<double> intraAxonal;
-//    intraAxonal.SetGradientList(gradientList);
-//    intraAxonal.SetDiffusivity(m_Controls->m_MaxFaBox->value());
-//    intraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
-//    intraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
+    //    mitk::StickModel<double> intraAxonal;
+    //    intraAxonal.SetGradientList(gradientList);
+    //    intraAxonal.SetDiffusivity(m_Controls->m_MaxFaBox->value());
+    //    intraAxonal.SetSignalScale(m_Controls->m_FiberS0Box->value());
+    //    intraAxonal.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
 
     mitk::BallModel<double> freeDiffusion;
     freeDiffusion.SetGradientList(gradientList);
@@ -464,11 +520,10 @@ void QmitkFiberfoxView::GenerateImage()
         snr = 0.0001;
     if (snr<=99)
     {
-        noiseVariance = 1/snr;
+        noiseVariance = (double)m_Controls->m_FiberS0Box->value()/snr;
         noiseVariance *= noiseVariance;
     }
     mitk::RicianNoiseModel<double> noiseModel;
-    noiseModel.SetScaleFactor(m_Controls->m_FiberS0Box->value());
     noiseModel.SetNoiseVariance(noiseVariance);
 
     // artifact models
@@ -486,47 +541,111 @@ void QmitkFiberfoxView::GenerateImage()
         artifactList.push_back(&t2Model);
     }
 
-    itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();
-    filter->SetImageRegion(imageRegion);
-    filter->SetSpacing(spacing);
-    filter->SetFiberBundle(fiberBundle);
-    modelList.push_back(&extraAxonal);
-//    modelList.push_back(&intraAxonal);
-    filter->SetFiberModels(modelList);
-    modelList.clear();
-    modelList.push_back(&freeDiffusion);
-    filter->SetNonFiberModels(modelList);
-    filter->SetNoiseModel(&noiseModel);
-    filter->SetKspaceArtifacts(artifactList);
-    filter->SetOuputKspaceImage(m_Controls->m_KspaceImageBox->isChecked());
-    filter->SetVolumeAccuracy(m_Controls->m_VolumeAccuracyBox->value());
-    if (m_TissueMask.IsNotNull())
-    {
-        ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
-        mitk::CastToItkImage<ItkUcharImgType>(m_TissueMask, mask);
-        filter->SetTissueMask(mask);
-    }
-    filter->Update();
 
-    mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-    image->SetVectorImage( filter->GetOutput() );
-    image->SetB_Value(bVal);
-    image->SetDirections(gradientList);
-    image->InitializeFromVectorImage();
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData( image );
-    node->SetName(m_Controls->m_ImageName->text().toStdString());
-    if (m_Controls->m_KspaceImageBox->isChecked())
-        node->SetBoolProperty("use-color", false);
-    GetDataStorage()->Add(node, m_SelectedBundle);
-
-    mitk::BaseData::Pointer basedata = node->GetData();
-    if (basedata.IsNotNull())
+    for (int i=0; i<m_SelectedBundles.size(); i++)
     {
-        mitk::RenderingManager::GetInstance()->InitializeViews(
-                    basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());
+        if (fiberBundle->GetNumFibers()<=0)
+            continue;
+
+        itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();
+        filter->SetImageRegion(imageRegion);
+        filter->SetSpacing(spacing);
+        filter->SetFiberBundle(fiberBundle);
+        modelList.push_back(&extraAxonal);
+        //    modelList.push_back(&intraAxonal);
+        filter->SetFiberModels(modelList);
+        modelList.clear();
+        modelList.push_back(&freeDiffusion);
+        filter->SetNonFiberModels(modelList);
+        filter->SetNoiseModel(&noiseModel);
+        filter->SetKspaceArtifacts(artifactList);
+        filter->SetVolumeAccuracy(m_Controls->m_VolumeAccuracyBox->value());
+        filter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
+        filter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
+        if (m_TissueMask.IsNotNull())
+        {
+            ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
+            mitk::CastToItkImage<ItkUcharImgType>(m_TissueMask, mask);
+            filter->SetTissueMask(mask);
+        }
+        filter->Update();
+
+        mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
+        image->SetVectorImage( filter->GetOutput() );
+        image->SetB_Value(bVal);
+        image->SetDirections(gradientList);
+        image->InitializeFromVectorImage();
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData( image );
+        node->SetName(m_Controls->m_ImageName->text().toStdString());
+        GetDataStorage()->Add(node, m_SelectedBundle);
+
+        if (m_Controls->m_KspaceImageBox->isChecked())
+        {
+            itk::Image<double, 3>::Pointer kspace = filter->GetKspaceImage();
+            mitk::Image::Pointer image = mitk::Image::New();
+            image->InitializeByItk(kspace.GetPointer());
+            image->SetVolume(kspace->GetBufferPointer());
+
+            mitk::DataNode::Pointer node = mitk::DataNode::New();
+            node->SetData( image );
+            node->SetName("k-space");
+            node->SetBoolProperty("use color", false);
+            GetDataStorage()->Add(node, m_SelectedBundle);
+        }
+
+        mitk::BaseData::Pointer basedata = node->GetData();
+        if (basedata.IsNotNull())
+        {
+            mitk::RenderingManager::GetInstance()->InitializeViews(
+                        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
     }
+}
+
+void QmitkFiberfoxView::TransformBundles()
+{
+    if ( m_SelectedBundles.size()<1 ){
+        QMessageBox::information( NULL, "Warning", "Select at least one fiber bundle!");
+        MITK_WARN("QmitkFiberProcessingView") << "Select at least one fiber bundle!";
+        return;
+    }
+
+    std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
+    for (it; it!=m_SelectedBundles.end(); ++it)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+        fib->RotateAroundAxis(m_Controls->m_XrotBox->value(), m_Controls->m_YrotBox->value(), m_Controls->m_ZrotBox->value());
+        fib->TranslateFibers(m_Controls->m_XtransBox->value(), m_Controls->m_YtransBox->value(), m_Controls->m_ZtransBox->value());
+    }
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkFiberfoxView::CopyBundles()
+{
+    if ( m_SelectedBundles.size()<1 ){
+        QMessageBox::information( NULL, "Warning", "Select at least one fiber bundle!");
+        MITK_WARN("QmitkFiberProcessingView") << "Select at least one fiber bundle!";
+        return;
+    }
+
+    std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
+    for (it; it!=m_SelectedBundles.end(); ++it)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+        mitk::FiberBundleX::Pointer newBundle = fib->GetDeepCopy();
+        QString name((*it)->GetName().c_str());
+        name += "_copy";
+
+        mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
+        fbNode->SetData(newBundle);
+        fbNode->SetName(name.toStdString());
+        fbNode->SetVisibility(true);
+        GetDataStorage()->Add(fbNode);
+    }
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberfoxView::JoinBundles()
@@ -553,6 +672,7 @@ void QmitkFiberfoxView::JoinBundles()
     fbNode->SetName(name.toStdString());
     fbNode->SetVisibility(true);
     GetDataStorage()->Add(fbNode);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberfoxView::UpdateGui()
@@ -567,19 +687,36 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_CircleButton->setEnabled(true);
         m_Controls->m_FiberGenMessage->setVisible(false);
     }
-    else
+    else if (m_SelectedBundle.IsNull())
     {
         m_Controls->m_CircleButton->setEnabled(false);
         m_Controls->m_FiberGenMessage->setVisible(true);
     }
 
+    if (m_SelectedDWI.IsNotNull())
+    {
+        m_Controls->m_DiffusionPropsMessage->setVisible(true);
+        m_Controls->m_BvalueBox->setEnabled(false);
+        m_Controls->m_NumGradientsBox->setEnabled(false);
+    }
+    else
+    {
+        m_Controls->m_DiffusionPropsMessage->setVisible(false);
+        m_Controls->m_BvalueBox->setEnabled(true);
+        m_Controls->m_NumGradientsBox->setEnabled(true);
+    }
+
     if (m_SelectedBundle.IsNotNull())
     {
+        m_Controls->m_TransformBundlesButton->setEnabled(true);
+        m_Controls->m_CopyBundlesButton->setEnabled(true);
         m_Controls->m_GenerateFibersButton->setEnabled(true);
         m_Controls->m_FiberBundleLabel->setText(m_SelectedBundle->GetName().c_str());
     }
     else
     {
+        m_Controls->m_TransformBundlesButton->setEnabled(false);
+        m_Controls->m_CopyBundlesButton->setEnabled(false);
         m_Controls->m_GenerateFibersButton->setEnabled(false);
         m_Controls->m_FiberBundleLabel->setText("<font color='red'>mandatory</font>");
     }
@@ -597,6 +734,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedBundles.clear();
     m_SelectedBundle = NULL;
     m_SelectedImage = NULL;
+    m_SelectedDWI = NULL;
     m_Controls->m_TissueMaskLabel->setText("<font color='grey'>optional</font>");
     m_Controls->m_GeometryMessage->setVisible(false);
     m_Controls->m_GeometryFrame->setEnabled(true);
@@ -606,7 +744,11 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     {
         mitk::DataNode::Pointer node = nodes.at(i);
 
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+        if ( node.IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()) )
+        {
+            m_SelectedDWI = node;
+        }
+        else if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
             m_SelectedImage = node;
             bool isBinary = false;
@@ -621,8 +763,19 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {
-            m_SelectedBundle = node;
-            m_SelectedBundles.push_back(node);
+            if (m_Controls->m_RealTimeFibers->isChecked() && node!=m_SelectedBundle)
+            {
+                m_SelectedBundle = node;
+                m_SelectedBundles.push_back(node);
+                mitk::FiberBundleX::Pointer newFib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+                if (newFib->GetNumFibers()!=m_Controls->m_FiberDensityBox->value())
+                    GenerateFibers();
+            }
+            else
+            {
+                m_SelectedBundle = node;
+                m_SelectedBundles.push_back(node);
+            }
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
         {
@@ -641,9 +794,6 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         }
     }
     UpdateGui();
-
-//    if (m_Controls->m_RealTimeFibers->isChecked())
-//        GenerateFibers();
 }
 
 

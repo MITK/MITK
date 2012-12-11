@@ -39,10 +39,12 @@ typename StickModel< ScalarType >::PixelType StickModel< ScalarType >::SimulateM
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
         GradientType g = this->m_GradientList[i];
-        if (g.GetNorm()>0.0001)
+        double bVal = g.GetNorm(); bVal *= bVal;
+
+        if (bVal>0.0001)
         {
             double dot = this->m_FiberDirection*g;
-            signal[i] = exp( -m_BValue*m_Diffusivity*dot*dot );
+            signal[i] = exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
         }
         else
             signal[i] = 1;

@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarSubdivisionPolygon.h"
 #include "mitkPlanarRectangle.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkPlanarEllipse.h"
 
 #include "mitkBasePropertySerializer.h"
 
@@ -147,6 +148,10 @@ void mitk::PlanarFigureReader::GenerateData()
     else if (type == "PlanarCircle")
     {
       planarFigure = mitk::PlanarCircle::New();
+    }
+    else if (type == "PlanarEllipse")
+    {
+      planarFigure = mitk::PlanarEllipse::New();
     }
     else if (type == "PlanarCross")
     {

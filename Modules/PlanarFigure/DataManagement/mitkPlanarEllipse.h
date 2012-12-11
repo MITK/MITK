@@ -94,6 +94,13 @@ public:
       m_MinMaxRadiusContraintsActive = active;
   }
 
+  /** \brief Treat ellipse as circle (equal radii)
+  */
+  void SetTreatAsCircle( bool active )
+  {
+      m_TreatAsCircle = active;
+  }
+
 protected:
   PlanarEllipse();
   virtual ~PlanarEllipse();

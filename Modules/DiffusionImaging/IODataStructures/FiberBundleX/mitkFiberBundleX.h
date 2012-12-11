@@ -36,11 +36,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  /**
+/**
    * \brief Base Class for Fiber Bundles;   */
-  class  MitkDiffusionImaging_EXPORT FiberBundleX : public BaseData
-  {
-  public:
+class  MitkDiffusionImaging_EXPORT FiberBundleX : public BaseData
+{
+public:
 
     // fiber colorcodings
     static const char* COLORCODING_ORIENTATION_BASED;
@@ -74,6 +74,8 @@ namespace mitk {
     bool RemoveLongFibers(float lengthInMM);
     bool ApplyCurvatureThreshold(float minRadius, bool deleteFibers);
     void MirrorFibers(unsigned int axis);
+    void RotateAroundAxis(double x, double y, double z);
+    void TranslateFibers(double x, double y, double z);
 
     // add/subtract fibers
     FiberBundleX::Pointer AddBundle(FiberBundleX* fib);
@@ -102,7 +104,7 @@ namespace mitk {
 
     std::vector<int> GetPointsRoi()
     {
-      return m_PointsRoi;
+        return m_PointsRoi;
     }
 
     // copy fiber bundle
@@ -111,7 +113,7 @@ namespace mitk {
     // compare fiber bundles
     bool Equals(FiberBundleX* fib);
 
-  protected:
+protected:
 
     FiberBundleX( vtkPolyData* fiberPolyData = NULL );
     virtual ~FiberBundleX();
@@ -124,7 +126,7 @@ namespace mitk {
     // calculate colorcoding values according to m_CurrentColorCoding
     void UpdateColorCoding();
 
-  private:
+private:
 
     // actual fiber container
     vtkSmartPointer<vtkPolyData>  m_FiberPolyData;
@@ -145,7 +147,7 @@ namespace mitk {
 
     std::vector<int> m_PointsRoi; // this global variable needs to be refactored
 
-  };
+};
 
 } // namespace mitk
 

@@ -127,7 +127,8 @@ bool mitk::DiffusionImage<TPixelType>::AreAlike(GradientDirectionType g1,
                                                 double precision)
 {
   GradientDirectionType diff = g1 - g2;
-  return diff.two_norm() < precision;
+  GradientDirectionType diff2 = g1 + g2;
+  return diff.two_norm() < precision || diff2.two_norm() < precision;
 }
 
 template<typename TPixelType>

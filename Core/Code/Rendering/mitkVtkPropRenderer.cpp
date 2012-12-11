@@ -351,7 +351,6 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   glTranslatef( translateX, 0, 0.0);
   glScalef( zoom, zoom, 1.0 );
 
-  /* ende maleike */
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
   glLoadIdentity();

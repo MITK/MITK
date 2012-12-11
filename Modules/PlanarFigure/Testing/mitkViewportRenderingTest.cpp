@@ -144,7 +144,7 @@ int mitkViewportRenderingTest(int argc, char* argv[]) {
   renderingHelper.Render();
 
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = true;
+  bool generateReferenceScreenshot = false;
   if(generateReferenceScreenshot)
   {
     std::string tmpFilename = std::string("/tmp/viewportrendering_") + gen_random_filename() + ".png";

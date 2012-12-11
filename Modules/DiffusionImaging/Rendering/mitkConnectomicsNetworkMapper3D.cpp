@@ -541,9 +541,9 @@ double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< 
   // using distance to a specific node as parameter
   if( parameterName == connectomicsRenderingNodeParameterColoringShortestPath )
   {
-    bool labelNotFound( this->GetInput()->CheckForLabel( m_ChosenNodeLabel ) );
+    bool labelFound( this->GetInput()->CheckForLabel( m_ChosenNodeLabel ) );
     // check whether the chosen node is valid
-    if( labelNotFound )
+    if( !labelFound )
     {
       MITK_WARN << "Node chosen for rendering is not valid.";
       for(int index(0); index < end; index++)
@@ -554,11 +554,12 @@ double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< 
     }
     else
     {
+      const std::vector< double > distanceVector = this->GetInput()->GetShortestDistanceVectorFromLabel( m_ChosenNodeLabel );
       for(int index(0); index < end; index++)
       {
-        parameterVector->at( index ) = 1.0;
+        parameterVector->at( index ) = distanceVector[index];
       }
-      return 1.0;
+      maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
     }
   }
 

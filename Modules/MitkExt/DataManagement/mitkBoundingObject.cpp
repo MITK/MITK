@@ -69,7 +69,10 @@ void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
 
   mitk::Vector3D size;
   for(unsigned int i=0; i < 3; ++i)
-    size[i] = (aGeometry3D->GetExtentInMM(i)/2.0) -1;
+  {
+    size[i] = (aGeometry3D->GetExtentInMM(i)/2.0);
+  }
   GetGeometry()->SetSpacing( size );
   GetTimeSlicedGeometry()->UpdateInformation();
 }
+

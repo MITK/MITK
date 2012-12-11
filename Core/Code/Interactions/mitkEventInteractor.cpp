@@ -55,7 +55,7 @@ int mitk::EventInteractor::GetLayer()
 
 bool mitk::EventInteractor::operator <(const EventInteractor::Pointer eventInteractor)
 {
-  return (GetLayer() < eventInteractor->GetLayer());
+  return (GetLayer() > eventInteractor->GetLayer()); // intentionally greater than !
 }
 
 mitk::EventInteractor::~EventInteractor()

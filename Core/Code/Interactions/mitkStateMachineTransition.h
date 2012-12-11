@@ -28,19 +28,21 @@ namespace mitk
 {
   class StateMachineState;
 
-  /**
+    typedef std::vector<mitk::StateMachineAction::Pointer> ActionVectorType;
+    typedef itk::SmartPointer<StateMachineState> SpStateMachineState;
+
+    /**
    * @brief Connects two states, and holds references to actions that are executed on transition.
    *
    * @ingroup Interaction
    **/
-  class MITK_CORE_EXPORT StateMachineTransition: public itk::Object
+
+    class MITK_CORE_EXPORT StateMachineTransition: public itk::Object
   {
   public:
     mitkClassMacro(StateMachineTransition, itk::Object);
     mitkNewMacro3Param(Self, std::string,std::string,std::string);
 
-    typedef std::vector<mitk::StateMachineAction::Pointer> ActionVectorType;
-    typedef itk::SmartPointer<StateMachineState> SpStateMachineState;
 
     void AddAction(StateMachineAction::Pointer action);
     SpStateMachineState GetNextState();

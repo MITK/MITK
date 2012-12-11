@@ -22,11 +22,16 @@
 #include "mitkEvent.h"
 #include "mitkCommon.h"
 #include <MitkExports.h>
+#include "mitkEventConfig.h"
+#include <string>
 
 
 namespace mitk
 {
-
+  /** Base Class for Interaction handling classes.
+   *  Handles loading of configuration object and mapping of events to variant names.
+   */
+  class InteractionEvent;
   class MITK_CORE_EXPORT EventHandler : public itk::Object {
 
   public:
@@ -36,7 +41,12 @@ namespace mitk
   protected:
     EventHandler();
     virtual ~EventHandler();
+    virtual bool LoadEventConfig();
+    virtual bool LoadEventConfig(std::string filename);
+    std::string GetMappedEvent(InteractionEvent* interactionEvent);
 
+  private:
+    EventConfig* m_EventConfig;
 
   };
 

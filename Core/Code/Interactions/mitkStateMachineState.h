@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef SMSTATE_H_HEADER_INCLUDED_C19A8A5D
 #define SMSTATE_H_HEADER_INCLUDED_C19A8A5D
 
@@ -24,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkWeakPointer.h>
 #include <itkObjectFactory.h>
 #include "mitkStateMachineTransition.h"
-
 namespace mitk {
+
 
   class MITK_CORE_EXPORT StateMachineState : public itk::Object
   {

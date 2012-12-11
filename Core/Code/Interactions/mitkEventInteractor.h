@@ -24,28 +24,32 @@
 #include <MitkExports.h>
 #include "mitkEventStateMachine.h"
 
-
 namespace mitk
 {
   class DataNode;
-  class MITK_CORE_EXPORT EventInteractor : public EventStateMachine {
+  class MITK_CORE_EXPORT EventInteractor: public EventStateMachine
+  {
 
   public:
-  typedef itk::SmartPointer<DataNode> NodeType;
+    typedef itk::SmartPointer<DataNode> NodeType;
     mitkClassMacro(EventInteractor, EventStateMachine);
     itkNewMacro(Self);
 
-   bool operator<(const EventInteractor::Pointer eventInteractor);
+    /**
+     * Overload operator to compare Interactors. Criteria is the layer of the associated DataNode.
+     * Note: This is intentionally implemented using 'greater than' to achieve a list which is sorted in descending order
+     * (DataNodes on top are first in list)
+     */
+    bool operator<(const EventInteractor::Pointer eventInteractor);
 
-   void SetDataNode(NodeType);
+    void SetDataNode(NodeType);
 
-   NodeType GetDataNode();
-   int GetLayer();
+    NodeType GetDataNode();
+    int GetLayer();
 
   protected:
     EventInteractor();
     virtual ~EventInteractor();
-
 
   private:
     NodeType m_DataNode;

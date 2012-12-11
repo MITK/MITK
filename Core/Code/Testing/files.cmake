@@ -8,6 +8,7 @@ set(MODULE_TESTS
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
+  mitkEventConfigTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
@@ -40,7 +41,6 @@ set(MODULE_TESTS
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
-  mitkStateMachineConfigTest.cpp
   mitkStateMachineContainerTest.cpp
   mitkStateTest.cpp
   mitkSurfaceTest.cpp

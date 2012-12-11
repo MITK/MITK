@@ -66,8 +66,14 @@ mitk::Dispatcher::~Dispatcher()
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
   InteractionEvent::Pointer p = event;
-  m_Interactors.sort();
-  return false; // TODO: dummy implementation
+  m_Interactors.sort(); // sorts interactors by layer (descending);
+  for (std::list<EventInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end(); ++it)
+  {
+    if ((*it)->HandleEvent(event)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /*

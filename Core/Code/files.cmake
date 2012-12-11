@@ -213,6 +213,7 @@ set(CPP_FILES
   Interactions/mitkDisplayVectorInteractorLevelWindow.cpp
   Interactions/mitkDisplayVectorInteractorScroll.cpp
   Interactions/mitkEvent.cpp
+  Interactions/mitkEventConfig.cpp
   Interactions/mitkEventDescription.cpp
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventHandler.cpp
@@ -239,7 +240,6 @@ set(CPP_FILES
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkState.cpp
-  Interactions/mitkStateMachineConfig.cpp
   Interactions/mitkStateMachineContainer.cpp
   Interactions/mitkStateEvent.cpp
   Interactions/mitkStateMachine.cpp

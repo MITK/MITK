@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /** \file mitkConnectomicsRenderingProperties.h
-   * \brief This file defines the rendering properties available for connectomics newtorks in MITK.
+   * \brief This file defines the rendering properties available for connectomics networks in MITK.
    *
    * This file collects and explains the properties which can be used to modify the visualisation
    * of connectomics networks.

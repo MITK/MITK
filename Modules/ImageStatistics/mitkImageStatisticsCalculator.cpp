@@ -24,9 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkChangeInformationImageFilter.h>
 #include <itkExtractImageFilter.h>
-
+#include <itkMinimumMaximumImageCalculator.h>
 #include <itkStatisticsImageFilter.h>
 #include <itkLabelStatisticsImageFilter.h>
+#include <itkMaskImageFilter.h>
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -726,23 +727,25 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
     this->UnmaskedStatisticsProgressUpdate();
   }
 
-
-
   // Calculate statistics (separate filter)
   typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput( image );
-  unsigned long observerTag = statisticsFilter->AddObserver(
-    itk::ProgressEvent(), progressListener );
-
+  unsigned long observerTag = statisticsFilter->AddObserver( itk::ProgressEvent(), progressListener );
   statisticsFilter->Update();
-
   statisticsFilter->RemoveObserver( observerTag );
-
-
   this->InvokeEvent( itk::EndEvent() );
 
-  Statistics statistics;
+  // Calculate minimum and maximum
+  typedef itk::MinimumMaximumImageCalculator< ImageType > MinMaxFilterType;
+  typename MinMaxFilterType::Pointer minMaxFilter = MinMaxFilterType::New();
+  minMaxFilter->SetImage( image );
+  unsigned long observerTag2 = minMaxFilter->AddObserver( itk::ProgressEvent(), progressListener );
+  minMaxFilter->Compute();
+  minMaxFilter->RemoveObserver( observerTag2 );
+  this->InvokeEvent( itk::EndEvent() );
+
+  Statistics statistics; statistics.Reset();
   statistics.Label = 1;
   statistics.N = image->GetBufferedRegion().GetNumberOfPixels();
   statistics.Min = statisticsFilter->GetMinimum();
@@ -750,8 +753,15 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statistics.Mean = statisticsFilter->GetMean();
   statistics.Median = 0.0;
   statistics.Sigma = statisticsFilter->GetSigma();
-  statistics.RMS = sqrt( statistics.Mean * statistics.Mean
-    + statistics.Sigma * statistics.Sigma );
+  statistics.RMS = sqrt( statistics.Mean * statistics.Mean + statistics.Sigma * statistics.Sigma );
+
+  statistics.MinIndex.set_size(image->GetImageDimension());
+  statistics.MaxIndex.set_size(image->GetImageDimension());
+  for (int i=0; i<statistics.MaxIndex.size(); i++)
+  {
+      statistics.MaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
+      statistics.MinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
+  }
 
   statisticsContainer->push_back( statistics );
 
@@ -977,6 +987,21 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     }
   }
 
+  typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
+  typename MaskImageFilterType::Pointer masker = MaskImageFilterType::New();
+  masker->SetOutsideValue( (statisticsFilter->GetMinimum()+statisticsFilter->GetMaximum())/2 );
+  masker->SetInput1(adaptedImage);
+  masker->SetInput2(adaptedMaskImage);
+  masker->Update();
+
+  // Calculate minimum and maximum
+  typedef itk::MinimumMaximumImageCalculator< ImageType > MinMaxFilterType;
+  typename MinMaxFilterType::Pointer minMaxFilter = MinMaxFilterType::New();
+  minMaxFilter->SetImage( masker->GetOutput() );
+  unsigned long observerTag2 = minMaxFilter->AddObserver( itk::ProgressEvent(), progressListener );
+  minMaxFilter->Compute();
+  minMaxFilter->RemoveObserver( observerTag2 );
+  this->InvokeEvent( itk::EndEvent() );
 
   if ( maskNonEmpty )
   {
@@ -997,6 +1022,15 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.Sigma = labelStatisticsFilter->GetSigma( *it );
       statistics.RMS = sqrt( statistics.Mean * statistics.Mean
         + statistics.Sigma * statistics.Sigma );
+
+        statistics.MinIndex.set_size(adaptedImage->GetImageDimension());
+        statistics.MaxIndex.set_size(adaptedImage->GetImageDimension());
+        for (int i=0; i<statistics.MaxIndex.size(); i++)
+        {
+            statistics.MaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
+            statistics.MinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
+        }
+
       statisticsContainer->push_back( statistics );
     }
   }

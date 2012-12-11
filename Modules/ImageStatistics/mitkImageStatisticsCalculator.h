@@ -82,6 +82,8 @@ public:
     double Variance;
     double Sigma;
     double RMS;
+    vnl_vector< int > MinIndex;
+    vnl_vector< int > MaxIndex;
 
     void Reset()
     {

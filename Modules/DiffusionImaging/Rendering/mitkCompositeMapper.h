@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageVtkMapper2D.h"
 #include "mitkOdfVtkMapper2D.h"
 #include "mitkLevelWindowProperty.h"
-
+#include <valgrind/callgrind.h>
 namespace mitk {
 
   class CopyImageMapper2D : public ImageVtkMapper2D
@@ -43,8 +43,8 @@ namespace mitk {
   {
   public:
 
-    mitkClassMacro(CompositeMapper,VtkMapper2D);
-    itkNewMacro(Self);
+    mitkClassMacro(CompositeMapper,VtkMapper2D)
+    itkNewMacro(Self)
 
     virtual void MitkRenderOverlay(BaseRenderer* renderer)
     {
@@ -134,20 +134,21 @@ namespace mitk {
       m_OdfMapper->SetGeometry3D(aGeometry3D);
     }
 
-  protected:
-
-    virtual void GenerateData()
+    virtual void Update(mitk::BaseRenderer* renderer)
     {
-      m_OdfMapper->GenerateData();
+      m_OdfMapper->Update(renderer);
+      GenerateDataForRenderer(renderer);
     }
+
+  protected:
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer)
     {
       m_ImgMapper->GenerateDataForRenderer(renderer);
-      if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )
-      {
-        m_OdfMapper->GenerateDataForRenderer(renderer);
-      }
+//      if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )
+//      {
+//        m_OdfMapper->GenerateDataForRenderer(renderer);
+//      }
     }
 
     CompositeMapper();

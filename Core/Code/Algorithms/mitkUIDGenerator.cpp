@@ -36,7 +36,9 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
     throw std::invalid_argument("To few digits requested");
   }
 
-  std::srand((unsigned int) time( (time_t *)0 ));
+  static int instanceID = 0;
+  unsigned int seed = ((time( (time_t *)0 )) + getpid()) * 10 + instanceID++;
+  std::srand(seed);
 }
 
 std::string UIDGenerator::GetUID()
@@ -48,6 +50,8 @@ std::string UIDGenerator::GetUID()
 
   if (t)
   {
+
+
     s << t->tm_year + 1900;
 
     if (t->tm_mon < 9) s << "0"; // add a 0 for months 1 to 9

@@ -598,7 +598,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
       vtkLut->Build();
       mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
       mitkLutProp->SetLookupTable(mitkLut);
-      node->SetProperty( "LookupTable", mitkLutProp );
+//      node->SetProperty( "LookupTable", mitkLutProp );
     }
     if((overwrite) || (node->GetProperty("TransferFunction", renderer)==NULL))
     {

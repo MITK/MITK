@@ -21,25 +21,25 @@ mitk::Dispatcher::Dispatcher()
 {
 }
 
-void mitk::Dispatcher::AddEventInteractor(const DataNode* dataNode)
+void mitk::Dispatcher::AddDataInteractor(const DataNode* dataNode)
 {
-  RemoveEventInteractor(dataNode);
+  RemoveDataInteractor(dataNode);
   RemoveOrphanedInteractors();
-  EventInteractor::Pointer eventInteractor = dataNode->GetDataInteractor();
-  if (eventInteractor.IsNotNull())
+  DataInteractor::Pointer dataInteractor = dataNode->GetDataInteractor();
+  if (dataInteractor.IsNotNull())
   {
-    m_Interactors.push_back(eventInteractor);
+    m_Interactors.push_back(dataInteractor);
   }
 }
 
 /*
- * Note: One EventInteractor can only have one DataNode and vice versa,
- * BUT the m_Interactors list may contain another EventInteractor that is still connected to this DataNode,
- * in this case we have to remove >1 EventInteractor. (Some special case of switching DataNodes between EventInteractors and registering a
- * DataNode to a DataStorage after assigning it to an EventInteractor)
+ * Note: One DataInteractor can only have one DataNode and vice versa,
+ * BUT the m_Interactors list may contain another DataInteractor that is still connected to this DataNode,
+ * in this case we have to remove >1 DataInteractor. (Some special case of switching DataNodes between DataInteractors and registering a
+ * DataNode to a DataStorage after assigning it to an DataInteractor)
  */
 
-void mitk::Dispatcher::RemoveEventInteractor(const DataNode* dataNode)
+void mitk::Dispatcher::RemoveDataInteractor(const DataNode* dataNode)
 {
   for (ListInteractorType::iterator it = m_Interactors.begin(); it != m_Interactors.end();)
   {
@@ -67,7 +67,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
   InteractionEvent::Pointer p = event;
   m_Interactors.sort(); // sorts interactors by layer (descending);
-  for (std::list<EventInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end(); ++it)
+  for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end(); ++it)
   {
     if ((*it)->HandleEvent(event)) {
       return true;
@@ -77,8 +77,8 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 }
 
 /*
- * Checks if DataNodes associated with EventInteractors point back to them.
- * If not remove the EventInteractors. (This can happen when s.o. tries to set DataNodes to multiple EventInteractors)
+ * Checks if DataNodes associated with DataInteractors point back to them.
+ * If not remove the DataInteractors. (This can happen when s.o. tries to set DataNodes to multiple DataInteractors)
  */
 void mitk::Dispatcher::RemoveOrphanedInteractors()
 {
@@ -91,7 +91,7 @@ void mitk::Dispatcher::RemoveOrphanedInteractors()
     }
     else
     {
-      mitk::EventInteractor::Pointer interactor = dn->GetDataInteractor();
+      mitk::DataInteractor::Pointer interactor = dn->GetDataInteractor();
       if (!(interactor == (*it).GetPointer()))
       {
         it = m_Interactors.erase(it);

@@ -5,6 +5,7 @@ set(MODULE_TESTS
   mitkCoreObjectFactoryTest.cpp
   mitkMaterialTest.cpp
   mitkActionTest.cpp
+  mitkDataInteractorTest.cpp
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp

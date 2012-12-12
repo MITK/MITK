@@ -546,13 +546,13 @@ bool mitk::DataNode::IsInteractorEnabled() const
   return mitk::GlobalInteraction::GetInstance()->InteractorRegistered( m_Interactor.GetPointer() );
 }
 
-void mitk::DataNode::SetDataInteractor(EventInteractor::Pointer interactor)
+void mitk::DataNode::SetDataInteractor(DataInteractor::Pointer interactor)
 {
   m_DataInteractor = interactor;
   Modified();
 }
 
-mitk::EventInteractor::Pointer mitk::DataNode::GetDataInteractor() const
+mitk::DataInteractor::Pointer mitk::DataNode::GetDataInteractor() const
 {
   return m_DataInteractor;
 }

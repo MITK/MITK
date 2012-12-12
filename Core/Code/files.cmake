@@ -205,6 +205,7 @@ set(CPP_FILES
   Interactions/mitkAffineInteractor.cpp
   Interactions/mitkBindDispatcherInteractor.cpp
   Interactions/mitkCoordinateSupplier.cpp
+  Interactions/mitkDataInteractor.cpp
   Interactions/mitkDispatcher.cpp
   Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkDisplayInteractor.cpp
@@ -217,7 +218,6 @@ set(CPP_FILES
   Interactions/mitkEventDescription.cpp
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventHandler.cpp
-  Interactions/mitkEventInteractor.cpp
   Interactions/mitkEventMapper.cpp
   Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp

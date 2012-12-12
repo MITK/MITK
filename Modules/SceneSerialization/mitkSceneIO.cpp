@@ -46,7 +46,6 @@ See LICENSE.txt or http://www.mitk.org for details.
   #include <sys/time.h>
 #endif
 
-int mitk::SceneIO::tempDiretoryID = 0;
 
 mitk::SceneIO::SceneIO()
 :m_WorkingDirectory(""),
@@ -60,7 +59,6 @@ mitk::SceneIO::~SceneIO()
 
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
-  mitk::SceneIO::tempDiretoryID++;
 
 #ifdef WIN32
   SYSTEMTIME st;
@@ -76,18 +74,9 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
 
   mitk::UIDGenerator uidGen("UID_",16);
 
-  std::cout << "UID1: "<<uidGen.GetUID()<<std::endl;
-    std::cout << "UID2: "<<uidGen.GetUID()<<std::endl;
-      uidGen = mitk::UIDGenerator("UID_",16);
-      std::cout << "UID1: "<<uidGen.GetUID()<<std::endl;
-        std::cout << "UID2: "<<uidGen.GetUID()<<std::endl;
-
-
   std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uidGen.GetUID();
-  //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
   std::string uniquename = returnValue + Poco::Path::separator();
   Poco::File tempdir( uniquename );
-    std::cout << "uniquename: "<<uniquename<<std::endl;
 
   try
   {

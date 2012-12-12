@@ -61,7 +61,6 @@ mitk::SceneIO::~SceneIO()
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
   mitk::SceneIO::tempDiretoryID++;
-  std::stringstream uniqueNumber;
 
 #ifdef WIN32
   SYSTEMTIME st;
@@ -75,13 +74,20 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
   srand ( time_microsec.tv_usec );
 #endif
 
-  int randomNumber = rand() % 1000 + 1;
+  mitk::UIDGenerator uidGen("UID_",16);
 
-  uniqueNumber << mitk::SceneIO::tempDiretoryID << randomNumber;
-  std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();
+  std::cout << "UID1: "<<uidGen.GetUID()<<std::endl;
+    std::cout << "UID2: "<<uidGen.GetUID()<<std::endl;
+      uidGen = mitk::UIDGenerator("UID_",16);
+      std::cout << "UID1: "<<uidGen.GetUID()<<std::endl;
+        std::cout << "UID2: "<<uidGen.GetUID()<<std::endl;
+
+
+  std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uidGen.GetUID();
   //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
   std::string uniquename = returnValue + Poco::Path::separator();
   Poco::File tempdir( uniquename );
+    std::cout << "uniquename: "<<uniquename<<std::endl;
 
   try
   {
@@ -102,9 +108,7 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
       srand ( time_microsec.tv_usec );
 #endif
 
-      randomNumber = rand() % 10000 + 1;
-      uniqueNumber << randomNumber;
-      returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();
+      returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uidGen.GetUID();
       uniquename = returnValue + Poco::Path::separator();
       Poco::File tempdir2( uniquename );
       if (!tempdir2.createDirectory())

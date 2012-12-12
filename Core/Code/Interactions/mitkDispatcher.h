@@ -42,7 +42,7 @@ namespace mitk
     mitkClassMacro(Dispatcher, itk::Object);
     itkNewMacro(Self);
 
-    typedef std::list<DatatInteractor::Pointer> ListInteractorType;
+    typedef std::list<DataInteractor::Pointer> ListInteractorType;
 
     /**
      * To post new Events which are to be handled by the Dispatcher.

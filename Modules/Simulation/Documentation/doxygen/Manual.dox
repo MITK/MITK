@@ -1,0 +1,56 @@
+/**
+\page SimulationManualPage The MITK Simulation Module
+
+The MITK Simulation Module provides medical simulation capabilities by integrating the Simulation Open Framework Architecture (SOFA) into MITK.
+
+\section SimulationManualBuildInstructions Build Instructions
+
+Activate the %CMake option <tt>MITK_USE_SOFA</tt> to automatically download and build SOFA as well as the MITK Simulation Module during the superbuild process. Afterwards you can activate simulation-enabled plugins during the MITK build configuration, e.g. <tt>MITK_BUILD_org.mitk.gui.qt.simulation</tt>.
+
+\section SimulationManualIntroduction Introduction
+
+It is strongly recommended that you are at least familiar with the basic concepts of SOFA before you proceed reading.
+
+SOFA is intended to be used as a framework by itself. It is split into the following three packages:
+
+<ul>
+  <li> Framework
+  <li> Modules
+  <li> Applications
+</ul>
+
+While the former two packages make up the actual framework, the latter package is built on top of them and provides end user applications, e.g. runSofa.
+
+To be able to integrate SOFA into MITK, the MITK Simulation Module conceptionally replaces the application layer and solely uses the framework and module layer as a toolkit.
+
+\section SimulationManualDrawing Drawing
+
+Drawing is done by SOFA at three different places:
+
+<ul>
+  <li> <tt>sofa::component::visualmodel</tt> classes
+  <li> <tt>sofa::core::visual::DrawTool</tt> class
+  <li> <tt>sofa::helper::gl</tt> classes
+</ul>
+
+These cases are handled by the MITK Simulation Module as follows.
+
+\subsection SimulationManualDrawingVisualModel sofa::component::visualmodel
+
+The most important class is <tt>OglModel</tt> since it makes up most of the visual part of a simulation scene. It inherits from <tt>VisualModel</tt> (which encapsulates all API-independent drawing code) and contains OpenGL-related code to ultimately draw the visual model.
+
+To hook into the drawing of visual models, the MITK Simulation Module creates an alias in the SOFA object system so that every <tt>OglModel</tt> node found in a scene file is used to instantiate a MITK <b>SimulationModel</b> class instead. This class creates VTK actors that contain the visual model rather than draw it directly. The simulation mapper, which is responsible for drawing the simulation scene, utilizes the visitor mechanism of SOFA to collect all VTK actors and finally draws them.
+
+Other classes which are injected by aliases into the SOFA object system include all lighting-related classes. These are currently replaced by empty placeholder classes (customized lighting might be supported in the future).
+
+\subsection SimulationManualDrawingDrawToolGL sofa::core::visual::DrawTool
+
+The abstract class <tt>DrawTool</tt> (and its default OpenGL implementation <tt>DrawToolGL</tt>) provides the interface to draw basic primitives, e.g. points, lines, spheres, arrows and so forth. It is usually set by a call to <tt> sofa::core::visual::VisualParams::defaultInstance()->drawTool()</tt> at application initialization.
+
+The MITK Simulation Module provide its own VTK-based implementation <b>SimulationDrawTool</b>. This class creates VTK actors instead of drawing anything directly. There is one <b>SimulationDrawTool</b> per simulation and the simulation mapper draws all these VTK actors according to which simulation scene is drawn.
+
+\subsection SimulationManualDrawingGL sofa::helper::gl
+
+All classes in this namespace are problematic since they don't support the SOFA object system and therefore cannot be easily replaced by own implementations. Currently they are not handled by MITK at all. A future workaround might include patching of SOFA during the superbuild process. The cleanest approach would be to get rid these classes completely and use the draw tool instead.
+
+*/

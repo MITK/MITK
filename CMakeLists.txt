@@ -151,6 +151,7 @@ option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_
 option(MITK_DCMTK_BUILD_SHARED_LIBS "EXPERIMENTAL, superbuild only: build DCMTK as shared libs" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 
@@ -720,6 +721,10 @@ endif()
 
 if(OpenCV_DIR)
   set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${OpenCV_DIR}/bin/%VS_BUILD_TYPE%")
+endif()
+
+if(SOFA_DIR)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${SOFA_DIR}/bin/%VS_BUILD_TYPE%;${SOFA_DIR}/../SOFA-src/bin")
 endif()
 
 # DCMTK is statically build

@@ -1,0 +1,12 @@
+set(CPP_FILES
+  mitkSimulation.cpp
+  mitkSimulationDrawTool.cpp
+  mitkSimulationPropAssemblyVisitor.cpp
+  mitkSimulationIOFactory.cpp
+  mitkSimulationMapper3D.cpp
+  mitkSimulationReader.cpp
+  mitkSimulationObjectFactory.cpp
+  mitkSimulationLight.cpp
+  mitkSimulationLightManager.cpp
+  mitkSimulationModel.cpp
+)

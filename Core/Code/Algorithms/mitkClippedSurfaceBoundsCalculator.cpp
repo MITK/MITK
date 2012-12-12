@@ -20,42 +20,48 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
     const mitk::PlaneGeometry* geometry,
-    mitk::Image::Pointer image):
-  m_PlaneGeometry(NULL),
-  m_Geometry3D(NULL),
-  m_Image(NULL)
+    mitk::Image::Pointer image)
+: m_PlaneGeometry(NULL)
+, m_Geometry3D(NULL)
+, m_Image(NULL)
 {
-  // initialize with meaningless slice indices
-  m_MinMaxOutput.clear();
-  for(int i = 0; i < 3; i++)
-  {
-    m_MinMaxOutput.push_back(
-        OutputType( std::numeric_limits<int>::max() ,
-                    std::numeric_limits<int>::min() ));
-  }
-
+  this->InitializeOutput();
 
   this->SetInput(geometry, image);
 }
 
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
     const mitk::Geometry3D* geometry,
-    mitk::Image::Pointer image):
-  m_PlaneGeometry(NULL),
-  m_Geometry3D(NULL),
-  m_Image(NULL)
+    mitk::Image::Pointer image)
+: m_PlaneGeometry(NULL)
+, m_Geometry3D(NULL)
+, m_Image(NULL)
+{
+  this->InitializeOutput();
+
+  this->SetInput(geometry, image);
+}
+
+mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator( const PointListType pointlist, mitk::Image::Pointer image )
+: m_PlaneGeometry(NULL)
+, m_Geometry3D(NULL)
+, m_Image(image)
+{
+  this->InitializeOutput();
+
+  m_ObjectPointsInWorldCoordinates = pointlist;
+}
+
+void mitk::ClippedSurfaceBoundsCalculator::InitializeOutput()
 {
   // initialize with meaningless slice indices
   m_MinMaxOutput.clear();
   for(int i = 0; i < 3; i++)
   {
     m_MinMaxOutput.push_back(
-        OutputType( std::numeric_limits<int>::max() ,
-                    std::numeric_limits<int>::min() ));
+      OutputType( std::numeric_limits<int>::max() ,
+      std::numeric_limits<int>::min() ));
   }
-
-
-  this->SetInput(geometry, image);
 }
 
 mitk::ClippedSurfaceBoundsCalculator::~ClippedSurfaceBoundsCalculator()
@@ -72,6 +78,7 @@ mitk::ClippedSurfaceBoundsCalculator::SetInput(
     this->m_PlaneGeometry = geometry;
     this->m_Image = image;
     this->m_Geometry3D = NULL;        //Not possible to set both
+    m_ObjectPointsInWorldCoordinates.clear();
   }
 }
 
@@ -85,6 +92,18 @@ mitk::ClippedSurfaceBoundsCalculator::SetInput(
     this->m_Geometry3D = geometry;
     this->m_Image = image;
     this->m_PlaneGeometry = NULL;     //Not possible to set both
+    m_ObjectPointsInWorldCoordinates.clear();
+  }
+}
+
+void mitk::ClippedSurfaceBoundsCalculator::SetInput( const std::vector<mitk::Point3D> pointlist, mitk::Image *image )
+{
+  if ( !pointlist.empty() && image )
+  {
+    m_Geometry3D = NULL;
+    m_PlaneGeometry = NULL;
+    m_Image = image;
+    m_ObjectPointsInWorldCoordinates = pointlist;
   }
 }
 
@@ -125,6 +144,10 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
     int allSlices = slicedGeometry3D->GetSlices();
     this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry3D->GetGeometry2D(0)));
     this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry3D->GetGeometry2D(allSlices-1)));
+  }
+  else if( !m_ObjectPointsInWorldCoordinates.empty() )
+  {
+    this->CalculateIntersectionPoints( m_ObjectPointsInWorldCoordinates );
   }
 }
 
@@ -285,7 +308,47 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
             this->m_MinMaxOutput[dim].second = ROUND_P(intersectionIndexPoint[dim]);     //set new value
         }
       }
+
+      this->EnforceImageBounds();
     }
   }
 }
+
+void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints( PointListType pointList )
+{
+  PointListType::iterator pointIterator;
+
+  mitk::SlicedGeometry3D::Pointer imageGeometry = m_Image->GetSlicedGeometry();
+
+
+  for ( pointIterator = pointList.begin(); pointIterator != pointList.end(); pointIterator++ )
+  {
+    mitk::Point3D pntInIndexCoordinates;
+    imageGeometry->WorldToIndex( (*pointIterator), pntInIndexCoordinates );
+
+    m_MinMaxOutput[0].first = pntInIndexCoordinates[0] < m_MinMaxOutput[0].first ? ROUND_P(pntInIndexCoordinates[0]) : m_MinMaxOutput[0].first;
+    m_MinMaxOutput[0].second = pntInIndexCoordinates[0] > m_MinMaxOutput[0].second ? ROUND_P(pntInIndexCoordinates[0]) : m_MinMaxOutput[0].second;
+
+    m_MinMaxOutput[1].first = pntInIndexCoordinates[1] < m_MinMaxOutput[1].first ? ROUND_P(pntInIndexCoordinates[1]) : m_MinMaxOutput[1].first;
+    m_MinMaxOutput[1].second = pntInIndexCoordinates[1] > m_MinMaxOutput[1].second ? ROUND_P(pntInIndexCoordinates[1]) : m_MinMaxOutput[1].second;
+
+    m_MinMaxOutput[2].first = pntInIndexCoordinates[2] < m_MinMaxOutput[2].first ? ROUND_P(pntInIndexCoordinates[2]) : m_MinMaxOutput[2].first;
+    m_MinMaxOutput[2].second = pntInIndexCoordinates[2] > m_MinMaxOutput[2].second ? ROUND_P(pntInIndexCoordinates[2]) : m_MinMaxOutput[2].second;
+  }
+
+  this->EnforceImageBounds();
+
+}
+
+void mitk::ClippedSurfaceBoundsCalculator::EnforceImageBounds()
+{
+  m_MinMaxOutput[0].first = std::max( m_MinMaxOutput[0].first, 0 );
+  m_MinMaxOutput[1].first = std::max( m_MinMaxOutput[1].first, 0 );
+  m_MinMaxOutput[2].first = std::max( m_MinMaxOutput[2].first, 0 );
+
+  m_MinMaxOutput[0].second = std::min( m_MinMaxOutput[0].second, (int) m_Image->GetDimension(0)-1 );
+  m_MinMaxOutput[1].second = std::min( m_MinMaxOutput[1].second, (int) m_Image->GetDimension(1)-1 );
+  m_MinMaxOutput[2].second = std::min( m_MinMaxOutput[2].second, (int) m_Image->GetDimension(2)-1 );
+}
+
 

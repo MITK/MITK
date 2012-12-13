@@ -651,7 +651,7 @@ int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double
     mitk::Point2D point;
     point[0] = posX;
     point[1] = posY;
-    TransformOpenGLPointToViewport(point);
+    point = TransformOpenGLPointToViewport(point);
 
     vtkTextActor* textActor = vtkTextActor::New();
 

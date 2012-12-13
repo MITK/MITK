@@ -241,6 +241,8 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   {
     if (m_TextCollection.size() > 0)
     {
+      m_TextRenderer->SetViewport( this->GetVtkRenderer()->GetViewport() );
+
       for (TextMapType::iterator it = m_TextCollection.begin(); it != m_TextCollection.end() ; it++)
         m_TextRenderer->AddViewProp((*it).second);
       m_TextRenderer->Render();

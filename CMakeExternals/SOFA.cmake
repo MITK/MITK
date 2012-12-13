@@ -172,20 +172,20 @@ message(STATUS \"extracting... done\")")
   set(md5 "25e078187ce57b96357f4d713856a195")
 
   write_downloadfile_script(
-    "${stamp_dir}/download-cmake.cmake"
+    "${stamp_dir}/download-patch.cmake"
     "${url_base}${file}"
     "${download_dir}/${file}"
     "${md5}"
   )
 
   write_extractfile_script(
-    "${stamp_dir}/extract-cmake.cmake"
+    "${stamp_dir}/extract-patch.cmake"
     "${download_dir}/${file}"
     "${source_dir}"
   )
 
-  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-cmake.cmake)
-  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-cmake.cmake)
+  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-patch.cmake)
+  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-patch.cmake)
 
   set(file "sofa-cmake-1.0-rc1.zip")
   set(md5 "41fc95b1a51a404c28eac5860932b017")

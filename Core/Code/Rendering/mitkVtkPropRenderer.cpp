@@ -338,11 +338,18 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
       -1.0, 1.0
       );
 
-  // scale OpenGL contents to (VTK) viewport
-  float windowWidth = GetDisplayGeometry()->GetSizeInDisplayUnits()[0];
-  float windowHeight = GetDisplayGeometry()->GetSizeInDisplayUnits()[1];
+  const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
 
-  glScalef(iViewport[2]/windowWidth, iViewport[3]/windowHeight, 1.0);
+  float windowWidth = displayGeometry->GetSizeInDisplayUnits()[0];
+  float windowHeight = displayGeometry->GetSizeInDisplayUnits()[1];
+
+  float viewportHeight = iViewport[3]; // seemingly right
+
+  float translateX = (iViewport[2] - iViewport[3]) / 2.0 - (windowWidth - windowHeight)/2.0;
+  float zoom = viewportHeight / windowHeight;
+
+  glTranslatef( translateX, 0, 0.0);
+  glScalef( zoom, zoom, 1.0 );
 
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
@@ -631,6 +638,8 @@ mitk::DataNode *
 
 
 
+
+
 /*!
 \brief Writes some 2D text as overlay. Function returns an unique int Text_ID for each call, which can be used via the GetTextLabelProperty(int text_id) function
 in order to get a vtkTextProperty. This property enables the setup of font, font size, etc.
@@ -639,10 +648,16 @@ int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double
 {
   if(text.size() > 0)
   {
+    mitk::Point2D point;
+    point[0] = posX;
+    point[1] = posY;
+    TransformOpenGLPointToViewport(point);
+
     vtkTextActor* textActor = vtkTextActor::New();
 
-    textActor->SetPosition(posX,posY);
+    textActor->SetPosition(point[0],point[1]);
     textActor->SetInput(text.c_str());
+    textActor->SetTextScaleModeToNone();
     textActor->GetTextProperty()->SetColor(color1, color2, color3); //TODO: Read color from node property
     textActor->GetTextProperty()->SetOpacity( opacity );
     int text_id = m_TextCollection.size();
@@ -944,4 +959,26 @@ void mitk::VtkPropRenderer::AdjustCameraToScene(){
       this->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
     }
   }
+}
+
+mitk::Point2D mitk::VtkPropRenderer::TransformOpenGLPointToViewport( mitk::Point2D point )
+{
+  GLint iViewport[4];
+  // Get a copy of the viewport
+  glGetIntegerv( GL_VIEWPORT, iViewport );
+  const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
+
+  float windowWidth = displayGeometry->GetSizeInDisplayUnits()[0];
+  float windowHeight = displayGeometry->GetSizeInDisplayUnits()[1];
+
+  float viewportHeight = iViewport[3]; // seemingly right
+
+  float translateX = (iViewport[2] - iViewport[3]) / 2.0 - (windowWidth - windowHeight)/2.0;
+  float zoom = viewportHeight / windowHeight;
+
+  point[0] += translateX;
+  point[0] *= zoom;
+  point[1] *= zoom;
+
+  return point;
 }

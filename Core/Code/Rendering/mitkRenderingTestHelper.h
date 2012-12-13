@@ -72,6 +72,12 @@ public:
     mitk::DataStorage::Pointer GetDataStorage();
 protected:
 
+    /** @brief Prints the opengl information, e.g. version, vendor and extensions,
+     *         This function can only be called after an opengl context is active.
+     *         It only prints the context after the vtkRenderwindow is fully initialized.
+     **/
+    void PrintGLInfo();
+
     /** @brief This method tries to load the given file into a member datastorage, in order to render it.
         @param fileName The filename of the file to be loaded (including path).
     **/

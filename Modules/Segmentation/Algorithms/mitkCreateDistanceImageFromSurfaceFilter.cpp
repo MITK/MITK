@@ -209,9 +209,13 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   // index-coordinates (must not be less than 1) and multiply it with the
   // spacing of the reference-image.
   Vector3D extentMM;
-  extentMM[0] = ( std::max(abs(maxPointInIndexCoordinates[0] - minPointInIndexCoordinates[0]), (long) 1) ) * m_ReferenceImage->GetSpacing()[0];
-  extentMM[1] = ( std::max(abs(maxPointInIndexCoordinates[1] - minPointInIndexCoordinates[1]), (long) 1) ) * m_ReferenceImage->GetSpacing()[1];
-  extentMM[2] = ( std::max(abs(maxPointInIndexCoordinates[2] - minPointInIndexCoordinates[2]), (long) 1) ) * m_ReferenceImage->GetSpacing()[2];
+  for (unsigned int dim = 0; dim < 3; ++dim)
+  {
+    extentMM[dim] = std::max( std::abs(maxPointInIndexCoordinates[dim] - minPointInIndexCoordinates[dim]),
+                              (DistanceImageType::IndexType::IndexValueType) 1
+                            )
+                    * m_ReferenceImage->GetSpacing()[dim];
+  }
 
   /*
   * Now create an empty distance image. The create image will always have the same sizeOfRegion, independent from

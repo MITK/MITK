@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,12 +26,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMarchingCubes.h>
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
+#include "mitkImageWriter.h"
+#include "mitkSurfaceVtkWriter.h"
+#include "mitkImageToSurfaceFilter.h"
 
 #include "itkTimeProbe.h"
 #include "itkResampleImageFilter.h"
 #include "itkInvertIntensityImageFilter.h"
 #include "itkBinaryThresholdImageFilter.h"
 #include "mitkImageAccessByItk.h"
+
+#include "mitkImageCast.h"
+
 
 mitk::PlanarFigureSegmentationController::PlanarFigureSegmentationController()
 : itk::Object()
@@ -122,7 +128,7 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
 //      PlanarFigureListType::iterator whereIter = m_PlanarFigureList.begin();
 //      whereIter += indexOfFigure;
 //      m_PlanarFigureList.erase( whereIter );
-//  
+//
 //      SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
 //      surfaceIter += indexOfFigure;
 //      m_SurfaceList.erase( surfaceIter );
@@ -130,12 +136,12 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
   else
   {
     // this is not very nice! If the figure that has been removed is NOT the last
-    // one in the list we have to create new filters and add all remaining 
+    // one in the list we have to create new filters and add all remaining
     // inputs again.
-    // 
-    // Has to be done as the filters do not work when removing an input 
+    //
+    // Has to be done as the filters do not work when removing an input
     // other than the last one.
-    
+
     // create new filters
     InitializeFilters();
 
@@ -172,20 +178,44 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
     return m_SegmentationAsImage;
   }
 
+  itk::Image<double, 3>::Pointer itkImage;
+  CastToItkImage( m_ReferenceImage, itkImage );
+  m_DistanceImageCreator->SetReferenceImage( itkImage );
+
   m_ReduceFilter->Update();
   m_NormalsFilter->Update();
   m_DistanceImageCreator->Update();
 
   mitk::Image::Pointer distanceImage = m_DistanceImageCreator->GetOutput();
 
-  vtkSmartPointer<vtkMarchingCubes> marchingCubes = vtkMarchingCubes::New();
-  marchingCubes->SetInput( distanceImage->GetVtkImageData() );
-  marchingCubes->SetValue(0,0);
-  marchingCubes->Update();
+  // If this bool flag is true, the distanceImage will be written to the
+  // filesystem as nrrd-image and as surface-representation.
+  bool debugOutput(false);
+  if ( debugOutput )
+  {
+    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
+    imageWriter->SetInput( distanceImage );
+    imageWriter->SetExtension( ".nrrd" );
+    imageWriter->SetFileName( "v:/DistanceImage" );
+    imageWriter->Update();
+  }
 
-  mitk::Surface::Pointer segmentationAsSurface = mitk::Surface::New();
-  segmentationAsSurface->SetVtkPolyData(marchingCubes->GetOutput());
-  segmentationAsSurface->GetGeometry()->SetOrigin( distanceImage->GetGeometry()->GetOrigin() );
+  mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
+  imageToSurfaceFilter->SetInput( distanceImage );
+  imageToSurfaceFilter->SetThreshold( 0 );
+  imageToSurfaceFilter->Update();
+
+  mitk::Surface::Pointer segmentationAsSurface = imageToSurfaceFilter->GetOutput();
+
+  if ( debugOutput )
+  {
+    mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer surfaceWriter = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
+    surfaceWriter->SetInput( segmentationAsSurface );
+    surfaceWriter->SetExtension( ".vtk" );
+    surfaceWriter->SetFileName( "v:/DistanceImageAsSurface.vtk" );
+    surfaceWriter->Update();
+  }
+
 
   mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
   surfaceToImageFilter->SetInput( segmentationAsSurface );
@@ -240,7 +270,7 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
 //     mitk::Point2D polyLinePoint = figure->GetControlPoint(i);
 //     mitk::Point3D pointInWorldCoordiantes;
 //     figureGeometry->Map( polyLinePoint, pointInWorldCoordiantes );
-// 
+//
 //     // and add them as new points to the vtkPoints
 //     points->InsertNextPoint( pointInWorldCoordiantes[0], pointInWorldCoordiantes[1], pointInWorldCoordiantes[2] );
 //     ++pointCounter;
@@ -278,4 +308,5 @@ void mitk::PlanarFigureSegmentationController::InitializeFilters()
   m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
   m_DistanceImageCreator = mitk::CreateDistanceImageFromSurfaceFilter::New();
 }
+
 

@@ -132,26 +132,23 @@ message(STATUS \"extracting... done\")")
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-modules.cmake)
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-modules.cmake)
 
-  if(MSVC OR APPLE)
+  if(MSVC)
     if(MSVC90)
       if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(file "sofa-dependencies-win64-msvc-2008-1.0-rc1.zip")
-        set(md5 "11bc875da23e2f4e8f8094bf136d19ea")
+        set(md5 "5aaf89c36bbd6b87f8c5784a505bf789")
       else()
         set(file "sofa-dependencies-win32-msvc-2008-1.0-rc1.zip")
-        set(md5 "de1fedeb6468e1938857ceb07abc26fb")
+        set(md5 "b4240694393bd5014f1870a394e84d38")
       endif()
     elseif(MSVC10)
       if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(file "dependencies-win64-msvc-2010-1.0-rc1.zip")
-        set(md5 "a6901ebe20752c5bd6a00d43df6f150e")
+        set(md5 "57014882593b28e3b3e5a4fa85803776")
       else()
         set(file "dependencies-win32-msvc-2010-1.0-rc1.zip")
-        set(md5 "c720994e5dedc186176b0bb711a0d5d3")
+        set(md5 "b6de57312d36d5bd56980ef0284b9ab9")
       endif()
-    elseif(APPLE)
-      set(file "sofa-dependencies-mac-1.0-rc1.zip")
-      set(md5 "e93402fbf596693880007921985ddaea")
     endif()
 
     write_downloadfile_script(
@@ -171,8 +168,27 @@ message(STATUS \"extracting... done\")")
     list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-dependencies.cmake)
   endif()
 
+  set(file "sofa-patch-1.0-rc1.zip")
+  set(md5 "25e078187ce57b96357f4d713856a195")
+
+  write_downloadfile_script(
+    "${stamp_dir}/download-cmake.cmake"
+    "${url_base}${file}"
+    "${download_dir}/${file}"
+    "${md5}"
+  )
+
+  write_extractfile_script(
+    "${stamp_dir}/extract-cmake.cmake"
+    "${download_dir}/${file}"
+    "${source_dir}"
+  )
+
+  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-cmake.cmake)
+  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-cmake.cmake)
+
   set(file "sofa-cmake-1.0-rc1.zip")
-  set(md5 "10b35b4101ac655abaa51547f7356a84")
+  set(md5 "41fc95b1a51a404c28eac5860932b017")
 
   write_downloadfile_script(
     "${stamp_dir}/download-cmake.cmake"

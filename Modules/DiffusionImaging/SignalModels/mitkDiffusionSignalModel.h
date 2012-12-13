@@ -51,6 +51,21 @@ public:
     double GetRelaxationT2() { return m_RelaxationT2; }
     ScalarType GetSignalScale() { return m_SignalScale; }
     int GetNumGradients(){ return m_GradientList.size(); }
+    std::vector< int > GetBaselineIndices()
+    {
+        std::vector< int > result;
+        for( unsigned int i=0; i<this->m_GradientList.size(); i++)
+            if (m_GradientList.at(i).GetNorm()<0.0001)
+                result.push_back(i);
+        return result;
+    }
+    int GetFirstBaselineIndex()
+    {
+        for( unsigned int i=0; i<this->m_GradientList.size(); i++)
+            if (m_GradientList.at(i).GetNorm()<0.0001)
+                return i;
+        return -1;
+    }
 
 protected:
 

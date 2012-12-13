@@ -363,6 +363,7 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
             d->m_DataNodeToPlanarFigureData.find(nodes->at(x));
         d->m_DataNodeToPlanarFigureData.erase( it2 );// removing planar figure from tracked figure list
         PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
+        EnableCrosshairNavigation();
       }
     }
   }

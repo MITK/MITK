@@ -196,15 +196,24 @@ void QmitkFiberfoxView::OnFlipButton()
 QmitkFiberfoxView::GradientListType QmitkFiberfoxView::GenerateHalfShell(int NPoints)
 {
     NPoints *= 2;
+    GradientListType pointshell;
+
+    int numB0 = NPoints/10;
+    if (numB0==0)
+        numB0=1;
+    GradientType g;
+    g.Fill(0.0);
+    for (int i=0; i<numB0; i++)
+        pointshell.push_back(g);
+
+    if (NPoints==0)
+        return pointshell;
+
     vnl_vector<double> theta; theta.set_size(NPoints);
-
     vnl_vector<double> phi; phi.set_size(NPoints);
-
     double C = sqrt(4*M_PI);
-
     phi(0) = 0.0;
     phi(NPoints-1) = 0.0;
-
     for(int i=0; i<NPoints; i++)
     {
         theta(i) = acos(-1.0+2.0*i/(NPoints-1.0)) - M_PI / 2.0;
@@ -215,16 +224,6 @@ QmitkFiberfoxView::GradientListType QmitkFiberfoxView::GenerateHalfShell(int NPo
             // % (2*DIST_POINTSHELL_PI);
         }
     }
-
-    GradientListType pointshell;
-
-    int numB0 = NPoints/10;
-    if (numB0==0)
-        numB0=1;
-    GradientType g;
-    g.Fill(0.0);
-    for (int i=0; i<numB0; i++)
-        pointshell.push_back(g);
 
     for(int i=0; i<NPoints; i++)
     {

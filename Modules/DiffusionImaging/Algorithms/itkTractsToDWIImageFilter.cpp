@@ -208,11 +208,15 @@ void TractsToDWIImageFilter::GenerateData()
     if (m_NonFiberModels.empty())
         itkExceptionMacro("No diffusion model for non-fiber compartments defined!");
 
+    int baselineIndex = m_FiberModels[0]->GetFirstBaselineIndex();
+    if (baselineIndex<0)
+        itkExceptionMacro("No baseline index found!");
+
     // determine k-space undersampling
     for (int i=0; i<m_KspaceArtifacts.size(); i++)
         if ( dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i)) )
             m_Upsampling = dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i))->GetKspaceCropping();
-    if (m_Upsampling<=1)
+    if (m_Upsampling<1)
         m_Upsampling = 1;
 
     if (m_TissueMask.IsNotNull())
@@ -459,8 +463,8 @@ void TractsToDWIImageFilter::GenerateData()
                                 doubleDwi->SetPixel(newIdx, doubleDwi->GetPixel(newIdx) + frac*m_FiberModels[k]->SimulateMeasurement());
 
                                 DoubleDwiType::PixelType pix = doubleDwi->GetPixel(newIdx);
-                                if (pix[0]>maxFiberDensity)
-                                    maxFiberDensity = pix[0];
+                                if (pix[baselineIndex]>maxFiberDensity)
+                                    maxFiberDensity = pix[baselineIndex];
                             }
                         }
                     }
@@ -495,7 +499,7 @@ void TractsToDWIImageFilter::GenerateData()
             if (it3.Get()>0)
             {
                 // compartment weights are calculated according to fiber density
-                double w = compartments.at(0)->GetPixel(index)[0]/maxFiberDensity;
+                double w = compartments.at(0)->GetPixel(index)[baselineIndex]/maxFiberDensity;
                 if (m_EnforcePureFiberVoxels && w>0)
                     w = 1;
 
@@ -504,8 +508,8 @@ void TractsToDWIImageFilter::GenerateData()
                 {
                     DoubleDwiType::Pointer doubleDwi = compartments.at(i);
                     DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
-                    if (pix[0]>0)
-                        pix /= pix[0];
+                    if (pix[baselineIndex]>0)
+                        pix /= pix[baselineIndex];
                     pix *= w/m_FiberModels.size();
                     doubleDwi->SetPixel(index, pix);
                 }
@@ -515,8 +519,8 @@ void TractsToDWIImageFilter::GenerateData()
                 {
                     DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
                     DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
-                    if (pix[0]>0)
-                        pix /= pix[0];
+                    if (pix[baselineIndex]>0)
+                        pix /= pix[baselineIndex];
                     pix *= (1-w)/m_NonFiberModels.size();
                     doubleDwi->SetPixel(index, pix);
                 }

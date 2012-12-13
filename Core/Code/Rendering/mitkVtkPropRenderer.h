@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,7 +39,7 @@ class vtkTextProperty;
 class vtkAssemblyPath;
 
 
-namespace mitk 
+namespace mitk
 {
 
 class Mapper;
@@ -67,7 +67,7 @@ public:
 
   mitkClassMacro(VtkPropRenderer,BaseRenderer);
   mitkNewMacro3Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager* );
-  
+
   typedef std::map<int,Mapper*> MappersMapType;
 
   // Render - called by vtkMitkRenderProp, returns the number of props rendered
@@ -101,6 +101,9 @@ public:
 
   // Simple text rendering method
   int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0, float opacity = 1.0);
+
+  mitk::Point2D TransformOpenGLPointToViewport( mitk::Point2D point );
+
   vtkTextProperty * GetTextLabelProperty(int text_id);
 
   // Initialization / geometry handling

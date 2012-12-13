@@ -20,10 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkActor.h>
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>
+#include <vtkImageReader2.h>
+#include <vtkImageReader2Factory.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
+#include <vtkTexture.h>
 
 mitk::SimulationModel::SimulationModel()
   : m_LastTime(-1.0),
@@ -35,6 +38,7 @@ mitk::SimulationModel::SimulationModel()
 
 mitk::SimulationModel::~SimulationModel()
 {
+  this->DeleteVtkTextures();
   this->DeleteVtkObjects();
 }
 
@@ -49,6 +53,14 @@ void mitk::SimulationModel::DeleteVtkObjects()
     (*actor)->Delete();
 
   m_Actors.clear();
+}
+
+void mitk::SimulationModel::DeleteVtkTextures()
+{
+  for (std::map<unsigned int, vtkTexture*>::const_iterator texture = m_Textures.begin(); texture != m_Textures.end(); ++texture)
+    texture->second->Delete();
+
+  m_Textures.clear();
 }
 
 void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualParams* vparams, bool transparent)
@@ -104,7 +116,6 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
 
   vtkFloatArray* vtkNormals = vtkFloatArray::New();
   vtkNormals->SetNumberOfComponents(3);
-  vtkNormals->SetName("Normals");
 
   for (unsigned int i = 0; i < numNormals; ++i)
     vtkNormals->InsertNextTuple(normals[i].elems);
@@ -113,6 +124,26 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
 
   vtkNormals->Delete();
 
+  sofa::core::loader::Material m = g.materialId >= 0
+    ? materials.getValue()[g.materialId]
+    : material.getValue();
+
+  if (m.useTexture && m.activated)
+  {
+    const sofa::defaulttype::ResizableExtVector<TexCoord>& texCoords = this->getVtexcoords();
+    unsigned int numTexCoords = texCoords.size();
+
+    vtkFloatArray* vtkTexCoords = vtkFloatArray::New();
+    vtkTexCoords->SetNumberOfComponents(2);
+
+    for (unsigned int i = 0; i < numTexCoords; ++i)
+      vtkTexCoords->InsertNextTuple(texCoords[i].elems);
+
+    polyData->GetPointData()->SetTCoords(vtkTexCoords);
+
+    vtkTexCoords->Delete();
+  }
+
   vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
   polyDataMapper->SetInput(polyData);
 
@@ -120,9 +151,8 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
-  sofa::core::loader::Material m = g.materialId >= 0
-    ? materials.getValue()[g.materialId]
-    : material.getValue();
+  if (m.useTexture && m.activated)
+    actor->SetTexture(m_Textures[g.materialId]);
 
   sofa::defaulttype::Vec4f ambient = !m.useAmbient
     ? sofa::defaulttype::Vec4f()
@@ -150,6 +180,7 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
 
   property->SetAmbientColor(ambient.x(), ambient.y(), ambient.z());
   property->SetDiffuseColor(diffuse.x(), diffuse.y(), diffuse.z());
+  property->SetSpecular(1.0);
   property->SetSpecularColor(specular.x(), specular.y(), specular.z());
   property->SetSpecularPower(shininess);
 
@@ -240,4 +271,54 @@ void mitk::SimulationModel::internalDraw(const sofa::core::visual::VisualParams*
     for (unsigned int i = 0; i < groups.size(); ++i)
       this->DrawGroup(i, vparams, transparent);
   }
+}
+
+bool mitk::SimulationModel::loadTexture(const std::string& filename)
+{
+  return false;
+}
+
+bool mitk::SimulationModel::loadTextures()
+{
+  this->DeleteVtkTextures();
+
+  std::vector<unsigned int> activatedTextures;
+
+  const sofa::helper::vector<sofa::core::loader::Material>& materials = this->materials.getValue();
+  unsigned int numMaterials = materials.size();
+
+  for (unsigned int i = 0; i < numMaterials; ++i)
+  {
+    const sofa::core::loader::Material& material = materials[i];
+
+    if (material.useTexture && material.activated)
+      activatedTextures.push_back(i);
+  }
+
+  unsigned int numActivatedTextures = activatedTextures.size();
+
+  for (unsigned int i = 0; i < numActivatedTextures; ++i)
+  {
+    std::string textureFilename = materials[activatedTextures[i]].textureFilename;
+
+    if (!sofa::helper::system::DataRepository.findFile(textureFilename))
+      return false;
+
+    vtkImageReader2* imageReader = vtkImageReader2Factory::CreateImageReader2(textureFilename.c_str());
+
+    if (imageReader == NULL)
+      return false;
+
+    imageReader->SetFileName(textureFilename.c_str());
+
+    vtkTexture* texture = vtkTexture::New();
+    texture->SetInput(imageReader->GetOutputDataObject(0));
+    texture->InterpolateOn();
+
+    imageReader->Delete();
+
+    m_Textures.insert(std::make_pair(activatedTextures[i], texture));
+  }
+
+  return true;
 }

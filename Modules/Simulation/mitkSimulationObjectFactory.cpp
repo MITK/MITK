@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulation.h"
 #include "mitkSimulationMapper3D.h"
 #include "mitkSimulationObjectFactory.h"
-#include "mitkSimulationLight.h"
-#include "mitkSimulationLightManager.h"
 #include "mitkSimulationModel.h"
 #include <mitkCoreObjectFactory.h>
 #include <sofa/component/init.h>
@@ -37,16 +35,9 @@ mitk::SimulationObjectFactory::SimulationObjectFactory()
   sofa::component::init();
   sofa::simulation::xml::initXml();
 
-  int SimulationLightClass = sofa::core::RegisterObject("").add<SimulationLight>();
-  sofa::core::ObjectFactory::AddAlias("DirectionalLight", "SimulationLight", true);
-  sofa::core::ObjectFactory::AddAlias("PositionalLight", "SimulationLight", true);
-  sofa::core::ObjectFactory::AddAlias("SpotLight", "SimulationLight", true);
-
-  int SimulationLightManagerClass = sofa::core::RegisterObject("").add<SimulationLightManager>();
-  sofa::core::ObjectFactory::AddAlias("LightManager", "SimulationLightManager", true);
-
   int SimulationModelClass = sofa::core::RegisterObject("").add<SimulationModel>();
   sofa::core::ObjectFactory::AddAlias("OglModel", "SimulationModel", true);
+  sofa::core::ObjectFactory::AddAlias("VisualModel", "SimulationModel", true);
 }
 
 mitk::SimulationObjectFactory::~SimulationObjectFactory()

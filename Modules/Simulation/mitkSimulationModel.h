@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class vtkActor;
 class vtkObjectBase;
+class vtkTexture;
 
 namespace mitk
 {
@@ -31,6 +32,9 @@ namespace mitk
     SOFA_CLASS(SimulationModel, sofa::component::visualmodel::VisualModelImpl);
 
     std::vector<vtkActor*> GetActors() const;
+
+    bool loadTexture(const std::string& filename);
+    bool loadTextures();
 
   protected:
     void internalDraw(const sofa::core::visual::VisualParams* vparams, bool transparent);
@@ -43,10 +47,12 @@ namespace mitk
     MyType& operator=(const MyType&);
 
     void DeleteVtkObjects();
+    void DeleteVtkTextures();
     void DrawGroup(int ig, const sofa::core::visual::VisualParams* vparams, bool transparent);
 
     std::vector<vtkObjectBase*> m_VtkObjects;
     std::vector<vtkActor*> m_Actors;
+    std::map<unsigned int, vtkTexture*> m_Textures;
 
     double m_LastTime;
     bool m_LastShowNormals;

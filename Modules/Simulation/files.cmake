@@ -6,7 +6,5 @@ set(CPP_FILES
   mitkSimulationMapper3D.cpp
   mitkSimulationReader.cpp
   mitkSimulationObjectFactory.cpp
-  mitkSimulationLight.cpp
-  mitkSimulationLightManager.cpp
   mitkSimulationModel.cpp
 )

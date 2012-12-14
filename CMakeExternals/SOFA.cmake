@@ -169,7 +169,7 @@ message(STATUS \"extracting... done\")")
   endif()
 
   set(file "sofa-patch-1.0-rc1.zip")
-  set(md5 "25e078187ce57b96357f4d713856a195")
+  set(md5 "b6c112c94dbca92ca5bec894e9bfa18e")
 
   write_downloadfile_script(
     "${stamp_dir}/download-patch.cmake"

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 , m_LayoutIndex(0)
 {
   Initialize( renderingManager, name.toStdString().c_str() ); // Initialize mitkRenderWindowBase
- 
+
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
 
@@ -46,7 +46,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 QmitkRenderWindow::~QmitkRenderWindow()
 {
   Destroy(); // Destroy mitkRenderWindowBase
- 
+
 }
 
 void QmitkRenderWindow::SetResendQtEvents(bool resend)
@@ -62,7 +62,7 @@ void QmitkRenderWindow::SetLayoutIndex( unsigned int layoutIndex )
 }
 
 unsigned int QmitkRenderWindow::GetLayoutIndex()
-{ 
+{
   if( m_MenuWidget )
     return m_MenuWidget->GetLayoutIndex();
   else
@@ -70,17 +70,18 @@ unsigned int QmitkRenderWindow::GetLayoutIndex()
 }
 
 void QmitkRenderWindow::LayoutDesignListChanged( int layoutDesignIndex )
-{ 
-  if( m_MenuWidget ) 
-    m_MenuWidget->UpdateLayoutDesignList( layoutDesignIndex );  
+{
+  if( m_MenuWidget )
+    m_MenuWidget->UpdateLayoutDesignList( layoutDesignIndex );
 }
 
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 {
   mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
   this->mousePressMitkEvent(&myevent);
-  
-  QVTKWidget::mousePressEvent(me);
+
+  // temp hack for bug 9432, don't let QVTKWidget generate rendering requests (in some kind of way)
+  //QVTKWidget::mousePressEvent(me);
 
   if (m_ResendQtEvents) me->ignore();
 }
@@ -89,8 +90,9 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 {
   mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
   this->mouseReleaseMitkEvent(&myevent);
-  
-  QVTKWidget::mouseReleaseEvent(me);
+
+  // temp hack for bug 9432, don't let QVTKWidget generate rendering requests (in some kind of way)
+  //QVTKWidget::mouseReleaseEvent(me);
 
   if (m_ResendQtEvents) me->ignore();
 }
@@ -99,18 +101,19 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
   this->AdjustRenderWindowMenuVisibility( me->pos() );
 
-  
+
   mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
   this->mouseMoveMitkEvent(&myevent);
-  
-  QVTKWidget::mouseMoveEvent(me);
+
+  // temp hack for bug 9432, don't let QVTKWidget generate rendering requests (in some kind of way)
+  //QVTKWidget::mouseMoveEvent(me);
 
   //if (m_ResendQtEvents) me->ignore();
   ////Show/Hide Menu Widget
   //if( m_MenuWidgetActivated )
   //{
   //  //Show Menu Widget when mouse is inside of the define region of the top right corner
-  //  if( m_MenuWidget->GetLayoutIndex() <= QmitkRenderWindowMenu::CORONAL 
+  //  if( m_MenuWidget->GetLayoutIndex() <= QmitkRenderWindowMenu::CORONAL
   //    && me->pos().x() >= 0
   //    && me->pos().y() <= m_MenuWidget->height() + 20 )
   //  {
@@ -118,8 +121,8 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   //    m_MenuWidget->show();
   //    m_MenuWidget->update();
   //  }
-  //  else if( m_MenuWidget->GetLayoutIndex() == QmitkRenderWindowMenu::THREE_D  
-  //    && me->pos().x() >= this->width() - m_MenuWidget->width() - 20 
+  //  else if( m_MenuWidget->GetLayoutIndex() == QmitkRenderWindowMenu::THREE_D
+  //    && me->pos().x() >= this->width() - m_MenuWidget->width() - 20
   //    && me->pos().y() <= m_MenuWidget->height() + 20 )
   //  {
   //    m_MenuWidget->MoveWidgetToCorrectPos(1.0);
@@ -130,7 +133,7 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   //  else if( !m_MenuWidget->GetSettingsMenuVisibilty() )
   //  {
   //    m_MenuWidget->hide();
-  //  }    
+  //  }
   //}
 }
 
@@ -139,9 +142,10 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   mitk::WheelEvent myevent(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
   this->wheelMitkEvent(&myevent);
 
-  QVTKWidget::wheelEvent(we);
+  // temp hack for bug 9432, don't let QVTKWidget generate rendering requests (in some kind of way)
+  //QVTKWidget::wheelEvent(we);
 
-  if (m_ResendQtEvents) 
+  if (m_ResendQtEvents)
     we->ignore();
 }
 
@@ -152,7 +156,8 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   this->keyPressMitkEvent(&mke);
   ke->accept();
 
-  QVTKWidget::keyPressEvent(ke);
+  // temp hack for bug 9432, don't let QVTKWidget generate rendering requests (in some kind of way)
+  //QVTKWidget::keyPressEvent(ke);
 
   if (m_ResendQtEvents) ke->ignore();
 }
@@ -175,9 +180,9 @@ void QmitkRenderWindow::DeferredHideMenu( )
 void QmitkRenderWindow::leaveEvent( QEvent *e )
 {
   MITK_DEBUG << "QmitkRenderWindow::leaveEvent";
-  
+
   if( m_MenuWidget )
-    m_MenuWidget->smoothHide();  
+    m_MenuWidget->smoothHide();
 
   QVTKWidget::leaveEvent(e);
 }
@@ -191,7 +196,7 @@ void QmitkRenderWindow::paintEvent(QPaintEvent* /*event*/)
 void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
 {
   this->resizeMitkEvent(event->size().width(), event->size().height());
-  
+
   QVTKWidget::resizeEvent(event);
 
   emit resized();
@@ -273,7 +278,7 @@ void QmitkRenderWindow::FullScreenMode(bool state)
 {
   if( m_MenuWidget )
     m_MenuWidget->ChangeFullScreenMode( state );
-}  
+}
 
 
 void QmitkRenderWindow::dragEnterEvent( QDragEnterEvent *event )

@@ -673,6 +673,12 @@ void mitk::BaseRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk:
 
 void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent * we)
 {
+  BaseRendererMapType::iterator brIter;
+  for( brIter = baseRendererMap.begin(); brIter != baseRendererMap.end(); brIter++ )
+  {
+    (*brIter).second->GetRenderingManager()->ExecutePendingRequests();
+  }
+
   if(m_MapperID==1)
   {
     Point2D p(we->GetDisplayPosition());

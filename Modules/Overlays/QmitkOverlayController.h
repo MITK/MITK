@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,9 +37,9 @@ class QmitkRenderWindow;
 *
 * This controller manages all QmitkOverlays of one QmitkRenderWindow.
 *
-* When constructed, it creates one QWidget for each possible display-position and sets the 
+* When constructed, it creates one QWidget for each possible display-position and sets the
 * appropriate attributes and layouts.
-* 
+*
 * It is possible to add new Overlays using AddOverlay( QmitkOverlay ).
 * This overlay will be added to the correct Widget according to its destined position (stored in QmitkOverlay).
 * If this widget already holds an overlay, the layer-property is taken into account. If no layer has been set,
@@ -47,7 +47,7 @@ class QmitkRenderWindow;
 *
 * It is possible to set the visibility of all overlays at a time using SetOverlayVisibility(bool).
 *
-* RenderWindow specific properties can be set using the internal mitk::PropertyList. This propertyList and the 
+* RenderWindow specific properties can be set using the internal mitk::PropertyList. This propertyList and the
 * 'default' propertyList of the RenderingManager will be concatenated before the overlay is set up.
 * If one property exists in both propertyLists, the one in the QmitkOverlayController will be used!
 *
@@ -58,7 +58,7 @@ class QmitkRenderWindow;
 
 class Overlays_EXPORT QmitkOverlayController : public QObject
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
 
@@ -88,7 +88,7 @@ public:
   * \brief getter for the RenderWindow-specific PropertyList
   */
   mitk::PropertyList* GetPropertyList();
-  
+
   /**
   * \brief setter for the RenderWindow-specific PropertyList
   */
@@ -99,14 +99,20 @@ public slots :
     /**
     * \brief adjusts the position of all overlays to the position of the RenderWindow
     *
-    * This method updates the position of all Widgets according to the position of the RenderWindow 
+    * This method updates the position of all Widgets according to the position of the RenderWindow
     * and the extend of the overlays.
     */
-    void AdjustOverlayPosition();
+    void AdjustAllOverlayPosition();
+
+    void AdjustOverlayPosition( QmitkOverlay::DisplayPosition displayPosition );
 
     void UpdateAllOverlays();
 
     void UpdateOverlayData( QmitkOverlay* overlay );
+
+signals:
+
+    void InternalAdjustOverlayPosition( QmitkOverlay::DisplayPosition );
 
 
 protected:
@@ -125,14 +131,14 @@ protected:
   * \brief re-aligning the overlays - not implemented yet
   */
   virtual void AlignOverlays();
- 
+
   /**
   * \brief initializes one QWidget - internally used by InitializeOverlayLayout()
   */
   void InitializeWidget( QmitkOverlay::DisplayPosition pos );
- 
+
   void RestackOverlays( QmitkOverlay::DisplayPosition pos );
- 
+
 
   typedef std::map< QmitkOverlay::DisplayPosition, QWidget* > OverlayPositionMap;
   typedef std::vector< QmitkOverlay* > OverlayVector;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkTextOverlay::QmitkTextOverlay( const char* id )
 : QmitkOverlay(id)
+, m_ObservedProperty( NULL )
 , m_ObserverTag(0)
 {
   m_Widget = m_Label = new QLabel();
@@ -63,8 +64,11 @@ void QmitkTextOverlay::UpdateDisplayedTextFromProperties()
   {
     MITK_DEBUG << "Property " << m_Id << " could not be found";
   }
-  m_Label->setText( text.c_str() );
-  m_Label->repaint();
+  if ( text != m_Label->text().toStdString() )
+  {
+    m_Label->setText( text.c_str() );
+    m_Label->repaint();
+  }
 }
 
 
@@ -78,7 +82,7 @@ void QmitkTextOverlay::UpdateFontProperties( mitk::PropertyList::Pointer pl )
   QFont font = QFont();
 
   // get the desired color of the textOverlays
-  mitk::ColorProperty::Pointer colorProp = 
+  mitk::ColorProperty::Pointer colorProp =
     dynamic_cast<mitk::ColorProperty*>( propertyList->GetProperty( "overlay.color" ) );
 
   if ( colorProp.IsNull() )
@@ -98,18 +102,18 @@ void QmitkTextOverlay::UpdateFontProperties( mitk::PropertyList::Pointer pl )
   //if ( opacityProperty.IsNull() )
   //{
   //  m_Label->setWindowOpacity( 1 );
-  //} 
+  //}
   //else
   //{
   //  m_Label->setWindowOpacity( opacityProperty->GetValue() );
   //}
-  
+
    //set the desired font-size of the overlays
   int fontSize = 0;
   if ( !propertyList->GetIntProperty( "overlay.fontSize", fontSize ) )
   {
     fontSize = 9.5;
-  } 
+  }
   font.setPointSize( fontSize );
 
   bool useKerning = false;
@@ -131,15 +135,23 @@ void QmitkTextOverlay::UpdateFontProperties( mitk::PropertyList::Pointer pl )
 
 void QmitkTextOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
 {
-  if ( prop.IsNotNull() )
+  if ( m_ObservedProperty != prop && m_ObserverTag == 0 )
   {
-    prop->RemoveObserver(m_ObserverTag);
+    if ( prop.IsNotNull() )
+    {
+      if ( m_ObservedProperty.IsNotNull() )
+      {
+        m_ObservedProperty->RemoveObserver( m_ObserverTag );
+      }
 
-    typedef itk::SimpleMemberCommand< QmitkTextOverlay > MemberCommandType;
-    MemberCommandType::Pointer propModifiedCommand;
-    propModifiedCommand = MemberCommandType::New();
-    propModifiedCommand->SetCallbackFunction( this, &QmitkTextOverlay::UpdateDisplayedTextFromProperties );
-    m_ObserverTag = prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
+      typedef itk::SimpleMemberCommand< QmitkTextOverlay > MemberCommandType;
+      MemberCommandType::Pointer propModifiedCommand;
+      propModifiedCommand = MemberCommandType::New();
+      propModifiedCommand->SetCallbackFunction( this, &QmitkTextOverlay::UpdateDisplayedTextFromProperties );
+      m_ObserverTag = prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
+    }
+
+    m_ObservedProperty = prop;
   }
   else
   {

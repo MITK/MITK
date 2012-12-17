@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -55,8 +55,8 @@ See LICENSE.txt or http://www.mitk.org for details.
     *
     * First, this method sets text-overlay specific properties as described in the class docu above.
     * Secondly, the actual text of the label is set.
-    * 
-    * \WARNING No error will be issued if the property containing the text is not found, the TextOverlay 
+    *
+    * \WARNING No error will be issued if the property containing the text is not found, the TextOverlay
     * will show an empty string!
     */
     virtual void GenerateData( mitk::PropertyList::Pointer );
@@ -66,19 +66,21 @@ See LICENSE.txt or http://www.mitk.org for details.
     /**
     * \brief internal helper class to determine text-properties
     *
-    * This method is only used internally to apply the text specific properties that can be set 
+    * This method is only used internally to apply the text specific properties that can be set
     * using a mitk::PropertyList. If a property cannot be found, a default value is used.
     *
     * The values of these properties are then attributed to the label using QFont and QPalette.
-    */ 
+    */
     void GetProperties( mitk::PropertyList::Pointer );
-   
+
     void SetupCallback( mitk::BaseProperty::Pointer prop );
-   
+
     void SetScaleFactor();
 
     /** \brief QWidget internally representing the TextOverlay */
-    QmitkScalarBar* m_ScalarBar;  
+    QmitkScalarBar* m_ScalarBar;
+
+    mitk::BaseProperty::Pointer m_ObservedProperty;
 
     mitk::PropertyList::Pointer m_PropertyList;
     unsigned long m_ObserverTag;

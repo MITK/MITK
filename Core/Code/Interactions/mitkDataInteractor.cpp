@@ -66,3 +66,8 @@ mitk::DataInteractor::~DataInteractor()
     m_DataNode = NULL;
   }
 }
+
+void mitk::DataInteractor::ConnectActionsAndFunctions()
+{
+  MITK_WARN << "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
+}

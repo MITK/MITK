@@ -349,19 +349,18 @@ mitk::MouseButtons QmitkRenderWindow::GetButtonState(QMouseEvent* me)
 {
   mitk::MouseButtons buttonState = mitk::NoButton;
 
-  if (me->buttons() == Qt::LeftButton)
-  {
-    buttonState = buttonState | mitk::RightMouseButton;
-  }
-  if (me->buttons() == Qt::RightButton)
+  if (me->buttons() & Qt::LeftButton)
   {
     buttonState = buttonState | mitk::LeftMouseButton;
   }
-  if (me->buttons() == Qt::MiddleButton)
+  if (me->buttons() & Qt::RightButton)
+  {
+    buttonState = buttonState | mitk::RightMouseButton;
+  }
+  if (me->buttons() & Qt::MiddleButton)
   {
     buttonState = buttonState | mitk::MiddleMouseButton;
   }
-
   return buttonState;
 }
 
@@ -369,19 +368,18 @@ mitk::ModifierKeys QmitkRenderWindow::GetModifiers(QMouseEvent* me)
 {
   mitk::ModifierKeys modifiers = mitk::NoKey;
 
-  if (me->modifiers() == Qt::ALT)
+  if (me->modifiers() & Qt::ALT)
   {
     modifiers = modifiers | mitk::AltKey;
   }
-  if (me->modifiers() == Qt::CTRL)
+  if (me->modifiers() & Qt::CTRL)
   {
     modifiers = modifiers | mitk::ControlKey;
   }
-  if (me->modifiers() == Qt::SHIFT)
+  if (me->modifiers() & Qt::SHIFT)
   {
     modifiers = modifiers | mitk::ShiftKey;
   }
-
   return modifiers;
 }
 
@@ -389,19 +387,18 @@ mitk::MouseButtons QmitkRenderWindow::GetButtonState(QWheelEvent* we)
 {
   mitk::MouseButtons buttonState = mitk::NoButton;
 
-  if (we->buttons() == Qt::LeftButton)
+  if (we->buttons() & Qt::LeftButton)
   {
     buttonState = buttonState | mitk::RightMouseButton;
   }
-  if (we->buttons() == Qt::RightButton)
+  if (we->buttons() & Qt::RightButton)
   {
     buttonState = buttonState | mitk::LeftMouseButton;
   }
-  if (we->buttons() == Qt::MiddleButton)
+  if (we->buttons() & Qt::MiddleButton)
   {
     buttonState = buttonState | mitk::MiddleMouseButton;
   }
-
   return buttonState;
 }
 
@@ -409,15 +406,15 @@ mitk::ModifierKeys QmitkRenderWindow::GetModifiers(QWheelEvent* we)
 {
   mitk::ModifierKeys modifiers = mitk::NoKey;
 
-  if (we->modifiers() == Qt::ALT)
+  if (we->modifiers() & Qt::ALT)
   {
     modifiers = modifiers | mitk::AltKey;
   }
-  if (we->modifiers() == Qt::CTRL)
+  if (we->modifiers() & Qt::CTRL)
   {
     modifiers = modifiers | mitk::ControlKey;
   }
-  if (we->modifiers() == Qt::SHIFT)
+  if (we->modifiers() & Qt::SHIFT)
   {
     modifiers = modifiers | mitk::ShiftKey;
   }

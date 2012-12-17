@@ -61,7 +61,8 @@ int mitkEventConfigTest(int /*argc*/, char* /*argv*/[])
    */
 
   mitk::Point2D pos;
-  mitk::MousePressEvent::Pointer mpe1 = mitk::MousePressEvent::New(NULL,pos,mitk::MiddleMouseButton,mitk::ControlKey | mitk::AltKey,mitk::LeftMouseButton );
+  mitk::MousePressEvent::Pointer mpe1 = mitk::MousePressEvent::New(NULL,pos,mitk::MiddleMouseButton | mitk::LeftMouseButton ,mitk::ControlKey | mitk::AltKey,mitk::LeftMouseButton  );
+  mitk::MousePressEvent::Pointer standard1 = mitk::MousePressEvent::New(NULL,pos,mitk::LeftMouseButton,mitk::NoKey ,mitk::LeftMouseButton );
   mitk::MouseMoveEvent::Pointer mme1 = mitk::MouseMoveEvent::New(NULL,pos,mitk::RightMouseButton | mitk::LeftMouseButton,mitk::ShiftKey );
   mitk::MouseMoveEvent::Pointer mme2 = mitk::MouseMoveEvent::New(NULL,pos,mitk::RightMouseButton,mitk::ShiftKey );
   mitk::MouseWheelEvent::Pointer mwe1 = mitk::MouseWheelEvent::New(NULL,pos,mitk::RightMouseButton,mitk::ShiftKey,-2 );
@@ -70,6 +71,7 @@ int mitkEventConfigTest(int /*argc*/, char* /*argv*/[])
 
   MITK_TEST_CONDITION_REQUIRED(
        smc->GetMappedEvent(mpe1.GetPointer()) == "Variant1" &&
+       smc->GetMappedEvent(standard1.GetPointer()) == "Standard1" &&
        smc->GetMappedEvent(mme1.GetPointer()) == "Move2" &&
        smc->GetMappedEvent(ke.GetPointer()) == "Key1" &&
        smc->GetMappedEvent(mme2.GetPointer()) == "" // does not exist in file

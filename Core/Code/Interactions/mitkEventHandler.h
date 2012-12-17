@@ -37,12 +37,12 @@ namespace mitk
   public:
     mitkClassMacro(EventHandler, itk::Object);
     itkNewMacro(Self);
+    virtual bool LoadEventConfig();
+    virtual bool LoadEventConfig(std::string filename);
 
   protected:
     EventHandler();
     virtual ~EventHandler();
-    virtual bool LoadEventConfig();
-    virtual bool LoadEventConfig(std::string filename);
     std::string GetMappedEvent(InteractionEvent* interactionEvent);
 
   private:

@@ -39,7 +39,7 @@ namespace mitk
   class MITK_CORE_EXPORT TActionFunctor
   {
   public:
-    virtual bool DoAction(StateMachineAction*, const InteractionEvent*)=0;
+    virtual bool DoAction(StateMachineAction*, InteractionEvent*)=0;
     virtual ~TActionFunctor()
     {
     }
@@ -54,7 +54,7 @@ namespace mitk
   {
   public:
 
-    TSpecificActionFunctor(T* object, bool (T::*memberFunctionPointer)(StateMachineAction*, const InteractionEvent*)) :
+    TSpecificActionFunctor(T* object, bool (T::*memberFunctionPointer)(StateMachineAction*, InteractionEvent*)) :
         m_Object(object), m_MemberFunctionPointer(memberFunctionPointer)
     {
     }
@@ -62,14 +62,14 @@ namespace mitk
     virtual ~TSpecificActionFunctor()
     {
     }
-    virtual bool DoAction(StateMachineAction* action, const InteractionEvent* event)
+    virtual bool DoAction(StateMachineAction* action, InteractionEvent* event)
     {
       return (*m_Object.*m_MemberFunctionPointer)(action, event);// executes member function
     }
 
   private:
     T* m_Object;
-    bool (T::*m_MemberFunctionPointer)(StateMachineAction*, const InteractionEvent*);
+    bool (T::*m_MemberFunctionPointer)(StateMachineAction*, InteractionEvent*);
   };
 
 
@@ -77,7 +77,7 @@ namespace mitk
    *  It assumes that there is a typedef Classname Self in classes that use this macro, as is provided by e.g. mitkClassMacro
    */
 #define CONNECT_FUNCTION(a, f) \
-    EventStateMachine::AddActionFunction(a, new TSpecificStateMachineFunctor<Self>(this, &Self::f));
+    EventStateMachine::AddActionFunction(a, new TSpecificActionFunctor<Self>(this, &Self::f));
 
   /**
    * Super-class that provides the functionality of a StateMachine for DataInteractors.
@@ -103,6 +103,7 @@ namespace mitk
      * If a transition is associated with multiple actions - "false" is returned if ALL action return false,
      * and the event is treated as HANDLED even though some actions might not have been executed! So be sure that all actions that occur within
      * one transitions have the same conditions.
+     * TODO: fixme description
      */
     bool HandleEvent(InteractionEvent* event);
 
@@ -114,11 +115,28 @@ namespace mitk
      */
     void AddActionFunction(std::string action, TActionFunctor* functor);
 
+
+    /**
+     * Is called after loading a statemachine.
+     * Overwrite this function in specific interactor implementations.
+     * Connect actions and functions using the  CONNECT_FUNCTION macro within this function.
+     */
+
+    virtual void ConnectActionsAndFunctions();
+
     /**
      * Looks up function that is associated with action and executes it.
      * To implement your own execution scheme overwrite this in your DataInteractor.
      */
-    virtual bool ExecuteAction(StateMachineAction* action, InteractionEvent* stateEvent);
+    virtual bool ExecuteAction(StateMachineAction* action, InteractionEvent* interactionEvent);
+
+    /**
+     * [Implementation Optional]
+     * Overwrite this function to check if Pointer is over a data object with which interaction is possible.
+     * This helps structuring the code, but helps to keep the decision of executing a transition on statemachine level.
+     * A possible implementation could be:
+     */
+    virtual bool IsPointerOverData(InteractionEvent* interactionEvent);
 
 
   private:

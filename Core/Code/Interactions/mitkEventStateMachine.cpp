@@ -36,6 +36,10 @@ void mitk::EventStateMachine::LoadStateMachine(std::string filename)
   m_StateMachineContainer = StateMachineContainer::New();
   m_StateMachineContainer->LoadBehavior(filename);
   m_CurrentState = m_StateMachineContainer->GetStartState();
+
+  // clear actions map ,and connect all actions as declared in sub-class
+  m_ActionFunctionsMap.clear();
+  ConnectActionsAndFunctions();
 }
 
 mitk::EventStateMachine::~EventStateMachine()
@@ -66,7 +70,13 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event)
     bool success = false;
     for (ActionVectorType::iterator it = actions.begin(); it != actions.end(); ++it)
     {
-      success |= ExecuteAction(*it,event); // treat an event as handled if at least one of the actions is executed successfully
+
+      success |= ExecuteAction(*it, event); // treat an event as handled if at least one of the actions is executed successfully
+    }
+    if (success)
+    {
+      // perform state change
+      m_CurrentState = transition->GetNextState();
     }
     return success;
   }
@@ -74,6 +84,11 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event)
   {
     return false; // no transition found that matches event
   }
+}
+
+void mitk::EventStateMachine::ConnectActionsAndFunctions()
+{
+  MITK_WARN<< "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
 }
 
 bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, InteractionEvent* event)
@@ -90,4 +105,10 @@ bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, Interact
   }
   bool retVal = actionFunction->DoAction(action, event);
   return retVal;
+}
+
+bool mitk::EventStateMachine::IsPointerOverData(InteractionEvent* interactionEvent)
+{
+  interactionEvent->GetEventClass(); // dummy
+  return true;
 }

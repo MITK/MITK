@@ -137,6 +137,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
   }
 
+
   // Key
   if (!list->GetStringProperty(KEY.c_str(), strKey))
   {
@@ -164,6 +165,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
 
   if (eventClass == "MousePressEvent")
   {
+    // buttonstates incorporate the event button (as in Qt)
+    buttonState = buttonState | eventButton;
     event = MousePressEvent::New(NULL, pos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "MouseMoveEvent")

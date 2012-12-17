@@ -16,23 +16,31 @@
 
 #include "mitkStandaloneDataStorage.h"
 #include "mitkDataNode.h"
-#include "mitkInteractor.h"
-#include "mitkDataInteractor.h"
+#include "mitkTestInteractor.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkTestingMacros.h"
 #include "mitkGlobalInteraction.h"
+#include "mitkMousePressEvent.h"
+#include "mitkMouseMoveEvent.h"
+#include "mitkInteractionEventConst.h"
 
-int mitkDispatcherTest(int /*argc*/, char* /*argv*/[])
+int mitkDataInteractorTest(int /*argc*/, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("Dispatcher")
+  MITK_TEST_BEGIN("DataInteractor")
 
   /*
-   * Tests the process of creating Interactors and assigning DataNodes to them.
-   * Test checks if these Interactors are added to the Dispatcher under different conditions,
-   * and in different call order.
+   * Objective: Testing the processing of user input by DataInteractors
+   *
+   * by     creating Renderer,DataStorage,DataNode and DataInteractor
+   *        registering DataNode with Interactor, then
+   *
+   *        sending user input to the Dispatcher, and
+   *
+   * check  if DataNode changes according to user input and statemachine.
+   *
    */
 
-  // Global interaction must(!) be initialized if used
+  // Global interaction must(!) be initialized if used, needed for RenderWindow
   mitk  ::GlobalInteraction::GetInstance()->Initialize("global");
 
   // Here BindDispatcherInteractor and Dispatcher should be created automatically
@@ -42,78 +50,36 @@ int mitkDispatcherTest(int /*argc*/, char* /*argv*/[])
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   mitk::DataNode::Pointer dn = mitk::DataNode::New();
   mitk::DataNode::Pointer dn2 = mitk::DataNode::New();
-  mitk::DataInteractor::Pointer ei = mitk::DataInteractor::New();
-  mitk::DataInteractor::Pointer ei2 = mitk::DataInteractor::New();
+  mitk::TestInteractor::Pointer interactor = mitk::TestInteractor::New();
 
-
-  MITK_TEST_CONDITION_REQUIRED(
-      renderer->GetDispatcher()->GetNumberOfInteractors() == 0
-      , "01 Check Existence of Dispatcher." );
-
-  ei->SetDataNode(dn);
+  interactor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/AddAndRemovePoints.xml");
+  interactor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+  interactor->SetDataNode(dn);
   renderer->SetDataStorage(ds);
   ds->Add(dn);
 
-  int num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(
-      num == 1
-      , "02 Number of registered Interactors " << num << " , expected 1" );
+  // Now generate events and see if interactor reacts:
 
-  // This _must not_ result in additionally registered interactors.
-  ei->SetDataNode(dn);
-  ei->SetDataNode(dn);
+    mitk::MouseButtons buttonStates = mitk::NoButton;
+    mitk::MouseButtons eventButton = mitk::LeftMouseButton;
+    mitk::ModifierKeys modifiers = mitk::NoKey;
 
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(
-      num == 1
-      , "03 Number of registered Interactors " << num << " , expected 1" );
+    mitk::Point2D point;
+    point[0] = 17;
+    point[1] = 170;
 
-  // Switching the DataNode of an Interactor also must not result in extra registered Interactors in Dispatcher
-  // since dn2 is not connected to DataStorage
-  // ei would still reveive dispatcher events for ds 1 !! TODO: FiXMe?
-  ei->SetDataNode(dn2);
+    // MousePress Events
+    mitk::MousePressEvent::Pointer me1 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
+    mitk::MouseMoveEvent::Pointer mm1 = mitk::MouseMoveEvent::New(renderer,point, buttonStates, modifiers);
+    renderer->GetDispatcher()->ProcessEvent(me1.GetPointer());
+    renderer->GetDispatcher()->ProcessEvent(me1.GetPointer());
+    renderer->GetDispatcher()->ProcessEvent(mm1.GetPointer());
+    renderer->GetDispatcher()->ProcessEvent(me1.GetPointer());
+    renderer->GetDispatcher()->ProcessEvent(me1.GetPointer());
 
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(
-      num == 1
-      , "04 Number of registered Interactors " << num << " , expected 1" );
-
-  // DataNode Added to DataStorage, now Interactor entry in Dispatcher should be replaced,
-  // hence no additional Interactor in the Dispatcher
-  ds->Add(dn2);
-
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(
-      num == 1
-      , "05 Number of registered Interactors " << num << " , expected 1" );
-
-  // New DataNode and new interactor, this should result in additional Interactor in the Dispatcher.
-
-  ei2->SetDataNode(dn);
-
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(
-      num == 2
-      , "06 Number of registered Interactors " << num << " , expected 2" );
-
-  // Here ei and ei2 point to the same dn2; dn2 now only points to ei2, so ei is abandoned,
-  // therefore ei1 is expected to be removed
-
-  ei2->SetDataNode(dn2);
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(
-      num == 1
-      , "07 Number of registered Interactors " << num << " , expected 1" );
-
-  // Setting DataNode in Interactor to NULL, should remove Interactor from Dispatcher
-  ei2->SetDataNode(NULL);
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(
-      num == 0
-      , "08 Number of registered Interactors " << num << " , expected 0" );
 
   renWin->Delete();
-  // always end with this!
+
   MITK_TEST_END()
 
 }

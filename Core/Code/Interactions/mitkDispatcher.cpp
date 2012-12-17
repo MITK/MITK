@@ -65,11 +65,13 @@ mitk::Dispatcher::~Dispatcher()
 
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
+//  MITK_INFO << "Event received " << event->GetEventClass();
   InteractionEvent::Pointer p = event;
   m_Interactors.sort(); // sorts interactors by layer (descending);
   for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end(); ++it)
   {
-    if ((*it)->HandleEvent(event)) {
+    if ((*it)->HandleEvent(event))
+    {
       return true;
     }
   }

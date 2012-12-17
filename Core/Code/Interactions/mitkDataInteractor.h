@@ -26,6 +26,11 @@
 
 namespace mitk
 {
+  /** Base class from with data interactors are to be derived.
+   * Provides an interface that is relevant for the interactor to work together with the dispatcher.
+   * To implement a new interactor overwrite the ConnectActionsAndFunctions to connect the actions.
+   */
+
   class DataNode;
   class MITK_CORE_EXPORT DataInteractor: public EventStateMachine
   {
@@ -50,6 +55,7 @@ namespace mitk
   protected:
     DataInteractor();
     virtual ~DataInteractor();
+    virtual void ConnectActionsAndFunctions();
 
   private:
     NodeType m_DataNode;

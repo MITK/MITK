@@ -332,6 +332,7 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
 {
   OnInterpolationActivated(status);
+  m_Interpolator->Activate2DInterpolation(status);
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationEnabled(bool status)

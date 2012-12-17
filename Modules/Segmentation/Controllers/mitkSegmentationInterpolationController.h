@@ -137,6 +137,11 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
     void OnImageModified(const itk::EventObject&);
 
+    /**
+     * Activate/Deactivate the 2D interpolation.
+    */
+    void Activate2DInterpolation(bool);
+
   protected:
 
     /**
@@ -193,6 +198,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     Image::ConstPointer m_Segmentation;
     Image::ConstPointer m_ReferenceImage;
     bool m_BlockModified;
+    bool m_2DInterpolationActivated;
 };
 
 } // namespace

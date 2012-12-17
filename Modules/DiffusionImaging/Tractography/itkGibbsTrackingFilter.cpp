@@ -262,6 +262,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     catch(...)
     {
         MITK_ERROR  << "Particle grid allocation failed. Not enough memory? Try to increase the particle length.";
+        m_IsInValidState = false;
         m_AbortTracking = true;
         m_BuildFibers = false;
         return;

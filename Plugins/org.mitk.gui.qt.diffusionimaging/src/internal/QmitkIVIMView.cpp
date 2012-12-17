@@ -456,6 +456,9 @@ void QmitkIVIMView::FittIVIMStart()
 
 void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
 {
+    if(!m_Visible)
+        return;
+
     m_Controls->m_Warning->setVisible(false);
     if(!m_Controls || m_DiffusionImageNode.IsNull())
         return;

@@ -334,7 +334,18 @@ bool CompareLayer(mitk::DataNode::Pointer i,mitk::DataNode::Pointer j)
 void QmitkFiberfoxView::GenerateFibers()
 {
     if (m_SelectedBundles.empty())
-        return;
+    {
+        if (m_SelectedFiducial.IsNull())
+            return;
+
+        mitk::DataStorage::SetOfObjects::ConstPointer parents = GetDataStorage()->GetSources(m_SelectedFiducial);
+        for( mitk::DataStorage::SetOfObjects::const_iterator it = parents->begin(); it != parents->end(); ++it )
+            if(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()))
+                m_SelectedBundles.push_back(*it);
+
+        if (m_SelectedBundles.empty())
+            return;
+    }
 
     vector< vector< mitk::PlanarEllipse::Pointer > > fiducials;
     vector< vector< unsigned int > > fliplist;
@@ -681,7 +692,7 @@ void QmitkFiberfoxView::UpdateGui()
     else
         m_Controls->m_FlipButton->setEnabled(false);
 
-    if (m_SelectedImage.IsNotNull())
+    if (m_SelectedImage.IsNotNull() || m_SelectedBundle.IsNotNull())
     {
         m_Controls->m_CircleButton->setEnabled(true);
         m_Controls->m_FiberGenMessage->setVisible(false);

@@ -43,7 +43,7 @@
           <string notr="true">color: rgb(255, 0, 0);</string>
          </property>
          <property name="text">
-          <string>Please select an image to draw the fiber fiducials. If you can't provide a suitable image, generate one using the &quot;Signal Generation&quot; tab.</string>
+          <string>Please select an image or an existing fiber bundle to draw the fiber fiducials. If you can't provide a suitable image, generate one using the &quot;Signal Generation&quot; tab.</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>

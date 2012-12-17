@@ -158,7 +158,11 @@ void mitk::SimulationDrawTool::drawLines(const std::vector<Vector3>& points, con
   unsigned int numIndices = indices.size();
 
   for (unsigned int i = 0; i < numIndices; ++i)
-    lines->InsertNextCell(2, indices[i].elems);
+  {
+    lines->InsertNextCell(2);
+    lines->InsertCellPoint(indices[i].elems[0]);
+    lines->InsertCellPoint(indices[i].elems[1]);
+  }
 
   polyData->SetLines(lines);
 
@@ -202,8 +206,10 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   for (unsigned int i = 0; i < points.size(); i += 3)
   {
-    vtkIdType triangle[] = { i, i + 1, i + 2 };
-    triangles->InsertNextCell(3, triangle);
+    triangles->InsertNextCell(3);
+    triangles->InsertCellPoint(i);
+    triangles->InsertCellPoint(i + 1);
+    triangles->InsertCellPoint(i + 2);
   }
 
   polyData->SetPolys(triangles);
@@ -256,8 +262,10 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   for (unsigned int i = 0; i < points.size(); i += 3)
   {
-    vtkIdType triangle[] = { i, i + 1, i + 2 };
-    triangles->InsertNextCell(3, triangle);
+    triangles->InsertNextCell(3);
+    triangles->InsertCellPoint(i);
+    triangles->InsertCellPoint(i + 1);
+    triangles->InsertCellPoint(i + 2);
   }
 
   polyData->SetPolys(triangles);
@@ -316,7 +324,12 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
   unsigned int numIndices = indices.size();
 
   for (unsigned int i = 0; i < numIndices; ++i)
-    triangles->InsertNextCell(3, indices[i].elems);
+  {
+    triangles->InsertNextCell(3);
+    triangles->InsertCellPoint(indices[i].elems[0]);
+    triangles->InsertCellPoint(indices[i].elems[1]);
+    triangles->InsertCellPoint(indices[i].elems[2]);
+  }
 
   polyData->SetPolys(triangles);
 
@@ -353,15 +366,15 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
   m_Actors.push_back(actor);
 }
 
-void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points, const std::vector<Vector3>& normals, const std::vector<Vec4f>& colors)
+void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>&, const std::vector<Vector3>&, const std::vector<Vec4f>&)
 {
 }
 
-void mitk::SimulationDrawTool::drawTriangleStrip(const std::vector<Vector3>& points, const std::vector<Vector3>& normals, const Vec4f color)
+void mitk::SimulationDrawTool::drawTriangleStrip(const std::vector<Vector3>&, const std::vector<Vector3>&, const Vec4f)
 {
 }
 
-void mitk::SimulationDrawTool::drawTriangleFan(const std::vector<Vector3>& points, const std::vector<Vector3>& normals, const Vec4f color)
+void mitk::SimulationDrawTool::drawTriangleFan(const std::vector<Vector3>&, const std::vector<Vector3>&, const Vec4f)
 {
 }
 
@@ -511,7 +524,7 @@ void mitk::SimulationDrawTool::drawCone(const Vector3& point1, const Vector3& po
   m_Actors.push_back(actor);
 }
 
-void mitk::SimulationDrawTool::drawCube(const float& edgeRadius, const Vec4f& color, const int& subdivisions)
+void mitk::SimulationDrawTool::drawCube(const float&, const Vec4f&, const int&)
 {
 }
 
@@ -544,23 +557,23 @@ void mitk::SimulationDrawTool::drawPlus(const float& edgeRadius, const Vec4f& co
   this->drawCylinder(Vector3(0.0, 0.0, -1.0), Vector3(0.0, 0.0, 1.0), edgeRadius, color, subdivisions);
 }
 
-void mitk::SimulationDrawTool::drawPoint(const Vector3& position, const Vec4f& color)
+void mitk::SimulationDrawTool::drawPoint(const Vector3&, const Vec4f&)
 {
 }
 
-void mitk::SimulationDrawTool::drawPoint(const Vector3& position, const Vector3& normal, const Vec4f& color)
+void mitk::SimulationDrawTool::drawPoint(const Vector3&, const Vector3&, const Vec4f&)
 {
 }
 
-void mitk::SimulationDrawTool::drawTriangle(const Vector3& point1, const Vector3& point2, const Vector3& point3, const Vector3& normal, const Vec4f& color)
+void mitk::SimulationDrawTool::drawTriangle(const Vector3&, const Vector3&, const Vector3&, const Vector3&, const Vec4f&)
 {
 }
 
-void mitk::SimulationDrawTool::drawTriangle(const Vector3& point1, const Vector3& point2, const Vector3& point3, const Vector3& normal, const Vec4f& color1, const Vec4f& color2, const Vec4f& color3)
+void mitk::SimulationDrawTool::drawTriangle(const Vector3&, const Vector3&, const Vector3&, const Vector3&, const Vec4f&, const Vec4f&, const Vec4f&)
 {
 }
 
-void mitk::SimulationDrawTool::drawSphere(const Vector3& position, float radius)
+void mitk::SimulationDrawTool::drawSphere(const Vector3&, float)
 {
 }
 
@@ -572,19 +585,19 @@ void mitk::SimulationDrawTool::popMatrix()
 {
 }
 
-void mitk::SimulationDrawTool::multMatrix(float* matrix)
+void mitk::SimulationDrawTool::multMatrix(float*)
 {
 }
 
-void mitk::SimulationDrawTool::scale(float factor)
+void mitk::SimulationDrawTool::scale(float)
 {
 }
 
-void mitk::SimulationDrawTool::setMaterial(const Vec4f& color, std::string name)
+void mitk::SimulationDrawTool::setMaterial(const Vec4f&, std::string)
 {
 }
 
-void mitk::SimulationDrawTool::resetMaterial(const Vec4f& color, std::string name)
+void mitk::SimulationDrawTool::resetMaterial(const Vec4f&, std::string)
 {
 }
 
@@ -597,7 +610,7 @@ void mitk::SimulationDrawTool::setPolygonMode(int mode, bool wireframe)
   m_Wireframe = wireframe;
 }
 
-void mitk::SimulationDrawTool::setLightingEnabled(bool isEnabled)
+void mitk::SimulationDrawTool::setLightingEnabled(bool)
 {
 }
 

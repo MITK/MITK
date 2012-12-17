@@ -102,10 +102,21 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   int numQuads = g.quad0 + g.nbq;
 
   for (int i = g.tri0; i < numTriangles; ++i)
-    polys->InsertNextCell(3, reinterpret_cast<const vtkIdType*>(triangles[i].elems));
+  {
+    polys->InsertNextCell(3);
+    polys->InsertCellPoint(triangles[i].elems[0]);
+    polys->InsertCellPoint(triangles[i].elems[1]);
+    polys->InsertCellPoint(triangles[i].elems[2]);
+  }
 
   for (int i = g.quad0; i < numQuads; ++i)
-    polys->InsertNextCell(4, reinterpret_cast<const vtkIdType*>(quads[i].elems));
+  {
+    polys->InsertNextCell(4);
+    polys->InsertCellPoint(quads[i].elems[0]);
+    polys->InsertCellPoint(quads[i].elems[1]);
+    polys->InsertCellPoint(quads[i].elems[2]);
+    polys->InsertCellPoint(quads[i].elems[3]);
+  }
 
   polyData->SetPolys(polys);
 
@@ -207,8 +218,9 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
     points->SetPoint(j, vertices[i].elems);
     points->SetPoint(k, (vertices[i] + normals[i]).elems);
 
-    vtkIdType line[] = { j, k };
-    lines->InsertNextCell(2, line);
+    lines->InsertNextCell(2);
+    lines->InsertCellPoint(j);
+    lines->InsertCellPoint(k);
   }
 
   polyData = vtkPolyData::New();

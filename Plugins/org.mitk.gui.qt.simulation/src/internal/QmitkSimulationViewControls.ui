@@ -159,7 +159,7 @@
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QWidget</extends>
-   <header>qmitkdatastoragecombobox.h</header>
+   <header>QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

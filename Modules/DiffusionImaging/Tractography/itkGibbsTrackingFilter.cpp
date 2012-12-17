@@ -241,7 +241,6 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     // load sphere interpolator to evaluate the ODFs
     SphereInterpolator* interpolator = new SphereInterpolator(m_LutPath);
 
-    MITK_INFO << "GibbsTrackingFilter: 1";
     // handle lookup table not found cases
     if( !interpolator->IsInValidState() )
     {
@@ -250,19 +249,23 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
       m_BuildFibers = false;
       mitkThrow() << "Unable to load lookup tables.";
     }
-    MITK_INFO << "GibbsTrackingFilter: 2";
-
     // initialize the actual tracking components (ParticleGrid, Metropolis Hastings Sampler and Energy Computer)
-    ParticleGrid* particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength, m_ParticleGridCellCapacity);
-
-    MITK_INFO << "GibbsTrackingFilter: 3";
-
-    GibbsEnergyComputer* encomp = new GibbsEnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
-    encomp->SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
-
-    MITK_INFO << "GibbsTrackingFilter: 4";
-
-    MetropolisHastingsSampler* sampler = new MetropolisHastingsSampler(particleGrid, encomp, randGen, m_CurvatureThreshold);
+    ParticleGrid* particleGrid;
+    GibbsEnergyComputer* encomp;
+    MetropolisHastingsSampler* sampler;
+    try{
+        particleGrid = new ParticleGrid(m_MaskImage, m_ParticleLength, m_ParticleGridCellCapacity);
+        encomp = new GibbsEnergyComputer(m_QBallImage, m_MaskImage, particleGrid, interpolator, randGen);
+        encomp->SetParameters(m_ParticleWeight,m_ParticleWidth,m_ConnectionPotential*m_ParticleLength*m_ParticleLength,m_CurvatureThreshold,m_InexBalance,m_ParticlePotential);
+        sampler = new MetropolisHastingsSampler(particleGrid, encomp, randGen, m_CurvatureThreshold);
+    }
+    catch(...)
+    {
+        MITK_ERROR  << "Particle grid allocation failed. Not enough memory? Try to increase the particle length.";
+        m_AbortTracking = true;
+        m_BuildFibers = false;
+        return;
+    }
 
     MITK_INFO << "----------------------------------------";
     MITK_INFO << "Iterations: " << m_Iterations;
@@ -283,6 +286,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     TimeProbe clock; clock.Start();
     m_NumAcceptedFibers = 0;
     unsigned long counter = 1;
+    if (!m_AbortTracking)
     for( m_CurrentStep = 1; m_CurrentStep <= m_Steps; m_CurrentStep++ )
     {
         // update temperatur for simulated annealing process

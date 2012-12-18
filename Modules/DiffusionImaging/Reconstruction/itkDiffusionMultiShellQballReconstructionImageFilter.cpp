@@ -17,22 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __itkDiffusionMultiShellQballReconstructionImageFilter_cpp
 
 #include <itkDiffusionMultiShellQballReconstructionImageFilter.h>
-#include <itkImageRegionConstIterator.h>
-#include <itkImageRegionConstIteratorWithIndex.h>
-#include <itkImageRegionIterator.h>
-#include <itkArray.h>
-#include <vnl/vnl_vector.h>
 
-#include <boost/version.hpp>
-#include <stdio.h>
-#include <locale>
-#include <strstream>
-#include "mitkDiffusionFunctionCollection.h"
-#include "itkPointShell.h"
-#include <memory>
-
-#include <fstream>
-
+#include <itkTimeProbe.h>
+#include <itkPointShell.h>
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace itk {
 
@@ -61,6 +49,73 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   this->SetNumberOfRequiredInputs( 1 );
 }
 
+
+template< class T, class TG, class TO, int L, int NODF>
+void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
+::SetGradientImage( GradientDirectionContainerType *gradientDirection
+                    , const GradientImagesType *gradientImage
+                    , float bvalue)
+{
+  m_BValue = bvalue;
+  m_GradientDirectionContainer = gradientDirection;
+  m_NumberOfBaselineImages = 0;
+
+
+  if(m_BValueMap.size() == 0){
+    itkWarningMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : no GradientIndexMapAvalible");
+
+    GradientDirectionContainerType::ConstIterator gdcit;
+    for( gdcit = m_GradientDirectionContainer->Begin(); gdcit != m_GradientDirectionContainer->End(); ++gdcit)
+    {
+      double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
+      m_BValueMap[bValueKey].push_back(gdcit.Index());
+    }
+
+  }
+  if(m_BValueMap.find(0) == m_BValueMap.end())
+  {
+    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : GradientIndxMap with no b-Zero indecies found: check input BValueMap");
+  }
+
+
+  m_NumberOfBaselineImages = m_BValueMap[0].size();
+  m_NumberOfGradientDirections = gradientDirection->Size() - m_NumberOfBaselineImages;
+  // ensure that the gradient image we received has as many components as
+  // the number of gradient directions
+  if( gradientImage->GetVectorLength() != m_NumberOfBaselineImages + m_NumberOfGradientDirections )
+  {
+    itkExceptionMacro( << m_NumberOfGradientDirections << " gradients + " << m_NumberOfBaselineImages
+                       << "baselines = " << m_NumberOfGradientDirections + m_NumberOfBaselineImages
+                       << " directions specified but image has " << gradientImage->GetVectorLength()
+                       << " components.");
+  }
+
+
+  ProcessObject::SetNthInput( 0, const_cast< GradientImagesType* >(gradientImage) );
+
+  std::string gradientImageClassName(ProcessObject::GetInput(0)->GetNameOfClass());
+  if ( strcmp(gradientImageClassName.c_str(),"VectorImage") != 0 )
+    itkExceptionMacro( << "There is only one Gradient image. I expect that to be a VectorImage. But its of type: " << gradientImageClassName );
+
+
+  m_BZeroImage = BZeroImageType::New();
+  typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
+  m_BZeroImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
+  m_BZeroImage->SetOrigin( img->GetOrigin() );     // Set the image origin
+  m_BZeroImage->SetDirection( img->GetDirection() );  // Set the image direction
+  m_BZeroImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
+  m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
+  m_BZeroImage->Allocate();
+
+  m_CoefficientImage = CoefficientImageType::New();
+  m_CoefficientImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
+  m_CoefficientImage->SetOrigin( img->GetOrigin() );     // Set the image origin
+  m_CoefficientImage->SetDirection( img->GetDirection() );  // Set the image direction
+  m_CoefficientImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
+  m_CoefficientImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
+  m_CoefficientImage->Allocate();
+
+}
 
 template<class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
@@ -321,72 +376,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   }
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::SetGradientImage( GradientDirectionContainerType *gradientDirection
-                    , const GradientImagesType *gradientImage
-                    , float bvalue)
-{
-  m_BValue = bvalue;
-  m_GradientDirectionContainer = gradientDirection;
-  m_NumberOfBaselineImages = 0;
 
-
-  if(m_BValueMap.size() == 0){
-    itkWarningMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : no GradientIndexMapAvalible");
-
-    GradientDirectionContainerType::ConstIterator gdcit;
-    for( gdcit = m_GradientDirectionContainer->Begin(); gdcit != m_GradientDirectionContainer->End(); ++gdcit)
-    {
-      double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
-      m_BValueMap[bValueKey].push_back(gdcit.Index());
-    }
-
-  }
-  if(m_BValueMap.find(0) == m_BValueMap.end())
-  {
-    itkExceptionMacro(<< "DiffusionMultiShellQballReconstructionImageFilter.cpp : GradientIndxMap with no b-Zero indecies found: check input image");
-  }
-
-
-  m_NumberOfBaselineImages = m_BValueMap[0].size();
-  m_NumberOfGradientDirections = gradientDirection->Size() - m_NumberOfBaselineImages;
-  // ensure that the gradient image we received has as many components as
-  // the number of gradient directions
-  if( gradientImage->GetVectorLength() != m_NumberOfBaselineImages + m_NumberOfGradientDirections )
-  {
-    itkExceptionMacro( << m_NumberOfGradientDirections << " gradients + " << m_NumberOfBaselineImages
-                       << "baselines = " << m_NumberOfGradientDirections + m_NumberOfBaselineImages
-                       << " directions specified but image has " << gradientImage->GetVectorLength()
-                       << " components.");
-  }
-
-
-  ProcessObject::SetNthInput( 0, const_cast< GradientImagesType* >(gradientImage) );
-
-  std::string gradientImageClassName(ProcessObject::GetInput(0)->GetNameOfClass());
-  if ( strcmp(gradientImageClassName.c_str(),"VectorImage") != 0 )
-    itkExceptionMacro( << "There is only one Gradient image. I expect that to be a VectorImage. But its of type: " << gradientImageClassName );
-
-
-  m_BZeroImage = BZeroImageType::New();
-  typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
-  m_BZeroImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
-  m_BZeroImage->SetOrigin( img->GetOrigin() );     // Set the image origin
-  m_BZeroImage->SetDirection( img->GetDirection() );  // Set the image direction
-  m_BZeroImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
-  m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
-  m_BZeroImage->Allocate();
-
-  m_CoefficientImage = CoefficientImageType::New();
-  m_CoefficientImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
-  m_CoefficientImage->SetOrigin( img->GetOrigin() );     // Set the image origin
-  m_CoefficientImage->SetDirection( img->GetDirection() );  // Set the image direction
-  m_CoefficientImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
-  m_CoefficientImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
-  m_CoefficientImage->Allocate();
-
-}
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
@@ -432,29 +422,31 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       if(m_Interpolation_Flag)
       {
-        int interp_SHOrder_shell1 = 6;
-        while( ((interp_SHOrder_shell1+1)*(interp_SHOrder_shell1+2)/2) > size_shell1 && interp_SHOrder_shell1 > L )
+        int interp_SHOrder_shell1 = 10;
+        while( ((interp_SHOrder_shell1+1)*(interp_SHOrder_shell1+2)/2) > size_shell1  )
           interp_SHOrder_shell1 -= 2 ;
 
         const int number_coeffs_shell1 = (int)(interp_SHOrder_shell1*interp_SHOrder_shell1 + interp_SHOrder_shell1 + 2.0)/2.0 + interp_SHOrder_shell1;
 
-        int interp_SHOrder_shell2 = 6;
-        while( ((interp_SHOrder_shell2+1)*(interp_SHOrder_shell2+2)/2) > size_shell2 && interp_SHOrder_shell2 > L )
+        int interp_SHOrder_shell2 = 10;
+        while( ((interp_SHOrder_shell2+1)*(interp_SHOrder_shell2+2)/2) > size_shell2  )
           interp_SHOrder_shell2 -= 2 ;
 
         const int number_coeffs_shell2 = (int)(interp_SHOrder_shell2*interp_SHOrder_shell2 + interp_SHOrder_shell2 + 2.0)/2.0 + interp_SHOrder_shell2;
 
-        int interp_SHOrder_shell3 = 6;
-        while( ((interp_SHOrder_shell3+1)*(interp_SHOrder_shell3+2)/2) > size_shell3 && interp_SHOrder_shell3 > L )
+        int interp_SHOrder_shell3 = 10;
+        while( ((interp_SHOrder_shell3+1)*(interp_SHOrder_shell3+2)/2) > size_shell3  )
           interp_SHOrder_shell3 -= 2 ;
 
         const int number_coeffs_shell3 = (int)(interp_SHOrder_shell3*interp_SHOrder_shell3 + interp_SHOrder_shell3 + 2.0)/2.0 + interp_SHOrder_shell3;
 
 
-        MITK_INFO << "Debug Information: Multishell Reconstruction filter - Interpolation";
-        MITK_INFO << "Shell 1 - SHOrder: " << interp_SHOrder_shell1 << " Number of Coeffs: " << number_coeffs_shell1;
-        MITK_INFO << "Shell 2 - SHOrder: " << interp_SHOrder_shell2 << " Number of Coeffs: " << number_coeffs_shell2;
-        MITK_INFO << "Shell 3 - SHOrder: " << interp_SHOrder_shell3 << " Number of Coeffs: " << number_coeffs_shell3;
+        MITK_INFO << "Debug Information: Multishell Reconstruction filter";
+        MITK_INFO << "Wanted SH-Level: " << L;
+        MITK_INFO << "Interpolation";
+        MITK_INFO << "Shell 1 - SHOrder: " << interp_SHOrder_shell1 << " Number Directions " << size_shell1 << " Number of Coeffs: " << number_coeffs_shell1;
+        MITK_INFO << "Shell 2 - SHOrder: " << interp_SHOrder_shell2 << " Number Directions " << size_shell2 << " Number of Coeffs: " << number_coeffs_shell2;
+        MITK_INFO << "Shell 3 - SHOrder: " << interp_SHOrder_shell3 << " Number Directions " << size_shell3 << " Number of Coeffs: " << number_coeffs_shell3;
 
         // Create direction container for all directions (no duplicates, different directions from all shells)
         IndiciesVector  all_directions_container = GetAllDirections();
@@ -462,8 +454,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         m_MaxDirections = all_directions_container.size();
 
         // create target SH-Basis
+        // initialize empty target matrix and set the wanted directions
         vnl_matrix<double> * Q = new vnl_matrix<double>(3, m_MaxDirections);
         ComputeSphericalFromCartesian(Q, all_directions_container);
+        // initialize a SH Basis, neede to interpolate from oldDirs -> newDirs
         m_TARGET_SH_shell1 = new vnl_matrix<double>(m_MaxDirections, number_coeffs_shell1);
         ComputeSphericalHarmonicsBasis(Q, m_TARGET_SH_shell1, interp_SHOrder_shell1);
         delete Q;
@@ -479,23 +473,28 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         m_TARGET_SH_shell3 = new vnl_matrix<double>(m_MaxDirections, number_coeffs_shell3);
         ComputeSphericalHarmonicsBasis(Q, m_TARGET_SH_shell3, interp_SHOrder_shell3);
         delete Q;
-
-
-
         // end creat target SH-Basis
+
+
+
 
         // create measured-SHBasis
         // Shell 1
         vnl_matrix<double> * tempSHBasis;
         vnl_matrix_inverse<double> * temp;
 
+        // initialize empty matrix and set the measured directions of shell1
         Q = new vnl_matrix<double>(3, shell1.size());
         ComputeSphericalFromCartesian(Q, shell1);
-
+        // initialize a SH Basis, need to get the coeffs from measuredShell
         tempSHBasis = new vnl_matrix<double>(shell1.size(), number_coeffs_shell1);
         ComputeSphericalHarmonicsBasis(Q, tempSHBasis, interp_SHOrder_shell1);
-        temp = new vnl_matrix_inverse<double>((*tempSHBasis));
+        // inversion of the SH=Basis
+        // c_s1 = B^-1 * shell1
+        // interp_Values = targetSHBasis * c_s1
 
+        // Values = m_TARGET_SH_shell1 * Interpolation_SHT1_inv * DataShell1;
+        temp = new vnl_matrix_inverse<double>((*tempSHBasis));
         m_Interpolation_SHT1_inv = new vnl_matrix<double>(temp->inverse());
 
         delete Q;
@@ -559,6 +558,7 @@ template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int NumberOfThreads)
 {
+
   itk::TimeProbe clock;
   clock.Start();
   switch(m_ReconstructionType)
@@ -582,12 +582,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread)
 {
   // Get output image pointer
-  typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(ProcessObject::GetOutput(0));
+  typename OdfImageType::Pointer outputImage = static_cast< OdfImageType * >(ProcessObject::GetOutput(0));
   // Get input gradient image pointer
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
 
   // ImageRegionIterator for the output image
-  ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
+  ImageRegionIterator< OdfImageType > oit(outputImage, outputRegionForThread);
   oit.GoToBegin();
 
   // ImageRegionIterator for the BZero (output) image
@@ -644,10 +644,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       // approximate ODF coeffs
       vnl_vector<double>  coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
-      coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+      coeffs[0] = 1.0/(2.0*sqrt(M_PI));
 
       odf = element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
-      odf *= (QBALL_ANAL_RECON_PI*4/NODF);
+      odf *= (M_PI*4/NODF);
     }
     // set ODF to ODF-Image
     oit.Set( odf );
@@ -659,14 +659,29 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   MITK_INFO << "One Thread finished reconstruction";
 }
 
+//#include "itkLevenbergMarquardtOptimizer.h"
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread)
 {
 
+ /* itk::LevenbergMarquardtOptimizer::Pointer optimizer = itk::LevenbergMarquardtOptimizer::New();
+  optimizer->SetUseCostFunctionGradient(false);
 
-  //  vnl_levenberg_marquardt LMOptimizer = new vnl_levenberg_marquardt();
+  // Scale the translation components of the Transform in the Optimizer
+  itk::LevenbergMarquardtOptimizer::ScalesType scales(transform->GetNumberOfParameters());
+  scales.Fill(0.01);
+  unsigned long numberOfIterations = 80000;
+  double gradientTolerance = 1e-10; // convergence criterion
+  double valueTolerance = 1e-10; // convergence criterion
+  double epsilonFunction = 1e-10; // convergence criterion
+  optimizer->SetScales( scales );
+  optimizer->SetNumberOfIterations( numberOfIterations );
+  optimizer->SetValueTolerance( valueTolerance );
+  optimizer->SetGradientTolerance( gradientTolerance );
+  optimizer->SetEpsilonFunction( epsilonFunction );*/
+
 
 }
 
@@ -677,11 +692,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
   // Input Gradient Image and Output ODF Image
   typedef typename GradientImagesType::PixelType         GradientVectorType;
-  typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(ProcessObject::GetOutput(0));
+  typename OdfImageType::Pointer outputImage = static_cast< OdfImageType * >(ProcessObject::GetOutput(0));
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
 
   // Define Image iterators
-  ImageRegionIterator< OutputImageType > odfOutputImageIterator(outputImage, outputRegionForThread);
+  ImageRegionIterator< OdfImageType > odfOutputImageIterator(outputImage, outputRegionForThread);
   ImageRegionConstIterator< GradientImagesType > gradientInputImageIterator(gradientImagePointer, outputRegionForThread );
   ImageRegionIterator< BZeroImageType > bzeroIterator(m_BZeroImage, outputRegionForThread);
   ImageRegionIterator< CoefficientImageType > coefficientImageIterator(m_CoefficientImage, outputRegionForThread);
@@ -890,13 +905,13 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
 
       // the first coeff is a fix value
-      coeffs[0] = 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+      coeffs[0] = 1.0/(2.0*sqrt(M_PI));
 
       coeffPixel = element_cast<double, TO>(coeffs).data_block();
 
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
-      odf *= ((QBALL_ANAL_RECON_PI*4)/NODF);
+      odf *= ((M_PI*4)/NODF);
     }
 
     // set ODF to ODF-Image
@@ -961,7 +976,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 
   int numberOfGradientDirections = refVector.size();
 
-  if( numberOfGradientDirections < (((L+1)*(L+2))/2) || numberOfGradientDirections < 6  )
+  if( numberOfGradientDirections <= (((L+1)*(L+2))/2) || numberOfGradientDirections < 6  )
   {
     itkExceptionMacro( << "At least (L+1)(L+2)/2 gradient directions for each shell are required; current : " << numberOfGradientDirections );
   }
@@ -1002,13 +1017,13 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   MatrixDoublePtr inverse(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   (*inverse) = pseudo_inv->inverse();
 
-  const double factor = (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
+  const double factor = (1.0/(16.0*M_PI*M_PI));
   MatrixDoublePtr SignalReonstructionMatrix (new vnl_matrix<double>((*inverse) * (SHBasisMatrix->transpose())));
   m_CoeffReconstructionMatrix = new vnl_matrix<double>(( factor * ((*FRTMatrix) * ((*SHEigenvalues) * (*SignalReonstructionMatrix))) ));
 
 
   // SH Basis for ODF-reconstruction
-  vnl_matrix_fixed<double, 3, NOdfDirections>* U = itk::PointShell<NOdfDirections, vnl_matrix_fixed<double, 3, NOdfDirections> >::DistributePointShell();
+  vnl_matrix_fixed<double, 3, NOdfDirections>* U = PointShell<NOdfDirections, vnl_matrix_fixed<double, 3, NOdfDirections> >::DistributePointShell();
   for(int i=0; i<NOdfDirections; i++)
   {
     double x = (*U)(0,i);

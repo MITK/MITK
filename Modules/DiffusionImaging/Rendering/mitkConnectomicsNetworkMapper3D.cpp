@@ -99,6 +99,20 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
     vectorOfEdgeColorParameterValues.resize( vectorOfEdges.size() );
     double maxEdgeColorParameterValue( FillEdgeParameterVector( &vectorOfEdgeColorParameterValues, m_EdgeColorParameter ) );
 
+    //////////////////////Prepare Filtering//////////////////////
+    // true will be rendered
+    std::vector< bool > vectorOfNodeFilterBools( vectorOfNodes.size(), true );
+    if( m_ChosenNodeFilter == connectomicsRenderingNodeThresholdingFilter )
+    {
+      FillNodeFilterBoolVector( &vectorOfNodeFilterBools, m_NodeThresholdParameter );
+    }
+
+    std::vector< bool > vectorOfEdgeFilterBools( vectorOfEdges.size(), true );
+    if( m_ChosenEdgeFilter == connectomicsRenderingEdgeThresholdFilter )
+    {
+      FillEdgeFilterBoolVector( &vectorOfEdgeFilterBools, m_EdgeThresholdParameter );
+    }
+
     //////////////////////Create Spheres/////////////////////////
     for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
     {
@@ -144,7 +158,10 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
 
       actor->GetProperty()->SetColor( red, green, blue);
 
-      m_NetworkAssembly->AddPart(actor);
+      if( vectorOfNodeFilterBools[i] )
+      {
+        m_NetworkAssembly->AddPart(actor);
+      }
     }
 
     //////////////////////Create Tubes/////////////////////////
@@ -213,8 +230,10 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
 
       actor->GetProperty()->SetColor( red, green, blue);
 
-      m_NetworkAssembly->AddPart(actor);
-
+      if( vectorOfEdgeFilterBools[i] )
+      {
+        m_NetworkAssembly->AddPart(actor);
+      }
     }
   }
   else if( m_ChosenRenderingScheme == connectomicsRenderingVTKScheme )
@@ -415,6 +434,14 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
   mitk::ConnectomicsRenderingNodeFilteringProperty * nodeFilter =
     static_cast< mitk::ConnectomicsRenderingNodeFilteringProperty * > (
     this->GetDataNode()->GetProperty( connectomicsRenderingNodeFilteringPropertyName.c_str() ) );
+
+  mitk::ConnectomicsRenderingNodeThresholdParameterProperty * nodeThresholdParameter =
+    static_cast< mitk::ConnectomicsRenderingNodeThresholdParameterProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingNodeThresholdFilterParameterName.c_str() ) );
+  mitk::ConnectomicsRenderingEdgeThresholdParameterProperty * edgeThresholdParameter =
+    static_cast< mitk::ConnectomicsRenderingEdgeThresholdParameterProperty * > (
+    this->GetDataNode()->GetProperty( connectomicsRenderingEdgeThresholdFilterParameterName.c_str() ) );
+
   mitk::FloatProperty * nodeThreshold = static_cast< mitk::FloatProperty * > (
     this->GetDataNode()->GetProperty( connectomicsRenderingNodeThresholdFilterThresholdName.c_str() ) );
   mitk::ColorProperty * nodeColorStart = static_cast< mitk::ColorProperty * > (
@@ -452,8 +479,10 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
     m_ChosenRenderingScheme != renderingScheme->GetValueAsString() ||
     m_ChosenEdgeFilter != edgeFilter->GetValueAsString() ||
     m_EdgeThreshold != edgeThreshold->GetValue() ||
+    m_EdgeThresholdParameter != edgeThresholdParameter->GetValueAsString() ||
     m_ChosenNodeFilter != nodeFilter->GetValueAsString() ||
     m_NodeThreshold != nodeThreshold->GetValue() ||
+    m_NodeThresholdParameter != nodeThresholdParameter->GetValueAsString() ||
     m_NodeColorStart != nodeColorStart->GetValue() ||
     m_NodeColorEnd != nodeColorEnd->GetValue() ||
     m_NodeRadiusStart != nodeRadiusStart->GetValue() ||
@@ -472,8 +501,10 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
     m_ChosenRenderingScheme = renderingScheme->GetValueAsString();
     m_ChosenEdgeFilter = edgeFilter->GetValueAsString();
     m_EdgeThreshold = edgeThreshold->GetValue();
+    m_EdgeThresholdParameter = edgeThresholdParameter->GetValueAsString();
     m_ChosenNodeFilter = nodeFilter->GetValueAsString();
     m_NodeThreshold = nodeThreshold->GetValue();
+    m_NodeThresholdParameter = nodeThresholdParameter->GetValueAsString();
     m_NodeColorStart = nodeColorStart->GetValue();
     m_NodeColorEnd = nodeColorEnd->GetValue();
     m_NodeRadiusStart = nodeRadiusStart->GetValue();
@@ -629,4 +660,101 @@ double mitk::ConnectomicsNetworkMapper3D::FillEdgeParameterVector( std::vector< 
   }
 
   return maximum;
+}
+
+void mitk::ConnectomicsNetworkMapper3D::FillNodeFilterBoolVector( std::vector< bool > * boolVector, std::string parameterName )
+{
+  std::vector< double > parameterVector;
+  parameterVector.resize( boolVector->size() );
+  int end( parameterVector.size() );
+
+  // using the degree as parameter
+  if( parameterName == connectomicsRenderingNodeParameterDegree )
+  {
+    std::vector< int > vectorOfDegree = this->GetInput()->GetDegreeOfNodes();
+    for(int index(0); index < end; index++)
+    {
+      parameterVector.at( index ) = vectorOfDegree[ index ];
+    }
+  }
+
+  // using betweenness centrality as parameter
+  if( parameterName == connectomicsRenderingNodeParameterBetweenness )
+  {
+    std::vector< double > vectorOfBetweenness = this->GetInput()->GetNodeBetweennessVector();
+    for(int index(0); index < end; index++)
+    {
+      parameterVector.at( index ) = vectorOfBetweenness[index];
+    }
+  }
+
+  // using clustering coefficient as parameter
+  if( parameterName == connectomicsRenderingNodeParameterClustering )
+  {
+    const std::vector< double > vectorOfClustering = this->GetInput()->GetLocalClusteringCoefficients();
+    for(int index(0); index < end; index++)
+    {
+      parameterVector.at( index ) = vectorOfClustering[index];
+    }
+  }
+
+  for( int index( 0 ), end( boolVector->size() ); index < end; index++ )
+  {
+    if( parameterVector.at( index ) >= m_NodeThreshold )
+    {
+      boolVector->at( index ) = true;
+    }
+    else
+    {
+      boolVector->at( index ) = false;
+    }
+  }
+
+  return;
+
+}
+
+void mitk::ConnectomicsNetworkMapper3D::FillEdgeFilterBoolVector( std::vector< bool > * boolVector, std::string parameterName )
+{
+  std::vector< double > parameterVector;
+  parameterVector.resize( boolVector->size() );
+  int end( parameterVector.size() );
+
+
+  // using the weight as parameter
+  if( parameterName == connectomicsRenderingEdgeParameterWeight )
+  {
+    std::vector< std::pair<
+      std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode >
+      , mitk::ConnectomicsNetwork::NetworkEdge > >  vectorOfEdges = this->GetInput()->GetVectorOfAllEdges();
+
+    for(int index(0); index < end; index++)
+    {
+      parameterVector.at( index ) = vectorOfEdges[ index ].second.weight;
+    }
+  }
+
+  // using the edge centrality as parameter
+  if( parameterName == connectomicsRenderingEdgeParameterCentrality )
+  {
+    const std::vector< double > vectorOfCentrality = this->GetInput()->GetEdgeBetweennessVector();
+    for(int index(0); index < end; index++)
+    {
+      parameterVector.at( index ) = vectorOfCentrality[index];
+    }
+  }
+
+  for( int index( 0 ), end( boolVector->size() ); index < end; index++ )
+  {
+    if( parameterVector.at( index ) >= m_EdgeThreshold )
+    {
+      boolVector->at( index ) = true;
+    }
+    else
+    {
+      boolVector->at( index ) = false;
+    }
+  }
+
+  return;
 }

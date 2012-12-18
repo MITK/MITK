@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingProperties.h"
 
 #define EDGE_THRESHOLD_WEIGHT 0
+#define EDGE_THRESHOLD_CENTRALITY 1
 
 mitk::ConnectomicsRenderingEdgeThresholdParameterProperty::ConnectomicsRenderingEdgeThresholdParameterProperty( )
 {
@@ -57,6 +58,7 @@ mitk::ConnectomicsRenderingEdgeThresholdParameterProperty::ConnectomicsRendering
 void mitk::ConnectomicsRenderingEdgeThresholdParameterProperty::AddRenderingEdgeThresholdParameters()
 {
   AddEnum( connectomicsRenderingEdgeParameterWeight , EDGE_THRESHOLD_WEIGHT );
+  AddEnum( connectomicsRenderingEdgeParameterCentrality , EDGE_THRESHOLD_CENTRALITY );
 }
 
 

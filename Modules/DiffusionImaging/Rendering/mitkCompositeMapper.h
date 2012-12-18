@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageVtkMapper2D.h"
 #include "mitkOdfVtkMapper2D.h"
 #include "mitkLevelWindowProperty.h"
-#include <valgrind/callgrind.h>
+
 namespace mitk {
 
   class CopyImageMapper2D : public ImageVtkMapper2D

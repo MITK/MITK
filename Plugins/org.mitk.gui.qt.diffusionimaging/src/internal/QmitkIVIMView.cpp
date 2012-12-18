@@ -425,22 +425,16 @@ void QmitkIVIMView::FittIVIMStart()
 {
 
     std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
-    if (nodes.empty()) return;
 
-    if (!nodes.front())
+    mitk::DiffusionImage<short>* img;
+    for ( int i=0; i<nodes.size(); i++ )
     {
-        // Nothing selected. Inform the user and return
-        QMessageBox::information( NULL, "Template", "Please load and select a diffusion image before starting image processing.");
-        return;
+        img = dynamic_cast<mitk::DiffusionImage<short>*>(nodes.at(i)->GetData());
+        if (img)
+            break;
     }
-
-    mitk::DiffusionImage<short>* img =
- dynamic_cast<mitk::DiffusionImage<short>*>(
-                nodes.front()->GetData());
-
     if (!img)
     {
-        // Nothing selected. Inform the user and return
         QMessageBox::information( NULL, "Template", "No valid diffusion image was found.");
         return;
     }

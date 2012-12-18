@@ -668,7 +668,6 @@ void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
         ++oit2;
         ++iit;
     }
-    std::cout << std::endl << std::endl;
 
     if(m_Verbose)
     {

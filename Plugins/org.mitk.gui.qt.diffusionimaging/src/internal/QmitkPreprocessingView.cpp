@@ -301,7 +301,7 @@ void QmitkPreprocessingView::DoShowGradientDirections()
     typedef mitk::DiffusionImage<short*>::BValueMap::iterator BValueMapIterator;
     BValueMap bValMap =  m_DiffusionImage->GetB_ValueMap();
 
-    GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirectionsWithMeasurementFrame();
+    GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
     mitk::Geometry3D::Pointer geometry = m_DiffusionImage->GetGeometry();
     int shellCount = 1;
     for(BValueMapIterator it = bValMap.begin(); it!=bValMap.end(); ++it)
@@ -447,7 +447,7 @@ void QmitkPreprocessingView::MergeDwis()
         if ( dwi.IsNotNull() )
         {
             imageContainer.push_back(dwi->GetVectorImage());
-            gradientListContainer.push_back(dwi->GetDirectionsWithMeasurementFrame());
+            gradientListContainer.push_back(dwi->GetDirections());
             bValueContainer.push_back(dwi->GetB_Value());
         }
     }

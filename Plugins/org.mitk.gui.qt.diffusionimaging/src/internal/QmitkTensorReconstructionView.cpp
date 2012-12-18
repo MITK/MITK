@@ -736,6 +736,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
                 }
             }
 
+            tensorImage->SetDirection( vols->GetVectorImage()->GetDirection() );
             image->InitializeByItk( tensorImage.GetPointer() );
             image->SetVolume( tensorReconstructionFilter->GetOutput()->GetBufferPointer() );
             mitk::DataNode::Pointer node=mitk::DataNode::New();

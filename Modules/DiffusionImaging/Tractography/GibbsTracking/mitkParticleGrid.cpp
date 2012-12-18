@@ -40,10 +40,13 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength, int c
 
     m_CellCapacity = cellCapacity;          // maximum number of particles per grid cell
     m_ContainerCapacity = 100000;           // initial particle container capacity
-    int numCells = m_GridSize[0]*m_GridSize[1]*m_GridSize[2];   // number of grid cells
+    unsigned long  numCells = m_GridSize[0]*m_GridSize[1]*m_GridSize[2];   // number of grid cells
+    unsigned long  gridSize = numCells*m_CellCapacity;
+    if ( itk::NumericTraits<int>::max()<gridSize )
+        throw std::bad_alloc();
 
     m_Particles.resize(m_ContainerCapacity);        // allocate and initialize particles
-    m_Grid.resize(numCells*m_CellCapacity, NULL);   // allocate and initialize particle grid
+    m_Grid.resize(gridSize, NULL);   // allocate and initialize particle grid
     m_OccupationCount.resize(numCells, 0);          // allocate and initialize occupation counter array
     m_NeighbourTracker.cellidx.resize(8, 0);        // allocate and initialize neighbour tracker
     m_NeighbourTracker.cellidx_c.resize(8, 0);

@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // itk includes
 #include "itksys/SystemTools.hxx"
+#include <mitkILinkedRenderWindowPart.h>
+#include <QmitkRenderWindow.h>
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 
@@ -87,7 +89,28 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*)(this->m_Controls->m_IgnoreZerosCheckbox), SIGNAL(clicked()),(QObject*) this, SLOT(OnIgnoreZerosCheckboxClicked()) );
     connect( (QObject*) this->m_CalculationThread, SIGNAL(finished()),this, SLOT( OnThreadedStatisticsCalculationEnds()),Qt::QueuedConnection);
     connect( (QObject*) this, SIGNAL(StatisticsUpdate()),this, SLOT( RequestStatisticsUpdate()), Qt::QueuedConnection);
+
+    connect( (QObject*) this->m_Controls->m_StatisticsTable, SIGNAL(cellDoubleClicked(int,int)),this, SLOT( JumpToCoordinates(int,int)) );
   }
+}
+
+void QmitkImageStatisticsView::JumpToCoordinates(int row ,int col)
+{
+    mitk::Point3D world;
+    if (row==4)
+        world = m_WorldMin;
+    else if (row==3)
+        world = m_WorldMax;
+    else
+        return;
+
+    mitk::IRenderWindowPart* part = this->GetRenderWindowPart();
+    if (part)
+    {
+        part->GetRenderWindow("axial")->GetSliceNavigationController()->SelectSliceByPoint(world);
+        part->GetRenderWindow("sagittal")->GetSliceNavigationController()->SelectSliceByPoint(world);
+        part->GetRenderWindow("coronal")->GetSliceNavigationController()->SelectSliceByPoint(world);
+    }
 }
 
 void QmitkImageStatisticsView::OnIgnoreZerosCheckboxClicked()
@@ -253,6 +276,9 @@ void QmitkImageStatisticsView::UpdateStatistics()
     this->m_StatisticsUpdatePending =  false;
     return;
   }
+  m_WorldMin.Fill(-1);
+  m_WorldMax.Fill(-1);
+
  // classify selected nodes
   mitk::NodePredicateDataType::Pointer imagePredicate = mitk::NodePredicateDataType::New("Image");
 
@@ -559,6 +585,19 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   const mitk::ImageStatisticsCalculator::Statistics &s,
   const mitk::Image *image )
 {
+    if (s.MaxIndex.size()==3)
+    {
+        mitk::Point3D index;
+        index[0] = s.MaxIndex[0];
+        index[1] = s.MaxIndex[1];
+        index[2] = s.MaxIndex[2];
+        m_SelectedImage->GetGeometry()->IndexToWorld(index, m_WorldMax);
+        index[0] = s.MinIndex[0];
+        index[1] = s.MinIndex[1];
+        index[2] = s.MinIndex[2];
+        m_SelectedImage->GetGeometry()->IndexToWorld(index, m_WorldMin);
+    }
+
   this->m_Controls->m_StatisticsTable->setItem( 0, 0, new QTableWidgetItem(
     QString("%1").arg(s.Mean, 0, 'f', 2) ) );
   this->m_Controls->m_StatisticsTable->setItem( 0, 1, new QTableWidgetItem(
@@ -567,11 +606,27 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setItem( 0, 2, new QTableWidgetItem(
     QString("%1").arg(s.RMS, 0, 'f', 2) ) );
 
-  this->m_Controls->m_StatisticsTable->setItem( 0, 3, new QTableWidgetItem(
-    QString("%1").arg(s.Max, 0, 'f', 2) ) );
+    QString max; max.append(QString("%1").arg(s.Max, 0, 'f', 2));
+    max += " (";
+    for (int i=0; i<s.MaxIndex.size(); i++)
+    {
+        max += QString::number(s.MaxIndex[i]);
+        if (i<s.MaxIndex.size()-1)
+            max += ",";
+    }
+    max += ")";
+  this->m_Controls->m_StatisticsTable->setItem( 0, 3, new QTableWidgetItem( max ) );
 
-  this->m_Controls->m_StatisticsTable->setItem( 0, 4, new QTableWidgetItem(
-    QString("%1").arg(s.Min, 0, 'f', 2) ) );
+    QString min; min.append(QString("%1").arg(s.Min, 0, 'f', 2));
+    min += " (";
+    for (int i=0; i<s.MinIndex.size(); i++)
+    {
+        min += QString::number(s.MinIndex[i]);
+        if (i<s.MinIndex.size()-1)
+            min += ",";
+    }
+    min += ")";
+  this->m_Controls->m_StatisticsTable->setItem( 0, 4, new QTableWidgetItem( min ) );
 
   this->m_Controls->m_StatisticsTable->setItem( 0, 5, new QTableWidgetItem(
     QString("%1").arg(s.N) ) );

@@ -680,6 +680,7 @@ void mitk::PlanarFigure::AppendPointToPolyLine( unsigned int index, PolyLineElem
   if ( index < m_PolyLines.size() )
   {
     m_PolyLines.at( index ).push_back( element );
+    m_PolyLineUpToDate = false;
   }
   else
   {
@@ -692,6 +693,7 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
   if ( index < m_HelperPolyLines.size() )
   {
     m_HelperPolyLines.at( index ).push_back( element );
+    m_HelperLinesUpToDate = false;
   }
   else
   {

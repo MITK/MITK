@@ -68,8 +68,8 @@ public:
   void InitializeFromVectorImage();
   void SetDisplayIndexForRendering(int displayIndex);
 
-  GradientDirectionContainerType::Pointer GetDirections() { return m_OriginalDirections; }
-  GradientDirectionContainerType::Pointer GetDirectionsWithMeasurementFrame() { return m_Directions; }
+  GradientDirectionContainerType::Pointer GetDirectionsWithoutMeasurementFrame() { return m_OriginalDirections; }
+  GradientDirectionContainerType::Pointer GetDirections() { return m_Directions; }
 
   void SetDirections( GradientDirectionContainerType::Pointer directions )
   {

@@ -303,10 +303,7 @@ void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
   }
 
   UpdateBValueList();
-
   AddDirectionsContainerObserver();
-
-
 }
 
 // returns number of gradients

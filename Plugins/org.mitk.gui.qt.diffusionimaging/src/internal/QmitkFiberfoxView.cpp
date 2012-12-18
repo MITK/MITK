@@ -480,7 +480,7 @@ void QmitkFiberfoxView::GenerateImage()
     {
         mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
         bVal = dwi->GetB_Value();
-        mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = dwi->GetDirectionsWithMeasurementFrame();
+        mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = dwi->GetDirections();
         for (int i=0; i<dirs->Size(); i++)
         {
             DiffusionSignalModel<double>::GradientType g;

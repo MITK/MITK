@@ -135,7 +135,7 @@ namespace mitk {
     int GetNumberOfVertices() const;
 
     /** get overall number of edges in the network */
-    int GetNumberOfEdges();
+    int GetNumberOfEdges() const;
 
     /** get number of vertices, that are connected to themselves */
     int GetNumberOfSelfLoops();
@@ -165,7 +165,10 @@ namespace mitk {
     double GetGlobalClusteringCoefficient( );
 
     /** Get the betweenness centrality for each vertex in form of a vector of length (number vertices)*/
-    std::vector< double > GetBetweennessVector() const;
+    std::vector< double > GetNodeBetweennessVector() const;
+
+    /** Get the betweenness centrality for each edge in form of a vector of length (number edges)*/
+    std::vector< double > GetEdgeBetweennessVector() const;
 
     /** Check whether a vertex with the specified label exists*/
     bool CheckForLabel( std::string targetLabel ) const;

@@ -526,7 +526,7 @@ double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< 
   // using betweenness centrality as parameter
   if( parameterName == connectomicsRenderingNodeParameterBetweenness )
   {
-    std::vector< double > vectorOfBetweenness = this->GetInput()->GetBetweennessVector();
+    std::vector< double > vectorOfBetweenness = this->GetInput()->GetNodeBetweennessVector();
     for(int index(0); index < end; index++)
     {
       parameterVector->at( index ) = vectorOfBetweenness[index];
@@ -605,6 +605,18 @@ double mitk::ConnectomicsNetworkMapper3D::FillEdgeParameterVector( std::vector< 
     for(int index(0); index < end; index++)
     {
       parameterVector->at( index ) = vectorOfEdges[ index ].second.weight;
+    }
+
+    maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
+  }
+
+  // using the edge centrality as parameter
+  if( parameterName == connectomicsRenderingEdgeParameterCentrality )
+  {
+    const std::vector< double > vectorOfCentrality = this->GetInput()->GetEdgeBetweennessVector();
+    for(int index(0); index < end; index++)
+    {
+      parameterVector->at( index ) = vectorOfCentrality[index];
     }
 
     maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );

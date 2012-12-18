@@ -299,6 +299,11 @@ namespace mitk {
     */
    const std::string connectomicsRenderingEdgeParameterWeight = "Weight";
 
+   /**
+    * \brief Using the edge centrality as parameter
+    */
+   const std::string connectomicsRenderingEdgeParameterCentrality = "Edge betweenness centrality";
+
     /**
     * \brief Constant
     *

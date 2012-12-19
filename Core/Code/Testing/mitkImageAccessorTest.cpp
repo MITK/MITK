@@ -209,7 +209,7 @@ int mitkImageAccessorTest(int argc, char* argv[])
    image->GetGeometry()->Initialize();
 
    itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
-   unsigned int noOfThreads = 100;
+   unsigned int noOfThreads = 1;
 
    // initialize barrier
    itk::Barrier::Pointer barrier = itk::Barrier::New();

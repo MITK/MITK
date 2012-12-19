@@ -522,8 +522,6 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
  mainActionsToolBar->addAction(fileOpenAction);
  mainActionsToolBar->addAction(fileSaveProjectAction);
  mainActionsToolBar->addAction(closeProjectAction);
- mainActionsToolBar->addAction(undoAction);
- mainActionsToolBar->addAction(redoAction);
 if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
 {
  mainActionsToolBar->addAction(openDicomEditorAction);
@@ -758,7 +756,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
     {
       mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
       mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
-      mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
+      //mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
     }
   }
 }

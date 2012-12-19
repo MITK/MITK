@@ -21,7 +21,7 @@
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Fiber Generation</string>
+       <string>Fiber Definition</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_8">
        <item row="1" column="0">
@@ -809,7 +809,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>k-Space undersampling:</string>
+                <string>k-Space Undersampling:</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -1020,7 +1020,7 @@
           <item row="4" column="0">
            <widget class="QCheckBox" name="m_AddGibbsRinging">
             <property name="text">
-             <string>Add Gibbs ringing</string>
+             <string>Add Gibbs Ringing</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -1135,26 +1135,7 @@
              <property name="margin">
               <number>0</number>
              </property>
-             <item row="1" column="3">
-              <widget class="QDoubleSpinBox" name="m_SpacingZ">
-               <property name="decimals">
-                <number>3</number>
-               </property>
-               <property name="minimum">
-                <double>0.100000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>50.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-               <property name="value">
-                <double>2.500000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
+             <item row="2" column="2">
               <widget class="QDoubleSpinBox" name="m_SpacingY">
                <property name="decimals">
                 <number>3</number>
@@ -1173,155 +1154,33 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="label_2">
                <property name="text">
                 <string>Image Spacing:</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Image Dimensions:</string>
+             <item row="2" column="3">
+              <widget class="QDoubleSpinBox" name="m_SpacingZ">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>50.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>2.500000000000000</double>
                </property>
               </widget>
              </item>
-             <item row="0" column="2">
-              <widget class="QComboBox" name="m_SizeY">
-               <property name="currentIndex">
-                <number>4</number>
-               </property>
-               <item>
-                <property name="text">
-                 <string>4</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>8</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>16</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>32</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>64</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>128</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>256</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>512</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>1024</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>2048</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>4096</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="QComboBox" name="m_SizeZ">
-               <property name="currentIndex">
-                <number>4</number>
-               </property>
-               <item>
-                <property name="text">
-                 <string>1</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>2</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>4</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>8</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>16</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>32</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>64</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>128</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>256</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>512</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>1024</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>2048</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>4096</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QDoubleSpinBox" name="m_SpacingX">
                <property name="decimals">
                 <number>3</number>
@@ -1340,66 +1199,68 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="m_SizeX">
-               <property name="currentIndex">
-                <number>4</number>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Image Dimensions:</string>
                </property>
-               <item>
-                <property name="text">
-                 <string>4</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>8</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>16</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>32</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>64</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>128</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>256</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>512</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>1024</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>2048</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>4096</string>
-                </property>
-               </item>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="m_SizeX">
+               <property name="toolTip">
+                <string>Fiber sampling factor which determines the accuracy of the calculated fiber and non-fiber volume fractions.</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>1000</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>32</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QSpinBox" name="m_SizeY">
+               <property name="toolTip">
+                <string>Fiber sampling factor which determines the accuracy of the calculated fiber and non-fiber volume fractions.</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>32</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QSpinBox" name="m_SizeZ">
+               <property name="toolTip">
+                <string>Fiber sampling factor which determines the accuracy of the calculated fiber and non-fiber volume fractions.</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>5</number>
+               </property>
               </widget>
              </item>
             </layout>
@@ -1408,7 +1269,7 @@
           <item row="1" column="0">
            <widget class="QCheckBox" name="m_KspaceImageBox">
             <property name="text">
-             <string>Output k-space image</string>
+             <string>Output k-Space Image</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -1471,7 +1332,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>b-value:</string>
+                <string>b-Value:</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -1570,7 +1431,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>Non Fiber S0:</string>
+                <string>Non-fiber S0:</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -1630,7 +1491,7 @@
                 <number>1</number>
                </property>
                <property name="value">
-                <number>5</number>
+                <number>10</number>
                </property>
               </widget>
              </item>
@@ -1731,9 +1592,6 @@
   <tabstop>m_ImageName</tabstop>
   <tabstop>m_GenerateImageButton</tabstop>
   <tabstop>m_KspaceImageBox</tabstop>
-  <tabstop>m_SizeX</tabstop>
-  <tabstop>m_SizeY</tabstop>
-  <tabstop>m_SizeZ</tabstop>
   <tabstop>m_SpacingX</tabstop>
   <tabstop>m_SpacingY</tabstop>
   <tabstop>m_SpacingZ</tabstop>

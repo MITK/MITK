@@ -167,6 +167,7 @@ void QmitkGibbsTrackingView::AfterThread()
 
     GenerateFiberBundle();
     m_FiberBundleNode = NULL;
+    m_GlobalTracker = NULL;
 }
 
 // start tracking timer and update gui elements before tracking is started

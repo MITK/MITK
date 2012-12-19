@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulation.h"
 #include "mitkSimulationReader.h"
 #include <algorithm>
+#include <sofa/core/visual/VisualParams.h>
 #include <sofa/helper/system/SetDirectory.h>
 
 bool mitk::SimulationReader::CanReadFile(const std::string& filename, const std::string&, const std::string&)
@@ -60,7 +61,7 @@ void mitk::SimulationReader::GenerateData()
 
   std::string path = sofa::helper::system::SetDirectory::GetParentDir(m_FileName.c_str());
   sofa::helper::system::DataRepository.addFirstPath(path);
-  sofa::simulation::Node::SPtr rootNode = sofa::core::objectmodel::SPtr_dynamic_cast<sofa::simulation::Node>(sofaSimulation->loadFromFile(m_FileName.c_str()));
+  sofa::simulation::Node::SPtr rootNode = sofa::core::objectmodel::SPtr_dynamic_cast<sofa::simulation::Node>(sofaSimulation->load(m_FileName.c_str()));
 
   if (rootNode == NULL)
   {

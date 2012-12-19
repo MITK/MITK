@@ -536,6 +536,10 @@ void mitk::SimulationDrawTool::drawCylinder(const Vector3& point1, const Vector3
   this->drawCone(point1, point2, radius, radius, color, subdivisions);
 }
 
+void mitk::SimulationDrawTool::drawCapsule(const Vector3&, const Vector3&, float, const Vec4f, int)
+{
+}
+
 void mitk::SimulationDrawTool::drawArrow(const Vector3& point1, const Vector3& point2, float radius, const Vec4f color, int subdivisions)
 {
   if (!m_Update)
@@ -562,6 +566,10 @@ void mitk::SimulationDrawTool::drawPoint(const Vector3&, const Vec4f&)
 }
 
 void mitk::SimulationDrawTool::drawPoint(const Vector3&, const Vector3&, const Vec4f&)
+{
+}
+
+void mitk::SimulationDrawTool::drawTriangle(const Vector3&, const Vector3&, const Vector3&, const Vector3&)
 {
 }
 
@@ -614,6 +622,6 @@ void mitk::SimulationDrawTool::setLightingEnabled(bool)
 {
 }
 
-void mitk::SimulationDrawTool::clear()
+void mitk::SimulationDrawTool::writeOverlayText(int, int, unsigned int, const Vec4f&, const char*)
 {
 }

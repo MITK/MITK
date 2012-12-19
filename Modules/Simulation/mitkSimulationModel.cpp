@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulation.h"
 #include "mitkSimulationModel.h"
 #include <sofa/core/visual/DisplayFlags.h>
+#include <sofa/core/visual/VisualParams.h>
 #include <vtkActor.h>
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>

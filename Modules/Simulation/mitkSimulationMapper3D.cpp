@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulationModel.h"
 #include "mitkSimulationPropAssemblyVisitor.h"
 #include <sofa/component/visualmodel/VisualStyle.h>
+#include <sofa/core/visual/VisualParams.h>
 
 mitk::SimulationMapper3D::LocalStorage::LocalStorage()
   : m_VtkProp(vtkSmartPointer<vtkPropAssembly>::New())

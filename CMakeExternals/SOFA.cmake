@@ -94,82 +94,28 @@ message(STATUS \"extracting... done\")")
   set(source_dir "${CMAKE_BINARY_DIR}/${proj}-src")
 
   set(url_base "http://dl.dropbox.com/u/5822501/")
-  set(file "sofa-framework-1.0-rc1.zip")
-  set(md5 "e0f57db0d4c8178afba55c31cf7b6bdc")
+  set(rev "8935")
+  set(file "sofa-rev${rev}.zip")
+  set(md5 "ec5028b9b3ec23293983c4d785325847")
 
   write_downloadfile_script(
-    "${stamp_dir}/download-framework.cmake"
+    "${stamp_dir}/download-sofa.cmake"
     "${url_base}${file}"
     "${download_dir}/${file}"
     "${md5}"
   )
 
   write_extractfile_script(
-    "${stamp_dir}/extract-framework.cmake"
+    "${stamp_dir}/extract-sofa.cmake"
     "${download_dir}/${file}"
     "${source_dir}"
   )
 
-  set(download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-framework.cmake)
-  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-framework.cmake)
+  set(download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-sofa.cmake)
+  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-sofa.cmake)
 
-  set(file "sofa-modules-1.0-rc1.zip")
-  set(md5 "27c9d35ea3fd4bbc753ead62f522c6e7")
-
-  write_downloadfile_script(
-    "${stamp_dir}/download-modules.cmake"
-    "${url_base}${file}"
-    "${download_dir}/${file}"
-    "${md5}"
-  )
-
-  write_extractfile_script(
-    "${stamp_dir}/extract-modules.cmake"
-    "${download_dir}/${file}"
-    "${source_dir}"
-  )
-
-  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-modules.cmake)
-  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-modules.cmake)
-
-  if(MSVC)
-    if(MSVC90)
-      if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(file "sofa-dependencies-win64-msvc-2008-1.0-rc1.zip")
-        set(md5 "5aaf89c36bbd6b87f8c5784a505bf789")
-      else()
-        set(file "sofa-dependencies-win32-msvc-2008-1.0-rc1.zip")
-        set(md5 "b4240694393bd5014f1870a394e84d38")
-      endif()
-    elseif(MSVC10)
-      if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(file "dependencies-win64-msvc-2010-1.0-rc1.zip")
-        set(md5 "57014882593b28e3b3e5a4fa85803776")
-      else()
-        set(file "dependencies-win32-msvc-2010-1.0-rc1.zip")
-        set(md5 "b6de57312d36d5bd56980ef0284b9ab9")
-      endif()
-    endif()
-
-    write_downloadfile_script(
-      "${stamp_dir}/download-dependencies.cmake"
-      "${url_base}${file}"
-      "${download_dir}/${file}"
-      "${md5}"
-    )
-
-    write_extractfile_script(
-      "${stamp_dir}/extract-dependencies.cmake"
-      "${download_dir}/${file}"
-      "${source_dir}"
-    )
-
-    list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-dependencies.cmake)
-    list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-dependencies.cmake)
-  endif()
-
-  set(file "sofa-patch-1.0-rc1.zip")
-  set(md5 "b6c112c94dbca92ca5bec894e9bfa18e")
+  set(file "sofa-rev${rev}-patch.zip")
+  set(md5 "34709f71ad134502ca2cec68737f1883")
 
   write_downloadfile_script(
     "${stamp_dir}/download-patch.cmake"
@@ -187,8 +133,8 @@ message(STATUS \"extracting... done\")")
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-patch.cmake)
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-patch.cmake)
 
-  set(file "sofa-cmake-1.0-rc1.zip")
-  set(md5 "41fc95b1a51a404c28eac5860932b017")
+  set(file "sofa-rev${rev}-cmake.zip")
+  set(md5 "bc49343e153ff0eec563d20dc0bbd91f")
 
   write_downloadfile_script(
     "${stamp_dir}/download-cmake.cmake"

@@ -15,18 +15,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSimulation.h"
+#include <sofa/core/visual/VisualParams.h>
+#include <sofa/simulation/bgl/BglSimulation.h>
+#include <sofa/simulation/graph/DAGSimulation.h>
 #include <sofa/simulation/tree/TreeSimulation.h>
 
 const float mitk::Simulation::ScaleFactor = 1000.0f;
 
-static sofa::simulation::Simulation::SPtr CreateSimulation()
+static sofa::simulation::Simulation::SPtr CreateSimulation(mitk::Simulation::SimulationType type = mitk::Simulation::Tree)
 {
-  std::string key = "MultiMappingObject";
-
-  if (sofa::simulation::xml::BaseElement::NodeFactory::HasKey(key))
-    sofa::simulation::xml::BaseElement::NodeFactory::ResetEntry(key);
-
-  return sofa::core::objectmodel::New<sofa::simulation::tree::TreeSimulation>();
+  if (type == mitk::Simulation::DAG)
+    return sofa::core::objectmodel::New<sofa::simulation::graph::DAGSimulation>();
+  else if (type == mitk::Simulation::Bgl)
+    return sofa::core::objectmodel::New<sofa::simulation::bgl::BglSimulation>();
+  else
+    return sofa::core::objectmodel::New<sofa::simulation::tree::TreeSimulation>();
 }
 
 void mitk::Simulation::SetActiveSimulation(mitk::Simulation* simulation)

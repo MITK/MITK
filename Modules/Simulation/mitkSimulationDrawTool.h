@@ -72,10 +72,12 @@ namespace mitk
     void drawCone(const Vector3& point1, const Vector3& point2, float radius1, float radius2, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f), int subdivisions = 16);
     void drawCube(const float& edgeRadius, const Vec4f& color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f), const int& subdivisions = 16);
     void drawCylinder(const Vector3& point1, const Vector3& point2, float radius, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f), int subdivisions = 16);
+    void drawCapsule(const Vector3& point1, const Vector3& point2, float radius, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f), int subdivisions = 16);
     void drawArrow(const Vector3& point1, const Vector3& point2, float radius, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f), int subdivisions = 16);
     void drawPlus(const float& edgeRadius, const Vec4f& color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f), const int& subdivisions = 16);
     void drawPoint(const Vector3& position, const Vec4f& color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     void drawPoint(const Vector3& position, const Vector3& normal, const Vec4f& color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+    void drawTriangle(const Vector3& point1, const Vector3& point2, const Vector3& point3, const Vector3& normal);
     void drawTriangle(const Vector3& point1, const Vector3& point2, const Vector3& point3, const Vector3& normal, const Vec4f& color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     void drawTriangle(const Vector3& point1, const Vector3& point2, const Vector3& point3, const Vector3& normal, const Vec4f& color1, const Vec4f& color2, const Vec4f& color3);
     void drawSphere(const Vector3& position, float radius);
@@ -87,7 +89,7 @@ namespace mitk
     void resetMaterial(const Vec4f& color, std::string name = "");
     void setPolygonMode(int mode, bool wireframe);
     void setLightingEnabled(bool isEnabled);
-    void clear();
+    void writeOverlayText(int x, int y, unsigned int fontSize, const Vec4f& color, const char* text);
 
   private:
     SimulationDrawTool(const SimulationDrawTool&);

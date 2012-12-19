@@ -96,7 +96,7 @@ message(STATUS \"extracting... done\")")
   set(url_base "http://dl.dropbox.com/u/5822501/")
   set(rev "8935")
   set(file "sofa-rev${rev}.zip")
-  set(md5 "ec5028b9b3ec23293983c4d785325847")
+  set(md5 "3d151df2b797130a9b8fa4fd60cc4cab")
 
   write_downloadfile_script(
     "${stamp_dir}/download-sofa.cmake"
@@ -115,7 +115,7 @@ message(STATUS \"extracting... done\")")
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-sofa.cmake)
 
   set(file "sofa-rev${rev}-patch.zip")
-  set(md5 "34709f71ad134502ca2cec68737f1883")
+  set(md5 "1584acde8a206d96b837c2b04855667e")
 
   write_downloadfile_script(
     "${stamp_dir}/download-patch.cmake"
@@ -134,7 +134,7 @@ message(STATUS \"extracting... done\")")
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-patch.cmake)
 
   set(file "sofa-rev${rev}-cmake.zip")
-  set(md5 "bc49343e153ff0eec563d20dc0bbd91f")
+  set(md5 "8235d8790e084fe8209ef74bfb353dcd")
 
   write_downloadfile_script(
     "${stamp_dir}/download-cmake.cmake"

@@ -166,8 +166,13 @@ void QmitkGibbsTrackingView::AfterThread()
     }
 
     GenerateFiberBundle();
-    m_FiberBundleNode = NULL;
-    m_GlobalTracker = NULL;
+    m_FiberBundleNode = 0;
+    m_GlobalTracker = 0;
+
+    // images not needed anymore ( relevant only for computation )
+    // we need to release them to remove the memory access block created through CastToItk<> calls
+    this->m_ItkQBallImage = 0;
+    this->m_ItkTensorImage = 0;
 }
 
 // start tracking timer and update gui elements before tracking is started

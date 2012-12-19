@@ -1796,18 +1796,14 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
 
     mitk::TbssRoiImage::Pointer tbssRoi = mitk::TbssRoiImage::New();
-    //mitk::CastToTbssImage(m_CurrentRoi.GetPointer(), tbssRoi);
+
     tbssRoi->SetRoi(roi);
     tbssRoi->SetImage(roiImg);
     tbssRoi->SetStructure(m_Controls->m_Structure->text().toStdString());
     tbssRoi->InitializeFromImage();
 
-
-   // mitk::Image::Pointer tbssRoi = mitk::Image::New();
-    //mitk::CastToTbssImage(m_CurrentRoi.GetPointer(), tbssRoi);
-   // mitk::CastToMitkImage(roiImg, tbssRoi);
-
     AddTbssToDataStorage(tbssRoi, m_Controls->m_RoiName->text().toStdString());
+
 
   }
 

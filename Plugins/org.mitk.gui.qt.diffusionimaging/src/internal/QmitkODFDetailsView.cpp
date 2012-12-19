@@ -126,6 +126,7 @@ void QmitkODFDetailsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes
   m_Controls->m_InputImageLabel->setText("<font color='red'>mandatory</font>");
 
   m_ImageNode = NULL;
+
   // iterate selection
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
   {
@@ -163,6 +164,9 @@ void QmitkODFDetailsView::UpdateOdf()
       return;
     }
 
+    // restore the input image label ( needed in case the last run resulted into an exception )
+    m_Controls->m_InputImageLabel->setText(m_ImageNode->GetName().c_str());
+
     // ODF Normalization Property
     mitk::OdfNormalizationMethodProperty* nmp = dynamic_cast<mitk::OdfNormalizationMethodProperty*>(m_ImageNode->GetProperty( "Normalization" ));
     if(nmp)
@@ -193,7 +197,6 @@ void QmitkODFDetailsView::UpdateOdf()
     {
       m_Controls->m_ODFRenderWidget->setVisible(true);
       m_Controls->m_OdfBox->setVisible(true);
-      OdfVectorImgType::Pointer itkQBallImage = OdfVectorImgType::New();
 
       try
       {
@@ -239,25 +242,22 @@ void QmitkODFDetailsView::UpdateOdf()
         m_Controls->m_OdfValuesTextEdit->setText(values);
         m_Controls->m_OverviewTextEdit->setVisible(true);
       }
-      catch( mitk::MemoryIsLockedException &e)
+      catch( mitk::Exception &e )
       {
         MITK_WARN << "LOCKED : " << e.what();
         m_Controls->m_ODFRenderWidget->setVisible(false);
         m_Controls->m_OdfBox->setVisible(false);
         m_Controls->m_OverviewTextEdit->setVisible(false);
-      }
-      catch( mitk::Exception &e)
-      {
-        MITK_WARN << "OTHER EXC: " << e.what();
-        m_Controls->m_ODFRenderWidget->setVisible(false);
-        m_Controls->m_OdfBox->setVisible(false);
-        m_Controls->m_OverviewTextEdit->setVisible(false);
+
+        // reset the selection
+        m_Controls->m_InputImageLabel->setText("<font color='green'>Click image to restore rendering!</font>");
       }
     }
     else if (dynamic_cast<mitk::TensorImage*>(m_ImageNode->GetData()))
     {
       m_Controls->m_ODFRenderWidget->setVisible(true);
       m_Controls->m_OdfBox->setVisible(false);
+
 
       mitk::TensorImage* qball_image = dynamic_cast< mitk::TensorImage*>(m_ImageNode->GetData());
 
@@ -311,19 +311,15 @@ void QmitkODFDetailsView::UpdateOdf()
         m_Controls->m_OverviewTextEdit->setVisible(true);
       }
       // end pixel access block
-      catch( mitk::MemoryIsLockedException &e)
+      catch(mitk::Exception &e )
       {
         MITK_WARN << "LOCKED : " << e.what();
         m_Controls->m_ODFRenderWidget->setVisible(false);
         m_Controls->m_OdfBox->setVisible(false);
         m_Controls->m_OverviewTextEdit->setVisible(false);
-      }
-      catch( mitk::Exception &e)
-      {
-        MITK_WARN << "OTHER EXC: " << e.what();
-        m_Controls->m_ODFRenderWidget->setVisible(false);
-        m_Controls->m_OdfBox->setVisible(false);
-        m_Controls->m_OverviewTextEdit->setVisible(false);
+
+        // reset the selection
+        m_Controls->m_InputImageLabel->setText("<font color='green'>Click image to restore rendering!</font>");
       }
     }
     else

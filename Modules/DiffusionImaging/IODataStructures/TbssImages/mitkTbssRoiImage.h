@@ -81,7 +81,9 @@ namespace mitk
     void InitializeFromImage()
     {
       MITK_INFO << "make an mitk image that can be shown by mitk";
-      this->InitializeByItk(m_Image.GetPointer(),1,1);
+      this->InitializeByItk(m_Image.GetPointer());
+
+      this->SetChannel(m_Image->GetBufferPointer());
     }
 
 

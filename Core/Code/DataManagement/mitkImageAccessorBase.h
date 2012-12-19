@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegion.h>
 #include <itkSimpleFastMutexLock.h>
 #include <itkSmartPointer.h>
+#include <itkMultiThreader.h>
 
 #include "mitkImageDataItem.h"
 
@@ -43,17 +44,16 @@ struct ImageAccessorWaitLock {
   itk::SimpleFastMutexLock m_Mutex;
 };
 
+itk::ThreadProcessIDType MITK_CORE_EXPORT CurrentThreadHandle();
+bool MITK_CORE_EXPORT CompareThreadHandles(itk::ThreadProcessIDType, itk::ThreadProcessIDType);
+
+
 class MITK_CORE_EXPORT ImageAccessorBase {
 
   friend class Image;
 
   friend class ImageReadAccessor;
   friend class ImageWriteAccessor;
-
-  template <class TPixel, unsigned int VDimension>
-  friend class ImagePixelReadAccessor;
-  template <class TPixel, unsigned int VDimension>
-  friend class ImagePixelWriteAccessor;
 
 public:
 
@@ -124,6 +124,8 @@ protected:
 
   /** \brief Uses the WaitLock to wait for another ImageAccessor*/
   void WaitForReleaseOf(ImageAccessorWaitLock* wL);
+
+  itk::ThreadProcessIDType m_Thread;
 
 };
 

@@ -36,7 +36,7 @@ namespace itk
 {
 TractsToDWIImageFilter::TractsToDWIImageFilter()
     : m_CircleDummy(false)
-    , m_VolumeAccuracy(1)
+    , m_VolumeAccuracy(10)
     , m_Upsampling(1)
     , m_NumberOfRepetitions(1)
     , m_EnforcePureFiberVoxels(true)
@@ -331,7 +331,7 @@ void TractsToDWIImageFilter::GenerateData()
     if (m_FiberBundle->GetFiberSampling()<=0 || 10/m_FiberBundle->GetFiberSampling()>minSpacing*0.5/m_VolumeAccuracy)
     {
         fiberBundle = m_FiberBundle->GetDeepCopy();
-        fiberBundle->ResampleFibers(minSpacing*0.5/m_VolumeAccuracy);
+        fiberBundle->ResampleFibers(minSpacing/m_VolumeAccuracy);
     }
 
     // generate double images to wokr with because we don't want to lose precision

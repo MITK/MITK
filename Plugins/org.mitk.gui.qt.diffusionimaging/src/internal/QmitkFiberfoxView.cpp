@@ -441,9 +441,9 @@ void QmitkFiberfoxView::GenerateFibers()
 void QmitkFiberfoxView::GenerateImage()
 {
     itk::ImageRegion<3> imageRegion;
-    imageRegion.SetSize(0, m_Controls->m_SizeX->currentText().toInt());
-    imageRegion.SetSize(1, m_Controls->m_SizeY->currentText().toInt());
-    imageRegion.SetSize(2, m_Controls->m_SizeZ->currentText().toInt());
+    imageRegion.SetSize(0, m_Controls->m_SizeX->value());
+    imageRegion.SetSize(1, m_Controls->m_SizeY->value());
+    imageRegion.SetSize(2, m_Controls->m_SizeZ->value());
     mitk::Vector3D spacing;
     spacing[0] = m_Controls->m_SpacingX->value();
     spacing[1] = m_Controls->m_SpacingY->value();
@@ -455,9 +455,9 @@ void QmitkFiberfoxView::GenerateImage()
     if (m_SelectedBundle.IsNull())
     {
         mitk::Image::Pointer image = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(
-                    m_Controls->m_SizeX->currentText().toInt(),
-                    m_Controls->m_SizeY->currentText().toInt(),
-                    m_Controls->m_SizeZ->currentText().toInt(),
+                    m_Controls->m_SizeX->value(),
+                    m_Controls->m_SizeY->value(),
+                    m_Controls->m_SizeZ->value(),
                     m_Controls->m_SpacingX->value(),
                     m_Controls->m_SpacingY->value(),
                     m_Controls->m_SpacingZ->value());

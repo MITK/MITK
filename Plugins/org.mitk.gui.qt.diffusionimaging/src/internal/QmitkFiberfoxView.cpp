@@ -479,6 +479,10 @@ void QmitkFiberfoxView::GenerateImage()
     else
     {
         mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
+        imageRegion = dwi->GetVectorImage()->GetLargestPossibleRegion();
+        spacing = dwi->GetVectorImage()->GetSpacing();
+        origin = dwi->GetVectorImage()->GetOrigin();
+        directionMatrix = dwi->GetVectorImage()->GetDirection();
         bVal = dwi->GetB_Value();
         mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = dwi->GetDirectionsWithMeasurementFrame();
         for (int i=0; i<dirs->Size(); i++)
@@ -550,6 +554,8 @@ void QmitkFiberfoxView::GenerateImage()
         itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();
         filter->SetImageRegion(imageRegion);
         filter->SetSpacing(spacing);
+        filter->SetOrigin(origin);
+        filter->SetDirectionMatrix(directionMatrix);
         filter->SetFiberBundle(fiberBundle);
         modelList.push_back(&extraAxonal);
         //    modelList.push_back(&intraAxonal);
@@ -562,6 +568,7 @@ void QmitkFiberfoxView::GenerateImage()
         filter->SetVolumeAccuracy(m_Controls->m_VolumeAccuracyBox->value());
         filter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
         filter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
+
         if (m_TissueMask.IsNotNull())
         {
             ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
@@ -676,20 +683,34 @@ void QmitkFiberfoxView::JoinBundles()
 
 void QmitkFiberfoxView::UpdateGui()
 {
+    m_Controls->m_FiberBundleLabel->setText("<font color='red'>mandatory</font>");
+    m_Controls->m_GeometryFrame->setEnabled(true);
+    m_Controls->m_GeometryMessage->setVisible(false);
+    m_Controls->m_DiffusionPropsMessage->setVisible(false);
+    m_Controls->m_FiberGenMessage->setVisible(true);
+
+    m_Controls->m_TransformBundlesButton->setEnabled(false);
+    m_Controls->m_CopyBundlesButton->setEnabled(false);
+    m_Controls->m_GenerateFibersButton->setEnabled(false);
+    m_Controls->m_FlipButton->setEnabled(false);
+    m_Controls->m_CircleButton->setEnabled(false);
+    m_Controls->m_BvalueBox->setEnabled(true);
+    m_Controls->m_NumGradientsBox->setEnabled(true);
+    m_Controls->m_JoinBundlesButton->setEnabled(false);
+
     if (m_SelectedFiducial.IsNotNull())
         m_Controls->m_FlipButton->setEnabled(true);
-    else
-        m_Controls->m_FlipButton->setEnabled(false);
 
     if (m_SelectedImage.IsNotNull())
     {
         m_Controls->m_CircleButton->setEnabled(true);
         m_Controls->m_FiberGenMessage->setVisible(false);
     }
-    else if (m_SelectedBundle.IsNull())
+
+    if (m_TissueMask.IsNotNull())
     {
-        m_Controls->m_CircleButton->setEnabled(false);
-        m_Controls->m_FiberGenMessage->setVisible(true);
+        m_Controls->m_GeometryMessage->setVisible(true);
+        m_Controls->m_GeometryFrame->setEnabled(false);
     }
 
     if (m_SelectedDWI.IsNotNull())
@@ -697,12 +718,8 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_DiffusionPropsMessage->setVisible(true);
         m_Controls->m_BvalueBox->setEnabled(false);
         m_Controls->m_NumGradientsBox->setEnabled(false);
-    }
-    else
-    {
-        m_Controls->m_DiffusionPropsMessage->setVisible(false);
-        m_Controls->m_BvalueBox->setEnabled(true);
-        m_Controls->m_NumGradientsBox->setEnabled(true);
+        m_Controls->m_GeometryMessage->setVisible(true);
+        m_Controls->m_GeometryFrame->setEnabled(false);
     }
 
     if (m_SelectedBundle.IsNotNull())
@@ -711,19 +728,10 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_CopyBundlesButton->setEnabled(true);
         m_Controls->m_GenerateFibersButton->setEnabled(true);
         m_Controls->m_FiberBundleLabel->setText(m_SelectedBundle->GetName().c_str());
-    }
-    else
-    {
-        m_Controls->m_TransformBundlesButton->setEnabled(false);
-        m_Controls->m_CopyBundlesButton->setEnabled(false);
-        m_Controls->m_GenerateFibersButton->setEnabled(false);
-        m_Controls->m_FiberBundleLabel->setText("<font color='red'>mandatory</font>");
-    }
 
-    if (m_SelectedBundles.size()>1)
-        m_Controls->m_JoinBundlesButton->setEnabled(true);
-    else
-        m_Controls->m_JoinBundlesButton->setEnabled(false);
+        if (m_SelectedBundles.size()>1)
+            m_Controls->m_JoinBundlesButton->setEnabled(true);
+    }
 }
 
 void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes )
@@ -735,8 +743,6 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedImage = NULL;
     m_SelectedDWI = NULL;
     m_Controls->m_TissueMaskLabel->setText("<font color='grey'>optional</font>");
-    m_Controls->m_GeometryMessage->setVisible(false);
-    m_Controls->m_GeometryFrame->setEnabled(true);
 
     // iterate all selected objects, adjust warning visibility
     for( int i=0; i<nodes.size(); i++)
@@ -746,6 +752,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         if ( node.IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()) )
         {
             m_SelectedDWI = node;
+            m_SelectedImage = node;
         }
         else if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
@@ -756,8 +763,6 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
             {
                 m_TissueMask = dynamic_cast<mitk::Image*>(node->GetData());
                 m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
-                m_Controls->m_GeometryMessage->setVisible(true);
-                m_Controls->m_GeometryFrame->setEnabled(false);
             }
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )

@@ -133,3 +133,7 @@ void QmitkScalarBarOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
   }
 }
 
+QSize QmitkScalarBarOverlay::GetNeededSize()
+{
+  return m_Widget->size();
+}

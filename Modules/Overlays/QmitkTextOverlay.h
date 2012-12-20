@@ -84,6 +84,9 @@ See LICENSE.txt or http://www.mitk.org for details.
     */
     void GenerateData( mitk::PropertyList::Pointer );
 
+    QSize GetNeededSize();
+
+
   protected:
 
     /**

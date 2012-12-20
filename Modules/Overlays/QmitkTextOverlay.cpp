@@ -159,3 +159,11 @@ void QmitkTextOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
   }
 }
 
+QSize QmitkTextOverlay::GetNeededSize()
+{
+  QFont font = m_Label->font();
+  QFontMetrics fm(font);
+
+  return fm.size( Qt::TextSingleLine, m_Label->text() );
+}
+

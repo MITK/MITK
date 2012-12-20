@@ -61,6 +61,9 @@ See LICENSE.txt or http://www.mitk.org for details.
     */
     virtual void GenerateData( mitk::PropertyList::Pointer );
 
+    QSize GetNeededSize();
+
+
   protected:
 
     /**
@@ -76,7 +79,6 @@ See LICENSE.txt or http://www.mitk.org for details.
     void SetupCallback( mitk::BaseProperty::Pointer prop );
 
     void SetScaleFactor();
-
     /** \brief QWidget internally representing the TextOverlay */
     QmitkScalarBar* m_ScalarBar;
 

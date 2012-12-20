@@ -34,11 +34,6 @@ QmitkOverlayController::QmitkOverlayController( QmitkRenderWindow* rw, mitk::Pro
     return;
   }
 
-  qRegisterMetaType<QmitkOverlay::DisplayPosition>( "QmitkOverlay::DisplayPosition" );
-
-  connect( this, SIGNAL( InternalAdjustOverlayPosition( QmitkOverlay::DisplayPosition ) ),
-    this, SLOT( AdjustOverlayPosition( QmitkOverlay::DisplayPosition ) ), Qt::QueuedConnection );
-
   connect( rw, SIGNAL( moved() ), this, SLOT( AdjustAllOverlayPosition() ) );
 
   this->InitializeOverlayLayout();
@@ -211,6 +206,9 @@ void QmitkOverlayController::AdjustOverlayPosition( QmitkOverlay::DisplayPositio
     {
       // setting position of top-center overlay-container
       widget = m_PositionedOverlays[ QmitkOverlay::top_Center ];
+      QSize size = GetMinimumSizeForWidget( displayPosition );
+      widget->setMinimumWidth( size.width() );
+
       pos = m_RenderWindow->mapToGlobal( QPoint( m_RenderWindow->size().width()/2, 0 ) ) ;
       widget->move( pos.x() - widget->size().width()/2, pos.y() );
 
@@ -221,6 +219,9 @@ void QmitkOverlayController::AdjustOverlayPosition( QmitkOverlay::DisplayPositio
     {
       // setting position of top-right overlay-container
       widget = m_PositionedOverlays[ QmitkOverlay::top_Right ];
+      QSize size = GetMinimumSizeForWidget( displayPosition );
+      widget->setMinimumWidth( size.width() );
+
       pos = m_RenderWindow->mapToGlobal( QPoint( m_RenderWindow->size().width(), 0 ) ) ;
       widget->move( pos.x() - widget->size().width(), pos.y() );
 
@@ -231,6 +232,9 @@ void QmitkOverlayController::AdjustOverlayPosition( QmitkOverlay::DisplayPositio
     {
       // setting position of middle-left overlay-container
       widget = m_PositionedOverlays[ QmitkOverlay::middle_Left ];
+      QSize size = GetMinimumSizeForWidget( displayPosition );
+      widget->setMinimumWidth( size.width() );
+
       pos = m_RenderWindow->mapToGlobal( QPoint( 0, m_RenderWindow->size().height()/2 ) ) ;
       widget->move( pos.x(), pos.y() - widget->size().height()/2 );
 
@@ -241,6 +245,9 @@ void QmitkOverlayController::AdjustOverlayPosition( QmitkOverlay::DisplayPositio
     {
       // setting position of middle-right overlay-container
       widget = m_PositionedOverlays[ QmitkOverlay::middle_Right ];
+      QSize size = GetMinimumSizeForWidget( displayPosition );
+      widget->setMinimumWidth( size.width() );
+
       pos = m_RenderWindow->mapToGlobal( QPoint( m_RenderWindow->size().width(), m_RenderWindow->size().height()/2 ) ) ;
       widget->move( pos.x() - widget->size().width(), pos.y() - widget->size().height()/2 );
 
@@ -251,6 +258,9 @@ void QmitkOverlayController::AdjustOverlayPosition( QmitkOverlay::DisplayPositio
     {
       // setting position of bottom-left overlay-container
       widget = m_PositionedOverlays[ QmitkOverlay::bottom_Left ];
+      QSize size = GetMinimumSizeForWidget( displayPosition );
+      widget->setMinimumWidth( size.width() );
+
       pos = m_RenderWindow->mapToGlobal( QPoint( 0, m_RenderWindow->size().height() ) ) ;
       widget->move( pos.x(), pos.y() - widget->size().height() );
 
@@ -261,6 +271,9 @@ void QmitkOverlayController::AdjustOverlayPosition( QmitkOverlay::DisplayPositio
     {
       // setting position of bottom-center overlay-container
       widget = m_PositionedOverlays[ QmitkOverlay::bottom_Center ];
+      QSize size = GetMinimumSizeForWidget( displayPosition );
+      widget->setMinimumWidth( size.width() );
+
       pos = m_RenderWindow->mapToGlobal( QPoint(  m_RenderWindow->size().width()/2, m_RenderWindow->size().height() ) ) ;
       widget->move( pos.x() - widget->size().width()/2, pos.y() - widget->size().height() );
 
@@ -271,6 +284,9 @@ void QmitkOverlayController::AdjustOverlayPosition( QmitkOverlay::DisplayPositio
     {
       // setting position of bottom-right overlay-container
       widget = m_PositionedOverlays[ QmitkOverlay::bottom_Right ];
+      QSize size = GetMinimumSizeForWidget( displayPosition );
+      widget->setMinimumWidth( size.width() );
+
       pos = m_RenderWindow->mapToGlobal( QPoint(  m_RenderWindow->size().width(), m_RenderWindow->size().height() ) ) ;
       widget->move( pos.x() - widget->size().width(), pos.y() - widget->size().height() );
 
@@ -350,13 +366,23 @@ void QmitkOverlayController::UpdateOverlayData( QmitkOverlay* overlay )
   if ( overlay != NULL)
   {
     overlay->GenerateData( m_PropertyList );
+    AdjustOverlayPosition( overlay->GetPosition() );
 
-    // We trigger the re-adjusting of the overlay-positions
-    // by emitting this signal. It's a QueuedConnection,
-    // so Qt will have enough time to get the geometries right.
-    emit InternalAdjustOverlayPosition( overlay->GetPosition() );
   }
 }
+
+void QmitkOverlayController::RemoveAllOverlays()
+{
+  foreach( QmitkOverlay* overlay, m_AllOverlays )
+  {
+    overlay->GetWidget()->setParent( NULL );
+    overlay->GetWidget()->hide();
+    overlay->deleteLater();
+  }
+
+  m_AllOverlays.clear();
+}
+
 
 void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
 {
@@ -387,6 +413,7 @@ void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
 
     overlay->deleteLater();
   }
+
 }
 
 
@@ -463,6 +490,25 @@ void QmitkOverlayController::UpdateAllOverlays()
   {
     this->UpdateOverlayData( overlay );
   }
+}
+
+QSize QmitkOverlayController::GetMinimumSizeForWidget( QmitkOverlay::DisplayPosition displayPosition )
+{
+  int width = 0;
+  int height = 0;
+
+  foreach( QmitkOverlay* overlay, m_AllOverlays )
+  {
+    if ( overlay->GetPosition() == displayPosition )
+    {
+      QSize overlaySize = overlay->GetNeededSize();
+      width = std::max( width, overlaySize.width() );
+      height = std::max( height, overlaySize.height() );
+    }
+  }
+
+  QSize result( width, height );
+  return result;
 }
 
 

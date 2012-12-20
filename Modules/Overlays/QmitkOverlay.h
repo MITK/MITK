@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,11 +33,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
  This class is the basis for all classes representing objects that can be visualized as overlays in MITK.
  It encapsulates an ID, as well as a display-position and a layer.
- 
+
  The ID is used to access mitkProperties in a PropertyList that holds information that is needed for the visualization,
  e.g. text for TextOverlays or scaleFactor for ScalarBarOverlays ...
 
- The display-position encodes where on the screen the overlay will be positioned at 
+ The display-position encodes where on the screen the overlay will be positioned at
  (see and USE the constants defined by DisplayPosition):
 \verbatim
  0 - 1 - 2
@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class Overlays_EXPORT QmitkOverlay : public QObject
 {
-  Q_OBJECT 
+  Q_OBJECT
 
 public:
 
@@ -83,7 +83,7 @@ public:
 
   /** \brief setter for the display-position  */
   virtual void SetPosition( DisplayPosition );
-  
+
   /** \brief getter for the display-position  */
   virtual DisplayPosition GetPosition();
 
@@ -103,13 +103,15 @@ public:
   */
   virtual QWidget* GetWidget();
 
+  virtual QSize GetNeededSize() = 0;
+
+
 protected:
 
   /**
     \brief Add drop shadow effect via QGraphicsEffect
   */
   void AddDropShadow( QWidget* widget );
-
   /** \brief ID of the overlay */
   const char* m_Id;
 
@@ -117,7 +119,7 @@ protected:
   DisplayPosition m_Position;
 
   /** \brief layer of the overlay */
-  unsigned int m_Layer;   
+  unsigned int m_Layer;
 
   /** \brief internal QWidget representing the overlay */
   QWidget* m_Widget;

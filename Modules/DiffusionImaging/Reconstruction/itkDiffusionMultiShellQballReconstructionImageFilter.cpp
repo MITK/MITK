@@ -432,19 +432,19 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       if(m_Interpolation_Flag)
       {
-        int interp_SHOrder_shell1 = 6;
+        int interp_SHOrder_shell1 = 20;
         while( ((interp_SHOrder_shell1+1)*(interp_SHOrder_shell1+2)/2) > size_shell1 && interp_SHOrder_shell1 > L )
           interp_SHOrder_shell1 -= 2 ;
 
         const int number_coeffs_shell1 = (int)(interp_SHOrder_shell1*interp_SHOrder_shell1 + interp_SHOrder_shell1 + 2.0)/2.0 + interp_SHOrder_shell1;
 
-        int interp_SHOrder_shell2 = 6;
+        int interp_SHOrder_shell2 = 20;
         while( ((interp_SHOrder_shell2+1)*(interp_SHOrder_shell2+2)/2) > size_shell2 && interp_SHOrder_shell2 > L )
           interp_SHOrder_shell2 -= 2 ;
 
         const int number_coeffs_shell2 = (int)(interp_SHOrder_shell2*interp_SHOrder_shell2 + interp_SHOrder_shell2 + 2.0)/2.0 + interp_SHOrder_shell2;
 
-        int interp_SHOrder_shell3 = 6;
+        int interp_SHOrder_shell3 = 20;
         while( ((interp_SHOrder_shell3+1)*(interp_SHOrder_shell3+2)/2) > size_shell3 && interp_SHOrder_shell3 > L )
           interp_SHOrder_shell3 -= 2 ;
 
@@ -452,9 +452,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 
         MITK_INFO << "Debug Information: Multishell Reconstruction filter - Interpolation";
-        MITK_INFO << "Shell 1 - SHOrder: " << interp_SHOrder_shell1 << " Number of Coeffs: " << number_coeffs_shell1;
-        MITK_INFO << "Shell 2 - SHOrder: " << interp_SHOrder_shell2 << " Number of Coeffs: " << number_coeffs_shell2;
-        MITK_INFO << "Shell 3 - SHOrder: " << interp_SHOrder_shell3 << " Number of Coeffs: " << number_coeffs_shell3;
+        MITK_INFO << "Shell 1 - SHOrder: " << interp_SHOrder_shell1 << " Number of Coeffs: " << number_coeffs_shell1 << " Number of Gradientdirections: " << size_shell1;
+        MITK_INFO << "Shell 2 - SHOrder: " << interp_SHOrder_shell2 << " Number of Coeffs: " << number_coeffs_shell2 << " Number of Gradientdirections: " << size_shell2;
+        MITK_INFO << "Shell 3 - SHOrder: " << interp_SHOrder_shell3 << " Number of Coeffs: " << number_coeffs_shell3 << " Number of Gradientdirections: " << size_shell3;
+        MITK_INFO << "Overall - SHOrder: " << L                     << " Number of Coeffs: " << (L+1)*(L+2)*0.5      << " Number of Gradientdirections: " << size_shell1+size_shell2+size_shell3;
 
         // Create direction container for all directions (no duplicates, different directions from all shells)
         IndiciesVector  all_directions_container = GetAllDirections();

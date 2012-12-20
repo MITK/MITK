@@ -522,6 +522,7 @@ void QmitkFiberfoxView::GenerateImage()
     mitk::BallModel<double> freeDiffusion;
     freeDiffusion.SetGradientList(gradientList);
     freeDiffusion.SetBvalue(bVal);
+    freeDiffusion.SetDiffusivity(m_Controls->m_BallD->value());
     freeDiffusion.SetSignalScale(m_Controls->m_NonFiberS0Box->value());
     freeDiffusion.SetRelaxationT2(m_Controls->m_NonFiberRelaxationT2Box->value());
     itk::TractsToDWIImageFilter::DiffusionModelList modelList;

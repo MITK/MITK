@@ -29,7 +29,7 @@ If not self-explanatory please refer to TODO.
 Fiberfox uses a ball-zeppelin model to generate the artificial signal. For details about the signal generation process please refer to TODO.
 A diffusion weighted image is generated from the fibers by selecting the according fiber bundle in the datamanager and clicking "Generate Image". Additionally to the fiber bundle a binary mask can be specified that defines the tissue area. Voxels outside of this mask will contain no signal, only noise. If no tissue mask is selected, the whole image volume is regarded as tissue. Fiberfox allows the addition of artifcats often present in EPI based diffusion weighted datasets like rician noise, Gibbs ringing and blurring introduced by the T2 signal decay.
 
-Image Settings:
+Image and Compartment Settings:
 \li Enforce Pure Fiber Voxels: Disable partial voluming. All voxels touched by at least one fiber are treated as pure fiber voxles.
 \li Output k-Space Image: Output an image of the fourier transformed baseline signal.
 \li Image Dimensions: The number of voxels in each image dimension.
@@ -37,10 +37,10 @@ Image Settings:
 \li #Gradient Directions: The number of gradient directions distributed over the half-sphere.
 \li b-value: The b-value (in mm/s²) used for the diffusion signal generation.
 \li Repetitions: Number of averaged repetitions. Used to suppress noise in real acquisitions.
-\li Kernel FA: Fractional anisotropy of the zeppelin compartment.
-\li Fiber S0: Scaling factor for the fiber tissue signal.
-\li Non-fiber S0: Scaling factor for the non-fiber tissue signal.
 \li Volume Accuracy: The higher the value, the more accurate the volume fraction estimation for the compartments. Corresponds to the number of sampling points on a fiber over a distance of the minimum spacing value.
+\li Fractional anisotropy: Determins anisotropy of the zeppelin compartment.
+\li Diffusivity: Diffusivity parameter of the ball compartment.
+\li Signal Scale: Scaling factor for the raw signal.
 
 Noise and Artifacts:
 \li SNR: The signal-to-noise ratio relative to the fiber signal sacling factor. A rician noise model is used. If the SNR is larger than 99, no noise is added to the image.

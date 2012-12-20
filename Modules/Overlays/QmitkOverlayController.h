@@ -79,6 +79,9 @@ public:
 
   void RemoveOverlay( QmitkOverlay* );
 
+  void RemoveAllOverlays();
+
+
   /**
   * \brief setting the visibility of all overlays
   */
@@ -133,7 +136,7 @@ protected:
   void InitializeWidget( QmitkOverlay::DisplayPosition pos );
 
   void RestackOverlays( QmitkOverlay::DisplayPosition pos );
-
+  QSize GetMinimumSizeForWidget( QmitkOverlay::DisplayPosition displayPosition );
 
   typedef std::map< QmitkOverlay::DisplayPosition, QWidget* > OverlayPositionMap;
   typedef std::vector< QmitkOverlay* > OverlayVector;

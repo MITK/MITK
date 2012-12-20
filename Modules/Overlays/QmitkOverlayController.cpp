@@ -34,11 +34,6 @@ QmitkOverlayController::QmitkOverlayController( QmitkRenderWindow* rw, mitk::Pro
     return;
   }
 
-  qRegisterMetaType<QmitkOverlay::DisplayPosition>( "QmitkOverlay::DisplayPosition" );
-
-  connect( this, SIGNAL( InternalAdjustOverlayPosition( QmitkOverlay::DisplayPosition ) ),
-    this, SLOT( AdjustOverlayPosition( QmitkOverlay::DisplayPosition ) ), Qt::QueuedConnection );
-
   connect( rw, SIGNAL( moved() ), this, SLOT( AdjustAllOverlayPosition() ) );
 
   this->InitializeOverlayLayout();
@@ -350,11 +345,8 @@ void QmitkOverlayController::UpdateOverlayData( QmitkOverlay* overlay )
   if ( overlay != NULL)
   {
     overlay->GenerateData( m_PropertyList );
+    AdjustOverlayPosition( overlay->GetPosition() );
 
-    // We trigger the re-adjusting of the overlay-positions
-    // by emitting this signal. It's a QueuedConnection,
-    // so Qt will have enough time to get the geometries right.
-    emit InternalAdjustOverlayPosition( overlay->GetPosition() );
   }
 }
 

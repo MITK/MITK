@@ -110,11 +110,6 @@ public slots :
 
     void UpdateOverlayData( QmitkOverlay* overlay );
 
-signals:
-
-    void InternalAdjustOverlayPosition( QmitkOverlay::DisplayPosition );
-
-
 protected:
 
   /**

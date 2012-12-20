@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ConnectomicsRenderingProperties_H_HEADER_INCLUDED
 
 #include <string.h>
-#include "mitkproperties.h"
+#include "mitkProperties.h"
 #include "mitkStringProperty.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkColorProperty.h"

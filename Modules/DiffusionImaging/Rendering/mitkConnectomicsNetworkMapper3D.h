@@ -92,10 +92,39 @@ namespace mitk {
 
     vtkPropAssembly *m_NetworkAssembly;
 
+    /**
+    * \brief Returns true if the properties have changed since the last data generation
+    */
+    bool PropertiesChanged();
 
+    // Create vectors for customizing color and radius and return maximum
+    double FillNodeParameterVector( std::vector< double > * parameterVector, std::string parameterName );
+    double FillEdgeParameterVector( std::vector< double > * parameterVector, std::string parameterName );
 
+    void FillNodeFilterBoolVector( std::vector< bool > * boolVector, std::string parameterName );
+    void FillEdgeFilterBoolVector( std::vector< bool > * boolVector, std::string parameterName );
 
-
+    // Property storing members
+    std::string m_ChosenRenderingScheme;
+    std::string m_ChosenEdgeFilter;
+    std::string m_EdgeThresholdParameter;
+    double m_EdgeThreshold;
+    std::string m_ChosenNodeFilter;
+    std::string m_NodeThresholdParameter;
+    double m_NodeThreshold;
+    mitk::Color m_NodeColorStart;
+    mitk::Color m_NodeColorEnd;
+    double m_NodeRadiusStart;
+    double m_NodeRadiusEnd;
+    std::string m_ChosenNodeLabel;
+    mitk::Color m_EdgeColorStart;
+    mitk::Color m_EdgeColorEnd;
+    double m_EdgeRadiusStart;
+    double m_EdgeRadiusEnd;
+    std::string m_NodeRadiusParameter;
+    std::string m_NodeColorParameter;
+    std::string m_EdgeRadiusParameter;
+    std::string m_EdgeColorParameter;
   };
 
 } // namespace mitk

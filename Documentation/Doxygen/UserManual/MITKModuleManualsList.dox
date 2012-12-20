@@ -14,5 +14,6 @@ The modules are shared libraries that provide functionality that can be used by 
 
   \li \ref PlanarPropertiesPage
   \li \subpage DiffusionImagingPropertiesPage
+  \li \subpage ConnectomicsRenderingPropertiesPage
 
 */

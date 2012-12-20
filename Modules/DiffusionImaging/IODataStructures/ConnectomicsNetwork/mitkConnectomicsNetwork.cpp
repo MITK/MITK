@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsNetwork.h"
 #include <boost/graph/clustering_coefficient.hpp>
+#include <boost/graph/betweenness_centrality.hpp>
 
 /* Constructor and Destructor */
 mitk::ConnectomicsNetwork::ConnectomicsNetwork()
@@ -204,7 +205,7 @@ int mitk::ConnectomicsNetwork::GetNumberOfVertices() const
   return boost::num_vertices( m_Network );
 }
 
-int mitk::ConnectomicsNetwork::GetNumberOfEdges()
+int mitk::ConnectomicsNetwork::GetNumberOfEdges() const
 {
   return boost::num_edges( m_Network );
 }
@@ -339,7 +340,7 @@ int mitk::ConnectomicsNetwork::GetMaximumDegree() const
   return maximumDegree;
 }
 
-std::vector< double > mitk::ConnectomicsNetwork::GetLocalClusteringCoefficients( )
+std::vector< double > mitk::ConnectomicsNetwork::GetLocalClusteringCoefficients( ) const
 {
   std::vector< double > vectorOfClusteringCoefficients;
 
@@ -584,4 +585,105 @@ void mitk::ConnectomicsNetwork::PruneEdgesBelowWeight( int targetWeight )
   // this will remove any nodes which, after deleting edges are now
   // unconnected, also this calls UpdateIDs()
   PruneUnconnectedSingleNodes();
+}
+
+std::vector< double > mitk::ConnectomicsNetwork::GetNodeBetweennessVector() const
+{
+  std::vector< double > betweennessVector;
+
+  betweennessVector.clear();
+  betweennessVector.resize( this->GetNumberOfVertices() );
+
+  boost::brandes_betweenness_centrality(
+    m_Network,
+    boost::centrality_map(
+    boost::make_iterator_property_map( betweennessVector.begin(), boost::get( &NetworkNode::id, m_Network ), double() )
+    ).vertex_index_map( boost::get( &NetworkNode::id, m_Network ) )
+    );
+
+  return betweennessVector;
+}
+
+std::vector< double > mitk::ConnectomicsNetwork::GetEdgeBetweennessVector() const
+{
+  // std::map used for convenient initialization
+  typedef std::map<EdgeDescriptorType, int> EdgeIndexStdMap;
+  EdgeIndexStdMap stdEdgeIndex;
+  // associative property map needed for iterator property map-wrapper
+  typedef boost::associative_property_map< EdgeIndexStdMap > EdgeIndexMap;
+  EdgeIndexMap edgeIndex(stdEdgeIndex);
+
+  boost::graph_traits<NetworkType>::edge_iterator iterator, end;
+
+  // sets iterator to start end end to end
+  boost::tie(iterator, end) = boost::edges( m_Network );
+
+  int i(0);
+  for ( ; iterator != end; ++iterator, ++i)
+  {
+    stdEdgeIndex.insert(std::pair< EdgeDescriptorType, int >( *iterator, i));
+  }
+
+  // Define EdgeCentralityMap
+  std::vector< double > edgeBetweennessVector(boost::num_edges( m_Network ), 0.0);
+  // Create the external property map
+  boost::iterator_property_map< std::vector< double >::iterator, EdgeIndexMap >
+    e_centrality_map(edgeBetweennessVector.begin(), edgeIndex);
+
+  // Define VertexCentralityMap
+  typedef boost::property_map< NetworkType, boost::vertex_index_t>::type VertexIndexMap;
+  VertexIndexMap vertexIndex = get(boost::vertex_index, m_Network );
+  std::vector< double > betweennessVector(boost::num_vertices( m_Network ), 0.0);
+  // Create the external property map
+  boost::iterator_property_map< std::vector< double >::iterator, VertexIndexMap >
+    v_centrality_map(betweennessVector.begin(), vertexIndex);
+
+  boost::brandes_betweenness_centrality( m_Network, v_centrality_map, e_centrality_map );
+
+  return edgeBetweennessVector;
+}
+
+std::vector< double > mitk::ConnectomicsNetwork::GetShortestDistanceVectorFromLabel( std::string targetLabel ) const
+{
+  std::vector< VertexDescriptorType > predecessorMap( boost::num_vertices( m_Network ) );
+  int numberOfNodes( boost::num_vertices( m_Network ) );
+
+  std::vector< double > distanceMatrix;
+  distanceMatrix.resize( numberOfNodes );
+
+  boost::graph_traits<NetworkType>::vertex_iterator iterator, end;
+  boost::tie(iterator, end) = boost::vertices( m_Network );
+
+  while( (iterator != end) && (m_Network[ *iterator ].label != targetLabel) )
+  {
+    ++iterator;
+  }
+
+  if( iterator == end )
+  {
+    MITK_WARN << "Label not found";
+    return distanceMatrix;
+  }
+
+  boost::dijkstra_shortest_paths(m_Network, *iterator, boost::predecessor_map(&predecessorMap[ 0 ]).distance_map(&distanceMatrix[ 0 ]).weight_map( boost::get( &NetworkEdge::edge_weight ,m_Network ) ) ) ;
+
+  return distanceMatrix;
+}
+
+bool mitk::ConnectomicsNetwork::CheckForLabel( std::string targetLabel ) const
+{
+  boost::graph_traits<NetworkType>::vertex_iterator iterator, end;
+  boost::tie(iterator, end) = boost::vertices( m_Network );
+
+  while( (iterator != end) && (m_Network[ *iterator ].label != targetLabel) )
+  {
+    ++iterator;
+  }
+
+  if( iterator == end )
+  {
+    return false;
+  }
+
+  return true;
 }

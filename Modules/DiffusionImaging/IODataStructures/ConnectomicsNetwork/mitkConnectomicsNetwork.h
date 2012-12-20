@@ -135,7 +135,7 @@ namespace mitk {
     int GetNumberOfVertices() const;
 
     /** get overall number of edges in the network */
-    int GetNumberOfEdges();
+    int GetNumberOfEdges() const;
 
     /** get number of vertices, that are connected to themselves */
     int GetNumberOfSelfLoops();
@@ -156,13 +156,25 @@ namespace mitk {
     int GetMaximumDegree() const;
 
     /** Get a vector in the format vector[ vertexID ] = clustering coefficient */
-    std::vector< double > GetLocalClusteringCoefficients( );
+    std::vector< double > GetLocalClusteringCoefficients( ) const;
 
     /** Get a vector in the format vector[ degree ] = average clustering coefficient */
     std::vector< double > GetClusteringCoefficientsByDegree( );
 
     /** Get the global clustering coefficient */
     double GetGlobalClusteringCoefficient( );
+
+    /** Get the betweenness centrality for each vertex in form of a vector of length (number vertices)*/
+    std::vector< double > GetNodeBetweennessVector() const;
+
+    /** Get the betweenness centrality for each edge in form of a vector of length (number edges)*/
+    std::vector< double > GetEdgeBetweennessVector() const;
+
+    /** Check whether a vertex with the specified label exists*/
+    bool CheckForLabel( std::string targetLabel ) const;
+
+    /** Get the shortest distance from a specified vertex to all other vertices in form of a vector of length (number vertices)*/
+    std::vector< double > GetShortestDistanceVectorFromLabel( std::string targetLabel ) const;
 
     /** Access boost graph directly */
     NetworkType* GetBoostGraph();

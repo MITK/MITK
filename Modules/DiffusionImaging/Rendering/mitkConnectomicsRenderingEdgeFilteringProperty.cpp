@@ -59,7 +59,7 @@ mitk::ConnectomicsRenderingEdgeFilteringProperty::ConnectomicsRenderingEdgeFilte
 void mitk::ConnectomicsRenderingEdgeFilteringProperty::AddRenderingFilter()
 {
   AddEnum( connectomicsRenderingEdgeNoFilter, NO_FILTER );
-  AddEnum( connectomicsRenderingEdgeShortestPathFilter, SHORTEST_PATH_FILTER );
+  //AddEnum( connectomicsRenderingEdgeShortestPathFilter, SHORTEST_PATH_FILTER );
   AddEnum( connectomicsRenderingEdgeThresholdFilter, THRESHOLDING_FILTER );
 }
 

@@ -80,3 +80,4 @@ void QmitkOverlay::AddDropShadow( QWidget* widget )
 
 
 
+

@@ -38,4 +38,7 @@ void QmitkCustomWidgetOverlay::SetWidget( QWidget* widget )
 }
 
 
-
+QSize QmitkCustomWidgetOverlay::GetNeededSize()
+{
+  return m_Widget->size();
+}

@@ -532,17 +532,22 @@ public:
                                            bool sort = true,
                                            bool load4D = true,
                                            bool correctGantryTilt = true,
-                                           UpdateCallBackMethod callback = 0);
+                                           UpdateCallBackMethod callback = 0,
+                                           Image::Pointer preLoadedImageBlock = 0);
 
   /**
     \brief See LoadDicomSeries! Just a slightly different interface.
+
+    If \p preLoadedImageBlock is provided, the reader will only "fake" loading and create appropriate
+    mitk::Properties.
   */
   static bool LoadDicomSeries(const StringContainer &filenames,
                               DataNode &node,
                               bool sort = true,
                               bool load4D = true,
                               bool correctGantryTilt = true,
-                              UpdateCallBackMethod callback = 0);
+                              UpdateCallBackMethod callback = 0,
+                              Image::Pointer preLoadedImageBlock = 0);
 
 protected:
 
@@ -869,7 +874,7 @@ protected:
   template <typename PixelType>
   static
   void
-  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback);
+  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock);
 
   /**
     \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
@@ -879,7 +884,7 @@ protected:
   template <typename PixelType>
   static
   Image::Pointer
-  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command = NULL);
+  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command = NULL, Image::Pointer preLoadedImageBlock = NULL);
 
   /**
     \brief Sort files into time step blocks of a 3D+t image.

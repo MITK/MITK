@@ -32,7 +32,7 @@ namespace mitk
 {
 
 template <typename PixelType>
-void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback)
+void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
 {
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
@@ -53,7 +53,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
   try
   {
-    mitk::Image::Pointer image = mitk::Image::New();
+    Image::Pointer image = preLoadedImageBlock.IsNull() ? Image::New() : preLoadedImageBlock;
     CallbackCommand *command = callback ? new CallbackCommand(callback) : 0;
     bool initialize_node = false;
 
@@ -61,6 +61,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     if ( DicomSeriesReader::IsPhilips3DDicom(filenames.front().c_str())  )
     {
       // TODO what about imageBlockDescriptor?
+      // TODO what about preLoadedImageBlock?
       ReadPhilips3DDicom(filenames.front().c_str(), image);
       initialize_node = true;
     }
@@ -122,7 +123,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       {
 
         DcmIoType::Pointer io;
-        image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, io, command ); // load first 3D block
+        image = LoadDICOMByITK<PixelType>( imageBlocks.front(), correctTilt, tiltInfo, io, command, preLoadedImageBlock ); // load first 3D block
 
         imageBlockDescriptor.AddFiles(imageBlocks.front()); // only the first part is loaded
         imageBlockDescriptor.SetHasMultipleTimePoints( false );
@@ -153,45 +154,59 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
         unsigned int act_volume = 1u;
 
-        reader->SetFileNames(imageBlocks.front());
-        reader->Update();
-
-        typename ImageType::Pointer readVolume = reader->GetOutput();
-        // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
-        if (correctTilt)
+        if (preLoadedImageBlock.IsNull())
         {
-          readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
-        }
+          reader->SetFileNames(imageBlocks.front());
 
-        gdcm::Scanner scanner;
-        ScanForSliceInformation(filenames, scanner);
-
-        image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
-        image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
-        FixSpacingInformation( image, imageBlockDescriptor );
-        CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, imageBlockDescriptor, image);
-
-        MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
-                                            << image->GetDimension(1) << ", "
-                                            << image->GetDimension(2) << ", "
-                                            << image->GetDimension(3) << "]";
-
-        MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
-                                          << image->GetGeometry()->GetSpacing()[1] << ", "
-                                          << image->GetGeometry()->GetSpacing()[2] << "]";
-
-        for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
-        {
-          reader->SetFileNames(*df_it);
           reader->Update();
-          readVolume = reader->GetOutput();
 
+          typename ImageType::Pointer readVolume = reader->GetOutput();
+          // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
           if (correctTilt)
           {
             readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
           }
 
-          image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
+          image->InitializeByItk( readVolume.GetPointer(), 1, volume_count);
+          image->SetImportVolume( readVolume->GetBufferPointer(), 0u);
+
+          FixSpacingInformation( image, imageBlockDescriptor );
+        }
+        else
+        {
+          StringContainer fakeList;
+          fakeList.push_back( imageBlocks.front().front() );
+          reader->SetFileNames(fakeList); // only ONE first filename to get MetaDataDictionary
+        }
+
+        gdcm::Scanner scanner;
+        ScanForSliceInformation(filenames, scanner);
+        CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, imageBlockDescriptor, image);
+
+        MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
+          << image->GetDimension(1) << ", "
+          << image->GetDimension(2) << ", "
+          << image->GetDimension(3) << "]";
+
+        MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
+          << image->GetGeometry()->GetSpacing()[1] << ", "
+          << image->GetGeometry()->GetSpacing()[2] << "]";
+
+        if ( preLoadedImageBlock.IsNull() )
+        {
+          for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
+          {
+            reader->SetFileNames(*df_it);
+            reader->Update();
+            typename ImageType::Pointer readVolume = reader->GetOutput();
+
+            if (correctTilt)
+            {
+              readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+            }
+
+            image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
+          }
         }
 
         initialize_node = true;
@@ -232,7 +247,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 }
 
 template <typename PixelType>
-Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command )
+Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock )
 {
   /******** Normal Case, 3D (also for GDCM < 2 usable) ***************/
   mitk::Image::Pointer image = mitk::Image::New();
@@ -251,18 +266,29 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
     reader->AddObserver(itk::ProgressEvent(), command);
   }
 
-  reader->SetFileNames(filenames);
-  reader->Update();
-  typename ImageType::Pointer readVolume = reader->GetOutput();
-
-  // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
-  if (correctTilt)
+  if (preLoadedImageBlock.IsNull())
   {
-    readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
-  }
+    reader->SetFileNames(filenames);
+    reader->Update();
+    typename ImageType::Pointer readVolume = reader->GetOutput();
 
-  image->InitializeByItk(readVolume.GetPointer());
-  image->SetImportVolume(readVolume->GetBufferPointer());
+    // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
+    if (correctTilt)
+    {
+      readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+    }
+
+    image->InitializeByItk(readVolume.GetPointer());
+    image->SetImportVolume(readVolume->GetBufferPointer());
+  }
+  else
+  {
+    image = preLoadedImageBlock;
+    StringContainer fakeList;
+    fakeList.push_back( filenames.front() );
+    reader->SetFileNames( fakeList ); // we always need to load at least one file to get the MetaDataDictionary
+    reader->Update();
+  }
 
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
                                       << image->GetDimension(1) << ", "

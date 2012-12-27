@@ -87,9 +87,13 @@ protected:
   QmitkDirectoryListWidget *m_ModulesDirectories;
   QmitkFileListWidget      *m_ModulesFiles;
   QCheckBox                *m_LoadFromHomeDir;
+  QCheckBox                *m_LoadFromHomeDirCliModules;
   QCheckBox                *m_LoadFromCurrentDir;
+  QCheckBox                *m_LoadFromCurrentDirCliModules;
   QCheckBox                *m_LoadFromApplicationDir;
+  QCheckBox                *m_LoadFromApplicationDirCliModules;
   QCheckBox                *m_LoadFromAutoLoadPathDir;
+
   QComboBox                *m_ValidationMode;
   QSpinBox                 *m_MaximumNumberProcesses;
 

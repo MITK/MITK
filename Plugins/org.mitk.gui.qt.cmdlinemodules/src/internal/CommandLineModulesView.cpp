@@ -211,21 +211,27 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   m_DirectoryWatcher->setDebug(m_DebugOutput);
 
   bool loadApplicationDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, false);
+  bool loadApplicationDirCliModules = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR_CLI_MODULES, true);
   bool loadHomeDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR, false);
+  bool loadHomeDirCliModules = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR_CLI_MODULES, false);
   bool loadCurrentDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR, false);
+  bool loadCurrentDirCliModules = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES, false);
   bool loadAutoLoadDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, false);
 
   // Get some default application paths.
 
   // Here we can use the preferences to set up the builder,
   ctkCmdLineModuleDefaultPathBuilder builder;
-  builder.setLoadFromApplicationDir(loadApplicationDir);
-  builder.setLoadFromHomeDir(loadHomeDir);
-  builder.setLoadFromCurrentDir(loadCurrentDir);
-  builder.setLoadFromCtkModuleLoadPath(loadAutoLoadDir);
+  if (loadApplicationDir)           builder.addApplicationDir();
+  if (loadApplicationDirCliModules) builder.addApplicationDir("cli-modules");
+  if (loadHomeDir)                  builder.addHomeDir();
+  if (loadHomeDirCliModules)        builder.addHomeDir("cli-modules");
+  if (loadCurrentDir)               builder.addCurrentDir();
+  if (loadCurrentDirCliModules)     builder.addCurrentDir("cli-modules");
+  if (loadAutoLoadDir)              builder.addCtkModuleLoadPath();
 
   // and then we ask the builder to set up the paths.
-  QStringList defaultPaths = builder.build();
+  QStringList defaultPaths = builder.getDirectoryList();
 
   // We get additional directory paths from preferences.
   QString pathString = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));

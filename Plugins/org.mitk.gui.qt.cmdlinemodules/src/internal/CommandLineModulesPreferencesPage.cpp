@@ -39,8 +39,11 @@ CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 , m_ModulesDirectories(0)
 , m_ModulesFiles(0)
 , m_LoadFromHomeDir(0)
+, m_LoadFromHomeDirCliModules(0)
 , m_LoadFromCurrentDir(0)
+, m_LoadFromCurrentDirCliModules(0)
 , m_LoadFromApplicationDir(0)
+, m_LoadFromApplicationDirCliModules(0)
 , m_LoadFromAutoLoadPathDir(0)
 , m_ValidationMode(0)
 , m_MaximumNumberProcesses(0)
@@ -87,11 +90,16 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_ModulesFiles->m_Label->setText("Select additional executables:");
   m_DebugOutput = new QCheckBox(m_MainControl);
 
-  m_LoadFromApplicationDir = new QCheckBox(m_MainControl);
   m_LoadFromAutoLoadPathDir = new QCheckBox(m_MainControl);
+  m_LoadFromApplicationDir = new QCheckBox(m_MainControl);
+  m_LoadFromApplicationDirCliModules = new QCheckBox(m_MainControl);
   m_LoadFromHomeDir = new QCheckBox(m_MainControl);
+  m_LoadFromHomeDirCliModules = new QCheckBox(m_MainControl);
   m_LoadFromCurrentDir = new QCheckBox(m_MainControl);
+  m_LoadFromCurrentDirCliModules = new QCheckBox(m_MainControl);
+
   m_ValidationMode = new QComboBox(m_MainControl);
+
   m_ValidationMode->addItem("strict", ctkCmdLineModuleManager::STRICT_VALIDATION);
   m_ValidationMode->addItem("none", ctkCmdLineModuleManager::SKIP_VALIDATION);
   m_ValidationMode->addItem("weak", ctkCmdLineModuleManager::WEAK_VALIDATION);
@@ -105,8 +113,11 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   formLayout->addRow("XML validation mode:", m_ValidationMode);
   formLayout->addRow("max. concurrent processes:", m_MaximumNumberProcesses);
   formLayout->addRow("scan home directory:", m_LoadFromHomeDir);
+  formLayout->addRow("scan home directory/cli-modules:", m_LoadFromHomeDirCliModules);
   formLayout->addRow("scan current directory:", m_LoadFromCurrentDir);
+  formLayout->addRow("scan current directory/cli-modules:", m_LoadFromCurrentDirCliModules);
   formLayout->addRow("scan installation directory:", m_LoadFromApplicationDir);
+  formLayout->addRow("scan installation directory/cli-modules:", m_LoadFromApplicationDirCliModules);
   formLayout->addRow("scan CTK_MODULE_LOAD_PATH:", m_LoadFromAutoLoadPathDir);
   formLayout->addRow("additional module directories:", m_ModulesDirectories);
   formLayout->addRow("additional modules:", m_ModulesFiles);
@@ -145,8 +156,11 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, m_OutputDirectory->directory().toStdString());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, m_DebugOutput->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, m_LoadFromApplicationDir->isChecked());
+  m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR_CLI_MODULES, m_LoadFromApplicationDirCliModules->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR, m_LoadFromHomeDir->isChecked());
+  m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR_CLI_MODULES, m_LoadFromHomeDirCliModules->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR, m_LoadFromCurrentDir->isChecked());
+  m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES, m_LoadFromCurrentDirCliModules->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, m_LoadFromAutoLoadPathDir->isChecked());
 
   std::string paths = this->ConvertToStdString(m_ModulesDirectories->directories());
@@ -186,8 +200,11 @@ void CommandLineModulesPreferencesPage::Update()
 
   m_DebugOutput->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false));
   m_LoadFromApplicationDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, false));
+  m_LoadFromApplicationDirCliModules->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR_CLI_MODULES, true));
   m_LoadFromHomeDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR, false));
+  m_LoadFromHomeDirCliModules->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR_CLI_MODULES, false));
   m_LoadFromCurrentDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR, false));
+  m_LoadFromCurrentDirCliModules->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES, false));
   m_LoadFromAutoLoadPathDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, false));
 
   QString paths = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));
